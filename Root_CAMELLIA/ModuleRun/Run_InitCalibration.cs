@@ -21,7 +21,6 @@ namespace Root_CAMELLIA.Module
         bool m_useCalWafer = true;
         bool m_useRefWafer = true;
         bool m_InitialCal = true;
-        
 
         (Met.SettingData, Met.Nanoview.ERRORCODE_NANOVIEW) m_SettingDataWithErrorCode;
         public Run_InitCalibration(Module_Camellia module)

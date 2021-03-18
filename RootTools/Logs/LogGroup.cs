@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Text;
@@ -39,30 +40,38 @@ namespace RootTools
 
         void LogSave()
         {
-            string sPath = LogView._logView.p_sPath; 
-            string sDate = m_qLog.Peek().m_sDate;
-            sPath += "\\" + sDate;
-            Directory.CreateDirectory(sPath);
-            using (StreamWriter writer = new StreamWriter(sPath + "\\" + sDate + "_" + p_id + ".txt", true, Encoding.Default))
+            string sPath = LogView._logView.p_sPath;
+            try
             {
-                while (m_qLog.Count > 0)
+                string sDate = m_qLog.Peek().m_sDate;
+                sPath += "\\" + sDate;
+                Directory.CreateDirectory(sPath);
+                using (StreamWriter writer = new StreamWriter(sPath + "\\" + sDate + "_" + p_id + ".txt", true, Encoding.Default))
                 {
-                    Log.Data data = m_qLog.Peek();
-                    if(data!= null)
+                    while (m_qLog.Count > 0)
                     {
-                        if (data.m_sDate != sDate) return;
-                        m_qLog.Dequeue();
-                        writer.WriteLine(data.p_sLog);
-                        p_aLog.Add(data);
-                        while (p_aLog.Count > c_lLog) p_aLog.RemoveAt(0);
+                        Log.Data data = m_qLog.Peek();
+                        if (data != null)
+                        {
+                            if (data.m_sDate != sDate) return;
+                            m_qLog.Dequeue();
+                            writer.WriteLine(data.p_sLog);
+                            p_aLog.Add(data);
+                            while (p_aLog.Count > c_lLog) p_aLog.RemoveAt(0);
+                        }
+                        else
+                        {
+                            m_qLog.Dequeue();
+                        }
+
                     }
-                    else
-                    {
-                        m_qLog.Dequeue();
-                    }
-                    
                 }
             }
+            catch(Exception)
+            {
+
+            }
+            
         }
 
         public ObservableCollection<Log.Data> p_aLog { get; set; }

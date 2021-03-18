@@ -126,7 +126,7 @@ namespace Root_CAMELLIA
                     {
                         if (child.IsWaferExist(0) == true)
                         {
-                            //child.SetAlarm();
+                            child.SetAlarm();
                             return false;
                         }
                     }
