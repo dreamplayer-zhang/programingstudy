@@ -227,7 +227,10 @@ namespace RootTools.Module
                     p_bEnableHome = false;
                     p_sRun = "Stop";
                     string sStateHome = StateHome();
-                    if (sStateHome == "OK") p_eState = eState.Ready;
+                    if (sStateHome == "OK")
+                    {
+                        if (p_eRemote != eRemote.Client) p_eState = eState.Ready;
+                    }
                     else StopHome();
                     break;
                 case eState.Ready:

@@ -1,6 +1,7 @@
 ﻿using RootTools;
 using RootTools.Module;
 using RootTools.Trees;
+using System.ComponentModel;
 using System.Threading;
 
 namespace Root_VEGA_P_Vision.Module
@@ -155,7 +156,10 @@ namespace Root_VEGA_P_Vision.Module
             if (EQ.p_bSimulate) return "OK";
             if (p_eRemote == eRemote.Client)
             {
-                return RemoteRun(eRemoteRun.StateHome, null, false);
+                InitBackgroundWorker();
+                if (m_bgwClientHome.IsBusy) return "OK";
+                m_bgwClientHome.RunWorkerAsync();
+                return "OK"; 
             }
             else
             {
@@ -164,6 +168,20 @@ namespace Root_VEGA_P_Vision.Module
                 p_eState = (p_sInfo == "OK") ? eState.Ready : eState.Error;
                 return "OK";
             }
+        }
+
+        BackgroundWorker m_bgwClientHome = null;
+        void InitBackgroundWorker()
+        {
+            if (m_bgwClientHome != null) return;
+            m_bgwClientHome = new BackgroundWorker();
+            m_bgwClientHome.DoWork += M_bgwClientHome_DoWork;
+        }
+
+        private void M_bgwClientHome_DoWork(object sender, DoWorkEventArgs e)
+        {
+            string sRun = RemoteRun(eRemoteRun.StateHome, null, false);
+            p_eState = (sRun == "OK") ? eState.Ready : eState.Init; 
         }
         #endregion
 
