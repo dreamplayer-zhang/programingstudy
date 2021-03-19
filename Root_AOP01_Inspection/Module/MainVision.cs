@@ -882,7 +882,7 @@ namespace Root_AOP01_Inspection.Module
             cptCenter.X = (int)(ptMaxRelative.X) + (int)(nWidthDiff / 2);
             cptCenter.Y = (int)(ptMaxRelative.Y) + (int)(nHeightDiff / 2);
 
-            return true;
+            return bFoundTemplate;
         }
 
         Image<Gray, byte> FloodFill(Image<Gray, byte> imgSrc, System.Drawing.Point ptSeed, int nPaintValue, out CRect crtBoundingBox, Connectivity connect)
@@ -3611,8 +3611,12 @@ namespace Root_AOP01_Inspection.Module
             struct structTemplate
             {
                 public Image<Gray, byte> img;
+                public double dSobelScore;
                 public int nMemoryX;
                 public int nMemoryY;
+                public bool bRTFound;
+                public bool bRBFound;
+                public bool bLBFound;
             }
 
             public override string Run()
@@ -3646,46 +3650,115 @@ namespace Root_AOP01_Inspection.Module
                     }));
                 }
 
-                // LT Blob
+                Image<Gray, byte> imgLT = m_module.GetGrayByteImageFromMemory(mem, crtLTROI);
+                Image<Gray, byte> imgLTBinary = imgLT.ThresholdBinaryInv(new Gray(150.0), new Gray(255.0));
+
                 CvBlobs blobs = new CvBlobs();
                 CvBlobDetector blobDetector = new CvBlobDetector();
-                Image<Gray, byte> imgOriginal = m_module.GetGrayByteImageFromMemory(mem, crtLTROI);
-                Image<Gray, byte> imgBinary = imgOriginal.ThresholdBinaryInv(new Gray(50.0), new Gray(128.0));
-                blobDetector.Detect(imgBinary, blobs);
-
+                blobDetector.Detect(imgLTBinary, blobs);
+                int iIndex = 0;
                 foreach (CvBlob blob in blobs.Values)
                 {
-                    // 작은거 필터링
-                    if (blob.Area < 100) continue;
-                    // Template 이미지 찾기
-                    DPoint[] ptsContour = blob.GetContour();
-                    CRect crtBoundingBox;
-                    Image<Gray, byte> imgBinaryClone = imgBinary.Clone();
-                    Image<Gray, byte> imgAfterFloodFill = m_module.FloodFill(imgBinaryClone, ptsContour[0], 255, out crtBoundingBox, Connectivity.FourConnected);
-                    Image<Gray, byte> imgResult = imgAfterFloodFill - imgBinary;
-                    CvBlobs templates = new CvBlobs();
-                    CvBlobDetector templateDetector = new CvBlobDetector();
-                    templateDetector.Detect(imgResult, templates);
-                    foreach (CvBlob template in templates.Values)
+                    if (blob.Area < 70) continue;
+                    System.Drawing.Rectangle rectBoundingBox = blob.BoundingBox;
+                    rectBoundingBox.Inflate(30, 30);
+                    CRect crtBoundingBox = new CRect(crtLTROI.Left + rectBoundingBox.Left, crtLTROI.Top + rectBoundingBox.Top, crtLTROI.Left + rectBoundingBox.Right, crtLTROI.Top + rectBoundingBox.Bottom);
+                    Image<Gray, byte> imgTemplate = m_module.GetGrayByteImageFromMemory(mem, crtBoundingBox);
+                    Mat matTemplate = imgTemplate.Mat;
+                    double dScore = GetImageFocusScoreWithSobel(matTemplate);
+                    if (dScore < 100) continue;
+                    structTemplate templateInfo = new structTemplate();
+                    templateInfo.img = imgTemplate;
+                    templateInfo.dSobelScore = dScore;
+                    templateInfo.nMemoryX = crtLTROI.Left + rectBoundingBox.Left;
+                    templateInfo.nMemoryY = crtLTROI.Top + rectBoundingBox.Top;
+                    templateInfos.Add(templateInfo);
+                    iIndex++;
+                }
+                List<structTemplate> sortedList = templateInfos.OrderByDescending(x => x.dSobelScore).ToList();
+
+                // RT, RB, LB 위치에서 TemplateMatching
+
+                // RT
+                Image<Gray, byte> imgRTROI = m_module.GetGrayByteImageFromMemory(mem, crtRTROI);
+                Image<Gray, byte> imgRTBinary = imgRTROI.ThresholdBinaryInv(new Gray(150.0), new Gray(255.0));
+                imgRTBinary.Save("D:\\RTBinary.bmp");
+                foreach (structTemplate template in sortedList)
+                {
+                    CPoint cptCenter = new CPoint();
+                    Image<Gray, byte> imgTemplateBinary = template.img.ThresholdBinaryInv(new Gray(150.0), new Gray(255.0));
+                    imgTemplateBinary.Save("D:\\CurrentTemplate.bmp");
+                    bool bResult = m_module.TemplateMatching(imgRTBinary, imgTemplateBinary, out cptCenter, 0.8);
+                    if (bResult == true)
                     {
-                        structTemplate templateInfo = new structTemplate();
-                        templateInfo.img = imgResult.Copy(template.BoundingBox);
-                        templateInfo.nMemoryX = crtLTROI.Left + template.BoundingBox.X;
-                        templateInfo.nMemoryY = crtLTROI.Top + template.BoundingBox.Y;
-                        templateInfos.Add(templateInfo);
+                        System.Drawing.Rectangle roi = new System.Drawing.Rectangle(cptCenter.X - (imgTemplateBinary.Width / 2), cptCenter.Y - (imgTemplateBinary.Height / 2), imgTemplateBinary.Width, imgTemplateBinary.Height);
+                        imgRTBinary.Copy(roi).Save($"D:\\{(int)template.dSobelScore}_RT.bmp");
                     }
                 }
 
-                // RT, RB, LB ROI 안에서 LT에서 찾은 Blob들 각각 Template Matching
-                Image<Gray, byte> imgRTROI = m_module.GetGrayByteImageFromMemory(mem, crtRTROI);
-                Image<Gray, byte> imgBinaryRT = imgRTROI.ThresholdBinaryInv(new Gray(50.0), new Gray(128.0));
-                foreach(structTemplate templateInfo in templateInfos)
+                // RB
+                Image<Gray, byte> imgRBROI = m_module.GetGrayByteImageFromMemory(mem, crtRBROI);
+                Image<Gray, byte> imgRBBinary = imgRBROI.ThresholdBinaryInv(new Gray(150.0), new Gray(255.0));
+                imgRBBinary.Save("D:\\RBBinary.bmp");
+                foreach(structTemplate template in sortedList)
                 {
                     CPoint cptCenter = new CPoint();
-                    bool bRet = m_module.TemplateMatching(imgBinaryRT, templateInfo.img, out cptCenter, 0.9);
+                    Image<Gray, byte> imgTemplateBinary = template.img.ThresholdBinaryInv(new Gray(150.0), new Gray(255.0));
+                    imgTemplateBinary.Save("D:\\CurrentTemplate.bmp");
+                    bool bResult = m_module.TemplateMatching(imgRBBinary, imgTemplateBinary, out cptCenter, 0.8);
+                    if (bResult == true)
+                    {
+                        System.Drawing.Rectangle roi = new System.Drawing.Rectangle(cptCenter.X - (imgTemplateBinary.Width / 2), cptCenter.Y - (imgTemplateBinary.Height / 2), imgTemplateBinary.Width, imgTemplateBinary.Height);
+                        imgRBBinary.Copy(roi).Save($"D:\\{(int)template.dSobelScore}_RB.bmp");
+                    }
+                }
+
+                // LB
+                Image<Gray, byte> imgLBROI = m_module.GetGrayByteImageFromMemory(mem, crtLBROI);
+                Image<Gray, byte> imgLBBinary = imgLBROI.ThresholdBinaryInv(new Gray(150.0), new Gray(255.0));
+                imgLBBinary.Save("D:\\LBBinary.bmp");
+                foreach (structTemplate template in sortedList)
+                {
+                    CPoint cptCenter = new CPoint();
+                    Image<Gray, byte> imgTemplateBinary = template.img.ThresholdBinaryInv(new Gray(150.0), new Gray(255.0));
+                    imgTemplateBinary.Save("D:\\CurrentTemplate.bmp");
+                    bool bResult = m_module.TemplateMatching(imgLBBinary, imgTemplateBinary, out cptCenter, 0.8);
+                    if (bResult == true)
+                    {
+                        System.Drawing.Rectangle roi = new System.Drawing.Rectangle(cptCenter.X - (imgTemplateBinary.Width / 2), cptCenter.Y - (imgTemplateBinary.Height / 2), imgTemplateBinary.Width, imgTemplateBinary.Height);
+                        imgLBBinary.Copy(roi).Save($"D:\\{(int)template.dSobelScore}_LB.bmp");
+                    }
                 }
 
                 return "OK";
+            }
+
+            public double GetImageFocusScoreWithSobel(Mat matSrc)
+            {
+                //Emgu.CV.Mat matSrc = new Emgu.CV.Mat(img.p_Size.X, img.p_Size.Y, Emgu.CV.CvEnum.DepthType.Cv8U, img.GetBytePerPixel(), img.GetPtr(), (int)img.p_Stride);
+                Emgu.CV.Mat matGrad = new Emgu.CV.Mat();
+
+                int nScale = 1;
+                int nDelta = 0;
+                //int ddepth = (int)Emgu.CV.CvEnum.DepthType.Cv8U;
+                Emgu.CV.Mat matGradX = new Emgu.CV.Mat();
+                Emgu.CV.Mat matGradY = new Emgu.CV.Mat();
+                Emgu.CV.Mat matAbsGradX = new Emgu.CV.Mat();
+                Emgu.CV.Mat matAbsGradY = new Emgu.CV.Mat();
+                ///Gradient X
+                Emgu.CV.CvInvoke.Sobel(matSrc, matGradX, Emgu.CV.CvEnum.DepthType.Cv8U, 1, 0, 3, nScale, nDelta, Emgu.CV.CvEnum.BorderType.Default);
+                ///Gradient Y
+                Emgu.CV.CvInvoke.Sobel(matSrc, matGradY, Emgu.CV.CvEnum.DepthType.Cv8U, 0, 1, 3, nScale, nDelta, Emgu.CV.CvEnum.BorderType.Default);
+                Emgu.CV.CvInvoke.ConvertScaleAbs(matGradX, matAbsGradX, nScale, nDelta);
+                Emgu.CV.CvInvoke.ConvertScaleAbs(matGradY, matAbsGradY, nScale, nDelta);
+                Emgu.CV.CvInvoke.AddWeighted(matAbsGradX, 0.5, matAbsGradY, 0.5, 0, matGrad);
+
+                Emgu.CV.Structure.MCvScalar mu = new Emgu.CV.Structure.MCvScalar();
+                Emgu.CV.Structure.MCvScalar sigma = new Emgu.CV.Structure.MCvScalar();
+                Emgu.CV.CvInvoke.MeanStdDev(matGrad, ref mu, ref sigma);
+                double dFocusMeasure = mu.V0 * mu.V0;
+
+                return dFocusMeasure;
             }
         }
         #endregion
