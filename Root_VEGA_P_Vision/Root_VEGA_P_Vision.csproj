@@ -184,6 +184,8 @@
     <Compile Include="Module\InfoPod.cs" />
     <Compile Include="Module\IRTRChild.cs" />
     <Compile Include="Module\Vision.cs" />
+    <Compile Include="Module\Vision\Run_MainGrab.cs" />
+    <Compile Include="Module\Vision\Run_Rotate.cs" />
     <Compile Include="Module\Vision\Run_SideGrab.cs" />
     <Compile Include="Module\Vision\Run_StainGrab.cs" />
     <Compile Include="MVVM\Converter.cs" />

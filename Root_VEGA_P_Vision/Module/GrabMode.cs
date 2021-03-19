@@ -89,7 +89,7 @@ namespace Root_VEGA_P_Vision.Module
         #endregion
 
         #region Light
-        LightSet m_lightSet;
+        public LightSet m_lightSet;
         List<double> m_aLightPower = new List<double>();
         void RunTreeLight(Tree tree, bool bVisible, bool bReadOnly)
         {
@@ -97,7 +97,7 @@ namespace Root_VEGA_P_Vision.Module
 
             while (m_aLightPower.Count < m_lightSet.m_aLight.Count)
                 m_aLightPower.Add(0);
-            for (int n = 0; n < m_aLightPower.Count; n++)
+            for (int n = 0;  n < m_aLightPower.Count; n++)
             {
                 m_aLightPower[n] = tree.Set(m_aLightPower[n], m_aLightPower[n], m_lightSet.m_aLight[n].m_sName, "Light Power (0 ~ 100 %%)", bVisible, bReadOnly);
             }
@@ -109,7 +109,10 @@ namespace Root_VEGA_P_Vision.Module
                 m_lightSet.m_aLight[n].m_light.p_fSetPower = bOn ? m_aLightPower[n] : 0;
             }
         }
-
+        public void SetLight(int n,bool bOn)
+        {
+            m_lightSet.m_aLight[n].m_light.p_fSetPower = bOn ? m_aLightPower[n] : 0;
+        }
         public int GetLightByName(string str)
         {
             for (int i = 0; i < m_lightSet.m_aLight.Count; i++)

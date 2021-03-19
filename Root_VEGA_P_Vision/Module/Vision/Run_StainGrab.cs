@@ -1,15 +1,11 @@
 ﻿using RootTools;
-using RootTools.Camera;
 using RootTools.Camera.BaslerPylon;
 using RootTools.Control;
 using RootTools.Memory;
 using RootTools.Module;
 using RootTools.Trees;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.InteropServices;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Root_VEGA_P_Vision.Module
@@ -27,6 +23,7 @@ namespace Root_VEGA_P_Vision.Module
             m_module = module;
             mainOpt = m_module.m_mainOptic;
             camStain = mainOpt.camStain;
+            sStainGrabMode = "";
             InitModuleRun(module);
         }
         #region Property
@@ -55,12 +52,12 @@ namespace Root_VEGA_P_Vision.Module
 
         public override string Run()
         {
-            if (p_sStainGrabMode == null) return "Grab Mode : Side Grab == Null";
+            if (p_sStainGrabMode == null) return "Grab Mode : Stain Grab == Null";
 
             try
             {
                 #region [Local Variable]
-                AxisXY axisXY = m_module.axisXY;
+                AxisXY axisXY = m_module.m_stage.m_axisXY;
                 Axis axisZ = mainOpt.m_axisZ;
 
                 StainGrabMode.m_dTrigger = Convert.ToInt32(10 * StainGrabMode.m_dResY_um);  // 1pulse = 0.1um -> 10pulse = 1um
@@ -84,7 +81,7 @@ namespace Root_VEGA_P_Vision.Module
 
                 StainGrabMode.SetLight(true);
 
-                if (m_module.Run(mainOpt.Move(axisZ, StainGrabMode.m_nFocusPosZ)))
+                if (m_module.Run(m_module.Move(axisZ, StainGrabMode.m_nFocusPosZ)))
                     return p_sInfo;
 
                 for (int x = 0; x < nXCount; x++)
@@ -92,24 +89,24 @@ namespace Root_VEGA_P_Vision.Module
                     if (EQ.IsStop())
                         return "OK";
 
-                    double dPosX = StainGrabMode.m_rpAxisCenter.X - (nPulsePerWidth * nXCount / 2) + x * nPulsePerWidth;
+                    double dPosX = StainGrabMode.m_rpAxisCenter.X - nPulsePerWidth * (nXCount / 2 + x);
 
-                    if (m_module.Run(mainOpt.Move(axisXY.p_axisX, dPosX)))
+                    if (m_module.Run(m_module.Move(axisXY.p_axisX, dPosX)))
                         return p_sInfo;
 
                     for (int y = 0; y < nYCount; y++)
                     {
+                        double dPosY = StainGrabMode.m_rpAxisCenter.Y - nPulsePerHeight * (nYCount / 2 + y );
+
+                        if (m_module.Run(m_module.Move(axisXY.p_axisY, dPosY)))
+                            return p_sInfo;
+
                         camStain.Grab();
 
                         IntPtr ptr = mem.GetPtr();
                         Parallel.For(0, nCamHeight, (i) => {
                             Marshal.Copy(camStain.p_ImageData.m_aBuf, 0, (IntPtr)((long)ptr + (x * nCamWidth) + (i * mem.W)), nCamWidth);
                         });
-
-                        double dPosY = StainGrabMode.m_rpAxisCenter.Y - (nPulsePerHeight * nYCount / 2) + y * nPulsePerHeight;
-
-                        if(m_module.Run(mainOpt.Move(axisXY.p_axisY,dPosY)))
-                            return p_sInfo;
                     }
                 }
             }

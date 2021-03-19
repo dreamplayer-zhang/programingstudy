@@ -20,8 +20,7 @@ namespace Root_VEGA_P_Vision.Module
         LightSet lightSet;
         MemoryPool memoryPool;
         MemoryGroup memoryGroup;
-        public AxisXY axisXY;
-
+        public int sideGrabCnt = 0;
         public override void GetTools(bool bInit)
         {
             p_sInfo = m_toolBox.Get(ref memoryPool, this, "Memory", 1);
@@ -32,6 +31,25 @@ namespace Root_VEGA_P_Vision.Module
             m_remote.GetTools(bInit);
         }
         #endregion
+
+        public string Move(Axis axis, double pos, bool bWait = true)
+        {
+            string sRun = axis.StartMove(pos);
+            if (sRun.Equals("OK")) return sRun;
+            return bWait ? axis.WaitReady() : "OK";
+        }
+        public string Move(Axis axis, double pos,double v,bool bWait = true)
+        {
+            string sRun = axis.StartMove(pos,v);
+            if (sRun.Equals("OK")) return sRun;
+            return bWait ? axis.WaitReady() : "OK";
+        }
+        public string MoveXY(RPoint posmm, bool bWait = true)
+        {
+            string sRun = m_stage.m_axisXY.StartMove(new RPoint(posmm));
+            if (sRun.Equals("OK")) return sRun;
+            return bWait ? m_stage.m_axisXY.WaitReady() : "OK";
+        }
 
         #region Stage
         public class Stage : NotifyProperty
@@ -78,12 +96,6 @@ namespace Root_VEGA_P_Vision.Module
             }
 
             double m_pulsePermm = 10000; 
-            public string Move(double mmX, double mmY, bool bWait = true)
-            {
-                string sRun = m_axisXY.StartMove(mmX * m_pulsePermm, mmY * m_pulsePermm);
-                if (sRun != "OK") return sRun;
-                return bWait ? m_axisXY.WaitReady() : "OK";
-            }
 
             public void RunTree(Tree tree)
             {
@@ -133,22 +145,11 @@ namespace Root_VEGA_P_Vision.Module
                 memoryTDI = m_vision.memoryGroup.CreateMemory(eMainScan.MemoryTDI.ToString(), 1, 1, 1000, 1000);
                 memoryZStack = m_vision.memoryGroup.CreateMemory(eMainScan.MemoryZStack.ToString(), 1, 1, 1000, 1000);
             }
-
+            public ImageData GetMemoryData(eMainScan mem)
+            {
+                return new ImageData(m_vision.memoryPool.GetMemory(m_vision.p_id, mem.ToString()));
+            }
             public double m_pulsePermm = 10000;
-
-            public string Move(Axis axis, double pos, bool bWait = true)
-            {
-                string sRun = axis.StartMove(pos);
-                if (sRun.Equals("OK")) return sRun;
-                return bWait ? axis.WaitReady() : "OK";
-            }
-
-            public string MoveXY(CPoint posmm,bool bWait = true)
-            {
-                string sRun = m_vision.axisXY.StartMove(new RPoint(posmm));
-                if (sRun.Equals("OK")) return sRun;
-                return bWait ? m_vision.axisXY.WaitReady() : "OK";
-            }
 
             public void RunTree(Tree tree)
             {
@@ -167,11 +168,11 @@ namespace Root_VEGA_P_Vision.Module
         #region SideOptic
         public class SideOptic : NotifyProperty
         {
-            Camera_Basler camSide;
+            public Camera_Basler camSide;
             MemoryData memoryTop, memoryLeft, memoryRight, memoryBottom;
             public enum eSide
             {
-                Top,Left,Right,Bottom
+                Top,Left,Bottom,Right
             }
             public Axis axisZ;
 
@@ -193,14 +194,11 @@ namespace Root_VEGA_P_Vision.Module
                 memoryRight = m_vision.memoryGroup.CreateMemory(eSide.Right.ToString(), 1, 1, 1000, 1000);
                 memoryBottom = m_vision.memoryGroup.CreateMemory(eSide.Bottom.ToString(), 1, 1, 1000, 1000);
             }
-
-            double m_pulsePermm = 10000;
-            public string Move(double mmZ, bool bWait = true)
+            public MemoryData GetMemoryData(eSide mem)
             {
-                string sRun = axisZ.StartMove(mmZ * m_pulsePermm);
-                if (sRun != "OK") return sRun;
-                return bWait ? axisZ.WaitReady() : "OK";
+                return m_vision.memoryPool.GetMemory(m_vision.p_id, mem.ToString());
             }
+            public double m_pulsePermm = 10000;
 
             public void RunTree(Tree tree)
             {
@@ -406,9 +404,11 @@ namespace Root_VEGA_P_Vision.Module
         #region ModuleRun
         protected override void InitModuleRuns()
         {
+            AddModuleRunList(new Run_Rotate(this), true, "Rotate");
+            AddModuleRunList(new Run_SideGrab(this), true, "Main Grab");
             //AddModuleRunList(new Run_SideGrab(this), true, "Side Grab");
             AddModuleRunList(new Run_StainGrab(this), true, "Stain Grab");
-        }
+        }        
         #endregion
     }
 }
