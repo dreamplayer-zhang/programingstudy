@@ -398,7 +398,8 @@ namespace Root_Rinse_Loader.Module
             p_bEMG = m_diEMG.p_bIn;
             p_bAir = m_diAir.p_bIn;
             p_bDoorLock = m_diDoorLock.p_bIn;
-            p_bBuzzerOff = m_diBuzzerOff.p_bIn; 
+            p_bBuzzerOff = m_diBuzzerOff.p_bIn;
+            EQ.p_bDoorOpen = m_diLightCurtain.p_bIn; 
             if (m_swBlick.ElapsedMilliseconds < 500) return;
             m_swBlick.Start();
             m_bBlink = !m_bBlink; 

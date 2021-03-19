@@ -307,6 +307,7 @@ namespace Root_Rinse_Loader.Module
         public string RunUnload()
         {
             if (m_rinse.p_eMode != RinseL.eRunMode.Stack) return "Run mode is not Stack";
+            if (m_roller.IsEmpty() == false) return "OK";
             if (Run(RunPickerDown(false))) return p_sInfo;
             if (Run(MoveLoader(ePos.Roller))) return p_sInfo;
             if (Run(m_roller.RunRotate(false))) return p_sInfo;
