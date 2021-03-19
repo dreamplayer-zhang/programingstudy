@@ -362,6 +362,7 @@ namespace Root_Rinse_Loader.Module
 
         public override void Reset()
         {
+            RunVacuum(false); 
             base.Reset();
         }
         #endregion

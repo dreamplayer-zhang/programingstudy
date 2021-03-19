@@ -39,7 +39,7 @@ namespace Root_Rinse_Loader
         void Init()
         {
             textBlockState.DataContext = EQ.m_EQ;
-            textBolckUnloadState.DataContext = m_handler.m_rinse;
+            textBlockUnloadState.DataContext = m_handler.m_rinse;
             textBlockRinseState.DataContext = m_handler.m_rinse;
             buttonMode.DataContext = m_handler.m_rinse;
             textBoxWidth.DataContext = m_handler.m_rinse;
@@ -132,12 +132,12 @@ namespace Root_Rinse_Loader
             if (rinse.m_tcpip.p_bConnect)
             {    
                 borderUnloadState.Background = (rinse.p_eStateUnloader == EQ.eState.Ready || rinse.p_eStateUnloader == EQ.eState.Run) ? Brushes.SeaGreen : Brushes.Gold;
-                textBolckUnloadState.Text = rinse.p_eStateUnloader.ToString();
+                textBlockUnloadState.Text = rinse.p_eStateUnloader.ToString();
             }
             else
             {
                 borderUnloadState.Background = Brushes.Crimson;
-                textBolckUnloadState.Text = "disconnect";
+                textBlockUnloadState.Text = "Click to Connect";
             }
 
             gridRed.Background = (bBlink && (EQ.p_eState == EQ.eState.Error)) ? Brushes.Crimson : Brushes.DarkRed;
@@ -198,5 +198,11 @@ namespace Root_Rinse_Loader
             if (binding != null) binding.UpdateSource();
         }
         #endregion
+
+        private void textBlockUnloadState_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            if (m_handler.m_rinse.m_tcpip.p_bConnect) return;
+            m_handler.m_rinse.m_tcpip.Connect(); 
+        }
     }
 }

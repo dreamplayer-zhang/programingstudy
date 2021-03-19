@@ -259,13 +259,14 @@
                                             x:Name="borderUnloadState"
                                             CornerRadius="10"
                                             Background="SeaGreen">
-                                            <TextBlock x:Name="textBolckUnloadState"
+                                            <TextBlock x:Name="textBlockUnloadState"
                                                    Text="{Binding p_eStateUnloader}"
                                                    FontSize="30"
                                                    FontWeight="Bold"
                                                    FontFamily="Arial"
                                                    VerticalAlignment="Center"
-                                                   HorizontalAlignment="Center" />
+                                                   HorizontalAlignment="Center" 
+                                                   PreviewMouseLeftButtonDown="textBlockUnloadState_PreviewMouseLeftButtonDown"/>
                                         </Border>
                                     </GroupBox>
                                     <GroupBox Header="Rinse State"

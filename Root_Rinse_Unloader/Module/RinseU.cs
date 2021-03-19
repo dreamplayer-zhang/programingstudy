@@ -499,14 +499,13 @@ namespace Root_Rinse_Unloader.Module
                             AddProtocol(asRead[0], eCmd, asRead[2]);
                             p_eStateLoader = GetEQeState(asRead[2]);
                             //switch (GetEQeState(asRead[2]))
-                            switch(p_eStateLoader)
+                            switch (p_eStateLoader)
                             {
                                 case EQ.eState.Home:
-                                    //if (EQ.p_eState != EQ.eState.Run) EQ.p_eState = EQ.eState.Home; //forget
-                                    EQ.p_eState = EQ.eState.Home;
+                                    if (EQ.p_eState != EQ.eState.Run) EQ.p_eState = EQ.eState.Home;
                                     break;
-                                case EQ.eState.Run: 
-                                    EQ.p_eState = EQ.eState.Run; 
+                                case EQ.eState.Run:
+                                    if (EQ.p_eState == EQ.eState.Ready) EQ.p_eState = EQ.eState.Run;
                                     break;
                             }
                             break;
