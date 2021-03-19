@@ -250,6 +250,7 @@ namespace Root_Rinse_Unloader.Module
         DIO_I m_diBuzzerOff;
         DIO_Os m_doLamp;
         DIO_Os m_doBuzzer;
+        DIO_I m_diLightCurtain;
         void GetToolsDIO()
         {
             p_sInfo = m_toolBox.Get(ref m_diEMG, this, "Emergency");
@@ -258,6 +259,7 @@ namespace Root_Rinse_Unloader.Module
             p_sInfo = m_toolBox.Get(ref m_diBuzzerOff, this, "Buzzer Off");
             p_sInfo = m_toolBox.Get(ref m_doLamp, this, "Lamp", m_asLamp);
             p_sInfo = m_toolBox.Get(ref m_doBuzzer, this, "Buzzer", m_asBuzzer);
+            p_sInfo = m_toolBox.Get(ref m_diLightCurtain, this, "Light Curtain");
         }
 
         bool _bEMG = false;
@@ -332,14 +334,42 @@ namespace Root_Rinse_Unloader.Module
             m_doBuzzer.AllOff();
         }
 
+        StopWatch m_swLightCurtain = new StopWatch();
+        double _secLightCurtain = 5;
+        int _msLightCurtain = 5000;
+        public double p_secLightCurtain
+        {
+            get { return _secLightCurtain; }
+            set
+            {
+                _secLightCurtain = value;
+                _msLightCurtain = (int)(1000 * value); 
+            }
+        }
+        void CheckLightCurtan()
+        {
+            if (m_diLightCurtain.p_bIn == false) m_swLightCurtain.Start();
+            if (p_eState != eState.Run) return;
+            if (m_diLightCurtain.p_bIn == false) return;
+            if (m_swLightCurtain.ElapsedMilliseconds > _msLightCurtain)
+            {
+                EQ.p_bStop = true;
+                p_eState = eState.Error;
+                p_sInfo = "Light Curtain Check Timeout";
+            }
+        }
+
         public bool m_bBlink = false;
         StopWatch m_swBlick = new StopWatch();
+        
         void RunThreadDIO()
         {
             p_bEMG = m_diEMG.p_bIn;
             p_bAir = m_diAir.p_bIn;
             p_bDoorLock = m_diDoorLock.p_bIn;
             p_bBuzzerOff = m_diBuzzerOff.p_bIn;
+            EQ.p_bDoorOpen = m_diLightCurtain.p_bIn;
+            CheckLightCurtan(); 
             if (m_swBlick.ElapsedMilliseconds < 500) return;
             m_swBlick.Start();
             m_bBlink = !m_bBlink;
@@ -524,6 +554,46 @@ namespace Root_Rinse_Unloader.Module
                 if (asState[n] == sState) return (EQ.eState)n;
             }
             return EQ.eState.Null; 
+        }
+        #endregion
+
+        #region Tact Time
+        double _secTact = 0;
+        public double p_secTact
+        {
+            get { return _secTact; }
+            set
+            {
+                _secTact = value;
+                OnPropertyChanged();
+            }
+        }
+
+        double _secAveTact = 0;
+        public double p_secAveTact
+        {
+            get { return _secAveTact; }
+            set
+            {
+                _secAveTact = value;
+                OnPropertyChanged();
+            }
+        }
+
+        List<long> m_aTact = new List<long>();
+        StopWatch m_swTact = new StopWatch();
+        public void CheckTact()
+        {
+            long msTact = m_swTact.ElapsedMilliseconds / 10;
+            m_swTact.Start();
+            m_aTact.Add(msTact);
+            if (m_aTact.Count <= 1) return;
+            p_secTact = msTact / 100.0;
+            long msSum = 0;
+            for (int n = 1; n < m_aTact.Count; n++) msSum += m_aTact[n];
+            msSum /= (m_aTact.Count - 1);
+            p_secAveTact = msSum / 100.0;
+            while (m_aTact.Count > 4) m_aTact.RemoveAt(0);
         }
         #endregion
 

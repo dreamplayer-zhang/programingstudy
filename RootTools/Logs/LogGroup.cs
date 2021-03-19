@@ -43,6 +43,7 @@ namespace RootTools
             string sPath = LogView._logView.p_sPath;
             try
             {
+                if (m_qLog.Count <= 0) return;
                 string sDate = m_qLog.Peek().m_sDate;
                 sPath += "\\" + sDate;
                 Directory.CreateDirectory(sPath);
@@ -67,11 +68,7 @@ namespace RootTools
                     }
                 }
             }
-            catch(Exception)
-            {
-
-            }
-            
+            catch (Exception) { }
         }
 
         public ObservableCollection<Log.Data> p_aLog { get; set; }

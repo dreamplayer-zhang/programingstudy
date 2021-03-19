@@ -561,6 +561,46 @@ namespace Root_Rinse_Loader.Module
         }
         #endregion
 
+        #region Tact Time
+        double _secTact = 0;
+        public double p_secTact
+        {
+            get { return _secTact; }
+            set
+            {
+                _secTact = value;
+                OnPropertyChanged();
+            }
+        }
+
+        double _secAveTact = 0;
+        public double p_secAveTact
+        {
+            get { return _secAveTact; }
+            set
+            {
+                _secAveTact = value;
+                OnPropertyChanged();
+            }
+        }
+
+        List<long> m_aTact = new List<long>();
+        StopWatch m_swTact = new StopWatch();
+        public void CheckTact()
+        {
+            long msTact = m_swTact.ElapsedMilliseconds / 10;
+            m_swTact.Start();
+            m_aTact.Add(msTact);
+            if (m_aTact.Count <= 1) return;
+            p_secTact = msTact / 100.0;
+            long msSum = 0;
+            for (int n = 1; n < m_aTact.Count; n++) msSum += m_aTact[n];
+            msSum /= (m_aTact.Count - 1);
+            p_secAveTact = msSum / 100.0;
+            while (m_aTact.Count > 4) m_aTact.RemoveAt(0);
+        }
+        #endregion
+
         #region Tree
         public override void RunTree(Tree tree)
         {

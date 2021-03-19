@@ -55,7 +55,13 @@ namespace Root_Rinse_Loader.Module
                 m_loader.p_sInfo = toolBox.Get(ref m_doBlow, m_loader, m_id + ".Blow");
             }
 
-            string m_id;
+            public bool IsDrop()
+            {
+                if (m_dioVacuum.p_bOut == false) return false;
+                return (m_dioVacuum.p_bIn == false); 
+            }
+
+            public string m_id;
             Loader m_loader;
             public Picker(string id, Loader loader)
             {
@@ -88,14 +94,19 @@ namespace Root_Rinse_Loader.Module
         public string RunVacuum(bool bOn)
         {
             p_bVacuum = bOn;
-            foreach (Picker picker in m_aPicker) picker.m_dioVacuum.Write(bOn);
+            for (int n = 0; n < 4; n++)
+            {
+                m_aPicker[n].m_dioVacuum.Write(bOn && m_storage.m_stack.m_diCheck[n].p_bIn); 
+            }
             if (bOn)
             {
                 Thread.Sleep((int)(1000 * m_secVac));
+                foreach (Picker picker in m_aPicker) picker.m_dioVacuum.Write(picker.m_dioVacuum.p_bIn);
                 return "OK";
             }
             else
             {
+                m_bCheckStrip = false; 
                 foreach (Picker picker in m_aPicker) picker.m_doBlow.Write(true);
                 Thread.Sleep((int)(1000 * m_secBlow));
                 foreach (Picker picker in m_aPicker) picker.m_doBlow.Write(false);
@@ -142,37 +153,6 @@ namespace Root_Rinse_Loader.Module
             }
         }
 
-        public string RunCheckStrip()
-        {
-            string sResult = "OK";
-            List<Picker> picker = m_aPicker;
-            if (m_storage.m_stack.m_diCheck[0].p_bIn)
-                if (picker[0].m_dioVacuum.p_bIn == false)
-                {
-                    m_alidPickerStripCheck0.p_bSet = true;
-                    return "Picker0 Strip Check Error";
-                }
-            if (m_storage.m_stack.m_diCheck[1].p_bIn)
-                if (picker[1].m_dioVacuum.p_bIn == false)
-                {
-                    m_alidPickerStripCheck1.p_bSet = true;
-                    return "Picker1 Strip Check Error";
-                }
-            if (m_storage.m_stack.m_diCheck[2].p_bIn)
-                if (picker[2].m_dioVacuum.p_bIn == false)
-                {
-                    m_alidPickerStripCheck2.p_bSet = true;
-                    return "Picker2 Strip Check Error";
-                }
-            if (m_storage.m_stack.m_diCheck[3].p_bIn)
-                if (picker[3].m_dioVacuum.p_bIn == false)
-                {
-                    m_alidPickerStripCheck3.p_bSet = true;
-                    return "Picker3 Strip Check Error";
-                }
-            return sResult;
-        }
-
         void RunTreePicker(Tree tree)
         {
             m_secVac = tree.Set(m_secVac, m_secVac, "Vacuum", "Vacuum Sensor Wait (sec)");
@@ -203,9 +183,10 @@ namespace Root_Rinse_Loader.Module
             m_axis.AddPos(Enum.GetNames(typeof(ePos)));
         }
 
-        public string MoveLoader(ePos ePos)
+        public string MoveLoader(ePos ePos, bool bWait = true)
         {
             m_axis.StartMove(ePos);
+            if (bWait == false) return "OK"; 
             return m_axis.WaitReady(); 
         }
         #endregion
@@ -297,9 +278,9 @@ namespace Root_Rinse_Loader.Module
             Thread.Sleep(200);
             //m_storage.StartStackDown();
             if (Run(m_storage.MoveStack_Down())) return p_sInfo;
-            if (Run(RunCheckStrip())) return p_sInfo;
             Thread.Sleep(100);
             if (Run(RunShakeUp())) return p_sInfo;
+            m_bCheckStrip = true; 
             if (Run(MoveLoader(ePos.Roller))) return p_sInfo;
             return "OK";
         }
@@ -311,11 +292,13 @@ namespace Root_Rinse_Loader.Module
             if (Run(RunPickerDown(false))) return p_sInfo;
             if (Run(MoveLoader(ePos.Roller))) return p_sInfo;
             if (Run(m_roller.RunRotate(false))) return p_sInfo;
-            Thread.Sleep(100); 
+            Thread.Sleep(100);
+            m_bCheckStrip = false;
             if (Run(RunPickerDown(true))) return p_sInfo;
             Thread.Sleep(200);
             if (Run(RunVacuum(false))) return p_sInfo;
             if (Run(RunPickerDown(false))) return p_sInfo;
+            m_rinse.CheckTact(); 
             if (Run(m_roller.RunRotate(true))) return p_sInfo;
             if (m_storage.m_stack.p_bCheck) return "OK"; 
             if (Run(MoveLoader(ePos.Rail))) return p_sInfo;
@@ -328,6 +311,39 @@ namespace Root_Rinse_Loader.Module
             //if (m_rinse.p_eStateRinse != RinseL.eRinseRun.Run) return "Rinse State not Run";
             //if (m_rinse.p_eStateUnloader != EQ.eState.Run) return "Rinse Unloader State not Run";
             return p_bVacuum ? RunUnload() : RunLoad(); 
+        }
+        #endregion
+
+        #region Thread Check
+        bool m_bThreadCheck = false;
+        Thread m_threadCheck; 
+        void InitThreadCheck()
+        {
+            m_threadCheck = new Thread(new ThreadStart(RunThreadCheck));
+            m_threadCheck.Start();
+        }
+
+        bool m_bCheckStrip = false; 
+        void RunThreadCheck()
+        {
+            m_bThreadCheck = true;
+            Thread.Sleep(1000); 
+            while (m_bThreadCheck)
+            {
+                Thread.Sleep(10); 
+                if (m_bCheckStrip)
+                {
+                    foreach (Picker picker in m_aPicker)
+                    {
+                        if (picker.IsDrop())
+                        {
+                            EQ.p_bStop = true;
+                            p_eState = eState.Error;
+                            p_sInfo = picker.m_id + " : Picker drop Strip"; 
+                        }
+                    }
+                }
+            }
         }
         #endregion
 
@@ -370,10 +386,16 @@ namespace Root_Rinse_Loader.Module
             m_roller = roller;
             InitPickers(); 
             InitBase(id, engineer);
+            InitThreadCheck(); 
         }
 
         public override void ThreadStop()
         {
+            if (m_bThreadCheck)
+            {
+                m_bThreadCheck = false;
+                m_threadCheck.Join(); 
+            }
             base.ThreadStop();
         }
 
