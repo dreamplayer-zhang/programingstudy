@@ -1,5 +1,7 @@
 ﻿using Root_CAMELLIA.Data;
+using Root_CAMELLIA.Draw;
 using Root_CAMELLIA.Module;
+using Root_CAMELLIA.ShapeDraw;
 using RootTools;
 using RootTools.Control;
 using RootTools.Module;
@@ -23,6 +25,64 @@ namespace Root_CAMELLIA
         public event EventHandler<DialogCloseRequestedEventArgs> CloseRequested;
 
         #region Property
+        public int TabIndex
+        {
+            get
+            {
+                return _TabIndex;
+            }
+            set
+            {
+                if(value == 0)
+                {
+                    Run_Measure measure = (Run_Measure)ModuleCamellia.CloneModuleRun("Measure");
+                    StageCenterPos = measure.m_StageCenterPos_pulse;
+                }
+                SetProperty(ref _TabIndex, value);
+            }
+        }
+        int _TabIndex = 0;
+
+        public RPoint StageCenterPos
+        {
+            get
+            {
+                return _StageCenterPos;
+            }
+            set
+            {
+                SetProperty(ref _StageCenterPos, value);
+            }
+        }
+
+        RPoint _StageCenterPos = new RPoint();
+
+        public bool p_IsShowPoint
+        {
+            get
+            {
+                return m_IsShowPoint;
+            }
+            set
+            {
+                if (value)
+                {
+                    for(int i = 0; i < listSelectedPoint.Count; i++)
+                    {
+                        listSelectedPoint[i].CanvasEllipse.Visibility = Visibility.Visible;
+                    }
+                }
+                else
+                {
+                    for (int i = 0; i < listSelectedPoint.Count; i++)
+                    {
+                        listSelectedPoint[i].CanvasEllipse.Visibility = Visibility.Hidden;
+                    }
+                }
+                SetProperty(ref m_IsShowPoint, value);
+            }
+        }
+        bool m_IsShowPoint = true;
         /// <summary>
         /// Selected Tab Axis Index
         /// </summary>
@@ -257,43 +317,291 @@ namespace Root_CAMELLIA
         }
         private Axis _StageAxisZ;
 
+        private Module_Camellia moduleCamellia;
+        public Module_Camellia ModuleCamellia
+        {
+            get
+            {
+                return moduleCamellia;
+            }
+            set
+            {
+                SetProperty(ref moduleCamellia, value);
+            }
+        }
+        private TabAxis eTabAxis = TabAxis.AxisX;
 
-        //private Visibility _tttt = Visibility.Hidden;
-        //public Visibility tttt
+        private RootViewer_ViewModel m_rootViewer = new RootViewer_ViewModel();
+        public RootViewer_ViewModel p_rootViewer
+        {
+            get
+            {
+                return m_rootViewer;
+            }
+            set
+            {
+                SetProperty(ref m_rootViewer, value);
+            }
+        }
+
+        Dispatcher dispatcher = null;
+
+        double m_alpha = 0.0;
+        public double p_alpha
+        {
+            get
+            {
+                return m_alpha;
+            }
+            set
+            {
+                SetProperty(ref m_alpha, value);
+            }
+        }
+
+        ObservableCollection<UIElement> m_measurePoint = new ObservableCollection<UIElement>();
+        public ObservableCollection<UIElement> p_measurePoint
+        {
+            get
+            {
+                return m_measurePoint;
+            }
+            set
+            {
+                SetProperty(ref m_measurePoint, value);
+            }
+        }
+
+        ObservableCollection<UIElement> m_selectedPoint = new ObservableCollection<UIElement>();
+        public ObservableCollection<UIElement> p_selectedPoint
+        {
+            get
+            {
+                return m_selectedPoint;
+            }
+            set
+            {
+                SetProperty(ref m_selectedPoint, value);
+            }
+        }
+
+
+        private List<ShapeEllipse> listCandidatePoint = new List<ShapeEllipse>();
+        private List<ShapeEllipse> listSelectedPoint = new List<ShapeEllipse>();
+        List<CCircle> listRealPos = new List<CCircle>();
+        public void SetMovePoint(RecipeData rd)
+        {
+            double RatioX = 1000 / BaseDefine.ViewSize;
+            double RatioY = 1000 / BaseDefine.ViewSize;
+            int CenterX = (int)(1000 * 0.5f);
+            int CenterY = (int)(1000 * 0.5f);
+            DrawGeometryManager drawGeometryManager = new DrawGeometryManager();
+            ObservableCollection<UIElement> temp = new ObservableCollection<UIElement>();
+            listCandidatePoint.Clear();
+            listSelectedPoint.Clear();
+            for (int i = 0; i < rd.DataCandidatePoint.Count; i++)
+            {
+                ShapeManager dataPoint = new ShapeEllipse(GeneralTools.StageHoleBrush);
+                ShapeEllipse dataCandidatePoint = dataPoint as ShapeEllipse;
+
+                CCircle circle = new CCircle(rd.DataCandidatePoint[i].x, rd.DataCandidatePoint[i].y, rd.DataCandidatePoint[i].width + 4,
+                    rd.DataCandidatePoint[i].height + 4, rd.DataCandidatePoint[i].MeasurementOffsetX, rd.DataCandidatePoint[i].MeasurementOffsetY);
+                circle.Transform(RatioX, RatioY);
+
+                Circle c = drawGeometryManager.GetRect(circle, CenterX, CenterY);
+                dataCandidatePoint.SetData(c, (int)(circle.width), (int)(circle.height), 95);
+                temp.Add(dataCandidatePoint.UIElement);
+                listCandidatePoint.Add(dataCandidatePoint);
+                listRealPos = new List<CCircle>(rd.DataCandidatePoint.ToArray());
+            }
+
+            p_measurePoint = temp;
+
+            temp = new ObservableCollection<UIElement>();
+            for (int i = 0; i < rd.DataSelectedPoint.Count; i++)
+            {
+                ShapeManager dataPoint = new ShapeEllipse(GeneralTools.GbHole);
+                ShapeEllipse dataSelectedPoint = dataPoint as ShapeEllipse;
+
+                CCircle circle = new CCircle(rd.DataSelectedPoint[i].x, rd.DataSelectedPoint[i].y, rd.DataSelectedPoint[i].width + 4,
+                  rd.DataSelectedPoint[i].height + 4, rd.DataSelectedPoint[i].MeasurementOffsetX, rd.DataSelectedPoint[i].MeasurementOffsetY);
+                circle.Transform(RatioX, RatioY);
+
+                Circle c = drawGeometryManager.GetRect(circle, CenterX, CenterY);
+                dataSelectedPoint.SetData(c, (int)(circle.width), (int)(circle.height), 95);
+                temp.Add(dataSelectedPoint.UIElement);
+                listSelectedPoint.Add(dataSelectedPoint);
+            }
+
+            p_selectedPoint = temp;
+        }
+
+        PM_SR_Parameter m_pmParameter = new PM_SR_Parameter();
+        public PM_SR_Parameter p_pmParameter
+        {
+            get
+            {
+                return m_pmParameter;
+            }
+            set
+            {
+                SetProperty(ref m_pmParameter, value);
+            }
+        }
+
+
+
+        #endregion
+
+
+
+        public Dlg_Engineer_ViewModel(MainWindow_ViewModel main)
+        {
+            ModuleCamellia = ((CAMELLIA_Handler)App.m_engineer.ClassHandler()).m_camellia;
+
+            //p_recipeData = DataManager.Instance.recipeDM.MeasurementRD;
+            AxisX = ModuleCamellia.p_axisXY.p_axisX;
+            AxisY = ModuleCamellia.p_axisXY.p_axisY;
+            AxisZ = ModuleCamellia.p_axisZ;
+            AxisLifter = ModuleCamellia.p_axisLifter;
+
+            TiltAxisX = ModuleCamellia.p_tiltAxisXY.p_axisX;
+            TiltAxisY = ModuleCamellia.p_tiltAxisXY.p_axisY;
+            StageAxisZ = ModuleCamellia.p_stageAxisZ;
+
+            ModuleCamellia.p_CamVRS.Grabed += OnGrabImageUpdate;
+
+            p_rootViewer.p_VisibleMenu = Visibility.Collapsed;
+
+            dispatcher = Application.Current.Dispatcher;
+
+            //m_task = new Task(()=>RunTask());
+            //m_task.Start();
+        }
+
+        //private bool m_isStart = false;
+        //void RunTask()
         //{
-        //    get
+        //    m_isStart = true;
+        //    while (m_isStart)
         //    {
-        //        return _tttt;
-        //    }
-        //    set
-        //    {
-        //        SetProperty(ref _tttt, value);
+        //        Thread.Sleep(1);
         //    }
         //}
 
-        //public int asdf = 0;
-        //public ICommand CmdTest
-        //{
-        //    get
-        //    {
-        //        return new RelayCommand(() =>
-        //        {
-        //            asdf++;
+        public void OnMouseLeave(object sender, MouseEventArgs e)
+        {
+            foreach (ShapeEllipse se in listCandidatePoint)
+            {
+                se.SetBrush(GeneralTools.StageHoleBrush);
+            }
+            nMinIndex = -1;
+        }
 
-        //            if (asdf > 10 && asdf <= 20)
-        //            {
-        //                tttt = Visibility.Visible;
-        //            }
-        //            else if (asdf > 20)
-        //            {
-        //                tttt = Visibility.Hidden;
-        //                asdf = 0;
-        //            }
+        public void OnMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            if (listRealPos.Count <= 0)
+            {
+                return;
+            }
 
-        //        });
-        //    }
-        //}
+            if (ModuleCamellia.p_eState != ModuleBase.eState.Ready)
+            {
+                MessageBox.Show("Vision Home이 완료 되지 않았습니다.");
+                return;
+            }
 
+            double centerX;
+            double centerY;
+            if (DataManager.Instance.m_waferCentering.m_ptCenter.X == 0 && DataManager.Instance.m_waferCentering.m_ptCenter.Y == 0)
+            {
+                centerX = StageCenterPos.X;
+                centerY = StageCenterPos.Y;
+            }
+            else // 나중에 centering 값 추가 테스트 진행 예정
+            {
+                centerX = StageCenterPos.X;
+                centerY = StageCenterPos.Y;
+            }
+
+            double x = listRealPos[nMinIndex].x;
+            double y = listRealPos[nMinIndex].y;
+            double dX = centerX - x * 10000;
+            double dY = centerY - y * 10000;
+            Thread thread = new Thread(() =>
+            {
+                string str;
+                str = ModuleCamellia.p_axisXY.StartMove(new RPoint(dX, dY));
+                if (str != "OK")
+                {
+                    MessageBox.Show(str);
+                    return;
+                }
+                ModuleCamellia.p_axisXY.WaitReady();
+            });
+            thread.Start();
+            //MessageBox.Show(listRealPos[nMinIndex].x.ToString() + " " + listRealPos[nMinIndex].y.ToString());
+        }
+
+
+        int nMinIndex = -1;
+        int nSelectIndex = -1;
+        public void OnMouseMove(object sender, MouseEventArgs e)
+        {
+            Point pt = e.GetPosition((UIElement)sender);
+
+            double dMin = 9999;
+            int nIndex = 0;
+            
+
+            foreach (ShapeEllipse se in listCandidatePoint)
+            {
+                double dDistance = GetDistance(se, new System.Windows.Point(pt.X, pt.Y));
+
+                if (dDistance < dMin)
+                {
+                    dMin = dDistance;
+                    nMinIndex = nIndex;
+                }
+                nIndex++;
+            }
+
+            foreach (ShapeEllipse se in listCandidatePoint)
+            {
+                if (se.Equals(listCandidatePoint[nMinIndex]))
+                {
+                    //bSelected = true;
+                    se.SetBrush(GeneralTools.GbSelect);
+                }
+                else
+                {
+                    se.SetBrush(GeneralTools.StageHoleBrush);
+                }
+            }
+
+            nIndex = 0;
+
+            foreach (ShapeEllipse se in listSelectedPoint)
+            {
+                if (se.CenterX == listCandidatePoint[nMinIndex].CenterX && se.CenterY == listCandidatePoint[nMinIndex].CenterY)
+                {
+                    se.SetBrush(GeneralTools.SelectedOverBrush);
+                }
+                else
+                {
+                    se.SetBrush(GeneralTools.GbHole);
+                }
+            }
+        }
+
+        private double GetDistance(ShapeEllipse eg, Point pt)
+        {
+            double dResult = Math.Sqrt(Math.Pow(eg.CenterX - pt.X, 2) + Math.Pow(eg.CenterY - pt.Y, 2));
+
+            return Math.Round(dResult, 3);
+        }
+
+        #region Cameara Command
         public ICommand ConnectCommand
         {
             get
@@ -302,7 +610,6 @@ namespace Root_CAMELLIA
                 {
 
                     ModuleCamellia.p_CamVRS.FunctionConnect();
-
                 });
             }
         }
@@ -346,65 +653,6 @@ namespace Root_CAMELLIA
             }
         }
         #endregion
-
-        private Module_Camellia moduleCamellia;
-        public Module_Camellia ModuleCamellia
-        {
-            get
-            {
-                return moduleCamellia;
-            }
-            set
-            {
-                SetProperty(ref moduleCamellia, value);
-            }
-        }
-        private TabAxis eTabAxis = TabAxis.AxisX;
-
-        private RootViewer_ViewModel m_rootViewer = new RootViewer_ViewModel();
-        public RootViewer_ViewModel p_rootViewer
-        {
-            get
-            {
-                return m_rootViewer;
-            }
-            set
-            {
-                SetProperty(ref m_rootViewer, value);
-            }
-        }
-
-        Dispatcher dispatcher = null;
-
-        public Dlg_Engineer_ViewModel(MainWindow_ViewModel main)
-        {
-            ModuleCamellia = ((CAMELLIA_Handler)App.m_engineer.ClassHandler()).m_camellia;
-
-            AxisX = ModuleCamellia.p_axisXY.p_axisX;
-            AxisY = ModuleCamellia.p_axisXY.p_axisY;
-            AxisZ = ModuleCamellia.p_axisZ;
-            AxisLifter = ModuleCamellia.p_axisLifter;
-
-            TiltAxisX = ModuleCamellia.p_tiltAxisXY.p_axisX;
-            TiltAxisY = ModuleCamellia.p_tiltAxisXY.p_axisY;
-            StageAxisZ = ModuleCamellia.p_stageAxisZ;
-
-            ModuleCamellia.p_CamVRS.Grabed += OnGrabImageUpdate;
-
-            p_rootViewer.p_VisibleMenu = Visibility.Collapsed;
-
-            dispatcher = Application.Current.Dispatcher;
-        }
-
-        private void OnGrabImageUpdate(object sender, EventArgs e)
-        {
-            dispatcher.Invoke(() =>
-            {
-                p_rootViewer.SetImageSource();
-            });
-
-        }
-
 
         #region Motion Command
         public ICommand CmdAllHome
@@ -697,6 +945,8 @@ namespace Root_CAMELLIA
 
         #region General Command
 
+        
+
         public ICommand LoadedCommand
         {
             get
@@ -709,6 +959,10 @@ namespace Root_CAMELLIA
                     }
                     while (!ModuleCamellia.p_CamVRS.m_ConnectDone) ;
                     p_rootViewer.p_ImageData = ModuleCamellia.p_CamVRS.p_ImageViewer.p_ImageData;
+                    RaisePropertyChanged("p_pmParameter");
+
+                    Run_Measure measure = (Run_Measure)ModuleCamellia.CloneModuleRun("Measure");
+                    StageCenterPos = measure.m_StageCenterPos_pulse;
                 });
             }
         }
@@ -729,6 +983,29 @@ namespace Root_CAMELLIA
         #endregion
 
         #region Function
+        public void UpdateParameter()
+        {
+            LibSR_Met.DataManager dataManager = LibSR_Met.DataManager.GetInstance();
+            dataManager.m_SettngData.nAverage_NIR = p_pmParameter.p_NIRAverage;
+            dataManager.m_SettngData.nAverage_VIS = p_pmParameter.p_VISAverage;
+            dataManager.m_SettngData.nInitCalIntTime_NIR = p_pmParameter.p_InitNIRIntegrationTime;
+            dataManager.m_SettngData.nInitCalIntTime_VIS = p_pmParameter.p_InitVISIntegrationTime;
+            dataManager.m_SettngData.nBoxcar_NIR = p_pmParameter.p_NIRBoxcar;
+            dataManager.m_SettngData.nBoxcar_VIS = p_pmParameter.p_VISBoxcar;
+            dataManager.m_SettngData.nBGIntTime_NIR = p_pmParameter.p_BGNIRIntegrationTime;
+            dataManager.m_SettngData.nBGIntTime_VIS = p_pmParameter.p_BGVISIntegrationTime;
+            dataManager.m_SettngData.nMeasureIntTime_NIR = p_pmParameter.p_NIRIntegrationTime;
+            dataManager.m_SettngData.nMeasureIntTime_VIS = p_pmParameter.p_VISIntegrationTime;
+            dataManager.m_SettngData.dAlphaFit = p_pmParameter.p_alpha1;
+        }
+        private void OnGrabImageUpdate(object sender, EventArgs e)
+        {
+            dispatcher.Invoke(() =>
+            {
+                p_rootViewer.SetImageSource();
+            });
+
+        }
         private void MeasureSample()
         {
             EQ.p_bStop = false;
@@ -740,6 +1017,9 @@ namespace Root_CAMELLIA
             Thread thread = new Thread(() =>
             {
                 Run_Measure measure = (Run_Measure)ModuleCamellia.CloneModuleRun("Measure");
+                UpdateParameter();
+                measure.m_isPM = true;
+                measure.m_isAlphaFit = p_pmParameter.p_isAlpha1;
                 measure.Run();
             });
             thread.Start();
@@ -755,6 +1035,8 @@ namespace Root_CAMELLIA
             Thread thread = new Thread(() =>
             {
                 Run_CalibrationWaferCentering calibration = (Run_CalibrationWaferCentering)ModuleCamellia.CloneModuleRun("CalibrationWaferCentering");
+                UpdateParameter();
+                calibration.m_isPM = true;
                 calibration.m_useCal = true;
                 calibration.m_useCentering = false;
                 calibration.Run();
@@ -771,7 +1053,9 @@ namespace Root_CAMELLIA
             }
             Thread thread = new Thread(() =>
             {
-                Run_InitCalibration initCalibration = (Run_InitCalibration)ModuleCamellia.CloneModuleRun("InitCalWaferCentering");
+                Run_InitCalibration initCalibration = (Run_InitCalibration)ModuleCamellia.CloneModuleRun("InitCalibration");
+                initCalibration.m_isPM = true;
+                UpdateParameter();
                 initCalibration.Run();
             });
             thread.Start();
@@ -820,6 +1104,63 @@ namespace Root_CAMELLIA
         }
 
         #endregion
+
+        public class PM_SR_Parameter : ObservableObject
+        {
+            #region Property
+
+            double m_alpha1 = 1.0;
+            public double p_alpha1
+            {
+                get
+                {
+                    return m_alpha1;
+                }
+                set
+                {
+                    SetProperty(ref m_alpha1, value);
+                }
+            }
+            public bool p_isAlpha1 { get; set; } = false;
+            public int p_VISIntegrationTime { get; set; } = 25;
+            public int p_NIRIntegrationTime { get; set; } = 150;
+            public int p_InitVISIntegrationTime { get; set; } = 25;
+            public int p_InitNIRIntegrationTime { get; set; } = 150;
+            public int p_BGVISIntegrationTime { get; set; } = 50;
+            public int p_BGNIRIntegrationTime { get; set; } = 150;
+            public int p_VISBoxcar { get; set; } = 2;
+            public int p_NIRBoxcar { get; set; } = 2;
+            public int p_VISAverage { get; set; } = 3;
+            public int p_NIRAverage { get; set; } = 3;
+            public int p_repeat { get; set; } = 1;
+            public int p_delay { get; set; } = 0;
+            #endregion
+
+            private void LoadSRParameter()
+            {
+                (LibSR_Met.SettingData, LibSR_Met.Nanoview.ERRORCODE_NANOVIEW) m_SettingDataWithErrorCode = App.m_nanoView.LoadSettingParameters();
+                if (m_SettingDataWithErrorCode.Item2 == LibSR_Met.Nanoview.ERRORCODE_NANOVIEW.SR_NO_ERROR)
+                {
+                    p_NIRAverage = m_SettingDataWithErrorCode.Item1.nAverage_NIR;
+                    p_VISAverage = m_SettingDataWithErrorCode.Item1.nAverage_VIS;
+                    p_InitVISIntegrationTime = m_SettingDataWithErrorCode.Item1.nInitCalIntTime_VIS;
+                    p_InitNIRIntegrationTime = m_SettingDataWithErrorCode.Item1.nInitCalIntTime_NIR;
+                    p_BGNIRIntegrationTime = m_SettingDataWithErrorCode.Item1.nBGIntTime_NIR;
+                    p_BGVISIntegrationTime = m_SettingDataWithErrorCode.Item1.nBGIntTime_VIS;
+                    p_VISBoxcar = m_SettingDataWithErrorCode.Item1.nBoxcar_VIS;
+                    p_NIRBoxcar = m_SettingDataWithErrorCode.Item1.nBoxcar_NIR;
+
+                }
+            }
+
+            public void SetRecipeData(RecipeData rd)
+            {
+                p_VISIntegrationTime = rd.VISIntegrationTime;
+                p_NIRIntegrationTime = rd.NIRIntegrationTime;
+
+                LoadSRParameter();
+            }
+        }
         public class WorkPoint
         {
             private string _Name;

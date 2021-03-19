@@ -21,9 +21,10 @@ namespace Root_CAMELLIA.Module
         bool m_useCalWafer = true;
         bool m_useRefWafer = true;
         bool m_InitialCal = true;
-        
 
         (Met.SettingData, Met.Nanoview.ERRORCODE_NANOVIEW) m_SettingDataWithErrorCode;
+        public bool m_isPM = false;
+        public Dlg_Engineer_ViewModel.PM_SR_Parameter SR_Parameter = new Dlg_Engineer_ViewModel.PM_SR_Parameter();
         public Run_InitCalibration(Module_Camellia module)
         {
             m_module = module;
@@ -72,12 +73,17 @@ namespace Root_CAMELLIA.Module
                 if (m_module.Run(axisXY.WaitReady()))
                     return p_sInfo;
 
-                m_SettingDataWithErrorCode = App.m_nanoView.LoadSettingParameters();
-                if (m_SettingDataWithErrorCode.Item2 == Met.Nanoview.ERRORCODE_NANOVIEW.SR_NO_ERROR)
+                if (!m_isPM)
                 {
-                    Met.SettingData setting = m_SettingDataWithErrorCode.Item1;
-                    App.m_nanoView.Calibration(setting.nBGIntTime_VIS, setting.nBGIntTime_NIR, setting.nAverage_VIS, setting.nAverage_NIR, m_InitialCal, m_dataManager.recipeDM.MeasurementRD.VISIntegrationTime, m_dataManager.recipeDM.MeasurementRD.NIRIntegrationTime);
+                    m_SettingDataWithErrorCode = App.m_nanoView.LoadSettingParameters();
+                    if (m_SettingDataWithErrorCode.Item2 != Met.Nanoview.ERRORCODE_NANOVIEW.SR_NO_ERROR)
+                    {
+                        return "Load Parameter Error";
+                    }
+                    LibSR_Met.DataManager.GetInstance().m_SettngData = m_SettingDataWithErrorCode.Item1;
                 }
+
+                App.m_nanoView.Calibration(m_InitialCal);
             }
 
             if (m_useRefWafer)
@@ -88,12 +94,17 @@ namespace Root_CAMELLIA.Module
                 if (m_module.Run(axisXY.WaitReady()))
                     return p_sInfo;
 
-                m_SettingDataWithErrorCode = App.m_nanoView.LoadSettingParameters();
-                if (m_SettingDataWithErrorCode.Item2 == Met.Nanoview.ERRORCODE_NANOVIEW.SR_NO_ERROR)
+                if (!m_isPM)
                 {
-                    Met.SettingData setting = m_SettingDataWithErrorCode.Item1;
-                    App.m_nanoView.Calibration(setting.nBGIntTime_VIS, setting.nBGIntTime_NIR, setting.nAverage_VIS, setting.nAverage_NIR, m_InitialCal, m_dataManager.recipeDM.MeasurementRD.VISIntegrationTime, m_dataManager.recipeDM.MeasurementRD.NIRIntegrationTime);
+                    m_SettingDataWithErrorCode = App.m_nanoView.LoadSettingParameters();
+                    if (m_SettingDataWithErrorCode.Item2 != Met.Nanoview.ERRORCODE_NANOVIEW.SR_NO_ERROR)
+                    {
+                        return "Load Parameter Error";
+                    }
+                    LibSR_Met.DataManager.GetInstance().m_SettngData = m_SettingDataWithErrorCode.Item1;
                 }
+
+                App.m_nanoView.Calibration(m_InitialCal);
             }
 
             return "OK";

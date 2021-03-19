@@ -39,7 +39,7 @@ namespace Root_CAMELLIA.Module
         public DataManager m_DataManager;
         public MainWindow_ViewModel mwvm;
         InfoCarrier[] infoCarrier = new InfoCarrier[2];
-        Log m_log;
+        Log m_camelliaLog;
         #region ToolBox
 
         AxisXY m_axisXY;
@@ -278,7 +278,7 @@ namespace Root_CAMELLIA.Module
         }
         public Module_Camellia(string id, IEngineer engineer, List<ILoadport> loadports)
         {
-            m_log = LogView.GetLog(id, id);
+            m_camelliaLog = LogView.GetLog(id, id);
             m_waferSize = new InfoWafer.WaferSize(id, false, false);
             base.InitBase(id, engineer);
             InitWorkPoint();
@@ -308,6 +308,8 @@ namespace Root_CAMELLIA.Module
             AddModuleRunList(new Run_InitCalibration(this), true, "InitCalCentering");
             AddModuleRunList(new Run_CalibrationWaferCentering(this), true, "Background Calibration_Centering");
             AddModuleRunList(new Run_Measure(this), true, "Measurement");
+            AddModuleRunList(new Run_PMSensorTilt(this), true, "PM Sensor Tilt");
+            AddModuleRunList(new Run_PMTiltAlign(this), true, "PM Camera Tilt");
         }
 
         public override string StateHome()
@@ -394,7 +396,7 @@ namespace Root_CAMELLIA.Module
             base.RunThread();
             if (m_bUseInitCal)
             {
-                if (EQ.p_eState == EQ.eState.Run)
+                if (EQ.p_eState == EQ.eState.Run && !EQ.p_bRecovery)
                 {
                     if (!CanInitCal[EQ.p_nRunLP] && infoCarrier[EQ.p_nRunLP].p_eState == InfoCarrier.eState.Dock)
                     {

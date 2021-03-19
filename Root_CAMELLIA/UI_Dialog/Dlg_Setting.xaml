@@ -98,6 +98,8 @@
                         <RowDefinition Height="30" />
                         <RowDefinition Height="30" />
                         <RowDefinition Height="30" />
+                        <RowDefinition Height="30" />
+                        <RowDefinition Height="30" />
                     </Grid.RowDefinitions>
                     <Grid Margin="0,3">
                         <Grid.ColumnDefinitions>
@@ -222,6 +224,60 @@
                             <ColumnDefinition Width="0.5*" />
                             <ColumnDefinition Width="2*" />
                         </Grid.ColumnDefinitions>
+                        <TextBlock Text="VIS Init Intergration Time"
+                                   Margin="10,0,0,0"
+                                   Grid.Column="0"
+                                   VerticalAlignment="Center" />
+                        <TextBlock Text=":"
+                                   Grid.Column="1"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center" />
+                        <Grid Grid.Column="2">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="3*" />
+                                <ColumnDefinition />
+                            </Grid.ColumnDefinitions>
+                            <TextBox Grid.Column="0"
+                                     Margin="5,0" Text="{Binding p_VISInitIntegrationTime}" IsEnabled="{Binding p_Main.p_InitNanoview}"  VerticalContentAlignment="Center"/>
+                            <TextBlock Grid.Column="2"
+                                       Margin="10,0,0,0"
+                                       Text="ms"
+                                       VerticalAlignment="Center"/>
+                        </Grid>
+                    </Grid>
+                    <Grid Margin="0,3" Grid.Row="6">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="1.5*" />
+                            <ColumnDefinition Width="0.5*" />
+                            <ColumnDefinition Width="2*" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="NIR Init Intergration Time"
+                                   Margin="10,0,0,0"
+                                   Grid.Column="0"
+                                   VerticalAlignment="Center" />
+                        <TextBlock Text=":"
+                                   Grid.Column="1"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center" />
+                        <Grid Grid.Column="2">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="3*" />
+                                <ColumnDefinition />
+                            </Grid.ColumnDefinitions>
+                            <TextBox Grid.Column="0"
+                                     Margin="5,0" Text="{Binding p_NIRInitIntegrationTime}" IsEnabled="{Binding p_Main.p_InitNanoview}"  VerticalContentAlignment="Center"/>
+                            <TextBlock Grid.Column="2"
+                                       Margin="10,0,0,0"
+                                       Text="ms"
+                                       VerticalAlignment="Center"/>
+                        </Grid>
+                    </Grid>
+                    <Grid Margin="0,3" Grid.Row="7">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="1.5*" />
+                            <ColumnDefinition Width="0.5*" />
+                            <ColumnDefinition Width="2*" />
+                        </Grid.ColumnDefinitions>
                         <TextBlock Text="VIS Average"
                                    Margin="10,0,0,0"
                                    Grid.Column="0"
@@ -239,7 +295,7 @@
                                      Margin="5,0" Text="{Binding p_VISAverage}" IsEnabled="{Binding p_Main.p_InitNanoview}"  VerticalContentAlignment="Center"/>
                         </Grid>
                     </Grid>
-                    <Grid Margin="0,3" Grid.Row="6">
+                    <Grid Margin="0,3" Grid.Row="8">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="1.5*" />
                             <ColumnDefinition Width="0.5*" />
@@ -262,7 +318,7 @@
                                      Margin="5,0" Text="{Binding p_NIRAverage}" IsEnabled="{Binding p_Main.p_InitNanoview}"  VerticalContentAlignment="Center"/>
                         </Grid>
                     </Grid>
-                    <Grid Margin="0,3" Grid.Row="7">
+                    <Grid Margin="0,3" Grid.Row="9">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="1.5*" />
                             <ColumnDefinition Width="0.5*" />
@@ -483,56 +539,6 @@
                                    Grid.Column="0"
                                    VerticalAlignment="Center" />
                             <ToggleButton Grid.Column="1"  Style="{StaticResource CustomToggleButton}" IsChecked="{Binding p_UseThickness, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-                        </Grid>
-                    </Grid>
-                    <Grid Margin="0,3" Grid.Row="3">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="1.5*" />
-                            <ColumnDefinition Width="0.5*" />
-                            <ColumnDefinition Width="2*" />
-                        </Grid.ColumnDefinitions>
-                        <TextBlock Text="???"
-                                   Margin="10,0,0,0"
-                                   Grid.Column="0"
-                                   VerticalAlignment="Center" />
-                        <TextBlock Text=":"
-                                   Grid.Column="1"
-                                   HorizontalAlignment="Center"
-                                   VerticalAlignment="Center" />
-                        <Grid Grid.Column="2">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="3*" />
-                                <ColumnDefinition />
-                            </Grid.ColumnDefinitions>
-                            <TextBox Grid.Column="0"
-                                     Margin="5,0" />
-                            <Button Content="..."
-                                    Grid.Column="1" />
-                        </Grid>
-                    </Grid>
-                    <Grid Margin="0,3" Grid.Row="4">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="1.5*" />
-                            <ColumnDefinition Width="0.5*" />
-                            <ColumnDefinition Width="2*" />
-                        </Grid.ColumnDefinitions>
-                        <TextBlock Text="???"
-                                   Margin="10,0,0,0"
-                                   Grid.Column="0"
-                                   VerticalAlignment="Center" />
-                        <TextBlock Text=":"
-                                   Grid.Column="1"
-                                   HorizontalAlignment="Center"
-                                   VerticalAlignment="Center" />
-                        <Grid Grid.Column="2">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="3*" />
-                                <ColumnDefinition />
-                            </Grid.ColumnDefinitions>
-                            <TextBox Grid.Column="0"
-                                     Margin="5,0" />
-                            <Button Content="..."
-                                    Grid.Column="1" />
                         </Grid>
                     </Grid>
                 </Grid>
