@@ -94,6 +94,32 @@ namespace Root_CAMELLIA
             }
         }
 
+        private int m_VISInitIntegrationTime = 25;
+        public int p_VISInitIntegrationTime
+        {
+            get
+            {
+                return m_VISInitIntegrationTime;
+            }
+            set
+            {
+                SetProperty(ref m_VISInitIntegrationTime, value);
+            }
+        }
+
+        private int m_NIRInitIntegrationTime = 150;
+        public int p_NIRInitIntegrationTime
+        {
+            get
+            {
+                return m_NIRInitIntegrationTime;
+            }
+            set
+            {
+                SetProperty(ref m_NIRInitIntegrationTime, value);
+            }
+        }
+
 
         private int m_VISAverage = 5;
         public int p_VISAverage
@@ -186,6 +212,8 @@ namespace Root_CAMELLIA
             {
                 p_VISBGIntegrationTime = nanoViewParameter.Item1.nBGIntTime_VIS;
                 p_NIRBGIntegrationTime = nanoViewParameter.Item1.nBGIntTime_NIR;
+                p_VISInitIntegrationTime = nanoViewParameter.Item1.nInitCalIntTime_VIS;
+                p_NIRInitIntegrationTime = nanoViewParameter.Item1.nInitCalIntTime_NIR;
                 p_VISAverage = nanoViewParameter.Item1.nAverage_VIS;
                 p_NIRAverage = nanoViewParameter.Item1.nAverage_NIR;
             }
@@ -319,6 +347,8 @@ namespace Root_CAMELLIA
                         LibSR_Met.SettingData set = new LibSR_Met.SettingData();
                         set.nAverage_NIR = p_NIRAverage;
                         set.nAverage_VIS = p_VISAverage;
+                        set.nInitCalIntTime_NIR = p_NIRInitIntegrationTime;
+                        set.nInitCalIntTime_VIS = p_VISInitIntegrationTime;
                         set.nBGIntTime_NIR = p_NIRBGIntegrationTime;
                         set.nBGIntTime_VIS = p_VISBGIntegrationTime;
                         App.m_nanoView.SaveSettingParameters(set);

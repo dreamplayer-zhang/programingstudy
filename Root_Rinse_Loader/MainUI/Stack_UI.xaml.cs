@@ -125,5 +125,20 @@ namespace Root_Rinse_Loader.MainUI
         {
             m_storage.MoveStackReady(); 
         }
+
+        private void buttonLoaderStorage_Click(object sender, RoutedEventArgs e)
+        {
+            m_loader.MoveLoader(Loader.ePos.Stotage); 
+        }
+
+        private void buttonLoaderRail_Click(object sender, RoutedEventArgs e)
+        {
+            m_loader.MoveLoader(Loader.ePos.Rail);
+        }
+
+        private void buttonLoaderRoller_Click(object sender, RoutedEventArgs e)
+        {
+            m_loader.MoveLoader(Loader.ePos.Roller);
+        }
     }
 }

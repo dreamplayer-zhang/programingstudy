@@ -1,4 +1,5 @@
 ﻿using RootTools;
+using RootTools.Trees;
 using System;
 
 namespace Root_VEGA_P_Vision.Module
@@ -43,7 +44,7 @@ namespace Root_VEGA_P_Vision.Module
         }
         #endregion
 
-        #region ToString
+        #region Convert String
         public override string ToString()
         {
             return ((int)p_ePod).ToString() + ',' + p_bTurn.ToString(); 
@@ -51,20 +52,23 @@ namespace Root_VEGA_P_Vision.Module
 
         public void FromString(string sInfoPod)
         {
-            //forget
-        }
-
-        public InfoPod(string sInfoPod)
-        {
             try
             {
                 string[] asInfoPod = sInfoPod.Split(',');
-                p_ePod = (ePod)Convert.ToInt32(asInfoPod[0]); 
+                p_ePod = (ePod)Convert.ToInt32(asInfoPod[0]);
                 p_bTurn = (asInfoPod[1] == true.ToString());
                 p_id = p_ePod.ToString();
                 m_reg = new Registry("InfoPod." + p_id);
             }
             catch (Exception) { }
+        }
+        #endregion
+
+        #region Tree
+        public void RunTree(Tree tree, bool bVisible)
+        {
+            p_ePod = (ePod)tree.Set(p_ePod, p_ePod, "Pod", "Pod Name", bVisible, true);
+            p_bTurn = tree.Set(p_bTurn, p_bTurn, "Bottom Up", "Turn Over", bVisible); 
         }
         #endregion
 

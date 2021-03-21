@@ -774,6 +774,8 @@ namespace Root_CAMELLIA
                 {
                     var viewModel = EngineerViewModel;
                     var dialog = dialogService.GetDialog(viewModel) as Dlg_Engineer;
+                    viewModel.p_pmParameter.SetRecipeData(DataManager.recipeDM.MeasurementRD);
+                    viewModel.SetMovePoint(DataManager.recipeDM.MeasurementRD);
                     dialog.HandlerUI.Init(App.m_engineer.m_handler);
                     dialog.LogUI.Init(LogView._logView);
                     dialog.ToolBoxUI.Init(App.m_engineer);

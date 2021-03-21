@@ -104,7 +104,7 @@ namespace RootTools.Comm
             get { return (m_socket == null) ? false : m_socket.Connected; }
         }
 
-        string Connect()
+        public string Connect()
         {
             try
             {

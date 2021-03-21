@@ -437,6 +437,7 @@ namespace Root_EFEM
                 {
                     case EQ.eState.Home: StateHome(); break;
                     case EQ.eState.Run:
+                    case EQ.eState.Recovery:
                         if (p_moduleList.m_qModuleRun.Count == 0)
                         {
                             m_process.p_sInfo = m_process.RunNextSequence();
