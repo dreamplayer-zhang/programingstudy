@@ -103,7 +103,9 @@ namespace Root_VEGA_P_Vision.Module
 
                         camStain.Grab();
 
-                        IntPtr ptr = mem.GetPtr();
+                        bool isFlipped = m_module.p_infoPod.p_bTurn;
+
+                        IntPtr ptr = mem.GetPtr(Convert.ToInt32(isFlipped));
                         Parallel.For(0, nCamHeight, (i) => {
                             Marshal.Copy(camStain.p_ImageData.m_aBuf, 0, (IntPtr)((long)ptr + (x * nCamWidth) + (i * mem.W)), nCamWidth);
                         });

@@ -8,6 +8,7 @@ using RootTools.Memory;
 using RootTools.Module;
 using RootTools.ToolBoxs;
 using RootTools.Trees;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Threading;
@@ -21,6 +22,14 @@ namespace Root_VEGA_P_Vision.Module
         MemoryPool memoryPool;
         MemoryGroup memoryGroup;
         public int sideGrabCnt = 0;
+        public enum eParts
+        {
+            EIP_Cover, EIP_Plate
+        }
+        public enum eUpDown
+        {
+            Front, Back
+        }
         public override void GetTools(bool bInit)
         {
             p_sInfo = m_toolBox.Get(ref memoryPool, this, "Memory", 1);
@@ -32,6 +41,7 @@ namespace Root_VEGA_P_Vision.Module
         }
         #endregion
 
+        #region[Move]
         public string Move(Axis axis, double pos, bool bWait = true)
         {
             string sRun = axis.StartMove(pos);
@@ -50,6 +60,7 @@ namespace Root_VEGA_P_Vision.Module
             if (sRun.Equals("OK")) return sRun;
             return bWait ? m_stage.m_axisXY.WaitReady() : "OK";
         }
+        #endregion
 
         #region Stage
         public class Stage : NotifyProperty
@@ -119,10 +130,10 @@ namespace Root_VEGA_P_Vision.Module
             public Camera_Dalsa camTDI;
             public Camera_Basler camStain;
             public Camera_Matrox camZStack;
-            MemoryData memoryStain, memoryTDI, memoryZStack;
-            public enum eMainScan
+
+            public enum eInsp
             {
-                MemoryStain,MemoryTDI,MemoryZStack
+                Stain,Main
             }
 
             public void GetTools(ToolBox toolBox, bool bInit)
@@ -141,13 +152,13 @@ namespace Root_VEGA_P_Vision.Module
 
             public void InitMemorys()
             {
-                memoryStain = m_vision.memoryGroup.CreateMemory(eMainScan.MemoryStain.ToString(), 1, 1, 1000, 1000);
-                memoryTDI = m_vision.memoryGroup.CreateMemory(eMainScan.MemoryTDI.ToString(), 1, 1, 1000, 1000);
-                memoryZStack = m_vision.memoryGroup.CreateMemory(eMainScan.MemoryZStack.ToString(), 1, 1, 1000, 1000);
+                foreach(var v in Enum.GetValues(typeof(eParts)))
+                    foreach(var v2 in Enum.GetValues(typeof(eUpDown)))
+                        m_vision.memoryGroup.CreateMemory(v.ToString() + "." + v2.ToString(), 1, 1, 1000,1000);
             }
-            public ImageData GetMemoryData(eMainScan mem)
+            public MemoryData GetMemoryData(eParts parts,eUpDown updown)
             {
-                return new ImageData(m_vision.memoryPool.GetMemory(m_vision.p_id, mem.ToString()));
+                return m_vision.memoryPool.GetMemory(m_vision.p_id, parts.ToString()+"."+updown.ToString());
             }
             public double m_pulsePermm = 10000;
 
@@ -160,6 +171,8 @@ namespace Root_VEGA_P_Vision.Module
             public MainOptic(Vision vision)
             {
                 m_vision = vision;
+                StainMems = new MemoryData[4];
+                MainMems = new MemoryData[4];
             }
         }
         public MainOptic m_mainOptic;
@@ -169,7 +182,7 @@ namespace Root_VEGA_P_Vision.Module
         public class SideOptic : NotifyProperty
         {
             public Camera_Basler camSide;
-            MemoryData memoryTop, memoryLeft, memoryRight, memoryBottom;
+
             public enum eSide
             {
                 Top,Left,Bottom,Right
@@ -189,14 +202,17 @@ namespace Root_VEGA_P_Vision.Module
 
             public void InitMemorys()
             {
-                memoryTop = m_vision.memoryGroup.CreateMemory(eSide.Top.ToString(), 1, 1, 1000, 1000);
-                memoryLeft = m_vision.memoryGroup.CreateMemory(eSide.Left.ToString(), 1, 1, 1000, 1000);
-                memoryRight = m_vision.memoryGroup.CreateMemory(eSide.Right.ToString(), 1, 1, 1000, 1000);
-                memoryBottom = m_vision.memoryGroup.CreateMemory(eSide.Bottom.ToString(), 1, 1, 1000, 1000);
+                foreach (var v in Enum.GetValues(typeof(eParts)))
+                    foreach (var v2 in Enum.GetValues(typeof(eSide)))
+                        m_vision.memoryGroup.CreateMemory(v.ToString() + "." + v2.ToString(), 1, 1, 1000, 1000);
             }
-            public MemoryData GetMemoryData(eSide mem)
+            public MemoryData GetMemoryData(eParts parts,eSide side)
             {
-                return m_vision.memoryPool.GetMemory(m_vision.p_id, mem.ToString());
+                return m_vision.memoryPool.GetMemory(m_vision.p_id, parts.ToString()+"."+side.ToString());
+            }
+            public MemoryData GetMemoryData(string str)
+            {
+                return m_vision.memoryPool.GetMemory(m_vision.p_id, str);
             }
             public double m_pulsePermm = 10000;
 
@@ -405,8 +421,8 @@ namespace Root_VEGA_P_Vision.Module
         protected override void InitModuleRuns()
         {
             AddModuleRunList(new Run_Rotate(this), true, "Rotate");
-            AddModuleRunList(new Run_SideGrab(this), true, "Main Grab");
-            //AddModuleRunList(new Run_SideGrab(this), true, "Side Grab");
+            AddModuleRunList(new Run_MainGrab(this), true, "Main Grab");
+            AddModuleRunList(new Run_SideGrab(this), true, "Side Grab");
             AddModuleRunList(new Run_StainGrab(this), true, "Stain Grab");
         }        
         #endregion

@@ -188,6 +188,7 @@
     <Compile Include="Module\Vision\Run_Rotate.cs" />
     <Compile Include="Module\Vision\Run_SideGrab.cs" />
     <Compile Include="Module\Vision\Run_StainGrab.cs" />
+    <Compile Include="Module\Vision\Run_ZStack.cs" />
     <Compile Include="MVVM\Converter.cs" />
     <Compile Include="MVVM\Helper.cs" />
     <Compile Include="MVVM\ObservableObject.cs" />

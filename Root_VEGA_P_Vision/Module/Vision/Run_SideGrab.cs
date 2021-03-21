@@ -21,6 +21,7 @@ namespace Root_VEGA_P_Vision.Module
         GrabMode SidegrabMode;
         Camera_Basler camSide;
         string sSideGrabMode;
+
         public Run_SideGrab(Vision module)
         {
             m_module = module;
@@ -80,8 +81,10 @@ namespace Root_VEGA_P_Vision.Module
 
                 if (m_module.sideGrabCnt > 3) m_module.sideGrabCnt = 0;
 
-                MemoryData mem = sideOpt.GetMemoryData((Vision.SideOptic.eSide)Enum.ToObject(typeof(Vision.SideOptic.eSide),m_module.sideGrabCnt++));
-
+                InfoPod.ePod parts = m_module.p_infoPod.p_ePod;
+                //MemoryData mem = sideOpt.GetMemoryData(parts.ToString());
+                Vision.eUpDown e = Enum.ToObject(typeof(Vision.eUpDown), m_module.p_infoPod.p_bTurn);
+                MemoryData mem = sideOpt.GetMemoryData(parts.ToString() + "."+);
                 if (m_module.Run(m_module.Move(axisZ, SidegrabMode.m_nFocusPosZ)))
                     return p_sInfo;
 
