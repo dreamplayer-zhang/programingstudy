@@ -26,7 +26,7 @@ namespace RootTools_Vision.Database
 
         public float m_fGV;
         public int m_nChipIndexX; // Chip Index
-        public int m_nCHipIndexY;
+        public int m_nChipIndexY;
         //public string sImagePath;
 
         //private Rect m_rtDefectRect;
@@ -70,7 +70,7 @@ namespace RootTools_Vision.Database
             m_rtDefectBox = new Rect(fAbsX - (fDefectW / 2), fAbsY - (fDefectH / 2), fDefectW, fDefectH);
 
             m_nChipIndexX = chipIdxX;
-            m_nCHipIndexY = chipIdxY;
+            m_nChipIndexY = chipIdxY;
 
             p_rtDefectRect = new Rect(m_rtDefectBox.Left, p_rtDefectBox.Top, m_fWidth, m_fHeight);
         }
@@ -91,7 +91,7 @@ namespace RootTools_Vision.Database
             m_rtDefectBox = new Rect(fDefectAbsLeft, fDefectAbsTop, fDefectW, fDefectH);
 
             m_nChipIndexX = nChipIdxX;
-            m_nCHipIndexY = nChipIdxY;
+            m_nChipIndexY = nChipIdxY;
 
             p_rtDefectRect = new Rect(m_rtDefectBox.Left, p_rtDefectBox.Top, m_fWidth, m_fHeight);
         }
@@ -121,7 +121,7 @@ namespace RootTools_Vision.Database
             m_rtDefectBox = new Rect(fDefectAbsLeft, fDefectAbsTop, fDefectW, fDefectH);
 
             m_nChipIndexX = nChipIdxX;
-            m_nCHipIndexY = nChipIdxY;
+            m_nChipIndexY = nChipIdxY;
 
             p_rtDefectRect = new Rect(m_rtDefectBox.Left, p_rtDefectBox.Top, m_fWidth, m_fHeight);
         }
