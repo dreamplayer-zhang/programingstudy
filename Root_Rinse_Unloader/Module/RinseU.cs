@@ -256,9 +256,9 @@ namespace Root_Rinse_Unloader.Module
             p_sInfo = m_toolBox.Get(ref m_diEMG, this, "Emergency");
             p_sInfo = m_toolBox.Get(ref m_diAir, this, "Air Pressure");
             p_sInfo = m_toolBox.Get(ref m_diDoorLock, this, "Door Lock");
-            p_sInfo = m_toolBox.Get(ref m_diBuzzerOff, this, "Buzzer Off");
-            p_sInfo = m_toolBox.Get(ref m_doLamp, this, "Lamp", m_asLamp);
-            p_sInfo = m_toolBox.Get(ref m_doBuzzer, this, "Buzzer", m_asBuzzer);
+            p_sInfo = m_toolBox.Get(ref m_diBuzzerOff, this, "Buzzer Off", false);
+            p_sInfo = m_toolBox.Get(ref m_doLamp, this, "Lamp", m_asLamp, false);
+            p_sInfo = m_toolBox.Get(ref m_doBuzzer, this, "Buzzer", m_asBuzzer, false);
             p_sInfo = m_toolBox.Get(ref m_diLightCurtain, this, "Light Curtain");
         }
 
@@ -348,12 +348,13 @@ namespace Root_Rinse_Unloader.Module
         }
         void CheckLightCurtan()
         {
-            if (m_diLightCurtain.p_bIn == false) m_swLightCurtain.Start();
-            if (p_eState != eState.Run) return;
-            if (m_diLightCurtain.p_bIn == false) return;
+            if (m_diLightCurtain.p_bIn == true) m_swLightCurtain.Start();
+            //if (p_eState != eState.Run) return;
+            if (m_diLightCurtain.p_bIn == true) return;
             if (m_swLightCurtain.ElapsedMilliseconds > _msLightCurtain)
             {
                 EQ.p_bStop = true;
+                EQ.p_eState = EQ.eState.Error; 
                 p_eState = eState.Error;
                 p_sInfo = "Light Curtain Check Timeout";
             }
@@ -460,6 +461,7 @@ namespace Root_Rinse_Unloader.Module
         public Protocol AddProtocol(string id, eCmd eCmd, dynamic value)
         {
             Protocol protocol = new Protocol(id, eCmd, value);
+            if (m_tcpip.m_tcpSocket == null) return protocol; 
             if (!m_tcpip.m_tcpSocket.m_socket.Connected) return protocol;
             if (id == p_id) m_qProtocolSend.Enqueue(protocol);
             else m_qProtocolReply.Enqueue(protocol);
@@ -609,6 +611,7 @@ namespace Root_Rinse_Unloader.Module
         {
             p_id = id;
             InitBase(id, engineer);
+            InitALID();
 
             InitThread();
             InitTimer(); 

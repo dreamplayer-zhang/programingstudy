@@ -219,16 +219,16 @@
                                         <ColumnDefinition/>
                                         <ColumnDefinition/>
                                     </Grid.ColumnDefinitions>
-                                    <GroupBox Header="Unloader State"
+                                    <GroupBox Header="Loader State"
                                           Style="{StaticResource group}"
                                           Margin="5,10"
                                           Grid.Column="0"
                                           BorderThickness="0">
                                         <Border Margin="5"
                                             CornerRadius="10"
-                                            x:Name="borderState"
+                                            x:Name="borderLoadState"
                                             Background="SeaGreen">
-                                            <TextBlock x:Name="textBlockState" Text="{Binding p_eState}"
+                                            <TextBlock x:Name="textBlockLoadState" Text="{Binding p_eStateLoader}"
                                                    FontSize="30"
                                                    FontWeight="Bold"
                                                    FontFamily="Arial"
@@ -236,16 +236,16 @@
                                                    HorizontalAlignment="Center"/>
                                         </Border>
                                     </GroupBox>
-                                    <GroupBox Header="Loader State"
+                                    <GroupBox Header="Unloader State"
                                           Style="{StaticResource group}"
                                           Margin="5,10"
                                           Grid.Column="1"
                                           BorderThickness="0">
                                         <Border Margin="5"
                                             CornerRadius="10"
-                                            x:Name="borderLoadState"
+                                            x:Name="borderState"
                                             Background="SeaGreen">
-                                            <TextBlock x:Name="textBlockLoadState" Text="{Binding p_eStateLoader}"
+                                            <TextBlock x:Name="textBlockState" Text="{Binding p_eState}"
                                                    FontSize="30"
                                                    FontWeight="Bold"
                                                    FontFamily="Arial"
