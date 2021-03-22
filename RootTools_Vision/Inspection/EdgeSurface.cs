@@ -17,6 +17,11 @@ namespace RootTools_Vision
 
 		private EdgeSurfaceParameter parameterEdge;
 		private EdgeSurfaceRecipe recipeEdge;
+		//private GrabMode grabModeEdge;
+
+		private GrabModeBase grabModeTop;
+		private GrabModeBase grabModeSide;
+		private GrabModeBase grabModeBtm;
 
 		public enum EdgeMapPositionX
 		{
@@ -30,6 +35,13 @@ namespace RootTools_Vision
 			m_sName = this.GetType().Name;
 		}
 
+		public void SetGrabMode(GrabModeBase top, GrabModeBase side, GrabModeBase btm)
+		{
+			grabModeTop = top;
+			grabModeSide = side;
+			grabModeBtm = btm;
+		}
+
 		public override WorkBase Clone()
 		{
 			return (WorkBase)this.MemberwiseClone();
@@ -41,6 +53,7 @@ namespace RootTools_Vision
 			{
 				this.parameterEdge = this.parameter as EdgeSurfaceParameter;
 				this.recipeEdge = recipe.GetItem<EdgeSurfaceRecipe>();
+				//this.grabModeEdge = grabMode;
 			}
 			return true;
 		}
@@ -53,9 +66,6 @@ namespace RootTools_Vision
 
 		public void DoInspection()
 		{
-			//if (this.currentWorkplace.MapIndexY == -1)
-			//	return;
-
 			if (this.currentWorkplace.Index == 0)
 				return;
 
@@ -133,7 +143,7 @@ namespace RootTools_Vision
 						label[i].area,
 						label[i].value,
 						0,
-						CalcDegree(0),
+						CalcDegree(0, param),
 						this.currentWorkplace.PositionX + label[i].boundLeft,
 						this.currentWorkplace.PositionY + label[i].boundTop,
 						Math.Abs(label[i].boundRight - label[i].boundLeft),// * resolution),
@@ -145,14 +155,13 @@ namespace RootTools_Vision
 			}
 		}
 
-		public float CalcDegree(int defectLeft)
+		public float CalcDegree(int defectY, EdgeSurfaceParameterBase param)
 		{
-			float degree = 0;
-			//// (끝지점 - 시작지점) / defectLeft
+			//// (끝지점 - 시작지점) / defectY
 			//int bufferY = (int)(360000 / this.parameterEdge.camTriggerRatio) + this.parameterEdge.camHeight;
 
-			//degree = () / defectLeft;
-
+			float heightPerDegree = (param.EndNotch - param.StartNotch) / 540000;
+			float degree = (defectY - param.StartNotch) * heightPerDegree;
 			return degree;
 		}
 
@@ -172,11 +181,11 @@ namespace RootTools_Vision
 			int avg, avgNext;
 			int edge = width;
 			
-			avgNext = MeanForYCoordinates(arrSrc, startPtY, startPtX, width, height);
+			avgNext = MeanOfYCoordinates(arrSrc, startPtY, startPtX, width, height);
 			for (int x = startPtX + 1; x < width; x++)
 			{
 				avg = avgNext;
-				avgNext = MeanForYCoordinates(arrSrc, startPtY, x, width, height);
+				avgNext = MeanOfYCoordinates(arrSrc, startPtY, x, width, height);
 
 				if ((avg >= prox && prox > avgNext) || (avg <= prox && prox < avgNext))
 				{
@@ -187,7 +196,7 @@ namespace RootTools_Vision
 			return edge;
 		}
 
-		public int MeanForYCoordinates(byte[] arrSrc, int startPtY, int findPtX, int width, int height)
+		public int MeanOfYCoordinates(byte[] arrSrc, int startPtY, int findPtX, int width, int height)
 		{
 			int avg = 0;
 

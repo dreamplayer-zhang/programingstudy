@@ -868,7 +868,7 @@ namespace Root_WIND2
                     else if (table.Columns[i].ColumnName == "m_fAbsY") fAbsY = (double)dataRow.ItemArray[i];
                     else if (table.Columns[i].ColumnName == "m_fGV") fGV = (double)dataRow.ItemArray[i];
                     else if (table.Columns[i].ColumnName == "m_nChipIndexX") nChipIndexX = (int)dataRow.ItemArray[i];
-                    else if (table.Columns[i].ColumnName == "m_nCHipIndexY") nCHipIndexY = (int)dataRow.ItemArray[i];
+                    else if (table.Columns[i].ColumnName == "m_nChipIndexY") nCHipIndexY = (int)dataRow.ItemArray[i];
                 }
 
                 Defect defect = new Defect(sInpectionID

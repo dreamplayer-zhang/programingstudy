@@ -17,9 +17,9 @@ namespace Root_WIND2.Module
 	public class Run_GrabEdge : ModuleRunBase
 	{
 		EdgeSideVision module;
-		GrabMode gmTop = null;
-		GrabMode gmSide = null;
-		GrabMode gmBtm = null;
+		GrabModeEdge gmTop = null;
+		GrabModeEdge gmSide = null;
+		GrabModeEdge gmBtm = null;
 
 		string m_sGrabModeTop = "";
 		string m_sGrabModeSide = "";
@@ -67,7 +67,7 @@ namespace Root_WIND2.Module
 			InitModuleRun(module);
 		}
 
-		public GrabMode GetGrabMode(string grabModeName)
+		public GrabModeBase GetGrabMode(string grabModeName)
 		{
 			return module.GetGrabMode(grabModeName);
 		}

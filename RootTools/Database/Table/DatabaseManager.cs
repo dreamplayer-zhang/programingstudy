@@ -98,52 +98,140 @@ namespace RootTools.Database
 				MySqlCommand cmd = new MySqlCommand(sSelectQuery, m_MainConnectSession.GetConnection());
 				MySqlDataReader rdr = cmd.ExecuteReader();
 				List<string> tableList = new List<string>();
+				List<string> columnListTest = new List<string>();
 				while (rdr.Read())
 				{
 					object table = rdr["TABLE_NAME"];
 					tableList.Add(table.ToString());
-					//sSelectQuery = "select column_name from INFORMATION_SCHEMA.columns where table_schema='wind2' and table_name='"+a.ToString()+"'";
-					//cmd = new MySqlCommand(sSelectQuery, m_MainConnectSession.GetConnection());
-					//MySqlDataReader rdr2 = cmd.ExecuteReader();
-					//while (rdr2.Read())
-					//               {
-					//	object b = rdr["COLUMN_NAME"];
-					//}
-					////for ()
-
 				}
 				rdr.Close();
-				//bool isSame = true;
+
+				bool isSame = true;
 				FieldInfo[] defectFieldInfos = null;
+				FieldInfo[] lotinfoFieldInfos = null;
 				List<string> columnList = new List<string>();
+
 				for (int i = 0; i < tableList.Count; i++)
 				{
-					if (tableList[i].Equals("defect"))
-					{
-						Type defectType = typeof(Defect);
-						defectFieldInfos = defectType.GetFields(BindingFlags.Instance | BindingFlags.Public);
-					}
 					sSelectQuery = "select column_name from INFORMATION_SCHEMA.columns where table_schema='wind2' and table_name='" + tableList[i] + "'";
 					cmd = new MySqlCommand(sSelectQuery, m_MainConnectSession.GetConnection());
-
 					rdr = cmd.ExecuteReader();
-					//int a = 0;
+
 					while (rdr.Read())
 					{
 						object columnName = rdr["COLUMN_NAME"];
 						columnList.Add(columnName.ToString());
 					}
+					rdr.Close();
 
-					object[] tt = defectFieldInfos[i].GetCustomAttributes(true);
-					ObsoleteAttribute ob = (ObsoleteAttribute)tt[0];
-					string test = ob.Message;
-					if (defectFieldInfos.Length != columnList.Count)
-                    {
-						//isSame = false;
-						break;
-                    }
+					if (tableList[i].Equals("defect"))
+					{
+						Type defectType = typeof(Defect);
+						defectFieldInfos = defectType.GetFields(BindingFlags.Instance | BindingFlags.Public);
+
+						if (defectFieldInfos.Length != columnList.Count)
+						{
+							columnList = new List<string>();
+							isSame = false;
+							break;
+						}
+                        else
+                        {
+							for (int j = 0; j < defectFieldInfos.Length; j++)
+							{
+								if (!defectFieldInfos[j].Name.Equals(columnList[j]))
+								{
+									//object[] tt = defectFieldInfos[j].GetCustomAttributes(true);
+									//ObsoleteAttribute ob = (ObsoleteAttribute)tt[0];
+									//string test = ob.Message;
+
+									columnList = new List<string>();
+									isSame = false;
+									break;
+								}
+							}
+							if (!isSame)
+							{
+								break;
+							}
+						}
+					}
+					else if (tableList[i].Equals("lotinfo"))
+					{
+						Type lotinfoType = typeof(Lotinfo);
+						lotinfoFieldInfos = lotinfoType.GetFields(BindingFlags.Instance | BindingFlags.Public);
+
+						if (lotinfoFieldInfos.Length != columnList.Count)
+						{
+							columnList = new List<string>();
+							isSame = false;
+							break;
+						}
+                        else
+                        {
+							for (int j = 0; j < lotinfoFieldInfos.Length; j++)
+							{
+								if (!lotinfoFieldInfos[j].Name.Equals(columnList[j]))
+								{
+									//object[] tt = lotinfoFieldInfos[j].GetCustomAttributes(true);
+									//ObsoleteAttribute ob = (ObsoleteAttribute)tt[0];
+									//string test = ob.Message;
+
+									columnList = new List<string>();
+									isSame = false;
+									break;
+								}
+							}
+							if (!isSame)
+							{
+								columnList = new List<string>();
+								break;
+							}
+						}
+					}
+					columnList = new List<string>();
 				}
-				rdr.Close();
+
+				if (tableList.Count == 0)
+				{
+					isSame = false;
+				}
+
+				if (!isSame)
+				{
+					if (tableList.Count > 0)
+					{
+						if (MessageBox.Show("Current DB component version does not match. Do you want to backup old DB then create new DB?", "Warning", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+						{
+							// Backup and Reset DB
+							string strDBTime = "wind2_" + DateTime.Now.ToString("yyyyMMdd_HHmmss");
+							sSelectQuery = "create database `" + strDBTime + "`";
+							cmd = new MySqlCommand(sSelectQuery, m_MainConnectSession.GetConnection());
+							rdr = cmd.ExecuteReader();
+							rdr.Close();
+
+							sSelectQuery = "rename table `wind2`.`defect` to `" + strDBTime + "`.`defect`, `wind2`.`lotinfo` to `" + strDBTime + "`.`lotinfo`";
+							cmd = new MySqlCommand(sSelectQuery, m_MainConnectSession.GetConnection());
+							rdr = cmd.ExecuteReader();
+							rdr.Close();
+
+							// Create empty tables
+							CreateTable("defect", typeof(Defect), nameof(Defect.m_nDefectIndex));
+							CreateTable("lotinfo", typeof(Lotinfo), nameof(Lotinfo.sInspectionID));
+						}
+					}
+					else if (tableList.Count == 0)
+                    {
+						if (MessageBox.Show("Current DB table is empty. Do you want to create new DB?", "Warning", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+						{
+							// Create empty tables
+							CreateTable("defect", typeof(Defect), nameof(Defect.m_nDefectIndex));
+							CreateTable("lotinfo", typeof(Lotinfo), nameof(Lotinfo.sInspectionID));
+						}
+					}
+
+					isSame = true;
+				}
 				return true;
 			}
 			catch(Exception e)
@@ -397,7 +485,14 @@ namespace RootTools.Database
 				string nullAble = " NULL";
 				if(keyName == fld[i].Name)
 				{
-					nullAble = " NOT NULL AUTO_INCREMENT";
+					if (fld[i].FieldType == typeof(int))
+                    {
+						nullAble = " NOT NULL AUTO_INCREMENT";
+					}
+					else
+					{
+						nullAble = " NOT NULL";
+					}
 				}
 				nullAble += ",";
 
@@ -413,6 +508,10 @@ namespace RootTools.Database
 				{
 					stbr.Append(" varchar(45) "+ nullAble);
 				}
+				else if (fld[i].FieldType == typeof(DateTime))
+				{
+					stbr.Append(" datetime " + nullAble);
+				}
 			}
 			stbr.Append(string.Format("PRIMARY KEY ({0})) ENGINE=InnoDB DEFAULT CHARSET=utf8;", keyName));
 			var result = SendQuery(stbr.ToString());
@@ -426,7 +525,7 @@ namespace RootTools.Database
 #endif
 				if(!CheckExistTable(tableName))
 				{
-					//var tableQuery = string.Format("CREATE TABLE '{0}' ('m_nDefectIndex' int(11) NOT NULL AUTO_INCREMENT,'m_strInspectionID' varchar(45) DEFAULT NULL,'m_nDefectCode' int(11) DEFAULT NULL,'m_fSize' double DEFAULT NULL,'m_fWidth' double DEFAULT NULL,'m_fHeight' double DEFAULT NULL,'m_fRelX' double DEFAULT NULL,'m_fRelY' double DEFAULT NULL,'m_fAbsX' double DEFAULT NULL,'m_fAbsY' double DEFAULT NULL,'m_fGV' double DEFAULT NULL,'m_nChipIndexX' int(11) DEFAULT NULL,'m_nCHipIndexY' int(11) DEFAULT NULL,PRIMARY KEY ('m_nDefectIndex')) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8;", tableName);
+					//var tableQuery = string.Format("CREATE TABLE '{0}' ('m_nDefectIndex' int(11) NOT NULL AUTO_INCREMENT,'m_strInspectionID' varchar(45) DEFAULT NULL,'m_nDefectCode' int(11) DEFAULT NULL,'m_fSize' double DEFAULT NULL,'m_fWidth' double DEFAULT NULL,'m_fHeight' double DEFAULT NULL,'m_fRelX' double DEFAULT NULL,'m_fRelY' double DEFAULT NULL,'m_fAbsX' double DEFAULT NULL,'m_fAbsY' double DEFAULT NULL,'m_fGV' double DEFAULT NULL,'m_nChipIndexX' int(11) DEFAULT NULL,'m_nChipIndexY' int(11) DEFAULT NULL,PRIMARY KEY ('m_nDefectIndex')) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8;", tableName);
 					CreateTable(tableName, typeof(Defect),nameof(Defect.m_nDefectIndex));
 				}
 				StringBuilder temp = new StringBuilder();
@@ -538,14 +637,17 @@ namespace RootTools.Database
 #endif
 		}
 
-		public void SetLotinfo(string lotid, string partid, string setupid, string cstid, string waferid, string recipeid)
+		public void SetLotinfo(DateTime inspectionstart, DateTime inspectionend, string lotid, string partid, string setupid, string cstid, string waferid, string recipeid)
 		{
 			//Inspection ID 생성(KEY)
-			m_Loftinfo.SetLotinfo(lotid, partid, setupid, cstid, waferid, recipeid);
+			m_Loftinfo.SetLotinfo(inspectionstart, inspectionend, lotid, partid, setupid, cstid, waferid, recipeid);
 			m_sInspectionID = MakeInspectionID(m_Loftinfo);
 			string sLotinfoQuery;
-			sLotinfoQuery = string.Format("INSERT INTO lotinfo(INSPECTIONID, LOTID, CSTID, WAFERID, RECIPEID)" +
-				" values('{0}','{1}','{2}','{3}','{4}')"
+
+			sLotinfoQuery = string.Format("INSERT INTO lotinfo(InspectionStart, InspectionEnd, sInspectionID, sLotID, sCSTID, sWaferID, sRecipeID)" +
+				" values('{0}','{1}','{2}','{3}','{4}','{5}','{6}')"
+				, inspectionstart.ToString("yyyyMMddHHmmss")
+				, inspectionend.ToString("yyyyMMddHHmmss")
 				, m_sInspectionID
 				, m_Loftinfo.GetLotID()
 				, m_Loftinfo.GetCSTID()

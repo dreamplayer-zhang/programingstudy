@@ -52,8 +52,8 @@ namespace Root_WIND2
                 SetProperty(ref m_nScanWholeLine, value);
             }
         }
-        ObservableCollection<GrabMode> m_GrabMode = new ObservableCollection<GrabMode>();
-        public ObservableCollection<GrabMode> p_GrabMode
+        ObservableCollection<GrabModeFront> m_GrabMode = new ObservableCollection<GrabModeFront>();
+        public ObservableCollection<GrabModeFront> p_GrabMode
         {
             get
             {
@@ -64,8 +64,8 @@ namespace Root_WIND2
                 SetProperty(ref m_GrabMode, value);
             }
         }
-        GrabMode m_SelGrabMode = null;
-        public GrabMode p_SelGrabMode
+        GrabModeFront m_SelGrabMode = null;
+        public GrabModeFront p_SelGrabMode
         {
             get
             {
