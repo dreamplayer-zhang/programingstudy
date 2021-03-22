@@ -197,6 +197,7 @@ namespace Root_VEGA_P_Vision.Module
         {
             m_teach = new TeachRTR();
             InitBase(id, engineer, eRemote);
+            OnChangeState += Buffer_OnChangeState;
         }
 
         public override void ThreadStop()
@@ -207,6 +208,7 @@ namespace Root_VEGA_P_Vision.Module
         #region RemoteRun
         public enum eRemoteRun
         {
+            ServerState,
             StateHome,
             Reset,
             BeforeGet,
@@ -232,12 +234,18 @@ namespace Root_VEGA_P_Vision.Module
             run.m_eRemoteRun = eRemoteRun;
             switch (eRemoteRun)
             {
+                case eRemoteRun.ServerState: run.m_eState = value; break; 
                 case eRemoteRun.StateHome: break;
                 case eRemoteRun.Reset: break;
                 case eRemoteRun.BeforeGet: break;
                 case eRemoteRun.BeforePut: run.m_infoPod = value; break;
             }
             return run; 
+        }
+
+        private void Buffer_OnChangeState(eState eState)
+        {
+            if (p_eRemote == eRemote.Server) RemoteRun(eRemoteRun.ServerState, eState);
         }
         #endregion
 
@@ -315,6 +323,7 @@ namespace Root_VEGA_P_Vision.Module
             {
                 switch (m_eRemoteRun)
                 {
+                    case eRemoteRun.ServerState: m_module.p_eState = m_eState; break; 
                     case eRemoteRun.StateHome: return m_module.StateHome();
                     case eRemoteRun.Reset: m_module.Reset(); break;
                     case eRemoteRun.BeforeGet: return m_module.BeforeGet();
