@@ -149,6 +149,8 @@ namespace Root_WIND2
 			if (this.Recipe == null)
 				return;
 
+			DateTime inspectionStart = DateTime.Now;
+			DateTime inspectionEnd = DateTime.Now;
 			string lotId = "Lotid";
 			string partId = "Partid";
 			string setupId = "SetupID";
@@ -157,7 +159,7 @@ namespace Root_WIND2
 			//string sRecipe = "RecipeID";
 			string recipeName = recipe.Name;
 
-			DatabaseManager.Instance.SetLotinfo(lotId, partId, setupId, cstId, waferId, recipeName);
+			DatabaseManager.Instance.SetLotinfo(inspectionStart, inspectionEnd, lotId, partId, setupId, cstId, waferId, recipeName);
 
 			base.Start();
 		}

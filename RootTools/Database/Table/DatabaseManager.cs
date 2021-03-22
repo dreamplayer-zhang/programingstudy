@@ -397,7 +397,14 @@ namespace RootTools.Database
 				string nullAble = " NULL";
 				if(keyName == fld[i].Name)
 				{
-					nullAble = " NOT NULL AUTO_INCREMENT";
+					if (fld[i].FieldType == typeof(int))
+                    {
+						nullAble = " NOT NULL AUTO_INCREMENT";
+					}
+					else
+					{
+						nullAble = " NOT NULL";
+					}
 				}
 				nullAble += ",";
 
@@ -412,6 +419,10 @@ namespace RootTools.Database
 				else if (fld[i].FieldType == typeof(string) || fld[i].FieldType == typeof(String))
 				{
 					stbr.Append(" varchar(45) "+ nullAble);
+				}
+				else if (fld[i].FieldType == typeof(DateTime))
+				{
+					stbr.Append(" datetime " + nullAble);
 				}
 			}
 			stbr.Append(string.Format("PRIMARY KEY ({0})) ENGINE=InnoDB DEFAULT CHARSET=utf8;", keyName));
@@ -538,14 +549,17 @@ namespace RootTools.Database
 #endif
 		}
 
-		public void SetLotinfo(string lotid, string partid, string setupid, string cstid, string waferid, string recipeid)
+		public void SetLotinfo(DateTime inspectionstart, DateTime inspectionend, string lotid, string partid, string setupid, string cstid, string waferid, string recipeid)
 		{
 			//Inspection ID 생성(KEY)
-			m_Loftinfo.SetLotinfo(lotid, partid, setupid, cstid, waferid, recipeid);
+			m_Loftinfo.SetLotinfo(inspectionstart, inspectionend, lotid, partid, setupid, cstid, waferid, recipeid);
 			m_sInspectionID = MakeInspectionID(m_Loftinfo);
 			string sLotinfoQuery;
-			sLotinfoQuery = string.Format("INSERT INTO lotinfo(INSPECTIONID, LOTID, CSTID, WAFERID, RECIPEID)" +
-				" values('{0}','{1}','{2}','{3}','{4}')"
+
+			sLotinfoQuery = string.Format("INSERT INTO lotinfo(InspectionStart, InspectionEnd, sInspectionID, sLotID, sCSTID, sWaferID, sRecipeID)" +
+				" values('{0}','{1}','{2}','{3}','{4}','{5}','{6}')"
+				, inspectionstart.ToString("yyyyMMddHHmmss")
+				, inspectionend.ToString("yyyyMMddHHmmss")
 				, m_sInspectionID
 				, m_Loftinfo.GetLotID()
 				, m_Loftinfo.GetCSTID()
