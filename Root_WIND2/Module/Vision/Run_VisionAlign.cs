@@ -43,7 +43,7 @@ namespace Root_WIND2.Module
 
         public double m_dVRSToAlignOffsetZ = 0;
 
-        public GrabMode m_grabMode = null;
+        public GrabModeFront m_grabMode = null;
         string m_sGrabMode = "";
 
         public string p_sGrabMode

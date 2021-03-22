@@ -106,20 +106,20 @@ namespace Root_WIND2.Module
 
         #region Grab Mode
         int m_lGrabMode = 0;
-        public ObservableCollection<GrabMode> m_aGrabMode = new ObservableCollection<GrabMode>();
+        public ObservableCollection<GrabModeFront> m_aGrabMode = new ObservableCollection<GrabModeFront>();
         public List<string> p_asGrabMode
         {
             get
             {
                 List<string> asGrabMode = new List<string>();
-                foreach (GrabMode grabMode in m_aGrabMode) asGrabMode.Add(grabMode.p_sName);
+                foreach (GrabModeBase grabMode in m_aGrabMode) asGrabMode.Add(grabMode.p_sName);
                 return asGrabMode;
             }
         }
 
-        public GrabMode GetGrabMode(string sGrabMode)
+        public GrabModeFront GetGrabMode(string sGrabMode)
         {
-            foreach (GrabMode grabMode in m_aGrabMode)
+            foreach (GrabModeFront grabMode in m_aGrabMode)
             {
                 if (sGrabMode == grabMode.p_sName) return grabMode;
             }
@@ -128,7 +128,7 @@ namespace Root_WIND2.Module
 
         public void ClearData()
         {
-            foreach (GrabMode grabMode in m_aGrabMode)
+            foreach (GrabModeFront grabMode in m_aGrabMode)
             {
                 grabMode.m_ptXYAlignData = new RPoint(0, 0);
                 grabMode.m_dVRSFocusPos = 0;
@@ -143,12 +143,12 @@ namespace Root_WIND2.Module
             while (m_aGrabMode.Count < m_lGrabMode)
             {
                 string id = "Mode." + m_aGrabMode.Count.ToString("00");
-                GrabMode grabMode = new GrabMode(id, m_cameraSet, m_lightSet, m_memoryPool, m_LensLinearTurret);
+                GrabModeFront grabMode = new GrabModeFront(id, m_cameraSet, m_lightSet, m_memoryPool, m_LensLinearTurret);
                 m_aGrabMode.Add(grabMode);
             }
             while (m_aGrabMode.Count > m_lGrabMode) m_aGrabMode.RemoveAt(m_aGrabMode.Count - 1);
-            foreach (GrabMode grabMode in m_aGrabMode) grabMode.RunTreeName(tree.GetTree("Name", false));
-            foreach (GrabMode grabMode in m_aGrabMode) grabMode.RunTree(tree.GetTree(grabMode.p_sName, false), true, false);
+            foreach (GrabModeFront grabMode in m_aGrabMode) grabMode.RunTreeName(tree.GetTree("Name", false));
+            foreach (GrabModeFront grabMode in m_aGrabMode) grabMode.RunTree(tree.GetTree(grabMode.p_sName, false), true, false);
         }
         #endregion
 
