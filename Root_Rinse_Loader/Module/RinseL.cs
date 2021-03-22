@@ -227,6 +227,14 @@ namespace Root_Rinse_Loader.Module
                 OnPropertyChanged(); 
             }
         }
+
+        public bool IsEnableStart()
+        {
+            if (EQ.p_eState != EQ.eState.Ready) return false;
+            if (p_eStateUnloader == EQ.eState.Ready) return true;
+            if (p_eStateUnloader == EQ.eState.Run) return true;
+            return false; 
+        }
         #endregion
 
         #region GAF
@@ -314,9 +322,9 @@ namespace Root_Rinse_Loader.Module
             p_sInfo = m_toolBox.Get(ref m_diEMG, this, "Emergency");
             p_sInfo = m_toolBox.Get(ref m_diAir, this, "Air Pressure");
             p_sInfo = m_toolBox.Get(ref m_diDoorLock, this, "Door Lock");
-            p_sInfo = m_toolBox.Get(ref m_diBuzzerOff, this, "Buzzer Off");
-            p_sInfo = m_toolBox.Get(ref m_doLamp, this, "Lamp", m_asLamp);
-            p_sInfo = m_toolBox.Get(ref m_doBuzzer, this, "Buzzer", m_asBuzzer);
+            p_sInfo = m_toolBox.Get(ref m_diBuzzerOff, this, "Buzzer Off", false);
+            p_sInfo = m_toolBox.Get(ref m_doLamp, this, "Lamp", m_asLamp, false);
+            p_sInfo = m_toolBox.Get(ref m_doBuzzer, this, "Buzzer", m_asBuzzer, false);
             p_sInfo = m_toolBox.Get(ref m_diLightCurtain, this, "Light Curtain");
         }
 

@@ -346,6 +346,11 @@
     </Compile>
     <Compile Include="Database\TempLogger.cs" />
     <Compile Include="GeneralFunction.cs" />
+    <Compile Include="GrabMode\GrabModeBase.cs" />
+    <Compile Include="GrabMode\GrabModeBack.cs" />
+    <Compile Include="GrabMode\GrabModeEdge.cs" />
+    <Compile Include="GrabMode\GrabModeFront.cs" />
+    <Compile Include="GrabMode\GrabModeReticleSide.cs" />
     <Compile Include="ImageProcess\AutoFocus.cs" />
     <Compile Include="Camera\BaslerPylon\Camera_Basler.cs" />
     <Compile Include="Camera\BaslerPylon\Camera_Basler_Classes.cs" />

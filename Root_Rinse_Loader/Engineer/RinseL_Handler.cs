@@ -211,7 +211,8 @@ namespace Root_Rinse_Loader.Engineer
             if (EQ.p_bPickerSet)
             {
                 EQ.p_eState = EQ.eState.Ready;
-                p_moduleList.m_qModuleRun.Clear(); 
+                p_moduleList.m_qModuleRun.Clear();
+                EQ.p_bPickerSet = false; 
                 return "OK"; 
             }
             else
