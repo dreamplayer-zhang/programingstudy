@@ -97,15 +97,20 @@
             <Setter Property="Background"
                     Value="{StaticResource ControlBackGround}" />
             <Style.Triggers>
-                <Trigger Property="IsChecked"
+                <!--<Trigger Property="IsChecked"
                          Value="True">
                     <Setter Property="Background"
-                            Value="SteelBlue" />
-                </Trigger>
+                            Value="Gray" />
+                </Trigger>-->
                 <Trigger Property="IsChecked"
                          Value="False">
                     <Setter Property="Background"
-                            Value="Gray" />
+                            Value="LightCoral" />
+                </Trigger>
+                <Trigger Property="IsMouseOver"
+                         Value="True">
+                    <Setter Property="Background"
+                            Value="#BEE6FD" />
                 </Trigger>
             </Style.Triggers>
         </Style>
@@ -116,7 +121,34 @@
             <Setter Property="Margin" Value="10"/>
             <Setter Property="Height" Value="40"/>
             <!--<Setter Property="BorderBrush" Value="{x:Null}"/>-->
-            <Setter Property="Background" Value="{StaticResource ControlBackGround}"/>
+            <Setter Property="Background"
+                    Value="{StaticResource ControlBackGround}" />
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding RelativeSource={RelativeSource Self}, Path=Tag}"
+                             Value="True">
+                    <DataTrigger.EnterActions>
+                        <BeginStoryboard Name="sbBlink">
+                            <Storyboard RepeatBehavior="Forever">
+                                <ColorAnimation Storyboard.TargetProperty="Background.Color"
+                                                AutoReverse="True"
+                                                From="LightCoral"
+                                                To="Red"
+                                                FillBehavior="Stop"
+                                                BeginTime="0:0:0"
+                                                Duration="0:0:0.7" />
+                                <!--<ColorAnimation Storyboard.TargetProperty="Background.Color"
+                                                From="LightCoral"
+                                                To="#e3e3e3"
+                                                BeginTime="0:0:1"
+                                                Duration="0:0:1" />-->
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </DataTrigger.EnterActions>
+                    <DataTrigger.ExitActions>
+                        <RemoveStoryboard BeginStoryboardName="sbBlink" />
+                    </DataTrigger.ExitActions>
+                </DataTrigger>
+            </Style.Triggers>
         </Style>
         <Style TargetType="{x:Type TextBlock}" x:Key="BasicTb">
             <Setter Property="FontFamily" Value="Arial"/>

@@ -191,10 +191,12 @@ namespace Root_AOP01_Packing
                 {
                     EQ.p_bStop = true;
                     EQ.p_eState = EQ.eState.Init;
+                    p_moduleList.p_sNowProgress = "INIT ERROR";
                     return module.p_id + " Home Error";
                 }
             }
-            p_moduleList.p_sNowProgress = "Init Done";
+
+            p_moduleList.p_sNowProgress = "INIT DONE";
             return "OK";
         }
         #endregion

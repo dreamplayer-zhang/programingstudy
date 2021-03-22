@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Root_AOP01_Packing" 
+             xmlns:tools="clr-namespace:RootTools;assembly=RootTools"
              mc:Ignorable="d" 
              d:DesignHeight="800" d:DesignWidth="1912" 
              Background="{StaticResource PanelBackGround}">
@@ -30,47 +31,112 @@
                         <ColumnDefinition />
                     </Grid.ColumnDefinitions>
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="3*" />
-                        <RowDefinition Height="7*" />
+                        <RowDefinition Height="2*" />
+                        <RowDefinition Height="8*" />
                     </Grid.RowDefinitions>
-                    <GroupBox Grid.Row="0"
-                              Grid.Column="0"
-                              Header="Now In Progress" FontSize="18">
+
+                    <GroupBox Header="Machine"
+                              FontSize="13">
                         <Grid>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="1*" />
-                                <RowDefinition Height="3*" />
-                            </Grid.RowDefinitions>
-                            <Border Grid.Row="0"
-                                    CornerRadius="3"
-                                    Margin="5"
-                                    Background="Gainsboro">
-                                <TextBlock Text="{Binding p_ModuleList.p_sNowProgress}" 
+                            <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="1*" />
+                            <ColumnDefinition Width="3*" />
+                        </Grid.ColumnDefinitions>
+                            <Grid Margin="10">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition />
+                                    <RowDefinition Height="3*" />
+                                </Grid.RowDefinitions>
+                                <TextBlock Text="OFFLINE"
                                            VerticalAlignment="Center"
                                            HorizontalAlignment="Center"
                                            FontWeight="Bold"
-                                           FontSize="18"/>
-                            </Border>
-                            <UniformGrid Grid.Row="1"
-                                         Margin="10,5"
-                                         Columns="2"
-                                         TextElement.FontSize="14">
-                            <TextBlock Text="Pod ID"
-                                       VerticalAlignment="Center" />
-                            <TextBlock Text="pod00001"
-                                       VerticalAlignment="Center"
-                                       HorizontalAlignment="Left" />
-                            <TextBlock Text="Lot ID"
-                                       VerticalAlignment="Center" />
-                            <TextBlock Text="lot00001"
-                                       VerticalAlignment="Center"
-                                       HorizontalAlignment="Left" />
-                            <TextBlock Text="Reticle ID"
-                                       VerticalAlignment="Center" />
-                                <TextBlock Text="dummy001"
+                                           FontSize="18" />
+                                <Grid Grid.Row="1">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition />
+                                        <RowDefinition />
+                                        <RowDefinition />
+                                    </Grid.RowDefinitions>
+                                    <Border Grid.Row="0"
+                                            BorderBrush="Gray"
+                                            BorderThickness="1,1,1,0"
+                                            Opacity="{Binding p_AOP01.p_opactiyRED}"
+                                            Background="Crimson"
+                                            CornerRadius="5,5,0,0" />
+
+                                    <Border Grid.Row="1"
+                                            BorderBrush="Gray"
+                                            BorderThickness="1,1,1,1"
+                                            Opacity="{Binding p_AOP01.p_opactiyYELLOW}"
+                                            Background="#FFFDDA3B" />
+
+                                    <Border Grid.Row="2"
+                                            BorderBrush="Gray"
+                                            BorderThickness="1,0,1,1"
+                                            Opacity="{Binding p_AOP01.p_opactiyGREEN}"
+                                            Background="SeaGreen"
+                                            CornerRadius="0,0,5,5" />
+                                </Grid>
+                            </Grid>
+                            <Grid Grid.Column="1">
+                            <Grid.RowDefinitions>
+                                <RowDefinition />
+                                <RowDefinition Height="2*" />
+                            </Grid.RowDefinitions>
+                            <Border Grid.Row="0"
+                                    CornerRadius="3"
+                                    Margin="5,5,5,0"
+                                    Background="Gainsboro">
+                                <TextBlock DataContext="{Binding Source={x:Static tools:EQ.m_EQ}}"
+                                           Text="{Binding p_eState}"
                                            VerticalAlignment="Center"
-                                           HorizontalAlignment="Left" />
+                                           HorizontalAlignment="Center"
+                                           FontWeight="Bold"
+                                           FontSize="18" />
+                            </Border>
+                            <UniformGrid Grid.Row="2"
+                                         Grid.Column="1"
+                                         Columns="2"
+                                         Margin="5">
+                                <Border Grid.Row="0"
+                                        Grid.Column="0"
+                                        BorderBrush="LightGray"
+                                        BorderThickness="2,2,0,2">
+                                    <TextBlock Text=" Loadport A Run Time :"
+                                               FontSize="13"
+                                               VerticalAlignment="Center" />
+                                </Border>
+                                <Border Grid.Row="0"
+                                        Grid.Column="1"
+                                        BorderBrush="LightGray"
+                                        BorderThickness="0,2,2,2">
+                                    <TextBlock x:Name="textblockRunTime1"
+                                               Text="00:00:00"
+                                               FontSize="15"
+                                               VerticalAlignment="Center"
+                                               HorizontalAlignment="Center" />
+                                </Border>
+                                <Border Grid.Row="1"
+                                        Grid.Column="0"
+                                        BorderBrush="LightGray"
+                                        BorderThickness="2,0,0,2">
+                                    <TextBlock Text=" Loadport B Run Time :"
+                                               FontSize="13"
+                                               VerticalAlignment="Center" />
+                                </Border>
+                                <Border Grid.Row="1"
+                                        Grid.Column="1"
+                                        BorderBrush="LightGray"
+                                        BorderThickness="0,0,2,2">
+                                    <TextBlock x:Name="textblockRunTime2"
+                                               Text="00:00:00"
+                                               FontSize="15"
+                                               VerticalAlignment="Center"
+                                               HorizontalAlignment="Center" />
+                                </Border>
                             </UniformGrid>
+                        </Grid>
                         </Grid>
                     </GroupBox>
 
@@ -85,7 +151,7 @@
                         </Grid.RowDefinitions>
 
                         <GroupBox Grid.Row="0"
-                                  FontSize="15"
+                                  FontSize="13"
                                   Grid.Column="0"
                                   Header="Loadport A"
                                   DataContext="{Binding p_LoadportA}">
@@ -94,34 +160,39 @@
                                     <RowDefinition Height="55*" />
                                     <RowDefinition Height="45*" />
                                 </Grid.RowDefinitions>
-                                <UniformGrid Columns="2"
-                                             TextElement.FontSize="14"
-                                             Margin="0,1">
-                                    <TextBlock Text="Pod ID"
-                                               VerticalAlignment="Center"
-                                               Margin="10,0" />
-                                    <TextBlock Text="{Binding p_sCarrierID}"
-                                               VerticalAlignment="Center"
-                                               Margin="10,0" />
-                                    <TextBlock Text="Lot ID"
-                                               VerticalAlignment="Center"
-                                               Margin="10,0" />
-                                    <TextBlock Text="{Binding p_sLotID}"
-                                               VerticalAlignment="Center"
-                                               Margin="10,0" />
-                                    <TextBlock Text="Reticle ID"
-                                               VerticalAlignment="Center"
-                                               Margin="10,0" />
-                                    <TextBlock Text="{Binding p_sRecipeID}"
-                                               VerticalAlignment="Center"
-                                               Margin="10,0" />
-                                    <TextBlock Text="State"
-                                               VerticalAlignment="Center"
-                                               Margin="10,0" />
-                                    <TextBlock Text="{Binding p_sState}"
-                                               VerticalAlignment="Center"
-                                               Margin="10,0" />
-                                </UniformGrid>
+                                <Grid Margin="5">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="4*" />
+                                        <ColumnDefinition Width="6*" />
+                                    </Grid.ColumnDefinitions>
+                                    <UniformGrid Columns="1">
+                                        <TextBlock Text="Pod ID"
+                                                   VerticalAlignment="Center"
+                                                   Margin="10,0" />
+                                        <TextBlock Text="Reticle ID"
+                                                   VerticalAlignment="Center"
+                                                   Margin="10,0" />
+                                        <TextBlock Text="State"
+                                                   VerticalAlignment="Center"
+                                                   Margin="10,0" />
+                                    </UniformGrid>
+                                    <UniformGrid Grid.Column="1"
+                                                 Columns="1">
+                                        <TextBlock Text="{Binding p_infoCarrier.p_sCarrierID}"
+                                                   FontSize="16"
+                                                   FontWeight="Bold"
+                                                   VerticalAlignment="Center"
+                                                   Margin="10,0" />
+                                        <TextBlock Text="{Binding p_sRecipeID}"
+                                                   VerticalAlignment="Center"
+                                                   Margin="10,0" />
+                                        <TextBlock Text="{Binding p_eState}"
+                                                   FontWeight="Bold"
+                                                   FontSize="16"
+                                                   VerticalAlignment="Center"
+                                                   Margin="10,0" />
+                                    </UniformGrid>
+                                </Grid>
                                 <Border BorderBrush="Gray"
                                         BorderThickness="1"
                                         Grid.Row="1"
@@ -129,12 +200,12 @@
                                         Margin="4.5">
                                     <UniformGrid Columns="4"
                                                  Rows="2">
-                                        <Border>
+                                        <Border x:Name="A_Auto">
                                             <TextBlock Text="Auto"
                                                        VerticalAlignment="Center"
                                                        HorizontalAlignment="Center" />
                                         </Border>
-                                        <Border>
+                                        <Border x:Name="A_Manual">
                                             <TextBlock Text="Manual"
                                                        VerticalAlignment="Center"
                                                        HorizontalAlignment="Center" />
@@ -159,7 +230,7 @@
                                                        VerticalAlignment="Center"
                                                        HorizontalAlignment="Center" />
                                         </Border>
-                                        <Border>
+                                        <Border x:Name="A_Reserve">
                                             <TextBlock Text="Reserve"
                                                        VerticalAlignment="Center"
                                                        HorizontalAlignment="Center" />
@@ -176,8 +247,9 @@
                         </GroupBox>
                         <GroupBox Grid.Row="0"
                                   Grid.Column="1"
-                                  FontSize="15"
-                                  Header="Loadport B">
+                                  FontSize="13"
+                                  Header="Loadport B"
+                                  DataContext="{Binding p_LoadportB}">
                             <Grid>
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="55*" />
@@ -192,12 +264,6 @@
                                     <TextBlock Text="{Binding p_sCarrierID}"
                                                VerticalAlignment="Center"
                                                Margin="10,0" />
-                                    <TextBlock Text="Lot ID"
-                                               VerticalAlignment="Center"
-                                               Margin="10,0" />
-                                    <TextBlock Text="{Binding p_sLotID}"
-                                               VerticalAlignment="Center"
-                                               Margin="10,0" />
                                     <TextBlock Text="Reticle ID"
                                                VerticalAlignment="Center"
                                                Margin="10,0" />
@@ -207,7 +273,9 @@
                                     <TextBlock Text="State"
                                                VerticalAlignment="Center"
                                                Margin="10,0" />
-                                    <TextBlock Text="{Binding p_sState}"
+                                    <TextBlock Text="{Binding p_eState}"
+                                               FontSize="18"
+                                               FontWeight="Bold"
                                                VerticalAlignment="Center"
                                                Margin="10,0" />
                                 </UniformGrid>
@@ -218,32 +286,32 @@
                                         Margin="4.5">
                                     <UniformGrid Columns="4"
                                                  Rows="2">
-                                        <Border>
+                                        <Border Background="{Binding p_doAuto, Converter={StaticResource LoadportBrushConverter}}">
                                             <TextBlock Text="Auto"
                                                        VerticalAlignment="Center"
                                                        HorizontalAlignment="Center" />
                                         </Border>
-                                        <Border Background="SeaGreen">
+                                        <Border Background="{Binding p_doManual, Converter={StaticResource LoadportBrushConverter}}">
                                             <TextBlock Text="Manual"
                                                        VerticalAlignment="Center"
                                                        HorizontalAlignment="Center" />
                                         </Border>
-                                        <Border>
+                                        <Border Background="{Binding p_doPlaced, Converter={StaticResource LoadportBrushConverter}}">
                                             <TextBlock Text="Placed"
                                                        VerticalAlignment="Center"
                                                        HorizontalAlignment="Center" />
                                         </Border>
-                                        <Border>
+                                        <Border Background="{Binding p_doPresent, Converter={StaticResource LoadportBrushConverter}}">
                                             <TextBlock Text="Present"
                                                        VerticalAlignment="Center"
                                                        HorizontalAlignment="Center" />
                                         </Border>
-                                        <Border>
+                                        <Border Background="{Binding p_doLoad, Converter={StaticResource LoadportBrushConverter}}">
                                             <TextBlock Text="Load"
                                                        VerticalAlignment="Center"
                                                        HorizontalAlignment="Center" />
                                         </Border>
-                                        <Border>
+                                        <Border Background="{Binding p_doUnload, Converter={StaticResource LoadportBrushConverter}}">
                                             <TextBlock Text="Unload"
                                                        VerticalAlignment="Center"
                                                        HorizontalAlignment="Center" />
@@ -253,7 +321,7 @@
                                                        VerticalAlignment="Center"
                                                        HorizontalAlignment="Center" />
                                         </Border>
-                                        <Border Background="Crimson">
+                                        <Border Background="{Binding p_doAlram, Converter={StaticResource LoadportBrushConverter}}">
                                             <TextBlock Text="Alarm"
                                                        VerticalAlignment="Center"
                                                        HorizontalAlignment="Center" />
@@ -269,45 +337,51 @@
                                      Rows="3"
                                      Columns="2">
                             <GroupBox Header="Elevator"
-                                      FontSize="15">
+                                      FontSize="13">
                                 <TextBlock Text="{Binding p_Elevator.p_eState}"
                                            VerticalAlignment="Center"
                                            FontWeight="Bold"
+                                           FontSize="18"
                                            HorizontalAlignment="Center" />
                             </GroupBox>
                             <GroupBox Header="Unloadport"
-                                      FontSize="15">
+                                      FontSize="13">
                                 <TextBlock Text="{Binding p_Unloadport.p_eState}"
                                            VerticalAlignment="Center"
                                            FontWeight="Bold"
+                                           FontSize="18"
                                            HorizontalAlignment="Center" />
                             </GroupBox>
                             <GroupBox Header="RTR A"
-                                      FontSize="15">
+                                      FontSize="13">
                                 <TextBlock Text="{Binding p_RTRA.p_eState}"
                                            VerticalAlignment="Center"
                                            FontWeight="Bold"
+                                           FontSize="18"
                                            HorizontalAlignment="Center" />
                             </GroupBox>
                             <GroupBox Header="RTR B"
-                                      FontSize="15">
+                                      FontSize="13">
                                 <TextBlock Text="{Binding p_RTRB.p_eState}"
                                            VerticalAlignment="Center"
                                            FontWeight="Bold"
+                                           FontSize="18"
                                            HorizontalAlignment="Center" />
                             </GroupBox>
                             <GroupBox Header="Taping Module"
-                                      FontSize="15">
+                                      FontSize="13">
                                 <TextBlock Text="{Binding p_TapePacker.p_eState}"
                                            VerticalAlignment="Center"
                                            FontWeight="Bold"
+                                           FontSize="18"
                                            HorizontalAlignment="Center" />
                             </GroupBox>
                             <GroupBox Header="Packing Module"
-                                      FontSize="15">
+                                      FontSize="13">
                                 <TextBlock Text="{Binding p_VacuumPacker.p_eState}"
                                            VerticalAlignment="Center"
                                            FontWeight="Bold"
+                                           FontSize="18"
                                            HorizontalAlignment="Center" />
                             </GroupBox>
 
@@ -358,20 +432,30 @@
                 <Grid Grid.Column="1"
                       Visibility="Visible">
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="1*" />
-                        <RowDefinition Height="9*" />
+                        <RowDefinition Height="15*" />
+                        <RowDefinition Height="85*" />
                     </Grid.RowDefinitions>
                     <GroupBox Grid.Row="0"
                               Grid.ColumnSpan="2"
                               Header="Progress"
-                              FontSize="18"
-                              Name="prog"
+                              FontSize="15"
                               DataContext="{Binding p_ModuleList}">
                         <Grid Margin="10,5">
-                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition />
+                                    <RowDefinition />
+                                </Grid.RowDefinitions>
+                            <Grid Margin="2">
+                                <TextBlock Text="{Binding p_sNowProgress}"
+                                       VerticalAlignment="Center"
+                                       HorizontalAlignment="Left"
+                                       FontWeight="Bold"
+                                       FontSize="25" />
+                            </Grid>
+                            <Grid Grid.Row="1">
                                 <ProgressBar Value="{Binding p_iRun}"
                                              Maximum="{Binding p_maxRun}"
-                                             Foreground="SeaGreen" />
+                                             Foreground="SteelBlue" />
                                 <TextBlock Text="{Binding p_Percent}"
                                            HorizontalAlignment="Center"
                                            VerticalAlignment="Center"
@@ -381,7 +465,7 @@
                         </Grid>
                     </GroupBox>
                     <GroupBox Header="Process"
-                              FontSize="18"
+                              FontSize="15"
                               Grid.Row="1">
                         <Grid>
                             <Grid.ColumnDefinitions>
@@ -390,24 +474,20 @@
                             </Grid.ColumnDefinitions>
                             <Grid Grid.Column="0"
                                   Margin="5">
-                                <GroupBox Grid.Row="3"
-                                          FontSize="15"
-                                          Header="Job List">
-                                    <ItemsControl ItemsSource="{Binding p_ModuleList.p_moduleList}"
-                                                  Margin="0,5">
-                                        <ItemsControl.ItemTemplate>
-                                            <DataTemplate>
-                                                <Grid Height="40"
-                                                      Background="{Binding p_eRunState, Converter={StaticResource ModuleRunStateBrushconverter}}"
-                                                      Width="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualWidth}">
-                                                    <TextBlock Text="{Binding Converter={StaticResource ModuleRunStepConverter}}"
-                                                               VerticalAlignment="Center"
-                                                               Margin="3,0" />
-                                                </Grid>
-                                            </DataTemplate>
-                                        </ItemsControl.ItemTemplate>
-                                    </ItemsControl>
-                                </GroupBox>
+                                <ItemsControl ItemsSource="{Binding p_ModuleList.p_moduleList}"
+                                              Margin="0,5">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Grid Height="40"
+                                                  Background="{Binding p_eRunState, Converter={StaticResource ModuleRunStateBrushconverter}}"
+                                                  Width="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualWidth}">
+                                                <TextBlock Text="{Binding Converter={StaticResource ModuleRunStepConverter}}"
+                                                           VerticalAlignment="Center"
+                                                           Margin="3,0" />
+                                            </Grid>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
                             </Grid>
                             <ScrollViewer Grid.Column="1"
                                           Margin="5">
@@ -432,7 +512,7 @@
                                                                Opacity="{Binding p_eRunState, Converter={StaticResource ModuleRunStateVisibleConverter}, ConverterParameter=Opacity}" />
                                                         <local:LoadingControl Visibility="{Binding p_eRunState, Converter={StaticResource ModuleRunStateVisibleConverter}}" />
                                                         <Grid Grid.Column="1"
-                                                              Margin="40,50">
+                                                              Margin="40,40">
                                                             <Grid.RowDefinitions>
                                                                 <RowDefinition />
                                                                 <RowDefinition />
@@ -440,6 +520,7 @@
                                                             <TextBlock Text="{Binding p_eRunState}"
                                                                        VerticalAlignment="Bottom"
                                                                        FontSize="20"
+                                                                       FontWeight="Bold"
                                                                        FontFamily="Arial" />
                                                             <ProgressBar Grid.Row="1"
                                                                          Maximum="100"
@@ -461,30 +542,44 @@
                 <Grid Grid.Column="2">
                     <StackPanel VerticalAlignment="Top"
                                 Margin="0,20">
-                        <Button Content="POD START"
+                        <Button Content="{Binding p_sPodBtn}"
+                                IsEnabled="{Binding p_bEnablePodBtn}"
                                 Style="{StaticResource SetupPanelBtn}"
-                                Command="{Binding cmdPodStart}" />
-                        <Button Content="CASE START"
+                                Command="{Binding cmdPodStart}"/>
+                        <Button Content="{Binding p_sCaseBtn}"
+                                IsEnabled="{Binding p_bEnableCaseBtn}"
                                 Style="{StaticResource SetupPanelBtn}"
-                                Command="{Binding cmdCaseStart}" />
-                        <Button Content="RUN STEP"
+                                Command="{Binding cmdCaseStart}"/>
+                        <Button Content="{Binding p_sStepbtn}"
+                                IsEnabled="{Binding p_bEnableStepBtn}"
                                 Style="{StaticResource SetupPanelBtn}"
-                                Click="Button_Click_1" />
-                        <Button Content="INITIALIZE"
+                                Click="Button_Click_1"/>
+                        <Button Content="{Binding p_sInitBtn}"
+                                IsEnabled="{Binding p_bEnableInitBtn}"
                                 Style="{StaticResource SetupPanelBtn}"
                                 Command="{Binding cmdInit}" />
+                        <Button Content="{Binding p_sPauseBtn}"
+                                IsEnabled="{Binding p_bEnablePauseBtn}"
+                                Style="{StaticResource SetupPanelBtn}"
+                                Command="{Binding cmdPause}"/>
                         <!--<Button Content="RECOVERY"
                                 Style="{StaticResource SetupPanelBtn}"
                                 Command="{Binding cmdHome}" />-->
                     </StackPanel>
                     <StackPanel VerticalAlignment="Bottom" Margin="0,0">
                         <Button Content="OHT" Style="{StaticResource SetupPanelBtn}" />
-                        <Button Content="ALARM" Style="{StaticResource SetupPanelBtn}"/>
                         <Button Content="BUZZER OFF" Style="{StaticResource SetupPanelBtn}"/>
-                        <ToggleButton Content="Door UnLock"
-                                      Style="{StaticResource OperationToggleBtn}" IsChecked="False"/>
-                        <ToggleButton Content="ONLINE"
+                        <Button Content="ALARM"
+                                Style="{StaticResource SetupPanelBtn}"
+                                Command="{Binding cmdAlarm}"
+                                x:Name="btnAlarm">
+                        </Button>
+                        <ToggleButton Content="{Binding p_sDoorBtn}"
+                                      IsChecked="{Binding p_bDoorLock}"
                                       Style="{StaticResource OperationToggleBtn}"/>
+                        <ToggleButton Content="{Binding p_sOnlineBtn}"
+                                      Style="{StaticResource OperationToggleBtn}"
+                                      Command="{Binding cmdOnline}"/>
                     </StackPanel>
                 </Grid>
             </Grid>

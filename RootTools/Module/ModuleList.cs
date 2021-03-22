@@ -296,25 +296,28 @@ namespace RootTools.Module
             set 
             {
                 _iRun = value;
-                string asdf = ((double)_iRun / (double)p_maxRun *100).ToString("F2");
+                p_Percent = ((double)_iRun / (double)p_maxRun *100).ToString("F2");
+                if(p_sNowProgress != "STOP" && value == p_maxRun)
+                    p_sNowProgress = "DONE";
+                
                 //if (value == 0)
                 //    _iRun = value;
                 //else
                 //    _iRun = (p_maxRun == 0) ? p_maxRun : p_maxRun - (int)value;
                 ////_iRun = (m_qModuleRun.Count == 0) ? p_maxRun : p_maxRun - m_qModuleRun.Count;
 
-                //int now = p_maxRun - (int)value;
-                //if (now == 0)
-                //{
-                //    p_Percent = "100%";
-                //    _iRun = p_maxRun;
-                //}
-                //else if (now == p_maxRun)
-                //{
-                //    p_Percent = "0%";
-                //}
-                //else
-                //    p_Percent = ((double)now / (double)p_maxRun * 100).ToString("F2");
+                    //int now = p_maxRun - (int)value;
+                    //if (now == 0)
+                    //{
+                    //    p_Percent = "100%";
+                    //    _iRun = p_maxRun;
+                    //}
+                    //else if (now == p_maxRun)
+                    //{
+                    //    p_Percent = "0%";
+                    //}
+                    //else
+                    //    p_Percent = ((double)now / (double)p_maxRun * 100).ToString("F2");
                 OnPropertyChanged(); 
             }
         }
