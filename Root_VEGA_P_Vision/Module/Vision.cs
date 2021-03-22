@@ -22,6 +22,9 @@ namespace Root_VEGA_P_Vision.Module
         MemoryPool memoryPool;
         MemoryGroup memoryGroup;
         public int sideGrabCnt = 0;
+        public MainOptic m_mainOptic;
+        public SideOptic m_sideOptic;
+
         public enum eParts
         {
             EIP_Cover, EIP_Plate
@@ -126,10 +129,13 @@ namespace Root_VEGA_P_Vision.Module
         #region MainOptic
         public class MainOptic : NotifyProperty
         {
+            Vision m_vision;
+
             public Axis m_axisZ;
             public Camera_Dalsa camTDI;
             public Camera_Basler camStain;
             public Camera_Matrox camZStack;
+            public double m_pulsePermm;
 
             public enum eInsp
             {
@@ -153,41 +159,40 @@ namespace Root_VEGA_P_Vision.Module
             public void InitMemorys()
             {
                 foreach(var v in Enum.GetValues(typeof(eParts)))
-                    foreach(var v2 in Enum.GetValues(typeof(eUpDown)))
-                        m_vision.memoryGroup.CreateMemory(v.ToString() + "." + v2.ToString(), 1, 1, 1000,1000);
+                    foreach(var v2 in Enum.GetValues(typeof(eInsp)))
+                        foreach(var v3 in Enum.GetValues(typeof(eUpDown)))
+                            m_vision.memoryGroup.CreateMemory(v.ToString() + "." + v2.ToString()+"."+v3.ToString(), 1, 1, 1000,1000);
             }
-            public MemoryData GetMemoryData(eParts parts,eUpDown updown)
+            public MemoryData GetMemoryData(InfoPod.ePod parts,eInsp insp,eUpDown updown)
             {
-                return m_vision.memoryPool.GetMemory(m_vision.p_id, parts.ToString()+"."+updown.ToString());
+                return m_vision.memoryPool.GetMemory(m_vision.p_id, parts.ToString()+"."+insp.ToString()+"."+updown.ToString());
             }
-            public double m_pulsePermm = 10000;
 
             public void RunTree(Tree tree)
             {
                 m_pulsePermm = tree.Set(m_pulsePermm, m_pulsePermm, "Pulse / mm", "Stage XY Pulse per 1mm (pulse)");
             }
 
-            Vision m_vision;
             public MainOptic(Vision vision)
             {
                 m_vision = vision;
-                StainMems = new MemoryData[4];
-                MainMems = new MemoryData[4];
+                m_pulsePermm = 10000;
             }
         }
-        public MainOptic m_mainOptic;
         #endregion
 
         #region SideOptic
         public class SideOptic : NotifyProperty
         {
+            Vision m_vision;
+            public Axis axisZ;
             public Camera_Basler camSide;
+            public double m_pulsePermm;
 
             public enum eSide
             {
                 Top,Left,Bottom,Right
             }
-            public Axis axisZ;
 
             public void GetTools(ToolBox toolBox, bool bInit)
             {
@@ -206,7 +211,8 @@ namespace Root_VEGA_P_Vision.Module
                     foreach (var v2 in Enum.GetValues(typeof(eSide)))
                         m_vision.memoryGroup.CreateMemory(v.ToString() + "." + v2.ToString(), 1, 1, 1000, 1000);
             }
-            public MemoryData GetMemoryData(eParts parts,eSide side)
+
+            public MemoryData GetMemoryData(InfoPod.ePod parts,eSide side)
             {
                 return m_vision.memoryPool.GetMemory(m_vision.p_id, parts.ToString()+"."+side.ToString());
             }
@@ -214,20 +220,18 @@ namespace Root_VEGA_P_Vision.Module
             {
                 return m_vision.memoryPool.GetMemory(m_vision.p_id, str);
             }
-            public double m_pulsePermm = 10000;
 
             public void RunTree(Tree tree)
             {
                 m_pulsePermm = tree.Set(m_pulsePermm, m_pulsePermm, "Pulse / mm", "Stage XY Pulse per 1mm (pulse)");
             }
 
-            Vision m_vision;
             public SideOptic(Vision vision)
             {
                 m_vision = vision;
+                m_pulsePermm = 10000;
             }
         }
-        public SideOptic m_sideOptic;
         #endregion
 
         #region InfoPod

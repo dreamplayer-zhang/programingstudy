@@ -67,11 +67,10 @@ namespace Root_VEGA_P_Vision.Module
                 int nPulsePerWidth = nCamWidth * StainGrabMode.m_dTrigger;
                 int nPulsePerHeight = nCamHeight * StainGrabMode.m_dTrigger;
 
-                string strPool = StainGrabMode.m_memoryPool.p_id;
-                string strGroup = StainGrabMode.m_memoryGroup.p_id;
-                string strMemory = StainGrabMode.m_memoryData.p_id;
+                InfoPod.ePod parts = m_module.p_infoPod.p_ePod;
+                Vision.eUpDown upDown = (Vision.eUpDown)Enum.ToObject(typeof(Vision.eUpDown), m_module.p_infoPod.p_bTurn);
 
-                MemoryData mem = m_module.m_engineer.GetMemory(strPool, strGroup, strMemory);
+                MemoryData mem = mainOpt.GetMemoryData(parts, Vision.MainOptic.eInsp.Stain, upDown);
 
                 //가로 총 Pixel 갯수 : PodWidth * 1000 / camera res X
                 //가로 횟수 : 총 Pixel 갯수 / CamWidth

@@ -18,13 +18,11 @@ namespace Root_VEGA_P_Vision.Module
         Vision m_module;
         Vision.MainOptic mainOpt;
         GrabMode MainGrabMode;
-        Camera_Dalsa camMain;
         string sMainGrabMode;
         public Run_MainGrab(Vision module)
         {
             m_module = module;
             mainOpt = m_module.m_mainOptic;
-            camMain = mainOpt.camTDI;
             sMainGrabMode = "";
             InitModuleRun(module);
         }
@@ -75,11 +73,10 @@ namespace Root_VEGA_P_Vision.Module
                 int nScanSpeed = Convert.ToInt32((double)MainGrabMode.m_nMaxFrame * MainGrabMode.m_dTrigger * nCamHeight * MainGrabMode.m_nScanRate / 100);
                 int nScanOffset_pulse = 40000;
 
-                string strPool = MainGrabMode.m_memoryPool.p_id;
-                string strGroup = MainGrabMode.m_memoryGroup.p_id;
-                string strMemory = MainGrabMode.m_memoryData.p_id;
+                InfoPod.ePod parts = m_module.p_infoPod.p_ePod;
+                Vision.eUpDown upDown = (Vision.eUpDown)Enum.ToObject(typeof(Vision.eUpDown), m_module.p_infoPod.p_bTurn);
 
-                MemoryData mem = m_module.m_engineer.GetMemory(strPool, strGroup, strMemory);
+                MemoryData mem = mainOpt.GetMemoryData(parts,Vision.MainOptic.eInsp.Main,upDown);
 
                 double dStartPosY = MainGrabMode.m_rpAxisCenter.Y - nTotalTriggerCount / 2 - nScanOffset_pulse;
                 double dEndPosY = MainGrabMode.m_rpAxisCenter.Y + nTotalTriggerCount / 2 + nScanOffset_pulse;

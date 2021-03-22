@@ -1,15 +1,11 @@
 ﻿using RootTools;
-using RootTools.Camera;
 using RootTools.Camera.BaslerPylon;
 using RootTools.Control;
 using RootTools.Memory;
 using RootTools.Module;
 using RootTools.Trees;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.InteropServices;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Root_VEGA_P_Vision.Module
@@ -51,7 +47,8 @@ namespace Root_VEGA_P_Vision.Module
 
         public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
         {
-            p_sSideGrabMode = tree.Set(p_sSideGrabMode, p_sSideGrabMode, m_module.p_asGrabMode, "Grab Mode : Side Grab", "Select GrabMode", bVisible);
+            p_sSideGrabMode = tree.Set(p_sSideGrabMode, p_sSideGrabMode, m_module.p_asGrabMode, 
+                "Grab Mode : Side Grab", "Select GrabMode", bVisible);
         }
 
         public override string Run()
@@ -72,19 +69,20 @@ namespace Root_VEGA_P_Vision.Module
                 int nPodSizeY_px = Convert.ToInt32(SidegrabMode.m_nPodSize_mm * sideOpt.m_pulsePermm / SidegrabMode.m_dResY_um);  // 웨이퍼 영역의 Y픽셀 갯수
                 int nPulsePerWidth = nCamWidth * SidegrabMode.m_dTrigger;
                 int nPulsePerHeight = nCamHeight * SidegrabMode.m_dTrigger;
+
                 //가로 총 Pixel 갯수 : PodWidth * 1000 / camera res X
                 //가로 횟수 : 총 Pixel 갯수 / CamWidth
                 int nXCount = nPodSizeY_px / nCamWidth;
                 int nYCount = nPodSizeY_px / nCamHeight;
-                #endregion
                 int lightcnt = SidegrabMode.m_lightSet.m_aLight.Count;
 
-                if (m_module.sideGrabCnt > 3) m_module.sideGrabCnt = 0;
-
                 InfoPod.ePod parts = m_module.p_infoPod.p_ePod;
-                //MemoryData mem = sideOpt.GetMemoryData(parts.ToString());
-                Vision.eUpDown e = Enum.ToObject(typeof(Vision.eUpDown), m_module.p_infoPod.p_bTurn);
-                MemoryData mem = sideOpt.GetMemoryData(parts.ToString() + "."+);
+                //-> 찍는거 확인한다음에 어떻게 집어넣을지 확인해야됨 (계획 : p_bTurn + grabcount(어차피 두번직으니까))
+                //Vision.eUpDown upDown = (Vision.eUpDown)Enum.ToObject(typeof(Vision.eUpDown), m_module.p_infoPod.p_bTurn);
+                //Vision.SideOptic.eSide side = ;
+                MemoryData mem = sideOpt.GetMemoryData(parts, Vision.SideOptic.eSide.Left);
+                #endregion
+
                 if (m_module.Run(m_module.Move(axisZ, SidegrabMode.m_nFocusPosZ)))
                     return p_sInfo;
 
