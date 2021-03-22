@@ -98,52 +98,119 @@ namespace RootTools.Database
 				MySqlCommand cmd = new MySqlCommand(sSelectQuery, m_MainConnectSession.GetConnection());
 				MySqlDataReader rdr = cmd.ExecuteReader();
 				List<string> tableList = new List<string>();
+				List<string> columnListTest = new List<string>();
 				while (rdr.Read())
 				{
 					object table = rdr["TABLE_NAME"];
 					tableList.Add(table.ToString());
-					//sSelectQuery = "select column_name from INFORMATION_SCHEMA.columns where table_schema='wind2' and table_name='"+a.ToString()+"'";
-					//cmd = new MySqlCommand(sSelectQuery, m_MainConnectSession.GetConnection());
-					//MySqlDataReader rdr2 = cmd.ExecuteReader();
-					//while (rdr2.Read())
-					//               {
-					//	object b = rdr["COLUMN_NAME"];
-					//}
-					////for ()
-
 				}
 				rdr.Close();
-				//bool isSame = true;
+
+				bool isSame = true;
 				FieldInfo[] defectFieldInfos = null;
+				FieldInfo[] lotinfoFieldInfos = null;
 				List<string> columnList = new List<string>();
+
 				for (int i = 0; i < tableList.Count; i++)
 				{
-					if (tableList[i].Equals("defect"))
-					{
-						Type defectType = typeof(Defect);
-						defectFieldInfos = defectType.GetFields(BindingFlags.Instance | BindingFlags.Public);
-					}
 					sSelectQuery = "select column_name from INFORMATION_SCHEMA.columns where table_schema='wind2' and table_name='" + tableList[i] + "'";
 					cmd = new MySqlCommand(sSelectQuery, m_MainConnectSession.GetConnection());
-
 					rdr = cmd.ExecuteReader();
-					//int a = 0;
+
 					while (rdr.Read())
 					{
 						object columnName = rdr["COLUMN_NAME"];
 						columnList.Add(columnName.ToString());
 					}
+					rdr.Close();
 
-					object[] tt = defectFieldInfos[i].GetCustomAttributes(true);
-					ObsoleteAttribute ob = (ObsoleteAttribute)tt[0];
-					string test = ob.Message;
-					if (defectFieldInfos.Length != columnList.Count)
-                    {
-						//isSame = false;
-						break;
-                    }
+					if (tableList[i].Equals("defect"))
+					{
+						Type defectType = typeof(Defect);
+						defectFieldInfos = defectType.GetFields(BindingFlags.Instance | BindingFlags.Public);
+
+						if (defectFieldInfos.Length != columnList.Count)
+						{
+							columnList = new List<string>();
+							isSame = false;
+							break;
+						}
+                        else
+                        {
+							for (int j = 0; j < defectFieldInfos.Length; j++)
+							{
+								if (!defectFieldInfos[j].Name.Equals(columnList[j]))
+								{
+									//object[] tt = defectFieldInfos[j].GetCustomAttributes(true);
+									//ObsoleteAttribute ob = (ObsoleteAttribute)tt[0];
+									//string test = ob.Message;
+
+									columnList = new List<string>();
+									isSame = false;
+									break;
+								}
+							}
+							if (!isSame)
+							{
+								break;
+							}
+						}
+					}
+					else if (tableList[i].Equals("lotinfo"))
+					{
+						Type lotinfoType = typeof(Lotinfo);
+						lotinfoFieldInfos = lotinfoType.GetFields(BindingFlags.Instance | BindingFlags.Public);
+
+						if (lotinfoFieldInfos.Length != columnList.Count)
+						{
+							columnList = new List<string>();
+							isSame = false;
+							break;
+						}
+                        else
+                        {
+							for (int j = 0; j < lotinfoFieldInfos.Length; j++)
+							{
+								if (!lotinfoFieldInfos[j].Name.Equals(columnList[j]))
+								{
+									//object[] tt = lotinfoFieldInfos[j].GetCustomAttributes(true);
+									//ObsoleteAttribute ob = (ObsoleteAttribute)tt[0];
+									//string test = ob.Message;
+
+									columnList = new List<string>();
+									isSame = false;
+									break;
+								}
+							}
+							if (!isSame)
+							{
+								columnList = new List<string>();
+								break;
+							}
+						}
+					}
+					columnList = new List<string>();
 				}
-				rdr.Close();
+				if (!isSame)
+				{
+					// Backup and Reset DB
+					string strDBTime = "wind2_" + DateTime.Now.ToString("yyyyMMdd_HHmmss");
+					sSelectQuery = "create database `" + strDBTime + "`";
+					cmd = new MySqlCommand(sSelectQuery, m_MainConnectSession.GetConnection());
+					rdr = cmd.ExecuteReader();
+					rdr.Close();
+
+					sSelectQuery = "rename table `wind2`.`defect` to `" + strDBTime + "`.`defect`, `wind2`.`lotinfo` to `" + strDBTime + "`.`lotinfo`";
+					cmd = new MySqlCommand(sSelectQuery, m_MainConnectSession.GetConnection());
+					rdr = cmd.ExecuteReader();
+					rdr.Close();
+
+					// Create empty tables
+					CreateTable("defect", typeof(Defect), nameof(Defect.m_nDefectIndex));
+					CreateTable("lotinfo", typeof(Lotinfo), nameof(Lotinfo.sInspectionID));
+
+					isSame = true;
+				}
 				return true;
 			}
 			catch(Exception e)
