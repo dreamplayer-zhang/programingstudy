@@ -44,7 +44,7 @@ namespace Root_WIND2.Module
         int m_nAFOffset2 = 0;
 
 
-        public GrabMode m_grabMode = null;
+        public GrabModeFront m_grabMode = null;
         string m_sGrabMode = "";
 
         #region AutoFocus Param

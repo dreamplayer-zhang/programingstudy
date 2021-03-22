@@ -121,9 +121,9 @@ namespace Root_WIND2.UI_User
             get => this.selectedGrabModeIndex;
             set
             {
-                GrabMode mode = ((WIND2_Handler)GlobalObjects.Instance.Get<WIND2_Engineer>().ClassHandler()).p_Vision.m_aGrabMode[value];
-                this.CamResolutionX = mode.m_dResX_um;
-                this.CamResolutionY = mode.m_dResY_um;
+                GrabModeBase mode = ((WIND2_Handler)GlobalObjects.Instance.Get<WIND2_Engineer>().ClassHandler()).p_Vision.m_aGrabMode[value];
+                this.CamResolutionX = mode.m_dTargetResX_um;
+                this.CamResolutionY = mode.m_dTargetResY_um;
                 this.WaferSize = mode.m_nWaferSize_mm;
                 SetProperty<int>(ref this.selectedGrabModeIndex, value);
             }

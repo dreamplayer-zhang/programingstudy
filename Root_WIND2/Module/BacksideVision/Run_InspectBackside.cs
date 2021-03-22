@@ -18,7 +18,7 @@ namespace Root_WIND2.Module
 
         // Grab 관련 파라매터 (이거 나중에 구조 변경 필요할듯)
         //bool m_bInvDir = false;
-        public GrabMode m_grabMode = null;
+        public GrabModeBack m_grabMode = null;
         string m_sGrabMode = "";
 
         #region [Getter Setter]
