@@ -191,25 +191,43 @@ namespace RootTools.Database
 					}
 					columnList = new List<string>();
 				}
+
+				if (tableList.Count == 0)
+				{
+					isSame = false;
+				}
+
 				if (!isSame)
 				{
-					if (MessageBox.Show("Current DB component version does not match. Do you want to backup old DB then create new DB?", "Warning", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+					if (tableList.Count > 0)
 					{
-						// Backup and Reset DB
-						string strDBTime = "wind2_" + DateTime.Now.ToString("yyyyMMdd_HHmmss");
-						sSelectQuery = "create database `" + strDBTime + "`";
-						cmd = new MySqlCommand(sSelectQuery, m_MainConnectSession.GetConnection());
-						rdr = cmd.ExecuteReader();
-						rdr.Close();
+						if (MessageBox.Show("Current DB component version does not match. Do you want to backup old DB then create new DB?", "Warning", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+						{
+							// Backup and Reset DB
+							string strDBTime = "wind2_" + DateTime.Now.ToString("yyyyMMdd_HHmmss");
+							sSelectQuery = "create database `" + strDBTime + "`";
+							cmd = new MySqlCommand(sSelectQuery, m_MainConnectSession.GetConnection());
+							rdr = cmd.ExecuteReader();
+							rdr.Close();
 
-						sSelectQuery = "rename table `wind2`.`defect` to `" + strDBTime + "`.`defect`, `wind2`.`lotinfo` to `" + strDBTime + "`.`lotinfo`";
-						cmd = new MySqlCommand(sSelectQuery, m_MainConnectSession.GetConnection());
-						rdr = cmd.ExecuteReader();
-						rdr.Close();
+							sSelectQuery = "rename table `wind2`.`defect` to `" + strDBTime + "`.`defect`, `wind2`.`lotinfo` to `" + strDBTime + "`.`lotinfo`";
+							cmd = new MySqlCommand(sSelectQuery, m_MainConnectSession.GetConnection());
+							rdr = cmd.ExecuteReader();
+							rdr.Close();
 
-						// Create empty tables
-						CreateTable("defect", typeof(Defect), nameof(Defect.m_nDefectIndex));
-						CreateTable("lotinfo", typeof(Lotinfo), nameof(Lotinfo.sInspectionID));
+							// Create empty tables
+							CreateTable("defect", typeof(Defect), nameof(Defect.m_nDefectIndex));
+							CreateTable("lotinfo", typeof(Lotinfo), nameof(Lotinfo.sInspectionID));
+						}
+					}
+					else if (tableList.Count == 0)
+                    {
+						if (MessageBox.Show("Current DB table is empty. Do you want to create new DB?", "Warning", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+						{
+							// Create empty tables
+							CreateTable("defect", typeof(Defect), nameof(Defect.m_nDefectIndex));
+							CreateTable("lotinfo", typeof(Lotinfo), nameof(Lotinfo.sInspectionID));
+						}
 					}
 
 					isSame = true;
