@@ -58,13 +58,17 @@ namespace Root_WIND2
 			EdgeSurface edgeSurface = new EdgeSurface();
 			ProcessDefect_Edge processDefect_Edge = new ProcessDefect_Edge("defect");
 
+			// top/side/btm 각 Set
 			foreach (ParameterBase param in paramList)
 				edgeSurface.SetParameter(param);
-
+			edgeSurface.SetGrabMode(((WIND2_Handler)GlobalObjects.Instance.Get<WIND2_Engineer>().ClassHandler()).p_EdgeSideVision.m_aGrabMode[recipe.GetItem<EdgeSurfaceRecipe>().EdgeRecipeBaseTop.GrabModeIndex],
+									((WIND2_Handler)GlobalObjects.Instance.Get<WIND2_Engineer>().ClassHandler()).p_EdgeSideVision.m_aGrabMode[recipe.GetItem<EdgeSurfaceRecipe>().EdgeRecipeBaseSide.GrabModeIndex],
+									((WIND2_Handler)GlobalObjects.Instance.Get<WIND2_Engineer>().ClassHandler()).p_EdgeSideVision.m_aGrabMode[recipe.GetItem<EdgeSurfaceRecipe>().EdgeRecipeBaseBtm.GrabModeIndex]);
+			
 			workBundle.Add(edgeSurface);
 			workBundle.Add(processDefect_Edge);
 			workBundle.SetRecipe(this.Recipe);
-
+			//workBundle.SetGrabMode(((WIND2_Handler)GlobalObjects.Instance.Get<WIND2_Engineer>().ClassHandler()).p_EdgeSideVision.m_aGrabMode[recipe.GetItem<EdgeSurfaceRecipe>().EdgeRecipeBaseTop.GrabModeIndex]);
 			return workBundle;
 		}
 
@@ -105,11 +109,11 @@ namespace Root_WIND2
 			int startY = recipe.PositionOffset * (bufferHeight / 360);
 			int endY = bufferHeight + startY;
 			*/
-			
+
 			// ROI
 			int roiWidth = param.ROIWidth;
 			int roiHeight = param.ROIHeight;
-			for (int i = 0; i < 3/*bufferHeight / roiHeight*/; i++)
+			for (int i = 0; i < 1/*bufferHeight / roiHeight*/; i++)
 			{
 				int calcStartY = (roiHeight * i) + firstNotch;
 				int calcHeight = roiHeight;
@@ -132,7 +136,6 @@ namespace Root_WIND2
 
 				Workplace workplace = new Workplace((int)mapX, i, 0, calcStartY, roiWidth, calcHeight, workplaceBundle.Count);
 				workplace.SetSharedBuffer(sharedBufferInfo);
-
 				workplaceBundle.Add(workplace);
 			}
 		}
