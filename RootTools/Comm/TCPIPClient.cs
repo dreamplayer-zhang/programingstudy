@@ -113,6 +113,7 @@ namespace RootTools.Comm
                 m_socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.KeepAlive, true);
 
                 m_socket.BeginConnect(p_sIP, p_nPort, new AsyncCallback(CallBack_Connect), m_socket);
+                OnPropertyChanged("p_bConnect"); 
                 return "OK"; 
             }
             catch (SocketException eX) { return "Connect :" + eX.Message; }
@@ -173,6 +174,8 @@ namespace RootTools.Comm
             }
             catch (Exception e)
             {
+                m_socket = null;
+                OnPropertyChanged("p_bConnect");
                 p_sInfo = "Send : " + e.Message;
                 return p_sInfo;
             }
@@ -188,6 +191,8 @@ namespace RootTools.Comm
             }
             catch (Exception e)
             {
+                m_socket = null;
+                OnPropertyChanged("p_bConnect");
                 p_sInfo = "Send : " + e.Message;
                 return p_sInfo;
             }
@@ -224,13 +229,13 @@ namespace RootTools.Comm
             Thread.Sleep(3000);
             while (m_bThread)
             {
-                Thread.Sleep(2);
+                Thread.Sleep(10);
                 if (p_bUse)
                 {
                     if (p_bConnect == false)
                     {
-                        p_sInfo = Connect();
                         Thread.Sleep(1000);
+                        p_sInfo = Connect();
                     }
                     else if (m_qSend.Count > 0)
                     {

@@ -395,12 +395,42 @@ namespace Root_Rinse_Loader.Module
         ModuleRunBase m_runMagazine;
         protected override void InitModuleRuns()
         {
+            AddModuleRunList(new Run_Delay(this), false, "Time Delay (sec)");
             AddModuleRunList(new Run_MoveMagazine(this), false, "Move Elevator Magazine Position");
             AddModuleRunList(new Run_MoveStack(this), false, "Move Elevator Stack Position");
             AddModuleRunList(new Run_Pusher(this), false, "Move Elevator & Run Pusher");
             AddModuleRunList(new Run_Clamp(this), false, "Run Clamp");
             m_runReady = AddModuleRunList(new Run_StackReady(this), false, "Run Stack Move Ready Position");
             m_runMagazine = AddModuleRunList(new Run_RunMagazine(this), false, "Run Magazine");
+        }
+
+        public class Run_Delay : ModuleRunBase
+        {
+            Storage m_module;
+            public Run_Delay(Storage module)
+            {
+                m_module = module;
+                InitModuleRun(module);
+            }
+
+            int m_secDelay = 1;
+            public override ModuleRunBase Clone()
+            {
+                Run_Delay run = new Run_Delay(m_module);
+                run.m_secDelay = m_secDelay;
+                return run;
+            }
+
+            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
+            {
+                m_secDelay = tree.Set(m_secDelay, m_secDelay, "Delay", "Time Delay (sec)", bVisible);
+            }
+
+            public override string Run()
+            {
+                Thread.Sleep(1000 * m_secDelay); 
+                return "OK";
+            }
         }
 
         public class Run_MoveMagazine : ModuleRunBase

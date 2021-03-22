@@ -18,7 +18,7 @@ namespace Root_Rinse_Loader.Module
         {
             p_sInfo = m_toolBox.Get(ref m_axis, this, "Loader");
             p_sInfo = m_toolBox.Get(ref m_dioPickerDown, this, "PickerDown", "Up", "Down", true, true);
-            p_sInfo = m_toolBox.Get(ref m_diPickerSet, this, "PickerSet");
+            p_sInfo = m_toolBox.Get(ref m_dioPickerSet, this, "PickerSet");
             foreach (Picker picker in m_aPicker) picker.GetTools(m_toolBox);
             if (bInit)
             {
@@ -192,59 +192,26 @@ namespace Root_Rinse_Loader.Module
         #endregion
 
         #region PickerSet
+        DIO_IO m_dioPickerSet;
         string RunPickerSet()
         {
-            try
+            int n = 0;
+            bool bOn = true; 
+            m_dioPickerSet.Write(bOn); 
+            while (m_dioPickerSet.p_bIn == false)
             {
-                if (Run(MoveLoader(ePos.Stotage))) return p_sInfo;
-                while (true)
+                Thread.Sleep(10);
+                if (EQ.IsStop()) return "EQ Stop";
+                n++; 
+                if (n >= 50)
                 {
-                    switch (CheckPickerSet())
-                    {
-                        case ePickerSet.Stop: return "OK";
-                        case ePickerSet.UpDown:
-                            if (Run(RunPickerDown(!m_bPickerDown))) return p_sInfo;
-                            break;
-                        case ePickerSet.Vacuum:
-                            if (Run(RunVacuum(!p_bVacuum))) return p_sInfo;
-                            break;
-                    }
+                    n = 0;
+                    bOn = !bOn;
+                    m_dioPickerSet.Write(bOn);
                 }
             }
-            finally
-            {
-                m_storage.StartStackDown();
-                RunPickerDown(false);
-                Thread.Sleep(200);
-                MoveLoader(ePos.Roller);
-                EQ.p_bPickerSet = false; 
-            }
-        }
-
-        enum ePickerSet
-        {
-            UpDown,
-            Vacuum,
-            Stop
-        }
-
-        DIO_I m_diPickerSet;
-        StopWatch m_swPickerSet = new StopWatch();
-        ePickerSet CheckPickerSet()
-        {
-            while (m_diPickerSet.p_bIn == false)
-            {
-                Thread.Sleep(10);
-                if (EQ.IsStop()) return ePickerSet.Stop;
-            }
-            m_swPickerSet.Start();
-            while (m_diPickerSet.p_bIn)
-            {
-                Thread.Sleep(10);
-                if (EQ.IsStop()) return ePickerSet.Stop;
-                if (m_swPickerSet.ElapsedMilliseconds > 3000) return ePickerSet.Stop;
-            }
-            return (m_swPickerSet.ElapsedMilliseconds < 600) ? ePickerSet.UpDown : ePickerSet.Vacuum;
+            m_dioPickerSet.Write(false);
+            return "OK"; 
         }
 
         public string m_sFilePickerSet = "";
@@ -338,7 +305,9 @@ namespace Root_Rinse_Loader.Module
                         if (picker.IsDrop())
                         {
                             EQ.p_bStop = true;
-                            p_eState = eState.Error;
+                            EQ.p_eState = EQ.eState.Ready;
+                            m_rinse.RunBuzzer(RinseL.eBuzzer.Error);
+                            picker.m_dioVacuum.Write(false); 
                             p_sInfo = picker.m_id + " : Picker drop Strip"; 
                         }
                     }

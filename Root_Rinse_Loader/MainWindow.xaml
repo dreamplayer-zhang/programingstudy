@@ -265,8 +265,7 @@
                                                    FontWeight="Bold"
                                                    FontFamily="Arial"
                                                    VerticalAlignment="Center"
-                                                   HorizontalAlignment="Center" 
-                                                   PreviewMouseLeftButtonDown="textBlockUnloadState_PreviewMouseLeftButtonDown"/>
+                                                   HorizontalAlignment="Center"/>
                                         </Border>
                                     </GroupBox>
                                     <GroupBox Header="Rinse State"

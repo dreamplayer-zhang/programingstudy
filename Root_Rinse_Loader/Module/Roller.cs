@@ -52,7 +52,8 @@ namespace Root_Rinse_Loader.Module
         {
             for (int n = 0; n < 4; n++)
             {
-                if (m_aLine[n].m_diCheck[0].p_bIn || m_aLine[n].m_diCheck[1].p_bIn) return false;
+                //if (m_aLine[n].m_diCheck[0].p_bIn || m_aLine[n].m_diCheck[1].p_bIn) return false;
+                if (m_aLine[n].m_diCheck[1].p_bIn) return false;
             }
             return true; 
         }

@@ -118,7 +118,7 @@ namespace Root_Rinse_Loader
             bool bBlink = rinse.m_bBlink; 
 
             buttonHome.IsEnabled = EQ.p_eState != EQ.eState.Run;
-            buttonStart.IsEnabled = EQ.p_eState == EQ.eState.Ready;
+            buttonStart.IsEnabled = m_handler.m_rinse.IsEnableStart();
             buttonPause.IsEnabled = EQ.p_eState == EQ.eState.Run;
             buttonReset.IsEnabled = (EQ.p_eState == EQ.eState.Error) || (EQ.p_eState == EQ.eState.Ready);
             buttonPickerSet.IsEnabled = EQ.p_eState == EQ.eState.Ready;
@@ -134,11 +134,7 @@ namespace Root_Rinse_Loader
                 borderUnloadState.Background = (rinse.p_eStateUnloader == EQ.eState.Ready || rinse.p_eStateUnloader == EQ.eState.Run) ? Brushes.SeaGreen : Brushes.Gold;
                 textBlockUnloadState.Text = rinse.p_eStateUnloader.ToString();
             }
-            else
-            {
-                borderUnloadState.Background = Brushes.Crimson;
-                textBlockUnloadState.Text = "Click to Connect";
-            }
+            else { borderUnloadState.Background = Brushes.Crimson; }
 
             gridRed.Background = (bBlink && (EQ.p_eState == EQ.eState.Error)) ? Brushes.Crimson : Brushes.DarkRed;
             gridYellow.Background = (bBlink && (EQ.p_eState == EQ.eState.Ready)) ? Brushes.Gold : Brushes.YellowGreen;
@@ -198,11 +194,5 @@ namespace Root_Rinse_Loader
             if (binding != null) binding.UpdateSource();
         }
         #endregion
-
-        private void textBlockUnloadState_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-        {
-            if (m_handler.m_rinse.m_tcpip.p_bConnect) return;
-            m_handler.m_rinse.m_tcpip.Connect(); 
-        }
     }
 }
