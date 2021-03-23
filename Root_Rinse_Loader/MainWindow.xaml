@@ -210,14 +210,14 @@
                                   Height="1"
                                   Margin="0,0"
                                   Background="Black" />
-                                <TextBlock Text="State"
+                                <TextBlock Text="상태"
                                        Grid.Row="0"
                                        FontSize="35"
                                        FontWeight="Bold"
                                        FontFamily="Arial"
                                        VerticalAlignment="Center"
                                        HorizontalAlignment="Center" />
-                                <TextBlock Text="Option"
+                                <TextBlock Text="설정"
                                        Grid.Row="2"
                                        FontSize="35"
                                        FontWeight="Bold"
@@ -232,7 +232,7 @@
                                         <ColumnDefinition />
                                         <ColumnDefinition />
                                     </Grid.ColumnDefinitions>
-                                    <GroupBox Header="Loader State"
+                                    <GroupBox Header="로더부"
                                           Style="{StaticResource group}"
                                           Margin="5,10"
                                           Grid.Column="0"
@@ -250,7 +250,7 @@
                                                    HorizontalAlignment="Center" />
                                         </Border>
                                     </GroupBox>
-                                    <GroupBox Header="Unloader State"
+                                    <GroupBox Header="언로더 부"
                                           Style="{StaticResource group}"
                                           Margin="5,10"
                                           Grid.Column="1"
@@ -259,16 +259,16 @@
                                             x:Name="borderUnloadState"
                                             CornerRadius="10"
                                             Background="SeaGreen">
-                                            <TextBlock x:Name="textBolckUnloadState"
+                                            <TextBlock x:Name="textBlockUnloadState"
                                                    Text="{Binding p_eStateUnloader}"
                                                    FontSize="30"
                                                    FontWeight="Bold"
                                                    FontFamily="Arial"
                                                    VerticalAlignment="Center"
-                                                   HorizontalAlignment="Center" />
+                                                   HorizontalAlignment="Center"/>
                                         </Border>
                                     </GroupBox>
-                                    <GroupBox Header="Rinse State"
+                                    <GroupBox Header="수세기"
                                           Style="{StaticResource group}"
                                           Grid.Column="2"
                                           Margin="5,10"
@@ -294,7 +294,7 @@
                                         <ColumnDefinition />
                                         <ColumnDefinition />
                                     </Grid.ColumnDefinitions>
-                                    <GroupBox Header="Mode"
+                                    <GroupBox Header="모드"
                                           Style="{StaticResource group}"
                                           Margin="5,10"
                                           BorderThickness="0">
@@ -307,7 +307,7 @@
                                             BorderBrush="{x:Null}"
                                             Click="buttonMode_Click" />
                                     </GroupBox>
-                                    <GroupBox Header="Strip Width"
+                                    <GroupBox Header="자제 폭"
                                           Grid.Column="1"
                                           Style="{StaticResource group}"
                                           BorderThickness="0"
@@ -342,7 +342,7 @@
                                                    Grid.Column="1" />
                                         </Grid>
                                     </GroupBox>
-                                    <GroupBox Header="Rotate Speed"
+                                    <GroupBox Header="롤러 속도"
                                           Grid.Column="2"
                                           Style="{StaticResource group}"
                                           BorderThickness="0"
@@ -398,7 +398,7 @@
                     <ColumnDefinition />
                 </Grid.ColumnDefinitions>
                 <Button x:Name="buttonHome"
-                        Content="Initialize"
+                        Content="초기화"
                         Grid.Column="0"
                         Margin="10"
                         FontSize="40"
@@ -407,7 +407,7 @@
                         BorderBrush="{x:Null}"
                         Click="buttonHome_Click" />
                 <Button x:Name="buttonStart"
-                        Content="Start"
+                        Content="작업 시작"
                         Grid.Column="1"
                         Margin="10"
                         FontSize="40"
@@ -416,7 +416,7 @@
                         BorderBrush="{x:Null}"
                         Click="buttonStart_Click" />
                 <Button x:Name="buttonPause"
-                        Content="Pause"
+                        Content="일시 정지"
                         Grid.Column="2"
                         Margin="10"
                         FontSize="40"
@@ -425,7 +425,7 @@
                         BorderBrush="{x:Null}"
                         Click="buttonPause_Click" />
                 <Button x:Name="buttonReset"
-                        Content="Reset"
+                        Content="리셋"
                         Grid.Column="3"
                         Margin="10"
                         FontSize="40"
@@ -434,7 +434,7 @@
                         BorderBrush="{x:Null}"
                         Click="buttonReset_Click" />
                 <Button x:Name="buttonPickerSet"
-                        Content="Picker Set"
+                        Content="피커 셋"
                         Grid.Column="4"
                         Margin="10"
                         FontSize="40"

@@ -27,7 +27,7 @@ namespace Root_WIND2.Module
 
         // Grab 관련 파라매터 (이거 나중에 구조 변경 필요할듯)
         //bool m_bInvDir = false;
-        public GrabMode m_grabMode = null;
+        public GrabModeFront m_grabMode = null;
         string m_sGrabMode = "";
 
         #region [Getter Setter]
@@ -110,14 +110,14 @@ namespace Root_WIND2.Module
                 int nScanLine = 0;
                 int nMMPerUM = 1000;
 
-                double dXScale = m_grabMode.m_dResX_um * 10;
+                double dXScale = m_grabMode.m_dTargetResX_um * 10;
                 cpMemoryOffset.X += (nScanLine + m_grabMode.m_ScanStartLine) * m_grabMode.m_GD.m_nFovSize;
-                m_grabMode.m_dTrigger = Convert.ToInt32(10 * m_grabMode.m_dResY_um);  // 1pulse = 0.1um -> 10pulse = 1um
-                int nWaferSizeY_px = Convert.ToInt32(m_grabMode.m_nWaferSize_mm * nMMPerUM / m_grabMode.m_dResY_um);  // 웨이퍼 영역의 Y픽셀 갯수
+                m_grabMode.m_dTrigger = Convert.ToInt32(10 * m_grabMode.m_dTargetResY_um);  // 1pulse = 0.1um -> 10pulse = 1um
+                int nWaferSizeY_px = Convert.ToInt32(m_grabMode.m_nWaferSize_mm * nMMPerUM / m_grabMode.m_dTargetResY_um);  // 웨이퍼 영역의 Y픽셀 갯수
                 int nTotalTriggerCount = Convert.ToInt32(m_grabMode.m_dTrigger * nWaferSizeY_px);   // 스캔영역 중 웨이퍼 스캔 구간에서 발생할 Trigger 갯수
                 int nScanOffset_pulse = 40000;
 
-                int nWaferSizeX_px = Convert.ToInt32(m_grabMode.m_nWaferSize_mm * nMMPerUM / m_grabMode.m_dResX_um);
+                int nWaferSizeX_px = Convert.ToInt32(m_grabMode.m_nWaferSize_mm * nMMPerUM / m_grabMode.m_dTargetResX_um);
                 int nWholeWaferScanLineNumber = (int)Math.Ceiling((double)nWaferSizeX_px / m_grabMode.m_GD.m_nFovSize);
 
                 int startOffsetX = cpMemoryOffset.X;

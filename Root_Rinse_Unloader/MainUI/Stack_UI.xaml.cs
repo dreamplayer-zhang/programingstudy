@@ -73,5 +73,15 @@ namespace Root_Rinse_Unloader.MainUI
         {
             m_storage.MoveStackReady();
         }
+
+        private void buttonLoaderRoller_Click(object sender, RoutedEventArgs e)
+        {
+            m_loader.MoveLoader(Loader.ePos.Roller);
+        }
+
+        private void buttonLoaderStorage_Click(object sender, RoutedEventArgs e)
+        {
+            m_loader.MoveLoader(Loader.ePos.Stotage); 
+        }
     }
 }

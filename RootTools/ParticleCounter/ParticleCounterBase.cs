@@ -174,7 +174,8 @@ namespace RootTools.ParticleCounter
             m_sampleRun = sample;
             if (IsBusy()) return "Busy"; 
             ClearCount();
-            if (Run(ConnectModbus())) return m_sRun; 
+            if (Run(ConnectModbus())) return m_sRun;
+            m_bgw.RunWorkerAsync(); 
             return "OK";
         }
 
@@ -197,7 +198,8 @@ namespace RootTools.ParticleCounter
             {
                 if (Run(WaitDone(m_sampleRun))) return;
                 if (Run(ReadParticleCount())) return;
-                p_bDone = false; 
+                p_bDone = false;
+                Thread.Sleep(10); 
             }
             p_bRun = false; 
         }

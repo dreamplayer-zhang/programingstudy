@@ -9,6 +9,7 @@ namespace Root_CAMELLIA.LibSR_Met
     public class ConstValue
     {
         public const string PATH_LOG = @"C:\Log\Camellia\";
+        public const string PATH_PM_RESULT_FOLDER = @"C:\Camellia\PM\PM_Result\";
         public const int SPECTROMETER_MAX_PIXELSIZE = 5001;  //350nm ~ 1500nm (1nm 간격)
         public const int RAWDATA_POINT_MAX_SIZE = 100;
 

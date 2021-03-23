@@ -56,9 +56,6 @@ namespace Root_CAMELLIA.LibSR_Met
             m_Model = new Model();
             m_MaterialList = m_Model.m_MaterialList;
             m_LayerList = m_Model.m_LayerList;
-            //Thickenss Alphafit
-            m_SR.bAlpha1Fit = true;
-            m_SR.Alpha1 = 1.0;
         }
 
         [DllImport("kernel32")]
@@ -276,11 +273,24 @@ namespace Root_CAMELLIA.LibSR_Met
                     GetPrivateProfileString("ARC Detector Parameter", "Average", "No Info.", key, nBufSize, sPath);
                     if (int.TryParse(key.ToString(), out nData)) datas.nAverage_VIS = nData;
 
+                    GetPrivateProfileString("ARC Detector Parameter", "Boxcar", "No Info.", key, nBufSize, sPath);
+                    if (int.TryParse(key.ToString(), out nData)) datas.nBoxcar_VIS= nData;
+
+                    GetPrivateProfileString("ARC Detector Parameter", "Integration time", "No Info.", key, nBufSize, sPath);
+                    if (int.TryParse(key.ToString(), out nData)) datas.nInitCalIntTime_VIS = nData;
+
                     GetPrivateProfileString("ARCNIR Detector Parameter", "Background Int. time", "No Info.", key, nBufSize, sPath);
                     if (int.TryParse(key.ToString(), out nData)) datas.nBGIntTime_NIR = nData;
 
                     GetPrivateProfileString("ARCNIR Detector Parameter", "Average", "No Info.", key, nBufSize, sPath);
                     if (int.TryParse(key.ToString(), out nData)) datas.nAverage_NIR = nData;
+
+                    GetPrivateProfileString("ARCNIR Detector Parameter", "Boxcar", "No Info.", key, nBufSize, sPath);
+                    if (int.TryParse(key.ToString(), out nData)) datas.nBoxcar_NIR = nData;
+
+                    GetPrivateProfileString("ARCNIR Detector Parameter", "Integration time", "No Info.", key, nBufSize, sPath);
+                    if (int.TryParse(key.ToString(), out nData)) datas.nInitCalIntTime_NIR = nData;
+
 
                     return (datas, ERRORCODE_NANOVIEW.SR_NO_ERROR);
                 }
@@ -300,25 +310,26 @@ namespace Root_CAMELLIA.LibSR_Met
 
        
 
-        public ERRORCODE_NANOVIEW Calibration(int nBGIntTime_VIS, int nBGIntTime_NIR, int nAverage_VIS, int nAverage_NIR, bool bInitialCal, int nIntegrationTime_VIS, int nIntegrationTime_NIR)
+        public ERRORCODE_NANOVIEW Calibration(bool bInitialCal)
         {
             //Init Calibration 아니고 Sample 측정 시 Measure Background
             try
             {
-                //if (bInitialCal == true)
-                //{
                 double[] spectrum = new double[ConstValue.SPECTROMETER_MAX_PIXELSIZE];
                 if (isExceptNIR)
                 {
-                    nBGIntTime_NIR = 15;
-                    nAverage_NIR = 0;
+                    m_SR.BackIntTime_NIR = 15;
+                    m_SR.Average_NIR = 0;
                 }
-                m_SR.IntTime_VIS = nIntegrationTime_VIS;
-                m_SR.IntTime_NIR = nIntegrationTime_NIR;
-                m_SR.BackIntTime_VIS = nBGIntTime_VIS;
-                m_SR.BackIntTime_NIR = nBGIntTime_NIR;
-                m_SR.Average_VIS = nAverage_VIS;
-                m_SR.Average_NIR = nAverage_NIR;
+                else
+                {
+                    m_SR.BackIntTime_NIR = m_DM.m_SettngData.nBGIntTime_NIR;
+                    m_SR.Average_NIR = m_DM.m_SettngData.nAverage_NIR;
+                }
+                m_SR.IntTime_VIS = m_DM.m_SettngData.nInitCalIntTime_VIS;
+                m_SR.IntTime_NIR = m_DM.m_SettngData.nInitCalIntTime_NIR;
+                m_SR.BackIntTime_VIS = m_DM.m_SettngData.nBGIntTime_VIS;
+                m_SR.Average_VIS = m_DM.m_SettngData.nAverage_VIS;
                 m_SR.bUpdateBeta = bInitialCal;
               
 
@@ -378,7 +389,7 @@ namespace Root_CAMELLIA.LibSR_Met
             }
         }
 
-        public ERRORCODE_NANOVIEW SampleMeasure(int nPointIndex, double dXPos, double dYPos, int nIntTime_VIS, int nAverage_VIS, int nIntTime_NIR, int nAverage_NIR, bool bExcept_NIR, bool bTransmittance, bool bThickness, float nLowerWaveLength, float nUpperWavelength) //num of data를 반환할 필요가 있는지 모르겠음
+        public ERRORCODE_NANOVIEW SampleMeasure(int nPointIndex, double dXPos, double dYPos, bool bExcept_NIR, bool bTransmittance, bool bThickness, float nLowerWaveLength, float nUpperWavelength) //num of data를 반환할 필요가 있는지 모르겠음
         {
             try
             {
@@ -392,13 +403,14 @@ namespace Root_CAMELLIA.LibSR_Met
                     m_DM.bTransmittance = bTransmittance;
                     if (m_DM.bExcept_NIR)
                     {
-                        nIntTime_NIR = 15;
-                        nAverage_NIR = 0;
+                        m_SR.IntTime_NIR = 15;
                     }
-                    m_SR.IntTime_VIS = nIntTime_VIS;
-                    m_SR.Average_VIS = nAverage_VIS;
-                    m_SR.IntTime_NIR = nIntTime_NIR;
-                    m_SR.Average_NIR = nAverage_NIR;
+                    else
+                    {
+                        m_SR.IntTime_NIR = m_DM.m_SettngData.nMeasureIntTime_NIR;
+                    }
+                    m_SR.IntTime_VIS = m_DM.m_SettngData.nMeasureIntTime_VIS;
+                    
                    
                     double[] rs = new double[ConstValue.SPECTROMETER_MAX_PIXELSIZE];
                     double[] reflectance = new double[ConstValue.SPECTROMETER_MAX_PIXELSIZE];
@@ -485,8 +497,13 @@ namespace Root_CAMELLIA.LibSR_Met
                 return ERRORCODE_NANOVIEW.NANOVIEW_ERROR;
             }
         }
+        
+       public double GetAlphaFit()
+        {
+            return m_SR.Alpha1;
+        }
 
-        public ERRORCODE_NANOVIEW GetThickness(int nPointIndex, int nIteration, double dDampingFactor)
+        public ERRORCODE_NANOVIEW GetThickness(int nPointIndex, int nIteration, double dDampingFactor, bool isAlphafit = true)
         {
             try
             {
@@ -494,6 +511,8 @@ namespace Root_CAMELLIA.LibSR_Met
                 {
                     m_SR.m_iteration = nIteration;
                     m_SR.m_divratio = Math.Round(dDampingFactor,3);
+                    m_SR.bAlpha1Fit = isAlphafit;
+                    m_SR.Alpha1 = 1.0;
 
                     if (m_Model.m_LayerList.Count == 0)
                     {

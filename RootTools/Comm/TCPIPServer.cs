@@ -80,10 +80,9 @@ namespace RootTools.Comm
             {
                 m_bRun = true;
                 Socket socket = m_socket;
-                while (socket.Connected)
+                while (m_bRun && socket.Connected)
                 {
                     Thread.Sleep(10);
-                    if (!m_bRun) break;
                     if (m_qSend.Count > 0)
                     {
                         string sMsg = m_qSend.Peek();
@@ -151,6 +150,7 @@ namespace RootTools.Comm
         #region Accept
         void CallBack_Accept(IAsyncResult ar)
         {
+            if (m_bRun == false) return;
             if (m_socket == null) return; 
             try
             {
@@ -248,8 +248,10 @@ namespace RootTools.Comm
             }
         }
 
+        public bool m_bRun = true; 
         public void ThreadStop()
         {
+            m_bRun = false; 
             if (m_tcpSocket != null) m_tcpSocket.ThreadStop();
             if (m_socket != null)
             {
