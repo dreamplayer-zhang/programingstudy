@@ -1,4 +1,5 @@
-﻿using System;
+﻿using RootTools;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -17,7 +18,7 @@ namespace Root_CAMELLIA
     /// <summary>
     /// Dlg_Review.xaml에 대한 상호 작용 논리
     /// </summary>
-    public partial class Dlg_Review : Window
+    public partial class Dlg_Review : Window, IDialog
     {
         public Dlg_Review()
         {

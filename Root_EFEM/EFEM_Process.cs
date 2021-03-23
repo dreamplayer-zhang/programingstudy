@@ -389,7 +389,10 @@ namespace Root_EFEM
             if (m_qSequence.Count == 0 || EQ.IsStop())
             {
                 EQ.p_eState = EQ.eState.Ready;
-                ClearInfoWafer();
+                if (!EQ.IsStop())
+                {
+                   ClearInfoWafer();
+                }
                 return EQ.IsStop() ? "EQ Stop" : "OK";
             }
             Sequence sequence = m_qSequence.Peek();

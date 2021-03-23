@@ -368,11 +368,6 @@ namespace Root_CAMELLIA
             }
         }
 
-        //private void OnClickToggleButton(object sender, RoutedEventArgs e)
-        //{
-
-        //}
-
         public event EventHandler<DialogCloseRequestedEventArgs> CloseRequested;
     }
 }

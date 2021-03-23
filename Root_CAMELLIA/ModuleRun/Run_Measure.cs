@@ -132,6 +132,9 @@ namespace Root_CAMELLIA.Module
                     }
                     m_mwvm.p_Progress = (((double)(index + 1) / m_DataManager.recipeDM.MeasurementRD.DataSelectedPoint.Count) * 100);
                     SaveRawData(index);
+                    // Spectrum data Thread 추가 두개두개두개
+                    //LibSR_Met.DataManager.GetInstance().SaveResultFileSlot()
+                    //SaveRT
                     sw.Stop();
                     System.Diagnostics.Debug.WriteLine(sw.ElapsedMilliseconds);
                 }
@@ -263,6 +266,8 @@ namespace Root_CAMELLIA.Module
                             return "Layer Model Not Ready";
                         }
 
+                        // SaveReflectance
+
                     //pp.m_nanoView.
                     StopWatch sw = new StopWatch();
                     sw.Start();
@@ -356,6 +361,11 @@ namespace Root_CAMELLIA.Module
             m_bStart = false;
             test.Stop();
             m_log.Warn("Measure End >> " + test.ElapsedMilliseconds);
+
+            // 레드로 빼버림?  contour는 일단 보류..
+            //  DCOL 세이브 필요
+            
+
             return "OK";
         }
 
