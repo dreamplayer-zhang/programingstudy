@@ -102,7 +102,7 @@
                                 <Button FontWeight="Bold"
                                             Content="PM"
                                             Width="100"
-                                            Margin="5,5" />
+                                            Margin="5,5"/>
                                 <Button FontWeight="Bold"
                                             Content="VRS Viewer"
                                             Width="100"
@@ -346,8 +346,7 @@
                                     </Grid>
                                 </Grid>
                                 <Grid Grid.Row="1">
-                                    <GroupBox Header="Reflectance Graph">
-                                    </GroupBox>
+                                    <met:PMRGraph Grid.Column="0" Width="auto" Height="auto"/>
                                 </Grid>
                             </Grid>
                             <Grid Grid.Column="1">
