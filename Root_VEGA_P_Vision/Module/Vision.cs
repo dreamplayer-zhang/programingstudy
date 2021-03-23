@@ -139,7 +139,7 @@ namespace Root_VEGA_P_Vision.Module
 
             public enum eInsp
             {
-                Stain,Main
+                Stain,Main,Stack
             }
 
             public void GetTools(ToolBox toolBox, bool bInit)

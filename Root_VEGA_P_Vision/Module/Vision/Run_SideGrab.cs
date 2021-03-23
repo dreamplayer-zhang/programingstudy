@@ -17,6 +17,7 @@ namespace Root_VEGA_P_Vision.Module
         GrabMode SidegrabMode;
         Camera_Basler camSide;
         string sSideGrabMode;
+        Vision.SideOptic.eSide side;
 
         public Run_SideGrab(Vision module)
         {
@@ -49,6 +50,7 @@ namespace Root_VEGA_P_Vision.Module
         {
             p_sSideGrabMode = tree.Set(p_sSideGrabMode, p_sSideGrabMode, m_module.p_asGrabMode, 
                 "Grab Mode : Side Grab", "Select GrabMode", bVisible);
+            side = (Vision.SideOptic.eSide)tree.Set(side, side, "Scan Direction", "Side Scan Direction", bVisible);
         }
 
         public override string Run()
@@ -79,8 +81,8 @@ namespace Root_VEGA_P_Vision.Module
                 InfoPod.ePod parts = m_module.p_infoPod.p_ePod;
                 //-> 찍는거 확인한다음에 어떻게 집어넣을지 확인해야됨 (계획 : p_bTurn + grabcount(어차피 두번직으니까))
                 //Vision.eUpDown upDown = (Vision.eUpDown)Enum.ToObject(typeof(Vision.eUpDown), m_module.p_infoPod.p_bTurn);
-                //Vision.SideOptic.eSide side = ;
-                MemoryData mem = sideOpt.GetMemoryData(parts, Vision.SideOptic.eSide.Left);
+                //Vision.SideOptic.eSide side = SidegrabMode.side;
+                MemoryData mem = sideOpt.GetMemoryData(parts, side);
                 #endregion
 
                 if (m_module.Run(m_module.Move(axisZ, SidegrabMode.m_nFocusPosZ)))

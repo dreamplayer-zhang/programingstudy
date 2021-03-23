@@ -19,12 +19,19 @@ namespace Root_VEGA_P_Vision.Module
         Vision.MainOptic mainOpt;
         GrabMode MainGrabMode;
         string sMainGrabMode;
+
+
         public Run_MainGrab(Vision module)
         {
             m_module = module;
+            Init();
+            InitModuleRun(module);
+        }
+
+        void Init()
+        {
             mainOpt = m_module.m_mainOptic;
             sMainGrabMode = "";
-            InitModuleRun(module);
         }
         #region Property
         string p_sMainGrabMode
@@ -47,8 +54,11 @@ namespace Root_VEGA_P_Vision.Module
         }
         public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
         {
-            p_sMainGrabMode = tree.Set(p_sMainGrabMode, p_sMainGrabMode, m_module.p_asGrabMode, "Grab Mode : Main Grab", "Select GrabMode", bVisible);
+             p_sMainGrabMode = tree.Set(p_sMainGrabMode, p_sMainGrabMode, m_module.p_asGrabMode, "Grab Mode : Main Grab", "Select GrabMode", bVisible);
+            if (MainGrabMode != null)
+                MainGrabMode.RunTreeLinescanOption(tree, bVisible);
         }
+
         public override string Run()
         {
             if (p_sMainGrabMode == null) return "Grab Mode : Main Grab == Null";
