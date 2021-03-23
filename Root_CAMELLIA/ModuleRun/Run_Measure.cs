@@ -255,19 +255,19 @@ namespace Root_CAMELLIA.Module
                             m_mwvm.p_ArrowVisible = Visibility.Visible;
                         }
                     }
-                        if (App.m_nanoView.SampleMeasure(i, x, y,
-    m_mwvm.SettingViewModel.p_ExceptNIR, m_DataManager.recipeDM.MeasurementRD.UseTransmittance, m_DataManager.recipeDM.MeasurementRD.UseThickness,
-    m_DataManager.recipeDM.MeasurementRD.LowerWaveLength, m_DataManager.recipeDM.MeasurementRD.UpperWaveLength) != Met.Nanoview.ERRORCODE_NANOVIEW.SR_NO_ERROR)
-                        {
-                            isEQStop = false;
-                            return "Layer Model Not Ready";
-                        }
+    //                    if (App.m_nanoView.SampleMeasure(i, x, y,
+    //m_mwvm.SettingViewModel.p_ExceptNIR, m_DataManager.recipeDM.MeasurementRD.UseTransmittance, m_DataManager.recipeDM.MeasurementRD.UseThickness,
+    //m_DataManager.recipeDM.MeasurementRD.LowerWaveLength, m_DataManager.recipeDM.MeasurementRD.UpperWaveLength) != Met.Nanoview.ERRORCODE_NANOVIEW.SR_NO_ERROR)
+    //                    {
+    //                        isEQStop = false;
+    //                        return "Layer Model Not Ready";
+    //                    }
 
-                    //pp.m_nanoView.
-                    StopWatch sw = new StopWatch();
-                    sw.Start();
+    //                //pp.m_nanoView.
+    //                StopWatch sw = new StopWatch();
+    //                sw.Start();
 
-                    thicknessQueue.Enqueue(i);
+    //                thicknessQueue.Enqueue(i);
 
                     if (i < m_DataManager.recipeDM.MeasurementRD.DataSelectedPoint.Count - 1)
                     {
