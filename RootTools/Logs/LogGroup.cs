@@ -84,7 +84,6 @@ namespace RootTools
             {
 
             }
-            catch (Exception) { }
         }
 
         public ObservableCollection<Log.Data> p_aLog { get; set; }
