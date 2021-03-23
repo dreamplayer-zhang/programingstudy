@@ -9,51 +9,11 @@
              mc:Ignorable="d" 
              d:DesignHeight="500" d:DesignWidth="800">
     <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
-        <!--Title Bar-->
-        <Grid Grid.Row="0"
-              Name ="TitleBar"
-              Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}"
-              Grid.ColumnSpan="2">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="Auto" />
-            </Grid.ColumnDefinitions>
-            <Icon:AtiLogo Width="30"
-                          Height="21"
-                          VerticalAlignment="Center"
-                          Margin="2" />
-            <TextBlock Text="PM"
-                       FontSize="14"
-                       FontWeight="Bold"
-                       Foreground="Black"
-                       HorizontalAlignment="Left"
-                       VerticalAlignment="Center"
-                       Margin="355,4,0,5" Grid.Column="1"/>
-            <StackPanel WindowChrome.IsHitTestVisibleInChrome="True"
-                        Orientation="Horizontal"
-                        Grid.Column="2">
-                <Button Style="{StaticResource SystemButton}"
-                        x:Name="CloseButton"
-                        Width="20"
-                        Height="25"
-                        Margin="0,0,0,0"
-                        Command="{Binding CmdClose}"
-                        VerticalAlignment="Bottom">
-                    <Path Style="{StaticResource CloseIconKey}" />
-                </Button>
-            </StackPanel>
-        </Grid>
-        <Grid Grid.Row="1">
-            <Grid.ColumnDefinitions>
+        <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="2.2*"/>
                 <ColumnDefinition Width="4.5*"/>
                 <ColumnDefinition Width="3.5*"/>
-            </Grid.ColumnDefinitions>
+        </Grid.ColumnDefinitions>
             <GroupBox Header="PM List" Grid.Column="0">
                 <Grid>
                     <Grid.RowDefinitions>
@@ -71,13 +31,25 @@
                 </Grid>
             </GroupBox>
             <GroupBox Header ="PM View" Grid.Column="1">
-
-            </GroupBox>
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="5*"/>
+                    <RowDefinition Height="3*"/>
+                </Grid.RowDefinitions>
+                <Grid Grid.Row="0">
+                    <Viewbox>
+                        
+                    </Viewbox>
+                </Grid>
+            </Grid>
+        </GroupBox>
             <GroupBox Header ="PM Log" Grid.Column="2">
-
+                 <Grid>
+               
+                </Grid>
             </GroupBox>
 
-        </Grid>
+  
     </Grid>
 </UserControl>
 
