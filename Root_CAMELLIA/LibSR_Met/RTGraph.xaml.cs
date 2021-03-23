@@ -88,16 +88,25 @@ namespace Root_CAMELLIA.LibSR_Met
                         NIR_Wavelength[n] = data.Wavelength[n];
                         NIR_Reflectance[n] = data.Reflectance[n];
                     }
-                    if (m_DM.bExcept_NIR)
+                    try
                     {
-                        m_ReflectancePlotTable = GraphR.plt.PlotScatterHighlight(VIS_Wavelength, VIS_Reflectance, markerSize: 2.5);
-                        GraphR.plt.Axis(350, 950, -10, 100);
+                        if (m_DM.bExcept_NIR)
+                        {
+                            m_ReflectancePlotTable = GraphR.plt.PlotScatterHighlight(VIS_Wavelength, VIS_Reflectance, markerSize: 2.5);
+                            GraphR.plt.Axis(350, 950, -10, 100);
+                        }
+                        else
+                        {
+                            m_ReflectancePlotTable = GraphR.plt.PlotScatterHighlight(NIR_Wavelength, NIR_Reflectance, markerSize: 2.5);
+                            GraphR.plt.Axis(350, 1500, -10, 100);
+                        }
                     }
-                    else
+                    catch(Exception)
                     {
-                        m_ReflectancePlotTable = GraphR.plt.PlotScatterHighlight(NIR_Wavelength, NIR_Reflectance, markerSize: 2.5);
-                        GraphR.plt.Axis(350,1500, -10, 100);
+
                     }
+
+                   
                     if (m_DM.bThickness && m_DM.bViewCalRGraph)
                     {
                         m_ReflectancePlotTable_Calc = GraphR.plt.PlotScatterHighlight(VIS_Wavelength, CalcReflectance, markerSize: 2.5);

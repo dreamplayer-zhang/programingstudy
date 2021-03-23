@@ -16,7 +16,7 @@
             if (m_nModule < 0) return;
             if (m_nOffset < 0) return; 
             string sLog = p_sLongID + ", Write Output : " + bOn.ToString();
-            if (sLog != m_sLog) m_log.Info(sLog);
+            if (sLog != m_sLog) m_log?.Info(sLog);
             m_sLog = sLog;
             CAXD.AxdoWriteOutportBit(m_nModule, m_nOffset, (bOn ? (uint)1 : (uint)0));
         }

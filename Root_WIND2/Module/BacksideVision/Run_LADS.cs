@@ -18,7 +18,7 @@ namespace Root_WIND2.Module
     {
         // Member
         BackSideVision m_module;
-        GrabMode m_grabMode = null;
+        GrabModeBack m_grabMode = null;
         string m_sGrabMode = "";
 
         public string p_sGrabMode
@@ -71,10 +71,10 @@ namespace Root_WIND2.Module
                 int nCamWidth = m_grabMode.m_camera.GetRoiSize().X;
                 int nCamHeight = m_grabMode.m_camera.GetRoiSize().Y;
 
-                double dXScale = m_grabMode.m_dResX_um * 10;
+                double dXScale = m_grabMode.m_dTargetResX_um * 10;
                 cpMemoryOffset.X += (nScanLine + m_grabMode.m_ScanStartLine) * nCamWidth;
-                m_grabMode.m_dTrigger = Convert.ToInt32(10 * m_grabMode.m_dResY_um);  // 1pulse = 0.1um -> 10pulse = 1um
-                int nWaferSizeY_px = Convert.ToInt32(m_grabMode.m_nWaferSize_mm * nMMPerUM / m_grabMode.m_dResY_um);  // 웨이퍼 영역의 Y픽셀 갯수 
+                m_grabMode.m_dTrigger = Convert.ToInt32(10 * m_grabMode.m_dTargetResY_um);  // 1pulse = 0.1um -> 10pulse = 1um
+                int nWaferSizeY_px = Convert.ToInt32(m_grabMode.m_nWaferSize_mm * nMMPerUM / m_grabMode.m_dTargetResY_um);  // 웨이퍼 영역의 Y픽셀 갯수 
                 int nTotalTriggerCount = Convert.ToInt32(m_grabMode.m_dTrigger * nWaferSizeY_px);   // 스캔영역 중 웨이퍼 스캔 구간에서 발생할 Trigger 갯수
                 int nScanOffset_pulse = 10000;
                 string strPool = m_grabMode.m_memoryPool.p_id;

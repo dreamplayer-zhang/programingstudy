@@ -28,7 +28,7 @@ namespace RootTools.Database
         public float m_fAbsY;
 
         public int m_nChipIndexX; // Chip Index
-        public int m_nCHipIndexY;
+        public int m_nChipIndexY;
 
         protected Rect m_rtDefectBox;
         public Rect p_rtDefectBox { get => m_rtDefectBox; set => m_rtDefectBox = value; }
@@ -65,7 +65,7 @@ namespace RootTools.Database
             m_fAbsY = fDefectAbsTop + fDefectH / 2;
 
             m_nChipIndexX = nChipIdxX;
-            m_nCHipIndexY = nChipIdxY;
+            m_nChipIndexY = nChipIdxY;
 
 			m_rtDefectBox = new Rect(fDefectAbsLeft, fDefectAbsTop, fDefectW, fDefectH);
         }

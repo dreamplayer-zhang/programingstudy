@@ -453,6 +453,100 @@ namespace Root_CAMELLIA.LibSR_Met
         }
 
         #region Save 함수 추가 작업 할 것
+
+        public bool SaveReflectance(string sPath, int nPointIdx)   //우리 포멧용
+        {
+            if (Path.GetExtension(sPath) != ".csv")
+            {
+                sPath += ".csv";
+            }
+            StreamWriter writer = new StreamWriter(sPath);
+            RawData raw = m_RawData[nPointIdx];
+
+            if (writer == null)
+            {
+                return false;
+            }
+
+            for (int n = 0; n < raw.nNIRDataNum; n++)
+            {
+                writer.WriteLine(raw.Wavelength[n].ToString() + "," + raw.Reflectance[n].ToString());
+            }
+            writer.Close();
+            return true;
+        }
+
+        public bool SaveRT(string sPath, int nPointIdx, double dLowerWavelength, double dUpperWavelength)   //우리 포멧용
+        {
+            int nDataMin = 9999;
+            int nDataMinLayerIdx = 0;
+            for (int n = 0; n < m_LayerData.Count; n++)
+            {
+                if (m_LayerData[n].wavelength.Count < nDataMin)
+                {
+                    nDataMin = m_LayerData[n].wavelength.Count;
+                    nDataMinLayerIdx = n;
+                }
+            }
+
+            int nStartNum = 0, nEndNum = 0;
+            bool bFound = false;
+            for (int n = 0; n < m_RawData[nPointIdx].Wavelength.Count(); n++)
+            {
+                if (m_LayerData[nDataMinLayerIdx].wavelength[0] < m_RawData[nPointIdx].Wavelength[n]
+                    && m_RawData[nPointIdx].Wavelength[n] < m_LayerData[nDataMinLayerIdx].wavelength[nDataMin - 1])
+                {
+                    if (bFound == false)
+                    {
+                        nStartNum = n;
+                        bFound = true;
+                    }
+                }
+                else if (bFound == true)
+                {
+                    nEndNum = n;
+                    break;
+                }
+            }
+
+            if (Path.GetExtension(sPath) != ".csv")
+            {
+                sPath += ".csv";
+            }
+            StreamWriter writer = new StreamWriter(sPath);
+            RawData raw = m_RawData[nPointIdx];
+
+            if (writer == null)
+            {
+                return false;
+            }
+            writer.WriteLine("GoF," + Math.Round(raw.dGoF, 6).ToString());
+            for (int n = 0; n < raw.Thickness.Count; n++)
+            {
+                writer.WriteLine(m_LayerData[n].sRefName + "," + raw.Thickness[n].ToString());
+            }
+
+            writer.WriteLine("Wavelength,Reflectance,Transmittance");
+
+            if (raw.Transmittance != null)
+            {
+                for (int n = 0; n < raw.nNIRDataNum; n++)
+                {
+                    if (nStartNum <= n && n < nEndNum)
+                    {
+                        writer.WriteLine(raw.Wavelength[n].ToString() + "," + raw.Reflectance[n].ToString() + "," + raw.Transmittance[n - nStartNum].ToString());
+                    }
+                    else
+                    {
+                        writer.WriteLine(raw.Wavelength[n].ToString() + "," + raw.Reflectance[n].ToString());
+                    }
+                }
+            }
+
+            writer.Close();
+            return true;
+        }
+
         public bool SaveResultFileDCOL(string sPath, string sFoupID, string sLotID, string sToolID, string sWaferID, string sSlotID, string sSWVersion, string sRCPName)
         {
             try
@@ -1217,6 +1311,12 @@ namespace Root_CAMELLIA.LibSR_Met
                 return false;
             }
         }
+        public bool SaveContourMapData(string sPath, List<ContourMapData> mapdata, bool bUseMinusData = false)
+        {
+            // ContourMap 완성된 이후 작업하겠습니다.
+            return true;
+        }
+
         public bool SaveResultFileSummary(string sPath, string sLotID, string sSlotID)
         {
             int n = 0;

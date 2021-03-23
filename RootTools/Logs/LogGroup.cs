@@ -44,12 +44,12 @@ namespace RootTools
             string sPath = LogView._logView.p_sPath;
             try
             {
+                //string sDate = "";
+                Log.Data logData;
                 if (m_qLog.Count <= 0) return;
-                //string sDate;
-                Log.Data LogData;
-                if(m_qLog.TryPeek(out LogData))
+                if (m_qLog.TryPeek(out logData))
                 {
-                    string sDate = LogData.m_sDate;
+                    string sDate = logData.m_sDate;
                     sPath += "\\" + sDate;
                     Directory.CreateDirectory(sPath);
                     using (StreamWriter writer = new StreamWriter(sPath + "\\" + sDate + "_" + p_id + ".txt", true, Encoding.Default))
@@ -57,12 +57,12 @@ namespace RootTools
                         while (m_qLog.Count > 0)
                         {
                             Log.Data data;
-                            if(m_qLog.TryPeek(out data))
+                            if (m_qLog.TryPeek(out data))
                             {
                                 if (data != null)
                                 {
-                                    Log.Data dequeue;
                                     if (data.m_sDate != sDate) return;
+                                    Log.Data dequeue;
                                     if (m_qLog.TryDequeue(out dequeue))
                                     {
                                         writer.WriteLine(data.p_sLog);
@@ -78,9 +78,12 @@ namespace RootTools
                             }
                         }
                     }
-                }
+                } 
             }
-            catch (Exception) { }
+            catch(Exception)
+            {
+
+            }
         }
 
         public ObservableCollection<Log.Data> p_aLog { get; set; }

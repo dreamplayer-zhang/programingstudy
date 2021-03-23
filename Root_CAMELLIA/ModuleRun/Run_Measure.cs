@@ -180,12 +180,12 @@ namespace Root_CAMELLIA.Module
             Axis axisZ = m_module.p_axisZ;
 
             // stage 48724 , wafer 47932
-            if (m_module.Run(axisZ.StartMove(m_dFocusZ_pulse)))
-            {
-                return p_sInfo;
-            }
-            if (m_module.Run(axisZ.WaitReady()))
-                return p_sInfo;
+            //if (m_module.Run(axisZ.StartMove(m_dFocusZ_pulse)))
+            //{
+            //    return p_sInfo;
+            //}
+            //if (m_module.Run(axisZ.WaitReady()))
+            //    return p_sInfo;
 
             //return "OK";
 

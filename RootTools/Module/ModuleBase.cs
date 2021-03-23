@@ -93,7 +93,6 @@ namespace RootTools.Module
         }
         public bool Run(string sInfo)
         {
-            
             p_sInfo = sInfo;
             if (EQ.IsStop()) p_sInfo = "EQ Stop";
             return sInfo != "OK";
