@@ -42,5 +42,10 @@ namespace RootTools_Vision
 
             DataContext = new MainWindow_ViewModel();
         }
+
+        private void Window_Closed(object sender, EventArgs e)
+        {
+
+        }
     }
 }

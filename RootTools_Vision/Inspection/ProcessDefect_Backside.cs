@@ -1,6 +1,7 @@
 ﻿using RootTools;
 using RootTools.Database;
 using RootTools_CLR;
+using RootTools_Vision.Utility;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -90,6 +91,29 @@ namespace RootTools_Vision
             {
                 DatabaseManager.Instance.AddDefectDataList(MergeDefectList, TableName);
             }
+
+            Settings settings = new Settings();
+            SettingItem_SetupBackside settings_backside = settings.GetItem<SettingItem_SetupBackside>();
+
+            Tools.SaveDefectImage(Path.Combine(settings_backside.DefectImagePath, sInspectionID), MergeDefectList, this.currentWorkplace.SharedBufferInfo, this.currentWorkplace.SharedBufferByteCnt);
+
+            if (settings_backside.UseKlarf)
+            {
+                KlarfData_Lot klarfData = new KlarfData_Lot();
+                Directory.CreateDirectory(settings_backside.KlarfSavePath);
+
+                //klarfData.AddSlot(recipe.WaferMap, MergeDefectList, this.recipe.GetItem<BacksideRecipe>());
+                //klarfData.WaferStart(recipe.WaferMap, DateTime.Now);
+                //klarfData.SetResultTimeStamp();
+
+                //klarfData.SaveKlarf(settings_backside.KlarfSavePath, false);
+
+                //Tools.SaveTiffImage(settings_backside.KlarfSavePath, MergeDefectList, this.currentWorkplace.SharedBufferInfo);
+                
+                Tools.SaveImageJpg(this.currentWorkplace.SharedBufferInfo, new Rect(0, 0, 3000, 3000), settings_backside.KlarfSavePath + "\\" + DateTime.Now.ToString("yyyyMMddhhmmss") + "_backside.jpg", (long)(settings_backside.WholeWaferImageCompressionRate * 100));
+            }
+
+
 
             WorkEventManager.OnInspectionDone(this.currentWorkplace, new InspectionDoneEventArgs(new List<CRect>()));
             WorkEventManager.OnIntegratedProcessDefectDone(this.currentWorkplace, new IntegratedProcessDefectDoneEventArgs());
