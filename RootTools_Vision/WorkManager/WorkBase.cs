@@ -32,7 +32,8 @@ namespace RootTools_Vision
     {
         protected RecipeBase recipe;
         protected ParameterBase parameter;
-        
+        protected GrabModeBase grabMode;
+
         [NonSerialized]
         protected Workplace currentWorkplace;
 
@@ -100,6 +101,11 @@ namespace RootTools_Vision
             this.workplaceBufferG = bufferG;
             this.workplaceBufferB = bufferB;
         }
+
+        public void SetGrabMode(GrabModeBase grabMode)
+		{
+            this.grabMode = grabMode;
+		}
 
         public byte[] GetWorkplaceBuffer(IMAGE_CHANNEL channel)
         {

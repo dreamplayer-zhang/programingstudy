@@ -42,11 +42,9 @@ namespace Root_Rinse_Unloader
             buttonStart.IsEnabled = EQ.p_eState == EQ.eState.Ready;
             buttonPause.IsEnabled = EQ.p_eState == EQ.eState.Run;
             buttonReset.IsEnabled = (EQ.p_eState == EQ.eState.Error) || (EQ.p_eState == EQ.eState.Ready);
-            buttonPickerSet.IsEnabled = EQ.p_eState == EQ.eState.Ready;
 
             bool bRun = bBlink && (EQ.p_eState == EQ.eState.Run);
             buttonStart.Foreground = (bRun && EQ.p_bPickerSet == false) ? Brushes.Red : Brushes.Black;
-            buttonPickerSet.Foreground = (bRun && EQ.p_bPickerSet) ? Brushes.Red : Brushes.Black;
             borderState.Background = (EQ.p_eState == EQ.eState.Ready || EQ.p_eState == EQ.eState.Run) ? Brushes.SeaGreen : Brushes.Gold;
 
 
@@ -186,11 +184,6 @@ namespace Root_Rinse_Unloader
             foreach (Roller.Line line in m_handler.m_roller.m_aLine) line.p_eSensor = Roller.Line.eSensor.Empty;
             m_handler.m_rinse.RunBuzzerOff();
             EQ.p_eState = EQ.eState.Ready;
-        }
-
-        private void buttonPickerSet_Click(object sender, RoutedEventArgs e)
-        {
-            m_handler.StartPickerSet();
         }
 
         private void textBoxWidth_PreviewKeyDown(object sender, System.Windows.Input.KeyEventArgs e)

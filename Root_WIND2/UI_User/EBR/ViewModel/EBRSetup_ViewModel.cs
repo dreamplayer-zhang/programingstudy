@@ -72,7 +72,7 @@ namespace Root_WIND2.UI_User
 			get => this.selectedGrabModeIndex;
 			set
 			{
-				GrabMode mode = ((WIND2_Handler)GlobalObjects.Instance.Get<WIND2_Engineer>().ClassHandler()).p_EdgeSideVision.m_aGrabMode[value];
+				GrabModeBase mode = ((WIND2_Handler)GlobalObjects.Instance.Get<WIND2_Engineer>().ClassHandler()).p_EdgeSideVision.m_aGrabMode[value];
 				Run_InspectEBR inspect = ((Run_InspectEBR)((WIND2_Handler)GlobalObjects.Instance.Get<WIND2_Engineer>().ClassHandler()).p_EdgeSideVision.CloneModuleRun("InspectEBR"));
 
 				if (mode.m_camera != null)
@@ -84,10 +84,10 @@ namespace Root_WIND2.UI_User
 				if (Recipe.CameraHeight == 0)
 					Recipe.CameraHeight = inspect.CameraHeight;
 
-				Recipe.Resolution = mode.m_dResX_um;
+				Recipe.Resolution = mode.m_dTargetResX_um;
 				Recipe.TriggerRatio = mode.m_dCamTriggerRatio;
 				Recipe.ImageOffset = inspect.ImageOffset;
-				
+
 				SetProperty<int>(ref this.selectedGrabModeIndex, value);
 			}
 		}

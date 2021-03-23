@@ -46,7 +46,8 @@ namespace RootTools
             {
                 //string sDate = "";
                 Log.Data logData;
-                if(m_qLog.TryPeek(out logData))
+                if (m_qLog.Count <= 0) return;
+                if (m_qLog.TryPeek(out logData))
                 {
                     string sDate = logData.m_sDate;
                     sPath += "\\" + sDate;
@@ -83,7 +84,7 @@ namespace RootTools
             {
 
             }
-            
+            catch (Exception) { }
         }
 
         public ObservableCollection<Log.Data> p_aLog { get; set; }

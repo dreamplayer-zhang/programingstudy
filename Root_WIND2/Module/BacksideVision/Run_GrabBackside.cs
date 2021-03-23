@@ -17,8 +17,8 @@ namespace Root_WIND2.Module
     {
         // Member
         BackSideVision m_module;
-        GrabMode m_MaingrabMode = null;
-        GrabMode m_LADSgrabMode = null;
+        GrabModeBack m_MaingrabMode = null;
+        GrabModeBack m_LADSgrabMode = null;
         string m_sGrabMode = "";
         string m_sLADSGrabMode = "";
 
@@ -81,9 +81,9 @@ namespace Root_WIND2.Module
             int nMMPerUM = 1000;
             int nCamWidth = m_MaingrabMode.m_camera.GetRoiSize().X;
             int nCamHeight = m_MaingrabMode.m_camera.GetRoiSize().Y;
-            m_MaingrabMode.m_dTrigger = Convert.ToInt32(10 * m_MaingrabMode.m_dResY_um);  // 1pulse = 0.1um -> 10pulse = 1um
-            double dXScale = m_MaingrabMode.m_dResX_um * 10; //resolution to pulse
-            int nWaferSizeY_px = Convert.ToInt32(m_MaingrabMode.m_nWaferSize_mm * nMMPerUM / m_MaingrabMode.m_dResY_um);  // 웨이퍼 영역의 Y픽셀 갯수
+            m_MaingrabMode.m_dTrigger = Convert.ToInt32(10 * m_MaingrabMode.m_dTargetResY_um);  // 1pulse = 0.1um -> 10pulse = 1um
+            double dXScale = m_MaingrabMode.m_dTargetResX_um * 10; //resolution to pulse
+            int nWaferSizeY_px = Convert.ToInt32(m_MaingrabMode.m_nWaferSize_mm * nMMPerUM / m_MaingrabMode.m_dTargetResY_um);  // 웨이퍼 영역의 Y픽셀 갯수
             int nTotalTriggerCount = Convert.ToInt32(m_MaingrabMode.m_dTrigger * nWaferSizeY_px);   // 스캔영역 중 웨이퍼 스캔 구간의 Trigger pulse
             int nScanSpeed = Convert.ToInt32((double)m_MaingrabMode.m_nMaxFrame * m_MaingrabMode.m_dTrigger * nCamHeight * m_MaingrabMode.m_nScanRate / 100);
             int nScanOffset_pulse = 40000;
@@ -153,7 +153,7 @@ namespace Root_WIND2.Module
 
                     if (m_MaingrabMode.m_bUseLADS)
                     {
-                        int nLADSMaxScanNum = Convert.ToInt32((m_LADSgrabMode.m_nWaferSize_mm * nMMPerUM / m_LADSgrabMode.m_dResY_um) / m_LADSgrabMode.m_camera.GetRoiSize().X);
+                        int nLADSMaxScanNum = Convert.ToInt32((m_LADSgrabMode.m_nWaferSize_mm * nMMPerUM / m_LADSgrabMode.m_dTargetResY_um) / m_LADSgrabMode.m_camera.GetRoiSize().X);
                         int nMainMaxScanNum = nWaferSizeY_px / m_MaingrabMode.m_camera.GetRoiSize().X;
 
                         int ladsinfonum = nLADSMaxScanNum * (nScanLine+ m_MaingrabMode.m_ScanStartLine) / nMainMaxScanNum;
