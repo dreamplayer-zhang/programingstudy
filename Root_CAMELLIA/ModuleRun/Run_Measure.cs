@@ -132,6 +132,9 @@ namespace Root_CAMELLIA.Module
                     }
                     m_mwvm.p_Progress = (((double)(index + 1) / m_DataManager.recipeDM.MeasurementRD.DataSelectedPoint.Count) * 100);
                     SaveRawData(index);
+                    // Spectrum data Thread 추가 두개두개두개
+                    //LibSR_Met.DataManager.GetInstance().SaveResultFileSlot()
+                    //SaveRT
                     sw.Stop();
                     System.Diagnostics.Debug.WriteLine(sw.ElapsedMilliseconds);
                 }
@@ -180,12 +183,12 @@ namespace Root_CAMELLIA.Module
             Axis axisZ = m_module.p_axisZ;
 
             // stage 48724 , wafer 47932
-            if (m_module.Run(axisZ.StartMove(m_dFocusZ_pulse)))
-            {
-                return p_sInfo;
-            }
-            if (m_module.Run(axisZ.WaitReady()))
-                return p_sInfo;
+            //if (m_module.Run(axisZ.StartMove(m_dFocusZ_pulse)))
+            //{
+            //    return p_sInfo;
+            //}
+            //if (m_module.Run(axisZ.WaitReady()))
+            //    return p_sInfo;
 
             //return "OK";
 
@@ -263,11 +266,26 @@ namespace Root_CAMELLIA.Module
                             return "Layer Model Not Ready";
                         }
 
+                        // SaveReflectance
+
                     //pp.m_nanoView.
                     StopWatch sw = new StopWatch();
                     sw.Start();
 
                     thicknessQueue.Enqueue(i);
+    //                    if (App.m_nanoView.SampleMeasure(i, x, y,
+    //m_mwvm.SettingViewModel.p_ExceptNIR, m_DataManager.recipeDM.MeasurementRD.UseTransmittance, m_DataManager.recipeDM.MeasurementRD.UseThickness,
+    //m_DataManager.recipeDM.MeasurementRD.LowerWaveLength, m_DataManager.recipeDM.MeasurementRD.UpperWaveLength) != Met.Nanoview.ERRORCODE_NANOVIEW.SR_NO_ERROR)
+    //                    {
+    //                        isEQStop = false;
+    //                        return "Layer Model Not Ready";
+    //                    }
+
+    //                //pp.m_nanoView.
+    //                StopWatch sw = new StopWatch();
+    //                sw.Start();
+
+    //                thicknessQueue.Enqueue(i);
 
                     if (i < m_DataManager.recipeDM.MeasurementRD.DataSelectedPoint.Count - 1)
                     {
@@ -356,6 +374,11 @@ namespace Root_CAMELLIA.Module
             m_bStart = false;
             test.Stop();
             m_log.Warn("Measure End >> " + test.ElapsedMilliseconds);
+
+            // 레드로 빼버림?  contour는 일단 보류..
+            //  DCOL 세이브 필요
+            
+
             return "OK";
         }
 

@@ -65,7 +65,7 @@ namespace Root_AOP01_Inspection.Module
         public bool m_bPlaced = false;
         public bool CheckPlaced()
         {
-            GemCarrierBase.ePresent present = m_bPlaced ? GemCarrierBase.ePresent.Exist : GemCarrierBase.ePresent.Empty;
+            GemCarrierBase.ePresent present = m_OHT.m_bPODExist ? GemCarrierBase.ePresent.Exist : GemCarrierBase.ePresent.Empty;
             if (p_infoCarrier.CheckPlaced(present) != "OK") m_alidPlaced.Run(true, "Placed Sensor Remain Checked while Pod State = " + p_infoCarrier.p_eState);
             switch (p_infoCarrier.p_ePresentSensor)
             {
@@ -723,7 +723,7 @@ namespace Root_AOP01_Inspection.Module
         #region StateReady
         public override string StateReady()
         {
-            CheckPlaced();
+            //CheckPlaced();
             //if (p_infoCarrier.m_bReqReadCarrierID)
             //{
             //    p_infoCarrier.m_bReqReadCarrierID = false;

@@ -290,11 +290,21 @@ namespace Root_CAMELLIA.Module
                 infoCarrier[i] = loadports[i].p_infoCarrier;
                 CanInitCal[i] = false;  
             }
+            try
+            {
+                if (p_CamVRS != null && !p_CamVRS.p_CamInfo._OpenStatus)
+                {
+                    p_CamVRS.Connect();
+                }
+                   
+                if(p_CamVRS != null)
+                 while (!p_CamVRS.m_ConnectDone) ;
+            }
+            catch
+            {
 
-            if (!p_CamVRS.p_CamInfo._OpenStatus)
-                p_CamVRS.Connect();
+            }
 
-            while (!p_CamVRS.m_ConnectDone) ;
         }
 
         public override void ThreadStop()
@@ -312,80 +322,88 @@ namespace Root_CAMELLIA.Module
             AddModuleRunList(new Run_PMTiltAlign(this), true, "PM Camera Tilt");
         }
 
+
+        bool m_isHomeRun = false;
         public override string StateHome()
         {
-
-
-            p_sInfo = "OK";
-            if (EQ.p_bSimulate)
-                return "OK";
-
-            m_tiltAxisXY.p_axisX.p_eState = Axis.eState.Ready;
-            m_tiltAxisXY.p_axisY.p_eState = Axis.eState.Ready;
-            m_stageAxisZ.p_eState = Axis.eState.Ready;
-
-            Thread.Sleep(200);
-            if (m_listAxis.Count == 0) return "OK";
-            if (p_eState == eState.Run) return "Invalid State : Run";
-            if (EQ.IsStop()) return "Home Stop";
-
-            foreach (Axis axis in m_listAxis)
+            m_isHomeRun = true;
+            try
             {
-                if (axis != null) axis.ServoOn(true);
-            }
-            Thread.Sleep(200);
-            if (EQ.IsStop()) return "Home Stop";
+                p_sInfo = "OK";
+                if (EQ.p_bSimulate)
+                    return "OK";
 
-            for (int i = 0; i < p_axisLifter.m_bDIO_I.Count; i++)
-            {
-                p_axisLifter.m_bDIO_I[i] = false;
-            }
-            if (!LifterMoveVacuumCheck())
-            {
-                p_eState = eState.Error;
-                p_sInfo = "Vacuum is not turn off";
-                MessageBox.Show(p_sInfo);
+                m_tiltAxisXY.p_axisX.p_eState = Axis.eState.Ready;
+                m_tiltAxisXY.p_axisY.p_eState = Axis.eState.Ready;
+                m_stageAxisZ.p_eState = Axis.eState.Ready;
+
+                Thread.Sleep(200);
+                if (m_listAxis.Count == 0) return "OK";
+                if (p_eState == eState.Run) return "Invalid State : Run";
+                if (EQ.IsStop()) return "Home Stop";
+
+                foreach (Axis axis in m_listAxis)
+                {
+                    if (axis != null) axis.ServoOn(true);
+                }
+                Thread.Sleep(200);
+                if (EQ.IsStop()) return "Home Stop";
+
+                for (int i = 0; i < p_axisLifter.m_bDIO_I.Count; i++)
+                {
+                    p_axisLifter.m_bDIO_I[i] = false;
+                }
+                if (!LifterMoveVacuumCheck())
+                {
+                    p_eState = eState.Error;
+                    p_sInfo = "Vacuum is not turn off";
+                    MessageBox.Show(p_sInfo);
+                    return p_sInfo;
+                }
+                p_axisLifter.StartHome();
+                if (p_axisLifter.WaitReady() != "OK")
+                {
+                    p_eState = eState.Error;
+                    p_sInfo = "Lifter Home Error";
+                    MessageBox.Show(p_sInfo);
+                    return p_sInfo;
+                }
+
+                for (int i = 0; i < p_axisLifter.m_bDIO_I.Count; i++)
+                {
+                    p_axisLifter.m_bDIO_I[i] = true;
+                }
+
+
+                p_axisXY.p_axisX.StartHome();
+                p_axisXY.p_axisY.StartHome();
+                p_axisZ.StartHome();
+
+                if (p_axisXY.p_axisX.WaitReady() != "OK")
+                {
+                    p_eState = eState.Error;
+                    return "AxisX Home Error";
+                }
+
+                if (p_axisXY.p_axisY.WaitReady() != "OK")
+                {
+                    p_eState = eState.Error;
+                    return "AxisY Home Error";
+                }
+
+                if (p_axisZ.WaitReady() != "OK")
+                {
+                    p_eState = eState.Error;
+                    return "AxisZ Home Error";
+                }
+                p_eState = (p_sInfo == "OK") ? eState.Ready : eState.Error;
+
                 return p_sInfo;
             }
-            p_axisLifter.StartHome();
-            if (p_axisLifter.WaitReady() != "OK")
+            finally
             {
-                p_eState = eState.Error;
-                p_sInfo = "Lifter Home Error";
-                MessageBox.Show(p_sInfo);
-                return p_sInfo;
-            }
-
-            for (int i = 0; i < p_axisLifter.m_bDIO_I.Count; i++)
-            {
-                p_axisLifter.m_bDIO_I[i] = true;
-            }
-
-
-            p_axisXY.p_axisX.StartHome();
-            p_axisXY.p_axisY.StartHome();
-            p_axisZ.StartHome();
-
-            if (p_axisXY.p_axisX.WaitReady() != "OK")
-            {
-                p_eState = eState.Error;
-                return "AxisX Home Error";
-            }
-
-            if (p_axisXY.p_axisY.WaitReady() != "OK")
-            {
-                p_eState = eState.Error;
-                return "AxisY Home Error";
-            }
-
-            if (p_axisZ.WaitReady() != "OK")
-            {
-                p_eState = eState.Error;
-                return "AxisZ Home Error";
-            }
-            p_eState = (p_sInfo == "OK") ? eState.Ready : eState.Error;
-
-            return p_sInfo;
+                m_isHomeRun = false;
+            }  
         }
 
 
@@ -632,6 +650,11 @@ namespace Root_CAMELLIA.Module
         eCheckWafer m_eCheckWafer = eCheckWafer.InfoWafer;
         public bool IsWaferExist(int nID)
         {
+            
+            if(EQ.p_eState != EQ.eState.Home && p_eState == eState.Home)
+            {
+                StateHome();
+            }
             switch (m_eCheckWafer)
             {
                 case eCheckWafer.Sensor:

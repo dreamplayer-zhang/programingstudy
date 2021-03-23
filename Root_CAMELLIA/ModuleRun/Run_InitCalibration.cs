@@ -73,17 +73,18 @@ namespace Root_CAMELLIA.Module
                 if (m_module.Run(axisXY.WaitReady()))
                     return p_sInfo;
 
-                if (!m_isPM)
-                {
-                    m_SettingDataWithErrorCode = App.m_nanoView.LoadSettingParameters();
-                    if (m_SettingDataWithErrorCode.Item2 != Met.Nanoview.ERRORCODE_NANOVIEW.SR_NO_ERROR)
-                    {
-                        return "Load Parameter Error";
-                    }
-                    LibSR_Met.DataManager.GetInstance().m_SettngData = m_SettingDataWithErrorCode.Item1;
-                }
+                //if (!m_isPM)
+                //{
+                //    m_SettingDataWithErrorCode = App.m_nanoView.LoadSettingParameters();
+                //    if (m_SettingDataWithErrorCode.Item2 != Met.Nanoview.ERRORCODE_NANOVIEW.SR_NO_ERROR)
+                //    {
+                //        return "Load Parameter Error";
+                //    }
+                //    LibSR_Met.DataManager.GetInstance().m_SettngData = m_SettingDataWithErrorCode.Item1;
+                //}
 
-                App.m_nanoView.Calibration(m_InitialCal);
+                //App.m_nanoView.Calibration(m_InitialCal);
+                System.Threading.Thread.Sleep(8000);
             }
 
             if (m_useRefWafer)

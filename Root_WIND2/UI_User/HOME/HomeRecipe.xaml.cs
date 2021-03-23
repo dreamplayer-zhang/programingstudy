@@ -1,5 +1,4 @@
-﻿using RootTools;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,23 +10,19 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace Root_CAMELLIA
+namespace Root_WIND2.UI_User
 {
     /// <summary>
-    /// Dlg_Review.xaml에 대한 상호 작용 논리
+    /// HomeRecipe.xaml에 대한 상호 작용 논리
     /// </summary>
-    public partial class Dlg_Review : Window, IDialog
+    public partial class HomeRecipe : UserControl
     {
-        public Dlg_Review()
+        public HomeRecipe()
         {
             InitializeComponent();
-        }
-
-        private void TitleBar_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-        {
-            this.DragMove();
         }
     }
 }
