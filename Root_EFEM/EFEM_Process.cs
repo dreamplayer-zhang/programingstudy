@@ -391,7 +391,7 @@ namespace Root_EFEM
                 EQ.p_eState = EQ.eState.Ready;
                 if (!EQ.IsStop())
                 {
-                   ClearInfoWafer();
+                    ClearInfoWafer();
                 }
                 return EQ.IsStop() ? "EQ Stop" : "OK";
             }

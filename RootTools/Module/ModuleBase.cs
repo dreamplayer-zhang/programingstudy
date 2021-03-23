@@ -93,7 +93,6 @@ namespace RootTools.Module
         }
         public bool Run(string sInfo)
         {
-            
             p_sInfo = sInfo;
             if (EQ.IsStop()) p_sInfo = "EQ Stop";
             return sInfo != "OK";
@@ -227,7 +226,10 @@ namespace RootTools.Module
                     p_bEnableHome = false;
                     p_sRun = "Stop";
                     string sStateHome = StateHome();
-                    if (sStateHome == "OK") p_eState = eState.Ready;
+                    if (sStateHome == "OK")
+                    {
+                        if (p_eRemote != eRemote.Client) p_eState = eState.Ready;
+                    }
                     else StopHome();
                     break;
                 case eState.Ready:
@@ -418,6 +420,7 @@ namespace RootTools.Module
             if (m_qModuleRun.Count == 0) return false;
             ModuleRunBase moduleRun = m_qModuleRun.Peek();
             if (moduleRun.m_bRemoteRun == false) return false;
+            moduleRun.p_eRunState = ModuleRunBase.eRunState.Run;
             m_swRun.Restart();
             m_log.Info("RemoteRun : " + moduleRun.p_id + " Start");
             try
@@ -429,6 +432,7 @@ namespace RootTools.Module
                 }
             }
             catch (Exception e) { p_sInfo = "StateRun Exception = " + e.Message; }
+            moduleRun.p_eRunState = ModuleRunBase.eRunState.Done;
             m_log.Info("RemoteRun : " + moduleRun.p_id + " Done : " + (m_swRun.ElapsedMilliseconds / 1000.0).ToString("0.00 sec"));
             if (m_qModuleRun.Count > 0) m_qModuleRun.Dequeue();
             return true; 

@@ -36,11 +36,19 @@ namespace RootTools_Vision
 
         public void SetWorkplaceBuffer(byte[] bufferR_GRAY, byte[] bufferG, byte[] bufferB)
         {
-            foreach(WorkBase work in this)
+            foreach (WorkBase work in this)
             {
                 work.SetWorkplaceBuffer(bufferR_GRAY, bufferG, bufferB);
             }
         }
+
+        public void SetGrabMode(RootTools.GrabModeBase grabMode)
+		{
+            foreach (WorkBase work in this)
+			{
+                work.SetGrabMode(grabMode);
+			}
+		}
 
         public void Reset()
         {

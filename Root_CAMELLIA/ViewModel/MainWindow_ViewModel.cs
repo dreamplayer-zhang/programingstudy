@@ -743,7 +743,14 @@ namespace Root_CAMELLIA
                     if (RecipeViewModel.dataManager.recipeDM.RecipeOpen())
                     {
                         RecipeViewModel.UpdateListView(true);
-                        RecipeViewModel.UpdateLayerGridView();
+                        try
+                        {
+                            RecipeViewModel.UpdateLayerGridView();
+                        }
+                        catch
+                        {
+
+                        }
                         RecipeViewModel.UpdateView(true);
                         p_DrawPointElement = new ObservableCollection<UIElement>(RecipeViewModel.p_DrawPointElement);
                         DrawMeasureRoute();
@@ -776,7 +783,14 @@ namespace Root_CAMELLIA
                         isRecipeLoad = true;
                     }
                     RecipeViewModel.UpdateListView(isRecipeLoad);
-                    RecipeViewModel.UpdateLayerGridView();
+                    try
+                    {
+                       RecipeViewModel.UpdateLayerGridView();
+                    }
+                    catch
+                    {
+
+                    }
                     RecipeViewModel.UpdateView(isRecipeLoad, true);
 
                     p_DrawPointElement = new ObservableCollection<UIElement>(RecipeViewModel.p_DrawPointElement);

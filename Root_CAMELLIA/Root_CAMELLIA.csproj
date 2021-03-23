@@ -231,7 +231,9 @@
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Core" />
+    <Reference Include="System.Core">
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.Net.Http" />
@@ -270,6 +272,9 @@
     <Compile Include="Control\Humidity.xaml.cs">
       <DependentUpon>Humidity.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Control\PMCheckReview.xaml.cs">
+      <DependentUpon>PMCheckReview.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Control\StageViewControl.xaml.cs">
       <DependentUpon>StageViewControl.xaml</DependentUpon>
     </Compile>
@@ -291,6 +296,9 @@
     <Compile Include="LibSR_Met\LogManager.cs" />
     <Compile Include="LibSR_Met\Nanoview.cs" />
     <Compile Include="LibSR_Met\PMDatas.cs" />
+    <Compile Include="LibSR_Met\PMRGraph.xaml.cs">
+      <DependentUpon>PMRGraph.xaml</DependentUpon>
+    </Compile>
     <Compile Include="LibSR_Met\RTGraph.xaml.cs" />
     <Compile Include="ModuleRun\Run_AutoFocus.cs" />
     <Compile Include="ModuleRun\Run_CalibrationWaferCentering.cs" />
@@ -417,6 +425,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Control\PMCheckReview.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Control\StageViewControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -426,6 +438,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="LibSR_Met\CountGraph.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="LibSR_Met\PMRGraph.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

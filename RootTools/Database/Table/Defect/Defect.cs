@@ -25,7 +25,7 @@ namespace RootTools.Database
         
         public float m_fGV;
         public int m_nChipIndexX; // Chip Index
-        public int m_nCHipIndexY;
+        public int m_nChipIndexY;
         //public string sImagePath;
                 
         protected int m_nImgsizeX; 
@@ -56,7 +56,7 @@ namespace RootTools.Database
             m_rtDefectBox = new Rect(fAbsX - (fDefectW / 2), fAbsY - (fDefectH / 2), fDefectW, fDefectH);
 
             m_nChipIndexX = chipIdxX;
-            m_nCHipIndexY = chipIdxY;
+            m_nChipIndexY = chipIdxY;
         }
         public Defect(string strInspectionID, int nDefectCode, float fDefectSz, float fDefectGV, float fDefectAbsLeft, float fDefectAbsTop, float fDefectW, float fDefectH, int nChipIdxX, int nChipIdxY)
         {
@@ -75,7 +75,7 @@ namespace RootTools.Database
             m_rtDefectBox = new Rect(fDefectAbsLeft, fDefectAbsTop, fDefectW, fDefectH);
 
             m_nChipIndexX = nChipIdxX;
-            m_nCHipIndexY = nChipIdxY;
+            m_nChipIndexY = nChipIdxY;
         }
 
         public void SetDefectIndex(int nIndex)
@@ -103,7 +103,7 @@ namespace RootTools.Database
             m_rtDefectBox = new Rect(fDefectAbsLeft, fDefectAbsTop, fDefectW, fDefectH);
 
             m_nChipIndexX = nChipIdxX;
-            m_nCHipIndexY = nChipIdxY;
+            m_nChipIndexY = nChipIdxY;
         }
 
         public void CalcAbsToRelPos(int nRefX, int nRefY)

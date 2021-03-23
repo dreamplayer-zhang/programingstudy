@@ -183,12 +183,12 @@ namespace Root_CAMELLIA.Module
             Axis axisZ = m_module.p_axisZ;
 
             // stage 48724 , wafer 47932
-            if (m_module.Run(axisZ.StartMove(m_dFocusZ_pulse)))
-            {
-                return p_sInfo;
-            }
-            if (m_module.Run(axisZ.WaitReady()))
-                return p_sInfo;
+            //if (m_module.Run(axisZ.StartMove(m_dFocusZ_pulse)))
+            //{
+            //    return p_sInfo;
+            //}
+            //if (m_module.Run(axisZ.WaitReady()))
+            //    return p_sInfo;
 
             //return "OK";
 
@@ -273,6 +273,19 @@ namespace Root_CAMELLIA.Module
                     sw.Start();
 
                     thicknessQueue.Enqueue(i);
+    //                    if (App.m_nanoView.SampleMeasure(i, x, y,
+    //m_mwvm.SettingViewModel.p_ExceptNIR, m_DataManager.recipeDM.MeasurementRD.UseTransmittance, m_DataManager.recipeDM.MeasurementRD.UseThickness,
+    //m_DataManager.recipeDM.MeasurementRD.LowerWaveLength, m_DataManager.recipeDM.MeasurementRD.UpperWaveLength) != Met.Nanoview.ERRORCODE_NANOVIEW.SR_NO_ERROR)
+    //                    {
+    //                        isEQStop = false;
+    //                        return "Layer Model Not Ready";
+    //                    }
+
+    //                //pp.m_nanoView.
+    //                StopWatch sw = new StopWatch();
+    //                sw.Start();
+
+    //                thicknessQueue.Enqueue(i);
 
                     if (i < m_DataManager.recipeDM.MeasurementRD.DataSelectedPoint.Count - 1)
                     {
