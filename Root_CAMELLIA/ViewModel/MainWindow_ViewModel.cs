@@ -306,6 +306,20 @@ namespace Root_CAMELLIA
         }
         private ObservableCollection<UIElement> m_DrawRouteElement = new ObservableCollection<UIElement>();
 
+        public ObservableCollection<UIElement> p_DrawPointElement
+        {
+            get
+            {
+                return m_DrawPointElement;
+            }
+            set
+            {
+                //m_DrawPointElement = value;
+                SetProperty(ref m_DrawPointElement, value);
+            }
+        }
+        private ObservableCollection<UIElement> m_DrawPointElement = new ObservableCollection<UIElement>();
+
         public double p_Progress
         {
             get
@@ -576,6 +590,7 @@ namespace Root_CAMELLIA
             SettingViewModel = new Dlg_Setting_ViewModel(this);
             RecipeViewModel = new Dlg_RecipeManager_ViewModel(this);   
             PMViewModel = new Dlg_PM_ViewModel(this);
+            ReviewViewModel = new Dlg_Review_ViewModel(this);
         }
 
         private void DialogInit(MainWindow main)
@@ -585,6 +600,7 @@ namespace Root_CAMELLIA
             dialogService.Register<Dlg_RecipeManager_ViewModel, Dlg_RecipeManager>();
             dialogService.Register<Dlg_Setting_ViewModel, Dlg_Setting>();
             dialogService.Register<Dlg_PM_ViewModel, Dlg_PM>();
+            dialogService.Register<Dlg_Review_ViewModel, Dlg_Review>();
         }
 
         private void DrawMeasureRoute()
@@ -614,6 +630,7 @@ namespace Root_CAMELLIA
         public Dlg_PM_ViewModel PMViewModel;
         public Dlg_Setting_ViewModel SettingViewModel;
         public Dlg_Engineer_ViewModel EngineerViewModel;
+        public Dlg_Review_ViewModel ReviewViewModel;
         public Dlg_RecipeManager_ViewModel RecipeViewModel
         {
             get
@@ -726,8 +743,16 @@ namespace Root_CAMELLIA
                     if (RecipeViewModel.dataManager.recipeDM.RecipeOpen())
                     {
                         RecipeViewModel.UpdateListView(true);
-                        RecipeViewModel.UpdateLayerGridView();
+                        try
+                        {
+                            RecipeViewModel.UpdateLayerGridView();
+                        }
+                        catch
+                        {
+
+                        }
                         RecipeViewModel.UpdateView(true);
+                        p_DrawPointElement = new ObservableCollection<UIElement>(RecipeViewModel.p_DrawPointElement);
                         DrawMeasureRoute();
                         p_Progress = 0;
                     }
@@ -741,26 +766,34 @@ namespace Root_CAMELLIA
             {
                 return new RelayCommand(() =>
                 {
-                    var viewModel = new Dlg_RecipeManager_ViewModel(this);
-                    //viewModel.dataManager = RecipeViewModel.dataManager;
+                    //var viewModel = new Dlg_RecipeManager_ViewModel(this);
+                    ////viewModel.dataManager = RecipeViewModel.dataManager;
                     bool isRecipeLoad = false;
-                    if(DataManager.Instance.recipeDM.TeachRecipeName != "")
+                    if (DataManager.Instance.recipeDM.TeachRecipeName != "")
                     {
                         isRecipeLoad = true;
                     }
-                    viewModel.UpdateListView(isRecipeLoad);
-                    viewModel.UpdateView(isRecipeLoad);
-                    Nullable<bool> result = dialogService.ShowDialog(viewModel);
-
+                    RecipeViewModel.UpdateListView(isRecipeLoad);
+                    RecipeViewModel.UpdateView(isRecipeLoad, true);
+                    Nullable<bool> result = dialogService.ShowDialog(RecipeViewModel);
+                   
                     isRecipeLoad = false;
                     if (DataManager.Instance.recipeDM.TeachRecipeName != "")
                     {
                         isRecipeLoad = true;
                     }
                     RecipeViewModel.UpdateListView(isRecipeLoad);
-                    RecipeViewModel.UpdateLayerGridView();
-                    RecipeViewModel.UpdateView(isRecipeLoad);
+                    try
+                    {
+                       RecipeViewModel.UpdateLayerGridView();
+                    }
+                    catch
+                    {
 
+                    }
+                    RecipeViewModel.UpdateView(isRecipeLoad, true);
+
+                    p_DrawPointElement = new ObservableCollection<UIElement>(RecipeViewModel.p_DrawPointElement);
                     DrawMeasureRoute();
 
                 });
@@ -834,25 +867,28 @@ namespace Root_CAMELLIA
                     //    }
 
                     //}
-                    Dlg_Review review = new Dlg_Review();
-                    review.ShowDialog();
-                    //GaugeListItem gauge = new GaugeListItem();
-                    //gauge.Gauge = new GaugeChart();
-                    //gauge.p_columnIndex = 0;
-                    //gauge.p_rowIndex = 3;
-                    //gauge.Gauge.p_name = "aftest";
-                    //gauge.Gauge.p_value = 40;
-                    //GaugeListItems.Add(gauge);
-                    ////p_Test.p_value = rand.Next(0,100);
-                            ///
-                            // GaugeListItems = new ObservableCollection<GaugeListItem>();
-                        int cols = 0;
+                    //Dlg_Review review = new Dlg_Review();
+                    //review.ShowDialog();
+                    ////GaugeListItem gauge = new GaugeListItem();
+                    ////gauge.Gauge = new GaugeChart();
+                    ////gauge.p_columnIndex = 0;
+                    ////gauge.p_rowIndex = 3;
+                    ////gauge.Gauge.p_name = "aftest";
+                    ////gauge.Gauge.p_value = 40;
+                    ////GaugeListItems.Add(gauge);
+                    //////p_Test.p_value = rand.Next(0,100);
+                    //        ///
+                    //        // GaugeListItems = new ObservableCollection<GaugeListItem>();
+                    //    int cols = 0;
                     // GaugeListItems.Clear();
 
                     //for(int i= 0; i < GaugeListItems.Count; i++)
                     //{
 
                     //}
+                    var viewModel = ReviewViewModel;
+                    var dialog = dialogService.GetDialog(viewModel) as Dlg_Review;
+                    Nullable<bool> result = dialog.ShowDialog();
                 });
             }
         }

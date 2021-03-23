@@ -246,6 +246,8 @@ namespace Root_Rinse_Unloader.Module
             {
                 if (line.m_diCheck[2].p_bIn)
                 {
+                    EQ.p_bStop = true;
+                    EQ.p_eState = EQ.eState.Error; 
                     m_alidRollerStripCheck.p_bSet = true;
                     return "Roller Check Strip";
                 }

@@ -1,4 +1,5 @@
 ﻿using Root_Rinse_Loader.Module;
+using RootTools;
 using RootTools.Control;
 using System;
 using System.Collections.Generic;
@@ -67,7 +68,7 @@ namespace Root_Rinse_Loader.MainUI
         {
             gridCheck.Children.Clear();
             gridCheck.ColumnDefinitions.Clear(); 
-            for (int n = 0; n < 4; n++)
+            for (int n = 3; n >= 0; n--)
             {
                 CheckSensor check = new CheckSensor(m_stack.m_diCheck[n]);
                 gridCheck.ColumnDefinitions.Add(new ColumnDefinition());
@@ -128,16 +129,19 @@ namespace Root_Rinse_Loader.MainUI
 
         private void buttonLoaderStorage_Click(object sender, RoutedEventArgs e)
         {
+            if (EQ.p_bPickerSet) return; 
             m_loader.MoveLoader(Loader.ePos.Stotage); 
         }
 
         private void buttonLoaderRail_Click(object sender, RoutedEventArgs e)
         {
+            if (EQ.p_bPickerSet) return;
             m_loader.MoveLoader(Loader.ePos.Rail);
         }
 
         private void buttonLoaderRoller_Click(object sender, RoutedEventArgs e)
         {
+            if (EQ.p_bPickerSet) return;
             m_loader.MoveLoader(Loader.ePos.Roller);
         }
     }

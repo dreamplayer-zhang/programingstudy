@@ -276,7 +276,7 @@ namespace Root_CAMELLIA
         public string StateHome()
         {
             m_HomeProgress.Reset();
-            m_HomeProgress.HomeProgressShow();
+            m_HomeProgress.HomeProgressShow(); // 여기 수정필요
             string sInfo = StateHome(m_wtr);
             if(sInfo != "OK")
             {

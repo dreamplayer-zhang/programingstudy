@@ -511,6 +511,11 @@ namespace Root_CAMELLIA
                 return;
             }
 
+            if (EnableBtn)
+            {
+                return;
+            }
+
             double centerX;
             double centerY;
             if (DataManager.Instance.m_waferCentering.m_ptCenter.X == 0 && DataManager.Instance.m_waferCentering.m_ptCenter.Y == 0)
@@ -530,6 +535,7 @@ namespace Root_CAMELLIA
             double dY = centerY - y * 10000;
             Thread thread = new Thread(() =>
             {
+                EnableBtn = false;
                 string str;
                 str = ModuleCamellia.p_axisXY.StartMove(new RPoint(dX, dY));
                 if (str != "OK")
@@ -538,6 +544,7 @@ namespace Root_CAMELLIA
                     return;
                 }
                 ModuleCamellia.p_axisXY.WaitReady();
+                EnableBtn = true;
             });
             thread.Start();
             //MessageBox.Show(listRealPos[nMinIndex].x.ToString() + " " + listRealPos[nMinIndex].y.ToString());
@@ -545,7 +552,6 @@ namespace Root_CAMELLIA
 
 
         int nMinIndex = -1;
-        int nSelectIndex = -1;
         public void OnMouseMove(object sender, MouseEventArgs e)
         {
             Point pt = e.GetPosition((UIElement)sender);
@@ -977,6 +983,17 @@ namespace Root_CAMELLIA
                     ModuleCamellia.mwvm.p_StageCenterPulse = measure.m_StageCenterPos_pulse;
 
                     CloseRequested(this, new DialogCloseRequestedEventArgs(true));
+                });
+            }
+        }
+
+        public ICommand CmdPM
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+
                 });
             }
         }

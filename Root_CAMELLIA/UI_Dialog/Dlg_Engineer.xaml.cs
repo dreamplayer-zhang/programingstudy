@@ -23,6 +23,7 @@ namespace Root_CAMELLIA
         public Dlg_Engineer()
         {
             InitializeComponent();
+
         }
         private void CloseButton_Click(object sender, RoutedEventArgs e)
         {
