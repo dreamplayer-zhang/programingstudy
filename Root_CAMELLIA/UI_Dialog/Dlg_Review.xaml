@@ -11,7 +11,7 @@
         ResizeMode="CanResize"
         WindowStartupLocation="CenterScreen"
         WindowState="Normal"
-        Width="1820" Height="980"
+        Width="1420" Height="780"
         BorderBrush="Black" BorderThickness="1"
         Background="{StaticResource PanelBackGround}"
         mc:Ignorable="d">
@@ -76,117 +76,70 @@
         </Grid>
         <Grid Grid.Row="2" Background="White">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="0.6*"/>
+                <ColumnDefinition Width="0.8*"/>
                 <ColumnDefinition Width="2*"/>
             </Grid.ColumnDefinitions>
-            <local:Explorer/>
+            <TabControl>
+                <TabItem Header="Summary">
+                    <local:Explorer DataContext="{Binding p_summary}"/>
+                </TabItem>
+                <TabItem Header="history" DataContext="{Binding p_history}">
+                    <local:Explorer/>
+                </TabItem>
+            </TabControl>
             <Grid Grid.Column="1">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="0.5*"/>
-                    <RowDefinition Height="2*"/>
-                </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="2*"/>
+                    <ColumnDefinition Width="0.6*"/>
+                    <ColumnDefinition/>
                 </Grid.ColumnDefinitions>
-                <Border BorderBrush="LightGray" BorderThickness="1" Margin="3">
-                    <Grid Margin="3" Background="{StaticResource ControlBackGround}">
-                        <Grid.RowDefinitions>
-                            <RowDefinition/>
-                            <RowDefinition/>
-                            <RowDefinition/>
-                            <RowDefinition/>
-                            <RowDefinition/>
-                        </Grid.RowDefinitions>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="0.8*"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
-                        <Border BorderBrush="Black" BorderThickness="1">
-                            <TextBlock Margin="5" Text="Data1" VerticalAlignment="Center" TextAlignment="Center"></TextBlock>
-                        </Border>
-                        <Border Grid.Row="1" BorderBrush="Black" BorderThickness="1,0,1,1">
-                            <TextBlock Margin="5" Text="Data2" VerticalAlignment="Center" TextAlignment="Center"></TextBlock>
-                        </Border>
-                        <Border Grid.Row="2" BorderBrush="Black" BorderThickness="1,0,1,1">
-                            <TextBlock Margin="5" Text="Data3" VerticalAlignment="Center" TextAlignment="Center"></TextBlock>
-                        </Border>
-                        <Border Grid.Row="3" BorderBrush="Black" BorderThickness="1,0,1,1">
-                            <TextBlock Margin="5" Text="Data4" VerticalAlignment="Center" TextAlignment="Center"></TextBlock>
-                        </Border>
-                        <Border Grid.Row="4" BorderBrush="Black" BorderThickness="1,0,1,1">
-                            <TextBlock Margin="5" Text="Data5" VerticalAlignment="Center" TextAlignment="Center"></TextBlock>
-                        </Border>
-                        <Border Grid.Column="1" Grid.Row="0" BorderBrush="Black" BorderThickness="1,1,1,1">
-                            <TextBlock Margin="5" Text="-" VerticalAlignment="Center" TextAlignment="Center"></TextBlock>
-                        </Border>
-                        <Border Grid.Column="1" Grid.Row="1" BorderBrush="Black" BorderThickness="1,0,1,1">
-                            <TextBlock Margin="5" Text="0.0" VerticalAlignment="Center" TextAlignment="Center"></TextBlock>
-                        </Border>
-                        <Border Grid.Column="1" Grid.Row="2" BorderBrush="Black" BorderThickness="1,0,1,1">
-                            <TextBlock Margin="5" Text="0.0" VerticalAlignment="Center" TextAlignment="Center"></TextBlock>
-                        </Border>
-                        <Border Grid.Column="1" Grid.Row="3" BorderBrush="Black" BorderThickness="1,0,1,1">
-                            <TextBlock Margin="5" Text="0" VerticalAlignment="Center" TextAlignment="Center"></TextBlock>
-                        </Border>
-                        <Border Grid.Column="1" Grid.Row="4" BorderBrush="Black" BorderThickness="1,0,1,1">
-                            <TextBlock Margin="5" Text="0.0 / 0.00" VerticalAlignment="Center" TextAlignment="Center"></TextBlock>
-                        </Border>
-                    </Grid>
-                </Border>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="0.8*"/>
+                </Grid.RowDefinitions>
+                <Grid>
+                    <TabControl>
+                        <TabItem Header="Stage">
+                            <stage:CamelliaStage></stage:CamelliaStage>
+                        </TabItem>
+                        <TabItem Header="Contour">
 
-                <Grid Grid.Row="1">
-                    <GroupBox Header="Raw Data">
-                        <DataGrid>
-                            <DataGrid.Columns>
-                                <DataGridTextColumn Header="No. "/>
-                                <DataGridTextColumn Header="X (mm)"/>
-                                <DataGridTextColumn Header="Y (mm)"/>
-                                <DataGridTextColumn Header="Thickness"/>
-                                <DataGridTextColumn Header="Reflectance"/>
-                                <DataGridTextColumn Header="trensmittance"/>
-                            </DataGrid.Columns>
-                        </DataGrid>
+                        </TabItem>
+                    </TabControl>
+                </Grid>
+                <Grid Grid.Column="1">
+                    <GroupBox Header="Layer Data">
+
                     </GroupBox>
                 </Grid>
-                <Grid Grid.Column="1" Grid.RowSpan="2">
+                <Grid Grid.Row="1" Grid.ColumnSpan="2">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="0.3*"/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
                     <Grid>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="*"/>
-                            <RowDefinition Height="*"/>
-                        </Grid.RowDefinitions>
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition/>
-                                <ColumnDefinition/>
-                            </Grid.ColumnDefinitions>
-                            <Grid>
-                                <GroupBox Header="Map" BorderBrush="Black">
-                                    <stage:CamelliaStage/>
-                                </GroupBox>
-                            </Grid>
-                            <Grid Grid.Column="1">
-                                <Grid.RowDefinitions>
-                                    <RowDefinition/>
-                                    <RowDefinition/>
-                                    <RowDefinition/>
-                                </Grid.RowDefinitions>
-                                <GroupBox Header="Data1" BorderBrush="Black">
-                                    
-                                </GroupBox>
-                                <GroupBox Grid.Row="1" Header="Data2" BorderBrush="Black">
-
-                                </GroupBox>
-                                <GroupBox Grid.Row="2" Header="Data3" BorderBrush="Black">
-
-                                </GroupBox>
-                            </Grid>
-                        </Grid>
-                        <Grid Grid.Row="1">
-                            <GroupBox Header="Graph">
-                                <graph:RTGraph/>
-                            </GroupBox>
-                        </Grid>
+                        <GroupBox Header="Data">
+                            <ListBox>
+                                <ListBoxItem>
+                                    <TextBlock Text="GOF : 99.434344"></TextBlock>
+                                </ListBoxItem>
+                                <ListBoxItem>
+                                    <TextBlock Text="Temp : 25.3"></TextBlock>
+                                </ListBoxItem>
+                                <ListBoxItem>
+                                    <TextBlock Text="Humidity : 40.2"></TextBlock>
+                                </ListBoxItem>
+                            </ListBox>
+                        </GroupBox>
+                    </Grid>
+                    <Grid Grid.Column="1">
+                        <TabControl>
+                            <TabItem Header="Reflectance">
+                                <graph:RTGraph></graph:RTGraph>
+                            </TabItem>
+                            <TabItem Header="Transmittance">
+                                <graph:RTGraph></graph:RTGraph>
+                            </TabItem>
+                        </TabControl>
                     </Grid>
                 </Grid>
             </Grid>

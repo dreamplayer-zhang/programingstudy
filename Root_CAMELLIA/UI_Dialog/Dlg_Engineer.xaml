@@ -97,258 +97,253 @@
                      Width="100">
                 <Grid>
                     <StackPanel>
-                        <Grid Height="40">
-                            <StackPanel Orientation="Horizontal">
-                                <Button FontWeight="Bold"
-                                            Content="PM"
-                                            Width="100"
-                                            Margin="5,5"/>
-                                <Button FontWeight="Bold"
-                                            Content="VRS Viewer"
-                                            Width="100"
-                                            Margin="5,5" />
-                                <Button FontWeight="Bold"
-                                            Content="Test"
-                                            Width="100"
-                                            Margin="5,5" Command="{Binding CmdTest}" />
-                            </StackPanel>
-                        </Grid>
+                        <Grid Height="10"/>
                         <Grid Height="740">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="4*" />
                                 <ColumnDefinition Width="4.8*" />
                                 <ColumnDefinition Width="0.6*" />
                             </Grid.ColumnDefinitions>
-                            <Grid Grid.Column="0">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="1.2*"/>
-                                    <ColumnDefinition/>
-                                </Grid.ColumnDefinitions>
-                                <Grid.RowDefinitions>
-                                    <RowDefinition />
-                                    <RowDefinition />
-                                </Grid.RowDefinitions>
-                                <Grid Grid.Row="0">
-                                    <met:CountGraph Grid.Column="0" Width="auto" Height="auto"/>
-                                </Grid>
-                                <Grid Grid.Column="1" Grid.RowSpan="2">
-                                    <Grid>
-                                        <Grid.RowDefinitions>
-                                            <RowDefinition Height="0.4*"/>
-                                            <RowDefinition Height="0.3*"/>
-                                            <RowDefinition/>
-                                        </Grid.RowDefinitions>
-                                        <GroupBox Header="SR Parameter"
-                                                  Grid.Column="1">
-                                            <Grid Margin="5,0">
-                                                <Grid.RowDefinitions>
-                                                    <RowDefinition />
-                                                    <RowDefinition />
-                                                    <RowDefinition />
-                                                    <RowDefinition />
-                                                    <RowDefinition />
-                                                    <RowDefinition />
-                                                    <RowDefinition />
-                                                </Grid.RowDefinitions>
-                                                <StackPanel Orientation="Horizontal"
-                                                            VerticalAlignment="Center"
-                                                            Grid.Row="0">
-                                                    <TextBlock Text="Alpha1 :"
-                                                               Margin="3,0" TextAlignment="Center" VerticalAlignment="Center" />
-                                                    <TextBox Width="60" VerticalAlignment="Center"
-                                                             Margin="10,0" Text="{Binding p_pmParameter.p_alpha1, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" TextAlignment="Center" />
-                                                    <CheckBox VerticalAlignment="Center"
-                                                              Margin="3,0" HorizontalAlignment="Center" IsChecked="{Binding p_pmParameter.p_isAlpha1, Mode=TwoWay}"/>
-                                                    <TextBlock Text="Show Measure Point"
-                                                               Margin="10,0,10,0" TextAlignment="Center" VerticalAlignment="Center" />
-                                                    <CheckBox VerticalAlignment="Center"
-                                                              Margin="0,0" HorizontalAlignment="Center" IsChecked="{Binding p_IsShowPoint, Mode=TwoWay}"/>
-                                                </StackPanel>
-                                                <StackPanel Orientation="Horizontal"
-                                                            VerticalAlignment="Center"
-                                                            Grid.Row="1">
-                                                    <TextBlock Text="Intergration Time :"
-                                                               Margin="3,0" TextAlignment="Center" VerticalAlignment="Center"/>
-                                                    <TextBlock Text="VIS"  TextAlignment="Center" VerticalAlignment="Center" Margin="10,0,0,0" />
-                                                    <TextBox Width="40"  VerticalAlignment="Center" Margin="3,0,13,0"  TextAlignment="Center" Text="{Binding p_pmParameter.p_VISIntegrationTime, UpdateSourceTrigger=LostFocus, Mode=TwoWay}"/>
-                                                    <TextBlock Text="NIR"  TextAlignment="Center" VerticalAlignment="Center"/>
-                                                    <TextBox Width="40" Margin="3,0"  VerticalAlignment="Center" TextAlignment="Center" Text="{Binding p_pmParameter.p_NIRIntegrationTime, UpdateSourceTrigger=LostFocus, Mode=TwoWay}"/>
-                                                </StackPanel>
-                                                <StackPanel Orientation="Horizontal"
-                                                            VerticalAlignment="Center"
-                                                            Grid.Row="2">
-                                                    <TextBlock Text="Init Intergration Time:"
-                                                               Margin="3,0" TextAlignment="Center" VerticalAlignment="Center" />
-                                                    <TextBlock Text="VIS"  TextAlignment="Center" VerticalAlignment="Center" Margin="5,0,0,0" />
-                                                    <TextBox Width="40" Margin="3,0,13,0" Text="{Binding p_pmParameter.p_InitVISIntegrationTime, UpdateSourceTrigger=LostFocus, Mode=TwoWay}"  VerticalAlignment="Center" TextAlignment="Center"/>
-                                                    <TextBlock Text="NIR"  TextAlignment="Center" VerticalAlignment="Center"/>
-                                                    <TextBox Width="40" Margin="3,0" Text="{Binding p_pmParameter.p_InitNIRIntegrationTime, UpdateSourceTrigger=LostFocus, Mode=TwoWay}" VerticalAlignment="Center" TextAlignment="Center"/>
-                                                </StackPanel>
-                                                <StackPanel Orientation="Horizontal"
-                                                            VerticalAlignment="Center"
-                                                            Grid.Row="3">
-                                                    <TextBlock Text="BG Intergration Time:"
-                                                               Margin="3,0" TextAlignment="Center" VerticalAlignment="Center" />
-                                                    <TextBlock Text="VIS"  TextAlignment="Center" VerticalAlignment="Center" Margin="5,0,0,0" />
-                                                    <TextBox Width="40" Margin="3,0,13,0" Text="{Binding p_pmParameter.p_BGVISIntegrationTime, UpdateSourceTrigger=LostFocus, Mode=TwoWay}"  VerticalAlignment="Center" TextAlignment="Center"/>
-                                                    <TextBlock Text="NIR"  TextAlignment="Center" VerticalAlignment="Center"/>
-                                                    <TextBox Width="40" Margin="3,0" Text="{Binding p_pmParameter.p_BGNIRIntegrationTime, UpdateSourceTrigger=LostFocus, Mode=TwoWay}" VerticalAlignment="Center" TextAlignment="Center"/>
-                                                </StackPanel>
-                                                <StackPanel Orientation="Horizontal"
-                                                            VerticalAlignment="Center"
-                                                            Grid.Row="4">
-                                                    <TextBlock Text="Boxcar :"
-                                                               Margin="3,0" VerticalAlignment="Center" TextAlignment="Center" />
-                                                    <TextBlock Text="VIS"  TextAlignment="Center" VerticalAlignment="Center" Margin="5,0,0,0" />
-                                                    <TextBox Width="60"
-                                                             Margin="10,0" Text="{Binding p_pmParameter.p_VISBoxcar, UpdateSourceTrigger=LostFocus, Mode=TwoWay}" VerticalAlignment="Center" TextAlignment="Center"/>
-                                                    <TextBlock Text="NIR"  TextAlignment="Center" VerticalAlignment="Center" Margin="0" />
-                                                    <TextBox Width="60"
-                                                             Margin="10,0" Text="{Binding p_pmParameter.p_NIRBoxcar, UpdateSourceTrigger=LostFocus, Mode=TwoWay}" VerticalAlignment="Center" TextAlignment="Center"/>
-                                                </StackPanel>
-                                                <UniformGrid Columns="1"
-                                                             Grid.Row="5">
-                                                    <StackPanel Orientation="Horizontal"
-                                                                VerticalAlignment="Center">
-                                                        <TextBlock Text="Average :"
-                                                                   Margin="3,0" VerticalAlignment="Center"/>
-                                                        <TextBlock Text="VIS"  TextAlignment="Center" VerticalAlignment="Center" Margin="5,0,0,0" />
-                                                        <TextBox Width="60"
-                                                                 Margin="3,0" Text="{Binding p_pmParameter.p_VISAverage, UpdateSourceTrigger=LostFocus, Mode=TwoWay}" VerticalAlignment="Center" TextAlignment="Center"/>
-                                                        <TextBlock Text="NIR"  TextAlignment="Center" VerticalAlignment="Center" Margin="5,0" />
-                                                        <TextBox Width="60"
-                                                                 Margin="3,0" Text="{Binding p_pmParameter.p_NIRAverage, UpdateSourceTrigger=LostFocus, Mode=TwoWay}" VerticalAlignment="Center" TextAlignment="Center"/>
-                                                    </StackPanel>
-                                                </UniformGrid>
-                                                <UniformGrid Columns="2"
-                                                             Grid.Row="6">
-                                                    <StackPanel Orientation="Horizontal"
-                                                                VerticalAlignment="Center">
-                                                        <TextBlock Text="Repeat :"
-                                                                   Margin="3,0" VerticalAlignment="Center"/>
-                                                        <TextBox Width="60"
-                                                                 Margin="9,0" Text="{Binding p_pmParameter.p_repeat, UpdateSourceTrigger=LostFocus, Mode=TwoWay}" VerticalAlignment="Center" TextAlignment="Center"/>
-                                                    </StackPanel>
-                                                    <StackPanel Orientation="Horizontal"
-                                                                VerticalAlignment="Center">
-                                                        <TextBlock Text="Delay :"
-                                                                   Margin="3,0" VerticalAlignment="Center"/>
-                                                        <TextBox Width="60"
-                                                                 Margin="3,0" Text="{Binding p_pmParameter.p_delay, UpdateSourceTrigger=LostFocus, Mode=TwoWay}" VerticalAlignment="Center" TextAlignment="Center"/>
-                                                    </StackPanel>
-                                                </UniformGrid>
-                                            </Grid>
-                                        </GroupBox>
-                                        <Grid Grid.Row="1" Grid.Column="1">
+                            <GroupBox Header="PM">
+                                <TabControl>
+                                    <TabItem Header="PM Manual">
+                                        <Grid Grid.Column="0">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="1.2*"/>
+                                                <ColumnDefinition/>
+                                            </Grid.ColumnDefinitions>
                                             <Grid.RowDefinitions>
                                                 <RowDefinition />
                                                 <RowDefinition />
                                             </Grid.RowDefinitions>
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition/>
-                                                <ColumnDefinition/>
-                                            </Grid.ColumnDefinitions>
-                                            <Button Content="Wafer Centering"
+                                            <Grid Grid.Row="0">
+                                                <met:CountGraph Grid.Column="0" Width="auto" Height="auto"/>
+                                            </Grid>
+                                            <Grid Grid.Column="1" Grid.RowSpan="2">
+                                                <Grid>
+                                                    <Grid.RowDefinitions>
+                                                        <RowDefinition Height="0.4*"/>
+                                                        <RowDefinition Height="0.3*"/>
+                                                        <RowDefinition/>
+                                                    </Grid.RowDefinitions>
+                                                    <GroupBox Header="SR Parameter"
+                                                  Grid.Column="1">
+                                                        <Grid Margin="5,0">
+                                                            <Grid.RowDefinitions>
+                                                                <RowDefinition />
+                                                                <RowDefinition />
+                                                                <RowDefinition />
+                                                                <RowDefinition />
+                                                                <RowDefinition />
+                                                                <RowDefinition />
+                                                                <RowDefinition />
+                                                            </Grid.RowDefinitions>
+                                                            <StackPanel Orientation="Horizontal"
+                                                            VerticalAlignment="Center"
+                                                            Grid.Row="0">
+                                                                <TextBlock Text="Alpha1 :"
+                                                               Margin="3,0" TextAlignment="Center" VerticalAlignment="Center" />
+                                                                <TextBox Width="60" VerticalAlignment="Center"
+                                                             Margin="10,0" Text="{Binding p_pmParameter.p_alpha1, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" TextAlignment="Center" />
+                                                                <CheckBox VerticalAlignment="Center"
+                                                              Margin="3,0" HorizontalAlignment="Center" IsChecked="{Binding p_pmParameter.p_isAlpha1, Mode=TwoWay}"/>
+                                                                <TextBlock Text="Show Measure Point"
+                                                               Margin="10,0,10,0" TextAlignment="Center" VerticalAlignment="Center" />
+                                                                <CheckBox VerticalAlignment="Center"
+                                                              Margin="0,0" HorizontalAlignment="Center" IsChecked="{Binding p_IsShowPoint, Mode=TwoWay}"/>
+                                                            </StackPanel>
+                                                            <StackPanel Orientation="Horizontal"
+                                                            VerticalAlignment="Center"
+                                                            Grid.Row="1">
+                                                                <TextBlock Text="Intergration Time :"
+                                                               Margin="3,0" TextAlignment="Center" VerticalAlignment="Center"/>
+                                                                <TextBlock Text="VIS"  TextAlignment="Center" VerticalAlignment="Center" Margin="10,0,0,0" />
+                                                                <TextBox Width="40"  VerticalAlignment="Center" Margin="3,0,13,0"  TextAlignment="Center" Text="{Binding p_pmParameter.p_VISIntegrationTime, UpdateSourceTrigger=LostFocus, Mode=TwoWay}"/>
+                                                                <TextBlock Text="NIR"  TextAlignment="Center" VerticalAlignment="Center"/>
+                                                                <TextBox Width="40" Margin="3,0"  VerticalAlignment="Center" TextAlignment="Center" Text="{Binding p_pmParameter.p_NIRIntegrationTime, UpdateSourceTrigger=LostFocus, Mode=TwoWay}"/>
+                                                            </StackPanel>
+                                                            <StackPanel Orientation="Horizontal"
+                                                            VerticalAlignment="Center"
+                                                            Grid.Row="2">
+                                                                <TextBlock Text="Init Intergration Time:"
+                                                               Margin="3,0" TextAlignment="Center" VerticalAlignment="Center" />
+                                                                <TextBlock Text="VIS"  TextAlignment="Center" VerticalAlignment="Center" Margin="5,0,0,0" />
+                                                                <TextBox Width="40" Margin="3,0,13,0" Text="{Binding p_pmParameter.p_InitVISIntegrationTime, UpdateSourceTrigger=LostFocus, Mode=TwoWay}"  VerticalAlignment="Center" TextAlignment="Center"/>
+                                                                <TextBlock Text="NIR"  TextAlignment="Center" VerticalAlignment="Center"/>
+                                                                <TextBox Width="40" Margin="3,0" Text="{Binding p_pmParameter.p_InitNIRIntegrationTime, UpdateSourceTrigger=LostFocus, Mode=TwoWay}" VerticalAlignment="Center" TextAlignment="Center"/>
+                                                            </StackPanel>
+                                                            <StackPanel Orientation="Horizontal"
+                                                            VerticalAlignment="Center"
+                                                            Grid.Row="3">
+                                                                <TextBlock Text="BG Intergration Time:"
+                                                               Margin="3,0" TextAlignment="Center" VerticalAlignment="Center" />
+                                                                <TextBlock Text="VIS"  TextAlignment="Center" VerticalAlignment="Center" Margin="5,0,0,0" />
+                                                                <TextBox Width="40" Margin="3,0,13,0" Text="{Binding p_pmParameter.p_BGVISIntegrationTime, UpdateSourceTrigger=LostFocus, Mode=TwoWay}"  VerticalAlignment="Center" TextAlignment="Center"/>
+                                                                <TextBlock Text="NIR"  TextAlignment="Center" VerticalAlignment="Center"/>
+                                                                <TextBox Width="40" Margin="3,0" Text="{Binding p_pmParameter.p_BGNIRIntegrationTime, UpdateSourceTrigger=LostFocus, Mode=TwoWay}" VerticalAlignment="Center" TextAlignment="Center"/>
+                                                            </StackPanel>
+                                                            <StackPanel Orientation="Horizontal"
+                                                            VerticalAlignment="Center"
+                                                            Grid.Row="4">
+                                                                <TextBlock Text="Boxcar :"
+                                                               Margin="3,0" VerticalAlignment="Center" TextAlignment="Center" />
+                                                                <TextBlock Text="VIS"  TextAlignment="Center" VerticalAlignment="Center" Margin="5,0,0,0" />
+                                                                <TextBox Width="60"
+                                                             Margin="10,0" Text="{Binding p_pmParameter.p_VISBoxcar, UpdateSourceTrigger=LostFocus, Mode=TwoWay}" VerticalAlignment="Center" TextAlignment="Center"/>
+                                                                <TextBlock Text="NIR"  TextAlignment="Center" VerticalAlignment="Center" Margin="0" />
+                                                                <TextBox Width="60"
+                                                             Margin="10,0" Text="{Binding p_pmParameter.p_NIRBoxcar, UpdateSourceTrigger=LostFocus, Mode=TwoWay}" VerticalAlignment="Center" TextAlignment="Center"/>
+                                                            </StackPanel>
+                                                            <UniformGrid Columns="1"
+                                                             Grid.Row="5">
+                                                                <StackPanel Orientation="Horizontal"
+                                                                VerticalAlignment="Center">
+                                                                    <TextBlock Text="Average :"
+                                                                   Margin="3,0" VerticalAlignment="Center"/>
+                                                                    <TextBlock Text="VIS"  TextAlignment="Center" VerticalAlignment="Center" Margin="5,0,0,0" />
+                                                                    <TextBox Width="60"
+                                                                 Margin="3,0" Text="{Binding p_pmParameter.p_VISAverage, UpdateSourceTrigger=LostFocus, Mode=TwoWay}" VerticalAlignment="Center" TextAlignment="Center"/>
+                                                                    <TextBlock Text="NIR"  TextAlignment="Center" VerticalAlignment="Center" Margin="5,0" />
+                                                                    <TextBox Width="60"
+                                                                 Margin="3,0" Text="{Binding p_pmParameter.p_NIRAverage, UpdateSourceTrigger=LostFocus, Mode=TwoWay}" VerticalAlignment="Center" TextAlignment="Center"/>
+                                                                </StackPanel>
+                                                            </UniformGrid>
+                                                            <UniformGrid Columns="2"
+                                                             Grid.Row="6">
+                                                                <StackPanel Orientation="Horizontal"
+                                                                VerticalAlignment="Center">
+                                                                    <TextBlock Text="Repeat :"
+                                                                   Margin="3,0" VerticalAlignment="Center"/>
+                                                                    <TextBox Width="60"
+                                                                 Margin="9,0" Text="{Binding p_pmParameter.p_repeat, UpdateSourceTrigger=LostFocus, Mode=TwoWay}" VerticalAlignment="Center" TextAlignment="Center"/>
+                                                                </StackPanel>
+                                                                <StackPanel Orientation="Horizontal"
+                                                                VerticalAlignment="Center">
+                                                                    <TextBlock Text="Delay :"
+                                                                   Margin="3,0" VerticalAlignment="Center"/>
+                                                                    <TextBox Width="60"
+                                                                 Margin="3,0" Text="{Binding p_pmParameter.p_delay, UpdateSourceTrigger=LostFocus, Mode=TwoWay}" VerticalAlignment="Center" TextAlignment="Center"/>
+                                                                </StackPanel>
+                                                            </UniformGrid>
+                                                        </Grid>
+                                                    </GroupBox>
+                                                    <Grid Grid.Row="1" Grid.Column="1">
+                                                        <Grid.RowDefinitions>
+                                                            <RowDefinition />
+                                                            <RowDefinition />
+                                                        </Grid.RowDefinitions>
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition/>
+                                                            <ColumnDefinition/>
+                                                        </Grid.ColumnDefinitions>
+                                                        <Button Content="Wafer Centering"
                                                     Margin="5"
                                                     Grid.Row="0"
                                                     Command="{Binding CmdCentering}" />
-                                            <Button
+                                                        <Button
                                                     Margin="5"
                                                     Grid.Column="1" Grid.Row="0"
                                                     Command="{Binding CmdInitCal}">
-                                                <TextBlock TextAlignment="Center">
+                                                            <TextBlock TextAlignment="Center">
                                                     Init Calibration
-                                                </TextBlock>
-                                            </Button>
-                                            <Button 
+                                                            </TextBlock>
+                                                        </Button>
+                                                        <Button 
                                                     Margin="5"
                                                     Grid.Row="1"
                                                     Command="{Binding CmdMeasureBack}">
-                                                <TextBlock>
+                                                            <TextBlock>
                                                     Background : Calibration
-                                                </TextBlock>
-                                            </Button>
-                                            <Button Content="Measure Sample"
+                                                            </TextBlock>
+                                                        </Button>
+                                                        <Button Content="Measure Sample"
                                                     Margin="5"
                                                     Grid.Column="1" Grid.Row="1"
                                                     Command="{Binding CmdMeasureSample}" />
-                                        </Grid>
-                                        <Grid Grid.Row="2">
-                                            <Viewbox>
-                                                <stage:CamelliaStage/>
-                                            </Viewbox>
-                                            <Viewbox>
-                                                <ItemsControl ItemsSource="{Binding p_measurePoint, UpdateSourceTrigger=PropertyChanged}"
+                                                    </Grid>
+                                                    <Grid Grid.Row="2">
+                                                        <Viewbox>
+                                                            <stage:CamelliaStage/>
+                                                        </Viewbox>
+                                                        <Viewbox>
+                                                            <ItemsControl ItemsSource="{Binding p_measurePoint, UpdateSourceTrigger=PropertyChanged}"
                               Width="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualWidth}"
                               Height="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualHeight}" BorderBrush="Black" BorderThickness="1">
-                                                    <ItemsControl.ItemsPanel>
-                                                        <ItemsPanelTemplate>
-                                                            <Canvas ClipToBounds="True"  Width="{x:Static local:BaseDefine.CanvasWidth}" Height="{x:Static local:BaseDefine.CanvasHeight}">
-                                                            </Canvas>
-                                                        </ItemsPanelTemplate>
-                                                    </ItemsControl.ItemsPanel>
-                                                </ItemsControl>
-                                            </Viewbox>
-                                            <Viewbox>
-                                                <ItemsControl ItemsSource="{Binding p_selectedPoint, UpdateSourceTrigger=PropertyChanged}"
+                                                                <ItemsControl.ItemsPanel>
+                                                                    <ItemsPanelTemplate>
+                                                                        <Canvas ClipToBounds="True"  Width="{x:Static local:BaseDefine.CanvasWidth}" Height="{x:Static local:BaseDefine.CanvasHeight}">
+                                                                        </Canvas>
+                                                                    </ItemsPanelTemplate>
+                                                                </ItemsControl.ItemsPanel>
+                                                            </ItemsControl>
+                                                        </Viewbox>
+                                                        <Viewbox>
+                                                            <ItemsControl ItemsSource="{Binding p_selectedPoint, UpdateSourceTrigger=PropertyChanged}"
                               Width="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualWidth}"
                               Height="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualHeight}" BorderBrush="Black" BorderThickness="1">
-                                                    <ItemsControl.ItemsPanel>
-                                                        <ItemsPanelTemplate>
-                                                            <Canvas ClipToBounds="True"  Width="{x:Static local:BaseDefine.CanvasWidth}" Height="{x:Static local:BaseDefine.CanvasHeight}">
-                                                            </Canvas>
-                                                        </ItemsPanelTemplate>
-                                                    </ItemsControl.ItemsPanel>
-                                                </ItemsControl>
-                                            </Viewbox>
-                                            <Viewbox Margin="3" Grid.Row="1">
-                                                <Canvas ClipToBounds="True"  Width="{x:Static local:BaseDefine.CanvasWidth}" Height="{x:Static local:BaseDefine.CanvasHeight}"
+                                                                <ItemsControl.ItemsPanel>
+                                                                    <ItemsPanelTemplate>
+                                                                        <Canvas ClipToBounds="True"  Width="{x:Static local:BaseDefine.CanvasWidth}" Height="{x:Static local:BaseDefine.CanvasHeight}">
+                                                                        </Canvas>
+                                                                    </ItemsPanelTemplate>
+                                                                </ItemsControl.ItemsPanel>
+                                                            </ItemsControl>
+                                                        </Viewbox>
+                                                        <Viewbox Margin="3" Grid.Row="1">
+                                                            <Canvas ClipToBounds="True"  Width="{x:Static local:BaseDefine.CanvasWidth}" Height="{x:Static local:BaseDefine.CanvasHeight}"
                                     Background="#01FFFFFF" Focusable="true">
-                                                    <Border BorderBrush="Black" BorderThickness="1" Panel.ZIndex="99">
-                                                        <Grid>
-                                                            <Rectangle Width="5" Height="40" Fill="#990000FF" />
-                                                            <!--<TextBlock Text="Test" FontSize="20" VerticalAlignment="Center" HorizontalAlignment="Center" />-->
-                                                            <Rectangle Width="40" Height="5" Fill="#990000FF" />
-                                                        </Grid>
-                                                        <Canvas.Left>
-                                                            <MultiBinding Converter="{StaticResource AxisToStageConverter}" ConverterParameter="40">
-                                                                <Binding Path="StageCenterPos.X"/>
-                                                                <Binding Path="ModuleCamellia.p_axisXY.p_axisX.p_posActual"/>
-                                                                <Binding Path="ModuleCamellia.p_axisXY.p_axisX"/>
-                                                            </MultiBinding>
-                                                        </Canvas.Left>
-                                                        <Canvas.Top>
-                                                            <MultiBinding Converter="{StaticResource AxisToStageConverter}" ConverterParameter="40">
-                                                                <Binding Path="StageCenterPos.Y"/>
-                                                                <Binding Path="ModuleCamellia.p_axisXY.p_axisY.p_posActual"/>
-                                                                <Binding Path="ModuleCamellia.p_axisXY.p_axisY"/>
-                                                            </MultiBinding>
-                                                        </Canvas.Top>
-                                                    </Border>
-                                                </Canvas>
-                                            </Viewbox>
-                                            <Viewbox>
-                                                <Canvas ClipToBounds="True"  Width="{x:Static local:BaseDefine.CanvasWidth}" Height="{x:Static local:BaseDefine.CanvasHeight}" Background="#00FFFFFF">
-                                                    <i:Interaction.Triggers>
-                                                        <i:EventTrigger EventName="MouseMove">
-                                                            <i:CallMethodAction TargetObject="{Binding}" MethodName="OnMouseMove" />
-                                                        </i:EventTrigger>
-                                                        <i:EventTrigger EventName="MouseLeave">
-                                                            <i:CallMethodAction TargetObject="{Binding}" MethodName="OnMouseLeave" />
-                                                        </i:EventTrigger>
-                                                        <i:EventTrigger EventName="MouseLeftButtonUp" >
-                                                            <i:CallMethodAction TargetObject="{Binding}" MethodName="OnMouseLeftButtonUp" />
-                                                        </i:EventTrigger>
-                                                    </i:Interaction.Triggers>
-                                                </Canvas>
-                                            </Viewbox>
+                                                                <Border BorderBrush="Black" BorderThickness="1" Panel.ZIndex="99">
+                                                                    <Grid>
+                                                                        <Rectangle Width="5" Height="40" Fill="#990000FF" />
+                                                                        <!--<TextBlock Text="Test" FontSize="20" VerticalAlignment="Center" HorizontalAlignment="Center" />-->
+                                                                        <Rectangle Width="40" Height="5" Fill="#990000FF" />
+                                                                    </Grid>
+                                                                    <Canvas.Left>
+                                                                        <MultiBinding Converter="{StaticResource AxisToStageConverter}" ConverterParameter="40">
+                                                                            <Binding Path="StageCenterPos.X"/>
+                                                                            <Binding Path="ModuleCamellia.p_axisXY.p_axisX.p_posActual"/>
+                                                                            <Binding Path="ModuleCamellia.p_axisXY.p_axisX"/>
+                                                                        </MultiBinding>
+                                                                    </Canvas.Left>
+                                                                    <Canvas.Top>
+                                                                        <MultiBinding Converter="{StaticResource AxisToStageConverter}" ConverterParameter="40">
+                                                                            <Binding Path="StageCenterPos.Y"/>
+                                                                            <Binding Path="ModuleCamellia.p_axisXY.p_axisY.p_posActual"/>
+                                                                            <Binding Path="ModuleCamellia.p_axisXY.p_axisY"/>
+                                                                        </MultiBinding>
+                                                                    </Canvas.Top>
+                                                                </Border>
+                                                            </Canvas>
+                                                        </Viewbox>
+                                                        <Viewbox>
+                                                            <Canvas ClipToBounds="True"  Width="{x:Static local:BaseDefine.CanvasWidth}" Height="{x:Static local:BaseDefine.CanvasHeight}" Background="#00FFFFFF">
+                                                                <i:Interaction.Triggers>
+                                                                    <i:EventTrigger EventName="MouseMove">
+                                                                        <i:CallMethodAction TargetObject="{Binding}" MethodName="OnMouseMove" />
+                                                                    </i:EventTrigger>
+                                                                    <i:EventTrigger EventName="MouseLeave">
+                                                                        <i:CallMethodAction TargetObject="{Binding}" MethodName="OnMouseLeave" />
+                                                                    </i:EventTrigger>
+                                                                    <i:EventTrigger EventName="MouseLeftButtonUp" >
+                                                                        <i:CallMethodAction TargetObject="{Binding}" MethodName="OnMouseLeftButtonUp" />
+                                                                    </i:EventTrigger>
+                                                                </i:Interaction.Triggers>
+                                                            </Canvas>
+                                                        </Viewbox>
+                                                    </Grid>
+                                                </Grid>
+                                            </Grid>
+                                            <Grid Grid.Row="1">
+                                                <GroupBox Header="Reflectance Graph">
+                                                </GroupBox>
+                                            </Grid>
                                         </Grid>
-                                    </Grid>
-                                </Grid>
-                                <Grid Grid.Row="1">
-                                    <met:PMRGraph Grid.Column="0" Width="auto" Height="auto"/>
-                                </Grid>
-                            </Grid>
+                                    </TabItem>
+                                    <TabItem Header="PM Setting">
+
+                                    </TabItem>
+                                </TabControl>
+                            </GroupBox>
                             <Grid Grid.Column="1">
                                 <GroupBox Header="Motion Controller">
                                     <Grid>
