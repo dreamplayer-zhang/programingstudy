@@ -107,10 +107,18 @@ namespace RootTools_Vision
     public class WorkplaceStateChangedEventArgs : EventArgs
     {
         public readonly Workplace workplace;
+        public readonly WorkplaceBundle workplaceBundle;
 
         public WorkplaceStateChangedEventArgs(Workplace _workplace)
         {
             this.workplace = _workplace;
+            this.workplaceBundle = new WorkplaceBundle();
+        }
+
+        public WorkplaceStateChangedEventArgs(Workplace _workplace, WorkplaceBundle _workplaceBundle)
+        {
+            this.workplace = _workplace;
+            this.workplaceBundle = _workplaceBundle;
         }
     }
     [Serializable]
@@ -123,8 +131,15 @@ namespace RootTools_Vision
     [Serializable]
     public class InspectionStartArgs : EventArgs
     {
+        public readonly WorkplaceBundle workplaceBundle;
         public InspectionStartArgs()
         {
+            this.workplaceBundle = new WorkplaceBundle();
+        }
+
+        public InspectionStartArgs(WorkplaceBundle workplaceBundle)
+        {
+            this.workplaceBundle = workplaceBundle;
         }
     }
 

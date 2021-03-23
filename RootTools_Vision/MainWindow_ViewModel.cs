@@ -1,4 +1,5 @@
-﻿using RootTools.Database;
+﻿using RootTools;
+using RootTools.Database;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,6 +7,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Input;
 
 namespace RootTools_Vision
 {
@@ -50,39 +52,31 @@ namespace RootTools_Vision
 
         private void TimerConnection(Object obj)
         {
-            if (this.client.IsConnected == false && this.isTryingConnection == false)
+            if (this.remoteInspetcionManager.IsConnected == false && this.isTryingConnection == false)
             {
                 isTryingConnection = true;
                 Logger.AddMsg(LOG_MESSAGE_TYPE.Network, "Try Connect...");
                 Application.Current.Dispatcher.Invoke(() =>
                 {
-                    client.TryConnect();
+                    remoteInspetcionManager.TryConnect();
                 });
                 isTryingConnection = false;
             }
         }
 
-        private ClonableWorkFactory client = new ClonableWorkFactory();
+        private ClonableWorkFactory remoteInspetcionManager = new ClonableWorkFactory();
 
-
-        private void Button_Click(object sender, RoutedEventArgs e)
+        #region [Command]
+        public ICommand WindowClosingCommand
         {
-
+            get => new RelayCommand(() =>
+            {
+                remoteInspetcionManager.Exit();
+                remoteInspetcionManager.Clear();
+                Application.Current.Shutdown();
+            });
         }
+        #endregion
 
-        private void Button_Click_1(object sender, RoutedEventArgs e)
-        {
-
-        }
-
-        private void Button_Server(object sender, RoutedEventArgs e)
-        {
-
-        }
-
-        private void Button_Client(object sender, RoutedEventArgs e)
-        {
-
-        }
     }
 }
