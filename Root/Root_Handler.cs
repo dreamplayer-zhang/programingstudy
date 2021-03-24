@@ -20,8 +20,8 @@ namespace Root
         //public RemoteModule m_server;
         //public TestServer m_tcpServer;
         //public TestClient m_tcpClient;
-        public Buffer m_bufferClient;
-        public Buffer m_bufferServer;
+        public Vision m_bufferClient;
+        public Vision m_bufferServer;
         void InitModule()
         {
             p_moduleList = new ModuleList(m_engineer);
@@ -39,9 +39,9 @@ namespace Root
             //InitModule(m_tcpServer);
             //m_tcpClient = new TestClient("TestClient", m_engineer);
             //InitModule(m_tcpClient);
-            m_bufferServer = new Buffer("BufferServer", m_engineer, ModuleBase.eRemote.Server);
+            m_bufferServer = new Vision("BufferServer", m_engineer, ModuleBase.eRemote.Server);
             InitModule(m_bufferServer);
-            m_bufferClient = new Buffer("BufferClient", m_engineer, ModuleBase.eRemote.Client);
+            m_bufferClient = new Vision("BufferClient", m_engineer, ModuleBase.eRemote.Client);
             InitModule(m_bufferClient);
         }
 
