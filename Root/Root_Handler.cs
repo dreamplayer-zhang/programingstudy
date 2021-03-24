@@ -39,9 +39,9 @@ namespace Root
             //InitModule(m_tcpServer);
             //m_tcpClient = new TestClient("TestClient", m_engineer);
             //InitModule(m_tcpClient);
-            m_bufferServer = new Vision("BufferServer", m_engineer, ModuleBase.eRemote.Server);
+            m_bufferServer = new Vision("VisionServer", m_engineer, ModuleBase.eRemote.Server);
             InitModule(m_bufferServer);
-            m_bufferClient = new Vision("BufferClient", m_engineer, ModuleBase.eRemote.Client);
+            m_bufferClient = new Vision("VisionClient", m_engineer, ModuleBase.eRemote.Client);
             InitModule(m_bufferClient);
         }
 

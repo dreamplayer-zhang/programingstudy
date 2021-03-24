@@ -293,7 +293,7 @@ namespace Root_VEGA_P_Vision.Module
             if (p_eRemote == eRemote.Client) return RemoteRun(eRemoteRun.StateHome, eRemote.Client, null);
             else
             {
-                Thread.Sleep(2000);
+                Thread.Sleep(100);
                 p_sInfo = base.StateHome();
                 p_eState = (p_sInfo == "OK") ? eState.Ready : eState.Error;
                 return "OK";
@@ -324,15 +324,12 @@ namespace Root_VEGA_P_Vision.Module
 
         private void Vision_OnChangeState(eState eState)
         {
-            if (p_eRemote == eRemote.Server)
+            switch (p_eState)
             {
-                switch (p_eState)
-                {
-                    case eState.Init:
-                    case eState.Error:
-                        RemoteRun(eRemoteRun.ServerState, eRemote.Server, eState);
-                        break;
-                }
+                case eState.Init:
+                case eState.Error:
+                    RemoteRun(eRemoteRun.ServerState, eRemote.Server, eState);
+                    break;
             }
         }
 
@@ -465,8 +462,8 @@ namespace Root_VEGA_P_Vision.Module
         #region ModuleRun
         protected override void InitModuleRuns()
         {
-            AddModuleRunList(new Run_Delay(this), true, "Time Delay");
             AddModuleRunList(new Run_Remote(this), true, "Remote Run");
+            AddModuleRunList(new Run_Delay(this), true, "Time Delay");
         }
 
         public class Run_Delay : ModuleRunBase
