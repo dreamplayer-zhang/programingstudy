@@ -398,7 +398,7 @@ namespace RootTools.Module
         public string StartRun(ModuleRunBase moduleRun)
         {
             if (EQ.IsStop()) return "EQ Stop";
-            if (moduleRun.m_eRemote == p_eRemote) m_qModuleRemote.Enqueue(moduleRun); 
+            if ((moduleRun.m_eRemote != eRemote.Local) && (moduleRun.m_eRemote == p_eRemote)) m_qModuleRemote.Enqueue(moduleRun); 
             else m_qModuleRun.Enqueue(moduleRun);
             p_sInfo = "StartRun : " + moduleRun.m_sModuleRun;
             return "OK";
@@ -630,6 +630,7 @@ namespace RootTools.Module
                 if (protocol.m_eRemote == m_module.p_eRemote) Recieve(protocol);
                 else ServerModuleRun(protocol);
             }
+
             void ServerModuleRun(Protocol protocol)
             {
                 ModuleRunBase run = m_module.CloneModuleRun(protocol.m_sCmd);

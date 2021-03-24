@@ -250,7 +250,7 @@ namespace Root_VEGA_P_Vision.Module
             return "OK";
         }
 
-        public bool IsPodExist()
+        public bool IsPodExist(InfoPod.ePod ePod)
         {
             return (p_infoPod != null);
         }
