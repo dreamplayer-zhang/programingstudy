@@ -275,6 +275,7 @@
     <Compile Include="Control\PMCheckReview.xaml.cs">
       <DependentUpon>PMCheckReview.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Control\PMCheckReview_ViewModel.cs" />
     <Compile Include="Control\StageViewControl.xaml.cs">
       <DependentUpon>StageViewControl.xaml</DependentUpon>
     </Compile>
@@ -286,6 +287,7 @@
     <Compile Include="Converter\LampStateToColorConverter.cs" />
     <Compile Include="Converter\ValueToColorConverter.cs" />
     <Compile Include="Converter\ValueToUIValueConverter.cs" />
+    <Compile Include="Data\SaveMeasureData.cs" />
     <Compile Include="LibSR_Met\Calculation.cs" />
     <Compile Include="LibSR_Met\ConstValue.cs" />
     <Compile Include="LibSR_Met\CountGraph.xaml.cs">

@@ -6,6 +6,7 @@
              xmlns:local="clr-namespace:Root_CAMELLIA.Control"
              xmlns:mat="clr-namespace:Root_CAMELLIA.LibSR_Met"
              xmlns:Icon="clr-namespace:Root_CAMELLIA.Control.Icon"
+             xmlns:tools="clr-namespace:RootTools;assembly=RootTools"
              mc:Ignorable="d" 
              d:DesignHeight="500" d:DesignWidth="800">
     <Grid>
@@ -37,16 +38,21 @@
                     <RowDefinition Height="3*"/>
                 </Grid.RowDefinitions>
                 <Grid Grid.Row="0">
-                    <Viewbox>
-                        
-                    </Viewbox>
+                    <tools:RootViewer DataContext="{Binding p_rootViewer}"></tools:RootViewer>
                 </Grid>
             </Grid>
         </GroupBox>
             <GroupBox Header ="PM Log" Grid.Column="2">
                  <Grid>
-               
-                </Grid>
+                <DataGrid Grid.Row="1" ItemsSource="{Binding p_DataTable}" AutoGenerateColumns="False" CanUserAddRows="False" CanUserSortColumns="True" EnableColumnVirtualization="True"  CanUserDeleteRows="False"
+                                  EnableRowVirtualization="True" ScrollViewer.CanContentScroll="True" SelectionMode="Single">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Time" Width="*" Binding="{Binding ListIndex}" IsReadOnly="True"/>
+                        <DataGridTextColumn Header="List" Width="*" Binding="{Binding ListX}" IsReadOnly="True"/>
+                        <DataGridTextColumn Header="Result" Width="*" Binding="{Binding ListY}" IsReadOnly="True"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </Grid>
             </GroupBox>
 
   
