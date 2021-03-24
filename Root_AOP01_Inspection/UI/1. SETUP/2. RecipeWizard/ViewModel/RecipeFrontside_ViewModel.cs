@@ -548,66 +548,72 @@ namespace Root_AOP01_Inspection
                 return new RelayCommand(() =>
                 {
                     MainVision mainVision = ((AOP01_Handler)m_Engineer.ClassHandler()).m_mainVision;
-                    if (p_bEnableAlignKeyInsp)
-                    {
-                        MainVision.Run_AlignKeyInspection alignKeyInspection = (MainVision.Run_AlignKeyInspection)mainVision.CloneModuleRun("AlignKeyInspection");
-                        alignKeyInspection.m_dMatchScore = p_dAlignKeyTemplateMatchingScore / 100;
-                        alignKeyInspection.m_nNGSpec_um = p_nAlignKeyNGSpec_um;
-                        mainVision.StartRun(alignKeyInspection);
-                    }
 
-                    if (p_bEnablePatternShift)
-                    {
-                        MainVision.Run_PatternShiftAndRotation patternShiftAndRotation = (MainVision.Run_PatternShiftAndRotation)mainVision.CloneModuleRun("PatternShiftAndRotation");
-                        patternShiftAndRotation.m_dMatchScore = p_dPatternShiftAndRotationTemplateMatchingScore / 100;
-                        patternShiftAndRotation.m_dNGSpecDistance_mm = p_dPatternShiftAndRotationShiftSpec;
-                        patternShiftAndRotation.m_dNGSpecDegree = p_dPatternShiftAndRotationRotationSpec;
-                        mainVision.StartRun(patternShiftAndRotation);
-                    }
+                    //
+                    MainVision.Run_Test2 test = (MainVision.Run_Test2)mainVision.CloneModuleRun("Test2");
+                    mainVision.StartRun(test);
+                    //
 
-                    if (p_bEnablePellicleShift)
-                    {
-                        MainVision.Run_PellicleShiftAndRotation pellicleShiftAndRotation = (MainVision.Run_PellicleShiftAndRotation)mainVision.CloneModuleRun("PellicleShiftAndRotation");
-                        pellicleShiftAndRotation.m_dNGSpecDistance_mm = p_dPellicleShiftAndRotationShiftSpec;
-                        pellicleShiftAndRotation.m_dNGSpecDegree = p_dPellicleShiftAndRotationRotationSpec;
-                        mainVision.StartRun(pellicleShiftAndRotation);
-                    }
+     //               if (p_bEnableAlignKeyInsp)
+     //               {
+     //                   MainVision.Run_AlignKeyInspection alignKeyInspection = (MainVision.Run_AlignKeyInspection)mainVision.CloneModuleRun("AlignKeyInspection");
+     //                   alignKeyInspection.m_dMatchScore = p_dAlignKeyTemplateMatchingScore / 100;
+     //                   alignKeyInspection.m_nNGSpec_um = p_nAlignKeyNGSpec_um;
+     //                   mainVision.StartRun(alignKeyInspection);
+     //               }
 
-                    if (p_bEnableBarcodeInsp)
-                    {
-                        MainVision.Run_BarcodeInspection barcodeInspection = (MainVision.Run_BarcodeInspection)mainVision.CloneModuleRun("BarcodeInspection");
-                        barcodeInspection.m_nThreshold = p_nBarcodeThreshold;
-                        mainVision.StartRun(barcodeInspection);
-					}
-					if (p_bEnablePatternDiscolor)
-					{
-						//startTestInsp();
+     //               if (p_bEnablePatternShift)
+     //               {
+     //                   MainVision.Run_PatternShiftAndRotation patternShiftAndRotation = (MainVision.Run_PatternShiftAndRotation)mainVision.CloneModuleRun("PatternShiftAndRotation");
+     //                   patternShiftAndRotation.m_dMatchScore = p_dPatternShiftAndRotationTemplateMatchingScore / 100;
+     //                   patternShiftAndRotation.m_dNGSpecDistance_mm = p_dPatternShiftAndRotationShiftSpec;
+     //                   patternShiftAndRotation.m_dNGSpecDegree = p_dPatternShiftAndRotationRotationSpec;
+     //                   mainVision.StartRun(patternShiftAndRotation);
+     //               }
 
-						ResultDataTable = null;
-						ResultDataTable = new DataTable();
-						SelectedDataTable = null;
-                        MainVision.Run_SurfaceInspection surfaceInspection = (MainVision.Run_SurfaceInspection)mainVision.CloneModuleRun(App.MainModuleName);
-                        //현재 ViewModel에 있는 edgebox를 저장한다.
-                        if (m_ImageViewer_VM.TRectList.Count == 6)
-                        {
-                            //tempList = new List<TRect>(viewer.TRectList);
-                            surfaceInspection.EdgeList = new List<TRect>(m_ImageViewer_VM.TRectList).ToArray();
-                        }
-                        p_ImageViewer_VM.Clear();
+     //               if (p_bEnablePellicleShift)
+     //               {
+     //                   MainVision.Run_PellicleShiftAndRotation pellicleShiftAndRotation = (MainVision.Run_PellicleShiftAndRotation)mainVision.CloneModuleRun("PellicleShiftAndRotation");
+     //                   pellicleShiftAndRotation.m_dNGSpecDistance_mm = p_dPellicleShiftAndRotationShiftSpec;
+     //                   pellicleShiftAndRotation.m_dNGSpecDegree = p_dPellicleShiftAndRotationRotationSpec;
+     //                   mainVision.StartRun(pellicleShiftAndRotation);
+     //               }
 
-                        surfaceInspection.BrightGV = BrightGV;
-                        surfaceInspection.SurfaceGV = SurfaceGV;
-                        surfaceInspection.SurfaceSize = SurfaceSize;
+     //               if (p_bEnableBarcodeInsp)
+     //               {
+     //                   MainVision.Run_BarcodeInspection barcodeInspection = (MainVision.Run_BarcodeInspection)mainVision.CloneModuleRun("BarcodeInspection");
+     //                   barcodeInspection.m_nThreshold = p_nBarcodeThreshold;
+     //                   mainVision.StartRun(barcodeInspection);
+					//}
+					//if (p_bEnablePatternDiscolor)
+					//{
+					//	//startTestInsp();
 
-                        surfaceInspection.InspectionOffsetX_Left = InspectionOffsetX_Left;
-                        surfaceInspection.InspectionOffsetX_Right = InspectionOffsetX_Right;
-                        surfaceInspection.InspectionOffsetY = InspectionOffsetY;
-                        surfaceInspection.BlockSizeWidth = BlockSizeWidth;
-                        surfaceInspection.BlockSizeHeight = BlockSizeHeight;
-                        surfaceInspection.UpdateTree();
+					//	ResultDataTable = null;
+					//	ResultDataTable = new DataTable();
+					//	SelectedDataTable = null;
+     //                   MainVision.Run_SurfaceInspection surfaceInspection = (MainVision.Run_SurfaceInspection)mainVision.CloneModuleRun(App.MainModuleName);
+     //                   //현재 ViewModel에 있는 edgebox를 저장한다.
+     //                   if (m_ImageViewer_VM.TRectList.Count == 6)
+     //                   {
+     //                       //tempList = new List<TRect>(viewer.TRectList);
+     //                       surfaceInspection.EdgeList = new List<TRect>(m_ImageViewer_VM.TRectList).ToArray();
+     //                   }
+     //                   p_ImageViewer_VM.Clear();
 
-                        mainVision.StartRun(surfaceInspection);
-					}
+     //                   surfaceInspection.BrightGV = BrightGV;
+     //                   surfaceInspection.SurfaceGV = SurfaceGV;
+     //                   surfaceInspection.SurfaceSize = SurfaceSize;
+
+     //                   surfaceInspection.InspectionOffsetX_Left = InspectionOffsetX_Left;
+     //                   surfaceInspection.InspectionOffsetX_Right = InspectionOffsetX_Right;
+     //                   surfaceInspection.InspectionOffsetY = InspectionOffsetY;
+     //                   surfaceInspection.BlockSizeWidth = BlockSizeWidth;
+     //                   surfaceInspection.BlockSizeHeight = BlockSizeHeight;
+     //                   surfaceInspection.UpdateTree();
+
+     //                   mainVision.StartRun(surfaceInspection);
+					//}
 				});
             }
         }

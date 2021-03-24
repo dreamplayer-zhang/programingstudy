@@ -3859,6 +3859,7 @@ namespace Root_AOP01_Inspection.Module
                 CRect crtInLB = new CRect(new CPoint(m_cptReticleCenterPos.X - nHalfFrameWidth_px + (m_nInSearchAreaWidth / 2) + m_nInHorizontalOffset, m_cptReticleCenterPos.Y + nHalfFrameHeight_px - (m_nInSearchAreaHeight / 2) - m_nInVerticalOffset), m_nInSearchAreaWidth, m_nInSearchAreaHeight);
 
                 // implement
+                // ROI 그리기
                 if (dispatcher != null)
                 {
                     dispatcher.Invoke(new Action(delegate ()
@@ -3876,7 +3877,77 @@ namespace Root_AOP01_Inspection.Module
                     }));
                 }
 
+                // LT ROI 에서 Template 후보 리스트 만들기
+                Image<Gray, byte> imgOutLT = m_module.GetGrayByteImageFromMemory(mem, crtOutLT);
+                Image<Gray, byte> imgOutLTBinary = imgOutLT.ThresholdBinaryInv(new Gray(100.0), new Gray(255.0));
+                List<TemplateInfo> lstTemplateInfo = GetTemplateList(imgOutLTBinary);
+
+                foreach (TemplateInfo templateInfo in lstTemplateInfo)
+                {
+                    templateInfo.img.Save($"D:\\{(int)templateInfo.dSobelScore}.bmp");
+                }
+
                 return "OK";
+            }
+
+            struct TemplateInfo
+            {
+                public Image<Gray, byte> img;
+                public double dSobelScore;
+            }
+
+            public double GetImageFocusScoreWithSobel(Mat matSrc)
+            {
+                //Emgu.CV.Mat matSrc = new Emgu.CV.Mat(img.p_Size.X, img.p_Size.Y, Emgu.CV.CvEnum.DepthType.Cv8U, img.GetBytePerPixel(), img.GetPtr(), (int)img.p_Stride);
+                Emgu.CV.Mat matGrad = new Emgu.CV.Mat();
+
+                int nScale = 1;
+                int nDelta = 0;
+                //int ddepth = (int)Emgu.CV.CvEnum.DepthType.Cv8U;
+                Emgu.CV.Mat matGradX = new Emgu.CV.Mat();
+                Emgu.CV.Mat matGradY = new Emgu.CV.Mat();
+                Emgu.CV.Mat matAbsGradX = new Emgu.CV.Mat();
+                Emgu.CV.Mat matAbsGradY = new Emgu.CV.Mat();
+                ///Gradient X
+                Emgu.CV.CvInvoke.Sobel(matSrc, matGradX, Emgu.CV.CvEnum.DepthType.Cv8U, 1, 0, 3, nScale, nDelta, Emgu.CV.CvEnum.BorderType.Default);
+                ///Gradient Y
+                Emgu.CV.CvInvoke.Sobel(matSrc, matGradY, Emgu.CV.CvEnum.DepthType.Cv8U, 0, 1, 3, nScale, nDelta, Emgu.CV.CvEnum.BorderType.Default);
+                Emgu.CV.CvInvoke.ConvertScaleAbs(matGradX, matAbsGradX, nScale, nDelta);
+                Emgu.CV.CvInvoke.ConvertScaleAbs(matGradY, matAbsGradY, nScale, nDelta);
+                Emgu.CV.CvInvoke.AddWeighted(matAbsGradX, 0.5, matAbsGradY, 0.5, 0, matGrad);
+
+                Emgu.CV.Structure.MCvScalar mu = new Emgu.CV.Structure.MCvScalar();
+                Emgu.CV.Structure.MCvScalar sigma = new Emgu.CV.Structure.MCvScalar();
+                Emgu.CV.CvInvoke.MeanStdDev(matGrad, ref mu, ref sigma);
+                double dFocusMeasure = mu.V0 * mu.V0;
+
+                return dFocusMeasure;
+            }
+
+            List<TemplateInfo> GetTemplateList(Image<Gray,byte> img)
+            {
+                // variable
+                CvBlobs blobs = new CvBlobs();
+                CvBlobDetector blobDetector = new CvBlobDetector();
+                List<TemplateInfo> lstTemplateInfo = new List<TemplateInfo>();
+
+                // implement
+                blobDetector.Detect(img, blobs);
+                foreach (CvBlob blob in blobs.Values)
+                {
+                    System.Drawing.Rectangle rtBoundingBox = blob.BoundingBox;
+                    if (rtBoundingBox.Width < 10 || rtBoundingBox.Height < 10) continue;
+                    Image<Gray, byte> imgTemplate = img.Copy(rtBoundingBox);
+                    double dSobelScore = GetImageFocusScoreWithSobel(imgTemplate.Mat);
+                    TemplateInfo templateInfo = new TemplateInfo();
+                    templateInfo.img = imgTemplate;
+                    templateInfo.dSobelScore = dSobelScore;
+                    lstTemplateInfo.Add(templateInfo);
+                }
+
+                List<TemplateInfo> lstSortedTemplateInfo = lstTemplateInfo.OrderByDescending(x => x.dSobelScore).ToList(); // Sobel Score로 Sorting한 List
+
+                return lstSortedTemplateInfo;
             }
         }
         #endregion
