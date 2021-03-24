@@ -407,14 +407,41 @@
                         <Grid Grid.Column="2" Margin="5">
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="2*"/>
-                                <RowDefinition/>
+                                <RowDefinition Height="3*"/>
+                                <RowDefinition Height="2* "/>
                             </Grid.RowDefinitions>
-                            <UniformGrid Rows="3" Columns="1">
+                            <UniformGrid Rows="2" Columns="1">
                                 <RadioButton Content="Reflectance" VerticalAlignment="Center" IsChecked="{Binding IsReflectanceCheck}"/>
                                 <RadioButton Content="Transmittance" VerticalAlignment="Center" IsChecked="{Binding IsTransmittanceCheck}" IsEnabled="{Binding p_UseTransmittance}"/>
-                                <TextBox local:FocusExtension.IsFocused="{Binding MyIsFocused, UpdateSourceTrigger=PropertyChanged}" Text="{Binding WaveLengthValue, UpdateSourceTrigger=LostFocus, StringFormat=N2}" TextAlignment="Center" VerticalContentAlignment="Center"/>
                             </UniformGrid>
-                            <UniformGrid Rows="1" Columns="2" Grid.Row="1">
+                            <Grid Grid.Row="1">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition />
+                                    <RowDefinition />
+                                </Grid.RowDefinitions>
+                                    <Grid Grid.Row="0">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="4*"/>
+                                            <ColumnDefinition Width="2*"/>
+                                            <ColumnDefinition Width="2*"/>
+                                     </Grid.ColumnDefinitions>
+                                    <TextBlock Text="Wavelength" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="0"/>
+                                     <TextBlock Text="Scale" VerticalAlignment="Center" HorizontalAlignment="Center"  Grid.Column="1"/>
+                                    <TextBlock Text="Offset" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="2"/>
+                                    </Grid>
+                                    <Grid Grid.Row="1">
+                                        <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="4*"/>
+                                        <ColumnDefinition Width="2*"/>
+                                        <ColumnDefinition Width="2*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBox local:FocusExtension.IsFocused="{Binding MyIsFocused, UpdateSourceTrigger=PropertyChanged}" Text="{Binding WaveLengthValue, UpdateSourceTrigger=LostFocus, StringFormat=N2}" TextAlignment="Center" VerticalContentAlignment="Center" Margin="2" Grid.Column="0"/>
+                                    <TextBox local:FocusExtension.IsFocused="{Binding MyIsFocused, UpdateSourceTrigger=PropertyChanged}" Text="{Binding WaveLengthValue, UpdateSourceTrigger=LostFocus, StringFormat=N2}" TextAlignment="Center" VerticalContentAlignment="Center" Margin="2" Grid.Column="1"/>
+                                    <TextBox local:FocusExtension.IsFocused="{Binding MyIsFocused, UpdateSourceTrigger=PropertyChanged}" Text="{Binding WaveLengthValue, UpdateSourceTrigger=LostFocus, StringFormat=N2}" TextAlignment="Center" VerticalContentAlignment="Center" Margin="2" Grid.Column="2"/>
+                            
+                                    </Grid>
+                                </Grid>
+                            <UniformGrid Rows="1" Columns="2" Grid.Row="2">
                                 <Button Content="Add" Margin="0,5,2,5" Command="{Binding CmdAddWaveLength}"/>
                                 <Button Content="Delete" Margin="2,5,1,5" Command="{Binding CmdDeleteWaveLength}"/>
                             </UniformGrid>

@@ -17,7 +17,7 @@ using Met = Root_CAMELLIA.LibSR_Met;
 
 namespace Root_CAMELLIA.Module
 {
-    class Run_PMSensorTilt : ModuleRunBase
+    class Run_PMReflectance : ModuleRunBase
     {
         Module_Camellia m_module;
         MainWindow_ViewModel m_mwvm;
@@ -27,17 +27,16 @@ namespace Root_CAMELLIA.Module
         bool m_InitialCal = true;
 
         (Met.SettingData, Met.Nanoview.ERRORCODE_NANOVIEW) m_SettingDataWithErrorCode;
-        public Run_PMSensorTilt(Module_Camellia module)
+        public Run_PMReflectance(Module_Camellia module)
         {
             m_module = module;
             m_mwvm = module.mwvm;
             m_DataManager = module.m_DataManager;
             InitModuleRun(module);
         }
-
         public override ModuleRunBase Clone()
         {
-            Run_PMSensorTilt run = new Run_PMSensorTilt(m_module);
+            Run_PMReflectance run = new Run_PMReflectance(m_module);
             run.m_calWaferCenterPos_pulse = m_calWaferCenterPos_pulse;
             run.m_useCalWafer = m_useCalWafer;
             run.m_InitialCal = m_InitialCal;
@@ -66,8 +65,8 @@ namespace Root_CAMELLIA.Module
             // 현재 축값 받아오기
             AxisXY axisXY = m_module.p_axisXY;
             m_log.Info("[CheckSensorTilt] Stage Move Ready");
-            
-            
+
+
             //Cal Sample 로 이동 & Init Calibration
             if (m_useCalWafer)
             {
@@ -113,11 +112,11 @@ namespace Root_CAMELLIA.Module
                 m_log.Info("[CheckSensorTilt] Nano-View SettingDataLoad Error");
                 return "[CheckSensorTilt] Nano-View SettingDataLoad Error";
             }
-            //
+
             object obj;
             for (int n = 0; n < PMDatas.SensorTiltRepeatNum; n++)
             {
-                if (App.m_nanoView.SampleMeasure(0, 0, 0, 
+                if (App.m_nanoView.SampleMeasure(0, 0, 0,
                        m_mwvm.SettingViewModel.p_ExceptNIR, m_DataManager.recipeDM.MeasurementRD.UseTransmittance, m_DataManager.recipeDM.MeasurementRD.UseThickness,
                        m_DataManager.recipeDM.MeasurementRD.LowerWaveLength, m_DataManager.recipeDM.MeasurementRD.UpperWaveLength) == Met.Nanoview.ERRORCODE_NANOVIEW.SR_NO_ERROR)
                 {
@@ -125,7 +124,7 @@ namespace Root_CAMELLIA.Module
                     string sFileName = Met.ConstValue.PATH_PM_RESULT_FOLDER + sDate + @"\CheckSensorTilt" + n + "_" + DateTime.Now.ToShortDateString() + "_" + DateTime.Now.Hour.ToString("00") + DateTime.Now.Minute.ToString("00") + ".csv";
                     if (Met.DataManager.GetInstance().SaveCheckSensorData(sFileName, 0))
                     {
-                        
+
                         m_log.Info("[CheckSensorTilt] Acquire Refelctance" + "[" + n + "]");
                     }
                     else
@@ -155,4 +154,3 @@ namespace Root_CAMELLIA.Module
         }
     }
 }
-
