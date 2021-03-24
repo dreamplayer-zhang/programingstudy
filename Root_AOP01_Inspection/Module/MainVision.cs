@@ -1292,6 +1292,7 @@ namespace Root_AOP01_Inspection.Module
             AddModuleRunList(main, true, "Run MainSurfaceInspection");
             AddModuleRunList(new Run_TestPellicle(this), true, "Run Delay");
             AddModuleRunList(new Run_Test(this), true, "Run Test");
+            AddModuleRunList(new Run_Test2(this), true, "Run Test2");
         }
         #endregion
 
@@ -3650,13 +3651,13 @@ namespace Root_AOP01_Inspection.Module
                     }));
                 }
 
+                // LT ROI에서 Template 후보 리스트 만들기
                 Image<Gray, byte> imgLT = m_module.GetGrayByteImageFromMemory(mem, crtLTROI);
-                Image<Gray, byte> imgLTBinary = imgLT.ThresholdBinaryInv(new Gray(150.0), new Gray(255.0));
+                Image<Gray, byte> imgLTBinary = imgLT.ThresholdBinaryInv(new Gray(130), new Gray(255.0));
 
                 CvBlobs blobs = new CvBlobs();
                 CvBlobDetector blobDetector = new CvBlobDetector();
                 blobDetector.Detect(imgLTBinary, blobs);
-                int iIndex = 0;
                 foreach (CvBlob blob in blobs.Values)
                 {
                     if (blob.Area < 70) continue;
@@ -3666,67 +3667,74 @@ namespace Root_AOP01_Inspection.Module
                     Image<Gray, byte> imgTemplate = m_module.GetGrayByteImageFromMemory(mem, crtBoundingBox);
                     Mat matTemplate = imgTemplate.Mat;
                     double dScore = GetImageFocusScoreWithSobel(matTemplate);
-                    if (dScore < 100) continue;
+                    if (dScore < 10) continue;
                     structTemplate templateInfo = new structTemplate();
-                    templateInfo.img = imgTemplate;
+                    templateInfo.img = imgTemplate.ThresholdBinaryInv(new Gray(130.0), new Gray(255.0));
                     templateInfo.dSobelScore = dScore;
                     templateInfo.nMemoryX = crtLTROI.Left + rectBoundingBox.Left;
                     templateInfo.nMemoryY = crtLTROI.Top + rectBoundingBox.Top;
                     templateInfos.Add(templateInfo);
-                    iIndex++;
                 }
-                List<structTemplate> sortedList = templateInfos.OrderByDescending(x => x.dSobelScore).ToList();
+                List<structTemplate> sortedList = templateInfos.OrderByDescending(x => x.dSobelScore).ToList(); // Sobel Score로 Sorting한 List
 
                 // RT, RB, LB 위치에서 TemplateMatching
-
                 // RT
                 Image<Gray, byte> imgRTROI = m_module.GetGrayByteImageFromMemory(mem, crtRTROI);
-                Image<Gray, byte> imgRTBinary = imgRTROI.ThresholdBinaryInv(new Gray(150.0), new Gray(255.0));
-                imgRTBinary.Save("D:\\RTBinary.bmp");
+                Image<Gray, byte> imgRTBinary = imgRTROI.ThresholdBinaryInv(new Gray(130), new Gray(255.0));
+                //imgRTBinary.Save("D:\\RTBinary.bmp");
                 foreach (structTemplate template in sortedList)
                 {
                     CPoint cptCenter = new CPoint();
-                    Image<Gray, byte> imgTemplateBinary = template.img.ThresholdBinaryInv(new Gray(150.0), new Gray(255.0));
-                    imgTemplateBinary.Save("D:\\CurrentTemplate.bmp");
-                    bool bResult = m_module.TemplateMatching(imgRTBinary, imgTemplateBinary, out cptCenter, 0.8);
+                    //imgTemplateBinary.Save("D:\\CurrentTemplate.bmp");
+                    bool bResult = m_module.TemplateMatching(imgRTBinary, template.img, out cptCenter, 0.8);
                     if (bResult == true)
                     {
-                        System.Drawing.Rectangle roi = new System.Drawing.Rectangle(cptCenter.X - (imgTemplateBinary.Width / 2), cptCenter.Y - (imgTemplateBinary.Height / 2), imgTemplateBinary.Width, imgTemplateBinary.Height);
-                        imgRTBinary.Copy(roi).Save($"D:\\{(int)template.dSobelScore}_RT.bmp");
+                        int nX = cptCenter.X - (template.img.Width / 2);
+                        int nY = cptCenter.Y - (template.img.Height / 2);
+                        if (nX < 0) nX = 0;
+                        if (nY < 0) nY = 0;
+                        System.Drawing.Rectangle roi = new System.Drawing.Rectangle(nX, nY, template.img.Width, template.img.Height);
+                        //imgRTBinary.Copy(roi).Save($"D:\\{(int)template.dSobelScore}_RT.bmp");
                     }
                 }
 
                 // RB
                 Image<Gray, byte> imgRBROI = m_module.GetGrayByteImageFromMemory(mem, crtRBROI);
-                Image<Gray, byte> imgRBBinary = imgRBROI.ThresholdBinaryInv(new Gray(150.0), new Gray(255.0));
-                imgRBBinary.Save("D:\\RBBinary.bmp");
-                foreach(structTemplate template in sortedList)
+                Image<Gray, byte> imgRBBinary = imgRBROI.ThresholdBinaryInv(new Gray(130), new Gray(255.0));
+                //imgRBBinary.Save("D:\\RBBinary.bmp");
+                foreach (structTemplate template in sortedList)
                 {
                     CPoint cptCenter = new CPoint();
-                    Image<Gray, byte> imgTemplateBinary = template.img.ThresholdBinaryInv(new Gray(150.0), new Gray(255.0));
-                    imgTemplateBinary.Save("D:\\CurrentTemplate.bmp");
-                    bool bResult = m_module.TemplateMatching(imgRBBinary, imgTemplateBinary, out cptCenter, 0.8);
+                    //imgTemplateBinary.Save("D:\\CurrentTemplate.bmp");
+                    bool bResult = m_module.TemplateMatching(imgRBBinary, template.img, out cptCenter, 0.8);
                     if (bResult == true)
                     {
-                        System.Drawing.Rectangle roi = new System.Drawing.Rectangle(cptCenter.X - (imgTemplateBinary.Width / 2), cptCenter.Y - (imgTemplateBinary.Height / 2), imgTemplateBinary.Width, imgTemplateBinary.Height);
-                        imgRBBinary.Copy(roi).Save($"D:\\{(int)template.dSobelScore}_RB.bmp");
+                        int nX = cptCenter.X - (template.img.Width / 2);
+                        int nY = cptCenter.Y - (template.img.Height / 2);
+                        if (nX < 0) nX = 0;
+                        if (nY < 0) nY = 0;
+                        System.Drawing.Rectangle roi = new System.Drawing.Rectangle(nX, nY, template.img.Width, template.img.Height);
+                        //imgRBBinary.Copy(roi).Save($"D:\\{(int)template.dSobelScore}_RB.bmp");
                     }
                 }
 
                 // LB
                 Image<Gray, byte> imgLBROI = m_module.GetGrayByteImageFromMemory(mem, crtLBROI);
-                Image<Gray, byte> imgLBBinary = imgLBROI.ThresholdBinaryInv(new Gray(150.0), new Gray(255.0));
-                imgLBBinary.Save("D:\\LBBinary.bmp");
+                Image<Gray, byte> imgLBBinary = imgLBROI.ThresholdBinaryInv(new Gray(130), new Gray(255.0));
+                //imgLBBinary.Save("D:\\LBBinary.bmp");
                 foreach (structTemplate template in sortedList)
                 {
                     CPoint cptCenter = new CPoint();
-                    Image<Gray, byte> imgTemplateBinary = template.img.ThresholdBinaryInv(new Gray(150.0), new Gray(255.0));
-                    imgTemplateBinary.Save("D:\\CurrentTemplate.bmp");
-                    bool bResult = m_module.TemplateMatching(imgLBBinary, imgTemplateBinary, out cptCenter, 0.8);
+                    //imgTemplateBinary.Save("D:\\CurrentTemplate.bmp");
+                    bool bResult = m_module.TemplateMatching(imgLBBinary, template.img, out cptCenter, 0.8);
                     if (bResult == true)
                     {
-                        System.Drawing.Rectangle roi = new System.Drawing.Rectangle(cptCenter.X - (imgTemplateBinary.Width / 2), cptCenter.Y - (imgTemplateBinary.Height / 2), imgTemplateBinary.Width, imgTemplateBinary.Height);
-                        imgLBBinary.Copy(roi).Save($"D:\\{(int)template.dSobelScore}_LB.bmp");
+                        int nX = cptCenter.X - (template.img.Width / 2);
+                        int nY = cptCenter.Y - (template.img.Height / 2);
+                        if (nX < 0) nX = 0;
+                        if (nY < 0) nY = 0;
+                        System.Drawing.Rectangle roi = new System.Drawing.Rectangle(nX, nY, template.img.Width, template.img.Height);
+                        //imgLBBinary.Copy(roi).Save($"D:\\{(int)template.dSobelScore}_LB.bmp");
                     }
                 }
 
@@ -3759,6 +3767,116 @@ namespace Root_AOP01_Inspection.Module
                 double dFocusMeasure = mu.V0 * mu.V0;
 
                 return dFocusMeasure;
+            }
+        }
+        #endregion
+
+        #region Test2
+        public class Run_Test2 : ModuleRunBase
+        {
+            MainVision m_module;
+            public CPoint m_cptReticleCenterPos = new CPoint();
+            public int m_nReticleSize_mm = 150;
+            public int m_nFrameWidth_mm = 115;
+            public int m_nFrameHeight_mm = 150;
+            public int m_nOutVerticalOffset = 1000;
+            public int m_nOutHorizontalOffset = 1000;
+            public int m_nOutSearchAreaWidth = 1000;
+            public int m_nOutSearchAreaHeight = 1000;
+            public int m_nInVerticalOffset = 1000;
+            public int m_nInHorizontalOffset = 1000;
+            public int m_nInSearchAreaWidth = 1000;
+            public int m_nInSearchAreaHeight = 1000;
+            
+            public Run_Test2(MainVision module)
+            {
+                m_module = module;
+                InitModuleRun(module);
+            }
+
+            public override ModuleRunBase Clone()
+            {
+                Run_Test2 run = new Run_Test2(m_module);
+                run.m_cptReticleCenterPos = new CPoint(m_cptReticleCenterPos);
+                run.m_nReticleSize_mm = m_nReticleSize_mm;
+                run.m_nFrameWidth_mm = m_nFrameWidth_mm;
+                run.m_nFrameHeight_mm = m_nFrameHeight_mm;
+                run.m_nOutVerticalOffset = m_nOutVerticalOffset;
+                run.m_nOutHorizontalOffset = m_nOutHorizontalOffset;
+                run.m_nOutSearchAreaWidth = m_nOutSearchAreaWidth;
+                run.m_nOutSearchAreaHeight = m_nOutSearchAreaHeight;
+                run.m_nInVerticalOffset = m_nInVerticalOffset;
+                run.m_nInHorizontalOffset = m_nInHorizontalOffset;
+                run.m_nInSearchAreaWidth = m_nInSearchAreaWidth;
+                run.m_nInSearchAreaHeight = m_nInSearchAreaHeight;
+
+                return run;
+            }
+
+            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
+            {
+                m_cptReticleCenterPos = tree.Set(m_cptReticleCenterPos, m_cptReticleCenterPos, "Reticle Center Memory Position", "Reticle Center Memory Position", bVisible);
+                m_nReticleSize_mm = (tree.GetTree("Reticle & Frame Size", false, bVisible)).Set(m_nReticleSize_mm, m_nReticleSize_mm, "Reticle Size [mm]", "Reticle Size [mm]", bVisible);
+                m_nFrameWidth_mm = (tree.GetTree("Reticle & Frame Size", false, bVisible)).Set(m_nFrameWidth_mm, m_nFrameWidth_mm, "Frame Width [mm]", "Frame Width [mm]", bVisible);
+                m_nFrameHeight_mm = (tree.GetTree("Reticle & Frame Size", false, bVisible)).Set(m_nFrameHeight_mm, m_nFrameHeight_mm, "Frame Height [mm]", "Frame Height [mm]", bVisible);
+
+                m_nOutVerticalOffset = (tree.GetTree("Out Feature Setting", false, bVisible)).Set(m_nOutVerticalOffset, m_nOutVerticalOffset, "Vertical Offset [px]", "Vertical Offset [px]", bVisible);
+                m_nOutHorizontalOffset = (tree.GetTree("Out Feature Setting", false, bVisible)).Set(m_nOutHorizontalOffset, m_nOutHorizontalOffset, "Horizontal Offset [px]", "Horizontal Offset [px]", bVisible);
+                m_nOutSearchAreaWidth = (tree.GetTree("Out Feature Setting", false, bVisible)).Set(m_nOutSearchAreaWidth, m_nOutSearchAreaWidth, "Search Area Width [px]", "Search Area Width [px]", bVisible);
+                m_nOutSearchAreaHeight = (tree.GetTree("Out Feature Setting", false, bVisible)).Set(m_nOutSearchAreaHeight, m_nOutSearchAreaHeight, "Search Area Height [px]", "Search Area Height [px]", bVisible);
+
+                m_nInVerticalOffset = (tree.GetTree("In Feature Setting", false, bVisible)).Set(m_nInVerticalOffset, m_nInVerticalOffset, "Vertical Offset [px]", "Vertical Offset [px]", bVisible);
+                m_nInHorizontalOffset = (tree.GetTree("In Feature Setting", false, bVisible)).Set(m_nInHorizontalOffset, m_nInHorizontalOffset, "Horizontal Offset [px]", "Horizontal Offset [px]", bVisible);
+                m_nInSearchAreaWidth = (tree.GetTree("In Feature Setting", false, bVisible)).Set(m_nInSearchAreaWidth, m_nInSearchAreaWidth, "Search Area Width [px]", "Search Area Width [px]", bVisible);
+                m_nInSearchAreaHeight = (tree.GetTree("In Feature Setting", false, bVisible)).Set(m_nInSearchAreaHeight, m_nInSearchAreaHeight, "Search Area Height [px]", "Search Area Height [px]", bVisible);
+            }
+
+            public override string Run()
+            {
+                // variable
+                string strPool = "MainVision.Vision Memory";
+                string strGroup = "MainVision";
+                string strMemory = "Main";
+                MemoryData mem = m_module.m_engineer.GetMemory(strPool, strGroup, strMemory);
+                int nMMPerUM = 1000;
+                int nHalfReticleLength_px = (m_nReticleSize_mm / 2) * nMMPerUM / 5/*90TDI Resolution*/;
+                int nHalfFrameWidth_px = (m_nFrameWidth_mm / 2) * nMMPerUM / 5/*90TDI Resolution*/;
+                int nHalfFrameHeight_px = (m_nFrameHeight_mm / 2) * nMMPerUM / 5/*90TDI Resolution*/;
+
+                RecipeFrontside_Viewer_ViewModel targetViewer = UIManager.Instance.SetupViewModel.m_RecipeFrontSide.p_ImageViewer_VM;
+                Dispatcher dispatcher = UIManager.Instance.SetupViewModel.m_RecipeFrontSide.currentDispatcher;
+
+                // Out ROI
+                CRect crtOutLT = new CRect(new CPoint(m_cptReticleCenterPos.X - nHalfReticleLength_px + (m_nOutSearchAreaWidth / 2) + m_nOutHorizontalOffset, m_cptReticleCenterPos.Y - nHalfReticleLength_px + (m_nOutSearchAreaHeight / 2) + m_nOutVerticalOffset), m_nOutSearchAreaWidth, m_nOutSearchAreaHeight);
+                CRect crtOutRT = new CRect(new CPoint(m_cptReticleCenterPos.X + nHalfReticleLength_px - (m_nOutSearchAreaWidth / 2) - m_nOutHorizontalOffset, m_cptReticleCenterPos.Y - nHalfReticleLength_px + (m_nOutSearchAreaHeight / 2) + m_nOutVerticalOffset), m_nOutSearchAreaWidth, m_nOutSearchAreaHeight);
+                CRect crtOutRB = new CRect(new CPoint(m_cptReticleCenterPos.X + nHalfReticleLength_px - (m_nOutSearchAreaWidth / 2) - m_nOutHorizontalOffset, m_cptReticleCenterPos.Y + nHalfReticleLength_px - (m_nOutSearchAreaHeight / 2) - m_nOutVerticalOffset), m_nOutSearchAreaWidth, m_nOutSearchAreaHeight);
+                CRect crtOutLB = new CRect(new CPoint(m_cptReticleCenterPos.X - nHalfReticleLength_px + (m_nOutSearchAreaWidth / 2) + m_nOutHorizontalOffset, m_cptReticleCenterPos.Y + nHalfReticleLength_px - (m_nOutSearchAreaHeight / 2) - m_nOutVerticalOffset), m_nOutSearchAreaWidth, m_nOutSearchAreaHeight);
+
+                // In ROI
+                CRect crtInLT = new CRect(new CPoint(m_cptReticleCenterPos.X - nHalfFrameWidth_px + (m_nInSearchAreaWidth / 2) + m_nInHorizontalOffset, m_cptReticleCenterPos.Y - nHalfFrameHeight_px + (m_nInSearchAreaHeight / 2) + m_nInVerticalOffset), m_nInSearchAreaWidth, m_nInSearchAreaHeight);
+                CRect crtInRT = new CRect(new CPoint(m_cptReticleCenterPos.X + nHalfFrameWidth_px - (m_nInSearchAreaWidth / 2) - m_nInHorizontalOffset, m_cptReticleCenterPos.Y - nHalfFrameHeight_px + (m_nInSearchAreaHeight / 2) + m_nInVerticalOffset), m_nInSearchAreaWidth, m_nInSearchAreaHeight);
+                CRect crtInRB = new CRect(new CPoint(m_cptReticleCenterPos.X + nHalfFrameWidth_px - (m_nInSearchAreaWidth / 2) - m_nInHorizontalOffset, m_cptReticleCenterPos.Y + nHalfFrameHeight_px - (m_nInSearchAreaHeight / 2) - m_nInVerticalOffset), m_nInSearchAreaWidth, m_nInSearchAreaHeight);
+                CRect crtInLB = new CRect(new CPoint(m_cptReticleCenterPos.X - nHalfFrameWidth_px + (m_nInSearchAreaWidth / 2) + m_nInHorizontalOffset, m_cptReticleCenterPos.Y + nHalfFrameHeight_px - (m_nInSearchAreaHeight / 2) - m_nInVerticalOffset), m_nInSearchAreaWidth, m_nInSearchAreaHeight);
+
+                // implement
+                if (dispatcher != null)
+                {
+                    dispatcher.Invoke(new Action(delegate ()
+                    {
+                        targetViewer.Clear();
+                        targetViewer.DrawRect(crtOutLT, RecipeFrontside_Viewer_ViewModel.ColorType.Defect); // Red
+                        targetViewer.DrawRect(crtOutRT, RecipeFrontside_Viewer_ViewModel.ColorType.Defect);
+                        targetViewer.DrawRect(crtOutRB, RecipeFrontside_Viewer_ViewModel.ColorType.Defect);
+                        targetViewer.DrawRect(crtOutLB, RecipeFrontside_Viewer_ViewModel.ColorType.Defect);
+
+                        targetViewer.DrawRect(crtInLT, RecipeFrontside_Viewer_ViewModel.ColorType.MapData); // Lime
+                        targetViewer.DrawRect(crtInRT, RecipeFrontside_Viewer_ViewModel.ColorType.MapData);
+                        targetViewer.DrawRect(crtInRB, RecipeFrontside_Viewer_ViewModel.ColorType.MapData);
+                        targetViewer.DrawRect(crtInLB, RecipeFrontside_Viewer_ViewModel.ColorType.MapData);
+                    }));
+                }
+
+                return "OK";
             }
         }
         #endregion
