@@ -307,8 +307,10 @@
     <Compile Include="ModuleRun\Run_Delay.cs" />
     <Compile Include="ModuleRun\Run_InitCalibration.cs" />
     <Compile Include="ModuleRun\Run_Measure.cs" />
-    <Compile Include="ModuleRun\Run_PMSensorTilt.cs" />
-    <Compile Include="ModuleRun\Run_PMTiltAlign.cs" />
+    <Compile Include="ModuleRun\Run_PMReflectance.cs" />
+    <Compile Include="ModuleRun\Run_PMSensorStageAlign.cs" />
+    <Compile Include="ModuleRun\Run_PMThickness.cs" />
+    <Compile Include="ModuleRun\Run_PMSensorCameraTilt.cs" />
     <Compile Include="Module\Module_FDC.cs" />
     <Compile Include="Module\Module_FFU.cs" />
     <Compile Include="Module\Interlock.cs" />

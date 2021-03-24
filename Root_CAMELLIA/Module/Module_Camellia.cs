@@ -320,8 +320,10 @@ namespace Root_CAMELLIA.Module
             AddModuleRunList(new Run_InitCalibration(this), true, "InitCalCentering");
             AddModuleRunList(new Run_CalibrationWaferCentering(this), true, "Background Calibration_Centering");
             AddModuleRunList(new Run_Measure(this), true, "Measurement");
-            AddModuleRunList(new Run_PMSensorTilt(this), true, "PM Sensor Tilt");
-            AddModuleRunList(new Run_PMTiltAlign(this), true, "PM Camera Tilt");
+            AddModuleRunList(new Run_PMReflectance (this), true, "PM Reflectance");
+            AddModuleRunList(new Run_PMThickness (this), true, "PM Thickness");
+            AddModuleRunList(new Run_PMSensorStageAlign (this), true, "PM Sensor_Stage Align");
+            AddModuleRunList(new Run_PMSensorCameraTilt (this), true, "PM Sensor_Camera Tilt");
         }
 
 

@@ -169,7 +169,7 @@ namespace RootTools.Comm
         {
             try
             {
-                if (sMsg.Length < 128) m_commLog.Add(CommLog.eType.Send, sMsg);
+                m_commLog.Add(CommLog.eType.Send, sMsg);
                 m_socket.Send(Encoding.ASCII.GetBytes(sMsg));
             }
             catch (Exception e)
@@ -185,8 +185,7 @@ namespace RootTools.Comm
         {
             try
             {
-                if (sMsg.Length < 128)
-                    m_commLog.Add(CommLog.eType.Send, Encoding.ASCII.GetString(sMsg));
+                m_commLog.Add(CommLog.eType.Send, Encoding.ASCII.GetString(sMsg));
                 m_socket.Send(sMsg);
             }
             catch (Exception e)
@@ -248,10 +247,8 @@ namespace RootTools.Comm
                     {
                         byte[] sMsg = m_qSendByte.Peek();
                         string sSend = SendMsg(sMsg);
-                        if (sSend == "OK")
-                            m_qSendByte.Dequeue();
-                        else
-                            m_commLog.Add(CommLog.eType.Info, sSend);
+                        if (sSend == "OK") m_qSendByte.Dequeue();
+                        else m_commLog.Add(CommLog.eType.Info, sSend);
                     }
                 }
                 else if (m_socket != null)

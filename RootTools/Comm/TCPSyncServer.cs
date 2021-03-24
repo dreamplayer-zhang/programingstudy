@@ -96,7 +96,7 @@ namespace RootTools.Comm
                 {
                     int lReceive = m_socketComm.Receive(m_aBufRead);
                     if (lReceive > 0) EventReciveData(m_aBufRead, lReceive, m_socketComm);
-                    if (m_bCommLog) m_commLog.Add(CommLog.eType.Receive, (lReceive < 64) ? Encoding.ASCII.GetString(m_aBufRead, 0, lReceive) : "Large Data");
+                    if (m_bCommLog) m_commLog.Add(CommLog.eType.Receive, Encoding.ASCII.GetString(m_aBufRead, 0, lReceive));
                 }
                 catch (Exception e) { m_commLog.Add(CommLog.eType.Info, "Receive Exception : " + e.Message); }
             }
@@ -109,7 +109,7 @@ namespace RootTools.Comm
             if (m_socketComm == null) return "Not Connected";
             byte[] aBuf = Encoding.Default.GetBytes(sMsg);
             m_socketComm.Send(aBuf);
-            if (m_bCommLog) m_commLog.Add(CommLog.eType.Send, (sMsg.Length < 64) ? sMsg : "Large Data");
+            if (m_bCommLog) m_commLog.Add(CommLog.eType.Send, sMsg);
             return "OK";
         }
 
@@ -117,7 +117,7 @@ namespace RootTools.Comm
         {
             if (m_socketComm == null) return "Not Connected";
             m_socketComm.Send(aBuf);
-            if (m_bCommLog) m_commLog.Add(CommLog.eType.Send, (aBuf.Length < 64) ? Encoding.ASCII.GetString(aBuf, 0, aBuf.Length) : "Large Data");
+            if (m_bCommLog) m_commLog.Add(CommLog.eType.Send, Encoding.ASCII.GetString(aBuf, 0, aBuf.Length));
             return "OK";
         }
         #endregion

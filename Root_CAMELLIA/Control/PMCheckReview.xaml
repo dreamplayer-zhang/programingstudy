@@ -10,12 +10,16 @@
              mc:Ignorable="d" 
              d:DesignHeight="500" d:DesignWidth="800">
     <Grid>
-        <Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="5*"/>
+            <RowDefinition Height="3*"/>
+        </Grid.RowDefinitions>
+        <Grid Grid.Row="0">
+            <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="2.2*"/>
                 <ColumnDefinition Width="4.5*"/>
-                <ColumnDefinition Width="3.5*"/>
-        </Grid.ColumnDefinitions>
-            <GroupBox Header="PM List" Grid.Column="0">
+            </Grid.ColumnDefinitions>
+            <GroupBox Header="PM List" Grid.Column="0" >
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition/>
@@ -24,38 +28,42 @@
                         <RowDefinition/>
                         <RowDefinition/>
                     </Grid.RowDefinitions>
-                    <Button Content="Reflectance Repeatability" Grid.Row="0" Margin="5" Command="{Binding Cmd13Point}"/>
-                    <Button Content="Thickness Repeatability" Grid.Row="1" Margin="5" Command="{Binding Cmd13Point}"/>
-                    <Button Content="Stage-Sensor Offset" Grid.Row="2" Margin="5" Command="{Binding Cmd13Point}"/>
-                    <Button Content="Camera-Sensor Tilt" Grid.Row="3" Margin="5" Command="{Binding Cmd13Point}"/>
-                    <Button Content="Vacuum Variation" Grid.Row="4" Margin="5" Command="{Binding Cmd13Point}"/>
+                    <Button Content="Reflectance Repeatability" Grid.Row="0" Margin="5" Command="{Binding CmdReflectanceRepeatability}"/>
+                    <Button Content="Thickness Repeatability" Grid.Row="1" Margin="5" Command="{Binding CmdThicknessRepeatability}"/>
+                    <Button Content="Stage-Sensor Offset" Grid.Row="2" Margin="5" Command="{Binding CmdSensorStageAlign}"/>
+                    <Button Content="Camera-Sensor Tilt" Grid.Row="3" Margin="5" Command="{Binding CmdSensorCameraTilt}"/>
+                    <Button Content="Vacuum Variation" Grid.Row="4" Margin="5"/>
                 </Grid>
             </GroupBox>
             <GroupBox Header ="PM View" Grid.Column="1">
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="5*"/>
-                    <RowDefinition Height="3*"/>
-                </Grid.RowDefinitions>
-                <Grid Grid.Row="0">
-                    <tools:RootViewer DataContext="{Binding p_rootViewer}"></tools:RootViewer>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="5*"/>
+                        <ColumnDefinition Width="3*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid Grid.Row="0">
+                        <tools:RootViewer DataContext="{Binding p_rootViewer}"></tools:RootViewer>
+                    </Grid>
+                    <Grid Grid.Row="1">
+                    </Grid>
                 </Grid>
-            </Grid>
-        </GroupBox>
-            <GroupBox Header ="PM Log" Grid.Column="2">
-                 <Grid>
-                <DataGrid Grid.Row="1" ItemsSource="{Binding p_DataTable}" AutoGenerateColumns="False" CanUserAddRows="False" CanUserSortColumns="True" EnableColumnVirtualization="True"  CanUserDeleteRows="False"
-                                  EnableRowVirtualization="True" ScrollViewer.CanContentScroll="True" SelectionMode="Single">
-                    <DataGrid.Columns>
-                        <DataGridTextColumn Header="Time" Width="*" Binding="{Binding ListIndex}" IsReadOnly="True"/>
-                        <DataGridTextColumn Header="List" Width="*" Binding="{Binding ListX}" IsReadOnly="True"/>
-                        <DataGridTextColumn Header="Result" Width="*" Binding="{Binding ListY}" IsReadOnly="True"/>
-                    </DataGrid.Columns>
-                </DataGrid>
-            </Grid>
             </GroupBox>
+        </Grid>
+        <Grid Grid.Row="1">
+            <GroupBox Header ="PM Log">
+                 <Grid>
+                    <DataGrid ItemsSource="{Binding p_DataTable}" AutoGenerateColumns="False" CanUserAddRows="False" CanUserSortColumns="True" EnableColumnVirtualization="True"  CanUserDeleteRows="False"
+                                  EnableRowVirtualization="True" ScrollViewer.CanContentScroll="True" SelectionMode="Single">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Time" Width="3*" Binding="{Binding ListIndex}" IsReadOnly="True"/>
+                            <DataGridTextColumn Header="List" Width="5*" Binding="{Binding ListX}" IsReadOnly="True"/>
+                            <DataGridTextColumn Header="Result" Width="10*" Binding="{Binding ListY}" IsReadOnly="True"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Grid>
+            </GroupBox>
+        </Grid>
 
-  
     </Grid>
 </UserControl>
 

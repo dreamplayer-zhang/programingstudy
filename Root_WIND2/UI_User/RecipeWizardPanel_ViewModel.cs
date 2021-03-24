@@ -59,6 +59,9 @@ namespace Root_WIND2.UI_User
         #region [Views]
         public readonly RecipeWizardPanel Main = new RecipeWizardPanel();
 
+        // HOME
+        public readonly UI_User.HomeRecipe homeRecipe = new HomeRecipe();
+
         // FRONT
         public readonly UI_User.FrontsideSummary frontsideSummary = new UI_User.FrontsideSummary();
         public readonly UI_User.FrontsideProduct frontsideProduct = new UI_User.FrontsideProduct();
@@ -85,6 +88,14 @@ namespace Root_WIND2.UI_User
         #endregion
 
         #region [ViewModels]
+
+        #region [Home ViewModels]
+        private UI_User.HomeRecipe_ViewModel homeRecipeVM = new HomeRecipe_ViewModel();
+        public UI_User.HomeRecipe_ViewModel HomeRecipeVM
+        {
+            get => homeRecipeVM;
+        }
+        #endregion
 
         #region [Front ViewModels]
         private UI_User.FrontsideProduct_ViewModel frontsideSummaryVM = new FrontsideProduct_ViewModel();
@@ -241,6 +252,20 @@ namespace Root_WIND2.UI_User
 
 
         #region [Command]
+
+        #region [Command Home]
+        public ICommand btnHomeRecipe
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    SetPage(homeRecipe);
+                    homeRecipe.DataContext = homeRecipeVM;
+                });
+            }
+        }
+        #endregion
 
         #region [Command Front]
         public ICommand btnFrontSummary
