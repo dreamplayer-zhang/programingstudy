@@ -122,8 +122,9 @@
                                             <Grid Grid.Column="1" Grid.RowSpan="2">
                                                 <Grid>
                                                     <Grid.RowDefinitions>
-                                                        <RowDefinition Height="0.4*"/>
+                                                        <RowDefinition Height="0.6*"/>
                                                         <RowDefinition Height="0.3*"/>
+                                                        <RowDefinition Height="40"/>
                                                         <RowDefinition/>
                                                     </Grid.RowDefinitions>
                                                     <GroupBox Header="SR Parameter"
@@ -261,7 +262,7 @@
                                                     Grid.Column="1" Grid.Row="1"
                                                     Command="{Binding CmdMeasureSample}" />
                                                     </Grid>
-                                                    <Grid Grid.Row="2">
+                                                    <Grid Grid.Row="3">
                                                         <Viewbox>
                                                             <stage:CamelliaStage/>
                                                         </Viewbox>
