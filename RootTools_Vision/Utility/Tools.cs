@@ -23,6 +23,9 @@ namespace RootTools_Vision
 {
     public partial class Tools
     {
+        [DllImport("kernel32.dll", EntryPoint = "CopyMemory", SetLastError = false)]
+        public static extern void CopyMemory(IntPtr dest, IntPtr src, uint count);
+
         public static byte[] CovertImageToArray(Image img)
         {
             byte[] data;
@@ -81,6 +84,8 @@ namespace RootTools_Vision
             return null;
         }
 
+
+        // 이거 삭제 필요
         public static Bitmap ConvertArrayToColorBitmap(IntPtr rawDataR, IntPtr rawDataG, IntPtr rawDataB, int _memWidth, int _byteCount, Rect rect)
         {
             try
@@ -112,11 +117,6 @@ namespace RootTools_Vision
 
                     bmp.Palette = palette;
                 }
-                else
-                {
-                    //Color Palette 만들줄 아는사람 넣어줘
-                }
-                //Marshal.Copy(,);
 
 
                 BitmapData bmpData = bmp.LockBits(new Rectangle(0, 0, 640, 480), ImageLockMode.WriteOnly, format);
@@ -209,7 +209,101 @@ namespace RootTools_Vision
             }
             return null;
         }
-                
+
+        public static Bitmap CovertBufferToBitmap(SharedBufferInfo info, Rect rect)
+        {
+            try
+            {
+                int _byteCount = info.ByteCnt;
+                int _width = info.Width;
+                int _height = info.Height;
+
+                System.Drawing.Imaging.PixelFormat format = System.Drawing.Imaging.PixelFormat.Format8bppIndexed;
+                if (_byteCount == 1)
+                {
+                    format = System.Drawing.Imaging.PixelFormat.Format8bppIndexed;
+                }
+                else if (_byteCount == 3)
+                {
+                    format = System.Drawing.Imaging.PixelFormat.Format24bppRgb;
+                }
+                else
+                {
+                    System.Windows.MessageBox.Show("지원하지 않는 PixelFormat입니다.");
+                    return null;
+                }
+
+                int stride = (int)Math.Ceiling((double)_width / 4) * 4;
+                Bitmap bmp = new Bitmap((int)rect.Width, (int)rect.Height, format);
+
+                ColorPalette palette = bmp.Palette;
+
+                if (_byteCount == 1)
+                {
+                    for (int i = 0; i < 256; i++)
+                        palette.Entries[i] = Color.FromArgb(i, i, i);
+
+                    bmp.Palette = palette;
+                }
+
+
+                BitmapData bmpData = bmp.LockBits(new Rectangle(0, 0, (int)rect.Width, (int)rect.Height), ImageLockMode.WriteOnly, format);
+
+                IntPtr pointer = bmpData.Scan0;
+                if (_byteCount == 1)
+                {
+                   
+                    for (int i = 0; i < _height; i++)
+                    {
+                        CopyMemory(info.PtrR_GRAY + i * _width, pointer + i * bmpData.Stride, (uint)_width);
+                    }
+                }
+                else if (_byteCount == 3)
+                {
+                    unsafe
+                    {
+                        byte* pDst = (byte*)pointer.ToPointer();
+                        byte* pR = (byte*)info.PtrR_GRAY.ToPointer();
+                        byte* pG = (byte*)info.PtrG.ToPointer();
+                        byte* pB = (byte*)info.PtrB.ToPointer();
+
+                        for (int i = 0; i < rect.Y; i++)
+                        {
+                            pR += info.Width;
+                            pG += info.Width;
+                            pB += info.Width;
+                        }
+
+                        pR += (int)rect.Left;
+                        pG += (int)rect.Left;
+                        pB += (int)rect.Left;
+
+                        for (int i = 0; i < rect.Height; i++)
+                        {
+                            for (int j = 0; j < rect.Width; j++)
+                            {
+                                pDst[i * (bmpData.Stride) + j * _byteCount + 0] = *(pB + j);
+                                pDst[i * (bmpData.Stride) + j * _byteCount + 1] = *(pG + j);
+                                pDst[i * (bmpData.Stride) + j * _byteCount + 2] = *(pR + j);
+                            }
+
+                            pR += info.Width;
+                            pG += info.Width;
+                            pB += info.Width;
+                        }
+                    }
+                }
+                bmp.UnlockBits(bmpData);
+
+                return bmp;
+            }
+            catch (Exception)
+            {
+
+            }
+            return null;
+        }
+
         public static Bitmap CovertArrayToBitmap(byte[] rawdata, int _width, int _height, int _byteCount)
         {
             try
@@ -263,6 +357,7 @@ namespace RootTools_Vision
                     unsafe
                     {
                         byte* pPointer = (byte*)pointer.ToPointer();
+
                         for (int i = 0; i < _height; i++)
                             for (int j = 0; j < _width; j++)
                             {
@@ -437,6 +532,56 @@ namespace RootTools_Vision
 
             return rst;
         }
+
+        private static ImageCodecInfo GetEncoder(ImageFormat format)
+        {
+            ImageCodecInfo[] codecs = ImageCodecInfo.GetImageEncoders();
+            foreach (ImageCodecInfo codec in codecs)
+            {
+                if (codec.FormatID == format.Guid)
+                {
+                    return codec;
+                }
+            }
+            return null;
+        }
+
+        
+
+        public static bool SaveImageJpg(SharedBufferInfo info, Rect rect, string savePath, long compressRatio)
+        {
+            Bitmap bmp = CovertBufferToBitmap(info, rect);
+
+            SaveImageJpg(bmp, savePath, compressRatio);
+
+            return true;
+        }
+        public static bool SaveImageJpg(Bitmap bmp, string savePath, long compressRatio)
+        {
+            try
+            {
+                ImageCodecInfo jpgEncoder = GetEncoder(ImageFormat.Jpeg);
+
+                System.Drawing.Imaging.Encoder myEncoder =
+                    System.Drawing.Imaging.Encoder.Quality;
+
+                EncoderParameters enconderParameters = new EncoderParameters(1);
+
+                EncoderParameter parameter = new EncoderParameter(myEncoder, compressRatio);
+                enconderParameters.Param[0] = parameter;
+                bmp.Save(savePath, jpgEncoder, enconderParameters);
+
+                return true;
+            }
+            catch(Exception ex)
+            {
+                TempLogger.Write("Error", ex);
+                return false;
+            }
+        }
+
+        
+        
 
 
         public static bool LoadBitmapToRawdata(string filepath, byte[] rawdata, ref int _width, ref int _height, ref int _byteCount)

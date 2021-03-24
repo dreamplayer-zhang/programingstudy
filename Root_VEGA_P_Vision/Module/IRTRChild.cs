@@ -23,7 +23,7 @@ namespace Root_VEGA_P_Vision.Module
 
         string AfterPut();
 
-        bool IsPodExist();
+        bool IsPodExist(InfoPod.ePod ePod);
 
         int GetTeachRTR(InfoPod infoPod);
 

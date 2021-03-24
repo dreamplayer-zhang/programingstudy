@@ -165,7 +165,18 @@ namespace RootTools_Vision
         public void Exit()
         {
             if (this.listenThread != null)
+            {
                 this.listenThread.Abort();
+                this.listenThread = null;
+            }
+                
+
+            if (this.readThread != null)
+            {
+                this.readThread.Abort();
+                this.readThread = null;
+            }
+                
         }
 
         private void ListenForClients()

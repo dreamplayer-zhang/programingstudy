@@ -122,21 +122,6 @@ namespace RootTools.Module
             return StateHome(m_listAxis);
         }
 
-        public virtual string ServerBeforePut()
-        {
-            return "FALSE";
-        }
-
-        public virtual string ServerBeforeGet()
-        {
-            return "FALSE";
-        }
-
-        public virtual string RemoteRun(Remote.Protocol protocol)
-        {
-            return ""; 
-        }
-
         protected virtual void StopHome()
         {
             EQ.p_bStop = true;
@@ -199,6 +184,41 @@ namespace RootTools.Module
         }
         #endregion
 
+        #region RemoteThread
+        Thread m_threadRemote;
+        void ThreadRemote()
+        {
+            m_bThread = true;
+            Thread.Sleep(5000);
+            while (m_bThread)
+            {
+                Thread.Sleep(10);
+                StateRemote(); 
+            }
+        }
+
+        /// <summary> m_qModuleRemote : RunThread에서 실행 대기 중인 Remote ModuleRunBase (EQ.IsStop() 인 경우만 정지) </summary>
+        public Queue<ModuleRunBase> m_qModuleRemote = new Queue<ModuleRunBase>();
+        bool StateRemote()
+        {
+            if (m_qModuleRemote.Count == 0) return false;
+            ModuleRunBase moduleRun = m_qModuleRemote.Peek();
+            if (moduleRun.m_eRemote == eRemote.Local) return false;
+            try
+            {
+                m_swRun.Restart();
+                m_log.Info("RemoteClient : " + moduleRun.p_id + " Start");
+                moduleRun.p_eRunState = ModuleRunBase.eRunState.Run;
+                p_sInfo = m_remote.RemoteSend(moduleRun);
+            }
+            catch (Exception e) { p_sInfo = "RemoteClient Exception = " + e.Message; }
+            moduleRun.p_eRunState = ModuleRunBase.eRunState.Done;
+            m_log.Info("RemoteClient : " + moduleRun.p_id + " Done : " + (m_swRun.ElapsedMilliseconds / 1000.0).ToString("0.00 sec"));
+            if (m_qModuleRemote.Count > 0) m_qModuleRemote.Dequeue();
+            return true;
+        }
+        #endregion
+
         #region Thread
         bool m_bThread = false;
         Thread m_thread;
@@ -215,7 +235,7 @@ namespace RootTools.Module
 
         protected virtual void RunThread()
         {
-            if (StateRemote()) return;
+            if (StateServer()) return; 
             switch (p_eState)
             {
                 case eState.Init:
@@ -226,10 +246,7 @@ namespace RootTools.Module
                     p_bEnableHome = false;
                     p_sRun = "Stop";
                     string sStateHome = StateHome();
-                    if (sStateHome == "OK")
-                    {
-                        if (p_eRemote != eRemote.Client) p_eState = eState.Ready;
-                    }
+                    if (sStateHome == "OK") p_eState = eState.Ready;
                     else StopHome();
                     break;
                 case eState.Ready:
@@ -381,9 +398,29 @@ namespace RootTools.Module
         public string StartRun(ModuleRunBase moduleRun)
         {
             if (EQ.IsStop()) return "EQ Stop";
-            m_qModuleRun.Enqueue(moduleRun);
+            if ((moduleRun.m_eRemote != eRemote.Local) && (moduleRun.m_eRemote == p_eRemote)) m_qModuleRemote.Enqueue(moduleRun); 
+            else m_qModuleRun.Enqueue(moduleRun);
             p_sInfo = "StartRun : " + moduleRun.m_sModuleRun;
             return "OK";
+        }
+
+        bool StateServer()
+        {
+            if (m_qModuleRun.Count == 0) return false;
+            ModuleRunBase moduleRun = m_qModuleRun.Peek();
+            if (moduleRun.m_eRemote == eRemote.Local) return false;
+            try
+            {
+                m_swRun.Restart();
+                m_log.Info("RemoteServer : " + moduleRun.p_id + " Start");
+                moduleRun.p_eRunState = ModuleRunBase.eRunState.Run;
+                p_sInfo = moduleRun.Run();
+            }
+            catch (Exception e) { p_sInfo = "RemoteServer Exception = " + e.Message; }
+            moduleRun.p_eRunState = ModuleRunBase.eRunState.Done;
+            m_log.Info("RemoteServer : " + moduleRun.p_id + " Done : " + (m_swRun.ElapsedMilliseconds / 1000.0).ToString("0.00 sec"));
+            if (m_qModuleRun.Count > 0) m_qModuleRun.Dequeue();
+            return true;
         }
 
         StopWatch m_swRun = new StopWatch(); 
@@ -394,14 +431,7 @@ namespace RootTools.Module
             moduleRun.p_eRunState = ModuleRunBase.eRunState.Run;
             m_swRun.Restart();
             m_log.Info("ModuleRun : " + moduleRun.p_id + " Start");
-			try 
-            { 
-                switch (p_eRemote)
-                {
-                    case eRemote.Client: p_sInfo = m_remote.RemoteSend(moduleRun); break;
-                    default: p_sInfo = moduleRun.Run();break;
-                }
-            }
+			try { p_sInfo = moduleRun.Run(); }
             catch (Exception e) { p_sInfo = "StateRun Exception = " + e.Message; }
             moduleRun.p_eRunState = ModuleRunBase.eRunState.Done;
             m_log.Info("ModuleRun : " + moduleRun.p_id + " Done : " + (m_swRun.ElapsedMilliseconds / 1000.0).ToString("0.00 sec"));
@@ -413,29 +443,6 @@ namespace RootTools.Module
                 moduleRun.SetALID(p_sInfo);
             }
             return p_sInfo;
-        }
-
-        bool StateRemote()
-        {
-            if (m_qModuleRun.Count == 0) return false;
-            ModuleRunBase moduleRun = m_qModuleRun.Peek();
-            if (moduleRun.m_bRemoteRun == false) return false;
-            moduleRun.p_eRunState = ModuleRunBase.eRunState.Run;
-            m_swRun.Restart();
-            m_log.Info("RemoteRun : " + moduleRun.p_id + " Start");
-            try
-            {
-                switch (p_eRemote)
-                {
-                    case eRemote.Client: p_sInfo = m_remote.RemoteSend(moduleRun); break;
-                    default: p_sInfo = moduleRun.Run(); break;
-                }
-            }
-            catch (Exception e) { p_sInfo = "StateRun Exception = " + e.Message; }
-            moduleRun.p_eRunState = ModuleRunBase.eRunState.Done;
-            m_log.Info("RemoteRun : " + moduleRun.p_id + " Done : " + (m_swRun.ElapsedMilliseconds / 1000.0).ToString("0.00 sec"));
-            if (m_qModuleRun.Count > 0) m_qModuleRun.Dequeue();
-            return true; 
         }
         #endregion
 
@@ -464,20 +471,9 @@ namespace RootTools.Module
             MemoryStream m_memoryStream = new MemoryStream();
 
             #region eCmd
-            public enum eProtocol
-            {
-                ModuleRun,
-                RemoteRun,
-
-                Initial,
-                BeforeGet,
-                BeforePut,
-            }
-
             public class Protocol
             {
                 public eRemote m_eRemote = eRemote.Local; 
-                public eProtocol m_eProtocol = eProtocol.ModuleRun;
                 public string m_sCmd = "";
                 
                 string _sRun = ""; 
@@ -487,7 +483,7 @@ namespace RootTools.Module
                     set
                     {
                         _sRun = value;
-                        _sSend = m_eRemote.ToString() +',' + m_eProtocol.ToString() + ',' + m_sCmd + ',' + _sRun;
+                        _sSend = m_eRemote.ToString() + ',' + m_sCmd + ',' + _sRun;
                     }
                 }
 
@@ -502,9 +498,8 @@ namespace RootTools.Module
                         try
                         {
                             m_eRemote = GetRemote(asSend[0]);
-                            m_eProtocol = GetProtocol(asSend[1]);
-                            m_sCmd = asSend[2];
-                            int l = asSend[0].Length + asSend[1].Length + asSend[2].Length + 3;
+                            m_sCmd = asSend[1];
+                            int l = asSend[0].Length + asSend[1].Length + 2;
                             _sRun = _sSend.Substring(l, _sSend.Length - l);
                         }
                         catch (Exception) { }
@@ -514,7 +509,6 @@ namespace RootTools.Module
                 public bool IsSame(Protocol protocol)
                 {
                     if (m_eRemote != protocol.m_eRemote) return false;
-                    if (m_eProtocol != protocol.m_eProtocol) return false;
                     if (m_sCmd != protocol.m_sCmd) return false;
                     return true; 
                 }
@@ -530,10 +524,9 @@ namespace RootTools.Module
                     return p_sRun; 
                 }
 
-                public Protocol(eRemote eRemote, eProtocol eProtocol, string sCmd, string sRun)
+                public Protocol(eRemote eRemote, string sCmd, string sRun)
                 {
                     m_eRemote = eRemote; 
-                    m_eProtocol = eProtocol;
                     m_sCmd = sCmd;
                     p_sRun = sRun;
                 }
@@ -550,15 +543,6 @@ namespace RootTools.Module
                         if (remote.ToString() == sRemote) return remote;
                     }
                     return eRemote.Local;
-                }
-
-                eProtocol GetProtocol(string sProtocol)
-                {
-                    foreach (eProtocol protocol in Enum.GetValues(typeof(eProtocol)))
-                    {
-                        if (protocol.ToString() == sProtocol) return protocol; 
-                    }
-                    return eProtocol.ModuleRun; 
                 }
             }
             #endregion
@@ -606,17 +590,11 @@ namespace RootTools.Module
                 run.RunTree(m_treeRoot, true);
                 m_treeRoot.m_job.Close();
                 string sRun = m_treeRoot.m_job.m_sMemory;
-                Protocol protocol = new Protocol(m_module.p_eRemote, eProtocol.ModuleRun, run.m_sModuleRun, sRun); 
+                Protocol protocol = new Protocol(m_module.p_eRemote, run.m_sModuleRun, sRun); 
                 Send(protocol);
                 m_memoryStream.Close();
                 m_module.p_sInfo = protocol.WaitDone();
                 return m_module.p_sInfo; 
-            }
-
-            public string RemoteSend(eProtocol eProtocol, string sCmd, string sRun)
-            {
-                Protocol protocol = new Protocol(m_module.p_eRemote, eProtocol, sCmd, sRun);
-                return RemoteSend(protocol); 
             }
 
             public string RemoteSend(Protocol protocol)
@@ -632,12 +610,7 @@ namespace RootTools.Module
                 if (sSend.Length <= 0) return;
                 Protocol protocol = new Protocol(sSend);
                 if (protocol.m_eRemote == m_module.p_eRemote) Recieve(protocol);
-                else
-                {
-                    switch (protocol.m_eProtocol)
-                    {
-                    }
-                }
+                else ServerModuleRun(protocol);
             }
             #endregion
 
@@ -655,38 +628,7 @@ namespace RootTools.Module
                 if (sSend.Length <= 0) return;
                 Protocol protocol = new Protocol(sSend);
                 if (protocol.m_eRemote == m_module.p_eRemote) Recieve(protocol);
-                else
-                {
-                    switch (protocol.m_eProtocol)
-                    {
-                        case eProtocol.ModuleRun: ServerModuleRun(protocol); break;
-
-                        case eProtocol.Initial: InitialModule(protocol); break;
-                        case eProtocol.BeforeGet: BeforeGet(protocol); break;
-                        case eProtocol.BeforePut: BeforePut(protocol); break;
-                        default:
-                            break;
-                    }
-                }
-            }
-            void BeforeGet(Protocol protocol)
-            {
-                protocol.p_sRun = m_module.ServerBeforeGet();
-                Send(protocol);
-            }
-            void BeforePut(Protocol protocol)
-            {
-                protocol.p_sRun = m_module.ServerBeforePut();
-                Send(protocol);
-            }
-
-            void InitialModule(Protocol protocol)
-            {
-                m_module.p_eState = eState.Home;
-                while (m_module.IsBusy()) Thread.Sleep(10);
-                EQ.p_eState = EQ.eState.Ready;
-                protocol.p_sRun = m_module.p_sInfo;
-                Send(protocol);
+                else ServerModuleRun(protocol);
             }
 
             void ServerModuleRun(Protocol protocol)
@@ -845,12 +787,11 @@ namespace RootTools.Module
 
         void RunTreeQueue(Tree tree)
         {
+            int n = 0; 
+            ModuleRunBase[] aModuleRemote = m_qModuleRemote.ToArray();
+            foreach (ModuleRunBase run in aModuleRemote) run.RunTree(tree.GetTree(n++, run.p_id), true);
             ModuleRunBase[] aModuleRun = m_qModuleRun.ToArray();
-            for (int n = 0; n < aModuleRun.Length; n++)
-            {
-                ModuleRunBase run = aModuleRun[n];
-                run.RunTree(tree.GetTree(n, run.p_id), true); 
-            }
+            foreach (ModuleRunBase run in aModuleRun) run.RunTree(tree.GetTree(n++, run.p_id), true);
         }
         #endregion
 
@@ -884,6 +825,8 @@ namespace RootTools.Module
 
             m_thread = new Thread(new ThreadStart(ThreadRun));
             m_thread.Start();
+            m_threadRemote = new Thread(new ThreadStart(ThreadRemote));
+            m_threadRemote.Start();
         }
 
         public virtual void ThreadStop()
@@ -893,7 +836,8 @@ namespace RootTools.Module
                 m_qModuleRun.Clear();
                 m_bThread = false;
                 EQ.p_bStop = true;
-                //m_thread.Join();
+                m_thread.Join();
+                m_threadRemote.Join(); 
             }
         }
     }
