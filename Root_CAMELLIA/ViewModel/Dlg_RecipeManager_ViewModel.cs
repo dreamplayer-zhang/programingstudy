@@ -453,7 +453,7 @@ namespace Root_CAMELLIA
         }
         private DataTable _PointListItem = new DataTable();
 
-        public ObservableCollection<double> ReflectanceListItem
+        public ObservableCollection<WavelengthItem> ReflectanceListItem
         {
             get
             {
@@ -466,9 +466,9 @@ namespace Root_CAMELLIA
             }
         }
 
-        private ObservableCollection<double> _ReflectanceListItem = new ObservableCollection<double>();
+        private ObservableCollection<WavelengthItem> _ReflectanceListItem = new ObservableCollection<WavelengthItem>();
 
-        public ObservableCollection<double> TransmittanceListItem
+        public ObservableCollection<WavelengthItem> TransmittanceListItem
         {
             get
             {
@@ -481,7 +481,7 @@ namespace Root_CAMELLIA
             }
         }
 
-        private ObservableCollection<double> _TransmittanceListItem = new ObservableCollection<double>();
+        private ObservableCollection<WavelengthItem> _TransmittanceListItem = new ObservableCollection<WavelengthItem>();
 
         public ObservableCollection<string> MaterialListItem
         {
@@ -751,6 +751,31 @@ namespace Root_CAMELLIA
                     MessageBox.Show("Invalid Value Entered", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
                 RaisePropertyChanged("WaveLengthValue");
+            }
+        }
+
+        private double _WaveLengthScale = 1.0;
+        public double WaveLengthScale
+        {
+            get
+            {
+                return _WaveLengthScale;
+            }
+            set
+            {
+                SetProperty(ref _WaveLengthScale, value);
+            }
+        }
+        private double _WaveLenghOffset = 0.0;
+        public double WaveLengthOffset
+        {
+            get
+            {
+                return _WaveLenghOffset;
+            }
+            set
+            {
+                SetProperty(ref _WaveLenghOffset,value);
             }
         }
 
@@ -3398,22 +3423,56 @@ namespace Root_CAMELLIA
                             return;
                         }
                     }
+                    WavelengthItem item = new WavelengthItem(value, WaveLengthScale, WaveLengthOffset);
+
+                    if (!CheckVaildValue(value))
+                    {
+                        return;
+                    }
+
                     if (IsReflectanceCheck)
                     {
-                        dataManager.recipeDM.TeachingRD.WaveLengthReflectance.Add(value);
-                        ReflectanceListItem.Add(value);
-                        ReflectanceListItem = new ObservableCollection<double>(ReflectanceListItem.OrderBy(x=>x));
+                        dataManager.recipeDM.TeachingRD.WaveLengthReflectance.Add(item);
+                        ReflectanceListItem.Add(item);
+                        ReflectanceListItem = new ObservableCollection<WavelengthItem>(ReflectanceListItem.OrderBy(x => x.p_waveLength));
+                        //ReflectanceListItem.Add(value);
+                        //ReflectanceListItem = new ObservableCollection<double>(ReflectanceListItem.OrderBy(x=>x));
                     }
                     else if(IsTransmittanceCheck)
                     {
-                        dataManager.recipeDM.TeachingRD.WaveLengthTransmittance.Add(value);
-                        TransmittanceListItem.Add(value);
-                        TransmittanceListItem = new ObservableCollection<double>(TransmittanceListItem.OrderBy(x => x));
+                        dataManager.recipeDM.TeachingRD.WaveLengthTransmittance.Add(item);
+                        TransmittanceListItem.Add(item);
+                        TransmittanceListItem = new ObservableCollection<WavelengthItem>(TransmittanceListItem.OrderBy(x => x.p_waveLength));
                     }
-                    WaveLengthValue = "0";
+                    //WaveLengthValue = "0";
                     MyIsFocused = true;
                 });
             }
+        }
+
+        private bool CheckVaildValue(double wave)
+        {
+            if (IsReflectanceCheck)
+            {
+                foreach(WavelengthItem item in dataManager.recipeDM.TeachingRD.WaveLengthReflectance)
+                {
+                    if(item.p_waveLength == wave)
+                    {
+                        return false;
+                    }
+                }
+            }
+            else
+            {
+                foreach (WavelengthItem item in dataManager.recipeDM.TeachingRD.WaveLengthTransmittance)
+                {
+                    if (item.p_waveLength == wave)
+                    {
+                        return false;
+                    }
+                }
+            }
+            return true;
         }
 
         public ICommand CmdDeleteWaveLength

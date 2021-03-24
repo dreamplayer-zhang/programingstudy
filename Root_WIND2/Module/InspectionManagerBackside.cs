@@ -96,8 +96,8 @@ namespace Root_WIND2
 
             BacksideSurface surface = new BacksideSurface();
             BacksideSurfaceParameter param = new BacksideSurfaceParameter();
-            param.Intensity = 150;
-            param.Size = 1;
+            param.Intensity = 100;
+            param.Size = 0;
             surface.SetParameter(param);
 
             ProcessDefect processDefect = new ProcessDefect();

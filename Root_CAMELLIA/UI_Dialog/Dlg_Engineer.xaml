@@ -4,6 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:Icon="clr-namespace:Root_CAMELLIA.Control.Icon"
+        xmlns:control ="clr-namespace:Root_CAMELLIA.Control"
         xmlns:local="clr-namespace:Root_CAMELLIA"
         xmlns:tools="clr-namespace:RootTools;assembly=RootTools"
         xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
@@ -340,6 +341,9 @@
                                         </Grid>
                                     </TabItem>
                                     <TabItem Header="PM Setting">
+                                        <control:PMCheckReview>
+                                            
+                                        </control:PMCheckReview>
 
                                     </TabItem>
                                 </TabControl>

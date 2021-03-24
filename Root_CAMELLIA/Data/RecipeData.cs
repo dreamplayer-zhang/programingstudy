@@ -15,8 +15,8 @@ namespace Root_CAMELLIA.Data
         public float UpperWaveLength { get; set; }
         public int LMIteration { get; set; }
         public float DampingFactor { get; set; }
-        public List<double> WaveLengthReflectance { get; set; } = new List<double>();
-        public List<double> WaveLengthTransmittance { get; set; } = new List<double>();
+        public List<WavelengthItem> WaveLengthReflectance { get; set; } = new List<WavelengthItem>();
+        public List<WavelengthItem> WaveLengthTransmittance { get; set; } = new List<WavelengthItem>();
         public int VISIntegrationTime { get; set; } = 20;
         public int NIRIntegrationTime { get; set; } = 150;
         public bool UseThickness { get; set; } = true;
@@ -67,8 +67,8 @@ namespace Root_CAMELLIA.Data
             data.UpperWaveLength = UpperWaveLength;
             data.LMIteration = LMIteration;
             data.DampingFactor = DampingFactor;
-            data.WaveLengthReflectance = new List<double>(WaveLengthReflectance.ToArray());
-            data.WaveLengthTransmittance = new List<double>(WaveLengthTransmittance.ToArray());
+            data.WaveLengthReflectance = new List<WavelengthItem>(WaveLengthReflectance.ToArray());
+            data.WaveLengthTransmittance = new List<WavelengthItem>(WaveLengthTransmittance.ToArray());
             data.VISIntegrationTime = VISIntegrationTime;
             data.NIRIntegrationTime = NIRIntegrationTime;
             data.UseThickness = UseThickness;
@@ -162,4 +162,49 @@ namespace Root_CAMELLIA.Data
         }
     }
     #endregion
+    public class WavelengthItem
+    {
+        double m_waveLength = 350.0;
+        public double p_waveLength
+        {
+            get
+            {
+                return m_waveLength;
+            }
+            set
+            {
+                m_waveLength = value;
+            }
+        }
+        double m_scale = 1.0;
+        public double p_scale
+        {
+            get
+            {
+                return m_scale;
+            }
+            set
+            {
+                m_scale = value;
+            }
+        }
+        double m_offset = 0.0;
+        public double p_offset
+        {
+            get
+            {
+                return m_offset;
+            }
+            set
+            {
+                m_offset = value;
+            }
+        }
+        public WavelengthItem(double waveLength, double scale, double offset)
+        {
+            p_waveLength = waveLength;
+            p_scale = scale;
+            p_offset = offset;
+        }
+    }
 }

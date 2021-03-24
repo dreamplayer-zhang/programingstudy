@@ -228,6 +228,7 @@ namespace Root_CAMELLIA.Module
         public enum eAxisPos
         {
             Ready,
+            Home,
             InitCal
         }
         private void InitWorkPoint()
@@ -235,6 +236,7 @@ namespace Root_CAMELLIA.Module
             m_axisXY.p_axisX.AddPos(Enum.GetNames(typeof(eAxisPos)));
             m_axisXY.p_axisY.AddPos(Enum.GetNames(typeof(eAxisPos)));
             m_axisZ.AddPos(Enum.GetNames(typeof(eAxisPos)));
+            m_axisLifter.AddPos(Enum.GetNames(typeof(eAxisPos)));
             m_axisLifter.AddIO(m_axisXReady);
             m_axisLifter.AddIO(m_axisYReady);
             //m_axisLifter.AddIO(m_vaccum);
@@ -318,8 +320,10 @@ namespace Root_CAMELLIA.Module
             AddModuleRunList(new Run_InitCalibration(this), true, "InitCalCentering");
             AddModuleRunList(new Run_CalibrationWaferCentering(this), true, "Background Calibration_Centering");
             AddModuleRunList(new Run_Measure(this), true, "Measurement");
-            AddModuleRunList(new Run_PMSensorTilt(this), true, "PM Sensor Tilt");
-            AddModuleRunList(new Run_PMTiltAlign(this), true, "PM Camera Tilt");
+            AddModuleRunList(new Run_PMReflectance (this), true, "PM Reflectance");
+            AddModuleRunList(new Run_PMThickness (this), true, "PM Thickness");
+            AddModuleRunList(new Run_PMSensorStageAlign (this), true, "PM Sensor_Stage Align");
+            AddModuleRunList(new Run_PMSensorCameraTilt (this), true, "PM Sensor_Camera Tilt");
         }
 
 
@@ -442,7 +446,7 @@ namespace Root_CAMELLIA.Module
 
         public string LifterDown()
         {
-            if (p_axisLifter.IsInPos(eAxisPos.Ready))
+            if (p_axisLifter.IsInPos(eAxisPos.Home))
             {
                 return "OK";
             }
@@ -451,11 +455,11 @@ namespace Root_CAMELLIA.Module
             {
                 if (!m_vacuum.p_bIn)
                 {
-                    if (Run(p_axisLifter.StartMove(eAxisPos.Ready)))
+                    if (p_axisLifter.StartMove(eAxisPos.Ready) != "OK")
                     {
                         return p_sInfo;
                     }
-                    if (Run(p_axisLifter.WaitReady()))
+                    if (p_axisLifter.WaitReady() != "OK")
                         return p_sInfo;
                 }
                 else
@@ -650,11 +654,10 @@ namespace Root_CAMELLIA.Module
         eCheckWafer m_eCheckWafer = eCheckWafer.InfoWafer;
         public bool IsWaferExist(int nID)
         {
-            
-            if(EQ.p_eState != EQ.eState.Home && p_eState == eState.Home)
-            {
-                StateHome();
-            }
+            //if(EQ.p_eState != EQ.eState.Home && p_eState == eState.Home)
+            //{
+            //    StateHome();
+            //}
             switch (m_eCheckWafer)
             {
                 case eCheckWafer.Sensor:

@@ -317,12 +317,10 @@ namespace RootTools_Vision
         {
             if (this.currentWorkplace.Width == 0 || this.currentWorkplace.Height == 0) return;
 
-            if(this.currentWorkplace.SharedBufferInfo.PtrR_GRAY == IntPtr.Zero ||
-               this.currentWorkplace.SharedBufferInfo.PtrG == IntPtr.Zero ||
-               this.currentWorkplace.SharedBufferInfo.PtrB == IntPtr.Zero)
-            {
+            if (this.currentWorkplace.SharedBufferInfo.PtrR_GRAY == IntPtr.Zero)
                 return;
-            }
+
+            
 
             Tools.ParallelImageCopy(
                 this.currentWorkplace.SharedBufferInfo.PtrR_GRAY,
@@ -336,6 +334,12 @@ namespace RootTools_Vision
                     this.currentWorkplace.PositionY),
                 this.workplaceBufferR_GRAY);
 
+
+            if (this.currentWorkplace.SharedBufferInfo.PtrG == IntPtr.Zero ||
+               this.currentWorkplace.SharedBufferInfo.PtrB == IntPtr.Zero)
+            {
+                return;
+            }
 
             if (this.currentWorkplace.SharedBufferInfo.ByteCnt == 3)
             {
