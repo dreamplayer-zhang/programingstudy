@@ -247,6 +247,7 @@
                                         <TextBlock Text="fit" Style="{StaticResource GridHeaderStyle}" />
                                     </DataGridCheckBoxColumn.Header>
                                 </DataGridCheckBoxColumn>
+                                
                                 <DataGridComboBoxColumn Width="*" SelectedValueBinding="{Binding SelectedEmm, UpdateSourceTrigger=PropertyChanged}">
                                     <DataGridComboBoxColumn.Header>
                                         <TextBlock Text="Emm" Style="{StaticResource GridHeaderStyle}" />
@@ -263,6 +264,16 @@
                                         </Style>
                                     </DataGridComboBoxColumn.EditingElementStyle>
                                 </DataGridComboBoxColumn>
+                                <DataGridTextColumn Width="50" Binding="{Binding Scale, StringFormat=N3, UpdateSourceTrigger=LostFocus, Mode=TwoWay}">
+                                    <DataGridTextColumn.Header>
+                                        <TextBlock Text="Scale" Style="{StaticResource GridHeaderStyle}" />
+                                    </DataGridTextColumn.Header>
+                                </DataGridTextColumn>
+                                <DataGridTextColumn Width="50" Binding="{Binding Offset, StringFormat=N3, UpdateSourceTrigger=LostFocus, Mode=TwoWay}">
+                                    <DataGridTextColumn.Header>
+                                        <TextBlock Text="Offset" Style="{StaticResource GridHeaderStyle}" />
+                                    </DataGridTextColumn.Header>
+                                </DataGridTextColumn>
                             </DataGrid.Columns>
                         </DataGrid>
                         <Grid Grid.Row="1">
@@ -382,13 +393,25 @@
                         <Grid Margin="5">
                             <Grid>
                                 <Grid.RowDefinitions>
-                                    <RowDefinition Height="0.15*"/>
+                                    <RowDefinition Height="0.18*"/>
                                     <RowDefinition/>
                                 </Grid.RowDefinitions>
-                                <Border Background="White" BorderBrush="#ABADB3" BorderThickness="1">
-                                    <TextBlock Grid.Row="0" Text="Reflectance" VerticalAlignment="Top" HorizontalAlignment="Center" Margin="0,2"/>
-                                </Border>
-                                <ListBox Grid.Row="1" ItemsSource="{Binding ReflectanceListItem, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" IsSynchronizedWithCurrentItem="True" HorizontalContentAlignment="Center" SelectedIndex="{Binding ReflectanceSelectedIndex}" />
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition/>
+                                    </Grid.RowDefinitions>
+                                    <Border Background="White" BorderBrush="#ABADB3" BorderThickness="1">
+                                        <TextBlock Grid.Row="0" Text="Reflectance" TextAlignment="Center" Margin="0,2"/>
+                                    </Border>
+                                </Grid>
+                                <DataGrid Grid.Row="1" ItemsSource="{Binding ReflectanceListItem}" AutoGenerateColumns="False" CanUserAddRows="False" CanUserSortColumns="True" EnableColumnVirtualization="True"  CanUserDeleteRows="False"
+                                  EnableRowVirtualization="True" ScrollViewer.CanContentScroll="True" SelectionMode="Single" SelectedIndex="{Binding ReflectanceSelectedIndex}">
+                                    <DataGrid.Columns>
+                                        <DataGridTextColumn Header="Wave" Width="*" Binding="{Binding p_waveLength}" IsReadOnly="True"/>
+                                        <DataGridTextColumn Header="Scale" Width="*" Binding="{Binding p_scale}" IsReadOnly="True"/>
+                                        <DataGridTextColumn Header="Offset" Width="*" Binding="{Binding p_offset}" IsReadOnly="True"/>
+                                    </DataGrid.Columns>
+                                </DataGrid>
                             </Grid>
                         </Grid>
                         <Grid Grid.Column="1" Margin="5">
@@ -436,8 +459,8 @@
                                         <ColumnDefinition Width="2*"/>
                                     </Grid.ColumnDefinitions>
                                     <TextBox local:FocusExtension.IsFocused="{Binding MyIsFocused, UpdateSourceTrigger=PropertyChanged}" Text="{Binding WaveLengthValue, UpdateSourceTrigger=LostFocus, StringFormat=N2}" TextAlignment="Center" VerticalContentAlignment="Center" Margin="2" Grid.Column="0"/>
-                                    <TextBox local:FocusExtension.IsFocused="{Binding MyIsFocused, UpdateSourceTrigger=PropertyChanged}" Text="{Binding WaveLengthValue, UpdateSourceTrigger=LostFocus, StringFormat=N2}" TextAlignment="Center" VerticalContentAlignment="Center" Margin="2" Grid.Column="1"/>
-                                    <TextBox local:FocusExtension.IsFocused="{Binding MyIsFocused, UpdateSourceTrigger=PropertyChanged}" Text="{Binding WaveLengthValue, UpdateSourceTrigger=LostFocus, StringFormat=N2}" TextAlignment="Center" VerticalContentAlignment="Center" Margin="2" Grid.Column="2"/>
+                                    <TextBox local:FocusExtension.IsFocused="{Binding MyIsFocused, UpdateSourceTrigger=PropertyChanged}" Text="{Binding WaveLengthScale, UpdateSourceTrigger=LostFocus, StringFormat=N2}" TextAlignment="Center" VerticalContentAlignment="Center" Margin="2" Grid.Column="1"/>
+                                    <TextBox local:FocusExtension.IsFocused="{Binding MyIsFocused, UpdateSourceTrigger=PropertyChanged}" Text="{Binding WaveLengthOffset, UpdateSourceTrigger=LostFocus, StringFormat=N2}" TextAlignment="Center" VerticalContentAlignment="Center" Margin="2" Grid.Column="2"/>
                             
                                     </Grid>
                                 </Grid>
