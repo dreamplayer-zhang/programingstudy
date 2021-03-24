@@ -17,6 +17,7 @@ namespace RootTools_Vision
         private int intensity = 0;
         private int size = 0;
         private bool isBright = false;
+        public int DefectCode = 10000;
         private DiffFilterMethod diffFilter = DiffFilterMethod.Average;
         #endregion
 

@@ -1,6 +1,7 @@
 ﻿using RootTools;
 using RootTools.Database;
 using RootTools_CLR;
+using RootTools_Vision.Utility;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -19,9 +20,12 @@ namespace RootTools_Vision
         /// Defect Image가 저장될 Root Directory Path. 기본값 : D:\DefectImage
         /// </summary>
         public string DefectImagePath { get => sDefectimagePath; set => sDefectimagePath = value; }
+        
+        string TableName;
 
-        public ProcessDefect_Backside()
+        public ProcessDefect_Backside(string tableName)
         {
+            TableName = tableName;
         }
 
         public override WORK_TYPE Type => WORK_TYPE.DEFECTPROCESS_ALL;
@@ -88,8 +92,31 @@ namespace RootTools_Vision
             //// Add Defect to DB
             if (MergeDefectList.Count > 0)
             {
-                DatabaseManager.Instance.AddDefectDataList(MergeDefectList);
+                DatabaseManager.Instance.AddDefectDataList(MergeDefectList, TableName);
             }
+
+            Settings settings = new Settings();
+            SettingItem_SetupBackside settings_backside = settings.GetItem<SettingItem_SetupBackside>();
+
+            Tools.SaveDefectImage(Path.Combine(settings_backside.DefectImagePath, sInspectionID), MergeDefectList, this.currentWorkplace.SharedBufferInfo, this.currentWorkplace.SharedBufferByteCnt);
+
+            if (settings_backside.UseKlarf)
+            {
+                KlarfData_Lot klarfData = new KlarfData_Lot();
+                Directory.CreateDirectory(settings_backside.KlarfSavePath);
+
+                //klarfData.AddSlot(recipe.WaferMap, MergeDefectList, this.recipe.GetItem<BacksideRecipe>());
+                //klarfData.WaferStart(recipe.WaferMap, DateTime.Now);
+                //klarfData.SetResultTimeStamp();
+
+                //klarfData.SaveKlarf(settings_backside.KlarfSavePath, false);
+
+                //Tools.SaveTiffImage(settings_backside.KlarfSavePath, MergeDefectList, this.currentWorkplace.SharedBufferInfo);
+                
+                Tools.SaveImageJpg(this.currentWorkplace.SharedBufferInfo, new Rect(0, 0, 3000, 3000), settings_backside.KlarfSavePath + "\\" + DateTime.Now.ToString("yyyyMMddhhmmss") + "_backside.jpg", (long)(settings_backside.WholeWaferImageCompressionRate * 100));
+            }
+
+
 
             WorkEventManager.OnInspectionDone(this.currentWorkplace, new InspectionDoneEventArgs(new List<CRect>()));
             WorkEventManager.OnIntegratedProcessDefectDone(this.currentWorkplace, new IntegratedProcessDefectDoneEventArgs());
@@ -183,7 +210,7 @@ namespace RootTools_Vision
                     else if (defectRect2.Contains(defectRect1))
                     {
                         DefectList[i].SetDefectInfo(sInspectionID, DefectList[j].m_nDefectCode, DefectList[j].m_fSize, DefectList[j].m_fGV, DefectList[j].m_fWidth, DefectList[j].m_fHeight
-                            , 0, 0, (float)DefectList[j].p_rtDefectBox.Left, (float)DefectList[j].p_rtDefectBox.Top, DefectList[j].m_nChipIndexX, DefectList[j].m_nCHipIndexY);
+                            , 0, 0, (float)DefectList[j].p_rtDefectBox.Left, (float)DefectList[j].p_rtDefectBox.Top, DefectList[j].m_nChipIndexX, DefectList[j].m_nChipIndexY);
                         DefectList[j].m_fSize = -123;
                         continue;
                     }
@@ -222,7 +249,7 @@ namespace RootTools_Vision
                         float fDefectRelY = 0;
 
                         DefectList[i].SetDefectInfo(sInspectionID, nDefectCode, fDefectSz, fDefectGV, fDefectWidth, fDefectHeight
-                            , fDefectRelX, fDefectRelY, fDefectLeft, fDefectTop, DefectList[j].m_nChipIndexX, DefectList[j].m_nCHipIndexY);
+                            , fDefectRelX, fDefectRelY, fDefectLeft, fDefectTop, DefectList[j].m_nChipIndexX, DefectList[j].m_nChipIndexY);
 
                         DefectList[j].m_fSize = -123; // Merge된 Defect이 중복 저장되지 않도록...
                     }

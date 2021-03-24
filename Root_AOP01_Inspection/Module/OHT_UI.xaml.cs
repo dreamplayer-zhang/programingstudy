@@ -78,7 +78,7 @@ namespace Root_AOP01_Inspection.Module
             }
             else
             {
-                m_loadport.p_infoCarrier.p_eReqAccessLP = GemCarrierBase.eAccessLP.Auto;
+                m_loadport.p_infoCarrier.p_eReqAccessLP = GemCarrierBase.eAccessLP.Auto; //KHD 210317
                 //changeLPState(GemCarrierBase.eAccessLP.Auto);
                 if (!m_loadport.m_diPlaced.p_bIn || !m_loadport.m_diPresent.p_bIn)
                 {
@@ -93,10 +93,10 @@ namespace Root_AOP01_Inspection.Module
                 m_OHT.m_doReady.p_bOn = false;
                 m_OHT.m_doES.p_bOn = true;
                 m_OHT.m_bAuto = true;
-                if((m_loadport.m_diPlaced.p_bIn || !m_loadport.m_diPresent.p_bIn) && m_OHT.p_eState == OHT_Semi.eState.All_Off)
-                {
-                    m_carrier.p_eTransfer = GemCarrierBase.eTransfer.ReadyToUnload;
-                }
+                //if((m_loadport.m_diPlaced.p_bIn || !m_loadport.m_diPresent.p_bIn) && m_OHT.p_eState == OHT_Semi.eState.All_Off) //KHD 210317
+                //{
+                //    m_carrier.p_eTransfer = GemCarrierBase.eTransfer.ReadyToUnload;
+                //}
             }
         }
         #endregion
@@ -112,11 +112,13 @@ namespace Root_AOP01_Inspection.Module
             
             if (m_OHT.p_eState == OHT_Semi.eState.All_Off && !m_OHT.m_bOHTErr && (!m_loadport.m_diPlaced.p_bIn|| !m_loadport.m_diPresent.p_bIn))
             {
-                m_carrier.p_ePresentSensor = GemCarrierBase.ePresent.Exist;
+                //m_carrier.p_ePresentSensor = GemCarrierBase.ePresent.Exist;
+                m_OHT.m_bPODExist = true;
             }
             else if (m_loadport.m_diPlaced.p_bIn && m_loadport.m_diPresent.p_bIn)
             {
-                m_carrier.p_ePresentSensor = GemCarrierBase.ePresent.Empty;
+                //m_carrier.p_ePresentSensor = GemCarrierBase.ePresent.Empty;
+                m_OHT.m_bPODExist = false;
                 bStartTD3 = false;
             }
             if (m_OHT.p_eState == OHT_Semi.eState.Busy_On)
@@ -131,6 +133,7 @@ namespace Root_AOP01_Inspection.Module
                     if (!m_loadport.m_diPlaced.p_bIn && !m_loadport.m_diPresent.p_bIn && m_carrier.p_eTransfer == GemCarrierBase.eTransfer.ReadyToLoad)
                     {
                         m_carrier.p_ePresentSensor = GemCarrierBase.ePresent.Exist;
+                        m_OHT.m_bPODExist = true;
                         bStartTD3 = false;
                     }
                 }
@@ -141,9 +144,10 @@ namespace Root_AOP01_Inspection.Module
                         m_OHT.StartTD3();
                         bStartTD3 = true;
                     }
-                    else if (m_loadport.m_diPlaced.p_bIn && m_loadport.m_diPresent.p_bIn && m_carrier.p_eTransfer == GemCarrierBase.eTransfer.ReadyToLoad)
+                    else if (m_loadport.m_diPlaced.p_bIn && m_loadport.m_diPresent.p_bIn && m_carrier.p_eTransfer == GemCarrierBase.eTransfer.ReadyToUnload)
                     {
                         m_carrier.p_ePresentSensor = GemCarrierBase.ePresent.Empty;
+                        m_OHT.m_bPODExist = false;
                         bStartTD3 = false;
                     }
                 }
@@ -156,50 +160,65 @@ namespace Root_AOP01_Inspection.Module
                         m_OHT.m_bOHTErr = true;
                     }
                 }
-
             }
-            else if (m_OHT.p_eState == OHT_Semi.eState.LU_Req_Off || m_OHT.p_eState == OHT_Semi.eState.Ready_Off)
+            else if (m_OHT.p_eState == OHT_Semi.eState.LU_Req_Off || m_OHT.p_eState == OHT_Semi.eState.Ready_Off/*|| m_OHT.p_eState == OHT_Semi.eState.Ready_Off*/)
             {
                 if (m_carrier.p_eTransfer == GemCarrierBase.eTransfer.ReadyToLoad)
                 {
                     if (m_loadport.m_diPlaced.p_bIn || m_loadport.m_diPresent.p_bIn)
                     {
-                        m_carrier.p_ePresentSensor = GemCarrierBase.ePresent.Empty;
+                        //m_carrier.p_ePresentSensor = GemCarrierBase.ePresent.Empty;
+                        m_OHT.m_bPODExist = false;
                     }
                     else
                     {
-                        m_carrier.p_ePresentSensor = GemCarrierBase.ePresent.Exist;
+                        //m_carrier.p_ePresentSensor = GemCarrierBase.ePresent.Exist;
+                        m_OHT.m_bPODExist = true;
                     }
                 }
                 else if (m_carrier.p_eTransfer == GemCarrierBase.eTransfer.ReadyToUnload)
                 {
                     if (!m_loadport.m_diPlaced.p_bIn || !m_loadport.m_diPresent.p_bIn)
                     {
-                        m_carrier.p_ePresentSensor = GemCarrierBase.ePresent.Exist;
+                        //m_carrier.p_ePresentSensor = GemCarrierBase.ePresent.Exist;
+                        m_OHT.m_bPODExist = true;
                     }
                     else
                     {
-                        m_carrier.p_ePresentSensor = GemCarrierBase.ePresent.Empty;
+                        //m_carrier.p_ePresentSensor = GemCarrierBase.ePresent.Empty;
+                        m_OHT.m_bPODExist = false;
                     }
                 }
             }
-            else
+            /*else if(m_OHT.p_eState == OHT_Semi.eState.Ready_Off)
             {
                 if (m_carrier.p_eTransfer == GemCarrierBase.eTransfer.ReadyToLoad)
                 {
-                    if (!m_loadport.m_diPlaced.p_bIn || !m_loadport.m_diPresent.p_bIn)
-                    {
-                        m_carrier.p_ePresentSensor = GemCarrierBase.ePresent.Exist;
-                    }
-                }
-                else if(m_carrier.p_eTransfer == GemCarrierBase.eTransfer.ReadyToUnload)
-                {
                     if (m_loadport.m_diPlaced.p_bIn || m_loadport.m_diPresent.p_bIn)
                     {
-                        m_carrier.p_ePresentSensor = GemCarrierBase.ePresent.Empty;
+                        //m_carrier.p_ePresentSensor = GemCarrierBase.ePresent.Empty;
+                        m_OHT.m_bPODExist = false;
+                    }
+                    else
+                    {
+                        //m_carrier.p_ePresentSensor = GemCarrierBase.ePresent.Exist;
+                        m_OHT.m_bPODExist = true;
                     }
                 }
-            }
+                else if (m_carrier.p_eTransfer == GemCarrierBase.eTransfer.ReadyToUnload)
+                {
+                    if (!m_loadport.m_diPlaced.p_bIn || !m_loadport.m_diPresent.p_bIn)
+                    {
+                        //m_carrier.p_ePresentSensor = GemCarrierBase.ePresent.Exist;
+                        m_OHT.m_bPODExist = true;
+                    }
+                    else
+                    {
+                        //m_carrier.p_ePresentSensor = GemCarrierBase.ePresent.Empty;
+                        m_OHT.m_bPODExist = false;
+                    }
+                }
+            }*/
 
             if(m_loadport.p_infoCarrier.p_eReqAccessLP == GemCarrierBase.eAccessLP.Manual)
             {
@@ -211,7 +230,8 @@ namespace Root_AOP01_Inspection.Module
                 //{
                 //    m_carrier.p_ePresentSensor = GemCarrierBase.ePresent.Exist;
                 //}
-                blockTransferState.Text = "TransferBlocked";
+                //blockTransferState.Text = "TransferBlocked";
+                m_carrier.p_eTransfer = GemCarrierBase.eTransfer.TransferBlocked; //KHD 210317
             }
             bool bPodIn = p_bBlink ? !m_loadport.m_diPlaced.p_bIn : !m_loadport.m_diPresent.p_bIn;
             imageInPod.Visibility = bPodIn ? Visibility.Visible : Visibility.Hidden;
@@ -268,11 +288,11 @@ namespace Root_AOP01_Inspection.Module
                 {
                     if(bProtectError)
                     {
-                        if ((!m_loadport.m_diPlaced.p_bIn || !m_loadport.m_diPresent.p_bIn) && m_OHT.p_eState == OHT_Semi.eState.All_Off)
+                        if ((m_loadport.m_diPlaced.p_bIn || m_loadport.m_diPresent.p_bIn) && m_OHT.p_eState == OHT_Semi.eState.All_Off)
                         {
                             m_carrier.p_eTransfer = GemCarrierBase.eTransfer.ReadyToLoad;
                         }
-                        else if((m_loadport.m_diPlaced.p_bIn && m_loadport.m_diPresent.p_bIn) && m_OHT.p_eState == OHT_Semi.eState.All_Off)
+                        else if((!m_loadport.m_diPlaced.p_bIn && !m_loadport.m_diPresent.p_bIn) && m_OHT.p_eState == OHT_Semi.eState.All_Off)
                         {
                             m_carrier.p_eTransfer = GemCarrierBase.eTransfer.ReadyToUnload;
                         }
@@ -361,11 +381,12 @@ namespace Root_AOP01_Inspection.Module
             m_OHT.m_doReady.p_bOn = false;
             m_OHT.p_sInfo = "";
             m_OHT.m_bOHTErr = false;
-            if (!m_loadport.m_bPlaced && m_OHT.p_eState == OHT_Semi.eState.All_Off)
+            m_OHT.p_eState = OHT_Semi.eState.All_Off;
+            if (!m_OHT.m_bPODExist && m_OHT.p_eState == OHT_Semi.eState.All_Off)
             {
                 m_carrier.p_eTransfer = GemCarrierBase.eTransfer.ReadyToLoad;
             }
-            else if (m_loadport.m_bPlaced && m_OHT.p_eState == OHT_Semi.eState.All_Off)
+            else if (m_OHT.m_bPODExist && m_OHT.p_eState == OHT_Semi.eState.All_Off)
             {
                 m_carrier.p_eTransfer = GemCarrierBase.eTransfer.ReadyToUnload;
             }

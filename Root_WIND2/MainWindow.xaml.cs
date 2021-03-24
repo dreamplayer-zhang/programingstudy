@@ -47,12 +47,14 @@ namespace Root_WIND2
 
         private void Window_Closing(object sender, CancelEventArgs e)
         {
+
             ThreadStop();
 
             //GlobalObjects.Instance.Get<InspectionManagerFrontside>().Exit();
             //GlobalObjects.Instance.Get<InspectionManagerBackside>().Exit();
 
             GlobalObjects.Instance.Clear();
+            Application.Current.Shutdown();
             //GlobalObjects.Instance.Get<InspectionManagerEdge>().Exit();
             //GlobalObjects.Instance.Get<InspectionManagerEBR>().Exit();
 
@@ -145,7 +147,7 @@ namespace Root_WIND2
             SettingItem_Database frontSettings = GlobalObjects.Instance.Get<Settings>().GetItem<SettingItem_Database>();
             ///////시연용 임시코드
             DatabaseManager.Instance.SetDatabase(1, frontSettings.SerevrName, frontSettings.DBName, frontSettings.DBUserID, frontSettings.DBPassword);
-            //DatabaseManager.Instance.ValidateDatabase();
+            DatabaseManager.Instance.ValidateDatabase();
             //////
 
             logView.Init(LogView._logView);

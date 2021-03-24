@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 
 namespace RootTools_Vision
 {
+    [Serializable]
     public class WorkDoneAllEventArgs : EventArgs
     {
         public WorkDoneAllEventArgs()
@@ -14,7 +15,7 @@ namespace RootTools_Vision
             
         }
     }
-
+    [Serializable]
     public class PositionDoneEventArgs : EventArgs
     {
         public readonly CPoint ptOldStart;
@@ -53,7 +54,7 @@ namespace RootTools_Vision
             this.listRect = _rect;
         }
     }
-
+    [Serializable]
     public class ProcessDefectDoneEventArgs : EventArgs
     {
         public ProcessDefectDoneEventArgs()
@@ -61,7 +62,7 @@ namespace RootTools_Vision
 
         }
     }
-
+    [Serializable]
     public class IntegratedProcessDefectDoneEventArgs : EventArgs
     {
         public IntegratedProcessDefectDoneEventArgs()
@@ -69,7 +70,7 @@ namespace RootTools_Vision
 
         }
     }
-
+    [Serializable]
     public class ProcessDefectWaferStartEventArgs : EventArgs
     {
         public ProcessDefectWaferStartEventArgs()
@@ -77,7 +78,7 @@ namespace RootTools_Vision
 
         }
     }
-
+    [Serializable]
     public class ProcessDefectEdgeDoneEventArgs : EventArgs
     {
         public ProcessDefectEdgeDoneEventArgs()
@@ -85,7 +86,7 @@ namespace RootTools_Vision
 
         }
     }
-
+    [Serializable]
     public class ProcessMeasurementDoneEventArgs : EventArgs
     {
         public ProcessMeasurementDoneEventArgs()
@@ -93,7 +94,7 @@ namespace RootTools_Vision
 
         }
     }
-
+    [Serializable]
     public class UIRedrawEventArgs : EventArgs
     {
         public UIRedrawEventArgs()
@@ -102,31 +103,47 @@ namespace RootTools_Vision
         }
     }
 
+    [Serializable]
     public class WorkplaceStateChangedEventArgs : EventArgs
     {
         public readonly Workplace workplace;
+        public readonly WorkplaceBundle workplaceBundle;
 
         public WorkplaceStateChangedEventArgs(Workplace _workplace)
         {
             this.workplace = _workplace;
+            this.workplaceBundle = new WorkplaceBundle();
+        }
+
+        public WorkplaceStateChangedEventArgs(Workplace _workplace, WorkplaceBundle _workplaceBundle)
+        {
+            this.workplace = _workplace;
+            this.workplaceBundle = _workplaceBundle;
         }
     }
-
+    [Serializable]
     public class RequestStopEventArgs : EventArgs
     {
         public RequestStopEventArgs()
         {
         }
     }
-
+    [Serializable]
     public class InspectionStartArgs : EventArgs
     {
+        public readonly WorkplaceBundle workplaceBundle;
         public InspectionStartArgs()
         {
+            this.workplaceBundle = new WorkplaceBundle();
+        }
+
+        public InspectionStartArgs(WorkplaceBundle workplaceBundle)
+        {
+            this.workplaceBundle = workplaceBundle;
         }
     }
 
-    ///
+    [Serializable]
     public class MemoryIDArgs : EventArgs
     {
         public readonly MemoryID MemoryID;
@@ -137,6 +154,7 @@ namespace RootTools_Vision
         }
     }
 
+    [Serializable]
     public class LogArgs : EventArgs
     {
         public readonly LOG_MESSAGE_TYPE type;

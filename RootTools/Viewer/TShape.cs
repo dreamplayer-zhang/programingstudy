@@ -235,7 +235,20 @@ namespace RootTools
 
         }
 
-        public void SetData()
+		public TRect(TRect rect)
+		{
+            this.CanvasRect = rect.CanvasRect;
+            this.Data = new List<PointLine>(rect.Data);
+            this.FillBrush = rect.FillBrush;
+            this.isSelected = rect.isSelected;
+            this.MemoryRect = new CRect(rect.MemoryRect);
+            this.MemPointBuffer = new CPoint(rect.MemPointBuffer);
+            this.ModifyTool = rect.ModifyTool;
+            this.Tag = rect.Tag;
+            this.UIElement = rect.UIElement;
+        }
+
+		public void SetData()
         {
             Data = new List<PointLine>();
             for (int y = MemoryRect.Top; y < MemoryRect.Bottom+1; y++)

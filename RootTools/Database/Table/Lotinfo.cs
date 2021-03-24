@@ -38,8 +38,10 @@ namespace RootTools.Database
         }
 
 
-        public void SetLotinfo(string lotid, string partid, string setupid, string cstid, string waferid, string recipeid)
+        public void SetLotinfo(DateTime inspectionstart, DateTime inspectionend, string lotid, string partid, string setupid, string cstid, string waferid, string recipeid)
         {
+            InspectionStart = inspectionstart;
+            InspectionEnd = inspectionend;
             sLotID = lotid;
             sPartID = partid;
             sSetupID = setupid;

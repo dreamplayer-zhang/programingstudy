@@ -23,7 +23,7 @@ using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
 using RootTools.Database;
 
-namespace RootTools_Vision
+namespace RootTools_Vision  
 {
     /// <summary>
     /// MainWindow.xaml에 대한 상호 작용 논리
@@ -41,6 +41,11 @@ namespace RootTools_Vision
             InitializeComponent();
 
             DataContext = new MainWindow_ViewModel();
+        }
+
+        private void Window_Closed(object sender, EventArgs e)
+        {
+
         }
     }
 }

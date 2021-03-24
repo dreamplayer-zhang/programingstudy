@@ -114,10 +114,10 @@ namespace Root_CAMELLIA
             {
                 if (child.p_infoWafer != null)
                 {
-                    if (child.IsWaferExist(0) == false)
+                    if (!child.p_id.Contains("Loadport"))
                     {
-                        child.SetAlarm();
-                        return false;
+                        if (child.IsWaferExist(0) == false) return false;
+                        if (child.IsWaferExist(0) == true) return true;
                     }
                 }
                 else if (child.p_infoWafer == null)
@@ -130,6 +130,10 @@ namespace Root_CAMELLIA
                             return false;
                         }
                     }
+                }
+                else if(child.p_infoWafer != null)
+                {
+                    
                 }
             }
             return iWTR.IsEnableRecovery();
@@ -271,11 +275,8 @@ namespace Root_CAMELLIA
         public bool m_bIsPossible_Recovery = false;
         public string StateHome()
         {
-            //string sInfo = StateHome(m_moduleList.m_aModule);
-            //if (sInfo == "OK")
-            //    EQ.p_eState = EQ.eState.Ready;
-            //return sInfo;
-            m_HomeProgress.HomeProgressShow();
+            m_HomeProgress.Reset();
+            m_HomeProgress.HomeProgressShow(); // 여기 수정필요
             string sInfo = StateHome(m_wtr);
             if(sInfo != "OK")
             {
@@ -289,6 +290,34 @@ namespace Root_CAMELLIA
             {
                 m_gem.DeleteAllJobInfo();
             }
+
+            IWTR iWTR = (IWTR)m_wtr;
+            foreach (IWTRChild child in iWTR.p_aChild)
+            {
+                if (child.p_infoWafer != null)
+                {
+                    if (!child.p_id.Contains("Loadport"))
+                    {
+                        if (child.IsWaferExist(0) == false)
+                        {
+                            child.SetAlarm();
+                            return "Wafer Check Error";
+                        }
+                    }
+                }
+                else if (child.p_infoWafer == null)
+                {
+                    if (!child.p_id.Contains("Loadport"))
+                    {
+                        if (child.IsWaferExist(0) == true)
+                        {
+                            child.SetAlarm();
+                            return "Wafer Check Error";
+                        }
+                    }
+                }
+            }
+
             return sInfo;
         }
 

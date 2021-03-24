@@ -159,15 +159,15 @@
                 </Grid>
                 <StackPanel Grid.Row="1" Orientation="Horizontal">
                     <Label Content=" "/>
-                    <Label x:Name="lableALID" Content="{Binding p_nID}" ToolTip="ALID" Foreground="White" FontSize="20"/>
-                    <Label x:Name="lableModule" Content="{Binding p_sModule}" ToolTip="Module" Foreground="White" FontSize="20"/>
-                    <Label x:Name="lableDesc" Content="{Binding p_sDesc}" ToolTip="Description" Foreground="White" FontSize="20"/>
+                    <Label x:Name="lableALID" Content="{Binding p_nID}" ToolTip="ALID" Foreground="Black" FontSize="20"/>
+                    <Label x:Name="lableModule" Content="{Binding p_sModule}" ToolTip="Module" Foreground="Black" FontSize="20"/>
+                    <Label x:Name="lableDesc" Content="{Binding p_sDesc}" ToolTip="Description" Foreground="Black" FontSize="20"/>
                 </StackPanel>
                 <Grid Grid.Row="2" Background="AliceBlue">
                 </Grid>
                 <Grid Grid.Row="3" >
                     <StackPanel Grid.Row="1" Orientation="Horizontal">
-                        <Label x:Name="lableMsg" Content="{Binding p_sMsg}" ToolTip="Message" Foreground="White" FontSize="20" />
+                        <Label x:Name="lableMsg" Content="{Binding p_sMsg}" ToolTip="Message" Foreground="Black" FontSize="20" />
                     </StackPanel>
                 </Grid>
             </Grid>

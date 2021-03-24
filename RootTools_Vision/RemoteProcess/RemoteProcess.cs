@@ -16,6 +16,16 @@ namespace RootTools_Vision
         Slave
     }
 
+    public enum REMOTE_PROCESS_STATE
+    {
+        None = 0,
+        Start,
+        Sync,
+        ReadyWork,
+        Working,
+        WorkDone,
+    }
+
     public class RemoteProcess
     {
         public event PipeCommMessageReceivedHandler MessageReceived;
@@ -25,6 +35,8 @@ namespace RootTools_Vision
         #region [Members]
 
         REMOTE_MODE mode;
+
+        REMOTE_PROCESS_STATE processState = REMOTE_PROCESS_STATE.None;
         //Process process;
         private string processName = "RootTools_Vision";
         private PipeComm pipeComm = null;
@@ -32,6 +44,17 @@ namespace RootTools_Vision
         int timeoutMillisecond;
 
         #endregion
+
+        public string ProcessName
+        {
+            get => this.processName;
+        }
+
+        public REMOTE_PROCESS_STATE ProcessState
+        {
+            get => this.processState;
+            set => this.processState = value;
+        }
 
         public RemoteProcess(REMOTE_MODE _mode = REMOTE_MODE.None, string moduleName = "module", int timeoutMillisecond = 3000)
         {
@@ -161,6 +184,25 @@ namespace RootTools_Vision
 
         #region [Process]
 
+        public void StartProcess()
+        {
+            ExitProcess();
+
+            Process[] processes = Process.GetProcessesByName(this.processName);
+            string startPath = this.processName + ".exe";
+            Process.Start(startPath);
+          
+        }
+
+        public bool CheckProcess()
+        {
+            Process[] processes = Process.GetProcessesByName(this.processName);
+            if (processes.Length == 1)
+                return true;
+            else
+                return false;
+        }
+
         public void Exit()
         {
             ExitPipe();
@@ -173,7 +215,14 @@ namespace RootTools_Vision
             {
                 if (prc.ProcessName.StartsWith(processName))
                 {
-                    prc.Kill();
+                    try
+                    {
+                        prc.Kill();
+                    }
+                    catch
+                    {
+
+                    }
                 }
             }
         }

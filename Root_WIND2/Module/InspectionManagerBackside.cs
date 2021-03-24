@@ -48,6 +48,8 @@ namespace Root_WIND2
 
         private new void Start()
         {
+            DateTime inspectionStart = DateTime.Now;
+            DateTime inspectionEnd = DateTime.Now;
             string lotId = "Lotid";
             string partId = "Partid";
             string setupId = "SetupID";
@@ -56,7 +58,7 @@ namespace Root_WIND2
             //string sRecipe = "RecipeID";
             string recipeName = recipe.Name;
 
-            DatabaseManager.Instance.SetLotinfo(lotId, partId, setupId, cstId, waferId, recipeName);
+            DatabaseManager.Instance.SetLotinfo(inspectionStart, inspectionEnd, lotId, partId, setupId, cstId, waferId, recipeName);
 
             base.Start();
         }
@@ -99,7 +101,7 @@ namespace Root_WIND2
             surface.SetParameter(param);
 
             ProcessDefect processDefect = new ProcessDefect();
-            ProcessDefect_Backside processDefect_Backside = new ProcessDefect_Backside();
+            ProcessDefect_Backside processDefect_Backside = new ProcessDefect_Backside("defect");
 
 
             workBundle.Add(alignment);

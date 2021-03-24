@@ -89,6 +89,7 @@ namespace Root_Rinse_Unloader.Module
             {
                 m_aPicker[n].m_dioVacuum.Write(bOn);
             }
+            //if (!bOn) Thread.Sleep((int)(1000 * m_secBlow));
             Thread.Sleep(200);
             //if (bOn) Thread.Sleep((int)(1000 * m_secVac));
             //else
@@ -146,6 +147,45 @@ namespace Root_Rinse_Unloader.Module
         }
         #endregion
 
+        #region Tact Time
+        double _secTact = 0;
+        public double p_secTact
+        {
+            get { return _secTact; }
+            set
+            {
+                _secTact = value;
+                OnPropertyChanged();
+            }
+        }
+
+        double _secAveTact = 0;
+        public double p_secAveTact
+        {
+            get { return _secAveTact; }
+            set
+            {
+                _secAveTact = value;
+                OnPropertyChanged();
+            }
+        }
+
+        List<double> m_aTact = new List<double>();
+        StopWatch m_swTact = new StopWatch();
+        void CheckTact()
+        {
+            double secTact = m_swTact.ElapsedMilliseconds / 1000.0;
+            m_swTact.Start();
+            m_aTact.Add(secTact);
+            if (m_aTact.Count <= 1) return;
+            p_secTact = secTact;
+            double secSum = 0;
+            for (int n = 1; n < m_aTact.Count; n++) secSum += m_aTact[n];
+            p_secAveTact = secSum / (m_aTact.Count - 1);
+            while (m_aTact.Count > 4) m_aTact.RemoveAt(0);
+        }
+        #endregion
+
         #region Run Load
         public string RunLoad()
         {
@@ -157,8 +197,9 @@ namespace Root_Rinse_Unloader.Module
                 Thread.Sleep(10);
                 if (EQ.IsStop()) return "EQ Stop"; 
             }
-            if (Run(RunPickerDown(true))) return p_sInfo;
             if (Run(RunVacuum(true))) return p_sInfo;
+            if (Run(RunPickerDown(true))) return p_sInfo;
+            Thread.Sleep((int)(1000 * m_secVac));
             if (Run(RunPickerDown(false))) return p_sInfo;
             if (Run(RunCheckStrip())) return p_sInfo;
             m_roller.p_eStep = Roller.eStep.Empty;
@@ -180,6 +221,7 @@ namespace Root_Rinse_Unloader.Module
                 if (Run(MoveLoader(ePos.Stotage))) return p_sInfo;
                 //if (Run(RunPickerDown(true))) return p_sInfo;
                 if (Run(RunVacuum(false))) return p_sInfo;
+                m_rinse.CheckTact(); 
                 //if (Run(RunPickerDown(false))) return p_sInfo;
                 if (Run(MoveLoader(ePos.Roller))) return p_sInfo;
                 m_storage.StartMoveStackReady();
@@ -200,10 +242,12 @@ namespace Root_Rinse_Unloader.Module
         public string RunCheckStrip()
         {
             string sResult = "OK";
-            foreach(Roller.Line line in m_roller.m_aLine)
+            foreach (Roller.Line line in m_roller.m_aLine)
             {
-                if(line.m_diCheck[2].p_bIn)
+                if (line.m_diCheck[2].p_bIn)
                 {
+                    EQ.p_bStop = true;
+                    EQ.p_eState = EQ.eState.Error; 
                     m_alidRollerStripCheck.p_bSet = true;
                     return "Roller Check Strip";
                 }
@@ -223,8 +267,18 @@ namespace Root_Rinse_Unloader.Module
             RunPickerDown(false);
             RunVacuum(false); 
             p_sInfo = base.StateHome();
-            p_eState = (p_sInfo == "OK") ? eState.Ready : eState.Error;
-            m_axis.StartMove(ePos.Roller); 
+            //p_eState = (p_sInfo == "OK") ? eState.Ready : eState.Error;
+            //m_axis.StartMove(ePos.Roller); 
+            if(p_sInfo == "OK")
+            {
+                Thread.Sleep(200);
+                //if (Run(m_axis.StartMove(ePos.Roller)))
+                //{
+                //    p_eState = eState.Error;
+                //    return p_sInfo;
+                //}
+                p_eState = eState.Ready;
+            }
             return p_sInfo;
         }
 

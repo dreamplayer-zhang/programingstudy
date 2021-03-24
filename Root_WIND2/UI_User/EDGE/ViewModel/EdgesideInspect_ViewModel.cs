@@ -83,8 +83,9 @@ namespace Root_WIND2.UI_User
 				this.ImageViewerSideVM.ClearObjects();
 				this.ImageViewerBtmVM.ClearObjects();
 				Progress = 0;
-				//MaxProgress = GlobalObjects.Instance.Get<InspectionManagerEdge>().GetWorkplaceCount();
-				Inspect();
+
+				if (GlobalObjects.Instance.Get<InspectionManagerEdge>() != null)
+					GlobalObjects.Instance.Get<InspectionManagerEdge>().Start();
 			});
 		}
 
@@ -92,7 +93,16 @@ namespace Root_WIND2.UI_User
 		{
 			get => new RelayCommand(() =>
 			{
-				Scan();
+				EQ.p_bStop = false;
+				EdgeSideVision edgeSideVision = ((WIND2_Handler)GlobalObjects.Instance.Get<WIND2_Engineer>().ClassHandler()).p_EdgeSideVision;
+				if (edgeSideVision.p_eState != ModuleBase.eState.Ready)
+				{
+					MessageBox.Show("Vision Home이 완료 되지 않았습니다.");
+					return;
+				}
+
+				Run_GrabEdge grab = (Run_GrabEdge)edgeSideVision.CloneModuleRun("GrabEdge");
+				edgeSideVision.StartRun(grab);
 			});
 		}
 
@@ -100,7 +110,8 @@ namespace Root_WIND2.UI_User
 		{
 			get => new RelayCommand(() =>
 			{
-				
+				if (GlobalObjects.Instance.Get<InspectionManagerEdge>() != null)
+					GlobalObjects.Instance.Get<InspectionManagerEdge>().Stop();
 			});
 		}
 
@@ -132,26 +143,6 @@ namespace Root_WIND2.UI_User
 				GlobalObjects.Instance.Get<InspectionManagerEdge>().InspectionDone += WorkEventManager_InspectionDone;
 				GlobalObjects.Instance.Get<InspectionManagerEdge>().IntegratedProcessDefectDone += WorkEventManager_IntegratedProcessDefectDone;
 			}
-		}
-
-		public void Scan()
-		{
-			EQ.p_bStop = false;
-			EdgeSideVision edgeSideVision = ((WIND2_Handler)GlobalObjects.Instance.Get<WIND2_Engineer>().ClassHandler()).p_EdgeSideVision;
-			if (edgeSideVision.p_eState != ModuleBase.eState.Ready)
-			{
-				MessageBox.Show("Vision Home이 완료 되지 않았습니다.");
-				return;
-			}
-
-			Run_GrabEdge grab = (Run_GrabEdge)edgeSideVision.CloneModuleRun("GrabEdge");
-			edgeSideVision.StartRun(grab);
-		}
-
-		public void Inspect()
-		{
-			if (GlobalObjects.Instance.Get<InspectionManagerEdge>() != null)
-				GlobalObjects.Instance.Get<InspectionManagerEdge>().Start();
 		}
 
 		private void WorkEventManager_InspectionDone(object sender, InspectionDoneEventArgs e)

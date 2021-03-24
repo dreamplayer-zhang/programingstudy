@@ -15,7 +15,7 @@ namespace RootTools_Vision
     /// - 기존에 WorkplaceBudnle 0번에 MasterWorkplace(MapIndex가 모두 -1)을 자동으로 생성하게 했으나
     ///   개발자가 직접 CreateWorkplaceBundle 메서드를 구현하여 사용에 맞게끔 생성하도록 변경
     /// </history>
-    public class WorkplaceBundle : ObservableCollection<Workplace>, ISerializable
+    public class WorkplaceBundle : ObservableCollection<Workplace>
     {
         #region [Members]
         private int sizeX;
@@ -35,23 +35,23 @@ namespace RootTools_Vision
             set => this.sizeY = value;
         }
 
-        public WorkplaceBundle() { }        
+        //public WorkplaceBundle() { }        
 
-        public WorkplaceBundle(SerializationInfo info, StreamingContext context)
-        {
-            WorkplaceBundle wb = (WorkplaceBundle)info.GetValue("workplaceList", typeof(WorkplaceBundle));
-            this.sizeX = wb.sizeX;
-            this.sizeY = wb.sizeY;
-            foreach(Workplace wp in wb)
-            {
-                this.Add(wp);
-            }
-        }
+        //public WorkplaceBundle(SerializationInfo info, StreamingContext context)
+        //{
+        //    WorkplaceBundle wb = (WorkplaceBundle)info.GetValue("workplaceList", typeof(WorkplaceBundle));
+        //    this.sizeX = wb.sizeX;
+        //    this.sizeY = wb.sizeY;
+        //    foreach(Workplace wp in wb)
+        //    {
+        //        this.Add(wp);
+        //    }
+        //}
 
-        public void GetObjectData(SerializationInfo info, StreamingContext context)
-        {
-            info.AddValue("workplaceList", this);
-        }
+        //public void GetObjectData(SerializationInfo info, StreamingContext context)
+        //{
+        //    info.AddValue("workplaceList", this);
+        //}
         #endregion
 
         /// <summary>

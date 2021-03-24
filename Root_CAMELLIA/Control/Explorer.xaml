@@ -5,7 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Root_CAMELLIA"
              mc:Ignorable="d" 
-             d:DesignHeight="800" d:DesignWidth="800" Loaded="UserControl_Loaded">
+             d:DesignHeight="800" d:DesignWidth="400">
     <Grid Background="White">
         <Grid.RowDefinitions>
             <RowDefinition Height="30"/>
@@ -19,7 +19,7 @@
                         <ColumnDefinition/>
                     </Grid.ColumnDefinitions>
                     <UniformGrid Grid.Row="0" Columns="4">
-                        <Button Margin="1" Content="Refresh" Click="Button_Click"></Button>
+                        <Button Margin="1" Content="Refresh" Command="{Binding CmdRefresh}" ></Button>
                     </UniformGrid>
                 </Grid>
             </Border>
@@ -27,10 +27,9 @@
         <Grid Grid.Row="1" Grid.ColumnSpan="2">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="2*"/>
             </Grid.ColumnDefinitions>
             <GroupBox Header="Explorer">
-                <TreeView x:Name="ExplorerTree" Grid.Column="0" Margin="5" BorderBrush="Black" BorderThickness="1">
+                <TreeView x:Name="ExplorerTree" Grid.Column="0" Margin="5" BorderBrush="Black" BorderThickness="1"  ItemsSource="{Binding p_collection}">
                     <TreeView.Resources>
                         <Style TargetType="{x:Type local:ImageTreeViewItem}">
                             <Setter Property="HeaderTemplate">
@@ -47,13 +46,6 @@
                         </Style>
                     </TreeView.Resources>
                 </TreeView>
-            </GroupBox>
-            <GroupBox Grid.Column="1" Header="Data">
-                <Grid>
-                    <ListBox BorderBrush="Black" BorderThickness="1" Margin="5">
-
-                    </ListBox>
-                </Grid>
             </GroupBox>
         </Grid>
     </Grid>

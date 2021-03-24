@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace RootTools_Vision
 {
-    public enum REMOTE_PROCESS_TYPE
+    public enum REMOTE_PROCESS_MESSAGE_TYPE
     {
         StartSync,
         EndSync,
@@ -27,6 +27,8 @@ namespace RootTools_Vision
 
         DefectList,
         InspectionDone,
+        IntergratedProcessDefectDone,
+        WorkplaceStateChanged,
         //
         StartRemote,
         StartCreateCloneFactory,

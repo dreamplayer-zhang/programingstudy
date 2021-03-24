@@ -62,6 +62,10 @@ namespace Root_CAMELLIA.LibSR_Met
                             DrawCountGraph("Wavelength [nm]", "Counts", Wavelength, SpectrumData, nNumOfSpectrum);
                         }
                     }
+                    else
+                    {
+                        m_bUpdate = false;
+                    }
                 }
             }
         }

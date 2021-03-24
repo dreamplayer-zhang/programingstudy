@@ -57,7 +57,7 @@ namespace RootTools_Vision
 	public class EdgeSurfaceRecipeBase : ObservableObject
 	{
 		#region [Parameter]
-		private string grabModeName;
+		private int grabModeIndex;
 		// Camera
 		private int cameraWidth;
 		private int cameraHeight;
@@ -72,10 +72,10 @@ namespace RootTools_Vision
 		#endregion
 
 		#region [Getter Setter]
-		public string GrabModeName
+		public int GrabModeIndex
 		{
-			get => this.grabModeName;
-			set => SetProperty<string>(ref this.grabModeName, value);
+			get => this.grabModeIndex;
+			set => SetProperty<int>(ref this.grabModeIndex, value);
 		}
 		public int CameraWidth
 		{
