@@ -285,7 +285,7 @@ namespace Root_WIND2
                     InspectionManagerBackside inspectionBack = GlobalObjects.Instance.Register<InspectionManagerBackside>
                     (
                     recipeBack,
-                    new SharedBufferInfo(frontImage.GetPtr(0), frontImage.p_Size.X, frontImage.p_Size.Y, frontImage.GetBytePerPixel(), frontImage.GetPtr(1), frontImage.GetPtr(2))
+                    new SharedBufferInfo(backImage.GetPtr(0), backImage.p_Size.X, backImage.p_Size.Y, backImage.GetBytePerPixel(), backImage.GetPtr(1), backImage.GetPtr(2))
                     );
                 }
 

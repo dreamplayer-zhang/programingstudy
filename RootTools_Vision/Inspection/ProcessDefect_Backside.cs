@@ -77,7 +77,10 @@ namespace RootTools_Vision
 
             //Workplace displayDefect = new Workplace();
             foreach (Defect defect in MergeDefectList)
+            {
+                if (this.currentWorkplace.DefectList == null) continue;
                 this.currentWorkplace.DefectList.Add(defect);
+            }
 
             string sInspectionID = DatabaseManager.Instance.GetInspectionID();
             Tools.SaveDefectImage(Path.Combine(DefectImagePath, sInspectionID), MergeDefectList, this.currentWorkplace.SharedBufferInfo, this.currentWorkplace.SharedBufferInfo.ByteCnt);
