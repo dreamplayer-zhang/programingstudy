@@ -113,7 +113,7 @@ namespace RootTools_Vision
 
                 //Tools.SaveTiffImage(settings_backside.KlarfSavePath, MergeDefectList, this.currentWorkplace.SharedBufferInfo);
                 
-                Tools.SaveImageJpg(this.currentWorkplace.SharedBufferInfo, new Rect(0, 0, 3000, 3000), settings_backside.KlarfSavePath + "\\" + DateTime.Now.ToString("yyyyMMddhhmmss") + "_backside.jpg", (long)(settings_backside.WholeWaferImageCompressionRate * 100));
+                //Tools.SaveImageJpg(this.currentWorkplace.SharedBufferInfo, new Rect(0, 0, 3000, 3000), settings_backside.KlarfSavePath + "\\" + DateTime.Now.ToString("yyyyMMddhhmmss") + "_backside.jpg", (long)(settings_backside.WholeWaferImageCompressionRate * 100));
             }
 
 
