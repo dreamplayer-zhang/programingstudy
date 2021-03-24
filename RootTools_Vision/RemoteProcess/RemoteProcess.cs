@@ -186,14 +186,12 @@ namespace RootTools_Vision
 
         public void StartProcess()
         {
-            Process[] processes = Process.GetProcessesByName(this.processName);
-            if(processes.Length != 1)
-            {
-                ExitProcess();
+            ExitProcess();
 
-                string startPath = this.processName + ".exe";
-                Process.Start(startPath);
-            }            
+            Process[] processes = Process.GetProcessesByName(this.processName);
+            string startPath = this.processName + ".exe";
+            Process.Start(startPath);
+          
         }
 
         public bool CheckProcess()
@@ -217,7 +215,14 @@ namespace RootTools_Vision
             {
                 if (prc.ProcessName.StartsWith(processName))
                 {
-                    prc.Kill();
+                    try
+                    {
+                        prc.Kill();
+                    }
+                    catch
+                    {
+
+                    }
                 }
             }
         }

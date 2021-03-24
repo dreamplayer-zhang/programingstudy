@@ -26,6 +26,7 @@ using Point = System.Windows.Point;
 using Rectangle = System.Windows.Shapes.Rectangle;
 using Size = System.Windows.Size;
 using System.Collections;
+using System.Reflection;
 
 namespace Root_WIND2
 {
@@ -33,6 +34,9 @@ namespace Root_WIND2
     {
         RecipeBase recipe;
         List<Defect> m_ReviewDefectlist;
+
+        private DateTime _selectedStartDate;
+        private DateTime _selectedEndDate;
 
         private ObservableCollection<UIElement> m_Element = new ObservableCollection<UIElement>();
         public ObservableCollection<UIElement> p_Element
@@ -52,6 +56,9 @@ namespace Root_WIND2
         public Review_ViewModel(Review review)
         {
             init();
+
+            _selectedStartDate = DateTime.Now.Date;
+            _selectedEndDate = DateTime.Now.Date;
         }
         public void init()
         {
@@ -168,19 +175,22 @@ namespace Root_WIND2
                 if (selectedRow != null)
                 {
                     //string sInspectionID = (string)selectedRow.Row.ItemArray[0]; // Temp
+                    FieldInfo[] lotinfoFieldInfos = null;
+                    Type lotinfoType = typeof(Lotinfo);
+                    lotinfoFieldInfos = lotinfoType.GetFields(BindingFlags.Instance | BindingFlags.Public);
 
                     try
                     {
-                        string sInspectionID = (string)GetDataGridItem(lotinfo_Datatable, selectedRow, "INSPECTIONID");
+                        string sInspectionID = (string)GetDataGridItem(lotinfo_Datatable, selectedRow, lotinfoFieldInfos[2].Name);
                         string sReicpePath = @"C:\Root\Recipe";
-                        string sRecipeID = (string)GetDataGridItem(lotinfo_Datatable, selectedRow, "RECIPEID");
+                        string sRecipeID = (string)GetDataGridItem(lotinfo_Datatable, selectedRow, lotinfoFieldInfos[6].Name);
                         string sReicpeFileName = sRecipeID + ".rcp";
                         recipe.Read(Path.Combine(sReicpePath, sRecipeID, sReicpeFileName));
                         m_DefectView.SetRecipe(recipe);
                         DisplayDefectData(sInspectionID);
 
                         m_DefectView.tbRcpName.Text = sRecipeID.ToString();
-                        m_DefectView.tbWaferID.Text = (string)GetDataGridItem(lotinfo_Datatable, selectedRow, "WAFERID");
+                        m_DefectView.tbWaferID.Text = (string)GetDataGridItem(lotinfo_Datatable, selectedRow, lotinfoFieldInfos[5].Name);
                         m_DefectView.tbTotalCnt.Text = m_ReviewDefectlist.Count.ToString() + " (EA)";
                         m_DefectView.tb_EdgeCnt.Text = m_ReviewDefectlist.Count.ToString() + " (EA)";
                     }
@@ -203,9 +213,13 @@ namespace Root_WIND2
                 DataRowView selectedRow = (DataRowView)pSelected_Defect;
                 if (selectedRow != null)
                 {
+                    FieldInfo[] defectFieldInfos = null;
+                    Type defectType = typeof(Defect);
+                    defectFieldInfos = defectType.GetFields(BindingFlags.Instance | BindingFlags.Public);
+
                     // BMP Open Event
-                    int nIndex = (int)GetDataGridItem(Defect_Datatable, selectedRow, "m_nDefectIndex");
-                    string sInspectionID = (string)GetDataGridItem(Defect_Datatable, selectedRow, "m_strInspectionID");
+                    int nIndex = (int)GetDataGridItem(Defect_Datatable, selectedRow, defectFieldInfos[0].Name);
+                    string sInspectionID = (string)GetDataGridItem(Defect_Datatable, selectedRow, defectFieldInfos[1].Name);
                     string sFileName = nIndex.ToString() + ".bmp";
                     DisplayDefectImage(sInspectionID, sFileName);
 
@@ -580,6 +594,54 @@ namespace Root_WIND2
             }
         }
 
+        bool checkedStartDatetime = false;
+
+        public bool CheckedStartDatetime
+        {
+            get { return checkedStartDatetime; }
+            set
+            {
+                checkedStartDatetime = value;
+            }
+        }
+
+        bool checkedEndDatetime = false;
+        public bool CheckedEndDatetime
+        {
+            get { return checkedEndDatetime; }
+            set
+            {
+                checkedEndDatetime = value;
+            }
+        }
+
+        public DateTime SelectedStartDate
+        {
+            get
+            {
+                return _selectedStartDate;
+            }
+            set
+            {
+                //_selectedStartDate = value;
+                SetProperty(ref _selectedStartDate, value);
+                RaisePropertyChanged("SelectedStartDate");
+            }
+        }
+
+        public DateTime SelectedEndDate
+        {
+            get
+            {
+                return _selectedEndDate;
+            }
+            set
+            {
+                SetProperty(ref _selectedEndDate, value);
+                RaisePropertyChanged("SelectedEndDate");
+            }
+        }
+
         #endregion
 
         #region DataTypeEnum
@@ -617,8 +679,12 @@ namespace Root_WIND2
             if (m_ReviewDefectlist == null)
                 return;
 
-            double relX = (double)GetDataGridItem(Defect_Datatable, selectedRow, "m_fRelX");
-            double relY = (double)GetDataGridItem(Defect_Datatable, selectedRow, "m_fRelY");
+            FieldInfo[] defectFieldInfos = null;
+            Type defectType = typeof(Defect);
+            defectFieldInfos = defectType.GetFields(BindingFlags.Instance | BindingFlags.Public);
+
+            double relX = (double)GetDataGridItem(Defect_Datatable, selectedRow, defectFieldInfos[6].Name);
+            double relY = (double)GetDataGridItem(Defect_Datatable, selectedRow, defectFieldInfos[7].Name);
 
             m_DefectView.DisplaySelectedFrontDefect(m_ReviewDefectlist.Count, relX, relY);
         }
@@ -627,8 +693,12 @@ namespace Root_WIND2
             if (m_ReviewDefectlist == null)
                 return;
 
-            double relX = (double)GetDataGridItem(Defect_Datatable, selectedRow, "m_fRelX");
-            double relY = (double)GetDataGridItem(Defect_Datatable, selectedRow, "m_fRelY");
+            FieldInfo[] defectFieldInfos = null;
+            Type defectType = typeof(Defect);
+            defectFieldInfos = defectType.GetFields(BindingFlags.Instance | BindingFlags.Public);
+
+            double relX = (double)GetDataGridItem(Defect_Datatable, selectedRow, defectFieldInfos[6].Name);
+            double relY = (double)GetDataGridItem(Defect_Datatable, selectedRow, defectFieldInfos[7].Name);
 
             m_DefectView.DisplaySelectedBackDefect(m_ReviewDefectlist.Count, relX, relY);
         }
@@ -637,8 +707,12 @@ namespace Root_WIND2
             if (m_ReviewDefectlist == null)
                 return;
 
-            int index = (int)GetDataGridItem(Defect_Datatable, selectedRow, "m_nDefectIndex");
-            //double absY = (double)GetDataGridItem(Defect_Datatable, selectedRow, "m_fAbsY");
+            FieldInfo[] defectFieldInfos = null;
+            Type defectType = typeof(Defect);
+            defectFieldInfos = defectType.GetFields(BindingFlags.Instance | BindingFlags.Public);
+
+            int index = (int)GetDataGridItem(Defect_Datatable, selectedRow, defectFieldInfos[0].Name);
+            //double absY = (double)GetDataGridItem(Defect_Datatable, selectedRow, defectFieldInfos[9].Name);
             Double absY = 0;
             double theta = CalculateEdgeDefectTheta(absY);
 
@@ -715,7 +789,26 @@ namespace Root_WIND2
         {
             // Lotinfo 갱신
             string sLotInfo = "lotinfo";
-            pLotinfo_Datatable = DatabaseManager.Instance.SelectTable(sLotInfo);
+
+            // Add DateTime Filter
+            if (CheckedStartDatetime && CheckedEndDatetime)
+            {
+                pLotinfo_Datatable = DatabaseManager.Instance.SelectTableDatetime(sLotInfo, SelectedStartDate.ToString("yyyy-MM-dd"), SelectedEndDate.ToString("yyyy-MM-dd"));
+            }
+            else if (CheckedStartDatetime && !CheckedEndDatetime)
+            {
+                pLotinfo_Datatable = DatabaseManager.Instance.SelectTableDatetime(sLotInfo, SelectedStartDate.ToString("yyyy-MM-dd"), null);
+            }
+            else if (!CheckedStartDatetime && CheckedEndDatetime)
+            {
+                pLotinfo_Datatable = DatabaseManager.Instance.SelectTableDatetime(sLotInfo, null, SelectedEndDate.ToString("yyyy-MM-dd"));
+            }
+            // Add Wafer ID Filter
+            // Add Recipe Name Filter
+            else
+            {
+                pLotinfo_Datatable = DatabaseManager.Instance.SelectTable(sLotInfo);
+            }
         }
         public void LoadGoldenImage()
         {
@@ -850,25 +943,29 @@ namespace Root_WIND2
             double fAbsY = 0;
             double fGV = 0;
             int nChipIndexX = 0;
-            int nCHipIndexY = 0;
+            int nChipIndexY = 0;
+
+            FieldInfo[] defectFieldInfos = null;
+            Type defectType = typeof(Defect);
+            defectFieldInfos = defectType.GetFields(BindingFlags.Instance | BindingFlags.Public);
 
             foreach (DataRow dataRow in table.Rows)
             {
                 for (int i = 0; i < table.Columns.Count; i++)
                 {
-                    if (table.Columns[i].ColumnName == "m_nDefectIndex") nDefectIndex = (int)dataRow.ItemArray[i];
-                    else if (table.Columns[i].ColumnName == "m_strInspectionID") sInpectionID = (string)dataRow.ItemArray[i];
-                    else if (table.Columns[i].ColumnName == "m_nDefectCode") nDefectCode = (int)dataRow.ItemArray[i];
-                    else if (table.Columns[i].ColumnName == "m_fSize") fSize = (double)dataRow.ItemArray[i];
-                    else if (table.Columns[i].ColumnName == "m_fWidth") fWidth = (double)dataRow.ItemArray[i];
-                    else if (table.Columns[i].ColumnName == "m_fHeight") fHeight = (double)dataRow.ItemArray[i];
-                    else if (table.Columns[i].ColumnName == "m_fRelX") fRelX = (double)dataRow.ItemArray[i];
-                    else if (table.Columns[i].ColumnName == "m_fRelY") fRelY = (double)dataRow.ItemArray[i];
-                    else if (table.Columns[i].ColumnName == "m_fAbsX") fAbsX = (double)dataRow.ItemArray[i];
-                    else if (table.Columns[i].ColumnName == "m_fAbsY") fAbsY = (double)dataRow.ItemArray[i];
-                    else if (table.Columns[i].ColumnName == "m_fGV") fGV = (double)dataRow.ItemArray[i];
-                    else if (table.Columns[i].ColumnName == "m_nChipIndexX") nChipIndexX = (int)dataRow.ItemArray[i];
-                    else if (table.Columns[i].ColumnName == "m_nChipIndexY") nCHipIndexY = (int)dataRow.ItemArray[i];
+                    if (table.Columns[i].ColumnName == defectFieldInfos[0].Name) nDefectIndex = (int)dataRow.ItemArray[i];
+                    else if (table.Columns[i].ColumnName == defectFieldInfos[1].Name) sInpectionID = (string)dataRow.ItemArray[i];
+                    else if (table.Columns[i].ColumnName == defectFieldInfos[2].Name) nDefectCode = (int)dataRow.ItemArray[i];
+                    else if (table.Columns[i].ColumnName == defectFieldInfos[3].Name) fSize = (double)dataRow.ItemArray[i];
+                    else if (table.Columns[i].ColumnName == defectFieldInfos[4].Name) fWidth = (double)dataRow.ItemArray[i];
+                    else if (table.Columns[i].ColumnName == defectFieldInfos[5].Name) fHeight = (double)dataRow.ItemArray[i];
+                    else if (table.Columns[i].ColumnName == defectFieldInfos[6].Name) fRelX = (double)dataRow.ItemArray[i];
+                    else if (table.Columns[i].ColumnName == defectFieldInfos[7].Name) fRelY = (double)dataRow.ItemArray[i];
+                    else if (table.Columns[i].ColumnName == defectFieldInfos[8].Name) fAbsX = (double)dataRow.ItemArray[i];
+                    else if (table.Columns[i].ColumnName == defectFieldInfos[9].Name) fAbsY = (double)dataRow.ItemArray[i];
+                    else if (table.Columns[i].ColumnName == defectFieldInfos[10].Name) fGV = (double)dataRow.ItemArray[i];
+                    else if (table.Columns[i].ColumnName == defectFieldInfos[11].Name) nChipIndexX = (int)dataRow.ItemArray[i];
+                    else if (table.Columns[i].ColumnName == defectFieldInfos[12].Name) nChipIndexY = (int)dataRow.ItemArray[i];
                 }
 
                 Defect defect = new Defect(sInpectionID
@@ -877,7 +974,7 @@ namespace Root_WIND2
                                             , (float)fWidth, (float)fHeight
                                             , (float)fRelX, (float)fRelY
                                             , (float)fAbsX, (float)fAbsY
-                                            , nChipIndexX, nCHipIndexY);
+                                            , nChipIndexX, nChipIndexY);
                 defect.SetDefectIndex(nDefectIndex);
                 defects.Add(defect);
             }
@@ -918,8 +1015,11 @@ namespace Root_WIND2
                 DefectGVHistogram[0].Values.Clear();
             }
             DataRow[] foundRows;
-            string expression = "m_fGV >= 0";
-            string sortOrder = "m_fGV ASC";
+            FieldInfo[] defectFieldInfos = null;
+            Type defectType = typeof(Defect);
+            defectFieldInfos = defectType.GetFields(BindingFlags.Instance | BindingFlags.Public);
+            string expression = defectFieldInfos[10].Name + " >= 0"; // m_fGV
+            string sortOrder = defectFieldInfos[10].Name + " ASC"; // m_fGV
             foundRows = pDefect_Datatable.Select(expression, sortOrder);
 
             if (foundRows.Length == 0)
@@ -936,7 +1036,7 @@ namespace Root_WIND2
             {
                 foreach (DataRow table in foundRows)
                 {
-                    double gv = (double)table[11];
+                    double gv = (double)(int)table[11];
                     GVHistogram[(int)gv/2]++;
                 }
             }
@@ -944,7 +1044,7 @@ namespace Root_WIND2
             {
                 foreach (DataRow table in foundRows)
                 {
-                    double gv = (double)table[11];
+                    double gv = (double)(int)table[11];
                     if (gvHistogramMode == GVHistogramType.Dark)
                     {
                         if ((int)gv / 2 < binSz)
@@ -990,8 +1090,11 @@ namespace Root_WIND2
                 DefectSizeHistogram[0].Values.Clear();
             }
             DataRow[] foundRows;
-            string expression = "m_fSize >= 0";
-            string sortOrder = "m_fSize ASC";
+            FieldInfo[] defectFieldInfos = null;
+            Type defectType = typeof(Defect);
+            defectFieldInfos = defectType.GetFields(BindingFlags.Instance | BindingFlags.Public);
+            string expression = defectFieldInfos[3].Name + " >= 0"; // m_fSize
+            string sortOrder = defectFieldInfos[3].Name + " ASC"; // m_fSize
             foundRows = pDefect_Datatable.Select(expression, sortOrder);
 
             if (foundRows.Length == 0)

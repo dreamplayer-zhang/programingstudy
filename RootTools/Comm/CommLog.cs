@@ -60,6 +60,7 @@ namespace RootTools.Comm
         {
             try
             {
+                if (sMsg.Length > 256) sMsg = sMsg.Substring(0, 250) + " ...";
                 m_qLog.Enqueue(new LogData(type, sMsg));
                 if (m_log != null)
                 {

@@ -247,7 +247,7 @@ namespace RootTools_Vision
             DebugOutput.PrintWorkplaceBundle(workplaces);
 #endif
 
-            WorkEventManager.OnInspectionStart(this, new InspectionStartArgs());
+            WorkEventManager.OnInspectionStart(this, new InspectionStartArgs(this.workplaceBundle));
 
             foreach (WorkManager wm in this.workManagers)
             {
@@ -301,7 +301,7 @@ namespace RootTools_Vision
                 Debug.WriteLine("[Start]");
                 DebugOutput.PrintWorkplaceBundle(workplaces);
 #endif
-                WorkEventManager.OnInspectionStart(this, new InspectionStartArgs());
+                WorkEventManager.OnInspectionStart(this, new InspectionStartArgs(this.workplaceBundle));
 
                 foreach (WorkManager wm in this.workManagers)
                 {
@@ -360,6 +360,8 @@ namespace RootTools_Vision
             }
 
             this.workManagers.Clear();
+
+            ExitRemoteProcess();
         }
 
         /// <summary>
@@ -694,6 +696,7 @@ namespace RootTools_Vision
                     
                     if (protocol.msg == REMOTE_PROCESS_MESSAGE_TYPE.EndWork.ToString())
                     {
+                        isWorking = false;
                         this.remote.EventChange(PipeCommMessageReceived_Callback);
                         this.remote.ProcessState = REMOTE_PROCESS_STATE.WorkDone;
                         return;
@@ -827,19 +830,19 @@ namespace RootTools_Vision
             //}
         }
 
-        public void RemoteStart(WORK_TYPE initWorkType = WORK_TYPE.NONE)        
+        System.Windows.Forms.Timer timer = null;
+
+        public void RemoteProcessStart(WORK_TYPE initWorkType = WORK_TYPE.NONE)        
         {
             if (this.remoteMode != REMOTE_MODE.Master) return;
 
             // Master 쪽 시퀀스임
 
             this.remote.ProcessState = REMOTE_PROCESS_STATE.None;
-            // Process 확인
-            this.remote.StartProcess();
 
             int tryCount = 0;
             int tryOut = 10;
-            while(!this.remote.CheckProcess())
+            while(!this.remote.CheckProcess() && this.IsConnected == false)
             {
                 if(tryCount < tryOut)
                 {
@@ -856,7 +859,8 @@ namespace RootTools_Vision
 
             this.remote.ProcessState = REMOTE_PROCESS_STATE.Start;
 
-            this.TryConnect(); // Listen Start
+            if(this.IsConnected == false)
+                this.TryConnect(); // Listen Start
 
             int time100Millisec = 0;
             int timeOutSec = 100; //10초
@@ -878,20 +882,60 @@ namespace RootTools_Vision
             Thread.Sleep(100);  //Read Thread 실행 대기
 
             StartSync();
-
             if(WaitProcess(REMOTE_PROCESS_STATE.Sync) == false)
+            {
+                return;
+            }
+
+            //RemoteProcessStartWork();
+
+            if (this.timer == null)
+            {
+                this.timer = new System.Windows.Forms.Timer();
+                this.timer.Interval = 5000;
+                this.timer.Tick += timer_tick;
+                timer.Start();
+            }
+        }
+
+        bool isWorking = false;
+
+        public void RemoteProcessStartWork()
+        {
+            if (WaitProcess(REMOTE_PROCESS_STATE.Sync) == false)
             {
                 return;
             }
 
             ReadyWork();
 
-            if(WaitProcess(REMOTE_PROCESS_STATE.ReadyWork) == false)
+            if (WaitProcess(REMOTE_PROCESS_STATE.ReadyWork) == false)
             {
                 return;
             }
 
+            isWorking = true;
+
             StartWork();
+        }
+
+        public void timer_tick(object obj, EventArgs args)
+        {
+            if(this.remote.CheckProcess() == false)
+            {
+                
+                RemoteProcessStart();
+
+                if (this.isWorking == true)
+                {
+                    if (WaitProcess(REMOTE_PROCESS_STATE.Sync) == false)
+                    {
+                        return;
+                    }
+
+                    RemoteProcessStartWork();
+                }
+            }
         }
 
         public bool WaitProcess(REMOTE_PROCESS_STATE state, int timeOut100Millisec = 100)
@@ -906,7 +950,7 @@ namespace RootTools_Vision
                 }
                 else
                 {
-                    MessageBox.Show("Remote Process를 진행할 수 없습니다 :" + state.ToString() + "\ntime out :" + timeOut100Millisec);
+                    MessageBox.Show("Remote Process를 진행할 수 없습니다 : " + state.ToString() + "\ntime out :" + timeOut100Millisec);
                     return false;
                 }
             }
@@ -923,7 +967,7 @@ namespace RootTools_Vision
 
             DebugOutput.PrintWorkplaceBundle(workplaceBundle);
 #endif
-            WorkEventManager.OnInspectionStart(this, new InspectionStartArgs());
+            WorkEventManager.OnInspectionStart(this, new InspectionStartArgs(this.workplaceBundle));
 
             workBundle.SetRecipe(this.recipe);
             workBundle.SetWorkplacBundle(this.workplaceBundle);
