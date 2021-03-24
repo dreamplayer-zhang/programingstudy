@@ -35,6 +35,9 @@ namespace Root_WIND2
         RecipeBase recipe;
         List<Defect> m_ReviewDefectlist;
 
+        private DateTime _selectedStartDate;
+        private DateTime _selectedEndDate;
+
         private ObservableCollection<UIElement> m_Element = new ObservableCollection<UIElement>();
         public ObservableCollection<UIElement> p_Element
         {
@@ -53,6 +56,9 @@ namespace Root_WIND2
         public Review_ViewModel(Review review)
         {
             init();
+
+            _selectedStartDate = DateTime.Now.Date;
+            _selectedEndDate = DateTime.Now.Date;
         }
         public void init()
         {
@@ -588,6 +594,54 @@ namespace Root_WIND2
             }
         }
 
+        bool checkedStartDatetime = false;
+
+        public bool CheckedStartDatetime
+        {
+            get { return checkedStartDatetime; }
+            set
+            {
+                checkedStartDatetime = value;
+            }
+        }
+
+        bool checkedEndDatetime = false;
+        public bool CheckedEndDatetime
+        {
+            get { return checkedEndDatetime; }
+            set
+            {
+                checkedEndDatetime = value;
+            }
+        }
+
+        public DateTime SelectedStartDate
+        {
+            get
+            {
+                return _selectedStartDate;
+            }
+            set
+            {
+                //_selectedStartDate = value;
+                SetProperty(ref _selectedStartDate, value);
+                RaisePropertyChanged("SelectedStartDate");
+            }
+        }
+
+        public DateTime SelectedEndDate
+        {
+            get
+            {
+                return _selectedEndDate;
+            }
+            set
+            {
+                SetProperty(ref _selectedEndDate, value);
+                RaisePropertyChanged("SelectedEndDate");
+            }
+        }
+
         #endregion
 
         #region DataTypeEnum
@@ -735,7 +789,26 @@ namespace Root_WIND2
         {
             // Lotinfo 갱신
             string sLotInfo = "lotinfo";
-            pLotinfo_Datatable = DatabaseManager.Instance.SelectTable(sLotInfo);
+
+            // Add DateTime Filter
+            if (CheckedStartDatetime && CheckedEndDatetime)
+            {
+                pLotinfo_Datatable = DatabaseManager.Instance.SelectTableDatetime(sLotInfo, SelectedStartDate.ToString("yyyy-MM-dd"), SelectedEndDate.ToString("yyyy-MM-dd"));
+            }
+            else if (CheckedStartDatetime && !CheckedEndDatetime)
+            {
+                pLotinfo_Datatable = DatabaseManager.Instance.SelectTableDatetime(sLotInfo, SelectedStartDate.ToString("yyyy-MM-dd"), null);
+            }
+            else if (!CheckedStartDatetime && CheckedEndDatetime)
+            {
+                pLotinfo_Datatable = DatabaseManager.Instance.SelectTableDatetime(sLotInfo, null, SelectedEndDate.ToString("yyyy-MM-dd"));
+            }
+            // Add Wafer ID Filter
+            // Add Recipe Name Filter
+            else
+            {
+                pLotinfo_Datatable = DatabaseManager.Instance.SelectTable(sLotInfo);
+            }
         }
         public void LoadGoldenImage()
         {
