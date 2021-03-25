@@ -53,19 +53,13 @@ namespace RootTools
             m_nWaferSize_mm = tree.Set(m_nWaferSize_mm, m_nWaferSize_mm, "Wafer Size Y", "Wafer Size Y", bVisible);
             m_cpMemoryOffset = tree.Set(m_cpMemoryOffset, m_cpMemoryOffset, "Memory Offset", "Grab Start Memory Position (px)", bVisible);
             m_nYOffset = tree.Set(m_nYOffset, m_nYOffset, "Cam Y Offset", "Y Tilt(pxl)", bVisible);
-            m_dCamTriggerRatio = tree.Set(m_dCamTriggerRatio, m_dCamTriggerRatio, "Trigger Ratio", "Trigger Ratio", bVisible);
-
-            m_dTargetResX_um = (tree.GetTree("Resolution [um]", false, bVisible)).Set(m_dTargetResX_um, m_dTargetResX_um, "X Target", "X Target Resolution", bVisible);
-            m_dTargetResY_um = (tree.GetTree("Resolution [um]", false, bVisible)).Set(m_dTargetResY_um, m_dTargetResY_um, "Y Target", "Y Target Resolution", bVisible);
-            m_dRealResX_um = (tree.GetTree("Resolution [um]", false, bVisible)).Set(m_dRealResX_um, m_dRealResX_um, "X Real", "X Real Resolution", bVisible);
-            m_dRealResY_um = (tree.GetTree("Resolution [um]", false, bVisible)).Set(m_dRealResY_um, m_dRealResY_um, "Y Real", "Y Real Resolution", bVisible);
 
             m_nMaxFrame = (tree.GetTree("Scan Velocity", false, bVisible)).Set(m_nMaxFrame, m_nMaxFrame, "Max Frame", "Camera Max Frame Spec", bVisible);
             m_nScanRate = (tree.GetTree("Scan Velocity", false, bVisible)).Set(m_nScanRate, m_nScanRate, "Scan Rate", "카메라 Frame 사용률 1~ 100 %", bVisible);
                         
-            m_GD.m_nFovStart = tree.Set(m_GD.m_nFovStart, m_GD.m_nFovStart, "Cam Fov Star Pxl", "Pixel", bVisible);
-            m_GD.m_nFovSize = tree.Set(m_GD.m_nFovSize, m_GD.m_nFovSize, "Cam Fov Size Pxl", "Pixel", bVisible);
-            m_GD.m_nOverlap = tree.Set(m_GD.m_nOverlap, m_GD.m_nOverlap, "Cam Overlap Size Pxl", "Pixel", bVisible);
+            m_GD.m_nFovStart = (tree.GetTree("FOV", false, bVisible)).Set(m_GD.m_nFovStart, m_GD.m_nFovStart, "Cam Fov Start Pxl", "Pixel", bVisible);
+            m_GD.m_nFovSize = (tree.GetTree("FOV", false, bVisible)).Set(m_GD.m_nFovSize, m_GD.m_nFovSize, "Cam Fov Size Pxl", "Pixel", bVisible);
+            m_GD.m_nOverlap = (tree.GetTree("FOV", false, bVisible)).Set(m_GD.m_nOverlap, m_GD.m_nOverlap, "Cam Overlap Size Pxl", "Pixel", bVisible);
 
             m_GD.m_dScaleR = (tree.GetTree("Scale", false, bVisible)).Set(m_GD.m_dScaleR, m_GD.m_dScaleR, "XScaleR", "X Scale R Channel, Default = 1", bVisible);
             m_GD.m_dScaleG = (tree.GetTree("Scale", false, bVisible)).Set(m_GD.m_dScaleG, m_GD.m_dScaleG, "XScaleG", "X Scale G Channel, Default = 1", bVisible);
@@ -87,6 +81,12 @@ namespace RootTools
                 m_sCamera = tree.Set(m_sCamera, m_sCamera, m_cameraSet.p_asCamera, "Camera", "Select Camera", bVisible, bReadOnly);
                 m_camera = m_cameraSet.Get(m_sCamera);
             }
+            m_dCamTriggerRatio = tree.Set(m_dCamTriggerRatio, m_dCamTriggerRatio, "Trigger Ratio", "Trigger Ratio", bVisible);
+
+            m_dTargetResX_um = (tree.GetTree("Resolution [um]", false, bVisible)).Set(m_dTargetResX_um, m_dTargetResX_um, "X Target", "X Target Resolution", bVisible);
+            m_dTargetResY_um = (tree.GetTree("Resolution [um]", false, bVisible)).Set(m_dTargetResY_um, m_dTargetResY_um, "Y Target", "Y Target Resolution", bVisible);
+            m_dRealResX_um = (tree.GetTree("Resolution [um]", false, bVisible)).Set(m_dRealResX_um, m_dRealResX_um, "X Real", "X Real Resolution", bVisible);
+            m_dRealResY_um = (tree.GetTree("Resolution [um]", false, bVisible)).Set(m_dRealResY_um, m_dRealResY_um, "Y Real", "Y Real Resolution", bVisible);
         }
 
         public void StartGrab(MemoryData memory, CPoint cpScanOffset, int nLine, GrabData m_GrabData = null, bool bTest = false)
@@ -252,7 +252,7 @@ namespace RootTools
         {
             RunTreeOption(tree.GetTree("Option", false), bVisible, bReadOnly);
             RunTreeCamera(tree.GetTree("Camera", false), bVisible, bReadOnly);
-            RunTreeLight(tree.GetTree("LightPower", false), bVisible, bReadOnly);
+            RunTreeLight(tree.GetTree("Light", false), bVisible, bReadOnly);
             RunTreeMemory(tree.GetTree("Memory", false), bVisible, bReadOnly);
         }
 
