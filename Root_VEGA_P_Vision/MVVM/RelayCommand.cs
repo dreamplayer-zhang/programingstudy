@@ -2,7 +2,7 @@
 using System.Diagnostics;
 using System.Windows.Input;
 
-namespace Root_WIND2
+namespace Root_VEGA_P_Vision
 {
     public class RelayCommand<T> : ICommand
     {

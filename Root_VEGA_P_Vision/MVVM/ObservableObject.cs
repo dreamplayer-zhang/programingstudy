@@ -4,7 +4,7 @@ using System.Diagnostics;
 using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
 
-namespace Root_WIND2
+namespace Root_VEGA_P_Vision
 {
     [Serializable]
     public abstract class ObservableObject : INotifyPropertyChanged

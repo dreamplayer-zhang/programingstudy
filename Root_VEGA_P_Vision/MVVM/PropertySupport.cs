@@ -1,11 +1,8 @@
 ﻿using System;
-using System.Globalization;
 using System.Linq.Expressions;
 using System.Reflection;
-using System.Windows;
-using System.Windows.Data;
 
-namespace Root_WIND2
+namespace Root_VEGA_P_Vision
 {
     public static class PropertySupport
     {

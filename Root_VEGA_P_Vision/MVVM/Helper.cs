@@ -1,96 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
 using System.Windows.Media;
 
-namespace Helper
+namespace Root_VEGA_P_Vision
 {
-    public static class SizeObserver
-    {
-        public static readonly DependencyProperty ObserveProperty = DependencyProperty.RegisterAttached(
-            "Observe",
-            typeof(bool),
-            typeof(SizeObserver),
-            new FrameworkPropertyMetadata(OnObserveChanged));
-
-        public static readonly DependencyProperty ObservedWidthProperty = DependencyProperty.RegisterAttached(
-            "ObservedWidth",
-            typeof(double),
-            typeof(SizeObserver));
-
-        public static readonly DependencyProperty ObservedHeightProperty = DependencyProperty.RegisterAttached(
-            "ObservedHeight",
-            typeof(double),
-            typeof(SizeObserver));
-
-        public static bool GetObserve(FrameworkElement frameworkElement)
-        {
-            //frameworkElement.AssertNotNull("frameworkElement");
-            return (bool)frameworkElement.GetValue(ObserveProperty);
-        }
-
-        public static void SetObserve(FrameworkElement frameworkElement, bool observe)
-        {
-            //frameworkElement.AssertNotNull("frameworkElement");
-            frameworkElement.SetValue(ObserveProperty, observe);
-        }
-
-        public static double GetObservedWidth(FrameworkElement frameworkElement)
-        {
-            //ameworkElement.AssertNotNull("frameworkElement");
-            return (double)frameworkElement.GetValue(ObservedWidthProperty);
-        }
-
-        public static void SetObservedWidth(FrameworkElement frameworkElement, double observedWidth)
-        {
-            //frameworkElement.AssertNotNull("frameworkElement");
-            frameworkElement.SetValue(ObservedWidthProperty, observedWidth);
-        }
-
-        public static double GetObservedHeight(FrameworkElement frameworkElement)
-        {
-            //frameworkElement.AssertNotNull("frameworkElement");
-            return (double)frameworkElement.GetValue(ObservedHeightProperty);
-        }
-
-        public static void SetObservedHeight(FrameworkElement frameworkElement, double observedHeight)
-        {
-            //frameworkElement.AssertNotNull("frameworkElement");
-            frameworkElement.SetValue(ObservedHeightProperty, observedHeight);
-        }
-
-        private static void OnObserveChanged(DependencyObject dependencyObject, DependencyPropertyChangedEventArgs e)
-        {
-            var frameworkElement = (FrameworkElement)dependencyObject;
-
-            if ((bool)e.NewValue)
-            {
-                frameworkElement.SizeChanged += OnFrameworkElementSizeChanged;
-                UpdateObservedSizesForFrameworkElement(frameworkElement);
-            }
-            else
-            {
-                frameworkElement.SizeChanged -= OnFrameworkElementSizeChanged;
-            }
-        }
-
-        private static void OnFrameworkElementSizeChanged(object sender, SizeChangedEventArgs e)
-        {
-            UpdateObservedSizesForFrameworkElement((FrameworkElement)sender);
-        }
-
-        private static void UpdateObservedSizesForFrameworkElement(FrameworkElement frameworkElement)
-        {
-            frameworkElement.SetCurrentValue(ObservedWidthProperty, frameworkElement.ActualWidth);
-            frameworkElement.SetCurrentValue(ObservedHeightProperty, frameworkElement.ActualHeight);
-
-
-        }
-    }
     public static class AutoScrollHelper
     {
         public static readonly DependencyProperty AutoScrollProperty =
@@ -128,6 +44,95 @@ namespace Helper
         public static void SetAutoScroll(DependencyObject obj, bool value)
         {
             obj.SetValue(AutoScrollProperty, value);
+        }
+    }
+
+    public class BooleanToVisiblityConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if ((bool)value)
+            {
+                return Visibility.Visible;
+            }
+            else
+            {
+                return Visibility.Collapsed;
+            }
+
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return true;
+        }
+    }
+
+    public class BooleanToPassFailStringConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if ((bool)value)
+            {
+                return "Pass";
+            }
+            else
+            {
+                return "Fail";
+            }
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+    public class VisibilityToWindowStateConverter : IMultiValueConverter
+    {
+        public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
+        {
+            WindowState state = (WindowState)parameter;
+            for(int i=0;i<values.Length;i++)
+            {
+                switch (values[i])
+                {
+                    case Visibility.Visible:
+                        values[i] = Visibility.Collapsed;
+                        break;
+                    case Visibility.Collapsed:
+                        values[i] = Visibility.Visible;
+                        break;
+                }
+            }
+
+            if (state.Equals(WindowState.Maximized))
+                return WindowState.Normal;
+            else
+                return WindowState.Maximized;
+        }
+
+        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+    public class BooleanToPassFailColorConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if ((bool)value)
+            {
+                return Brushes.Green;
+            }
+            else
+            {
+                return Brushes.Red;
+            }
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
         }
     }
 }
