@@ -25,11 +25,6 @@ namespace RootTools_Vision
 		private int diffEBR;
 		private int offsetBevel;
 		private int offsetEBR;
-
-		// temp 
-		private int startNotch;
-		private int endNotch;
-
 		#endregion
 
 		#region [Getter/Setter]
@@ -123,27 +118,6 @@ namespace RootTools_Vision
 				SetProperty<int>(ref this.offsetEBR, value);
 			}
 		}
-
-		// temp
-		[Category("Parameter")]
-		public int StartNotch
-		{
-			get => this.startNotch;
-			set
-			{
-				SetProperty<int>(ref this.startNotch, value);
-			}
-		}
-		[Category("Parameter")]
-		public int EndNotch
-		{
-			get => this.endNotch;
-			set
-			{
-				SetProperty<int>(ref this.endNotch, value);
-			}
-		}
-		//
 
 		[Browsable(false)]
 		public int MaskIndex 

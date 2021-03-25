@@ -74,28 +74,16 @@ namespace RootTools_Vision
 	public class EdgeSurfaceParameterBase : ObservableObject
 	{
 		#region [Parameter]
-		private int roiHeight = 1;
-		private int roiWidth = 1;
-		private int threshold = 1;
+		private int roiWidth = 500;
+		private int roiHeight = 1000;
+		private int threshold = 10;
 		private int defectSizeMin = 1;
+		private int defectSizeMax = 10000;
 		private int mergeDist = 1;
 		private int edgeSearchLevel = 20;
-
-		// temp 
-		private int startNotch;
-		private int endNotch;
 		#endregion
 
 		#region [Getter/Setter]
-		[Category("Parameter")]
-		public int ROIHeight
-		{
-			get => this.roiHeight;
-			set
-			{
-				SetProperty<int>(ref this.roiHeight, value);
-			}
-		}
 		[Category("Parameter")]
 		public int ROIWidth
 		{
@@ -103,6 +91,15 @@ namespace RootTools_Vision
 			set
 			{
 				SetProperty<int>(ref this.roiWidth, value);
+			}
+		}
+		[Category("Parameter")]
+		public int ROIHeight
+		{
+			get => this.roiHeight;
+			set
+			{
+				SetProperty<int>(ref this.roiHeight, value);
 			}
 		}
 		[Category("Parameter")]
@@ -124,6 +121,15 @@ namespace RootTools_Vision
 			}
 		}
 		[Category("Parameter")]
+		public int DefectSizeMax
+		{
+			get => this.defectSizeMax;
+			set
+			{
+				SetProperty<int>(ref this.defectSizeMax, value);
+			}
+		}
+		[Category("Parameter")]
 		public int MergeDist
 		{
 			get => this.mergeDist;
@@ -141,27 +147,6 @@ namespace RootTools_Vision
 				SetProperty<int>(ref this.edgeSearchLevel, value);
 			}
 		}
-
-		// temp
-		[Category("Parameter")]
-		public int StartNotch
-		{
-			get => this.startNotch;
-			set
-			{
-				SetProperty<int>(ref this.startNotch, value);
-			}
-		}
-		[Category("Parameter")]
-		public int EndNotch
-		{
-			get => this.endNotch;
-			set
-			{
-				SetProperty<int>(ref this.endNotch, value);
-			}
-		}
-		//
 		#endregion
 	}
 }
