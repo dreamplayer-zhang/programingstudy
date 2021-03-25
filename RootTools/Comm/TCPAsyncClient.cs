@@ -89,7 +89,7 @@ namespace RootTools.Comm
             get { return (m_socket == null) ? false : m_socket.Connected; }
         }
 
-        void Connect()
+        public void Connect()
         {
             try
             {

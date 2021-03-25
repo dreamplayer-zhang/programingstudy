@@ -198,6 +198,8 @@ namespace Root_VEGA_P_Vision.Module
         #endregion
 
         #region IRTRChild
+        public bool p_bLock { get; set; }
+
         public string IsGetOK()
         {
             if (p_eState != eState.Ready) return p_id + " eState not Ready"; 
