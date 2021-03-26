@@ -11,6 +11,7 @@ using RootTools.Trees;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Threading;
 
 namespace Root_VEGA_P_Vision.Module
 {
@@ -145,9 +146,9 @@ namespace Root_VEGA_P_Vision.Module
             {
                 if (m_vision.p_eRemote == eRemote.Client) return;
                 m_vision.p_sInfo = toolBox.GetAxis(ref m_axisZ, m_vision, "Main Optic AxisZ");
-                m_vision.p_sInfo = toolBox.Get(ref camTDI, m_vision, "TDI Cam");
-                m_vision.p_sInfo = toolBox.Get(ref camStain, m_vision, "Stain Cam");
-                m_vision.p_sInfo = toolBox.Get(ref camZStack, m_vision, "Z-Stacking Cam");
+                m_vision.p_sInfo = toolBox.GetCamera(ref camTDI, m_vision, "TDI Cam");
+                m_vision.p_sInfo = toolBox.GetCamera(ref camStain, m_vision, "Stain Cam");
+                m_vision.p_sInfo = toolBox.GetCamera(ref camZStack, m_vision, "Z-Stacking Cam");
 
                 if (bInit)
                 {
@@ -196,8 +197,8 @@ namespace Root_VEGA_P_Vision.Module
             public void GetTools(ToolBox toolBox, bool bInit)
             {
                 if (m_vision.p_eRemote == eRemote.Client) return;
-                m_vision.p_sInfo = toolBox.Get(ref camSide, m_vision, "Side Cam");
-                m_vision.p_sInfo = toolBox.GetAxis(ref m_axisZ, m_vision, "Side Optic AxisZ");
+                m_vision.p_sInfo = toolBox.GetCamera(ref camSide, m_vision, "Side Cam");
+                m_vision.p_sInfo = toolBox.GetAxis(ref axisZ, m_vision, "Side Optic AxisZ");
                 if (bInit)
                 {
 
@@ -576,11 +577,10 @@ namespace Root_VEGA_P_Vision.Module
             AddModuleRunList(new Run_MainGrab(this), true, "Main Grab");
             AddModuleRunList(new Run_SideGrab(this), true, "Side Grab");
             AddModuleRunList(new Run_StainGrab(this), true, "Stain Grab");
-        }        
             AddModuleRunList(new Run_Remote(this), true, "Remote Run");
             AddModuleRunList(new Run_Delay(this), true, "Time Delay");
-        }
-
+        }        
+            
         public class Run_Delay : ModuleRunBase
         {
             Vision m_module;
