@@ -13,7 +13,11 @@ namespace RootTools
 {
 	public class GrabModeEdge : GrabModeBase
 	{
-		public int m_nImageHeight = 1000;
+		public double m_nStartDegree = 0;
+		public double m_nScanDegree = 360;
+		public int m_nCameraPositionOffset = 0;
+		public int m_nCameraHeight = 2000;	// Camera 연결 안되어 있을 시, 검사에 필요한 Camera Height
+		public int m_nImageHeight = 10000;
 
 		public GrabModeEdge(string id, CameraSet cameraSet, LightSet lightSet, MemoryPool memoryPool, LensLinearTurret lensTurret = null) : base(id, cameraSet, lightSet, memoryPool, lensTurret)
 		{
@@ -28,6 +32,10 @@ namespace RootTools
 		{
 			GrabModeEdge src = (GrabModeEdge)grabMode;
 			GrabModeEdge dst = (GrabModeEdge)base.Copy(src);
+			dst.m_nStartDegree = src.m_nStartDegree;
+			dst.m_nScanDegree = src.m_nScanDegree;
+			dst.m_nCameraPositionOffset = src.m_nCameraPositionOffset;
+			dst.m_nCameraHeight = src.m_nCameraHeight;
 			dst.m_nImageHeight = src.m_nImageHeight;
 			return dst;
 		}
@@ -35,11 +43,17 @@ namespace RootTools
 		public override void RunTree(Tree tree, bool bVisible, bool bReadOnly)
 		{
 			base.RunTree(tree, bVisible, bReadOnly);
-			RunTreeEdge(tree, bVisible, bReadOnly);
+			RunTreeEdge(tree.GetTree("Edge", false), bVisible, bReadOnly);
 		}
 
 		private void RunTreeEdge(Tree tree, bool bVisible, bool bReadOnly)
 		{
+			m_nStartDegree = tree.Set(m_nStartDegree, m_nStartDegree, "Start Degree", "시작 위치", bVisible);
+			m_nScanDegree = tree.Set(m_nScanDegree, m_nScanDegree, "Scan Degree", "스캔 각도", bVisible);
+
+			m_nCameraPositionOffset = tree.Set(m_nCameraPositionOffset, m_nCameraPositionOffset, "Position Offset", "Camera Position Offset(Degree)", bVisible);
+			
+			m_nCameraHeight = tree.Set(m_nCameraHeight, m_nCameraHeight, "Camera Height", "Camera Height", bVisible);
 			m_nImageHeight = tree.Set(m_nImageHeight, m_nImageHeight, "Image Height", "전체 Image Height", bVisible);
 		}
 	}

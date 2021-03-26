@@ -70,34 +70,30 @@ namespace RootTools_Vision
 				Tools.SaveDefectImage(Path.Combine(settings_edgeside.DefectImagePath, sInspectionID), MergeDefectList[i], sharedBufferInfo, i + 1);
 			}
 
-			if (settings_edgeside.UseKlarf)
-			{
-				KlarfData_Lot klarfData = new KlarfData_Lot();
-				Directory.CreateDirectory(settings_edgeside.KlarfSavePath);
+			//if (settings_edgeside.UseKlarf)
+			//{
+			//	KlarfData_Lot klarfData = new KlarfData_Lot();
+			//	Directory.CreateDirectory(settings_edgeside.KlarfSavePath);
 
-				klarfData.AddSlot(recipe.WaferMap, MergeDefectList, this.recipe.GetItem<OriginRecipe>());
-				klarfData.WaferStart(recipe.WaferMap, DateTime.Now);
-				klarfData.SetResultTimeStamp();
+			//	klarfData.AddSlot(recipe.WaferMap, MergeDefectList, this.recipe.GetItem<OriginRecipe>());
+			//	klarfData.WaferStart(recipe.WaferMap, DateTime.Now);
+			//	klarfData.SetResultTimeStamp();
 
-				klarfData.SaveKlarf(settings_edgeside.KlarfSavePath, false);
+			//	klarfData.SaveKlarf(settings_edgeside.KlarfSavePath, false);
 
-				//TEST(settings_edgeside.KlarfSavePath, MergeDefectList, this.currentWorkplace.SharedBufferInfo);
-				//Tools.SaveTiffImage(settings_edgeside.KlarfSavePath, MergeDefectList, this.currentWorkplace.SharedBufferInfo);
-			}
+			//	//TEST(settings_edgeside.KlarfSavePath, MergeDefectList, this.currentWorkplace.SharedBufferInfo);
+			//	//Tools.SaveTiffImage(settings_edgeside.KlarfSavePath, MergeDefectList, this.currentWorkplace.SharedBufferInfo);
+			//}
 			//WorkEventManager.OnInspectionDone(this.currentWorkplace, new InspectionDoneEventArgs(new List<CRect>(), true));
 			WorkEventManager.OnIntegratedProcessDefectDone(this.currentWorkplace, new IntegratedProcessDefectDoneEventArgs());
 		}
 
+		/*
 		public System.Drawing.Bitmap testest(Defect defect)
 		{
 			SharedBufferInfo sharedBufferInfo_Top = GetSharedBufferInfoByChipX((int)EdgeSurface.EdgeMapPositionX.Top);
 			SharedBufferInfo sharedBufferInfo_Side = GetSharedBufferInfoByChipX((int)EdgeSurface.EdgeMapPositionX.Side);
 			SharedBufferInfo sharedBufferInfo_Btm = GetSharedBufferInfoByChipX((int)EdgeSurface.EdgeMapPositionX.Btm);
-
-			// 각도로 가져오니까 필요없어
-			//int posOffset_Top = this.recipe.GetItem<EdgeSurfaceRecipe>().EdgeRecipeBaseTop.PositionOffset;
-			//int posOffset_Side = this.recipe.GetItem<EdgeSurfaceRecipe>().EdgeRecipeBaseSide.PositionOffset;
-			//int posOffset_Btm = this.recipe.GetItem<EdgeSurfaceRecipe>().EdgeRecipeBaseBtm.PositionOffset;
 
 			// TOP DEFECT 일 경우
 			//첫 notch + (각도 * 1도당 image height)
@@ -117,10 +113,6 @@ namespace RootTools_Vision
 			System.Drawing.Bitmap bitmap_Side = Tools.ConvertArrayToColorBitmap(sharedBufferInfo_Side.PtrR_GRAY, sharedBufferInfo_Side.PtrG, sharedBufferInfo_Side.PtrB, sharedBufferInfo_Side.Width, sharedBufferInfo_Side.ByteCnt, calcDefectRect_Side);
 			System.Drawing.Bitmap bitmap_Btm = Tools.ConvertArrayToColorBitmap(sharedBufferInfo_Btm.PtrR_GRAY, sharedBufferInfo_Btm.PtrG, sharedBufferInfo_Btm.PtrB, sharedBufferInfo_Btm.Width, sharedBufferInfo_Btm.ByteCnt, calcDefectRect_Btm);
 
-			//System.Drawing.Bitmap bmap = new System.Drawing.Bitmap(100, 100);
-			//System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(bmap);
-			//System.Drawing.Image img = System.Drawing.Bitmap.FromFile("d:\\test.gif");
-			//System.Drawing.Image img2 = System.Drawing.Bitmap.FromFile("d:\\test2.gif");
 
 			System.Drawing.Bitmap bitmap = new System.Drawing.Bitmap(bitmap_Top.Width + bitmap_Side.Width + bitmap_Btm.Width, bitmap_Top.Height);
 			System.Drawing.Graphics g = System.Drawing.Graphics.FromImage(bitmap);
@@ -131,7 +123,7 @@ namespace RootTools_Vision
 
 			return bitmap;
 		}
-
+		*/
 
 		public void TEST(string Path, List<Defect> dataList, SharedBufferInfo sharedBuffer)
 		{
@@ -144,8 +136,8 @@ namespace RootTools_Vision
 			for (int i = 0; i < dataList.Count; i++)
 			{
 				MemoryStream image = new MemoryStream();
-				//System.Drawing.Bitmap bitmap = Tools.ConvertArrayToColorBitmap(sharedBuffer.PtrR_GRAY, sharedBuffer.PtrG, sharedBuffer.PtrB, sharedBuffer.Width, sharedBuffer.ByteCnt, dataList[i].GetRect());
-				System.Drawing.Bitmap bitmap = testest(dataList[i]);
+				System.Drawing.Bitmap bitmap = Tools.ConvertArrayToColorBitmap(sharedBuffer.PtrR_GRAY, sharedBuffer.PtrG, sharedBuffer.PtrB, sharedBuffer.Width, sharedBuffer.ByteCnt, dataList[i].GetRect());
+				//System.Drawing.Bitmap bitmap = testest(dataList[i]);
 				bitmap.Save(image, ImageFormat.Tiff);
 				inputImage.Add(image);
 			}

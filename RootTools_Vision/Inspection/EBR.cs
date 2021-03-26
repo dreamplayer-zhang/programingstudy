@@ -125,31 +125,31 @@ namespace RootTools_Vision
 			// Add measurement
 			string sInspectionID = DatabaseManager.Instance.GetInspectionID();
 			
-			this.currentWorkplace.AddMeasurement(sInspectionID,
-								"EDGE",
-								Measurement.MeasureType.EBR,
-								Measurement.EBRMeasureItem.Bevel,
-								(float)((waferEdgeX - bevelX) * recipeEBR.Resolution),
-								this.currentWorkplace.Width,
-								this.currentWorkplace.Height,
-								CalculateAngle(this.currentWorkplace.Index),
-								this.currentWorkplace.PositionX,
-								this.currentWorkplace.PositionY,
-								this.currentWorkplace.MapIndexX,
-								this.currentWorkplace.MapIndexY);
+			//this.currentWorkplace.AddMeasurement(sInspectionID,
+			//					"EDGE",
+			//					Measurement.MeasureType.EBR,
+			//					Measurement.EBRMeasureItem.Bevel,
+			//					(float)((waferEdgeX - bevelX) * recipeEBR.Resolution),
+			//					this.currentWorkplace.Width,
+			//					this.currentWorkplace.Height,
+			//					CalculateAngle(this.currentWorkplace.Index),
+			//					this.currentWorkplace.PositionX,
+			//					this.currentWorkplace.PositionY,
+			//					this.currentWorkplace.MapIndexX,
+			//					this.currentWorkplace.MapIndexY);
 
-			this.currentWorkplace.AddMeasurement(sInspectionID,
-								"EDGE",
-								Measurement.MeasureType.EBR,
-								Measurement.EBRMeasureItem.EBR,
-								(float)(waferEdgeX - ebrX * recipeEBR.Resolution),
-								this.currentWorkplace.Width,
-								this.currentWorkplace.Height,
-								CalculateAngle(this.currentWorkplace.Index),
-								this.currentWorkplace.PositionX,
-								this.currentWorkplace.PositionY,
-								this.currentWorkplace.MapIndexX,
-								this.currentWorkplace.MapIndexY);
+			//this.currentWorkplace.AddMeasurement(sInspectionID,
+			//					"EDGE",
+			//					Measurement.MeasureType.EBR,
+			//					Measurement.EBRMeasureItem.EBR,
+			//					(float)(waferEdgeX - ebrX * recipeEBR.Resolution),
+			//					this.currentWorkplace.Width,
+			//					this.currentWorkplace.Height,
+			//					CalculateAngle(this.currentWorkplace.Index),
+			//					this.currentWorkplace.PositionX,
+			//					this.currentWorkplace.PositionY,
+			//					this.currentWorkplace.MapIndexX,
+			//					this.currentWorkplace.MapIndexY);
 		}
 
 		private float CalculateAngle(int index)
