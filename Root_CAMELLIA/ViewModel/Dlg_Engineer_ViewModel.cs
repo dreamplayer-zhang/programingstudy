@@ -454,6 +454,18 @@ namespace Root_CAMELLIA
         #endregion
 
 
+        PMCheckReview_ViewModel m_PMCheckReview_ViewModel = new PMCheckReview_ViewModel();
+        public PMCheckReview_ViewModel p_PMCheckReview_ViewModel
+        {
+            get
+            {
+                return m_PMCheckReview_ViewModel;
+            }
+            set
+            {
+                SetProperty(ref m_PMCheckReview_ViewModel, value);
+            }
+        }
 
         public Dlg_Engineer_ViewModel(MainWindow_ViewModel main)
         {
@@ -472,9 +484,9 @@ namespace Root_CAMELLIA
             ModuleCamellia.p_CamVRS.Grabed += OnGrabImageUpdate;
 
             p_rootViewer.p_VisibleMenu = Visibility.Collapsed;
-
             dispatcher = Application.Current.Dispatcher;
 
+            //p_PMCheckReview_ViewModel.p_rootViewer.p_ImageData = ModuleCamellia.p_CamVRS.p_ImageViewer.p_ImageData;
             //m_task = new Task(()=>RunTask());
             //m_task.Start();
         }
