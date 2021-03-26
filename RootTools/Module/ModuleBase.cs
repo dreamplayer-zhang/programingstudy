@@ -578,7 +578,7 @@ namespace RootTools.Module
             TCPIPClient m_client;
             void InitClient(bool bInit)
             {
-                m_module.p_sInfo = m_module.m_toolBox.Get(ref m_client, m_module, "TCPIP");
+                m_module.p_sInfo = m_module.m_toolBox.GetComm(ref m_client, m_module, "TCPIP");
                 if (bInit) m_client.EventReciveData += M_client_EventReciveData;
             }
 
@@ -618,7 +618,7 @@ namespace RootTools.Module
             TCPIPServer m_server;
             void InitServer(bool bInit)
             {
-                m_module.p_sInfo = m_module.m_toolBox.Get(ref m_server, m_module, "TCPIP");
+                m_module.p_sInfo = m_module.m_toolBox.GetComm(ref m_server, m_module, "TCPIP");
                 if (bInit) m_server.EventReciveData += M_server_EventReciveData;
             }
 

@@ -16,9 +16,9 @@ namespace Root_Rinse_Loader.Module
 
         public override void GetTools(bool bInit)
         {
-            p_sInfo = m_toolBox.Get(ref m_axis, this, "Loader");
-            p_sInfo = m_toolBox.Get(ref m_dioPickerDown, this, "PickerDown", "Up", "Down", true, true);
-            p_sInfo = m_toolBox.Get(ref m_dioPickerSet, this, "PickerSet");
+            p_sInfo = m_toolBox.GetAxis(ref m_axis, this, "Loader");
+            p_sInfo = m_toolBox.GetDIO(ref m_dioPickerDown, this, "PickerDown", "Up", "Down", true, true);
+            p_sInfo = m_toolBox.GetDIO(ref m_dioPickerSet, this, "PickerSet");
             foreach (Picker picker in m_aPicker) picker.GetTools(m_toolBox);
             if (bInit)
             {
@@ -51,8 +51,8 @@ namespace Root_Rinse_Loader.Module
             public DIO_O m_doBlow;
             public void GetTools(ToolBox toolBox)
             {
-                m_loader.p_sInfo = toolBox.Get(ref m_dioVacuum, m_loader, m_id + ".Vacuum");
-                m_loader.p_sInfo = toolBox.Get(ref m_doBlow, m_loader, m_id + ".Blow");
+                m_loader.p_sInfo = toolBox.GetDIO(ref m_dioVacuum, m_loader, m_id + ".Vacuum");
+                m_loader.p_sInfo = toolBox.GetDIO(ref m_doBlow, m_loader, m_id + ".Blow");
             }
 
             public bool IsDrop()

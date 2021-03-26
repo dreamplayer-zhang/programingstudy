@@ -46,8 +46,8 @@ namespace Root_EFEM.Module
         //}
         public override void GetTools(bool bInit)
         {
-            p_sInfo = m_toolBox.Get(ref m_axisXY, this, "Stage");
-            p_sInfo = m_toolBox.Get(ref m_axistheta, this, "Theta");
+            p_sInfo = m_toolBox.GetAxis(ref m_axisXY, this, "Stage");
+            p_sInfo = m_toolBox.GetAxis(ref m_axistheta, this, "Theta");
             //p_sInfo = m_toolBox.Get(ref m_axisZ, this, "StageZ");
             p_sInfo = m_toolBox.Get(ref m_memoryPool, this, "Memory", 1);
             m_alid_WaferExist = m_gaf.GetALID(this, "Vision Wafer Exist", "Vision Wafer Exist");

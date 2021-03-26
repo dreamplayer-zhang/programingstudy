@@ -28,10 +28,10 @@ namespace Root_VEGA_P_Vision.Module
             public void GetTools(ToolBox toolBox, bool bInit)
             {
                 if (m_vision.p_eRemote == eRemote.Client) return;
-                m_vision.p_sInfo = toolBox.Get(ref m_axisXY, m_vision, "Stage");
-                m_vision.p_sInfo = toolBox.Get(ref m_axisR, m_vision, "Stage Rotate");
-                m_vision.p_sInfo = toolBox.Get(ref m_diStageLoad[0], m_vision, "Stage Load X");
-                m_vision.p_sInfo = toolBox.Get(ref m_diStageLoad[1], m_vision, "Stage Load Y");
+                m_vision.p_sInfo = toolBox.GetAxis(ref m_axisXY, m_vision, "Stage");
+                m_vision.p_sInfo = toolBox.GetAxis(ref m_axisR, m_vision, "Stage Rotate");
+                m_vision.p_sInfo = toolBox.GetDIO(ref m_diStageLoad[0], m_vision, "Stage Load X");
+                m_vision.p_sInfo = toolBox.GetDIO(ref m_diStageLoad[1], m_vision, "Stage Load Y");
                 if (bInit)
                 {
 
@@ -93,7 +93,7 @@ namespace Root_VEGA_P_Vision.Module
             public void GetTools(ToolBox toolBox, bool bInit)
             {
                 if (m_vision.p_eRemote == eRemote.Client) return;
-                m_vision.p_sInfo = toolBox.Get(ref m_axisZ, m_vision, "Main Optic AxisZ");
+                m_vision.p_sInfo = toolBox.GetAxis(ref m_axisZ, m_vision, "Main Optic AxisZ");
                 if (bInit)
                 {
 
@@ -136,7 +136,7 @@ namespace Root_VEGA_P_Vision.Module
             public void GetTools(ToolBox toolBox, bool bInit)
             {
                 if (m_vision.p_eRemote == eRemote.Client) return;
-                m_vision.p_sInfo = toolBox.Get(ref m_axisZ, m_vision, "Side Optic AxisZ");
+                m_vision.p_sInfo = toolBox.GetAxis(ref m_axisZ, m_vision, "Side Optic AxisZ");
                 if (bInit)
                 {
 

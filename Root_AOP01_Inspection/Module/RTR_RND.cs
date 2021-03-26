@@ -24,10 +24,10 @@ namespace Root_AOP01_Inspection.Module
         public int m_teachReticleFlip = -1;
         public override void GetTools(bool bInit)
         {
-            p_sInfo = m_toolBox.Get(ref m_rs232, this, "RS232");
-            p_sInfo = m_toolBox.Get(ref m_doTopBlow, this, "Top Blow");                                         
-            p_sInfo = m_toolBox.Get(ref m_doBottomBlow, this, "Bottom Blow");                                   
-            p_sInfo = m_toolBox.Get(ref m_diReticleCheck, this, "Reticle Check Sensor Door Crush InterLock");   
+            p_sInfo = m_toolBox.GetComm(ref m_rs232, this, "RS232");
+            p_sInfo = m_toolBox.GetDIO(ref m_doTopBlow, this, "Top Blow");                                         
+            p_sInfo = m_toolBox.GetDIO(ref m_doBottomBlow, this, "Bottom Blow");                                   
+            p_sInfo = m_toolBox.GetDIO(ref m_diReticleCheck, this, "Reticle Check Sensor Door Crush InterLock");   
             m_dicArm[eArm.Upper].GetTools(m_toolBox);
             m_dicArm[eArm.Lower].GetTools(m_toolBox);
             if (bInit)
@@ -136,8 +136,8 @@ namespace Root_AOP01_Inspection.Module
             public DIO_I m_diArmClose;
             public void GetTools(ToolBox toolBox)
             {
-                m_module.p_sInfo = toolBox.Get(ref m_diCheckVac, m_module, m_eArm.ToString() + ".CheckVac");
-                m_module.p_sInfo = toolBox.Get(ref m_diArmClose, m_module, m_eArm.ToString() + ".ArmClose");
+                m_module.p_sInfo = toolBox.GetDIO(ref m_diCheckVac, m_module, m_eArm.ToString() + ".CheckVac");
+                m_module.p_sInfo = toolBox.GetDIO(ref m_diArmClose, m_module, m_eArm.ToString() + ".ArmClose");
             }
 
             enum eCheckWafer

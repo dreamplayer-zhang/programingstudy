@@ -20,7 +20,7 @@ namespace Root_VEGA_P.Module
         TCPAsyncClient m_tcpip;
         public override void GetTools(bool bInit)
         {
-            p_sInfo = m_toolBox.Get(ref m_tcpip, this, "TCPIP");
+            p_sInfo = m_toolBox.GetComm(ref m_tcpip, this, "TCPIP");
             m_armEOP.GetTools(m_toolBox, this);
             m_armEIP.GetTools(m_toolBox, this);
             if (bInit)
@@ -72,9 +72,9 @@ namespace Root_VEGA_P.Module
             public DIO_I m_diCheckDoor;
             public void GetTools(ToolBox toolBox, RTR module)
             {
-                module.p_sInfo = toolBox.Get(ref m_diArmClose, module, p_id + ".ArmClose");
-                module.p_sInfo = toolBox.Get(ref m_diCheckDome, module, p_id + ".CheckDome");
-                module.p_sInfo = toolBox.Get(ref m_diCheckDoor, module, p_id + ".CheckDoor");
+                module.p_sInfo = toolBox.GetDIO(ref m_diArmClose, module, p_id + ".ArmClose");
+                module.p_sInfo = toolBox.GetDIO(ref m_diCheckDome, module, p_id + ".CheckDome");
+                module.p_sInfo = toolBox.GetDIO(ref m_diCheckDoor, module, p_id + ".CheckDoor");
             }
 
             public bool IsArmClose()
@@ -104,8 +104,8 @@ namespace Root_VEGA_P.Module
             string[] m_asGrip = new string[3] { "Home", "Grip", "Empty" };
             public void GetTools(ToolBox toolBox, RTR module)
             {
-                module.p_sInfo = toolBox.Get(ref m_diArmClose, module, p_id + ".ArmClose");
-                module.p_sInfo = toolBox.Get(ref m_diGrip, module, p_id + ".Grip", m_asGrip); 
+                module.p_sInfo = toolBox.GetDIO(ref m_diArmClose, module, p_id + ".ArmClose");
+                module.p_sInfo = toolBox.GetDIO(ref m_diGrip, module, p_id + ".Grip", m_asGrip); 
             }
 
             public string RunGrip(bool bGrip, RTR module)

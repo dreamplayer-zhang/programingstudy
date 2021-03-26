@@ -39,18 +39,18 @@ namespace Root_Siltron.Module
 
         public override void GetTools(bool bInit)
         {
-            p_sInfo = m_toolBox.Get(ref m_axisRotate, this, "Rotate");
-            p_sInfo = m_toolBox.Get(ref m_axisEdgeX, this, "Edge X");
-            p_sInfo = m_toolBox.Get(ref m_axisXZ, this, "Camera XZ");
-            p_sInfo = m_toolBox.Get(ref m_doVac, this, "Stage Vacuum");
-            p_sInfo = m_toolBox.Get(ref m_doBlow, this, "Stage Blow");
+            p_sInfo = m_toolBox.GetAxis(ref m_axisRotate, this, "Rotate");
+            p_sInfo = m_toolBox.GetAxis(ref m_axisEdgeX, this, "Edge X");
+            p_sInfo = m_toolBox.GetAxis(ref m_axisXZ, this, "Camera XZ");
+            p_sInfo = m_toolBox.GetDIO(ref m_doVac, this, "Stage Vacuum");
+            p_sInfo = m_toolBox.GetDIO(ref m_doBlow, this, "Stage Blow");
             p_sInfo = m_toolBox.Get(ref m_memoryPool, this, "Memory", 1);
-            p_sInfo = m_toolBox.Get(ref m_camEdgeTop, this, "Cam Edge Top");
-            p_sInfo = m_toolBox.Get(ref m_camEdgeSide, this, " Cam Edge Side");
-            p_sInfo = m_toolBox.Get(ref m_camEdgeBottom, this, " Cam Edge Bottom");
-			p_sInfo = m_toolBox.Get(ref m_camNotchTop, this, " Cam Notch Top");
-			p_sInfo = m_toolBox.Get(ref m_camNotchSide, this, " Cam Notch Side");
-			p_sInfo = m_toolBox.Get(ref m_camNotchBottom, this, " Cam Notch Bottom");
+            p_sInfo = m_toolBox.GetCamera(ref m_camEdgeTop, this, "Cam Edge Top");
+            p_sInfo = m_toolBox.GetCamera(ref m_camEdgeSide, this, " Cam Edge Side");
+            p_sInfo = m_toolBox.GetCamera(ref m_camEdgeBottom, this, " Cam Edge Bottom");
+			p_sInfo = m_toolBox.GetCamera(ref m_camNotchTop, this, " Cam Notch Top");
+			p_sInfo = m_toolBox.GetCamera(ref m_camNotchSide, this, " Cam Notch Side");
+			p_sInfo = m_toolBox.GetCamera(ref m_camNotchBottom, this, " Cam Notch Bottom");
 			p_sInfo = m_toolBox.Get(ref m_lightSet, this);
             m_memoryGroup = m_memoryPool.GetGroup(p_id);
         }

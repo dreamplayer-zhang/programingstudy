@@ -94,7 +94,7 @@ namespace Root_EFEM.Module
 
         public string GetTools(ModuleBase module, bool bInit)
         {
-            string sInfo = module.m_toolBox.Get(ref m_rs232, module, "RFID RS232");
+            string sInfo = module.m_toolBox.GetComm(ref m_rs232, module, "RFID RS232");
             if (bInit)
             {
                 m_rs232.OnReceive += M_rs232_OnReceive;

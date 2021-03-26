@@ -22,9 +22,9 @@ namespace Root_ASIS.Module
         SRP350 m_srp350; 
         public override void GetTools(bool bInit)
         {
-            p_sInfo = m_toolBox.Get(ref m_diFull, this, "Strip Full");
-            p_sInfo = m_toolBox.Get(ref m_diOpen, this, "Tray Door Open");
-            p_sInfo = m_toolBox.Get(ref m_diProduct, this, "Product Check", "Product", p_lTray);
+            p_sInfo = m_toolBox.GetDIO(ref m_diFull, this, "Strip Full");
+            p_sInfo = m_toolBox.GetDIO(ref m_diOpen, this, "Tray Door Open");
+            p_sInfo = m_toolBox.GetDIO(ref m_diProduct, this, "Product Check", "Product", p_lTray);
             m_aLED[0].GetTools(m_toolBox, bInit);
             m_aLED[1].GetTools(m_toolBox, bInit);
             p_sInfo = m_toolBox.Get(ref m_srp350, this, "Printer"); 
@@ -76,7 +76,7 @@ namespace Root_ASIS.Module
             public RS232 m_rs232; 
             public void GetTools(ToolBox toolBox, bool bInit)
             {
-                m_trays.p_sInfo = toolBox.Get(ref m_rs232, m_trays, m_id);
+                m_trays.p_sInfo = toolBox.GetComm(ref m_rs232, m_trays, m_id);
                 if (bInit)
                 {
                     m_rs232.OnReceive += M_rs232_OnReceive;

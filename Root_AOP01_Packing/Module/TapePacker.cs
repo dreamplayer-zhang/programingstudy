@@ -66,9 +66,9 @@ namespace Root_AOP01_Packing.Module
             }
             public void GetTools(ToolBox toolBox, bool bInit)
             {
-                m_packer.p_sInfo = toolBox.Get(ref m_reticleVRS, m_packer, "Check Reticle");
-                m_packer.p_sInfo = toolBox.Get(ref m_CheckRemainVRS, m_packer, "Check Remain Tape");
-                m_packer.p_sInfo = toolBox.Get(ref m_CheckEndVRS, m_packer, "Check End Tape");
+                m_packer.p_sInfo = toolBox.GetCamera(ref m_reticleVRS, m_packer, "Check Reticle");
+                m_packer.p_sInfo = toolBox.GetCamera(ref m_CheckRemainVRS, m_packer, "Check Remain Tape");
+                m_packer.p_sInfo = toolBox.GetCamera(ref m_CheckEndVRS, m_packer, "Check End Tape");
             }
             public string RunCheckTapeVRS()
             {
@@ -118,14 +118,14 @@ namespace Root_AOP01_Packing.Module
 
             public void GetTools(ToolBox toolBox, bool bInit)
             {
-                m_packer.p_sInfo = toolBox.Get(ref m_axis, m_packer, m_id);
-                m_packer.p_sInfo = toolBox.Get(ref m_doCutter, m_packer, m_id + ".Cutter Off");
-                m_packer.p_sInfo = toolBox.Get(ref m_diCheckCutter[0], m_packer, m_id + ".Cutter ON");
-                m_packer.p_sInfo = toolBox.Get(ref m_diCheckCutter[1], m_packer, m_id + ".Cutter OFF");
-                m_packer.p_sInfo = toolBox.Get(ref m_solLock, m_packer, m_id + ".Lock", "Unlock", "Lock");
-                m_packer.p_sInfo = toolBox.Get(ref m_diCheckPlaced[0], m_packer, m_id + ".Placed Left");
-                m_packer.p_sInfo = toolBox.Get(ref m_diCheckPlaced[1], m_packer, m_id + ".Placed Right");
-                m_packer.p_sInfo = toolBox.Get(ref m_solTapeStoper, m_packer, m_id + ".Stopper", "Stop", "Release");
+                m_packer.p_sInfo = toolBox.GetAxis(ref m_axis, m_packer, m_id);
+                m_packer.p_sInfo = toolBox.GetDIO(ref m_doCutter, m_packer, m_id + ".Cutter Off");
+                m_packer.p_sInfo = toolBox.GetDIO(ref m_diCheckCutter[0], m_packer, m_id + ".Cutter ON");
+                m_packer.p_sInfo = toolBox.GetDIO(ref m_diCheckCutter[1], m_packer, m_id + ".Cutter OFF");
+                m_packer.p_sInfo = toolBox.GetDIO(ref m_solLock, m_packer, m_id + ".Lock", "Unlock", "Lock");
+                m_packer.p_sInfo = toolBox.GetDIO(ref m_diCheckPlaced[0], m_packer, m_id + ".Placed Left");
+                m_packer.p_sInfo = toolBox.GetDIO(ref m_diCheckPlaced[1], m_packer, m_id + ".Placed Right");
+                m_packer.p_sInfo = toolBox.GetDIO(ref m_solTapeStoper, m_packer, m_id + ".Stopper", "Stop", "Release");
 
                 if (bInit)
                 {
@@ -201,8 +201,8 @@ namespace Root_AOP01_Packing.Module
 
             public void GetTools(ToolBox toolBox, bool bInit)
             {
-                m_packer.p_sInfo = toolBox.Get(ref m_solRollerUp, m_packer, m_id + ".UpDown", "Down", "Up");
-                m_packer.p_sInfo = toolBox.Get(ref m_solRollerPush, m_packer, m_id + ".Push", "Back", "Push");
+                m_packer.p_sInfo = toolBox.GetDIO(ref m_solRollerUp, m_packer, m_id + ".UpDown", "Down", "Up");
+                m_packer.p_sInfo = toolBox.GetDIO(ref m_solRollerPush, m_packer, m_id + ".Push", "Back", "Push");
                 if (bInit)
                 {
                     m_packer.InitSolvalve(m_solRollerPush);
@@ -249,12 +249,12 @@ namespace Root_AOP01_Packing.Module
 
             public void GetTools(ToolBox toolBox, bool bInit)
             {
-                m_packer.p_sInfo = toolBox.Get(ref m_solHead, m_packer, m_id + ".Head", "Up", "Down");
-                m_packer.p_sInfo = toolBox.Get(ref m_solPicker, m_packer, m_id + ".Picker", "Up", "Down");
-                m_packer.p_sInfo = toolBox.Get(ref m_diOverload, m_packer, m_id + ".Overload");
-                m_packer.p_sInfo = toolBox.Get(ref m_diTopCheck, m_packer, m_id + ".Check Case Top");
-                m_packer.p_sInfo = toolBox.Get(ref m_dioVacuum, m_packer, m_id + ".Vacuum");
-                m_packer.p_sInfo = toolBox.Get(ref m_doBlow, m_packer, m_id + ".Blow");
+                m_packer.p_sInfo = toolBox.GetDIO(ref m_solHead, m_packer, m_id + ".Head", "Up", "Down");
+                m_packer.p_sInfo = toolBox.GetDIO(ref m_solPicker, m_packer, m_id + ".Picker", "Up", "Down");
+                m_packer.p_sInfo = toolBox.GetDIO(ref m_diOverload, m_packer, m_id + ".Overload");
+                m_packer.p_sInfo = toolBox.GetDIO(ref m_diTopCheck, m_packer, m_id + ".Check Case Top");
+                m_packer.p_sInfo = toolBox.GetDIO(ref m_dioVacuum, m_packer, m_id + ".Vacuum");
+                m_packer.p_sInfo = toolBox.GetDIO(ref m_doBlow, m_packer, m_id + ".Blow");
                 if (bInit)
                 {
                     m_packer.InitSolvalve(m_solHead);
@@ -344,8 +344,8 @@ namespace Root_AOP01_Packing.Module
 
             public void GetTools(ToolBox toolBox, bool bInit)
             {
-                m_packer.p_sInfo = toolBox.Get(ref m_axis, m_packer, m_id + ".Rotate");
-                m_packer.p_sInfo = toolBox.Get(ref m_diCheck, m_packer, m_id + ".Check");
+                m_packer.p_sInfo = toolBox.GetAxis(ref m_axis, m_packer, m_id + ".Rotate");
+                m_packer.p_sInfo = toolBox.GetDIO(ref m_diCheck, m_packer, m_id + ".Check");
                 if (bInit)
                 {
                 }

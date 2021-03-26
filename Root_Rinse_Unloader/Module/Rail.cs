@@ -15,11 +15,11 @@ namespace Root_Rinse_Unloader.Module
         #region ToolBox
         public override void GetTools(bool bInit)
         {
-            p_sInfo = m_toolBox.Get(ref m_axisRotate, this, "Rotate");
-            p_sInfo = m_toolBox.Get(ref m_axisWidth, this, "Width");
-            p_sInfo = m_toolBox.Get(ref m_dioPusher, this, "Pusher", "Back", "Push");
-            p_sInfo = m_toolBox.Get(ref m_dioPusherDown, this, "PusherDown", "Up", "Down");
-            p_sInfo = m_toolBox.Get(ref m_diPusherOverload, this, "PusherOverload");
+            p_sInfo = m_toolBox.GetAxis(ref m_axisRotate, this, "Rotate");
+            p_sInfo = m_toolBox.GetAxis(ref m_axisWidth, this, "Width");
+            p_sInfo = m_toolBox.GetDIO(ref m_dioPusher, this, "Pusher", "Back", "Push");
+            p_sInfo = m_toolBox.GetDIO(ref m_dioPusherDown, this, "PusherDown", "Up", "Down");
+            p_sInfo = m_toolBox.GetDIO(ref m_diPusherOverload, this, "PusherOverload");
             foreach (Line line in m_aLine) line.GetTools(m_toolBox);
             if (bInit)
             {
@@ -46,9 +46,9 @@ namespace Root_Rinse_Unloader.Module
             DIO_I[] m_diCheck = new DIO_I[3];
             public void GetTools(ToolBox toolBox)
             {
-                m_rail.p_sInfo = toolBox.Get(ref m_diCheck[0], m_rail, m_id + ".Start");
-                m_rail.p_sInfo = toolBox.Get(ref m_diCheck[1], m_rail, m_id + ".Mid");
-                m_rail.p_sInfo = toolBox.Get(ref m_diCheck[2], m_rail, m_id + ".Arrived");
+                m_rail.p_sInfo = toolBox.GetDIO(ref m_diCheck[0], m_rail, m_id + ".Start");
+                m_rail.p_sInfo = toolBox.GetDIO(ref m_diCheck[1], m_rail, m_id + ".Mid");
+                m_rail.p_sInfo = toolBox.GetDIO(ref m_diCheck[2], m_rail, m_id + ".Arrived");
             }
 
             public enum eSensor
