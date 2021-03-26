@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -459,6 +460,9 @@ namespace Root_CAMELLIA
         {
             ModuleCamellia = ((CAMELLIA_Handler)App.m_engineer.ClassHandler()).m_camellia;
 
+            // 연결 콜벡 이벤트 추가 += Connected_Callback;
+            ModuleCamellia.p_CamVRS.Connected += Connected_Callback;
+
             //p_recipeData = DataManager.Instance.recipeDM.MeasurementRD;
             AxisX = ModuleCamellia.p_axisXY.p_axisX;
             AxisY = ModuleCamellia.p_axisXY.p_axisY;
@@ -477,6 +481,33 @@ namespace Root_CAMELLIA
 
             //m_task = new Task(()=>RunTask());
             //m_task.Start();
+        }
+
+        private void Connected_Callback(object sender, EventArgs e)
+        {
+            //ImageData sourceData = ModuleCamellia.p_CamVRS.p_ImageViewer.p_ImageData;
+
+            //IntPtr ptr0 = sourceData.GetPtr();
+            ////byte[] ptr1 = sourceData.GetByteArray();
+            ////IntPtr ptr2 = sourceData.GetPtr(1);
+            ////IntPtr ptr3 = sourceData.GetPtr(2);
+
+            //byte[] buf = new byte[sourceData.p_Size.X];
+
+            ////Array.Clear(ptr1, 0, sourceData.p_Size.X * sourceData.p_Size.Y);
+            //for (int i = 0; i < sourceData.p_Size.Y; i++)
+            //{
+
+            //    Marshal.Copy(buf, 0, ptr0, sourceData.p_Size.X);
+
+
+            //    ptr0 += sourceData.p_Size.X * 3;
+            //}
+
+            p_rootViewer.p_ImageData = ModuleCamellia.p_CamVRS.p_ImageViewer.p_ImageData;
+            //ModuleCamellia.p_CamVRS.p_ImageViewer.SetImageSource();
+
+
         }
 
         //private bool m_isStart = false;
@@ -959,12 +990,14 @@ namespace Root_CAMELLIA
             {
                 return new RelayCommand(() =>
                 {
-                    if (!ModuleCamellia.p_CamVRS.p_CamInfo.OpenStatus)
-                    {
-                        ModuleCamellia.p_CamVRS.Connect();
-                    }
-                    while (!ModuleCamellia.p_CamVRS.m_ConnectDone) ;
-                    p_rootViewer.p_ImageData = ModuleCamellia.p_CamVRS.p_ImageViewer.p_ImageData;
+                    //if (!ModuleCamellia.p_CamVRS.p_CamInfo.OpenStatus)
+                    //{
+                    //    ModuleCamellia.p_CamVRS.Connect();
+                    //}
+                    //while (!ModuleCamellia.p_CamVRS.m_ConnectDone) ;
+
+                    //// if(연결되있을 경우만)
+                    //p_rootViewer.p_ImageData = ModuleCamellia.p_CamVRS.p_ImageViewer.p_ImageData;
                     RaisePropertyChanged("p_pmParameter");
 
                     Run_Measure measure = (Run_Measure)ModuleCamellia.CloneModuleRun("Measure");
@@ -1020,6 +1053,8 @@ namespace Root_CAMELLIA
             dispatcher.Invoke(() =>
             {
                 p_rootViewer.SetImageSource();
+                
+                p_rootViewer.p_ImageData.SaveImageSync(@"C:\Users\cgkim\Desktop\image\test.bmp");
             });
 
         }
@@ -1031,15 +1066,16 @@ namespace Root_CAMELLIA
                 MessageBox.Show("Vision Home이 완료 되지 않았습니다.");
                 return;
             }
-            Thread thread = new Thread(() =>
-            {
+            //Thread thread = new Thread(() =>
+            //{
                 Run_Measure measure = (Run_Measure)ModuleCamellia.CloneModuleRun("Measure");
                 UpdateParameter();
                 measure.m_isPM = true;
                 measure.m_isAlphaFit = p_pmParameter.p_isAlpha1;
-                measure.Run();
-            });
-            thread.Start();
+                ModuleCamellia.StartRun(measure);
+                //measure.Run();
+            //});
+            //thread.Start();
         }
         private void Calibration()
         {
@@ -1056,7 +1092,8 @@ namespace Root_CAMELLIA
                 calibration.m_isPM = true;
                 calibration.m_useCal = true;
                 calibration.m_useCentering = false;
-                calibration.Run();
+                //calibration.Run();
+                ModuleCamellia.StartRun(calibration);
             });
             thread.Start();
         }
@@ -1073,7 +1110,8 @@ namespace Root_CAMELLIA
                 Run_InitCalibration initCalibration = (Run_InitCalibration)ModuleCamellia.CloneModuleRun("InitCalibration");
                 initCalibration.m_isPM = true;
                 UpdateParameter();
-                initCalibration.Run();
+                //initCalibration.Run();
+                ModuleCamellia.StartRun(initCalibration);
             });
             thread.Start();
         }
@@ -1090,7 +1128,8 @@ namespace Root_CAMELLIA
                 Run_CalibrationWaferCentering centering = (Run_CalibrationWaferCentering)ModuleCamellia.CloneModuleRun("CalibrationWaferCentering");
                 centering.m_useCal = false;
                 centering.m_useCentering = true;
-                centering.Run();
+                //centering.Run();
+                ModuleCamellia.StartRun(centering);
             });
             thread.Start();
         }

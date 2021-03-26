@@ -692,7 +692,15 @@
                                                         <Border Background="White" BorderBrush="#ABADB3" BorderThickness="1">
                                                             <TextBlock Grid.Row="0" Text="Reflectance" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="0,2" TextAlignment="Center"/>
                                                         </Border>
-                                                        <ListBox Grid.Row="1" ItemsSource="{Binding RecipeViewModel.ReflectanceListItem, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}" IsSynchronizedWithCurrentItem="True" HorizontalContentAlignment="Center"/>
+                                                        <!--<ListBox Grid.Row="1" ItemsSource="{Binding RecipeViewModel.ReflectanceListItem, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}" IsSynchronizedWithCurrentItem="True" HorizontalContentAlignment="Center"/>-->
+                                                        <DataGrid Grid.Row="1" ItemsSource="{Binding RecipeViewModel.ReflectanceListItem}" AutoGenerateColumns="False" CanUserAddRows="False" CanUserSortColumns="True" EnableColumnVirtualization="True"  CanUserDeleteRows="False"
+                                  EnableRowVirtualization="True" ScrollViewer.CanContentScroll="True" SelectionMode="Single">
+                                                            <DataGrid.Columns>
+                                                                <DataGridTextColumn Header="Wave" Width="*" Binding="{Binding p_waveLength}" IsReadOnly="True"/>
+                                                                <DataGridTextColumn Header="Scale" Width="*" Binding="{Binding p_scale}" IsReadOnly="True"/>
+                                                                <DataGridTextColumn Header="Offset" Width="*" Binding="{Binding p_offset}" IsReadOnly="True"/>
+                                                            </DataGrid.Columns>
+                                                        </DataGrid>
                                                     </Grid>
                                                 </Grid>
                                                 <Grid Grid.Column="1" Margin="5">

@@ -21,6 +21,7 @@ namespace RootTools.Camera.BaslerPylon
         public Dispatcher _dispatcher;
 
         public event System.EventHandler Grabed;
+        public event System.EventHandler Connected;
 
         #region Property
         public string p_id { get; set; }
@@ -332,9 +333,11 @@ namespace RootTools.Camera.BaslerPylon
                 }
                 UpdateCamInfo(ConnectCamInfo, m_cam);
                 m_ConnectDone = true;
+                ConnectEvent();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                MessageBox.Show(ex.Message);
                 m_ConnectDone = false;
             }
         }
@@ -875,6 +878,20 @@ namespace RootTools.Camera.BaslerPylon
         {
             if (Grabed != null)
                 Grabed.Invoke(this, e);
+        }
+
+        void ConnectEvent()
+        {
+            if(Connected != null)
+            {
+                OnConnected();
+            }
+        }
+
+        protected virtual void OnConnected()
+        {
+            if (Connected != null)
+                Connected.Invoke(this, new EventArgs());
         }
         public void FunctionConnect()
         {

@@ -651,6 +651,7 @@ namespace RootTools
             //int width = (int)(rect.Right * 0.25);
             //if (width * 4 != rect.Right) rect.Right = (width + 1) * 4;
 
+
             FileStream fs = new FileStream(sFile, FileMode.Create, FileAccess.Write);
             BinaryWriter bw = new BinaryWriter(fs);
 
@@ -1035,10 +1036,39 @@ namespace RootTools
             byte[] pBuf = new byte[(long)sz.X * p_nByte];
             int nProgress = 0;
 
+            if (m_ptrImg == IntPtr.Zero) return;
+
             Parallel.For(0, sz.Y, new ParallelOptions { MaxDegreeOfParallelism = 20 }, (y) =>
             {
                 if (Worker_MemoryClear.CancellationPending)
                     return;
+
+                Marshal.Copy(pBuf, 0, (IntPtr)((long)m_ptrImg + (long)sz.X * p_nByte * y), sz.X * p_nByte);
+                if (GetBytePerPixel() == 3)
+                {
+                    Marshal.Copy(pBuf, 0, (IntPtr)((long)m_MemData.GetPtr(1) + (long)sz.X * p_nByte * y), sz.X * p_nByte);
+                    Marshal.Copy(pBuf, 0, (IntPtr)((long)m_MemData.GetPtr(2) + (long)sz.X * p_nByte * y), sz.X * p_nByte);
+                }
+                nProgress++;
+                if (nProgress % np == 0)
+                    p_nProgress = Convert.ToInt32(((double)nProgress / sz.Y) * 100); ;
+            });
+        }
+
+        public unsafe void ClearImage_TEST()
+        {
+            CPoint sz = p_Size;
+            int np = sz.Y / 100;
+            byte[] pBuf = new byte[(long)sz.X * p_nByte];
+            int nProgress = 0;
+
+            if (m_ptrImg == IntPtr.Zero) return;
+
+            Parallel.For(0, sz.Y, new ParallelOptions { MaxDegreeOfParallelism = 20 }, (y) =>
+            {
+                if (Worker_MemoryClear.CancellationPending)
+                    return;
+
                 Marshal.Copy(pBuf, 0, (IntPtr)((long)m_ptrImg + (long)sz.X * p_nByte * y), sz.X * p_nByte);
                 if (GetBytePerPixel() == 3)
                 {
