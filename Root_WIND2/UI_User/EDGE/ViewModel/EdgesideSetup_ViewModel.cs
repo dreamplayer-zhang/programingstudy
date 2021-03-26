@@ -14,14 +14,13 @@ namespace Root_WIND2.UI_User
 		private EdgeSurfaceRecipeBase recipe;
 		private EdgeSurfaceParameterBase parameter;
 		
-		// grab mode
 		private int selectedGrabModeIndex = 0;
-		private int topPositionOffset = 0;
-		private int sidePositionOffset = 0;
-		private int btmPositionOffset = 0;
-		private int topImageOffset = 0;
-		private int sideImageOffset = 0;
-		private int btmImageOffset = 0;
+		// grab mode data
+		private int cameraWidth;
+		private int cameraHeight;
+		private int imageHeight;
+		private double resolution;
+		private int positionOffset;
 
 		private bool isTopChecked = true;
 		private bool isSideChecked = false;
@@ -46,84 +45,6 @@ namespace Root_WIND2.UI_User
 			set => SetProperty(ref parameter, value);
 		}
 
-		public int TopPositionOffset
-		{
-			get
-			{
-				EdgeSideVision module = ((WIND2_Handler)GlobalObjects.Instance.Get<WIND2_Engineer>().ClassHandler()).p_EdgeSideVision;
-				Run_InspectEdge inspect = (Run_InspectEdge)module.CloneModuleRun("InspectEdge");
-
-				topPositionOffset = inspect.TopPositionOffset;
-				return topPositionOffset;
-			}
-			set => SetProperty(ref topPositionOffset, value);
-		}
-
-		public int SidePositionOffset
-		{
-			get
-			{
-				EdgeSideVision module = ((WIND2_Handler)GlobalObjects.Instance.Get<WIND2_Engineer>().ClassHandler()).p_EdgeSideVision;
-				Run_InspectEdge inspect = (Run_InspectEdge)module.CloneModuleRun("InspectEdge");
-
-				sidePositionOffset = inspect.SidePositionOffset;
-				return sidePositionOffset;
-			}
-			set => SetProperty(ref sidePositionOffset, value);
-		}
-
-		public int BtmPositionOffset
-		{
-			get
-			{
-				EdgeSideVision module = ((WIND2_Handler)GlobalObjects.Instance.Get<WIND2_Engineer>().ClassHandler()).p_EdgeSideVision;
-				Run_InspectEdge inspect = (Run_InspectEdge)module.CloneModuleRun("InspectEdge");
-
-				btmPositionOffset = inspect.BtmPositionOffset;
-				return btmPositionOffset;
-			}
-			set => SetProperty(ref btmPositionOffset, value);
-		}
-
-		public int TopImageOffset
-		{
-			get
-			{
-				EdgeSideVision module = ((WIND2_Handler)GlobalObjects.Instance.Get<WIND2_Engineer>().ClassHandler()).p_EdgeSideVision;
-				Run_InspectEdge inspect = (Run_InspectEdge)module.CloneModuleRun("InspectEdge");
-
-				topImageOffset = inspect.TopImageOffset;
-				return topImageOffset;
-			}
-			set => SetProperty(ref topImageOffset, value);
-		}
-
-		public int SideImageOffset
-		{
-			get
-			{
-				EdgeSideVision module = ((WIND2_Handler)GlobalObjects.Instance.Get<WIND2_Engineer>().ClassHandler()).p_EdgeSideVision;
-				Run_InspectEdge inspect = (Run_InspectEdge)module.CloneModuleRun("InspectEdge");
-
-				sideImageOffset = inspect.SideImageOffset;
-				return sideImageOffset;
-			}
-			set => SetProperty(ref sideImageOffset, value);
-		}
-
-		public int BtmImageOffset
-		{
-			get
-			{
-				EdgeSideVision module = ((WIND2_Handler)GlobalObjects.Instance.Get<WIND2_Engineer>().ClassHandler()).p_EdgeSideVision;
-				Run_InspectEdge inspect = (Run_InspectEdge)module.CloneModuleRun("InspectEdge");
-
-				btmImageOffset = inspect.BtmImageOffset;
-				return btmImageOffset;
-			}
-			set => SetProperty(ref btmImageOffset, value);
-		}
-
 		public List<string> GrabModeList
 		{
 			get
@@ -132,35 +53,58 @@ namespace Root_WIND2.UI_User
 			}
 		}
 
+		public int CameraWidth
+		{
+			get => cameraWidth;
+			set => SetProperty(ref cameraWidth, value);
+		}
+
+		public int CameraHeight
+		{
+			get => cameraHeight;
+			set => SetProperty(ref cameraHeight, value);
+		}
+
+		public int ImageHeight
+		{
+			get => imageHeight;
+			set => SetProperty(ref imageHeight, value);
+		}
+
+		public double Resolution
+		{
+			get => resolution;
+			set => SetProperty(ref resolution, value);
+		}
+
+		public int PositionOffset
+		{
+			get => positionOffset;
+			set => SetProperty(ref positionOffset, value);
+		}
+
 		public int SelectedGrabModeIndex
 		{
 			get => this.selectedGrabModeIndex;
 			set
 			{
-				//GrabMode mode = ((WIND2_Handler)GlobalObjects.Instance.Get<WIND2_Engineer>().ClassHandler()).p_EdgeSideVision.m_aGrabMode[value];
-				RootTools.GrabModeBase mode = ((WIND2_Handler)GlobalObjects.Instance.Get<WIND2_Engineer>().ClassHandler()).p_EdgeSideVision.m_aGrabMode[value];
-				Run_InspectEdge inspect = ((Run_InspectEdge)((WIND2_Handler)GlobalObjects.Instance.Get<WIND2_Engineer>().ClassHandler()).p_EdgeSideVision.CloneModuleRun("InspectEdge"));
+				GrabModeEdge mode = ((WIND2_Handler)GlobalObjects.Instance.Get<WIND2_Engineer>().ClassHandler()).p_EdgeSideVision.m_aGrabMode[value];
 
-				Recipe.GrabModeIndex = value;
 				if (mode.m_camera != null)
 				{
-					Recipe.CameraWidth = mode.m_camera.GetRoiSize().X;
-					Recipe.CameraHeight = mode.m_camera.GetRoiSize().Y;
+					CameraWidth = mode.m_camera.GetRoiSize().X;
+					CameraHeight = mode.m_camera.GetRoiSize().Y;
 				}
-
-				if (Recipe.CameraHeight == 0)
+				else
 				{
-					if (isTopChecked)
-						Recipe.CameraHeight = inspect.TopCameraHeight;
-					else if (isSideChecked)
-						Recipe.CameraHeight = inspect.SideCameraHeight;
-					else if (isBtmChecked)
-						Recipe.CameraHeight = inspect.BtmCameraHeight;
+					CameraWidth = 0;
+					CameraHeight = mode.m_nCameraHeight;
 				}
+				ImageHeight = mode.m_nImageHeight;
+				Resolution = mode.m_dTargetResX_um;
+				PositionOffset = mode.m_nCameraPositionOffset;
 
-				Recipe.Resolution = mode.m_dTargetResX_um;
-				Recipe.TriggerRatio = mode.m_dCamTriggerRatio;
-
+				Recipe.GrabModeIndex = value;
 				SetProperty<int>(ref this.selectedGrabModeIndex, value);
 			}
 		}
@@ -262,8 +206,6 @@ namespace Root_WIND2.UI_User
 				DrawToolVM.init(GlobalObjects.Instance.GetNamed<ImageData>("EdgeTopImage"), GlobalObjects.Instance.Get<DialogService>());
 				Parameter = recipe.GetItem<EdgeSurfaceParameter>().EdgeParamBaseTop;
 				Recipe = recipe.GetItem<EdgeSurfaceRecipe>().EdgeRecipeBaseTop;
-				Recipe.PositionOffset = this.TopPositionOffset;
-				Recipe.ImageOffset = this.TopImageOffset;
 				this.SelectedGrabModeIndex = Recipe.GrabModeIndex;
 			}
 			else if (dataName == "Side")
@@ -271,8 +213,6 @@ namespace Root_WIND2.UI_User
 				DrawToolVM.init(GlobalObjects.Instance.GetNamed<ImageData>("EdgeSideImage"), GlobalObjects.Instance.Get<DialogService>());
 				Parameter = recipe.GetItem<EdgeSurfaceParameter>().EdgeParamBaseSide;
 				Recipe = recipe.GetItem<EdgeSurfaceRecipe>().EdgeRecipeBaseSide;
-				Recipe.PositionOffset = this.SidePositionOffset;
-				Recipe.ImageOffset = this.SideImageOffset;
 				this.SelectedGrabModeIndex = Recipe.GrabModeIndex;
 			}
 			else if (dataName == "Bottom")
@@ -280,8 +220,6 @@ namespace Root_WIND2.UI_User
 				DrawToolVM.init(GlobalObjects.Instance.GetNamed<ImageData>("EdgeBottomImage"), GlobalObjects.Instance.Get<DialogService>());
 				Parameter = recipe.GetItem<EdgeSurfaceParameter>().EdgeParamBaseBtm;
 				Recipe = recipe.GetItem<EdgeSurfaceRecipe>().EdgeRecipeBaseBtm;
-				Recipe.PositionOffset = this.BtmPositionOffset;
-				Recipe.ImageOffset = this.BtmImageOffset;
 				this.SelectedGrabModeIndex = Recipe.GrabModeIndex;
 			}
 			else

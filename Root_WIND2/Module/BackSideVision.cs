@@ -52,17 +52,17 @@ namespace Root_WIND2.Module
 
         public override void GetTools(bool bInit)
         {
-            p_sInfo = m_toolBox.Get(ref axisZ, this, "Axis Z");
-            p_sInfo = m_toolBox.Get(ref axisXY, this, "Axis XY");
-            p_sInfo = m_toolBox.Get(ref doVac, this, "Stage Vacuum");
-            p_sInfo = m_toolBox.Get(ref doBlow, this, "Stage Blow");
-            p_sInfo = m_toolBox.Get(ref diWaferExist, this, "Wafer Exist");
-            p_sInfo = m_toolBox.Get(ref diWaferExistVac, this, "Wafer Exist Vac Check");
+            p_sInfo = m_toolBox.GetAxis(ref axisZ, this, "Axis Z");
+            p_sInfo = m_toolBox.GetAxis(ref axisXY, this, "Axis XY");
+            p_sInfo = m_toolBox.GetDIO(ref doVac, this, "Stage Vacuum");
+            p_sInfo = m_toolBox.GetDIO(ref doBlow, this, "Stage Blow");
+            p_sInfo = m_toolBox.GetDIO(ref diWaferExist, this, "Wafer Exist");
+            p_sInfo = m_toolBox.GetDIO(ref diWaferExistVac, this, "Wafer Exist Vac Check");
             
             p_sInfo = m_toolBox.Get(ref memoryPool, this, "BackSide Memory", 1);
             p_sInfo = m_toolBox.Get(ref lightSet, this);
-            p_sInfo = m_toolBox.Get(ref camMain, this, "MainCam");
-            p_sInfo = m_toolBox.Get(ref camLADS, this, "LADSCam");
+            p_sInfo = m_toolBox.GetCamera(ref camMain, this, "MainCam");
+            p_sInfo = m_toolBox.GetCamera(ref camLADS, this, "LADSCam");
             memoryGroup = memoryPool.GetGroup(p_id);
             alid_WaferExist = m_gaf.GetALID(this, "Wafer Exist", "Wafer Exist");
 

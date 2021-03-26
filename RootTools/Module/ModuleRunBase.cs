@@ -54,7 +54,8 @@ namespace RootTools.Module
             set { SetProperty(ref _nProgress, value); }
         }
 
-        public bool m_bRemoteRun = false; 
+        public ModuleBase.eRemote m_eRemote = ModuleBase.eRemote.Local; 
+
         public string p_id { get; set; }
         public string m_sModuleRun;
         protected Log m_log;

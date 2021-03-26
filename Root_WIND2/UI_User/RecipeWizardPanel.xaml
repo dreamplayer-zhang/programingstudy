@@ -7,6 +7,17 @@
              xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
              mc:Ignorable="d" d:DesignWidth="800">
     <UserControl.Resources>
+        <!-- HOME -->
+        <ControlTemplate x:Key="home_menu">
+            <Border
+                Background="{StaticResource sidetap_child_background}">
+                <StackPanel Margin="0, 4, 0, 0" HorizontalAlignment="Stretch">
+                    <RadioButton Content="Recipe" IsChecked="True" Command="{Binding btnHomeRecipe}" Style="{StaticResource sidetap_child_radiobutton}"/>
+                    <RadioButton Content="Maintanence"  Command="{Binding btnHomeRecipe}" Style="{StaticResource sidetap_child_radiobutton}"/>
+                    <RadioButton Content="SEC/Gem" Command="{Binding btnHomeRecipe}" Style="{StaticResource sidetap_child_radiobutton}"/>
+                </StackPanel>
+            </Border>
+        </ControlTemplate>
         <!-- FRONT -->
         <ControlTemplate x:Key="front_menu">
             <Border
@@ -87,7 +98,8 @@
         </Grid.ColumnDefinitions>
         <Border Background="{StaticResource sidetap_parent_background}">
             <StackPanel Margin="0, 4, 0, 0" HorizontalAlignment="Right">
-                <RadioButton x:Name="btnFront" Content="FRONT" IsChecked="True" Style="{StaticResource sidetap_parent_radiobutton}"/>
+                <RadioButton x:Name="btnHome" Content="HOME" IsChecked="True" Style="{StaticResource sidetap_parent_radiobutton}"/>
+                <RadioButton x:Name="btnFront" Content="FRONT" Style="{StaticResource sidetap_parent_radiobutton}"/>
                 <RadioButton x:Name="btnBack" Content="BACK" Style="{StaticResource sidetap_parent_radiobutton}"/>
                 <RadioButton x:Name="btnEdge" Content="EDGE" Style="{StaticResource sidetap_parent_radiobutton}"/>
                 <RadioButton x:Name="btnEBR" Content="EBR"  Style="{StaticResource sidetap_parent_radiobutton}"/>
@@ -98,6 +110,13 @@
             <ContentControl.Style>
                 <Style TargetType="ContentControl">
                     <Style.Triggers>
+                        <!-- HOME -->
+                        <DataTrigger Binding="{Binding ElementName=btnHome,Path=IsChecked}"
+                                     Value="True">
+                            <Setter Property="Template" 
+                                    Value="{StaticResource home_menu}"/>
+                        </DataTrigger>
+                        
                         <!-- FRONT -->
                         <DataTrigger Binding="{Binding ElementName=btnFront,Path=IsChecked}"
                                      Value="True">

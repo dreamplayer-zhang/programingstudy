@@ -102,17 +102,22 @@
                                                           VerticalAlignment="Center"
                                                           Margin="0,5,0,0"
                                                           FontSize="12"
-                                                          x:Name="cbStart" />
-                                                <local:DateTimePicker IsEnabled="{Binding ElementName=cbStart, Path=IsChecked}"
-                                                                      DateFormat="yyyy-MM-dd"
-                                                                      Background="#FFFBFBFB" />
+                                                          x:Name="cbStart"
+                                                          IsChecked="{Binding Path=CheckedStartDatetime}" />
+                                                <DatePicker IsEnabled="{Binding ElementName=cbStart, Path=IsChecked}"
+                                                            Background="#FFFBFBFB"
+                                                            SelectedDate ="{Binding SelectedStartDate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
+                                                            IsTodayHighlighted="True" />
                                                 <CheckBox Content="End Date"
                                                           VerticalAlignment="Center"
                                                           Margin="0,5,0,0"
                                                           FontSize="12"
-                                                          x:Name="cbEnd" />
-                                                <local:DateTimePicker IsEnabled="{Binding ElementName=cbEnd, Path=IsChecked}"
-                                                                      DateFormat="yyyy-MM-dd" />
+                                                          x:Name="cbEnd"
+                                                          IsChecked="{Binding Path=CheckedEndDatetime}" />
+                                                <DatePicker IsEnabled="{Binding ElementName=cbEnd, Path=IsChecked}"
+                                                            Background="#FFFBFBFB"
+                                                            SelectedDate ="{Binding SelectedEndDate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
+                                                            IsTodayHighlighted="True" />
                                                 <Grid Margin="0,8,0,0">
                                                     <Grid.ColumnDefinitions>
                                                         <ColumnDefinition />

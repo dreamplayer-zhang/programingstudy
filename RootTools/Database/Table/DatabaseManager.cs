@@ -384,6 +384,48 @@ namespace RootTools.Database
 			}
 #endif
 		}
+		public DataTable SelectTableDatetime(string sTable, string startDatetime, string endDatetime)
+		{
+			DataSet data = new DataSet();
+			DataTable table;
+
+			FieldInfo[] lotinfoFieldInfos = null;
+			Type lotinfoType = typeof(Lotinfo);
+			lotinfoFieldInfos = lotinfoType.GetFields(BindingFlags.Instance | BindingFlags.Public);
+#if !DEBUG
+			try
+			{
+#endif
+
+			string sSelectQuery = null;
+			if (startDatetime != null && endDatetime != null)
+            {
+				sSelectQuery = string.Format("SELECT * FROM wind2.{0} WHERE DATE({1}) BETWEEN '{2}' AND '{3}';", sTable, lotinfoFieldInfos[0].Name, startDatetime, endDatetime);
+			}
+			else if (startDatetime != null && endDatetime == null)
+            {
+				sSelectQuery = string.Format("SELECT * FROM wind2.{0} WHERE DATE({1}) >= '{2}';", sTable, lotinfoFieldInfos[0].Name, startDatetime);
+			}
+			else if (startDatetime == null && endDatetime != null)
+            {
+				sSelectQuery = string.Format("SELECT * FROM wind2.{0} WHERE DATE({1}) =< '{2}';", sTable, lotinfoFieldInfos[0].Name, endDatetime);
+			}
+			
+			MySqlDataAdapter ap = new MySqlDataAdapter();
+			ap.SelectCommand = new MySqlCommand(sSelectQuery, m_MainConnectSession.GetConnection());
+			ap.Fill(data);
+			table = data.Tables[0].Copy();
+			return table;
+#if !DEBUG
+			}
+			catch (Exception ex)
+			{
+				TempLogger.Write("Database", ex);
+				table = data.Tables[0].Copy();
+				return table;
+			}
+#endif
+		}
 
 		public DataTable SelectTablewithInspectionID(string sTable, string sInspectionID)
 		{

@@ -15,8 +15,8 @@ namespace Root_Rinse_Loader.Module
         #region ToolBox
         public override void GetTools(bool bInit)
         {
-            p_sInfo = m_toolBox.Get(ref m_axisRotate, this, "Rotate");
-            p_sInfo = m_toolBox.Get(ref m_axisWidth, this, "Width");
+            p_sInfo = m_toolBox.GetAxis(ref m_axisRotate, this, "Rotate");
+            p_sInfo = m_toolBox.GetAxis(ref m_axisWidth, this, "Width");
             foreach (Line line in m_aLine) line.GetTools(m_toolBox);
             if (bInit)
             {
@@ -31,9 +31,9 @@ namespace Root_Rinse_Loader.Module
             DIO_I[] m_diCheck = new DIO_I[3]; 
             public void GetTools(ToolBox toolBox)
             {
-                m_rail.p_sInfo = toolBox.Get(ref m_diCheck[0], m_rail, m_id + ".Start");
-                m_rail.p_sInfo = toolBox.Get(ref m_diCheck[1], m_rail, m_id + ".Mid");
-                m_rail.p_sInfo = toolBox.Get(ref m_diCheck[2], m_rail, m_id + ".Arrived");
+                m_rail.p_sInfo = toolBox.GetDIO(ref m_diCheck[0], m_rail, m_id + ".Start");
+                m_rail.p_sInfo = toolBox.GetDIO(ref m_diCheck[1], m_rail, m_id + ".Mid");
+                m_rail.p_sInfo = toolBox.GetDIO(ref m_diCheck[2], m_rail, m_id + ".Arrived");
             }
 
             public bool m_bExist = false; 

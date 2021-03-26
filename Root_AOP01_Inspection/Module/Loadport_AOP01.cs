@@ -44,14 +44,14 @@ namespace Root_AOP01_Inspection.Module
         public bool m_bUnLoadCheck = false;
         public override void GetTools(bool bInit)
         {
-            p_sInfo = m_toolBox.Get(ref m_diPlaced, this, "Place");
-            p_sInfo = m_toolBox.Get(ref m_diPresent, this, "Present");
-            p_sInfo = m_toolBox.Get(ref m_diOpen, this, "Open");
-            p_sInfo = m_toolBox.Get(ref m_diClose, this, "Close");
-            p_sInfo = m_toolBox.Get(ref m_diReady, this, "Ready");
-            p_sInfo = m_toolBox.Get(ref m_diRun, this, "Run");
-            p_sInfo = m_toolBox.Get(ref m_rs232, this, "RS232");
-            p_sInfo = m_toolBox.Get(ref m_OHT, this, p_infoCarrier, "OHT");
+            p_sInfo = m_toolBox.GetDIO(ref m_diPlaced, this, "Place");
+            p_sInfo = m_toolBox.GetDIO(ref m_diPresent, this, "Present");
+            p_sInfo = m_toolBox.GetDIO(ref m_diOpen, this, "Open");
+            p_sInfo = m_toolBox.GetDIO(ref m_diClose, this, "Close");
+            p_sInfo = m_toolBox.GetDIO(ref m_diReady, this, "Ready");
+            p_sInfo = m_toolBox.GetDIO(ref m_diRun, this, "Run");
+            p_sInfo = m_toolBox.GetComm(ref m_rs232, this, "RS232");
+            p_sInfo = m_toolBox.GetOHT(ref m_OHT, this, p_infoCarrier, "OHT");
             if (bInit)
             {
                 m_rs232.OnReceive += M_rs232_OnReceive;
@@ -65,7 +65,7 @@ namespace Root_AOP01_Inspection.Module
         public bool m_bPlaced = false;
         public bool CheckPlaced()
         {
-            GemCarrierBase.ePresent present = m_bPlaced ? GemCarrierBase.ePresent.Exist : GemCarrierBase.ePresent.Empty;
+            GemCarrierBase.ePresent present = m_OHT.m_bPODExist ? GemCarrierBase.ePresent.Exist : GemCarrierBase.ePresent.Empty;
             if (p_infoCarrier.CheckPlaced(present) != "OK") m_alidPlaced.Run(true, "Placed Sensor Remain Checked while Pod State = " + p_infoCarrier.p_eState);
             switch (p_infoCarrier.p_ePresentSensor)
             {
@@ -723,7 +723,7 @@ namespace Root_AOP01_Inspection.Module
         #region StateReady
         public override string StateReady()
         {
-            CheckPlaced();
+            //CheckPlaced();
             //if (p_infoCarrier.m_bReqReadCarrierID)
             //{
             //    p_infoCarrier.m_bReqReadCarrierID = false;

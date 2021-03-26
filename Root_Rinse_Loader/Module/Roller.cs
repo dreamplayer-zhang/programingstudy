@@ -13,8 +13,8 @@ namespace Root_Rinse_Loader.Module
         #region ToolBox
         public override void GetTools(bool bInit)
         {
-            p_sInfo = m_toolBox.Get(ref m_axisRotate[0], this, "Rotate0");
-            p_sInfo = m_toolBox.Get(ref m_axisRotate[1], this, "Rotate1");
+            p_sInfo = m_toolBox.GetAxis(ref m_axisRotate[0], this, "Rotate0");
+            p_sInfo = m_toolBox.GetAxis(ref m_axisRotate[1], this, "Rotate1");
             foreach (Line line in m_aLine) line.GetTools(m_toolBox);
             if (bInit)
             {
@@ -29,8 +29,8 @@ namespace Root_Rinse_Loader.Module
             public DIO_I[] m_diCheck = new DIO_I[2];
             public void GetTools(ToolBox toolBox)
             {
-                m_roller.p_sInfo = toolBox.Get(ref m_diCheck[0], m_roller, m_id + ".Check0");
-                m_roller.p_sInfo = toolBox.Get(ref m_diCheck[1], m_roller, m_id + ".Check1");
+                m_roller.p_sInfo = toolBox.GetDIO(ref m_diCheck[0], m_roller, m_id + ".Check0");
+                m_roller.p_sInfo = toolBox.GetDIO(ref m_diCheck[1], m_roller, m_id + ".Check1");
             }
 
             string m_id;

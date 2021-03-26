@@ -44,7 +44,7 @@ namespace RootTools.ToolBoxs
         #region ITool DIO
         public IToolDIO m_toolDIO = null;
 
-        public string Get(ref DIO_I value, ModuleBase module, string id, bool bLog = true, bool bEnableRun = false)
+        public string GetDIO(ref DIO_I value, ModuleBase module, string id, bool bLog = true, bool bEnableRun = false)
         {
             if (value == null) value = new DIO_I(m_toolDIO, module.p_id + "." + id, bLog ? module.m_log : null, bEnableRun);
             string sInfo = value.RunTree(module.m_treeRootTool.GetTree(id));
@@ -53,7 +53,7 @@ namespace RootTools.ToolBoxs
             return "OK";
         }
 
-        public string Get(ref DIO_O value, ModuleBase module, string id, bool bLog = true, bool bEnableRun = false)
+        public string GetDIO(ref DIO_O value, ModuleBase module, string id, bool bLog = true, bool bEnableRun = false)
         {
             if (value == null) value = new DIO_O(m_toolDIO, module.p_id + "." + id, bLog ? module.m_log : null, bEnableRun);
             string sInfo = value.RunTree(module.m_treeRootTool.GetTree(id));
@@ -62,7 +62,7 @@ namespace RootTools.ToolBoxs
             return "OK";
         }
 
-        public string Get(ref DIO_Is value, ModuleBase module, string id, string[] asDI, bool bLog = true, bool bEnableRun = false)
+        public string GetDIO(ref DIO_Is value, ModuleBase module, string id, string[] asDI, bool bLog = true, bool bEnableRun = false)
         {
             if (value == null) value = new DIO_Is(m_toolDIO, module.p_id + "." + id, bLog ? module.m_log : null, bEnableRun, asDI);
             string sInfo = value.RunTree(module.m_treeRootTool.GetTree(id));
@@ -71,7 +71,7 @@ namespace RootTools.ToolBoxs
             return "OK";
         }
 
-        public string Get(ref DIO_Is value, ModuleBase module, string id, string sDI, int nCount, bool bLog = true, bool bEnableRun = false)
+        public string GetDIO(ref DIO_Is value, ModuleBase module, string id, string sDI, int nCount, bool bLog = true, bool bEnableRun = false)
         {
             if (value == null) value = new DIO_Is(m_toolDIO, module.p_id + "." + id, bLog ? module.m_log : null, bEnableRun, sDI, nCount);
             string sInfo = value.RunTree(module.m_treeRootTool.GetTree(id));
@@ -80,7 +80,7 @@ namespace RootTools.ToolBoxs
             return "OK";
         }
 
-        public string Get(ref DIO_Os value, ModuleBase module, string id, string[] asDO, bool bLog = true, bool bEnableRun = false)
+        public string GetDIO(ref DIO_Os value, ModuleBase module, string id, string[] asDO, bool bLog = true, bool bEnableRun = false)
         {
             if (value == null) value = new DIO_Os(m_toolDIO, module.p_id + "." + id, bLog ? module.m_log : null, bEnableRun, asDO);
             string sInfo = value.RunTree(module.m_treeRootTool.GetTree(id));
@@ -89,7 +89,7 @@ namespace RootTools.ToolBoxs
             return "OK";
         }
 
-        public string Get(ref DIO_IO value, ModuleBase module, string id, bool bLog = true, bool bEnableRun = false)
+        public string GetDIO(ref DIO_IO value, ModuleBase module, string id, bool bLog = true, bool bEnableRun = false)
         {
             if (value == null) value = new DIO_IO(m_toolDIO, module.p_id + "." + id, bLog ? module.m_log : null, bEnableRun);
             string sInfo = value.RunTree(module.m_treeRootTool.GetTree(id));
@@ -99,7 +99,7 @@ namespace RootTools.ToolBoxs
             return "OK";
         }
 
-        public string Get(ref DIO_I2O value, ModuleBase module, string id, string sFalse, string sTrue, bool bLog = true, bool bEnableRun = false)
+        public string GetDIO(ref DIO_I2O value, ModuleBase module, string id, string sFalse, string sTrue, bool bLog = true, bool bEnableRun = false)
         {
             if (value == null) value = new DIO_I2O(m_toolDIO, module.p_id + "." + id, bLog ? module.m_log : null, bEnableRun, sFalse, sTrue);
             string sInfo = value.RunTree(module.m_treeRootTool.GetTree(id));
@@ -110,7 +110,7 @@ namespace RootTools.ToolBoxs
             return "OK";
         }
 
-        public string Get(ref DIO_I2O2 value, ModuleBase module, string id, string sFalse, string sTrue, bool bLog = true, bool bEnableRun = false)
+        public string GetDIO(ref DIO_I2O2 value, ModuleBase module, string id, string sFalse, string sTrue, bool bLog = true, bool bEnableRun = false)
         {
             if (value == null) value = new DIO_I2O2(m_toolDIO, module.p_id + "." + id, bLog ? module.m_log : null, bEnableRun, sFalse, sTrue);
             string sInfo = value.RunTree(module.m_treeRootTool.GetTree(id));
@@ -124,14 +124,14 @@ namespace RootTools.ToolBoxs
         #endregion
 
         #region ITool Axis
-        public string Get(ref Axis value, ModuleBase module, string id)
+        public string GetAxis(ref Axis value, ModuleBase module, string id)
         {
             if (value == null) value = m_control.GetAxis(module.p_id + "." + id, module.m_log);
             module.m_listAxis.Add(value);
             return "OK";
         }
 
-        public string Get(ref AxisXY value, ModuleBase module, string id)
+        public string GetAxis(ref AxisXY value, ModuleBase module, string id)
         {
             if (value == null) value = m_control.GetAxisXY(module.p_id + "." + id, module.m_log);
             module.m_listAxis.Add(value.p_axisX);
@@ -156,15 +156,6 @@ namespace RootTools.ToolBoxs
             if (value == null)
             {
                 value = m_memoryTool.CreatePool(module.p_id + "." + id, fGB);
-                module.m_aTool.Add(value);
-            }
-            return "OK";
-        }
-        public string Get(ref MemoryPool value, ModuleBase module, string id, double fGB , bool bTest)
-        {
-            if (value == null)
-            {
-                value = m_memoryTool.CreatePool(id, fGB);
                 module.m_aTool.Add(value);
             }
             return "OK";
@@ -233,7 +224,7 @@ namespace RootTools.ToolBoxs
             module.m_aTool.Add(module.m_cameraSet);
         }
 
-        public string Get(ref CameraBasler value, ModuleBase module, string id)
+        public string GetCamera(ref CameraBasler value, ModuleBase module, string id)
         {
             if (value == null)
             {
@@ -244,7 +235,7 @@ namespace RootTools.ToolBoxs
             return "OK";
         }
 
-        public string Get(ref CameraDalsa value, ModuleBase module, string id)
+        public string GetCamera(ref CameraDalsa value, ModuleBase module, string id)
         {
             if (value == null)
             {
@@ -255,7 +246,7 @@ namespace RootTools.ToolBoxs
             return "OK";
         }
 
-        public string Get(ref Camera_Basler value, ModuleBase module, string id)
+        public string GetCamera(ref Camera_Basler value, ModuleBase module, string id)
         {
             if (value == null)
             {
@@ -273,7 +264,7 @@ namespace RootTools.ToolBoxs
             return "OK";
         }
 
-        public string Get(ref Camera_Dalsa value, ModuleBase module, string id)
+        public string GetCamera(ref Camera_Dalsa value, ModuleBase module, string id)
         {
             if (value == null)
             {
@@ -291,7 +282,7 @@ namespace RootTools.ToolBoxs
             return "OK";
         }
 
-        public string Get(ref Camera_Matrox value, ModuleBase module, string id)
+        public string GetCamera(ref Camera_Matrox value, ModuleBase module, string id)
         {
             if (value == null)
             {
@@ -309,7 +300,7 @@ namespace RootTools.ToolBoxs
             return "OK";
         }
 
-        public string Get(ref Camera_Silicon value, ModuleBase module, string id)
+        public string GetCamera(ref Camera_Silicon value, ModuleBase module, string id)
         {
             if (value == null)
             {
@@ -327,7 +318,7 @@ namespace RootTools.ToolBoxs
             return "OK";
         }
 
-        public string Get(ref Camera_CognexOCR value, ModuleBase module, string id)
+        public string GetCamera(ref Camera_CognexOCR value, ModuleBase module, string id)
         {
             if (value == null)
             {
@@ -371,7 +362,7 @@ namespace RootTools.ToolBoxs
 
         #region ITool Comm
         ToolSet m_toolSetComm = null;
-        public string Get(ref NamedPipe value, ModuleBase module, string id)
+        public string GetComm(ref NamedPipe value, ModuleBase module, string id)
         {
             if (m_toolSetComm == null) m_toolSetComm = InitToolSet("Comm");
             if (value == null)
@@ -383,7 +374,7 @@ namespace RootTools.ToolBoxs
             return "OK";
         }
 
-        public string Get(ref TCPIPServer value, ModuleBase module, string id)
+        public string GetComm(ref TCPIPServer value, ModuleBase module, string id)
         {
             if (m_toolSetComm == null) m_toolSetComm = InitToolSet("Comm");
             if (value == null)
@@ -395,7 +386,7 @@ namespace RootTools.ToolBoxs
             return "OK";
         }
 
-        public string Get(ref TCPIPClient value, ModuleBase module, string id)
+        public string GetComm(ref TCPIPClient value, ModuleBase module, string id)
         {
             if (m_toolSetComm == null) m_toolSetComm = InitToolSet("Comm");
             if (value == null)
@@ -407,7 +398,7 @@ namespace RootTools.ToolBoxs
             return "OK";
         }
 
-        public string Get(ref TCPAsyncServer value, ModuleBase module, string id, int lMaxBuffer = 4096)
+        public string GetComm(ref TCPAsyncServer value, ModuleBase module, string id, int lMaxBuffer = 4096)
         {
             if (m_toolSetComm == null) m_toolSetComm = InitToolSet("Comm");
             if (value == null)
@@ -419,7 +410,7 @@ namespace RootTools.ToolBoxs
             return "OK";
         }
 
-        public string Get(ref TCPAsyncClient value, ModuleBase module, string id, int lMaxBuffer = 4096)
+        public string GetComm(ref TCPAsyncClient value, ModuleBase module, string id, int lMaxBuffer = 4096)
         {
             if (m_toolSetComm == null) m_toolSetComm = InitToolSet("Comm");
             if (value == null)
@@ -431,7 +422,7 @@ namespace RootTools.ToolBoxs
             return "OK";
         }
 
-        public string Get(ref TCPSyncServer value, ModuleBase module, string id, int lMaxBuffer = 4096)
+        public string GetComm(ref TCPSyncServer value, ModuleBase module, string id, int lMaxBuffer = 4096)
         {
             if (m_toolSetComm == null) m_toolSetComm = InitToolSet("Comm");
             if (value == null)
@@ -443,7 +434,7 @@ namespace RootTools.ToolBoxs
             return "OK";
         }
 
-        public string Get(ref TCPSyncClient value, ModuleBase module, string id, int lMaxBuffer = 4096)
+        public string GetComm(ref TCPSyncClient value, ModuleBase module, string id, int lMaxBuffer = 4096)
         {
             if (m_toolSetComm == null) m_toolSetComm = InitToolSet("Comm");
             if (value == null)
@@ -455,7 +446,7 @@ namespace RootTools.ToolBoxs
             return "OK";
         }
 
-        public string Get(ref RS232 value, ModuleBase module, string id)
+        public string GetComm(ref RS232 value, ModuleBase module, string id)
         {
             if (m_toolSetComm == null) m_toolSetComm = InitToolSet("Comm");
             if (value == null)
@@ -467,7 +458,7 @@ namespace RootTools.ToolBoxs
             return "OK";
         }
 
-        public string Get(ref RS232byte value, ModuleBase module, string id)
+        public string GetComm(ref RS232byte value, ModuleBase module, string id)
         {
             if (m_toolSetComm == null) m_toolSetComm = InitToolSet("Comm");
             if (value == null)
@@ -479,7 +470,7 @@ namespace RootTools.ToolBoxs
             return "OK";
         }
 
-        public string Get(ref Modbus value, ModuleBase module, string id)
+        public string GetComm(ref Modbus value, ModuleBase module, string id)
         {
             if (m_toolSetComm == null) m_toolSetComm = InitToolSet("Comm");
             if (value == null)
@@ -490,7 +481,9 @@ namespace RootTools.ToolBoxs
             }
             return "OK";
         }
+        #endregion
 
+        #region ZoomLens
         public string Get(ref ZoomLens.ZoomLens value, ModuleBase module, string id)
         {
             if (m_toolSetComm == null) m_toolSetComm = InitToolSet("Comm");
@@ -507,7 +500,7 @@ namespace RootTools.ToolBoxs
         #region ITool OHT
         ToolSet m_toolSetOHT = null;
 
-        public string Get(ref OHT_Semi value, ModuleBase module, GemCarrierBase carrier, string id)
+        public string GetOHT(ref OHT_Semi value, ModuleBase module, GemCarrierBase carrier, string id)
         {
             if (m_toolSetOHT == null) m_toolSetOHT = InitToolSet("OHT");
             if (value == null)
@@ -520,7 +513,7 @@ namespace RootTools.ToolBoxs
             return "OK";
         }
 
-        public string Get(ref OHT_SSEM value, ModuleBase module, GemCarrierBase carrier, string id)
+        public string GetOHT(ref OHT_SSEM value, ModuleBase module, GemCarrierBase carrier, string id)
         {
             if (m_toolSetOHT == null) m_toolSetOHT = InitToolSet("OHT");
             if (value == null)
@@ -533,7 +526,7 @@ namespace RootTools.ToolBoxs
             return "OK";
         }
 
-        public string Get(ref OHTNew.OHT value, ModuleBase module, GemCarrierBase carrier, string id)
+        public string GetOHT(ref OHTNew.OHT value, ModuleBase module, GemCarrierBase carrier, string id)
         {
             if (m_toolSetOHT == null) m_toolSetOHT = InitToolSet("OHT");
             if (value == null)

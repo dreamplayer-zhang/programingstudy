@@ -16,7 +16,7 @@ namespace Root_AOP01_Packing
         Camera_Basler m_tapeVRS;
         public override void GetTools(bool bInit)
         {
-            p_sInfo = m_toolBox.Get(ref m_tapeVRS, this, "Tape VRS");
+            p_sInfo = m_toolBox.GetCamera(ref m_tapeVRS, this, "Tape VRS");
         }
         public Vision_AOP(string id, IEngineer engineer)
         {

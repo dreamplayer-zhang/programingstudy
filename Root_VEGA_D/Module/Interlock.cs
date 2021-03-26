@@ -35,28 +35,28 @@ namespace Root_VEGA_D.Module
         DIO_O m_doDoorLock;
         public override void GetTools(bool bInit)
         {
-            p_sInfo = m_toolBox.Get(ref m_diEmergency, this, "Emergency");
-            p_sInfo = m_toolBox.Get(ref m_diMCReset, this, "MC Reset");
-            p_sInfo = m_toolBox.Get(ref m_diDoorLock, this, "Door Lock");
-            p_sInfo = m_toolBox.Get(ref m_diInterlock_key, this, "Interlock Key");
-            p_sInfo = m_toolBox.Get(ref m_diCDA1, this, "CDA1 Pressure");
-            p_sInfo = m_toolBox.Get(ref m_diCDA2, this, "CDA2 Pressure");
-            p_sInfo = m_toolBox.Get(ref m_diEFEMLeft_Door, this, "EFEM Left Door");
-            p_sInfo = m_toolBox.Get(ref m_diEFEMRight_Door, this, "EFEM Right Door");
-            p_sInfo = m_toolBox.Get(ref m_diActiveIsolator_Alarm, this, "Active Isolator Alarm");
-            p_sInfo = m_toolBox.Get(ref m_diVisionFFU_Door, this, "Vision FFU Door");
-            p_sInfo = m_toolBox.Get(ref m_diVisionTop_Door, this, "Vision Top Door");
-            p_sInfo = m_toolBox.Get(ref m_diVisionBtm_Door, this, "Vision Bottom Door");
-            p_sInfo = m_toolBox.Get(ref m_diVisionSlide_Door, this, "Vision Slide Door");
-            p_sInfo = m_toolBox.Get(ref m_diPC1Fan_Alarm, this, "PC1 Fan Alarm");
-            p_sInfo = m_toolBox.Get(ref m_diPC2Fan_Alarm, this, "PC2 Fan Alarm");
-            p_sInfo = m_toolBox.Get(ref m_di4ChLEDFan_Alarm, this, "4Ch LED Fan Alarm");
-            p_sInfo = m_toolBox.Get(ref m_diEFEMFan_Alarm, this, "EFEM Fan Alarm");
-            p_sInfo = m_toolBox.Get(ref m_diELECRackFan_Alarm, this, "Elec Rack Fan Alarm");
-            p_sInfo = m_toolBox.Get(ref m_diPiezo_Alarm, this, "Piezo Alarm");
-            p_sInfo = m_toolBox.Get(ref m_diLightCurtain, this, "Light Curtain");
-            p_sInfo = m_toolBox.Get(ref m_diProtectionbar, this, "Protectionbar Sensor");
-            p_sInfo = m_toolBox.Get(ref m_doDoorLock, this, "Door Lock On/Off");
+            p_sInfo = m_toolBox.GetDIO(ref m_diEmergency, this, "Emergency");
+            p_sInfo = m_toolBox.GetDIO(ref m_diMCReset, this, "MC Reset");
+            p_sInfo = m_toolBox.GetDIO(ref m_diDoorLock, this, "Door Lock");
+            p_sInfo = m_toolBox.GetDIO(ref m_diInterlock_key, this, "Interlock Key");
+            p_sInfo = m_toolBox.GetDIO(ref m_diCDA1, this, "CDA1 Pressure");
+            p_sInfo = m_toolBox.GetDIO(ref m_diCDA2, this, "CDA2 Pressure");
+            p_sInfo = m_toolBox.GetDIO(ref m_diEFEMLeft_Door, this, "EFEM Left Door");
+            p_sInfo = m_toolBox.GetDIO(ref m_diEFEMRight_Door, this, "EFEM Right Door");
+            p_sInfo = m_toolBox.GetDIO(ref m_diActiveIsolator_Alarm, this, "Active Isolator Alarm");
+            p_sInfo = m_toolBox.GetDIO(ref m_diVisionFFU_Door, this, "Vision FFU Door");
+            p_sInfo = m_toolBox.GetDIO(ref m_diVisionTop_Door, this, "Vision Top Door");
+            p_sInfo = m_toolBox.GetDIO(ref m_diVisionBtm_Door, this, "Vision Bottom Door");
+            p_sInfo = m_toolBox.GetDIO(ref m_diVisionSlide_Door, this, "Vision Slide Door");
+            p_sInfo = m_toolBox.GetDIO(ref m_diPC1Fan_Alarm, this, "PC1 Fan Alarm");
+            p_sInfo = m_toolBox.GetDIO(ref m_diPC2Fan_Alarm, this, "PC2 Fan Alarm");
+            p_sInfo = m_toolBox.GetDIO(ref m_di4ChLEDFan_Alarm, this, "4Ch LED Fan Alarm");
+            p_sInfo = m_toolBox.GetDIO(ref m_diEFEMFan_Alarm, this, "EFEM Fan Alarm");
+            p_sInfo = m_toolBox.GetDIO(ref m_diELECRackFan_Alarm, this, "Elec Rack Fan Alarm");
+            p_sInfo = m_toolBox.GetDIO(ref m_diPiezo_Alarm, this, "Piezo Alarm");
+            p_sInfo = m_toolBox.GetDIO(ref m_diLightCurtain, this, "Light Curtain");
+            p_sInfo = m_toolBox.GetDIO(ref m_diProtectionbar, this, "Protectionbar Sensor");
+            p_sInfo = m_toolBox.GetDIO(ref m_doDoorLock, this, "Door Lock On/Off");
 
             if (bInit)
             {

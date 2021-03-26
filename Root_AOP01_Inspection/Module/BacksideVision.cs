@@ -72,10 +72,10 @@ namespace Root_AOP01_Inspection.Module
             //p_sInfo = m_toolBox.Get(ref m_axisXY, this, "Axis XY");
             p_sInfo = m_toolBox.Get(ref m_memoryPool, this, "Vision Memory", 1);
             p_sInfo = m_toolBox.Get(ref m_lightSet, this);
-            p_sInfo = m_toolBox.Get(ref m_CamTDI90, this, "TDI 90");
-            p_sInfo = m_toolBox.Get(ref m_CamTDI45, this, "TDI 45");
-            p_sInfo = m_toolBox.Get(ref m_CamTDISide, this, "TDI Side");
-            p_sInfo = m_toolBox.Get(ref m_CamLADS, this, "LADS");
+            p_sInfo = m_toolBox.GetCamera(ref m_CamTDI90, this, "TDI 90");
+            p_sInfo = m_toolBox.GetCamera(ref m_CamTDI45, this, "TDI 45");
+            p_sInfo = m_toolBox.GetCamera(ref m_CamTDISide, this, "TDI Side");
+            p_sInfo = m_toolBox.GetCamera(ref m_CamLADS, this, "LADS");
             m_alid_WaferExist = m_gaf.GetALID(this, "BacksideVision Wafer Exist", "BacksideVision Wafer Exist");
         }
         #endregion

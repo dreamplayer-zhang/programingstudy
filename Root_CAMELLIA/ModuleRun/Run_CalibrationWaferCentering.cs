@@ -12,6 +12,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using static Root_CAMELLIA.Module.Module_Camellia;
 
 namespace Root_CAMELLIA.Module
 {
@@ -28,6 +29,14 @@ namespace Root_CAMELLIA.Module
         double m_dResX_um = 1;
         double m_dResY_um = 1;
         double m_dFocusZ = 0;
+
+        bool m_bUseCustomSpeed = false;
+        double m_dMoveSpeedX = 0;
+        double m_dMoveSpeedY = 0;
+        double m_dMoveAccX = -1;
+        double m_dMoveDecX = -1;
+        double m_dMoveAccY = -1;
+        double m_dMoveDecY = -1;
 
         bool m_InitialCal = false;
         public bool m_useCal = true;
@@ -56,7 +65,31 @@ namespace Root_CAMELLIA.Module
             run.m_useCal = m_useCal;
             run.m_useCentering = m_useCentering;
             run.m_dFocusZ = m_dFocusZ;
+            run.m_dMoveSpeedX = m_dMoveSpeedX;
+            run.m_dMoveSpeedY = m_dMoveSpeedY;
+            run.m_dMoveAccX = m_dMoveAccX;
+            run.m_dMoveAccY = m_dMoveAccY;
+            run.m_dMoveDecX = m_dMoveDecX;
+            run.m_dMoveDecY = m_dMoveDecY;
+            run.m_bUseCustomSpeed = m_bUseCustomSpeed;
             return run;
+        }
+
+        private bool CheckVaildParameter()
+        {
+            if(m_dMoveSpeedX == 0 || m_dMoveSpeedY == 0)
+            {
+                return false;
+            }
+            if(m_dMoveAccX == -1 || m_dMoveDecX == -1)
+            {
+                return false;
+            }
+            if(m_dMoveAccY == -1 || m_dMoveDecY == -1)
+            {
+                return false;
+            }
+            return true;
         }
 
         public override void RunTree(Tree tree, bool bVisible, bool bReadOnly)
@@ -72,6 +105,14 @@ namespace Root_CAMELLIA.Module
             m_useCal = tree.Set(m_useCal, m_useCal, "Use Calibration", "Use Calibration", bVisible);
             m_useCentering = tree.Set(m_useCentering, m_useCentering, "Use Centering", "Use Centering", bVisible);
             m_dFocusZ = tree.Set(m_dFocusZ, m_dFocusZ, "Focus Z Pos", "Focus Z Pos", bVisible);
+            
+            m_dMoveSpeedX = tree.Set(m_dMoveSpeedX, m_dMoveSpeedX, "Move Speed X", "Move Speed X", bVisible);
+            m_dMoveSpeedY = tree.Set(m_dMoveSpeedY, m_dMoveSpeedY, "Move Speed Y", "Move Speed Y", bVisible);
+            m_dMoveAccX = tree.Set(m_dMoveAccX, m_dMoveAccX, "Move Acc X", "Move Acc X", bVisible);
+            m_dMoveAccY = tree.Set(m_dMoveAccY, m_dMoveAccY, "Move Acc Y", "Move Acc Y", bVisible);
+            m_dMoveDecX = tree.Set(m_dMoveDecX, m_dMoveDecX, "Move Dec X", "Move Dec X", bVisible);
+            m_dMoveDecY = tree.Set(m_dMoveDecY, m_dMoveDecY, "Move Dec Y", "Move Dec Y", bVisible);
+            m_bUseCustomSpeed = tree.Set(m_bUseCustomSpeed, m_bUseCustomSpeed, "Use Custom Speed", "Use Custom Speed", bVisible);
             //RunTreeLight(tree.GetTree("LightPower", false), bVisible, bReadOnly);
         }
 
@@ -84,8 +125,20 @@ namespace Root_CAMELLIA.Module
             Axis axisZ = m_module.p_axisZ;
             string strVRSImageDir = "D:\\";
             string strVRSImageFullPath = "";
-            StopWatch sw = new StopWatch();
-            sw.Start();
+
+
+            if (m_module.LifterDown() != "OK")
+            {
+                return p_sInfo;
+            }
+
+            if (m_module.Run(axisZ.StartMove(491453)))
+            {
+                return p_sInfo;
+            }
+            if (m_module.Run(axisZ.WaitReady()))
+                return p_sInfo;
+
             if (m_useCal)
             {
                 if (m_useCentering)
@@ -114,29 +167,45 @@ namespace Root_CAMELLIA.Module
             Camera_Basler VRS = m_module.p_CamVRS;
             ImageData img = VRS.p_ImageViewer.p_ImageData;
 
-
-            if (m_module.LifterDown() != "OK")
+            StopWatch sw = new StopWatch();
+            if (VRS.p_CamInfo._OpenStatus == false) VRS.Connect();
+            while (VRS.p_CamInfo._OpenStatus == false)
             {
-                return p_sInfo;
+                if (sw.ElapsedMilliseconds > 15000)
+                {
+                    sw.Stop();
+                    return "Navigation Camera Not Connected";
+                }
             }
-
-            m_module.VaccumOnOff(true);
-
+            sw.Stop();
 
 
-            if (m_module.Run(axisZ.StartMove(491453)))
+            //m_module.VaccumOnOff(true);
+
+
+
+            
+
+            if (m_bUseCustomSpeed && CheckVaildParameter())
             {
-                return p_sInfo;
+                if(m_module.Run(axisXY.p_axisX.StartMove(m_WaferLT_pulse.X, m_dMoveSpeedX, m_dMoveAccX, m_dMoveDecX)))
+                {
+                    return p_sInfo;
+                }
+                if (m_module.Run(axisXY.p_axisY.StartMove(m_WaferLT_pulse.Y, m_dMoveSpeedY, m_dMoveAccY, m_dMoveDecY)))
+                {
+                    return p_sInfo;
+                }
+                if (m_module.Run(axisXY.WaitReady()))
+                    return p_sInfo;
             }
-            if (m_module.Run(axisZ.WaitReady()))
-                return p_sInfo;
-
-
-            if (m_module.Run(axisXY.StartMove(m_WaferLT_pulse)))
-                return p_sInfo;
-            if (m_module.Run(axisXY.WaitReady()))
-                return p_sInfo;
-
+            else
+            {
+                if (m_module.Run(axisXY.StartMove(m_WaferLT_pulse)))
+                    return p_sInfo;
+                if (m_module.Run(axisXY.WaitReady()))
+                    return p_sInfo;
+            }
              //Thread.Sleep(1000);
 
             ImageData asdv = new ImageData(VRS.p_ImageViewer.p_ImageData.m_MemData);
@@ -158,17 +227,34 @@ namespace Root_CAMELLIA.Module
             CenteringParam param = new CenteringParam(img, VRS.GetRoiSize(), m_EdgeSearchRange, m_EdgeSearchLevel, WaferCentering.eDir.LT);
             ThreadPool.QueueUserWorkItem(m_DataManager.m_waferCentering.FindEdge, param);
 
-            if (m_module.Run(axisXY.StartMove(m_WaferRT_pulse)))
-                return p_sInfo;
-            if (m_module.Run(axisXY.WaitReady()))
-                return p_sInfo;
-           // return "OK";
+
+            if (m_bUseCustomSpeed && CheckVaildParameter())
+            {
+                if (m_module.Run(axisXY.p_axisX.StartMove(m_WaferRT_pulse.X, m_dMoveSpeedX, m_dMoveAccX, m_dMoveDecX)))
+                {
+                    return p_sInfo;
+                }
+                if (m_module.Run(axisXY.p_axisY.StartMove(m_WaferRT_pulse.Y, m_dMoveSpeedY, m_dMoveAccY, m_dMoveDecY)))
+                {
+                    return p_sInfo;
+                }
+                if (m_module.Run(axisXY.WaitReady()))
+                    return p_sInfo;
+            }
+            else
+            {
+                if (m_module.Run(axisXY.StartMove(m_WaferRT_pulse)))
+                    return p_sInfo;
+                if (m_module.Run(axisXY.WaitReady()))
+                    return p_sInfo;
+            }
+            // return "OK";
             //m_DataManager.m_waferCentering.FindEdge(param);
             //Thread.Sleep(1000);
 
 
 
-            
+
 
             if (VRS.Grab() == "OK")
             {
@@ -186,12 +272,28 @@ namespace Root_CAMELLIA.Module
             ThreadPool.QueueUserWorkItem(m_DataManager.m_waferCentering.FindEdge, param);
             //m_DataManager.m_waferCentering.FindEdge(param);
 
-           // Thread.Sleep(1000);
-            if (m_module.Run(axisXY.StartMove(m_WaferRB_pulse)))
-                return p_sInfo;
-            if (m_module.Run(axisXY.WaitReady()))
-                return p_sInfo;
-            
+            // Thread.Sleep(1000);
+            if (m_bUseCustomSpeed && CheckVaildParameter())
+            {
+                if (m_module.Run(axisXY.p_axisX.StartMove(m_WaferRB_pulse.X, m_dMoveSpeedX, m_dMoveAccX, m_dMoveDecX)))
+                {
+                    return p_sInfo;
+                }
+                if (m_module.Run(axisXY.p_axisY.StartMove(m_WaferRB_pulse.Y, m_dMoveSpeedY, m_dMoveAccY, m_dMoveDecY)))
+                {
+                    return p_sInfo;
+                }
+                if (m_module.Run(axisXY.WaitReady()))
+                    return p_sInfo;
+            }
+            else
+            {
+                if (m_module.Run(axisXY.StartMove(m_WaferRB_pulse)))
+                    return p_sInfo;
+                if (m_module.Run(axisXY.WaitReady()))
+                    return p_sInfo;
+            }
+
             if (VRS.Grab() == "OK")
             {
                 strVRSImageFullPath = string.Format(strVRSImageDir + "VRSImage_{0}.bmp", 2);

@@ -27,7 +27,7 @@ namespace Root_EFEM.Module
 
         public override void GetTools(bool bInit)
         {
-            p_sInfo = m_toolBox.Get(ref m_rs232, this, "RS232");
+            p_sInfo = m_toolBox.GetComm(ref m_rs232, this, "RS232");
             if (bInit)
             {
                 m_rs232.OnReceive += M_rs232_OnReceive;

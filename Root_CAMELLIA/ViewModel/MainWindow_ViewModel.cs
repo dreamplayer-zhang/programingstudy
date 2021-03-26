@@ -919,6 +919,7 @@ namespace Root_CAMELLIA
                     
                     m_MainWindow.Close();
                     App.m_engineer.ThreadStop();
+                    DataManager.Instance.m_SaveMeasureData.ThreadStop();
                     Application.Current.Shutdown();
                 });
             }

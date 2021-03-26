@@ -27,16 +27,16 @@ namespace Root_ASIS.Module
         DIO_O[] m_doAlign = new DIO_O[2];
         public override void GetTools(bool bInit)
         {
-            p_sInfo = m_toolBox.Get(ref m_axis[0], this, "Pusher");
-            p_sInfo = m_toolBox.Get(ref m_axis[1], this, "Gripper");
-            p_sInfo = m_toolBox.Get(ref m_diSensor[0], this, "Pusher Sensor");
-            p_sInfo = m_toolBox.Get(ref m_diSensor[1], this, "Gripper Sensor");
-            p_sInfo = m_toolBox.Get(ref m_diProduct[0], this, "Pusher Product");
-            p_sInfo = m_toolBox.Get(ref m_diProduct[1], this, "Gripper Product");
-            p_sInfo = m_toolBox.Get(ref m_dioGrip[0], this, "Pusher Grip", "Off", "Grip");
-            p_sInfo = m_toolBox.Get(ref m_dioGrip[1], this, "Gripper Grip", "Off", "Grip");
-            p_sInfo = m_toolBox.Get(ref m_doAlign[0], this, "Pusher Align");
-            p_sInfo = m_toolBox.Get(ref m_doAlign[1], this, "Gripper Align");
+            p_sInfo = m_toolBox.GetAxis(ref m_axis[0], this, "Pusher");
+            p_sInfo = m_toolBox.GetAxis(ref m_axis[1], this, "Gripper");
+            p_sInfo = m_toolBox.GetDIO(ref m_diSensor[0], this, "Pusher Sensor");
+            p_sInfo = m_toolBox.GetDIO(ref m_diSensor[1], this, "Gripper Sensor");
+            p_sInfo = m_toolBox.GetDIO(ref m_diProduct[0], this, "Pusher Product");
+            p_sInfo = m_toolBox.GetDIO(ref m_diProduct[1], this, "Gripper Product");
+            p_sInfo = m_toolBox.GetDIO(ref m_dioGrip[0], this, "Pusher Grip", "Off", "Grip");
+            p_sInfo = m_toolBox.GetDIO(ref m_dioGrip[1], this, "Gripper Grip", "Off", "Grip");
+            p_sInfo = m_toolBox.GetDIO(ref m_doAlign[0], this, "Pusher Align");
+            p_sInfo = m_toolBox.GetDIO(ref m_doAlign[1], this, "Gripper Align");
             m_blowTop.GetTools("Blow Top", m_toolBox);
             m_blowBottom.GetTools("Blow Bottom", m_toolBox);
             if (m_railWidth != null) m_railWidth.GetTools(m_toolBox); 
@@ -56,7 +56,7 @@ namespace Root_ASIS.Module
             Axis m_axis; 
             public void GetTools(ToolBox toolBox)
             {
-                m_cleaner.p_sInfo = toolBox.Get(ref m_axis, m_cleaner, "RailWidth"); 
+                m_cleaner.p_sInfo = toolBox.GetAxis(ref m_axis, m_cleaner, "RailWidth"); 
             }
 
             double[] m_posAxis = new double[2];
@@ -98,9 +98,9 @@ namespace Root_ASIS.Module
             DIO_IO[] m_dioBlow = new DIO_IO[3];
             public void GetTools(string sGroup, ToolBox toolBox)
             {
-                m_cleaner.p_sInfo = toolBox.Get(ref m_dioBlow[0], m_cleaner, sGroup + "0");
-                m_cleaner.p_sInfo = toolBox.Get(ref m_dioBlow[1], m_cleaner, sGroup + "1");
-                m_cleaner.p_sInfo = toolBox.Get(ref m_dioBlow[2], m_cleaner, sGroup + "2");
+                m_cleaner.p_sInfo = toolBox.GetDIO(ref m_dioBlow[0], m_cleaner, sGroup + "0");
+                m_cleaner.p_sInfo = toolBox.GetDIO(ref m_dioBlow[1], m_cleaner, sGroup + "1");
+                m_cleaner.p_sInfo = toolBox.GetDIO(ref m_dioBlow[2], m_cleaner, sGroup + "2");
             }
 
             public bool m_bUseDI = false;
