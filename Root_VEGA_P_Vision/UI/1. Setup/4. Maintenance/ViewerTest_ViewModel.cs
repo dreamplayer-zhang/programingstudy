@@ -1,17 +1,13 @@
 ﻿using RootTools;
 using RootTools.Memory;
 using RootTools_Vision;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Root_VEGA_P_Vision.UI
 {
     class ViewerTest_ViewModel : ObservableObject
     {
         RootViewer_ViewModel m_Viewer = new RootViewer_ViewModel();
+        #region [Property]
         public RootViewer_ViewModel p_Viewer
         {
             get
@@ -36,7 +32,7 @@ namespace Root_VEGA_P_Vision.UI
                 SetProperty(ref m_MiniImageViewer, value);
             }
         }
-
+        #endregion
         MemoryTool m_ToolMemory;
         ImageData m_imagedata;
 
@@ -50,9 +46,9 @@ namespace Root_VEGA_P_Vision.UI
             m_Viewer.init(null, GlobalObjects.Instance.Get<DialogService>());
             m_ToolMemory = tool;
 
-            m_imagedata = new ImageData(m_ToolMemory.GetMemory("Vision.Memory", "Vision", "Main"));
+            m_imagedata = new ImageData(m_ToolMemory.GetMemory("Vision.Memory", "Vision", "EIP_Plate.Main.Front"));
             m_imagedata.p_nByte = 1;
-            m_imagedata.p_nPlane = 3;
+            m_imagedata.p_nPlane = 1;
             p_Viewer.SetImageData(m_imagedata);
         }
 

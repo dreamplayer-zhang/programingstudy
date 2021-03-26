@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Controls;
+﻿using System.Windows.Controls;
 using System.Windows.Input;
 
 namespace Root_VEGA_P_Vision
@@ -16,11 +11,13 @@ namespace Root_VEGA_P_Vision
         public Home_ViewModel(Setup_ViewModel setup)
         {
             m_Setup = setup;
-            init();
+            Init();
         }
-        private void init()
+        private void Init()
         {
             Main = new HomePanel();
+
+            //SetPage(Main);
         }
 
         public void SetPage(UserControl page)

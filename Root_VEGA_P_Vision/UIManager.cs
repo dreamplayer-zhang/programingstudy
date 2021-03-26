@@ -63,7 +63,7 @@ namespace Root_VEGA_P_Vision
             if (window == null) return;
 
             MainPanel.Children.Clear();
-            MainPanel.Children.Add((UIElement)window);
+            MainPanel.Children.Add(window);
         }
 
         public void ChangeUIMode()
@@ -78,7 +78,6 @@ namespace Root_VEGA_P_Vision
         public void ChangeUISetup()
         {
             ChangeMainUI(setupWindow);
-
         }
 
         public void ChangeUIRun()

@@ -180,7 +180,7 @@ namespace Root_VEGA_P_Vision
         {
             p_NaviButtons.Clear();
 
-            homeVM.SetPage(homeVM.Main);
+            //homeVM.SetPage(homeVM.Main);
             p_CurrentPanel = homeVM.Main;
             p_CurrentPanel.DataContext = homeVM;
         }

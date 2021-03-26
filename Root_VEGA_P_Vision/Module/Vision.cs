@@ -11,7 +11,6 @@ using RootTools.Trees;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Threading;
 
 namespace Root_VEGA_P_Vision.Module
 {

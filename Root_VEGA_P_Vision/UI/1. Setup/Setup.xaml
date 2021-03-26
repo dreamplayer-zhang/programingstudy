@@ -9,186 +9,11 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="25"/>
-            <RowDefinition Height="25"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <!--Menu-->
-        <Border Grid.Row="0"
-                Background="{StaticResource ControlBackGround}"
-                BorderBrush="DimGray"
-                BorderThickness="0,0,0,0">
-            <StackPanel Orientation="Horizontal">
-                <Menu>
-                    <MenuItem Background="{StaticResource ControlBackGround}"
-                              BorderBrush="#FF707070"
-                              BorderThickness="0,0,0,0">
-                        <MenuItem.Header>
-                            <Grid Width="70"
-                                  Height="25">
-                                <TextBlock Text="File"
-                                           FontSize="13"
-                                           FontWeight="Bold"
-                                           VerticalAlignment="Center"
-                                           HorizontalAlignment="Center" />
-                            </Grid>
-                        </MenuItem.Header>
-                        <MenuItem Header="New">
-                            <!--<MenuItem.Icon>
-                                <material:PackIcon Kind="FileOutline" />
-                            </MenuItem.Icon>-->
-                        </MenuItem>
-                        <MenuItem Header="Load">
-                            <!--<MenuItem.Icon>
-                                <material:PackIcon Kind="FileUploadOutline"/>
-                            </MenuItem.Icon>-->
-                        </MenuItem>
-                        <MenuItem Header="Save">
-                            <!--<MenuItem.Icon>
-                                <material:PackIcon Kind="ContentSaveOutline"/>
-                            </MenuItem.Icon>-->
-                        </MenuItem>
-                        <MenuItem Header="Save As">
-                            <!--<MenuItem.Icon>
-                                <material:PackIcon Kind="ContentSaveEditOutline"/>
-                            </MenuItem.Icon>-->
-                        </MenuItem>
-                    </MenuItem>
-                    <MenuItem Background="{StaticResource ControlBackGround}"
-                              BorderBrush="#FF707070"
-                              BorderThickness="0,0,0,0">
-                        <MenuItem.Header>
-                            <Grid Width="70"
-                                  Height="25">
-                                <TextBlock Text="View"
-                                           FontSize="13"
-                                           FontWeight="Bold"
-                                           VerticalAlignment="Center"
-                                           HorizontalAlignment="Center" />
-                            </Grid>
-                        </MenuItem.Header>
-                        <MenuItem Header="Log">
-
-                        </MenuItem>
-                        <MenuItem Header="Alarm">
-
-                        </MenuItem>
-                        <MenuItem Header="FDC">
-
-                        </MenuItem>
-                    </MenuItem>
-                    <MenuItem Background="{StaticResource ControlBackGround}"
-                              BorderBrush="#FF707070"
-                              BorderThickness="0,0,0,0">
-                        <MenuItem.Header>
-                            <Grid Width="70"
-                                  Height="25">
-                                <TextBlock Text="Tool"
-                                           FontSize="13"
-                                           FontWeight="Bold"
-                                           VerticalAlignment="Center"
-                                           HorizontalAlignment="Center" />
-                            </Grid>
-                        </MenuItem.Header>
-                        <MenuItem Header="Login">
-
-                        </MenuItem>
-                        <MenuItem Header="RTR">
-
-                        </MenuItem>
-                        <MenuItem Header="Loadport">
-
-                        </MenuItem>
-                        <MenuItem Header="Setting">
-
-                        </MenuItem>
-                    </MenuItem>
-                    <MenuItem Background="{StaticResource ControlBackGround}"
-                              BorderBrush="#FF707070"
-                              BorderThickness="0,0,0,0">
-                        <MenuItem.Header>
-                            <Grid Width="100"
-                                  Height="25">
-                                <TextBlock Text="Network"
-                                           FontSize="13"
-                                           FontWeight="Bold"
-                                           VerticalAlignment="Center"
-                                           HorizontalAlignment="Center" />
-                            </Grid>
-                        </MenuItem.Header>
-                        <MenuItem Header="Online">
-
-                        </MenuItem>
-                        <MenuItem Header="Offline">
-
-                        </MenuItem>
-                        <MenuItem Header="GEM">
-
-                        </MenuItem>
-                    </MenuItem>
-                    <MenuItem Background="{StaticResource ControlBackGround}"
-                              BorderBrush="#FF707070"
-                              BorderThickness="0,0,0,0">
-                        <MenuItem.Header>
-                            <Grid Width="100"
-                                  Height="25">
-                                <TextBlock Text="Navigation"
-                                           FontSize="13"
-                                           FontWeight="Bold"
-                                           VerticalAlignment="Center"
-                                           HorizontalAlignment="Center" />
-                            </Grid>
-                        </MenuItem.Header>
-                        <MenuItem Header="Setup Home" />
-                        <MenuItem Header="Inspction" />
-                        <MenuItem Header="Recipe Wizard">
-                            <MenuItem Header="Recipe Summary" />
-                            <MenuItem Header="PreAlign" />
-                            <MenuItem Header="FrontSide">
-                                <MenuItem Header="Front Summary" />
-                                <MenuItem Header="Alignment" />
-                                <MenuItem Header="General" />
-                            </MenuItem>
-                            <MenuItem Header="BackSide" />
-                            <MenuItem Header="EBR" />
-                            <MenuItem Header="Edge" />
-                        </MenuItem>
-                        <MenuItem Header="Matienance" />
-                        <MenuItem Header="GEM" />
-                    </MenuItem>
-                    <MenuItem Background="{StaticResource ControlBackGround}"
-                              BorderBrush="#FF707070"
-                              Command="{Binding btnMode}"
-                              BorderThickness="0,0,0,0">
-                        <MenuItem.Header>
-                            <Grid Width="100"
-                                  Height="25">
-                                <TextBlock Text="Mode Select"
-                                           FontSize="13"
-                                           FontWeight="Bold"
-                                           VerticalAlignment="Center"
-                                           HorizontalAlignment="Center" />
-                            </Grid>
-                        </MenuItem.Header>
-                    </MenuItem>
-                </Menu>
-                <Button Width="100" BorderThickness="0" Background="{StaticResource ControlBackGround}"
-                        Command="{Binding btnPopUpSetting}">
-                    <TextBlock Text="Setting" 
-                                               FontSize="13"
-                                               FontWeight="Bold"
-                                               VerticalAlignment="Center"
-                                               HorizontalAlignment="Center"/>
-                </Button>
-                <!--<Button Width="100" Content="Test"  Command="{Binding btnTest}"/>-->
-
-
-            </StackPanel>
-        </Border>
-        <!--End Menu-->
-
         <!--Toolbar-->
-        <Border Grid.Row="1"
+        <Border Grid.Row="0"
                 Background="{StaticResource ControlBackGround}"
                 BorderBrush="DimGray"
                 BorderThickness="0,0,0,0">
@@ -295,7 +120,7 @@
         <!--End Toolbar-->
 
         <!--Panel-->
-        <Border Grid.Row="2">
+        <Border Grid.Row="1">
             <Grid>
                 <ContentControl Content="{Binding p_CurrentPanel}"/>
             </Grid>
