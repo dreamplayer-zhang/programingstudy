@@ -190,7 +190,8 @@ namespace Root_VEGA_P_Vision.Module
         Registry m_reg = null;
         public void ReadPod_Registry()
         {
-            int nPod = m_reg.Read("InfoPod", -1);
+            m_reg = new Registry("InfoPod");
+            int nPod = m_reg.Read(p_id, -1);
             if (nPod < 0) return;  
             p_infoPod = new InfoPod((InfoPod.ePod)nPod);
             p_infoPod.ReadReg();
@@ -255,6 +256,11 @@ namespace Root_VEGA_P_Vision.Module
         public bool IsPodExist(InfoPod.ePod ePod)
         {
             return (p_infoPod != null);
+        }
+
+        public bool IsEnableRecovery()
+        {
+            return p_infoPod != null;
         }
         #endregion
 

@@ -1,6 +1,7 @@
 ﻿using Root_EFEM;
 using Root_EFEM.Module;
 using Root_VEGA_P.Module;
+using Root_VEGA_P_Vision.Module;
 using RootTools;
 using RootTools.GAFs;
 using RootTools.Gem;
@@ -33,23 +34,23 @@ namespace Root_VEGA_P.Engineer
         #region Module
         public ModuleList p_moduleList { get; set; }
         public VEGA_P_Recipe m_recipe;
-        public EFEM_Process m_process;
-
+        //public EFEM_Process m_process; //forgetVegaP
+        public RTR m_rtr; 
         void InitModule()
         {
             p_moduleList = new ModuleList(m_engineer);
-            InitWTR();
-            InitLoadport();
-            InitParticleCounter();
+            m_rtr = new RTR("RTR", m_engineer);
+            InitModule(m_rtr); 
+            //InitLoadport();
+            //InitParticleCounter();
 
-            IWTR iWTR = (IWTR)m_wtr;
-            m_wtr.RunTree(Tree.eMode.RegRead);
-            m_wtr.RunTree(Tree.eMode.Init);
-            iWTR.ReadInfoReticle_Registry();
+            m_rtr.RunTree(Tree.eMode.RegRead);
+            m_rtr.RunTree(Tree.eMode.Init);
+            m_rtr.ReadPod_Registry();
 
             m_recipe = new VEGA_P_Recipe("Recipe", m_engineer);
             foreach (ModuleBase module in p_moduleList.m_aModule.Keys) m_recipe.AddModule(module);
-            m_process = new EFEM_Process("Process", m_engineer, iWTR, m_aLoadport);
+            //m_process = new EFEM_Process("Process", m_engineer, iWTR, m_aLoadport);
         }
 
         void InitModule(ModuleBase module)
@@ -61,36 +62,11 @@ namespace Root_VEGA_P.Engineer
 
         public bool IsEnableRecovery()
         {
-            IWTR iWTR = (IWTR)m_wtr;
-            foreach (IWTRChild child in iWTR.p_aChild)
+            foreach (IRTRChild child in m_rtr.p_aChild)
             {
-                if (child.p_infoWafer != null) return true;
+                if (child.IsEnableRecovery()) return true;
             }
-            return iWTR.IsEnableRecovery();
-        }
-        #endregion
-
-        #region Module WTR
-        enum eWTR
-        {
-            RND,
-            Cymechs
-        }
-        eWTR m_eWTR = eWTR.RND;
-        public ModuleBase m_wtr;
-        void InitWTR()
-        {
-            switch (m_eWTR)
-            {
-                case eWTR.Cymechs: m_wtr = new WTR_Cymechs("WTR", m_engineer); break;
-                default: m_wtr = new WTR_RND("WTR", m_engineer); break;
-            }
-            InitModule(m_wtr);
-        }
-
-        public void RunTreeWTR(Tree tree)
-        {
-            m_eWTR = (eWTR)tree.Set(m_eWTR, m_eWTR, "Type", "WTR Type");
+            return m_rtr.IsEnableRecovery();
         }
         #endregion
 
@@ -118,7 +94,7 @@ namespace Root_VEGA_P.Engineer
                 }
                 InitModule(module);
                 m_aLoadport.Add((ILoadport)module);
-                ((IWTR)m_wtr).AddChild((IWTRChild)module);
+                m_rtr.AddChild((IRTRChild)module);
             }
         }
 
@@ -143,11 +119,9 @@ namespace Root_VEGA_P.Engineer
         #endregion
 
         #region StateHome
-        public bool m_bIsPossible_Recovery = false;
         public string StateHome()
         {
-            //string sInfo = StateHome(p_moduleList.m_aModule); lyj temp
-            string sInfo = StateHome(m_wtr);
+            string sInfo = StateHome(m_rtr);
             if (sInfo != "OK")
             {
                 EQ.p_eState = EQ.eState.Init;
@@ -155,7 +129,6 @@ namespace Root_VEGA_P.Engineer
             }
             sInfo = StateHome((ModuleBase)m_aLoadport[0], (ModuleBase)m_aLoadport[1]);
             if (sInfo == "OK") EQ.p_eState = EQ.eState.Ready;
-            if (sInfo == "OK") m_bIsPossible_Recovery = true;
             return sInfo;
         }
 
@@ -218,22 +191,22 @@ namespace Root_VEGA_P.Engineer
         public string AddSequence(dynamic infoSlot)
         {
             m_infoRnRSlot = infoSlot;
-            m_process.p_sInfo = m_process.AddInfoWafer(infoSlot);
+            //m_process.p_sInfo = m_process.AddInfoWafer(infoSlot); //forgetVegaP
             return "OK";
         }
 
         public void CalcSequence()
         {
-            m_process.ReCalcSequence();
-            CalcDockingUndocking();
+            //m_process.ReCalcSequence(); //forgetVegaP
+            //CalcDockingUndocking();
         }
 
         public void CalcRecover()
         {
-            m_process.CalcRecover();
-            CalcDockingUndocking();
+            //m_process.CalcRecover(); //forgetVegaP
+            //CalcDockingUndocking();
         }
-
+/*
         void CalcDockingUndocking()
         {
             List<EFEM_Process.Sequence> aSequence = new List<EFEM_Process.Sequence>();
@@ -278,14 +251,14 @@ namespace Root_VEGA_P.Engineer
                 if (loadport.p_id == sequence.m_infoWafer.m_sModule) return false;
             }
             return true;
-        }
+        } */
         #endregion
 
         #region IHandler
         public void CheckFinish()
         {
             if (m_gem.p_cjRun == null) return;
-            if (m_process.m_qSequence.Count > 0) return;
+            //if (m_process.m_qSequence.Count > 0) return;
             foreach (GemPJ pj in m_gem.p_cjRun.m_aPJ)
             {
                 m_gem?.SendPJComplete(pj.m_sPJobID);
@@ -329,54 +302,25 @@ namespace Root_VEGA_P.Engineer
                         if (p_moduleList.m_qModuleRun.Count == 0)
                         {
                             //CheckLoad();
-                            m_process.p_sInfo = m_process.RunNextSequence();
+                            //m_process.p_sInfo = m_process.RunNextSequence();
                             //CheckUnload();
-                            if ((EQ.p_nRnR > 1) && (m_process.m_qSequence.Count == 0))
-                            {
-                                m_process.p_sInfo = m_process.AddInfoWafer(m_infoRnRSlot);
-                                CalcSequence();
-                                EQ.p_nRnR--;
-                                EQ.p_eState = EQ.eState.Run;
-                            }
+                            //if ((EQ.p_nRnR > 1) && (m_process.m_qSequence.Count == 0))
+                            //{
+                                //m_process.p_sInfo = m_process.AddInfoWafer(m_infoRnRSlot);
+                                //CalcSequence();
+                                //EQ.p_nRnR--;
+                                //EQ.p_eState = EQ.eState.Run;
+                            //}
                         }
                         break;
                 }
             }
         }
-        /*
-        void CheckLoad()
-        {
-            EFEM_Process.Sequence sequence = m_process.m_qSequence.Peek();
-            string sLoadport = sequence.m_infoWafer.m_sModule;
-            foreach (ILoadport loadport in m_aLoadport)
-            {
-                if (loadport.p_id == sLoadport) loadport.RunDocking();
-            }
-        }
-
-        void CheckUnload()
-        {
-            EFEM_Process.Sequence[] aSequence = m_process.m_qSequence.ToArray();
-            foreach (ILoadport loadport in m_aLoadport)
-            {
-                if (loadport.p_infoCarrier.p_eState == InfoCarrier.eState.Dock)
-                {
-                    string sLoadport = loadport.p_id;
-                    bool bUndock = true;
-                    foreach (EFEM_Process.Sequence sequence in aSequence)
-                    {
-                        if (sequence.m_infoWafer.m_sModule == sLoadport) bUndock = false;
-                    }
-                    if (bUndock) loadport.RunUndocking();
-                }
-            }
-        } */
         #endregion
 
         #region Tree
         public void RunTreeModule(Tree tree)
         {
-            RunTreeWTR(tree.GetTree("WTR"));
             RunTreeLoadport(tree.GetTree("Loadport"));
         }
         #endregion

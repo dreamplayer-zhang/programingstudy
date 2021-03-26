@@ -32,5 +32,7 @@ namespace Root_VEGA_P_Vision.Module
         int GetTeachRTR(InfoPod infoPod);
 
         void RunTreeTeach(Tree tree);
+
+        bool IsEnableRecovery(); 
     }
 }
