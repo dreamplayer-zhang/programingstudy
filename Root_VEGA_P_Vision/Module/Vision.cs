@@ -265,7 +265,7 @@ namespace Root_VEGA_P_Vision.Module
         #endregion
 
         #region Teach RTR
-        Buffer.TeachRTR m_teach; 
+        Holder.TeachRTR m_teach; 
         public int GetTeachRTR(InfoPod infoPod)
         {
             return m_teach.GetTeach(infoPod);
@@ -322,7 +322,7 @@ namespace Root_VEGA_P_Vision.Module
         public Vision(string id, IEngineer engineer, eRemote eRemote)
         {
             m_reg = new Registry(p_id + "_InfoPod");
-            m_teach = new Buffer.TeachRTR(); 
+            m_teach = new Holder.TeachRTR(); 
             m_stage = new Stage(this);
             m_mainOptic = new MainOptic(this);
             m_sideOptic = new SideOptic(this); 
