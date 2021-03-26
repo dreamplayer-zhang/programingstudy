@@ -254,9 +254,9 @@ namespace Root_Rinse_Loader.Module
         public override void GetTools(bool bInit)
         {
             GetToolsDIO(); 
-            p_sInfo = m_toolBox.Get(ref m_tcpip, this, "TCPIP");
-            p_sInfo = m_toolBox.Get(ref m_diRinseRun, this, "Rinse Run");
-            p_sInfo = m_toolBox.Get(ref m_doRinseEmg, this, "Rinse Emg Stop");
+            p_sInfo = m_toolBox.GetComm(ref m_tcpip, this, "TCPIP");
+            p_sInfo = m_toolBox.GetDIO(ref m_diRinseRun, this, "Rinse Run");
+            p_sInfo = m_toolBox.GetDIO(ref m_doRinseEmg, this, "Rinse Emg Stop");
             if (bInit)
             {
                 InitALID();
@@ -319,13 +319,13 @@ namespace Root_Rinse_Loader.Module
         DIO_I m_diLightCurtain;
         void GetToolsDIO()
         {
-            p_sInfo = m_toolBox.Get(ref m_diEMG, this, "Emergency");
-            p_sInfo = m_toolBox.Get(ref m_diAir, this, "Air Pressure");
-            p_sInfo = m_toolBox.Get(ref m_diDoorLock, this, "Door Lock");
-            p_sInfo = m_toolBox.Get(ref m_diBuzzerOff, this, "Buzzer Off", false);
-            p_sInfo = m_toolBox.Get(ref m_doLamp, this, "Lamp", m_asLamp, false);
-            p_sInfo = m_toolBox.Get(ref m_doBuzzer, this, "Buzzer", m_asBuzzer, false);
-            p_sInfo = m_toolBox.Get(ref m_diLightCurtain, this, "Light Curtain");
+            p_sInfo = m_toolBox.GetDIO(ref m_diEMG, this, "Emergency");
+            p_sInfo = m_toolBox.GetDIO(ref m_diAir, this, "Air Pressure");
+            p_sInfo = m_toolBox.GetDIO(ref m_diDoorLock, this, "Door Lock");
+            p_sInfo = m_toolBox.GetDIO(ref m_diBuzzerOff, this, "Buzzer Off", false);
+            p_sInfo = m_toolBox.GetDIO(ref m_doLamp, this, "Lamp", m_asLamp, false);
+            p_sInfo = m_toolBox.GetDIO(ref m_doBuzzer, this, "Buzzer", m_asBuzzer, false);
+            p_sInfo = m_toolBox.GetDIO(ref m_diLightCurtain, this, "Light Curtain");
         }
 
         bool _bEMG = false;

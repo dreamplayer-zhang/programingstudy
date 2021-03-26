@@ -34,14 +34,14 @@ namespace Root_ASIS.Module
 
         public override void GetTools(bool bInit)
         {
-            p_sInfo = m_toolBox.Get(ref m_axis, this, "Boat");
-            p_sInfo = m_toolBox.Get(ref m_doVacuum, this, "Vacuum");
-            p_sInfo = m_toolBox.Get(ref m_doBlow, this, "Blow");
-            p_sInfo = m_toolBox.Get(ref m_doWingBlow, this, "WingBlow");
-            p_sInfo = m_toolBox.Get(ref m_doCleanBlow, this, "CleanBlow");
+            p_sInfo = m_toolBox.GetAxis(ref m_axis, this, "Boat");
+            p_sInfo = m_toolBox.GetDIO(ref m_doVacuum, this, "Vacuum");
+            p_sInfo = m_toolBox.GetDIO(ref m_doBlow, this, "Blow");
+            p_sInfo = m_toolBox.GetDIO(ref m_doWingBlow, this, "WingBlow");
+            p_sInfo = m_toolBox.GetDIO(ref m_doCleanBlow, this, "CleanBlow");
             p_sInfo = m_toolBox.Get(ref m_lightSet, this); 
             p_sInfo = m_toolBox.Get(ref m_memoryPool, this, "Memory", 1);
-            p_sInfo = m_toolBox.Get(ref m_cam, this, "Camera");
+            p_sInfo = m_toolBox.GetCamera(ref m_cam, this, "Camera");
             if (bInit) InitTools();
         }
 

@@ -45,10 +45,10 @@ namespace Root_Rinse_Unloader.Module
         DIO_I2O m_dioStopperUp; 
         public override void GetTools(bool bInit)
         {
-            p_sInfo = m_toolBox.Get(ref m_axisRotate[0], this, "Rotate0");
-            p_sInfo = m_toolBox.Get(ref m_axisRotate[1], this, "Rotate1");
-            p_sInfo = m_toolBox.Get(ref m_axisAlign, this, "Align"); 
-            p_sInfo = m_toolBox.Get(ref m_dioStopperUp, this, "StopperUp", "Down", "Up"); 
+            p_sInfo = m_toolBox.GetAxis(ref m_axisRotate[0], this, "Rotate0");
+            p_sInfo = m_toolBox.GetAxis(ref m_axisRotate[1], this, "Rotate1");
+            p_sInfo = m_toolBox.GetAxis(ref m_axisAlign, this, "Align"); 
+            p_sInfo = m_toolBox.GetDIO(ref m_dioStopperUp, this, "StopperUp", "Down", "Up"); 
             foreach (Line line in m_aLine) line.GetTools(m_toolBox);
             if (bInit) 
             {
@@ -119,11 +119,11 @@ namespace Root_Rinse_Unloader.Module
             public DIO_I2O[] m_dioAlignUp = new DIO_I2O[2]; 
             public void GetTools(ToolBox toolBox)
             {
-                m_roller.p_sInfo = toolBox.Get(ref m_diCheck[0], m_roller, m_id + ".Start");
-                m_roller.p_sInfo = toolBox.Get(ref m_diCheck[1], m_roller, m_id + ".Mid");
-                m_roller.p_sInfo = toolBox.Get(ref m_diCheck[2], m_roller, m_id + ".Arrived");
-                m_roller.p_sInfo = toolBox.Get(ref m_dioAlignUp[0], m_roller, m_id + ".AlignL_Up", "Down", "Up");
-                m_roller.p_sInfo = toolBox.Get(ref m_dioAlignUp[1], m_roller, m_id + ".AlignR_Up", "Down", "Up");
+                m_roller.p_sInfo = toolBox.GetDIO(ref m_diCheck[0], m_roller, m_id + ".Start");
+                m_roller.p_sInfo = toolBox.GetDIO(ref m_diCheck[1], m_roller, m_id + ".Mid");
+                m_roller.p_sInfo = toolBox.GetDIO(ref m_diCheck[2], m_roller, m_id + ".Arrived");
+                m_roller.p_sInfo = toolBox.GetDIO(ref m_dioAlignUp[0], m_roller, m_id + ".AlignL_Up", "Down", "Up");
+                m_roller.p_sInfo = toolBox.GetDIO(ref m_dioAlignUp[1], m_roller, m_id + ".AlignR_Up", "Down", "Up");
             }
 
             public enum eSensor

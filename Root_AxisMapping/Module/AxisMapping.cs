@@ -22,14 +22,14 @@ namespace Root_AxisMapping.Module
         public CameraDalsa m_cam;
         public override void GetTools(bool bInit)
         {
-            p_sInfo = m_toolBox.Get(ref m_axisRotate, this, "Rotate");
-            p_sInfo = m_toolBox.Get(ref m_axisXY, this, "Stage");
-            p_sInfo = m_toolBox.Get(ref m_axisZ, this, "Camera Z"); 
-            p_sInfo = m_toolBox.Get(ref m_doVacuum, this, "Vacuum");
+            p_sInfo = m_toolBox.GetAxis(ref m_axisRotate, this, "Rotate");
+            p_sInfo = m_toolBox.GetAxis(ref m_axisXY, this, "Stage");
+            p_sInfo = m_toolBox.GetAxis(ref m_axisZ, this, "Camera Z"); 
+            p_sInfo = m_toolBox.GetDIO(ref m_doVacuum, this, "Vacuum");
             p_sInfo = m_toolBox.Get(ref m_memoryPool, this, "Memory", 4);
             p_sInfo = m_toolBox.Get(ref m_memoryPoolResult, this, "MemoryResult", 1);
             p_sInfo = m_toolBox.Get(ref m_memoryPoolMerge, this, "MemoryMerge", 1);
-            p_sInfo = m_toolBox.Get(ref m_cam, this, "Camera");
+            p_sInfo = m_toolBox.GetCamera(ref m_cam, this, "Camera");
             if (bInit) InitTools();
         }
 

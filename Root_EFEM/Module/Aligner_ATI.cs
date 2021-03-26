@@ -37,18 +37,18 @@ namespace Root_EFEM.Module
 
         public override void GetTools(bool bInit)
         {
-            p_sInfo = m_toolBox.Get(ref m_axisRotate, this, "AxisRotate");
-            p_sInfo = m_toolBox.Get(ref m_axisCamAlign, this, "AxisCamera");
-            p_sInfo = m_toolBox.Get(ref m_axisCamOCR, this, "AxisOCR");
-            p_sInfo = m_toolBox.Get(ref m_dioVac, this, "Vacuum");
-            p_sInfo = m_toolBox.Get(ref m_doBlow, this, "Blow");
-            p_sInfo = m_toolBox.Get(ref m_doLightCoaxial, this, "LightCoaxial");
-            p_sInfo = m_toolBox.Get(ref m_doLightSide, this, "LightSide");
-            p_sInfo = m_toolBox.Get(ref m_dioLift, this, "Lift", "Down", "Up");
-            p_sInfo = m_toolBox.Get(ref m_diWaferExist, this, "WaferExist");
+            p_sInfo = m_toolBox.GetAxis(ref m_axisRotate, this, "AxisRotate");
+            p_sInfo = m_toolBox.GetAxis(ref m_axisCamAlign, this, "AxisCamera");
+            p_sInfo = m_toolBox.GetAxis(ref m_axisCamOCR, this, "AxisOCR");
+            p_sInfo = m_toolBox.GetDIO(ref m_dioVac, this, "Vacuum");
+            p_sInfo = m_toolBox.GetDIO(ref m_doBlow, this, "Blow");
+            p_sInfo = m_toolBox.GetDIO(ref m_doLightCoaxial, this, "LightCoaxial");
+            p_sInfo = m_toolBox.GetDIO(ref m_doLightSide, this, "LightSide");
+            p_sInfo = m_toolBox.GetDIO(ref m_dioLift, this, "Lift", "Down", "Up");
+            p_sInfo = m_toolBox.GetDIO(ref m_diWaferExist, this, "WaferExist");
             p_sInfo = m_toolBox.Get(ref m_memoryPool, this, "Memory", 1);
-            p_sInfo = m_toolBox.Get(ref m_camAlign, this, "Align");
-            p_sInfo = m_toolBox.Get(ref m_camOCR, this, "OCR");
+            p_sInfo = m_toolBox.GetCamera(ref m_camAlign, this, "Align");
+            p_sInfo = m_toolBox.GetCamera(ref m_camOCR, this, "OCR");
 
             m_alid_WaferExist = m_gaf.GetALID(this, "Aligner Wafer Exist", "Aligner Wafer Exist");
             if (bInit) InitTools();
