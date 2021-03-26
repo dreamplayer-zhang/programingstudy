@@ -60,15 +60,15 @@ namespace Root_VEGA_D.Module
 
         public override void GetTools(bool bInit)
         {
-            p_sInfo = m_toolBox.Get(ref m_axisRotate, this, "Axis Rotate");
-            p_sInfo = m_toolBox.Get(ref m_axisZ, this, "Axis Z");
-            p_sInfo = m_toolBox.Get(ref m_axisXY, this, "Axis XY");
-            p_sInfo = m_toolBox.Get(ref m_doVac, this, "Stage Vacuum");
-            p_sInfo = m_toolBox.Get(ref m_doBlow, this, "Stage Blow");
+            p_sInfo = m_toolBox.GetAxis(ref m_axisRotate, this, "Axis Rotate");
+            p_sInfo = m_toolBox.GetAxis(ref m_axisZ, this, "Axis Z");
+            p_sInfo = m_toolBox.GetAxis(ref m_axisXY, this, "Axis XY");
+            p_sInfo = m_toolBox.GetDIO(ref m_doVac, this, "Stage Vacuum");
+            p_sInfo = m_toolBox.GetDIO(ref m_doBlow, this, "Stage Blow");
             p_sInfo = m_toolBox.Get(ref m_lightSet, this);
-            p_sInfo = m_toolBox.Get(ref m_CamMain, this, "MainCam");
-            p_sInfo = m_toolBox.Get(ref m_CamAlign, this, "AlignCam");
-            p_sInfo = m_toolBox.Get(ref m_CamAutoFocus, this, "AutoFocusCam");
+            p_sInfo = m_toolBox.GetCamera(ref m_CamMain, this, "MainCam");
+            p_sInfo = m_toolBox.GetCamera(ref m_CamAlign, this, "AlignCam");
+            p_sInfo = m_toolBox.GetCamera(ref m_CamAutoFocus, this, "AutoFocusCam");
             p_sInfo = m_toolBox.Get(ref m_LensLinearTurret, this, "LensTurret");
 
             p_sInfo = m_toolBox.Get(ref m_memoryPool, this, "Memory", 1);

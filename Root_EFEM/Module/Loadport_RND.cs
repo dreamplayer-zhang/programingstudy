@@ -40,14 +40,14 @@ namespace Root_EFEM.Module
         }
         public override void GetTools(bool bInit)
         {
-            p_sInfo = m_toolBox.Get(ref m_diPlaced, this, "Place");
-            p_sInfo = m_toolBox.Get(ref m_diPresent, this, "Present");
-            p_sInfo = m_toolBox.Get(ref m_diLoad, this, "Load");
-            p_sInfo = m_toolBox.Get(ref m_diUnload, this, "Unload");
-            p_sInfo = m_toolBox.Get(ref m_diDoorOpen, this, "DoorOpen");
-            p_sInfo = m_toolBox.Get(ref m_diDocked, this, "Docked");
-            p_sInfo = m_toolBox.Get(ref m_rs232, this, "RS232");
-            p_sInfo = m_toolBox.Get(ref _OHT, this, p_infoCarrier, "OHT");
+            p_sInfo = m_toolBox.GetDIO(ref m_diPlaced, this, "Place");
+            p_sInfo = m_toolBox.GetDIO(ref m_diPresent, this, "Present");
+            p_sInfo = m_toolBox.GetDIO(ref m_diLoad, this, "Load");
+            p_sInfo = m_toolBox.GetDIO(ref m_diUnload, this, "Unload");
+            p_sInfo = m_toolBox.GetDIO(ref m_diDoorOpen, this, "DoorOpen");
+            p_sInfo = m_toolBox.GetDIO(ref m_diDocked, this, "Docked");
+            p_sInfo = m_toolBox.GetComm(ref m_rs232, this, "RS232");
+            p_sInfo = m_toolBox.GetOHT(ref _OHT, this, p_infoCarrier, "OHT");
             if (bInit)
             {
                 m_rs232.OnReceive += M_rs232_OnReceive;

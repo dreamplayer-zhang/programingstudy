@@ -148,20 +148,20 @@ namespace Root_Vega.Module
 
         public override void GetTools(bool bInit)
         {
-            p_sInfo = m_toolBox.Get(ref m_axisXY, this, "StageXY");
-            p_sInfo = m_toolBox.Get(ref m_axisZ, this, "StageZ");
-            p_sInfo = m_toolBox.Get(ref m_axisClamp, this, "StageClamp");
-            p_sInfo = m_toolBox.Get(ref m_CamMain, this, "MainCam");
-            p_sInfo = m_toolBox.Get(ref m_CamVRS, this, "VRS");
-            p_sInfo = m_toolBox.Get(ref m_CamAlign1, this, "Align1");
-            p_sInfo = m_toolBox.Get(ref m_CamAlign2, this, "Align2");
-            p_sInfo = m_toolBox.Get(ref m_CamRADS, this, "RADS");
+            p_sInfo = m_toolBox.GetAxis(ref m_axisXY, this, "StageXY");
+            p_sInfo = m_toolBox.GetAxis(ref m_axisZ, this, "StageZ");
+            p_sInfo = m_toolBox.GetAxis(ref m_axisClamp, this, "StageClamp");
+            p_sInfo = m_toolBox.GetCamera(ref m_CamMain, this, "MainCam");
+            p_sInfo = m_toolBox.GetCamera(ref m_CamVRS, this, "VRS");
+            p_sInfo = m_toolBox.GetCamera(ref m_CamAlign1, this, "Align1");
+            p_sInfo = m_toolBox.GetCamera(ref m_CamAlign2, this, "Align2");
+            p_sInfo = m_toolBox.GetCamera(ref m_CamRADS, this, "RADS");
             p_sInfo = m_toolBox.Get(ref m_lightSet, this);
             p_sInfo = m_toolBox.Get(ref m_memoryPool, this, "Memory", 1);
             p_sInfo = m_toolBox.Get(ref m_inspectTool, this);
             p_sInfo = m_toolBox.Get(ref m_ZoomLens, this, "ZoomLens");
 
-            p_sInfo = m_toolBox.Get(ref m_diPatternReticleExistSensor, this, "Pattern Reticle Sensor");
+            p_sInfo = m_toolBox.GetDIO(ref m_diPatternReticleExistSensor, this, "Pattern Reticle Sensor");
 
             // 노트북에서 구동시 RADS 내부에서 DataSocket 생성 후 무한루프에 빠지는 문제로 인해 조건 추가
             bool bUseRADS = false;

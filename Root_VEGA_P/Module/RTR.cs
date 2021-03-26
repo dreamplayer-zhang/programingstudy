@@ -1,4 +1,5 @@
-﻿using RootTools;
+﻿using Root_VEGA_P_Vision.Module;
+using RootTools;
 using RootTools.Comm;
 using RootTools.Control;
 using RootTools.GAFs;
@@ -7,24 +8,21 @@ using RootTools.ToolBoxs;
 using RootTools.Trees;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace Root_VEGA_P.Module
 {
-    /*
     public class RTR : ModuleBase
     {
         #region ToolBox
         TCPAsyncClient m_tcpip;
         public override void GetTools(bool bInit)
         {
-            p_sInfo = m_toolBox.Get(ref m_tcpip, this, "TCPIP");
-            m_dicArm[eArm.Upper].GetTools(m_toolBox);
-            m_dicArm[eArm.Lower].GetTools(m_toolBox);
+            p_sInfo = m_toolBox.GetComm(ref m_tcpip, this, "TCPIP");
+            m_armEOP.GetTools(m_toolBox, this);
+            m_armEIP.GetTools(m_toolBox, this);
             if (bInit)
             {
                 m_tcpip.EventReciveData += M_tcpip_EventReciveData;
@@ -37,103 +35,174 @@ namespace Root_VEGA_P.Module
         ALID alid_RND;
         void InitALID()
         {
-            alid_RND = m_gaf.GetALID(this, "RND", "WTR RND ERROR");
+            alid_RND = m_gaf.GetALID(this, "RND", "RTR RND ERROR");
         }
         #endregion
 
-        #region Arm
-        public enum eArm
+        #region IArm
+        public interface IArm
         {
-            Lower,
-            Upper,
-        }
-        public Dictionary<eArm, Arm> m_dicArm = new Dictionary<eArm, Arm>();
-        protected virtual void InitArms(string id, IEngineer engineer)
-        {
-            m_dicArm.Add(eArm.Lower, new Arm(id, eArm.Lower, this, engineer, true, false));
-            m_dicArm.Add(eArm.Upper, new Arm(id, eArm.Upper, this, engineer, true, false));
+            string p_id { get; set; }
+            bool IsArmClose();
+            bool IsPodExist();
         }
 
-        public List<WTRArm> p_aArm
+        public int GetArmID(InfoPod infoPod)
         {
-            get
+            switch (infoPod.p_ePod)
             {
-                List<WTRArm> aArm = new List<WTRArm>();
-                foreach (Arm arm in m_dicArm.Values) aArm.Add(arm);
-                return aArm;
+                case InfoPod.ePod.EOP_Dome:
+                case InfoPod.ePod.EOP_Door: return 2;
+                default: return 1;
             }
         }
+        #endregion
 
-        List<string> p_asArm
+        #region EOP Arm
+        public class ArmEOP : IArm
         {
-            get
+            public string p_id { get; set; }
+            public ArmEOP(string id)
             {
-                List<string> asArm = new List<string>();
-                foreach (Arm arm in m_dicArm.Values)
-                {
-                    if (arm.p_bEnable) asArm.Add(arm.m_eArm.ToString());
-                }
-                return asArm;
-            }
-        }
-
-        void RunTreeArm(Tree tree, ref eArm eArm, bool bVisible)
-        {
-            if (p_asArm.Count < 2)
-            {
-                foreach (Arm arm in m_dicArm.Values)
-                {
-                    if (arm.p_bEnable) eArm = arm.m_eArm;
-                }
-                return;
-            }
-            string sArm = eArm.ToString();
-            sArm = tree.Set(sArm, sArm, p_asArm, "Arm", "Select WTR Arm", bVisible);
-            foreach (Arm arm in m_dicArm.Values)
-            {
-                if (arm.m_eArm.ToString() == sArm) eArm = arm.m_eArm;
-            }
-        }
-
-        public class Arm
-        {
-            public eArm m_eArm;
-
-            RTR m_module;
-            public Arm(string id, eArm arm, RTR module, IEngineer engineer)
-            {
-                m_eArm = arm;
-                m_module = module;
-                Init(id + "." + arm.ToString(), engineer, bEnableWaferSize, bEnableWaferCount);
+                p_id = id;
             }
 
-            public DIO_I m_diCheckVac;
             public DIO_I m_diArmClose;
-            public void GetTools(ToolBox toolBox)
+            public DIO_I m_diCheckDome;
+            public DIO_I m_diCheckDoor;
+            public void GetTools(ToolBox toolBox, RTR module)
             {
-                m_module.p_sInfo = toolBox.Get(ref m_diCheckVac, m_module, m_eArm.ToString() + ".CheckVac");
-                m_module.p_sInfo = toolBox.Get(ref m_diArmClose, m_module, m_eArm.ToString() + ".ArmClose");
+                module.p_sInfo = toolBox.GetDIO(ref m_diArmClose, module, p_id + ".ArmClose");
+                module.p_sInfo = toolBox.GetDIO(ref m_diCheckDome, module, p_id + ".CheckDome");
+                module.p_sInfo = toolBox.GetDIO(ref m_diCheckDoor, module, p_id + ".CheckDoor");
             }
 
-            enum eCheckWafer
+            public bool IsArmClose()
             {
-                InfoWafer,
-                Sensor,
-            };
-            eCheckWafer m_eCheckWafer = eCheckWafer.Sensor;
-            public override bool IsWaferExist()
-            {
-                switch (m_eCheckWafer)
-                {
-                    case eCheckWafer.Sensor: return m_diCheckVac.p_bIn;
-                    default: return (p_infoWafer != null);
-                }
+                return m_diArmClose.p_bIn;
             }
 
-            public void RunTree(Tree tree)
+            public bool IsPodExist()
             {
-                m_eCheckWafer = (eCheckWafer)tree.Set(m_eCheckWafer, m_eCheckWafer, "Wafer Check", "Wafer Check Option");
-                base.RunTree(tree);
+                return m_diCheckDome.p_bIn || m_diCheckDoor.p_bIn;
+            }
+        }
+        public ArmEOP m_armEOP = new ArmEOP("EOP");
+        #endregion
+
+        #region EIP Arm
+        public class ArmEIP : IArm
+        {
+            public string p_id { get; set; }
+            public ArmEIP(string id)
+            {
+                p_id = id;
+            }
+
+            public DIO_I m_diArmClose;
+            public DIO_Is m_diGrip;
+            string[] m_asGrip = new string[3] { "Home", "Grip", "Empty" };
+            public void GetTools(ToolBox toolBox, RTR module)
+            {
+                module.p_sInfo = toolBox.GetDIO(ref m_diArmClose, module, p_id + ".ArmClose");
+                module.p_sInfo = toolBox.GetDIO(ref m_diGrip, module, p_id + ".Grip", m_asGrip); 
+            }
+
+            public string RunGrip(bool bGrip, RTR module)
+            {
+                int nGrip = bGrip ? 1 : 0;
+                if (module.Run(module.WriteCmd(eCmd.Grip, "1", nGrip))) return module.p_sInfo;
+                if (module.Run(module.WaitReply(module.m_secMotion))) return module.p_sInfo;
+                return "OK";
+            }
+
+            public bool IsArmClose()
+            {
+                return m_diArmClose.p_bIn;
+            }
+
+            public bool IsPodExist()
+            {
+                return m_diGrip.ReadDI(m_asGrip[1]);
+            }
+        }
+        public ArmEIP m_armEIP = new ArmEIP("EIP");
+        #endregion
+
+        #region InfoPod
+        InfoPod _infoPod = null;
+        public InfoPod p_infoPod
+        {
+            get { return _infoPod; }
+            set
+            {
+                int nPod = (value != null) ? (int)value.p_ePod : -1;
+                _infoPod = value;
+                m_reg.Write("InfoPod." + p_id, nPod);
+                value.WriteReg();
+                OnPropertyChanged();
+            }
+        }
+
+        Registry m_reg = null;
+        public void ReadPod_Registry()
+        {
+            m_reg = new Registry("InfoPod"); 
+            int nPod = m_reg.Read(p_id, -1);
+            p_infoPod = new InfoPod((InfoPod.ePod)nPod);
+            p_infoPod.ReadReg();
+            foreach (IRTRChild child in p_aChild) child.ReadPod_Registry();
+        }
+        #endregion
+
+        #region IsPodExist
+        enum eCheckPod
+        {
+            InfoPod,
+            Sensor,
+            Both
+        }
+        eCheckPod m_eCheckPod = eCheckPod.Both;
+        void RunTreeCheckPod(Tree tree)
+        {
+            m_eCheckPod = (eCheckPod)tree.Set(m_eCheckPod, m_eCheckPod, "Type", "Check Pod Type");
+        }
+
+        public bool IsPodExist()
+        {
+            switch (m_eCheckPod)
+            {
+                case eCheckPod.InfoPod: return p_infoPod != null;
+                case eCheckPod.Sensor: return m_armEOP.IsPodExist() || m_armEIP.IsPodExist();
+                default:
+                    if (p_infoPod == null) return false;
+                    return m_armEOP.IsPodExist() || m_armEIP.IsPodExist();
+            }
+        }
+
+        public bool IsPodExist(InfoPod.ePod ePod)
+        {
+            switch (m_eCheckPod)
+            {
+                case eCheckPod.InfoPod: return IsPodExistInfoPod(ePod); 
+                case eCheckPod.Sensor: return IsPodExistSensor(ePod);
+                default: return IsPodExistInfoPod(ePod) && IsPodExistSensor(ePod); 
+            }
+        }
+
+        bool IsPodExistInfoPod(InfoPod.ePod ePod)
+        {
+            if (p_infoPod == null) return false;
+            return p_infoPod.p_ePod == ePod;
+        }
+
+        bool IsPodExistSensor(InfoPod.ePod ePod)
+        {
+            switch (ePod)
+            {
+                case InfoPod.ePod.EOP_Door: return m_armEOP.m_diCheckDoor.p_bIn;
+                case InfoPod.ePod.EOP_Dome: return m_armEOP.m_diCheckDome.p_bIn;
+                default: return m_armEIP.IsPodExist();
             }
         }
         #endregion
@@ -435,7 +504,6 @@ namespace Root_VEGA_P.Module
             return "OK";
         }
 
-
         protected string WaitReply(int secTimeout)
         {
             try
@@ -514,7 +582,7 @@ namespace Root_VEGA_P.Module
         {
             int msComm = (int)(1000 * m_secDelayComm);
             int ms10 = 0;
-            if (m_tcpip.p_bConnect == false) m_tcpip.p_bConnect = true;
+            if (m_tcpip.p_bConnect == false) m_tcpip.Connect();
 
             if (Run(WriteCmd(eCmd.ResetCPU))) return true;
             Thread.Sleep(100);
@@ -525,7 +593,6 @@ namespace Root_VEGA_P.Module
                 ms10 += 10;
                 if (ms10 > msComm)
                 {
-                    m_tcpip.p_bConnect = false;
                     m_bNeedHome = true;
                     m_eSendCmd = eCmd.None;
                     return true;
@@ -547,6 +614,96 @@ namespace Root_VEGA_P.Module
         }
         #endregion
 
+        #region IRTRChild
+        public List<string> m_asChild = new List<string>();
+        List<IRTRChild> _aChild = new List<IRTRChild>();
+        public List<IRTRChild> p_aChild { get { return _aChild; } }
+        public void AddChild(params IRTRChild[] childs)
+        {
+            foreach (IRTRChild child in childs)
+            {
+                if (child != null)
+                {
+                    child.p_bLock = true;
+                    p_aChild.Add(child);
+                    m_asChild.Add(child.p_id);
+                }
+            }
+            RunTree(Tree.eMode.Init);
+        }
+
+        protected IRTRChild GetChild(string sChild)
+        {
+            foreach (IRTRChild child in p_aChild)
+            {
+                if (child.p_id == sChild) return child;
+            }
+            return null;
+        }
+
+        public bool IsEnableRecovery()
+        {
+            return p_infoPod != null; 
+        }
+        #endregion
+
+        #region Home
+        const int c_nReset = 3;
+        public override string StateHome()
+        {
+            if (EQ.p_bSimulate)
+            {
+                p_eState = eState.Ready;
+                return "OK";
+            }
+            try
+            {
+                int nReset = 0;
+                while (IsFailResetCPU())
+                {
+                    nReset++;
+                    if (nReset > c_nReset) return "Reset CPU Error";
+                    Thread.Sleep(100);
+                }
+                foreach (IRTRChild child in p_aChild) child.p_bLock = true;
+                eCmd eCmdHome = m_bNeedHome ? eCmd.FindHome : eCmd.MoveHome;
+                if (Run(WriteCmd(eCmdHome))) return p_sInfo;
+                m_bNeedHome = false;
+                if (Run(WaitReply(m_secHome))) return p_sInfo;
+                p_eState = eState.Ready;
+                foreach (IRTRChild child in p_aChild) child.p_bLock = false;
+                return "OK";
+            }
+            catch (Exception e)
+            {
+                EQ.p_bStop = true;
+                p_eState = eState.Error;
+                return "State Home Exception : " + e.Message; 
+            }
+        }
+        #endregion
+
+        #region override
+        public override void RunTree(Tree tree)
+        {
+            base.RunTree(tree);
+            RunTreeCheckPod(tree.GetTree("Check Pod"));
+            foreach (IRTRChild child in p_aChild) child.RunTreeTeach(tree.GetTree("Teach", false));
+            RunTimeoutTree(tree.GetTree("Timeout", false));
+        }
+
+        public override void Reset()
+        {
+            base.Reset();
+        }
+
+        public override void ButtonHome()
+        {
+            m_bNeedHome = true;
+            base.ButtonHome();
+        }
+        #endregion
+
         public RTR(string id, IEngineer engineer)
         {
             InitBase(id, engineer);
@@ -556,6 +713,197 @@ namespace Root_VEGA_P.Module
         {
             base.ThreadStop();
         }
+
+        #region ModuleRun
+        protected override void InitModuleRuns()
+        {
+            AddModuleRunList(new Run_ResetCPU(this), false, "Reset RTR CPU");
+            AddModuleRunList(new Run_Grip(this), false, "Run Grip RTR Arm");
+            AddModuleRunList(new Run_Get(this), false, "RTR Run Get Motion");
+            AddModuleRunList(new Run_Put(this), false, "RTR Run Put Motion");
+        }
+
+        public class Run_ResetCPU : ModuleRunBase
+        {
+            RTR m_module;
+            public Run_ResetCPU(RTR module)
+            {
+                m_module = module;
+                InitModuleRun(module);
+            }
+
+            bool m_bReset = true;
+            public override ModuleRunBase Clone()
+            {
+                Run_ResetCPU run = new Run_ResetCPU(m_module);
+                run.m_bReset = m_bReset;
+                return run;
+            }
+
+            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
+            {
+                m_bReset = tree.Set(m_bReset, m_bReset, "Reset", "Reset CPU", bVisible, true);
+            }
+
+            public override string Run()
+            {
+                return m_module.WriteCmd(eCmd.ResetCPU);
+            }
+        }
+
+        public class Run_Grip : ModuleRunBase
+        {
+            RTR m_module;
+            public Run_Grip(RTR module)
+            {
+                m_module = module;
+                InitModuleRun(module);
+            }
+
+            bool m_bGrip = false;
+            public override ModuleRunBase Clone()
+            {
+                Run_Grip run = new Run_Grip(m_module);
+                run.m_bGrip = m_bGrip;
+                return run;
+            }
+
+            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
+            {
+                m_bGrip = tree.Set(m_bGrip, m_bGrip, "Grip", "Grip Arm Grip", bVisible);
+            }
+
+            public override string Run()
+            {
+                return m_module.m_armEIP.RunGrip(m_bGrip, m_module);
+            }
+        }
+
+        public class Run_Get : ModuleRunBase
+        {
+            RTR m_module;
+            public Run_Get(RTR module)
+            {
+                p_sChild = "";
+                m_module = module;
+                InitModuleRun(module);
+            }
+
+            public string p_sChild { get; set; }
+            public override ModuleRunBase Clone()
+            {
+                Run_Get run = new Run_Get(m_module);
+                run.p_sChild = p_sChild;
+                return run;
+            }
+
+            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
+            {
+                p_sChild = tree.Set(p_sChild, p_sChild, m_module.m_asChild, "Child", "RTR Child Name", bVisible);
+            }
+
+            public override string Run()
+            {
+                IRTRChild child = m_module.GetChild(p_sChild);
+                if (child == null) return "RTR Child not Found : " + p_sChild;
+                if (EQ.p_bSimulate)
+                {
+                    m_module.p_infoPod = child.p_infoPod;
+                    child.p_infoPod = null;
+                    return "OK";
+                }
+                int posRTR = child.GetTeachRTR(child.p_infoPod);
+                int nArm = m_module.GetArmID(child.p_infoPod); 
+                if (posRTR < 0) return "RTR Teach Position Not Defined";
+                if (child.p_eState != eState.Ready)
+                {
+                    if (m_module.Run(m_module.WriteCmd(eCmd.GetReady, posRTR, 1, nArm))) return p_sInfo;
+                }
+                while (child.p_eState != eState.Ready)
+                {
+                    if (EQ.IsStop()) return "Stop";
+                    Thread.Sleep(100);
+                }
+                if (m_module.Run(child.BeforeGet())) return p_sInfo;
+                if (m_module.Run(child.IsGetOK())) return p_sInfo;
+                m_module.p_infoPod = child.p_infoPod;
+                try
+                {
+                    child.p_bLock = true;
+                    if (m_module.Run(m_module.WriteCmd(eCmd.Get, posRTR, 1, nArm))) return p_sInfo;
+                    if (m_module.Run(m_module.WaitReply(m_module.m_secMotion))) return p_sInfo;
+                    child.p_bLock = false;
+                    child.AfterGet();
+                }
+                finally
+                {
+                    if (m_module.IsPodExist()) child.p_infoPod = null; 
+                    else m_module.p_infoPod = null;
+                }
+                return m_module.IsPodExist() ? "OK" : "RTR Get Error : " + child.p_id;
+            }
+        }
+
+        public class Run_Put : ModuleRunBase
+        {
+            RTR m_module;
+            public Run_Put(RTR module)
+            {
+                p_sChild = "";
+                m_module = module;
+                InitModuleRun(module);
+            }
+
+            public string p_sChild { get; set; }
+            public override ModuleRunBase Clone()
+            {
+                Run_Put run = new Run_Put(m_module);
+                run.p_sChild = p_sChild;
+                return run;
+            }
+
+            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
+            {
+                p_sChild = tree.Set(p_sChild, p_sChild, m_module.m_asChild, "Child", "RTR Child Name", bVisible);
+            }
+
+            public override string Run()
+            {
+                IRTRChild child = m_module.GetChild(p_sChild);
+                if (child == null) return "RTR Child not Found : " + p_sChild;
+                if (EQ.p_bSimulate)
+                {
+                    child.p_infoPod = m_module.p_infoPod;
+                    m_module.p_infoPod = null; 
+                    return "OK";
+                }
+                while (child.p_eState != eState.Ready)
+                {
+                    if (EQ.IsStop()) return "Stop";
+                    Thread.Sleep(100);
+                }
+                int posRTR = child.GetTeachRTR(m_module.p_infoPod);
+                int nArm = m_module.GetArmID(m_module.p_infoPod);
+                if (posRTR < 0) return "RTR Teach Position Not Defined";
+                if (m_module.Run(child.BeforePut(m_module.p_infoPod))) return p_sInfo;
+                if (m_module.Run(child.IsPutOK(m_module.p_infoPod))) return p_sInfo;
+                child.p_infoPod = m_module.p_infoPod;
+                try
+                {
+                    child.p_bLock = true;
+                    if (m_module.Run(m_module.WriteCmd(eCmd.Put, posRTR, 1, nArm))) return p_sInfo;
+                    if (m_module.Run(m_module.WaitReply(m_module.m_secMotion))) return p_sInfo;
+                    child.p_bLock = false;
+                    child.AfterPut();
+                }
+                finally
+                {
+                    if (m_module.IsPodExist()) child.p_infoPod = null;
+                    else m_module.p_infoPod = null;
+                }
+                return m_module.IsPodExist() ? "RTR Put Error : " + child.p_id : "OK"; 
+            }
+        }
+        #endregion
     }
-    */
 }

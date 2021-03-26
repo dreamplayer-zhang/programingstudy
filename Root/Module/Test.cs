@@ -44,14 +44,14 @@ namespace Root.Module
         LensLinearTurret m_lens; 
         public override void GetTools(bool bInit)
         {
-            p_sInfo = m_toolBox.Get(ref m_dioStart, this, "Start");
-            p_sInfo = m_toolBox.Get(ref m_dioDoor, this, "Door", "Close", "Open");
-            p_sInfo = m_toolBox.Get(ref m_diTest, this, "Test");
-            p_sInfo = m_toolBox.Get(ref m_doBeep, this, "Beep");
-            p_sInfo = m_toolBox.Get(ref m_doBuzzer, this, "Buzzer", Enum.GetNames(typeof(eBuzzer)));
-            p_sInfo = m_toolBox.Get(ref m_axisXY, this, "Loader");
-            p_sInfo = m_toolBox.Get(ref m_axisZ, this, "CamZ");
-            p_sInfo = m_toolBox.Get(ref m_namePipe, this, "Pipe");
+            p_sInfo = m_toolBox.GetDIO(ref m_dioStart, this, "Start");
+            p_sInfo = m_toolBox.GetDIO(ref m_dioDoor, this, "Door", "Close", "Open");
+            p_sInfo = m_toolBox.GetDIO(ref m_diTest, this, "Test");
+            p_sInfo = m_toolBox.GetDIO(ref m_doBeep, this, "Beep");
+            p_sInfo = m_toolBox.GetDIO(ref m_doBuzzer, this, "Buzzer", Enum.GetNames(typeof(eBuzzer)));
+            p_sInfo = m_toolBox.GetAxis(ref m_axisXY, this, "Loader");
+            p_sInfo = m_toolBox.GetAxis(ref m_axisZ, this, "CamZ");
+            p_sInfo = m_toolBox.GetComm(ref m_namePipe, this, "Pipe");
             //p_sInfo = m_toolBox.Get(ref m_socketServer, this, "SocketServer");
             //p_sInfo = m_toolBox.Get(ref m_socketClient, this, "SocketClient");
             p_sInfo = m_toolBox.Get(ref m_light, this);

@@ -15,8 +15,8 @@ namespace Root_ASIS.Module
 
         public override void GetTools(bool bInit)
         {
-            p_sInfo = m_toolBox.Get(ref m_doBuzzer, this, "Buzzer", Enum.GetNames(typeof(eBuzzer)));
-            p_sInfo = m_toolBox.Get(ref m_diPickerSet, this, "PickerSet"); 
+            p_sInfo = m_toolBox.GetDIO(ref m_doBuzzer, this, "Buzzer", Enum.GetNames(typeof(eBuzzer)));
+            p_sInfo = m_toolBox.GetDIO(ref m_diPickerSet, this, "PickerSet"); 
             if (bInit) InitTools();
         }
 

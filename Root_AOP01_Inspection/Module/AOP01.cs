@@ -62,28 +62,28 @@ namespace Root_AOP01_Inspection.Module
 
         public override void GetTools(bool bInit)
         {
-            p_sInfo = m_toolBox.Get(ref m_doLamp, this, "Lamp", m_asLamp);
-            p_sInfo = m_toolBox.Get(ref m_doBuzzer, this, "Buzzer", m_asBuzzer, true, true);
-            p_sInfo = m_toolBox.Get(ref m_diEMS, this, "EMS");
-            p_sInfo = m_toolBox.Get(ref m_diProtectionBar, this, "ProtectionBar");
-            p_sInfo = m_toolBox.Get(ref m_diMCReset, this, "MC Reset");
-            p_sInfo = m_toolBox.Get(ref m_diCDA1Low, this, "CDA1 Low");
-            p_sInfo = m_toolBox.Get(ref m_diCDA2Low, this, "CDA2 Low");
-            p_sInfo = m_toolBox.Get(ref m_dioBuzzerOff, this, "Buzzer Off");
-            p_sInfo = m_toolBox.Get(ref m_diDoorLock, this, "Door Lock");
-            p_sInfo = m_toolBox.Get(ref m_diInterlock_Key, this, "InterLock Key");
-            p_sInfo = m_toolBox.Get(ref m_diLightCurtain, this, "Light Curtain");
-            p_sInfo = m_toolBox.Get(ref m_doDoorLock_Use, this, "Door Lock Use");
+            p_sInfo = m_toolBox.GetDIO(ref m_doLamp, this, "Lamp", m_asLamp);
+            p_sInfo = m_toolBox.GetDIO(ref m_doBuzzer, this, "Buzzer", m_asBuzzer, true, true);
+            p_sInfo = m_toolBox.GetDIO(ref m_diEMS, this, "EMS");
+            p_sInfo = m_toolBox.GetDIO(ref m_diProtectionBar, this, "ProtectionBar");
+            p_sInfo = m_toolBox.GetDIO(ref m_diMCReset, this, "MC Reset");
+            p_sInfo = m_toolBox.GetDIO(ref m_diCDA1Low, this, "CDA1 Low");
+            p_sInfo = m_toolBox.GetDIO(ref m_diCDA2Low, this, "CDA2 Low");
+            p_sInfo = m_toolBox.GetDIO(ref m_dioBuzzerOff, this, "Buzzer Off");
+            p_sInfo = m_toolBox.GetDIO(ref m_diDoorLock, this, "Door Lock");
+            p_sInfo = m_toolBox.GetDIO(ref m_diInterlock_Key, this, "InterLock Key");
+            p_sInfo = m_toolBox.GetDIO(ref m_diLightCurtain, this, "Light Curtain");
+            p_sInfo = m_toolBox.GetDIO(ref m_doDoorLock_Use, this, "Door Lock Use");
 
-            p_sInfo = m_toolBox.Get(ref m_di4CH_LED_Cont_FAN, this, "4CH LED Cont FAN");
-            p_sInfo = m_toolBox.Get(ref m_di12CH_LED_Cont_FAN, this, "12CH LED Cont FAN");
-            p_sInfo = m_toolBox.Get(ref m_diPC_FAN, this, "PC FAN");
-            p_sInfo = m_toolBox.Get(ref m_diELECPNLDoor, this, "ELEC PNL Door");
-            p_sInfo = m_toolBox.Get(ref m_diETCDoor, this, "ETC Door");
-            p_sInfo = m_toolBox.Get(ref m_diPCDoor, this, "PC Door");
-            p_sInfo = m_toolBox.Get(ref m_disideDoor, this, "Side Door");
-            p_sInfo = m_toolBox.Get(ref m_diELECPNLDoorFan, this, "ELEC PNL Door Fan");
-            p_sInfo = m_toolBox.Get(ref m_diETCDoorFan, this, "ETC Door Fan");
+            p_sInfo = m_toolBox.GetDIO(ref m_di4CH_LED_Cont_FAN, this, "4CH LED Cont FAN");
+            p_sInfo = m_toolBox.GetDIO(ref m_di12CH_LED_Cont_FAN, this, "12CH LED Cont FAN");
+            p_sInfo = m_toolBox.GetDIO(ref m_diPC_FAN, this, "PC FAN");
+            p_sInfo = m_toolBox.GetDIO(ref m_diELECPNLDoor, this, "ELEC PNL Door");
+            p_sInfo = m_toolBox.GetDIO(ref m_diETCDoor, this, "ETC Door");
+            p_sInfo = m_toolBox.GetDIO(ref m_diPCDoor, this, "PC Door");
+            p_sInfo = m_toolBox.GetDIO(ref m_disideDoor, this, "Side Door");
+            p_sInfo = m_toolBox.GetDIO(ref m_diELECPNLDoorFan, this, "ELEC PNL Door Fan");
+            p_sInfo = m_toolBox.GetDIO(ref m_diETCDoorFan, this, "ETC Door Fan");
 
 
 

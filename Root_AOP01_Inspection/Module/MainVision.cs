@@ -93,20 +93,20 @@ namespace Root_AOP01_Inspection.Module
 
         public override void GetTools(bool bInit)
         {
-            p_sInfo = m_toolBox.Get(ref m_diExistVision, this, "Reticle Exist on Vision");
-            p_sInfo = m_toolBox.Get(ref m_diReticleTiltCheck, this, "Reticle Tilt Check");
-            p_sInfo = m_toolBox.Get(ref m_diReticleFrameCheck, this, "Reticle Frame Check");
-            p_sInfo = m_toolBox.Get(ref m_do45DTrigger, this, "45D Trigger");
-            p_sInfo = m_toolBox.Get(ref m_axisRotate, this, "Axis Rotate");
-            p_sInfo = m_toolBox.Get(ref m_axisSideZ, this, "Axis Side Z");
-            p_sInfo = m_toolBox.Get(ref m_axisZ, this, "Axis Z");
-            p_sInfo = m_toolBox.Get(ref m_axisXY, this, "Axis XY");
+            p_sInfo = m_toolBox.GetDIO(ref m_diExistVision, this, "Reticle Exist on Vision");
+            p_sInfo = m_toolBox.GetDIO(ref m_diReticleTiltCheck, this, "Reticle Tilt Check");
+            p_sInfo = m_toolBox.GetDIO(ref m_diReticleFrameCheck, this, "Reticle Frame Check");
+            p_sInfo = m_toolBox.GetDIO(ref m_do45DTrigger, this, "45D Trigger");
+            p_sInfo = m_toolBox.GetAxis(ref m_axisRotate, this, "Axis Rotate");
+            p_sInfo = m_toolBox.GetAxis(ref m_axisSideZ, this, "Axis Side Z");
+            p_sInfo = m_toolBox.GetAxis(ref m_axisZ, this, "Axis Z");
+            p_sInfo = m_toolBox.GetAxis(ref m_axisXY, this, "Axis XY");
             p_sInfo = m_toolBox.Get(ref m_memoryPool, this, "Vision Memory", 1);
             p_sInfo = m_toolBox.Get(ref m_lightSet, this);
-            p_sInfo = m_toolBox.Get(ref m_CamTDI90, this, "TDI 90");
-            p_sInfo = m_toolBox.Get(ref m_CamTDI45, this, "TDI 45");
-            p_sInfo = m_toolBox.Get(ref m_CamTDISide, this, "TDI Side");
-            p_sInfo = m_toolBox.Get(ref m_CamLADS, this, "LADS");
+            p_sInfo = m_toolBox.GetCamera(ref m_CamTDI90, this, "TDI 90");
+            p_sInfo = m_toolBox.GetCamera(ref m_CamTDI45, this, "TDI 45");
+            p_sInfo = m_toolBox.GetCamera(ref m_CamTDISide, this, "TDI Side");
+            p_sInfo = m_toolBox.GetCamera(ref m_CamLADS, this, "LADS");
             m_axisRotate.StartMove(1000);
         }
         #endregion

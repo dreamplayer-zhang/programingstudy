@@ -13,20 +13,20 @@ namespace Root
     {
         #region Module
         public ModuleList p_moduleList { get; set; }
-        public Test m_test;
+        //public Test m_test;
         //public BayerConvert m_bayer;
         //public ReadExcel m_readExcel;
         //public RemoteModule m_remote;
         //public RemoteModule m_server;
         //public TestServer m_tcpServer;
         //public TestClient m_tcpClient;
-        //public Vision m_bufferClient;
-        //public Vision m_bufferServer;
+        public Vision m_bufferClient;
+        public Vision m_bufferServer;
         void InitModule()
         {
             p_moduleList = new ModuleList(m_engineer);
-            m_test = new Test("Test", m_engineer);
-            InitModule(m_test);
+            //m_test = new Test("Test", m_engineer);
+            //InitModule(m_test);
             //m_bayer = new BayerConvert("BayerConvert", m_engineer);
             //InitModule(m_bayer);
             //m_readExcel = new ReadExcel("ReadExcel", m_engineer);
@@ -39,10 +39,10 @@ namespace Root
             //InitModule(m_tcpServer);
             //m_tcpClient = new TestClient("TestClient", m_engineer);
             //InitModule(m_tcpClient);
-            //m_bufferServer = new Vision("VisionServer", m_engineer, ModuleBase.eRemote.Server);
-            //InitModule(m_bufferServer);
-            //m_bufferClient = new Vision("VisionClient", m_engineer, ModuleBase.eRemote.Client);
-            //InitModule(m_bufferClient);
+            m_bufferServer = new Vision("VisionServer", m_engineer, ModuleBase.eRemote.Server);
+            InitModule(m_bufferServer);
+            m_bufferClient = new Vision("VisionClient", m_engineer, ModuleBase.eRemote.Client);
+            InitModule(m_bufferClient);
         }
 
         void InitModule(ModuleBase module)

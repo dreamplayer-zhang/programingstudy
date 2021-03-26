@@ -9,12 +9,7 @@ namespace RootTools_Vision
 	public class EBRRecipe : RecipeItemBase
 	{
 		#region [Parameter]
-		// Camera
-		private int cameraWidth;
-		private int cameraHeight;
-		private double cameraResolution;
-		private double cameraTriggerRatio;
-		private int imageOffset;
+		private int grabModeIndex;
 
 		// Light
 		private int lightWhite = 0;
@@ -22,30 +17,10 @@ namespace RootTools_Vision
 		#endregion
 
 		#region [Getter Setter]
-		public int CameraWidth
+		public int GrabModeIndex
 		{
-			get => this.cameraWidth;
-			set => SetProperty<int>(ref this.cameraWidth, value);
-		}
-		public int CameraHeight
-		{
-			get => this.cameraHeight;
-			set => SetProperty<int>(ref this.cameraHeight, value);
-		}
-		public double Resolution
-		{
-			get => this.cameraResolution;
-			set => SetProperty<double>(ref this.cameraResolution, value);
-		}
-		public double TriggerRatio
-		{
-			get => this.cameraTriggerRatio;
-			set => SetProperty<double>(ref this.cameraTriggerRatio, value);
-		}
-		public int ImageOffset
-		{
-			get => this.imageOffset;
-			set => SetProperty<int>(ref this.imageOffset, value);
+			get => this.grabModeIndex;
+			set => SetProperty<int>(ref this.grabModeIndex, value);
 		}
 		public int LightWhite
 		{

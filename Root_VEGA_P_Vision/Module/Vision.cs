@@ -28,10 +28,10 @@ namespace Root_VEGA_P_Vision.Module
             public void GetTools(ToolBox toolBox, bool bInit)
             {
                 if (m_vision.p_eRemote == eRemote.Client) return;
-                m_vision.p_sInfo = toolBox.Get(ref m_axisXY, m_vision, "Stage");
-                m_vision.p_sInfo = toolBox.Get(ref m_axisR, m_vision, "Stage Rotate");
-                m_vision.p_sInfo = toolBox.Get(ref m_diStageLoad[0], m_vision, "Stage Load X");
-                m_vision.p_sInfo = toolBox.Get(ref m_diStageLoad[1], m_vision, "Stage Load Y");
+                m_vision.p_sInfo = toolBox.GetAxis(ref m_axisXY, m_vision, "Stage");
+                m_vision.p_sInfo = toolBox.GetAxis(ref m_axisR, m_vision, "Stage Rotate");
+                m_vision.p_sInfo = toolBox.GetDIO(ref m_diStageLoad[0], m_vision, "Stage Load X");
+                m_vision.p_sInfo = toolBox.GetDIO(ref m_diStageLoad[1], m_vision, "Stage Load Y");
                 if (bInit)
                 {
 
@@ -93,7 +93,7 @@ namespace Root_VEGA_P_Vision.Module
             public void GetTools(ToolBox toolBox, bool bInit)
             {
                 if (m_vision.p_eRemote == eRemote.Client) return;
-                m_vision.p_sInfo = toolBox.Get(ref m_axisZ, m_vision, "Main Optic AxisZ");
+                m_vision.p_sInfo = toolBox.GetAxis(ref m_axisZ, m_vision, "Main Optic AxisZ");
                 if (bInit)
                 {
 
@@ -136,7 +136,7 @@ namespace Root_VEGA_P_Vision.Module
             public void GetTools(ToolBox toolBox, bool bInit)
             {
                 if (m_vision.p_eRemote == eRemote.Client) return;
-                m_vision.p_sInfo = toolBox.Get(ref m_axisZ, m_vision, "Side Optic AxisZ");
+                m_vision.p_sInfo = toolBox.GetAxis(ref m_axisZ, m_vision, "Side Optic AxisZ");
                 if (bInit)
                 {
 
@@ -190,7 +190,8 @@ namespace Root_VEGA_P_Vision.Module
         Registry m_reg = null;
         public void ReadPod_Registry()
         {
-            int nPod = m_reg.Read("InfoPod", -1);
+            m_reg = new Registry("InfoPod");
+            int nPod = m_reg.Read(p_id, -1);
             if (nPod < 0) return;  
             p_infoPod = new InfoPod((InfoPod.ePod)nPod);
             p_infoPod.ReadReg();
@@ -198,6 +199,8 @@ namespace Root_VEGA_P_Vision.Module
         #endregion
 
         #region IRTRChild
+        public bool p_bLock { get; set; }
+
         public string IsGetOK()
         {
             if (p_eState != eState.Ready) return p_id + " eState not Ready"; 
@@ -253,6 +256,11 @@ namespace Root_VEGA_P_Vision.Module
         public bool IsPodExist(InfoPod.ePod ePod)
         {
             return (p_infoPod != null);
+        }
+
+        public bool IsEnableRecovery()
+        {
+            return p_infoPod != null;
         }
         #endregion
 
