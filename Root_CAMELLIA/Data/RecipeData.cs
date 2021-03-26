@@ -162,44 +162,11 @@ namespace Root_CAMELLIA.Data
         }
     }
     #endregion
-    public class WavelengthItem
+    public struct WavelengthItem
     {
-        double m_waveLength = 350.0;
-        public double p_waveLength
-        {
-            get
-            {
-                return m_waveLength;
-            }
-            set
-            {
-                m_waveLength = value;
-            }
-        }
-        double m_scale = 1.0;
-        public double p_scale
-        {
-            get
-            {
-                return m_scale;
-            }
-            set
-            {
-                m_scale = value;
-            }
-        }
-        double m_offset = 0.0;
-        public double p_offset
-        {
-            get
-            {
-                return m_offset;
-            }
-            set
-            {
-                m_offset = value;
-            }
-        }
+        public double p_waveLength { get; set; }
+        public double p_scale { get; set; }
+        public double p_offset { get; set; }
         public WavelengthItem(double waveLength, double scale, double offset)
         {
             p_waveLength = waveLength;

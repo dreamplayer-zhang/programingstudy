@@ -335,16 +335,12 @@
                                                 </Grid>
                                             </Grid>
                                             <Grid Grid.Row="1">
-                                                <GroupBox Header="Reflectance Graph">
-                                                </GroupBox>
+                                                <met:PMRGraph Width="auto" Height="auto"/>
                                             </Grid>
                                         </Grid>
                                     </TabItem>
                                     <TabItem Header="PM Setting">
-                                        <control:PMCheckReview>
-                                            
-                                        </control:PMCheckReview>
-
+                                        <control:PMCheckReview DataContext="{Binding p_PMCheckReview_ViewModel}"/>
                                     </TabItem>
                                 </TabControl>
                             </GroupBox>
