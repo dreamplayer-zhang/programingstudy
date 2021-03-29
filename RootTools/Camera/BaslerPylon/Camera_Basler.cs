@@ -74,6 +74,17 @@ namespace RootTools.Camera.BaslerPylon
         Basler.Pylon.Camera m_cam;
         int m_nGrabTimeout = 2000;
         ImageData m_ImageGrab;
+        public ImageData p_ImageData
+        {
+            get
+            {
+                return m_ImageGrab;
+            }
+            set
+            {
+                SetProperty(ref m_ImageGrab, value);
+            }
+        }
         ImageViewer_ViewModel m_ImageViewer;
         public bool m_ConnectDone = false;
         public ImageViewer_ViewModel p_ImageViewer
@@ -457,7 +468,7 @@ namespace RootTools.Camera.BaslerPylon
             }
         }
 
-
+        #region RelayCommand
         public RelayCommand UserSetSaveCommand
         {
             get
@@ -532,7 +543,7 @@ namespace RootTools.Camera.BaslerPylon
             {
             }
         }
-
+        #endregion
         public void GrabOneShot()
         {
             try

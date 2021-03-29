@@ -41,7 +41,7 @@ namespace Root_AOP01_Inspection
         public Maintenance_ViewModel m_Maintenance;
         private GEM_ViewModel m_GEM;
 
-        public RecipeWizard_ViewModel m_RecipeWizard { get; private set; }
+        private RecipeWizard_ViewModel m_RecipeWizard;
         private RecipeSpec_ViewModel m_RecipeSpec;
         public Recipe45D_ViewModel m_Recipe45D { get; private set; }
         public RecipeFrontside_ViewModel m_RecipeFrontSide { get; private set; }
