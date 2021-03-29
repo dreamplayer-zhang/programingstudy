@@ -77,9 +77,9 @@ namespace Root_VEGA_D
             return bReadyLoadport && bReadyToUnload && bAccess & bPlaced;
         }
         #endregion
-
         public void Init(ILoadport loadport, VEGA_D_Handler handler, IRFID rfid)
         {
+
             m_loadport = (Loadport_Cymechs)loadport;
             m_handler = handler;
             m_rfid = rfid;

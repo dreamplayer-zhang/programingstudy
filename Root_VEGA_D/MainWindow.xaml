@@ -79,16 +79,17 @@
                         x:Name="NormalizeButton"
                         Width="34"
                         Height="26"
-                        Margin="0,0,10,0"
+                        Margin="0,0,10,-1"
                         Foreground="White"
-                        Click="NormalizeButton_Click">
+                        Visibility="Collapsed"
+                        Click="NormalizeButton_Click" VerticalAlignment="Top">
                     <Path Style="{StaticResource NormalizeIconKey}" />
                 </Button>
                 <Button Style="{StaticResource SystemButton}"
                         x:Name="CloseButton"
                         Width="34"
                         Height="26"
-                        Margin="0,0,10,2"
+                        Margin="0,0,10,-1"
                         Foreground="White"
                         Click="CloseButton_Click"
                         VerticalAlignment="Bottom">
@@ -871,7 +872,7 @@
                                                                             Binding="{Binding Path=y}"
                                                                             Width="*" />
                                                     </DataGrid.Columns>
-                                                   
+
                                                 </DataGrid>
                                             </Grid>
 
@@ -1072,7 +1073,7 @@
                                                                                 Width="1.5*"
                                                                                 Binding="{Binding y}" />
                                                         </DataGrid.Columns>
-                                                      
+
                                                     </DataGrid>
                                                 </GroupBox>
                                                 <GroupBox Header="Search Option"
@@ -2258,7 +2259,7 @@
                                     Click="buttonBuzzOff_Click"/>
                         </Grid>
                     </Grid>
-                    
+
                 </Grid>
             </Grid>
         </Border>

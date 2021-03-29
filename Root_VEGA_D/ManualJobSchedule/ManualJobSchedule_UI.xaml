@@ -44,7 +44,7 @@
             </Setter>
         </Style>
         <Style x:Key="ButtonStyle1" TargetType="{x:Type Button}">
-            <Setter Property="Background" Value="DarkGoldenrod"/>
+            <Setter Property="Background" Value="SlateGray"/>
             <Setter Property="Foreground" Value="White"/>
             <Setter Property="FontSize" Value="30"/>
             <Setter Property="FontWeight" Value="Bold"/>
@@ -107,22 +107,22 @@
         <!--<Style x:Key="SwitchTypeToggleButton" TargetType="{x:Type ToggleButton}">-->
         <Style TargetType="{x:Type ToggleButton}">
             <Style.Resources>
-                <Color x:Key="Color.Additional.LightGrey">#989EA8</Color>
-                <Color x:Key="Color.Additional.MediumGrey">#61656B</Color>
-                <Color x:Key="Color.MedtronicBranding.MedtronicBlue">#004B87</Color>
-                <Color x:Key="Color.MedtronicBranding.CobaltBlue">#0085CA</Color>
+                <Color x:Key="Color.Additional.LightGray">#989EA8</Color>
+                <Color x:Key="Color.Additional.MediumGray">#61656B</Color>
+                <Color x:Key="Color.MedtronicBranding.MediumPurple">#FF9370DB</Color>
+                <Color x:Key="Color.MedtronicBranding.MediumSeeGreen">#FF3CB371</Color>
                 <Style x:Key="ToggleButtonContentTextbox" TargetType="TextBlock">
                     <Setter Property="HorizontalAlignment" Value="Stretch" />
                     <Setter Property="VerticalAlignment" Value="Stretch" />
                 </Style>
                 <SolidColorBrush x:Key="ToggleButtonFalseBackground"
-                         Color="{StaticResource Color.Additional.LightGrey}" />
+                          Color="{StaticResource Color.Additional.LightGray}" />
                 <SolidColorBrush x:Key="ToggleButtonTrueBackground"
-                         Color="{StaticResource Color.MedtronicBranding.CobaltBlue}" />
+                         Color="{StaticResource Color.MedtronicBranding.MediumSeeGreen}" />
                 <SolidColorBrush x:Key="ToggleButtonFalseForeground"
-                         Color="{StaticResource Color.Additional.MediumGrey}" />
+                         Color="{StaticResource Color.Additional.MediumGray}" />
                 <SolidColorBrush x:Key="ToggleButtonTrueForeground"
-                         Color="{StaticResource Color.MedtronicBranding.MedtronicBlue}" />
+                         Color="{StaticResource Color.MedtronicBranding.MediumPurple}" />
                 <TextBlock x:Key="OffContent"
                    Style="{StaticResource ToggleButtonContentTextbox}"
                    Text="Off" />
@@ -210,7 +210,7 @@
             </Setter>
         </Style>
     </Window.Resources>
-    <Grid Background="BurlyWood">
+    <Grid Background="DarkSlateGray">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="347*"/>
             <ColumnDefinition Width="114*"/>

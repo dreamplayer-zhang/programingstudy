@@ -58,6 +58,9 @@
     <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="EasyModbus">
+      <HintPath>bin\x64\EasyModbus.dll</HintPath>
+    </Reference>
     <Reference Include="MahApps.Metro.IconPacks, Version=4.0.0.0, Culture=neutral, PublicKeyToken=0c0d510f9915137a, processorArchitecture=MSIL">
       <HintPath>..\packages\MahApps.Metro.IconPacks.4.8.0\lib\net47\MahApps.Metro.IconPacks.dll</HintPath>
     </Reference>
@@ -199,6 +202,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Module\FFU_Fan_UI.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="UI_UserControl\HomeProgress_UI.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -247,6 +254,11 @@
     <Compile Include="ManualJobSchedule\ManualJobSchedule.cs" />
     <Compile Include="ManualJobSchedule\ManualJobSchedule_UI.xaml.cs">
       <DependentUpon>ManualJobSchedule_UI.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Module\FDC.cs" />
+    <Compile Include="Module\FFU.cs" />
+    <Compile Include="Module\FFU_Fan_UI.xaml.cs">
+      <DependentUpon>FFU_Fan_UI.xaml</DependentUpon>
     </Compile>
     <Compile Include="Module\GrabMode.cs" />
     <Compile Include="Module\Interlock.cs" />
