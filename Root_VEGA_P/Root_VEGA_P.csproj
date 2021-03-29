@@ -210,7 +210,8 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Module\LoadPort.cs" />
+    <Compile Include="Module\InfoPods.cs" />
+    <Compile Include="Module\Loadport.cs" />
     <Compile Include="Module\NozzleSet.cs" />
     <Compile Include="Module\ParticleCounter.cs" />
     <Compile Include="Module\RTR.cs" />

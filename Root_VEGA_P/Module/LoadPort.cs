@@ -1,24 +1,34 @@
 ﻿using Root_VEGA_P_Vision.Module;
 using RootTools;
 using RootTools.Control;
+using RootTools.Gem;
 using RootTools.Module;
+using RootTools.OHTNew;
 using RootTools.ToolBoxs;
 using RootTools.Trees;
 using System;
-using System.Collections.Generic;
 using System.Threading;
 
 namespace Root_VEGA_P.Module
 {
-    public class LoadPort : ModuleBase, IRTRChild
+    public class Loadport : ModuleBase, IRTRChild
     {
         #region ToolBox
+        OHT m_OHT; 
         public override void GetTools(bool bInit)
         {
+            p_sInfo = m_toolBox.GetOHT(ref m_OHT, this, m_infoPods, "OHT"); 
             m_stage.GetTools(m_toolBox, this, bInit);
             m_door.GetTools(m_toolBox, this);
             m_interlock.GetTools(m_toolBox, this);
             m_led.GetTools(m_toolBox, this); 
+        }
+        #endregion
+
+        #region RFID
+        void InitRFID()
+        {
+            //forget
         }
         #endregion
 
@@ -36,7 +46,7 @@ namespace Root_VEGA_P.Module
             DIO_I2O2 m_dioPodOpen;
             DIO_Is m_diCheck;
             DIO_I2O2 m_dioVacuum; 
-            public void GetTools(ToolBox toolBox, LoadPort module, bool bInit)
+            public void GetTools(ToolBox toolBox, Loadport module, bool bInit)
             {
                 module.p_sInfo = toolBox.GetAxis(ref m_axis, module, p_id);
                 module.p_sInfo = toolBox.GetDIO(ref m_dioPodOpen, module, p_id + ".PodOpen", "Close", "Open");
@@ -153,7 +163,7 @@ namespace Root_VEGA_P.Module
             DIO_Is[] m_diDoorSeal = new DIO_Is[2] { null, null };
             DIO_Os m_doDoorSeal;
             DIO_I2O2 m_dioDoor; 
-            public void GetTools(ToolBox toolBox, LoadPort module)
+            public void GetTools(ToolBox toolBox, Loadport module)
             {
                 module.p_sInfo = toolBox.GetDIO(ref m_dioDoor, module, p_id + ".Door", "Close", "Open");
                 module.p_sInfo = toolBox.GetDIO(ref m_diDoorSeal[0], module, p_id + "SealA", Enum.GetNames(typeof(eDoorSeal)));
@@ -227,7 +237,7 @@ namespace Root_VEGA_P.Module
             public DIO_I m_diLightCurtain;
             public DIO_I m_diProtectionBar;
             public DIO_I m_diOHTGuide; 
-            public void GetTools(ToolBox toolBox, LoadPort module)
+            public void GetTools(ToolBox toolBox, Loadport module)
             {
                 module.p_sInfo = toolBox.GetDIO(ref m_diCDA, module, "CDA");
                 module.p_sInfo = toolBox.GetDIO(ref m_diLightCurtain, module, "LightCurtain");
@@ -299,8 +309,8 @@ namespace Root_VEGA_P.Module
             }
 
             public string p_id { get; set; }
-            LoadPort m_loadport; 
-            public Interlock(string id, LoadPort loadport)
+            Loadport m_loadport; 
+            public Interlock(string id, Loadport loadport)
             {
                 p_id = id;
                 m_loadport = loadport; 
@@ -323,7 +333,7 @@ namespace Root_VEGA_P.Module
                 Alarm
             }
             DIO_Os m_doLED;
-            public void GetTools(ToolBox toolBox, LoadPort module)
+            public void GetTools(ToolBox toolBox, Loadport module)
             {
                 module.p_sInfo = toolBox.GetDIO(ref m_doLED, module, p_id, Enum.GetNames(typeof(eLED)));
             }
@@ -367,72 +377,91 @@ namespace Root_VEGA_P.Module
                     swBlink.Start();
                     m_led.m_bBlink = !m_led.m_bBlink; 
                 }
+                m_infoPods.p_ePresentSensor = (m_stage.p_bPlaced && m_stage.p_bPresent) ? GemCarrierBase.ePresent.Exist : GemCarrierBase.ePresent.Empty;
                 m_led.RunLED(LED.eLED.Manual, (EQ.p_eState == EQ.eState.Ready) && (EQ.IsStop() == false));
                 m_led.RunLED(LED.eLED.Auto, EQ.p_eState == EQ.eState.Run);
                 m_led.RunLED(LED.eLED.Placed, m_stage.p_bPlaced);
                 m_led.RunLED(LED.eLED.Present, m_stage.p_bPresent);
-                m_led.RunLED(LED.eLED.Load, m_bLoading);
-                m_led.RunLED(LED.eLED.Unload, m_bUnloading);
+                m_led.RunLED(LED.eLED.Load, m_bDocking);
+                m_led.RunLED(LED.eLED.Unload, m_bUndockng);
                 m_led.RunLED(LED.eLED.Alarm, EQ.p_eState == EQ.eState.Error);
             }
         }
         #endregion
 
-        #region InfoPod
-        Stack<InfoPod> m_infoPod = new Stack<InfoPod>();
+        #region InfoPods
+        InfoPods m_infoPods; 
+        void InitInfoPods(string id, IEngineer engineer)
+        {
+            m_infoPods = new InfoPods(this, id, engineer); 
+        }
+
         public InfoPod p_infoPod
         {
-            get
-            {
-                if (m_infoPod.Count == 0) return null;
-                return m_infoPod.Peek();
-            }
-            set
-            {
-                int nPod = (value != null) ? (int)value.p_ePod : -1;
-                if (value == null) m_infoPod.Pop();
-                else m_infoPod.Push(value);
-                m_reg.Write("InfoPod", nPod);
-                value.WriteReg();
-                OnPropertyChanged();
-            }
+            get { return m_infoPods.p_infoPod; }
+            set { m_infoPods.p_infoPod = value; }
         }
 
-        Registry m_reg = null;
         public void ReadPod_Registry()
         {
-            m_reg = new Registry("InfoPod");
-            int nPod = m_reg.Read(p_id, -1);
-            if (nPod < 0) return;
-            NewInfoPod(nPod + 1); 
-            p_infoPod.ReadReg();
-        }
-
-        void NewInfoPod(int nPod)
-        {
-            ClearInfoPod();
-            for (int n = 0; n < nPod; n++) m_infoPod.Push(new InfoPod((InfoPod.ePod)n));
-        }
-
-        void ClearInfoPod()
-        {
-            m_infoPod.Clear();
+            m_infoPods.ReadPod_Registry(); 
         }
         #endregion
 
-        #region Loading
-        bool m_bLoading = false; 
-        public string RunLoading()
+        #region Docking
+        bool m_bDocking = false; 
+        public string RunDocking()
         {
-            return "OK"; //forget
+            try
+            {
+                if (EQ.p_bSimulate)
+                {
+                    m_infoPods.p_ePresentSensor = GemCarrierBase.ePresent.Exist;
+                    m_infoPods.p_sCarrierID = "Simulation"; 
+                }
+                else
+                {
+                    switch (m_infoPods.p_eState)
+                    {
+                        case InfoPods.eState.Dock: return "OK";
+                        case InfoPods.eState.Empty: return "Pod not Exist";
+                    }
+                    //RFID ??
+
+                }
+                m_infoPods.SendCarrierID(m_infoPods.p_sCarrierID); 
+                m_bDocking = true; 
+                if (m_stage.p_bPlaced == false) return "Not Placed";
+                if (m_stage.p_bPresent == false) return "Not Present";
+                if (Run(m_stage.RunVacuum(true))) return p_sInfo;
+                if (Run(m_door.RunDoor(true))) return p_sInfo;
+                if (Run(m_stage.RunMove(Stage.ePos.Inside))) return p_sInfo;
+                if (Run(m_door.RunDoor(false))) return p_sInfo;
+                if (Run(m_stage.RunPodOpen(true))) return p_sInfo;
+                if (Run(m_stage.RunVacuum(false))) return p_sInfo;
+                m_infoPods.NewInfoPod(4);
+                return "OK";
+            }
+            finally { m_bDocking = false; }
         }
         #endregion
 
-        #region Unloading
-        bool m_bUnloading = false;
-        public string RunUnloading()
+        #region Undocking
+        bool m_bUndockng = false;
+        public string RunUndocking()
         {
-            return "OK"; //forget
+            try
+            {
+                if (Run(m_stage.RunVacuum(true))) return p_sInfo;
+                if (Run(m_stage.RunPodOpen(false))) return p_sInfo;
+                if (Run(m_door.RunDoor(true))) return p_sInfo;
+                if (Run(m_stage.RunMove(Stage.ePos.Outside))) return p_sInfo;
+                if (Run(m_door.RunDoor(false))) return p_sInfo;
+                if (Run(m_stage.RunVacuum(false))) return p_sInfo;
+                m_infoPods.ClearInfoPod();
+                return "OK";
+            }
+            finally { m_bUndockng = false; }
         }
         #endregion
 
@@ -449,7 +478,7 @@ namespace Root_VEGA_P.Module
         {
             if (p_eState != eState.Ready) return p_id + " eState not Ready";
             int nPod = (int)infoPod.p_ePod;
-            if (nPod == m_infoPod.Count) return "OK";
+            if (nPod == m_infoPods.GetPodCount()) return "OK";
             return p_id + " Invalid Pod Type : " + infoPod.p_ePod.ToString();
         }
 
@@ -475,7 +504,7 @@ namespace Root_VEGA_P.Module
 
         public bool IsPodExist(InfoPod.ePod ePod)
         {
-            return (m_infoPod.Count > 0);
+            return (m_infoPods.GetPodCount() > 0);
         }
 
         public bool IsEnableRecovery()
@@ -517,6 +546,7 @@ namespace Root_VEGA_P.Module
             if (EQ.p_bSimulate) return "OK";
             if (Run(m_door.RunDoor(true))) return p_sInfo;
             if (Run(base.StateHome())) return p_sInfo;
+            if (Run(m_stage.RunMove(Stage.ePos.Outside))) return p_sInfo; 
             return m_door.RunDoor(false);
         }
         #endregion
@@ -530,8 +560,9 @@ namespace Root_VEGA_P.Module
         }
         #endregion
 
-        public LoadPort(string id, IEngineer engineer)
+        public Loadport(string id, IEngineer engineer)
         {
+            InitInfoPods(id, engineer); 
             m_interlock = new Interlock("Interlock", this);
             InitBase(id, engineer);
             InitThreadCheck(); 
@@ -550,8 +581,58 @@ namespace Root_VEGA_P.Module
         #region ModuleRun
         protected override void InitModuleRuns()
         {
-//            AddModuleRunList(new Run_Docking(this), false, "Docking Pod to Work Position");
-//            AddModuleRunList(new Run_Undocking(this), false, "Undocking Pod from Work Position");
+            AddModuleRunList(new Run_Docking(this), false, "Docking Pod to Work Position");
+            AddModuleRunList(new Run_Undocking(this), false, "Undocking Pod from Work Position");
+        }
+
+        public class Run_Docking : ModuleRunBase
+        {
+            Loadport m_module;
+            public Run_Docking(Loadport module)
+            {
+                m_module = module;
+                InitModuleRun(module);
+            }
+
+            public override ModuleRunBase Clone()
+            {
+                Run_Docking run = new Run_Docking(m_module);
+                return run;
+            }
+
+            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
+            {
+            }
+
+            public override string Run()
+            {
+                return m_module.RunDocking();
+            }
+        }
+
+        public class Run_Undocking : ModuleRunBase
+        {
+            Loadport m_module;
+            public Run_Undocking(Loadport module)
+            {
+                m_module = module;
+                InitModuleRun(module);
+            }
+
+            public override ModuleRunBase Clone()
+            {
+                Run_Docking run = new Run_Docking(m_module);
+                return run;
+            }
+
+            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
+            {
+            }
+
+            public override string Run()
+            {
+                return m_module.RunUndocking();
+            }
         }
         #endregion
     }
