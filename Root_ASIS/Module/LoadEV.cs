@@ -21,15 +21,15 @@ namespace Root_ASIS.Module
 
         public override void GetTools(bool bInit)
         {
-            p_sInfo = m_toolBox.Get(ref m_dioEV, this, "Elevator", "Down", "Up");
-            p_sInfo = m_toolBox.Get(ref m_diTop, this, "Top");
-            p_sInfo = m_toolBox.Get(ref m_diCheck, this, "Check");
-            p_sInfo = m_toolBox.Get(ref m_diBlowAlarm, this, "BlowAlarm");
-            p_sInfo = m_toolBox.Get(ref m_diPaper, this, "Paper");
-            p_sInfo = m_toolBox.Get(ref m_diPaperCheck, this, "PaperCheck");
-            p_sInfo = m_toolBox.Get(ref m_diPaperFull, this, "PaperFull");
-            p_sInfo = m_toolBox.Get(ref m_doIonBlow, this, "IonBlow");
-            p_sInfo = m_toolBox.Get(ref m_doAlignBlow, this, "AlignBlow");
+            p_sInfo = m_toolBox.GetDIO(ref m_dioEV, this, "Elevator", "Down", "Up");
+            p_sInfo = m_toolBox.GetDIO(ref m_diTop, this, "Top");
+            p_sInfo = m_toolBox.GetDIO(ref m_diCheck, this, "Check");
+            p_sInfo = m_toolBox.GetDIO(ref m_diBlowAlarm, this, "BlowAlarm");
+            p_sInfo = m_toolBox.GetDIO(ref m_diPaper, this, "Paper");
+            p_sInfo = m_toolBox.GetDIO(ref m_diPaperCheck, this, "PaperCheck");
+            p_sInfo = m_toolBox.GetDIO(ref m_diPaperFull, this, "PaperFull");
+            p_sInfo = m_toolBox.GetDIO(ref m_doIonBlow, this, "IonBlow");
+            p_sInfo = m_toolBox.GetDIO(ref m_doAlignBlow, this, "AlignBlow");
             if (bInit) InitTools();
         }
 

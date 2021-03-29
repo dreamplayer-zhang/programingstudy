@@ -13,8 +13,8 @@ namespace Root_Rinse_Loader.Module
         #region ToolBox
         public override void GetTools(bool bInit)
         {
-            p_sInfo = m_toolBox.Get(ref m_axisRotate[0], this, "Rotate0");
-            p_sInfo = m_toolBox.Get(ref m_axisRotate[1], this, "Rotate1");
+            p_sInfo = m_toolBox.GetAxis(ref m_axisRotate[0], this, "Rotate0");
+            p_sInfo = m_toolBox.GetAxis(ref m_axisRotate[1], this, "Rotate1");
             foreach (Line line in m_aLine) line.GetTools(m_toolBox);
             if (bInit)
             {
@@ -26,11 +26,11 @@ namespace Root_Rinse_Loader.Module
         #region Line
         public class Line
         {
-            DIO_I[] m_diCheck = new DIO_I[2];
+            public DIO_I[] m_diCheck = new DIO_I[2];
             public void GetTools(ToolBox toolBox)
             {
-                m_roller.p_sInfo = toolBox.Get(ref m_diCheck[0], m_roller, m_id + ".Check0");
-                m_roller.p_sInfo = toolBox.Get(ref m_diCheck[1], m_roller, m_id + ".Check1");
+                m_roller.p_sInfo = toolBox.GetDIO(ref m_diCheck[0], m_roller, m_id + ".Check0");
+                m_roller.p_sInfo = toolBox.GetDIO(ref m_diCheck[1], m_roller, m_id + ".Check1");
             }
 
             string m_id;
@@ -46,6 +46,16 @@ namespace Root_Rinse_Loader.Module
         void InitILines()
         {
             for (int n = 0; n < 4; n++) m_aLine.Add(new Line("Line" + n.ToString(), this));
+        }
+
+        public bool IsEmpty()
+        {
+            for (int n = 0; n < 4; n++)
+            {
+                //if (m_aLine[n].m_diCheck[0].p_bIn || m_aLine[n].m_diCheck[1].p_bIn) return false;
+                if (m_aLine[n].m_diCheck[1].p_bIn) return false;
+            }
+            return true; 
         }
         #endregion
 

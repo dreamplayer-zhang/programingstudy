@@ -18,6 +18,10 @@ namespace RootTools_Vision
 		private EdgeSurfaceParameter parameterEdge;
 		private EdgeSurfaceRecipe recipeEdge;
 
+		private GrabModeEdge grabModeTop;
+		private GrabModeEdge grabModeSide;
+		private GrabModeEdge grabModeBtm;
+
 		public enum EdgeMapPositionX
 		{
 			Top = 0,
@@ -28,6 +32,13 @@ namespace RootTools_Vision
 		public EdgeSurface() : base()
 		{
 			m_sName = this.GetType().Name;
+		}
+
+		public void SetGrabMode(GrabModeBase top, GrabModeBase side, GrabModeBase btm)
+		{
+			grabModeTop = (GrabModeEdge)top;
+			grabModeSide = (GrabModeEdge)side;
+			grabModeBtm = (GrabModeEdge)btm;
 		}
 
 		public override WorkBase Clone()
@@ -53,9 +64,6 @@ namespace RootTools_Vision
 
 		public void DoInspection()
 		{
-			//if (this.currentWorkplace.MapIndexY == -1)
-			//	return;
-
 			if (this.currentWorkplace.Index == 0)
 				return;
 
@@ -80,9 +88,10 @@ namespace RootTools_Vision
 			int roiWidth = param.ROIWidth;
 			int roiHeight = param.ROIHeight;
 			int threshold = param.Threshold;
-			int defectSize = param.DefectSizeMin;
+			int defectSizeMin = param.DefectSizeMin;
+			int defectSizeMax = param.DefectSizeMax;
 			int searchLevel = param.EdgeSearchLevel;
-			//double resolution = param.Resolution;
+			double resolution = 1.67;//param.Resolution;
 
 			if (this.currentWorkplace.Height < roiHeight)
 				roiHeight = this.currentWorkplace.Height;
@@ -126,18 +135,23 @@ namespace RootTools_Vision
 			string sInspectionID = DatabaseManager.Instance.GetInspectionID();
 			for (int i = 0; i < label.Length; i++)
 			{
-				if (label[i].area > defectSize)
+				if ((label[i].area * resolution) > defectSizeMin || (label[i].area * resolution) < defectSizeMax)
 				{
+					int defectLeft = this.currentWorkplace.PositionX + label[i].boundLeft;
+					int defectTop = this.currentWorkplace.PositionY + label[i].boundTop;
+					int defectWidth = Math.Abs(label[i].boundRight - label[i].boundLeft);
+					int defectHeight = Math.Abs(label[i].boundBottom - label[i].boundTop);
+
 					this.currentWorkplace.AddDefect(sInspectionID,
 						10001,
-						label[i].area,
+						(float)(label[i].area * resolution),
 						label[i].value,
 						0,
-						CalcDegree(0),
-						this.currentWorkplace.PositionX + label[i].boundLeft,
-						this.currentWorkplace.PositionY + label[i].boundTop,
-						Math.Abs(label[i].boundRight - label[i].boundLeft),// * resolution),
-						Math.Abs(label[i].boundBottom - label[i].boundTop),// * resolution),
+						CalcDegree(defectLeft + (defectHeight/2), param),
+						defectLeft,
+						defectTop,
+						(float)(defectWidth * resolution),
+						(float)(defectHeight * resolution),
 						this.currentWorkplace.MapIndexX,
 						this.currentWorkplace.MapIndexY
 						);
@@ -145,14 +159,16 @@ namespace RootTools_Vision
 			}
 		}
 
-		public float CalcDegree(int defectLeft)
+		public float CalcDegree(int defectY, EdgeSurfaceParameterBase param)
 		{
 			float degree = 0;
-			//// (끝지점 - 시작지점) / defectLeft
+
+			//// (끝지점 - 시작지점) / defectY
 			//int bufferY = (int)(360000 / this.parameterEdge.camTriggerRatio) + this.parameterEdge.camHeight;
 
-			//degree = () / defectLeft;
-
+			//float heightPerDegree = grabModeTop.m_nImageHeight / 540000;
+			//float heightPerDegree = (param.EndNotch - param.StartNotch) / 540000;
+			//float degree = (defectY - param.StartNotch) * heightPerDegree;
 			return degree;
 		}
 
@@ -172,11 +188,11 @@ namespace RootTools_Vision
 			int avg, avgNext;
 			int edge = width;
 			
-			avgNext = MeanForYCoordinates(arrSrc, startPtY, startPtX, width, height);
+			avgNext = MeanOfYCoordinates(arrSrc, startPtY, startPtX, width, height);
 			for (int x = startPtX + 1; x < width; x++)
 			{
 				avg = avgNext;
-				avgNext = MeanForYCoordinates(arrSrc, startPtY, x, width, height);
+				avgNext = MeanOfYCoordinates(arrSrc, startPtY, x, width, height);
 
 				if ((avg >= prox && prox > avgNext) || (avg <= prox && prox < avgNext))
 				{
@@ -187,7 +203,7 @@ namespace RootTools_Vision
 			return edge;
 		}
 
-		public int MeanForYCoordinates(byte[] arrSrc, int startPtY, int findPtX, int width, int height)
+		public int MeanOfYCoordinates(byte[] arrSrc, int startPtY, int findPtX, int width, int height)
 		{
 			int avg = 0;
 

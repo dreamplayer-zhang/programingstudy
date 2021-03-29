@@ -417,7 +417,7 @@ namespace Root_CAMELLIA.Data
                 {
                     maxValue = LineAvg;
                 }
-                vectorX += vector.X + nSearchRange;
+                vectorX += vector.X;
                 vectorY += vector.Y;
             }//);
 

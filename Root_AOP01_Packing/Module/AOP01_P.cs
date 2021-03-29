@@ -139,34 +139,34 @@ namespace Root_AOP01_Packing.Module
         }
         public override void GetTools(bool bInit)
         {
-            p_sInfo = m_toolBox.Get(ref m_doLamp, this, "Tower Lamp", asLamp);
-            p_sInfo = m_toolBox.Get(ref do_Buzzer, this, "Buzzer", asBuzzer, true, true);
-            p_sInfo = m_toolBox.Get(ref do_door_Lock, this, "Door Lock");
+            p_sInfo = m_toolBox.GetDIO(ref m_doLamp, this, "Tower Lamp", asLamp);
+            p_sInfo = m_toolBox.GetDIO(ref do_Buzzer, this, "Buzzer", asBuzzer, true, true);
+            p_sInfo = m_toolBox.GetDIO(ref do_door_Lock, this, "Door Lock");
 
             m_toolBox.Get(ref m_tk4s, this, "FDC", ((AOP01_Engineer)m_engineer).m_dialogService);
             m_toolBox.Get(ref m_FFU, this, "FFU", ((AOP01_Engineer)m_engineer).m_dialogService);
-            p_sInfo = m_toolBox.Get(ref di_InterlockKey, this, "Interlock Key");
-            p_sInfo = m_toolBox.Get(ref di_LightCurtainKey, this, "Light Curtian Key");
-            p_sInfo = m_toolBox.Get(ref di_EMO, this, "EMS");
-            p_sInfo = m_toolBox.Get(ref di_CDA, this, "CDA");
-            p_sInfo = m_toolBox.Get(ref di_MCReset, this, "M/C Reset");
-            p_sInfo = m_toolBox.Get(ref di_Fan_4CH, this, "4CH Fan");
-            p_sInfo = m_toolBox.Get(ref di_Fan_PC, this, "PC Fan");
-            p_sInfo = m_toolBox.Get(ref dio_TapeLoad, this, "Tape Load");
-            p_sInfo = m_toolBox.Get(ref dio_TapeUnload, this, "Tape Unload");
-            p_sInfo = m_toolBox.Get(ref di_door_Machine, this, "Door Machine");
-            p_sInfo = m_toolBox.Get(ref di_door_AirTop, this, "Door Air Top");
-            p_sInfo = m_toolBox.Get(ref di_door_IO, this, "Door I/O");
-            p_sInfo = m_toolBox.Get(ref di_door_Elec, this, "Door Elec");
-            p_sInfo = m_toolBox.Get(ref di_ProtectionBar, this, "Protection Bar Loadport");
-            p_sInfo = m_toolBox.Get(ref di_LightCurtain_Load, this, "Light Curtain Loadport");
-            p_sInfo = m_toolBox.Get(ref di_LightCurtain_Unload, this, "Light Curtain Unloadport");
-            p_sInfo = m_toolBox.Get(ref di_Elevator_Protection1, this, "Elevator Protection Sensor Forward");
-            p_sInfo = m_toolBox.Get(ref di_Elevator_Protection2, this, "Elevator Protection Sensor Backward");
-            p_sInfo = m_toolBox.Get(ref di_Cartridge_Check1, this, "Cartridge Check Left");
-            p_sInfo = m_toolBox.Get(ref di_Cartridge_Check2, this, "Cartirdge Check Right");
-            p_sInfo = m_toolBox.Get(ref di_Wrapper_WrapCheck, this, "Wrapper Exist Sensor");
-            p_sInfo = m_toolBox.Get(ref di_Wrapper_WrapLevelCheck, this, "Wrapper Level Sensor");
+            p_sInfo = m_toolBox.GetDIO(ref di_InterlockKey, this, "Interlock Key");
+            p_sInfo = m_toolBox.GetDIO(ref di_LightCurtainKey, this, "Light Curtian Key");
+            p_sInfo = m_toolBox.GetDIO(ref di_EMO, this, "EMS");
+            p_sInfo = m_toolBox.GetDIO(ref di_CDA, this, "CDA");
+            p_sInfo = m_toolBox.GetDIO(ref di_MCReset, this, "M/C Reset");
+            p_sInfo = m_toolBox.GetDIO(ref di_Fan_4CH, this, "4CH Fan");
+            p_sInfo = m_toolBox.GetDIO(ref di_Fan_PC, this, "PC Fan");
+            p_sInfo = m_toolBox.GetDIO(ref dio_TapeLoad, this, "Tape Load");
+            p_sInfo = m_toolBox.GetDIO(ref dio_TapeUnload, this, "Tape Unload");
+            p_sInfo = m_toolBox.GetDIO(ref di_door_Machine, this, "Door Machine");
+            p_sInfo = m_toolBox.GetDIO(ref di_door_AirTop, this, "Door Air Top");
+            p_sInfo = m_toolBox.GetDIO(ref di_door_IO, this, "Door I/O");
+            p_sInfo = m_toolBox.GetDIO(ref di_door_Elec, this, "Door Elec");
+            p_sInfo = m_toolBox.GetDIO(ref di_ProtectionBar, this, "Protection Bar Loadport");
+            p_sInfo = m_toolBox.GetDIO(ref di_LightCurtain_Load, this, "Light Curtain Loadport");
+            p_sInfo = m_toolBox.GetDIO(ref di_LightCurtain_Unload, this, "Light Curtain Unloadport");
+            p_sInfo = m_toolBox.GetDIO(ref di_Elevator_Protection1, this, "Elevator Protection Sensor Forward");
+            p_sInfo = m_toolBox.GetDIO(ref di_Elevator_Protection2, this, "Elevator Protection Sensor Backward");
+            p_sInfo = m_toolBox.GetDIO(ref di_Cartridge_Check1, this, "Cartridge Check Left");
+            p_sInfo = m_toolBox.GetDIO(ref di_Cartridge_Check2, this, "Cartirdge Check Right");
+            p_sInfo = m_toolBox.GetDIO(ref di_Wrapper_WrapCheck, this, "Wrapper Exist Sensor");
+            p_sInfo = m_toolBox.GetDIO(ref di_Wrapper_WrapLevelCheck, this, "Wrapper Level Sensor");
 
             
             if (bInit)

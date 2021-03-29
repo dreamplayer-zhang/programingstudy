@@ -15,9 +15,9 @@ namespace Root_Rinse_Unloader.Module
         #region ToolBox
         public override void GetTools(bool bInit)
         {
-            p_sInfo = m_toolBox.Get(ref m_axis, this, "Loader");
-            p_sInfo = m_toolBox.Get(ref m_dioPickerDown, this, "PickerDown", "Up", "Down");
-            p_sInfo = m_toolBox.Get(ref m_diPickerSet, this, "PickerSet");
+            p_sInfo = m_toolBox.GetAxis(ref m_axis, this, "Loader");
+            p_sInfo = m_toolBox.GetDIO(ref m_dioPickerDown, this, "PickerDown", "Up", "Down");
+            p_sInfo = m_toolBox.GetDIO(ref m_diPickerSet, this, "PickerSet");
             foreach (Picker picker in m_aPicker) picker.GetTools(m_toolBox, bInit);
             if (bInit)
             {
@@ -44,8 +44,8 @@ namespace Root_Rinse_Unloader.Module
             public DIO_O m_doBlow;
             public void GetTools(ToolBox toolBox, bool bInit)
             {
-                m_loader.p_sInfo = toolBox.Get(ref m_dioVacuum, m_loader, m_id + ".Vacuum");
-                m_loader.p_sInfo = toolBox.Get(ref m_doBlow, m_loader, m_id + ".Blow");
+                m_loader.p_sInfo = toolBox.GetDIO(ref m_dioVacuum, m_loader, m_id + ".Vacuum");
+                m_loader.p_sInfo = toolBox.GetDIO(ref m_doBlow, m_loader, m_id + ".Blow");
                 if (bInit)
                 {
                     m_dioVacuum.Write(false);
@@ -147,6 +147,45 @@ namespace Root_Rinse_Unloader.Module
         }
         #endregion
 
+        #region Tact Time
+        double _secTact = 0;
+        public double p_secTact
+        {
+            get { return _secTact; }
+            set
+            {
+                _secTact = value;
+                OnPropertyChanged();
+            }
+        }
+
+        double _secAveTact = 0;
+        public double p_secAveTact
+        {
+            get { return _secAveTact; }
+            set
+            {
+                _secAveTact = value;
+                OnPropertyChanged();
+            }
+        }
+
+        List<double> m_aTact = new List<double>();
+        StopWatch m_swTact = new StopWatch();
+        void CheckTact()
+        {
+            double secTact = m_swTact.ElapsedMilliseconds / 1000.0;
+            m_swTact.Start();
+            m_aTact.Add(secTact);
+            if (m_aTact.Count <= 1) return;
+            p_secTact = secTact;
+            double secSum = 0;
+            for (int n = 1; n < m_aTact.Count; n++) secSum += m_aTact[n];
+            p_secAveTact = secSum / (m_aTact.Count - 1);
+            while (m_aTact.Count > 4) m_aTact.RemoveAt(0);
+        }
+        #endregion
+
         #region Run Load
         public string RunLoad()
         {
@@ -159,7 +198,6 @@ namespace Root_Rinse_Unloader.Module
                 if (EQ.IsStop()) return "EQ Stop"; 
             }
             if (Run(RunVacuum(true))) return p_sInfo;
-
             if (Run(RunPickerDown(true))) return p_sInfo;
             Thread.Sleep((int)(1000 * m_secVac));
             if (Run(RunPickerDown(false))) return p_sInfo;
@@ -183,6 +221,7 @@ namespace Root_Rinse_Unloader.Module
                 if (Run(MoveLoader(ePos.Stotage))) return p_sInfo;
                 //if (Run(RunPickerDown(true))) return p_sInfo;
                 if (Run(RunVacuum(false))) return p_sInfo;
+                m_rinse.CheckTact(); 
                 //if (Run(RunPickerDown(false))) return p_sInfo;
                 if (Run(MoveLoader(ePos.Roller))) return p_sInfo;
                 m_storage.StartMoveStackReady();
@@ -203,10 +242,12 @@ namespace Root_Rinse_Unloader.Module
         public string RunCheckStrip()
         {
             string sResult = "OK";
-            foreach(Roller.Line line in m_roller.m_aLine)
+            foreach (Roller.Line line in m_roller.m_aLine)
             {
-                if(line.m_diCheck[2].p_bIn)
+                if (line.m_diCheck[2].p_bIn)
                 {
+                    EQ.p_bStop = true;
+                    EQ.p_eState = EQ.eState.Error; 
                     m_alidRollerStripCheck.p_bSet = true;
                     return "Roller Check Strip";
                 }

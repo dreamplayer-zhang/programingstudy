@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using Root_WIND2.Module;
+using RootTools;
 using RootTools.Database;
 using RootTools.OHT;
 using RootTools_Vision;
@@ -58,9 +59,14 @@ namespace Root_WIND2
 			EdgeSurface edgeSurface = new EdgeSurface();
 			ProcessDefect_Edge processDefect_Edge = new ProcessDefect_Edge("defect");
 
+			// top/side/btm 각 Set
 			foreach (ParameterBase param in paramList)
 				edgeSurface.SetParameter(param);
 
+			edgeSurface.SetGrabMode(((WIND2_Handler)GlobalObjects.Instance.Get<WIND2_Engineer>().ClassHandler()).p_EdgeSideVision.m_aGrabMode[recipe.GetItem<EdgeSurfaceRecipe>().EdgeRecipeBaseTop.GrabModeIndex],
+									((WIND2_Handler)GlobalObjects.Instance.Get<WIND2_Engineer>().ClassHandler()).p_EdgeSideVision.m_aGrabMode[recipe.GetItem<EdgeSurfaceRecipe>().EdgeRecipeBaseSide.GrabModeIndex],
+									((WIND2_Handler)GlobalObjects.Instance.Get<WIND2_Engineer>().ClassHandler()).p_EdgeSideVision.m_aGrabMode[recipe.GetItem<EdgeSurfaceRecipe>().EdgeRecipeBaseBtm.GrabModeIndex]);
+			
 			workBundle.Add(edgeSurface);
 			workBundle.Add(processDefect_Edge);
 			workBundle.SetRecipe(this.Recipe);
@@ -91,25 +97,45 @@ namespace Root_WIND2
 
 		private void CreateWorkplace_Edge(EdgeSurfaceRecipeBase recipe, EdgeSurfaceParameterBase param, EdgeSurface.EdgeMapPositionX mapX, SharedBufferInfo sharedBufferInfo, ref WorkplaceBundle workplaceBundle)
 		{
-			// temp notch
-			int firstNotch = param.StartNotch;
-			int lastNotch = param.EndNotch;
-			int bufferHeight = lastNotch - firstNotch;
-			//
-
-			// 나중에 원복
-			/*
-			// 360도 memory height
-			int bufferHeight = (int)(360000 / recipe.TriggerRatio) + recipe.ImageOffset;
-			// 검사 시작/끝 Y좌표 설정
-			int startY = recipe.PositionOffset * (bufferHeight / 360);
-			int endY = bufferHeight + startY;
-			*/
+			GrabModeEdge grabMode = ((WIND2_Handler)GlobalObjects.Instance.Get<WIND2_Engineer>().ClassHandler()).p_EdgeSideVision.m_aGrabMode[recipe.GrabModeIndex];
+			if (grabMode == null)
+			{ 
+				MessageBox.Show("Grab Mode를 설정해주세요.");
+				return;
+			}
 			
-			// ROI
+			int imgHeight = grabMode.m_nImageHeight;    // Image 전체 Height
+			int heightPerDegree = (int)(imgHeight / grabMode.m_nScanDegree);    // 1도 Image Height
+			int startY = heightPerDegree * grabMode.m_nCameraPositionOffset;
+			int endY = (heightPerDegree * 360) + startY;
+
 			int roiWidth = param.ROIWidth;
 			int roiHeight = param.ROIHeight;
-			for (int i = 0; i < 3/*bufferHeight / roiHeight*/; i++)
+
+			for (int i = 0; i < endY / roiHeight; i++)
+			{
+				int calcStartY = (roiHeight * i) + startY;
+				int calcHeight = roiHeight;
+
+				if ((calcStartY + roiHeight) > imgHeight)
+					calcHeight = imgHeight - calcStartY;
+
+				if (calcHeight <= 0) break;
+
+				Workplace workplace = new Workplace((int)mapX, i, 0, calcStartY, roiWidth, calcHeight, workplaceBundle.Count);
+				workplace.SetSharedBuffer(sharedBufferInfo);
+				workplaceBundle.Add(workplace);
+			}
+
+			// Notch to Notch 방식
+			/*
+			int firstNotch = 0;	// FindNotch
+			int lastNotch = 0;	// FindNotch
+			int bufferHeight = lastNotch - firstNotch;
+
+			int roiWidth = param.ROIWidth;
+			int roiHeight = param.ROIHeight;
+			for (int i = 0; i < bufferHeight / roiHeight; i++)
 			{
 				int calcStartY = (roiHeight * i) + firstNotch;
 				int calcHeight = roiHeight;
@@ -119,22 +145,11 @@ namespace Root_WIND2
 
 				if (calcHeight <= 0) break;
 
-				// 나중에 원복
-				/*
-				int calcStartY = (roiHeight * i) + startY + recipe.ImageOffset;
-				int calcHeight = roiHeight;
-
-				if ((calcStartY + roiHeight) > endY)
-					calcHeight = endY - calcStartY;
-
-				if (calcHeight <= 0) break;
-				*/
-
 				Workplace workplace = new Workplace((int)mapX, i, 0, calcStartY, roiWidth, calcHeight, workplaceBundle.Count);
 				workplace.SetSharedBuffer(sharedBufferInfo);
-
 				workplaceBundle.Add(workplace);
 			}
+			*/
 		}
 
 		public int GetWorkplaceCount()
@@ -149,6 +164,8 @@ namespace Root_WIND2
 			if (this.Recipe == null)
 				return;
 
+			DateTime inspectionStart = DateTime.Now;
+			DateTime inspectionEnd = DateTime.Now;
 			string lotId = "Lotid";
 			string partId = "Partid";
 			string setupId = "SetupID";
@@ -157,7 +174,7 @@ namespace Root_WIND2
 			//string sRecipe = "RecipeID";
 			string recipeName = recipe.Name;
 
-			DatabaseManager.Instance.SetLotinfo(lotId, partId, setupId, cstId, waferId, recipeName);
+			DatabaseManager.Instance.SetLotinfo(inspectionStart, inspectionEnd, lotId, partId, setupId, cstId, waferId, recipeName);
 
 			base.Start();
 		}

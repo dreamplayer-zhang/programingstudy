@@ -15,9 +15,9 @@ namespace Root_ASIS.Module
         DIO_O m_doBlow; 
         public void GetTools(ModuleBase module, bool bInit)
         {
-            module.p_sInfo = module.m_toolBox.Get(ref m_dioDown, module, "UpDown", "Up", "Down");
-            module.p_sInfo = module.m_toolBox.Get(ref m_dioVacuum, module, "Vacuum");
-            module.p_sInfo = module.m_toolBox.Get(ref m_doBlow, module, "Blow");
+            module.p_sInfo = module.m_toolBox.GetDIO(ref m_dioDown, module, "UpDown", "Up", "Down");
+            module.p_sInfo = module.m_toolBox.GetDIO(ref m_dioVacuum, module, "Vacuum");
+            module.p_sInfo = module.m_toolBox.GetDIO(ref m_doBlow, module, "Blow");
         }
         #endregion
 

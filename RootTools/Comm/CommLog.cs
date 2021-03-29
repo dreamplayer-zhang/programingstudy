@@ -58,18 +58,27 @@ namespace RootTools.Comm
 
         public void Add(eType type, string sMsg)
         {
-            m_qLog.Enqueue(new LogData(type, sMsg));
-            if (m_log != null)
+            try
             {
-                string sHead = "";
-                switch (type)
+                if (sMsg.Length > 256) sMsg = sMsg.Substring(0, 250) + " ...";
+                m_qLog.Enqueue(new LogData(type, sMsg));
+                if (m_log != null)
                 {
-                    case eType.Send: sHead = " ==> "; break;
-                    case eType.Receive: sHead = "<==  "; break;
-                    default: sHead = "Info : "; break;
+                    string sHead = "";
+                    switch (type)
+                    {
+                        case eType.Send: sHead = " ==> "; break;
+                        case eType.Receive: sHead = "<==  "; break;
+                        default: sHead = "Info : "; break;
+                    }
+                    m_log.Info(sHead + sMsg);
                 }
-                m_log.Info(sHead + sMsg);
             }
+            catch
+            {
+
+            }
+            
         }
         #endregion
 

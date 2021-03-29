@@ -9,50 +9,66 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="2*"/>
+            <RowDefinition Height="2*"/>
             <RowDefinition Height="5*"/>
         </Grid.RowDefinitions>
-        <GroupBox Grid.Row="0" Header="Strip Check" Style="{StaticResource group}" Margin="5,10" BorderThickness="0">
+        <GroupBox Grid.Row="0" Header="자제 감지" Style="{StaticResource group}" Margin="5,10" BorderThickness="0">
             <Grid x:Name="gridCheck"/>
         </GroupBox>
-        <Grid Grid.Row="1">
+        <GroupBox Grid.Row="1" Header="로더 축" Style="{StaticResource group}" Margin="5,10" BorderThickness="0">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Button Grid.Column="0" x:Name="buttonLoaderStorage" Content="스토리지" Margin="5,5" FontSize="30" FontWeight="Bold" FontFamily="Arial"
+                            BorderBrush="{x:Null}"  Click="buttonLoaderStorage_Click" />
+                <Button Grid.Column="1" x:Name="buttonLoaderRail" Content="레일" Margin="5,5" FontSize="30" FontWeight="Bold" FontFamily="Arial"
+                            BorderBrush="{x:Null}"  Click="buttonLoaderRail_Click" />
+                <Button Grid.Column="2" x:Name="buttonLoaderRoller" Content="롤러" Margin="5,5" FontSize="30" FontWeight="Bold" FontFamily="Arial"
+                            BorderBrush="{x:Null}"  Click="buttonLoaderRoller_Click" />
+            </Grid>
+        </GroupBox>
+        <Grid Grid.Row="2">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
-            <GroupBox Grid.Column="0" Header="Elevator" Style="{StaticResource group}" Margin="5,10" BorderThickness="0">
+            <GroupBox Grid.Column="0" Header="에레베이터" Style="{StaticResource group}" Margin="5,10" BorderThickness="0">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="*"/>
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
-                    <Button Grid.Row="0" x:Name="buttonElevatorReady" Content="Ready" Margin="5,5" FontSize="30" FontWeight="Bold" FontFamily="Arial"
+                    <Button Grid.Row="0" x:Name="buttonElevatorReady" Content="준비" Margin="5,5" FontSize="30" FontWeight="Bold" FontFamily="Arial"
                             BorderBrush="{x:Null}"  Click="buttonElevatorReady_Click" />
-                    <Button Grid.Row="1" x:Name="buttonElevetorDown" Content="Down" Margin="5,5" FontSize="30" FontWeight="Bold" FontFamily="Arial"
+                    <Button Grid.Row="1" x:Name="buttonElevetorDown" Content="아래로" Margin="5,5" FontSize="30" FontWeight="Bold" FontFamily="Arial"
                             BorderBrush="{x:Null}"  Click="buttonElevetorDown_Click" />
                 </Grid>
             </GroupBox>
-            <GroupBox Grid.Column="1" Header="Picker" Style="{StaticResource group}" Margin="5,10" BorderThickness="0">
+            <GroupBox Grid.Column="1" Header="피커" Style="{StaticResource group}" Margin="5,10" BorderThickness="0">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="*"/>
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
-                    <Button Grid.Row="0" x:Name="buttonPickerSetUp" Content="Up" Margin="5,5" FontSize="30" FontWeight="Bold" FontFamily="Arial"
+                    <Button Grid.Row="0" x:Name="buttonPickerSetUp" Content="업" Margin="5,5" FontSize="30" FontWeight="Bold" FontFamily="Arial"
                             BorderBrush="{x:Null}"  Click="buttonPickerSetUp_Click" />
-                    <Button Grid.Row="1" x:Name="buttonPickerSetDown" Content="Down" Margin="5,5" FontSize="30" FontWeight="Bold" FontFamily="Arial"
+                    <Button Grid.Row="1" x:Name="buttonPickerSetDown" Content="다운" Margin="5,5" FontSize="30" FontWeight="Bold" FontFamily="Arial"
                             BorderBrush="{x:Null}"  Click="buttonPickerSetDown_Click" />
                 </Grid>
             </GroupBox>
-            <GroupBox Grid.Column="2" Header="Picker Vacuum" Style="{StaticResource group}" Margin="5,10" BorderThickness="0">
+            <GroupBox Grid.Column="2" Header="피커 공압" Style="{StaticResource group}" Margin="5,10" BorderThickness="0">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="*"/>
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
-                    <Button Grid.Row="0" x:Name="buttonVacuumOn" Content="On" Margin="5,5" FontSize="30" FontWeight="Bold" FontFamily="Arial"
+                    <Button Grid.Row="0" x:Name="buttonVacuumOn" Content="켜기" Margin="5,5" FontSize="30" FontWeight="Bold" FontFamily="Arial"
                             BorderBrush="{x:Null}"  Click="buttonVacuumOn_Click" />
-                    <Button Grid.Row="1" x:Name="buttonVacuumOff" Content="Off" Margin="5,5" FontSize="30" FontWeight="Bold" FontFamily="Arial"
+                    <Button Grid.Row="1" x:Name="buttonVacuumOff" Content="끄기" Margin="5,5" FontSize="30" FontWeight="Bold" FontFamily="Arial"
                             BorderBrush="{x:Null}"  Click="buttonVacuumOff_Click" />
                 </Grid>
             </GroupBox>

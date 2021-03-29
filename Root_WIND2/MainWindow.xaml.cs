@@ -147,7 +147,7 @@ namespace Root_WIND2
             SettingItem_Database frontSettings = GlobalObjects.Instance.Get<Settings>().GetItem<SettingItem_Database>();
             ///////시연용 임시코드
             DatabaseManager.Instance.SetDatabase(1, frontSettings.SerevrName, frontSettings.DBName, frontSettings.DBUserID, frontSettings.DBPassword);
-            //DatabaseManager.Instance.ValidateDatabase();
+            DatabaseManager.Instance.ValidateDatabase();
             //////
 
             logView.Init(LogView._logView);
@@ -287,7 +287,7 @@ namespace Root_WIND2
                     InspectionManagerBackside inspectionBack = GlobalObjects.Instance.Register<InspectionManagerBackside>
                     (
                     recipeBack,
-                    new SharedBufferInfo(frontImage.GetPtr(0), frontImage.p_Size.X, frontImage.p_Size.Y, frontImage.GetBytePerPixel(), frontImage.GetPtr(1), frontImage.GetPtr(2))
+                    new SharedBufferInfo(backImage.GetPtr(0), backImage.p_Size.X, backImage.p_Size.Y, backImage.GetBytePerPixel(), backImage.GetPtr(1), backImage.GetPtr(2))
                     );
                 }
 

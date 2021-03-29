@@ -17,7 +17,7 @@ namespace Root_EFEM.Module
         protected RS232 m_rs232;
         public override void GetTools(bool bInit)
         {
-            p_sInfo = m_toolBox.Get(ref m_rs232, this, "RS232");
+            p_sInfo = m_toolBox.GetComm(ref m_rs232, this, "RS232");
             m_dicArm[eArm.Upper].GetTools(m_toolBox);
             m_dicArm[eArm.Lower].GetTools(m_toolBox);
             if (bInit)
@@ -116,8 +116,8 @@ namespace Root_EFEM.Module
             public DIO_I m_diArmClose;
             public void GetTools(ToolBox toolBox)
             {
-                m_module.p_sInfo = toolBox.Get(ref m_diCheckVac, m_module, m_eArm.ToString() + ".CheckVac");
-                m_module.p_sInfo = toolBox.Get(ref m_diArmClose, m_module, m_eArm.ToString() + ".ArmClose");
+                m_module.p_sInfo = toolBox.GetDIO(ref m_diCheckVac, m_module, m_eArm.ToString() + ".CheckVac");
+                m_module.p_sInfo = toolBox.GetDIO(ref m_diArmClose, m_module, m_eArm.ToString() + ".ArmClose");
             }
 
             enum eCheckWafer
@@ -521,13 +521,13 @@ namespace Root_EFEM.Module
         {
             try
             {
-                if (EQ.IsStop()) return "EQ Stop";
+               // if (EQ.IsStop()) return "EQ Stop";
                 int msDelay = 1000 * secTimeout;
                 int ms10 = 0;
                 if (m_rs232.p_bConnect == false) return m_eSendCmd.ToString() + " RS232 not Connect !!";
                 while (m_eSendCmd != eCmd.None)
                 {
-                    if (EQ.IsStop()) return "EQ Stop";
+                    //if (EQ.IsStop()) return "EQ Stop";
                     Thread.Sleep(10);
                     ms10 += 10;
                     if (ms10 > msDelay) return m_eSendCmd.ToString() + " Has no Answer !!";
@@ -976,11 +976,8 @@ namespace Root_EFEM.Module
                 finally
                 {
                     //0203 여기 왜 거꾸로..? // 0204 I/O 잘못 됨
-                    if (m_module.m_dicArm[m_eArm].IsWaferExist()) 
-                        child.SetInfoWafer(m_nChildID, null);
-
+                    if (m_module.m_dicArm[m_eArm].IsWaferExist()) child.SetInfoWafer(m_nChildID, null);
                     else m_module.m_dicArm[m_eArm].p_infoWafer = null;
-                        m_module.m_dicArm[m_eArm].p_infoWafer = null;
                 }
                 if (m_module.m_dicArm[m_eArm].IsWaferExist() == false) 
                     return "OK";

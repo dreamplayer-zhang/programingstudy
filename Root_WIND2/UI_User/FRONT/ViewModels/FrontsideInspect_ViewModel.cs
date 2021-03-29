@@ -84,7 +84,6 @@ namespace Root_WIND2.UI_User
         }
         #endregion
 
-        
 
 
         public FrontsideInspect_ViewModel()
@@ -258,7 +257,8 @@ namespace Root_WIND2.UI_User
         {
             get => new RelayCommand(() =>
             {
-                GlobalObjects.Instance.Get<InspectionManagerFrontside>().RemoteStart();
+                GlobalObjects.Instance.Get<InspectionManagerFrontside>().RemoteProcessStart();
+                GlobalObjects.Instance.Get<InspectionManagerFrontside>().RemoteProcessStartWork();
             });
         }
         #endregion

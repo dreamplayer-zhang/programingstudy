@@ -93,20 +93,20 @@ namespace Root_AOP01_Inspection.Module
 
         public override void GetTools(bool bInit)
         {
-            p_sInfo = m_toolBox.Get(ref m_diExistVision, this, "Reticle Exist on Vision");
-            p_sInfo = m_toolBox.Get(ref m_diReticleTiltCheck, this, "Reticle Tilt Check");
-            p_sInfo = m_toolBox.Get(ref m_diReticleFrameCheck, this, "Reticle Frame Check");
-            p_sInfo = m_toolBox.Get(ref m_do45DTrigger, this, "45D Trigger");
-            p_sInfo = m_toolBox.Get(ref m_axisRotate, this, "Axis Rotate");
-            p_sInfo = m_toolBox.Get(ref m_axisSideZ, this, "Axis Side Z");
-            p_sInfo = m_toolBox.Get(ref m_axisZ, this, "Axis Z");
-            p_sInfo = m_toolBox.Get(ref m_axisXY, this, "Axis XY");
+            p_sInfo = m_toolBox.GetDIO(ref m_diExistVision, this, "Reticle Exist on Vision");
+            p_sInfo = m_toolBox.GetDIO(ref m_diReticleTiltCheck, this, "Reticle Tilt Check");
+            p_sInfo = m_toolBox.GetDIO(ref m_diReticleFrameCheck, this, "Reticle Frame Check");
+            p_sInfo = m_toolBox.GetDIO(ref m_do45DTrigger, this, "45D Trigger");
+            p_sInfo = m_toolBox.GetAxis(ref m_axisRotate, this, "Axis Rotate");
+            p_sInfo = m_toolBox.GetAxis(ref m_axisSideZ, this, "Axis Side Z");
+            p_sInfo = m_toolBox.GetAxis(ref m_axisZ, this, "Axis Z");
+            p_sInfo = m_toolBox.GetAxis(ref m_axisXY, this, "Axis XY");
             p_sInfo = m_toolBox.Get(ref m_memoryPool, this, "Vision Memory", 1);
             p_sInfo = m_toolBox.Get(ref m_lightSet, this);
-            p_sInfo = m_toolBox.Get(ref m_CamTDI90, this, "TDI 90");
-            p_sInfo = m_toolBox.Get(ref m_CamTDI45, this, "TDI 45");
-            p_sInfo = m_toolBox.Get(ref m_CamTDISide, this, "TDI Side");
-            p_sInfo = m_toolBox.Get(ref m_CamLADS, this, "LADS");
+            p_sInfo = m_toolBox.GetCamera(ref m_CamTDI90, this, "TDI 90");
+            p_sInfo = m_toolBox.GetCamera(ref m_CamTDI45, this, "TDI 45");
+            p_sInfo = m_toolBox.GetCamera(ref m_CamTDISide, this, "TDI Side");
+            p_sInfo = m_toolBox.GetCamera(ref m_CamLADS, this, "LADS");
             m_axisRotate.StartMove(1000);
         }
         #endregion
@@ -2596,12 +2596,6 @@ namespace Root_AOP01_Inspection.Module
                 run.m_nThreshold = m_nThreshold;
                 run.m_nSubImageThreshold = m_nSubImageThreshold;
                 run.m_dNGSpecScratchLength_mm = m_dNGSpecScratchLength_mm;
-
-                if (EQ.p_bSimulate == false)
-                {
-                    run.m_dNGSpecScratchLength_mm = UIManager.Instance.SetupViewModel.m_RecipeWizard.p_dBarcodeScratchSpec_mm;
-                }
-
                 return run;
             }
 
@@ -3414,13 +3408,6 @@ namespace Root_AOP01_Inspection.Module
                 run.m_dMatchScore = m_dMatchScore;
                 run.m_dNGSpecDistance_mm = m_dNGSpecDistance_mm;
                 run.m_dNGSpecDegree = m_dNGSpecDegree;
-
-                if (EQ.p_bSimulate == false)
-                {
-                    run.m_dNGSpecDistance_mm = UIManager.Instance.SetupViewModel.m_RecipeWizard.p_dPatternArrayShiftSpec_mm;
-                    run.m_dNGSpecDegree = UIManager.Instance.SetupViewModel.m_RecipeWizard.p_dPatternArrayRotationSpec_degree;
-                }
-
                 return run;
             }
 
@@ -3710,12 +3697,6 @@ namespace Root_AOP01_Inspection.Module
                 run.m_dMatchScore = m_dMatchScore;
                 run.m_nThreshold = m_nThreshold;
                 run.m_nNGSpec_um = m_nNGSpec_um;
-
-                if (EQ.p_bSimulate == false)
-                {
-                    run.m_nNGSpec_um = (int)UIManager.Instance.SetupViewModel.m_RecipeWizard.p_dAlignKeyExistSpec_um;
-                }
-
                 return run;
             }
 
@@ -4399,13 +4380,6 @@ namespace Root_AOP01_Inspection.Module
                 run.m_nFrameEdgeThreshold = m_nFrameEdgeThreshold;
                 run.m_dNGSpecDistance_mm = m_dNGSpecDistance_mm;
                 run.m_dNGSpecDegree = m_dNGSpecDegree;
-
-                if (EQ.p_bSimulate == false)
-                {
-                    run.m_dNGSpecDistance_mm = UIManager.Instance.SetupViewModel.m_RecipeWizard.p_dPellicleShiftSpec_mm;
-                    run.m_dNGSpecDegree = UIManager.Instance.SetupViewModel.m_RecipeWizard.p_dPellicleRotationSpec_degree;
-                }
-
                 return run;
             }
 
@@ -4725,12 +4699,6 @@ namespace Root_AOP01_Inspection.Module
                 Run_PellicleExpandingInspection run = new Run_PellicleExpandingInspection(m_module);
                 run.m_nLaserThreshold = m_nLaserThreshold;
                 run.m_nNGSpec_um = m_nNGSpec_um;
-
-                if (EQ.p_bSimulate == false)
-                {
-                    run.m_nNGSpec_um = (int)UIManager.Instance.SetupViewModel.m_RecipeWizard.p_dPellicleExpandingSpec_um;
-                }
-
                 return run;
             }
 

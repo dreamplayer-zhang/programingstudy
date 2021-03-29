@@ -104,7 +104,7 @@ namespace RootTools.Comm
             get { return (m_socket == null) ? false : m_socket.Connected; }
         }
 
-        string Connect()
+        public string Connect()
         {
             try
             {
@@ -113,6 +113,7 @@ namespace RootTools.Comm
                 m_socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.KeepAlive, true);
 
                 m_socket.BeginConnect(p_sIP, p_nPort, new AsyncCallback(CallBack_Connect), m_socket);
+                OnPropertyChanged("p_bConnect"); 
                 return "OK"; 
             }
             catch (SocketException eX) { return "Connect :" + eX.Message; }
@@ -168,11 +169,13 @@ namespace RootTools.Comm
         {
             try
             {
-                if (sMsg.Length < 128) m_commLog.Add(CommLog.eType.Send, sMsg);
+                m_commLog.Add(CommLog.eType.Send, sMsg);
                 m_socket.Send(Encoding.ASCII.GetBytes(sMsg));
             }
             catch (Exception e)
             {
+                m_socket = null;
+                OnPropertyChanged("p_bConnect");
                 p_sInfo = "Send : " + e.Message;
                 return p_sInfo;
             }
@@ -182,12 +185,13 @@ namespace RootTools.Comm
         {
             try
             {
-                if (sMsg.Length < 128)
-                    m_commLog.Add(CommLog.eType.Send, Encoding.ASCII.GetString(sMsg));
+                m_commLog.Add(CommLog.eType.Send, Encoding.ASCII.GetString(sMsg));
                 m_socket.Send(sMsg);
             }
             catch (Exception e)
             {
+                m_socket = null;
+                OnPropertyChanged("p_bConnect");
                 p_sInfo = "Send : " + e.Message;
                 return p_sInfo;
             }
@@ -224,13 +228,13 @@ namespace RootTools.Comm
             Thread.Sleep(3000);
             while (m_bThread)
             {
-                Thread.Sleep(2);
+                Thread.Sleep(10);
                 if (p_bUse)
                 {
                     if (p_bConnect == false)
                     {
-                        p_sInfo = Connect();
                         Thread.Sleep(1000);
+                        p_sInfo = Connect();
                     }
                     else if (m_qSend.Count > 0)
                     {
@@ -243,10 +247,8 @@ namespace RootTools.Comm
                     {
                         byte[] sMsg = m_qSendByte.Peek();
                         string sSend = SendMsg(sMsg);
-                        if (sSend == "OK")
-                            m_qSendByte.Dequeue();
-                        else
-                            m_commLog.Add(CommLog.eType.Info, sSend);
+                        if (sSend == "OK") m_qSendByte.Dequeue();
+                        else m_commLog.Add(CommLog.eType.Info, sSend);
                     }
                 }
                 else if (m_socket != null)

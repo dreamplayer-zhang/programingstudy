@@ -1,4 +1,5 @@
 ﻿using Root.Module;
+using Root_VEGA_P_Vision.Module;
 using RootTools;
 using RootTools.GAFs;
 using RootTools.Module;
@@ -19,7 +20,8 @@ namespace Root
         //public RemoteModule m_server;
         //public TestServer m_tcpServer;
         //public TestClient m_tcpClient;
-        public TestThread m_testThread;
+        public Vision m_bufferClient;
+        public Vision m_bufferServer;
         void InitModule()
         {
             p_moduleList = new ModuleList(m_engineer);
@@ -37,8 +39,10 @@ namespace Root
             //InitModule(m_tcpServer);
             //m_tcpClient = new TestClient("TestClient", m_engineer);
             //InitModule(m_tcpClient);
-            m_testThread = new TestThread("TestThread", m_engineer);
-            InitModule(m_testThread);
+            m_bufferServer = new Vision("VisionServer", m_engineer, ModuleBase.eRemote.Server);
+            InitModule(m_bufferServer);
+            m_bufferClient = new Vision("VisionClient", m_engineer, ModuleBase.eRemote.Client);
+            InitModule(m_bufferClient);
         }
 
         void InitModule(ModuleBase module)

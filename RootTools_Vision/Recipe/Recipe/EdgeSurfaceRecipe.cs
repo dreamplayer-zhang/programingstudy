@@ -57,55 +57,17 @@ namespace RootTools_Vision
 	public class EdgeSurfaceRecipeBase : ObservableObject
 	{
 		#region [Parameter]
-		private string grabModeName;
-		// Camera
-		private int cameraWidth;
-		private int cameraHeight;
-		private double cameraResolution;
-		private double cameraTriggerRatio;
-		private int positionOffset;	// top side bottom 위치 offset
-		private int imageOffset;
+		private int grabModeIndex;
 		// Light
 		private int lightWhite = 0;
 		private int lightSide = 0;
-
 		#endregion
 
 		#region [Getter Setter]
-		public string GrabModeName
+		public int GrabModeIndex
 		{
-			get => this.grabModeName;
-			set => SetProperty<string>(ref this.grabModeName, value);
-		}
-		public int CameraWidth
-		{
-			get => this.cameraWidth;
-			set => SetProperty<int>(ref this.cameraWidth, value);
-		}
-		public int CameraHeight
-		{
-			get => this.cameraHeight;
-			set => SetProperty<int>(ref this.cameraHeight, value);
-		}
-		public double Resolution
-		{
-			get => this.cameraResolution;
-			set => SetProperty<double>(ref this.cameraResolution, value);	
-		}
-		public double TriggerRatio
-		{
-			get => this.cameraTriggerRatio;
-			set => SetProperty<double>(ref this.cameraTriggerRatio, value);
-		}
-		public int PositionOffset
-		{
-			get => this.positionOffset;
-			set => SetProperty<int>(ref this.positionOffset, value);
-		}
-		public int ImageOffset
-		{
-			get => this.imageOffset;
-			set => SetProperty<int>(ref this.imageOffset, value);
+			get => this.grabModeIndex;
+			set => SetProperty<int>(ref this.grabModeIndex, value);
 		}
 		public int LightWhite
 		{

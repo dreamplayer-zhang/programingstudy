@@ -58,20 +58,5 @@
         <DataGrid ItemsSource="{Binding LogEntries}">
 
         </DataGrid>
-        <!--<ItemsControl Grid.Row="1"
-                      ItemsSource="{Binding LogEntries}" Style="{StaticResource LogViewerStyle}">
-            <ItemsControl.Template>
-                <ControlTemplate>
-                    <ScrollViewer CanContentScroll="True">
-                        <ItemsPresenter/>
-                    </ScrollViewer>
-                </ControlTemplate>
-            </ItemsControl.Template>
-            <ItemsControl.ItemsPanel>
-                <ItemsPanelTemplate>
-                    <VirtualizingStackPanel IsItemsHost="True"/>
-                </ItemsPanelTemplate>
-            </ItemsControl.ItemsPanel>
-        </ItemsControl>-->
     </Grid>
 </UserControl>

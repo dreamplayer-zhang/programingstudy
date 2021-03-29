@@ -22,8 +22,14 @@ namespace Root_WIND2.UI_User
 		private EBR_ImageViewer_ViewModel imageViewerVM;
 		private EBRRecipe recipe;
 		private EBRParameter parameter;
-		private int selectedGrabModeIndex = 0;
 
+		private int selectedGrabModeIndex = 0;
+		// grab mode data
+		private int cameraWidth;
+		private int cameraHeight;
+		private double resolution;
+
+		#region Data Viewer Parameter
 		private DataTable measurementDataTable;
 		private SeriesCollection measurementGraph;
 		private string[] xLabels;
@@ -36,6 +42,7 @@ namespace Root_WIND2.UI_User
 		private int sizeYMaxVal = 1000; 
 		private double sizeFrom = 0;
 		private double sizeTo = 50;
+		#endregion
 
 		#region [Getter / Setter]
 		public EBR_ImageViewer_ViewModel ImageViewerVM
@@ -66,28 +73,43 @@ namespace Root_WIND2.UI_User
 				return ((WIND2_Handler)GlobalObjects.Instance.Get<WIND2_Engineer>().ClassHandler()).p_EdgeSideVision.p_asGrabMode;
 			}
 		}
+		public int CameraWidth
+		{
+			get => cameraWidth;
+			set => SetProperty(ref cameraWidth, value);
+		}
 
+		public int CameraHeight
+		{
+			get => cameraHeight;
+			set => SetProperty(ref cameraHeight, value);
+		}
+
+		public double Resolution
+		{
+			get => resolution;
+			set => SetProperty(ref resolution, value);
+		}
 		public int SelectedGrabModeIndex
 		{
 			get => this.selectedGrabModeIndex;
 			set
 			{
-				GrabMode mode = ((WIND2_Handler)GlobalObjects.Instance.Get<WIND2_Engineer>().ClassHandler()).p_EdgeSideVision.m_aGrabMode[value];
-				Run_InspectEBR inspect = ((Run_InspectEBR)((WIND2_Handler)GlobalObjects.Instance.Get<WIND2_Engineer>().ClassHandler()).p_EdgeSideVision.CloneModuleRun("InspectEBR"));
+				GrabModeEdge mode = ((WIND2_Handler)GlobalObjects.Instance.Get<WIND2_Engineer>().ClassHandler()).p_EdgeSideVision.m_aGrabMode[value];
 
 				if (mode.m_camera != null)
 				{
-					Recipe.CameraWidth = mode.m_camera.GetRoiSize().X;
-					Recipe.CameraHeight = mode.m_camera.GetRoiSize().Y;
+					CameraWidth = mode.m_camera.GetRoiSize().X;
+					CameraHeight = mode.m_camera.GetRoiSize().Y;
 				}
+				else
+				{
+					CameraWidth = 0;
+					CameraHeight = mode.m_nCameraHeight;
+				}
+				Resolution = mode.m_dTargetResX_um;
 
-				if (Recipe.CameraHeight == 0)
-					Recipe.CameraHeight = inspect.CameraHeight;
-
-				Recipe.Resolution = mode.m_dResX_um;
-				Recipe.TriggerRatio = mode.m_dCamTriggerRatio;
-				Recipe.ImageOffset = inspect.ImageOffset;
-				
+				Recipe.GrabModeIndex = value;
 				SetProperty<int>(ref this.selectedGrabModeIndex, value);
 			}
 		}

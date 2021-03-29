@@ -181,6 +181,17 @@ namespace RootTools_Vision
             DefectList.AddRange(DefectList_Delete);
         }
 
+        private List<string> ConvertDataListToStringList(List<Defect> defectList)
+        {
+            List<string> stringList = new List<string>();
+            foreach (Defect defect in defectList)
+            {
+                //string str = string.Format("{0} {1} {2} {3} {4} {5} {6} {7} {8} {9} {10} {11} {12} {13} {14} {15} {16}");
+                //stringList.Add(str);
+            }
+            return stringList;
+        }
+
         // 지울거야
         /*
         private List<Defect> MergeDefect(List<Defect> DefectList, int mergeDist)
@@ -210,7 +221,7 @@ namespace RootTools_Vision
                     else if(defectRect2.Contains(defectRect1))
                     {
                         DefectList[i].SetDefectInfo(sInspectionID, DefectList[j].m_nDefectCode, DefectList[j].m_fSize, DefectList[j].m_fGV, DefectList[j].m_fWidth, DefectList[j].m_fHeight
-                            , 0, 0, (float)DefectList[j].p_rtDefectBox.Left, (float)DefectList[j].p_rtDefectBox.Top, DefectList[j].m_nChipIndexX, DefectList[j].m_nCHipIndexY);
+                            , 0, 0, (float)DefectList[j].p_rtDefectBox.Left, (float)DefectList[j].p_rtDefectBox.Top, DefectList[j].m_nChipIndexX, DefectList[j].m_nChipIndexY);
                         DefectList[j].m_fSize = -123;
                         continue;
                     }
@@ -249,7 +260,7 @@ namespace RootTools_Vision
                         float fDefectRelY = 0;
 
                         DefectList[i].SetDefectInfo(sInspectionID, nDefectCode, fDefectSz, fDefectGV, fDefectWidth, fDefectHeight
-                            , fDefectRelX, fDefectRelY, fDefectLeft, fDefectTop, DefectList[j].m_nChipIndexX, DefectList[j].m_nCHipIndexY);
+                            , fDefectRelX, fDefectRelY, fDefectLeft, fDefectTop, DefectList[j].m_nChipIndexX, DefectList[j].m_nChipIndexY);
 
                         DefectList[j].m_fSize = -123; // Merge된 Defect이 중복 저장되지 않도록...
                     }
