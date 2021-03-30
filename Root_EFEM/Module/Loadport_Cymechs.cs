@@ -500,7 +500,7 @@ namespace Root_EFEM.Module
                     m_loadport.m_alidCMD.Run(true, "RS232 Connection Lost !!");
                     return "RS232 Connection Lost !!";
                 }
-                int nWait = 100 * secWait;
+                int nWait = 1000 * secWait;
                 while (nWait > 0)
                 {
                     if (EQ.IsStop()) 
