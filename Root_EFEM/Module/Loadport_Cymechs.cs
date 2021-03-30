@@ -896,9 +896,9 @@ namespace Root_EFEM.Module
             InitCmd();
             p_infoCarrier = new InfoCarrier(this, id, engineer, bEnableWaferSize, bEnableWaferCount);
             //m_rfid = rfid;
-            if (id == "Loadport1")
+            if (id == "LoadportA")
                 p_infoCarrier.p_sLocID = "LP1";
-            else if (id == "Loadport2")
+            else if (id == "LoadportB")
                 p_infoCarrier.p_sLocID = "LP2";
             m_aTool.Add(p_infoCarrier);
             InitBase(id, engineer);

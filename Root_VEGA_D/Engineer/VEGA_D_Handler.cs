@@ -129,7 +129,7 @@ namespace Root_VEGA_D.Engineer
         void InitLoadport()
         {
             ModuleBase module;
-            int cLP = 1;
+            char cLP = 'A';
             for (int n = 0; n < m_lLoadport; n++, cLP++)
             {
                 string sID = "Loadport" + cLP;
