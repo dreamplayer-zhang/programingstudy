@@ -140,8 +140,8 @@ namespace Root_CAMELLIA
                         }
                     case TabAxis.TiltZ:
                         {
-                            SelectedAxis = TiltAxisZ;
-                            CurrentAxisWorkPoints = GetWorkPoint(TiltAxisZ.m_aPos);
+                            SelectedAxis = StageAxisZ;
+                            CurrentAxisWorkPoints = GetWorkPoint(StageAxisZ.m_aPos);
                             return;
                         }
                 }
@@ -305,18 +305,18 @@ namespace Root_CAMELLIA
         }
         private Axis _TiltAxisY;
 
-        public Axis TiltAxisZ
+        public Axis StageAxisZ
         {
             get
             {
-                return _TiltAxisZ;
+                return _StageAxisZ;
             }
             set
             {
-                SetProperty(ref _TiltAxisZ, value);
+                SetProperty(ref _StageAxisZ, value);
             }
         }
-        private Axis _TiltAxisZ;
+        private Axis _StageAxisZ;
 
         private Module_Camellia moduleCamellia;
         public Module_Camellia ModuleCamellia
@@ -466,21 +466,6 @@ namespace Root_CAMELLIA
 
 
         #endregion
-
-
-        PMCheckReview_ViewModel m_PMCheckReview_ViewModel = new PMCheckReview_ViewModel();
-        public PMCheckReview_ViewModel p_PMCheckReview_ViewModel
-        {
-            get
-            {
-                return m_PMCheckReview_ViewModel;
-            }
-            set
-            {
-                SetProperty(ref m_PMCheckReview_ViewModel, value);
-            }
-        }
-
         public Dlg_Engineer_ViewModel(MainWindow_ViewModel main)
         {
             ModuleCamellia = ((CAMELLIA_Handler)App.m_engineer.ClassHandler()).m_camellia;
@@ -496,7 +481,7 @@ namespace Root_CAMELLIA
 
             TiltAxisX = ModuleCamellia.p_tiltAxisXY.p_axisX;
             TiltAxisY = ModuleCamellia.p_tiltAxisXY.p_axisY;
-            TiltAxisZ = ModuleCamellia.p_tiltAxisZ;
+            StageAxisZ = ModuleCamellia.p_stageAxisZ;
 
             ModuleCamellia.p_CamVRS.Grabed += OnGrabImageUpdate;
 
