@@ -22,11 +22,11 @@
             <TextBlock Width="70" HorizontalAlignment="Center"  VerticalAlignment="Center" Grid.Row="0" Text="{Binding p_sTemp}" Foreground="Black" TextAlignment="Center" TextWrapping="Wrap"/>
         </Grid>
         <Grid Grid.Row="1" Margin="5" RenderTransformOrigin="0.5, 0.5">
-            <packicon:PackIconMaterial Grid.Row="0" Kind="Fire"
+            <packicon:PackIconWeatherIcons Grid.Row="0" Kind="Thermometer"
                                        HorizontalAlignment="Center" VerticalAlignment="Center"
                                        Width="{Binding ActualHeight, RelativeSource={RelativeSource FindAncestor, AncestorType=Grid}}"
                                        Height="{Binding ActualHeight, RelativeSource={RelativeSource FindAncestor, AncestorType=Grid}}">
-                <packicon:PackIconMaterial.Foreground>
+                <packicon:PackIconWeatherIcons.Foreground>
                     <LinearGradientBrush StartPoint="0 0" EndPoint="0 1">
                         <GradientStop Color="Black" Offset="0"/>
                         <GradientStop x:Name="GradientStop1" Color="Red">
@@ -39,8 +39,8 @@
                             </GradientStop.Offset>
                         </GradientStop>
                     </LinearGradientBrush>
-                </packicon:PackIconMaterial.Foreground>
-            </packicon:PackIconMaterial>
+                </packicon:PackIconWeatherIcons.Foreground>
+            </packicon:PackIconWeatherIcons>
         </Grid>
         <Grid Grid.Row="2">
             <Grid.RowDefinitions>

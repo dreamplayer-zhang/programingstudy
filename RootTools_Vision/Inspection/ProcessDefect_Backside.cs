@@ -81,7 +81,10 @@ namespace RootTools_Vision
 
             //Workplace displayDefect = new Workplace();
             foreach (Defect defect in MergeDefectList)
+            {
+                if (this.currentWorkplace.DefectList == null) continue;
                 this.currentWorkplace.DefectList.Add(defect);
+            }
 
             string sInspectionID = DatabaseManager.Instance.GetInspectionID();
             Tools.SaveDefectImage(Path.Combine(DefectImagePath, sInspectionID), MergeDefectList, this.currentWorkplace.SharedBufferInfo, this.currentWorkplace.SharedBufferInfo.ByteCnt);
@@ -110,7 +113,7 @@ namespace RootTools_Vision
 
                 //Tools.SaveTiffImage(settings_backside.KlarfSavePath, MergeDefectList, this.currentWorkplace.SharedBufferInfo);
                 
-                Tools.SaveImageJpg(this.currentWorkplace.SharedBufferInfo, new Rect(0, 0, 3000, 3000), settings_backside.KlarfSavePath + "\\" + DateTime.Now.ToString("yyyyMMddhhmmss") + "_backside.jpg", (long)(settings_backside.WholeWaferImageCompressionRate * 100));
+                //Tools.SaveImageJpg(this.currentWorkplace.SharedBufferInfo, new Rect(0, 0, 3000, 3000), settings_backside.KlarfSavePath + "\\" + DateTime.Now.ToString("yyyyMMddhhmmss") + "_backside.jpg", (long)(settings_backside.WholeWaferImageCompressionRate * 100));
             }
 
 

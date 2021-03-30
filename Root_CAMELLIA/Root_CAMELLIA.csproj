@@ -275,6 +275,7 @@
     <Compile Include="Control\PMCheckReview.xaml.cs">
       <DependentUpon>PMCheckReview.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Control\PMCheckReview_ViewModel.cs" />
     <Compile Include="Control\StageViewControl.xaml.cs">
       <DependentUpon>StageViewControl.xaml</DependentUpon>
     </Compile>
@@ -284,8 +285,10 @@
     <Compile Include="Converter\BoolConverter.cs" />
     <Compile Include="Converter\HumidityToGradientOffsetConverter.cs" />
     <Compile Include="Converter\LampStateToColorConverter.cs" />
+    <Compile Include="Converter\ModuleStateToLoadingOpacityConverter.cs" />
     <Compile Include="Converter\ValueToColorConverter.cs" />
     <Compile Include="Converter\ValueToUIValueConverter.cs" />
+    <Compile Include="Data\SaveMeasureData.cs" />
     <Compile Include="LibSR_Met\Calculation.cs" />
     <Compile Include="LibSR_Met\ConstValue.cs" />
     <Compile Include="LibSR_Met\CountGraph.xaml.cs">
@@ -305,12 +308,15 @@
     <Compile Include="ModuleRun\Run_Delay.cs" />
     <Compile Include="ModuleRun\Run_InitCalibration.cs" />
     <Compile Include="ModuleRun\Run_Measure.cs" />
-    <Compile Include="ModuleRun\Run_PMSensorTilt.cs" />
-    <Compile Include="ModuleRun\Run_PMTiltAlign.cs" />
+    <Compile Include="ModuleRun\Run_PMReflectance.cs" />
+    <Compile Include="ModuleRun\Run_PMSensorStageAlign.cs" />
+    <Compile Include="ModuleRun\Run_PMThickness.cs" />
+    <Compile Include="ModuleRun\Run_PMSensorCameraTilt.cs" />
     <Compile Include="Module\Module_FDC.cs" />
     <Compile Include="Module\Module_FFU.cs" />
     <Compile Include="Module\Interlock.cs" />
     <Compile Include="Module\TowerLamp.cs" />
+    <Compile Include="TemplateSelector\FFUTemplateSelector.cs" />
     <Compile Include="UI_Dialog\Dlg_OHT.xaml.cs">
       <DependentUpon>Dlg_OHT.xaml</DependentUpon>
     </Compile>

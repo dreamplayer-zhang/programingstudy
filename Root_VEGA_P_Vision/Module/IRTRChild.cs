@@ -10,7 +10,11 @@ namespace Root_VEGA_P_Vision.Module
         ModuleBase.eState p_eState { get; }
 
         InfoPod p_infoPod { get; set; }
-        
+
+        void ReadPod_Registry();
+
+        bool p_bLock { get; set; }
+
         string IsGetOK();
 
         string IsPutOK(InfoPod infoPod);
@@ -23,12 +27,12 @@ namespace Root_VEGA_P_Vision.Module
 
         string AfterPut();
 
-        bool IsPodExist();
+        bool IsPodExist(InfoPod.ePod ePod);
 
         int GetTeachRTR(InfoPod infoPod);
 
         void RunTreeTeach(Tree tree);
 
-        void ReadPod_Registry(); 
+        bool IsEnableRecovery(); 
     }
 }

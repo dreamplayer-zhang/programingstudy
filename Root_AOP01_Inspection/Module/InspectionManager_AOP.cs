@@ -341,6 +341,8 @@ namespace Root_AOP01_Inspection.Module
 		}
 		public void InitInspectionInfo()
 		{
+			DateTime inspectionStart = DateTime.Now; //temp
+			DateTime inspectionEnd = DateTime.Now; //temp
 			string lotId = "Lotid";
 			string partId = "Partid";
 			string setupId = "SetupID";
@@ -352,7 +354,8 @@ namespace Root_AOP01_Inspection.Module
 			{
 				try
 				{
-					DatabaseManager.Instance.SetLotinfo(lotId, partId, setupId, cstId, waferId, recipeName);
+					DatabaseManager.Instance.SetLotinfo(inspectionStart, inspectionEnd, lotId, partId, setupId, cstId, waferId, recipeName);
+					//DatabaseManager.Instance.SetLotinfo(lotId, partId, setupId, cstId, waferId, recipeName);
 				}
 				catch (MySqlException ex)
 				{

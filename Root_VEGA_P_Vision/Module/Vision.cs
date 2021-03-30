@@ -1,8 +1,16 @@
 ﻿using RootTools;
+using RootTools.Camera.BaslerPylon;
+using RootTools.Camera.Dalsa;
+using RootTools.Camera.Matrox;
 using RootTools.Control;
+using RootTools.Light;
+using RootTools.Memory;
 using RootTools.Module;
 using RootTools.ToolBoxs;
 using RootTools.Trees;
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Threading;
 
 namespace Root_VEGA_P_Vision.Module
@@ -10,12 +18,50 @@ namespace Root_VEGA_P_Vision.Module
     public class Vision : ModuleBase, IRTRChild
     {
         #region ToolBox
+        LightSet lightSet;
+        MemoryPool memoryPool;
+        MemoryGroup memoryGroup;
+        public int sideGrabCnt = 0;
+        public MainOptic m_mainOptic;
+        public SideOptic m_sideOptic;
+
+        public enum eParts
+        {
+            EIP_Cover, EIP_Plate
+        }
+        public enum eUpDown
+        {
+            Front, Back
+        }
         public override void GetTools(bool bInit)
         {
-            m_stage.GetTools(m_toolBox, bInit);
-            m_mainOptic.GetTools(m_toolBox, bInit);
-            m_sideOptic.GetTools(m_toolBox, bInit); 
-            m_remote.GetTools(bInit); 
+            p_sInfo = m_toolBox.Get(ref memoryPool, this, "Memory", 1);
+            p_sInfo = m_toolBox.Get(ref lightSet, this);
+            m_stage.GetTools(m_toolBox, bInit); 
+            m_mainOptic.GetTools(m_toolBox, bInit); //TDI, Stain, ZStack
+            m_sideOptic.GetTools(m_toolBox, bInit);  //Side
+            m_remote.GetTools(bInit);
+        }
+        #endregion
+
+        #region[Move]
+        public string Move(Axis axis, double pos, bool bWait = true)
+        {
+            string sRun = axis.StartMove(pos);
+            if (sRun.Equals("OK")) return sRun;
+            return bWait ? axis.WaitReady() : "OK";
+        }
+        public string Move(Axis axis, double pos,double v,bool bWait = true)
+        {
+            string sRun = axis.StartMove(pos,v);
+            if (sRun.Equals("OK")) return sRun;
+            return bWait ? axis.WaitReady() : "OK";
+        }
+        public string MoveXY(RPoint posmm, bool bWait = true)
+        {
+            string sRun = m_stage.m_axisXY.StartMove(new RPoint(posmm));
+            if (sRun.Equals("OK")) return sRun;
+            return bWait ? m_stage.m_axisXY.WaitReady() : "OK";
         }
         #endregion
 
@@ -28,10 +74,10 @@ namespace Root_VEGA_P_Vision.Module
             public void GetTools(ToolBox toolBox, bool bInit)
             {
                 if (m_vision.p_eRemote == eRemote.Client) return;
-                m_vision.p_sInfo = toolBox.Get(ref m_axisXY, m_vision, "Stage");
-                m_vision.p_sInfo = toolBox.Get(ref m_axisR, m_vision, "Stage Rotate");
-                m_vision.p_sInfo = toolBox.Get(ref m_diStageLoad[0], m_vision, "Stage Load X");
-                m_vision.p_sInfo = toolBox.Get(ref m_diStageLoad[1], m_vision, "Stage Load Y");
+                m_vision.p_sInfo = toolBox.GetAxis(ref m_axisXY, m_vision, "Stage");
+                m_vision.p_sInfo = toolBox.GetAxis(ref m_axisR, m_vision, "Stage Rotate");
+                m_vision.p_sInfo = toolBox.GetDIO(ref m_diStageLoad[0], m_vision, "Stage Load X");
+                m_vision.p_sInfo = toolBox.GetDIO(ref m_diStageLoad[1], m_vision, "Stage Load Y");
                 if (bInit)
                 {
 
@@ -64,12 +110,6 @@ namespace Root_VEGA_P_Vision.Module
             }
 
             double m_pulsePermm = 10000; 
-            public string Move(double mmX, double mmY, bool bWait = true)
-            {
-                string sRun = m_axisXY.StartMove(mmX * m_pulsePermm, mmY * m_pulsePermm);
-                if (sRun != "OK") return sRun;
-                return bWait ? m_axisXY.WaitReady() : "OK";
-            }
 
             public void RunTree(Tree tree)
             {
@@ -89,11 +129,27 @@ namespace Root_VEGA_P_Vision.Module
         #region MainOptic
         public class MainOptic : NotifyProperty
         {
+            Vision m_vision;
+
             public Axis m_axisZ;
+            public Camera_Dalsa camTDI;
+            public Camera_Basler camStain;
+            public Camera_Matrox camZStack;
+            public double m_pulsePermm;
+
+            public enum eInsp
+            {
+                Stain,Main,Stack
+            }
+
             public void GetTools(ToolBox toolBox, bool bInit)
             {
                 if (m_vision.p_eRemote == eRemote.Client) return;
-                m_vision.p_sInfo = toolBox.Get(ref m_axisZ, m_vision, "Main Optic AxisZ");
+                m_vision.p_sInfo = toolBox.GetAxis(ref m_axisZ, m_vision, "Main Optic AxisZ");
+                m_vision.p_sInfo = toolBox.GetCamera(ref camTDI, m_vision, "TDI Cam");
+                m_vision.p_sInfo = toolBox.GetCamera(ref camStain, m_vision, "Stain Cam");
+                m_vision.p_sInfo = toolBox.GetCamera(ref camZStack, m_vision, "Z-Stacking Cam");
+
                 if (bInit)
                 {
 
@@ -102,17 +158,14 @@ namespace Root_VEGA_P_Vision.Module
 
             public void InitMemorys()
             {
-                //m_memoryGroup = m_memoryPool.GetGroup(p_id);
-                //m_memoryMain = m_memoryGroup.CreateMemory("Main", 3, 1, 40000, 40000);
-                //m_memoryMain = m_memoryGroup.CreateMemory("Layer", 1, 4, 30000, 30000); // Chip 크기 최대 30,000 * 30,000 고정 Origin ROI 메모리 할당 20.11.02 JTL 
+                foreach(var v in Enum.GetValues(typeof(eParts)))
+                    foreach(var v2 in Enum.GetValues(typeof(eInsp)))
+                        foreach(var v3 in Enum.GetValues(typeof(eUpDown)))
+                            m_vision.memoryGroup.CreateMemory(v.ToString() + "." + v2.ToString()+"."+v3.ToString(), 1, 1, 1000,1000);
             }
-
-            double m_pulsePermm = 10000;
-            public string Move(double mmZ, bool bWait = true)
+            public MemoryData GetMemoryData(InfoPod.ePod parts,eInsp insp,eUpDown updown)
             {
-                string sRun = m_axisZ.StartMove(mmZ * m_pulsePermm);
-                if (sRun != "OK") return sRun;
-                return bWait ? m_axisZ.WaitReady() : "OK";
+                return m_vision.memoryPool.GetMemory(m_vision.p_id, parts.ToString()+"."+insp.ToString()+"."+updown.ToString());
             }
 
             public void RunTree(Tree tree)
@@ -120,23 +173,32 @@ namespace Root_VEGA_P_Vision.Module
                 m_pulsePermm = tree.Set(m_pulsePermm, m_pulsePermm, "Pulse / mm", "Stage XY Pulse per 1mm (pulse)");
             }
 
-            Vision m_vision;
             public MainOptic(Vision vision)
             {
                 m_vision = vision;
+                m_pulsePermm = 10000;
             }
         }
-        MainOptic m_mainOptic;
         #endregion
 
         #region SideOptic
         public class SideOptic : NotifyProperty
         {
-            public Axis m_axisZ;
+            Vision m_vision;
+            public Axis axisZ;
+            public Camera_Basler camSide;
+            public double m_pulsePermm;
+
+            public enum eSide
+            {
+                Top,Left,Bottom,Right
+            }
+
             public void GetTools(ToolBox toolBox, bool bInit)
             {
                 if (m_vision.p_eRemote == eRemote.Client) return;
-                m_vision.p_sInfo = toolBox.Get(ref m_axisZ, m_vision, "Side Optic AxisZ");
+                m_vision.p_sInfo = toolBox.GetCamera(ref camSide, m_vision, "Side Cam");
+                m_vision.p_sInfo = toolBox.GetAxis(ref axisZ, m_vision, "Side Optic AxisZ");
                 if (bInit)
                 {
 
@@ -145,17 +207,18 @@ namespace Root_VEGA_P_Vision.Module
 
             public void InitMemorys()
             {
-                //m_memoryGroup = m_memoryPool.GetGroup(p_id);
-                //m_memoryMain = m_memoryGroup.CreateMemory("Main", 3, 1, 40000, 40000);
-                //m_memoryMain = m_memoryGroup.CreateMemory("Layer", 1, 4, 30000, 30000); // Chip 크기 최대 30,000 * 30,000 고정 Origin ROI 메모리 할당 20.11.02 JTL 
+                foreach (var v in Enum.GetValues(typeof(eParts)))
+                    foreach (var v2 in Enum.GetValues(typeof(eSide)))
+                        m_vision.memoryGroup.CreateMemory(v.ToString() + "." + v2.ToString(), 1, 1, 1000, 1000);
             }
 
-            double m_pulsePermm = 10000;
-            public string Move(double mmZ, bool bWait = true)
+            public MemoryData GetMemoryData(InfoPod.ePod parts,eSide side)
             {
-                string sRun = m_axisZ.StartMove(mmZ * m_pulsePermm);
-                if (sRun != "OK") return sRun;
-                return bWait ? m_axisZ.WaitReady() : "OK";
+                return m_vision.memoryPool.GetMemory(m_vision.p_id, parts.ToString()+"."+side.ToString());
+            }
+            public MemoryData GetMemoryData(string str)
+            {
+                return m_vision.memoryPool.GetMemory(m_vision.p_id, str);
             }
 
             public void RunTree(Tree tree)
@@ -163,13 +226,12 @@ namespace Root_VEGA_P_Vision.Module
                 m_pulsePermm = tree.Set(m_pulsePermm, m_pulsePermm, "Pulse / mm", "Stage XY Pulse per 1mm (pulse)");
             }
 
-            Vision m_vision;
             public SideOptic(Vision vision)
             {
                 m_vision = vision;
+                m_pulsePermm = 10000;
             }
         }
-        SideOptic m_sideOptic;
         #endregion
 
         #region InfoPod
@@ -190,7 +252,8 @@ namespace Root_VEGA_P_Vision.Module
         Registry m_reg = null;
         public void ReadPod_Registry()
         {
-            int nPod = m_reg.Read("InfoPod", -1);
+            m_reg = new Registry("InfoPod");
+            int nPod = m_reg.Read(p_id, -1);
             if (nPod < 0) return;  
             p_infoPod = new InfoPod((InfoPod.ePod)nPod);
             p_infoPod.ReadReg();
@@ -198,6 +261,8 @@ namespace Root_VEGA_P_Vision.Module
         #endregion
 
         #region IRTRChild
+        public bool p_bLock { get; set; }
+
         public string IsGetOK()
         {
             if (p_eState != eState.Ready) return p_id + " eState not Ready"; 
@@ -218,16 +283,24 @@ namespace Root_VEGA_P_Vision.Module
 
         public string BeforeGet()
         {
-            // Move to Ready Pos ?
-            // Vacuum Off ?
-            return "OK";
+            if (p_eRemote == eRemote.Client) return RemoteRun(eRemoteRun.BeforeGet, eRemote.Client, null);
+            else
+            {
+                // Move to Ready Pos ?
+                // Vacuum Off ?
+                return "OK";
+            }
         }
 
         public string BeforePut(InfoPod infoPod)
         {
-            // Move to Ready Pos ?
-            // Vacuum Off ?
-            return "OK";
+            if (p_eRemote == eRemote.Client) return RemoteRun(eRemoteRun.BeforePut, eRemote.Client, infoPod);
+            else
+            {
+                // Move to Ready Pos ?
+                // Vacuum Off ?
+                return "OK";
+            }
         }
 
         public string AfterGet()
@@ -242,14 +315,19 @@ namespace Root_VEGA_P_Vision.Module
             return "OK";
         }
 
-        public bool IsPodExist()
+        public bool IsPodExist(InfoPod.ePod ePod)
         {
             return (p_infoPod != null);
+        }
+
+        public bool IsEnableRecovery()
+        {
+            return p_infoPod != null;
         }
         #endregion
 
         #region Teach RTR
-        Buffer.TeachRTR m_teach; 
+        Holder.TeachRTR m_teach; 
         public int GetTeachRTR(InfoPod infoPod)
         {
             return m_teach.GetTeach(infoPod);
@@ -264,11 +342,16 @@ namespace Root_VEGA_P_Vision.Module
         #region override
         public override void Reset()
         {
-            base.Reset();
+            if (p_eRemote == eRemote.Client) RemoteRun(eRemoteRun.Reset, eRemote.Client, null);
+            else
+            {
+                base.Reset();
+            }
         }
 
         public override void InitMemorys()
         {
+            memoryGroup = memoryPool.GetGroup(p_id);
             m_mainOptic.InitMemorys();
             m_sideOptic.InitMemorys(); 
         }
@@ -278,14 +361,10 @@ namespace Root_VEGA_P_Vision.Module
         public override string StateHome()
         {
             if (EQ.p_bSimulate) return "OK";
-
-            if (p_eRemote == eRemote.Client)
-            {
-                m_remote.RemoteSend(Remote.eProtocol.Initial, "INIT", "INIT");
-                return "OK";
-            }
+            if (p_eRemote == eRemote.Client) return RemoteRun(eRemoteRun.StateHome, eRemote.Client, null);
             else
             {
+                Thread.Sleep(100);
                 p_sInfo = base.StateHome();
                 p_eState = (p_sInfo == "OK") ? eState.Ready : eState.Error;
                 return "OK";
@@ -300,17 +379,69 @@ namespace Root_VEGA_P_Vision.Module
             m_stage.RunTree(tree.GetTree("Stage"));
             m_mainOptic.RunTree(tree.GetTree("Main Optic"));
             m_sideOptic.RunTree(tree.GetTree("Side Optic"));
+            RunTreeGrabMode(tree.GetTree("Grab Mode"));
         }
+        #endregion
+
+        #region Grab Mode
+        int m_lGrabMode = 0;
+        public ObservableCollection<GrabMode> m_aGrabMode = new ObservableCollection<GrabMode>();
+        public List<string> p_asGrabMode
+        {
+            get
+            {
+                List<string> asGrabMode = new List<string>();
+                foreach (GrabMode grabMode in m_aGrabMode) 
+                    asGrabMode.Add(grabMode.p_sName);
+                return asGrabMode;
+            }
+        }
+
+        public GrabMode GetGrabMode(string sGrabMode)
+        {
+            foreach (GrabMode grabMode in m_aGrabMode)
+                if (sGrabMode == grabMode.p_sName) return grabMode;
+          
+            return null;
+        }
+
+        void RunTreeGrabMode(Tree tree)
+        {
+            m_lGrabMode = tree.Set(m_lGrabMode, m_lGrabMode, "Count", "Grab Mode Count");
+            while (m_aGrabMode.Count < m_lGrabMode)
+            {
+                string id = "Mode." + m_aGrabMode.Count.ToString("00");
+                GrabMode grabMode = new GrabMode(id, m_cameraSet, lightSet, memoryPool);
+                m_aGrabMode.Add(grabMode);
+            }
+            while (m_aGrabMode.Count > m_lGrabMode) m_aGrabMode.RemoveAt(m_aGrabMode.Count - 1);
+            foreach (GrabMode grabMode in m_aGrabMode) grabMode.RunTreeName(tree.GetTree("Name", false));
+            foreach (GrabMode grabMode in m_aGrabMode)
+                grabMode.RunTree(tree.GetTree(grabMode.p_sName, false), true, false);
+        }
+
         #endregion
 
         public Vision(string id, IEngineer engineer, eRemote eRemote)
         {
             m_reg = new Registry(p_id + "_InfoPod");
-            m_teach = new Buffer.TeachRTR(); 
+            m_teach = new Holder.TeachRTR(); 
             m_stage = new Stage(this);
             m_mainOptic = new MainOptic(this);
             m_sideOptic = new SideOptic(this); 
-            InitBase(id, engineer, eRemote); 
+            InitBase(id, engineer, eRemote);
+            OnChangeState += Vision_OnChangeState;
+        }
+
+        private void Vision_OnChangeState(eState eState)
+        {
+            switch (p_eState)
+            {
+                case eState.Init:
+                case eState.Error:
+                    RemoteRun(eRemoteRun.ServerState, eRemote.Server, eState);
+                    break;
+            }
         }
 
         public override void ThreadStop()
@@ -318,12 +449,138 @@ namespace Root_VEGA_P_Vision.Module
             base.ThreadStop();
         }
 
+        #region Test Result
+        public class TestResult
+        {
+            public int m_nResult = 0;
+            public string m_sResult = "OK";
+
+            public void RunTree(Tree tree, bool bVisible)
+            {
+                m_nResult = tree.Set(m_nResult, m_nResult, "Int", "Int Result", bVisible);
+                m_sResult = tree.Set(m_sResult, m_sResult, "String", "String Result", bVisible);
+            }
+        }
+        TestResult _testResult = new TestResult();
+        public TestResult p_testResult
+        {
+            get { return _testResult; }
+            set
+            {
+                _testResult = value;
+                if (p_eRemote == eRemote.Server) RemoteRun(eRemoteRun.TestResult, eRemote.Server, value);
+            }
+        }
+        #endregion
+
+        #region RemoteRun
+        public enum eRemoteRun
+        {
+            ServerState,
+            StateHome,
+            Reset,
+            BeforeGet,
+            BeforePut,
+            TestResult,
+        }
+
+        Run_Remote GetRemoteRun(eRemoteRun eRemoteRun, eRemote eRemote, dynamic value)
+        {
+            Run_Remote run = new Run_Remote(this);
+            run.m_eRemoteRun = eRemoteRun;
+            run.m_eRemote = eRemote;
+            switch (eRemoteRun)
+            {
+                case eRemoteRun.ServerState: run.m_eState = value; break;
+                case eRemoteRun.StateHome: break;
+                case eRemoteRun.Reset: break;
+                case eRemoteRun.BeforeGet: break;
+                case eRemoteRun.BeforePut: run.m_infoPod = value; break;
+                case eRemoteRun.TestResult: run.m_testResult = value; break;
+            }
+            return run;
+        }
+
+        string RemoteRun(eRemoteRun eRemoteRun, eRemote eRemote, dynamic value)
+        {
+            Run_Remote run = GetRemoteRun(eRemoteRun, eRemote, value);
+            StartRun(run);
+            while (run.p_eRunState != ModuleRunBase.eRunState.Done)
+            {
+                Thread.Sleep(10);
+                if (EQ.IsStop()) return "EQ Stop";
+            }
+            return p_sInfo;
+        }
+
+        public class Run_Remote : ModuleRunBase
+        {
+            Vision m_module;
+            public Run_Remote(Vision module)
+            {
+                m_module = module;
+                InitModuleRun(module);
+            }
+
+            public eRemoteRun m_eRemoteRun = eRemoteRun.StateHome;
+            public eState m_eState = eState.Init;
+            public InfoPod m_infoPod = new InfoPod(InfoPod.ePod.EIP_Cover);
+            public TestResult m_testResult = new TestResult();
+            public override ModuleRunBase Clone()
+            {
+                Run_Remote run = new Run_Remote(m_module);
+                run.m_eRemoteRun = m_eRemoteRun;
+                run.m_eState = m_eState;
+                run.m_infoPod = m_infoPod;
+                run.m_testResult = m_testResult;
+                return run;
+            }
+
+            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
+            {
+                m_eRemoteRun = (eRemoteRun)tree.Set(m_eRemoteRun, m_eRemoteRun, "RemoteRun", "Select Remote Run", bVisible);
+                m_eRemote = (eRemote)tree.Set(m_eRemote, m_eRemote, "Remote", "Remote", false);
+                switch (m_eRemoteRun)
+                {
+                    case eRemoteRun.ServerState:
+                        m_eState = (eState)tree.Set(m_eState, m_eState, "State", "Module State", bVisible);
+                        break;
+                    case eRemoteRun.BeforePut:
+                        m_infoPod.RunTree(tree.GetTree("InfoPod", true, bVisible), bVisible);
+                        break;
+                    case eRemoteRun.TestResult:
+                        m_testResult.RunTree(tree.GetTree("TestResult", true, bVisible), bVisible);
+                        break;
+                }
+            }
+
+            public override string Run()
+            {
+                switch (m_eRemoteRun)
+                {
+                    case eRemoteRun.ServerState: m_module.p_eState = m_eState; break;
+                    case eRemoteRun.StateHome: return m_module.StateHome();
+                    case eRemoteRun.Reset: m_module.Reset(); break;
+                    case eRemoteRun.BeforeGet: return m_module.BeforeGet();
+                    case eRemoteRun.BeforePut: return m_module.BeforePut(m_infoPod);
+                    case eRemoteRun.TestResult: m_module.p_testResult = m_testResult; break;
+                }
+                return "OK";
+            }
+        }
+        #endregion
+
         #region ModuleRun
         protected override void InitModuleRuns()
         {
+            AddModuleRunList(new Run_Rotate(this), true, "Rotate");
+            AddModuleRunList(new Run_MainGrab(this), true, "Main Grab");
+            AddModuleRunList(new Run_SideGrab(this), true, "Side Grab");
+            AddModuleRunList(new Run_StainGrab(this), true, "Stain Grab");
+            AddModuleRunList(new Run_Remote(this), true, "Remote Run");
             AddModuleRunList(new Run_Delay(this), true, "Time Delay");
-        }
-
+        }        
+            
         public class Run_Delay : ModuleRunBase
         {
             Vision m_module;

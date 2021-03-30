@@ -126,15 +126,15 @@ namespace Root_AOP01_Packing.Module
             DIO_I m_diLevel; // X49
             public void GetTools(ToolBox toolBox, bool bInit)
             {
-                m_packer.p_sInfo = toolBox.Get(ref m_axisPickerX, m_packer, m_id + ".Picker X");
-                m_packer.p_sInfo = toolBox.Get(ref m_axisPickerZ, m_packer, m_id + ".Picker Z");
-                m_packer.p_sInfo = toolBox.Get(ref m_dioVacuum[0], m_packer, m_id + ".Vacuum Center");
-                m_packer.p_sInfo = toolBox.Get(ref m_dioVacuum[1], m_packer, m_id + ".Vacuum Side");
-                m_packer.p_sInfo = toolBox.Get(ref m_doBlow[0], m_packer, m_id + ".Blow Center");
-                m_packer.p_sInfo = toolBox.Get(ref m_doBlow[1], m_packer, m_id + ".Blow Side");
-                m_packer.p_sInfo = toolBox.Get(ref m_solPush, m_packer, m_id + ".Push", "Back", "Push");
-                m_packer.p_sInfo = toolBox.Get(ref m_diCheck, m_packer, m_id + ".Wrapper Check");
-                m_packer.p_sInfo = toolBox.Get(ref m_diLevel, m_packer, m_id + ".Wrapper Level");
+                m_packer.p_sInfo = toolBox.GetAxis(ref m_axisPickerX, m_packer, m_id + ".Picker X");
+                m_packer.p_sInfo = toolBox.GetAxis(ref m_axisPickerZ, m_packer, m_id + ".Picker Z");
+                m_packer.p_sInfo = toolBox.GetDIO(ref m_dioVacuum[0], m_packer, m_id + ".Vacuum Center");
+                m_packer.p_sInfo = toolBox.GetDIO(ref m_dioVacuum[1], m_packer, m_id + ".Vacuum Side");
+                m_packer.p_sInfo = toolBox.GetDIO(ref m_doBlow[0], m_packer, m_id + ".Blow Center");
+                m_packer.p_sInfo = toolBox.GetDIO(ref m_doBlow[1], m_packer, m_id + ".Blow Side");
+                m_packer.p_sInfo = toolBox.GetDIO(ref m_solPush, m_packer, m_id + ".Push", "Back", "Push");
+                m_packer.p_sInfo = toolBox.GetDIO(ref m_diCheck, m_packer, m_id + ".Wrapper Check");
+                m_packer.p_sInfo = toolBox.GetDIO(ref m_diLevel, m_packer, m_id + ".Wrapper Level");
                 if (bInit)
                 {
                     m_packer.InitSolvalve(m_solPush);
@@ -279,13 +279,13 @@ namespace Root_AOP01_Packing.Module
             DIO_I2O2 m_solRoller; // Roller Up:Down(X124:X125 / Y88:Y89)
             public void GetTools(ToolBox toolBox, bool bInit)
             {
-                m_packer.p_sInfo = toolBox.Get(ref m_doVacuum[0], m_packer, m_id + ".Vacuum Center");
-                m_packer.p_sInfo = toolBox.Get(ref m_doVacuum[1], m_packer, m_id + ".Vacuum Side");
-                m_packer.p_sInfo = toolBox.Get(ref m_doBlow[0], m_packer, m_id + ".Blow Center");
-                m_packer.p_sInfo = toolBox.Get(ref m_doBlow[1], m_packer, m_id + ".Blow Side");
-                m_packer.p_sInfo = toolBox.Get(ref m_solUp, m_packer, m_id + ".Up", "Down", "Up");
-                m_packer.p_sInfo = toolBox.Get(ref m_solRotate, m_packer, m_id + ".Rotate", "Home", "90");
-                m_packer.p_sInfo = toolBox.Get(ref m_solRoller, m_packer, m_id + ".Roller", "Up", "Down");
+                m_packer.p_sInfo = toolBox.GetDIO(ref m_doVacuum[0], m_packer, m_id + ".Vacuum Center");
+                m_packer.p_sInfo = toolBox.GetDIO(ref m_doVacuum[1], m_packer, m_id + ".Vacuum Side");
+                m_packer.p_sInfo = toolBox.GetDIO(ref m_doBlow[0], m_packer, m_id + ".Blow Center");
+                m_packer.p_sInfo = toolBox.GetDIO(ref m_doBlow[1], m_packer, m_id + ".Blow Side");
+                m_packer.p_sInfo = toolBox.GetDIO(ref m_solUp, m_packer, m_id + ".Up", "Down", "Up");
+                m_packer.p_sInfo = toolBox.GetDIO(ref m_solRotate, m_packer, m_id + ".Rotate", "Home", "90");
+                m_packer.p_sInfo = toolBox.GetDIO(ref m_solRoller, m_packer, m_id + ".Roller", "Up", "Down");
                 if (bInit)
                 {
                     m_packer.InitSolvalve(m_solUp);
@@ -355,9 +355,9 @@ namespace Root_AOP01_Packing.Module
             DIO_I2O2 m_solPush; // Y56,Y57 푸셔 솔
             public void GetTools(ToolBox toolBox, bool bInit)
             {
-                m_packer.p_sInfo = toolBox.Get(ref m_axisTransfer, m_packer, m_id);
-                m_packer.p_sInfo = toolBox.Get(ref m_solDown, m_packer, m_id + ".Down", "Up", "Down");
-                m_packer.p_sInfo = toolBox.Get(ref m_solPush, m_packer, m_id + ".Push", "Back", "Push");
+                m_packer.p_sInfo = toolBox.GetAxis(ref m_axisTransfer, m_packer, m_id);
+                m_packer.p_sInfo = toolBox.GetDIO(ref m_solDown, m_packer, m_id + ".Down", "Up", "Down");
+                m_packer.p_sInfo = toolBox.GetDIO(ref m_solPush, m_packer, m_id + ".Push", "Back", "Push");
                 if (bInit)
                 {
                     m_packer.InitSolvalve(m_solDown);
@@ -460,14 +460,14 @@ namespace Root_AOP01_Packing.Module
             DIO_I2O2 m_solGuideX; // Guide X Front:Back (X68:X69 / Y50:Y51) 
             public void GetTools(ToolBox toolBox, bool bInit)
             {
-                m_packer.p_sInfo = toolBox.Get(ref m_dioHolderVac[0], m_packer, m_id + ".UpHolder Vacuum");
-                m_packer.p_sInfo = toolBox.Get(ref m_dioHolderVac[1], m_packer, m_id + ".DownHolder Vacuum");
-                m_packer.p_sInfo = toolBox.Get(ref m_doHolderBlow[0], m_packer, m_id + ".UpHolder Blow");
-                m_packer.p_sInfo = toolBox.Get(ref m_doHolderBlow[1], m_packer, m_id + ".DownHolder Blow");
-                m_packer.p_sInfo = toolBox.Get(ref m_solHold[0], m_packer, m_id + ".UpHolder", "Open", "Hold");
-                m_packer.p_sInfo = toolBox.Get(ref m_solHold[1], m_packer, m_id + ".DownHolder", "Open", "Hold");
-                m_packer.p_sInfo = toolBox.Get(ref m_solGuideZ, m_packer, m_id + ".Guide Z", "Up", "Down");
-                m_packer.p_sInfo = toolBox.Get(ref m_solGuideX, m_packer, m_id + ".Guide X", "Backward", "Forward");
+                m_packer.p_sInfo = toolBox.GetDIO(ref m_dioHolderVac[0], m_packer, m_id + ".UpHolder Vacuum");
+                m_packer.p_sInfo = toolBox.GetDIO(ref m_dioHolderVac[1], m_packer, m_id + ".DownHolder Vacuum");
+                m_packer.p_sInfo = toolBox.GetDIO(ref m_doHolderBlow[0], m_packer, m_id + ".UpHolder Blow");
+                m_packer.p_sInfo = toolBox.GetDIO(ref m_doHolderBlow[1], m_packer, m_id + ".DownHolder Blow");
+                m_packer.p_sInfo = toolBox.GetDIO(ref m_solHold[0], m_packer, m_id + ".UpHolder", "Open", "Hold");
+                m_packer.p_sInfo = toolBox.GetDIO(ref m_solHold[1], m_packer, m_id + ".DownHolder", "Open", "Hold");
+                m_packer.p_sInfo = toolBox.GetDIO(ref m_solGuideZ, m_packer, m_id + ".Guide Z", "Up", "Down");
+                m_packer.p_sInfo = toolBox.GetDIO(ref m_solGuideX, m_packer, m_id + ".Guide X", "Backward", "Forward");
                 if (bInit)
                 {
                     m_packer.InitSolvalve(m_solGuideZ);
@@ -655,13 +655,13 @@ namespace Root_AOP01_Packing.Module
 
             public void GetTools(ToolBox toolBox, bool bInit)
             {
-                m_packer.p_sInfo = toolBox.Get(ref m_axisVacArmX, m_packer, m_id + ".Arm X");
-                m_packer.p_sInfo = toolBox.Get(ref m_axisBridge, m_packer, m_id + ".Bridge");
-                m_packer.p_sInfo = toolBox.Get(ref m_axisVacArmWidth, m_packer, m_id + ".Arm Width");
-                m_packer.p_sInfo = toolBox.Get(ref m_solBridge, m_packer, m_id + ".Bridge", "Back", "Push");
+                m_packer.p_sInfo = toolBox.GetAxis(ref m_axisVacArmX, m_packer, m_id + ".Arm X");
+                m_packer.p_sInfo = toolBox.GetAxis(ref m_axisBridge, m_packer, m_id + ".Bridge");
+                m_packer.p_sInfo = toolBox.GetAxis(ref m_axisVacArmWidth, m_packer, m_id + ".Arm Width");
+                m_packer.p_sInfo = toolBox.GetDIO(ref m_solBridge, m_packer, m_id + ".Bridge", "Back", "Push");
                 //m_packer.p_sInfo = toolBox.Get(ref m_solRaise, m_packer, m_id + ".Raise", "Down", "Up");
-                m_packer.p_sInfo = toolBox.Get(ref m_diPodCheck, m_packer, m_id + ".Pod Check");
-                m_packer.p_sInfo = toolBox.Get(ref m_doArmVacuumPump, m_packer, m_id + ".Vacuum Pump");
+                m_packer.p_sInfo = toolBox.GetDIO(ref m_diPodCheck, m_packer, m_id + ".Pod Check");
+                m_packer.p_sInfo = toolBox.GetDIO(ref m_doArmVacuumPump, m_packer, m_id + ".Vacuum Pump");
                 if (bInit)
                 {
                     m_packer.InitSolvalve(m_solBridge);
@@ -807,12 +807,12 @@ namespace Root_AOP01_Packing.Module
             DIO_O m_doHeatTimeout; //Y12
             public void GetTools(ToolBox toolBox, bool bInit)
             {
-                m_packer.p_sInfo = toolBox.Get(ref m_solSponge[0], m_packer, m_id + ".UpSponge", "Up", "Down");
-                m_packer.p_sInfo = toolBox.Get(ref m_solSponge[1], m_packer, m_id + ".DownSponge", "Up", "Down");
-                m_packer.p_sInfo = toolBox.Get(ref m_solHeater[0], m_packer, m_id + ".UpSilicone", "Up", "Down");
-                m_packer.p_sInfo = toolBox.Get(ref m_solHeater[1], m_packer, m_id + ".DownHeater", "Up", "Down");
-                m_packer.p_sInfo = toolBox.Get(ref m_dioHeat, m_packer, m_id + ".Heat");
-                m_packer.p_sInfo = toolBox.Get(ref m_doHeatTimeout, m_packer, m_id + ".Heat Timeout");
+                m_packer.p_sInfo = toolBox.GetDIO(ref m_solSponge[0], m_packer, m_id + ".UpSponge", "Up", "Down");
+                m_packer.p_sInfo = toolBox.GetDIO(ref m_solSponge[1], m_packer, m_id + ".DownSponge", "Up", "Down");
+                m_packer.p_sInfo = toolBox.GetDIO(ref m_solHeater[0], m_packer, m_id + ".UpSilicone", "Up", "Down");
+                m_packer.p_sInfo = toolBox.GetDIO(ref m_solHeater[1], m_packer, m_id + ".DownHeater", "Up", "Down");
+                m_packer.p_sInfo = toolBox.GetDIO(ref m_dioHeat, m_packer, m_id + ".Heat");
+                m_packer.p_sInfo = toolBox.GetDIO(ref m_doHeatTimeout, m_packer, m_id + ".Heat Timeout");
                 if (bInit)
                 {
                     m_dioHeat.Write(false);

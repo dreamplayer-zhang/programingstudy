@@ -103,6 +103,16 @@ namespace RootTools.Camera.Matrox
             }
         }
 
+        byte[] bufarr;
+        public byte[] p_aBuf
+        {
+            get
+            {
+                MIL.MbufGet2d(m_MilBuffers[0], 0, 0, p_nWidth, p_nHeight, bufarr);
+                return bufarr;
+            }
+        }
+
         ImageViewer_ViewModel m_ImageViewer;
         public ImageViewer_ViewModel p_ImageViewer
         {
@@ -334,7 +344,7 @@ namespace RootTools.Camera.Matrox
             GC.SuppressFinalize(this);
         }
 
-        void LiveGrab()
+        public void LiveGrab()
         {
             // variable
             UserDataObject userObject = new UserDataObject();

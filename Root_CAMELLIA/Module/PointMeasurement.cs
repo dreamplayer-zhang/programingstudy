@@ -59,9 +59,9 @@ namespace Root_CAMELLIA
 
         public override void GetTools(bool bInit)
         {
-            p_sInfo = m_toolBox.Get(ref m_axisXY, this, "StageXY");
-            p_sInfo = m_toolBox.Get(ref m_axisZ, this, "StageZ");
-            p_sInfo = m_toolBox.Get(ref m_CamVRS, this, "VRS");
+            p_sInfo = m_toolBox.GetAxis(ref m_axisXY, this, "StageXY");
+            p_sInfo = m_toolBox.GetAxis(ref m_axisZ, this, "StageZ");
+            p_sInfo = m_toolBox.GetCamera(ref m_CamVRS, this, "VRS");
             p_sInfo = m_toolBox.Get(ref m_lightSet, this);
 
             #region 이전코드

@@ -371,13 +371,6 @@ namespace Root_EFEM
             foreach (EFEM_Process.Sequence sequence in aSequence)
             {
                 if (loadport.p_id == sequence.m_infoWafer.m_sModule) return true; 
-                //{
-                    //if (loadport.p_infoCarrier.p_eState == InfoCarrier.eState.Dock) return true;
-                    //ModuleRunBase runDocking = loadport.GetModuleRunDocking().Clone();
-                    //EFEM_Process.Sequence sequenceDock = new EFEM_Process.Sequence(runDocking, sequence.m_infoWafer);
-                    //m_process.m_qSequence.Enqueue(sequenceDock);
-                    //return true;
-                //}
             }
             return false; 
         }

@@ -47,35 +47,35 @@ namespace Root_CAMELLIA.Module
 
         public override void GetTools(bool bInit)
         {
-            p_sInfo = m_toolBox.Get(ref m_diEmergency, this, "Emergency");
-            p_sInfo = m_toolBox.Get(ref m_diCDALow, this, "CDA Low");
-            p_sInfo = m_toolBox.Get(ref m_diVacLow, this, "VAC Low");
-            p_sInfo = m_toolBox.Get(ref m_diDoorLock, this, "Door Lock");
-            p_sInfo = m_toolBox.Get(ref m_diMCReset, this, "MC Reset");
-            p_sInfo = m_toolBox.Get(ref m_diInterlock_key, this, "Interlock Key");
-            p_sInfo = m_toolBox.Get(ref m_diEFEMElec_Door, this, "EFEM Elec Door");
-            p_sInfo = m_toolBox.Get(ref m_diEFEMAir_Door, this, "EFEM Air Door");
-            p_sInfo = m_toolBox.Get(ref m_diEFEMPC_Door, this, "EFEM PC Door");
-            p_sInfo = m_toolBox.Get(ref m_diEFEMWTR_Door, this, "EFEM WTR Door");
-            p_sInfo = m_toolBox.Get(ref m_diVisionPC_Door, this, "Vision PC Door");
-            p_sInfo = m_toolBox.Get(ref m_diVisionTop_Door, this, "Vision Top Door");
-            p_sInfo = m_toolBox.Get(ref m_diVisionBtm_Door, this, "Vision Bottom Door");
-            p_sInfo = m_toolBox.Get(ref m_diVisionLoof_Door, this, "Vision Loof Door");
-            p_sInfo = m_toolBox.Get(ref m_diEFEMElec_FanAlarm, this, "EFEM Elec Fan Alarm");
-            p_sInfo = m_toolBox.Get(ref m_diEFEMPC_FanAlarm, this, "EFEM PC Fan Alarm");
-            p_sInfo = m_toolBox.Get(ref m_diEFEMWTR_FanAlarm, this, "EFEM WTR Fan Alarm");
-            p_sInfo = m_toolBox.Get(ref m_diVision4Ch_FanAlarm, this, "Vision 4Ch Fan Alarm");
-            p_sInfo = m_toolBox.Get(ref m_diVisionPC_FanAlarm, this, "Vision PC Fan Alarm");
-            p_sInfo = m_toolBox.Get(ref m_diVisionTop_FanAlarm, this, "Vision Top Fan Alarm");
-            p_sInfo = m_toolBox.Get(ref m_diVisionBtm_FanAlarm, this, "Vision Bottom Fan Alarm");
-            p_sInfo = m_toolBox.Get(ref m_diLPIonizerAlarm, this, "Loadport Ionizer Alarm");
-            p_sInfo = m_toolBox.Get(ref m_diALIonizerAlarm, this, "Aligner Ionizer Alarm");
-            p_sInfo = m_toolBox.Get(ref m_diVSIonizerAlarm, this, "Vision Ionizer Alarm");
-            p_sInfo = m_toolBox.Get(ref m_diProtectionbar, this, "Protection bar");
+            p_sInfo = m_toolBox.GetDIO(ref m_diEmergency, this, "Emergency");
+            p_sInfo = m_toolBox.GetDIO(ref m_diCDALow, this, "CDA Low");
+            p_sInfo = m_toolBox.GetDIO(ref m_diVacLow, this, "VAC Low");
+            p_sInfo = m_toolBox.GetDIO(ref m_diDoorLock, this, "Door Lock");
+            p_sInfo = m_toolBox.GetDIO(ref m_diMCReset, this, "MC Reset");
+            p_sInfo = m_toolBox.GetDIO(ref m_diInterlock_key, this, "Interlock Key");
+            p_sInfo = m_toolBox.GetDIO(ref m_diEFEMElec_Door, this, "EFEM Elec Door");
+            p_sInfo = m_toolBox.GetDIO(ref m_diEFEMAir_Door, this, "EFEM Air Door");
+            p_sInfo = m_toolBox.GetDIO(ref m_diEFEMPC_Door, this, "EFEM PC Door");
+            p_sInfo = m_toolBox.GetDIO(ref m_diEFEMWTR_Door, this, "EFEM WTR Door");
+            p_sInfo = m_toolBox.GetDIO(ref m_diVisionPC_Door, this, "Vision PC Door");
+            p_sInfo = m_toolBox.GetDIO(ref m_diVisionTop_Door, this, "Vision Top Door");
+            p_sInfo = m_toolBox.GetDIO(ref m_diVisionBtm_Door, this, "Vision Bottom Door");
+            p_sInfo = m_toolBox.GetDIO(ref m_diVisionLoof_Door, this, "Vision Loof Door");
+            p_sInfo = m_toolBox.GetDIO(ref m_diEFEMElec_FanAlarm, this, "EFEM Elec Fan Alarm");
+            p_sInfo = m_toolBox.GetDIO(ref m_diEFEMPC_FanAlarm, this, "EFEM PC Fan Alarm");
+            p_sInfo = m_toolBox.GetDIO(ref m_diEFEMWTR_FanAlarm, this, "EFEM WTR Fan Alarm");
+            p_sInfo = m_toolBox.GetDIO(ref m_diVision4Ch_FanAlarm, this, "Vision 4Ch Fan Alarm");
+            p_sInfo = m_toolBox.GetDIO(ref m_diVisionPC_FanAlarm, this, "Vision PC Fan Alarm");
+            p_sInfo = m_toolBox.GetDIO(ref m_diVisionTop_FanAlarm, this, "Vision Top Fan Alarm");
+            p_sInfo = m_toolBox.GetDIO(ref m_diVisionBtm_FanAlarm, this, "Vision Bottom Fan Alarm");
+            p_sInfo = m_toolBox.GetDIO(ref m_diLPIonizerAlarm, this, "Loadport Ionizer Alarm");
+            p_sInfo = m_toolBox.GetDIO(ref m_diALIonizerAlarm, this, "Aligner Ionizer Alarm");
+            p_sInfo = m_toolBox.GetDIO(ref m_diVSIonizerAlarm, this, "Vision Ionizer Alarm");
+            p_sInfo = m_toolBox.GetDIO(ref m_diProtectionbar, this, "Protection bar");
 
-            p_sInfo = m_toolBox.Get(ref m_doDoorLock, this, "Door Lock On/Off");
-            p_sInfo = m_toolBox.Get(ref m_doIonizer, this, "Ionizer On/Off");
-            p_sInfo = m_toolBox.Get(ref m_doServoOn, this, "Servo On/Off");
+            p_sInfo = m_toolBox.GetDIO(ref m_doDoorLock, this, "Door Lock On/Off");
+            p_sInfo = m_toolBox.GetDIO(ref m_doIonizer, this, "Ionizer On/Off");
+            p_sInfo = m_toolBox.GetDIO(ref m_doServoOn, this, "Servo On/Off");
 
             if (bInit)
             {

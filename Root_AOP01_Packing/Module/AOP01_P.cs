@@ -8,12 +8,15 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Threading;
 
 namespace Root_AOP01_Packing.Module
 {
     public class AOP01_P : ModuleBase
     {
+        
         public bool m_bUseDoorAlarm = true;
 
         string[] asLamp = Enum.GetNames(typeof(eLamp));
@@ -23,31 +26,31 @@ namespace Root_AOP01_Packing.Module
         public DIO_Os m_doLamp;
         public TK4SGroup m_tk4s; // 온도, 정전기
         public FFU_Group m_FFU;
-        DIO_Os do_Buzzer;
-        DIO_O do_door_Lock;
+        public DIO_Os do_Buzzer;
+        public DIO_O do_door_Lock;
        
-        DIO_I di_InterlockKey;
-        DIO_I di_LightCurtainKey;
-        DIO_I di_EMO;
-        DIO_I di_CDA;
-        DIO_I di_MCReset;
-        DIO_I di_Fan_4CH;
-        DIO_I di_Fan_PC;
-        DIO_IO dio_TapeLoad;
-        DIO_IO dio_TapeUnload;
-        DIO_I di_door_Machine;
-        DIO_I di_door_AirTop;
-        DIO_I di_door_IO;
-        DIO_I di_door_Elec;
-        DIO_I di_ProtectionBar;        
-        DIO_I di_LightCurtain_Load;
-        DIO_I di_LightCurtain_Unload;
-        DIO_I di_Elevator_Protection1;
-        DIO_I di_Elevator_Protection2;
-        DIO_I di_Cartridge_Check1;
-        DIO_I di_Cartridge_Check2;
-        DIO_I di_Wrapper_WrapCheck;
-        DIO_I di_Wrapper_WrapLevelCheck;
+        public DIO_I di_InterlockKey;
+        public DIO_I di_LightCurtainKey;
+        public DIO_I di_EMO;
+        public DIO_I di_CDA;
+        public DIO_I di_MCReset;
+        public DIO_I di_Fan_4CH;
+        public DIO_I di_Fan_PC;
+        public DIO_IO dio_TapeLoad;
+        public DIO_IO dio_TapeUnload;
+        public DIO_I di_door_Machine;
+        public DIO_I di_door_AirTop;
+        public DIO_I di_door_IO;
+        public DIO_I di_door_Elec;
+        public DIO_I di_ProtectionBar;        
+        public DIO_I di_LightCurtain_Load;
+        public DIO_I di_LightCurtain_Unload;
+        public DIO_I di_Elevator_Protection1;
+        public DIO_I di_Elevator_Protection2;
+        public DIO_I di_Cartridge_Check1;
+        public DIO_I di_Cartridge_Check2;
+        public DIO_I di_Wrapper_WrapCheck;
+        public DIO_I di_Wrapper_WrapLevelCheck;
         #endregion
 
         #region GAF
@@ -86,36 +89,84 @@ namespace Root_AOP01_Packing.Module
         }
         #endregion
 
+        #region UI Property
+        public double p_opactiyRED
+        {
+            get
+            {
+                return _opacityRED;
+            }
+            set
+            {
+                _opacityRED = value;
+                OnPropertyChanged();
+            }
+        }
+        private double _opacityRED = 1;
+        public double p_opactiyYELLOW
+        {
+            get
+            {
+                return _opacityYELLOW;
+            }
+            set
+            {
+                _opacityYELLOW = value;
+                OnPropertyChanged();
+            }
+        }
+        private double _opacityYELLOW = 1;
+        public double p_opactiyGREEN
+        {
+            get
+            {
+                return _opactiyGREEN;
+            }
+            set
+            {
+                _opactiyGREEN = value;
+                OnPropertyChanged();
+            }
+        }
+        private double _opactiyGREEN = 1;
+        #endregion
+
+        private void ReadLamp()
+        {
+            p_opactiyRED = m_doLamp.ReadDO(eLamp.Red) ? 1 : 0.2;
+            p_opactiyYELLOW = m_doLamp.ReadDO(eLamp.Yellow) ? 1 : 0.2;
+            p_opactiyGREEN = m_doLamp.ReadDO(eLamp.Green) ? 1 : 0.2;
+        }
         public override void GetTools(bool bInit)
         {
-            p_sInfo = m_toolBox.Get(ref m_doLamp, this, "Tower Lamp", asLamp);
-            p_sInfo = m_toolBox.Get(ref do_Buzzer, this, "Buzzer", asBuzzer, true, true);
-            p_sInfo = m_toolBox.Get(ref do_door_Lock, this, "Door Lock");
+            p_sInfo = m_toolBox.GetDIO(ref m_doLamp, this, "Tower Lamp", asLamp);
+            p_sInfo = m_toolBox.GetDIO(ref do_Buzzer, this, "Buzzer", asBuzzer, true, true);
+            p_sInfo = m_toolBox.GetDIO(ref do_door_Lock, this, "Door Lock");
 
             m_toolBox.Get(ref m_tk4s, this, "FDC", ((AOP01_Engineer)m_engineer).m_dialogService);
             m_toolBox.Get(ref m_FFU, this, "FFU", ((AOP01_Engineer)m_engineer).m_dialogService);
-            p_sInfo = m_toolBox.Get(ref di_InterlockKey, this, "Interlock Key");
-            p_sInfo = m_toolBox.Get(ref di_LightCurtainKey, this, "Light Curtian Key");
-            p_sInfo = m_toolBox.Get(ref di_EMO, this, "EMS");
-            p_sInfo = m_toolBox.Get(ref di_CDA, this, "CDA");
-            p_sInfo = m_toolBox.Get(ref di_MCReset, this, "M/C Reset");
-            p_sInfo = m_toolBox.Get(ref di_Fan_4CH, this, "4CH Fan");
-            p_sInfo = m_toolBox.Get(ref di_Fan_PC, this, "PC Fan");
-            p_sInfo = m_toolBox.Get(ref dio_TapeLoad, this, "Tape Load");
-            p_sInfo = m_toolBox.Get(ref dio_TapeUnload, this, "Tape Unload");
-            p_sInfo = m_toolBox.Get(ref di_door_Machine, this, "Door Machine");
-            p_sInfo = m_toolBox.Get(ref di_door_AirTop, this, "Door Air Top");
-            p_sInfo = m_toolBox.Get(ref di_door_IO, this, "Door I/O");
-            p_sInfo = m_toolBox.Get(ref di_door_Elec, this, "Door Elec");
-            p_sInfo = m_toolBox.Get(ref di_ProtectionBar, this, "Protection Bar Loadport");
-            p_sInfo = m_toolBox.Get(ref di_LightCurtain_Load, this, "Light Curtain Loadport");
-            p_sInfo = m_toolBox.Get(ref di_LightCurtain_Unload, this, "Light Curtain Unloadport");
-            p_sInfo = m_toolBox.Get(ref di_Elevator_Protection1, this, "Elevator Protection Sensor Forward");
-            p_sInfo = m_toolBox.Get(ref di_Elevator_Protection2, this, "Elevator Protection Sensor Backward");
-            p_sInfo = m_toolBox.Get(ref di_Cartridge_Check1, this, "Cartridge Check Left");
-            p_sInfo = m_toolBox.Get(ref di_Cartridge_Check2, this, "Cartirdge Check Right");
-            p_sInfo = m_toolBox.Get(ref di_Wrapper_WrapCheck, this, "Wrapper Exist Sensor");
-            p_sInfo = m_toolBox.Get(ref di_Wrapper_WrapLevelCheck, this, "Wrapper Level Sensor");
+            p_sInfo = m_toolBox.GetDIO(ref di_InterlockKey, this, "Interlock Key");
+            p_sInfo = m_toolBox.GetDIO(ref di_LightCurtainKey, this, "Light Curtian Key");
+            p_sInfo = m_toolBox.GetDIO(ref di_EMO, this, "EMS");
+            p_sInfo = m_toolBox.GetDIO(ref di_CDA, this, "CDA");
+            p_sInfo = m_toolBox.GetDIO(ref di_MCReset, this, "M/C Reset");
+            p_sInfo = m_toolBox.GetDIO(ref di_Fan_4CH, this, "4CH Fan");
+            p_sInfo = m_toolBox.GetDIO(ref di_Fan_PC, this, "PC Fan");
+            p_sInfo = m_toolBox.GetDIO(ref dio_TapeLoad, this, "Tape Load");
+            p_sInfo = m_toolBox.GetDIO(ref dio_TapeUnload, this, "Tape Unload");
+            p_sInfo = m_toolBox.GetDIO(ref di_door_Machine, this, "Door Machine");
+            p_sInfo = m_toolBox.GetDIO(ref di_door_AirTop, this, "Door Air Top");
+            p_sInfo = m_toolBox.GetDIO(ref di_door_IO, this, "Door I/O");
+            p_sInfo = m_toolBox.GetDIO(ref di_door_Elec, this, "Door Elec");
+            p_sInfo = m_toolBox.GetDIO(ref di_ProtectionBar, this, "Protection Bar Loadport");
+            p_sInfo = m_toolBox.GetDIO(ref di_LightCurtain_Load, this, "Light Curtain Loadport");
+            p_sInfo = m_toolBox.GetDIO(ref di_LightCurtain_Unload, this, "Light Curtain Unloadport");
+            p_sInfo = m_toolBox.GetDIO(ref di_Elevator_Protection1, this, "Elevator Protection Sensor Forward");
+            p_sInfo = m_toolBox.GetDIO(ref di_Elevator_Protection2, this, "Elevator Protection Sensor Backward");
+            p_sInfo = m_toolBox.GetDIO(ref di_Cartridge_Check1, this, "Cartridge Check Left");
+            p_sInfo = m_toolBox.GetDIO(ref di_Cartridge_Check2, this, "Cartirdge Check Right");
+            p_sInfo = m_toolBox.GetDIO(ref di_Wrapper_WrapCheck, this, "Wrapper Exist Sensor");
+            p_sInfo = m_toolBox.GetDIO(ref di_Wrapper_WrapLevelCheck, this, "Wrapper Level Sensor");
 
             
             if (bInit)
@@ -165,6 +216,7 @@ namespace Root_AOP01_Packing.Module
             ////TapeloadCheck(); // ??
             InterruptCheck();
             ModuleCheck();
+            ReadLamp();
         }
 
         private void MachineCheck()
@@ -202,6 +254,31 @@ namespace Root_AOP01_Packing.Module
                 if (!di_door_IO.p_bIn)
                     alid_Door.Run(!di_door_IO.p_bIn, "Please Check " + di_door_IO.m_id);
             }
+        }
+        public bool bDoorClosedCheck()
+        {
+            if (!di_door_Machine.p_bIn)
+            {
+                alid_Door.Run(!di_door_Machine.p_bIn, "Please Check " + di_door_Machine.m_id);
+                return false;
+            }
+            if (!di_door_Elec.p_bIn)
+            {
+                alid_Door.Run(!di_door_Elec.p_bIn, "Please Check " + di_door_Elec.m_id);
+                return false;
+            }
+            if (!di_door_AirTop.p_bIn)
+            {
+                alid_Door.Run(!di_door_AirTop.p_bIn, "Please Check " + di_door_AirTop.m_id);
+                return false;
+            }
+            if (!di_door_IO.p_bIn)
+            {
+                alid_Door.Run(!di_door_IO.p_bIn, "Please Check " + di_door_IO.m_id);
+                return false;
+            }
+
+            return true;
         }
         private void TapeloadCheck()
         {
@@ -256,6 +333,8 @@ namespace Root_AOP01_Packing.Module
         {
             alid_Tk4s.Run(true, str);
         }
+
+
 
         public enum eLamp
         {

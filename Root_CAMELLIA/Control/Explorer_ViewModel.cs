@@ -22,6 +22,28 @@ namespace Root_CAMELLIA
 {
     public class Explorer_ViewModel : ObservableObject
     {
+        public event System.EventHandler DoubleClicked;
+
+
+        void DoubleClickedEvent(System.Windows.Input.MouseEventArgs e)
+        {
+            if (DoubleClicked != null)
+                OnDoubleClicked(e);
+        }
+
+        protected virtual void OnDoubleClicked(System.Windows.Input.MouseEventArgs e)
+        {
+            if (DoubleClicked != null)
+            {
+                DoubleClicked.Invoke(this, e);
+            }
+        }
+        public virtual void OnMouseDoubleClick(object sender, System.Windows.Input.MouseEventArgs e)
+        {
+            int test = 10;
+            DoubleClickedEvent(e);
+        }
+
         #region property
         //System.Windows.Controls.TreeView m_treeView = new System.Windows.Controls.TreeView();
         //public System.Windows.Controls.TreeView p_treeView
@@ -52,6 +74,10 @@ namespace Root_CAMELLIA
         string path = @"C:\";
         List<string> pathList = new List<string>();
         #endregion
+        public Explorer_ViewModel()
+        {
+
+        }
         public Explorer_ViewModel(string path)
         {
             this.path = path;

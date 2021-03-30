@@ -15,8 +15,8 @@ namespace Root_ASIS.Module
         DIO_I m_diPaperFull; 
         public override void GetTools(bool bInit)
         {
-            p_sInfo = m_toolBox.Get(ref m_axis, this, "Axis");
-            p_sInfo = m_toolBox.Get(ref m_diPaperFull, this, "Paper Full"); 
+            p_sInfo = m_toolBox.GetAxis(ref m_axis, this, "Axis");
+            p_sInfo = m_toolBox.GetDIO(ref m_diPaperFull, this, "Paper Full"); 
             m_aPicker[ePicker.Strip].GetTools(this, bInit);
             m_aPicker[ePicker.Paper].GetTools(this, bInit);
             if (bInit) InitTools();

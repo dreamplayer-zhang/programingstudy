@@ -21,11 +21,11 @@ namespace Root_VEGA_P.Module
         {
             for (int n = 0; n < m_aSolValve.Count; n++)
             {
-                p_sInfo = m_toolBox.Get(ref m_aSolValve[n].m_do, this, m_aSolValve[n].m_id);
+                p_sInfo = m_toolBox.GetDIO(ref m_aSolValve[n].m_do, this, m_aSolValve[n].m_id);
             }
-            p_sInfo = m_toolBox.Get(ref m_mdCounter, this, "Modbus");
-            p_sInfo = m_toolBox.Get(ref m_rs232, this, "RS232");
-            p_sInfo = m_toolBox.Get(ref m_mbFlow, this, "Flow"); 
+            p_sInfo = m_toolBox.GetComm(ref m_mdCounter, this, "Modbus");
+            p_sInfo = m_toolBox.GetComm(ref m_rs232, this, "RS232");
+            p_sInfo = m_toolBox.GetComm(ref m_mbFlow, this, "Flow"); 
             if (bInit)
             {
                 m_rs232.OnReceive += M_rs232_OnReceive;

@@ -33,6 +33,7 @@ namespace Root_CAMELLIA.Module
         RPoint m_ptTestMeasurePoint = new RPoint();
 
         Task m_thread;
+        Task m_taskSave;
         bool m_bStart = false;
         bool m_CalcThicknessDone = false;
 
@@ -160,6 +161,10 @@ namespace Root_CAMELLIA.Module
 
             m_thread = new Task(RunThread);
             m_thread.Start();
+
+
+            InfoWafer info = m_module.p_infoWafer;
+
 
             //m_SettingDataWithErrorCode = App.m_nanoView.LoadSettingParameters();
             //Met.SettingData setting = null;

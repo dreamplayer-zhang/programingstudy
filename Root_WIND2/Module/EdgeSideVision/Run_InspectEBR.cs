@@ -15,26 +15,12 @@ namespace Root_WIND2.Module
 		EdgeSideVision module;
 
 		string recipeName = string.Empty;
-		int cameraHeight = 2000; // camera height
-		int imageOffset = 0;	// 이미지 시작 지점 offset
-
 		#region [Getter/Setter]
 
 		public string RecipeName
 		{
 			get => recipeName;
 			set => recipeName = value;
-		}
-		public int CameraHeight
-		{
-			get => cameraHeight;
-			set => cameraHeight = value;
-		}
-
-		public int ImageOffset
-		{
-			get => imageOffset;
-			set => imageOffset = value;
 		}
 		#endregion
 
@@ -48,16 +34,12 @@ namespace Root_WIND2.Module
 		{
 			Run_InspectEBR run = new Run_InspectEBR(module);
 			run.recipeName = recipeName;
-			run.cameraHeight = cameraHeight;
-			run.imageOffset = imageOffset;
 			return run;
 		}
 
 		public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
 		{
 			recipeName = tree.SetFile(recipeName, recipeName, "rcp", "Recipe", "Recipe Name", bVisible);
-			cameraHeight = (tree.GetTree("Camera Height", false, bVisible)).Set(cameraHeight, cameraHeight, "Height", "Camera Height", bVisible);
-			imageOffset = (tree.GetTree("Image Offset", false, bVisible)).Set(imageOffset, imageOffset, "Offset", "Height offset (pxl)", bVisible);
 		}
 
 		public override string Run()

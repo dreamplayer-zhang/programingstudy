@@ -16,9 +16,9 @@ namespace Root_Rinse_Loader.Module
 
         public override void GetTools(bool bInit)
         {
-            p_sInfo = m_toolBox.Get(ref m_axis, this, "Loader");
-            p_sInfo = m_toolBox.Get(ref m_dioPickerDown, this, "PickerDown", "Up", "Down", true, true);
-            p_sInfo = m_toolBox.Get(ref m_dioPickerSet, this, "PickerSet");
+            p_sInfo = m_toolBox.GetAxis(ref m_axis, this, "Loader");
+            p_sInfo = m_toolBox.GetDIO(ref m_dioPickerDown, this, "PickerDown", "Up", "Down", true, true);
+            p_sInfo = m_toolBox.GetDIO(ref m_dioPickerSet, this, "PickerSet");
             foreach (Picker picker in m_aPicker) picker.GetTools(m_toolBox);
             if (bInit)
             {
@@ -51,8 +51,8 @@ namespace Root_Rinse_Loader.Module
             public DIO_O m_doBlow;
             public void GetTools(ToolBox toolBox)
             {
-                m_loader.p_sInfo = toolBox.Get(ref m_dioVacuum, m_loader, m_id + ".Vacuum");
-                m_loader.p_sInfo = toolBox.Get(ref m_doBlow, m_loader, m_id + ".Blow");
+                m_loader.p_sInfo = toolBox.GetDIO(ref m_dioVacuum, m_loader, m_id + ".Vacuum");
+                m_loader.p_sInfo = toolBox.GetDIO(ref m_doBlow, m_loader, m_id + ".Blow");
             }
 
             public bool IsDrop()
@@ -90,7 +90,6 @@ namespace Root_Rinse_Loader.Module
 
         double m_secVac = 2;
         double m_secBlow = 0.5;
-        double m_secRollerStop = 1;
         public string RunVacuum(bool bOn)
         {
             p_bVacuum = bOn;
@@ -158,7 +157,6 @@ namespace Root_Rinse_Loader.Module
             m_secVac = tree.Set(m_secVac, m_secVac, "Vacuum", "Vacuum Sensor Wait (sec)");
             m_secBlow = tree.Set(m_secBlow, m_secBlow, "Blow", "Blow Time (sec)");
             m_nShake = tree.Set(m_nShake, m_nShake, "Shake", "Shake Up Count");
-            m_secRollerStop = tree.Set(m_secRollerStop, m_secRollerStop, "Roller Stop", "Roller Stop Wait (sec)");
             RunTreePickerShake(tree.GetTree("Shake Delay", true, m_nShake > 0), m_nShake > 0); 
         }
 
@@ -226,10 +224,9 @@ namespace Root_Rinse_Loader.Module
         {
             if (m_storage.m_stack.p_bCheck == false)
             {
+                if (Run(m_roller.RunRotate(false))) return p_sInfo;
                 m_rinse.RunBuzzer(RinseL.eBuzzer.Finish);
                 EQ.p_eState = EQ.eState.Ready;
-                Thread.Sleep((int)(1000 * m_secRollerStop));
-                if (Run(m_roller.RunRotate(false))) return p_sInfo;
                 return "OK";
             }
             if (m_rinse.p_eMode != RinseL.eRunMode.Stack) return "Run mode is not Stack"; 

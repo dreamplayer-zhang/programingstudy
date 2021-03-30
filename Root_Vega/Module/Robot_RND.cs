@@ -24,10 +24,10 @@ namespace Root_Vega.Module
         Camera_CognexOCR m_camOCR;
         public override void GetTools(bool bInit)
         {
-            p_sInfo = m_toolBox.Get(ref m_diCheckVac, this, "CheckVac");
-            p_sInfo = m_toolBox.Get(ref m_diArmClose, this, "ArmClose");
-            p_sInfo = m_toolBox.Get(ref m_rs232, this, "RS232");
-            p_sInfo = m_toolBox.Get(ref m_camOCR, this, "CamOCR");
+            p_sInfo = m_toolBox.GetDIO(ref m_diCheckVac, this, "CheckVac");
+            p_sInfo = m_toolBox.GetDIO(ref m_diArmClose, this, "ArmClose");
+            p_sInfo = m_toolBox.GetComm(ref m_rs232, this, "RS232");
+            p_sInfo = m_toolBox.GetCamera(ref m_camOCR, this, "CamOCR");
             if (bInit)
             {
                 InitALID();

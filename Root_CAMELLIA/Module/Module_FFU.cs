@@ -14,18 +14,28 @@ namespace Root_CAMELLIA.Module
 		public Modbus m_modbus;
 		public override void GetTools(bool bInit)
 		{
-			p_sInfo = m_toolBox.Get(ref m_modbus, this, "Modbus");
+			p_sInfo = m_toolBox.GetComm(ref m_modbus, this, "Modbus");
 		}
-		#endregion
+        #endregion
 
-		#region Unit
-		public class Unit : NotifyProperty
+        #region Unit
+
+        #region Interface
+        public interface UnitState
+        {
+			void InitALID(Module_FFU FFU);
+			void RunTree(Tree tree);
+        }
+        #endregion
+
+        public class Unit : NotifyProperty
 		{
 			#region Fan
-			public class Fan : NotifyProperty
+			public class Fan : NotifyProperty, UnitState
 			{
 				public RPoint m_mmLimit = new RPoint();
 				public int m_nSet = 0;
+				public int m_nMode = 0;
 				int _nRPM = 0;
 				public int p_nRPM
 				{
@@ -33,12 +43,12 @@ namespace Root_CAMELLIA.Module
 					set
 					{
 						if (_nRPM == value) return;
-						if (m_nSet == 0)
+						if (m_nMode == 0)
 						{
 							m_alidSetted_RPMLow.Run(m_mmLimit.X > _nRPM, "FFU RPM Lower than Low Limit.");
 							m_alidSetted_RPMHigh.Run(m_mmLimit.Y < _nRPM, "FFU RPM Higher than High Limit.");
 						}
-						else if (m_nSet == 1)
+						else if (m_nMode == 1)
 						{
 							m_alidSetted_PreLow.Run(m_mmLimit.X > _nRPM, "FFU Pressure Lower than Low Limit.");
 							m_alidSetted_PreHigh.Run(m_mmLimit.Y < _nRPM, "FFU Pressure Higher than High Limit.");
@@ -73,7 +83,7 @@ namespace Root_CAMELLIA.Module
 				ALID m_alidSetted_RPMLow;
 				ALID m_alidSetted_PreHigh;
 				ALID m_alidSetted_PreLow;
-				public void InitALID(Module_FFU FFU)
+				public  void InitALID(Module_FFU FFU)
 				{
 					GAF GAF = FFU.m_gaf;
 					m_alidFan = GAF.GetALID(FFU, m_id + " : Fan Error", "Fan Run Error");
@@ -232,6 +242,7 @@ namespace Root_CAMELLIA.Module
 				public void RunTree(Tree tree)
 				{
 					p_sFan = tree.Set(p_sFan, p_sFan, "Fan ID", "Fan ID");
+					m_nMode = tree.Set(m_nMode, m_nMode, "Set Mode", "RPM = 0, Pressure = 1");
 					m_nSet = tree.Set(m_nSet, m_nSet, "Set", "Fan Set Value (RPM) or Pressure (0.1pa)");
 					m_mmLimit = tree.Set(m_mmLimit, m_mmLimit, "Limit", "FFU Lower & Upper Limit");
 
@@ -300,6 +311,7 @@ namespace Root_CAMELLIA.Module
 			List<int> m_aTempValue = new List<int>();
 			List<int> m_aHumidityValue = new List<int>();
 
+
 			public void InitFan()
 			{
 				while (m_aFan.Count < m_lFan) m_aFan.Add(new Fan(m_FFU, m_id + ".Fan" + m_aFan.Count.ToString("00")));
@@ -353,8 +365,8 @@ namespace Root_CAMELLIA.Module
             
 
             #region Temp
-            public class Temp : NotifyProperty
-            {
+            public class Temp : NotifyProperty, UnitState
+			{
 				public RPoint m_mmLimit { get; set; } = new RPoint();
 				int _nTemp;
 				public int p_nTemp
@@ -406,7 +418,7 @@ namespace Root_CAMELLIA.Module
 			#endregion
 
 			#region Humidity
-			public class Humidity : NotifyProperty
+			public class Humidity : NotifyProperty, UnitState
 			{
 				public RPoint m_mmLimit { get; set;} = new RPoint();
 				int _nHumidity;

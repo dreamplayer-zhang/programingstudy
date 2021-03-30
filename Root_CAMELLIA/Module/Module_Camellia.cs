@@ -228,6 +228,7 @@ namespace Root_CAMELLIA.Module
         public enum eAxisPos
         {
             Ready,
+            Home,
             InitCal
         }
         private void InitWorkPoint()
@@ -235,6 +236,7 @@ namespace Root_CAMELLIA.Module
             m_axisXY.p_axisX.AddPos(Enum.GetNames(typeof(eAxisPos)));
             m_axisXY.p_axisY.AddPos(Enum.GetNames(typeof(eAxisPos)));
             m_axisZ.AddPos(Enum.GetNames(typeof(eAxisPos)));
+            m_axisLifter.AddPos(Enum.GetNames(typeof(eAxisPos)));
             m_axisLifter.AddIO(m_axisXReady);
             m_axisLifter.AddIO(m_axisYReady);
             //m_axisLifter.AddIO(m_vaccum);
@@ -260,19 +262,19 @@ namespace Root_CAMELLIA.Module
 
         public override void GetTools(bool bInit)
         {
-            p_sInfo = m_toolBox.Get(ref m_axisXY, this, "StageXY");
-            p_sInfo = m_toolBox.Get(ref m_axisZ, this, "NavigationZ");
-            p_sInfo = m_toolBox.Get(ref m_axisLifter, this, "StageLifter");
-            p_sInfo = m_toolBox.Get(ref m_tiltAxisXY, this, "TiltXY");
-            p_sInfo = m_toolBox.Get(ref m_stageAxisZ, this, "StageZ");
-            p_sInfo = m_toolBox.Get(ref m_CamVRS, this, "VRS");
+            p_sInfo = m_toolBox.GetAxis(ref m_axisXY, this, "StageXY");
+            p_sInfo = m_toolBox.GetAxis(ref m_axisZ, this, "NavigationZ");
+            p_sInfo = m_toolBox.GetAxis(ref m_axisLifter, this, "StageLifter");
+            p_sInfo = m_toolBox.GetAxis(ref m_tiltAxisXY, this, "TiltXY");
+            p_sInfo = m_toolBox.GetAxis(ref m_stageAxisZ, this, "StageZ");
+            p_sInfo = m_toolBox.GetCamera(ref m_CamVRS, this, "VRS");
             p_sInfo = m_toolBox.Get(ref m_lightSet, this);
-            p_sInfo = m_toolBox.Get(ref m_axisXReady, this, "Stage X Ready");
-            p_sInfo = m_toolBox.Get(ref m_axisYReady, this, "Stage Y Ready");   
-            p_sInfo = m_toolBox.Get(ref m_vacuum, this, "Vaccum On");
-            p_sInfo = m_toolBox.Get(ref m_vacuumOnOff, this, "Vaccum OnOff");
-            p_sInfo = m_toolBox.Get(ref m_homeExistWafer, this, "Home Wafer Exist");
-            p_sInfo = m_toolBox.Get(ref m_loadExistWafer, this, "Load Wafer Exist");
+            p_sInfo = m_toolBox.GetDIO(ref m_axisXReady, this, "Stage X Ready");
+            p_sInfo = m_toolBox.GetDIO(ref m_axisYReady, this, "Stage Y Ready");   
+            p_sInfo = m_toolBox.GetDIO(ref m_vacuum, this, "Vaccum On");
+            p_sInfo = m_toolBox.GetDIO(ref m_vacuumOnOff, this, "Vaccum OnOff");
+            p_sInfo = m_toolBox.GetDIO(ref m_homeExistWafer, this, "Home Wafer Exist");
+            p_sInfo = m_toolBox.GetDIO(ref m_loadExistWafer, this, "Load Wafer Exist");
             m_alid_WaferExist = m_gaf.GetALID(this, "Vision Wafer Exist", "Vision Wafer Exist");
 
         }
@@ -290,20 +292,13 @@ namespace Root_CAMELLIA.Module
                 infoCarrier[i] = loadports[i].p_infoCarrier;
                 CanInitCal[i] = false;  
             }
-            try
-            {
-                if (p_CamVRS != null && !p_CamVRS.p_CamInfo._OpenStatus)
-                {
-                    p_CamVRS.Connect();
-                }
-                   
-                if(p_CamVRS != null)
-                 while (!p_CamVRS.m_ConnectDone) ;
-            }
-            catch
-            {
-
-            }
+           // try
+            //{
+            //    if (p_CamVRS != null && !p_CamVRS.p_CamInfo._OpenStatus)
+            //    {
+            //        p_CamVRS.Connect();
+            //    }
+            //}
 
         }
 
@@ -318,8 +313,10 @@ namespace Root_CAMELLIA.Module
             AddModuleRunList(new Run_InitCalibration(this), true, "InitCalCentering");
             AddModuleRunList(new Run_CalibrationWaferCentering(this), true, "Background Calibration_Centering");
             AddModuleRunList(new Run_Measure(this), true, "Measurement");
-            AddModuleRunList(new Run_PMSensorTilt(this), true, "PM Sensor Tilt");
-            AddModuleRunList(new Run_PMTiltAlign(this), true, "PM Camera Tilt");
+            AddModuleRunList(new Run_PMReflectance (this), true, "PM Reflectance");
+            AddModuleRunList(new Run_PMThickness (this), true, "PM Thickness");
+            AddModuleRunList(new Run_PMSensorStageAlign (this), true, "PM Sensor_Stage Align");
+            AddModuleRunList(new Run_PMSensorCameraTilt (this), true, "PM Sensor_Camera Tilt");
         }
 
 
@@ -442,7 +439,7 @@ namespace Root_CAMELLIA.Module
 
         public string LifterDown()
         {
-            if (p_axisLifter.IsInPos(eAxisPos.Ready))
+            if (p_axisLifter.IsInPos(eAxisPos.Home))
             {
                 return "OK";
             }
@@ -451,11 +448,11 @@ namespace Root_CAMELLIA.Module
             {
                 if (!m_vacuum.p_bIn)
                 {
-                    if (Run(p_axisLifter.StartMove(eAxisPos.Ready)))
+                    if (p_axisLifter.StartMove(eAxisPos.Ready) != "OK")
                     {
                         return p_sInfo;
                     }
-                    if (Run(p_axisLifter.WaitReady()))
+                    if (p_axisLifter.WaitReady() != "OK")
                         return p_sInfo;
                 }
                 else
@@ -650,11 +647,10 @@ namespace Root_CAMELLIA.Module
         eCheckWafer m_eCheckWafer = eCheckWafer.InfoWafer;
         public bool IsWaferExist(int nID)
         {
-            
-            if(EQ.p_eState != EQ.eState.Home && p_eState == eState.Home)
-            {
-                StateHome();
-            }
+            //if(EQ.p_eState != EQ.eState.Home && p_eState == eState.Home)
+            //{
+            //    StateHome();
+            //}
             switch (m_eCheckWafer)
             {
                 case eCheckWafer.Sensor:

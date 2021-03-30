@@ -14,7 +14,7 @@ namespace Root_AOP01_Inspection.Module
 		public Modbus m_modbus;
 		public override void GetTools(bool bInit)
 		{
-			p_sInfo = m_toolBox.Get(ref m_modbus, this, "Modbus");
+			p_sInfo = m_toolBox.GetComm(ref m_modbus, this, "Modbus");
 		}
 		#endregion
 
