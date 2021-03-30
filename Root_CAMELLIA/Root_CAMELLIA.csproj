@@ -285,6 +285,7 @@
     <Compile Include="Converter\BoolConverter.cs" />
     <Compile Include="Converter\HumidityToGradientOffsetConverter.cs" />
     <Compile Include="Converter\LampStateToColorConverter.cs" />
+    <Compile Include="Converter\ModuleStateToLoadingOpacityConverter.cs" />
     <Compile Include="Converter\ValueToColorConverter.cs" />
     <Compile Include="Converter\ValueToUIValueConverter.cs" />
     <Compile Include="Data\SaveMeasureData.cs" />
@@ -315,6 +316,7 @@
     <Compile Include="Module\Module_FFU.cs" />
     <Compile Include="Module\Interlock.cs" />
     <Compile Include="Module\TowerLamp.cs" />
+    <Compile Include="TemplateSelector\FFUTemplateSelector.cs" />
     <Compile Include="UI_Dialog\Dlg_OHT.xaml.cs">
       <DependentUpon>Dlg_OHT.xaml</DependentUpon>
     </Compile>

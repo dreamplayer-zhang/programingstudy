@@ -74,5 +74,11 @@ namespace Root_CAMELLIA
             }
         }
         #endregion
+
+
+        //public override void OnMouseDoubleClick(object sender, System.Windows.Input.MouseEventArgs e)
+        //{
+        //    int test = 30;
+        //}
     }
 }

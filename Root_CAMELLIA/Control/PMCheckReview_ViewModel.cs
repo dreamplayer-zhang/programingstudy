@@ -11,12 +11,16 @@ using RootTools.Module;
 using System.Windows.Input;
 using System.Threading;
 using Root_CAMELLIA.Module;
+using Emgu.CV;
+using Emgu.CV.Structure;
+using System.Windows.Media.Imaging;
 
 namespace Root_CAMELLIA
 {
     public class PMCheckReview_ViewModel : ObservableObject
     {
-        private RootViewer_ViewModel m_rootViewer = new RootViewer_ViewModel();
+        #region
+        RootViewer_ViewModel m_rootViewer = new RootViewer_ViewModel();
         public RootViewer_ViewModel p_rootViewer
         {
             get
@@ -28,6 +32,7 @@ namespace Root_CAMELLIA
                 SetProperty(ref m_rootViewer, value);
             }
         }
+        #endregion
         public PMCheckReview_ViewModel()
         {
             Init();
@@ -35,14 +40,53 @@ namespace Root_CAMELLIA
 
         public void Init()
         {
+            ModuleCamellia = ((CAMELLIA_Handler)App.m_engineer.ClassHandler()).m_camellia;
             //pointListItem = new DataTable();
             p_DataTable.Columns.Add(new DataColumn("TIme"));
             p_DataTable.Columns.Add(new DataColumn("List"));
             p_DataTable.Columns.Add(new DataColumn("Result"));
 
-            ModuleCamellia = ((CAMELLIA_Handler)App.m_engineer.ClassHandler()).m_camellia;
+            //p_rootViewer.p_ImgSource
+            //p_rootViewer.p_ImageData = ModuleCamellia.p_CamVRS.p_ImageViewer.p_ImageData;
+            //ModuleCamellia.p_CamVRS.p_ImageViewer.p_ImageData;
+            //p_rootViewer.p_ImgSource = ImageHelper.GetBitmapSourceFromBitmap();
+            ModuleCamellia.p_CamVRS.Captured += GetImage;
         }
-        DataTable m_DataTable = new DataTable();
+
+        BitmapSource m_imageSource;
+        public BitmapSource p_imageSource
+        {
+            get
+            {
+                return m_imageSource;
+            }
+            set
+            {
+                SetProperty(ref m_imageSource, value);
+            }
+        }
+
+        private object lockObject = new object();
+        private void GetImage(object obj, EventArgs e)
+        {
+            Thread.Sleep(100);
+            RootTools.Camera.BaslerPylon.Camera_Basler p_CamVRS = ModuleCamellia.p_CamVRS;
+            Mat mat = new Mat(new System.Drawing.Size(p_CamVRS.GetRoiSize().X, p_CamVRS.GetRoiSize().Y), Emgu.CV.CvEnum.DepthType.Cv8U, 3, p_CamVRS.p_ImageViewer.p_ImageData.GetPtr(), (int)p_CamVRS.p_ImageViewer.p_ImageData.p_Stride * 3);
+            Image<Bgra, byte> img = mat.ToImage<Bgra, byte>();
+
+            //CvInvoke.Imshow("aa",img.Mat);
+            //CvInvoke.WaitKey(0);
+            //CvInvoke.DestroyAllWindows();
+            //p_rootViewer.p_ImageData = new ImageData(p_CamVRS.p_ImageViewer.p_ImageData);
+            //lock (lockObject)
+            //{
+
+                p_imageSource = ImageHelper.ToBitmapSource(img);
+            //}
+            //p_rootViewer.SetImageSource();
+        }
+
+            DataTable m_DataTable = new DataTable();
         public DataTable p_DataTable
         {
             get

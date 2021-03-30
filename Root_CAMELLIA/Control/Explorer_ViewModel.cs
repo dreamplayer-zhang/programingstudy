@@ -22,6 +22,12 @@ namespace Root_CAMELLIA
 {
     public class Explorer_ViewModel : ObservableObject
     {
+
+        public virtual void OnMouseDoubleClick(object sender, System.Windows.Input.MouseEventArgs e)
+        {
+            int test = 10;
+        }
+
         #region property
         //System.Windows.Controls.TreeView m_treeView = new System.Windows.Controls.TreeView();
         //public System.Windows.Controls.TreeView p_treeView

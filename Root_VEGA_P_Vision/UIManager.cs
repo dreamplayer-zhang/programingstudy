@@ -58,6 +58,9 @@ namespace Root_VEGA_P_Vision
             setupViewModel = new Setup_ViewModel();
             setupWindow.DataContext = setupViewModel;
         }
+        void InitOperationMode()
+        {
+        }
         public void ChangeMainUI(UIElement window)
         {
             if (window == null) return;
@@ -73,6 +76,7 @@ namespace Root_VEGA_P_Vision
 
         public void ChangeUIReview()
         {
+
         }
 
         public void ChangeUISetup()
@@ -82,6 +86,7 @@ namespace Root_VEGA_P_Vision
 
         public void ChangeUIRun()
         {
+
         }
     }
 }

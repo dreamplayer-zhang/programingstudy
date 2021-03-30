@@ -16,24 +16,12 @@
         Title="Root Vega-P">
     <i:Interaction.Triggers>
         <i:EventTrigger EventName="Loaded">
-            <i:InvokeCommandAction Command="{Binding WindowLoadedCommand}"/>
+            <i:InvokeCommandAction Command="{Binding WindowLoadedCommand}" />
         </i:EventTrigger>
         <i:EventTrigger EventName="Closing">
-            <i:InvokeCommandAction Command="{Binding WindowClosingCommand}"/>
+            <i:InvokeCommandAction Command="{Binding WindowClosingCommand}" />
         </i:EventTrigger>
     </i:Interaction.Triggers>
-    <!--<Window.Style>
-        <Style TargetType="Window">
-            --><!--Visibility="{Binding Path=Visibility, ElementName=MaximizeButton,Converter={StaticResource VisibleToCollapsed}}">-->
-                    <!--<Setter Property="{Binding Path=Visibility, ElementName=MaximizeButton,Converter={StaticResource BooleanToVisiblity}}"/>--><!--
-            <Setter Property="WindowState" Value="Maximized"/>
-            <Style.Triggers>
-                <DataTrigger Binding="{Binding ElementName=NormalizeButton,Path=Visibility}" Value="Visible">
-                    <Setter Property="Visibility" Value="Collapsed"/>
-                </DataTrigger>
-            </Style.Triggers>
-        </Style>
-    </Window.Style>-->
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="25"/>
@@ -272,17 +260,12 @@
                       ShowsPreview="True" Grid.ColumnSpan="2"/>
 
         <!--Log-->
-        <Border Grid.Row="4" Grid.ColumnSpan="2" Panel.ZIndex="99" Margin="3">
-            <TabControl>
-                <TabItem Header="Log" FontSize="10">
-                    <tools:LogView_UI x:Name="logView" Margin="1" />
-                </TabItem>
-                <TabItem Header="Inspection" FontSize="10"/>
-                <TabItem Header="I/O" FontSize="10"/>
-                <TabItem Header="Network" FontSize="10"/>
-                <TabItem Header="Result" FontSize="10"/>
-            </TabControl>
-
+        <Border Grid.Row="4"
+                Grid.ColumnSpan="2"
+                Panel.ZIndex="99"
+                Margin="3">
+            <tools:LogView_UI x:Name="logView"
+                              Margin="1" />
         </Border>
     </Grid>
 </Window>
