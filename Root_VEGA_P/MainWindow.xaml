@@ -269,7 +269,7 @@
               x:Name="MainPanel">
             <TabControl>
                 <TabItem Header="Recipe">
-                    
+                    <UI:Panel_RecipeManger />
                 </TabItem>
                 <TabItem Header="Engineer">
                     <engineer:VEGA_P_Engineer_UI x:Name="engineerUI"/>

@@ -567,7 +567,7 @@
                                 Command="{Binding cmdHome}" />-->
                     </StackPanel>
                     <StackPanel VerticalAlignment="Bottom" Margin="0,0">
-                        <Button Content="OHT" Style="{StaticResource SetupPanelBtn}" />
+                        <Button Content="OHT" Style="{StaticResource SetupPanelBtn}"  Command="{Binding cmdOHT}"/>
                         <Button Content="BUZZER OFF" Style="{StaticResource SetupPanelBtn}"/>
                         <Button Content="ALARM"
                                 Style="{StaticResource SetupPanelBtn}"
