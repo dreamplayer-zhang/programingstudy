@@ -83,7 +83,8 @@
             </Grid.ColumnDefinitions>
             <TabControl>
                 <TabItem Header="Summary">
-                    <local:Explorer DataContext="{Binding p_summary}"/>
+                    <local:Explorer DataContext="{Binding p_summary}">
+                    </local:Explorer>
                 </TabItem>
                 <TabItem Header="history" DataContext="{Binding p_history}">
                     <local:Explorer/>
