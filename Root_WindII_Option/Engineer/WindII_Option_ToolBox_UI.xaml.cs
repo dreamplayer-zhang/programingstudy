@@ -2,20 +2,20 @@
 using RootTools.Trees;
 using System.Windows.Controls;
 
-namespace Root_VEGA_P_Vision.Engineer
+namespace Root_WindII_Option.Engineer
 {
     /// <summary>
-    /// VEGA_P_Vision_ToolBox_UI.xaml에 대한 상호 작용 논리
+    /// _bPresent_ToolBox_UI.xaml에 대한 상호 작용 논리
     /// </summary>
-    public partial class VEGA_P_Vision_ToolBox_UI : UserControl
+    public partial class WindII_Option_ToolBox_UI : UserControl
     {
-        public VEGA_P_Vision_ToolBox_UI()
+        public WindII_Option_ToolBox_UI()
         {
             InitializeComponent();
         }
 
-        VEGA_P_Vision_Engineer m_engineer;
-        public void Init(VEGA_P_Vision_Engineer engineer)
+        WindII_Option_Engineer m_engineer;
+        public void Init(WindII_Option_Engineer engineer)
         {
             m_engineer = engineer;
             logViewUI.Init(LogView._logView);
