@@ -1,4 +1,6 @@
-﻿using Root_EFEM.Module;
+﻿using Root_EFEM;
+using Root_EFEM.Module;
+using Root_WindII_Option.Module;
 using RootTools;
 using RootTools.GAFs;
 using RootTools.Gem;
@@ -10,9 +12,9 @@ using System.Threading;
 using System.Windows.Controls;
 using System.Windows.Media;
 
-namespace Root_EFEM
+namespace Root_WindII.Engineer
 {
-    public class EFEM_Handler : IHandler
+    public class WindII_Handler : IHandler
     {
         #region UI Binding
         public Brush p_brushHandler
@@ -26,28 +28,27 @@ namespace Root_EFEM
             get { return Brushes.BurlyWood; }
             set { }
         }
-        #endregion 
+        #endregion
 
         #region Module
         public ModuleList p_moduleList { get; set; }
         public EFEM_Recipe m_recipe;
-        public EFEM_Process m_process;
-
+        public EFEM_Process m_process; 
         void InitModule()
         {
             p_moduleList = new ModuleList(m_engineer);
-            InitWTR(); 
+            InitWTR();
             InitLoadport();
-            InitAligner();
-            InitVision();
+            InitBackside(ModuleBase.eRemote.Client);
+
             m_wtr.RunTree(Tree.eMode.RegRead);
             m_wtr.RunTree(Tree.eMode.Init);
             IWTR iWTR = (IWTR)m_wtr;
-            iWTR.ReadInfoReticle_Registry(); 
+            iWTR.ReadInfoReticle_Registry();
             m_recipe = new EFEM_Recipe("Recipe", m_engineer);
             foreach (ModuleBase module in p_moduleList.m_aModule.Keys) m_recipe.AddModule(module);
             m_process = new EFEM_Process("Process", m_engineer, iWTR, m_aLoadport);
-            CalcRecover(); 
+            CalcRecover();
         }
 
         void InitModule(ModuleBase module)
@@ -81,42 +82,42 @@ namespace Root_EFEM
         {
             switch (m_eWTR)
             {
-                case eWTR.Cymechs: m_wtr = new WTR_Cymechs("WTR", m_engineer);break;
+                case eWTR.Cymechs: m_wtr = new WTR_Cymechs("WTR", m_engineer); break;
                 default: m_wtr = new WTR_RND("WTR", m_engineer); break;
             }
-            InitModule(m_wtr); 
+            InitModule(m_wtr);
         }
 
         public void RunTreeWTR(Tree tree)
         {
-            m_eWTR = (eWTR)tree.Set(m_eWTR, m_eWTR, "Type", "WTR Type"); 
+            m_eWTR = (eWTR)tree.Set(m_eWTR, m_eWTR, "Type", "WTR Type");
         }
         #endregion
 
         #region Module Loadport
         enum eLoadport
-        { 
+        {
             RND,
             Cymechs,
         }
         List<eLoadport> m_aLoadportType = new List<eLoadport>();
-        List<ILoadport> m_aLoadport = new List<ILoadport>(); 
-        int m_lLoadport = 2; 
+        List<ILoadport> m_aLoadport = new List<ILoadport>();
+        int m_lLoadport = 2;
         void InitLoadport()
         {
             ModuleBase module;
-            char cLP = 'A'; 
+            char cLP = 'A';
             for (int n = 0; n < m_lLoadport; n++, cLP++)
             {
                 string sID = "Loadport" + cLP;
                 switch (m_aLoadportType[n])
                 {
                     case eLoadport.RND: module = new Loadport_RND(sID, m_engineer, true, true); break;
-                    case eLoadport.Cymechs: module = new Loadport_Cymechs(sID, m_engineer, true, true); break; 
+                    case eLoadport.Cymechs: module = new Loadport_Cymechs(sID, m_engineer, true, true); break;
                     default: module = new Loadport_RND(sID, m_engineer, true, true); break;
                 }
                 InitModule(module);
-                m_aLoadport.Add((ILoadport)module); 
+                m_aLoadport.Add((ILoadport)module);
                 ((IWTR)m_wtr).AddChild((IWTRChild)module);
             }
         }
@@ -143,7 +144,7 @@ namespace Root_EFEM
         {
             ModuleBase module;
             char cID = 'A';
-            for(int n=0; n<m_lLoadport; n++)
+            for (int n = 0; n < m_lLoadport; n++)
             {
                 string sID = "RFID" + cID;
                 switch (m_aRFIDType[n])
@@ -169,89 +170,14 @@ namespace Root_EFEM
         }
         #endregion
 
-        #region Module Aligner
-        enum eAligner
-        { 
-            None,
-            ATI,
-            RND
-        }
-        eAligner m_eAligner = eAligner.ATI;
-        void InitAligner()
+        #region Backside
+        bool m_bBackside = true;
+        public Backside m_backside;
+        void InitBackside(ModuleBase.eRemote eRemote)
         {
-            ModuleBase module = null; 
-            switch (m_eAligner)
-            {
-                case eAligner.ATI: module = new Aligner_ATI("Aligner", m_engineer); break;
-                case eAligner.RND: module = new Aligner_RND("Aligner", m_engineer); break; 
-            }
-            if (module != null)
-            {
-                InitModule(module);
-                ((IWTR)m_wtr).AddChild((IWTRChild)module);
-            }
-        }
-
-        public void RunTreeAligner(Tree tree)
-        {
-            m_eAligner = (eAligner)tree.Set(m_eAligner, m_eAligner, "Type", "Aligner Type");
-        }
-        #endregion
-
-        #region Module Vision
-        enum eVision
-        {
-            Backside,
-            EBR,
-            AOP
-        }
-        List<eVision> m_aVisionType = new List<eVision>();
-        int m_lVision = 1; 
-        void InitVision()
-        {
-            ModuleBase module; 
-            for (int n = 0; n < m_lVision; n++)
-            {
-                string sN = n.ToString("00"); 
-                string sID = "Vision" + sN; 
-                switch (m_aVisionType[n])
-                {
-                    case eVision.Backside: module = new Vision_Backside(GetVisionID(n), m_engineer); break;
-                    case eVision.EBR: module = new Vision_EBR(GetVisionID(n), m_engineer); break;
-                    case eVision.AOP: module = new Vision_AOP(GetVisionID(n), m_engineer); break;
-                    default: module = new Vision_AOP(GetVisionID(n), m_engineer); break; 
-                }
-                InitModule(module);
-                ((IWTR)m_wtr).AddChild((IWTRChild)module);
-            }
-        }
-
-        string GetVisionID(int n)
-        {
-            eVision eVision = m_aVisionType[n];
-            int nCount = 0;
-            foreach (eVision vision in m_aVisionType)
-            {
-                if (vision == eVision) nCount++; 
-            }
-            if (nCount == 1) return eVision.ToString();
-            nCount = 0; 
-            for (int i = 0; i < n; i++)
-            {
-                if (m_aVisionType[i] == eVision) nCount++;
-            }
-            return eVision.ToString() + nCount.ToString(); 
-        }
-
-        public void RunTreeVision(Tree tree)
-        {
-            m_lVision = tree.Set(m_lVision, m_lVision, "Count", "Vision Count");
-            while (m_aVisionType.Count < m_lVision) m_aVisionType.Add(eVision.AOP);
-            Tree treeType = tree.GetTree("Type");
-            for (int n = 0; n < m_lVision; n++)
-            {
-                m_aVisionType[n] = (eVision)treeType.Set(m_aVisionType[n], m_aVisionType[n], n.ToString("00"), "Vision Type");
-            }
+            if (m_bBackside == false) return;
+            m_backside = new Backside("Backside", m_engineer, eRemote);
+            InitModule(m_backside);
         }
         #endregion
 
@@ -322,22 +248,21 @@ namespace Root_EFEM
         public string AddSequence(dynamic infoSlot)
         {
             m_infoRnRSlot = infoSlot;
-            m_process.AddInfoWafer(infoSlot);
+            m_process.p_sInfo = m_process.AddInfoWafer(infoSlot); 
             return "OK";
         }
 
         public void CalcSequence()
         {
-            m_process.ReCalcSequence();
-            CalcDockingUndocking(); 
+            m_process.ReCalcSequence(); 
+            CalcDockingUndocking();
         }
 
         public void CalcRecover()
         {
-            m_process.CalcRecover();
+            m_process.CalcRecover(); 
             CalcDockingUndocking();
         }
-
         void CalcDockingUndocking()
         {
             List<EFEM_Process.Sequence> aSequence = new List<EFEM_Process.Sequence>();
@@ -370,18 +295,18 @@ namespace Root_EFEM
         {
             foreach (EFEM_Process.Sequence sequence in aSequence)
             {
-                if (loadport.p_id == sequence.m_infoWafer.m_sModule) return true; 
+                if (loadport.p_id == sequence.m_infoWafer.m_sModule) return true;
             }
-            return false; 
+            return false;
         }
 
         bool CalcUnload(ILoadport loadport, List<EFEM_Process.Sequence> aSequence)
         {
             foreach (EFEM_Process.Sequence sequence in aSequence)
             {
-                if (loadport.p_id == sequence.m_infoWafer.m_sModule) return false; 
+                if (loadport.p_id == sequence.m_infoWafer.m_sModule) return false;
             }
-            return true; 
+            return true;
         }
         #endregion
 
@@ -430,7 +355,6 @@ namespace Root_EFEM
                 {
                     case EQ.eState.Home: StateHome(); break;
                     case EQ.eState.Run:
-                    case EQ.eState.Recovery:
                         if (p_moduleList.m_qModuleRun.Count == 0)
                         {
                             m_process.p_sInfo = m_process.RunNextSequence();
@@ -453,21 +377,19 @@ namespace Root_EFEM
         {
             RunTreeWTR(tree.GetTree("WTR"));
             RunTreeLoadport(tree.GetTree("Loadport"));
-            RunTreeRFID(tree.GetTree("RFID"));
-            RunTreeAligner(tree.GetTree("Aligner"));
-            RunTreeVision(tree.GetTree("Vision"));
+            m_bBackside = tree.Set(m_bBackside, m_bBackside, "Backside", "Use Backside");
         }
         #endregion
 
         string m_id;
-        public EFEM_Engineer m_engineer;
+        public WindII_Engineer m_engineer;
         public GAF m_gaf;
         IGem m_gem;
 
         public void Init(string id, IEngineer engineer)
         {
             m_id = id;
-            m_engineer = (EFEM_Engineer)engineer;
+            m_engineer = (WindII_Engineer)engineer;
             m_gaf = engineer.ClassGAF();
             m_gem = engineer.ClassGem();
             InitModule();
