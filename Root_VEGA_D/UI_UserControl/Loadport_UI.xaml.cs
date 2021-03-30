@@ -66,7 +66,6 @@ namespace Root_VEGA_D
             bool bPlaced = m_loadport.CheckPlaced();
 
             if (m_handler.IsEnableRecovery() == true) return false;
-            return true;
             return bReadyLoadport && bReadyToLoad && bReadyState && bEQReadyState && bPlaced;
         }
 

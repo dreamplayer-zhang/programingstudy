@@ -132,8 +132,8 @@ namespace Root_VEGA_D.Engineer
             int cLP = 1;
             for (int n = 0; n < m_lLoadport; n++, cLP++)
             {
-                //string sID = "Loadport" + cLP;
-                string sID = "LP" + cLP;
+                string sID = "Loadport" + cLP;
+                //string sID = "LP" + cLP;
                 switch (m_aLoadportType[n])
                 {
                     case eLoadport.RND: module = new Loadport_RND(sID, m_engineer, true, true); break;
