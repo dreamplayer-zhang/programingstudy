@@ -450,6 +450,19 @@ namespace Root_CAMELLIA
             }
         }
 
+        PMCheckReview_ViewModel m_PMCheckReview_ViewModel = new PMCheckReview_ViewModel();
+        public PMCheckReview_ViewModel p_PMCheckReview_ViewModel
+        {
+            get
+            {
+                return m_PMCheckReview_ViewModel;
+            }
+            set
+            {
+                SetProperty(ref m_PMCheckReview_ViewModel, value);
+            }
+        }
+
 
 
         #endregion
@@ -715,6 +728,10 @@ namespace Root_CAMELLIA
             {
                 return new RelayCommand(() =>
                 {
+                    if (CheckAxis())
+                    {
+                        return;
+                    }
                     // 선택한 작업점 위치로 Move
                     Thread thread = new Thread(() =>
                     {
@@ -758,6 +775,10 @@ namespace Root_CAMELLIA
             {
                 return new RelayCommand(() =>
                 {
+                    if (CheckAxis())
+                    {
+                        return;
+                    }
                     // Select Axis Home
                     Thread thread = new Thread(() =>
                     {
@@ -776,6 +797,10 @@ namespace Root_CAMELLIA
             {
                 return new RelayCommand(() =>
                 {
+                    if (CheckAxis())
+                    {
+                        return;
+                    }
                     // 지금 축 위치 propertygrid에 set
                     double pos = SelectedAxis.p_posActual;
                     CurrentAxisWorkPoints[SelectedWorkPointIndex].Value = pos;
@@ -814,6 +839,10 @@ namespace Root_CAMELLIA
             {
                 return new RelayCommand(() =>
                 {
+                    if (!CheckAxis())
+                    {
+                        return;
+                    }
                     SelectedAxis.ServoOn(!AxisX.p_bServoOn);
                     SelectedAxis.ServoOn(!AxisY.p_bServoOn);
                 });
@@ -825,6 +854,10 @@ namespace Root_CAMELLIA
             {
                 return new RelayCommand(() =>
                 {
+                    if (!CheckAxis())
+                    {
+                        return;
+                    }
                     //select Axis jog
                     string str = SelectedAxis.Jog(-1);
                     if (str != "OK")
@@ -840,6 +873,10 @@ namespace Root_CAMELLIA
             {
                 return new RelayCommand(() =>
                 {
+                    if (!CheckAxis())
+                    {
+                        return;
+                    }
                     string str = SelectedAxis.Jog(-0.31);
                     if (str != "OK")
                     {
@@ -854,7 +891,10 @@ namespace Root_CAMELLIA
             {
                 return new RelayCommand(() =>
                 {
-
+                    if (!CheckAxis())
+                    {
+                        return;
+                    }
                     string str = SelectedAxis.StartMove(-PosValue);
                     if(str != "OK")
                     {
@@ -870,6 +910,10 @@ namespace Root_CAMELLIA
             {
                 return new RelayCommand(() =>
                 {
+                    if (!CheckAxis())
+                    {
+                        return;
+                    }
                     string str = SelectedAxis.StartMove(PosValue);
                     if (str != "OK")
                     {
@@ -885,6 +929,10 @@ namespace Root_CAMELLIA
             {
                 return new RelayCommand(() =>
                 {
+                    if (!CheckAxis())
+                    {
+                        return;
+                    }
                     string str = SelectedAxis.Jog(0.31);
                     if (str != "OK")
                     {
@@ -900,6 +948,10 @@ namespace Root_CAMELLIA
             {
                 return new RelayCommand(() =>
                 {
+                    if (!CheckAxis())
+                    {
+                        return;
+                    }
                     string str = SelectedAxis.Jog(1);
                     if (str != "OK")
                     {
@@ -914,7 +966,7 @@ namespace Root_CAMELLIA
             {
                 return new RelayCommand(() =>
                 {
-                    if(SelectedAxis == null)
+                    if (!CheckAxis())
                     {
                         return;
                     }
@@ -925,6 +977,16 @@ namespace Root_CAMELLIA
             }
         }
         #endregion
+
+        private bool CheckAxis()
+        {
+            if(SelectedAxis == null)
+            {
+                MessageBox.Show("Please Select Axis", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                return false;
+            }
+            return true;
+        }
 
         #region SR Command
         public ICommand CmdCentering
@@ -982,7 +1044,30 @@ namespace Root_CAMELLIA
 
         #region General Command
 
-        
+        public ICommand CmdTest
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    //if (!ModuleCamellia.p_CamVRS.p_CamInfo.OpenStatus)
+                    //{
+                    //    ModuleCamellia.p_CamVRS.Connect();
+                    //}
+                    //while (!ModuleCamellia.p_CamVRS.m_ConnectDone) ;
+
+                    //// if(연결되있을 경우만)
+                    //p_rootViewer.p_ImageData = ModuleCamellia.p_CamVRS.p_ImageViewer.p_ImageData;
+                    Thread thread = new Thread(() =>
+                    {
+                        Run_Delay delay = (Run_Delay)ModuleCamellia.CloneModuleRun("Delay");
+                        ModuleCamellia.StartRun(delay);
+                    });
+                    thread.Start();
+                    //StageCenterPos = measure.m_StageCenterPos_pulse;
+                });
+            }
+        }
 
         public ICommand LoadedCommand
         {

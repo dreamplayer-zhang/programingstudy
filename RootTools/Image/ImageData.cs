@@ -197,6 +197,7 @@ namespace RootTools
             p_Size = new CPoint(40000, 40000);
             m_ToolMemory = tool;
         }
+
         public byte[] GetData(System.Drawing.Rectangle View_Rect, int CanvasWidth, int CanvasHeight)
         {
             return m_ToolMemory.GetOtherMemory(View_Rect, CanvasWidth, CanvasHeight, m_sPool, m_sGroup, m_sMem, p_nPlane);
@@ -2317,6 +2318,28 @@ namespace RootTools
 
 
         }
+
+        public static Mat ToMat(BitmapSource source)
+        {
+            if (source.Format == PixelFormats.Bgra32)
+            {
+                Mat result = new Mat();
+                result.Create(source.PixelHeight, source.PixelWidth, DepthType.Cv8U, 4);
+                source.CopyPixels(Int32Rect.Empty, result.DataPointer, result.Step * result.Rows, result.Step);
+                return result;
+            }
+            else if (source.Format == PixelFormats.Bgr24)
+            {
+                Mat result = new Mat();
+                result.Create(source.PixelHeight, source.PixelWidth, DepthType.Cv8U, 3);
+                source.CopyPixels(Int32Rect.Empty, result.DataPointer, result.Step * result.Rows, result.Step);
+                return result;
+            }
+            else
+            {
+                throw new Exception(String.Format("Convertion from BitmapSource of format {0} is not supported.", source.Format));
+            }
+        } 
         public static BitmapSource ToBitmapSource(Image<Bgra, byte> image)
         {
             using (System.Drawing.Bitmap source = image.Bitmap)

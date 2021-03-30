@@ -39,10 +39,12 @@
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="5*"/>
-                        <ColumnDefinition Width="3*"/>
                     </Grid.ColumnDefinitions>
                     <Grid Grid.Row="0">
-                        <tools:RootViewer DataContext="{Binding p_rootViewer}"></tools:RootViewer>
+                        <!--<tools:RootViewer DataContext="{Binding p_rootViewer}"></tools:RootViewer>-->
+                        <Canvas x:Name="canvas">
+                            <Image Source="{Binding p_imageSource, UpdateSourceTrigger=PropertyChanged}" Width="{Binding Path=ActualWidth, ElementName=canvas}" Height="{Binding Path=ActualHeight, ElementName=canvas}"  Stretch="Uniform"></Image>    
+                        </Canvas>
                     </Grid>
                     <Grid Grid.Row="1">
                     </Grid>

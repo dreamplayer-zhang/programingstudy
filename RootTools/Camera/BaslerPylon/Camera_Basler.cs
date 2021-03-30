@@ -21,6 +21,7 @@ namespace RootTools.Camera.BaslerPylon
         public Dispatcher _dispatcher;
 
         public event System.EventHandler Grabed;
+        public event System.EventHandler Captured;
         public event System.EventHandler Connected;
 
         #region Property
@@ -495,7 +496,11 @@ namespace RootTools.Camera.BaslerPylon
         {
             get
             {
-                return new RelayCommand(GrabOneShot);
+                return new RelayCommand(() =>
+                {
+                    GrabOneShot();
+                    
+                });
             }
             set
             {
@@ -536,12 +541,14 @@ namespace RootTools.Camera.BaslerPylon
             }
         }
 
+        bool isGrabOneShot { get; set; } = false;
         public void GrabOneShot()
         {
             try
             {
                 if (m_cam.IsOpen)
                 {
+                    isGrabOneShot = true;
                     //stopWatch.Reset();
                     stopWatch.Restart();
 
@@ -566,9 +573,11 @@ namespace RootTools.Camera.BaslerPylon
                     _dispatcher.Invoke(new Action(delegate ()
                     {
                         p_ImageViewer.SetRoiRect();
+                       
                     }));
                 }
                 m_cam.StreamGrabber.Start(1, GrabStrategy.OneByOne, GrabLoop.ProvidedByStreamGrabber);
+                CapturedEvent();
             }
             catch (Exception) { }
         }
@@ -763,6 +772,7 @@ namespace RootTools.Camera.BaslerPylon
                 e.DisposeGrabResultIfClone();
             }
         }
+
         private void OnImageGrabbed(Object sender, ImageGrabbedEventArgs e)
         {
             try
@@ -792,8 +802,12 @@ namespace RootTools.Camera.BaslerPylon
                                 byte[] aBuf = grabResult.PixelData as byte[];
                                 Marshal.Copy(aBuf, 0, m_ImageGrab.GetPtr(), m_ImageGrab.p_Size.X * m_ImageGrab.p_Size.Y);
                             }
+                            //if (isGrabOneShot && test == 0)
+                            //{
+                            //    CapturedEvent();
+                            //    test++;
+                            //}
                             GrabEvent();
-
                             // 최대 30프레임으로 화면 업데이트
                             //if (stopWatch.ElapsedMilliseconds > 33)
                             {
@@ -878,6 +892,20 @@ namespace RootTools.Camera.BaslerPylon
         {
             if (Grabed != null)
                 Grabed.Invoke(this, e);
+        }
+
+        void CapturedEvent()
+        {
+            if (Captured != null)
+                OnCaptured();
+        }
+
+        protected virtual void OnCaptured()
+        {
+            if(Captured != null)
+            {
+                Captured.Invoke(this, new EventArgs());
+            }
         }
 
         void ConnectEvent()
