@@ -143,6 +143,11 @@ namespace RootTools.Comm
             }
         }
 
+        public void Send(byte[] p)
+        {
+            m_socket.Send(p);
+        }
+
         void CallBackSend(IAsyncResult ar)
         {
             Async async = (Async)ar.AsyncState;

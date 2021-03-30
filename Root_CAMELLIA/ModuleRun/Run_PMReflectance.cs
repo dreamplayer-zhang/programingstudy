@@ -85,27 +85,27 @@ namespace Root_CAMELLIA.Module
                 setting = m_SettingDataWithErrorCode.Item1;
 
                 ////Init Cal
-                //if (App.m_nanoView.Calibration(setting.nBGIntTime_VIS, setting.nBGIntTime_NIR, setting.nAverage_VIS, setting.nAverage_NIR, m_InitialCal, m_DataManager.recipeDM.MeasurementRD.VISIntegrationTime, m_DataManager.recipeDM.MeasurementRD.NIRIntegrationTime) == Met.Nanoview.ERRORCODE_NANOVIEW.SR_NO_ERROR)
-                //{
-                //    m_InitialCal = false;
-                //    m_log.Info("[CheckSensorTilt] Init Calbration OK");
+                if (App.m_nanoView.Calibration(m_InitialCal )== Met.Nanoview.ERRORCODE_NANOVIEW.SR_NO_ERROR)
+                {
+                    m_InitialCal = false;
+                    m_log.Info("[CheckSensorTilt] Init Calbration OK");
 
-                //}
-                //else
-                //{
-                //    m_log.Info("[CheckSensorTilt] Init Calbration fail");
-                //    return "[CheckSensorTilt] Init Calbration fail";
-                //}
+                }
+                else
+                {
+                    m_log.Info("[CheckSensorTilt] Init Calbration fail");
+                    return "[CheckSensorTilt] Init Calbration fail";
+                }
                 ////Sample Cal
-                //if (App.m_nanoView.Calibration(setting.nBGIntTime_VIS, setting.nBGIntTime_NIR, setting.nAverage_VIS, setting.nAverage_NIR, m_InitialCal, m_DataManager.recipeDM.MeasurementRD.VISIntegrationTime, m_DataManager.recipeDM.MeasurementRD.NIRIntegrationTime) == Met.Nanoview.ERRORCODE_NANOVIEW.SR_NO_ERROR)
-                //{
-                //    m_log.Info("[CheckSensorTilt] Sample Calbration OK");
-                //}
-                //else
-                //{
-                //    m_log.Info("[CheckSensorTilt] Init Calbration fail");
-                //    return "[CheckSensorTilt] Init Calbration fail";
-                //}
+                if (App.m_nanoView.Calibration(m_InitialCal) == Met.Nanoview.ERRORCODE_NANOVIEW.SR_NO_ERROR)
+                {
+                    m_log.Info("[CheckSensorTilt] Sample Calbration OK");
+                }
+                else
+                {
+                    m_log.Info("[CheckSensorTilt] Init Calbration fail");
+                    return "[CheckSensorTilt] Init Calbration fail";
+                }
             }
             else
             {

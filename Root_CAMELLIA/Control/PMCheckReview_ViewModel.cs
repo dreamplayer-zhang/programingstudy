@@ -98,6 +98,7 @@ namespace Root_CAMELLIA
                 SetProperty(ref m_DataTable, value);
             }
         }
+
         public void UpdatePMList ()
         {
             p_DataTable.Clear();
@@ -161,31 +162,18 @@ namespace Root_CAMELLIA
 
         private void PMReflectanceRepeatability ()
         {
-            //EQ.p_bStop = false;
-            //if (ModuleCamellia.p_eState != ModuleBase.eState.Ready)
-            //{
-            //    MessageBox.Show("Vision Home이 완료 되지 않았습니다.");
-            //    return;
-            //}
-            //Thread thread = new Thread(() =>
-            //{
-            //    Run_PMReflectance ReflectanceRepeatability = (Run_PMReflectance)ModuleCamellia.CloneModuleRun("PMTiltAlign");
-            //    ReflectanceRepeatability.Run();
-            //});
-            //thread.Start();
-
-            Mat mat = ImageHelper.ToMat(p_imageSource);
-            //CvInvoke.Imshow("test", mat);
-            //CvInvoke.WaitKey(0);
-            //CvInvoke.DestroyAllWindows();
-
-            //Image<Gray, byte> image = mat.ToImage<Gray, byte>();
-            //Mat gray = new Mat();
-            //gray = image.Mat;
-            //CvInvoke.Sobel(gray, gray, Emgu.CV.CvEnum.DepthType.Cv8U, 1 ,1);
-
-            //p_imageSource = ImageHelper.ToBitmapSource(gray.ToImage<Gray, byte>());
-
+            EQ.p_bStop = false;
+            if (ModuleCamellia.p_eState != ModuleBase.eState.Ready)
+            {
+                MessageBox.Show("Vision Home이 완료 되지 않았습니다.");
+                return;
+            }
+            Thread thread = new Thread(() =>
+            {
+                Run_PMReflectance ReflectanceRepeatability = (Run_PMReflectance)ModuleCamellia.CloneModuleRun("PMReflectance");
+                ReflectanceRepeatability.Run();
+            });
+            thread.Start();
         }
         private void PMThickenssRepeatability ()
         {
@@ -197,7 +185,7 @@ namespace Root_CAMELLIA
             }
             Thread thread = new Thread(() =>
             {
-                Run_PMThickness ThicknessRepeatability = (Run_PMThickness)ModuleCamellia.CloneModuleRun("PMTiltAlign");
+                Run_PMThickness ThicknessRepeatability = (Run_PMThickness)ModuleCamellia.CloneModuleRun("PMThickness");
                 ThicknessRepeatability.Run();
             });
             thread.Start();
@@ -212,7 +200,7 @@ namespace Root_CAMELLIA
             }
             Thread thread = new Thread(() =>
             {
-                Run_PMSensorStageAlign SensorStageAlign = (Run_PMSensorStageAlign)ModuleCamellia.CloneModuleRun("PMTiltAlign");
+                Run_PMSensorStageAlign SensorStageAlign = (Run_PMSensorStageAlign)ModuleCamellia.CloneModuleRun("PMSensorStageAlign");
                 SensorStageAlign.Run();
             });
             thread.Start();
@@ -227,7 +215,7 @@ namespace Root_CAMELLIA
             }
             Thread thread = new Thread(() =>
             {
-                Run_PMSensorCameraTilt SensorCameraTilt= (Run_PMSensorCameraTilt)ModuleCamellia.CloneModuleRun("PMTiltAlign");
+                Run_PMSensorCameraTilt SensorCameraTilt= (Run_PMSensorCameraTilt)ModuleCamellia.CloneModuleRun("PMSensorCameraTilt");
                 SensorCameraTilt.Run();
             });
             thread.Start();

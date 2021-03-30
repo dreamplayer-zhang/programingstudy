@@ -201,7 +201,6 @@ namespace Root_WIND2.UI_User
 
         public void SetParameter()
         {
-            if (IsLoaded) return;
             List<ParameterBase> paramList = new List<ParameterBase>();
             foreach (InspectionItem item in p_cInspItem)
             {
@@ -225,17 +224,16 @@ namespace Root_WIND2.UI_User
             recipe.ParameterItemList = paramList;
         }
 
+        
 
-        bool IsLoaded = false;
         #region ICommand
         public ICommand LoadedCommand
         {
             get => new RelayCommand(() =>
             {
                 this.ImageViewerVM.DisplayBox();
-                IsLoaded = true;
+
                 LoadRecipe();
-                IsLoaded = false;
             });
         }
 

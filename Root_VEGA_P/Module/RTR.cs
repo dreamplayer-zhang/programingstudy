@@ -61,12 +61,6 @@ namespace Root_VEGA_P.Module
         #region EOP Arm
         public class ArmEOP : IArm
         {
-            public string p_id { get; set; }
-            public ArmEOP(string id)
-            {
-                p_id = id;
-            }
-
             public DIO_I m_diArmClose;
             public DIO_I m_diCheckDome;
             public DIO_I m_diCheckDoor;
@@ -86,6 +80,12 @@ namespace Root_VEGA_P.Module
             {
                 return m_diCheckDome.p_bIn || m_diCheckDoor.p_bIn;
             }
+
+            public string p_id { get; set; }
+            public ArmEOP(string id)
+            {
+                p_id = id;
+            }
         }
         public ArmEOP m_armEOP = new ArmEOP("EOP");
         #endregion
@@ -93,19 +93,18 @@ namespace Root_VEGA_P.Module
         #region EIP Arm
         public class ArmEIP : IArm
         {
-            public string p_id { get; set; }
-            public ArmEIP(string id)
+            enum eGrip
             {
-                p_id = id;
+                Home,
+                Grip,
+                Empty
             }
-
             public DIO_I m_diArmClose;
             public DIO_Is m_diGrip;
-            string[] m_asGrip = new string[3] { "Home", "Grip", "Empty" };
             public void GetTools(ToolBox toolBox, RTR module)
             {
                 module.p_sInfo = toolBox.GetDIO(ref m_diArmClose, module, p_id + ".ArmClose");
-                module.p_sInfo = toolBox.GetDIO(ref m_diGrip, module, p_id + ".Grip", m_asGrip); 
+                module.p_sInfo = toolBox.GetDIO(ref m_diGrip, module, p_id + ".Grip", Enum.GetNames(typeof(eGrip))); 
             }
 
             public string RunGrip(bool bGrip, RTR module)
@@ -123,7 +122,13 @@ namespace Root_VEGA_P.Module
 
             public bool IsPodExist()
             {
-                return m_diGrip.ReadDI(m_asGrip[1]);
+                return m_diGrip.ReadDI(eGrip.Grip);
+            }
+
+            public string p_id { get; set; }
+            public ArmEIP(string id)
+            {
+                p_id = id;
             }
         }
         public ArmEIP m_armEIP = new ArmEIP("EIP");
@@ -616,8 +621,7 @@ namespace Root_VEGA_P.Module
 
         #region IRTRChild
         public List<string> m_asChild = new List<string>();
-        List<IRTRChild> _aChild = new List<IRTRChild>();
-        public List<IRTRChild> p_aChild { get { return _aChild; } }
+        public List<IRTRChild> p_aChild { get; set; }
         public void AddChild(params IRTRChild[] childs)
         {
             foreach (IRTRChild child in childs)
@@ -706,6 +710,7 @@ namespace Root_VEGA_P.Module
 
         public RTR(string id, IEngineer engineer)
         {
+            p_aChild = new List<IRTRChild>(); 
             InitBase(id, engineer);
         }
 

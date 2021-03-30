@@ -342,8 +342,7 @@
                                                 </Grid>
                                             </Grid>
                                             <Grid Grid.Row="1">
-                                                <GroupBox Header="Reflectance Graph">
-                                                </GroupBox>
+                                                <met:PMRGraph Width="auto" Height="auto"/>
                                             </Grid>
                                         </Grid>
                                     </TabItem>

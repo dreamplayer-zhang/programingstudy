@@ -393,7 +393,7 @@ namespace RootTools.Control
         public virtual string StartMove(double fPos, string sSpeed = null)
         {
             m_posDst = fPos;
-            m_speedNow = (sSpeed != null) ? GetSpeedValue(sSpeed) : GetSpeedValue(EQ.p_bDoorOpen ? eSpeed.Move : eSpeed.Move_DoorOpen);
+            m_speedNow = (sSpeed != null) ? GetSpeedValue(sSpeed) : GetSpeedValue(EQ.p_bDoorOpen ? eSpeed.Move_DoorOpen : eSpeed.Move);
             m_swMove.Start();
             if (EQ.IsStop()) return p_id + " EQ Stop";
             if (EQ.p_bSimulate) return "OK";

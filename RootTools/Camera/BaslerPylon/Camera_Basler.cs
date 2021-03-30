@@ -76,6 +76,17 @@ namespace RootTools.Camera.BaslerPylon
         Basler.Pylon.Camera m_cam;
         int m_nGrabTimeout = 2000;
         ImageData m_ImageGrab;
+        public ImageData p_ImageData
+        {
+            get
+            {
+                return m_ImageGrab;
+            }
+            set
+            {
+                SetProperty(ref m_ImageGrab, value);
+            }
+        }
         ImageViewer_ViewModel m_ImageViewer;
         public bool m_ConnectDone = false;
         public ImageViewer_ViewModel p_ImageViewer
@@ -461,7 +472,7 @@ namespace RootTools.Camera.BaslerPylon
             }
         }
 
-
+        #region RelayCommand
         public RelayCommand UserSetSaveCommand
         {
             get
@@ -540,15 +551,13 @@ namespace RootTools.Camera.BaslerPylon
             {
             }
         }
-
-        bool isGrabOneShot { get; set; } = false;
+        #endregion
         public void GrabOneShot()
         {
             try
             {
                 if (m_cam.IsOpen)
                 {
-                    isGrabOneShot = true;
                     //stopWatch.Reset();
                     stopWatch.Restart();
 
@@ -802,11 +811,6 @@ namespace RootTools.Camera.BaslerPylon
                                 byte[] aBuf = grabResult.PixelData as byte[];
                                 Marshal.Copy(aBuf, 0, m_ImageGrab.GetPtr(), m_ImageGrab.p_Size.X * m_ImageGrab.p_Size.Y);
                             }
-                            //if (isGrabOneShot && test == 0)
-                            //{
-                            //    CapturedEvent();
-                            //    test++;
-                            //}
                             GrabEvent();
                             // 최대 30프레임으로 화면 업데이트
                             //if (stopWatch.ElapsedMilliseconds > 33)
