@@ -49,11 +49,13 @@
             <i:InvokeCommandAction Command="{Binding LoadedCommand}" />
         </i:EventTrigger>
     </i:Interaction.Triggers>
+    
     <Grid Background="{StaticResource main_view_background}">
+
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="45*"/>
+            <ColumnDefinition Width="45*"/>
+            <ColumnDefinition Width="10*"/>
         </Grid.ColumnDefinitions>
         <GroupBox Margin="4"
                   Header="Recipe List" Style="{StaticResource main_view_groupbox}">
@@ -62,7 +64,7 @@
                     <ColumnDefinition Width="9*"/>
                     <ColumnDefinition Width="1*"/>
                 </Grid.ColumnDefinitions>
-                <vision:RecipeListViewer Grid.Column="0" DataContext="{Binding RecipeListViewerVM}"/>
+                <vision:RecipeSelectionViewer Grid.Column="0" DataContext="{Binding RecipeSelectionViewerVM}"/>
                 <StackPanel Grid.Column="1"
                             Orientation="Vertical">
                     <Button Content="Open" Style="{StaticResource RecipeListViewerButton}" Margin="0,4,4 4"/>
@@ -73,36 +75,13 @@
             </Grid>
         </GroupBox>
 
-        <Grid Grid.Column="1">
-            <Grid.RowDefinitions>
-                <RowDefinition />
-                <RowDefinition />
-                <RowDefinition />
-                <RowDefinition />
-                <RowDefinition />
-            </Grid.RowDefinitions>
-
-            <GroupBox Grid.Row="0"
-                      Margin="4"
-                      Header="Frontside" Style="{StaticResource main_view_groupbox}">
-            </GroupBox>
-            <GroupBox Grid.Row="1"
-                      Margin="4"
-                      Header="Backside" Style="{StaticResource main_view_groupbox}">
-            </GroupBox>
-            <GroupBox Grid.Row="2"
-                      Margin="4"
-                      Header="Edge" Style="{StaticResource main_view_groupbox}">
-            </GroupBox>
-            <GroupBox Grid.Row="3"
-                      Margin="4"
-                      Header="EBR" Style="{StaticResource main_view_groupbox}">
-            </GroupBox>
-            <GroupBox Grid.Row="4"
-                      Margin="4"
-                      Header="Alignment" Style="{StaticResource main_view_groupbox}">
-            </GroupBox>
-
+        <Grid Grid.Column="1" >
+            <ListBox Margin="4"
+                     ItemsSource="{Binding ModuleList}"
+                     SelectedIndex="{Binding p_SelectedChipIndex}"
+                     HorizontalContentAlignment="Stretch"
+                     Background="Transparent">
+            </ListBox>
         </Grid>
     </Grid>
 </UserControl>

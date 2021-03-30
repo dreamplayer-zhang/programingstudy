@@ -33,7 +33,7 @@ namespace Root_WindII_Option.Engineer
         void InitModule()
         {
             p_moduleList = new ModuleList(m_engineer);
-            InitBackside(p_moduleList, ModuleBase.eRemote.Server); 
+            InitBackside(ModuleBase.eRemote.Server); 
         }
 
         void InitModule(ModuleBase module)
@@ -47,13 +47,11 @@ namespace Root_WindII_Option.Engineer
         #region Backside
         bool m_bBackside = true; 
         public Backside m_backside;
-        void InitBackside(ModuleList moduleList, ModuleBase.eRemote eRemote)
+        void InitBackside(ModuleBase.eRemote eRemote)
         {
             if (m_bBackside == false) return; 
             m_backside = new Backside("Backside", m_engineer, eRemote);
-            ModuleBase_UI ui = new ModuleBase_UI();
-            ui.Init(m_backside);
-            moduleList.AddModule(m_backside, ui);
+            InitModule(m_backside); 
         }
         #endregion
 

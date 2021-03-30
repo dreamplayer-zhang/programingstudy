@@ -165,6 +165,18 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Page Include="Engineer\WindII_Engineer_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Engineer\WindII_Handler_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Engineer\WindII_ToolBox_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -172,6 +184,17 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Engineer\WindII_Engineer.cs" />
+    <Compile Include="Engineer\WindII_Engineer_UI.xaml.cs">
+      <DependentUpon>WindII_Engineer_UI.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Engineer\WindII_Handler.cs" />
+    <Compile Include="Engineer\WindII_Handler_UI.xaml.cs">
+      <DependentUpon>WindII_Handler_UI.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Engineer\WindII_ToolBox_UI.xaml.cs">
+      <DependentUpon>WindII_ToolBox_UI.xaml</DependentUpon>
     </Compile>
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
@@ -204,6 +227,20 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\RootTools\RootTools.csproj">
+      <Project>{ce787353-5e00-4574-9f49-7cee7f087a86}</Project>
+      <Name>RootTools</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Root_EFEM\Root_EFEM.csproj">
+      <Project>{23175072-261b-4601-8909-152ee93b78f0}</Project>
+      <Name>Root_EFEM</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Root_WindII_Option\Root_WindII_Option.csproj">
+      <Project>{280678a3-0e0d-4e62-8803-48b4c68fb8fc}</Project>
+      <Name>Root_WindII_Option</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
