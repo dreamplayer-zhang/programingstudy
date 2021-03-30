@@ -14,7 +14,7 @@ using System.Windows.Media;
 
 namespace Root_AOP01_Packing
 {
-    public class AOP01_Handler : IHandler
+    public class AOP01_Handler : ObservableObject, IHandler
     {
         #region UI Binding
         public Brush p_brushHandler
@@ -28,6 +28,8 @@ namespace Root_AOP01_Packing
             get { return Brushes.BurlyWood; }
             set { }
         }
+
+
         #endregion 
 
         #region Module
@@ -153,9 +155,15 @@ namespace Root_AOP01_Packing
         }
 
         protected string StateHome(List<ModuleBase> aModule)
-        {
-            foreach (ModuleBase module in aModule) module.StartHome();
+        {           
+            foreach (ModuleBase module in aModule)
+            {
+                module.StartHome();
+            }
+            p_moduleList.p_maxRun = aModule.Count;
+            p_moduleList.p_iRun = 0;
             bool bHoming = true;
+            List<string> HomeDoneList = new List<string>();
             while (bHoming)
             {
                 Thread.Sleep(10);
@@ -163,7 +171,19 @@ namespace Root_AOP01_Packing
                 foreach (ModuleBase module in aModule)
                 {
                     if (module.p_eState == ModuleBase.eState.Home) bHoming = true;
+                    if (module.p_eState == ModuleBase.eState.Ready)
+                    {
+                        if (!HomeDoneList.Contains(module.p_id))
+                        {
+                            HomeDoneList.Add(module.p_id);
+                            p_moduleList.p_iRun++;
+                        }
+                    }
+                    
                 }
+                p_moduleList.p_Percent = (HomeDoneList.Count * 10).ToString();
+                
+                
             }
             foreach (ModuleBase module in aModule)
             {
@@ -171,9 +191,12 @@ namespace Root_AOP01_Packing
                 {
                     EQ.p_bStop = true;
                     EQ.p_eState = EQ.eState.Init;
+                    p_moduleList.p_sNowProgress = "INIT ERROR";
                     return module.p_id + " Home Error";
                 }
             }
+
+            p_moduleList.p_sNowProgress = "INIT DONE";
             return "OK";
         }
         #endregion

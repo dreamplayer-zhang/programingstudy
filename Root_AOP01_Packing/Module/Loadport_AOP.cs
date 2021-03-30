@@ -392,10 +392,10 @@ namespace Root_AOP01_Packing.Module
         #region StateHome
         public override string StateHome()
         {
-            if (EQ.p_bSimulate == false)
+            if (EQ.p_bSimulate)
             {
-                p_sInfo = base.StateHome();
-                if (p_sInfo != "OK") return p_sInfo; 
+                p_eState = eState.Ready;
+                return "OK";
             }
             p_sInfo = base.StateHome();
             p_eState = (p_sInfo == "OK") ? eState.Ready : eState.Error;
