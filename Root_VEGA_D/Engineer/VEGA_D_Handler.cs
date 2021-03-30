@@ -34,7 +34,7 @@ namespace Root_VEGA_D.Engineer
         #region Module
         public ModuleList p_moduleList { get; set; }
         public VEGA_D_Recipe m_recipe;
-        public EFEM_Process m_process;
+        public VEGA_D_Process m_process;
         public Vision m_vision;
         public Vision_IPU m_visionIPU;
         public HomeProgress_UI m_HomeProgress = new HomeProgress_UI();
@@ -70,7 +70,7 @@ namespace Root_VEGA_D.Engineer
             iWTR.ReadInfoReticle_Registry();
             m_recipe = new VEGA_D_Recipe("Recipe", m_engineer);
             foreach (ModuleBase module in p_moduleList.m_aModule.Keys) m_recipe.AddModule(module);
-            m_process = new EFEM_Process("Process", m_engineer, iWTR, m_aLoadport);
+            m_process = new VEGA_D_Process("Process", m_engineer, iWTR);
             CalcRecover();
         }
 
@@ -129,10 +129,11 @@ namespace Root_VEGA_D.Engineer
         void InitLoadport()
         {
             ModuleBase module;
-            char cLP = 'A';
+            int cLP = 1;
             for (int n = 0; n < m_lLoadport; n++, cLP++)
             {
-                string sID = "Loadport" + cLP;
+                //string sID = "Loadport" + cLP;
+                string sID = "LP" + cLP;
                 switch (m_aLoadportType[n])
                 {
                     case eLoadport.RND: module = new Loadport_RND(sID, m_engineer, true, true); break;
@@ -288,7 +289,7 @@ namespace Root_VEGA_D.Engineer
 
         void CalcDockingUndocking()
         {
-            List<EFEM_Process.Sequence> aSequence = new List<EFEM_Process.Sequence>();
+            List<VEGA_D_Process.Sequence> aSequence = new List<VEGA_D_Process.Sequence>();
             while (m_process.m_qSequence.Count > 0) aSequence.Add(m_process.m_qSequence.Dequeue());
             List<ILoadport> aDock = new List<ILoadport>();
             foreach (ILoadport loadport in m_aLoadport)
@@ -297,7 +298,7 @@ namespace Root_VEGA_D.Engineer
             }
             while (aSequence.Count > 0)
             {
-                EFEM_Process.Sequence sequence = aSequence[0];
+                VEGA_D_Process.Sequence sequence = aSequence[0];
                 m_process.m_qSequence.Enqueue(sequence);
                 aSequence.RemoveAt(0);
                 for (int n = aDock.Count - 1; n >= 0; n--)
@@ -305,7 +306,7 @@ namespace Root_VEGA_D.Engineer
                     if (CalcUnload(aDock[n], aSequence))
                     {
                         ModuleRunBase runUndocking = aDock[n].GetModuleRunUndocking().Clone();
-                        EFEM_Process.Sequence sequenceUndock = new EFEM_Process.Sequence(runUndocking, sequence.m_infoWafer);
+                        VEGA_D_Process.Sequence sequenceUndock = new VEGA_D_Process.Sequence(runUndocking, sequence.m_infoWafer);
                         m_process.m_qSequence.Enqueue(sequenceUndock);
                         aDock.RemoveAt(n);
                     }
@@ -314,15 +315,15 @@ namespace Root_VEGA_D.Engineer
             m_process.RunTree(Tree.eMode.Init);
         }
 
-        bool CalcDocking(ILoadport loadport, List<EFEM_Process.Sequence> aSequence)
+        bool CalcDocking(ILoadport loadport, List<VEGA_D_Process.Sequence> aSequence)
         {
-            foreach (EFEM_Process.Sequence sequence in aSequence)
+            foreach (VEGA_D_Process.Sequence sequence in aSequence)
             {
                 if (loadport.p_id == sequence.m_infoWafer.m_sModule) //return true;
                 {
                     if (loadport.p_infoCarrier.p_eState == InfoCarrier.eState.Dock) return true;
                     ModuleRunBase runDocking = loadport.GetModuleRunDocking().Clone();
-                    EFEM_Process.Sequence sequenceDock = new EFEM_Process.Sequence(runDocking, sequence.m_infoWafer);
+                    VEGA_D_Process.Sequence sequenceDock = new VEGA_D_Process.Sequence(runDocking, sequence.m_infoWafer);
                     m_process.m_qSequence.Enqueue(sequenceDock);
                     return true;
                 }
@@ -330,9 +331,9 @@ namespace Root_VEGA_D.Engineer
             return false;
         }
 
-        bool CalcUnload(ILoadport loadport, List<EFEM_Process.Sequence> aSequence)
+        bool CalcUnload(ILoadport loadport, List<VEGA_D_Process.Sequence> aSequence)
         {
-            foreach (EFEM_Process.Sequence sequence in aSequence)
+            foreach (VEGA_D_Process.Sequence sequence in aSequence)
             {
                 if (loadport.p_id == sequence.m_infoWafer.m_sModule) return false;
             }

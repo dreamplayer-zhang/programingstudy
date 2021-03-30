@@ -268,13 +268,18 @@
                                HorizontalAlignment="Center"
                                FontSize="30"
                                FontWeight="Bold"/>
-                    <TextBox Grid.Row="1" Grid.Column="0"
+                    <!--<TextBox Grid.Row="1" Grid.Column="0"
                              TextAlignment="Center"
                              VerticalContentAlignment="Center"
                              FontSize="30"
                              x:Name="textboxLocID"
-                             Margin="15,0,15,25"/>
-
+                             Margin="15,0,15,25"/>-->
+                    <Label Grid.Row="1" Grid.Column="0"
+                           x:Name="textboxLocID"
+                           VerticalAlignment="Center"
+                           HorizontalAlignment="Center"
+                           FontSize="30"
+                           FontWeight="Bold"/>
                     <TextBlock Grid.Row="0" Grid.Column="1"
                                Text="Lot ID"
                                VerticalAlignment="Center"

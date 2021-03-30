@@ -7,6 +7,7 @@
         xmlns:icon="clr-namespace:Root_VEGA_D.Icon"
         xmlns:control="clr-namespace:Root_VEGA_D.Control"
         xmlns:engineer="clr-namespace:Root_VEGA_D.Engineer"
+        xmlns:module="clr-namespace:Root_VEGA_D.Module"
         mc:Ignorable="d"
         WindowStyle="None"
         Loaded="Window_Loaded"
@@ -736,10 +737,11 @@
                                         </Grid.ColumnDefinitions>
                                         <Grid.RowDefinitions>
                                             <RowDefinition Height="30" />
-                                            <RowDefinition Height="120" />
-                                            <RowDefinition Height="120" />
-                                            <RowDefinition Height="120" />
-                                            <RowDefinition Height="450" />
+                                            <RowDefinition Height="100" />
+                                            <RowDefinition Height="100" />
+                                            <RowDefinition Height="400" />
+                                            <RowDefinition Height="100" />
+                                            <RowDefinition Height="100" />
                                         </Grid.RowDefinitions>
                                         <Grid Grid.Column="0"
                                               Grid.Row="0"
@@ -771,11 +773,11 @@
 
                                         <GroupBox Header="Product Info"
                                                   Grid.Column="0"
-                                                  Grid.Row="1">
-                                            <UniformGrid Margin="10">
+                                                  Grid.Row="1" DataContext="">
+                                            <UniformGrid Margin="5,2">
                                                 <TextBlock Text="Reticle ID"
                                                            HorizontalAlignment="Left" />
-                                                <TextBlock Text="PA200131022"
+                                                <TextBlock Text="{Binding p_sSlotID}" x:Name="TextBlockRetID"
                                                            HorizontalAlignment="Left" />
                                                 <TextBlock Text="Reticle Type"
                                                            HorizontalAlignment="Left" />
@@ -784,8 +786,8 @@
                                             </UniformGrid>
                                         </GroupBox>
                                         <GroupBox Header="Recipe Info"
-                                                  Grid.Column="0"
-                                                  Grid.Row="2">
+                                                  Grid.Column="1"
+                                                  Grid.Row="1">
                                             <UniformGrid Margin="5,2">
                                                 <TextBlock Text="Recipe Name"
                                                            HorizontalAlignment="Left" />
@@ -799,7 +801,7 @@
                                         </GroupBox>
                                         <GroupBox Header="Illumination Info"
                                                   Grid.Column="0"
-                                                  Grid.Row="3">
+                                                  Grid.Row="2">
                                             <UniformGrid Margin="5,2"
                                                          Columns="2">
                                                 <TextBlock Text="Red"
@@ -818,7 +820,7 @@
                                         </GroupBox>
                                         <GroupBox Header="Coordinate Info"
                                                   Grid.Column="0"
-                                                  Grid.Row="4">
+                                                  Grid.Row="3">
                                             <Grid Margin="5,2">
                                                 <Grid.RowDefinitions>
                                                     <RowDefinition />
@@ -877,8 +879,56 @@
                                             </Grid>
 
                                         </GroupBox>
+                                        <GroupBox Header="FFU"
+                                                  Grid.Row="4"
+                                                  Grid.Column="0">
+                                            <Grid Margin="5,2">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition/>
+                                                    <ColumnDefinition/>
+                                                    <ColumnDefinition/>
+                                                    <ColumnDefinition/>
+                                                    <ColumnDefinition/>
+                                                    <ColumnDefinition/>
+                                                </Grid.ColumnDefinitions>
+                                                <module:FFU_Fan_UI Grid.Row="0" x:Name="FanUI0"/>
+                                                <module:FFU_Fan_UI Grid.Column="1" x:Name="FanUI1"/>
+                                                <module:FFU_Fan_UI Grid.Column="2" x:Name="FanUI2"/>
+                                                <module:FFU_Fan_UI Grid.Column="3" x:Name="FanUI3"/>
+                                                <module:FFU_Fan_UI Grid.Column="4" x:Name="FanUI4"/>
+                                                <module:FFU_Fan_UI Grid.Column="5" x:Name="FanUI5"/>
+
+                                            </Grid>
+                                        </GroupBox>
+                                        <GroupBox Header="FDC"
+                                                  Grid.Row="5"
+                                                  Grid.Column="0">
+                                            <Grid Margin="5,2">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition/>
+                                                    <ColumnDefinition/>
+                                                    <ColumnDefinition/>
+                                                </Grid.ColumnDefinitions>
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition/>
+                                                    <RowDefinition/>
+                                                </Grid.RowDefinitions>
+                                                <TextBlock Grid.Row="0" Grid.Column="0" Text="Volt"
+                                                           HorizontalAlignment="Left" />
+                                                <TextBlock Grid.Row="0" Grid.Column="1" Text="A"
+                                                           HorizontalAlignment="Left" />
+                                                <TextBlock Grid.Row="0" Grid.Column="2" Text="B"
+                                                           HorizontalAlignment="Left" />
+                                                <TextBlock Grid.Row="1" Grid.Column="0" Text="C"
+                                                           HorizontalAlignment="Left" />
+                                                <TextBlock Grid.Row="1" Grid.Column="1" Text="D"
+                                                           HorizontalAlignment="Left" />
+                                                <TextBlock Grid.Row="1" Grid.Column="2" Text="E"
+                                                           HorizontalAlignment="Left" />
+                                            </Grid>
+                                        </GroupBox>
                                         <Grid Grid.Column="1"
-                                              Grid.Row="1">
+                                              Grid.Row="2">
                                             <GroupBox  Header="Inspection Info"
                                                        Grid.Row="0">
                                                 <Grid>
@@ -949,7 +999,7 @@
                                         </Grid>
                                         <GroupBox Header="Inspection Area"
                                                   Grid.Column="1"
-                                                  Grid.Row="2"
+                                                  Grid.Row="3"
                                                   Grid.RowSpan="3">
 
                                             <Grid Background="Black">
@@ -2209,7 +2259,7 @@
                             FontSize="15"
                             Content="Stop"
                             Margin="10" />-->
-                    <Grid Grid.Row="6">
+                    <Grid Grid.Row="6" Margin="10,0,10,0">
                         <Grid.RowDefinitions>
                             <RowDefinition/>
                             <RowDefinition/>

@@ -34,6 +34,7 @@ namespace Root_VEGA_D
 
         VEGA_D_Handler m_handler;
         Loadport_Cymechs m_loadport;
+        ManualJobSchedule m_manualjob;
         IRFID m_rfid;
 
         public Loadport_UI()
@@ -65,6 +66,7 @@ namespace Root_VEGA_D
             bool bPlaced = m_loadport.CheckPlaced();
 
             if (m_handler.IsEnableRecovery() == true) return false;
+            return true;
             return bReadyLoadport && bReadyToLoad && bReadyState && bEQReadyState && bPlaced;
         }
 
@@ -87,6 +89,11 @@ namespace Root_VEGA_D
             InitTimer();
             m_bgwLoad.DoWork += M_bgwLoad_DoWork;
             m_bgwLoad.RunWorkerCompleted += M_bgwLoad_RunWorkerCompleted;
+
+            InfoCarrier infoCarrier = m_loadport.p_infoCarrier;
+            infoCarrier.m_aInfoWafer[0] = (InfoWafer)infoCarrier.m_aGemSlot[0];
+            infoCarrier.m_aInfoWafer[0].p_eState = GemSlotBase.eState.Exist;
+            m_manualjob = new ManualJobSchedule(infoCarrier);
         }
 
         private void M_bgwLoad_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
@@ -107,12 +114,8 @@ namespace Root_VEGA_D
 
         private void M_bgwLoad_DoWork(object sender, DoWorkEventArgs e)
         {
-            InfoCarrier infoCarrier = m_loadport.p_infoCarrier;
-            infoCarrier.m_aInfoWafer[0] = (InfoWafer)infoCarrier.m_aGemSlot[0];
-            infoCarrier.m_aInfoWafer[0].p_eState = GemSlotBase.eState.Exist;
-
-            ManualJobSchedule manualJob = new ManualJobSchedule(infoCarrier);
-            if (manualJob.ShowPopup() == false) return;
+            //ManualJobSchedule manualJob = new ManualJobSchedule(infoCarrier);
+            //if (manualJob.ShowPopup() == false) return;
 
             m_loadport.StartRun(m_loadport.GetModuleRunDocking().Clone());
 
@@ -126,6 +129,7 @@ namespace Root_VEGA_D
         #region Button Click Event
         private void buttonLoad_Click(object sender, RoutedEventArgs e)
         {
+            if (m_manualjob.ShowPopup() == false) return;
             m_bgwLoad.RunWorkerAsync();
         }
 

@@ -98,6 +98,7 @@ namespace Root_VEGA_D
             loadportA.Init(m_handler.m_aLoadport[0], m_handler, m_handler.m_aRFID[0]);
             loadportB.Init(m_handler.m_aLoadport[1], m_handler, m_handler.m_aRFID[1]);
             InitTimer();
+            TextBlockRetID.DataContext = m_handler.m_aLoadport[0].p_infoCarrier.m_aGemSlot[0];
         }
 
         void ThreadStop()

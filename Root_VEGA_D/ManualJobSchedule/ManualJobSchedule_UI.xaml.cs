@@ -43,7 +43,7 @@ namespace Root_VEGA_D
 
         void InitInfo()
         {
-            textboxLocID.Text = m_infoCarrier.p_sLocID;
+            textboxLocID.Content = m_infoCarrier.p_sLocID;
             textboxLotID.Text = m_infoCarrier.p_sLotID;
             textboxCstID.Text = m_infoCarrier.p_sCarrierID;
         }
@@ -83,7 +83,7 @@ namespace Root_VEGA_D
         {
             if (m_infoCarrier != null)
             {
-                m_infoCarrier.p_sLocID = textboxLocID.Text;
+                //m_infoCarrier.p_sLocID = textboxLocID.Text;
                 m_infoCarrier.p_sLotID = textboxLotID.Text;
                 m_infoCarrier.p_sCarrierID = textboxCstID.Text;
             }
