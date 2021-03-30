@@ -17,6 +17,14 @@ namespace Root_CAMELLIA
             {
                 return string.Format("{0} %", val / 10);
             }
+            else if ((string)parameter == "Fan")
+            {
+                return string.Format("{0} Pa", val); 
+            }
+            else if((string)parameter == "RPM")
+            {
+                return string.Format("{0} RPM", val);
+            }
             else
             {
                 return string.Format("{0} °C", val / 10);

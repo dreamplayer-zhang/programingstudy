@@ -348,7 +348,6 @@ namespace RootTools
                     return;
 
                 SetProperty(ref m_LayerCanvasWidth, value);
-                SetRoiRect();
             }
         }
 
@@ -365,7 +364,6 @@ namespace RootTools
                     return;
 
                 SetProperty(ref m_LayerCanvasHeight, value);
-                SetRoiRect();
             }
         }
         #endregion

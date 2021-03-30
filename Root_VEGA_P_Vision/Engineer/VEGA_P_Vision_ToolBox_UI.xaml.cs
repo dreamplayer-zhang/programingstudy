@@ -13,6 +13,7 @@ namespace Root_VEGA_P_Vision.Engineer
         {
             InitializeComponent();
         }
+
         VEGA_P_Vision_Engineer m_engineer;
         public void Init(VEGA_P_Vision_Engineer engineer)
         {
