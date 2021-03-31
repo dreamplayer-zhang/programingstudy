@@ -4,6 +4,7 @@ using RootTools.Control;
 using RootTools.Gem;
 using RootTools.Module;
 using RootTools.OHTNew;
+using RootTools.RFIDs;
 using RootTools.ToolBoxs;
 using RootTools.Trees;
 using System;
@@ -14,10 +15,12 @@ namespace Root_VEGA_P.Module
     public class Loadport : ModuleBase, IRTRChild
     {
         #region ToolBox
-        OHT m_OHT; 
+        OHT m_OHT;
+        RFID m_RFID; 
         public override void GetTools(bool bInit)
         {
-            p_sInfo = m_toolBox.GetOHT(ref m_OHT, this, m_infoPods, "OHT"); 
+            p_sInfo = m_toolBox.GetOHT(ref m_OHT, this, m_infoPods, "OHT");
+            p_sInfo = m_toolBox.Get(ref m_RFID, this, "RFID"); 
             m_stage.GetTools(m_toolBox, this, bInit);
             m_door.GetTools(m_toolBox, this);
             m_interlock.GetTools(m_toolBox, this);

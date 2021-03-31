@@ -68,6 +68,6 @@ namespace Root_VEGA_P
 				this.DragMove();
 			}
 		}
-		#endregion
-	}
+        #endregion
+    }
 }

@@ -20,6 +20,7 @@ using RootTools.OHTNew;
 using RootTools.ParticleCounter;
 using RootTools.Printer;
 using RootTools.RADS;
+using RootTools.RFIDs;
 using RootTools.RTC5s.LaserBright;
 using RootTools.SQLogs;
 using System;
@@ -355,6 +356,21 @@ namespace RootTools.ToolBoxs
                 InitLensSet(module);
                 value = new LensLinearTurret(module.p_id + "." + id, module.m_log);
                 module.m_lensSet.Add(value);
+            }
+            return "OK";
+        }
+        #endregion
+
+        #region ITool RFID
+        ToolSet m_toolSetRFID = null; 
+        public string Get(ref RFID value, ModuleBase module, string id)
+        {
+            if (m_toolSetRFID == null) m_toolSetRFID = InitToolSet("RFID");
+            if (value == null)
+            {
+                value = new RFID(module.p_id + "." + id, module.m_log);
+                m_toolSetRFID.AddTool(value);
+                module.m_aTool.Add(value); 
             }
             return "OK";
         }
