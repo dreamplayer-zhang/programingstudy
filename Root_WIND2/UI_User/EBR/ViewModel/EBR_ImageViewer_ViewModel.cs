@@ -93,14 +93,14 @@ namespace Root_WIND2.UI_User
             RedrawShapes();
         }
 
-        //public override void CanvasMovePoint_Ref(CPoint point, int nX, int nY)
-        //{
-		//	base.CanvasMovePoint_Ref(point, nX, nY);
-		//	RedrawShapes();
-		//}
-        #endregion
+		public override void CanvasMovePoint_Ref(CPoint point, int nX, int nY)
+		{
+			base.CanvasMovePoint_Ref(point, nX, nY);
+			RedrawShapes();
+		}
+		#endregion
 
-        public void ClearObjects()
+		public void ClearObjects()
         {
             rectList.Clear();
             p_DrawElement.Clear();

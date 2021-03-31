@@ -43,9 +43,9 @@
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
-            <icon:AtiLogo Width="35"
-                           Height="20"
-                           Margin="3" />
+            <Viewbox Margin="3">
+                <icon:AtiLogo/>
+            </Viewbox>
             <TextBlock Text="ADI"
                        FontFamily="Arial"
                        Foreground="White"
@@ -150,7 +150,7 @@
                     </Grid.ColumnDefinitions>
                     <Grid Grid.Column="1"
                           Grid.Row="0">
-                        <TextBlock Text="ADI"
+                        <TextBlock Text="VEGA-D"
                                    FontWeight="Bold" />
                     </Grid>
                     <Grid Grid.Column="1"
@@ -312,9 +312,9 @@
                     <Grid Grid.Row="1">
                         <GroupBox Header="Map">
                             <Grid Background="Black">
-                                <Image Source="Resource/ReticleMap2.PNG"
+                                <!--<Image Source="Resource/ReticleMap2.PNG"
                                        Margin="20,10"
-                                       Stretch="Fill" />
+                                       Stretch="Fill" />-->
                             </Grid>
                         </GroupBox>
                     </Grid>
@@ -716,61 +716,72 @@
                 <Grid Grid.Column="2"
                       Grid.Row="2">
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="4*" />
+                        <RowDefinition Height="35" />
+                        <RowDefinition Height="*" />
                         <RowDefinition Height="0"
                                        x:Name="LogSplitter" />
                         <RowDefinition Height="00"
                                        x:Name="LogArea" />
                     </Grid.RowDefinitions>
-                    <TabControl Style="{StaticResource ResourceKey=WizardTabControl}"
-                                Margin="2">
+                    <Grid Grid.Row="0"
+                          Grid.ColumnSpan="2"
+                          Background="AliceBlue">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="2*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Grid Grid.Column="1">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition />
+                                <ColumnDefinition />
+                                <ColumnDefinition />
+                                <ColumnDefinition />
+                            </Grid.ColumnDefinitions>
+                            <Button Content="New"
+                                    FontWeight="Bold"
+                                    Margin="3,5"
+                                    Grid.Column="0" />
+                            <Button Content="Load"
+                                    FontWeight="Bold"
+                                    Grid.Column="1"
+                                    Margin="3,5" />
+                            <Button Content="Save"
+                                    FontWeight="Bold"
+                                    Margin="3,5"
+                                    Grid.Column="2" />
+                            <Button Content="Save As"
+                                    FontWeight="Bold"
+                                    Grid.Column="3"
+                                    Margin="3,5" />
+                        </Grid>
+                        <TextBlock Grid.Column="0"
+                                   Text="D:\200811ADI.rcp"
+                                   FontSize="16"
+                                   VerticalAlignment="Center"
+                                   HorizontalAlignment="Center"
+                                   FontWeight="Bold" />
+                    </Grid>
+                    <TabControl Style="{StaticResource ResourceKey=WizardTabControl}" Grid.Row="1">
                         <TabItem Header="Information"
                                  Style="{StaticResource ResourceKey=WizardTabItem}">
                             <ScrollViewer Background="White">
-                                <Grid>
-                                    <Grid Grid.Column="0">
+                                <StackPanel>
+                                    <Grid Grid.Column="0"
+                                          Background="AliceBlue"
+                                          Height="840">
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition />
                                             <ColumnDefinition />
                                         </Grid.ColumnDefinitions>
                                         <Grid.RowDefinitions>
-                                            <RowDefinition Height="30" />
-                                            <RowDefinition Height="120" />
-                                            <RowDefinition Height="120" />
-                                            <RowDefinition Height="120" />
-                                            <RowDefinition Height="450" />
+                                            <RowDefinition Height="*" />
+                                            <RowDefinition Height="*" />
+                                            <RowDefinition Height="*" />
+                                            <RowDefinition Height="3*" />
                                         </Grid.RowDefinitions>
-                                        <Grid Grid.Column="0"
-                                              Grid.Row="0"
-                                              Grid.ColumnSpan="2"
-                                              Background="AliceBlue">
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition />
-                                                <ColumnDefinition Width="2.5*" />
-                                            </Grid.ColumnDefinitions>
-                                            <Grid Grid.Column="0">
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition />
-                                                    <ColumnDefinition />
-                                                    <ColumnDefinition />
-                                                </Grid.ColumnDefinitions>
-                                                <Button Content="Save"
-                                                        Margin="3" />
-                                                <Button Content="Save As"
-                                                        Grid.Column="1"
-                                                        Margin="3" />
-                                                <Button Content="Load"
-                                                        Grid.Column="2"
-                                                        Margin="3" />
-                                            </Grid>
-                                            <TextBlock Grid.Column="1"
-                                                       Text="D:\200811ADI.rcp"
-                                                       FontWeight="Bold" />
-                                        </Grid>
-
                                         <GroupBox Header="Product Info"
                                                   Grid.Column="0"
-                                                  Grid.Row="1">
+                                                  Grid.Row="0">
                                             <UniformGrid Margin="10">
                                                 <TextBlock Text="Reticle ID"
                                                            HorizontalAlignment="Left" />
@@ -784,7 +795,7 @@
                                         </GroupBox>
                                         <GroupBox Header="Recipe Info"
                                                   Grid.Column="0"
-                                                  Grid.Row="2">
+                                                  Grid.Row="1">
                                             <UniformGrid Margin="5,2">
                                                 <TextBlock Text="Recipe Name"
                                                            HorizontalAlignment="Left" />
@@ -798,7 +809,7 @@
                                         </GroupBox>
                                         <GroupBox Header="Illumination Info"
                                                   Grid.Column="0"
-                                                  Grid.Row="3">
+                                                  Grid.Row="2">
                                             <UniformGrid Margin="5,2"
                                                          Columns="2">
                                                 <TextBlock Text="Red"
@@ -817,7 +828,7 @@
                                         </GroupBox>
                                         <GroupBox Header="Coordinate Info"
                                                   Grid.Column="0"
-                                                  Grid.Row="4">
+                                                  Grid.Row="3">
                                             <Grid Margin="5,2">
                                                 <Grid.RowDefinitions>
                                                     <RowDefinition />
@@ -871,13 +882,13 @@
                                                                             Binding="{Binding Path=y}"
                                                                             Width="*" />
                                                     </DataGrid.Columns>
-                                                   
+
                                                 </DataGrid>
                                             </Grid>
 
                                         </GroupBox>
                                         <Grid Grid.Column="1"
-                                              Grid.Row="1">
+                                              Grid.Row="0">
                                             <GroupBox  Header="Inspection Info"
                                                        Grid.Row="0">
                                                 <Grid>
@@ -948,13 +959,13 @@
                                         </Grid>
                                         <GroupBox Header="Inspection Area"
                                                   Grid.Column="1"
-                                                  Grid.Row="2"
+                                                  Grid.Row="1"
                                                   Grid.RowSpan="3">
 
                                             <Grid Background="Black">
-                                                <Image Source="Resource/ReticleMap2.PNG"
+                                                <!--<Image Source="Resource/ReticleMap2.PNG"
                                                        Stretch="Fill"
-                                                       Margin="10" />
+                                                       Margin="10" />-->
                                                 <Viewbox>
                                                     <Canvas Width="1000"
                                                             Height="1000">
@@ -995,12 +1006,13 @@
                                             </Grid>
                                         </GroupBox>
                                     </Grid>
-                                </Grid>
+                                </StackPanel>
                             </ScrollViewer>
                         </TabItem>
-                        <TabItem Header="Recipe Wizard"
+                        <TabItem Header="Recipe Manager"
                                  Style="{StaticResource ResourceKey=WizardTabItem}">
-                            <ScrollViewer Background="White">
+                            <local:RecipeManager_UI />
+                            <!--<ScrollViewer Background="White">
                                 <StackPanel>
                                     <Grid>
                                         <Grid.ColumnDefinitions>
@@ -1189,9 +1201,9 @@
                                                           Grid.Row="1">
                                                     <Grid Background="Black"
                                                           Margin="5,2">
-                                                        <Image Source="Resource/ReticleMap2.PNG"
+                                                        --><!--<Image Source="Resource/ReticleMap2.PNG"
                                                                Margin="20,10"
-                                                               Stretch="Fill" />
+                                                               Stretch="Fill" />--><!--
                                                     </Grid>
                                                 </GroupBox>
                                                 <GroupBox Header="Coordinate"
@@ -1699,7 +1711,11 @@
                                         </Grid>
                                     </Grid>
                                 </StackPanel>
-                            </ScrollViewer>
+                            </ScrollViewer>-->
+                        </TabItem>
+                        <TabItem Header="Recipe Wizard"
+                                 Style="{StaticResource WizardTabItem}">
+                            
                         </TabItem>
                         <TabItem Header="Run"
                                  Style="{StaticResource ResourceKey=WizardTabItem}">
@@ -1707,43 +1723,15 @@
                                 <StackPanel>
                                     <Grid Background="White">
                                         <Grid.RowDefinitions>
-                                            <RowDefinition Height="30" />
                                             <RowDefinition Height="200" />
-                                            <RowDefinition Height="680" />
+                                            <RowDefinition Height="640" />
                                         </Grid.RowDefinitions>
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition />
                                             <ColumnDefinition />
                                         </Grid.ColumnDefinitions>
                                         <Grid Grid.Column="0"
-                                              Grid.Row="0"
-                                              Grid.ColumnSpan="2"
-                                              Background="AliceBlue">
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition />
-                                                <ColumnDefinition Width="2.5*" />
-                                            </Grid.ColumnDefinitions>
-                                            <Grid Grid.Column="0">
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition />
-                                                    <ColumnDefinition />
-                                                    <ColumnDefinition />
-                                                </Grid.ColumnDefinitions>
-                                                <Button Content="Save"
-                                                        Margin="3" />
-                                                <Button Content="Save As"
-                                                        Grid.Column="1"
-                                                        Margin="3" />
-                                                <Button Content="Load"
-                                                        Grid.Column="2"
-                                                        Margin="3" />
-                                            </Grid>
-                                            <TextBlock Grid.Column="1"
-                                                       Text="D:\200811ADI.rcp"
-                                                       FontWeight="Bold" />
-                                        </Grid>
-                                        <Grid Grid.Column="0"
-                                              Grid.Row="1">
+                                              Grid.Row="0">
                                             <GroupBox Header="Progress">
                                                 <Grid Margin="10,2">
                                                     <Grid.RowDefinitions>
@@ -1791,15 +1779,15 @@
                                             </GroupBox>
                                         </Grid>
                                         <Grid Grid.Column="1"
-                                              Grid.Row="1">
+                                              Grid.Row="0">
                                             <GroupBox Header="Histogram">
-                                                <Image Margin="10"
+                                                <!--<Image Margin="10"
                                                        Stretch="Fill"
-                                                       Source="Resource/Histogram.PNG" />
+                                                       Source="Resource/Histogram.PNG" />-->
                                             </GroupBox>
                                         </Grid>
                                         <Grid Grid.Column="0"
-                                              Grid.Row="2">
+                                              Grid.Row="1">
                                             <GroupBox Header="Defect List">
                                                 <Grid Margin="5,2">
                                                     <Grid.RowDefinitions>
@@ -1861,7 +1849,7 @@
                                             </GroupBox>
                                         </Grid>
                                         <Grid Grid.Column="1"
-                                              Grid.Row="2">
+                                              Grid.Row="1">
                                             <Grid.RowDefinitions>
                                                 <RowDefinition Height="1*" />
                                                 <RowDefinition Height="1*" />
@@ -2121,13 +2109,13 @@
                             </Grid>
                         </TabItem>-->
                     </TabControl>
-                    <GridSplitter Grid.Row="1"
+                    <GridSplitter Grid.Row="2"
                                   HorizontalAlignment="Stretch"
                                   VerticalAlignment="Stretch"
                                   Background="{StaticResource Splitter}"
                                   ShowsPreview="True"
                                   Grid.ColumnSpan="2" />
-                    <TabControl Grid.Row="2"
+                    <TabControl Grid.Row="3"
                                 Background="White">
                         <TabItem Header="System" />
                         <TabItem Header="Process" />

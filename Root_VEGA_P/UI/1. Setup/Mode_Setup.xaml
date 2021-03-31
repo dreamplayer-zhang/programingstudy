@@ -4,9 +4,134 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Root_VEGA_P.UI"
-             mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
+             mc:Ignorable="d"
+             d:DesignHeight="888"
+             d:DesignWidth="1912"
+             Background="{StaticResource PanelBackGround}">
     <Grid>
-            
+        <Grid.RowDefinitions>
+            <RowDefinition Height="25" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <!--Toolbar-->
+        <Border Grid.Row="0"
+                Background="{StaticResource ControlBackGround}"
+                BorderBrush="DimGray"
+                BorderThickness="0,0,0,0">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="12*" />
+                    <ColumnDefinition Width="88*" />
+                </Grid.ColumnDefinitions>
+                <!--Icon Btns-->
+                <Grid Grid.Column="0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition />
+                        <ColumnDefinition />
+                        <ColumnDefinition />
+                        <ColumnDefinition />
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+                    <Grid Grid.Column="0">
+                        <Button FontWeight="Bold"
+                                FontSize="13"
+                                BorderThickness="0,0,0,0"
+                                ToolTip="Back"
+                                Command="{Binding p_CurrentPanel.DataContext.btnBack}"
+                                Background="{StaticResource ControlBackGround}">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="Back" />
+                            </StackPanel>
+                        </Button>
+                    </Grid>
+                    <Grid Grid.Column="1">
+                        <Button FontWeight="Bold"
+                                FontSize="13"
+                                BorderThickness="0,0,0,0"
+                                ToolTip="Setup Home"
+                                Command="{Binding btnNaviSetupHome}"
+                                Background="{StaticResource ControlBackGround}">
+                            <StackPanel Orientation="Horizontal">
+                                <!--<TextBlock Text="Home"/>-->
+                                <TextBlock Text="Home" />
+                            </StackPanel>
+                        </Button>
+                    </Grid>
+                    <Grid Grid.Column="2">
+                        <Button FontWeight="Bold"
+                                FontSize="13"
+                                ToolTip="New Recipe"
+                                BorderThickness="0"
+                                Background="{StaticResource ControlBackGround}"
+                                Command="{Binding btnNewRecipe}">
+                            <Button.Content>
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="New" />
+                                </StackPanel>
+                            </Button.Content>
+                        </Button>
+                    </Grid>
+                    <Grid Grid.Column="3">
+                        <Button FontWeight="Bold"
+                                FontSize="13"
+                                BorderThickness="0,0,0,0"
+                                ToolTip="Load Recipe"
+                                Background="{StaticResource ControlBackGround}"
+                                Command="{Binding btnLoadRecipe}">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="Load"/>
+                                <!--<material:PackIcon Kind="FolderOpen"/>-->
+
+                            </StackPanel>
+                        </Button>
+                    </Grid>
+                    <Grid Grid.Column="4">
+                        <Button FontWeight="Bold"
+                                FontSize="13"
+                                ToolTip="Save Recipe"
+                                BorderThickness="0"
+                                Background="{StaticResource ControlBackGround}"
+                                Command="{Binding btnSaveRecipe}">
+                            <Button.Content>
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="Save" />
+                                </StackPanel>
+                            </Button.Content>
+                        </Button>
+                    </Grid>
+                </Grid>
+                <!--End Icon Btns-->
+
+                <!--Navigation Btns-->
+                <Grid Grid.Column="1">
+                    <StackPanel Orientation="Horizontal">
+                        <Button Width="120"
+                                Command="{Binding btnNaviSetupHome}"
+                                Cursor="Hand"
+                                Background="LightBlue"
+                                BorderBrush="{x:Null}"
+                                Content="Setup" />
+                        <ItemsControl ItemsSource="{Binding p_NaviButtons}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <StackPanel Orientation="Horizontal" />
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                        </ItemsControl>
+                    </StackPanel>
+                </Grid>
+                <!--End Navigation Btns-->
+            </Grid>
+        </Border>
+        <!--End Toolbar-->
+
+        <!--Panel-->
+        <Border Grid.Row="1">
+            <Grid>
+                <ContentControl Content="{Binding p_CurrentPanel}" />
+            </Grid>
+        </Border>
+        <!--End Panel-->
     </Grid>
 </UserControl>
