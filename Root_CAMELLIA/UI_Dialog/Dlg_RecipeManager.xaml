@@ -247,7 +247,7 @@
                                         <TextBlock Text="fit" Style="{StaticResource GridHeaderStyle}" />
                                     </DataGridCheckBoxColumn.Header>
                                 </DataGridCheckBoxColumn>
-                                
+
                                 <DataGridComboBoxColumn Width="*" SelectedValueBinding="{Binding SelectedEmm, UpdateSourceTrigger=PropertyChanged}">
                                     <DataGridComboBoxColumn.Header>
                                         <TextBlock Text="Emm" Style="{StaticResource GridHeaderStyle}" />
@@ -417,14 +417,25 @@
                         <Grid Grid.Column="1" Margin="5">
                             <Grid>
                                 <Grid.RowDefinitions>
-                                    <RowDefinition Height="0.15*"/>
+                                    <RowDefinition Height="0.18*"/>
                                     <RowDefinition/>
                                 </Grid.RowDefinitions>
-                                <Border Background="White" BorderBrush="#ABADB3" BorderThickness="1">
-                                    <TextBlock Grid.Row="0" Text="Transmittance" VerticalAlignment="Top" HorizontalAlignment="Center" Margin="0,2"/>
-                                </Border>
-                                <ListBox Grid.Row="1" ItemsSource="{Binding TransmittanceListItem, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" IsSynchronizedWithCurrentItem="True" HorizontalContentAlignment="Center"
-                                         SelectedIndex="{Binding TransmittanceSelectedIndex}" IsEnabled="{Binding p_UseTransmittance}"/>
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition/>
+                                    </Grid.RowDefinitions>
+                                    <Border Background="White" BorderBrush="#ABADB3" BorderThickness="1">
+                                        <TextBlock Grid.Row="0" Text="Transmittance" VerticalAlignment="Top" HorizontalAlignment="Center" Margin="0,2"/>
+                                    </Border>
+                                </Grid>
+                                <DataGrid Grid.Row="1" ItemsSource="{Binding TransmittanceListItem}" AutoGenerateColumns="False" CanUserAddRows="False" CanUserSortColumns="True" EnableColumnVirtualization="True"  CanUserDeleteRows="False"
+                                  EnableRowVirtualization="True" ScrollViewer.CanContentScroll="True" SelectionMode="Single" SelectedIndex="{Binding TramsmittanceSelectedIndex}">
+                                    <DataGrid.Columns>
+                                        <DataGridTextColumn Header="Wave" Width="*" Binding="{Binding p_waveLength}" IsReadOnly="True"/>
+                                        <DataGridTextColumn Header="Scale" Width="*" Binding="{Binding p_scale}" IsReadOnly="True"/>
+                                        <DataGridTextColumn Header="Offset" Width="*" Binding="{Binding p_offset}" IsReadOnly="True"/>
+                                    </DataGrid.Columns>
+                                </DataGrid>
                             </Grid>
                         </Grid>
                         <Grid Grid.Column="2" Margin="5">
@@ -442,18 +453,18 @@
                                     <RowDefinition />
                                     <RowDefinition />
                                 </Grid.RowDefinitions>
-                                    <Grid Grid.Row="0">
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="4*"/>
-                                            <ColumnDefinition Width="2*"/>
-                                            <ColumnDefinition Width="2*"/>
-                                     </Grid.ColumnDefinitions>
+                                <Grid Grid.Row="0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="4*"/>
+                                        <ColumnDefinition Width="2*"/>
+                                        <ColumnDefinition Width="2*"/>
+                                    </Grid.ColumnDefinitions>
                                     <TextBlock Text="Wavelength" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="0"/>
-                                     <TextBlock Text="Scale" VerticalAlignment="Center" HorizontalAlignment="Center"  Grid.Column="1"/>
+                                    <TextBlock Text="Scale" VerticalAlignment="Center" HorizontalAlignment="Center"  Grid.Column="1"/>
                                     <TextBlock Text="Offset" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="2"/>
-                                    </Grid>
-                                    <Grid Grid.Row="1">
-                                        <Grid.ColumnDefinitions>
+                                </Grid>
+                                <Grid Grid.Row="1">
+                                    <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="4*"/>
                                         <ColumnDefinition Width="2*"/>
                                         <ColumnDefinition Width="2*"/>
@@ -461,9 +472,9 @@
                                     <TextBox local:FocusExtension.IsFocused="{Binding MyIsFocused, UpdateSourceTrigger=PropertyChanged}" Text="{Binding WaveLengthValue, UpdateSourceTrigger=LostFocus, StringFormat=N2}" TextAlignment="Center" VerticalContentAlignment="Center" Margin="2" Grid.Column="0"/>
                                     <TextBox local:FocusExtension.IsFocused="{Binding MyIsFocused, UpdateSourceTrigger=PropertyChanged}" Text="{Binding WaveLengthScale, UpdateSourceTrigger=LostFocus, StringFormat=N2}" TextAlignment="Center" VerticalContentAlignment="Center" Margin="2" Grid.Column="1"/>
                                     <TextBox local:FocusExtension.IsFocused="{Binding MyIsFocused, UpdateSourceTrigger=PropertyChanged}" Text="{Binding WaveLengthOffset, UpdateSourceTrigger=LostFocus, StringFormat=N2}" TextAlignment="Center" VerticalContentAlignment="Center" Margin="2" Grid.Column="2"/>
-                            
-                                    </Grid>
+
                                 </Grid>
+                            </Grid>
                             <UniformGrid Rows="1" Columns="2" Grid.Row="2">
                                 <Button Content="Add" Margin="0,5,2,5" Command="{Binding CmdAddWaveLength}"/>
                                 <Button Content="Delete" Margin="2,5,1,5" Command="{Binding CmdDeleteWaveLength}"/>
@@ -851,52 +862,8 @@
 
                 <Grid Grid.Row="3">
                     <GroupBox Header="PreView">
-                        <Grid>
-                            <!--<Viewbox Margin="10">
-                                <ItemsControl ItemsSource="{Binding p_PreviewDrawElement, UpdateSourceTrigger=PropertyChanged}"
-                              Width="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualWidth}"
-                              Height="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualHeight}" BorderBrush="Black" BorderThickness="1">
-                                    <ItemsControl.ItemsPanel>
-                                        <ItemsPanelTemplate>
-                                            <Canvas Width="{x:Static local:BaseDefine.CanvasWidth}" Height="{x:Static local:BaseDefine.CanvasHeight}" ClipToBounds="True" Background="#01FFFFFF">
-                                            </Canvas>
-                                        </ItemsPanelTemplate>
-                                    </ItemsControl.ItemsPanel>
-                                </ItemsControl>
-                            </Viewbox>-->
-                            <Viewbox Margin="10">
-                                <stage:CamelliaStage  ClipToBounds="True" Background="#01FFFFFF"/>
-                            </Viewbox>
-                            <Viewbox Margin="10">
-                                <ItemsControl ItemsSource="{Binding p_PreviewDrawElement, UpdateSourceTrigger=PropertyChanged}"
-                              Width="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualWidth}"
-                              Height="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualHeight}">
-                                    <ItemsControl.ItemsPanel>
-                                        <ItemsPanelTemplate>
-                                            <Canvas Width="{x:Static local:BaseDefine.CanvasWidth}" Height="{x:Static local:BaseDefine.CanvasHeight}" ClipToBounds="True" Background="#01FFFFFF">
-                                            </Canvas>
-                                        </ItemsPanelTemplate>
-                                    </ItemsControl.ItemsPanel>
-                                </ItemsControl>
-                            </Viewbox>
-                            <Viewbox>
-                                <Canvas x:Name="StagePreView" Width="{x:Static local:BaseDefine.CanvasWidth}" Height="{x:Static local:BaseDefine.CanvasHeight}" ClipToBounds="True" Background="#01FFFFFF">
-                                    <i:Interaction.Triggers>
-                                        <i:EventTrigger EventName="MouseMove">
-                                            <i:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=StagePreView, Mode=OneWay}" MethodName="OnMouseMovePreView" />
-                                        </i:EventTrigger>
-                                        <i:EventTrigger EventName="MouseWheel" >
-                                            <i:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=StagePreView, Mode=OneWay}" MethodName="OnMouseWheelPreView" />
-                                        </i:EventTrigger>
-                                        <i:EventTrigger EventName="MouseLeftButtonDown" >
-                                            <i:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=StagePreView, Mode=OneWay}" MethodName="OnMouseLeftButtonDownPreView" />
-                                        </i:EventTrigger>
-                                    </i:Interaction.Triggers>
-                                </Canvas>
-                            </Viewbox>
-                        </Grid>
                         <!--<stage:CamelliaStage></stage:CamelliaStage>-->
-                        <!--<Viewbox Margin="10">
+                        <Viewbox Margin="10">
                             <ItemsControl ItemsSource="{Binding p_PreviewDrawElement}"
                               Width="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualWidth}"
                               Height="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualHeight}" BorderBrush="Black" BorderThickness="1">
@@ -918,7 +885,7 @@
                                     </ItemsPanelTemplate>
                                 </ItemsControl.ItemsPanel>
                             </ItemsControl>
-                        </Viewbox>-->
+                        </Viewbox>
                     </GroupBox>
                 </Grid>
             </Grid>

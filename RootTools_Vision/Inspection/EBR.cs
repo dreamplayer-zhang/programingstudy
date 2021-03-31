@@ -16,6 +16,7 @@ namespace RootTools_Vision
 
 		private EBRParameter parameterEBR;
 		private EBRRecipe recipeEBR;
+		private GrabModeEdge grabModeEdge;
 
 		public EBR() : base()
 		{
@@ -26,7 +27,7 @@ namespace RootTools_Vision
 		{
 			this.parameterEBR = this.parameter as EBRParameter;
 			this.recipeEBR = this.recipe.GetItem<EBRRecipe>();
-
+			this.grabModeEdge = this.grabMode as GrabModeEdge;
 			return true;
 		}
 
@@ -112,6 +113,7 @@ namespace RootTools_Vision
 			int diffEdge = this.parameterEBR.DiffEdge;
 			int diffBevel = this.parameterEBR.DiffBevel;
 			int diffEBR = this.parameterEBR.DiffEBR;
+			double resolution = this.grabModeEdge.m_dTargetResX_um;
 
 			int[] arrDiffReverse = new int[arrDiff.Length];
 			for (int i = 0; i < arrDiff.Length; i++)
@@ -124,12 +126,12 @@ namespace RootTools_Vision
 
 			// Add measurement
 			string sInspectionID = DatabaseManager.Instance.GetInspectionID();
-			
+
 			this.currentWorkplace.AddMeasurement(sInspectionID,
 								"EDGE",
 								Measurement.MeasureType.EBR,
 								Measurement.EBRMeasureItem.Bevel,
-								(float)((waferEdgeX - bevelX) * recipeEBR.Resolution),
+								(float)((waferEdgeX - bevelX) * resolution),
 								this.currentWorkplace.Width,
 								this.currentWorkplace.Height,
 								CalculateAngle(this.currentWorkplace.Index),
@@ -142,7 +144,7 @@ namespace RootTools_Vision
 								"EDGE",
 								Measurement.MeasureType.EBR,
 								Measurement.EBRMeasureItem.EBR,
-								(float)(waferEdgeX - ebrX * recipeEBR.Resolution),
+								(float)((waferEdgeX - ebrX) * resolution),
 								this.currentWorkplace.Width,
 								this.currentWorkplace.Height,
 								CalculateAngle(this.currentWorkplace.Index),

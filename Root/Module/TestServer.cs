@@ -14,7 +14,7 @@ namespace Root.Module
         //TCPSyncServer m_tcpip;
         public override void GetTools(bool bInit)
         {
-            p_sInfo = m_toolBox.Get(ref m_tcpip, this, "Server", 2000000);
+            p_sInfo = m_toolBox.GetComm(ref m_tcpip, this, "Server", 2000000);
             if (bInit) m_tcpip.EventReciveData += M_tcpip_EventReciveData;
         }
         #endregion

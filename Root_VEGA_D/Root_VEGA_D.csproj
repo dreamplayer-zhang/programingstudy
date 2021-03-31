@@ -209,6 +209,13 @@
     <Page Include="Module\FFU_Fan_UI.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    <Page Include="RecipeManager_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="RecipeWizard_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UI_UserControl\HomeProgress_UI.xaml">
       <SubType>Designer</SubType>
@@ -272,6 +279,12 @@
     <Compile Include="Module\Interlock.cs" />
     <Compile Include="Module\TowerLamp.cs" />
     <Compile Include="Module\Vision\Run_GrabLineScan.cs" />
+    <Compile Include="RecipeManager_UI.xaml.cs">
+      <DependentUpon>RecipeManager_UI.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="RecipeWizard_UI.xaml.cs">
+      <DependentUpon>RecipeWizard_UI.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI_UserControl\HomeProgress_UI.xaml.cs">
       <DependentUpon>HomeProgress_UI.xaml</DependentUpon>
     </Compile>
@@ -335,7 +348,10 @@
       <Name>Root_VEGA_D_IPU</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="RecipeManager\" />
+    <Folder Include="RecipeWizard\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>copy /Y "$(SolutionDir)Lib\CRT_Runtime\10.0.18362.0\x64_bin\ucrt\ucrtbased.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\ucrtbased.dll"

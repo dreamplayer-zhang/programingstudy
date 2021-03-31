@@ -262,19 +262,19 @@ namespace Root_CAMELLIA.Module
 
         public override void GetTools(bool bInit)
         {
-            p_sInfo = m_toolBox.Get(ref m_axisXY, this, "StageXY");
-            p_sInfo = m_toolBox.Get(ref m_axisZ, this, "NavigationZ");
-            p_sInfo = m_toolBox.Get(ref m_axisLifter, this, "StageLifter");
-            p_sInfo = m_toolBox.Get(ref m_tiltAxisXY, this, "TiltXY");
-            p_sInfo = m_toolBox.Get(ref m_stageAxisZ, this, "StageZ");
-            p_sInfo = m_toolBox.Get(ref m_CamVRS, this, "VRS");
+            p_sInfo = m_toolBox.GetAxis(ref m_axisXY, this, "StageXY");
+            p_sInfo = m_toolBox.GetAxis(ref m_axisZ, this, "NavigationZ");
+            p_sInfo = m_toolBox.GetAxis(ref m_axisLifter, this, "StageLifter");
+            p_sInfo = m_toolBox.GetAxis(ref m_tiltAxisXY, this, "TiltXY");
+            p_sInfo = m_toolBox.GetAxis(ref m_stageAxisZ, this, "StageZ");
+            p_sInfo = m_toolBox.GetCamera(ref m_CamVRS, this, "VRS");
             p_sInfo = m_toolBox.Get(ref m_lightSet, this);
-            p_sInfo = m_toolBox.Get(ref m_axisXReady, this, "Stage X Ready");
-            p_sInfo = m_toolBox.Get(ref m_axisYReady, this, "Stage Y Ready");   
-            p_sInfo = m_toolBox.Get(ref m_vacuum, this, "Vaccum On");
-            p_sInfo = m_toolBox.Get(ref m_vacuumOnOff, this, "Vaccum OnOff");
-            p_sInfo = m_toolBox.Get(ref m_homeExistWafer, this, "Home Wafer Exist");
-            p_sInfo = m_toolBox.Get(ref m_loadExistWafer, this, "Load Wafer Exist");
+            p_sInfo = m_toolBox.GetDIO(ref m_axisXReady, this, "Stage X Ready");
+            p_sInfo = m_toolBox.GetDIO(ref m_axisYReady, this, "Stage Y Ready");   
+            p_sInfo = m_toolBox.GetDIO(ref m_vacuum, this, "Vaccum On");
+            p_sInfo = m_toolBox.GetDIO(ref m_vacuumOnOff, this, "Vaccum OnOff");
+            p_sInfo = m_toolBox.GetDIO(ref m_homeExistWafer, this, "Home Wafer Exist");
+            p_sInfo = m_toolBox.GetDIO(ref m_loadExistWafer, this, "Load Wafer Exist");
             m_alid_WaferExist = m_gaf.GetALID(this, "Vision Wafer Exist", "Vision Wafer Exist");
 
         }
@@ -292,20 +292,13 @@ namespace Root_CAMELLIA.Module
                 infoCarrier[i] = loadports[i].p_infoCarrier;
                 CanInitCal[i] = false;  
             }
-            try
-            {
-                if (p_CamVRS != null && !p_CamVRS.p_CamInfo._OpenStatus)
-                {
-                    p_CamVRS.Connect();
-                }
-                   
-                if(p_CamVRS != null)
-                 while (!p_CamVRS.m_ConnectDone) ;
-            }
-            catch
-            {
-
-            }
+           // try
+            //{
+            //    if (p_CamVRS != null && !p_CamVRS.p_CamInfo._OpenStatus)
+            //    {
+            //        p_CamVRS.Connect();
+            //    }
+            //}
 
         }
 

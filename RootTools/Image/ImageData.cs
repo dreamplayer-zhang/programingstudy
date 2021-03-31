@@ -197,6 +197,7 @@ namespace RootTools
             p_Size = new CPoint(40000, 40000);
             m_ToolMemory = tool;
         }
+
         public byte[] GetData(System.Drawing.Rectangle View_Rect, int CanvasWidth, int CanvasHeight)
         {
             return m_ToolMemory.GetOtherMemory(View_Rect, CanvasWidth, CanvasHeight, m_sPool, m_sGroup, m_sMem, p_nPlane);
@@ -651,6 +652,7 @@ namespace RootTools
             //int width = (int)(rect.Right * 0.25);
             //if (width * 4 != rect.Right) rect.Right = (width + 1) * 4;
 
+
             FileStream fs = new FileStream(sFile, FileMode.Create, FileAccess.Write);
             BinaryWriter bw = new BinaryWriter(fs);
 
@@ -1035,10 +1037,39 @@ namespace RootTools
             byte[] pBuf = new byte[(long)sz.X * p_nByte];
             int nProgress = 0;
 
+            if (m_ptrImg == IntPtr.Zero) return;
+
             Parallel.For(0, sz.Y, new ParallelOptions { MaxDegreeOfParallelism = 20 }, (y) =>
             {
                 if (Worker_MemoryClear.CancellationPending)
                     return;
+
+                Marshal.Copy(pBuf, 0, (IntPtr)((long)m_ptrImg + (long)sz.X * p_nByte * y), sz.X * p_nByte);
+                if (GetBytePerPixel() == 3)
+                {
+                    Marshal.Copy(pBuf, 0, (IntPtr)((long)m_MemData.GetPtr(1) + (long)sz.X * p_nByte * y), sz.X * p_nByte);
+                    Marshal.Copy(pBuf, 0, (IntPtr)((long)m_MemData.GetPtr(2) + (long)sz.X * p_nByte * y), sz.X * p_nByte);
+                }
+                nProgress++;
+                if (nProgress % np == 0)
+                    p_nProgress = Convert.ToInt32(((double)nProgress / sz.Y) * 100); ;
+            });
+        }
+
+        public unsafe void ClearImage_TEST()
+        {
+            CPoint sz = p_Size;
+            int np = sz.Y / 100;
+            byte[] pBuf = new byte[(long)sz.X * p_nByte];
+            int nProgress = 0;
+
+            if (m_ptrImg == IntPtr.Zero) return;
+
+            Parallel.For(0, sz.Y, new ParallelOptions { MaxDegreeOfParallelism = 20 }, (y) =>
+            {
+                if (Worker_MemoryClear.CancellationPending)
+                    return;
+
                 Marshal.Copy(pBuf, 0, (IntPtr)((long)m_ptrImg + (long)sz.X * p_nByte * y), sz.X * p_nByte);
                 if (GetBytePerPixel() == 3)
                 {
@@ -2287,6 +2318,28 @@ namespace RootTools
 
 
         }
+
+        public static Mat ToMat(BitmapSource source)
+        {
+            if (source.Format == PixelFormats.Bgra32)
+            {
+                Mat result = new Mat();
+                result.Create(source.PixelHeight, source.PixelWidth, DepthType.Cv8U, 4);
+                source.CopyPixels(Int32Rect.Empty, result.DataPointer, result.Step * result.Rows, result.Step);
+                return result;
+            }
+            else if (source.Format == PixelFormats.Bgr24)
+            {
+                Mat result = new Mat();
+                result.Create(source.PixelHeight, source.PixelWidth, DepthType.Cv8U, 3);
+                source.CopyPixels(Int32Rect.Empty, result.DataPointer, result.Step * result.Rows, result.Step);
+                return result;
+            }
+            else
+            {
+                throw new Exception(String.Format("Convertion from BitmapSource of format {0} is not supported.", source.Format));
+            }
+        } 
         public static BitmapSource ToBitmapSource(Image<Bgra, byte> image)
         {
             using (System.Drawing.Bitmap source = image.Bitmap)

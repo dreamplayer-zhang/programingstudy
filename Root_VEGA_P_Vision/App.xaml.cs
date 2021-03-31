@@ -13,5 +13,9 @@ namespace Root_VEGA_P_Vision
     /// </summary>
     public partial class App : Application
     {
+        private void SolidColorBrush_Changed(object sender, EventArgs e)
+        {
+
+        }
     }
 }

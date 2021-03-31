@@ -181,6 +181,17 @@ namespace RootTools_Vision
             DefectList.AddRange(DefectList_Delete);
         }
 
+        private List<string> ConvertDataListToStringList(List<Defect> defectList)
+        {
+            List<string> stringList = new List<string>();
+            foreach (Defect defect in defectList)
+            {
+                //string str = string.Format("{0} {1} {2} {3} {4} {5} {6} {7} {8} {9} {10} {11} {12} {13} {14} {15} {16}");
+                //stringList.Add(str);
+            }
+            return stringList;
+        }
+
         // 지울거야
         /*
         private List<Defect> MergeDefect(List<Defect> DefectList, int mergeDist)

@@ -58,17 +58,9 @@ namespace RootTools_Vision
 	{
 		#region [Parameter]
 		private int grabModeIndex;
-		// Camera
-		private int cameraWidth;
-		private int cameraHeight;
-		private double cameraResolution;
-		private double cameraTriggerRatio;
-		private int positionOffset;	// top side bottom 위치 offset
-		private int imageOffset;
 		// Light
 		private int lightWhite = 0;
 		private int lightSide = 0;
-
 		#endregion
 
 		#region [Getter Setter]
@@ -76,36 +68,6 @@ namespace RootTools_Vision
 		{
 			get => this.grabModeIndex;
 			set => SetProperty<int>(ref this.grabModeIndex, value);
-		}
-		public int CameraWidth
-		{
-			get => this.cameraWidth;
-			set => SetProperty<int>(ref this.cameraWidth, value);
-		}
-		public int CameraHeight
-		{
-			get => this.cameraHeight;
-			set => SetProperty<int>(ref this.cameraHeight, value);
-		}
-		public double Resolution
-		{
-			get => this.cameraResolution;
-			set => SetProperty<double>(ref this.cameraResolution, value);	
-		}
-		public double TriggerRatio
-		{
-			get => this.cameraTriggerRatio;
-			set => SetProperty<double>(ref this.cameraTriggerRatio, value);
-		}
-		public int PositionOffset
-		{
-			get => this.positionOffset;
-			set => SetProperty<int>(ref this.positionOffset, value);
-		}
-		public int ImageOffset
-		{
-			get => this.imageOffset;
-			set => SetProperty<int>(ref this.imageOffset, value);
 		}
 		public int LightWhite
 		{

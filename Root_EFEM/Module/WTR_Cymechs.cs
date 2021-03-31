@@ -44,14 +44,14 @@ namespace Root_EFEM.Module
             switch (p_eComm)
             {
                 case eComm.TCPIP:
-                    p_sInfo = m_toolBox.Get(ref m_tcpip, this, "TCPIP"); 
+                    p_sInfo = m_toolBox.GetComm(ref m_tcpip, this, "TCPIP"); 
                     if (bInit)
                     {
                         m_tcpip.EventReciveData += M_tcpip_EventReciveData;
                     }
                     break; 
                 case eComm.RS232:
-                    p_sInfo = m_toolBox.Get(ref m_rs232, this, "RS232");
+                    p_sInfo = m_toolBox.GetComm(ref m_rs232, this, "RS232");
                     if (bInit)
                     {
                         m_rs232.OnReceive += M_rs232_OnReceive;

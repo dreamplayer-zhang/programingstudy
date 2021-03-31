@@ -126,7 +126,7 @@ namespace RootTools.Module
         {
             EQ.p_bStop = true;
             foreach (Axis axis in m_listAxis) if (axis != null) axis.ServoOn(false);
-            p_eState = eState.Init;
+            p_eState = eState.Error;
         }
 
         public virtual string StateReady()
@@ -578,7 +578,7 @@ namespace RootTools.Module
             TCPIPClient m_client;
             void InitClient(bool bInit)
             {
-                m_module.p_sInfo = m_module.m_toolBox.Get(ref m_client, m_module, "TCPIP");
+                m_module.p_sInfo = m_module.m_toolBox.GetComm(ref m_client, m_module, "TCPIP");
                 if (bInit) m_client.EventReciveData += M_client_EventReciveData;
             }
 
@@ -618,7 +618,7 @@ namespace RootTools.Module
             TCPIPServer m_server;
             void InitServer(bool bInit)
             {
-                m_module.p_sInfo = m_module.m_toolBox.Get(ref m_server, m_module, "TCPIP");
+                m_module.p_sInfo = m_module.m_toolBox.GetComm(ref m_server, m_module, "TCPIP");
                 if (bInit) m_server.EventReciveData += M_server_EventReciveData;
             }
 

@@ -14,8 +14,8 @@ namespace Root_ASIS.Module
         DIO_I m_diEmg;
         public override void GetTools(bool bInit)
         {
-            p_sInfo = m_toolBox.Get(ref m_axis, this, "Axis");
-            p_sInfo = m_toolBox.Get(ref m_diEmg, this, "Emegency");
+            p_sInfo = m_toolBox.GetAxis(ref m_axis, this, "Axis");
+            p_sInfo = m_toolBox.GetDIO(ref m_diEmg, this, "Emegency");
             m_picker.GetTools(this, bInit);
             if (bInit) InitTools();
         }

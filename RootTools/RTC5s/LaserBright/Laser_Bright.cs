@@ -29,10 +29,10 @@ namespace RootTools.RTC5s.LaserBright
         public string GetTools(ModuleBase module)
         {
             ToolBox toolBox = module.m_toolBox;
-            p_sInfo = toolBox.Get(ref m_dioEnable, module, p_id + ".Enable");
-            p_sInfo = toolBox.Get(ref m_diReady, module, p_id + ".Ready");
-            p_sInfo = toolBox.Get(ref m_doStart, module, p_id + ".Start");
-            p_sInfo = toolBox.Get(ref m_doEmergency, module, p_id + ".Emergency");
+            p_sInfo = toolBox.GetDIO(ref m_dioEnable, module, p_id + ".Enable");
+            p_sInfo = toolBox.GetDIO(ref m_diReady, module, p_id + ".Ready");
+            p_sInfo = toolBox.GetDIO(ref m_doStart, module, p_id + ".Start");
+            p_sInfo = toolBox.GetDIO(ref m_doEmergency, module, p_id + ".Emergency");
             InitListDIO(module);
             return p_sInfo;
         }

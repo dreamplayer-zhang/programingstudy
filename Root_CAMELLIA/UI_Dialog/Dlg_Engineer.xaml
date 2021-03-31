@@ -40,6 +40,7 @@
         <local:AxisYToMotionUIConverter x:Key="AxisYToMotionUI"/>
         <local:AxisZToMotionUIConverter x:Key="AxisZToMotionUI"/>
         <local:AxisLifterToMotionUIConverter x:Key="AxisLifterToMotionUI"/>
+        <local:ModuleStateToLoadingOpacityConverter x:Key="ModuleStateConverter"/>
         <viewConverter:ConnectStringToBoolConverter x:Key="ConnectStringToBoolConverters" />
     </Window.Resources>
     <Grid>
@@ -123,8 +124,9 @@
                                             <Grid Grid.Column="1" Grid.RowSpan="2">
                                                 <Grid>
                                                     <Grid.RowDefinitions>
-                                                        <RowDefinition Height="0.4*"/>
+                                                        <RowDefinition Height="0.6*"/>
                                                         <RowDefinition Height="0.3*"/>
+                                                        <RowDefinition Height="40"/>
                                                         <RowDefinition/>
                                                     </Grid.RowDefinitions>
                                                     <GroupBox Header="SR Parameter"
@@ -236,7 +238,11 @@
                                                         <Grid.ColumnDefinitions>
                                                             <ColumnDefinition/>
                                                             <ColumnDefinition/>
+                                                            <ColumnDefinition/>
                                                         </Grid.ColumnDefinitions>
+                                                        <Grid Grid.ColumnSpan="3" Grid.RowSpan="2" Panel.ZIndex="1">
+                                                            <local:LoadingControl Opacity="{Binding ModuleCamellia.p_eState, Converter={StaticResource ModuleStateConverter}}"/>
+                                                        </Grid>
                                                         <Button Content="Wafer Centering"
                                                     Margin="5"
                                                     Grid.Row="0"
@@ -253,16 +259,17 @@
                                                     Margin="5"
                                                     Grid.Row="1"
                                                     Command="{Binding CmdMeasureBack}">
-                                                            <TextBlock>
-                                                    Background : Calibration
+                                                            <TextBlock TextWrapping="Wrap" TextAlignment="Center">
+                                                    Background Calibration
                                                             </TextBlock>
                                                         </Button>
                                                         <Button Content="Measure Sample"
                                                     Margin="5"
                                                     Grid.Column="1" Grid.Row="1"
                                                     Command="{Binding CmdMeasureSample}" />
+                                                        <Button Grid.Column="2" Margin="5" Command="{Binding CmdTest}">Test Button</Button>
                                                     </Grid>
-                                                    <Grid Grid.Row="2">
+                                                    <Grid Grid.Row="3">
                                                         <Viewbox>
                                                             <stage:CamelliaStage/>
                                                         </Viewbox>
@@ -335,16 +342,12 @@
                                                 </Grid>
                                             </Grid>
                                             <Grid Grid.Row="1">
-                                                <GroupBox Header="Reflectance Graph">
-                                                </GroupBox>
+                                                <met:PMRGraph Width="auto" Height="auto"/>
                                             </Grid>
                                         </Grid>
                                     </TabItem>
                                     <TabItem Header="PM Setting">
-                                        <control:PMCheckReview>
-                                            
-                                        </control:PMCheckReview>
-
+                                        <control:PMCheckReview DataContext="{Binding p_PMCheckReview_ViewModel}" />
                                     </TabItem>
                                 </TabControl>
                             </GroupBox>
@@ -561,7 +564,7 @@
                                                                 BorderBrush="{x:Null}">
                                                         <i:Interaction.Triggers>
                                                             <i:EventTrigger EventName="PreviewMouseLeftButtonDown">
-                                                                <i:InvokeCommandAction Command="{Binding cmdRelMoveMinus}" />
+                                                                <i:InvokeCommandAction Command="{Binding CmdRelMoveMinus}" />
                                                             </i:EventTrigger>
                                                             <i:EventTrigger EventName="PreviewMouseLeftButtonUp">
                                                                 <i:InvokeCommandAction Command="{Binding CmdStop}" />

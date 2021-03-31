@@ -23,12 +23,12 @@ namespace Root_AOP01_Packing.Module
         DIO_I[] m_diCheck = new DIO_I[3]; 
         public override void GetTools(bool bInit)
         {
-            p_sInfo = m_toolBox.Get(ref m_axis, this, "Door");
-            p_sInfo = m_toolBox.Get(ref m_diDoor[0], this, "Door Close");
-            p_sInfo = m_toolBox.Get(ref m_diDoor[1], this, "Door Open");
-            p_sInfo = m_toolBox.Get(ref m_diCheck[0], this, "Check0");
-            p_sInfo = m_toolBox.Get(ref m_diCheck[1], this, "Check1");
-            p_sInfo = m_toolBox.Get(ref m_diCheck[2], this, "Check2");
+            p_sInfo = m_toolBox.GetAxis(ref m_axis, this, "Door");
+            p_sInfo = m_toolBox.GetDIO(ref m_diDoor[0], this, "Door Close");
+            p_sInfo = m_toolBox.GetDIO(ref m_diDoor[1], this, "Door Open");
+            p_sInfo = m_toolBox.GetDIO(ref m_diCheck[0], this, "Check0");
+            p_sInfo = m_toolBox.GetDIO(ref m_diCheck[1], this, "Check1");
+            p_sInfo = m_toolBox.GetDIO(ref m_diCheck[2], this, "Check2");
             if (bInit)
             {
                 InitPos(); 

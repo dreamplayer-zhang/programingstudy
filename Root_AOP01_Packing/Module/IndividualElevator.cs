@@ -31,12 +31,12 @@ namespace Root_AOP01_Packing.Module
         DIO_I[] m_diProtection = new DIO_I[2];
         public override void GetTools(bool bInit)
         {
-            p_sInfo = m_toolBox.Get(ref m_axis, this, "Elevator");
-            p_sInfo = m_toolBox.Get(ref m_diCheck[0], this, "Check 0");
-            p_sInfo = m_toolBox.Get(ref m_diCheck[1], this, "Check 1");
-            p_sInfo = m_toolBox.Get(ref m_diCheck[2], this, "Check 2");
-            p_sInfo = m_toolBox.Get(ref m_diProtection[0], this, "Protection 0");
-            p_sInfo = m_toolBox.Get(ref m_diProtection[1], this, "Protection 1");
+            p_sInfo = m_toolBox.GetAxis(ref m_axis, this, "Elevator");
+            p_sInfo = m_toolBox.GetDIO(ref m_diCheck[0], this, "Check 0");
+            p_sInfo = m_toolBox.GetDIO(ref m_diCheck[1], this, "Check 1");
+            p_sInfo = m_toolBox.GetDIO(ref m_diCheck[2], this, "Check 2");
+            p_sInfo = m_toolBox.GetDIO(ref m_diProtection[0], this, "Protection 0");
+            p_sInfo = m_toolBox.GetDIO(ref m_diProtection[1], this, "Protection 1");
             if (bInit)
             {
                 InitPosElevator();

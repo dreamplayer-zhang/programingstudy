@@ -35,8 +35,8 @@ namespace Root_CAMELLIA.Module
 
         public override void GetTools(bool bInit)
         {
-            p_sInfo = m_toolBox.Get(ref m_doLamp, this, "Lamp", m_asLamp);
-            p_sInfo = m_toolBox.Get(ref m_doBuzzer, this, "Buzzer", m_asBuzzer);
+            p_sInfo = m_toolBox.GetDIO(ref m_doLamp, this, "Lamp", m_asLamp);
+            p_sInfo = m_toolBox.GetDIO(ref m_doBuzzer, this, "Buzzer", m_asBuzzer);
             if (bInit)
             {
                 EQ.m_EQ.OnChanged += M_EQ_OnChanged;

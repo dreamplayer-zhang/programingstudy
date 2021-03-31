@@ -44,9 +44,14 @@ namespace Root_CAMELLIA
         {
             this.mainWindow_ViewModel = mainWindow_ViewModel;
 
-            
+            //m_history.DoubleClicked += DoubleClick;
 
             InitExplorer();
+        }
+
+        public void DoubleClick(object sender, MouseEventArgs e)
+        {
+
         }
 
         private void InitExplorer()
@@ -74,5 +79,11 @@ namespace Root_CAMELLIA
             }
         }
         #endregion
+
+
+        //public override void OnMouseDoubleClick(object sender, System.Windows.Input.MouseEventArgs e)
+        //{
+        //    int test = 30;
+        //}
     }
 }

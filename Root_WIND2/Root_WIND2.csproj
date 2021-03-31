@@ -344,6 +344,10 @@
       <DependentUpon>HomeRecipe.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI_User\HOME\HomeRecipe_ViewModel.cs" />
+    <Compile Include="UI_User\HOME\ModuleView.xaml.cs">
+      <DependentUpon>ModuleView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI_User\HOME\ModuleView_ViewModel.cs" />
     <Compile Include="UI_User\Interfaces\IPage.cs" />
     <Compile Include="UI_User\RecipeWizardPanel.xaml.cs">
       <DependentUpon>RecipeWizardPanel.xaml</DependentUpon>
@@ -762,6 +766,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="UI_User\HOME\HomeRecipe.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI_User\HOME\ModuleView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

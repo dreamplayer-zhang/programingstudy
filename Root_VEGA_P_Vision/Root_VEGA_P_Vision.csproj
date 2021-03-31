@@ -129,8 +129,14 @@
     <Reference Include="MahApps.Metro.IconPacks.Zondicons, Version=4.0.0.0, Culture=neutral, PublicKeyToken=0c0d510f9915137a, processorArchitecture=MSIL">
       <HintPath>..\packages\MahApps.Metro.IconPacks.4.8.0\lib\net47\MahApps.Metro.IconPacks.Zondicons.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.Expression.Interactions, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Windows.Interactivity.WPF.2.0.20525\lib\net40\Microsoft.Expression.Interactions.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Windows.Interactivity, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Windows.Interactivity.WPF.2.0.20525\lib\net40\System.Windows.Interactivity.dll</HintPath>
+    </Reference>
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
@@ -149,6 +155,55 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Control\Button\NaviBtn.xaml.cs">
+      <DependentUpon>NaviBtn.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Control\Icon\AtiLogo.xaml.cs">
+      <DependentUpon>AtiLogo.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Control\Icon\Calendar.xaml.cs">
+      <DependentUpon>Calendar.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Engineer\VEGA_P_Vision_ToolBox_UI.xaml.cs">
+      <DependentUpon>VEGA_P_Vision_ToolBox_UI.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="MainVM.cs" />
+    <Compile Include="MVVM\Helper.cs" />
+    <Compile Include="MVVM\ObservableObject.cs" />
+    <Compile Include="MVVM\PropertySupport.cs" />
+    <Compile Include="MVVM\RelayCommand.cs" />
+    <Compile Include="UIManager.cs" />
+    <Compile Include="UI\1. Setup\1.Home\HomePanel.xaml.cs">
+      <DependentUpon>HomePanel.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\1. Setup\1.Home\Home_ViewModel.cs" />
+    <Compile Include="UI\1. Setup\Setup.xaml.cs">
+      <DependentUpon>Setup.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\1. Setup\Setup_ViewModel.cs" />
+    <Compile Include="UI\1. Setup\4. Maintenance\MaintenancePanel.xaml.cs">
+      <DependentUpon>MaintenancePanel.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\1. Setup\4. Maintenance\Maintenance_ViewModel.cs" />
+    <Compile Include="UI\1. Setup\4. Maintenance\ViewerTest.xaml.cs">
+      <DependentUpon>ViewerTest.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\1. Setup\4. Maintenance\ViewerTest_ViewModel.cs" />
+    <Compile Include="UI\SelectMode.xaml.cs">
+      <DependentUpon>SelectMode.xaml</DependentUpon>
+    </Compile>
+    <Page Include="Control\Button\NaviBtn.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Control\Icon\AtiLogo.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Control\Icon\Calendar.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="Engineer\VEGA_P_Vision_Engineer_UI.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -157,9 +212,13 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="MainWindow.xaml">
-      <Generator>MSBuild:Compile</Generator>
+    <Page Include="Engineer\VEGA_P_Vision_ToolBox_UI.xaml">
       <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="MainWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
@@ -175,14 +234,39 @@
     </Compile>
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
-      <SubType>Code</SubType>
     </Compile>
+    <Page Include="UI\1. Setup\1.Home\HomePanel.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\1. Setup\Setup.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\1. Setup\4. Maintenance\MaintenancePanel.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\1. Setup\4. Maintenance\ViewerTest.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\SelectMode.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Module\Buffer.cs" />
+    <Compile Include="Module\GrabMode.cs" />
+    <Compile Include="Module\Holder.cs" />
     <Compile Include="Module\InfoPod.cs" />
     <Compile Include="Module\IRTRChild.cs" />
     <Compile Include="Module\Vision.cs" />
+    <Compile Include="Module\Vision\Run_MainGrab.cs" />
+    <Compile Include="Module\Vision\Run_Rotate.cs" />
+    <Compile Include="Module\Vision\Run_SideGrab.cs" />
+    <Compile Include="Module\Vision\Run_StainGrab.cs" />
+    <Compile Include="Module\Vision\Run_ZStack.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -214,6 +298,68 @@
       <Project>{ce787353-5e00-4574-9f49-7cee7f087a86}</Project>
       <Name>RootTools</Name>
     </ProjectReference>
+    <ProjectReference Include="..\RootTools_Vision\RootTools_Vision.csproj">
+      <Project>{b9fa8faa-0522-41f3-99ad-eb307e385f76}</Project>
+      <Name>RootTools_Vision</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Control\Icon\Resource\arrow_pointing_left_127px.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Control\Icon\Resource\file_settings_127px.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Control\Icon\Resource\folder_127px.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Control\Icon\Resource\home_127px.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Control\Icon\Resource\monitor_127px.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Control\Icon\Resource\play_127px.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Control\Icon\Resource\save_127px.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Control\Icon\Resource\system_task_127px.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="UI\2. Review\" />
+    <Folder Include="UI\3. Operation\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>copy /Y "$(SolutionDir)Lib\CRT_Runtime\10.0.18362.0\x64_bin\ucrt\ucrtbased.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\ucrtbased.dll"
+copy /Y "$(SolutionDir)SQLite\sqlite3.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\sqlite3.dll"
+copy /Y "$(SolutionDir)Lib\opencv_world347d.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\opencv_world347d.dll"
+copy /Y "$(SolutionDir)Lib\opencv_world347.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\opencv_world347.dll"
+IF NOT EXIST "$(SolutionDir)$(ProjectName)\$(OutDir)\x64" (mkdir "$(SolutionDir)$(ProjectName)\$(OutDir)\x64")
+copy /Y "$(SolutionDir)Lib\EMGU.CV\x64\concrt140.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\x64\concrt140.dll"
+copy /Y "$(SolutionDir)Lib\EMGU.CV\x64\cvextern.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\x64\cvextern.dll"
+copy /Y "$(SolutionDir)Lib\EMGU.CV\x64\msvcp140.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\x64\msvcp140.dll"
+copy /Y "$(SolutionDir)Lib\EMGU.CV\x64\opencv_videoio_ffmpeg411_64.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\x64\opencv_videoio_ffmpeg411_64.dll"
+copy /Y "$(SolutionDir)Lib\EMGU.CV\x64\vcruntime140.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\x64\vcruntime140.dll"
+IF NOT EXIST "C:\vsdb\init" (mkdir "C:\vsdb\init")
+copy /Y "$(SolutionDir)Init\vsdb.txt" "C:\vsdb\init\vsdb.txt"
+copy /Y "$(SolutionDir)RootTools\Control\Ajin\DLL\x86_x64\AXL.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\AXL.dll"
+copy /Y "$(SolutionDir)RootTools\Control\Ajin\DLL\x86_x64\AXL.lib" "$(SolutionDir)$(ProjectName)\$(OutDir)\AXL.lib"
+copy /Y "$(SolutionDir)RootTools\Control\Ajin\DLL\x86_x64\EzBasicAxl.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\EzBasicAxl.dll"
+IF NOT EXIST "$(SolutionDir)$(ProjectName)\$(OutDir)\plugin" (mkdir "$(SolutionDir)$(ProjectName)\$(OutDir)\plugin")
+copy /Y "$(SolutionDir)Lib\mariadb-connector-c\lib\mariadb\libmariadb.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\libmariadb.dll"
+copy /Y "$(SolutionDir)Lib\mariadb-connector-c\lib\mariadb\libmariadb.lib" "$(SolutionDir)$(ProjectName)\$(OutDir)\libmariadb.lib"
+copy /Y "$(SolutionDir)Lib\mariadb-connector-c\lib\mariadb\libmariadb.pdb" "$(SolutionDir)$(ProjectName)\$(OutDir)\libmariadb.pdb"
+copy /Y "$(SolutionDir)Lib\mariadb-connector-c\lib\mariadb\mariadbclient.lib" "$(SolutionDir)$(ProjectName)\$(OutDir)\mariadbclient.lib"
+copy /Y "$(SolutionDir)Lib\mariadb-connector-c\lib\mariadb\plugin\auth_gssapi_client.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\plugin\auth_gssapi_client.dll"
+copy /Y "$(SolutionDir)Lib\mariadb-connector-c\lib\mariadb\plugin\caching_sha2_password.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\plugin\caching_sha2_password.dll"
+copy /Y "$(SolutionDir)Lib\mariadb-connector-c\lib\mariadb\plugin\client_ed25519.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\plugin\client_ed25519.dll"
+copy /Y "$(SolutionDir)Lib\mariadb-connector-c\lib\mariadb\plugin\dialog.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\plugin\dialog.dll"
+copy /Y "$(SolutionDir)Lib\mariadb-connector-c\lib\mariadb\plugin\mysql_clear_password.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\plugin\mysql_clear_password.dll"
+copy /Y "$(SolutionDir)Lib\mariadb-connector-c\lib\mariadb\plugin\pvio_npipe.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\plugin\pvio_npipe.dll"
+copy /Y "$(SolutionDir)Lib\mariadb-connector-c\lib\mariadb\plugin\pvio_shmem.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\plugin\pvio_shmem.dll"
+copy /Y "$(SolutionDir)Lib\mariadb-connector-c\lib\mariadb\plugin\sha256_password.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\plugin\sha256_password.dll"</PostBuildEvent>
+  </PropertyGroup>
 </Project>

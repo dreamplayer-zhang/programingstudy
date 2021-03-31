@@ -13,7 +13,7 @@ namespace Root_ASIS.Module
         Axis m_axis;
         public override void GetTools(bool bInit)
         {
-            p_sInfo = m_toolBox.Get(ref m_axis, this, "Axis");
+            p_sInfo = m_toolBox.GetAxis(ref m_axis, this, "Axis");
             m_picker.GetTools(this, bInit);
             if (bInit) InitTools();
         }

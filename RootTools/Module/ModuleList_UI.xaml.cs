@@ -39,10 +39,12 @@ namespace RootTools.Module
             foreach (ModuleRunBase moduleRun in m_moduleList.p_moduleList)
             {
                 m_moduleList.p_Percent = "0";
+                moduleRun.p_nProgress = 0;
                 moduleRun.p_eRunState = ModuleRunBase.eRunState.Ready;
             }
             m_moduleList.p_visibleRnR = Visibility.Hidden;
             m_moduleList.p_sInfo = m_moduleList.ClickRun();
+            m_moduleList.p_sNowProgress = "Module Run";
         }
 
         private void ButtonRunStep_Click(object sender, RoutedEventArgs e)

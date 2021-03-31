@@ -62,6 +62,21 @@ namespace RootTools.Module
                 m_infoList.Add(_sInfo);
             }
         }
+
+        private string _sNowProgress = "Need Init";
+        public string p_sNowProgress
+        {
+            get
+            {
+                return _sNowProgress;
+            }
+            set
+            {
+                _sNowProgress = value;
+                OnPropertyChanged();
+            }
+
+        }
         #endregion
 
         #region List ModuleBase
@@ -114,7 +129,7 @@ namespace RootTools.Module
                         if (m_qModuleRun.Count > 0)
                         {
                             ModuleRunBase moduleRun = m_qModuleRun.Peek();
-                            p_iRun = m_qModuleRun.Count;
+                            p_iRun = p_maxRun - m_qModuleRun.Count;
                             moduleRun.StartRun();
                             Thread.Sleep(100);
                             while (moduleRun.m_moduleBase.m_qModuleRun.Count > 0) Thread.Sleep(10);
@@ -138,7 +153,7 @@ namespace RootTools.Module
                             }
                         }
                         if (m_qModuleRun.Count == 0)
-                            p_iRun = p_maxRun;
+                            p_iRun = p_maxRun - m_qModuleRun.Count;
 
                         break;
                     case EQ.eState.Error:
@@ -181,7 +196,6 @@ namespace RootTools.Module
                 case EQ.eState.Recovery:
                     m_qModuleRun.Clear();
                     p_moduleList.Clear();
-                    p_iRun = m_qModuleRun.Count;
                     EQ.p_bStop = true;
                     break;
                 case EQ.eState.Error: m_handler.Reset(); break;
@@ -191,6 +205,7 @@ namespace RootTools.Module
 
         public void StartModuleRuns()
         {
+            
             EQ.p_bStop = false;
             p_moduleList.Clear();
             foreach (ModuleRunBase moduleRun in m_moduleRunList.p_aModuleRun)
@@ -280,17 +295,29 @@ namespace RootTools.Module
             }
             set 
             {
+                _iRun = value;
+                p_Percent = ((double)_iRun / (double)p_maxRun *100).ToString("F2");
+                if(p_sNowProgress != "STOP" && value == p_maxRun)
+                    p_sNowProgress = "DONE";
                 
-                if (value == 0)
-                    _iRun = value;
-                else
-                    _iRun = (m_qModuleRun.Count == 0) ? p_maxRun : p_maxRun - m_qModuleRun.Count;
+                //if (value == 0)
+                //    _iRun = value;
+                //else
+                //    _iRun = (p_maxRun == 0) ? p_maxRun : p_maxRun - (int)value;
+                ////_iRun = (m_qModuleRun.Count == 0) ? p_maxRun : p_maxRun - m_qModuleRun.Count;
 
-                int now = p_maxRun - (int)value;
-                if (now == 0)
-                    p_Percent = "100%";
-                else
-                    p_Percent = ((double)now / (double)p_maxRun * 100).ToString("F2");
+                    //int now = p_maxRun - (int)value;
+                    //if (now == 0)
+                    //{
+                    //    p_Percent = "100%";
+                    //    _iRun = p_maxRun;
+                    //}
+                    //else if (now == p_maxRun)
+                    //{
+                    //    p_Percent = "0%";
+                    //}
+                    //else
+                    //    p_Percent = ((double)now / (double)p_maxRun * 100).ToString("F2");
                 OnPropertyChanged(); 
             }
         }

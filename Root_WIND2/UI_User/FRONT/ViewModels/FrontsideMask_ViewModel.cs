@@ -1607,10 +1607,10 @@ namespace Root_WIND2.UI_User
             if (ptrMem == IntPtr.Zero)
                 return;
 
-            byte[] buf = new byte[originWidth * p_ROILayer.GetBytePerPixel()];
+            byte[] buf = new byte[originWidth * p_ROILayer.p_nByte];
             for (int y = 0; y < originHeight; y++)
             {
-                Marshal.Copy(buf, 0, (IntPtr)((long)ptrMem + (long)p_ROILayer.p_Size.X * p_ROILayer.GetBytePerPixel() * y), buf.Length);
+                Marshal.Copy(buf, 0, (IntPtr)((long)ptrMem + (long)p_ROILayer.p_Size.X * p_ROILayer.p_nByte * y), buf.Length);
             }
 
 
@@ -1654,10 +1654,10 @@ namespace Root_WIND2.UI_User
             if (ptrMem == IntPtr.Zero)
                 return;
 
-            byte[] buf = new byte[originWidth * p_ROILayer.GetBytePerPixel()];
+            byte[] buf = new byte[originWidth * p_ROILayer.p_nByte];
             for (int y = 0; y < originHeight; y++)
             {
-                Marshal.Copy(buf, 0, (IntPtr)((long)ptrMem + (long)p_ROILayer.p_Size.X * p_ROILayer.GetBytePerPixel() * y), buf.Length);
+                Marshal.Copy(buf, 0, (IntPtr)((long)ptrMem + (long)p_ROILayer.p_Size.X * p_ROILayer.p_nByte * y), buf.Length);
             }
 
 
@@ -1699,14 +1699,13 @@ namespace Root_WIND2.UI_User
             if (ptrMem == IntPtr.Zero)
                 return;
 
-            byte[] buf = new byte[originWidth * p_ROILayer.GetBytePerPixel()];
+            byte[] buf = new byte[originWidth * p_ROILayer.p_nByte];
             for (int i = 0; i < originHeight; i++)
             {
-                Marshal.Copy(buf, 0, (IntPtr)((long)ptrMem + (long)p_ROILayer.p_Size.X * p_ROILayer.GetBytePerPixel() * i), buf.Length);
+                Marshal.Copy(buf, 0, (IntPtr)((long)ptrMem + (long)p_ROILayer.p_Size.X * p_ROILayer.p_nByte * i), buf.Length);
             }
 
-            if(p_SelectedROI!=null)
-                p_SelectedROI.p_Data.Clear();
+            p_SelectedROI.p_Data.Clear();
             SetRecipeData();
         }
         private void Worker_ClearROI_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)

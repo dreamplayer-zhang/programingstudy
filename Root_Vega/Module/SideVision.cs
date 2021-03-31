@@ -200,23 +200,23 @@ namespace Root_Vega.Module
         #endregion
         public override void GetTools(bool bInit)
         {
-            p_sInfo = m_toolBox.Get(ref m_axisXY, this, "AxisXY");
-            p_sInfo = m_toolBox.Get(ref m_axisZ, this, "AxisZ");
-            p_sInfo = m_toolBox.Get(ref m_axisTheta, this, "AxisTheta");
-            p_sInfo = m_toolBox.Get(ref m_axisClamp, this, "AxisClamp");
+            p_sInfo = m_toolBox.GetAxis(ref m_axisXY, this, "AxisXY");
+            p_sInfo = m_toolBox.GetAxis(ref m_axisZ, this, "AxisZ");
+            p_sInfo = m_toolBox.GetAxis(ref m_axisTheta, this, "AxisTheta");
+            p_sInfo = m_toolBox.GetAxis(ref m_axisClamp, this, "AxisClamp");
             p_sInfo = m_toolBox.Get(ref m_lightSet, this);
             //p_sInfo = m_toolBox.Get(ref m_RADSControl, this, "RADSControl");
             p_sInfo = m_toolBox.Get(ref m_memoryPool, this, "Memory", 1);
             p_sInfo = m_toolBox.Get(ref m_inspectTool, this);
-            p_sInfo = m_toolBox.Get(ref m_CamBevel, this, "Bevel Main");
-            p_sInfo = m_toolBox.Get(ref m_CamSide, this, "Side Main");
-            p_sInfo = m_toolBox.Get(ref m_CamLADS, this, "LADS");
-            p_sInfo = m_toolBox.Get(ref m_CamBevelVRS, this, "Bevel VRS");
-            p_sInfo = m_toolBox.Get(ref m_CamSideVRS, this, "Side VRS");
-            p_sInfo = m_toolBox.Get(ref m_CamAlign1, this, "Side_Align1");
-            p_sInfo = m_toolBox.Get(ref m_CamAlign2, this, "Side_Align2");
+            p_sInfo = m_toolBox.GetCamera(ref m_CamBevel, this, "Bevel Main");
+            p_sInfo = m_toolBox.GetCamera(ref m_CamSide, this, "Side Main");
+            p_sInfo = m_toolBox.GetCamera(ref m_CamLADS, this, "LADS");
+            p_sInfo = m_toolBox.GetCamera(ref m_CamBevelVRS, this, "Bevel VRS");
+            p_sInfo = m_toolBox.GetCamera(ref m_CamSideVRS, this, "Side VRS");
+            p_sInfo = m_toolBox.GetCamera(ref m_CamAlign1, this, "Side_Align1");
+            p_sInfo = m_toolBox.GetCamera(ref m_CamAlign2, this, "Side_Align2");
 
-            p_sInfo = m_toolBox.Get(ref m_diSideReticleExistSensor, this, "Side Reticle Sensor");
+            p_sInfo = m_toolBox.GetDIO(ref m_diSideReticleExistSensor, this, "Side Reticle Sensor");
 
             if (bInit) m_inspectTool.OnInspectDone += M_inspectTool_OnInspectDone;
         }

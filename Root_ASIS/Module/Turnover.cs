@@ -17,12 +17,12 @@ namespace Root_ASIS.Module
 
         public override void GetTools(bool bInit)
         {
-            p_sInfo = m_toolBox.Get(ref m_axisTurn, this, "Turn");
-            p_sInfo = m_toolBox.Get(ref m_dioUp, this, "Up", "Down", "Up");
-            p_sInfo = m_toolBox.Get(ref m_doVac[0], this, "Vacuum 0");
-            p_sInfo = m_toolBox.Get(ref m_doVac[1], this, "Vacuum 1");
-            p_sInfo = m_toolBox.Get(ref m_doBlow[0], this, "Blow 0");
-            p_sInfo = m_toolBox.Get(ref m_doBlow[1], this, "Blow 1");
+            p_sInfo = m_toolBox.GetAxis(ref m_axisTurn, this, "Turn");
+            p_sInfo = m_toolBox.GetDIO(ref m_dioUp, this, "Up", "Down", "Up");
+            p_sInfo = m_toolBox.GetDIO(ref m_doVac[0], this, "Vacuum 0");
+            p_sInfo = m_toolBox.GetDIO(ref m_doVac[1], this, "Vacuum 1");
+            p_sInfo = m_toolBox.GetDIO(ref m_doBlow[0], this, "Blow 0");
+            p_sInfo = m_toolBox.GetDIO(ref m_doBlow[1], this, "Blow 1");
             if (bInit) InitTools();
         }
 

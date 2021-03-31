@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Root_AOP01_Packing"
         xmlns:icon="clr-namespace:Root_AOP01_Packing.Icon"
+        xmlns:tools="clr-namespace:RootTools;assembly=RootTools"
         mc:Ignorable="d"
         WindowStyle="None"
         WindowStartupLocation="CenterScreen"
@@ -270,7 +271,10 @@
                     <TabItem.Header>
                         <TextBlock Text="Log" FontWeight="Bold"/>
                     </TabItem.Header>
-                    <TabControl Visibility="{Binding ElementName=viewLog, Path=IsChecked, Converter={StaticResource BooleanToVisiblity}}">
+                    <tools:LogView_UI x:Name="logViewUI"
+                                      Visibility="{Binding ElementName=viewLog, Path=IsChecked, Converter={StaticResource BooleanToVisiblity}}"
+                                      Margin="2" />
+                    <!--<TabControl Visibility="{Binding ElementName=viewLog, Path=IsChecked, Converter={StaticResource BooleanToVisiblity}}">
                         <TabItem Header="ALL" FontSize="10">
                             <TextBlock Text="Log Area" Margin="5"/>
                         </TabItem>
@@ -279,7 +283,7 @@
                         <TabItem Header="I/O" FontSize="10"/>
                         <TabItem Header="Network" FontSize="10"/>
                         <TabItem Header="Result" FontSize="10"/>
-                    </TabControl>
+                    </TabControl>-->
                 </TabItem>
                 <TabItem Width="50" Visibility="{Binding ElementName=viewAlarm, Path=IsChecked, Converter={StaticResource BooleanToVisiblity}}">
                     <TabItem.Header>

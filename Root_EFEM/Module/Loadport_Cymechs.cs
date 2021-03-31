@@ -20,6 +20,7 @@ namespace Root_EFEM.Module
         {
             m_alid_WaferExist.Run(true, "Aligner Wafer Exist Error");
         }
+        
         #region ToolBox
 
         RS232 m_rs232;
@@ -124,15 +125,15 @@ namespace Root_EFEM.Module
         public bool m_bUnLoadCheck = false;
         public override void GetTools(bool bInit)
         {
-            p_sInfo = m_toolBox.Get(ref m_diPlaced, this, "Place");
-            p_sInfo = m_toolBox.Get(ref m_diPresent, this, "Present");
-            p_sInfo = m_toolBox.Get(ref m_diOpen, this, "Open");
-            p_sInfo = m_toolBox.Get(ref m_diClose, this, "Close");
-            p_sInfo = m_toolBox.Get(ref m_diReady, this, "Ready");
-            p_sInfo = m_toolBox.Get(ref m_diRun, this, "Run");
-            p_sInfo = m_toolBox.Get(ref m_rs232, this, "RS232");
+            p_sInfo = m_toolBox.GetDIO(ref m_diPlaced, this, "Place");
+            p_sInfo = m_toolBox.GetDIO(ref m_diPresent, this, "Present");
+            p_sInfo = m_toolBox.GetDIO(ref m_diOpen, this, "Open");
+            p_sInfo = m_toolBox.GetDIO(ref m_diClose, this, "Close");
+            p_sInfo = m_toolBox.GetDIO(ref m_diReady, this, "Ready");
+            p_sInfo = m_toolBox.GetDIO(ref m_diRun, this, "Run");
+            p_sInfo = m_toolBox.GetComm(ref m_rs232, this, "RS232");
             //p_sInfo = m_toolBox.Get(ref m_OHT, this, p_infoCarrier, "OHT");
-            p_sInfo = m_toolBox.Get(ref _OHT, this, p_infoCarrier, "OHT");
+            p_sInfo = m_toolBox.GetOHT(ref _OHT, this, p_infoCarrier, "OHT");
             if (bInit)
             {
                 m_rs232.OnReceive += M_rs232_OnReceive;
@@ -895,6 +896,7 @@ namespace Root_EFEM.Module
             p_id = id;
             InitCmd();
             p_infoCarrier = new InfoCarrier(this, id, engineer, bEnableWaferSize, bEnableWaferCount);
+            
             //m_rfid = rfid;
             if (id == "LoadportA")
                 p_infoCarrier.p_sLocID = "LP1";

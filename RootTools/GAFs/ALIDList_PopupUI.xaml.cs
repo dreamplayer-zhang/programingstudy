@@ -48,6 +48,10 @@ namespace RootTools.GAFs
         {
             m_listALID.ClearALID();
             SetLableBinding(null);
+            if(m_listALID.p_aSetALID.Count == 0)
+            {
+                return;
+            }
             ALID alid = (ALID)listViewALID.Items[m_listALID.p_aSetALID.Count - 1];
             SetLableBinding(alid);
         }

@@ -4,9 +4,13 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Root_CAMELLIA.Control"
+             xmlns:main="clr-namespace:Root_CAMELLIA"
              xmlns:packicon="http://metro.mahapps.com/winfx/xaml/iconpacks"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.Resources>
+        <main:ValueToUIValueConverter x:Key="ValueConverter"/>
+    </UserControl.Resources>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="auto"/>
@@ -17,10 +21,22 @@
             <TextBlock Width="70" HorizontalAlignment="Center"  VerticalAlignment="Center" Grid.Row="0" Text="{Binding p_sFan}" Foreground="Black" TextAlignment="Center" TextWrapping="Wrap"/>
         </Grid>
         <Grid Grid.Row="1" Margin="5" RenderTransformOrigin="0.5, 0.5">
-            <packicon:PackIconMaterial Grid.Row="0" Kind="Fan" Foreground="Black"
+            <packicon:PackIconMaterial Grid.Row="0" Foreground="Black"
                                        HorizontalAlignment="Center" VerticalAlignment="Center"
                                        Width="{Binding ActualHeight, RelativeSource={RelativeSource FindAncestor, AncestorType=Grid}}"
                                        Height="{Binding ActualHeight, RelativeSource={RelativeSource FindAncestor, AncestorType=Grid}}">
+                <packicon:PackIconMaterial.Style>
+                    <Style TargetType="packicon:PackIconMaterial">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding p_bRun, UpdateSourceTrigger=PropertyChanged}" Value="False">
+                                <Setter Property="Kind" Value="FanAlert"></Setter>
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding p_bRun, UpdateSourceTrigger=PropertyChanged}" Value="True">
+                                <Setter Property="Kind" Value="Fan"></Setter>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </packicon:PackIconMaterial.Style>
             </packicon:PackIconMaterial>
             <Grid.RenderTransform>
                 <RotateTransform/>
@@ -51,9 +67,11 @@
             <Grid.RowDefinitions>
                 <RowDefinition Height="auto"/>
                 <RowDefinition Height="auto"/>
+                <RowDefinition Height="auto"/>
             </Grid.RowDefinitions>
-            <TextBlock HorizontalAlignment="Stretch" Grid.Row="0" Text="RPM" Foreground="Black" TextAlignment="Center"/>
-            <TextBlock HorizontalAlignment="Center" Grid.Row="1" Text="{Binding p_nRPM}" Foreground="Black"/>
+            <!--<TextBlock HorizontalAlignment="Stretch" Grid.Row="0" Text="RPM" Foreground="Black" TextAlignment="Center"/>-->
+            <TextBlock HorizontalAlignment="Center" Grid.Row="1" Text="{Binding p_nRPM, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource ValueConverter}, ConverterParameter=RPM}" Foreground="Black"/>
+            <TextBlock HorizontalAlignment="Center" Grid.Row="2" Text="{Binding p_fPressure, Converter={StaticResource ValueConverter}, ConverterParameter=Fan}" Foreground="Black"/>
         </Grid>
         <Grid></Grid>
     </Grid>

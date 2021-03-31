@@ -31,10 +31,10 @@ namespace Root_EFEM.Module
 
         public override void GetTools(bool bInit)
         {
-            p_sInfo = m_toolBox.Get(ref m_diWaferExist, this, "WaferExist");
-            p_sInfo = m_toolBox.Get(ref m_rs232, this, "RS232");
+            p_sInfo = m_toolBox.GetDIO(ref m_diWaferExist, this, "WaferExist");
+            p_sInfo = m_toolBox.GetComm(ref m_rs232, this, "RS232");
             p_sInfo = m_toolBox.Get(ref m_memoryPool, this, "Memory", 1);
-            p_sInfo = m_toolBox.Get(ref m_camOCR, this, "OCR");
+            p_sInfo = m_toolBox.GetCamera(ref m_camOCR, this, "OCR");
             if (bInit)
             {
                 InitMemory();

@@ -676,33 +676,5 @@ namespace ViewConverter
         }
     }
 
-    public class BoolToEnableStringConverter : IValueConverter
-    {
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            bool bValue = (bool)value;
-            if (bValue == true) return "Enable";
-            else return "Disable";
-        }
 
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            throw new NotImplementedException();
-        }
-    }
-
-    public class BoolToEnableColorConverter : IValueConverter
-    {
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            bool bValue = (bool)value;
-            if (bValue == true) return Brushes.Green;
-            else return Brushes.Red;
-        }
-
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            throw new NotImplementedException();
-        }
-    }
 }
