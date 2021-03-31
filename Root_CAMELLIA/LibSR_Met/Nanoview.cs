@@ -429,6 +429,8 @@ namespace Root_CAMELLIA.LibSR_Met
                         data.nNIRDataNum = m_SR.m_ExpNum;
                         data.dX = dXPos;
                         data.dY = dYPos;
+                        Array.Reverse(m_SR.m_ExpR);
+                        Array.Reverse(m_SR.m_Expnm);
                         m_SR.m_ExpR.CopyTo(data.Reflectance, 0);
                         m_SR.m_Expnm.CopyTo(data.Wavelength, 0);
                         for (int i=0; i<nNumOfData;i++)
@@ -443,7 +445,7 @@ namespace Root_CAMELLIA.LibSR_Met
                         }
                         //Array.Copy(reflectance, data.VIS_Reflectance, data.nThicknessDataNum);
                         //Array.Copy(eV, data.eV, data.nThicknessDataNum);
-
+                       
                         m_DM.m_Log.WriteLog(LogType.Operating, "Sample Measure Done");
                         //MessageBox.Show("Sample Measure Done"); //추후 제거
                     }

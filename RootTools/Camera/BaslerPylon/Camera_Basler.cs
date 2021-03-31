@@ -22,6 +22,8 @@ namespace RootTools.Camera.BaslerPylon
 
         public event System.EventHandler Grabed;
 
+        public event System.EventHandler Captured;
+
         #region Property
         public string p_id { get; set; }
         public bool bStopThread
@@ -566,6 +568,7 @@ namespace RootTools.Camera.BaslerPylon
                     }));
                 }
                 m_cam.StreamGrabber.Start(1, GrabStrategy.OneByOne, GrabLoop.ProvidedByStreamGrabber);
+                CaptureEvent();
             }
             catch (Exception) { }
         }
@@ -875,6 +878,17 @@ namespace RootTools.Camera.BaslerPylon
         {
             if (Grabed != null)
                 Grabed.Invoke(this, e);
+        }
+
+        void CaptureEvent()
+        {
+            if (Captured != null)
+                OnCapture(new EventArgs());
+        }
+        protected virtual void OnCapture(EventArgs e)
+        {
+            if (Captured != null)
+                Captured.Invoke(this, e);
         }
         public void FunctionConnect()
         {

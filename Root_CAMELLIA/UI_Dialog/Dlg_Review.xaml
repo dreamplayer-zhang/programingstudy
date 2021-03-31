@@ -4,6 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:Icon="clr-namespace:Root_CAMELLIA.Control.Icon"
+        xmlns:Graph="clr-namespace:Root_CAMELLIA.Control"
         xmlns:local="clr-namespace:Root_CAMELLIA"
         xmlns:stage="clr-namespace:Camellia2Stage"
         xmlns:graph="clr-namespace:Root_CAMELLIA.LibSR_Met"
@@ -134,10 +135,14 @@
                     <Grid Grid.Column="1">
                         <TabControl>
                             <TabItem Header="Reflectance">
-                                <graph:RTGraph></graph:RTGraph>
+                                <Grid>
+                                    <Graph:Review_RGraph/>
+                                </Grid>
                             </TabItem>
                             <TabItem Header="Transmittance">
-                                <graph:RTGraph></graph:RTGraph>
+                                <Grid>
+                                    <Graph:Review_TGraph/>
+                                </Grid>
                             </TabItem>
                         </TabControl>
                     </Grid>

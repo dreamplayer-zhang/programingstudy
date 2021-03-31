@@ -3,6 +3,7 @@ using RootTools.Trees;
 using System;
 using System.Collections.Generic;
 using System.IO.Ports;
+using System.Threading;
 using System.Windows.Controls;
 
 namespace RootTools.Comm
@@ -160,7 +161,10 @@ namespace RootTools.Comm
         bool m_bLogReceive = false; 
         private void M_client_ReceiveDataChanged(object sender)
         {
-           if (m_bLogReceive) m_commLog.Add(CommLog.eType.Receive, BitConverter.ToString(m_client.receiveData)); 
+            if (m_bLogReceive)
+            {
+                m_commLog.Add(CommLog.eType.Receive, BitConverter.ToString(m_client.receiveData));
+            }
           }
 
         void RunTreeLog(Tree tree)

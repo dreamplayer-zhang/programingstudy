@@ -76,6 +76,8 @@ namespace Root_CAMELLIA.Data
             data.ModelRecipePath = ModelRecipePath;
         }
 
+        
+
         public bool ContainsData(List<CCircle> list, CCircle circle, out int nIndex)
         {
             bool bRst = false;

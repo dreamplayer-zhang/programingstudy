@@ -3,6 +3,7 @@ using RootTools.Comm;
 using RootTools.GAFs;
 using RootTools.Module;
 using RootTools.Trees;
+using System;
 using System.Collections.Generic;
 using System.Threading;
 
@@ -505,7 +506,7 @@ namespace Root_CAMELLIA.Module
 						m_FFU.m_modbus.WriteHoldingRegister(m_idUnit, 32, m_aFanRPMSet);
 					}
 				}
-				catch { }
+				catch(Exception e) { }
 			}
 
 			bool IsRPMSet()

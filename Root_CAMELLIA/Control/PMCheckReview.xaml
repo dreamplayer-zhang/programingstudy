@@ -41,10 +41,13 @@
                         <ColumnDefinition Width="5*"/>
                         <ColumnDefinition Width="3*"/>
                     </Grid.ColumnDefinitions>
-                    <Grid Grid.Row="0">
-                        <tools:RootViewer DataContext="{Binding p_rootViewer}"></tools:RootViewer>
+                    <Grid Grid.Column="0">
+                            <!--<Canvas>
+                                <Image Source="{Binding p_pmImgSource, UpdateSourceTrigger=PropertyChanged}" Stretch="Uniform" Margin="2"></Image>
+                            </Canvas>-->
+                            <tools:RootViewer DataContext="{Binding p_rootViewer}"></tools:RootViewer>
                     </Grid>
-                    <Grid Grid.Row="1">
+                    <Grid Grid.Column="1">
                     </Grid>
                 </Grid>
             </GroupBox>

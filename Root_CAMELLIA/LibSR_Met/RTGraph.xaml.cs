@@ -188,7 +188,6 @@ namespace Root_CAMELLIA.LibSR_Met
                                 NIR_Wavelength[n] = data.Wavelength[n];
                                 NIR_Transmittance[n] = data.Transmittance[n];
                             }
-                            //Array.Reverse(NIR_Transmittance);
                             m_TransmittancePlotTable = GraphT.plt.PlotScatterHighlight(NIR_Wavelength, NIR_Transmittance, markerSize: 2.5);
                             GraphT.plt.Axis(350, 1500, -10, 100);
                         }

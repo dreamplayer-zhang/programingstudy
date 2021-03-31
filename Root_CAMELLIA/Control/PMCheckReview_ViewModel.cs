@@ -11,6 +11,11 @@ using RootTools.Module;
 using System.Windows.Input;
 using System.Threading;
 using Root_CAMELLIA.Module;
+using System.Windows.Media.Imaging;
+using Emgu.CV;
+using System.Drawing;
+using System.Runtime.InteropServices;
+using System.Windows.Threading;
 
 namespace Root_CAMELLIA
 {
@@ -28,6 +33,20 @@ namespace Root_CAMELLIA
                 SetProperty(ref m_rootViewer, value);
             }
         }
+
+        private BitmapSource m_pmImgSource;
+        public BitmapSource p_pmImgSource
+        {
+            get
+            {
+                return m_pmImgSource;
+            }
+            set
+            {
+                SetProperty(ref m_pmImgSource, value);
+            }
+        }
+
         public PMCheckReview_ViewModel()
         {
             Init();
@@ -40,8 +59,37 @@ namespace Root_CAMELLIA
             p_DataTable.Columns.Add(new DataColumn("List"));
             p_DataTable.Columns.Add(new DataColumn("Result"));
 
+            dispatcher = Application.Current.Dispatcher;
+
             ModuleCamellia = ((CAMELLIA_Handler)App.m_engineer.ClassHandler()).m_camellia;
+
+            ModuleCamellia.p_CamVRS.Captured += GetImage;
         }
+
+        private Dispatcher dispatcher;
+        public void GetImage(object sender, EventArgs e)
+        {
+            //ImageData p_ImageData = ModuleCamellia.p_CamVRS.p_ImageViewer.p_ImageData;
+            BitmapSource bitmapSource = ModuleCamellia.p_CamVRS.p_ImageViewer.p_ImageData.GetBitMapSource(3);
+            p_rootViewer.p_ImageData = ModuleCamellia.p_CamVRS.p_ImageViewer.p_ImageData;
+
+
+            //p_pmImgSource = bitmapSource;
+            //p_rootViewer.p_ImageData = p_ImageData;
+            //dispatcher.Invoke(() =>
+            //{
+            //    p_rootViewer.SetImageData(p_ImageData);
+            //});
+            //RootTools.Camera.BaslerPylon.Camera_Basler p_CamVRS = ModuleCamellia.p_CamVRS;
+            //Mat mat = new Mat(new System.Drawing.Size(p_CamVRS.GetRoiSize().X, p_CamVRS.GetRoiSize().Y), Emgu.CV.CvEnum.DepthType.Cv8U, 3, p_CamVRS.p_ImageViewer.p_ImageData.GetPtr(), (int)p_CamVRS.p_ImageViewer.p_ImageData.p_Stride * 3);
+            ////CvInvoke.Imshow("test",mat);
+            ////CvInvoke.WaitKey(0);
+            ////CvInvoke.DestroyAllWindows();
+            //BitmapSource bit = CreateBitmapSourceFromBitmap(mat.Bitmap);
+            //p_pmImgSource = bit;
+
+        }
+
         DataTable m_DataTable = new DataTable();
         public DataTable p_DataTable
         {
@@ -94,7 +142,7 @@ namespace Root_CAMELLIA
             }
         }
 
-        public ICommand cmdSensorStageAlign
+        public ICommand CmdSensorStageAlign
         {
             get
             {
@@ -127,7 +175,8 @@ namespace Root_CAMELLIA
             Thread thread = new Thread(() =>
             {
                 Run_PMReflectance ReflectanceRepeatability = (Run_PMReflectance)ModuleCamellia.CloneModuleRun("PMReflectance");
-                ReflectanceRepeatability.Run();
+                ModuleCamellia.StartRun(ReflectanceRepeatability) ;
+                //ReflectanceRepeatability.Run();
             });
             thread.Start();
         }
@@ -142,11 +191,11 @@ namespace Root_CAMELLIA
             Thread thread = new Thread(() =>
             {
                 Run_PMThickness ThicknessRepeatability = (Run_PMThickness)ModuleCamellia.CloneModuleRun("PMThickness");
-                ThicknessRepeatability.Run();
+                ModuleCamellia.StartRun(ThicknessRepeatability);
             });
             thread.Start();
         }
-        private void PMSensorStageAlign ()
+        private void PMSensorStageAlign()
         {
             EQ.p_bStop = false;
             if (ModuleCamellia.p_eState != ModuleBase.eState.Ready)
@@ -157,7 +206,7 @@ namespace Root_CAMELLIA
             Thread thread = new Thread(() =>
             {
                 Run_PMSensorStageAlign SensorStageAlign = (Run_PMSensorStageAlign)ModuleCamellia.CloneModuleRun("PMSensorStageAlign");
-                SensorStageAlign.Run();
+                ModuleCamellia.StartRun(SensorStageAlign);
             });
             thread.Start();
         }
@@ -172,7 +221,7 @@ namespace Root_CAMELLIA
             Thread thread = new Thread(() =>
             {
                 Run_PMSensorCameraTilt SensorCameraTilt= (Run_PMSensorCameraTilt)ModuleCamellia.CloneModuleRun("PMSensorCameraTilt");
-                SensorCameraTilt.Run();
+                ModuleCamellia.StartRun(SensorCameraTilt);
             });
             thread.Start();
         }

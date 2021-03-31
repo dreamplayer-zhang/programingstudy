@@ -3,6 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.IO;
+using System.Windows;
+using System.Drawing;
+using System.Windows.Forms;
 
 namespace Root_CAMELLIA.LibSR_Met
 {
@@ -15,6 +19,7 @@ namespace Root_CAMELLIA.LibSR_Met
         OK = 1, //PM결과 정상
         CheckError = 2  //측정중 내부 에러 발생
     }
+
     public enum PMItem
     {
         LightSource,
@@ -24,6 +29,11 @@ namespace Root_CAMELLIA.LibSR_Met
         VacVariation,
         CameraSensorOffset,
         CSSAlign    //Camera Stage Sensor
+    }
+    public class SensorTiltDatas
+    {
+        public List<double> Wavelength = new List<double>();
+        public List<double> Diff = new List<double>();
     }
     public class PMResult
     {
@@ -35,79 +45,150 @@ namespace Root_CAMELLIA.LibSR_Met
 
     public class PMDatas
     {
+        public List<PMResult> Result;
+        public List<SensorTiltDatas> SensorTiltData;
         //Common
-        public double CheckRangeStart = 350; //350[nm]
-        public double CheckRangeEnd = 1500;  //1500[nm]
+        public int nCheckRangeStart = 350; //350[nm]
+        public int nCheckRangeEnd = 1500;  //1500[nm]
 
         //Sensor Tilt
-        public double SensorTiltError = 1;    //1
-        public int SensorTiltRepeatNum = 15;
+        public double dSensorTiltError = 1;    //1
+        public int nSensorTiltRepeatNum = 15;
+
+        public List<double> WavelengthRef;
+        public List<double> ReflectanceRef;
 
         DataManager m_DM = DataManager.GetInstance();
         public PMDatas()
         {
+            Result = new List<PMResult>();
+            SensorTiltData = new List<SensorTiltDatas>();
 
+            WavelengthRef = new List<double>();
+            ReflectanceRef = new List<double>();
         }
+        public void LoadPMData()
+        {
+            try
+            {
+                LoadReflectanceData();
+
+                if (!File.Exists(ConstValue.PATH_PM_FILE))
+                {
+                    m_DM.m_Log.WriteLog(LogType.PM, "[Error]PM & Monitoring - PM.cpm file is not exist.");
+                    return;
+                }
+
+                StreamReader sr = new StreamReader(ConstValue.PATH_PM_FILE);
+
+                while (!sr.EndOfStream)
+                {
+                    string str = sr.ReadLine();
+                    string[] datas = str.Split(':');
+                    string[] dataTemp;// = datas[1].Split(',');
+
+                    if (datas[1] == string.Empty)
+                        continue;
+
+                    switch (datas[0])
+                    {
+                        case "CheckRangeStart":
+                            nCheckRangeStart = Convert.ToInt32(datas[1]);
+                            break;
+                        case "CheckRangeEnd":
+                            nCheckRangeEnd = Convert.ToInt32(datas[1]);
+                            break;
+                        case "SensorTiltError":
+                            dSensorTiltError = Convert.ToDouble(datas[1]);
+                            break;
+                        case "SensorTiltRepeatNum":
+                            nSensorTiltRepeatNum = Convert.ToInt32(datas[1]);
+                            break;
+                        
+                    }
+                }
+                sr.Close();
+            }
+            catch (Exception ex)
+            {
+
+            }
+        }
+        private void LoadReflectanceData()
+        {
+            if (!File.Exists(ConstValue.PATH_PM_REFLECTANCE_FILE))
+            {
+                m_DM.m_Log.WriteLog(LogType.PM, "[Error]PM & Monitoring - PMReflectance.csv file is not exist.");
+                return;
+            }
+            StreamReader sr = new StreamReader(ConstValue.PATH_PM_REFLECTANCE_FILE);
+
+            sr.ReadLine();
+            while (!sr.EndOfStream)
+            {
+                string sTemp = sr.ReadLine();
+                string[] srDatas = sTemp.Split(',');
+
+                WavelengthRef.Add(Convert.ToDouble(srDatas[0]));
+                ReflectanceRef.Add(Convert.ToDouble(srDatas[1]));
+            }
+            sr.Close();
+        }
+        public CheckResult CheckSensorTilt()
+        {
+            m_DM.m_Log.WriteLog(LogType.PM, "CheckSensorTilt()");
+
+            if (m_DM.m_RawData[0].Wavelength.Count() == 0)
+            {
+                m_DM.m_Log.WriteLog(LogType.PM, "[CheckError]PM & Monitoring - No measurement data.");
+                return CheckResult.CheckError;
+            }
+
+            PMResult rstPM = new PMResult();
+            rstPM.ItemName = PMItem.SensorTilt;
+            rstPM.Reference = "±" + dSensorTiltError.ToString() + "%";
 
 
-        //public CheckResult CheckSensorTilt()
-        //{
-        //    m_DM.m_Log.WriteLog(LogType.PM, "CheckSensorTilt()");
+            //SensorTiltDataStartN = 350;
+            //SensorTiltDataEndN = 1500;
+            //int nWLCount = SensorTiltDataEndN - ensorTiltDataStartN + 1;
+            //SensorTiltDataCount = nWLCount;
 
-        //    if (m_DM.m_RawData[0].Wavelength.Count() == 0)
-        //    {
-        //        m_DM.m_Log.WriteLog(LogType.PM, "[CheckError]PM & Monitoring - No measurement data.");
-        //        return CheckResult.CheckError;
-        //    }
+            if (Math.Abs(m_DM.m_RawData[0].Wavelength[0] - WavelengthRef[0]) > 0.1)
+            {
+                // 둘다 350 부터 시작 해야함
+                //m_DM.m_LM.WriteLog(LOG.PM, "[CheckError]PM & Monitoring - CalData와 측정Data 갯수 불일치");
+                m_DM.m_Log.WriteLog(LogType.PM, "[CheckError]PM & Monitoring - Cal data and measurement data number do not match");
+                return CheckResult.CheckError;
+            }
+            if(double.IsNaN(m_DM.m_RawData[0].Reflectance[0]) ==true)
+            {
+                m_DM.m_Log.WriteLog(LogType.PM, "[Error]CheckSensorTilt - MeasureData Error:" );
+                rstPM.Error = true;
+                return CheckResult.CheckError;
+            }
+            SensorTiltDatas tiltData = new SensorTiltDatas();
+            int nCheckPMRange = nCheckRangeEnd - nCheckRangeStart;
+            double dDiffSum = 0.0, dAvg = 0.0;
+            for (int n = 0; n < nCheckPMRange; n++)
+            {
+                tiltData.Wavelength.Add(WavelengthRef[n]);
+                tiltData.Diff.Add(Math.Abs(ReflectanceRef[n] - m_DM.m_RawData[0].Reflectance[n]));
+                dDiffSum += (Math.Abs(ReflectanceRef[n] - m_DM.m_RawData[0].Reflectance[n]));
+            }
+            SensorTiltData.Add(tiltData);
+            dAvg = dDiffSum / (double)nCheckPMRange;
+            rstPM.Measured = dAvg;
 
-        //    PMResult rstPM = new PMResult();
-        //    rstPM.ItemName = PMItem.SensorTilt;
-        //    rstPM.Reference = "±" + SensorTiltError.ToString() + "%";
-
-        //    int nStartNum = 0, nEndNum = 0;
-        //    bool bFound = false;
-        //    for (int n = 0; n < m_DM.m_RawData[0].Wavelength.Count(); n++)
-        //    {
-        //        if (CheckRangeStart <= m_DM.m_RawData[0].Wavelength[n] && m_DM.m_RawData[0].Wavelength[n] <= CheckRangeEnd)
-        //        {
-        //            if (bFound == false)
-        //            {
-        //                nStartNum = n;
-        //                bFound = true;
-        //            }
-        //        }
-        //        else if (bFound == true)
-        //        {
-        //            nEndNum = n - 1;
-        //            break;
-        //        }
-        //    }
-        //    int nWLCount = nEndNum - nStartNum + 1;
-        //    SensorTiltDataCount = nWLCount;
-        //    SensorTiltDataStartN = nStartNum;
-        //    SensorTiltDataEndN = nEndNum;
-
-        //    if (Math.Abs(m_DM.m_RawData[0].Wavelength[nStartNum] - WavelengthRef[nStartNum]) > 0.1)
-        //    {
-        //        //m_DM.m_LM.WriteLog(LOG.PM, "[CheckError]PM & Monitoring - CalData와 측정Data 갯수 불일치");
-        //        m_DM.m_Log.WriteLog(LogType.PM, "[CheckError]PM & Monitoring - Cal data and measurement data number do not match");
-        //        return CheckResult.CheckError;
-        //    }
-
-        //    SensorTiltDatas tiltData = new SensorTiltDatas();
-
-        //    for (int n = nStartNum; n < nEndNum; n++)
-        //    {
-        //        tiltData.Wavelength.Add(WavelengthRef[n]);
-        //        tiltData.Diff.Add(Math.Abs(ReflectanceRef[n] - m_DM.m_RawData[0].Reflectance[n]));
-        //    }
-        //    m_DM.m_PMData.SensorTiltData.Add(tiltData);
-
-        //    m_DM.m_Log.WriteLog(LogType.PM, "[OK]CheckSensorTilt");
-        //    rstPM.Error = false;
-        //    return CheckResult.OK;
-
-
-        //}
+            if (Math.Abs(dAvg) > dSensorTiltError)
+            {
+                m_DM.m_Log.WriteLog(LogType.PM, "[Error]CheckSensorTilt - RDiffAvg:" + dAvg.ToString() + "/SensorTiltError:" + dSensorTiltError.ToString());
+                rstPM.Error = true;
+                return CheckResult.Error;
+            }
+            m_DM.m_Log.WriteLog(LogType.PM, "[OK]CheckSensorTilt - RDiffAvg:" + dAvg.ToString() + "/SensorTiltError:" + dSensorTiltError.ToString());
+            rstPM.Error = false;
+            return CheckResult.OK;
+        }
     }
 }
