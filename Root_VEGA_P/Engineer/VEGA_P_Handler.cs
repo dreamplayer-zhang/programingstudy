@@ -42,8 +42,8 @@ namespace Root_VEGA_P.Engineer
             p_moduleList = new ModuleList(m_engineer);
             m_rtr = new RTR("RTR", m_engineer);
             InitModule(m_rtr);
-            //m_loadport = new Loadport("Loadport", m_engineer);
-            //InitModule(m_loadport);
+            m_loadport = new Loadport("Loadport", m_engineer);
+            InitModule(m_loadport);
 
             m_rtr.RunTree(Tree.eMode.RegRead);
             m_rtr.RunTree(Tree.eMode.Init);

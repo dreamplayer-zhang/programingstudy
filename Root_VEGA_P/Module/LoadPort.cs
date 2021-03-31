@@ -153,6 +153,17 @@ namespace Root_VEGA_P.Module
             }
         }
         Stage m_stage = new Stage("Stage");
+
+        public bool p_bPlaced
+        {
+            get { return m_stage.p_bPlaced; }
+        }
+
+        public bool p_bPresent
+        {
+            get { return m_stage.p_bPresent; }
+        }
+
         #endregion
 
         #region Door
@@ -170,7 +181,7 @@ namespace Root_VEGA_P.Module
             {
                 module.p_sInfo = toolBox.GetDIO(ref m_dioDoor, module, p_id + ".Door", "Close", "Open");
                 module.p_sInfo = toolBox.GetDIO(ref m_diDoorSeal[0], module, p_id + "SealA", Enum.GetNames(typeof(eDoorSeal)));
-                module.p_sInfo = toolBox.GetDIO(ref m_diDoorSeal[2], module, p_id + "SealB", Enum.GetNames(typeof(eDoorSeal)));
+                module.p_sInfo = toolBox.GetDIO(ref m_diDoorSeal[1], module, p_id + "SealB", Enum.GetNames(typeof(eDoorSeal)));
                 module.p_sInfo = toolBox.GetDIO(ref m_doDoorSeal, module, p_id + ".Seal", Enum.GetNames(typeof(eDoorSeal)));
             }
 

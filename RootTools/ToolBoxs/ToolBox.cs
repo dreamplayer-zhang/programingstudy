@@ -547,7 +547,7 @@ namespace RootTools.ToolBoxs
             if (m_toolSetOHT == null) m_toolSetOHT = InitToolSet("OHT");
             if (value == null)
             {
-                value = new OHTNew.OHT(module.p_id + "." + id, module, (ILoadport)module, carrier, m_toolDIO);
+                value = new OHTNew.OHT(module.p_id + "." + id, module, carrier, m_toolDIO);
                 m_toolSetOHT.AddTool(value);
                 module.m_aTool.Add(value);
             }
