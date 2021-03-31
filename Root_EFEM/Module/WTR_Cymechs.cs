@@ -744,6 +744,8 @@ namespace Root_EFEM.Module
                 }
             }
             RunTree(Tree.eMode.Init);
+            RunTreeRun(Tree.eMode.Init);
+
         }
 
         IWTRChild GetChild(string sChild)

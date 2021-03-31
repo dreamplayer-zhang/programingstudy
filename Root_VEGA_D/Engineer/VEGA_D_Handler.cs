@@ -53,7 +53,7 @@ namespace Root_VEGA_D.Engineer
             InitAligner();
             m_vision = new Vision("Vision", m_engineer);
             InitModule(m_vision);
-            iWTR.AddChild(m_vision); 
+            iWTR.AddChild(m_vision);
             m_visionIPU = new Vision_IPU("Vision_IPU", m_engineer, ModuleBase.eRemote.Client);
             InitModule(m_visionIPU);
             m_FDC = new FDC("FDC", m_engineer);
@@ -137,7 +137,7 @@ namespace Root_VEGA_D.Engineer
                 switch (m_aLoadportType[n])
                 {
                     case eLoadport.RND: module = new Loadport_RND(sID, m_engineer, true, true); break;
-                    case eLoadport.Cymechs: module = new Loadport_Cymechs(sID, m_engineer, true, true); break;
+                    case eLoadport.Cymechs: module = new Loadport_Cymechs(sID, m_engineer, true, false); break;
                     default: module = new Loadport_RND(sID, m_engineer, true, true); break;
                 }
                 InitModule(module);
