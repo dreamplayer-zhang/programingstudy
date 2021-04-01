@@ -463,6 +463,9 @@
       <DependentUpon>RFID_Brooks_UI.xaml</DependentUpon>
     </Compile>
     <Compile Include="RFIDs\RFID_Ceyon.cs" />
+    <Compile Include="RFIDs\RFID_UI.xaml.cs">
+      <DependentUpon>RFID_UI.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Trees\TreeItem_FolderName.cs" />
     <Compile Include="Viewer\CustomViewer\DrawableRootViewer.xaml.cs">
       <DependentUpon>DrawableRootViewer.xaml</DependentUpon>
@@ -1124,6 +1127,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="RFIDs\RFID_Brooks_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="RFIDs\RFID_UI.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
