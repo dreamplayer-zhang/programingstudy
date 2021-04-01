@@ -906,12 +906,14 @@ namespace RootTools.Camera.Dalsa
 
         public void GrabArea()
         {
-            p_CamParam.ReadParamter();
+            m_CamParam.SetLiveParameter();
             m_ImageLive = new ImageData(p_CamParam.p_Width, p_CamParam.p_Height, 1);
             p_ImageViewer.SetImageData(m_ImageLive);
             m_pSapBuf = new IntPtr[p_nBuf];
+
             for (int n = 0; n < p_nBuf; n++)
                 m_sapBuf.GetAddress(n, out m_pSapBuf[n]);
+
             p_CamInfo.p_eState = eCamState.GrabLive;
             m_nGrabTrigger = 0;
             m_sapXfer.Grab();
@@ -1009,6 +1011,8 @@ namespace RootTools.Camera.Dalsa
                     {
                         m_sapXfer.Freeze();
                         p_CamInfo.p_eState = eCamState.Ready;
+                        DestroysObjects("Live Grab Stop");
+
                     }
                 });
             }

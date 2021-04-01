@@ -67,6 +67,11 @@ namespace Root_VEGA_P_Vision.Module
                 int nPulsePerWidth = nCamWidth * StainGrabMode.m_dTrigger;
                 int nPulsePerHeight = nCamHeight * StainGrabMode.m_dTrigger;
 
+
+                //tmp
+                m_module.p_infoPod.p_ePod = InfoPod.ePod.EIP_Cover;
+                m_module.p_infoPod.p_bTurn = false;
+
                 InfoPod.ePod parts = m_module.p_infoPod.p_ePod;
                 Vision.eUpDown upDown = (Vision.eUpDown)Enum.ToObject(typeof(Vision.eUpDown), m_module.p_infoPod.p_bTurn);
 
