@@ -7,12 +7,5 @@
              xmlns:comm="clr-namespace:RootTools.Comm"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-    <TabControl>
-        <TabItem Header="Brooks">
-            
-        </TabItem>
-        <TabItem Header="RS232">
-            <comm:RS232_UI x:Name="rs232UI"/>
-        </TabItem>
-    </TabControl>
+    <comm:RS232_UI x:Name="rs232UI"/>
 </UserControl>
