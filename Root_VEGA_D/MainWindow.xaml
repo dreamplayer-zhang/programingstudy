@@ -764,7 +764,7 @@
                     <TabControl Style="{StaticResource ResourceKey=WizardTabControl}" Grid.Row="1">
                         <TabItem Header="Information"
                                  Style="{StaticResource ResourceKey=WizardTabItem}">
-                            <ScrollViewer Background="White">
+                            <ScrollViewer Background="White" FontSize="17">
                                 <StackPanel>
                                     <Grid Grid.Column="0"
                                           Background="AliceBlue"
@@ -1011,7 +1011,7 @@
                         </TabItem>
                         <TabItem Header="Recipe Manager"
                                  Style="{StaticResource ResourceKey=WizardTabItem}">
-                            <local:RecipeManager_UI />
+                            <local:RecipeManager_UI/>
                             <!--<ScrollViewer Background="White">
                                 <StackPanel>
                                     <Grid>
@@ -1715,7 +1715,7 @@
                         </TabItem>
                         <TabItem Header="Recipe Wizard"
                                  Style="{StaticResource WizardTabItem}">
-                            
+                            <local:RecipeWizard_UI x:Name="RecipeWizard_UI" />
                         </TabItem>
                         <TabItem Header="Run"
                                  Style="{StaticResource ResourceKey=WizardTabItem}">
