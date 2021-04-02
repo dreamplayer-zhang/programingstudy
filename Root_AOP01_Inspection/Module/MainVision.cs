@@ -903,7 +903,7 @@ namespace Root_AOP01_Inspection.Module
             int nB = 0;
 
             // implement
-            byte[,,] imgarr = imgSrc.Data;
+            byte[,,] imgarr = (byte[,,])(imgSrc.Data.Clone());
             for (int y = 0; y < imgSrc.Height; y++)
             {
                 for (int x = 0; x < imgSrc.Width; x++)
@@ -4575,7 +4575,7 @@ namespace Root_AOP01_Inspection.Module
             public override string Run()
             {
                 RecipeWizard_ViewModel recipeWizard = UIManager.Instance.SetupViewModel.m_RecipeWizard;
-                if (recipeWizard.p_bUsePatternArrayShiftAndRotation == false) return "OK";
+                if (recipeWizard.p_bUseAlignKeyExist == false) return "OK";
 
                 // variable
                 string strPool = "MainVision.Vision Memory";
@@ -4591,10 +4591,12 @@ namespace Root_AOP01_Inspection.Module
                 CPoint cptSearchAreaCenter;
                 bool bFound = false;
                 Mat[] matarr = new Mat[4];
+                Image<Gray, byte>[] imgArr = new Image<Gray, byte>[4];
                 RecipeFrontside_Viewer_ViewModel targetViewer = UIManager.Instance.SetupViewModel.m_RecipeFrontSide.p_ImageViewer_VM;
                 Dispatcher dispatcher = UIManager.Instance.SetupViewModel.m_RecipeFrontSide.currentDispatcher;
 
                 // implement
+                m_module.p_bAlignKeyPass = true;
                 m_module.p_nAlignKeyProgressValue = 0;
                 m_module.p_nAlignKeyProgressMin = 0;
                 m_module.p_nAlignKeyProgressMax = 7;
@@ -4649,7 +4651,6 @@ namespace Root_AOP01_Inspection.Module
                         CRect crtFoundRect = new CRect(ptStart, ptEnd);
                         Image<Gray, byte> imgFound = m_module.GetGrayByteImageFromMemory(mem, crtFoundRect);
                         Image<Gray, byte> imgBinary = imgFound.ThresholdBinaryInv(new Gray(m_nThreshold), new Gray(128));
-                        Mat matBinary = imgBinary.Mat;
                         CvBlobs blobs = new CvBlobs();
                         CvBlobDetector blobDetector = new CvBlobDetector();
                         blobDetector.Detect(imgBinary, blobs);
@@ -4664,7 +4665,7 @@ namespace Root_AOP01_Inspection.Module
                             }
                         }
                         CRect crtBoundingBox;
-                        Mat matResult = m_module.FloodFill(matBinary, ptsContour[0], 255, out crtBoundingBox, Connectivity.EightConnected);
+                        Image<Gray, byte> imgResult = m_module.FloodFill(imgBinary, ptsContour[0], 255, out crtBoundingBox, Connectivity.EightConnected);
                         //
                         string strText = "Width=" + crtBoundingBox.Width + ", Height=" + crtBoundingBox.Height;
                         if (dispatcher != null)
@@ -4675,23 +4676,23 @@ namespace Root_AOP01_Inspection.Module
                             }));
                         }
                         //
-                        matResult = matResult - matBinary;
+                        imgResult = imgResult - imgBinary;
+
                         if (i == (int)eSearchPoint.RT)  // Flip Horizontal
                         {
-                            CvInvoke.Flip(matResult, matResult, FlipType.Horizontal);
+                            CvInvoke.Flip(imgResult, imgResult, FlipType.Horizontal);
                         }
                         else if (i == (int)eSearchPoint.RB) // Flip Horizontal & Vertical
                         {
-                            CvInvoke.Flip(matResult, matResult, FlipType.Horizontal);
-                            CvInvoke.Flip(matResult, matResult, FlipType.Vertical);
+                            CvInvoke.Flip(imgResult, imgResult, FlipType.Horizontal);
+                            CvInvoke.Flip(imgResult, imgResult, FlipType.Vertical);
                         }
                         else if (i == (int)eSearchPoint.LB) // Flip Vertical
                         {
-                            CvInvoke.Flip(matResult, matResult, FlipType.Vertical);
+                            CvInvoke.Flip(imgResult, imgResult, FlipType.Vertical);
                         }
-                        matarr[i] = matResult.Clone();
+                        imgArr[i] = imgResult.Clone();
                     }
-
                     m_module.p_nAlignKeyProgressValue++;
                     if (m_module.p_nAlignKeyProgressMax - m_module.p_nAlignKeyProgressMin > 0)
                         m_module.p_nAlignKeyProgressPercent = (int)((double)m_module.p_nAlignKeyProgressValue / (double)(m_module.p_nAlignKeyProgressMax - m_module.p_nAlignKeyProgressMin) * 100);
@@ -4700,19 +4701,19 @@ namespace Root_AOP01_Inspection.Module
                 // Compare All Image
                 for (int i = 0; i < 3; i++)
                 {
-                    Mat matMaster = matarr[i].Clone();
-                    Image<Gray, byte> imgMaster = matMaster.ToImage<Gray, byte>();
+                    Image<Gray, byte> imgMaster = imgArr[i].Clone();
                     for (int j = i + 1; j < 4; j++)
                     {
-                        Mat matSlave = matarr[j].Clone();
-                        Image<Gray, byte> imgSlave = matSlave.ToImage<Gray, byte>();
+                        Image<Gray, byte> imgSlave = imgArr[j].Clone();
                         CvBlobs blobs = new CvBlobs();
                         CvBlobDetector blobDetector = new CvBlobDetector();
                         blobDetector.Detect(imgSlave, blobs);
                         foreach (CvBlob blob in blobs.Values)
                         {
-                            Mat matMiniTemplate = new Mat(matSlave, blob.BoundingBox);
-                            Image<Gray, byte> imgMiniTemplate = matMiniTemplate.ToImage<Gray, byte>();
+                            System.Drawing.Rectangle rtInflate = blob.BoundingBox;
+                            if (rtInflate.Width + 10 <= imgSlave.Width && rtInflate.Height + 10 <= imgSlave.Height)
+                                rtInflate.Inflate(5, 5);
+                            Image<Gray, byte> imgMiniTemplate = imgSlave.GetSubRect(rtInflate);
                             Image<Gray, float> imgMatchResult = imgMaster.MatchTemplate(imgMiniTemplate, TemplateMatchingType.CcorrNormed);
                             float[,,] matches = imgMatchResult.Data;
                             float fMaxScore = float.MinValue;
@@ -4729,9 +4730,19 @@ namespace Root_AOP01_Inspection.Module
                                     }
                                 }
                             }
+                            
                             Image<Gray, byte> imgMasterClone = imgMaster.Clone();
+                            Image<Gray, byte> imgMiniTemplateClone = imgMiniTemplate.Clone();
+
+                            // Edge 성분
+                            Image<Gray, float> imgMiniTemplateLaplace = imgMiniTemplate.Laplace(1);
+                            Image<Gray, float> imgMiniTemplateLaplaceDilate = imgMiniTemplateLaplace.Dilate(1);
+                            imgMiniTemplateClone = imgMiniTemplateClone + imgMiniTemplateLaplaceDilate.Convert<Gray, byte>();
+                            imgMiniTemplateClone = imgMiniTemplateClone.ThresholdBinary(new Gray(m_nThreshold), new Gray(255));
+                            imgMasterClone = imgMasterClone.ThresholdBinary(new Gray(m_nThreshold), new Gray(255));
+                            
                             byte[,,] barrMaster = imgMasterClone.Data;
-                            byte[,,] barrMiniTemplate = imgMiniTemplate.Data;
+                            byte[,,] barrMiniTemplate = imgMiniTemplateClone.Data;
                             for (int x = 0; x < imgMiniTemplate.Width; x++)
                             {
                                 for (int y = 0; y < imgMiniTemplate.Height; y++)
@@ -4740,10 +4751,9 @@ namespace Root_AOP01_Inspection.Module
                                 }
                             }
                             Image<Gray, byte> imgSub = new Image<Gray, byte>(barrMaster);
-                            imgSub = imgSub.Erode(1);
-
+                            
                             // 차영상 Blob 결과
-                            bool bResult = GetResultFromImage(imgSub);
+                            bool bResult = GetResultFromImage(imgSub.ThresholdBinary(new Gray(m_nThreshold), new Gray(255)));
 
                             string strName = "";
                             if (i == (int)eSearchPoint.LT) strName += eSearchPoint.LT.ToString() + "-";
@@ -4758,11 +4768,10 @@ namespace Root_AOP01_Inspection.Module
 
                             imgSub.Save("D:\\AOP01\\AlignKeyInspection\\ESCHO_" + strName + ".BMP");
 
-                            //if (bResult == false)
-                            //{
-                            //    m_module.p_bAlignKeyPass = false;
-                            //    return "Fail";
-                            //}
+                            if (bResult == false)
+                            {
+                                m_module.p_bAlignKeyPass = false;
+                            }
                         }
                     }
 
@@ -4770,7 +4779,7 @@ namespace Root_AOP01_Inspection.Module
                     if (m_module.p_nAlignKeyProgressMax - m_module.p_nAlignKeyProgressMin > 0)
                         m_module.p_nAlignKeyProgressPercent = (int)((double)m_module.p_nAlignKeyProgressValue / (double)(m_module.p_nAlignKeyProgressMax - m_module.p_nAlignKeyProgressMin) * 100);
                 }
-                m_module.p_bAlignKeyPass = true;
+                //m_module.p_bAlignKeyPass = true;
                 return "OK";
             }
 
