@@ -2028,9 +2028,6 @@ namespace Root_AOP01_Inspection.Module
 
                 try
                 {
-                    RecipeWizard_ViewModel recipeWizard = UIManager.Instance.SetupViewModel.m_RecipeWizard;
-                    if (recipeWizard.p_bUseEdgeBroken == false) return "OK";
-
                     m_grabMode.SetLight(true);
 
                     AxisXY axisXY = m_module.m_axisXY;
@@ -2165,9 +2162,6 @@ namespace Root_AOP01_Inspection.Module
 
                 try
                 {
-                    RecipeWizard_ViewModel recipeWizard = UIManager.Instance.SetupViewModel.m_RecipeWizard;
-                    if (recipeWizard.p_bUseAlignKeyExist == false && recipeWizard.p_bUseBarcodeScratch == false && recipeWizard.p_bUsePatternArrayShiftAndRotation == false && recipeWizard.p_bUsePatternDiscolor == false && recipeWizard.p_bUsePellicleShiftAndRotation == false) return "OK";
-
                     m_grabMode.SetLight(true);
 
                     //((Camera_Dalsa)m_grabMode.m_camera).p_CamParam.p_eDir = DalsaParameterSet.eDir.Reverse;
@@ -2508,9 +2502,6 @@ namespace Root_AOP01_Inspection.Module
 
                 try
                 {
-                    RecipeWizard_ViewModel recipeWizard = UIManager.Instance.SetupViewModel.m_RecipeWizard;
-                    if (recipeWizard.p_bUsePellicleFrontside == false && recipeWizard.p_bUsePellicleHaze == false) return "OK";
-
                     AxisXY axisXY = m_module.m_axisXY;
                     Axis axisZ = m_module.m_axisZ;
                     Axis axisRotate = m_module.m_axisRotate;
@@ -2748,9 +2739,6 @@ namespace Root_AOP01_Inspection.Module
 
                 try
                 {
-                    RecipeWizard_ViewModel recipeWizard = UIManager.Instance.SetupViewModel.m_RecipeWizard;
-                    if (recipeWizard.p_bUsePellicleExpanding == false) return "OK";
-
                     m_grabMode.SetLight(true);
                     ladsinfos.Clear();
 
@@ -2911,9 +2899,6 @@ namespace Root_AOP01_Inspection.Module
                         
             public override string Run()
             {
-                RecipeWizard_ViewModel recipeWizard = UIManager.Instance.SetupViewModel.m_RecipeWizard;
-                if (recipeWizard.p_bUseBarcodeScratch == false) return "OK";
-
                 // variable
                 CPoint[] cptarrBarcodLTPoint = new CPoint[3];
                 int[] narrBarcodeWidth = new int[3];
@@ -4665,9 +4650,6 @@ namespace Root_AOP01_Inspection.Module
 
             public override string Run()
             {
-                RecipeWizard_ViewModel recipeWizard = UIManager.Instance.SetupViewModel.m_RecipeWizard;
-                if (recipeWizard.p_bUseAlignKeyExist == false) return "OK";
-
                 // variable
                 string strPool = "MainVision.Vision Memory";
                 string strGroup = "MainVision";
@@ -4827,7 +4809,7 @@ namespace Root_AOP01_Inspection.Module
 
                             // Edge 성분
                             Image<Gray, float> imgMiniTemplateLaplace = imgMiniTemplate.Laplace(1);
-                            Image<Gray, float> imgMiniTemplateLaplaceDilate = imgMiniTemplateLaplace.Dilate(1);
+                            Image<Gray, float> imgMiniTemplateLaplaceDilate = imgMiniTemplateLaplace.Dilate(3);
                             imgMiniTemplateClone = imgMiniTemplateClone + imgMiniTemplateLaplaceDilate.Convert<Gray, byte>();
                             imgMiniTemplateClone = imgMiniTemplateClone.ThresholdBinary(new Gray(m_nThreshold), new Gray(255));
                             imgMasterClone = imgMasterClone.ThresholdBinary(new Gray(m_nThreshold), new Gray(255));
@@ -5249,9 +5231,6 @@ namespace Root_AOP01_Inspection.Module
 
             public override string Run()
             {
-                RecipeWizard_ViewModel recipeWizard = UIManager.Instance.SetupViewModel.m_RecipeWizard;
-                if (recipeWizard.p_bUsePellicleShiftAndRotation == false) return "OK";
-
                 // variable
                 MemoryData mem = m_module.m_engineer.GetMemory(App.mPool, App.mGroup, App.mMainMem);
                 Run_Grab moduleRunGrab = (Run_Grab)m_module.CloneModuleRun("Grab");
@@ -5562,9 +5541,6 @@ namespace Root_AOP01_Inspection.Module
 
             public override string Run()
             {
-                RecipeWizard_ViewModel recipeWizard = UIManager.Instance.SetupViewModel.m_RecipeWizard;
-                if (recipeWizard.p_bUsePellicleExpanding == false) return "OK";
-
                 // variable
                 Run_LADS moduleRunLADS = (Run_LADS)m_module.CloneModuleRun("LADS");
                 GrabMode grabMode = m_module.GetGrabMode("LADS");
