@@ -60,22 +60,26 @@
                                 <RowDefinition/>
                                 <RowDefinition/>
                                 <RowDefinition/>
-                            </Grid.RowDefinitions>
-                            <TextBlock Text="Edge Broken"                   Grid.Row="0" Grid.Column="0"/>
-                            <TextBlock Text="{Binding p_bUseEdgeBroken, Converter={StaticResource BoolToEnableStringConverters}}" Foreground="{Binding p_bUseEdgeBroken, Converter={StaticResource BoolToEnableColorConverters}}"   Grid.Row="0" Grid.Column="1"/>
-                            <TextBlock Text="> 3 mm"                         Grid.Row="0" Grid.Column="2"/>
-                            <TextBlock Text="Pattern Array Shift"           Grid.Row="1" Grid.Column="0"/>
+                                <RowDefinition/>
+                        </Grid.RowDefinitions>
+                        <TextBlock Text="Edge Broken"                   Grid.Row="0" Grid.Column="0"/>
+                        <TextBlock Text="{Binding p_bUseEdgeBroken, Converter={StaticResource BoolToEnableStringConverters}}" Foreground="{Binding p_bUseEdgeBroken, Converter={StaticResource BoolToEnableColorConverters}}"   Grid.Row="0" Grid.Column="1"/>
+                        <TextBlock Text="{Binding p_dEdgeBrokenSpec_mm, StringFormat={}> \{0:n4\} mm}" Grid.Row="0" Grid.Column="2"/>
+                        <TextBlock Text="Pattern Array Shift"           Grid.Row="1" Grid.Column="0"/>
                         <TextBlock Text="{Binding p_bUsePatternShiftAndRotation, Converter={StaticResource BoolToEnableStringConverters}}" Foreground="{Binding p_bUsePatternShiftAndRotation, Converter={StaticResource BoolToEnableColorConverters}}"  Grid.Row="1" Grid.Column="1"/>
-                            <TextBlock Text="> 0.5 mm"                      Grid.Row="1" Grid.Column="2"/>
-                            <TextBlock Text="Pattern Discolor"             Grid.Row="2" Grid.Column="0"/>
-                        <TextBlock Text="{Binding p_bUsePatternDiscolor, Converter={StaticResource BoolToEnableStringConverters}}" Foreground="{Binding p_bUsePatternDiscolor, Converter={StaticResource BoolToEnableColorConverters}}" Grid.Row="2" Grid.Column="1"/>
-                            <TextBlock Text="> 1 mm"                        Grid.Row="2" Grid.Column="2"/>
-                            <TextBlock Text="Barcode Scartch"             Grid.Row="3" Grid.Column="0"/>
-                        <TextBlock Text="{Binding p_bUseBarcodeScratch, Converter={StaticResource BoolToEnableStringConverters}}" Foreground="{Binding p_bUseBarcodeScratch, Converter={StaticResource BoolToEnableColorConverters}}" Grid.Row="3" Grid.Column="1"/>
-                            <TextBlock Text="> 1 mm"                        Grid.Row="3" Grid.Column="2"/>
-                            <TextBlock Text="Align Key Exist"             Grid.Row="4" Grid.Column="0"/>
-                        <TextBlock Text="{Binding p_bUseAlignKeyExist, Converter={StaticResource BoolToEnableStringConverters}}" Foreground="{Binding p_bUseAlignKeyExist, Converter={StaticResource BoolToEnableColorConverters}}" Grid.Row="4" Grid.Column="1"/>
-                            <TextBlock Text="> 30 um"                        Grid.Row="4" Grid.Column="2"/>
+                        <TextBlock Text="{Binding p_dPatternShiftSpec_mm, StringFormat={}> \{0:n4\} mm}" Grid.Row="1" Grid.Column="2"/>
+                        <TextBlock Text="Pattern Array Rotation" Grid.Row="2" Grid.Column="0"/>
+                        <TextBlock Text="{Binding p_bUsePatternShiftAndRotation, Converter={StaticResource BoolToEnableStringConverters}}" Foreground="{Binding p_bUsePatternShiftAndRotation, Converter={StaticResource BoolToEnableColorConverters}}"  Grid.Row="2" Grid.Column="1"/>
+                        <TextBlock Text="{Binding p_dPatternRotationSpec_degree, StringFormat={}> \{0:n4\} º}" Grid.Row="2" Grid.Column="2"/>
+                        <TextBlock Text="Pattern Discolor"             Grid.Row="3" Grid.Column="0"/>
+                        <TextBlock Text="{Binding p_bUsePatternDiscolor, Converter={StaticResource BoolToEnableStringConverters}}" Foreground="{Binding p_bUsePatternDiscolor, Converter={StaticResource BoolToEnableColorConverters}}" Grid.Row="3" Grid.Column="1"/>
+                        <TextBlock Text="> 1 mm"                        Grid.Row="3" Grid.Column="2"/>
+                        <TextBlock Text="Barcode Scartch"             Grid.Row="4" Grid.Column="0"/>
+                        <TextBlock Text="{Binding p_bUseBarcodeScratch, Converter={StaticResource BoolToEnableStringConverters}}" Foreground="{Binding p_bUseBarcodeScratch, Converter={StaticResource BoolToEnableColorConverters}}" Grid.Row="4" Grid.Column="1"/>
+                        <TextBlock Text="> 1 mm"                        Grid.Row="4" Grid.Column="2"/>
+                        <TextBlock Text="Align Key Exist"             Grid.Row="5" Grid.Column="0"/>
+                        <TextBlock Text="{Binding p_bUseAlignKeyExist, Converter={StaticResource BoolToEnableStringConverters}}" Foreground="{Binding p_bUseAlignKeyExist, Converter={StaticResource BoolToEnableColorConverters}}" Grid.Row="5" Grid.Column="1"/>
+                        <TextBlock Text="> 30 um"                        Grid.Row="5" Grid.Column="2"/>
                         </Grid>
                         <Grid Grid.Column="1">
                             <Grid.Resources>
@@ -96,19 +100,23 @@
                                 <RowDefinition/>
                                 <RowDefinition/>
                                 <RowDefinition/>
-                            </Grid.RowDefinitions>
-                            <TextBlock Text="Pellicle Shift"                   Grid.Row="0" Grid.Column="0"/>
+                                <RowDefinition/>
+                        </Grid.RowDefinitions>
+                        <TextBlock Text="Pellicle Shift"                   Grid.Row="0" Grid.Column="0"/>
                         <TextBlock Text="{Binding p_bUsePellicleShiftAndRotation, Converter={StaticResource BoolToEnableStringConverters}}" Foreground="{Binding p_bUsePellicleShiftAndRotation, Converter={StaticResource BoolToEnableColorConverters}}"   Grid.Row="0" Grid.Column="1"/>
-                            <TextBlock Text="> 0.3 mm"                         Grid.Row="0" Grid.Column="2"/>
-                            <TextBlock Text="Pellicle Haze"           Grid.Row="1" Grid.Column="0"/>
-                        <TextBlock Text="{Binding p_bUsePellicleHaze, Converter={StaticResource BoolToEnableStringConverters}}" Foreground="{Binding p_bUsePellicleHaze, Converter={StaticResource BoolToEnableColorConverters}}"  Grid.Row="1" Grid.Column="1"/>
-                            <TextBlock Text="> 1 mm"                      Grid.Row="1" Grid.Column="2"/>
-                            <TextBlock Text="Pellicle Expanding"             Grid.Row="2" Grid.Column="0"/>
-                        <TextBlock Text="{Binding p_bUsePellicleExpanding, Converter={StaticResource BoolToEnableStringConverters}}" Foreground="{Binding p_bUsePellicleExpanding, Converter={StaticResource BoolToEnableColorConverters}}" Grid.Row="2" Grid.Column="1"/>
-                            <TextBlock Text="> 100 um"                        Grid.Row="2" Grid.Column="2"/>
-                            <TextBlock Text="Pellicle Frontside"             Grid.Row="3" Grid.Column="0"/>
-                        <TextBlock Text="{Binding p_bUsePellicleFrontside, Converter={StaticResource BoolToEnableStringConverters}}" Foreground="{Binding p_bUsePellicleFrontside, Converter={StaticResource BoolToEnableColorConverters}}" Grid.Row="3" Grid.Column="1"/>
-                            <TextBlock Text="> 10 um"                        Grid.Row="3" Grid.Column="2"/>
+                        <TextBlock Text="> 0.3 mm"                         Grid.Row="0" Grid.Column="2"/>
+                        <TextBlock Text="Pellicle Rotation"                   Grid.Row="1" Grid.Column="0"/>
+                        <TextBlock Text="{Binding p_bUsePellicleShiftAndRotation, Converter={StaticResource BoolToEnableStringConverters}}" Foreground="{Binding p_bUsePellicleShiftAndRotation, Converter={StaticResource BoolToEnableColorConverters}}"   Grid.Row="1" Grid.Column="1"/>
+                        <TextBlock Text="> 0.3 º"                         Grid.Row="1" Grid.Column="2"/>
+                        <TextBlock Text="Pellicle Haze"           Grid.Row="2" Grid.Column="0"/>
+                        <TextBlock Text="{Binding p_bUsePellicleHaze, Converter={StaticResource BoolToEnableStringConverters}}" Foreground="{Binding p_bUsePellicleHaze, Converter={StaticResource BoolToEnableColorConverters}}"  Grid.Row="2" Grid.Column="1"/>
+                        <TextBlock Text="> 1 mm"                      Grid.Row="2" Grid.Column="2"/>
+                        <TextBlock Text="Pellicle Expanding"             Grid.Row="3" Grid.Column="0"/>
+                        <TextBlock Text="{Binding p_bUsePellicleExpanding, Converter={StaticResource BoolToEnableStringConverters}}" Foreground="{Binding p_bUsePellicleExpanding, Converter={StaticResource BoolToEnableColorConverters}}" Grid.Row="3" Grid.Column="1"/>
+                        <TextBlock Text="> 100 um"                        Grid.Row="3" Grid.Column="2"/>
+                        <TextBlock Text="Pellicle Frontside"             Grid.Row="4" Grid.Column="0"/>
+                        <TextBlock Text="{Binding p_bUsePellicleFrontside, Converter={StaticResource BoolToEnableStringConverters}}" Foreground="{Binding p_bUsePellicleFrontside, Converter={StaticResource BoolToEnableColorConverters}}" Grid.Row="4" Grid.Column="1"/>
+                        <TextBlock Text="> 10 um"                        Grid.Row="4" Grid.Column="2"/>
                         </Grid>
                     </Grid>
                     <!--45D-->
@@ -171,7 +179,7 @@
                         <TextBlock Text="Pellicle Haze" FontWeight="Bold"               Grid.Row="0" Grid.Column="0"/>
                         <TextBlock Text="Enable"                        Grid.Row="1" Grid.Column="0"/>
                         <TextBlock Text=":"                           Grid.Row="1" Grid.Column="1"/>
-                        <TextBlock Text="True"                        Grid.Row="1" Grid.Column="2"/>
+                        <TextBlock Text="{Binding p_bUsePellicleHaze}" Grid.Row="1" Grid.Column="2"/>
                         <TextBlock Text="Spec"          Grid.Row="2" Grid.Column="0"/>
                         <TextBlock Text=":"                           Grid.Row="2" Grid.Column="1"/>
                         <TextBlock Text="> 1mm"                       Grid.Row="2" Grid.Column="2"/>
@@ -192,7 +200,7 @@
                         <TextBlock Text="Pellicle FrontSide"  FontWeight="Bold"         Grid.Row="0" Grid.Column="0"/>
                         <TextBlock Text="Enable"                    Grid.Row="1" Grid.Column="0"/>
                         <TextBlock Text=":"                     Grid.Row="1" Grid.Column="1"/>
-                        <TextBlock Text="True"                  Grid.Row="1" Grid.Column="2"/>
+                        <TextBlock Text="{Binding p_bUsePellicleFrontside}" Grid.Row="1" Grid.Column="2"/>
                         <TextBlock Text="GV"                    Grid.Row="2" Grid.Column="0"/>
                         <TextBlock Text=":"                     Grid.Row="2" Grid.Column="1"/>
                         <TextBlock Text="> 25"                  Grid.Row="2" Grid.Column="2"/>
@@ -265,7 +273,7 @@
                         <TextBlock Text="Pattern Discolor" FontWeight="Bold"               Grid.Row="0" Grid.Column="0"/>
                         <TextBlock Text="Enable"                        Grid.Row="1" Grid.Column="0"/>
                         <TextBlock Text=":"                           Grid.Row="1" Grid.Column="1"/>
-                        <TextBlock Text="True"                        Grid.Row="1" Grid.Column="2"/>
+                        <TextBlock Text="{Binding p_bUsePatternDiscolor}" Grid.Row="1" Grid.Column="2"/>
                         <TextBlock Text="Spec"          Grid.Row="2" Grid.Column="0"/>
                         <TextBlock Text=":"                           Grid.Row="2" Grid.Column="1"/>
                         <TextBlock Text="> 1mm"                       Grid.Row="2" Grid.Column="2"/>
@@ -285,7 +293,7 @@
                         <TextBlock Text="Align Key Exist"  FontWeight="Bold"         Grid.Row="0" Grid.Column="0"/>
                         <TextBlock Text="Enable"                    Grid.Row="1" Grid.Column="0"/>
                         <TextBlock Text=":"     Grid.Row="1" Grid.Column="1"/>
-                        <TextBlock Text="True"      Grid.Row="1" Grid.Column="2"/>
+                        <TextBlock Text="{Binding p_bUseAlignKeyExist}" Grid.Row="1" Grid.Column="2"/>
                         <TextBlock Text="Score"     Grid.Row="2" Grid.Column="0"/>
                         <TextBlock Text=":"     Grid.Row="2" Grid.Column="1"/>
                         <TextBlock Text="80"      Grid.Row="2" Grid.Column="2"/>
@@ -309,7 +317,7 @@
                         <TextBlock Text="Pattern Shift"  FontWeight="Bold"              Grid.Row="0" Grid.Column="0"/>
                         <TextBlock Text="Enable"          Grid.Row="1" Grid.Column="0"/>
                         <TextBlock Text=":"                     Grid.Row="1" Grid.Column="1"/>
-                        <TextBlock Text="True"                    Grid.Row="1" Grid.Column="2"/>
+                        <TextBlock Text="{Binding p_bUsePatternShiftAndRotation}" Grid.Row="1" Grid.Column="2"/>
                         <TextBlock Text="Score"          Grid.Row="2" Grid.Column="0"/>
                         <TextBlock Text=":"                     Grid.Row="2" Grid.Column="1"/>
                         <TextBlock Text="80"                    Grid.Row="2" Grid.Column="2"/>
@@ -334,7 +342,7 @@
                         <TextBlock Text="Pellicle Shift" FontWeight="Bold"               Grid.Row="0" Grid.Column="0"/>
                         <TextBlock Text="Enable"                        Grid.Row="1" Grid.Column="0"/>
                         <TextBlock Text=":"                           Grid.Row="1" Grid.Column="1"/>
-                        <TextBlock Text="True"                        Grid.Row="1" Grid.Column="2"/>
+                        <TextBlock Text="{Binding p_bUsePellicleShiftAndRotation}" Grid.Row="1" Grid.Column="2"/>
                         <TextBlock Text="Scroe"          Grid.Row="2" Grid.Column="0"/>
                         <TextBlock Text=":"                           Grid.Row="2" Grid.Column="1"/>
                         <TextBlock Text="80"                       Grid.Row="2" Grid.Column="2"/>
@@ -358,7 +366,7 @@
                         <TextBlock Text="Barcode Scratch"  FontWeight="Bold"         Grid.Row="0" Grid.Column="0"/>
                         <TextBlock Text="Enable"                    Grid.Row="1" Grid.Column="0"/>
                         <TextBlock Text=":"     Grid.Row="1" Grid.Column="1"/>
-                        <TextBlock Text="True"      Grid.Row="1" Grid.Column="2"/>
+                        <TextBlock Text="{Binding p_bUseBarcodeScratch}"      Grid.Row="1" Grid.Column="2"/>
                         <TextBlock Text="GV"     Grid.Row="2" Grid.Column="0"/>
                         <TextBlock Text=":"     Grid.Row="2" Grid.Column="1"/>
                         <TextBlock Text="> 0"      Grid.Row="2" Grid.Column="2"/>
@@ -431,7 +439,7 @@
                         <TextBlock Text="Edge Broken" FontWeight="Bold"               Grid.Row="0" Grid.Column="0"/>
                         <TextBlock Text="Enable"                        Grid.Row="1" Grid.Column="0"/>
                         <TextBlock Text=":"                           Grid.Row="1" Grid.Column="1"/>
-                        <TextBlock Text="True"                        Grid.Row="1" Grid.Column="2"/>
+                        <TextBlock Text="{Binding p_bUseEdgeBroken}" Grid.Row="1" Grid.Column="2"/>
                         <TextBlock Text="GV"          Grid.Row="2" Grid.Column="0"/>
                         <TextBlock Text=":"                           Grid.Row="2" Grid.Column="1"/>
                         <TextBlock Text="> 30"                       Grid.Row="2" Grid.Column="2"/>
@@ -520,7 +528,7 @@
                         <TextBlock Text="Pellicle Expanding" FontWeight="Bold"               Grid.Row="0" Grid.Column="0"/>
                         <TextBlock Text="Enable"                        Grid.Row="1" Grid.Column="0"/>
                         <TextBlock Text=":"                           Grid.Row="1" Grid.Column="1"/>
-                        <TextBlock Text="True"                        Grid.Row="1" Grid.Column="2"/>
+                        <TextBlock Text="{Binding p_bUsePellicleExpanding}" Grid.Row="1" Grid.Column="2"/>
                         <TextBlock Text="Distance"          Grid.Row="2" Grid.Column="0"/>
                         <TextBlock Text=":"                           Grid.Row="2" Grid.Column="1"/>
                         <TextBlock Text="> 100 um"                       Grid.Row="2" Grid.Column="2"/>

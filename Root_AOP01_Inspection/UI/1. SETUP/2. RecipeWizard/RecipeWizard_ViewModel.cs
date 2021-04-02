@@ -84,6 +84,27 @@ namespace Root_AOP01_Inspection
             get { return m_bUsePellicleFrontside; }
             set { SetProperty(ref m_bUsePellicleFrontside, value); }
         }
+
+        double m_dEdgeBrokenSpec_mm = 0.3;
+        public double p_dEdgeBrokenSpec_mm
+        {
+            get { return m_dEdgeBrokenSpec_mm; }
+            set { SetProperty(ref m_dEdgeBrokenSpec_mm, value); }
+        }
+
+        double m_dPatternShiftSpec_mm = 0.5;
+        public double p_dPatternShiftSpec_mm
+        {
+            get { return m_dPatternShiftSpec_mm; }
+            set { SetProperty(ref m_dPatternShiftSpec_mm, value); }
+        }
+
+        double m_dPatternRotationSpec_degree = 0.5;
+        public double p_dPatternRotationSpec_degree
+        {
+            get { return m_dPatternRotationSpec_degree; }
+            set { SetProperty(ref m_dPatternRotationSpec_degree, value); }
+        }
         #endregion
 
         public ICommand btnSummary
