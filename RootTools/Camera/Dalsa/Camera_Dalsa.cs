@@ -955,7 +955,7 @@ namespace RootTools.Camera.Dalsa
         {
             Camera_Dalsa cam = args.Context as Camera_Dalsa;
             cam.m_nGrabTrigger++;
-            Debug.Write("XferTrigger : " + cam.m_nGrabTrigger);
+            Debug.WriteLine("XferTrigger : " + cam.m_nGrabTrigger);
         }
         #endregion
 

@@ -97,57 +97,55 @@ namespace Root_VEGA_P_Vision.Module
                     return p_sInfo;
 
 
-                for (int x = 0; x < nXCount; x++)
+
+                foreach(int v in illumList)
                 {
-                    if (EQ.IsStop())
-                        return "OK";
-
-                    double dPosX = StainGrabMode.m_rpAxisCenter.X + nPodSizeY_px * 1000 - nPulsePerWidth * (x);
-
-                    //if (m_module.Run(m_module.Move(axisXY.p_axisX, dPosX)))
-                    if (m_module.Run(axisXY.StartMove(new RPoint(dPosX, StainGrabMode.m_rpAxisCenter.Y + nPodSizeY_px * 500))))
-                        return p_sInfo;
-                    if (m_module.Run(axisXY.WaitReady()))
-                        return p_sInfo;
-
-                    for (int y = 0; y < nYCount; y++)
+                    StainGrabMode.SetLight(v, true);
+                    for (int x = 0; x < nXCount; x++)
                     {
-                        double tmp = (double)nYCount / 2 + y;
-                        double dPosY = StainGrabMode.m_rpAxisCenter.Y + nPodSizeY_px * 500 - nPulsePerHeight * y;
+                        if (EQ.IsStop())
+                            return "OK";
 
-                        if (m_module.Run(axisXY.p_axisY.StartMove(dPosY)))
+                        double dPosX = StainGrabMode.m_rpAxisCenter.X + nPodSizeY_px * 1000 - nPulsePerWidth * (x);
+
+                        //if (m_module.Run(m_module.Move(axisXY.p_axisX, dPosX)))
+                        if (m_module.Run(axisXY.StartMove(new RPoint(dPosX, StainGrabMode.m_rpAxisCenter.Y + nPodSizeY_px * 500))))
                             return p_sInfo;
-                        if (m_module.Run(axisXY.p_axisY.WaitReady()))
+                        if (m_module.Run(axisXY.WaitReady()))
                             return p_sInfo;
 
-                        int cnt = 0;
-
-                        foreach (int v in illumList)
+                        for (int y = 0; y < nYCount; y++)
                         {
-                            camStain.Grab();
-                            StainGrabMode.SetLight(v, true);
+                            double tmp = (double)nYCount / 2 + y;
+                            double dPosY = StainGrabMode.m_rpAxisCenter.Y + nPodSizeY_px * 500 - nPulsePerHeight * y;
 
-                            lock(new object())
+                            if (m_module.Run(axisXY.p_axisY.StartMove(dPosY)))
+                                return p_sInfo;
+                            if (m_module.Run(axisXY.p_axisY.WaitReady()))
+                                return p_sInfo;
+
+                            camStain.Grab();
+
+                            lock (new object())
                             {
-                                IntPtr ptr = mem.GetPtr(cnt++);
+                                IntPtr ptr = mem.GetPtr(v);
 
                                 byte[] arr = camStain.p_ImageData.m_aBuf;
 
+                                int byteperpxl = camStain.p_ImageData.GetBytePerPixel();
+
                                 Parallel.For(0, nCamHeight, (j) =>
                                 {
-                                    Marshal.Copy(arr, (nCamHeight - j - 1) * nCamWidth, (IntPtr)((long)ptr + (x * nCamWidth) + ((j + nCamHeight * y) * mem.W)), nCamWidth);
+                                    Marshal.Copy(arr, (nCamHeight - j - 1) * nCamWidth * byteperpxl, (IntPtr)((long)ptr + (x * nCamWidth * byteperpxl) + ((j + nCamHeight * y) * mem.W)), nCamWidth * byteperpxl);
                                 });
                             }
 
                             camStain.StopGrab();
-                            Thread.Sleep(1000);
-                            StainGrabMode.SetLight(false);
-
-                            //StainGrabMode.SetLight(v, false);
-
                         }
                     }
+                    StainGrabMode.SetLight(false);
                 }
+                
             }
             finally
             {
