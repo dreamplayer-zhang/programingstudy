@@ -4,9 +4,14 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Root_AOP01_Inspection"
+             xmlns:converter="clr-namespace:ViewConverter;assembly=RootTools"
              mc:Ignorable="d" 
              d:DesignHeight="2866" d:DesignWidth="1683" Background="{StaticResource PanelBackGround}">
     <!--d:DesignHeight="866" d:DesignWidth="1683" Background="{StaticResource PanelBackGround}">-->
+    <UserControl.Resources>
+        <converter:BoolToEnableColorConverter x:Key="BoolToEnableColorConverters"/>
+        <converter:BoolToEnableStringConverter x:Key="BoolToEnableStringConverters"/>
+    </UserControl.Resources>
     <Grid>
         <ScrollViewer VerticalScrollBarVisibility="Visible">
             <StackPanel Margin="20">
@@ -57,19 +62,19 @@
                                 <RowDefinition/>
                             </Grid.RowDefinitions>
                             <TextBlock Text="Edge Broken"                   Grid.Row="0" Grid.Column="0"/>
-                            <TextBlock Text="Enable" Foreground="Green"   Grid.Row="0" Grid.Column="1"/>
+                            <TextBlock Text="{Binding p_bUseEdgeBroken, Converter={StaticResource BoolToEnableStringConverters}}" Foreground="{Binding p_bUseEdgeBroken, Converter={StaticResource BoolToEnableColorConverters}}"   Grid.Row="0" Grid.Column="1"/>
                             <TextBlock Text="> 3 mm"                         Grid.Row="0" Grid.Column="2"/>
                             <TextBlock Text="Pattern Array Shift"           Grid.Row="1" Grid.Column="0"/>
-                            <TextBlock Text="Enable" Foreground="Green"  Grid.Row="1" Grid.Column="1"/>
+                        <TextBlock Text="{Binding p_bUsePatternShiftAndRotation, Converter={StaticResource BoolToEnableStringConverters}}" Foreground="{Binding p_bUsePatternShiftAndRotation, Converter={StaticResource BoolToEnableColorConverters}}"  Grid.Row="1" Grid.Column="1"/>
                             <TextBlock Text="> 0.5 mm"                      Grid.Row="1" Grid.Column="2"/>
                             <TextBlock Text="Pattern Discolor"             Grid.Row="2" Grid.Column="0"/>
-                            <TextBlock Text="Enable" Foreground="Green" Grid.Row="2" Grid.Column="1"/>
+                        <TextBlock Text="{Binding p_bUsePatternDiscolor, Converter={StaticResource BoolToEnableStringConverters}}" Foreground="{Binding p_bUsePatternDiscolor, Converter={StaticResource BoolToEnableColorConverters}}" Grid.Row="2" Grid.Column="1"/>
                             <TextBlock Text="> 1 mm"                        Grid.Row="2" Grid.Column="2"/>
                             <TextBlock Text="Barcode Scartch"             Grid.Row="3" Grid.Column="0"/>
-                            <TextBlock Text="Enable" Foreground="Green" Grid.Row="3" Grid.Column="1"/>
+                        <TextBlock Text="{Binding p_bUseBarcodeScratch, Converter={StaticResource BoolToEnableStringConverters}}" Foreground="{Binding p_bUseBarcodeScratch, Converter={StaticResource BoolToEnableColorConverters}}" Grid.Row="3" Grid.Column="1"/>
                             <TextBlock Text="> 1 mm"                        Grid.Row="3" Grid.Column="2"/>
                             <TextBlock Text="Align Key Exist"             Grid.Row="4" Grid.Column="0"/>
-                            <TextBlock Text="Enable" Foreground="Green" Grid.Row="4" Grid.Column="1"/>
+                        <TextBlock Text="{Binding p_bUseAlignKeyExist, Converter={StaticResource BoolToEnableStringConverters}}" Foreground="{Binding p_bUseAlignKeyExist, Converter={StaticResource BoolToEnableColorConverters}}" Grid.Row="4" Grid.Column="1"/>
                             <TextBlock Text="> 30 um"                        Grid.Row="4" Grid.Column="2"/>
                         </Grid>
                         <Grid Grid.Column="1">
@@ -93,16 +98,16 @@
                                 <RowDefinition/>
                             </Grid.RowDefinitions>
                             <TextBlock Text="Pellicle Shift"                   Grid.Row="0" Grid.Column="0"/>
-                            <TextBlock Text="Enable" Foreground="Green"   Grid.Row="0" Grid.Column="1"/>
+                        <TextBlock Text="{Binding p_bUsePellicleShiftAndRotation, Converter={StaticResource BoolToEnableStringConverters}}" Foreground="{Binding p_bUsePellicleShiftAndRotation, Converter={StaticResource BoolToEnableColorConverters}}"   Grid.Row="0" Grid.Column="1"/>
                             <TextBlock Text="> 0.3 mm"                         Grid.Row="0" Grid.Column="2"/>
                             <TextBlock Text="Pellicle Haze"           Grid.Row="1" Grid.Column="0"/>
-                            <TextBlock Text="Disable" Foreground="Crimson"  Grid.Row="1" Grid.Column="1"/>
+                        <TextBlock Text="{Binding p_bUsePellicleHaze, Converter={StaticResource BoolToEnableStringConverters}}" Foreground="{Binding p_bUsePellicleHaze, Converter={StaticResource BoolToEnableColorConverters}}"  Grid.Row="1" Grid.Column="1"/>
                             <TextBlock Text="> 1 mm"                      Grid.Row="1" Grid.Column="2"/>
                             <TextBlock Text="Pellicle Expanding"             Grid.Row="2" Grid.Column="0"/>
-                            <TextBlock Text="Enable" Foreground="Green" Grid.Row="2" Grid.Column="1"/>
+                        <TextBlock Text="{Binding p_bUsePellicleExpanding, Converter={StaticResource BoolToEnableStringConverters}}" Foreground="{Binding p_bUsePellicleExpanding, Converter={StaticResource BoolToEnableColorConverters}}" Grid.Row="2" Grid.Column="1"/>
                             <TextBlock Text="> 100 um"                        Grid.Row="2" Grid.Column="2"/>
                             <TextBlock Text="Pellicle Frontside"             Grid.Row="3" Grid.Column="0"/>
-                            <TextBlock Text="Enable" Foreground="Green" Grid.Row="3" Grid.Column="1"/>
+                        <TextBlock Text="{Binding p_bUsePellicleFrontside, Converter={StaticResource BoolToEnableStringConverters}}" Foreground="{Binding p_bUsePellicleFrontside, Converter={StaticResource BoolToEnableColorConverters}}" Grid.Row="3" Grid.Column="1"/>
                             <TextBlock Text="> 10 um"                        Grid.Row="3" Grid.Column="2"/>
                         </Grid>
                     </Grid>

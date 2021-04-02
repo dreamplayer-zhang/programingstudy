@@ -27,6 +27,11 @@ namespace Root_AOP01_Inspection
     public class RecipeFrontside_ViewModel : ObservableObject
     {
         Setup_ViewModel m_Setup;
+        public Setup_ViewModel p_Setup
+        {
+            get { return m_Setup; }
+            set { SetProperty(ref m_Setup, value); }
+        }
         AOP01_Engineer m_Engineer;
         MainVision m_mainVision;
         public Dispatcher currentDispatcher;
@@ -82,36 +87,7 @@ namespace Root_AOP01_Inspection
 
 		#region Property
 		bool m_bEnableAlignKeyInsp = false;
-        public bool p_bEnableAlignKeyInsp
-        {
-            get { return m_bEnableAlignKeyInsp; }
-            set { SetProperty(ref m_bEnableAlignKeyInsp, value); }
-        }
-        bool m_bEnableBarcodeInsp = false;
-        public bool p_bEnableBarcodeInsp
-        {
-            get { return m_bEnableBarcodeInsp; }
-            set { SetProperty(ref m_bEnableBarcodeInsp, value); }
-        }
-        bool m_bEnablePatternShift = false;
-        public bool p_bEnablePatternShift
-        {
-            get { return m_bEnablePatternShift; }
-            set { SetProperty(ref m_bEnablePatternShift, value); }
-        }
-        bool m_bEnablePellicleShift = false;
-        public bool p_bEnablePellicleShift
-        {
-            get { return m_bEnablePellicleShift; }
-            set { SetProperty(ref m_bEnablePellicleShift, value); }
-		}
-		bool m_bEnablePatternDiscolor = false;
-		public bool p_bEnablePatternDiscolor
-		{
-			get { return m_bEnablePatternDiscolor; }
-			set { SetProperty(ref m_bEnablePatternDiscolor, value); }
-		}
-
+        
 		#region Align Key Parameter
 		double m_dAlignKeyTemplateMatchingScore = 90;
         public double p_dAlignKeyTemplateMatchingScore
@@ -537,7 +513,7 @@ namespace Root_AOP01_Inspection
                 {
                     MainVision mainVision = ((AOP01_Handler)m_Engineer.ClassHandler()).m_mainVision;
 
-                    if (p_bEnableAlignKeyInsp)
+                    if (true)
                     {
                         MainVision.Run_AlignKeyInspection alignKeyInspection = (MainVision.Run_AlignKeyInspection)mainVision.CloneModuleRun("AlignKeyInspection");
                         alignKeyInspection.m_dMatchScore = p_dAlignKeyTemplateMatchingScore / 100;
@@ -545,7 +521,7 @@ namespace Root_AOP01_Inspection
                         mainVision.StartRun(alignKeyInspection);
                     }
 
-                    if (p_bEnablePatternShift)
+                    if (true)
                     {
                         MainVision.Run_PatternShiftAndRotation patternShiftAndRotation = (MainVision.Run_PatternShiftAndRotation)mainVision.CloneModuleRun("PatternShiftAndRotation");
                         patternShiftAndRotation.m_dMatchScore = p_dPatternShiftAndRotationTemplateMatchingScore / 100;
@@ -554,7 +530,7 @@ namespace Root_AOP01_Inspection
                         mainVision.StartRun(patternShiftAndRotation);
                     }
 
-                    if (p_bEnablePellicleShift)
+                    if (true)
                     {
                         MainVision.Run_PellicleShiftAndRotation pellicleShiftAndRotation = (MainVision.Run_PellicleShiftAndRotation)mainVision.CloneModuleRun("PellicleShiftAndRotation");
                         pellicleShiftAndRotation.m_dNGSpecDistance_mm = p_dPellicleShiftAndRotationShiftSpec;
@@ -562,13 +538,13 @@ namespace Root_AOP01_Inspection
                         mainVision.StartRun(pellicleShiftAndRotation);
                     }
 
-                    if (p_bEnableBarcodeInsp)
+                    if (true)
                     {
                         MainVision.Run_BarcodeInspection barcodeInspection = (MainVision.Run_BarcodeInspection)mainVision.CloneModuleRun("BarcodeInspection");
                         barcodeInspection.m_nThreshold = p_nBarcodeThreshold;
                         mainVision.StartRun(barcodeInspection);
 					}
-					if (p_bEnablePatternDiscolor)
+					if (true)
 					{
                         //startTestInsp();
                         //RootTools.Database.DatabaseManager.Instance.ClearTableData("defect");

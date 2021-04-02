@@ -102,25 +102,25 @@
                                         <TextBlock FontSize="12" Text="Enable Barcode Insp." Style="{StaticResource BasicTb}" Grid.Row="4"/>
 
                                         <ToggleButton Content="True" Grid.Row="0" Grid.Column="1" 
-                                              VerticalAlignment="Center"
-                                              HorizontalAlignment="Center" Width="85"
-                                                      IsChecked="{Binding p_bEnablePatternDiscolor}"/>
+                                                      VerticalAlignment="Center"
+                                                      HorizontalAlignment="Center" Width="85"
+                                                      IsChecked="{Binding p_Setup.p_RecipeWizard.p_bUsePatternDiscolor}"/>
                                         <ToggleButton Content="True" Grid.Row="1" Grid.Column="1" 
                                                       VerticalAlignment="Center"
                                                       HorizontalAlignment="Center" Width="85"
-                                                      IsChecked="{Binding p_bEnableAlignKeyInsp}"/>
+                                                      IsChecked="{Binding p_Setup.p_RecipeWizard.p_bUseAlignKeyExist}"/>
                                         <ToggleButton Content="True" Grid.Row="2" Grid.Column="1" 
                                                       VerticalAlignment="Center"
                                                       HorizontalAlignment="Center" Width="85"
-                                                      IsChecked="{Binding p_bEnablePatternShift}"/>
+                                                      IsChecked="{Binding p_Setup.p_RecipeWizard.p_bUsePatternShiftAndRotation}"/>
                                         <ToggleButton Content="True" Grid.Row="3" Grid.Column="1" 
                                                       VerticalAlignment="Center"
                                                       HorizontalAlignment="Center" Width="85"
-                                                      IsChecked="{Binding p_bEnablePellicleShift}"/>
+                                                      IsChecked="{Binding p_Setup.p_RecipeWizard.p_bUsePellicleShiftAndRotation}"/>
                                         <ToggleButton Content="True" Grid.Row="4" Grid.Column="1" 
                                                       VerticalAlignment="Center"
                                                       HorizontalAlignment="Center" Width="85"
-                                                      IsChecked="{Binding p_bEnableBarcodeInsp}"/>
+                                                      IsChecked="{Binding p_Setup.p_RecipeWizard.p_bUseBarcodeScratch}"/>
                                     </Grid>
                                 </GroupBox>
                                 <GroupBox Grid.Row="1" Header="Illumination">

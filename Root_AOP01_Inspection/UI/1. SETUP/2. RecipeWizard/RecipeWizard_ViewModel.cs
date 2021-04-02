@@ -3,7 +3,7 @@ using System.Windows.Input;
 
 namespace Root_AOP01_Inspection
 {
-    class RecipeWizard_ViewModel : ObservableObject
+    public class RecipeWizard_ViewModel : ObservableObject
     {
         public RecipeWizard_Panel RecipeWizard = new RecipeWizard_Panel();
 
@@ -21,6 +21,70 @@ namespace Root_AOP01_Inspection
             m_Setup = setup;        
         }
 
+        #region Property
+        bool m_bUseEdgeBroken = false;
+        public bool p_bUseEdgeBroken
+        {
+            get { return m_bUseEdgeBroken; }
+            set { SetProperty(ref m_bUseEdgeBroken, value); }
+        }
+
+        bool m_bUsePatternShiftAndRotation = false;
+        public bool p_bUsePatternShiftAndRotation
+        {
+            get { return m_bUsePatternShiftAndRotation; }
+            set { SetProperty(ref m_bUsePatternShiftAndRotation, value); }
+        }
+
+        bool m_bUsePatternDiscolor = false;
+        public bool p_bUsePatternDiscolor
+        {
+            get { return m_bUsePatternDiscolor; }
+            set { SetProperty(ref m_bUsePatternDiscolor, value); }
+        }
+
+        bool m_bUseBarcodeScratch = false;
+        public bool p_bUseBarcodeScratch
+        {
+            get { return m_bUseBarcodeScratch; }
+            set { SetProperty(ref m_bUseBarcodeScratch, value); }
+        }
+
+        bool m_bUseAlignKeyExist = false;
+        public bool p_bUseAlignKeyExist
+        {
+            get { return m_bUseAlignKeyExist; }
+            set { SetProperty(ref m_bUseAlignKeyExist, value); }
+        }
+
+        bool m_bUsePellicleShiftAndRotation = false;
+        public bool p_bUsePellicleShiftAndRotation
+        {
+            get { return m_bUsePellicleShiftAndRotation; }
+            set { SetProperty(ref m_bUsePellicleShiftAndRotation, value); }
+        }
+
+        bool m_bUsePellicleHaze = false;
+        public bool p_bUsePellicleHaze
+        {
+            get { return m_bUsePellicleHaze; }
+            set { SetProperty(ref m_bUsePellicleHaze, value); }
+        }
+
+        bool m_bUsePellicleExpanding = false;
+        public bool p_bUsePellicleExpanding
+        {
+            get { return m_bUsePellicleExpanding; }
+            set { SetProperty(ref m_bUsePellicleExpanding, value); }
+        }
+
+        bool m_bUsePellicleFrontside = false;
+        public bool p_bUsePellicleFrontside
+        {
+            get { return m_bUsePellicleFrontside; }
+            set { SetProperty(ref m_bUsePellicleFrontside, value); }
+        }
+        #endregion
 
         public ICommand btnSummary
         {

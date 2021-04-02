@@ -8,6 +8,11 @@ namespace Root_AOP01_Inspection
     class RecipeLADS_ViewModel : ObservableObject
     {
         Setup_ViewModel m_Setup;
+        public Setup_ViewModel p_Setup
+        {
+            get { return m_Setup; }
+            set { SetProperty(ref m_Setup, value); }
+        }
         AOP01_Engineer m_Engineer;
         MainVision m_mainVision;
         public MainVision p_mainVision
@@ -35,12 +40,6 @@ namespace Root_AOP01_Inspection
         }
 
         #region Property
-        bool m_bEnablePellicleExpanding = false;
-        public bool p_bEnablePellicleExpanding
-        {
-            get { return m_bEnablePellicleExpanding; }
-            set { SetProperty(ref m_bEnablePellicleExpanding, value); }
-        }
 
         #region PellicleExpanding Parameter
         int m_nPellicleExpandingSpec = 100;
@@ -71,7 +70,7 @@ namespace Root_AOP01_Inspection
             {
                 return new RelayCommand(() => {
                     MainVision mainVision = ((AOP01_Handler)m_Engineer.ClassHandler()).m_mainVision;
-                    if (p_bEnablePellicleExpanding)
+                    if (true)
                     {
                         MainVision.Run_PellicleExpandingInspection pellicleExpandingInspection = (MainVision.Run_PellicleExpandingInspection)mainVision.CloneModuleRun("PellicleExpandingInspection");
                         pellicleExpandingInspection.m_nNGSpec_um = p_nPellicleExpandingSpec;
