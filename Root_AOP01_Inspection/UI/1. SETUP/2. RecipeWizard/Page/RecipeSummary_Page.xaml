@@ -73,13 +73,13 @@
                         <TextBlock Text="{Binding p_dPatternRotationSpec_degree, StringFormat={}> \{0:n4\} º}" Grid.Row="2" Grid.Column="2"/>
                         <TextBlock Text="Pattern Discolor"             Grid.Row="3" Grid.Column="0"/>
                         <TextBlock Text="{Binding p_bUsePatternDiscolor, Converter={StaticResource BoolToEnableStringConverters}}" Foreground="{Binding p_bUsePatternDiscolor, Converter={StaticResource BoolToEnableColorConverters}}" Grid.Row="3" Grid.Column="1"/>
-                        <TextBlock Text="> 1 mm"                        Grid.Row="3" Grid.Column="2"/>
+                        <TextBlock Text="{Binding p_dPatternDiscolorSpec_mm, StringFormat={}> \{0:n4\} mm}" Grid.Row="3" Grid.Column="2"/>
                         <TextBlock Text="Barcode Scartch"             Grid.Row="4" Grid.Column="0"/>
                         <TextBlock Text="{Binding p_bUseBarcodeScratch, Converter={StaticResource BoolToEnableStringConverters}}" Foreground="{Binding p_bUseBarcodeScratch, Converter={StaticResource BoolToEnableColorConverters}}" Grid.Row="4" Grid.Column="1"/>
-                        <TextBlock Text="> 1 mm"                        Grid.Row="4" Grid.Column="2"/>
+                        <TextBlock Text="{Binding p_dBarcodeScratchSpec_mm, StringFormat={}> \{0:n4\} mm}" Grid.Row="4" Grid.Column="2"/>
                         <TextBlock Text="Align Key Exist"             Grid.Row="5" Grid.Column="0"/>
                         <TextBlock Text="{Binding p_bUseAlignKeyExist, Converter={StaticResource BoolToEnableStringConverters}}" Foreground="{Binding p_bUseAlignKeyExist, Converter={StaticResource BoolToEnableColorConverters}}" Grid.Row="5" Grid.Column="1"/>
-                        <TextBlock Text="> 30 um"                        Grid.Row="5" Grid.Column="2"/>
+                        <TextBlock Text="{Binding p_dAlignKeyExistSpec_um, StringFormat={}> \{0:n4\} um}" Grid.Row="5" Grid.Column="2"/>
                         </Grid>
                         <Grid Grid.Column="1">
                             <Grid.Resources>
@@ -104,20 +104,20 @@
                         </Grid.RowDefinitions>
                         <TextBlock Text="Pellicle Shift"                   Grid.Row="0" Grid.Column="0"/>
                         <TextBlock Text="{Binding p_bUsePellicleShiftAndRotation, Converter={StaticResource BoolToEnableStringConverters}}" Foreground="{Binding p_bUsePellicleShiftAndRotation, Converter={StaticResource BoolToEnableColorConverters}}"   Grid.Row="0" Grid.Column="1"/>
-                        <TextBlock Text="> 0.3 mm"                         Grid.Row="0" Grid.Column="2"/>
+                        <TextBlock Text="{Binding p_dPellicleShiftSpec_mm, StringFormat={}> \{0:n4\} mm}" Grid.Row="0" Grid.Column="2"/>
                         <TextBlock Text="Pellicle Rotation"                   Grid.Row="1" Grid.Column="0"/>
                         <TextBlock Text="{Binding p_bUsePellicleShiftAndRotation, Converter={StaticResource BoolToEnableStringConverters}}" Foreground="{Binding p_bUsePellicleShiftAndRotation, Converter={StaticResource BoolToEnableColorConverters}}"   Grid.Row="1" Grid.Column="1"/>
-                        <TextBlock Text="> 0.3 º"                         Grid.Row="1" Grid.Column="2"/>
+                        <TextBlock Text="{Binding p_dPellicleRotationSpec_degree, StringFormat={}> \{0:n4\} º}" Grid.Row="1" Grid.Column="2"/>
                         <TextBlock Text="Pellicle Haze"           Grid.Row="2" Grid.Column="0"/>
                         <TextBlock Text="{Binding p_bUsePellicleHaze, Converter={StaticResource BoolToEnableStringConverters}}" Foreground="{Binding p_bUsePellicleHaze, Converter={StaticResource BoolToEnableColorConverters}}"  Grid.Row="2" Grid.Column="1"/>
-                        <TextBlock Text="> 1 mm"                      Grid.Row="2" Grid.Column="2"/>
+                        <TextBlock Text="{Binding p_dPellicleHazeSpec_mm, StringFormat={}> \{0:n4\} mm}" Grid.Row="2" Grid.Column="2"/>
                         <TextBlock Text="Pellicle Expanding"             Grid.Row="3" Grid.Column="0"/>
                         <TextBlock Text="{Binding p_bUsePellicleExpanding, Converter={StaticResource BoolToEnableStringConverters}}" Foreground="{Binding p_bUsePellicleExpanding, Converter={StaticResource BoolToEnableColorConverters}}" Grid.Row="3" Grid.Column="1"/>
-                        <TextBlock Text="> 100 um"                        Grid.Row="3" Grid.Column="2"/>
+                        <TextBlock Text="{Binding p_dPellicleExpandingSpec_um, StringFormat={}> \{0:n4\} um}" Grid.Row="3" Grid.Column="2"/>
                         <TextBlock Text="Pellicle Frontside"             Grid.Row="4" Grid.Column="0"/>
                         <TextBlock Text="{Binding p_bUsePellicleFrontside, Converter={StaticResource BoolToEnableStringConverters}}" Foreground="{Binding p_bUsePellicleFrontside, Converter={StaticResource BoolToEnableColorConverters}}" Grid.Row="4" Grid.Column="1"/>
-                        <TextBlock Text="> 10 um"                        Grid.Row="4" Grid.Column="2"/>
-                        </Grid>
+                        <TextBlock Text="{Binding p_dPellicleFrontsideSpec_um, StringFormat={}> \{0:n4\} um}" Grid.Row="4" Grid.Column="2"/>
+                    </Grid>
                     </Grid>
                     <!--45D-->
                 <TextBlock Text="45D"
@@ -182,7 +182,7 @@
                         <TextBlock Text="{Binding p_bUsePellicleHaze}" Grid.Row="1" Grid.Column="2"/>
                         <TextBlock Text="Spec"          Grid.Row="2" Grid.Column="0"/>
                         <TextBlock Text=":"                           Grid.Row="2" Grid.Column="1"/>
-                        <TextBlock Text="> 1mm"                       Grid.Row="2" Grid.Column="2"/>
+                        <TextBlock Text="{Binding p_dPellicleHazeSpec_mm, StringFormat={}> \{0:n4\} mm}" Grid.Row="2" Grid.Column="2"/>
                     </Grid>
                     <Grid Grid.Column="2" Margin="0,0,100,0">
                         <Grid.ColumnDefinitions>
@@ -206,7 +206,7 @@
                         <TextBlock Text="> 25"                  Grid.Row="2" Grid.Column="2"/>
                         <TextBlock Text="Size"                  Grid.Row="3" Grid.Column="0"/>
                         <TextBlock Text=":"                     Grid.Row="3" Grid.Column="1"/>
-                        <TextBlock Text="> 1 um"                Grid.Row="3" Grid.Column="2"/>
+                        <TextBlock Text="{Binding p_dPellicleFrontsideSpec_um, StringFormat={}> \{0:n4\} um}" Grid.Row="3" Grid.Column="2"/>
                         <TextBlock Text="Pit Level"             Grid.Row="4" Grid.Column="0"/>
                         <TextBlock Text=":"                     Grid.Row="4" Grid.Column="1"/>
                         <TextBlock Text="> 0"                   Grid.Row="4" Grid.Column="2"/>
@@ -276,7 +276,7 @@
                         <TextBlock Text="{Binding p_bUsePatternDiscolor}" Grid.Row="1" Grid.Column="2"/>
                         <TextBlock Text="Spec"          Grid.Row="2" Grid.Column="0"/>
                         <TextBlock Text=":"                           Grid.Row="2" Grid.Column="1"/>
-                        <TextBlock Text="> 1mm"                       Grid.Row="2" Grid.Column="2"/>
+                        <TextBlock Text="{Binding p_dPatternDiscolorSpec_mm, StringFormat={}> \{0:n4\} mm}" Grid.Row="2" Grid.Column="2"/>
                     </Grid>
                     <Grid Grid.Column="2" Margin="0,0,100,5">
                         <Grid.ColumnDefinitions>
@@ -299,7 +299,7 @@
                         <TextBlock Text="80"      Grid.Row="2" Grid.Column="2"/>
                         <TextBlock Text="Spec"     Grid.Row="3" Grid.Column="0"/>
                         <TextBlock Text=":"     Grid.Row="3" Grid.Column="1"/>
-                        <TextBlock Text="> 30 um"      Grid.Row="3" Grid.Column="2"/>
+                        <TextBlock Text="{Binding p_dAlignKeyExistSpec_um, StringFormat={}> \{0:n4\} um}"      Grid.Row="3" Grid.Column="2"/>
                     </Grid>
                     <Grid Grid.Column="0" Grid.Row="1" Margin="0,5,100,0">
                         <Grid.ColumnDefinitions>
@@ -323,7 +323,7 @@
                         <TextBlock Text="80"                    Grid.Row="2" Grid.Column="2"/>
                         <TextBlock Text="Spec"          Grid.Row="3" Grid.Column="0"/>
                         <TextBlock Text=":"                     Grid.Row="3" Grid.Column="1"/>
-                        <TextBlock Text="> 0.5 mm"                    Grid.Row="3" Grid.Column="2"/>
+                        <TextBlock Text="{Binding p_dPatternShiftSpec_mm, StringFormat={}> \{0:n4\} mm}" Grid.Row="3" Grid.Column="2"/>
                     </Grid>
                     <Grid Grid.Column="1" Grid.Row="1" Margin="0,5,100,0">
                         <Grid.ColumnDefinitions>
@@ -348,7 +348,7 @@
                         <TextBlock Text="80"                       Grid.Row="2" Grid.Column="2"/>
                         <TextBlock Text="Scroe"          Grid.Row="3" Grid.Column="0"/>
                         <TextBlock Text=":"                           Grid.Row="3" Grid.Column="1"/>
-                        <TextBlock Text="> 0.3 mm"                       Grid.Row="3" Grid.Column="2"/>
+                        <TextBlock Text="{Binding p_dPellicleShiftSpec_mm, StringFormat={}> \{0:n4\} mm}" Grid.Row="3" Grid.Column="2"/>
                     </Grid>
                     <Grid Grid.Column="2" Grid.Row="1" Margin="0,5,100,0">
                         <Grid.ColumnDefinitions>
@@ -372,10 +372,7 @@
                         <TextBlock Text="> 0"      Grid.Row="2" Grid.Column="2"/>
                         <TextBlock Text="Size"     Grid.Row="3" Grid.Column="0"/>
                         <TextBlock Text=":"     Grid.Row="3" Grid.Column="1"/>
-                        <TextBlock Text="> 0 um"      Grid.Row="3" Grid.Column="2"/>
-                        <TextBlock Text="Pit Level"             Grid.Row="4" Grid.Column="0"/>
-                        <TextBlock Text=":"                     Grid.Row="4" Grid.Column="1"/>
-                        <TextBlock Text="> 0"                   Grid.Row="4" Grid.Column="2"/>
+                        <TextBlock Text="{Binding p_dBarcodeScratchSpec_mm, StringFormat={}> \{0:n4\} mm}" Grid.Row="3" Grid.Column="2"/>
                     </Grid>
                 </Grid>
                 <!--Edge-->
@@ -464,7 +461,7 @@
                         <TextBlock Text="True"                  Grid.Row="1" Grid.Column="2"/>
                         <TextBlock Text="Size"                    Grid.Row="2" Grid.Column="0"/>
                         <TextBlock Text=":"                     Grid.Row="2" Grid.Column="1"/>
-                        <TextBlock Text="> 2 um"                  Grid.Row="2" Grid.Column="2"/>
+                        <TextBlock Text="{Binding p_dEdgeBrokenSpec_mm, StringFormat={}> \{0:n4\} mm}" Grid.Row="2" Grid.Column="2"/>
                     </Grid>
                 </Grid>
                 <!--LADS-->
@@ -531,7 +528,7 @@
                         <TextBlock Text="{Binding p_bUsePellicleExpanding}" Grid.Row="1" Grid.Column="2"/>
                         <TextBlock Text="Distance"          Grid.Row="2" Grid.Column="0"/>
                         <TextBlock Text=":"                           Grid.Row="2" Grid.Column="1"/>
-                        <TextBlock Text="> 100 um"                       Grid.Row="2" Grid.Column="2"/>
+                        <TextBlock Text="{Binding p_dPellicleExpandingSpec_um, StringFormat={}> \{0:n4\} um}" Grid.Row="2" Grid.Column="2"/>
                     </Grid>
                 </Grid>
             </StackPanel>

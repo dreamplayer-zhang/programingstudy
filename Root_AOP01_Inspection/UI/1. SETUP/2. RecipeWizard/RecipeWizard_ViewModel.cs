@@ -105,6 +105,62 @@ namespace Root_AOP01_Inspection
             get { return m_dPatternRotationSpec_degree; }
             set { SetProperty(ref m_dPatternRotationSpec_degree, value); }
         }
+
+        double m_dPatternDiscolorSpec_mm = 1.0;
+        public double p_dPatternDiscolorSpec_mm
+        {
+            get { return m_dPatternDiscolorSpec_mm; }
+            set { SetProperty(ref m_dPatternDiscolorSpec_mm, value); }
+        }
+
+        double m_dBarcodeScratchSpec_mm = 1.0;
+        public double p_dBarcodeScratchSpec_mm
+        {
+            get { return m_dBarcodeScratchSpec_mm; }
+            set { SetProperty(ref m_dBarcodeScratchSpec_mm, value); }
+        }
+
+        double m_dAlignKeyExistSpec_um = 30.0;
+        public double p_dAlignKeyExistSpec_um
+        {
+            get { return m_dAlignKeyExistSpec_um; }
+            set { SetProperty(ref m_dAlignKeyExistSpec_um, value); }
+        }
+
+        double m_dPellicleShiftSpec_mm = 0.5;
+        public double p_dPellicleShiftSpec_mm
+        {
+            get { return m_dPellicleShiftSpec_mm; }
+            set { SetProperty(ref m_dPellicleShiftSpec_mm, value); }
+        }
+
+        double m_dPellicleRotationSpec_degree = 0.5;
+        public double p_dPellicleRotationSpec_degree
+        {
+            get { return m_dPellicleRotationSpec_degree; }
+            set { SetProperty(ref m_dPellicleRotationSpec_degree, value); }
+        }
+
+        double m_dPellicleHazeSpec_mm = 1.0;
+        public double p_dPellicleHazeSpec_mm
+        {
+            get { return m_dPellicleHazeSpec_mm; }
+            set { SetProperty(ref m_dPellicleHazeSpec_mm, value); }
+        }
+
+        double m_dPellicleExpandingSpec_um = 100;
+        public double p_dPellicleExpandingSpec_um
+        {
+            get { return m_dPellicleExpandingSpec_um; }
+            set { SetProperty(ref m_dPellicleExpandingSpec_um, value); }
+        }
+
+        double m_dPellicleFrontsideSpec_um = 10.0;
+        public double p_dPellicleFrontsideSpec_um
+        {
+            get { return m_dPellicleFrontsideSpec_um; }
+            set { SetProperty(ref m_dPellicleFrontsideSpec_um, value); }
+        }
         #endregion
 
         public ICommand btnSummary
