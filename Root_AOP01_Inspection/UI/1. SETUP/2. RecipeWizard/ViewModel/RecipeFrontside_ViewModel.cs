@@ -517,7 +517,6 @@ namespace Root_AOP01_Inspection
                     {
                         MainVision.Run_AlignKeyInspection alignKeyInspection = (MainVision.Run_AlignKeyInspection)mainVision.CloneModuleRun("AlignKeyInspection");
                         alignKeyInspection.m_dMatchScore = p_dAlignKeyTemplateMatchingScore / 100;
-                        alignKeyInspection.m_nNGSpec_um = p_nAlignKeyNGSpec_um;
                         mainVision.StartRun(alignKeyInspection);
                     }
 
@@ -525,16 +524,12 @@ namespace Root_AOP01_Inspection
                     {
                         MainVision.Run_PatternShiftAndRotation patternShiftAndRotation = (MainVision.Run_PatternShiftAndRotation)mainVision.CloneModuleRun("PatternShiftAndRotation");
                         patternShiftAndRotation.m_dMatchScore = p_dPatternShiftAndRotationTemplateMatchingScore / 100;
-                        patternShiftAndRotation.m_dNGSpecDistance_mm = p_dPatternShiftAndRotationShiftSpec;
-                        patternShiftAndRotation.m_dNGSpecDegree = p_dPatternShiftAndRotationRotationSpec;
                         mainVision.StartRun(patternShiftAndRotation);
                     }
 
                     if (true)
                     {
                         MainVision.Run_PellicleShiftAndRotation pellicleShiftAndRotation = (MainVision.Run_PellicleShiftAndRotation)mainVision.CloneModuleRun("PellicleShiftAndRotation");
-                        pellicleShiftAndRotation.m_dNGSpecDistance_mm = p_dPellicleShiftAndRotationShiftSpec;
-                        pellicleShiftAndRotation.m_dNGSpecDegree = p_dPellicleShiftAndRotationRotationSpec;
                         mainVision.StartRun(pellicleShiftAndRotation);
                     }
 

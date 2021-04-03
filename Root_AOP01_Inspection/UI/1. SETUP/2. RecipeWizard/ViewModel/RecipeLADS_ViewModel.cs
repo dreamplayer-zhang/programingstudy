@@ -73,7 +73,6 @@ namespace Root_AOP01_Inspection
                     if (true)
                     {
                         MainVision.Run_PellicleExpandingInspection pellicleExpandingInspection = (MainVision.Run_PellicleExpandingInspection)mainVision.CloneModuleRun("PellicleExpandingInspection");
-                        pellicleExpandingInspection.m_nNGSpec_um = p_nPellicleExpandingSpec;
                         mainVision.StartRun(pellicleExpandingInspection);
                     }
                 });

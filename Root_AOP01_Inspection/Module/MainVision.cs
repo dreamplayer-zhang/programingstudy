@@ -2847,7 +2847,6 @@ namespace Root_AOP01_Inspection.Module
             public bool m_bDarkBackground = true;
             public int m_nThreshold = 70;
             public int m_nSubImageThreshold = 70;
-            public double m_dNGSpecScratchLength_mm = 1;
 
             public Run_BarcodeInspection(MainVision module)
             {
@@ -2873,7 +2872,6 @@ namespace Root_AOP01_Inspection.Module
                 run.m_bDarkBackground = m_bDarkBackground;
                 run.m_nThreshold = m_nThreshold;
                 run.m_nSubImageThreshold = m_nSubImageThreshold;
-                run.m_dNGSpecScratchLength_mm = m_dNGSpecScratchLength_mm;
                 return run;
             }
 
@@ -2894,7 +2892,6 @@ namespace Root_AOP01_Inspection.Module
                 m_bDarkBackground = tree.Set(m_bDarkBackground, m_bDarkBackground, "Dark Background", "Dark Background", bVisible);
                 m_nThreshold = tree.Set(m_nThreshold, m_nThreshold, "Find Edge Threshold", "Find Edge Threshold", bVisible);
                 m_nSubImageThreshold = tree.Set(m_nSubImageThreshold, m_nSubImageThreshold, "Sub Image Threshold", "Sub Image Threshold", bVisible);
-                m_dNGSpecScratchLength_mm = tree.Set(m_dNGSpecScratchLength_mm, m_dNGSpecScratchLength_mm, "Scratch Spec [mm]", "Scratch Spec [mm]", bVisible);
             }
                         
             public override string Run()
@@ -3036,9 +3033,10 @@ namespace Root_AOP01_Inspection.Module
                 blobDetector.Detect(img, blobs);
 
                 int nMMPerUM = 1000;
+                double dScratchSpec_mm = UIManager.Instance.SetupViewModel.p_RecipeWizard.p_dBarcodeScratchSpec_mm;
                 foreach (CvBlob blob in blobs.Values)
                 {
-                    if (blob.BoundingBox.Width * 5/*TDI90 Resolution = 5*/ > m_dNGSpecScratchLength_mm * nMMPerUM || blob.BoundingBox.Height * 5/*TDI90 Resolution = 5*/ > m_dNGSpecScratchLength_mm * nMMPerUM)
+                    if (blob.BoundingBox.Width * 5/*TDI90 Resolution = 5*/ > dScratchSpec_mm * nMMPerUM || blob.BoundingBox.Height * 5/*TDI90 Resolution = 5*/ > dScratchSpec_mm * nMMPerUM)
                     {
                         m_module.p_bBarcodePass = false;
                         break;
@@ -3877,10 +3875,7 @@ namespace Root_AOP01_Inspection.Module
             public int m_nInSearchAreaWidth = 1000;
             public int m_nInSearchAreaHeight = 1000;
             public double m_dMatchScore = 0.95;
-            public double m_dNGSpecDistance_mm = 500.0;
-            public double m_dNGSpecDegree = 0.5;
-
-
+            
             public Run_PatternShiftAndRotation(MainVision module)
             {
                 m_module = module;
@@ -3903,8 +3898,6 @@ namespace Root_AOP01_Inspection.Module
                 run.m_nInSearchAreaWidth = m_nInSearchAreaWidth;
                 run.m_nInSearchAreaHeight = m_nInSearchAreaHeight;
                 run.m_dMatchScore = m_dMatchScore;
-                run.m_dNGSpecDistance_mm = m_dNGSpecDistance_mm;
-                run.m_dNGSpecDegree = m_dNGSpecDegree;
 
                 return run;
             }
@@ -3927,8 +3920,6 @@ namespace Root_AOP01_Inspection.Module
                 m_nInSearchAreaHeight = (tree.GetTree("In Feature Setting", false, bVisible)).Set(m_nInSearchAreaHeight, m_nInSearchAreaHeight, "Search Area Height [px]", "Search Area Height [px]", bVisible);
 
                 m_dMatchScore = tree.GetTree("NG Spec", false, bVisible).Set(m_dMatchScore, m_dMatchScore, "Template Matching Score [0.0~1.0]", "Template Matching Score [0.0~1.0]", bVisible);
-                m_dNGSpecDistance_mm = tree.GetTree("NG Spec", false, bVisible).Set(m_dNGSpecDistance_mm, m_dNGSpecDistance_mm, "Distance NG Spec [mm]", "Distance NG Spec [mm]", bVisible);
-                m_dNGSpecDegree = tree.GetTree("NG Spec", false, bVisible).Set(m_dNGSpecDegree, m_dNGSpecDegree, "Degree NG Spec", "Degree NG Spec", bVisible);
             }
 
             public override string Run()
@@ -4199,7 +4190,9 @@ namespace Root_AOP01_Inspection.Module
                     double dInLineThetaDegree = dInLineThetaRadian * (180 / Math.PI);
                     m_module.p_dPatternShiftAngle = Math.Abs(dOutLineThetaDegree - dInLineThetaDegree);
 
-                    if (m_module.p_dPatternShiftDistance > m_dNGSpecDistance_mm || m_module.p_dPatternShiftAngle > m_dNGSpecDegree) m_module.p_bPatternShiftPass = false;
+                    double dPatternShiftSpec_mm = UIManager.Instance.SetupViewModel.p_RecipeWizard.p_dPatternShiftSpec_mm;
+                    double dPatternRotationSpec_degree = UIManager.Instance.SetupViewModel.p_RecipeWizard.p_dPatternRotationSpec_degree;
+                    if (m_module.p_dPatternShiftDistance > dPatternShiftSpec_mm || m_module.p_dPatternShiftAngle > dPatternRotationSpec_degree) m_module.p_bPatternShiftPass = false;
                 }
                 else
                 {
@@ -4622,7 +4615,6 @@ namespace Root_AOP01_Inspection.Module
             public int m_nSearchArea = 2000;
             public double m_dMatchScore = 0.95;
             public int m_nThreshold = 70;
-            public int m_nNGSpec_um = 30;
 
             public Run_AlignKeyInspection(MainVision module)
             {
@@ -4636,7 +4628,6 @@ namespace Root_AOP01_Inspection.Module
                 run.m_nSearchArea = m_nSearchArea;
                 run.m_dMatchScore = m_dMatchScore;
                 run.m_nThreshold = m_nThreshold;
-                run.m_nNGSpec_um = m_nNGSpec_um;
                 return run;
             }
 
@@ -4645,7 +4636,6 @@ namespace Root_AOP01_Inspection.Module
                 m_nSearchArea = tree.Set(m_nSearchArea, m_nSearchArea, "Search Area Size [px]", "Search Area Size [px]", bVisible);
                 m_dMatchScore = tree.Set(m_dMatchScore, m_dMatchScore, "Template Matching Score [0.0~1.0]", "Template Matching Score [0.0~1.0]", bVisible);
                 m_nThreshold = tree.Set(m_nThreshold, m_nThreshold, "Binary Threshold [GV]", "Binary Threshold [GV]", bVisible);
-                m_nNGSpec_um = tree.Set(m_nNGSpec_um, m_nNGSpec_um, "NG Spec [um]", "NG Spec [um]", bVisible);
             }
 
             public override string Run()
@@ -4861,12 +4851,13 @@ namespace Root_AOP01_Inspection.Module
                 // variable
                 CvBlobs blobs = new CvBlobs();
                 CvBlobDetector blobDetector = new CvBlobDetector();
+                double dNGSpec_um = UIManager.Instance.SetupViewModel.p_RecipeWizard.p_dAlignKeyExistSpec_um;
 
                 // implement
                 blobDetector.Detect(img, blobs);
                 foreach (CvBlob blob in blobs.Values)
                 {
-                    if (blob.BoundingBox.Width > m_nNGSpec_um / 5/*Resolution*/ || blob.BoundingBox.Height > m_nNGSpec_um / 5/*Resolution*/) return false;
+                    if (blob.BoundingBox.Width > dNGSpec_um / 5/*Resolution*/ || blob.BoundingBox.Height > dNGSpec_um / 5/*Resolution*/) return false;
                 }
 
                 return true;
@@ -5187,10 +5178,6 @@ namespace Root_AOP01_Inspection.Module
             public int m_nReticleEdgeThreshold = 20;
             public int m_nFrameEdgeThreshold = 40;
 
-            // NG Spec
-            public double m_dNGSpecDistance_mm = 0.3;
-            public double m_dNGSpecDegree = 0.5;
-
             public Run_PellicleShiftAndRotation(MainVision module)
             {
                 m_module = module;
@@ -5209,8 +5196,6 @@ namespace Root_AOP01_Inspection.Module
                 run.m_nFrameEdgeSearchArea = m_nFrameEdgeSearchArea;
                 run.m_nReticleEdgeThreshold = m_nReticleEdgeThreshold;
                 run.m_nFrameEdgeThreshold = m_nFrameEdgeThreshold;
-                run.m_dNGSpecDistance_mm = m_dNGSpecDistance_mm;
-                run.m_dNGSpecDegree = m_dNGSpecDegree;
                 return run;
             }
 
@@ -5225,8 +5210,6 @@ namespace Root_AOP01_Inspection.Module
                 m_nFrameEdgeSearchArea = (tree.GetTree("Position Parameter", false, bVisible)).Set(m_nFrameEdgeSearchArea, m_nFrameEdgeSearchArea, "Frame Edge Search Area [px]", "Frame Edge Search Area [px]", bVisible);
                 m_nReticleEdgeThreshold = (tree.GetTree("Inspection Parameter", false, bVisible)).Set(m_nReticleEdgeThreshold, m_nReticleEdgeThreshold, "Reticle Edge Threshold", "Reticle Edge Threshold", bVisible);
                 m_nFrameEdgeThreshold = (tree.GetTree("Inspection Parameter", false, bVisible)).Set(m_nFrameEdgeThreshold, m_nFrameEdgeThreshold, "Frame Edge Threshold", "Frame Edge Threshold", bVisible);
-                m_dNGSpecDistance_mm = (tree.GetTree("NG Spec", false, bVisible)).Set(m_dNGSpecDistance_mm, m_dNGSpecDistance_mm, "Distance NG Spec [mm]", "Distance NG Spec [mm]", bVisible);
-                m_dNGSpecDegree = (tree.GetTree("NG Spec", false, bVisible)).Set(m_dNGSpecDegree, m_dNGSpecDegree, "Degree NG Spec [º]", "Degree NG Spec [º]", bVisible);
             }
 
             public override string Run()
@@ -5484,8 +5467,10 @@ namespace Root_AOP01_Inspection.Module
                 double dResultDistance = m_module.GetDistanceOfTwoPoint(new CPoint((int)rtReticleEdge.Center.X, (int)rtReticleEdge.Center.Y), new CPoint((int)rtFrameEdge.Center.X, (int)rtFrameEdge.Center.Y));
                 double dResultAngle = Math.Abs(dFrameAngle - dReticleAngle);
 
-                if (m_dNGSpecDistance_mm < (dResultDistance * moduleRunGrab.m_dResY_um / 1000)) m_module.p_bPellicleShiftPass = false;
-                if (m_dNGSpecDegree < m_module.p_dPatternShiftAngle) m_module.p_bPellicleShiftPass = false;
+                double dPellicleShiftSpec_mm = UIManager.Instance.SetupViewModel.p_RecipeWizard.p_dPellicleShiftSpec_mm;
+                double dPellicleRotationSpec_degree = UIManager.Instance.SetupViewModel.p_RecipeWizard.p_dPellicleRotationSpec_degree;
+                if (dPellicleShiftSpec_mm < (dResultDistance * moduleRunGrab.m_dResY_um / 1000)) m_module.p_bPellicleShiftPass = false;
+                if (dPellicleRotationSpec_degree < m_module.p_dPatternShiftAngle) m_module.p_bPellicleShiftPass = false;
 
                 m_module.p_dPellicleShiftDistance = dResultDistance * moduleRunGrab.m_dResY_um / 1000;
                 m_module.p_dPellicleShiftAngle = dResultAngle;
@@ -5517,7 +5502,6 @@ namespace Root_AOP01_Inspection.Module
         {
             MainVision m_module;
             int m_nLaserThreshold = 70;
-            public int m_nNGSpec_um = 100;
 
             public Run_PellicleExpandingInspection(MainVision module)
             {
@@ -5529,14 +5513,12 @@ namespace Root_AOP01_Inspection.Module
             {
                 Run_PellicleExpandingInspection run = new Run_PellicleExpandingInspection(m_module);
                 run.m_nLaserThreshold = m_nLaserThreshold;
-                run.m_nNGSpec_um = m_nNGSpec_um;
                 return run;
             }
 
             public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
             {
                 m_nLaserThreshold = tree.Set(m_nLaserThreshold, m_nLaserThreshold, "Laser Threshold [GV]", "Laser Threshold [GV]", bVisible);
-                m_nNGSpec_um = tree.Set(m_nNGSpec_um, m_nNGSpec_um, "Pellicle Expanding NG Spec [um]", "Pellicle Expanding NG Spec [um]", bVisible);
             }
 
             public override string Run()
@@ -5744,7 +5726,8 @@ namespace Root_AOP01_Inspection.Module
 
                 m_module.p_dPellicleExpandingMax = nMax;
                 m_module.p_dPellicleExpandingMin = nMin;
-                if ((nMax - nMin) * 400 / 10/*1px당 Pulse = 400*/ > m_nNGSpec_um) m_module.p_bPellicleExpandingPass = false;
+                double dNGSpec_um = UIManager.Instance.SetupViewModel.p_RecipeWizard.p_dPellicleExpandingSpec_um;
+                if ((nMax - nMin) * 400 / 10/*1px당 Pulse = 400*/ > dNGSpec_um) m_module.p_bPellicleExpandingPass = false;
                 else m_module.p_bPellicleExpandingPass = true;
             }
 

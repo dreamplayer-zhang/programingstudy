@@ -314,16 +314,19 @@
                             <RowDefinition/>
                             <RowDefinition/>
                         </Grid.RowDefinitions>
-                        <TextBlock Text="Pattern Shift"  FontWeight="Bold"              Grid.Row="0" Grid.Column="0"/>
+                        <TextBlock Text="Pattern Shift / Rotation"  FontWeight="Bold"              Grid.Row="0" Grid.Column="0"/>
                         <TextBlock Text="Enable"          Grid.Row="1" Grid.Column="0"/>
                         <TextBlock Text=":"                     Grid.Row="1" Grid.Column="1"/>
                         <TextBlock Text="{Binding p_bUsePatternShiftAndRotation}" Grid.Row="1" Grid.Column="2"/>
                         <TextBlock Text="Score"          Grid.Row="2" Grid.Column="0"/>
                         <TextBlock Text=":"                     Grid.Row="2" Grid.Column="1"/>
                         <TextBlock Text="80"                    Grid.Row="2" Grid.Column="2"/>
-                        <TextBlock Text="Spec"          Grid.Row="3" Grid.Column="0"/>
+                        <TextBlock Text="Shift Spec"          Grid.Row="3" Grid.Column="0"/>
                         <TextBlock Text=":"                     Grid.Row="3" Grid.Column="1"/>
                         <TextBlock Text="{Binding p_dPatternShiftSpec_mm, StringFormat={}> \{0:n4\} mm}" Grid.Row="3" Grid.Column="2"/>
+                        <TextBlock Text="Rotation Spec" Grid.Row="4" Grid.Column="0"/>
+                        <TextBlock Text=":" Grid.Row="4" Grid.Column="1"/>
+                        <TextBlock Text="{Binding p_dPatternRotationSpec_degree, StringFormat={}> \{0:n4\} º}" Grid.Row="4" Grid.Column="2"/>
                     </Grid>
                     <Grid Grid.Column="1" Grid.Row="1" Margin="0,5,100,0">
                         <Grid.ColumnDefinitions>
@@ -339,16 +342,19 @@
                             <RowDefinition/>
                         </Grid.RowDefinitions>
 
-                        <TextBlock Text="Pellicle Shift" FontWeight="Bold"               Grid.Row="0" Grid.Column="0"/>
+                        <TextBlock Text="Pellicle Shift / Rotation" FontWeight="Bold"               Grid.Row="0" Grid.Column="0"/>
                         <TextBlock Text="Enable"                        Grid.Row="1" Grid.Column="0"/>
                         <TextBlock Text=":"                           Grid.Row="1" Grid.Column="1"/>
                         <TextBlock Text="{Binding p_bUsePellicleShiftAndRotation}" Grid.Row="1" Grid.Column="2"/>
                         <TextBlock Text="Scroe"          Grid.Row="2" Grid.Column="0"/>
                         <TextBlock Text=":"                           Grid.Row="2" Grid.Column="1"/>
                         <TextBlock Text="80"                       Grid.Row="2" Grid.Column="2"/>
-                        <TextBlock Text="Scroe"          Grid.Row="3" Grid.Column="0"/>
+                        <TextBlock Text="Shift Spec"          Grid.Row="3" Grid.Column="0"/>
                         <TextBlock Text=":"                           Grid.Row="3" Grid.Column="1"/>
                         <TextBlock Text="{Binding p_dPellicleShiftSpec_mm, StringFormat={}> \{0:n4\} mm}" Grid.Row="3" Grid.Column="2"/>
+                        <TextBlock Text="Rotation Spec" Grid.Row="4" Grid.Column="0"/>
+                        <TextBlock Text=":" Grid.Row="4" Grid.Column="1"/>
+                        <TextBlock Text="{Binding p_dPellicleRotationSpec_degree, StringFormat={}> \{0:n4\} º}" Grid.Row="4" Grid.Column="2"/>
                     </Grid>
                     <Grid Grid.Column="2" Grid.Row="1" Margin="0,5,100,0">
                         <Grid.ColumnDefinitions>
