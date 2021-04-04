@@ -1,4 +1,5 @@
-﻿using System;
+﻿using RootTools.Trees;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,6 +10,8 @@ namespace RootTools.RFIDs
 {
     public interface IRFID
     {
+        string Read(out string sRead);
+        void RunTree(Tree tree);
         UserControl p_ui { get; }
         void ThreadStop(); 
     }

@@ -28,13 +28,6 @@ namespace Root_VEGA_P.Module
         }
         #endregion
 
-        #region RFID
-        void InitRFID()
-        {
-            //forget
-        }
-        #endregion
-
         #region Stage
         public class Stage : NotifyProperty
         {
@@ -440,8 +433,9 @@ namespace Root_VEGA_P.Module
                         case InfoPods.eState.Dock: return "OK";
                         case InfoPods.eState.Empty: return "Pod not Exist";
                     }
-                    //RFID ??
-
+                    string sRFID = ""; 
+                    m_RFID.Read(out sRFID);
+                    m_infoPods.p_sCarrierID = sRFID; 
                 }
                 m_infoPods.SendCarrierID(m_infoPods.p_sCarrierID); 
                 m_bDocking = true; 

@@ -8,7 +8,6 @@
              mc:Ignorable="d"
              d:DesignHeight="849"
              d:DesignWidth="1052">
-
     <Grid>
         <ScrollViewer Background="White" Grid.Row="1">
             <StackPanel>
@@ -116,7 +115,7 @@
                             </StackPanel>
                         </Grid>
                     </Grid>
-                    <Grid Grid.Column="1" Background="AliceBlue">
+                    <Grid Grid.Column="1">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="1.2*" />
@@ -460,10 +459,8 @@
                                 <RowDefinition Height="*" />
                             </Grid.RowDefinitions>
                             <GroupBox Header="Map" Grid.Row="0">
-                                <Grid Background="Black"
-                                      Margin="5,2">
-
-                                </Grid>
+                                <Image Source="Resource/Reticle.png"
+                                       Stretch="Fill" />
                             </GroupBox>
                             <GroupBox Header="Inspection Item" Grid.Row="1">
                                 <Grid Margin="5,2">
@@ -499,20 +496,26 @@
                                         <TextBlock Text="Property"
                                                    Grid.Column="0"
                                                    Grid.Row="0"
+                                                   VerticalAlignment="Center"
                                                    HorizontalAlignment="Left" />
                                         <TextBlock Text="X"
+                                                   VerticalAlignment="Center"
                                                    Grid.Column="1"
                                                    Grid.Row="0" />
                                         <TextBlock Text="Y"
+                                                   VerticalAlignment="Center"
                                                    Grid.Column="2"
                                                    Grid.Row="0" />
                                         <TextBlock Text="Width"
+                                                   VerticalAlignment="Center"
                                                    Grid.Column="3"
                                                    Grid.Row="0" />
                                         <TextBlock Text="Height"
+                                                   VerticalAlignment="Center"
                                                    Grid.Column="4"
                                                    Grid.Row="0" />
                                         <TextBlock Text="Pattern(D2D)"
+                                                   VerticalAlignment="Center"
                                                    Grid.Column="0"
                                                    Grid.Row="1"
                                                    HorizontalAlignment="Left" />
@@ -533,6 +536,7 @@
                                                  Margin="2,0"
                                                  VerticalAlignment="Center" />
                                         <TextBlock Text="NonPattern(Surface)"
+                                                   VerticalAlignment="Center"
                                                    Grid.Column="0"
                                                    Grid.Row="2"
                                                    HorizontalAlignment="Left" />

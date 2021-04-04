@@ -123,33 +123,12 @@ namespace RootTools.RFIDs
         int m_nReadID = 0;
         int m_secRS232 = 2;
         int m_msRS232 = 2000;
-        void RunTreeCmd(Tree tree)
+        public void RunTree(Tree tree)
         {
             m_nReadID = tree.Set(m_nReadID, m_nReadID, "Reader ID", "RFID Reader ID (0 ~ 15)");
             m_secRS232 = tree.Set(m_secRS232, m_secRS232, "RS232 Timeout", "RS232 Receive Timeout (sec)");
             m_msRS232 = 1000 * m_secRS232; 
             InitReadCmd(); 
-        }
-        #endregion
-
-        #region Tree
-        TreeRoot m_treeRoot; 
-        void InitTree()
-        {
-            m_treeRoot = new TreeRoot(p_id, m_log);
-            m_treeRoot.UpdateTree += M_treeRoot_UpdateTree;
-        }
-
-        private void M_treeRoot_UpdateTree()
-        {
-            RunTree(Tree.eMode.Update);
-            RunTree(Tree.eMode.RegWrite);
-        }
-
-        public void RunTree(Tree.eMode mode)
-        {
-            m_treeRoot.p_eMode = mode;
-            RunTreeCmd(m_treeRoot.GetTree("Setup"));
         }
         #endregion
 
@@ -171,7 +150,6 @@ namespace RootTools.RFIDs
         {
             p_id = id;
             m_log = log;
-            InitTree();
             InitRS232();
         }
 

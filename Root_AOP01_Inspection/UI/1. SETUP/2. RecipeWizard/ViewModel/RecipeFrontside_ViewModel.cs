@@ -536,6 +536,7 @@ namespace Root_AOP01_Inspection
                 return new RelayCommand(() =>
                 {
                     MainVision mainVision = ((AOP01_Handler)m_Engineer.ClassHandler()).m_mainVision;
+
                     if (p_bEnableAlignKeyInsp)
                     {
                         MainVision.Run_AlignKeyInspection alignKeyInspection = (MainVision.Run_AlignKeyInspection)mainVision.CloneModuleRun("AlignKeyInspection");
