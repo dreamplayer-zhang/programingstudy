@@ -21,6 +21,33 @@
             <TabItem Header="Setting">
                 <tree:TreeUI x:Name="treeRootUI"/>
             </TabItem>
+            <TabItem Header="Data">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <StackPanel Grid.Row="0" Orientation="Horizontal">
+                        <CheckBox x:Name="checkBoxRead" Content="Timer Read" Margin="3" Click="checkBoxRead_Click"/>
+                        <TextBlock Text="  Unit = " VerticalAlignment="Center"/>
+                        <TextBox Margin="3" Text="{Binding p_nViewUnit}" Width="40" TextAlignment="Center"/>
+                    </StackPanel>
+                    <TabControl Grid.Row="1">
+                        <TabItem Header="Coil">
+                            <local:ModbusData_UI x:Name="modbusCoil"/>
+                        </TabItem>
+                        <TabItem Header="DiscreateInput">
+                            <local:ModbusData_UI x:Name="modbusDiscreateInput"/>
+                        </TabItem>
+                        <TabItem Header="HoldingRegister">
+                            <local:ModbusData_UI x:Name="modbusHoldingRegister"/>
+                        </TabItem>
+                        <TabItem Header="InputRegister">
+                            <local:ModbusData_UI x:Name="modbusInputRegister"/>
+                        </TabItem>
+                    </TabControl>
+                </Grid>
+            </TabItem>
         </TabControl>
     </Grid>
 </UserControl>

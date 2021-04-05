@@ -2,6 +2,7 @@
 using RootTools.Trees;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO.Ports;
 using System.Windows.Controls;
 
@@ -337,6 +338,152 @@ namespace RootTools.Comm
         }
         #endregion
 
+        #region Data for UI Display
+        byte _nViewUnit = 1;
+        public byte p_nViewUnit
+        {
+            get { return _nViewUnit; }
+            set
+            {
+                _nViewUnit = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public class DataGroup : NotifyProperty
+        {
+            #region Property
+            public enum eType
+            {
+                Coil,
+                DiscreateInput,
+                HoldingRegister,
+                InputRegister
+            }
+            public eType p_eType { get; set; }
+            
+            bool _bUse = false; 
+            public bool p_bUse
+            {
+                get { return _bUse; }
+                set
+                {
+                    _bUse = value;
+                    OnPropertyChanged(); 
+                }
+            }
+
+            int _nStart = 0;
+            public int p_nStart
+            {
+                get { return _nStart; }
+                set
+                {
+                    _nStart = value;
+                    ReAllocate();
+                    OnPropertyChanged(); 
+                }
+            }
+
+            int _nEnd = 1;
+            public int p_nEnd
+            {
+                get { return _nEnd; }
+                set
+                {
+                    _nEnd = value;
+                    ReAllocate();
+                    OnPropertyChanged();
+                }
+            }
+            #endregion
+
+            public class Data : NotifyProperty
+            {
+                public int p_nAddress { get; set; }
+
+                int _nData = 0; 
+                public int p_nData
+                {
+                    get { return _nData; }
+                    set
+                    {
+                        _nData = value;
+                        OnPropertyChanged(); 
+                    }
+                }
+
+                public Data(int nAddress)
+                {
+                    p_nAddress = nAddress; 
+                }
+            }
+            public List<bool> m_abData = new List<bool>();
+            public List<int> m_anData = new List<int>(); 
+            public ObservableCollection<Data> m_aData = new ObservableCollection<Data>(); 
+            void ReAllocate()
+            {
+                m_aData.Clear();
+                m_abData.Clear();
+                m_anData.Clear();
+                for (int n = p_nStart; n <= p_nEnd; n++)
+                {
+                    m_aData.Add(new Data(n));
+                    switch (p_eType)
+                    {
+                        case eType.Coil:
+                        case eType.DiscreateInput: m_abData.Add(false); break;
+                        case eType.HoldingRegister:
+                        case eType.InputRegister: m_anData.Add(0); break;
+                    }
+                }
+            }
+
+            public void ReadData(byte nUnit)
+            {
+                if (p_bUse == false) return; 
+                switch (p_eType)
+                {
+                    case eType.Coil: 
+                        m_modbus.ReadCoils(nUnit, p_nStart, m_abData);
+                        for (int n = 0; n < m_aData.Count; n++) m_aData[n].p_nData = m_abData[n] ? 1 : 0;
+                        break;
+                    case eType.DiscreateInput: 
+                        m_modbus.ReadDiscreateInputs(nUnit, p_nStart, m_abData);
+                        for (int n = 0; n < m_aData.Count; n++) m_aData[n].p_nData = m_abData[n] ? 1 : 0;
+                        break;
+                    case eType.HoldingRegister: 
+                        m_modbus.ReadHoldingRegister(nUnit, p_nStart, m_anData);
+                        for (int n = 0; n < m_aData.Count; n++) m_aData[n].p_nData = m_anData[n];
+                        break;
+                    case eType.InputRegister: 
+                        m_modbus.ReadInputRegister(nUnit, p_nStart, m_anData);
+                        for (int n = 0; n < m_aData.Count; n++) m_aData[n].p_nData = m_anData[n];
+                        break; 
+                }
+            }
+
+            Modbus m_modbus; 
+            public DataGroup(eType eType, Modbus modbus)
+            {
+                p_eType = eType;
+                m_modbus = modbus; 
+            }
+        }
+        public List<DataGroup> m_aDataGroup = new List<DataGroup>(); 
+        void InitDataGroup()
+        {
+            m_aDataGroup.Add(new DataGroup(DataGroup.eType.Coil, this));
+            m_aDataGroup.Add(new DataGroup(DataGroup.eType.DiscreateInput, this));
+            m_aDataGroup.Add(new DataGroup(DataGroup.eType.HoldingRegister, this));
+            m_aDataGroup.Add(new DataGroup(DataGroup.eType.InputRegister, this));
+        }
+        public void ReadDataGroup(int nUnit)
+        {
+            foreach (DataGroup group in m_aDataGroup) group.ReadData((byte)nUnit);
+        }
+        #endregion
+
         #region Tree
         private void M_treeRoot_UpdateTree()
         {
@@ -373,7 +520,8 @@ namespace RootTools.Comm
             InitCommType(id); 
             m_treeRoot = new TreeRoot(id, log);
             m_treeRoot.UpdateTree += M_treeRoot_UpdateTree;
-            InitClient(); 
+            InitClient();
+            InitDataGroup(); 
             RunTree(Tree.eMode.RegRead);
             p_sInfo = Connect(); 
         }

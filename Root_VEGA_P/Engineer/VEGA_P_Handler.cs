@@ -1,12 +1,9 @@
-﻿using Root_EFEM;
-using Root_EFEM.Module;
-using Root_VEGA_P.Module;
+﻿using Root_VEGA_P.Module;
 using Root_VEGA_P_Vision.Module;
 using RootTools;
 using RootTools.GAFs;
 using RootTools.Gem;
 using RootTools.Module;
-using RootTools.OHTNew;
 using RootTools.Trees;
 using System.Collections.Generic;
 using System.Threading;
@@ -35,11 +32,14 @@ namespace Root_VEGA_P.Engineer
         public ModuleList p_moduleList { get; set; }
         public VEGA_P_Recipe m_recipe;
         //public EFEM_Process m_process; //forgetVegaP
+        public VEGA_P m_VEGA; 
         public RTR m_rtr;
         public Loadport m_loadport; 
         void InitModule()
         {
             p_moduleList = new ModuleList(m_engineer);
+            m_VEGA = new VEGA_P("VEGA P", m_engineer);
+            InitModule(m_VEGA); 
             m_rtr = new RTR("RTR", m_engineer);
             InitModule(m_rtr);
             m_loadport = new Loadport("Loadport", m_engineer);
