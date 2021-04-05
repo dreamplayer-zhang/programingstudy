@@ -4,6 +4,7 @@ using RootTools.Control;
 using RootTools.Gem;
 using RootTools.Module;
 using RootTools.OHTNew;
+using RootTools.RFIDs;
 using RootTools.ToolBoxs;
 using RootTools.Trees;
 using System;
@@ -14,21 +15,16 @@ namespace Root_VEGA_P.Module
     public class Loadport : ModuleBase, IRTRChild
     {
         #region ToolBox
-        OHT m_OHT; 
+        OHT m_OHT;
+        RFID m_RFID; 
         public override void GetTools(bool bInit)
         {
-            p_sInfo = m_toolBox.GetOHT(ref m_OHT, this, m_infoPods, "OHT"); 
+            p_sInfo = m_toolBox.GetOHT(ref m_OHT, this, m_infoPods, "OHT");
+            p_sInfo = m_toolBox.Get(ref m_RFID, this, "RFID"); 
             m_stage.GetTools(m_toolBox, this, bInit);
             m_door.GetTools(m_toolBox, this);
             m_interlock.GetTools(m_toolBox, this);
             m_led.GetTools(m_toolBox, this); 
-        }
-        #endregion
-
-        #region RFID
-        void InitRFID()
-        {
-            //forget
         }
         #endregion
 
@@ -150,6 +146,17 @@ namespace Root_VEGA_P.Module
             }
         }
         Stage m_stage = new Stage("Stage");
+
+        public bool p_bPlaced
+        {
+            get { return m_stage.p_bPlaced; }
+        }
+
+        public bool p_bPresent
+        {
+            get { return m_stage.p_bPresent; }
+        }
+
         #endregion
 
         #region Door
@@ -167,7 +174,7 @@ namespace Root_VEGA_P.Module
             {
                 module.p_sInfo = toolBox.GetDIO(ref m_dioDoor, module, p_id + ".Door", "Close", "Open");
                 module.p_sInfo = toolBox.GetDIO(ref m_diDoorSeal[0], module, p_id + "SealA", Enum.GetNames(typeof(eDoorSeal)));
-                module.p_sInfo = toolBox.GetDIO(ref m_diDoorSeal[2], module, p_id + "SealB", Enum.GetNames(typeof(eDoorSeal)));
+                module.p_sInfo = toolBox.GetDIO(ref m_diDoorSeal[1], module, p_id + "SealB", Enum.GetNames(typeof(eDoorSeal)));
                 module.p_sInfo = toolBox.GetDIO(ref m_doDoorSeal, module, p_id + ".Seal", Enum.GetNames(typeof(eDoorSeal)));
             }
 
@@ -426,8 +433,9 @@ namespace Root_VEGA_P.Module
                         case InfoPods.eState.Dock: return "OK";
                         case InfoPods.eState.Empty: return "Pod not Exist";
                     }
-                    //RFID ??
-
+                    string sRFID = ""; 
+                    m_RFID.Read(out sRFID);
+                    m_infoPods.p_sCarrierID = sRFID; 
                 }
                 m_infoPods.SendCarrierID(m_infoPods.p_sCarrierID); 
                 m_bDocking = true; 

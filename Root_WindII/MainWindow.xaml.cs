@@ -1,17 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Root_WindII.Engineer;
+using System.ComponentModel;
+using System.IO;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace Root_WindII
 {
@@ -23,6 +13,19 @@ namespace Root_WindII
         public MainWindow()
         {
             InitializeComponent();
+        }
+
+        WindII_Engineer m_engineer = new WindII_Engineer();
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            if (!Directory.Exists(@"C:\Recipe\Wind2")) Directory.CreateDirectory(@"C:\Recipe\Wind2");
+            m_engineer.Init("Wind2");
+            engineerUI.Init(m_engineer);
+        }
+
+        private void Window_Closing(object sender, CancelEventArgs e)
+        {
+            m_engineer.ThreadStop();
         }
     }
 }

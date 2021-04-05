@@ -6,6 +6,7 @@
         xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
         xmlns:tools="clr-namespace:RootTools;assembly=RootTools"
         xmlns:local="clr-namespace:Root_VEGA_P"
+        xmlns:UI ="clr-namespace:Root_VEGA_P.UI"
         xmlns:engineer="clr-namespace:Root_VEGA_P.Engineer"
         xmlns:icon="clr-namespace:Root_VEGA_P.Icon"
         mc:Ignorable="d"
@@ -13,6 +14,8 @@
         WindowStartupLocation="CenterScreen"
         AllowsTransparency="False"
         ResizeMode="CanResizeWithGrip"
+        Loaded="Window_Loaded"
+        Closing="Window_Closing"
         Height="1080"
         Width="1920"
         Title="Root Vega-P">
@@ -266,7 +269,14 @@
         <!--Main Panel-->
         <Grid Grid.Row="2"
               x:Name="MainPanel">
-            <engineer:VEGA_P_Engineer_UI x:Name="engineerUI"/>
+            <TabControl>
+                <TabItem Header="Recipe">
+                    <UI:Panel_RecipeManger />
+                </TabItem>
+                <TabItem Header="Engineer">
+                    <engineer:VEGA_P_Engineer_UI x:Name="engineerUI"/>
+                </TabItem>
+            </TabControl>
 
         </Grid>
 

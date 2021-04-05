@@ -114,7 +114,8 @@
                                         <TextBlock FontSize="12" Text="Upload Image Res." Style="{StaticResource BasicTb}" Grid.Row="2"/>
                                         <ToggleButton Content="True" Grid.Row="0" Grid.Column="1" 
                                               VerticalAlignment="Center"
-                                              HorizontalAlignment="Center" Width="85"/>
+                                              HorizontalAlignment="Center" Width="85"
+                                                      IsChecked="{Binding p_Setup.p_RecipeWizard.p_bUseEdgeBroken}"/>
                                         <ComboBox Grid.Row="1" Grid.Column="1" SelectedIndex="0" 
                                           VerticalAlignment="Center"
                                           HorizontalAlignment="Center">
