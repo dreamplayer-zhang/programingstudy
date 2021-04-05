@@ -155,6 +155,8 @@ namespace Root_EFEM.Module
                 if (m_bOnRead == false)
                 {
                     m_sReadID = m_sRFID;
+                    string sinfo = "Location : " + p_id + ", RFID: " + m_sReadID;
+                    m_rs232.m_commLog.Add(CommLog.eType.Info, sinfo);
                     m_bReadID = true;
                     return "OK";
                 }
@@ -190,7 +192,7 @@ namespace Root_EFEM.Module
                         int nLow = Convert16To10(sBuffer[n + 1]);
                         int nDecode = nHigh * 16 + nLow;
                         char cDecode = (char)nDecode;
-                        if (cDecode == (char)m_cEndCharacter) break;
+                        if (cDecode == (char)m_cEndCharacter || cDecode == '\0') break;
                         sData += cDecode;
                     }
                     break;
@@ -215,11 +217,11 @@ namespace Root_EFEM.Module
             }
             else if (ch >= (char)'A' && ch <= (char)'F')
             {
-                nDigit10 = (int)(ch - 'A');
+                nDigit10 = (int)(ch - 55);
             }
             else if (ch >= (char)'a' && ch <= (char)'f')
             {
-                nDigit10 = (int)(ch - 'a');
+                nDigit10 = (int)(ch - 87);
             }
             return nDigit10;
         }

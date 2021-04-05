@@ -16,7 +16,7 @@ namespace Root_VEGA_D.Module
         public Modbus m_modbus;
         public override void GetTools(bool bInit)
         {
-            p_sInfo = m_toolBox.Get(ref m_modbus, this, "Modbus");
+           // p_sInfo = m_toolBox.Get(ref m_modbus, this, "Modbus");
         }
         #endregion
 
@@ -237,20 +237,22 @@ namespace Root_VEGA_D.Module
         protected override void RunThread()
         {
             base.RunThread();
-            Thread.Sleep(m_msInterval);
-            if (!m_modbus.m_client.Connected)
-            {
-                Thread.Sleep(1000);
-                p_sInfo = m_modbus.Connect();
-            }
-            else
-            {
-                if (m_aData.Count > m_iData)
-                {
-                    m_aData[m_iData].ReadInputRegister(m_modbus);
-                    m_iData = (m_iData + 1) % m_aData.Count;
-                }
-            }
+            Thread.Sleep(1000);
+
+            //Thread.Sleep(m_msInterval);
+            //if (!m_modbus.m_client.Connected)
+            //{
+            //    Thread.Sleep(1000);
+            //    p_sInfo = m_modbus.Connect();
+            //}
+            //else
+            //{
+            //    if (m_aData.Count > m_iData)
+            //    {
+            //        m_aData[m_iData].ReadInputRegister(m_modbus);
+            //        m_iData = (m_iData + 1) % m_aData.Count;
+            //    }
+            //}
         }
 
         int m_msInterval = 100;
