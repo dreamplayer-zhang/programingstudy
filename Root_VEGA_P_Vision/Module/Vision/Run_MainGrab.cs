@@ -20,7 +20,6 @@ namespace Root_VEGA_P_Vision.Module
         GrabMode MainGrabMode;
         string sMainGrabMode;
 
-
         public Run_MainGrab(Vision module)
         {
             m_module = module;
