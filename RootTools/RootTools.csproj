@@ -456,6 +456,16 @@
     <Compile Include="Comm\FFUModuleUI.xaml.cs">
       <DependentUpon>FFUModuleUI.xaml</DependentUpon>
     </Compile>
+    <Compile Include="RFIDs\IRFID.cs" />
+    <Compile Include="RFIDs\RFID.cs" />
+    <Compile Include="RFIDs\RFID_Brooks.cs" />
+    <Compile Include="RFIDs\RFID_Brooks_UI.xaml.cs">
+      <DependentUpon>RFID_Brooks_UI.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="RFIDs\RFID_Ceyon.cs" />
+    <Compile Include="RFIDs\RFID_UI.xaml.cs">
+      <DependentUpon>RFID_UI.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Trees\TreeItem_FolderName.cs" />
     <Compile Include="Viewer\CustomViewer\DrawableRootViewer.xaml.cs">
       <DependentUpon>DrawableRootViewer.xaml</DependentUpon>
@@ -1115,6 +1125,14 @@
     <Page Include="Comm\FFUModuleUI.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="RFIDs\RFID_Brooks_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="RFIDs\RFID_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Viewer\CustomViewer\DrawableRootViewer.xaml">
       <Generator>MSBuild:Compile</Generator>

@@ -349,7 +349,7 @@ namespace Root_Rinse_Unloader.Module
         void CheckLightCurtan()
         {
             if (m_diLightCurtain.p_bIn == true) m_swLightCurtain.Start();
-            //if (p_eState != eState.Run) return;
+            if (EQ.p_eState != EQ.eState.Run) return;
             if (m_diLightCurtain.p_bIn == true) return;
             if (m_swLightCurtain.ElapsedMilliseconds > _msLightCurtain)
             {

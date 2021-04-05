@@ -126,7 +126,7 @@ namespace RootTools.Module
         {
             EQ.p_bStop = true;
             foreach (Axis axis in m_listAxis) if (axis != null) axis.ServoOn(false);
-            p_eState = eState.Init;
+            p_eState = eState.Error;
         }
 
         public virtual string StateReady()

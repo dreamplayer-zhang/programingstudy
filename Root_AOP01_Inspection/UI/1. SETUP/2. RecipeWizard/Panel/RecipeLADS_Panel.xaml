@@ -100,7 +100,7 @@
                                         <ToggleButton Content="True" Grid.Row="0" Grid.Column="1" 
                                                       VerticalAlignment="Center"
                                                       HorizontalAlignment="Center" Width="85"
-                                                      IsChecked="{Binding p_bEnablePellicleExpanding}"/>
+                                                      IsChecked="{Binding p_Setup.p_RecipeWizard.p_bUsePellicleExpanding}"/>
                                         <ComboBox Grid.Row="1" Grid.Column="1" SelectedIndex="0" Width="85" VerticalAlignment="Center" HorizontalAlignment="Center">
                                             <ComboBoxItem Content="113mm"/>
                                             <ComboBoxItem Content="115mm"/>

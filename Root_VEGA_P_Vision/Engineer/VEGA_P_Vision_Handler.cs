@@ -30,14 +30,14 @@ namespace Root_VEGA_P_Vision.Engineer
         #region Module
         public ModuleList p_moduleList { get; set; }
         public Vision m_vision;
-        public Buffer m_buffer;
+        public Holder m_holder;
         void InitModule()
         {
             p_moduleList = new ModuleList(m_engineer);
             m_vision = new Vision("Vision", m_engineer, ModuleBase.eRemote.Server);
             InitModule(m_vision);
-            m_buffer = new Buffer("Buffer", m_engineer, ModuleBase.eRemote.Server);
-            InitModule(m_buffer); 
+            m_holder = new Holder("Holder", m_engineer, ModuleBase.eRemote.Server);
+            InitModule(m_holder); 
         }
 
         void InitModule(ModuleBase module)

@@ -127,6 +127,27 @@ namespace Root_AOP01_Inspection
 				InfoTextBolcks.Add(new InfoTextBolck(textGrid, rect));
 			}
 		}
+
+		public void DrawRect(CRect crtROI, ColorType color, String text = null, int FontSz = 15)
+		{
+			SetShapeColor(color);
+
+			TRect rect = rectInfo as TRect;
+			rect.MemPointBuffer = new CPoint(crtROI.Left, crtROI.Top);
+			rect.MemoryRect.Left = crtROI.Left;
+			rect.MemoryRect.Top = crtROI.Top;
+			rectInfo = Drawing(rectInfo, new CPoint(crtROI.Right, crtROI.Bottom));
+			Shapes.Add(rectInfo);
+			TRectList.Add(rect);
+			p_DrawElement.Add(rectInfo.UIElement);
+
+			if (text != null)
+			{
+				Grid textGrid = WriteInfoText(text, rect, color, FontSz);
+				InfoTextBolcks.Add(new InfoTextBolck(textGrid, rect));
+			}
+		}
+
 		public void DrawRect(List<CRect> RectList, ColorType color, List<String> textList = null, int FontSz = 15)
 		{
 			int i = 0;

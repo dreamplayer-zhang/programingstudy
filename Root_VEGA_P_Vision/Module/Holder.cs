@@ -1,12 +1,11 @@
 ﻿using RootTools;
 using RootTools.Module;
 using RootTools.Trees;
-using System.ComponentModel;
 using System.Threading;
 
 namespace Root_VEGA_P_Vision.Module
 {
-    public class Buffer : ModuleBase, IRTRChild
+    public class Holder : ModuleBase, IRTRChild
     {
         #region ToolBox
         public override void GetTools(bool bInit)
@@ -181,14 +180,14 @@ namespace Root_VEGA_P_Vision.Module
         }
         #endregion
 
-        public Buffer(string id, IEngineer engineer, eRemote eRemote)
+        public Holder(string id, IEngineer engineer, eRemote eRemote)
         {
             m_teach = new TeachRTR();
             InitBase(id, engineer, eRemote);
-            OnChangeState += Buffer_OnChangeState;
+            OnChangeState += Holder_OnChangeState;
         }
 
-        private void Buffer_OnChangeState(eState eState)
+        private void Holder_OnChangeState(eState eState)
         {
             switch (p_eState)
             {
@@ -245,8 +244,8 @@ namespace Root_VEGA_P_Vision.Module
 
         public class Run_Remote : ModuleRunBase
         {
-            Buffer m_module;
-            public Run_Remote(Buffer module)
+            Holder m_module;
+            public Run_Remote(Holder module)
             {
                 m_module = module;
                 InitModuleRun(module);
@@ -303,8 +302,8 @@ namespace Root_VEGA_P_Vision.Module
 
         public class Run_Delay : ModuleRunBase
         {
-            Buffer m_module;
-            public Run_Delay(Buffer module)
+            Holder m_module;
+            public Run_Delay(Holder module)
             {
                 m_module = module;
                 InitModuleRun(module);

@@ -35,14 +35,15 @@ namespace Root_VEGA_P.Engineer
         public ModuleList p_moduleList { get; set; }
         public VEGA_P_Recipe m_recipe;
         //public EFEM_Process m_process; //forgetVegaP
-        public RTR m_rtr; 
+        public RTR m_rtr;
+        public Loadport m_loadport; 
         void InitModule()
         {
             p_moduleList = new ModuleList(m_engineer);
             m_rtr = new RTR("RTR", m_engineer);
-            InitModule(m_rtr); 
-            //InitLoadport();
-            //InitParticleCounter();
+            InitModule(m_rtr);
+            m_loadport = new Loadport("Loadport", m_engineer);
+            InitModule(m_loadport);
 
             m_rtr.RunTree(Tree.eMode.RegRead);
             m_rtr.RunTree(Tree.eMode.Init);
@@ -70,54 +71,6 @@ namespace Root_VEGA_P.Engineer
         }
         #endregion
 
-        #region Module Loadport
-        enum eLoadport
-        {
-            RND,
-            Cymechs,
-        }
-        List<eLoadport> m_aLoadportType = new List<eLoadport>();
-        public List<ILoadport> m_aLoadport = new List<ILoadport>();
-        int m_lLoadport = 2;
-        void InitLoadport()
-        {
-            ModuleBase module;
-            char cLP = 'A';
-            for (int n = 0; n < m_lLoadport; n++, cLP++)
-            {
-                string sID = "Loadport" + cLP;
-                switch (m_aLoadportType[n])
-                {
-                    case eLoadport.RND: module = new Loadport_RND(sID, m_engineer, true, true); break;
-                    case eLoadport.Cymechs: module = new Loadport_Cymechs(sID, m_engineer, true, true); break;
-                    default: module = new Loadport_RND(sID, m_engineer, true, true); break;
-                }
-                InitModule(module);
-                m_aLoadport.Add((ILoadport)module);
-                m_rtr.AddChild((IRTRChild)module);
-            }
-        }
-
-        void InitParticleCounter()
-        {
-            ModuleBase module;
-            module = new ParticleCounter("Particle Counter", m_engineer);
-            //module = new ParticleCounter(m_id, m_engineer);
-            InitModule(module);
-        }
-
-        public void RunTreeLoadport(Tree tree)
-        {
-            m_lLoadport = tree.Set(m_lLoadport, m_lLoadport, "Count", "Loadport Count");
-            while (m_aLoadportType.Count < m_lLoadport) m_aLoadportType.Add(eLoadport.RND);
-            Tree treeType = tree.GetTree("Type");
-            for (int n = 0; n < m_lLoadport; n++)
-            {
-                m_aLoadportType[n] = (eLoadport)treeType.Set(m_aLoadportType[n], m_aLoadportType[n], n.ToString("00"), "Loadport Type");
-            }
-        }
-        #endregion
-
         #region StateHome
         public string StateHome()
         {
@@ -127,7 +80,7 @@ namespace Root_VEGA_P.Engineer
                 EQ.p_eState = EQ.eState.Init;
                 return sInfo;
             }
-            sInfo = StateHome((ModuleBase)m_aLoadport[0], (ModuleBase)m_aLoadport[1]);
+            //sInfo = StateHome((ModuleBase)m_aLoadport[0], (ModuleBase)m_aLoadport[1]);
             if (sInfo == "OK") EQ.p_eState = EQ.eState.Ready;
             return sInfo;
         }
@@ -268,13 +221,6 @@ namespace Root_VEGA_P.Engineer
 
         public dynamic GetGemSlot(string sSlot)
         {
-            foreach (ILoadport loadport in m_aLoadport)
-            {
-                foreach (GemSlotBase slot in loadport.p_infoCarrier.m_aGemSlot)
-                {
-                    if (slot.p_id == sSlot) return slot;
-                }
-            }
             return null;
         }
         #endregion
@@ -321,7 +267,6 @@ namespace Root_VEGA_P.Engineer
         #region Tree
         public void RunTreeModule(Tree tree)
         {
-            RunTreeLoadport(tree.GetTree("Loadport"));
         }
         #endregion
 

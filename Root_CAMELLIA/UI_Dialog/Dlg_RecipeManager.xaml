@@ -857,52 +857,8 @@
 
                 <Grid Grid.Row="3">
                     <GroupBox Header="PreView">
-                        <Grid>
-                            <!--<Viewbox Margin="10">
-                                <ItemsControl ItemsSource="{Binding p_PreviewDrawElement, UpdateSourceTrigger=PropertyChanged}"
-                              Width="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualWidth}"
-                              Height="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualHeight}" BorderBrush="Black" BorderThickness="1">
-                                    <ItemsControl.ItemsPanel>
-                                        <ItemsPanelTemplate>
-                                            <Canvas Width="{x:Static local:BaseDefine.CanvasWidth}" Height="{x:Static local:BaseDefine.CanvasHeight}" ClipToBounds="True" Background="#01FFFFFF">
-                                            </Canvas>
-                                        </ItemsPanelTemplate>
-                                    </ItemsControl.ItemsPanel>
-                                </ItemsControl>
-                            </Viewbox>-->
-                            <Viewbox Margin="10">
-                                <stage:CamelliaStage  ClipToBounds="True" Background="#01FFFFFF"/>
-                            </Viewbox>
-                            <Viewbox Margin="10">
-                                <ItemsControl ItemsSource="{Binding p_PreviewDrawElement, UpdateSourceTrigger=PropertyChanged}"
-                              Width="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualWidth}"
-                              Height="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualHeight}">
-                                    <ItemsControl.ItemsPanel>
-                                        <ItemsPanelTemplate>
-                                            <Canvas Width="{x:Static local:BaseDefine.CanvasWidth}" Height="{x:Static local:BaseDefine.CanvasHeight}" ClipToBounds="True" Background="#01FFFFFF">
-                                            </Canvas>
-                                        </ItemsPanelTemplate>
-                                    </ItemsControl.ItemsPanel>
-                                </ItemsControl>
-                            </Viewbox>
-                            <Viewbox>
-                                <Canvas x:Name="StagePreView" Width="{x:Static local:BaseDefine.CanvasWidth}" Height="{x:Static local:BaseDefine.CanvasHeight}" ClipToBounds="True" Background="#01FFFFFF">
-                                    <i:Interaction.Triggers>
-                                        <i:EventTrigger EventName="MouseMove">
-                                            <i:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=StagePreView, Mode=OneWay}" MethodName="OnMouseMovePreView" />
-                                        </i:EventTrigger>
-                                        <i:EventTrigger EventName="MouseWheel" >
-                                            <i:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=StagePreView, Mode=OneWay}" MethodName="OnMouseWheelPreView" />
-                                        </i:EventTrigger>
-                                        <i:EventTrigger EventName="MouseLeftButtonDown" >
-                                            <i:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=StagePreView, Mode=OneWay}" MethodName="OnMouseLeftButtonDownPreView" />
-                                        </i:EventTrigger>
-                                    </i:Interaction.Triggers>
-                                </Canvas>
-                            </Viewbox>
-                        </Grid>
                         <!--<stage:CamelliaStage></stage:CamelliaStage>-->
-                        <!--<Viewbox Margin="10">
+                        <Viewbox Margin="10">
                             <ItemsControl ItemsSource="{Binding p_PreviewDrawElement}"
                               Width="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualWidth}"
                               Height="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualHeight}" BorderBrush="Black" BorderThickness="1">
@@ -924,7 +880,7 @@
                                     </ItemsPanelTemplate>
                                 </ItemsControl.ItemsPanel>
                             </ItemsControl>
-                        </Viewbox>-->
+                        </Viewbox>
                     </GroupBox>
                 </Grid>
             </Grid>

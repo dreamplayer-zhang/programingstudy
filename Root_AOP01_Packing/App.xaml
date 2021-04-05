@@ -59,14 +59,60 @@
                 </Setter.Value>
             </Setter>
         </Style>
-        <Style TargetType="{x:Type ToggleButton}" x:Key="SetupPanelToggleBtn">
+        <Style TargetType="{x:Type ToggleButton}"
+               x:Key="SetupPanelToggleBtn">
+            <Setter Property="FontFamily"
+                    Value="Arial" />
+            <Setter Property="FontSize"
+                    Value="15" />
+            <Setter Property="FontWeight"
+                    Value="Bold" />
+            <Setter Property="Margin"
+                    Value="10" />
+            <Setter Property="Height"
+                    Value="40" />
+            <!--<Setter Property="BorderBrush" Value="{x:Null}"/>-->
+            <Setter Property="Background"
+                    Value="{StaticResource ControlBackGround}" />
+        </Style>
+        <Style TargetType="{x:Type ToggleButton}" x:Key="OperationToggleBtn">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ToggleButton">
+                        <Border Background="{TemplateBinding Background}"
+                                BorderBrush="#FF767676"
+                                BorderThickness="1">
+                            <ContentPresenter HorizontalAlignment="Center"
+                                              VerticalAlignment="Center" />
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
             <Setter Property="FontFamily" Value="Arial"/>
             <Setter Property="FontSize" Value="15"/>
             <Setter Property="FontWeight" Value="Bold"/>
             <Setter Property="Margin" Value="10"/>
             <Setter Property="Height" Value="40"/>
             <!--<Setter Property="BorderBrush" Value="{x:Null}"/>-->
-            <Setter Property="Background" Value="{StaticResource ControlBackGround}"/>
+            <Setter Property="Background"
+                    Value="{StaticResource ControlBackGround}" />
+            <Style.Triggers>
+                <!--<Trigger Property="IsChecked"
+                         Value="True">
+                    <Setter Property="Background"
+                            Value="Gray" />
+                </Trigger>-->
+                <Trigger Property="IsChecked"
+                         Value="False">
+                    <Setter Property="Background"
+                            Value="LightCoral" />
+                </Trigger>
+                <Trigger Property="IsMouseOver"
+                         Value="True">
+                    <Setter Property="Background"
+                            Value="#BEE6FD" />
+                </Trigger>
+            </Style.Triggers>
         </Style>
         <Style TargetType="{x:Type Button}" x:Key="SetupPanelBtn">
             <Setter Property="FontFamily" Value="Arial"/>
@@ -75,7 +121,34 @@
             <Setter Property="Margin" Value="10"/>
             <Setter Property="Height" Value="40"/>
             <!--<Setter Property="BorderBrush" Value="{x:Null}"/>-->
-            <Setter Property="Background" Value="{StaticResource ControlBackGround}"/>
+            <Setter Property="Background"
+                    Value="{StaticResource ControlBackGround}" />
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding RelativeSource={RelativeSource Self}, Path=Tag}"
+                             Value="True">
+                    <DataTrigger.EnterActions>
+                        <BeginStoryboard Name="sbBlink">
+                            <Storyboard RepeatBehavior="Forever">
+                                <ColorAnimation Storyboard.TargetProperty="Background.Color"
+                                                AutoReverse="True"
+                                                From="LightCoral"
+                                                To="Red"
+                                                FillBehavior="Stop"
+                                                BeginTime="0:0:0"
+                                                Duration="0:0:0.7" />
+                                <!--<ColorAnimation Storyboard.TargetProperty="Background.Color"
+                                                From="LightCoral"
+                                                To="#e3e3e3"
+                                                BeginTime="0:0:1"
+                                                Duration="0:0:1" />-->
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </DataTrigger.EnterActions>
+                    <DataTrigger.ExitActions>
+                        <RemoveStoryboard BeginStoryboardName="sbBlink" />
+                    </DataTrigger.ExitActions>
+                </DataTrigger>
+            </Style.Triggers>
         </Style>
         <Style TargetType="{x:Type TextBlock}" x:Key="BasicTb">
             <Setter Property="FontFamily" Value="Arial"/>

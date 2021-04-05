@@ -542,11 +542,21 @@ namespace RootTools_Vision
         /// <summary>
         /// 초기 설정값과 SharedBuffer만 카피?
         /// </summary>
+        /*
         public Workplace Clone()
         {
             Workplace wp = new Workplace(mapIndexX, mapIndexY, positionX, positionY, Width, Height, Index);
 
-            //wp.SetSharedBuffer(this.sharedBufferR_GRAY, this.sharedBufferWidth, this.SharedBufferHeight, this.sharedBufferHeight, this.sharedBufferG, this.sharedBufferB);
+            wp.SetSharedBuffer(this.sharedBufferR_GRAY, this.sharedBufferWidth, this.SharedBufferHeight, this.sharedBufferHeight, this.sharedBufferG, this.sharedBufferB);
+
+            return wp;
+        }
+        */
+
+        public Workplace Clone()
+        {
+            Workplace wp = new Workplace(mapIndexX, mapIndexY, positionX, positionY, Width, Height, Index);
+
             wp.SetSharedBuffer(this.sharedBufferInfo);
 
             return wp;

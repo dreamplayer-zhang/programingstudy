@@ -21,6 +21,8 @@ namespace RootTools.Camera.BaslerPylon
         public Dispatcher _dispatcher;
 
         public event System.EventHandler Grabed;
+        public event System.EventHandler Captured;
+        public event System.EventHandler Connected;
 
         public event System.EventHandler Captured;
 
@@ -76,6 +78,17 @@ namespace RootTools.Camera.BaslerPylon
         Basler.Pylon.Camera m_cam;
         int m_nGrabTimeout = 2000;
         ImageData m_ImageGrab;
+        public ImageData p_ImageData
+        {
+            get
+            {
+                return m_ImageGrab;
+            }
+            set
+            {
+                SetProperty(ref m_ImageGrab, value);
+            }
+        }
         ImageViewer_ViewModel m_ImageViewer;
         public bool m_ConnectDone = false;
         public ImageViewer_ViewModel p_ImageViewer
@@ -334,9 +347,11 @@ namespace RootTools.Camera.BaslerPylon
                 }
                 UpdateCamInfo(ConnectCamInfo, m_cam);
                 m_ConnectDone = true;
+                ConnectEvent();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                MessageBox.Show(ex.Message);
                 m_ConnectDone = false;
             }
         }
@@ -459,7 +474,7 @@ namespace RootTools.Camera.BaslerPylon
             }
         }
 
-
+        #region RelayCommand
         public RelayCommand UserSetSaveCommand
         {
             get
@@ -494,7 +509,11 @@ namespace RootTools.Camera.BaslerPylon
         {
             get
             {
-                return new RelayCommand(GrabOneShot);
+                return new RelayCommand(() =>
+                {
+                    GrabOneShot();
+                    
+                });
             }
             set
             {
@@ -534,7 +553,7 @@ namespace RootTools.Camera.BaslerPylon
             {
             }
         }
-
+        #endregion
         public void GrabOneShot()
         {
             try
@@ -565,10 +584,11 @@ namespace RootTools.Camera.BaslerPylon
                     _dispatcher.Invoke(new Action(delegate ()
                     {
                         p_ImageViewer.SetRoiRect();
+                       
                     }));
                 }
                 m_cam.StreamGrabber.Start(1, GrabStrategy.OneByOne, GrabLoop.ProvidedByStreamGrabber);
-                CaptureEvent();
+                CapturedEvent();
             }
             catch (Exception) { }
         }
@@ -763,6 +783,7 @@ namespace RootTools.Camera.BaslerPylon
                 e.DisposeGrabResultIfClone();
             }
         }
+
         private void OnImageGrabbed(Object sender, ImageGrabbedEventArgs e)
         {
             try
@@ -793,7 +814,6 @@ namespace RootTools.Camera.BaslerPylon
                                 Marshal.Copy(aBuf, 0, m_ImageGrab.GetPtr(), m_ImageGrab.p_Size.X * m_ImageGrab.p_Size.Y);
                             }
                             GrabEvent();
-
                             // 최대 30프레임으로 화면 업데이트
                             //if (stopWatch.ElapsedMilliseconds > 33)
                             {
@@ -880,15 +900,32 @@ namespace RootTools.Camera.BaslerPylon
                 Grabed.Invoke(this, e);
         }
 
-        void CaptureEvent()
+        void CapturedEvent()
         {
             if (Captured != null)
-                OnCapture(new EventArgs());
+                OnCaptured();
         }
-        protected virtual void OnCapture(EventArgs e)
+
+        protected virtual void OnCaptured()
         {
-            if (Captured != null)
-                Captured.Invoke(this, e);
+            if(Captured != null)
+            {
+                Captured.Invoke(this, new EventArgs());
+            }
+        }
+
+        void ConnectEvent()
+        {
+            if(Connected != null)
+            {
+                OnConnected();
+            }
+        }
+
+        protected virtual void OnConnected()
+        {
+            if (Connected != null)
+                Connected.Invoke(this, new EventArgs());
         }
         public void FunctionConnect()
         {

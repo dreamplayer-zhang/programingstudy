@@ -1,0 +1,129 @@
+﻿<UserControl x:Class="Root_VEGA_P.UI.Panel_RecipeManger"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:local="clr-namespace:Root_VEGA_P.UI"
+             mc:Ignorable="d"
+             d:DesignHeight="818"
+             d:DesignWidth="1912"
+             Background="{StaticResource PanelBackGround}">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="12*" />
+            <ColumnDefinition Width="88*" />
+        </Grid.ColumnDefinitions>
+        <Border BorderBrush="{StaticResource Splitter}"
+                BorderThickness="0,0,1,0">
+            <StackPanel Margin="0,10,0,0">
+                <ToggleButton Content="Recipe Manager"
+                              IsChecked="True"
+                              Style="{StaticResource SetupPanelToggleBtn}" />
+                <ToggleButton Content="Pod Manager"
+                              IsChecked="False"
+                              Style="{StaticResource SetupPanelToggleBtn}" />
+            </StackPanel>
+        </Border>
+
+        <Grid Grid.Column="1"
+              x:Name="SubPanel">
+
+            <GroupBox Header="Recipe Manager"
+                      FontSize="20">
+                <Grid Grid.Row="1">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="3*" />
+                        <ColumnDefinition Width="7*" />
+                    </Grid.ColumnDefinitions>
+                    <Grid Grid.Column="0"
+                          Margin="5">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="8*" />
+                        </Grid.RowDefinitions>
+                        <Button Content="New"
+                                Height="40"
+                                Margin="0,5" 
+                                Grid.Row="0"/>
+                        <Button Content="Load"
+                                Height="40"
+                                Margin="0,5" 
+                                Grid.Row="1"/>
+                        <Button Content="Save"
+                                Height="40"
+                                Margin="0,5"
+                                Grid.Row="2" />
+                        <Button Content="Save As"
+                                Height="40"
+                                Margin="0,5"
+                                Grid.Row="3" />
+                        <Grid Grid.Row="4">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="1.5*" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="Recipe Name"
+                                       VerticalAlignment="Center" />
+                            <TextBlock Text="＊"
+                                       VerticalAlignment="Center"
+                                       HorizontalAlignment="Right" />
+                            <TextBox Grid.Column="1"
+                                     Text="TestRecipe"
+                                     VerticalAlignment="Center"
+                                     Margin="0,0,0,0" />
+                        </Grid>
+                        <Grid Grid.Row="5">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="1.5*" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="Pod"
+                                       Grid.Row="1"
+                                       VerticalAlignment="Center" />
+                            <TextBlock Text="＊"
+                                       Grid.Row="1"
+                                       VerticalAlignment="Center"
+                                       HorizontalAlignment="Right" />
+                            <TextBox Grid.Column="1"
+                                     Grid.Row="1"
+                                     IsEnabled="False"
+                                     Text="3EN0525820500017"
+                                     VerticalAlignment="Center"
+                                     Margin="0,0,0,0" />
+                        </Grid>
+                        <ListView Grid.Row="6"
+                                  Grid.ColumnSpan="2"
+                                  ScrollViewer.VerticalScrollBarVisibility="Visible"
+                                  ScrollViewer.HorizontalScrollBarVisibility="Visible">
+                            <ListView.View>
+                                <GridView TextElement.FontSize="9">
+                                    <GridViewColumn Width="200"
+                                                    Header="POD" />
+                                    <GridViewColumn Width="120"
+                                                    Header="Weight" />
+                                    <GridViewColumn Width="200"
+                                                    Header="EOP DOME" />
+                                    <GridViewColumn Width="200"
+                                                    Header="EOP DOOR" />
+                                    <GridViewColumn Width="200"
+                                                    Header="EIP COVER" />
+                                    <GridViewColumn Width="200"
+                                                    Header="EIP BASE" />
+                                </GridView>
+                            </ListView.View>
+                        </ListView>
+                    </Grid>
+                    <Grid Grid.Column="1">
+                        
+                    </Grid>
+                </Grid>
+            </GroupBox>
+        </Grid>
+
+    </Grid>
+</UserControl>

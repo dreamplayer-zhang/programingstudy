@@ -122,8 +122,8 @@
                             Background="Black">
                             <Image Source="{Binding Path= ImageViewerVM.p_ThumNailImgSource}" />
                             <Rectangle Margin="{Binding Path = ImageViewerVM.p_TumbnailImgMargin}"
-                                   Width="{Binding DrawToolVM.p_TumbnailImg_Rect.Width}"
-                                   Height="{Binding DrawToolVM.p_TumbnailImg_Rect.Height}"
+                                   Width="{Binding ImageViewerVM.p_TumbnailImg_Rect.Width}"
+                                   Height="{Binding ImageViewerVM.p_TumbnailImg_Rect.Height}"
                                    Stroke="Blue"
                                    StrokeThickness="4" />
                             <i:Interaction.Behaviors>

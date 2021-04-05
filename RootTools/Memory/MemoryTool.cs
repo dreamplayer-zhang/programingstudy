@@ -1,4 +1,4 @@
-﻿using Emgu.CV;
+using Emgu.CV;
 using Emgu.CV.Structure;
 using Microsoft.Win32;
 using RootTools.Comm;
@@ -107,7 +107,7 @@ namespace RootTools.Memory
 
             // 또 다른 클라이언트의 연결을 대기한다.
             mainSock.BeginAccept(AcceptCallback, null);
-           
+
             AsyncObject obj = new AsyncObject(nSize);
             obj.WorkingSocket = client;
 
@@ -359,7 +359,7 @@ namespace RootTools.Memory
         }
 
         public MemoryPool CreatePool(string sPool, double fGB)
-        {
+          {
             MemoryPool memoryPool = new MemoryPool(sPool, this, fGB);
             p_aPool.Add(memoryPool);
             MemoryChanged(); 
@@ -461,7 +461,9 @@ namespace RootTools.Memory
         MemServer m_Server;
         MemClient m_Client;
 
-        bool bUseServer = false;
+        //TCPAsyncClient m_Client;
+        //TCPAsyncServer m_Server;
+
         bool bServer = true;
         int nPort = 5000;
 
@@ -503,7 +505,7 @@ namespace RootTools.Memory
             m_idProcess = tree.Set(m_idProcess, m_idProcess, "ID", "Memory Process ID", bVisible && m_bStartProcess);
             m_sProcessFile = tree.SetFile(m_sProcessFile, m_sProcessFile, "exe", "File", "Process File Name", bVisible && m_bStartProcess);
         }
-
+        bool bUseServer = false;
         void RunTreeTCPSetup(Tree tree)
         {
             bUseServer = tree.Set(bUseServer, bUseServer, "Use Memory Server", "Use Mem Server");
@@ -530,6 +532,17 @@ namespace RootTools.Memory
             {
                 //  m_ClientTree.RunTree(tree);
             }
+
+            //if (bServer && m_Server != null)
+            //{
+            //    m_Server.RunTree(tree);
+            //    //m_ServerTree.RunTree(tree);
+            //}
+            //if (!bServer && m_Client != null)
+            //{
+            //    m_Client.RunTree(tree);
+            //    //m_ClientTree.RunTree(tree);
+            //}
         }
 
         #endregion
@@ -620,7 +633,6 @@ namespace RootTools.Memory
             if (bMaster) NotifyMemoryChange(); 
             m_treeRootRun = new TreeRoot(id, m_log);
             m_treeRootRun.UpdateTree += M_treeRootRun_UpdateTree;
-            RunTreeRun(Tree.eMode.RegRead);
             KillInspectProcess();
             if (bMaster == false) InitTimer();
 
@@ -634,6 +646,10 @@ namespace RootTools.Memory
                 m_Server.RunTree(Tree.eMode.RegRead);
                 m_Server.Start();
                 m_Server.EventReciveData += M_Server_EventReciveData;
+                //m_Server = new MemServer(m_log);
+                //RunTreeRun(Tree.eMode.RegRead);
+                //m_Server.Start(nPort);
+                //m_Server.EventReciveData += M_Server_EventReciveData;
             }
             else
             {
@@ -641,6 +657,9 @@ namespace RootTools.Memory
                 m_Client.Connect();
                 m_Client.EventReciveData += M_Client_EventReciveData;
             }
+            RunTreeRun(Tree.eMode.RegRead);
+
+
         }
 
         public void ThreadStop()
@@ -657,20 +676,19 @@ namespace RootTools.Memory
         bool _bRecieve = false;
         byte[] m_abuf;
         public byte[] GetOtherMemory(System.Drawing.Rectangle View_Rect, int CanvasWidth, int CanvasHeight,  string sPool, string sGourp, string sMem, int nByte)
-        {
-            if (!bUseServer) return null;
-
+        {  
             Stopwatch watch = new Stopwatch();
             watch.Start();
             string str = "GET" + Splitter + GetSerializeString(View_Rect) + Splitter + CanvasWidth + Splitter + CanvasHeight + Splitter + sPool+ Splitter + sGourp + Splitter + sMem + Splitter + nByte;
            
             _bRecieve = true;
-            m_Server.Send(str);
+            if(m_Server!=null)
+                m_Server.Send(str);
         
             while (_bRecieve)
             {
                 Thread.Sleep(5);
-                if (watch.ElapsedMilliseconds > 1000)
+                if (watch.ElapsedMilliseconds > 10000)
                     return m_abuf;
             }
             _bRecieve = false;
@@ -699,6 +717,28 @@ namespace RootTools.Memory
             //}
         }
 
+        private void M_Server_EventReciveData(byte[] aBuf, int nSize,Socket socket)
+        {
+            //socket.Send(aBuf, nSize, SocketFlags.None);
+            //string str = Encoding.Default.GetString(aBuf, 0, nSize);
+            //m_qLog.Enqueue(new Mars(0, Encoding.ASCII.GetString(aBuf, 0, nSize)));
+            //string[] aStr = str.Split(Splitter);
+            //string astr = str;
+
+            m_abuf = aBuf;// Encoding.Default.GetBytes(str);//            Convert.FromBase64String(str);
+                          // m_abuf = Decompress(m_abuf);
+            _bRecieve = false;
+            //switch (aStr)
+            //{
+            //    case "GET":
+            //m_ReciveBitmapSource = StringToImageSource(astr);
+
+            //      m_ReciveBitmapSource = (BitmapSource)GetSerializeObject(aStr, m_ReciveBitmapSource.GetType());
+            //        _bRecieve = true;
+            //        break;
+            //}
+        }
+
         private void M_Client_EventReciveData(byte[] aBuf, int nSize)
         {
             string str = Encoding.ASCII.GetString(aBuf, 0, nSize);
@@ -710,6 +750,23 @@ namespace RootTools.Memory
                     byte[] res = GetImageView((System.Drawing.Rectangle)(GetSerializeObject(aStr[1], rect.GetType())), Convert.ToInt32(aStr[2]), Convert.ToInt32(aStr[3]), Convert.ToString(aStr[4]), Convert.ToString(aStr[5]), Convert.ToString(aStr[6]), Convert.ToInt32(aStr[7]));
                    // res = Compress(res);
                     m_Client.Send(res);
+                    break;
+            }
+            //System.Drawing.Rectangle viewrect = GetSerializeObject(aStr[1],     );
+        }
+
+        private void M_Client_EventReciveData(byte[] aBuf, int nSize,Socket socket)
+        {
+            string str = Encoding.ASCII.GetString(aBuf, 0, nSize);
+            string[] aStr = str.Split(Splitter);
+            switch (aStr[0])
+            {
+                case "GET":
+                    System.Drawing.Rectangle rect = new System.Drawing.Rectangle();
+                    byte[] res = GetImageView((System.Drawing.Rectangle)(GetSerializeObject(aStr[1], rect.GetType())), Convert.ToInt32(aStr[2]), Convert.ToInt32(aStr[3]), Convert.ToString(aStr[4]), Convert.ToString(aStr[5]), Convert.ToString(aStr[6]), Convert.ToInt32(aStr[7]));
+                     //res = Compress(res);
+                    m_Client.Send(res);
+                    //m_Client.Send(Encoding.Default.GetString(res));
                     break;
             }
             //System.Drawing.Rectangle viewrect = GetSerializeObject(aStr[1],     );

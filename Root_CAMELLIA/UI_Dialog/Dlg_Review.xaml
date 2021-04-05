@@ -8,11 +8,12 @@
         xmlns:local="clr-namespace:Root_CAMELLIA"
         xmlns:stage="clr-namespace:Camellia2Stage"
         xmlns:graph="clr-namespace:Root_CAMELLIA.LibSR_Met"
+        xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
         WindowStyle="None"
         ResizeMode="CanResize"
         WindowStartupLocation="CenterScreen"
         WindowState="Normal"
-        Width="1420" Height="780"
+        Width="1820" Height="780"
         BorderBrush="Black" BorderThickness="1"
         Background="{StaticResource PanelBackGround}"
         mc:Ignorable="d">
@@ -78,17 +79,33 @@
         <Grid Grid.Row="2" Background="White">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="0.8*"/>
+                <ColumnDefinition Width="0.65*"/>
                 <ColumnDefinition Width="2*"/>
             </Grid.ColumnDefinitions>
             <TabControl>
                 <TabItem Header="Summary">
-                    <local:Explorer DataContext="{Binding p_summary}"/>
+                    <local:Explorer DataContext="{Binding p_summary}">
+                    </local:Explorer>
                 </TabItem>
                 <TabItem Header="history" DataContext="{Binding p_history}">
                     <local:Explorer/>
                 </TabItem>
             </TabControl>
             <Grid Grid.Column="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="0.3*"/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+                <Grid>
+                    
+                </Grid>
+                <Grid Grid.Row="1">
+                    <DataGrid>
+                        
+                    </DataGrid>
+                </Grid>
+            </Grid>
+            <Grid Grid.Column="2">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="0.6*"/>
                     <ColumnDefinition/>
@@ -135,11 +152,13 @@
                     <Grid Grid.Column="1">
                         <TabControl>
                             <TabItem Header="Reflectance">
+                                <!--Todo Reflectance-->
                                 <Grid>
                                     <Graph:ReviewGraph/>
                                 </Grid>
                             </TabItem>
                             <TabItem Header="Transmittance">
+                                <!--Todo Transmittance-->
                                 <Grid>
                                     <Graph:ReviewGraph/>
                                 </Grid>

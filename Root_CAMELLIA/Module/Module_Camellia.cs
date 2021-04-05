@@ -292,19 +292,12 @@ namespace Root_CAMELLIA.Module
                 infoCarrier[i] = loadports[i].p_infoCarrier;
                 CanInitCal[i] = false;  
             }
-            //try
+           // try
             //{
             //    if (p_CamVRS != null && !p_CamVRS.p_CamInfo._OpenStatus)
             //    {
             //        p_CamVRS.Connect();
             //    }
-                   
-            //    if(p_CamVRS != null)
-            //     while (!p_CamVRS.m_ConnectDone) ;
-            //}
-            //catch
-            //{
-
             //}
 
         }
