@@ -81,15 +81,30 @@
                 <ColumnDefinition Width="0.65*"/>
                 <ColumnDefinition Width="2*"/>
             </Grid.ColumnDefinitions>
-            <TabControl>
+            <Grid.RowDefinitions>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+            <TabControl SelectedIndex="{Binding p_tabIdx}">
                 <TabItem Header="Summary">
-                    <local:Explorer DataContext="{Binding p_summary}">
-                    </local:Explorer>
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition/>
+                        </Grid.RowDefinitions>
+                        <local:Explorer DataContext="{Binding p_summary}" Grid.Row="1"/>
+                    </Grid>
                 </TabItem>
-                <TabItem Header="history" DataContext="{Binding p_history}">
-                    <local:Explorer/>
+                <TabItem Header="history">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition/>
+                        </Grid.RowDefinitions>
+                        <local:Explorer DataContext="{Binding p_history}" Grid.Row="1"/>
+                    </Grid>
                 </TabItem>
             </TabControl>
+
             <Grid Grid.Column="1">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="0.3*"/>
@@ -152,6 +167,7 @@
                         <TabControl>
                             <TabItem Header="Reflectance">
                                 <!--Todo Reflectance-->
+                                <graph:PMRGraph Width="auto" Height="auto"/>
                             </TabItem>
                             <TabItem Header="Transmittance">
                                 <!--Todo Transmittance-->

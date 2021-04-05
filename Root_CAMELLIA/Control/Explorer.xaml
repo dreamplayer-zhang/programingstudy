@@ -6,8 +6,70 @@
              xmlns:local="clr-namespace:Root_CAMELLIA"
              xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
              mc:Ignorable="d" 
-             d:DesignHeight="800" d:DesignWidth="400">
-    <Grid Background="White">
+             d:DesignHeight="300" d:DesignWidth="300">
+    <UserControl.Resources>
+        <local:DoubleToProgressConverter x:Key="ProgressConverter"/>
+        <HierarchicalDataTemplate x:Key="NavTreeTempl" ItemsSource="{Binding Path=Children, UpdateSourceTrigger=PropertyChanged}" >
+            <Button 
+        ToolTip="{Binding Path=FullPathName, Mode=OneTime}"     
+        Background="{x:Null}" BorderBrush="{x:Null}"  Padding="0" Height="20"
+        Focusable="False" ClickMode="Hover">
+
+                <!-- Icon + Friendly Name horizontally stacked -->
+                <StackPanel Orientation="Horizontal" Margin="0" VerticalAlignment="Stretch" >
+                    <Image
+              Source="{Binding Path=MyIcon, Mode=OneWay}"
+              Stretch="Fill"
+              />
+                    <TextBlock Margin="5,0,0,0" Text="{Binding FriendlyName, Mode=OneTime}" VerticalAlignment="Center"/>
+                </StackPanel>
+            </Button>
+
+        </HierarchicalDataTemplate>
+    </UserControl.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="20"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="4*"/>
+            </Grid.ColumnDefinitions>
+            <Button  HorizontalAlignment="Left" Margin="1"
+                        Command="{Binding Path=DataContext.CmdRefresh, 
+                   RelativeSource = {RelativeSource FindAncestor, AncestorType={x:Type UserControl}}}"
+                Content="Refresh"
+                ToolTip="Externally add new folder and press button"></Button>
+            <TextBlock Grid.Column="1" Margin="-10,0,10,0" TextAlignment="Left" VerticalAlignment="Center">Select Path :</TextBlock>
+            <TextBlock Grid.Column="2" Text="{Binding Path=DataContext.p_CurrentPath, UpdateSourceTrigger=PropertyChanged, RelativeSource = {RelativeSource FindAncestor, AncestorType={x:Type UserControl}}}" VerticalAlignment="Center"></TextBlock>
+        </Grid>
+        <Border Grid.Row="1" BorderBrush="Black" BorderThickness="1">
+            <TreeView 
+    BorderThickness="0"
+           
+    ItemsSource="{Binding Path=RootChildren}"
+    ItemTemplate="{StaticResource NavTreeTempl}" VirtualizingStackPanel.IsVirtualizing="True">
+
+                <TreeView.ItemContainerStyle>
+                    <Style TargetType="{x:Type TreeViewItem}">
+                        <Setter Property="IsExpanded" Value="{Binding Path=IsExpanded, Mode=TwoWay}"/>
+                        <!--<Setter Property="IsSelected" Value="{Binding Path=IsSelected, Mode=TwoWay}"/>-->
+                        <!--<Setter Property="dd1:DragDropManager.DropTargetAdvisor" Value="{StaticResource FolderPlaneItemsDropAdvisor}"/>-->
+                    </Style>
+                </TreeView.ItemContainerStyle>
+                <i:Interaction.Triggers>
+                    <i:EventTrigger EventName="MouseDoubleClick">
+                        <i:CallMethodAction TargetObject="{Binding}" MethodName="OnMouseDoubleClick" />
+                    </i:EventTrigger>
+                </i:Interaction.Triggers>
+            </TreeView>
+        </Border>
+      
+    </Grid>
+    <!--<Grid Background="White">
         <Grid.RowDefinitions>
             <RowDefinition Height="30"/>
             <RowDefinition />
@@ -15,13 +77,8 @@
         <Grid>
             <Border Margin="2" BorderThickness="1" BorderBrush="Black">
                 <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition/>
-                    </Grid.ColumnDefinitions>
-                    <UniformGrid Grid.Row="0" Columns="4">
-                        <Button Margin="1" Content="Refresh" Command="{Binding CmdRefresh}" ></Button>
-                    </UniformGrid>
+                    <Button Margin="1" Content="Refresh" Command="{Binding CmdRefresh}" Width="60" HorizontalAlignment="Left"></Button>
+              
                 </Grid>
             </Border>
         </Grid>
@@ -30,7 +87,8 @@
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
             <GroupBox Header="Explorer">
-                <TreeView x:Name="ExplorerTree" Grid.Column="0" Margin="5" BorderBrush="Black" BorderThickness="1"  ItemsSource="{Binding p_collection}">
+                <TreeView x:Name="ExplorerTree" Grid.Column="0" Margin="5" BorderBrush="Black" BorderThickness="1"  ItemsSource="{Binding p_collection}"
+                            VirtualizingStackPanel.IsVirtualizing ="True" VirtualizingStackPanel.VirtualizationMode ="Recycling">
                     <TreeView.Resources>
                         <Style TargetType="{x:Type local:ImageTreeViewItem}">
                             <Setter Property="HeaderTemplate">
@@ -54,5 +112,5 @@
                 </TreeView>
             </GroupBox>
         </Grid>
-    </Grid>
+    </Grid>-->
 </UserControl>

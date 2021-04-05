@@ -8,7 +8,7 @@
         xmlns:Icon ="clr-namespace:Root_CAMELLIA.Control.Icon"
         xmlns:i="http://schemas.microsoft.com/xaml/behaviors" 
         xmlns:met="clr-namespace:Root_CAMELLIA.LibSR_Met"
-        xmlns:tools="clr-namespace:RootTools.Control.ACS;assembly=RootTools"
+        xmlns:tools="clr-namespace:RootTools;assembly=RootTools"
         xmlns:arrow="clr-namespace:Petzold.Media2D"
         xmlns:ctrl="clr-namespace:Root_CAMELLIA.Control"
         xmlns:stage="clr-namespace:Camellia2Stage"
@@ -770,6 +770,7 @@
                     </Grid>
                 </TabItem>
                 <TabItem Header="Log" Width="80">
+                    <tools:LogView_UI x:Name="LogUI" Margin="2"/>
                 </TabItem>
                 <TabItem Header="RT Graph">
                     <met:RTGraph DataContext="{Binding p_RTGraph, UpdateSourceTrigger=PropertyChanged}"/>

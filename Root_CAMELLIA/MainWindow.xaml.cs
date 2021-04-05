@@ -84,6 +84,8 @@ namespace Root_CAMELLIA
             int nLPNum = m_handler.m_aLoadport.Count;
             for (int i = 0; i < nLPNum; i++) dlgOHT.Init(m_handler.m_aLoadport[i].m_OHTNew);
 
+            LogUI.Init(LogView._logView);
+
             InitTimer();
         }
 
