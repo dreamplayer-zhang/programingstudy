@@ -3662,203 +3662,7 @@ namespace Root_AOP01_Inspection.Module
         }
         #endregion
 
-        #region Test
-        public class Run_Test : ModuleRunBase
-        {
-            MainVision m_module;
-            public CPoint m_cptReticleCenterPos = new CPoint();
-            public int m_nReticleSize_mm = 150;
-            public int m_nSearchArea_mm = 10;
-            public int m_nOffset_mm = 1;
-
-            public Run_Test(MainVision module)
-            {
-                m_module = module;
-                InitModuleRun(module);
-            }
-
-            public override ModuleRunBase Clone()
-            {
-                Run_Test run = new Run_Test(m_module);
-                run.m_cptReticleCenterPos = new CPoint(m_cptReticleCenterPos);
-                run.m_nReticleSize_mm = m_nReticleSize_mm;
-                run.m_nSearchArea_mm = m_nSearchArea_mm;
-                run.m_nOffset_mm = m_nOffset_mm;
-
-                return run;
-            }
-
-            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
-            {
-                m_cptReticleCenterPos = tree.Set(m_cptReticleCenterPos, m_cptReticleCenterPos, "Reticle Center Memory Position", "Reticle Center Memory Position", bVisible);
-                m_nReticleSize_mm = tree.Set(m_nReticleSize_mm, m_nReticleSize_mm, "Reticle Size [mm]", "Reticle Size [mm]", bVisible);
-                m_nSearchArea_mm = tree.Set(m_nSearchArea_mm, m_nSearchArea_mm, "Search Area [mm]", "Search Area [mm]", bVisible);
-                m_nOffset_mm = tree.Set(m_nOffset_mm, m_nOffset_mm, "Inner Offset [mm]", "Inner Offset [mm]", bVisible);
-            }
-
-            struct structTemplate
-            {
-                public Image<Gray, byte> img;
-                public double dSobelScore;
-                public int nMemoryX;
-                public int nMemoryY;
-                public bool bRTFound;
-                public bool bRBFound;
-                public bool bLBFound;
-            }
-
-            public override string Run()
-            {
-                string strPool = "MainVision.Vision Memory";
-                string strGroup = "MainVision";
-                string strMemory = "Main";
-                MemoryData mem = m_module.m_engineer.GetMemory(strPool, strGroup, strMemory);
-                int nMMPerUM = 1000;
-                int nOutPos = (((m_nReticleSize_mm - (m_nOffset_mm * 2)) / 2) * nMMPerUM) / 5;
-                int nInPos = (((m_nReticleSize_mm - (m_nSearchArea_mm * 2) - (m_nOffset_mm * 2)) / 2) * nMMPerUM) / 5;
-                List<structTemplate> templateInfos = new List<structTemplate>();
-
-                RecipeFrontside_Viewer_ViewModel targetViewer = UIManager.Instance.SetupViewModel.m_RecipeFrontSide.p_ImageViewer_VM;
-                Dispatcher dispatcher = UIManager.Instance.SetupViewModel.m_RecipeFrontSide.currentDispatcher;
-
-                CRect crtLTROI = new CRect(new CPoint(m_cptReticleCenterPos.X - nOutPos, m_cptReticleCenterPos.Y - nOutPos), new CPoint(m_cptReticleCenterPos.X - nInPos, m_cptReticleCenterPos.Y - nInPos));
-                CRect crtRTROI = new CRect(new CPoint(m_cptReticleCenterPos.X + nInPos, m_cptReticleCenterPos.Y - nOutPos), new CPoint(m_cptReticleCenterPos.X + nOutPos, m_cptReticleCenterPos.Y - nInPos));
-                CRect crtRBROI = new CRect(new CPoint(m_cptReticleCenterPos.X + nInPos, m_cptReticleCenterPos.Y + nInPos), new CPoint(m_cptReticleCenterPos.X + nOutPos, m_cptReticleCenterPos.Y + nOutPos));
-                CRect crtLBROI = new CRect(new CPoint(m_cptReticleCenterPos.X - nOutPos, m_cptReticleCenterPos.Y + nInPos), new CPoint(m_cptReticleCenterPos.X - nInPos, m_cptReticleCenterPos.Y + nOutPos));
-
-                if (dispatcher != null)
-                {
-                    dispatcher.Invoke(new Action(delegate ()
-                    {
-                        targetViewer.Clear();
-                        targetViewer.DrawRect(crtLTROI, RecipeFrontside_Viewer_ViewModel.ColorType.Defect);
-                        targetViewer.DrawRect(crtRTROI, RecipeFrontside_Viewer_ViewModel.ColorType.Defect);
-                        targetViewer.DrawRect(crtLBROI, RecipeFrontside_Viewer_ViewModel.ColorType.Defect);
-                        targetViewer.DrawRect(crtRBROI, RecipeFrontside_Viewer_ViewModel.ColorType.Defect);
-                    }));
-                }
-
-                // LT ROI에서 Template 후보 리스트 만들기
-                Image<Gray, byte> imgLT = m_module.GetGrayByteImageFromMemory(mem, crtLTROI);
-                Image<Gray, byte> imgLTBinary = imgLT.ThresholdBinaryInv(new Gray(130), new Gray(255.0));
-
-                CvBlobs blobs = new CvBlobs();
-                CvBlobDetector blobDetector = new CvBlobDetector();
-                blobDetector.Detect(imgLTBinary, blobs);
-                foreach (CvBlob blob in blobs.Values)
-                {
-                    if (blob.Area < 70) continue;
-                    System.Drawing.Rectangle rectBoundingBox = blob.BoundingBox;
-                    rectBoundingBox.Inflate(30, 30);
-                    CRect crtBoundingBox = new CRect(crtLTROI.Left + rectBoundingBox.Left, crtLTROI.Top + rectBoundingBox.Top, crtLTROI.Left + rectBoundingBox.Right, crtLTROI.Top + rectBoundingBox.Bottom);
-                    Image<Gray, byte> imgTemplate = m_module.GetGrayByteImageFromMemory(mem, crtBoundingBox);
-                    Mat matTemplate = imgTemplate.Mat;
-                    double dScore = GetImageFocusScoreWithSobel(matTemplate);
-                    if (dScore < 10) continue;
-                    structTemplate templateInfo = new structTemplate();
-                    templateInfo.img = imgTemplate.ThresholdBinaryInv(new Gray(130.0), new Gray(255.0));
-                    templateInfo.dSobelScore = dScore;
-                    templateInfo.nMemoryX = crtLTROI.Left + rectBoundingBox.Left;
-                    templateInfo.nMemoryY = crtLTROI.Top + rectBoundingBox.Top;
-                    templateInfos.Add(templateInfo);
-                }
-                List<structTemplate> sortedList = templateInfos.OrderByDescending(x => x.dSobelScore).ToList(); // Sobel Score로 Sorting한 List
-
-                // RT, RB, LB 위치에서 TemplateMatching
-                // RT
-                Image<Gray, byte> imgRTROI = m_module.GetGrayByteImageFromMemory(mem, crtRTROI);
-                Image<Gray, byte> imgRTBinary = imgRTROI.ThresholdBinaryInv(new Gray(130), new Gray(255.0));
-                //imgRTBinary.Save("D:\\RTBinary.bmp");
-                foreach (structTemplate template in sortedList)
-                {
-                    CPoint cptCenter = new CPoint();
-                    //imgTemplateBinary.Save("D:\\CurrentTemplate.bmp");
-                    bool bResult = m_module.TemplateMatching(imgRTBinary, template.img, out cptCenter, 0.8);
-                    if (bResult == true)
-                    {
-                        int nX = cptCenter.X - (template.img.Width / 2);
-                        int nY = cptCenter.Y - (template.img.Height / 2);
-                        if (nX < 0) nX = 0;
-                        if (nY < 0) nY = 0;
-                        System.Drawing.Rectangle roi = new System.Drawing.Rectangle(nX, nY, template.img.Width, template.img.Height);
-                        //imgRTBinary.Copy(roi).Save($"D:\\{(int)template.dSobelScore}_RT.bmp");
-                    }
-                }
-
-                // RB
-                Image<Gray, byte> imgRBROI = m_module.GetGrayByteImageFromMemory(mem, crtRBROI);
-                Image<Gray, byte> imgRBBinary = imgRBROI.ThresholdBinaryInv(new Gray(130), new Gray(255.0));
-                //imgRBBinary.Save("D:\\RBBinary.bmp");
-                foreach (structTemplate template in sortedList)
-                {
-                    CPoint cptCenter = new CPoint();
-                    //imgTemplateBinary.Save("D:\\CurrentTemplate.bmp");
-                    bool bResult = m_module.TemplateMatching(imgRBBinary, template.img, out cptCenter, 0.8);
-                    if (bResult == true)
-                    {
-                        int nX = cptCenter.X - (template.img.Width / 2);
-                        int nY = cptCenter.Y - (template.img.Height / 2);
-                        if (nX < 0) nX = 0;
-                        if (nY < 0) nY = 0;
-                        System.Drawing.Rectangle roi = new System.Drawing.Rectangle(nX, nY, template.img.Width, template.img.Height);
-                        //imgRBBinary.Copy(roi).Save($"D:\\{(int)template.dSobelScore}_RB.bmp");
-                    }
-                }
-
-                // LB
-                Image<Gray, byte> imgLBROI = m_module.GetGrayByteImageFromMemory(mem, crtLBROI);
-                Image<Gray, byte> imgLBBinary = imgLBROI.ThresholdBinaryInv(new Gray(130), new Gray(255.0));
-                //imgLBBinary.Save("D:\\LBBinary.bmp");
-                foreach (structTemplate template in sortedList)
-                {
-                    CPoint cptCenter = new CPoint();
-                    //imgTemplateBinary.Save("D:\\CurrentTemplate.bmp");
-                    bool bResult = m_module.TemplateMatching(imgLBBinary, template.img, out cptCenter, 0.8);
-                    if (bResult == true)
-                    {
-                        int nX = cptCenter.X - (template.img.Width / 2);
-                        int nY = cptCenter.Y - (template.img.Height / 2);
-                        if (nX < 0) nX = 0;
-                        if (nY < 0) nY = 0;
-                        System.Drawing.Rectangle roi = new System.Drawing.Rectangle(nX, nY, template.img.Width, template.img.Height);
-                        //imgLBBinary.Copy(roi).Save($"D:\\{(int)template.dSobelScore}_LB.bmp");
-                    }
-                }
-
-                return "OK";
-            }
-
-            public double GetImageFocusScoreWithSobel(Mat matSrc)
-            {
-                //Emgu.CV.Mat matSrc = new Emgu.CV.Mat(img.p_Size.X, img.p_Size.Y, Emgu.CV.CvEnum.DepthType.Cv8U, img.GetBytePerPixel(), img.GetPtr(), (int)img.p_Stride);
-                Emgu.CV.Mat matGrad = new Emgu.CV.Mat();
-
-                int nScale = 1;
-                int nDelta = 0;
-                //int ddepth = (int)Emgu.CV.CvEnum.DepthType.Cv8U;
-                Emgu.CV.Mat matGradX = new Emgu.CV.Mat();
-                Emgu.CV.Mat matGradY = new Emgu.CV.Mat();
-                Emgu.CV.Mat matAbsGradX = new Emgu.CV.Mat();
-                Emgu.CV.Mat matAbsGradY = new Emgu.CV.Mat();
-                ///Gradient X
-                Emgu.CV.CvInvoke.Sobel(matSrc, matGradX, Emgu.CV.CvEnum.DepthType.Cv8U, 1, 0, 3, nScale, nDelta, Emgu.CV.CvEnum.BorderType.Default);
-                ///Gradient Y
-                Emgu.CV.CvInvoke.Sobel(matSrc, matGradY, Emgu.CV.CvEnum.DepthType.Cv8U, 0, 1, 3, nScale, nDelta, Emgu.CV.CvEnum.BorderType.Default);
-                Emgu.CV.CvInvoke.ConvertScaleAbs(matGradX, matAbsGradX, nScale, nDelta);
-                Emgu.CV.CvInvoke.ConvertScaleAbs(matGradY, matAbsGradY, nScale, nDelta);
-                Emgu.CV.CvInvoke.AddWeighted(matAbsGradX, 0.5, matAbsGradY, 0.5, 0, matGrad);
-
-                Emgu.CV.Structure.MCvScalar mu = new Emgu.CV.Structure.MCvScalar();
-                Emgu.CV.Structure.MCvScalar sigma = new Emgu.CV.Structure.MCvScalar();
-                Emgu.CV.CvInvoke.MeanStdDev(matGrad, ref mu, ref sigma);
-                double dFocusMeasure = mu.V0 * mu.V0;
-
-                return dFocusMeasure;
-            }
-        }
-        #endregion
-
-        #region Test2
+        #region PatternShiftAndRotation
         public class Run_PatternShiftAndRotation : ModuleRunBase
         {
             MainVision m_module;
@@ -4308,8 +4112,8 @@ namespace Root_AOP01_Inspection.Module
         }
         #endregion
 
-        // PatternShiftRotation 구버전
-        //#region PatternArrayShift & Rotation 검사
+
+        #region PatternShiftRotation 구버전
         //public class Run_PatternShiftAndRotation : ModuleRunBase
         //{
         //    MainVision m_module;
@@ -4597,7 +4401,7 @@ namespace Root_AOP01_Inspection.Module
         //        return cptCentroid;
         //    }
         //}
-        //#endregion
+        #endregion
 
         #region Align Key 검사
         public class Run_AlignKeyInspection : ModuleRunBase
