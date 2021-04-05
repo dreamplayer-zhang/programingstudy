@@ -18,9 +18,9 @@ namespace Root_VEGA_P.UI
     /// <summary>
     /// Mode_Setup.xaml에 대한 상호 작용 논리
     /// </summary>
-    public partial class Mode_Setup : UserControl
+    public partial class Setup_Main : UserControl
     {
-        public Mode_Setup()
+        public Setup_Main()
         {
             InitializeComponent();
         }

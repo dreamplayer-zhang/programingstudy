@@ -12,7 +12,8 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-
+using Root_VEGA_D.Engineer;
+using RootTools;
 namespace Root_VEGA_D
 {
     /// <summary>
@@ -23,6 +24,17 @@ namespace Root_VEGA_D
         public RecipeWizard_UI()
         {
             InitializeComponent();
+        }
+
+        public RootViewer_ViewModel viewerVM;
+        public VEGA_D_Engineer m_engineer;
+        public bool init(VEGA_D_Engineer engineer)
+        {
+            m_engineer = engineer;
+            viewerVM = new RootViewer_ViewModel();
+            viewerVM.init(new ImageData(m_engineer.ClassMemoryTool().GetMemory("Vision.Memory", "Vision", "Main")));
+            Viewer_UI.DataContext = viewerVM;
+            return true;
         }
     }
 }

@@ -102,25 +102,25 @@
                                         <TextBlock FontSize="12" Text="Enable Barcode Insp." Style="{StaticResource BasicTb}" Grid.Row="4"/>
 
                                         <ToggleButton Content="True" Grid.Row="0" Grid.Column="1" 
-                                              VerticalAlignment="Center"
-                                              HorizontalAlignment="Center" Width="85"
-                                                      IsChecked="{Binding p_bEnablePatternDiscolor}"/>
+                                                      VerticalAlignment="Center"
+                                                      HorizontalAlignment="Center" Width="85"
+                                                      IsChecked="{Binding p_Setup.p_RecipeWizard.p_bUsePatternDiscolor}"/>
                                         <ToggleButton Content="True" Grid.Row="1" Grid.Column="1" 
                                                       VerticalAlignment="Center"
                                                       HorizontalAlignment="Center" Width="85"
-                                                      IsChecked="{Binding p_bEnableAlignKeyInsp}"/>
+                                                      IsChecked="{Binding p_Setup.p_RecipeWizard.p_bUseAlignKeyExist}"/>
                                         <ToggleButton Content="True" Grid.Row="2" Grid.Column="1" 
                                                       VerticalAlignment="Center"
                                                       HorizontalAlignment="Center" Width="85"
-                                                      IsChecked="{Binding p_bEnablePatternShift}"/>
+                                                      IsChecked="{Binding p_Setup.p_RecipeWizard.p_bUsePatternShiftAndRotation}"/>
                                         <ToggleButton Content="True" Grid.Row="3" Grid.Column="1" 
                                                       VerticalAlignment="Center"
                                                       HorizontalAlignment="Center" Width="85"
-                                                      IsChecked="{Binding p_bEnablePellicleShift}"/>
+                                                      IsChecked="{Binding p_Setup.p_RecipeWizard.p_bUsePellicleShiftAndRotation}"/>
                                         <ToggleButton Content="True" Grid.Row="4" Grid.Column="1" 
                                                       VerticalAlignment="Center"
                                                       HorizontalAlignment="Center" Width="85"
-                                                      IsChecked="{Binding p_bEnableBarcodeInsp}"/>
+                                                      IsChecked="{Binding p_Setup.p_RecipeWizard.p_bUseBarcodeScratch}"/>
                                     </Grid>
                                 </GroupBox>
                                 <GroupBox Grid.Row="1" Header="Illumination">
@@ -205,7 +205,7 @@
                                         <TextBox Style="{StaticResource BasicTbox}" Text="{Binding p_dAlignKeyTemplateMatchingScore}" Width="80" Height="20" Grid.Column="1" Grid.Row="0"/>
                                         <TextBlock FontSize="12" Text="Spec" Style="{StaticResource BasicTb}" Grid.Row="1"/>
                                         <TextBlock Style="{StaticResource BasicTb}" Text=">" HorizontalAlignment="Left" Grid.Column="1" Margin="20,0" Grid.Row="1"/>
-                                        <TextBox Style="{StaticResource BasicTbox}" Text="{Binding p_nAlignKeyNGSpec}" Width="80" Height="20" Grid.Column="1" Grid.Row="1"/>
+                                        <TextBox Style="{StaticResource BasicTbox}" Text="{Binding p_Setup.p_RecipeWizard.p_dAlignKeyExistSpec_um}" Width="80" Height="20" Grid.Column="1" Grid.Row="1"/>
                                         <TextBlock Style="{StaticResource BasicTb}" Text="um" HorizontalAlignment="Right" Grid.Column="1" Margin="5,0" Grid.Row="1"/>
                                     </Grid>
                                 </GroupBox>
@@ -225,10 +225,10 @@
                                         <TextBlock FontSize="12" Text="Rotation Spec [º]" Style="{StaticResource BasicTb}" Grid.Row="2"/>
                                         <TextBox Grid.Column="2" Grid.Row="0" Text="{Binding p_dPatternShiftAndRotationTemplateMatchingScore}" Style="{StaticResource BasicTbox}" Width="80" Height="20"/>
                                         <TextBlock Style="{StaticResource BasicTb}" Text=">" HorizontalAlignment="Left" Grid.Column="1" Margin="20,0" Grid.Row="1"/>
-                                        <TextBox Style="{StaticResource BasicTbox}" Text="{Binding p_dPatternShiftAndRotationShiftSpec}" Width="80" Height="20" Grid.Column="1" Grid.Row="1"/>
+                                        <TextBox Style="{StaticResource BasicTbox}" Text="{Binding p_Setup.p_RecipeWizard.p_dPatternShiftSpec_mm}" Width="80" Height="20" Grid.Column="1" Grid.Row="1"/>
                                         <TextBlock Style="{StaticResource BasicTb}" Text="mm" HorizontalAlignment="Right" Grid.Column="1" Margin="5,0" Grid.Row="1"/>
                                         <TextBlock Style="{StaticResource BasicTb}" Text=">" HorizontalAlignment="Left" Grid.Column="1" Margin="20,0" Grid.Row="2"/>
-                                        <TextBox Style="{StaticResource BasicTbox}" Text="{Binding p_dPatternShiftAndRotationRotationSpec}" Width="80" Height="20" Grid.Column="1" Grid.Row="2"/>
+                                        <TextBox Style="{StaticResource BasicTbox}" Text="{Binding p_Setup.p_RecipeWizard.p_dPatternRotationSpec_degree}" Width="80" Height="20" Grid.Column="1" Grid.Row="2"/>
                                         <TextBlock Style="{StaticResource BasicTb}" Text="º" HorizontalAlignment="Right" Grid.Column="1" Margin="5,0" Grid.Row="2"/>
                                     </Grid>
                                 </GroupBox>
@@ -245,10 +245,10 @@
                                         <TextBlock FontSize="12" Text="Shift Spec" Style="{StaticResource BasicTb}" Grid.Row="0"/>
                                         <TextBlock FontSize="12" Text="Rotation Spec [º]" Style="{StaticResource BasicTb}" Grid.Row="1"/>
                                         <TextBlock Style="{StaticResource BasicTb}" Text=">" HorizontalAlignment="Left" Grid.Column="1" Margin="20,0" Grid.Row="0"/>
-                                        <TextBox Style="{StaticResource BasicTbox}" Text="{Binding p_dPellicleShiftAndRotationShiftSpec}" Width="80" Height="20" Grid.Column="1" Grid.Row="0"/>
+                                        <TextBox Style="{StaticResource BasicTbox}" Text="{Binding p_Setup.p_RecipeWizard.p_dPellicleShiftSpec_mm}" Width="80" Height="20" Grid.Column="1" Grid.Row="0"/>
                                         <TextBlock Style="{StaticResource BasicTb}" Text="mm" HorizontalAlignment="Right" Grid.Column="1" Margin="5,0" Grid.Row="0"/>
                                         <TextBlock Style="{StaticResource BasicTb}" Text=">" HorizontalAlignment="Left" Grid.Column="1" Margin="20,0" Grid.Row="1"/>
-                                        <TextBox Style="{StaticResource BasicTbox}" Text="{Binding p_dPellicleShiftAndRotationRotationSpec}" Width="80" Height="20" Grid.Column="1" Grid.Row="1"/>
+                                        <TextBox Style="{StaticResource BasicTbox}" Text="{Binding p_Setup.p_RecipeWizard.p_dPellicleRotationSpec_degree}" Width="80" Height="20" Grid.Column="1" Grid.Row="1"/>
                                         <TextBlock Style="{StaticResource BasicTb}" Text="º" HorizontalAlignment="Right" Grid.Column="1" Margin="5,0" Grid.Row="1"/>
 
                                     </Grid>
@@ -268,8 +268,10 @@
                                                 <Grid.RowDefinitions>
                                                     <RowDefinition/>
                                                 </Grid.RowDefinitions>
-                                                <TextBlock FontSize="12" Text="GV" Style="{StaticResource BasicTb}" Grid.Row="0"/>
-                                                <TextBox Style="{StaticResource BasicTbox}" Width="80" Height="20" Grid.Column="2" Grid.Row="0" Text="{Binding p_nBarcodeThreshold}"/>
+                                                <TextBlock FontSize="12" Text="Scratch" Style="{StaticResource BasicTb}" Grid.Row="0"/>
+                                                <TextBlock Style="{StaticResource BasicTb}" Text=">" HorizontalAlignment="Left" Grid.Column="1" Margin="20,0" Grid.Row="1"/>
+                                                <TextBox Style="{StaticResource BasicTbox}" Width="80" Height="20" Grid.Column="2" Grid.Row="0" Text="{Binding p_Setup.p_RecipeWizard.p_dBarcodeScratchSpec_mm}"/>
+                                                <TextBlock Style="{StaticResource BasicTb}" Text="mm" HorizontalAlignment="Right" Grid.Column="1" Margin="5,0" Grid.Row="1"/>
                                             </Grid>
                                         </GroupBox>
                                         <GroupBox Header="Defect Code" Grid.Row="1">
