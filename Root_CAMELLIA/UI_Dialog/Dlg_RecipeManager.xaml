@@ -258,18 +258,13 @@
                                             <Setter Property="IsReadOnly" Value="True"/>
                                         </Style>
                                     </DataGridComboBoxColumn.ElementStyle>
-                                    <DataGridComboBoxColumn.EditingElementStyle>
-                                        <Style TargetType="ComboBox">
-                                            <Setter Property="ItemsSource" Value="{Binding Emm, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-                                        </Style>
-                                    </DataGridComboBoxColumn.EditingElementStyle>
                                 </DataGridComboBoxColumn>
-                                <DataGridTextColumn Width="50" Binding="{Binding Scale, StringFormat=N3, UpdateSourceTrigger=LostFocus, Mode=TwoWay}">
+                                <DataGridTextColumn Width="50" Binding="{Binding Scale, StringFormat=N1, UpdateSourceTrigger=LostFocus, Mode=TwoWay}">
                                     <DataGridTextColumn.Header>
                                         <TextBlock Text="Scale" Style="{StaticResource GridHeaderStyle}" />
                                     </DataGridTextColumn.Header>
                                 </DataGridTextColumn>
-                                <DataGridTextColumn Width="50" Binding="{Binding Offset, StringFormat=N3, UpdateSourceTrigger=LostFocus, Mode=TwoWay}">
+                                <DataGridTextColumn Width="50" Binding="{Binding Offset, StringFormat=N1, UpdateSourceTrigger=LostFocus, Mode=TwoWay}">
                                     <DataGridTextColumn.Header>
                                         <TextBlock Text="Offset" Style="{StaticResource GridHeaderStyle}" />
                                     </DataGridTextColumn.Header>

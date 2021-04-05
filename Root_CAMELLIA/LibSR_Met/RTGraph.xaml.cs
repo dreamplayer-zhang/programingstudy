@@ -338,7 +338,7 @@ namespace Root_CAMELLIA.LibSR_Met
                     GraphR.Render();
 
                     labelR.Visibility = Visibility.Visible;
-                    labelR.Content = $"(Wavelength[nm], Reflectance[%]) = ({dX:N3}, {dY:N3})" + Environment.NewLine + $"(Wavelength[nm], CalcReflectance[%]) = ({dX2:N3}, {dY2:N3})";
+                    labelR.Content = $"(Wavelength[nm], Reflectance[%]) = ({dX:N1}, {dY:N3})" + Environment.NewLine + $"(Wavelength[nm], CalcReflectance[%]) = ({dX2:N1}, {dY2:N3})";
                 }
             }));
         }
@@ -360,7 +360,7 @@ namespace Root_CAMELLIA.LibSR_Met
                         GraphT.Render();
 
                         labelT.Visibility = Visibility.Visible;
-                        labelT.Content = $"(Wavelength[nm], Reflectance[%]) = ({x:N3}, {y:N3})";
+                        labelT.Content = $"(Wavelength[nm], Reflectance[%]) = ({x:N1}, {y:N3})";
                     }
                 }
             }));

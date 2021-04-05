@@ -276,11 +276,8 @@
       <DependentUpon>PMCheckReview.xaml</DependentUpon>
     </Compile>
     <Compile Include="Control\PMCheckReview_ViewModel.cs" />
-    <Compile Include="Control\Review_RGraph.xaml.cs">
-      <DependentUpon>Review_RGraph.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Control\Review_TGraph.xaml.cs">
-      <DependentUpon>Review_TGraph.xaml</DependentUpon>
+    <Compile Include="Control\ReviewGraph.xaml.cs">
+      <DependentUpon>ReviewGraph.xaml</DependentUpon>
     </Compile>
     <Compile Include="Control\StageViewControl.xaml.cs">
       <DependentUpon>StageViewControl.xaml</DependentUpon>
@@ -439,11 +436,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Control\Review_RGraph.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Control\Review_TGraph.xaml">
+    <Page Include="Control\ReviewGraph.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

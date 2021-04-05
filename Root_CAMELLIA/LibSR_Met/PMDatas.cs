@@ -48,12 +48,12 @@ namespace Root_CAMELLIA.LibSR_Met
         public List<PMResult> Result;
         public List<SensorTiltDatas> SensorTiltData;
         //Common
-        public int nCheckRangeStart = 350; //350[nm]
-        public int nCheckRangeEnd = 1500;  //1500[nm]
+        public int nCheckRangeStart; //350[nm]
+        public int nCheckRangeEnd;  //1500[nm]
 
         //Sensor Tilt
-        public double dSensorTiltError = 1;    //1
-        public int nSensorTiltRepeatNum = 15;
+        public double dSensorTiltError;    //1
+        public int nSensorTiltRepeatNum;
 
         public List<double> WavelengthRef;
         public List<double> ReflectanceRef;
@@ -92,16 +92,16 @@ namespace Root_CAMELLIA.LibSR_Met
 
                     switch (datas[0])
                     {
-                        case "CheckRangeStart":
+                        case "nCheckRangeStart":
                             nCheckRangeStart = Convert.ToInt32(datas[1]);
                             break;
-                        case "CheckRangeEnd":
+                        case "nCheckRangeEnd":
                             nCheckRangeEnd = Convert.ToInt32(datas[1]);
                             break;
-                        case "SensorTiltError":
+                        case "dSensorTiltError":
                             dSensorTiltError = Convert.ToDouble(datas[1]);
                             break;
-                        case "SensorTiltRepeatNum":
+                        case "nSensorTiltRepeatNum":
                             nSensorTiltRepeatNum = Convert.ToInt32(datas[1]);
                             break;
                         

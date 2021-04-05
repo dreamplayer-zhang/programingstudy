@@ -393,13 +393,37 @@ namespace Root_CAMELLIA.LibSR_Met
                     throw new Exception("Point: "+ nPointIndex .ToString()+ " Data is not exist.");
                 }
 
-                if(Path.GetExtension(sPath) != ".csv")
-                    sPath += ".csv";
+                
 
-                StreamWriter sw = new StreamWriter(sPath);
+                string [] sFilePath = sPath.Split('\\');
+                string sFolderPath = "";
+                for (int i=0; i< sFilePath.Length-1; i++)
+                {
+                    sFolderPath += sFilePath[i]+"\\";
+                }
+
+                sFolderPath += nPointIndex.ToString() + "\\";
+
+
+                if (!Directory.Exists(sFolderPath))
+                {
+                    Directory.CreateDirectory(sFolderPath);
+                }
+
+                string strPath = sFolderPath;
+                if (!Directory.Exists(strPath))
+                {
+                    Directory.CreateDirectory(strPath);
+                }
+
+                sFolderPath += sFilePath[sFilePath.Length-1];
+                sPath = sFolderPath;
+                if (Path.GetExtension(sPath) != ".csv")
+                    sPath += ".csv";
+                StreamWriter sw = new StreamWriter (sPath);
                 RawData data = m_RawData[nPointIndex];
                 sw.WriteLine("Wavelength[nm],Reflectance[%],Transmittance[%]");
-                for (int n = 0; n < data.Transmittance.Length ; n++)
+                for (int n = 0; n < data.nNIRDataNum; n++)
                 {
                     sw.WriteLine("{0},{1},{2}", data.Wavelength[n], data.Reflectance[n], data.Transmittance[n]);
                 }
@@ -422,26 +446,35 @@ namespace Root_CAMELLIA.LibSR_Met
                 {
                     throw new Exception("Point: " + nPointIndex.ToString() + " Data is not exist.");
                 }
-                bool bFirst = true;
-                if (File.Exists(sPath))
+
+                string[] sFilePath = sPath.Split('\\');
+                string sFolderPath = "";
+                for (int i = 0; i < sFilePath.Length - 1; i++)
                 {
-                    bFirst = false;
+                    sFolderPath += sFilePath[i] + "\\";
                 }
-                else
+
+                if (!Directory.Exists(sFolderPath))
                 {
-                    string FileSpace = sPath.Replace(".csv", "");
-                    File.Create(FileSpace);
+                    Directory.CreateDirectory(sFolderPath);
                 }
+
+                string strPath = sFolderPath;
+                if (!Directory.Exists(strPath))
+                {
+                    Directory.CreateDirectory(strPath);
+                }
+
 
                 if (Path.GetExtension(sPath) != ".csv")
                 {
                     sPath += ".csv";
                 }
-                StreamWriter sw = new StreamWriter(new FileStream(sPath, FileMode.Create));
+                StreamWriter sw = new StreamWriter (sPath);
                 RawData data = m_RawData[nPointIndex];
 
                 sw.WriteLine("Wavelength[nm],Reflectance[%]");
-                for (int n = 0; n < data.Wavelength.Length; n++)
+                for (int n = 0; n < m_RawData[nPointIndex].nNIRDataNum; n++)
                 {
                     sw.WriteLine("{0},{1}", data.Wavelength[n], data.Reflectance[n]);
                 }

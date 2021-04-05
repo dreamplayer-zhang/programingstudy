@@ -115,7 +115,7 @@ namespace Root_CAMELLIA.LibSR_Met
                 GraphCount.Render();
 
                 labelCount.Visibility = Visibility.Visible;
-                labelCount.Content = $"(Wavelength [nm], Counts) = ({x:N3}, {y:N3})";
+                labelCount.Content = $"(Wavelength [nm], Counts) = ({x:N1}, {y:N3})";
 
             }
         }

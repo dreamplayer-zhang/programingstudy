@@ -134,16 +134,16 @@ namespace Root_CAMELLIA.Module
                     m_mwvm.p_Progress = (((double)(index + 1) / m_DataManager.recipeDM.MeasurementRD.DataSelectedPoint.Count) * 100);
                     SaveRawData(index);
                     // Spectrum data Thread 추가 두개두개두개
-                    LibSR_Met.DataManager.GetInstance().SaveResultFileSlot(@"C:\Users\ATI\Desktop\SaveTest\" + index + "_" + DateTime.Now.ToString("HHmmss") + "test.csv", m_module.p_infoWafer.p_sCarrierID,
-                        m_module.p_infoWafer.p_sLotID, "Tools", m_module.p_infoWafer.p_sWaferID, m_module.p_infoWafer.p_sSlotID,
-                        "1.0.0.0", m_DataManager.recipeDM.TeachRecipeName, index, m_DataManager.recipeDM.MeasurementRD.DataSelectedPoint[m_DataManager.recipeDM.MeasurementRD.DataMeasurementRoute[index]].x, m_DataManager.recipeDM.MeasurementRD.DataSelectedPoint[m_DataManager.recipeDM.MeasurementRD.DataMeasurementRoute[index]].y, m_DataManager.recipeDM.MeasurementRD.LowerWaveLength,
-                        m_DataManager.recipeDM.MeasurementRD.UpperWaveLength);
+                    //LibSR_Met.DataManager.GetInstance().SaveResultFileSlot(@"C:\Users\ATI\Desktop\SaveTest\" + index + "_" + DateTime.Now.ToString("HHmmss") + "test.csv", m_module.p_infoWafer.p_sCarrierID,
+                    //    m_module.p_infoWafer.p_sLotID, "Tools", m_module.p_infoWafer.p_sWaferID, m_module.p_infoWafer.p_sSlotID,
+                    //    "1.0.0.0", m_DataManager.recipeDM.TeachRecipeName, index, m_DataManager.recipeDM.MeasurementRD.DataSelectedPoint[m_DataManager.recipeDM.MeasurementRD.DataMeasurementRoute[index]].x, m_DataManager.recipeDM.MeasurementRD.DataSelectedPoint[m_DataManager.recipeDM.MeasurementRD.DataMeasurementRoute[index]].y, m_DataManager.recipeDM.MeasurementRD.LowerWaveLength,
+                    //    m_DataManager.recipeDM.MeasurementRD.UpperWaveLength);
                     //SaveRT
                     LibSR_Met.DataManager.GetInstance().SaveRT(@"C:\Users\ATI\Desktop\SaveTest\RT\" + index + "_" + DateTime.Now.ToString("HHmmss") + "test.csv", index);
                     sw.Stop();
                     System.Diagnostics.Debug.WriteLine(sw.ElapsedMilliseconds);
                 }
-               
+
                 if (MeasureDone && thicknessQueue.Count() == 0)
                 {
                     m_CalcThicknessDone = true;
@@ -387,9 +387,9 @@ namespace Root_CAMELLIA.Module
             // 레드로 빼버림?  contour는 일단 보류..
             //  DCOL 세이브 필요
 
-            LibSR_Met.DataManager.GetInstance().AllContourMapDataFitting(m_DataManager.recipeDM.MeasurementRD.WaveLengthReflectance, m_DataManager.recipeDM.MeasurementRD.WaveLengthTransmittance);
-            LibSR_Met.DataManager.GetInstance().SaveResultFileSummary(@"C:\Users\ATI\Desktop\SaveTest\Summary\"+ DateTime.Now.ToString("HHmmss")+"Summary.csv", m_module.p_infoWafer.p_sLotID,
-                m_module.p_infoWafer.p_sSlotID);
+            //LibSR_Met.DataManager.GetInstance().AllContourMapDataFitting(m_DataManager.recipeDM.MeasurementRD.WaveLengthReflectance, m_DataManager.recipeDM.MeasurementRD.WaveLengthTransmittance);
+            //LibSR_Met.DataManager.GetInstance().SaveResultFileSummary(@"C:\Users\ATI\Desktop\SaveTest\Summary\"+ DateTime.Now.ToString("HHmmss")+"Summary.csv", m_module.p_infoWafer.p_sLotID,
+            //    m_module.p_infoWafer.p_sSlotID);
 
             return "OK";
         }

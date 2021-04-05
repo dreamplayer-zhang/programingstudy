@@ -136,12 +136,12 @@
                         <TabControl>
                             <TabItem Header="Reflectance">
                                 <Grid>
-                                    <Graph:Review_RGraph/>
+                                    <Graph:ReviewGraph/>
                                 </Grid>
                             </TabItem>
                             <TabItem Header="Transmittance">
                                 <Grid>
-                                    <Graph:Review_TGraph/>
+                                    <Graph:ReviewGraph/>
                                 </Grid>
                             </TabItem>
                         </TabControl>

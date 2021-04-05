@@ -66,7 +66,7 @@ namespace Root_CAMELLIA.LibSR_Met
                     PMGraphR.Render();
 
                     PMlabelR.Visibility = Visibility.Visible;
-                    PMlabelR.Content = $"(Wavelength[nm], Reflectance[%]) = ({dX:N3}, {dY:N3})";
+                    PMlabelR.Content = $"(Wavelength[nm], Reflectance[%]) = ({dX:N1}, {dY:N3})";
                 }
             }));
         }
