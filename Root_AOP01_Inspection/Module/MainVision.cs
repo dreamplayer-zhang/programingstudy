@@ -1385,8 +1385,6 @@ namespace Root_AOP01_Inspection.Module
 
 
             AddModuleRunList(new Run_TestPellicle(this), true, "Run Delay");
-            AddModuleRunList(new Run_Test(this), true, "Run Test");
-            //AddModuleRunList(new Run_Test2(this), true, "Run Test2");
         }
         #endregion
 
