@@ -12,7 +12,7 @@
         ResizeMode="CanResize"
         WindowStartupLocation="CenterScreen"
         WindowState="Normal"
-        Width="1820" Height="780"
+        Width="1420" Height="780"
         BorderBrush="Black" BorderThickness="1"
         Background="{StaticResource PanelBackGround}"
         mc:Ignorable="d">
@@ -77,8 +77,8 @@
         </Grid>
         <Grid Grid.Row="2" Background="White">
             <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="0.9*"/>
                 <ColumnDefinition Width="0.8*"/>
-                <ColumnDefinition Width="0.65*"/>
                 <ColumnDefinition Width="2*"/>
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
@@ -111,17 +111,27 @@
                     <RowDefinition/>
                 </Grid.RowDefinitions>
                 <Grid>
-                    
+                    <GroupBox Header="Spectrum Data">
+                        <ListBox>
+                            
+                        </ListBox>
+                    </GroupBox>
                 </Grid>
                 <Grid Grid.Row="1">
-                    <DataGrid>
-                        
-                    </DataGrid>
+                    <GroupBox Header="Point Data">
+                        <DataGrid>
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Site" Width="70"/>
+                                <DataGridTextColumn Header="X(mm)" Width="70"/>
+                                <DataGridTextColumn Header="Y(mm)" Width="70"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </GroupBox>
                 </Grid>
             </Grid>
             <Grid Grid.Column="2">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="0.6*"/>
+                    <ColumnDefinition Width="0.9*"/>
                     <ColumnDefinition/>
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
@@ -131,7 +141,23 @@
                 <Grid>
                     <TabControl>
                         <TabItem Header="Stage">
-                            <stage:CamelliaStage></stage:CamelliaStage>
+                            <Grid>
+                                <Viewbox Margin="3">
+                                    <stage:CamelliaStage></stage:CamelliaStage>
+                                </Viewbox>
+                                <Viewbox Margin="3">
+                                    <ItemsControl ItemsSource="{Binding p_PointElement}"
+                              Width="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualWidth}"
+                              Height="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualHeight}" BorderBrush="Black" BorderThickness="1">
+                                        <ItemsControl.ItemsPanel>
+                                            <ItemsPanelTemplate>
+                                                <Canvas ClipToBounds="True"  Width="{x:Static local:BaseDefine.CanvasWidth}" Height="{x:Static local:BaseDefine.CanvasHeight}" Background="#01FFFFFF" Focusable="true">
+                                                </Canvas>
+                                            </ItemsPanelTemplate>
+                                        </ItemsControl.ItemsPanel>
+                                    </ItemsControl>
+                                </Viewbox>
+                            </Grid>
                         </TabItem>
                         <TabItem Header="Contour">
 
@@ -139,16 +165,20 @@
                     </TabControl>
                 </Grid>
                 <Grid Grid.Column="1">
-                    <GroupBox Header="Layer Data">
-
-                    </GroupBox>
-                </Grid>
-                <Grid Grid.Row="1" Grid.ColumnSpan="2">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="0.3*"/>
+                    <!--<Grid.ColumnDefinitions>
                         <ColumnDefinition/>
-                    </Grid.ColumnDefinitions>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>-->
+                    <Grid.RowDefinitions>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
                     <Grid>
+                        <GroupBox Header="Layer Data">
+
+                        </GroupBox>
+                    </Grid>
+                    <Grid Grid.Row="1">
                         <GroupBox Header="Data">
                             <ListBox>
                                 <ListBoxItem>
@@ -163,7 +193,12 @@
                             </ListBox>
                         </GroupBox>
                     </Grid>
-                    <Grid Grid.Column="1">
+                </Grid>
+                <Grid Grid.Row="1" Grid.ColumnSpan="2">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+                    <Grid Grid.Column="0">
                         <TabControl>
                             <TabItem Header="Reflectance">
                                 <!--Todo Reflectance-->

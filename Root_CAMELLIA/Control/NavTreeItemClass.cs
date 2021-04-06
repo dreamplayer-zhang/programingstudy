@@ -37,7 +37,7 @@ namespace Root_CAMELLIA
         // Design decisions: 
         // - do we use INotifyPropertyChanged. Maybe not quite aproporiate in model, but without MVVM framework practical shortcut
         // - do we introduce IsSelected, in most cases I would advice: Yes. I use now button+command to set Path EACH time item pressed
-        // bool IsSelected { get; set; }
+        bool IsSelected { get; set; }
         // void DeselectAll();
 
         // Specific for this application, could be introduced later in more specific interface/classes
@@ -88,6 +88,16 @@ namespace Root_CAMELLIA
                 //    Children = GetMyChildren();
                 //}
                 SetExpandedIcon();
+            }
+        }
+
+        private bool isSelected = false;
+        public bool IsSelected
+        {
+            get { return isSelected; }
+            set
+            {
+                SetProperty(ref isSelected, value);
             }
         }
 

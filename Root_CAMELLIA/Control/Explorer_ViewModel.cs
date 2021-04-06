@@ -163,31 +163,31 @@ namespace Root_CAMELLIA
 
         }
 
-        public event System.EventHandler DoubleClicked;
+        public event System.EventHandler ItemClicked;
 
 
 
 
-        void DoubleClickedEvent(object path)
+        void ItemClickedEvent(object path)
         {
-            if (DoubleClicked != null)
-                OnDoubleClicked(path);
+            if (ItemClicked != null)
+                OnItemClicked(path);
         }
 
-        protected virtual void OnDoubleClicked(object path)
+        protected virtual void OnItemClicked(object path)
         {
-            if (DoubleClicked != null)
+            if (ItemClicked != null)
             {
-                DoubleClicked.Invoke(path, new EventArgs());
+                ItemClicked.Invoke(path, new EventArgs());
             }
         }
-        public void OnMouseDoubleClick(object sender, System.Windows.Input.MouseEventArgs e)
+
+        public void OnMouseLeftButtonUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
-            //TreeView item = sender as TreeView;
-            //System.Windows.Controls.TreeView sen = (System.Windows.Controls.TreeView)sender;
-            //((TreeViewItem)sen.SelectedItem).HasItems
             System.Windows.Controls.TreeView sen = (System.Windows.Controls.TreeView)sender;
             INavTreeItem selectedItem = (INavTreeItem)sen.SelectedItem;
+            //sen.Background = System.Windows.Media.Brushes.Red;
+            //selectedItem.
             if (selectedItem == null)
             {
                 return;
@@ -198,7 +198,7 @@ namespace Root_CAMELLIA
             FileAttributes chkAtt = File.GetAttributes(path);
             if ((chkAtt & FileAttributes.Directory) != FileAttributes.Directory)
             {
-                DoubleClickedEvent((object)path);
+                ItemClickedEvent((object)path);
             }
         }
 

@@ -46,8 +46,8 @@ namespace Root_CAMELLIA
         {
             this.mainWindow_ViewModel = mainWindow_ViewModel;
 
-            m_summary.DoubleClicked += DoubleClick;
-            m_history.DoubleClicked += DoubleClick;
+            m_summary.ItemClicked += ItemClick;
+            m_history.ItemClicked += ItemClick;
 
             InitExplorer();
         }
@@ -64,7 +64,9 @@ namespace Root_CAMELLIA
                 SetProperty(ref m_currentPath, value);
             }
         }
-        public void DoubleClick(object sender, EventArgs e)
+
+        //ObservableObject<>
+        public void ItemClick(object sender, EventArgs e)
         {
             string path = (string)sender;
             if(p_currentPath == path)
@@ -124,11 +126,6 @@ namespace Root_CAMELLIA
         {
             //p_explorer.p_treeView = new System.Windows.Controls.TreeView();
             //m_explorer.p_treeView.SelectedItemChanged += ExplorerItemDoubleClick;
-        }
-
-        public void ExplorerItemDoubleClick(object sender, RoutedEventArgs e)
-        {
-            MessageBox.Show("Double click");
         }
 
         public event EventHandler<DialogCloseRequestedEventArgs> CloseRequested;
