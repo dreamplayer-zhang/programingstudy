@@ -124,7 +124,7 @@ namespace Root_Rinse_Unloader.Module
         {
             double fW75 = m_axisWidth.GetPosValue(ePos.W75);
             double fW85 = m_axisWidth.GetPosValue(ePos.W85);
-            double dPos = (fW85 - fW75) * (fWidth - 75) / 10;
+            double dPos = (fW85 - fW75) * (fWidth - 75) / 10 + fW75;
             m_axisWidth.StartMove(dPos);
             return m_axisWidth.WaitReady();
         }
