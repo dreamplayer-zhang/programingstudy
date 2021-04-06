@@ -61,7 +61,7 @@ namespace RootTools.Comm
         private void M_timer_Tick(object sender, EventArgs e)
         {
             if (checkBoxRead.IsChecked == false) return;
-            m_modbus.ReadDataGroup(1); 
+            m_modbus.ReadDataGroup(m_modbus.p_nViewUnit); 
             if (m_swTimer.ElapsedMilliseconds > 300000) checkBoxRead.IsChecked = false;
         }
     }

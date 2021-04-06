@@ -12,12 +12,12 @@ namespace RootTools.Comm
             InitializeComponent();
         }
 
-        public Modbus.DataGroup m_dataGroup; 
-        public void Init(Modbus.DataGroup dataGroup)
+        public Modbus m_modbus; 
+        public void Init(Modbus modbus)
         {
-            m_dataGroup = dataGroup;
-            DataContext = dataGroup;
-            dataGridData.ItemsSource = dataGroup.m_aData; 
+            m_modbus = modbus;
+            DataContext = modbus;
+            dataGridData.ItemsSource = modbus.m_aViewData; 
         }
     }
 }
