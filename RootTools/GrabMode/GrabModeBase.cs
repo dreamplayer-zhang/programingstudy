@@ -117,9 +117,9 @@ namespace RootTools
 
         #region Light
         public LightSet m_lightSet;
-        List<double> m_aLightPower = new List<double>();
+        protected List<double> m_aLightPower = new List<double>();
 
-        void RunTreeLight(Tree tree, bool bVisible, bool bReadOnly)
+        protected void RunTreeLight(Tree tree, bool bVisible, bool bReadOnly)
         {
             if (m_lightSet == null) return;
 
@@ -135,10 +135,16 @@ namespace RootTools
         {
             for (int n = 0; n < m_aLightPower.Count; n++)
             {
-                m_lightSet.m_aLight[n].m_light.p_fSetPower = bOn ? m_aLightPower[n] : 0;
+                if(m_lightSet.m_aLight[n].m_light!=null)
+                    m_lightSet.m_aLight[n].m_light.p_fSetPower = bOn ? m_aLightPower[n] : 0;
             }
         }
 
+        public void SetLightByIdx(int nIdx)
+        {
+            m_lightSet.m_aLight[nIdx].m_light.p_fSetPower = m_aLightPower[nIdx];
+
+        }
         public int GetLightByName(string str)
         {
             for (int i = 0; i < m_lightSet.m_aLight.Count; i++)

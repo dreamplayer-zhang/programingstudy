@@ -178,6 +178,21 @@ namespace Root_VEGA_P_Vision.Module
                 m_vision = vision;
                 m_pulsePermm = 10000;
             }
+            public string CameraInit()
+            {
+                if (camStain == null) return "Camera Stain is NULL";
+                camStain.Connect();
+
+                if (camTDI == null) return "Main Camera is NULL";
+                if (!camTDI.p_CamInfo.p_eState.Equals(RootTools.Camera.Dalsa.eCamState.Init)) return "Main Camera state is not init";
+                camTDI.Connect();
+
+                //if (camZStack == null) return "ZStacking Camera is NULL";
+                //if (camZStack.p_CamInfo.p_eState.Equals(RootTools.Camera.Dalsa.eCamState.Init)) return "Zstacking Camera state is not init";
+                //camZStack.Connect();
+
+                return "OK";
+            }
         }
         #endregion
 
@@ -230,6 +245,14 @@ namespace Root_VEGA_P_Vision.Module
             {
                 m_vision = vision;
                 m_pulsePermm = 10000;
+            }
+
+            public string CameraInit()
+            {
+                if (camSide == null) return "Camera Stain is NULL";
+                camSide.Connect();
+
+                return "OK";
             }
         }
         #endregion
@@ -365,6 +388,10 @@ namespace Root_VEGA_P_Vision.Module
             else
             {
                 Thread.Sleep(100);
+
+                m_mainOptic.CameraInit();
+                m_sideOptic.CameraInit();
+
                 p_sInfo = base.StateHome();
                 p_eState = (p_sInfo == "OK") ? eState.Ready : eState.Error;
                 return "OK";
