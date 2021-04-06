@@ -171,6 +171,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Page Include="Control\Arrow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Control\Block.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -199,6 +203,14 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="RecipeManager_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="RecipeWizard_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="UI_UserControl\HomeProgress_UI.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -222,6 +234,9 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Control\Arrow.xaml.cs">
+      <DependentUpon>Arrow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Control\Block.xaml.cs">
       <DependentUpon>Block.xaml</DependentUpon>
@@ -252,6 +267,13 @@
     <Compile Include="Module\Interlock.cs" />
     <Compile Include="Module\TowerLamp.cs" />
     <Compile Include="Module\Vision\Run_GrabLineScan.cs" />
+    <Compile Include="RecipeManager_UI.xaml.cs">
+      <DependentUpon>RecipeManager_UI.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="RecipeWizard_UI.xaml.cs">
+      <DependentUpon>RecipeWizard_UI.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="RecipeWizard_VM.cs" />
     <Compile Include="UI_UserControl\HomeProgress_UI.xaml.cs">
       <DependentUpon>HomeProgress_UI.xaml</DependentUpon>
     </Compile>
@@ -316,5 +338,8 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup />
+  <ItemGroup>
+    <Resource Include="Resource\Reticle.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

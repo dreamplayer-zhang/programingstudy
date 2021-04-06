@@ -756,8 +756,12 @@ namespace RootTools
 				//System.Windows.MessageBox.Show(ee.ToString());
 			}
 
-			RedrawingElement();
-		}
+            //System.Windows.Application.Current.Dispatcher.Invoke(() =>
+            //{
+            RedrawingElement();
+            //});
+
+        }
 
 		public unsafe Image<Gray, byte> GetSamplingGrayImage()
 		{

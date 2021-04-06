@@ -16,9 +16,9 @@ namespace Root_Rinse_Loader.Module
         {
             foreach (Magazine magazine in m_aMagazine) magazine.GetTools(m_toolBox);
             m_stack.GetTools(m_toolBox);
-            p_sInfo = m_toolBox.Get(ref m_dioPusher, this, "Pusher", "Backward", "Forward");
-            p_sInfo = m_toolBox.Get(ref m_diOverload, this, "Overload");
-            p_sInfo = m_toolBox.Get(ref m_axis, this, "Elevator"); 
+            p_sInfo = m_toolBox.GetDIO(ref m_dioPusher, this, "Pusher", "Backward", "Forward");
+            p_sInfo = m_toolBox.GetDIO(ref m_diOverload, this, "Overload");
+            p_sInfo = m_toolBox.GetAxis(ref m_axis, this, "Elevator"); 
             if (bInit) 
             {
                 InitPosElevator(); 
@@ -42,8 +42,8 @@ namespace Root_Rinse_Loader.Module
             DIO_IO m_dioClamp;
             public void GetTools(ToolBox toolBox)
             {
-                m_storage.p_sInfo = toolBox.Get(ref m_diCheck, m_storage, m_id + ".Check");
-                m_storage.p_sInfo = toolBox.Get(ref m_dioClamp, m_storage, m_id + ".Clamp");
+                m_storage.p_sInfo = toolBox.GetDIO(ref m_diCheck, m_storage, m_id + ".Check");
+                m_storage.p_sInfo = toolBox.GetDIO(ref m_dioClamp, m_storage, m_id + ".Clamp");
             }
 
             bool _bCheck = false; 
@@ -117,11 +117,11 @@ namespace Root_Rinse_Loader.Module
             public DIO_I[] m_diCheck = new DIO_I[4]; 
             public void GetTools(ToolBox toolBox)
             {
-                m_storage.p_sInfo = toolBox.Get(ref m_diLevel, m_storage, m_id + ".Level");
-                m_storage.p_sInfo = toolBox.Get(ref m_diCheck[0], m_storage, m_id + ".Check0");
-                m_storage.p_sInfo = toolBox.Get(ref m_diCheck[1], m_storage, m_id + ".Check1");
-                m_storage.p_sInfo = toolBox.Get(ref m_diCheck[2], m_storage, m_id + ".Check2");
-                m_storage.p_sInfo = toolBox.Get(ref m_diCheck[3], m_storage, m_id + ".Check3");
+                m_storage.p_sInfo = toolBox.GetDIO(ref m_diLevel, m_storage, m_id + ".Level");
+                m_storage.p_sInfo = toolBox.GetDIO(ref m_diCheck[0], m_storage, m_id + ".Check0");
+                m_storage.p_sInfo = toolBox.GetDIO(ref m_diCheck[1], m_storage, m_id + ".Check1");
+                m_storage.p_sInfo = toolBox.GetDIO(ref m_diCheck[2], m_storage, m_id + ".Check2");
+                m_storage.p_sInfo = toolBox.GetDIO(ref m_diCheck[3], m_storage, m_id + ".Check3");
             }
 
             bool _bLevel = false;

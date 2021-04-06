@@ -33,13 +33,13 @@ namespace Root_CAMELLIA
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             double actPos = (double)value;
-            double canvasPos = 7000 * actPos / 2830000;
+            double canvasPos = 7000 * actPos / 2938590; // 최대, 최소 구해야함
             if (value == null)
             {
                 return 0.0;
             }
 
-            return canvasPos;
+            return 7000-canvasPos;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

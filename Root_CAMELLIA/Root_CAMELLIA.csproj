@@ -231,7 +231,9 @@
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Core" />
+    <Reference Include="System.Core">
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.Net.Http" />
@@ -259,6 +261,7 @@
     <Compile Include="Control\Explorer.xaml.cs">
       <DependentUpon>Explorer.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Control\Explorer_ViewModel.cs" />
     <Compile Include="Control\Fan.xaml.cs">
       <DependentUpon>Fan.xaml</DependentUpon>
     </Compile>
@@ -269,6 +272,10 @@
     <Compile Include="Control\Humidity.xaml.cs">
       <DependentUpon>Humidity.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Control\PMCheckReview.xaml.cs">
+      <DependentUpon>PMCheckReview.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Control\PMCheckReview_ViewModel.cs" />
     <Compile Include="Control\StageViewControl.xaml.cs">
       <DependentUpon>StageViewControl.xaml</DependentUpon>
     </Compile>
@@ -278,8 +285,10 @@
     <Compile Include="Converter\BoolConverter.cs" />
     <Compile Include="Converter\HumidityToGradientOffsetConverter.cs" />
     <Compile Include="Converter\LampStateToColorConverter.cs" />
+    <Compile Include="Converter\ModuleStateToLoadingOpacityConverter.cs" />
     <Compile Include="Converter\ValueToColorConverter.cs" />
     <Compile Include="Converter\ValueToUIValueConverter.cs" />
+    <Compile Include="Data\SaveMeasureData.cs" />
     <Compile Include="LibSR_Met\Calculation.cs" />
     <Compile Include="LibSR_Met\ConstValue.cs" />
     <Compile Include="LibSR_Met\CountGraph.xaml.cs">
@@ -290,18 +299,24 @@
     <Compile Include="LibSR_Met\LogManager.cs" />
     <Compile Include="LibSR_Met\Nanoview.cs" />
     <Compile Include="LibSR_Met\PMDatas.cs" />
+    <Compile Include="LibSR_Met\PMRGraph.xaml.cs">
+      <DependentUpon>PMRGraph.xaml</DependentUpon>
+    </Compile>
     <Compile Include="LibSR_Met\RTGraph.xaml.cs" />
     <Compile Include="ModuleRun\Run_AutoFocus.cs" />
     <Compile Include="ModuleRun\Run_CalibrationWaferCentering.cs" />
     <Compile Include="ModuleRun\Run_Delay.cs" />
     <Compile Include="ModuleRun\Run_InitCalibration.cs" />
     <Compile Include="ModuleRun\Run_Measure.cs" />
-    <Compile Include="ModuleRun\Run_PMSensorTilt.cs" />
-    <Compile Include="ModuleRun\Run_PMTiltAlign.cs" />
+    <Compile Include="ModuleRun\Run_PMReflectance.cs" />
+    <Compile Include="ModuleRun\Run_PMSensorStageAlign.cs" />
+    <Compile Include="ModuleRun\Run_PMThickness.cs" />
+    <Compile Include="ModuleRun\Run_PMSensorCameraTilt.cs" />
     <Compile Include="Module\Module_FDC.cs" />
     <Compile Include="Module\Module_FFU.cs" />
     <Compile Include="Module\Interlock.cs" />
     <Compile Include="Module\TowerLamp.cs" />
+    <Compile Include="TemplateSelector\FFUTemplateSelector.cs" />
     <Compile Include="UI_Dialog\Dlg_OHT.xaml.cs">
       <DependentUpon>Dlg_OHT.xaml</DependentUpon>
     </Compile>
@@ -345,6 +360,7 @@
     <Compile Include="UI_UserControl\Loadport_UI.xaml.cs">
       <DependentUpon>Loadport_UI.xaml</DependentUpon>
     </Compile>
+    <Compile Include="ViewModel\Dlg_Review_ViewModel.cs" />
     <Compile Include="ViewModel\Dlg_Setting_ViewModel.cs" />
     <Compile Include="UI_Dialog\Dlg_Setting.xaml.cs">
       <DependentUpon>Dlg_Setting.xaml</DependentUpon>
@@ -415,6 +431,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Control\PMCheckReview.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Control\StageViewControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -424,6 +444,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="LibSR_Met\CountGraph.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="LibSR_Met\PMRGraph.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

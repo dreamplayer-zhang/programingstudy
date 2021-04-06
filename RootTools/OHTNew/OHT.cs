@@ -32,9 +32,14 @@ namespace RootTools.OHTNew
             }
         }
 
-        bool p_bPresent
+        public bool p_bPresent
         {
-            get { return m_loadport.p_bPlaced && m_loadport.p_bPresent; }
+            get { return m_loadport.p_bPresent; }
+        }
+
+        public bool p_bPlaced
+        {
+            get { return m_loadport.p_bPlaced; }
         }
 
         bool _bAuto = false; 
@@ -677,16 +682,16 @@ namespace RootTools.OHTNew
         #endregion
 
         public ModuleBase m_module;
-        public ILoadport m_loadport; 
+        dynamic m_loadport; 
         public Log m_log;
         public GemCarrierBase m_carrier = null;
         IToolDIO m_toolDIO;
 
-        public OHT(string id, ModuleBase module, ILoadport loadport, GemCarrierBase carrier, IToolDIO toolDIO)
+        public OHT(string id, ModuleBase module, GemCarrierBase carrier, IToolDIO toolDIO)
         {
             p_id = id;
             m_module = module;
-            m_loadport = loadport; 
+            m_loadport = module; 
             m_carrier = carrier;
             m_log = module.m_log;
             m_toolDIO = toolDIO;

@@ -5,6 +5,7 @@ using RootTools.Control;
 using RootTools.GAFs;
 using RootTools.Memory;
 using RootTools.Module;
+using RootTools.ToolBoxs;
 using RootTools.Trees;
 using System;
 using System.Collections.Generic;
@@ -37,18 +38,19 @@ namespace Root_EFEM.Module
 
         public override void GetTools(bool bInit)
         {
-            p_sInfo = m_toolBox.Get(ref m_axisRotate, this, "AxisRotate");
-            p_sInfo = m_toolBox.Get(ref m_axisCamAlign, this, "AxisCamera");
-            p_sInfo = m_toolBox.Get(ref m_axisCamOCR, this, "AxisOCR");
-            p_sInfo = m_toolBox.Get(ref m_dioVac, this, "Vacuum");
-            p_sInfo = m_toolBox.Get(ref m_doBlow, this, "Blow");
-            p_sInfo = m_toolBox.Get(ref m_doLightCoaxial, this, "LightCoaxial");
-            p_sInfo = m_toolBox.Get(ref m_doLightSide, this, "LightSide");
-            p_sInfo = m_toolBox.Get(ref m_dioLift, this, "Lift", "Down", "Up");
-            p_sInfo = m_toolBox.Get(ref m_diWaferExist, this, "WaferExist");
+            m_flipper.GetTools(m_toolBox, this, bInit);
+            p_sInfo = m_toolBox.GetAxis(ref m_axisRotate, this, "AxisRotate");
+            p_sInfo = m_toolBox.GetAxis(ref m_axisCamAlign, this, "AxisCamera");
+            p_sInfo = m_toolBox.GetAxis(ref m_axisCamOCR, this, "AxisOCR");
+            p_sInfo = m_toolBox.GetDIO(ref m_dioVac, this, "Vacuum");
+            p_sInfo = m_toolBox.GetDIO(ref m_doBlow, this, "Blow");
+            p_sInfo = m_toolBox.GetDIO(ref m_doLightCoaxial, this, "LightCoaxial");
+            p_sInfo = m_toolBox.GetDIO(ref m_doLightSide, this, "LightSide");
+            p_sInfo = m_toolBox.GetDIO(ref m_dioLift, this, "Lift", "Down", "Up");
+            p_sInfo = m_toolBox.GetDIO(ref m_diWaferExist, this, "WaferExist");
             p_sInfo = m_toolBox.Get(ref m_memoryPool, this, "Memory", 1);
-            p_sInfo = m_toolBox.Get(ref m_camAlign, this, "Align");
-            p_sInfo = m_toolBox.Get(ref m_camOCR, this, "OCR");
+            p_sInfo = m_toolBox.GetCamera(ref m_camAlign, this, "Align");
+            p_sInfo = m_toolBox.GetCamera(ref m_camOCR, this, "OCR");
 
             m_alid_WaferExist = m_gaf.GetALID(this, "Aligner Wafer Exist", "Aligner Wafer Exist");
             if (bInit) InitTools();
@@ -60,6 +62,172 @@ namespace Root_EFEM.Module
             InitMemory();
             InitPosAlign();
             InitPosOCR();
+        }
+        #endregion
+
+        #region Flipper
+        public class Flipper
+        {
+            Axis m_axisX;
+            Axis m_axisZ;
+            Axis m_axisRotate;
+            DIO_IO m_dioVacuum; 
+            DIO_O m_doBlow;
+            DIO_I2O2 m_dioGuide; 
+            public void GetTools(ToolBox toolBox, Aligner_ATI module, bool bInit)
+            {
+                module.p_sInfo = toolBox.GetDIO(ref m_dioVacuum, module, p_id + "Vacuum");
+                module.p_sInfo = toolBox.GetDIO(ref m_doBlow, module, p_id + "Blow");
+                module.p_sInfo = toolBox.GetDIO(ref m_dioGuide, module, p_id + "Guide", "Back", "Push");
+                module.p_sInfo = toolBox.GetAxis(ref m_axisX, module, p_id + "AxisX");
+                module.p_sInfo = toolBox.GetAxis(ref m_axisZ, module, p_id + "AxisZ");
+                module.p_sInfo = toolBox.GetAxis(ref m_axisRotate, module, p_id + "AxisRotate");
+                if  (bInit)
+                {
+                    InitPosX();
+                    InitPosZ();
+                    InitPosRotate(); 
+                }
+            }
+
+            #region Vacuum
+            double m_secBlow = 0.5;
+            double m_secVac = 1; 
+            public string RunVacuum(bool bOn)
+            {
+                m_dioVacuum.Write(bOn);
+                if (bOn == false)
+                {
+                    m_doBlow.Write(true);
+                    Thread.Sleep((int)(500 * m_secBlow));
+                    m_doBlow.Write(false);
+                    return "OK";
+                }
+                int msVac = (int)(1000 * m_secVac);
+                while (m_dioVacuum.p_bIn != bOn)
+                {
+                    Thread.Sleep(10);
+                    if (EQ.IsStop()) return p_id + " EQ Stop";
+                    if (m_dioVacuum.m_swWrite.ElapsedMilliseconds > msVac) return "Vacuum Sensor Timeout";
+                }
+                return "OK";
+            }
+            #endregion
+
+            #region Guide
+            public string RunGuide(bool bGuide)
+            {
+                m_dioGuide.Write(bGuide);
+                return m_dioGuide.WaitDone(); 
+            }
+            #endregion
+
+            #region AxisX
+            public double m_xOffset = 2;
+            public enum ePosX
+            {
+                Backward,
+                Forward
+            }
+            void InitPosX()
+            {
+                m_axisX.AddPos(Enum.GetNames(typeof(ePosX))); 
+            }
+
+            public string RunMoveX(ePosX ePosX, double fOffset)
+            {
+                m_axisX.StartMove(ePosX, fOffset);
+                return m_axisX.WaitReady();
+            }
+            #endregion
+
+            #region AxisZ
+            public enum ePosZ
+            {
+                GetReady,
+                GetUp,
+                PutReady,
+                PutDown
+            }
+            void InitPosZ()
+            {
+                m_axisZ.AddPos(Enum.GetNames(typeof(ePosZ)));
+            }
+
+            public string RunMoveZ(ePosZ ePosZ)
+            {
+                m_axisZ.StartMove(ePosZ);
+                return m_axisZ.WaitReady();
+            }
+            #endregion
+
+            #region AxisRotate
+            public enum ePosRotate
+            {
+                UpSide,
+                DownSide
+            }
+            void InitPosRotate()
+            {
+                m_axisRotate.AddPos(Enum.GetNames(typeof(ePosRotate)));
+            }
+
+            public string RunMoveRotate(ePosRotate ePosRotate)
+            {
+                m_axisRotate.StartMove(ePosRotate);
+                return m_axisRotate.WaitReady();
+            }
+            #endregion
+
+            #region Tree
+            public void RunTree(Tree tree)
+            {
+                m_secBlow = tree.Set(m_secBlow, m_secBlow, "Blow", "Vaccum Blow Time (sec)");
+                m_secVac = tree.Set(m_secVac, m_secVac, "Vacuum", "Vacuum On Timout (sec)");
+                m_xOffset = tree.Set(m_xOffset, m_xOffset, "X Offset", "Axis X Offset"); 
+            }
+            #endregion
+
+            public string p_id { get; set; }
+            public Flipper(string id)
+            {
+                p_id = id; 
+            }
+
+        }
+        Flipper m_flipper = new Flipper("Flipper");
+
+        public string RunGet()
+        {
+            if (Run(m_flipper.RunVacuum(false))) return p_sInfo;
+            if (Run(m_flipper.RunMoveX(Flipper.ePosX.Backward, 0))) return p_sInfo;
+            if (Run(m_flipper.RunMoveRotate(Flipper.ePosRotate.UpSide))) return p_sInfo;
+            if (Run(m_flipper.RunMoveZ(Flipper.ePosZ.GetReady))) return p_sInfo;
+            if (Run(m_flipper.RunMoveX(Flipper.ePosX.Forward, m_flipper.m_xOffset))) return p_sInfo;
+            if (Run(RunVacuum(false))) return p_sInfo; 
+            if (Run(m_flipper.RunMoveZ(Flipper.ePosZ.GetUp))) return p_sInfo;
+            if (Run(m_flipper.RunGuide(true))) return p_sInfo;
+            if (Run(m_flipper.RunVacuum(true))) return p_sInfo; 
+            if (Run(m_flipper.RunMoveX(Flipper.ePosX.Backward, 0))) return p_sInfo;
+            return "OK";
+        }
+
+        public string RunPut()
+        {
+            if (Run(m_flipper.RunVacuum(true))) return p_sInfo;
+            if (Run(m_flipper.RunMoveX(Flipper.ePosX.Backward, 0))) return p_sInfo;
+            if (Run(m_flipper.RunMoveRotate(Flipper.ePosRotate.DownSide))) return p_sInfo;
+            if (Run(m_flipper.RunMoveZ(Flipper.ePosZ.PutReady))) return p_sInfo;
+            if (Run(m_flipper.RunMoveX(Flipper.ePosX.Forward, 0))) return p_sInfo; //forget ??
+            if (Run(m_flipper.RunMoveZ(Flipper.ePosZ.PutDown))) return p_sInfo;
+            if (Run(m_flipper.RunVacuum(false))) return p_sInfo;
+            if (Run(RunVacuum(true))) return p_sInfo;
+            if (Run(m_flipper.RunGuide(false))) return p_sInfo;
+            if (Run(m_flipper.RunMoveX(Flipper.ePosX.Forward, m_flipper.m_xOffset))) return p_sInfo; //forget ??
+            if (Run(m_flipper.RunMoveZ(Flipper.ePosZ.PutReady))) return p_sInfo;
+            if (Run(m_flipper.RunMoveX(Flipper.ePosX.Backward, 0))) return p_sInfo;
+            if (Run(m_flipper.RunMoveRotate(Flipper.ePosRotate.UpSide))) return p_sInfo;
+            return "OK"; 
         }
         #endregion
 
@@ -82,10 +250,26 @@ namespace Root_EFEM.Module
             set { m_doLightSide.Write(value); }
         }
 
-        public bool p_bVac
+        double m_secBlow = 0.5;
+        double m_secVac = 1;
+        public string RunVacuum(bool bOn)
         {
-            get { return m_dioVac.p_bOut; }
-            set { m_dioVac.Write(value); }
+            m_dioVac.Write(bOn);
+            if (bOn == false)
+            {
+                m_doBlow.Write(true);
+                Thread.Sleep((int)(500 * m_secBlow));
+                m_doBlow.Write(false);
+                return "OK";
+            }
+            int msVac = (int)(1000 * m_secVac);
+            while (m_dioVac.p_bIn != bOn)
+            {
+                Thread.Sleep(10);
+                if (EQ.IsStop()) return p_id + " EQ Stop";
+                if (m_dioVac.m_swWrite.ElapsedMilliseconds > msVac) return "Vacuum Sensor Timeout";
+            }
+            return "OK";
         }
         #endregion
 
@@ -213,7 +397,9 @@ namespace Root_EFEM.Module
         {
             m_lRotate = tree.Set(m_lRotate, m_lRotate, "PpR", "Pulse per Round (pulse)");
             m_nRotateBack = tree.Set(m_nRotateBack, m_nRotateBack, "Rotate Back", "Rotate Back Pulse (pulse)");
-            RunTreeAlign(tree.GetTree("Grab", false));
+            m_secVac = tree.Set(m_secVac, m_secVac, "Vacuum", "Stage Vacuum On Timeout (sec)");
+            m_secBlow = tree.Set(m_secBlow, m_secBlow, "Blow", "Stage Vacuum Blow Time (sec)"); 
+            RunTreeAlign(tree.GetTree("Grab"));
         }
         #endregion
 
@@ -327,7 +513,7 @@ namespace Root_EFEM.Module
         public override void RunTree(Tree tree)
         {
             base.RunTree(tree);
-            RunTreeSetup(tree.GetTree("Setup", false));
+            RunTreeSetup(tree.GetTree("Setup"));
         }
 
         void RunTreeSetup(Tree tree)
@@ -337,6 +523,7 @@ namespace Root_EFEM.Module
             RunTreeWafer(tree.GetTree("Default Wafer", false));
             RunTreeRotate(tree.GetTree("Rotate", false));
             m_waferSize.RunTree(tree.GetTree("Wafer Size", false), true);
+            m_flipper.RunTree(tree.GetTree("Flipper"));
         }
 
         public override void Reset()
@@ -501,6 +688,7 @@ namespace Root_EFEM.Module
         protected override void InitModuleRuns()
         {
             AddModuleRunList(new Run_Delay(this), true, "Just Time Delay");
+            AddModuleRunList(new Run_Flipper(this), true, "Flipper Get&Put Wafer");
             AddModuleRunList(new Run_Inspect(this), false, "Inspect Align Camera Image for Find Notch");
             AddModuleRunList(new Run_Grab(this), false, "Run Align Grab");
             AddModuleRunList(new Run_Align(this), true, "Run Align with Inspect");
@@ -530,6 +718,44 @@ namespace Root_EFEM.Module
             public override string Run()
             {
                 Thread.Sleep((int)(1000 * m_secDelay));
+                return "OK";
+            }
+        }
+
+        public class Run_Flipper : ModuleRunBase
+        {
+            Aligner_ATI m_module;
+            public Run_Flipper(Aligner_ATI module)
+            {
+                m_module = module;
+                InitModuleRun(module);
+            }
+
+            enum eFlipper
+            {
+                Get,
+                Put
+            }
+            eFlipper m_eFlipper = eFlipper.Get; 
+            public override ModuleRunBase Clone()
+            {
+                Run_Flipper run = new Run_Flipper(m_module);
+                run.m_eFlipper = m_eFlipper;
+                return run;
+            }
+
+            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
+            {
+                m_eFlipper = (eFlipper)tree.Set(m_eFlipper, m_eFlipper, "Flipper", "Flipper Run", bVisible);
+            }
+            public override string Run()
+            {
+                if (EQ.p_bSimulate) return "OK"; 
+                switch (m_eFlipper)
+                {
+                    case eFlipper.Get: return m_module.RunGet();
+                    case eFlipper.Put: return m_module.RunPut(); 
+                }
                 return "OK";
             }
         }
@@ -641,7 +867,7 @@ namespace Root_EFEM.Module
             public override string Run() //forget
             {
                 if (EQ.p_bSimulate) return "OK";
-                m_module.p_bVac = true;
+                m_module.RunVacuum(true); 
                 m_module.p_bLightCoaxial = true;
 
                 if (m_module.Run(m_module.m_axisCamAlign.StartMove(ePosAlign.Align))) return p_sInfo;
@@ -657,7 +883,7 @@ namespace Root_EFEM.Module
                 if (m_module.Run(m_module.m_axisCamAlign.WaitReady())) return p_sInfo;
                 if (m_module.Run(m_module.m_axisRotate.WaitReady())) return p_sInfo;
 
-                m_module.p_bVac = false;
+                m_module.RunVacuum(false);
                 m_module.p_bLightCoaxial = false;
                 //if (m_module.Run(m_module.AlignGrab(m_inspect.m_aoiParam))) return p_sInfo;
                 //if (m_module.Run(m_module.FindMaxNotch())) return p_sInfo;

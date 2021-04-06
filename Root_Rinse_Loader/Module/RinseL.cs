@@ -250,13 +250,14 @@ namespace Root_Rinse_Loader.Module
         #endregion
 
         #region ToolBox
+        DIO_I m_diAirEmergency;
         public TCPIPClient m_tcpip; 
         public override void GetTools(bool bInit)
         {
             GetToolsDIO(); 
-            p_sInfo = m_toolBox.Get(ref m_tcpip, this, "TCPIP");
-            p_sInfo = m_toolBox.Get(ref m_diRinseRun, this, "Rinse Run");
-            p_sInfo = m_toolBox.Get(ref m_doRinseEmg, this, "Rinse Emg Stop");
+            p_sInfo = m_toolBox.GetComm(ref m_tcpip, this, "TCPIP");
+            p_sInfo = m_toolBox.GetDIO(ref m_diRinseRun, this, "Rinse Run");
+            p_sInfo = m_toolBox.GetDIO(ref m_doRinseEmg, this, "Rinse Emg Stop");
             if (bInit)
             {
                 InitALID();
@@ -268,8 +269,6 @@ namespace Root_Rinse_Loader.Module
 
         public override string StateHome()
         {
-            //m_qProtocolSend.Clear();
-            //m_protocolSend = null;      //??
             return p_sInfo;
         }
 
@@ -319,13 +318,13 @@ namespace Root_Rinse_Loader.Module
         DIO_I m_diLightCurtain;
         void GetToolsDIO()
         {
-            p_sInfo = m_toolBox.Get(ref m_diEMG, this, "Emergency");
-            p_sInfo = m_toolBox.Get(ref m_diAir, this, "Air Pressure");
-            p_sInfo = m_toolBox.Get(ref m_diDoorLock, this, "Door Lock");
-            p_sInfo = m_toolBox.Get(ref m_diBuzzerOff, this, "Buzzer Off", false);
-            p_sInfo = m_toolBox.Get(ref m_doLamp, this, "Lamp", m_asLamp, false);
-            p_sInfo = m_toolBox.Get(ref m_doBuzzer, this, "Buzzer", m_asBuzzer, false);
-            p_sInfo = m_toolBox.Get(ref m_diLightCurtain, this, "Light Curtain");
+            p_sInfo = m_toolBox.GetDIO(ref m_diEMG, this, "Emergency");
+            p_sInfo = m_toolBox.GetDIO(ref m_diAir, this, "Air Pressure");
+            p_sInfo = m_toolBox.GetDIO(ref m_diDoorLock, this, "Door Lock");
+            p_sInfo = m_toolBox.GetDIO(ref m_diBuzzerOff, this, "Buzzer Off", false);
+            p_sInfo = m_toolBox.GetDIO(ref m_doLamp, this, "Lamp", m_asLamp, false);
+            p_sInfo = m_toolBox.GetDIO(ref m_doBuzzer, this, "Buzzer", m_asBuzzer, false);
+            p_sInfo = m_toolBox.GetDIO(ref m_diLightCurtain, this, "Light Curtain");
         }
 
         bool _bEMG = false;
@@ -487,13 +486,13 @@ namespace Root_Rinse_Loader.Module
                 {
                     Protocol protocol = m_qProtocolReply.Dequeue();
                     m_tcpip.Send(protocol.p_sCmd);
-                    Thread.Sleep(100);
+                    Thread.Sleep(10);
                 }
                 else if ((m_qProtocolSend.Count > 0) && (m_protocolSend == null))
                 {
                     m_protocolSend = m_qProtocolSend.Dequeue();
                     m_tcpip.Send(m_protocolSend.p_sCmd);
-                    Thread.Sleep(100);
+                    Thread.Sleep(10);
                 }
             }
         }
@@ -501,7 +500,6 @@ namespace Root_Rinse_Loader.Module
         public Protocol AddProtocol(string id, eCmd eCmd, dynamic value)
         {
             Protocol protocol = new Protocol(id, eCmd, value);
-            if (!m_tcpip.p_bConnect) return protocol;
             if (id == p_id) m_qProtocolSend.Enqueue(protocol);
             else m_qProtocolReply.Enqueue(protocol); 
             return protocol;

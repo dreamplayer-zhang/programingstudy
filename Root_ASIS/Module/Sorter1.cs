@@ -15,9 +15,9 @@ namespace Root_ASIS.Module
         DIO_I m_diSafeZ;
         public override void GetTools(bool bInit)
         {
-            p_sInfo = m_toolBox.Get(ref m_axisX, this, "Axis X");
-            p_sInfo = m_toolBox.Get(ref m_axisZ, this, "Axis Z");
-            p_sInfo = m_toolBox.Get(ref m_diSafeZ, this, "Safe Z Position");
+            p_sInfo = m_toolBox.GetAxis(ref m_axisX, this, "Axis X");
+            p_sInfo = m_toolBox.GetAxis(ref m_axisZ, this, "Axis Z");
+            p_sInfo = m_toolBox.GetDIO(ref m_diSafeZ, this, "Safe Z Position");
             m_picker.GetTools(this, bInit);
             if (bInit) InitTools();
         }

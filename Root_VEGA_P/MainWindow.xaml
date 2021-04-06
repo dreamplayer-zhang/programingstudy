@@ -3,13 +3,300 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+        xmlns:tools="clr-namespace:RootTools;assembly=RootTools"
         xmlns:local="clr-namespace:Root_VEGA_P"
+        xmlns:UI ="clr-namespace:Root_VEGA_P.UI"
         xmlns:engineer="clr-namespace:Root_VEGA_P.Engineer"
+        xmlns:icon="clr-namespace:Root_VEGA_P.Icon"
         mc:Ignorable="d"
+        WindowStyle="None"
+        WindowStartupLocation="CenterScreen"
+        AllowsTransparency="False"
+        ResizeMode="CanResizeWithGrip"
         Loaded="Window_Loaded"
         Closing="Window_Closing"
-        Title="VEGA_P" Height="450" Width="800" WindowState="Maximized">
+        Height="1080"
+        Width="1920"
+        Title="Root Vega-P">
+    <i:Interaction.Triggers>
+        <i:EventTrigger EventName="Loaded">
+            <i:InvokeCommandAction Command="{Binding WindowLoadedCommand}" />
+        </i:EventTrigger>
+        <i:EventTrigger EventName="Closing">
+            <i:InvokeCommandAction Command="{Binding WindowClosingCommand}" />
+        </i:EventTrigger>
+    </i:Interaction.Triggers>
     <Grid>
-        <engineer:VEGA_P_Engineer_UI x:Name="engineerUI"/>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="25" />
+            <RowDefinition Height="30" />
+            <RowDefinition Height="85*" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="15*" />
+            <!--<RowDefinition Height="Auto" x:Name="ViewArea"/>-->
+        </Grid.RowDefinitions>
+        <!--Title Bar-->
+        <Grid Grid.Row="0"
+              Name="TitleBar"
+              Background="{DynamicResource MainThema}"
+              MouseLeftButtonDown="TitleBar_MouseLeftButtonDown">
+            <StackPanel Orientation="Horizontal">
+                <Viewbox Margin="3"
+                         VerticalAlignment="Center">
+                    <icon:ATI />
+                </Viewbox>
+                <TextBlock Text="VEGA-P"
+                           Foreground="White"
+                           VerticalAlignment="Center"
+                           FontSize="12"
+                           Margin="5,0,0,0"
+                           Grid.Column="1" />
+                <TextBlock Name="textblockAssembly"
+                           Text=""
+                           Foreground="White"
+                           VerticalAlignment="Center"
+                           FontSize="12" />
+            </StackPanel>
+            <!--<TextBlock Text="Recipe Name.rcp"
+                       Foreground="White"
+                       VerticalAlignment="Center"
+                       HorizontalAlignment="Center" />-->
+            <StackPanel WindowChrome.IsHitTestVisibleInChrome="True"
+                        HorizontalAlignment="Right"
+                        Orientation="Horizontal"
+                        Grid.Column="2">
+                <TextBlock Text="OFFLINE"
+                           Foreground="White"
+                           VerticalAlignment="Center"
+                           Margin="20,0" />
+                <Button Style="{StaticResource SystemBtnStyle}"
+                        x:Name="MinimizeButton"
+                        Click="MinimizeButton_Click">
+
+                    <Path Style="{StaticResource MinimizeIconKey}" />
+                </Button>
+                <Button Style="{StaticResource SystemBtnStyle}"
+                        x:Name="MaximizeButton"
+                        Click="MaximizeButton_Click">
+                    <Path Style="{StaticResource MaximizeIconKey}" />
+                </Button>
+                <Button Style="{StaticResource SystemBtnStyle}"
+                        x:Name="NormalizeButton"
+                        Click="NormalizeButton_Click">
+                    <Path Style="{StaticResource NormalizeIconKey}" />
+                </Button>
+                <Button Style="{StaticResource SystemBtnStyle}"
+                        x:Name="CloseButton"
+                        VerticalAlignment="Bottom">
+                    <Path Style="{StaticResource CloseIconKey}" />
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="Click">
+                            <i:InvokeCommandAction Command="{Binding MenuItemExitCommand}" />
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+                </Button>
+            </StackPanel>
+        </Grid>
+
+        <!--Menu-->
+        <Border Grid.Row="1"
+                Background="{StaticResource ControlBackGround}"
+                BorderBrush="DimGray"
+                BorderThickness="0,0,0,0">
+            <Grid>
+                <StackPanel Orientation="Horizontal">
+                    <Menu Background="{StaticResource ControlBackGround}">
+                        <MenuItem Background="{StaticResource ControlBackGround}"
+                                  Width="70"
+                                  Height="30"
+                                  Padding="0"
+                                  BorderBrush="#FF707070"
+                                  BorderThickness="0,0,0,0">
+                            <MenuItem.Header>
+                                <Grid Width="70">
+                                    <TextBlock Text="File"
+                                               FontSize="13"
+                                               FontWeight="Bold"
+                                               VerticalAlignment="Center"
+                                               HorizontalAlignment="Center" />
+                                </Grid>
+                            </MenuItem.Header>
+                            <MenuItem Header="New">
+
+                            </MenuItem>
+                            <MenuItem Header="Load">
+
+                            </MenuItem>
+                            <MenuItem Header="Save">
+
+                            </MenuItem>
+                            <MenuItem Header="Save As">
+
+                            </MenuItem>
+                        </MenuItem>
+                        <MenuItem Background="{StaticResource ControlBackGround}"
+                                  BorderBrush="#FF707070"
+                                  Width="70"
+                                  x:Name="ViewMenu"
+                                  BorderThickness="0,0,0,0"
+                                  Padding="0">
+                            <MenuItem.Header>
+                                <Grid Width="70">
+                                    <TextBlock Text="View"
+                                               FontSize="13"
+                                               FontWeight="Bold"
+                                               VerticalAlignment="Center"
+                                               HorizontalAlignment="Center" />
+                                </Grid>
+                            </MenuItem.Header>
+                            <MenuItem Header="Log"
+                                      IsCheckable="True"
+                                      x:Name="viewLog" />
+                            <MenuItem Header="FDC"
+                                      IsCheckable="True"
+                                      x:Name="viewFDC" />
+
+                        </MenuItem>
+                        <MenuItem Background="{StaticResource ControlBackGround}"
+                                  BorderBrush="#FF707070"
+                                  Width="70"
+                                  BorderThickness="0,0,0,0"
+                                  Padding="0">
+                            <MenuItem.Header>
+                                <Grid Width="70">
+                                    <TextBlock Text="Tool"
+                                               FontSize="13"
+                                               FontWeight="Bold"
+                                               VerticalAlignment="Center"
+                                               HorizontalAlignment="Center" />
+                                </Grid>
+                            </MenuItem.Header>
+                            <MenuItem Header="Login">
+                            </MenuItem>
+                            <MenuItem Header="Setting">
+                            </MenuItem>
+                        </MenuItem>
+                        <MenuItem Background="{StaticResource ControlBackGround}"
+                                  BorderBrush="#FF707070"
+                                  Width="100"
+                                  BorderThickness="0,0,0,0"
+                                  Padding="0">
+                            <MenuItem.Header>
+                                <Grid Width="100">
+                                    <TextBlock Text="Network"
+                                               FontSize="13"
+                                               FontWeight="Bold"
+                                               VerticalAlignment="Center"
+                                               HorizontalAlignment="Center" />
+                                </Grid>
+                            </MenuItem.Header>
+                            <MenuItem Header="Online">
+
+                            </MenuItem>
+                            <MenuItem Header="Offline"
+                                      IsEnabled="False">
+
+                            </MenuItem>
+                            <MenuItem Header="GEM"
+                                      IsEnabled="False">
+
+                            </MenuItem>
+
+                        </MenuItem>
+                        <MenuItem Background="{StaticResource ControlBackGround}"
+                                  BorderBrush="#FF707070"
+                                  Width="100"
+                                  BorderThickness="0,0,0,0"
+                                  Padding="0">
+                            <MenuItem.Header>
+                                <Grid Width="100">
+                                    <TextBlock Text="Navigation"
+                                               FontSize="13"
+                                               FontWeight="Bold"
+                                               VerticalAlignment="Center"
+                                               HorizontalAlignment="Center" />
+                                </Grid>
+                            </MenuItem.Header>
+                            <MenuItem Header="Setup">
+                                <MenuItem Header="Recipe Wizard">
+                                    <MenuItem Header="Recipe Summary" />
+                                    <MenuItem Header="Recipe Spec" />
+                                </MenuItem>
+                                <MenuItem Header="Matienance" />
+                                <MenuItem Header="GEM" />
+                            </MenuItem>
+                            <MenuItem Header="Review">
+                            </MenuItem>
+                            <MenuItem Header="Run">
+                            </MenuItem>
+                        </MenuItem>
+                        <MenuItem Background="{StaticResource ControlBackGround}"
+                                  BorderBrush="#FF707070"
+                                  Width="110"
+                                  BorderThickness="0,0,0,0"
+                                  Padding="0">
+                            <MenuItem.Header>
+                                <Grid Width="110">
+                                    <TextBlock Text="Mode Select"
+                                               FontSize="13"
+                                               FontWeight="Bold"
+                                               VerticalAlignment="Center"
+                                               HorizontalAlignment="Center" />
+                                </Grid>
+                            </MenuItem.Header>
+                        </MenuItem>
+                        <MenuItem Background="{StaticResource ControlBackGround}"
+                                  BorderBrush="#FF707070"
+                                  Width="110"
+                                  BorderThickness="0,0,0,0"
+                                  Padding="0">
+                            <MenuItem.Header>
+                                <Grid Width="100">
+                                    <TextBlock Text="Setting"
+                                               FontSize="13"
+                                               FontWeight="Bold"
+                                               VerticalAlignment="Center"
+                                               HorizontalAlignment="Center" />
+                                </Grid>
+                            </MenuItem.Header>
+                        </MenuItem>
+                    </Menu>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!--Main Panel-->
+        <Grid Grid.Row="2"
+              x:Name="MainPanel">
+            <TabControl>
+                <TabItem Header="Recipe">
+                    <UI:Panel_RecipeManger />
+                </TabItem>
+                <TabItem Header="Engineer">
+                    <engineer:VEGA_P_Engineer_UI x:Name="engineerUI"/>
+                </TabItem>
+            </TabControl>
+
+        </Grid>
+
+        <!--Splitter-->
+        <GridSplitter Grid.Row="3"
+                      Height="3"
+                      HorizontalAlignment="Stretch"
+                      VerticalAlignment="Stretch"
+                      x:Name="splitter"
+                      Background="{StaticResource Splitter}"
+                      ShowsPreview="True"
+                      Grid.ColumnSpan="2" />
+
+        <!--Log-->
+        <Border Grid.Row="4"
+                Grid.ColumnSpan="2"
+                Panel.ZIndex="99"
+                Margin="3">
+            <tools:LogView_UI x:Name="logView"
+                              Margin="1" />
+        </Border>
     </Grid>
 </Window>

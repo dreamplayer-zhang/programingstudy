@@ -17,7 +17,7 @@ using Met = Root_CAMELLIA.LibSR_Met;
 
 namespace Root_CAMELLIA.Module
 {
-    class Run_PMTiltAlign : ModuleRunBase
+    class Run_PMSensorCameraTilt : ModuleRunBase
     {
         Module_Camellia m_module;
         DataManager m_DataManager;
@@ -25,7 +25,7 @@ namespace Root_CAMELLIA.Module
         //double m_dResX_um = 1;
         //double m_dResY_um = 1;
         double m_dFocusZ_pulse = 1; // Pulse
-        public Run_PMTiltAlign(Module_Camellia module)
+        public Run_PMSensorCameraTilt (Module_Camellia module)
         {
             m_module = module;
             m_DataManager = module.m_DataManager;
@@ -33,7 +33,7 @@ namespace Root_CAMELLIA.Module
         }
         public override ModuleRunBase Clone()
         {
-            Run_PMTiltAlign run = new Run_PMTiltAlign(m_module);
+            Run_PMSensorCameraTilt run = new Run_PMSensorCameraTilt (m_module);
             run.m_StageCenterPos_pulse = m_StageCenterPos_pulse;
             //run.m_dResX_um = m_dResX_um;
             //run.m_dResY_um = m_dResY_um;
@@ -99,6 +99,18 @@ namespace Root_CAMELLIA.Module
             {
                 return "Grab Error";
             }
+
+            StopWatch sw = new StopWatch();
+            if (VRS.p_CamInfo._OpenStatus == false) VRS.Connect();
+            while (VRS.p_CamInfo._OpenStatus == false)
+            {
+                if (sw.ElapsedMilliseconds > 15000)
+                {
+                    sw.Stop();
+                    return "Navigation Camera Not Connected";
+                }
+            }
+            sw.Stop();
             return "OK";
         }
     }

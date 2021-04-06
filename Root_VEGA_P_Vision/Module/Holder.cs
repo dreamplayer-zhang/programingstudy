@@ -1,12 +1,11 @@
 ﻿using RootTools;
 using RootTools.Module;
 using RootTools.Trees;
-using System.ComponentModel;
 using System.Threading;
 
 namespace Root_VEGA_P_Vision.Module
 {
-    public class Buffer : ModuleBase, IRTRChild
+    public class Holder : ModuleBase, IRTRChild
     {
         #region ToolBox
         public override void GetTools(bool bInit)
@@ -34,13 +33,16 @@ namespace Root_VEGA_P_Vision.Module
         Registry m_reg = null;
         public void ReadPod_Registry()
         {
-            int nPod = m_reg.Read("InfoPod", -1);
+            m_reg = new Registry("InfoPod");
+            int nPod = m_reg.Read(p_id, -1);
             p_infoPod = new InfoPod((InfoPod.ePod)nPod);
             p_infoPod.ReadReg();
         }
         #endregion
 
         #region IRTRChild
+        public bool p_bLock { get; set; }
+
         public string IsGetOK()
         {
             if (p_eState != eState.Ready) return p_id + " eState not Ready";
@@ -61,7 +63,7 @@ namespace Root_VEGA_P_Vision.Module
 
         public string BeforeGet()
         {
-            if (p_eRemote == eRemote.Client) return RemoteRun(eRemoteRun.BeforeGet, null);
+            if (p_eRemote == eRemote.Client) return RemoteRun(eRemoteRun.BeforeGet, eRemote.Client, null);
             else
             {
                 return "OK";
@@ -70,7 +72,7 @@ namespace Root_VEGA_P_Vision.Module
 
         public string BeforePut(InfoPod infoPod)
         {
-            if (p_eRemote == eRemote.Client) return RemoteRun(eRemoteRun.BeforePut, infoPod);
+            if (p_eRemote == eRemote.Client) return RemoteRun(eRemoteRun.BeforePut, eRemote.Client, infoPod);
             else
             {
                 return "OK";
@@ -87,9 +89,14 @@ namespace Root_VEGA_P_Vision.Module
             return "OK";
         }
 
-        public bool IsPodExist()
+        public bool IsPodExist(InfoPod.ePod ePod)
         {
             return (p_infoPod != null);
+        }
+
+        public bool IsEnableRecovery()
+        {
+            return p_infoPod != null; 
         }
         #endregion
 
@@ -138,7 +145,7 @@ namespace Root_VEGA_P_Vision.Module
         #region override
         public override void Reset()
         {
-            if (p_eRemote == eRemote.Client) RemoteRun(eRemoteRun.Reset, null);
+            if (p_eRemote == eRemote.Client) RemoteRun(eRemoteRun.Reset, eRemote.Client, null);
             else
             {
                 base.Reset();
@@ -154,13 +161,7 @@ namespace Root_VEGA_P_Vision.Module
         public override string StateHome()
         {
             if (EQ.p_bSimulate) return "OK";
-            if (p_eRemote == eRemote.Client)
-            {
-                InitBackgroundWorker();
-                if (m_bgwClientHome.IsBusy) return "OK";
-                m_bgwClientHome.RunWorkerAsync();
-                return "OK"; 
-            }
+            if (p_eRemote == eRemote.Client) return RemoteRun(eRemoteRun.StateHome, eRemote.Client, null);
             else
             {
                 Thread.Sleep(2000); 
@@ -168,20 +169,6 @@ namespace Root_VEGA_P_Vision.Module
                 p_eState = (p_sInfo == "OK") ? eState.Ready : eState.Error;
                 return "OK";
             }
-        }
-
-        BackgroundWorker m_bgwClientHome = null;
-        void InitBackgroundWorker()
-        {
-            if (m_bgwClientHome != null) return;
-            m_bgwClientHome = new BackgroundWorker();
-            m_bgwClientHome.DoWork += M_bgwClientHome_DoWork;
-        }
-
-        private void M_bgwClientHome_DoWork(object sender, DoWorkEventArgs e)
-        {
-            string sRun = RemoteRun(eRemoteRun.StateHome, null, false);
-            p_eState = (sRun == "OK") ? eState.Ready : eState.Init; 
         }
         #endregion
 
@@ -193,11 +180,22 @@ namespace Root_VEGA_P_Vision.Module
         }
         #endregion
 
-        public Buffer(string id, IEngineer engineer, eRemote eRemote)
+        public Holder(string id, IEngineer engineer, eRemote eRemote)
         {
             m_teach = new TeachRTR();
             InitBase(id, engineer, eRemote);
-            OnChangeState += Buffer_OnChangeState;
+            OnChangeState += Holder_OnChangeState;
+        }
+
+        private void Holder_OnChangeState(eState eState)
+        {
+            switch (p_eState)
+            {
+                case eState.Init:
+                case eState.Error:
+                    RemoteRun(eRemoteRun.ServerState, eRemote.Server, eState);
+                    break;
+            }
         }
 
         public override void ThreadStop()
@@ -213,25 +211,14 @@ namespace Root_VEGA_P_Vision.Module
             Reset,
             BeforeGet,
             BeforePut,
+            TestResult, 
         }
 
-        string RemoteRun(eRemoteRun eRemoteRun, dynamic value, bool bWait = true)
-        {
-            Run_Remote run = GetRemoteRun(eRemoteRun, value); 
-            StartRun(run);
-            if (bWait == false) return "OK"; 
-            while (run.p_eRunState != ModuleRunBase.eRunState.Done)
-            {
-                Thread.Sleep(10);
-                if (EQ.IsStop()) return "EQ Stop"; 
-            }
-            return p_sInfo;
-        }
-
-        Run_Remote GetRemoteRun(eRemoteRun eRemoteRun, dynamic value)
+        Run_Remote GetRemoteRun(eRemoteRun eRemoteRun, eRemote eRemote, dynamic value)
         {
             Run_Remote run = new Run_Remote(this);
             run.m_eRemoteRun = eRemoteRun;
+            run.m_eRemote = eRemote; 
             switch (eRemoteRun)
             {
                 case eRemoteRun.ServerState: run.m_eState = value; break; 
@@ -243,24 +230,80 @@ namespace Root_VEGA_P_Vision.Module
             return run; 
         }
 
-        private void Buffer_OnChangeState(eState eState)
+        string RemoteRun(eRemoteRun eRemoteRun, eRemote eRemote, dynamic value)
         {
-            if (p_eRemote == eRemote.Server) RemoteRun(eRemoteRun.ServerState, eState);
+            Run_Remote run = GetRemoteRun(eRemoteRun, eRemote, value);
+            StartRun(run);
+            while (run.p_eRunState != ModuleRunBase.eRunState.Done)
+            {
+                Thread.Sleep(10);
+                if (EQ.IsStop()) return "EQ Stop";
+            }
+            return p_sInfo;
+        }
+
+        public class Run_Remote : ModuleRunBase
+        {
+            Holder m_module;
+            public Run_Remote(Holder module)
+            {
+                m_module = module;
+                InitModuleRun(module);
+            }
+
+            public eRemoteRun m_eRemoteRun = eRemoteRun.StateHome;
+            public eState m_eState = eState.Init;
+            public InfoPod m_infoPod = new InfoPod(InfoPod.ePod.EIP_Cover);
+            public override ModuleRunBase Clone()
+            {
+                Run_Remote run = new Run_Remote(m_module);
+                run.m_eRemoteRun = m_eRemoteRun;
+                run.m_eState = m_eState;
+                run.m_infoPod = m_infoPod;
+                return run;
+            }
+
+            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
+            {
+                m_eRemoteRun = (eRemoteRun)tree.Set(m_eRemoteRun, m_eRemoteRun, "RemoteRun", "Select Remote Run", bVisible);
+                m_eRemote = (eRemote)tree.Set(m_eRemote, m_eRemote, "Remote", "Remote", false);
+                switch (m_eRemoteRun)
+                {
+                    case eRemoteRun.ServerState:
+                        m_eState = (eState)tree.Set(m_eState, m_eState, "State", "Module State", bVisible);
+                        break;
+                    case eRemoteRun.BeforePut:
+                        m_infoPod.RunTree(tree.GetTree("InfoPod", true, bVisible), bVisible);
+                        break;
+                }
+            }
+
+            public override string Run()
+            {
+                switch (m_eRemoteRun)
+                {
+                    case eRemoteRun.ServerState: m_module.p_eState = m_eState; break;
+                    case eRemoteRun.StateHome: return m_module.StateHome();
+                    case eRemoteRun.Reset: m_module.Reset(); break;
+                    case eRemoteRun.BeforeGet: return m_module.BeforeGet();
+                    case eRemoteRun.BeforePut: return m_module.BeforePut(m_infoPod);
+                }
+                return "OK";
+            }
         }
         #endregion
 
         #region ModuleRun
-        Run_Remote m_runRemote; 
         protected override void InitModuleRuns()
         {
+            AddModuleRunList(new Run_Remote(this), true, "Remote Run");
             AddModuleRunList(new Run_Delay(this), true, "Time Delay");
-            m_runRemote = (Run_Remote)AddModuleRunList(new Run_Remote(this), true, "Remote Run");
         }
 
         public class Run_Delay : ModuleRunBase
         {
-            Buffer m_module;
-            public Run_Delay(Buffer module)
+            Holder m_module;
+            public Run_Delay(Holder module)
             {
                 m_module = module;
                 InitModuleRun(module);
@@ -282,53 +325,6 @@ namespace Root_VEGA_P_Vision.Module
             public override string Run()
             {
                 Thread.Sleep((int)(1000 * m_secDelay / 2));
-                return "OK";
-            }
-        }
-
-        public class Run_Remote : ModuleRunBase
-        {
-            Buffer m_module;
-            public Run_Remote(Buffer module)
-            {
-                m_module = module;
-                m_bRemoteRun = true;
-                InitModuleRun(module);
-            }
-
-            public eRemoteRun m_eRemoteRun = eRemoteRun.StateHome;
-            public eState m_eState = eState.Init;
-            public InfoPod m_infoPod = new InfoPod(InfoPod.ePod.EIP_Cover);
-            public override ModuleRunBase Clone()
-            {
-                Run_Remote run = new Run_Remote(m_module);
-                run.m_eRemoteRun = m_eRemoteRun;
-                run.m_eState = m_eState;
-                run.m_infoPod = m_infoPod;
-                return run;
-            }
-
-            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
-            {
-                m_eRemoteRun = (eRemoteRun)tree.Set(m_eRemoteRun, m_eRemoteRun, "RemoteRun", "Select Remote Run", bVisible);
-                switch (m_eRemoteRun)
-                {
-                    case eRemoteRun.BeforePut:
-                        m_infoPod.RunTree(tree.GetTree("InfoPod", true, bVisible), bVisible); 
-                        break;
-                }
-            }
-
-            public override string Run()
-            {
-                switch (m_eRemoteRun)
-                {
-                    case eRemoteRun.ServerState: m_module.p_eState = m_eState; break; 
-                    case eRemoteRun.StateHome: return m_module.StateHome();
-                    case eRemoteRun.Reset: m_module.Reset(); break;
-                    case eRemoteRun.BeforeGet: return m_module.BeforeGet();
-                    case eRemoteRun.BeforePut: return m_module.BeforePut(m_infoPod);
-                }
                 return "OK";
             }
         }

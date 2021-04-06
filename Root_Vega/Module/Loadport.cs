@@ -36,26 +36,26 @@ namespace Root_Vega.Module
 
         public override void GetTools(bool bInit)
         {
-            p_sInfo = m_toolBox.Get(ref m_axisZ, this, "Z");
-            p_sInfo = m_toolBox.Get(ref m_axisTheta, this, "Theta");
-            p_sInfo = m_toolBox.Get(ref m_axisPodLifter, this, "Pod Lifter");
-            p_sInfo = m_toolBox.Get(ref m_axisReticleLifter, this, "Reticle Lifter");
-            p_sInfo = m_toolBox.Get(ref m_diIonizer, this, "X-ray Ionizer");
-            p_sInfo = m_toolBox.Get(ref m_dioPlaced, this, "Placed");
-            p_sInfo = m_toolBox.Get(ref m_dioPresent, this, "Present");
-            p_sInfo = m_toolBox.Get(ref m_diInnerPod, this, "InnerPod");
-            p_sInfo = m_toolBox.Get(ref m_diReticle, this, "Reticle");
-            p_sInfo = m_toolBox.Get(ref m_doManual, this, "Manual");
-            p_sInfo = m_toolBox.Get(ref m_doAuto, this, "Auto");
-            p_sInfo = m_toolBox.Get(ref m_doLoad, this, "Load");
-            p_sInfo = m_toolBox.Get(ref m_doUnload, this, "Unload");
-            p_sInfo = m_toolBox.Get(ref m_doAlarm, this, "Alarm");
+            p_sInfo = m_toolBox.GetAxis(ref m_axisZ, this, "Z");
+            p_sInfo = m_toolBox.GetAxis(ref m_axisTheta, this, "Theta");
+            p_sInfo = m_toolBox.GetAxis(ref m_axisPodLifter, this, "Pod Lifter");
+            p_sInfo = m_toolBox.GetAxis(ref m_axisReticleLifter, this, "Reticle Lifter");
+            p_sInfo = m_toolBox.GetDIO(ref m_diIonizer, this, "X-ray Ionizer");
+            p_sInfo = m_toolBox.GetDIO(ref m_dioPlaced, this, "Placed");
+            p_sInfo = m_toolBox.GetDIO(ref m_dioPresent, this, "Present");
+            p_sInfo = m_toolBox.GetDIO(ref m_diInnerPod, this, "InnerPod");
+            p_sInfo = m_toolBox.GetDIO(ref m_diReticle, this, "Reticle");
+            p_sInfo = m_toolBox.GetDIO(ref m_doManual, this, "Manual");
+            p_sInfo = m_toolBox.GetDIO(ref m_doAuto, this, "Auto");
+            p_sInfo = m_toolBox.GetDIO(ref m_doLoad, this, "Load");
+            p_sInfo = m_toolBox.GetDIO(ref m_doUnload, this, "Unload");
+            p_sInfo = m_toolBox.GetDIO(ref m_doAlarm, this, "Alarm");
             //            p_sInfo = m_toolBox.Get(ref m_doPodCylinder, this, "Alarm", Enum.GetNames(typeof(ePodCylinder)));
-            p_sInfo = m_toolBox.Get(ref m_OHT, this, m_infoPod, "OHT");
-            p_sInfo = m_toolBox.Get(ref m_doPodCylinderOpen, this, "Pod cylinder open");
-            p_sInfo = m_toolBox.Get(ref m_doPodCylinderClose, this, "Pod cylinder close");
-            p_sInfo = m_toolBox.Get(ref m_diFrontCheck, this, "Front Pod cylinder check");
-            p_sInfo = m_toolBox.Get(ref m_diBackCheck, this, "Back Pod cylinder check");
+            p_sInfo = m_toolBox.GetOHT(ref m_OHT, this, m_infoPod, "OHT");
+            p_sInfo = m_toolBox.GetDIO(ref m_doPodCylinderOpen, this, "Pod cylinder open");
+            p_sInfo = m_toolBox.GetDIO(ref m_doPodCylinderClose, this, "Pod cylinder close");
+            p_sInfo = m_toolBox.GetDIO(ref m_diFrontCheck, this, "Front Pod cylinder check");
+            p_sInfo = m_toolBox.GetDIO(ref m_diBackCheck, this, "Back Pod cylinder check");
             if (bInit)
             {
                 InitPosZ();

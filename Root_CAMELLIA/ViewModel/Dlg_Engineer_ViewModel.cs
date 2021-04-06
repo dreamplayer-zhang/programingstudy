@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -137,7 +138,7 @@ namespace Root_CAMELLIA
                             CurrentAxisWorkPoints = GetWorkPoint(TiltAxisY.m_aPos);
                             return;
                         }
-                    case TabAxis.StageZ:
+                    case TabAxis.TiltZ:
                         {
                             SelectedAxis = StageAxisZ;
                             CurrentAxisWorkPoints = GetWorkPoint(StageAxisZ.m_aPos);
@@ -449,15 +450,28 @@ namespace Root_CAMELLIA
             }
         }
 
+        PMCheckReview_ViewModel m_PMCheckReview_ViewModel = new PMCheckReview_ViewModel();
+        public PMCheckReview_ViewModel p_PMCheckReview_ViewModel
+        {
+            get
+            {
+                return m_PMCheckReview_ViewModel;
+            }
+            set
+            {
+                SetProperty(ref m_PMCheckReview_ViewModel, value);
+            }
+        }
+
 
 
         #endregion
-
-
-
         public Dlg_Engineer_ViewModel(MainWindow_ViewModel main)
         {
             ModuleCamellia = ((CAMELLIA_Handler)App.m_engineer.ClassHandler()).m_camellia;
+
+            // 연결 콜벡 이벤트 추가 += Connected_Callback;
+            ModuleCamellia.p_CamVRS.Connected += Connected_Callback;
 
             //p_recipeData = DataManager.Instance.recipeDM.MeasurementRD;
             AxisX = ModuleCamellia.p_axisXY.p_axisX;
@@ -472,11 +486,38 @@ namespace Root_CAMELLIA
             ModuleCamellia.p_CamVRS.Grabed += OnGrabImageUpdate;
 
             p_rootViewer.p_VisibleMenu = Visibility.Collapsed;
-
             dispatcher = Application.Current.Dispatcher;
 
+            //p_PMCheckReview_ViewModel.p_rootViewer.p_ImageData = ModuleCamellia.p_CamVRS.p_ImageViewer.p_ImageData;
             //m_task = new Task(()=>RunTask());
             //m_task.Start();
+        }
+
+        private void Connected_Callback(object sender, EventArgs e)
+        {
+            //ImageData sourceData = ModuleCamellia.p_CamVRS.p_ImageViewer.p_ImageData;
+
+            //IntPtr ptr0 = sourceData.GetPtr();
+            ////byte[] ptr1 = sourceData.GetByteArray();
+            ////IntPtr ptr2 = sourceData.GetPtr(1);
+            ////IntPtr ptr3 = sourceData.GetPtr(2);
+
+            //byte[] buf = new byte[sourceData.p_Size.X];
+
+            ////Array.Clear(ptr1, 0, sourceData.p_Size.X * sourceData.p_Size.Y);
+            //for (int i = 0; i < sourceData.p_Size.Y; i++)
+            //{
+
+            //    Marshal.Copy(buf, 0, ptr0, sourceData.p_Size.X);
+
+
+            //    ptr0 += sourceData.p_Size.X * 3;
+            //}
+
+            p_rootViewer.p_ImageData = ModuleCamellia.p_CamVRS.p_ImageViewer.p_ImageData;
+            //ModuleCamellia.p_CamVRS.p_ImageViewer.SetImageSource();
+
+
         }
 
         //private bool m_isStart = false;
@@ -511,6 +552,11 @@ namespace Root_CAMELLIA
                 return;
             }
 
+            if (EnableBtn)
+            {
+                return;
+            }
+
             double centerX;
             double centerY;
             if (DataManager.Instance.m_waferCentering.m_ptCenter.X == 0 && DataManager.Instance.m_waferCentering.m_ptCenter.Y == 0)
@@ -530,6 +576,7 @@ namespace Root_CAMELLIA
             double dY = centerY - y * 10000;
             Thread thread = new Thread(() =>
             {
+                EnableBtn = false;
                 string str;
                 str = ModuleCamellia.p_axisXY.StartMove(new RPoint(dX, dY));
                 if (str != "OK")
@@ -538,6 +585,7 @@ namespace Root_CAMELLIA
                     return;
                 }
                 ModuleCamellia.p_axisXY.WaitReady();
+                EnableBtn = true;
             });
             thread.Start();
             //MessageBox.Show(listRealPos[nMinIndex].x.ToString() + " " + listRealPos[nMinIndex].y.ToString());
@@ -545,7 +593,6 @@ namespace Root_CAMELLIA
 
 
         int nMinIndex = -1;
-        int nSelectIndex = -1;
         public void OnMouseMove(object sender, MouseEventArgs e)
         {
             Point pt = e.GetPosition((UIElement)sender);
@@ -678,6 +725,10 @@ namespace Root_CAMELLIA
             {
                 return new RelayCommand(() =>
                 {
+                    if (CheckAxis())
+                    {
+                        return;
+                    }
                     // 선택한 작업점 위치로 Move
                     Thread thread = new Thread(() =>
                     {
@@ -721,6 +772,10 @@ namespace Root_CAMELLIA
             {
                 return new RelayCommand(() =>
                 {
+                    if (CheckAxis())
+                    {
+                        return;
+                    }
                     // Select Axis Home
                     Thread thread = new Thread(() =>
                     {
@@ -739,6 +794,10 @@ namespace Root_CAMELLIA
             {
                 return new RelayCommand(() =>
                 {
+                    if (CheckAxis())
+                    {
+                        return;
+                    }
                     // 지금 축 위치 propertygrid에 set
                     double pos = SelectedAxis.p_posActual;
                     CurrentAxisWorkPoints[SelectedWorkPointIndex].Value = pos;
@@ -777,6 +836,10 @@ namespace Root_CAMELLIA
             {
                 return new RelayCommand(() =>
                 {
+                    if (!CheckAxis())
+                    {
+                        return;
+                    }
                     SelectedAxis.ServoOn(!AxisX.p_bServoOn);
                     SelectedAxis.ServoOn(!AxisY.p_bServoOn);
                 });
@@ -788,6 +851,10 @@ namespace Root_CAMELLIA
             {
                 return new RelayCommand(() =>
                 {
+                    if (!CheckAxis())
+                    {
+                        return;
+                    }
                     //select Axis jog
                     string str = SelectedAxis.Jog(-1);
                     if (str != "OK")
@@ -803,6 +870,10 @@ namespace Root_CAMELLIA
             {
                 return new RelayCommand(() =>
                 {
+                    if (!CheckAxis())
+                    {
+                        return;
+                    }
                     string str = SelectedAxis.Jog(-0.31);
                     if (str != "OK")
                     {
@@ -817,7 +888,10 @@ namespace Root_CAMELLIA
             {
                 return new RelayCommand(() =>
                 {
-
+                    if (!CheckAxis())
+                    {
+                        return;
+                    }
                     string str = SelectedAxis.StartMove(-PosValue);
                     if(str != "OK")
                     {
@@ -833,6 +907,10 @@ namespace Root_CAMELLIA
             {
                 return new RelayCommand(() =>
                 {
+                    if (!CheckAxis())
+                    {
+                        return;
+                    }
                     string str = SelectedAxis.StartMove(PosValue);
                     if (str != "OK")
                     {
@@ -848,6 +926,10 @@ namespace Root_CAMELLIA
             {
                 return new RelayCommand(() =>
                 {
+                    if (!CheckAxis())
+                    {
+                        return;
+                    }
                     string str = SelectedAxis.Jog(0.31);
                     if (str != "OK")
                     {
@@ -863,6 +945,10 @@ namespace Root_CAMELLIA
             {
                 return new RelayCommand(() =>
                 {
+                    if (!CheckAxis())
+                    {
+                        return;
+                    }
                     string str = SelectedAxis.Jog(1);
                     if (str != "OK")
                     {
@@ -877,7 +963,7 @@ namespace Root_CAMELLIA
             {
                 return new RelayCommand(() =>
                 {
-                    if(SelectedAxis == null)
+                    if (!CheckAxis())
                     {
                         return;
                     }
@@ -888,6 +974,16 @@ namespace Root_CAMELLIA
             }
         }
         #endregion
+
+        private bool CheckAxis()
+        {
+            if(SelectedAxis == null)
+            {
+                MessageBox.Show("Please Select Axis", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                return false;
+            }
+            return true;
+        }
 
         #region SR Command
         public ICommand CmdCentering
@@ -945,7 +1041,30 @@ namespace Root_CAMELLIA
 
         #region General Command
 
-        
+        public ICommand CmdTest
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    //if (!ModuleCamellia.p_CamVRS.p_CamInfo.OpenStatus)
+                    //{
+                    //    ModuleCamellia.p_CamVRS.Connect();
+                    //}
+                    //while (!ModuleCamellia.p_CamVRS.m_ConnectDone) ;
+
+                    //// if(연결되있을 경우만)
+                    //p_rootViewer.p_ImageData = ModuleCamellia.p_CamVRS.p_ImageViewer.p_ImageData;
+                    Thread thread = new Thread(() =>
+                    {
+                        Run_Delay delay = (Run_Delay)ModuleCamellia.CloneModuleRun("Delay");
+                        ModuleCamellia.StartRun(delay);
+                    });
+                    thread.Start();
+                    //StageCenterPos = measure.m_StageCenterPos_pulse;
+                });
+            }
+        }
 
         public ICommand LoadedCommand
         {
@@ -953,12 +1072,14 @@ namespace Root_CAMELLIA
             {
                 return new RelayCommand(() =>
                 {
-                    if (!ModuleCamellia.p_CamVRS.p_CamInfo.OpenStatus)
-                    {
-                        ModuleCamellia.p_CamVRS.Connect();
-                    }
-                    while (!ModuleCamellia.p_CamVRS.m_ConnectDone) ;
-                    p_rootViewer.p_ImageData = ModuleCamellia.p_CamVRS.p_ImageViewer.p_ImageData;
+                    //if (!ModuleCamellia.p_CamVRS.p_CamInfo.OpenStatus)
+                    //{
+                    //    ModuleCamellia.p_CamVRS.Connect();
+                    //}
+                    //while (!ModuleCamellia.p_CamVRS.m_ConnectDone) ;
+
+                    //// if(연결되있을 경우만)
+                    //p_rootViewer.p_ImageData = ModuleCamellia.p_CamVRS.p_ImageViewer.p_ImageData;
                     RaisePropertyChanged("p_pmParameter");
 
                     Run_Measure measure = (Run_Measure)ModuleCamellia.CloneModuleRun("Measure");
@@ -977,6 +1098,17 @@ namespace Root_CAMELLIA
                     ModuleCamellia.mwvm.p_StageCenterPulse = measure.m_StageCenterPos_pulse;
 
                     CloseRequested(this, new DialogCloseRequestedEventArgs(true));
+                });
+            }
+        }
+
+        public ICommand CmdPM
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+
                 });
             }
         }
@@ -1003,6 +1135,8 @@ namespace Root_CAMELLIA
             dispatcher.Invoke(() =>
             {
                 p_rootViewer.SetImageSource();
+                
+                p_rootViewer.p_ImageData.SaveImageSync(@"C:\Users\cgkim\Desktop\image\test.bmp");
             });
 
         }
@@ -1014,15 +1148,16 @@ namespace Root_CAMELLIA
                 MessageBox.Show("Vision Home이 완료 되지 않았습니다.");
                 return;
             }
-            Thread thread = new Thread(() =>
-            {
+            //Thread thread = new Thread(() =>
+            //{
                 Run_Measure measure = (Run_Measure)ModuleCamellia.CloneModuleRun("Measure");
                 UpdateParameter();
                 measure.m_isPM = true;
                 measure.m_isAlphaFit = p_pmParameter.p_isAlpha1;
-                measure.Run();
-            });
-            thread.Start();
+                ModuleCamellia.StartRun(measure);
+                //measure.Run();
+            //});
+            //thread.Start();
         }
         private void Calibration()
         {
@@ -1039,7 +1174,8 @@ namespace Root_CAMELLIA
                 calibration.m_isPM = true;
                 calibration.m_useCal = true;
                 calibration.m_useCentering = false;
-                calibration.Run();
+                //calibration.Run();
+                ModuleCamellia.StartRun(calibration);
             });
             thread.Start();
         }
@@ -1056,7 +1192,8 @@ namespace Root_CAMELLIA
                 Run_InitCalibration initCalibration = (Run_InitCalibration)ModuleCamellia.CloneModuleRun("InitCalibration");
                 initCalibration.m_isPM = true;
                 UpdateParameter();
-                initCalibration.Run();
+                //initCalibration.Run();
+                ModuleCamellia.StartRun(initCalibration);
             });
             thread.Start();
         }
@@ -1073,7 +1210,8 @@ namespace Root_CAMELLIA
                 Run_CalibrationWaferCentering centering = (Run_CalibrationWaferCentering)ModuleCamellia.CloneModuleRun("CalibrationWaferCentering");
                 centering.m_useCal = false;
                 centering.m_useCentering = true;
-                centering.Run();
+                //centering.Run();
+                ModuleCamellia.StartRun(centering);
             });
             thread.Start();
         }
@@ -1197,7 +1335,7 @@ namespace Root_CAMELLIA
             Lifter,
             TiltX,
             TiltY,
-            StageZ
+            TiltZ
         }
     }
 }

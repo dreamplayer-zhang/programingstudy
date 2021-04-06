@@ -4,8 +4,9 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Root_CAMELLIA"
+             xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
              mc:Ignorable="d" 
-             d:DesignHeight="800" d:DesignWidth="400" Loaded="UserControl_Loaded">
+             d:DesignHeight="800" d:DesignWidth="400">
     <Grid Background="White">
         <Grid.RowDefinitions>
             <RowDefinition Height="30"/>
@@ -19,7 +20,7 @@
                         <ColumnDefinition/>
                     </Grid.ColumnDefinitions>
                     <UniformGrid Grid.Row="0" Columns="4">
-                        <Button Margin="1" Content="Refresh" Click="Button_Click"></Button>
+                        <Button Margin="1" Content="Refresh" Command="{Binding CmdRefresh}" ></Button>
                     </UniformGrid>
                 </Grid>
             </Border>
@@ -29,7 +30,7 @@
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
             <GroupBox Header="Explorer">
-                <TreeView x:Name="ExplorerTree" Grid.Column="0" Margin="5" BorderBrush="Black" BorderThickness="1">
+                <TreeView x:Name="ExplorerTree" Grid.Column="0" Margin="5" BorderBrush="Black" BorderThickness="1"  ItemsSource="{Binding p_collection}">
                     <TreeView.Resources>
                         <Style TargetType="{x:Type local:ImageTreeViewItem}">
                             <Setter Property="HeaderTemplate">
@@ -45,6 +46,11 @@
                             </Setter>
                         </Style>
                     </TreeView.Resources>
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="MouseDoubleClick">
+                            <i:CallMethodAction TargetObject="{Binding}" MethodName="OnMouseDoubleClick" />
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
                 </TreeView>
             </GroupBox>
         </Grid>

@@ -8,10 +8,11 @@
         xmlns:Icon ="clr-namespace:Root_CAMELLIA.Control.Icon"
         xmlns:i="http://schemas.microsoft.com/xaml/behaviors" 
         xmlns:met="clr-namespace:Root_CAMELLIA.LibSR_Met"
-        xmlns:tools="clr-namespace:RootTools;assembly=RootTools"
+        xmlns:tools="clr-namespace:RootTools.Control.ACS;assembly=RootTools"
         xmlns:arrow="clr-namespace:Petzold.Media2D"
         xmlns:ctrl="clr-namespace:Root_CAMELLIA.Control"
         xmlns:stage="clr-namespace:Camellia2Stage"
+        xmlns:TemplateSelector="clr-namespace:Root_CAMELLIA.TemplateSelector"
         mc:Ignorable="d"
         WindowStyle="None"
         AllowsTransparency="False"
@@ -27,7 +28,6 @@
         <local:AxisToStageUIConverter x:Key="AxisToStageConverter"/>
         <local:MeasurePointToStageUIConverter x:Key="PointToStageConverter"/>
         <local:DoubleToProgressConverter x:Key="ProgressConverter"/>
-        
     </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
@@ -256,7 +256,8 @@
                             </ItemsControl>
                         </GroupBox>
                         <GroupBox Grid.Column="1" BorderBrush="Black" BorderThickness="1" Header="FFU">
-                            <ItemsControl ItemsSource="{Binding FanListItems, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
+                            <ItemsControl x:Name="FFUList" ItemsSource="{Binding FFUListItems}" ItemTemplateSelector="{DynamicResource FFUTemplateSelector}">
+                                <!--ItemsSource="{Binding FanListItems, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">-->
                                 <ItemsControl.ItemsPanel>
                                     <ItemsPanelTemplate>
                                         <Grid>
@@ -282,15 +283,16 @@
                                     </Style>
                                 </ItemsControl.ItemContainerStyle>
                                 <ItemsControl.Resources>
-                                    <DataTemplate DataType="{x:Type local:FanListItem}">
-                                        <ctrl:Fan VerticalAlignment="Center" HorizontalAlignment="Center" DataContext="{Binding Fan, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+                                    <DataTemplate x:Key="FanControl" DataType="{x:Type local:FFUListItem}">
+                                        <ctrl:Fan VerticalAlignment="Center" HorizontalAlignment="Center" DataContext="{Binding Unit, UpdateSourceTrigger=Default, Mode=TwoWay}"/>
                                     </DataTemplate>
-                                    <DataTemplate DataType="{x:Type local:HumidityListItem}">
-                                        <ctrl:Humidity VerticalAlignment="Center" HorizontalAlignment="Center" DataContext="{Binding Humidity, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+                                    <DataTemplate x:Key="HumidityControl" DataType="{x:Type local:FFUListItem}">
+                                        <ctrl:Humidity VerticalAlignment="Center" HorizontalAlignment="Center" DataContext="{Binding Unit, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
                                     </DataTemplate>
-                                    <DataTemplate DataType="{x:Type local:TemperatureListItem}">
-                                        <ctrl:Temp VerticalAlignment="Center" HorizontalAlignment="Center" DataContext="{Binding Temperature, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+                                    <DataTemplate x:Key="TemperatureControl" DataType="{x:Type local:FFUListItem}">
+                                        <ctrl:Temp VerticalAlignment="Center" HorizontalAlignment="Center" DataContext="{Binding Unit, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
                                     </DataTemplate>
+                                    <TemplateSelector:FFUTemplateSelector x:Key="FFUTemplateSelector"  Fan="{StaticResource FanControl}" Humidity="{StaticResource HumidityControl}" Temperature="{StaticResource TemperatureControl}"/>
                                 </ItemsControl.Resources>
                             </ItemsControl>
                         </GroupBox>
@@ -393,7 +395,7 @@
                         </Viewbox>
                         <Viewbox Margin="3"
                                  Grid.Row="1">
-                            <ItemsControl ItemsSource="{Binding p_DrawPointElement, UpdateSourceTrigger=PropertyChanged}"
+                            <ItemsControl ItemsSource="{Binding RecipeViewModel.p_DrawPointElement}"
                               Width="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualWidth}"
                               Height="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualHeight}" BorderBrush="Black" BorderThickness="1">
                                 <ItemsControl.ItemsPanel>
@@ -692,7 +694,15 @@
                                                         <Border Background="White" BorderBrush="#ABADB3" BorderThickness="1">
                                                             <TextBlock Grid.Row="0" Text="Reflectance" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="0,2" TextAlignment="Center"/>
                                                         </Border>
-                                                        <ListBox Grid.Row="1" ItemsSource="{Binding RecipeViewModel.ReflectanceListItem, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}" IsSynchronizedWithCurrentItem="True" HorizontalContentAlignment="Center"/>
+                                                        <!--<ListBox Grid.Row="1" ItemsSource="{Binding RecipeViewModel.ReflectanceListItem, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}" IsSynchronizedWithCurrentItem="True" HorizontalContentAlignment="Center"/>-->
+                                                        <DataGrid Grid.Row="1" ItemsSource="{Binding RecipeViewModel.ReflectanceListItem}" AutoGenerateColumns="False" CanUserAddRows="False" CanUserSortColumns="True" EnableColumnVirtualization="True"  CanUserDeleteRows="False"
+                                  EnableRowVirtualization="True" ScrollViewer.CanContentScroll="True" SelectionMode="Single">
+                                                            <DataGrid.Columns>
+                                                                <DataGridTextColumn Header="Wave" Width="*" Binding="{Binding p_waveLength}" IsReadOnly="True"/>
+                                                                <DataGridTextColumn Header="Scale" Width="*" Binding="{Binding p_scale}" IsReadOnly="True"/>
+                                                                <DataGridTextColumn Header="Offset" Width="*" Binding="{Binding p_offset}" IsReadOnly="True"/>
+                                                            </DataGrid.Columns>
+                                                        </DataGrid>
                                                     </Grid>
                                                 </Grid>
                                                 <Grid Grid.Column="1" Margin="5">
@@ -760,7 +770,6 @@
                     </Grid>
                 </TabItem>
                 <TabItem Header="Log" Width="80">
-                    <tools:LogView_UI x:Name="LogUI"/>
                 </TabItem>
                 <TabItem Header="RT Graph">
                     <met:RTGraph DataContext="{Binding p_RTGraph, UpdateSourceTrigger=PropertyChanged}"/>

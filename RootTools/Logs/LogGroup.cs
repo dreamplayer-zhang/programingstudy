@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
@@ -26,7 +27,7 @@ namespace RootTools
         #endregion
 
         #region Data
-        public Queue<Log.Data> m_qLog = new Queue<Log.Data>();
+        public ConcurrentQueue<Log.Data> m_qLog = new ConcurrentQueue<Log.Data>();
         public void AddData(Log.Data data)
         {
             if (m_eLevelMin > data.p_eLevel) return;
@@ -43,9 +44,10 @@ namespace RootTools
             string sPath = LogView._logView.p_sPath;
             try
             {
+                //string sDate = "";
+                Log.Data logData;
                 if (m_qLog.Count <= 0) return;
-                Log.Data logData = m_qLog.Peek(); 
-                if (logData != null)
+                if (m_qLog.TryPeek(out logData))
                 {
                     string sDate = logData.m_sDate;
                     sPath += "\\" + sDate;
@@ -54,25 +56,34 @@ namespace RootTools
                     {
                         while (m_qLog.Count > 0)
                         {
-                            Log.Data data = m_qLog.Peek();
-                            if (data != null)
+                            Log.Data data;
+                            if (m_qLog.TryPeek(out data))
                             {
-                                if (data.m_sDate != sDate) return;
-                                m_qLog.Dequeue();
-                                writer.WriteLine(data.p_sLog);
-                                p_aLog.Add(data);
-                                while (p_aLog.Count > c_lLog) p_aLog.RemoveAt(0);
-                            }
-                            else
-                            {
-                                m_qLog.Dequeue();
+                                if (data != null)
+                                {
+                                    if (data.m_sDate != sDate) return;
+                                    Log.Data dequeue;
+                                    if (m_qLog.TryDequeue(out dequeue))
+                                    {
+                                        writer.WriteLine(data.p_sLog);
+                                        p_aLog.Add(data);
+                                        while (p_aLog.Count > c_lLog) p_aLog.RemoveAt(0);
+                                    }
+                                }
+                                else
+                                {
+                                    Log.Data dequeue;
+                                    m_qLog.TryDequeue(out dequeue);
+                                }
                             }
                         }
                     }
-                }
+                } 
+            }
+            catch(Exception)
+            {
 
             }
-            catch (Exception) { }
         }
 
         public ObservableCollection<Log.Data> p_aLog { get; set; }

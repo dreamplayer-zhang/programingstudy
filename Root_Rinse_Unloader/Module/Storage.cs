@@ -16,7 +16,7 @@ namespace Root_Rinse_Unloader.Module
         {
             foreach (Magazine magazine in m_aMagazine) magazine.GetTools(m_toolBox);
             m_stack.GetTools(m_toolBox);
-            p_sInfo = m_toolBox.Get(ref m_axis, this, "Elevator");
+            p_sInfo = m_toolBox.GetAxis(ref m_axis, this, "Elevator");
             if (bInit)
             {
                 InitPosElevator();
@@ -39,8 +39,8 @@ namespace Root_Rinse_Unloader.Module
             DIO_IO m_dioClamp;
             public void GetTools(ToolBox toolBox)
             {
-                m_storage.p_sInfo = toolBox.Get(ref m_diCheck, m_storage, m_id + ".Check");
-                m_storage.p_sInfo = toolBox.Get(ref m_dioClamp, m_storage, m_id + ".Clamp");
+                m_storage.p_sInfo = toolBox.GetDIO(ref m_diCheck, m_storage, m_id + ".Check");
+                m_storage.p_sInfo = toolBox.GetDIO(ref m_dioClamp, m_storage, m_id + ".Clamp");
             }
 
             bool _bCheck = false;
@@ -111,7 +111,7 @@ namespace Root_Rinse_Unloader.Module
             DIO_I m_diLevel;
             public void GetTools(ToolBox toolBox)
             {
-                m_storage.p_sInfo = toolBox.Get(ref m_diLevel, m_storage, m_id + ".Level");
+                m_storage.p_sInfo = toolBox.GetDIO(ref m_diLevel, m_storage, m_id + ".Level");
             }
 
             bool _bLevel = false;

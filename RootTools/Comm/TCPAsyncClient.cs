@@ -89,7 +89,7 @@ namespace RootTools.Comm
             get { return (m_socket == null) ? false : m_socket.Connected; }
         }
 
-        void Connect()
+        public void Connect()
         {
             try
             {
@@ -141,6 +141,11 @@ namespace RootTools.Comm
                 m_socket.BeginSend(async.m_aBuf, 0, async.m_aBuf.Length, SocketFlags.None, m_cbSend, async);
                 return "OK";
             }
+        }
+
+        public void Send(byte[] p)
+        {
+            m_socket.Send(p);
         }
 
         void CallBackSend(IAsyncResult ar)

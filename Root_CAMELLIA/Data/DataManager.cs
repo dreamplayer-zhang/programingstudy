@@ -11,6 +11,7 @@ namespace Root_CAMELLIA.Data
         public RecipeDataManager recipeDM { get; set; }
         public WaferCentering m_waferCentering;
         public Calibration m_calibration;
+        public SaveMeasureData m_SaveMeasureData;
         public MainWindow_ViewModel Main { get; set; }
 
         private static DataManager instance;
@@ -35,6 +36,7 @@ namespace Root_CAMELLIA.Data
             recipeDM = new RecipeDataManager(this);
             m_waferCentering = new WaferCentering();
             m_calibration = new Calibration();
+            m_SaveMeasureData = new SaveMeasureData();
         }
     }
 }

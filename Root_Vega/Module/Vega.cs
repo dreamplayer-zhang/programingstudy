@@ -59,25 +59,25 @@ namespace Root_Vega.Module
 
         public override void GetTools(bool bInit)
         {
-            p_sInfo = m_toolBox.Get(ref m_doLamp, this, "Lamp", m_asLamp);
-            p_sInfo = m_toolBox.Get(ref m_doBuzzer, this, "Buzzer", m_asBuzzer, true, true);
-            p_sInfo = m_toolBox.Get(ref m_diEMS, this, "EMS");
-            p_sInfo = m_toolBox.Get(ref m_diProtectionBar, this, "ProtectionBar");
-            p_sInfo = m_toolBox.Get(ref m_diMCReset, this, "MC Reset");
-            p_sInfo = m_toolBox.Get(ref m_diCDALow, this, "CDA Low");
-            p_sInfo = m_toolBox.Get(ref m_diVaccumLow, this, "Vaccum Low");
-            p_sInfo = m_toolBox.Get(ref m_dioBuzzerOffButton, this, "Buzzer Off Button");
-            p_sInfo = m_toolBox.Get(ref m_diDoorLock, this, "Door Lock");
-            p_sInfo = m_toolBox.Get(ref m_doDoorLock_Use, this, "Door Lock Use");
-            p_sInfo = m_toolBox.Get(ref m_diIonizerAlarmCheck, this, "Ionizer Alarm Check",m_asIonizer,true,true);
-            p_sInfo = m_toolBox.Get(ref m_diElecPnl_1_FanAlarm, this, "Elec Panel 1 Fan Alarm");
-            p_sInfo = m_toolBox.Get(ref m_diElecPnl_2_FanAlarm, this, "Elec Panel 2 Fan Alarm");
-            p_sInfo = m_toolBox.Get(ref m_diPCPnl_FanAlarm, this, "PC Panel Fan Alarm");
-            p_sInfo = m_toolBox.Get(ref m_diPC_FanAlarm, this, "PC Fan Alarm");
-            p_sInfo = m_toolBox.Get(ref m_diInterlock_Key, this, "InterLock Key");
-            p_sInfo = m_toolBox.Get(ref m_di12chLED1FanAlarm, this, "12Ch LED 1 Fan Alarm");
-            p_sInfo = m_toolBox.Get(ref m_di12chLED2FanAlarm, this, "12Ch LED 2 Fan Alarm");
-            p_sInfo = m_toolBox.Get(ref m_doIonizerOnOff, this, "Ionizer On/Off");
+            p_sInfo = m_toolBox.GetDIO(ref m_doLamp, this, "Lamp", m_asLamp);
+            p_sInfo = m_toolBox.GetDIO(ref m_doBuzzer, this, "Buzzer", m_asBuzzer, true, true);
+            p_sInfo = m_toolBox.GetDIO(ref m_diEMS, this, "EMS");
+            p_sInfo = m_toolBox.GetDIO(ref m_diProtectionBar, this, "ProtectionBar");
+            p_sInfo = m_toolBox.GetDIO(ref m_diMCReset, this, "MC Reset");
+            p_sInfo = m_toolBox.GetDIO(ref m_diCDALow, this, "CDA Low");
+            p_sInfo = m_toolBox.GetDIO(ref m_diVaccumLow, this, "Vaccum Low");
+            p_sInfo = m_toolBox.GetDIO(ref m_dioBuzzerOffButton, this, "Buzzer Off Button");
+            p_sInfo = m_toolBox.GetDIO(ref m_diDoorLock, this, "Door Lock");
+            p_sInfo = m_toolBox.GetDIO(ref m_doDoorLock_Use, this, "Door Lock Use");
+            p_sInfo = m_toolBox.GetDIO(ref m_diIonizerAlarmCheck, this, "Ionizer Alarm Check",m_asIonizer,true,true);
+            p_sInfo = m_toolBox.GetDIO(ref m_diElecPnl_1_FanAlarm, this, "Elec Panel 1 Fan Alarm");
+            p_sInfo = m_toolBox.GetDIO(ref m_diElecPnl_2_FanAlarm, this, "Elec Panel 2 Fan Alarm");
+            p_sInfo = m_toolBox.GetDIO(ref m_diPCPnl_FanAlarm, this, "PC Panel Fan Alarm");
+            p_sInfo = m_toolBox.GetDIO(ref m_diPC_FanAlarm, this, "PC Fan Alarm");
+            p_sInfo = m_toolBox.GetDIO(ref m_diInterlock_Key, this, "InterLock Key");
+            p_sInfo = m_toolBox.GetDIO(ref m_di12chLED1FanAlarm, this, "12Ch LED 1 Fan Alarm");
+            p_sInfo = m_toolBox.GetDIO(ref m_di12chLED2FanAlarm, this, "12Ch LED 2 Fan Alarm");
+            p_sInfo = m_toolBox.GetDIO(ref m_doIonizerOnOff, this, "Ionizer On/Off");
             p_sInfo = m_RFID.GetTools(this, bInit);
 
             if (bInit)
@@ -268,7 +268,7 @@ namespace Root_Vega.Module
             RS232 m_rs232;
             public string GetTools(ModuleBase module, bool bInit)
             {
-                string sInfo = module.m_toolBox.Get(ref m_rs232, module, "RFID RS232");
+                string sInfo = module.m_toolBox.GetComm(ref m_rs232, module, "RFID RS232");
                 if (bInit)
                 {
                     m_rs232.OnReceive += M_rs232_OnReceive;

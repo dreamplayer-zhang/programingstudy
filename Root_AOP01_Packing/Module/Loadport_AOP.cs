@@ -44,22 +44,22 @@ namespace Root_AOP01_Packing.Module
         }
         public override void GetTools(bool bInit)
         {
-            p_sInfo = m_toolBox.Get(ref m_diPodCheck[0], this, "POD Check0");
-            p_sInfo = m_toolBox.Get(ref m_diPodCheck[1], this, "POD Check1");
-            p_sInfo = m_toolBox.Get(ref m_diPodCheck[2], this, "POD Check2");
-            p_sInfo = m_toolBox.Get(ref m_dioGuide, this, "Guide", "Up", "Down");
-            p_sInfo = m_toolBox.Get(ref m_axisDoor, this, "Door");
-            p_sInfo = m_toolBox.Get(ref m_diDoor[0], this, "Door Close");
-            p_sInfo = m_toolBox.Get(ref m_diDoor[1], this, "Door Open");
-            p_sInfo = m_toolBox.Get(ref m_doManual, this, "Manual");
-            p_sInfo = m_toolBox.Get(ref m_doAuto, this, "Auto");
-            p_sInfo = m_toolBox.Get(ref m_doPresent, this, "Present");
-            p_sInfo = m_toolBox.Get(ref m_doPlaced, this, "Placed");
-            p_sInfo = m_toolBox.Get(ref m_doLoad, this, "Load");
-            p_sInfo = m_toolBox.Get(ref m_doUnload, this, "Unload");
-            p_sInfo = m_toolBox.Get(ref m_doAlarm, this, "Alram");
+            p_sInfo = m_toolBox.GetDIO(ref m_diPodCheck[0], this, "POD Check0");
+            p_sInfo = m_toolBox.GetDIO(ref m_diPodCheck[1], this, "POD Check1");
+            p_sInfo = m_toolBox.GetDIO(ref m_diPodCheck[2], this, "POD Check2");
+            p_sInfo = m_toolBox.GetDIO(ref m_dioGuide, this, "Guide", "Up", "Down");
+            p_sInfo = m_toolBox.GetAxis(ref m_axisDoor, this, "Door");
+            p_sInfo = m_toolBox.GetDIO(ref m_diDoor[0], this, "Door Close");
+            p_sInfo = m_toolBox.GetDIO(ref m_diDoor[1], this, "Door Open");
+            p_sInfo = m_toolBox.GetDIO(ref m_doManual, this, "Manual");
+            p_sInfo = m_toolBox.GetDIO(ref m_doAuto, this, "Auto");
+            p_sInfo = m_toolBox.GetDIO(ref m_doPresent, this, "Present");
+            p_sInfo = m_toolBox.GetDIO(ref m_doPlaced, this, "Placed");
+            p_sInfo = m_toolBox.GetDIO(ref m_doLoad, this, "Load");
+            p_sInfo = m_toolBox.GetDIO(ref m_doUnload, this, "Unload");
+            p_sInfo = m_toolBox.GetDIO(ref m_doAlarm, this, "Alram");
             //p_sInfo = m_toolBox.Get(ref m_OHT, this, p_infoCarrier, "OHT");
-            p_sInfo = m_toolBox.Get(ref _OHT, this, p_infoCarrier, "OHT");
+            p_sInfo = m_toolBox.GetOHT(ref _OHT, this, p_infoCarrier, "OHT");
             if (bInit) 
             {
                 InitPos();
@@ -392,10 +392,10 @@ namespace Root_AOP01_Packing.Module
         #region StateHome
         public override string StateHome()
         {
-            if (EQ.p_bSimulate == false)
+            if (EQ.p_bSimulate)
             {
-                p_sInfo = base.StateHome();
-                if (p_sInfo != "OK") return p_sInfo; 
+                p_eState = eState.Ready;
+                return "OK";
             }
             p_sInfo = base.StateHome();
             p_eState = (p_sInfo == "OK") ? eState.Ready : eState.Error;

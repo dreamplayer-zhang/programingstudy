@@ -110,31 +110,31 @@ namespace Root_AOP01_Packing
         }
         public override void GetTools(bool bInit)
         {
-            p_sInfo = m_toolBox.Get(ref _axisAll[0], this, "Tape Stage Rotate");
-            p_sInfo = m_toolBox.Get(ref _axisAll[1], this, "Tape Cartridge X");
-            p_sInfo = m_toolBox.Get(ref _axisAll[2], this, "Loadport");
-            p_sInfo = m_toolBox.Get(ref _axisAll[3], this, "Unloadport");
-            p_sInfo = m_toolBox.Get(ref _axisAll[4], this, "Individual Elevator");
-            p_sInfo = m_toolBox.Get(ref _axisAll[5], this, "Vaccum Arm Width");
-            p_sInfo = m_toolBox.Get(ref _axisAll[6], this, "Vaccum Arm X");
-            p_sInfo = m_toolBox.Get(ref _axisAll[7], this, "Loader Plate X");
-            p_sInfo = m_toolBox.Get(ref _axisAll[8], this, "Picker X");
-            p_sInfo = m_toolBox.Get(ref _axisAll[9], this, "Picker Z");
-            p_sInfo = m_toolBox.Get(ref _axisAll[10], this, "Loader Pusher X");
+            p_sInfo = m_toolBox.GetAxis(ref _axisAll[0], this, "Tape Stage Rotate");
+            p_sInfo = m_toolBox.GetAxis(ref _axisAll[1], this, "Tape Cartridge X");
+            p_sInfo = m_toolBox.GetAxis(ref _axisAll[2], this, "Loadport");
+            p_sInfo = m_toolBox.GetAxis(ref _axisAll[3], this, "Unloadport");
+            p_sInfo = m_toolBox.GetAxis(ref _axisAll[4], this, "Individual Elevator");
+            p_sInfo = m_toolBox.GetAxis(ref _axisAll[5], this, "Vaccum Arm Width");
+            p_sInfo = m_toolBox.GetAxis(ref _axisAll[6], this, "Vaccum Arm X");
+            p_sInfo = m_toolBox.GetAxis(ref _axisAll[7], this, "Loader Plate X");
+            p_sInfo = m_toolBox.GetAxis(ref _axisAll[8], this, "Picker X");
+            p_sInfo = m_toolBox.GetAxis(ref _axisAll[9], this, "Picker Z");
+            p_sInfo = m_toolBox.GetAxis(ref _axisAll[10], this, "Loader Pusher X");
 
-            p_sInfo = m_toolBox.Get(ref _diEMS, this, "EMS");
+            p_sInfo = m_toolBox.GetDIO(ref _diEMS, this, "EMS");
 
-            p_sInfo = m_toolBox.Get(ref _diAllDoorLock, this, "All Door Lock");
+            p_sInfo = m_toolBox.GetDIO(ref _diAllDoorLock, this, "All Door Lock");
 
-            p_sInfo = m_toolBox.Get(ref _diDoorLock[0], this, "Main Panel Top left Door Lock");
-            p_sInfo = m_toolBox.Get(ref _diDoorLock[1], this, "Main Panel Bottom left Door Lock");
-            p_sInfo = m_toolBox.Get(ref _diDoorLock[2], this, "Main Panel Door");
+            p_sInfo = m_toolBox.GetDIO(ref _diDoorLock[0], this, "Main Panel Top left Door Lock");
+            p_sInfo = m_toolBox.GetDIO(ref _diDoorLock[1], this, "Main Panel Bottom left Door Lock");
+            p_sInfo = m_toolBox.GetDIO(ref _diDoorLock[2], this, "Main Panel Door");
 
-            p_sInfo = m_toolBox.Get(ref _diLightCurtain[0], this, "UnloadPort Light Curtain");
-            p_sInfo = m_toolBox.Get(ref _diLightCurtain[1], this, "LoadPort Light Curtain");
-            p_sInfo = m_toolBox.Get(ref _diProtectionBar, this, "Protection Bar");
+            p_sInfo = m_toolBox.GetDIO(ref _diLightCurtain[0], this, "UnloadPort Light Curtain");
+            p_sInfo = m_toolBox.GetDIO(ref _diLightCurtain[1], this, "LoadPort Light Curtain");
+            p_sInfo = m_toolBox.GetDIO(ref _diProtectionBar, this, "Protection Bar");
 
-            p_sInfo = m_toolBox.Get(ref _doDoorLock, this, "Door Lock");
+            p_sInfo = m_toolBox.GetDIO(ref _doDoorLock, this, "Door Lock");
 
             _alid_EMS = m_gaf.GetALID(this, "EMS", "EMS ERROR");
             _alid_DoorOpen = m_gaf.GetALID(this, "DOOR", "DOOR ERROR");

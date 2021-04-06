@@ -1,0 +1,316 @@
+﻿<UserControl x:Class="Root_VEGA_D.RecipeWizard_UI"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:local="clr-namespace:Root_VEGA_D"
+             xmlns:tools="clr-namespace:RootTools;assembly=RootTools"
+             xmlns:control="clr-namespace:Root_VEGA_D.Control"
+             xmlns:icon="clr-namespace:Root_VEGA_D.Icon"
+             mc:Ignorable="d"
+             d:DesignHeight="849"
+             d:DesignWidth="1052">
+    <Grid Background="White">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="2*"/>
+            <ColumnDefinition />
+        </Grid.ColumnDefinitions>
+        <GroupBox Header="Viewer">
+            <tools:RootViewer x:Name="Viewer_UI"/>
+        </GroupBox>
+        <Grid Grid.Column="1"
+              Margin="0,10,0,0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="45" />
+                <RowDefinition Height="12*" />
+                <RowDefinition Height="45*" />
+                <RowDefinition Height="43*" />
+            </Grid.RowDefinitions>
+            <Button Content="Snap"
+                    Margin="8,5"
+                    Style="{StaticResource SetupPanelBtn}" />
+            <GroupBox Header="Manaul Algin"
+                      Grid.Row="1">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition />
+                        <RowDefinition Height="35"/>
+                    </Grid.RowDefinitions>
+                    <Button Content="Align"
+                            Margin="0"
+                            Grid.Row="1"
+                            Style="{StaticResource SetupPanelBtn}" />
+                    <Grid Grid.Row="0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="2*" />
+                            <ColumnDefinition Width="3*" />
+                            <ColumnDefinition Width="2*" />
+                            <ColumnDefinition Width="3*" />
+                        </Grid.ColumnDefinitions>
+                        <RadioButton Content="Point 1" 
+                                     VerticalAlignment="Center"
+                                     HorizontalAlignment="Center"/>
+                        <TextBox Text="0,0"
+                                 Grid.Column="1"
+                                 IsReadOnly="True"
+                                 Margin="5,0"
+                                 HorizontalContentAlignment="Center"
+                                 VerticalAlignment="Center" />
+                        <RadioButton Content="Point 2" 
+                                         VerticalAlignment="Center"
+                                         HorizontalAlignment="Center"
+                                         Grid.Column="2"/>
+                        
+                        <TextBox Text="0,0"
+                                 Grid.Column="3"
+                                 IsReadOnly="True"
+                                 Margin="5,0"
+                                 HorizontalContentAlignment="Center"
+                                 VerticalAlignment="Center" />
+                    </Grid>
+                </Grid>
+            </GroupBox>
+            <GroupBox Header="Coordinate"
+                      Grid.Row="2">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="25*" />
+                        <RowDefinition Height="20" />
+                        <RowDefinition Height="75*" />
+                    </Grid.RowDefinitions>
+                    <UniformGrid Columns="2"
+                                 Margin="0,5"
+                                 Grid.Row="0">
+                        <TextBlock Text="Die Size"
+                                   HorizontalAlignment="Left" />
+                        <TextBlock Text="0, 0"
+                                   HorizontalAlignment="Left" />
+                        <TextBlock Text="Scribe Lane Size"
+                                   HorizontalAlignment="Left" />
+                        <TextBlock Text="0, 0"
+                                   HorizontalAlignment="Left" />
+                        <TextBlock Text="Shot Size"
+                                   HorizontalAlignment="Left" />
+                        <TextBlock Text="0, 0"
+                                   HorizontalAlignment="Left" />
+                        <TextBlock Text="Shot"
+                                   HorizontalAlignment="Left" />
+                        <TextBlock Text="0, 0"
+                                   HorizontalAlignment="Left" />
+                    </UniformGrid>
+                    <CheckBox Content="Manual Input"
+                              Grid.ColumnSpan="2"
+                              x:Name="cbManualMap"
+                              Margin="0,5,0,0"
+                              Grid.Row="1" />
+                    <Grid Grid.Row="2">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="40" />
+                            <ColumnDefinition Width="4*" />
+                            <ColumnDefinition Width="3*" />
+                            <ColumnDefinition Width="3*" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition />
+                            <RowDefinition />
+                            <RowDefinition />
+                            <RowDefinition />
+                            <RowDefinition />
+                            <RowDefinition />
+                            <RowDefinition />
+                            <RowDefinition />
+                            <RowDefinition />
+                            <RowDefinition Height="45" />
+                        </Grid.RowDefinitions>
+                        <TextBlock Text="Index"
+                                   Grid.Column="0"
+                                   HorizontalAlignment="Left"
+                                   Margin="0,2" />
+                        <TextBlock Text="Property"
+                                   Grid.Column="1"
+                                   Margin="0,2"
+                                   HorizontalAlignment="Left" />
+                        <TextBlock Text="X"
+                                   Grid.Column="2"
+                                   Margin="3,2" />
+                        <TextBlock Text="Y"
+                                   Grid.Column="3"
+                                   Margin="3,2" />
+                        <RadioButton Content="a."
+                                   Grid.Row="1"
+                                   HorizontalAlignment="Left" />
+                        <RadioButton Content="b."
+                                   Grid.Row="2"
+                                   HorizontalAlignment="Left" />
+                        <RadioButton Content="c."
+                                   Grid.Row="3"
+                                   HorizontalAlignment="Left" />
+                        <RadioButton Content="d."
+                                   Grid.Row="4"
+                                   HorizontalAlignment="Left" />
+                        <RadioButton Content="e."
+                                   Grid.Row="5"
+                                   HorizontalAlignment="Left" />
+                        <RadioButton Content="f."
+                                   Grid.Row="6"
+                                   HorizontalAlignment="Left" />
+                        <RadioButton Content="g."
+                                   Grid.Row="7"
+                                   HorizontalAlignment="Left" />
+                        <RadioButton Content="h."
+                                   Grid.Row="8"
+                                   HorizontalAlignment="Left" />
+                        <TextBlock Text="FirstDieLeft"
+                                   Grid.Column="1"
+                                   Grid.Row="1"
+                                   HorizontalAlignment="Left" />
+                        <TextBlock Text="FirstDieRight"
+                                   Grid.Column="1"
+                                   Grid.Row="2"
+                                   HorizontalAlignment="Left" />
+                        <TextBlock Text="SecondDieLeft"
+                                   Grid.Column="1"
+                                   Grid.Row="3"
+                                   HorizontalAlignment="Left" />
+                        <TextBlock Text="LastDieRight"
+                                   Grid.Column="1"
+                                   Grid.Row="4"
+                                   HorizontalAlignment="Left" />
+                        <TextBlock Text="FirstDieBottom"
+                                   Grid.Column="1"
+                                   Grid.Row="5"
+                                   HorizontalAlignment="Left" />
+                        <TextBlock Text="FirstDieUp"
+                                   Grid.Column="1"
+                                   Grid.Row="6"
+                                   HorizontalAlignment="Left" />
+                        <TextBlock Text="SecondDieBottom"
+                                   Grid.Column="1"
+                                   Grid.Row="7"
+                                   HorizontalAlignment="Left" />
+                        <TextBlock Text="LastDieUp"
+                                   Grid.Column="1"
+                                   Grid.Row="8"
+                                   HorizontalAlignment="Left" />
+                        <TextBox Grid.Column="2"
+                                 IsEnabled="{Binding ElementName=cbManualMap, Path=IsChecked}"
+                                 Grid.Row="1"
+                                 Margin="3,0"
+                                 VerticalAlignment="Center" />
+                        <TextBox Grid.Column="2"
+                                 IsEnabled="{Binding ElementName=cbManualMap, Path=IsChecked}"
+                                 Grid.Row="2"
+                                 Margin="3,0"
+                                 VerticalAlignment="Center" />
+                        <TextBox Grid.Column="2"
+                                 IsEnabled="{Binding ElementName=cbManualMap, Path=IsChecked}"
+                                 Grid.Row="3"
+                                 Margin="3,0"
+                                 VerticalAlignment="Center" />
+                        <TextBox Grid.Column="2"
+                                 IsEnabled="{Binding ElementName=cbManualMap, Path=IsChecked}"
+                                 Grid.Row="4"
+                                 Margin="3,0"
+                                 VerticalAlignment="Center" />
+                        <TextBox Grid.Column="2"
+                                 IsEnabled="{Binding ElementName=cbManualMap, Path=IsChecked}"
+                                 Grid.Row="5"
+                                 Margin="3,0"
+                                 VerticalAlignment="Center" />
+                        <TextBox Grid.Column="2"
+                                 IsEnabled="{Binding ElementName=cbManualMap, Path=IsChecked}"
+                                 Grid.Row="6"
+                                 Margin="3,0"
+                                 VerticalAlignment="Center" />
+                        <TextBox Grid.Column="2"
+                                 IsEnabled="{Binding ElementName=cbManualMap, Path=IsChecked}"
+                                 Grid.Row="7"
+                                 Margin="3,0"
+                                 VerticalAlignment="Center" />
+                        <TextBox Grid.Column="2"
+                                 IsEnabled="{Binding ElementName=cbManualMap, Path=IsChecked}"
+                                 Grid.Row="8"
+                                 Margin="3,0"
+                                 VerticalAlignment="Center" />
+                        <TextBox Grid.Column="3"
+                                 IsEnabled="{Binding ElementName=cbManualMap, Path=IsChecked}"
+                                 Grid.Row="1"
+                                 Margin="3,0"
+                                 VerticalAlignment="Center" />
+                        <TextBox Grid.Column="3"
+                                 IsEnabled="{Binding ElementName=cbManualMap, Path=IsChecked}"
+                                 Grid.Row="2"
+                                 Margin="3,0"
+                                 VerticalAlignment="Center" />
+                        <TextBox Grid.Column="3"
+                                 IsEnabled="{Binding ElementName=cbManualMap, Path=IsChecked}"
+                                 Grid.Row="3"
+                                 Margin="3,0"
+                                 VerticalAlignment="Center" />
+                        <TextBox Grid.Column="3"
+                                 IsEnabled="{Binding ElementName=cbManualMap, Path=IsChecked}"
+                                 Grid.Row="4"
+                                 Margin="3,0"
+                                 VerticalAlignment="Center" />
+                        <TextBox Grid.Column="3"
+                                 IsEnabled="{Binding ElementName=cbManualMap, Path=IsChecked}"
+                                 Grid.Row="5"
+                                 Margin="3,0"
+                                 VerticalAlignment="Center" />
+                        <TextBox Grid.Column="3"
+                                 IsEnabled="{Binding ElementName=cbManualMap, Path=IsChecked}"
+                                 Grid.Row="6"
+                                 Margin="3,0"
+                                 VerticalAlignment="Center" />
+                        <TextBox Grid.Column="3"
+                                 IsEnabled="{Binding ElementName=cbManualMap, Path=IsChecked}"
+                                 Grid.Row="7"
+                                 Margin="3,0"
+                                 VerticalAlignment="Center" />
+                        <TextBox Grid.Column="3"
+                                 IsEnabled="{Binding ElementName=cbManualMap, Path=IsChecked}"
+                                 Grid.Row="8"
+                                 Margin="3,0"
+                                 VerticalAlignment="Center" />
+                        <Button Content="Save"
+                                Grid.ColumnSpan="4"
+                                Grid.Row="10"
+                                Margin="0,5"
+                                Style="{StaticResource SetupPanelBtn}"/>
+                    </Grid>
+                </Grid>
+            </GroupBox>
+            <GroupBox Header="Help" Grid.Row="3">
+                <Grid>
+                    <Image Source="Resource/Reticle.png" Stretch="Fill" />
+                    <Canvas >
+                        <control:Arrow Text="a."
+                                       Canvas.Left="50"
+                                       Canvas.Top="216" />
+                        <!--<control:Arrow Text="b."
+                                       Canvas.Left="91"
+                                       Canvas.Top="216" />
+                        <control:Arrow Text="c."
+                                       Canvas.Left="100"
+                                       Canvas.Top="216" />
+                        <control:Arrow Text="d."
+                                       Canvas.Left="241"
+                                       Canvas.Top="216" />
+                        <control:Arrow Text="e."
+                                       Canvas.Left="241"
+                                       Canvas.Top="216" />
+                        <control:Arrow Text="f."
+                                       Canvas.Left="241"
+                                       Canvas.Top="168" />
+                        <control:Arrow Text="g."
+                                       Canvas.Left="241"
+                                       Canvas.Top="162" />
+                        <control:Arrow Text="h."
+                                       Canvas.Left="241"
+                                       Canvas.Top="7" />-->
+                    </Canvas>
+                </Grid>
+            </GroupBox>
+        </Grid>
+    </Grid>
+</UserControl>
