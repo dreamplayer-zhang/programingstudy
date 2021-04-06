@@ -203,12 +203,12 @@ namespace RootTools.Light
         }
         bool RunLVSnewTree(Tree tree)
         {
-            m_nLVS = tree.Set(m_nLVS, m_nLVS, "Count", "Light LVS Count (RS232)");
-            while (p_aLightToolLVSnew.Count > m_nLVS)
+            m_nLVSnew = tree.Set(m_nLVSnew, m_nLVSnew, "Count", "Light LVS Count (RS232)");
+            while (p_aLightToolLVSnew.Count > m_nLVSnew)
                 p_aLightToolLVSnew.RemoveAt(p_aLightToolLVSnew.Count - 1);
-            while (p_aLightToolLVSnew.Count < m_nLVS)
+            while (p_aLightToolLVSnew.Count < m_nLVSnew)
             {
-                LightTool_LVS_new lightTool = new LightTool_LVS_new(c_sLVS + "." + (char)('A' + p_aLightToolLVSnew.Count), m_engineer);
+                LightTool_LVS_new lightTool = new LightTool_LVS_new(c_sLVSnew + "." + (char)('A' + p_aLightToolLVSnew.Count), m_engineer);
                 p_aLightToolLVSnew.Add(lightTool);
             }
             return true;
