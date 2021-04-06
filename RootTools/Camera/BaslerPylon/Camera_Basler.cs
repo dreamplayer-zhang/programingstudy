@@ -565,6 +565,7 @@ namespace RootTools.Camera.BaslerPylon
                     
                     m_cam.StreamGrabber.ImageGrabbed += OnImageGrabbed;
                 }
+
                 // Starts the grabbing of one image.
                 m_cam.Parameters[PLCamera.AcquisitionMode].SetValue(PLCamera.AcquisitionMode.SingleFrame);
                 string s_curPixelFormat = m_cam.Parameters[PLCamera.PixelFormat].GetValue();
@@ -591,6 +592,10 @@ namespace RootTools.Camera.BaslerPylon
             catch (Exception) { }
         }
 
+        public bool IsConnected()
+        {
+            return m_cam.IsOpen;
+        }
 
         // Starts the continuous grabbing of images and handles exceptions.
         public void GrabContinuousShot(bool isImageUpdate = true)
