@@ -45,6 +45,8 @@ namespace Root_VEGA_P.Engineer
             m_loadport = new Loadport("Loadport", m_engineer);
             InitModule(m_loadport);
 
+            InitParticleCounter();
+
             m_rtr.RunTree(Tree.eMode.RegRead);
             m_rtr.RunTree(Tree.eMode.Init);
             m_rtr.ReadPod_Registry();
@@ -59,6 +61,14 @@ namespace Root_VEGA_P.Engineer
             ModuleBase_UI ui = new ModuleBase_UI();
             ui.Init(module);
             p_moduleList.AddModule(module, ui);
+        }
+
+        void InitParticleCounter()
+        {
+            ModuleBase module;
+            module = new ParticleCounter("Particle Counter", m_engineer);
+            //module = new ParticleCounter(m_id, m_engineer);
+            InitModule(module);
         }
 
         public bool IsEnableRecovery()
