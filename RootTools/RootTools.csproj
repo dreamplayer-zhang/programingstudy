@@ -250,6 +250,9 @@
       <DependentUpon>GraphWindowTest.xaml</DependentUpon>
     </Compile>
     <Compile Include="Comm\Modbus.cs" />
+    <Compile Include="Comm\ModbusData_UI.xaml.cs">
+      <DependentUpon>ModbusData_UI.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Comm\Modbus_UI.xaml.cs">
       <DependentUpon>Modbus_UI.xaml</DependentUpon>
     </Compile>
@@ -431,6 +434,10 @@
     <Compile Include="Light\LightTool_DAWOO.cs" />
     <Compile Include="Light\LightTool_DAWOO_UI.xaml.cs">
       <DependentUpon>LightTool_DAWOO_UI.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Light\LightTool_LVS_new.cs" />
+    <Compile Include="Light\LightTool_LVS_new_UI.xaml.cs">
+      <DependentUpon>LightTool_LVS_new_UI.xaml</DependentUpon>
     </Compile>
     <Compile Include="OHTNew\ILoadport.cs" />
     <Compile Include="OHTNew\OHT.cs" />
@@ -850,6 +857,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Comm\ModbusData_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Comm\Modbus_UI.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -1011,6 +1022,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Light\LightTool_Kwangwoo_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Light\LightTool_LVS_new_UI.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

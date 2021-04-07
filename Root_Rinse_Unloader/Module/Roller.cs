@@ -80,8 +80,8 @@ namespace Root_Rinse_Unloader.Module
         #region Align Axis
         public enum ePos
         {
-            W70,
-            W100,
+            W75,
+            W95,
         }
         void InitPosWidth()
         {
@@ -90,9 +90,9 @@ namespace Root_Rinse_Unloader.Module
 
         string RunMoveAlign(double fWidth)
         {
-            double fW70 = m_axisAlign.GetPosValue(ePos.W70);
-            double fW100 = m_axisAlign.GetPosValue(ePos.W100);
-            double dPos = (fW100 - fW70) * (fWidth - 70) / 30;
+            double fW75 = m_axisAlign.GetPosValue(ePos.W75);
+            double fW95 = m_axisAlign.GetPosValue(ePos.W95);
+            double dPos = (fW95 - fW75) * (fWidth - 75) / 20 + fW75;
             m_axisAlign.StartMove(dPos);
             return m_axisAlign.WaitReady();
         }
@@ -100,7 +100,7 @@ namespace Root_Rinse_Unloader.Module
         public string RunMoveAlign(bool bAlign)
         {
             double fWidth = m_rinse.p_widthStrip;
-            if (bAlign == false) fWidth += 10000; 
+            if (bAlign == false) fWidth += 5; 
             return RunMoveAlign(fWidth); 
         }
         #endregion
@@ -178,7 +178,9 @@ namespace Root_Rinse_Unloader.Module
             foreach (Line line in m_aLine)
             {
                 line.m_dioAlignUp[0].Write(bUp);
+                Thread.Sleep(100);
                 line.m_dioAlignUp[1].Write(bUp);
+                Thread.Sleep(100); 
             }
             Thread.Sleep(100);
             StopWatch sw = new StopWatch();
