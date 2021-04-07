@@ -30,7 +30,8 @@ namespace Root_Rinse_Unloader.MainUI
 
         public void OnTimer(bool bBlink)
         {
-            buttonClamp.Foreground = (bBlink && m_magazine.p_bClamp) ? Brushes.Red : Brushes.Black;
+            if (m_magazine.p_bCheck == false) buttonClamp.Foreground = Brushes.LightGray;
+            else buttonClamp.Foreground = (bBlink && m_magazine.p_bClamp) ? Brushes.Red : Brushes.Black;
         }
     }
 }

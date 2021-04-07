@@ -73,12 +73,12 @@ namespace Root_Rinse_Loader.Module
             public void CheckSensor()
             {
                 p_bCheck = m_diCheck.p_bIn;
-                p_bClamp = m_dioClamp.p_bIn; 
+                p_bClamp = !m_dioClamp.p_bIn; 
             }
 
             public void RunClamp(bool bClamp)
             {
-                m_dioClamp.Write(bClamp && p_bCheck); 
+                m_dioClamp.Write(!bClamp); 
             }
 
             public eMagazine m_eMagazine = eMagazine.Magazine1;
