@@ -347,7 +347,7 @@
                                         </Grid>
                                     </TabItem>
                                     <TabItem Header="PM Setting">
-                                        <control:PMCheckReview DataContext="{Binding p_PMCheckReview_ViewModel}" />
+                                        <local:PMCheckReview DataContext="{Binding p_PMCheckReview_ViewModel}" />
                                     </TabItem>
                                 </TabControl>
                             </GroupBox>

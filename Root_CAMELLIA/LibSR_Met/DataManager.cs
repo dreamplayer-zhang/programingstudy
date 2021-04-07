@@ -1,4 +1,5 @@
 ﻿using NanoView;
+using Root_CAMELLIA.Data;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -71,8 +72,6 @@ namespace Root_CAMELLIA.LibSR_Met
             guest1path = null;
             guest2name = null;
             guest2path = null;
-
-            linearScale = new LinearScale();
         }
 
         //Get Transmittance 
@@ -87,7 +86,6 @@ namespace Root_CAMELLIA.LibSR_Met
         public double dTHKRangeRate = 100;    //두께 범위 (%)-> CONSTVALUE 값으로 지정할 것
         public double dTargetThickness;   //투과율계산용 타겟 두께
         public bool bUseTargetTHK;  //투과율 계산시 타겟 두께를 쓸것인가 여부
-        public LinearScale scales = new LinearScale();  //190627
         
         //
     }
@@ -121,8 +119,16 @@ namespace Root_CAMELLIA.LibSR_Met
     ///</summary>
     public class LinearScale  //190627
     {
-        public double dScale = 1.0; //Ax + B의 A  
-        public double dOffset = 0.0;  //Ax + B의 B
+        public double dWaveLength { get; private set; } = 350;
+        public double dScale { get; private set; } = 1.0; //Ax + B의 A  
+        public double dOffset { get; private set; } = 0.0;  //Ax + B의 B
+
+        public LinearScale(double waveLength, double scale, double offset)
+        {
+            dWaveLength = waveLength;
+            dScale = scale;
+            dOffset = offset;
+        }
     }
 
     public class HoleData
@@ -147,9 +153,10 @@ namespace Root_CAMELLIA.LibSR_Met
         private static DataManager instance = null;
         public LogManager m_Log;
         public RawData[] m_RawData;    //point 갯수만큼
-        public List<ContourMapData> m_ContourMapData;
-        public List<double> m_WL_List_R;  //관심 refelctance의 wavelength list
-        public List<double> m_WL_List_T;  //관심 transmittance의 wavelength list
+        public List<ContourMapData> m_ContourMapDataR;
+        public List<ContourMapData> m_ContourMapDataT;
+        public List<WavelengthItem> m_ScalesListR;
+        public List<WavelengthItem> m_ScalesListT;
         public List<LayerData> m_LayerData;
         public bool bExcept_NIR = false;
         public bool bThickness = true;
@@ -190,9 +197,10 @@ namespace Root_CAMELLIA.LibSR_Met
         {
             m_Log = new LogManager();
             m_RawData = new RawData[ConstValue.RAWDATA_POINT_MAX_SIZE];
-            m_ContourMapData = new List<ContourMapData>();
-            m_WL_List_R = new List<double>();// 특정 반사율 파장 리스트 
-            m_WL_List_T = new List<double>();// 특정 투과율 파장 리스트 
+            m_ContourMapDataR = new List<ContourMapData>();
+            m_ContourMapDataT = new List<ContourMapData>();
+            m_ScalesListR = new List<WavelengthItem>(); //190627
+            m_ScalesListT = new List<WavelengthItem>();
             m_LayerData = new List<LayerData>();
 
             m_SettngData = new SettingData();
@@ -344,7 +352,6 @@ namespace Root_CAMELLIA.LibSR_Met
                 for (int n = 0; n < ConstValue.RAWDATA_POINT_MAX_SIZE; n++)
                 {
                     m_RawData[n].bDataExist = false;
-                    //m_RawData[n].Wavelength = new double[ConstValue.SPECTROMETER_MAX_PIXELSIZE];
                     m_RawData[n].Wavelength = Enumerable.Repeat(0.0, ConstValue.SPECTROMETER_MAX_PIXELSIZE).ToArray();
                     //m_RawData[n].Reflectance = new double[ConstValue.SPECTROMETER_MAX_PIXELSIZE];
                     m_RawData[n].Reflectance = Enumerable.Repeat(0.0, ConstValue.SPECTROMETER_MAX_PIXELSIZE).ToArray();
@@ -386,15 +393,37 @@ namespace Root_CAMELLIA.LibSR_Met
                     throw new Exception("Point: "+ nPointIndex .ToString()+ " Data is not exist.");
                 }
 
-                if(Path.GetExtension(sPath) != ".csv")
+                
+
+                string [] sFilePath = sPath.Split('\\');
+                string sFolderPath = "";
+                for (int i=0; i< sFilePath.Length-1; i++)
+                {
+                    sFolderPath += sFilePath[i]+"\\";
+                }
+
+                sFolderPath += nPointIndex.ToString() + "\\";
+
+
+                if (!Directory.Exists(sFolderPath))
+                {
+                    Directory.CreateDirectory(sFolderPath);
+                }
+
+                string strPath = sFolderPath;
+                if (!Directory.Exists(strPath))
+                {
+                    Directory.CreateDirectory(strPath);
+                }
+
+                sFolderPath += sFilePath[sFilePath.Length-1];
+                sPath = sFolderPath;
+                if (Path.GetExtension(sPath) != ".csv")
                     sPath += ".csv";
-
-                StreamWriter sw = new StreamWriter(sPath);
+                StreamWriter sw = new StreamWriter (sPath);
                 RawData data = m_RawData[nPointIndex];
-
-                Array.Reverse(data.Transmittance);
                 sw.WriteLine("Wavelength[nm],Reflectance[%],Transmittance[%]");
-                for (int n = 0; n < data.Transmittance.Length ; n++)
+                for (int n = 0; n < data.nNIRDataNum; n++)
                 {
                     sw.WriteLine("{0},{1},{2}", data.Wavelength[n], data.Reflectance[n], data.Transmittance[n]);
                 }
@@ -417,26 +446,35 @@ namespace Root_CAMELLIA.LibSR_Met
                 {
                     throw new Exception("Point: " + nPointIndex.ToString() + " Data is not exist.");
                 }
-                bool bFirst = true;
-                if (File.Exists(sPath))
+
+                string[] sFilePath = sPath.Split('\\');
+                string sFolderPath = "";
+                for (int i = 0; i < sFilePath.Length - 1; i++)
                 {
-                    bFirst = false;
+                    sFolderPath += sFilePath[i] + "\\";
                 }
-                else
+
+                if (!Directory.Exists(sFolderPath))
                 {
-                    string FileSpace = sPath.Replace(".csv", "");
-                    File.Create(FileSpace);
+                    Directory.CreateDirectory(sFolderPath);
                 }
+
+                string strPath = sFolderPath;
+                if (!Directory.Exists(strPath))
+                {
+                    Directory.CreateDirectory(strPath);
+                }
+
 
                 if (Path.GetExtension(sPath) != ".csv")
                 {
                     sPath += ".csv";
                 }
-                StreamWriter sw = new StreamWriter(new FileStream(sPath, FileMode.Create));
+                StreamWriter sw = new StreamWriter (sPath);
                 RawData data = m_RawData[nPointIndex];
 
                 sw.WriteLine("Wavelength[nm],Reflectance[%]");
-                for (int n = 0; n < data.Wavelength.Length; n++)
+                for (int n = 0; n < m_RawData[nPointIndex].nNIRDataNum; n++)
                 {
                     sw.WriteLine("{0},{1}", data.Wavelength[n], data.Reflectance[n]);
                 }
@@ -476,46 +514,14 @@ namespace Root_CAMELLIA.LibSR_Met
             return true;
         }
 
-        public bool SaveRT(string sPath, int nPointIdx, double dLowerWavelength, double dUpperWavelength)   //우리 포멧용
+        public bool SaveRT(string sPath, int nPointIdx)   //우리 포멧용
         {
-            int nDataMin = 9999;
-            int nDataMinLayerIdx = 0;
-            for (int n = 0; n < m_LayerData.Count; n++)
-            {
-                if (m_LayerData[n].wavelength.Count < nDataMin)
-                {
-                    nDataMin = m_LayerData[n].wavelength.Count;
-                    nDataMinLayerIdx = n;
-                }
-            }
-
-            int nStartNum = 0, nEndNum = 0;
-            bool bFound = false;
-            for (int n = 0; n < m_RawData[nPointIdx].Wavelength.Count(); n++)
-            {
-                if (m_LayerData[nDataMinLayerIdx].wavelength[0] < m_RawData[nPointIdx].Wavelength[n]
-                    && m_RawData[nPointIdx].Wavelength[n] < m_LayerData[nDataMinLayerIdx].wavelength[nDataMin - 1])
-                {
-                    if (bFound == false)
-                    {
-                        nStartNum = n;
-                        bFound = true;
-                    }
-                }
-                else if (bFound == true)
-                {
-                    nEndNum = n;
-                    break;
-                }
-            }
-
             if (Path.GetExtension(sPath) != ".csv")
             {
                 sPath += ".csv";
             }
             StreamWriter writer = new StreamWriter(sPath);
             RawData raw = m_RawData[nPointIdx];
-
             if (writer == null)
             {
                 return false;
@@ -525,24 +531,18 @@ namespace Root_CAMELLIA.LibSR_Met
             {
                 writer.WriteLine(m_LayerData[n].sRefName + "," + raw.Thickness[n].ToString());
             }
-
             writer.WriteLine("Wavelength,Reflectance,Transmittance");
-
-            if (raw.Transmittance != null)
+            for (int n = 0; n < raw.nNIRDataNum; n++)
             {
-                for (int n = 0; n < raw.nNIRDataNum; n++)
+                if (bTransmittance)
                 {
-                    if (nStartNum <= n && n < nEndNum)
-                    {
-                        writer.WriteLine(raw.Wavelength[n].ToString() + "," + raw.Reflectance[n].ToString() + "," + raw.Transmittance[n - nStartNum].ToString());
-                    }
-                    else
-                    {
-                        writer.WriteLine(raw.Wavelength[n].ToString() + "," + raw.Reflectance[n].ToString());
-                    }
+                    writer.WriteLine(raw.Wavelength[n].ToString() + "," + raw.Reflectance[n].ToString() + "," + raw.Transmittance[n].ToString());
+                }
+                else
+                {
+                    writer.WriteLine(raw.Wavelength[n].ToString() + "," + raw.Reflectance[n].ToString());
                 }
             }
-
             writer.Close();
             return true;
         }
@@ -567,7 +567,7 @@ namespace Root_CAMELLIA.LibSR_Met
                 sw.WriteLine();
                 sw.WriteLine("WAFER ID," + sWaferID);
                 sw.WriteLine("LOT ID," + sFoupID + "_" + sLotID);
-                sw.WriteLine("WAFER #," + sWaferNum[1]);
+                //sw.WriteLine("WAFER #," + sWaferNum[1]);
                 sw.WriteLine("SLOT," + sSlotID);
                 sw.WriteLine("WAFER STATUS," + "Pass");
                 sw.WriteLine("DATA TYPE," + "TF");
@@ -715,13 +715,13 @@ namespace Root_CAMELLIA.LibSR_Met
                 sw.WriteLine();
 
                 sHeader = "X_Ref,Y_Ref,root lot ID,SLOT ID,Site";
-                foreach (double R in m_WL_List_R)
+                foreach (WavelengthItem R in m_ScalesListR)
                 {
-                    sHeader += ",R_" + R.ToString("0.####");
+                    sHeader += ",R_" + R.p_waveLength.ToString("0.####");
                 }
-                foreach (double T in m_WL_List_T)
+                foreach (WavelengthItem T in m_ScalesListT)
                 {
-                    sHeader += ",T_" + T.ToString("0.####");
+                    sHeader += ",T_" + T.p_waveLength.ToString("0.####");
                 }
                 sw.WriteLine(sHeader);
 
@@ -731,9 +731,14 @@ namespace Root_CAMELLIA.LibSR_Met
                     {
                         sData = string.Empty;
                         sData += m_RawData[n].dX.ToString("0.####") + "," + m_RawData[n].dY.ToString("0.####") + "," + sLotID + "," + sSlotID + "," + (n + 1).ToString();
-                        for (int i = 0; i < m_ContourMapData.Count; i++)
+                        for (int i = 0; i < m_ContourMapDataR.Count; i++)
                         {
-                            sData += "," + m_ContourMapData[i].HoleData[n].Value.ToString("0.####");
+                            sData += "," + m_ContourMapDataR[i].HoleData[n].Value.ToString("0.####");
+                        }
+                        sw.WriteLine(sData);
+                        for (int i = 0; i < m_ContourMapDataT.Count; i++)
+                        {
+                            sData += "," + m_ContourMapDataT[i].HoleData[n].Value.ToString("0.####");
                         }
                         sw.WriteLine(sData);
                     }
@@ -930,13 +935,13 @@ namespace Root_CAMELLIA.LibSR_Met
 
                 //summary
                 sHeader = "X_Ref,Y_Ref,root lot ID,SLOT ID,Site";
-                foreach (double R in m_WL_List_R)
+                foreach (WavelengthItem R in m_ScalesListR)
                 {
-                    sHeader += ",R_" + R.ToString("0.####");
+                    sHeader += ",R_" + R.p_waveLength.ToString("0.####");
                 }
-                foreach (double T in m_WL_List_T)
+                foreach (WavelengthItem T in m_ScalesListT)
                 {
-                    sHeader += ",T_" + T.ToString("0.####");
+                    sHeader += ",T_" + T.p_waveLength.ToString("0.####");
                 }
                 sHeader += ",GOF";
                 for (int n = 0; n < m_LayerData.Count - 1; n++)
@@ -951,9 +956,13 @@ namespace Root_CAMELLIA.LibSR_Met
                     {
                         sData = string.Empty;
                         sData += m_RawData[n].dX.ToString("0.####") + "," + m_RawData[n].dY.ToString("0.####") + "," + sLotID + "," + sSlotID + "," + (n + 1).ToString();
-                        for (int i = 0; i < m_ContourMapData.Count; i++)
+                        for (int i = 0; i < m_ContourMapDataR.Count; i++)
                         {
-                            sData += "," + m_ContourMapData[i].HoleData[n].Value.ToString("0.####");
+                            sData += "," + m_ContourMapDataR[i].HoleData[n].Value.ToString("0.####");
+                        }
+                        for (int i = 0; i < m_ContourMapDataT.Count; i++)
+                        {
+                            sData += "," + m_ContourMapDataT[i].HoleData[n].Value.ToString("0.####");
                         }
                         sData += "," + m_RawData[n].dGoF.ToString("0.####");
                         for (int i = 0; i < m_RawData[n].Thickness.Count; i++)
@@ -1168,13 +1177,13 @@ namespace Root_CAMELLIA.LibSR_Met
 
                 //summary
                 sHeader = "X_Ref,Y_Ref,root lot ID,SLOT ID,Site";
-                foreach (double R in m_WL_List_R)
+                foreach (WavelengthItem R in m_ScalesListR)
                 {
-                    sHeader += ",R_" + R.ToString("0.####");
+                    sHeader += ",R_" + R.p_waveLength.ToString("0.####");
                 }
-                foreach (double T in m_WL_List_T)
+                foreach (WavelengthItem T in m_ScalesListT)
                 {
-                    sHeader += ",T_" + T.ToString("0.####");
+                    sHeader += ",T_" + T.p_waveLength.ToString("0.####");
                 }
                 sHeader += ",GOF";
                 for (int n = 0; n < m_LayerData.Count - 1; n++)
@@ -1192,9 +1201,13 @@ namespace Root_CAMELLIA.LibSR_Met
                         {
                             sData = string.Empty;
                             sData += m_RawData[n].dX.ToString("0.####") + "," + m_RawData[n].dY.ToString("0.####") + "," + sLotID + "," + sSlotID + "," + (m + 1).ToString();
-                            for (int i = 0; i < m_ContourMapData.Count; i++)
+                            for (int i = 0; i < m_ContourMapDataR.Count; i++)
                             {
-                                sData += "," + m_ContourMapData[i].HoleData[n].Value.ToString("0.####");
+                                sData += "," + m_ContourMapDataR[i].HoleData[n].Value.ToString("0.####");
+                            }
+                            for (int i = 0; i < m_ContourMapDataT.Count; i++)
+                            {
+                                sData += "," + m_ContourMapDataT[i].HoleData[n].Value.ToString("0.####");
                             }
                             sData += "," + m_RawData[n].dGoF.ToString("0.####");
                             for (int i = 0; i < m_RawData[n].Thickness.Count; i++)
@@ -1227,38 +1240,7 @@ namespace Root_CAMELLIA.LibSR_Met
             int n = 0;
             try
             {
-                //int nDataMin = 9999;
-                //int nDataMinLayerIdx = 0;
-                //for (int i = 0; i < m_LayerData.Count; i++)
-                //{
-                //    if (m_LayerData[i].wavelength.Count < nDataMin)
-                //    {
-                //        nDataMin = m_LayerData[i].wavelength.Count;
-                //        nDataMinLayerIdx = i;
-                //    }
-                //}
-
-                //int nStartNum = 0, nEndNum = 0;
-                //bool bFound = false;
-                //for (int i = 0; i < m_RawData[nPointIdx].Wavelength.Count(); i++)
-                //{
-                //    if (m_LayerData[nDataMinLayerIdx].wavelength[0] < m_RawData[nPointIdx].Wavelength[i]
-                //        && m_RawData[nPointIdx].Wavelength[i] < m_LayerData[nDataMinLayerIdx].wavelength[nDataMin - 1])
-                //    {
-                //        if (bFound == false)
-                //        {
-                //            nStartNum = i;
-                //            bFound = true;
-                //        }
-                //    }
-                //    else if (bFound == true)
-                //    {
-                //        nEndNum = i;
-                //        break;
-                //    }
-                //}
-
-                string[] sWaferNum = sWaferID.Split('.');
+                //string[] sWaferNum = sWaferID.Split('.');
                 RawData raw = m_RawData[nPointIdx];
 
                 StreamWriter sw = new StreamWriter(sPath);
@@ -1275,7 +1257,7 @@ namespace Root_CAMELLIA.LibSR_Met
                 sw.WriteLine();
                 sw.WriteLine("WAFER ID," + sWaferID);
                 sw.WriteLine("LOT ID," + sFoupID + "_" + sLotID);
-                sw.WriteLine("WAFER #," + sWaferNum[1]);
+                //  sw.WriteLine("WAFER #," + sWaferNum[1]);
                 sw.WriteLine("SLOT," + sSlotID);
                 sw.WriteLine();
                 sw.WriteLine("WAFER STATUS," + "Pass");
@@ -1285,22 +1267,17 @@ namespace Root_CAMELLIA.LibSR_Met
                 sw.WriteLine("Y_Position," + dYPos.ToString("F3"));
                 sw.WriteLine();
                 sw.WriteLine("Wavelength [nm],Reflectance,Transmittance");
-
-                for (n = 0; n < raw.Wavelength.Count(); n++)
-                {
-                    //수정? 투과율 계산 공식이 반영 된다면 수정되어야 함
-                    //if (nStartNum <= n && n < nEndNum)
-                    //{
-                    //    sw.WriteLine(raw.Wavelength[n].ToString("0.####") + "," + raw.Reflectance[n].ToString("0.####") + "," + raw.Transmittance[n - nStartNum].ToString("0.####"));
-                    //}
-                    //else
-                    //{
-                    //    sw.WriteLine(raw.Wavelength[n].ToString("0.####") + "," + raw.Reflectance[n].ToString("0.####") + ",0");
-                    //}
-                    sw.WriteLine(raw.Wavelength[n].ToString("0.####") + "," + raw.Reflectance[n].ToString("0.####") + "," + raw.Transmittance[n].ToString("0.####"));
-                    
-                }
-
+                    for (n = 0 ; n < raw.nNIRDataNum; n++)
+                    {
+                        if (bTransmittance)
+                        {
+                            sw.WriteLine(raw.Wavelength[n].ToString("0.####") + "," + raw.Reflectance[n].ToString("0.####") + "," + raw.Transmittance[n].ToString("0.####"));
+                        }
+                        else
+                        {
+                            sw.WriteLine(raw.Wavelength[n].ToString("0.####") + "," + raw.Reflectance[n].ToString("0.####") + ",0");
+                        }
+                    }
                 sw.Close();
                 m_Log.WriteLog(LogType.Datas, " SaveResultFileSlot()_Saved");
                 return true;
@@ -1324,13 +1301,13 @@ namespace Root_CAMELLIA.LibSR_Met
             {
                 StreamWriter sw = new StreamWriter(sPath);
                 string sHeader = "X_Ref,Y_Ref,root lot ID,SLOT ID,Site";
-                foreach (double R in m_WL_List_R)
+                foreach (WavelengthItem R in m_ScalesListR)
                 {
-                    sHeader += ",R_" + R.ToString("0.####");
+                    sHeader += ",R_" + R.p_waveLength.ToString("0.####");
                 }
-                foreach (double T in m_WL_List_T)
+                foreach (WavelengthItem T in m_ScalesListT)
                 {
-                    sHeader += ",T_" + T.ToString("0.####");
+                    sHeader += ",T_" + T.p_waveLength.ToString("0.####");
                 }
                 sHeader += ",GOF";
                 for (n = 0; n < m_LayerData.Count - 1; n++)// Recipe 설정 Model data (박막 물질)
@@ -1340,15 +1317,19 @@ namespace Root_CAMELLIA.LibSR_Met
                 sw.WriteLine(sHeader);
 
                 string sData;
-                for (n = 0; n < m_RawData.Length; n++)
+                for (n = 0; n < 13; n++)
                 {
                     if (m_RawData[n].Wavelength.Length != 0)// 수정? .count 였는데 .length 사용
                     {
                         sData = string.Empty;// 수정? dX와 dY 가 데이터를 받도록 연결되어있는지 확인 필요
                         sData += m_RawData[n].dX.ToString("0.####") + "," + m_RawData[n].dY.ToString("0.####") + "," + sLotID + "," + sSlotID + "," + (n + 1).ToString();
-                        for (int i = 0; i < m_ContourMapData.Count; i++)
+                        for (int i = 0; i < m_ContourMapDataR.Count; i++)
                         {
-                            sData += "," + m_ContourMapData[i].HoleData[n].Value.ToString("0.####");
+                            sData += "," + m_ContourMapDataR[i].HoleData[n].Value.ToString("0.####");
+                        }
+                        for (int i = 0; i < m_ContourMapDataT.Count; i++)
+                        {
+                            sData += "," + m_ContourMapDataT[i].HoleData[n].Value.ToString("0.####");
                         }
                         sData += "," + m_RawData[n].dGoF.ToString("0.####");
 
@@ -1381,13 +1362,13 @@ namespace Root_CAMELLIA.LibSR_Met
 
                 StreamWriter sw = new StreamWriter(sPath);
                 string sHeader = "X_Ref,Y_Ref,root lot ID,SLOT ID,Site";
-                foreach (double R in m_WL_List_R)
+                foreach (WavelengthItem R in m_ScalesListR)
                 {
-                    sHeader += ",R_" + R.ToString("0.####");
+                    sHeader += ",R_" + R.p_waveLength.ToString("0.####");
                 }
-                foreach (double T in m_WL_List_T)
+                foreach (WavelengthItem T in m_ScalesListT)
                 {
-                    sHeader += ",T_" + T.ToString("0.####");
+                    sHeader += ",T_" + T.p_waveLength.ToString("0.####");
                 }
                 sHeader += ",GOF";
                 for (n = 0; n < m_LayerData.Count - 1; n++)
@@ -1407,9 +1388,13 @@ namespace Root_CAMELLIA.LibSR_Met
                         {
                             sData = string.Empty;
                             sData += m_RawData[n].dX.ToString("0.####") + "," + m_RawData[n].dY.ToString("0.####") + "," + sLotID + "," + sSlotID + "," + (m + 1).ToString();
-                            for (int i = 0; i < m_ContourMapData.Count; i++)
+                            for (int i = 0; i < m_ContourMapDataR.Count; i++)
                             {
-                                sData += "," + m_ContourMapData[i].HoleData[n].Value.ToString("0.####");
+                                sData += "," + m_ContourMapDataR[i].HoleData[n].Value.ToString("0.####");
+                            }
+                            for (int i = 0; i < m_ContourMapDataT.Count; i++)
+                            {
+                                sData += "," + m_ContourMapDataT[i].HoleData[n].Value.ToString("0.####");
                             }
                             sData += "," + m_RawData[n].dGoF.ToString("0.####");
 
@@ -1433,6 +1418,120 @@ namespace Root_CAMELLIA.LibSR_Met
             }
         }
 
+        public void AllContourMapDataFitting(List<WavelengthItem> R, List<WavelengthItem> T)
+        {
+            m_ScalesListR = new List<WavelengthItem>(R.ToArray());
+            m_ScalesListT = new List<WavelengthItem>(T.ToArray());
+            if (m_RawData[0].Wavelength[0] == 0)
+                return;
+
+            m_ContourMapDataR.Clear();
+            m_ContourMapDataT.Clear();
+
+            for(int i = 0; i < m_ScalesListR.Count; i++)
+            {
+                ContourMapData mapdata = new ContourMapData();
+                mapdata.Valuetype = FitValueType.Reflectance;
+                mapdata.Wavelength = m_ScalesListR[i].p_waveLength;
+                m_ContourMapDataR.Add(mapdata);
+            }
+            for(int i = 0; i < m_ScalesListT.Count; i++)
+            {
+                ContourMapData mapdata = new ContourMapData();
+                mapdata.Valuetype = FitValueType.Transmittance;
+                mapdata.Wavelength = m_ScalesListT[i].p_waveLength;
+                m_ContourMapDataT.Add(mapdata);
+            }
+
+
+            for (int n = 0; n < 13; n++)
+            {
+                int indexR = 0;
+                int indexT = 0;
+                bool isDoneR = false;
+                bool isDoneT = false;
+                for (int k = 0; k < m_RawData[n].nNIRDataNum; k++)
+                {
+
+                    double dRawDataWaveLength = m_RawData[n].Wavelength[k];
+                    if (dRawDataWaveLength == m_ScalesListR[indexR].p_waveLength && !isDoneR)
+                    {
+                        double dValue = m_RawData[n].Reflectance[k];
+                        //double dWaveLength = m_ScalesListR[indexR].p_waveLength;
+                        HoleData holedata = new HoleData();
+                        holedata.XPos = m_RawData[n].dX;
+                        holedata.YPos = m_RawData[n].dY;
+                        dValue *= m_ScalesListR[indexR].p_scale;  //190627
+                        dValue += m_ScalesListR[indexR].p_offset; //190627
+                        holedata.Value = dValue;
+                        m_ContourMapDataR[indexR].HoleData.Add(holedata);                    
+
+                        indexR++;
+                    }
+
+                    if(indexR == m_ScalesListR.Count)
+                    {
+                        isDoneR = true;
+                    }
+
+                    if(dRawDataWaveLength == m_ScalesListT[indexT].p_waveLength && !isDoneT)
+                    {
+                        double dValue = m_RawData[n].Reflectance[k];
+                        //double dWaveLength = m_ScalesListT[indexT].p_waveLength;
+                        HoleData holedata = new HoleData();
+                        holedata.XPos = m_RawData[n].dX;
+                        holedata.YPos = m_RawData[n].dY;
+                        dValue *= m_ScalesListT[indexT].p_scale;  //190627
+                        dValue += m_ScalesListT[indexT].p_offset; //190627
+                        holedata.Value = dValue;
+                        m_ContourMapDataT[indexT].HoleData.Add(holedata);
+
+
+
+                        indexT++;
+                    }
+
+                    if (indexT == m_ScalesListT.Count)
+                    {
+                        isDoneT = true;
+                    }
+
+                    if (isDoneR && isDoneT)
+                    {
+                        break;
+                    }
+                }
+            }
+
+
+            //for (int n = 0; n < m_RawData.Length; n++)
+            //{
+            //    int index = 0;
+            //    for (int k = 0; k < m_RawData[n].nNIRDataNum; k++)
+            //    {
+            //        double dValue = m_RawData[n].Transmittance[k];
+            //        double dWaveLength = m_ScalesListT[index].p_waveLength;
+            //        if (dValue == m_ScalesListT[index].p_waveLength)
+            //        {
+
+
+            //            HoleData holedata = new HoleData();
+            //            holedata.XPos = m_RawData[n].dX;
+            //            holedata.YPos = m_RawData[n].dY;
+            //            dValue *= m_ScalesListT[index].p_scale;  //190627
+            //            dValue += m_ScalesListT[index].p_offset; //190627
+            //            holedata.Value = dValue;
+            //            m_ContourMapData[m_ScalesListT.Count].HoleData.Add(holedata);
+
+            //            ContourMapData mapdata = new ContourMapData();
+            //            mapdata.Valuetype = FitValueType.Transmittance;
+            //            mapdata.Wavelength = dWaveLength;
+            //            m_ContourMapData.Add(mapdata);
+            //        }
+            //    }
+            //}
+              
+        }
         #endregion
 
     }

@@ -95,7 +95,7 @@ namespace RootTools.Camera.Dalsa
             TdiArea,
         }
 
-        
+
         public enum eDeviceScanType
         {
             Linescan,
@@ -107,7 +107,7 @@ namespace RootTools.Camera.Dalsa
             Internal,
             External,
         }
-        
+
         public Log m_log;
         SapAcqDevice m_sapCam;
         SapAcquisition m_SapGrabber;
@@ -131,7 +131,7 @@ namespace RootTools.Camera.Dalsa
                 return m_Height;
             }
             set
-            {   
+            {
                 SetFeatureValue(ref m_Height, value, "Height", typeof(ulong));
                 RaisePropertyChanged();
             }
@@ -189,9 +189,9 @@ namespace RootTools.Camera.Dalsa
         eDeviceScanType m_eDeviceScanType = eDeviceScanType.Linescan;
         public eDeviceScanType p_eDeviceScanType
         {
-            get 
+            get
             {
-                return m_eDeviceScanType; 
+                return m_eDeviceScanType;
             }
             set
             {
@@ -273,7 +273,7 @@ namespace RootTools.Camera.Dalsa
                 default:
                     m_log.Info("Dalsa Cam Feature Change Fail - Type Def Fail");
                     break;
-            }  
+            }
         }
         public void SetGrabDirection(eDir dir)
         {
@@ -289,14 +289,14 @@ namespace RootTools.Camera.Dalsa
         public void ReadParamter()
         {
             //ulong buff= 0;
-            int nBuff =0;
+            int nBuff = 0;
             //m_sapCam.GetFeatureValue("Width", out buff);
             //m_Width = Convert.ToInt32( buff);
             //m_sapCam.GetFeatureValue("Height", out buff);
             //m_Height = Convert.ToInt32(buff);
             //m_SapGrabber.GetParameter(SapAcquisition.Prm.HACTIVE, out nBuff);
             //m_Height = nBuff;
-            
+
             m_SapGrabber.GetCapability(SapAcquisition.Cap.HACTIVE_MAX, out nBuff);
             m_SapGrabber.GetParameter(SapAcquisition.Prm.CROP_WIDTH, out m_Width);
             m_SapGrabber.GetParameter(SapAcquisition.Prm.CROP_HEIGHT, out m_Height);
@@ -308,7 +308,24 @@ namespace RootTools.Camera.Dalsa
                     m_sapCam.SetFeatureValue("TriggerMode", "External");
             }
         }
-        
+
+        public void SetLiveParameter()
+        {
+            m_SapGrabber.GetParameter(SapAcquisition.Prm.CROP_WIDTH, out m_Width);
+            m_SapGrabber.GetParameter(SapAcquisition.Prm.CROP_HEIGHT, out m_Height);
+
+            if(m_sapCam!=null)
+            {
+                string str;
+                m_sapCam.GetFeatureValue("TriggerMode", out str);
+                if (!str.Equals("Internal"))
+                    m_sapCam.SetFeatureValue("TriggerMode", "Internal");
+                m_sapCam.GetFeatureValue("TDI Mode", out str);
+                if (!str.Equals("TdiArea"))
+                    m_sapCam.SetFeatureValue("TDI Mode", "TdiArea");
+
+            }
+        }
         public void SetCamHandle(SapAcqDevice device, SapAcquisition acquisition)
         {
             m_sapCam = device;

@@ -74,7 +74,10 @@ namespace Root_CAMELLIA.Data
             data.UseThickness = UseThickness;
             data.UseTransmittance = UseTransmittance;
             data.ModelRecipePath = ModelRecipePath;
+            
         }
+
+        
 
         public bool ContainsData(List<CCircle> list, CCircle circle, out int nIndex)
         {
@@ -174,4 +177,6 @@ namespace Root_CAMELLIA.Data
             p_offset = offset;
         }
     }
+
+    
 }
