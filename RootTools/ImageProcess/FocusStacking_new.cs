@@ -138,8 +138,9 @@ namespace RootTools.ImageProcess
             DI.sw.Start();
             total.Start();
 
-            DI.p_nFocusCount = DI.memData.p_nByte;
-
+            DI.p_nFocusCount = DI.memData.p_nCount-1;
+            DI.p_nHeight = nHeight;
+            DI.p_nWidth = nWidth;
             ListOfSrc = new Mat[DI.p_nFocusCount];
 
             CreateSrcData(ref ListOfSrc,nHeight,nWidth);
@@ -193,15 +194,22 @@ namespace RootTools.ImageProcess
             //이미지 연산.
             res = ComparePixelData(ListOfSrc, ListOfLaplacianData, out ListOfPartImg);
 
-            byte* n_ptr = (byte*)DI.memData.GetPtr(DI.memData.p_nCount-1);
-            byte* ptr = (byte*)res.DataPointer.ToPointer();
+            /*
+             
+                        IntPtr srcPtr = ipSrc + m_Width * y;
+                        IntPtr dstPtr = (IntPtr)((long)m_MemPtr + m_cpScanOffset.X + (yp + m_cpScanOffset.Y) * m_Memory.W);
+
+                        Buffer.MemoryCopy((void*)srcPtr, (void*)dstPtr, m_Width, m_Width);
+             */
+            IntPtr n_ptr = DI.memData.GetPtr(DI.memData.p_nCount-1);
+            IntPtr ptr = res.DataPointer.ToPointer();
             Parallel.For(0, res.Height, (j) =>
             {
-                Buffer.MemoryCopy(n_ptr + j * DI.memData.W, ptr + j * res.Width, res.Width, res.Width);
+                Buffer.MemoryCopy((n_ptr + j * DI.memData.W), ptr + j * res.Width, res.Width, res.Width);
             });
 
             //save
-            res.Save(DI.sDirPath + "\\" + "_Result_" + DI.nTest_beforeAvg + "_" + DI.nTest_afterAvg + "_" + DI.p_nMaskSize + "_" + total.ElapsedMilliseconds + ".tif");
+            //res.Save(DI.sDirPath + "\\" + "_Result_" + DI.nTest_beforeAvg + "_" + DI.nTest_afterAvg + "_" + DI.p_nMaskSize + "_" + total.ElapsedMilliseconds + ".tif");
             //Console.WriteLine("총 소요시간 : " + total.ElapsedMilliseconds + "ms");
         }
 
