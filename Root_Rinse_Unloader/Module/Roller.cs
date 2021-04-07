@@ -268,6 +268,10 @@ namespace Root_Rinse_Unloader.Module
 
         public string RunWaitArrived()
         {
+            m_rail.RunMoveWidth(m_rinse.p_widthStrip);
+            RunMoveAlign(false);
+            RunAlignerUp(m_rinse.p_eMode == RinseU.eRunMode.Magazine);
+            RunStopperUp(true);
             while ((p_eStep != eStep.Picker) && (p_eStep != eStep.Send))
             {
                 Thread.Sleep(10);
@@ -292,11 +296,8 @@ namespace Root_Rinse_Unloader.Module
                 if (Run(RunRotate(false))) return p_sInfo;
                 if (m_rinse.p_eMode == RinseU.eRunMode.Magazine)
                 {
-                    if (Run(RunMoveAlign(false))) return p_sInfo;
-                    if (Run(RunAlignerUp(true))) return p_sInfo;
                     if (Run(RunMoveAlign(true))) return p_sInfo;
                     if (Run(RunMoveAlign(false))) return p_sInfo;
-                    if (Run(RunAlignerUp(false))) return p_sInfo;
                 }
                 for (int n = 0; n < 4; n++) m_bExist[n] = m_aLine[n].p_eSensor != Line.eSensor.Empty;
                 switch (m_rinse.p_eMode)
