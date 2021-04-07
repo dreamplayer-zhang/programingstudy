@@ -23,6 +23,7 @@ namespace RootTools.Comm
             m_modbus = modbus;
             DataContext = modbus;
             commLogUI.Init(modbus.m_commLog);
+            dataGridData.ItemsSource = modbus.m_aViewData; 
             treeRootUI.Init(modbus.m_treeRoot);
             modbus.RunTree(Tree.eMode.Init);
             InitTimer(); 
@@ -59,6 +60,11 @@ namespace RootTools.Comm
             if (checkBoxRead.IsChecked == false) return;
             m_modbus.ReadViewData(m_modbus.p_nViewUnit); 
             if (m_swTimer.ElapsedMilliseconds > 300000) checkBoxRead.IsChecked = false;
+        }
+
+        private void buttonAdd_Click(object sender, RoutedEventArgs e)
+        {
+            //forget
         }
     }
 }

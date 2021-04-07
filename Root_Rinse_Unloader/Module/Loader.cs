@@ -396,14 +396,13 @@ namespace Root_Rinse_Unloader.Module
 
         #region ModuleRun
         ModuleRunBase m_runRun;
-        ModuleRunBase m_runPickerSet;
         protected override void InitModuleRuns()
         {
             AddModuleRunList(new Run_Move(this), false, "Move Axis");
             AddModuleRunList(new Run_Load(this), false, "Load Strip");
             AddModuleRunList(new Run_Unload(this), false, "Unload Strip");
             m_runRun = AddModuleRunList(new Run_Run(this), false, "Move Strip");
-            m_runPickerSet = AddModuleRunList(new Run_PickerSet(this), false, "PickerSet");
+            AddModuleRunList(new Run_PickerSet(this), false, "PickerSet");
         }
 
         public class Run_Move : ModuleRunBase

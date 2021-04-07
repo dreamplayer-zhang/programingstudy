@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using NanoView;
@@ -44,7 +45,7 @@ namespace Root_CAMELLIA.LibSR_Met
         string m_sConfigPath = string.Empty;
 
         public bool isExceptNIR = false;
-
+        public bool bCheckSampleCal = false;
         //double[] m_Spectrum;
         private bool m_bSRInitialized = false;
         private bool m_bPreLampOn = false;
@@ -84,6 +85,17 @@ namespace Root_CAMELLIA.LibSR_Met
                     m_bSRInitialized = true;
                     m_DM.m_Log.WriteLog(LogType.Operating, "SR Initialize Done");
                     MessageBox.Show("Initialize Done"); //추후 제거
+
+                    //double Boxcar_VIS = m_SR.Boxcar_VIS;
+                    //double Average_VIS = m_SR.Average_VIS;
+                    //double IntTime_VIS = m_SR.IntTime_VIS;
+                    //double BackIntTime_VIS = m_SR.BackIntTime_VIS;
+
+                    //double Boxcar_NIR = m_SR.Boxcar_NIR;
+                    //double Average_NIR = m_SR.Average_NIR;
+                    //double IntTime_NIR = m_SR.IntTime_NIR;
+                    //double BackIntTime_NIR = m_SR.BackIntTime_NIR;
+
                 }
                 else
                 {
@@ -334,6 +346,7 @@ namespace Root_CAMELLIA.LibSR_Met
               
 
                 ERRORCODE_NANOVIEW rst = (ERRORCODE_NANOVIEW)m_SR.MeasureBackground(spectrum);
+                Thread.Sleep(1000);
                 if (rst == ERRORCODE_NANOVIEW.SR_NO_ERROR)
                 {
                     string sLogPlus = "";
@@ -342,6 +355,10 @@ namespace Root_CAMELLIA.LibSR_Met
 
                     m_DM.m_Log.WriteLog(LogType.Operating, sLogPlus + "Calibration Done");
                     //MessageBox.Show(sLogPlus + "Calibration Done");
+                    if(!bInitialCal)
+                    {
+                        bCheckSampleCal = true;
+                    }
                 }
                 else
                 {
@@ -389,12 +406,17 @@ namespace Root_CAMELLIA.LibSR_Met
             }
         }
 
-        public ERRORCODE_NANOVIEW SampleMeasure(int nPointIndex, double dXPos, double dYPos, bool bExcept_NIR, bool bTransmittance, bool bThickness, float nLowerWaveLength, float nUpperWavelength) //num of data를 반환할 필요가 있는지 모르겠음
+        public ERRORCODE_NANOVIEW SampleMeasure(int nPointIndex, double dXPos, double dYPos, bool bExcept_NIR, bool bTransmittance, bool bThickness, float nLowerWaveLength, float nUpperWavelength) 
         {
             try
             {
                 if (m_bSRInitialized == true)
                 {
+                    if(!bCheckSampleCal)
+                    {
+                        m_DM.m_Log.WriteLog(LogType.Operating, "Sample Calibration First");
+                        MessageBox.Show("Sample Calibration First"); 
+                    }
                     //fitting할때 들어가야함
                     //_layer[] layers = m_DM.m_LayerData.To_layer();
                     //m_SR.Model(layers, layers.Length);
@@ -429,8 +451,12 @@ namespace Root_CAMELLIA.LibSR_Met
                         data.nNIRDataNum = m_SR.m_ExpNum;
                         data.dX = dXPos;
                         data.dY = dYPos;
+                        Array.Reverse(m_SR.m_ExpR);
+                        Array.Reverse(m_SR.m_Expnm);
                         m_SR.m_ExpR.CopyTo(data.Reflectance, 0);
+                        
                         m_SR.m_Expnm.CopyTo(data.Wavelength, 0);
+                        Array.Reverse(m_SR.m_ExpR);
                         for (int i=0; i<nNumOfData;i++)
                         {
                             if( Math.Round(ConstValue.EV_TO_WAVELENGTH_VALUE/ eV[i])== nUpperWavelength)
@@ -443,7 +469,7 @@ namespace Root_CAMELLIA.LibSR_Met
                         }
                         //Array.Copy(reflectance, data.VIS_Reflectance, data.nThicknessDataNum);
                         //Array.Copy(eV, data.eV, data.nThicknessDataNum);
-
+                       
                         m_DM.m_Log.WriteLog(LogType.Operating, "Sample Measure Done");
                         //MessageBox.Show("Sample Measure Done"); //추후 제거
                     }
@@ -754,6 +780,7 @@ namespace Root_CAMELLIA.LibSR_Met
         {
             try
             {
+
                 if (m_bSRInitialized == false)
                 {
                     MessageBox.Show("Initialize first");

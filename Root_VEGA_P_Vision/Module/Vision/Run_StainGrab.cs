@@ -87,16 +87,10 @@ namespace Root_VEGA_P_Vision.Module
 
                 List<int> illumList = new List<int>();
                 for (int i = 0; i < StainGrabMode.m_lightSet.m_aLight.Count; i++)
-                {
+                    if (StainGrabMode.GetLight(i) != 0) illumList.Add(i);
 
-                    if (StainGrabMode.GetLight(i) == 0) continue;
-                    else
-                        illumList.Add(i);
-                }
                 if (m_module.Run(m_module.Move(axisZ, StainGrabMode.m_nFocusPosZ)))
                     return p_sInfo;
-
-
 
                 foreach(int v in illumList)
                 {
@@ -126,26 +120,19 @@ namespace Root_VEGA_P_Vision.Module
 
                             camStain.Grab();
 
-                            lock (new object())
+                            IntPtr ptr = mem.GetPtr(v);
+                            byte[] arr = camStain.p_ImageData.m_aBuf;
+                            int byteperpxl = camStain.p_ImageData.GetBytePerPixel();
+                            Parallel.For(0, nCamHeight, (j) =>
                             {
-                                IntPtr ptr = mem.GetPtr(v);
-
-                                byte[] arr = camStain.p_ImageData.m_aBuf;
-
-                                int byteperpxl = camStain.p_ImageData.GetBytePerPixel();
-
-                                Parallel.For(0, nCamHeight, (j) =>
-                                {
-                                    Marshal.Copy(arr, (nCamHeight - j - 1) * nCamWidth * byteperpxl, (IntPtr)((long)ptr + (x * nCamWidth * byteperpxl) + ((j + nCamHeight * y) * mem.W)), nCamWidth * byteperpxl);
-                                });
-                            }
+                                Marshal.Copy(arr, (nCamHeight - j - 1) * nCamWidth * byteperpxl, (IntPtr)((long)ptr + (x * nCamWidth * byteperpxl) + ((j + nCamHeight * y) * mem.W)), nCamWidth * byteperpxl);
+                            });
 
                             camStain.StopGrab();
                         }
                     }
                     StainGrabMode.SetLight(false);
                 }
-                
             }
             finally
             {
