@@ -214,7 +214,7 @@ namespace Root_Rinse_Loader.Module
         public string MoveMagazine(eMagazine eMagazine, int iIndex, bool bWait = true)
         {
             if ((iIndex < 0) || (iIndex >= 20)) return "Invalid Index"; 
-            m_axis.StartMove(eMagazine, (19 - iIndex) * m_dZ);
+            m_axis.StartMove(eMagazine, (iIndex - 19) * m_dZ);
             return m_axis.WaitReady(); 
         }
 
