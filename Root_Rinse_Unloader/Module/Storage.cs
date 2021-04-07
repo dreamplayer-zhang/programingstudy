@@ -69,13 +69,13 @@ namespace Root_Rinse_Unloader.Module
 
             public void CheckSensor()
             {
-                p_bCheck = !m_diCheck.p_bIn;
+                p_bCheck = m_diCheck.p_bIn;
                 p_bClamp = !m_dioClamp.p_bIn;
             }
 
             public void RunClamp(bool bClamp)
             {
-                m_dioClamp.Write(!(bClamp && p_bCheck));
+                m_dioClamp.Write(!bClamp);
             }
 
             public string m_id;
