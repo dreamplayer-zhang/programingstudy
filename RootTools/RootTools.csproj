@@ -250,9 +250,6 @@
       <DependentUpon>GraphWindowTest.xaml</DependentUpon>
     </Compile>
     <Compile Include="Comm\Modbus.cs" />
-    <Compile Include="Comm\ModbusData_UI.xaml.cs">
-      <DependentUpon>ModbusData_UI.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Comm\Modbus_UI.xaml.cs">
       <DependentUpon>Modbus_UI.xaml</DependentUpon>
     </Compile>
@@ -855,10 +852,6 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Comm\CyUSBTool_UI.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Comm\ModbusData_UI.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

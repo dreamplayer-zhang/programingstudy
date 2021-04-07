@@ -25,27 +25,28 @@
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
                     <StackPanel Grid.Row="0" Orientation="Horizontal">
-                        <CheckBox x:Name="checkBoxRead" Content="Timer Read" Margin="3" Click="checkBoxRead_Click"/>
                         <TextBlock Text="  Unit = " VerticalAlignment="Center"/>
                         <TextBox Margin="3" Text="{Binding p_nViewUnit}" Width="40" TextAlignment="Center"/>
+                        <CheckBox x:Name="checkBoxRead" Content="Timer Read" Margin="30,3,3,3" VerticalAlignment="Center" Click="checkBoxRead_Click"/>
                     </StackPanel>
-                    <TabControl Grid.Row="1">
-                        <TabItem Header="Coil">
-                            <local:ModbusData_UI x:Name="modbusCoil"/>
-                        </TabItem>
-                        <TabItem Header="DiscreateInput">
-                            <local:ModbusData_UI x:Name="modbusDiscreateInput"/>
-                        </TabItem>
-                        <TabItem Header="HoldingRegister">
-                            <local:ModbusData_UI x:Name="modbusHoldingRegister"/>
-                        </TabItem>
-                        <TabItem Header="InputRegister">
-                            <local:ModbusData_UI x:Name="modbusInputRegister"/>
-                        </TabItem>
-                    </TabControl>
+                    <StackPanel Grid.Row="1" Orientation="Horizontal">
+                        <ComboBox x:Name="comboType" Width="120" Margin="3"/>
+                        <TextBox Text="{Binding p_nViewStart}" Width="50" TextAlignment="Center" Margin="3"/>
+                        <TextBlock Text="~" TextAlignment="Center" Margin="3"/>
+                        <TextBox Text="{Binding p_nViewEnd}" Width="50" TextAlignment="Center" Margin="3"/>
+                        <Button x:Name="buttonAdd" Content="Add View" Click="buttonAdd_Click"/>
+                    </StackPanel>
+                    <DataGrid Grid.Row="2" x:Name="dataGridData" IsReadOnly="False" AutoGenerateColumns="false" GridLinesVisibility="None">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Modbus" Binding="{Binding p_eType}"/>
+                            <DataGridTextColumn Header="Address" Binding="{Binding p_nAddress}"/>
+                            <DataGridTextColumn Header="Data" Binding="{Binding p_nData}"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
                 </Grid>
             </TabItem>
         </TabControl>
