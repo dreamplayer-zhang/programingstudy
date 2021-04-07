@@ -149,6 +149,7 @@ namespace Root_Rinse_Unloader.Engineer
         public RinseU_Handler m_handler = new RinseU_Handler();
         public void Init(string id)
         {
+            EQ.m_bRun = true;
             EQ.m_sModel = id;
             LogView.Init();
             InitTree();
@@ -162,6 +163,7 @@ namespace Root_Rinse_Unloader.Engineer
 
         public void ThreadStop()
         {
+            EQ.m_bRun = false;
             m_gaf.ThreadStop();
             m_handler.ThreadStop();
             m_toolBox.ThreadStop();

@@ -82,7 +82,7 @@ namespace Root_Rinse_Loader.MainUI
 
         private void buttonMove_Click(object sender, RoutedEventArgs e)
         {
-            m_storage.MoveMagazine(m_rinse.p_eMagazine, m_rinse.p_iMagazine); 
+            m_storage.MoveMagazine(m_rinse.p_eMagazine, m_rinse.p_iMagazine, false); 
         }
     }
 }

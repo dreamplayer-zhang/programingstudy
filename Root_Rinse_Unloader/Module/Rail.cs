@@ -197,6 +197,11 @@ namespace Root_Rinse_Unloader.Module
                 p_eState = eState.Ready;
                 return "OK";
             }
+            foreach (Line line in m_aLine)
+            {
+                if (line.p_eSensor == Line.eSensor.Arrived) return "Check Strip";
+                if (line.p_eSensor == Line.eSensor.Exist) return "Check Strip";
+            }
             m_axisRotate.ServoOn(true);
             p_sInfo = base.StateHome(m_axisWidth);
             p_eState = (p_sInfo == "OK") ? eState.Ready : eState.Error;
