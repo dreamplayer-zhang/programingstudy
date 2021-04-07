@@ -7,6 +7,6 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <GroupBox x:Name="groupBox" Margin="5,10" Style="{StaticResource group}" BorderThickness="0">
-        <Button x:Name="buttonClamp" Content="Clamp" IsEnabled="{Binding p_bCheck}" Margin="5,0" FontSize="30" FontWeight="Bold" FontFamily="Arial" BorderBrush="{x:Null}" Click="buttonClamp_Click"/>
+        <Button x:Name="buttonClamp" Content="Clamp" Margin="5,0" FontSize="30" FontWeight="Bold" FontFamily="Arial" BorderBrush="{x:Null}" Click="buttonClamp_Click"/>
     </GroupBox>
 </UserControl>

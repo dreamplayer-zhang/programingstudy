@@ -188,7 +188,6 @@ namespace Root_CAMELLIA.LibSR_Met
                                 NIR_Wavelength[n] = data.Wavelength[n];
                                 NIR_Transmittance[n] = data.Transmittance[n];
                             }
-                            //Array.Reverse(NIR_Transmittance);
                             m_TransmittancePlotTable = GraphT.plt.PlotScatterHighlight(NIR_Wavelength, NIR_Transmittance, markerSize: 2.5);
                             GraphT.plt.Axis(350, 1500, -10, 100);
                         }
@@ -339,7 +338,7 @@ namespace Root_CAMELLIA.LibSR_Met
                     GraphR.Render();
 
                     labelR.Visibility = Visibility.Visible;
-                    labelR.Content = $"(Wavelength[nm], Reflectance[%]) = ({dX:N3}, {dY:N3})" + Environment.NewLine + $"(Wavelength[nm], CalcReflectance[%]) = ({dX2:N3}, {dY2:N3})";
+                    labelR.Content = $"(Wavelength[nm], Reflectance[%]) = ({dX:N1}, {dY:N3})" + Environment.NewLine + $"(Wavelength[nm], CalcReflectance[%]) = ({dX2:N1}, {dY2:N3})";
                 }
             }));
         }
@@ -361,7 +360,7 @@ namespace Root_CAMELLIA.LibSR_Met
                         GraphT.Render();
 
                         labelT.Visibility = Visibility.Visible;
-                        labelT.Content = $"(Wavelength[nm], Reflectance[%]) = ({x:N3}, {y:N3})";
+                        labelT.Content = $"(Wavelength[nm], Reflectance[%]) = ({x:N1}, {y:N3})";
                     }
                 }
             }));
