@@ -247,17 +247,21 @@
                                         <TextBlock Text="fit" Style="{StaticResource GridHeaderStyle}" />
                                     </DataGridCheckBoxColumn.Header>
                                 </DataGridCheckBoxColumn>
-
-                                <DataGridComboBoxColumn Width="*" SelectedValueBinding="{Binding SelectedEmm, UpdateSourceTrigger=PropertyChanged}">
+                                <DataGridComboBoxColumn Width="*"  SelectedValueBinding="{Binding SelectedGuest2, UpdateSourceTrigger=PropertyChanged}" DisplayMemberPath="Name" SelectedValuePath="FullPath">
                                     <DataGridComboBoxColumn.Header>
-                                        <TextBlock Text="Emm" Style="{StaticResource GridHeaderStyle}" />
+                                        <TextBlock Text="Guest2" Style="{StaticResource GridHeaderStyle}" />
                                     </DataGridComboBoxColumn.Header>
                                     <DataGridComboBoxColumn.ElementStyle>
                                         <Style TargetType="ComboBox">
-                                            <Setter Property="ItemsSource" Value="{Binding Emm, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                            <Setter Property="ItemsSource" Value="{Binding Guest2, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                                             <Setter Property="IsReadOnly" Value="True"/>
                                         </Style>
                                     </DataGridComboBoxColumn.ElementStyle>
+                                    <DataGridComboBoxColumn.EditingElementStyle>
+                                        <Style TargetType="ComboBox">
+                                            <Setter Property="ItemsSource" Value="{Binding Guest2, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                        </Style>
+                                    </DataGridComboBoxColumn.EditingElementStyle>
                                 </DataGridComboBoxColumn>
                                 <DataGridTextColumn Width="50" Binding="{Binding Scale, StringFormat=N1, UpdateSourceTrigger=LostFocus, Mode=TwoWay}">
                                     <DataGridTextColumn.Header>
@@ -865,7 +869,7 @@
                                 <ItemsControl.ItemsPanel>
                                     <ItemsPanelTemplate>
                                         <Canvas x:Name="StagePreView" Width="{x:Static local:BaseDefine.CanvasWidth}" Height="{x:Static local:BaseDefine.CanvasHeight}" ClipToBounds="True" Background="#01FFFFFF">
-                                            <i:Interaction.Triggers>
+                                            <!--<i:Interaction.Triggers>
                                                 <i:EventTrigger EventName="MouseMove">
                                                     <i:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=StagePreView, Mode=OneWay}" MethodName="OnMouseMovePreView" />
                                                 </i:EventTrigger>
@@ -875,7 +879,7 @@
                                                 <i:EventTrigger EventName="MouseLeftButtonDown" >
                                                     <i:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=StagePreView, Mode=OneWay}" MethodName="OnMouseLeftButtonDownPreView" />
                                                 </i:EventTrigger>
-                                            </i:Interaction.Triggers>
+                                            </i:Interaction.Triggers>-->
                                         </Canvas>
                                     </ItemsPanelTemplate>
                                 </ItemsControl.ItemsPanel>

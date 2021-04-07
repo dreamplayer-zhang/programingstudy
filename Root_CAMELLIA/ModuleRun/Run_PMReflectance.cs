@@ -54,7 +54,7 @@ namespace Root_CAMELLIA.Module
 
         public override string Run()
         {
-            Met.PMDatas PMDatas = new Met.PMDatas();
+            Met.PMDatas m_PMDatas = new Met.PMDatas();
             Met.CheckResult rst;
 
 
@@ -87,7 +87,7 @@ namespace Root_CAMELLIA.Module
                 return p_sInfo;
             }
             // 시작
-            PMDatas.LoadPMData();
+            m_PMDatas.LoadPMData();
             m_log.Info("[CheckSensorTilt] Start");
             // 현재 축값 받아오기
             AxisXY axisXY = m_module.p_axisXY;
@@ -168,7 +168,7 @@ namespace Root_CAMELLIA.Module
             //}
 
             object obj;
-            for (int n = 0; n < PMDatas.nSensorTiltRepeatNum; n++)
+            for (int n = 0; n < m_PMDatas.nSensorTiltRepeatNum; n++)
             {
                 if (App.m_nanoView.SampleMeasure(0, 0, 0,
                        m_mwvm.SettingViewModel.p_ExceptNIR, m_DataManager.recipeDM.MeasurementRD.UseTransmittance, m_DataManager.recipeDM.MeasurementRD.UseThickness,
@@ -182,7 +182,7 @@ namespace Root_CAMELLIA.Module
 
                         m_log.Info("[CheckSensorTilt] Acquire Refelctance" + "[" + n + "]");
                         
-                        rst = PMDatas.CheckSensorTilt();
+                        rst = m_PMDatas.CheckSensorTilt();
                         if (rst == Met.CheckResult.OK)
                         {
                             m_log.Info("[CheckSensorTilt] CheckResult Normal" + "[" + n + "]");

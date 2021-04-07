@@ -48,6 +48,8 @@ namespace Root_CAMELLIA.LibSR_Met
             PMGraphR.plt.Axis(350, 1500, -10, 100);
             PMGraphR.Render();
 
+            PMlabelR.Visibility = Visibility.Visible;
+
             m_bDataDetect = true;
         }
 

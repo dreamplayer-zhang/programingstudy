@@ -36,6 +36,35 @@ namespace Root_CAMELLIA
         public PMCheckReview_ViewModel()
         {
             Init();
+            PageInit();
+        }
+
+        object m_page;
+        public object p_page
+        {
+            get
+            {
+                return m_page;
+            }
+            set
+            {
+                SetProperty(ref m_page, value);
+            }
+        }
+
+        #region Page ViewModel
+        PM_Reflectance_ViewModel m_pmReflectance_VM;
+        PM_SensorCameraTilt_ViewModel m_pmSensorTilt_VM;
+        PM_SensorHoleOffset_ViewModel m_pmSensorHoleOffset_VM;
+        PM_Thickness_ViewModel m_pmThickness_VM;
+        #endregion
+
+        public void PageInit()
+        {
+            m_pmReflectance_VM = new PM_Reflectance_ViewModel();
+            m_pmSensorTilt_VM = new PM_SensorCameraTilt_ViewModel();
+            m_pmSensorHoleOffset_VM = new PM_SensorHoleOffset_ViewModel();
+            m_pmThickness_VM = new PM_Thickness_ViewModel();
         }
 
         public void Init()
@@ -81,12 +110,12 @@ namespace Root_CAMELLIA
             //lock (lockObject)
             //{
 
-                p_imageSource = ImageHelper.ToBitmapSource(img);
+            p_imageSource = ImageHelper.ToBitmapSource(img);
             //}
             //p_rootViewer.SetImageSource();
         }
 
-            DataTable m_DataTable = new DataTable();
+        DataTable m_DataTable = new DataTable();
         public DataTable p_DataTable
         {
             get
@@ -99,7 +128,7 @@ namespace Root_CAMELLIA
             }
         }
 
-        public void UpdatePMList ()
+        public void UpdatePMList()
         {
             p_DataTable.Clear();
             DataRow row;
@@ -123,6 +152,7 @@ namespace Root_CAMELLIA
             {
                 return new RelayCommand(() =>
                 {
+                    p_page = m_pmReflectance_VM;
                     PMReflectanceRepeatability();
                 });
             }
@@ -133,6 +163,7 @@ namespace Root_CAMELLIA
             {
                 return new RelayCommand(() =>
                 {
+                    p_page = m_pmThickness_VM;
                     PMThickenssRepeatability();
                 });
             }
@@ -144,6 +175,7 @@ namespace Root_CAMELLIA
             {
                 return new RelayCommand(() =>
                 {
+                    p_page = m_pmSensorHoleOffset_VM;
                     PMSensorStageAlign();
                 });
             }
@@ -155,13 +187,16 @@ namespace Root_CAMELLIA
             {
                 return new RelayCommand(() =>
                 {
+                    p_page = m_pmSensorTilt_VM;
                     PMSensorCameraTilt();
+
                 });
             }
         }
 
-        private void PMReflectanceRepeatability ()
+        private void PMReflectanceRepeatability()
         {
+            
             EQ.p_bStop = false;
             if (ModuleCamellia.p_eState != ModuleBase.eState.Ready)
             {
@@ -171,12 +206,12 @@ namespace Root_CAMELLIA
             Thread thread = new Thread(() =>
             {
                 Run_PMReflectance ReflectanceRepeatability = (Run_PMReflectance)ModuleCamellia.CloneModuleRun("PMReflectance");
-                ModuleCamellia.StartRun(ReflectanceRepeatability) ;
+                ModuleCamellia.StartRun(ReflectanceRepeatability);
                 //ReflectanceRepeatability.Run();
             });
             thread.Start();
         }
-        private void PMThickenssRepeatability ()
+        private void PMThickenssRepeatability()
         {
             EQ.p_bStop = false;
             if (ModuleCamellia.p_eState != ModuleBase.eState.Ready)
@@ -216,10 +251,12 @@ namespace Root_CAMELLIA
             }
             Thread thread = new Thread(() =>
             {
-                Run_PMSensorCameraTilt SensorCameraTilt= (Run_PMSensorCameraTilt)ModuleCamellia.CloneModuleRun("PMSensorCameraTilt");
+                Run_PMSensorCameraTilt SensorCameraTilt = (Run_PMSensorCameraTilt)ModuleCamellia.CloneModuleRun("PMSensorCameraTilt");
                 ModuleCamellia.StartRun(SensorCameraTilt);
             });
             thread.Start();
+
+           
         }
     }
 }

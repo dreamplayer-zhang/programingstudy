@@ -74,6 +74,7 @@ namespace Root_CAMELLIA.Data
             data.UseThickness = UseThickness;
             data.UseTransmittance = UseTransmittance;
             data.ModelRecipePath = ModelRecipePath;
+            
         }
 
         
@@ -176,4 +177,6 @@ namespace Root_CAMELLIA.Data
             p_offset = offset;
         }
     }
+
+    
 }

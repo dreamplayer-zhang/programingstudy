@@ -85,6 +85,12 @@ namespace Root_CAMELLIA
             for (int i = 0; i < nLPNum; i++) dlgOHT.Init(m_handler.m_aLoadport[i].m_OHTNew);
 
             InitTimer();
+
+            //m_handler.m_camellia.p_CamVRS.Connect();
+            //while (!m_handler.m_camellia.p_CamVRS.m_ConnectDone)
+            //{
+
+            //}
         }
 
         DispatcherTimer m_timer = new DispatcherTimer();

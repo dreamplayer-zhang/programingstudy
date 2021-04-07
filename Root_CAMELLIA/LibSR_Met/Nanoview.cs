@@ -406,7 +406,7 @@ namespace Root_CAMELLIA.LibSR_Met
             }
         }
 
-        public ERRORCODE_NANOVIEW SampleMeasure(int nPointIndex, double dXPos, double dYPos, bool bExcept_NIR, bool bTransmittance, bool bThickness, float nLowerWaveLength, float nUpperWavelength) //num of data를 반환할 필요가 있는지 모르겠음
+        public ERRORCODE_NANOVIEW SampleMeasure(int nPointIndex, double dXPos, double dYPos, bool bExcept_NIR, bool bTransmittance, bool bThickness, float nLowerWaveLength, float nUpperWavelength) 
         {
             try
             {
@@ -454,7 +454,9 @@ namespace Root_CAMELLIA.LibSR_Met
                         Array.Reverse(m_SR.m_ExpR);
                         Array.Reverse(m_SR.m_Expnm);
                         m_SR.m_ExpR.CopyTo(data.Reflectance, 0);
+                        
                         m_SR.m_Expnm.CopyTo(data.Wavelength, 0);
+                        Array.Reverse(m_SR.m_ExpR);
                         for (int i=0; i<nNumOfData;i++)
                         {
                             if( Math.Round(ConstValue.EV_TO_WAVELENGTH_VALUE/ eV[i])== nUpperWavelength)
@@ -778,6 +780,7 @@ namespace Root_CAMELLIA.LibSR_Met
         {
             try
             {
+
                 if (m_bSRInitialized == false)
                 {
                     MessageBox.Show("Initialize first");

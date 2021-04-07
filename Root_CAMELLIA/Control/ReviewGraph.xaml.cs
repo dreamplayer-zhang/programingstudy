@@ -27,7 +27,7 @@ namespace Root_CAMELLIA.Control
             InitializeComponent();
         }
 
-        public void DrawReviewGraph(int nPointIndex, string xlabel, string ylabel, double[] xvalus, double[] yvalues)
+        public void DrawReviewGraph( string xlabel, string ylabel, double[] xvalus, double[] yvalues)
         {
             ReviewGraphDraw.Reset();
             ReviewGraphDraw.plt.XLabel(xlabel);

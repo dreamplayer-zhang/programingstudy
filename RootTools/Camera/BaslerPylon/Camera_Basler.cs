@@ -24,8 +24,6 @@ namespace RootTools.Camera.BaslerPylon
         public event System.EventHandler Captured;
         public event System.EventHandler Connected;
 
-        public event System.EventHandler Captured;
-
         #region Property
         public string p_id { get; set; }
         public bool bStopThread

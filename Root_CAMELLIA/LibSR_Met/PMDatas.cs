@@ -7,6 +7,7 @@ using System.IO;
 using System.Windows;
 using System.Drawing;
 using System.Windows.Forms;
+using OpenCvSharp;
 
 namespace Root_CAMELLIA.LibSR_Met
 {
@@ -58,6 +59,18 @@ namespace Root_CAMELLIA.LibSR_Met
         public List<double> WavelengthRef;
         public List<double> ReflectanceRef;
 
+        //Sensor-Camera Tilt Check
+        public System.Windows.Point Align_CenterPosTop = new System.Windows.Point();    //이미지 상에서의 센서 센터
+        public System.Windows.Point Align_CenterPosBot = new System.Windows.Point();
+        public double dAlign_ResultDeg = 0.0;
+
+        public int nAlignAxisPosZ;
+        public int nSensorCenterX;
+        public int nSensorCenterY;
+        public double dCameraAxisOffsetZ;//[pulse]
+        public double dDistSensorCamera; //[um]
+        public int nAlignThreshold;
+
         DataManager m_DM = DataManager.GetInstance();
         public PMDatas()
         {
@@ -104,7 +117,22 @@ namespace Root_CAMELLIA.LibSR_Met
                         case "nSensorTiltRepeatNum":
                             nSensorTiltRepeatNum = Convert.ToInt32(datas[1]);
                             break;
-                        
+                        case "nSensorCenterX":
+                            nSensorCenterX = Convert.ToInt32(datas[1]);
+                            break;
+                        case "nSensorCenterY":
+                            nSensorCenterY = Convert.ToInt32(datas[1]);
+                            break;
+                        case "dCameraAxisOffsetZ":
+                            dCameraAxisOffsetZ = Convert.ToInt32(datas[1]);
+                            break;
+                        case "dDistSensorCamera":
+                            dDistSensorCamera = Convert.ToDouble(datas[1]);
+                            break;
+                        case "nAlignThreshold":
+                            nAlignThreshold = Convert.ToInt32(datas[1]);
+                            break;
+
                     }
                 }
                 sr.Close();
@@ -190,5 +218,99 @@ namespace Root_CAMELLIA.LibSR_Met
             rstPM.Error = false;
             return CheckResult.OK;
         }
+        public bool CalcCenterPoint(bool bTop, Emgu.CV.Mat matImg)
+        {
+            try
+            {
+                int nThreshold = nAlignThreshold;
+                double dDiameter = 0.0;
+                //Hole Point
+                List<OpenCvSharp.CPlusPlus.Point> ptSelected = new List<OpenCvSharp.CPlusPlus.Point>();
+                ptSelected.Add(new OpenCvSharp.CPlusPlus.Point(nSensorCenterX, nSensorCenterY));
+                
+                //Convert Emgu to OpenCV 
+                Bitmap Imagbitmap = matImg.Bitmap;
+                OpenCvSharp.CPlusPlus.Mat imgMat = OpenCvSharp.Extensions.BitmapConverter.ToMat(Imagbitmap);
+                
+                OpenCvSharp.CPlusPlus.Cv2.CvtColor(imgMat, imgMat, OpenCvSharp.ColorConversion.BgrToGray);
+
+                OpenCvSharp.CPlusPlus.Point ptResult = ImageProcess.FindCircleCenter(imgMat, ptSelected, nThreshold, ref dDiameter);
+
+                if (bTop == true)
+                {
+                    double X = ptResult.X;
+                    double Y = ptResult.Y;
+
+                    Align_CenterPosTop.X = X;
+                    Align_CenterPosTop.Y = Y;
+
+                    if (ptResult.X == 0 && ptResult.Y == 0)
+                    {
+                        m_DM.m_Log.WriteLog(LogType.PM, "[Error]CalcCenterPoint<Top>");
+                        return false;
+                    }
+
+                    m_DM.m_Log.WriteLog(LogType.PM, "[OK]CalcCenterPoint<Top> - X: " + Align_CenterPosTop.X.ToString() + " , Y: " +Align_CenterPosTop.Y.ToString());
+                }
+                else
+                {
+                    double X = ptResult.X;
+                    double Y = ptResult.Y;
+
+                    Align_CenterPosBot.X = X;
+                    Align_CenterPosBot.Y = Y;
+
+                    if (ptResult.X == 0 && ptResult.Y == 0)
+                    {
+                        m_DM.m_Log.WriteLog(LogType.PM, "[Error]CalcCenterPoint<Bot>");
+                        return false;
+                    }
+
+                    m_DM.m_Log.WriteLog(LogType.PM, "[OK]CalcCenterPoint<Bot> - X: " +Align_CenterPosTop.X.ToString() + " , Y: " +Align_CenterPosTop.Y.ToString());
+                }
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                m_DM.m_Log.WriteLog(LogType.PM, "[Error]CalcCenterPoint - " + ex.Message);
+                return false;
+            }
+        }
+        public CheckResult CheckCSSAlign()
+        {
+            try
+            {
+                double dX = Math.Sqrt(Math.Pow(Align_CenterPosTop.X - Align_CenterPosBot.X, 2) + Math.Pow(Align_CenterPosTop.Y - Align_CenterPosBot.Y, 2)) * 1.098;
+                double dY = dDistSensorCamera  - (double)((nAlignAxisPosZ + dCameraAxisOffsetZ) / 10.0);
+
+                if (dX > 0.0 && dY > 0.0)
+                {
+                    dAlign_ResultDeg = Math.Atan2(dX, dY) * (180 / Math.PI);
+
+                    m_DM.m_Log.WriteLog(LogType.PM, "[OK]CheckCSSAlign X = " + dX.ToString() + "[um], Y = " + dY.ToString() + "[um] / Align Deg. = " + dAlign_ResultDeg.ToString() + "[Deg.]");
+                    return CheckResult.OK;
+                }
+                else if (dX == 0.0)
+                {
+                    dAlign_ResultDeg = 0.0;
+                    m_DM.m_Log.WriteLog(LogType.PM, "[OK]CheckCSSAlign X = " + dX.ToString() + "[um], Y = " + dY.ToString() + "[um] / Align Deg. = " + dAlign_ResultDeg.ToString() + "[Deg.]");
+                    return CheckResult.OK;
+                }
+                else
+                {
+                    dAlign_ResultDeg = -9999.0;
+                    m_DM.m_Log.WriteLog(LogType.PM, "[Error]CheckCSSAlign X = " + dX.ToString() + "[um], Y = " + dY.ToString() + "[um]");
+                    return CheckResult.Error;
+                }
+            }
+            catch (Exception ex)
+            {
+                dAlign_ResultDeg = -9999.0;
+                m_DM.m_Log.WriteLog(LogType.PM, "[Error]CheckCSSAlign - Msg: " + ex.Message);
+                return CheckResult.Error;
+            }
+        }
+
     }
 }

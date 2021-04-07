@@ -96,29 +96,36 @@ namespace Root_CAMELLIA.LibSR_Met
                     GraphCount.plt.Axis(350, 1500, -10, 65000);
                 }
                 GraphCount.Render();
+                double dMaxCount =  SpectrumGraph.Max();
+                int nMaxCountIndex = Array.IndexOf(SpectrumGraph, dMaxCount);
+                string sMaxCountWL = Convert.ToString(Math.Round(WavelengthGraph[nMaxCountIndex],0));
+                string sMaxCount = Convert.ToString(Math.Round(dMaxCount,0));
+                labelCount.Visibility = Visibility.Visible;
+                labelCount.Content = $"(Wavelength, Counts) = ({sMaxCountWL:N1}, {sMaxCount:N1})";
+
                 m_bDataDetect = true;
             }));
 
         }
 
-        private void CountGraph_MouseMove(object sender, MouseEventArgs e)
-        {
-            // 커서 움직임에 따라 데이터 비율 달라기도록 하기
-            if (m_bDataDetect == true)
-            {
-                var mousePos = e.MouseDevice.GetPosition(GraphCount);
-                double mouseX = GraphCount.plt.CoordinateFromPixelX(mousePos.X);
-                double mouseY = GraphCount.plt.CoordinateFromPixelY(mousePos.Y);
+        //private void CountGraph_MouseMove(object sender, MouseEventArgs e)
+        //{
+        //    // 커서 움직임에 따라 데이터 비율 달라기도록 하기
+        //    if (m_bDataDetect == true)
+        //    {
+        //        var mousePos = e.MouseDevice.GetPosition(GraphCount);
+        //        double mouseX = GraphCount.plt.CoordinateFromPixelX(mousePos.X);
+        //        double mouseY = GraphCount.plt.CoordinateFromPixelY(mousePos.Y);
 
-                m_CountDataPlotTable.HighlightClear();
-                var (x, y, index) = m_CountDataPlotTable.HighlightPointNearest(mouseX, mouseY);
-                GraphCount.Render();
+        //        m_CountDataPlotTable.HighlightClear();
+        //        var (x, y, index) = m_CountDataPlotTable.HighlightPointNearest(mouseX, mouseY);
+        //        GraphCount.Render();
 
-                labelCount.Visibility = Visibility.Visible;
-                labelCount.Content = $"(Wavelength [nm], Counts) = ({x:N1}, {y:N3})";
+        //        labelCount.Visibility = Visibility.Visible;
+        //        labelCount.Content = $"(Wavelength [nm], Counts) = ({x:N1}, {y:N3})";
 
-            }
-        }
+        //    }
+        //}
         private void btnLiveGraph_checkedChanged(object sender, RoutedEventArgs e)
         {
             if (btnLiveSpectrum.IsChecked == true)
