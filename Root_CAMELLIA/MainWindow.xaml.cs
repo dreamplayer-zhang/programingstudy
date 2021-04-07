@@ -87,6 +87,12 @@ namespace Root_CAMELLIA
             LogUI.Init(LogView._logView);
 
             InitTimer();
+
+            //m_handler.m_camellia.p_CamVRS.Connect();
+            //while (!m_handler.m_camellia.p_CamVRS.m_ConnectDone)
+            //{
+
+            //}
         }
 
         DispatcherTimer m_timer = new DispatcherTimer();

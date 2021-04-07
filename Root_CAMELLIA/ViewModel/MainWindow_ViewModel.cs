@@ -137,8 +137,8 @@ namespace Root_CAMELLIA
             Run_Measure measure = (Run_Measure)p_Module_Camellia.CloneModuleRun("Measure");
             this.p_StageCenterPulse = measure.m_StageCenterPos_pulse;
 
-            if(p_Module_Camellia.p_CamVRS != null)
-                p_Module_Camellia.p_CamVRS.Connect();
+            //if(p_Module_Camellia.p_CamVRS != null)
+            //    p_Module_Camellia.p_CamVRS.Connect();
 
             InitNanoView();
             if (p_InitNanoview)

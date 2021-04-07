@@ -1,5 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\packages\OpenCvSharp-AnyCPU.2.4.10.20170306\build\OpenCvSharp-AnyCPU.props" Condition="Exists('..\packages\OpenCvSharp-AnyCPU.2.4.10.20170306\build\OpenCvSharp-AnyCPU.props')" />
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -209,6 +210,21 @@
     <Reference Include="NumericUpDownLib, Version=2.4.2.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Dirkster.NumericUpDownLib.2.4.2\lib\net40\NumericUpDownLib.dll</HintPath>
     </Reference>
+    <Reference Include="OpenCvSharp, Version=1.0.0.0, Culture=neutral, PublicKeyToken=6adad1e807fea099, processorArchitecture=MSIL">
+      <HintPath>..\packages\OpenCvSharp-AnyCPU.2.4.10.20170306\lib\net45\OpenCvSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="OpenCvSharp.Blob, Version=1.0.0.0, Culture=neutral, PublicKeyToken=6adad1e807fea099, processorArchitecture=MSIL">
+      <HintPath>..\packages\OpenCvSharp-AnyCPU.2.4.10.20170306\lib\net45\OpenCvSharp.Blob.dll</HintPath>
+    </Reference>
+    <Reference Include="OpenCvSharp.CPlusPlus, Version=1.0.0.0, Culture=neutral, PublicKeyToken=6adad1e807fea099, processorArchitecture=MSIL">
+      <HintPath>..\packages\OpenCvSharp-AnyCPU.2.4.10.20170306\lib\net45\OpenCvSharp.CPlusPlus.dll</HintPath>
+    </Reference>
+    <Reference Include="OpenCvSharp.Extensions, Version=1.0.0.0, Culture=neutral, PublicKeyToken=6adad1e807fea099, processorArchitecture=MSIL">
+      <HintPath>..\packages\OpenCvSharp-AnyCPU.2.4.10.20170306\lib\net45\OpenCvSharp.Extensions.dll</HintPath>
+    </Reference>
+    <Reference Include="OpenCvSharp.UserInterface, Version=1.0.0.0, Culture=neutral, PublicKeyToken=6adad1e807fea099, processorArchitecture=MSIL">
+      <HintPath>..\packages\OpenCvSharp-AnyCPU.2.4.10.20170306\lib\net45\OpenCvSharp.UserInterface.dll</HintPath>
+    </Reference>
     <Reference Include="PresentationFramework.Aero" />
     <Reference Include="ScottPlot, Version=4.0.39.0, Culture=neutral, PublicKeyToken=86698dc10387c39e, processorArchitecture=MSIL">
       <HintPath>..\packages\ScottPlot.4.0.39\lib\netstandard2.0\ScottPlot.dll</HintPath>
@@ -280,6 +296,25 @@
       <DependentUpon>PMCheckReview.xaml</DependentUpon>
     </Compile>
     <Compile Include="Control\PMCheckReview_ViewModel.cs" />
+    <Compile Include="Control\PMResultViewModel\PM_Reflectance_ViewModel.cs" />
+    <Compile Include="Control\PMResultViewModel\PM_SensorCameraTilt_ViewModel.cs" />
+    <Compile Include="Control\PMResultViewModel\PM_SensorHoleOttset_ViewModel.cs" />
+    <Compile Include="Control\PMResultViewModel\PM_Thickness_ViewModel.cs" />
+    <Compile Include="Control\PMResultView\PM_Reflectance.xaml.cs">
+      <DependentUpon>PM_Reflectance.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Control\PMResultView\PM_SensorCameraTilt.xaml.cs">
+      <DependentUpon>PM_SensorCameraTilt.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Control\PMResultView\PM_SensorHoleOffset.xaml.cs">
+      <DependentUpon>PM_SensorHoleOffset.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Control\PMResultView\PM_Thickenss.xaml.cs">
+      <DependentUpon>PM_Thickenss.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Control\ReviewGraph.xaml.cs">
+      <DependentUpon>ReviewGraph.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Control\StageViewControl.xaml.cs">
       <DependentUpon>StageViewControl.xaml</DependentUpon>
     </Compile>
@@ -302,6 +337,8 @@
     </Compile>
     <Compile Include="LibSR_Met\DataManager.cs" />
     <Compile Include="LibSR_Met\ExtensionMethod.cs" />
+    <Compile Include="LibSR_Met\Fitting.cs" />
+    <Compile Include="LibSR_Met\ImageProcess.cs" />
     <Compile Include="LibSR_Met\LogManager.cs" />
     <Compile Include="LibSR_Met\Nanoview.cs" />
     <Compile Include="LibSR_Met\PMDatas.cs" />
@@ -438,6 +475,26 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Control\PMCheckReview.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Control\PMResultView\PM_Reflectance.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Control\PMResultView\PM_SensorCameraTilt.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Control\PMResultView\PM_SensorHoleOffset.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Control\PMResultView\PM_Thickenss.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Control\ReviewGraph.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -695,4 +752,10 @@ copy /Y "$(SolutionDir)Lib\MetLib\NETOmniDriver-NET40.dll" $(SolutionDir)$(Proje
 copy /Y "$(SolutionDir)Lib\MetLib\OmniDriver64.dll" $(SolutionDir)$(ProjectName)\$(OutDir)\OmniDriver64.dll"
 copy /Y "$(SolutionDir)Lib\MetLib\r4nd_class.dll" $(SolutionDir)$(ProjectName)\$(OutDir)\r4nd_class.dll"</PostBuildEvent>
   </PropertyGroup>
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>이 프로젝트는 이 컴퓨터에 없는 NuGet 패키지를 참조합니다. 해당 패키지를 다운로드하려면 NuGet 패키지 복원을 사용하십시오. 자세한 내용은 http://go.microsoft.com/fwlink/?LinkID=322105를 참조하십시오. 누락된 파일은 {0}입니다.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\OpenCvSharp-AnyCPU.2.4.10.20170306\build\OpenCvSharp-AnyCPU.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\OpenCvSharp-AnyCPU.2.4.10.20170306\build\OpenCvSharp-AnyCPU.props'))" />
+  </Target>
 </Project>

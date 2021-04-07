@@ -158,7 +158,13 @@ namespace Root_CAMELLIA.Module
             //}
 
             if (!m_useCentering)
+            {
+                if (m_module.Run(axisZ.StartMove(0)))
+                    return p_sInfo;
+                if (m_module.Run(axisZ.WaitReady()))
+                    return p_sInfo;
                 return "OK";
+            }
 
             m_DataManager.m_waferCentering.FindEdgeInit();
 
@@ -332,6 +338,11 @@ namespace Root_CAMELLIA.Module
                     return "EQ Stop";
                 }
             }
+
+            if (m_module.Run(axisZ.StartMove(0)))
+                return p_sInfo;
+            if (m_module.Run(axisZ.WaitReady()))
+                return p_sInfo;
 
             m_module.SetLight(false);
 

@@ -48,6 +48,8 @@ namespace Root_CAMELLIA.LibSR_Met
             PMGraphR.plt.Axis(350, 1500, -10, 100);
             PMGraphR.Render();
 
+            PMlabelR.Visibility = Visibility.Visible;
+
             m_bDataDetect = true;
         }
 
@@ -66,7 +68,7 @@ namespace Root_CAMELLIA.LibSR_Met
                     PMGraphR.Render();
 
                     PMlabelR.Visibility = Visibility.Visible;
-                    PMlabelR.Content = $"(Wavelength[nm], Reflectance[%]) = ({dX:N3}, {dY:N3})";
+                    PMlabelR.Content = $"(Wavelength[nm], Reflectance[%]) = ({dX:N1}, {dY:N3})";
                 }
             }));
         }

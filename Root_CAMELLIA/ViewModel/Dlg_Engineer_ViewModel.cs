@@ -138,13 +138,13 @@ namespace Root_CAMELLIA
                             CurrentAxisWorkPoints = GetWorkPoint(TiltAxisY.m_aPos);
                             return;
                         }
-                    case TabAxis.TiltZ:
+                    case TabAxis.StageZ:
                         {
                             SelectedAxis = StageAxisZ;
                             CurrentAxisWorkPoints = GetWorkPoint(StageAxisZ.m_aPos);
                             return;
-                        }
                 }
+                        }
                 SetProperty(ref _MotionTabIndex, value);
             }
         }
@@ -1136,7 +1136,7 @@ namespace Root_CAMELLIA
             {
                 p_rootViewer.SetImageSource();
                 
-                p_rootViewer.p_ImageData.SaveImageSync(@"C:\Users\cgkim\Desktop\image\test.bmp");
+                //p_rootViewer.p_ImageData.SaveImageSync(@"C:\Users\cgkim\Desktop\image\test.bmp");
             });
 
         }
@@ -1335,7 +1335,7 @@ namespace Root_CAMELLIA
             Lifter,
             TiltX,
             TiltY,
-            TiltZ
+            StageZ
         }
     }
 }

@@ -22,10 +22,6 @@ namespace RootTools.Comm
         {
             m_modbus = modbus;
             DataContext = modbus;
-            modbusCoil.Init(modbus.m_aDataGroup[0]); 
-            modbusDiscreateInput.Init(modbus.m_aDataGroup[1]);
-            modbusHoldingRegister.Init(modbus.m_aDataGroup[2]); 
-            modbusInputRegister.Init(modbus.m_aDataGroup[3]);
             commLogUI.Init(modbus.m_commLog);
             treeRootUI.Init(modbus.m_treeRoot);
             modbus.RunTree(Tree.eMode.Init);
@@ -61,7 +57,7 @@ namespace RootTools.Comm
         private void M_timer_Tick(object sender, EventArgs e)
         {
             if (checkBoxRead.IsChecked == false) return;
-            m_modbus.ReadDataGroup(1); 
+            m_modbus.ReadViewData(m_modbus.p_nViewUnit); 
             if (m_swTimer.ElapsedMilliseconds > 300000) checkBoxRead.IsChecked = false;
         }
     }
