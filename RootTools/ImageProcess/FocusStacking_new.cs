@@ -193,19 +193,14 @@ namespace RootTools.ImageProcess
            
             //이미지 연산.
             res = ComparePixelData(ListOfSrc, ListOfLaplacianData, out ListOfPartImg);
-
-            /*
-             
-                        IntPtr srcPtr = ipSrc + m_Width * y;
-                        IntPtr dstPtr = (IntPtr)((long)m_MemPtr + m_cpScanOffset.X + (yp + m_cpScanOffset.Y) * m_Memory.W);
-
-                        Buffer.MemoryCopy((void*)srcPtr, (void*)dstPtr, m_Width, m_Width);
-             */
-            IntPtr n_ptr = DI.memData.GetPtr(DI.memData.p_nCount-1);
-            IntPtr ptr = res.DataPointer.ToPointer();
+            
             Parallel.For(0, res.Height, (j) =>
             {
-                Buffer.MemoryCopy((n_ptr + j * DI.memData.W), ptr + j * res.Width, res.Width, res.Width);
+                int memWidth = (int)DI.memData.W;
+                IntPtr n_ptr = DI.memData.GetPtr(DI.memData.p_nCount - 1) + j*memWidth;
+                IntPtr ptr = res.DataPointer + j*res.Width;
+
+                Buffer.MemoryCopy((void*)n_ptr, (void*)ptr, res.Width, res.Width);
             });
 
             //save
