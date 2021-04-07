@@ -2,6 +2,7 @@
 using RootTools.Memory;
 using RootTools.Module;
 using RootTools.Trees;
+using RootTools.ImageProcess;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -68,9 +69,10 @@ namespace Root_VEGA_P_Vision.Module
                 InfoPod.ePod parts = m_module.p_infoPod.p_ePod;
                 Vision.eUpDown upDown = (Vision.eUpDown)Enum.ToObject(typeof(Vision.eUpDown), m_module.p_infoPod.p_bTurn);
                 MemoryData mem = mainOpt.GetMemoryData(parts, Vision.MainOptic.eInsp.Stack, upDown);
+                FocusStacking_new fs = new FocusStacking_new(mem);
                 int nCamWidth = ZStackGrabMode.m_camera.GetRoiSize().X;
                 int nCamHeight = ZStackGrabMode.m_camera.GetRoiSize().Y;
-                nstep = mem.p_nCount;
+                nstep = mem.p_nCount-1;
 
                 double dstep = (nendPos - nstartPos)/nstep;
                 for (int step=0;step<nstep;step++)
@@ -87,7 +89,7 @@ namespace Root_VEGA_P_Vision.Module
                     });
                 }
 
-                //stacking 하는거 라이브러리 연동코드추가
+                fs.Run(nCamWidth, nCamHeight);
             }
             finally
             {
