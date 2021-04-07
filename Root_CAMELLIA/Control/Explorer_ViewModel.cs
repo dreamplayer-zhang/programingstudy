@@ -144,6 +144,7 @@ namespace Root_CAMELLIA
                 return new RelayCommand(() =>
                 {
                     RebuildTree(pIncludeFileChildren: true, InitPath: p_InitPath);
+                    ItemRefreshEvent();
                 });
             }
         }
@@ -164,6 +165,7 @@ namespace Root_CAMELLIA
         }
 
         public event System.EventHandler ItemClicked;
+        public event System.EventHandler ItemRefresh;
 
 
 
@@ -182,7 +184,38 @@ namespace Root_CAMELLIA
             }
         }
 
+        void ItemRefreshEvent()
+        {
+            if (ItemRefresh != null)
+                OnItemRefresh();
+        }
+        protected void OnItemRefresh()
+        {
+            if (ItemRefresh != null)
+                ItemRefresh.Invoke(this, new EventArgs());
+        }
+
         public void OnMouseLeftButtonUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            System.Windows.Controls.TreeView sen = (System.Windows.Controls.TreeView)sender;
+            INavTreeItem selectedItem = (INavTreeItem)sen.SelectedItem;
+            //sen.Background = System.Windows.Media.Brushes.Red;
+            //selectedItem.
+            if (selectedItem == null)
+            {
+                return;
+            }
+            string path = (string)selectedItem.FullPathName;
+            p_CurrentPath = path;
+            //System.Windows.Forms.MessageBox.Show(path);
+            FileAttributes chkAtt = File.GetAttributes(path);
+            if ((chkAtt & FileAttributes.Directory) != FileAttributes.Directory)
+            {
+                ItemClickedEvent((object)path);
+            }
+        }
+
+        public void OnSelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
             System.Windows.Controls.TreeView sen = (System.Windows.Controls.TreeView)sender;
             INavTreeItem selectedItem = (INavTreeItem)sen.SelectedItem;

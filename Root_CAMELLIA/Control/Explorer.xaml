@@ -87,6 +87,9 @@
                     <i:EventTrigger EventName="MouseLeftButtonUp">
                         <i:CallMethodAction TargetObject="{Binding}" MethodName="OnMouseLeftButtonUp" />
                     </i:EventTrigger>
+                    <i:EventTrigger EventName="SelectedItemChanged">
+                        <i:CallMethodAction TargetObject="{Binding}" MethodName="OnSelectedItemChanged" />
+                    </i:EventTrigger>
                 </i:Interaction.Triggers>
                 <TreeView.Resources>
                     <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}"
@@ -94,50 +97,6 @@
                 </TreeView.Resources>
             </TreeView>
         </Border>
-      
+
     </Grid>
-    <!--<Grid Background="White">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="30"/>
-            <RowDefinition />
-        </Grid.RowDefinitions>
-        <Grid>
-            <Border Margin="2" BorderThickness="1" BorderBrush="Black">
-                <Grid>
-                    <Button Margin="1" Content="Refresh" Command="{Binding CmdRefresh}" Width="60" HorizontalAlignment="Left"></Button>
-              
-                </Grid>
-            </Border>
-        </Grid>
-        <Grid Grid.Row="1" Grid.ColumnSpan="2">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
-            <GroupBox Header="Explorer">
-                <TreeView x:Name="ExplorerTree" Grid.Column="0" Margin="5" BorderBrush="Black" BorderThickness="1"  ItemsSource="{Binding p_collection}"
-                            VirtualizingStackPanel.IsVirtualizing ="True" VirtualizingStackPanel.VirtualizationMode ="Recycling">
-                    <TreeView.Resources>
-                        <Style TargetType="{x:Type local:ImageTreeViewItem}">
-                            <Setter Property="HeaderTemplate">
-                                <Setter.Value>
-                                    <DataTemplate>
-                                        <StackPanel Orientation="Horizontal" Height="20">
-                                            <Image Name="img"  Width="16" Height="16" Stretch="Fill" Source="{Binding RelativeSource={RelativeSource Mode=FindAncestor,
-                                                AncestorType={x:Type local:ImageTreeViewItem}}, Path=IconImage, UpdateSourceTrigger=PropertyChanged}"/>
-                                            <TextBlock Text="{Binding}" Margin="5,0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                                        </StackPanel>
-                                    </DataTemplate>
-                                </Setter.Value>
-                            </Setter>
-                        </Style>
-                    </TreeView.Resources>
-                    <i:Interaction.Triggers>
-                        <i:EventTrigger EventName="MouseDoubleClick">
-                            <i:CallMethodAction TargetObject="{Binding}" MethodName="OnMouseDoubleClick" />
-                        </i:EventTrigger>
-                    </i:Interaction.Triggers>
-                </TreeView>
-            </GroupBox>
-        </Grid>
-    </Grid>-->
 </UserControl>

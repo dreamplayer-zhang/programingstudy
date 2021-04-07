@@ -112,19 +112,92 @@
                 </Grid.RowDefinitions>
                 <Grid>
                     <GroupBox Header="Spectrum Data">
-                        <ListBox>
-                            
-                        </ListBox>
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="20"/>
+                                <RowDefinition/>
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition/>
+                                <ColumnDefinition/>
+                            </Grid.ColumnDefinitions>
+                            <Border BorderBrush="{StaticResource ProgressBarBackground}" BorderThickness="1" Margin="3">
+                                <TextBlock Text="Reflectance" VerticalAlignment="Center" TextAlignment="Center"/>
+                            </Border>
+                            <Border Grid.Column="1" BorderBrush="{StaticResource ProgressBarBackground}" BorderThickness="1" Margin="3">
+                                <TextBlock  Text="Transmiittance" VerticalAlignment="Center" TextAlignment="Center"/>
+                            </Border>
+                            <ListBox Grid.Row="1" Margin="3" ItemsSource="{Binding p_reflectanceList}" IsEnabled="{Binding p_IsSummary}">
+                                <ListBox.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <StackPanel HorizontalAlignment="Stretch">
+                                            <StackPanel.Resources>
+                                                <Style TargetType="ListBoxItem">
+                                                    <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                                                    <Setter Property="Focusable" Value="False"/>
+                                                </Style>
+                                            </StackPanel.Resources>
+                                        </StackPanel>
+                                    </ItemsPanelTemplate>
+                                </ListBox.ItemsPanel>
+                            </ListBox>
+                            <ListBox Grid.Row="1" Grid.Column="1" Margin="3" ItemsSource="{Binding p_transmittanceList}" IsEnabled="{Binding p_IsSummary}">
+                                <ListBox.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <StackPanel HorizontalAlignment="Stretch">
+                                            <StackPanel.Resources>
+                                                <Style TargetType="ListBoxItem">
+                                                    <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                                                    <Setter Property="Focusable" Value="False"/>
+                                                </Style>
+                                            </StackPanel.Resources>
+                                        </StackPanel>
+                                    </ItemsPanelTemplate>
+                                </ListBox.ItemsPanel>
+                            </ListBox>
+                            <Grid Grid.ColumnSpan="2" Grid.RowSpan="2">
+                                <Grid.Style>
+                                    <Style TargetType="Grid">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding p_IsSummary, UpdateSourceTrigger=PropertyChanged}" Value="False">
+                                                <Setter Property="Background">
+                                                    <Setter.Value>
+                                                        <SolidColorBrush Color="Black" Opacity="0.5"/>
+                                                    </Setter.Value>
+                                                </Setter>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Grid.Style>
+                            </Grid>
+                        </Grid>
                     </GroupBox>
                 </Grid>
                 <Grid Grid.Row="1">
                     <GroupBox Header="Point Data">
-                        <DataGrid>
+                        <DataGrid ItemsSource="{Binding PointListItem}" AutoGenerateColumns="False" CanUserAddRows="False" CanUserSortColumns="False" EnableColumnVirtualization="True"  CanUserDeleteRows="False" IsEnabled="{Binding p_IsSummary}"
+                                  EnableRowVirtualization="True" ScrollViewer.CanContentScroll="True" SelectionMode="Single" IsReadOnly="True" SelectedIndex="{Binding p_SelectedItemIndex}" PreviewKeyDown="DataGrid_PreviewKeyDown">
                             <DataGrid.Columns>
-                                <DataGridTextColumn Header="Site" Width="70"/>
-                                <DataGridTextColumn Header="X(mm)" Width="70"/>
-                                <DataGridTextColumn Header="Y(mm)" Width="70"/>
+                                <DataGridTextColumn Header="Site" Binding="{Binding ListSite}" Width="*"/>
+                                <DataGridTextColumn Header="X(mm)" Binding="{Binding ListX}" Width="*"/>
+                                <DataGridTextColumn Header="Y(mm)" Binding="{Binding ListY}" Width="*"/>
                             </DataGrid.Columns>
+                            <i:Interaction.Triggers>
+                                <i:EventTrigger EventName="MouseMove">
+                                    <i:CallMethodAction TargetObject="{Binding}" MethodName="OnMouseMoveDataGrid" />
+                                </i:EventTrigger>
+                                <i:EventTrigger EventName="MouseLeftButtonUp" >
+                                    <i:CallMethodAction TargetObject="{Binding}" MethodName="OnMouseLeftButtonUpDataGrid" />
+                                </i:EventTrigger>
+                            </i:Interaction.Triggers>
+                            <DataGrid.CellStyle>
+                                <Style TargetType="DataGridCell">
+                                    <Setter Property="BorderThickness" Value="0"/>
+                                    <!-- Update from comments.
+                 Remove the focus indication for the selected cell -->
+                                    <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+                                </Style>
+                            </DataGrid.CellStyle>
                         </DataGrid>
                     </GroupBox>
                 </Grid>
@@ -142,10 +215,10 @@
                     <TabControl>
                         <TabItem Header="Stage">
                             <Grid>
-                                <Viewbox Margin="3">
-                                    <stage:CamelliaStage></stage:CamelliaStage>
+                                <Viewbox Margin="3" Width="auto">
+                                    <stage:CamelliaStage Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}"></stage:CamelliaStage>
                                 </Viewbox>
-                                <Viewbox Margin="3">
+                                <Viewbox Margin="3" Width="auto" Height="auto">
                                     <ItemsControl ItemsSource="{Binding p_PointElement}"
                               Width="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualWidth}"
                               Height="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualHeight}" BorderBrush="Black" BorderThickness="1">
@@ -155,6 +228,42 @@
                                                 </Canvas>
                                             </ItemsPanelTemplate>
                                         </ItemsControl.ItemsPanel>
+                                    </ItemsControl>
+                                </Viewbox>
+                                <Viewbox Margin="3" Width="auto">
+                                    <ItemsControl IsEnabled="{Binding p_IsSummary}"
+                              Width="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualWidth}"
+                              Height="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualHeight}">
+                                        <ItemsControl.ItemsPanel>
+                                            <ItemsPanelTemplate>
+                                                <Canvas ClipToBounds="True"  Width="{x:Static local:BaseDefine.CanvasWidth}" Height="{x:Static local:BaseDefine.CanvasHeight}" Background="#01FFFFFF" Focusable="true">
+                                                </Canvas>
+                                            </ItemsPanelTemplate>
+                                        </ItemsControl.ItemsPanel>
+                                        <ItemsControl.Style>
+                                            <Style TargetType="ItemsControl">
+                                                <Style.Triggers>
+                                                    <Trigger Property="IsEnabled" Value="False">
+                                                        <Setter Property="Background">
+                                                            <Setter.Value>
+                                                                <SolidColorBrush Color="Black" Opacity="0.5"/>
+                                                            </Setter.Value>
+                                                        </Setter>
+                                                    </Trigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </ItemsControl.Style>
+                                        <i:Interaction.Triggers>
+                                            <i:EventTrigger EventName="MouseMove">
+                                                <i:CallMethodAction TargetObject="{Binding}" MethodName="OnMouseMove" />
+                                            </i:EventTrigger>
+                                            <i:EventTrigger EventName="MouseLeave">
+                                                <i:CallMethodAction TargetObject="{Binding}" MethodName="OnMouseLeave" />
+                                            </i:EventTrigger>
+                                            <i:EventTrigger EventName="MouseLeftButtonUp" >
+                                                <i:CallMethodAction TargetObject="{Binding}" MethodName="OnMouseLeftButtonUp" />
+                                            </i:EventTrigger>
+                                        </i:Interaction.Triggers>
                                     </ItemsControl>
                                 </Viewbox>
                             </Grid>

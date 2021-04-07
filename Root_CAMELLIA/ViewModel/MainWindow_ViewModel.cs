@@ -322,6 +322,20 @@ namespace Root_CAMELLIA
         }
         private ObservableCollection<UIElement> m_DrawPointElement = new ObservableCollection<UIElement>();
 
+        public ObservableCollection<UIElement> p_DrawCandidatePointElement
+        {
+            get
+            {
+                return m_DrawCandidatePointElement;
+            }
+            set
+            {
+                //m_DrawPointElement = value;
+                SetProperty(ref m_DrawCandidatePointElement, value);
+            }
+        }
+        private ObservableCollection<UIElement> m_DrawCandidatePointElement = new ObservableCollection<UIElement>();
+
         public double p_Progress
         {
             get
@@ -754,6 +768,7 @@ namespace Root_CAMELLIA
 
                         }
                         RecipeViewModel.UpdateView(true);
+                        p_DrawCandidatePointElement = new ObservableCollection<UIElement>(RecipeViewModel.p_DrawCandidatePointElement);
                         p_DrawPointElement = new ObservableCollection<UIElement>(RecipeViewModel.p_DrawPointElement);
                         DrawMeasureRoute();
                         p_Progress = 0;
@@ -795,6 +810,10 @@ namespace Root_CAMELLIA
                     }
                     RecipeViewModel.UpdateView(isRecipeLoad, true);
 
+                    if (isRecipeLoad)
+                    {
+                        p_DrawCandidatePointElement = new ObservableCollection<UIElement>(RecipeViewModel.p_DrawCandidatePointElement);
+                    }
                     p_DrawPointElement = new ObservableCollection<UIElement>(RecipeViewModel.p_DrawPointElement);
                     DrawMeasureRoute();
 

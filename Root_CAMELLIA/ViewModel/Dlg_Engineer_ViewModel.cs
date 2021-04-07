@@ -725,7 +725,7 @@ namespace Root_CAMELLIA
             {
                 return new RelayCommand(() =>
                 {
-                    if (CheckAxis())
+                    if (!CheckAxis())
                     {
                         return;
                     }
@@ -747,11 +747,11 @@ namespace Root_CAMELLIA
             {
                 return new RelayCommand(() =>
                 {
-                    
-                    AxisX.StopAxis();
-                    AxisY.StopAxis();
-                    AxisZ.StopAxis();
-                    AxisLifter.StopAxis();
+                    SelectedAxis.StopAxis();
+                    //AxisX.StopAxis();
+                    //AxisY.StopAxis();
+                    //AxisZ.StopAxis();
+                    //AxisLifter.StopAxis();
                 });
             }
         }
@@ -772,7 +772,7 @@ namespace Root_CAMELLIA
             {
                 return new RelayCommand(() =>
                 {
-                    if (CheckAxis())
+                    if (!CheckAxis())
                     {
                         return;
                     }
@@ -794,7 +794,7 @@ namespace Root_CAMELLIA
             {
                 return new RelayCommand(() =>
                 {
-                    if (CheckAxis())
+                    if (!CheckAxis())
                     {
                         return;
                     }
