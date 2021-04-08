@@ -94,7 +94,7 @@ namespace RootTools.Light
                     case eType.Power4:
                         //if (sRead.Length != m_sSend.Length) return "Invalid Protocol Length";
                         sRead = sRead.Replace('R', 'W');
-                        if (sRead != m_sSend) return "Invalid Protocol Receive";
+                        //if (sRead != m_sSend) return "Invalid Protocol Receive";
                         break; 
                 }
                 return "OK"; 
