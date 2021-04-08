@@ -56,6 +56,7 @@ namespace Root_Rinse_Unloader.Module
                 Empty,
                 Exist,
                 Arrived,
+                Push
             }
             eSensor _eSensor = eSensor.Empty;
             public eSensor p_eSensor
@@ -78,18 +79,13 @@ namespace Root_Rinse_Unloader.Module
                         if (m_diCheck[0].p_bIn || m_diCheck[1].p_bIn) p_eSensor = eSensor.Exist;
                         break;
                     case eSensor.Exist:
-                        if (m_diCheck[2].p_bIn)
-                        {
-                            p_eSensor = eSensor.Arrived;
-                        }
+                        if (m_diCheck[2].p_bIn) p_eSensor = eSensor.Arrived;
                         break;
+                    case eSensor.Push:
+                        if (m_diCheck[1].p_bIn == false) p_eSensor = eSensor.Push;
+                        break; 
                 }
                 return "OK";
-            }
-
-            public bool IsArriveDone()
-            {
-                return m_diCheck[1].p_bIn == false; 
             }
 
             string m_id;
@@ -155,7 +151,7 @@ namespace Root_Rinse_Unloader.Module
         {
             try
             {
-                if (Run(m_storage.RunMoveMagazine())) return p_sInfo; 
+//                if (Run(m_storage.RunMoveMagazine())) return p_sInfo; //forget
                 if (Run(m_dioPusher.RunSol(false))) return p_sInfo;
                 if (Run(RunPusherDown(true))) return p_sInfo;
                 while (m_storage.IsBusy())
@@ -215,16 +211,18 @@ namespace Root_Rinse_Unloader.Module
         #endregion
 
         #region Run Run
-        List<bool> m_bExist; 
+        List<bool> m_bExist = new List<bool>(); 
         public string StartRun(List<bool> bExist)
         {
-            m_bExist = bExist; 
+            m_bExist = bExist;
+            while (m_bExist.Count < 4) m_bExist.Add(true); 
             StartRun(m_runRun); 
             return "OK";
         }
 
         public string RunRun(double secArrive)
         {
+            RunRotate(true); 
             while (IsExist() == false)
             {
                 Thread.Sleep(10);
@@ -238,14 +236,15 @@ namespace Root_Rinse_Unloader.Module
             Thread.Sleep((int)(1000 * secArrive));
             foreach (Line line in m_aLine)
             {
-                if (line.IsArriveDone() == false)
+                if (line.p_eSensor != Line.eSensor.Push)
                 {
                     m_alidArrived.p_bSet = true; 
                     return "Arrive Done Error";
                 }
             }
             string sRun = RunPusher();
-            m_alidPusher.p_bSet = (sRun != "OK"); 
+            m_alidPusher.p_bSet = (sRun != "OK");
+            RunRotate(false); 
             return sRun; 
         }
 

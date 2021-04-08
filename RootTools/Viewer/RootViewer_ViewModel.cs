@@ -1523,24 +1523,43 @@ namespace RootTools
 
             if (ofd.ShowDialog() == DialogResult.OK)
             {
-                var viewModel = new Dialog_ImageOpenViewModel(this as RootViewer_ViewModel);
-                Nullable<bool> result = m_DialogService.ShowDialog(viewModel);
-                if (result.HasValue)
+                if (m_DialogService == null)
                 {
-                    if (result.Value)
+                    int channel = 0;
+                    if (p_ImageData.GetBytePerPixel() == 3)
                     {
-                        int channel = 0;
-                        if (p_ImageData.GetBytePerPixel() == 3)
-                        {
-                            if (p_eColorViewMode == eColorViewMode.G) channel = 1;
-                            else if (p_eColorViewMode == eColorViewMode.B) channel = 2;
-                        }
-
-                        p_ImageData.OpenFile(ofd.FileName, p_CopyOffset, channel);
+                        if (p_eColorViewMode == eColorViewMode.G)
+                            channel = 1;
+                        else if (p_eColorViewMode == eColorViewMode.B)
+                            channel = 2;
                     }
-                    else
+
+                    p_ImageData.OpenFile(ofd.FileName, p_CopyOffset, channel);
+                    return;
+                }
+                else
+                {
+                    var viewModel = new Dialog_ImageOpenViewModel(this as RootViewer_ViewModel);
+                    Nullable<bool> result = m_DialogService.ShowDialog(viewModel);
+                    if (result.HasValue)
                     {
-                        // Cancelled
+                        if (result.Value)
+                        {
+                            int channel = 0;
+                            if (p_ImageData.GetBytePerPixel() == 3)
+                            {
+                                if (p_eColorViewMode == eColorViewMode.G)
+                                    channel = 1;
+                                else if (p_eColorViewMode == eColorViewMode.B)
+                                    channel = 2;
+                            }
+
+                            p_ImageData.OpenFile(ofd.FileName, p_CopyOffset, channel);
+                        }
+                        else
+                        {
+                            // Cancelled
+                        }
                     }
                 }
             }
