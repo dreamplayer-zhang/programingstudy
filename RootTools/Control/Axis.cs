@@ -460,14 +460,6 @@ namespace RootTools.Control
                 default: return "WaitReady Error p_eState = " + p_eState.ToString();
             }
         }
-
-        public string WaitReadyDelayed(int nDelayTime = 0, double dInPos = -1)
-        {
-            Thread.Sleep(nDelayTime);
-
-            return WaitReady(dInPos);
-        }
-
         private void M_EQ_OnChanged(_EQ.eEQ eEQ, dynamic value)
         {
             if (eEQ != _EQ.eEQ.DoorOpen) return;
