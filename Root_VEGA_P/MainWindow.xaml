@@ -58,10 +58,6 @@
                            VerticalAlignment="Center"
                            FontSize="12" />
             </StackPanel>
-            <!--<TextBlock Text="Recipe Name.rcp"
-                       Foreground="White"
-                       VerticalAlignment="Center"
-                       HorizontalAlignment="Center" />-->
             <StackPanel WindowChrome.IsHitTestVisibleInChrome="True"
                         HorizontalAlignment="Right"
                         Orientation="Horizontal"
