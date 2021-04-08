@@ -210,11 +210,11 @@ namespace Root_Rinse_Loader.Module
             m_axis.AddPos("Stack_Down");
         }
 
-        int m_dZ = 6;
+        int m_dZ = 6000;
         public string MoveMagazine(eMagazine eMagazine, int iIndex, bool bWait)
         {
             if ((iIndex < 0) || (iIndex >= 20)) return "Invalid Index"; 
-            m_axis.StartMove(eMagazine, (iIndex - 19) * m_dZ);
+            m_axis.StartMove(eMagazine, -iIndex * m_dZ);
             if (bWait) return m_axis.WaitReady();
             return "OK";
         }
@@ -275,6 +275,8 @@ namespace Root_Rinse_Loader.Module
         double m_secRunDelay = 0; 
         public string RunMagazine()
         {
+            RunMagazine(m_rinse.p_eMagazine, m_rinse.p_iMagazine); 
+
             foreach (eMagazine eMagazine in Enum.GetValues(typeof(eMagazine)))
             {
                 m_rinse.p_eMagazine = eMagazine; 
@@ -286,7 +288,7 @@ namespace Root_Rinse_Loader.Module
         string RunMagazine(eMagazine eMagazine)
         {
             if (m_aMagazine[(int)eMagazine].p_bCheck == false) return "OK";
-            for (int n = 0; n < 20; n++)
+            for (int n = 19; n >= 0; n--)
             {
                 m_rinse.p_iMagazine = n; 
                 if (Run(MoveMagazine(eMagazine, n, true))) return p_sInfo;
@@ -294,6 +296,16 @@ namespace Root_Rinse_Loader.Module
                 Thread.Sleep((int)(1000 * m_secRunDelay));
             }
             return "OK"; 
+        }
+
+        string RunMagazine(eMagazine eMagazine, int iMagazine)
+        {
+            if (m_aMagazine[(int)eMagazine].p_bCheck == false) return "OK";
+            if (Run(MoveMagazine(eMagazine, iMagazine, true))) return p_sInfo;
+            Thread.Sleep((int)(500 * m_secRunDelay));
+            if (Run(RunPusher())) return p_sInfo;
+            Thread.Sleep((int)(500 * m_secRunDelay));
+            return ""; 
         }
         #endregion
 

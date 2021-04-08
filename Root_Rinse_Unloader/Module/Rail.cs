@@ -250,32 +250,34 @@ namespace Root_Rinse_Unloader.Module
 
         bool IsExist()
         {
-            int[] nExist = { 0, 0 }; 
-            for (int n = 0; n < m_bExist.Count; n++)
+            foreach (Line line in m_aLine)
             {
-                m_aLine[n].CheckSensor();
-                if (m_bExist[n])
-                {
-                    nExist[0]++;
-                    if (m_aLine[n].p_eSensor != Line.eSensor.Empty) nExist[1]++; 
-                }
+                line.CheckSensor(); 
+                if (line.p_eSensor != Line.eSensor.Empty) return true; 
             }
-            return nExist[0] == nExist[1];
+            return false; 
         }
 
         bool IsArrived()
         {
-            int[] nExist = { 0, 0 };
-            for (int n = 0; n < m_bExist.Count; n++)
+            foreach (Line line in m_aLine)
             {
-                m_aLine[n].CheckSensor();
-                if (m_bExist[n])
+                line.CheckSensor(); 
+                switch (line.p_eSensor)
                 {
-                    nExist[0]++;
-                    if (m_aLine[n].p_eSensor == Line.eSensor.Arrived) nExist[1]++;
+                    case Line.eSensor.Exist:
+                    case Line.eSensor.Arrived: return false; 
                 }
             }
-            return nExist[0] == nExist[1];
+            for (int n = 0; n < m_bExist.Count; n++)
+            {
+                if (m_bExist[n] != (m_aLine[n].p_eSensor == Line.eSensor.Push))
+                {
+                    //EQ.p_bStop = true;
+                    //EQ.p_eState = EQ.eState.Error; 
+                }
+            }
+            return true;
         }
         #endregion
 

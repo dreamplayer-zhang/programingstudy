@@ -68,7 +68,7 @@ namespace Root_Rinse_Loader.MainUI
 
         private void buttonNew_Click(object sender, RoutedEventArgs e)
         {
-            m_rinse.p_eMagazine = Storage.eMagazine.Magazine1; 
+            m_rinse.p_eMagazine = Storage.eMagazine.Magazine4; 
             m_rinse.p_iMagazine = 0; 
         }
 
