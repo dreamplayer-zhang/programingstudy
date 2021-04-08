@@ -296,5 +296,13 @@ namespace RootTools.Comm
                 m_socket = null;
             }
         }
+
+        public bool IsConnected()
+        {
+            if (m_socket != null)
+                return m_socket.Connected;
+
+            return false;
+        }
     }
 }
