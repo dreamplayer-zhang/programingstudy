@@ -160,6 +160,7 @@ namespace Root_Rinse_Loader.Module
 
         public ObservableCollection<Strips> p_aSend = new ObservableCollection<Strips>();
         public ObservableCollection<Strips> p_aReceive = new ObservableCollection<Strips>();
+        int m_iSend = 0; 
         private void M_timer_Tick(object sender, EventArgs e)
         {
             if (m_qSend.Count > 0) p_aSend.Add(m_qSend.Dequeue());
@@ -173,6 +174,18 @@ namespace Root_Rinse_Loader.Module
                     strip.p_sReceive = sStrip;
                     p_aReceive.Add(strip);
                 }
+            }
+            else
+            {
+                switch (m_iSend)
+                {
+                    case 0: AddProtocol(p_id, eCmd.SetMode, p_eMode); break;
+                    case 1: AddProtocol(p_id, eCmd.SetWidth, p_widthStrip); break;
+                    case 2: AddProtocol(p_id, eCmd.EQLeState, EQ.p_eState); break;
+                    case 3: AddProtocol(p_id, eCmd.SetRotateSpeed, p_fRotateSpeed);break;
+                    default: m_iSend = -1; break; 
+                }
+                m_iSend++;
             }
         }
         #endregion
@@ -285,9 +298,6 @@ namespace Root_Rinse_Loader.Module
                         case EQ.eState.Ready: RunBuzzerOff(); break;
                     }
                     break;
-                case _EQ.eEQ.PickerSet:
-                    AddProtocol(p_id, eCmd.PickerSet, value);
-                    break; 
             }
         }
         #endregion
@@ -432,7 +442,6 @@ namespace Root_Rinse_Loader.Module
             SetWidth,
             EQLeState,
             EQUeState,
-            PickerSet,
             StripSend,
             StripReceive,
             ResultClear,
