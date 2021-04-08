@@ -816,11 +816,8 @@ namespace RootTools
                 int rowSize = (rect.Width * nByte + 3) & ~3;
                 byte[] aBuf = new byte[(long)rowSize];
                 IntPtr ptr = IntPtr.Zero;
-                if (p_nPlane == 1)
-                {
-                    ptr = GetPtr(0);
-                }
-                else if (p_nPlane == 3)
+
+                if (p_nPlane == 3)
                 {
                     ptr = IntPtr.Zero;
                     switch (channel)
@@ -833,11 +830,25 @@ namespace RootTools
                     }
                 }
                 else
-                    return;
+                    ptr = GetPtr();
 
                 if (ptr != IntPtr.Zero)
                 {
-                    if (nByte == 2)
+                    if(p_nByte == nByte)
+                    {
+                        for (int j = rect.Top + rect.Height - 1; j >= rect.Top; j--)
+                        {
+                            Array.Clear(aBuf, 0, rowSize);
+
+                            long idx = ((long)j * p_Size.X + rect.Left) * p_nByte;
+                            IntPtr srcPtr = new IntPtr(ptr.ToInt64() + idx);
+                            Marshal.Copy(srcPtr, aBuf, 0, rowSize);
+
+                            bw.Write(aBuf);
+                            p_nProgress = Convert.ToInt32(((double)(rect.Height - (j - rect.Top)) / rect.Height) * 100);
+                        }
+                    }
+                    else
                     {
                         for (int j = rect.Top + rect.Height - 1; j >= rect.Top; j--)
                         {
@@ -865,20 +876,6 @@ namespace RootTools
                                     aBuf[i * nByte + 1] = (byte)((val & 0x00FF));
                                 }
                             });
-
-                            bw.Write(aBuf);
-                            p_nProgress = Convert.ToInt32(((double)(rect.Height - (j - rect.Top)) / rect.Height) * 100);
-                        }
-                    }
-                    else
-                    {
-                        for (int j = rect.Top + rect.Height - 1; j >= rect.Top; j--)
-                        {
-                            Array.Clear(aBuf, 0, rowSize);
-
-                            long idx = ((long)j * p_Size.X + rect.Left) * p_nByte;
-                            IntPtr srcPtr = new IntPtr(ptr.ToInt64() + idx);
-                            Marshal.Copy(srcPtr, aBuf, 0, rowSize);
 
                             bw.Write(aBuf);
                             p_nProgress = Convert.ToInt32(((double)(rect.Height - (j - rect.Top)) / rect.Height) * 100);
