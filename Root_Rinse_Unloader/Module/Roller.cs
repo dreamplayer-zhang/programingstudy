@@ -285,6 +285,7 @@ namespace Root_Rinse_Unloader.Module
 
         public string RunWaitArrived()
         {
+            m_storage.StartMoveMagazine(false); 
             m_rail.RunMoveWidth(m_rinse.p_widthStrip);
             m_rail.RunPusherDown(m_rinse.p_eMode == RinseU.eRunMode.Stack); 
             RunMoveAlign(false);
@@ -378,12 +379,14 @@ namespace Root_Rinse_Unloader.Module
 
         RinseU m_rinse;
         Rail m_rail;
-        public Roller(string id, IEngineer engineer, RinseU rinse, Rail rail)
+        Storage m_storage; 
+        public Roller(string id, IEngineer engineer, RinseU rinse, Rail rail, Storage storage)
         {
             while (m_bExist.Count < 4) m_bExist.Add(false);
             p_id = id;
             m_rinse = rinse;
-            m_rail = rail; 
+            m_rail = rail;
+            m_storage = storage; 
             InitILines();
             InitBase(id, engineer);
 

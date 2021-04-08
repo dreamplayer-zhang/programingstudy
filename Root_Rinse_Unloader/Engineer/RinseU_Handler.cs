@@ -45,7 +45,7 @@ namespace Root_Rinse_Unloader.Engineer
             InitModule(m_storage);
             m_rail = new Rail("Rail", m_engineer, m_rinse, m_storage);
             InitModule(m_rail);
-            m_roller = new Roller("Roller", m_engineer, m_rinse, m_rail);
+            m_roller = new Roller("Roller", m_engineer, m_rinse, m_rail, m_storage);
             InitModule(m_roller);
             m_loader = new Loader("Loader", m_engineer, m_rinse, m_storage, m_roller);
             InitModule(m_loader);
