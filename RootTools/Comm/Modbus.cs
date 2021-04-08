@@ -429,9 +429,12 @@ namespace RootTools.Comm
             }
         }
         public ObservableCollection<ViewData> m_aViewData = new ObservableCollection<ViewData>();
-        public void AddViewData(eType eType, int nStartAddress, int nCount)
+
+        public int p_nViewStart { get; set; }
+        public int p_nViewEnd { get; set; }
+        public void AddViewData(eType eType)
         {
-            for (int n = 0; n < nCount; n++) m_aViewData.Add(new ViewData(this, eType, nStartAddress + n)); 
+            for (int n = p_nViewStart; n <= p_nViewEnd; n++) m_aViewData.Add(new ViewData(this, eType, n)); 
         }
 
         public string ReadViewData(byte nUnit)

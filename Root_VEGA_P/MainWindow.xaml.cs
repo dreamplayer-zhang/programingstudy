@@ -73,6 +73,11 @@ namespace Root_VEGA_P
 				this.DragMove();
 			}
 		}
-        #endregion
-    }
+		#endregion
+
+		private void CloseButton_Click(object sender, RoutedEventArgs e)
+		{
+			this.Close();
+		}
+	}
 }

@@ -266,5 +266,14 @@ namespace RootTools.Comm
             if (m_tcpSocket == null) return "Not Connected"; 
             return m_tcpSocket.Send(sMsg); 
         }
+
+        public bool IsConnected()
+        {
+            if (m_tcpSocket != null)
+                if(m_tcpSocket.m_socket != null)
+                    return m_tcpSocket.m_socket.Connected;
+
+            return false;
+        }
     }
 }

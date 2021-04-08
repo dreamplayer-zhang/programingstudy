@@ -156,11 +156,11 @@ namespace Root_Rinse_Unloader.Module
             m_axis.AddPos("Stack");
         }
 
-        int m_dZ = 6;
+        int m_dZ = 6000;
         public string MoveMagazine(eMagazine eMagazine, int iIndex, bool bWait)
         {
             if ((iIndex < 0) || (iIndex >= 20)) return "Invalid Index";
-            m_axis.StartMove(eMagazine, (iIndex - 19) * m_dZ);
+            m_axis.StartMove(eMagazine, -iIndex * m_dZ);
             if (bWait) return m_axis.WaitReady();
             return "OK"; 
         }

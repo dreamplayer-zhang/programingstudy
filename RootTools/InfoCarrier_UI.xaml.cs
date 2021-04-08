@@ -51,7 +51,8 @@ namespace RootTools
 
         private void M_timer_Tick(object sender, EventArgs e)
         {
-            m_infoCarrier.RunTreeWafer(Tree.eMode.Init);
+            if (EQ.m_bRun) m_infoCarrier.RunTreeWafer(Tree.eMode.Init);
+            else m_timer.Stop(); 
         }
         #endregion
 
