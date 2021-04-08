@@ -18,7 +18,7 @@ namespace RootTools.ImageProcess
         }
 
         public MemoryData memData;
-        public string sDirPath = @"C:\Recipe\VEGA_P_Vision";
+        public string sDirPath = @"C:\Recipe\VEGA_P\";
         public bool bTest;
         public int nTest_afterAvg;
         public int nTest_beforeAvg;
@@ -193,18 +193,18 @@ namespace RootTools.ImageProcess
            
             //이미지 연산.
             res = ComparePixelData(ListOfSrc, ListOfLaplacianData, out ListOfPartImg);
-            
+            CvInvoke.Imwrite(DI.sDirPath + "Res.bmp",res);
             Parallel.For(0, res.Height, (j) =>
             {
                 int memWidth = (int)DI.memData.W;
                 IntPtr n_ptr = DI.memData.GetPtr(DI.memData.p_nCount - 1) + j*memWidth;
                 IntPtr ptr = res.DataPointer + j*res.Width;
 
-                Buffer.MemoryCopy((void*)n_ptr, (void*)ptr, res.Width, res.Width);
+                Buffer.MemoryCopy((void*)ptr, (void*)n_ptr, res.Width, res.Width);
             });
 
             //save
-            //res.Save(DI.sDirPath + "\\" + "_Result_" + DI.nTest_beforeAvg + "_" + DI.nTest_afterAvg + "_" + DI.p_nMaskSize + "_" + total.ElapsedMilliseconds + ".tif");
+            //res.Save(DI.sDirPath + "\\" + "_Result_" + ".bmp");
             //Console.WriteLine("총 소요시간 : " + total.ElapsedMilliseconds + "ms");
         }
 
