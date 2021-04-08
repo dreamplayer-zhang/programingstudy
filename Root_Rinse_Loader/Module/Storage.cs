@@ -275,37 +275,36 @@ namespace Root_Rinse_Loader.Module
         double m_secRunDelay = 0; 
         public string RunMagazine()
         {
-            RunMagazine(m_rinse.p_eMagazine, m_rinse.p_iMagazine); 
-
-            foreach (eMagazine eMagazine in Enum.GetValues(typeof(eMagazine)))
+            while (EQ.p_bStop == false)
             {
-                m_rinse.p_eMagazine = eMagazine; 
-                RunMagazine(eMagazine);
+                Thread.Sleep(1);
+                if (Run(RunMagazine(m_rinse.p_eMagazine, m_rinse.p_iMagazine))) return p_sInfo;
+                m_rinse.p_iMagazine++;
+                if (m_rinse.p_iMagazine >= 20)
+                {
+                    m_rinse.p_iMagazine = 0;
+                    eMagazine eMagazine = m_rinse.p_eMagazine; 
+                    switch(eMagazine)
+                    {
+                        case eMagazine.Magazine1: return "OK";
+                        case eMagazine.Magazine2: m_rinse.p_eMagazine = eMagazine.Magazine1; break;
+                        case eMagazine.Magazine3: m_rinse.p_eMagazine = eMagazine.Magazine2; break;
+                        case eMagazine.Magazine4: m_rinse.p_eMagazine = eMagazine.Magazine3; break;
+                    }
+                }
             }
-            return "OK";
-        }
-
-        string RunMagazine(eMagazine eMagazine)
-        {
-            if (m_aMagazine[(int)eMagazine].p_bCheck == false) return "OK";
-            for (int n = 19; n >= 0; n--)
-            {
-                m_rinse.p_iMagazine = n; 
-                if (Run(MoveMagazine(eMagazine, n, true))) return p_sInfo;
-                if (Run(RunPusher())) return p_sInfo;
-                Thread.Sleep((int)(1000 * m_secRunDelay));
-            }
-            return "OK"; 
+            return "EQ Stop";
         }
 
         string RunMagazine(eMagazine eMagazine, int iMagazine)
         {
             if (m_aMagazine[(int)eMagazine].p_bCheck == false) return "OK";
+            if (m_aMagazine[(int)eMagazine].p_bClamp == false) return "OK";
             if (Run(MoveMagazine(eMagazine, iMagazine, true))) return p_sInfo;
             Thread.Sleep((int)(500 * m_secRunDelay));
             if (Run(RunPusher())) return p_sInfo;
             Thread.Sleep((int)(500 * m_secRunDelay));
-            return ""; 
+            return "OK"; 
         }
         #endregion
 

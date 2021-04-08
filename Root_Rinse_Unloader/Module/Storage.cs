@@ -269,6 +269,9 @@ namespace Root_Rinse_Unloader.Module
                 case RinseU.eRunMode.Stack:
                     StartMoveStackReady();
                     break;
+                case RinseU.eRunMode.Magazine:
+                    StartMoveMagazine(false);
+                    break; 
             }
         }
         #endregion
@@ -280,39 +283,40 @@ namespace Root_Rinse_Unloader.Module
             return "OK";
         }
 
-        public string RunMoveMagazine()
-        {
-            if (m_aMagazine[(int)m_rinse.p_eMagazine].p_bClamp == false)
-            {
-                m_rinse.p_iMagazine = 0;
-                if (Run(SetNextMagazine())) return p_sInfo;
-            }
-            return MoveMagazine(m_rinse.p_eMagazine, m_rinse.p_iMagazine, true); 
-        }
-
-        public string StartMoveNextMagazine()
+        public string StartMoveMagazine(bool bNext)
         {
             Run_RunNextMagazine run = (Run_RunNextMagazine)m_runNextMagazine.Clone();
+            run.m_bNext = bNext; 
             return StartRun(run); 
         }
 
-        public string MoveNextMagazine()
+        public string MoveMagazine(bool bNext)
         {
-            if (m_rinse.p_iMagazine < 19) m_rinse.p_iMagazine++;
-            else
+            if (bNext)
             {
-                m_rinse.p_iMagazine = 0;
-                if (Run(SetNextMagazine())) return p_sInfo; 
+                m_rinse.p_iMagazine++;
+                if (m_rinse.p_iMagazine >= 20)
+                {
+                    m_rinse.p_iMagazine = 0;
+                    if (Run(SetNextMagazine(m_rinse.p_eMagazine))) return p_sInfo;
+                }
             }
             return MoveMagazine(m_rinse.p_eMagazine, m_rinse.p_iMagazine, true); 
         }
 
-        string SetNextMagazine()
+        string SetNextMagazine(eMagazine eMagazine)
         {
-            if (m_rinse.p_eMagazine >= eMagazine.Magazine4) return "Cassette Full";
-            m_rinse.p_eMagazine = m_rinse.p_eMagazine + 1;
-            if (m_aMagazine[(int)m_rinse.p_eMagazine].p_bClamp) return "OK";
-            return SetNextMagazine(); 
+            switch (eMagazine)
+            {
+                case eMagazine.Magazine1: return "Magazine Full";
+                case eMagazine.Magazine2: m_rinse.p_eMagazine = eMagazine.Magazine1; break;
+                case eMagazine.Magazine3: m_rinse.p_eMagazine = eMagazine.Magazine2; break;
+                case eMagazine.Magazine4: m_rinse.p_eMagazine = eMagazine.Magazine3; break;
+            }
+            bool bCheck = m_aMagazine[(int)m_rinse.p_eMagazine].p_bCheck;
+            bool bClamp = m_aMagazine[(int)m_rinse.p_eMagazine].p_bClamp; 
+            if (bCheck && bClamp) return "OK";
+            return SetNextMagazine(m_rinse.p_eMagazine); 
         }
 
         ModuleRunBase m_runReady;
@@ -447,19 +451,22 @@ namespace Root_Rinse_Unloader.Module
                 InitModuleRun(module);
             }
 
+            public bool m_bNext = true; 
             public override ModuleRunBase Clone()
             {
                 Run_RunNextMagazine run = new Run_RunNextMagazine(m_module);
+                run.m_bNext = m_bNext; 
                 return run;
             }
 
             public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
             {
+                m_bNext = tree.Set(m_bNext, m_bNext, "Next", "Move Next Magazine", bVisible); 
             }
 
             public override string Run()
             {
-                return m_module.MoveNextMagazine();
+                return m_module.MoveMagazine(m_bNext);
             }
         }
         #endregion
