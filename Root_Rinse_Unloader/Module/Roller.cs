@@ -49,7 +49,7 @@ namespace Root_Rinse_Unloader.Module
             p_sInfo = m_toolBox.GetAxis(ref m_axisRotate[1], this, "Rotate1");
             p_sInfo = m_toolBox.GetAxis(ref m_axisAlign, this, "Align"); 
             p_sInfo = m_toolBox.GetDIO(ref m_dioStopperUp, this, "StopperUp", "Down", "Up"); 
-            foreach (Line line in m_aLine) line.GetTools(m_toolBox);
+            foreach (Line line in m_aLine) line.GetTools(m_toolBox, bInit);
             if (bInit) 
             {
                 InitPosWidth();
@@ -117,13 +117,18 @@ namespace Root_Rinse_Unloader.Module
         {
             public DIO_I[] m_diCheck = new DIO_I[3];
             public DIO_I2O[] m_dioAlignUp = new DIO_I2O[2]; 
-            public void GetTools(ToolBox toolBox)
+            public void GetTools(ToolBox toolBox, bool bInit)
             {
                 m_roller.p_sInfo = toolBox.GetDIO(ref m_diCheck[0], m_roller, m_id + ".Start");
                 m_roller.p_sInfo = toolBox.GetDIO(ref m_diCheck[1], m_roller, m_id + ".Mid");
                 m_roller.p_sInfo = toolBox.GetDIO(ref m_diCheck[2], m_roller, m_id + ".Arrived");
                 m_roller.p_sInfo = toolBox.GetDIO(ref m_dioAlignUp[0], m_roller, m_id + ".AlignL_Up", "Down", "Up");
                 m_roller.p_sInfo = toolBox.GetDIO(ref m_dioAlignUp[1], m_roller, m_id + ".AlignR_Up", "Down", "Up");
+                if (bInit)
+                {
+                    m_dioAlignUp[0].Write(false);
+                    m_dioAlignUp[1].Write(false); 
+                }
             }
 
             public enum eSensor
@@ -173,7 +178,19 @@ namespace Root_Rinse_Unloader.Module
             for (int n = 0; n < 4; n++) m_aLine.Add(new Line("Line" + n.ToString(), this));
         }
 
-        public string RunAlignerUp(bool bUp)
+        bool _bPusherUp = false;
+        public bool p_bPusherUp
+        {
+            get { return _bPusherUp; }
+            set
+            {
+                if (_bPusherUp == value) return;
+                _bPusherUp = value;
+                RunPusherUp(value); 
+                OnPropertyChanged(); 
+            }
+        }
+        string RunPusherUp(bool bUp)
         {
             foreach (Line line in m_aLine)
             {
@@ -268,6 +285,13 @@ namespace Root_Rinse_Unloader.Module
 
         public string RunWaitArrived()
         {
+            m_storage.StartMoveMagazine(false); 
+            m_rail.RunMoveWidth(m_rinse.p_widthStrip);
+            m_rail.RunPusherDown(m_rinse.p_eMode == RinseU.eRunMode.Stack); 
+            RunMoveAlign(false);
+            p_bPusherUp = (m_rinse.p_eMode == RinseU.eRunMode.Magazine);
+            RunStopperUp(true);
+            RunRotate(true); 
             while ((p_eStep != eStep.Picker) && (p_eStep != eStep.Send))
             {
                 Thread.Sleep(10);
@@ -286,41 +310,34 @@ namespace Root_Rinse_Unloader.Module
         public List<bool> m_bExist = new List<bool>();
         public string RunAlign()
         {
-            try
+            Thread.Sleep((int)(1000 * m_secArrived));
+            if (Run(RunRotate(false))) return p_sInfo;
+            if (m_rinse.p_eMode == RinseU.eRunMode.Magazine)
             {
-                Thread.Sleep((int)(1000 * m_secArrived)); 
-                if (Run(RunRotate(false))) return p_sInfo;
-                if (m_rinse.p_eMode == RinseU.eRunMode.Magazine)
-                {
-                    if (Run(RunMoveAlign(false))) return p_sInfo;
-                    if (Run(RunAlignerUp(true))) return p_sInfo;
-                    if (Run(RunMoveAlign(true))) return p_sInfo;
-                    if (Run(RunMoveAlign(false))) return p_sInfo;
-                    if (Run(RunAlignerUp(false))) return p_sInfo;
-                }
-                for (int n = 0; n < 4; n++) m_bExist[n] = m_aLine[n].p_eSensor != Line.eSensor.Empty;
-                switch (m_rinse.p_eMode)
-                {
-                    case RinseU.eRunMode.Magazine:
-                        RunStopperUp(false);
-                        while (m_rail.p_eState != eState.Ready)
-                        {
-                            Thread.Sleep(10);
-                            if (EQ.IsStop()) return "EQ Stop";
-                        }
-                        m_rail.StartRun(m_bExist);
-                        RunRotate(true);
-                        Thread.Sleep(100);
-                        p_eStep = eStep.Send;
-                        foreach (Line line in m_aLine) line.p_eSensor = Line.eSensor.Empty;
-                        break;
-                    case RinseU.eRunMode.Stack:
-                        p_eStep = eStep.Picker;
-                        break;
-                }
-                return "OK";
+                if (Run(RunMoveAlign(true))) return p_sInfo;
+                if (Run(RunMoveAlign(false))) return p_sInfo;
             }
-            finally { RunAlignerUp(false); }
+            for (int n = 0; n < 4; n++) m_bExist[n] = m_aLine[n].p_eSensor != Line.eSensor.Empty;
+            switch (m_rinse.p_eMode)
+            {
+                case RinseU.eRunMode.Magazine:
+                    RunStopperUp(false);
+                    while (m_rail.p_eState != eState.Ready)
+                    {
+                        Thread.Sleep(10);
+                        if (EQ.IsStop()) return "EQ Stop";
+                    }
+                    RunRotate(true);
+                    m_rail.StartRun(m_bExist);
+                    Thread.Sleep(100);
+                    p_eStep = eStep.Send;
+                    foreach (Line line in m_aLine) line.p_eSensor = Line.eSensor.Empty;
+                    break;
+                case RinseU.eRunMode.Stack:
+                    p_eStep = eStep.Picker;
+                    break;
+            }
+            return "OK";
         }
 
         void RunTreeAlign(Tree tree)
@@ -337,8 +354,8 @@ namespace Root_Rinse_Unloader.Module
                 p_eState = eState.Ready;
                 return "OK";
             }
-            RunStopperUp(false); 
-            RunAlignerUp(false); 
+            RunStopperUp(false);
+            p_bPusherUp = false; 
             m_axisRotate[0].ServoOn(true);
             m_axisRotate[1].ServoOn(true);
             StateHome(m_axisAlign); 
@@ -362,12 +379,14 @@ namespace Root_Rinse_Unloader.Module
 
         RinseU m_rinse;
         Rail m_rail;
-        public Roller(string id, IEngineer engineer, RinseU rinse, Rail rail)
+        Storage m_storage; 
+        public Roller(string id, IEngineer engineer, RinseU rinse, Rail rail, Storage storage)
         {
             while (m_bExist.Count < 4) m_bExist.Add(false);
             p_id = id;
             m_rinse = rinse;
-            m_rail = rail; 
+            m_rail = rail;
+            m_storage = storage; 
             InitILines();
             InitBase(id, engineer);
 
@@ -389,7 +408,7 @@ namespace Root_Rinse_Unloader.Module
         {
             p_eStep = eStep.Empty; 
             RunStopperUp(true);
-            RunAlignerUp(false); 
+            p_bPusherUp = (m_rinse.p_eMode == RinseU.eRunMode.Magazine); 
             RunRotate(true);
             foreach (Line line in m_aLine) line.p_eSensor = Line.eSensor.Empty; 
         }
@@ -485,7 +504,7 @@ namespace Root_Rinse_Unloader.Module
 
             public override string Run()
             {
-                return m_module.RunAlignerUp(m_bUp);
+                return m_module.RunPusherUp(m_bUp);
             }
         }
 

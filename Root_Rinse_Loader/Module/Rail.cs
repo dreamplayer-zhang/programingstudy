@@ -28,7 +28,7 @@ namespace Root_Rinse_Loader.Module
         #region Line
         public class Line
         {
-            DIO_I[] m_diCheck = new DIO_I[3]; 
+            public DIO_I[] m_diCheck = new DIO_I[3]; 
             public void GetTools(ToolBox toolBox)
             {
                 m_rail.p_sInfo = toolBox.GetDIO(ref m_diCheck[0], m_rail, m_id + ".Start");
@@ -109,6 +109,10 @@ namespace Root_Rinse_Loader.Module
             {
                 p_eState = eState.Ready;
                 return "OK";
+            }
+            foreach (Line line in m_aLine)
+            {
+                for (int n = 0; n < 2; n++) if (line.m_diCheck[n].p_bIn) return "Check Strip";
             }
             m_axisRotate.ServoOn(true); 
             p_sInfo = base.StateHome(m_axisWidth);

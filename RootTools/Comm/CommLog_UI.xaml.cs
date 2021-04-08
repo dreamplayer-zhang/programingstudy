@@ -31,7 +31,7 @@ namespace RootTools.Comm
 
         private void listViewLog_LayoutUpdated(object sender, EventArgs e)
         {
-            p_nCount = listViewLog.Items.Count;
+            if (EQ.m_bRun) p_nCount = listViewLog.Items.Count;
         }
 
         int _nCount = 0;

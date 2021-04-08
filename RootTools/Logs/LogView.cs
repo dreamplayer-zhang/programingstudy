@@ -47,11 +47,14 @@ namespace RootTools
 
         public static void Init()
         {
+            EQ.m_bRun = true;
             _logView.Init(); 
         }
 
         public static void ThreadStop()
         {
+            EQ.m_bRun = false;
+            _logView.ThreadStop(); 
         }
     }
 

@@ -8,15 +8,15 @@
              xmlns:control="clr-namespace:Root_VEGA_D.Control"
              xmlns:icon="clr-namespace:Root_VEGA_D.Icon"
              mc:Ignorable="d"
-             d:DesignHeight="849"
-             d:DesignWidth="1052">
+             d:DesignHeight="848"
+             d:DesignWidth="1056">
     <Grid Background="White">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="2*"/>
             <ColumnDefinition />
         </Grid.ColumnDefinitions>
         <GroupBox Header="Viewer">
-            <tools:RootViewer x:Name="Viewer_UI"/>
+            <tools:RootViewer x:Name="Viewer_UI" MouseLeftButtonDown="Viewer_UI_MouseLeftButtonDown"/>
         </GroupBox>
         <Grid Grid.Column="1"
               Margin="0,10,0,0">
@@ -30,16 +30,13 @@
                     Margin="8,5"
                     Style="{StaticResource SetupPanelBtn}" />
             <GroupBox Header="Manaul Algin"
+                      GotFocus="GroupBox_GotFocus_1"
                       Grid.Row="1">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition />
-                        <RowDefinition Height="35"/>
+                        <RowDefinition Height="35" />
                     </Grid.RowDefinitions>
-                    <Button Content="Align"
-                            Margin="0"
-                            Grid.Row="1"
-                            Style="{StaticResource SetupPanelBtn}" />
                     <Grid Grid.Row="0">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="2*" />
@@ -48,29 +45,37 @@
                             <ColumnDefinition Width="3*" />
                         </Grid.ColumnDefinitions>
                         <RadioButton Content="Point 1" 
+                                     x:Name="rb_AlignPt1"
                                      VerticalAlignment="Center"
                                      HorizontalAlignment="Center"/>
                         <TextBox Text="0,0"
+                                 x:Name="tb_AlignPt1"
                                  Grid.Column="1"
                                  IsReadOnly="True"
                                  Margin="5,0"
                                  HorizontalContentAlignment="Center"
                                  VerticalAlignment="Center" />
-                        <RadioButton Content="Point 2" 
-                                         VerticalAlignment="Center"
-                                         HorizontalAlignment="Center"
-                                         Grid.Column="2"/>
-                        
+                        <RadioButton Content="Point 2"
+                                     x:Name="rb_AlignPt2"
+                                     VerticalAlignment="Center"
+                                     HorizontalAlignment="Center"
+                                     Grid.Column="2" />
                         <TextBox Text="0,0"
+                                 x:Name="tb_AlignPt2"
                                  Grid.Column="3"
                                  IsReadOnly="True"
                                  Margin="5,0"
                                  HorizontalContentAlignment="Center"
                                  VerticalAlignment="Center" />
                     </Grid>
+                    <Button Content="Align"
+                            Margin="0"
+                            Grid.Row="1"
+                            Style="{StaticResource SetupPanelBtn}" />
                 </Grid>
             </GroupBox>
             <GroupBox Header="Coordinate"
+                      GotFocus="GroupBox_GotFocus"
                       Grid.Row="2">
                 <Grid>
                     <Grid.RowDefinitions>
@@ -79,23 +84,27 @@
                         <RowDefinition Height="75*" />
                     </Grid.RowDefinitions>
                     <UniformGrid Columns="2"
-                                 Margin="0,5"
+                                 Margin="5,5"
                                  Grid.Row="0">
                         <TextBlock Text="Die Size"
                                    HorizontalAlignment="Left" />
                         <TextBlock Text="0, 0"
+                                   x:Name="tb_dieSize"
                                    HorizontalAlignment="Left" />
                         <TextBlock Text="Scribe Lane Size"
                                    HorizontalAlignment="Left" />
                         <TextBlock Text="0, 0"
+                                   x:Name="tb_laneSize"
                                    HorizontalAlignment="Left" />
                         <TextBlock Text="Shot Size"
                                    HorizontalAlignment="Left" />
                         <TextBlock Text="0, 0"
+                                   x:Name="tb_shotSize"
                                    HorizontalAlignment="Left" />
                         <TextBlock Text="Shot"
                                    HorizontalAlignment="Left" />
                         <TextBlock Text="0, 0"
+                                   x:Name="tb_shot"
                                    HorizontalAlignment="Left" />
                     </UniformGrid>
                     <CheckBox Content="Manual Input"
@@ -131,33 +140,58 @@
                                    Margin="0,2"
                                    HorizontalAlignment="Left" />
                         <TextBlock Text="X"
+                                   
                                    Grid.Column="2"
-                                   Margin="3,2" />
+                                   Margin="5,2" />
                         <TextBlock Text="Y"
                                    Grid.Column="3"
-                                   Margin="3,2" />
+                                   Margin="5,2" />
                         <RadioButton Content="a."
+                                     Tag="a"
+                                     Checked="Coordinate_Checked"
+                                     x:Name="rb_a"
                                    Grid.Row="1"
                                    HorizontalAlignment="Left" />
                         <RadioButton Content="b."
+                                     Tag="b"
+                                     Checked="Coordinate_Checked"
+                                     x:Name="rb_b"
                                    Grid.Row="2"
                                    HorizontalAlignment="Left" />
                         <RadioButton Content="c."
+                                     Tag="c"
+                                     Checked="Coordinate_Checked"
+                                     x:Name="rb_c"
                                    Grid.Row="3"
                                    HorizontalAlignment="Left" />
                         <RadioButton Content="d."
+                                     Tag="d"
+                                     Checked="Coordinate_Checked"
+                                     x:Name="rb_d"
                                    Grid.Row="4"
                                    HorizontalAlignment="Left" />
                         <RadioButton Content="e."
+                                     Tag="e"
+                                     Checked="Coordinate_Checked"
+                                     x:Name="rb_e"
                                    Grid.Row="5"
                                    HorizontalAlignment="Left" />
                         <RadioButton Content="f."
+                                     Tag="f"
+                                     Checked="Coordinate_Checked"
+                                     x:Name="rb_f"
                                    Grid.Row="6"
                                    HorizontalAlignment="Left" />
                         <RadioButton Content="g."
+                                     Tag="g"
+                                     Checked="Coordinate_Checked"
+                                     x:Name="rb_g"
                                    Grid.Row="7"
                                    HorizontalAlignment="Left" />
                         <RadioButton Content="h."
+                                     Tag="h"
+                                     Checked="Coordinate_Checked"
+                                     x:Name="rb_h"
                                    Grid.Row="8"
                                    HorizontalAlignment="Left" />
                         <TextBlock Text="FirstDieLeft"
@@ -193,21 +227,25 @@
                                    Grid.Row="8"
                                    HorizontalAlignment="Left" />
                         <TextBox Grid.Column="2"
+                                 x:Name="tb_a"
                                  IsEnabled="{Binding ElementName=cbManualMap, Path=IsChecked}"
                                  Grid.Row="1"
                                  Margin="3,0"
                                  VerticalAlignment="Center" />
                         <TextBox Grid.Column="2"
+                                 x:Name="tb_b"
                                  IsEnabled="{Binding ElementName=cbManualMap, Path=IsChecked}"
                                  Grid.Row="2"
                                  Margin="3,0"
                                  VerticalAlignment="Center" />
                         <TextBox Grid.Column="2"
+                                 x:Name="tb_c"
                                  IsEnabled="{Binding ElementName=cbManualMap, Path=IsChecked}"
                                  Grid.Row="3"
                                  Margin="3,0"
                                  VerticalAlignment="Center" />
                         <TextBox Grid.Column="2"
+                                 x:Name="tb_d"
                                  IsEnabled="{Binding ElementName=cbManualMap, Path=IsChecked}"
                                  Grid.Row="4"
                                  Margin="3,0"
@@ -215,59 +253,71 @@
                         <TextBox Grid.Column="2"
                                  IsEnabled="{Binding ElementName=cbManualMap, Path=IsChecked}"
                                  Grid.Row="5"
+                                 Visibility="Collapsed"
                                  Margin="3,0"
                                  VerticalAlignment="Center" />
                         <TextBox Grid.Column="2"
                                  IsEnabled="{Binding ElementName=cbManualMap, Path=IsChecked}"
                                  Grid.Row="6"
+                                 Visibility="Collapsed"
                                  Margin="3,0"
                                  VerticalAlignment="Center" />
                         <TextBox Grid.Column="2"
                                  IsEnabled="{Binding ElementName=cbManualMap, Path=IsChecked}"
                                  Grid.Row="7"
+                                 Visibility="Collapsed"
                                  Margin="3,0"
                                  VerticalAlignment="Center" />
                         <TextBox Grid.Column="2"
                                  IsEnabled="{Binding ElementName=cbManualMap, Path=IsChecked}"
                                  Grid.Row="8"
+                                 Visibility="Collapsed"
                                  Margin="3,0"
                                  VerticalAlignment="Center" />
                         <TextBox Grid.Column="3"
                                  IsEnabled="{Binding ElementName=cbManualMap, Path=IsChecked}"
                                  Grid.Row="1"
+                                 Visibility="Collapsed"
                                  Margin="3,0"
                                  VerticalAlignment="Center" />
                         <TextBox Grid.Column="3"
                                  IsEnabled="{Binding ElementName=cbManualMap, Path=IsChecked}"
                                  Grid.Row="2"
+                                 Visibility="Collapsed"
                                  Margin="3,0"
                                  VerticalAlignment="Center" />
                         <TextBox Grid.Column="3"
                                  IsEnabled="{Binding ElementName=cbManualMap, Path=IsChecked}"
                                  Grid.Row="3"
+                                 Visibility="Collapsed"
                                  Margin="3,0"
                                  VerticalAlignment="Center" />
                         <TextBox Grid.Column="3"
                                  IsEnabled="{Binding ElementName=cbManualMap, Path=IsChecked}"
                                  Grid.Row="4"
+                                 Visibility="Collapsed"
                                  Margin="3,0"
                                  VerticalAlignment="Center" />
                         <TextBox Grid.Column="3"
+                                 x:Name="tb_e"
                                  IsEnabled="{Binding ElementName=cbManualMap, Path=IsChecked}"
                                  Grid.Row="5"
                                  Margin="3,0"
                                  VerticalAlignment="Center" />
                         <TextBox Grid.Column="3"
+                                 x:Name="tb_f"
                                  IsEnabled="{Binding ElementName=cbManualMap, Path=IsChecked}"
                                  Grid.Row="6"
                                  Margin="3,0"
                                  VerticalAlignment="Center" />
                         <TextBox Grid.Column="3"
+                                 x:Name="tb_g"
                                  IsEnabled="{Binding ElementName=cbManualMap, Path=IsChecked}"
                                  Grid.Row="7"
                                  Margin="3,0"
                                  VerticalAlignment="Center" />
                         <TextBox Grid.Column="3"
+                                 x:Name="tb_h"
                                  IsEnabled="{Binding ElementName=cbManualMap, Path=IsChecked}"
                                  Grid.Row="8"
                                  Margin="3,0"
@@ -282,32 +332,44 @@
             </GroupBox>
             <GroupBox Header="Help" Grid.Row="3">
                 <Grid>
-                    <Image Source="Resource/Reticle.png" Stretch="Fill" />
-                    <Canvas >
+                    <Image Source="Resource/Reticle.png"
+                           Width="320"
+                           Height="320"
+                           Opacity="0.5" />
+                    <Canvas Width="320"
+                            Height="320">
                         <control:Arrow Text="a."
-                                       Canvas.Left="50"
-                                       Canvas.Top="216" />
-                        <!--<control:Arrow Text="b."
-                                       Canvas.Left="91"
-                                       Canvas.Top="216" />
+                                       x:Name="Arrow_a"
+                                       Canvas.Left="46"
+                                       Canvas.Top="213"/>
+                        <control:Arrow Text="b."
+                                       x:Name="Arrow_b"
+                                       Canvas.Left="86"
+                                       Canvas.Top="213" />
                         <control:Arrow Text="c."
-                                       Canvas.Left="100"
-                                       Canvas.Top="216" />
+                                       x:Name="Arrow_c"
+                                       Canvas.Left="94"
+                                       Canvas.Top="213" />
                         <control:Arrow Text="d."
-                                       Canvas.Left="241"
-                                       Canvas.Top="216" />
+                                       x:Name="Arrow_d"
+                                       Canvas.Left="229"
+                                       Canvas.Top="213" />
                         <control:Arrow Text="e."
-                                       Canvas.Left="241"
-                                       Canvas.Top="216" />
+                                       x:Name="Arrow_e"
+                                       Canvas.Left="229"
+                                       Canvas.Top="213" />
                         <control:Arrow Text="f."
-                                       Canvas.Left="241"
-                                       Canvas.Top="168" />
+                                       x:Name="Arrow_f"
+                                       Canvas.Left="229"
+                                       Canvas.Top="166" />
                         <control:Arrow Text="g."
-                                       Canvas.Left="241"
-                                       Canvas.Top="162" />
+                                       x:Name="Arrow_g"
+                                       Canvas.Left="229"
+                                       Canvas.Top="160" />
                         <control:Arrow Text="h."
-                                       Canvas.Left="241"
-                                       Canvas.Top="7" />-->
+                                       x:Name="Arrow_h"
+                                       Canvas.Left="229"
+                                       Canvas.Top="7" />
                     </Canvas>
                 </Grid>
             </GroupBox>

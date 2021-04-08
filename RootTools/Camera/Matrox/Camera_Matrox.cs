@@ -22,7 +22,7 @@ namespace RootTools.Camera.Matrox
         Dispatcher _dispatcher = Dispatcher.CurrentDispatcher;
         public event EventHandler Grabed;
         BackgroundWorker bgw_Connect = new BackgroundWorker();
-        ImageData m_ImageLive;
+        public ImageData m_ImageLive;
 
         private MIL_ID m_MilApplication;                     // Application -> 프로그램당 하나
         private MIL_ID m_MilSystem;                          // 프레임그래버
@@ -227,7 +227,7 @@ namespace RootTools.Camera.Matrox
             bgw_Connect.DoWork += bgw_Connect_Dowork;
             bgw_Connect.RunWorkerCompleted += bgw_Connect_RunWorkerCompleted;
             //m_ImageLive = new ImageData(1920, 1080, 1);
-            m_ImageLive = new ImageData(6560, 1080, 1);
+            m_ImageLive = new ImageData(4096, 4000, 1);
             p_ImageViewer = new ImageViewer_ViewModel(m_ImageLive, null, _dispatcher);
             p_CamInfo = new MatroxCamInfo(m_log);
             RunTree(Tree.eMode.RegRead);
@@ -258,7 +258,7 @@ namespace RootTools.Camera.Matrox
                 MIL.MappAlloc(MIL.M_NULL, MIL.M_DEFAULT, ref m_MilApplication);
             // System
             if (m_MilSystem == MIL.M_NULL)
-                MIL.MsysAlloc(MIL.M_DEFAULT, MIL.M_SYSTEM_SOLIOS, MIL.M_DEFAULT, MIL.M_DEFAULT, ref m_MilSystem);  // system discriptor 는 연결 타입  
+                MIL.MsysAlloc(MIL.M_DEFAULT, MIL.M_SYSTEM_DEFAULT, MIL.M_DEFAULT, MIL.M_DEFAULT, ref m_MilSystem);  // system discriptor 는 연결 타입  
             // Display
             if (m_MilDisplay == MIL.M_NULL)
                 MIL.MdispAlloc(m_MilSystem, MIL.M_DEFAULT, "M_DEFAULT", MIL.M_WINDOWED, ref m_MilDisplay);
@@ -274,7 +274,8 @@ namespace RootTools.Camera.Matrox
                     // Digitizer
                     if (m_MilDigitizer == MIL.M_NULL)
                     {
-                        MIL.MdigAlloc(m_MilSystem, MIL.M_DEFAULT, p_CamInfo.p_sFile, MIL.M_DEFAULT, ref m_MilDigitizer);
+                        //MIL.MdigAlloc(m_MilSystem, MIL.M_DEFAULT, p_CamInfo.p_sFile, MIL.M_DEFAULT, ref m_MilDigitizer);
+                        MIL.MdigAlloc(m_MilSystem, MIL.M_DEFAULT, MIL.M_SYSTEM_DEFAULT, MIL.M_DEFAULT, ref m_MilDigitizer);
                         //MIL.MdigAlloc(m_MilSystem, MIL.M_DEFAULT, p_CamInfo.p_sFile, MIL.M_EMULATED, ref m_MilDigitizer);
 
                         p_nImgBand = (int)MIL.MdigInquire(m_MilDigitizer, MIL.M_SIZE_BAND, MIL.M_NULL);

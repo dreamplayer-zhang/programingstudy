@@ -43,7 +43,7 @@ namespace Root_Rinse_Unloader.Module
         #region Line
         public class Line : NotifyProperty
         {
-            DIO_I[] m_diCheck = new DIO_I[3];
+            public DIO_I[] m_diCheck = new DIO_I[3];
             public void GetTools(ToolBox toolBox)
             {
                 m_rail.p_sInfo = toolBox.GetDIO(ref m_diCheck[0], m_rail, m_id + ".Start");
@@ -56,6 +56,7 @@ namespace Root_Rinse_Unloader.Module
                 Empty,
                 Exist,
                 Arrived,
+                Push
             }
             eSensor _eSensor = eSensor.Empty;
             public eSensor p_eSensor
@@ -78,18 +79,13 @@ namespace Root_Rinse_Unloader.Module
                         if (m_diCheck[0].p_bIn || m_diCheck[1].p_bIn) p_eSensor = eSensor.Exist;
                         break;
                     case eSensor.Exist:
-                        if (m_diCheck[2].p_bIn)
-                        {
-                            p_eSensor = eSensor.Arrived;
-                        }
+                        if (m_diCheck[2].p_bIn) p_eSensor = eSensor.Arrived;
                         break;
+                    case eSensor.Push:
+                        if (m_diCheck[1].p_bIn == false) p_eSensor = eSensor.Push;
+                        break; 
                 }
                 return "OK";
-            }
-
-            public bool IsArriveDone()
-            {
-                return m_diCheck[1].p_bIn == false; 
             }
 
             string m_id;
@@ -155,7 +151,7 @@ namespace Root_Rinse_Unloader.Module
         {
             try
             {
-                if (Run(m_storage.RunMoveMagazine())) return p_sInfo; 
+                if (Run(m_storage.MoveMagazine(false))) return p_sInfo; //forget
                 if (Run(m_dioPusher.RunSol(false))) return p_sInfo;
                 if (Run(RunPusherDown(true))) return p_sInfo;
                 while (m_storage.IsBusy())
@@ -178,7 +174,7 @@ namespace Root_Rinse_Unloader.Module
                 if (Run(m_dioPusher.RunSol(false))) return p_sInfo;
                 if (Run(RunPusherDown(false))) return p_sInfo;
                 foreach (Line line in m_aLine) line.p_eSensor = Line.eSensor.Empty;
-                m_storage.StartMoveNextMagazine();
+                m_storage.StartMoveMagazine(true);
                 return "OK";
             }
             finally
@@ -197,6 +193,13 @@ namespace Root_Rinse_Unloader.Module
                 p_eState = eState.Ready;
                 return "OK";
             }
+            foreach (Line line in m_aLine)
+            {
+                foreach (DIO_I di in line.m_diCheck)
+                {
+                    if (di.p_bIn) return "Check Strip";
+                }
+            }
             m_axisRotate.ServoOn(true);
             p_sInfo = base.StateHome(m_axisWidth);
             p_eState = (p_sInfo == "OK") ? eState.Ready : eState.Error;
@@ -210,16 +213,18 @@ namespace Root_Rinse_Unloader.Module
         #endregion
 
         #region Run Run
-        List<bool> m_bExist; 
+        List<bool> m_bExist = new List<bool>(); 
         public string StartRun(List<bool> bExist)
         {
-            m_bExist = bExist; 
+            m_bExist = bExist;
+            while (m_bExist.Count < 4) m_bExist.Add(true); 
             StartRun(m_runRun); 
             return "OK";
         }
 
         public string RunRun(double secArrive)
         {
+            RunRotate(true); 
             while (IsExist() == false)
             {
                 Thread.Sleep(10);
@@ -233,45 +238,48 @@ namespace Root_Rinse_Unloader.Module
             Thread.Sleep((int)(1000 * secArrive));
             foreach (Line line in m_aLine)
             {
-                if (line.IsArriveDone() == false)
+                if (line.p_eSensor != Line.eSensor.Push)
                 {
                     m_alidArrived.p_bSet = true; 
                     return "Arrive Done Error";
                 }
             }
             string sRun = RunPusher();
-            m_alidPusher.p_bSet = (sRun != "OK"); 
+            m_alidPusher.p_bSet = (sRun != "OK");
+            RunRotate(false); 
             return sRun; 
         }
 
         bool IsExist()
         {
-            int[] nExist = { 0, 0 }; 
-            for (int n = 0; n < m_bExist.Count; n++)
+            foreach (Line line in m_aLine)
             {
-                m_aLine[n].CheckSensor();
-                if (m_bExist[n])
-                {
-                    nExist[0]++;
-                    if (m_aLine[n].p_eSensor != Line.eSensor.Empty) nExist[1]++; 
-                }
+                line.CheckSensor(); 
+                if (line.p_eSensor != Line.eSensor.Empty) return true; 
             }
-            return nExist[0] == nExist[1];
+            return false; 
         }
 
         bool IsArrived()
         {
-            int[] nExist = { 0, 0 };
-            for (int n = 0; n < m_bExist.Count; n++)
+            foreach (Line line in m_aLine)
             {
-                m_aLine[n].CheckSensor();
-                if (m_bExist[n])
+                line.CheckSensor(); 
+                switch (line.p_eSensor)
                 {
-                    nExist[0]++;
-                    if (m_aLine[n].p_eSensor == Line.eSensor.Arrived) nExist[1]++;
+                    case Line.eSensor.Exist:
+                    case Line.eSensor.Arrived: return false; 
                 }
             }
-            return nExist[0] == nExist[1];
+            for (int n = 0; n < m_bExist.Count; n++)
+            {
+                if (m_bExist[n] != (m_aLine[n].p_eSensor == Line.eSensor.Push))
+                {
+                    //EQ.p_bStop = true;
+                    //EQ.p_eState = EQ.eState.Error; 
+                }
+            }
+            return true;
         }
         #endregion
 

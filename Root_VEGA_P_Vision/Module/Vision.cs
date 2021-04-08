@@ -187,9 +187,9 @@ namespace Root_VEGA_P_Vision.Module
                 if (!camTDI.p_CamInfo.p_eState.Equals(RootTools.Camera.Dalsa.eCamState.Init)) return "Main Camera state is not init";
                 camTDI.Connect();
 
-                //if (camZStack == null) return "ZStacking Camera is NULL";
-                //if (camZStack.p_CamInfo.p_eState.Equals(RootTools.Camera.Dalsa.eCamState.Init)) return "Zstacking Camera state is not init";
-                //camZStack.Connect();
+                if (camZStack == null) return "ZStacking Camera is NULL";
+                if (!camZStack.p_CamInfo.p_eState.Equals(RootTools.Camera.Matrox.eCamState.Init)) return "Zstacking Camera state is not init";
+                camZStack.Connect();
 
                 return "OK";
             }
@@ -604,6 +604,7 @@ namespace Root_VEGA_P_Vision.Module
             AddModuleRunList(new Run_MainGrab(this), true, "Main Grab");
             AddModuleRunList(new Run_SideGrab(this), true, "Side Grab");
             AddModuleRunList(new Run_StainGrab(this), true, "Stain Grab");
+            AddModuleRunList(new Run_ZStack(this), true, "Z Stack Grab");
             AddModuleRunList(new Run_Remote(this), true, "Remote Run");
             AddModuleRunList(new Run_Delay(this), true, "Time Delay");
         }        

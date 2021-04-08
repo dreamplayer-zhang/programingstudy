@@ -80,7 +80,7 @@ namespace RootTools.Comm
             {
                 m_bRun = true;
                 Socket socket = m_socket;
-                while (m_bRun && socket.Connected)
+                while (EQ.m_bRun && m_bRun && socket.Connected)
                 {
                     Thread.Sleep(10);
                     if (m_qSend.Count > 0)
@@ -265,6 +265,15 @@ namespace RootTools.Comm
         {
             if (m_tcpSocket == null) return "Not Connected"; 
             return m_tcpSocket.Send(sMsg); 
+        }
+
+        public bool IsConnected()
+        {
+            if (m_tcpSocket != null)
+                if(m_tcpSocket.m_socket != null)
+                    return m_tcpSocket.m_socket.Connected;
+
+            return false;
         }
     }
 }

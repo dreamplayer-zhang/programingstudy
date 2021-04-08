@@ -32,7 +32,7 @@ namespace Root_VEGA_D_IPU.Engineer
         void InitModule()
         {
             p_moduleList = new ModuleList(m_engineer);
-            m_vision = new Vision_IPU("Vision", m_engineer);
+            m_vision = new Vision_IPU("Vision", m_engineer, ModuleBase.eRemote.Server);
             InitModule(m_vision);
         }
 

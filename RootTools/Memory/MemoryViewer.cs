@@ -1,5 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Diagnostics;
+using System.Threading.Tasks;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -176,12 +178,13 @@ namespace RootTools.Memory
             p_nProgress = nInt;
         }
 
-        public void FileSave(string sFile)
+        public void FileSave(string sFile, int nByte = 1)
         {
             if (p_memoryData == null) return;
+            p_memoryData.UpdateOpenProgress += P_memoryData_UpdateOpenProgress1;
             switch (GetUpperExt(sFile))
             {
-                case "BMP": p_memoryData.p_sInfo = p_memoryData.FileSaveBMP(sFile, p_nMemoryIndex); break;
+                case "BMP": p_memoryData.p_sInfo = p_memoryData.FileSaveBMP(sFile, p_nMemoryIndex, nByte); break;
                 case "JPG": p_memoryData.p_sInfo = p_memoryData.FileSaveJPG(sFile, p_nMemoryIndex); break; 
             }
         }
@@ -390,6 +393,10 @@ namespace RootTools.Memory
         byte[] m_aBufDisplay = null; 
         unsafe void UpdateBitmapSource()
         {
+            Parallel.For(0, 4, new ParallelOptions { MaxDegreeOfParallelism = 12 }, (i) =>
+            {
+                Debug.WriteLine(i.ToString());
+            });
             if (p_memoryData == null) return;
             if (p_memoryData.GetPtr(p_nMemoryIndex) == null) return;
             if (p_szWindow.X * p_szWindow.Y == 0) return;
@@ -397,24 +404,36 @@ namespace RootTools.Memory
 
             m_szImage = new CPoint((int)(p_memoryData.p_sz.X * p_fZoom), (int)(p_memoryData.p_sz.Y * p_fZoom));
 
-            int nByte = p_memoryData.p_nByte;
+            int nBytePerPixel = p_memoryData.p_nByte * p_memoryData.p_nCount;
             CPoint sz = m_szBitmapSource = new CPoint(Math.Min(p_szWindow.X, m_szImage.X), Math.Min(p_szWindow.Y, m_szImage.Y));
-            byte[] aBuf = m_aBufDisplay = new byte[(long)nByte * sz.Y * sz.X];
+            byte[] aBuf = m_aBufDisplay = new byte[(long)nBytePerPixel * sz.Y * sz.X];
             FixOffset();
 
             int[] aX = new int[sz.X];
             for (int x = 0; x < sz.X; x++)
             {
-                aX[x] = nByte * (m_cpOffset.X + (int)Math.Round(x / p_fZoom));
+                aX[x] = nBytePerPixel * (m_cpOffset.X + (int)Math.Round(x / p_fZoom));
             }
 
-            for (int y = 0, iy = 0; y < sz.Y; y++, iy += nByte * sz.X)
+            for (int y = 0, iy = 0; y < sz.Y; y++, iy += nBytePerPixel * sz.X)
             {
                 int pY = m_cpOffset.Y + (int)Math.Round(y / p_fZoom);
                 byte* pSrc = (byte*)p_memoryData.GetPtr(p_nMemoryIndex, 0, pY).ToPointer();
-                switch (nByte)
+                switch (nBytePerPixel)
                 {
-                    case 1: for (int x = 0; x < sz.X; x++) aBuf[x + iy] = *(pSrc + aX[x]); break;
+                    case 1:
+                        for (int x = 0; x < sz.X; x++)
+                        {
+                            aBuf[x + iy] = *(pSrc + aX[x]);
+                        }   
+                        break;
+                    case 2:
+                        for (int x = 0, ix = 0; x < sz.X; x++, ix += 2)
+                        {
+                            aBuf[ix + iy] = *(pSrc + aX[x]);
+                            aBuf[ix + iy + 1] = *(pSrc + aX[x] + 1);
+                        }
+                        break;
                     case 3:
                     case 4:
                         for (int x = 0, ix = 0; x < sz.X; x++, ix += 3)
@@ -426,8 +445,17 @@ namespace RootTools.Memory
                         break;
                 }
             }
-            PixelFormat pixelFormat = (nByte == 1) ? PixelFormats.Gray8 : PixelFormats.Bgr24; 
-            p_bitmapSrc = BitmapSource.Create(sz.X, sz.Y, 96, 96, pixelFormat, null, aBuf, nByte * sz.X);
+            PixelFormat pixelFormat;
+            int bytePerPixel = p_memoryData.p_nByte * p_memoryData.p_nCount;
+            switch (bytePerPixel)
+            {
+                case 1: pixelFormat = PixelFormats.Gray8;   break;
+                case 2: pixelFormat = PixelFormats.Gray16;  break;
+                case 3:
+                case 4: pixelFormat = PixelFormats.Bgr24;   break;
+                default:    return;
+            }
+            p_bitmapSrc = BitmapSource.Create(sz.X, sz.Y, 96, 96, pixelFormat, null, aBuf, nBytePerPixel * sz.X);
         }
 
         void FixOffset()
