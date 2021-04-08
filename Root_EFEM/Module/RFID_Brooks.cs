@@ -215,11 +215,13 @@ namespace Root_EFEM.Module
             }
             else if (ch >= (char)'A' && ch <= (char)'F')
             {
-                nDigit10 = (int)(ch - 'A');
+                //nDigit10 = (int)(ch - 'A');
+                nDigit10 = (int)(ch - 55);
             }
             else if (ch >= (char)'a' && ch <= (char)'f')
             {
-                nDigit10 = (int)(ch - 'a');
+                //nDigit10 = (int)(ch - 'a');
+                nDigit10 = (int)(ch - 87);
             }
             return nDigit10;
         }

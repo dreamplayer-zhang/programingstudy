@@ -438,7 +438,7 @@ namespace Root_EFEM.Module
         protected void M_rs232_OnReceive(string sRead)
         {
             string[] sReads = sRead.Split(' ');
-            if (sReads[0] == "ERR") m_log.Error(GetErrorString(sReads[1]));
+			if (sReads[0] == "ERR" || sReads.Length > 1) m_log.Error(GetErrorString(sReads[1]));
             else m_log.Info(sRead + " <-- Recv] ");
             Run(ReplyCmd(sReads));
             if (p_sInfo != "OK") p_eState = eState.Error;
