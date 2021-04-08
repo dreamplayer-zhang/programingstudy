@@ -88,7 +88,7 @@
                 </Button>
                 <Button Style="{StaticResource SystemBtnStyle}"
                         x:Name="CloseButton"
-                        VerticalAlignment="Bottom">
+                        VerticalAlignment="Bottom" Click="CloseButton_Click">
                     <Path Style="{StaticResource CloseIconKey}" />
                     <i:Interaction.Triggers>
                         <i:EventTrigger EventName="Click">
