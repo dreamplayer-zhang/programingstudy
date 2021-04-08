@@ -4,7 +4,6 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:Icon="clr-namespace:Root_CAMELLIA.Control.Icon"
-        xmlns:Graph="clr-namespace:Root_CAMELLIA.Control"
         xmlns:local="clr-namespace:Root_CAMELLIA"
         xmlns:stage="clr-namespace:Camellia2Stage"
         xmlns:graph="clr-namespace:Root_CAMELLIA.LibSR_Met"
@@ -290,7 +289,15 @@
                     </Grid>
                     <Grid Grid.Row="1">
                         <GroupBox Header="Data">
-                            <ListBox>
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition/>
+                                    <RowDefinition/>
+                                    <RowDefinition/>
+                                    <RowDefinition/>
+                                </Grid.RowDefinitions>
+                            </Grid>
+                            <!--<ListBox>
                                 <ListBoxItem>
                                     <TextBlock Text="GOF : 99.434344"></TextBlock>
                                 </ListBoxItem>
@@ -300,7 +307,7 @@
                                 <ListBoxItem>
                                     <TextBlock Text="Humidity : 40.2"></TextBlock>
                                 </ListBoxItem>
-                            </ListBox>
+                            </ListBox>-->
                         </GroupBox>
                     </Grid>
                 </Grid>
@@ -313,13 +320,35 @@
                             <TabItem Header="Reflectance">
                                 <!--Todo Reflectance-->
                                 <Grid>
-                                    <Graph:ReviewGraph/>
+                                    <ItemsControl ItemsSource="{Binding p_reviewReflectanceGraph}">
+                                        <ItemsControl.ItemsPanel>
+                                            <ItemsPanelTemplate>
+                                                <Grid/>
+                                            </ItemsPanelTemplate>
+                                        </ItemsControl.ItemsPanel>
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <local:ReviewGraph DataContext="{Binding p_reflectanceGraph}"/>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
                                 </Grid>
                             </TabItem>
                             <TabItem Header="Transmittance">
                                 <!--Todo Transmittance-->
                                 <Grid>
-                                    <Graph:ReviewGraph/>
+                                    <ItemsControl ItemsSource="{Binding p_reviewTransmittanceGraph}">
+                                        <ItemsControl.ItemsPanel>
+                                            <ItemsPanelTemplate>
+                                                <Grid/>
+                                            </ItemsPanelTemplate>
+                                        </ItemsControl.ItemsPanel>
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <local:ReviewGraph DataContext="{Binding p_transmittanceGraph}"/>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
                                 </Grid>
                             </TabItem>
                         </TabControl>

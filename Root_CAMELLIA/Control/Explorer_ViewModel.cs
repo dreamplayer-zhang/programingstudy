@@ -79,7 +79,7 @@ namespace Root_CAMELLIA
         {
             // create a new RootItem given rootNumber using convention
             RootNr = pRootNumber;
-            NavTreeItem treeRootItem = NavTreeRootItemUtils.ReturnRootItem(pRootNumber, pIncludeFileChildren);
+            NavTreeItem treeRootItem = NavTreeRootItemUtils.ReturnRootItem(pRootNumber, pIncludeFileChildren, InitPath);
             TreeName = treeRootItem.FriendlyName;
             if(InitPath != "")
             {

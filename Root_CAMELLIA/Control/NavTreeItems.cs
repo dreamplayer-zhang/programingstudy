@@ -5,6 +5,7 @@ using System.IO;
 using System.ComponentModel;
 using System.Windows;
 using System.Threading;
+using System.Text.RegularExpressions;
 
 namespace Root_CAMELLIA
 {
@@ -29,6 +30,15 @@ namespace Root_CAMELLIA
             FullPathName = "$xxDriveRoot$";
         }
 
+        public DriveRootItem(string InitPath)
+        {
+            //Constructor sets some properties
+            FriendlyName = "RootFile";
+            IsExpanded = true;
+            FullPathName = "$xxDriveRoot$";
+            InitPathName = InitPath;
+        }
+
         public override BitmapSource GetMyIcon()
         {
             // Note: introduce more "speaking" icons for RootItems
@@ -50,35 +60,47 @@ namespace Root_CAMELLIA
             string fn = "";
 
             //string[] allDrives = System.Environment.GetLogicalDrives();
-            DriveInfo[] allDrives = DriveInfo.GetDrives();
-            foreach (DriveInfo drive in allDrives)
-                if (drive.IsReady && drive.Name.Contains("C"))
-                {
-                    item1 = new DriveItem();
+            //DriveInfo[] allDrives = DriveInfo.GetDrives();
+            DirectoryInfo di = new DirectoryInfo(InitPathName);
+            //foreach (Directory dir in di.GetDirectories())
+            //{
 
-                    // Some processing for the FriendlyName
-                    fn = drive.Name.Replace(@"\", "");
-                    item1.FullPathName = fn;
-                    if (drive.VolumeLabel == string.Empty)
-                    {
-                        //fn = drive.DriveType.ToString() + " (" + fn + ")";
-                        fn =" (" + fn + ")";
-                    }
-                    else if (drive.DriveType == DriveType.CDRom)
-                    {
-                        fn = drive.DriveType.ToString() + " " + drive.VolumeLabel + " (" + fn + ")";
-                    }
-                    else
-                    {
-                        fn = drive.VolumeLabel + " (" + fn + ")";
-                    }
+            //}
+            item1 = new DriveItem();
 
-                    item1.FriendlyName = fn;
-                    item1.InitPathName = InitPathName;
-                    item1.IsExpanded = true;
-                    item1.IncludeFileChildren = this.IncludeFileChildren;
-                    childrenList.Add(item1);
-                }
+            item1.FullPathName = di.FullName;
+            item1.FriendlyName = di.Name;
+            item1.InitPathName = InitPathName;
+            item1.IsExpanded = true;
+            item1.IncludeFileChildren = this.IncludeFileChildren;
+            childrenList.Add(item1);
+            //if (drive.IsReady && drive.Name.Contains("C"))
+            //{
+            //    item1 = new DriveItem();
+
+            //    // Some processing for the FriendlyName
+            //    fn = drive.Name.Replace(@"\", "");
+            //    item1.FullPathName = fn;
+            //    if (drive.VolumeLabel == string.Empty)
+            //    {
+            //        //fn = drive.DriveType.ToString() + " (" + fn + ")";
+            //        fn =" (" + fn + ")";
+            //    }
+            //    else if (drive.DriveType == DriveType.CDRom)
+            //    {
+            //        fn = drive.DriveType.ToString() + " " + drive.VolumeLabel + " (" + fn + ")";
+            //    }
+            //    else
+            //    {
+            //        fn = drive.VolumeLabel + " (" + fn + ")";
+            //    }
+
+            //    item1.FriendlyName = fn;
+            //    item1.InitPathName = InitPathName;
+            //    item1.IsExpanded = true;
+            //    item1.IncludeFileChildren = this.IncludeFileChildren;
+            //    childrenList.Add(item1);
+            //}
 
             return childrenList;
         }
@@ -96,45 +118,64 @@ namespace Root_CAMELLIA
 
         public override ObservableCollection<INavTreeItem> GetMyChildren()
         {
+            System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
+            sw.Start();
             ObservableCollection<INavTreeItem> childrenList = new ObservableCollection<INavTreeItem>() { };
             INavTreeItem item1;
 
-            DriveInfo drive = new DriveInfo(this.FullPathName);
-            if (!drive.IsReady) return childrenList;
-
-            DirectoryInfo di = new DirectoryInfo(((DriveInfo)drive).RootDirectory.Name);
-            if (!di.Exists) return childrenList;
-
-
-            foreach (DirectoryInfo dir in di.GetDirectories())
+            try
             {
-                if(!(di.Name == @"C:\" && dir.Name.Contains("Camellia2")))
+                DirectoryInfo di = new DirectoryInfo(this.FullPathName); // may be acces not allowed
+                //object paramObj = childrenList;
+                //object paramObj2 = di;
+                string[] deepArray = FullPathName.Split('\\');
+                int deep = deepArray.Length - 1;
+                if (!di.Exists) return childrenList;
+                string[] directorys = InitPathName.Split('\\');
+
+                foreach (DirectoryInfo dir in di.GetDirectories())
                 {
-                    continue;
+                    //if (!dir.FullName.Contains(directorys[directorys.Length - 1]))
+                    //    continue;
+                    //if(deep == 5)
+                    //{
+                    //    if(!dir.Name.Equals("ResultData_Summary")){
+                    //        continue;
+                    //    }
+                    //}
+                    item1 = new FolderItem();
+                    item1.FullPathName = FullPathName + "\\" + dir.Name;
+                    item1.FriendlyName = dir.Name;
+                    item1.InitPathName = InitPathName;
+                    item1.IncludeFileChildren = this.IncludeFileChildren;
+                    childrenList.Add(item1);
                 }
-                item1 = new FolderItem();
-                item1.FullPathName = FullPathName + "\\" + dir.Name;
-                item1.FriendlyName = dir.Name;
-                item1.InitPathName = InitPathName;
-                item1.IsExpanded = true;
-                item1.IncludeFileChildren = this.IncludeFileChildren;
-                childrenList.Add(item1);
-            }
 
-            //if (this.IncludeFileChildren)
-            {
-                if (di.FullName.Contains("Camellia2"))
+                int count = 0;
+                Application.Current.Dispatcher.Invoke(new Action(() =>
                 {
                     foreach (FileInfo file in di.GetFiles())
                     {
+                        //Thread.Sleep(1);
+                        if (file.Extension != ".csv")
+                        {
+                            //p_Progress = ((++count) * 100) / di.GetFiles().Length;
+                            continue;
+                        }
                         item1 = new FileItem();
                         item1.FullPathName = FullPathName + "\\" + file.Name;
                         item1.FriendlyName = file.Name;
                         item1.InitPathName = InitPathName;
                         childrenList.Add(item1);
+                        //p_Progress = ((++count) * 100) / di.GetFiles().Length;
                     }
-                }
-
+                }));
+                sw.Stop();
+                System.Diagnostics.Debug.WriteLine(sw.ElapsedMilliseconds);
+            }
+            catch (UnauthorizedAccessException e)
+            {
+                Console.WriteLine(e.Message);
             }
             return childrenList;
         }
@@ -167,13 +208,27 @@ namespace Root_CAMELLIA
                 DirectoryInfo di = new DirectoryInfo(this.FullPathName); // may be acces not allowed
                 //object paramObj = childrenList;
                 //object paramObj2 = di;
+                string[] deepArray = FullPathName.Split('\\');
+                int deep = deepArray.Length - 1; 
                 if (!di.Exists) return childrenList;
                 string[] directorys = InitPathName.Split('\\');
-                
+
+                Regex regex = new Regex(@"[0-9]{4}-[0-9]{2}-[0-9]{2}");
                 foreach (DirectoryInfo dir in di.GetDirectories())
                 {
-                    if (!dir.FullName.Contains(directorys[directorys.Length - 1]))
-                        continue;
+                    if (regex.IsMatch(di.Name))
+                    {
+                        if (!dir.Name.Equals("ResultData_Summary"))
+                            continue;
+                    }
+                    //if (!dir.FullName.Contains(directorys[directorys.Length - 1]))
+                    //    continue;
+                    //if(deep == 5)
+                    //{
+                    //    if(!dir.Name.Equals("ResultData_Summary")){
+                    //        continue;
+                    //    }
+                    //}
                     item1 = new FolderItem();
                     item1.FullPathName = FullPathName + "\\" + dir.Name;
                     item1.FriendlyName = dir.Name;

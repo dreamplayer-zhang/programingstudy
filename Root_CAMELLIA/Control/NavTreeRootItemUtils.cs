@@ -37,11 +37,11 @@ namespace Root_CAMELLIA
 
         // Using convention and reflection to get RootItem iRootNr
         //If iRootNr>= ListNavTreeRootItemsByConvention().Count we use driveItem by default
-        public static NavTreeItem ReturnRootItem(int iRootNr, bool includeFileChildren = false)
+        public static NavTreeItem ReturnRootItem(int iRootNr, bool includeFileChildren = false, string InitPath = "")
         {
             // Set default System.Type
             Type selectedType = typeof(DriveRootItem);
-            string selectedName = "Drive";
+            string selectedName = "Folder";
 
             // Can you find other type given the conventions ..RootItem name and iRootNr
             var entityTypes =
@@ -63,7 +63,8 @@ namespace Root_CAMELLIA
             }
 
             // Use selectedType to create root ..         
-            NavTreeItem rootItem = (NavTreeItem)Activator.CreateInstance(selectedType);
+            //NavTreeItem rootItem = (NavTreeItem)Activator.CreateInstance(selectedType, InitPath);
+            NavTreeItem rootItem = (NavTreeItem)Activator.CreateInstance(selectedType, InitPath);
             rootItem.FriendlyName = selectedName;
             rootItem.IncludeFileChildren = includeFileChildren;
 

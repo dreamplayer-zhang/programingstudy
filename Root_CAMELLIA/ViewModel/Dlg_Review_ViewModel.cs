@@ -18,9 +18,10 @@ namespace Root_CAMELLIA
 {
     public class Dlg_Review_ViewModel : ObservableObject, IDialogRequestClose
     {
+        #region Property
         private MainWindow_ViewModel mainWindow_ViewModel;
 
-        Explorer_ViewModel m_summary = new Explorer_ViewModel(InitPath : @"C:\Camellia2\Summary");
+        Explorer_ViewModel m_summary = new Explorer_ViewModel(InitPath : @"C:\Camellia2\PRD");
         public Explorer_ViewModel p_summary
         {
             get
@@ -46,6 +47,32 @@ namespace Root_CAMELLIA
             }
         }
 
+        ObservableCollection<ReviewGraph> m_reviewReflectanceGraph = new ObservableCollection<ReviewGraph>();
+        public ObservableCollection<ReviewGraph> p_reviewReflectanceGraph
+        {
+            get
+            {
+                return m_reviewReflectanceGraph;
+            }
+            set
+            {
+                SetProperty(ref m_reviewReflectanceGraph, value);
+            }
+        }
+
+
+        ObservableCollection<ReviewGraph> m_reviewTransmittanceGraph = new ObservableCollection<ReviewGraph>();
+        public ObservableCollection<ReviewGraph> p_reviewTransmittanceGraph
+        {
+            get
+            {
+                return m_reviewTransmittanceGraph;
+            }
+            set
+            {
+                SetProperty(ref m_reviewTransmittanceGraph, value);
+            }
+        }
 
 
         public Dlg_Review_ViewModel(MainWindow_ViewModel mainWindow_ViewModel)
@@ -59,6 +86,11 @@ namespace Root_CAMELLIA
             InitExplorer();
 
             InitDataGrid();
+
+            p_reflectanceGraph = new ReviewGraph();
+            p_reviewReflectanceGraph.Add(p_reflectanceGraph);
+            p_transmittanceGraph = new ReviewGraph();
+            p_reviewTransmittanceGraph.Add(p_transmittanceGraph);
         }
 
         string m_currentPath = @"C:\Camellia2\Summary\";
@@ -138,9 +170,102 @@ namespace Root_CAMELLIA
         private List<string> m_transmittanceList = new List<string>();
         List<Point> pointList = new List<Point>();
 
+        int m_tabIdx = 0;
+        public int p_tabIdx
+        {
+            get
+            {
+                return m_tabIdx;
+            }
+            set
+            {
+                SetProperty(ref m_tabIdx, value);
+                if (value == 1)
+                {
+                    p_IsSummary = false;
+                    ClearData();
+                }
+                else
+                {
+                    p_IsSummary = true;
+                }
+            }
+        }
+
+        bool m_IsSummary = true;
+        public bool p_IsSummary
+        {
+            get
+            {
+                return m_IsSummary;
+            }
+            set
+            {
+                SetProperty(ref m_IsSummary, value);
+            }
+        }
+
+        ObservableCollection<UIElement> m_PointElement = new ObservableCollection<UIElement>();
+        public ObservableCollection<UIElement> p_PointElement
+        {
+            get
+            {
+                return m_PointElement;
+            }
+            set
+            {
+                SetProperty(ref m_PointElement, value);
+            }
+        }
+        public int p_SelectedItemIndex
+        {
+            get
+            {
+                return m_SelectedItemIndex;
+            }
+            set
+            {
+                SetProperty(ref m_SelectedItemIndex, value);
+                if(m_SelectedItemIndex != -1)
+                {
+                    ReadCSVGraphData();
+                }
+            }
+        }
+        int m_SelectedItemIndex = -1;
+
+        ReviewGraph m_reflectanceGraph;
+        public ReviewGraph p_reflectanceGraph
+        {
+            get
+            {
+                return m_reflectanceGraph;
+            }
+            set
+            {
+                SetProperty(ref m_reflectanceGraph, value);
+            }
+        }
+        ReviewGraph m_transmittanceGraph;
+        public ReviewGraph p_transmittanceGraph
+        {
+            get
+            {
+                return m_transmittanceGraph;
+            }
+            set
+            {
+                SetProperty(ref m_transmittanceGraph, value);
+            }
+        }
+        #endregion
+
+        #region Function
+        List<double> GoFList = new List<double>();
         private void ReadCSV(string path)
         {
             pointList.Clear();
+            GoFList.Clear();
             try
             {
                 var reader = new StreamReader(File.OpenRead(path));
@@ -164,6 +289,11 @@ namespace Root_CAMELLIA
                     if(int.TryParse(values[4], out site))
                     {
                         dataGridList.Add(site);
+                    }
+                    double GoF = 0;
+                    if(double.TryParse(values[11], out GoF))
+                    {
+                        GoFList.Add(GoF);
                     }
 
                     if(idx == 0)
@@ -215,6 +345,14 @@ namespace Root_CAMELLIA
             
         }
 
+        private double GetDistance(ShapeEllipse eg, Point pt)
+        {
+            double dResult = Math.Sqrt(Math.Pow(eg.CenterX - pt.X, 2) + Math.Pow(eg.CenterY - pt.Y, 2));
+
+            return Math.Round(dResult, 3);
+        }
+
+
         private void ClearData()
         {
             PointListItem.Clear();
@@ -223,6 +361,7 @@ namespace Root_CAMELLIA
             p_reflectanceList = new List<string>();
             p_transmittanceList = new List<string>();
             p_SelectedItemIndex = -1;
+            p_reflectanceGraph.ReviewGraphReset();
         }
 
         private void SetDataGrid(List<Point> pt, List<int> site)
@@ -268,53 +407,9 @@ namespace Root_CAMELLIA
             p_PointElement = temp;
         }
 
-        int m_tabIdx = 0;
-        public int p_tabIdx
-        {
-            get
-            {
-                return m_tabIdx;
-            }
-            set
-            {
-                SetProperty(ref m_tabIdx, value);
-                if(value == 1)
-                {
-                    p_IsSummary = false;
-                    ClearData();
-                }
-                else
-                {
-                    p_IsSummary = true;
-                }
-            }
-        }
+        #endregion
 
-        bool m_IsSummary = true;
-        public bool p_IsSummary
-        {
-            get
-            {
-                return m_IsSummary;
-            }
-            set
-            {
-                SetProperty(ref m_IsSummary, value);
-            }
-        }
-
-        ObservableCollection<UIElement> m_PointElement = new ObservableCollection<UIElement>();
-        public ObservableCollection<UIElement> p_PointElement
-        {
-            get
-            {
-                return m_PointElement;
-            }
-            set
-            {
-                SetProperty(ref m_PointElement, value);
-            }
-        }
+        
 
         private void InitExplorer()
         {
@@ -322,7 +417,7 @@ namespace Root_CAMELLIA
             //m_explorer.p_treeView.SelectedItemChanged += ExplorerItemDoubleClick;
         }
 
-        public event EventHandler<DialogCloseRequestedEventArgs> CloseRequested;
+     
 
         #region Command
         public ICommand CmdClose
@@ -355,8 +450,30 @@ namespace Root_CAMELLIA
             }
         }
 
+        public ICommand CmdLoaded
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    //if (p_tabIdx == 0)
+                    //{
+                    //    p_summary.RebuildTree(pIncludeFileChildren: true, InitPath: @"C:\Camellia2\Summary");
+                    //}
+                    //else
+                    //{
+                    //    p_history.RebuildTree(pIncludeFileChildren: true, InitPath: @"C:\Camellia2\History");
+                    //}
+                });
+            }
+        }
+
 
         #endregion
+
+
+        #region Event
+        public event EventHandler<DialogCloseRequestedEventArgs> CloseRequested;
 
         int nMinIndex = -1;
         public void OnMouseMove(object sender, MouseEventArgs e)
@@ -401,13 +518,6 @@ namespace Root_CAMELLIA
             }
         }
 
-        private double GetDistance(ShapeEllipse eg, Point pt)
-        {
-            double dResult = Math.Sqrt(Math.Pow(eg.CenterX - pt.X, 2) + Math.Pow(eg.CenterY - pt.Y, 2));
-
-            return Math.Round(dResult, 3);
-        }
-
         public void OnMouseLeave(object sender, MouseEventArgs e)
         {
             foreach (ShapeEllipse se in listSelectedPoint)
@@ -420,23 +530,13 @@ namespace Root_CAMELLIA
                 {
                     se.SetBrush(GeneralTools.SelectBrush);
                 }
+                else
+                {
+                    se.SetBrush(GeneralTools.GbHole);
+                }
             }
             nMinIndex = -1;
         }
-
-
-        public int p_SelectedItemIndex
-        {
-            get
-            {
-                return m_SelectedItemIndex;
-            }
-            set
-            {
-                SetProperty(ref m_SelectedItemIndex, value);
-            }
-        }
-        int m_SelectedItemIndex = -1;
 
         public void OnMouseMoveDataGrid(object sender, MouseEventArgs e)
         {
@@ -460,15 +560,6 @@ namespace Root_CAMELLIA
             listSelectedPoint[p_SelectedItemIndex].SetBrush(GeneralTools.SelectBrush);
         }
 
-        //public void OnSelectedCellChange(object sender, SelectedCellsChangedEventArgs e)
-        //{
-        //    int t = 10;
-        //    foreach (ShapeEllipse se in listSelectedPoint)
-        //    {
-        //        se.SetBrush(GeneralTools.GbHole);
-        //    }
-        //    listSelectedPoint[p_SelectedItemIndex].SetBrush(GeneralTools.SelectBrush);
-        //}
         public void OnMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
             if(pointList.Count <= 0 || nMinIndex == p_SelectedItemIndex)
@@ -486,54 +577,82 @@ namespace Root_CAMELLIA
             }
             listSelectedPoint[nMinIndex].SetBrush(GeneralTools.SelectBrush);
             p_SelectedItemIndex = nMinIndex;
-            //if (listRealPos.Count <= 0)
-            //{
-            //    return;
-            //}
-
-            //if (ModuleCamellia.p_eState != ModuleBase.eState.Ready)
-            //{
-            //    MessageBox.Show("Vision Home이 완료 되지 않았습니다.");
-            //    return;
-            //}
-
-            //if (EnableBtn)
-            //{
-            //    return;
-            //}
-
-            //double centerX;
-            //double centerY;
-            //if (DataManager.Instance.m_waferCentering.m_ptCenter.X == 0 && DataManager.Instance.m_waferCentering.m_ptCenter.Y == 0)
-            //{
-            //    centerX = StageCenterPos.X;
-            //    centerY = StageCenterPos.Y;
-            //}
-            //else // 나중에 centering 값 추가 테스트 진행 예정
-            //{
-            //    centerX = StageCenterPos.X;
-            //    centerY = StageCenterPos.Y;
-            //}
-
-            //double x = listRealPos[nMinIndex].x;
-            //double y = listRealPos[nMinIndex].y;
-            //double dX = centerX - x * 10000;
-            //double dY = centerY - y * 10000;
-            //Thread thread = new Thread(() =>
-            //{
-            //    EnableBtn = false;
-            //    string str;
-            //    str = ModuleCamellia.p_axisXY.StartMove(new RPoint(dX, dY));
-            //    if (str != "OK")
-            //    {
-            //        MessageBox.Show(str);
-            //        return;
-            //    }
-            //    ModuleCamellia.p_axisXY.WaitReady();
-            //    EnableBtn = true;
-            //});
-            //thread.Start();
-            //MessageBox.Show(listRealPos[nMinIndex].x.ToString() + " " + listRealPos[nMinIndex].y.ToString());
         }
+
+        void ReadCSVGraphData()
+        {
+            
+            // 0_000734test
+            try
+            {
+                var reader = new StreamReader(File.OpenRead(@"C:\Camellia2\Summary\13\0_000645test.csv"));
+
+                //List<int> dataGridList = new List<int>();
+                //List<string> reflectanceList = new List<string>();
+                //List<string> transmittanceList = new List<string>();
+                List<double> waveLengthList = new List<double>();
+                List<double> reflectanceList = new List<double>();
+                List<double> transmittanceList = new List<double>();
+                bool IsFindLine = false;
+                int idx = 0;
+                while (!reader.EndOfStream)
+                {
+                    var line = reader.ReadLine();
+                    var values = line.Split(',');
+                    if(line.Contains("Wavelength") && line.Contains("Reflectance") && line.Contains("Transmittance"))
+                    {
+                        IsFindLine = true;
+                        continue;
+                    }
+
+                    if (IsFindLine)
+                    {
+                        waveLengthList.Add(double.Parse(values[0]));
+                        reflectanceList.Add(double.Parse(values[1]));
+                        transmittanceList.Add(double.Parse(values[2]));
+                    }
+                    //if (double.TryParse(values[0], out x) && double.TryParse(values[1], out y))
+                    //{
+                    //    pointList.Add(new Point(x, y));
+                    //}
+                    ////listB.Add(values[1]);
+                    ////listC.Add(values[4]);
+                    //int site = 0;
+                    //if (int.TryParse(values[4], out site))
+                    //{
+                    //    dataGridList.Add(site);
+                    //}
+
+                    //if (idx == 0)
+                    //{
+                    //    for (int i = 0; i < values.Length; i++)
+                    //    {
+                    //        if (values[i].Contains("R_"))
+                    //        {
+                    //            var val = values[i].Split('_');
+                    //            reflectanceList.Add(val[1]);
+                    //        }
+                    //        else if (values[i].Contains("T_"))
+                    //        {
+                    //            var val = values[i].Split('_');
+                    //            transmittanceList.Add(val[1]);
+                    //        }
+                    //    }
+                    //}
+                    idx++;
+                }
+                p_reflectanceGraph.DrawReviewGraph("WaveLength [nm]","Reflectance [%]", waveLengthList.ToArray(), reflectanceList.ToArray());
+                p_transmittanceGraph.DrawReviewGraph("WaveLength [nm]", "Transmittance [%]", waveLengthList.ToArray(),transmittanceList.ToArray());
+            }
+            catch(Exception e)
+            {
+                MessageBox.Show(e.Message);
+            }
+        }
+        void DrawGraph()
+        {
+
+        }
+        #endregion
     }
 }
