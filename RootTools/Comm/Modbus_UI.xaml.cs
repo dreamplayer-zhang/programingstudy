@@ -23,7 +23,9 @@ namespace RootTools.Comm
             m_modbus = modbus;
             DataContext = modbus;
             commLogUI.Init(modbus.m_commLog);
-            dataGridData.ItemsSource = modbus.m_aViewData; 
+            dataGridData.ItemsSource = modbus.m_aViewData;
+            comboType.ItemsSource = Enum.GetValues(typeof(Modbus.eType));
+            comboType.SelectedIndex = 0;
             treeRootUI.Init(modbus.m_treeRoot);
             modbus.RunTree(Tree.eMode.Init);
             InitTimer(); 
@@ -64,7 +66,8 @@ namespace RootTools.Comm
 
         private void buttonAdd_Click(object sender, RoutedEventArgs e)
         {
-            //forget
+            Modbus.eType eType = (Modbus.eType)comboType.SelectedItem;
+            m_modbus.AddViewData(eType); 
         }
     }
 }
