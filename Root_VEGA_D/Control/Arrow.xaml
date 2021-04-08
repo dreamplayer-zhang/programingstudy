@@ -17,7 +17,7 @@
                              Storyboard.TargetProperty="Opacity" />
         </Storyboard>
     </UserControl.Resources>
-    <Grid x:Name="grid" Opacity="1">
+    <Grid x:Name="grid">
         <Grid.Triggers>
             <EventTrigger RoutedEvent="FrameworkElement.Loaded">
                 <BeginStoryboard Storyboard="{StaticResource Animation}" />
