@@ -50,8 +50,8 @@ namespace Root_VEGA_D.Engineer
             InitAligner();
             m_vision = new Vision("Vision", m_engineer);
             InitModule(m_vision);
-            iWTR.AddChild(m_vision); 
-            m_visionIPU = new Vision_IPU("Vision_IPU", m_engineer, ModuleBase.eRemote.Client);
+            iWTR.AddChild(m_vision);
+            m_visionIPU = new Vision_IPU("Vision_IPU", m_engineer);
             InitModule(m_visionIPU);
             m_interlock = new Interlock("Interlock", m_engineer);
             InitModule(m_interlock);

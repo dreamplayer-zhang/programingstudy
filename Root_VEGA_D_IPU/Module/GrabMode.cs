@@ -3,12 +3,11 @@ using RootTools.Camera;
 using RootTools.Lens.LinearTurret;
 using RootTools.Light;
 using RootTools.Memory;
-using RootTools.RADS;
 using RootTools.Trees;
 using System;
 using System.Collections.Generic;
 
-namespace Root_VEGA_D.Module
+namespace Root_VEGA_D_IPU.Module
 {
     public enum eScanPos
     {
@@ -47,6 +46,7 @@ namespace Root_VEGA_D.Module
         public GrabData m_GD = new GrabData();
         LensLinearTurret m_lens = null;
         public string m_sLens = "";
+        public int m_nRemoteGrabLine = 0;
         void RunTreeOption(Tree tree, bool bVisible, bool bReadOnly)
         {
             m_rpAxisCenter = tree.Set(m_rpAxisCenter, m_rpAxisCenter, "Center Axis Position", "Center Axis Position (mm)", bVisible);
@@ -189,31 +189,10 @@ namespace Root_VEGA_D.Module
         #endregion
 
         #region Axis
-        public double m_dTrigger = 10;
+        public int m_dTrigger = 10;
         public int m_intervalAcc = 100000;        // 가속 구간 point,  단위 0.1um
         public int m_ScanLineNum = 1;
         public int m_ScanStartLine = 0;
-        #endregion
-
-        #region RADS
-        public RADSControl m_RADSControl;
-        bool m_bUseRADS = false;
-        public bool pUseRADS
-        {
-            get
-            {
-                return m_bUseRADS;
-            }
-            set
-            {
-                m_bUseRADS = value;
-            }
-        }
-        void RunTreeRADS(Tree tree, bool bVisible, bool bReadOnly)
-        {
-            m_bUseRADS = tree.Set(pUseRADS, pUseRADS, "Use", "Using RADS", bVisible, false);
-        }
-
         #endregion
 
         public eScanPos m_eScanPos = eScanPos.Bottom;
@@ -230,20 +209,19 @@ namespace Root_VEGA_D.Module
 
         public string p_sName { get; set; }
 
-        public GrabMode(string id, CameraSet cameraSet, LightSet lightSet, MemoryPool memoryPool, LensLinearTurret lensTurret = null, RADSControl radsControl = null)
+        public GrabMode(string id, CameraSet cameraSet, LightSet lightSet, MemoryPool memoryPool, LensLinearTurret lensTurret = null )
         {
             p_id = id;
             p_sName = id;
             m_cameraSet = cameraSet;
             m_lightSet = lightSet;
             m_memoryPool = memoryPool;
-            m_RADSControl = radsControl;
             m_lens = lensTurret;
         }
 
         public static GrabMode Copy(GrabMode src)
         {
-            GrabMode dst = new GrabMode(src.p_id, src.m_cameraSet, src.m_lightSet, src.m_memoryPool,null, src.m_RADSControl);
+            GrabMode dst = new GrabMode(src.p_id, src.m_cameraSet, src.m_lightSet, src.m_memoryPool);
             dst.Grabed = src.Grabed;
             dst.m_bUseBiDirectionScan = src.m_bUseBiDirectionScan;
             dst.m_camera = src.m_camera;
@@ -288,7 +266,6 @@ namespace Root_VEGA_D.Module
             RunTreeLight(tree.GetTree("LightPower", false), bVisible, bReadOnly);
             RunTreeMemory(tree.GetTree("Memory", false), bVisible, bReadOnly);
             RunTreeScanPos(tree.GetTree("ScanPos", false), bVisible, bReadOnly);
-            RunTreeRADS(tree.GetTree("RADS", false), bVisible, bReadOnly);
         }
 
         public void RunTreeLADS(Tree tree)

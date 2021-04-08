@@ -1004,6 +1004,14 @@ namespace RootTools.Camera.Dalsa
             }
         }
 
+        public void AbortGrabThread()
+        {
+            if (m_GrabThread != null)
+                m_GrabThread.Abort();
+
+            p_CamInfo.p_eState = eCamState.Ready;
+        }
+
         public double GetFps() { return 0; }
 
         #region Camera Event
