@@ -81,7 +81,7 @@ namespace Root_Rinse_Unloader.Module
                     case eSensor.Exist:
                         if (m_diCheck[2].p_bIn) p_eSensor = eSensor.Arrived;
                         break;
-                    case eSensor.Push:
+                    case eSensor.Arrived:
                         if (m_diCheck[1].p_bIn == false) p_eSensor = eSensor.Push;
                         break; 
                 }
@@ -235,15 +235,12 @@ namespace Root_Rinse_Unloader.Module
                 Thread.Sleep(10);
                 if (EQ.IsStop()) return "EQ Stop";
             }
-            Thread.Sleep((int)(1000 * secArrive));
-            foreach (Line line in m_aLine)
+            while (IsReadyPush() == false)
             {
-                if (line.p_eSensor != Line.eSensor.Push)
-                {
-                    m_alidArrived.p_bSet = true; 
-                    return "Arrive Done Error";
-                }
+                Thread.Sleep(10);
+                if (EQ.IsStop()) return "EQ Stop";
             }
+            Thread.Sleep((int)(1000 * secArrive));
             string sRun = RunPusher();
             m_alidPusher.p_bSet = (sRun != "OK");
             RunRotate(false); 
@@ -267,8 +264,7 @@ namespace Root_Rinse_Unloader.Module
                 line.CheckSensor(); 
                 switch (line.p_eSensor)
                 {
-                    case Line.eSensor.Exist:
-                    case Line.eSensor.Arrived: return false; 
+                    case Line.eSensor.Exist: return false;
                 }
             }
             for (int n = 0; n < m_bExist.Count; n++)
@@ -278,6 +274,16 @@ namespace Root_Rinse_Unloader.Module
                     //EQ.p_bStop = true;
                     //EQ.p_eState = EQ.eState.Error; 
                 }
+            }
+            return true;
+        }
+
+        bool IsReadyPush()
+        {
+            foreach (Line line in m_aLine)
+            {
+                line.CheckSensor();
+                if (line.p_eSensor != Line.eSensor.Arrived) return false;
             }
             return true;
         }

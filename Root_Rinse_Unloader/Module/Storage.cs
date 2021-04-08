@@ -14,7 +14,7 @@ namespace Root_Rinse_Unloader.Module
         #region ToolBox
         public override void GetTools(bool bInit)
         {
-            foreach (Magazine magazine in m_aMagazine) magazine.GetTools(m_toolBox);
+            foreach (Magazine magazine in m_aMagazine) magazine.GetTools(m_toolBox, bInit);
             m_stack.GetTools(m_toolBox);
             p_sInfo = m_toolBox.GetAxis(ref m_axis, this, "Elevator");
             if (bInit)
@@ -36,11 +36,12 @@ namespace Root_Rinse_Unloader.Module
         public class Magazine : NotifyProperty
         {
             DIO_I m_diCheck;
-            DIO_IO m_dioClamp;
-            public void GetTools(ToolBox toolBox)
+            public DIO_IO m_dioClamp;
+            public void GetTools(ToolBox toolBox, bool bInit)
             {
                 m_storage.p_sInfo = toolBox.GetDIO(ref m_diCheck, m_storage, m_id + ".Check");
                 m_storage.p_sInfo = toolBox.GetDIO(ref m_dioClamp, m_storage, m_id + ".Clamp");
+                if (bInit) m_dioClamp.Write(!m_diCheck.p_bIn); 
             }
 
             bool _bCheck = false;
