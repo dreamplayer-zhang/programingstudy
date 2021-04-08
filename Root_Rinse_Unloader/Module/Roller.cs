@@ -405,7 +405,7 @@ namespace Root_Rinse_Unloader.Module
         {
             p_eStep = eStep.Empty; 
             RunStopperUp(true);
-            p_bPusherUp = false; 
+            p_bPusherUp = (m_rinse.p_eMode == RinseU.eRunMode.Magazine); 
             RunRotate(true);
             foreach (Line line in m_aLine) line.p_eSensor = Line.eSensor.Empty; 
         }

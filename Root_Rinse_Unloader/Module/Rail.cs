@@ -43,7 +43,7 @@ namespace Root_Rinse_Unloader.Module
         #region Line
         public class Line : NotifyProperty
         {
-            DIO_I[] m_diCheck = new DIO_I[3];
+            public DIO_I[] m_diCheck = new DIO_I[3];
             public void GetTools(ToolBox toolBox)
             {
                 m_rail.p_sInfo = toolBox.GetDIO(ref m_diCheck[0], m_rail, m_id + ".Start");
@@ -195,8 +195,10 @@ namespace Root_Rinse_Unloader.Module
             }
             foreach (Line line in m_aLine)
             {
-                if (line.p_eSensor == Line.eSensor.Arrived) return "Check Strip";
-                if (line.p_eSensor == Line.eSensor.Exist) return "Check Strip";
+                foreach (DIO_I di in line.m_diCheck)
+                {
+                    if (di.p_bIn) return "Check Strip";
+                }
             }
             m_axisRotate.ServoOn(true);
             p_sInfo = base.StateHome(m_axisWidth);
