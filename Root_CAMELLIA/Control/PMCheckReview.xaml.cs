@@ -13,7 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace Root_CAMELLIA.Control
+namespace Root_CAMELLIA
 {
     /// <summary>
     /// PMCheckReview.xaml에 대한 상호 작용 논리
@@ -23,6 +23,22 @@ namespace Root_CAMELLIA.Control
         public PMCheckReview()
         {
             InitializeComponent();
+        }
+        private void btn_ReflectanceRepeatability_Click(object sender, RoutedEventArgs e)
+        {
+            DataContext = new PM_Reflectance_ViewModel();
+        }
+
+        
+        private void btn_ThicknessRepeatability_Click(object sender, RoutedEventArgs e)
+        {
+            DataContext = new PM_Thickness_ViewModel();
+
+        }
+
+        private void btn_SensorHoleOffset_Click(object sender, RoutedEventArgs e)
+        {
+            DataContext = new PM_SensorHoleOffset_ViewModel();
         }
     }
 }

@@ -21,6 +21,34 @@
             <TabItem Header="Setting">
                 <tree:TreeUI x:Name="treeRootUI"/>
             </TabItem>
+            <TabItem Header="Data">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <StackPanel Grid.Row="0" Orientation="Horizontal">
+                        <TextBlock Text="  Unit = " VerticalAlignment="Center"/>
+                        <TextBox Margin="3" Text="{Binding p_nViewUnit}" Width="40" TextAlignment="Center"/>
+                        <CheckBox x:Name="checkBoxRead" Content="Timer Read" Margin="30,3,3,3" VerticalAlignment="Center" Click="checkBoxRead_Click"/>
+                    </StackPanel>
+                    <StackPanel Grid.Row="1" Orientation="Horizontal">
+                        <ComboBox x:Name="comboType" Width="120" Margin="3"/>
+                        <TextBox Text="{Binding p_nViewStart}" Width="50" TextAlignment="Center" Margin="3"/>
+                        <TextBlock Text="~" TextAlignment="Center" Margin="3"/>
+                        <TextBox Text="{Binding p_nViewEnd}" Width="50" TextAlignment="Center" Margin="3"/>
+                        <Button x:Name="buttonAdd" Content="Add View" Click="buttonAdd_Click"/>
+                    </StackPanel>
+                    <DataGrid Grid.Row="2" x:Name="dataGridData" IsReadOnly="False" AutoGenerateColumns="false" GridLinesVisibility="None">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Modbus" Binding="{Binding p_eType}"/>
+                            <DataGridTextColumn Header="Address" Binding="{Binding p_nAddress}"/>
+                            <DataGridTextColumn Header="Data" Binding="{Binding p_nData}"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Grid>
+            </TabItem>
         </TabControl>
     </Grid>
 </UserControl>

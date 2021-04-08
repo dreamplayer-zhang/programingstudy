@@ -73,12 +73,12 @@ namespace Root_Rinse_Loader.Module
             public void CheckSensor()
             {
                 p_bCheck = m_diCheck.p_bIn;
-                p_bClamp = m_dioClamp.p_bIn; 
+                p_bClamp = !m_dioClamp.p_bIn; 
             }
 
             public void RunClamp(bool bClamp)
             {
-                m_dioClamp.Write(bClamp && p_bCheck); 
+                m_dioClamp.Write(!bClamp); 
             }
 
             public eMagazine m_eMagazine = eMagazine.Magazine1;
@@ -211,11 +211,12 @@ namespace Root_Rinse_Loader.Module
         }
 
         int m_dZ = 6;
-        public string MoveMagazine(eMagazine eMagazine, int iIndex, bool bWait = true)
+        public string MoveMagazine(eMagazine eMagazine, int iIndex, bool bWait)
         {
             if ((iIndex < 0) || (iIndex >= 20)) return "Invalid Index"; 
-            m_axis.StartMove(eMagazine, iIndex * m_dZ);
-            return m_axis.WaitReady(); 
+            m_axis.StartMove(eMagazine, (iIndex - 19) * m_dZ);
+            if (bWait) return m_axis.WaitReady();
+            return "OK";
         }
 
         public string MoveStack()
@@ -288,7 +289,7 @@ namespace Root_Rinse_Loader.Module
             for (int n = 0; n < 20; n++)
             {
                 m_rinse.p_iMagazine = n; 
-                if (Run(MoveMagazine(eMagazine, n))) return p_sInfo;
+                if (Run(MoveMagazine(eMagazine, n, true))) return p_sInfo;
                 if (Run(RunPusher())) return p_sInfo;
                 Thread.Sleep((int)(1000 * m_secRunDelay));
             }
@@ -460,7 +461,7 @@ namespace Root_Rinse_Loader.Module
 
             public override string Run()
             {
-                return m_module.MoveMagazine(m_eMagazine, m_iIndex); 
+                return m_module.MoveMagazine(m_eMagazine, m_iIndex, true); 
             }
         }
 
@@ -516,7 +517,7 @@ namespace Root_Rinse_Loader.Module
 
             public override string Run()
             {
-                if (m_module.Run(m_module.MoveMagazine(m_eMagazine, m_iIndex))) return p_sInfo;
+                if (m_module.Run(m_module.MoveMagazine(m_eMagazine, m_iIndex, true))) return p_sInfo;
                 return m_module.RunPusher(); 
             }
         }

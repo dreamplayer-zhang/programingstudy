@@ -92,7 +92,7 @@ namespace RootTools.Light
                 {
                     case eType.Power3:
                     case eType.Power4:
-                        if (sRead.Length != m_sSend.Length) return "Invalid Protocol Length";
+                        //if (sRead.Length != m_sSend.Length) return "Invalid Protocol Length";
                         sRead = sRead.Replace('R', 'W');
                         if (sRead != m_sSend) return "Invalid Protocol Receive";
                         break; 

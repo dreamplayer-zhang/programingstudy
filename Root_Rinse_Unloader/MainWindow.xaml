@@ -286,7 +286,6 @@
                                             <TextBox x:Name="textBoxWidth" Text="{Binding p_widthStrip}"
                                                  HorizontalAlignment="Center"
                                                  VerticalAlignment="Center"
-                                                 IsReadOnly="True"
                                                  Margin="0,0,60,0"
                                                  Width="300"
                                                  Height="60"

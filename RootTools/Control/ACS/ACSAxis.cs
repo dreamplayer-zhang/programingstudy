@@ -141,7 +141,6 @@ namespace RootTools.Control.ACS
                 return p_sInfo; 
             }
             p_eState = eState.Move;
-            Thread.Sleep(100);
             return "OK";
         }
 
@@ -168,7 +167,6 @@ namespace RootTools.Control.ACS
                 return p_sInfo;
             }
             p_eState = eState.Move;
-            Thread.Sleep(100);
             return "OK";
         }
         #endregion

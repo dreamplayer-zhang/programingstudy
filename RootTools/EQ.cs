@@ -19,6 +19,7 @@ namespace RootTools
         }
 
         public static _EQ m_EQ = new _EQ();
+        public static bool m_bRun = false; 
 
         public static string m_sModel = "Model"; 
         public static string c_sPathRecipe = "c:\\Recipe";

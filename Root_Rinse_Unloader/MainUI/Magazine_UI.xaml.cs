@@ -44,7 +44,7 @@ namespace Root_Rinse_Unloader.MainUI
                 gridMagazineLevels.RowDefinitions.Add(new RowDefinition());
                 MagazineClamp_UI ui = new MagazineClamp_UI();
                 ui.Init(magazine);
-                Grid.SetRow(ui, 3 - gridMagazineLevels.Children.Count);
+                Grid.SetRow(ui, gridMagazineLevels.Children.Count);
                 gridMagazineLevels.Children.Add(ui);
                 m_aMagazine.Add(ui);
             }
@@ -82,7 +82,7 @@ namespace Root_Rinse_Unloader.MainUI
 
         private void buttonMove_Click(object sender, RoutedEventArgs e)
         {
-            m_storage.MoveMagazine(m_rinse.p_eMagazine, m_rinse.p_iMagazine);
+            m_storage.MoveMagazine(m_rinse.p_eMagazine, m_rinse.p_iMagazine, false);
         }
     }
 }
