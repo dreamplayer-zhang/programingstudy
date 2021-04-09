@@ -316,6 +316,7 @@ namespace Root_Rinse_Loader.Module
                 p_eState = eState.Ready;
                 return "OK";
             }
+            foreach (Magazine magazine in m_aMagazine) magazine.RunClamp(magazine.p_bCheck);
             p_sInfo = base.StateHome();
             p_eState = (p_sInfo == "OK") ? eState.Ready : eState.Error;
             return p_sInfo;
@@ -373,6 +374,7 @@ namespace Root_Rinse_Loader.Module
 
         public override void ThreadStop()
         {
+            foreach (Magazine magazine in m_aMagazine) magazine.RunClamp(false);
             if (m_bThreadCheck)
             {
                 m_bThreadCheck = false;
