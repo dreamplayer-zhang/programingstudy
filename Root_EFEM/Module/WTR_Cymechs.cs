@@ -675,6 +675,7 @@ namespace Root_EFEM.Module
                 Protocol protocol = new Protocol(eCmd, this, sCmd);
                 m_qProtocol.Enqueue(protocol);
                 if (Run(protocol.WaitReply(m_secRS232))) return p_sInfo;
+                sRead = protocol.m_sRead;
                 return "OK"; 
             }
             finally { m_protocolSend = null; } 
