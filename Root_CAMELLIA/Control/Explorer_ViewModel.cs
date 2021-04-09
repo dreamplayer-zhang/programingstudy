@@ -67,6 +67,7 @@ namespace Root_CAMELLIA
             if (InitPath != "")
                 treeRootItem.InitPathName = InitPath;
 
+            treeRootItem.LastPathName = p_CurrentPath;
             // Copy children treeRootItem to RootChildren, set up new tree 
             foreach (INavTreeItem item in treeRootItem.Children) { RootChildren.Add(item); }
 
@@ -87,6 +88,7 @@ namespace Root_CAMELLIA
                 p_CurrentPath = InitPath;
                 treeRootItem.InitPathName = p_InitPath;
             }
+            treeRootItem.LastPathName = "";
             // Delete RootChildren and init RootChildren ussing treeRootItem.Children
             foreach (INavTreeItem item in RootChildren) { item.DeleteChildren(); }
             RootChildren.Clear();
@@ -207,6 +209,7 @@ namespace Root_CAMELLIA
             }
             string path = (string)selectedItem.FullPathName;
             p_CurrentPath = path;
+            RootChildren[0].LastPathName = p_CurrentPath;
             //System.Windows.Forms.MessageBox.Show(path);
             FileAttributes chkAtt = File.GetAttributes(path);
             if ((chkAtt & FileAttributes.Directory) != FileAttributes.Directory)
@@ -227,6 +230,7 @@ namespace Root_CAMELLIA
             }
             string path = (string)selectedItem.FullPathName;
             p_CurrentPath = path;
+            RootChildren[0].LastPathName = p_CurrentPath;
             //System.Windows.Forms.MessageBox.Show(path);
             FileAttributes chkAtt = File.GetAttributes(path);
             if ((chkAtt & FileAttributes.Directory) != FileAttributes.Directory)

@@ -30,6 +30,8 @@ namespace Root_CAMELLIA
 
         string InitPathName { get; set; }
 
+        string LastPathName { get; set; }
+
         ObservableCollection<INavTreeItem> Children { get; }
 
         bool IsExpanded { get; set; }
@@ -53,6 +55,7 @@ namespace Root_CAMELLIA
         // for display in tree
         public string FriendlyName { get; set; }
         public string InitPathName { get; set; }
+        public string LastPathName { get; set; }
         protected BitmapSource myIcon;
         public BitmapSource MyIcon 
         {

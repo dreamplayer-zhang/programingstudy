@@ -176,7 +176,7 @@
                 <Grid Grid.Row="1">
                     <GroupBox Header="Point Data">
                         <DataGrid ItemsSource="{Binding PointListItem}" AutoGenerateColumns="False" CanUserAddRows="False" CanUserSortColumns="False" EnableColumnVirtualization="True"  CanUserDeleteRows="False" IsEnabled="{Binding p_IsSummary}"
-                                  EnableRowVirtualization="True" ScrollViewer.CanContentScroll="True" SelectionMode="Single" IsReadOnly="True" SelectedIndex="{Binding p_SelectedItemIndex}" PreviewKeyDown="DataGrid_PreviewKeyDown">
+                                  EnableRowVirtualization="True" ScrollViewer.CanContentScroll="True" SelectionMode="Single" IsReadOnly="True" SelectedIndex="{Binding p_SelectedItemIndex}" PreviewKeyDown="DataGrid_PreviewKeyDown" PreviewMouseRightButtonDown="DataGrid_PreviewMouseDown" PreviewMouseRightButtonUp="DataGrid_PreviewMouseUp">
                             <DataGrid.Columns>
                                 <DataGridTextColumn Header="Site" Binding="{Binding ListSite}" Width="*"/>
                                 <DataGridTextColumn Header="X(mm)" Binding="{Binding ListX}" Width="*"/>

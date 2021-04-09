@@ -113,6 +113,7 @@ namespace Root_CAMELLIA
             {
                 return;
             }
+            ClearData();
             p_currentPath = path;
             ReadCSV(path);
         }
@@ -184,10 +185,15 @@ namespace Root_CAMELLIA
                 {
                     p_IsSummary = false;
                     ClearData();
+                    
                 }
                 else
                 {
                     p_IsSummary = true;
+                    if (p_summary.p_CurrentPath.Contains(".csv"))
+                    {
+                        ReadCSV(p_summary.p_CurrentPath);
+                    }
                 }
             }
         }
@@ -362,6 +368,7 @@ namespace Root_CAMELLIA
             p_transmittanceList = new List<string>();
             p_SelectedItemIndex = -1;
             p_reflectanceGraph.ReviewGraphReset();
+            p_transmittanceGraph.ReviewGraphReset();
         }
 
         private void SetDataGrid(List<Point> pt, List<int> site)
@@ -587,9 +594,6 @@ namespace Root_CAMELLIA
             {
                 var reader = new StreamReader(File.OpenRead(@"C:\Camellia2\Summary\13\0_000645test.csv"));
 
-                //List<int> dataGridList = new List<int>();
-                //List<string> reflectanceList = new List<string>();
-                //List<string> transmittanceList = new List<string>();
                 List<double> waveLengthList = new List<double>();
                 List<double> reflectanceList = new List<double>();
                 List<double> transmittanceList = new List<double>();
@@ -611,34 +615,7 @@ namespace Root_CAMELLIA
                         reflectanceList.Add(double.Parse(values[1]));
                         transmittanceList.Add(double.Parse(values[2]));
                     }
-                    //if (double.TryParse(values[0], out x) && double.TryParse(values[1], out y))
-                    //{
-                    //    pointList.Add(new Point(x, y));
-                    //}
-                    ////listB.Add(values[1]);
-                    ////listC.Add(values[4]);
-                    //int site = 0;
-                    //if (int.TryParse(values[4], out site))
-                    //{
-                    //    dataGridList.Add(site);
-                    //}
 
-                    //if (idx == 0)
-                    //{
-                    //    for (int i = 0; i < values.Length; i++)
-                    //    {
-                    //        if (values[i].Contains("R_"))
-                    //        {
-                    //            var val = values[i].Split('_');
-                    //            reflectanceList.Add(val[1]);
-                    //        }
-                    //        else if (values[i].Contains("T_"))
-                    //        {
-                    //            var val = values[i].Split('_');
-                    //            transmittanceList.Add(val[1]);
-                    //        }
-                    //    }
-                    //}
                     idx++;
                 }
                 p_reflectanceGraph.DrawReviewGraph("WaveLength [nm]","Reflectance [%]", waveLengthList.ToArray(), reflectanceList.ToArray());
@@ -648,10 +625,6 @@ namespace Root_CAMELLIA
             {
                 MessageBox.Show(e.Message);
             }
-        }
-        void DrawGraph()
-        {
-
         }
         #endregion
     }

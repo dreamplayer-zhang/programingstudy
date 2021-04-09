@@ -59,17 +59,17 @@ namespace Root_CAMELLIA
             INavTreeItem item1;
             string fn = "";
 
-            //string[] allDrives = System.Environment.GetLogicalDrives();
-            //DriveInfo[] allDrives = DriveInfo.GetDrives();
             DirectoryInfo di = new DirectoryInfo(InitPathName);
-            //foreach (Directory dir in di.GetDirectories())
-            //{
 
-            //}
+            //string[] LastPath = LastPathName.Split('\\');
+            //string[] CalcPath = di.FullName.Split('\\');
+
+
             item1 = new DriveItem();
 
             item1.FullPathName = di.FullName;
             item1.FriendlyName = di.Name;
+            item1.LastPathName = InitPathName;
             item1.InitPathName = InitPathName;
             item1.IsExpanded = true;
             item1.IncludeFileChildren = this.IncludeFileChildren;
@@ -133,8 +133,31 @@ namespace Root_CAMELLIA
                 if (!di.Exists) return childrenList;
                 string[] directorys = InitPathName.Split('\\');
 
+                string[] LastPath = { }, CalcPath;
+                if (LastPathName != "")
+                {
+                    LastPath = LastPathName.Split('\\');
+                    CalcPath = di.FullName.Split('\\');
+                }
+
+
                 foreach (DirectoryInfo dir in di.GetDirectories())
                 {
+                    CalcPath = dir.FullName.Split('\\');
+                    int deeps = CalcPath.Length;
+                    string expandedPath = "";
+                    for(int i = 0; i < deeps; i++)
+                    {
+                        if(LastPathName == "" || LastPath.Length <= i)
+                        {
+                            break;
+                        }
+                        expandedPath += LastPath[i];
+                        if (i != deeps - 1)
+                        {
+                            expandedPath += "\\";
+                        }
+                    }
                     //if (!dir.FullName.Contains(directorys[directorys.Length - 1]))
                     //    continue;
                     //if(deep == 5)
@@ -143,10 +166,18 @@ namespace Root_CAMELLIA
                     //        continue;
                     //    }
                     //}
+                    //if(dir.FullName)
+                    bool IsExpand = false;
+                    if(dir.FullName == expandedPath)
+                    {
+                        IsExpand = true;
+                    }
                     item1 = new FolderItem();
                     item1.FullPathName = FullPathName + "\\" + dir.Name;
                     item1.FriendlyName = dir.Name;
+                    item1.LastPathName = LastPathName;
                     item1.InitPathName = InitPathName;
+                    item1.IsExpanded = IsExpand;
                     item1.IncludeFileChildren = this.IncludeFileChildren;
                     childrenList.Add(item1);
                 }
@@ -213,6 +244,13 @@ namespace Root_CAMELLIA
                 if (!di.Exists) return childrenList;
                 string[] directorys = InitPathName.Split('\\');
 
+                string[] LastPath = { }, CalcPath;
+                if (LastPathName != "")
+                {
+                    LastPath = LastPathName.Split('\\');
+                    CalcPath = di.FullName.Split('\\');
+                }
+
                 Regex regex = new Regex(@"[0-9]{4}-[0-9]{2}-[0-9]{2}");
                 foreach (DirectoryInfo dir in di.GetDirectories())
                 {
@@ -221,18 +259,36 @@ namespace Root_CAMELLIA
                         if (!dir.Name.Equals("ResultData_Summary"))
                             continue;
                     }
-                    //if (!dir.FullName.Contains(directorys[directorys.Length - 1]))
-                    //    continue;
-                    //if(deep == 5)
-                    //{
-                    //    if(!dir.Name.Equals("ResultData_Summary")){
-                    //        continue;
-                    //    }
-                    //}
+                    
+                    CalcPath = dir.FullName.Split('\\');
+                    int deeps = CalcPath.Length;
+                    string expandedPath = "";
+                    for (int i = 0; i < deeps; i++)
+                    {
+                        if (LastPathName == "" || LastPath.Length <= i)
+                        {
+                            break;
+                        }
+
+                        expandedPath += LastPath[i];
+                        if (i != deeps - 1)
+                        {
+                            expandedPath += "\\";
+                        }
+                    }
+
+                    bool IsExpand = false;
+                    if (dir.FullName == expandedPath)
+                    {
+                        IsExpand = true;
+                    }
+
                     item1 = new FolderItem();
                     item1.FullPathName = FullPathName + "\\" + dir.Name;
                     item1.FriendlyName = dir.Name;
+                    item1.LastPathName = LastPathName;
                     item1.InitPathName = InitPathName;
+                    item1.IsExpanded = IsExpand;
                     item1.IncludeFileChildren = this.IncludeFileChildren;
                     childrenList.Add(item1);
                 }
@@ -248,9 +304,16 @@ namespace Root_CAMELLIA
                             //p_Progress = ((++count) * 100) / di.GetFiles().Length;
                             continue;
                         }
+                        bool isSelect = false;
+                        if (LastPathName.Contains(".csv") && LastPathName == file.FullName)
+                        {
+                            isSelect = true;
+                        }
+
                         item1 = new FileItem();
                         item1.FullPathName = FullPathName + "\\" + file.Name;
                         item1.FriendlyName = file.Name;
+                        item1.IsSelected = isSelect;
                         item1.InitPathName = InitPathName;
                         childrenList.Add(item1);
                         //p_Progress = ((++count) * 100) / di.GetFiles().Length;
