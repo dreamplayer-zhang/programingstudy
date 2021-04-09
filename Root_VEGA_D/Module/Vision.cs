@@ -3,6 +3,7 @@ using RootTools;
 using RootTools.Camera.BaslerPylon;
 using RootTools.Camera.Dalsa;
 using RootTools.Control;
+using RootTools.Control.Ajin;
 using RootTools.GAFs;
 using RootTools.Lens.LinearTurret;
 using RootTools.Light;
@@ -10,6 +11,7 @@ using RootTools.Memory;
 using RootTools.Module;
 using RootTools.Trees;
 using RootTools_Vision.Utility;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Threading;
@@ -76,6 +78,7 @@ namespace Root_VEGA_D.Module
             //m_remote.GetTools(bInit);
         }
         #endregion
+
 
         #region Grab Mode
         int m_lGrabMode = 0;
@@ -179,6 +182,37 @@ namespace Root_VEGA_D.Module
             m_pulseRound = tree.Set(m_pulseRound, m_pulseRound, "Rotate Pulse / Round", "Rotate" +
                 " Axis Pulse / 1 Round (pulse)");
         }
+
+        public enum eAxisPosX
+        { 
+            Ready,
+        }
+        public enum eAxisPosY
+        {
+            Ready,
+        }
+        public enum eAxisPosZ
+        {
+            Ready,
+        }
+        public enum eAxisPosRotate
+        {
+            Ready,
+        }
+        void InitPosAlign()
+        {
+            m_axisZ.AddPos(Enum.GetNames(typeof(eAxisPosZ)));
+            m_axisRotate.AddPos(Enum.GetNames(typeof(eAxisPosRotate)));
+            if (m_axisXY.p_axisX != null)
+            {
+                (m_axisXY.p_axisX).AddPos(Enum.GetNames(typeof(eAxisPosX)));
+            }
+            if (m_axisXY.p_axisY != null)
+            {
+                (m_axisXY.p_axisY).AddPos(Enum.GetNames(typeof(eAxisPosY)));
+            }
+        }
+
         #endregion
 
         #region IWTRChild
@@ -244,13 +278,23 @@ namespace Root_VEGA_D.Module
             if (p_eRemote == eRemote.Client) return RemoteRun(eRemoteRun.BeforeGet, eRemote.Client, nID);
             else
             {
-                m_axisXY.StartMove("Position_0");
-                m_axisRotate.StartMove("Position_0");
-                m_axisZ.StartMove("Position_0");
+                if (Run(m_axisZ.StartMove(eAxisPosZ.Ready))) return p_sInfo;
+                if (Run(m_axisRotate.StartMove(eAxisPosRotate.Ready))) return p_sInfo;
+                if (Run(m_axisXY.StartMove(eAxisPosX.Ready))) return p_sInfo;
 
-                m_axisXY.WaitReady();
-                m_axisRotate.WaitReady();
-                m_axisZ.WaitReady();
+                if (Run(m_axisXY.WaitReady()))
+                    return p_sInfo;
+                if (Run(m_axisRotate.WaitReady()))
+                    return p_sInfo;
+                if (Run(m_axisZ.WaitReady()))
+                    return p_sInfo;
+                //m_axisXY.StartMove("Position_0");
+                //m_axisRotate.StartMove("Position_0");
+                //m_axisZ.StartMove("Position_0");
+
+                //m_axisXY.WaitReady();
+                //m_axisRotate.WaitReady();
+                //m_axisZ.WaitReady();
 
                 ClearData();
 
@@ -263,13 +307,23 @@ namespace Root_VEGA_D.Module
             if (p_eRemote == eRemote.Client) return RemoteRun(eRemoteRun.BeforePut, eRemote.Client, nID);
             else
             {
-                m_axisXY.StartMove("Position_0");
-                m_axisRotate.StartMove("Position_0");
-                m_axisZ.StartMove("Position_0");
+                if (Run(m_axisZ.StartMove(eAxisPosZ.Ready))) return p_sInfo;
+                if (Run(m_axisRotate.StartMove(eAxisPosRotate.Ready))) return p_sInfo;
+                if (Run(m_axisXY.StartMove(eAxisPosX.Ready))) return p_sInfo;
 
-                m_axisXY.WaitReady();
-                m_axisRotate.WaitReady();
-                m_axisZ.WaitReady();
+                if (Run(m_axisXY.WaitReady()))
+                    return p_sInfo;
+                if (Run(m_axisRotate.WaitReady()))
+                    return p_sInfo;
+                if (Run(m_axisZ.WaitReady()))
+                    return p_sInfo;
+                //m_axisXY.StartMove("Position_0");
+                //m_axisRotate.StartMove("Position_0");
+                //m_axisZ.StartMove("Position_0");
+
+                //m_axisXY.WaitReady();
+                //m_axisRotate.WaitReady();
+                //m_axisZ.WaitReady();
 
                 return "OK";
             }
@@ -362,6 +416,7 @@ namespace Root_VEGA_D.Module
         public Vision(string id, IEngineer engineer)
         {
             base.InitBase(id, engineer);
+            InitPosAlign();
             m_waferSize = new InfoWafer.WaferSize(id, false, false);
             OnChangeState += Vision_OnChangeState;
         }
