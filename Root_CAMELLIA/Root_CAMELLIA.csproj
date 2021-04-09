@@ -288,6 +288,10 @@
     <Compile Include="Control\Humidity.xaml.cs">
       <DependentUpon>Humidity.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Control\NavTreeItemClass.cs" />
+    <Compile Include="Control\NavTreeItems.cs" />
+    <Compile Include="Control\NavTreeRootItemUtils.cs" />
+    <Compile Include="Control\NavTreeUtils.cs" />
     <Compile Include="Control\PMCheckReview.xaml.cs">
       <DependentUpon>PMCheckReview.xaml</DependentUpon>
     </Compile>
@@ -317,6 +321,8 @@
     <Compile Include="Control\Temp.xaml.cs">
       <DependentUpon>Temp.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Control\Util\GetIconUseDll.cs" />
+    <Compile Include="Control\Util\GetImageFn.cs" />
     <Compile Include="Converter\BoolConverter.cs" />
     <Compile Include="Converter\HumidityToGradientOffsetConverter.cs" />
     <Compile Include="Converter\LampStateToColorConverter.cs" />
@@ -680,6 +686,23 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resource\open2.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resource\doc_32.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resource\doc.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resource\docBlack.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resource\folder.ico" />
+    <Resource Include="Resource\openFolder.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resource\csv.ico" />
+    <Resource Include="Resource\database.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\EMGU.CV.4.1.1.3497\build\EMGU.CV.targets" Condition="Exists('..\packages\EMGU.CV.4.1.1.3497\build\EMGU.CV.targets')" />

@@ -25,7 +25,7 @@ namespace Root_CAMELLIA
         }
         public string BuzzerOff()
         {
-            //working
+            m_handler.m_towerlamp.BuzzerOff();
             return "OK";
         }
         public string Recovery()

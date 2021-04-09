@@ -13,7 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace Root_CAMELLIA.Control
+namespace Root_CAMELLIA
 {
     /// <summary>
     /// Review_RGraph.xaml에 대한 상호 작용 논리
@@ -41,6 +41,11 @@ namespace Root_CAMELLIA.Control
 
             m_bDataDetect = true;
 
+        }
+
+        public void ReviewGraphReset()
+        {
+            ReviewGraphDraw.Reset();
         }
 
         private void ReviewGraph_MouseMove(object sender, MouseEventArgs e)
