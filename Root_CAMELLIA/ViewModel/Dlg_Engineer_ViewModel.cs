@@ -752,9 +752,6 @@ namespace Root_CAMELLIA
                     //AxisY.StopAxis();
                     //AxisZ.StopAxis();
                     //AxisLifter.StopAxis();
-                    //TiltAxisX.StopAxis();
-                    //TiltAxisY.StopAxis();
-                    //StageAxisZ.StopAxis();
                 });
             }
         }

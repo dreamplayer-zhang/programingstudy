@@ -1084,6 +1084,7 @@ namespace RootTools
             IntPtr unmanagedPointer = Marshal.AllocHGlobal(m_aBuf.Length);
             Marshal.Copy(m_aBuf, 0, unmanagedPointer, m_aBuf.Length);
             FileSaveBMP(targetPath, unmanagedPointer, new CRect(0, 0, m_Size.X, m_Size.Y));
+            Marshal.FreeHGlobal(unmanagedPointer);
         }
 
         void Worker_MemoryClear_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)

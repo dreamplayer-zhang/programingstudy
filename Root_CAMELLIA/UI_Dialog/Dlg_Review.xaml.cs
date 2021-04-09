@@ -29,5 +29,10 @@ namespace Root_CAMELLIA
         {
             this.DragMove();
         }
+
+        private void DataGrid_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            e.Handled = true;
+        }
     }
 }
