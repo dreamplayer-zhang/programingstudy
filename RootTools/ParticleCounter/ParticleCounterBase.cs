@@ -65,6 +65,17 @@ namespace RootTools.ParticleCounter
                 m_secHold = tree.Set(m_secHold, m_secHold, "Hold", "Hold Time (sec)");
                 m_nRepeat = tree.Set(m_nRepeat, m_nRepeat, "Repeat", "Repeat Count");
             }
+
+            public Sample()
+            {
+            }
+
+            public Sample(Sample sample)
+            {
+                m_secSample = sample.m_secSample;
+                m_secHold = sample.m_secHold;
+                m_nRepeat = sample.m_nRepeat; 
+            }
         }
         public Sample m_sample = new Sample(); 
 
@@ -148,10 +159,7 @@ namespace RootTools.ParticleCounter
                 m_modbus.ReadCoils(m_nUnit, 1, ref _bDone);
                 return _bDone;
             }
-            set 
-            { 
-                m_modbus.WriteCoils(m_nUnit, 1, value); 
-            }
+            set { m_modbus.WriteCoils(m_nUnit, 1, value); }
         }
 
         string WaitDone(Sample sample)
@@ -165,12 +173,19 @@ namespace RootTools.ParticleCounter
             }
             return "Read Data Timeout";
         }
+
+        int m_msTimeout = 0; 
+        public bool IsTimeout()
+        {
+            return (m_swRun.ElapsedMilliseconds > m_msTimeout);
+        }
         #endregion
 
         #region Run
         Sample m_sampleRun; 
         public string StartRun(Sample sample)
         {
+            m_msTimeout = 1000 * (sample.m_secSample + 2);
             m_sampleRun = sample;
             if (IsBusy()) return "Busy"; 
             ClearCount();
@@ -206,7 +221,7 @@ namespace RootTools.ParticleCounter
 
         private void M_bgw_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            //forget
+            
         }
 
         public bool IsBusy()
