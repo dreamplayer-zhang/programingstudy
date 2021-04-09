@@ -617,8 +617,8 @@ namespace Root_Rinse_Loader.Module
             if (m_tcpip.p_bConnect == false) m_tcpip.Connect(); 
             AddProtocol(p_id, eCmd.SetMode, p_eMode); 
             AddProtocol(p_id, eCmd.SetWidth, p_widthStrip); 
-            AddProtocol(p_id, eCmd.EQLeState, EQ.p_eState); 
-            AddProtocol(p_id, eCmd.SetRotateSpeed, p_fRotateSpeed); 
+            AddProtocol(p_id, eCmd.SetRotateSpeed, p_fRotateSpeed);
+            AddProtocol(p_id, eCmd.EQLeState, EQ.p_eState);
             base.Reset();
         }
 

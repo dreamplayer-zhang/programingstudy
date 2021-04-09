@@ -224,6 +224,7 @@ namespace Root_Rinse_Unloader.Module
 
         public string RunRun(double secArrive)
         {
+            if (Run(RunPusherDown(false))) return p_sInfo; 
             RunRotate(true); 
             while (IsExist() == false)
             {
@@ -267,14 +268,6 @@ namespace Root_Rinse_Unloader.Module
                     case Line.eSensor.Exist: return false;
                 }
             }
-            for (int n = 0; n < m_bExist.Count; n++)
-            {
-                if (m_bExist[n] != (m_aLine[n].p_eSensor == Line.eSensor.Push))
-                {
-                    //EQ.p_bStop = true;
-                    //EQ.p_eState = EQ.eState.Error; 
-                }
-            }
             return true;
         }
 
@@ -283,7 +276,7 @@ namespace Root_Rinse_Unloader.Module
             foreach (Line line in m_aLine)
             {
                 line.CheckSensor();
-                if (line.p_eSensor != Line.eSensor.Arrived) return false;
+                if (line.p_eSensor == Line.eSensor.Arrived) return false;
             }
             return true;
         }

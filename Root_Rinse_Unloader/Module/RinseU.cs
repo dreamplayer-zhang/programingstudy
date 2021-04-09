@@ -510,6 +510,7 @@ namespace Root_Rinse_Unloader.Module
                                     if (EQ.p_eState == EQ.eState.Ready) EQ.p_eState = EQ.eState.Run;
                                     break;
                             }
+                            AddProtocol(p_id, eCmd.EQUeState, EQ.p_eState);
                             break;
                         case eCmd.PickerSet:
                             AddProtocol(asRead[0], eCmd, asRead[2]);
