@@ -527,10 +527,55 @@ namespace Root_VEGA_D.Module
             }
         }
         #endregion
+        #region Test_Run
+        public class Run_Test : ModuleRunBase
+        {
+            Vision m_module;
+            public RPoint m_rpAxisCenter = new RPoint();
+            public Run_Test(Vision module)
+            {
+                m_module = module;
+                InitModuleRun(module);
 
+            }
+            public override ModuleRunBase Clone()
+            {
+                Run_Test run = new Run_Test(m_module);
+                run.m_rpAxisCenter = new RPoint(m_rpAxisCenter);
+                return run;
+            }
+            string m_sFlip = "Test";
+            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
+            {
+                m_rpAxisCenter = tree.Set(m_rpAxisCenter, m_rpAxisCenter, "Center Axis Position", "Center Axis Position (mm)", bVisible);
+                m_sFlip = tree.Set(m_sFlip, m_sFlip, "Test", "Bottom", bVisible, true);
+            }
+
+            public override string Run()
+            {
+                Thread.Sleep(1000);
+                AxisXY axisXY = m_module.m_axisXY;
+                double dStartPosY = m_rpAxisCenter.Y;
+
+
+
+                double dPosX = m_rpAxisCenter.X;
+
+
+                if (m_module.Run(axisXY.StartMove(new RPoint(dPosX, dStartPosY))))
+                    return p_sInfo;
+                if (m_module.Run(axisXY.WaitReady()))
+                    return p_sInfo;
+                Thread.Sleep(2000);
+                //m_module.p_eState = eState.Ready;
+                return "OK";
+            }
+        }
+        #endregion
         #region ModuleRun
         protected override void InitModuleRuns()
         {
+            AddModuleRunList(new Run_Test(this), true, "Test");
             AddModuleRunList(new Run_Remote(this), true, "Remote Run");
             //AddModuleRunList(new Run_Delay(this), true, "Time Delay");
             //AddModuleRunList(new Run_Rotate(this), false, "Rotate Axis");
