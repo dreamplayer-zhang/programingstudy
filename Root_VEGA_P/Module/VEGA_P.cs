@@ -2,11 +2,7 @@
 using RootTools.Comm;
 using RootTools.Module;
 using RootTools.Trees;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Root_VEGA_P.Module
 {
@@ -92,7 +88,7 @@ namespace Root_VEGA_P.Module
                 m_vegaP = vegaP; 
             }
         }
-        FlowSensor m_flowSensor; 
+        public FlowSensor m_flowSensor; 
         void InitFlowSensor()
         {
             m_flowSensor = new FlowSensor("FlowSensor", this);

@@ -66,7 +66,7 @@ namespace Root_VEGA_P.Engineer
         void InitParticleCounter()
         {
             ModuleBase module;
-            module = new ParticleCounter("Particle Counter", m_engineer);
+            module = new ParticleCounter("Particle Counter", m_engineer, m_VEGA.m_flowSensor);
             //module = new ParticleCounter(m_id, m_engineer);
             InitModule(module);
         }
