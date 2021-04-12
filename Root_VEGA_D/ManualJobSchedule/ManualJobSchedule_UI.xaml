@@ -246,7 +246,7 @@
         </Grid.Style>
         <Grid.RowDefinitions>
             <RowDefinition Height="4*"/>
-            <RowDefinition Height="2*"/>
+            <RowDefinition Height="0.3*"/>
             <RowDefinition Height="2*"/>
             <RowDefinition Height="2*"/>
         </Grid.RowDefinitions>
@@ -287,6 +287,7 @@
                                FontWeight="Bold"/>
                     <TextBox Grid.Row="1" Grid.Column="1"
                              TextAlignment="Center"
+                             Text="{Binding p_sLotID}"
                              VerticalContentAlignment="Center"
                              FontSize="30"
                              x:Name="textboxLotID"
@@ -299,6 +300,7 @@
                                FontSize="30"
                                FontWeight="Bold"/>
                     <TextBox Grid.Row="1" Grid.Column="2"
+                             Text="{Binding p_sCarrierID}"
                              TextAlignment="Center"
                              VerticalContentAlignment="Center"
                              FontSize="30"
@@ -308,7 +310,7 @@
             </GroupBox>
         </Grid>
         <Grid Grid.Row="1" Grid.ColumnSpan="2">
-            <GroupBox FontSize="20" Header="Recipe Select" Foreground="White" Margin="5">
+            <GroupBox FontSize="20" Header="Recipe Select" Foreground="White" Margin="5" Visibility="Hidden">
                 <StackPanel Orientation="Horizontal">
                     <TextBlock Text="Recipe ID = "
                                VerticalAlignment="Center"
@@ -328,6 +330,7 @@
                     <ToggleButton x:Name="checkRnR"
                                   Margin="10"
                                   Width="160"
+                                  IsChecked="{Binding p_bRNR}"
                                   Checked="checkRnR_Checked"
                                   Unchecked="checkRnR_Unchecked"/>
                     <TextBlock Text="RNR Mode"
@@ -345,7 +348,9 @@
                              x:Name="textboxRnR"
                              Margin="0,15,15,15"
                              FontSize="30"
-                             VerticalContentAlignment="Center"/>
+                             VerticalContentAlignment="Center"
+                             IsEnabled="{Binding ElementName=RNRMode, Path=IsChecked}"
+                             Text = "{Binding p_nRnR}"/>
                 </StackPanel>
             </GroupBox>
         </Grid>

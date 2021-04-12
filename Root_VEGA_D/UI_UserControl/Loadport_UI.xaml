@@ -35,7 +35,8 @@
                                        Margin="10,0"/>
                         </Border>
                         <Border BorderBrush="Gray" BorderThickness="1">
-                            <TextBlock Text="{Binding p_sCarrierID}"
+                            <TextBlock x:Name="textBoxPodID"
+                                       Text="{Binding p_sCarrierID}"
                                        VerticalAlignment="Center"
                                        Margin="10,0"/>
                         </Border>
@@ -45,7 +46,8 @@
                                        Margin="10,0"/>
                         </Border>
                         <Border BorderBrush="Gray" BorderThickness="1">
-                            <TextBlock Text="{Binding p_sLotID}"
+                            <TextBlock x:Name="textBoxLotID"
+                                       Text="{Binding p_sLotID}"
                                        VerticalAlignment="Center"
                                        Margin="10,0"/>
                         </Border>
@@ -56,7 +58,8 @@
                                        Margin="10,0"/>
                         </Border>
                         <Border BorderBrush="Gray" BorderThickness="1">
-                            <TextBlock Text="{Binding p_sRecipeID}"
+                            <TextBlock Text="{Binding p_sRecipe}"
+                                       x:Name="textBoxRecipeID"
                                        VerticalAlignment="Center"
                                        Margin="10,0"/>
                         </Border>
@@ -67,7 +70,7 @@
                                        Margin="10,0"/>
                         </Border>
                         <Border BorderBrush="Gray" BorderThickness="1">
-                            <TextBlock Text="{Binding p_sState}"
+                            <TextBlock Text="{Binding p_eState}"
                                        VerticalAlignment="Center"
                                        Margin="10,0"/>
                         </Border>

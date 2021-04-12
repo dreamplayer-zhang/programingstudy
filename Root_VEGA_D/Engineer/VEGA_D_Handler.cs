@@ -99,14 +99,10 @@ namespace Root_VEGA_D.Engineer
             Cymechs,
         }
         eWTR m_eWTR = eWTR.Cymechs;
-        public ModuleBase m_wtr;
+        public WTR_Cymechs m_wtr;
         void InitWTR()
         {
-            switch (m_eWTR)
-            {
-                case eWTR.Cymechs: m_wtr = new WTR_Cymechs("WTR", m_engineer); break;
-                default: m_wtr = new WTR_RND("WTR", m_engineer); break;
-            }
+            m_wtr = new WTR_Cymechs("WTR", m_engineer);
             InitModule(m_wtr);
         }
 
@@ -267,6 +263,7 @@ namespace Root_VEGA_D.Engineer
         #endregion
 
         #region Calc Sequence
+        public int p_nRnRCount = 0;
         dynamic m_infoRnRSlot;
         public string AddSequence(dynamic infoSlot)
         {
@@ -396,6 +393,7 @@ namespace Root_VEGA_D.Engineer
                                 CalcSequence();
                                 //m_nRnR--;
                                 EQ.p_nRnR--;
+                                p_nRnRCount++;
                                 EQ.p_eState = EQ.eState.Run;
                             }
                         }

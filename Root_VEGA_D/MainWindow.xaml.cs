@@ -4,8 +4,10 @@ using RootTools;
 using RootTools.Module;
 using System;
 using System.ComponentModel;
+using System.Globalization;
 using System.IO;
 using System.Windows;
+using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
@@ -99,6 +101,9 @@ namespace Root_VEGA_D
             loadportB.Init(m_handler.m_aLoadport[1], m_handler, m_handler.m_aRFID[1]);
             InitTimer();
             TextBlockRetID.DataContext = m_handler.m_aLoadport[0].p_infoCarrier.m_aGemSlot[0];
+            Is_InLP.Background = (m_handler.m_aLoadport[0].p_infoCarrier.m_aInfoWafer[0] != null)||(m_handler.m_aLoadport[0].p_infoCarrier.m_aInfoWafer[1] != null) ? Brushes.MediumBlue: Brushes.Gray;
+            Is_InRTR.Background = m_handler.m_wtr.m_dicArm[0].p_infoWafer== null ? Brushes.MediumBlue : Brushes.Gray;
+            Is_InVS.Background = m_handler.m_vision.p_infoWafer == null ? Brushes.MediumBlue : Brushes.Gray;
         }
 
         void ThreadStop()

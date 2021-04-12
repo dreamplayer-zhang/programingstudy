@@ -37,21 +37,21 @@ namespace Root_VEGA_D
         {
             m_Manualjob = manualJob;
             this.DataContext = manualJob;
-            InitInfo();
+            //InitInfo();
             InitRecipe();
         }
 
-        void InitInfo()
-        {
-            textboxLocID.Content = m_infoCarrier.p_sLocID;
-            textboxLotID.Text = m_infoCarrier.p_sLotID;
-            textboxCstID.Text = m_infoCarrier.p_sCarrierID;
-        }
+        //void InitInfo()
+        //{
+        //    textboxLocID.Content = m_infoCarrier.p_sLocID;
+        //    textboxLotID.Text = m_infoCarrier.p_sLotID;
+        //    textboxCstID.Text = m_infoCarrier.p_sCarrierID;
+        //}
 
         void InitRecipe()
         {
-            DirectoryInfo info = new DirectoryInfo("C:\\Recipe\\");
-            FileInfo[] files = info.GetFiles("*.VegaD");
+            DirectoryInfo info = new DirectoryInfo("C:\\Recipe\\VEGA_D");
+            FileInfo[] files = info.GetFiles("*.Vega_D");
             List<string> asRecipeFile = new List<string>();
             foreach(FileInfo fileInfo in files)
             {
@@ -69,12 +69,14 @@ namespace Root_VEGA_D
 
         private void checkRnR_Checked(object sender, RoutedEventArgs e)
         {
+            m_Manualjob.p_bRnR = true;
             textblockRnR.Visibility = Visibility.Visible;
             textboxRnR.Visibility = Visibility.Visible;
         }
 
         private void checkRnR_Unchecked(object sender, RoutedEventArgs e)
         {
+            m_Manualjob.p_bRnR = false;
             textblockRnR.Visibility = Visibility.Hidden;
             textboxRnR.Visibility = Visibility.Hidden;
         }
@@ -93,7 +95,8 @@ namespace Root_VEGA_D
             {
                 m_infoWafer.p_eState = GemSlotBase.eState.Select;
                 m_infoWafer.p_sWaferID = "ReticleID";
-                m_infoWafer.RecipeOpen("C:\\Recipe\\" + m_infoWafer.p_sRecipe);
+                //m_infoWafer.RecipeOpen("C:\\Recipe\\" + m_infoWafer.p_sRecipe);
+                m_infoWafer.RecipeOpen("C:\\Recipe\\" + "OnlyOne");//단일 레시피 적용
                 m_infoCarrier.StartProcess(m_infoWafer.p_id);
             }
             else return;
