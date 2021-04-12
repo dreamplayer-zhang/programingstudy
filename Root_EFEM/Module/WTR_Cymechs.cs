@@ -125,13 +125,18 @@ namespace Root_EFEM.Module
                 m_module = module;
                 Init(id + "." + arm.ToString(), engineer, bEnableWaferSize, bEnableWaferCount); 
             }
-
+            enum eCheckWafer
+            {
+                InfoWafer,
+                Sensor
+            }
+            eCheckWafer m_eCheckWafer = eCheckWafer.Sensor;
             public override bool IsWaferExist()
             {
+                bool bExist = false;
                 switch (m_eCheckWafer)
                 {
                     case eCheckWafer.Sensor:
-                        bool bExist = false;
                         //m_module.p_sInfo = m_module.RequestWafer(m_eArm, ref bExist);
                         if (m_module.m_diReticleCheck.p_bIn == true)  //lyj add
                         {                                            //lyj add
@@ -140,10 +145,12 @@ namespace Root_EFEM.Module
                         return bExist;
                     default: return (p_infoWafer != null);
                 }
+                //m_module.p_sInfo = m_module.RequestWafer(m_eArm, ref bExist);
+                //return bExist;
             }
-
             public override void RunTree(Tree tree)
             {
+                m_eCheckWafer = (eCheckWafer)tree.Set(m_eCheckWafer, m_eCheckWafer, "CheckWafer", "CheckWafer");
                 base.RunTree(tree);
             }
         }

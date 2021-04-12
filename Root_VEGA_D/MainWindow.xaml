@@ -2265,6 +2265,10 @@
 
                                                 </Grid>
                                             </GroupBox>
+                                        </Grid>
+                                    </Grid>
+                                </StackPanel>
+                            </ScrollViewer>
                         </TabItem>
                         <!--<TabItem Header="Maint"
                                  Style="{StaticResource ResourceKey=WizardTabItem}"
