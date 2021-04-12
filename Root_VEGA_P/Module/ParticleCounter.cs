@@ -4,6 +4,9 @@ using RootTools.Module;
 using RootTools.ParticleCounter;
 using RootTools.ToolBoxs;
 using RootTools.Trees;
+using System;
+using System.IO;
+using System.Text;
 using System.Threading;
 
 namespace Root_VEGA_P.Module
@@ -11,12 +14,12 @@ namespace Root_VEGA_P.Module
     public class ParticleCounter : ModuleBase
     {
         #region ToolBox
-        LasairIII m_lasair; 
+        LasairIII m_particleCounter; 
         public override void GetTools(bool bInit)
         {
             m_regulator.GetTools(m_toolBox, bInit);
             m_nozzleSet.GetTools(m_toolBox);
-            p_sInfo = m_toolBox.Get(ref m_lasair, this, "LasAir3"); 
+            p_sInfo = m_toolBox.Get(ref m_particleCounter, this, "LasAir3"); 
             if (bInit) { }
         }
         #endregion
@@ -96,16 +99,50 @@ namespace Root_VEGA_P.Module
         #region Run
         public string RunCount(Run_Run run)
         {
-            if (Run(m_nozzleSet.RunNozzle(run.m_open))) return p_sInfo; 
+            /*
+            if (Run(m_nozzleSet.RunNozzle(run.m_open))) return p_sInfo;
             if (Run(m_regulator.RunPump(run.m_nPump))) return p_sInfo;
-            if (Run(m_lasair.StartRun(run.m_sample))) return p_sInfo; 
+            if (Run(m_lasair.StartRun(run.m_sample))) return p_sInfo;
             while (m_lasair.IsBusy())
             {
                 Thread.Sleep(100);
                 if (m_lasair.IsTimeout()) return "Particle Counter Run Timeout";
-                if (EQ.IsStop()) return "EQ Stop"; 
+                if (EQ.IsStop()) return "EQ Stop";
+            }
+            */
+            int iNozzle = 0; 
+            while (EQ.IsStop() == false)
+            {
+                if (Run(m_nozzleSet.RunNozzle(iNozzle))) return p_sInfo;
+                if (Run(m_regulator.RunPump(run.m_nPump))) return p_sInfo;
+                if (Run(m_particleCounter.StartRun(run.m_sample))) return p_sInfo;
+                while (m_particleCounter.IsBusy())
+                {
+                    Thread.Sleep(100);
+                    if (m_particleCounter.IsTimeout()) return "Particle Counter Run Timeout";
+                    if (EQ.IsStop()) return "EQ Stop";
+                }
+                SaveResult(iNozzle);
+                iNozzle = (iNozzle + 1) % m_nozzleSet.p_nNozzle; 
             }
             return "OK"; 
+        }
+
+        void SaveResult(int iNozzle)
+        {
+            DateTime dt = DateTime.Now;
+            string sFile = "c:\\ParticleCountResult"; 
+            Directory.CreateDirectory(sFile);
+            sFile += "\\Nozzle" + iNozzle.ToString("00") + "." + dt.ToString() + ".txt"; 
+            using(StreamWriter sw = new StreamWriter(sFile, true, Encoding.Default))
+            {
+                foreach (ParticleCounterBase.ParticleCount pc in m_particleCounter.m_aParticleCount)
+                {
+                    sw.Write(pc.m_sParticleSize); 
+                    foreach (int nParticle in pc.m_aCount) sw.Write("\t" + nParticle.ToString());
+                    sw.WriteLine(); 
+                }
+            }
         }
         #endregion
 
