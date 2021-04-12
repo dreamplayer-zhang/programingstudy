@@ -2265,7 +2265,12 @@
 
                                                 </Grid>
                                             </GroupBox>
+                                        </Grid>
+                                    </Grid>
+                                </StackPanel>
+                            </ScrollViewer>
                         </TabItem>
+                        
                         <!--<TabItem Header="Maint"
                                  Style="{StaticResource ResourceKey=WizardTabItem}"
                                  x:Name="TabMaint"
@@ -2466,7 +2471,6 @@
                             <Grid x:Name="Is_InRTR"
                                   Grid.Column="1"
                                   Grid.Row="1"
-                                  Background="Gray"
                                   Opacity="0.6"
                                   Margin="5">
                                 <TextBlock Text="Robot" />
@@ -2474,7 +2478,6 @@
                             <Grid x:Name="Is_InVS"
                                   Grid.Column="2"
                                   Grid.Row="1"
-                                  Background="Gray"
                                   Opacity="0.6"
                                   Margin="5">
                                 <TextBlock Text="Vision" />

@@ -125,6 +125,12 @@ namespace Root_EFEM.Module
                 m_module = module;
                 Init(id + "." + arm.ToString(), engineer, bEnableWaferSize, bEnableWaferCount); 
             }
+            enum eCheckWafer
+            {
+                InfoWafer,
+                Sensor,
+            };
+            eCheckWafer m_eCheckWafer = eCheckWafer.Sensor;
 
             public override bool IsWaferExist()
             {
@@ -144,6 +150,7 @@ namespace Root_EFEM.Module
 
             public override void RunTree(Tree tree)
             {
+                m_eCheckWafer = (eCheckWafer)tree.Set(m_eCheckWafer, m_eCheckWafer, "Wafer Check", "Wafer Check Option");
                 base.RunTree(tree);
             }
         }

@@ -408,7 +408,7 @@ copy /Y "$(SolutionDir)Lib\MetLib\Reference\ZedGraph.dll" $(SolutionDir)$(Projec
 copy /Y "$(SolutionDir)Lib\MetLib\NanoView.dll" $(SolutionDir)$(ProjectName)\$(OutDir)\NanoView.dll"
 copy /Y "$(SolutionDir)Lib\MetLib\NETOmniDriver-NET40.dll" $(SolutionDir)$(ProjectName)\$(OutDir)\NETOmniDriver-NET40.dll"
 copy /Y "$(SolutionDir)Lib\MetLib\OmniDriver64.dll" $(SolutionDir)$(ProjectName)\$(OutDir)\OmniDriver64.dll"
-copy /Y "$(SolutionDir)Lib\MetLib\r4nd_class.dll" $(SolutionDir)$(ProjectName)\$(OutDir)\r4nd_class.dll"</PostBuildEvent>
+copy /Y "$(SolutionDir)Lib\MetLib\r4nd_class.dll" $(SolutionDir)$(ProjectName)\$(OutDir)\r4nd_class.dll"
 copy /Y "$(SolutionDir)Lib\WibuCm64.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\WibuCm64.dll"</PostBuildEvent>
   </PropertyGroup>
 </Project>

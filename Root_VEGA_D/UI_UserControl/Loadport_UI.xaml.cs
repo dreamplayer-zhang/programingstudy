@@ -57,7 +57,6 @@ namespace Root_VEGA_D
 
         bool IsEnableLoad()
         {
-            return true;
             bool bReadyLoadport = (m_loadport.p_eState == ModuleBase.eState.Ready);
             bool bReadyToLoad = (m_loadport.p_infoCarrier.p_eTransfer == GemCarrierBase.eTransfer.ReadyToLoad);
             bReadyToLoad = true;
@@ -128,9 +127,9 @@ namespace Root_VEGA_D
         private void buttonLoad_Click(object sender, RoutedEventArgs e)
         {
             if (IsEnableLoad() == false) return;
-            ModuleRunBase moduleRun = m_rfid.m_runReadID.Clone();
-            m_rfid.StartRun(moduleRun);
-            while ((EQ.IsStop() != true) && m_rfid.IsBusy()) Thread.Sleep(10);
+            //ModuleRunBase moduleRun = m_rfid.m_runReadID.Clone();
+            //m_rfid.StartRun(moduleRun);
+            //while ((EQ.IsStop() != true) && m_rfid.IsBusy()) Thread.Sleep(10);
             m_loadport.RunDocking();
             if (m_loadport.p_infoCarrier.m_aInfoWafer[0] == null)
             {
