@@ -141,7 +141,7 @@ namespace RootTools.Control.ACS
                 return p_sInfo; 
             }
             p_eState = eState.Move;
-            Thread.Sleep(100);
+            Thread.Sleep(10);
             return "OK";
         }
 
@@ -168,7 +168,7 @@ namespace RootTools.Control.ACS
                 return p_sInfo;
             }
             p_eState = eState.Move;
-            Thread.Sleep(100);
+            Thread.Sleep(10);
             return "OK";
         }
         #endregion
@@ -273,30 +273,132 @@ namespace RootTools.Control.ACS
             double dUpTime = (trigger.m_dUpTime < 0) ? m_dTrigTime : trigger.m_dUpTime; 
             if (m_nAxis < 0) return;
             if (p_bConnect == false) return;
-            try
-            {
-                if (m_bTriggerOn == bOn) return;
-                if (bOn == false)
-                {
-                    p_channel.StopPeg(m_nAxis);
-                    p_log.Info("Trigger Off");
-                }
-                else
-                {
-                    p_channel.PegInc(p_channel.ACSC_AMF_SYNCHRONOUS, m_nAxis, dUpTime / 1000.0, trigger.m_aPos[0], trigger.m_dPos, trigger.m_aPos[1], 0, 0);
-                    string sTrigger = trigger.m_aPos[0].ToString() + " ~ " + trigger.m_aPos[1].ToString() + ", " + trigger.m_dPos.ToString();
-                    p_log.Info("Trigger On : " + sTrigger + ", " + dUpTime.ToString());
-                }
-                m_bTriggerOn = bOn;
-            }
-            catch (Exception e)
-            {
-                p_sInfo = p_id + " Set Trigger Error : " + e.Message;
-                p_eState = eState.Init;
-                m_bTriggerOn = false;
-            }
-        }
 
+
+            if (bOn)
+            {
+                if (m_bTriggerOn)
+                    return;
+
+                // 트리거 시작/끝 위치 지정 (Y축의 1/4 스케일링 필요)
+                double dStartTriggerPos = trigger.m_aPos[0] * 0.25;
+                double dEndTriggerPos = trigger.m_aPos[1] * 0.25;
+
+                // Y축 시작/끝 위치 지정 (트리거 시작/끝 위치에서부터 임의로 10mm만큼 여유)
+                double dStartAxisPos = trigger.m_aPos[0] - 10;
+                double dEndAxisPos = trigger.m_aPos[1] + 10;
+
+                // 트리거 발생 간격
+                double dTriggerInterval = trigger.m_dPos * 0.001 * 0.25;
+
+                // 트리거 유지 시간
+                double dTriggerUpTime = trigger.m_dUpTime;
+
+                // ACSPL+ 버퍼 3번 스크립트 변수에 데이터 세팅 
+                p_channel.WriteVariable(dStartTriggerPos, "StartTriggerPos", p_channel.ACSC_BUFFER_3);  // Start Trigger
+                p_channel.WriteVariable(dEndTriggerPos, "EndTriggerPos", p_channel.ACSC_BUFFER_3);      // End Trigger
+                p_channel.WriteVariable(dStartAxisPos, "StartAxisPos", p_channel.ACSC_BUFFER_3);        // Start Axis
+                p_channel.WriteVariable(dEndAxisPos, "EndAxisPos", p_channel.ACSC_BUFFER_3);            // End Axis
+                p_channel.WriteVariable(dTriggerInterval, "TriggerInterval", p_channel.ACSC_BUFFER_3);  // Trigger Interval
+                p_channel.WriteVariable(dTriggerUpTime, "TriggerUpTime", p_channel.ACSC_BUFFER_3);      // Trigger UpTime
+
+                // 이벤트 설정
+                p_channel.SetInterruptMask(p_channel.ACSC_INTR_PROGRAM_END, p_channel.ACSC_BUFFER_3);
+                p_channel.EnableEvent(p_channel.ACSC_INTR_PROGRAM_END);
+                p_channel.PROGRAMEND += P_channel_PROGRAMEND;
+
+                // 스크립트 실행
+                m_acs.m_aBuffer[3].Run();
+
+                // 버퍼 내 스크립트 내용 .NET 라이브러리로 구현 한 코드 (수정이 필요)
+                //p_channel.AssignPegNT(p_channel.ACSC_AXIS_1, 0x0b101, 0xb0001);
+                //p_channel.AssignPegOutputsNT(p_channel.ACSC_AXIS_1, 0x0b000, 0x0b000);
+                //p_channel.Enable(p_channel.ACSC_AXIS_2);
+
+                //p_channel.ToPoint(0, m_nAxis, dStartAxisPos);
+
+                //p_channel.PegInc(0, p_channel.ACSC_AXIS_1, dTriggerUpTime, dStartTriggerPos, dTriggerInterval, dEndAxisPos, p_channel.ACSC_NONE, p_channel.ACSC_NONE);
+
+                //p_channel.ToPoint(0, m_nAxis, dStartAxisPos);
+
+                // 로그
+                string sTrigger = trigger.m_aPos[0].ToString() + " ~ " + trigger.m_aPos[1].ToString() + ", " + trigger.m_dPos.ToString();
+                p_log.Info("Trigger On : " + sTrigger + ", " + dUpTime.ToString());
+
+                // Axis 상태 변경
+                p_eState = eState.Move;
+                Thread.Sleep(10);
+            }
+            else
+            {
+                if (!m_bTriggerOn)
+                    return;
+
+                // 스크립트 수행 중지
+                m_acs.m_aBuffer[3].Stop();
+
+                // 이벤트 설정
+                p_channel.SetInterruptMask(p_channel.ACSC_INTR_PROGRAM_END, p_channel.ACSC_BUFFER_3);
+                p_channel.DisableEvent(p_channel.ACSC_INTR_PROGRAM_END);
+                p_channel.PROGRAMEND -= P_channel_PROGRAMEND;
+
+                // 로그
+                p_log.Info("Trigger Off");
+
+                // Axis 상태 변경
+                p_eState = eState.Ready;
+                Thread.Sleep(10);
+            }
+
+            m_bTriggerOn = bOn;
+
+            //if (trigger == null) trigger = m_trigger;
+            //double dUpTime = (trigger.m_dUpTime < 0) ? m_dTrigTime : trigger.m_dUpTime; 
+            //if (m_nAxis < 0) return;
+            //if (p_bConnect == false) return;
+            //try
+            //{
+            //    if (m_bTriggerOn == bOn) return;
+            //    if (bOn == false)
+            //    {
+            //        p_channel.StopPeg(m_nAxis);
+            //        p_log.Info("Trigger Off");
+            //    }
+            //    else
+            //    {
+            //        p_channel.PegInc(p_channel.ACSC_AMF_SYNCHRONOUS, m_nAxis, dUpTime / 1000.0, trigger.m_aPos[0], trigger.m_dPos, trigger.m_aPos[1], 0, 0);
+            //        string sTrigger = trigger.m_aPos[0].ToString() + " ~ " + trigger.m_aPos[1].ToString() + ", " + trigger.m_dPos.ToString();
+            //        p_log.Info("Trigger On : " + sTrigger + ", " + dUpTime.ToString());
+            //    }
+            //    m_bTriggerOn = bOn;
+            //}
+            //catch (Exception e)
+            //{
+            //    p_sInfo = p_id + " Set Trigger Error : " + e.Message;
+            //    p_eState = eState.Init;
+            //    m_bTriggerOn = false;
+            //}
+        }
+        private void P_channel_ACSPLPROGRAM(int Param)
+        {
+            throw new NotImplementedException();
+        }
+        private void P_channel_PROGRAMEND(int Param)
+        {
+            // 이벤트 설정
+            p_channel.SetInterruptMask(p_channel.ACSC_INTR_PROGRAM_END, p_channel.ACSC_BUFFER_3);
+            p_channel.DisableEvent(p_channel.ACSC_INTR_PROGRAM_END);
+            p_channel.PROGRAMEND -= P_channel_PROGRAMEND;
+
+            // 로그
+            p_log.Info("Trigger Off");
+
+            // Axis 상태 변경
+            p_eState = eState.Ready;
+            Thread.Sleep(10);
+
+            m_bTriggerOn = false;
+        }
         public void RunTreeSettingTrigger(Tree tree)
         {
             m_bLevel = tree.Set(m_bLevel, m_bLevel, "Level", "Trigger Level (true = Active High)");
@@ -352,14 +454,26 @@ namespace RootTools.Control.ACS
                         }
                         break;
                     case eState.Move:
-                        if (p_sensorInPos) p_eState = eState.Ready;
+                        {
+                            int nMotor = p_channel.GetMotorState(m_nAxis);
+                            bool bMove = ((nMotor & p_channel.ACSC_MST_MOVE) != 0);
+                            bool bInPos = ((nMotor & p_channel.ACSC_MST_INPOS) != 0);
+                            if (!bMove && bInPos) p_eState = eState.Ready;
+                            //if (p_sensorInPos) p_eState = eState.Ready;
+                        }
                         break;
                     case eState.Jog:
-                        if (p_sensorInPos) p_eState = eState.Ready;
-                        if (EQ.IsStop())
                         {
-                            StopAxis();
-                            p_eState = eState.Ready;
+                            int nMotor = p_channel.GetMotorState(m_nAxis);
+                            bool bMove = ((nMotor & p_channel.ACSC_MST_MOVE) != 0);
+                            bool bInPos = ((nMotor & p_channel.ACSC_MST_INPOS) != 0);
+                            if (!bMove && bInPos) p_eState = eState.Ready;
+                            //if (p_sensorInPos) p_eState = eState.Ready;
+                            if (EQ.IsStop())
+                            {
+                                StopAxis();
+                                p_eState = eState.Ready;
+                            }
                         }
                         break;
                     default: break;
@@ -404,7 +518,9 @@ namespace RootTools.Control.ACS
             {
                 int nMotor = p_channel.GetMotorState(m_nAxis);
                 p_bServoOn = ((nMotor & p_channel.ACSC_MST_ENABLE) != 0);
-                p_sensorInPos = ((nMotor & p_channel.ACSC_MST_INPOS) != 0);
+                bool bMove = ((nMotor & p_channel.ACSC_MST_MOVE) != 0);
+                bool bInPos = ((nMotor & p_channel.ACSC_MST_INPOS) != 0);
+                p_sensorInPos = !bMove && bInPos;
                 int nLimit = (int)aLimit.GetValue(m_nAxis);
                 p_sensorMinusLimit = (nLimit & p_channel.ACSC_SAFETY_LL) != 0;
                 p_sensorPlusLimit = (nLimit & p_channel.ACSC_SAFETY_RL) != 0;

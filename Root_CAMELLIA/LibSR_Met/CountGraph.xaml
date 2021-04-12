@@ -27,7 +27,7 @@
                             <Image Source="../LibSR_Met/Resources/graph csv.png" Stretch="UniformToFill" Visibility="Visible" VerticalAlignment="Center" HorizontalAlignment="Center"/>
                         </StackPanel>
                     </ToggleButton>
-                    <CheckBox x:Name="chbAutoScale" Grid.Column="1" Content="Auto Scale" Margin="2" Checked="chbAutoScale_checkedChanged" Unchecked="chbAutoScale_checkedChanged" IsEnabled="False">
+                    <CheckBox x:Name="chbAutoScale" Grid.Column="1" Content="Auto Scale" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="2" Checked="chbAutoScale_checkedChanged" Unchecked="chbAutoScale_checkedChanged" IsEnabled="False">
                         <CheckBox.Style>
                             <Style>
                                 <Style.Triggers>
@@ -39,7 +39,7 @@
                         </CheckBox.Style>
                     </CheckBox>
                 </Grid>
-                <WpfPlot Name="GraphCount" MouseMove="CountGraph_MouseMove" Grid.Row="1">
+                <WpfPlot Name="GraphCount" Grid.Row="1">
                 </WpfPlot>
             </Grid>
         </GroupBox>

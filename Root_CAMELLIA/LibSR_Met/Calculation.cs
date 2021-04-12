@@ -261,8 +261,6 @@ namespace Root_CAMELLIA.LibSR_Met
                     m_DM.m_RawData[nPointIdx].Transmittance[i] = dTAvg;
                 }
             });
-
-            // });
             sw.Stop();
             Debug.WriteLine("task2 >> " + sw.ElapsedMilliseconds.ToString());
             //});
@@ -621,8 +619,8 @@ namespace Root_CAMELLIA.LibSR_Met
             for (int n = 0; n < nDNum; n++)
             {
                 double dTHK = mPn[n];
-                dTHK *= m_DM.m_LayerData[n].scales.dScale;
-                dTHK += m_DM.m_LayerData[n].scales.dOffset;
+                //dTHK *= m_DM.m_LayerData[n].scales.dScale;
+               // dTHK += m_DM.m_LayerData[n].scales.dOffset;
 
                 if (double.IsNaN(dTHK) || double.IsNegativeInfinity(dTHK) || double.IsPositiveInfinity(dTHK))
                 {

@@ -54,39 +54,43 @@ namespace Root_VEGA_P_Vision.Module
         #endregion
 
         #region Light
-        List<double> m_aLightPower = new List<double>();
-        void RunTreeLight(Tree tree, bool bVisible, bool bReadOnly)
-        {
-            if (m_lightSet == null) return;
+        //override List<double> m_aLightPower = new List<double>();
+        //void RunTreeLight(Tree tree, bool bVisible, bool bReadOnly)
+        //{
+        //    if (m_lightSet == null) return;
 
-            while (m_aLightPower.Count < m_lightSet.m_aLight.Count)
-                m_aLightPower.Add(0);
-            for (int n = 0;  n < m_aLightPower.Count; n++)
-            {
-                m_aLightPower[n] = tree.Set(m_aLightPower[n], m_aLightPower[n], m_lightSet.m_aLight[n].m_sName, "Light Power (0 ~ 100 %%)", bVisible, bReadOnly);
-            }
-        }
+        //    while (m_aLightPower.Count < m_lightSet.m_aLight.Count)
+        //        m_aLightPower.Add(0);
+        //    for (int n = 0;  n < m_aLightPower.Count; n++)
+        //    {
+        //        m_aLightPower[n] = tree.Set(m_aLightPower[n], m_aLightPower[n], m_lightSet.m_aLight[n].m_sName, "Light Power (0 ~ 100 %%)", bVisible, bReadOnly);
+        //    }
+        //}
 
         public void SetLight(int n,bool bOn)
         {
             m_lightSet.m_aLight[n].m_light.p_fSetPower = bOn ? m_aLightPower[n] : 0;
         }
-        #endregion
-
-        #region Memory
-        string m_sMemoryGroup = "";
-        string m_sMemoryData = "Grab";
-
-        public void RunTreeMemory(Tree tree, bool bVisible, bool bReadOnly)
+        public double GetLight(int n)
         {
-            if (m_sMemoryGroup == "") m_sMemoryGroup = m_memoryPool.m_asGroup[0];
-            m_sMemoryGroup = tree.Set(m_sMemoryGroup, m_sMemoryGroup, m_memoryPool.m_asGroup, "Group", "Memory Group Name", bVisible, bReadOnly);
-            m_memoryGroup = m_memoryPool.GetGroup(m_sMemoryGroup);
-            if (m_memoryGroup == null) return;
-            m_sMemoryData = tree.Set(m_sMemoryData, m_sMemoryData, m_memoryGroup.m_asMemory, "Data", "Memory Data Name", bVisible, bReadOnly);
-            m_memoryData = m_memoryGroup.GetMemory(m_sMemoryData);
+            return m_aLightPower[n];
         }
         #endregion
+
+        //#region Memory
+        //string m_sMemoryGroup = "";
+        //string m_sMemoryData = "Grab";
+
+        //public void RunTreeMemory(Tree tree, bool bVisible, bool bReadOnly)
+        //{
+        //    if (m_sMemoryGroup == "") m_sMemoryGroup = m_memoryPool.m_asGroup[0];
+        //    m_sMemoryGroup = tree.Set(m_sMemoryGroup, m_sMemoryGroup, m_memoryPool.m_asGroup, "Group", "Memory Group Name", bVisible, bReadOnly);
+        //    m_memoryGroup = m_memoryPool.GetGroup(m_sMemoryGroup);
+        //    if (m_memoryGroup == null) return;
+        //    m_sMemoryData = tree.Set(m_sMemoryData, m_sMemoryData, m_memoryGroup.m_asMemory, "Data", "Memory Data Name", bVisible, bReadOnly);
+        //    m_memoryData = m_memoryGroup.GetMemory(m_sMemoryData);
+        //}
+        //#endregion
 
         #region Axis
         public int m_ScanLineNum = 1;

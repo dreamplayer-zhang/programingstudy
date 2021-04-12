@@ -298,14 +298,14 @@ namespace Root_Rinse_Unloader.Module
             }
         }
 
-        bool _bDoorLock = false;
-        public bool p_bDoorLock
+        bool _bDoorOpen = false;
+        public bool p_bDoorOpen
         {
-            get { return _bDoorLock; }
+            get { return _bDoorOpen; }
             set
             {
-                if (_bDoorLock == value) return;
-                _bDoorLock = value;
+                if (_bDoorOpen == value) return;
+                _bDoorOpen = value;
                 OnPropertyChanged();
                 EQ.p_bDoorOpen = value;
             }
@@ -367,9 +367,8 @@ namespace Root_Rinse_Unloader.Module
         {
             p_bEMG = m_diEMG.p_bIn;
             p_bAir = m_diAir.p_bIn;
-            p_bDoorLock = m_diDoorLock.p_bIn;
+            p_bDoorOpen = !m_diDoorLock.p_bIn || !m_diLightCurtain.p_bIn;
             p_bBuzzerOff = m_diBuzzerOff.p_bIn;
-            EQ.p_bDoorOpen = m_diLightCurtain.p_bIn;
             CheckLightCurtan(); 
             if (m_swBlick.ElapsedMilliseconds < 500) return;
             m_swBlick.Start();
@@ -401,6 +400,7 @@ namespace Root_Rinse_Unloader.Module
             StripReceive,
             ResultClear,
             SetRotateSpeed,
+            BuzzerOff
         }
         public string[] m_asCmd = Enum.GetNames(typeof(eCmd)); 
 
@@ -510,6 +510,7 @@ namespace Root_Rinse_Unloader.Module
                                     if (EQ.p_eState == EQ.eState.Ready) EQ.p_eState = EQ.eState.Run;
                                     break;
                             }
+                            AddProtocol(p_id, eCmd.EQUeState, EQ.p_eState);
                             break;
                         case eCmd.PickerSet:
                             AddProtocol(asRead[0], eCmd, asRead[2]);
@@ -524,6 +525,10 @@ namespace Root_Rinse_Unloader.Module
                             p_fRotateSpeed = Convert.ToDouble(asRead[2]);
                             RunTree(Tree.eMode.Init);
                             break;
+                        case eCmd.BuzzerOff:
+                            AddProtocol(asRead[0], eCmd, asRead[2]);
+                            RunBuzzerOff();
+                            break; 
                     }
                 }
             }

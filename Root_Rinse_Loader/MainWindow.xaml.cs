@@ -169,7 +169,8 @@ namespace Root_Rinse_Loader
 
         private void buttonReset_Click(object sender, RoutedEventArgs e)
         {
-            m_handler.m_rinse.RunBuzzerOff(); 
+            m_handler.m_rinse.RunBuzzerOff();
+            m_handler.m_rinse.Reset(); 
             EQ.p_eState = EQ.eState.Ready;
         }
 

@@ -359,7 +359,7 @@ namespace RootTools.Memory
         }
 
         public MemoryPool CreatePool(string sPool, double fGB)
-        {
+          {
             MemoryPool memoryPool = new MemoryPool(sPool, this, fGB);
             p_aPool.Add(memoryPool);
             MemoryChanged(); 

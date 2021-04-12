@@ -20,7 +20,6 @@ namespace Root_VEGA_P_Vision.Module
         GrabMode MainGrabMode;
         string sMainGrabMode;
 
-
         public Run_MainGrab(Vision module)
         {
             m_module = module;
@@ -83,10 +82,12 @@ namespace Root_VEGA_P_Vision.Module
                 int nScanSpeed = Convert.ToInt32((double)MainGrabMode.m_nMaxFrame * MainGrabMode.m_dTrigger * nCamHeight * MainGrabMode.m_nScanRate / 100);
                 int nScanOffset_pulse = 40000;
 
-                InfoPod.ePod parts = m_module.p_infoPod.p_ePod;
-                Vision.eUpDown upDown = (Vision.eUpDown)Enum.ToObject(typeof(Vision.eUpDown), m_module.p_infoPod.p_bTurn);
+                //InfoPod.ePod parts = m_module.p_infoPod.p_ePod;
+                //Vision.eUpDown upDown = (Vision.eUpDown)Enum.ToObject(typeof(Vision.eUpDown), m_module.p_infoPod.p_bTurn);
 
-                MemoryData mem = mainOpt.GetMemoryData(parts,Vision.MainOptic.eInsp.Main,upDown);
+                //MemoryData mem = mainOpt.GetMemoryData(parts,Vision.MainOptic.eInsp.Main,upDown);
+
+                MemoryData mem = mainOpt.GetMemoryData(InfoPod.ePod.EIP_Cover, Vision.MainOptic.eInsp.Main, Vision.eUpDown.Front);
 
                 double dStartPosY = MainGrabMode.m_rpAxisCenter.Y - nTotalTriggerCount / 2 - nScanOffset_pulse;
                 double dEndPosY = MainGrabMode.m_rpAxisCenter.Y + nTotalTriggerCount / 2 + nScanOffset_pulse;
@@ -106,7 +107,12 @@ namespace Root_VEGA_P_Vision.Module
                 MainGrabMode.SetLight(true);
                 cpMemoryOffset.X += MainGrabMode.m_ScanStartLine * nCamWidth;
 
-                while(MainGrabMode.m_ScanLineNum>nScanLine)
+                if(m_module.Run(axisZ.StartMove(MainGrabMode.m_nFocusPosZ)))
+                    return p_sInfo;
+                if (m_module.Run(axisZ.WaitReady()))
+                    return p_sInfo;
+
+                while (MainGrabMode.m_ScanLineNum>nScanLine)
                 {
                     if (EQ.IsStop()) return "OK";
 
@@ -120,19 +126,21 @@ namespace Root_VEGA_P_Vision.Module
 
                     grabData.bInvY = MainGrabMode.m_eGrabDirection == eGrabDirection.Forward;
 
-                    double dPosX = MainGrabMode.m_rpAxisCenter.X - nPodSizeY_px * (double)MainGrabMode.m_dTrigger / 2 + 
+                    double dPosX = MainGrabMode.m_rpAxisCenter.X + nPodSizeY_px * (double)MainGrabMode.m_dTrigger / 2 - 
                         (nScanLine + MainGrabMode.m_ScanStartLine) * nCamWidth * dXScale;
 
-                    if (m_module.Run(m_module.Move(axisZ, MainGrabMode.m_nFocusPosZ)))
+                    if (m_module.Run(axisXY.StartMove(new RPoint(dPosX, dStartPosY))))
                         return p_sInfo;
-                    if (m_module.Run(m_module.MoveXY(new RPoint(dPosX, dStartPosY))))
+                    if (m_module.Run(axisXY.WaitReady()))
                         return p_sInfo;
 
                     axisXY.p_axisY.SetTrigger(dTriggerStartPosY, dTriggerEndPosY, MainGrabMode.m_dTrigger, 5, true);
                     MainGrabMode.StartGrab(mem, cpMemoryOffset, nPodSizeY_px, grabData);
                     MainGrabMode.Grabed += GrabMode_Grabed;
 
-                    if (m_module.Run(m_module.Move(axisXY.p_axisY, dEndPosY,nScanSpeed)))
+                    if (m_module.Run(axisXY.p_axisY.StartMove(dEndPosY, nScanSpeed)))
+                        return p_sInfo;
+                    if (m_module.Run(axisXY.p_axisY.WaitReady()))
                         return p_sInfo;
 
                     axisXY.p_axisY.RunTrigger(false);

@@ -120,24 +120,13 @@ namespace Root_EFEM.Module
                 m_module.p_sInfo = toolBox.GetDIO(ref m_diArmClose, m_module, m_eArm.ToString() + ".ArmClose");
             }
 
-            enum eCheckWafer
-            {
-                InfoWafer,
-                Sensor,
-            };
-            eCheckWafer m_eCheckWafer = eCheckWafer.Sensor;
             public override bool IsWaferExist()
             {
-                switch (m_eCheckWafer)
-                {
-                    case eCheckWafer.Sensor: return m_diCheckVac.p_bIn;
-                    default: return (p_infoWafer != null);
-                }
+                return m_diCheckVac.p_bIn;
             }
 
             public override void RunTree(Tree tree)
             {
-                m_eCheckWafer = (eCheckWafer)tree.Set(m_eCheckWafer, m_eCheckWafer, "Wafer Check", "Wafer Check Option");
                 base.RunTree(tree);
             }
         }

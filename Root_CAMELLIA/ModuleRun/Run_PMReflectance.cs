@@ -14,6 +14,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using static Root_CAMELLIA.Module.Module_Camellia;
 using Met = Root_CAMELLIA.LibSR_Met;
+using System.IO;
 
 namespace Root_CAMELLIA.Module
 {
@@ -53,7 +54,32 @@ namespace Root_CAMELLIA.Module
 
         public override string Run()
         {
-            Met.PMDatas PMDatas = new Met.PMDatas();
+            Met.PMDatas m_PMDatas = new Met.PMDatas();
+            Met.CheckResult rst;
+
+
+            if (!Directory.Exists(Met.ConstValue.PATH_PM_RESULT_FOLDER))
+            {
+                Directory.CreateDirectory(Met.ConstValue.PATH_PM_RESULT_FOLDER);
+            }
+
+            string strPath = Met.ConstValue.PATH_PM_RESULT_FOLDER + DateTime.Now.Year.ToString("0000") + "-" + DateTime.Now.Month.ToString("00") + "-" + DateTime.Now.Day.ToString("00");
+            if (!Directory.Exists(strPath))
+            {
+                Directory.CreateDirectory(strPath);
+            }
+
+            if (!Directory.Exists(Met.ConstValue.PATH_MONITORING_RESULT_FOLDER))
+            {
+                Directory.CreateDirectory(Met.ConstValue.PATH_MONITORING_RESULT_FOLDER);
+            }
+
+            string strPathMo = Met.ConstValue.PATH_MONITORING_RESULT_FOLDER + DateTime.Now.Year.ToString("0000") + "-" + DateTime.Now.Month.ToString("00") + "-" + DateTime.Now.Day.ToString("00");
+            if (!Directory.Exists(strPathMo))
+            {
+                Directory.CreateDirectory(strPathMo);
+            }
+
             Axis axisLifter = m_module.p_axisLifter;
             // PM 동작 하기전에 lifter 내려가 있는지 체크
             if (m_module.LifterDown() != "OK")
@@ -61,6 +87,7 @@ namespace Root_CAMELLIA.Module
                 return p_sInfo;
             }
             // 시작
+            m_PMDatas.LoadPMData();
             m_log.Info("[CheckSensorTilt] Start");
             // 현재 축값 받아오기
             AxisXY axisXY = m_module.p_axisXY;
@@ -79,13 +106,17 @@ namespace Root_CAMELLIA.Module
             }
 
             m_SettingDataWithErrorCode = App.m_nanoView.LoadSettingParameters();
-            Met.SettingData setting = null;
+            //Met.SettingData setting = null;
             if (m_SettingDataWithErrorCode.Item2 == Met.Nanoview.ERRORCODE_NANOVIEW.SR_NO_ERROR)
             {
-                setting = m_SettingDataWithErrorCode.Item1;
+                Met.DataManager.GetInstance().m_SettngData = m_SettingDataWithErrorCode.Item1;
+
+
+                Met.DataManager.GetInstance().m_SettngData.nMeasureIntTime_NIR = m_DataManager.recipeDM.MeasurementRD.NIRIntegrationTime;
+                Met.DataManager.GetInstance().m_SettngData.nMeasureIntTime_VIS = m_DataManager.recipeDM.MeasurementRD.VISIntegrationTime;
 
                 ////Init Cal
-                if (App.m_nanoView.Calibration(m_InitialCal )== Met.Nanoview.ERRORCODE_NANOVIEW.SR_NO_ERROR)
+                if (App.m_nanoView.Calibration(m_InitialCal)== Met.Nanoview.ERRORCODE_NANOVIEW.SR_NO_ERROR)
                 {
                     m_InitialCal = false;
                     m_log.Info("[CheckSensorTilt] Init Calbration OK");
@@ -96,7 +127,7 @@ namespace Root_CAMELLIA.Module
                     m_log.Info("[CheckSensorTilt] Init Calbration fail");
                     return "[CheckSensorTilt] Init Calbration fail";
                 }
-                ////Sample Cal
+                Thread.Sleep(1000);
                 if (App.m_nanoView.Calibration(m_InitialCal) == Met.Nanoview.ERRORCODE_NANOVIEW.SR_NO_ERROR)
                 {
                     m_log.Info("[CheckSensorTilt] Sample Calbration OK");
@@ -113,19 +144,60 @@ namespace Root_CAMELLIA.Module
                 return "[CheckSensorTilt] Nano-View SettingDataLoad Error";
             }
 
+            ////Sample Cal
+            /// m_SettingDataWithErrorCode = App.m_nanoView.LoadSettingParameters();
+            //Met.SettingData setting = null;
+            //if (m_SettingDataWithErrorCode.Item2 == Met.Nanoview.ERRORCODE_NANOVIEW.SR_NO_ERROR)
+            //{
+            //    Met.DataManager.GetInstance().m_SettngData = m_SettingDataWithErrorCode.Item1;
+
+            //    if (App.m_nanoView.Calibration(m_InitialCal) == Met.Nanoview.ERRORCODE_NANOVIEW.SR_NO_ERROR)
+            //    {
+            //        m_log.Info("[CheckSensorTilt] Sample Calbration OK");
+            //    }
+            //    else
+            //    {
+            //        m_log.Info("[CheckSensorTilt] Init Calbration fail");
+            //        return "[CheckSensorTilt] Init Calbration fail";
+            //    }
+            //}
+            //else
+            //{
+            //    m_log.Info("[CheckSensorTilt] Nano-View SettingDataLoad Error");
+            //    return "[CheckSensorTilt] Nano-View SettingDataLoad Error";
+            //}
+
             object obj;
-            for (int n = 0; n < PMDatas.SensorTiltRepeatNum; n++)
+            for (int n = 0; n < m_PMDatas.nSensorTiltRepeatNum; n++)
             {
                 if (App.m_nanoView.SampleMeasure(0, 0, 0,
                        m_mwvm.SettingViewModel.p_ExceptNIR, m_DataManager.recipeDM.MeasurementRD.UseTransmittance, m_DataManager.recipeDM.MeasurementRD.UseThickness,
                        m_DataManager.recipeDM.MeasurementRD.LowerWaveLength, m_DataManager.recipeDM.MeasurementRD.UpperWaveLength) == Met.Nanoview.ERRORCODE_NANOVIEW.SR_NO_ERROR)
                 {
+                   
                     string sDate = DateTime.Now.Year.ToString("0000") + "-" + DateTime.Now.Month.ToString("00") + "-" + DateTime.Now.Day.ToString("00");
                     string sFileName = Met.ConstValue.PATH_PM_RESULT_FOLDER + sDate + @"\CheckSensorTilt" + n + "_" + DateTime.Now.ToShortDateString() + "_" + DateTime.Now.Hour.ToString("00") + DateTime.Now.Minute.ToString("00") + ".csv";
                     if (Met.DataManager.GetInstance().SaveCheckSensorData(sFileName, 0))
                     {
 
                         m_log.Info("[CheckSensorTilt] Acquire Refelctance" + "[" + n + "]");
+                        
+                        rst = m_PMDatas.CheckSensorTilt();
+                        if (rst == Met.CheckResult.OK)
+                        {
+                            m_log.Info("[CheckSensorTilt] CheckResult Normal" + "[" + n + "]");
+                        }
+                        else if (rst == Met.CheckResult.Error)
+                        {
+                            m_log.Info("[CheckSensorTilt] CheckResult Error" + "[" + n + "]");
+                            return "[CheckSensorTilt] CheckResult Error" + "[" + n + "]";
+                        }
+                        else if (rst == Met.CheckResult.CheckError)
+                        {
+                            m_log.Info("[CheckSensorTilt] Acquire Refelctance Error" + "[" + n + "]");
+                            return "[CheckSensorTilt] CheckResult Acquire Refelctance Error" + "[" + n + "]";
+                        }
+
                     }
                     else
                     {
@@ -138,12 +210,11 @@ namespace Root_CAMELLIA.Module
                     m_log.Info("[CheckSensorTilt] Measuring Error" + "[" + n + "]");
                     return "[CheckSensorTilt] Measuring Error" + "[" + n + "]";
                 }
-                Met.CheckResult rst;
+
+                
                 //rst = Met.PMDatas.CheckSensorTilt();
 
             }
-
-
 
             //리턴값 반환할 것
             return "OK";

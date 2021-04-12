@@ -19,11 +19,6 @@ namespace Root_VEGA_D
     /// </summary>
     public partial class MainWindow : Window
     {
-        VEGA_D_Handler m_handler;
-        public MainWindow()
-        {
-            InitializeComponent();
-        }
         #region TitleBar
         private void MinimizeButton_Click(object sender, RoutedEventArgs e)
         {
@@ -74,10 +69,6 @@ namespace Root_VEGA_D
 
         #endregion
 
-        //bool m_blogin = false;
-
-
-
         #region Window Event
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
@@ -91,7 +82,12 @@ namespace Root_VEGA_D
         }
         #endregion
 
+        VEGA_D_Handler m_handler;
         VEGA_D_Engineer m_engineer = new VEGA_D_Engineer();
+        public MainWindow()
+        {
+            InitializeComponent();
+        }
         void Init()
         {
             m_engineer.Init("VEGA_D");
@@ -99,12 +95,19 @@ namespace Root_VEGA_D
             m_handler = m_engineer.m_handler;
             loadportA.Init(m_handler.m_aLoadport[0], m_handler, m_handler.m_aRFID[0]);
             loadportB.Init(m_handler.m_aLoadport[1], m_handler, m_handler.m_aRFID[1]);
+            RecipeWizard_UI.init(m_engineer);
             InitTimer();
             TextBlockRetID.DataContext = m_handler.m_aLoadport[0].p_infoCarrier.m_aGemSlot[0];
             Is_InLP.Background = (m_handler.m_aLoadport[0].p_infoCarrier.m_aInfoWafer[0] != null)||(m_handler.m_aLoadport[0].p_infoCarrier.m_aInfoWafer[1] != null) ? Brushes.MediumBlue: Brushes.Gray;
             Is_InRTR.Background = m_handler.m_wtr.m_dicArm[0].p_infoWafer== null ? Brushes.MediumBlue : Brushes.Gray;
             Is_InVS.Background = m_handler.m_vision.p_infoWafer == null ? Brushes.MediumBlue : Brushes.Gray;
         }
+
+        //bool m_blogin = false;
+
+
+
+
 
         void ThreadStop()
         {
@@ -184,7 +187,6 @@ namespace Root_VEGA_D
             EQ.p_eState = EQ.eState.Run;
             EQ.p_bRecovery = true;
         }
-
         private void buttonBuzzOff_Click(object sender, RoutedEventArgs e)
         {
             m_engineer.BuzzerOff();

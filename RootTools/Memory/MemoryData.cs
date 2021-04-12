@@ -8,6 +8,7 @@ using System.Drawing.Imaging;
 using System.IO;
 using System.IO.MemoryMappedFiles;
 using System.Runtime.InteropServices;
+using System.Threading.Tasks;
 using System.Windows;
 
 namespace RootTools.Memory
@@ -342,85 +343,389 @@ namespace RootTools.Memory
         }
 
         #region BMP File
+        bool ReadBitmapFileHeader(BinaryReader br, ref uint bfOffbits)
+        {
+            if (br == null)
+                return false;
+
+            ushort bfType;
+            uint bfSize;
+
+            bfType = br.ReadUInt16();       // bfType;
+            bfSize = br.ReadUInt32();       // bfSize
+            br.ReadUInt16();                // bfReserved1
+            br.ReadUInt16();                // bfReserved2
+            bfOffbits = br.ReadUInt32();    // bfOffbits
+
+            if (bfType != 0x4d42)
+                return false;
+
+            return true;
+        }
+        bool ReadBitmapInfoHeader(BinaryReader br, ref int width, ref int height, ref int nByte)
+        {
+            if (br == null)
+                return false;
+
+            uint biSize;
+
+            biSize = br.ReadUInt32();       // biSize
+            width = br.ReadInt32();         // biWidth
+            height = br.ReadInt32();        // biHeight
+            br.ReadUInt16();                // biPlanes
+            nByte = br.ReadUInt16() / 8;    // biBitCount
+            br.ReadUInt32();                // biCompression
+            br.ReadUInt32();                // biSizeImage
+            br.ReadInt32();                 // biXPelsPerMeter
+            br.ReadInt32();                 // biYPelsPerMeter
+            br.ReadUInt32();                // biClrUsed
+            br.ReadUInt32();                // biClrImportant
+
+            return true;
+        }
         public string FileOpenBMP(string sFile, int nIndex)
         {
-            if ((nIndex < 0) || (nIndex >= p_nCount)) return "Invalid Index"; 
+            if ((nIndex < 0) || (nIndex >= p_nCount)) return "Invalid Index";
+
             FileStream fs = null;
-            try 
-            { 
-                fs = new FileStream(sFile, FileMode.Open, FileAccess.Read, FileShare.Read, 32768, true); 
-            }
-            catch (Exception) { return "File Open Error"; }
-            BinaryReader br = new BinaryReader(fs);
-            if (br.ReadUInt16() != 0x4D42) return "Invalid Bitmap Type";
-            uint bfSize = br.ReadUInt32();
-            br.ReadUInt16();
-            br.ReadUInt16();
-            uint bfOffBits = br.ReadUInt32();
-            uint biSize = br.ReadUInt32();
-            CPoint szBMP = new CPoint(); 
-            szBMP.X = br.ReadInt32();
-            szBMP.Y = br.ReadInt32();
-            br.ReadUInt16();
-            int nByte = br.ReadUInt16() / 8;
-            if (nByte != p_nByte) return "Invalid Pixel Depth"; 
-            br.ReadUInt32();
-            br.ReadUInt32();
-            br.ReadInt32();
-            br.ReadInt32();
-            br.ReadUInt32();
-            br.ReadUInt32();
-            if (p_sz.X < szBMP.X) p_sz.X = szBMP.X;
-            if (p_sz.Y < szBMP.Y) p_sz.Y = szBMP.Y;
-            if (p_nByte == 1) br.ReadBytes(256 * 4); 
-            for (int y = 0; y < szBMP.Y; y++)
+            try
             {
-                byte[] pBuf = br.ReadBytes(p_nByte * szBMP.X);
-                Marshal.Copy(pBuf, 0, GetPtr(nIndex, 0, szBMP.Y - y - 1), p_nByte * szBMP.X);
-                UpdateOpenProgress?.Invoke(Convert.ToInt32(((double)y / p_sz.Y) * 100));
+                fs = new FileStream(sFile, FileMode.Open, FileAccess.Read, FileShare.Read, 32768, true);
             }
-            br.Close();
-            fs.Close();
+            catch (Exception)
+            {
+                return "Can't create FileStream";
+            }
+
+            BinaryReader br = null;
+            try
+            {
+                br = new BinaryReader(fs);
+            }
+            catch (Exception)
+            {
+                fs.Close();
+                return "Can't create BinaryWriter";
+            }
+
+            try
+            {
+                // Bitmap File Header
+                uint bfOffbits = 0;
+                if (ReadBitmapFileHeader(br, ref bfOffbits) == false)
+                    return "Occured error reading bitmap file header";
+
+                // Bitmap Info Header
+                int width = 0;
+                int height = 0;
+                int nByte = 0;
+                if (ReadBitmapInfoHeader(br, ref width, ref height, ref nByte) == false)
+                    return "Occured error reading bitmap info header";
+
+                // 이미지 파일의 채널 개수가 이미 생성된 메모리의 채널 개수보다 많을 경우 Open 과정 중단
+                if (nByte > p_nByte * p_nCount)
+                {
+                    return "Not enough memory count to load image file";
+                }
+
+                // 읽어올 이미지 내 영역
+                CRect rect = new CRect(0, 0, width, height);
+                if (width > p_sz.X) rect.Right -= width - p_sz.X;
+                if (height > p_sz.Y) rect.Bottom -= height - p_sz.Y;
+
+
+                // 픽셀 데이터 존재하는 부분으로 Seek
+                fs.Seek(bfOffbits, SeekOrigin.Begin);
+
+                // 파일로부터 픽셀 데이터 읽어오기
+                byte[] aBuf = new byte[(long)rect.Width * nByte];
+                int fileRowSize = (width * nByte + 3) & ~3; // 파일 내 하나의 열당 너비 사이즈 (4의 배수)
+
+                if (nByte == 1 || nByte == 2)
+                {
+                    IntPtr ptr = GetPtr(nIndex);
+                    if (ptr == IntPtr.Zero)
+                        return "Wrong memory nIndex"; ;
+
+                    // 읽지 않아도 되는 하단부분은 읽지 않고 스킵
+                    fs.Seek((height - rect.Bottom) * fileRowSize, SeekOrigin.Current);
+
+                    for (int j = rect.Bottom - 1; j >= rect.Top; j--)
+                    {
+                        Array.Clear(aBuf, 0, rect.Width * nByte);
+
+                        // 이미지 좌측 영역 스킵
+                        fs.Seek(rect.Left * nByte, SeekOrigin.Current);
+
+                        // 파일에서 필요한 만큼 데이터를 읽어 메모리에 복사
+                        fs.Read(aBuf, 0, rect.Width * nByte);
+                        //IntPtr destPtr = ptr + ((j + offset.Y) * p_Size.X) * p_nByte;
+                        IntPtr destPtr = new IntPtr(ptr.ToInt64() + ((long)j * p_sz.X) * p_nByte);
+
+                        Marshal.Copy(aBuf, 0, destPtr, rect.Width * nByte);
+
+                        // 이미지 우측 영역 스킵
+                        fs.Seek(fileRowSize - rect.Right * nByte, SeekOrigin.Current);
+
+                        // 진행상황 표시
+                        UpdateOpenProgress?.Invoke(Convert.ToInt32(((double)rect.Height - (j - rect.Top)) / rect.Height * 100));
+                    }
+                }
+                else/* if (nByte == 3)*/
+                {
+                    IntPtr ptrR = GetPtr(0);
+                    IntPtr ptrG = GetPtr(1);
+                    IntPtr ptrB = GetPtr(2);
+                    if (ptrR == IntPtr.Zero || ptrB == IntPtr.Zero || ptrG == IntPtr.Zero)
+                        return "Not enough memory count";
+
+                    // 읽지 않아도 되는 하단부분은 읽지 않고 스킵
+                    fs.Seek((height - rect.Bottom) * fileRowSize, SeekOrigin.Current);
+
+                    for (int j = rect.Bottom - 1; j >= rect.Top; j--)
+                    {
+                        Array.Clear(aBuf, 0, rect.Width * nByte);
+
+                        // 이미지 좌측 영역 스킵
+                        fs.Seek(rect.Left * nByte, SeekOrigin.Current);
+
+                        // 파일에서 필요한 만큼 데이터를 읽어 메모리에 복사
+                        fs.Read(aBuf, 0, rect.Width * nByte);
+
+                        Parallel.For(0, rect.Width, new ParallelOptions { MaxDegreeOfParallelism = 12 }, (i) =>
+                        {
+                            Int64 idx = ((Int64)j) * p_sz.X + i;
+
+                            unsafe
+                            {
+                                ((byte*)(ptrB))[idx] = aBuf[i * 3];
+                                ((byte*)(ptrG))[idx] = aBuf[i * 3 + 1];
+                                ((byte*)(ptrR))[idx] = aBuf[i * 3 + 2];
+                            }
+                        });
+
+                        // 이미지 우측 영역 스킵
+                        fs.Seek(fileRowSize - rect.Right * nByte, SeekOrigin.Current);
+
+                        // 진행상황 표시
+                        UpdateOpenProgress?.Invoke(Convert.ToInt32(((double)rect.Height - (j - rect.Top)) / rect.Height * 100));
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                return "Occured error opening BMP file";
+            }
+            finally
+            {
+                br.Close();
+                fs.Close();
+            }
+
+
+
+
+            //FileStream fs = null;
+            //try 
+            //{ 
+            //    fs = new FileStream(sFile, FileMode.Open, FileAccess.Read, FileShare.Read, 32768, true); 
+            //}
+            //catch (Exception) { return "File Open Error"; }
+            //BinaryReader br = new BinaryReader(fs);
+            //if (br.ReadUInt16() != 0x4D42) return "Invalid Bitmap Type";
+            //uint bfSize = br.ReadUInt32();
+            //br.ReadUInt16();
+            //br.ReadUInt16();
+            //uint bfOffBits = br.ReadUInt32();
+            //uint biSize = br.ReadUInt32();
+            //CPoint szBMP = new CPoint(); 
+            //szBMP.X = br.ReadInt32();
+            //szBMP.Y = br.ReadInt32();
+            //br.ReadUInt16();
+            //int nByte = br.ReadUInt16() / 8;
+            //if (nByte != p_nByte) return "Invalid Pixel Depth"; 
+            //br.ReadUInt32();
+            //br.ReadUInt32();
+            //br.ReadInt32();
+            //br.ReadInt32();
+            //br.ReadUInt32();
+            //br.ReadUInt32();
+            //if (p_sz.X < szBMP.X) p_sz.X = szBMP.X;
+            //if (p_sz.Y < szBMP.Y) p_sz.Y = szBMP.Y;
+            //if (p_nByte == 1) br.ReadBytes(256 * 4); 
+            //for (int y = 0; y < szBMP.Y; y++)
+            //{
+            //    byte[] pBuf = br.ReadBytes(p_nByte * szBMP.X);
+            //    Marshal.Copy(pBuf, 0, GetPtr(nIndex, 0, szBMP.Y - y - 1), p_nByte * szBMP.X);
+            //    UpdateOpenProgress?.Invoke(Convert.ToInt32(((double)y / p_sz.Y) * 100));
+            //}
+            //br.Close();
+            //fs.Close();
             return "OK"; 
         }
+        bool WriteBitmapFileHeader(BinaryWriter bw, int nByte, int width, int height)
+        {
+            if (bw == null)
+                return false;
 
-        public string FileSaveBMP(string sFile, int nIndex)
+            int rowSize = (width * nByte + 3) & ~3;
+            int paletteSize = (nByte == 1 ? (256 * 4) : 0);
+
+            int size = 14 + 40 + paletteSize + rowSize * height;
+            int offbit = 14 + 40 + paletteSize;
+
+            bw.Write(Convert.ToUInt16(0x4d42));                     // bfType;
+            bw.Write(Convert.ToUInt32((uint)size));                 // bfSize
+            bw.Write(Convert.ToUInt16(0));                          // bfReserved1
+            bw.Write(Convert.ToUInt16(0));                          // bfReserved2
+            bw.Write(Convert.ToUInt32(offbit));                     // bfOffbits
+
+            return true;
+        }
+        bool WriteBitmapInfoHeader(BinaryWriter bw, int width, int height, bool isGrayScale, int nByte)
+        {
+            if (bw == null)
+                return false;
+
+            int biBitCount = (isGrayScale == true ? nByte : p_nByte) * p_nCount * 8;
+
+            bw.Write(Convert.ToUInt32(40));                         // biSize
+            bw.Write(Convert.ToInt32(width));                       // biWidth
+            bw.Write(Convert.ToInt32(height));                      // biHeight
+            bw.Write(Convert.ToUInt16(1));                          // biPlanes
+            bw.Write(Convert.ToUInt16(biBitCount));                  // biBitCount
+            bw.Write(Convert.ToUInt32(0));                          // biCompression
+            bw.Write(Convert.ToUInt32(0));                          // biSizeImage
+            bw.Write(Convert.ToInt32(0));                           // biXPelsPerMeter
+            bw.Write(Convert.ToInt32(0));                           // biYPelsPerMeter
+            bw.Write(Convert.ToUInt32((isGrayScale == true) ? 256 : 0));   // biClrUsed
+            bw.Write(Convert.ToUInt32((isGrayScale == true) ? 256 : 0));   // biClrImportant
+
+            return true;
+        }
+        bool WritePalette(BinaryWriter bw)
+        {
+            if (bw == null)
+                return false;
+
+            for (int i = 0; i < 256; i++)
+            {
+                bw.Write(Convert.ToByte(i));
+                bw.Write(Convert.ToByte(i));
+                bw.Write(Convert.ToByte(i));
+                bw.Write(Convert.ToByte(255));
+            }
+
+            return true;
+        }
+        public string FileSaveBMP(string sFile, int nIndex, int nByte = 1)
         {
             if ((nIndex < 0) || (nIndex >= p_nCount)) return "Invalid Index";
-            FileStream fs = new FileStream(sFile, FileMode.Create, FileAccess.Write);
-            BinaryWriter bw = new BinaryWriter(fs);
-            bw.Write((ushort)0x4d42);
-            bw.Write((uint)(54 + 1024 + p_sz.X * p_sz.Y));
-            bw.Write((ushort)0);
-            bw.Write((ushort)0);
-            bw.Write((uint)1078);
-            bw.Write((uint)40);
-            bw.Write(p_sz.X);
-            bw.Write(p_sz.Y);
-            bw.Write((ushort)1);
-            bw.Write((ushort)(8 * p_nByte));
-            bw.Write((uint)0);
-            bw.Write((uint)(p_sz.X * p_sz.Y));
-            bw.Write(0);
-            bw.Write(0);
-            bw.Write((uint)256);
-            bw.Write((uint)256);
-            for (int n = 0; n < 256; n++)
+
+            FileStream fs = null;
+            try
             {
-                byte i = (byte)n; 
-                bw.Write(i);
-                bw.Write(i);
-                bw.Write(i);
-                bw.Write((byte)255);
+                fs = new FileStream(sFile, FileMode.Create, FileAccess.Write);
             }
-            byte[] aBuf = new byte[(long)p_nByte * p_sz.X];
-            for (int y = 0; y < p_sz.Y; y++)
+            catch (Exception)
             {
-                Marshal.Copy(GetPtr(nIndex, 0, p_sz.Y - y - 1), aBuf, 0, p_nByte * p_sz.X);
-                bw.Write(aBuf); 
+                return "Can't create FileStream";
             }
-            bw.Close();
-            fs.Close();
+
+            BinaryWriter bw = null;
+            try
+            {
+                bw = new BinaryWriter(fs);
+            }
+            catch (Exception)
+            {
+                fs.Close();
+                return "Can't create BinaryWriter";
+            }
+
+            try
+            {
+                // Bitmap File Header
+                if (WriteBitmapFileHeader(bw, nByte, p_sz.X, p_sz.Y) == false)
+                    return "Occured error writing bitmap file header";
+
+                // Bitmap Info Header
+                if (WriteBitmapInfoHeader(bw, p_sz.X, p_sz.Y, true, nByte) == false)
+                    return "Occured error writing bitmap info header";
+
+                // Palette (if it's 1byte gray image)
+                if (nByte == 1)
+                    WritePalette(bw);
+
+                // Pixel data
+                int rowSize = (p_sz.X * nByte + 3) & ~3;
+                byte[] aBuf = new byte[(long)rowSize];
+                IntPtr ptr = GetPtr(nIndex);
+
+                if (ptr != IntPtr.Zero)
+                {
+                    if (p_nByte == nByte)
+                    {
+                        for (int j = p_sz.Y - 1; j >= 0; j--)
+                        {
+                            Array.Clear(aBuf, 0, rowSize);
+
+                            long idx = (long)j * p_sz.X * nByte;
+                            IntPtr srcPtr = new IntPtr(ptr.ToInt64() + idx);
+                            Marshal.Copy(srcPtr, aBuf, 0, rowSize);
+
+                            bw.Write(aBuf);
+
+                            UpdateOpenProgress?.Invoke(Convert.ToInt32(((double)(p_sz.Y - j) / p_sz.Y) * 100));
+                        }
+                    }
+                    else
+                    {
+                        for (int j = p_sz.Y - 1; j >= 0; j--)
+                        {
+                            Array.Clear(aBuf, 0, rowSize);
+
+                            long idx = (long)j * p_sz.X * p_nByte;
+
+                            Parallel.For(0, p_sz.X, new ParallelOptions { MaxDegreeOfParallelism = 12 }, (i) =>
+                            {
+                                unsafe
+                                {
+                                    byte* arrByte = (byte*)ptr.ToPointer();
+
+                                    if (nByte == 1)         // 2byte -> 1byte
+                                    {
+                                        aBuf[i] = arrByte[idx + i * p_nByte + 0];
+                                    }
+                                    else if (nByte == 2)    // 1byte -> 2byte
+                                    {
+                                        int val = arrByte[idx + i * p_nByte];
+                                        val = (int)((val / 255.0) * (Math.Pow(2, 8 * nByte) - 1));
+                                        aBuf[i * nByte + 0] = (byte)((val & 0xFF00) >> 8);
+                                        aBuf[i * nByte + 1] = (byte)((val & 0x00FF));
+                                    }
+                                }
+                            });
+
+                            bw.Write(aBuf);
+
+                            UpdateOpenProgress?.Invoke(Convert.ToInt32(((double)(p_sz.Y - j) / p_sz.Y) * 100));
+                        }
+                    }
+                }
+                else
+                    return "Cannot read addresss in MemoryData";
+            }
+            catch (Exception ex)
+            {
+                return "Occured error writing BMP file";
+            }
+            finally
+            {
+                bw.Close();
+                fs.Close();
+            }
+
             return "OK";
         }
         #endregion

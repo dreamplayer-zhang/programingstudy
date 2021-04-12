@@ -9,6 +9,11 @@ namespace Root_AOP01_Inspection
 	public class RecipeEdge_ViewModel : ObservableObject
 	{
 		Setup_ViewModel m_Setup;
+		public Setup_ViewModel p_Setup
+        {
+            get { return m_Setup; }
+            set { SetProperty(ref m_Setup, value); }
+        }
 		AOP01_Engineer m_Engineer;
 
 

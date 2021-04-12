@@ -174,6 +174,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Page Include="Control\Arrow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Control\Block.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -242,6 +246,9 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Control\Arrow.xaml.cs">
+      <DependentUpon>Arrow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Control\Block.xaml.cs">
       <DependentUpon>Block.xaml</DependentUpon>
     </Compile>
@@ -278,6 +285,7 @@
     </Compile>
     <Compile Include="Module\GrabMode.cs" />
     <Compile Include="Module\Interlock.cs" />
+    <Compile Include="Module\Reicpe\PosRecipeData.cs" />
     <Compile Include="Module\TowerLamp.cs" />
     <Compile Include="Module\Vision\Run_GrabLineScan.cs" />
     <Compile Include="RecipeManager_UI.xaml.cs">
@@ -286,6 +294,7 @@
     <Compile Include="RecipeWizard_UI.xaml.cs">
       <DependentUpon>RecipeWizard_UI.xaml</DependentUpon>
     </Compile>
+    <Compile Include="RecipeWizard_VM.cs" />
     <Compile Include="UI_UserControl\HomeProgress_UI.xaml.cs">
       <DependentUpon>HomeProgress_UI.xaml</DependentUpon>
     </Compile>
@@ -349,9 +358,9 @@
       <Name>Root_VEGA_D_IPU</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
-    <Folder Include="RecipeManager\" />
-    <Folder Include="RecipeWizard\" />
+    <Resource Include="Resource\Reticle.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
@@ -368,6 +377,7 @@ copy /Y "$(SolutionDir)Lib\EMGU.CV\x64\vcruntime140.dll" "$(SolutionDir)$(Projec
 copy /Y "$(SolutionDir)Lib\AXL\AXL.dll" $(SolutionDir)$(ProjectName)\$(OutDir)\AXL.dll"
 copy /Y "$(SolutionDir)Lib\AXL\AXL.lib" $(SolutionDir)$(ProjectName)\$(OutDir)\AXL.lib"
 copy /Y "$(SolutionDir)Lib\AXL\EzBasicAxl.dll" $(SolutionDir)$(ProjectName)\$(OutDir)\EzBasicAxl.dll"
+
 IF NOT EXIST "C:\vsdb\init" (mkdir "C:\vsdb\init")
 copy /Y "$(SolutionDir)Init\vsdb.txt" "C:\vsdb\init\vsdb.txt"
 IF NOT EXIST "$(SolutionDir)$(ProjectName)\$(OutDir)\plugin" (mkdir "$(SolutionDir)$(ProjectName)\$(OutDir)\plugin")
@@ -399,5 +409,6 @@ copy /Y "$(SolutionDir)Lib\MetLib\NanoView.dll" $(SolutionDir)$(ProjectName)\$(O
 copy /Y "$(SolutionDir)Lib\MetLib\NETOmniDriver-NET40.dll" $(SolutionDir)$(ProjectName)\$(OutDir)\NETOmniDriver-NET40.dll"
 copy /Y "$(SolutionDir)Lib\MetLib\OmniDriver64.dll" $(SolutionDir)$(ProjectName)\$(OutDir)\OmniDriver64.dll"
 copy /Y "$(SolutionDir)Lib\MetLib\r4nd_class.dll" $(SolutionDir)$(ProjectName)\$(OutDir)\r4nd_class.dll"</PostBuildEvent>
+copy /Y "$(SolutionDir)Lib\WibuCm64.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\WibuCm64.dll"</PostBuildEvent>
   </PropertyGroup>
 </Project>

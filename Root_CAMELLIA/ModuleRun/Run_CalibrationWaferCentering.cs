@@ -127,42 +127,48 @@ namespace Root_CAMELLIA.Module
             string strVRSImageFullPath = "";
 
 
-            if (m_module.LifterDown() != "OK")
-            {
-                return p_sInfo;
-            }
+            //if (m_module.LifterDown() != "OK")
+            //{
+            //    return p_sInfo;
+            //}
 
-            if (m_module.Run(axisZ.StartMove(491453)))
-            {
-                return p_sInfo;
-            }
-            if (m_module.Run(axisZ.WaitReady()))
-                return p_sInfo;
+            //if (m_module.Run(axisZ.StartMove(491453)))
+            //{
+            //    return p_sInfo;
+            //}
+            //if (m_module.Run(axisZ.WaitReady()))
+            //    return p_sInfo;
 
-            if (m_useCal)
-            {
-                if (m_useCentering)
-                {
-                    if (m_DataManager.m_calibration.Run(m_InitialCal, m_isPM) != "OK")
-                    {
-                        return "Calibration fail";
-                    }
-                }
-                else
-                {
-                    if (m_DataManager.m_calibration.Run(m_InitialCal, m_isPM, false) != "OK")
-                    {
-                        return "Calibration fail";
-                    }
-                }
-            }
+            //if (m_useCal)
+            //{
+            //    if (m_useCentering)
+            //    {
+            //        if (m_DataManager.m_calibration.Run(m_InitialCal, m_isPM) != "OK")
+            //        {
+            //            return "Calibration fail";
+            //        }
+            //    }
+            //    else
+            //    {
+            //        if (m_DataManager.m_calibration.Run(m_InitialCal, m_isPM, false) != "OK")
+            //        {
+            //            return "Calibration fail";
+            //        }
+            //    }
+            //}
 
             if (!m_useCentering)
+            {
+                if (m_module.Run(axisZ.StartMove(0)))
+                    return p_sInfo;
+                if (m_module.Run(axisZ.WaitReady()))
+                    return p_sInfo;
                 return "OK";
+            }
 
             m_DataManager.m_waferCentering.FindEdgeInit();
 
-            m_module.SetLight(true);
+            //m_module.SetLight(true);
 
             Camera_Basler VRS = m_module.p_CamVRS;
             ImageData img = VRS.p_ImageViewer.p_ImageData;
@@ -186,29 +192,29 @@ namespace Root_CAMELLIA.Module
 
             
 
-            if (m_bUseCustomSpeed && CheckVaildParameter())
-            {
-                if(m_module.Run(axisXY.p_axisX.StartMove(m_WaferLT_pulse.X, m_dMoveSpeedX, m_dMoveAccX, m_dMoveDecX)))
-                {
-                    return p_sInfo;
-                }
-                if (m_module.Run(axisXY.p_axisY.StartMove(m_WaferLT_pulse.Y, m_dMoveSpeedY, m_dMoveAccY, m_dMoveDecY)))
-                {
-                    return p_sInfo;
-                }
-                if (m_module.Run(axisXY.WaitReady()))
-                    return p_sInfo;
-            }
-            else
-            {
-                if (m_module.Run(axisXY.StartMove(m_WaferLT_pulse)))
-                    return p_sInfo;
-                if (m_module.Run(axisXY.WaitReady()))
-                    return p_sInfo;
-            }
+            //if (m_bUseCustomSpeed && CheckVaildParameter())
+            //{
+            //    if(m_module.Run(axisXY.p_axisX.StartMove(m_WaferLT_pulse.X, m_dMoveSpeedX, m_dMoveAccX, m_dMoveDecX)))
+            //    {
+            //        return p_sInfo;
+            //    }
+            //    if (m_module.Run(axisXY.p_axisY.StartMove(m_WaferLT_pulse.Y, m_dMoveSpeedY, m_dMoveAccY, m_dMoveDecY)))
+            //    {
+            //        return p_sInfo;
+            //    }
+            //    if (m_module.Run(axisXY.WaitReady()))
+            //        return p_sInfo;
+            //}
+            //else
+            //{
+            //    if (m_module.Run(axisXY.StartMove(m_WaferLT_pulse)))
+            //        return p_sInfo;
+            //    if (m_module.Run(axisXY.WaitReady()))
+            //        return p_sInfo;
+            //}
              //Thread.Sleep(1000);
 
-            ImageData asdv = new ImageData(VRS.p_ImageViewer.p_ImageData.m_MemData);
+            //ImageData asdv = new ImageData(VRS.p_ImageViewer.p_ImageData.m_MemData);
             
             if (VRS.Grab() == "OK")
             {
@@ -228,26 +234,26 @@ namespace Root_CAMELLIA.Module
             ThreadPool.QueueUserWorkItem(m_DataManager.m_waferCentering.FindEdge, param);
 
 
-            if (m_bUseCustomSpeed && CheckVaildParameter())
-            {
-                if (m_module.Run(axisXY.p_axisX.StartMove(m_WaferRT_pulse.X, m_dMoveSpeedX, m_dMoveAccX, m_dMoveDecX)))
-                {
-                    return p_sInfo;
-                }
-                if (m_module.Run(axisXY.p_axisY.StartMove(m_WaferRT_pulse.Y, m_dMoveSpeedY, m_dMoveAccY, m_dMoveDecY)))
-                {
-                    return p_sInfo;
-                }
-                if (m_module.Run(axisXY.WaitReady()))
-                    return p_sInfo;
-            }
-            else
-            {
-                if (m_module.Run(axisXY.StartMove(m_WaferRT_pulse)))
-                    return p_sInfo;
-                if (m_module.Run(axisXY.WaitReady()))
-                    return p_sInfo;
-            }
+            //if (m_bUseCustomSpeed && CheckVaildParameter())
+            //{
+            //    if (m_module.Run(axisXY.p_axisX.StartMove(m_WaferRT_pulse.X, m_dMoveSpeedX, m_dMoveAccX, m_dMoveDecX)))
+            //    {
+            //        return p_sInfo;
+            //    }
+            //    if (m_module.Run(axisXY.p_axisY.StartMove(m_WaferRT_pulse.Y, m_dMoveSpeedY, m_dMoveAccY, m_dMoveDecY)))
+            //    {
+            //        return p_sInfo;
+            //    }
+            //    if (m_module.Run(axisXY.WaitReady()))
+            //        return p_sInfo;
+            //}
+            //else
+            //{
+            //    if (m_module.Run(axisXY.StartMove(m_WaferRT_pulse)))
+            //        return p_sInfo;
+            //    if (m_module.Run(axisXY.WaitReady()))
+            //        return p_sInfo;
+            //}
             // return "OK";
             //m_DataManager.m_waferCentering.FindEdge(param);
             //Thread.Sleep(1000);
@@ -273,26 +279,26 @@ namespace Root_CAMELLIA.Module
             //m_DataManager.m_waferCentering.FindEdge(param);
 
             // Thread.Sleep(1000);
-            if (m_bUseCustomSpeed && CheckVaildParameter())
-            {
-                if (m_module.Run(axisXY.p_axisX.StartMove(m_WaferRB_pulse.X, m_dMoveSpeedX, m_dMoveAccX, m_dMoveDecX)))
-                {
-                    return p_sInfo;
-                }
-                if (m_module.Run(axisXY.p_axisY.StartMove(m_WaferRB_pulse.Y, m_dMoveSpeedY, m_dMoveAccY, m_dMoveDecY)))
-                {
-                    return p_sInfo;
-                }
-                if (m_module.Run(axisXY.WaitReady()))
-                    return p_sInfo;
-            }
-            else
-            {
-                if (m_module.Run(axisXY.StartMove(m_WaferRB_pulse)))
-                    return p_sInfo;
-                if (m_module.Run(axisXY.WaitReady()))
-                    return p_sInfo;
-            }
+            //if (m_bUseCustomSpeed && CheckVaildParameter())
+            //{
+            //    if (m_module.Run(axisXY.p_axisX.StartMove(m_WaferRB_pulse.X, m_dMoveSpeedX, m_dMoveAccX, m_dMoveDecX)))
+            //    {
+            //        return p_sInfo;
+            //    }
+            //    if (m_module.Run(axisXY.p_axisY.StartMove(m_WaferRB_pulse.Y, m_dMoveSpeedY, m_dMoveAccY, m_dMoveDecY)))
+            //    {
+            //        return p_sInfo;
+            //    }
+            //    if (m_module.Run(axisXY.WaitReady()))
+            //        return p_sInfo;
+            //}
+            //else
+            //{
+            //    if (m_module.Run(axisXY.StartMove(m_WaferRB_pulse)))
+            //        return p_sInfo;
+            //    if (m_module.Run(axisXY.WaitReady()))
+            //        return p_sInfo;
+            //}
 
             if (VRS.Grab() == "OK")
             {
@@ -332,6 +338,11 @@ namespace Root_CAMELLIA.Module
                     return "EQ Stop";
                 }
             }
+
+            if (m_module.Run(axisZ.StartMove(0)))
+                return p_sInfo;
+            if (m_module.Run(axisZ.WaitReady()))
+                return p_sInfo;
 
             m_module.SetLight(false);
 

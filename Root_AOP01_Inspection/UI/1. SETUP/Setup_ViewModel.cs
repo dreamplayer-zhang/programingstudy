@@ -42,6 +42,11 @@ namespace Root_AOP01_Inspection
         private GEM_ViewModel m_GEM;
 
         private RecipeWizard_ViewModel m_RecipeWizard;
+        public RecipeWizard_ViewModel p_RecipeWizard
+        {
+            get { return m_RecipeWizard; }
+            set { SetProperty(ref m_RecipeWizard, value); }
+        }
         private RecipeSpec_ViewModel m_RecipeSpec;
         public Recipe45D_ViewModel m_Recipe45D { get; private set; }
         public RecipeFrontside_ViewModel m_RecipeFrontSide { get; private set; }

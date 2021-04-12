@@ -66,6 +66,8 @@ namespace Root_Rinse_Unloader
             gridRed.Background = (bBlink && (EQ.p_eState == EQ.eState.Error)) ? Brushes.Crimson : Brushes.DarkRed;
             gridYellow.Background = (bBlink && (EQ.p_eState == EQ.eState.Ready)) ? Brushes.Gold : Brushes.YellowGreen;
             gridGreen.Background = (bBlink && (EQ.p_eState == EQ.eState.Run)) ? Brushes.SeaGreen : Brushes.DarkGreen;
+
+            tabControlStorage.SelectedIndex = (int)m_handler.m_rinse.p_eMode;
         }
         #endregion
 

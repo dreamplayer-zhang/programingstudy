@@ -405,6 +405,7 @@
       <DependentUpon>Ajin_UI.xaml</DependentUpon>
     </Compile>
     <Compile Include="Control\IControl.cs" />
+    <Compile Include="ImageProcess\FocusStacking_new.cs" />
     <Compile Include="Image\CustomCanvas.cs" />
     <Compile Include="Image\MiniViewer.xaml.cs">
       <DependentUpon>MiniViewer.xaml</DependentUpon>
@@ -432,6 +433,10 @@
     <Compile Include="Light\LightTool_DAWOO_UI.xaml.cs">
       <DependentUpon>LightTool_DAWOO_UI.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Light\LightTool_LVS_new.cs" />
+    <Compile Include="Light\LightTool_LVS_new_UI.xaml.cs">
+      <DependentUpon>LightTool_LVS_new_UI.xaml</DependentUpon>
+    </Compile>
     <Compile Include="OHTNew\ILoadport.cs" />
     <Compile Include="OHTNew\OHT.cs" />
     <Compile Include="OHTNew\OHT_ButtonUI.xaml.cs">
@@ -456,8 +461,16 @@
     <Compile Include="Comm\FFUModuleUI.xaml.cs">
       <DependentUpon>FFUModuleUI.xaml</DependentUpon>
     </Compile>
+    <Compile Include="RFIDs\IRFID.cs" />
     <Compile Include="RFIDs\RFID.cs" />
     <Compile Include="RFIDs\RFID_Brooks.cs" />
+    <Compile Include="RFIDs\RFID_Brooks_UI.xaml.cs">
+      <DependentUpon>RFID_Brooks_UI.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="RFIDs\RFID_Ceyon.cs" />
+    <Compile Include="RFIDs\RFID_UI.xaml.cs">
+      <DependentUpon>RFID_UI.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Trees\TreeItem_FolderName.cs" />
     <Compile Include="Viewer\CustomViewer\DrawableRootViewer.xaml.cs">
       <DependentUpon>DrawableRootViewer.xaml</DependentUpon>
@@ -1006,6 +1019,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Light\LightTool_LVS_new_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Light\LightTool_LVS_UI.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -1117,6 +1134,14 @@
     <Page Include="Comm\FFUModuleUI.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="RFIDs\RFID_Brooks_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="RFIDs\RFID_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Viewer\CustomViewer\DrawableRootViewer.xaml">
       <Generator>MSBuild:Compile</Generator>
