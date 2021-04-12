@@ -401,6 +401,7 @@ namespace Root_Rinse_Unloader.Module
             StripReceive,
             ResultClear,
             SetRotateSpeed,
+            BuzzerOff
         }
         public string[] m_asCmd = Enum.GetNames(typeof(eCmd)); 
 
@@ -525,6 +526,10 @@ namespace Root_Rinse_Unloader.Module
                             p_fRotateSpeed = Convert.ToDouble(asRead[2]);
                             RunTree(Tree.eMode.Init);
                             break;
+                        case eCmd.BuzzerOff:
+                            AddProtocol(asRead[0], eCmd, asRead[2]);
+                            RunBuzzerOff();
+                            break; 
                     }
                 }
             }

@@ -392,7 +392,8 @@ namespace Root_Rinse_Loader.Module
 
         public void RunBuzzerOff()
         {
-            m_doBuzzer.AllOff(); 
+            m_doBuzzer.AllOff();
+            AddProtocol(p_id, eCmd.BuzzerOff, "Off"); 
         }
 
         public bool m_bBlink = false; 
@@ -433,6 +434,7 @@ namespace Root_Rinse_Loader.Module
             StripReceive,
             ResultClear,
             SetRotateSpeed,
+            BuzzerOff,
         }
         public string[] m_asCmd = Enum.GetNames(typeof(eCmd));
 
