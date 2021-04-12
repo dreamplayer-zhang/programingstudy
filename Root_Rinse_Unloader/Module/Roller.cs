@@ -275,12 +275,15 @@ namespace Root_Rinse_Unloader.Module
             while (EQ.IsStop() == false)
             {
                 Thread.Sleep(10); 
-                foreach (Line line in m_aLine)
+                if (p_eStep == eStep.Empty)
                 {
-                    if (line.p_eSensor != Line.eSensor.Empty)
+                    foreach (Line line in m_aLine)
                     {
-                        p_eStep = eStep.Exist;
-                        return "OK";
+                        if (line.p_eSensor != Line.eSensor.Empty)
+                        {
+                            p_eStep = eStep.Exist;
+                            return "OK";
+                        }
                     }
                 }
             }
