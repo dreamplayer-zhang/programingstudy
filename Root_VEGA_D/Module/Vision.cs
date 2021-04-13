@@ -406,41 +406,59 @@ namespace Root_VEGA_D.Module
                 if(!socket.Connected)
                 {
                     if(p_eState == eState.Run)
-                        EQ.p_bStop = true;
+                        EQ.p_bPause = true;
                 }
             }
-
-            int nStartIdx = 0;
-            TCPIPComm_VEGA_D.Command cmd = TCPIPComm_VEGA_D.Command.none;
-            Dictionary<string, string> mapParam = new Dictionary<string, string>();
-
-            while (m_tcpipCommServer.ParseMessage(aBuf, nSize, ref nStartIdx, ref cmd, mapParam))
+            else
             {
-                switch (cmd)
+                int nStartIdx = 0;
+                TCPIPComm_VEGA_D.Command cmd = TCPIPComm_VEGA_D.Command.none;
+                Dictionary<string, string> mapParam = new Dictionary<string, string>();
+
+                while (m_tcpipCommServer.ParseMessage(aBuf, nSize, ref nStartIdx, ref cmd, mapParam))
                 {
-                    case TCPIPComm_VEGA_D.Command.result:
-                        {
-                            ModuleRunBase moduleRunBase = m_aModuleRun.Find(x => (x.GetType() == typeof(Run_GrabLineScan)));
-                            if (moduleRunBase != null)
-                                moduleRunBase.Run();
-                        }
-                        break;
-                    case TCPIPComm_VEGA_D.Command.alive:
-                        break;
-                    case TCPIPComm_VEGA_D.Command.ready:
-                        break;
-                    case TCPIPComm_VEGA_D.Command.resume:
-                        {
-                            // 이전에 이미지 그랩 작업을 이어서 할 수 있도록 처리
-                            EQ.p_bPause = false;
-                            EQ.p_bStop = false;
-                            EQ.p_bSimulate = false;
-                            Reset();
-                            StartRun(p_sModuleRun);
-                        }
-                        break;
-                    default:
-                        break;
+                    switch (cmd)
+                    {
+                        case TCPIPComm_VEGA_D.Command.result:
+                            {
+                                ModuleRunBase moduleRunBase = m_aModuleRun.Find(x => (x.GetType() == typeof(Run_GrabLineScan)));
+                                if (moduleRunBase != null)
+                                    moduleRunBase.Run();
+                            }
+                            break;
+                        case TCPIPComm_VEGA_D.Command.alive:
+                            break;
+                        case TCPIPComm_VEGA_D.Command.ready:
+                            break;
+                        case TCPIPComm_VEGA_D.Command.resume:
+                            {
+                                if (EQ.p_bPause == true)
+                                {
+                                    // 이전에 이미지 그랩 작업을 이어서 할 수 있도록 처리
+                                    int totalScanLine = int.Parse(mapParam[TCPIPComm_VEGA_D.PARAM_NAME_TOTALSCANLINECOUNT]);
+                                    int curScanLine = int.Parse(mapParam[TCPIPComm_VEGA_D.PARAM_NAME_CURRENTSCANLINE]);
+                                    int startScanLine = int.Parse(mapParam[TCPIPComm_VEGA_D.PARAM_NAME_STARTSCANLINE]);
+
+                                    ModuleRunBase moduleRunBase = m_aModuleRun.Find(x => (x.GetType() == typeof(Run_GrabLineScan)));
+                                    if (moduleRunBase != null)
+                                    {
+                                        Run_GrabLineScan grabLineScan = moduleRunBase as Run_GrabLineScan;
+                                        if (grabLineScan != null)
+                                        {
+                                            grabLineScan.m_grabMode.m_ScanLineNum = totalScanLine - curScanLine;
+                                            grabLineScan.m_grabMode.m_ScanStartLine = startScanLine + curScanLine;
+
+                                            EQ.p_bPause = false;
+                                            //Reset();
+                                            //StartRun(p_sModuleRun);
+                                        }
+                                    }
+                                }
+                            }
+                            break;
+                        default:
+                            break;
+                    }
                 }
             }
         }

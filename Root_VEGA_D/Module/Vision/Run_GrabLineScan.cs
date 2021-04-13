@@ -168,7 +168,7 @@ namespace Root_VEGA_D.Module
                     grabData.nScanOffsetY = nLineIndex * m_grabMode.m_nYOffset;
 
                     // IPU PC와 연결된 상태라면 Send Message
-                    if (m_module.TcpipCommServer.server.IsConnected())
+                    if (m_module.TcpipCommServer.IsConnected())
                     {
                         Dictionary<string, string> mapParam = new Dictionary<string, string>();
                         mapParam[TCPIPComm_VEGA_D.PARAM_NAME_OFFSETX] = cpMemoryOffset.X.ToString();
@@ -179,6 +179,7 @@ namespace Root_VEGA_D.Module
                         mapParam[TCPIPComm_VEGA_D.PARAM_NAME_LINE] = nWaferSizeY_px.ToString();
                         mapParam[TCPIPComm_VEGA_D.PARAM_NAME_TOTALSCANLINECOUNT] = m_grabMode.m_ScanLineNum.ToString();
                         mapParam[TCPIPComm_VEGA_D.PARAM_NAME_CURRENTSCANLINE] = nScanLine.ToString();
+                        mapParam[TCPIPComm_VEGA_D.PARAM_NAME_STARTSCANLINE] = m_grabMode.m_ScanStartLine.ToString();
 
                         m_module.TcpipCommServer.SendMessage(TCPIPComm_VEGA_D.Command.start, mapParam);
                     }
@@ -190,7 +191,7 @@ namespace Root_VEGA_D.Module
                     MemoryData mem = m_module.m_engineer.GetMemory(strPool, strGroup, strMemory);
 
                     CPoint tmpMemOffset = new CPoint(cpMemoryOffset);
-                    if (m_module.TcpipCommServer.server.IsConnected())
+                    if (m_module.TcpipCommServer.IsConnected())
                     {
                         // IPU PC와 연결된 상태에서는 이미지 데이터가 복사될 Main PC의 Memory 위치가
                         // Memory Width를 넘어가게 되면 다시 0부터 이미지를 얻어오도록 Memory Offset을 계산
@@ -209,7 +210,7 @@ namespace Root_VEGA_D.Module
                         return p_sInfo;
 
                     // IPU PC와 연결된 상태라면 스캔 종료 메세지 전달
-                    if (m_module.TcpipCommServer.server.IsConnected())
+                    if (m_module.TcpipCommServer.IsConnected())
                         m_module.TcpipCommServer.SendMessage(TCPIPComm_VEGA_D.Command.end);
 
                     // X축을 미리 움직임

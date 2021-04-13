@@ -62,6 +62,7 @@ namespace Root_VEGA_D_IPU.Module
             resume,
         }
 
+        // start command
         public const string PARAM_NAME_OFFSETX = "OFFSETX";
         public const string PARAM_NAME_OFFSETY = "OFFSETY";
         public const string PARAM_NAME_SCANDIR = "DIR";
@@ -71,6 +72,7 @@ namespace Root_VEGA_D_IPU.Module
         public const string PARAM_NAME_LINE = "LINE";
         public const string PARAM_NAME_TOTALSCANLINECOUNT = "TOTALSCANLINECOUNT";
         public const string PARAM_NAME_CURRENTSCANLINE = "CURRENTSCANLINE";
+        public const string PARAM_NAME_STARTSCANLINE = "STARTSCANLINE";
 
         const string COMMAND_NAME = "CMD";
 

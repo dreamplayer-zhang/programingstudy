@@ -320,6 +320,12 @@ namespace Root_VEGA_D_IPU.Module
 
         #region Communication to VEGA-D
 
+        const string REGSUBKEYNAME_GRABLINESCANSTATE = "GrabLineScanState";
+        const string REGSUBKEYNAME_TOTALSCANLINE = "TotalScanLine";
+        const string REGSUBKEYNAME_CURRENTSCANLINE = "CurrentScanLine";
+        const string REGSUBKEYNAME_STARTSCANLINE = "StartScanLine";
+
+
         private void EventReceiveData(byte[] aBuf, int nSize, Socket socket)
         {
             if (nSize <= 0)
@@ -350,6 +356,7 @@ namespace Root_VEGA_D_IPU.Module
                             int nLine = int.Parse(mapParam[TCPIPComm_VEGA_D.PARAM_NAME_LINE]);                          // Line
                             int nScanLineNum = int.Parse(mapParam[TCPIPComm_VEGA_D.PARAM_NAME_TOTALSCANLINECOUNT]);     // Total scan line count
                             int nScanLine = int.Parse(mapParam[TCPIPComm_VEGA_D.PARAM_NAME_CURRENTSCANLINE]);           // Current scan line
+                            int nStartScanLine = int.Parse(mapParam[TCPIPComm_VEGA_D.PARAM_NAME_STARTSCANLINE]);        // Start scan line
 
                             // 이미지 데이터 복사 스레드 실행
                             string strPool = m_memoryPool.p_id;
@@ -357,6 +364,14 @@ namespace Root_VEGA_D_IPU.Module
                             string strMemory = m_memoryMain.p_id;
                             MemoryData mem = m_engineer.GetMemory(strPool, strGroup, strMemory);
                             m_CamMain.GrabLineScan(mem, ptOffset, nLine);
+
+
+                            // 작업 중인 이미지 그랩 데이터 저장
+                            Registry reg = new Registry(p_id + ".TCPIP");
+                            reg.Write(REGSUBKEYNAME_GRABLINESCANSTATE, cmd.ToString());
+                            reg.Write(REGSUBKEYNAME_TOTALSCANLINE, nScanLineNum);
+                            reg.Write(REGSUBKEYNAME_CURRENTSCANLINE, nScanLine);
+                            reg.Write(REGSUBKEYNAME_STARTSCANLINE, nStartScanLine);
                         }
                         break;
                     case TCPIPComm_VEGA_D.Command.end:
@@ -365,7 +380,16 @@ namespace Root_VEGA_D_IPU.Module
                             m_CamMain.StopGrab();
 
                             // 작업 중인 이미지 그랩 데이터 저장
-                            
+                            Registry reg = new Registry(p_id + ".TCPIP");
+                            int totalScanLine = reg.Read(REGSUBKEYNAME_TOTALSCANLINE, -1);
+                            int curScanLine = reg.Read(REGSUBKEYNAME_CURRENTSCANLINE, -1);
+                            string grabLineScanState = cmd.ToString();
+                            if (totalScanLine != -1 && curScanLine != -1)
+                            {
+                                if (totalScanLine == curScanLine + 1)
+                                    grabLineScanState = "";
+                            }
+                            reg.Write(REGSUBKEYNAME_GRABLINESCANSTATE, grabLineScanState);
 
                             EQ.p_bStop = true;
                         }
@@ -386,12 +410,24 @@ namespace Root_VEGA_D_IPU.Module
         private void EventConnect(Socket socket)
         {
             // 이전에 작업하던 이미지 그랩 데이터 확인
-            //if(이전 이미지 그랩 작업 데이터 != null)
-            //{
-            //    Dictionary<string, string> mapParam = new Dictionary<string, string>();
+            Registry reg = new Registry(p_id + ".TCPIP");
+            string strState = reg.Read(REGSUBKEYNAME_GRABLINESCANSTATE, "");
+            if(strState != "")
+            {
+                int totalScanLine = reg.Read(REGSUBKEYNAME_TOTALSCANLINE, -1);
+                int curScanLine = reg.Read(REGSUBKEYNAME_CURRENTSCANLINE, -1);
+                int startScanLine = reg.Read(REGSUBKEYNAME_STARTSCANLINE, -1);
+                if(totalScanLine != -1 && curScanLine != -1 && startScanLine != -1)
+                {
+                    Dictionary<string, string> mapParam = new Dictionary<string, string>();
 
-            //    m_tcpipCommClient.SendMessage(TCPIPComm_VEGA_D.Command.resume, mapParam);
-            //}
+                    mapParam[TCPIPComm_VEGA_D.PARAM_NAME_TOTALSCANLINECOUNT] = totalScanLine.ToString();
+                    mapParam[TCPIPComm_VEGA_D.PARAM_NAME_CURRENTSCANLINE] = curScanLine.ToString();
+                    mapParam[TCPIPComm_VEGA_D.PARAM_NAME_STARTSCANLINE] = startScanLine.ToString();
+
+                    m_tcpipCommClient.SendMessage(TCPIPComm_VEGA_D.Command.resume, mapParam);
+                }
+            }
         }
         #endregion
     }
