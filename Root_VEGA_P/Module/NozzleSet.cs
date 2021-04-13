@@ -13,7 +13,7 @@ namespace Root_VEGA_P.Module
         {
             for (int n = 0; n < m_aNozzle.Count; n++)
             {
-                toolBox.GetDIO(ref m_aNozzle[n].m_do, m_particleCounter, m_aNozzle[n].m_id);
+                toolBox.GetDIO(ref m_aNozzle[n].m_do, m_particleCounter, m_aNozzle[n].p_id);
             }
             return "OK";
         }
@@ -23,23 +23,16 @@ namespace Root_VEGA_P.Module
         public class Nozzle
         {
             public DIO_O m_do = null;
-            public string m_id = "";
-            public string p_sName { get; set; }
+            public string p_id { get; set; }
 
             public void Write(bool bOpen)
             {
                 m_do?.Write(bOpen);
             }
 
-            public void RunTreeName(Tree tree)
-            {
-                p_sName = tree.Set(p_sName, p_sName, m_id, "Nozzle Name"); 
-            }
-
             public Nozzle(string id)
             {
-                m_id = id;
-                p_sName = id;
+                p_id = id;
             }
         }
         List<Nozzle> m_aNozzle = new List<Nozzle>();
@@ -64,7 +57,7 @@ namespace Root_VEGA_P.Module
             {
                 for (int n = 0; n < p_nNozzle; n++)
                 {
-                    m_aOpen[n] = tree.Set(m_aOpen[n], m_aOpen[n], m_nozzleSet.m_aNozzle[n].p_sName, "Nozzle Open");
+                    m_aOpen[n] = tree.Set(m_aOpen[n], m_aOpen[n], m_nozzleSet.m_aNozzle[n].p_id, "Nozzle Open");
                 }
             }
 
@@ -119,8 +112,6 @@ namespace Root_VEGA_P.Module
         public void RunTreeName(Tree tree)
         {
             p_nNozzle = tree.Set(p_nNozzle, p_nNozzle, "Count", "Nozzle Count");
-            Tree treeName = tree.GetTree("Name"); 
-            foreach (Nozzle nozzle in m_aNozzle) nozzle.RunTreeName(treeName); 
         }
         #endregion
 

@@ -260,7 +260,7 @@ namespace Root_Rinse_Unloader.Module
         string InitWaitArrived()
         {
             p_eStep = eStep.Empty;
-            m_storage.StartMoveMagazine(false);
+            if (m_rinse.p_eMode == RinseU.eRunMode.Magazine) m_storage.StartMoveMagazine(false);
             m_rail.RunMoveWidth(m_rinse.p_widthStrip);
             m_rail.RunPusherDown(m_rinse.p_eMode == RinseU.eRunMode.Stack);
             RunMoveAlign(false);
@@ -275,12 +275,15 @@ namespace Root_Rinse_Unloader.Module
             while (EQ.IsStop() == false)
             {
                 Thread.Sleep(10); 
-                foreach (Line line in m_aLine)
+                if (p_eStep == eStep.Empty)
                 {
-                    if (line.p_eSensor != Line.eSensor.Empty)
+                    foreach (Line line in m_aLine)
                     {
-                        p_eStep = eStep.Exist;
-                        return "OK";
+                        if (line.p_eSensor != Line.eSensor.Empty)
+                        {
+                            p_eStep = eStep.Exist;
+                            return "OK";
+                        }
                     }
                 }
             }
@@ -432,18 +435,20 @@ namespace Root_Rinse_Unloader.Module
             RunStopperUp(true);
             p_bAlignerUp = (m_rinse.p_eMode == RinseU.eRunMode.Magazine); 
             RunRotate(true);
-            foreach (Line line in m_aLine) line.p_eSensor = Line.eSensor.Empty; 
+            foreach (Line line in m_aLine) line.p_eSensor = Line.eSensor.Empty;
+            StartRun(m_runWaitArrive); 
         }
         #endregion
 
         #region ModuleRun
+        ModuleRunBase m_runWaitArrive;
         protected override void InitModuleRuns()
         {
             AddModuleRunList(new Run_Rotate(this), false, "Roller Rotate");
             AddModuleRunList(new Run_StopperUp(this), false, "Roller StopperUp");
             AddModuleRunList(new Run_AlignerUp(this), false, "Roller AlignerUp");
             AddModuleRunList(new Run_Align(this), false, "Roller Align");
-            AddModuleRunList(new Run_WaitArrive(this), false, "Wait Strip Arrived");
+            m_runWaitArrive = AddModuleRunList(new Run_WaitArrive(this), false, "Wait Strip Arrived");
         }
 
         public class Run_Rotate : ModuleRunBase
