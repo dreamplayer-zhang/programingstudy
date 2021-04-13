@@ -171,13 +171,14 @@ namespace Root_VEGA_D.Module
                     if (m_module.TcpipCommServer.server.IsConnected())
                     {
                         Dictionary<string, string> mapParam = new Dictionary<string, string>();
-                        mapParam["OFFSETX"] = cpMemoryOffset.X.ToString();
-                        mapParam["OFFSETY"] = cpMemoryOffset.Y.ToString();
-                        mapParam["DIR"] = true.ToString();
-                        mapParam["FOV"] = grabData.m_nFovSize.ToString();
-                        mapParam["OVERLAP"] = grabData.m_nOverlap.ToString();
-                        mapParam["LINE"] = nWaferSizeY_px.ToString();
-                        mapParam["SCANLINECOUNT"] = m_grabMode.m_ScanLineNum.ToString();
+                        mapParam[TCPIPComm_VEGA_D.PARAM_NAME_OFFSETX] = cpMemoryOffset.X.ToString();
+                        mapParam[TCPIPComm_VEGA_D.PARAM_NAME_OFFSETY] = cpMemoryOffset.Y.ToString();
+                        mapParam[TCPIPComm_VEGA_D.PARAM_NAME_SCANDIR] = true.ToString();
+                        mapParam[TCPIPComm_VEGA_D.PARAM_NAME_FOV] = grabData.m_nFovSize.ToString();
+                        mapParam[TCPIPComm_VEGA_D.PARAM_NAME_OVERLAP] = grabData.m_nOverlap.ToString();
+                        mapParam[TCPIPComm_VEGA_D.PARAM_NAME_LINE] = nWaferSizeY_px.ToString();
+                        mapParam[TCPIPComm_VEGA_D.PARAM_NAME_TOTALSCANLINECOUNT] = m_grabMode.m_ScanLineNum.ToString();
+                        mapParam[TCPIPComm_VEGA_D.PARAM_NAME_CURRENTSCANLINE] = nScanLine.ToString();
 
                         m_module.TcpipCommServer.SendMessage(TCPIPComm_VEGA_D.Command.start, mapParam);
                     }

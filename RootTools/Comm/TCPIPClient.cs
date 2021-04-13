@@ -12,6 +12,7 @@ namespace RootTools.Comm
     public class TCPIPClient : NotifyProperty, ITool, IComm
     {
         public event TCPIPServer.OnReciveData EventReciveData;
+        public event TCPIPServer.OnConnect EventConnect;
 
         #region ITool
         public string p_id { get; set; }
@@ -127,6 +128,9 @@ namespace RootTools.Comm
                 Socket socket = (Socket)ar.AsyncState; 
                 if (socket.Connected == false) return;
                 socket.EndConnect(ar);
+
+                if (EventConnect != null) EventConnect(socket);
+
                 socket.BeginReceive(m_aBufRead, 0, m_aBufRead.Length, SocketFlags.None, new AsyncCallback(CallBack_Receive), socket);
                 p_sInfo = p_id + " is Connect !!"; 
             }
@@ -138,19 +142,46 @@ namespace RootTools.Comm
         byte[] m_aBufRead;
         void CallBack_Receive(IAsyncResult ar)
         {
+            Socket socket = (Socket)ar.AsyncState;
             try
-            {
-                if (ar == null) return;
-                Socket socket = (Socket)ar.AsyncState;
-                int nRead = socket.EndReceive(ar);
-                if (nRead > 0)
                 {
-                    m_commLog.Add(CommLog.eType.Receive, (nRead < 1024) ? Encoding.ASCII.GetString(m_aBufRead, 0, nRead) : "...");
-                    socket.BeginReceive(m_aBufRead, 0, m_aBufRead.Length, SocketFlags.None, new AsyncCallback(CallBack_Receive), socket);
-                    if (EventReciveData != null) EventReciveData(m_aBufRead, nRead, socket);
+                    if (ar == null || !socket.Connected)
+                    {
+                        // 연결에 문제 있음을 확인
+                        m_commLog.Add(CommLog.eType.Info, "Disconnect !!");
+
+                        if (EventReciveData != null) EventReciveData(m_aBufRead, 0, socket);
+                        socket.Close();
+
+                        return;
+                    }
+
+                    int nReadLength = socket.EndReceive(ar);
+                    if (nReadLength > 0)
+                    {
+                        m_commLog.Add(CommLog.eType.Receive, (nReadLength < 1024) ? Encoding.ASCII.GetString(m_aBufRead, 0, nReadLength) : "...");
+
+                        socket.BeginReceive(m_aBufRead, 0, m_aBufRead.Length, SocketFlags.None, new AsyncCallback(CallBack_Receive), socket);
+                        if (EventReciveData != null) EventReciveData(m_aBufRead, nReadLength, socket);
+                    }
+                    else m_commLog.Add(CommLog.eType.Info, "CallBack_Receive Close");
                 }
-            }
-            catch (Exception eX) { p_sInfo = p_id + eX.Message; }
+                catch (SocketException ex)
+                {
+                    // SocketException 발생
+                    m_commLog.Add(CommLog.eType.Info, "Receive SocketException : " + ex.Message);
+
+                    if (ex.SocketErrorCode == SocketError.ConnectionReset)
+                    {
+                        if (EventReciveData != null) EventReciveData(m_aBufRead, 0, socket);
+                        socket.Close();
+                    }
+                }
+                catch (Exception eX)
+                {
+                    // Exception 발생
+                    m_commLog.Add(CommLog.eType.Info, "Receive Exception : " + eX.Message);
+                }
         }
 
         Queue<byte[]> m_qSendByte = new Queue<byte[]>();

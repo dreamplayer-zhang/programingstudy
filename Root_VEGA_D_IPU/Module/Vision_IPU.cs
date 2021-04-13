@@ -206,7 +206,8 @@ namespace Root_VEGA_D_IPU.Module
             m_toolBox.GetComm(ref client, this, "TCPIP");
 
             m_tcpipCommClient = new TCPIPComm_VEGA_D(client);
-            m_tcpipCommClient.EventReciveData += EventReceiveData;
+            m_tcpipCommClient.EventReceiveData += EventReceiveData;
+            m_tcpipCommClient.EventConnect += EventConnect;
         }
 
         private void Vision_IPU_OnChangeState(eState eState)
@@ -318,15 +319,6 @@ namespace Root_VEGA_D_IPU.Module
         #endregion
 
         #region Communication to VEGA-D
-        const string OFFSETX_PARAM_NAME = "OFFSETX";
-        const string OFFSETY_PARAM_NAME = "OFFSETY";
-        const string SCANDIR_PARAM_NAME = "DIR";
-        const string FOV_PARAM_NAME = "FOV";
-        const string OVERLAP_PARAM_NAME = "OVERLAP";
-        const string RCPNAME_PARAM_NAME = "RCPNAME";
-        const string LINE_PARAM_NAME = "LINE";
-        const string SCANLINECOUNT_PARAM_NAME = "SCANLINECOUNT";
-
 
         private void EventReceiveData(byte[] aBuf, int nSize, Socket socket)
         {
@@ -347,16 +339,19 @@ namespace Root_VEGA_D_IPU.Module
                                 m_CamMain.ConnectAsSlave();
 
                             // 메세지에서 데이터 얻어오기
-                            CPoint ptOffset = new CPoint(int.Parse(mapParam[OFFSETX_PARAM_NAME]), int.Parse(mapParam[OFFSETY_PARAM_NAME]));                 // memory offset
-                            eGrabDirection dir = bool.Parse(mapParam[SCANDIR_PARAM_NAME]) == false ? eGrabDirection.Forward : eGrabDirection.BackWard;      // scan dir
-                            int fov = int.Parse(mapParam[FOV_PARAM_NAME]);                                                                                  // fov
-                            int overlap = int.Parse(mapParam[OVERLAP_PARAM_NAME]);                                                                          // overlap
-                            int nLine = int.Parse(mapParam[LINE_PARAM_NAME]);                                                                               // line
-                            int nScanLineNum = int.Parse(mapParam[SCANLINECOUNT_PARAM_NAME]);                                                               // scan line count
+                            int offsetX = int.Parse(mapParam[TCPIPComm_VEGA_D.PARAM_NAME_OFFSETX]);
+                            int offsetY = int.Parse(mapParam[TCPIPComm_VEGA_D.PARAM_NAME_OFFSETY]);
+                            bool bScanDir = bool.Parse(mapParam[TCPIPComm_VEGA_D.PARAM_NAME_SCANDIR]);
+
+                            CPoint ptOffset = new CPoint(offsetX, offsetY);                                             // Memory offset
+                            eGrabDirection dir = bScanDir == false ? eGrabDirection.Forward : eGrabDirection.BackWard;  // Scan dir
+                            int fov = int.Parse(mapParam[TCPIPComm_VEGA_D.PARAM_NAME_FOV]);                             // fov
+                            int overlap = int.Parse(mapParam[TCPIPComm_VEGA_D.PARAM_NAME_OVERLAP]);                     // Overlap
+                            int nLine = int.Parse(mapParam[TCPIPComm_VEGA_D.PARAM_NAME_LINE]);                          // Line
+                            int nScanLineNum = int.Parse(mapParam[TCPIPComm_VEGA_D.PARAM_NAME_TOTALSCANLINECOUNT]);     // Total scan line count
+                            int nScanLine = int.Parse(mapParam[TCPIPComm_VEGA_D.PARAM_NAME_CURRENTSCANLINE]);           // Current scan line
 
                             // 이미지 데이터 복사 스레드 실행
-                            int nScanLine = 0;
-
                             string strPool = m_memoryPool.p_id;
                             string strGroup = m_memoryGroup.p_id;
                             string strMemory = m_memoryMain.p_id;
@@ -369,11 +364,14 @@ namespace Root_VEGA_D_IPU.Module
                             m_CamMain.AbortGrabThread();
                             m_CamMain.StopGrab();
 
+                            // 작업 중인 이미지 그랩 데이터 저장
+                            
+
                             EQ.p_bStop = true;
                         }
                         break;
                     case TCPIPComm_VEGA_D.Command.rcpname:
-                        string rcpname = mapParam[RCPNAME_PARAM_NAME];
+                        string rcpname = mapParam[TCPIPComm_VEGA_D.PARAM_NAME_RCPNAME];
                         break;
                     case TCPIPComm_VEGA_D.Command.alive:
                         break;
@@ -383,6 +381,17 @@ namespace Root_VEGA_D_IPU.Module
                         break;
                 }
             }
+        }
+
+        private void EventConnect(Socket socket)
+        {
+            // 이전에 작업하던 이미지 그랩 데이터 확인
+            //if(이전 이미지 그랩 작업 데이터 != null)
+            //{
+            //    Dictionary<string, string> mapParam = new Dictionary<string, string>();
+
+            //    m_tcpipCommClient.SendMessage(TCPIPComm_VEGA_D.Command.resume, mapParam);
+            //}
         }
         #endregion
     }

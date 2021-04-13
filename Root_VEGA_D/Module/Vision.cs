@@ -385,7 +385,7 @@ namespace Root_VEGA_D.Module
             m_toolBox.GetComm(ref server, this, "TCPIP");
 
             m_tcpipCommServer = new TCPIPComm_VEGA_D(server);
-            m_tcpipCommServer.EventReciveData += EventReceiveData;
+            m_tcpipCommServer.EventReceiveData += EventReceiveData;
         }
 
         private void Vision_OnChangeState(eState eState)
@@ -402,7 +402,13 @@ namespace Root_VEGA_D.Module
         private void EventReceiveData(byte[] aBuf, int nSize, Socket socket)
         {
             if (nSize <= 0)
-                return;
+            {
+                if(!socket.Connected)
+                {
+                    if(p_eState == eState.Run)
+                        ButtonRun();
+                }
+            }
 
             int nStartIdx = 0;
             TCPIPComm_VEGA_D.Command cmd = TCPIPComm_VEGA_D.Command.none;
@@ -422,6 +428,12 @@ namespace Root_VEGA_D.Module
                     case TCPIPComm_VEGA_D.Command.alive:
                         break;
                     case TCPIPComm_VEGA_D.Command.ready:
+                        break;
+                    case TCPIPComm_VEGA_D.Command.resume:
+                        {
+                            // 이전에 이미지 그랩 작업을 이어서 할 수 있도록 처리
+
+                        }
                         break;
                     default:
                         break;
