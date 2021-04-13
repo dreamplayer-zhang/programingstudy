@@ -402,7 +402,7 @@ namespace Root_Rinse_Loader.Module
         {
             p_bEMG = m_diEMG.p_bIn;
             p_bAir = m_diAir.p_bIn;
-            p_bDoorOpen = m_diDoorLock.p_bIn || m_diLightCurtain.p_bIn;
+            p_bDoorOpen = !m_diDoorLock.p_bIn || !m_diLightCurtain.p_bIn;
             p_bBuzzerOff = m_diBuzzerOff.p_bIn;
             if (m_swBlick.ElapsedMilliseconds < 500) return;
             m_swBlick.Start();

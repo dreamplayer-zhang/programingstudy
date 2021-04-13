@@ -335,11 +335,23 @@ namespace Root_CAMELLIA.LibSR_Met
                 }
                 else
                 {
-                    m_SR.BackIntTime_NIR = m_DM.m_SettngData.nBGIntTime_NIR;
-                    m_SR.Average_NIR = m_DM.m_SettngData.nAverage_NIR;
+                    
+                        m_SR.BackIntTime_NIR = m_DM.m_SettngData.nBGIntTime_NIR;
+                        m_SR.Average_NIR = m_DM.m_SettngData.nAverage_NIR;
+                    
                 }
-                m_SR.IntTime_VIS = m_DM.m_SettngData.nInitCalIntTime_VIS;
-                m_SR.IntTime_NIR = m_DM.m_SettngData.nInitCalIntTime_NIR;
+                if(bInitialCal==true)
+                {
+                    m_SR.IntTime_VIS = m_DM.m_SettngData.nInitCalIntTime_VIS;
+                    m_SR.IntTime_NIR = m_DM.m_SettngData.nInitCalIntTime_NIR;
+                }
+                else
+                {
+                    //m_SR.IntTime_VIS = 40;
+                    //m_SR.IntTime_NIR =160;
+                    m_SR.IntTime_VIS = m_DM.m_SettngData.nMeasureIntTime_VIS;
+                    m_SR.IntTime_NIR = m_DM.m_SettngData.nMeasureIntTime_NIR;
+                }
                 m_SR.BackIntTime_VIS = m_DM.m_SettngData.nBGIntTime_VIS;
                 m_SR.Average_VIS = m_DM.m_SettngData.nAverage_VIS;
                 m_SR.bUpdateBeta = bInitialCal;
@@ -410,6 +422,7 @@ namespace Root_CAMELLIA.LibSR_Met
         {
             try
             {
+                Thread.Sleep(1000);
                 if (m_bSRInitialized == true)
                 {
                     if(!bCheckSampleCal)
@@ -780,6 +793,12 @@ namespace Root_CAMELLIA.LibSR_Met
         {
             try
             {
+                m_SR.BackIntTime_NIR = m_DM.m_SettngData.nBGIntTime_NIR;
+                m_SR.Average_NIR = m_DM.m_SettngData.nAverage_NIR;
+                m_SR.IntTime_VIS = m_DM.m_SettngData.nInitCalIntTime_VIS;
+                m_SR.IntTime_NIR = m_DM.m_SettngData.nInitCalIntTime_NIR;
+                m_SR.BackIntTime_VIS = m_DM.m_SettngData.nBGIntTime_VIS;
+                m_SR.Average_VIS = m_DM.m_SettngData.nAverage_VIS;
 
                 if (m_bSRInitialized == false)
                 {

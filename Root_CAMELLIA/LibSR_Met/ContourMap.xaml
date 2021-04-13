@@ -1,0 +1,53 @@
+﻿<UserControl x:Class="Root_CAMELLIA.LibSR_Met.ContourMap"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"  
+             xmlns:local="clr-namespace:Root_CAMELLIA.LibSR_Met"
+             xmlns:scott="clr-namespace:ScottPlot;assembly=ScottPlot"
+             xmlns:ChartDirector="clr-namespace:ChartDirector;assembly=netchartdir" UseLayoutRounding="True"
+             mc:Ignorable="d"
+             d:DesignHeight="450" d:DesignWidth="500">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="90"/>
+        </Grid.ColumnDefinitions>
+
+        <Grid Grid.Column="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="4*"></RowDefinition>
+                <RowDefinition Height="1*"></RowDefinition>
+            </Grid.RowDefinitions>
+            <Grid Grid.Row="0" Name="gridChart" SizeChanged="gridChart_SizeChanged">
+                <ChartDirector:WPFChartViewer x:Name="ContourMapViewer" ViewPortChanged="ContourMapViewer_ViewPortChanged" />
+            </Grid>
+            <Grid Grid.Row="1">
+                <WpfPlot Name="graphHisto"></WpfPlot>
+            </Grid>
+
+        </Grid>
+        <Grid Grid.Column="1" Background="GhostWhite">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="1*"/>
+                <RowDefinition Height="1*"/>
+                <RowDefinition Height="1*"/>
+                <RowDefinition Height="1*"/>
+                <RowDefinition Height="5*"/>
+            </Grid.RowDefinitions>
+            <Grid Grid.Row="0">
+                <RadioButton x:Name="radioR" Checked="radiobutton_Checked" GroupName="Data" Content="R" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="10"></RadioButton>
+            </Grid>
+            <Grid Grid.Row="1">
+                <RadioButton x:Name="radioT" Checked="radiobutton_Checked" GroupName="Data" Content="T" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="10"></RadioButton>
+            </Grid>
+            <Grid Grid.Row="2">
+                <Label Content="Wavelength" VerticalAlignment="Bottom" HorizontalAlignment="Left"></Label>
+            </Grid>
+            <Grid Grid.Row="3">
+                <ComboBox Name="comboWL" SelectionChanged="comboWL_SelectionChanged" DropDownOpened="comboWL_DropDownOpened" VerticalAlignment="Top" Margin="5">
+                </ComboBox>
+            </Grid>
+        </Grid>
+    </Grid>
+</UserControl>

@@ -207,6 +207,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Lib\MetLib\NanoView.dll</HintPath>
     </Reference>
+    <Reference Include="netchartdir, Version=6.4.0.0, Culture=neutral, PublicKeyToken=2db5fc05de12e204, processorArchitecture=MSIL">
+      <HintPath>..\packages\ChartDirector.Net.6.4.0\lib\net40\netchartdir.dll</HintPath>
+    </Reference>
     <Reference Include="NumericUpDownLib, Version=2.4.2.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Dirkster.NumericUpDownLib.2.4.2\lib\net40\NumericUpDownLib.dll</HintPath>
     </Reference>
@@ -332,6 +335,9 @@
     <Compile Include="Data\SaveMeasureData.cs" />
     <Compile Include="LibSR_Met\Calculation.cs" />
     <Compile Include="LibSR_Met\ConstValue.cs" />
+    <Compile Include="LibSR_Met\ContourMap.xaml.cs">
+      <DependentUpon>ContourMap.xaml</DependentUpon>
+    </Compile>
     <Compile Include="LibSR_Met\CountGraph.xaml.cs">
       <DependentUpon>CountGraph.xaml</DependentUpon>
     </Compile>
@@ -505,6 +511,10 @@
     <Page Include="Control\Temp.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="LibSR_Met\ContourMap.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="LibSR_Met\CountGraph.xaml">
       <SubType>Designer</SubType>
@@ -752,10 +762,4 @@ copy /Y "$(SolutionDir)Lib\MetLib\NETOmniDriver-NET40.dll" $(SolutionDir)$(Proje
 copy /Y "$(SolutionDir)Lib\MetLib\OmniDriver64.dll" $(SolutionDir)$(ProjectName)\$(OutDir)\OmniDriver64.dll"
 copy /Y "$(SolutionDir)Lib\MetLib\r4nd_class.dll" $(SolutionDir)$(ProjectName)\$(OutDir)\r4nd_class.dll"</PostBuildEvent>
   </PropertyGroup>
-  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
-    <PropertyGroup>
-      <ErrorText>이 프로젝트는 이 컴퓨터에 없는 NuGet 패키지를 참조합니다. 해당 패키지를 다운로드하려면 NuGet 패키지 복원을 사용하십시오. 자세한 내용은 http://go.microsoft.com/fwlink/?LinkID=322105를 참조하십시오. 누락된 파일은 {0}입니다.</ErrorText>
-    </PropertyGroup>
-    <Error Condition="!Exists('..\packages\OpenCvSharp-AnyCPU.2.4.10.20170306\build\OpenCvSharp-AnyCPU.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\OpenCvSharp-AnyCPU.2.4.10.20170306\build\OpenCvSharp-AnyCPU.props'))" />
-  </Target>
 </Project>

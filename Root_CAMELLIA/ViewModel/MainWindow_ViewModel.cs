@@ -112,6 +112,33 @@ namespace Root_CAMELLIA
             }
         }
 
+        ObservableCollection<Met.ContourMap> m_ContourMapCollection = new ObservableCollection<Met.ContourMap>();
+        public ObservableCollection<Met.ContourMap> p_ContourMapCollection
+        {
+            get
+            {
+                return m_ContourMapCollection;
+            }
+            set
+            {
+                SetProperty(ref m_ContourMapCollection, value);
+            }
+        }
+
+
+        Met.ContourMap m_ContourMapGraph = new Met.ContourMap();
+        public Met.ContourMap p_ContourMapGraph
+        {
+            get
+            {
+                return m_ContourMapGraph;
+            }
+            set
+            {
+                SetProperty(ref m_ContourMapGraph, value);
+            }
+        }
+
         RPoint m_StageCenterPulse = new RPoint();
         public RPoint p_StageCenterPulse
         {
@@ -145,6 +172,8 @@ namespace Root_CAMELLIA
             {
                 InitTimer();
             }
+
+            p_ContourMapCollection.Add(p_ContourMapGraph);
             //m_reg.Write(,);
         }
 
@@ -799,6 +828,9 @@ namespace Root_CAMELLIA
                     {
                         isRecipeLoad = true;
                     }
+
+                    if (!isRecipeLoad)
+                        RecipeViewModel.ClearData();
                     RecipeViewModel.UpdateListView(isRecipeLoad);
                     try
                     {
