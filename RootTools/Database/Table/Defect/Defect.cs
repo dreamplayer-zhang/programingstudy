@@ -32,6 +32,11 @@ namespace RootTools.Database
         protected int m_nImgsizeY;
 
         protected Rect m_rtDefectBox;
+
+        public string memPOOL;
+        public string memGROUP;
+        public string memMEMORY;
+
         public Rect p_rtDefectBox { get => m_rtDefectBox; set => m_rtDefectBox = value; }
 
         // 모든 Defect 정보들 

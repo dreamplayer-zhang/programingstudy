@@ -549,7 +549,7 @@ namespace Root_Vega
 
 		public void _endInsp()
 		{
-			m_Engineer.m_InspManager.InspectionDone(App.indexFilePath);
+			m_Engineer.m_InspManager.InspectionDone(App.indexFilePath, m_Engineer.m_recipe.VegaRecipeData.UseDefectMerge, m_Engineer.m_recipe.VegaRecipeData.MergeDistance);
 		}
 
 		public void _addRoi()

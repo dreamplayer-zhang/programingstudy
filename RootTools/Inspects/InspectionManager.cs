@@ -17,6 +17,7 @@ using RootTools.ToolBoxs;
 using System.Drawing.Imaging;
 using System.Windows;
 using System.IO.Compression;
+using RootTools.Database;
 
 namespace RootTools.Inspects
 {
@@ -111,26 +112,26 @@ namespace RootTools.Inspects
 		public bool m_bFeatureSearchFail = false;
 		public bool m_bAlignFail = false;
 		public int p_nPatternInspDoneNum
-        {
-            get { return m_nPatternInspDoneNum; }
-            set
-            {
+		{
+			get { return m_nPatternInspDoneNum; }
+			set
+			{
 				if (m_nPatternInspDoneNum == value) return;
 				m_nPatternInspDoneNum = value;
 				OnPropertyChanged("p_nPatternInspDoneNum");
-            }
-        }
+			}
+		}
 		int m_nSideInspDoneNum = 0;
 		public int p_nSideInspDoneNum
-        {
-            get { return m_nSideInspDoneNum; }
-            set
-            {
+		{
+			get { return m_nSideInspDoneNum; }
+			set
+			{
 				if (m_nSideInspDoneNum == value) return;
 				m_nSideInspDoneNum = value;
 				OnPropertyChanged("p_nSideInspDoneNum");
-            }
-        }
+			}
+		}
 
 		public int m_nTotalDefectCount = 0;
 		public float[] m_farrAfineMatrix = null;
@@ -153,20 +154,20 @@ namespace RootTools.Inspects
 			p_nPatternInspDoneNum = 0;
 			p_nSideInspDoneNum = 0;
 			m_nTotalDefectCount = 0;
-			
+
 			inspThread = new Thread(DoInspection);
 
-            //if (inspThread != null)
-            //{
-            //	if (inspThread.IsAlive)
-            //	{
-            //		inspThread.Abort();
-            //	}
-            //}
-            inspThread.Start();
+			//if (inspThread != null)
+			//{
+			//	if (inspThread.IsAlive)
+			//	{
+			//		inspThread.Abort();
+			//	}
+			//}
+			inspThread.Start();
 
-        }
-        public void DoInspection()
+		}
+		public void DoInspection()
 		{
 			if (!IsInitialized)
 				return;
@@ -229,8 +230,8 @@ namespace RootTools.Inspects
 							InspectionThread[i].bState == Inspection.InspectionState.None)
 							{
 								InspectionProperty ipQueue = p_qInspection.Dequeue();
-								if ( p_qInspection.Count == 0)
-                                {
+								if (p_qInspection.Count == 0)
+								{
 									Console.WriteLine("Queue Item Count : " + p_qInspection.Count);
 									sw.Stop();
 									Console.WriteLine(string.Format("Insepction End : {0}", sw.ElapsedMilliseconds / 1000.0));
@@ -348,7 +349,91 @@ namespace RootTools.Inspects
 			}
 		}
 
-		public void InspectionDone(string inspIndexFilePath)
+		public static List<Defect> MergeDefect(List<Defect> DefectList, int mergeDist, string sInspectionID)
+		{
+			//string sInspectionID = DatabaseManager.Instance.GetInspectionID();
+			List<Defect> MergeDefectList = new List<Defect>();
+			int nDefectIndex = 1;
+
+			for (int i = 0; i < DefectList.Count; i++)
+			{
+				if (DefectList[i].m_fSize == -123)
+					continue;
+
+				for (int j = 0; j < DefectList.Count; j++)
+				{
+					System.Windows.Rect defectRect1 = DefectList[i].p_rtDefectBox;
+					System.Windows.Rect defectRect2 = DefectList[j].p_rtDefectBox;
+
+					if (DefectList[j].m_fSize == -123 || (i == j))
+						continue;
+
+					else if (defectRect1.Contains(defectRect2))
+					{
+						DefectList[j].m_fSize = -123;
+						continue;
+					}
+					else if (defectRect2.Contains(defectRect1))
+					{
+						DefectList[i].SetDefectInfo(sInspectionID, DefectList[j].m_nDefectCode, DefectList[j].m_fSize, DefectList[j].m_fGV, DefectList[j].m_fWidth, DefectList[j].m_fHeight
+							, 0, 0, (float)DefectList[j].p_rtDefectBox.Left, (float)DefectList[j].p_rtDefectBox.Top, DefectList[j].m_nChipIndexX, DefectList[j].m_nChipIndexY);
+						DefectList[j].m_fSize = -123;
+						continue;
+					}
+					else if (defectRect1.IntersectsWith(defectRect2))
+					{
+						System.Windows.Rect intersect = System.Windows.Rect.Intersect(defectRect1, defectRect2);
+						if (intersect.Height == 0 || intersect.Width == 0)
+						{
+							DefectList[j].m_fSize = -123;
+							continue;
+						}
+					}
+
+					defectRect1.Inflate(new System.Windows.Size(mergeDist, mergeDist)); // Rect 가로/세로 mergeDist 만큼 확장
+					if (defectRect1.IntersectsWith(defectRect2) && (DefectList[i].m_nDefectCode == DefectList[j].m_nDefectCode))
+					{
+						System.Windows.Rect intersect = System.Windows.Rect.Intersect(defectRect1, defectRect2);
+						if (intersect.Height == 0 || intersect.Width == 0) // Rect가 선만 겹쳐도 Intersect True가 됨! (실제 Dist보다 +1 만큼 더 되어 merge되는 것을 방지)
+							continue;
+
+						// Merge Defect Info
+						int nDefectCode = DefectList[j].m_nDefectCode;
+
+						float fDefectGV = (float)((DefectList[i].m_fGV + DefectList[j].m_fGV) / 2.0);
+						float fDefectLeft = (defectRect2.Left < defectRect1.Left + mergeDist) ? (float)defectRect2.Left : (float)defectRect1.Left + mergeDist;
+						float fDefectTop = (defectRect2.Top < defectRect1.Top + mergeDist) ? (float)defectRect2.Top : (float)defectRect1.Top + mergeDist;
+						float fDefectRight = (defectRect2.Right > defectRect1.Right - mergeDist) ? (float)defectRect2.Right : (float)defectRect1.Right - mergeDist;
+						float fDefectBottom = (defectRect2.Bottom > defectRect1.Bottom - mergeDist) ? (float)defectRect2.Bottom : (float)defectRect1.Bottom - mergeDist;
+
+						float fDefectWidth = fDefectRight - fDefectLeft;
+						float fDefectHeight = fDefectBottom - fDefectTop;
+
+						float fDefectSz = (fDefectWidth > fDefectHeight) ? fDefectWidth : fDefectHeight;
+
+						float fDefectRelX = 0;
+						float fDefectRelY = 0;
+
+						DefectList[i].SetDefectInfo(sInspectionID, nDefectCode, fDefectSz, fDefectGV, fDefectWidth, fDefectHeight
+							, fDefectRelX, fDefectRelY, fDefectLeft, fDefectTop, DefectList[j].m_nChipIndexX, DefectList[j].m_nChipIndexY);
+
+						DefectList[j].m_fSize = -123; // Merge된 Defect이 중복 저장되지 않도록...
+					}
+				}
+			}
+
+			for (int i = 0; i < DefectList.Count; i++)
+			{
+				if (DefectList[i].m_fSize != -123)
+				{
+					MergeDefectList.Add(DefectList[i]);
+					MergeDefectList[nDefectIndex - 1].SetDefectIndex(nDefectIndex++);
+				}
+			}
+
+			return MergeDefectList;
+		}
+		public void InspectionDone(string inspIndexFilePath, bool isMerge, int mergeDistance)
 		{
 			//bool testFlag = false;
 			Stopwatch sw = new Stopwatch();
@@ -370,7 +455,81 @@ namespace RootTools.Inspects
 				//완료 표시
 
 				//완료. 검사결과 출력
-				DataSet tempSet = connector.GetDataSet("tempdata");
+				//Merge 준비
+				DataSet templist = connector.GetDataSet("tempdata");
+				DataSet tempSet = templist.Copy();
+				if (isMerge)
+				{
+					tempSet.Tables["tempdata"].Rows.Clear();
+					List<Defect> tempList = new List<Defect>();
+					foreach (DataRow item in templist.Tables[0].Rows)
+					{
+						//item[]
+						/*
+						 * CREATE TABLE tempdata(
+						 * idx INT NOT NULL AUTO_INCREMENT, 
+						 * ClassifyCode INT NULL, 
+						 * AreaSize DOUBLE NULL,  
+						 * Length INT NULL,  
+						 * Width INT NULL, 
+						 * Height INT NULL, 
+						 * FOV INT NULL, 
+						 * PosX DOUBLE NULL, 
+						 * PosY DOUBLE NULL, 
+						 * memPOOL longtext DEFAULT NULL, 
+						 * memGROUP longtext DEFAULT NULL, 
+						 * memMEMORY longtext DEFAULT NULL,
+						*/
+						//ClassifyCode, AreaSize, Length, Width, Height, FOV, PosX, PosY, memPOOL, memGROUP, memMEMORY
+
+						var ClassifyCode = Convert.ToInt32(item["ClassifyCode"].ToString());
+						var AreaSize = Convert.ToSingle(item["AreaSize"].ToString());
+						var Length = Convert.ToInt32(item["Length"].ToString());
+						var Width = Convert.ToInt32(item["Width"].ToString());
+						var Height = Convert.ToInt32(item["Height"].ToString());
+						var FOV = Convert.ToInt32(item["FOV"].ToString());
+						var PosX = Convert.ToDouble(item["PosX"].ToString());
+						var PosY = Convert.ToDouble(item["PosY"].ToString());
+						var memPOOL = item["memPOOL"].ToString();
+						var memGROUP = item["memGROUP"].ToString();
+						var memMEMORY = item["memMEMORY"].ToString();
+
+						var DefectRect = new CRect((int)(PosX - Width / 2.0), (int)(PosY - Height / 2.0), (int)(PosX + Width / 2.0), (int)(PosY + Height / 2.0));
+
+						//string strInspectionID, int nDefectCode, float fDefectSz, float fDefectGV, float fDefectW, float fDefectH, float fRelX, float fRelY, float fAbsX, float fAbsY, int chipIdxX, int chipIdxY
+						Defect tempDef = new Defect("", ClassifyCode, AreaSize, 0, DefectRect.Left, DefectRect.Top, Width, Height, 0, 0);
+
+						tempDef.memPOOL = memPOOL;
+						tempDef.memGROUP = memGROUP;
+						tempDef.memMEMORY = memMEMORY;
+
+						tempList.Add(tempDef);
+					}
+					tempList = MergeDefect(tempList, mergeDistance, "");
+					int idx = 0;
+					foreach (var item in tempList)
+					{
+						System.Data.DataRow dataRow = tempSet.Tables["tempdata"].NewRow();
+
+						dataRow["idx"] = idx;
+						dataRow["ClassifyCode"] = item.m_nDefectCode;
+						dataRow["AreaSize"] = item.m_fSize;
+						dataRow["Length"] = item.m_fWidth > item.m_fHeight ? item.m_fWidth : item.m_fHeight;
+						dataRow["Width"] = item.m_fWidth;
+						dataRow["Height"] = item.m_fHeight;
+						dataRow["FOV"] = "0";
+						dataRow["PosX"] = Convert.ToInt32(item.m_fAbsX);
+						dataRow["PosY"] = Convert.ToInt32(item.m_fAbsY);
+
+						dataRow["memPOOL"] = item.memPOOL;
+						dataRow["memGROUP"] = item.memGROUP;
+						dataRow["memMEMORY"] = item.memMEMORY;
+
+						idx++;
+						tempSet.Tables["tempdata"].ImportRow(dataRow);
+					}
+				}
+
 
 				inspDefaultDir = @"C:\vsdb";
 				if (!System.IO.Directory.Exists(inspDefaultDir))
@@ -409,73 +568,73 @@ namespace RootTools.Inspects
 				//encoder.Compression = System.Windows.Media.Imaging.TiffCompressOption.Zip;
 
 				//Data,@No(INTEGER),DCode(INTEGER),Size(INTEGER),Length(INTEGER),Width(INTEGER),Height(INTEGER),InspMode(INTEGER),FOV(INTEGER),PosX(INTEGER),PosY(INTEGER)
-				if(!Directory.Exists(System.IO.Path.Combine(inspDefaultDir, System.IO.Path.GetFileNameWithoutExtension(inspFileName))))
+				if (!Directory.Exists(System.IO.Path.Combine(inspDefaultDir, System.IO.Path.GetFileNameWithoutExtension(inspFileName))))
 				{
 					Directory.CreateDirectory(System.IO.Path.Combine(inspDefaultDir, System.IO.Path.GetFileNameWithoutExtension(inspFileName)));
 				}
 				//using (FileStream fs = new FileStream(System.IO.Path.Combine(inspDefaultDir, System.IO.Path.GetFileNameWithoutExtension(inspFileName) + ".vega_image"), FileMode.Create))
 				//{
-					//fs.Write(BitConverter.GetBytes(tempSet.Tables["tempdata"].Rows.Count), 0, sizeof(int));//defect 개수 저장
-					foreach (System.Data.DataRow item in tempSet.Tables["tempdata"].Rows)
+				//fs.Write(BitConverter.GetBytes(tempSet.Tables["tempdata"].Rows.Count), 0, sizeof(int));//defect 개수 저장
+				foreach (System.Data.DataRow item in tempSet.Tables["tempdata"].Rows)
+				{
+					System.Data.DataRow dataRow = VSDataDT.NewRow();
+
+					dataRow["No"] = item["idx"];
+					dataRow["DCode"] = item["ClassifyCode"];
+					dataRow["AreaSize"] = item["AreaSize"];
+					dataRow["Length"] = item["Length"];
+					dataRow["Width"] = item["Width"];
+					dataRow["Height"] = item["Height"];
+					dataRow["FOV"] = item["FOV"];
+					int posX = Convert.ToInt32(item["PosX"]);
+					int posY = Convert.ToInt32(item["PosY"]);
+					//	회전보정
+					System.Drawing.PointF ptfOriginPos = new System.Drawing.PointF(posX, posY);
+					System.Drawing.PointF ptfTransformedPos = new System.Drawing.PointF(posX, posY);
+					if (m_farrAfineMatrix != null)
 					{
-						System.Data.DataRow dataRow = VSDataDT.NewRow();
-
-						dataRow["No"] = item["idx"];
-						dataRow["DCode"] = item["ClassifyCode"];
-						dataRow["AreaSize"] = item["AreaSize"];
-						dataRow["Length"] = item["Length"];
-						dataRow["Width"] = item["Width"];
-						dataRow["Height"] = item["Height"];
-						dataRow["FOV"] = item["FOV"];
-						int posX = Convert.ToInt32(item["PosX"]);
-						int posY = Convert.ToInt32(item["PosY"]);
-						//	회전보정
-						System.Drawing.PointF ptfOriginPos = new System.Drawing.PointF(posX, posY);
-						System.Drawing.PointF ptfTransformedPos = new System.Drawing.PointF(posX, posY);
-						if (m_farrAfineMatrix != null)
-                        {
-							ptfTransformedPos = AffineTransform(ptfOriginPos, m_farrAfineMatrix);
-						}
-						//
-						if (refPosDictionary != null)
+						ptfTransformedPos = AffineTransform(ptfOriginPos, m_farrAfineMatrix);
+					}
+					//
+					if (refPosDictionary != null)
+					{
+						if (refPosDictionary.ContainsKey(Convert.ToInt32(item["ClassifyCode"])))
 						{
-							if (refPosDictionary.ContainsKey(Convert.ToInt32(item["ClassifyCode"])))
-							{
-								//보정 기본 좌표가 있는 경우 보정 기준 좌표를 적용한다
-								ptfTransformedPos.X -= refPosDictionary[Convert.ToInt32(item["ClassifyCode"])].X;
-								ptfTransformedPos.Y -= refPosDictionary[Convert.ToInt32(item["ClassifyCode"])].Y;
-							}
+							//보정 기본 좌표가 있는 경우 보정 기준 좌표를 적용한다
+							ptfTransformedPos.X -= refPosDictionary[Convert.ToInt32(item["ClassifyCode"])].X;
+							ptfTransformedPos.Y -= refPosDictionary[Convert.ToInt32(item["ClassifyCode"])].Y;
 						}
-						dataRow["PosX"] = posX;
-						dataRow["PosY"] = posY;
+					}
+					dataRow["PosX"] = posX;
+					dataRow["PosY"] = posY;
 
-						dataRow["TransformPosX"] = ptfTransformedPos.X;
-						dataRow["TransformPosY"] = ptfTransformedPos.Y;
+					dataRow["TransformPosX"] = ptfTransformedPos.X;
+					dataRow["TransformPosY"] = ptfTransformedPos.Y;
 
-						dataRow["TdiImageExist"] = 1;
-						dataRow["VrsImageExist"] = 0;
+					dataRow["TdiImageExist"] = 1;
+					dataRow["VrsImageExist"] = 0;
 
-						VSDataDT.Rows.Add(dataRow);
-
-
-						//TODO 
-						//  int,int,bytes 무한반복
+					VSDataDT.Rows.Add(dataRow);
 
 
-						double fPosX = Convert.ToDouble(item["PosX"]);
-						double fPosY = Convert.ToDouble(item["PosY"]);
-						CRect ImageSizeBlock = new CRect(
-								 (int)fPosX - ImageWidth / 2,
-								 (int)fPosY - ImageHeight / 2,
-								 (int)fPosX + ImageWidth / 2,
-								 (int)fPosY + ImageHeight / 2);
-						string pool = item["memPOOL"].ToString();
-						string group = item["memGROUP"].ToString();
-						string memory = item["memMEMORY"].ToString();
-						var tempMem = m_toolBox.m_memoryTool.GetMemory(pool, group, memory);
-						var img = new ImageData(tempMem);
+					//TODO 
+					//  int,int,bytes 무한반복
+
+
+					double fPosX = Convert.ToDouble(item["PosX"]);
+					double fPosY = Convert.ToDouble(item["PosY"]);
+					CRect ImageSizeBlock = new CRect(
+							 (int)fPosX - ImageWidth / 2,
+							 (int)fPosY - ImageHeight / 2,
+							 (int)fPosX + ImageWidth / 2,
+							 (int)fPosY + ImageHeight / 2);
+					string pool = item["memPOOL"].ToString();
+					string group = item["memGROUP"].ToString();
+					string memory = item["memMEMORY"].ToString();
+					var tempMem = m_toolBox.m_memoryTool.GetMemory(pool, group, memory);
+					var img = new ImageData(tempMem);
 					//var imageBytes = img.GetRectByteArray(ImageSizeBlock);
-					img.SaveRectImage(ImageSizeBlock, System.IO.Path.Combine(inspDefaultDir, System.IO.Path.GetFileNameWithoutExtension(inspFileName), System.IO.Path.GetFileNameWithoutExtension(inspFileName) +"_"+Convert.ToInt32(item["idx"]).ToString("D8") + ".bmp"));
+					img.SaveRectImage(ImageSizeBlock, System.IO.Path.Combine(inspDefaultDir, System.IO.Path.GetFileNameWithoutExtension(inspFileName), System.IO.Path.GetFileNameWithoutExtension(inspFileName) + "_" + Convert.ToInt32(item["idx"]).ToString("D8") + ".bmp"));
 
 					//fs.Write(BitConverter.GetBytes(Convert.ToInt32(item["idx"].ToString())), 0, sizeof(int));//4
 					//fs.Write(BitConverter.GetBytes(ImageWidth), 0, sizeof(int));//4
@@ -489,7 +648,7 @@ namespace RootTools.Inspects
 					if (tempSet.Tables["tempdata"].Rows.Count <= Directory.GetFiles(System.IO.Path.Combine(inspDefaultDir, System.IO.Path.GetFileNameWithoutExtension(inspFileName))).Count())
 						break;
 				}
-				Archive(System.IO.Path.Combine(inspDefaultDir, System.IO.Path.GetFileNameWithoutExtension(inspFileName)), System.IO.Path.Combine(inspDefaultDir, System.IO.Path.GetFileNameWithoutExtension(inspFileName) + ".zip"),"*.*");
+				Archive(System.IO.Path.Combine(inspDefaultDir, System.IO.Path.GetFileNameWithoutExtension(inspFileName)), System.IO.Path.Combine(inspDefaultDir, System.IO.Path.GetFileNameWithoutExtension(inspFileName) + ".zip"), "*.*");
 				Directory.Delete(System.IO.Path.Combine(inspDefaultDir, System.IO.Path.GetFileNameWithoutExtension(inspFileName)));
 
 				System.Data.DataRow searchDataRow = SearchDataDT.NewRow();
@@ -612,14 +771,14 @@ namespace RootTools.Inspects
 		}
 		public void ClearDefectList()
 		{
-			if(this.ClearDefect != null)
+			if (this.ClearDefect != null)
 			{
 				this.ClearDefect();
 			}
 		}
 		public static void RefreshDefectDraw()
 		{
-			if(RefreshDefect != null)
+			if (RefreshDefect != null)
 			{
 				RefreshDefect();
 			}
@@ -842,7 +1001,7 @@ namespace RootTools.Inspects
 							//blockcount++;
 						}
 						else if (IgnoreArea.IsInside(new CPoint(inspblock.Left, inspblock.Top)) &&
-							!IgnoreArea.IsInside(new CPoint(inspblock.Right, inspblock.Bottom)) && 
+							!IgnoreArea.IsInside(new CPoint(inspblock.Right, inspblock.Bottom)) &&
 							nInnerRange != 0)
 						{
 							CRect first = new CRect(inspblock);
@@ -874,7 +1033,7 @@ namespace RootTools.Inspects
 							//blockcount += 3;
 						}
 						else if (IgnoreArea.IsInside(new CPoint(inspblock.Right, inspblock.Bottom)) &&
-							!IgnoreArea.IsInside(new CPoint(inspblock.Left, inspblock.Top)) && 
+							!IgnoreArea.IsInside(new CPoint(inspblock.Left, inspblock.Top)) &&
 							nInnerRange != 0)
 						{
 							//오른쪽 아래만 포함되는 경우. 세조각으로 자른다
