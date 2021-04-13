@@ -112,6 +112,33 @@ namespace Root_CAMELLIA
             }
         }
 
+        ObservableCollection<Met.ContourMap> m_ContourMapCollection = new ObservableCollection<Met.ContourMap>();
+        public ObservableCollection<Met.ContourMap> p_ContourMapCollection
+        {
+            get
+            {
+                return m_ContourMapCollection;
+            }
+            set
+            {
+                SetProperty(ref m_ContourMapCollection, value);
+            }
+        }
+
+
+        Met.ContourMap m_ContourMapGraph = new Met.ContourMap();
+        public Met.ContourMap p_ContourMapGraph
+        {
+            get
+            {
+                return m_ContourMapGraph;
+            }
+            set
+            {
+                SetProperty(ref m_ContourMapGraph, value);
+            }
+        }
+
         RPoint m_StageCenterPulse = new RPoint();
         public RPoint p_StageCenterPulse
         {
@@ -137,14 +164,16 @@ namespace Root_CAMELLIA
             Run_Measure measure = (Run_Measure)p_Module_Camellia.CloneModuleRun("Measure");
             this.p_StageCenterPulse = measure.m_StageCenterPos_pulse;
 
-            if(p_Module_Camellia.p_CamVRS != null)
-                p_Module_Camellia.p_CamVRS.Connect();
+            //if(p_Module_Camellia.p_CamVRS != null)
+            //    p_Module_Camellia.p_CamVRS.Connect();
 
             InitNanoView();
             if (p_InitNanoview)
             {
                 InitTimer();
             }
+
+            p_ContourMapCollection.Add(p_ContourMapGraph);
             //m_reg.Write(,);
         }
 
@@ -321,6 +350,20 @@ namespace Root_CAMELLIA
             }
         }
         private ObservableCollection<UIElement> m_DrawPointElement = new ObservableCollection<UIElement>();
+
+        public ObservableCollection<UIElement> p_DrawCandidatePointElement
+        {
+            get
+            {
+                return m_DrawCandidatePointElement;
+            }
+            set
+            {
+                //m_DrawPointElement = value;
+                SetProperty(ref m_DrawCandidatePointElement, value);
+            }
+        }
+        private ObservableCollection<UIElement> m_DrawCandidatePointElement = new ObservableCollection<UIElement>();
 
         public double p_Progress
         {
@@ -754,6 +797,7 @@ namespace Root_CAMELLIA
 
                         }
                         RecipeViewModel.UpdateView(true);
+                        p_DrawCandidatePointElement = new ObservableCollection<UIElement>(RecipeViewModel.p_DrawCandidatePointElement);
                         p_DrawPointElement = new ObservableCollection<UIElement>(RecipeViewModel.p_DrawPointElement);
                         DrawMeasureRoute();
                         p_Progress = 0;
@@ -784,6 +828,9 @@ namespace Root_CAMELLIA
                     {
                         isRecipeLoad = true;
                     }
+
+                    if (!isRecipeLoad)
+                        RecipeViewModel.ClearData();
                     RecipeViewModel.UpdateListView(isRecipeLoad);
                     try
                     {
@@ -795,6 +842,10 @@ namespace Root_CAMELLIA
                     }
                     RecipeViewModel.UpdateView(isRecipeLoad, true);
 
+                    if (isRecipeLoad)
+                    {
+                        p_DrawCandidatePointElement = new ObservableCollection<UIElement>(RecipeViewModel.p_DrawCandidatePointElement);
+                    }
                     p_DrawPointElement = new ObservableCollection<UIElement>(RecipeViewModel.p_DrawPointElement);
                     DrawMeasureRoute();
 
@@ -923,6 +974,7 @@ namespace Root_CAMELLIA
                     m_MainWindow.Close();
                     App.m_engineer.ThreadStop();
                     DataManager.Instance.m_SaveMeasureData.ThreadStop();
+                    App.m_engineer.BuzzerOff();
                     Application.Current.Shutdown();
                 });
             }

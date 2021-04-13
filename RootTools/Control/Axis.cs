@@ -460,7 +460,6 @@ namespace RootTools.Control
                 default: return "WaitReady Error p_eState = " + p_eState.ToString();
             }
         }
-
         private void M_EQ_OnChanged(_EQ.eEQ eEQ, dynamic value)
         {
             if (eEQ != _EQ.eEQ.DoorOpen) return;

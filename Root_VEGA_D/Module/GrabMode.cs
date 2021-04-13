@@ -3,6 +3,7 @@ using RootTools.Camera;
 using RootTools.Lens.LinearTurret;
 using RootTools.Light;
 using RootTools.Memory;
+using RootTools.RADS;
 using RootTools.Trees;
 using System;
 using System.Collections.Generic;
@@ -36,7 +37,7 @@ namespace Root_VEGA_D.Module
         public CPoint m_cpMemoryOffset = new CPoint();  // Memory Offset
         public double m_dResX_um = 1;                   // Camera Resolution X
         public double m_dResY_um = 1;                   // Camera Resolution Y
-        public int m_nFocusPosZ = 0;                    // Focus Position Z
+        public double m_dFocusPosZ = 0;                 // Focus Position Z
         public int m_nWaferSize_mm = 1000;              // Wafer Size (mm)
         public int m_nMaxFrame = 100;                   // Camera max Frame 스펙
         public int m_nScanRate = 100;                   // Camera Frame Spec 사용률 ? 1~100 %
@@ -69,7 +70,7 @@ namespace Root_VEGA_D.Module
             m_GD.m_dShiftG = tree.Set(m_GD.m_dShiftG, m_GD.m_dShiftG, "XShiftG", "X Shift G Channel, Default = 0", bVisible);
             m_GD.m_dShiftB = tree.Set(m_GD.m_dShiftB, m_GD.m_dShiftB, "XShiftB", "X Shift B Channel, Default = 0", bVisible);
             
-            m_nFocusPosZ = tree.Set(m_nFocusPosZ, m_nFocusPosZ, "Focus Z Position", "Focus Z Position", bVisible);
+            m_dFocusPosZ = tree.Set(m_dFocusPosZ, m_dFocusPosZ, "Focus Z Position", "Focus Z Position", bVisible);
             m_nWaferSize_mm = tree.Set(m_nWaferSize_mm, m_nWaferSize_mm, "Wafer Size Y", "Wafer Size Y", bVisible);
             m_nMaxFrame = (tree.GetTree("Scan Velocity", false, bVisible)).Set(m_nMaxFrame, m_nMaxFrame, "Max Frame", "Camera Max Frame Spec", bVisible);
             m_nScanRate = (tree.GetTree("Scan Velocity", false, bVisible)).Set(m_nScanRate, m_nScanRate, "Scan Rate", "카메라 Frame 사용률 1~ 100 %", bVisible);
@@ -188,10 +189,31 @@ namespace Root_VEGA_D.Module
         #endregion
 
         #region Axis
-        public int m_dTrigger = 10;
+        public double m_dTrigger = 10;
         public int m_intervalAcc = 100000;        // 가속 구간 point,  단위 0.1um
         public int m_ScanLineNum = 1;
         public int m_ScanStartLine = 0;
+        #endregion
+
+        #region RADS
+        public RADSControl m_RADSControl;
+        bool m_bUseRADS = false;
+        public bool pUseRADS
+        {
+            get
+            {
+                return m_bUseRADS;
+            }
+            set
+            {
+                m_bUseRADS = value;
+            }
+        }
+        void RunTreeRADS(Tree tree, bool bVisible, bool bReadOnly)
+        {
+            m_bUseRADS = tree.Set(pUseRADS, pUseRADS, "Use", "Using RADS", bVisible, false);
+        }
+
         #endregion
 
         public eScanPos m_eScanPos = eScanPos.Bottom;
@@ -208,19 +230,20 @@ namespace Root_VEGA_D.Module
 
         public string p_sName { get; set; }
 
-        public GrabMode(string id, CameraSet cameraSet, LightSet lightSet, MemoryPool memoryPool, LensLinearTurret lensTurret = null )
+        public GrabMode(string id, CameraSet cameraSet, LightSet lightSet, MemoryPool memoryPool, LensLinearTurret lensTurret = null, RADSControl radsControl = null)
         {
             p_id = id;
             p_sName = id;
             m_cameraSet = cameraSet;
             m_lightSet = lightSet;
             m_memoryPool = memoryPool;
+            m_RADSControl = radsControl;
             m_lens = lensTurret;
         }
 
         public static GrabMode Copy(GrabMode src)
         {
-            GrabMode dst = new GrabMode(src.p_id, src.m_cameraSet, src.m_lightSet, src.m_memoryPool);
+            GrabMode dst = new GrabMode(src.p_id, src.m_cameraSet, src.m_lightSet, src.m_memoryPool,null, src.m_RADSControl);
             dst.Grabed = src.Grabed;
             dst.m_bUseBiDirectionScan = src.m_bUseBiDirectionScan;
             dst.m_camera = src.m_camera;
@@ -243,7 +266,7 @@ namespace Root_VEGA_D.Module
             dst.m_dCamTriggerRatio = src.m_dCamTriggerRatio;
             dst.m_dResX_um = src.m_dResX_um;
             dst.m_dResY_um = src.m_dResY_um;
-            dst.m_nFocusPosZ = src.m_nFocusPosZ;
+            dst.m_dFocusPosZ = src.m_dFocusPosZ;
             dst.m_nWaferSize_mm = src.m_nWaferSize_mm;
             dst.m_nMaxFrame = src.m_nMaxFrame;
             dst.m_nScanRate = src.m_nScanRate;
@@ -265,6 +288,7 @@ namespace Root_VEGA_D.Module
             RunTreeLight(tree.GetTree("LightPower", false), bVisible, bReadOnly);
             RunTreeMemory(tree.GetTree("Memory", false), bVisible, bReadOnly);
             RunTreeScanPos(tree.GetTree("ScanPos", false), bVisible, bReadOnly);
+            RunTreeRADS(tree.GetTree("RADS", false), bVisible, bReadOnly);
         }
 
         public void RunTreeLADS(Tree tree)

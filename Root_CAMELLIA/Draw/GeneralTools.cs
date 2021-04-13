@@ -16,6 +16,7 @@ namespace Root_CAMELLIA
         public static SolidColorBrush SelectPointBrush { get; } = new SolidColorBrush(Color.FromArgb(128, 0, 0, 255));
         public static SolidColorBrush StageHoleBrush { get; } = new SolidColorBrush(Color.FromArgb(64, 128, 128, 128));
         public static SolidColorBrush SelectedOverBrush { get; } = new SolidColorBrush(Color.FromArgb(255, 255, 255, 128));
+        public static SolidColorBrush SelectBrush { get; } = new SolidColorBrush(Color.FromArgb(255, 0, 255, 0));
 
         public static RadialGradientBrush Gb { get; } = new RadialGradientBrush(
            new GradientStopCollection() { new GradientStop(new SolidColorBrush(Color.FromArgb(255, 130, 130, 130)).Color, 0.3),

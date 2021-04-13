@@ -185,6 +185,13 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Module\VEGA_P.cs" />
+    <Compile Include="UI\1. Setup\Panel_RecipeManger.xaml.cs">
+      <DependentUpon>Panel_RecipeManger.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\1. Setup\Mode_Setup.xaml.cs">
+      <DependentUpon>Mode_Setup.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI\SelectMode.xaml.cs">
       <DependentUpon>SelectMode.xaml</DependentUpon>
     </Compile>
@@ -238,6 +245,14 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="UI\1. Setup\Panel_RecipeManger.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\1. Setup\Mode_Setup.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="UI\SelectMode.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -302,6 +317,11 @@
     <Resource Include="Icon\Resource\play_127px.png" />
     <Resource Include="Icon\Resource\save_127px.png" />
     <Resource Include="Icon\Resource\system_task_127px.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="UI\2. Review\" />
+    <Folder Include="UI\3. Operation\" />
+    <Folder Include="ViewModel\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

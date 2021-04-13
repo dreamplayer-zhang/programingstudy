@@ -69,5 +69,10 @@ namespace Root_VEGA_P
 			}
 		}
 		#endregion
+
+		private void CloseButton_Click(object sender, RoutedEventArgs e)
+		{
+			this.Close();
+		}
 	}
 }

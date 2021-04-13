@@ -2,7 +2,9 @@
 using RootTools.Trees;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO.Ports;
+using System.Threading;
 using System.Windows.Controls;
 
 namespace RootTools.Comm
@@ -160,7 +162,10 @@ namespace RootTools.Comm
         bool m_bLogReceive = false; 
         private void M_client_ReceiveDataChanged(object sender)
         {
-           if (m_bLogReceive) m_commLog.Add(CommLog.eType.Receive, BitConverter.ToString(m_client.receiveData)); 
+            if (m_bLogReceive)
+            {
+                m_commLog.Add(CommLog.eType.Receive, BitConverter.ToString(m_client.receiveData));
+            }
           }
 
         void RunTreeLog(Tree tree)
@@ -337,6 +342,113 @@ namespace RootTools.Comm
         }
         #endregion
 
+        #region ViewData for UI Display
+        byte _nViewUnit = 1;
+        public byte p_nViewUnit
+        {
+            get { return _nViewUnit; }
+            set
+            {
+                _nViewUnit = value;
+                OnPropertyChanged();
+            }
+        }
+
+        string _sViewInfo = "OK";
+        public string p_sViewInfo
+        {
+            get { return _sViewInfo; }
+            set
+            {
+                if (_sViewInfo == value) return;
+                _sViewInfo = value;
+                OnPropertyChanged(); 
+            }
+        }
+
+        public enum eType
+        {
+            Coil,
+            DiscreateInput,
+            HoldingRegister,
+            InputRegister
+        }
+        public class ViewData : NotifyProperty
+        {
+            public eType p_eType { get; set; }
+            public int p_nAddress { get; set; }
+
+            int _nData = 0;
+            public int p_nData
+            {
+                get { return _nData; }
+                set
+                {
+                    _nData = value;
+                    OnPropertyChanged();
+                }
+            }
+
+            bool m_bOn = false;
+            int m_nValue = 0;
+            public string ReadData(byte nUnit)
+            {
+                string sInfo = "";
+                try
+                {
+                    switch (p_eType)
+                    {
+                        case eType.Coil:
+                            sInfo = m_modbus.ReadCoils(nUnit, p_nAddress, ref m_bOn);
+                            p_nData = m_bOn ? 1 : 0;
+                            break;
+                        case eType.DiscreateInput:
+                            sInfo = m_modbus.ReadDiscreateInputs(nUnit, p_nAddress, ref m_bOn);
+                            p_nData = m_bOn ? 1 : 0;
+                            break;
+                        case eType.HoldingRegister:
+                            sInfo = m_modbus.ReadHoldingRegister(nUnit, p_nAddress, ref m_nValue);
+                            p_nData = m_nValue;
+                            break;
+                        case eType.InputRegister:
+                            sInfo = m_modbus.ReadInputRegister(nUnit, p_nAddress, ref m_nValue);
+                            p_nData = m_nValue;
+                            break;
+                    }
+                }
+                catch (Exception e) { sInfo = "Exception : " + e.Message; }
+                return sInfo;
+            }
+
+            Modbus m_modbus; 
+            public ViewData(Modbus modbus, eType eType, int nAddress)
+            {
+                m_modbus = modbus; 
+                p_eType = eType; 
+                p_nAddress = nAddress;
+            }
+        }
+        public ObservableCollection<ViewData> m_aViewData = new ObservableCollection<ViewData>();
+
+        public int p_nViewStart { get; set; }
+        public int p_nViewEnd { get; set; }
+        public void AddViewData(eType eType)
+        {
+            for (int n = p_nViewStart; n <= p_nViewEnd; n++) m_aViewData.Add(new ViewData(this, eType, n)); 
+        }
+
+        public string ReadViewData(byte nUnit)
+        {
+            if (p_bConnect == false) return "Not Connected"; 
+            foreach (ViewData data in m_aViewData)
+            {
+                p_sViewInfo = data.ReadData(nUnit);
+                if (p_sViewInfo != "OK") return p_sViewInfo; 
+            }
+            return "OK";
+        }
+        #endregion
+
         #region Tree
         private void M_treeRoot_UpdateTree()
         {
@@ -373,7 +485,7 @@ namespace RootTools.Comm
             InitCommType(id); 
             m_treeRoot = new TreeRoot(id, log);
             m_treeRoot.UpdateTree += M_treeRoot_UpdateTree;
-            InitClient(); 
+            InitClient();
             RunTree(Tree.eMode.RegRead);
             p_sInfo = Connect(); 
         }

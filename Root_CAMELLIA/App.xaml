@@ -5,7 +5,125 @@
              StartupUri="MainWindow.xaml">
     
     <Application.Resources>
-   
+
+
+        <LinearGradientBrush x:Key="SelectedBrusch">
+            <GradientStop Offset="0.2" Color="GainsBoro"/>
+            <GradientStop Offset="0.8" Color="White"/>
+        </LinearGradientBrush>
+
+        <!-- refine: use this color -->
+        <LinearGradientBrush x:Key="UnSelectedBrusch">
+            <GradientStop Offset="0.2" Color="White"/>
+            <GradientStop Offset="0.8" Color="White"/>
+        </LinearGradientBrush>
+
+        <Style x:Key="selectedItemUseBrusch" TargetType="ListBoxItem">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ListBoxItem}">
+                        <Border Name="ListboxItemBorder">
+                            <ContentPresenter/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter TargetName="ListboxItemBorder" Property="Background" Value="{StaticResource SelectedBrusch}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Just small experiment. SlideControl style copied from book "WPF Control Development Unleashed" -->
+        <!-- Adaptions: color ThumbBrush1 less flashy, corners Border more straight -->
+        <LinearGradientBrush x:Key="SlideBrush" StartPoint="0,0" EndPoint="1,0">
+            <GradientStop Offset="0" Color="#bcbcbc"/>
+            <GradientStop Offset="0.5" Color="#eeeeee"/>
+        </LinearGradientBrush>
+
+        <ControlTemplate x:Key="RBTemplate" TargetType="RepeatButton">
+            <Rectangle Fill="Transparent"/>
+        </ControlTemplate>
+
+        <ControlTemplate x:Key="ThumbTemplate" TargetType="Thumb">
+            <Border
+          Background="{TemplateBinding BorderBrush}"
+          CornerRadius="2"
+          BorderThickness="0"
+          Padding="1">
+                <Border Background="{TemplateBinding Background}" CornerRadius="2" BorderThickness="0"/>
+            </Border>
+        </ControlTemplate>
+
+        <ControlTemplate x:Key="VerticalScrollBarTemplate" TargetType="ScrollBar">
+            <Grid>
+                <Border
+              CornerRadius="2"
+              Background="{StaticResource SelectedBrusch}"
+              BorderBrush="#999999"
+              BorderThickness="1"
+              Padding="1">
+                    <Track x:Name="PART_Track" IsDirectionReversed="True">
+                        <Track.DecreaseRepeatButton>
+                            <RepeatButton Command="ScrollBar.PageUpCommand" Template="{StaticResource RBTemplate}"/>
+                        </Track.DecreaseRepeatButton>
+                        <Track.Thumb>
+                            <Thumb
+                          Template="{StaticResource ThumbTemplate}"
+                          Background="{TemplateBinding Background}"
+                          BorderThickness="1"
+                          BorderBrush="{TemplateBinding BorderBrush}"/>
+                        </Track.Thumb>
+                        <Track.IncreaseRepeatButton>
+                            <RepeatButton Command="ScrollBar.PageDownCommand" Template="{StaticResource RBTemplate}"/>
+                        </Track.IncreaseRepeatButton>
+                    </Track>
+                </Border>
+            </Grid>
+        </ControlTemplate>
+
+        <!-- to do: can't we set a trigger Orientaion=vertical, IsDirection is false?? -->
+        <ControlTemplate x:Key="HorizontalScrollBarTemplate" TargetType="ScrollBar">
+            <Grid>
+                <Border
+              CornerRadius="2"
+              Background="{StaticResource SelectedBrusch}"
+              BorderBrush="#999999"
+              BorderThickness="1"
+              Padding="1">
+                    <Track x:Name="PART_Track" IsDirectionReversed="False">
+                        <Track.DecreaseRepeatButton>
+                            <RepeatButton Command="ScrollBar.PageUpCommand" Template="{StaticResource RBTemplate}"/>
+                        </Track.DecreaseRepeatButton>
+                        <Track.Thumb>
+                            <Thumb
+                          Template="{StaticResource ThumbTemplate}"
+                          Background="{TemplateBinding Background}"
+                          BorderThickness="1"
+                          BorderBrush="{TemplateBinding BorderBrush}"/>
+                        </Track.Thumb>
+                        <Track.IncreaseRepeatButton>
+                            <RepeatButton Command="ScrollBar.PageDownCommand" Template="{StaticResource RBTemplate}"/>
+                        </Track.IncreaseRepeatButton>
+                    </Track>
+                </Border>
+            </Grid>
+        </ControlTemplate>
+
+        <Style x:Key="{x:Type ScrollBar}" TargetType="ScrollBar">
+            <Setter Property="BorderBrush" Value="Silver"/>
+            <Style.Triggers>
+                <Trigger Property="Orientation" Value="Horizontal">
+                    <Setter Property="Template" Value="{StaticResource HorizontalScrollBarTemplate}"/>
+                </Trigger>
+                <Trigger Property="Orientation" Value="Vertical">
+                    <Setter Property="Template" Value="{StaticResource VerticalScrollBarTemplate}"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+
 
         <Style TargetType="TextBlock">
             <Setter Property="FontFamily" Value="Arial"/>

@@ -254,9 +254,7 @@ namespace Root_CAMELLIA.Module
             if(m_loadExistWafer.p_bIn)
                 m_alid_WaferExist.Run(true, "Vision Load Position Wafer Exist Error");
             else if(m_homeExistWafer.p_bIn)
-            {
                 m_alid_WaferExist.Run(true, "Vision Home Position Wafer Exist Error");
-            }
         }
 
 
@@ -444,33 +442,53 @@ namespace Root_CAMELLIA.Module
                 return "OK";
             }
 
-            if (LifterMoveVacuumCheck())
+            if (m_loadExistWafer.p_bIn)
             {
                 if (!m_vacuum.p_bIn)
                 {
-                    if (p_axisLifter.StartMove(eAxisPos.Ready) != "OK")
-                    {
-                        return p_sInfo;
-                    }
-                    if (p_axisLifter.WaitReady() != "OK")
-                        return p_sInfo;
+                    VaccumOnOff(true);
                 }
-                else
+
+                if (p_axisLifter.StartMove(eAxisPos.Ready) != "OK")
                 {
-                    p_sInfo = p_id + " Vacuum is not turn off";
                     return p_sInfo;
                 }
+                if (p_axisLifter.WaitReady() != "OK")
+                    return p_sInfo;
             }
             else
             {
-                p_sInfo = p_id + " Vacuum is not turn off";
+                p_sInfo = p_id + " Wafer Not Exist Error";
                 return p_sInfo;
             }
 
-            if (!m_vacuum.p_bIn)
-            {
-                VaccumOnOff(true);
-            }
+            //if (LifterMoveVacuumCheck())
+            //{
+            //    if (!m_vacuum.p_bIn)
+            //    {
+            //        if (p_axisLifter.StartMove(eAxisPos.Ready) != "OK")
+            //        {
+            //            return p_sInfo;
+            //        }
+            //        if (p_axisLifter.WaitReady() != "OK")
+            //            return p_sInfo;
+            //    }
+            //    else
+            //    {
+            //        p_sInfo = p_id + " Vacuum is not turn off";
+            //        return p_sInfo;
+            //    }
+            //}
+            //else
+            //{
+            //    p_sInfo = p_id + " Vacuum is not turn off";
+            //    return p_sInfo;
+            //}
+
+            //if (!m_vacuum.p_bIn)
+            //{
+            //    VaccumOnOff(true);
+            //}
 
             return "OK";
         }

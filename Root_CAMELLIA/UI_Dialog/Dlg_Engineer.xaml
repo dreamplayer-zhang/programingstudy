@@ -41,6 +41,7 @@
         <local:AxisZToMotionUIConverter x:Key="AxisZToMotionUI"/>
         <local:AxisLifterToMotionUIConverter x:Key="AxisLifterToMotionUI"/>
         <local:ModuleStateToLoadingOpacityConverter x:Key="ModuleStateConverter"/>
+        <local:ModuleStateToLoadingEnableConverter x:Key="ModuleStateToEnableConverter"/>
         <viewConverter:ConnectStringToBoolConverter x:Key="ConnectStringToBoolConverters" />
     </Window.Resources>
     <Grid>
@@ -246,11 +247,11 @@
                                                         <Button Content="Wafer Centering"
                                                     Margin="5"
                                                     Grid.Row="0"
-                                                    Command="{Binding CmdCentering}" />
+                                                    Command="{Binding CmdCentering}" IsEnabled="{Binding ModuleCamellia.p_eState, Converter={StaticResource ModuleStateToEnableConverter} }" />
                                                         <Button
                                                     Margin="5"
                                                     Grid.Column="1" Grid.Row="0"
-                                                    Command="{Binding CmdInitCal}">
+                                                    Command="{Binding CmdInitCal}" IsEnabled="{Binding ModuleCamellia.p_eState, Converter={StaticResource ModuleStateToEnableConverter} }">
                                                             <TextBlock TextAlignment="Center">
                                                     Init Calibration
                                                             </TextBlock>
@@ -258,7 +259,7 @@
                                                         <Button 
                                                     Margin="5"
                                                     Grid.Row="1"
-                                                    Command="{Binding CmdMeasureBack}">
+                                                    Command="{Binding CmdMeasureBack}" IsEnabled="{Binding ModuleCamellia.p_eState, Converter={StaticResource ModuleStateToEnableConverter} }">
                                                             <TextBlock TextWrapping="Wrap" TextAlignment="Center">
                                                     Background Calibration
                                                             </TextBlock>
@@ -266,8 +267,13 @@
                                                         <Button Content="Measure Sample"
                                                     Margin="5"
                                                     Grid.Column="1" Grid.Row="1"
-                                                    Command="{Binding CmdMeasureSample}" />
-                                                        <Button Grid.Column="2" Margin="5" Command="{Binding CmdTest}">Test Button</Button>
+                                                    Command="{Binding CmdMeasureSample}" IsEnabled="{Binding ModuleCamellia.p_eState, Converter={StaticResource ModuleStateToEnableConverter} }"/>
+                                                        <Button Grid.Column="2" Grid.Row="0" Margin="5" Command="{Binding CmdInit}" Content="Initialize" IsEnabled="{Binding ModuleCamellia.p_eState, Converter={StaticResource ModuleStateToEnableConverter} }"/>
+                                                        <Button Content="Measure Sample"
+                                                    Margin="5"
+                                                    Grid.Column="1" Grid.Row="1"
+                                                    Command="{Binding CmdMeasureSample}" IsEnabled="{Binding ModuleCamellia.p_eState, Converter={StaticResource ModuleStateToEnableConverter} }" />
+                                                        <Button Grid.Column="2" Grid.Row="1" Margin="5" Command="{Binding }" IsEnabled="{Binding ModuleCamellia.p_eState, Converter={StaticResource ModuleStateToEnableConverter} }">Test Button</Button>
                                                     </Grid>
                                                     <Grid Grid.Row="3">
                                                         <Viewbox>
@@ -347,7 +353,7 @@
                                         </Grid>
                                     </TabItem>
                                     <TabItem Header="PM Setting">
-                                        <control:PMCheckReview DataContext="{Binding p_PMCheckReview_ViewModel}" />
+                                        <local:PMCheckReview DataContext="{Binding p_PMCheckReview_ViewModel}" />
                                     </TabItem>
                                 </TabControl>
                             </GroupBox>

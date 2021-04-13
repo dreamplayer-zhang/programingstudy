@@ -1,19 +1,16 @@
 ﻿using RootTools.Comm;
-using RootTools.Module;
 using RootTools.Trees;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
+using System.Windows.Controls;
 
 namespace RootTools.RFIDs
 {
-    public class RFID_Brooks
+    public class RFID_Brooks : IRFID
     {
         #region RS232
-        RS232 m_rs232;
+        public RS232 m_rs232;
         void InitRS232()
         {
             m_rs232 = new RS232(p_id, m_log);
@@ -126,7 +123,7 @@ namespace RootTools.RFIDs
         int m_nReadID = 0;
         int m_secRS232 = 2;
         int m_msRS232 = 2000;
-        void RunTree(Tree tree)
+        public void RunTree(Tree tree)
         {
             m_nReadID = tree.Set(m_nReadID, m_nReadID, "Reader ID", "RFID Reader ID (0 ~ 15)");
             m_secRS232 = tree.Set(m_secRS232, m_secRS232, "RS232 Timeout", "RS232 Receive Timeout (sec)");
@@ -135,13 +132,30 @@ namespace RootTools.RFIDs
         }
         #endregion
 
+        #region UI
+        public UserControl p_ui
+        {
+            get
+            {
+                RFID_Brooks_UI ui = new RFID_Brooks_UI();
+                ui.Init(this);
+                return ui;
+            }
+        }
+        #endregion
+
         public string p_id { get; set; }
         Log m_log; 
-        public RFID_Brooks(string sModule)
+        public RFID_Brooks(string id, Log log)
         {
-            p_id = sModule + ".RFID";
-            m_log = LogView.GetLog(sModule); 
-            InitRS232(); 
+            p_id = id;
+            m_log = log;
+            InitRS232();
+        }
+
+        public void ThreadStop()
+        {
+            m_rs232.ThreadStop(); 
         }
     }
 }

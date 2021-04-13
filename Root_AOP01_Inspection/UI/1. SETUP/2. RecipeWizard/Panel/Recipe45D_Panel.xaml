@@ -91,11 +91,13 @@
                                         <TextBlock FontSize="12" Text="Enable Pellicle Haze Insp." Style="{StaticResource BasicTb}" Grid.Row="0"/>
                                         <TextBlock FontSize="12" Text="Enable Pellicle Frontside Insp" Style="{StaticResource BasicTb}" Grid.Row="1"/>
                                         <ToggleButton Content="True" Grid.Row="0" Grid.Column="1" 
-                                              VerticalAlignment="Center"
-                                              HorizontalAlignment="Center" Width="85"/>
+                                                      VerticalAlignment="Center"
+                                                      HorizontalAlignment="Center" Width="85"
+                                                      IsChecked="{Binding p_Setup.p_RecipeWizard.p_bUsePellicleHaze}"/>
                                         <ToggleButton Content="True" Grid.Row="1" Grid.Column="1" 
-                                              VerticalAlignment="Center"
-                                              HorizontalAlignment="Center" Width="85"/>
+                                                      VerticalAlignment="Center"
+                                                      HorizontalAlignment="Center" Width="85"
+                                                      IsChecked="{Binding p_Setup.p_RecipeWizard.p_bUsePellicleFrontside}"/>
                                     </Grid>
                                 </GroupBox>
                                 <GroupBox Grid.Row="1" Header="Illumination">

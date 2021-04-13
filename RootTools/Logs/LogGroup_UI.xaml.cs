@@ -35,7 +35,7 @@ namespace RootTools
 
         private void DataGrid_LayoutUpdated(object sender, System.EventArgs e)
         {
-            p_nCount = dataGrid.Items.Count; 
+            if (EQ.m_bRun) p_nCount = dataGrid.Items.Count; 
         }
     }
 }

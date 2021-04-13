@@ -113,7 +113,7 @@ namespace Root_CAMELLIA.Module
             }
 
             object obj;
-            for (int n = 0; n < PMDatas.SensorTiltRepeatNum; n++)
+            for (int n = 0; n < PMDatas.nSensorTiltRepeatNum; n++)
             {
                 if (App.m_nanoView.SampleMeasure(0, 0, 0,
                        m_mwvm.SettingViewModel.p_ExceptNIR, m_DataManager.recipeDM.MeasurementRD.UseTransmittance, m_DataManager.recipeDM.MeasurementRD.UseThickness,

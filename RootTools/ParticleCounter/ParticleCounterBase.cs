@@ -55,33 +55,37 @@ namespace RootTools.ParticleCounter
         #region Sample
         public class Sample
         {
-            public int m_secSample = 10;
-            public int m_secHold = 1;
+            public int m_secSample = 60;
+            public int m_secHold = 10;
             public int m_nRepeat = 1;
 
             public void RunTree(Tree tree)
             {
                 m_secSample = tree.Set(m_secSample, m_secSample, "Sample", "Sample Time (sec)");
                 m_secHold = tree.Set(m_secHold, m_secHold, "Hold", "Hold Time (sec)");
-                m_nRepeat = tree.Set(m_nRepeat, m_nRepeat, "Repeat", "Repeat Count");
+                m_nRepeat = tree.Set(m_nRepeat, m_nRepeat, "Repeat", "Repeat Count", false);
+            }
+
+            public Sample()
+            {
+            }
+
+            public Sample(Sample sample)
+            {
+                m_secSample = sample.m_secSample;
+                m_secHold = sample.m_secHold;
+                m_nRepeat = sample.m_nRepeat; 
             }
         }
         public Sample m_sample = new Sample(); 
 
         public string SetSample(Sample sample)
         {
-            if (Run(m_modbus.WriteCoils(m_nUnit, 8, false))) return m_sRun;
-            if (Run(m_modbus.WriteHoldingRegister(m_nUnit, 2, sample.m_secSample))) return m_sRun;
-            if (Run(m_modbus.WriteHoldingRegister(m_nUnit, 3, sample.m_secHold))) return m_sRun;
-            if (Run(m_modbus.WriteHoldingRegister(m_nUnit, 4, sample.m_nRepeat))) return m_sRun;
+            if (Run(m_modbus.WriteCoils(m_nUnit, 8, false))) return p_sInfo;
+            if (Run(m_modbus.WriteHoldingRegister(m_nUnit, 2, sample.m_secSample))) return p_sInfo;
+            if (Run(m_modbus.WriteHoldingRegister(m_nUnit, 3, sample.m_secHold))) return p_sInfo;
+            if (Run(m_modbus.WriteHoldingRegister(m_nUnit, 4, sample.m_nRepeat))) return p_sInfo;
             return "OK";
-        }
-
-        string m_sRun = "OK";
-        bool Run(string sRun)
-        {
-            m_sRun = sRun;
-            return sRun != "OK";
         }
         #endregion
 
@@ -104,7 +108,7 @@ namespace RootTools.ParticleCounter
         {
             try
             {
-                if (Run(m_modbus.ReadInputRegister(m_nUnit, 228, m_aRead))) return m_sRun;
+                if (Run(m_modbus.ReadInputRegister(m_nUnit, 228, m_aRead))) return p_sInfo;
                 for (int n = 0; n < m_asParticleSize.Length; n++)
                 {
                     m_aRead[2 * n] &= 0xffff;
@@ -156,7 +160,7 @@ namespace RootTools.ParticleCounter
 
         string WaitDone(Sample sample)
         {
-            int msTimeout = 1000 * (sample.m_secSample + 2); 
+            int msTimeout = 1000 * (sample.m_secSample + sample.m_secHold + 10); 
             while (m_swRun.ElapsedMilliseconds < msTimeout)
             {
                 Thread.Sleep(10);
@@ -165,16 +169,24 @@ namespace RootTools.ParticleCounter
             }
             return "Read Data Timeout";
         }
+
+        int m_msTimeout = 0; 
+        public bool IsTimeout()
+        {
+            return false; //forget
+            //return (m_swRun.ElapsedMilliseconds > m_msTimeout);
+        }
         #endregion
 
         #region Run
         Sample m_sampleRun; 
         public string StartRun(Sample sample)
         {
+            m_msTimeout = 1000 * (sample.m_nRepeat * sample.m_secSample + 10);
             m_sampleRun = sample;
             if (IsBusy()) return "Busy"; 
             ClearCount();
-            if (Run(ConnectModbus())) return m_sRun;
+            if (Run(ConnectModbus())) return p_sInfo;
             m_bgw.RunWorkerAsync(); 
             return "OK";
         }
@@ -188,30 +200,46 @@ namespace RootTools.ParticleCounter
 
         private void M_bgw_DoWork(object sender, DoWorkEventArgs e)
         {
+            p_sInfo = "Start Run"; 
             p_bRun = false;
-            p_bDone = false;
             if (Run(SetSample(m_sampleRun))) return;
             Thread.Sleep(10);
             p_bRun = true;
             Thread.Sleep(1000 * m_sampleRun.m_secHold);
+            p_bDone = false;
             for (int n = 0; n < m_sampleRun.m_nRepeat; n++)
             {
+                Thread.Sleep(1000 * (m_sampleRun.m_secSample + 5)); 
                 if (Run(WaitDone(m_sampleRun))) return;
                 if (Run(ReadParticleCount())) return;
                 p_bDone = false;
                 Thread.Sleep(10); 
             }
-            p_bRun = false; 
+            p_bRun = false;
+            p_sInfo = "OK"; 
         }
 
         private void M_bgw_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            //forget
+            
         }
 
         public bool IsBusy()
         {
             return m_bgw.IsBusy; 
+        }
+
+        public void Reset()
+        {
+            p_bRun = false;
+            p_bDone = false;
+        }
+
+        public string p_sInfo { get; set; }
+        bool Run(string sInfo)
+        {
+            p_sInfo = sInfo;
+            return sInfo != "OK";
         }
         #endregion
 
@@ -254,6 +282,7 @@ namespace RootTools.ParticleCounter
             InitModbus();
             InitTree();
             InitBackgroundWorker();
+            Reset(); 
         }
 
         public void ThreadStop()

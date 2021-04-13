@@ -20,6 +20,7 @@ using RootTools.OHTNew;
 using RootTools.ParticleCounter;
 using RootTools.Printer;
 using RootTools.RADS;
+using RootTools.RFIDs;
 using RootTools.RTC5s.LaserBright;
 using RootTools.SQLogs;
 using System;
@@ -360,6 +361,21 @@ namespace RootTools.ToolBoxs
         }
         #endregion
 
+        #region ITool RFID
+        ToolSet m_toolSetRFID = null; 
+        public string Get(ref RFID value, ModuleBase module, string id)
+        {
+            if (m_toolSetRFID == null) m_toolSetRFID = InitToolSet("RFID");
+            if (value == null)
+            {
+                value = new RFID(module.p_id + "." + id, module.m_log);
+                m_toolSetRFID.AddTool(value);
+                module.m_aTool.Add(value); 
+            }
+            return "OK";
+        }
+        #endregion
+
         #region ITool Comm
         ToolSet m_toolSetComm = null;
         public string GetComm(ref NamedPipe value, ModuleBase module, string id)
@@ -531,7 +547,7 @@ namespace RootTools.ToolBoxs
             if (m_toolSetOHT == null) m_toolSetOHT = InitToolSet("OHT");
             if (value == null)
             {
-                value = new OHTNew.OHT(module.p_id + "." + id, module, (ILoadport)module, carrier, m_toolDIO);
+                value = new OHTNew.OHT(module.p_id + "." + id, module, carrier, m_toolDIO);
                 m_toolSetOHT.AddTool(value);
                 module.m_aTool.Add(value);
             }
@@ -574,7 +590,7 @@ namespace RootTools.ToolBoxs
         ToolSet m_toolSetParticleCounter = null;
         public string Get(ref LasairIII value, ModuleBase module, string id)
         {
-            if (m_toolSetPrinter == null) m_toolSetParticleCounter = InitToolSet("ParticleCounter");
+            if (m_toolSetParticleCounter == null) m_toolSetParticleCounter = InitToolSet("ParticleCounter");
             if (value == null)
             {
                 value = new LasairIII(module.p_id + "." + id, module.m_log);
@@ -586,7 +602,7 @@ namespace RootTools.ToolBoxs
 
         public string Get(ref AirnetII_310 value, ModuleBase module, string id)
         {
-            if (m_toolSetPrinter == null) m_toolSetParticleCounter = InitToolSet("ParticleCounter");
+            if (m_toolSetParticleCounter == null) m_toolSetParticleCounter = InitToolSet("ParticleCounter");
             if (value == null)
             {
                 value = new AirnetII_310(module.p_id + "." + id, module.m_log);

@@ -1,5 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\packages\OpenCvSharp-AnyCPU.2.4.10.20170306\build\OpenCvSharp-AnyCPU.props" Condition="Exists('..\packages\OpenCvSharp-AnyCPU.2.4.10.20170306\build\OpenCvSharp-AnyCPU.props')" />
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -206,8 +207,26 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Lib\MetLib\NanoView.dll</HintPath>
     </Reference>
+    <Reference Include="netchartdir, Version=6.4.0.0, Culture=neutral, PublicKeyToken=2db5fc05de12e204, processorArchitecture=MSIL">
+      <HintPath>..\packages\ChartDirector.Net.6.4.0\lib\net40\netchartdir.dll</HintPath>
+    </Reference>
     <Reference Include="NumericUpDownLib, Version=2.4.2.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Dirkster.NumericUpDownLib.2.4.2\lib\net40\NumericUpDownLib.dll</HintPath>
+    </Reference>
+    <Reference Include="OpenCvSharp, Version=1.0.0.0, Culture=neutral, PublicKeyToken=6adad1e807fea099, processorArchitecture=MSIL">
+      <HintPath>..\packages\OpenCvSharp-AnyCPU.2.4.10.20170306\lib\net45\OpenCvSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="OpenCvSharp.Blob, Version=1.0.0.0, Culture=neutral, PublicKeyToken=6adad1e807fea099, processorArchitecture=MSIL">
+      <HintPath>..\packages\OpenCvSharp-AnyCPU.2.4.10.20170306\lib\net45\OpenCvSharp.Blob.dll</HintPath>
+    </Reference>
+    <Reference Include="OpenCvSharp.CPlusPlus, Version=1.0.0.0, Culture=neutral, PublicKeyToken=6adad1e807fea099, processorArchitecture=MSIL">
+      <HintPath>..\packages\OpenCvSharp-AnyCPU.2.4.10.20170306\lib\net45\OpenCvSharp.CPlusPlus.dll</HintPath>
+    </Reference>
+    <Reference Include="OpenCvSharp.Extensions, Version=1.0.0.0, Culture=neutral, PublicKeyToken=6adad1e807fea099, processorArchitecture=MSIL">
+      <HintPath>..\packages\OpenCvSharp-AnyCPU.2.4.10.20170306\lib\net45\OpenCvSharp.Extensions.dll</HintPath>
+    </Reference>
+    <Reference Include="OpenCvSharp.UserInterface, Version=1.0.0.0, Culture=neutral, PublicKeyToken=6adad1e807fea099, processorArchitecture=MSIL">
+      <HintPath>..\packages\OpenCvSharp-AnyCPU.2.4.10.20170306\lib\net45\OpenCvSharp.UserInterface.dll</HintPath>
     </Reference>
     <Reference Include="PresentationFramework.Aero" />
     <Reference Include="ScottPlot, Version=4.0.39.0, Culture=neutral, PublicKeyToken=86698dc10387c39e, processorArchitecture=MSIL">
@@ -272,16 +291,41 @@
     <Compile Include="Control\Humidity.xaml.cs">
       <DependentUpon>Humidity.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Control\NavTreeItemClass.cs" />
+    <Compile Include="Control\NavTreeItems.cs" />
+    <Compile Include="Control\NavTreeRootItemUtils.cs" />
+    <Compile Include="Control\NavTreeUtils.cs" />
     <Compile Include="Control\PMCheckReview.xaml.cs">
       <DependentUpon>PMCheckReview.xaml</DependentUpon>
     </Compile>
     <Compile Include="Control\PMCheckReview_ViewModel.cs" />
+    <Compile Include="Control\PMResultViewModel\PM_Reflectance_ViewModel.cs" />
+    <Compile Include="Control\PMResultViewModel\PM_SensorCameraTilt_ViewModel.cs" />
+    <Compile Include="Control\PMResultViewModel\PM_SensorHoleOttset_ViewModel.cs" />
+    <Compile Include="Control\PMResultViewModel\PM_Thickness_ViewModel.cs" />
+    <Compile Include="Control\PMResultView\PM_Reflectance.xaml.cs">
+      <DependentUpon>PM_Reflectance.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Control\PMResultView\PM_SensorCameraTilt.xaml.cs">
+      <DependentUpon>PM_SensorCameraTilt.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Control\PMResultView\PM_SensorHoleOffset.xaml.cs">
+      <DependentUpon>PM_SensorHoleOffset.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Control\PMResultView\PM_Thickenss.xaml.cs">
+      <DependentUpon>PM_Thickenss.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Control\ReviewGraph.xaml.cs">
+      <DependentUpon>ReviewGraph.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Control\StageViewControl.xaml.cs">
       <DependentUpon>StageViewControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="Control\Temp.xaml.cs">
       <DependentUpon>Temp.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Control\Util\GetIconUseDll.cs" />
+    <Compile Include="Control\Util\GetImageFn.cs" />
     <Compile Include="Converter\BoolConverter.cs" />
     <Compile Include="Converter\HumidityToGradientOffsetConverter.cs" />
     <Compile Include="Converter\LampStateToColorConverter.cs" />
@@ -291,11 +335,16 @@
     <Compile Include="Data\SaveMeasureData.cs" />
     <Compile Include="LibSR_Met\Calculation.cs" />
     <Compile Include="LibSR_Met\ConstValue.cs" />
+    <Compile Include="LibSR_Met\ContourMap.xaml.cs">
+      <DependentUpon>ContourMap.xaml</DependentUpon>
+    </Compile>
     <Compile Include="LibSR_Met\CountGraph.xaml.cs">
       <DependentUpon>CountGraph.xaml</DependentUpon>
     </Compile>
     <Compile Include="LibSR_Met\DataManager.cs" />
     <Compile Include="LibSR_Met\ExtensionMethod.cs" />
+    <Compile Include="LibSR_Met\Fitting.cs" />
+    <Compile Include="LibSR_Met\ImageProcess.cs" />
     <Compile Include="LibSR_Met\LogManager.cs" />
     <Compile Include="LibSR_Met\Nanoview.cs" />
     <Compile Include="LibSR_Met\PMDatas.cs" />
@@ -435,6 +484,26 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Control\PMResultView\PM_Reflectance.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Control\PMResultView\PM_SensorCameraTilt.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Control\PMResultView\PM_SensorHoleOffset.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Control\PMResultView\PM_Thickenss.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Control\ReviewGraph.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Control\StageViewControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -442,6 +511,10 @@
     <Page Include="Control\Temp.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="LibSR_Met\ContourMap.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="LibSR_Met\CountGraph.xaml">
       <SubType>Designer</SubType>
@@ -623,6 +696,23 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resource\open2.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resource\doc_32.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resource\doc.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resource\docBlack.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resource\folder.ico" />
+    <Resource Include="Resource\openFolder.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resource\csv.ico" />
+    <Resource Include="Resource\database.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\EMGU.CV.4.1.1.3497\build\EMGU.CV.targets" Condition="Exists('..\packages\EMGU.CV.4.1.1.3497\build\EMGU.CV.targets')" />

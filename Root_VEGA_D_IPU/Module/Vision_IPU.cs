@@ -1,12 +1,37 @@
 ﻿using RootTools;
+using RootTools.Camera;
+using RootTools.Camera.Dalsa;
+using RootTools.Comm;
+using RootTools.Lens.LinearTurret;
+using RootTools.Light;
+using RootTools.Memory;
 using RootTools.Module;
 using RootTools.Trees;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Net.Sockets;
 using System.Threading;
 
 namespace Root_VEGA_D_IPU.Module
 {
     public class Vision_IPU : ModuleBase
     {
+        MemoryPool m_memoryPool;
+        MemoryGroup m_memoryGroup;
+        MemoryData m_memoryMain;
+        LightSet m_lightSet;
+
+        Camera_Dalsa m_CamMain;
+
+        LensLinearTurret m_LensLinearTurret;
+
+        TCPIPComm_VEGA_D m_tcpipCommClient;
+        #region [Getter Setter]
+        public MemoryPool MemoryPool { get => m_memoryPool; private set => m_memoryPool = value; }
+        public LightSet LightSet { get => m_lightSet; private set => m_lightSet = value; }
+        public Camera_Dalsa CamMain { get => m_CamMain; private set => m_CamMain = value; }
+        #endregion
+
         #region ToolBox
 
         public override void GetTools(bool bInit)
@@ -16,7 +41,15 @@ namespace Root_VEGA_D_IPU.Module
                 case eRemote.Client: GetClientTools(bInit); break;
                 case eRemote.Server: GetServerTools(bInit); break; 
             }
-            m_remote.GetTools(bInit);
+
+            p_sInfo = m_toolBox.Get(ref m_lightSet, this);
+            p_sInfo = m_toolBox.GetCamera(ref m_CamMain, this, "MainCam");
+
+            p_sInfo = m_toolBox.Get(ref m_LensLinearTurret, this, "LensTurret");
+
+            p_sInfo = m_toolBox.Get(ref m_memoryPool, this, "Memory", 1);
+
+            //m_remote.GetTools(bInit);
         }
 
         void GetClientTools(bool bInit)
@@ -25,6 +58,54 @@ namespace Root_VEGA_D_IPU.Module
 
         void GetServerTools(bool bInit)
         {
+        }
+        #endregion
+
+        #region Grab Mode
+        int m_lGrabMode = 0;
+        public ObservableCollection<GrabMode> m_aGrabMode = new ObservableCollection<GrabMode>();
+        public List<string> p_asGrabMode
+        {
+            get
+            {
+                List<string> asGrabMode = new List<string>();
+                foreach (GrabMode grabMode in m_aGrabMode) asGrabMode.Add(grabMode.p_sName);
+                return asGrabMode;
+            }
+        }
+
+        public GrabMode GetGrabMode(string sGrabMode)
+        {
+            foreach (GrabMode grabMode in m_aGrabMode)
+            {
+                if (sGrabMode == grabMode.p_sName) return grabMode;
+            }
+            return null;
+        }
+
+        public void ClearData()
+        {
+            foreach (GrabMode grabMode in m_aGrabMode)
+            {
+                grabMode.m_ptXYAlignData = new RPoint(0, 0);
+                grabMode.m_dVRSFocusPos = 0;
+            }
+            this.RunTree(Tree.eMode.RegWrite);
+            this.RunTree(Tree.eMode.Init);
+        }
+
+        void RunTreeGrabMode(Tree tree)
+        {
+            m_lGrabMode = tree.Set(m_lGrabMode, m_lGrabMode, "Count", "Grab Mode Count");
+            while (m_aGrabMode.Count < m_lGrabMode)
+            {
+                string id = "Mode." + m_aGrabMode.Count.ToString("00");
+                GrabMode grabMode = new GrabMode(id, m_cameraSet, m_lightSet, m_memoryPool, m_LensLinearTurret);
+                m_aGrabMode.Add(grabMode);
+            }
+            while (m_aGrabMode.Count > m_lGrabMode) m_aGrabMode.RemoveAt(m_aGrabMode.Count - 1);
+            foreach (GrabMode grabMode in m_aGrabMode) grabMode.RunTreeName(tree.GetTree("Name", false));
+            foreach (GrabMode grabMode in m_aGrabMode) grabMode.RunTree(tree.GetTree(grabMode.p_sName, false), true, false);
         }
         #endregion
 
@@ -47,6 +128,9 @@ namespace Root_VEGA_D_IPU.Module
                 case eRemote.Server:
                     break; 
             }
+
+            m_memoryGroup = m_memoryPool.GetGroup(p_id);
+            m_memoryMain = m_memoryGroup.CreateMemory("Main", 3, 1, 40000, 40000);
         }
         #endregion
 
@@ -107,14 +191,22 @@ namespace Root_VEGA_D_IPU.Module
         }
         #endregion
 
-        public Vision_IPU(string id, IEngineer engineer, eRemote eRemote)
+        public Vision_IPU(string id, IEngineer engineer, eRemote eRemote = eRemote.Local)
         {
             //            InitLineScan();+
             //            InitAreaScan();
             base.InitBase(id, engineer, eRemote);
             m_waferSize = new InfoWafer.WaferSize(id, false, false); //forget delete ?
             //            InitMemory();
+
             OnChangeState += Vision_IPU_OnChangeState;
+
+            // Main PC와 연결될 Client Socket 생성
+            TCPIPClient client = null;
+            m_toolBox.GetComm(ref client, this, "TCPIP");
+
+            m_tcpipCommClient = new TCPIPComm_VEGA_D(client);
+            m_tcpipCommClient.EventReciveData += EventReceiveData;
         }
 
         private void Vision_IPU_OnChangeState(eState eState)
@@ -225,5 +317,73 @@ namespace Root_VEGA_D_IPU.Module
         }
         #endregion
 
+        #region Communication to VEGA-D
+        const string OFFSETX_PARAM_NAME = "OFFSETX";
+        const string OFFSETY_PARAM_NAME = "OFFSETY";
+        const string SCANDIR_PARAM_NAME = "DIR";
+        const string FOV_PARAM_NAME = "FOV";
+        const string OVERLAP_PARAM_NAME = "OVERLAP";
+        const string RCPNAME_PARAM_NAME = "RCPNAME";
+        const string LINE_PARAM_NAME = "LINE";
+        const string SCANLINECOUNT_PARAM_NAME = "SCANLINECOUNT";
+
+
+        private void EventReceiveData(byte[] aBuf, int nSize, Socket socket)
+        {
+            if (nSize <= 0)
+                return;
+
+            int nStartIdx = 0;
+            TCPIPComm_VEGA_D.Command cmd = TCPIPComm_VEGA_D.Command.none;
+            Dictionary<string, string> mapParam = new Dictionary<string, string>();
+
+            while (m_tcpipCommClient.ParseMessage(aBuf, nSize, ref nStartIdx, ref cmd, mapParam))
+            {
+                switch (cmd)
+                {
+                    case TCPIPComm_VEGA_D.Command.start:
+                        {
+                            if (m_CamMain.p_CamInfo.p_eState == eCamState.Init)
+                                m_CamMain.ConnectAsSlave();
+
+                            // 메세지에서 데이터 얻어오기
+                            CPoint ptOffset = new CPoint(int.Parse(mapParam[OFFSETX_PARAM_NAME]), int.Parse(mapParam[OFFSETY_PARAM_NAME]));                 // memory offset
+                            eGrabDirection dir = bool.Parse(mapParam[SCANDIR_PARAM_NAME]) == false ? eGrabDirection.Forward : eGrabDirection.BackWard;      // scan dir
+                            int fov = int.Parse(mapParam[FOV_PARAM_NAME]);                                                                                  // fov
+                            int overlap = int.Parse(mapParam[OVERLAP_PARAM_NAME]);                                                                          // overlap
+                            int nLine = int.Parse(mapParam[LINE_PARAM_NAME]);                                                                               // line
+                            int nScanLineNum = int.Parse(mapParam[SCANLINECOUNT_PARAM_NAME]);                                                               // scan line count
+
+                            // 이미지 데이터 복사 스레드 실행
+                            int nScanLine = 0;
+
+                            string strPool = m_memoryPool.p_id;
+                            string strGroup = m_memoryGroup.p_id;
+                            string strMemory = m_memoryMain.p_id;
+                            MemoryData mem = m_engineer.GetMemory(strPool, strGroup, strMemory);
+                            m_CamMain.GrabLineScan(mem, ptOffset, nLine);
+                        }
+                        break;
+                    case TCPIPComm_VEGA_D.Command.end:
+                        {
+                            m_CamMain.AbortGrabThread();
+                            m_CamMain.StopGrab();
+
+                            EQ.p_bStop = true;
+                        }
+                        break;
+                    case TCPIPComm_VEGA_D.Command.rcpname:
+                        string rcpname = mapParam[RCPNAME_PARAM_NAME];
+                        break;
+                    case TCPIPComm_VEGA_D.Command.alive:
+                        break;
+                    case TCPIPComm_VEGA_D.Command.ready:
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+        #endregion
     }
 }

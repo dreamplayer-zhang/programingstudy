@@ -1523,26 +1523,26 @@ namespace RootTools
 
             if (ofd.ShowDialog() == DialogResult.OK)
             {
-                var viewModel = new Dialog_ImageOpenViewModel(this as RootViewer_ViewModel);
-                Nullable<bool> result = m_DialogService.ShowDialog(viewModel);
-                if (result.HasValue)
+                int channel = 0;
+                if (p_ImageData.GetBytePerPixel() == 3)
                 {
-                    if (result.Value)
-                    {
-                        int channel = 0;
-                        if (p_ImageData.GetBytePerPixel() == 3)
-                        {
-                            if (p_eColorViewMode == eColorViewMode.G) channel = 1;
-                            else if (p_eColorViewMode == eColorViewMode.B) channel = 2;
-                        }
+                    if (p_eColorViewMode == eColorViewMode.G)
+                        channel = 1;
+                    else if (p_eColorViewMode == eColorViewMode.B)
+                        channel = 2;
+                }
 
-                        p_ImageData.OpenFile(ofd.FileName, p_CopyOffset, channel);
-                    }
-                    else
+                if (m_DialogService != null)
+                {
+                    var viewModel = new Dialog_ImageOpenViewModel(this as RootViewer_ViewModel);
+                    Nullable<bool> result = m_DialogService.ShowDialog(viewModel);
+                    if (!result.HasValue || !result.Value)
                     {
-                        // Cancelled
+                        return;
                     }
                 }
+
+                p_ImageData.OpenFile(ofd.FileName, p_CopyOffset, channel);
             }
         }
         public void _saveImage()

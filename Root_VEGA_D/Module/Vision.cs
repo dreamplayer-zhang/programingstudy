@@ -1,17 +1,21 @@
 ﻿using Root_EFEM.Module;
+using Root_VEGA_D_IPU.Module;
 using RootTools;
 using RootTools.Camera.BaslerPylon;
 using RootTools.Camera.Dalsa;
+using RootTools.Comm;
 using RootTools.Control;
 using RootTools.GAFs;
 using RootTools.Lens.LinearTurret;
 using RootTools.Light;
 using RootTools.Memory;
 using RootTools.Module;
+using RootTools.RADS;
 using RootTools.Trees;
 using RootTools_Vision.Utility;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Net.Sockets;
 using System.Threading;
 
 namespace Root_VEGA_D.Module
@@ -38,9 +42,14 @@ namespace Root_VEGA_D.Module
         Camera_Dalsa m_CamMain;
         Camera_Basler m_CamAlign;
         Camera_Basler m_CamAutoFocus;
+        Camera_Basler m_CamRADS;
 
         KlarfData_Lot m_KlarfData_Lot;
         LensLinearTurret m_LensLinearTurret;
+
+        TCPIPComm_VEGA_D m_tcpipCommServer;
+        RADSControl m_RADSControl;
+
         #region [Getter Setter]
         public Axis AxisRotate { get => m_axisRotate; private set => m_axisRotate = value; }
         public Axis AxisZ { get => m_axisZ; private set => m_axisZ = value; }
@@ -56,6 +65,7 @@ namespace Root_VEGA_D.Module
         public Camera_Basler CamAlign { get => m_CamAlign; private set => m_CamAlign = value; }
         public Camera_Basler CamAutoFocus { get => m_CamAutoFocus; private set => m_CamAutoFocus = value; }
         public KlarfData_Lot KlarfData_Lot { get => m_KlarfData_Lot; private set => m_KlarfData_Lot = value; }
+        public TCPIPComm_VEGA_D TcpipCommServer { get => m_tcpipCommServer; private set => m_tcpipCommServer = value; }
         #endregion
 
         public override void GetTools(bool bInit)
@@ -69,11 +79,16 @@ namespace Root_VEGA_D.Module
             p_sInfo = m_toolBox.GetCamera(ref m_CamMain, this, "MainCam");
             p_sInfo = m_toolBox.GetCamera(ref m_CamAlign, this, "AlignCam");
             p_sInfo = m_toolBox.GetCamera(ref m_CamAutoFocus, this, "AutoFocusCam");
+            p_sInfo = m_toolBox.GetCamera(ref m_CamRADS, this, "RADS");
             p_sInfo = m_toolBox.Get(ref m_LensLinearTurret, this, "LensTurret");
 
             p_sInfo = m_toolBox.Get(ref m_memoryPool, this, "Memory", 1);
             m_alid_WaferExist = m_gaf.GetALID(this, "Vision Wafer Exist", "Vision Wafer Exist");
             //m_remote.GetTools(bInit);
+
+            bool bUseRADS = false;
+            //if (m_CamRADS.p_CamInfo != null) bUseRADS = true;
+            //p_sInfo = m_toolBox.Get(ref m_RADSControl, this, "RADSControl", bUseRADS);
         }
         #endregion
 
@@ -359,11 +374,18 @@ namespace Root_VEGA_D.Module
         }
         #endregion
 
-        public Vision(string id, IEngineer engineer)
+        public Vision(string id, IEngineer engineer, eRemote eRemote = eRemote.Local)
         {
             base.InitBase(id, engineer);
             m_waferSize = new InfoWafer.WaferSize(id, false, false);
             OnChangeState += Vision_OnChangeState;
+
+            // IPU PC와 연결될 Server Socket 생성
+            TCPIPServer server = null;
+            m_toolBox.GetComm(ref server, this, "TCPIP");
+
+            m_tcpipCommServer = new TCPIPComm_VEGA_D(server);
+            m_tcpipCommServer.EventReciveData += EventReceiveData;
         }
 
         private void Vision_OnChangeState(eState eState)
@@ -374,6 +396,36 @@ namespace Root_VEGA_D.Module
                 case eState.Error:
                     RemoteRun(eRemoteRun.ServerState, eRemote.Server, eState);
                     break;
+            }
+        }
+
+        private void EventReceiveData(byte[] aBuf, int nSize, Socket socket)
+        {
+            if (nSize <= 0)
+                return;
+
+            int nStartIdx = 0;
+            TCPIPComm_VEGA_D.Command cmd = TCPIPComm_VEGA_D.Command.none;
+            Dictionary<string, string> mapParam = new Dictionary<string, string>();
+
+            while (m_tcpipCommServer.ParseMessage(aBuf, nSize, ref nStartIdx, ref cmd, mapParam))
+            {
+                switch (cmd)
+                {
+                    case TCPIPComm_VEGA_D.Command.result:
+                        {
+                            ModuleRunBase moduleRunBase = m_aModuleRun.Find(x => (x.GetType() == typeof(Run_GrabLineScan)));
+                            if (moduleRunBase != null)
+                                moduleRunBase.Run();
+                        }
+                        break;
+                    case TCPIPComm_VEGA_D.Command.alive:
+                        break;
+                    case TCPIPComm_VEGA_D.Command.ready:
+                        break;
+                    default:
+                        break;
+                }
             }
         }
 
