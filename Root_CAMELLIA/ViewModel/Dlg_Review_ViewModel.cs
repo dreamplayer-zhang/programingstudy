@@ -618,8 +618,8 @@ namespace Root_CAMELLIA
 
                     idx++;
                 }
-                p_reflectanceGraph.DrawReviewGraph("WaveLength [nm]","Reflectance [%]", waveLengthList.ToArray(), reflectanceList.ToArray());
-                p_transmittanceGraph.DrawReviewGraph("WaveLength [nm]", "Transmittance [%]", waveLengthList.ToArray(),transmittanceList.ToArray());
+                p_reflectanceGraph.DrawReviewGraph("Reflectacne","WaveLength [nm]","Reflectance [%]", waveLengthList.ToArray(), reflectanceList.ToArray());
+                p_transmittanceGraph.DrawReviewGraph("Transmittance","WaveLength [nm]", "Transmittance [%]", waveLengthList.ToArray(),transmittanceList.ToArray());
             }
             catch(Exception e)
             {

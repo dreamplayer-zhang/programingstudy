@@ -27,19 +27,23 @@ namespace Root_CAMELLIA
             InitializeComponent();
         }
 
-        public void DrawReviewGraph( string xlabel, string ylabel, double[] xvalus, double[] yvalues)
+        public void DrawReviewGraph(string Title, string xlabel, string ylabel, double[] xvalus, double[] yvalues)
         {
-            ReviewGraphDraw.Reset();
-            ReviewGraphDraw.plt.XLabel(xlabel);
-            ReviewGraphDraw.plt.YLabel(ylabel);
-            double dStartWL = xvalus[0];
-            double dStopWL = xvalus[xvalus.Length - 1];
-            m_ReviewPlotTable = ReviewGraphDraw.plt.PlotScatterHighlight(xvalus, yvalues, markerSize: 2.5);
+            Dispatcher.Invoke(new Action(() =>
+            {
+                ReviewGraphDraw.Reset();
+                ReviewGraphDraw.plt.XLabel(xlabel, null, null, null, 15, null);
+                ReviewGraphDraw.plt.YLabel(ylabel, null, null, 15, null, null);
+                ReviewGraphDraw.plt.Title(Title);
+                double dStartWL = xvalus[0];
+                double dStopWL = xvalus[xvalus.Length-1];
+                m_ReviewPlotTable = ReviewGraphDraw.plt.PlotScatterHighlight(xvalus, yvalues, markerSize: 2.5);
+                //ReviewGraphDraw.plt.AutoScale();
+                ReviewGraphDraw.plt.Axis(dStartWL, dStopWL,-0.1, 0.1);
+                ReviewGraphDraw.Render();
 
-            ReviewGraphDraw.plt.Axis(dStartWL, dStopWL, -10, 100);
-            ReviewGraphDraw.Render();
-
-            m_bDataDetect = true;
+                m_bDataDetect = true;
+            }));
 
         }
 
@@ -48,25 +52,7 @@ namespace Root_CAMELLIA
             ReviewGraphDraw.Reset();
         }
 
-        private void ReviewGraph_MouseMove(object sender, MouseEventArgs e)
-        {
-            Dispatcher.Invoke(new Action(() =>
-            {
-                if (m_bDataDetect == true)
-                {
-                    var mousePos = e.MouseDevice.GetPosition(ReviewGraphDraw);
-                    double mouseX = ReviewGraphDraw.plt.CoordinateFromPixelX(mousePos.X);
-                    double mouseY = ReviewGraphDraw.plt.CoordinateFromPixelY(mousePos.Y);
-
-                    m_ReviewPlotTable.HighlightClear();
-                    var (dX, dY, nIndex) = m_ReviewPlotTable.HighlightPointNearest(mouseX, mouseY);
-                    ReviewGraphDraw.Render();
-
-                    labelReview.Visibility = Visibility.Visible;
-                    labelReview.Content = $"({dX:N1}, {dY:N3})";
-                }
-            }));
-        }
+       
 
     }
 }

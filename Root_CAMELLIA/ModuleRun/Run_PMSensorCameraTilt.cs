@@ -188,6 +188,7 @@ namespace Root_CAMELLIA.Module
             {
                 m_log.Info("[CheckCSSAlign] Error");
             }
+            m_module.mwvm.EngineerViewModel.p_PMCheckReview_ViewModel.m_pmSensorTilt_VM.p_pmSenserCamera.p_SensorCameraAlign = m_PMData.dAlign_ResultDeg;
 
             return "OK";
         }

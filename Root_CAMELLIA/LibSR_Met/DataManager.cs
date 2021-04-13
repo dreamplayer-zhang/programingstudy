@@ -131,11 +131,31 @@ namespace Root_CAMELLIA.LibSR_Met
         }
     }
 
-    public class HoleData
+    public class HoleData : ICloneable
     {
         public double XPos;
         public double YPos;
         public double Value;
+
+        public HoleData()
+        {
+            XPos = 0.0;
+            YPos = 0.0;
+            Value = 0.0;
+        }
+
+
+        public object Clone()
+        {
+            //HoleData data = source
+
+            HoleData data = new HoleData();
+            data.XPos = XPos;
+            data.YPos = YPos;
+            data.Value = Value;
+
+            return data;
+        }
     }
 
     ///<summary>
@@ -143,7 +163,6 @@ namespace Root_CAMELLIA.LibSR_Met
     ///</summary>
     public class ContourMapData
     {
-        public FitValueType Valuetype;
         public double Wavelength;
         public List<HoleData> HoleData = new List<HoleData>();
     }
@@ -1431,14 +1450,12 @@ namespace Root_CAMELLIA.LibSR_Met
             for(int i = 0; i < m_ScalesListR.Count; i++)
             {
                 ContourMapData mapdata = new ContourMapData();
-                mapdata.Valuetype = FitValueType.Reflectance;
                 mapdata.Wavelength = m_ScalesListR[i].p_waveLength;
                 m_ContourMapDataR.Add(mapdata);
             }
             for(int i = 0; i < m_ScalesListT.Count; i++)
             {
                 ContourMapData mapdata = new ContourMapData();
-                mapdata.Valuetype = FitValueType.Transmittance;
                 mapdata.Wavelength = m_ScalesListT[i].p_waveLength;
                 m_ContourMapDataT.Add(mapdata);
             }
