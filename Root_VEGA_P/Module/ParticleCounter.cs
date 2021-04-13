@@ -35,13 +35,16 @@ namespace Root_VEGA_P.Module
                 return sInfo; 
             }
 
-            public int m_nPump = 0; 
-            public string RunPump(int nPump)
+            public double m_hPa = 0; 
+            public string RunPump(double hPa)
             {
                 string sInfo = ConnectRS232();
                 if (sInfo != "OK") return sInfo;
-                m_nPump = nPump; 
-                m_rs232.Send("SET " + nPump.ToString());
+                if (hPa < 0) hPa = 0;
+                if (hPa > 5) hPa = 5; 
+                m_hPa = hPa;
+                int nPower = (int)(200 * hPa); 
+                m_rs232.Send("SET " + nPower.ToString());
                 return "OK";
             }
 
@@ -234,21 +237,21 @@ namespace Root_VEGA_P.Module
             public override ModuleRunBase Clone()
             {
                 Run_Pump run = new Run_Pump(m_module);
-                run.m_nPump = m_nPump; 
+                run.m_hPa = m_hPa; 
                 run.m_secDelay = m_secDelay;
                 return run;
             }
 
-            int m_nPump = 1000; 
+            double m_hPa = 2; 
             public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
             {
-                m_nPump = tree.Set(m_nPump, m_nPump, "Pump", "Pump Power (0 ~ 1000)", bVisible); 
+                m_hPa = tree.Set(m_hPa, m_hPa, "hPa", "Pump Power (1 ~ 5 hPa)", bVisible); 
                 m_secDelay = tree.Set(m_secDelay, m_secDelay, "Delay", "Delay Time (sec)", bVisible);
             }
 
             public override string Run()
             {
-                if (m_module.Run(m_module.m_regulator.RunPump(m_nPump))) return p_sInfo; 
+                if (m_module.Run(m_module.m_regulator.RunPump(m_hPa))) return p_sInfo; 
                 Thread.Sleep(1000 * m_secDelay);
                 if (m_module.Run(m_module.m_regulator.RunPump(0))) return p_sInfo;
                 return "OK";
