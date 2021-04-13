@@ -15,8 +15,8 @@ namespace RootTools
 	{
 		public double m_nStartDegree = 0;
 		public double m_nScanDegree = 360;
-		public int m_nCameraPositionOffset = 0;
-		public int m_nCameraHeight = 2000;	// Camera 연결 안되어 있을 시, 검사에 필요한 Camera Height
+		public int m_nCameraPositionOffset = 0;		// degree
+		public int m_nCameraHeight = 2000;			// Camera 연결 안되어 있을 시, 검사에 필요한 Camera Height
 		public int m_nImageHeight = 10000;
 
 		public GrabModeEdge(string id, CameraSet cameraSet, LightSet lightSet, MemoryPool memoryPool, LensLinearTurret lensTurret = null) : base(id, cameraSet, lightSet, memoryPool, lensTurret)
