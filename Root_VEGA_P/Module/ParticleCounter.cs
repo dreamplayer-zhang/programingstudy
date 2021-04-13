@@ -110,7 +110,11 @@ namespace Root_VEGA_P.Module
                 if (EQ.IsStop()) return "EQ Stop";
             }
             */
-            int iNozzle = 0; 
+
+            string sFile = "c:\\ParticleCountResult";
+            Directory.CreateDirectory(sFile);
+
+            int iNozzle = 0;
             while (EQ.IsStop() == false)
             {
                 if (Run(m_nozzleSet.RunNozzle(iNozzle))) return p_sInfo;
@@ -122,26 +126,40 @@ namespace Root_VEGA_P.Module
                     if (m_particleCounter.IsTimeout()) return "Particle Counter Run Timeout";
                     if (EQ.IsStop()) return "EQ Stop";
                 }
-                SaveResult(iNozzle);
-                iNozzle = (iNozzle + 1) % m_nozzleSet.p_nNozzle; 
+                SaveResult(sFile + "\\Nozzle" + iNozzle.ToString("00") + "." + DateTime.Now.ToString() + ".txt");
+                foreach (ParticleCounterBase.ParticleCount pc in m_particleCounter.m_aParticleCount)
+                {
+                    SaveResult(pc, sFile + "\\Nozzle" + iNozzle.ToString("00") + "." + pc.m_sParticleSize + ".txt"); 
+                }
+                iNozzle = (iNozzle + 1) % m_nozzleSet.p_nNozzle;
             }
             return "OK"; 
         }
 
-        void SaveResult(int iNozzle)
+        void SaveResult(string sFile)
         {
-            DateTime dt = DateTime.Now;
-            string sFile = "c:\\ParticleCountResult"; 
-            Directory.CreateDirectory(sFile);
-            sFile += "\\Nozzle" + iNozzle.ToString("00") + "." + dt.ToString() + ".txt"; 
-            using(StreamWriter sw = new StreamWriter(sFile, true, Encoding.Default))
+            using (StreamWriter sw = new StreamWriter(sFile, false, Encoding.Default))
             {
                 foreach (ParticleCounterBase.ParticleCount pc in m_particleCounter.m_aParticleCount)
                 {
-                    sw.Write(pc.m_sParticleSize); 
+                    sw.Write(pc.m_sParticleSize);
                     foreach (int nParticle in pc.m_aCount) sw.Write("\t" + nParticle.ToString());
-                    sw.WriteLine(); 
+                    sw.WriteLine();
                 }
+            }
+        }
+
+        void SaveResult(ParticleCounterBase.ParticleCount pc, string sFile)
+        {
+            using (StreamWriter sw = new StreamWriter(sFile, true, Encoding.Default))
+            {
+                int nSum = 0;
+                foreach (int nParticle in pc.m_aCount)
+                {
+                    sw.Write("\t" + nParticle.ToString());
+                    nSum += nParticle; 
+                }
+                sw.WriteLine("\t" + nSum.ToString()); 
             }
         }
         #endregion
