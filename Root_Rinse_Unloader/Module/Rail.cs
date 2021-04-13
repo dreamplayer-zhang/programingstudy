@@ -312,11 +312,19 @@ namespace Root_Rinse_Unloader.Module
             {
                 case RinseU.eRunMode.Magazine:
                     RunMoveWidth(m_rinse.p_widthStrip);
-                    RunPusherDown(false);
+                    if (RunPusherDown(false) != "OK")
+                    {
+                        EQ.p_bStop = true;
+                        p_eState = eState.Error; 
+                    }
                     RunRotate(true);
                     break;
                 case RinseU.eRunMode.Stack:
-                    RunPusherDown(true); 
+                    if (RunPusherDown(true) != "OK")
+                    {
+                        EQ.p_bStop = true;
+                        p_eState = eState.Error;
+                    }
                     RunRotate(false);
                     break;
             }
@@ -329,6 +337,7 @@ namespace Root_Rinse_Unloader.Module
         {
             AddModuleRunList(new Run_MoveWidth(this), false, "Move Rail Width");
             AddModuleRunList(new Run_Rotate(this), false, "Rail Rotate");
+            AddModuleRunList(new Run_PusherDown(this), false, "Pusher Down");
             m_runRun = AddModuleRunList(new Run_Run(this), false, "Rail Run");
         }
 
@@ -387,6 +396,46 @@ namespace Root_Rinse_Unloader.Module
                 return m_module.RunRotate(m_bRotate);
             }
         }
+
+        public class Run_PusherDown : ModuleRunBase
+        {
+            Rail m_module;
+            public Run_PusherDown(Rail module)
+            {
+                m_module = module;
+                InitModuleRun(module);
+            }
+
+            bool m_bDown = false;
+            bool m_bRepeat = false; 
+            public override ModuleRunBase Clone()
+            {
+                Run_PusherDown run = new Run_PusherDown(m_module);
+                run.m_bDown = m_bDown;
+                run.m_bRepeat = m_bRepeat;
+                return run;
+            }
+
+            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
+            {
+                m_bRepeat = tree.Set(m_bRepeat, m_bRepeat, "Repeat", "Pusher Up Down Repeat", bVisible);
+                m_bDown = tree.Set(m_bDown, m_bDown, "Down", "Pusher Down", bVisible && (m_bRepeat == false));
+            }
+
+            public override string Run()
+            {
+                bool bDown = true; 
+                while (m_bRepeat)
+                {
+                    m_module.RunPusherDown(bDown);
+                    Thread.Sleep(1000);
+                    bDown = !bDown;
+                    if (EQ.IsStop()) return "EQ Stop"; 
+                }
+                return m_module.RunPusherDown(m_bDown);
+            }
+        }
+
 
         public class Run_Run : ModuleRunBase
         {

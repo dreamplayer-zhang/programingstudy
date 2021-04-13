@@ -219,10 +219,8 @@ namespace Root_Rinse_Unloader.Module
                     if (EQ.IsStop()) return "EQ Stop";
                 }
                 if (Run(MoveLoader(ePos.Stotage))) return p_sInfo;
-                //if (Run(RunPickerDown(true))) return p_sInfo;
                 if (Run(RunVacuum(false))) return p_sInfo;
                 m_rinse.CheckTact(); 
-                //if (Run(RunPickerDown(false))) return p_sInfo;
                 if (Run(MoveLoader(ePos.Roller))) return p_sInfo;
                 m_storage.StartMoveStackReady();
                 return "OK";
