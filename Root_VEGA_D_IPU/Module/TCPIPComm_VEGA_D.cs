@@ -127,17 +127,20 @@ namespace Root_VEGA_D_IPU.Module
 
         private void EventReceiveDataFunc(byte[] aBuf, int nSize, Socket socket)
         {
-            EventReceiveData(aBuf, nSize, socket);
+            if(EventReceiveData != null)
+                EventReceiveData(aBuf, nSize, socket);
         }
 
         private void EventAcceptFunc(Socket socket)
         {
-            EventAccept(socket);
+            if (EventAccept != null)
+                EventAccept(socket);
         }
 
         private void EventConnectFunc(Socket socket)
         {
-            EventConnect(socket);
+            if (EventConnect != null)
+                EventConnect(socket);
         }
 
         public void SendMessage(Command cmd)

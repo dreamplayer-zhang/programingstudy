@@ -406,7 +406,7 @@ namespace Root_VEGA_D.Module
                 if(!socket.Connected)
                 {
                     if(p_eState == eState.Run)
-                        ButtonRun();
+                        EQ.p_bStop = true;
                 }
             }
 
@@ -432,7 +432,11 @@ namespace Root_VEGA_D.Module
                     case TCPIPComm_VEGA_D.Command.resume:
                         {
                             // 이전에 이미지 그랩 작업을 이어서 할 수 있도록 처리
-
+                            EQ.p_bPause = false;
+                            EQ.p_bStop = false;
+                            EQ.p_bSimulate = false;
+                            Reset();
+                            StartRun(p_sModuleRun);
                         }
                         break;
                     default:
