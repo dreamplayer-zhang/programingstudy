@@ -2,6 +2,7 @@
 using RootTools.Comm;
 using RootTools.Control;
 using RootTools.Module;
+using RootTools.ParticleCounter;
 using RootTools.ToolBoxs;
 using System;
 using System.Collections.Generic;
@@ -12,13 +13,17 @@ using System.Threading.Tasks;
 
 namespace Root_VEGA_P.Module
 {
+    /*
     public class ParticleCounterSet
     {
-        /*
         #region ToolBox
-        public void GetTools(bool bInit)
+        LasairIII m_particleCounter;
+        public void GetTools(ToolBox toolBox, bool bInit)
         {
-
+            m_regulator.GetTools(toolBox, bInit);
+            m_nozzleSet.GetTools(toolBox);
+            toolBox.Get(ref m_particleCounter, this, p_id + ".LasAir3");
+            if (bInit) { }
         }
         #endregion
 
@@ -83,6 +88,13 @@ namespace Root_VEGA_P.Module
         }
         #endregion
 
-*/
+        public string p_id { get; set; }
+        ModuleBase m_module; 
+        public ParticleCounterSet(string id, ModuleBase module)
+        {
+            p_id = id;
+            m_module = module; 
+        }
     }
+    */
 }
