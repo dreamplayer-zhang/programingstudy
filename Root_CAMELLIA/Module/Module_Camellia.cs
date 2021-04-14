@@ -121,6 +121,19 @@ namespace Root_CAMELLIA.Module
             }
         }
 
+        private string _dataSavePath = "";
+        public string p_dataSavePath
+        {
+            get
+            {
+                return _dataSavePath;
+            }
+            set
+            {
+                _dataSavePath = value;
+            }
+        }
+
         #region InfoWafer
         string m_sInfoWafer = "";
         InfoWafer _infoWafer = null;
@@ -649,6 +662,9 @@ namespace Root_CAMELLIA.Module
 
         public string AfterGet(int nID)
         {
+            // Make Directory
+            p_dataSavePath = BaseDefine.Dir_MeasureSaveRootPath + p_infoWafer.p_sRecipe + @"\" + DateTime.Now.ToString("yyyy-MM-dd") + "T" + DateTime.Now.ToString("HH-mm-ss");
+            GeneralTools.MakeDirectory(p_dataSavePath);
             return "OK";
         }
 

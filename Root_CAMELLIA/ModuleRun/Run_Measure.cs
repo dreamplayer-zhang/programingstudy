@@ -135,9 +135,13 @@ namespace Root_CAMELLIA.Module
                     SaveRawData(index);
                     // Spectrum data Thread 추가 두개두개두개
                     //LibSR_Met.DataManager.GetInstance().SaveResultFileSlot(@"C:\Users\ATI\Desktop\SaveTest\" + index + "_" + DateTime.Now.ToString("HHmmss") + "test.csv", m_module.p_infoWafer.p_sCarrierID,
-                    //    m_module.p_infoWafer.p_sLotID, "Tools", m_module.p_infoWafer.p_sWaferID, m_module.p_infoWafer.p_sSlotID,
-                    //    "1.0.0.0", m_DataManager.recipeDM.TeachRecipeName, index, m_DataManager.recipeDM.MeasurementRD.DataSelectedPoint[m_DataManager.recipeDM.MeasurementRD.DataMeasurementRoute[index]].x, m_DataManager.recipeDM.MeasurementRD.DataSelectedPoint[m_DataManager.recipeDM.MeasurementRD.DataMeasurementRoute[index]].y, m_DataManager.recipeDM.MeasurementRD.LowerWaveLength,
+                    //    m_module.p_infoWafer.p_sLotID, BaseDefine.TOOL_NAME, m_module.p_infoWafer.p_sWaferID, m_module.p_infoWafer.p_sSlotID,
+                    //    BaseDefine.Configuration.Version, m_DataManager.recipeDM.TeachRecipeName, index,
+                    //    m_DataManager.recipeDM.MeasurementRD.DataSelectedPoint[m_DataManager.recipeDM.MeasurementRD.DataMeasurementRoute[index]].x,
+                    //    m_DataManager.recipeDM.MeasurementRD.DataSelectedPoint[m_DataManager.recipeDM.MeasurementRD.DataMeasurementRoute[index]].y,
+                    //    m_DataManager.recipeDM.MeasurementRD.LowerWaveLength,
                     //    m_DataManager.recipeDM.MeasurementRD.UpperWaveLength);
+                    LibSR_Met.DataManager.GetInstance().SaveResultFileSlot(m_slotSpectraDataPath + "name", m_module.p_infoWafer, m_DataManager.recipeDM, index);
                     //SaveRT
                     LibSR_Met.DataManager.GetInstance().SaveRT(@"C:\Users\ATI\Desktop\SaveTest\RT\" + index + "_" + DateTime.Now.ToString("HHmmss") + "test.csv", index);
                     sw.Stop();
@@ -151,8 +155,42 @@ namespace Root_CAMELLIA.Module
                 }
             }
         }
+
+        string m_summaryPath = "";
+        string m_resultPath = "";
+        string m_slotContourMapPath = "";
+        string m_slotSpectraDataPath = "";
+
+        private bool MakeSaveDirectory()
+        {
+            string rootPath = m_module.p_dataSavePath;
+            try
+            {
+                m_summaryPath = rootPath + "\\ResultData_Summary";
+                GeneralTools.MakeDirectory(m_summaryPath);
+                m_resultPath = rootPath + "\\ResultData";
+                GeneralTools.MakeDirectory(m_resultPath);
+                m_slotContourMapPath = rootPath + "\\Slot." + m_module.p_infoWafer.m_nSlot + "\\ContourMap";
+                GeneralTools.MakeDirectory(m_slotContourMapPath);
+                m_slotSpectraDataPath = rootPath + "\\Slot." + m_module.p_infoWafer.m_nSlot + "\\SpectraData";
+                GeneralTools.MakeDirectory(m_slotSpectraDataPath);
+            }
+            catch(Exception e)
+            {
+                return false;
+            }
+          
+            return true;
+        } 
         public override string Run()
         {
+
+            if (!MakeSaveDirectory())
+            {
+                return "Make Directory Error";
+            }
+
+
             StopWatch test = new StopWatch();
             test.Start();
             m_log.Warn("Measure Start >> ");
