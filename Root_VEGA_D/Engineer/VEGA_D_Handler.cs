@@ -54,7 +54,7 @@ namespace Root_VEGA_D.Engineer
             m_vision = new Vision("Vision", m_engineer);
             InitModule(m_vision);
             iWTR.AddChild(m_vision);
-            m_visionIPU = new Vision_IPU("Vision_IPU", m_engineer, ModuleBase.eRemote.Client);
+            m_visionIPU = new Vision_IPU("Vision_IPU", m_engineer);
             InitModule(m_visionIPU);
             m_FDC = new FDC("FDC", m_engineer);
             InitModule(m_FDC);

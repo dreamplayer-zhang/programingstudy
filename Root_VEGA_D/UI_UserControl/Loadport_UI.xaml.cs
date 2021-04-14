@@ -80,7 +80,6 @@ namespace Root_VEGA_D
         #endregion
         public void Init(ILoadport loadport, VEGA_D_Handler handler, IRFID rfid)
         {
-
             m_loadport = (Loadport_Cymechs)loadport;
             m_handler = handler;
             m_rfid = (RFID_Brooks)rfid;
@@ -104,7 +103,7 @@ namespace Root_VEGA_D
             switch (m_loadport.p_eState)
             {
                 case ModuleBase.eState.Ready:
-                    if (m_manualjob.SetInfoPod() != "OK") return;
+                    if (m_manualjob.CheckInfoPod() != "OK") return;
                     Thread.Sleep(100);
                     //InfoCarrier infoCarrier = m_loadport.p_infoCarrier;
                     //ManualJobSchedule manualJob = new ManualJobSchedule(infoCarrier);
@@ -116,9 +115,6 @@ namespace Root_VEGA_D
 
         private void M_bgwLoad_DoWork(object sender, DoWorkEventArgs e)
         {
-            if (m_loadport.p_id == "LoadportA") EQ.p_nRunLP = 0;
-            else if (m_loadport.p_id == "LoadportB") EQ.p_nRunLP = 1;
-
             while ((EQ.IsStop() != true) && m_loadport.IsBusy()) Thread.Sleep(10);
             Thread.Sleep(100);
         }
@@ -126,7 +122,10 @@ namespace Root_VEGA_D
         #region Button Click Event
         private void buttonLoad_Click(object sender, RoutedEventArgs e)
         {
+
             if (IsEnableLoad() == false) return;
+            if (m_loadport.p_id == "LoadportA") EQ.p_nRunLP = 0;
+            else if (m_loadport.p_id == "LoadportB") EQ.p_nRunLP = 1;
             //ModuleRunBase moduleRun = m_rfid.m_runReadID.Clone();
             //m_rfid.StartRun(moduleRun);
             //while ((EQ.IsStop() != true) && m_rfid.IsBusy()) Thread.Sleep(10);

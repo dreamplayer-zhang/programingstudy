@@ -958,7 +958,7 @@ namespace Root_EFEM.Module
 
             string m_sSimulCarrierID = "CarrierID";
             bool m_bMapping = true;
-            bool m_bReadRFID = true;
+            public bool m_bReadRFID = true;
             public override ModuleRunBase Clone()
             {
                 Run_Docking run = new Run_Docking(m_module);

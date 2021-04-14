@@ -45,7 +45,7 @@ namespace Root_VEGA_D
             p_nRnR = 1;
             return jobschedule.DialogResult == true;
         }
-        public string SetInfoPod()
+        public string CheckInfoPod()
         {
             if (m_loadport.p_infoCarrier.m_aInfoWafer == null)
             {
