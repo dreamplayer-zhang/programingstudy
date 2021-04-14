@@ -7,6 +7,7 @@
         mc:Ignorable="d"
         WindowStyle="ToolWindow"
         Closing="Window_Closing"
+                ResizeMode="NoResize"
         WindowStartupLocation="CenterScreen"
         Title="ManualJobSchedule" Height="740" Width="930.5" Background="#FF406859" Topmost="True">
     <Window.Resources>
@@ -246,7 +247,7 @@
         </Grid.Style>
         <Grid.RowDefinitions>
             <RowDefinition Height="4*"/>
-            <RowDefinition Height="0.3*"/>
+            <RowDefinition Height="2*"/>
             <RowDefinition Height="2*"/>
             <RowDefinition Height="2*"/>
         </Grid.RowDefinitions>
@@ -359,8 +360,10 @@
                 <ColumnDefinition/>
                 <ColumnDefinition/>
             </Grid.ColumnDefinitions>
-            <Button Grid.Column="0" Style="{StaticResource ButtonStyle1}"
+            <!--<Button Grid.Column="0" Style="{StaticResource ButtonStyle1}"
                     Content="Run"
+                    x:Name="btnRun"
+                    Visibility="{Binding p_diOpen}"
                     IsDefault="True"
                     Margin="20"
                     Click="Button_Click"/>
@@ -368,6 +371,18 @@
                     Content="Cancel"
                     IsCancel="True"
                     Margin="20"
+                    Click="Button_Click_1"/>-->
+            <Button Grid.Column="0" Style="{StaticResource ButtonStyle1}"
+                    Content="Run"
+                    Margin="20"
+                    x:Name="btnRun"
+                    IsDefault="True"
+                    Visibility="{Binding p_diOpen}"
+                    Click="Button_Click"/>
+            <Button Grid.Column="1" Style="{StaticResource ButtonStyle1}"
+                    Content="Cancel"
+                    Margin="20"
+                    IsCancel="True"
                     Click="Button_Click_1"/>
         </Grid>
     </Grid>

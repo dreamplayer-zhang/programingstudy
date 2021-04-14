@@ -55,6 +55,7 @@ namespace Root_EFEM.Module
             set
             {
                 m_diOpen = value;
+                OnPropertyChanged();
             }
         }
         public DIO_I p_diClose
@@ -109,6 +110,7 @@ namespace Root_EFEM.Module
         private DIO_I m_diClose;
         private DIO_I m_diReady;
         private DIO_I m_diRun;
+
         //private OHT_Semi m_OHT;
         OHT _OHT;
         public OHT m_OHTNew

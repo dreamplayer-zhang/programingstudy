@@ -24,11 +24,11 @@ namespace Root_VEGA_D
             m_handler = m_engineer.m_handler;
         }
 
-        public bool ShowPopup()
+        public bool ShowPopup(VEGA_D_Handler handler)
         {
             if (ManualJobSchedule_UI.m_bShow) return false;
             ManualJobSchedule_UI jobschedule = new ManualJobSchedule_UI(m_infoCarrier);
-            jobschedule.Init(this);
+            jobschedule.Init(this, m_engineer, m_loadport);
             jobschedule.ShowDialog();
             p_bRnR = false;
             if (p_bRnR)
