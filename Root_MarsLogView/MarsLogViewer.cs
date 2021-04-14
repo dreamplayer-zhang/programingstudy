@@ -55,6 +55,10 @@ namespace Root_MarsLogView
             foreach (string sCmd in asVision)
             {
                 string[] asCmd = sCmd.Split(':');
+                if(asCmd[0] == "WaferID")
+				{
+					if (asCmd.Length == 3) asCmd[1] = asCmd[1] + ':' + asCmd[2];
+				}
                 if (asCmd.Length >= 2)
                 {
                     switch (asCmd[0])
