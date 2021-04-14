@@ -108,11 +108,11 @@ namespace Root_CAMELLIA
             {
                 nRepeatCount[i] = i+1;
             }
-            p_PMReflectance500.DrawReviewGraph("500", "Count","Diff [%]", nRepeatCount, m_PMData.DiffReflectnace500);
+            //p_PMReflectance500.DrawReviewGraph("500", "Count","Diff [%]", nRepeatCount, m_PMData.DiffReflectnace500);
 
-            p_PMReflectance740.DrawReviewGraph("740", "Count", "Diff [%]",  nRepeatCount, m_PMData.DiffReflectnace740);
+            //p_PMReflectance740.DrawReviewGraph("740", "Count", "Diff [%]",  nRepeatCount, m_PMData.DiffReflectnace740);
             
-            p_PMReflectance1100.DrawReviewGraph("1100", "Count", "Diff [%]", nRepeatCount, m_PMData.DiffReflectnace1100);
+            //p_PMReflectance1100.DrawReviewGraph("1100", "Count", "Diff [%]", nRepeatCount, m_PMData.DiffReflectnace1100);
         }
     }
 }

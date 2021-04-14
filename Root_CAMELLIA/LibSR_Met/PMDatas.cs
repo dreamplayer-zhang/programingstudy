@@ -45,17 +45,17 @@ namespace Root_CAMELLIA.LibSR_Met
     }
     public class CalPMReflectance
     {
-        public double dMin;
-        public double dMax;
-        public double dCop;
-        public double dAvg;
-    }
-    public class DiffData
-    {
-        public double[] DiffReflectnace500;
-        public double[] DiffReflectnace740;
-        public double[] DiffReflectnace1100;
-        public double[] DiffReflectnaceTotal;
+        public double[] dDiffReflectance;
+        public double dWavelength = 0.0;
+        public double dMin = 0.0;
+        public double dMax = 0.0;
+        public double dCop = 0.0;
+        public double dAvg = 0.0;
+
+        public CalPMReflectance()
+        {
+            dDiffReflectance = new double[15];
+        }
     }
     public class PMDatas
     {
@@ -72,16 +72,9 @@ namespace Root_CAMELLIA.LibSR_Met
         public List<double> WavelengthRef;
         public List<double> ReflectanceRef;
 
-        public double[] DiffReflectnace500;
-        public double[] DiffReflectnace740;
-        public double[] DiffReflectnace1100;
-        public double[] DiffReflectnaceTotal;
-
-        public List<CalPMReflectance> PMResult500;
-        public List<CalPMReflectance> PMResult740;
-        public List<CalPMReflectance> PMResult1100;
-        public List<CalPMReflectance> PMResultTotal;
-
+        public string sCheckResultWavelength;
+        public string[] arrCheckWavelength;
+        public CalPMReflectance[] m_CalPMReflectance;
 
         //Sensor-Camera Tilt Check
         public System.Windows.Point Align_CenterPosTop = new System.Windows.Point();    //이미지 상에서의 센서 센터
@@ -103,12 +96,13 @@ namespace Root_CAMELLIA.LibSR_Met
 
             WavelengthRef = new List<double>();
             ReflectanceRef = new List<double>();
-            
 
-            PMResult500 = new List<CalPMReflectance>();
-            PMResult740 = new List<CalPMReflectance>();
-            PMResult1100 = new List<CalPMReflectance>();
-            PMResultTotal = new List<CalPMReflectance>();
+
+            m_CalPMReflectance = new CalPMReflectance[ConstValue.PM_REFLECTANCE_CHECK_WAVELENGTH_COUNT];
+            for (int i = 0; i < ConstValue.PM_REFLECTANCE_CHECK_WAVELENGTH_COUNT; i++)
+            {
+                m_CalPMReflectance[i] = new CalPMReflectance();
+            }
         }
         public void LoadPMData()
         {
@@ -128,7 +122,7 @@ namespace Root_CAMELLIA.LibSR_Met
                 {
                     string str = sr.ReadLine();
                     string[] datas = str.Split(':');
-                    string[] dataTemp;// = datas[1].Split(',');
+                    
 
                     if (datas[1] == string.Empty)
                         continue;
@@ -146,6 +140,9 @@ namespace Root_CAMELLIA.LibSR_Met
                             break;
                         case "nSensorTiltRepeatNum":
                             nSensorTiltRepeatNum = Convert.ToInt32(datas[1]);
+                            break;
+                        case "sCheckResultWavelength":
+                            sCheckResultWavelength = datas[1];
                             break;
                         case "nSensorCenterX":
                             nSensorCenterX = Convert.ToInt32(datas[1]);
@@ -194,13 +191,16 @@ namespace Root_CAMELLIA.LibSR_Met
         }
         public CheckResult CheckSensorTilt(int nCurrentNum)
         {
-            if (nCurrentNum == 0)
+            if(nCurrentNum==0)
             {
-                DiffReflectnace500 = new double[nSensorTiltRepeatNum];
-                DiffReflectnace740 = new double[nSensorTiltRepeatNum];
-                DiffReflectnace1100 = new double[nSensorTiltRepeatNum];
-                DiffReflectnaceTotal = new double[nSensorTiltRepeatNum];
+                arrCheckWavelength = sCheckResultWavelength.Split(',');
+                for(int n=0; n< arrCheckWavelength.Length; n++)
+                {
+                    m_CalPMReflectance[n].dWavelength = Convert.ToDouble(arrCheckWavelength[n]);
+                }
+
             }
+
             m_DM.m_Log.WriteLog(LogType.PM, "CheckSensorTilt()");
 
             if (m_DM.m_RawData[0].Wavelength.Count() == 0)
@@ -213,16 +213,9 @@ namespace Root_CAMELLIA.LibSR_Met
             rstPM.ItemName = PMItem.SensorTilt;
             rstPM.Reference = "±" + dSensorTiltError.ToString() + "%";
 
-
-            //SensorTiltDataStartN = 350;
-            //SensorTiltDataEndN = 1500;
-            //int nWLCount = SensorTiltDataEndN - ensorTiltDataStartN + 1;
-            //SensorTiltDataCount = nWLCount;
-
             if (Math.Abs(m_DM.m_RawData[0].Wavelength[0] - WavelengthRef[0]) > 0.1)
             {
-                // 둘다 350 부터 시작 해야함
-                //m_DM.m_LM.WriteLog(LOG.PM, "[CheckError]PM & Monitoring - CalData와 측정Data 갯수 불일치");
+                
                 m_DM.m_Log.WriteLog(LogType.PM, "[CheckError]PM & Monitoring - Cal data and measurement data number do not match");
                 return CheckResult.CheckError;
             }
@@ -235,28 +228,31 @@ namespace Root_CAMELLIA.LibSR_Met
             SensorTiltDatas tiltData = new SensorTiltDatas();
             int nCheckPMRange = nCheckRangeEnd - nCheckRangeStart;
             double dDiffSum = 0.0, dAvg = 0.0;
+            int nCheckNum = 0;
             for (int n = 0; n < nCheckPMRange; n++)
             {
-                if (WavelengthRef[n] == 500)
+                if (WavelengthRef[n] == m_CalPMReflectance[nCheckNum].dWavelength)
                 {
-                    DiffReflectnace500[nCurrentNum] = ReflectanceRef[n] - m_DM.m_RawData[0].Reflectance[n];
+                    m_CalPMReflectance[nCheckNum].dDiffReflectance[nCurrentNum] = ReflectanceRef[n] - m_DM.m_RawData[0].Reflectance[n];
+                    nCheckNum++;
                 }
-                if (WavelengthRef[n] == 740)
-                {
-                    DiffReflectnace740[nCurrentNum] = ReflectanceRef[n] - m_DM.m_RawData[0].Reflectance[n];
-                }
-                if (WavelengthRef[n] == 1100)
-                {
-                    DiffReflectnace1100[nCurrentNum] = ReflectanceRef[n] - m_DM.m_RawData[0].Reflectance[n];
-                }
+                
                 tiltData.Wavelength.Add(WavelengthRef[n]);
                 tiltData.Diff.Add(Math.Abs(ReflectanceRef[n] - m_DM.m_RawData[0].Reflectance[n]));
                 dDiffSum += (Math.Abs(ReflectanceRef[n] - m_DM.m_RawData[0].Reflectance[n]));
             }
+            if(nCheckNum== arrCheckWavelength.Length)
+            {
+                m_DM.m_Log.WriteLog(LogType.PM, "All Check Wavelengh Cal done["+nCurrentNum.ToString()+"]");
+            }
+            else
+            {
+                m_DM.m_Log.WriteLog(LogType.PM, "All Check Wavelengh Cal done[" + nCurrentNum.ToString() + "]");
+            }
             SensorTiltData.Add(tiltData);
             dAvg = dDiffSum / (double)nCheckPMRange;
             rstPM.Measured = dAvg;
-            DiffReflectnaceTotal[nCurrentNum] = dAvg;
+            m_CalPMReflectance[nCheckNum+1].dDiffReflectance[nCurrentNum]= dAvg;
             if (Math.Abs(dAvg) > dSensorTiltError)
             {
                 m_DM.m_Log.WriteLog(LogType.PM, "[Error]CheckSensorTilt - RDiffAvg:" + dAvg.ToString() + "/SensorTiltError:" + dSensorTiltError.ToString());
@@ -267,85 +263,32 @@ namespace Root_CAMELLIA.LibSR_Met
             rstPM.Error = false;
             if(nCurrentNum == nSensorTiltRepeatNum-1)
             {
-                bool bCalDone = CalPMReflectanceResult();
+                bool bCalDone = CalPMReflectanceResult(arrCheckWavelength.Length); 
             }
 
             return CheckResult.OK;
         }
-        private bool CalPMReflectanceResult()
+        private bool CalPMReflectanceResult(int nCalResultNum)
         {
-            CalPMReflectance CalRefResult = new CalPMReflectance();
-            CalRefResult.dMin = DiffReflectnace500.Min();
-            CalRefResult.dMax = DiffReflectnace500.Max();
-            if (CalRefResult.dMin > 0 && CalRefResult.dMax > 0)
+            for (int n = 0; n < nCalResultNum + 1; n++)
             {
-                CalRefResult.dCop = -CalRefResult.dMin + CalRefResult.dMax;
-            }
-            else if (CalRefResult.dMin < 0 && CalRefResult.dMax < 0)
-            {
-                CalRefResult.dCop = -Math.Abs(CalRefResult.dMin) + Math.Abs(CalRefResult.dMax);
-            }
-            else
-            {
-                CalRefResult.dCop = Math.Abs(CalRefResult.dMin) + Math.Abs(CalRefResult.dMax);
-            }
-            CalRefResult.dAvg = DiffReflectnace500.Average();
-            PMResult500.Add(CalRefResult);
 
-            
-            CalRefResult.dMin = DiffReflectnace740.Min();
-            CalRefResult.dMax = DiffReflectnace740.Max();
-            if (CalRefResult.dMin > 0 && CalRefResult.dMax > 0)
-            {
-                CalRefResult.dCop = -CalRefResult.dMin + CalRefResult.dMax;
+                m_CalPMReflectance[n].dMin = m_CalPMReflectance[n].dDiffReflectance.Min();
+                m_CalPMReflectance[n].dMax = m_CalPMReflectance[n].dDiffReflectance.Max();
+                if (m_CalPMReflectance[n].dMin > 0 && m_CalPMReflectance[n].dMax > 0)
+                {
+                    m_CalPMReflectance[n].dCop = -m_CalPMReflectance[n].dMin + m_CalPMReflectance[n].dMax;
+                }
+                else if (m_CalPMReflectance[n].dMin < 0 && m_CalPMReflectance[n].dMax < 0)
+                {
+                    m_CalPMReflectance[n].dCop = -Math.Abs(m_CalPMReflectance[n].dMin) + Math.Abs(m_CalPMReflectance[n].dMax);
+                }
+                else
+                {
+                    m_CalPMReflectance[n].dCop = Math.Abs(m_CalPMReflectance[n].dMin) + Math.Abs(m_CalPMReflectance[n].dMax);
+                }
+                m_CalPMReflectance[n].dAvg = m_CalPMReflectance[n].dDiffReflectance.Average();
             }
-            else if (CalRefResult.dMin < 0 && CalRefResult.dMax < 0)
-            {
-                CalRefResult.dCop = -Math.Abs(CalRefResult.dMin) + Math.Abs(CalRefResult.dMax);
-            }
-            else
-            {
-                CalRefResult.dCop = Math.Abs(CalRefResult.dMin) + Math.Abs(CalRefResult.dMax);
-            }
-            CalRefResult.dAvg = DiffReflectnace740.Average();
-            PMResult740.Add(CalRefResult);
-
-
-            CalRefResult.dMin = DiffReflectnace1100.Min();
-            CalRefResult.dMax = DiffReflectnace1100.Max();
-            if (CalRefResult.dMin > 0 && CalRefResult.dMax > 0)
-            {
-                CalRefResult.dCop = -CalRefResult.dMin + CalRefResult.dMax;
-            }
-            else if (CalRefResult.dMin < 0 && CalRefResult.dMax < 0)
-            {
-                CalRefResult.dCop = -Math.Abs(CalRefResult.dMin) + Math.Abs(CalRefResult.dMax);
-            }
-            else
-            {
-                CalRefResult.dCop = Math.Abs(CalRefResult.dMin) + Math.Abs(CalRefResult.dMax);
-            }
-            CalRefResult.dAvg = DiffReflectnace1100.Average();
-            PMResult1100.Add(CalRefResult);
-
-
-            CalRefResult.dMin = DiffReflectnaceTotal.Min();
-            CalRefResult.dMax = DiffReflectnaceTotal.Max();
-            if (CalRefResult.dMin > 0 && CalRefResult.dMax > 0)
-            {
-                CalRefResult.dCop = -CalRefResult.dMin + CalRefResult.dMax;
-            }
-            else if (CalRefResult.dMin < 0 && CalRefResult.dMax < 0)
-            {
-                CalRefResult.dCop = -Math.Abs(CalRefResult.dMin) + Math.Abs(CalRefResult.dMax);
-            }
-            else
-            {
-                CalRefResult.dCop = Math.Abs(CalRefResult.dMin) + Math.Abs(CalRefResult.dMax);
-            }
-            CalRefResult.dAvg = DiffReflectnaceTotal.Average();
-            PMResultTotal.Add(CalRefResult);
-            // min max col 
             return true;
         }
         public bool CalcCenterPoint(bool bTop, Emgu.CV.Mat matImg)

@@ -14,7 +14,7 @@ namespace Root_CAMELLIA.LibSR_Met
         public const string PATH_PM_FILE = @"C:\Camellia\Init\PM.cpm";
         public const string PATH_PM_REFLECTANCE_FILE = @"C:\Camellia\Init\PMReflectance.csv";
         public const string PATH_MONITORING_RESULT_FOLDER = @"C:\Camellia\Data\Monitoring_Result\";
-        //
+        public const int PM_REFLECTANCE_CHECK_WAVELENGTH_COUNT = 10;
         public const int SPECTROMETER_MAX_PIXELSIZE = 5001;  //350nm ~ 1500nm (1nm 간격)
         public const int RAWDATA_POINT_MAX_SIZE = 100;
 

@@ -40,6 +40,8 @@ namespace Root_CAMELLIA.Module
         public Dlg_Engineer_ViewModel.PM_SR_Parameter SR_Parameter = new Dlg_Engineer_ViewModel.PM_SR_Parameter();
         public bool m_isPM = false;
         public bool m_isAlphaFit = false;
+        public bool m_isPointMeasure = false;
+        public RPoint m_ptMeasure = new RPoint();
         public Run_Measure(Module_Camellia module)
         {
             m_module = module;
@@ -141,9 +143,9 @@ namespace Root_CAMELLIA.Module
                     //    m_DataManager.recipeDM.MeasurementRD.DataSelectedPoint[m_DataManager.recipeDM.MeasurementRD.DataMeasurementRoute[index]].y,
                     //    m_DataManager.recipeDM.MeasurementRD.LowerWaveLength,
                     //    m_DataManager.recipeDM.MeasurementRD.UpperWaveLength);
-                    LibSR_Met.DataManager.GetInstance().SaveResultFileSlot(m_slotSpectraDataPath + "name", m_module.p_infoWafer, m_DataManager.recipeDM, index);
+                    LibSR_Met.DataManager.GetInstance().SaveResultFileSlot(m_slotSpectraDataPath + "\\" +index+"_"+DateTime.Now.ToString("HHmmss"), m_module.p_infoWafer, m_DataManager.recipeDM, index);
                     //SaveRT
-                    LibSR_Met.DataManager.GetInstance().SaveRT(@"C:\Users\ATI\Desktop\SaveTest\RT\" + index + "_" + DateTime.Now.ToString("HHmmss") + "test.csv", index);
+                    //LibSR_Met.DataManager.GetInstance().SaveRT(@"C:\Users\ATI\Desktop\SaveTest\RT\" + index + "_" + DateTime.Now.ToString("HHmmss") + "test.csv", index);
                     sw.Stop();
                     System.Diagnostics.Debug.WriteLine(sw.ElapsedMilliseconds);
                 }
@@ -160,12 +162,17 @@ namespace Root_CAMELLIA.Module
         string m_resultPath = "";
         string m_slotContourMapPath = "";
         string m_slotSpectraDataPath = "";
-
+        string m_historyRTDataPath = "";
         private bool MakeSaveDirectory()
         {
             string rootPath = m_module.p_dataSavePath;
             try
             {
+                string[] path = rootPath.Split('\\');
+                if (System.IO.Directory.Exists(rootPath))
+                {
+                    rootPath = rootPath.Replace(path[path.Length - 1],DateTime.Now.ToString("yyyy-MM-dd") + "T" + DateTime.Now.ToString("HH-mm-ss"));
+                }
                 m_summaryPath = rootPath + "\\ResultData_Summary";
                 GeneralTools.MakeDirectory(m_summaryPath);
                 m_resultPath = rootPath + "\\ResultData";
@@ -174,6 +181,7 @@ namespace Root_CAMELLIA.Module
                 GeneralTools.MakeDirectory(m_slotContourMapPath);
                 m_slotSpectraDataPath = rootPath + "\\Slot." + m_module.p_infoWafer.m_nSlot + "\\SpectraData";
                 GeneralTools.MakeDirectory(m_slotSpectraDataPath);
+                ////m_historyRTDataPath = BaseDefine.Dir_HistorySaveRootPath + ""
             }
             catch(Exception e)
             {
@@ -249,7 +257,7 @@ namespace Root_CAMELLIA.Module
             Met.DataManager dm = Met.DataManager.GetInstance();
             //App.m_nanoView.UpdateModel();
             dm.ClearRawData();
-            if (!m_bUseTestSequence)
+            if (!m_bUseTestSequence && !m_isPointMeasure)
             {
                 double centerX;
                 double centerY;
@@ -314,7 +322,7 @@ namespace Root_CAMELLIA.Module
                         }
 
                     // SaveReflectance
-                    LibSR_Met.DataManager.GetInstance().SaveReflectance(@"C:\Users\ATI\Desktop\SaveTest\Reflectance\" + i + "_" + DateTime.Now.ToString("HHmmss") + "Reflectance.csv", i);
+                    LibSR_Met.DataManager.GetInstance().SaveReflectance(m_resultPath + "\\" + i + "_" + DateTime.Now.ToString("HHmmss") + "Reflectance.csv", i);
                     //pp.m_nanoView.
                     StopWatch sw = new StopWatch();
                     sw.Start();
@@ -375,6 +383,16 @@ namespace Root_CAMELLIA.Module
                 m_mwvm.p_ArrowVisible = Visibility.Hidden;
 
             }
+            else if (m_isPointMeasure)
+            {
+                if (App.m_nanoView.SampleMeasure(0, m_ptMeasure.X, m_ptMeasure.Y,
+                      m_mwvm.SettingViewModel.p_ExceptNIR, m_DataManager.recipeDM.MeasurementRD.UseTransmittance, m_DataManager.recipeDM.MeasurementRD.UseThickness,
+                      m_DataManager.recipeDM.MeasurementRD.LowerWaveLength, m_DataManager.recipeDM.MeasurementRD.UpperWaveLength) != Met.Nanoview.ERRORCODE_NANOVIEW.SR_NO_ERROR)
+                {
+                    return "Layer Model Not Ready";
+                }
+                thicknessQueue.Enqueue(0);
+            }
             else
             {
                 if (m_module.Run(axisXY.StartMove(m_ptTestMeasurePoint)))
@@ -429,8 +447,8 @@ namespace Root_CAMELLIA.Module
             //  DCOL 세이브 필요
 
             //LibSR_Met.DataManager.GetInstance().AllContourMapDataFitting(m_DataManager.recipeDM.MeasurementRD.WaveLengthReflectance, m_DataManager.recipeDM.MeasurementRD.WaveLengthTransmittance);
-            //LibSR_Met.DataManager.GetInstance().SaveResultFileSummary(@"C:\Users\ATI\Desktop\SaveTest\Summary\"+ DateTime.Now.ToString("HHmmss")+"Summary.csv", m_module.p_infoWafer.p_sLotID,
-            //    m_module.p_infoWafer.p_sSlotID);
+            LibSR_Met.DataManager.GetInstance().SaveResultFileSummary(m_summaryPath +"\\" + DateTime.Now.ToString("HHmmss") + "Summary.csv", m_module.p_infoWafer.p_sLotID,
+                m_module.p_infoWafer.p_sSlotID);
 
             return "OK";
         }

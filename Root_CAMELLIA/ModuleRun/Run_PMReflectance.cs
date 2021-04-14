@@ -224,9 +224,9 @@ namespace Root_CAMELLIA.Module
                 nRepeatCount[i] = i + 1;
             }
 
-            m_module.mwvm.EngineerViewModel.p_PMCheckReview_ViewModel.m_pmReflectance_VM.p_PMReflectance500.DrawReviewGraph("500 nm", "Diff [%]", "Count", nRepeatCount, m_PMData.DiffReflectnace500);
-            m_module.mwvm.EngineerViewModel.p_PMCheckReview_ViewModel.m_pmReflectance_VM.p_PMReflectance740.DrawReviewGraph("740 nm", "Diff [%]", "Count", nRepeatCount, m_PMData.DiffReflectnace740);
-            m_module.mwvm.EngineerViewModel.p_PMCheckReview_ViewModel.m_pmReflectance_VM.p_PMReflectance1100.DrawReviewGraph("1100 nm", "Diff [%]", "Count", nRepeatCount, m_PMData.DiffReflectnace1100);
+            //m_module.mwvm.EngineerViewModel.p_PMCheckReview_ViewModel.m_pmReflectance_VM.p_PMReflectance500.DrawReviewGraph("500 nm", "Diff [%]", "Count", nRepeatCount, m_PMData.DiffReflectnace500);
+            //m_module.mwvm.EngineerViewModel.p_PMCheckReview_ViewModel.m_pmReflectance_VM.p_PMReflectance740.DrawReviewGraph("740 nm", "Diff [%]", "Count", nRepeatCount, m_PMData.DiffReflectnace740);
+            //m_module.mwvm.EngineerViewModel.p_PMCheckReview_ViewModel.m_pmReflectance_VM.p_PMReflectance1100.DrawReviewGraph("1100 nm", "Diff [%]", "Count", nRepeatCount, m_PMData.DiffReflectnace1100);
             //리턴값 반환할 것
             return "OK";
         }
