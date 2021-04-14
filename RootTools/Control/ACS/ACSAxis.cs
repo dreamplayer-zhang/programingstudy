@@ -141,7 +141,7 @@ namespace RootTools.Control.ACS
                 return p_sInfo; 
             }
             p_eState = eState.Move;
-            Thread.Sleep(10);
+            Thread.Sleep(100);
             return "OK";
         }
 
@@ -168,7 +168,7 @@ namespace RootTools.Control.ACS
                 return p_sInfo;
             }
             p_eState = eState.Move;
-            Thread.Sleep(10);
+            Thread.Sleep(100);
             return "OK";
         }
         #endregion
@@ -243,7 +243,7 @@ namespace RootTools.Control.ACS
             p_sInfo = m_acs.m_aBuffer[m_nHomeBuffer].Run();
             if (p_sInfo != "OK") return p_sInfo;
             p_eState = eState.Home;
-            Thread.Sleep(10);
+            Thread.Sleep(100);
             return "OK";
         }
 
@@ -285,8 +285,8 @@ namespace RootTools.Control.ACS
                 double dEndTriggerPos = trigger.m_aPos[1] * 0.25;
 
                 // Y축 시작/끝 위치 지정 (트리거 시작/끝 위치에서부터 임의로 10mm만큼 여유)
-                double dStartAxisPos = trigger.m_aPos[0] - 10;
-                double dEndAxisPos = trigger.m_aPos[1] + 10;
+                double dStartAxisPos = trigger.m_aPos[0] - 20;
+                double dEndAxisPos = trigger.m_aPos[1] + 20;
 
                 // 트리거 발생 간격
                 double dTriggerInterval = trigger.m_dPos * 0.001 * 0.25;
@@ -327,7 +327,7 @@ namespace RootTools.Control.ACS
 
                 // Axis 상태 변경
                 p_eState = eState.Move;
-                Thread.Sleep(10);
+                Thread.Sleep(100);
             }
             else
             {
@@ -347,7 +347,7 @@ namespace RootTools.Control.ACS
 
                 // Axis 상태 변경
                 p_eState = eState.Ready;
-                Thread.Sleep(10);
+                Thread.Sleep(100);
             }
 
             m_bTriggerOn = bOn;
@@ -395,7 +395,7 @@ namespace RootTools.Control.ACS
 
             // Axis 상태 변경
             p_eState = eState.Ready;
-            Thread.Sleep(10);
+            Thread.Sleep(100);
 
             m_bTriggerOn = false;
         }
