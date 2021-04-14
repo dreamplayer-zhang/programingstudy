@@ -2848,6 +2848,8 @@ namespace Root_AOP01_Inspection.Module
             public int m_nThreshold = 70;
             public int m_nSubImageThreshold = 70;
 
+            public bool[] m_barrPass = new bool[3];
+
             public Run_BarcodeInspection(MainVision module)
             {
                 m_module = module;
@@ -2927,38 +2929,45 @@ namespace Root_AOP01_Inspection.Module
                 narrBarcodeHeight[0] = m_nBarcode1ROIHeight;
                 narrBarcodeHeight[1] = m_nBarcode2ROIHeight;
                 narrBarcodeHeight[2] = m_nBarcode3ROIHeight;
+                m_barrPass[0] = true;
+                m_barrPass[1] = true;
+                m_barrPass[2] = true;
 
-                while (true)
+                string strTimeStamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
+                m_module.p_nBarcodeInspectionProgressValue = 0;
+                m_module.p_nBarcodeInspectionProgressMin = 0;
+                m_module.p_nBarcodeInspectionProgressMax = 3;
+                if (m_module.p_nBarcodeInspectionProgressMax - m_module.p_nBarcodeInspectionProgressMin > 0)
+                    m_module.p_nBarcodeInspectionProgressPercent = (int)((double)m_module.p_nBarcodeInspectionProgressValue / (double)(m_module.p_nBarcodeInspectionProgressMax - m_module.p_nBarcodeInspectionProgressMin) * 100);
+                m_module.p_bBarcodePass = true;
+
+                for (int i = 0; i < 3; i++)
                 {
-                    m_module.p_nBarcodeInspectionProgressValue = 0;
-                    m_module.p_nBarcodeInspectionProgressMin = 0;
-                    m_module.p_nBarcodeInspectionProgressMax = 3;
-                    if (m_module.p_nBarcodeInspectionProgressMax - m_module.p_nBarcodeInspectionProgressMin > 0)
-                        m_module.p_nBarcodeInspectionProgressPercent = (int)((double)m_module.p_nBarcodeInspectionProgressValue / (double)(m_module.p_nBarcodeInspectionProgressMax - m_module.p_nBarcodeInspectionProgressMin) * 100);
-                    m_module.p_bBarcodePass = true;
-
-                    for (int i = 0; i < 3; i++)
+                    if (narrBarcodeWidth[i] == 0 || narrBarcodeHeight[i] == 0)
                     {
-                        if (narrBarcodeWidth[i] == 0 || narrBarcodeHeight[i] == 0)
-                        {
-                            m_module.p_nBarcodeInspectionProgressValue++;
-                            if (m_module.p_nBarcodeInspectionProgressMax - m_module.p_nBarcodeInspectionProgressMin > 0)
-                                m_module.p_nBarcodeInspectionProgressPercent = (int)((double)m_module.p_nBarcodeInspectionProgressValue / (double)(m_module.p_nBarcodeInspectionProgressMax - m_module.p_nBarcodeInspectionProgressMin) * 100);
-                            continue;
-                        }
-                        BarcodeInspection(cptarrBarcodLTPoint[i], narrBarcodeWidth[i], narrBarcodeHeight[i], i);
                         m_module.p_nBarcodeInspectionProgressValue++;
                         if (m_module.p_nBarcodeInspectionProgressMax - m_module.p_nBarcodeInspectionProgressMin > 0)
                             m_module.p_nBarcodeInspectionProgressPercent = (int)((double)m_module.p_nBarcodeInspectionProgressValue / (double)(m_module.p_nBarcodeInspectionProgressMax - m_module.p_nBarcodeInspectionProgressMin) * 100);
+                        continue;
                     }
+                    BarcodeInspection(cptarrBarcodLTPoint[i], narrBarcodeWidth[i], narrBarcodeHeight[i], i, strTimeStamp);
+                    m_module.p_nBarcodeInspectionProgressValue++;
+                    if (m_module.p_nBarcodeInspectionProgressMax - m_module.p_nBarcodeInspectionProgressMin > 0)
+                        m_module.p_nBarcodeInspectionProgressPercent = (int)((double)m_module.p_nBarcodeInspectionProgressValue / (double)(m_module.p_nBarcodeInspectionProgressMax - m_module.p_nBarcodeInspectionProgressMin) * 100);
                 }
+
+                using (System.IO.StreamWriter sr = new System.IO.StreamWriter($"D:\\AOP01\\BarcodeInspection\\{strTimeStamp}_Result.csv"))
+                {
+                    sr.WriteLine("ROI0_Result, ROI1_Result, ROI2_Result");
+                    sr.WriteLine("{0}, {1}, {2}", m_barrPass[0], m_barrPass[1], m_barrPass[2]);
+                }
+
 
                 return "OK";
             }
 
-            private void BarcodeInspection(CPoint cptBarcodeLTPoint, int nBarcodeWidth, int nBarcodeHeight, int iBarcodeNumber)
+            private void BarcodeInspection(CPoint cptBarcodeLTPoint, int nBarcodeWidth, int nBarcodeHeight, int iBarcodeNumber, string strTimeStamp)
             {
-                string strTimeStamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
                 MemoryData mem = m_module.m_engineer.GetMemory(App.mPool, App.mGroup, App.mMainMem);
                 CPoint cptStartROIPoint = cptBarcodeLTPoint;
                 CPoint cptEndROIPoint = new CPoint(cptStartROIPoint.X + nBarcodeWidth, cptStartROIPoint.Y + nBarcodeHeight);
@@ -3051,6 +3060,7 @@ namespace Root_AOP01_Inspection.Module
                     if (blob.BoundingBox.Width * 5/*TDI90 Resolution = 5*/ > dScratchSpec_mm * nMMPerUM || blob.BoundingBox.Height * 5/*TDI90 Resolution = 5*/ > dScratchSpec_mm * nMMPerUM)
                     {
                         m_module.p_bBarcodePass = false;
+                        m_barrPass[iBarcodeNumber] = false;
                         break;
                     }
                 }
@@ -3747,6 +3757,7 @@ namespace Root_AOP01_Inspection.Module
                 }
 
                 // variable
+                string strTimeStamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
                 string strPool = "MainVision.Vision Memory";
                 string strGroup = "MainVision";
                 string strMemory = "Main";
@@ -4015,6 +4026,12 @@ namespace Root_AOP01_Inspection.Module
                     double dPatternShiftSpec_mm = UIManager.Instance.SetupViewModel.p_RecipeWizard.p_dPatternShiftSpec_mm;
                     double dPatternRotationSpec_degree = UIManager.Instance.SetupViewModel.p_RecipeWizard.p_dPatternRotationSpec_degree;
                     if (m_module.p_dPatternShiftDistance > dPatternShiftSpec_mm || m_module.p_dPatternShiftAngle > dPatternRotationSpec_degree) m_module.p_bPatternShiftPass = false;
+
+                    using (System.IO.StreamWriter sr = new System.IO.StreamWriter($"D:\\AOP01\\PatternShiftAndRotationInspection\\{strTimeStamp}_Result.csv"))
+                    {
+                        sr.WriteLine("Pass,Distance,Angle");
+                        sr.WriteLine("{0},{1},{2}", m_module.p_bPatternShiftPass, m_module.p_dPatternShiftDistance, m_module.p_dPatternShiftAngle);
+                    }
                 }
                 else
                 {
@@ -4469,6 +4486,7 @@ namespace Root_AOP01_Inspection.Module
                 }
 
                 // variable
+                string strTimeStamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
                 string strPool = "MainVision.Vision Memory";
                 string strGroup = "MainVision";
                 string strMemory = "Main";
@@ -4657,7 +4675,7 @@ namespace Root_AOP01_Inspection.Module
                             else if (j == (int)eSearchPoint.RB) strName += eSearchPoint.RB;
                             else strName += eSearchPoint.LB;
 
-                            imgSub.Save("D:\\AOP01\\AlignKeyInspection\\ESCHO_" + strName + ".BMP");
+                            imgSub.Save($"D:\\AOP01\\AlignKeyInspection\\{strTimeStamp}_SUBIMG_" + strName + ".BMP");
 
                             if (bResult == false)
                             {
@@ -4670,7 +4688,13 @@ namespace Root_AOP01_Inspection.Module
                     if (m_module.p_nAlignKeyProgressMax - m_module.p_nAlignKeyProgressMin > 0)
                         m_module.p_nAlignKeyProgressPercent = (int)((double)m_module.p_nAlignKeyProgressValue / (double)(m_module.p_nAlignKeyProgressMax - m_module.p_nAlignKeyProgressMin) * 100);
                 }
-                //m_module.p_bAlignKeyPass = true;
+
+                using (System.IO.StreamWriter sr = new System.IO.StreamWriter($"D:\\AOP01\\AlignKeyInspection\\{strTimeStamp}_Result.csv"))
+                {
+                    sr.WriteLine("Result");
+                    sr.WriteLine("{0}", m_module.p_bAlignKeyPass);
+                }
+
                 return "OK";
             }
 
