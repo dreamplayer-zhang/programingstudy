@@ -2896,6 +2896,12 @@ namespace Root_AOP01_Inspection.Module
                         
             public override string Run()
             {
+                if (UIManager.Instance.SetupViewModel.p_RecipeWizard.p_bUseBarcodeScratch == false)
+                {
+                    m_log.Info("Barcode Inspection Not Used, Skip this ModuleRun");
+                    return "OK";
+                }
+
                 // variable
                 CPoint[] cptarrBarcodLTPoint = new CPoint[3];
                 int[] narrBarcodeWidth = new int[3];
@@ -2922,26 +2928,29 @@ namespace Root_AOP01_Inspection.Module
                 narrBarcodeHeight[1] = m_nBarcode2ROIHeight;
                 narrBarcodeHeight[2] = m_nBarcode3ROIHeight;
 
-                m_module.p_nBarcodeInspectionProgressValue = 0;
-                m_module.p_nBarcodeInspectionProgressMin = 0;
-                m_module.p_nBarcodeInspectionProgressMax = 3;
-                if (m_module.p_nBarcodeInspectionProgressMax - m_module.p_nBarcodeInspectionProgressMin > 0)
-                    m_module.p_nBarcodeInspectionProgressPercent = (int)((double)m_module.p_nBarcodeInspectionProgressValue / (double)(m_module.p_nBarcodeInspectionProgressMax - m_module.p_nBarcodeInspectionProgressMin) * 100);
-                m_module.p_bBarcodePass = true;
-
-                for (int i = 0; i<3; i++)
+                while (true)
                 {
-                    if (narrBarcodeWidth[i] == 0 || narrBarcodeHeight[i] == 0)
+                    m_module.p_nBarcodeInspectionProgressValue = 0;
+                    m_module.p_nBarcodeInspectionProgressMin = 0;
+                    m_module.p_nBarcodeInspectionProgressMax = 3;
+                    if (m_module.p_nBarcodeInspectionProgressMax - m_module.p_nBarcodeInspectionProgressMin > 0)
+                        m_module.p_nBarcodeInspectionProgressPercent = (int)((double)m_module.p_nBarcodeInspectionProgressValue / (double)(m_module.p_nBarcodeInspectionProgressMax - m_module.p_nBarcodeInspectionProgressMin) * 100);
+                    m_module.p_bBarcodePass = true;
+
+                    for (int i = 0; i < 3; i++)
                     {
+                        if (narrBarcodeWidth[i] == 0 || narrBarcodeHeight[i] == 0)
+                        {
+                            m_module.p_nBarcodeInspectionProgressValue++;
+                            if (m_module.p_nBarcodeInspectionProgressMax - m_module.p_nBarcodeInspectionProgressMin > 0)
+                                m_module.p_nBarcodeInspectionProgressPercent = (int)((double)m_module.p_nBarcodeInspectionProgressValue / (double)(m_module.p_nBarcodeInspectionProgressMax - m_module.p_nBarcodeInspectionProgressMin) * 100);
+                            continue;
+                        }
+                        BarcodeInspection(cptarrBarcodLTPoint[i], narrBarcodeWidth[i], narrBarcodeHeight[i], i);
                         m_module.p_nBarcodeInspectionProgressValue++;
                         if (m_module.p_nBarcodeInspectionProgressMax - m_module.p_nBarcodeInspectionProgressMin > 0)
                             m_module.p_nBarcodeInspectionProgressPercent = (int)((double)m_module.p_nBarcodeInspectionProgressValue / (double)(m_module.p_nBarcodeInspectionProgressMax - m_module.p_nBarcodeInspectionProgressMin) * 100);
-                        continue;
                     }
-                    BarcodeInspection(cptarrBarcodLTPoint[i], narrBarcodeWidth[i], narrBarcodeHeight[i], i);
-                    m_module.p_nBarcodeInspectionProgressValue++;
-                    if (m_module.p_nBarcodeInspectionProgressMax - m_module.p_nBarcodeInspectionProgressMin > 0)
-                        m_module.p_nBarcodeInspectionProgressPercent = (int)((double)m_module.p_nBarcodeInspectionProgressValue / (double)(m_module.p_nBarcodeInspectionProgressMax - m_module.p_nBarcodeInspectionProgressMin) * 100);
                 }
 
                 return "OK";
@@ -2949,6 +2958,7 @@ namespace Root_AOP01_Inspection.Module
 
             private void BarcodeInspection(CPoint cptBarcodeLTPoint, int nBarcodeWidth, int nBarcodeHeight, int iBarcodeNumber)
             {
+                string strTimeStamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
                 MemoryData mem = m_module.m_engineer.GetMemory(App.mPool, App.mGroup, App.mMainMem);
                 CPoint cptStartROIPoint = cptBarcodeLTPoint;
                 CPoint cptEndROIPoint = new CPoint(cptStartROIPoint.X + nBarcodeWidth, cptStartROIPoint.Y + nBarcodeHeight);
@@ -2957,8 +2967,9 @@ namespace Root_AOP01_Inspection.Module
                 CRect crtHalfRight;// = new CRect(new CPoint(crtROI.Center().X, cptStartROIPoint.Y), cptEndROIPoint);
 
                 Image<Gray, byte> imgROI = m_module.GetGrayByteImageFromMemory(mem, crtROI);
+                if (imgROI == null) return;
                 Mat matROI = imgROI.Mat;
-                matROI.Save($"D:\\AOP01\\BarcodeInspection\\ROI{iBarcodeNumber}.bmp");
+                matROI.Save($"D:\\AOP01\\BarcodeInspection\\{strTimeStamp}_ROI{iBarcodeNumber}.bmp");
 
                 RecipeFrontside_Viewer_ViewModel targetViewer = UIManager.Instance.SetupViewModel.m_RecipeFrontSide.p_ImageViewer_VM;
                 Dispatcher dispatcher = UIManager.Instance.SetupViewModel.m_RecipeFrontSide.currentDispatcher;
@@ -2970,8 +2981,9 @@ namespace Root_AOP01_Inspection.Module
                 int nRight = GetBarcodeSideEdge(mem, crtROI, 10, eSearchDirection.RightToLeft, m_nThreshold, m_bDarkBackground);
                 CRect crtBarcode = new CRect(cptBarcodeLTPoint.X + nLeft, cptBarcodeLTPoint.Y + nTop, cptBarcodeLTPoint.X + nRight, cptBarcodeLTPoint.Y + nBottom);
                 Image<Gray, byte> imgBarcode = m_module.GetGrayByteImageFromMemory(mem, crtBarcode);
+                if (imgBarcode == null) return;
                 Mat matBarcode = imgBarcode.Mat;
-                matBarcode.Save($"D:\\AOP01\\BarcodeInspection\\BeforeRotation{iBarcodeNumber}.bmp");
+                matBarcode.Save($"D:\\AOP01\\BarcodeInspection\\{strTimeStamp}_BeforeRotation{iBarcodeNumber}.bmp");
 
                 //
                 if (dispatcher != null)
@@ -2999,7 +3011,7 @@ namespace Root_AOP01_Inspection.Module
                 Mat matRotation = new Mat();
                 CvInvoke.GetRotationMatrix2D(new System.Drawing.PointF(matBarcode.Width / 2, matBarcode.Height / 2), dThetaDegree, 1.0, matAffine);
                 CvInvoke.WarpAffine(matBarcode, matRotation, matAffine, new System.Drawing.Size(matBarcode.Width, matBarcode.Height));
-                matRotation.Save($"D:\\AOP01\\BarcodeInspection\\AfterRotation{iBarcodeNumber}.bmp");
+                matRotation.Save($"D:\\AOP01\\BarcodeInspection\\{strTimeStamp}_AfterRotation{iBarcodeNumber}.bmp");
 
                 // 회전 후 외곽영역 Cutting
                 int y1 = 10;
@@ -3007,7 +3019,7 @@ namespace Root_AOP01_Inspection.Module
                 int x1 = 10;
                 int x2 = matRotation.Cols - 10;
                 Mat matCutting = new Mat(matRotation, new Range(y1, y2), new Range(x1, x2));
-                matCutting.Save($"D:\\AOP01\\BarcodeInspection\\Cutting{iBarcodeNumber}.bmp");
+                matCutting.Save($"D:\\AOP01\\BarcodeInspection\\{strTimeStamp}_Cutting{iBarcodeNumber}.bmp");
 
                 // Profile 구하기
                 Mat matSub = GetRowProfileMat(matCutting);
@@ -3021,12 +3033,12 @@ namespace Root_AOP01_Inspection.Module
                 matResult3 = matSub - matCutting;
                 matResult = matResult2 + matResult3;
 
-                matResult.Save($"D:\\AOP01\\BarcodeInspection\\Result{iBarcodeNumber}.bmp");
+                matResult.Save($"D:\\AOP01\\BarcodeInspection\\{strTimeStamp}_Result{iBarcodeNumber}.bmp");
 
                 // 차영상에서 Blob Labeling
                 Mat matBinary = new Mat();
                 CvInvoke.Threshold(matResult, matBinary, m_nSubImageThreshold, 255, ThresholdType.Binary);
-                matBinary.Save($"D:\\AOP01\\BarcodeInspection\\BinaryResult{iBarcodeNumber}.bmp");
+                matBinary.Save($"D:\\AOP01\\BarcodeInspection\\{strTimeStamp}_BinaryResult{iBarcodeNumber}.bmp");
                 CvBlobs blobs = new CvBlobs();
                 CvBlobDetector blobDetector = new CvBlobDetector();
                 Image<Gray, byte> img = matBinary.ToImage<Gray, byte>();
@@ -3728,6 +3740,12 @@ namespace Root_AOP01_Inspection.Module
 
             public override string Run()
             {
+                if (UIManager.Instance.SetupViewModel.p_RecipeWizard.p_bUsePatternShiftAndRotation == false)
+                {
+                    m_log.Info("Pattern Shift & Rotation Inspection Not Used, Skip this ModuleRun");
+                    return "OK";
+                }
+
                 // variable
                 string strPool = "MainVision.Vision Memory";
                 string strGroup = "MainVision";
@@ -4444,6 +4462,12 @@ namespace Root_AOP01_Inspection.Module
 
             public override string Run()
             {
+                if (UIManager.Instance.SetupViewModel.p_RecipeWizard.p_bUseAlignKeyExist == false)
+                {
+                    m_log.Info("Align Key Exist Inspection Not Used, Skip this ModuleRun");
+                    return "OK";
+                }
+
                 // variable
                 string strPool = "MainVision.Vision Memory";
                 string strGroup = "MainVision";
@@ -5018,6 +5042,12 @@ namespace Root_AOP01_Inspection.Module
 
             public override string Run()
             {
+                if (UIManager.Instance.SetupViewModel.p_RecipeWizard.p_bUsePellicleShiftAndRotation == false)
+                {
+                    m_log.Info("Pellicle Shift & Rotation Inspection Not Used, Skip this ModuleRun");
+                    return "OK";
+                }
+
                 // variable
                 MemoryData mem = m_module.m_engineer.GetMemory(App.mPool, App.mGroup, App.mMainMem);
                 Run_Grab moduleRunGrab = (Run_Grab)m_module.CloneModuleRun("Grab");
@@ -5327,6 +5357,12 @@ namespace Root_AOP01_Inspection.Module
 
             public override string Run()
             {
+                if (UIManager.Instance.SetupViewModel.p_RecipeWizard.p_bUsePellicleExpanding == false)
+                {
+                    m_log.Info("Pellicle Expanding Inspection Not Used, Skip this ModuleRun");
+                    return "OK";
+                }
+
                 // variable
                 Run_LADS moduleRunLADS = (Run_LADS)m_module.CloneModuleRun("LADS");
                 GrabMode grabMode = m_module.GetGrabMode("LADS");
