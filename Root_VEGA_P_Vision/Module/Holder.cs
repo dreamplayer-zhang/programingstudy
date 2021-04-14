@@ -15,10 +15,13 @@ namespace Root_VEGA_P_Vision.Module
         DIO_I m_diExist; 
         public override void GetTools(bool bInit)
         {
-            p_sInfo = m_toolBox.GetDIO(ref m_diCover, this, "Cover Check");
-            p_sInfo = m_toolBox.GetDIO(ref m_diPlate, this, "Plate Check");
-            p_sInfo = m_toolBox.GetDIO(ref m_diExist, this, "Exist");
-            p_sInfo = m_toolBox.GetDIO(ref m_dioLifter, this, "Lifter", "Down", "Up"); 
+            if (p_eRemote == eRemote.Server)
+            {
+                p_sInfo = m_toolBox.GetDIO(ref m_diCover, this, "Cover Check");
+                p_sInfo = m_toolBox.GetDIO(ref m_diPlate, this, "Plate Check");
+                p_sInfo = m_toolBox.GetDIO(ref m_diExist, this, "Exist");
+                p_sInfo = m_toolBox.GetDIO(ref m_dioLifter, this, "Lifter", "Down", "Up");
+            }
             m_remote.GetTools(bInit);
         }
         #endregion
