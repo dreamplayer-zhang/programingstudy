@@ -125,9 +125,7 @@ namespace Root_CAMELLIA.Module
             Axis axisZ = m_module.p_axisZ;
             string strVRSImageDir = "D:\\";
             string strVRSImageFullPath = "";
-            Met.DataManager.GetInstance().m_SettngData.nMeasureIntTime_NIR = m_DataManager.recipeDM.MeasurementRD.NIRIntegrationTime;
-            Met.DataManager.GetInstance().m_SettngData.nMeasureIntTime_VIS = m_DataManager.recipeDM.MeasurementRD.VISIntegrationTime;
-
+           
             if (m_module.LifterDown() != "OK")
             {
                 return p_sInfo;
@@ -144,14 +142,14 @@ namespace Root_CAMELLIA.Module
             {
                 if (m_useCentering)
                 {
-                    if (m_DataManager.m_calibration.Run(m_InitialCal,m_DataManager.recipeDM.MeasurementRD.NIRIntegrationTime, m_DataManager.recipeDM.MeasurementRD.VISIntegrationTime, m_isPM) != "OK")
+                    if (m_DataManager.m_calibration.Run(m_InitialCal, m_isPM) != "OK")
                     {
                         return "Calibration fail";
                     }
                 }
                 else
                 {
-                    if (m_DataManager.m_calibration.Run(m_InitialCal,m_DataManager.recipeDM.MeasurementRD.NIRIntegrationTime, m_DataManager.recipeDM.MeasurementRD.VISIntegrationTime, m_isPM, false) != "OK")
+                    if (m_DataManager.m_calibration.Run(m_InitialCal, m_isPM, false) != "OK")
                     {
                         return "Calibration fail";
                     }
@@ -187,12 +185,6 @@ namespace Root_CAMELLIA.Module
             sw.Stop();
 
 
-            m_module.VaccumOnOff(true);
-
-
-
-
-
             if (m_bUseCustomSpeed && CheckVaildParameter())
             {
                 if (m_module.Run(axisXY.p_axisX.StartMove(m_WaferLT_pulse.X, m_dMoveSpeedX, m_dMoveAccX, m_dMoveDecX)))
@@ -220,8 +212,8 @@ namespace Root_CAMELLIA.Module
             if (VRS.Grab() == "OK")
             {
                 //asdv.SetData(VRS.p_ImageViewer.p_ImageData.GetPtr(), new CRect(0,0, 2044, 2044), (int)VRS.p_ImageViewer.p_ImageData.p_Stride, 3);
-                strVRSImageFullPath = string.Format(strVRSImageDir + "VRSImage_{0}.bmp", 0);
-                img.SaveImageSync(strVRSImageFullPath);
+                //strVRSImageFullPath = string.Format(strVRSImageDir + "VRSImage_{0}.bmp", 0);
+                //img.SaveImageSync(strVRSImageFullPath);
                 //Grab error
             }
             else
@@ -265,8 +257,8 @@ namespace Root_CAMELLIA.Module
 
             if (VRS.Grab() == "OK")
             {
-                strVRSImageFullPath = string.Format(strVRSImageDir + "VRSImage_{0}.bmp", 1);
-                img.SaveImageSync(strVRSImageFullPath);
+                //strVRSImageFullPath = string.Format(strVRSImageDir + "VRSImage_{0}.bmp", 1);
+                //img.SaveImageSync(strVRSImageFullPath);
                 //Grab error
             }
             else
@@ -303,8 +295,8 @@ namespace Root_CAMELLIA.Module
 
             if (VRS.Grab() == "OK")
             {
-                strVRSImageFullPath = string.Format(strVRSImageDir + "VRSImage_{0}.bmp", 2);
-                img.SaveImageSync(strVRSImageFullPath);
+                //strVRSImageFullPath = string.Format(strVRSImageDir + "VRSImage_{0}.bmp", 2);
+                //img.SaveImageSync(strVRSImageFullPath);
                 //Grab error
             }
             else
@@ -316,8 +308,7 @@ namespace Root_CAMELLIA.Module
             param = new CenteringParam(img, VRS.GetRoiSize(), m_EdgeSearchRange, m_EdgeSearchLevel, WaferCentering.eDir.RB);
             ThreadPool.QueueUserWorkItem(m_DataManager.m_waferCentering.FindEdge, param);
             //m_DataManager.m_waferCentering.FindEdge(param);
-            while ((!m_DataManager.m_waferCentering.FindLTEdgeDone || !m_DataManager.m_waferCentering.FindRTEdgeDone
-                || !m_DataManager.m_waferCentering.FindRBEdgeDone) && m_useCentering)
+            while ((!m_DataManager.m_waferCentering.FindLTEdgeDone || !m_DataManager.m_waferCentering.FindRTEdgeDone || !m_DataManager.m_waferCentering.FindRBEdgeDone) && m_useCentering)
             {
                 if (m_DataManager.m_waferCentering.ErrorString != "OK")
                 {

@@ -242,6 +242,9 @@ namespace Root_CAMELLIA.Data
 
         public void FindEdgeInit()
         {
+            FindLTEdgeDone = false;
+            FindRTEdgeDone = false;
+            FindRBEdgeDone = false;
             ErrorString = "OK";
         }
 
