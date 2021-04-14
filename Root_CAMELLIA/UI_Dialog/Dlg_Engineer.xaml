@@ -11,6 +11,7 @@
         xmlns:viewConverter="clr-namespace:ViewConverter;assembly=RootTools"
         xmlns:met="clr-namespace:Root_CAMELLIA.LibSR_Met"
         xmlns:stage="clr-namespace:Camellia2Stage"
+        xmlns:System="clr-namespace:System;assembly=mscorlib"
         WindowStyle="None"
         ResizeMode="CanResize"
         WindowStartupLocation="CenterScreen"
@@ -66,12 +67,14 @@
                           Height="21"
                           VerticalAlignment="Center"
                           Margin="2" />
-            <TextBlock Text="Camellia Ⅱ - Version 0.0.1"
+            <!--<TextBlock Text="Camellia Ⅱ - Version 0.0.1"
                        FontSize="11"
                        Foreground="Black"
                        VerticalAlignment="Center"
                        Margin="5,0,0,0"
-                       Grid.Column="1" />
+                       Grid.Column="1" />-->
+            <TextBlock Grid.Column="1" Text="{Binding Path=Version, Source={x:Static local:BaseDefine.Configuration}}"  FontSize="11" Foreground="Black" VerticalAlignment="Center" Margin="5,0,0,0"/>
+
             <TextBlock Text="ENGINEER"
                        FontSize="14"
                        FontWeight="Bold"

@@ -867,7 +867,7 @@ namespace Root_CAMELLIA
                     dialog.ToolBoxUI.Init(App.m_engineer);
                     Nullable<bool> result = dialog.ShowDialog();
 
-                    if (m_Module_FDC.m_aData[0].p_IsUpdate || m_Module_FDC_Vision.m_aData[0].p_IsUpdate)
+                    if (m_Module_FDC.m_aData[0].p_IsUpdate || m_Module_FDC_Vision.m_aData[0].p_IsUpdate )
                     {
                         UpdateGaugeUI();
                         m_Module_FDC.m_aData[0].p_IsUpdate = false;

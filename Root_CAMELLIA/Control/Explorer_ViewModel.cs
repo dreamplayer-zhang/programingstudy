@@ -134,7 +134,7 @@ namespace Root_CAMELLIA
             {
                 return new RelayCommand(() =>
                 {
-                    int i = 10;
+                    //int i = 10;
                 });
             }
         }

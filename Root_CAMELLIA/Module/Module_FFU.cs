@@ -35,6 +35,7 @@ namespace Root_CAMELLIA.Module
 			public class Fan : NotifyProperty, UnitState
 			{
 				public RPoint m_mmLimit = new RPoint();
+				public RPoint m_mmPressureLimit = new RPoint();
 				public int m_nSet = 0;
 				public int m_nMode = 0;
 				int _nRPM = 0;
@@ -43,21 +44,14 @@ namespace Root_CAMELLIA.Module
 					get { return _nRPM; }
 					set
 					{
-						if (_nRPM == value) return;
-						if (m_nMode == 0)
-						{
-							m_alidSetted_RPMLow.Run(m_mmLimit.X > _nRPM, "FFU RPM Lower than Low Limit.");
-							m_alidSetted_RPMHigh.Run(m_mmLimit.Y < _nRPM, "FFU RPM Higher than High Limit.");
-						}
-						else if (m_nMode == 1)
-						{
-							m_alidSetted_PreLow.Run(m_mmLimit.X > _nRPM, "FFU Pressure Lower than Low Limit.");
-							m_alidSetted_PreHigh.Run(m_mmLimit.Y < _nRPM, "FFU Pressure Higher than High Limit.");
-						}
+                        if (_nRPM == value) return;
 
-						_nRPM = value;
-						OnPropertyChanged();
-					}
+                        m_alidSetted_RPMLow.Run(m_mmLimit.X > _nRPM, "FFU RPM Lower than Low Limit.");
+                        m_alidSetted_RPMHigh.Run(m_mmLimit.Y < _nRPM, "FFU RPM Higher than High Limit.");
+
+                        _nRPM = value;
+                        OnPropertyChanged();
+                    }
 				}
 
 				double _fPressure = 0;
@@ -67,6 +61,10 @@ namespace Root_CAMELLIA.Module
 					set
 					{
 						if (_fPressure == value) return;
+
+						m_alidSetted_PreLow.Run(m_mmPressureLimit.X > _fPressure, "FFU Pressure Lower than Low Limit.");
+						m_alidSetted_PreHigh.Run(m_mmPressureLimit.Y < _fPressure, "FFU Pressure Higher than High Limit.");
+
 						_fPressure = value;
 						OnPropertyChanged();
 					}
@@ -243,10 +241,10 @@ namespace Root_CAMELLIA.Module
 				public void RunTree(Tree tree)
 				{
 					p_sFan = tree.Set(p_sFan, p_sFan, "Fan ID", "Fan ID");
-					m_nMode = tree.Set(m_nMode, m_nMode, "Set Mode", "RPM = 0, Pressure = 1");
+					//m_nMode = tree.Set(m_nMode, m_nMode, "Set Mode", "RPM = 0, Pressure = 1");
 					m_nSet = tree.Set(m_nSet, m_nSet, "Set", "Fan Set Value (RPM) or Pressure (0.1pa)");
 					m_mmLimit = tree.Set(m_mmLimit, m_mmLimit, "Limit", "FFU Lower & Upper Limit");
-
+					m_mmPressureLimit = tree.Set(m_mmPressureLimit, m_mmPressureLimit, "Pressure Limit", "FFU Pressure Lower & Upper Limit");
 					p_IsUpdate = true;
 				}
 

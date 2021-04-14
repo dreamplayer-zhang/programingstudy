@@ -1,5 +1,6 @@
 ﻿using NanoView;
 using Root_CAMELLIA.Data;
+using RootTools;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -1250,6 +1251,73 @@ namespace Root_CAMELLIA.LibSR_Met
             catch (Exception ex)
             {
                 m_Log.WriteLog(LogType.Error, "SaveResultFileLot() - Error");
+                return false;
+            }
+        }
+
+        public bool SaveResultFileSlot(string sPath, InfoWafer infoWafer, RecipeDataManager recipeData, int nPointIdx)
+        {
+            if (Path.GetExtension(sPath) != ".csv")
+            {
+                sPath += ".csv";
+            }
+
+            int n = 0;
+            try
+            {
+                string[] sWaferNum = infoWafer.p_sWaferID.Split('.');
+                RawData raw = m_RawData[nPointIdx];
+
+                StreamWriter sw = new StreamWriter(sPath);
+                sw.WriteLine("LOT ID," + infoWafer.p_sCarrierID + "_" + infoWafer.p_sLotID);
+                //여기수정
+                sw.WriteLine("DATE/TIME," + DateTime.Now.Month.ToString("00") + "/" + DateTime.Now.Day.ToString("00") + "/" + DateTime.Now.Year.ToString("0000") + " " + DateTime.Now.Hour.ToString("00") + ":" + DateTime.Now.Minute.ToString("00") + ":" + DateTime.Now.Second.ToString("00"));
+                sw.WriteLine();
+                sw.WriteLine("TOOL ID," + BaseDefine.TOOL_NAME);
+                sw.WriteLine("SOFTWARE VERSION," + BaseDefine.Configuration.Version);
+                sw.WriteLine("RECIPE," + recipeData.TeachRecipeName);
+                sw.WriteLine("MACHINE TYPE," + "CAMELLIA");
+                sw.WriteLine();
+                sw.WriteLine();
+                sw.WriteLine();
+                sw.WriteLine("WAFER ID," + infoWafer.p_sWaferID);
+                sw.WriteLine("LOT ID," + infoWafer.p_sCarrierID + "_" + infoWafer.p_sLotID);
+                if(sWaferNum.Length > 1)
+                {
+                    sw.WriteLine("WAFER #," + sWaferNum[1]);
+                }
+                else
+                {
+                    sw.WriteLine("WAFER #," + "");
+                }
+                sw.WriteLine("SLOT," + infoWafer.p_sSlotID);
+                sw.WriteLine();
+                sw.WriteLine("WAFER STATUS," + "Pass");
+                sw.WriteLine("DATA TYPE," + "TF");
+                sw.WriteLine("RECIPE," + recipeData.TeachRecipeName);
+                // m_DataManager.recipeDM.MeasurementRD.DataSelectedPoint[m_DataManager.recipeDM.MeasurementRD.DataMeasurementRoute[index]].x
+                sw.WriteLine("X_Position," + recipeData.MeasurementRD.DataSelectedPoint[recipeData.MeasurementRD.DataMeasurementRoute[nPointIdx]].x.ToString("F3"));
+                sw.WriteLine("Y_Position," + recipeData.MeasurementRD.DataSelectedPoint[recipeData.MeasurementRD.DataMeasurementRoute[nPointIdx]].y.ToString("F3"));
+                sw.WriteLine();
+                sw.WriteLine("Wavelength [nm],Reflectance,Transmittance");
+                for (n = 0; n < raw.nNIRDataNum; n++)
+                {
+                    if (bTransmittance)
+                    {
+                        sw.WriteLine(raw.Wavelength[n].ToString("0.####") + "," + raw.Reflectance[n].ToString("0.####") + "," + raw.Transmittance[n].ToString("0.####"));
+                    }
+                    else
+                    {
+                        sw.WriteLine(raw.Wavelength[n].ToString("0.####") + "," + raw.Reflectance[n].ToString("0.####") + ",0");
+                    }
+                }
+                sw.Close();
+                m_Log.WriteLog(LogType.Datas, " SaveResultFileSlot()_Saved");
+                return true;
+            }
+            catch(Exception ex)
+            {
+                m_Log.WriteLog(LogType.Error, "SaveResultFileSlot() - Error / <" + n.ToString() + "> - " + ex.Message);
                 return false;
             }
         }

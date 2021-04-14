@@ -29,17 +29,17 @@ namespace Root_CAMELLIA
         //    m_DataManager = module.m_DataManager;
         //}
 
-        public string Run(bool bInitialCal, int NIRMeasureIntegrationTime, int VisMeasureIntegrationTime, bool isPM = false, bool bUseThread = true)
+        public string Run(bool bInitialCal,  bool isPM = false, bool bUseThread = true)
         {
 
-            if (bInitialCal)
-            {
-                bInitialCal = false;
-            }
-            else
-            {
-                CalDone = false;
-            }
+            //if (bInitialCal)
+            //{
+            //    bInitialCal = false;
+            //}
+            //else
+            //{
+            //    CalDone = false;
+            //}
 
             if (!isPM)
 
@@ -49,8 +49,9 @@ namespace Root_CAMELLIA
                 {
                     Met.DataManager.GetInstance().m_SettngData = m_SettingDataWithErrorCode.Item1;
 
-                    Met.DataManager.GetInstance().m_SettngData.nMeasureIntTime_NIR = NIRMeasureIntegrationTime;
-                    Met.DataManager.GetInstance().m_SettngData.nMeasureIntTime_VIS = VisMeasureIntegrationTime;
+                    Met.DataManager.GetInstance().m_SettngData.nMeasureIntTime_NIR = DataManager.Instance.recipeDM.MeasurementRD.NIRIntegrationTime;
+
+                    Met.DataManager.GetInstance().m_SettngData.nMeasureIntTime_VIS = DataManager.Instance.recipeDM.MeasurementRD.VISIntegrationTime;
                 }
                 else
                 {
