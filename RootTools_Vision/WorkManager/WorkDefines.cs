@@ -9,12 +9,12 @@ namespace RootTools_Vision
     #region [Enums]
     public enum WORK_TYPE
     {
-        NONE                    = 0b0000000,
-        SNAP                    = 0b0000010,
-        ALIGNMENT               = 0b0000100,
-        INSPECTION              = 0b0001000,
-        DEFECTPROCESS           = 0b0010000,
-        DEFECTPROCESS_ALL       = 0b0100000,
+        NONE                    = 0,
+        SNAP                    = 1,
+        ALIGNMENT               = 2,
+        INSPECTION              = 3,
+        DEFECTPROCESS           = 4,
+        DEFECTPROCESS_ALL       = 5,
     }
 
     public enum WORKMANAGER_STATE

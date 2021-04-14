@@ -255,7 +255,7 @@ namespace RootTools_Vision
             for (int i = 0; i < defectList.Count; i++)
             {
 				MemoryStream image = new MemoryStream();
-                System.Drawing.Bitmap bitmap = Tools.ConvertArrayToColorBitmap(sharedBuffer.PtrR_GRAY, sharedBuffer.PtrG, sharedBuffer.PtrB, sharedBuffer.Width, sharedBuffer.ByteCnt, defectList[i].GetRect());
+                System.Drawing.Bitmap bitmap = Tools.CovertBufferToBitmap(sharedBuffer, defectList[i].GetRect());
                 //System.Drawing.Bitmap NewImg = new System.Drawing.Bitmap(bitmap);
                 bitmap.Save(image, ImageFormat.Tiff);
                 inputImage.Add(image);
@@ -328,9 +328,8 @@ namespace RootTools_Vision
             for (int i = 0; i < dataList.Count; i++)
             {
                 MemoryStream image = new MemoryStream();
-				System.Drawing.Bitmap bitmap = Tools.ConvertArrayToColorBitmap(sharedBuffer.PtrR_GRAY, sharedBuffer.PtrG, sharedBuffer.PtrB, sharedBuffer.Width, sharedBuffer.ByteCnt, dataList[i].GetRect());
-				//System.Drawing.Bitmap NewImg = new System.Drawing.Bitmap(bitmap);
-				bitmap.Save(image, ImageFormat.Tiff);
+                System.Drawing.Bitmap bitmap = Tools.CovertBufferToBitmap(sharedBuffer, dataList[i].GetRect());
+                bitmap.Save(image, ImageFormat.Tiff);
                 inputImage.Add(image);
             }
 

@@ -48,12 +48,7 @@
                     <ColumnDefinition Width="auto"/>
                     <ColumnDefinition Width="auto"/>
                 </Grid.ColumnDefinitions>
-                <TextBlock Text="Camellia Ⅱ - Version 0.0.1"
-                       FontSize="11"
-                       Foreground="Black"
-                       VerticalAlignment="Center"
-                       Margin="5,0,0,0"
-                       Grid.Column="0" />
+               <TextBlock Grid.Column="1" Text="{Binding Path=Version, Source={x:Static local:BaseDefine.Configuration}}"  FontSize="11" Foreground="Black" VerticalAlignment="Center" Margin="5,0,0,0"/>
                 <TextBlock Text="{Binding RecipePath}"
                        FontSize="11"
                        Foreground="Black"
@@ -84,13 +79,26 @@
             </StackPanel>
         </Grid>
         <!--Menu-->
-        <Menu Grid.Row="1" Background="{DynamicResource ControlBackGround}" Grid.ColumnSpan="2"
+        <!--<Menu Grid.Row="1" Background="{DynamicResource ControlBackGround}" Grid.ColumnSpan="2"
               Height="25">
             <MenuItem x:Name="RecipeNew" Header="New"  Height="25" Command="{Binding CmdRecipeNew}"/>
             <MenuItem x:Name="RecipeOpen" Header="Open" Command="{Binding CmdRecipeOpen}"/>
             <MenuItem x:Name="RecipeSave" Header="Save" Command="{Binding CmdRecipeSave}"/>
             <MenuItem x:Name="RecipeSaveAs" Header="Save As" Command="{Binding CmdRecipeSaveAs}"/>
-        </Menu>
+        </Menu>-->
+        <Grid Grid.Row="1" Background="{DynamicResource ControlBackGround}" Grid.ColumnSpan="2" Height="25">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="230"/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <UniformGrid Columns="4">
+                <Button BorderBrush="{x:Null}" BorderThickness="0" Content="New" Command="{Binding CmdRecipeNew}"/>
+                <Button BorderBrush="{x:Null}" BorderThickness="0" Content="Open" Command="{Binding CmdRecipeOpen}"/>
+                <Button BorderBrush="{x:Null}" BorderThickness="0" Content="Save" Command="{Binding CmdRecipeSave}"/>
+                <Button BorderBrush="{x:Null}" BorderThickness="0" Content="Save As" Command="{Binding CmdRecipeSaveAs}"/>
+            </UniformGrid>
+        </Grid>
 
         <Grid Grid.Row="2">
             <Grid.ColumnDefinitions>
@@ -490,7 +498,7 @@
                                     <ColumnDefinition Width="12*"/>
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Text="Lower WaveLength" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="0"/>
-                                <TextBox Grid.Column="1" Margin="3" Text="{Binding LowerWaveLength, UpdateSourceTrigger=LostFocus, Mode=TwoWay, StringFormat=N2}" TextAlignment="Center" VerticalContentAlignment="Center"
+                                <TextBox Grid.Column="1" Margin="3" Text="{Binding LowerWaveLength, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay, StringFormat=N2}" TextAlignment="Center" VerticalContentAlignment="Center"
                                          IsEnabled="{Binding p_UseThickness}"></TextBox>
                             </Grid>
                             <Grid Margin="5" Background="Gainsboro">
@@ -499,7 +507,7 @@
                                     <ColumnDefinition Width="12*"/>
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Text="Upper WaveLength" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="0"/>
-                                <TextBox Grid.Column="1" Margin="3" Text="{Binding UpperWaveLength, UpdateSourceTrigger=LostFocus, Mode=TwoWay, StringFormat=N2}" TextAlignment="Center" VerticalContentAlignment="Center"
+                                <TextBox Grid.Column="1" Margin="3" Text="{Binding UpperWaveLength, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay, StringFormat=N2}" TextAlignment="Center" VerticalContentAlignment="Center"
                                          IsEnabled="{Binding p_UseThickness}"></TextBox>
                             </Grid>
                             <Grid Margin="5" Background="Gainsboro">
@@ -517,7 +525,7 @@
                                     <ColumnDefinition Width="12*"/>
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Text="Damping Factor" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="0"/>
-                                <TextBox Grid.Column="1" Margin="3" Text="{Binding DampingFactor, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay, StringFormat=N1}" TextAlignment="Center" VerticalContentAlignment="Center"
+                                <TextBox Grid.Column="1" Margin="3" Text="{Binding DampingFactor, UpdateSourceTrigger=Default, Mode=TwoWay, StringFormat=N1}" TextAlignment="Center" VerticalContentAlignment="Center"
                                          IsEnabled="{Binding p_UseThickness}"></TextBox>
                             </Grid>
                         </UniformGrid>

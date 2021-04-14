@@ -82,6 +82,7 @@ namespace Root_CAMELLIA.Data
             m_ptCenter.X = cx;
             m_ptCenter.Y = cy;
 
+
             string sPath = @"C:\Users\ATI\Desktop\CenteringTest\";
             string sLogFileName = "Centering.txt";
             string sTimeLog = DateTime.Now.ToString("HH:mm:ss") + ":" + DateTime.Now.Millisecond.ToString("000") + " : Center X =" + ((int)cx).ToString() + ", Center Y = " + ((int)cy).ToString();
@@ -391,10 +392,6 @@ namespace Root_CAMELLIA.Data
         public void GetMinMax(Mat Image, PointF point, PointF vector, int nSearchRange, int nSearchLength, out byte min, out byte max)
         {
             byte[] pImg = Image.GetRawData();
-
-            min = Byte.MaxValue;
-            max = Byte.MinValue;
-
             double vectorX = 0;
             double vectorY = 0;
 
