@@ -10,6 +10,7 @@ using System.Windows;
 using System.Windows.Media;
 using System.Windows.Threading;
 using System.Data;
+using RootTools_Vision.WorkManager3;
 
 namespace Root_WIND2.UI_User
 {
@@ -191,11 +192,31 @@ namespace Root_WIND2.UI_User
             });
         }
 
+        WorkManager workManager;
 
         public RelayCommand btnStart
         {
             get => new RelayCommand(() =>
             {
+
+                //ImageData imageData = this.ImageViewerVM.p_ImageData;
+                //if (workManager == null)
+                //{
+                //    workManager = new WorkManager(new SharedBufferInfo(
+                //    imageData.GetPtr(0),
+                //    imageData.p_Size.X,
+                //    imageData.p_Size.Y,
+                //    imageData.GetBytePerPixel(),
+                //    imageData.GetPtr(1),
+                //    imageData.GetPtr(2)));
+
+
+                //    workManager.SetRecipe(GlobalObjects.Instance.Get<RecipeFront>());
+                //}
+
+                //workManager.Start();
+
+                //return;
                 //GlobalObjects.Instance.Get<InspectionManagerFrontside>().RemoteStart();
                 this.ImageViewerVM.ClearObjects();
                 if (GlobalObjects.Instance.Get<InspectionManagerFrontside>() != null)
@@ -238,9 +259,11 @@ namespace Root_WIND2.UI_User
         {
             get => new RelayCommand(() =>
             {
+                //workManager.Stop();
+
                 if (GlobalObjects.Instance.Get<InspectionManagerFrontside>() != null)
                 {
-                    GlobalObjects.Instance.Get<InspectionManagerFrontside>().Stop();
+                   GlobalObjects.Instance.Get<InspectionManagerFrontside>().Stop();
                 }
             });
         }

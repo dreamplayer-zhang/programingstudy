@@ -90,7 +90,15 @@ namespace Root_VEGA_P.Module
                 if (m_aNozzle.Count == value) return;
                 while (m_aNozzle.Count > value) m_aNozzle.RemoveAt(m_aNozzle.Count - 1);
                 while (m_aNozzle.Count < value) m_aNozzle.Add(new Nozzle("Nozzle" + m_aNozzle.Count.ToString("00")));
+                m_reg.Write("nNozzle", value); 
             }
+        }
+
+        Registry m_reg;
+        void InitNozzle(string id)
+        {
+            m_reg = new Registry(id);
+            p_nNozzle = m_reg.Read("nNozzle", 1);
         }
         #endregion
 
@@ -116,12 +124,6 @@ namespace Root_VEGA_P.Module
         #endregion
 
         #region Init Nozzle
-        Registry m_reg;
-        void InitNozzle(string id)
-        {
-            m_reg = new Registry(id);
-            p_nNozzle = m_reg.Read("nNozzle", 1);
-        }
         #endregion
 
         ParticleCounter m_particleCounter;

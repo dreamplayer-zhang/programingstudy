@@ -49,8 +49,8 @@ namespace Root_WIND2
 		protected override WorkplaceBundle CreateWorkplaceBundle()
 		{
 			// find notch
-			int firstNotch = 0;
-			int lastNotch = 0;
+			int firstNotch = recipe.GetItem<EBRRecipe>().FirstNotch;
+			int lastNotch = recipe.GetItem<EBRRecipe>().LastNotch;
 
 			int bufferHeight = lastNotch - firstNotch;
 			int bufferHeightPerDegree = bufferHeight / 360;
@@ -86,7 +86,7 @@ namespace Root_WIND2
 				ebr.SetParameter(param);
 			ebr.SetGrabMode(((WIND2_Handler)GlobalObjects.Instance.Get<WIND2_Engineer>().ClassHandler()).p_EdgeSideVision.m_aGrabMode[recipe.GetItem<EBRRecipe>().GrabModeIndex]);
 			
-				workBundle.Add(ebr);
+			workBundle.Add(ebr);
 			workBundle.Add(processMeasurement);
 			workBundle.SetRecipe(recipe);
 			return workBundle;

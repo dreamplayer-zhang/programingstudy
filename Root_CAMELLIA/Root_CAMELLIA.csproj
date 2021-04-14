@@ -237,6 +237,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Lib\MetLib\NanoView.dll</HintPath>
     </Reference>
+    <Reference Include="netchartdir, Version=6.4.0.0, Culture=neutral, PublicKeyToken=2db5fc05de12e204, processorArchitecture=MSIL">
+      <HintPath>..\packages\ChartDirector.Net.6.4.0\lib\net40\netchartdir.dll</HintPath>
+    </Reference>
     <Reference Include="NumericUpDownLib, Version=2.4.2.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Dirkster.NumericUpDownLib.2.4.2\lib\net40\NumericUpDownLib.dll</HintPath>
     </Reference>
@@ -362,6 +365,9 @@
     <Compile Include="Data\SaveMeasureData.cs" />
     <Compile Include="LibSR_Met\Calculation.cs" />
     <Compile Include="LibSR_Met\ConstValue.cs" />
+    <Compile Include="LibSR_Met\ContourMap.xaml.cs">
+      <DependentUpon>ContourMap.xaml</DependentUpon>
+    </Compile>
     <Compile Include="LibSR_Met\CountGraph.xaml.cs">
       <DependentUpon>CountGraph.xaml</DependentUpon>
     </Compile>
@@ -535,6 +541,10 @@
     <Page Include="Control\Temp.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="LibSR_Met\ContourMap.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="LibSR_Met\CountGraph.xaml">
       <SubType>Designer</SubType>

@@ -54,7 +54,7 @@ namespace Root_CAMELLIA.Module
 
         public override string Run()
         {
-            Met.PMDatas m_PMDatas = new Met.PMDatas();
+            Met.PMDatas m_PMData = new Met.PMDatas();
             Met.CheckResult rst;
 
 
@@ -87,7 +87,7 @@ namespace Root_CAMELLIA.Module
                 return p_sInfo;
             }
             // 시작
-            m_PMDatas.LoadPMData();
+            m_PMData.LoadPMData();
             m_log.Info("[CheckSensorTilt] Start");
             // 현재 축값 받아오기
             AxisXY axisXY = m_module.p_axisXY;
@@ -168,7 +168,7 @@ namespace Root_CAMELLIA.Module
             //}
 
             object obj;
-            for (int n = 0; n < m_PMDatas.nSensorTiltRepeatNum; n++)
+            for (int n = 0; n < m_PMData.nSensorTiltRepeatNum; n++)
             {
                 if (App.m_nanoView.SampleMeasure(0, 0, 0,
                        m_mwvm.SettingViewModel.p_ExceptNIR, m_DataManager.recipeDM.MeasurementRD.UseTransmittance, m_DataManager.recipeDM.MeasurementRD.UseThickness,
@@ -182,7 +182,7 @@ namespace Root_CAMELLIA.Module
 
                         m_log.Info("[CheckSensorTilt] Acquire Refelctance" + "[" + n + "]");
                         
-                        rst = m_PMDatas.CheckSensorTilt();
+                        rst = m_PMData.CheckSensorTilt(n);
                         if (rst == Met.CheckResult.OK)
                         {
                             m_log.Info("[CheckSensorTilt] CheckResult Normal" + "[" + n + "]");
@@ -215,7 +215,18 @@ namespace Root_CAMELLIA.Module
                 //rst = Met.PMDatas.CheckSensorTilt();
 
             }
+            //m_module.mwvm.EngineerViewModel.p_PMCheckReview_ViewModel.m_pmSensorTilt_VM.p_pmSenserCamera.p_SensorCameraAlign = m_PMData.dAlign_ResultDeg;
+            // m_module.mwvm.EngineerViewModel.p_PMCheckReview_ViewModel.m_pmReflectance_VM.DrawPMGraph();
 
+            double[] nRepeatCount = new double[m_PMData.nSensorTiltRepeatNum];
+            for (int i = 0; i < m_PMData.nSensorTiltRepeatNum; i++)
+            {
+                nRepeatCount[i] = i + 1;
+            }
+
+            m_module.mwvm.EngineerViewModel.p_PMCheckReview_ViewModel.m_pmReflectance_VM.p_PMReflectance500.DrawReviewGraph("500 nm", "Diff [%]", "Count", nRepeatCount, m_PMData.DiffReflectnace500);
+            m_module.mwvm.EngineerViewModel.p_PMCheckReview_ViewModel.m_pmReflectance_VM.p_PMReflectance740.DrawReviewGraph("740 nm", "Diff [%]", "Count", nRepeatCount, m_PMData.DiffReflectnace740);
+            m_module.mwvm.EngineerViewModel.p_PMCheckReview_ViewModel.m_pmReflectance_VM.p_PMReflectance1100.DrawReviewGraph("1100 nm", "Diff [%]", "Count", nRepeatCount, m_PMData.DiffReflectnace1100);
             //리턴값 반환할 것
             return "OK";
         }

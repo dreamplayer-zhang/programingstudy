@@ -1534,6 +1534,12 @@ namespace Root_CAMELLIA
             }
             RedrawStage();
         }
+
+        public void ClearData()
+        {
+            dataManager.recipeDM.TeachingRD = new RecipeData();
+            UpdateParameter();
+        }
         public void OnMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             System.Windows.Point pt = e.GetPosition((UIElement)sender);

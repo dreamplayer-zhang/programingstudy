@@ -225,7 +225,7 @@ namespace Root_CAMELLIA
                 SetProperty(ref _EnableBtn, value);
             }
         }
-        private bool _EnableBtn = false;
+        private bool _EnableBtn = true;
 
         public Axis AxisX
         {
@@ -552,7 +552,7 @@ namespace Root_CAMELLIA
                 return;
             }
 
-            if (EnableBtn)
+            if (!EnableBtn)
             {
                 return;
             }
@@ -1109,6 +1109,17 @@ namespace Root_CAMELLIA
                 return new RelayCommand(() =>
                 {
 
+                });
+            }
+        }
+
+        public ICommand CmdInit
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    UpdateParameter();
                 });
             }
         }
