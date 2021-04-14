@@ -93,7 +93,7 @@ namespace RootTools.Gem
                     if (p_ePresentSensor == ePresent.Exist)
                     {
                         if (m_gem != null) p_bCarrierOn = true; 
-                        m_bReqReadCarrierID = true;
+                        //m_bReqReadCarrierID = true;//jws 210414 check 필요 여기서 rfid 리드 요청함
                     }
                     break;
                 case eTransfer.ReadyToUnload:
@@ -269,11 +269,17 @@ namespace RootTools.Gem
         #region CarrierID
         public void SendCarrierID(string sCarrierID)
         {
-            if (m_gem == null || m_gem.p_eControl != eControl.ONLINEREMOTE) 
+            if (m_gem == null)
             {
                 p_eStateCarrierID = eGemState.VerificationOK;
                 p_eTransfer = eTransfer.TransferBlocked;
-                return; 
+                return;
+            }
+            if (m_gem.p_eControl != eControl.ONLINEREMOTE)
+            {
+                p_eStateCarrierID = eGemState.VerificationOK;
+                p_eTransfer = eTransfer.TransferBlocked;
+                return;
             }
             m_gem.SendCarrierID(this, sCarrierID);
             p_sCarrierID = sCarrierID; 

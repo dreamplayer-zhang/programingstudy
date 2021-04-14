@@ -794,8 +794,18 @@ namespace RootTools.Module
             foreach (ModuleRunBase run in aModuleRun) run.RunTree(tree.GetTree(n++, run.p_id), true);
         }
         #endregion
-
-        public string p_id { get; set; }
+        string _id = "";
+        public string p_id
+        {
+            get
+            { return _id; }
+            set
+            {
+                if (_id == value) return;
+                _id = value;
+                OnPropertyChanged();
+            }
+        }
 
         public IEngineer m_engineer;
         public Log m_log;

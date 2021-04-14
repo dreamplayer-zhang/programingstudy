@@ -1,5 +1,6 @@
 ﻿using RootTools;
 using RootTools.Comm;
+using RootTools.Control;
 using RootTools.Module;
 using RootTools.ParticleCounter;
 using RootTools.ToolBoxs;
@@ -27,12 +28,18 @@ namespace Root_VEGA_P.Module
         #region Regulator
         public class Regulator : NotifyProperty
         {
+            DIO_I m_diBackFlow; 
             RS232 m_rs232; 
-            public string GetTools(ToolBox toolBox, bool bInit)
+            public void GetTools(ToolBox toolBox, bool bInit)
             {
-                string sInfo = toolBox.GetComm(ref m_rs232, m_particleCounter, "Regulator");
+                toolBox.GetDIO(ref m_diBackFlow, m_particleCounter, "BackFlow"); 
+                toolBox.GetComm(ref m_rs232, m_particleCounter, "Regulator");
                 if (bInit) m_rs232.p_bConnect = true;
-                return sInfo; 
+            }
+
+            public bool IsBackFlow()
+            {
+                return m_diBackFlow.p_bIn; 
             }
 
             public double m_hPa = 0; 
@@ -123,22 +130,23 @@ namespace Root_VEGA_P.Module
                 if (Run(m_nozzleSet.RunNozzle(iNozzle))) return p_sInfo;
                 if (Run(m_regulator.RunPump(run.m_hPa))) return p_sInfo;
                 if (Run(m_particleCounter.StartRun(run.m_sample))) return p_sInfo;
+                bool bBackFlow = false; 
                 while (m_particleCounter.IsBusy())
                 {
                     Thread.Sleep(100);
-                    if (m_particleCounter.IsTimeout()) return "Particle Counter Run Timeout";
+                    bBackFlow |= m_regulator.IsBackFlow(); 
                     if (EQ.IsStop()) return "EQ Stop";
                 }
                 if (Run(m_regulator.RunPump(0))) return p_sInfo;
                 string sTime = GetTime(); 
-                SaveResult(sPath + "\\Nozzle" + iNozzle.ToString("00") + ".txt", sTime);
+                SaveResult(sPath + "\\Nozzle" + iNozzle.ToString("00") + ".txt", sTime, bBackFlow);
                 iNozzle = (iNozzle + 1) % m_nozzleSet.p_nNozzle;
                 Thread.Sleep(5000); 
             }
             return "OK"; 
         }
 
-        void SaveResult(string sFile, string sTime)
+        void SaveResult(string sFile, string sTime, bool bBackFlow)
         {
             using (StreamWriter sw = new StreamWriter(sFile, true, Encoding.Default))
             {
@@ -147,7 +155,7 @@ namespace Root_VEGA_P.Module
                 {
                     foreach (int nParticle in pc.m_aCount) sw.Write("\t" + nParticle.ToString());
                 }
-                sw.WriteLine();
+                sw.WriteLine("\t" + (bBackFlow ? "BackFlow" : "OK"));
             }
         }
 
