@@ -299,7 +299,8 @@ namespace Root_Vega
 		private void M_InspManager_AddDefect(DefectDataWrapper item)
 		{
 			var target = InspectionManager.GetInspectionTarget(item.nClassifyCode);
-			if ((InspectionManager.GetInspectionType(item.nClassifyCode) == InspectionType.AbsoluteSurface || InspectionManager.GetInspectionType(item.nClassifyCode) == InspectionType.RelativeSurface) &&
+			if ((InspectionManager.GetInspectionType(item.nClassifyCode) == InspectionType.AbsoluteSurfaceDark || InspectionManager.GetInspectionType(item.nClassifyCode) == InspectionType.RelativeSurfaceDark ||
+				InspectionManager.GetInspectionType(item.nClassifyCode) == InspectionType.AbsoluteSurfaceBright || InspectionManager.GetInspectionType(item.nClassifyCode) == InspectionType.RelativeSurfaceBright) &&
 				target >= InspectionTarget.BevelInspection && target <= InspectionTarget.BevelInspectionBottom)
 			{
 				_dispatcher.BeginInvoke(new Action(delegate ()
@@ -368,11 +369,19 @@ namespace Root_Vega
 					for (int j = 0; j < tempRoi.Surface.ParameterList.Count; j++)
 					{
 						var param = tempRoi.Surface.ParameterList[j];
-						InspectionType type = InspectionType.AbsoluteSurface;
+						InspectionType type = InspectionType.AbsoluteSurfaceDark;
 
-						if (!param.UseAbsoluteInspection)
+						if (!param.UseAbsoluteInspection && param.UseDarkInspection)
 						{
-							type = InspectionType.RelativeSurface;
+							type = InspectionType.RelativeSurfaceDark;
+						}
+						else if (!param.UseAbsoluteInspection && !param.UseDarkInspection)
+						{
+							type = InspectionType.RelativeSurfaceBright;
+						}
+						else if (param.UseAbsoluteInspection && !param.UseDarkInspection)
+						{
+							type = InspectionType.AbsoluteSurfaceBright;
 						}
 						InspectionTarget target = (InspectionTarget)((int)InspectionTarget.BevelInspectionTop + i);
 						int nDefectCode = InspectionManager.MakeDefectCode(target, type, 0);

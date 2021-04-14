@@ -366,7 +366,40 @@ namespace RootTools.Inspects
 					System.Windows.Rect defectRect2 = DefectList[j].p_rtDefectBox;
 
 					if (DefectList[i].m_nDefectCode != DefectList[j].m_nDefectCode)
-						continue;
+					{
+						//다르면 우선 분기 들어감
+						//예외처리
+						/*
+						DarkInspection = 1,//1~3까지는 Merge
+						AbsoluteSurfaceDark = 2,
+						RelativeSurfaceDark = 3,
+
+						BrightInspection = 5,//5~7까지는 Merge
+						AbsoluteSurfaceBright = 6,
+						RelativeSurfaceBright = 7,
+						 */
+						var firstCode = (int)GetInspectionType(DefectList[i].m_nDefectCode);
+						var secondCode = (int)GetInspectionType(DefectList[j].m_nDefectCode);
+
+						if(Math.Abs( firstCode - secondCode) > 2)
+						{
+							continue;//다른 디펙임
+						}
+						//여기 오면 두개 뺀 값이 최대 3칸 차이난다는 뜻. 여기서 범위 내에 두개가 다 들어가있는지 구한다
+						if(firstCode > 0 && firstCode < 4 && secondCode > 0 && secondCode < 4)
+						{
+							//Dark. Merge 진행
+						}
+						else if(firstCode > 4 && firstCode < 8 && secondCode > 4 && secondCode < 8)
+						{
+							//Bright. Merge 진행
+						}
+						else
+						{
+							continue;//다른 디펙임
+						}
+					}
+
 
 					if (DefectList[j].m_fSize == -123 || (i == j))
 						continue;
@@ -943,7 +976,8 @@ namespace RootTools.Inspects
 						{
 							ip.p_StripParam = (StripParamData)param;
 						}
-						else if (ip.p_InspType == InspectionType.AbsoluteSurface || ip.p_InspType == InspectionType.AbsoluteSurface)
+						else if (ip.p_InspType == InspectionType.AbsoluteSurfaceDark || ip.p_InspType == InspectionType.RelativeSurfaceDark
+							|| ip.p_InspType == InspectionType.AbsoluteSurfaceBright || ip.p_InspType == InspectionType.RelativeSurfaceBright)
 						{
 							ip.p_surfaceParam = (SurfaceParamData)param;
 						}
