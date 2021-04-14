@@ -365,6 +365,9 @@ namespace RootTools.Inspects
 					System.Windows.Rect defectRect1 = DefectList[i].p_rtDefectBox;
 					System.Windows.Rect defectRect2 = DefectList[j].p_rtDefectBox;
 
+					if (DefectList[i].m_nDefectCode != DefectList[j].m_nDefectCode)
+						continue;
+
 					if (DefectList[j].m_fSize == -123 || (i == j))
 						continue;
 
@@ -490,6 +493,7 @@ namespace RootTools.Inspects
 						var FOV = Convert.ToInt32(item["FOV"].ToString());
 						var PosX = Convert.ToDouble(item["PosX"].ToString());
 						var PosY = Convert.ToDouble(item["PosY"].ToString());
+						var GV = Convert.ToSingle(item["GV"].ToString());
 						var memPOOL = item["memPOOL"].ToString();
 						var memGROUP = item["memGROUP"].ToString();
 						var memMEMORY = item["memMEMORY"].ToString();
@@ -497,7 +501,7 @@ namespace RootTools.Inspects
 						var DefectRect = new CRect((int)(PosX - Width / 2.0), (int)(PosY - Height / 2.0), (int)(PosX + Width / 2.0), (int)(PosY + Height / 2.0));
 
 						//string strInspectionID, int nDefectCode, float fDefectSz, float fDefectGV, float fDefectW, float fDefectH, float fRelX, float fRelY, float fAbsX, float fAbsY, int chipIdxX, int chipIdxY
-						Defect tempDef = new Defect("", ClassifyCode, AreaSize, 0, DefectRect.Left, DefectRect.Top, Width, Height, 0, 0);
+						Defect tempDef = new Defect("", ClassifyCode, AreaSize, GV, DefectRect.Left, DefectRect.Top, Width, Height, 0, 0);
 
 						tempDef.memPOOL = memPOOL;
 						tempDef.memGROUP = memGROUP;
@@ -509,7 +513,7 @@ namespace RootTools.Inspects
 					int idx = 0;
 					foreach (var item in tempList)
 					{
-						System.Data.DataRow dataRow = tempSet.Tables["tempdata"].NewRow();
+						System.Data.DataRow dataRow = tempSet.Tables["tempdata"].NewRow();//
 
 						dataRow["idx"] = idx;
 						dataRow["ClassifyCode"] = item.m_nDefectCode;
@@ -517,16 +521,17 @@ namespace RootTools.Inspects
 						dataRow["Length"] = item.m_fWidth > item.m_fHeight ? item.m_fWidth : item.m_fHeight;
 						dataRow["Width"] = item.m_fWidth;
 						dataRow["Height"] = item.m_fHeight;
-						dataRow["FOV"] = "0";
+						dataRow["FOV"] = 0;// item.m_fGV;
 						dataRow["PosX"] = Convert.ToInt32(item.m_fAbsX);
 						dataRow["PosY"] = Convert.ToInt32(item.m_fAbsY);
+						dataRow["GV"] = Convert.ToInt32(item.m_fGV);
 
 						dataRow["memPOOL"] = item.memPOOL;
 						dataRow["memGROUP"] = item.memGROUP;
 						dataRow["memMEMORY"] = item.memMEMORY;
 
 						idx++;
-						tempSet.Tables["tempdata"].ImportRow(dataRow);
+						tempSet.Tables["tempdata"].Rows.Add(dataRow);
 					}
 				}
 
@@ -588,6 +593,7 @@ namespace RootTools.Inspects
 					dataRow["FOV"] = item["FOV"];
 					int posX = Convert.ToInt32(item["PosX"]);
 					int posY = Convert.ToInt32(item["PosY"]);
+					dataRow["GV"] = Convert.ToInt32(item["GV"]); 
 					//	회전보정
 					System.Drawing.PointF ptfOriginPos = new System.Drawing.PointF(posX, posY);
 					System.Drawing.PointF ptfTransformedPos = new System.Drawing.PointF(posX, posY);
