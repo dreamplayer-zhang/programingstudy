@@ -44,7 +44,6 @@
         <local:ModuleStateToLoadingOpacityConverter x:Key="ModuleStateConverter"/>
         <local:ModuleStateToLoadingEnableConverter x:Key="ModuleStateToEnableConverter"/>
         <viewConverter:ConnectStringToBoolConverter x:Key="ConnectStringToBoolConverters" />
-        <local:AssemblyVersionToTextConverter x:Key="AssemblyVersionToConverter"/>
     </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
