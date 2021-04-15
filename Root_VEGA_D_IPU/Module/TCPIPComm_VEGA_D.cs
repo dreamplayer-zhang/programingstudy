@@ -52,13 +52,11 @@ namespace Root_VEGA_D_IPU.Module
 
         public enum Command
         {
-            none,
-            start,
-            end,
-            rcpname,
-            result,
-            alive,
-            ready,
+            None,
+            LineStart,
+            LineEnd,
+            RcpName,
+            Result,
             resume,
         }
 

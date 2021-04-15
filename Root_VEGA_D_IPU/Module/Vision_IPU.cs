@@ -26,6 +26,8 @@ namespace Root_VEGA_D_IPU.Module
         LensLinearTurret m_LensLinearTurret;
 
         TCPIPComm_VEGA_D m_tcpipCommClient;
+
+        public bool m_bImgInspectCompleted = true;
         #region [Getter Setter]
         public MemoryPool MemoryPool { get => m_memoryPool; private set => m_memoryPool = value; }
         public LightSet LightSet { get => m_lightSet; private set => m_lightSet = value; }
@@ -332,14 +334,14 @@ namespace Root_VEGA_D_IPU.Module
                 return;
 
             int nStartIdx = 0;
-            TCPIPComm_VEGA_D.Command cmd = TCPIPComm_VEGA_D.Command.none;
+            TCPIPComm_VEGA_D.Command cmd = TCPIPComm_VEGA_D.Command.None;
             Dictionary<string, string> mapParam = new Dictionary<string, string>();
 
             while (m_tcpipCommClient.ParseMessage(aBuf, nSize, ref nStartIdx, ref cmd, mapParam))
             {
                 switch (cmd)
                 {
-                    case TCPIPComm_VEGA_D.Command.start:
+                    case TCPIPComm_VEGA_D.Command.LineStart:
                         {
                             if (m_CamMain.p_CamInfo.p_eState == eCamState.Init)
                                 m_CamMain.ConnectAsSlave();
@@ -374,32 +376,38 @@ namespace Root_VEGA_D_IPU.Module
                             reg.Write(REGSUBKEYNAME_STARTSCANLINE, nStartScanLine);
                         }
                         break;
-                    case TCPIPComm_VEGA_D.Command.end:
+                    case TCPIPComm_VEGA_D.Command.LineEnd:
                         {
+                            // Grab 스레드 작업 정지
                             m_CamMain.AbortGrabThread();
                             m_CamMain.StopGrab();
 
-                            // 작업 중인 이미지 그랩 데이터 저장
+                            // 작업 중인 이미지 그랩 데이터 얻어오기
                             Registry reg = new Registry(p_id + ".TCPIP");
                             int totalScanLine = reg.Read(REGSUBKEYNAME_TOTALSCANLINE, -1);
                             int curScanLine = reg.Read(REGSUBKEYNAME_CURRENTSCANLINE, -1);
                             string grabLineScanState = cmd.ToString();
+
                             if (totalScanLine != -1 && curScanLine != -1)
                             {
+                                // 마지막 라인 스캔일 때
                                 if (totalScanLine == curScanLine + 1)
+                                {
                                     grabLineScanState = "";
+                                }
                             }
+
+                            // 작업 중인 이미지 그랩 데이터 저장
                             reg.Write(REGSUBKEYNAME_GRABLINESCANSTATE, grabLineScanState);
+
+                            // 이미지 검사 시작
+                            
 
                             EQ.p_bStop = true;
                         }
                         break;
-                    case TCPIPComm_VEGA_D.Command.rcpname:
+                    case TCPIPComm_VEGA_D.Command.RcpName:
                         string rcpname = mapParam[TCPIPComm_VEGA_D.PARAM_NAME_RCPNAME];
-                        break;
-                    case TCPIPComm_VEGA_D.Command.alive:
-                        break;
-                    case TCPIPComm_VEGA_D.Command.ready:
                         break;
                     default:
                         break;

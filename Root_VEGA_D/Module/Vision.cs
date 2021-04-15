@@ -398,61 +398,76 @@ namespace Root_VEGA_D.Module
                     break;
             }
         }
-
+        public bool m_bDisconnectedGrabLineScaning = false;     // 이미지 스캔 도중 소켓통신 연결이 끊어졌을 때의 상태값
         private void EventReceiveData(byte[] aBuf, int nSize, Socket socket)
         {
             if (nSize <= 0)
             {
-                if(!socket.Connected)
+                // 연결이 종료되었을 때
+                if (!socket.Connected)
                 {
-                    if(p_eState == eState.Run)
-                        EQ.p_bPause = true;
+                    if (m_qModuleRun.Count > 0)
+                    {
+                        Run_GrabLineScan runGrabLineScan = m_qModuleRun.Peek() as Run_GrabLineScan;
+                        if (runGrabLineScan != null)
+                        {
+                            // 현재 GrabLineScan 진행중이었다면 EQ Stop 상태로 변경하고 이미지그랩 중에 중단되었다는 상태값 설정
+                            if (p_eState == eState.Run)
+                            {
+                                EQ.p_bStop = true;
+                                m_bDisconnectedGrabLineScaning = true;
+                            }
+                        }
+                    }
                 }
             }
             else
             {
                 int nStartIdx = 0;
-                TCPIPComm_VEGA_D.Command cmd = TCPIPComm_VEGA_D.Command.none;
+                TCPIPComm_VEGA_D.Command cmd = TCPIPComm_VEGA_D.Command.None;
                 Dictionary<string, string> mapParam = new Dictionary<string, string>();
 
+                // 도착한 메세지를 파싱하여 메세지 단위마다 처리
                 while (m_tcpipCommServer.ParseMessage(aBuf, nSize, ref nStartIdx, ref cmd, mapParam))
                 {
                     switch (cmd)
                     {
-                        case TCPIPComm_VEGA_D.Command.result:
-                            {
-                                ModuleRunBase moduleRunBase = m_aModuleRun.Find(x => (x.GetType() == typeof(Run_GrabLineScan)));
-                                if (moduleRunBase != null)
-                                    moduleRunBase.Run();
-                            }
-                            break;
-                        case TCPIPComm_VEGA_D.Command.alive:
-                            break;
-                        case TCPIPComm_VEGA_D.Command.ready:
-                            break;
                         case TCPIPComm_VEGA_D.Command.resume:
                             {
-                                if (EQ.p_bPause == true)
+                                if (EQ.IsStop() || m_bDisconnectedGrabLineScaning == true)
                                 {
                                     // 이전에 이미지 그랩 작업을 이어서 할 수 있도록 처리
                                     int totalScanLine = int.Parse(mapParam[TCPIPComm_VEGA_D.PARAM_NAME_TOTALSCANLINECOUNT]);
                                     int curScanLine = int.Parse(mapParam[TCPIPComm_VEGA_D.PARAM_NAME_CURRENTSCANLINE]);
                                     int startScanLine = int.Parse(mapParam[TCPIPComm_VEGA_D.PARAM_NAME_STARTSCANLINE]);
 
-                                    ModuleRunBase moduleRunBase = m_aModuleRun.Find(x => (x.GetType() == typeof(Run_GrabLineScan)));
-                                    if (moduleRunBase != null)
+                                    if(m_qModuleRun.Count > 0)
                                     {
-                                        Run_GrabLineScan grabLineScan = moduleRunBase as Run_GrabLineScan;
-                                        if (grabLineScan != null)
+                                        Run_GrabLineScan runGrabLineScan = m_qModuleRun.Peek() as Run_GrabLineScan;
+                                        if (runGrabLineScan != null)
                                         {
-                                            grabLineScan.m_grabMode.m_ScanLineNum = totalScanLine - curScanLine;
-                                            grabLineScan.m_grabMode.m_ScanStartLine = startScanLine + curScanLine;
+                                            runGrabLineScan.m_grabMode.m_ScanLineNum = totalScanLine - curScanLine;
+                                            runGrabLineScan.m_grabMode.m_ScanStartLine = startScanLine + curScanLine;
 
-                                            EQ.p_bPause = false;
-                                            //Reset();
-                                            //StartRun(p_sModuleRun);
+                                            EQ.p_bStop = false;
                                         }
                                     }
+                                }
+                                else
+                                {
+                                    // EQ Stop 상태를 변경하여 이미지 스캔을 재개하지 않을 것이므로
+                                    // 이미지 스캔 중 연결이 끊겼다는 상태값을 다시 리셋
+                                    m_bDisconnectedGrabLineScaning = false;
+                                }
+                            }
+                            break;
+                        case TCPIPComm_VEGA_D.Command.Result:
+                            {
+                                Run_GrabLineScan runGrabLineScan = m_qModuleRun.Peek() as Run_GrabLineScan;
+                                if (runGrabLineScan != null)
+                                {
+                                    // IPU에서 이미지 스캔 완료되었기 때문에 해당 상태변수 true로 변경
+                                    runGrabLineScan.m_bIPUCompleted = true;
                                 }
                             }
                             break;
@@ -460,6 +475,20 @@ namespace Root_VEGA_D.Module
                             break;
                     }
                 }
+            }
+        }
+
+        int m_nSocketReconnectWaitTime = 20000;
+        bool m_bWaitSocketReconnect = false;
+        void WaitSocketReconnectThread()
+        {
+            StopWatch sw = new StopWatch();
+            sw.Start();
+
+            m_bWaitSocketReconnect = true;
+            while(m_bWaitSocketReconnect && (sw.ElapsedMilliseconds > m_nSocketReconnectWaitTime))
+            {
+                Thread.Sleep(10);
             }
         }
 

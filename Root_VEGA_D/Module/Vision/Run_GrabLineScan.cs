@@ -26,6 +26,7 @@ namespace Root_VEGA_D.Module
         public GrabMode m_grabMode = null;
         double m_dTDIToVRSOffsetZ = 0;
         string m_sGrabMode = "";
+        public bool m_bIPUCompleted = true;
         public string p_sGrabMode
         {
             get { return m_sGrabMode; }
@@ -79,6 +80,10 @@ namespace Root_VEGA_D.Module
 
             Camera_Dalsa camera = (Camera_Dalsa)m_grabMode.m_camera;
             GrabData grabData = m_grabMode.m_GD;
+
+            // IPU와 연결 시, 이미지 검사 완료되었을 때의 변수
+            if (m_module.TcpipCommServer.IsConnected())
+                m_bIPUCompleted = false;
 
             try
             {
@@ -181,7 +186,7 @@ namespace Root_VEGA_D.Module
                         mapParam[TCPIPComm_VEGA_D.PARAM_NAME_CURRENTSCANLINE] = nScanLine.ToString();
                         mapParam[TCPIPComm_VEGA_D.PARAM_NAME_STARTSCANLINE] = m_grabMode.m_ScanStartLine.ToString();
 
-                        m_module.TcpipCommServer.SendMessage(TCPIPComm_VEGA_D.Command.start, mapParam);
+                        m_module.TcpipCommServer.SendMessage(TCPIPComm_VEGA_D.Command.LineStart, mapParam);
                     }
 
                     //카메라 그랩 시작
@@ -211,7 +216,7 @@ namespace Root_VEGA_D.Module
 
                     // IPU PC와 연결된 상태라면 스캔 종료 메세지 전달
                     if (m_module.TcpipCommServer.IsConnected())
-                        m_module.TcpipCommServer.SendMessage(TCPIPComm_VEGA_D.Command.end);
+                        m_module.TcpipCommServer.SendMessage(TCPIPComm_VEGA_D.Command.LineEnd);
 
                     // X축을 미리 움직임
                     axisXY.p_axisX.StartMove(dNextPosX);
@@ -223,6 +228,12 @@ namespace Root_VEGA_D.Module
                 m_grabMode.m_camera.StopGrab();
 
                 snapTimeWatcher.Stop();
+
+                // IPU와 연결상태에 이미지 검사가 끝나기까지 대기
+                while (m_module.TcpipCommServer.IsConnected() && !m_bIPUCompleted && !EQ.IsStop())
+                {
+                    Thread.Sleep(10);
+                }
 
                 // Log
                 TempLogger.Write("Snap", string.Format("{0:F3}", (double)snapTimeWatcher.ElapsedMilliseconds / (double)1000));
