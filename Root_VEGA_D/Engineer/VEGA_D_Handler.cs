@@ -60,7 +60,7 @@ namespace Root_VEGA_D.Engineer
             InitModule(m_FDC);
             m_FFU = new FFU("FFU", m_engineer);
             InitModule(m_FFU);
-            m_interlock = new Interlock("Interlock", m_engineer);
+            m_interlock = new Interlock("Interlock", m_engineer,m_engineer.m_ACS);
             InitModule(m_interlock);
             m_towerlamp = new TowerLamp("TowerLamp", m_engineer);
             InitModule(m_towerlamp);
@@ -130,12 +130,14 @@ namespace Root_VEGA_D.Engineer
             {
                 string sID = "Loadport" + cLP;
                 //string sID = "LP" + cLP;
-                switch (m_aLoadportType[n])
-                {
-                    case eLoadport.RND: module = new Loadport_RND(sID, m_engineer, true, true); break;
-                    case eLoadport.Cymechs: module = new Loadport_Cymechs(sID, m_engineer, true, false); break;
-                    default: module = new Loadport_RND(sID, m_engineer, true, true); break;
-                }
+                //switch (m_aLoadportType[n])
+                //{
+                //    case eLoadport.RND: module = new Loadport_RND(sID, m_engineer, true, true); break;
+                //    case eLoadport.Cymechs: module = new Loadport_Cymechs(sID, m_engineer, true, false); break;
+                //    default: module = new Loadport_RND(sID, m_engineer, true, true); break;
+                //}
+                m_aLoadportType[n] = eLoadport.Cymechs;
+                module = new Loadport_Cymechs(sID, m_engineer, true, false);
                 InitModule(module);
                 m_loadport.Add(module);
                 m_aLoadport.Add((ILoadport)module);
