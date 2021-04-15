@@ -39,7 +39,7 @@
                         </CheckBox.Style>
                     </CheckBox>
                 </Grid>
-                <WpfPlot Name="GraphCount" Grid.Row="1">
+                <WpfPlot Name="GraphCount" MouseMove="CountGraph_MouseMove" Grid.Row="1">
                 </WpfPlot>
             </Grid>
         </GroupBox>
