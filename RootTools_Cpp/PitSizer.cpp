@@ -36,6 +36,15 @@ float PitSizer::GetPitSize(byte* mem, int x, int y, int nW, int RefGV, int PitVa
 
 	float fSizeFraction;
 
+	if (nIndex == 1)
+	{
+		m_nGV = 255;
+	}
+	else if (nIndex == -1)
+	{
+		m_nGV = 0;
+	}
+
 	m_rcPitRect.left = x;
 	m_rcPitRect.right = x;
 	m_rcPitRect.top = y;
@@ -88,8 +97,18 @@ float PitSizer::GetPitSize(byte* mem, int x, int y, int nW, int RefGV, int PitVa
 						}
 					}
 
-					if (gv <= PitValue)	PitSize += 1.0;
-					else					PitSize += (float)(RefGV - gv) * fSizeFraction;
+					if (gv <= PitValue)
+					{
+						PitSize += 1.0;
+						if (m_nGV > gv)
+						{
+							m_nGV = gv;
+						}
+					}
+					else
+					{
+						PitSize += (float)(RefGV - gv) * fSizeFraction;
+					}
 
 					px = (p + 1)->x = px + dx;
 					py = (p + 1)->y = py + dy;
@@ -143,8 +162,16 @@ float PitSizer::GetPitSize(byte* mem, int x, int y, int nW, int RefGV, int PitVa
 
 		gv = mem[y * nW + x];
 		mem[y * nW + x] = 0;
-		if (gv >= PitValue) PitSize += 1.0;
-		else {
+		if (gv >= PitValue)
+		{
+			PitSize += 1.0;
+			if (m_nGV < gv)
+			{
+				m_nGV = gv;
+			}
+		}
+		else 
+		{
 			PitSize += (float)(RefGV - gv) * fSizeFraction;
 		}
 
@@ -278,4 +305,9 @@ int PitSizer::GetDefectMapLength()
 RECT PitSizer::GetPitRect()
 {
 	return m_rcPitRect;
+}
+
+int PitSizer::GetGV()
+{
+	return m_nGV;
 }
