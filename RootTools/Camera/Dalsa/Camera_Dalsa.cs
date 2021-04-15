@@ -142,6 +142,7 @@ namespace RootTools.Camera.Dalsa
         int m_nLine = 0;
         TreeRoot m_treeRoot = null;
 
+        double m_dPReXScale = 1; //Gray
         double m_dPReXScaleR = 1; 
         double m_dPReXScaleG = 1;
         double m_dPReXScaleB = 1;
@@ -149,6 +150,7 @@ namespace RootTools.Camera.Dalsa
         double m_dPReXShiftG = 0;
         double m_dPReXShiftB = 0;
 
+        int m_nPreWidth = 8000;
         int m_nPreWidthR = 8000;
         int m_nPreWidthG = 8000;
         int m_nPreWidthB = 8000;
@@ -157,11 +159,13 @@ namespace RootTools.Camera.Dalsa
         const int threadBuff = 16000;
         CLR_IP m_clrip = new CLR_IP();
 
+        List<byte[]> m_buff = new List<byte[]>();
         List<byte[]> m_buffR = new List<byte[]>();
         List<byte[]> m_buffG = new List<byte[]>();
         List<byte[]> m_buffB = new List<byte[]>();
         const int overlapsize = 100;
 
+        List<byte[]> m_Overlap = new List<byte[]>();
         List<byte[]> m_OverlapR = new List<byte[]>();
         List<byte[]> m_OverlapG = new List<byte[]>();
         List<byte[]> m_OverlapB = new List<byte[]>();
@@ -199,9 +203,11 @@ namespace RootTools.Camera.Dalsa
 
             for (int n = 0; n < thread; n++)
             {
+                m_buff.Add(new byte[threadBuff]);
                 m_buffR.Add(new byte[threadBuff]);
                 m_buffG.Add(new byte[threadBuff]);
                 m_buffB.Add(new byte[threadBuff]);
+                m_Overlap.Add(new byte[overlapsize]);
                 m_OverlapR.Add(new byte[overlapsize]);
                 m_OverlapG.Add(new byte[overlapsize]);
                 m_OverlapB.Add(new byte[overlapsize]);
@@ -586,6 +592,135 @@ namespace RootTools.Camera.Dalsa
         }
         int m_nOffsetTest = 0;
         private CRect m_LastROI = new CRect(0, 0, 0, 0);
+        unsafe void RunGrabLineScanOverlapThread()
+        {
+            StopWatch swGrab = new StopWatch();
+            int DelayGrab = 1000 * m_nGrabCount;
+
+            if (m_sapBuf == null)
+                p_sInfo = "CamDalsa Buffer Error !!";
+
+            int iBlock = 0;
+            int nByteCnt = m_sapBuf.BytesPerPixel;
+            int nScanOffsetX = m_cpScanOffset.X;
+            int nScanOffsetY = m_cpScanOffset.Y;
+            int nCamWidth = p_CamParam.p_Width;
+            int nCamHeight = p_CamParam.p_Height;
+            int nFovStart = m_GD.m_nFovStart;
+            int nOverlap = m_GD.m_nOverlap;
+
+            if (nOverlap > overlapsize)
+            {
+                MessageBox.Show("Overlap 이 100 보다큽니다.");
+                nOverlap = overlapsize;
+            }
+            int nFovSize = (int)(m_GD.m_nFovSize / m_GD.m_dScale) + nOverlap;
+
+            if (nCamWidth < nFovStart + nFovSize)
+            {
+                MessageBox.Show("FovStart+ nFovSize+ nOverlap가 CamWidth보다 큽니다.(" + nFovStart.ToString() + " + " + nFovSize.ToString() + " > " + nCamWidth.ToString() + ")");
+                nFovSize = nCamWidth - nFovStart;
+            }
+            int nBufSize = nCamHeight * nCamWidth;
+            long nMemWidth = m_Memory.W;
+
+            if (m_GD.m_nOverlap != m_nPreOverlap)
+            {
+                m_nPreOverlap = m_GD.m_nOverlap;
+                if (m_nPreOverlap != 0)
+                {
+                    double dRatio = 1.0 / m_nPreOverlap;
+                    for (int n = 0; n < m_nPreOverlap; n++)
+                    {
+                        m_pdOverlap[n] = dRatio * n;
+                    }
+                }
+            }
+
+            if (m_GD.m_dScale != m_dPReXScale
+                || nFovSize != m_nPreWidth)
+            {
+                m_dPReXScale = m_GD.m_dScale;
+                m_nPreWidth = nFovSize;
+                m_clrip.Cpp_CreatInterpolationData(0, m_dPReXScale, 0, m_nPreWidth);
+            }
+
+            const int nTimeOut_10s = 10000; //ms            
+            const int nTimeOutInterval = 10; // ms
+            int nScanAxisTimeOut = nTimeOut_10s / nTimeOutInterval;
+            int previBlock = 0;
+            while (iBlock < m_nGrabCount)
+            {
+                if (previBlock == iBlock)
+                {
+                    Thread.Sleep(nTimeOutInterval);
+                    if (--nScanAxisTimeOut <= 0)
+                    {
+                        m_log.Info("TimeOut - RunGrabLineScanOverlapThread");
+                        m_nGrabTrigger = m_nGrabCount;
+                    }
+                }
+                else
+                {
+                    previBlock = iBlock;
+                    nScanAxisTimeOut = nTimeOut_10s / nTimeOutInterval;
+                }
+                if (iBlock < m_nGrabTrigger)
+                {
+                    IntPtr ipSrc = m_pSapBuf[iBlock % p_nBuf];
+
+                    Parallel.For(0, nCamHeight, new ParallelOptions { MaxDegreeOfParallelism = thread }, (y) =>
+                    {
+                        int yp;
+                        if (Scandir)
+                            yp = m_nLine - (y + (iBlock) * nCamHeight) + m_nInverseYOffset + m_nOffsetTest;
+                        else
+                            yp = y + iBlock * nCamHeight + nScanOffsetY + m_nOffsetTest;
+
+
+                        long n = nScanOffsetX + yp * nMemWidth;
+                        IntPtr srcPtr = ipSrc + nCamWidth * y * nByteCnt + nFovStart;
+                        IntPtr dstPtr = (IntPtr)((long)m_MemPtr + n);
+                        int nThreadIdx = GetReadyThread();
+
+                        byte* pDst = (byte*)dstPtr.ToPointer();
+                        int* pSrc = (int*)srcPtr.ToPointer();
+                        for (int i = 0; i < nFovSize; i++)
+                            m_buff[nThreadIdx][i] = (byte)pSrc[i];
+                        
+                        if (m_nPreOverlap != 0 && nScanOffsetX >= nFovSize - nOverlap)
+                        {
+                            // overlap buffer
+                            fixed (byte* pbO = &m_Overlap[nThreadIdx][0])
+                                Buffer.MemoryCopy(pDst, pbO, nOverlap, nOverlap);
+                        }
+
+                        fixed (byte* pb = &m_buff[nThreadIdx][0])
+                            m_clrip.Cpp_ProcessInterpolation(0, nThreadIdx, pb, 1, nCamWidth, nFovSize, pDst);
+
+                        if (m_nPreOverlap != 0 && nScanOffsetX >= nFovSize - nOverlap)
+                        {
+                            fixed (byte* pbO = &m_Overlap[nThreadIdx][0])
+                            {
+                                Overlap(pbO, pDst, nOverlap);
+                            }
+                        }
+
+                        SetTheadDone(nThreadIdx);
+                    });
+                    iBlock++;
+                    m_LastROI.Left = nScanOffsetX;
+                    m_LastROI.Right = nScanOffsetX + nCamWidth;
+                    m_LastROI.Top = nScanOffsetY;
+                    m_LastROI.Bottom = nScanOffsetX + nCamHeight;
+                    GrabEvent();
+
+                    if (m_nGrabCount != 0)
+                        p_nGrabProgress = Convert.ToInt32((double)iBlock * 100 / m_nGrabCount);
+                }
+            }
+            p_CamInfo.p_eState = eCamState.Ready;
+        }
         unsafe void RunGrabLineScanThread()
         {
             StopWatch swGrab = new StopWatch();

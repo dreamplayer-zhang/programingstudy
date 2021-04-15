@@ -317,13 +317,15 @@ namespace RootTools.Camera.Dalsa
             if(m_sapCam!=null)
             {
                 string str;
+                m_sapCam.GetFeatureValue("DeviceScanType", out str);
+                if (!str.Equals("Areascan"))
+                    m_sapCam.SetFeatureValue("DeviceScanType", "Areascan");
+                m_sapCam.GetFeatureValue("sensorTDIModeSelection", out str);
+                if (!str.Equals("TdiArea"))
+                    m_sapCam.SetFeatureValue("sensorTDIModeSelection", "TdiArea");
                 m_sapCam.GetFeatureValue("TriggerMode", out str);
                 if (!str.Equals("Internal"))
                     m_sapCam.SetFeatureValue("TriggerMode", "Internal");
-                m_sapCam.GetFeatureValue("TDI Mode", out str);
-                if (!str.Equals("TdiArea"))
-                    m_sapCam.SetFeatureValue("TDI Mode", "TdiArea");
-
             }
         }
         public void SetCamHandle(SapAcqDevice device, SapAcquisition acquisition)
