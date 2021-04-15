@@ -101,25 +101,25 @@ namespace Root_CAMELLIA
             PMResultGraph1100.Add(PMReflectance1100);
         }
 
-        public void DrawPMGraph(int nRepeatNum,int GraphCount,double Wavelength,double [] arrDiffData)
+        public void DrawPMGraph(int GraphCount, Met.PMDatas PMData)
         {
             
-            double[] nRepeatCount = new double[nRepeatNum];
-            for (int i = 0; i < nRepeatNum; i++)
+            double[] nRepeatCount = new double[PMData.nSensorTiltRepeatNum];
+            for (int i = 0; i < PMData.nSensorTiltRepeatNum; i++)
             {
                 nRepeatCount[i] = i + 1;
             }
             if(GraphCount==0)
             {
-                p_PMReflectance500.DrawReviewGraph(Wavelength.ToString() +" [nm]", "Count", "Diff [%]", nRepeatCount, arrDiffData);
+                p_PMReflectance500.DrawReviewGraph(PMData.arrCheckWavelength[GraphCount].ToString() +" [nm]", "Repeat Count", "Diff [%]", nRepeatCount, PMData.m_CalPMReflectance[GraphCount].dDiffReflectance);
             }
             if (GraphCount == 1)
             {
-                p_PMReflectance740.DrawReviewGraph(Wavelength.ToString() + " [nm]", "Count", "Diff [%]", nRepeatCount, arrDiffData);
+                p_PMReflectance740.DrawReviewGraph(PMData.arrCheckWavelength[GraphCount].ToString() + " [nm]", "Repeat Count", "Diff [%]", nRepeatCount, PMData.m_CalPMReflectance[GraphCount].dDiffReflectance);
             }
             if (GraphCount == 2)
             {
-                p_PMReflectance1100.DrawReviewGraph(Wavelength.ToString() + " [nm]", "Count", "Diff [%]", nRepeatCount, arrDiffData);
+                p_PMReflectance1100.DrawReviewGraph(PMData.arrCheckWavelength[GraphCount].ToString() + " [nm]", "Repeat Count", "Diff [%]", nRepeatCount, PMData.m_CalPMReflectance[GraphCount].dDiffReflectance);
             }
 
         }
@@ -171,35 +171,6 @@ namespace Root_CAMELLIA
                 PMReflectanceResult.Rows.Add(row);
             });
         }
-        public void PMResultDataGrid(int MaxDataNum, int DataCount, double dWavelength, double dMin, double dMax, double dCop, double dAverage, double dSTD)
-        {
-            Met.PMDatas m_PMData = new Met.PMDatas();
-
-            double dfsd = m_PMData.nSensorTiltRepeatNum;
-
-            DataRow row;
-            if (DataCount == 0)
-            {
-                PMReflectanceResult.Clear();
-            }
-            Application.Current.Dispatcher.Invoke(() =>
-            {
-                row = PMReflectanceResult.NewRow();
-                if (DataCount == MaxDataNum)
-                {
-                    row["Wavelength"] = "Total";
-                }
-                else
-                {
-                    row["Wavelength"] = dWavelength.ToString();
-                }
-                row["Min"] = dMin.ToString();
-                row["Max"] = dMax.ToString();
-                row["Cop"] = dCop.ToString();
-                row["Average"] = dAverage.ToString();
-                row["STD"] = dSTD.ToString();
-                PMReflectanceResult.Rows.Add(row);
-            });
-        }
+       
     }
 }
