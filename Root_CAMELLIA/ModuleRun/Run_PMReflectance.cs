@@ -211,23 +211,21 @@ namespace Root_CAMELLIA.Module
                     return "[CheckSensorTilt] Measuring Error" + "[" + n + "]";
                 }
 
-                
-                //rst = Met.PMDatas.CheckSensorTilt();
-
             }
-            //m_module.mwvm.EngineerViewModel.p_PMCheckReview_ViewModel.m_pmSensorTilt_VM.p_pmSenserCamera.p_SensorCameraAlign = m_PMData.dAlign_ResultDeg;
-            // m_module.mwvm.EngineerViewModel.p_PMCheckReview_ViewModel.m_pmReflectance_VM.DrawPMGraph();
-
-            double[] nRepeatCount = new double[m_PMData.nSensorTiltRepeatNum];
-            for (int i = 0; i < m_PMData.nSensorTiltRepeatNum; i++)
+            #region PM Result Draw
+            for (int n = 0; n < m_PMData.arrCheckWavelength.Count() + 1; n++)
             {
-                nRepeatCount[i] = i + 1;
+                if (n <= m_PMData.arrCheckWavelength.Count())
+                {
+
+                    m_module.mwvm.EngineerViewModel.p_PMCheckReview_ViewModel.m_pmReflectance_VM.DrawPMGraph(m_PMData.nSensorTiltRepeatNum,n,m_PMData.m_CalPMReflectance[n].dWavelength, m_PMData.m_CalPMReflectance[n].dDiffReflectance);
+                }
+                m_module.mwvm.EngineerViewModel.p_PMCheckReview_ViewModel.m_pmReflectance_VM.PMResultDataGrid(n,m_PMData);
             }
 
-            //m_module.mwvm.EngineerViewModel.p_PMCheckReview_ViewModel.m_pmReflectance_VM.p_PMReflectance500.DrawReviewGraph("500 nm", "Diff [%]", "Count", nRepeatCount, m_PMData.DiffReflectnace500);
-            //m_module.mwvm.EngineerViewModel.p_PMCheckReview_ViewModel.m_pmReflectance_VM.p_PMReflectance740.DrawReviewGraph("740 nm", "Diff [%]", "Count", nRepeatCount, m_PMData.DiffReflectnace740);
-            //m_module.mwvm.EngineerViewModel.p_PMCheckReview_ViewModel.m_pmReflectance_VM.p_PMReflectance1100.DrawReviewGraph("1100 nm", "Diff [%]", "Count", nRepeatCount, m_PMData.DiffReflectnace1100);
-            //리턴값 반환할 것
+
+            #endregion
+
             return "OK";
         }
         private void SaveCheckSensorData()

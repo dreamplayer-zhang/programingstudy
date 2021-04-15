@@ -2330,7 +2330,7 @@ namespace Root_CAMELLIA
             }));
             
             sw.Stop();
-            System.Diagnostics.Debug.WriteLine("test " + sw.ElapsedMilliseconds);
+            //System.Diagnostics.Debug.WriteLine("test " + sw.ElapsedMilliseconds);
         }
 
         public void UpdateLayerGridView()

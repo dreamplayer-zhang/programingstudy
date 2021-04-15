@@ -770,7 +770,7 @@
                         </GroupBox>
                         <GroupBox Header="Current Progress" Grid.Row="2">
                             <Grid>
-                                <ProgressBar Minimum="0" Maximum="100" Margin="2" Value="{Binding p_Progress, UpdateSourceTrigger=PropertyChanged}" Foreground="{Binding p_ProgressColor}"/>
+                                <ProgressBar Minimum="0" Maximum="100" Margin="2" Value="{Binding p_Progress, UpdateSourceTrigger=PropertyChanged}" Foreground="{Binding p_ProgressColor}" Style="{StaticResource CustomProgress}"/>
                                 <TextBlock Text="{Binding p_Progress, Converter={StaticResource ProgressConverter}, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Center" VerticalAlignment="Center" ></TextBlock>
                             </Grid>
                         </GroupBox>

@@ -12,29 +12,25 @@
             <RowDefinition Height="1*"/>
             <RowDefinition Height="1*"/>
         </Grid.RowDefinitions>
-        <Grid>
-            <Grid Grid.Row="0">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="3*"/>
-                    <ColumnDefinition Width="7*"/>
-                </Grid.ColumnDefinitions>
-                <GroupBox Header="Parameter Setting" Grid.Row="0" Grid.Column="0">
-                    <Grid Grid.Row="0" Grid.Column="0">
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="1*"/>
-                            <RowDefinition Height="1*"/>
-                            <RowDefinition Height="1*"/>
-                            <RowDefinition Height="1*"/>
-                            <RowDefinition Height="1*"/>
-                        </Grid.RowDefinitions>
-                    </Grid>
-                </GroupBox>
-                <GroupBox Header="Result Data" Grid.Row="0" Grid.Column="1" >
-
-
-                </GroupBox>
+        <GroupBox Header="Result Data" Grid.Row="0" >
+            <Grid>
+                <DataGrid ItemsSource="{Binding PMReflectanceResult}" AutoGenerateColumns="False" CanUserAddRows="False" CanUserSortColumns="True" EnableColumnVirtualization="True"  CanUserDeleteRows="False"
+                                  EnableRowVirtualization="True" ScrollViewer.CanContentScroll="True" SelectionMode="Single" >
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Wavelength" Binding="{Binding Wavelength}" IsReadOnly="True" Width="1*" />
+                        <DataGridTextColumn Header="MIn" Binding="{Binding Min}" IsReadOnly="True" Width="1*"/>
+                        <DataGridTextColumn Header="Max" Binding="{Binding Max}" IsReadOnly="True" Width="1*"/>
+                        <DataGridTextColumn Header="Cop" Binding="{Binding Cop}" IsReadOnly="True" Width="1*"/>
+                        <DataGridTextColumn Header="Average" Binding="{Binding Average}" IsReadOnly="True" Width="1*"/>
+                        <DataGridTextColumn Header="STD" Binding="{Binding STD}" IsReadOnly="True" Width="1*"/>
+                    </DataGrid.Columns>
+                </DataGrid>
             </Grid>
-        </Grid>
+
+
+        </GroupBox>
+
+    
         <GroupBox Header="Result Graph" Grid.Row="1">
             <Grid>
                 <Grid.ColumnDefinitions>
