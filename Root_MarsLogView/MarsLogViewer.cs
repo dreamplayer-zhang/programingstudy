@@ -38,13 +38,22 @@ namespace Root_MarsLogView
         private void MarsLogViewer0_EventReciveData(byte[] aBuf, int nSize, Socket socket)
         {
             socket.Send(aBuf, nSize, SocketFlags.None);
-            m_qLog.Enqueue(new Mars(0, Encoding.ASCII.GetString(aBuf, 0, nSize)));
+            m_qLog.Enqueue(new Mars(0, GetHandlerString(Encoding.ASCII.GetString(aBuf, 0, nSize))));
         }
 
         private void MarsLogViewer1_EventReciveData(byte[] aBuf, int nSize, Socket socket)
         {
             socket.Send(aBuf, nSize, SocketFlags.None);
             m_qLog.Enqueue(new Mars(1, GetVisionString(Encoding.ASCII.GetString(aBuf, 0, nSize))));
+        }
+
+		private string GetHandlerString(string sHandler)//jws test
+		{
+            string[] asHandler = sHandler.Split(',');
+            GetDateTime(asHandler);
+            string sLog = asHandler[0];
+            for (int n = 1; n < 14; n++) sLog += ',' + asHandler[n];
+            return sLog;
         }
 
         string GetVisionString(string sVision)
