@@ -1505,7 +1505,7 @@ namespace Root_CAMELLIA.LibSR_Met
             }
         }
 
-        public void AllContourMapDataFitting(List<WavelengthItem> R, List<WavelengthItem> T)
+        public void AllContourMapDataFitting(List<WavelengthItem> R, List<WavelengthItem> T, int measurePointCount)
         {
             m_ScalesListR = new List<WavelengthItem>(R.ToArray());
             m_ScalesListT = new List<WavelengthItem>(T.ToArray());
@@ -1529,7 +1529,7 @@ namespace Root_CAMELLIA.LibSR_Met
             }
 
 
-            for (int n = 0; n < 13; n++)
+            for (int n = 0; n < measurePointCount; n++)
             {
                 int indexR = 0;
                 int indexT = 0;
@@ -1539,7 +1539,7 @@ namespace Root_CAMELLIA.LibSR_Met
                 {
 
                     double dRawDataWaveLength = m_RawData[n].Wavelength[k];
-                    if (dRawDataWaveLength == m_ScalesListR[indexR].p_waveLength && !isDoneR)
+                    if (m_ScalesListR.Count != 0 && dRawDataWaveLength == m_ScalesListR[indexR].p_waveLength && !isDoneR)
                     {
                         double dValue = m_RawData[n].Reflectance[k];
                         //double dWaveLength = m_ScalesListR[indexR].p_waveLength;
@@ -1559,7 +1559,7 @@ namespace Root_CAMELLIA.LibSR_Met
                         isDoneR = true;
                     }
 
-                    if(dRawDataWaveLength == m_ScalesListT[indexT].p_waveLength && !isDoneT)
+                    if(m_ScalesListT.Count != 0 && dRawDataWaveLength == m_ScalesListT[indexT].p_waveLength && !isDoneT)
                     {
                         double dValue = m_RawData[n].Reflectance[k];
                         //double dWaveLength = m_ScalesListT[indexT].p_waveLength;

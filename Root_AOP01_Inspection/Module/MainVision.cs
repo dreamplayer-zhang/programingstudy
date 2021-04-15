@@ -5379,6 +5379,7 @@ namespace Root_AOP01_Inspection.Module
                     ladsinfo.m_Heightinfo[i] = GetLaserHeight(img, out bErrorOccured);
                     while(bErrorOccured)    // Error 발생시 다시... 
                     {
+                        Thread.Sleep(1);
                         ladsinfo.m_Heightinfo[i] = GetLaserHeight(img, out bErrorOccured);
                     }
                 }

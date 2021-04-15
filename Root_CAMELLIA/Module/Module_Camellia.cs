@@ -301,7 +301,7 @@ namespace Root_CAMELLIA.Module
             for (int i = 0; i < loadports.Count; i++)
             {
                 infoCarrier[i] = loadports[i].p_infoCarrier;
-                CanInitCal[i] = false;  
+                CanInitCal[i] = false;
             }
            // try
             //{
@@ -427,6 +427,7 @@ namespace Root_CAMELLIA.Module
                     if (!CanInitCal[EQ.p_nRunLP] && infoCarrier[EQ.p_nRunLP].p_eState == InfoCarrier.eState.Dock)
                     {
                         CanInitCal[EQ.p_nRunLP] = true;
+                        
                         if (((Run_InitCalibration)CloneModuleRun("InitCalibration")).Run() != "OK")
                         {
                             p_sInfo = "Init Cal Error";
@@ -452,10 +453,13 @@ namespace Root_CAMELLIA.Module
         {
             if (p_axisLifter.IsInPos(eAxisPos.Home))
             {
+                if (!m_vacuum.p_bIn)
+                {
+                    VaccumOnOff(true);
+                }
                 return "OK";
             }
-
-            if (m_loadExistWafer.p_bIn)
+            else
             {
                 if (!m_vacuum.p_bIn)
                 {
@@ -469,11 +473,16 @@ namespace Root_CAMELLIA.Module
                 if (p_axisLifter.WaitReady() != "OK")
                     return p_sInfo;
             }
-            else
+
+           // if (m_loadExistWafer.p_bIn)
             {
-                p_sInfo = p_id + " Wafer Not Exist Error";
-                return p_sInfo;
+                
             }
+            //else
+            //{
+            //    p_sInfo = p_id + " Wafer Not Exist Error";
+            //    return p_sInfo;
+            //}
 
             //if (LifterMoveVacuumCheck())
             //{
@@ -663,13 +672,14 @@ namespace Root_CAMELLIA.Module
         public string AfterGet(int nID)
         {
             // Make Directory
-            p_dataSavePath = BaseDefine.Dir_MeasureSaveRootPath + p_infoWafer.p_sRecipe + @"\" + DateTime.Now.ToString("yyyy-MM-dd") + "T" + DateTime.Now.ToString("HH-mm-ss");
-            GeneralTools.MakeDirectory(p_dataSavePath);
+           
             return "OK";
         }
 
         public string AfterPut(int nID)
         {
+            p_dataSavePath = BaseDefine.Dir_MeasureSaveRootPath + p_infoWafer.p_sRecipe + @"\" + DateTime.Now.ToString("yyyy-MM-dd") + "T" + DateTime.Now.ToString("HH-mm-ss");
+            GeneralTools.MakeDirectory(p_dataSavePath);
             return "OK";
         }
 

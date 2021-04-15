@@ -21,7 +21,7 @@ namespace Root_CAMELLIA
         #region Property
         private MainWindow_ViewModel mainWindow_ViewModel;
 
-        Explorer_ViewModel m_summary = new Explorer_ViewModel(InitPath : @"C:\Camellia2\PRD");
+        Explorer_ViewModel m_summary = new Explorer_ViewModel(InitPath : BaseDefine.Dir_MeasureSaveRootPath);
         public Explorer_ViewModel p_summary
         {
             get

@@ -28,7 +28,8 @@ namespace Root_CAMELLIA
         public const string Dir_Recipe = @"C:\Camellia\Recipe\PRD\15Line\"; // 변경해야함
         public const string Dir_StageHole = @"C:\Camellia\StageCircleHole.txt"; //변경해야함
         public const string Dir_LockImg = "\\Resource\\locked.png";
-        public const string Dir_MeasureSaveRootPath = @"C:\Camellia2\PRD\Data\";
+        public const string Dir_MeasureSaveRootPath = @"D:\Camellia2\PRD\Data\";
+        public const string Dir_HistorySaveRootPath = @"D:\Camellia2\History\";
 
         public const string TOOL_NAME = "Camellia2";
 
