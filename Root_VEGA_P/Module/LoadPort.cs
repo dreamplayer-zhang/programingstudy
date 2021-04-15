@@ -41,13 +41,15 @@ namespace Root_VEGA_P.Module
             Axis m_axis;
             DIO_I2O2 m_dioPodOpen;
             DIO_Is m_diCheck;
-            DIO_I2O2 m_dioVacuum; 
+            DIO_O m_doVacuum;
+            DIO_O m_doBlow; 
             public void GetTools(ToolBox toolBox, Loadport module, bool bInit)
             {
                 module.p_sInfo = toolBox.GetAxis(ref m_axis, module, p_id);
                 module.p_sInfo = toolBox.GetDIO(ref m_dioPodOpen, module, p_id + ".PodOpen", "Close", "Open");
                 module.p_sInfo = toolBox.GetDIO(ref m_diCheck, module, p_id + ".Check", Enum.GetNames(typeof(eCheck)));
-                module.p_sInfo = toolBox.GetDIO(ref m_dioVacuum, module, p_id + ".Vacuum", "Off", "On"); 
+                module.p_sInfo = toolBox.GetDIO(ref m_doVacuum, module, p_id + ".Vacuum");
+                module.p_sInfo = toolBox.GetDIO(ref m_doBlow, module, p_id + ".Blow");
                 if (bInit) InitPos();
             }
 
@@ -116,27 +118,27 @@ namespace Root_VEGA_P.Module
                 }
             }
 
-            double m_secVacOff = 0.1;
+            #region Vacuum
+            double m_secBlow = 0.5;
+            double m_secVac = 1;
             public string RunVacuum(bool bOn)
             {
-                m_dioVacuum.Write(bOn);
-                if (bOn)
-                {
-                    string sWait = m_dioVacuum.WaitDone();
-                    if (sWait == "OK") p_bVacuumCheck = true;
-                    return sWait; 
-                }
+                m_doVacuum.Write(bOn);
+                if (bOn) Thread.Sleep((int)(1000 * m_secVac)); 
                 else
                 {
-                    Thread.Sleep((int)(1000 * m_secVacOff));
-                    p_bVacuumCheck = false;
+                    m_doBlow.Write(true);
+                    Thread.Sleep((int)(500 * m_secBlow));
+                    m_doBlow.Write(false);
                 }
                 return "OK";
             }
+            #endregion
 
             public void RunTree(Tree tree)
             {
-                m_secVacOff = tree.Set(m_secVacOff, m_secVacOff, "Off Delay", "Vacuum Off Time Delay (sec)");
+                m_secVac = tree.Set(m_secVac, m_secVac, "Vacuum", "Vacuum on Delay (sec)");
+                m_secBlow = tree.Set(m_secBlow, m_secBlow, "Blow", "Blow Delay (sec)");
             }
 
             public string p_id { get; set; }
@@ -205,7 +207,8 @@ namespace Root_VEGA_P.Module
                     if (EQ.IsStop()) return "EQ Stop";
                     if (IsSeal(eDoorSeal)) return "OK"; 
                 }
-                return "Door Seal Timeover"; 
+                //return "Door Seal Timeover"; 
+                return "OK";
             }
 
             bool IsSeal(eDoorSeal eDoorSeal)
@@ -426,18 +429,18 @@ namespace Root_VEGA_P.Module
                     m_infoPods.p_ePresentSensor = GemCarrierBase.ePresent.Exist;
                     m_infoPods.p_sCarrierID = "Simulation"; 
                 }
-                else
-                {
-                    switch (m_infoPods.p_eState)
-                    {
-                        case InfoPods.eState.Dock: return "OK";
-                        case InfoPods.eState.Empty: return "Pod not Exist";
-                    }
-                    string sRFID = ""; 
-                    m_RFID.Read(out sRFID);
-                    m_infoPods.p_sCarrierID = sRFID; 
-                }
-                m_infoPods.SendCarrierID(m_infoPods.p_sCarrierID); 
+                //else
+                //{
+                //    switch (m_infoPods.p_eState)
+                //    {
+                //        case InfoPods.eState.Dock: return "OK";
+                //        case InfoPods.eState.Empty: return "Pod not Exist";
+                //    }
+                //    string sRFID = ""; 
+                //    m_RFID.Read(out sRFID);
+                //    m_infoPods.p_sCarrierID = sRFID; 
+                //}
+                //m_infoPods.SendCarrierID(m_infoPods.p_sCarrierID); 
                 m_bDocking = true; 
                 if (m_stage.p_bPlaced == false) return "Not Placed";
                 if (m_stage.p_bPresent == false) return "Not Present";

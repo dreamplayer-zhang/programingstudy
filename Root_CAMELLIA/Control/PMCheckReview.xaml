@@ -33,7 +33,7 @@
         </Grid.RowDefinitions>
         <Grid Grid.Row="0">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="2.2*"/>
+                <ColumnDefinition Width="1.5*"/>
                 <ColumnDefinition Width="4.5*"/>
             </Grid.ColumnDefinitions>
             <GroupBox Header="PM List" Grid.Column="0" >

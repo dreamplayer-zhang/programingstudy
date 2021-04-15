@@ -46,7 +46,7 @@ namespace RootTools_Vision
 
         [NonSerialized]
         WorkplaceBundle workplaceBundle;
-
+         
 
         #endregion
 

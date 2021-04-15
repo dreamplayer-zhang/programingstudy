@@ -121,6 +121,19 @@ namespace Root_CAMELLIA.Module
             }
         }
 
+        private string _dataSavePath = "";
+        public string p_dataSavePath
+        {
+            get
+            {
+                return _dataSavePath;
+            }
+            set
+            {
+                _dataSavePath = value;
+            }
+        }
+
         #region InfoWafer
         string m_sInfoWafer = "";
         InfoWafer _infoWafer = null;
@@ -254,9 +267,7 @@ namespace Root_CAMELLIA.Module
             if(m_loadExistWafer.p_bIn)
                 m_alid_WaferExist.Run(true, "Vision Load Position Wafer Exist Error");
             else if(m_homeExistWafer.p_bIn)
-            {
                 m_alid_WaferExist.Run(true, "Vision Home Position Wafer Exist Error");
-            }
         }
 
 
@@ -290,7 +301,7 @@ namespace Root_CAMELLIA.Module
             for (int i = 0; i < loadports.Count; i++)
             {
                 infoCarrier[i] = loadports[i].p_infoCarrier;
-                CanInitCal[i] = false;  
+                CanInitCal[i] = false;
             }
            // try
             //{
@@ -416,6 +427,7 @@ namespace Root_CAMELLIA.Module
                     if (!CanInitCal[EQ.p_nRunLP] && infoCarrier[EQ.p_nRunLP].p_eState == InfoCarrier.eState.Dock)
                     {
                         CanInitCal[EQ.p_nRunLP] = true;
+                        
                         if (((Run_InitCalibration)CloneModuleRun("InitCalibration")).Run() != "OK")
                         {
                             p_sInfo = "Init Cal Error";
@@ -441,36 +453,64 @@ namespace Root_CAMELLIA.Module
         {
             if (p_axisLifter.IsInPos(eAxisPos.Home))
             {
-                return "OK";
-            }
-
-            if (LifterMoveVacuumCheck())
-            {
                 if (!m_vacuum.p_bIn)
                 {
-                    if (p_axisLifter.StartMove(eAxisPos.Ready) != "OK")
-                    {
-                        return p_sInfo;
-                    }
-                    if (p_axisLifter.WaitReady() != "OK")
-                        return p_sInfo;
+                    VaccumOnOff(true);
                 }
-                else
-                {
-                    p_sInfo = p_id + " Vacuum is not turn off";
-                    return p_sInfo;
-                }
+                return "OK";
             }
             else
             {
-                p_sInfo = p_id + " Vacuum is not turn off";
-                return p_sInfo;
+                if (!m_vacuum.p_bIn)
+                {
+                    VaccumOnOff(true);
+                }
+
+                if (p_axisLifter.StartMove(eAxisPos.Ready) != "OK")
+                {
+                    return p_sInfo;
+                }
+                if (p_axisLifter.WaitReady() != "OK")
+                    return p_sInfo;
             }
 
-            if (!m_vacuum.p_bIn)
+           // if (m_loadExistWafer.p_bIn)
             {
-                VaccumOnOff(true);
+                
             }
+            //else
+            //{
+            //    p_sInfo = p_id + " Wafer Not Exist Error";
+            //    return p_sInfo;
+            //}
+
+            //if (LifterMoveVacuumCheck())
+            //{
+            //    if (!m_vacuum.p_bIn)
+            //    {
+            //        if (p_axisLifter.StartMove(eAxisPos.Ready) != "OK")
+            //        {
+            //            return p_sInfo;
+            //        }
+            //        if (p_axisLifter.WaitReady() != "OK")
+            //            return p_sInfo;
+            //    }
+            //    else
+            //    {
+            //        p_sInfo = p_id + " Vacuum is not turn off";
+            //        return p_sInfo;
+            //    }
+            //}
+            //else
+            //{
+            //    p_sInfo = p_id + " Vacuum is not turn off";
+            //    return p_sInfo;
+            //}
+
+            //if (!m_vacuum.p_bIn)
+            //{
+            //    VaccumOnOff(true);
+            //}
 
             return "OK";
         }
@@ -631,11 +671,15 @@ namespace Root_CAMELLIA.Module
 
         public string AfterGet(int nID)
         {
+            // Make Directory
+           
             return "OK";
         }
 
         public string AfterPut(int nID)
         {
+            p_dataSavePath = BaseDefine.Dir_MeasureSaveRootPath + p_infoWafer.p_sRecipe + @"\" + DateTime.Now.ToString("yyyy-MM-dd") + "T" + DateTime.Now.ToString("HH-mm-ss");
+            GeneralTools.MakeDirectory(p_dataSavePath);
             return "OK";
         }
 

@@ -54,7 +54,7 @@ namespace Root_CAMELLIA.Module
 
         public override string Run()
         {
-            Met.PMDatas m_PMDatas = new Met.PMDatas();
+            Met.PMDatas m_PMData = new Met.PMDatas();
             Met.CheckResult rst;
 
 
@@ -87,7 +87,7 @@ namespace Root_CAMELLIA.Module
                 return p_sInfo;
             }
             // 시작
-            m_PMDatas.LoadPMData();
+            m_PMData.LoadPMData();
             m_log.Info("[CheckSensorTilt] Start");
             // 현재 축값 받아오기
             AxisXY axisXY = m_module.p_axisXY;
@@ -168,7 +168,7 @@ namespace Root_CAMELLIA.Module
             //}
 
             object obj;
-            for (int n = 0; n < m_PMDatas.nSensorTiltRepeatNum; n++)
+            for (int n = 0; n < m_PMData.nSensorTiltRepeatNum; n++)
             {
                 if (App.m_nanoView.SampleMeasure(0, 0, 0,
                        m_mwvm.SettingViewModel.p_ExceptNIR, m_DataManager.recipeDM.MeasurementRD.UseTransmittance, m_DataManager.recipeDM.MeasurementRD.UseThickness,
@@ -182,7 +182,7 @@ namespace Root_CAMELLIA.Module
 
                         m_log.Info("[CheckSensorTilt] Acquire Refelctance" + "[" + n + "]");
                         
-                        rst = m_PMDatas.CheckSensorTilt();
+                        rst = m_PMData.CheckSensorTilt(n);
                         if (rst == Met.CheckResult.OK)
                         {
                             m_log.Info("[CheckSensorTilt] CheckResult Normal" + "[" + n + "]");
@@ -211,12 +211,21 @@ namespace Root_CAMELLIA.Module
                     return "[CheckSensorTilt] Measuring Error" + "[" + n + "]";
                 }
 
-                
-                //rst = Met.PMDatas.CheckSensorTilt();
+            }
+            #region PM Result Draw
+            for (int n = 0; n < m_PMData.arrCheckWavelength.Count() + 1; n++)
+            {
+                if (n <= m_PMData.arrCheckWavelength.Count())
+                {
 
+                    m_module.mwvm.EngineerViewModel.p_PMCheckReview_ViewModel.m_pmReflectance_VM.DrawPMGraph(m_PMData.nSensorTiltRepeatNum,n,m_PMData.m_CalPMReflectance[n].dWavelength, m_PMData.m_CalPMReflectance[n].dDiffReflectance);
+                }
+                m_module.mwvm.EngineerViewModel.p_PMCheckReview_ViewModel.m_pmReflectance_VM.PMResultDataGrid(n,m_PMData);
             }
 
-            //리턴값 반환할 것
+
+            #endregion
+
             return "OK";
         }
         private void SaveCheckSensorData()

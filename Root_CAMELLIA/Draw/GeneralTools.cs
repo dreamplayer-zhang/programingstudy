@@ -1,6 +1,7 @@
 ﻿using Root_CAMELLIA.ShapeDraw;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -48,6 +49,12 @@ namespace Root_CAMELLIA
         public static int EdgeNum { get; } = 4;
         public static int DoubleHoleNum { get; } = 4;
         public static int GuideLineNum { get; } = 4;
+
+        public static void MakeDirectory(string path)
+        {
+            if (!Directory.Exists(path))
+                Directory.CreateDirectory(path);
+        }
 
         static GeneralTools()
         {

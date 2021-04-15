@@ -1,0 +1,761 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\packages\OpenCvSharp-AnyCPU.2.4.10.20170306\build\OpenCvSharp-AnyCPU.props" Condition="Exists('..\packages\OpenCvSharp-AnyCPU.2.4.10.20170306\build\OpenCvSharp-AnyCPU.props')" />
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{A2602393-D189-4EFE-88BE-E9A7D71E3448}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <RootNamespace>Root_CAMELLIA</RootNamespace>
+    <AssemblyName>Root_CAMELLIA</AssemblyName>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <WarningLevel>4</WarningLevel>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <Deterministic>true</Deterministic>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>x64</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <LangVersion>8.0</LangVersion>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <LangVersion>8.0</LangVersion>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x64\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <LangVersion>8.0</LangVersion>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>true</Prefer32Bit>
+    <WarningLevel>3</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
+    <OutputPath>bin\x64\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <LangVersion>8.0</LangVersion>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>true</Prefer32Bit>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Basler.Pylon, Version=1.1.0.0, Culture=neutral, PublicKeyToken=e389355f398382ab, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\RootTools\Camera\BaslerPylon\DLL\Basler.Pylon.dll</HintPath>
+    </Reference>
+    <Reference Include="ColorPickerLib, Version=1.6.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Dirkster.ColorPickerLib.1.6.2\lib\net40\ColorPickerLib.dll</HintPath>
+    </Reference>
+    <Reference Include="EasyModbus">
+      <HintPath>..\Lib\EasyModbus.dll</HintPath>
+    </Reference>
+    <Reference Include="Emgu.CV.UI, Version=4.1.1.3497, Culture=neutral, PublicKeyToken=7281126722ab4438, processorArchitecture=MSIL">
+      <HintPath>..\packages\EMGU.CV.4.1.1.3497\lib\net35\Emgu.CV.UI.dll</HintPath>
+    </Reference>
+    <Reference Include="Emgu.CV.World, Version=4.1.1.3497, Culture=neutral, PublicKeyToken=7281126722ab4438, processorArchitecture=MSIL">
+      <HintPath>..\packages\EMGU.CV.4.1.1.3497\lib\net35\Emgu.CV.World.dll</HintPath>
+    </Reference>
+    <Reference Include="LiveCharts, Version=0.9.7.0, Culture=neutral, PublicKeyToken=0bc1f845d1ebb8df, processorArchitecture=MSIL">
+      <HintPath>..\packages\LiveCharts.0.9.7\lib\net45\LiveCharts.dll</HintPath>
+    </Reference>
+    <Reference Include="LiveCharts.Wpf, Version=0.9.7.0, Culture=neutral, PublicKeyToken=0bc1f845d1ebb8df, processorArchitecture=MSIL">
+      <HintPath>..\packages\LiveCharts.Wpf.0.9.7\lib\net45\LiveCharts.Wpf.dll</HintPath>
+    </Reference>
+    <Reference Include="MahApps.Metro.IconPacks, Version=4.0.0.0, Culture=neutral, PublicKeyToken=0c0d510f9915137a, processorArchitecture=MSIL">
+      <HintPath>..\packages\MahApps.Metro.IconPacks.4.8.0\lib\net47\MahApps.Metro.IconPacks.dll</HintPath>
+    </Reference>
+    <Reference Include="MahApps.Metro.IconPacks.BootstrapIcons, Version=4.0.0.0, Culture=neutral, PublicKeyToken=0c0d510f9915137a, processorArchitecture=MSIL">
+      <HintPath>..\packages\MahApps.Metro.IconPacks.4.8.0\lib\net47\MahApps.Metro.IconPacks.BootstrapIcons.dll</HintPath>
+    </Reference>
+    <Reference Include="MahApps.Metro.IconPacks.BoxIcons, Version=4.0.0.0, Culture=neutral, PublicKeyToken=0c0d510f9915137a, processorArchitecture=MSIL">
+      <HintPath>..\packages\MahApps.Metro.IconPacks.4.8.0\lib\net47\MahApps.Metro.IconPacks.BoxIcons.dll</HintPath>
+    </Reference>
+    <Reference Include="MahApps.Metro.IconPacks.Codicons, Version=4.0.0.0, Culture=neutral, PublicKeyToken=0c0d510f9915137a, processorArchitecture=MSIL">
+      <HintPath>..\packages\MahApps.Metro.IconPacks.4.8.0\lib\net47\MahApps.Metro.IconPacks.Codicons.dll</HintPath>
+    </Reference>
+    <Reference Include="MahApps.Metro.IconPacks.Core, Version=4.0.0.0, Culture=neutral, PublicKeyToken=0c0d510f9915137a, processorArchitecture=MSIL">
+      <HintPath>..\packages\MahApps.Metro.IconPacks.4.8.0\lib\net47\MahApps.Metro.IconPacks.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="MahApps.Metro.IconPacks.Entypo, Version=4.0.0.0, Culture=neutral, PublicKeyToken=0c0d510f9915137a, processorArchitecture=MSIL">
+      <HintPath>..\packages\MahApps.Metro.IconPacks.4.8.0\lib\net47\MahApps.Metro.IconPacks.Entypo.dll</HintPath>
+    </Reference>
+    <Reference Include="MahApps.Metro.IconPacks.EvaIcons, Version=4.0.0.0, Culture=neutral, PublicKeyToken=0c0d510f9915137a, processorArchitecture=MSIL">
+      <HintPath>..\packages\MahApps.Metro.IconPacks.4.8.0\lib\net47\MahApps.Metro.IconPacks.EvaIcons.dll</HintPath>
+    </Reference>
+    <Reference Include="MahApps.Metro.IconPacks.FeatherIcons, Version=4.0.0.0, Culture=neutral, PublicKeyToken=0c0d510f9915137a, processorArchitecture=MSIL">
+      <HintPath>..\packages\MahApps.Metro.IconPacks.4.8.0\lib\net47\MahApps.Metro.IconPacks.FeatherIcons.dll</HintPath>
+    </Reference>
+    <Reference Include="MahApps.Metro.IconPacks.FileIcons, Version=4.0.0.0, Culture=neutral, PublicKeyToken=0c0d510f9915137a, processorArchitecture=MSIL">
+      <HintPath>..\packages\MahApps.Metro.IconPacks.4.8.0\lib\net47\MahApps.Metro.IconPacks.FileIcons.dll</HintPath>
+    </Reference>
+    <Reference Include="MahApps.Metro.IconPacks.Fontaudio, Version=4.0.0.0, Culture=neutral, PublicKeyToken=0c0d510f9915137a, processorArchitecture=MSIL">
+      <HintPath>..\packages\MahApps.Metro.IconPacks.4.8.0\lib\net47\MahApps.Metro.IconPacks.Fontaudio.dll</HintPath>
+    </Reference>
+    <Reference Include="MahApps.Metro.IconPacks.FontAwesome, Version=4.0.0.0, Culture=neutral, PublicKeyToken=0c0d510f9915137a, processorArchitecture=MSIL">
+      <HintPath>..\packages\MahApps.Metro.IconPacks.4.8.0\lib\net47\MahApps.Metro.IconPacks.FontAwesome.dll</HintPath>
+    </Reference>
+    <Reference Include="MahApps.Metro.IconPacks.ForkAwesome, Version=4.0.0.0, Culture=neutral, PublicKeyToken=0c0d510f9915137a, processorArchitecture=MSIL">
+      <HintPath>..\packages\MahApps.Metro.IconPacks.4.8.0\lib\net47\MahApps.Metro.IconPacks.ForkAwesome.dll</HintPath>
+    </Reference>
+    <Reference Include="MahApps.Metro.IconPacks.Ionicons, Version=4.0.0.0, Culture=neutral, PublicKeyToken=0c0d510f9915137a, processorArchitecture=MSIL">
+      <HintPath>..\packages\MahApps.Metro.IconPacks.4.8.0\lib\net47\MahApps.Metro.IconPacks.Ionicons.dll</HintPath>
+    </Reference>
+    <Reference Include="MahApps.Metro.IconPacks.JamIcons, Version=4.0.0.0, Culture=neutral, PublicKeyToken=0c0d510f9915137a, processorArchitecture=MSIL">
+      <HintPath>..\packages\MahApps.Metro.IconPacks.4.8.0\lib\net47\MahApps.Metro.IconPacks.JamIcons.dll</HintPath>
+    </Reference>
+    <Reference Include="MahApps.Metro.IconPacks.Material, Version=4.0.0.0, Culture=neutral, PublicKeyToken=0c0d510f9915137a, processorArchitecture=MSIL">
+      <HintPath>..\packages\MahApps.Metro.IconPacks.4.8.0\lib\net47\MahApps.Metro.IconPacks.Material.dll</HintPath>
+    </Reference>
+    <Reference Include="MahApps.Metro.IconPacks.MaterialDesign, Version=4.0.0.0, Culture=neutral, PublicKeyToken=0c0d510f9915137a, processorArchitecture=MSIL">
+      <HintPath>..\packages\MahApps.Metro.IconPacks.4.8.0\lib\net47\MahApps.Metro.IconPacks.MaterialDesign.dll</HintPath>
+    </Reference>
+    <Reference Include="MahApps.Metro.IconPacks.MaterialLight, Version=4.0.0.0, Culture=neutral, PublicKeyToken=0c0d510f9915137a, processorArchitecture=MSIL">
+      <HintPath>..\packages\MahApps.Metro.IconPacks.4.8.0\lib\net47\MahApps.Metro.IconPacks.MaterialLight.dll</HintPath>
+    </Reference>
+    <Reference Include="MahApps.Metro.IconPacks.Microns, Version=4.0.0.0, Culture=neutral, PublicKeyToken=0c0d510f9915137a, processorArchitecture=MSIL">
+      <HintPath>..\packages\MahApps.Metro.IconPacks.4.8.0\lib\net47\MahApps.Metro.IconPacks.Microns.dll</HintPath>
+    </Reference>
+    <Reference Include="MahApps.Metro.IconPacks.Modern, Version=4.0.0.0, Culture=neutral, PublicKeyToken=0c0d510f9915137a, processorArchitecture=MSIL">
+      <HintPath>..\packages\MahApps.Metro.IconPacks.4.8.0\lib\net47\MahApps.Metro.IconPacks.Modern.dll</HintPath>
+    </Reference>
+    <Reference Include="MahApps.Metro.IconPacks.Octicons, Version=4.0.0.0, Culture=neutral, PublicKeyToken=0c0d510f9915137a, processorArchitecture=MSIL">
+      <HintPath>..\packages\MahApps.Metro.IconPacks.4.8.0\lib\net47\MahApps.Metro.IconPacks.Octicons.dll</HintPath>
+    </Reference>
+    <Reference Include="MahApps.Metro.IconPacks.PicolIcons, Version=4.0.0.0, Culture=neutral, PublicKeyToken=0c0d510f9915137a, processorArchitecture=MSIL">
+      <HintPath>..\packages\MahApps.Metro.IconPacks.4.8.0\lib\net47\MahApps.Metro.IconPacks.PicolIcons.dll</HintPath>
+    </Reference>
+    <Reference Include="MahApps.Metro.IconPacks.PixelartIcons, Version=4.0.0.0, Culture=neutral, PublicKeyToken=0c0d510f9915137a, processorArchitecture=MSIL">
+      <HintPath>..\packages\MahApps.Metro.IconPacks.4.8.0\lib\net47\MahApps.Metro.IconPacks.PixelartIcons.dll</HintPath>
+    </Reference>
+    <Reference Include="MahApps.Metro.IconPacks.RadixIcons, Version=4.0.0.0, Culture=neutral, PublicKeyToken=0c0d510f9915137a, processorArchitecture=MSIL">
+      <HintPath>..\packages\MahApps.Metro.IconPacks.4.8.0\lib\net47\MahApps.Metro.IconPacks.RadixIcons.dll</HintPath>
+    </Reference>
+    <Reference Include="MahApps.Metro.IconPacks.RemixIcon, Version=4.0.0.0, Culture=neutral, PublicKeyToken=0c0d510f9915137a, processorArchitecture=MSIL">
+      <HintPath>..\packages\MahApps.Metro.IconPacks.4.8.0\lib\net47\MahApps.Metro.IconPacks.RemixIcon.dll</HintPath>
+    </Reference>
+    <Reference Include="MahApps.Metro.IconPacks.RPGAwesome, Version=4.0.0.0, Culture=neutral, PublicKeyToken=0c0d510f9915137a, processorArchitecture=MSIL">
+      <HintPath>..\packages\MahApps.Metro.IconPacks.4.8.0\lib\net47\MahApps.Metro.IconPacks.RPGAwesome.dll</HintPath>
+    </Reference>
+    <Reference Include="MahApps.Metro.IconPacks.SimpleIcons, Version=4.0.0.0, Culture=neutral, PublicKeyToken=0c0d510f9915137a, processorArchitecture=MSIL">
+      <HintPath>..\packages\MahApps.Metro.IconPacks.4.8.0\lib\net47\MahApps.Metro.IconPacks.SimpleIcons.dll</HintPath>
+    </Reference>
+    <Reference Include="MahApps.Metro.IconPacks.Typicons, Version=4.0.0.0, Culture=neutral, PublicKeyToken=0c0d510f9915137a, processorArchitecture=MSIL">
+      <HintPath>..\packages\MahApps.Metro.IconPacks.4.8.0\lib\net47\MahApps.Metro.IconPacks.Typicons.dll</HintPath>
+    </Reference>
+    <Reference Include="MahApps.Metro.IconPacks.Unicons, Version=4.0.0.0, Culture=neutral, PublicKeyToken=0c0d510f9915137a, processorArchitecture=MSIL">
+      <HintPath>..\packages\MahApps.Metro.IconPacks.4.8.0\lib\net47\MahApps.Metro.IconPacks.Unicons.dll</HintPath>
+    </Reference>
+    <Reference Include="MahApps.Metro.IconPacks.VaadinIcons, Version=4.0.0.0, Culture=neutral, PublicKeyToken=0c0d510f9915137a, processorArchitecture=MSIL">
+      <HintPath>..\packages\MahApps.Metro.IconPacks.4.8.0\lib\net47\MahApps.Metro.IconPacks.VaadinIcons.dll</HintPath>
+    </Reference>
+    <Reference Include="MahApps.Metro.IconPacks.WeatherIcons, Version=4.0.0.0, Culture=neutral, PublicKeyToken=0c0d510f9915137a, processorArchitecture=MSIL">
+      <HintPath>..\packages\MahApps.Metro.IconPacks.4.8.0\lib\net47\MahApps.Metro.IconPacks.WeatherIcons.dll</HintPath>
+    </Reference>
+    <Reference Include="MahApps.Metro.IconPacks.Zondicons, Version=4.0.0.0, Culture=neutral, PublicKeyToken=0c0d510f9915137a, processorArchitecture=MSIL">
+      <HintPath>..\packages\MahApps.Metro.IconPacks.4.8.0\lib\net47\MahApps.Metro.IconPacks.Zondicons.dll</HintPath>
+    </Reference>
+    <Reference Include="MathNet.Numerics, Version=4.12.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\MathNet.Numerics.4.12.0\lib\net461\MathNet.Numerics.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Expression.Interactions, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Windows.Interactivity.WPF.2.0.20525\lib\net40\Microsoft.Expression.Interactions.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.WindowsAPICodePack, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\WindowsAPICodePack-Core.1.1.1\lib\Microsoft.WindowsAPICodePack.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.WindowsAPICodePack.Shell, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\WindowsAPICodePack-Shell.1.1.1\lib\Microsoft.WindowsAPICodePack.Shell.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Xaml.Behaviors, Version=1.1.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Xaml.Behaviors.Wpf.1.1.31\lib\net45\Microsoft.Xaml.Behaviors.dll</HintPath>
+    </Reference>
+    <Reference Include="NanoView, Version=1.0.0.0, Culture=neutral, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Lib\MetLib\NanoView.dll</HintPath>
+    </Reference>
+    <Reference Include="NumericUpDownLib, Version=2.4.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Dirkster.NumericUpDownLib.2.4.2\lib\net40\NumericUpDownLib.dll</HintPath>
+    </Reference>
+    <Reference Include="OpenCvSharp, Version=1.0.0.0, Culture=neutral, PublicKeyToken=6adad1e807fea099, processorArchitecture=MSIL">
+      <HintPath>..\packages\OpenCvSharp-AnyCPU.2.4.10.20170306\lib\net45\OpenCvSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="OpenCvSharp.Blob, Version=1.0.0.0, Culture=neutral, PublicKeyToken=6adad1e807fea099, processorArchitecture=MSIL">
+      <HintPath>..\packages\OpenCvSharp-AnyCPU.2.4.10.20170306\lib\net45\OpenCvSharp.Blob.dll</HintPath>
+    </Reference>
+    <Reference Include="OpenCvSharp.CPlusPlus, Version=1.0.0.0, Culture=neutral, PublicKeyToken=6adad1e807fea099, processorArchitecture=MSIL">
+      <HintPath>..\packages\OpenCvSharp-AnyCPU.2.4.10.20170306\lib\net45\OpenCvSharp.CPlusPlus.dll</HintPath>
+    </Reference>
+    <Reference Include="OpenCvSharp.Extensions, Version=1.0.0.0, Culture=neutral, PublicKeyToken=6adad1e807fea099, processorArchitecture=MSIL">
+      <HintPath>..\packages\OpenCvSharp-AnyCPU.2.4.10.20170306\lib\net45\OpenCvSharp.Extensions.dll</HintPath>
+    </Reference>
+    <Reference Include="OpenCvSharp.UserInterface, Version=1.0.0.0, Culture=neutral, PublicKeyToken=6adad1e807fea099, processorArchitecture=MSIL">
+      <HintPath>..\packages\OpenCvSharp-AnyCPU.2.4.10.20170306\lib\net45\OpenCvSharp.UserInterface.dll</HintPath>
+    </Reference>
+    <Reference Include="PresentationFramework.Aero" />
+    <Reference Include="ScottPlot, Version=4.0.39.0, Culture=neutral, PublicKeyToken=86698dc10387c39e, processorArchitecture=MSIL">
+      <HintPath>..\packages\ScottPlot.4.0.39\lib\netstandard2.0\ScottPlot.dll</HintPath>
+    </Reference>
+    <Reference Include="ScottPlot.WPF, Version=4.0.39.0, Culture=neutral, PublicKeyToken=e53b06131e34a3aa, processorArchitecture=MSIL">
+      <HintPath>..\packages\ScottPlot.WPF.4.0.39\lib\net472\ScottPlot.WPF.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Activities" />
+    <Reference Include="System.Activities.Presentation" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Drawing.Common, Version=4.0.0.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Drawing.Common.4.7.0\lib\net461\System.Drawing.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Numerics" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.ValueTuple" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Core">
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xaml">
+      <RequiredTargetFramework>4.0</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="UIAutomationProvider" />
+    <Reference Include="WindowsBase" />
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+    <Reference Include="WindowsFormsIntegration" />
+    <Reference Include="WriteableBitmapEx.Wpf, Version=1.5.0.0, Culture=neutral, PublicKeyToken=50375ca6144f1c69, processorArchitecture=MSIL">
+      <HintPath>..\packages\WriteableBitmapEx.1.5.1.0\lib\net40\WriteableBitmapEx.Wpf.dll</HintPath>
+    </Reference>
+    <Reference Include="ZedGraph, Version=5.1.7.430, Culture=neutral, PublicKeyToken=02a83cbd123fcd60, processorArchitecture=MSIL">
+      <HintPath>..\packages\ZedGraph.5.1.7\lib\net35-Client\ZedGraph.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <ApplicationDefinition Include="App.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </ApplicationDefinition>
+    <Compile Include="Control\Camellia2Stage\CamelliaStage.xaml.cs" />
+    <Compile Include="Control\Explorer.xaml.cs">
+      <DependentUpon>Explorer.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Control\Explorer_ViewModel.cs" />
+    <Compile Include="Control\Fan.xaml.cs">
+      <DependentUpon>Fan.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Control\FocusExtension.cs" />
+    <Compile Include="Control\GaugeChart.xaml.cs">
+      <DependentUpon>GaugeChart.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Control\Humidity.xaml.cs">
+      <DependentUpon>Humidity.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Control\NavTreeItemClass.cs" />
+    <Compile Include="Control\NavTreeItems.cs" />
+    <Compile Include="Control\NavTreeRootItemUtils.cs" />
+    <Compile Include="Control\NavTreeUtils.cs" />
+    <Compile Include="Control\PMCheckReview.xaml.cs">
+      <DependentUpon>PMCheckReview.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Control\PMCheckReview_ViewModel.cs" />
+    <Compile Include="Control\PMResultViewModel\PM_Reflectance_ViewModel.cs" />
+    <Compile Include="Control\PMResultViewModel\PM_SensorCameraTilt_ViewModel.cs" />
+    <Compile Include="Control\PMResultViewModel\PM_SensorHoleOttset_ViewModel.cs" />
+    <Compile Include="Control\PMResultViewModel\PM_Thickness_ViewModel.cs" />
+    <Compile Include="Control\PMResultView\PM_Reflectance.xaml.cs">
+      <DependentUpon>PM_Reflectance.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Control\PMResultView\PM_SensorCameraTilt.xaml.cs">
+      <DependentUpon>PM_SensorCameraTilt.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Control\PMResultView\PM_SensorHoleOffset.xaml.cs">
+      <DependentUpon>PM_SensorHoleOffset.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Control\PMResultView\PM_Thickenss.xaml.cs">
+      <DependentUpon>PM_Thickenss.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Control\ReviewGraph.xaml.cs">
+      <DependentUpon>ReviewGraph.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Control\StageViewControl.xaml.cs">
+      <DependentUpon>StageViewControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Control\Temp.xaml.cs">
+      <DependentUpon>Temp.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Control\Util\GetIconUseDll.cs" />
+    <Compile Include="Control\Util\GetImageFn.cs" />
+    <Compile Include="Converter\BoolConverter.cs" />
+    <Compile Include="Converter\HumidityToGradientOffsetConverter.cs" />
+    <Compile Include="Converter\LampStateToColorConverter.cs" />
+    <Compile Include="Converter\ModuleStateToLoadingOpacityConverter.cs" />
+    <Compile Include="Converter\ValueToColorConverter.cs" />
+    <Compile Include="Converter\ValueToUIValueConverter.cs" />
+    <Compile Include="Data\SaveMeasureData.cs" />
+    <Compile Include="LibSR_Met\Calculation.cs" />
+    <Compile Include="LibSR_Met\ConstValue.cs" />
+    <Compile Include="LibSR_Met\CountGraph.xaml.cs">
+      <DependentUpon>CountGraph.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="LibSR_Met\DataManager.cs" />
+    <Compile Include="LibSR_Met\ExtensionMethod.cs" />
+    <Compile Include="LibSR_Met\Fitting.cs" />
+    <Compile Include="LibSR_Met\ImageProcess.cs" />
+    <Compile Include="LibSR_Met\LogManager.cs" />
+    <Compile Include="LibSR_Met\Nanoview.cs" />
+    <Compile Include="LibSR_Met\PMDatas.cs" />
+    <Compile Include="LibSR_Met\PMRGraph.xaml.cs">
+      <DependentUpon>PMRGraph.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="LibSR_Met\RTGraph.xaml.cs" />
+    <Compile Include="ModuleRun\Run_AutoFocus.cs" />
+    <Compile Include="ModuleRun\Run_CalibrationWaferCentering.cs" />
+    <Compile Include="ModuleRun\Run_Delay.cs" />
+    <Compile Include="ModuleRun\Run_InitCalibration.cs" />
+    <Compile Include="ModuleRun\Run_Measure.cs" />
+    <Compile Include="ModuleRun\Run_PMReflectance.cs" />
+    <Compile Include="ModuleRun\Run_PMSensorStageAlign.cs" />
+    <Compile Include="ModuleRun\Run_PMThickness.cs" />
+    <Compile Include="ModuleRun\Run_PMSensorCameraTilt.cs" />
+    <Compile Include="Module\Module_FDC.cs" />
+    <Compile Include="Module\Module_FFU.cs" />
+    <Compile Include="Module\Interlock.cs" />
+    <Compile Include="Module\TowerLamp.cs" />
+    <Compile Include="TemplateSelector\FFUTemplateSelector.cs" />
+    <Compile Include="UI_Dialog\Dlg_OHT.xaml.cs">
+      <DependentUpon>Dlg_OHT.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI_Dialog\Dlg_Review.xaml.cs">
+      <DependentUpon>Dlg_Review.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI_Dialog\test.xaml.cs">
+      <DependentUpon>test.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ManualJob\ManualJobSchedule.cs" />
+    <Compile Include="ManualJob\ManualJobSchedule_UI.xaml.cs">
+      <DependentUpon>ManualJobSchedule_UI.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI_Engineer\Camellia_Recipe_UI.xaml.cs">
+      <DependentUpon>Camellia_Recipe_UI.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Converter\AxisBoolToBrushConverter.cs" />
+    <Compile Include="BaseDefine.cs" />
+    <Compile Include="Converter\AxisToPositionConverter.cs" />
+    <Compile Include="Converter\AxisToMotionUIConverter.cs" />
+    <Compile Include="Converter\AxisStateToEnableConverter.cs" />
+    <Compile Include="Converter\AxisStateToLoadingOpacityConverter.cs" />
+    <Compile Include="Converter\AxisStateToOpacityConverter.cs" />
+    <Compile Include="Converter\AxisToStageUIConverter.cs" />
+    <Compile Include="Converter\ImageConverter.cs" />
+    <Compile Include="Converter\MeasurePointToStageUIConverter.cs" />
+    <Compile Include="Converter\PathConverter.cs" />
+    <Compile Include="Converter\TextBoxToIntConverter.cs" />
+    <Compile Include="Data\Calibration.cs" />
+    <Compile Include="Data\ModelData.cs" />
+    <Compile Include="Data\WaferCentering.cs" />
+    <Compile Include="Control\LoadingBlock.xaml.cs">
+      <DependentUpon>LoadingBlock.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Control\LoadingControl.xaml.cs">
+      <DependentUpon>LoadingControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI_UserControl\HomeProgress_UI.xaml.cs">
+      <DependentUpon>HomeProgress_UI.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI_UserControl\Loadport_UI.xaml.cs">
+      <DependentUpon>Loadport_UI.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ViewModel\Dlg_Review_ViewModel.cs" />
+    <Compile Include="ViewModel\Dlg_Setting_ViewModel.cs" />
+    <Compile Include="UI_Dialog\Dlg_Setting.xaml.cs">
+      <DependentUpon>Dlg_Setting.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI_Engineer\Camellia_ToolBox.xaml.cs">
+      <DependentUpon>Camellia_ToolBox.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ViewModel\Dlg_PM_ViewModel.cs" />
+    <Compile Include="UI_Engineer\Camellia_Engineer_UI.xaml.cs">
+      <DependentUpon>Camellia_Engineer_UI.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Data\DataManager.cs" />
+    <Compile Include="Data\PresetData.cs" />
+    <Compile Include="Data\RecipeDataManager.cs" />
+    <Compile Include="Data\RecipeData.cs" />
+    <Compile Include="ViewModel\Dlg_Engineer_ViewModel.cs" />
+    <Compile Include="Draw\ArrowLineLib\ArrowEnds.cs" />
+    <Compile Include="Draw\ArrowLineLib\ArrowLine.cs" />
+    <Compile Include="Draw\ArrowLineLib\ArrowLineBase.cs" />
+    <Compile Include="Draw\ArrowLineLib\ArrowPolyline.cs" />
+    <Compile Include="Draw\GeometryManager.cs" />
+    <Compile Include="Draw\ShapeManager.cs" />
+    <Compile Include="Draw\TextManager.cs" />
+    <Compile Include="UI_Dialog\Dlg_Engineer.xaml.cs">
+      <DependentUpon>Dlg_Engineer.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI_Dialog\Dlg_PM.xaml.cs">
+      <DependentUpon>Dlg_PM.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Draw\GeneralTools.cs" />
+    <Compile Include="ViewModel\MainWindow_ViewModel.cs" />
+    <Compile Include="Measurement\Measurement.cs" />
+    <Compile Include="Measurement\MeasurementManager.cs" />
+    <Compile Include="Module\Module_Camellia.cs" />
+    <Compile Include="Draw\ShapeDraw\Arc.cs" />
+    <Compile Include="Draw\ShapeDraw\Circle.cs" />
+    <Compile Include="Converter\ColorToBrushConverter.cs" />
+    <Compile Include="Draw\ShapeDraw\IShapeManager.cs" />
+    <Compile Include="Draw\ShapeDraw\Line.cs" />
+    <Compile Include="Draw\ShapeDraw\Polygon.cs" />
+    <Compile Include="Draw\ShapeDraw\DrawGeometryManager.cs" />
+    <Compile Include="CAMELLIA_Engineer.cs" />
+    <Compile Include="CAMELLIA_Handler.cs" />
+    <Compile Include="CAMELLIA_Process.cs" />
+    <Compile Include="CAMELLIA_Recipe.cs" />
+    <Compile Include="Module\PointMeasurement.cs" />
+    <Compile Include="UI_Engineer\Camellia_Hander_UI.xaml.cs">
+      <DependentUpon>Camellia_Hander_UI.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Control\WpfPropertyGrid.cs" />
+    <Page Include="Control\Camellia2Stage\CamelliaStage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Control\Explorer.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Control\Fan.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Control\GaugeChart.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Control\Humidity.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Control\PMCheckReview.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Control\PMResultView\PM_Reflectance.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Control\PMResultView\PM_SensorCameraTilt.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Control\PMResultView\PM_SensorHoleOffset.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Control\PMResultView\PM_Thickenss.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Control\ReviewGraph.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Control\StageViewControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Control\Temp.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="LibSR_Met\CountGraph.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="LibSR_Met\PMRGraph.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="LibSR_Met\RTGraph.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI_Dialog\Dlg_OHT.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI_Dialog\Dlg_Review.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI_Dialog\test.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ManualJob\ManualJobSchedule_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI_Engineer\Camellia_Recipe_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Control\LoadingBlock.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Control\LoadingControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI_Dialog\Dlg_Setting.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI_Engineer\Camellia_Engineer_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI_Dialog\Dlg_Engineer.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI_Dialog\Dlg_PM.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI_Dialog\Dlg_RecipeManager.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Control\Icon\AtiLogo.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Control\Icon\Calendar.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="MainWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Compile Include="App.xaml.cs">
+      <DependentUpon>App.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ViewModel\Dlg_RecipeManager_ViewModel.cs" />
+    <Compile Include="UI_Dialog\Dlg_RecipeManager.xaml.cs">
+      <DependentUpon>Dlg_RecipeManager.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Control\Icon\AtiLogo.xaml.cs">
+      <DependentUpon>AtiLogo.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Control\Icon\Calendar.xaml.cs">
+      <DependentUpon>Calendar.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="MainWindow.xaml.cs">
+      <DependentUpon>MainWindow.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Page Include="UI_Engineer\Camellia_Hander_UI.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI_Engineer\Camellia_ToolBox.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI_UserControl\HomeProgress_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI_UserControl\Loadport_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Properties\AssemblyInfo.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <None Include="packages.config" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resource\locked.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\RootTools\RootTools.csproj">
+      <Project>{ce787353-5e00-4574-9f49-7cee7f087a86}</Project>
+      <Name>RootTools</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\RootTools_CLR\RootTools_CLR.vcxproj">
+      <Project>{8037431c-5bb7-47cb-a0d1-aa12d577eb2a}</Project>
+      <Name>RootTools_CLR</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Root_EFEM\Root_EFEM.csproj">
+      <Project>{23175072-261b-4601-8909-152ee93b78f0}</Project>
+      <Name>Root_EFEM</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resource\icon_ref.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resource\icon_dis.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="LibSR_Met\Resources\addfile.png" />
+    <Resource Include="LibSR_Met\Resources\csv_32px.png" />
+    <Resource Include="LibSR_Met\Resources\file.png" />
+    <Resource Include="LibSR_Met\Resources\graph csv.png" />
+    <Resource Include="LibSR_Met\Resources\measure.png" />
+    <Resource Include="LibSR_Met\Resources\point csv.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resource\326.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resource\1436.ico" />
+    <Resource Include="Resource\1437.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resource\1431.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resource\open.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resource\open2.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resource\doc_32.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resource\doc.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resource\docBlack.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resource\folder.ico" />
+    <Resource Include="Resource\openFolder.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resource\csv.ico" />
+    <Resource Include="Resource\database.ico" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Import Project="..\packages\EMGU.CV.4.1.1.3497\build\EMGU.CV.targets" Condition="Exists('..\packages\EMGU.CV.4.1.1.3497\build\EMGU.CV.targets')" />
+  <PropertyGroup>
+    <PostBuildEvent>copy /Y "$(SolutionDir)Lib\CRT_Runtime\10.0.18362.0\x64_bin\ucrt\ucrtbased.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\ucrtbased.dll"
+copy /Y "$(SolutionDir)SQLite\sqlite3.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\sqlite3.dll"
+copy /Y "$(SolutionDir)Lib\opencv_world347d.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\opencv_world347d.dll"
+copy /Y "$(SolutionDir)Lib\opencv_world347.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\opencv_world347.dll"
+IF NOT EXIST "$(SolutionDir)$(ProjectName)\$(OutDir)\x64" (mkdir "$(SolutionDir)$(ProjectName)\$(OutDir)\x64")
+copy /Y "$(SolutionDir)Lib\EMGU.CV\x64\concrt140.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\x64\concrt140.dll"
+copy /Y "$(SolutionDir)Lib\EMGU.CV\x64\cvextern.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\x64\cvextern.dll"
+copy /Y "$(SolutionDir)Lib\EMGU.CV\x64\msvcp140.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\x64\msvcp140.dll"
+copy /Y "$(SolutionDir)Lib\EMGU.CV\x64\opencv_videoio_ffmpeg411_64.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\x64\opencv_videoio_ffmpeg411_64.dll"
+copy /Y "$(SolutionDir)Lib\EMGU.CV\x64\vcruntime140.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\x64\vcruntime140.dll"
+copy /Y "$(SolutionDir)Lib\AXL\AXL.dll" $(SolutionDir)$(ProjectName)\$(OutDir)\AXL.dll"
+copy /Y "$(SolutionDir)Lib\AXL\AXL.lib" $(SolutionDir)$(ProjectName)\$(OutDir)\AXL.lib"
+copy /Y "$(SolutionDir)Lib\AXL\EzBasicAxl.dll" $(SolutionDir)$(ProjectName)\$(OutDir)\EzBasicAxl.dll"
+IF NOT EXIST "C:\vsdb\init" (mkdir "C:\vsdb\init")
+copy /Y "$(SolutionDir)Init\vsdb.txt" "C:\vsdb\init\vsdb.txt"
+IF NOT EXIST "$(SolutionDir)$(ProjectName)\$(OutDir)\plugin" (mkdir "$(SolutionDir)$(ProjectName)\$(OutDir)\plugin")
+copy /Y "$(SolutionDir)Lib\mariadb-connector-c\lib\mariadb\libmariadb.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\libmariadb.dll"
+copy /Y "$(SolutionDir)Lib\mariadb-connector-c\lib\mariadb\libmariadb.lib" "$(SolutionDir)$(ProjectName)\$(OutDir)\libmariadb.lib"
+copy /Y "$(SolutionDir)Lib\mariadb-connector-c\lib\mariadb\libmariadb.pdb" "$(SolutionDir)$(ProjectName)\$(OutDir)\libmariadb.pdb"
+copy /Y "$(SolutionDir)Lib\mariadb-connector-c\lib\mariadb\mariadbclient.lib" "$(SolutionDir)$(ProjectName)\$(OutDir)\mariadbclient.lib"
+copy /Y "$(SolutionDir)Lib\mariadb-connector-c\lib\mariadb\plugin\auth_gssapi_client.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\plugin\auth_gssapi_client.dll"
+copy /Y "$(SolutionDir)Lib\mariadb-connector-c\lib\mariadb\plugin\caching_sha2_password.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\plugin\caching_sha2_password.dll"
+copy /Y "$(SolutionDir)Lib\mariadb-connector-c\lib\mariadb\plugin\client_ed25519.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\plugin\client_ed25519.dll"
+copy /Y "$(SolutionDir)Lib\mariadb-connector-c\lib\mariadb\plugin\dialog.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\plugin\dialog.dll"
+copy /Y "$(SolutionDir)Lib\mariadb-connector-c\lib\mariadb\plugin\mysql_clear_password.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\plugin\mysql_clear_password.dll"
+copy /Y "$(SolutionDir)Lib\mariadb-connector-c\lib\mariadb\plugin\pvio_npipe.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\plugin\pvio_npipe.dll"
+copy /Y "$(SolutionDir)Lib\mariadb-connector-c\lib\mariadb\plugin\pvio_shmem.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\plugin\pvio_shmem.dll"
+copy /Y "$(SolutionDir)Lib\mariadb-connector-c\lib\mariadb\plugin\sha256_password.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\plugin\sha256_password.dll"
+copy /Y "$(SolutionDir)Lib\WibuCm64.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\WibuCm64.dll"
+IF NOT EXIST "$(SolutionDir)$(ProjectName)\$(OutDir)\Reference" (mkdir "$(SolutionDir)$(ProjectName)\$(OutDir)\Reference")
+copy /Y "$(SolutionDir)Lib\MetLib\Reference\configb.dat" $(SolutionDir)$(ProjectName)\$(OutDir)\Reference\configb.dat"
+copy /Y "$(SolutionDir)Lib\MetLib\Reference\configb_0.dat" $(SolutionDir)$(ProjectName)\$(OutDir)\Reference\configb_0.dat"
+copy /Y "$(SolutionDir)Lib\MetLib\Reference\configb_1.dat" $(SolutionDir)$(ProjectName)\$(OutDir)\Reference\configb_1.dat"
+copy /Y "$(SolutionDir)Lib\MetLib\Reference\configc.dat" $(SolutionDir)$(ProjectName)\$(OutDir)\Reference\configc.dat"
+copy /Y "$(SolutionDir)Lib\MetLib\Reference\configc_org.dat" $(SolutionDir)$(ProjectName)\$(OutDir)\Reference\configc_org.dat"
+copy /Y "$(SolutionDir)Lib\MetLib\Reference\configd.dat" $(SolutionDir)$(ProjectName)\$(OutDir)\Reference\configd.dat"
+copy /Y "$(SolutionDir)Lib\MetLib\Reference\configd_0.dat" $(SolutionDir)$(ProjectName)\$(OutDir)\Reference\configd_0.dat"
+copy /Y "$(SolutionDir)Lib\MetLib\Reference\Init_ATI_NIR.cfg" $(SolutionDir)$(ProjectName)\$(OutDir)\Reference\Init_ATI_NIR.cfg"
+copy /Y "$(SolutionDir)Lib\MetLib\Reference\Init_ATI_NIR.ini" $(SolutionDir)$(ProjectName)\$(OutDir)\Reference\Init_ATI_NIR.ini"
+copy /Y "$(SolutionDir)Lib\MetLib\Reference\ZedGraph.dll" $(SolutionDir)$(ProjectName)\$(OutDir)\Reference\ZedGraph.dll"
+copy /Y "$(SolutionDir)Lib\MetLib\NanoView.dll" $(SolutionDir)$(ProjectName)\$(OutDir)\NanoView.dll"
+copy /Y "$(SolutionDir)Lib\MetLib\NETOmniDriver-NET40.dll" $(SolutionDir)$(ProjectName)\$(OutDir)\NETOmniDriver-NET40.dll"
+copy /Y "$(SolutionDir)Lib\MetLib\OmniDriver64.dll" $(SolutionDir)$(ProjectName)\$(OutDir)\OmniDriver64.dll"
+copy /Y "$(SolutionDir)Lib\MetLib\r4nd_class.dll" $(SolutionDir)$(ProjectName)\$(OutDir)\r4nd_class.dll"</PostBuildEvent>
+  </PropertyGroup>
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>이 프로젝트는 이 컴퓨터에 없는 NuGet 패키지를 참조합니다. 해당 패키지를 다운로드하려면 NuGet 패키지 복원을 사용하십시오. 자세한 내용은 http://go.microsoft.com/fwlink/?LinkID=322105를 참조하십시오. 누락된 파일은 {0}입니다.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\OpenCvSharp-AnyCPU.2.4.10.20170306\build\OpenCvSharp-AnyCPU.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\OpenCvSharp-AnyCPU.2.4.10.20170306\build\OpenCvSharp-AnyCPU.props'))" />
+  </Target>
+</Project>

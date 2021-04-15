@@ -134,7 +134,7 @@ namespace Root_CAMELLIA
             {
                 return new RelayCommand(() =>
                 {
-                    int i = 10;
+                    //int i = 10;
                 });
             }
         }
@@ -211,11 +211,19 @@ namespace Root_CAMELLIA
             p_CurrentPath = path;
             RootChildren[0].LastPathName = p_CurrentPath;
             //System.Windows.Forms.MessageBox.Show(path);
-            FileAttributes chkAtt = File.GetAttributes(path);
-            if ((chkAtt & FileAttributes.Directory) != FileAttributes.Directory)
+            try
             {
-                ItemClickedEvent((object)path);
+                FileAttributes chkAtt = File.GetAttributes(path);
+                if ((chkAtt & FileAttributes.Directory) != FileAttributes.Directory)
+                {
+                    ItemClickedEvent((object)path);
+                }
             }
+            catch(Exception ex)
+            {
+                System.Windows.Forms.MessageBox.Show(ex.Message);
+            }
+            
         }
 
         public void OnSelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
@@ -232,11 +240,18 @@ namespace Root_CAMELLIA
             p_CurrentPath = path;
             RootChildren[0].LastPathName = p_CurrentPath;
             //System.Windows.Forms.MessageBox.Show(path);
-            FileAttributes chkAtt = File.GetAttributes(path);
-            if ((chkAtt & FileAttributes.Directory) != FileAttributes.Directory)
+            try
             {
-                ItemClickedEvent((object)path);
+                FileAttributes chkAtt = File.GetAttributes(path);
+                if ((chkAtt & FileAttributes.Directory) != FileAttributes.Directory)
+                {
+                    ItemClickedEvent((object)path);
+                }
+            }catch(Exception ex)
+            {
+                System.Windows.Forms.MessageBox.Show(ex.Message);
             }
+
         }
 
         public class CustomRelayCommand : ICommand
