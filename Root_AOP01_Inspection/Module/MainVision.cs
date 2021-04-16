@@ -2855,6 +2855,8 @@ namespace Root_AOP01_Inspection.Module
             public int m_nThreshold = 70;
             public int m_nSubImageThreshold = 70;
 
+            public bool[] m_barrPass = new bool[3];
+
             public Run_BarcodeInspection(MainVision module)
             {
                 m_module = module;
@@ -2903,6 +2905,12 @@ namespace Root_AOP01_Inspection.Module
                         
             public override string Run()
             {
+                if (UIManager.Instance.SetupViewModel.p_RecipeWizard.p_bUseBarcodeScratch == false)
+                {
+                    m_log.Info("Barcode Inspection Not Used, Skip this ModuleRun");
+                    return "OK";
+                }
+
                 // variable
                 CPoint[] cptarrBarcodLTPoint = new CPoint[3];
                 int[] narrBarcodeWidth = new int[3];
@@ -2928,7 +2936,11 @@ namespace Root_AOP01_Inspection.Module
                 narrBarcodeHeight[0] = m_nBarcode1ROIHeight;
                 narrBarcodeHeight[1] = m_nBarcode2ROIHeight;
                 narrBarcodeHeight[2] = m_nBarcode3ROIHeight;
+                m_barrPass[0] = true;
+                m_barrPass[1] = true;
+                m_barrPass[2] = true;
 
+                string strTimeStamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
                 m_module.p_nBarcodeInspectionProgressValue = 0;
                 m_module.p_nBarcodeInspectionProgressMin = 0;
                 m_module.p_nBarcodeInspectionProgressMax = 3;
@@ -2936,7 +2948,7 @@ namespace Root_AOP01_Inspection.Module
                     m_module.p_nBarcodeInspectionProgressPercent = (int)((double)m_module.p_nBarcodeInspectionProgressValue / (double)(m_module.p_nBarcodeInspectionProgressMax - m_module.p_nBarcodeInspectionProgressMin) * 100);
                 m_module.p_bBarcodePass = true;
 
-                for (int i = 0; i<3; i++)
+                for (int i = 0; i < 3; i++)
                 {
                     if (narrBarcodeWidth[i] == 0 || narrBarcodeHeight[i] == 0)
                     {
@@ -2945,16 +2957,23 @@ namespace Root_AOP01_Inspection.Module
                             m_module.p_nBarcodeInspectionProgressPercent = (int)((double)m_module.p_nBarcodeInspectionProgressValue / (double)(m_module.p_nBarcodeInspectionProgressMax - m_module.p_nBarcodeInspectionProgressMin) * 100);
                         continue;
                     }
-                    BarcodeInspection(cptarrBarcodLTPoint[i], narrBarcodeWidth[i], narrBarcodeHeight[i], i);
+                    BarcodeInspection(cptarrBarcodLTPoint[i], narrBarcodeWidth[i], narrBarcodeHeight[i], i, strTimeStamp);
                     m_module.p_nBarcodeInspectionProgressValue++;
                     if (m_module.p_nBarcodeInspectionProgressMax - m_module.p_nBarcodeInspectionProgressMin > 0)
                         m_module.p_nBarcodeInspectionProgressPercent = (int)((double)m_module.p_nBarcodeInspectionProgressValue / (double)(m_module.p_nBarcodeInspectionProgressMax - m_module.p_nBarcodeInspectionProgressMin) * 100);
                 }
 
+                using (System.IO.StreamWriter sr = new System.IO.StreamWriter($"D:\\AOP01\\BarcodeInspection\\{strTimeStamp}_Result.csv"))
+                {
+                    sr.WriteLine("ROI0_Result, ROI1_Result, ROI2_Result");
+                    sr.WriteLine("{0}, {1}, {2}", m_barrPass[0], m_barrPass[1], m_barrPass[2]);
+                }
+
+
                 return "OK";
             }
 
-            private void BarcodeInspection(CPoint cptBarcodeLTPoint, int nBarcodeWidth, int nBarcodeHeight, int iBarcodeNumber)
+            private void BarcodeInspection(CPoint cptBarcodeLTPoint, int nBarcodeWidth, int nBarcodeHeight, int iBarcodeNumber, string strTimeStamp)
             {
                 MemoryData mem = m_module.m_engineer.GetMemory(App.mPool, App.mGroup, App.mMainMem);
                 CPoint cptStartROIPoint = cptBarcodeLTPoint;
@@ -2964,8 +2983,9 @@ namespace Root_AOP01_Inspection.Module
                 CRect crtHalfRight;// = new CRect(new CPoint(crtROI.Center().X, cptStartROIPoint.Y), cptEndROIPoint);
 
                 Image<Gray, byte> imgROI = m_module.GetGrayByteImageFromMemory(mem, crtROI);
+                if (imgROI == null) return;
                 Mat matROI = imgROI.Mat;
-                matROI.Save($"D:\\AOP01\\BarcodeInspection\\ROI{iBarcodeNumber}.bmp");
+                matROI.Save($"D:\\AOP01\\BarcodeInspection\\{strTimeStamp}_ROI{iBarcodeNumber}.bmp");
 
                 RecipeFrontside_Viewer_ViewModel targetViewer = UIManager.Instance.SetupViewModel.m_RecipeFrontSide.p_ImageViewer_VM;
                 Dispatcher dispatcher = UIManager.Instance.SetupViewModel.m_RecipeFrontSide.currentDispatcher;
@@ -2977,8 +2997,9 @@ namespace Root_AOP01_Inspection.Module
                 int nRight = GetBarcodeSideEdge(mem, crtROI, 10, eSearchDirection.RightToLeft, m_nThreshold, m_bDarkBackground);
                 CRect crtBarcode = new CRect(cptBarcodeLTPoint.X + nLeft, cptBarcodeLTPoint.Y + nTop, cptBarcodeLTPoint.X + nRight, cptBarcodeLTPoint.Y + nBottom);
                 Image<Gray, byte> imgBarcode = m_module.GetGrayByteImageFromMemory(mem, crtBarcode);
+                if (imgBarcode == null) return;
                 Mat matBarcode = imgBarcode.Mat;
-                matBarcode.Save($"D:\\AOP01\\BarcodeInspection\\BeforeRotation{iBarcodeNumber}.bmp");
+                matBarcode.Save($"D:\\AOP01\\BarcodeInspection\\{strTimeStamp}_BeforeRotation{iBarcodeNumber}.bmp");
 
                 //
                 if (dispatcher != null)
@@ -3006,7 +3027,7 @@ namespace Root_AOP01_Inspection.Module
                 Mat matRotation = new Mat();
                 CvInvoke.GetRotationMatrix2D(new System.Drawing.PointF(matBarcode.Width / 2, matBarcode.Height / 2), dThetaDegree, 1.0, matAffine);
                 CvInvoke.WarpAffine(matBarcode, matRotation, matAffine, new System.Drawing.Size(matBarcode.Width, matBarcode.Height));
-                matRotation.Save($"D:\\AOP01\\BarcodeInspection\\AfterRotation{iBarcodeNumber}.bmp");
+                matRotation.Save($"D:\\AOP01\\BarcodeInspection\\{strTimeStamp}_AfterRotation{iBarcodeNumber}.bmp");
 
                 // 회전 후 외곽영역 Cutting
                 int y1 = 10;
@@ -3014,7 +3035,7 @@ namespace Root_AOP01_Inspection.Module
                 int x1 = 10;
                 int x2 = matRotation.Cols - 10;
                 Mat matCutting = new Mat(matRotation, new Range(y1, y2), new Range(x1, x2));
-                matCutting.Save($"D:\\AOP01\\BarcodeInspection\\Cutting{iBarcodeNumber}.bmp");
+                matCutting.Save($"D:\\AOP01\\BarcodeInspection\\{strTimeStamp}_Cutting{iBarcodeNumber}.bmp");
 
                 // Profile 구하기
                 Mat matSub = GetRowProfileMat(matCutting);
@@ -3028,12 +3049,12 @@ namespace Root_AOP01_Inspection.Module
                 matResult3 = matSub - matCutting;
                 matResult = matResult2 + matResult3;
 
-                matResult.Save($"D:\\AOP01\\BarcodeInspection\\Result{iBarcodeNumber}.bmp");
+                matResult.Save($"D:\\AOP01\\BarcodeInspection\\{strTimeStamp}_Result{iBarcodeNumber}.bmp");
 
                 // 차영상에서 Blob Labeling
                 Mat matBinary = new Mat();
                 CvInvoke.Threshold(matResult, matBinary, m_nSubImageThreshold, 255, ThresholdType.Binary);
-                matBinary.Save($"D:\\AOP01\\BarcodeInspection\\BinaryResult{iBarcodeNumber}.bmp");
+                matBinary.Save($"D:\\AOP01\\BarcodeInspection\\{strTimeStamp}_BinaryResult{iBarcodeNumber}.bmp");
                 CvBlobs blobs = new CvBlobs();
                 CvBlobDetector blobDetector = new CvBlobDetector();
                 Image<Gray, byte> img = matBinary.ToImage<Gray, byte>();
@@ -3046,6 +3067,7 @@ namespace Root_AOP01_Inspection.Module
                     if (blob.BoundingBox.Width * 5/*TDI90 Resolution = 5*/ > dScratchSpec_mm * nMMPerUM || blob.BoundingBox.Height * 5/*TDI90 Resolution = 5*/ > dScratchSpec_mm * nMMPerUM)
                     {
                         m_module.p_bBarcodePass = false;
+                        m_barrPass[iBarcodeNumber] = false;
                         break;
                     }
                 }
@@ -3735,7 +3757,14 @@ namespace Root_AOP01_Inspection.Module
 
             public override string Run()
             {
+                if (UIManager.Instance.SetupViewModel.p_RecipeWizard.p_bUsePatternShiftAndRotation == false)
+                {
+                    m_log.Info("Pattern Shift & Rotation Inspection Not Used, Skip this ModuleRun");
+                    return "OK";
+                }
+
                 // variable
+                string strTimeStamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
                 string strPool = "MainVision.Vision Memory";
                 string strGroup = "MainVision";
                 string strMemory = "Main";
@@ -4004,6 +4033,12 @@ namespace Root_AOP01_Inspection.Module
                     double dPatternShiftSpec_mm = UIManager.Instance.SetupViewModel.p_RecipeWizard.p_dPatternShiftSpec_mm;
                     double dPatternRotationSpec_degree = UIManager.Instance.SetupViewModel.p_RecipeWizard.p_dPatternRotationSpec_degree;
                     if (m_module.p_dPatternShiftDistance > dPatternShiftSpec_mm || m_module.p_dPatternShiftAngle > dPatternRotationSpec_degree) m_module.p_bPatternShiftPass = false;
+
+                    using (System.IO.StreamWriter sr = new System.IO.StreamWriter($"D:\\AOP01\\PatternShiftAndRotationInspection\\{strTimeStamp}_Result.csv"))
+                    {
+                        sr.WriteLine("Pass,Distance,Angle");
+                        sr.WriteLine("{0},{1},{2}", m_module.p_bPatternShiftPass, m_module.p_dPatternShiftDistance, m_module.p_dPatternShiftAngle);
+                    }
                 }
                 else
                 {
@@ -4451,7 +4486,14 @@ namespace Root_AOP01_Inspection.Module
 
             public override string Run()
             {
+                if (UIManager.Instance.SetupViewModel.p_RecipeWizard.p_bUseAlignKeyExist == false)
+                {
+                    m_log.Info("Align Key Exist Inspection Not Used, Skip this ModuleRun");
+                    return "OK";
+                }
+
                 // variable
+                string strTimeStamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
                 string strPool = "MainVision.Vision Memory";
                 string strGroup = "MainVision";
                 string strMemory = "Main";
@@ -4640,7 +4682,7 @@ namespace Root_AOP01_Inspection.Module
                             else if (j == (int)eSearchPoint.RB) strName += eSearchPoint.RB;
                             else strName += eSearchPoint.LB;
 
-                            imgSub.Save("D:\\AOP01\\AlignKeyInspection\\ESCHO_" + strName + ".BMP");
+                            imgSub.Save($"D:\\AOP01\\AlignKeyInspection\\{strTimeStamp}_SUBIMG_" + strName + ".BMP");
 
                             if (bResult == false)
                             {
@@ -4653,7 +4695,13 @@ namespace Root_AOP01_Inspection.Module
                     if (m_module.p_nAlignKeyProgressMax - m_module.p_nAlignKeyProgressMin > 0)
                         m_module.p_nAlignKeyProgressPercent = (int)((double)m_module.p_nAlignKeyProgressValue / (double)(m_module.p_nAlignKeyProgressMax - m_module.p_nAlignKeyProgressMin) * 100);
                 }
-                //m_module.p_bAlignKeyPass = true;
+
+                using (System.IO.StreamWriter sr = new System.IO.StreamWriter($"D:\\AOP01\\AlignKeyInspection\\{strTimeStamp}_Result.csv"))
+                {
+                    sr.WriteLine("Result");
+                    sr.WriteLine("{0}", m_module.p_bAlignKeyPass);
+                }
+
                 return "OK";
             }
 
@@ -5025,7 +5073,14 @@ namespace Root_AOP01_Inspection.Module
 
             public override string Run()
             {
+                if (UIManager.Instance.SetupViewModel.p_RecipeWizard.p_bUsePellicleShiftAndRotation == false)
+                {
+                    m_log.Info("Pellicle Shift & Rotation Inspection Not Used, Skip this ModuleRun");
+                    return "OK";
+                }
+
                 // variable
+                string strTimeStamp = DateTime.Now.ToString();
                 MemoryData mem = m_module.m_engineer.GetMemory(App.mPool, App.mGroup, App.mMainMem);
                 Run_Grab moduleRunGrab = (Run_Grab)m_module.CloneModuleRun("Grab");
                 double dResX_um = moduleRunGrab.m_dResX_um;
@@ -5286,6 +5341,12 @@ namespace Root_AOP01_Inspection.Module
                 m_module.p_dPellicleShiftDistance = dResultDistance * moduleRunGrab.m_dResY_um / 1000;
                 m_module.p_dPellicleShiftAngle = dResultAngle;
 
+                using (System.IO.StreamWriter sr = new System.IO.StreamWriter($"D:\\AOP01\\PellicleShiftAndRotationInspection\\{strTimeStamp}_Result.csv"))
+                {
+                    sr.WriteLine("Pass,Distance,Angle");
+                    sr.WriteLine("{0},{1},{2}", m_module.p_bPellicleShiftPass, m_module.p_dPellicleShiftDistance, m_module.p_dPellicleShiftAngle);
+                }
+
                 return "OK";
             }
 
@@ -5334,7 +5395,14 @@ namespace Root_AOP01_Inspection.Module
 
             public override string Run()
             {
+                if (UIManager.Instance.SetupViewModel.p_RecipeWizard.p_bUsePellicleExpanding == false)
+                {
+                    m_log.Info("Pellicle Expanding Inspection Not Used, Skip this ModuleRun");
+                    return "OK";
+                }
+
                 // variable
+                string strTimeStamp = DateTime.Now.ToString();
                 Run_LADS moduleRunLADS = (Run_LADS)m_module.CloneModuleRun("LADS");
                 GrabMode grabMode = m_module.GetGrabMode("LADS");
                 string strPool = grabMode.m_memoryPool.p_id;
@@ -5360,6 +5428,12 @@ namespace Root_AOP01_Inspection.Module
                         m_module.p_nPellicleExpandingProgressPercent = (int)((double)m_module.p_nPellicleExpandingProgressValue / (double)(m_module.p_nPellicleExpandingProgressMax - m_module.p_nPellicleExpandingProgressMin) * 100);
                 }
                 SaveFocusMapImage(grabMode.m_ScanLineNum, nReticleSizeY_px / nCamHeight);
+
+                using (StreamWriter sr = new StreamWriter($"D:\\AOP01\\PellicleExpandingInspection\\{strTimeStamp}_Result.csv"))
+                {
+                    sr.WriteLine("Pass");
+                    sr.WriteLine("{0}", m_module.p_bPellicleExpandingPass);
+                }
 
                 return "OK";
             }
@@ -5530,8 +5604,8 @@ namespace Root_AOP01_Inspection.Module
                     //CvInvoke.Imwrite(@"D:\Test\" + x + ".bmp", ResultMat);
 
                 }
-                CvInvoke.Imwrite(@"D:\FocusMap.bmp", ResultMat);
-                
+                CvInvoke.Imwrite($"D:\\AOP01\\PellicleExpandingInspection\\FocusMap.bmp", ResultMat);
+
                 // Image Binding
                 System.Drawing.Bitmap bmp = ResultMat.Bitmap;
                 System.Drawing.Bitmap bmpTemp = new System.Drawing.Bitmap(bmp);
