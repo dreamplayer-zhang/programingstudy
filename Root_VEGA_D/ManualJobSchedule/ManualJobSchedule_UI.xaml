@@ -377,7 +377,7 @@
                     Margin="20"
                     x:Name="btnRun"
                     IsDefault="True"
-                    Visibility="{Binding p_diOpen}"
+                    Visibility="{Binding p_bIn}"
                     Click="Button_Click"/>
             <Button Grid.Column="1" Style="{StaticResource ButtonStyle1}"
                     Content="Cancel"

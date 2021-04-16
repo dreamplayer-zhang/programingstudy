@@ -49,7 +49,7 @@ namespace Root_VEGA_D
             m_handler = m_engineer.m_handler;
             //InitInfo();
             InitRecipe();
-            btnRun.DataContext = loadport;
+            btnRun.DataContext = loadport.p_diOpen;
         }
 
         //void InitInfo()

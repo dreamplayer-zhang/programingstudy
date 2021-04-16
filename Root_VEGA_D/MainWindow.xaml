@@ -191,7 +191,7 @@
                             <RowDefinition />
                         </Grid.RowDefinitions>
                         <Grid Grid.Row="0">
-                            <TextBlock Text="Date : 2020-07-08 11:08"
+                            <TextBlock x:Name="NowTime"
                                        HorizontalAlignment="Left"
                                        Margin="30,0,0,0"
                                        FontWeight="Bold" />
@@ -1317,7 +1317,7 @@
                             <engineer:VEGA_D_Engineer_UI x:Name="engineerUI"/>
                         </TabItem>
                         <TabItem Header="Recipe Manager"
-                                 Style="{StaticResource ResourceKey=WizardTabItem}" Visibility="Hidden">
+                                 Style="{StaticResource ResourceKey=WizardTabItem}" Visibility="Collapsed">
                             <local:RecipeManager_UI />
 
                             <!--<ScrollViewer Background="White">
@@ -2024,7 +2024,7 @@
                             </ScrollViewer>-->
                         </TabItem>
                         <TabItem Header="Recipe Wizard"
-                                 Style="{StaticResource WizardTabItem}" Visibility="Hidden">
+                                 Style="{StaticResource WizardTabItem}" Visibility="Collapsed">
                             <local:RecipeWizard_UI x:Name="RecipeWizard_UI" />
                         </TabItem>
                         <TabItem Header="Run"

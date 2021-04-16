@@ -148,9 +148,14 @@ namespace Root_EFEM.Module
 
         #region GAF
         ALID alid_Cymechs;
+        ALID alid_LoadportOpenCloseError;
+        ALID alid_LoadportRunReadyError;
+
         void InitALID()
         {
             alid_Cymechs = m_gaf.GetALID(this, "Cymechs", "LOADPORT CYMECHS ERROR");
+            alid_LoadportOpenCloseError = m_gaf.GetALID(this, "Cymechs", "LOADPORT Open Or Close State Error");
+            alid_LoadportRunReadyError = m_gaf.GetALID(this, "Cymechs", "LOADPORT Run Or Ready State Error");
         }
         #endregion
         //forget
@@ -227,6 +232,7 @@ namespace Root_EFEM.Module
 
         public string BeforeGet(int nID)
         {
+            alid_LoadportOpenCloseError.Run(!m_diOpen.p_bIn || !m_diReady.p_bIn, "m_diOpen.p_bIn : "+ m_diOpen.p_bIn + ", m_diReady.p_bIn : " + m_diReady.p_bIn);
             if (GetInfoWafer(nID) == null)
             {
                 m_alidGetOK.Run(true, p_id + nID.ToString("00") + " BeforeGet : InfoWafer = null");
@@ -237,6 +243,7 @@ namespace Root_EFEM.Module
 
         public string BeforePut(int nID)
         {
+            alid_LoadportOpenCloseError.Run(!m_diOpen.p_bIn || !m_diReady.p_bIn, "m_diOpen.p_bIn : " + m_diOpen.p_bIn + ", m_diReady.p_bIn : " + m_diReady.p_bIn);
             if (GetInfoWafer(nID) != null)
             {
                 m_alidPutOK.Run(true, p_id + nID.ToString("00") + " BeforePut : InfoWafer != null");
@@ -1019,31 +1026,31 @@ namespace Root_EFEM.Module
                     m_module.m_alidLoad.Run(true, p_sInfo);
                     return p_sInfo;
                 }
-                InfoCarrier infoCarrier = m_infoCarrier;
-                List<GemSlotBase.eState> aSlot = new List<GemSlotBase.eState>();
-                string sMap = "1000000000000000000000000";
-                foreach (char ch in sMap)
-                {
-                    switch (ch)
-                    {
-                        case '0':
-                            aSlot.Add(GemSlotBase.eState.Empty);
-                            break;
-                        case '1':
-                            aSlot.Add(GemSlotBase.eState.Exist);
-                            break;
-                        case 'D':
-                            aSlot.Add(GemSlotBase.eState.Double);
-                            break;
-                        case 'C':
-                            aSlot.Add(GemSlotBase.eState.Cross);
-                            break;
-                        default:
-                            aSlot.Add(GemSlotBase.eState.Undefined);
-                            break;
-                    }
-                }
-                if (!EQ.p_bRecovery) infoCarrier.SetMapData(aSlot);
+                //InfoCarrier infoCarrier = m_infoCarrier;
+                //List<GemSlotBase.eState> aSlot = new List<GemSlotBase.eState>();
+                //string sMap = "1000000000000000000000000";
+                //foreach (char ch in sMap)
+                //{
+                //    switch (ch)
+                //    {
+                //        case '0':
+                //            aSlot.Add(GemSlotBase.eState.Empty);
+                //            break;
+                //        case '1':
+                //            aSlot.Add(GemSlotBase.eState.Exist);
+                //            break;
+                //        case 'D':
+                //            aSlot.Add(GemSlotBase.eState.Double);
+                //            break;
+                //        case 'C':
+                //            aSlot.Add(GemSlotBase.eState.Cross);
+                //            break;
+                //        default:
+                //            aSlot.Add(GemSlotBase.eState.Undefined);
+                //            break;
+                //    }
+                //}
+                //if (!EQ.p_bRecovery) infoCarrier.SetMapData(aSlot);
                 m_infoCarrier.SendSlotMap();
                 while (m_infoCarrier.p_eStateSlotMap != GemCarrierBase.eGemState.VerificationOK)
                 {

@@ -215,7 +215,7 @@ namespace Root_VEGA_D
         {
             TimerUI();
             TimerLamp();
-
+            NowTime.Text = "Date : " + DateTime.Now.ToString();
             buttonResume.IsEnabled = IsEnable_Resume();
             buttonPause.IsEnabled = IsEnable_Pause();
             buttonInitialize.IsEnabled = IsEnable_Initial();
