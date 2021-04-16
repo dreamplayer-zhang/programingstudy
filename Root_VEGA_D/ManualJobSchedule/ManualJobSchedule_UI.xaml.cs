@@ -16,6 +16,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using Root_VEGA_D.Engineer;
 using Root_EFEM.Module;
+using System.Globalization;
 
 namespace Root_VEGA_D
 {
@@ -36,7 +37,7 @@ namespace Root_VEGA_D
             m_infoWafer = infoCarrier.GetInfoWafer(0);
         }
 
-        private void Window_Closing(object sender, CancelEventArgs e)
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             m_bShow = false;
         }
@@ -47,9 +48,9 @@ namespace Root_VEGA_D
             this.DataContext = manualJob;
             m_engineer = (VEGA_D_Engineer)engineer;
             m_handler = m_engineer.m_handler;
+            btnRun.DataContext = loadport;
             //InitInfo();
             InitRecipe();
-            btnRun.DataContext = loadport.p_diOpen;
         }
 
         //void InitInfo()
@@ -105,6 +106,7 @@ namespace Root_VEGA_D
             if (infoWafer != null)
             {
                 infoWafer.RecipeOpen("C:\\Recipe\\VEGA_D\\" + "OnlyOne.Vega_D");
+                //m_handler.m_RNRinfoWafer = infoWafer;
                 m_handler.AddSequence(infoWafer);
                 m_handler.CalcSequence();
             }
@@ -125,6 +127,24 @@ namespace Root_VEGA_D
         {
             m_infoCarrier.SetInfoWafer(0, null);
             this.Close();
+        }
+    }
+    class BooltoVisibleConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            {
+                if ((bool)value == true)
+                    return Visibility.Visible;
+                else
+                    return Visibility.Collapsed;
+            }
+
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return value;
         }
     }
 }

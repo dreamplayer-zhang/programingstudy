@@ -205,7 +205,18 @@ namespace Root_VEGA_D.Engineer
         public string StateHome()
         {
             m_HomeProgress.HomeProgressShow();
-            string sInfo = StateHome(p_moduleList.m_aModule);
+
+
+            //string sInfo = StateHome(p_moduleList.m_aModule);
+            string sInfo = StateHome(m_wtr);
+            if (sInfo != "OK")
+            {
+                EQ.p_eState = EQ.eState.Init;
+                return sInfo;
+            }
+            sInfo = StateHome(m_interlock, (ModuleBase)m_aLoadport[0], (ModuleBase)m_aLoadport[1], m_vision, m_visionIPU, m_towerlamp, (RFID_Brooks)m_aRFID[0], (RFID_Brooks)m_aRFID[1], m_FDC, m_FFU);
+            if (sInfo == "OK") EQ.p_eState = EQ.eState.Ready;
+            //if (sInfo == "OK") m_bIsPossible_Recovery = true;
             if (sInfo == "OK") EQ.p_eState = EQ.eState.Ready;
             return sInfo;
         }
@@ -391,6 +402,9 @@ namespace Root_VEGA_D.Engineer
                             if ((EQ.p_nRnR > 1) && (m_process.m_qSequence.Count == 0))
                             {
                                 while (m_aLoadport[EQ.p_nRunLP].p_infoCarrier.p_eState != InfoCarrier.eState.Placed) Thread.Sleep(10);
+                                //m_process.p_sInfo = m_process.AddInfoWafer(m_infoRnRSlot);
+                                m_infoRnRSlot.RecipeOpen("C:\\Recipe\\VEGA_D\\" + "OnlyOne.Vega_D");
+                                AddSequence(m_infoRnRSlot);
                                 m_process.p_sInfo = m_process.AddInfoWafer(m_infoRnRSlot);
                                 CalcSequence();
                                 //m_nRnR--;

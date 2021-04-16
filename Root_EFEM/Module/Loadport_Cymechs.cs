@@ -46,15 +46,26 @@ namespace Root_EFEM.Module
                 m_diPresent = value;
             }
         }
-        public DIO_I p_diOpen
+        //public bool m_bOpen = false;
+        //public DIO_I p_diOpen
+        //{
+        //    get
+        //    {
+        //        return m_diOpen;
+        //    }
+        //    set
+        //    {
+        //        m_diOpen = value;
+        //        m_bOpen = m_diOpen.p_bIn;
+        //        OnPropertyChanged();
+        //    }
+        //}
+        bool _bopen = false;
+        public bool p_open
         {
-            get
-            {
-                return m_diOpen;
-            }
-            set
-            {
-                m_diOpen = value;
+            get { return _bopen; }
+            set {
+                _bopen = value;
                 OnPropertyChanged();
             }
         }
@@ -1060,6 +1071,9 @@ namespace Root_EFEM.Module
                         return p_sInfo + " infoCarrier.p_eStateSlotMap = " + m_infoCarrier.p_eStateSlotMap.ToString();
                 }
                 m_infoCarrier.p_eState = InfoCarrier.eState.Dock;
+
+                if (m_module.m_diOpen.p_bIn) m_module.p_open = true;
+                else m_module.p_open = false;
                 return "OK";
 
                 //m_module.m_bUnLoadCheck = false;
@@ -1139,7 +1153,7 @@ namespace Root_EFEM.Module
                 }
                 if (!EQ.p_bSimulate)
                 {
-                    if (m_module.Run(m_module.CmdGetMap())) return p_sInfo;
+                    //if (m_module.Run(m_module.CmdGetMap())) return p_sInfo;
                     if (m_module.Run(m_module.CmdUnload()))
                     {
                         m_module.m_alidUnLoad.Run(true, p_sInfo);
