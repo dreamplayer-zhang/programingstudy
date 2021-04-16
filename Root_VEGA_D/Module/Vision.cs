@@ -466,15 +466,18 @@ namespace Root_VEGA_D.Module
                 // 연결이 종료되었을 때
                 if (!socket.Connected)
                 {
-                    Run_GrabLineScan runGrabLineScan = m_aModuleRun.Find(x => (x.GetType() == typeof(Run_GrabLineScan))) as Run_GrabLineScan;
-                    if (runGrabLineScan != null)
+                    if(m_qModuleRun.Count > 0)
                     {
-                        // 현재 GrabLineScan 진행중이었다면
-                        if (runGrabLineScan.p_eRunState == ModuleRunBase.eRunState.Run)
+                        Run_GrabLineScan runGrabLineScan = m_qModuleRun.Peek() as Run_GrabLineScan;
+                        if (runGrabLineScan != null)
                         {
-                            // EQ Stop 상태로 변경하고 이미지그랩 중에 중단되었다는 상태값 설정
-                            EQ.p_bStop = true;
-                            m_bDisconnectedGrabLineScanning = true;
+                            // 현재 GrabLineScan 진행중이었다면
+                            if (runGrabLineScan.p_eRunState == ModuleRunBase.eRunState.Run)
+                            {
+                                // EQ Stop 상태로 변경하고 이미지그랩 중에 중단되었다는 상태값 설정
+                                EQ.p_bPause = true;
+                                m_bDisconnectedGrabLineScanning = true;
+                            }
                         }
                     }
                 }
@@ -492,20 +495,23 @@ namespace Root_VEGA_D.Module
                     {
                         case TCPIPComm_VEGA_D.Command.resume:
                             {
-                                if (EQ.IsStop() || m_bDisconnectedGrabLineScanning == true)
+                                if (EQ.p_bPause == true || m_bDisconnectedGrabLineScanning == true)
                                 {
                                     // 이전에 이미지 그랩 작업을 이어서 할 수 있도록 처리
                                     int totalScanLine = int.Parse(mapParam[TCPIPComm_VEGA_D.PARAM_NAME_TOTALSCANLINECOUNT]);
                                     int curScanLine = int.Parse(mapParam[TCPIPComm_VEGA_D.PARAM_NAME_CURRENTSCANLINE]);
                                     int startScanLine = int.Parse(mapParam[TCPIPComm_VEGA_D.PARAM_NAME_STARTSCANLINE]);
 
-                                    Run_GrabLineScan runGrabLineScan = m_aModuleRun.Find(x => (x.GetType() == typeof(Run_GrabLineScan))) as Run_GrabLineScan;
-                                    if (runGrabLineScan != null)
+                                    if (m_qModuleRun.Count > 0)
                                     {
-                                        runGrabLineScan.m_grabMode.m_ScanLineNum = totalScanLine - curScanLine;
-                                        runGrabLineScan.m_grabMode.m_ScanStartLine = startScanLine + curScanLine;
+                                        Run_GrabLineScan runGrabLineScan = m_qModuleRun.Peek() as Run_GrabLineScan;
+                                        if (runGrabLineScan != null)
+                                        {
+                                            runGrabLineScan.m_grabMode.m_ScanLineNum = totalScanLine - curScanLine;
+                                            runGrabLineScan.m_grabMode.m_ScanStartLine = startScanLine + curScanLine;
 
-                                        EQ.p_bStop = false;
+                                            EQ.p_bPause = false;
+                                        }
                                     }
                                 }
                                 else
@@ -518,14 +524,17 @@ namespace Root_VEGA_D.Module
                             break;
                         case TCPIPComm_VEGA_D.Command.Result:
                             {
-                                Run_GrabLineScan runGrabLineScan = m_aModuleRun.Find(x => (x.GetType() == typeof(Run_GrabLineScan))) as Run_GrabLineScan;
-                                if (runGrabLineScan != null)
+                                if(m_qModuleRun.Count > 0)
                                 {
-                                    // 현재 GrabLineScan 진행중이었다면
-                                    if (runGrabLineScan.p_eRunState == ModuleRunBase.eRunState.Run)
+                                    Run_GrabLineScan runGrabLineScan = m_qModuleRun.Peek() as Run_GrabLineScan;
+                                    if (runGrabLineScan != null)
                                     {
-                                        // IPU에서 이미지 검사 완료되었기 때문에 해당 상태변수 true로 변경
-                                        runGrabLineScan.m_bIPUCompleted = true;
+                                        // 현재 GrabLineScan 진행중이었다면
+                                        if (runGrabLineScan.p_eRunState == ModuleRunBase.eRunState.Run)
+                                        {
+                                            // IPU에서 이미지 검사 완료되었기 때문에 해당 상태변수 true로 변경
+                                            runGrabLineScan.m_bIPUCompleted = true;
+                                        }
                                     }
                                 }
                             }
