@@ -54,6 +54,7 @@ namespace RootTools_Vision
 
             Tools.SaveDefectImage(Path.Combine(settings.MeasureImagePath, sInspectionID), measureList.Cast<Data>().ToList(), currentWorkplace.SharedBufferInfo);
 
+			/*
             if (GlobalObjects.Instance.Get<KlarfData_Lot>() != null)
             {
 				List<string> dataStringList = ConvertDataListToStringList(measureList, Measurement.EBRMeasureItem.EBR.ToString());
@@ -64,6 +65,7 @@ namespace RootTools_Vision
 
 				//Tools.SaveTiffImage(settings.KlarfSavePath, measureList.Cast<Data>().ToList(), sharedBufferInfo);
 			}
+			*/
 
             WorkEventManager.OnProcessMeasurementDone(this.currentWorkplace, new ProcessMeasurementDoneEventArgs());
         }

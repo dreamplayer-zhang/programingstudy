@@ -1,5 +1,6 @@
 ﻿using RootTools;
 using RootTools.Comm;
+using RootTools.Control;
 using RootTools.Module;
 using RootTools.ParticleCounter;
 using RootTools.ToolBoxs;
@@ -27,21 +28,30 @@ namespace Root_VEGA_P.Module
         #region Regulator
         public class Regulator : NotifyProperty
         {
+            DIO_I m_diBackFlow; 
             RS232 m_rs232; 
-            public string GetTools(ToolBox toolBox, bool bInit)
+            public void GetTools(ToolBox toolBox, bool bInit)
             {
-                string sInfo = toolBox.GetComm(ref m_rs232, m_particleCounter, "Regulator");
+                toolBox.GetDIO(ref m_diBackFlow, m_particleCounter, "BackFlow"); 
+                toolBox.GetComm(ref m_rs232, m_particleCounter, "Regulator");
                 if (bInit) m_rs232.p_bConnect = true;
-                return sInfo; 
             }
 
-            public int m_nPump = 0; 
-            public string RunPump(int nPump)
+            public bool IsBackFlow()
+            {
+                return m_diBackFlow.p_bIn; 
+            }
+
+            public double m_hPa = 0; 
+            public string RunPump(double hPa)
             {
                 string sInfo = ConnectRS232();
                 if (sInfo != "OK") return sInfo;
-                m_nPump = nPump; 
-                m_rs232.Send("SET " + nPump.ToString());
+                if (hPa < 0) hPa = 0;
+                if (hPa > 5) hPa = 5; 
+                m_hPa = hPa;
+                int nPower = (int)(200 * hPa); 
+                m_rs232.Send("SET " + nPower.ToString());
                 return "OK";
             }
 
@@ -110,39 +120,58 @@ namespace Root_VEGA_P.Module
                 if (EQ.IsStop()) return "EQ Stop";
             }
             */
-            int iNozzle = 0; 
+
+            string sPath = "c:\\ParticleCountResult";
+            Directory.CreateDirectory(sPath);
+
+            int iNozzle = 0;
             while (EQ.IsStop() == false)
             {
                 if (Run(m_nozzleSet.RunNozzle(iNozzle))) return p_sInfo;
-                if (Run(m_regulator.RunPump(run.m_nPump))) return p_sInfo;
+                if (Run(m_regulator.RunPump(run.m_hPa))) return p_sInfo;
                 if (Run(m_particleCounter.StartRun(run.m_sample))) return p_sInfo;
+                bool bBackFlow = false; 
                 while (m_particleCounter.IsBusy())
                 {
                     Thread.Sleep(100);
-                    if (m_particleCounter.IsTimeout()) return "Particle Counter Run Timeout";
+                    bBackFlow |= m_regulator.IsBackFlow(); 
                     if (EQ.IsStop()) return "EQ Stop";
                 }
-                SaveResult(iNozzle);
-                iNozzle = (iNozzle + 1) % m_nozzleSet.p_nNozzle; 
+                if (Run(m_regulator.RunPump(0))) return p_sInfo;
+                string sTime = GetTime(); 
+                SaveResult(sPath + "\\Nozzle" + iNozzle.ToString("00") + ".txt", sTime, bBackFlow);
+                iNozzle = (iNozzle + 1) % m_nozzleSet.p_nNozzle;
+                Thread.Sleep(5000); 
             }
             return "OK"; 
         }
 
-        void SaveResult(int iNozzle)
+        void SaveResult(string sFile, string sTime, bool bBackFlow)
         {
-            DateTime dt = DateTime.Now;
-            string sFile = "c:\\ParticleCountResult"; 
-            Directory.CreateDirectory(sFile);
-            sFile += "\\Nozzle" + iNozzle.ToString("00") + "." + dt.ToString() + ".txt"; 
-            using(StreamWriter sw = new StreamWriter(sFile, true, Encoding.Default))
+            using (StreamWriter sw = new StreamWriter(sFile, true, Encoding.Default))
             {
+                sw.Write(sTime);
                 foreach (ParticleCounterBase.ParticleCount pc in m_particleCounter.m_aParticleCount)
                 {
-                    sw.Write(pc.m_sParticleSize); 
                     foreach (int nParticle in pc.m_aCount) sw.Write("\t" + nParticle.ToString());
-                    sw.WriteLine(); 
                 }
+                sw.WriteLine("\t" + (bBackFlow ? "BackFlow" : "OK"));
             }
+        }
+
+        string GetTime()
+        {
+            DateTime dt = DateTime.Now;
+            return dt.Day.ToString() + '.' + dt.Hour.ToString("00") + '.' + dt.Minute.ToString("00") + '.' + dt.Second.ToString("00");
+        }
+        #endregion
+
+        #region State Home
+        public override string StateHome()
+        {
+            if (EQ.p_bSimulate) return "OK";
+            if (Run(base.StateHome())) return p_sInfo;
+            return "OK";
         }
         #endregion
 
@@ -216,21 +245,21 @@ namespace Root_VEGA_P.Module
             public override ModuleRunBase Clone()
             {
                 Run_Pump run = new Run_Pump(m_module);
-                run.m_nPump = m_nPump; 
+                run.m_hPa = m_hPa; 
                 run.m_secDelay = m_secDelay;
                 return run;
             }
 
-            int m_nPump = 1000; 
+            double m_hPa = 2; 
             public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
             {
-                m_nPump = tree.Set(m_nPump, m_nPump, "Pump", "Pump Power (0 ~ 1000)", bVisible); 
+                m_hPa = tree.Set(m_hPa, m_hPa, "hPa", "Pump Power (1 ~ 5 hPa)", bVisible); 
                 m_secDelay = tree.Set(m_secDelay, m_secDelay, "Delay", "Delay Time (sec)", bVisible);
             }
 
             public override string Run()
             {
-                if (m_module.Run(m_module.m_regulator.RunPump(m_nPump))) return p_sInfo; 
+                if (m_module.Run(m_module.m_regulator.RunPump(m_hPa))) return p_sInfo; 
                 Thread.Sleep(1000 * m_secDelay);
                 if (m_module.Run(m_module.m_regulator.RunPump(0))) return p_sInfo;
                 return "OK";
@@ -273,13 +302,13 @@ namespace Root_VEGA_P.Module
                 InitModuleRun(module);
             }
 
-            public int m_nPump = 100;
+            public double m_hPa = 2;
             public NozzleSet.Open m_open;
             public ParticleCounterBase.Sample m_sample; 
             public override ModuleRunBase Clone()
             {
                 Run_Run run = new Run_Run(m_module);
-                run.m_nPump = m_nPump;
+                run.m_hPa = m_hPa;
                 run.m_open = new NozzleSet.Open(m_open);
                 run.m_sample = new ParticleCounterBase.Sample(m_sample); 
                 return run;
@@ -287,7 +316,7 @@ namespace Root_VEGA_P.Module
 
             public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
             {
-                m_nPump = tree.Set(m_nPump, m_nPump, "Pump", "Regulator Pump Power (0 ~ 1000)");
+                m_hPa = tree.Set(m_hPa, m_hPa, "hPa", "Pump Power (1 ~ 5 hPa)", bVisible);
                 m_sample.RunTree(tree.GetTree("Sample")); 
                 m_open.RunTree(tree.GetTree("Nozzle")); 
             }

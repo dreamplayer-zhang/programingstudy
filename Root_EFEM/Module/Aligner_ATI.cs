@@ -123,7 +123,8 @@ namespace Root_EFEM.Module
             #endregion
 
             #region AxisX
-            public double m_xOffset = 2;
+            public double m_xOffset = 150000;
+            public double m_guideOffset = 1000;
             public enum ePosX
             {
                 Backward,
@@ -147,7 +148,7 @@ namespace Root_EFEM.Module
                 GetReady,
                 GetUp,
                 PutReady,
-                PutDown
+                PutUp
             }
             void InitPosZ()
             {
@@ -183,8 +184,9 @@ namespace Root_EFEM.Module
             public void RunTree(Tree tree)
             {
                 m_secBlow = tree.Set(m_secBlow, m_secBlow, "Blow", "Vaccum Blow Time (sec)");
-                m_secVac = tree.Set(m_secVac, m_secVac, "Vacuum", "Vacuum On Timout (sec)");
-                m_xOffset = tree.Set(m_xOffset, m_xOffset, "X Offset", "Axis X Offset"); 
+                m_secVac = tree.Set(m_secVac, m_secVac, "Vacuum", "Vacuum On Timeout (sec)");
+                m_xOffset = tree.Set(m_xOffset, m_xOffset, "X Offset", "Axis X Moving Offset");
+                m_guideOffset = tree.Set(m_guideOffset, m_guideOffset, "Guide Offset", "Axis X Guide Offset");
             }
             #endregion
 
@@ -199,34 +201,76 @@ namespace Root_EFEM.Module
 
         public string RunGet()
         {
-            if (Run(m_flipper.RunVacuum(false))) return p_sInfo;
-            if (Run(m_flipper.RunMoveX(Flipper.ePosX.Backward, 0))) return p_sInfo;
+            /*if (Run(m_flipper.RunVacuum(false))) return p_sInfo;
+            if (Run(m_flipper.RunMoveX(Flipper.ePosX.Backward, 0))) return p_sInfo; // 0값 대신 값 구하기
             if (Run(m_flipper.RunMoveRotate(Flipper.ePosRotate.UpSide))) return p_sInfo;
             if (Run(m_flipper.RunMoveZ(Flipper.ePosZ.GetReady))) return p_sInfo;
-            if (Run(m_flipper.RunMoveX(Flipper.ePosX.Forward, m_flipper.m_xOffset))) return p_sInfo;
-            if (Run(RunVacuum(false))) return p_sInfo; 
-            if (Run(m_flipper.RunMoveZ(Flipper.ePosZ.GetUp))) return p_sInfo;
+            if (Run(m_flipper.RunMoveX(Flipper.ePosX.Forward, m_flipper.m_xOffset))) return p_sInfo; // X offset 값 구하기
+            if (Run(RunVacuum(false))) return p_sInfo;
+            if (Run(m_flipper.RunMoveZ(Flipper.ePosZ.GetUp))) return p_sInfo; // up offset 값 구하기
             if (Run(m_flipper.RunGuide(true))) return p_sInfo;
-            if (Run(m_flipper.RunVacuum(true))) return p_sInfo; 
-            if (Run(m_flipper.RunMoveX(Flipper.ePosX.Backward, 0))) return p_sInfo;
+            if (Run(m_flipper.RunVacuum(true))) return p_sInfo;
+            if (Run(m_flipper.RunMoveX(Flipper.ePosX.Backward, 0))) return p_sInfo; // 0값 대신 값 구하기*/
+
+            // Start Init
+            if (Run(m_flipper.RunVacuum(false))) return p_sInfo;
+            if (Run(m_flipper.RunMoveX(Flipper.ePosX.Backward, 0))) return p_sInfo; // Home으로 이동
+            if (Run(m_flipper.RunMoveZ(Flipper.ePosZ.GetReady))) return p_sInfo; // 얼라이너척에 올려진 웨이퍼 높이가 가이드 지지대에 걸리지 않는 위치가 Ready Position
+            // End Init
+
+            // Start Rotate
+            if (Run(m_flipper.RunMoveRotate(Flipper.ePosRotate.UpSide))) return p_sInfo; // 뒤로 완전히 빠지고 올라온 후 Rotate
+            // End Rotate
+
+            // Start Get
+            if (Run(m_flipper.RunMoveX(Flipper.ePosX.Forward, m_flipper.m_xOffset))) return p_sInfo; // X offset 만큼 이동
+            if (Run(RunVacuum(false))) return p_sInfo;
+            if (Run(m_flipper.RunMoveZ(Flipper.ePosZ.GetUp))) return p_sInfo; // 플리퍼바닥과 가이드 지지대 높이차 정도 위로
+            if (Run(m_flipper.RunMoveX(Flipper.ePosX.Backward, m_flipper.m_guideOffset))) return p_sInfo;
+            if (Run(m_flipper.RunGuide(true))) return p_sInfo;
+            if (Run(m_flipper.RunVacuum(true))) return p_sInfo;
+            if (Run(m_flipper.RunMoveX(Flipper.ePosX.Backward, 0))) return p_sInfo; // Home으로 이동
+            // End Get
+
             return "OK";
         }
 
         public string RunPut()
         {
-            if (Run(m_flipper.RunVacuum(true))) return p_sInfo;
+            /*if (Run(m_flipper.RunVacuum(true))) return p_sInfo;
             if (Run(m_flipper.RunMoveX(Flipper.ePosX.Backward, 0))) return p_sInfo;
             if (Run(m_flipper.RunMoveRotate(Flipper.ePosRotate.DownSide))) return p_sInfo;
             if (Run(m_flipper.RunMoveZ(Flipper.ePosZ.PutReady))) return p_sInfo;
-            if (Run(m_flipper.RunMoveX(Flipper.ePosX.Forward, 0))) return p_sInfo; //forget ??
-            if (Run(m_flipper.RunMoveZ(Flipper.ePosZ.PutDown))) return p_sInfo;
+            if (Run(m_flipper.RunMoveX(Flipper.ePosX.Forward, m_flipper.m_xOffset))) return p_sInfo;
+            if (Run(m_flipper.RunMoveZ(Flipper.ePosZ.PutUp))) return p_sInfo;
             if (Run(m_flipper.RunVacuum(false))) return p_sInfo;
             if (Run(RunVacuum(true))) return p_sInfo;
             if (Run(m_flipper.RunGuide(false))) return p_sInfo;
-            if (Run(m_flipper.RunMoveX(Flipper.ePosX.Forward, m_flipper.m_xOffset))) return p_sInfo; //forget ??
+            if (Run(m_flipper.RunMoveX(Flipper.ePosX.Forward, m_flipper.m_guideOffset))) return p_sInfo;
             if (Run(m_flipper.RunMoveZ(Flipper.ePosZ.PutReady))) return p_sInfo;
             if (Run(m_flipper.RunMoveX(Flipper.ePosX.Backward, 0))) return p_sInfo;
-            if (Run(m_flipper.RunMoveRotate(Flipper.ePosRotate.UpSide))) return p_sInfo;
+            //if (Run(m_flipper.RunMoveRotate(Flipper.ePosRotate.UpSide))) return p_sInfo;*/
+
+            // Start Init
+            if (Run(m_flipper.RunVacuum(true))) return p_sInfo;
+            if (Run(m_flipper.RunMoveX(Flipper.ePosX.Backward, 0))) return p_sInfo; // Home으로 이동
+            if (Run(m_flipper.RunMoveZ(Flipper.ePosZ.PutReady))) return p_sInfo; // 플리퍼에 올려진 웨이퍼 높이가 얼라이너척보다 살짝 높게 Put Position
+            // End Init
+
+            // Start Rotate
+            if (Run(m_flipper.RunMoveRotate(Flipper.ePosRotate.DownSide))) return p_sInfo; // 뒤로 완전히 빠지고 올라온 후 Rotate
+            // End Rotate
+
+            // Start Put
+            if (Run(m_flipper.RunMoveX(Flipper.ePosX.Forward, m_flipper.m_xOffset))) return p_sInfo; // X offset 만큼 이동
+            if (Run(RunVacuum(true))) return p_sInfo;
+            if (Run(m_flipper.RunVacuum(false))) return p_sInfo;
+            if (Run(m_flipper.RunGuide(false))) return p_sInfo;
+            if (Run(m_flipper.RunMoveX(Flipper.ePosX.Forward, m_flipper.m_guideOffset))) return p_sInfo;
+            if (Run(m_flipper.RunMoveZ(Flipper.ePosZ.PutUp))) return p_sInfo; // 플리퍼바닥과 가이드 지지대 높이차 정도 위로
+            if (Run(m_flipper.RunMoveX(Flipper.ePosX.Backward, 0))) return p_sInfo; // Home으로 이동
+            // End Put
+
             return "OK"; 
         }
         #endregion

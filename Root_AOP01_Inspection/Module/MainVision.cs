@@ -36,6 +36,8 @@ using RootTools_CLR;
 using System.Linq;
 using RootTools.Inspects;
 using RootTools.GAFs;
+using System.Runtime.ExceptionServices;
+using System.Security;
 
 namespace Root_AOP01_Inspection.Module
 {
@@ -5373,45 +5375,63 @@ namespace Root_AOP01_Inspection.Module
                     CRect crtROI = new CRect(nLeft, nTop, nRight, nBottom);
                     ImageData img = new ImageData(crtROI.Width, crtROI.Height, 1);
                     img.SetData(p, crtROI, (int)mem.W);
-                    ladsinfo.m_Heightinfo[i] = GetLaserHeight(img);
+                    bool bErrorOccured = false;
+                    ladsinfo.m_Heightinfo[i] = GetLaserHeight(img, out bErrorOccured);
+                    while(bErrorOccured)    // Error 발생시 다시... 
+                    {
+                        Thread.Sleep(1);
+                        ladsinfo.m_Heightinfo[i] = GetLaserHeight(img, out bErrorOccured);
+                    }
                 }
                 ladsinfos.Add(ladsinfo);
             }
 
-            unsafe double GetLaserHeight(ImageData img)
+            [HandleProcessCorruptedStateExceptions]
+            [SecurityCritical]
+            unsafe double GetLaserHeight(ImageData img, out bool bErrorOccured)
             {
                 // variable
                 int nImgWidth = 100; //grabMode.m_camera.GetRoiSize().X;
                 int nImgHeight = 100; //grabMode.m_camera.GetRoiSize().Y;
                 double[] profile = new double[nImgWidth];
-                IntPtr dp = img.GetPtr();
-                
-                // implement
-                // make profile
-                for (int i = 0; i<nImgHeight; i++)
-                {
-                    byte* p = (byte*)(dp + nImgWidth * i);
-                    long sum = 0;
-                    for (int j = 0; j<nImgWidth; j++)
-                    {
-                        byte b = *(p + j);
-                        sum += b;
-                    }
-                    profile[i] = sum / nImgWidth;
-                }
-
                 double dReturnHeight = 0.0;
                 double max = 0;
-                for (int k = 1; k<profile.Length - 1; k++)
-                {
-                    if (max < profile[k])
-                    {
-                        max = profile[k];
-                        dReturnHeight = (profile[k] * k + profile[k - 1] * (k - 1) + profile[k + 1] * (k + 1)) / (profile[k] + profile[k - 1] + profile[k + 1]);
-                    }
-                }
 
-                return dReturnHeight;
+                try
+                {
+                    IntPtr dp = img.GetPtr();
+
+                    // implement
+                    // make profile
+                    for (int i = 0; i < nImgHeight; i++)
+                    {
+                        byte* p = (byte*)(dp + nImgWidth * i);
+                        long sum = 0;
+                        for (int j = 0; j < nImgWidth; j++)
+                        {
+                            byte b = *(p + j);
+                            sum += b;
+                        }
+                        profile[i] = sum / nImgWidth;
+                    }
+
+                    for (int k = 1; k < profile.Length - 1; k++)
+                    {
+                        if (max < profile[k])
+                        {
+                            max = profile[k];
+                            dReturnHeight = (profile[k] * k + profile[k - 1] * (k - 1) + profile[k + 1] * (k + 1)) / (profile[k] + profile[k - 1] + profile[k + 1]);
+                        }
+                    }
+
+                    bErrorOccured = false;
+                    return dReturnHeight;
+                }
+                catch(AccessViolationException e)
+                {
+                    bErrorOccured = true;
+                    return dReturnHeight;
+                }
             }
 
             #region CalculatingHeight(구)
@@ -5481,17 +5501,6 @@ namespace Root_AOP01_Inspection.Module
                     }
                 }
 
-                //StringBuilder strBuilder = new StringBuilder();
-                //for (int y = 0; y < nY; y++)
-                //{
-                //    for (int x = 0; x < nX; x++)
-                //    {
-                //        strBuilder.Append(ladsinfos[x].m_Heightinfo[y].ToString() + ",");
-                //    }
-                //    strBuilder.AppendLine();
-                //}
-                //File.WriteAllText("D:\\test.csv", strBuilder.ToString());
-
                 for (int x = 0; x < nX; x++)
                 {
                     Mat Vmat = new Mat();
@@ -5511,18 +5520,22 @@ namespace Root_AOP01_Inspection.Module
                     else
                         CvInvoke.HConcat(ResultMat, Vmat, ResultMat);
 
-                    CvInvoke.Imwrite(@"D:\Test\" + x + ".bmp", ResultMat);
+                    //CvInvoke.Imwrite(@"D:\Test\" + x + ".bmp", ResultMat);
 
                 }
                 CvInvoke.Imwrite(@"D:\FocusMap.bmp", ResultMat);
-
+                
                 // Image Binding
                 System.Drawing.Bitmap bmp = ResultMat.Bitmap;
+                System.Drawing.Bitmap bmpTemp = new System.Drawing.Bitmap(bmp);
+                bmp.Dispose();
+                bmp = null;
+                var bmpThumbnail = GetBitmapImageFromBitmap(bmpTemp);
                 if (m_module.dispatcher != null)
                 {
                     m_module.dispatcher.Invoke(new Action(delegate ()
                     {
-                        m_module.p_bmpImgPellicleHeatmap = GetBitmapImageFromBitmap(bmp);
+                        m_module.p_bmpImgPellicleHeatmap = bmpThumbnail;
                     }));
                 }
 

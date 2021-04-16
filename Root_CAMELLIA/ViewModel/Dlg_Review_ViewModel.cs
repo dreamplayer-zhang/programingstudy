@@ -21,7 +21,7 @@ namespace Root_CAMELLIA
         #region Property
         private MainWindow_ViewModel mainWindow_ViewModel;
 
-        Explorer_ViewModel m_summary = new Explorer_ViewModel(InitPath : @"C:\Camellia2\PRD");
+        Explorer_ViewModel m_summary = new Explorer_ViewModel(InitPath : BaseDefine.Dir_MeasureSaveRootPath);
         public Explorer_ViewModel p_summary
         {
             get
@@ -618,8 +618,8 @@ namespace Root_CAMELLIA
 
                     idx++;
                 }
-                p_reflectanceGraph.DrawReviewGraph("WaveLength [nm]","Reflectance [%]", waveLengthList.ToArray(), reflectanceList.ToArray());
-                p_transmittanceGraph.DrawReviewGraph("WaveLength [nm]", "Transmittance [%]", waveLengthList.ToArray(),transmittanceList.ToArray());
+                p_reflectanceGraph.DrawReviewGraph("Reflectacne","WaveLength [nm]","Reflectance [%]", waveLengthList.ToArray(), reflectanceList.ToArray());
+                p_transmittanceGraph.DrawReviewGraph("Transmittance","WaveLength [nm]", "Transmittance [%]", waveLengthList.ToArray(),transmittanceList.ToArray());
             }
             catch(Exception e)
             {

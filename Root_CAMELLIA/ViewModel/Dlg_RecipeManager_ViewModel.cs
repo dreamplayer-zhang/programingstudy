@@ -1256,7 +1256,35 @@ namespace Root_CAMELLIA
             {
                 se.SetBrush(GeneralTools.StageHoleBrush);
             }
+            int idx = 0;
             foreach(ShapeEllipse se in listSelectedPoint)
+            {
+                if (SetStartEndPointMode)
+                {
+                    int nDummyidx = -1;
+                    CCircle circle = dataManager.recipeDM.TeachingRD.DataSelectedPoint[idx];
+                    if (ContainsData(ListReorderPoint, circle, out nDummyidx))
+                    {
+                        se.SetBrush(System.Windows.Media.Brushes.Cyan);
+                        listPreviewSelectedPoint[idx].SetBrush(System.Windows.Media.Brushes.Cyan);
+                    }
+                    else
+                    {
+                        se.SetBrush(System.Windows.Media.Brushes.DarkBlue);
+                        listPreviewSelectedPoint[idx].SetBrush(System.Windows.Media.Brushes.DarkBlue);
+                    }
+                }
+                else
+                {
+                    se.SetBrush(GeneralTools.GbHole);
+                }
+                idx++;
+            }
+            foreach(ShapeEllipse se in listPreviewCandidatePoint)
+            {
+                se.SetBrush(GeneralTools.StageHoleBrush);
+            }
+            foreach(ShapeEllipse se in listPreviewSelectedPoint)
             {
                 se.SetBrush(GeneralTools.GbHole);
             }
@@ -1437,6 +1465,7 @@ namespace Root_CAMELLIA
             {
                 MouseMove = true;
                 RightMouseDown = true;
+                el.Focus();
                 if (ZoomScale == 1)
                 {
 
@@ -1533,6 +1562,12 @@ namespace Root_CAMELLIA
 
             }
             RedrawStage();
+        }
+
+        public void ClearData()
+        {
+            dataManager.recipeDM.TeachingRD = new RecipeData();
+            UpdateParameter();
         }
         public void OnMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
@@ -2295,7 +2330,7 @@ namespace Root_CAMELLIA
             }));
             
             sw.Stop();
-            System.Diagnostics.Debug.WriteLine("test " + sw.ElapsedMilliseconds);
+            //System.Diagnostics.Debug.WriteLine("test " + sw.ElapsedMilliseconds);
         }
 
         public void UpdateLayerGridView()
@@ -2313,8 +2348,9 @@ namespace Root_CAMELLIA
             {
                 dataManager.recipeDM.ModelData.MaterialList.Clear();
                 App.m_nanoView.m_MaterialList.Clear();
+                ModelPath = dataManager.recipeDM.TeachingRD.ModelRecipePath;
                 //LibSR_Met.DataManager.GetInstance().m_LayerData.Clear();
-                
+
                 //App.m_nanoView..Clear();
                 InitLayer();
             }
@@ -3234,6 +3270,21 @@ namespace Root_CAMELLIA
         #region ICommand&MethodAction
 
         #region ICommand
+        public ICommand UnloadedCommand
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    if (SetStartEndPointMode)
+                    {
+                        SetStartEndPointMode = false;
+                        ReorderBrush = normalBrush;
+                        PointAddMode = "Normal";
+                    }
+                });
+            }
+        }
         public ICommand CmdRouteOptimizaion
         {
             get

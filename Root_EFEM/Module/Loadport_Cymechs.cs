@@ -501,7 +501,7 @@ namespace Root_EFEM.Module
                     m_loadport.m_alidCMD.Run(true, "RS232 Connection Lost !!");
                     return "RS232 Connection Lost !!";
                 }
-                int nWait = 100 * secWait;
+                int nWait = 1000 * secWait;
                 while (nWait > 0)
                 {
                     if (EQ.IsStop()) 
@@ -898,6 +898,10 @@ namespace Root_EFEM.Module
             p_infoCarrier = new InfoCarrier(this, id, engineer, bEnableWaferSize, bEnableWaferCount);
             
             //m_rfid = rfid;
+            if (id == "LoadportA")
+                p_infoCarrier.p_sLocID = "LP1";
+            else if (id == "LoadportB")
+                p_infoCarrier.p_sLocID = "LP2";
             m_aTool.Add(p_infoCarrier);
             InitBase(id, engineer);
             InitEvent();
@@ -954,7 +958,7 @@ namespace Root_EFEM.Module
 
             string m_sSimulCarrierID = "CarrierID";
             bool m_bMapping = true;
-            bool m_bReadRFID = true;
+            public bool m_bReadRFID = true;
             public override ModuleRunBase Clone()
             {
                 Run_Docking run = new Run_Docking(m_module);

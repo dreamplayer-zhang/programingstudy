@@ -42,6 +42,15 @@ namespace RootTools_Vision
             return data;
         }
 
+        public static byte[] ConvertBufferToArrayRect(SharedBufferInfo info, Rect rect)
+        {
+            CRect cRect = new CRect((int)rect.Left, (int)rect.Top, (int)rect.Right, (int)rect.Bottom);
+            int size = cRect.Width * cRect.Height;//((int)rect.Width * (int)rect.Height);
+            byte[] dst = new byte[size];
+            Tools.ParallelImageCopy(info.PtrR_GRAY, info.Width, info.Height, cRect, dst);
+            return dst;
+        }
+
         public static Bitmap ConvertArrayToBitmapRect(byte[] rawData, int _width, int _height, int _byteCount, CRect _rect)
         {
             try
@@ -76,140 +85,14 @@ namespace RootTools_Vision
                     //Color Palette 만들줄 아는사람 넣어줘
                 }
 
+                return bmp;
             }
             catch
             {
-
+                return null;
             }
-            return null;
         }
-
-
-        // 이거 삭제 필요
-        public static Bitmap ConvertArrayToColorBitmap(IntPtr rawDataR, IntPtr rawDataG, IntPtr rawDataB, int _memWidth, int _byteCount, Rect rect)
-        {
-            try
-            {
-                System.Drawing.Imaging.PixelFormat format = System.Drawing.Imaging.PixelFormat.Format8bppIndexed;
-                if (_byteCount == 1)
-                {
-                    format = System.Drawing.Imaging.PixelFormat.Format8bppIndexed;
-                }
-                else if (_byteCount == 3)
-                {
-                    format = System.Drawing.Imaging.PixelFormat.Format24bppRgb;
-                }
-                else
-                {
-                    System.Windows.MessageBox.Show("지원하지 않는 PixelFormat입니다.");
-                    return null;
-                }
-
-                int stride = (int)Math.Ceiling((double)640 / 4) * 4;
-                Bitmap bmp = new Bitmap(640, 480, format);
-
-                ColorPalette palette = bmp.Palette;
-
-                if (_byteCount == 1)
-                {
-                    for (int i = 0; i < 256; i++)
-                        palette.Entries[i] = Color.FromArgb(i, i, i);
-
-                    bmp.Palette = palette;
-                }
-
-
-                BitmapData bmpData = bmp.LockBits(new Rectangle(0, 0, 640, 480), ImageLockMode.WriteOnly, format);
-
-                int centerX = (int)(rect.X + (rect.Width / 2));
-                int centerY = (int)(rect.Y + (rect.Height / 2));
-
-                Rect rt = new Rect();
-                int saveW = 640;
-                int saveH = 480;
-                if(rect.Width < saveW && rect.Height < saveH)
-                {
-                    rt.X = centerX - (saveW / 2);
-                    rt.Y = centerY - (saveH / 2);
-                    rt.Width = saveW;
-                    rt.Height = saveH;
-                }
-                else
-                {
-                    int nSaveW;
-                    int nSaveH;
-                    if (rect.Width > saveW)
-                        nSaveW = (int)rect.Width;
-                    else
-                        nSaveW = 640;
-
-                    if (rect.Height > saveH)
-                        nSaveH = (int)rect.Height;
-                    else
-                        nSaveH = 480;
-
-                    rt.X = (centerX - saveW / 2);
-                    rt.Y = (centerY - saveH / 2);
-                    rt.Width = nSaveW;
-                    rt.Height = nSaveH;
-                }
-                
-
-
-                IntPtr pointer = bmpData.Scan0;
-                {
-                    unsafe
-                    {
-                        byte* pPointer = (byte*)pointer.ToPointer();
-                        byte* pR = (byte*)rawDataR.ToPointer();
-                        byte* pG = (byte*)rawDataG.ToPointer();
-                        byte* pB = (byte*)rawDataB.ToPointer();
-
-                        for (int i = 0; i < rt.Y; i++)
-                        {
-                            pR += _memWidth;
-                            pG += _memWidth;
-                            pB += _memWidth;
-                        }
-
-                        pR += (int)rt.X;
-                        pG += (int)rt.X;
-                        pB += (int)rt.X;
-
-                        for (int i = 0; i < 480; i++)
-                        {
-                            for (int j = 0; j < 640; j++)
-                            {
-                                pPointer[i * (saveW * 3) + j * _byteCount + 0] = *(pB + j);
-                                pPointer[i * (saveW * 3) + j * _byteCount + 1] = *(pG + j);
-                                pPointer[i * (saveW * 3) + j * _byteCount + 2] = *(pR + j);
-                            }
-
-                            pR += _memWidth;
-                            pG += _memWidth;
-                            pB += _memWidth;
-                        }
-                    }
-                }
-                bmp.UnlockBits(bmpData);
-
-                if (rt.Width != 640 || rt.Height != 480)
-                {
-                    using (Graphics g = Graphics.FromImage(bmp))
-                    {
-                        g.DrawImage(bmp, 0, 0, saveW, saveH);
-                    }
-                }
-
-                return bmp;
-            }
-            catch (Exception)
-            {
-                //MessageBox.Show(ex.ToString());
-            }
-            return null;
-        }
-
+              
         public static Bitmap CovertBufferToBitmap(SharedBufferInfo info, Rect rect)
         {
             try
@@ -393,8 +276,7 @@ namespace RootTools_Vision
 
             return rst;
         }
-
-        
+                
         public unsafe static byte[] LoadBitmapToRawdata(string filepath, int* _width, int* _height)
         {
             byte[] resData = null;
@@ -471,6 +353,7 @@ namespace RootTools_Vision
                 dstB[i] = srcColor[i * 3 + 2];
             }
         }
+
         public static void ConvertRGB2Gray(byte[] srcColor, byte[] dstGray)
         {
             for (int i = 0; i < srcColor.Length / 3; i++)
@@ -478,6 +361,7 @@ namespace RootTools_Vision
                 dstGray[i] = (byte)(0.299 * srcColor[i * 3] + 0.587 * srcColor[i * 3 + 1] + 0.114 * srcColor[i * 3 + 2]);
             }
         }
+
         public static bool LoadBitmapToRawdata(string filepath, byte[] rawdata, int _width, int _height, int _byteCount)
         {
             //StopWatch stop = new StopWatch();
@@ -545,9 +429,7 @@ namespace RootTools_Vision
             }
             return null;
         }
-
         
-
         public static bool SaveImageJpg(SharedBufferInfo info, Rect rect, string savePath, long compressRatio)
         {
             Bitmap bmp = CovertBufferToBitmap(info, rect);
@@ -556,6 +438,7 @@ namespace RootTools_Vision
 
             return true;
         }
+        
         public static bool SaveImageJpg(Bitmap bmp, string savePath, long compressRatio)
         {
             try
@@ -579,10 +462,6 @@ namespace RootTools_Vision
                 return false;
             }
         }
-
-        
-        
-
 
         public static bool LoadBitmapToRawdata(string filepath, byte[] rawdata, ref int _width, ref int _height, ref int _byteCount)
         {
@@ -746,6 +625,44 @@ namespace RootTools_Vision
             //return obj;
         }
 
+        public static System.Windows.Media.Imaging.BitmapSource ConvertBitmapToSource(System.Drawing.Bitmap bitmap)
+        {
+            var bitmapData = bitmap.LockBits(
+                new System.Drawing.Rectangle(0, 0, bitmap.Width, bitmap.Height),
+                System.Drawing.Imaging.ImageLockMode.ReadWrite, bitmap.PixelFormat);
+
+
+            // Try creating a new image with a custom palette.
+
+
+            System.Windows.Media.Imaging.BitmapSource bitmapSource = null;
+            if (bitmap.PixelFormat == PixelFormat.Format8bppIndexed)
+            {
+                List<System.Windows.Media.Color> colors = new List<System.Windows.Media.Color>();
+                for (int i = 0; i < 256; i++)
+                    colors.Add(System.Windows.Media.Color.FromRgb((byte)i, (byte)i, (byte)i));
+                BitmapPalette palette = new BitmapPalette(colors);
+
+                bitmapSource = System.Windows.Media.Imaging.BitmapSource.Create(
+                bitmapData.Width, bitmapData.Height,
+                bitmap.HorizontalResolution, bitmap.VerticalResolution,
+                System.Windows.Media.PixelFormats.Indexed8, palette,
+                bitmapData.Scan0, bitmapData.Stride * bitmapData.Height, bitmapData.Stride);
+            }
+            else
+            {
+                bitmapSource = System.Windows.Media.Imaging.BitmapSource.Create(
+                bitmapData.Width, bitmapData.Height,
+                bitmap.HorizontalResolution, bitmap.VerticalResolution,
+                System.Windows.Media.PixelFormats.Bgr24, null,
+                bitmapData.Scan0, bitmapData.Stride * bitmapData.Height, bitmapData.Stride);
+            }
+
+
+            bitmap.UnlockBits(bitmapData);
+
+            return bitmapSource;
+        }
 
         public static string GetName<T>(Expression<Func<T>> expr)
         {
@@ -765,6 +682,7 @@ namespace RootTools_Vision
             }
             return bitmap;
         }
+
         public static T CreateInstance<T>()
         {
             return Activator.CreateInstance<T>();
@@ -802,44 +720,11 @@ namespace RootTools_Vision
             }
         }
 
-        public static System.Windows.Media.Imaging.BitmapSource ConvertBitmapToSource(System.Drawing.Bitmap bitmap)
+        public static Bitmap FlipYImage(System.Drawing.Bitmap source)
         {
-            var bitmapData = bitmap.LockBits(
-                new System.Drawing.Rectangle(0, 0, bitmap.Width, bitmap.Height),
-                System.Drawing.Imaging.ImageLockMode.ReadWrite, bitmap.PixelFormat);
-
-
-            // Try creating a new image with a custom palette.
-
-
-            System.Windows.Media.Imaging.BitmapSource bitmapSource = null;
-            if (bitmap.PixelFormat == PixelFormat.Format8bppIndexed)
-            {
-                List<System.Windows.Media.Color> colors = new List<System.Windows.Media.Color>();
-                for(int i = 0; i < 256; i++)
-                    colors.Add(System.Windows.Media.Color.FromRgb((byte)i, (byte)i, (byte)i));
-                BitmapPalette palette = new BitmapPalette(colors);
-
-                bitmapSource = System.Windows.Media.Imaging.BitmapSource.Create(
-                bitmapData.Width, bitmapData.Height,
-                bitmap.HorizontalResolution, bitmap.VerticalResolution,
-                System.Windows.Media.PixelFormats.Indexed8, palette,
-                bitmapData.Scan0, bitmapData.Stride * bitmapData.Height, bitmapData.Stride);
-            }
-            else
-            {
-                bitmapSource = System.Windows.Media.Imaging.BitmapSource.Create(
-                bitmapData.Width, bitmapData.Height,
-                bitmap.HorizontalResolution, bitmap.VerticalResolution,
-                System.Windows.Media.PixelFormats.Bgr24, null,
-                bitmapData.Scan0, bitmapData.Stride * bitmapData.Height, bitmapData.Stride);
-            }
-            
-
-            bitmap.UnlockBits(bitmapData);
-
-            return bitmapSource;
+            Bitmap dest = new Bitmap(source);
+            dest.RotateFlip(RotateFlipType.RotateNoneFlipY);
+            return dest;
         }
-
     }
 }

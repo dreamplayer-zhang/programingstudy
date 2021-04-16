@@ -590,7 +590,7 @@ namespace RootTools.ToolBoxs
         ToolSet m_toolSetParticleCounter = null;
         public string Get(ref LasairIII value, ModuleBase module, string id)
         {
-            if (m_toolSetPrinter == null) m_toolSetParticleCounter = InitToolSet("ParticleCounter");
+            if (m_toolSetParticleCounter == null) m_toolSetParticleCounter = InitToolSet("ParticleCounter");
             if (value == null)
             {
                 value = new LasairIII(module.p_id + "." + id, module.m_log);
@@ -602,7 +602,7 @@ namespace RootTools.ToolBoxs
 
         public string Get(ref AirnetII_310 value, ModuleBase module, string id)
         {
-            if (m_toolSetPrinter == null) m_toolSetParticleCounter = InitToolSet("ParticleCounter");
+            if (m_toolSetParticleCounter == null) m_toolSetParticleCounter = InitToolSet("ParticleCounter");
             if (value == null)
             {
                 value = new AirnetII_310(module.p_id + "." + id, module.m_log);

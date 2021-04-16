@@ -1,4 +1,5 @@
 ﻿using RootTools;
+using RootTools.Control;
 using RootTools.Module;
 using RootTools.Trees;
 using System.Threading;
@@ -8,10 +9,49 @@ namespace Root_VEGA_P_Vision.Module
     public class Holder : ModuleBase, IRTRChild
     {
         #region ToolBox
+        DIO_I2O2 m_dioLifter;
+        DIO_I m_diCover;
+        DIO_I m_diPlate;
+        DIO_I m_diExist; 
         public override void GetTools(bool bInit)
         {
-            //forget
+            if (p_eRemote == eRemote.Server)
+            {
+                p_sInfo = m_toolBox.GetDIO(ref m_diCover, this, "Cover Check");
+                p_sInfo = m_toolBox.GetDIO(ref m_diPlate, this, "Plate Check");
+                p_sInfo = m_toolBox.GetDIO(ref m_diExist, this, "Exist");
+                p_sInfo = m_toolBox.GetDIO(ref m_dioLifter, this, "Lifter", "Down", "Up");
+            }
             m_remote.GetTools(bInit);
+        }
+        #endregion
+
+        #region DIO
+        public enum eCheck
+        {
+            Empty,
+            Cover,
+            Plate,
+            Error
+        }
+
+        public eCheck CheckSensor()
+        {
+            if (m_diExist.p_bIn)
+            {
+                if (m_diCover.p_bIn && !m_diPlate.p_bIn) return eCheck.Cover;
+                if (!m_diCover.p_bIn && m_diPlate.p_bIn) return eCheck.Plate;
+                return eCheck.Error;
+            }
+            else
+            {
+                return (m_diCover.p_bIn || m_diPlate.p_bIn) ? eCheck.Error : eCheck.Empty;
+            }
+        }
+
+        public string RunLifter(bool bUp)
+        {
+            return m_dioLifter.RunSol(bUp); 
         }
         #endregion
 

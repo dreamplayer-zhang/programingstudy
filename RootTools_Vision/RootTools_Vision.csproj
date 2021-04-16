@@ -219,6 +219,12 @@
     <Compile Include="SingleObject.cs" />
     <Compile Include="Utility\TempLogger.cs" />
     <Compile Include="Utility\Tools.Inspection.cs" />
+    <Compile Include="WorkManager3\FixedSizeList.cs" />
+    <Compile Include="WorkManager3\TaskManager.cs" />
+    <Compile Include="WorkManager3\RecipeToWorkConverter.cs" />
+    <Compile Include="WorkManager3\RecipeToWorkplaceConverter.cs" />
+    <Compile Include="WorkManager3\WorkManager.cs" />
+    <Compile Include="WorkManager3\WorkPipe.cs" />
     <Compile Include="WorkManager\CloneableWorkBase.cs" />
     <Compile Include="WorkManager\DebugOutput.cs" />
     <Compile Include="WorkManager\Interfaces\IWorkplaceBundle.cs" />
@@ -231,6 +237,7 @@
     <Compile Include="WorkManager\WorkEventManagerArgs.cs" />
     <Compile Include="WorkManager\WorkFactory.cs" />
     <Compile Include="WorkManager\WorkManager.cs" />
+    <Compile Include="WorkManager3\WorkPipeLine.cs" />
     <Compile Include="WorkManager\Workplace.cs" />
     <Compile Include="WorkManager\WorkplaceBundle.cs" />
     <Compile Include="Inspection\ProcessDefect.cs" />

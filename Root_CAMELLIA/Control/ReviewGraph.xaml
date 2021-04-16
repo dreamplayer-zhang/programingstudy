@@ -13,6 +13,6 @@
             <RowDefinition Height="10*"/>
         </Grid.RowDefinitions>
         <Label Name="labelReview" Grid.Row="0" VerticalContentAlignment="Center" FontStretch="SemiExpanded" FontFamily="Consolas"/>
-        <WpfPlot Name ="ReviewGraphDraw" MouseMove="ReviewGraph_MouseMove" Grid.Row="1"/>
+        <WpfPlot Name ="ReviewGraphDraw" Grid.Row="1"/>
     </Grid>
 </UserControl>

@@ -77,6 +77,7 @@ namespace RootTools_Vision
             }
         }
 
+        //이거 없어도될듯
         public int InspectionBufferOffsetX
         {
             get => this.inspectionBufferOffsetX;

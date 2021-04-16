@@ -59,6 +59,21 @@ namespace Root_CAMELLIA.Module
             {
                 return p_sInfo;
             }
+            Camera_Basler VRS = m_module.p_CamVRS;
+            StopWatch sw = new StopWatch();
+            if (VRS.p_CamInfo._OpenStatus == false) VRS.Connect();
+            while (VRS.p_CamInfo._OpenStatus == false)
+            {
+                if (sw.ElapsedMilliseconds > 15000)
+                {
+                    sw.Stop();
+                    return "Navigation Camera Not Connected";
+                }
+            }
+            sw.Stop();
+
+
+
             //Camera Light Off
             m_module.SetLight(false);
             m_log.Info("[CheckCSSAlign] Camera Light Off");
@@ -67,7 +82,7 @@ namespace Root_CAMELLIA.Module
             //카메라 연결 확인 // 조명값 0
             string strVRSImageDir = "D:\\Temp\\";
             string strVRSImageFullPath = "";
-            Camera_Basler VRS = m_module.p_CamVRS;
+
             ImageData img = VRS.p_ImageViewer.p_ImageData;
             m_log.Info("[CheckCSSAlign] Navigation Camera Ready");
             //Z축 이동 준비
@@ -188,6 +203,7 @@ namespace Root_CAMELLIA.Module
             {
                 m_log.Info("[CheckCSSAlign] Error");
             }
+            m_module.mwvm.EngineerViewModel.p_PMCheckReview_ViewModel.m_pmSensorTilt_VM.p_pmSenserCamera.p_SensorCameraAlign = m_PMData.dAlign_ResultDeg;
 
             return "OK";
         }

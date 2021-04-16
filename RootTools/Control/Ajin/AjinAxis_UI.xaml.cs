@@ -92,12 +92,12 @@ namespace RootTools.Control.Ajin
         #endregion
 
         #region Jog
-        private void buttonJogM3_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e) { Jog(-1); }
-        private void buttonJogM2_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e) { Jog(-0.31); }
-        private void buttonJogM1_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e) { Jog(-0.1); }
-        private void buttonJogP1_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e) { Jog(0.1); }
-        private void buttonJogP2_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e) { Jog(0.31); }
-        private void buttonJogP3_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e) { Jog(1); }
+        private void buttonJogM3_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e) { EQ.p_bStop = false; Jog(-1); }
+        private void buttonJogM2_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e) { EQ.p_bStop = false; Jog(-0.31); }
+        private void buttonJogM1_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e) { EQ.p_bStop = false; Jog(-0.1); }
+        private void buttonJogP1_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e) { EQ.p_bStop = false; Jog(0.1); }
+        private void buttonJogP2_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e) { EQ.p_bStop = false; Jog(0.31); }
+        private void buttonJogP3_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e) { EQ.p_bStop = false; Jog(1); }
 
         private void buttonJog_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
@@ -108,8 +108,8 @@ namespace RootTools.Control.Ajin
 
         void Jog(double fScale)
         {
-            if (m_bRepeat) return; 
-            if (m_axis.p_eState != Axis.eState.Ready) return;
+            if (m_bRepeat) return;
+            //if (m_axis.p_eState != Axis.eState.Ready) return;
             m_axis.Jog(fScale, comboSpeedJog.Text); 
         }
         #endregion

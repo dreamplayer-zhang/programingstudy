@@ -182,7 +182,6 @@ namespace Root_CAMELLIA
                     childrenList.Add(item1);
                 }
 
-                int count = 0;
                 Application.Current.Dispatcher.Invoke(new Action(() =>
                 {
                     foreach (FileInfo file in di.GetFiles())

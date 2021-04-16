@@ -108,7 +108,8 @@ namespace RootTools.Inspects
 
 
 					List<DefectDataWrapper> arrDefects = new List<DefectDataWrapper>();
-					if (m_InspProp.p_InspType == InspectionType.AbsoluteSurface || m_InspProp.p_InspType == InspectionType.RelativeSurface)
+					if (m_InspProp.p_InspType == InspectionType.AbsoluteSurfaceDark || m_InspProp.p_InspType == InspectionType.RelativeSurfaceDark ||
+						m_InspProp.p_InspType == InspectionType.AbsoluteSurfaceBright || m_InspProp.p_InspType == InspectionType.RelativeSurfaceBright)
 					{
 						unsafe
 						{

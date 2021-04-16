@@ -40,12 +40,7 @@
                     <ColumnDefinition Width="auto"/>
                     <ColumnDefinition Width="auto"/>
                 </Grid.ColumnDefinitions>
-                <TextBlock Text="Camellia Ⅱ - Version 0.0.1"
-                       FontSize="11"
-                       Foreground="Black"
-                       VerticalAlignment="Center"
-                       Margin="5,0,0,0"
-                       Grid.Column="0" />
+                <TextBlock Grid.Column="1" Text="{Binding Path=Version, Source={x:Static local:BaseDefine.Configuration}}"  FontSize="11" Foreground="Black" VerticalAlignment="Center" Margin="5,0,0,0"/>
                 <TextBlock Text="{Binding RecipePath}"
                        FontSize="11"
                        Foreground="Black"

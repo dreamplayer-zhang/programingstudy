@@ -14,12 +14,14 @@ using Root_CAMELLIA.Module;
 using Emgu.CV;
 using Emgu.CV.Structure;
 using System.Windows.Media.Imaging;
+using Met = Root_CAMELLIA.LibSR_Met;
 
 
 namespace Root_CAMELLIA
 {
     public class PM_SensorCameraTilt_ViewModel : ObservableObject
     {
+        #region  VRS Camera View Image
         public PM_SensorCameraTilt_ViewModel()
         {
             ImageGrab();
@@ -37,16 +39,11 @@ namespace Root_CAMELLIA
             Mat mat = new Mat(new System.Drawing.Size(p_CamVRS.GetRoiSize().X, p_CamVRS.GetRoiSize().Y), Emgu.CV.CvEnum.DepthType.Cv8U, 3, p_CamVRS.p_ImageViewer.p_ImageData.GetPtr(), (int)p_CamVRS.p_ImageViewer.p_ImageData.p_Stride * 3);
             Image<Bgra, byte> img = mat.ToImage<Bgra, byte>();
 
-            //CvInvoke.Imshow("aa",img.Mat);
-            //CvInvoke.WaitKey(0);
-            //CvInvoke.DestroyAllWindows();
-            //p_rootViewer.p_ImageData = new ImageData(p_CamVRS.p_ImageViewer.p_ImageData);
-            //lock (lockObject)
-            //{
-
             p_imageSource = ImageHelper.ToBitmapSource(img);
-            //}
-            //p_rootViewer.SetImageSource();
+
+            double axisX_Position = ModuleCamellia.p_axisXY.p_axisX.p_posActual;
+            double axisY_Position = ModuleCamellia.p_axisXY.p_axisY.p_posActual;
+
         }
 
         BitmapSource m_imageSource;
@@ -74,5 +71,41 @@ namespace Root_CAMELLIA
                 SetProperty(ref moduleCamellia, value);
             }
         }
+
+        #endregion
+
+        #region SensorCameraTilt Result
+
+        PM_SensorCamera_Result m_pmSensorCameraResult = new PM_SensorCamera_Result();
+        public PM_SensorCamera_Result p_pmSenserCamera
+        {
+            get
+            {
+                return m_pmSensorCameraResult;
+            }
+            set
+            {
+                SetProperty(ref m_pmSensorCameraResult, value);
+            }
+        }
+
+        public class PM_SensorCamera_Result : ObservableObject
+        {
+            double m_SensorCameraAlign = 0.0;
+            public double p_SensorCameraAlign
+            {
+                get
+                {
+                    return m_SensorCameraAlign;
+                }
+                set
+                {
+                    SetProperty(ref m_SensorCameraAlign, value);
+                }
+            }
+
+
+        }
+        #endregion
     }
 }

@@ -47,19 +47,59 @@
             <RowDefinition />
         </Grid.RowDefinitions>
 
-        <TextBox Margin="4"  Text="{Binding SearchName, UpdateSourceTrigger=PropertyChanged}" />
+
+        <Grid Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition />
+                <ColumnDefinition Width="30"/>
+            </Grid.ColumnDefinitions>
+            <TextBox Grid.Column="0" 
+                 Margin="4"  
+                 Text="{Binding SearchProductName, UpdateSourceTrigger=PropertyChanged}" />
+            <Button Grid.Column="1"
+                    Margin="0,4,4,4"
+                    FontSize="14"
+                    FontWeight="Bold"
+                    Content="+"
+                    Command="{Binding btnCreateProductCommand}"/>
+        </Grid>
+        
+        
         <DataGrid Grid.Row="1" 
                   Margin="4,0,4,4" 
                   ItemsSource="{Binding ProductListItems}" 
                   SelectedItem="{Binding SelectedProductItem}"
                   IsReadOnly="True">
         </DataGrid>
+
+
+        <Grid Grid.Row="0"
+              Grid.Column="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition />
+                <ColumnDefinition Width="30"/>
+            </Grid.ColumnDefinitions>
+            <TextBox Grid.Column="0" 
+                 Margin="4"  
+                 Text="{Binding SearchStepName, UpdateSourceTrigger=PropertyChanged}" />
+            <Button Grid.Column="1"
+                    Margin="0,4,4,4"
+                    FontSize="14"
+                    FontWeight="Bold"
+                    Content="+"
+                    Command="{Binding btnCreateStepCommand}"/>
+        </Grid>
         <DataGrid  Grid.Column="1"
                    Grid.Row="1"
                    Margin="4,0,4,4"
                    ItemsSource="{Binding StepListItems}"
                    SelectedItem="{Binding SelectedStepItem}"
                    IsReadOnly="True">
+            <DataGrid.InputBindings>
+                <MouseBinding Gesture="LeftDoubleClick" 
+                              Command="{Binding stepItemDoubleClickCommand}" 
+                              CommandParameter="{Binding ElementName=UsersDataGrid, Path=SelectedItem}" />
+            </DataGrid.InputBindings>
         </DataGrid>
     </Grid>
 </UserControl>

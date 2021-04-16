@@ -59,6 +59,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>bin\Release\NanoView.dll</HintPath>
     </Reference>
+    <Reference Include="netchartdir, Version=6.4.0.0, Culture=neutral, PublicKeyToken=2db5fc05de12e204, processorArchitecture=MSIL">
+      <HintPath>..\packages\ChartDirector.Net.6.4.0\lib\net40\netchartdir.dll</HintPath>
+    </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
     <Reference Include="ScottPlot, Version=4.0.39.0, Culture=neutral, PublicKeyToken=86698dc10387c39e, processorArchitecture=MSIL">
@@ -88,6 +91,9 @@
   <ItemGroup>
     <Compile Include="Calculation.cs" />
     <Compile Include="ConstValue.cs" />
+    <Compile Include="CountourMap.xaml.cs">
+      <DependentUpon>CountourMap.xaml</DependentUpon>
+    </Compile>
     <Compile Include="DataManager.cs" />
     <Compile Include="ExtensionMethod.cs" />
     <Compile Include="LogManager.cs" />
@@ -118,6 +124,10 @@
     <Resource Include="Resources\graph csv.png" />
   </ItemGroup>
   <ItemGroup>
+    <Page Include="CountourMap.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="RTGraph.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

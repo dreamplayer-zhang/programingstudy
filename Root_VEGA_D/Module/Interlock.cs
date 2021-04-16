@@ -3,6 +3,8 @@ using RootTools.Control;
 using RootTools.GAFs;
 using RootTools.Module;
 using RootTools.Trees;
+using Root_VEGA_D.Engineer;
+using RootTools.Control.ACS;
 using System.Threading;
 
 namespace Root_VEGA_D.Module
@@ -70,8 +72,10 @@ namespace Root_VEGA_D.Module
         ALID m_alidMCReset_EMS;
         ALID m_alidMCReset_EMO;
         ALID m_alidDoorLock;
-        ALID m_alidCDA1;
-        ALID m_alidCDA2;
+        ALID m_alidCDA1_Low;
+        ALID m_alidCDA1_High;
+        ALID m_alidCDA2_Low;
+        ALID m_alidCDA2_High;
         ALID m_alidEFEMLeft_Door;
         ALID m_alidEFEMRight_Door;
         ALID m_alidActiveIsolator_Alarm;
@@ -93,8 +97,10 @@ namespace Root_VEGA_D.Module
             m_alidMCReset_EMS = m_gaf.GetALID(this, "MC Reset (EMS)", "MC Reset Error");
             m_alidMCReset_EMO = m_gaf.GetALID(this, "MC Reset (EMO)", "MC Reset Error");
             m_alidDoorLock = m_gaf.GetALID(this, "Door Lock", "Door Lock Error");
-            m_alidCDA1 = m_gaf.GetALID(this, "CDA1 Pressure", "CDA1 Pressure Error");
-            m_alidCDA2 = m_gaf.GetALID(this, "CDA2 Pressure", "CDA2 Pressure Error");
+            m_alidCDA1_Low = m_gaf.GetALID(this, "CDA1 Pressure Low Alarm", "CDA1 Pressure Low Error");
+            m_alidCDA1_High = m_gaf.GetALID(this, "CDA1 Pressure Low Alarm", "CDA1 Pressure Low Error");
+            m_alidCDA2_Low = m_gaf.GetALID(this, "CDA2 Pressure", "CDA2 Pressure Low Error");
+            m_alidCDA2_High = m_gaf.GetALID(this, "CDA2 Pressure", "CDA2 Pressure High Error");
             m_alidEFEMLeft_Door = m_gaf.GetALID(this, "EFEM Left Door", "EFEM Left Door Open");
             m_alidEFEMRight_Door = m_gaf.GetALID(this, "EFEM Right Door", "EFEM Right Door Open");
             m_alidVisionFFU_Door = m_gaf.GetALID(this, "Vision FFU Door", "Vision FFU Door Open");
@@ -112,7 +118,23 @@ namespace Root_VEGA_D.Module
             m_alidProtectionbar = m_gaf.GetALID(this, "Protectionbar", "Protectionbar Check Error");
         }
         #endregion
-
+        #region FDC
+        double CDA1_Value;
+        double CDA2_Value;
+        public void CheckFDC()
+		{
+            //CDA1_Value = m_ACS.GetAnalogData(m_diCDA1.m_bitDI.m_nID);
+            //CDA2_Value = m_ACS.GetAnalogData(m_diCDA2.m_bitDI.m_nID);
+            //if (CDA1_Value < m_mmLimitCDA1.X)
+            //{ m_alidCDA1_Low.Run(true, "CDA1_Value Pressure Lower than Limit"); }
+            //if (CDA1_Value > m_mmLimitCDA1.Y)
+            //{ m_alidCDA1_High.Run(true, "CDA1_Value Pressure Higher than Limit"); }
+            //if (CDA2_Value < m_mmLimitCDA2.X)
+            //{ m_alidCDA2_Low.Run(true, "CDA2_Value Pressure Lower than Limit"); }
+            //if (CDA2_Value > m_mmLimitCDA2.Y)
+            //{ m_alidCDA2_High.Run(true, "CDA2_Value Pressure Higher than Limit"); }
+        }
+        #endregion
         #region Thread
         protected override void RunThread()
         {
@@ -128,8 +150,10 @@ namespace Root_VEGA_D.Module
             {
                 m_alidDoorLock.Run(!m_diDoorLock.p_bIn, "Please Check Door Lock");
             }
-            m_alidCDA1.Run(!m_diCDA1.p_bIn, "Please Check CDA1 Pressure Sensor");
-            m_alidCDA2.Run(!m_diCDA2.p_bIn, "Please Check CDA2 Pressure Sensor");
+            CheckFDC();
+
+            //m_alidCDA1.Run(!m_diCDA1.p_bIn, "Please Check CDA1 Pressure Sensor");
+            //m_alidCDA2.Run(!m_diCDA2.p_bIn, "Please Check CDA2 Pressure Sensor");
 
             m_alidEFEMLeft_Door.Run(!m_diEFEMLeft_Door.p_bIn, "EFEM Left Door Open");
             m_alidEFEMRight_Door.Run(!m_diEFEMRight_Door.p_bIn, "EFEM Right Door Open");
@@ -163,18 +187,29 @@ namespace Root_VEGA_D.Module
         public override void RunTree(Tree tree)
         {
             RunTreeInterLock(tree.GetTree("Option", false));
+            RunTreeFDC(tree.GetTree("FDC Module", false));
             base.RunTree(tree);
         }
+        void RunTreeFDC(Tree tree)
+        {
+            m_mmLimitCDA1 = tree.Set(m_mmLimitCDA1, m_mmLimitCDA1, "Limit", "FDC CDA1 Lower & Upper Limit");
+            m_mmLimitCDA2 = tree.Set(m_mmLimitCDA2, m_mmLimitCDA2, "Limit", "FDC CDA2 Lower & Upper Limit");
+        }
+
         void RunTreeInterLock(Tree tree)
         {
             m_bLightCurtain_Use = tree.Set(m_bLightCurtain_Use, m_bLightCurtain_Use, "LightCurtain Use", "LightCurtain Use");
             m_bProtectionbar_Use = tree.Set(m_bProtectionbar_Use, m_bProtectionbar_Use, "Protectionbar Use", "Protectionbar Use");
         }
         #endregion
-
-        public Interlock(string id, IEngineer engineer)
+        public RPoint m_mmLimitCDA1 = new RPoint();
+        public RPoint m_mmLimitCDA2 = new RPoint();
+        ALID[] m_alid = new ALID[2] { null, null };
+        ACS m_ACS;
+        public Interlock(string id, IEngineer engineer,ACS acs)
         {
             p_id = id;
+            m_ACS = acs;
             base.InitBase(id, engineer);
         }
     }
