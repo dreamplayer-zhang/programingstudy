@@ -218,9 +218,9 @@ namespace Root_CAMELLIA.Module
                 if (n <= m_PMData.arrCheckWavelength.Count())
                 {
 
-                    m_module.mwvm.EngineerViewModel.p_PMCheckReview_ViewModel.m_pmReflectance_VM.DrawPMGraph(m_PMData.nSensorTiltRepeatNum,n,m_PMData.m_CalPMReflectance[n].dWavelength, m_PMData.m_CalPMReflectance[n].dDiffReflectance);
+                    m_module.mwvm.EngineerViewModel.p_PMCheckReview_ViewModel.m_pmReflectance_VM.DrawPMGraph(n, m_PMData);
                 }
-                m_module.mwvm.EngineerViewModel.p_PMCheckReview_ViewModel.m_pmReflectance_VM.PMResultDataGrid(n,m_PMData);
+                m_module.mwvm.EngineerViewModel.p_PMCheckReview_ViewModel.m_pmReflectance_VM.PMResultDataGrid(n, m_PMData);
             }
 
 
