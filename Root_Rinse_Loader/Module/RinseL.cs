@@ -250,7 +250,6 @@ namespace Root_Rinse_Loader.Module
         #endregion
 
         #region ToolBox
-        DIO_I m_diAirEmergency;
         public TCPIPClient m_tcpip; 
         public override void GetTools(bool bInit)
         {
