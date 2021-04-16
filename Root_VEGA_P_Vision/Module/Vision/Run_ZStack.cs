@@ -74,6 +74,8 @@ namespace Root_VEGA_P_Vision.Module
                 AxisXY axisXY = m_module.m_stage.m_axisXY;
                 Axis axisZ = mainOpt.m_axisZ;
 
+                double dTriggerStartPosZ = nstartPos;
+                double dTriggerEndPosZ = nendPos;
 
                 if (m_module.Run(axisXY.StartMove(new RPoint(ZStackGrabMode.m_rpAxisCenter.X, ZStackGrabMode.m_rpAxisCenter.Y))))
                     return p_sInfo;
@@ -85,15 +87,19 @@ namespace Root_VEGA_P_Vision.Module
                 //MemoryData mem = mainOpt.GetMemoryData(parts, Vision.MainOptic.eInsp.Stack, upDown);
 
                 MemoryData mem = mainOpt.GetMemoryData(InfoPod.ePod.EIP_Cover, Vision.MainOptic.eInsp.Stack, Vision.eUpDown.Front);
+                nstep = mem.p_nCount - 1;
+                double dstep = Math.Abs(nendPos - nstartPos) / nstep;
+                axisZ.SetTrigger(dTriggerStartPosZ, dTriggerEndPosZ, dstep, true);
 
                 FocusStacking_new fs = new FocusStacking_new(mem);
                 int nCamWidth = ZStackGrabMode.m_camera.GetRoiSize().X;
                 int nCamHeight = ZStackGrabMode.m_camera.GetRoiSize().Y;
+
+                ZStackGrabMode.StartZGrab(mem, nstep); //여기선 진자 찍는것만
+
+                /*double dstep = Math.Abs(nendPos - nstartPos) / nstep;  //area camera
+
                 nstep = mem.p_nCount - 1;
-
-
-                double dstep = Math.Abs(nendPos - nstartPos) / nstep;
-
                 for (int step = 0; step < nstep; step++)
                 {
                     double dPosZ = nstartPos + step * dstep;
@@ -113,7 +119,7 @@ namespace Root_VEGA_P_Vision.Module
                     });
 
                     Thread.Sleep(100);
-                }
+                }*/
 
                 fs.Run(nCamWidth, nCamHeight);
             }
