@@ -96,7 +96,7 @@ namespace Root_Rinse_Loader.Module
 
         public string RunRotate(bool bRotate)
         {
-            if (bRotate) m_axisRotate.Jog(m_rinse.p_fRotateSpeed);
+            if (bRotate) m_axisRotate.Jog(m_rinse.p_fRotateSpeed, "Move");
             else m_axisRotate.StopAxis(); 
             return "OK"; 
         }

@@ -298,14 +298,20 @@ namespace RootTools.Camera.Dalsa
             m_SapGrabber.GetParameter(SapAcquisition.Prm.CROP_HEIGHT, out m_Height);
 
             string res;
-            m_sapCam.GetFeatureValue("DeviceScanType", out res);
-            if (!res.Equals("Linescan"))
-                m_sapCam.SetFeatureValue("DeviceScanType", "Linescan");
+            if (m_sapCam != null)
+            {
+                m_sapCam.GetFeatureValue("DeviceScanType", out res);
+                if (!res.Equals("Linescan"))
+                    m_sapCam.SetFeatureValue("DeviceScanType", "Linescan");
+            }
             p_eDeviceScanType = eDeviceScanType.Linescan;
 
-            m_sapCam.GetFeatureValue("TriggerMode", out res);
-            if (!res.Equals("External"))
-                m_sapCam.SetFeatureValue("TriggerMode", "External");
+            if(m_sapCam != null)
+            {
+                m_sapCam.GetFeatureValue("TriggerMode", out res);
+                if (!res.Equals("External"))
+                    m_sapCam.SetFeatureValue("TriggerMode", "External");
+            }
             p_eTriggerMode = eTriggerMode.External;
 
         }
