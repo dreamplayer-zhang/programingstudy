@@ -1879,27 +1879,34 @@ namespace Root_AOP01_Inspection.Module
                     
 					int defectCode = 10000;
 
+                    var inspType = InspectionType.AbsoluteSurfaceDark;
+                    if(BrightGV)
+					{
+                        inspType = InspectionType.AbsoluteSurfaceBright;
+					}
+
                     switch (currentMgmName)
                     {
                         case App.SideLeftInspMgRegName:
                             targetViewModel = UIManager.Instance.SetupViewModel.m_RecipeEdge.p_ImageViewerLeft_VM;
-							defectCode = InspectionManager.MakeDefectCode(InspectionTarget.SideInspectionLeft, InspectionType.AbsoluteSurface, 0);
+							defectCode = InspectionManager.MakeDefectCode(InspectionTarget.SideInspectionLeft, inspType, 0);
+
                             break;
                         case App.SideTopInspMgRegName:
                             targetViewModel = UIManager.Instance.SetupViewModel.m_RecipeEdge.p_ImageViewerTop_VM;
-							defectCode = InspectionManager.MakeDefectCode(InspectionTarget.SideInspectionTop, InspectionType.AbsoluteSurface, 0);
+							defectCode = InspectionManager.MakeDefectCode(InspectionTarget.SideInspectionTop, inspType, 0);
                             break;
                         case App.SideBotInspMgRegName:
                             targetViewModel = UIManager.Instance.SetupViewModel.m_RecipeEdge.p_ImageViewerBot_VM;
-							defectCode = InspectionManager.MakeDefectCode(InspectionTarget.SideInspectionBottom, InspectionType.AbsoluteSurface, 0);
+							defectCode = InspectionManager.MakeDefectCode(InspectionTarget.SideInspectionBottom, inspType, 0);
                             break;
                         case App.SideRightInspMgRegName:
                             targetViewModel = UIManager.Instance.SetupViewModel.m_RecipeEdge.p_ImageViewerRight_VM;
-							defectCode = InspectionManager.MakeDefectCode(InspectionTarget.SideInspectionRight, InspectionType.AbsoluteSurface, 0);
+							defectCode = InspectionManager.MakeDefectCode(InspectionTarget.SideInspectionRight, inspType, 0);
                             break;
                         case App.PellInspMgRegName:
                             targetViewModel = UIManager.Instance.SetupViewModel.m_Recipe45D.p_ImageViewer_VM;
-							defectCode = InspectionManager.MakeDefectCode(InspectionTarget.Pellcile45, InspectionType.AbsoluteSurface, 0);
+							defectCode = InspectionManager.MakeDefectCode(InspectionTarget.Pellcile45, inspType, 0);
                             break;
                         //case App.BackInspMgRegName:
                         //	targetList = new List<TRect>(mainEdgeList[6]);
@@ -1908,7 +1915,7 @@ namespace Root_AOP01_Inspection.Module
                         case App.MainInspMgRegName:
                         default:
                             targetViewModel = UIManager.Instance.SetupViewModel.m_RecipeFrontSide.p_ImageViewer_VM;
-							defectCode = InspectionManager.MakeDefectCode(InspectionTarget.Chrome, InspectionType.AbsoluteSurface, 0);
+							defectCode = InspectionManager.MakeDefectCode(InspectionTarget.Chrome, inspType, 0);
                             break;
                     }
 
