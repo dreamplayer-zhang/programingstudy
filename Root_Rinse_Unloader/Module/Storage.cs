@@ -172,17 +172,22 @@ namespace Root_Rinse_Unloader.Module
             return m_axis.WaitReady();
         }
 
-        double m_posStackReady = -100000;
         double m_fJogScale = 1;
         public string MoveStackReady()
         {
-            MoveStack();
+            if (m_stack.p_bLevel)
+            {
+                m_axis.Jog(-m_fJogScale, "Move");
+                while (m_stack.p_bLevel && (EQ.IsStop() == false)) Thread.Sleep(10);
+                m_axis.StopAxis();
+                Thread.Sleep(500);
+            }
+            m_axis.Jog(m_fJogScale, "Move");
+            while (!m_stack.p_bLevel && (EQ.IsStop() == false)) Thread.Sleep(10);
+            m_axis.StopAxis();
+            m_axis.WaitReady();
+            Thread.Sleep(500);
             return "OK";
-        }
-
-        public bool p_bIsEnablePick
-        {
-            get { return Math.Abs(m_posStackReady - m_axis.p_posCommand) < 10; }
         }
 
         void RunTreeElevator(Tree tree)
@@ -269,12 +274,13 @@ namespace Root_Rinse_Unloader.Module
         {
             switch (m_rinse.p_eMode)
             {
-                case RinseU.eRunMode.Stack:
-                    StartMoveStackReady();
-                    break;
                 case RinseU.eRunMode.Magazine:
                     StartMoveMagazine(false);
-                    break; 
+                    break;
+                case RinseU.eRunMode.Stack:
+                    MoveStack(); 
+                    StartMoveStackReady();
+                    break;
             }
         }
         #endregion
