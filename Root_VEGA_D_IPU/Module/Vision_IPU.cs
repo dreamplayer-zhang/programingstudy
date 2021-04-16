@@ -401,6 +401,9 @@ namespace Root_VEGA_D_IPU.Module
                             reg.Write(REGSUBKEYNAME_GRABLINESCANSTATE, grabLineScanState);
 
                             // 이미지 검사 시작
+                            // (임시처리 - 검사 거치지 않고 마지막 라인일경우 바로 Result 메세지 전달)
+                            if(grabLineScanState == "")
+                                m_tcpipCommClient.SendMessage(TCPIPComm_VEGA_D.Command.Result);
                             
 
                             EQ.p_bStop = true;

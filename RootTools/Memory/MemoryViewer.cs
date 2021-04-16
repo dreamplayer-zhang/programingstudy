@@ -437,11 +437,6 @@ namespace RootTools.Memory
                             byte b2 = (byte)(*(pSrc + aX[x] + 1) << 4);
                             aBuf[ix + iy] = 0;
                             aBuf[ix + iy + 1] = (byte)(b1 | b2);
-
-                            //byte b1 = *(pSrc + aX[x]);
-                            //byte b2 = *(pSrc + aX[x] + 1);
-                            //ushort us = BitConverter.ToUInt16(new byte[] { b1, b2 }, 0);
-                            //byte b = (byte)(((double)us / (Math.Pow(2, 12) - 1)) * (Math.Pow(2, 8) - 1));
                         }
                         break;
                     case 3:

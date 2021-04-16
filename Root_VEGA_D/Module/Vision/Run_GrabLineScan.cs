@@ -189,7 +189,7 @@ namespace Root_VEGA_D.Module
                         m_module.TcpipCommServer.SendMessage(TCPIPComm_VEGA_D.Command.LineStart, mapParam);
                     }
 
-                    //카메라 그랩 시작
+                    // 카메라 그랩 시작
                     string strPool = m_grabMode.m_memoryPool.p_id;
                     string strGroup = m_grabMode.m_memoryGroup.p_id;
                     string strMemory = m_grabMode.m_memoryData.p_id;
@@ -219,7 +219,10 @@ namespace Root_VEGA_D.Module
                         m_module.TcpipCommServer.SendMessage(TCPIPComm_VEGA_D.Command.LineEnd);
 
                     // X축을 미리 움직임
-                    axisXY.p_axisX.StartMove(dNextPosX);
+                    //if (m_module.Run(axisXY.p_axisX.StartMove(dNextPosX)))
+                    //    return p_sInfo;
+                    //if (m_module.Run(axisXY.p_axisX.WaitReady()))
+                    //    return p_sInfo;
 
                     // 다음 이미지 획득을 위해 변수 값 변경
                     nScanLine++;

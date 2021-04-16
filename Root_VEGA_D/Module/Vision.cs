@@ -441,6 +441,7 @@ namespace Root_VEGA_D.Module
 
             m_tcpipCommServer = new TCPIPComm_VEGA_D(server);
             m_tcpipCommServer.EventReceiveData += EventReceiveData;
+            m_tcpipCommServer.EventAccept += EventAccept;
         }
 
         private void Vision_OnChangeState(eState eState)
@@ -453,7 +454,11 @@ namespace Root_VEGA_D.Module
                     break;
             }
         }
-        public bool m_bDisconnectedGrabLineScaning = false;     // 이미지 스캔 도중 소켓통신 연결이 끊어졌을 때의 상태값
+        public bool m_bDisconnectedGrabLineScanning = true;     // 이미지 스캔 도중 소켓통신 연결이 끊어졌을 때의 상태값
+        private void EventAccept(Socket socket)
+        {
+            m_bDisconnectedGrabLineScanning = false;
+        }
         private void EventReceiveData(byte[] aBuf, int nSize, Socket socket)
         {
             if (nSize <= 0)
@@ -461,17 +466,15 @@ namespace Root_VEGA_D.Module
                 // 연결이 종료되었을 때
                 if (!socket.Connected)
                 {
-                    if (m_qModuleRun.Count > 0)
+                    Run_GrabLineScan runGrabLineScan = m_aModuleRun.Find(x => (x.GetType() == typeof(Run_GrabLineScan))) as Run_GrabLineScan;
+                    if (runGrabLineScan != null)
                     {
-                        Run_GrabLineScan runGrabLineScan = m_qModuleRun.Peek() as Run_GrabLineScan;
-                        if (runGrabLineScan != null)
+                        // 현재 GrabLineScan 진행중이었다면
+                        if (runGrabLineScan.p_eRunState == ModuleRunBase.eRunState.Run)
                         {
-                            // 현재 GrabLineScan 진행중이었다면 EQ Stop 상태로 변경하고 이미지그랩 중에 중단되었다는 상태값 설정
-                            if (p_eState == eState.Run)
-                            {
-                                EQ.p_bStop = true;
-                                m_bDisconnectedGrabLineScaning = true;
-                            }
+                            // EQ Stop 상태로 변경하고 이미지그랩 중에 중단되었다는 상태값 설정
+                            EQ.p_bStop = true;
+                            m_bDisconnectedGrabLineScanning = true;
                         }
                     }
                 }
@@ -489,40 +492,41 @@ namespace Root_VEGA_D.Module
                     {
                         case TCPIPComm_VEGA_D.Command.resume:
                             {
-                                if (EQ.IsStop() || m_bDisconnectedGrabLineScaning == true)
+                                if (EQ.IsStop() || m_bDisconnectedGrabLineScanning == true)
                                 {
                                     // 이전에 이미지 그랩 작업을 이어서 할 수 있도록 처리
                                     int totalScanLine = int.Parse(mapParam[TCPIPComm_VEGA_D.PARAM_NAME_TOTALSCANLINECOUNT]);
                                     int curScanLine = int.Parse(mapParam[TCPIPComm_VEGA_D.PARAM_NAME_CURRENTSCANLINE]);
                                     int startScanLine = int.Parse(mapParam[TCPIPComm_VEGA_D.PARAM_NAME_STARTSCANLINE]);
 
-                                    if(m_qModuleRun.Count > 0)
+                                    Run_GrabLineScan runGrabLineScan = m_aModuleRun.Find(x => (x.GetType() == typeof(Run_GrabLineScan))) as Run_GrabLineScan;
+                                    if (runGrabLineScan != null)
                                     {
-                                        Run_GrabLineScan runGrabLineScan = m_qModuleRun.Peek() as Run_GrabLineScan;
-                                        if (runGrabLineScan != null)
-                                        {
-                                            runGrabLineScan.m_grabMode.m_ScanLineNum = totalScanLine - curScanLine;
-                                            runGrabLineScan.m_grabMode.m_ScanStartLine = startScanLine + curScanLine;
+                                        runGrabLineScan.m_grabMode.m_ScanLineNum = totalScanLine - curScanLine;
+                                        runGrabLineScan.m_grabMode.m_ScanStartLine = startScanLine + curScanLine;
 
-                                            EQ.p_bStop = false;
-                                        }
+                                        EQ.p_bStop = false;
                                     }
                                 }
                                 else
                                 {
                                     // EQ Stop 상태를 변경하여 이미지 스캔을 재개하지 않을 것이므로
                                     // 이미지 스캔 중 연결이 끊겼다는 상태값을 다시 리셋
-                                    m_bDisconnectedGrabLineScaning = false;
+                                    m_bDisconnectedGrabLineScanning = false;
                                 }
                             }
                             break;
                         case TCPIPComm_VEGA_D.Command.Result:
                             {
-                                Run_GrabLineScan runGrabLineScan = m_qModuleRun.Peek() as Run_GrabLineScan;
+                                Run_GrabLineScan runGrabLineScan = m_aModuleRun.Find(x => (x.GetType() == typeof(Run_GrabLineScan))) as Run_GrabLineScan;
                                 if (runGrabLineScan != null)
                                 {
-                                    // IPU에서 이미지 스캔 완료되었기 때문에 해당 상태변수 true로 변경
-                                    runGrabLineScan.m_bIPUCompleted = true;
+                                    // 현재 GrabLineScan 진행중이었다면
+                                    if (runGrabLineScan.p_eRunState == ModuleRunBase.eRunState.Run)
+                                    {
+                                        // IPU에서 이미지 검사 완료되었기 때문에 해당 상태변수 true로 변경
+                                        runGrabLineScan.m_bIPUCompleted = true;
+                                    }
                                 }
                             }
                             break;
