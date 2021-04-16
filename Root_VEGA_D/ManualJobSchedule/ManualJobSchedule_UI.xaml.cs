@@ -36,7 +36,7 @@ namespace Root_VEGA_D
             m_infoWafer = infoCarrier.GetInfoWafer(0);
         }
 
-        private void Window_Closing(object sender, CancelEventArgs e)
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             m_bShow = false;
         }

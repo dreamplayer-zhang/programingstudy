@@ -99,9 +99,10 @@ namespace Root_VEGA_D
             InitTimer();
             InitFFU();
             TextBlockRetID.DataContext = m_handler.m_aLoadport[0].p_infoCarrier.m_aGemSlot[0];
-            Is_InLP.Background = (m_handler.m_aLoadport[0].p_infoCarrier.m_aInfoWafer[0] != null)||(m_handler.m_aLoadport[0].p_infoCarrier.m_aInfoWafer[1] != null) ? Brushes.MediumBlue: Brushes.Gray;
-            Is_InRTR.Background = m_handler.m_wtr.m_dicArm[0].p_infoWafer!= null ? Brushes.MediumBlue : Brushes.Gray;
-            Is_InVS.Background = m_handler.m_vision.p_infoWafer != null ? Brushes.MediumBlue : Brushes.Gray;
+            LoadportAState.Background = m_handler.m_aLoadport[0].p_infoCarrier.m_aInfoWafer[0] != null ? Brushes.MediumBlue : Brushes.Gray;
+            LoadportBState.Background = m_handler.m_aLoadport[0].p_infoCarrier.m_aInfoWafer[1] != null ? Brushes.MediumBlue: Brushes.Gray;
+            RobotState.Background = m_handler.m_wtr.m_dicArm[0].p_infoWafer!= null ? Brushes.MediumBlue : Brushes.Gray;
+            VisionState.Background = m_handler.m_vision.p_infoWafer != null ? Brushes.MediumBlue : Brushes.Gray;
         }
 
         //bool m_blogin = false;
@@ -215,7 +216,8 @@ namespace Root_VEGA_D
         {
             TimerUI();
             TimerLamp();
-            NowTime.Text = "Date : " + DateTime.Now.ToString();
+            
+            NowTime.Text = "Date : " + DateTime.Now.ToString("yyyy.MM.dd  \r\n           tt hh:mm:ss", CultureInfo.InvariantCulture);
             buttonResume.IsEnabled = IsEnable_Resume();
             buttonPause.IsEnabled = IsEnable_Pause();
             buttonInitialize.IsEnabled = IsEnable_Initial();
@@ -225,8 +227,11 @@ namespace Root_VEGA_D
         {
             if (EQ.p_eState != EQ.eState.Run) EQ.p_bRecovery = false;
             //textState.Text = m_bRecovery ? "Recovery" : EQ.p_eState.ToString();
-            textState.Text = EQ.p_bRecovery ? "Recovery" : EQ.p_eState.ToString();
-            textState.Text = string.Format("State : {0}", textState.Text);
+            EQState.Text = EQ.p_bRecovery ? "Recovery" : EQ.p_eState.ToString();
+            LoadportAState.Text = m_handler.m_loadport[0].p_eState.ToString();
+            LoadportBState.Text = m_handler.m_loadport[1].p_eState.ToString();
+            RobotState.Text = m_handler.m_wtr.p_eState.ToString();
+            VisionState.Text = m_handler.m_vision.p_eState.ToString();
         }
 
         void TimerLamp()

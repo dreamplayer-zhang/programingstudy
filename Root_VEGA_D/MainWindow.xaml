@@ -176,8 +176,6 @@
                         <ColumnDefinition Width="10*" />
                         <ColumnDefinition Width="auto" />
                         <ColumnDefinition Width="10*" />
-                        <ColumnDefinition Width="auto" />
-                        <ColumnDefinition Width="10*" />
                     </Grid.ColumnDefinitions>
                     <Line Grid.Column="1"
                           Stroke="{StaticResource Splitter}"
@@ -185,22 +183,69 @@
                           Stretch="Fill"
                           Margin="0,-1,0,-1"
                           Y2="1" />
-                    <Grid Grid.Column="0">
-                        <Grid.RowDefinitions>
-                            <RowDefinition />
-                            <RowDefinition />
-                        </Grid.RowDefinitions>
-                        <Grid Grid.Row="0">
+                        <Grid Grid.Column="0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="1*" />
+                            <ColumnDefinition Width="3*" />
+                        </Grid.ColumnDefinitions>
+                        <Grid Grid.Column="0">
                             <TextBlock x:Name="NowTime"
                                        HorizontalAlignment="Left"
                                        Margin="30,0,0,0"
                                        FontWeight="Bold" />
                         </Grid>
-                        <Grid Grid.Row="1">
-                            <TextBlock Text="Now Progress"
-                                       HorizontalAlignment="Left"
-                                       Margin="30,0,0,0"
-                                       FontWeight="Bold" />
+                        <Grid Grid.Column="1">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="1*"/>
+                                <RowDefinition Height="1*"/>
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="1*"/>
+                                <ColumnDefinition Width="1*"/>
+                                <ColumnDefinition Width="1*"/>
+                                <ColumnDefinition Width="1*"/>
+                                <ColumnDefinition Width="1*"/>
+                            </Grid.ColumnDefinitions>
+                            <Border Grid.Column="0" Grid.Row="0" BorderBrush="#FF707070" BorderThickness="1">
+                                <TextBlock Text="EQ"
+                                           FontWeight="SemiBold"/>
+                            </Border>
+                            <Border Grid.Column="1" Grid.Row="0" BorderBrush="#FF707070" BorderThickness="1">
+                                <TextBlock Text="LoadportA"
+                                           FontWeight="SemiBold"/>
+                            </Border>
+                            <Border Grid.Column="2" Grid.Row="0" BorderBrush="#FF707070" BorderThickness="1">
+                                <TextBlock Text="LoadportB"
+                                           FontWeight="SemiBold"/>
+                            </Border>
+                            <Border Grid.Column="3" Grid.Row="0" BorderBrush="#FF707070" BorderThickness="1">
+                                <TextBlock Text="Robot"
+                                           FontWeight="SemiBold"/>
+                            </Border>
+                            <Border Grid.Column="4" Grid.Row="0" BorderBrush="#FF707070" BorderThickness="1">
+                                <TextBlock Text="Vision"
+                               FontWeight="SemiBold"/>
+                            </Border>
+                            <Border Grid.Column="0" Grid.Row="1" BorderBrush="#FF707070" BorderThickness="1">
+                                <TextBlock x:Name="EQState"
+                               FontWeight="SemiBold"/>
+                            </Border>
+                            <Border Grid.Column="1" Grid.Row="1" BorderBrush="#FF707070" BorderThickness="1">
+                                <TextBlock x:Name="LoadportAState"
+                               FontWeight="SemiBold"/>
+                            </Border>
+                            <Border Grid.Column="2" Grid.Row="1" BorderBrush="#FF707070" BorderThickness="1">
+                                <TextBlock x:Name="LoadportBState"
+                               FontWeight="SemiBold"/>
+                            </Border>
+                            <Border Grid.Column="3" Grid.Row="1" BorderBrush="#FF707070" BorderThickness="1">
+                                <TextBlock x:Name="RobotState"
+                               FontWeight="SemiBold"/>
+                            </Border>
+                            <Border Grid.Column="4" Grid.Row="1" BorderBrush="#FF707070" BorderThickness="1">
+                                <TextBlock x:Name="VisionState"
+                               FontWeight="SemiBold"/>
+                            </Border>
                         </Grid>
                     </Grid>
                     <Grid Grid.Column="2">
@@ -210,14 +255,14 @@
                         </Grid.RowDefinitions>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition />
-                            <ColumnDefinition Width="1.5*" />
+                            <ColumnDefinition Width="0.7*" />
                         </Grid.ColumnDefinitions>
 
                         <TextBlock Grid.Row="0"
-                                   Text="Need"
+                                   Text="INSPECTION TIME"
                                    FontWeight="Bold" />
                         <TextBlock Grid.Row="1"
-                                   Text="Run"
+                                   Text="RNR COUNT"
                                    FontWeight="Bold" />
                         <TextBlock Grid.Column="1"
                                    Grid.Row="0"
@@ -233,11 +278,7 @@
                             <control:LoadingControl />
                         </Viewbox>
                     </Grid>
-                    <TextBlock Grid.Column="6"
-                               x:Name="textState"
-                               FontWeight="SemiBold"
-                               Text="State : Error"/>
-                    <Border Grid.Column="8"
+                    <Border Grid.Column="6"
                             Margin="8"
                             BorderBrush="#FF707070"
                             BorderThickness="1">
@@ -1063,7 +1104,7 @@
                                 </StackPanel>
                             </ScrollViewer>
                         </TabItem>
-                      
+
                         <TabItem Header="Run"
                                  Style="{StaticResource ResourceKey=WizardTabItem}">
                             <ScrollViewer>
@@ -2270,7 +2311,7 @@
                                 </StackPanel>
                             </ScrollViewer>
                         </TabItem>
-                        
+
                         <!--<TabItem Header="Maint"
                                  Style="{StaticResource ResourceKey=WizardTabItem}"
                                  x:Name="TabMaint"
@@ -2431,16 +2472,14 @@
                 <Grid Grid.Column="4"
                       Grid.Row="2">
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="12*" />
+                        <RowDefinition Height="70*" />
                         <RowDefinition Height="auto" />
-                        <RowDefinition Height="35*" />
+                        <RowDefinition Height="70*" />
                         <RowDefinition Height="auto" />
-                        <RowDefinition Height="35*" />
-                        <RowDefinition Height="auto" />
-                        <RowDefinition Height="25*" />
+                        <RowDefinition Height="30*" />
                         <RowDefinition Height="auto" />
                     </Grid.RowDefinitions>
-                    <GroupBox Grid.Row="0"
+                    <!--<GroupBox Grid.Row="0"
                               Header="Mask Location">
                         <Grid>
                             <Grid.RowDefinitions>
@@ -2483,11 +2522,11 @@
                                 <TextBlock Text="Vision" />
                             </Grid>
                         </Grid>
-                    </GroupBox>
-                    <Grid Grid.Row="2">
+                    </GroupBox>-->
+                    <Grid Grid.Row="0">
                         <local:Loadport_UI x:Name="loadportA"/>
                     </Grid>
-                    <Grid Grid.Row="4">
+                    <Grid Grid.Row="2">
                         <local:Loadport_UI x:Name="loadportB"/>
                     </Grid>
                     <!--<Button Grid.Row="6"
@@ -2498,7 +2537,7 @@
                             FontSize="15"
                             Content="Stop"
                             Margin="10" />-->
-                    <Grid Grid.Row="6" Margin="10,0,10,0">
+                    <Grid Grid.Row="4" Margin="10,0,10,0">
                         <Grid.RowDefinitions>
                             <RowDefinition/>
                             <RowDefinition/>
