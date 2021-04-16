@@ -5073,6 +5073,7 @@ namespace Root_AOP01_Inspection.Module
                 }
 
                 // variable
+                string strTimeStamp = DateTime.Now.ToString();
                 MemoryData mem = m_module.m_engineer.GetMemory(App.mPool, App.mGroup, App.mMainMem);
                 Run_Grab moduleRunGrab = (Run_Grab)m_module.CloneModuleRun("Grab");
                 double dResX_um = moduleRunGrab.m_dResX_um;
@@ -5333,6 +5334,12 @@ namespace Root_AOP01_Inspection.Module
                 m_module.p_dPellicleShiftDistance = dResultDistance * moduleRunGrab.m_dResY_um / 1000;
                 m_module.p_dPellicleShiftAngle = dResultAngle;
 
+                using (System.IO.StreamWriter sr = new System.IO.StreamWriter($"D:\\AOP01\\PellicleShiftAndRotationInspection\\{strTimeStamp}_Result.csv"))
+                {
+                    sr.WriteLine("Pass,Distance,Angle");
+                    sr.WriteLine("{0},{1},{2}", m_module.p_bPellicleShiftPass, m_module.p_dPellicleShiftDistance, m_module.p_dPellicleShiftAngle);
+                }
+
                 return "OK";
             }
 
@@ -5388,6 +5395,7 @@ namespace Root_AOP01_Inspection.Module
                 }
 
                 // variable
+                string strTimeStamp = DateTime.Now.ToString();
                 Run_LADS moduleRunLADS = (Run_LADS)m_module.CloneModuleRun("LADS");
                 GrabMode grabMode = m_module.GetGrabMode("LADS");
                 string strPool = grabMode.m_memoryPool.p_id;
@@ -5413,6 +5421,12 @@ namespace Root_AOP01_Inspection.Module
                         m_module.p_nPellicleExpandingProgressPercent = (int)((double)m_module.p_nPellicleExpandingProgressValue / (double)(m_module.p_nPellicleExpandingProgressMax - m_module.p_nPellicleExpandingProgressMin) * 100);
                 }
                 SaveFocusMapImage(grabMode.m_ScanLineNum, nReticleSizeY_px / nCamHeight);
+
+                using (StreamWriter sr = new StreamWriter($"D:\\AOP01\\PellicleExpandingInspection\\{strTimeStamp}_Result.csv"))
+                {
+                    sr.WriteLine("Pass");
+                    sr.WriteLine("{0}", m_module.p_bPellicleExpandingPass);
+                }
 
                 return "OK";
             }
@@ -5582,8 +5596,8 @@ namespace Root_AOP01_Inspection.Module
                     //CvInvoke.Imwrite(@"D:\Test\" + x + ".bmp", ResultMat);
 
                 }
-                CvInvoke.Imwrite(@"D:\FocusMap.bmp", ResultMat);
-                
+                CvInvoke.Imwrite($"D:\\AOP01\\PellicleExpandingInspection\\FocusMap.bmp", ResultMat);
+
                 // Image Binding
                 System.Drawing.Bitmap bmp = ResultMat.Bitmap;
                 System.Drawing.Bitmap bmpTemp = new System.Drawing.Bitmap(bmp);
