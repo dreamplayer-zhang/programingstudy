@@ -17,6 +17,7 @@ using System.Windows.Shapes;
 using Root_VEGA_D.Engineer;
 using Root_EFEM.Module;
 using System.Globalization;
+using RootTools.Module;
 
 namespace Root_VEGA_D
 {
@@ -42,6 +43,7 @@ namespace Root_VEGA_D
             m_bShow = false;
         }
         ManualJobSchedule m_Manualjob;
+        Loadport_Cymechs m_loadport;
         public void Init(ManualJobSchedule manualJob, IEngineer engineer, Loadport_Cymechs loadport)
         {
             m_Manualjob = manualJob;
@@ -49,6 +51,7 @@ namespace Root_VEGA_D
             m_engineer = (VEGA_D_Engineer)engineer;
             m_handler = m_engineer.m_handler;
             btnRun.DataContext = loadport;
+            m_loadport = loadport;
             //InitInfo();
             InitRecipe();
         }
@@ -126,6 +129,8 @@ namespace Root_VEGA_D
         private void Button_Click_1(object sender, RoutedEventArgs e)
         {
             m_infoCarrier.SetInfoWafer(0, null);
+            ModuleRunBase UnDocking = m_loadport.m_runUndocking.Clone();
+            m_loadport.StartRun(UnDocking);
             this.Close();
         }
     }

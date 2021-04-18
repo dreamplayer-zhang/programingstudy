@@ -282,7 +282,6 @@
     <Compile Include="ManualJobSchedule\ManualJobSchedule_UI.xaml.cs">
       <DependentUpon>ManualJobSchedule_UI.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Module\FDC.cs" />
     <Compile Include="Module\FFU.cs" />
     <Compile Include="Module\FFU_Fan_UI.xaml.cs">
       <DependentUpon>FFU_Fan_UI.xaml</DependentUpon>

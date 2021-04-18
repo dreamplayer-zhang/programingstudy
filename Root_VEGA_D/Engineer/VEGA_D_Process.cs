@@ -329,7 +329,7 @@ namespace Root_VEGA_D.Engineer
 
         IWTRChild GetNextChild(InfoWafer infoWaferGet)
         {
-            for (int n = 1; n < infoWaferGet.m_qCalcProcess.Count; n++)
+            for (int n = 1; n < infoWaferGet.m_qCalcProcess.Count; n++)//check 필요
             {
                 ModuleRunBase moduleRun = infoWaferGet.m_qCalcProcess.Peek();
                 if (moduleRun.m_moduleBase.p_id != m_wtr.p_id) return (IWTRChild)moduleRun.m_moduleBase;

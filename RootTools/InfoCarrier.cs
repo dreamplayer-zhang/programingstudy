@@ -223,11 +223,11 @@ namespace RootTools
         {
             if (nID < 0) return;
             if (nID >= p_lWafer) return;
-            if (EQ.p_nRnR < 1)
+            if (EQ.p_nRnR <= 1)
             {
-                if (infoWafer == null && m_aInfoWafer[nID] != null) m_aInfoWafer[nID].ClearInfo(); 
+                if (infoWafer == null && m_aInfoWafer[nID] != null) m_aInfoWafer[nID].ClearInfo();
             }
-			m_aInfoWafer[nID] = infoWafer;
+            m_aInfoWafer[nID] = infoWafer;
             SaveInfoWafer(nID);
         }
 
@@ -275,7 +275,7 @@ namespace RootTools
         #region Mapping Function
         public string SetMapData(List<GemSlotBase.eState> aSlotState)
         {
-            if (p_lWafer > aSlotState.Count) return "SetMapData Length Error";
+            if (p_lWafer > aSlotState.Count) return "SetMapData Lendth Error";
             for (int n = 0; n < p_lWafer; n++)
             {
                 m_aGemSlot[n].p_eState = aSlotState[n];

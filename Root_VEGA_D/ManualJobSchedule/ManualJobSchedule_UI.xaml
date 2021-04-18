@@ -248,7 +248,7 @@
         </Grid.Style>
         <Grid.RowDefinitions>
             <RowDefinition Height="4*"/>
-            <RowDefinition Height="2*"/>
+            <RowDefinition Height="0.3*"/>
             <RowDefinition Height="2*"/>
             <RowDefinition Height="2*"/>
         </Grid.RowDefinitions>
@@ -312,7 +312,7 @@
             </GroupBox>
         </Grid>
         <Grid Grid.Row="1" Grid.ColumnSpan="2">
-            <GroupBox FontSize="20" Header="Recipe Select" Foreground="White" Margin="5" Visibility="Hidden">
+            <GroupBox FontSize="20" Header="Recipe Select" Foreground="White" Margin="5" Visibility="Collapsed">
                 <StackPanel Orientation="Horizontal">
                     <TextBlock Text="Recipe ID = "
                                VerticalAlignment="Center"
@@ -378,7 +378,7 @@
                     Margin="20"
                     x:Name="btnRun"
                     IsDefault="True"
-                    Visibility="{Binding p_bIn}"
+                    Visibility="{Binding p_open, Converter={StaticResource BooltoVisibleConverters}}"
                     Click="Button_Click"/>
             <Button Grid.Column="1" Style="{StaticResource ButtonStyle1}"
                     Content="Cancel"

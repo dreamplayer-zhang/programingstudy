@@ -115,8 +115,8 @@ namespace Root_EFEM.Module
         //    }
         //}
 
-        private DIO_I m_diPlaced;
-        private DIO_I m_diPresent;
+        public DIO_I m_diPlaced;
+        public DIO_I m_diPresent;
         private DIO_I m_diOpen;
         private DIO_I m_diClose;
         private DIO_I m_diReady;
@@ -243,7 +243,7 @@ namespace Root_EFEM.Module
 
         public string BeforeGet(int nID)
         {
-            alid_LoadportOpenCloseError.Run(!m_diOpen.p_bIn || !m_diReady.p_bIn, "m_diOpen.p_bIn : "+ m_diOpen.p_bIn + ", m_diReady.p_bIn : " + m_diReady.p_bIn);
+            alid_LoadportOpenCloseError.Run(!m_diOpen.p_bIn || m_diRun.p_bIn, "m_diOpen.p_bIn : "+ m_diOpen.p_bIn + ", m_diReady.p_bIn : " + m_diRun.p_bIn);
             if (GetInfoWafer(nID) == null)
             {
                 m_alidGetOK.Run(true, p_id + nID.ToString("00") + " BeforeGet : InfoWafer = null");
@@ -254,7 +254,7 @@ namespace Root_EFEM.Module
 
         public string BeforePut(int nID)
         {
-            alid_LoadportOpenCloseError.Run(!m_diOpen.p_bIn || !m_diReady.p_bIn, "m_diOpen.p_bIn : " + m_diOpen.p_bIn + ", m_diReady.p_bIn : " + m_diReady.p_bIn);
+            alid_LoadportOpenCloseError.Run(!m_diOpen.p_bIn || m_diRun.p_bIn, "m_diOpen.p_bIn : " + m_diOpen.p_bIn + ", m_diRun.p_bIn : " + m_diRun.p_bIn);
             if (GetInfoWafer(nID) != null)
             {
                 m_alidPutOK.Run(true, p_id + nID.ToString("00") + " BeforePut : InfoWafer != null");
@@ -1072,7 +1072,7 @@ namespace Root_EFEM.Module
                 }
                 m_infoCarrier.p_eState = InfoCarrier.eState.Dock;
 
-                if (m_module.m_diOpen.p_bIn) m_module.p_open = true;
+                if (m_module.m_diOpen.p_bIn == true && m_module.m_diRun.p_bIn ==false) m_module.p_open = true;
                 else m_module.p_open = false;
                 return "OK";
 
