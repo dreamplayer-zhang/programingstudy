@@ -8,6 +8,8 @@ using RootTools.Control;
 using RootTools.Module;
 using System.Collections.ObjectModel;
 using Met = Root_CAMELLIA.LibSR_Met;
+using System.Data;
+using System.Windows;
 
 namespace Root_CAMELLIA
 {
@@ -16,7 +18,7 @@ namespace Root_CAMELLIA
         public PM_Reflectance_ViewModel()
         {
             ResultGraph();
-
+            InitData();
         }
         ObservableCollection<ReviewGraph> PMResultGraph500 = new ObservableCollection<ReviewGraph>();
         public ObservableCollection<ReviewGraph> p_PMResultGraph500
@@ -97,22 +99,78 @@ namespace Root_CAMELLIA
             PMResultGraph500.Add(PMReflectance500);
             PMResultGraph740.Add(PMReflectance740);
             PMResultGraph1100.Add(PMReflectance1100);
-            
         }
 
-        public void DrawPMGraph()
+        public void DrawPMGraph(int GraphCount, Met.PMDatas PMData)
         {
-            Met.PMDatas m_PMData = new Met.PMDatas();
-            double [] nRepeatCount = new double[m_PMData.nSensorTiltRepeatNum];
-            for (int i = 0; i < m_PMData.nSensorTiltRepeatNum; i++)
-            {
-                nRepeatCount[i] = i+1;
-            }
-            //p_PMReflectance500.DrawReviewGraph("500", "Count","Diff [%]", nRepeatCount, m_PMData.DiffReflectnace500);
-
-            //p_PMReflectance740.DrawReviewGraph("740", "Count", "Diff [%]",  nRepeatCount, m_PMData.DiffReflectnace740);
             
-            //p_PMReflectance1100.DrawReviewGraph("1100", "Count", "Diff [%]", nRepeatCount, m_PMData.DiffReflectnace1100);
+            double[] nRepeatCount = new double[PMData.nSensorTiltRepeatNum];
+            for (int i = 0; i < PMData.nSensorTiltRepeatNum; i++)
+            {
+                nRepeatCount[i] = i + 1;
+            }
+            if(GraphCount==0)
+            {
+                p_PMReflectance500.DrawReviewGraph(PMData.arrCheckWavelength[GraphCount].ToString() +" [nm]", "Repeat Count", "Diff [%]", nRepeatCount, PMData.m_CalPMReflectance[GraphCount].dDiffReflectance);
+            }
+            if (GraphCount == 1)
+            {
+                p_PMReflectance740.DrawReviewGraph(PMData.arrCheckWavelength[GraphCount].ToString() + " [nm]", "Repeat Count", "Diff [%]", nRepeatCount, PMData.m_CalPMReflectance[GraphCount].dDiffReflectance);
+            }
+            if (GraphCount == 2)
+            {
+                p_PMReflectance1100.DrawReviewGraph(PMData.arrCheckWavelength[GraphCount].ToString() + " [nm]", "Repeat Count", "Diff [%]", nRepeatCount, PMData.m_CalPMReflectance[GraphCount].dDiffReflectance);
+            }
+
         }
+        private DataTable _PMReflectanceResultData = new DataTable();
+        public DataTable PMReflectanceResult
+        {
+            get
+            {
+                return _PMReflectanceResultData;
+            }
+            set
+            {
+                SetProperty(ref _PMReflectanceResultData, value);
+            }
+        }
+
+        public void InitData()
+        {
+            PMReflectanceResult.Columns.Add(new DataColumn("Wavelength"));
+            PMReflectanceResult.Columns.Add(new DataColumn("Min"));
+            PMReflectanceResult.Columns.Add(new DataColumn("Max"));
+            PMReflectanceResult.Columns.Add(new DataColumn("Cop"));
+            PMReflectanceResult.Columns.Add(new DataColumn("Average"));
+            PMReflectanceResult.Columns.Add(new DataColumn("STD"));
+        }
+        public void PMResultDataGrid(int DataCount, Met.PMDatas PMData)
+        {
+            DataRow row;
+            if (DataCount == 0)
+            {
+                PMReflectanceResult.Clear();
+            }
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                row = PMReflectanceResult.NewRow();
+                if (DataCount == PMData.arrCheckWavelength.Length)
+                {
+                    row["Wavelength"] = "Total";
+                }
+                else
+                {
+                    row["Wavelength"] = PMData.m_CalPMReflectance[DataCount].dWavelength.ToString();
+                }
+                row["Min"] = PMData.m_CalPMReflectance[DataCount].dMin.ToString();
+                row["Max"] = PMData.m_CalPMReflectance[DataCount].dMax.ToString();
+                row["Cop"] = PMData.m_CalPMReflectance[DataCount].dCop.ToString();
+                row["Average"] = PMData.m_CalPMReflectance[DataCount].dAvg.ToString();
+                row["STD"] = PMData.m_CalPMReflectance[DataCount].dSTD.ToString();
+                PMReflectanceResult.Rows.Add(row);
+            });
+        }
+       
     }
 }

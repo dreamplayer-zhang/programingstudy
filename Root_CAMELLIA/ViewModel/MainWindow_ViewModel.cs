@@ -12,6 +12,10 @@ using Root_CAMELLIA.Draw;
 using System.Windows.Media;
 using Root_CAMELLIA.Control;
 using System.Windows.Controls;
+using System.Windows.Media.Imaging;
+using Emgu.CV;
+using System.Threading;
+using Emgu.CV.Structure;
 
 namespace Root_CAMELLIA
 {
@@ -30,7 +34,19 @@ namespace Root_CAMELLIA
                 SetProperty(ref _DataManager, value);
             }
         }
-        
+
+        BitmapSource m_imageSource;
+        public BitmapSource p_imageSource
+        {
+            get
+            {
+                return m_imageSource;
+            }
+            set
+            {
+                SetProperty(ref m_imageSource, value);
+            }
+        }
 
         #region Property
         public Module_Camellia p_Module_Camellia
@@ -174,7 +190,28 @@ namespace Root_CAMELLIA
             }
 
             p_ContourMapCollection.Add(p_ContourMapGraph);
-            //m_reg.Write(,);
+
+
+            p_Module_Camellia.p_CamVRS.Captured += GetImage;
+        }
+
+        private void GetImage(object obj, EventArgs e)
+        {
+            Thread.Sleep(100);
+            RootTools.Camera.BaslerPylon.Camera_Basler p_CamVRS = p_Module_Camellia.p_CamVRS;
+            Mat mat = new Mat(new System.Drawing.Size(p_CamVRS.GetRoiSize().X, p_CamVRS.GetRoiSize().Y), Emgu.CV.CvEnum.DepthType.Cv8U, 3, p_CamVRS.p_ImageViewer.p_ImageData.GetPtr(), (int)p_CamVRS.p_ImageViewer.p_ImageData.p_Stride * 3);
+            Image<Bgra, byte> img = mat.ToImage<Bgra, byte>();
+
+            //CvInvoke.Imshow("aa",img.Mat);
+            //CvInvoke.WaitKey(0);
+            //CvInvoke.DestroyAllWindows();
+            //p_rootViewer.p_ImageData = new ImageData(p_CamVRS.p_ImageViewer.p_ImageData);
+            //lock (lockObject)
+            //{
+
+            p_imageSource = ImageHelper.ToBitmapSource(img);
+            //}
+            //p_rootViewer.SetImageSource();
         }
 
         public double p_ArrowX1
@@ -979,6 +1016,8 @@ namespace Root_CAMELLIA
                 });
             }
         }
+
+        public object ModuleCamellia { get; private set; }
         #endregion
 
         #region Event

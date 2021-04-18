@@ -796,7 +796,7 @@ namespace Root_Vega
 				m_Engineer.m_InspManager.m_bAlignFail = true;
 			}
 			#endregion
-			m_Engineer.m_InspManager.InspectionDone(App.indexFilePath);
+			m_Engineer.m_InspManager.InspectionDone(App.indexFilePath, m_Engineer.m_recipe.VegaRecipeData.UseDefectMerge, m_Engineer.m_recipe.VegaRecipeData.MergeDistance);
 		}
 
 		public CRect GetOverlapedRect(CRect crtFirst, CRect crtSecond)

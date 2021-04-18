@@ -51,6 +51,7 @@ namespace Root_CAMELLIA.LibSR_Met
         public double dMax = 0.0;
         public double dCop = 0.0;
         public double dAvg = 0.0;
+        public double dSTD = 0.0;
 
         public CalPMReflectance()
         {
@@ -252,7 +253,7 @@ namespace Root_CAMELLIA.LibSR_Met
             SensorTiltData.Add(tiltData);
             dAvg = dDiffSum / (double)nCheckPMRange;
             rstPM.Measured = dAvg;
-            m_CalPMReflectance[nCheckNum+1].dDiffReflectance[nCurrentNum]= dAvg;
+            m_CalPMReflectance[nCheckNum].dDiffReflectance[nCurrentNum]= dAvg;
             if (Math.Abs(dAvg) > dSensorTiltError)
             {
                 m_DM.m_Log.WriteLog(LogType.PM, "[Error]CheckSensorTilt - RDiffAvg:" + dAvg.ToString() + "/SensorTiltError:" + dSensorTiltError.ToString());
@@ -263,33 +264,64 @@ namespace Root_CAMELLIA.LibSR_Met
             rstPM.Error = false;
             if(nCurrentNum == nSensorTiltRepeatNum-1)
             {
-                bool bCalDone = CalPMReflectanceResult(arrCheckWavelength.Length); 
+                bool bCalDone = CalPMReflectanceResult(arrCheckWavelength.Length+1);
+               // m_DM.m_Log.WriteLog(LogType.PM, "Pm Result Data Save Done");
+                
+
+            }
+            else
+            {
+               
             }
 
             return CheckResult.OK;
         }
         private bool CalPMReflectanceResult(int nCalResultNum)
         {
-            for (int n = 0; n < nCalResultNum + 1; n++)
+            for (int n = 0; n < nCalResultNum ; n++)
             {
 
-                m_CalPMReflectance[n].dMin = m_CalPMReflectance[n].dDiffReflectance.Min();
-                m_CalPMReflectance[n].dMax = m_CalPMReflectance[n].dDiffReflectance.Max();
+                m_CalPMReflectance[n].dMin = Math.Round( m_CalPMReflectance[n].dDiffReflectance.Min(),3);
+                m_CalPMReflectance[n].dMax = Math.Round(m_CalPMReflectance[n].dDiffReflectance.Max(),3);
                 if (m_CalPMReflectance[n].dMin > 0 && m_CalPMReflectance[n].dMax > 0)
                 {
-                    m_CalPMReflectance[n].dCop = -m_CalPMReflectance[n].dMin + m_CalPMReflectance[n].dMax;
+                    m_CalPMReflectance[n].dCop = Math.Round(-m_CalPMReflectance[n].dMin + m_CalPMReflectance[n].dMax,3);
                 }
                 else if (m_CalPMReflectance[n].dMin < 0 && m_CalPMReflectance[n].dMax < 0)
                 {
-                    m_CalPMReflectance[n].dCop = -Math.Abs(m_CalPMReflectance[n].dMin) + Math.Abs(m_CalPMReflectance[n].dMax);
+                    m_CalPMReflectance[n].dCop = Math.Round(-Math.Abs(m_CalPMReflectance[n].dMin) + Math.Abs(m_CalPMReflectance[n].dMax),3);
                 }
                 else
                 {
-                    m_CalPMReflectance[n].dCop = Math.Abs(m_CalPMReflectance[n].dMin) + Math.Abs(m_CalPMReflectance[n].dMax);
+                    m_CalPMReflectance[n].dCop = Math.Round(Math.Abs(m_CalPMReflectance[n].dMin) + Math.Abs(m_CalPMReflectance[n].dMax),3);
                 }
-                m_CalPMReflectance[n].dAvg = m_CalPMReflectance[n].dDiffReflectance.Average();
+                m_CalPMReflectance[n].dAvg = Math.Round(m_CalPMReflectance[n].dDiffReflectance.Average(),3);
+
+                m_CalPMReflectance[n].dSTD = Math.Round(CalReflectanceSTD(n, m_CalPMReflectance[n].dAvg),3);
             }
             return true;
+        }
+
+        private double CalReflectanceSTD(int nCurrentResultNum, double nDataAvg)
+        {
+            double[] DataDeviation = new double[nSensorTiltRepeatNum];
+            double[] DataDoubleDeviation = new double[nSensorTiltRepeatNum];
+            double AvgDoubleDeviation = 0.0;
+            double ResultSTD_P = 0.0;
+
+            for(int n=0; n < nSensorTiltRepeatNum; n++)
+            {
+                DataDeviation[n] = m_CalPMReflectance[nCurrentResultNum].dDiffReflectance[n] - m_CalPMReflectance[nCurrentResultNum].dAvg;
+
+                DataDoubleDeviation[n] = Math.Pow(DataDeviation[n], 2);
+
+
+            }
+
+            AvgDoubleDeviation = DataDoubleDeviation.Average();
+            ResultSTD_P = Math.Sqrt(AvgDoubleDeviation);
+
+            return ResultSTD_P;
         }
         public bool CalcCenterPoint(bool bTop, Emgu.CV.Mat matImg)
         {

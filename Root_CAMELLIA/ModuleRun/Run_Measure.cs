@@ -168,6 +168,10 @@ namespace Root_CAMELLIA.Module
             string rootPath = m_module.p_dataSavePath;
             try
             {
+                if(m_module.p_infoWafer == null)
+                {
+                    return true;
+                }
                 string[] path = rootPath.Split('\\');
                 if (System.IO.Directory.Exists(rootPath))
                 {
@@ -441,7 +445,7 @@ namespace Root_CAMELLIA.Module
             m_log.Warn("Measure End >> " + test.ElapsedMilliseconds);
 
             // 레드로 빼버림?  contour는 일단 보류..
-            LibSR_Met.DataManager.GetInstance().AllContourMapDataFitting(m_DataManager.recipeDM.MeasurementRD.WaveLengthReflectance, m_DataManager.recipeDM.MeasurementRD.WaveLengthTransmittance);
+            LibSR_Met.DataManager.GetInstance().AllContourMapDataFitting(m_DataManager.recipeDM.MeasurementRD.WaveLengthReflectance, m_DataManager.recipeDM.MeasurementRD.WaveLengthTransmittance, m_DataManager.recipeDM.MeasurementRD.DataSelectedPoint.Count);
             m_mwvm.p_ContourMapGraph.InitializeContourMap();
             m_mwvm.p_ContourMapGraph.DrawAllDatas();
             //  DCOL 세이브 필요

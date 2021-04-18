@@ -17,7 +17,7 @@ using Root_EFEM.Module;
 using RootTools;
 using RootTools.Module;
 
-namespace Root_CAMELLIA.UI_UserControl
+namespace Root_CAMELLIA
 {
     /// <summary>
     /// HomeProgress_UI.xaml에 대한 상호 작용 논리
@@ -78,6 +78,7 @@ namespace Root_CAMELLIA.UI_UserControl
             m_swLoadport[1].Reset();
             m_swAligner.Reset();
             m_swVision.Reset();
+            bShow = false;
         }
 
         #region Timer
@@ -91,51 +92,104 @@ namespace Root_CAMELLIA.UI_UserControl
 
         private void M_timer_Tick(object sender, EventArgs e)
         {
-            if (bShow) this.Show();
+            if (bShow)
+            {
+                this.Show();
+            }
+            else
+            {
+                return;
+            }
             if (m_handler.m_wtr.p_eState == ModuleBase.eState.Home)
             {
+                progressWTR.Foreground = Brushes.Green;
                 progressWTR.Value = (int)(100 * Math.Min((double)((double)m_swWTR.ElapsedMilliseconds / (((WTR_RND)m_handler.m_wtr).m_secHome * 1000)), (double)1.0));
             }
-            else if (m_handler.m_wtr.p_eState == ModuleBase.eState.Ready) progressWTR.Value = 100;
-            else if (m_handler.m_wtr.p_eState == ModuleBase.eState.Error) progressWTR.Value = 0;    //working
+            else if (m_handler.m_wtr.p_eState == ModuleBase.eState.Ready)
+            {
+                progressWTR.Foreground = Brushes.Blue;
+                progressWTR.Value = 100;
+            }
+            else if (m_handler.m_wtr.p_eState == ModuleBase.eState.Error)
+            {
+                progressWTR.Foreground = Brushes.Red;
+                //progressWTR.Value = 0;    //working
+            }
             else progressWTR.Value = 0;
 
             if (m_handler.m_loadport[0].p_eState == ModuleBase.eState.Home)
             {
+                progressLP1.Foreground = Brushes.Green;
                 progressLP1.Value = (int)(100 * Math.Min((double)((double)m_swLoadport[0].ElapsedMilliseconds / (m_handler.m_aLoadport[0].p_secHome * 1000)), (double)1.0));
             }
-            else if (m_handler.m_loadport[0].p_eState == ModuleBase.eState.Ready) progressLP1.Value = 100;
-            else if (m_handler.m_loadport[0].p_eState == ModuleBase.eState.Error) progressLP1.Value = 0;    //working
+            else if (m_handler.m_loadport[0].p_eState == ModuleBase.eState.Ready)
+            {
+                progressLP1.Foreground = Brushes.Blue;
+                progressLP1.Value = 100;
+            }
+            else if (m_handler.m_loadport[0].p_eState == ModuleBase.eState.Error)
+            {
+                progressLP1.Foreground = Brushes.Red;
+               // progressLP1.Value = 0;    //working
+            }
             else progressLP1.Value = 0;
 
             if (m_handler.m_loadport[1].p_eState == ModuleBase.eState.Home)
             {
+                progressLP2.Foreground = Brushes.Green;
                 progressLP2.Value = (int)(100 * Math.Min((double)((double)m_swLoadport[1].ElapsedMilliseconds / (m_handler.m_aLoadport[1].p_secHome * 1000)), (double)1.0));
             }
-            else if (m_handler.m_loadport[1].p_eState == ModuleBase.eState.Ready) progressLP2.Value = 100;
-            else if (m_handler.m_loadport[1].p_eState == ModuleBase.eState.Error) progressLP2.Value = 0;    //working
+            else if (m_handler.m_loadport[1].p_eState == ModuleBase.eState.Ready)
+            {
+                progressLP2.Foreground = Brushes.Blue;
+                progressLP2.Value = 100;
+            }
+            else if (m_handler.m_loadport[1].p_eState == ModuleBase.eState.Error)
+            {
+                progressLP2.Foreground = Brushes.Red;
+                //progressLP2.Value = 0;    //working
+            }
             else progressLP2.Value = 0;
 
             if (m_handler.m_Aligner.p_eState == ModuleBase.eState.Home)
             {
+                progressAL.Foreground = Brushes.Green;
                 progressAL.Value = (int)(100 * Math.Min((double)((double)m_swAligner.ElapsedMilliseconds / (20 * 1000)), (double)1.0));
             }
-            else if (m_handler.m_Aligner.p_eState == ModuleBase.eState.Ready) progressAL.Value = 100;
-            else if (m_handler.m_Aligner.p_eState == ModuleBase.eState.Error) progressAL.Value = 0; //working
+            else if (m_handler.m_Aligner.p_eState == ModuleBase.eState.Ready)
+            {
+                progressAL.Foreground = Brushes.Blue;
+                progressAL.Value = 100;
+            }
+            else if (m_handler.m_Aligner.p_eState == ModuleBase.eState.Error)
+            {
+                progressAL.Foreground = Brushes.Red;
+            }
             else progressAL.Value = 0;
 
             if (m_handler.m_camellia.p_eState == ModuleBase.eState.Home)
             {
+                progressVS.Foreground = Brushes.Green;
                 progressVS.Value = (int)(100 * Math.Min((double)((double)m_swVision.ElapsedMilliseconds / (30 * 1000)), (double)1.0));
             }
-            else if (m_handler.m_camellia.p_eState == ModuleBase.eState.Ready) progressVS.Value = 100;
-            else if (m_handler.m_camellia.p_eState == ModuleBase.eState.Error) progressVS.Value = 0;    //working
+            else if (m_handler.m_camellia.p_eState == ModuleBase.eState.Ready)
+            {
+                progressVS.Foreground = Brushes.Blue;
+                progressVS.Value = 100;
+            }
+            else if (m_handler.m_camellia.p_eState == ModuleBase.eState.Error)
+            {
+                progressVS.Foreground = Brushes.Red;
+            }
             else progressVS.Value = 0;
 
             if (m_handler.m_wtr.p_eState == ModuleBase.eState.Ready && m_handler.m_loadport[0].p_eState == ModuleBase.eState.Ready &&
                 m_handler.m_loadport[1].p_eState == ModuleBase.eState.Ready && m_handler.m_Aligner.p_eState == ModuleBase.eState.Ready
                 && m_handler.m_camellia.p_eState == ModuleBase.eState.Ready)
+            {
+               // bShow = false;
                 this.Close();
+            }
         }
         #endregion
 

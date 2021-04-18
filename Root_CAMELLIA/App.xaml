@@ -366,7 +366,7 @@
             <Setter Property="FontWeight" Value="ExtraBold"/>
         </Style>
 
-        <Style x:Key="{x:Type ProgressBar}"
+        <Style x:Key="CustomProgress"
        TargetType="{x:Type ProgressBar}">
             <Setter Property="Foreground"
             Value="#01D328"/>

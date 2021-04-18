@@ -36,8 +36,10 @@ namespace Root_EFEM.Module
             p_eComm = (eComm)m_reg.Read("Comm", (int)p_eComm); 
         }
         #endregion
+
         #region DIO
         #endregion
+
         #region ToolBox
         public DIO_I m_diReticleCheck;
         TCPIPClient m_tcpip; 
