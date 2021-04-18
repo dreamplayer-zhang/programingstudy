@@ -89,8 +89,8 @@ namespace Root_VEGA_P.Module
                 toolBox.GetDIO(ref m_diCheckDome[1], m_EOP, p_id + ".Check 1");
                 toolBox.GetDIO(ref m_doClamp[0], m_EOP, p_id + ".Unclamp");
                 toolBox.GetDIO(ref m_doClamp[1], m_EOP, p_id + ".Clamp");
-                toolBox.GetDIO(ref m_diClamp[0], m_EOP, p_id, "Unclamp", 4);
-                toolBox.GetDIO(ref m_diClamp[1], m_EOP, p_id, "Clamp", 4);
+                toolBox.GetDIO(ref m_diClamp[0], m_EOP, p_id + ".Unclamp", "Unclamp", 4);
+                toolBox.GetDIO(ref m_diClamp[1], m_EOP, p_id + ".Clamp", "Clamp", 4);
                 toolBox.GetDIO(ref m_diCoverDown[0], m_EOP, p_id, "Cover Up", 2);
                 toolBox.GetDIO(ref m_diCoverDown[1], m_EOP, p_id, "Cover Down", 2);
                 if (bInit) InitPos();
@@ -253,7 +253,7 @@ namespace Root_VEGA_P.Module
 
             public void RunTreeTeach(Tree tree)
             {
-                m_teach = tree.Set(m_teach, m_teach, p_id, "RND RTR Teach");
+                m_teach = tree.Set(m_teach, m_teach, m_EOP.p_id + "." + p_id, "RND RTR Teach");
             }
             #endregion
 
@@ -434,7 +434,7 @@ namespace Root_VEGA_P.Module
 
             public void RunTreeTeach(Tree tree)
             {
-                m_teach = tree.Set(m_teach, m_teach, p_id, "RND RTR Teach");
+                m_teach = tree.Set(m_teach, m_teach, m_EOP.p_id + "." + p_id, "RND RTR Teach");
             }
             #endregion
 
@@ -545,7 +545,7 @@ namespace Root_VEGA_P.Module
 
         public override void ThreadStop()
         {
-
+            base.ThreadStop();
         }
 
         #region ModuleRun
