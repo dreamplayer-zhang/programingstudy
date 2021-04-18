@@ -320,6 +320,7 @@
     <Resource Include="Icon\Resource\system_task_127px.png" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Recipe\" />
     <Folder Include="UI\2. Review\" />
     <Folder Include="UI\3. Operation\" />
     <Folder Include="ViewModel\" />

@@ -172,6 +172,9 @@
     <Compile Include="MVVM\ObservableObject.cs" />
     <Compile Include="MVVM\PropertySupport.cs" />
     <Compile Include="MVVM\RelayCommand.cs" />
+    <Compile Include="Recipe\RecipeSide.cs" />
+    <Compile Include="Recipe\RecipeStain.cs" />
+    <Compile Include="Recipe\RecipeZStacking.cs" />
     <Compile Include="UIManager.cs" />
     <Compile Include="UI\1. Setup\1.Home\HomePanel.xaml.cs">
       <DependentUpon>HomePanel.xaml</DependentUpon>
@@ -289,6 +292,7 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
+    <Compile Include="Recipe\RecipeTDI.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

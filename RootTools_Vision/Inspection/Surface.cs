@@ -115,7 +115,6 @@ namespace RootTools_Vision
                 }
             }
 
-
             WorkEventManager.OnInspectionDone(this.workplace, new InspectionDoneEventArgs(new List<CRect>())); // 나중에 ProcessDefect쪽 EVENT로...
         }
     }
