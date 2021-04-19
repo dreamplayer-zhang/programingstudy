@@ -709,6 +709,7 @@ namespace Root_EFEM.Module
         #region StateHome
         public override string StateHome()
         {
+
             if (EQ.p_bSimulate)
             {
                 p_eState = eState.Ready;
@@ -1030,6 +1031,7 @@ namespace Root_EFEM.Module
                     child.p_bLock = true;
                     if (m_module.Run(m_module.CmdPick(posWTR, m_nChildID + 1, m_eArm))) return p_sInfo;
                     child.p_bLock = false;
+                    child.AfterGet(m_nChildID);
                 }
                 finally
                 {
@@ -1108,6 +1110,7 @@ namespace Root_EFEM.Module
                     child.p_bLock = true;
                     if (m_module.Run(m_module.CmdPlace(posWTR, m_nChildID + 1, m_eArm))) return p_sInfo;
                     child.p_bLock = false;
+                    child.AfterPut(m_nChildID);
                 }
                 finally
                 {

@@ -31,62 +31,60 @@
                     <UniformGrid Columns="2" Margin="0,1">
                         <Border>
                             <TextBlock Text="Carrier ID"
-                                       FontSize="15"
+                                       FontSize="12"
                                        VerticalAlignment="Center"
                                        HorizontalAlignment="Stretch"
                                        FontWeight="Bold"
-                                       Margin="30,0"/>
+                                       Margin="40,0"/>
                         </Border>
                         <Border>
                             <TextBlock x:Name="textBoxPodID"
-                                       FontSize="15"
+                                       FontSize="12"
                                        Text="{Binding p_sCarrierID}"
                                        VerticalAlignment="Center"
                                        Margin="30,0"/>
                         </Border>
                         <Border>
                             <TextBlock Text="Lot ID"
-                                       FontSize="15"
+                                       FontSize="12"
                                        VerticalAlignment="Center"
                                         FontWeight="Bold"
-                                       Margin="30,0"/>
+                                       Margin="40,0"/>
                         </Border>
                         <Border>
                             <TextBlock x:Name="textBoxLotID"
-                                       FontSize="15"
+                                       FontSize="12"
                                        Text="{Binding p_sLotID}"
                                        VerticalAlignment="Center"
                                        Margin="30,0"/>
                         </Border>
-
                         <Border>
                             <TextBlock Text="Recipe ID"
-                                       FontSize="15"
+                                       FontSize="12"
                                        VerticalAlignment="Center"
                                        FontWeight="Bold"
-                                       Margin="30,0"/>
+                                       Margin="40,0"/>
                         </Border>
                         <Border>
                             <TextBlock Text="{Binding p_sRecipe}"
-                                       FontSize="15"
+                                       FontSize="12"
                                        x:Name="textBoxRecipeID"
                                        VerticalAlignment="Center"
                                        Margin="30,0"/>
                         </Border>
-
-                        <Border>
+                        <!--<Border>
                             <TextBlock Text="State"
-                                       FontSize="15"
+                                       FontSize="12"
                                        VerticalAlignment="Center"
                                        FontWeight="Bold"
-                                       Margin="30,0"/>
+                                       Margin="40,0"/>
                         </Border>
                         <Border>
                             <TextBlock Text="{Binding p_eState}"
                                        FontSize="15"
                                        VerticalAlignment="Center"
                                        Margin="30,0"/>
-                        </Border>
+                        </Border>-->
                     </UniformGrid>
                 </GroupBox>
 

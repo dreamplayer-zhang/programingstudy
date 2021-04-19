@@ -199,8 +199,17 @@ namespace RootTools.Control.ACS
         }
         public double GetAnalogData(int portnum)
         {
-			double Data;
-                m_channel.GetAnalogInputNT(portnum, out Data);
+            double Data = new double();
+            if (portnum == 0)
+            {
+                Data = m_channel.ReadVariable("CDA1", -1);
+                System.Diagnostics.Debug.WriteLine(Data);
+            }
+            else if(portnum ==1)
+            {
+                Data = m_channel.ReadVariable("CDA2", -1);
+                System.Diagnostics.Debug.WriteLine(Data);
+            }
             return Data;
         }
         #endregion
