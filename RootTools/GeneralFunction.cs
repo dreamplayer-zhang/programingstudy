@@ -83,12 +83,6 @@ namespace RootTools
 
             return sb.ToString();
         }
-
-        public static void MakeDirectory(string path)
-        {
-            if(!Directory.Exists(path))
-                Directory.CreateDirectory(path);
-        }
         #endregion
     }
 }

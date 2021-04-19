@@ -10,7 +10,7 @@
     <UserControl.Resources>
         <Style TargetType="{x:Type Button}" x:Key="SetupPanelBtn">
             <Setter Property="FontFamily" Value="Arial"/>
-            <Setter Property="FontSize" Value="15"/>
+            <Setter Property="FontSize" Value="12"/>
             <Setter Property="FontWeight" Value="Bold"/>
             <Setter Property="Background" Value="#FF5482A1"/>
         </Style>
@@ -18,15 +18,16 @@
                          Color="#FF5482A1"/>
     </UserControl.Resources>
     <Grid>
-        <GroupBox Header="{Binding p_id}">
+        <!--<GroupBox Header="{Binding p_id}" Margin="0,5,0,0" BorderBrush="#FF5482A1" BorderThickness="2">-->
+        <GroupBox x:Name="LPNumber" Margin="0,5,0,0" BorderBrush="#FF5482A1" BorderThickness="2" Header="{Binding p_id}">
             <Grid Grid.Row="0">
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="1.5*"/>
+                    <RowDefinition Height="1.2*"/>
                     <RowDefinition Height="0.7*"/>
                     <RowDefinition Height="1*"/>
                     <RowDefinition Height="1*"/>
                 </Grid.RowDefinitions>
-                <GroupBox Grid.Row="0" Header="Information">
+                <GroupBox Grid.Row="0" Header="Information" Margin="0,0,0,0">
                     <UniformGrid Columns="2" Margin="0,1">
                         <Border BorderBrush="Gray" BorderThickness="1">
                             <TextBlock Text="Carrier ID"
@@ -34,7 +35,8 @@
                                        Margin="10,0"/>
                         </Border>
                         <Border BorderBrush="Gray" BorderThickness="1">
-                            <TextBlock Text="{Binding p_sCarrierID}"
+                            <TextBlock x:Name="textBoxPodID"
+                                       Text="{Binding p_sCarrierID}"
                                        VerticalAlignment="Center"
                                        Margin="10,0"/>
                         </Border>
@@ -44,7 +46,8 @@
                                        Margin="10,0"/>
                         </Border>
                         <Border BorderBrush="Gray" BorderThickness="1">
-                            <TextBlock Text="{Binding p_sLotID}"
+                            <TextBlock x:Name="textBoxLotID"
+                                       Text="{Binding p_sLotID}"
                                        VerticalAlignment="Center"
                                        Margin="10,0"/>
                         </Border>
@@ -55,7 +58,8 @@
                                        Margin="10,0"/>
                         </Border>
                         <Border BorderBrush="Gray" BorderThickness="1">
-                            <TextBlock Text="{Binding p_sRecipeID}"
+                            <TextBlock Text="{Binding p_sRecipe}"
+                                       x:Name="textBoxRecipeID"
                                        VerticalAlignment="Center"
                                        Margin="10,0"/>
                         </Border>
@@ -66,7 +70,7 @@
                                        Margin="10,0"/>
                         </Border>
                         <Border BorderBrush="Gray" BorderThickness="1">
-                            <TextBlock Text="{Binding p_sState}"
+                            <TextBlock Text="{Binding p_eState}"
                                        VerticalAlignment="Center"
                                        Margin="10,0"/>
                         </Border>
@@ -80,16 +84,16 @@
                             <RowDefinition Height="1.5*"/>
                         </Grid.RowDefinitions>
                         <Grid Grid.Row="0">
-                            <TextBlock Text="0%" VerticalAlignment="Bottom" Margin="10,0"/>
-                            <TextBlock Text="0 / 0" VerticalAlignment="Bottom" Margin="10,0" HorizontalAlignment="Right"/>
+                            <TextBlock Text="0%" VerticalAlignment="Bottom" Margin="10,-4,10,0"/>
+                            <TextBlock Text="0 / 0" VerticalAlignment="Bottom" Margin="10,-4,10,0" HorizontalAlignment="Right"/>
                         </Grid>
                         <Grid Grid.Row="1">
-                            <ProgressBar Margin="5"/>
+                            <ProgressBar Margin="2"/>
                         </Grid>
                     </Grid>
                 </GroupBox>
 
-                <Grid Grid.Row="2">
+                <Grid Grid.Row="2" Margin="0,-3">
                     <Grid.RowDefinitions>
                         <RowDefinition/>
                         <RowDefinition/>
@@ -102,25 +106,25 @@
                             Content="Manual"
                             Style="{StaticResource SetupPanelBtn}"
                             Foreground="White"
-                            Margin="5,3,5,3"/>
+                            Margin="5,3,5,2"></Button>
                     <Button Grid.Row="0" Grid.Column="1"
                             Content="Auto"
                             Style="{StaticResource SetupPanelBtn}"
                             Foreground="White"
-                            Margin="5,3,5,3"/>
+                            Margin="5,3,5,2"></Button>
 
                     <Button Grid.Row="1" Grid.Column="0"
                             Content="In Service"
                             Style="{StaticResource SetupPanelBtn}"
                             Foreground="White"
-                            Margin="5"/>
+                            Margin="5,3,5,5"></Button>
                     <Button Grid.Row="1" Grid.Column="1"
                             Content="Out Of Service"
                             Style="{StaticResource SetupPanelBtn}"
                             Foreground="White"
-                            Margin="5,3,5,3"/>
+                            Margin="5,3,5,5"></Button>
                 </Grid>
-                <Grid Grid.Row="3">
+                <Grid Grid.Row="3" Margin="0,-3">
                     <Grid.RowDefinitions>
                         <RowDefinition/>
                         <RowDefinition/>
@@ -130,14 +134,14 @@
                             x:Name="buttonLoad"
                             Style="{StaticResource SetupPanelBtn}"
                             Foreground="White"
-                            Margin="5,3,5,3"
+                            Margin="5,3,5,0"
                             Click="buttonLoad_Click"/>
                     <Button Grid.Row="1"
                             Content="Unload Request"
                             x:Name="buttonUnloadReq"
                             Style="{StaticResource SetupPanelBtn}"
                             Foreground="White"
-                            Margin="5,3,5,3"
+                            Margin="5,3,5,0"
                             Click="buttonUnloadReq_Click"/>
                 </Grid>
             </Grid>

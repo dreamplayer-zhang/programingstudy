@@ -34,7 +34,8 @@ namespace Root_VEGA_D
 
         VEGA_D_Handler m_handler;
         Loadport_Cymechs m_loadport;
-        IRFID m_rfid;
+        ManualJobSchedule m_manualjob;
+        RFID_Brooks m_rfid;
 
         public Loadport_UI()
         {
@@ -77,16 +78,24 @@ namespace Root_VEGA_D
             return bReadyLoadport && bReadyToUnload && bAccess & bPlaced;
         }
         #endregion
-
         public void Init(ILoadport loadport, VEGA_D_Handler handler, IRFID rfid)
         {
             m_loadport = (Loadport_Cymechs)loadport;
             m_handler = handler;
-            m_rfid = rfid;
-            this.DataContext = loadport;
+            m_rfid = (RFID_Brooks)rfid;
+            this.DataContext = m_loadport;
+
+            textBoxPodID.DataContext = loadport.p_infoCarrier;
+            textBoxLotID.DataContext = loadport.p_infoCarrier.m_aGemSlot[0];
+            textBoxRecipeID.DataContext = loadport.p_infoCarrier.m_aGemSlot[0];
+
             InitTimer();
             m_bgwLoad.DoWork += M_bgwLoad_DoWork;
             m_bgwLoad.RunWorkerCompleted += M_bgwLoad_RunWorkerCompleted;
+            InfoCarrier infoCarrier = m_loadport.p_infoCarrier;
+            infoCarrier.m_aInfoWafer[0] = (InfoWafer)infoCarrier.m_aGemSlot[0];
+            infoCarrier.m_aInfoWafer[0].p_eState = GemSlotBase.eState.Exist;
+            m_manualjob = new ManualJobSchedule(m_handler.m_engineer,m_loadport,infoCarrier);
         }
 
         private void M_bgwLoad_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
@@ -94,12 +103,11 @@ namespace Root_VEGA_D
             switch (m_loadport.p_eState)
             {
                 case ModuleBase.eState.Ready:
-                    if (EQ.p_bRecovery == false)
-                    {
-                        //InfoCarrier infoCarrier = m_loadport.p_infoCarrier;
-                        //ManualJobSchedule manualJob = new ManualJobSchedule(infoCarrier);
-                        //manualJob.ShowPopup();
-                    }
+                    if (m_manualjob.CheckInfoPod() != "OK") return;
+                    Thread.Sleep(100);
+                    //InfoCarrier infoCarrier = m_loadport.p_infoCarrier;
+                    //ManualJobSchedule manualJob = new ManualJobSchedule(infoCarrier);
+                    //manualJob.ShowPopup();
                     EQ.p_eState = EQ.eState.Run;
                     break;
             }
@@ -107,18 +115,6 @@ namespace Root_VEGA_D
 
         private void M_bgwLoad_DoWork(object sender, DoWorkEventArgs e)
         {
-            InfoCarrier infoCarrier = m_loadport.p_infoCarrier;
-            infoCarrier.m_aInfoWafer[0] = (InfoWafer)infoCarrier.m_aGemSlot[0];
-            infoCarrier.m_aInfoWafer[0].p_eState = GemSlotBase.eState.Exist;
-
-            ManualJobSchedule manualJob = new ManualJobSchedule(infoCarrier);
-            if (manualJob.ShowPopup() == false) return;
-
-            m_loadport.StartRun(m_loadport.GetModuleRunDocking().Clone());
-
-            if (m_loadport.p_id == "LoadportA") EQ.p_nRunLP = 0;
-            else if (m_loadport.p_id == "LoadportB") EQ.p_nRunLP = 1;
-
             while ((EQ.IsStop() != true) && m_loadport.IsBusy()) Thread.Sleep(10);
             Thread.Sleep(100);
         }
@@ -126,6 +122,21 @@ namespace Root_VEGA_D
         #region Button Click Event
         private void buttonLoad_Click(object sender, RoutedEventArgs e)
         {
+
+            if (IsEnableLoad() == false) return;
+            if (m_loadport.p_id == "LoadportA") EQ.p_nRunLP = 0;
+            else if (m_loadport.p_id == "LoadportB") EQ.p_nRunLP = 1;
+            //ModuleRunBase moduleRun = m_rfid.m_runReadID.Clone();
+            //m_rfid.StartRun(moduleRun);
+            //while ((EQ.IsStop() != true) && m_rfid.IsBusy()) Thread.Sleep(10);
+            m_loadport.RunDocking();
+            if (m_loadport.p_infoCarrier.m_aInfoWafer[0] == null)
+            {
+                m_loadport.m_alidInforeticle.Run(true, "Reticle Info Error");
+                m_loadport.RunUndocking();
+                return;
+            }
+            if (m_manualjob.ShowPopup() == false) return;
             m_bgwLoad.RunWorkerAsync();
         }
 

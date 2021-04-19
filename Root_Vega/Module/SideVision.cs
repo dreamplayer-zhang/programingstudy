@@ -804,7 +804,8 @@ namespace Root_Vega.Module
                     int nDefectCode = Convert.ToInt32(item["ClassifyCode"]);
                     InspectionType eType = InspectionManager.GetInspectionType(nDefectCode);
                     InspectionTarget eTarget = InspectionManager.GetInspectionTarget(nDefectCode);
-                    if ((eType == InspectionType.AbsoluteSurface) || (eType == InspectionType.RelativeSurface))
+                    if ((eType == InspectionType.AbsoluteSurfaceDark) || (eType == InspectionType.RelativeSurfaceDark) ||
+                        (eType == InspectionType.AbsoluteSurfaceBright) || (eType == InspectionType.RelativeSurfaceBright))
                     {
                         if (target == InspectionTarget.SideInspection)
                         {

@@ -347,8 +347,6 @@ namespace Root_CAMELLIA.LibSR_Met
                 }
                 else
                 {
-                    //m_SR.IntTime_VIS = 40;
-                    //m_SR.IntTime_NIR =160;
                     m_SR.IntTime_VIS = m_DM.m_SettngData.nMeasureIntTime_VIS;
                     m_SR.IntTime_NIR = m_DM.m_SettngData.nMeasureIntTime_NIR;
                 }
@@ -422,7 +420,7 @@ namespace Root_CAMELLIA.LibSR_Met
         {
             try
             {
-                Thread.Sleep(1000);
+                Thread.Sleep(300);
                 if (m_bSRInitialized == true)
                 {
                     if(!bCheckSampleCal)

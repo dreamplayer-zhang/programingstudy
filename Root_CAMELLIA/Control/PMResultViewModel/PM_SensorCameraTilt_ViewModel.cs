@@ -40,6 +40,10 @@ namespace Root_CAMELLIA
             Image<Bgra, byte> img = mat.ToImage<Bgra, byte>();
 
             p_imageSource = ImageHelper.ToBitmapSource(img);
+
+            double axisX_Position = ModuleCamellia.p_axisXY.p_axisX.p_posActual;
+            double axisY_Position = ModuleCamellia.p_axisXY.p_axisY.p_posActual;
+
         }
 
         BitmapSource m_imageSource;

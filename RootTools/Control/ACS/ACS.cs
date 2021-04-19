@@ -197,6 +197,12 @@ namespace RootTools.Control.ACS
             m_dio.RunTree(m_treeRoot);
             RunTreeConnect(m_treeRoot.GetTree("Connect")); 
         }
+        public double GetAnalogData(int portnum)
+        {
+			double Data;
+                m_channel.GetAnalogInputNT(portnum, out Data);
+            return Data;
+        }
         #endregion
 
         IEngineer m_engineer;

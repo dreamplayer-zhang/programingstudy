@@ -15,7 +15,7 @@ namespace RootTools.Camera.Dalsa
     };
 
     public class DalseCamInfo : ObservableObject
-    {  
+    {
         eCamState _eState = eCamState.Init;
         public eCamState p_eState
         {
@@ -52,6 +52,12 @@ namespace RootTools.Camera.Dalsa
             {
                 SetValueProperty(ref _sFile, value);
             }
+        }
+        string _sAreaCamfile = "";
+        public string p_sAreaCamFile
+        {
+            get => _sAreaCamfile;
+            set => SetValueProperty(ref _sAreaCamfile, value);
         }
         int _nResourceCnt = 0;
         public int p_nResourceIdx
@@ -288,43 +294,42 @@ namespace RootTools.Camera.Dalsa
 
         public void ReadParamter()
         {
-            //ulong buff= 0;
-            int nBuff = 0;
-            //m_sapCam.GetFeatureValue("Width", out buff);
-            //m_Width = Convert.ToInt32( buff);
-            //m_sapCam.GetFeatureValue("Height", out buff);
-            //m_Height = Convert.ToInt32(buff);
-            //m_SapGrabber.GetParameter(SapAcquisition.Prm.HACTIVE, out nBuff);
-            //m_Height = nBuff;
-
-            m_SapGrabber.GetCapability(SapAcquisition.Cap.HACTIVE_MAX, out nBuff);
             m_SapGrabber.GetParameter(SapAcquisition.Prm.CROP_WIDTH, out m_Width);
             m_SapGrabber.GetParameter(SapAcquisition.Prm.CROP_HEIGHT, out m_Height);
+
+            string res;
             if (m_sapCam != null)
             {
-                string strTriggerMode = "";
-                m_sapCam.GetFeatureValue("TriggerMode", out strTriggerMode);
-                if (strTriggerMode == "Internal")
+                m_sapCam.GetFeatureValue("DeviceScanType", out res);
+                if (!res.Equals("Linescan"))
+                    m_sapCam.SetFeatureValue("DeviceScanType", "Linescan");
+            }
+            p_eDeviceScanType = eDeviceScanType.Linescan;
+
+            if(m_sapCam != null)
+            {
+                m_sapCam.GetFeatureValue("TriggerMode", out res);
+                if (!res.Equals("External"))
                     m_sapCam.SetFeatureValue("TriggerMode", "External");
             }
+            p_eTriggerMode = eTriggerMode.External;
+
         }
-
-        public void SetLiveParameter()
+        public void SetAreaParams()
         {
-            m_SapGrabber.GetParameter(SapAcquisition.Prm.CROP_WIDTH, out m_Width);
-            m_SapGrabber.GetParameter(SapAcquisition.Prm.CROP_HEIGHT, out m_Height);
+            if (m_sapCam == null)
+                return;
 
-            if(m_sapCam!=null)
-            {
-                string str;
-                m_sapCam.GetFeatureValue("TriggerMode", out str);
-                if (!str.Equals("Internal"))
-                    m_sapCam.SetFeatureValue("TriggerMode", "Internal");
-                m_sapCam.GetFeatureValue("TDI Mode", out str);
-                if (!str.Equals("TdiArea"))
-                    m_sapCam.SetFeatureValue("TDI Mode", "TdiArea");
+            string res;
+            m_sapCam.GetFeatureValue("DeviceScanType", out res);
+            if (!res.Equals("Areascan"))
+                m_sapCam.SetFeatureValue("DeviceScanType", "Areascan");
+            p_eDeviceScanType = eDeviceScanType.Areascan;
 
-            }
+            m_sapCam.GetFeatureValue("TriggerMode", out res);
+            if (!res.Equals("Internal"))
+                m_sapCam.SetFeatureValue("TriggerMode", "Internal");
+            p_eTriggerMode = eTriggerMode.Internal;
         }
         public void SetCamHandle(SapAcqDevice device, SapAcquisition acquisition)
         {
@@ -339,5 +344,5 @@ namespace RootTools.Camera.Dalsa
         }
     }
 
-   
+
 }

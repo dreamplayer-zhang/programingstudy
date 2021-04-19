@@ -60,13 +60,12 @@ namespace Root_Rinse_Unloader.Module
 
         #region Rotate
         Axis[] m_axisRotate = new Axis[2];
-
         public string RunRotate(bool bRotate)
         {
             if (bRotate)
             {
-                m_axisRotate[0].Jog(m_rinse.p_fRotateSpeed);
-                m_axisRotate[1].Jog(m_rinse.p_fRotateSpeed);
+                m_axisRotate[0].Jog(m_rinse.p_fRotateSpeed, "Move");
+                m_axisRotate[1].Jog(m_rinse.p_fRotateSpeed, "Move");
             }
             else
             {
@@ -416,6 +415,13 @@ namespace Root_Rinse_Unloader.Module
             InitBase(id, engineer);
 
             InitThreadCheck(); 
+            EQ.m_EQ.OnChanged += M_EQ_OnChanged;
+        }
+
+        private void M_EQ_OnChanged(_EQ.eEQ eEQ, dynamic value)
+        {
+            if (eEQ != _EQ.eEQ.State) return;
+            if (value != EQ.eState.Run) RunRotate(false); 
         }
 
         public override void ThreadStop()

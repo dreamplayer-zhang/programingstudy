@@ -169,20 +169,12 @@ namespace RootTools.ParticleCounter
             }
             return "Read Data Timeout";
         }
-
-        int m_msTimeout = 0; 
-        public bool IsTimeout()
-        {
-            return false; //forget
-            //return (m_swRun.ElapsedMilliseconds > m_msTimeout);
-        }
         #endregion
 
         #region Run
         Sample m_sampleRun; 
         public string StartRun(Sample sample)
         {
-            m_msTimeout = 1000 * (sample.m_nRepeat * sample.m_secSample + 10);
             m_sampleRun = sample;
             if (IsBusy()) return "Busy"; 
             ClearCount();

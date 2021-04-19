@@ -33,9 +33,13 @@ namespace RootTools.Inspects
 	public enum InspectionType
 	{
 		None = 0,
-		AbsoluteSurface = 1,
-		RelativeSurface = 2,
+		DarkInspection = 1,//1~3까지는 Merge
+		AbsoluteSurfaceDark = 2,
+		RelativeSurfaceDark = 3,
 		D2D = 3,
 		Strip = 4,
+		BrightInspection = 5,//5~7까지는 Merge
+		AbsoluteSurfaceBright = 6,
+		RelativeSurfaceBright = 7,
 	}
 }

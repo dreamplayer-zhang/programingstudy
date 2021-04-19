@@ -3,13 +3,12 @@ using RootTools.Comm;
 using RootTools.GAFs;
 using RootTools.Module;
 using RootTools.Trees;
-using System;
 using System.Collections.Generic;
 using System.Threading;
 
-namespace Root_CAMELLIA.Module
+namespace Root_VEGA_D.Module
 {
-	public class Module_FFU : ModuleBase
+	public class FFU : ModuleBase
 	{
 		#region ToolBox
 		public Modbus m_modbus;
@@ -17,41 +16,42 @@ namespace Root_CAMELLIA.Module
 		{
 			p_sInfo = m_toolBox.GetComm(ref m_modbus, this, "Modbus");
 		}
-        #endregion
+		#endregion
 
-        #region Unit
-
-        #region Interface
-        public interface UnitState
-        {
-			void InitALID(Module_FFU FFU);
-			void RunTree(Tree tree);
-        }
-        #endregion
-
-        public class Unit : NotifyProperty
+		#region Unit
+		public class Unit : NotifyProperty
 		{
 			#region Fan
-			public class Fan : NotifyProperty, UnitState
+			public class Fan : NotifyProperty
 			{
 				public RPoint m_mmLimit = new RPoint();
-				public RPoint m_mmPressureLimit = new RPoint();
 				public int m_nSet = 0;
-				public int m_nMode = 0;
 				int _nRPM = 0;
 				public int p_nRPM
 				{
 					get { return _nRPM; }
 					set
 					{
-                        if (_nRPM == value) return;
+						if (_nRPM == value)
+						{
+							m_alidSetted_RPMLow.Run(m_mmLimit.X > _nRPM, "FFU RPM Lower than Low Limit.");
+							m_alidSetted_RPMHigh.Run(m_mmLimit.Y < _nRPM, "FFU RPM Higher than High Limit.");
+							return;
+						}
+						//if (m_nSet == 0)
+						//{
+						//	m_alidSetted_RPMLow.Run(m_mmLimit.X > _nRPM, "FFU RPM Lower than Low Limit.");
+						//	m_alidSetted_RPMHigh.Run(m_mmLimit.Y < _nRPM, "FFU RPM Higher than High Limit.");
+						//}
+						//else if (m_nSet == 1)
+						//{
+						//	m_alidSetted_PreLow.Run(m_mmLimit.X > _nRPM, "FFU Pressure Lower than Low Limit.");
+						//	m_alidSetted_PreHigh.Run(m_mmLimit.Y < _nRPM, "FFU Pressure Higher than High Limit.");
+						//}
 
-                        m_alidSetted_RPMLow.Run(m_mmLimit.X > _nRPM, "FFU RPM Lower than Low Limit.");
-                        m_alidSetted_RPMHigh.Run(m_mmLimit.Y < _nRPM, "FFU RPM Higher than High Limit.");
-
-                        _nRPM = value;
-                        OnPropertyChanged();
-                    }
+						_nRPM = value;
+						OnPropertyChanged();
+					}
 				}
 
 				double _fPressure = 0;
@@ -61,10 +61,6 @@ namespace Root_CAMELLIA.Module
 					set
 					{
 						if (_fPressure == value) return;
-
-						m_alidSetted_PreLow.Run(m_mmPressureLimit.X > _fPressure, "FFU Pressure Lower than Low Limit.");
-						m_alidSetted_PreHigh.Run(m_mmPressureLimit.Y < _fPressure, "FFU Pressure Higher than High Limit.");
-
 						_fPressure = value;
 						OnPropertyChanged();
 					}
@@ -82,7 +78,7 @@ namespace Root_CAMELLIA.Module
 				ALID m_alidSetted_RPMLow;
 				ALID m_alidSetted_PreHigh;
 				ALID m_alidSetted_PreLow;
-				public  void InitALID(Module_FFU FFU)
+				public void InitALID(FFU FFU)
 				{
 					GAF GAF = FFU.m_gaf;
 					m_alidFan = GAF.GetALID(FFU, m_id + " : Fan Error", "Fan Run Error");
@@ -236,37 +232,23 @@ namespace Root_CAMELLIA.Module
 				#endregion
 
 
-				public bool p_IsUpdate { get; set; } = false;
 
 				public void RunTree(Tree tree)
 				{
 					p_sFan = tree.Set(p_sFan, p_sFan, "Fan ID", "Fan ID");
-					//m_nMode = tree.Set(m_nMode, m_nMode, "Set Mode", "RPM = 0, Pressure = 1");
 					m_nSet = tree.Set(m_nSet, m_nSet, "Set", "Fan Set Value (RPM) or Pressure (0.1pa)");
 					m_mmLimit = tree.Set(m_mmLimit, m_mmLimit, "Limit", "FFU Lower & Upper Limit");
-					m_mmPressureLimit = tree.Set(m_mmPressureLimit, m_mmPressureLimit, "Pressure Limit", "FFU Pressure Lower & Upper Limit");
-					p_IsUpdate = true;
 				}
 
 				public string m_id;
-				string _sFan = "";
-				public string p_sFan 
-				{
-                    get { return _sFan; }
-                    set
-                    {
-						if (_sFan == value) return;
-						_sFan = value;
-						OnPropertyChanged();
-                    }
-				}
-				public Fan(Module_FFU FFU, string id)
+				public string p_sFan { get; set; }
+				public Fan(FFU FFU, string id)
 				{
 					m_id = id;
+					p_sFan = id;
 					InitALID(FFU);
 				}
 			}
-			#endregion
 			public List<Fan> m_aFan = new List<Fan>();
 			public List<Fan> p_aFan
 			{
@@ -278,38 +260,11 @@ namespace Root_CAMELLIA.Module
 					OnPropertyChanged();
 				}
 			}
-			public List<Temp> m_aTemp = new List<Temp>();
-			public List<Temp> p_aTemp
-			{
-				get { return m_aTemp; }
-				set
-				{
-					if (m_aTemp == value) return;
-					m_aTemp = value;
-					OnPropertyChanged();
-				}
-			}
-			public List<Humidity> m_aHumidity = new List<Humidity>();
-			public List<Humidity> p_aHumidity
-            {
-                get { return m_aHumidity; }
-                set
-                {
-					if (m_aHumidity == value) return;
-					m_aHumidity = value;
-					OnPropertyChanged();
-                }
-            }
-
 			List<int> m_aFanState = new List<int>();
 			List<int> m_aFanRPM = new List<int>();
 			List<int> m_aFanPressure = new List<int>();
 			List<int> m_aFanReset = new List<int>();
 			List<int> m_aFanRPMSet = new List<int>();
-
-			List<int> m_aTempValue = new List<int>();
-			List<int> m_aHumidityValue = new List<int>();
-
 
 			public void InitFan()
 			{
@@ -319,154 +274,31 @@ namespace Root_CAMELLIA.Module
 				InitListFan(m_aFanPressure);
 				InitListFan(m_aFanReset);
 				InitListFan(m_aFanRPMSet);
-
-                while (m_aTemp.Count < m_lTemp) m_aTemp.Add(new Temp(m_FFU, m_id + ".Temp" + m_aTemp.Count.ToString("00")));
-                InitListTemp(m_aTempValue);
-
-                while (m_aHumidity.Count < m_lHumidity) m_aHumidity.Add(new Humidity(m_FFU, m_id + ".Humidity" + m_aHumidity.Count.ToString("00")));
-                InitListHumidity(m_aHumidityValue);
-            }
+			}
 
 			void InitListFan(List<int> aList)
 			{
 				while (aList.Count > m_lFan) aList.RemoveAt(aList.Count - 1);
 				while (aList.Count < m_lFan) aList.Add(0);
-			}
-			void InitListTemp(List<int> aList)
-            {
-				int nTotal = 32 * m_lTemp;
-				aList.Clear();
-				for (int i = 0; i < nTotal; i++) aList.Add(0);
-            }
 
-			void InitListHumidity(List<int> aList)
-            {
-				int nTotal = 32 * m_lTemp;
-				aList.Clear();
-				for (int i = 0; i < nTotal; i++) aList.Add(0);
+				//p_aFanState.Add(0);
+
+				//	m_aTempFanRun.Add(false);
+				//	m_aIsFanRun.Add(false);
+				//	p_aIsFanRun.Add(false);
+				//	m_aFan.Add(new Fan(this, n));
+				//}
 			}
 
-			int m_lFan = 2;
-			int m_lTemp = 1;
-			int m_lHumidity = 1;
+			int m_lFan = 6;
 			public void RunTreeUnit(Tree tree)
 			{
 				p_sUnit = tree.Set(p_sUnit, p_sUnit, "Unit ID", "Unit ID");
 				m_idUnit = (byte)tree.Set((int)m_idUnit, (int)m_idUnit, "Unit Address", "Unit Address");
 				m_lFan = tree.Set(m_lFan, m_lFan, "Fan Count", "Fan Count");
-				m_lTemp = tree.Set(m_lTemp, m_lTemp, "Temp Count", "Temp Count");
-				m_lHumidity = tree.Set(m_lHumidity, m_lHumidity, "Humidity Count", "Humidity Count");
 				InitFan();
 				for (int n = 0; n < m_lFan; n++) m_aFan[n].RunTree(tree.GetTree(m_aFan[n].m_id));
-				for (int n = 0; n < m_lTemp; n++) m_aTemp[n].RunTree(tree.GetTree(m_aTemp[n].m_id));
-				for (int n = 0; n < m_lHumidity; n++) m_aHumidity[n].RunTree(tree.GetTree(m_aHumidity[n].m_id));
 			}
-            
-
-            #region Temp
-            public class Temp : NotifyProperty, UnitState
-			{
-				public RPoint m_mmLimit { get; set; } = new RPoint();
-				int _nTemp;
-				public int p_nTemp
-				{
-					get { return _nTemp; }
-					set
-					{
-						if (_nTemp == value) return;
-						m_alidTempLow.Run(m_mmLimit.X > _nTemp, "FFU Temp Lower than Low Limit.");
-						m_alidTempHigh.Run(m_mmLimit.Y < _nTemp, "FFU Temp Higher than High Limit.");
-						_nTemp = value;
-						OnPropertyChanged();
-					}
-				}
-				#region ALID
-				ALID m_alidTempHigh;
-				ALID m_alidTempLow;
-				public void InitALID(Module_FFU FFU)
-				{
-					GAF GAF = FFU.m_gaf;
-					m_alidTempHigh = GAF.GetALID(FFU, m_id + " : Temp High", "Temp too High");
-					m_alidTempLow = GAF.GetALID(FFU, m_id + " : Temp Low", "Temp RPM too Low");
-				}
-				#endregion
-				string _sTemp = "";
-				public string p_sTemp 
-				{
-                    get { return _sTemp; }
-                    set
-                    {
-						if (_sTemp == value) return;
-						_sTemp = value;
-						OnPropertyChanged();
-                    }
-				}
-				public void RunTree(Tree tree)
-				{
-					p_sTemp = tree.Set(p_sTemp, p_sTemp, "Temp ID", "Temp ID");
-					m_mmLimit = tree.Set(m_mmLimit, m_mmLimit, "Limit", "Temp Lower & Upper Limit");
-				}
-				public string m_id;
-				public Temp(Module_FFU FFU, string id)
-				{
-					m_id = id;
-					InitALID(FFU);
-				}
-			}
-
-			#endregion
-
-			#region Humidity
-			public class Humidity : NotifyProperty, UnitState
-			{
-				public RPoint m_mmLimit { get; set;} = new RPoint();
-				int _nHumidity;
-				public int p_nHumidity
-				{
-					get { return _nHumidity; }
-					set
-					{
-						if (_nHumidity == value) return;
-						m_alidHumidityLow.Run(m_mmLimit.X > _nHumidity, "FFU Humidity Lower than Low Limit.");
-						m_alidHumidityHigh.Run(m_mmLimit.Y < _nHumidity, "FFU Humidity Higher than High Limit.");
-						_nHumidity = value;
-						OnPropertyChanged();
-					}
-				}
-				#region ALID
-				ALID m_alidHumidityHigh;
-				ALID m_alidHumidityLow;
-				public void InitALID(Module_FFU FFU)
-				{
-					GAF GAF = FFU.m_gaf;
-					m_alidHumidityHigh = GAF.GetALID(FFU, m_id + " : Humidity High", "Humidity too High");
-					m_alidHumidityLow = GAF.GetALID(FFU, m_id + " : Humidity Low", "Humidity RPM too Low");
-				}
-				#endregion
-				string _sHumidity = "";
-				public string p_sHumidity 
-				{
-                    get { return _sHumidity; }
-                    set
-                    {
-						if (_sHumidity == value) return;
-						_sHumidity = value;
-						OnPropertyChanged();
-                    }
-				}
-				public void RunTree(Tree tree)
-				{
-					p_sHumidity = tree.Set(p_sHumidity, p_sHumidity, "Humidity ID", "Temp ID");
-					m_mmLimit = tree.Set(m_mmLimit, m_mmLimit, "Limit", "Humidity Lower & Upper Limit");
-                }
-				public string m_id;
-				public Humidity(Module_FFU FFU, string id)
-				{
-					m_id = id;
-					InitALID(FFU);
-				}
-			}
-
 			#endregion
 
 			#region Run Thread
@@ -486,37 +318,21 @@ namespace Root_CAMELLIA.Module
 					m_FFU.m_modbus.ReadHoldingRegister(m_idUnit, 128, m_aFanPressure);
 					for (int n = 0; n < m_lFan; n++) m_aFan[n].p_fPressure = m_aFan[n].p_bRun ? m_aFanPressure[n] / 10.0 : 0;
 
-					for (int n = 0; n < m_lHumidity; n++)
+					if (m_FFU.m_bResetFan)
 					{
 						Thread.Sleep(10);
-						int nHumidity = 0;
-						m_FFU.m_modbus.ReadHoldingRegister(m_idUnit, 193 + (32 * n), ref nHumidity);
-						m_aHumidity[n].p_nHumidity = nHumidity;
+						for (int n = 0; n < m_lFan; n++) m_aFanReset[n] = 1;
+						m_FFU.m_modbus.WriteHoldingRegister(m_idUnit, 96, m_aFanReset);
 					}
 
-					for (int n = 0; n < m_lTemp; n++)
-                    {
-						Thread.Sleep(10);
-						int nTemp = 0;
-						m_FFU.m_modbus.ReadHoldingRegister(m_idUnit, 194 + (32 * n), ref nTemp);
-						m_aTemp[n].p_nTemp = nTemp;
-					}
-
-                    if (m_FFU.m_bResetFan)
-                    {
-                        Thread.Sleep(10);
-                        for (int n = 0; n < m_lFan; n++) m_aFanReset[n] = 1;
-                        m_FFU.m_modbus.WriteHoldingRegister(m_idUnit, 96, m_aFanReset);
-                    }
-
-                    if (IsRPMSet())
+					if (IsRPMSet())
 					{
 						Thread.Sleep(10);
 						for (int n = 0; n < m_lFan; n++) m_aFanRPMSet[n] = m_aFan[n].m_nSet;
 						m_FFU.m_modbus.WriteHoldingRegister(m_idUnit, 32, m_aFanRPMSet);
 					}
 				}
-				catch(Exception e) { }
+				catch { }
 			}
 
 			bool IsRPMSet()
@@ -529,11 +345,11 @@ namespace Root_CAMELLIA.Module
 			}
 			#endregion
 
-			Module_FFU m_FFU;
+			FFU m_FFU;
 			byte m_idUnit = 0;
 			public string m_id;
 			public string p_sUnit { get; set; }
-			public Unit(Module_FFU FFU, int nID)
+			public Unit(FFU FFU, int nID)
 			{
 				m_FFU = FFU;
 				m_id = "Unit" + nID.ToString();
@@ -620,7 +436,7 @@ namespace Root_CAMELLIA.Module
 		}
 		#endregion
 
-		public Module_FFU(string id, IEngineer engineer)
+		public FFU(string id, IEngineer engineer)
 		{
 			p_id = id;
 			InitBase(id, engineer);

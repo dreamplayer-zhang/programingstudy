@@ -11,6 +11,7 @@
         xmlns:viewConverter="clr-namespace:ViewConverter;assembly=RootTools"
         xmlns:met="clr-namespace:Root_CAMELLIA.LibSR_Met"
         xmlns:stage="clr-namespace:Camellia2Stage"
+        xmlns:System="clr-namespace:System;assembly=mscorlib"
         WindowStyle="None"
         ResizeMode="CanResize"
         WindowStartupLocation="CenterScreen"
@@ -66,12 +67,14 @@
                           Height="21"
                           VerticalAlignment="Center"
                           Margin="2" />
-            <TextBlock Text="Camellia Ⅱ - Version 0.0.1"
+            <!--<TextBlock Text="Camellia Ⅱ - Version 0.0.1"
                        FontSize="11"
                        Foreground="Black"
                        VerticalAlignment="Center"
                        Margin="5,0,0,0"
-                       Grid.Column="1" />
+                       Grid.Column="1" />-->
+            <TextBlock Grid.Column="1" Text="{Binding Path=Version, Source={x:Static local:BaseDefine.Configuration}}"  FontSize="11" Foreground="Black" VerticalAlignment="Center" Margin="5,0,0,0"/>
+
             <TextBlock Text="ENGINEER"
                        FontSize="14"
                        FontWeight="Bold"
@@ -240,40 +243,53 @@
                                                             <ColumnDefinition/>
                                                             <ColumnDefinition/>
                                                             <ColumnDefinition/>
+                                                            <ColumnDefinition/>
                                                         </Grid.ColumnDefinitions>
-                                                        <Grid Grid.ColumnSpan="3" Grid.RowSpan="2" Panel.ZIndex="1">
-                                                            <local:LoadingControl Opacity="{Binding ModuleCamellia.p_eState, Converter={StaticResource ModuleStateConverter}}"/>
+                                                        <Grid Grid.ColumnSpan="4" Grid.RowSpan="2" Panel.ZIndex="1">
+                                                            <local:LoadingControl Opacity="{Binding ModuleCamellia.p_eState, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource ModuleStateConverter}}"/>
                                                         </Grid>
-                                                        <Button Content="Wafer Centering"
+                                                        <Button
                                                     Margin="5"
                                                     Grid.Row="0"
-                                                    Command="{Binding CmdCentering}" IsEnabled="{Binding ModuleCamellia.p_eState, Converter={StaticResource ModuleStateToEnableConverter} }" />
+                                                    Command="{Binding CmdCentering}" IsEnabled="{Binding ModuleCamellia.p_eState, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource ModuleStateToEnableConverter} }" >
+                                                            <TextBlock TextWrapping="Wrap" TextAlignment="Center">
+                                                    Wafer Centering
+                                                            </TextBlock>
+                                                        </Button>
                                                         <Button
                                                     Margin="5"
                                                     Grid.Column="1" Grid.Row="0"
-                                                    Command="{Binding CmdInitCal}" IsEnabled="{Binding ModuleCamellia.p_eState, Converter={StaticResource ModuleStateToEnableConverter} }">
-                                                            <TextBlock TextAlignment="Center">
+                                                    Command="{Binding CmdInitCal}" IsEnabled="{Binding ModuleCamellia.p_eState, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource ModuleStateToEnableConverter} }">
+                                                            <TextBlock TextWrapping="Wrap" TextAlignment="Center">
                                                     Init Calibration
                                                             </TextBlock>
                                                         </Button>
                                                         <Button 
                                                     Margin="5"
                                                     Grid.Row="1"
-                                                    Command="{Binding CmdMeasureBack}" IsEnabled="{Binding ModuleCamellia.p_eState, Converter={StaticResource ModuleStateToEnableConverter} }">
+                                                    Command="{Binding CmdMeasureBack}" IsEnabled="{Binding ModuleCamellia.p_eState, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource ModuleStateToEnableConverter} }">
                                                             <TextBlock TextWrapping="Wrap" TextAlignment="Center">
                                                     Background Calibration
                                                             </TextBlock>
                                                         </Button>
-                                                        <Button Content="Measure Sample"
+                                                        <Button Grid.Column="2" Grid.Row="0" Margin="5" Command="{Binding CmdInit}" Content="Initialize" IsEnabled="{Binding ModuleCamellia.p_eState, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource ModuleStateToEnableConverter} }"/>
+                                                        <Button
                                                     Margin="5"
                                                     Grid.Column="1" Grid.Row="1"
-                                                    Command="{Binding CmdMeasureSample}" IsEnabled="{Binding ModuleCamellia.p_eState, Converter={StaticResource ModuleStateToEnableConverter} }"/>
-                                                        <Button Grid.Column="2" Grid.Row="0" Margin="5" Command="{Binding CmdInit}" Content="Initialize" IsEnabled="{Binding ModuleCamellia.p_eState, Converter={StaticResource ModuleStateToEnableConverter} }"/>
-                                                        <Button Content="Measure Sample"
+                                                    Command="{Binding CmdMeasureSample}" IsEnabled="{Binding ModuleCamellia.p_eState, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource ModuleStateToEnableConverter} }" >
+                                                            <TextBlock TextWrapping="Wrap" TextAlignment="Center">
+                                                    Recipe Measure
+                                                            </TextBlock>
+                                                        </Button>
+                                                        <Button
                                                     Margin="5"
-                                                    Grid.Column="1" Grid.Row="1"
-                                                    Command="{Binding CmdMeasureSample}" IsEnabled="{Binding ModuleCamellia.p_eState, Converter={StaticResource ModuleStateToEnableConverter} }" />
-                                                        <Button Grid.Column="2" Grid.Row="1" Margin="5" Command="{Binding }" IsEnabled="{Binding ModuleCamellia.p_eState, Converter={StaticResource ModuleStateToEnableConverter} }">Test Button</Button>
+                                                    Grid.Column="2" Grid.Row="1"
+                                                    Command="{Binding CmdPointMeasure}" IsEnabled="{Binding ModuleCamellia.p_eState, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource ModuleStateToEnableConverter} }">
+                                                            <TextBlock TextWrapping="Wrap" TextAlignment="Center">
+                                                    Point Measure
+                                                            </TextBlock>
+                                                        </Button>
+                                                        <Button Grid.Column="3" Grid.Row="1" Margin="5" Command="{Binding}" IsEnabled="{Binding ModuleCamellia.p_eState, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource ModuleStateToEnableConverter} }">Repeat</Button>
                                                     </Grid>
                                                     <Grid Grid.Row="3">
                                                         <Viewbox>
@@ -308,19 +324,19 @@
                                     Background="#01FFFFFF" Focusable="true">
                                                                 <Border BorderBrush="Black" BorderThickness="1" Panel.ZIndex="99">
                                                                     <Grid>
-                                                                        <Rectangle Width="5" Height="40" Fill="#990000FF" />
+                                                                        <Rectangle Width="5" Height="60" Fill="#990000FF" />
                                                                         <!--<TextBlock Text="Test" FontSize="20" VerticalAlignment="Center" HorizontalAlignment="Center" />-->
-                                                                        <Rectangle Width="40" Height="5" Fill="#990000FF" />
+                                                                        <Rectangle Width="60" Height="5" Fill="#990000FF" />
                                                                     </Grid>
                                                                     <Canvas.Left>
-                                                                        <MultiBinding Converter="{StaticResource AxisToStageConverter}" ConverterParameter="40">
+                                                                        <MultiBinding Converter="{StaticResource AxisToStageConverter}" ConverterParameter="60">
                                                                             <Binding Path="StageCenterPos.X"/>
                                                                             <Binding Path="ModuleCamellia.p_axisXY.p_axisX.p_posActual"/>
                                                                             <Binding Path="ModuleCamellia.p_axisXY.p_axisX"/>
                                                                         </MultiBinding>
                                                                     </Canvas.Left>
                                                                     <Canvas.Top>
-                                                                        <MultiBinding Converter="{StaticResource AxisToStageConverter}" ConverterParameter="40">
+                                                                        <MultiBinding Converter="{StaticResource AxisToStageConverter}" ConverterParameter="60">
                                                                             <Binding Path="StageCenterPos.Y"/>
                                                                             <Binding Path="ModuleCamellia.p_axisXY.p_axisY.p_posActual"/>
                                                                             <Binding Path="ModuleCamellia.p_axisXY.p_axisY"/>
