@@ -347,6 +347,7 @@ namespace RootTools.Camera.Dalsa
         void SetUserset(int num)
         {
             string str;
+            if (m_sapCam == null) return;
             m_sapCam.GetFeatureValue("UserSetSelector", out str);
             if (!str.Contains(num.ToString()))
                 m_sapCam.SetFeatureValue("UserSetSelector", "UserSet" + num.ToString());
