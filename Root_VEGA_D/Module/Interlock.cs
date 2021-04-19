@@ -160,16 +160,23 @@ namespace Root_VEGA_D.Module
         public double m_CDA2_Value;
         public void CheckFDC()
 		{
-            p_CDA1_Value = m_ACS.GetAnalogData((int)eAnalog_CDA.CDA1);
-            p_CDA2_Value = m_ACS.GetAnalogData((int)eAnalog_CDA.CDA2);
-            if (p_CDA1_Value < m_mmLimitCDA1.X)
-            { m_alidCDA1_Low.Run(true, "CDA1_Value Pressure Lower than Limit"); }
-            if (p_CDA1_Value > m_mmLimitCDA1.Y)
-            { m_alidCDA1_High.Run(true, "CDA1_Value Pressure Higher than Limit"); }
-            if (p_CDA2_Value < m_mmLimitCDA2.X)
-            { m_alidCDA2_Low.Run(true, "CDA2_Value Pressure Lower than Limit"); }
-            if (p_CDA2_Value > m_mmLimitCDA2.Y)
-            { m_alidCDA2_High.Run(true, "CDA2_Value Pressure Higher than Limit"); }
+            if (m_ACS.p_id != null)
+            {
+                try
+                {
+                    p_CDA1_Value = m_ACS.GetAnalogData((int)eAnalog_CDA.CDA1);
+                    p_CDA2_Value = m_ACS.GetAnalogData((int)eAnalog_CDA.CDA2);
+                    if (p_CDA1_Value < m_mmLimitCDA1.X)
+                    { m_alidCDA1_Low.Run(true, "CDA1_Value Pressure Lower than Limit"); }
+                    if (p_CDA1_Value > m_mmLimitCDA1.Y)
+                    { m_alidCDA1_High.Run(true, "CDA1_Value Pressure Higher than Limit"); }
+                    if (p_CDA2_Value < m_mmLimitCDA2.X)
+                    { m_alidCDA2_Low.Run(true, "CDA2_Value Pressure Lower than Limit"); }
+                    if (p_CDA2_Value > m_mmLimitCDA2.Y)
+                    { m_alidCDA2_High.Run(true, "CDA2_Value Pressure Higher than Limit"); }
+                }
+                catch (Exception e) { m_log.Info(e.ToString()); }
+            }
         }
         #endregion
         #region Thread

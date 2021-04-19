@@ -493,12 +493,19 @@ namespace Root_VEGA_D.Module
                 return "OK";
             }
         }
+
+        public int m_secHome = 60;
+        void RunTreeTimeout(Tree tree)
+        {
+            m_secHome = tree.Set(m_secHome, m_secHome, "Home", "Timeout (sec)");
+        }
         #endregion
 
         #region Tree
         public override void RunTree(Tree tree)
         {
             base.RunTree(tree);
+
             RunTreeAxis(tree.GetTree("Axis", false));
             RunTreeGrabMode(tree.GetTree("Grab Mode", false));
         }

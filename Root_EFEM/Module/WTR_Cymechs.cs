@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading;
+using RootTools.GAFs;
 
 namespace Root_EFEM.Module
 {
@@ -46,6 +47,7 @@ namespace Root_EFEM.Module
         RS232 m_rs232;
         public override void GetTools(bool bInit)
         {
+            InitALID();
             p_sInfo = m_toolBox.GetDIO(ref m_diReticleCheck, this, "Reticle Check Sensor");
             switch (p_eComm)
             {
@@ -500,6 +502,8 @@ namespace Root_EFEM.Module
             if (m_protocolSend != null)
             {
                 bool bDone = m_protocolSend.OnReceive(sRead);
+                //string[] sreads = sRead.Split(' ');
+                //m_alidRTRCmdError.Run(sreads[0] == "_ERR", "Cymechs Robot Error, Error Code : " + sreads[1]);
                 if (bDone) m_protocolSend = null;
             }
         }
@@ -511,6 +515,8 @@ namespace Root_EFEM.Module
             if (m_protocolSend != null)
             {
                 bool bDone = m_protocolSend.OnReceive(sRead);
+                //string[] sreads = sRead.Split(' ');
+                //m_alidRTRCmdError.Run(sreads[0] == "_ERR", "Cymechs Robot Error, Error Code : " + sreads[1]);
                 if (bDone) m_protocolSend = null;
             }
         }
@@ -524,7 +530,15 @@ namespace Root_EFEM.Module
                 case eComm.TCPIP: return m_tcpip.Send(sCmd + "\r"); 
                 case eComm.RS232: return m_rs232.Send(sCmd);
             }
-            return "SendCmd Comm Type Error : " + p_eComm.ToString(); 
+            return "SendCmd Comm Type Error : " + p_eComm.ToString();
+        }
+        #endregion
+
+        #region GAF
+        public ALID m_alidRTRCmdError;
+        void InitALID()
+        {
+            m_alidRTRCmdError = m_gaf.GetALID(this, "Cymechs", "RTR CMD ERROR");
         }
         #endregion
 

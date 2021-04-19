@@ -55,6 +55,11 @@ namespace Root_VEGA_D
 
         private void M_timer_Tick(object sender, EventArgs e)
         {
+            if (EQ.p_eState != EQ.eState.Home)
+            {
+                bShow = false;
+                this.Close();
+            }
             if (bShow) this.Show();
             if (m_handler.m_wtr.p_eState == ModuleBase.eState.Home)
             {
@@ -80,6 +85,13 @@ namespace Root_VEGA_D
             else if (m_handler.m_loadport[1].p_eState == ModuleBase.eState.Error) progressLP2.Value = 0;    //working
             else progressLP2.Value = 0;
 
+            if (m_handler.m_vision.p_eState == ModuleBase.eState.Home)
+            {
+                progressVS.Value = (int)(100 * Math.Min((double)((double)m_swVision.ElapsedMilliseconds / (m_handler.m_vision.m_secHome * 1000)), (double)1.0));
+            }
+            else if (m_handler.m_vision.p_eState == ModuleBase.eState.Ready) progressVS.Value = 100;
+            else if (m_handler.m_vision.p_eState == ModuleBase.eState.Error) progressVS.Value = 0;    //working
+            else progressVS.Value = 0;
             //if (m_handler.m_camellia.p_eState == ModuleBase.eState.Home)
             //{
             //    progressVS.Value = (int)(100 * Math.Min((m_swAligner.ElapsedMilliseconds / (20 * 1000)), 1.0));
@@ -89,7 +101,7 @@ namespace Root_VEGA_D
             //else progressVS.Value = 0;
 
             if (m_handler.m_wtr.p_eState == ModuleBase.eState.Ready && m_handler.m_loadport[0].p_eState == ModuleBase.eState.Ready &&
-                m_handler.m_loadport[1].p_eState == ModuleBase.eState.Ready)
+                m_handler.m_loadport[1].p_eState == ModuleBase.eState.Ready && m_handler.m_vision.p_eState == ModuleBase.eState.Ready) 
                 this.Close();
         }
         #endregion
