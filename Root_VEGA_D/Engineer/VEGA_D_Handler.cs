@@ -40,7 +40,6 @@ namespace Root_VEGA_D.Engineer
         public HomeProgress_UI m_HomeProgress = new HomeProgress_UI();
         public Interlock m_interlock;
         public TowerLamp m_towerlamp;
-        public FDC m_FDC;
         public FFU m_FFU;
 
         void InitModule()
@@ -56,8 +55,6 @@ namespace Root_VEGA_D.Engineer
             iWTR.AddChild(m_vision);
             m_visionIPU = new Vision_IPU("Vision_IPU", m_engineer);
             InitModule(m_visionIPU);
-            m_FDC = new FDC("FDC", m_engineer);
-            InitModule(m_FDC);
             m_FFU = new FFU("FFU", m_engineer);
             InitModule(m_FFU);
             m_interlock = new Interlock("Interlock", m_engineer,m_engineer.m_ACS);
@@ -205,7 +202,18 @@ namespace Root_VEGA_D.Engineer
         public string StateHome()
         {
             m_HomeProgress.HomeProgressShow();
-            string sInfo = StateHome(p_moduleList.m_aModule);
+
+
+            //string sInfo = StateHome(p_moduleList.m_aModule);
+            string sInfo = StateHome(m_wtr);
+            if (sInfo != "OK")
+            {
+                EQ.p_eState = EQ.eState.Init;
+                return sInfo;
+            }
+            sInfo = StateHome(m_interlock, (ModuleBase)m_aLoadport[0], (ModuleBase)m_aLoadport[1], m_vision, m_visionIPU, m_towerlamp, (RFID_Brooks)m_aRFID[0], (RFID_Brooks)m_aRFID[1], m_FFU);
+            if (sInfo == "OK") EQ.p_eState = EQ.eState.Ready;
+            //if (sInfo == "OK") m_bIsPossible_Recovery = true;
             if (sInfo == "OK") EQ.p_eState = EQ.eState.Ready;
             return sInfo;
         }
@@ -391,6 +399,9 @@ namespace Root_VEGA_D.Engineer
                             if ((EQ.p_nRnR > 1) && (m_process.m_qSequence.Count == 0))
                             {
                                 while (m_aLoadport[EQ.p_nRunLP].p_infoCarrier.p_eState != InfoCarrier.eState.Placed) Thread.Sleep(10);
+                                //m_process.p_sInfo = m_process.AddInfoWafer(m_infoRnRSlot);
+                                //m_infoRnRSlot.RecipeOpen("C:\\Recipe\\VEGA_D\\" + "OnlyOne.Vega_D");
+                                //AddSequence(m_infoRnRSlot);
                                 m_process.p_sInfo = m_process.AddInfoWafer(m_infoRnRSlot);
                                 CalcSequence();
                                 //m_nRnR--;

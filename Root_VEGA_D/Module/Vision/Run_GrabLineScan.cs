@@ -212,7 +212,7 @@ namespace Root_VEGA_D.Module
                         m_module.TcpipCommServer.SendMessage(TCPIPComm_VEGA_D.Command.end);
 
                     // X축을 미리 움직임
-                    axisXY.p_axisX.StartMove(dNextPosX);
+                    //axisXY.p_axisX.StartMove(dNextPosX);
 
                     // 다음 이미지 획득을 위해 변수 값 변경
                     nScanLine++;
