@@ -183,7 +183,7 @@ namespace Root_Rinse_Unloader.Module
             get { return _bAlignerUp; }
             set
             {
-                if (_bAlignerUp == value) return;
+                //if (_bAlignerUp == value) return;
                 _bAlignerUp = value;
                 RunAlignerUp(value); 
                 OnPropertyChanged(); 
@@ -216,6 +216,18 @@ namespace Root_Rinse_Unloader.Module
                 if ((line.m_dioAlignUp[0].p_bDone == false) || (line.m_dioAlignUp[1].p_bDone == false)) return false; 
             }
             return true; 
+        }
+
+        public bool IsAlignerUp()
+        {
+            foreach (Line line in m_aLine)
+            {
+                if (line.m_dioAlignUp[0].m_aBitDI[0].p_bOn == false) return true;
+                if (line.m_dioAlignUp[1].m_aBitDI[0].p_bOn == false) return true;
+                if (line.m_dioAlignUp[0].m_aBitDI[1].p_bOn) return true;
+                if (line.m_dioAlignUp[1].m_aBitDI[1].p_bOn) return true;
+            }
+            return false;
         }
         #endregion
 
