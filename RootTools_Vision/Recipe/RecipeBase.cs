@@ -324,7 +324,7 @@ namespace RootTools_Vision
                     return (T)recipe;
             }
 
-            MessageBox.Show("Recipe 항목이나 Parameter 항목이 존재하지 않습니다. \nRegisterRecipe(혹은 RegisterParameter) 메서드를 통해 등록하십시오.");
+            //MessageBox.Show("Recipe 항목이나 Parameter 항목이 존재하지 않습니다. \nRegisterRecipe(혹은 RegisterParameter) 메서드를 통해 등록하십시오.");
 
             return default(T);
         }
