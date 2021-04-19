@@ -28,7 +28,11 @@ namespace Root_WIND2.UI_User
 
             m_cInspItem = new ObservableCollection<InspectionItem>();
             p_MaskList = new ObservableCollection<ItemMask>();
+            
             p_selectedMethodItem = null;
+
+            m_cOptionItem = new ObservableCollection<InspectionItem>();
+
         }
 
         #region [IPage Interfaces]
@@ -52,11 +56,41 @@ namespace Root_WIND2.UI_User
                 this.p_MaskList.Add(mask);
             }
 
-            // Inspectio Item
+            // Inspection Option Item
+            m_cOptionItem.Clear();
+            PositionParameter position = recipe.GetItem<PositionParameter>();
+            if(position == null)
+            {
+                position = new PositionParameter();
+            }
+            m_cOptionItem.Add(new InspectionItem(position));
+
+            ProcessDefectParameter processDefect = recipe.GetItem<ProcessDefectParameter>();
+            if (processDefect == null)
+            {
+                processDefect = new ProcessDefectParameter();
+            }
+            m_cOptionItem.Add(new InspectionItem(processDefect));
+
+            ProcessDefectWaferParameter processDefectWafer = recipe.GetItem<ProcessDefectWaferParameter>();
+            if (processDefectWafer == null)
+            {
+                processDefectWafer = new ProcessDefectWaferParameter();
+            }
+            m_cOptionItem.Add(new InspectionItem(processDefectWafer));
+
+
+
+
+
+            // Inspection Item
             p_cInspItem.Clear();
 
             foreach (ParameterBase parameterBase in recipe.ParameterItemList)
             {
+                if (parameterBase.GetType().GetInterface(nameof(IFrontsideInspection)) == null)
+                    continue;
+
                 InspectionItem item = new InspectionItem();
 
                 int selectMethod = 0;
@@ -98,9 +132,24 @@ namespace Root_WIND2.UI_User
             SetParameter();
         }
 
-         #endregion
+        #endregion
 
         #region Property
+
+        
+
+        private ObservableCollection<InspectionItem> m_cOptionItem;
+        public ObservableCollection<InspectionItem> p_cOptionItem
+        {
+            get
+            {
+                return m_cOptionItem;
+            }
+            set
+            {
+                SetProperty(ref m_cOptionItem, value);
+            }
+        }
 
         private ObservableCollection<InspectionItem> m_cInspItem;
         public ObservableCollection<InspectionItem> p_cInspItem
@@ -146,6 +195,7 @@ namespace Root_WIND2.UI_User
             }
             set
             {
+                m_selectedInspItem = null;
                 SetProperty(ref m_selectedInspItem, value);
                 if (m_selectedInspItem != null)
                     p_selectedMethodItem = m_selectedInspItem.p_InspMethod;
@@ -202,6 +252,10 @@ namespace Root_WIND2.UI_User
         public void SetParameter()
         {
             List<ParameterBase> paramList = new List<ParameterBase>();
+
+
+            paramList.Add(this.m_cOptionItem[0].p_InspMethod); //Position
+
             foreach (InspectionItem item in p_cInspItem)
             {
                 if (item.p_InspMethod is IMaskInspection)
@@ -219,6 +273,9 @@ namespace Root_WIND2.UI_User
 
                 paramList.Add(item.p_InspMethod);
             }
+
+            paramList.Add(this.m_cOptionItem[1].p_InspMethod); //ProcessDefect
+            paramList.Add(this.m_cOptionItem[2].p_InspMethod); //ProcessDefect_Wafer
 
             RecipeFront recipe = GlobalObjects.Instance.Get<RecipeFront>();
             recipe.ParameterItemList = paramList;
