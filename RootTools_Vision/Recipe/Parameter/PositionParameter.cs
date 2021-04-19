@@ -15,7 +15,7 @@ namespace RootTools_Vision
         Independent
     }
 
-    public class PositionParameter : ParameterBase, IMaskInspection, IColorInspection, IFrontsideInspection
+    public class PositionParameter : ParameterBase, IOptionParameter
     {
         public PositionParameter() : base(typeof(Position))
         {
@@ -116,6 +116,16 @@ namespace RootTools_Vision
         {
             get; 
             set; 
+        }
+
+        private bool usePosition = true;
+        public bool Use 
+        { 
+            get=> this.usePosition;
+            set
+            {
+                SetProperty(ref usePosition, value);
+            } 
         }
         #endregion
 
