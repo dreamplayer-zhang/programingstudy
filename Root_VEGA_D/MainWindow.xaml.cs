@@ -145,8 +145,6 @@ namespace Root_VEGA_D
             FanUI1.DataContext = m_handler.m_FFU.p_aUnit[0].p_aFan[1];
             FanUI2.DataContext = m_handler.m_FFU.p_aUnit[0].p_aFan[2];
             FanUI3.DataContext = m_handler.m_FFU.p_aUnit[0].p_aFan[3];
-            FanUI4.DataContext = m_handler.m_FFU.p_aUnit[0].p_aFan[4];
-            FanUI5.DataContext = m_handler.m_FFU.p_aUnit[0].p_aFan[5];
         }
 
         bool IsRunModule(ModuleBase module)
