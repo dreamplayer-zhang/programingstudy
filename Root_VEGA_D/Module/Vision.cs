@@ -25,14 +25,17 @@ namespace Root_VEGA_D.Module
     public class Vision : ModuleBase, IWTRChild
     {
         #region GAF
+        public ALID m_visionHomeError;
+        public ALID m_visionInspectError;
         public ALID m_alidShutterDownError;
         public ALID m_alidShutterUpError;
         ALID m_alid_WaferExist;
         void InitGAF()
         {
+            m_visionHomeError = m_gaf.GetALID(this, "Vision Home Error", "Vision Home Error");
+            m_visionInspectError = m_gaf.GetALID(this, "Vision Inspect Error", "Vision Inspect Error");
             m_alidShutterDownError = m_gaf.GetALID(this, "VS Shutter Error", "Shutter is not down");
             m_alidShutterUpError = m_gaf.GetALID(this, "VS Shutter Error", "Shutter is not up");
-
 
         }
         public void SetAlarm()
@@ -311,18 +314,19 @@ namespace Root_VEGA_D.Module
         public string BeforeGet(int nID)
         {
             //shutter
-            m_doShutterUp.Write(false);
-            Thread.Sleep(100);
-            m_doShutterDown.Write(true);
-            StopWatch sw = new StopWatch();
-            sw.Start();
-            while (!m_diShutterDownCheck.p_bIn || m_diShutterUpCheck.p_bIn)
-            {
-                if (sw.ElapsedMilliseconds > 5000)
-                {
-                    m_alidShutterDownError.Run(true, "Shutter error in Beforeget");
-                }
-            }
+            //m_doShutterUp.Write(false);
+            //Thread.Sleep(100);
+            //m_doShutterDown.Write(true);
+            //Thread.Sleep(3000);
+            //StopWatch sw = new StopWatch();
+            //sw.Start();
+            //while (!m_diShutterDownCheck.p_bIn || m_diShutterUpCheck.p_bIn)
+            //{
+            //    if (sw.ElapsedMilliseconds > 5000)
+            //    {
+            //        m_alidShutterDownError.Run(true, "Shutter error in Beforeget");
+            //    }
+            //}
             //
             if (p_eRemote == eRemote.Client) return RemoteRun(eRemoteRun.BeforeGet, eRemote.Client, nID);
             else
@@ -354,18 +358,19 @@ namespace Root_VEGA_D.Module
         public string BeforePut(int nID)
         {
             //shutter
-            m_doShutterUp.Write(false);
-            Thread.Sleep(100);
-            m_doShutterDown.Write(true);
-            StopWatch sw = new StopWatch();
-            sw.Start();
-            while (!m_diShutterDownCheck.p_bIn || m_diShutterUpCheck.p_bIn)
-            {
-                if (sw.ElapsedMilliseconds > 5000)
-                {
-                    m_alidShutterDownError.Run(true, "Shutter error in Beforeput");
-                }
-            }
+            //m_doShutterUp.Write(false);
+            //Thread.Sleep(100);
+            //m_doShutterDown.Write(true);
+            //Thread.Sleep(3000);
+            //StopWatch sw = new StopWatch();
+            //sw.Start();
+            //while (!m_diShutterDownCheck.p_bIn || m_diShutterUpCheck.p_bIn)
+            //{
+            //    if (sw.ElapsedMilliseconds > 5000)
+            //    {
+            //        m_alidShutterDownError.Run(true, "Shutter error in Beforeput");
+            //    }
+            //}
             //
             if (p_eRemote == eRemote.Client) return RemoteRun(eRemoteRun.BeforePut, eRemote.Client, nID);
             else
@@ -395,18 +400,19 @@ namespace Root_VEGA_D.Module
         public string AfterGet(int nID)
         {
             //shutter
-            m_doShutterDown.Write(false);
-            Thread.Sleep(100);
-            m_doShutterUp.Write(true);
-            StopWatch sw = new StopWatch();
-            sw.Start();
-            while (m_diShutterDownCheck.p_bIn || !m_diShutterUpCheck.p_bIn)
-            {
-                if (sw.ElapsedMilliseconds > 5000)
-                {
-                    m_alidShutterDownError.Run(true, "Shutter error in Afterget");
-                }
-            }
+            //m_doShutterDown.Write(false);
+            //Thread.Sleep(100);
+            //m_doShutterUp.Write(true);
+            //Thread.Sleep(3000);
+            //StopWatch sw = new StopWatch();
+            //sw.Start();
+            //while (m_diShutterDownCheck.p_bIn || !m_diShutterUpCheck.p_bIn)
+            //{
+            //    if (sw.ElapsedMilliseconds > 5000)
+            //    {
+            //        m_alidShutterDownError.Run(true, "Shutter error in Afterget");
+            //    }
+            //}
             //
             return "OK";
         }
@@ -414,18 +420,19 @@ namespace Root_VEGA_D.Module
         public string AfterPut(int nID)
         {
             //shutter
-            m_doShutterDown.Write(false);
-            Thread.Sleep(100);
-            m_doShutterUp.Write(true);
-            StopWatch sw = new StopWatch();
-            sw.Start();
-            while (m_diShutterDownCheck.p_bIn || !m_diShutterUpCheck.p_bIn)
-            {
-                if (sw.ElapsedMilliseconds > 5000)
-                {
-                    m_alidShutterDownError.Run(true, "Shutter error in Afterput");
-                }
-            }
+            //m_doShutterDown.Write(false);
+            //Thread.Sleep(100);
+            //m_doShutterUp.Write(true);
+            //Thread.Sleep(3000);
+            //StopWatch sw = new StopWatch();
+            //sw.Start();
+            //while (m_diShutterDownCheck.p_bIn || !m_diShutterUpCheck.p_bIn)
+            //{
+            //    if (sw.ElapsedMilliseconds > 5000)
+            //    {
+            //        m_alidShutterDownError.Run(true, "Shutter error in Afterput");
+            //    }
+            //}
             //
             return "OK";
         }
@@ -486,6 +493,7 @@ namespace Root_VEGA_D.Module
                 if (m_CamMain != null && m_CamMain.p_CamInfo.p_eState == eCamState.Init) m_CamMain.Connect();
 
                 p_sInfo = base.StateHome();
+                m_visionHomeError.Run(p_sInfo != "OK", "Vision Home Error");
                 p_eState = (p_sInfo == "OK") ? eState.Ready : eState.Error;
 
                 ClearData();

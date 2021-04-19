@@ -29,7 +29,7 @@ namespace RootTools.GAFs
 
         public void ClearALID()
         {
-            foreach (ALID alid in p_aALID)
+            foreach (ALID alid in p_aSetALID)
             {
                 alid.p_sMsg = "";
                 alid.p_bSet = false;
@@ -94,7 +94,11 @@ namespace RootTools.GAFs
         public ALIDList_PopupUI alidPopup;
         public void ShowPopup()
         {
-            if (ALIDList_PopupUI.m_bShow) return;
+            if (ALIDList_PopupUI.m_bShow)
+            {
+                alidPopup.Init(this, m_engineer);
+                return; 
+            }
             alidPopup = new ALIDList_PopupUI();
             alidPopup.Init(this, m_engineer);
             alidPopup.Show();

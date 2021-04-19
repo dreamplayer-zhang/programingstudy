@@ -33,7 +33,7 @@
                             <TextBlock Text="Carrier ID"
                                        FontSize="12"
                                        VerticalAlignment="Center"
-                                       HorizontalAlignment="Stretch"
+                                       HorizontalAlignment="Left"
                                        FontWeight="Bold"
                                        Margin="40,0"/>
                         </Border>
@@ -48,7 +48,8 @@
                             <TextBlock Text="Lot ID"
                                        FontSize="12"
                                        VerticalAlignment="Center"
-                                        FontWeight="Bold"
+                                       HorizontalAlignment="Left"
+                                       FontWeight="Bold"
                                        Margin="40,0"/>
                         </Border>
                         <Border>
@@ -62,6 +63,7 @@
                             <TextBlock Text="Recipe ID"
                                        FontSize="12"
                                        VerticalAlignment="Center"
+                                       HorizontalAlignment="Left"
                                        FontWeight="Bold"
                                        Margin="40,0"/>
                         </Border>
