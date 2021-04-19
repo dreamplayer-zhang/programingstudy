@@ -139,8 +139,11 @@
     <Compile Include="MainWindow_ViewModel.cs" />
     <Compile Include="MVVM\Converter.cs" />
     <Compile Include="Recipe\CloneableRecipe.cs" />
+    <Compile Include="Recipe\Interfaces\IOptionParameter.cs" />
     <Compile Include="Recipe\Interfaces\IRecipe.cs" />
     <Compile Include="Recipe\Parameter\BacksideSurfaceParameter.cs" />
+    <Compile Include="Recipe\Parameter\ProcessDefectParameter.cs" />
+    <Compile Include="Recipe\Parameter\ProcessDefectWaferParameter.cs" />
     <Compile Include="Recipe\Parameter\ReticleSurfaceParameter.cs" />
     <Compile Include="Recipe\Parameter\D2DParameter.cs" />
     <Compile Include="Recipe\Interfaces\IBacksideInspection.cs" />

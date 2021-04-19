@@ -19,6 +19,8 @@ namespace RootTools_Vision
     [XmlInclude(typeof(PositionParameter))]
     [XmlInclude(typeof(EdgeSurfaceParameter))]
     [XmlInclude(typeof(EBRParameter))]
+    [XmlInclude(typeof(ProcessDefectParameter))]
+    [XmlInclude(typeof(ProcessDefectWaferParameter))]
     //[XmlType(TypeName = "Parameter")]
     public abstract class ParameterBase : ObservableObject, IComparable<ParameterBase>, IRecipe
     {
