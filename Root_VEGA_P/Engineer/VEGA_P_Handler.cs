@@ -34,7 +34,8 @@ namespace Root_VEGA_P.Engineer
         //public EFEM_Process m_process; //forgetVegaP
         public VEGA_P m_VEGA; 
         public RTR m_rtr;
-        public Loadport m_loadport; 
+        public Loadport m_loadport;
+        public EOP m_EOP; 
         void InitModule()
         {
             p_moduleList = new ModuleList(m_engineer);
@@ -44,9 +45,12 @@ namespace Root_VEGA_P.Engineer
             InitModule(m_rtr);
             m_loadport = new Loadport("Loadport", m_engineer);
             InitModule(m_loadport);
+            m_EOP = new EOP("EOP", m_engineer);
+            InitModule(m_EOP); 
 
             InitParticleCounter();
 
+            m_rtr.AddChild(m_loadport, m_EOP.m_dome, m_EOP.m_door); 
             m_rtr.RunTree(Tree.eMode.RegRead);
             m_rtr.RunTree(Tree.eMode.Init);
             m_rtr.ReadPod_Registry();

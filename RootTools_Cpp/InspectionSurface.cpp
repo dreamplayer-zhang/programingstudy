@@ -96,6 +96,7 @@ std::vector<DefectDataStruct> CInspectionSurface::SurfaceInspection(bool bAbsolu
 					{
 						DefectDataStruct tempData = GetDefectData(rt, ptDefectPos, ret);
 						tempData.nClassifyCode = nClassifyCode;
+						tempData.GV = GetPitsizer()->GetGV();
 						vResult.push_back(tempData);
 						bInspResult = true;
 					}
@@ -106,6 +107,7 @@ std::vector<DefectDataStruct> CInspectionSurface::SurfaceInspection(bool bAbsolu
 
 					DefectDataStruct tempData = GetDefectData(rt, ptDefectPos, ret);
 					tempData.nClassifyCode = nClassifyCode;
+					tempData.GV = GetPitsizer()->GetGV();
 					vResult.push_back(tempData);
 					bInspResult = true;
 				}

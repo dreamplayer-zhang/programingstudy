@@ -131,7 +131,7 @@ namespace Root_Rinse_Unloader.Module
 
         public string RunRotate(bool bRotate)
         {
-            if (bRotate) m_axisRotate.Jog(m_rinse.p_fRotateSpeed);
+            if (bRotate) m_axisRotate.Jog(m_rinse.p_fRotateSpeed, "Move");
             else m_axisRotate.StopAxis(); 
             return "OK";
         }
@@ -203,6 +203,8 @@ namespace Root_Rinse_Unloader.Module
             m_axisRotate.ServoOn(true);
             p_sInfo = base.StateHome(m_axisWidth);
             p_eState = (p_sInfo == "OK") ? eState.Ready : eState.Error;
+            m_dioPusher.Write(false);
+            RunPusherDown(m_rinse.p_eMode == RinseU.eRunMode.Stack);
             return p_sInfo;
         }
 
@@ -298,6 +300,13 @@ namespace Root_Rinse_Unloader.Module
             m_storage = storage; 
             InitLines();
             InitBase(id, engineer);
+            EQ.m_EQ.OnChanged += M_EQ_OnChanged;
+        }
+
+        private void M_EQ_OnChanged(_EQ.eEQ eEQ, dynamic value)
+        {
+            if (eEQ != _EQ.eEQ.State) return;
+            if (value != EQ.eState.Run) RunRotate(false);
         }
 
         public override void ThreadStop()
