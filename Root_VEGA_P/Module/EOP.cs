@@ -393,7 +393,7 @@ namespace Root_VEGA_P.Module
                 if (p_eState != eState.Ready) return p_id + " eState not Ready";
                 switch (infoPod.p_ePod)
                 {
-                    case InfoPod.ePod.EOP_Door:
+                    case InfoPod.ePod.EOP_Dome:
                     case InfoPod.ePod.EIP_Cover:
                     case InfoPod.ePod.EIP_Plate:
                         return p_id + " Invalid Pod Type";
@@ -403,12 +403,12 @@ namespace Root_VEGA_P.Module
 
             public string BeforeGet()
             {
-                return "OK";
+                return RunCylinderUp(true); 
             }
 
             public string BeforePut(InfoPod infoPod)
             {
-                return "OK";
+                return RunCylinderUp(true);
             }
 
             public string AfterGet()
@@ -518,10 +518,6 @@ namespace Root_VEGA_P.Module
         {
             if (EQ.p_bSimulate) return "OK";
             string sHome = base.StateHome(m_axis);
-            if (sHome == "OK")
-            {
-                sHome = StateHome(m_dome.m_axisRotate); 
-            }
             p_eState = (sHome == "OK") ? eState.Ready : eState.Error;
             Reset(); 
             return "OK";
