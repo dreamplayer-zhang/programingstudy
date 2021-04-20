@@ -13,13 +13,14 @@ namespace Root_VEGA_P.Module
     {
         #region ToolBox
         Axis m_axis;
-        DIO_Os m_doCoverDown;
-        DIO_Os m_doCoverDownX;
+        DIO_O[,] m_doCoverDown = new DIO_O[2, 2] { { null, null }, { null, null } };
         public override void GetTools(bool bInit)
         {
             p_sInfo = m_toolBox.GetAxis(ref m_axis, this, "Y");
-            p_sInfo = m_toolBox.GetDIO(ref m_doCoverDown, this, "Cover", Enum.GetNames(typeof(eCover)));
-            p_sInfo = m_toolBox.GetDIO(ref m_doCoverDownX, this, "Cover X", Enum.GetNames(typeof(eCover)));
+            p_sInfo = m_toolBox.GetDIO(ref m_doCoverDown[0, 0], this, "Cover Up");
+            p_sInfo = m_toolBox.GetDIO(ref m_doCoverDown[0, 1], this, "Cover Down");
+            p_sInfo = m_toolBox.GetDIO(ref m_doCoverDown[1, 0], this, "Cover Up X");
+            p_sInfo = m_toolBox.GetDIO(ref m_doCoverDown[1, 1], this, "Cover Down X");
             m_dome.GetTools(m_toolBox, bInit);
             m_door.GetTools(m_toolBox, bInit); 
             if (bInit) InitPos();
@@ -45,16 +46,13 @@ namespace Root_VEGA_P.Module
         #endregion
 
         #region CoverDown
-        public enum eCover
-        {
-            Up,
-            Down
-        }
         double m_secCoverDown = 3; 
         public string RunCoverDown(bool bDown)
         {
-            m_doCoverDown.Write(bDown ? eCover.Down : eCover.Up);
-            m_doCoverDownX.Write(bDown ? eCover.Down : eCover.Up);
+            m_doCoverDown[0, 0].Write(!bDown);
+            m_doCoverDown[1, 0].Write(!bDown);
+            m_doCoverDown[0, 1].Write(bDown);
+            m_doCoverDown[1, 1].Write(bDown);
             StopWatch sw = new StopWatch();
             int msDown = (int)(1000 * m_secCoverDown);
             while (sw.ElapsedMilliseconds < msDown)
@@ -77,21 +75,24 @@ namespace Root_VEGA_P.Module
         {
             #region ToolBox
             public Axis m_axisRotate;
-            DIO_Is m_diCheckRotate;
-            DIO_Is m_diCheckDome;
-            DIO_Os m_doClamp;
+            DIO_I[] m_diCheckRotate = new DIO_I[2] { null, null };
+            DIO_I[] m_diCheckDome = new DIO_I[2] { null, null };
+            DIO_O[] m_doClamp = new DIO_O[2] { null, null };
             DIO_Is[] m_diClamp = new DIO_Is[2] { null, null };
             DIO_Is[] m_diCoverDown = new DIO_Is[2] { null, null };
             public void GetTools(ToolBox toolBox, bool bInit)
             {
                 toolBox.GetAxis(ref m_axisRotate, m_EOP, p_id + ".Rotate");
-                toolBox.GetDIO(ref m_diCheckRotate, m_EOP, p_id + ".Rotate", new string[] { "0", "1" });
-                toolBox.GetDIO(ref m_diCheckDome, m_EOP, p_id + ".Check", new string[] { "0", "1" });
-                toolBox.GetDIO(ref m_doClamp, m_EOP, p_id + ".Clamp", Enum.GetNames(typeof(eClamp)));
-                toolBox.GetDIO(ref m_diClamp[0], m_EOP, p_id + ".Unclamp", new string[] { "0", "1", "2", "3" });
-                toolBox.GetDIO(ref m_diClamp[1], m_EOP, p_id + ".Clamp", new string[] { "0", "1", "2", "3" });
-                toolBox.GetDIO(ref m_diCoverDown[0], m_EOP, p_id + ".CoverUp", new string[] { "0", "1" });
-                toolBox.GetDIO(ref m_diCoverDown[1], m_EOP, p_id + ".CoverDown", new string[] { "0", "1" });
+                toolBox.GetDIO(ref m_diCheckRotate[0], m_EOP, p_id + ".Check Rotate 0");
+                toolBox.GetDIO(ref m_diCheckRotate[1], m_EOP, p_id + ".Check Rotate 1");
+                toolBox.GetDIO(ref m_diCheckDome[0], m_EOP, p_id + ".Check 0");
+                toolBox.GetDIO(ref m_diCheckDome[1], m_EOP, p_id + ".Check 1");
+                toolBox.GetDIO(ref m_doClamp[0], m_EOP, p_id + ".Unclamp");
+                toolBox.GetDIO(ref m_doClamp[1], m_EOP, p_id + ".Clamp");
+                toolBox.GetDIO(ref m_diClamp[0], m_EOP, p_id + ".Unclamp", "Unclamp", 4);
+                toolBox.GetDIO(ref m_diClamp[1], m_EOP, p_id + ".Clamp", "Clamp", 4);
+                toolBox.GetDIO(ref m_diCoverDown[0], m_EOP, p_id, "Cover Up", 2);
+                toolBox.GetDIO(ref m_diCoverDown[1], m_EOP, p_id, "Cover Down", 2);
                 if (bInit) InitPos();
             }
             #endregion
@@ -117,12 +118,12 @@ namespace Root_VEGA_P.Module
             #region Check Input
             public bool IsCheckRotate()
             {
-                return m_diCheckRotate.ReadDI(0) && m_diCheckRotate.ReadDI(1); 
+                return m_diCheckRotate[0].p_bIn && m_diCheckRotate[1].p_bIn; 
             }
 
             public bool IsCheckDome()
             {
-                return m_diCheckDome.ReadDI(0) && m_diCheckDome.ReadDI(1); 
+                return m_diCheckDome[0].p_bIn && m_diCheckDome[1].p_bIn;
             }
 
             public bool IsCoverDown(bool bDown)
@@ -137,15 +138,11 @@ namespace Root_VEGA_P.Module
             #endregion
 
             #region Clamp
-            public enum eClamp
-            {
-                Unclamp,
-                Clamp
-            }
             double m_secClamp = 3;
             public string RunClamp(bool bClamp)
             {
-                m_doClamp.Write(bClamp ? eClamp.Clamp : eClamp.Unclamp); 
+                m_doClamp[0].Write(!bClamp);
+                m_doClamp[1].Write(bClamp);
                 StopWatch sw = new StopWatch();
                 int msClamp = (int)(1000 * m_secClamp); 
                 while (sw.ElapsedMilliseconds < msClamp)
@@ -256,7 +253,7 @@ namespace Root_VEGA_P.Module
 
             public void RunTreeTeach(Tree tree)
             {
-                m_teach = tree.GetTree("Particle Counter").Set(m_teach, m_teach, m_EOP.p_id + " " + p_id, "RND RTR Teach");
+                m_teach = tree.Set(m_teach, m_teach, m_EOP.p_id + "." + p_id, "RND RTR Teach");
             }
             #endregion
 
@@ -286,15 +283,20 @@ namespace Root_VEGA_P.Module
         public class Door : NotifyProperty, IRTRChild
         {
             #region ToolBox
-            DIO_Is m_diCheckDoor;
-            DIO_Os m_doCylinder;
-            DIO_Is[] m_diCylinder = new DIO_Is[2] { null, null };
+            DIO_I[] m_diCheckDoor = new DIO_I[2] { null, null };
+            DIO_O[] m_doUp = new DIO_O[2] { null, null };
+            DIO_Is[] m_diCylinderUp = new DIO_Is[2] { null, null };
+            DIO_Is[] m_diCoverDown = new DIO_Is[2] { null, null };
             public void GetTools(ToolBox toolBox, bool bInit)
             {
-                toolBox.GetDIO(ref m_diCheckDoor, m_EOP, p_id + ".Check", new string[] { "0", "1" });
-                toolBox.GetDIO(ref m_doCylinder, m_EOP, p_id + ".Cylinder", Enum.GetNames(typeof(eCylinder)));
-                toolBox.GetDIO(ref m_diCylinder[0], m_EOP, p_id + ".Cylinder Down", new string[] { "0", "1" });
-                toolBox.GetDIO(ref m_diCylinder[1], m_EOP, p_id + ".Cylinder Up", new string[] { "0", "1" });
+                toolBox.GetDIO(ref m_diCheckDoor[0], m_EOP, p_id + ".Check 0");
+                toolBox.GetDIO(ref m_diCheckDoor[1], m_EOP, p_id + ".Check 1");
+                toolBox.GetDIO(ref m_doUp[0], m_EOP, p_id + ".Down");
+                toolBox.GetDIO(ref m_doUp[1], m_EOP, p_id + ".Up");
+                toolBox.GetDIO(ref m_diCylinderUp[0], m_EOP, p_id, "Cylinder Down", 2);
+                toolBox.GetDIO(ref m_diCylinderUp[1], m_EOP, p_id, "Cylinder Up", 2);
+                toolBox.GetDIO(ref m_diCoverDown[0], m_EOP, p_id, "Cover Up", 2);
+                toolBox.GetDIO(ref m_diCoverDown[1], m_EOP, p_id, "Cover Down", 2);
                 if (bInit) { }
             }
             #endregion
@@ -302,47 +304,43 @@ namespace Root_VEGA_P.Module
             #region Check Input
             public bool IsCheckDoor()
             {
-                return m_diCheckDoor.ReadDI(0) && m_diCheckDoor.ReadDI(1);
+                return m_diCheckDoor[0].p_bIn && m_diCheckDoor[1].p_bIn;
             }
 
             public bool IsCoverDown(bool bDown)
             {
                 for (int n = 0; n < 2; n++)
                 {
-                    if (m_diCylinder[0].ReadDI(n) == bDown) return false;
-                    if (m_diCylinder[1].ReadDI(n) == !bDown) return false;
+                    if (m_diCoverDown[0].ReadDI(n) == bDown) return false;
+                    if (m_diCoverDown[1].ReadDI(n) == !bDown) return false;
                 }
                 return true;
             }
             #endregion
 
             #region Cylinder Up
-            public enum eCylinder
-            {
-                Down,
-                Up
-            }
             double m_secUp = 3;
-            public string RunCylinderUp(bool bUp)
+            public string RunUp(bool bUp)
             {
-                m_doCylinder.Write(bUp ? eCylinder.Up : eCylinder.Down); 
+                m_doUp[0].Write(!bUp);
+                m_doUp[1].Write(bUp);
                 StopWatch sw = new StopWatch();
                 int msUp = (int)(1000 * m_secUp);
                 while (sw.ElapsedMilliseconds < msUp)
                 {
                     Thread.Sleep(10);
                     if (EQ.IsStop()) return "EQ Stop";
-                    if (IsCylinder(bUp)) return "OK";
+                    if (IsClamp(bUp)) return "OK";
                 }
                 return "Run Cylinder Up Timeout";
             }
 
-            bool IsCylinder(bool bUp)
+            bool IsClamp(bool bClamp)
             {
                 for (int n = 0; n < 2; n++)
                 {
-                    if (m_diCylinder[0].ReadDI(n) == bUp) return false;
-                    if (m_diCylinder[1].ReadDI(n) == !bUp) return false;
+                    if (m_diCylinderUp[0].ReadDI(n) == bClamp) return false;
+                    if (m_diCylinderUp[1].ReadDI(n) == !bClamp) return false;
                 }
                 return true;
             }
@@ -393,7 +391,7 @@ namespace Root_VEGA_P.Module
                 if (p_eState != eState.Ready) return p_id + " eState not Ready";
                 switch (infoPod.p_ePod)
                 {
-                    case InfoPod.ePod.EOP_Dome:
+                    case InfoPod.ePod.EOP_Door:
                     case InfoPod.ePod.EIP_Cover:
                     case InfoPod.ePod.EIP_Plate:
                         return p_id + " Invalid Pod Type";
@@ -403,12 +401,12 @@ namespace Root_VEGA_P.Module
 
             public string BeforeGet()
             {
-                return RunCylinderUp(true); 
+                return "OK";
             }
 
             public string BeforePut(InfoPod infoPod)
             {
-                return RunCylinderUp(true);
+                return "OK";
             }
 
             public string AfterGet()
@@ -436,7 +434,7 @@ namespace Root_VEGA_P.Module
 
             public void RunTreeTeach(Tree tree)
             {
-                m_teach = tree.GetTree("Particle Counter").Set(m_teach, m_teach, m_EOP.p_id + " " + p_id, "RND RTR Teach");
+                m_teach = tree.Set(m_teach, m_teach, m_EOP.p_id + "." + p_id, "RND RTR Teach");
             }
             #endregion
 
@@ -475,20 +473,20 @@ namespace Root_VEGA_P.Module
             try
             {
                 if (Run(m_dome.RunRotate(Dome.ePos.Rotate))) return p_sInfo;
-                if (Run(m_door.RunCylinderUp(false))) return p_sInfo;
+                if (Run(m_door.RunUp(false))) return p_sInfo;
                 if (Run(RunMove(ePos.Forward))) return p_sInfo;
                 if (Run(RunCoverDown(true))) return p_sInfo;
                 // Particle Count
                 if (Run(RunCoverDown(false))) return p_sInfo;
                 if (Run(RunMove(ePos.Backward))) return p_sInfo;
-                if (Run(m_door.RunCylinderUp(true))) return p_sInfo;
+                if (Run(m_door.RunUp(true))) return p_sInfo;
                 if (Run(m_dome.RunRotate(Dome.ePos.Ready))) return p_sInfo;
                 if (Run(m_dome.RunClamp(false))) return p_sInfo;
             }
             finally
             {
                 string sMove = RunMove(ePos.Backward);
-                m_door.RunCylinderUp(true);
+                m_door.RunUp(true);
                 if (sMove == "OK")
                 {
                     m_dome.RunRotate(Dome.ePos.Ready);
@@ -505,7 +503,7 @@ namespace Root_VEGA_P.Module
             base.Reset();
             RunMove(ePos.Backward); 
             m_dome.RunRotate(Dome.ePos.Ready);
-            m_door.RunCylinderUp(true); 
+            m_door.RunUp(true); 
         }
 
         public override void InitMemorys()
@@ -518,9 +516,13 @@ namespace Root_VEGA_P.Module
         {
             if (EQ.p_bSimulate) return "OK";
             string sHome = base.StateHome(m_axis);
+            if (sHome == "OK")
+            {
+                sHome = StateHome(m_dome.m_axisRotate); 
+            }
             p_eState = (sHome == "OK") ? eState.Ready : eState.Error;
             Reset(); 
-            return sHome;
+            return "OK";
         }
         #endregion
 
@@ -528,7 +530,7 @@ namespace Root_VEGA_P.Module
         public override void RunTree(Tree tree)
         {
             base.RunTree(tree);
-            RunTreeCoverDown(tree.GetTree("Cover"));
+            RunTreeCoverDown(tree.GetTree("Cover Down"));
             m_dome.RunTree(tree.GetTree("Dome"));
             m_door.RunTree(tree.GetTree("Door"));
         }
@@ -551,7 +553,6 @@ namespace Root_VEGA_P.Module
         {
             AddModuleRunList(new Run_Delay(this), true, "Time Delay");
             AddModuleRunList(new Run_Run(this), true, "Run Particle Counter");
-            AddModuleRunList(new Run_RunSol(this), false, "Run Sol Test");
         }
 
         public class Run_Delay : ModuleRunBase
@@ -602,55 +603,11 @@ namespace Root_VEGA_P.Module
 
             public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
             {
-                m_bCheckPod = tree.Set(m_bCheckPod, m_bCheckPod, "Check Pod", "Check Pod State", bVisible);
             }
 
             public override string Run()
             {
                 return m_module.RunParticleCounter(m_bCheckPod);
-            }
-        }
-
-        public class Run_RunSol : ModuleRunBase
-        {
-            EOP m_module;
-            public Run_RunSol(EOP module)
-            {
-                m_module = module;
-                InitModuleRun(module);
-            }
-
-            enum eSol
-            {
-                EOP_Cover,
-                Dome_Clamp,
-                Door_Cylinder
-            }
-            eSol m_eSol = eSol.Dome_Clamp; 
-            bool m_bOn = false;
-            public override ModuleRunBase Clone()
-            {
-                Run_RunSol run = new Run_RunSol(m_module);
-                run.m_eSol = m_eSol;
-                run.m_bOn = m_bOn; 
-                return run;
-            }
-
-            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
-            {
-                m_eSol = (eSol)tree.Set(m_eSol, m_eSol, "SolValve", "Select SolValve", bVisible);
-                m_bOn = tree.Set(m_bOn, m_bOn, "On", "SolValve On", bVisible);
-            }
-
-            public override string Run()
-            {
-                switch (m_eSol)
-                {
-                    case eSol.Dome_Clamp: return m_module.m_dome.RunClamp(m_bOn);
-                    case eSol.Door_Cylinder: return m_module.m_door.RunCylinderUp(m_bOn);
-                    case eSol.EOP_Cover: return m_module.RunCoverDown(m_bOn); 
-                }
-                return "OK";
             }
         }
         #endregion

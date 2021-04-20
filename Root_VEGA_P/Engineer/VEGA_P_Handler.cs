@@ -35,11 +35,7 @@ namespace Root_VEGA_P.Engineer
         public VEGA_P m_VEGA; 
         public RTR m_rtr;
         public Loadport m_loadport;
-        public EOP m_EOP;
-        public EIP_Plate m_EIP_Plate;
-        public EIP_Cover m_EIP_Cover;
-        public Holder m_holder;
-        public Vision m_vision; 
+        public EOP m_EOP; 
         void InitModule()
         {
             p_moduleList = new ModuleList(m_engineer);
@@ -50,20 +46,11 @@ namespace Root_VEGA_P.Engineer
             m_loadport = new Loadport("Loadport", m_engineer);
             InitModule(m_loadport);
             m_EOP = new EOP("EOP", m_engineer);
-            InitModule(m_EOP);
-            m_EIP_Plate = new EIP_Plate("EIP Plate", m_engineer);
-            InitModule(m_EIP_Plate);
-            m_EIP_Cover = new EIP_Cover("EIP Cover", m_engineer);
-            InitModule(m_EIP_Cover);
+            InitModule(m_EOP); 
 
-            m_holder = new Holder("Holder", m_engineer, ModuleBase.eRemote.Client);
-            InitModule(m_holder);
-            m_vision = new Vision("Vision", m_engineer, ModuleBase.eRemote.Client);
-            InitModule(m_vision);
+            InitParticleCounter();
 
-            InitParticleCounter(); //forget delete
-
-            m_rtr.AddChild(m_loadport, m_EOP.m_dome, m_EOP.m_door, m_EIP_Plate, m_EIP_Cover, m_holder, m_vision); 
+            m_rtr.AddChild(m_loadport, m_EOP.m_dome, m_EOP.m_door); 
             m_rtr.RunTree(Tree.eMode.RegRead);
             m_rtr.RunTree(Tree.eMode.Init);
             m_rtr.ReadPod_Registry();

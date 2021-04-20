@@ -87,7 +87,7 @@
               HorizontalAlignment="Left">
             <Grid.RowDefinitions>
                 <RowDefinition  Height="160"/>
-                <RowDefinition  Height="260"/>
+                <RowDefinition  Height="240"/>
                 <RowDefinition  Height="*"/>
             </Grid.RowDefinitions>
             <GroupBox Grid.Row="0"
@@ -130,8 +130,7 @@
                     </Grid>
                 </StackPanel>
             </GroupBox>
-            <local:MotionController Grid.Row="1"/>
-            <!--<GroupBox Grid.Row="1"
+            <GroupBox Grid.Row="1"
                       Header="Motion Controller"
                       Style="{StaticResource main_view_groupbox}" Margin="4">
                 <Grid>
@@ -212,7 +211,7 @@
                         </i:Interaction.Triggers>
                     </Button>
                 </Grid>
-            </GroupBox>-->
+            </GroupBox>
         </Grid>
         <GroupBox Header="Feature Item List"  Grid.Column="1" Style="{StaticResource main_view_groupbox}" Margin="4">
             <Grid >
