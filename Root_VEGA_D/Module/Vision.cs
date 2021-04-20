@@ -464,6 +464,23 @@ namespace Root_VEGA_D.Module
                 timer.Stop();
 
             m_bDisconnectedGrabLineScanning = false;
+            if (m_qModuleRun.Count > 0)
+            {
+                Run_GrabLineScan runGrabLineScan = m_qModuleRun.Peek() as Run_GrabLineScan;
+                if (runGrabLineScan != null)
+                {
+                    // 현재 GrabLineScan 진행중이었다면
+                    if (runGrabLineScan.p_eRunState == ModuleRunBase.eRunState.Run)
+                    {
+                        // EQ Stop 상태로 변경하고 이미지그랩 중에 중단되었다는 상태값 설정
+                        m_bDisconnectedGrabLineScanning = true;
+                        lock (runGrabLineScan.m_lockWaitRun)
+                        {
+                            runGrabLineScan.m_bWaitRun = false;
+                        }
+                    }
+                }
+            }
         }
         private void EventAccept(Socket socket)
         {

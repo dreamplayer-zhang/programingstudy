@@ -513,7 +513,7 @@ namespace RootTools.Camera.Dalsa
             //    p_sInfo = p_id + " MemoryData Byte not 1";
             //    return;
             //}
-            m_GD = grabData != null ? grabData : m_GD;
+            grabData = grabData != null ? grabData : m_GD;
             m_Memory = memory;
             m_MemPtr = memory.GetPtr();
 
