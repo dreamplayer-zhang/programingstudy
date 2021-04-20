@@ -4,16 +4,10 @@ using RootTools.Control;
 using RootTools.Module;
 using RootTools.ParticleCounter;
 using RootTools.ToolBoxs;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace Root_VEGA_P.Module
 {
-    /*
     public class ParticleCounterSet
     {
         #region ToolBox
@@ -22,7 +16,7 @@ namespace Root_VEGA_P.Module
         {
             m_regulator.GetTools(toolBox, bInit);
             m_nozzleSet.GetTools(toolBox);
-            toolBox.Get(ref m_particleCounter, this, p_id + ".LasAir3");
+            toolBox.Get(ref m_particleCounter, m_module, "LasAir3");
             if (bInit) { }
         }
         #endregion
@@ -34,8 +28,8 @@ namespace Root_VEGA_P.Module
             RS232 m_rs232;
             public void GetTools(ToolBox toolBox, bool bInit)
             {
-                toolBox.GetDIO(ref m_diBackFlow, m_module, p_id + ".BackFlow");
-                toolBox.GetComm(ref m_rs232, m_module, p_id +".Regulator");
+                toolBox.GetDIO(ref m_diBackFlow, m_module, "BackFlow");
+                toolBox.GetComm(ref m_rs232, m_module, "Regulator");
                 if (bInit) m_rs232.p_bConnect = true;
             }
 
@@ -65,36 +59,29 @@ namespace Root_VEGA_P.Module
                 return m_rs232.p_bConnect ? "OK" : "RS232 Connect Error";
             }
 
-            string p_id { get; set; }
             ModuleBase m_module;
-            public Regulator(string id, ModuleBase module)
+            public Regulator(ModuleBase module)
             {
-                p_id = id;
                 m_module = module;
             }
         }
         Regulator m_regulator;
-        void InitRegulator()
-        {
-            m_regulator = new Regulator(p_id, m_module);
-        }
         #endregion
 
         #region NozzleSet
         NozzleSet m_nozzleSet;
         void InitNozzleSet()
         {
-            m_nozzleSet = new NozzleSet(m_module);
+            
         }
         #endregion
 
-        public string p_id { get; set; }
         ModuleBase m_module; 
-        public ParticleCounterSet(string id, ModuleBase module)
+        public ParticleCounterSet(ModuleBase module)
         {
-            p_id = id;
-            m_module = module; 
+            m_module = module;
+            m_regulator = new Regulator(m_module);
+            m_nozzleSet = new NozzleSet(m_module);
         }
     }
-    */
 }

@@ -121,6 +121,7 @@ namespace Root_VEGA_P_Vision.Module
 
         public string AfterGet()
         {
+            p_infoPod.p_bTurn = !p_infoPod.p_bTurn; 
             return "OK";
         }
 

@@ -1,5 +1,6 @@
 ﻿using RootTools;
 using RootTools.Control;
+using RootTools.Module;
 using RootTools.ToolBoxs;
 using RootTools.Trees;
 using System.Collections.Generic;
@@ -9,88 +10,48 @@ namespace Root_VEGA_P.Module
     public class NozzleSet : NotifyProperty
     {
         #region ToolBox
+        DIO_Os m_doNozzle; 
         public string GetTools(ToolBox toolBox)
         {
-            for (int n = 0; n < m_aNozzle.Count; n++)
-            {
-                toolBox.GetDIO(ref m_aNozzle[n].m_do, m_particleCounter, m_aNozzle[n].p_id);
-            }
+            toolBox.GetDIO(ref m_doNozzle, m_module, "Nozzle", m_asNozzle); 
             return "OK";
         }
         #endregion
 
-        #region Nozzle
-        public class Nozzle
-        {
-            public DIO_O m_do = null;
-            public string p_id { get; set; }
-
-            public void Write(bool bOpen)
-            {
-                m_do?.Write(bOpen);
-            }
-
-            public Nozzle(string id)
-            {
-                p_id = id;
-            }
-        }
-        List<Nozzle> m_aNozzle = new List<Nozzle>();
-        #endregion
-
         #region Nozzle Open
-        public class Open
+        public List<bool> m_aOpen = new List<bool>();
+
+        public List<bool> GetCloneOpen()
         {
-            public List<bool> m_aOpen = new List<bool>();
-            public int p_nNozzle
-            {
-                get { return m_aOpen.Count; }
-                set
-                {
-                    if (m_aOpen.Count == value) return;
-                    while (m_aOpen.Count > value) m_aOpen.RemoveAt(m_aOpen.Count - 1);
-                    while (m_aOpen.Count < value) m_aOpen.Add(false); 
-                }
-            }
-
-            public void RunTree(Tree tree)
-            {
-                for (int n = 0; n < p_nNozzle; n++)
-                {
-                    m_aOpen[n] = tree.Set(m_aOpen[n], m_aOpen[n], m_nozzleSet.m_aNozzle[n].p_id, "Nozzle Open");
-                }
-            }
-
-            NozzleSet m_nozzleSet; 
-            public Open(NozzleSet nozzleSet)
-            {
-                m_nozzleSet = nozzleSet; 
-            }
-
-            public Open(Open open)
-            {
-                m_nozzleSet = open.m_nozzleSet;
-                p_nNozzle = open.p_nNozzle;
-                for (int n = 0; n < p_nNozzle; n++) m_aOpen[n] = open.m_aOpen[n];
-            }
+            List<bool> aOpen = new List<bool>();
+            foreach (bool bOpen in m_aOpen) aOpen.Add(bOpen);
+            return aOpen; 
         }
-        public Open m_open; 
-        void InitOpen()
+
+        public void RunTreeOpen(Tree tree, List<bool> aOpen)
         {
-            m_open = new Open(this); 
+            for (int n = 0; n < p_nNozzle; n++)
+            {
+                aOpen[n] = tree.Set(aOpen[n], aOpen[n], (n + 1).ToString("00"), "Nozzle Open");
+            }
         }
         #endregion
 
         #region Property
+        string[] m_asNozzle = new string[1] { "1" };
+        int _nNozzle = 1; 
         public int p_nNozzle
         {
-            get { return m_aNozzle.Count; }
+            get { return _nNozzle; }
             set
             {
-                if (m_aNozzle.Count == value) return;
-                while (m_aNozzle.Count > value) m_aNozzle.RemoveAt(m_aNozzle.Count - 1);
-                while (m_aNozzle.Count < value) m_aNozzle.Add(new Nozzle("Nozzle" + m_aNozzle.Count.ToString("00")));
-                m_reg.Write("nNozzle", value); 
+                if (_nNozzle == value) return;
+                _nNozzle = value;
+                m_asNozzle = new string[value];
+                for (int n = 0; n < value; n++) m_asNozzle[n] = (n + 1).ToString("00");
+                m_aOpen.Clear();
+                for (int n = 0; n < value; n++) m_aOpen.Add(false);
+                m_reg.Write("nNozzle", value);
             }
         }
 
@@ -103,35 +64,31 @@ namespace Root_VEGA_P.Module
         #endregion
 
         #region Nozzle Run
-        public string RunNozzle(Open open)
+        public string RunNozzle(List<bool> aOpen)
         {
-            for (int n = 0; n < p_nNozzle; n++) m_aNozzle[n].Write(open.m_aOpen[n]); 
+            for (int n = 0; n < p_nNozzle; n++) m_doNozzle.Write(n, aOpen[n]); 
             return "OK";
         }
 
         public string RunNozzle(int nNozzle)
         {
-            for (int n = 0; n < p_nNozzle; n++) m_aNozzle[n].Write(n == nNozzle);
+            for (int n = 0; n < p_nNozzle; n++) m_doNozzle.Write(n, n == nNozzle); 
             return "OK";
         }
         #endregion
 
         #region Tree
-        public void RunTreeName(Tree tree)
+        public void RunTreeSetup(Tree tree)
         {
             p_nNozzle = tree.Set(p_nNozzle, p_nNozzle, "Count", "Nozzle Count");
         }
         #endregion
 
-        #region Init Nozzle
-        #endregion
-
-        ParticleCounter m_particleCounter;
-        public NozzleSet(ParticleCounter particleCounter)
+        ModuleBase m_module;
+        public NozzleSet(ModuleBase module)
         {
-            m_particleCounter = particleCounter;
-            InitNozzle(particleCounter.p_id);
-            InitOpen(); 
+            m_module = module;
+            InitNozzle(module.p_id);
         }
     }
 }
