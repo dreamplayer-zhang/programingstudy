@@ -1,9 +1,12 @@
-﻿using System;
+﻿using RootTools;
+using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace RootTools_Vision.WorkManager3
 {
@@ -17,6 +20,8 @@ namespace RootTools_Vision.WorkManager3
         private RecipeBase recipe;
 
         private WorkPipeLine pipeLine;
+
+        private ConcurrentQueue<Workplace> currentWorkplaceQueue;
         #endregion
 
         #region [Event]
@@ -101,9 +106,6 @@ namespace RootTools_Vision.WorkManager3
         }
 
 
-
-
-
         public void SetRecipe(RecipeBase recipe)
         {
             this.recipe = recipe;
@@ -147,10 +149,34 @@ namespace RootTools_Vision.WorkManager3
                 RecipeToWorkConverter.Convert(this.recipe);
             }
 
+            this.currentWorkplaceQueue = 
+                RecipeToWorkplaceConverter.ConvertToQueue(this.recipe.WaferMap, this.recipe.GetItem<OriginRecipe>(), this.sharedBuffer);
+
             pipeLine.Start(
-                RecipeToWorkplaceConverter.ConvertToQueue(this.recipe.WaferMap, this.recipe.GetItem<OriginRecipe>(), this.sharedBuffer), 
+                this.currentWorkplaceQueue, 
                 RecipeToWorkConverter.Convert(this.recipe)
                 );
+        }
+
+
+        public void CheckSnapDone(Rect snapArea)
+        {
+            if (this.currentWorkplaceQueue == null) return;
+
+            foreach (Workplace wp in this.currentWorkplaceQueue)
+            {
+                if (wp.WorkState >= WORK_TYPE.SNAP) continue;
+
+
+                wp.CheckSnapDone_Line(new CRect(0, 0, (int)snapArea.Right, (int)snapArea.Bottom));
+
+                //Rect checkArea = new Rect(new Point(wp.PositionX, wp.PositionY + wp.Width), new Point(wp.PositionX + wp.Width, wp.PositionY));
+
+                //if (snapArea.Contains(checkArea) == true)
+                //{
+                //    wp.WorkState = WORK_TYPE.SNAP;
+                //}
+            }
         }
 
         public void Stop()
