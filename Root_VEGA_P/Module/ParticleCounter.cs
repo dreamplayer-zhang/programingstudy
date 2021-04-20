@@ -2,11 +2,12 @@
 using RootTools.Comm;
 using RootTools.Control;
 using RootTools.Module;
+using RootTools.ParticleCounter;
+using RootTools.ToolBoxs;
 using RootTools.Trees;
 using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.ComponentModel;
+using System.IO;
+using System.Text;
 using System.Threading;
 
 namespace Root_VEGA_P.Module
@@ -14,437 +15,163 @@ namespace Root_VEGA_P.Module
     public class ParticleCounter : ModuleBase
     {
         #region ToolBox
-        RS232 m_rs232;
-        Modbus m_mdCounter;
-        Modbus m_mbFlow; 
+        LasairIII m_particleCounter; 
         public override void GetTools(bool bInit)
         {
-            for (int n = 0; n < m_aSolValve.Count; n++)
-            {
-                p_sInfo = m_toolBox.GetDIO(ref m_aSolValve[n].m_do, this, m_aSolValve[n].m_id);
-            }
-            p_sInfo = m_toolBox.GetComm(ref m_mdCounter, this, "Modbus");
-            p_sInfo = m_toolBox.GetComm(ref m_rs232, this, "RS232");
-            p_sInfo = m_toolBox.GetComm(ref m_mbFlow, this, "Flow"); 
-            if (bInit)
-            {
-                m_rs232.OnReceive += M_rs232_OnReceive;
-                m_rs232.p_bConnect = true;
-                ConnectModbus(m_mdCounter);
-                ConnectModbus(m_mbFlow);
-            }
+            m_regulator.GetTools(m_toolBox, bInit);
+            m_nozzleSet.GetTools(m_toolBox);
+            p_sInfo = m_toolBox.Get(ref m_particleCounter, this, "LasAir3"); 
+            if (bInit) { }
         }
         #endregion
 
-        #region Property
-        int _nUnit = 1;
-        byte m_nUnit = 1;
-        void RunTreeProperty(Tree tree)
+        #region Regulator
+        public class Regulator : NotifyProperty
         {
-            _nUnit = tree.Set(_nUnit, _nUnit, "Unit", "Modbus Unit #");
-            m_nUnit = (byte)_nUnit;
-        }
-        #endregion
-
-        #region SolValve
-        public class SolValve
-        {
-            public DIO_O m_do = null;
-            public string m_id = "";
-            public string p_sName { get; set; }
-
-            public void Write(bool bOpen)
+            DIO_I m_diBackFlow; 
+            RS232 m_rs232; 
+            public void GetTools(ToolBox toolBox, bool bInit)
             {
-                m_do?.Write(bOpen); 
+                toolBox.GetDIO(ref m_diBackFlow, m_particleCounter, "BackFlow"); 
+                toolBox.GetComm(ref m_rs232, m_particleCounter, "Regulator");
+                if (bInit) m_rs232.p_bConnect = true;
             }
 
-            public SolValve(string id)
+            public bool IsBackFlow()
             {
-                m_id = id;
-                p_sName = id; 
-            }
-        }
-        List<SolValve> m_aSolValve = new List<SolValve>(); 
-
-        Registry m_reg; 
-        void InitSolValve(string id)
-        {
-            m_reg = new Registry(id);
-            p_nSolValve = m_reg.Read("nSolValve", 1);
-            p_nSolValveSet = m_reg.Read("nSolValveSet", 1);
-        }
-
-        int _nSolValve = 0; 
-        public int p_nSolValve
-        {
-            get { return _nSolValve; }
-            set
-            {
-                if (_nSolValve == value) return;
-                _nSolValve = value;
-                m_aSolValve.Clear(); 
-                for (int n = 0; n < value; n++)
-                {
-                    m_aSolValve.Add(new SolValve("SolValve " + n.ToString("00")));
-                }
-            }
-        }
-
-        void RunTreeSolValve(Tree tree)
-        {
-            p_nSolValve = tree.Set(p_nSolValve, p_nSolValve, "Count", "SolValve Count");
-            Tree treeSol = tree.GetTree("Name");
-            foreach (SolValve sol in m_aSolValve) sol.p_sName = treeSol.Set(sol.p_sName, sol.p_sName, sol.m_id, "Solvalve Name"); 
-        }
-        #endregion
-
-        #region SolValue Set
-        public class SolValveSet
-        {
-            public string m_id;
-            public string p_sName { get; set; }
-            List<bool> m_aSet = new List<bool>();
-
-            public void RunTree(Tree tree)
-            {
-                p_sName = tree.Set(p_sName, p_sName, "Name", "SolValve Set Name"); 
-                for (int n = 0; n < m_aSet.Count; n++)
-                {
-                    m_aSet[n] = tree.Set(m_aSet[n], m_aSet[n], n.ToString("00") + "." + m_pc.m_aSolValve[n].p_sName, "SolValve Set On/Off"); 
-                }
+                return m_diBackFlow.p_bIn; 
             }
 
-            public string Run()
+            public double m_hPa = 0; 
+            public string RunPump(double hPa)
             {
-                for (int n = 0; n < m_aSet.Count; n++)
-                {
-                    m_pc.m_aSolValve[n].Write(m_aSet[n]); 
-                }
-                return "OK"; 
-            }
-
-            ParticleCounter m_pc = null; 
-            public SolValveSet(string id, ParticleCounter pc)
-            {
-                m_id = id;
-                p_sName = id;
-                m_pc = pc;
-                m_aSet.Clear(); 
-                for (int n = 0; n < pc.m_aSolValve.Count; n++) m_aSet.Add(false); 
-            }
-        }
-        List<SolValveSet> m_aSolValveSet = new List<SolValveSet>(); 
-        public List<string> p_asSolValveSet
-        {
-            get
-            {
-                List<string> asSet = new List<string>();
-                foreach (SolValveSet set in m_aSolValveSet) asSet.Add(set.p_sName);
-                return asSet; 
-            }
-        }
-
-        string RunSolValveSet(string sSolValveSet)
-        {
-            foreach (SolValveSet set in m_aSolValveSet)
-            {
-                if (set.p_sName == sSolValveSet) return set.Run(); 
-            }
-            return "Invalid SolValveSet Name"; 
-        }
-
-        int _nSolValveSet = 0;
-        public int p_nSolValveSet
-        {
-            get { return _nSolValveSet; }
-            set
-            {
-                if (_nSolValveSet == value) return;
-                _nSolValveSet = value;
-                m_aSolValveSet.Clear();
-                for (int n = 0; n < value; n++)
-                {
-                    m_aSolValveSet.Add(new SolValveSet("SolValveSet " + n.ToString("00"), this));
-                }
-            }
-        }
-
-        void RunTreeSolValveSet(Tree tree)
-        {
-            p_nSolValveSet = tree.Set(p_nSolValveSet, p_nSolValveSet, "Count", "SolValveSet Count");
-            foreach (SolValveSet sol in m_aSolValveSet) sol.RunTree(tree.GetTree(sol.p_sName, false)); 
-        }
-        #endregion
-
-        #region RS232
-        string ConnectRS232()
-        {
-            m_rs232.p_bConnect = true;
-            return m_rs232.p_bConnect ? "OK" : "RS232 Connect Error";
-        }
-
-        private void M_rs232_OnReceive(string sRead)
-        {
-        }
-        #endregion
-
-        #region Pressure
-        int _nPump = 1000; 
-        public int p_nPump
-        {
-            get { return _nPump; }
-            set
-            {
-                _nPump = value;
-                RunPump(value);
-                OnPropertyChanged();
-            }
-        }
-
-        string RunPump(int nPump)
-        {
-            if (Run(ConnectRS232())) return p_sInfo;
-            m_rs232.Send("SET " + nPump.ToString());
-            return "OK";
-        }
-        
-        List<int> m_aPressure = new List<int>();
-        double _fPressure = 0;
-        public double p_fPressure
-        {
-            get { return _fPressure; }
-            set
-            {
-                _fPressure = value;
-                OnPropertyChanged();
-            }
-        }
-
-        string ReadPressure()
-        {
-            if (Run(m_mdCounter.ReadInputRegister(m_nUnit, 221, m_aPressure))) return p_sInfo;
-            p_fPressure = (((m_aPressure[0] & 0xffff) << 16) + (m_aPressure[1] & 0xffff)) / 1000.0;
-            return "OK";
-        }
-        #endregion
-
-        #region Set Pressure
-        const double c_fPressureSet = 0.02; 
-        public string RunSetPressure(bool bPumpOn)
-        {
-            if (Run(RunPump(p_nPump))) return p_sInfo;
-            if (Run(ConnectModbus(m_mdCounter))) return p_sInfo;
-            if (Run(m_mdCounter.WriteCoils(m_nUnit, 8, false))) return p_sInfo;
-            if (Run(m_mdCounter.WriteHoldingRegister(m_nUnit, 2, 1))) return p_sInfo;
-            if (Run(m_mdCounter.WriteHoldingRegister(m_nUnit, 3, 0))) return p_sInfo;
-            if (Run(m_mdCounter.WriteHoldingRegister(m_nUnit, 4, 0))) return p_sInfo;
-            if (Run(m_mdCounter.WriteCoils(m_nUnit, 0, true))) return p_sInfo;
-            Thread.Sleep(2000);
-            try
-            {
-                int dV = 8; 
-                while (EQ.IsStop() == false)
-                {
-                    Thread.Sleep(1000);
-                    ReadPressure();
-                    p_sInfo = "p_fPressure = " + p_fPressure.ToString() + ", " + p_nPump.ToString(); 
-                    if (p_fPressure < 0.2) return "Pressure Too Low"; 
-                    if (Math.Abs(p_fPressure - 1) < c_fPressureSet) return "OK";
-                    if (p_fPressure < 1)
-                    {
-                        if (dV < 0) dV = -dV - 1;
-                    }
-                    else
-                    {
-                        if (dV > 0) dV = -dV;
-                    }
-                    p_nPump += dV;
-                    if (dV == 0) return "Set Pressure Error"; 
-                }
-                return "EQ Stop";
-            }
-            finally
-            {
-                if (bPumpOn == false) RunPump(0); 
-                m_mdCounter.WriteCoils(m_nUnit, 0, false);
-            }
-        }
-        #endregion
-
-        #region Modbus
-        string ConnectModbus(Modbus modbus)
-        {
-            if (modbus.m_client.Connected) return "OK";
-            p_sInfo = modbus.Connect();
-            return modbus.m_client.Connected ? "OK" : "Modbus Connect Error";
-        }
-        #endregion
-
-        #region Sample
-        int m_secSample = 1;
-        int m_secHold = 1;
-        int m_nRepeat = 3;
-
-        string SetSample()
-        {
-            if (Run(m_mdCounter.WriteCoils(m_nUnit, 8, false))) return p_sInfo;
-            if (Run(m_mdCounter.WriteHoldingRegister(m_nUnit, 2, m_secSample))) return p_sInfo;
-            if (Run(m_mdCounter.WriteHoldingRegister(m_nUnit, 3, m_secHold))) return p_sInfo;
-            if (Run(m_mdCounter.WriteHoldingRegister(m_nUnit, 4, m_nRepeat))) return p_sInfo;
-            return "OK";
-        }
-
-        void RunTreeSample(Tree tree)
-        {
-            m_secSample = tree.Set(m_secSample, m_secSample, "Sample", "Sample Time (sec)");
-            m_secHold = tree.Set(m_secHold, m_secHold, "Hold", "Hold Time (sec)");
-            m_nRepeat = tree.Set(m_nRepeat, m_nRepeat, "Repeat", "Repeat Count");
-        }
-        #endregion
-
-        #region Count
-        List<int> m_aRead = new List<int>();
-        ObservableCollection<int> p_aCount { get; set; }
-        void InitCount()
-        {
-            p_aCount = new ObservableCollection<int>();
-            for (int n = 0; n < 2 * c_lParticle; n++) m_aRead.Add(0);
-            for (int n = 0; n < c_lParticle; n++) p_aCount.Add(0);
-            m_aPressure.Add(0);
-            m_aPressure.Add(0);
-        }
-
-        string ReadParticle()
-        {
-            try
-            {
-                if (Run(m_mdCounter.WriteCoils(m_nUnit, 0, false))) return p_sInfo;
-                p_bDone = false;
-                if (Run(RunPump(p_nPump))) return p_sInfo;
-                if (Run(ConnectModbus(m_mdCounter))) return p_sInfo;
-                if (Run(SetSample())) return p_sInfo;
-                Thread.Sleep(10);
-                if (Run(m_mdCounter.WriteCoils(m_nUnit, 0, true))) return p_sInfo;
-                m_sw.Start();
-                Thread.Sleep(1000);
-                if (Run(WaitDone())) return p_sInfo;
-                if (Run(m_mdCounter.ReadInputRegister(m_nUnit, 228, m_aRead))) return p_sInfo;
-                for (int n = 0; n < 2* c_lParticle; n++) m_aRead[n] &= 0xffff;
+                string sInfo = ConnectRS232();
+                if (sInfo != "OK") return sInfo;
+                if (hPa < 0) hPa = 0;
+                if (hPa > 5) hPa = 5; 
+                m_hPa = hPa;
+                int nPower = (int)(200 * hPa); 
+                m_rs232.Send("SET " + nPower.ToString());
                 return "OK";
             }
-            finally
+
+            string ConnectRS232()
             {
-                RunPump(0);
-                p_bDone = false;
+                if (m_rs232.p_bConnect) return "OK"; 
+                m_rs232.p_bConnect = true;
+                Thread.Sleep(100); 
+                return m_rs232.p_bConnect ? "OK" : "RS232 Connect Error";
+            }
+
+            ParticleCounter m_particleCounter;
+            public Regulator(ParticleCounter particleCounter)
+            {
+                m_particleCounter = particleCounter; 
             }
         }
-
-        string StartRead(bool bStart)
+        Regulator m_regulator; 
+        void InitRegulator()
         {
-            if (Run(ConnectModbus(m_mdCounter))) return p_sInfo;
-            if (Run(m_mdCounter.WriteCoils(m_nUnit, 0, false))) return p_sInfo;
-            p_bDone = false;
-            if (Run(SetSample())) return p_sInfo;
-            Thread.Sleep(10);
-            if (Run(m_mdCounter.WriteCoils(m_nUnit, 0, bStart))) return p_sInfo;
-            m_sw.Start();
-            Thread.Sleep(1000);
-            if (Run(WaitDone())) return p_sInfo;
-            return RunRead(); 
-        }
-
-        string RunRead()
-        {
-            if (Run(m_mdCounter.ReadInputRegister(m_nUnit, 228, m_aRead))) return p_sInfo;
-            for (int n = 0; n < 2 * c_lParticle; n++) m_aRead[n] &= 0xffff;
-            for (int n = 0; n < c_lParticle; n++)
-            {
-                p_aCount[n] = (m_aRead[2 * n] << 16) + m_aRead[2 * n + 1];
-            }
-            RunTree(Tree.eMode.Init);
-            return "OK";
-        }
-
-        string RunReadFlow()
-        {
-            try
-            {
-                ConnectModbus(m_mbFlow);
-                int nFlow = 0;
-                return m_mbFlow.ReadInputRegister(1, 1000, ref nFlow);
-            }
-            catch (Exception e)
-            {
-                m_log.Error(e, "Read Flow");
-                return e.Message; 
-            }
-        }
-
-        public bool p_bDone
-        {
-            get
-            {
-                bool bDone = false;
-                m_mdCounter.ReadCoils(m_nUnit, 1, ref bDone);
-                return bDone;
-            }
-            set
-            {
-                m_mdCounter.WriteCoils(m_nUnit, 1, value);
-            }
-        }
-
-        StopWatch m_sw = new StopWatch();
-        string WaitDone()
-        {
-            int msTimeout = 1000 * (m_secHold + m_nRepeat * m_secSample + 15);
-            while (m_sw.ElapsedMilliseconds < msTimeout)
-            {
-                Thread.Sleep(100);
-                if (EQ.IsStop()) return "EQ Stop";
-                if (p_bDone) return "OK";
-            }
-            return "Read Data Timeout";
-        }
-
-        const int c_lParticle = 4; 
-        void RunTreeCount(Tree tree)
-        {
-            for (int n = 0; n < c_lParticle; n++)
-            {
-                tree.Set(p_aCount[n], p_aCount[n], n.ToString(), "Particle Count", true, true);
-            }
+            m_regulator = new Regulator(this); 
         }
         #endregion
 
-        #region Background
-        BackgroundWorker m_bgw = new BackgroundWorker();
-        void InitBackgroundWorker()
+        #region NozzleSet
+        NozzleSet m_nozzleSet; 
+        void InitNozzleSet()
         {
-            m_bgw.DoWork += M_bgw_DoWork;
-            m_bgw.RunWorkerCompleted += M_bgw_RunWorkerCompleted;
+            m_nozzleSet = new NozzleSet(this); 
+        }
+        #endregion
+
+        #region Flow Sensor
+        int m_nUnitFlow = 1;
+        VEGA_P.FlowSensor m_flowSensor;
+        public string RunReadFlow()
+        {
+            return "OK"; //forget
         }
 
-        public string StartReadParticle()
+        void RunTreeFlow(Tree tree)
         {
-            m_bgw.RunWorkerAsync();
-            return "OK";
+            m_nUnitFlow = tree.Set(m_nUnitFlow, m_nUnitFlow, "Unit", "Modbus Unit ID"); 
         }
+        #endregion
 
-        string m_sReadParticle = "";
-        private void M_bgw_DoWork(object sender, DoWorkEventArgs e)
+        #region Lasair
+        int m_nUnitLasair = 1;
+        void RunTreeLasair(Tree tree)
         {
-            m_sReadParticle = ReadParticle();
+            m_nUnitLasair = tree.Set(m_nUnitLasair, m_nUnitLasair, "Unit", "Modbus Unit ID");
         }
+        #endregion
 
-        private void M_bgw_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        #region Run
+        public string RunCount(Run_Run run)
         {
-            if (m_sReadParticle != "OK") return;
-            for (int n = 0; n < c_lParticle; n++)
+            /*
+            if (Run(m_nozzleSet.RunNozzle(run.m_open))) return p_sInfo;
+            if (Run(m_regulator.RunPump(run.m_nPump))) return p_sInfo;
+            if (Run(m_lasair.StartRun(run.m_sample))) return p_sInfo;
+            while (m_lasair.IsBusy())
             {
-                p_aCount[n] = (m_aRead[2 * n] << 16) + m_aRead[2 * n + 1]; 
+                Thread.Sleep(100);
+                if (m_lasair.IsTimeout()) return "Particle Counter Run Timeout";
+                if (EQ.IsStop()) return "EQ Stop";
             }
-            RunTree(Tree.eMode.Init);
+            */
+
+            string sPath = "c:\\ParticleCountResult";
+            Directory.CreateDirectory(sPath);
+
+            int iNozzle = 0;
+            while (EQ.IsStop() == false)
+            {
+                if (Run(m_nozzleSet.RunNozzle(iNozzle))) return p_sInfo;
+                if (Run(m_regulator.RunPump(run.m_hPa))) return p_sInfo;
+                if (Run(m_particleCounter.StartRun(run.m_sample))) return p_sInfo;
+                bool bBackFlow = false; 
+                while (m_particleCounter.IsBusy())
+                {
+                    Thread.Sleep(100);
+                    bBackFlow |= m_regulator.IsBackFlow(); 
+                    if (EQ.IsStop()) return "EQ Stop";
+                }
+                if (Run(m_regulator.RunPump(0))) return p_sInfo;
+                string sTime = GetTime(); 
+                SaveResult(sPath + "\\Nozzle" + iNozzle.ToString("00") + ".txt", sTime, bBackFlow);
+                iNozzle = (iNozzle + 1) % m_nozzleSet.p_nNozzle;
+                Thread.Sleep(5000); 
+            }
+            return "OK"; 
+        }
+
+        void SaveResult(string sFile, string sTime, bool bBackFlow)
+        {
+            using (StreamWriter sw = new StreamWriter(sFile, true, Encoding.Default))
+            {
+                sw.Write(sTime);
+                foreach (ParticleCounterBase.ParticleCount pc in m_particleCounter.m_aParticleCount)
+                {
+                    foreach (int nParticle in pc.m_aCount) sw.Write("\t" + nParticle.ToString());
+                }
+                sw.WriteLine("\t" + (bBackFlow ? "BackFlow" : "OK"));
+            }
+        }
+
+        string GetTime()
+        {
+            DateTime dt = DateTime.Now;
+            return dt.Day.ToString() + '.' + dt.Hour.ToString("00") + '.' + dt.Minute.ToString("00") + '.' + dt.Second.ToString("00");
+        }
+        #endregion
+
+        #region State Home
+        public override string StateHome()
+        {
+            if (EQ.p_bSimulate) return "OK";
+            if (Run(base.StateHome())) return p_sInfo;
+            return "OK";
         }
         #endregion
 
@@ -452,21 +179,19 @@ namespace Root_VEGA_P.Module
         public override void RunTree(Tree tree)
         {
             base.RunTree(tree);
-            RunTreeProperty(tree.GetTree("Property"));
-            RunTreeSample(tree.GetTree("Sample"));
-            RunTreeCount(tree.GetTree("Count"));
-            RunTreeSolValve(tree.GetTree("SolValve"));
-            RunTreeSolValveSet(tree.GetTree("SolValveSet"));
+            m_nozzleSet.RunTreeName(tree.GetTree("NozzleSet"));
+            RunTreeFlow(tree.GetTree("Flow Sensor"));
+            RunTreeLasair(tree.GetTree("Lasair"));
         }
         #endregion
 
-        public ParticleCounter(string id, IEngineer engineer)
+        public ParticleCounter(string id, IEngineer engineer, VEGA_P.FlowSensor flowSensor)
         {
-            InitSolValve(id); 
-            InitCount();
             p_id = id;
+            m_flowSensor = flowSensor; 
+            InitRegulator();
+            InitNozzleSet();
             InitBase(id, engineer);
-            InitBackgroundWorker();
         }
 
         #region ModuleRun
@@ -474,11 +199,8 @@ namespace Root_VEGA_P.Module
         {
             AddModuleRunList(new Run_Delay(this), false, "Time Delay");
             AddModuleRunList(new Run_Pump(this), false, "Run Pump");
-            AddModuleRunList(new Run_Pressure(this), false, "Run Set Pump Pressure");
-            AddModuleRunList(new Run_Run(this), false, "Run Particle Counter");
-            AddModuleRunList(new Run_Start(this), false, "Run Particle Counter");
-            AddModuleRunList(new Run_Read(this), false, "Read Particle Counter");
             AddModuleRunList(new Run_ReadFlow(this), false, "Read Flow Sensor");
+            AddModuleRunList(new Run_Run(this), false, "Run Particle Counter");
         }
 
         public class Run_Delay : ModuleRunBase
@@ -523,132 +245,24 @@ namespace Root_VEGA_P.Module
             public override ModuleRunBase Clone()
             {
                 Run_Pump run = new Run_Pump(m_module);
-                run.m_nPump = m_nPump; 
+                run.m_hPa = m_hPa; 
                 run.m_secDelay = m_secDelay;
                 return run;
             }
 
-            int m_nPump = 1000; 
+            double m_hPa = 2; 
             public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
             {
-                m_nPump = tree.Set(m_nPump, m_nPump, "Pump", "Pump Power (0 ~ 1000)", bVisible); 
+                m_hPa = tree.Set(m_hPa, m_hPa, "hPa", "Pump Power (1 ~ 5 hPa)", bVisible); 
                 m_secDelay = tree.Set(m_secDelay, m_secDelay, "Delay", "Delay Time (sec)", bVisible);
             }
 
             public override string Run()
             {
-                if (m_module.Run(m_module.RunPump(m_nPump))) return p_sInfo;
+                if (m_module.Run(m_module.m_regulator.RunPump(m_hPa))) return p_sInfo; 
                 Thread.Sleep(1000 * m_secDelay);
-                if (m_module.Run(m_module.RunPump(0))) return p_sInfo;
+                if (m_module.Run(m_module.m_regulator.RunPump(0))) return p_sInfo;
                 return "OK";
-            }
-        }
-
-        public class Run_Pressure : ModuleRunBase
-        {
-            ParticleCounter m_module;
-            public Run_Pressure(ParticleCounter module)
-            {
-                m_module = module;
-                InitModuleRun(module);
-            }
-
-            bool m_bPumpOn = false; 
-            public override ModuleRunBase Clone()
-            {
-                Run_Pressure run = new Run_Pressure(m_module);
-                run.m_bPumpOn = m_bPumpOn; 
-                return run;
-            }
-
-            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
-            {
-                m_bPumpOn = tree.Set(m_bPumpOn, m_bPumpOn, "Pump On", "Pump On After Set", bVisible);
-            }
-
-            public override string Run()
-            {
-                return m_module.RunSetPressure(m_bPumpOn);
-            }
-        }
-
-        public class Run_Run : ModuleRunBase
-        {
-            ParticleCounter m_module;
-            public Run_Run(ParticleCounter module)
-            {
-                m_module = module;
-                InitModuleRun(module);
-            }
-
-            public override ModuleRunBase Clone()
-            {
-                Run_Run run = new Run_Run(m_module);
-                return run;
-            }
-
-            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
-            {
-            }
-
-            public override string Run()
-            {
-                if (m_module.Run(m_module.RunSetPressure(true))) return p_sInfo; 
-                m_module.StartReadParticle();
-                return m_module.WaitDone();
-            }
-        }
-
-        public class Run_Start : ModuleRunBase
-        {
-            ParticleCounter m_module;
-            public Run_Start(ParticleCounter module)
-            {
-                m_module = module;
-                InitModuleRun(module);
-            }
-
-            bool m_bStart = true; 
-            public override ModuleRunBase Clone()
-            {
-                Run_Start run = new Run_Start(m_module);
-                run.m_bStart = m_bStart; 
-                return run;
-            }
-
-            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
-            {
-                m_bStart = tree.Set(m_bStart, m_bStart, "Start", "Start", bVisible);
-            }
-
-            public override string Run()
-            {
-                return m_module.StartRead(m_bStart);
-            }
-        }
-
-        public class Run_Read : ModuleRunBase
-        {
-            ParticleCounter m_module;
-            public Run_Read(ParticleCounter module)
-            {
-                m_module = module;
-                InitModuleRun(module);
-            }
-
-            public override ModuleRunBase Clone()
-            {
-                Run_Read run = new Run_Read(m_module);
-                return run;
-            }
-
-            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
-            {
-            }
-
-            public override string Run()
-            {
-                return m_module.RunRead();
             }
         }
 
@@ -674,6 +288,42 @@ namespace Root_VEGA_P.Module
             public override string Run()
             {
                 return m_module.RunReadFlow();
+            }
+        }
+
+        public class Run_Run : ModuleRunBase
+        {
+            ParticleCounter m_module;
+            public Run_Run(ParticleCounter module)
+            {
+                m_module = module;
+                m_open = new NozzleSet.Open(m_module.m_nozzleSet.m_open);
+                m_sample = new ParticleCounterBase.Sample(); 
+                InitModuleRun(module);
+            }
+
+            public double m_hPa = 2;
+            public NozzleSet.Open m_open;
+            public ParticleCounterBase.Sample m_sample; 
+            public override ModuleRunBase Clone()
+            {
+                Run_Run run = new Run_Run(m_module);
+                run.m_hPa = m_hPa;
+                run.m_open = new NozzleSet.Open(m_open);
+                run.m_sample = new ParticleCounterBase.Sample(m_sample); 
+                return run;
+            }
+
+            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
+            {
+                m_hPa = tree.Set(m_hPa, m_hPa, "hPa", "Pump Power (1 ~ 5 hPa)", bVisible);
+                m_sample.RunTree(tree.GetTree("Sample")); 
+                m_open.RunTree(tree.GetTree("Nozzle")); 
+            }
+
+            public override string Run()
+            {
+                return m_module.RunCount(this); 
             }
         }
         #endregion

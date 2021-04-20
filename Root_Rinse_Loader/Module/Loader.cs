@@ -224,8 +224,9 @@ namespace Root_Rinse_Loader.Module
         {
             if (m_storage.m_stack.p_bCheck == false)
             {
+                Thread.Sleep(10000); 
                 if (Run(m_roller.RunRotate(false))) return p_sInfo;
-                m_rinse.RunBuzzer(RinseL.eBuzzer.Finish);
+                m_rinse.SendFinish(); 
                 EQ.p_eState = EQ.eState.Ready;
                 return "OK";
             }
@@ -305,7 +306,8 @@ namespace Root_Rinse_Loader.Module
                             EQ.p_eState = EQ.eState.Ready;
                             m_rinse.RunBuzzer(RinseL.eBuzzer.Error);
                             picker.m_dioVacuum.Write(false); 
-                            p_sInfo = picker.m_id + " : Picker drop Strip"; 
+                            p_sInfo = picker.m_id + " : Picker drop Strip";
+                            m_bCheckStrip = false; 
                         }
                     }
                 }

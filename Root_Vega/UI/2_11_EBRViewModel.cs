@@ -215,7 +215,8 @@ namespace Root_Vega
 		/// <param name="args">arguments. 사용이 필요한 경우 수정해서 사용</param>
 		private void M_InspManager_AddDefect(DefectDataWrapper item)
 		{
-			if ((InspectionManager.GetInspectionType(item.nClassifyCode) == InspectionType.AbsoluteSurface || InspectionManager.GetInspectionType(item.nClassifyCode) == InspectionType.RelativeSurface) ||
+			if ((InspectionManager.GetInspectionType(item.nClassifyCode) == InspectionType.AbsoluteSurfaceDark || InspectionManager.GetInspectionType(item.nClassifyCode) == InspectionType.RelativeSurfaceDark) ||
+				(InspectionManager.GetInspectionType(item.nClassifyCode) == InspectionType.AbsoluteSurfaceBright || InspectionManager.GetInspectionType(item.nClassifyCode) == InspectionType.RelativeSurfaceBright) ||
 				InspectionManager.GetInspectionTarget(item.nClassifyCode) == InspectionTarget.EBR)
 			{
 				try
@@ -272,12 +273,21 @@ namespace Root_Vega
 					for (int j = 0; j < tempRoi.Surface.ParameterList.Count; j++)
 					{
 						var param = tempRoi.Surface.ParameterList[j];
-						InspectionType type = InspectionType.AbsoluteSurface;
+						InspectionType type = InspectionType.AbsoluteSurfaceDark;
 
-						if (!param.UseAbsoluteInspection)
+						if (!param.UseAbsoluteInspection && param.UseDarkInspection)
 						{
-							type = InspectionType.RelativeSurface;
+							type = InspectionType.RelativeSurfaceDark;
 						}
+						else if(!param.UseAbsoluteInspection && !param.UseDarkInspection)
+						{
+							type = InspectionType.RelativeSurfaceBright;
+						}
+						else if(param.UseAbsoluteInspection && !param.UseDarkInspection)
+						{
+							type = InspectionType.AbsoluteSurfaceBright;
+						}
+
 						int nDefectCode = InspectionManager.MakeDefectCode(InspectionTarget.EBR, type, 0);
 
 
@@ -385,7 +395,7 @@ namespace Root_Vega
 		}
 		private void _endInsp()
 		{
-			m_Engineer.m_InspManager.InspectionDone(App.indexFilePath);
+			m_Engineer.m_InspManager.InspectionDone(App.indexFilePath, m_Engineer.m_recipe.VegaRecipeData.UseDefectMerge, m_Engineer.m_recipe.VegaRecipeData.MergeDistance);
 		}
 		void _addParam()
 		{

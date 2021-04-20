@@ -195,7 +195,7 @@ namespace Root_WIND2.Module
                 base.Reset();
             }
         }
-
+            
         public override void InitMemorys()
         {
             m_memoryGroup = m_memoryPool.GetGroup(p_id);

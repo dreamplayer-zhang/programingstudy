@@ -185,6 +185,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Module\EIP_Cover.cs" />
+    <Compile Include="Module\EIP_Plate.cs" />
+    <Compile Include="Module\EOP.cs" />
+    <Compile Include="Module\ParticleCounterSet.cs" />
     <Compile Include="Module\VEGA_P.cs" />
     <Compile Include="UI\1. Setup\Panel_RecipeManger.xaml.cs">
       <DependentUpon>Panel_RecipeManger.xaml</DependentUpon>

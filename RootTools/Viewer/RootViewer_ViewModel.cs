@@ -1523,45 +1523,26 @@ namespace RootTools
 
             if (ofd.ShowDialog() == DialogResult.OK)
             {
-                if (m_DialogService == null)
+                int channel = 0;
+                if (p_ImageData.GetBytePerPixel() == 3)
                 {
-                    int channel = 0;
-                    if (p_ImageData.GetBytePerPixel() == 3)
-                    {
-                        if (p_eColorViewMode == eColorViewMode.G)
-                            channel = 1;
-                        else if (p_eColorViewMode == eColorViewMode.B)
-                            channel = 2;
-                    }
-
-                    p_ImageData.OpenFile(ofd.FileName, p_CopyOffset, channel);
-                    return;
+                    if (p_eColorViewMode == eColorViewMode.G)
+                        channel = 1;
+                    else if (p_eColorViewMode == eColorViewMode.B)
+                        channel = 2;
                 }
-                else
+
+                if (m_DialogService != null)
                 {
                     var viewModel = new Dialog_ImageOpenViewModel(this as RootViewer_ViewModel);
                     Nullable<bool> result = m_DialogService.ShowDialog(viewModel);
-                    if (result.HasValue)
+                    if (!result.HasValue || !result.Value)
                     {
-                        if (result.Value)
-                        {
-                            int channel = 0;
-                            if (p_ImageData.GetBytePerPixel() == 3)
-                            {
-                                if (p_eColorViewMode == eColorViewMode.G)
-                                    channel = 1;
-                                else if (p_eColorViewMode == eColorViewMode.B)
-                                    channel = 2;
-                            }
-
-                            p_ImageData.OpenFile(ofd.FileName, p_CopyOffset, channel);
-                        }
-                        else
-                        {
-                            // Cancelled
-                        }
+                        return;
                     }
                 }
+
+                p_ImageData.OpenFile(ofd.FileName, p_CopyOffset, channel);
             }
         }
         public void _saveImage()

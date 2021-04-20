@@ -250,7 +250,6 @@ namespace Root_Rinse_Loader.Module
         #endregion
 
         #region ToolBox
-        DIO_I m_diAirEmergency;
         public TCPIPClient m_tcpip; 
         public override void GetTools(bool bInit)
         {
@@ -285,9 +284,6 @@ namespace Root_Rinse_Loader.Module
                         case EQ.eState.Ready: RunBuzzerOff(); break;
                     }
                     break;
-                case _EQ.eEQ.PickerSet:
-                    AddProtocol(p_id, eCmd.PickerSet, value);
-                    break; 
             }
         }
         #endregion
@@ -362,14 +358,14 @@ namespace Root_Rinse_Loader.Module
             }
         }
 
-        bool _bDoorLock = false;
-        public bool p_bDoorLock
+        bool _bDoorOpen = false;
+        public bool p_bDoorOpen
         {
-            get { return _bDoorLock; }
+            get { return _bDoorOpen; }
             set
             {
-                if (_bDoorLock == value) return;
-                _bDoorLock = value;
+                if (_bDoorOpen == value) return;
+                _bDoorOpen = value;
                 OnPropertyChanged();
                 EQ.p_bDoorOpen = value;
             }
@@ -390,36 +386,51 @@ namespace Root_Rinse_Loader.Module
 
         public void RunBuzzer(eBuzzer eBuzzer)
         {
-            m_doBuzzer.Write(eBuzzer); 
+            m_doBuzzer.Write(eBuzzer);
+            m_swBuzzer.Start(); 
         }
 
         public void RunBuzzerOff()
         {
-            m_doBuzzer.AllOff(); 
+            m_doBuzzer.AllOff();
+            AddProtocol(p_id, eCmd.BuzzerOff, "Off"); 
+        }
+
+        StopWatch m_swBuzzer = new StopWatch();
+        int m_secBuzzerOff = 10;
+        void AutoBuzzerOff()
+        {
+            if (m_swBuzzer.ElapsedMilliseconds < (1000 * m_secBuzzerOff)) return;
+            m_swBuzzer.Start();
+            m_doBuzzer.AllOff();
         }
 
         public bool m_bBlink = false; 
         StopWatch m_swBlick = new StopWatch(); 
         void RunThreadDIO()
         {
+            AutoBuzzerOff(); 
             p_bEMG = m_diEMG.p_bIn;
             p_bAir = m_diAir.p_bIn;
-            p_bDoorLock = m_diDoorLock.p_bIn;
+            p_bDoorOpen = !m_diDoorLock.p_bIn || !m_diLightCurtain.p_bIn;
             p_bBuzzerOff = m_diBuzzerOff.p_bIn;
-            EQ.p_bDoorOpen = m_diLightCurtain.p_bIn; 
             if (m_swBlick.ElapsedMilliseconds < 500) return;
             m_swBlick.Start();
             m_bBlink = !m_bBlink; 
-            if (m_bBlink == false) m_doLamp.AllOff();
-            else
+            switch (EQ.p_eState)
             {
-                switch (EQ.p_eState)
-                {
-                    case EQ.eState.Ready: m_doLamp.Write(eLamp.Yellow); break;
-                    case EQ.eState.Run: m_doLamp.Write(eLamp.Green); break;
-                    case EQ.eState.Error: m_doLamp.Write(eLamp.Red); break;
-                    default: m_doLamp.AllOff(); break;
-                }
+                case EQ.eState.Init:
+                    m_doLamp.AllOff(); 
+                    m_doLamp.Write(eLamp.Yellow, m_bBlink); 
+                    break;
+                case EQ.eState.Home:
+                    m_doLamp.Write(eLamp.Yellow, true);
+                    m_doLamp.Write(eLamp.Green, true);
+                    m_doLamp.Write(eLamp.Red, true);
+                    break;
+                case EQ.eState.Ready: m_doLamp.Write(eLamp.Yellow); break;
+                case EQ.eState.Run: m_doLamp.Write(eLamp.Green); break;
+                case EQ.eState.Error: m_doLamp.Write(eLamp.Red); break;
             }
         }
         #endregion
@@ -432,11 +443,12 @@ namespace Root_Rinse_Loader.Module
             SetWidth,
             EQLeState,
             EQUeState,
-            PickerSet,
             StripSend,
             StripReceive,
             ResultClear,
             SetRotateSpeed,
+            BuzzerOff,
+            Finish, 
         }
         public string[] m_asCmd = Enum.GetNames(typeof(eCmd));
 
@@ -527,7 +539,7 @@ namespace Root_Rinse_Loader.Module
                         case eCmd.EQUeState:
                             AddProtocol(asRead[0], eCmd, asRead[2]);
                             p_eStateUnloader = GetEQeState(asRead[2]);
-                            if(p_eStateUnloader == EQ.eState.Error)
+                            if (p_eStateUnloader == EQ.eState.Error)
                             {
                                 m_alidUnloadError.p_bSet = true;
                                 EQ.p_eState = EQ.eState.Error;
@@ -540,7 +552,11 @@ namespace Root_Rinse_Loader.Module
                         case eCmd.ResultClear:
                             AddProtocol(asRead[0], eCmd, asRead[2]);
                             ClearStripResult(); 
-                            break; 
+                            break;
+                        case eCmd.BuzzerOff:
+                            AddProtocol(asRead[0], eCmd, asRead[2]);
+                            RunBuzzerOff();
+                            break;
                     }
                 }
             }
@@ -607,14 +623,35 @@ namespace Root_Rinse_Loader.Module
         }
         #endregion
 
+        #region SendFinish
+        public void SendFinish()
+        {
+            RunBuzzer(eBuzzer.Finish);
+            AddProtocol(p_id, eCmd.Finish, 0); 
+        }
+        #endregion
+
         #region Tree
         public override void RunTree(Tree tree)
         {
             base.RunTree(tree);
             p_eMode = (eRunMode)tree.Set(p_eMode, p_eMode, "Mode", "RunMode");
             p_widthStrip = tree.Set(p_widthStrip, p_widthStrip, "Width", "Strip Width (mm)");
+            m_secBuzzerOff = tree.Set(m_secBuzzerOff, m_secBuzzerOff, "Buzzer Off", "Buzzer Off Delay (sec)"); 
         }
         #endregion
+
+        public override void Reset()
+        {
+            if (m_tcpip.p_bConnect == false) m_tcpip.Connect();
+            Thread.Sleep(10); 
+            if (m_tcpip.p_bConnect == false) return;
+            AddProtocol(p_id, eCmd.SetMode, p_eMode); 
+            AddProtocol(p_id, eCmd.SetWidth, p_widthStrip); 
+            AddProtocol(p_id, eCmd.SetRotateSpeed, p_fRotateSpeed);
+            AddProtocol(p_id, eCmd.EQLeState, EQ.p_eState);
+            base.Reset();
+        }
 
         public RinseL(string id, IEngineer engineer)
         {

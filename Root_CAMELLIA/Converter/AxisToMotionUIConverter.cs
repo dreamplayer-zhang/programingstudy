@@ -51,8 +51,10 @@ namespace Root_CAMELLIA
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
+            //-78803
+            //655730
             double actPos = (double)value;
-            double canvasPos = 9500 * actPos / 64000;
+            double canvasPos = 9500 * actPos / 655730;
             if (value == null)
             {
                 return 0.0;
@@ -71,7 +73,7 @@ namespace Root_CAMELLIA
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             double actPos = (double)value;
-            double canvasPos = 9500 - (10000 * actPos / 103500);
+            double canvasPos = 9500 - (9500 * actPos / 103948);
             if (value == null)
             {
                 return 0.0;

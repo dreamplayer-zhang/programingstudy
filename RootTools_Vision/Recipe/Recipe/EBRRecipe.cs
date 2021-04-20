@@ -11,6 +11,10 @@ namespace RootTools_Vision
 		#region [Parameter]
 		private int grabModeIndex;
 
+		// TEMP
+		private int firstNotch;
+		private int lastNotch;
+
 		// Light
 		private int lightWhite = 0;
 		private int lightSide = 0;
@@ -21,6 +25,16 @@ namespace RootTools_Vision
 		{
 			get => this.grabModeIndex;
 			set => SetProperty<int>(ref this.grabModeIndex, value);
+		}
+		public int FirstNotch
+		{
+			get => this.firstNotch;
+			set => SetProperty<int>(ref this.firstNotch, value);
+		}
+		public int LastNotch
+		{
+			get => this.lastNotch;
+			set => SetProperty<int>(ref this.lastNotch, value);
 		}
 		public int LightWhite
 		{

@@ -4,8 +4,10 @@ using RootTools;
 using RootTools.Module;
 using System;
 using System.ComponentModel;
+using System.Globalization;
 using System.IO;
 using System.Windows;
+using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
@@ -95,6 +97,11 @@ namespace Root_VEGA_D
             loadportB.Init(m_handler.m_aLoadport[1], m_handler, m_handler.m_aRFID[1]);
             RecipeWizard_UI.init(m_engineer);
             InitTimer();
+            InitFFU();
+            TextBlockRetID.DataContext = m_handler.m_aLoadport[0].p_infoCarrier.m_aGemSlot[0];
+            Is_InLP.Background = (m_handler.m_aLoadport[0].p_infoCarrier.m_aInfoWafer[0] != null)||(m_handler.m_aLoadport[0].p_infoCarrier.m_aInfoWafer[1] != null) ? Brushes.MediumBlue: Brushes.Gray;
+            Is_InRTR.Background = m_handler.m_wtr.m_dicArm[0].p_infoWafer!= null ? Brushes.MediumBlue : Brushes.Gray;
+            Is_InVS.Background = m_handler.m_vision.p_infoWafer != null ? Brushes.MediumBlue : Brushes.Gray;
         }
 
         //bool m_blogin = false;
@@ -130,6 +137,15 @@ namespace Root_VEGA_D
         {
             if (IsEnable_Pause() == false) return;
             EQ.p_eState = EQ.eState.Ready;
+        }
+        void InitFFU()
+        {
+            FanUI0.DataContext = m_handler.m_FFU.p_aUnit[0].p_aFan[0];
+            FanUI1.DataContext = m_handler.m_FFU.p_aUnit[0].p_aFan[1];
+            FanUI2.DataContext = m_handler.m_FFU.p_aUnit[0].p_aFan[2];
+            FanUI3.DataContext = m_handler.m_FFU.p_aUnit[0].p_aFan[3];
+            FanUI4.DataContext = m_handler.m_FFU.p_aUnit[0].p_aFan[4];
+            FanUI5.DataContext = m_handler.m_FFU.p_aUnit[0].p_aFan[5];
         }
 
         bool IsRunModule(ModuleBase module)

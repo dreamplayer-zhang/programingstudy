@@ -8,7 +8,7 @@
         xmlns:Icon ="clr-namespace:Root_CAMELLIA.Control.Icon"
         xmlns:i="http://schemas.microsoft.com/xaml/behaviors" 
         xmlns:met="clr-namespace:Root_CAMELLIA.LibSR_Met"
-        xmlns:tools="clr-namespace:RootTools.Control.ACS;assembly=RootTools"
+        xmlns:tools="clr-namespace:RootTools;assembly=RootTools"
         xmlns:arrow="clr-namespace:Petzold.Media2D"
         xmlns:ctrl="clr-namespace:Root_CAMELLIA.Control"
         xmlns:stage="clr-namespace:Camellia2Stage"
@@ -50,12 +50,7 @@
                           Height="21"
                           VerticalAlignment="Center"
                           Margin="2"/>
-            <TextBlock Text="Camellia Ⅱ - Version 0.0.1"
-                       FontSize="11"
-                       Foreground="Black"
-                       VerticalAlignment="Center"
-                       Margin="5,0,0,0"
-                       Grid.Column="1" />
+            <TextBlock Grid.Column="1" Text="{Binding Path=Version, Source={x:Static local:BaseDefine.Configuration}}"  FontSize="11" Foreground="Black" VerticalAlignment="Center" Margin="5,0,0,0"/>
             <TextBlock Text="{Binding RecipeViewModel.RecipePath}"
                        FontSize="12"
                        FontWeight="Bold"
@@ -321,15 +316,10 @@
 
                 <GroupBox Header="Camera" Grid.Row="0">
                     <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition/>
-                            <ColumnDefinition/>
-                        </Grid.ColumnDefinitions>
                         <GroupBox Header="Captured Image">
-                            <Grid Background="Black"/>
-                        </GroupBox>
-                        <GroupBox Header="Captured Image" Grid.Column="1">
-                            <Grid Background="Black"/>
+                            <Canvas Background="Black" ClipToBounds="True" x:Name="canvas" >
+                                <Image Source="{Binding p_imageSource, UpdateSourceTrigger=PropertyChanged}" Width="{Binding Path=ActualWidth, ElementName=canvas}" Height="{Binding Path=ActualHeight, ElementName=canvas}"  Stretch="Fill"></Image>
+                            </Canvas>
                         </GroupBox>
                     </Grid>
                 </GroupBox>
@@ -375,27 +365,24 @@
                         </GroupBox>
                         <Viewbox Margin="3"
                                  Grid.Row="1">
-                            <!--<ItemsControl ItemsSource="{Binding RecipeViewModel.p_DrawElement}"
-                                          Width="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualWidth}"
-                                          Height="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualHeight}"
-                                          BorderBrush="Black"
-                                          BorderThickness="1">
-                                <ItemsControl.ItemsPanel>
-                                    <ItemsPanelTemplate>
-                                        <Canvas ClipToBounds="True"
-                                                Width="{x:Static local:BaseDefine.CanvasWidth}"
-                                                Height="{x:Static local:BaseDefine.CanvasHeight}"
-                                                Background="#01FFFFFF"
-                                                Focusable="true">
-                                        </Canvas>
-                                    </ItemsPanelTemplate>
-                                </ItemsControl.ItemsPanel>
-                            </ItemsControl>-->
                             <stage:CamelliaStage/>
                         </Viewbox>
                         <Viewbox Margin="3"
                                  Grid.Row="1">
-                            <ItemsControl ItemsSource="{Binding RecipeViewModel.p_DrawPointElement}"
+                            <ItemsControl ItemsSource="{Binding p_DrawCandidatePointElement}"
+                              Width="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualWidth}"
+                              Height="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualHeight}" BorderBrush="Black" BorderThickness="1">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <Canvas ClipToBounds="True"  Width="{x:Static local:BaseDefine.CanvasWidth}" Height="{x:Static local:BaseDefine.CanvasHeight}" Background="#01FFFFFF" Focusable="true">
+                                        </Canvas>
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                            </ItemsControl>
+                        </Viewbox>
+                        <Viewbox Margin="3"
+                                 Grid.Row="1">
+                            <ItemsControl ItemsSource="{Binding p_DrawPointElement}"
                               Width="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualWidth}"
                               Height="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualHeight}" BorderBrush="Black" BorderThickness="1">
                                 <ItemsControl.ItemsPanel>
@@ -505,11 +492,24 @@
                     <Grid Grid.Column="2">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="1*"/>
-                            <RowDefinition Height="2.5*"/>
-                            <RowDefinition Height="0.2*"/>
+                            <RowDefinition Height="1*"/>
+                            <RowDefinition Height="0.1*"/>
                         </Grid.RowDefinitions>
                         <GroupBox Header="Contour Map">
-
+                            <Border BorderBrush="Black" BorderThickness="1">
+                                <ItemsControl ItemsSource="{Binding p_ContourMapCollection}">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <Grid/>
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <met:ContourMap DataContext="{Binding p_ContourMapGraph, UpdateSourceTrigger=PropertyChanged}"/>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </Border>
                         </GroupBox>
                         <GroupBox Header="Measurement Data" Grid.Row="1">
                             <TabControl Background="Transparent">
@@ -666,7 +666,7 @@
                                                             <ColumnDefinition Width="12*"/>
                                                         </Grid.ColumnDefinitions>
                                                         <TextBlock Text="Integration Time (VIS)" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="0"/>
-                                                        <TextBox Grid.Column="1" Margin="3" Text="{Binding RecipeViewModel.VISIntegrationTime, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}" IsEnabled="False" TextAlignment="Center" VerticalContentAlignment="Center"></TextBox>
+                                                        <TextBox Grid.Column="1" Margin="1" Text="{Binding RecipeViewModel.VISIntegrationTime, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}" IsEnabled="False" TextAlignment="Center" VerticalContentAlignment="Center"></TextBox>
                                                     </Grid>
                                                     <Grid Margin="5" Background="Gainsboro">
                                                         <Grid.ColumnDefinitions>
@@ -674,7 +674,7 @@
                                                             <ColumnDefinition Width="12*"/>
                                                         </Grid.ColumnDefinitions>
                                                         <TextBlock Text="Integration Time (NIR)" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="0"/>
-                                                        <TextBox Grid.Column="1" Margin="3" Text="{Binding RecipeViewModel.NIRIntegrationTime, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}" IsEnabled="False" TextAlignment="Center" VerticalContentAlignment="Center"></TextBox>
+                                                        <TextBox Grid.Column="1" Margin="1" Text="{Binding RecipeViewModel.NIRIntegrationTime, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}" IsEnabled="False" TextAlignment="Center" VerticalContentAlignment="Center"></TextBox>
                                                     </Grid>
                                                 </UniformGrid>
                                             </Grid>
@@ -714,7 +714,14 @@
                                                         <Border Background="White" BorderBrush="#ABADB3" BorderThickness="1">
                                                             <TextBlock Grid.Row="0" Text="Transmittance" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="0,2" TextAlignment="Center"/>
                                                         </Border>
-                                                        <ListBox Grid.Row="1" ItemsSource="{Binding RecipeViewModel.TransmittanceListItem, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}" IsSynchronizedWithCurrentItem="True" HorizontalContentAlignment="Center" />
+                                                        <DataGrid Grid.Row="1" ItemsSource="{Binding RecipeViewModel.TransmittanceListItem}" AutoGenerateColumns="False" CanUserAddRows="False" CanUserSortColumns="True" EnableColumnVirtualization="True"  CanUserDeleteRows="False"
+                                  EnableRowVirtualization="True" ScrollViewer.CanContentScroll="True" SelectionMode="Single">
+                                                            <DataGrid.Columns>
+                                                                <DataGridTextColumn Header="Wave" Width="*" Binding="{Binding p_waveLength}" IsReadOnly="True"/>
+                                                                <DataGridTextColumn Header="Scale" Width="*" Binding="{Binding p_scale}" IsReadOnly="True"/>
+                                                                <DataGridTextColumn Header="Offset" Width="*" Binding="{Binding p_offset}" IsReadOnly="True"/>
+                                                            </DataGrid.Columns>
+                                                        </DataGrid>
                                                     </Grid>
                                                 </Grid>
                                             </Grid>
@@ -728,7 +735,7 @@
                                                             <ColumnDefinition Width="12*"/>
                                                         </Grid.ColumnDefinitions>
                                                         <TextBlock Text="Lower WaveLength" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="0"/>
-                                                        <TextBox Grid.Column="1" Margin="3" Text="{Binding RecipeViewModel.LowerWaveLength, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" TextAlignment="Center" VerticalContentAlignment="Center" IsEnabled="False"></TextBox>
+                                                        <TextBox Grid.Column="1" Margin="1" Text="{Binding RecipeViewModel.LowerWaveLength, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" TextAlignment="Center" VerticalContentAlignment="Center" IsEnabled="False"></TextBox>
                                                     </Grid>
                                                     <Grid Margin="5" Background="Gainsboro">
                                                         <Grid.ColumnDefinitions>
@@ -736,7 +743,7 @@
                                                             <ColumnDefinition Width="12*"/>
                                                         </Grid.ColumnDefinitions>
                                                         <TextBlock Text="Upper WaveLength" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="0"/>
-                                                        <TextBox Grid.Column="1" Margin="3" Text="{Binding RecipeViewModel.UpperWaveLength, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" TextAlignment="Center" VerticalContentAlignment="Center" IsEnabled="False"></TextBox>
+                                                        <TextBox Grid.Column="1" Margin="1" Text="{Binding RecipeViewModel.UpperWaveLength, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" TextAlignment="Center" VerticalContentAlignment="Center" IsEnabled="False"></TextBox>
                                                     </Grid>
                                                     <Grid Margin="5" Background="Gainsboro">
                                                         <Grid.ColumnDefinitions>
@@ -744,7 +751,7 @@
                                                             <ColumnDefinition Width="12*"/>
                                                         </Grid.ColumnDefinitions>
                                                         <TextBlock Text="Thickness LM Iteration" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="0"/>
-                                                        <TextBox Grid.Column="1" Margin="3" Text="{Binding RecipeViewModel.ThicknessLMIteration, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" TextAlignment="Center" VerticalContentAlignment="Center" IsEnabled="False"></TextBox>
+                                                        <TextBox Grid.Column="1" Margin="1" Text="{Binding RecipeViewModel.ThicknessLMIteration, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" TextAlignment="Center" VerticalContentAlignment="Center" IsEnabled="False"></TextBox>
                                                     </Grid>
                                                     <Grid Margin="5" Background="Gainsboro">
                                                         <Grid.ColumnDefinitions>
@@ -752,7 +759,7 @@
                                                             <ColumnDefinition Width="12*"/>
                                                         </Grid.ColumnDefinitions>
                                                         <TextBlock Text="Damping Factor" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="0"/>
-                                                        <TextBox Grid.Column="1" Margin="3" Text="{Binding RecipeViewModel.DampingFactor, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" TextAlignment="Center" VerticalContentAlignment="Center" IsEnabled="False"></TextBox>
+                                                        <TextBox Grid.Column="1" Margin="1" Text="{Binding RecipeViewModel.DampingFactor, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" TextAlignment="Center" VerticalContentAlignment="Center" IsEnabled="False"></TextBox>
                                                     </Grid>
                                                 </UniformGrid>
                                             </Grid>
@@ -763,13 +770,14 @@
                         </GroupBox>
                         <GroupBox Header="Current Progress" Grid.Row="2">
                             <Grid>
-                                <ProgressBar Minimum="0" Maximum="100" Margin="2" Value="{Binding p_Progress, UpdateSourceTrigger=PropertyChanged}" Foreground="{Binding p_ProgressColor}"/>
+                                <ProgressBar Minimum="0" Maximum="100" Margin="2" Value="{Binding p_Progress, UpdateSourceTrigger=PropertyChanged}" Foreground="{Binding p_ProgressColor}" Style="{StaticResource CustomProgress}"/>
                                 <TextBlock Text="{Binding p_Progress, Converter={StaticResource ProgressConverter}, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Center" VerticalAlignment="Center" ></TextBlock>
                             </Grid>
                         </GroupBox>
                     </Grid>
                 </TabItem>
                 <TabItem Header="Log" Width="80">
+                    <tools:LogView_UI x:Name="LogUI" Margin="2"/>
                 </TabItem>
                 <TabItem Header="RT Graph">
                     <met:RTGraph DataContext="{Binding p_RTGraph, UpdateSourceTrigger=PropertyChanged}"/>

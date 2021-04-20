@@ -26,6 +26,12 @@ namespace RootTools_Vision
 
                 for (int j = 0; j < DefectList.Count; j++)
                 {
+                    int defectCode1 = DefectList[i].m_nDefectCode;
+                    int defectCode2 = DefectList[j].m_nDefectCode;
+                    
+                    if (defectCode1 != defectCode2)
+                        continue;
+
                     System.Windows.Rect defectRect1 = DefectList[i].p_rtDefectBox;
                     System.Windows.Rect defectRect2 = DefectList[j].p_rtDefectBox;
 
@@ -149,6 +155,35 @@ namespace RootTools_Vision
             }
         }
 
+        public static void SaveDefectImageParallel(String path, List<Defect> defectList, SharedBufferInfo sharedBuffer, int nByteCnt)
+        {
+            path += "\\";
+            DirectoryInfo di = new DirectoryInfo(path);
+            if (!di.Exists)
+                di.Create();
+
+            if (defectList.Count < 1)
+                return;
+
+
+            Parallel.ForEach(defectList, defect =>
+            {
+                double cx = (defect.p_rtDefectBox.Left + defect.p_rtDefectBox.Right) / 2;
+                double cy = (defect.p_rtDefectBox.Top + defect.p_rtDefectBox.Bottom) / 2;
+                int startX = (int)cx - 320;
+                int startY = (int)cy - 240;
+                //int endX = startX + 640;
+                //int endY = startY + 480;
+
+                System.Drawing.Bitmap bitmap = CovertBufferToBitmap(sharedBuffer, new System.Windows.Rect(startX, startY, 640, 480));
+
+                if(System.IO.File.Exists(path + defect.m_nDefectIndex + ".bmp"))
+                    System.IO.File.Delete(path + defect.m_nDefectIndex + ".bmp");
+
+                bitmap.Save(path + defect.m_nDefectIndex + ".bmp");
+            });
+        }
+
         public static void SaveDefectImage(String path, List<Data> dataList, SharedBufferInfo sharedBuffer)
         {
             path += "\\";
@@ -255,7 +290,7 @@ namespace RootTools_Vision
             for (int i = 0; i < defectList.Count; i++)
             {
 				MemoryStream image = new MemoryStream();
-                System.Drawing.Bitmap bitmap = Tools.ConvertArrayToColorBitmap(sharedBuffer.PtrR_GRAY, sharedBuffer.PtrG, sharedBuffer.PtrB, sharedBuffer.Width, sharedBuffer.ByteCnt, defectList[i].GetRect());
+                System.Drawing.Bitmap bitmap = Tools.CovertBufferToBitmap(sharedBuffer, defectList[i].GetRect());
                 //System.Drawing.Bitmap NewImg = new System.Drawing.Bitmap(bitmap);
                 bitmap.Save(image, ImageFormat.Tiff);
                 inputImage.Add(image);
@@ -328,9 +363,8 @@ namespace RootTools_Vision
             for (int i = 0; i < dataList.Count; i++)
             {
                 MemoryStream image = new MemoryStream();
-				System.Drawing.Bitmap bitmap = Tools.ConvertArrayToColorBitmap(sharedBuffer.PtrR_GRAY, sharedBuffer.PtrG, sharedBuffer.PtrB, sharedBuffer.Width, sharedBuffer.ByteCnt, dataList[i].GetRect());
-				//System.Drawing.Bitmap NewImg = new System.Drawing.Bitmap(bitmap);
-				bitmap.Save(image, ImageFormat.Tiff);
+                System.Drawing.Bitmap bitmap = Tools.CovertBufferToBitmap(sharedBuffer, dataList[i].GetRect());
+                bitmap.Save(image, ImageFormat.Tiff);
                 inputImage.Add(image);
             }
 

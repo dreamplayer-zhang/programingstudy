@@ -51,7 +51,7 @@ namespace Root_Rinse_Unloader
             if (rinse.m_tcpip.m_tcpSocket == null)
             {
                 borderLoadState.Background = Brushes.Crimson;
-                textBlockLoadState.Text = "disconnect";
+                m_handler.m_rinse.p_eStateLoader = EQ.eState.Null; 
             }
             else if(rinse.m_tcpip.m_tcpSocket.m_socket.Connected)
             {
@@ -60,12 +60,14 @@ namespace Root_Rinse_Unloader
             else
             {
                 borderLoadState.Background = Brushes.Crimson;
-                textBlockLoadState.Text = "disconnect";
+                m_handler.m_rinse.p_eStateLoader = EQ.eState.Null;
             }
 
             gridRed.Background = (bBlink && (EQ.p_eState == EQ.eState.Error)) ? Brushes.Crimson : Brushes.DarkRed;
             gridYellow.Background = (bBlink && (EQ.p_eState == EQ.eState.Ready)) ? Brushes.Gold : Brushes.YellowGreen;
             gridGreen.Background = (bBlink && (EQ.p_eState == EQ.eState.Run)) ? Brushes.SeaGreen : Brushes.DarkGreen;
+
+            tabControlStorage.SelectedIndex = (int)m_handler.m_rinse.p_eMode;
         }
         #endregion
 

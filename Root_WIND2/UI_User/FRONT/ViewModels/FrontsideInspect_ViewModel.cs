@@ -10,6 +10,7 @@ using System.Windows;
 using System.Windows.Media;
 using System.Windows.Threading;
 using System.Data;
+using RootTools_Vision.WorkManager3;
 
 namespace Root_WIND2.UI_User
 {
@@ -95,14 +96,25 @@ namespace Root_WIND2.UI_User
             this.imageViewerVM = new FrontsideInspect_ImageViewer_ViewModel();
             this.imageViewerVM.init(GlobalObjects.Instance.GetNamed<ImageData>("FrontImage"), GlobalObjects.Instance.Get<DialogService>());
 
-            if (GlobalObjects.Instance.Get<InspectionManagerFrontside>() != null)
+
+            if (GlobalObjects.Instance.GetNamed<WorkManager>("frontInspection") != null)
             {
-                GlobalObjects.Instance.Get<InspectionManagerFrontside>().InspectionStart += InspectionStart_Callback;
-                GlobalObjects.Instance.Get<InspectionManagerFrontside>().PositionDone += PositionDone_Callback;
-                GlobalObjects.Instance.Get<InspectionManagerFrontside>().InspectionDone += InspectionDone_Callback;
-                GlobalObjects.Instance.Get<InspectionManagerFrontside>().ProcessDefectWaferStart += ProcessDefectWaferStart_Callback;
-                GlobalObjects.Instance.Get<InspectionManagerFrontside>().IntegratedProcessDefectDone += ProcessDefectWaferDone_Callback;
+                GlobalObjects.Instance.GetNamed<WorkManager>("frontInspection").InspectionStart += InspectionStart_Callback;
+                GlobalObjects.Instance.GetNamed<WorkManager>("frontInspection").PositionDone += PositionDone_Callback;
+                GlobalObjects.Instance.GetNamed<WorkManager>("frontInspection").InspectionDone += InspectionDone_Callback;
+                GlobalObjects.Instance.GetNamed<WorkManager>("frontInspection").ProcessDefectWaferStart += ProcessDefectWaferStart_Callback;
+                GlobalObjects.Instance.GetNamed<WorkManager>("frontInspection").IntegratedProcessDefectDone += ProcessDefectWaferDone_Callback;
             }
+
+
+            //if (GlobalObjects.Instance.Get<InspectionManagerFrontside>() != null)
+            //{
+            //    GlobalObjects.Instance.Get<InspectionManagerFrontside>().InspectionStart += InspectionStart_Callback;
+            //    GlobalObjects.Instance.Get<InspectionManagerFrontside>().PositionDone += PositionDone_Callback;
+            //    GlobalObjects.Instance.Get<InspectionManagerFrontside>().InspectionDone += InspectionDone_Callback;
+            //    GlobalObjects.Instance.Get<InspectionManagerFrontside>().ProcessDefectWaferStart += ProcessDefectWaferStart_Callback;
+            //    GlobalObjects.Instance.Get<InspectionManagerFrontside>().IntegratedProcessDefectDone += ProcessDefectWaferDone_Callback;
+            //}
 
             this.p_DataViewer_VM.SelectedCellsChanged += SelectedCellsChanged_Callback;
 
@@ -171,11 +183,17 @@ namespace Root_WIND2.UI_User
             {
                 LoadRecipe();
 
-                if (GlobalObjects.Instance.Get<InspectionManagerFrontside>() != null)
+                if (GlobalObjects.Instance.GetNamed<WorkManager>("frontInspection") != null)
                 {
-                    GlobalObjects.Instance.Get<InspectionManagerFrontside>().WorkplaceStateChanged += WorkplaceStateChanged_Callback;
+                    GlobalObjects.Instance.GetNamed<WorkManager>("frontInspection").WorkplaceStateChanged += WorkplaceStateChanged_Callback;
                     WIND2EventManager.SnapDone += SnapDone_Callback;
                 }
+
+                //if (GlobalObjects.Instance.Get<InspectionManagerFrontside>() != null)
+                //{
+                //    GlobalObjects.Instance.Get<InspectionManagerFrontside>().WorkplaceStateChanged += WorkplaceStateChanged_Callback;
+                //    WIND2EventManager.SnapDone += SnapDone_Callback;
+                //}
                     
             });
         }
@@ -183,25 +201,39 @@ namespace Root_WIND2.UI_User
         {
             get => new RelayCommand(() =>
             {
-                if (GlobalObjects.Instance.Get<InspectionManagerFrontside>() != null)
+                if (GlobalObjects.Instance.GetNamed<WorkManager>("frontInspection") != null)
                 {
-                    GlobalObjects.Instance.Get<InspectionManagerFrontside>().WorkplaceStateChanged -= WorkplaceStateChanged_Callback;
+                    GlobalObjects.Instance.GetNamed<WorkManager>("frontInspection").WorkplaceStateChanged -= WorkplaceStateChanged_Callback;
                     WIND2EventManager.SnapDone -= SnapDone_Callback;
                 }
+
+                //if (GlobalObjects.Instance.Get<InspectionManagerFrontside>() != null)
+                //{
+                //    GlobalObjects.Instance.Get<InspectionManagerFrontside>().WorkplaceStateChanged -= WorkplaceStateChanged_Callback;
+                //    WIND2EventManager.SnapDone -= SnapDone_Callback;
+                //}
             });
         }
 
+        WorkManager workManager;
 
         public RelayCommand btnStart
         {
             get => new RelayCommand(() =>
             {
-                //GlobalObjects.Instance.Get<InspectionManagerFrontside>().RemoteStart();
-                this.ImageViewerVM.ClearObjects();
-                if (GlobalObjects.Instance.Get<InspectionManagerFrontside>() != null)
+
+                if (GlobalObjects.Instance.GetNamed<WorkManager>("frontInspection") != null)
                 {
-                    GlobalObjects.Instance.Get<InspectionManagerFrontside>().Start(WORK_TYPE.SNAP);
+                    GlobalObjects.Instance.GetNamed<WorkManager>("frontInspection").Start();
                 }
+                return;
+
+                //GlobalObjects.Instance.Get<InspectionManagerFrontside>().RemoteStart();
+                //this.ImageViewerVM.ClearObjects();
+                //if (GlobalObjects.Instance.Get<InspectionManagerFrontside>() != null)
+                //{
+                //    GlobalObjects.Instance.Get<InspectionManagerFrontside>().Start(WORK_TYPE.SNAP);
+                //}
             });
         }
 
@@ -238,10 +270,16 @@ namespace Root_WIND2.UI_User
         {
             get => new RelayCommand(() =>
             {
-                if (GlobalObjects.Instance.Get<InspectionManagerFrontside>() != null)
+
+                if (GlobalObjects.Instance.GetNamed<WorkManager>("frontInspection") != null)
                 {
-                    GlobalObjects.Instance.Get<InspectionManagerFrontside>().Stop();
+                    GlobalObjects.Instance.GetNamed<WorkManager>("frontInspection").Stop();
                 }
+
+                //if (GlobalObjects.Instance.Get<InspectionManagerFrontside>() != null)
+                //{
+                //   GlobalObjects.Instance.Get<InspectionManagerFrontside>().Stop();
+                //}
             });
         }
 

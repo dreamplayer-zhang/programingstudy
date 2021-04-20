@@ -12,6 +12,10 @@ using Root_CAMELLIA.Draw;
 using System.Windows.Media;
 using Root_CAMELLIA.Control;
 using System.Windows.Controls;
+using System.Windows.Media.Imaging;
+using Emgu.CV;
+using System.Threading;
+using Emgu.CV.Structure;
 
 namespace Root_CAMELLIA
 {
@@ -30,7 +34,19 @@ namespace Root_CAMELLIA
                 SetProperty(ref _DataManager, value);
             }
         }
-        
+
+        BitmapSource m_imageSource;
+        public BitmapSource p_imageSource
+        {
+            get
+            {
+                return m_imageSource;
+            }
+            set
+            {
+                SetProperty(ref m_imageSource, value);
+            }
+        }
 
         #region Property
         public Module_Camellia p_Module_Camellia
@@ -112,6 +128,33 @@ namespace Root_CAMELLIA
             }
         }
 
+        ObservableCollection<Met.ContourMap> m_ContourMapCollection = new ObservableCollection<Met.ContourMap>();
+        public ObservableCollection<Met.ContourMap> p_ContourMapCollection
+        {
+            get
+            {
+                return m_ContourMapCollection;
+            }
+            set
+            {
+                SetProperty(ref m_ContourMapCollection, value);
+            }
+        }
+
+
+        Met.ContourMap m_ContourMapGraph = new Met.ContourMap();
+        public Met.ContourMap p_ContourMapGraph
+        {
+            get
+            {
+                return m_ContourMapGraph;
+            }
+            set
+            {
+                SetProperty(ref m_ContourMapGraph, value);
+            }
+        }
+
         RPoint m_StageCenterPulse = new RPoint();
         public RPoint p_StageCenterPulse
         {
@@ -145,7 +188,30 @@ namespace Root_CAMELLIA
             {
                 InitTimer();
             }
-            //m_reg.Write(,);
+
+            p_ContourMapCollection.Add(p_ContourMapGraph);
+
+
+            p_Module_Camellia.p_CamVRS.Captured += GetImage;
+        }
+
+        private void GetImage(object obj, EventArgs e)
+        {
+            Thread.Sleep(100);
+            RootTools.Camera.BaslerPylon.Camera_Basler p_CamVRS = p_Module_Camellia.p_CamVRS;
+            Mat mat = new Mat(new System.Drawing.Size(p_CamVRS.GetRoiSize().X, p_CamVRS.GetRoiSize().Y), Emgu.CV.CvEnum.DepthType.Cv8U, 3, p_CamVRS.p_ImageViewer.p_ImageData.GetPtr(), (int)p_CamVRS.p_ImageViewer.p_ImageData.p_Stride * 3);
+            Image<Bgra, byte> img = mat.ToImage<Bgra, byte>();
+
+            //CvInvoke.Imshow("aa",img.Mat);
+            //CvInvoke.WaitKey(0);
+            //CvInvoke.DestroyAllWindows();
+            //p_rootViewer.p_ImageData = new ImageData(p_CamVRS.p_ImageViewer.p_ImageData);
+            //lock (lockObject)
+            //{
+
+            p_imageSource = ImageHelper.ToBitmapSource(img);
+            //}
+            //p_rootViewer.SetImageSource();
         }
 
         public double p_ArrowX1
@@ -321,6 +387,20 @@ namespace Root_CAMELLIA
             }
         }
         private ObservableCollection<UIElement> m_DrawPointElement = new ObservableCollection<UIElement>();
+
+        public ObservableCollection<UIElement> p_DrawCandidatePointElement
+        {
+            get
+            {
+                return m_DrawCandidatePointElement;
+            }
+            set
+            {
+                //m_DrawPointElement = value;
+                SetProperty(ref m_DrawCandidatePointElement, value);
+            }
+        }
+        private ObservableCollection<UIElement> m_DrawCandidatePointElement = new ObservableCollection<UIElement>();
 
         public double p_Progress
         {
@@ -754,6 +834,7 @@ namespace Root_CAMELLIA
 
                         }
                         RecipeViewModel.UpdateView(true);
+                        p_DrawCandidatePointElement = new ObservableCollection<UIElement>(RecipeViewModel.p_DrawCandidatePointElement);
                         p_DrawPointElement = new ObservableCollection<UIElement>(RecipeViewModel.p_DrawPointElement);
                         DrawMeasureRoute();
                         p_Progress = 0;
@@ -784,6 +865,9 @@ namespace Root_CAMELLIA
                     {
                         isRecipeLoad = true;
                     }
+
+                    if (!isRecipeLoad)
+                        RecipeViewModel.ClearData();
                     RecipeViewModel.UpdateListView(isRecipeLoad);
                     try
                     {
@@ -795,6 +879,10 @@ namespace Root_CAMELLIA
                     }
                     RecipeViewModel.UpdateView(isRecipeLoad, true);
 
+                    if (isRecipeLoad)
+                    {
+                        p_DrawCandidatePointElement = new ObservableCollection<UIElement>(RecipeViewModel.p_DrawCandidatePointElement);
+                    }
                     p_DrawPointElement = new ObservableCollection<UIElement>(RecipeViewModel.p_DrawPointElement);
                     DrawMeasureRoute();
 
@@ -816,7 +904,7 @@ namespace Root_CAMELLIA
                     dialog.ToolBoxUI.Init(App.m_engineer);
                     Nullable<bool> result = dialog.ShowDialog();
 
-                    if (m_Module_FDC.m_aData[0].p_IsUpdate || m_Module_FDC_Vision.m_aData[0].p_IsUpdate)
+                    if (m_Module_FDC.m_aData[0].p_IsUpdate || m_Module_FDC_Vision.m_aData[0].p_IsUpdate )
                     {
                         UpdateGaugeUI();
                         m_Module_FDC.m_aData[0].p_IsUpdate = false;
@@ -923,10 +1011,13 @@ namespace Root_CAMELLIA
                     m_MainWindow.Close();
                     App.m_engineer.ThreadStop();
                     DataManager.Instance.m_SaveMeasureData.ThreadStop();
+                    App.m_engineer.BuzzerOff();
                     Application.Current.Shutdown();
                 });
             }
         }
+
+        public object ModuleCamellia { get; private set; }
         #endregion
 
         #region Event

@@ -139,8 +139,11 @@
     <Compile Include="MainWindow_ViewModel.cs" />
     <Compile Include="MVVM\Converter.cs" />
     <Compile Include="Recipe\CloneableRecipe.cs" />
+    <Compile Include="Recipe\Interfaces\IOptionParameter.cs" />
     <Compile Include="Recipe\Interfaces\IRecipe.cs" />
     <Compile Include="Recipe\Parameter\BacksideSurfaceParameter.cs" />
+    <Compile Include="Recipe\Parameter\ProcessDefectParameter.cs" />
+    <Compile Include="Recipe\Parameter\ProcessDefectWaferParameter.cs" />
     <Compile Include="Recipe\Parameter\ReticleSurfaceParameter.cs" />
     <Compile Include="Recipe\Parameter\D2DParameter.cs" />
     <Compile Include="Recipe\Interfaces\IBacksideInspection.cs" />
@@ -219,6 +222,12 @@
     <Compile Include="SingleObject.cs" />
     <Compile Include="Utility\TempLogger.cs" />
     <Compile Include="Utility\Tools.Inspection.cs" />
+    <Compile Include="WorkManager3\FixedSizeList.cs" />
+    <Compile Include="WorkManager3\TaskManager.cs" />
+    <Compile Include="WorkManager3\RecipeToWorkConverter.cs" />
+    <Compile Include="WorkManager3\RecipeToWorkplaceConverter.cs" />
+    <Compile Include="WorkManager3\WorkManager.cs" />
+    <Compile Include="WorkManager3\WorkPipe.cs" />
     <Compile Include="WorkManager\CloneableWorkBase.cs" />
     <Compile Include="WorkManager\DebugOutput.cs" />
     <Compile Include="WorkManager\Interfaces\IWorkplaceBundle.cs" />
@@ -231,6 +240,7 @@
     <Compile Include="WorkManager\WorkEventManagerArgs.cs" />
     <Compile Include="WorkManager\WorkFactory.cs" />
     <Compile Include="WorkManager\WorkManager.cs" />
+    <Compile Include="WorkManager3\WorkPipeLine.cs" />
     <Compile Include="WorkManager\Workplace.cs" />
     <Compile Include="WorkManager\WorkplaceBundle.cs" />
     <Compile Include="Inspection\ProcessDefect.cs" />

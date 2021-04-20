@@ -58,6 +58,13 @@
     <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="EasyModbus">
+      <HintPath>bin\x64\EasyModbus.dll</HintPath>
+    </Reference>
+    <Reference Include="Interop.SPIIPLUSCOM660Lib">
+      <HintPath>..\RootTools\obj\x64\Debug\Interop.SPIIPLUSCOM660Lib.dll</HintPath>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </Reference>
     <Reference Include="MahApps.Metro.IconPacks, Version=4.0.0.0, Culture=neutral, PublicKeyToken=0c0d510f9915137a, processorArchitecture=MSIL">
       <HintPath>..\packages\MahApps.Metro.IconPacks.4.8.0\lib\net47\MahApps.Metro.IconPacks.dll</HintPath>
     </Reference>
@@ -187,6 +194,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Engineer\VEGA_D_Process_UI.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="Engineer\VEGA_D_Engineer_UI.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -202,6 +213,10 @@
     <Page Include="ManualJobSchedule\ManualJobSchedule_UI.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Module\FFU_Fan_UI.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="RecipeManager_UI.xaml">
       <SubType>Designer</SubType>
@@ -247,6 +262,10 @@
     <Compile Include="Control\LoadingControl.xaml.cs">
       <DependentUpon>LoadingControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Engineer\VEGA_D_Process.cs" />
+    <Compile Include="Engineer\VEGA_D_Process_UI.xaml.cs">
+      <DependentUpon>VEGA_D_Process_UI.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Engineer\VEGA_D_Engineer.cs" />
     <Compile Include="Engineer\VEGA_D_Engineer_UI.xaml.cs">
       <DependentUpon>VEGA_D_Engineer_UI.xaml</DependentUpon>
@@ -262,6 +281,11 @@
     <Compile Include="ManualJobSchedule\ManualJobSchedule.cs" />
     <Compile Include="ManualJobSchedule\ManualJobSchedule_UI.xaml.cs">
       <DependentUpon>ManualJobSchedule_UI.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Module\FDC.cs" />
+    <Compile Include="Module\FFU.cs" />
+    <Compile Include="Module\FFU_Fan_UI.xaml.cs">
+      <DependentUpon>FFU_Fan_UI.xaml</DependentUpon>
     </Compile>
     <Compile Include="Module\GrabMode.cs" />
     <Compile Include="Module\Interlock.cs" />
@@ -338,7 +362,17 @@
       <Name>Root_VEGA_D_IPU</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <COMReference Include="SPIIPLUSCOM660Lib">
+      <Guid>{A50D9364-B5CE-4F09-BED2-E460B41671F6}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </COMReference>
+  </ItemGroup>
   <ItemGroup>
     <Resource Include="Resource\Reticle.png" />
   </ItemGroup>
@@ -354,6 +388,10 @@ copy /Y "$(SolutionDir)Lib\EMGU.CV\x64\cvextern.dll" "$(SolutionDir)$(ProjectNam
 copy /Y "$(SolutionDir)Lib\EMGU.CV\x64\msvcp140.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\x64\msvcp140.dll"
 copy /Y "$(SolutionDir)Lib\EMGU.CV\x64\opencv_videoio_ffmpeg411_64.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\x64\opencv_videoio_ffmpeg411_64.dll"
 copy /Y "$(SolutionDir)Lib\EMGU.CV\x64\vcruntime140.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\x64\vcruntime140.dll"
+copy /Y "$(SolutionDir)Lib\AXL\AXL.dll" $(SolutionDir)$(ProjectName)\$(OutDir)\AXL.dll"
+copy /Y "$(SolutionDir)Lib\AXL\AXL.lib" $(SolutionDir)$(ProjectName)\$(OutDir)\AXL.lib"
+copy /Y "$(SolutionDir)Lib\AXL\EzBasicAxl.dll" $(SolutionDir)$(ProjectName)\$(OutDir)\EzBasicAxl.dll"
+
 IF NOT EXIST "C:\vsdb\init" (mkdir "C:\vsdb\init")
 copy /Y "$(SolutionDir)Init\vsdb.txt" "C:\vsdb\init\vsdb.txt"
 IF NOT EXIST "$(SolutionDir)$(ProjectName)\$(OutDir)\plugin" (mkdir "$(SolutionDir)$(ProjectName)\$(OutDir)\plugin")
@@ -369,6 +407,22 @@ copy /Y "$(SolutionDir)Lib\mariadb-connector-c\lib\mariadb\plugin\mysql_clear_pa
 copy /Y "$(SolutionDir)Lib\mariadb-connector-c\lib\mariadb\plugin\pvio_npipe.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\plugin\pvio_npipe.dll"
 copy /Y "$(SolutionDir)Lib\mariadb-connector-c\lib\mariadb\plugin\pvio_shmem.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\plugin\pvio_shmem.dll"
 copy /Y "$(SolutionDir)Lib\mariadb-connector-c\lib\mariadb\plugin\sha256_password.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\plugin\sha256_password.dll"
+copy /Y "$(SolutionDir)Lib\WibuCm64.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\WibuCm64.dll"
+IF NOT EXIST "$(SolutionDir)$(ProjectName)\$(OutDir)\Reference" (mkdir "$(SolutionDir)$(ProjectName)\$(OutDir)\Reference")
+copy /Y "$(SolutionDir)Lib\MetLib\Reference\configb.dat" $(SolutionDir)$(ProjectName)\$(OutDir)\Reference\configb.dat"
+copy /Y "$(SolutionDir)Lib\MetLib\Reference\configb_0.dat" $(SolutionDir)$(ProjectName)\$(OutDir)\Reference\configb_0.dat"
+copy /Y "$(SolutionDir)Lib\MetLib\Reference\configb_1.dat" $(SolutionDir)$(ProjectName)\$(OutDir)\Reference\configb_1.dat"
+copy /Y "$(SolutionDir)Lib\MetLib\Reference\configc.dat" $(SolutionDir)$(ProjectName)\$(OutDir)\Reference\configc.dat"
+copy /Y "$(SolutionDir)Lib\MetLib\Reference\configc_org.dat" $(SolutionDir)$(ProjectName)\$(OutDir)\Reference\configc_org.dat"
+copy /Y "$(SolutionDir)Lib\MetLib\Reference\configd.dat" $(SolutionDir)$(ProjectName)\$(OutDir)\Reference\configd.dat"
+copy /Y "$(SolutionDir)Lib\MetLib\Reference\configd_0.dat" $(SolutionDir)$(ProjectName)\$(OutDir)\Reference\configd_0.dat"
+copy /Y "$(SolutionDir)Lib\MetLib\Reference\Init_ATI_NIR.cfg" $(SolutionDir)$(ProjectName)\$(OutDir)\Reference\Init_ATI_NIR.cfg"
+copy /Y "$(SolutionDir)Lib\MetLib\Reference\Init_ATI_NIR.ini" $(SolutionDir)$(ProjectName)\$(OutDir)\Reference\Init_ATI_NIR.ini"
+copy /Y "$(SolutionDir)Lib\MetLib\Reference\ZedGraph.dll" $(SolutionDir)$(ProjectName)\$(OutDir)\Reference\ZedGraph.dll"
+copy /Y "$(SolutionDir)Lib\MetLib\NanoView.dll" $(SolutionDir)$(ProjectName)\$(OutDir)\NanoView.dll"
+copy /Y "$(SolutionDir)Lib\MetLib\NETOmniDriver-NET40.dll" $(SolutionDir)$(ProjectName)\$(OutDir)\NETOmniDriver-NET40.dll"
+copy /Y "$(SolutionDir)Lib\MetLib\OmniDriver64.dll" $(SolutionDir)$(ProjectName)\$(OutDir)\OmniDriver64.dll"
+copy /Y "$(SolutionDir)Lib\MetLib\r4nd_class.dll" $(SolutionDir)$(ProjectName)\$(OutDir)\r4nd_class.dll"
 copy /Y "$(SolutionDir)Lib\WibuCm64.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\WibuCm64.dll"</PostBuildEvent>
   </PropertyGroup>
 </Project>

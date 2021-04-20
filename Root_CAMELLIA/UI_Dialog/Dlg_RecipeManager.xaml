@@ -17,6 +17,11 @@
         BorderBrush="Black" BorderThickness="1"
         Background="{StaticResource PanelBackGround}"
         mc:Ignorable="d">
+    <i:Interaction.Triggers>
+        <i:EventTrigger EventName="Unloaded">
+            <i:InvokeCommandAction Command="{Binding UnloadedCommand}" />
+        </i:EventTrigger>
+    </i:Interaction.Triggers>
     <Window.Resources>
         <local:ColorToBrushConverter x:Key="ColorToBrushConverter"/>
         <local:ImageConverter x:Key="ImageConverter"/>
@@ -48,12 +53,7 @@
                     <ColumnDefinition Width="auto"/>
                     <ColumnDefinition Width="auto"/>
                 </Grid.ColumnDefinitions>
-                <TextBlock Text="Camellia Ⅱ - Version 0.0.1"
-                       FontSize="11"
-                       Foreground="Black"
-                       VerticalAlignment="Center"
-                       Margin="5,0,0,0"
-                       Grid.Column="0" />
+               <TextBlock Grid.Column="0" Text="{Binding Path=Version, Source={x:Static local:BaseDefine.Configuration}}"  FontSize="11" Foreground="Black" VerticalAlignment="Center" Margin="5,0,0,0"/>
                 <TextBlock Text="{Binding RecipePath}"
                        FontSize="11"
                        Foreground="Black"
@@ -84,13 +84,26 @@
             </StackPanel>
         </Grid>
         <!--Menu-->
-        <Menu Grid.Row="1" Background="{DynamicResource ControlBackGround}" Grid.ColumnSpan="2"
+        <!--<Menu Grid.Row="1" Background="{DynamicResource ControlBackGround}" Grid.ColumnSpan="2"
               Height="25">
             <MenuItem x:Name="RecipeNew" Header="New"  Height="25" Command="{Binding CmdRecipeNew}"/>
             <MenuItem x:Name="RecipeOpen" Header="Open" Command="{Binding CmdRecipeOpen}"/>
             <MenuItem x:Name="RecipeSave" Header="Save" Command="{Binding CmdRecipeSave}"/>
             <MenuItem x:Name="RecipeSaveAs" Header="Save As" Command="{Binding CmdRecipeSaveAs}"/>
-        </Menu>
+        </Menu>-->
+        <Grid Grid.Row="1" Background="{DynamicResource ControlBackGround}" Grid.ColumnSpan="2" Height="25">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="230"/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <UniformGrid Columns="4">
+                <Button BorderBrush="{x:Null}" BorderThickness="0" Content="New" Command="{Binding CmdRecipeNew}"/>
+                <Button BorderBrush="{x:Null}" BorderThickness="0" Content="Open" Command="{Binding CmdRecipeOpen}"/>
+                <Button BorderBrush="{x:Null}" BorderThickness="0" Content="Save" Command="{Binding CmdRecipeSave}"/>
+                <Button BorderBrush="{x:Null}" BorderThickness="0" Content="Save As" Command="{Binding CmdRecipeSaveAs}"/>
+            </UniformGrid>
+        </Grid>
 
         <Grid Grid.Row="2">
             <Grid.ColumnDefinitions>
@@ -490,7 +503,7 @@
                                     <ColumnDefinition Width="12*"/>
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Text="Lower WaveLength" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="0"/>
-                                <TextBox Grid.Column="1" Margin="3" Text="{Binding LowerWaveLength, UpdateSourceTrigger=LostFocus, Mode=TwoWay, StringFormat=N2}" TextAlignment="Center" VerticalContentAlignment="Center"
+                                <TextBox Grid.Column="1" Margin="3" Text="{Binding LowerWaveLength, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay, StringFormat=N2}" TextAlignment="Center" VerticalContentAlignment="Center"
                                          IsEnabled="{Binding p_UseThickness}"></TextBox>
                             </Grid>
                             <Grid Margin="5" Background="Gainsboro">
@@ -499,7 +512,7 @@
                                     <ColumnDefinition Width="12*"/>
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Text="Upper WaveLength" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="0"/>
-                                <TextBox Grid.Column="1" Margin="3" Text="{Binding UpperWaveLength, UpdateSourceTrigger=LostFocus, Mode=TwoWay, StringFormat=N2}" TextAlignment="Center" VerticalContentAlignment="Center"
+                                <TextBox Grid.Column="1" Margin="3" Text="{Binding UpperWaveLength, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay, StringFormat=N2}" TextAlignment="Center" VerticalContentAlignment="Center"
                                          IsEnabled="{Binding p_UseThickness}"></TextBox>
                             </Grid>
                             <Grid Margin="5" Background="Gainsboro">
@@ -517,7 +530,7 @@
                                     <ColumnDefinition Width="12*"/>
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Text="Damping Factor" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="0"/>
-                                <TextBox Grid.Column="1" Margin="3" Text="{Binding DampingFactor, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay, StringFormat=N1}" TextAlignment="Center" VerticalContentAlignment="Center"
+                                <TextBox Grid.Column="1" Margin="3" Text="{Binding DampingFactor, UpdateSourceTrigger=Default, Mode=TwoWay, StringFormat=N1}" TextAlignment="Center" VerticalContentAlignment="Center"
                                          IsEnabled="{Binding p_UseThickness}"></TextBox>
                             </Grid>
                         </UniformGrid>
@@ -613,6 +626,18 @@
                             </Viewbox>-->
                             <Viewbox Margin="10" Width="auto" Grid.Row="0">
                                 <ItemsControl ItemsSource="{Binding p_DrawElement}"
+                              Width="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualWidth}"
+                              Height="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualHeight}" BorderBrush="Black" BorderThickness="1">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <Canvas ClipToBounds="True"  Width="{x:Static local:BaseDefine.CanvasWidth}" Height="{x:Static local:BaseDefine.CanvasHeight}">
+                                            </Canvas>
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                </ItemsControl>
+                            </Viewbox>
+                            <Viewbox Margin="10" Width="auto" Grid.Row="0">
+                                <ItemsControl ItemsSource="{Binding p_DrawCandidatePointElement}"
                               Width="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualWidth}"
                               Height="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualHeight}" BorderBrush="Black" BorderThickness="1">
                                     <ItemsControl.ItemsPanel>
@@ -861,15 +886,70 @@
 
                 <Grid Grid.Row="3">
                     <GroupBox Header="PreView">
-                        <!--<stage:CamelliaStage></stage:CamelliaStage>-->
-                        <Viewbox Margin="10">
+                        <Grid>
+                            <!--<Viewbox Margin="10">
+                                <ItemsControl ItemsSource="{Binding p_PreviewDrawElement, UpdateSourceTrigger=PropertyChanged}"
+                              Width="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualWidth}"
+                              Height="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualHeight}" BorderBrush="Black" BorderThickness="1">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <Canvas Width="{x:Static local:BaseDefine.CanvasWidth}" Height="{x:Static local:BaseDefine.CanvasHeight}" ClipToBounds="True" Background="#01FFFFFF">
+                                            </Canvas>
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                </ItemsControl>
+                            </Viewbox>-->
+                            <Viewbox Margin="10">
+                                <stage:CamelliaStage  ClipToBounds="True" Background="#01FFFFFF"/>
+                            </Viewbox>
+                            <Viewbox Margin="10">
+                                <ItemsControl ItemsSource="{Binding p_DrawPreviewCandidatePointElement, UpdateSourceTrigger=PropertyChanged}"
+                              Width="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualWidth}"
+                              Height="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualHeight}">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <Canvas Width="{x:Static local:BaseDefine.CanvasWidth}" Height="{x:Static local:BaseDefine.CanvasHeight}" ClipToBounds="True" Background="#01FFFFFF">
+                                            </Canvas>
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                </ItemsControl>
+                            </Viewbox>
+                            <Viewbox Margin="10">
+                                <ItemsControl ItemsSource="{Binding p_PreviewDrawElement, UpdateSourceTrigger=PropertyChanged}"
+                              Width="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualWidth}"
+                              Height="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualHeight}">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <Canvas Width="{x:Static local:BaseDefine.CanvasWidth}" Height="{x:Static local:BaseDefine.CanvasHeight}" ClipToBounds="True" Background="#01FFFFFF">
+                                            </Canvas>
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                </ItemsControl>
+                            </Viewbox>
+                            <Viewbox>
+                                <Canvas x:Name="StagePreView" Width="{x:Static local:BaseDefine.CanvasWidth}" Height="{x:Static local:BaseDefine.CanvasHeight}" ClipToBounds="True" Background="#01FFFFFF">
+                                    <i:Interaction.Triggers>
+                                        <i:EventTrigger EventName="MouseMove">
+                                            <i:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=StagePreView, Mode=OneWay}" MethodName="OnMouseMovePreView" />
+                                        </i:EventTrigger>
+                                        <i:EventTrigger EventName="MouseWheel" >
+                                            <i:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=StagePreView, Mode=OneWay}" MethodName="OnMouseWheelPreView" />
+                                        </i:EventTrigger>
+                                        <i:EventTrigger EventName="MouseLeftButtonDown" >
+                                            <i:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=StagePreView, Mode=OneWay}" MethodName="OnMouseLeftButtonDownPreView" />
+                                        </i:EventTrigger>
+                                    </i:Interaction.Triggers>
+                                </Canvas>
+                            </Viewbox>
+                        </Grid>
+                        <!--<Viewbox Margin="10">
                             <ItemsControl ItemsSource="{Binding p_PreviewDrawElement}"
                               Width="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualWidth}"
                               Height="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualHeight}" BorderBrush="Black" BorderThickness="1">
                                 <ItemsControl.ItemsPanel>
                                     <ItemsPanelTemplate>
                                         <Canvas x:Name="StagePreView" Width="{x:Static local:BaseDefine.CanvasWidth}" Height="{x:Static local:BaseDefine.CanvasHeight}" ClipToBounds="True" Background="#01FFFFFF">
-                                            <!--<i:Interaction.Triggers>
+                                            <i:Interaction.Triggers>
                                                 <i:EventTrigger EventName="MouseMove">
                                                     <i:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=StagePreView, Mode=OneWay}" MethodName="OnMouseMovePreView" />
                                                 </i:EventTrigger>
@@ -879,12 +959,12 @@
                                                 <i:EventTrigger EventName="MouseLeftButtonDown" >
                                                     <i:CallMethodAction TargetObject="{Binding Path=DataContext, ElementName=StagePreView, Mode=OneWay}" MethodName="OnMouseLeftButtonDownPreView" />
                                                 </i:EventTrigger>
-                                            </i:Interaction.Triggers>-->
+                                            </i:Interaction.Triggers>
                                         </Canvas>
                                     </ItemsPanelTemplate>
                                 </ItemsControl.ItemsPanel>
                             </ItemsControl>
-                        </Viewbox>
+                        </Viewbox>-->
                     </GroupBox>
                 </Grid>
             </Grid>

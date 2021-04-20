@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Input;
 
 namespace RootTools_Vision
 {
@@ -15,8 +16,16 @@ namespace RootTools_Vision
         public string FolderName { get; set; }
     }
 
+
+    public delegate void RecipeSelectedHandler(string recipePath);
+
     public class RecipeSelectionViewer_ViewModel : ObservableObject
     {
+        #region [Event]
+        public event RecipeSelectedHandler RecipeSelected;
+
+        #endregion
+
         #region [Properties]
         private ObservableCollection<FolderItem> productListItems = new ObservableCollection<FolderItem>();
         public ObservableCollection<FolderItem> ProductListItems
@@ -71,14 +80,26 @@ namespace RootTools_Vision
             }
         }
 
-        private string searchName = "";
-        public string SearchName
+        private string searchProductName = "";
+        public string SearchProductName
         {
-            get => this.searchName;
+            get => this.searchProductName;
             set
             {
-                SetProperty(ref this.searchName, value);
-                Refresh();
+                SetProperty(ref this.searchProductName, value);
+                SearchStepName = "";
+                RefreshProductItemList();
+            }
+        }
+
+        private string searchStepName = "";
+        public string SearchStepName
+        {
+            get => this.searchStepName;
+            set
+            {
+                SetProperty(ref this.searchStepName, value);
+                RefreshStepItemList();
             }
         }
         #endregion
@@ -88,7 +109,7 @@ namespace RootTools_Vision
 
         }
 
-        public void Refresh()
+        public void RefreshProductItemList()
         {
             this.ProductListItems.Clear();
 
@@ -98,7 +119,7 @@ namespace RootTools_Vision
             foreach (DirectoryInfo info in di.GetDirectories())
             {
                 string fileName = info.Name.ToLower();
-                if (fileName.Contains(this.SearchName.ToLower()))
+                if (fileName.Contains(this.SearchProductName.ToLower()))
                 {
                     Application.Current.Dispatcher.Invoke((Action)delegate
                     {
@@ -106,8 +127,6 @@ namespace RootTools_Vision
                     });
                 }
             }
-
-            RefreshStepItemList();
         }
 
         private void RefreshStepItemList()
@@ -116,30 +135,85 @@ namespace RootTools_Vision
             {
                 this.StepListItems.Clear();
 
+                ObservableCollection<FolderItem> newItems = new ObservableCollection<FolderItem>();
+
                 DirectoryInfo di_Step = new DirectoryInfo(RecipeRootPath + "\\" + SelectedProductItem.FolderName);
 
                 foreach (DirectoryInfo info in di_Step.GetDirectories())
                 {
                     string fileName = info.Name.ToLower();
 
-                    Application.Current.Dispatcher.Invoke((Action)delegate
+                   if (fileName.Contains(this.SearchStepName.ToLower()))
                     {
-                        this.StepListItems.Add(new FolderItem() { FolderName = info.Name });
-                    });
+                        newItems.Add(new FolderItem() { FolderName = info.Name });
+                    }
                 }
+
+                Application.Current.Dispatcher.Invoke((Action)delegate
+                {
+                    this.StepListItems = newItems;
+                });
             }
 
         }
 
 
         #region [Command]
-        //public ICommand LoadedCommand
-        //{
-        //    get => new RelayCommand(() =>
-        //    {
-        //        Refresh();
-        //    });
-        //}
+        public ICommand btnCreateProductCommand
+        {
+            get => new RelayCommand(() =>
+            {
+                try
+                {
+                    DirectoryInfo di = new DirectoryInfo(RecipeRootPath + "\\" + SearchProductName);
+                    di.Create();
+
+                    RefreshProductItemList();
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message);
+                }
+                
+            });
+        }
+
+        public ICommand btnCreateStepCommand
+        {
+            get => new RelayCommand(() =>
+            {
+                try
+                {
+                    DirectoryInfo di = new DirectoryInfo(RecipeRootPath + "\\" + SelectedProductItem.FolderName + "\\" + SearchStepName);
+                    di.Create();
+
+                    RefreshStepItemList();
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message);
+                }
+
+            });
+        }
+
+        public ICommand stepItemDoubleClickCommand
+        {
+            get => new RelayCommand(() =>
+            {
+                try
+                {
+                    if (RecipeSelected != null)
+                        RecipeSelected(this.SelectedProductItem + "." + this.SelectedStepItem);
+
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message);
+                }
+
+            });
+        }
         #endregion
     }
 }

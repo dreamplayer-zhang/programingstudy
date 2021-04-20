@@ -111,6 +111,7 @@ namespace RootTools.Light
         public List<LightBase> p_aLight { get; set; }
         void InitLight()
         {
+            m_rs232.p_bConnect = true;
             for (int n = 0; n < c_lLight; n++)
             {
                 Light light = new Light(p_id, n, p_rs232);

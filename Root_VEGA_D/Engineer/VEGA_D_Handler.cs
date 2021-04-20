@@ -34,12 +34,15 @@ namespace Root_VEGA_D.Engineer
         #region Module
         public ModuleList p_moduleList { get; set; }
         public VEGA_D_Recipe m_recipe;
-        public EFEM_Process m_process;
+        public VEGA_D_Process m_process;
         public Vision m_vision;
         public Vision_IPU m_visionIPU;
         public HomeProgress_UI m_HomeProgress = new HomeProgress_UI();
         public Interlock m_interlock;
         public TowerLamp m_towerlamp;
+        public FDC m_FDC;
+        public FFU m_FFU;
+
         void InitModule()
         {
             p_moduleList = new ModuleList(m_engineer);
@@ -50,10 +53,14 @@ namespace Root_VEGA_D.Engineer
             InitAligner();
             m_vision = new Vision("Vision", m_engineer);
             InitModule(m_vision);
-            iWTR.AddChild(m_vision); 
-            m_visionIPU = new Vision_IPU("Vision_IPU", m_engineer, ModuleBase.eRemote.Client);
+            iWTR.AddChild(m_vision);
+            m_visionIPU = new Vision_IPU("Vision_IPU", m_engineer);
             InitModule(m_visionIPU);
-            m_interlock = new Interlock("Interlock", m_engineer);
+            m_FDC = new FDC("FDC", m_engineer);
+            InitModule(m_FDC);
+            m_FFU = new FFU("FFU", m_engineer);
+            InitModule(m_FFU);
+            m_interlock = new Interlock("Interlock", m_engineer,m_engineer.m_ACS);
             InitModule(m_interlock);
             m_towerlamp = new TowerLamp("TowerLamp", m_engineer);
             InitModule(m_towerlamp);
@@ -63,7 +70,7 @@ namespace Root_VEGA_D.Engineer
             iWTR.ReadInfoReticle_Registry();
             m_recipe = new VEGA_D_Recipe("Recipe", m_engineer);
             foreach (ModuleBase module in p_moduleList.m_aModule.Keys) m_recipe.AddModule(module);
-            m_process = new EFEM_Process("Process", m_engineer, iWTR, m_aLoadport);
+            m_process = new VEGA_D_Process("Process", m_engineer, iWTR);
             CalcRecover();
         }
 
@@ -92,14 +99,10 @@ namespace Root_VEGA_D.Engineer
             Cymechs,
         }
         eWTR m_eWTR = eWTR.Cymechs;
-        public ModuleBase m_wtr;
+        public WTR_Cymechs m_wtr;
         void InitWTR()
         {
-            switch (m_eWTR)
-            {
-                case eWTR.Cymechs: m_wtr = new WTR_Cymechs("WTR", m_engineer); break;
-                default: m_wtr = new WTR_RND("WTR", m_engineer); break;
-            }
+            m_wtr = new WTR_Cymechs("WTR", m_engineer);
             InitModule(m_wtr);
         }
 
@@ -126,12 +129,15 @@ namespace Root_VEGA_D.Engineer
             for (int n = 0; n < m_lLoadport; n++, cLP++)
             {
                 string sID = "Loadport" + cLP;
-                switch (m_aLoadportType[n])
-                {
-                    case eLoadport.RND: module = new Loadport_RND(sID, m_engineer, true, true); break;
-                    case eLoadport.Cymechs: module = new Loadport_Cymechs(sID, m_engineer, true, true); break;
-                    default: module = new Loadport_RND(sID, m_engineer, true, true); break;
-                }
+                //string sID = "LP" + cLP;
+                //switch (m_aLoadportType[n])
+                //{
+                //    case eLoadport.RND: module = new Loadport_RND(sID, m_engineer, true, true); break;
+                //    case eLoadport.Cymechs: module = new Loadport_Cymechs(sID, m_engineer, true, false); break;
+                //    default: module = new Loadport_RND(sID, m_engineer, true, true); break;
+                //}
+                m_aLoadportType[n] = eLoadport.Cymechs;
+                module = new Loadport_Cymechs(sID, m_engineer, true, false);
                 InitModule(module);
                 m_loadport.Add(module);
                 m_aLoadport.Add((ILoadport)module);
@@ -259,6 +265,7 @@ namespace Root_VEGA_D.Engineer
         #endregion
 
         #region Calc Sequence
+        public int p_nRnRCount = 0;
         dynamic m_infoRnRSlot;
         public string AddSequence(dynamic infoSlot)
         {
@@ -281,7 +288,7 @@ namespace Root_VEGA_D.Engineer
 
         void CalcDockingUndocking()
         {
-            List<EFEM_Process.Sequence> aSequence = new List<EFEM_Process.Sequence>();
+            List<VEGA_D_Process.Sequence> aSequence = new List<VEGA_D_Process.Sequence>();
             while (m_process.m_qSequence.Count > 0) aSequence.Add(m_process.m_qSequence.Dequeue());
             List<ILoadport> aDock = new List<ILoadport>();
             foreach (ILoadport loadport in m_aLoadport)
@@ -290,7 +297,7 @@ namespace Root_VEGA_D.Engineer
             }
             while (aSequence.Count > 0)
             {
-                EFEM_Process.Sequence sequence = aSequence[0];
+                VEGA_D_Process.Sequence sequence = aSequence[0];
                 m_process.m_qSequence.Enqueue(sequence);
                 aSequence.RemoveAt(0);
                 for (int n = aDock.Count - 1; n >= 0; n--)
@@ -298,7 +305,7 @@ namespace Root_VEGA_D.Engineer
                     if (CalcUnload(aDock[n], aSequence))
                     {
                         ModuleRunBase runUndocking = aDock[n].GetModuleRunUndocking().Clone();
-                        EFEM_Process.Sequence sequenceUndock = new EFEM_Process.Sequence(runUndocking, sequence.m_infoWafer);
+                        VEGA_D_Process.Sequence sequenceUndock = new VEGA_D_Process.Sequence(runUndocking, sequence.m_infoWafer);
                         m_process.m_qSequence.Enqueue(sequenceUndock);
                         aDock.RemoveAt(n);
                     }
@@ -307,15 +314,15 @@ namespace Root_VEGA_D.Engineer
             m_process.RunTree(Tree.eMode.Init);
         }
 
-        bool CalcDocking(ILoadport loadport, List<EFEM_Process.Sequence> aSequence)
+        bool CalcDocking(ILoadport loadport, List<VEGA_D_Process.Sequence> aSequence)
         {
-            foreach (EFEM_Process.Sequence sequence in aSequence)
+            foreach (VEGA_D_Process.Sequence sequence in aSequence)
             {
                 if (loadport.p_id == sequence.m_infoWafer.m_sModule) //return true;
                 {
                     if (loadport.p_infoCarrier.p_eState == InfoCarrier.eState.Dock) return true;
                     ModuleRunBase runDocking = loadport.GetModuleRunDocking().Clone();
-                    EFEM_Process.Sequence sequenceDock = new EFEM_Process.Sequence(runDocking, sequence.m_infoWafer);
+                    VEGA_D_Process.Sequence sequenceDock = new VEGA_D_Process.Sequence(runDocking, sequence.m_infoWafer);
                     m_process.m_qSequence.Enqueue(sequenceDock);
                     return true;
                 }
@@ -323,9 +330,9 @@ namespace Root_VEGA_D.Engineer
             return false;
         }
 
-        bool CalcUnload(ILoadport loadport, List<EFEM_Process.Sequence> aSequence)
+        bool CalcUnload(ILoadport loadport, List<VEGA_D_Process.Sequence> aSequence)
         {
-            foreach (EFEM_Process.Sequence sequence in aSequence)
+            foreach (VEGA_D_Process.Sequence sequence in aSequence)
             {
                 if (loadport.p_id == sequence.m_infoWafer.m_sModule) return false;
             }
@@ -388,6 +395,7 @@ namespace Root_VEGA_D.Engineer
                                 CalcSequence();
                                 //m_nRnR--;
                                 EQ.p_nRnR--;
+                                p_nRnRCount++;
                                 EQ.p_eState = EQ.eState.Run;
                             }
                         }

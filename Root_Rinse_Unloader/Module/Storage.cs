@@ -14,7 +14,7 @@ namespace Root_Rinse_Unloader.Module
         #region ToolBox
         public override void GetTools(bool bInit)
         {
-            foreach (Magazine magazine in m_aMagazine) magazine.GetTools(m_toolBox);
+            foreach (Magazine magazine in m_aMagazine) magazine.GetTools(m_toolBox, bInit);
             m_stack.GetTools(m_toolBox);
             p_sInfo = m_toolBox.GetAxis(ref m_axis, this, "Elevator");
             if (bInit)
@@ -36,11 +36,12 @@ namespace Root_Rinse_Unloader.Module
         public class Magazine : NotifyProperty
         {
             DIO_I m_diCheck;
-            DIO_IO m_dioClamp;
-            public void GetTools(ToolBox toolBox)
+            public DIO_IO m_dioClamp;
+            public void GetTools(ToolBox toolBox, bool bInit)
             {
                 m_storage.p_sInfo = toolBox.GetDIO(ref m_diCheck, m_storage, m_id + ".Check");
                 m_storage.p_sInfo = toolBox.GetDIO(ref m_dioClamp, m_storage, m_id + ".Clamp");
+                if (bInit) m_dioClamp.Write(!m_diCheck.p_bIn); 
             }
 
             bool _bCheck = false;
@@ -171,17 +172,22 @@ namespace Root_Rinse_Unloader.Module
             return m_axis.WaitReady();
         }
 
-        double m_posStackReady = -100000;
         double m_fJogScale = 1;
         public string MoveStackReady()
         {
-            MoveStack();
+            if (m_stack.p_bLevel)
+            {
+                m_axis.Jog(-m_fJogScale, "Move");
+                while (m_stack.p_bLevel && (EQ.IsStop() == false)) Thread.Sleep(10);
+                m_axis.StopAxis();
+                Thread.Sleep(500);
+            }
+            m_axis.Jog(m_fJogScale, "Move");
+            while (!m_stack.p_bLevel && (EQ.IsStop() == false)) Thread.Sleep(10);
+            m_axis.StopAxis();
+            m_axis.WaitReady();
+            Thread.Sleep(500);
             return "OK";
-        }
-
-        public bool p_bIsEnablePick
-        {
-            get { return Math.Abs(m_posStackReady - m_axis.p_posCommand) < 10; }
         }
 
         void RunTreeElevator(Tree tree)
@@ -221,6 +227,7 @@ namespace Root_Rinse_Unloader.Module
                 p_eState = eState.Ready;
                 return "OK";
             }
+            foreach (Magazine magazine in m_aMagazine) magazine.RunClamp(magazine.p_bCheck);
             p_sInfo = base.StateHome();
             p_eState = (p_sInfo == "OK") ? eState.Ready : eState.Error;
             return p_sInfo;
@@ -253,12 +260,13 @@ namespace Root_Rinse_Unloader.Module
 
         public override void ThreadStop()
         {
-            base.ThreadStop();
+            foreach (Magazine magazine in m_aMagazine) magazine.RunClamp(false);
             if (m_bThreadCheck)
             {
                 m_bThreadCheck = false;
                 m_threadCheck.Join();
             }
+            base.ThreadStop();
         }
 
         #region StartRun
@@ -266,7 +274,11 @@ namespace Root_Rinse_Unloader.Module
         {
             switch (m_rinse.p_eMode)
             {
+                case RinseU.eRunMode.Magazine:
+                    StartMoveMagazine(false);
+                    break;
                 case RinseU.eRunMode.Stack:
+                    MoveStack(); 
                     StartMoveStackReady();
                     break;
             }
@@ -280,39 +292,40 @@ namespace Root_Rinse_Unloader.Module
             return "OK";
         }
 
-        public string RunMoveMagazine()
-        {
-            if (m_aMagazine[(int)m_rinse.p_eMagazine].p_bClamp == false)
-            {
-                m_rinse.p_iMagazine = 0;
-                if (Run(SetNextMagazine())) return p_sInfo;
-            }
-            return MoveMagazine(m_rinse.p_eMagazine, m_rinse.p_iMagazine, true); 
-        }
-
-        public string StartMoveNextMagazine()
+        public string StartMoveMagazine(bool bNext)
         {
             Run_RunNextMagazine run = (Run_RunNextMagazine)m_runNextMagazine.Clone();
+            run.m_bNext = bNext; 
             return StartRun(run); 
         }
 
-        public string MoveNextMagazine()
+        public string MoveMagazine(bool bNext)
         {
-            if (m_rinse.p_iMagazine < 19) m_rinse.p_iMagazine++;
-            else
+            if (bNext)
             {
-                m_rinse.p_iMagazine = 0;
-                if (Run(SetNextMagazine())) return p_sInfo; 
+                m_rinse.p_iMagazine++;
+                if (m_rinse.p_iMagazine >= 20)
+                {
+                    m_rinse.p_iMagazine = 0;
+                    if (Run(SetNextMagazine(m_rinse.p_eMagazine))) return p_sInfo;
+                }
             }
             return MoveMagazine(m_rinse.p_eMagazine, m_rinse.p_iMagazine, true); 
         }
 
-        string SetNextMagazine()
+        string SetNextMagazine(eMagazine eMagazine)
         {
-            if (m_rinse.p_eMagazine >= eMagazine.Magazine4) return "Cassette Full";
-            m_rinse.p_eMagazine = m_rinse.p_eMagazine + 1;
-            if (m_aMagazine[(int)m_rinse.p_eMagazine].p_bClamp) return "OK";
-            return SetNextMagazine(); 
+            switch (eMagazine)
+            {
+                case eMagazine.Magazine1: return "Magazine Full";
+                case eMagazine.Magazine2: m_rinse.p_eMagazine = eMagazine.Magazine1; break;
+                case eMagazine.Magazine3: m_rinse.p_eMagazine = eMagazine.Magazine2; break;
+                case eMagazine.Magazine4: m_rinse.p_eMagazine = eMagazine.Magazine3; break;
+            }
+            bool bCheck = m_aMagazine[(int)m_rinse.p_eMagazine].p_bCheck;
+            bool bClamp = m_aMagazine[(int)m_rinse.p_eMagazine].p_bClamp; 
+            if (bCheck && bClamp) return "OK";
+            return SetNextMagazine(m_rinse.p_eMagazine); 
         }
 
         ModuleRunBase m_runReady;
@@ -447,19 +460,22 @@ namespace Root_Rinse_Unloader.Module
                 InitModuleRun(module);
             }
 
+            public bool m_bNext = true; 
             public override ModuleRunBase Clone()
             {
                 Run_RunNextMagazine run = new Run_RunNextMagazine(m_module);
+                run.m_bNext = m_bNext; 
                 return run;
             }
 
             public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
             {
+                m_bNext = tree.Set(m_bNext, m_bNext, "Next", "Move Next Magazine", bVisible); 
             }
 
             public override string Run()
             {
-                return m_module.MoveNextMagazine();
+                return m_module.MoveMagazine(m_bNext);
             }
         }
         #endregion

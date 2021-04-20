@@ -125,8 +125,7 @@ namespace Root_CAMELLIA.Module
             Axis axisZ = m_module.p_axisZ;
             string strVRSImageDir = "D:\\";
             string strVRSImageFullPath = "";
-
-
+           
             if (m_module.LifterDown() != "OK")
             {
                 return p_sInfo;
@@ -186,15 +185,9 @@ namespace Root_CAMELLIA.Module
             sw.Stop();
 
 
-            //m_module.VaccumOnOff(true);
-
-
-
-            
-
             if (m_bUseCustomSpeed && CheckVaildParameter())
             {
-                if(m_module.Run(axisXY.p_axisX.StartMove(m_WaferLT_pulse.X, m_dMoveSpeedX, m_dMoveAccX, m_dMoveDecX)))
+                if (m_module.Run(axisXY.p_axisX.StartMove(m_WaferLT_pulse.X, m_dMoveSpeedX, m_dMoveAccX, m_dMoveDecX)))
                 {
                     return p_sInfo;
                 }
@@ -212,15 +205,15 @@ namespace Root_CAMELLIA.Module
                 if (m_module.Run(axisXY.WaitReady()))
                     return p_sInfo;
             }
-             //Thread.Sleep(1000);
+            //Thread.Sleep(1000);
 
-            ImageData asdv = new ImageData(VRS.p_ImageViewer.p_ImageData.m_MemData);
-            
+            //ImageData asdv = new ImageData(VRS.p_ImageViewer.p_ImageData.m_MemData);
+
             if (VRS.Grab() == "OK")
             {
                 //asdv.SetData(VRS.p_ImageViewer.p_ImageData.GetPtr(), new CRect(0,0, 2044, 2044), (int)VRS.p_ImageViewer.p_ImageData.p_Stride, 3);
-                strVRSImageFullPath = string.Format(strVRSImageDir + "VRSImage_{0}.bmp", 0);
-                img.SaveImageSync(strVRSImageFullPath);
+                //strVRSImageFullPath = string.Format(strVRSImageDir + "VRSImage_{0}.bmp", 0);
+                //img.SaveImageSync(strVRSImageFullPath);
                 //Grab error
             }
             else
@@ -264,8 +257,8 @@ namespace Root_CAMELLIA.Module
 
             if (VRS.Grab() == "OK")
             {
-                strVRSImageFullPath = string.Format(strVRSImageDir + "VRSImage_{0}.bmp", 1);
-                img.SaveImageSync(strVRSImageFullPath);
+                //strVRSImageFullPath = string.Format(strVRSImageDir + "VRSImage_{0}.bmp", 1);
+                //img.SaveImageSync(strVRSImageFullPath);
                 //Grab error
             }
             else
@@ -302,8 +295,8 @@ namespace Root_CAMELLIA.Module
 
             if (VRS.Grab() == "OK")
             {
-                strVRSImageFullPath = string.Format(strVRSImageDir + "VRSImage_{0}.bmp", 2);
-                img.SaveImageSync(strVRSImageFullPath);
+                //strVRSImageFullPath = string.Format(strVRSImageDir + "VRSImage_{0}.bmp", 2);
+                //img.SaveImageSync(strVRSImageFullPath);
                 //Grab error
             }
             else
@@ -315,8 +308,7 @@ namespace Root_CAMELLIA.Module
             param = new CenteringParam(img, VRS.GetRoiSize(), m_EdgeSearchRange, m_EdgeSearchLevel, WaferCentering.eDir.RB);
             ThreadPool.QueueUserWorkItem(m_DataManager.m_waferCentering.FindEdge, param);
             //m_DataManager.m_waferCentering.FindEdge(param);
-            while ((!m_DataManager.m_waferCentering.FindLTEdgeDone || !m_DataManager.m_waferCentering.FindRTEdgeDone
-                || !m_DataManager.m_waferCentering.FindRBEdgeDone) && m_useCentering)
+            while ((!m_DataManager.m_waferCentering.FindLTEdgeDone || !m_DataManager.m_waferCentering.FindRTEdgeDone || !m_DataManager.m_waferCentering.FindRBEdgeDone) && m_useCentering)
             {
                 if (m_DataManager.m_waferCentering.ErrorString != "OK")
                 {

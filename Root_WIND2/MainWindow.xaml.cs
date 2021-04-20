@@ -254,29 +254,44 @@ namespace Root_WIND2
                 RecipeEBR recipeEBR = GlobalObjects.Instance.Register<RecipeEBR>();
 
 
-                if(frontImage.GetPtr() == IntPtr.Zero)
+                if (frontImage.GetPtr() != IntPtr.Zero)
                 {
-                    //MessageBox.Show("Front Inspection 생성 실패, 메모리 할당 없음");
-                }
-                else
-                {
-                    // Inspection Manager
-                    InspectionManagerFrontside inspectionFront = GlobalObjects.Instance.Register<InspectionManagerFrontside>
-                        (
-                        ((WIND2_Handler)engineer.ClassHandler()).p_Vision,
-                        recipeFront,
-                        new SharedBufferInfo(
-                            frontImage.GetPtr(0), 
-                            frontImage.p_Size.X, 
-                            frontImage.p_Size.Y, 
-                            frontImage.GetBytePerPixel(), 
-                            frontImage.GetPtr(1), 
-                            frontImage.GetPtr(2), 
-                            new MemoryID(memoryFrontPool, memoryFrontGroup, memoryFront)
-                        ));
+                    RootTools_Vision.WorkManager3.WorkManager frontInspection = GlobalObjects.Instance.RegisterNamed<RootTools_Vision.WorkManager3.WorkManager>("frontInspection", 4);
 
-                    inspectionFront.SetRecipe(recipeFront);
+                    frontInspection.SetRecipe(recipeFront);
+                    frontInspection.SetSharedBuffer(new SharedBufferInfo(
+                                frontImage.GetPtr(0),
+                                frontImage.p_Size.X,
+                                frontImage.p_Size.Y,
+                                frontImage.GetBytePerPixel(),
+                                frontImage.GetPtr(1),
+                                frontImage.GetPtr(2),
+                                new MemoryID(memoryFrontPool, memoryFrontGroup, memoryFront)));
                 }
+                    
+                //if (frontImage.GetPtr() == IntPtr.Zero)
+                //{
+                //    //MessageBox.Show("Front Inspection 생성 실패, 메모리 할당 없음");
+                //}
+                //else
+                //{
+                //    // Inspection Manager
+                //    InspectionManagerFrontside inspectionFront = GlobalObjects.Instance.Register<InspectionManagerFrontside>
+                //        (
+                //        ((WIND2_Handler)engineer.ClassHandler()).p_Vision,
+                //        recipeFront,
+                //        new SharedBufferInfo(
+                //            frontImage.GetPtr(0), 
+                //            frontImage.p_Size.X, 
+                //            frontImage.p_Size.Y, 
+                //            frontImage.GetBytePerPixel(), 
+                //            frontImage.GetPtr(1), 
+                //            frontImage.GetPtr(2), 
+                //            new MemoryID(memoryFrontPool, memoryFrontGroup, memoryFront)
+                //        ));
+
+                //    inspectionFront.SetRecipe(recipeFront);
+                //}
 
                 if (backImage.GetPtr() == IntPtr.Zero)
                 {

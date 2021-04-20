@@ -1,5 +1,6 @@
 ﻿using RootTools;
 using RootTools.Comm;
+using RootTools.Control;
 using RootTools.Module;
 using RootTools.Trees;
 using System;
@@ -36,11 +37,16 @@ namespace Root_EFEM.Module
         }
         #endregion
 
+        #region DIO
+        #endregion
+
         #region ToolBox
+        public DIO_I m_diReticleCheck;
         TCPIPClient m_tcpip; 
         RS232 m_rs232;
         public override void GetTools(bool bInit)
         {
+            p_sInfo = m_toolBox.GetDIO(ref m_diReticleCheck, this, "Reticle Check Sensor");
             switch (p_eComm)
             {
                 case eComm.TCPIP:
@@ -59,7 +65,9 @@ namespace Root_EFEM.Module
                     }
                     break; 
             }
+
         }
+
         #endregion
 
         #region Arm
@@ -119,20 +127,24 @@ namespace Root_EFEM.Module
                 m_module = module;
                 Init(id + "." + arm.ToString(), engineer, bEnableWaferSize, bEnableWaferCount); 
             }
-
             enum eCheckWafer
             {
                 InfoWafer,
-                Sensor
-            }
+                Sensor,
+            };
             eCheckWafer m_eCheckWafer = eCheckWafer.Sensor;
+
             public override bool IsWaferExist()
             {
                 switch (m_eCheckWafer)
                 {
                     case eCheckWafer.Sensor:
                         bool bExist = false;
-                        m_module.p_sInfo = m_module.RequestWafer(m_eArm, ref bExist);
+                        //m_module.p_sInfo = m_module.RequestWafer(m_eArm, ref bExist);
+                        if (m_module.m_diReticleCheck.p_bIn == true)  //lyj add
+                        {                                            //lyj add
+                            bExist = true;                           //lyj add
+                        }                                            //lyj add
                         return bExist;
                     default: return (p_infoWafer != null);
                 }
@@ -140,7 +152,7 @@ namespace Root_EFEM.Module
 
             public override void RunTree(Tree tree)
             {
-                m_eCheckWafer = (eCheckWafer)tree.Set(m_eCheckWafer, m_eCheckWafer, "CheckWafer", "CheckWafer");
+                m_eCheckWafer = (eCheckWafer)tree.Set(m_eCheckWafer, m_eCheckWafer, "Wafer Check", "Wafer Check Option");
                 base.RunTree(tree);
             }
         }
@@ -675,6 +687,7 @@ namespace Root_EFEM.Module
                 Protocol protocol = new Protocol(eCmd, this, sCmd);
                 m_qProtocol.Enqueue(protocol);
                 if (Run(protocol.WaitReply(m_secRS232))) return p_sInfo;
+                sRead = protocol.m_sRead;
                 return "OK"; 
             }
             finally { m_protocolSend = null; } 
@@ -744,6 +757,8 @@ namespace Root_EFEM.Module
                 }
             }
             RunTree(Tree.eMode.Init);
+            RunTreeRun(Tree.eMode.Init);
+
         }
 
         IWTRChild GetChild(string sChild)
@@ -883,8 +898,37 @@ namespace Root_EFEM.Module
             AddModuleRunList(new Run_Reset(this), false, "Reset WTR CPU");
             m_runGet = AddModuleRunList(new Run_Get(this), false, "WTR Run Get Motion");
             m_runPut = AddModuleRunList(new Run_Put(this), false, "WTR Run Put Motion");
+            AddModuleRunList(new Run_CheckWafer(this), false, "Check Wafer");
         }
+        public class Run_CheckWafer : ModuleRunBase
+        {
+            WTR_Cymechs m_module;
+            public Run_CheckWafer(WTR_Cymechs module)
+            {
+                m_module = module;
+                InitModuleRun(module);
+            }
 
+            bool m_bRunCheckWafer = true;
+            public override ModuleRunBase Clone()
+            {
+                Run_CheckWafer run = new Run_CheckWafer(m_module);
+                run.m_bRunCheckWafer = m_bRunCheckWafer;
+                return run;
+            }
+
+            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
+            {
+                m_bRunCheckWafer = tree.Set(m_bRunCheckWafer, m_bRunCheckWafer, "CheckWafer", "CheckWafer", bVisible, true);
+            }
+
+            public override string Run()
+            {
+                m_module.SendCmd("RQ WAFER ARM ALL");
+                return "OK";
+            }
+
+        }
         public class Run_Reset : ModuleRunBase
         {
             WTR_Cymechs m_module;
