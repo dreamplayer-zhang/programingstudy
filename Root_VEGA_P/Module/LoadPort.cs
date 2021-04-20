@@ -207,8 +207,8 @@ namespace Root_VEGA_P.Module
                     if (EQ.IsStop()) return "EQ Stop";
                     if (IsSeal(eDoorSeal)) return "OK"; 
                 }
-                //return "Door Seal Timeover"; 
-                return "OK";
+                return "Door Seal Timeover";
+                //return "OK";
             }
 
             bool IsSeal(eDoorSeal eDoorSeal)
@@ -429,18 +429,18 @@ namespace Root_VEGA_P.Module
                     m_infoPods.p_ePresentSensor = GemCarrierBase.ePresent.Exist;
                     m_infoPods.p_sCarrierID = "Simulation"; 
                 }
-                //else
-                //{
-                //    switch (m_infoPods.p_eState)
-                //    {
-                //        case InfoPods.eState.Dock: return "OK";
-                //        case InfoPods.eState.Empty: return "Pod not Exist";
-                //    }
-                //    string sRFID = ""; 
-                //    m_RFID.Read(out sRFID);
-                //    m_infoPods.p_sCarrierID = sRFID; 
-                //}
-                //m_infoPods.SendCarrierID(m_infoPods.p_sCarrierID); 
+                else
+                {
+                    switch (m_infoPods.p_eState)
+                    {
+                        case InfoPods.eState.Dock: return "OK";
+                        case InfoPods.eState.Empty: return "Pod not Exist";
+                    }
+                    string sRFID = "";
+                    m_RFID.Read(out sRFID);
+                    m_infoPods.p_sCarrierID = sRFID;
+                }
+                m_infoPods.SendCarrierID(m_infoPods.p_sCarrierID);
                 m_bDocking = true; 
                 if (m_stage.p_bPlaced == false) return "Not Placed";
                 if (m_stage.p_bPresent == false) return "Not Present";
@@ -633,7 +633,7 @@ namespace Root_VEGA_P.Module
 
             public override ModuleRunBase Clone()
             {
-                Run_Docking run = new Run_Docking(m_module);
+                Run_Undocking run = new Run_Undocking(m_module);
                 return run;
             }
 

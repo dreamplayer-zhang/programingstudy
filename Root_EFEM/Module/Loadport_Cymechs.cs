@@ -46,15 +46,27 @@ namespace Root_EFEM.Module
                 m_diPresent = value;
             }
         }
-        public DIO_I p_diOpen
+        //public bool m_bOpen = false;
+        //public DIO_I p_diOpen
+        //{
+        //    get
+        //    {
+        //        return m_diOpen;
+        //    }
+        //    set
+        //    {
+        //        m_diOpen = value;
+        //        m_bOpen = m_diOpen.p_bIn;
+        //        OnPropertyChanged();
+        //    }
+        //}
+        bool _bopen = false;
+        public bool p_open
         {
-            get
-            {
-                return m_diOpen;
-            }
-            set
-            {
-                m_diOpen = value;
+            get { return _bopen; }
+            set {
+                _bopen = value;
+                OnPropertyChanged();
             }
         }
         public DIO_I p_diClose
@@ -103,12 +115,13 @@ namespace Root_EFEM.Module
         //    }
         //}
 
-        private DIO_I m_diPlaced;
-        private DIO_I m_diPresent;
+        public DIO_I m_diPlaced;
+        public DIO_I m_diPresent;
         private DIO_I m_diOpen;
         private DIO_I m_diClose;
         private DIO_I m_diReady;
         private DIO_I m_diRun;
+
         //private OHT_Semi m_OHT;
         OHT _OHT;
         public OHT m_OHTNew
@@ -146,9 +159,14 @@ namespace Root_EFEM.Module
 
         #region GAF
         ALID alid_Cymechs;
+        ALID alid_LoadportOpenCloseError;
+        ALID alid_LoadportRunReadyError;
+
         void InitALID()
         {
             alid_Cymechs = m_gaf.GetALID(this, "Cymechs", "LOADPORT CYMECHS ERROR");
+            alid_LoadportOpenCloseError = m_gaf.GetALID(this, "Cymechs", "LOADPORT Open Or Close State Error");
+            alid_LoadportRunReadyError = m_gaf.GetALID(this, "Cymechs", "LOADPORT Run Or Ready State Error");
         }
         #endregion
         //forget
@@ -225,6 +243,7 @@ namespace Root_EFEM.Module
 
         public string BeforeGet(int nID)
         {
+            alid_LoadportOpenCloseError.Run(!m_diOpen.p_bIn || m_diRun.p_bIn, "m_diOpen.p_bIn : "+ m_diOpen.p_bIn + ", m_diReady.p_bIn : " + m_diRun.p_bIn);
             if (GetInfoWafer(nID) == null)
             {
                 m_alidGetOK.Run(true, p_id + nID.ToString("00") + " BeforeGet : InfoWafer = null");
@@ -235,6 +254,7 @@ namespace Root_EFEM.Module
 
         public string BeforePut(int nID)
         {
+            alid_LoadportOpenCloseError.Run(!m_diOpen.p_bIn || m_diRun.p_bIn, "m_diOpen.p_bIn : " + m_diOpen.p_bIn + ", m_diRun.p_bIn : " + m_diRun.p_bIn);
             if (GetInfoWafer(nID) != null)
             {
                 m_alidPutOK.Run(true, p_id + nID.ToString("00") + " BeforePut : InfoWafer != null");
@@ -1017,31 +1037,31 @@ namespace Root_EFEM.Module
                     m_module.m_alidLoad.Run(true, p_sInfo);
                     return p_sInfo;
                 }
-                InfoCarrier infoCarrier = m_infoCarrier;
-                List<GemSlotBase.eState> aSlot = new List<GemSlotBase.eState>();
-                string sMap = "1000000000000000000000000";
-                foreach (char ch in sMap)
-                {
-                    switch (ch)
-                    {
-                        case '0':
-                            aSlot.Add(GemSlotBase.eState.Empty);
-                            break;
-                        case '1':
-                            aSlot.Add(GemSlotBase.eState.Exist);
-                            break;
-                        case 'D':
-                            aSlot.Add(GemSlotBase.eState.Double);
-                            break;
-                        case 'C':
-                            aSlot.Add(GemSlotBase.eState.Cross);
-                            break;
-                        default:
-                            aSlot.Add(GemSlotBase.eState.Undefined);
-                            break;
-                    }
-                }
-                if (!EQ.p_bRecovery) infoCarrier.SetMapData(aSlot);
+                //InfoCarrier infoCarrier = m_infoCarrier;
+                //List<GemSlotBase.eState> aSlot = new List<GemSlotBase.eState>();
+                //string sMap = "1000000000000000000000000";
+                //foreach (char ch in sMap)
+                //{
+                //    switch (ch)
+                //    {
+                //        case '0':
+                //            aSlot.Add(GemSlotBase.eState.Empty);
+                //            break;
+                //        case '1':
+                //            aSlot.Add(GemSlotBase.eState.Exist);
+                //            break;
+                //        case 'D':
+                //            aSlot.Add(GemSlotBase.eState.Double);
+                //            break;
+                //        case 'C':
+                //            aSlot.Add(GemSlotBase.eState.Cross);
+                //            break;
+                //        default:
+                //            aSlot.Add(GemSlotBase.eState.Undefined);
+                //            break;
+                //    }
+                //}
+                //if (!EQ.p_bRecovery) infoCarrier.SetMapData(aSlot);
                 m_infoCarrier.SendSlotMap();
                 while (m_infoCarrier.p_eStateSlotMap != GemCarrierBase.eGemState.VerificationOK)
                 {
@@ -1051,6 +1071,9 @@ namespace Root_EFEM.Module
                         return p_sInfo + " infoCarrier.p_eStateSlotMap = " + m_infoCarrier.p_eStateSlotMap.ToString();
                 }
                 m_infoCarrier.p_eState = InfoCarrier.eState.Dock;
+
+                if (m_module.m_diOpen.p_bIn == true && m_module.m_diRun.p_bIn ==false) m_module.p_open = true;
+                else m_module.p_open = false;
                 return "OK";
 
                 //m_module.m_bUnLoadCheck = false;
@@ -1130,7 +1153,7 @@ namespace Root_EFEM.Module
                 }
                 if (!EQ.p_bSimulate)
                 {
-                    if (m_module.Run(m_module.CmdGetMap())) return p_sInfo;
+                    //if (m_module.Run(m_module.CmdGetMap())) return p_sInfo;
                     if (m_module.Run(m_module.CmdUnload()))
                     {
                         m_module.m_alidUnLoad.Run(true, p_sInfo);

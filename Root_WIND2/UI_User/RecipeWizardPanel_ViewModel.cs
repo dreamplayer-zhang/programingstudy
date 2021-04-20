@@ -253,80 +253,6 @@ namespace Root_WIND2.UI_User
 
         #region [Command]
 
-        #region [Command Parent RadioButton]
-        public ICommand btnHomeClickedCommand
-        {
-            get
-            {
-                return new RelayCommand(() =>
-                {
-                    SetPage(homeRecipe);
-                    homeRecipe.DataContext = homeRecipeVM;
-                });
-            }
-        }
-        public ICommand btnFrontClickedCommand
-        {
-            get
-            {
-                return new RelayCommand(() =>
-                {
-                    SetPage(frontsideProduct);
-                    frontsideProduct.DataContext = frontsideProductVM;
-                });
-            }
-        }
-
-        public ICommand btnBackClickedCommand
-        {
-            get
-            {
-                return new RelayCommand(() =>
-                {
-                    SetPage(backsideSetup);
-                    backsideSetup.DataContext = backsideSetupVM;
-                });
-            }
-        }
-
-        public ICommand btnEdgeClickedCommand
-        {
-            get
-            {
-                return new RelayCommand(() =>
-                {
-                    SetPage(edgesideSetup);
-                    edgesideSetup.DataContext = edgesideSetupVM;
-                });
-            }
-        }
-
-        public ICommand btnEBRClickedCommand
-        {
-            get
-            {
-                return new RelayCommand(() =>
-                {
-                    SetPage(ebrSetup);
-                    ebrSetup.DataContext = ebrSetupVM;
-                });
-            }
-        }
-
-        public ICommand btnCameraClickedCommand
-        {
-            get
-            {
-                return new RelayCommand(() =>
-                {
-                    SetPage(cameraVrs);
-                    cameraVrs.DataContext = cameraVrsVM;
-                });
-            }
-        }
-
-        #endregion
-
         #region [Command Home]
         public ICommand btnHomeRecipe
         {
@@ -353,8 +279,6 @@ namespace Root_WIND2.UI_User
                 });
             }
         }
-
-
 
         public ICommand btnFrontProduct
         {

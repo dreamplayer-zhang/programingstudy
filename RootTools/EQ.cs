@@ -235,10 +235,5 @@ namespace RootTools
                 OnPropertyChanged();
             }
         }
-
-        public ref bool StopToken()
-        {
-            return ref this._bStop;
-        }
     }
 }

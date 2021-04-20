@@ -59,8 +59,6 @@ namespace RootTools_Vision
 
         private WorkplaceBundle parentBundle;
 
-        private bool snapDone = false;
-
         [NonSerialized] private List<Defect> defectList = new List<Defect>();
         [NonSerialized] private List<Measurement> measureList = new List<Measurement>();
         [NonSerialized] private Dictionary<PREWORKDATA_KEY, object> preworkdataDicitonary = new Dictionary<PREWORKDATA_KEY, object>();
@@ -92,7 +90,6 @@ namespace RootTools_Vision
             this.measureList = (List<Measurement>)info.GetValue(nameof(measureList), typeof(List<Measurement>));
             this.preworkdataDicitonary = (Dictionary<PREWORKDATA_KEY, object>)info.GetValue(nameof(preworkdataDicitonary), typeof(Dictionary<PREWORKDATA_KEY, object>));
             this.parentBundle = (WorkplaceBundle)info.GetValue(nameof(parentBundle), typeof(WorkplaceBundle));
-            this.snapDone = (bool)info.GetValue(nameof(snapDone), typeof(bool));
         }
 
         public void GetObjectData(SerializationInfo info, StreamingContext context)
@@ -119,7 +116,6 @@ namespace RootTools_Vision
             info.AddValue(nameof(measureList), measureList, typeof(List<Measurement>));
             info.AddValue(nameof(preworkdataDicitonary), preworkdataDicitonary, typeof(Dictionary<PREWORKDATA_KEY, object>));
             info.AddValue(nameof(parentBundle), parentBundle, typeof(WorkplaceBundle));
-            info.AddValue(nameof(snapDone), snapDone, typeof(bool));
         }
         #endregion
 
@@ -227,11 +223,6 @@ namespace RootTools_Vision
             get => this.height;
         }
 
-        public bool SnapDone
-        {
-            get => this.snapDone;
-        }
-
         public WORK_TYPE WorkState
         {
             get => this.workState;
@@ -329,16 +320,6 @@ namespace RootTools_Vision
             this.width = width;
             this.height = height;
             this.index = index;
-        }
-
-        public void CheckSnapDone_Line(CRect snapArea)
-        {
-            if (this.positionX + this.width <= snapArea.Right)
-            {
-                this.snapDone = true;
-            }
-            else
-                this.snapDone = false;
         }
 
         /// <summary>
