@@ -54,6 +54,7 @@ namespace RootTools_Vision
         public IntPtr PtrR_GRAY;
         public IntPtr PtrG;
         public IntPtr PtrB;
+        public List<IntPtr> liPtr;
 
         public int Width;
         public int Height;
@@ -70,11 +71,13 @@ namespace RootTools_Vision
         /// <param name="byteCnt"></param>
         /// <param name="sharedBufferG">없을 경우 IntPtr.Zero</param>
         /// <param name="sharedBufferB">없을 경우 IntPtr.Zero</param>
-        public SharedBufferInfo(IntPtr sharedBufferR_GRAY, int width, int height, int byteCnt, IntPtr sharedBufferG, IntPtr sharedBufferB)
+        /// <param name="liPtr">없을 경우 null</param>
+        public SharedBufferInfo(IntPtr sharedBufferR_GRAY, int width, int height, int byteCnt, IntPtr sharedBufferG, IntPtr sharedBufferB,List<IntPtr> liPtr = null)
         {
             this.PtrR_GRAY = sharedBufferR_GRAY;
             this.PtrG = sharedBufferG;
             this.PtrB = sharedBufferB;
+            this.liPtr = liPtr;
 
             this.Width = width;
             this.Height = height;
@@ -82,11 +85,13 @@ namespace RootTools_Vision
 
             this.MemoryID = new MemoryID();
         }
-        public SharedBufferInfo(IntPtr sharedBufferR_GRAY, int width, int height, int byteCnt, IntPtr sharedBufferG, IntPtr sharedBufferB , MemoryID memoryID)
+        
+        public SharedBufferInfo(IntPtr sharedBufferR_GRAY, int width, int height, int byteCnt, IntPtr sharedBufferG, IntPtr sharedBufferB , MemoryID memoryID,List<IntPtr> liPtr = null)
         {
             this.PtrR_GRAY = sharedBufferR_GRAY;
             this.PtrG = sharedBufferG;
             this.PtrB = sharedBufferB;
+            this.liPtr = liPtr;
 
             this.Width = width;
             this.Height = height;

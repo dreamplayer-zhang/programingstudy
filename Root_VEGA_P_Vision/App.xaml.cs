@@ -13,9 +13,7 @@ namespace Root_VEGA_P_Vision
     /// </summary>
     public partial class App : Application
     {
-        private void SolidColorBrush_Changed(object sender, EventArgs e)
-        {
-
-        }
+        public const string mPool = "Vision.Memory";
+        public const string mGroup = "Vision";
     }
 }

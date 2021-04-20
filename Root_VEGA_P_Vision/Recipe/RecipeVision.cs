@@ -2,11 +2,12 @@
 
 namespace Root_VEGA_P_Vision
 {
-    class RecipeTDI:RecipeBase
+    class RecipeVision:RecipeBase
     {
         public override void Initilize()
         {
-            base.Initilize();
+            RegisterRecipeItem<MaskRecipe>();
+            RegisterRecipeItem<SurfaceRecipe>();
         }
     }
 }

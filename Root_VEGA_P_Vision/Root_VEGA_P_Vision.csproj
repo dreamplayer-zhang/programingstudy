@@ -168,13 +168,11 @@
       <DependentUpon>VEGA_P_Vision_ToolBox_UI.xaml</DependentUpon>
     </Compile>
     <Compile Include="MainVM.cs" />
+    <Compile Include="Module\InspectionManagerVegaP.cs" />
     <Compile Include="MVVM\Helper.cs" />
     <Compile Include="MVVM\ObservableObject.cs" />
     <Compile Include="MVVM\PropertySupport.cs" />
     <Compile Include="MVVM\RelayCommand.cs" />
-    <Compile Include="Recipe\RecipeSide.cs" />
-    <Compile Include="Recipe\RecipeStain.cs" />
-    <Compile Include="Recipe\RecipeZStacking.cs" />
     <Compile Include="UIManager.cs" />
     <Compile Include="UI\1. Setup\1.Home\HomePanel.xaml.cs">
       <DependentUpon>HomePanel.xaml</DependentUpon>
@@ -195,6 +193,8 @@
     <Compile Include="UI\SelectMode.xaml.cs">
       <DependentUpon>SelectMode.xaml</DependentUpon>
     </Compile>
+    <Compile Include="VegaPEventArgs.cs" />
+    <Compile Include="VegaPEventManager.cs" />
     <Page Include="Control\Button\NaviBtn.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -292,7 +292,7 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
-    <Compile Include="Recipe\RecipeTDI.cs" />
+    <Compile Include="Recipe\RecipeVision.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
