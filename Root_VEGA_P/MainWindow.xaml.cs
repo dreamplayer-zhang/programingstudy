@@ -32,7 +32,8 @@ namespace Root_VEGA_P
 
 		void InitMemory()
 		{
-			m_engineer.ClassMemoryTool().CreatePool("VEGA-P", 1).GetGroup("Mask").CreateMemory("Layer", 1, 1, new RootTools.CPoint(20000, 20000));
+			m_engineer.ClassMemoryTool().CreatePool("VEGA-P", 1).GetGroup("Mask").CreateMemory("Image", 1, 1, new RootTools.CPoint(20000, 20000));
+			m_engineer.ClassMemoryTool().GetPool("VEGA-P").GetGroup("Mask").CreateMemory("Layer", 1, 1, new RootTools.CPoint(20000, 20000));
 		}
 		#region Title Bar
 		private void MinimizeButton_Click(object sender, RoutedEventArgs e)
