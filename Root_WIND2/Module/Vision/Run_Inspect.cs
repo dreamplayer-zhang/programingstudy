@@ -77,34 +77,23 @@ namespace Root_WIND2.Module
             inspectionTimeWatcher.Start();
 
             //레시피에 GrabMode 저장하고 있어야함
-
-            RootTools_Vision.WorkManager3.WorkManager workManager = GlobalObjects.Instance.GetNamed<RootTools_Vision.WorkManager3.WorkManager>("frontInspection");
-            if(workManager == null)
-            {
-                throw new ArgumentException("WorkManager가 초기화되지 않았습니다(null)");
-            }
-            workManager.Stop();
-
-            //InspectionManagerFrontside inspectionFront = GlobalObjects.Instance.Get<InspectionManagerFrontside>();
-            //inspectionFront.Stop();
+            InspectionManagerFrontside inspectionFront = GlobalObjects.Instance.Get<InspectionManagerFrontside>();
+            inspectionFront.Stop();
 
             if (m_grabMode == null) return "Grab Mode == null";
 
             if (EQ.IsStop() == false)
             {
-                if (workManager.OpenRecipe(m_sRecipeName) == false)
+                if (inspectionFront.Recipe.Read(m_sRecipeName) == false)
                     return "Recipe Open Fail";
 
-                workManager.Start(false);
+                inspectionFront.Start();
 
             }
             else
             {
-                workManager.Stop();
+                inspectionFront.Stop();
             }
-
-//#define TEST_ONLY_INSPECTION
-//#if TEST_ONLY_INSPECTION
 
             //ImageData frontImage = GlobalObjects.Instance.GetNamed<ImageData>("FrontImage");
             //frontImage.ClearImage();
@@ -277,33 +266,49 @@ namespace Root_WIND2.Module
                             cpMemoryOffset.X -= m_grabMode.m_GD.m_nFovSize;
                         }
                     }
+
+                    
+
                 }
                 m_grabMode.m_camera.StopGrab();
 
-//#endif
 
-            //  Check
-
-            if (workManager.WaitWorkDone(ref EQ.m_EQ.StopToken(), 60 * 1) == false)
+                //  Check
+                
+                int timeOutMinutes = 60 * 10;
+                StopWatch timeOutWatcher = new StopWatch();
+                timeOutWatcher.Start();
+                while(inspectionFront.CheckAllWorkDone() == false)
                 {
-                    inspectionTimeWatcher.Stop();
+                    if(EQ.IsStop())
+                    {
+                        inspectionTimeWatcher.Stop();
+                        timeOutWatcher.Stop();
+                        return "OK";
+                    }
 
-                    TempLogger.Write("Inspection", "Time out!!!");
-                    return "OK";
-                } // 5 minutes
+                    if (timeOutMinutes < timeOutWatcher.ElapsedMilliseconds / 1000)
+                    {
+                        timeOutWatcher.Stop();
+                        inspectionTimeWatcher.Stop();
+                        TempLogger.Write("Inspection", "Time out!!!");
+                        return "OK";
+                    }
 
+                    Thread.Sleep(1000);
+                }
+
+                timeOutWatcher.Stop();
                 inspectionTimeWatcher.Stop();
+
                 TempLogger.Write("Inspection", string.Format("{0:F3}", (double)inspectionTimeWatcher.ElapsedMilliseconds / (double)1000));
+
                 return "OK";
-//#if TEST_ONLY_INSPECTION
             }
-
-
             finally
             {
                 m_grabMode.SetLight(false);
             }
-//#endif
         }
     }
 }

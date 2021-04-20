@@ -482,6 +482,7 @@ namespace Root_EFEM.Module
                 Thread.Sleep(10);
                 if ((m_protocolSend == null) && (m_qProtocol.Count > 0))
                 {
+                    Thread.Sleep(50);
                     m_protocolSend = m_qProtocol.Dequeue();
                     p_sInfo = m_protocolSend.SendCmd();
                     if (p_sInfo != "OK")

@@ -252,7 +252,6 @@ namespace RootTools.Camera.Dalsa
             p_CamInfo.p_sFile = tree.SetFile(p_CamInfo.p_sFile, p_CamInfo.p_sFile, "ccf", "CamFile", "Cam File");
             p_CamInfo.p_sAreaCamFile = tree.SetFile(p_CamInfo.p_sAreaCamFile, p_CamInfo.p_sAreaCamFile, "ccf", "Area Cam file", "Area Cam File");
             p_CamInfo.p_nResourceIdx = tree.Set(p_CamInfo.p_nResourceIdx, p_CamInfo.p_nResourceIdx, "Resource Count", "Resource Count");
-            p_CamParam.p_nUserSetNum = tree.Set(p_CamParam.p_nUserSetNum, p_CamParam.p_nUserSetNum, "UserSet Number", "UserSet Number");
 
             //p_CamInfo._DeviceUserID = tree.Set(p_CamInfo._DeviceUserID, "Basler", "ID", "Device User ID");
             //m_nGrabTimeout = tree.Set(m_nGrabTimeout, 2000, "Timeout", "Grab Timeout (ms)");

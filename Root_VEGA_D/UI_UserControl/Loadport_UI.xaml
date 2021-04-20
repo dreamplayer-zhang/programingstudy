@@ -29,50 +29,63 @@
                 </Grid.RowDefinitions>
                 <GroupBox Grid.Row="0" Header="Information" Margin="0,0,0,0">
                     <UniformGrid Columns="2" Margin="0,1">
-                        <Border BorderBrush="Gray" BorderThickness="1">
+                        <Border>
                             <TextBlock Text="Carrier ID"
+                                       FontSize="15"
                                        VerticalAlignment="Center"
-                                       Margin="10,0"/>
+                                       HorizontalAlignment="Stretch"
+                                       FontWeight="Bold"
+                                       Margin="30,0"/>
                         </Border>
-                        <Border BorderBrush="Gray" BorderThickness="1">
+                        <Border>
                             <TextBlock x:Name="textBoxPodID"
+                                       FontSize="15"
                                        Text="{Binding p_sCarrierID}"
                                        VerticalAlignment="Center"
-                                       Margin="10,0"/>
+                                       Margin="30,0"/>
                         </Border>
-                        <Border BorderBrush="Gray" BorderThickness="1">
+                        <Border>
                             <TextBlock Text="Lot ID"
+                                       FontSize="15"
                                        VerticalAlignment="Center"
-                                       Margin="10,0"/>
+                                        FontWeight="Bold"
+                                       Margin="30,0"/>
                         </Border>
-                        <Border BorderBrush="Gray" BorderThickness="1">
+                        <Border>
                             <TextBlock x:Name="textBoxLotID"
+                                       FontSize="15"
                                        Text="{Binding p_sLotID}"
                                        VerticalAlignment="Center"
-                                       Margin="10,0"/>
+                                       Margin="30,0"/>
                         </Border>
 
-                        <Border BorderBrush="Gray" BorderThickness="1">
+                        <Border>
                             <TextBlock Text="Recipe ID"
+                                       FontSize="15"
                                        VerticalAlignment="Center"
-                                       Margin="10,0"/>
+                                       FontWeight="Bold"
+                                       Margin="30,0"/>
                         </Border>
-                        <Border BorderBrush="Gray" BorderThickness="1">
+                        <Border>
                             <TextBlock Text="{Binding p_sRecipe}"
+                                       FontSize="15"
                                        x:Name="textBoxRecipeID"
                                        VerticalAlignment="Center"
-                                       Margin="10,0"/>
+                                       Margin="30,0"/>
                         </Border>
 
-                        <Border BorderBrush="Gray" BorderThickness="1">
+                        <Border>
                             <TextBlock Text="State"
+                                       FontSize="15"
                                        VerticalAlignment="Center"
-                                       Margin="10,0"/>
+                                       FontWeight="Bold"
+                                       Margin="30,0"/>
                         </Border>
-                        <Border BorderBrush="Gray" BorderThickness="1">
+                        <Border>
                             <TextBlock Text="{Binding p_eState}"
+                                       FontSize="15"
                                        VerticalAlignment="Center"
-                                       Margin="10,0"/>
+                                       Margin="30,0"/>
                         </Border>
                     </UniformGrid>
                 </GroupBox>
@@ -102,7 +115,7 @@
                         <ColumnDefinition/>
                         <ColumnDefinition/>
                     </Grid.ColumnDefinitions>
-                    <Button Grid.Row="0" Grid.Column="0"
+                        <Button Grid.Row="0" Grid.Column="0"
                             Content="Manual"
                             Style="{StaticResource SetupPanelBtn}"
                             Foreground="White"

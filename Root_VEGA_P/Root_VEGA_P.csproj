@@ -327,5 +327,23 @@
     <Folder Include="UI\3. Operation\" />
     <Folder Include="ViewModel\" />
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="UI\1. Setup\covertop.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="UI\1. Setup\doom.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="UI\1. Setup\door.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="UI\1. Setup\coverbot.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="UI\1. Setup\basetop.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="UI\1. Setup\basebot.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

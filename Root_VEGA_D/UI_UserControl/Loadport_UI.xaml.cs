@@ -122,21 +122,24 @@ namespace Root_VEGA_D
         #region Button Click Event
         private void buttonLoad_Click(object sender, RoutedEventArgs e)
         {
-
             if (IsEnableLoad() == false) return;
             if (m_loadport.p_id == "LoadportA") EQ.p_nRunLP = 0;
             else if (m_loadport.p_id == "LoadportB") EQ.p_nRunLP = 1;
             //ModuleRunBase moduleRun = m_rfid.m_runReadID.Clone();
             //m_rfid.StartRun(moduleRun);
             //while ((EQ.IsStop() != true) && m_rfid.IsBusy()) Thread.Sleep(10);
-            m_loadport.RunDocking();
+            ModuleRunBase Docking = m_loadport.m_runDocking.Clone();
+            m_loadport.StartRun(Docking);
+            //m_loadport.RunDocking();
             if (m_loadport.p_infoCarrier.m_aInfoWafer[0] == null)
             {
                 m_loadport.m_alidInforeticle.Run(true, "Reticle Info Error");
-                m_loadport.RunUndocking();
+                ModuleRunBase UnDocking = m_loadport.m_runUndocking.Clone();
+                m_loadport.StartRun(UnDocking);
+                //m_loadport.RunUndocking();
                 return;
             }
-            if (m_manualjob.ShowPopup() == false) return;
+            if (m_manualjob.ShowPopup(m_handler) == false) return;
             m_bgwLoad.RunWorkerAsync();
         }
 

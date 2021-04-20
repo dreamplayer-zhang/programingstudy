@@ -190,7 +190,6 @@ namespace Root_Rinse_Unloader.Module
         public string RunLoad()
         {
             if (m_rinse.p_eMode != RinseU.eRunMode.Stack) return "Run mode is not Stack";
-            if (m_roller.IsAlignerUp()) return "Check Roller Aligner Up"; 
             if (Run(RunPickerDown(false))) return p_sInfo;
             if (Run(MoveLoader(ePos.Roller))) return p_sInfo;
             while (m_roller.p_eStep != Roller.eStep.Picker)
