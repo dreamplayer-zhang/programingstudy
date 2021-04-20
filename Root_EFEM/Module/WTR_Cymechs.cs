@@ -1025,10 +1025,10 @@ namespace Root_EFEM.Module
                 }
                 int posWTR = child.GetTeachWTR(child.GetInfoWafer(m_nChildID));
                 if (posWTR < 0) return "WTR Teach Position Not Defined";
-                if (child.p_eState != eState.Ready)
-                {
-                    if (m_module.Run(m_module.CmdGoto(posWTR, m_nChildID + 1, m_eArm, false, false))) return p_sInfo;
-                }
+                //if (child.p_eState != eState.Ready)
+                //{
+                //    if (m_module.Run(m_module.CmdGoto(posWTR, m_nChildID + 1, m_eArm, false, false))) return p_sInfo;
+                //}
                 while (child.p_eState != eState.Ready)
                 {
                     if (EQ.IsStop()) return "Stop";

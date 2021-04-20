@@ -159,11 +159,12 @@ namespace Root_VEGA_D.Module
             }
             set
             {
-                if (Math.Abs(m_CDA1_Value - value) < 0.05) return;
+               // if (Math.Abs(m_CDA1_Value - value) < 0.05) return;
                 m_CDA1_Value = value;
                 OnPropertyChanged();
             }
         }
+        public double m_CDA2_Value;
         public double p_CDA2_Value
         {
             get
@@ -172,12 +173,11 @@ namespace Root_VEGA_D.Module
             }
             set
             {
-                if (Math.Abs(m_CDA2_Value - value) < 0.05) return;
+               // if (Math.Abs(m_CDA2_Value - value) < 0.05) return;
                 m_CDA2_Value = value;
                 OnPropertyChanged();
             }
         }
-        public double m_CDA2_Value;
         public void CheckFDC()
 		{
 			Thread.Sleep(10);
@@ -185,9 +185,9 @@ namespace Root_VEGA_D.Module
 			{
 				try
 				{
-					p_CDA1_Value = m_ACS.GetAnalogData((int)eAnalog_CDA.CDA1);
-					p_CDA2_Value = m_ACS.GetAnalogData((int)eAnalog_CDA.CDA2);
-				}
+                    p_CDA1_Value = Math.Truncate(m_ACS.GetAnalogData((int)eAnalog_CDA.CDA1) / 32768 * 100) / 100;
+                    p_CDA2_Value = Math.Truncate(m_ACS.GetAnalogData((int)eAnalog_CDA.CDA2) / 32768 * 100) / 100;
+                }
 				catch (Exception e) { m_log.Info("FDC Error " + e.Message); }
 				if (p_CDA1_Value < m_mmLimitCDA1.X)
 				{ m_alidCDA1_Low.Run(true, "CDA1_Value Pressure Lower than Limit"); }

@@ -331,9 +331,11 @@ namespace Root_VEGA_D.Module
             {
                 if (Run(m_axisZ.StartMove(eAxisPosZ.Ready))) return p_sInfo;
                 if (Run(m_axisRotate.StartMove(eAxisPosRotate.Ready))) return p_sInfo;
-                if (Run(m_axisXY.StartMove(eAxisPosX.Ready))) return p_sInfo;
-
-                if (Run(m_axisXY.WaitReady()))
+                if (Run(m_axisXY.p_axisX.StartMove(eAxisPosX.Ready))) return p_sInfo;
+                if (Run(m_axisXY.p_axisY.StartMove(eAxisPosY.Ready))) return p_sInfo;
+                if (Run(m_axisXY.p_axisX.WaitReady()))
+                    return p_sInfo;
+                if (Run(m_axisXY.p_axisY.WaitReady()))
                     return p_sInfo;
                 if (Run(m_axisRotate.WaitReady()))
                     return p_sInfo;
@@ -374,9 +376,12 @@ namespace Root_VEGA_D.Module
             {
                 if (Run(m_axisZ.StartMove(eAxisPosZ.Ready))) return p_sInfo;
                 if (Run(m_axisRotate.StartMove(eAxisPosRotate.Ready))) return p_sInfo;
-                if (Run(m_axisXY.StartMove(eAxisPosX.Ready))) return p_sInfo;
+                if (Run(m_axisXY.p_axisX.StartMove(eAxisPosX.Ready))) return p_sInfo;
+                if (Run(m_axisXY.p_axisY.StartMove(eAxisPosY.Ready))) return p_sInfo;
 
-                if (Run(m_axisXY.WaitReady()))
+                if (Run(m_axisXY.p_axisX.WaitReady()))
+                    return p_sInfo;
+                if (Run(m_axisXY.p_axisY.WaitReady()))
                     return p_sInfo;
                 if (Run(m_axisRotate.WaitReady()))
                     return p_sInfo;

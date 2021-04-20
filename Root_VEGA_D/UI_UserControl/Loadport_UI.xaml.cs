@@ -128,12 +128,13 @@ namespace Root_VEGA_D
             //ModuleRunBase moduleRun = m_rfid.m_runReadID.Clone();
             //m_rfid.StartRun(moduleRun);
             //while ((EQ.IsStop() != true) && m_rfid.IsBusy()) Thread.Sleep(10);
+            m_loadport.p_open = false;
             ModuleRunBase Docking = m_loadport.m_runDocking.Clone();
             m_loadport.StartRun(Docking);
             //m_loadport.RunDocking();
             if (m_loadport.p_infoCarrier.m_aInfoWafer[0] == null)
             {
-                m_loadport.m_alidInforeticle.Run(true, "Reticle Info Error");
+                m_loadport.m_alidInforeticle.Run(true, "Reticle Info Error, Check Reticle in Loadport");
                 ModuleRunBase UnDocking = m_loadport.m_runUndocking.Clone();
                 m_loadport.StartRun(UnDocking);
                 //m_loadport.RunUndocking();

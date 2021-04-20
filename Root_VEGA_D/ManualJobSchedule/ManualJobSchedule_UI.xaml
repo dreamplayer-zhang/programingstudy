@@ -9,7 +9,7 @@
         Closing="Window_Closing"
                 ResizeMode="NoResize"
         WindowStartupLocation="CenterScreen"
-        Title="ManualJobSchedule" Height="740" Width="930.5" Background="#FF406859" Topmost="True">
+        Title="ManualJobSchedule" Height="700" Width="830.5" Background="#FF406859" Topmost="True">
     <Window.Resources>
         <local:BooltoVisibleConverter x:Key="BooltoVisibleConverters"/>
         <LinearGradientBrush x:Key="BtnGradientBrush" StartPoint="0,0" EndPoint="1,1">
@@ -343,12 +343,14 @@
                     <TextBlock Text="RNR Count : "
                                x:Name="textblockRnR"
                                FontSize="30"
+                               Visibility="Hidden"
                                Margin="100,15,0,15"
                                VerticalAlignment="Center"/>
                     <TextBox TextAlignment="Center"
                              Width="150"
                              x:Name="textboxRnR"
                              Margin="0,15,15,15"
+                             Visibility="Hidden"
                              FontSize="30"
                              VerticalContentAlignment="Center"
                              IsEnabled="{Binding ElementName=RNRMode, Path=IsChecked}"

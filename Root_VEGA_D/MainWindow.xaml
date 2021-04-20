@@ -187,7 +187,7 @@
                     </Grid>
                     <Grid Grid.Column="1"
                           Grid.Row="1">
-                        <TextBlock Text="Software Ver 0.01"
+                        <TextBlock x:Name="VersionInfo"
                                    FontWeight="Bold" />
                     </Grid>
                     <Grid Grid.Column="0"
@@ -215,7 +215,7 @@
                           Y2="1" />
                         <Grid Grid.Column="0">
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="1*" />
+                            <ColumnDefinition Width="2*" />
                             <ColumnDefinition Width="3*" />
                         </Grid.ColumnDefinitions>
                         <Grid Grid.Column="0">
@@ -296,7 +296,7 @@
                                            FontWeight="SemiBold"/>
                                 <!--</Border>-->
                                 <!--<Border Grid.Column="0" Grid.Row="1" BorderBrush="#FF707070" BorderThickness="1">-->
-                                <TextBlock x:Name="EQState"
+                                <TextBlock x:Name="EQState" Grid.Row="1"
                                FontWeight="SemiBold"/>
                             <!--</UniformGrid>-->
                             <!--</Border>-->
@@ -312,11 +312,11 @@
                                    FontWeight="Bold" />
                         <TextBlock Grid.Column="2"
                                    Grid.Row="0"
-                                   Text="00 : 00 : 00"
+                                   x:Name="InspectTime"
                                    FontWeight="Bold" />
                         <TextBlock Grid.Column="2"
                                    Grid.Row="1"
-                                   Text="00 : 00 : 00"
+                                   x:Name="RNRCount"
                                    FontWeight="Bold" />
                     </Grid>
                     <Grid Grid.Column="4">
@@ -918,21 +918,21 @@
                                FontWeight="SemiBold"/>
                                                     </Border>
                                                     <Border Grid.Column="0" Grid.Row="1" x:Name="LoadportABack">
-                                                        <TextBlock x:Name="LoadportAState" 
-                               FontWeight="SemiBold"/>
-                                                    </Border>
+                                                    <TextBlock x:Name="LoadportAState" Text="{Binding p_eState}"
+                               FontWeight="SemiBold" Foreground="{Binding p_eState ,Converter={StaticResource StateToColorConverters}}"/>
+                                                </Border>
                                                     <Border Grid.Column="1" Grid.Row="1" x:Name="LoadportBBack">
-                                                        <TextBlock x:Name="LoadportBState"
-                               FontWeight="SemiBold"/>
-                                                    </Border>
+                                                    <TextBlock x:Name="LoadportBState" Text="{Binding p_eState}"
+                               FontWeight="SemiBold" Foreground="{Binding p_eState ,Converter={StaticResource StateToColorConverters}}"/>
+                                                </Border>
                                                 <Border Grid.Column="2" Grid.Row="1" x:Name="RobotBack">
-                                                        <TextBlock x:Name="RobotState"  
-                               FontWeight="SemiBold"/>
-                                                    </Border>
+                                                    <TextBlock x:Name="RobotState" Text="{Binding p_eState}"
+                               FontWeight="SemiBold" Foreground="{Binding p_eState ,Converter={StaticResource StateToColorConverters}}"/>
+                                                </Border>
                                                 <Border Grid.Column="3" Grid.Row="1" x:Name="VisionBack">
-                                                        <TextBlock x:Name="VisionState"
-                               FontWeight="SemiBold"/>
-                                                    </Border>
+                                                    <TextBlock x:Name="VisionState" Text="{Binding p_eState}"
+                               FontWeight="SemiBold" Foreground="{Binding p_eState ,Converter={StaticResource StateToColorConverters}}"/>
+                                                </Border>
                                                     <!--<TextBlock Text="Recipe Name"
                                                            HorizontalAlignment="Left" />
                                                 <TextBlock Text="200811ADI.rcp"
@@ -965,44 +965,44 @@
                                                 </Grid.RowDefinitions>
                                                 <TextBlock Text="FP Isolator" Grid.Column="0" Grid.Row="0" 
                                                            HorizontalAlignment="Center" FontSize="12"/>
-                                                <ToggleButton  x:Name="btnFP_Isolator" Width ="{PriorityBinding}" Background="Green" Grid.Column="0" Grid.Row="1"
-                    Style="{StaticResource IO_indicator}" IsChecked="{Binding p_bIn}" HorizontalAlignment="Center" Margin="2"/>
+                                                <ToggleButton  x:Name="btnFP_Isolator" Width ="{PriorityBinding}" Background="Green" Grid.Column="0" Grid.Row="1" IsHitTestVisible="false"
+                    Style="{StaticResource IO_indicator}" HorizontalAlignment="Center" Margin="2"/>
                                                 <TextBlock Text="Isolator V" Grid.Column="1" Grid.Row="0"
                                                            HorizontalAlignment="Center" FontSize="12"/>
-                                                <ToggleButton x:Name="btnIsolator_V" Width ="{PriorityBinding}" Background="Green" Grid.Column="1" Grid.Row="1"
-                    Style="{StaticResource IO_indicator}" IsChecked="{Binding p_bIn}" HorizontalAlignment="Center" Margin="2"/>
+                                                <ToggleButton x:Name="btnIsolator_V" Width ="{PriorityBinding}" Background="Green" Grid.Column="1" Grid.Row="1" IsHitTestVisible="false"
+                    Style="{StaticResource IO_indicator}" HorizontalAlignment="Center" Margin="2"/>
                                                 <TextBlock Text="Factory Air Pad" Grid.Column="2" Grid.Row="0"
                                                            HorizontalAlignment="Center" FontSize="12"/>
-                                                <ToggleButton x:Name="btn_Factory_Air_Pad" Width ="{PriorityBinding}" Background="Green" Grid.Column="2" Grid.Row="1"
-                    Style="{StaticResource IO_indicator}" IsChecked="{Binding p_bIn}" HorizontalAlignment="Center" Margin="2"/>
+                                                <ToggleButton x:Name="btn_Factory_Air_Pad" Width ="{PriorityBinding}" Background="Green" Grid.Column="2" Grid.Row="1" IsHitTestVisible="false"
+                    Style="{StaticResource IO_indicator}" HorizontalAlignment="Center" Margin="2"/>
                                                 <TextBlock Text="Air Tank" Grid.Column="3" Grid.Row="0"
                                                            HorizontalAlignment="Center" FontSize="12"/>
-                                                <ToggleButton x:Name="btn_Air_Tank" Width ="{PriorityBinding}" Background="Green" Grid.Column="3" Grid.Row="1"
-                    Style="{StaticResource IO_indicator}" IsChecked="{Binding p_bIn}" HorizontalAlignment="Center" Margin="2"/>
+                                                <ToggleButton x:Name="btn_Air_Tank" Width ="{PriorityBinding}" Background="Green" Grid.Column="3" Grid.Row="1" IsHitTestVisible="false"
+                    Style="{StaticResource IO_indicator}" HorizontalAlignment="Center" Margin="2"/>
                                                 <TextBlock Text="X Bottom" Grid.Column="4" Grid.Row="0"
                                                            HorizontalAlignment="Center" FontSize="12"/>
-                                                <ToggleButton x:Name="btn_X_Bottom" Width ="{PriorityBinding}" Background="Green" Grid.Column="4" Grid.Row="1"
-                    Style="{StaticResource IO_indicator}" IsChecked="{Binding p_bIn}" HorizontalAlignment="Center" Margin="2"/>
+                                                <ToggleButton x:Name="btn_X_Bottom" Width ="{PriorityBinding}" Background="Green" Grid.Column="4" Grid.Row="1" IsHitTestVisible="false"
+                    Style="{StaticResource IO_indicator}" HorizontalAlignment="Center" Margin="2"/>
                                                 <TextBlock Text="X Side Master" Grid.Column="5" Grid.Row="0"
                                                            HorizontalAlignment="Center" FontSize="12"/>
-                                                <ToggleButton x:Name="btn_X_Side_Master" Width ="{PriorityBinding}" Background="Green" Grid.Column="5" Grid.Row="1"
-                    Style="{StaticResource IO_indicator}" IsChecked="{Binding p_bIn}" HorizontalAlignment="Center" Margin="2"/>
+                                                <ToggleButton x:Name="btn_X_Side_Master" Width ="{PriorityBinding}" Background="Green" Grid.Column="5" Grid.Row="1" IsHitTestVisible="false"
+                    Style="{StaticResource IO_indicator}" HorizontalAlignment="Center" Margin="2"/>
                                                 <TextBlock Text="X Side Slave" Grid.Column="6" Grid.Row="0"
                                                            HorizontalAlignment="Center" FontSize="12"/>
-                                                <ToggleButton x:Name="btn_X_Side_Slave" Width ="{PriorityBinding}" Background="Green" Grid.Column="6" Grid.Row="1"
-                    Style="{StaticResource IO_indicator}" IsChecked="{Binding p_bIn}" HorizontalAlignment="Center" Margin="2"/>
+                                                <ToggleButton x:Name="btn_X_Side_Slave" Width ="{PriorityBinding}" Background="Green" Grid.Column="6" Grid.Row="1" IsHitTestVisible="false"
+                    Style="{StaticResource IO_indicator}" HorizontalAlignment="Center" Margin="2"/>
                                                 <TextBlock Text="Y Bottom" Grid.Column="7" Grid.Row="0"
                                                            HorizontalAlignment="Center" FontSize="12"/>
-                                                <ToggleButton x:Name="btn_Y_Bottom" Width ="{PriorityBinding}" Background="Green" Grid.Column="7" Grid.Row="1"
-                    Style="{StaticResource IO_indicator}" IsChecked="{Binding p_bIn}" HorizontalAlignment="Center" Margin="2"/>
+                                                <ToggleButton x:Name="btn_Y_Bottom" Width ="{PriorityBinding}" Background="Green" Grid.Column="7" Grid.Row="1" IsHitTestVisible="false"
+                    Style="{StaticResource IO_indicator}" HorizontalAlignment="Center" Margin="2"/>
                                                 <TextBlock Text="Y Side Master" Grid.Column="8" Grid.Row="0"
                                                            HorizontalAlignment="Center" FontSize="12"/>
-                                                <ToggleButton x:Name="btn_Y_Side_Master" Width ="{PriorityBinding}" Background="Green" Grid.Column="8" Grid.Row="1"
-                    Style="{StaticResource IO_indicator}" IsChecked="{Binding p_bIn}" HorizontalAlignment="Center" Margin="2"/>
+                                                <ToggleButton x:Name="btn_Y_Side_Master" Width ="{PriorityBinding}" Background="Green" Grid.Column="8" Grid.Row="1" IsHitTestVisible="false"
+                    Style="{StaticResource IO_indicator}" HorizontalAlignment="Center" Margin="2"/>
                                                 <TextBlock Text="Y Side Slave" Grid.Column="9" Grid.Row="0"
                                                            HorizontalAlignment="Center" FontSize="12"/>
-                                                <ToggleButton x:Name="btn_Y_Side_Slave" Width ="{PriorityBinding}" Background="Green" Grid.Column="9" Grid.Row="1"
-                    Style="{StaticResource IO_indicator}" IsChecked="{Binding p_bIn}" HorizontalAlignment="Center" Margin="2"/>
+                                                <ToggleButton x:Name="btn_Y_Side_Slave" Width ="{PriorityBinding}" Background="Green" Grid.Column="9" Grid.Row="1" IsHitTestVisible="false"
+                    Style="{StaticResource IO_indicator}" HorizontalAlignment="Center" Margin="2"/>
                                             </Grid>
                                         </GroupBox>
                                         <GroupBox Header="Illumination Info"

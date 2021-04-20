@@ -19,6 +19,7 @@ namespace Root_VEGA_D
     /// </summary>
     public partial class MainWindow : Window
     {
+        Version assemblyVersion = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
         #region TitleBar
         private void MinimizeButton_Click(object sender, RoutedEventArgs e)
         {
@@ -84,6 +85,7 @@ namespace Root_VEGA_D
 
         VEGA_D_Handler m_handler;
         VEGA_D_Engineer m_engineer = new VEGA_D_Engineer();
+        Loadport_Cymechs[] m_loadport_Cymechs = new Loadport_Cymechs[2];
         public MainWindow()
         {
             InitializeComponent();
@@ -98,6 +100,9 @@ namespace Root_VEGA_D
             RecipeWizard_UI.init(m_engineer);
             InitTimer();
             InitFFU();
+            m_loadport_Cymechs[0] = (Loadport_Cymechs)m_handler.m_aLoadport[0];
+            m_loadport_Cymechs[1] = (Loadport_Cymechs)m_handler.m_aLoadport[1];
+            VersionInfo.Text = assemblyVersion.ToString();
             //TextBlockRetID.DataContext = m_handler.m_aLoadport[0].p_infoCarrier.m_aGemSlot[0];
         }
         //bool m_blogin = false;
@@ -138,17 +143,6 @@ namespace Root_VEGA_D
             FanUI3.DataContext = m_handler.m_FFU.p_aUnit[0].p_aFan[3];
             FDC_CDA1.DataContext = m_handler.m_interlock;
             FDC_CDA2.DataContext = m_handler.m_interlock;
-            
-            btnFP_Isolator.DataContext = m_handler.m_interlock.m_diFP_Isolator;
-            btnIsolator_V.DataContext = m_handler.m_interlock.m_diIsolator_VPre;
-            btn_Factory_Air_Pad.DataContext = m_handler.m_interlock.m_diFactory_Air_PadPre;
-            btn_Air_Tank.DataContext = m_handler.m_interlock.m_diAir_TankPre;
-            btn_X_Bottom.DataContext = m_handler.m_interlock.m_diX_BottomPre;
-            btn_X_Side_Master.DataContext = m_handler.m_interlock.m_diX_SideMasterPre;
-            btn_X_Side_Slave.DataContext = m_handler.m_interlock.m_diX_SideSlavePre;
-            btn_Y_Bottom.DataContext = m_handler.m_interlock.m_diY_BottomPre;
-            btn_Y_Side_Master.DataContext = m_handler.m_interlock.m_diY_SideMasterPre;
-            btn_Y_Side_Slave.DataContext = m_handler.m_interlock.m_diY_SideSlavePre;
         }
 
         bool IsRunModule(ModuleBase module)
@@ -227,6 +221,21 @@ namespace Root_VEGA_D
             buttonPause.IsEnabled = IsEnable_Pause();
             buttonInitialize.IsEnabled = IsEnable_Initial();
             buttonRecovery.IsEnabled = IsEnable_Recovery();
+            if (m_loadport_Cymechs[0].m_swLotTime.IsRunning)
+                InspectTime.Text = String.Format("{0:00}:{1:00}:{2:00}", m_loadport_Cymechs[0].m_swLotTime.Elapsed.Hours, m_loadport_Cymechs[0].m_swLotTime.Elapsed.Minutes, m_loadport_Cymechs[0].m_swLotTime.Elapsed.Seconds);
+            else
+                InspectTime.Text = String.Format("{0:00}:{1:00}:{2:00}", m_loadport_Cymechs[1].m_swLotTime.Elapsed.Hours, m_loadport_Cymechs[1].m_swLotTime.Elapsed.Minutes, m_loadport_Cymechs[1].m_swLotTime.Elapsed.Seconds);
+            RNRCount.Text = EQ.p_nRnR < 1 ? "0" : EQ.p_nRnR.ToString();
+            btnFP_Isolator.IsChecked = m_handler.m_interlock.m_diFP_Isolator.p_bIn;
+            btnIsolator_V.IsChecked = m_handler.m_interlock.m_diIsolator_VPre.p_bIn;
+            btn_Factory_Air_Pad.IsChecked = m_handler.m_interlock.m_diFactory_Air_PadPre.p_bIn;
+            btn_Air_Tank.IsChecked = m_handler.m_interlock.m_diAir_TankPre.p_bIn;
+            btn_X_Bottom.IsChecked = m_handler.m_interlock.m_diX_BottomPre.p_bIn;
+            btn_X_Side_Master.IsChecked = m_handler.m_interlock.m_diX_SideMasterPre.p_bIn;
+            btn_X_Side_Slave.IsChecked = m_handler.m_interlock.m_diX_SideSlavePre.p_bIn;
+            btn_Y_Bottom.IsChecked = m_handler.m_interlock.m_diY_BottomPre.p_bIn;
+            btn_Y_Side_Master.IsChecked = m_handler.m_interlock.m_diY_SideMasterPre.p_bIn;
+            btn_Y_Side_Slave.IsChecked = m_handler.m_interlock.m_diY_SideSlavePre.p_bIn;
         }
         void TimerUI()
         {
