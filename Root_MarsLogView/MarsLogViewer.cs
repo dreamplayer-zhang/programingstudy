@@ -50,10 +50,9 @@ namespace Root_MarsLogView
 		private string GetHandlerString(string sHandler)//jws test
 		{
             string[] asHandler = sHandler.Split(',');
-            int length = asHandler.Length;
             GetDateTime(asHandler);
             string sLog = asHandler[0];
-            for (int n = 1; n < length; n++) sLog += ',' + asHandler[n];
+            for (int n = 1; n < 14; n++) sLog += ',' + asHandler[n];
             return sLog;
         }
 
