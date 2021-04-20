@@ -153,6 +153,7 @@ namespace Root_VEGA_D.Engineer
         #region IEngineer Function
         public string BuzzerOff()
         {
+            m_handler.m_towerlamp.BuzzerOff();
             return "OK";
         }
 

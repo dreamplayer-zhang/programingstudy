@@ -60,13 +60,12 @@ namespace Root_Rinse_Unloader.Module
 
         #region Rotate
         Axis[] m_axisRotate = new Axis[2];
-
         public string RunRotate(bool bRotate)
         {
             if (bRotate)
             {
-                m_axisRotate[0].Jog(m_rinse.p_fRotateSpeed);
-                m_axisRotate[1].Jog(m_rinse.p_fRotateSpeed);
+                m_axisRotate[0].Jog(m_rinse.p_fRotateSpeed, "Move");
+                m_axisRotate[1].Jog(m_rinse.p_fRotateSpeed, "Move");
             }
             else
             {
@@ -184,7 +183,7 @@ namespace Root_Rinse_Unloader.Module
             get { return _bAlignerUp; }
             set
             {
-                if (_bAlignerUp == value) return;
+                //if (_bAlignerUp == value) return;
                 _bAlignerUp = value;
                 RunAlignerUp(value); 
                 OnPropertyChanged(); 
@@ -217,6 +216,18 @@ namespace Root_Rinse_Unloader.Module
                 if ((line.m_dioAlignUp[0].p_bDone == false) || (line.m_dioAlignUp[1].p_bDone == false)) return false; 
             }
             return true; 
+        }
+
+        public bool IsAlignerUp()
+        {
+            foreach (Line line in m_aLine)
+            {
+                if (line.m_dioAlignUp[0].m_aBitDI[0].p_bOn == false) return true;
+                if (line.m_dioAlignUp[1].m_aBitDI[0].p_bOn == false) return true;
+                if (line.m_dioAlignUp[0].m_aBitDI[1].p_bOn) return true;
+                if (line.m_dioAlignUp[1].m_aBitDI[1].p_bOn) return true;
+            }
+            return false;
         }
         #endregion
 
@@ -416,6 +427,13 @@ namespace Root_Rinse_Unloader.Module
             InitBase(id, engineer);
 
             InitThreadCheck(); 
+            EQ.m_EQ.OnChanged += M_EQ_OnChanged;
+        }
+
+        private void M_EQ_OnChanged(_EQ.eEQ eEQ, dynamic value)
+        {
+            if (eEQ != _EQ.eEQ.State) return;
+            if (value != EQ.eState.Run) RunRotate(false); 
         }
 
         public override void ThreadStop()

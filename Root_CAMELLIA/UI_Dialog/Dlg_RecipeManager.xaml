@@ -17,6 +17,11 @@
         BorderBrush="Black" BorderThickness="1"
         Background="{StaticResource PanelBackGround}"
         mc:Ignorable="d">
+    <i:Interaction.Triggers>
+        <i:EventTrigger EventName="Unloaded">
+            <i:InvokeCommandAction Command="{Binding UnloadedCommand}" />
+        </i:EventTrigger>
+    </i:Interaction.Triggers>
     <Window.Resources>
         <local:ColorToBrushConverter x:Key="ColorToBrushConverter"/>
         <local:ImageConverter x:Key="ImageConverter"/>
@@ -48,7 +53,7 @@
                     <ColumnDefinition Width="auto"/>
                     <ColumnDefinition Width="auto"/>
                 </Grid.ColumnDefinitions>
-               <TextBlock Grid.Column="1" Text="{Binding Path=Version, Source={x:Static local:BaseDefine.Configuration}}"  FontSize="11" Foreground="Black" VerticalAlignment="Center" Margin="5,0,0,0"/>
+               <TextBlock Grid.Column="0" Text="{Binding Path=Version, Source={x:Static local:BaseDefine.Configuration}}"  FontSize="11" Foreground="Black" VerticalAlignment="Center" Margin="5,0,0,0"/>
                 <TextBlock Text="{Binding RecipePath}"
                        FontSize="11"
                        Foreground="Black"

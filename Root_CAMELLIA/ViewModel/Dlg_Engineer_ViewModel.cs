@@ -536,6 +536,10 @@ namespace Root_CAMELLIA
             {
                 se.SetBrush(GeneralTools.StageHoleBrush);
             }
+            foreach (ShapeEllipse se in listSelectedPoint)
+            {
+                se.SetBrush(GeneralTools.GbHole);
+            }
             nMinIndex = -1;
         }
 
@@ -557,6 +561,7 @@ namespace Root_CAMELLIA
                 return;
             }
 
+            nSelectIndex = nMinIndex;
             double centerX;
             double centerY;
             if (DataManager.Instance.m_waferCentering.m_ptCenter.X == 0 && DataManager.Instance.m_waferCentering.m_ptCenter.Y == 0)
@@ -593,6 +598,7 @@ namespace Root_CAMELLIA
 
 
         int nMinIndex = -1;
+        int nSelectIndex = -1;
         public void OnMouseMove(object sender, MouseEventArgs e)
         {
             Point pt = e.GetPosition((UIElement)sender);
@@ -1036,6 +1042,17 @@ namespace Root_CAMELLIA
                 });
             }
         }
+
+        public ICommand CmdPointMeasure
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    PointMeasureSample();
+                });
+            }
+        }
         #endregion
 
 
@@ -1151,8 +1168,39 @@ namespace Root_CAMELLIA
             });
 
         }
+
+        private void PointMeasureSample()
+        {
+            if (!EnableBtn)
+            {
+                return;
+            }
+            EQ.p_bStop = false;
+            if (ModuleCamellia.p_eState != ModuleBase.eState.Ready)
+            {
+                MessageBox.Show("Vision Home이 완료 되지 않았습니다.");
+                return;
+            }
+
+            if(nSelectIndex == -1)
+            {
+                MessageBox.Show("Measure Point가 선택되지 않았습니다.");
+                return;
+            }
+            Run_Measure measure = (Run_Measure)ModuleCamellia.CloneModuleRun("Measure");
+            UpdateParameter();
+            measure.m_isPM = true;
+            measure.m_isAlphaFit = p_pmParameter.p_isAlpha1;
+            measure.m_isPointMeasure = true;
+            measure.m_ptMeasure = new RPoint(listRealPos[nSelectIndex].x, listRealPos[nSelectIndex].y);
+            ModuleCamellia.StartRun(measure);
+        }
         private void MeasureSample()
         {
+            if (!EnableBtn)
+            {
+                return;
+            }
             EQ.p_bStop = false;
             if (ModuleCamellia.p_eState != ModuleBase.eState.Ready)
             {
@@ -1172,6 +1220,10 @@ namespace Root_CAMELLIA
         }
         private void Calibration()
         {
+            if (!EnableBtn)
+            {
+                return;
+            }
             EQ.p_bStop = false;
             if (ModuleCamellia.p_eState != ModuleBase.eState.Ready)
             {
@@ -1192,6 +1244,10 @@ namespace Root_CAMELLIA
         }
         private void InitCalibration()
         {
+            if (!EnableBtn)
+            {
+                return;
+            }
             EQ.p_bStop = false;
             if (ModuleCamellia.p_eState != ModuleBase.eState.Ready)
             {
@@ -1210,6 +1266,10 @@ namespace Root_CAMELLIA
         }
         private void Centering()
         {
+            if (!EnableBtn)
+            {
+                return;
+            }
             EQ.p_bStop = false;
             if (ModuleCamellia.p_eState != ModuleBase.eState.Ready)
             {

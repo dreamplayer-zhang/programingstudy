@@ -190,6 +190,7 @@ namespace Root_Rinse_Unloader.Module
         public string RunLoad()
         {
             if (m_rinse.p_eMode != RinseU.eRunMode.Stack) return "Run mode is not Stack";
+            if (m_roller.IsAlignerUp()) return "Check Roller Aligner Up"; 
             if (Run(RunPickerDown(false))) return p_sInfo;
             if (Run(MoveLoader(ePos.Roller))) return p_sInfo;
             while (m_roller.p_eStep != Roller.eStep.Picker)
@@ -197,14 +198,30 @@ namespace Root_Rinse_Unloader.Module
                 Thread.Sleep(10);
                 if (EQ.IsStop()) return "EQ Stop"; 
             }
+            if (Run(RunPickerLoad())) return p_sInfo; 
+            if (RunCheckStrip() != "OK")
+            {
+                if (Run(RunPickerLoad())) return p_sInfo;
+            }
+            if (RunCheckStrip() != "OK")
+            {
+                EQ.p_bStop = true;
+                EQ.p_eState = EQ.eState.Error; 
+                m_alidRollerStripCheck.p_bSet = true;
+                return "Load Strip Error"; 
+            }
+            m_roller.p_eStep = Roller.eStep.Empty;
+            if (Run(m_roller.RunRotate(true))) return p_sInfo;
+            return "OK";
+        }
+
+        string RunPickerLoad()
+        {
             if (Run(RunVacuum(true))) return p_sInfo;
             if (Run(RunPickerDown(true))) return p_sInfo;
             Thread.Sleep((int)(1000 * m_secVac));
             if (Run(RunPickerDown(false))) return p_sInfo;
-            if (Run(RunCheckStrip())) return p_sInfo;
-            m_roller.p_eStep = Roller.eStep.Empty;
-            if (Run(m_roller.RunRotate(true))) return p_sInfo;
-            return "OK";
+            return "OK"; 
         }
 
         public string RunUnload()
@@ -242,13 +259,7 @@ namespace Root_Rinse_Unloader.Module
             string sResult = "OK";
             foreach (Roller.Line line in m_roller.m_aLine)
             {
-                if (line.m_diCheck[2].p_bIn)
-                {
-                    EQ.p_bStop = true;
-                    EQ.p_eState = EQ.eState.Error; 
-                    m_alidRollerStripCheck.p_bSet = true;
-                    return "Roller Check Strip";
-                }
+                if (line.m_diCheck[2].p_bIn) return "Roller Check Strip";
             }
             return sResult;
         }

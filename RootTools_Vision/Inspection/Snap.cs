@@ -17,7 +17,12 @@ namespace RootTools_Vision
 
         protected override bool Execution()
         {
-            return false;
+            return DoSnap();
+        }
+
+        private bool DoSnap()
+        {
+            return this.currentWorkplace.SnapDone;
         }
     }
 }

@@ -21,20 +21,20 @@ namespace RootTools_Vision.WorkManager3
 
         CancellationTokenSource cts;
 
-        public WorkPipeLine()
+        public WorkPipeLine(int inspectionThreadNum = 4)
         {
-            CreatePIpeLines();
+            CreatePIpeLines(inspectionThreadNum);
         }
 
-        private void CreatePIpeLines()
+        private void CreatePIpeLines(int inspectionThreadNum)
         {
             pipes = new List<WorkPipe>();
 
             // PipeLine 생성
             pipeSnap = new WorkPipe(WORK_TYPE.SNAP);
             pipeAlignment = new WorkPipe(WORK_TYPE.ALIGNMENT);
-            pipeInspection = new WorkPipe(WORK_TYPE.INSPECTION, 4);
-            pipeDefectProcess = new WorkPipe(WORK_TYPE.DEFECTPROCESS, 4);
+            pipeInspection = new WorkPipe(WORK_TYPE.INSPECTION, inspectionThreadNum);
+            pipeDefectProcess = new WorkPipe(WORK_TYPE.DEFECTPROCESS, inspectionThreadNum);
             pipeDefectProcessAll = new WorkPipe(WORK_TYPE.DEFECTPROCESS_ALL, 1, true);
 
             pipeSnap.SetNextPipe(pipeAlignment);
@@ -61,6 +61,11 @@ namespace RootTools_Vision.WorkManager3
                 }
             }
             return result;
+        }
+
+        public bool CheckPipeDone()
+        {
+            return CheckPipesReady();
         }
 
 

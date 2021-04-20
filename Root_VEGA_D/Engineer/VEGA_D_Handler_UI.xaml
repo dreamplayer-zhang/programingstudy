@@ -4,9 +4,9 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Root_VEGA_D.Engineer"
+             xmlns:local1="clr-namespace:Root_VEGA_D"
              xmlns:module="clr-namespace:RootTools.Module;assembly=RootTools"
-             xmlns:gaf="clr-namespace:RootTools.GAFs;assembly=RootTools"
-             xmlns:efem="clr-namespace:Root_EFEM;assembly=Root_EFEM"
+             xmlns:gaf="clr-namespace:RootTools.GAFs;assembly=RootTools" 
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <TabControl>
@@ -20,7 +20,7 @@
                         <local:VEGA_D_Recipe_UI x:Name="recipeUI"/>
                     </TabItem>
                     <TabItem Header="Process" Background="{Binding p_brushHandler}">
-                        <efem:EFEM_Process_UI x:Name="processUI"/>
+                        <local1:VEGA_D_Process_UI x:Name="processUI"/>
                     </TabItem>
                     <TabItem Header="GAF" Background="{Binding p_brushHandler}">
                         <gaf:GAF_UI x:Name="gafUI"/>

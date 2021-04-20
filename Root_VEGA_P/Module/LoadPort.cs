@@ -533,9 +533,10 @@ namespace Root_VEGA_P.Module
 
         public void RunTreeTeach(Tree tree)
         {
+            Tree treeTeach = tree.GetTree(p_id); 
             for (int n = 0; n < 4; n++)
             {
-                m_teachRTR[n] = tree.Set(m_teachRTR[n], m_teachRTR[n], ((InfoPod.ePod)n).ToString(), "RND RTR Teach"); 
+                m_teachRTR[n] = treeTeach.Set(m_teachRTR[n], m_teachRTR[n], ((InfoPod.ePod)n).ToString(), "RND RTR Teach"); 
             }
         }
         #endregion

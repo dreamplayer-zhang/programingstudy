@@ -145,6 +145,7 @@ namespace RootTools
 			nIdx = item.nIdx;
 			nLength = item.nLength;
 			bMergeUsed = false;
+			nGV = item.nGV;
 
 			ClusterItems = new List<DefectDataWrapper>();
 		}

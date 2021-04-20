@@ -239,12 +239,12 @@ namespace Root_Rinse_Loader.Module
             if (m_axis.p_posCommand > m_posStackReady - m_pulseDown) MoveStack();
             if (m_stack.p_bLevel)
             {
-                m_axis.Jog(-m_fJogScale);
+                m_axis.Jog(-m_fJogScale, "Move");
                 while (m_stack.p_bLevel && (EQ.IsStop() == false)) Thread.Sleep(10);
                 m_axis.StopAxis();
                 Thread.Sleep(500);
             }
-            m_axis.Jog(m_fJogScale);
+            m_axis.Jog(m_fJogScale, "Move");
             while (!m_stack.p_bLevel && (EQ.IsStop() == false)) Thread.Sleep(10);
             m_posStackReady = m_axis.p_posCommand;
             m_axis.StopAxis();

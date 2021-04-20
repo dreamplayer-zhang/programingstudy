@@ -14,5 +14,6 @@ public:
 	int nFOV;
 	double fPosX;
 	double fPosY;
+	int nGV;
 };
 
