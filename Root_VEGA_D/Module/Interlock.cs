@@ -201,14 +201,16 @@ namespace Root_VEGA_D.Module
 		}
         #endregion
         #region Thread
+        EQ.eState m_eStateLast;
         protected override void RunThread()
         {
             base.RunThread();
-            m_alidEmergency.Run(!m_diEmergency.p_bIn, "Please Check Emergency Sensor");
-            if (!m_diMCReset.p_bIn)
+            //m_alidEmergency.Run(!m_diEmergency.p_bIn, "Please Check Emergency Sensor");
+            if (!m_diMCReset.p_bIn && !m_diEmergency.p_bIn)
             {
+                m_alidEmergency.Run(true, "Please Check Emergency Sensor");
                 Thread.Sleep(100);
-                if (!m_diCDA1.p_bIn) m_alidMCReset_EMO.Run(!m_diMCReset.p_bIn, "Please Check M/C Reset (EMO)");
+                if (m_ACS.p_bConnect == false) m_alidMCReset_EMO.Run(!m_diMCReset.p_bIn, "Please Check M/C Reset (EMO)");
                 else m_alidMCReset_EMS.Run(!m_diMCReset.p_bIn, "Please Check M/C Reset (EMS)");
             }
             if (m_diInterlock_key.p_bIn)
@@ -235,6 +237,13 @@ namespace Root_VEGA_D.Module
             m_alidElecRackFan_Alarm.Run(!m_diELECRackFan_Alarm.p_bIn, "Elec Rack Fan Alarm");
             m_alidPiezo_Alarm.Run(!m_diPiezo_Alarm.p_bIn, "Piezo Alarm");
 
+            m_eStateLast = EQ.p_eState;
+            if (m_bDoorlock_Use == true && (m_eStatelast != EQ.p_eState))
+            {
+                if (EQ.p_eState == EQ.eState.Run) m_doDoorLock.Write(true);
+                else m_doDoorLock.Write(false);
+            }
+
             if (m_bLightCurtain_Use)
             {
                 m_alidLightCurtain.Run(!m_diLightCurtain.p_bIn, "Light Curtain Detect Error"); 
@@ -247,6 +256,7 @@ namespace Root_VEGA_D.Module
         #endregion
 
         #region Tree
+        bool m_bDoorlock_Use = false;
         bool m_bLightCurtain_Use = false;
         bool m_bProtectionbar_Use = false;
         public override void RunTree(Tree tree)
@@ -257,6 +267,7 @@ namespace Root_VEGA_D.Module
         }
         void RunTreeFDC(Tree tree)
         {
+            m_bDoorlock_Use = tree.Set(m_bDoorlock_Use, m_bDoorlock_Use, "Doorlock Use", "Doorlock Use");
             m_mmLimitCDA1 = tree.Set(m_mmLimitCDA1, m_mmLimitCDA1, "Limit", "FDC CDA1 Lower & Upper Limit");
             m_mmLimitCDA2 = tree.Set(m_mmLimitCDA2, m_mmLimitCDA2, "Limit", "FDC CDA2 Lower & Upper Limit");
         }

@@ -218,11 +218,11 @@ namespace Root_VEGA_D
         {
             TimerUI();
             TimerLamp();
-            NowTime.Text = "Date : " + DateTime.Now.ToString("yyyy.MM.dd  \r\n           tt hh:mm:ss", CultureInfo.InvariantCulture);
-            LoadportABack.Background = m_handler.m_aLoadport[0].p_infoCarrier.m_aInfoWafer[0] != null && m_handler.m_aLoadport[0].p_bPlaced && m_handler.m_aLoadport[0].p_bPresent ? Brushes.MediumSlateBlue : Brushes.Gray;
-            LoadportBBack.Background = m_handler.m_aLoadport[1].p_infoCarrier.m_aInfoWafer[0] != null && m_handler.m_aLoadport[1].p_bPlaced && m_handler.m_aLoadport[1].p_bPresent ? Brushes.MediumSlateBlue : Brushes.Gray;
-            RobotBack.Background = m_handler.m_wtr.m_dicArm[0].p_infoWafer != null ? Brushes.MediumSlateBlue : Brushes.Gray;
-            VisionBack.Background = m_handler.m_vision.p_infoWafer != null ? Brushes.MediumSlateBlue : Brushes.Gray;
+            NowTime.Text = "Date : " + DateTime.Now.ToString("yyyy.MM.dd tt hh:mm:ss", CultureInfo.InvariantCulture);
+            LoadportABack.Background = m_handler.m_aLoadport[0].p_infoCarrier.m_aInfoWafer[0] != null && m_handler.m_aLoadport[0].p_bPlaced && m_handler.m_aLoadport[0].p_bPresent ? Brushes.MediumSlateBlue : Brushes.AliceBlue;
+            LoadportBBack.Background = m_handler.m_aLoadport[1].p_infoCarrier.m_aInfoWafer[0] != null && m_handler.m_aLoadport[1].p_bPlaced && m_handler.m_aLoadport[1].p_bPresent ? Brushes.MediumSlateBlue : Brushes.AliceBlue;
+            RobotBack.Background = m_handler.m_wtr.m_dicArm[0].p_infoWafer != null ? Brushes.MediumSlateBlue : Brushes.AliceBlue;
+            VisionBack.Background = m_handler.m_vision.p_infoWafer != null ? Brushes.MediumSlateBlue : Brushes.AliceBlue;
             buttonResume.IsEnabled = IsEnable_Resume();
             buttonPause.IsEnabled = IsEnable_Pause();
             buttonInitialize.IsEnabled = IsEnable_Initial();

@@ -33,59 +33,66 @@
                             <TextBlock Text="Carrier ID"
                                        FontSize="15"
                                        VerticalAlignment="Center"
-                                       HorizontalAlignment="Stretch"
+                                       HorizontalAlignment="Left"
                                        FontWeight="Bold"
-                                       Margin="30,0"/>
+                                       Margin="40,0"/>
                         </Border>
                         <Border>
                             <TextBlock x:Name="textBoxPodID"
                                        FontSize="15"
                                        Text="{Binding p_sCarrierID}"
                                        VerticalAlignment="Center"
-                                       Margin="30,0"/>
+                                       HorizontalAlignment="Left"
+                                       Margin="40,0"/>
                         </Border>
                         <Border>
                             <TextBlock Text="Lot ID"
                                        FontSize="15"
                                        VerticalAlignment="Center"
+                                       HorizontalAlignment="Left"
                                         FontWeight="Bold"
-                                       Margin="30,0"/>
+                                       Margin="40,0"/>
                         </Border>
                         <Border>
                             <TextBlock x:Name="textBoxLotID"
                                        FontSize="15"
                                        Text="{Binding p_sLotID}"
                                        VerticalAlignment="Center"
-                                       Margin="30,0"/>
+                                       HorizontalAlignment="Left"
+                                       Margin="40,0"/>
                         </Border>
 
                         <Border>
                             <TextBlock Text="Recipe ID"
                                        FontSize="15"
                                        VerticalAlignment="Center"
+                                       HorizontalAlignment="Left"
                                        FontWeight="Bold"
-                                       Margin="30,0"/>
+                                       Margin="40,0"/>
                         </Border>
                         <Border>
                             <TextBlock Text="{Binding p_sRecipe}"
                                        FontSize="15"
                                        x:Name="textBoxRecipeID"
                                        VerticalAlignment="Center"
-                                       Margin="30,0"/>
+                                       HorizontalAlignment="Left"
+                                       Margin="40,0"/>
                         </Border>
 
                         <Border>
                             <TextBlock Text="State"
                                        FontSize="15"
                                        VerticalAlignment="Center"
+                                       HorizontalAlignment="Left"
                                        FontWeight="Bold"
-                                       Margin="30,0"/>
+                                       Margin="40,0"/>
                         </Border>
                         <Border>
                             <TextBlock Text="{Binding p_eState}"
                                        FontSize="15"
                                        VerticalAlignment="Center"
-                                       Margin="30,0"/>
+                                       HorizontalAlignment="Left"
+                                       Margin="40,0"/>
                         </Border>
                     </UniformGrid>
                 </GroupBox>
