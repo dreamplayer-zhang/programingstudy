@@ -39,9 +39,6 @@ namespace Root_EFEM.Module
         }
         #endregion
 
-        #region DIO
-        #endregion
-
         #region ToolBox
         public DIO_I m_diReticleCheck;
         TCPIPClient m_tcpip; 
@@ -541,10 +538,10 @@ namespace Root_EFEM.Module
 		{
             m_alidRTRCmdError = m_gaf.GetALID(this, "Cymechs", "RTR CMD ERROR");
 		}
+        #endregion
 
-
-		#region Protocol
-		public enum eCmd
+        #region Protocol
+        public enum eCmd
         {
             CLEAR,
             HOME,

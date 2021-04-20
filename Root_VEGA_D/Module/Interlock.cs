@@ -238,7 +238,7 @@ namespace Root_VEGA_D.Module
             m_alidPiezo_Alarm.Run(!m_diPiezo_Alarm.p_bIn, "Piezo Alarm");
 
             m_eStateLast = EQ.p_eState;
-            if (m_bDoorlock_Use == true && (m_eStatelast != EQ.p_eState))
+            if (m_bDoorlock_Use == true && (m_eStateLast != EQ.p_eState))
             {
                 if (EQ.p_eState == EQ.eState.Run) m_doDoorLock.Write(true);
                 else m_doDoorLock.Write(false);

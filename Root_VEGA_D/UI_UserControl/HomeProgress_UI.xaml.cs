@@ -66,7 +66,13 @@ namespace Root_VEGA_D
             {
                 progressWTR.Value = (int)(100 * Math.Min((double)((double)m_swWTR.ElapsedMilliseconds / (((WTR_Cymechs)m_handler.m_wtr).m_secHome * 1000)), (double)1.0));
             }
-            else if (m_handler.m_wtr.p_eState == ModuleBase.eState.Ready) progressWTR.Value = 100;
+            else if (m_handler.m_wtr.p_eState == ModuleBase.eState.Ready)
+            {
+                progressWTR.Value = 100;
+                m_swLoadport[0].Start();
+                m_swLoadport[1].Start();
+                m_swVision.Start();
+            }
             else if (m_handler.m_wtr.p_eState == ModuleBase.eState.Error) progressWTR.Value = 0;    //working
             else progressWTR.Value = 0;
 
