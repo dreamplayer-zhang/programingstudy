@@ -14,6 +14,7 @@ namespace Root_VEGA_P.Module
             p_sInfo = m_flowSensor.GetTools(this); 
             if (bInit)
             {
+                m_flowSensor.m_modbus.Connect(); 
             }
         }
         #endregion
@@ -21,7 +22,7 @@ namespace Root_VEGA_P.Module
         #region Flow Sensor
         public class FlowSensor : NotifyProperty
         {
-            Modbus m_modbus; 
+            public Modbus m_modbus; 
             public string GetTools(VEGA_P vegaP)
             {
                 return vegaP.m_toolBox.GetComm(ref m_modbus, vegaP, "Modbus"); 
@@ -30,16 +31,11 @@ namespace Root_VEGA_P.Module
             public class Channel
             {
                 Modbus m_modbus;
-                List<int> m_aRead = new List<int>(); 
-                public string Read()
+                public string Read(ref double fFlow)
                 {
-                    m_modbus.ReadHoldingRegister((byte)p_nUnit, 0, m_aRead); 
-                    for (int n = 0; n < 0x28; n+=4)
-                    {
-                        string sLog = "";
-                        for (int i = 0; i < 4; i++) sLog += m_aRead[n + i].ToString() + "\t";
-                        m_vegaP.m_log.Info(sLog); 
-                    }
+                    int nFlow = 0; 
+                    m_modbus.ReadHoldingRegister((byte)p_nUnit, 5, ref nFlow);
+                    fFlow = nFlow / 10.0; 
                     return "OK"; 
                 }
 
@@ -52,7 +48,6 @@ namespace Root_VEGA_P.Module
                     p_id = id + "." + nUnit.ToString("00");
                     m_vegaP = vegaP; 
                     m_modbus = vegaP.m_flowSensor.m_modbus;
-                    for (int n = 0; n <= 0x28; n++) m_aRead.Add(0); 
                 }
             }
             public List<Channel> m_aChannel = new List<Channel>();
@@ -68,11 +63,11 @@ namespace Root_VEGA_P.Module
                 }
             }
 
-            public string Read(int nChannel)
+            public string Read(int nChannel, ref double fFlow)
             {
                 if (nChannel < 0) return "Invalid Channel";
-                if (nChannel >= m_aChannel.Count) return "Invalid Channel";
-                return m_aChannel[nChannel].Read(); 
+                if (nChannel > m_aChannel.Count) return "Invalid Channel";
+                return m_aChannel[nChannel - 1].Read(ref fFlow); 
             }
 
             public void RunTree(Tree tree)

@@ -153,6 +153,7 @@ namespace RootTools.Control.ACS
         {
             m_bThread = true;
             Thread.Sleep(2000);
+            int nCount = 0;
             while (m_bThread)
             {
                 Thread.Sleep(1);
@@ -160,7 +161,17 @@ namespace RootTools.Control.ACS
                 {
                     m_dio.RunThreadCheck();
                     m_listAxis.RunThreadCheck();
-                    foreach (Buffer buffer in m_aBuffer) buffer.CheckState(); 
+                    foreach (Buffer buffer in m_aBuffer) buffer.CheckState();
+                }
+                else
+                {
+                    p_bConnect = true;
+                    Thread.Sleep(100);
+                    nCount++;
+                    if (nCount > 500)
+                    {
+                        m_log.Error("ACS Connect Error");
+                    }
                 }
             }
         }
@@ -199,8 +210,18 @@ namespace RootTools.Control.ACS
         }
         public double GetAnalogData(int portnum)
         {
-			double Data;
-                m_channel.GetAnalogInputNT(portnum, out Data);
+            double Data = new double();
+            if (portnum == 0)
+            {
+                Data = m_channel.ReadVariable("CDA1", -1);
+                System.Diagnostics.Debug.WriteLine(Data);
+            }
+            else if (portnum == 1)
+            {
+                Data = m_channel.ReadVariable("CDA2", -1);
+                System.Diagnostics.Debug.WriteLine(Data);
+            }
+            m_channel.GetAnalogInputNT(portnum, out Data);
             return Data;
         }
         #endregion

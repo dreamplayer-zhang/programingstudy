@@ -6,6 +6,7 @@ using RootTools.ParticleCounter;
 using RootTools.ToolBoxs;
 using RootTools.Trees;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Threading;
@@ -179,7 +180,7 @@ namespace Root_VEGA_P.Module
         public override void RunTree(Tree tree)
         {
             base.RunTree(tree);
-            m_nozzleSet.RunTreeName(tree.GetTree("NozzleSet"));
+            m_nozzleSet.RunTreeSetup(tree.GetTree("NozzleSet"));
             RunTreeFlow(tree.GetTree("Flow Sensor"));
             RunTreeLasair(tree.GetTree("Lasair"));
         }
@@ -297,19 +298,19 @@ namespace Root_VEGA_P.Module
             public Run_Run(ParticleCounter module)
             {
                 m_module = module;
-                m_open = new NozzleSet.Open(m_module.m_nozzleSet.m_open);
+                m_aOpen = m_module.m_nozzleSet.GetCloneOpen(); 
                 m_sample = new ParticleCounterBase.Sample(); 
                 InitModuleRun(module);
             }
 
             public double m_hPa = 2;
-            public NozzleSet.Open m_open;
+            public List<bool> m_aOpen;
             public ParticleCounterBase.Sample m_sample; 
             public override ModuleRunBase Clone()
             {
                 Run_Run run = new Run_Run(m_module);
                 run.m_hPa = m_hPa;
-                run.m_open = new NozzleSet.Open(m_open);
+                for (int n = 0; n < m_aOpen.Count; n++) run.m_aOpen[n] = m_aOpen[n]; 
                 run.m_sample = new ParticleCounterBase.Sample(m_sample); 
                 return run;
             }
@@ -317,8 +318,8 @@ namespace Root_VEGA_P.Module
             public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
             {
                 m_hPa = tree.Set(m_hPa, m_hPa, "hPa", "Pump Power (1 ~ 5 hPa)", bVisible);
-                m_sample.RunTree(tree.GetTree("Sample")); 
-                m_open.RunTree(tree.GetTree("Nozzle")); 
+                m_sample.RunTree(tree.GetTree("Sample"));
+                m_module.m_nozzleSet.RunTreeOpen(tree.GetTree("Nozzle"), m_aOpen); 
             }
 
             public override string Run()

@@ -24,17 +24,35 @@ namespace Root_VEGA_D.Module
 {
     public class Vision : ModuleBase, IWTRChild
     {
+        #region GAF
+        public ALID m_visionHomeError;
+        public ALID m_visionInspectError;
+        public ALID m_alidShutterDownError;
+        public ALID m_alidShutterUpError;
         ALID m_alid_WaferExist;
+        void InitGAF()
+        {
+            m_visionHomeError = m_gaf.GetALID(this, "Vision Home Error", "Vision Home Error");
+            m_visionInspectError = m_gaf.GetALID(this, "Vision Inspect Error", "Vision Inspect Error");
+            m_alidShutterDownError = m_gaf.GetALID(this, "VS Shutter Error", "Shutter is not down");
+            m_alidShutterUpError = m_gaf.GetALID(this, "VS Shutter Error", "Shutter is not up");
+        }
         public void SetAlarm()
         {
             m_alid_WaferExist.Run(true, "Vision Wafer Exist Error");
         }
-        #region ToolBox
-        Axis m_axisRotate;
+		#endregion
+
+		#region ToolBox
+		Axis m_axisRotate;
         Axis m_axisZ;
         AxisXY m_axisXY;
         DIO_O m_doVac;
         DIO_O m_doBlow;
+        DIO_O m_doShutterDown;
+        DIO_O m_doShutterUp;
+        DIO_I m_diShutterDownCheck;
+        DIO_I m_diShutterUpCheck;
         MemoryPool m_memoryPool;
         MemoryGroup m_memoryGroup;
         MemoryData m_memoryMain;
@@ -77,6 +95,10 @@ namespace Root_VEGA_D.Module
             p_sInfo = m_toolBox.GetAxis(ref m_axisXY, this, "Axis XY");
             p_sInfo = m_toolBox.GetDIO(ref m_doVac, this, "Stage Vacuum");
             p_sInfo = m_toolBox.GetDIO(ref m_doBlow, this, "Stage Blow");
+            p_sInfo = m_toolBox.GetDIO(ref m_doShutterUp, this, "Shutter Up");
+            p_sInfo = m_toolBox.GetDIO(ref m_doShutterDown, this, "Shutter Down");
+            p_sInfo = m_toolBox.GetDIO(ref m_diShutterUpCheck, this, "Shutter Up Check");
+            p_sInfo = m_toolBox.GetDIO(ref m_diShutterDownCheck, this, "Shutter Down Check");
             p_sInfo = m_toolBox.Get(ref m_lightSet, this);
             p_sInfo = m_toolBox.GetCamera(ref m_CamMain, this, "MainCam");
             p_sInfo = m_toolBox.GetCamera(ref m_CamAlign, this, "AlignCam");
@@ -290,6 +312,20 @@ namespace Root_VEGA_D.Module
 
         public string BeforeGet(int nID)
         {
+            ////shutter
+            //m_doShutterUp.Write(false);
+            //Thread.Sleep(100);
+            //m_doShutterDown.Write(true);
+            //StopWatch sw = new StopWatch();
+            //sw.Start();
+            //while (!m_diShutterDownCheck.p_bIn || m_diShutterUpCheck.p_bIn)
+            //{
+            //    if (sw.ElapsedMilliseconds > 5000)
+            //    {
+            //        m_alidShutterDownError.Run(true, "Shutter error in Beforeget");
+            //    }
+            //}
+            ////
             if (p_eRemote == eRemote.Client) return RemoteRun(eRemoteRun.BeforeGet, eRemote.Client, nID);
             else
             {
@@ -319,6 +355,20 @@ namespace Root_VEGA_D.Module
 
         public string BeforePut(int nID)
         {
+            ////shutter
+            //m_doShutterUp.Write(false);
+            //Thread.Sleep(100);
+            //m_doShutterDown.Write(true);
+            //StopWatch sw = new StopWatch();
+            //sw.Start();
+            //while (!m_diShutterDownCheck.p_bIn || m_diShutterUpCheck.p_bIn)
+            //{
+            //    if (sw.ElapsedMilliseconds > 5000)
+            //    {
+            //        m_alidShutterDownError.Run(true, "Shutter error in Beforeput");
+            //    }
+            //}
+            ////
             if (p_eRemote == eRemote.Client) return RemoteRun(eRemoteRun.BeforePut, eRemote.Client, nID);
             else
             {
@@ -346,11 +396,39 @@ namespace Root_VEGA_D.Module
 
         public string AfterGet(int nID)
         {
+            ////shutter
+            //m_doShutterDown.Write(false);
+            //Thread.Sleep(100);
+            //m_doShutterUp.Write(true);
+            //StopWatch sw = new StopWatch();
+            //sw.Start();
+            //while (m_diShutterDownCheck.p_bIn || !m_diShutterUpCheck.p_bIn)
+            //{
+            //    if (sw.ElapsedMilliseconds > 5000)
+            //    {
+            //        m_alidShutterDownError.Run(true, "Shutter error in Afterget");
+            //    }
+            //}
+            ////
             return "OK";
         }
 
         public string AfterPut(int nID)
         {
+            ////shutter
+            //m_doShutterDown.Write(false);
+            //Thread.Sleep(100);
+            //m_doShutterUp.Write(true);
+            //StopWatch sw = new StopWatch();
+            //sw.Start();
+            //while (m_diShutterDownCheck.p_bIn || !m_diShutterUpCheck.p_bIn)
+            //{
+            //    if (sw.ElapsedMilliseconds > 5000)
+            //    {
+            //        m_alidShutterDownError.Run(true, "Shutter error in Afterput");
+            //    }
+            //}
+            ////
             return "OK";
         }
 
@@ -410,6 +488,7 @@ namespace Root_VEGA_D.Module
                 if (m_CamMain != null && m_CamMain.p_CamInfo.p_eState == eCamState.Init) m_CamMain.Connect();
 
                 p_sInfo = base.StateHome();
+                m_visionHomeError.Run(p_sInfo != "OK", "Vision Home Error");
                 p_eState = (p_sInfo == "OK") ? eState.Ready : eState.Error;
 
                 ClearData();
@@ -417,6 +496,12 @@ namespace Root_VEGA_D.Module
                 return "OK";
             }
         }
+        public int m_secHome = 60;
+        void RunTreeTimeout(Tree tree)
+        {
+            m_secHome = tree.Set(m_secHome, m_secHome, "Home", "Timeout (sec)");
+        }
+
         #endregion
 
         #region Tree
@@ -441,6 +526,7 @@ namespace Root_VEGA_D.Module
 
             m_tcpipCommServer = new TCPIPComm_VEGA_D(server);
             m_tcpipCommServer.EventReciveData += EventReceiveData;
+            InitGAF();
         }
 
         private void Vision_OnChangeState(eState eState)

@@ -18,8 +18,8 @@ namespace Root_VEGA_P.Module
         public override void GetTools(bool bInit)
         {
             p_sInfo = m_toolBox.GetAxis(ref m_axis, this, "Y");
-            p_sInfo = m_toolBox.GetDIO(ref m_doCoverDown, this, "Cover", Enum.GetNames(typeof(eCoverDown)));
-            p_sInfo = m_toolBox.GetDIO(ref m_doCoverDownX, this, "Cover X", Enum.GetNames(typeof(eCoverDown)));
+            p_sInfo = m_toolBox.GetDIO(ref m_doCoverDown, this, "Cover", Enum.GetNames(typeof(eCover)));
+            p_sInfo = m_toolBox.GetDIO(ref m_doCoverDownX, this, "Cover X", Enum.GetNames(typeof(eCover)));
             m_dome.GetTools(m_toolBox, bInit);
             m_door.GetTools(m_toolBox, bInit); 
             if (bInit) InitPos();
@@ -45,7 +45,7 @@ namespace Root_VEGA_P.Module
         #endregion
 
         #region CoverDown
-        public enum eCoverDown
+        public enum eCover
         {
             Up,
             Down
@@ -53,8 +53,8 @@ namespace Root_VEGA_P.Module
         double m_secCoverDown = 3; 
         public string RunCoverDown(bool bDown)
         {
-            m_doCoverDown.Write(bDown ? eCoverDown.Down : eCoverDown.Up);
-            m_doCoverDownX.Write(bDown ? eCoverDown.Down : eCoverDown.Up);
+            m_doCoverDown.Write(bDown ? eCover.Down : eCover.Up);
+            m_doCoverDownX.Write(bDown ? eCover.Down : eCover.Up);
             StopWatch sw = new StopWatch();
             int msDown = (int)(1000 * m_secCoverDown);
             while (sw.ElapsedMilliseconds < msDown)
@@ -256,7 +256,7 @@ namespace Root_VEGA_P.Module
 
             public void RunTreeTeach(Tree tree)
             {
-                m_teach = tree.Set(m_teach, m_teach, m_EOP.p_id + "." + p_id, "RND RTR Teach");
+                m_teach = tree.GetTree("Particle Counter").Set(m_teach, m_teach, m_EOP.p_id + " " + p_id, "RND RTR Teach");
             }
             #endregion
 
@@ -436,7 +436,7 @@ namespace Root_VEGA_P.Module
 
             public void RunTreeTeach(Tree tree)
             {
-                m_teach = tree.Set(m_teach, m_teach, m_EOP.p_id + "." + p_id, "RND RTR Teach");
+                m_teach = tree.GetTree("Particle Counter").Set(m_teach, m_teach, m_EOP.p_id + " " + p_id, "RND RTR Teach");
             }
             #endregion
 
@@ -520,7 +520,7 @@ namespace Root_VEGA_P.Module
             string sHome = base.StateHome(m_axis);
             p_eState = (sHome == "OK") ? eState.Ready : eState.Error;
             Reset(); 
-            return "OK";
+            return sHome;
         }
         #endregion
 
@@ -528,7 +528,7 @@ namespace Root_VEGA_P.Module
         public override void RunTree(Tree tree)
         {
             base.RunTree(tree);
-            RunTreeCoverDown(tree.GetTree("Cover Down"));
+            RunTreeCoverDown(tree.GetTree("Cover"));
             m_dome.RunTree(tree.GetTree("Dome"));
             m_door.RunTree(tree.GetTree("Door"));
         }
