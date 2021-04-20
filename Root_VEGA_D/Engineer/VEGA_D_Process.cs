@@ -211,10 +211,10 @@ namespace Root_VEGA_D.Engineer
             foreach (Locate locate in m_aLocate) locate.p_calcWafer = locate.p_infoWafer;
             foreach (InfoWafer infoWafer in m_aInfoWafer)
             {
+                    infoWafer.m_qCalcProcess.Clear();
 
                 if (ManualJobSchedule_UI.bParallel)
                 {
-                    infoWafer.m_qCalcProcess.Clear();
                     ModuleRunBase[] aProcess = infoWafer.m_qProcess.ToArray();
                     foreach (ModuleRunBase run in aProcess) infoWafer.m_qCalcProcess.Enqueue(run);
                 }
