@@ -122,7 +122,7 @@
                       Style="{StaticResource main_view_groupbox}">
                 <StackPanel Margin="4">
                     <DataGrid ItemsSource="{Binding p_cOptionItem}"
-                                              SelectedItem="{Binding p_selectedInspItem}"
+                                              SelectedItem="{Binding p_selectedOptionItem, Mode=TwoWay}"
                                               SelectionMode="Single"
                                               IsReadOnly="True"
                                               AutoGenerateColumns="False">
@@ -178,10 +178,15 @@
                       Style="{StaticResource main_view_groupbox}">
                 <StackPanel Margin="4">
                     <DataGrid ItemsSource="{Binding p_cInspItem}"
-                              SelectedItem="{Binding p_selectedInspItem}"
+                              SelectedItem="{Binding p_selectedInspItem, Mode=TwoWay}"
                               SelectionMode="Single"
                               IsReadOnly="True"
                               AutoGenerateColumns="False">
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger EventName="MouseLeftButtonUp">
+                                <i:InvokeCommandAction Command="{Binding InspectionItemClickedCommand}" />
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
                         <DataGrid.Resources>
                             <CollectionViewSource Source="{Binding p_cInspItem}" x:Key="items"/>
                             <Style TargetType="DataGridColumnHeader">

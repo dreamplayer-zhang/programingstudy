@@ -186,6 +186,23 @@ namespace Root_WIND2.UI_User
             }
         }
 
+        private InspectionItem m_selectedOptionItem;
+        public InspectionItem p_selectedOptionItem
+        {
+            get
+            {
+                return m_selectedOptionItem;
+            }
+            set
+            {                
+                m_selectedOptionItem = null;
+                SetProperty(ref m_selectedOptionItem, value);
+                if (m_selectedOptionItem != null)
+                    p_selectedMethodItem = m_selectedOptionItem.p_InspMethod;
+            }
+        }
+
+
         private InspectionItem m_selectedInspItem;
         public InspectionItem p_selectedInspItem
         {
@@ -294,6 +311,14 @@ namespace Root_WIND2.UI_User
             });
         }
 
+        public ICommand InspectionItemClickedCommand
+        {
+            get => new RelayCommand(() =>
+             {
+                 this.p_selectedMethodItem = this.p_selectedInspItem.p_InspMethod;
+             });
+        }
+
         public ICommand btnAddInspItem
         {
             get
@@ -317,7 +342,7 @@ namespace Root_WIND2.UI_User
             get
             {
                 return new RelayCommand(() =>
-                {
+                {                    
                     m_selectedInspItem.p_InspMethod = p_selectedInspItem.p_InspMethod;
                     SetParameter();
                 });
