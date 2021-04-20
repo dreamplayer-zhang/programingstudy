@@ -73,7 +73,7 @@ namespace RootTools_Vision
 
         public CPoint ConvertRelToAbs_Chip(CPoint ptRel)
         {
-            return new CPoint(this.currentWorkplace.PositionX + ptRel.X, this.currentWorkplace.PositionY + this.recipeOrigin.DiePitchY + ptRel.Y);
+            return new CPoint(this.currentWorkplace.PositionX + ptRel.X, this.currentWorkplace.PositionY + this.recipeOrigin.OriginHeight + ptRel.Y);
         }
 
         public bool DoPosition()

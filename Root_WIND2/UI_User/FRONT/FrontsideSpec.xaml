@@ -111,16 +111,82 @@
             </GroupBox>
         </Grid>
         <Grid Grid.Column="1">
-            <GroupBox Header="Inspection Item"
+            <Grid.RowDefinitions>
+                <RowDefinition Height="200"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <GroupBox Grid.Row="0" Header="Inspection Option Item"
+                      Margin="4"
+                      Background="{StaticResource GroupBoxBackground}"
+                      Style="{StaticResource main_view_groupbox}">
+                <StackPanel Margin="4">
+                    <DataGrid ItemsSource="{Binding p_cOptionItem}"
+                                              SelectedItem="{Binding p_selectedOptionItem, Mode=TwoWay}"
+                                              SelectionMode="Single"
+                                              IsReadOnly="True"
+                                              AutoGenerateColumns="False">
+                        <DataGrid.Resources>
+                            <CollectionViewSource Source="{Binding p_cOptionItem}" x:Key="items"/>
+                            <Style TargetType="DataGridColumnHeader">
+                                <Setter Property="HorizontalAlignment" Value="Stretch"/>
+                                <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                            </Style>
+                            <Style x:Key="TextInCellLeft" TargetType="{x:Type TextBlock}" >
+                                <Setter Property="TextAlignment" Value="Left"/>
+                                <Setter Property="VerticalAlignment" Value="Bottom"/>
+                                <Setter Property="FontSize" Value="14"/>
+                                <Setter Property="Height" Value="24"/>
+                                <Setter Property="Margin" Value="12,6,0,0"/>
+                            </Style>
+                            <Style x:Key="TextInCellCenter" TargetType="{x:Type TextBlock}" >
+                                <Setter Property="TextAlignment" Value="Center"/>
+                                <Setter Property="VerticalAlignment" Value="Bottom"/>
+                                <Setter Property="FontSize" Value="14"/>
+                                <Setter Property="Height" Value="24"/>
+                                <Setter Property="Margin" Value="0,6,0,0"/>
+                            </Style>
+                            <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" 
+                                                             Color="Gainsboro"/>
+
+                        </DataGrid.Resources>
+
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="No." Width="35"
+                                                                ElementStyle="{StaticResource TextInCellCenter}"
+                                                                Binding="{Binding Converter={StaticResource IndexConverter}, 
+                                                                ConverterParameter={StaticResource ResourceKey=items}}"/>
+
+                            <DataGridTextColumn Header="Inspection Option Item" Width="*"
+                                                                    ElementStyle="{StaticResource TextInCellLeft}"
+                                                                    Binding="{Binding p_InspMethod.Name,
+                                                                    Converter={StaticResource StringConverter}}"/>
+                            
+                            <DataGridTextColumn Header="Use" Width="*"
+                                                                    ElementStyle="{StaticResource TextInCellCenter}"
+                                                                    Binding="{Binding p_InspMethod.Use,
+                                                                    Converter={StaticResource StringConverter}}"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </StackPanel>
+            </GroupBox>
+
+
+            <GroupBox Grid.Row="1" Header="Inspection Item"
                       Margin="4"
                       Background="{StaticResource GroupBoxBackground}"
                       Style="{StaticResource main_view_groupbox}">
                 <StackPanel Margin="4">
                     <DataGrid ItemsSource="{Binding p_cInspItem}"
-                                              SelectedItem="{Binding p_selectedInspItem}"
-                                              SelectionMode="Single"
-                                              IsReadOnly="True"
-                                              AutoGenerateColumns="False">
+                              SelectedItem="{Binding p_selectedInspItem, Mode=TwoWay}"
+                              SelectionMode="Single"
+                              IsReadOnly="True"
+                              AutoGenerateColumns="False">
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger EventName="MouseLeftButtonUp">
+                                <i:InvokeCommandAction Command="{Binding InspectionItemClickedCommand}" />
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
                         <DataGrid.Resources>
                             <CollectionViewSource Source="{Binding p_cInspItem}" x:Key="items"/>
                             <Style TargetType="DataGridColumnHeader">
@@ -256,6 +322,9 @@
                             Style="{StaticResource groupbox_button}"/>
                 </StackPanel>
             </GroupBox>
+
+
+            
         </Grid>
         <Grid Grid.Column="2">
             <GroupBox Header="Method Spec" 
