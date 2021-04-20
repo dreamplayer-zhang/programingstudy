@@ -1,7 +1,6 @@
 ﻿using Root_EFEM;
 using Root_EFEM.Module;
 using Root_VEGA_D.Module;
-using Root_VEGA_D_IPU.Module;
 using RootTools;
 using RootTools.GAFs;
 using RootTools.Gem;
@@ -36,7 +35,6 @@ namespace Root_VEGA_D.Engineer
         public VEGA_D_Recipe m_recipe;
         public VEGA_D_Process m_process;
         public Vision m_vision;
-        public Vision_IPU m_visionIPU;
         public HomeProgress_UI m_HomeProgress = new HomeProgress_UI();
         public Interlock m_interlock;
         public TowerLamp m_towerlamp;
@@ -54,8 +52,6 @@ namespace Root_VEGA_D.Engineer
             m_vision = new Vision("Vision", m_engineer);
             InitModule(m_vision);
             iWTR.AddChild(m_vision);
-            m_visionIPU = new Vision_IPU("Vision_IPU", m_engineer);
-            InitModule(m_visionIPU);
             m_FDC = new FDC("FDC", m_engineer);
             InitModule(m_FDC);
             m_FFU = new FFU("FFU", m_engineer);

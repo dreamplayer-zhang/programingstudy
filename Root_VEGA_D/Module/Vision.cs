@@ -19,6 +19,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Net.Sockets;
 using System.Threading;
+using System.Windows.Threading;
 
 namespace Root_VEGA_D.Module
 {
@@ -454,10 +455,18 @@ namespace Root_VEGA_D.Module
                     break;
             }
         }
-        public bool m_bDisconnectedGrabLineScanning = true;     // 이미지 스캔 도중 소켓통신 연결이 끊어졌을 때의 상태값
+        public bool m_bDisconnectedGrabLineScanning = false;    // 이미지 스캔 도중 소켓통신 연결이 끊어졌을 때의 상태값
+        int m_nDisconnectedStateResetTime = 20000;              // IPU와 연결이 끊어지고 재개될때까지 대기하는 시간
+        private void ResetDisconnectedStateTimerTick(object sender, EventArgs e)
+        {
+            DispatcherTimer timer = sender as DispatcherTimer;
+            if (timer != null)
+                timer.Stop();
+
+            m_bDisconnectedGrabLineScanning = false;
+        }
         private void EventAccept(Socket socket)
         {
-            m_bDisconnectedGrabLineScanning = false;
         }
         private void EventReceiveData(byte[] aBuf, int nSize, Socket socket)
         {
@@ -475,8 +484,17 @@ namespace Root_VEGA_D.Module
                             if (runGrabLineScan.p_eRunState == ModuleRunBase.eRunState.Run)
                             {
                                 // EQ Stop 상태로 변경하고 이미지그랩 중에 중단되었다는 상태값 설정
-                                EQ.p_bPause = true;
                                 m_bDisconnectedGrabLineScanning = true;
+                                lock(runGrabLineScan.m_lockWaitRun)
+                                {
+                                    runGrabLineScan.m_bWaitRun = true;
+                                }
+
+                                // IPU와 소켓통신 재 연결 될때까지의 상태 리셋 타이머 실행
+                                DispatcherTimer timer = new DispatcherTimer();
+                                timer.Interval = TimeSpan.FromMilliseconds(m_nDisconnectedStateResetTime);
+                                timer.Tick += new EventHandler(ResetDisconnectedStateTimerTick);
+                                timer.Start();
                             }
                         }
                     }
@@ -495,7 +513,7 @@ namespace Root_VEGA_D.Module
                     {
                         case TCPIPComm_VEGA_D.Command.resume:
                             {
-                                if (EQ.p_bPause == true || m_bDisconnectedGrabLineScanning == true)
+                                if (m_bDisconnectedGrabLineScanning)
                                 {
                                     // 이전에 이미지 그랩 작업을 이어서 할 수 있도록 처리
                                     int totalScanLine = int.Parse(mapParam[TCPIPComm_VEGA_D.PARAM_NAME_TOTALSCANLINECOUNT]);
@@ -507,10 +525,14 @@ namespace Root_VEGA_D.Module
                                         Run_GrabLineScan runGrabLineScan = m_qModuleRun.Peek() as Run_GrabLineScan;
                                         if (runGrabLineScan != null)
                                         {
-                                            runGrabLineScan.m_grabMode.m_ScanLineNum = totalScanLine - curScanLine;
-                                            runGrabLineScan.m_grabMode.m_ScanStartLine = startScanLine + curScanLine;
+                                            runGrabLineScan.m_nCurScanLine = curScanLine;
+                                            runGrabLineScan.m_grabMode.m_ScanLineNum = totalScanLine;
+                                            runGrabLineScan.m_grabMode.m_ScanStartLine = startScanLine;
 
-                                            EQ.p_bPause = false;
+                                            lock (runGrabLineScan.m_lockWaitRun)
+                                            {
+                                                runGrabLineScan.m_bWaitRun = false;
+                                            }
                                         }
                                     }
                                 }
