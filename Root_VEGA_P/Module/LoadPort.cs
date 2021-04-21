@@ -1,5 +1,6 @@
 ﻿using Root_VEGA_P_Vision.Module;
 using RootTools;
+using RootTools.Comm;
 using RootTools.Control;
 using RootTools.Gem;
 using RootTools.Module;
@@ -38,6 +39,7 @@ namespace Root_VEGA_P.Module
                 BadA,
                 BadB,
             }
+            LoadCell m_loadCell;
             Axis m_axis;
             DIO_I2O2 m_dioPodOpen;
             DIO_Is m_diCheck;
@@ -45,6 +47,7 @@ namespace Root_VEGA_P.Module
             DIO_O m_doBlow; 
             public void GetTools(ToolBox toolBox, Loadport module, bool bInit)
             {
+                m_loadCell.GetTools(toolBox, bInit);
                 module.p_sInfo = toolBox.GetAxis(ref m_axis, module, p_id);
                 module.p_sInfo = toolBox.GetDIO(ref m_dioPodOpen, module, p_id + ".PodOpen", "Close", "Open");
                 module.p_sInfo = toolBox.GetDIO(ref m_diCheck, module, p_id + ".Check", Enum.GetNames(typeof(eCheck)));
@@ -142,13 +145,17 @@ namespace Root_VEGA_P.Module
             }
 
             public string p_id { get; set; }
-            public Stage(string id)
+            public Stage(string id,Loadport loadport)
             {
-                p_id = id; 
+                p_id = id;
+                InitloadCell(loadport);
+            }
+            void InitloadCell(Loadport loadport)
+            {
+                m_loadCell = new LoadCell(loadport);
             }
         }
-        Stage m_stage = new Stage("Stage");
-
+        Stage m_stage;
         public bool p_bPlaced
         {
             get { return m_stage.p_bPlaced; }
@@ -399,6 +406,44 @@ namespace Root_VEGA_P.Module
         }
         #endregion
 
+        #region LoadCell
+        public class LoadCell : NotifyProperty
+        {
+            Loadport m_loadPort;
+            RS232 m_rs232;
+            public void GetTools(ToolBox toolBox, bool bInit)
+            {
+                toolBox.GetComm(ref m_rs232, m_loadPort, "LoadCell");
+                if (bInit)
+                    m_rs232.p_bConnect = true;
+            }
+            public string Run_GetWeight()
+            {
+                string sInfo = ConnectRS232();
+                if (sInfo != "OK") return sInfo;
+                return "OK";
+            }
+
+            private void M_rs232_OnReceive(string sRead)
+            {
+                if (sRead.Length < 9) return;
+                m_rs232.m_commLog.Add(CommLog.eType.Receive, "CAS Receive = " + sRead.Trim());
+            }
+
+            string ConnectRS232()
+            {
+                if (m_rs232.p_bConnect) return "OK";
+                m_rs232.p_bConnect = true;
+                m_rs232.OnReceive += M_rs232_OnReceive;
+                Thread.Sleep(100);
+                return m_rs232.p_bConnect ? "OK" : "RS232 Connect Error";
+            }
+            public LoadCell(Loadport loadport)
+            {
+                m_loadPort = loadport;
+            }
+        }
+        #endregion
         #region InfoPods
         InfoPods m_infoPods; 
         void InitInfoPods(string id, IEngineer engineer)
@@ -575,6 +620,8 @@ namespace Root_VEGA_P.Module
         {
             InitInfoPods(id, engineer); 
             m_interlock = new Interlock("Interlock", this);
+            m_stage = new Stage("Stage", this);
+
             InitBase(id, engineer);
             InitThreadCheck(); 
         }

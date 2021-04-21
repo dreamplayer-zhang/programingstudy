@@ -1,4 +1,5 @@
 ﻿using RootTools.Comm;
+using RootTools.ToolBoxs;
 using RootTools.Trees;
 using System;
 using System.Collections.Generic;
@@ -9,12 +10,17 @@ using System.Windows.Controls;
 
 namespace RootTools.Weigh
 {
-    public class CAS:ObservableObject
+    public class LoadCell:ObservableObject
     {
         IEngineer engineer;
         Log m_log;
         double weight = 0;
-        public CAS(string id,IEngineer engineer)
+
+        public void GetTools(ToolBox toolBox,bool bInit)
+        {
+            //toolBox.GetComm(ref m_rs232,)
+        }
+        public LoadCell(string id,IEngineer engineer)
         {
             p_id = id;
             this.engineer = engineer;
@@ -45,7 +51,7 @@ namespace RootTools.Weigh
         {
             get
             {
-                CAS_UI ui = new CAS_UI();
+                LoadCell_UI ui = new LoadCell_UI();
                 ui.Init(this);
                 return ui;
             }
