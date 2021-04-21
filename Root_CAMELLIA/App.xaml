@@ -129,6 +129,17 @@
             <Setter Property="FontFamily" Value="Arial"/>
         </Style>
 
+        <Style x:Key="CustomRadio" TargetType="{x:Type RadioButton}" >
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate>
+                        <ToggleButton Margin="3" Content="{Binding Path=(Content), RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type RadioButton}}}"
+                              IsChecked="{Binding Path=(IsChecked), RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type RadioButton}}}"/>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        
         <Style x:Key="CustomToggleButton" TargetType="{x:Type ToggleButton}">
             <Style.Resources>
                 <Color x:Key="Color.Additional.LightGrey">#989EA8</Color>

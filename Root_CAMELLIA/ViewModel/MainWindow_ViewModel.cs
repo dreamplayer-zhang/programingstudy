@@ -16,6 +16,7 @@ using System.Windows.Media.Imaging;
 using Emgu.CV;
 using System.Threading;
 using Emgu.CV.Structure;
+using System.Data;
 
 namespace Root_CAMELLIA
 {
@@ -402,6 +403,20 @@ namespace Root_CAMELLIA
         }
         private ObservableCollection<UIElement> m_DrawCandidatePointElement = new ObservableCollection<UIElement>();
 
+        public DataTable PointListItem
+        {
+            get
+            {
+                return _PointListItem;
+            }
+            set
+            {
+                SetProperty(ref _PointListItem, value);
+            }
+        }
+        private DataTable _PointListItem = new DataTable();
+
+
         public double p_Progress
         {
             get
@@ -673,6 +688,8 @@ namespace Root_CAMELLIA
             RecipeViewModel = new Dlg_RecipeManager_ViewModel(this);   
             PMViewModel = new Dlg_PM_ViewModel(this);
             ReviewViewModel = new Dlg_Review_ViewModel(this);
+            LoginViewModel = new Dlg_Login_ViewModel(this);
+            //StageMapViewModel = new Dlg_StageMapSetting_ViewModel(this);
         }
 
         private void DialogInit(MainWindow main)
@@ -683,6 +700,8 @@ namespace Root_CAMELLIA
             dialogService.Register<Dlg_Setting_ViewModel, Dlg_Setting>();
             dialogService.Register<Dlg_PM_ViewModel, Dlg_PM>();
             dialogService.Register<Dlg_Review_ViewModel, Dlg_Review>();
+            dialogService.Register<Dlg_Login_ViewModel, Dlg_Login>();
+            dialogService.Register<Dlg_StageMapSetting_ViewModel, Dlg_StageMapSetting>();
         }
 
         private void DrawMeasureRoute()
@@ -713,6 +732,8 @@ namespace Root_CAMELLIA
         public Dlg_Setting_ViewModel SettingViewModel;
         public Dlg_Engineer_ViewModel EngineerViewModel;
         public Dlg_Review_ViewModel ReviewViewModel;
+        public Dlg_Login_ViewModel LoginViewModel;
+        public Dlg_StageMapSetting_ViewModel StageMapViewModel;
         public Dlg_RecipeManager_ViewModel RecipeViewModel
         {
             get
@@ -836,6 +857,8 @@ namespace Root_CAMELLIA
                         RecipeViewModel.UpdateView(true);
                         p_DrawCandidatePointElement = new ObservableCollection<UIElement>(RecipeViewModel.p_DrawCandidatePointElement);
                         p_DrawPointElement = new ObservableCollection<UIElement>(RecipeViewModel.p_DrawPointElement);
+                        //PointListItem = RecipeViewModel.PointListItem;
+                        PointListItem = RecipeViewModel.PointListItem.Copy();
                         DrawMeasureRoute();
                         p_Progress = 0;
                     }
@@ -849,6 +872,10 @@ namespace Root_CAMELLIA
             {
                 return new RelayCommand(() =>
                 {
+                    if (!Login())
+                    {
+                        return;
+                    }
                     //var viewModel = new Dlg_RecipeManager_ViewModel(this);
                     ////viewModel.dataManager = RecipeViewModel.dataManager;
                     bool isRecipeLoad = false;
@@ -882,6 +909,7 @@ namespace Root_CAMELLIA
                     if (isRecipeLoad)
                     {
                         p_DrawCandidatePointElement = new ObservableCollection<UIElement>(RecipeViewModel.p_DrawCandidatePointElement);
+                        PointListItem = RecipeViewModel.PointListItem.Copy();
                     }
                     p_DrawPointElement = new ObservableCollection<UIElement>(RecipeViewModel.p_DrawPointElement);
                     DrawMeasureRoute();
@@ -889,12 +917,58 @@ namespace Root_CAMELLIA
                 });
             }
         }
+
+        public ICommand CmdLogin
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    if (!BaseDefine.Configuration.LoginSuccess)
+                        Login();
+                });
+            }
+        }
+
+        public ICommand CmdLogout
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    BaseDefine.Configuration.LoginSuccess = false;
+                });
+            }
+        }
+
+        bool Login()
+        {
+            if (BaseDefine.Configuration.LoginSuccess)
+            {
+                return true;
+            }
+            var loginViewmodel = LoginViewModel;
+            var loginDialog = dialogService.GetDialog(loginViewmodel) as Dlg_Login;
+            Nullable<bool> LoginResult = loginDialog.ShowDialog();
+            if (!(bool)LoginResult)
+            {
+                return false;
+            }
+            BaseDefine.Configuration.LoginSuccess = true;
+            return true;
+        }
+
         public ICommand CmdEngineer
         {
             get
             {
                 return new RelayCommand(() =>
                 {
+                    if (!Login())
+                    {
+                        return;
+                    }
+
                     var viewModel = EngineerViewModel;
                     var dialog = dialogService.GetDialog(viewModel) as Dlg_Engineer;
                     viewModel.p_pmParameter.SetRecipeData(DataManager.recipeDM.MeasurementRD);
@@ -920,7 +994,7 @@ namespace Root_CAMELLIA
             }
         }
 
-        public ICommand CmdTest
+        public ICommand CmdReview
         {
             get
             {
@@ -990,6 +1064,11 @@ namespace Root_CAMELLIA
             {
                 return new RelayCommand(() =>
                 {
+                    if (!Login())
+                    {
+                        return;
+                    }
+
                     var viewModel = SettingViewModel;
                     if (m_InitNanoview)
                     {

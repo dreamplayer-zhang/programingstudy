@@ -1,9 +1,7 @@
 ﻿using RootTools;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
-using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -14,23 +12,31 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
-using System.Windows.Threading;
 
 namespace Root_CAMELLIA
 {
     /// <summary>
-    /// Dlg_RecipeManger.xaml에 대한 상호 작용 논리
+    /// Dlg_Login.xaml에 대한 상호 작용 논리
     /// </summary>
-    public partial class Dlg_RecipeManager : Window, IDialog
+    public partial class Dlg_Login : Window, IDialog
     {
-        public Dlg_RecipeManager()
-        {         
-            InitializeComponent();
-        }
-        private void TitleBar_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        public Dlg_Login()
         {
-            this.DragMove();
+            InitializeComponent();
+            user.Focus();
         }
 
+        private void Border_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            //e.Handled = true;
+            try
+            {
+                this.DragMove();
+            }
+            catch
+            {
+
+            }
+        }
     }
 }

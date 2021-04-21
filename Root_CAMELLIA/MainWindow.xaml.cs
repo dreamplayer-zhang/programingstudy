@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Media;
 using System.Windows.Threading;
 using Root_CAMELLIA.UI_Dialog;
 using Root_EFEM.Module;
@@ -105,6 +106,7 @@ namespace Root_CAMELLIA
 
         private void M_timer_Tick(object sender, EventArgs e)
         {
+            tbTime.Text = DateTime.Now.ToString("yyyy-MM-dd HH-mm-ss");
             TimerUI();
             TimerLamp();
 
@@ -123,6 +125,25 @@ namespace Root_CAMELLIA
 
         void TimerLamp()
         {
+            if(EQ.p_eState == EQ.eState.Error)
+            {
+                LampTop.Background = new SolidColorBrush(Color.FromArgb(255, 221, 221, 221));
+                LampMid.Background = new SolidColorBrush(Color.FromArgb(255, 221, 221, 221));
+                LampBot.Background = Brushes.Red;
+            }
+            else if(EQ.p_eState == EQ.eState.Run)
+            {
+                LampTop.Background = Brushes.ForestGreen;
+                LampMid.Background = new SolidColorBrush(Color.FromArgb(255, 221, 221, 221));
+                LampBot.Background = new SolidColorBrush(Color.FromArgb(255, 221, 221, 221));
+            }
+            else
+            {
+                LampTop.Background = new SolidColorBrush(Color.FromArgb(255, 221, 221, 221));
+                LampMid.Background = Brushes.Gold;
+                LampBot.Background = new SolidColorBrush(Color.FromArgb(255, 221, 221, 221));
+            }
+
             //working
         }
 

@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Media;
@@ -117,6 +118,18 @@ namespace Root_CAMELLIA
             DataStageGuideLine[1].Set(0, 0, 98, 98);
             DataStageGuideLine[2].Set(0, 0, 150, 150);
             DataStageGuideLine[3].Set(0, 0, 196, 196);
+        }
+
+        public static string SHA256Hash(string data)
+        {
+            SHA256 sha = new SHA256Managed();
+            byte[] hash = sha.ComputeHash(Encoding.ASCII.GetBytes(data));
+            StringBuilder stringBuilder = new StringBuilder();
+            foreach (byte b in hash)
+            {
+                stringBuilder.AppendFormat("{0:x2}", b);
+            }
+            return stringBuilder.ToString();
         }
     }
 }
