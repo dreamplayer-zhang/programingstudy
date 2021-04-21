@@ -1,4 +1,5 @@
 ﻿using Root_VEGA_P.Engineer;
+using RootTools;
 using System.ComponentModel;
 using System.IO;
 using System.Windows;
@@ -22,6 +23,7 @@ namespace Root_VEGA_P
             if (!Directory.Exists(@"C:\Recipe\VEGA_P")) Directory.CreateDirectory(@"C:\Recipe\VEGA_P");
             m_engineer.Init("VEGA_P");
             engineerUI.Init(m_engineer);
+			logView.Init(LogView._logView);
         }
 
         private void Window_Closing(object sender, CancelEventArgs e)

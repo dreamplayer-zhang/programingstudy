@@ -414,8 +414,11 @@ namespace Root_VEGA_P.Module
             public void GetTools(ToolBox toolBox, bool bInit)
             {
                 toolBox.GetComm(ref m_rs232, m_loadPort, "LoadCell");
+
                 if (bInit)
                     m_rs232.p_bConnect = true;
+                
+                ConnectRS232();
             }
             public string Run_GetWeight()
             {
@@ -426,7 +429,7 @@ namespace Root_VEGA_P.Module
 
             private void M_rs232_OnReceive(string sRead)
             {
-                if (sRead.Length < 9) return;
+                //if (sRead.Length < 9) return;
                 m_rs232.m_commLog.Add(CommLog.eType.Receive, "CAS Receive = " + sRead.Trim());
             }
 

@@ -1,5 +1,6 @@
 ﻿using Root_VEGA_P_Vision.Module;
 using RootTools;
+using RootTools.Camera.BaslerPylon;
 using RootTools.Control;
 using RootTools.Module;
 using RootTools.ToolBoxs;
@@ -75,6 +76,7 @@ namespace Root_VEGA_P.Module
         {
             #region ToolBox
             public Axis m_axisRotate;
+            public Camera_Basler camDome;
             DIO_I[] m_diCheckRotate = new DIO_I[2] { null, null };
             DIO_I[] m_diCheckDome = new DIO_I[2] { null, null };
             DIO_O[] m_doClamp = new DIO_O[2] { null, null };
@@ -82,6 +84,7 @@ namespace Root_VEGA_P.Module
             DIO_Is[] m_diCoverDown = new DIO_Is[2] { null, null };
             public void GetTools(ToolBox toolBox, bool bInit)
             {
+                toolBox.GetCamera(ref camDome, m_EOP, p_id + ".Cam Dome");
                 toolBox.GetAxis(ref m_axisRotate, m_EOP, p_id + ".Rotate");
                 toolBox.GetDIO(ref m_diCheckRotate[0], m_EOP, p_id + ".Check Rotate 0");
                 toolBox.GetDIO(ref m_diCheckRotate[1], m_EOP, p_id + ".Check Rotate 1");
@@ -283,12 +286,14 @@ namespace Root_VEGA_P.Module
         public class Door : NotifyProperty, IRTRChild
         {
             #region ToolBox
+            public Camera_Basler camDoor;
             DIO_I[] m_diCheckDoor = new DIO_I[2] { null, null };
             DIO_O[] m_doUp = new DIO_O[2] { null, null };
             DIO_Is[] m_diCylinderUp = new DIO_Is[2] { null, null };
             DIO_Is[] m_diCoverDown = new DIO_Is[2] { null, null };
             public void GetTools(ToolBox toolBox, bool bInit)
             {
+                toolBox.GetCamera(ref camDoor, m_EOP, p_id + ".Cam Door");
                 toolBox.GetDIO(ref m_diCheckDoor[0], m_EOP, p_id + ".Check 0");
                 toolBox.GetDIO(ref m_diCheckDoor[1], m_EOP, p_id + ".Check 1");
                 toolBox.GetDIO(ref m_doUp[0], m_EOP, p_id + ".Down");
