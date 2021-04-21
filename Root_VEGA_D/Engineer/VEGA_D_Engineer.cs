@@ -1,4 +1,5 @@
-﻿using RootTools;
+﻿using Root_EFEM.Module;
+using RootTools;
 using RootTools.Control;
 using RootTools.Control.ACS;
 using RootTools.Control.Ajin;
@@ -159,11 +160,54 @@ namespace Root_VEGA_D.Engineer
 
         public string Recovery()
         {
+            if (IsEnable_Recovery() == false) return "Recovery is impossible";
+            m_handler.m_bIsPossible_Recovery = false;
+            m_handler.m_process.CalcRecover();
+            EQ.p_eState = EQ.eState.Run;
             return "OK";
         }
         #endregion
+        bool IsEnable_Recovery()
+        {
+            if (IsRunModule()) return false;
+            if (IsErrorModule()) return false;
+            if (EQ.p_eState != EQ.eState.Ready) return false;
+            if (m_handler.m_bIsPossible_Recovery == false) return false;
 
-
+            if (EQ.p_bStop == true) return false;
+            return m_handler.IsEnableRecovery();
+        }
+        bool IsRunModule()
+        {
+            if (IsRunModule((Loadport_Cymechs)m_handler.m_aLoadport[0])) return true;
+            if (IsRunModule((Loadport_Cymechs)m_handler.m_aLoadport[1])) return true;
+            if (IsRunModule(m_handler.m_wtr)) return true;
+            if (IsRunModule(m_handler.m_vision)) return true;
+            if (IsRunModule(m_handler.m_visionIPU)) return true;
+            return false;
+        }
+        bool IsRunModule(ModuleBase module)
+        {
+            if (module.p_eState == ModuleBase.eState.Run) return true;
+            if (module.p_eState == ModuleBase.eState.Home) return true;
+            if (module.p_eState == ModuleBase.eState.Error) return false;
+            return (module.m_qModuleRun.Count > 0);
+        }
+        bool IsErrorModule()
+        {
+            if (IsErrorModule(m_handler.m_loadport[0]) || IsErrorModule(m_handler.m_loadport[1]) ||
+                IsErrorModule(m_handler.m_wtr) || IsErrorModule(m_handler.m_vision))
+                return true;
+            else
+                return false;
+        }
+        bool IsErrorModule(ModuleBase module)
+        {
+            if (module.p_eState == ModuleBase.eState.Error)
+                return true;
+            else
+                return false;
+        }
         public VEGA_D_Handler m_handler = new VEGA_D_Handler();
         public void Init(string id)
         {

@@ -85,7 +85,10 @@ namespace Root_VEGA_D
             m_rfid = (RFID_Brooks)rfid;
             this.DataContext = m_loadport;
 
+            if(m_rfid.m_sResult != "OK")
             textBoxPodID.DataContext = loadport.p_infoCarrier;
+            else
+            { textBoxPodID.IsEnabled = false; }
             textBoxLotID.DataContext = loadport.p_infoCarrier.m_aGemSlot[0];
             textBoxRecipeID.DataContext = loadport.p_infoCarrier.m_aGemSlot[0];
 

@@ -199,6 +199,7 @@ namespace Root_VEGA_D.Engineer
         #endregion
 
         #region StateHome
+        public bool m_bIsPossible_Recovery = false;
         public string StateHome()
         {
             m_HomeProgress.HomeProgressShow();
@@ -213,8 +214,7 @@ namespace Root_VEGA_D.Engineer
             }
             sInfo = StateHome(m_interlock, (ModuleBase)m_aLoadport[0], (ModuleBase)m_aLoadport[1], m_vision, m_visionIPU, m_towerlamp, (RFID_Brooks)m_aRFID[0], (RFID_Brooks)m_aRFID[1], m_FFU);
             if (sInfo == "OK") EQ.p_eState = EQ.eState.Ready;
-            //if (sInfo == "OK") m_bIsPossible_Recovery = true;
-            if (sInfo == "OK") EQ.p_eState = EQ.eState.Ready;
+            if (sInfo == "OK") m_bIsPossible_Recovery = true;
             return sInfo;
         }
 

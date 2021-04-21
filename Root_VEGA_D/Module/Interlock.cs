@@ -102,6 +102,16 @@ namespace Root_VEGA_D.Module
         ALID m_alidEFEMLeft_Door;
         ALID m_alidEFEMRight_Door;
         ALID m_alidActiveIsolator_Alarm;
+        ALID m_alidFP_Isolator;
+        ALID m_alidIsolator_VPre;
+        ALID m_alidFactory_Air_PadPre;
+        ALID m_alidAir_TankPre;
+        ALID m_alidX_BottomPre;
+        ALID m_alidX_SideMasterPre;
+        ALID m_alidX_SideSlavePre;
+        ALID m_alidY_BottomPre;
+        ALID m_alidY_SideMasterPre;
+        ALID m_alidY_SideSlavePre;
         ALID m_alidVisionFFU_Door;
         ALID m_alidVisionTop_Door;
         ALID m_alidVisionBtm_Door;
@@ -130,6 +140,16 @@ namespace Root_VEGA_D.Module
             m_alidEFEMRight_Door = m_gaf.GetALID(this, "EFEM Right Door", "EFEM Right Door Open");
             m_alidVisionFFU_Door = m_gaf.GetALID(this, "Vision FFU Door", "Vision FFU Door Open");
             m_alidVisionTop_Door = m_gaf.GetALID(this, "Vision Top Door", "Vision Top Door Open");
+            m_alidFP_Isolator = m_gaf.GetALID(this, "Factory Pressure Isolator Error", "Factory Pressure Isolator Error");
+            m_alidIsolator_VPre = m_gaf.GetALID(this, "Isolator V Pressure Error", "Isolator V Pressure Error");
+            m_alidFactory_Air_PadPre = m_gaf.GetALID(this, "Factory Air PAd Pressure Error", "Factory Air Pad Pressure Error");
+            m_alidAir_TankPre = m_gaf.GetALID(this, "Air Tank Pressure Error", "Air Tank Pressure Error");
+            m_alidX_BottomPre = m_gaf.GetALID(this, "X Bottom Pressure Error", "X Bottom Pressure Error");
+            m_alidX_SideMasterPre = m_gaf.GetALID(this, "X Side Master Pressure Error", "X Side Master Pressure Error");
+            m_alidX_SideSlavePre = m_gaf.GetALID(this, "X Side Slave Pressure Error", "X Side Slave Pressure Error");
+            m_alidY_BottomPre = m_gaf.GetALID(this, "Y Bottom Pressure Error", "Y Bottom Pressure Error");
+            m_alidY_SideMasterPre = m_gaf.GetALID(this, "Y Side Master Pressure Error", "Y Side Master Pressure Error");
+            m_alidY_SideSlavePre = m_gaf.GetALID(this, "Y Side Slave Pressure Error", "Y Side Slave Pressure Error");
             m_alidVisionBtm_Door = m_gaf.GetALID(this, "Vision Btm Door", "Vision Bottom Door Open");
             m_alidVisionSlide_Door = m_gaf.GetALID(this, "Vision Slide Door", "Vision Slide Door Open");
             m_alidActiveIsolator_Alarm = m_gaf.GetALID(this, "Active Isolator", "Active Isolator Alarm");
@@ -229,6 +249,16 @@ namespace Root_VEGA_D.Module
             m_alidVisionBtm_Door.Run(!m_diVisionBtm_Door.p_bIn, "Vision Bottom Door Open");
             m_alidVisionSlide_Door.Run(!m_diVisionSlide_Door.p_bIn, "Vision Slide Door Open");
 
+            m_alidFP_Isolator.Run(!m_diFP_Isolator.p_bIn, "Factory Pressure Isolator Alarm");
+            m_alidIsolator_VPre.Run(!m_diIsolator_VPre.p_bIn, "Isolator V Alarm");
+            m_alidFactory_Air_PadPre.Run(!m_diFactory_Air_PadPre.p_bIn, "Factory Air Pad Pressure Alarm");
+            m_alidAir_TankPre.Run(!m_diAir_TankPre.p_bIn, "Air Tank Alarm");
+            m_alidX_BottomPre.Run(!m_diX_BottomPre.p_bIn, "X Bottom Pressure Alarm");
+            m_alidX_SideMasterPre.Run(!m_diX_SideMasterPre.p_bIn, "X Side Master Pressure Alarm");
+            m_alidX_SideSlavePre.Run(!m_diX_SideSlavePre.p_bIn, "X Side Slave Pressure Alarm");
+            m_alidY_BottomPre.Run(!m_diY_BottomPre.p_bIn, "Y Bottom Pressure Alarm");
+            m_alidY_SideMasterPre.Run(!m_diY_SideMasterPre.p_bIn, "Y Side Master Pressure Alarm");
+            m_alidY_SideSlavePre.Run(!m_diY_SideSlavePre.p_bIn, "Y Side Slave Pressure Alarm");
             m_alidActiveIsolator_Alarm.Run(!m_diActiveIsolator_Alarm.p_bIn, "Active Isolator Alarm");
             m_alidPC1Fan_Alarm.Run(!m_diPC1Fan_Alarm.p_bIn, "PC1 Fan Alarm");
             m_alidPC2Fan_Alarm.Run(!m_diPC2Fan_Alarm.p_bIn, "PC2 Fan Alarm");
@@ -278,8 +308,8 @@ namespace Root_VEGA_D.Module
             m_bProtectionbar_Use = tree.Set(m_bProtectionbar_Use, m_bProtectionbar_Use, "Protectionbar Use", "Protectionbar Use");
         }
         #endregion
-        public RPoint m_mmLimitCDA1 = new RPoint();
-        public RPoint m_mmLimitCDA2 = new RPoint();
+        public RPoint m_mmLimitCDA1 = new RPoint();//EFEM
+        public RPoint m_mmLimitCDA2 = new RPoint();//INSPECT
         ALID[] m_alid = new ALID[2] { null, null };
         ACS m_ACS;
         public Interlock(string id, IEngineer engineer,ACS acs)

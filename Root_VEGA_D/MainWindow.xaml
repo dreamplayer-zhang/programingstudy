@@ -182,12 +182,12 @@
                     </Grid.ColumnDefinitions>
                     <Grid Grid.Column="1"
                           Grid.Row="0">
-                        <TextBlock Text="VEGA-D"
+                        <TextBlock Text="VEGA-D" FontSize="20"
                                    FontWeight="Bold" />
                     </Grid>
                     <Grid Grid.Column="1"
                           Grid.Row="1">
-                        <TextBlock x:Name="VersionInfo"
+                        <TextBlock x:Name="VersionInfo" FontSize="20"
                                    FontWeight="Bold" />
                     </Grid>
                     <Grid Grid.Column="0"
@@ -863,13 +863,13 @@
                                             <ColumnDefinition />
                                         </Grid.ColumnDefinitions>
                                         <Grid.RowDefinitions>
-                                            <RowDefinition Height="30" />
-                                            <RowDefinition Height="100" />
-                                            <RowDefinition Height="100" />
-                                            <RowDefinition Height="150" />
-                                            <RowDefinition Height="150" />
-                                            <RowDefinition Height="150" />
-                                            <RowDefinition Height="80" />
+                                            <RowDefinition Height="3*" />
+                                            <RowDefinition Height="10*" />
+                                            <RowDefinition Height="10*" />
+                                            <RowDefinition Height="15*" />
+                                            <RowDefinition Height="15*" />
+                                            <RowDefinition Height="15*" />
+                                            <RowDefinition Height="8*" />
 
                                         </Grid.RowDefinitions>
                                         <!--<GroupBox Header="Product Info"

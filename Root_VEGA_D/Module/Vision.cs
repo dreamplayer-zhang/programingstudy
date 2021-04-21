@@ -27,6 +27,7 @@ namespace Root_VEGA_D.Module
         #region GAF
         public ALID m_visionHomeError;
         public ALID m_visionInspectError;
+        public ALID m_alidShutterSensor;
         public ALID m_alidShutterDownError;
         public ALID m_alidShutterUpError;
         ALID m_alid_WaferExist;
@@ -34,6 +35,7 @@ namespace Root_VEGA_D.Module
         {
             m_visionHomeError = m_gaf.GetALID(this, "Vision Home Error", "Vision Home Error");
             m_visionInspectError = m_gaf.GetALID(this, "Vision Inspect Error", "Vision Inspect Error");
+            m_alidShutterSensor= m_gaf.GetALID(this, "Shutter Sensor Error", "Shutter Sensor is detected");
             m_alidShutterDownError = m_gaf.GetALID(this, "VS Shutter Error", "Shutter is not down");
             m_alidShutterUpError = m_gaf.GetALID(this, "VS Shutter Error", "Shutter is not up");
         }
@@ -49,6 +51,9 @@ namespace Root_VEGA_D.Module
         AxisXY m_axisXY;
         DIO_O m_doVac;
         DIO_O m_doBlow;
+        DIO_I m_diMaskProtrude1;
+        DIO_I m_diMaskProtrude2;
+        DIO_I m_diRobotHandProtrude;
         DIO_O m_doShutterDown;
         DIO_O m_doShutterUp;
         DIO_I m_diShutterDownCheck;
@@ -95,6 +100,9 @@ namespace Root_VEGA_D.Module
             p_sInfo = m_toolBox.GetAxis(ref m_axisXY, this, "Axis XY");
             p_sInfo = m_toolBox.GetDIO(ref m_doVac, this, "Stage Vacuum");
             p_sInfo = m_toolBox.GetDIO(ref m_doBlow, this, "Stage Blow");
+            p_sInfo = m_toolBox.GetDIO(ref m_diMaskProtrude1, this, "Shutter Mask Protrude 1");
+            p_sInfo = m_toolBox.GetDIO(ref m_diMaskProtrude2, this, "Shutter Mask Protrude 2");
+            p_sInfo = m_toolBox.GetDIO(ref m_diRobotHandProtrude, this, "Shutter Robot Hand Protrude");
             p_sInfo = m_toolBox.GetDIO(ref m_doShutterUp, this, "Shutter Up");
             p_sInfo = m_toolBox.GetDIO(ref m_doShutterDown, this, "Shutter Down");
             p_sInfo = m_toolBox.GetDIO(ref m_diShutterUpCheck, this, "Shutter Up Check");
@@ -310,8 +318,20 @@ namespace Root_VEGA_D.Module
             return m_waferSize.GetData(infoWafer.p_eSize).m_teachWTR;
         }
 
+        public string ShutterSafety()
+		{
+            if (m_diMaskProtrude1.p_bIn) return "Mask Protrude 1 = "+ m_diMaskProtrude1.p_bIn;
+            if (m_diMaskProtrude2.p_bIn) return "Mask Protrude 2 = "+ m_diMaskProtrude2.p_bIn;
+            if (m_diRobotHandProtrude.p_bIn) return "Mask Protrude 1 = "+ m_diRobotHandProtrude.p_bIn;
+            return "OK";
+        }
+
         public string BeforeGet(int nID)
         {
+            p_sInfo = ShutterSafety();
+            m_alidShutterSensor.Run(p_sInfo != "OK", p_sInfo);
+
+
             ////shutter
             //m_doShutterUp.Write(false);
             //Thread.Sleep(100);
@@ -357,6 +377,8 @@ namespace Root_VEGA_D.Module
 
         public string BeforePut(int nID)
         {
+            p_sInfo = ShutterSafety();
+            m_alidShutterSensor.Run(p_sInfo != "OK", p_sInfo);
             ////shutter
             //m_doShutterUp.Write(false);
             //Thread.Sleep(100);
@@ -370,7 +392,9 @@ namespace Root_VEGA_D.Module
             //        m_alidShutterDownError.Run(true, "Shutter error in Beforeput");
             //    }
             //}
-            ////
+
+
+
             if (p_eRemote == eRemote.Client) return RemoteRun(eRemoteRun.BeforePut, eRemote.Client, nID);
             else
             {
@@ -401,6 +425,8 @@ namespace Root_VEGA_D.Module
 
         public string AfterGet(int nID)
         {
+            p_sInfo = ShutterSafety();
+            m_alidShutterSensor.Run(p_sInfo != "OK", p_sInfo);
             ////shutter
             //m_doShutterDown.Write(false);
             //Thread.Sleep(100);
@@ -420,6 +446,8 @@ namespace Root_VEGA_D.Module
 
         public string AfterPut(int nID)
         {
+            p_sInfo = ShutterSafety();
+            m_alidShutterSensor.Run(p_sInfo != "OK", p_sInfo);
             ////shutter
             //m_doShutterDown.Write(false);
             //Thread.Sleep(100);

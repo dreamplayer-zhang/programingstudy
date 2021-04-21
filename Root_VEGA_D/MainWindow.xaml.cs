@@ -102,7 +102,7 @@ namespace Root_VEGA_D
             InitFFU();
             m_loadport_Cymechs[0] = (Loadport_Cymechs)m_handler.m_aLoadport[0];
             m_loadport_Cymechs[1] = (Loadport_Cymechs)m_handler.m_aLoadport[1];
-            VersionInfo.Text = assemblyVersion.ToString();
+            VersionInfo.Text = "Ver " + assemblyVersion.ToString();
             //TextBlockRetID.DataContext = m_handler.m_aLoadport[0].p_infoCarrier.m_aGemSlot[0];
         }
         //bool m_blogin = false;
@@ -182,21 +182,39 @@ namespace Root_VEGA_D
         bool IsEnable_Recovery()
         {
             if (IsRunModule()) return false;
+            if (IsErrorModule()) return false;
             if (EQ.p_eState != EQ.eState.Ready) return false;
+            if (m_handler.m_bIsPossible_Recovery == false) return false;
+
             if (EQ.p_bStop == true) return false;
             return m_handler.IsEnableRecovery();
         }
         private void buttonRecovery_Click(object sender, RoutedEventArgs e)
         {
             if (IsEnable_Recovery() == false) return;
+            m_handler.m_bIsPossible_Recovery = false;
             m_handler.CalcRecover();
-            EQ.p_bStop = false;
             EQ.p_eState = EQ.eState.Run;
             EQ.p_bRecovery = true;
         }
         private void buttonBuzzOff_Click(object sender, RoutedEventArgs e)
         {
             m_engineer.BuzzerOff();
+        }
+        bool IsErrorModule()
+        {
+            if (IsErrorModule(m_handler.m_loadport[0]) || IsErrorModule(m_handler.m_loadport[1]) || 
+                IsErrorModule(m_handler.m_wtr) || IsErrorModule(m_handler.m_vision))
+                return true;
+            else
+                return false;
+        }
+        bool IsErrorModule(ModuleBase module)
+        {
+            if (module.p_eState == ModuleBase.eState.Error)
+                return true;
+            else
+                return false;
         }
 
         #region Timer
