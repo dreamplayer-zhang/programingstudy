@@ -21,7 +21,7 @@ namespace Root_VEGA_P.Module
         public override void GetTools(bool bInit)
         {
             p_sInfo = m_toolBox.GetOHT(ref m_OHT, this, m_infoPods, "OHT");
-            p_sInfo = m_toolBox.Get(ref m_RFID, this, "RFID"); 
+            p_sInfo = m_toolBox.Get(ref m_RFID, this, "RFID");
             m_stage.GetTools(m_toolBox, this, bInit);
             m_door.GetTools(m_toolBox, this);
             m_interlock.GetTools(m_toolBox, this);
@@ -411,6 +411,8 @@ namespace Root_VEGA_P.Module
         {
             Loadport m_loadPort;
             RS232 m_rs232;
+            double weight; //단위 kg
+
             public void GetTools(ToolBox toolBox, bool bInit)
             {
                 toolBox.GetComm(ref m_rs232, m_loadPort, "LoadCell");
@@ -429,8 +431,10 @@ namespace Root_VEGA_P.Module
 
             private void M_rs232_OnReceive(string sRead)
             {
-                //if (sRead.Length < 9) return;
-                m_rs232.m_commLog.Add(CommLog.eType.Receive, "CAS Receive = " + sRead.Trim());
+                string str = sRead.Trim();
+
+                m_rs232.m_commLog.Add(CommLog.eType.Receive, "CAS Receive = " + str);
+                weight = int.Parse(str);
             }
 
             string ConnectRS232()

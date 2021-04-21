@@ -2,6 +2,7 @@
 using RootTools;
 using RootTools.Camera.BaslerPylon;
 using RootTools.Control;
+using RootTools.Light;
 using RootTools.Module;
 using RootTools.ToolBoxs;
 using RootTools.Trees;
@@ -13,11 +14,14 @@ namespace Root_VEGA_P.Module
     public class EOP : ModuleBase
     {
         #region ToolBox
+        LightSet lightSet;
         Axis m_axis;
         DIO_O[,] m_doCoverDown = new DIO_O[2, 2] { { null, null }, { null, null } };
+
         public override void GetTools(bool bInit)
         {
             p_sInfo = m_toolBox.GetAxis(ref m_axis, this, "Y");
+            p_sInfo = m_toolBox.Get(ref lightSet, this);
             p_sInfo = m_toolBox.GetDIO(ref m_doCoverDown[0, 0], this, "Cover Up");
             p_sInfo = m_toolBox.GetDIO(ref m_doCoverDown[0, 1], this, "Cover Down");
             p_sInfo = m_toolBox.GetDIO(ref m_doCoverDown[1, 0], this, "Cover Up X");
