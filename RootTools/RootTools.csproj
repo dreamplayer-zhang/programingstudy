@@ -787,6 +787,10 @@
       <DependentUpon>Dialog_ImageOpen.xaml</DependentUpon>
     </Compile>
     <Compile Include="Image\Dialog_ImageOpenViewModel.cs" />
+    <Compile Include="Weigh\CAS.cs" />
+    <Compile Include="Weigh\CAS_UI.xaml.cs">
+      <DependentUpon>CAS_UI.xaml</DependentUpon>
+    </Compile>
     <Compile Include="ZoomLens\ZoomLens.cs" />
     <Compile Include="ZoomLens\ZoomLens_UI.xaml.cs">
       <DependentUpon>ZoomLens_UI.xaml</DependentUpon>
@@ -1180,6 +1184,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Image\Dialog_ImageOpen.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Weigh\CAS_UI.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
