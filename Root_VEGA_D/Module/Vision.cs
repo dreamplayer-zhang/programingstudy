@@ -1,4 +1,9 @@
-﻿using Root_EFEM.Module;
+﻿using Emgu.CV;
+using Emgu.CV.Cvb;
+using Emgu.CV.CvEnum;
+using Emgu.CV.Structure;
+using Emgu.CV.Util;
+using Root_EFEM.Module;
 using Root_VEGA_D_IPU.Module;
 using RootTools;
 using RootTools.Camera.BaslerPylon;
@@ -17,8 +22,10 @@ using RootTools_Vision.Utility;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Net.Sockets;
 using System.Threading;
+using System.Windows;
 using System.Windows.Threading;
 
 namespace Root_VEGA_D.Module
@@ -429,6 +436,92 @@ namespace Root_VEGA_D.Module
         }
         #endregion
 
+        #region Vision Algorithm
+        Image<Gray, byte> GetGrayByteImageFromMemory(MemoryData mem, CRect crtROI)
+        {
+            if (crtROI.Width < 1 || crtROI.Height < 1) return null;
+            if (crtROI.Left < 0 || crtROI.Top < 0) return null;
+            if (crtROI.Width % 4 != 0)
+            {
+                int nSpare = 0;
+                while (((crtROI.Width + nSpare) % 4) != 0) nSpare++;
+                crtROI = new CRect(crtROI.Left, crtROI.Top, crtROI.Right + nSpare, crtROI.Bottom);
+            }
+            ImageData img = new ImageData(crtROI.Width, crtROI.Height, 1);
+            IntPtr p = mem.GetPtr();
+            img.SetData(p, crtROI, (int)mem.W);
+
+            byte[] barr = img.GetByteArray();
+            System.Drawing.Bitmap bmp = img.GetBitmapToArray(crtROI.Width, crtROI.Height, barr);
+            Image<Gray, byte> imgReturn = new Image<Gray, byte>(bmp);
+
+            return imgReturn;
+        }
+
+        Image<Gray, byte> GetGrayByteImageFromMemory_12bit(MemoryData mem, CRect crtROI)
+        {
+            if (crtROI.Width < 1 || crtROI.Height < 1) return null;
+            if (crtROI.Left < 0 || crtROI.Top < 0) return null;
+            if (crtROI.Width % 4 != 0)
+            {
+                int nSpare = 0;
+                while (((crtROI.Width + nSpare) % 4) != 0) nSpare++;
+                crtROI = new CRect(crtROI.Left, crtROI.Top, crtROI.Right + nSpare, crtROI.Bottom);
+            }
+            ImageData img = new ImageData(crtROI.Width, crtROI.Height, 1);
+            IntPtr p = mem.GetPtr();
+            img.SetData_12bit(p, crtROI, (int)(mem.W / mem.p_nByte));
+
+            byte[] barr = img.GetByteArray();
+            System.Drawing.Bitmap bmp = img.GetBitmapToArray(crtROI.Width, crtROI.Height, barr);
+            Image<Gray, byte> imgReturn = new Image<Gray, byte>(bmp);
+
+            return imgReturn;
+        }
+
+        bool TemplateMatching(MemoryData mem, CRect crtSearchArea, Image<Gray, byte> imgSrc, Image<Gray, byte> imgTemplate, out CPoint cptCenter, double dMatchScore)
+        {
+            // variable
+            int nWidthDiff = 0;
+            int nHeightDiff = 0;
+            Point ptMaxRelative = new Point();
+            float fMaxScore = float.MinValue;
+            bool bFoundTemplate = false;
+
+            // implement
+            if (imgTemplate.Width > imgSrc.Width || imgTemplate.Height > imgSrc.Height)
+            {
+                cptCenter = new CPoint();
+                cptCenter.X = 0;
+                cptCenter.Y = 0;
+                return false;
+            }
+            Image<Gray, float> imgResult = imgSrc.MatchTemplate(imgTemplate, TemplateMatchingType.CcorrNormed);
+            nWidthDiff = imgSrc.Width - imgResult.Width;
+            nHeightDiff = imgSrc.Height - imgResult.Height;
+            float[,,] matches = imgResult.Data;
+
+            for (int x = 0; x < matches.GetLength(1); x++)
+            {
+                for (int y = 0; y < matches.GetLength(0); y++)
+                {
+                    if (fMaxScore < matches[y, x, 0] && dMatchScore <= matches[y, x, 0])
+                    {
+                        fMaxScore = matches[y, x, 0];
+                        ptMaxRelative.X = x;
+                        ptMaxRelative.Y = y;
+                        bFoundTemplate = true;
+                    }
+                }
+            }
+            cptCenter = new CPoint();
+            cptCenter.X = (int)(crtSearchArea.Left + ptMaxRelative.X) + (int)(nWidthDiff / 2);
+            cptCenter.Y = (int)(crtSearchArea.Top + ptMaxRelative.Y) + (int)(nHeightDiff / 2);
+
+            return bFoundTemplate;
+        }
+        #endregion
+
         public Vision(string id, IEngineer engineer, eRemote eRemote = eRemote.Local)
         {
             base.InitBase(id, engineer);
@@ -739,6 +832,145 @@ namespace Root_VEGA_D.Module
             }
         }
         #endregion
+
+        #region Run_MakeTemplateImage
+        public class Run_MakeTemplateImage : ModuleRunBase
+        {
+            Vision m_module;
+            public CPoint m_cptTopAlignMarkCenterPos = new CPoint();
+            public int m_nTopWidth = 500;
+            public int m_nTopHeight = 500;
+            public CPoint m_cptBottomAlignMarkCenterPos = new CPoint();
+            public int m_nBottomWidth = 500;
+            public int m_nBottomHeight = 500;
+
+            public Run_MakeTemplateImage(Vision module)
+            {
+                m_module = module;
+                InitModuleRun(module);
+            }
+            public override ModuleRunBase Clone()
+            {
+                Run_MakeTemplateImage run = new Run_MakeTemplateImage(m_module);
+
+                run.m_cptTopAlignMarkCenterPos = m_cptTopAlignMarkCenterPos;
+                run.m_nTopWidth = m_nTopWidth;
+                run.m_nTopHeight = m_nTopHeight;
+                run.m_cptBottomAlignMarkCenterPos = m_cptBottomAlignMarkCenterPos;
+                run.m_nBottomWidth = m_nBottomWidth;
+                run.m_nBottomHeight = m_nBottomHeight;
+
+                return run;
+            }
+
+            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
+            {
+                m_cptTopAlignMarkCenterPos = tree.Set(m_cptTopAlignMarkCenterPos, m_cptTopAlignMarkCenterPos, "Top Align Mark Center Position", "Top Align Mark Center Position", bVisible);
+                m_nTopWidth = tree.Set(m_nTopWidth, m_nTopWidth, "Top Align Mark Width", "Top Align Mark Width", bVisible);
+                m_nTopHeight = tree.Set(m_nTopHeight, m_nTopHeight, "Top Align Mark Height", "Top Align Mark Height", bVisible);
+                m_cptBottomAlignMarkCenterPos = tree.Set(m_cptBottomAlignMarkCenterPos, m_cptBottomAlignMarkCenterPos, "Bottom Align Mark Center Position", "Bottom Align Mark Center Position", bVisible);
+                m_nBottomWidth = tree.Set(m_nBottomWidth, m_nBottomWidth, "Bottom Align Mark Width", "Bottom Align Mark Width", bVisible);
+                m_nBottomHeight = tree.Set(m_nBottomHeight, m_nBottomHeight, "Bottom Align Mark Height", "Bottom Align Mark Height", bVisible);
+                m_nBottomHeight = tree.Set(m_nBottomHeight, m_nBottomHeight, "Bottom Align Mark Height", "Bottom Align Mark Height", bVisible);
+            }
+
+            public override string Run()
+            {
+                // variable
+                string strAlignMarkTemplateImagePath = "D:\\AlignMarkTemplateImage";
+                string strPool = "Vision.Memory";
+                string strGroup = "Vision";
+                string strMemory = "Main";
+                MemoryData mem = m_module.m_engineer.GetMemory(strPool, strGroup, strMemory);
+
+                // implement
+                if (!Directory.Exists(strAlignMarkTemplateImagePath))
+                    Directory.CreateDirectory(strAlignMarkTemplateImagePath);
+
+                CRect crtTopAlignMarkROI = new CRect(m_cptTopAlignMarkCenterPos, m_nTopWidth, m_nTopHeight);
+                CRect crtBottomAlignMarkROI = new CRect(m_cptBottomAlignMarkCenterPos, m_nBottomWidth, m_nBottomHeight);
+
+                m_module.GetGrayByteImageFromMemory_12bit(mem, crtTopAlignMarkROI).Save(Path.Combine(strAlignMarkTemplateImagePath, "TopTemplateImage.bmp"));
+                m_module.GetGrayByteImageFromMemory_12bit(mem, crtBottomAlignMarkROI).Save(Path.Combine(strAlignMarkTemplateImagePath, "BottomTemplateImage.bmp"));
+
+                return "OK";
+            }
+        }
+        #endregion
+
+        #region Run_PatternAlign
+        public class Run_PatternAlign : ModuleRunBase
+        {
+            Vision m_module;
+            public int m_nSearchAreaSize = 1000;
+            public double m_dMatchScore = 0.9;
+            public Run_PatternAlign(Vision module)
+            {
+                m_module = module;
+                InitModuleRun(module);
+            }
+            public override ModuleRunBase Clone()
+            {
+                Run_PatternAlign run = new Run_PatternAlign(m_module);
+                run.m_nSearchAreaSize = m_nSearchAreaSize;
+                run.m_dMatchScore = m_dMatchScore;
+                return run;
+            }
+
+            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
+            {
+                m_nSearchAreaSize = tree.Set(m_nSearchAreaSize, m_nSearchAreaSize, "Template Matching Search Area Size", "Template Matching Search Area Size", bVisible);
+                m_dMatchScore = tree.Set(m_dMatchScore, m_dMatchScore, "Template Matching Score", "Template Matching Score", bVisible);
+            }
+
+            public override string Run()
+            {
+                // variable
+                CPoint cptTopCenter;
+                CPoint cptBottomCenter;
+                CPoint cptTopResultCenter;
+                CPoint cptBottomResultCenter;
+                Run_MakeTemplateImage moduleRun = (Run_MakeTemplateImage)m_module.CloneModuleRun("MakeTemplateImage");
+                string strPool = "Vision.Memory";
+                string strGroup = "Vision";
+                string strMemory = "Main";
+                MemoryData mem = m_module.m_engineer.GetMemory(strPool, strGroup, strMemory);
+                bool bFoundTop = false;
+                bool bFoundBottom = false;
+                Image<Gray, byte> imgTop = new Image<Gray, byte>("D:\\AlignMarkTemplateImage\\TopTemplateImage.bmp");
+                Image<Gray, byte> imgBottom = new Image<Gray, byte>("D:\\AlignMarkTemplateImage\\BottomTemplateImage.bmp");
+
+                // implement
+                cptTopCenter = moduleRun.m_cptTopAlignMarkCenterPos;
+                cptBottomCenter = moduleRun.m_cptBottomAlignMarkCenterPos;
+
+                // Top Template Image Processing
+                Point ptStart = new Point(cptTopCenter.X - (m_nSearchAreaSize / 2), cptTopCenter.Y - (m_nSearchAreaSize / 2));
+                Point ptEnd = new Point(cptTopCenter.X + (m_nSearchAreaSize / 2), cptTopCenter.Y + (m_nSearchAreaSize / 2));
+                CRect crtSearchArea = new CRect(ptStart, ptEnd);
+                Image<Gray, byte> imgSrc = m_module.GetGrayByteImageFromMemory_12bit(mem, crtSearchArea);
+                bFoundTop = m_module.TemplateMatching(mem, crtSearchArea, imgSrc, imgTop, out cptTopResultCenter, m_dMatchScore);
+
+                // Bottom Template Image Processing
+                ptStart = new Point(cptBottomCenter.X - (m_nSearchAreaSize / 2), cptBottomCenter.Y - (m_nSearchAreaSize / 2));
+                ptEnd = new Point(cptBottomCenter.X + (m_nSearchAreaSize / 2), cptBottomCenter.Y + (m_nSearchAreaSize / 2));
+                crtSearchArea = new CRect(ptStart, ptEnd);
+                imgSrc = m_module.GetGrayByteImageFromMemory_12bit(mem, crtSearchArea);
+                bFoundBottom = m_module.TemplateMatching(mem, crtSearchArea, imgSrc, imgBottom, out cptBottomResultCenter, m_dMatchScore);
+
+                // Calculate Theta
+                if (bFoundTop && bFoundBottom) // Top & Bottom 모두 Template Matching 성공했을 경우
+                {
+                    double dThetaRadian = Math.Atan2((double)(cptBottomResultCenter.Y - cptTopResultCenter.Y), (double)(cptBottomResultCenter.X - cptTopResultCenter.X));
+                    double dThetaDegree = dThetaRadian * (180 / Math.PI);
+                    dThetaDegree -= 90;
+                }
+
+                return "OK";
+            }
+        }
+        #endregion
+
         #region ModuleRun
         protected override void InitModuleRuns()
         {
