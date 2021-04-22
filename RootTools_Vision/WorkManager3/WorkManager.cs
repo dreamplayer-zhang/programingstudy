@@ -88,9 +88,8 @@ namespace RootTools_Vision.WorkManager3
 
         public WorkManager(int inspectionThreadNum = 4)
         {
-            //pipeLine = new WorkPipeLine(inspectionThreadNum);
+            pipeLine = new WorkPipeLine(inspectionThreadNum);
 
-            pipeLine = new WorkPipeLine();
             WorkEventManager.PositionDone += PositionDone_Callback;
 
             WorkEventManager.InspectionStart += InspectionStart_Callback;
@@ -169,7 +168,7 @@ namespace RootTools_Vision.WorkManager3
                 if (wp.WorkState >= WORK_TYPE.SNAP) continue;
 
 
-                //wp.CheckSnapDone_Line(new CRect(0, 0, (int)snapArea.Right, (int)snapArea.Bottom));
+                wp.CheckSnapDone_Line(new CRect(0, 0, (int)snapArea.Right, (int)snapArea.Bottom));
 
                 //Rect checkArea = new Rect(new Point(wp.PositionX, wp.PositionY + wp.Width), new Point(wp.PositionX + wp.Width, wp.PositionY));
 
@@ -193,11 +192,11 @@ namespace RootTools_Vision.WorkManager3
         public bool WaitWorkDone(ref bool isCanceled, int timeoutSecond = 60)
         {
             int sec = 0;
-            //while(pipeLine.CheckPipeDone() == false && sec < timeoutSecond && isCanceled == false)
-            //{
-            //    Thread.Sleep(1000);
-            //    sec++;
-            //}
+            while (pipeLine.CheckPipeDone() == false && sec < timeoutSecond && isCanceled == false)
+            {
+                Thread.Sleep(1000);
+                sec++;
+            }
 
             return true;
         }
