@@ -90,7 +90,7 @@ namespace Root_VEGA_D
             else
             { textBoxPodID.IsEnabled = false; }
             textBoxLotID.DataContext = loadport.p_infoCarrier.m_aGemSlot[0];
-            textBoxRecipeID.DataContext = loadport.p_infoCarrier.m_aGemSlot[0];
+            //textBoxRecipeID.DataContext = loadport.p_infoCarrier.m_aGemSlot[0];
 
             InitTimer();
             m_bgwLoad.DoWork += M_bgwLoad_DoWork;

@@ -28,6 +28,7 @@ namespace Root_VEGA_D.Module
         public ALID m_visionHomeError;
         public ALID m_visionInspectError;
         public ALID m_alidShutterSensor;
+        public ALID m_alidReticleLocateInfoError;
         public ALID m_alidShutterDownError;
         public ALID m_alidShutterUpError;
         ALID m_alid_WaferExist;
@@ -38,6 +39,7 @@ namespace Root_VEGA_D.Module
             m_alidShutterSensor= m_gaf.GetALID(this, "Shutter Sensor Error", "Shutter Sensor is detected");
             m_alidShutterDownError = m_gaf.GetALID(this, "VS Shutter Error", "Shutter is not down");
             m_alidShutterUpError = m_gaf.GetALID(this, "VS Shutter Error", "Shutter is not up");
+            m_alidReticleLocateInfoError = m_gaf.GetALID(this, "Reticle Locate Info is not Correct", "Reticle Locate Info is not Correct");
         }
         public void SetAlarm()
         {
@@ -51,13 +53,17 @@ namespace Root_VEGA_D.Module
         AxisXY m_axisXY;
         DIO_O m_doVac;
         DIO_O m_doBlow;
-        DIO_I m_diMaskProtrude1;
-        DIO_I m_diMaskProtrude2;
-        DIO_I m_diRobotHandProtrude;
+        DIO_I m_diMaskProtrude1;//docking shutter에 존재하는 센서
+        DIO_I m_diMaskProtrude2;//docking shutter에 존재하는 센서
+        DIO_I m_diRobotHandProtrude;//docking shutter에 존재하는 센서
         DIO_O m_doShutterDown;
         DIO_O m_doShutterUp;
         DIO_I m_diShutterDownCheck;
         DIO_I m_diShutterUpCheck;
+        DIO_I m_diStageReticleCheck;
+        DIO_I m_diStageReticleTilt1;
+        DIO_I m_diStageReticleTilt2;
+
         MemoryPool m_memoryPool;
         MemoryGroup m_memoryGroup;
         MemoryData m_memoryMain;
@@ -107,6 +113,9 @@ namespace Root_VEGA_D.Module
             p_sInfo = m_toolBox.GetDIO(ref m_doShutterDown, this, "Shutter Down");
             p_sInfo = m_toolBox.GetDIO(ref m_diShutterUpCheck, this, "Shutter Up Check");
             p_sInfo = m_toolBox.GetDIO(ref m_diShutterDownCheck, this, "Shutter Down Check");
+            p_sInfo = m_toolBox.GetDIO(ref m_diStageReticleCheck, this, "Stage Reticle Check");
+            p_sInfo = m_toolBox.GetDIO(ref m_diStageReticleTilt1, this, "Stage Reticle Tilt Check 1");
+            p_sInfo = m_toolBox.GetDIO(ref m_diStageReticleTilt2, this, "Stage Reticle Tilt Check 2");
             p_sInfo = m_toolBox.Get(ref m_lightSet, this);
             p_sInfo = m_toolBox.GetCamera(ref m_CamMain, this, "MainCam");
             p_sInfo = m_toolBox.GetCamera(ref m_CamAlign, this, "AlignCam");
@@ -328,11 +337,9 @@ namespace Root_VEGA_D.Module
 
         public string BeforeGet(int nID)
         {
-            p_sInfo = ShutterSafety();
+            //shutter 
+            p_sInfo = ShutterSafety();//shutter Sensor check
             m_alidShutterSensor.Run(p_sInfo != "OK", p_sInfo);
-
-
-            ////shutter
             //m_doShutterUp.Write(false);
             //Thread.Sleep(100);
             //m_doShutterDown.Write(true);
@@ -346,6 +353,14 @@ namespace Root_VEGA_D.Module
             //    }
             //}
             ////
+            //
+            // 레티클 유무 체크
+            if (m_diStageReticleCheck.p_bIn == false)
+            {
+                m_alidReticleLocateInfoError.Run(true, "Reticle is not exist in Stage");
+                return "Reticle is not exist in Stage";
+            }
+
             if (p_eRemote == eRemote.Client) return RemoteRun(eRemoteRun.BeforeGet, eRemote.Client, nID);
             else
             {
@@ -392,8 +407,12 @@ namespace Root_VEGA_D.Module
             //        m_alidShutterDownError.Run(true, "Shutter error in Beforeput");
             //    }
             //}
-
-
+            // 레티클 유무 체크
+            if (m_diStageReticleCheck.p_bIn == true)
+            {
+                m_alidReticleLocateInfoError.Run(true, "Reticle is exist in Stage");
+                return "Reticle is exist in Stage";
+            }
 
             if (p_eRemote == eRemote.Client) return RemoteRun(eRemoteRun.BeforePut, eRemote.Client, nID);
             else
@@ -425,9 +444,14 @@ namespace Root_VEGA_D.Module
 
         public string AfterGet(int nID)
         {
+            if (m_diStageReticleCheck.p_bIn == true)
+            {
+                m_alidReticleLocateInfoError.Run(true, "Reticle is exist in Stage");
+                return "Reticle is exist in Stage";
+            }
+            ////shutter
             p_sInfo = ShutterSafety();
             m_alidShutterSensor.Run(p_sInfo != "OK", p_sInfo);
-            ////shutter
             //m_doShutterDown.Write(false);
             //Thread.Sleep(100);
             //m_doShutterUp.Write(true);
@@ -446,9 +470,14 @@ namespace Root_VEGA_D.Module
 
         public string AfterPut(int nID)
         {
+            if (m_diStageReticleCheck.p_bIn == false)
+            {
+                m_alidReticleLocateInfoError.Run(true, "Reticle is not exist in Stage");
+                return "Reticle is not exist in Stage";
+            }
+            ////shutter
             p_sInfo = ShutterSafety();
             m_alidShutterSensor.Run(p_sInfo != "OK", p_sInfo);
-            ////shutter
             //m_doShutterDown.Write(false);
             //Thread.Sleep(100);
             //m_doShutterUp.Write(true);
@@ -475,7 +504,7 @@ namespace Root_VEGA_D.Module
         {
             switch (m_eCheckWafer)
             {
-                case eCheckWafer.Sensor: return false; // m_diWaferExist.p_bIn;
+                case eCheckWafer.Sensor: return m_diStageReticleCheck.p_bIn;//jws tilt체크필요
                 default: return (p_infoWafer != null);
             }
         }

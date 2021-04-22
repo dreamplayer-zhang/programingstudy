@@ -122,10 +122,10 @@
                 <SolidColorBrush x:Key="ToggleButtonTrueBackground"
                          Color="{StaticResource Color.MedtronicBranding.MediumSeeGreen}" />
                 <SolidColorBrush x:Key="ToggleButtonFalseForeground"
-                         Color="{StaticResource Color.Additional.MediumGray}" />
+                         Color="White" />
                 <SolidColorBrush x:Key="ToggleButtonTrueForeground"
-                         Color="{StaticResource Color.MedtronicBranding.MediumPurple}" />
-                <TextBlock x:Key="OffContent"
+                         Color="White" />
+                <TextBlock x:Key="OffContent" 
                    Style="{StaticResource ToggleButtonContentTextbox}"
                    Text="Off" />
             </Style.Resources>
@@ -141,9 +141,8 @@
                                 </Grid.ColumnDefinitions>
                                 <Grid.RowDefinitions>
                                     <RowDefinition x:Name="TopRow" />
-                                    <RowDefinition />
+                                    <RowDefinition/>
                                 </Grid.RowDefinitions>
-
                                 <Ellipse x:Name="BackgroundEllipse1"
                                  Grid.RowSpan="2"
                                  Grid.Column="0"
@@ -191,8 +190,10 @@
                                     Orientation="Horizontal">
                                     <Border Width="{Binding ElementName=AnimationSizeBorder, Path=ActualWidth}" />
                                     <Ellipse x:Name="ForegroundEllipse"
-                                     Width="{Binding ElementName=MainRow, Path=ActualHeight}"
-                                     Height="{Binding ElementName=MainRow, Path=ActualHeight}"
+                                 Width="{Binding ElementName=MainRow,
+                                                 Path=ActualHeight}"
+                                 Height="{Binding ElementName=MainRow,
+                                                  Path=ActualHeight}"
                                      HorizontalAlignment="Right"
                                      Fill="{StaticResource ToggleButtonTrueForeground}" />
                                 </StackPanel>
@@ -329,17 +330,16 @@
         <Grid Grid.Row="2" Grid.ColumnSpan="2">
             <GroupBox FontSize="20" Header="Option" Foreground="White" Margin="5">
                 <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="RNR Mode"
+                               VerticalAlignment="Center"
+                               Margin="15"
+                               FontSize="30"/>
                     <ToggleButton x:Name="checkRnR"
                                   Margin="10"
                                   Width="160"
                                   IsChecked="{Binding p_bRNR}"
                                   Checked="checkRnR_Checked"
                                   Unchecked="checkRnR_Unchecked"/>
-                    <TextBlock Text="RNR Mode"
-                               VerticalAlignment="Center"
-                               Margin="15"
-                               FontSize="30"/>
-
                     <TextBlock Text="RNR Count : "
                                x:Name="textblockRnR"
                                FontSize="30"

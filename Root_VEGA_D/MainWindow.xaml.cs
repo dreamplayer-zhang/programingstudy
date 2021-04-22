@@ -86,6 +86,8 @@ namespace Root_VEGA_D
         VEGA_D_Handler m_handler;
         VEGA_D_Engineer m_engineer = new VEGA_D_Engineer();
         Loadport_Cymechs[] m_loadport_Cymechs = new Loadport_Cymechs[2];
+        Login_UI m_login;
+        Login.eLevel m_level;
         public MainWindow()
         {
             InitializeComponent();
@@ -93,7 +95,7 @@ namespace Root_VEGA_D
         void Init()
         {
             m_engineer.Init("VEGA_D");
-            engineerUI.Init(m_engineer);
+            //engineerUI.Init(m_engineer);
             m_handler = m_engineer.m_handler;
             loadportA.Init(m_handler.m_aLoadport[0], m_handler, m_handler.m_aRFID[0]);
             loadportB.Init(m_handler.m_aLoadport[1], m_handler, m_handler.m_aRFID[1]);
@@ -103,6 +105,16 @@ namespace Root_VEGA_D
             m_loadport_Cymechs[0] = (Loadport_Cymechs)m_handler.m_aLoadport[0];
             m_loadport_Cymechs[1] = (Loadport_Cymechs)m_handler.m_aLoadport[1];
             VersionInfo.Text = "Ver " + assemblyVersion.ToString();
+            btnLogin.Content = "User";
+            LoadportAState.DataContext = m_handler.m_loadport[0];
+            LoadportBState.DataContext = m_handler.m_loadport[1];
+            RobotState.DataContext = m_handler.m_wtr;
+            VisionState.DataContext = m_handler.m_vision;
+            btnLogin.DataContext = m_engineer.m_login;
+            engineerUI.Visibility = (m_engineer.m_login.p_eLevel >= Login.eLevel.Operator) ? Visibility.Visible : Visibility.Collapsed;
+            ReviewTab.Visibility = (m_engineer.m_login.p_eLevel >= Login.eLevel.Operator) ? Visibility.Visible : Visibility.Collapsed;
+            RunTab.Visibility = (m_engineer.m_login.p_eLevel >= Login.eLevel.Operator) ? Visibility.Visible : Visibility.Collapsed;
+
             //TextBlockRetID.DataContext = m_handler.m_aLoadport[0].p_infoCarrier.m_aGemSlot[0];
         }
         //bool m_blogin = false;
@@ -261,10 +273,6 @@ namespace Root_VEGA_D
             //textState.Text = m_bRecovery ? "Recovery" : EQ.p_eState.ToString();
             EQState.Foreground = EQ.p_eState.ToString() == "Error" ? Brushes.Red : Brushes.Green;
             EQState.Text = EQ.p_bRecovery ? "Recovery" : EQ.p_eState.ToString();
-            LoadportAState.DataContext = m_handler.m_loadport[0];
-            LoadportBState.DataContext = m_handler.m_loadport[1];
-            RobotState.DataContext = m_handler.m_wtr;
-            VisionState.DataContext = m_handler.m_vision;
         }
 
         void TimerLamp()
@@ -274,10 +282,18 @@ namespace Root_VEGA_D
             lampYellow.Background = EQ.p_eState == EQ.eState.Ready ? Brushes.Gold : Brushes.Ivory;
             lampGreen.Background = EQ.p_eState == EQ.eState.Run ? Brushes.SeaGreen : Brushes.Honeydew;
         }
-        #endregion
-        
-    }
-    public class StateToColorConverter : IValueConverter
+		#endregion
+
+		private void btnLogin_Click(object sender, RoutedEventArgs e)
+		{
+            m_login = new Login_UI(m_engineer);
+            m_login.ShowDialog();
+            engineerUI.Visibility = (m_engineer.m_login.p_eLevel >= Login.eLevel.Operator) ? Visibility.Visible : Visibility.Collapsed;
+            ReviewTab.Visibility = (m_engineer.m_login.p_eLevel >= Login.eLevel.Operator) ? Visibility.Visible : Visibility.Collapsed;
+            RunTab.Visibility = (m_engineer.m_login.p_eLevel >= Login.eLevel.Operator) ? Visibility.Visible : Visibility.Collapsed;
+        }
+	}
+	public class StateToColorConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {

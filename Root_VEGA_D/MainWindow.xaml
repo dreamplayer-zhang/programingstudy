@@ -8,6 +8,7 @@
         xmlns:control="clr-namespace:Root_VEGA_D.Control"
         xmlns:engineer="clr-namespace:Root_VEGA_D.Engineer"
         xmlns:module="clr-namespace:Root_VEGA_D.Module"
+        xmlns:tools="clr-namespace:RootTools;assembly=RootTools"
         mc:Ignorable="d"
         WindowStyle="None"
         Loaded="Window_Loaded"
@@ -215,7 +216,7 @@
                           Y2="1" />
                         <Grid Grid.Column="0">
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="2*" />
+                            <ColumnDefinition Width="3*" />
                             <ColumnDefinition Width="3*" />
                         </Grid.ColumnDefinitions>
                         <Grid Grid.Column="0">
@@ -355,32 +356,28 @@
                         <ColumnDefinition />
                     </Grid.ColumnDefinitions>
                     <Grid Grid.Column="0"
-                          Margin="5"
-                          Background="#FF5482A1">
-                        <TextBlock Text="GEM"
-                                   Foreground="White"
-                                   FontSize="15" />
+                          Margin="5">
+                        <Button x:Name="btnGEM"
+                                Content="GEM"
+                                Margin="0"
+                                Style="{StaticResource SetupPanelBtn}"
+                                />
                     </Grid>
                     <Grid Grid.Column="1"
-                          Margin="5"
-                          Background="#FF5482A1">
-                        <TextBlock Text="OHT"
-                                   Foreground="White"
-                                   FontSize="15" />
+                          Margin="5">
+                        <Button x:Name="btnOHT"
+                                Content="OHT"
+                                Margin="0"
+                                Style="{StaticResource SetupPanelBtn}"
+                                />
                     </Grid>
-                    <TextBlock Grid.Column="2"
-                               FontWeight="Bold"
-                               VerticalAlignment="Top"
-                               Margin="0,6,0,0"
-                               Text="Mode"
-                               FontSize="13" />
                     <Grid Grid.Column="2"
-                          Margin="5,20,5,5"
-                          Background="#FF5482A1">
-                        <TextBlock Text="User"
-                                   Foreground="White"
-                                   x:Name="tbUser"
-                                   FontSize="15" />
+                          Margin="5">
+                        <Button x:Name="btnLogin"
+                                Content="{Binding p_sUserName}"
+                                Margin="0"
+                                Style="{StaticResource SetupPanelBtn}"
+                                Click="btnLogin_Click"/>
                     </Grid>
                 </Grid>
                 <!--Left Panel-->
@@ -1248,7 +1245,7 @@
                             </ScrollViewer>
                         </TabItem>
 
-                        <TabItem Header="Run"
+                        <TabItem Header="Run" x:Name="RunTab"
                                  Style="{StaticResource ResourceKey=WizardTabItem}">
                             <ScrollViewer>
                                 <StackPanel>
@@ -1492,13 +1489,13 @@
                                 </StackPanel>
                             </ScrollViewer>
                         </TabItem>
-                        <TabItem Header="Review"
+                        <TabItem Header="Review" x:Name="ReviewTab"
                                  Style="{StaticResource ResourceKey=WizardTabItem}">
                             <Button Content="test"/>
                         </TabItem>
-                        <TabItem Header="Engineer"
+                        <TabItem Header="Engineer" x:Name="engineerUI"
                                  Style="{StaticResource ResourceKey=WizardTabItem}">
-                            <engineer:VEGA_D_Engineer_UI x:Name="engineerUI"/>
+                            <engineer:VEGA_D_Engineer_UI />
                         </TabItem>
                         <TabItem Header="Recipe Manager"
                                  Style="{StaticResource ResourceKey=WizardTabItem}" Visibility="Collapsed">
@@ -2211,7 +2208,7 @@
                                  Style="{StaticResource WizardTabItem}" Visibility="Collapsed">
                             <local:RecipeWizard_UI x:Name="RecipeWizard_UI" />
                         </TabItem>
-                        <TabItem Header="Run"
+                        <!--<TabItem Header="Run"
                                  Style="{StaticResource ResourceKey=WizardTabItem}">
                             <ScrollViewer Background="AliceBlue">
                                 <StackPanel>
@@ -2275,9 +2272,9 @@
                                         <Grid Grid.Column="1"
                                               Grid.Row="0">
                                             <GroupBox Header="Histogram">
-                                                <!--<Image Margin="10"
+                                                --><!--<Image Margin="10"
                                                        Stretch="Fill"
-                                                       Source="Resource/Histogram.PNG" />-->
+                                                       Source="Resource/Histogram.PNG" />--><!--
                                             </GroupBox>
                                         </Grid>
                                         <Grid Grid.Column="0"
@@ -2453,7 +2450,7 @@
                                     </Grid>
                                 </StackPanel>
                             </ScrollViewer>
-                        </TabItem>
+                        </TabItem>-->
 
                         <!--<TabItem Header="Maint"
                                  Style="{StaticResource ResourceKey=WizardTabItem}"
