@@ -208,13 +208,19 @@ namespace RootTools_Vision
                     string sInspectionID = DatabaseManager.Instance.GetInspectionID();
 
                     this.currentWorkplace.AddDefect(sInspectionID,
-                       90001,
+                       90000,
                        0,
                        0,
-                       this.currentWorkplace.PositionX,
-                       this.currentWorkplace.PositionY,
-                       this.currentWorkplace.Width,
-                       this.currentWorkplace.Height,
+                       maxStartX,
+                       maxStartY,
+                       maxEndX,
+                       maxEndY,
+                       maxEndX - maxStartX,
+                       maxEndY - maxStartY,
+                       //this.currentWorkplace.PositionX,
+                       //this.currentWorkplace.PositionY,
+                       //this.currentWorkplace.Width,
+                       //this.currentWorkplace.Height,
                        this.currentWorkplace.MapIndexX,
                        this.currentWorkplace.MapIndexY
                        );

@@ -32,6 +32,9 @@ namespace Root_WIND2
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
+            if (value == null)
+                return "null";
+
             return value.ToString();
         }
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
