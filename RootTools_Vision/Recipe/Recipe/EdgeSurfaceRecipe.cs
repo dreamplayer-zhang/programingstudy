@@ -67,17 +67,17 @@ namespace RootTools_Vision
 		public int GrabModeIndex
 		{
 			get => this.grabModeIndex;
-			set => SetProperty<int>(ref this.grabModeIndex, value);
+			set => SetProperty(ref grabModeIndex, value);
 		}
 		public int LightWhite
 		{
 			get => this.lightWhite;
-			set => SetProperty<int>(ref this.lightWhite, value);
+			set => SetProperty(ref lightWhite, value);
 		}
 		public int LightSide
 		{
 			get => this.lightSide;
-			set => SetProperty<int>(ref this.lightSide, value);
+			set => SetProperty(ref lightSide, value);
 		}
 		#endregion
 	}

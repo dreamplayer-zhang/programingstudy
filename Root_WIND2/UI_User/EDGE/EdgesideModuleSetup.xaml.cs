@@ -16,11 +16,11 @@ using System.Windows.Shapes;
 namespace Root_WIND2.UI_User
 {
 	/// <summary>
-	/// EdgesideSetup.xaml에 대한 상호 작용 논리
+	/// EdgeSetupNew.xaml에 대한 상호 작용 논리
 	/// </summary>
-	public partial class EdgesideSetup : UserControl
+	public partial class EdgesideModuleSetup : UserControl
 	{
-		public EdgesideSetup()
+		public EdgesideModuleSetup()
 		{
 			InitializeComponent();
 		}

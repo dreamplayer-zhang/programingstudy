@@ -305,6 +305,9 @@
     </Compile>
     <Compile Include="UI_User\EBR\ViewModel\EBRSetup_ViewModel.cs" />
     <Compile Include="UI_User\EBR\ViewModel\EBR_ImageViewer_ViewModel.cs" />
+    <Compile Include="UI_User\EDGE\EdgesideSetupModule.xaml.cs">
+      <DependentUpon>EdgesideSetupModule.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI_User\EDGE\EdgesideInspect.xaml.cs">
       <DependentUpon>EdgesideInspect.xaml</DependentUpon>
     </Compile>
@@ -312,8 +315,9 @@
       <DependentUpon>EdgesideSetup.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI_User\EDGE\ViewModel\EdgesideInspect_ViewModel.cs" />
-    <Compile Include="UI_User\EDGE\ViewModel\Edgeside_ImageViewer_ViewModel.cs" />
+    <Compile Include="UI_User\EDGE\ViewModel\EdgesideSetupModule_ViewModel.cs" />
     <Compile Include="UI_User\EDGE\ViewModel\EdgesideSetup_ViewModel.cs" />
+    <Compile Include="UI_User\EDGE\ViewModel\Edgeside_ImageViewer_ViewModel.cs" />
     <Compile Include="UI_User\FRONT\FrontsideAlignment.xaml.cs" />
     <Compile Include="UI_User\FRONT\FrontsideInspect.xaml.cs">
       <DependentUpon>FrontsideInspect.xaml</DependentUpon>
@@ -741,13 +745,17 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="UI_User\EDGE\EdgesideSetupModule.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="UI_User\EDGE\EdgesideInspect.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UI_User\EDGE\EdgesideSetup.xaml">
-      <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UI_User\FRONT\FrontsideAlignment.xaml" />
     <Page Include="UI_User\FRONT\FrontsideInspect.xaml">
