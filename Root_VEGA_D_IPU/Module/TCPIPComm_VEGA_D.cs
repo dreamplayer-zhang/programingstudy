@@ -82,6 +82,9 @@ namespace Root_VEGA_D_IPU.Module
 
             // ';'으로 메세지 단위 구분
             int msgSeperatorIdx = sRecv.IndexOf(';');
+            if (msgSeperatorIdx == -1)
+                msgSeperatorIdx = sRecv.Length; // ';' 문자가 없을 경우
+
             string strFullMsg = sRecv.Substring(0, msgSeperatorIdx);
             nStartIdx = msgSeperatorIdx + 1;
 

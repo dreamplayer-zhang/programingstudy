@@ -280,13 +280,31 @@ namespace RootTools.Control.ACS
                 if (m_bTriggerOn)
                     return;
 
+                // 이동 방향 여부
+                bool isIncrease = (trigger.m_aPos[0] < trigger.m_aPos[1]);
+
+                // 가속, 감속, 속도 얻어오기
+                double acc = p_channel.GetAcceleration(m_nAxis);
+                double dec = p_channel.GetDeceleration(m_nAxis);
+                double vel = p_channel.GetVelocity(m_nAxis);
+
+                // 가속, 감속에 걸리는 시간
+                double timeAcc = vel / acc;
+                double timeDec = vel / dec;
+
+                // 지정 속도 도달까지 필요한 이동거리
+                double accDistance = timeAcc * vel * 0.5;
+                double decDistance = timeDec * vel * 0.5;
+
                 // 트리거 시작/끝 위치 지정 (Y축의 1/4 스케일링 필요)
                 double dStartTriggerPos = trigger.m_aPos[0] * 0.25;
                 double dEndTriggerPos = trigger.m_aPos[1] * 0.25;
 
-                // Y축 시작/끝 위치 지정 (트리거 시작/끝 위치에서부터 임의로 10mm만큼 여유)
-                double dStartAxisPos = trigger.m_aPos[0] - 20;
-                double dEndAxisPos = trigger.m_aPos[1] + 20;
+                // Y축 시작/끝 위치 지정 (트리거 시작/끝 위치에서부터 지정속도 도달까지 걸리는 이동거리 * 1.5만큼 여유)
+                double marginalAccDistance = isIncrease ? -accDistance : accDistance;
+                double marginalDecDistance = isIncrease ? decDistance : -decDistance;
+                double dStartAxisPos = trigger.m_aPos[0] + marginalAccDistance * 1.5;
+                double dEndAxisPos = trigger.m_aPos[1] + marginalDecDistance * 1.5;
 
                 // 트리거 발생 간격
                 double dTriggerInterval = trigger.m_dPos * 0.001 * 0.25;

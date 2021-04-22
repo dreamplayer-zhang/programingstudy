@@ -455,30 +455,38 @@ namespace Root_VEGA_D.Module
                     break;
             }
         }
-        public bool m_bDisconnectedGrabLineScanning = false;    // 이미지 스캔 도중 소켓통신 연결이 끊어졌을 때의 상태값
+        ModuleRunBase PeekModuleRun()
+        {
+            if (m_qModuleRun.Count > 0)
+            {
+                return m_qModuleRun.Peek();
+            }
+            else
+                return null;
+        }
+
+        bool m_bDisconnectedGrabLineScanning = false;    // 이미지 스캔 도중 소켓통신 연결이 끊어졌을 때의 상태값
         int m_nDisconnectedStateResetTime = 20000;              // IPU와 연결이 끊어지고 재개될때까지 대기하는 시간
         private void ResetDisconnectedStateTimerTick(object sender, EventArgs e)
         {
+            // 소켓 연결 해제 이후 m_nDisconnectedStateResetTime (ms) 만큼 시간 뒤 호출되는 콜백함수
             DispatcherTimer timer = sender as DispatcherTimer;
             if (timer != null)
                 timer.Stop();
 
+            // 이미지 스캔을 재개하지 않을 것이므로
+            // 이미지 스캔 중 연결이 끊겼다는 상태값을 다시 리셋
             m_bDisconnectedGrabLineScanning = false;
-            if (m_qModuleRun.Count > 0)
+
+            // 재 연결까지 Run_GrabLineScan이 대기 중이라면 상태 변경
+            Run_GrabLineScan runGrabLineScan = PeekModuleRun() as Run_GrabLineScan;
+            if (runGrabLineScan != null)
             {
-                Run_GrabLineScan runGrabLineScan = m_qModuleRun.Peek() as Run_GrabLineScan;
-                if (runGrabLineScan != null)
+                // 현재 GrabLineScan 진행중이었다면
+                if (runGrabLineScan.p_eRunState == ModuleRunBase.eRunState.Run)
                 {
-                    // 현재 GrabLineScan 진행중이었다면
-                    if (runGrabLineScan.p_eRunState == ModuleRunBase.eRunState.Run)
-                    {
-                        // EQ Stop 상태로 변경하고 이미지그랩 중에 중단되었다는 상태값 설정
-                        m_bDisconnectedGrabLineScanning = true;
-                        lock (runGrabLineScan.m_lockWaitRun)
-                        {
-                            runGrabLineScan.m_bWaitRun = false;
-                        }
-                    }
+                    // EQ Stop 상태로 변경하고 이미지그랩 중에 중단되었다는 상태값 설정
+                    runGrabLineScan.m_bWaitRun = false;
                 }
             }
         }
@@ -490,30 +498,26 @@ namespace Root_VEGA_D.Module
             if (nSize <= 0)
             {
                 // 연결이 종료되었을 때
-                if (!socket.Connected)
-                {
-                    if(m_qModuleRun.Count > 0)
-                    {
-                        Run_GrabLineScan runGrabLineScan = m_qModuleRun.Peek() as Run_GrabLineScan;
-                        if (runGrabLineScan != null)
-                        {
-                            // 현재 GrabLineScan 진행중이었다면
-                            if (runGrabLineScan.p_eRunState == ModuleRunBase.eRunState.Run)
-                            {
-                                // EQ Stop 상태로 변경하고 이미지그랩 중에 중단되었다는 상태값 설정
-                                m_bDisconnectedGrabLineScanning = true;
-                                lock(runGrabLineScan.m_lockWaitRun)
-                                {
-                                    runGrabLineScan.m_bWaitRun = true;
-                                }
+                if (socket.Connected)
+                    return;
 
-                                // IPU와 소켓통신 재 연결 될때까지의 상태 리셋 타이머 실행
-                                DispatcherTimer timer = new DispatcherTimer();
-                                timer.Interval = TimeSpan.FromMilliseconds(m_nDisconnectedStateResetTime);
-                                timer.Tick += new EventHandler(ResetDisconnectedStateTimerTick);
-                                timer.Start();
-                            }
-                        }
+                Run_GrabLineScan runGrabLineScan = PeekModuleRun() as Run_GrabLineScan;
+                if (runGrabLineScan != null)
+                {
+                    // 현재 GrabLineScan 진행중이었다면
+                    if (runGrabLineScan.p_eRunState == ModuleRunBase.eRunState.Run)
+                    {
+                        // EQ Stop 상태로 변경하고 이미지그랩 중에 중단되었다는 상태값 설정
+                        m_bDisconnectedGrabLineScanning = true;
+
+                        // 재연결 시까지 RunGrabLineScan은 대기
+                        runGrabLineScan.m_bWaitRun = true;
+
+                        // IPU와 소켓통신 재 연결 될때까지의 상태 리셋 타이머 실행
+                        DispatcherTimer timer = new DispatcherTimer();
+                        timer.Interval = TimeSpan.FromMilliseconds(m_nDisconnectedStateResetTime);
+                        timer.Tick += new EventHandler(ResetDisconnectedStateTimerTick);
+                        timer.Start();
                     }
                 }
             }
@@ -537,20 +541,17 @@ namespace Root_VEGA_D.Module
                                     int curScanLine = int.Parse(mapParam[TCPIPComm_VEGA_D.PARAM_NAME_CURRENTSCANLINE]);
                                     int startScanLine = int.Parse(mapParam[TCPIPComm_VEGA_D.PARAM_NAME_STARTSCANLINE]);
 
-                                    if (m_qModuleRun.Count > 0)
+                                    Run_GrabLineScan runGrabLineScan = PeekModuleRun() as Run_GrabLineScan;
+                                    if (runGrabLineScan != null)
                                     {
-                                        Run_GrabLineScan runGrabLineScan = m_qModuleRun.Peek() as Run_GrabLineScan;
-                                        if (runGrabLineScan != null)
-                                        {
-                                            runGrabLineScan.m_nCurScanLine = curScanLine;
-                                            runGrabLineScan.m_grabMode.m_ScanLineNum = totalScanLine;
-                                            runGrabLineScan.m_grabMode.m_ScanStartLine = startScanLine;
+                                        runGrabLineScan.m_nCurScanLine = curScanLine;
+                                        runGrabLineScan.m_grabMode.m_ScanLineNum = totalScanLine;
+                                        runGrabLineScan.m_grabMode.m_ScanStartLine = startScanLine;
 
-                                            lock (runGrabLineScan.m_lockWaitRun)
-                                            {
-                                                runGrabLineScan.m_bWaitRun = false;
-                                            }
-                                        }
+                                        lock (runGrabLineScan.m_lockWaitRun)
+                                        {
+                                            runGrabLineScan.m_bWaitRun = false;
+                                        }   
                                     }
                                 }
                                 else
@@ -563,17 +564,14 @@ namespace Root_VEGA_D.Module
                             break;
                         case TCPIPComm_VEGA_D.Command.Result:
                             {
-                                if(m_qModuleRun.Count > 0)
+                                Run_GrabLineScan runGrabLineScan = PeekModuleRun() as Run_GrabLineScan;
+                                if (runGrabLineScan != null)
                                 {
-                                    Run_GrabLineScan runGrabLineScan = m_qModuleRun.Peek() as Run_GrabLineScan;
-                                    if (runGrabLineScan != null)
+                                    // 현재 GrabLineScan 진행중이었다면
+                                    if (runGrabLineScan.p_eRunState == ModuleRunBase.eRunState.Run)
                                     {
-                                        // 현재 GrabLineScan 진행중이었다면
-                                        if (runGrabLineScan.p_eRunState == ModuleRunBase.eRunState.Run)
-                                        {
-                                            // IPU에서 이미지 검사 완료되었기 때문에 해당 상태변수 true로 변경
-                                            runGrabLineScan.m_bIPUCompleted = true;
-                                        }
+                                        // IPU에서 이미지 검사 완료되었기 때문에 해당 상태변수 true로 변경
+                                        runGrabLineScan.m_bIPUCompleted = true;
                                     }
                                 }
                             }
@@ -582,20 +580,6 @@ namespace Root_VEGA_D.Module
                             break;
                     }
                 }
-            }
-        }
-
-        int m_nSocketReconnectWaitTime = 20000;
-        bool m_bWaitSocketReconnect = false;
-        void WaitSocketReconnectThread()
-        {
-            StopWatch sw = new StopWatch();
-            sw.Start();
-
-            m_bWaitSocketReconnect = true;
-            while(m_bWaitSocketReconnect && (sw.ElapsedMilliseconds > m_nSocketReconnectWaitTime))
-            {
-                Thread.Sleep(10);
             }
         }
 
