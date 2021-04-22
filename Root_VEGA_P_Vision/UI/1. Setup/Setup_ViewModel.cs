@@ -16,6 +16,7 @@ namespace Root_VEGA_P_Vision
 {
     public class Setup_ViewModel : ObservableObject, IDisposable
     {
+        #region Property
         private UserControl m_CurrentPanel;
         public UserControl p_CurrentPanel
         {
@@ -41,8 +42,10 @@ namespace Root_VEGA_P_Vision
                 SetProperty(ref m_NaviButtons, value);
             }
         }
+        #endregion
 
         private Home_ViewModel homeVM;
+        private RecipeManager_ViewModel RecipeManagerVM;
         public Maintenance_ViewModel maintVM;
 
         public Setup_ViewModel()
@@ -60,6 +63,7 @@ namespace Root_VEGA_P_Vision
         private void InitAllPanel()
         {
             homeVM = new Home_ViewModel(this);
+            RecipeManagerVM = new RecipeManager_ViewModel(this);
             maintVM = new Maintenance_ViewModel(this);
         }
         private void InitAllNaviBtn()
@@ -199,8 +203,8 @@ namespace Root_VEGA_P_Vision
 
             //Wizard.SetPage(Wizard.Summary);
 
-            //p_CurrentPanel = Wizard.Main;
-            //p_CurrentPanel.DataContext = Wizard;
+            p_CurrentPanel = Wizard.Main;
+            p_CurrentPanel.DataContext = Wizard;
         }
         public void SetMaintenance()
         {

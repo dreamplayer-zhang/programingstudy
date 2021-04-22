@@ -20,6 +20,7 @@ namespace Root_VEGA_P.Module
         DIO_Os m_doCoverDownX;
         public override void GetTools(bool bInit)
         {
+            p_sInfo = m_toolBox.Get(ref lightSet, this);
             p_sInfo = m_toolBox.GetAxis(ref m_axis, this, "Y");
             p_sInfo = m_toolBox.GetDIO(ref m_doCoverDown, this, "Cover", Enum.GetNames(typeof(eCover)));
             p_sInfo = m_toolBox.GetDIO(ref m_doCoverDownX, this, "Cover X", Enum.GetNames(typeof(eCover)));
@@ -79,6 +80,7 @@ namespace Root_VEGA_P.Module
         public class Dome : NotifyProperty, IRTRChild
         {
             #region ToolBox
+            CameraBasler camDome;
             public Axis m_axisRotate;
             DIO_Is m_diCheckRotate;
             DIO_Is m_diCheckDome;
@@ -290,11 +292,13 @@ namespace Root_VEGA_P.Module
         public class Door : NotifyProperty, IRTRChild
         {
             #region ToolBox
+            CameraBasler camDoor;
             DIO_Is m_diCheckDoor;
             DIO_Os m_doCylinder;
             DIO_Is[] m_diCylinder = new DIO_Is[2] { null, null };
             public void GetTools(ToolBox toolBox, bool bInit)
             {
+                toolBox.GetCamera(ref camDoor, m_EOP, p_id + ".Cam Door");
                 toolBox.GetDIO(ref m_diCheckDoor, m_EOP, p_id + ".Check", new string[] { "0", "1" });
                 toolBox.GetDIO(ref m_doCylinder, m_EOP, p_id + ".Cylinder", Enum.GetNames(typeof(eCylinder)));
                 toolBox.GetDIO(ref m_diCylinder[0], m_EOP, p_id + ".Cylinder Down", new string[] { "0", "1" });

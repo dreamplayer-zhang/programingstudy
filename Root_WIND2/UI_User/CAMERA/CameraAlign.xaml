@@ -220,7 +220,7 @@
                         </i:Interaction.Triggers>
                     </Button>
                 </Grid>
-            </GroupBox>
+            </GroupBox>-->
         </Grid>
         <GroupBox Header="Feature Item List"  Grid.Column="1" Style="{StaticResource main_view_groupbox}" Margin="4">
             <Grid >

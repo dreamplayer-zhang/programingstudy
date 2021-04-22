@@ -178,6 +178,10 @@
       <DependentUpon>HomePanel.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\1. Setup\1.Home\Home_ViewModel.cs" />
+    <Compile Include="UI\1. Setup\2. RecipeManager\RecipeMangerPanel.xaml.cs">
+      <DependentUpon>RecipeMangerPanel.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\1. Setup\2. RecipeManager\RecipeManager_ViewModel.cs" />
     <Compile Include="UI\1. Setup\Setup.xaml.cs">
       <DependentUpon>Setup.xaml</DependentUpon>
     </Compile>
@@ -239,6 +243,10 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
     </Compile>
     <Page Include="UI\1. Setup\1.Home\HomePanel.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\1. Setup\2. RecipeManager\RecipeMangerPanel.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -334,6 +342,24 @@
   <ItemGroup>
     <Folder Include="UI\2. Review\" />
     <Folder Include="UI\3. Operation\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\basebot.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\basetop.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\coverbot.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\covertop.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\doom.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\door.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
