@@ -51,7 +51,7 @@ namespace Root_VEGA_D.Module
         LensLinearTurret m_LensLinearTurret;
 
         TCPIPComm_VEGA_D m_tcpipCommServer;
-        RADSControl m_RADSControl;
+        public RADSControl m_RADSControl;
 
         #region [Getter Setter]
         public Axis AxisRotate { get => m_axisRotate; private set => m_axisRotate = value; }
@@ -90,8 +90,8 @@ namespace Root_VEGA_D.Module
             //m_remote.GetTools(bInit);
 
             bool bUseRADS = false;
-            //if (m_CamRADS.p_CamInfo != null) bUseRADS = true;
-            //p_sInfo = m_toolBox.Get(ref m_RADSControl, this, "RADSControl", bUseRADS);
+            if (m_CamRADS.p_CamInfo != null) bUseRADS = true;
+            p_sInfo = m_toolBox.Get(ref m_RADSControl, this, "RADSControl", bUseRADS);
         }
         #endregion
 
