@@ -168,6 +168,7 @@
       <DependentUpon>VEGA_P_Vision_ToolBox_UI.xaml</DependentUpon>
     </Compile>
     <Compile Include="MainVM.cs" />
+    <Compile Include="Module\InspectionManagerVegaP.cs" />
     <Compile Include="MVVM\Helper.cs" />
     <Compile Include="MVVM\ObservableObject.cs" />
     <Compile Include="MVVM\PropertySupport.cs" />
@@ -177,6 +178,10 @@
       <DependentUpon>HomePanel.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\1. Setup\1.Home\Home_ViewModel.cs" />
+    <Compile Include="UI\1. Setup\2. RecipeManager\RecipeMangerPanel.xaml.cs">
+      <DependentUpon>RecipeMangerPanel.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\1. Setup\2. RecipeManager\RecipeManager_ViewModel.cs" />
     <Compile Include="UI\1. Setup\Setup.xaml.cs">
       <DependentUpon>Setup.xaml</DependentUpon>
     </Compile>
@@ -192,6 +197,8 @@
     <Compile Include="UI\SelectMode.xaml.cs">
       <DependentUpon>SelectMode.xaml</DependentUpon>
     </Compile>
+    <Compile Include="VegaPEventArgs.cs" />
+    <Compile Include="VegaPEventManager.cs" />
     <Page Include="Control\Button\NaviBtn.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -236,6 +243,10 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
     </Compile>
     <Page Include="UI\1. Setup\1.Home\HomePanel.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\1. Setup\2. RecipeManager\RecipeMangerPanel.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -289,6 +300,7 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
+    <Compile Include="Recipe\RecipeVision.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -330,6 +342,24 @@
   <ItemGroup>
     <Folder Include="UI\2. Review\" />
     <Folder Include="UI\3. Operation\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\basebot.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\basetop.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\coverbot.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\covertop.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\doom.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\door.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
