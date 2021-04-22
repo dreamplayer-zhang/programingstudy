@@ -982,6 +982,8 @@ namespace Root_VEGA_D.Module
             //AddModuleRunList(new Run_Inspect(this), true, "Run Inspect");
             //AddModuleRunList(new Run_VisionAlign(this), true, "Run VisionAlign");
             //AddModuleRunList(new Run_AutoFocus(this), false, "Run AutoFocus");
+            AddModuleRunList(new Run_MakeTemplateImage(this), true, "Run Make TemplateImage");
+            AddModuleRunList(new Run_PatternAlign(this), true, "Run Pattern Align");
         }
         #endregion
     }
