@@ -25,4 +25,28 @@ namespace Root_VEGA_P.UI
             InitializeComponent();
         }
     }
+    public class Data
+    {
+        public string a
+        {
+            get;set;
+        }
+        public string b
+        {
+            get; set;
+        }
+        public string c
+        {
+            get; set;
+        }
+        public string d
+        {
+            get; set;
+        }
+        public string e
+        {
+            get; set;
+        }
+
+    }
 }
