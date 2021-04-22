@@ -74,6 +74,7 @@ namespace Root_VEGA_D.Module
         public Camera_Dalsa CamMain { get => m_CamMain; private set => m_CamMain = value; }
         public Camera_Basler CamAlign { get => m_CamAlign; private set => m_CamAlign = value; }
         public Camera_Basler CamAutoFocus { get => m_CamAutoFocus; private set => m_CamAutoFocus = value; }
+        public Camera_Basler CamRADS { get => m_CamRADS; private set => m_CamRADS = value; }
         public KlarfData_Lot KlarfData_Lot { get => m_KlarfData_Lot; private set => m_KlarfData_Lot = value; }
         public TCPIPComm_VEGA_D TcpipCommServer { get => m_tcpipCommServer; private set => m_tcpipCommServer = value; }
         #endregion
@@ -833,6 +834,80 @@ namespace Root_VEGA_D.Module
         }
         #endregion
 
+        #region RADSTEST
+        public class Run_RADS : ModuleRunBase
+        {
+            Vision m_module;
+
+            public Run_RADS(Vision module)
+            {
+                m_module = module;
+                InitModuleRun(module);
+            }
+
+            public override ModuleRunBase Clone()
+            {
+                Run_RADS run = new Run_RADS(m_module);
+                return run;
+            }
+
+            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
+            {
+            }
+            public override string Run()
+            {
+                // variabgle
+                Camera_Basler camRADS = (Camera_Basler)m_module.CamRADS;
+
+                // implement
+                try
+                {
+                    // RADS 연결
+                    if (m_module.m_RADSControl.p_IsRun == false)
+                    {
+                        m_module.m_RADSControl.m_timer.Start();
+                        m_module.m_RADSControl.p_IsRun = true;
+                        m_module.m_RADSControl.StartRADS();
+                        StopWatch sw = new StopWatch();
+                        if (camRADS.p_CamInfo._OpenStatus == false) camRADS.Connect();
+                        while (camRADS.p_CamInfo._OpenStatus == false)
+                        {
+                            if (sw.ElapsedMilliseconds > 15000)
+                            {
+                                sw.Stop();
+                                return "RADS Camera Not Connected";
+                            }
+                        }
+                        sw.Stop();
+                        camRADS.SetMulticast();
+                        camRADS.GrabContinuousShot();
+                    }
+
+                    StopWatch swDelay = new StopWatch();
+                    while(true)
+                    {
+                        if (swDelay.ElapsedMilliseconds > 10000)
+                        {
+                            swDelay.Stop();
+                            break;
+                        }
+                    }
+                }
+                finally
+                {
+                    if (m_module.m_RADSControl.p_IsRun == true)
+                    {
+                        m_module.m_RADSControl.m_timer.Stop();
+                        m_module.m_RADSControl.p_IsRun = false;
+                        m_module.m_RADSControl.StopRADS();
+                        if (camRADS.p_CamInfo._IsGrabbing == true) camRADS.StopGrab();
+                    }
+                }
+                return "OK";
+            }
+        }
+        #endregion
+
         #region Run_MakeTemplateImage
         public class Run_MakeTemplateImage : ModuleRunBase
         {
@@ -984,6 +1059,7 @@ namespace Root_VEGA_D.Module
             //AddModuleRunList(new Run_AutoFocus(this), false, "Run AutoFocus");
             AddModuleRunList(new Run_MakeTemplateImage(this), true, "Run Make TemplateImage");
             AddModuleRunList(new Run_PatternAlign(this), true, "Run Pattern Align");
+            AddModuleRunList(new Run_RADS(this), true, "Run RADS");
         }
         #endregion
     }
