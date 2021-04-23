@@ -185,6 +185,8 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Module\EIP_Cover.cs" />
+    <Compile Include="Module\EIP_Plate.cs" />
     <Compile Include="Module\EOP.cs" />
     <Compile Include="Module\ParticleCounterSet.cs" />
     <Compile Include="Module\VEGA_P.cs" />
@@ -324,6 +326,24 @@
     <Folder Include="UI\2. Review\" />
     <Folder Include="UI\3. Operation\" />
     <Folder Include="ViewModel\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="UI\1. Setup\covertop.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="UI\1. Setup\doom.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="UI\1. Setup\door.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="UI\1. Setup\coverbot.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="UI\1. Setup\basetop.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="UI\1. Setup\basebot.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -256,8 +256,7 @@ namespace Root_WIND2.Module
                     if (bNormal == true)
                     {
                         //WIND2EventManager.OnSnapDone(this, new SnapDoneArgs(new CPoint(startOffsetX, startOffsetY), cpMemoryOffset + new CPoint(m_grabMode.m_GD.m_nFovSize, nWaferSizeY_px)));
-                        WIND2EventManager.OnSnapDone(this, new SnapDoneArgs(new CPoint(startOffsetX, startOffsetY), cpMemoryOffset + new CPoint(m_grabMode.m_GD.m_nFovSize, nWaferSizeY_px)));
-
+                        workManager.CheckSnapDone(new Rect(new Point(startOffsetX, startOffsetY), new Point(cpMemoryOffset.X + m_grabMode.m_GD.m_nFovSize, cpMemoryOffset.Y + nWaferSizeY_px)));
                         nScanLine++;
                         cpMemoryOffset.X += m_grabMode.m_GD.m_nFovSize;
                     }
@@ -282,14 +281,14 @@ namespace Root_WIND2.Module
 
 //#endif
 
-            //  Check
-
+                //  Check
+                
             if (workManager.WaitWorkDone(ref EQ.m_EQ.StopToken(), 60 * 1) == false)
-                {
-                    inspectionTimeWatcher.Stop();
+                    {
+                        inspectionTimeWatcher.Stop();
 
-                    TempLogger.Write("Inspection", "Time out!!!");
-                    return "OK";
+                        TempLogger.Write("Inspection", "Time out!!!");
+                        return "OK";
                 } // 5 minutes
 
                 inspectionTimeWatcher.Stop();

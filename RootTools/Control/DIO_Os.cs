@@ -99,6 +99,11 @@ namespace RootTools.Control
             m_aBitDO[nIndex].Write(bOn); 
         }
 
+        public void Write(int nDO, bool bOn)
+        {
+            m_aBitDO[nDO].Write(bOn);
+        }
+
         public bool p_bEnableRun { get; set; }
 
         enum eRun

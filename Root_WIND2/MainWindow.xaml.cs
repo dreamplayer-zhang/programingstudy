@@ -260,15 +260,15 @@ namespace Root_WIND2
 
                     frontInspection.SetRecipe(recipeFront);
                     frontInspection.SetSharedBuffer(new SharedBufferInfo(
-                                frontImage.GetPtr(0),
-                                frontImage.p_Size.X,
-                                frontImage.p_Size.Y,
-                                frontImage.GetBytePerPixel(),
-                                frontImage.GetPtr(1),
-                                frontImage.GetPtr(2),
+                            frontImage.GetPtr(0), 
+                            frontImage.p_Size.X, 
+                            frontImage.p_Size.Y, 
+                            frontImage.GetBytePerPixel(), 
+                            frontImage.GetPtr(1), 
+                            frontImage.GetPtr(2), 
                                 new MemoryID(memoryFrontPool, memoryFrontGroup, memoryFront)));
                 }
-                    
+
                 //if (frontImage.GetPtr() == IntPtr.Zero)
                 //{
                 //    //MessageBox.Show("Front Inspection 생성 실패, 메모리 할당 없음");
@@ -306,6 +306,22 @@ namespace Root_WIND2
                     );
                 }
 
+                if (edgeTopImage.GetPtr() != IntPtr.Zero)
+                {
+                    RootTools_Vision.WorkManager3.WorkManager edgeTopInspection = GlobalObjects.Instance.RegisterNamed<RootTools_Vision.WorkManager3.WorkManager>("edgeTopInspection", 5);
+
+                    edgeTopInspection.SetRecipe(recipeEdge);
+                    edgeTopInspection.SetSharedBuffer(new SharedBufferInfo(
+                                edgeTopImage.GetPtr(0),
+                                edgeTopImage.p_Size.X,
+                                edgeTopImage.p_Size.Y,
+                                edgeTopImage.GetBytePerPixel(),
+                                edgeTopImage.GetPtr(1),
+                                edgeTopImage.GetPtr(2),
+                                new MemoryID(memoryFrontPool, memoryFrontGroup, memoryFront)));
+                }
+
+                /*
                 if (edgeTopImage.GetPtr() == IntPtr.Zero || edgeSideImage.GetPtr() == IntPtr.Zero || edgeBottomImage.GetPtr() == IntPtr.Zero)
                 {
                     //MessageBox.Show("Edge Inspection 생성 실패, 메모리 할당 없음");
@@ -324,7 +340,7 @@ namespace Root_WIND2
                         new SharedBufferInfo(edgeBottomImage.GetPtr(0), edgeBottomImage.p_Size.X, edgeBottomImage.p_Size.Y, edgeBottomImage.GetBytePerPixel(), edgeBottomImage.GetPtr(1), edgeBottomImage.GetPtr(2)),
                     });
                 }
-
+                */
 
                 if (ebrImage.GetPtr() == IntPtr.Zero)
                 {

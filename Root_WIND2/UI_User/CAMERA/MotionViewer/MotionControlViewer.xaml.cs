@@ -13,7 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace Root_WIND2.UI_User
+namespace Root_WIND2
 {
     /// <summary>
     /// MotionControlViewer.xaml에 대한 상호 작용 논리

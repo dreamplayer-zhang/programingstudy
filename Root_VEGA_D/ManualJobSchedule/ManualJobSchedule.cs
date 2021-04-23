@@ -24,25 +24,24 @@ namespace Root_VEGA_D
             m_handler = m_engineer.m_handler;
         }
 
-        public bool ShowPopup()
+        public bool ShowPopup(VEGA_D_Handler handler)
         {
+            p_bRnR = false;
             if (ManualJobSchedule_UI.m_bShow) return false;
             ManualJobSchedule_UI jobschedule = new ManualJobSchedule_UI(m_infoCarrier);
-            jobschedule.Init(this);
+            jobschedule.Init(this, m_engineer, m_loadport);
             jobschedule.ShowDialog();
-            p_bRnR = false;
             if (p_bRnR)
             {
-                m_handler.p_nRnRCount = p_nRnR;
+                EQ.p_nRnR = p_nRnR;
                 //RNR_UI rnr_ui = new RNR_UI();
                 //rnr_ui.Init(m_engineer);
                 //rnr_ui.Show();
             }
             else if (!p_bRnR)
             {
-                m_handler.p_nRnRCount = 1;
+                EQ.p_nRnR = 1;
             }
-            p_nRnR = 1;
             return jobschedule.DialogResult == true;
         }
         public string CheckInfoPod()
