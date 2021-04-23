@@ -456,13 +456,22 @@ namespace Root_CAMELLIA.LibSR_Met
                 bool bShutterOpen = false;
                 if (nPointIndex == 0)
                 {
-                    ShutterMotion(true);
+                    //ShutterMotion(true);
                     bool bCheckShutter = CheckShutter();
                     //bool bShutterOpen = false;
 
                     if (!bCheckShutter)
                     {
-                        bShutterOpen = ShutterMotion(bCheckShutter);
+                        ERRORCODE_NANOVIEW rst = Calibration(false);
+                        if(rst ==ERRORCODE_NANOVIEW.SR_NO_ERROR)
+                        {
+                            bShutterOpen = CheckShutter();
+                        }
+                        else
+                        {
+                            m_DM.m_Log.WriteLog(LogType.Error, "Sample Cal Error");
+                        }
+
                     }
                     else
                     {
