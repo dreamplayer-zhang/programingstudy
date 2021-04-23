@@ -95,7 +95,7 @@ namespace Root_VEGA_D
         void Init()
         {
             m_engineer.Init("VEGA_D");
-            //engineerUI.Init(m_engineer);
+            engineerUI.Init(m_engineer);
             m_handler = m_engineer.m_handler;
             loadportA.Init(m_handler.m_aLoadport[0], m_handler, m_handler.m_aRFID[0]);
             loadportB.Init(m_handler.m_aLoadport[1], m_handler, m_handler.m_aRFID[1]);
@@ -111,7 +111,7 @@ namespace Root_VEGA_D
             RobotState.DataContext = m_handler.m_wtr;
             VisionState.DataContext = m_handler.m_vision;
             btnLogin.DataContext = m_engineer.m_login;
-            engineerUI.Visibility = (m_engineer.m_login.p_eLevel >= Login.eLevel.Operator) ? Visibility.Visible : Visibility.Collapsed;
+            engineerTab.Visibility = (m_engineer.m_login.p_eLevel >= Login.eLevel.Operator) ? Visibility.Visible : Visibility.Collapsed;
             ReviewTab.Visibility = (m_engineer.m_login.p_eLevel >= Login.eLevel.Operator) ? Visibility.Visible : Visibility.Collapsed;
             RunTab.Visibility = (m_engineer.m_login.p_eLevel >= Login.eLevel.Operator) ? Visibility.Visible : Visibility.Collapsed;
 
@@ -288,7 +288,7 @@ namespace Root_VEGA_D
 		{
             m_login = new Login_UI(m_engineer);
             m_login.ShowDialog();
-            engineerUI.Visibility = (m_engineer.m_login.p_eLevel >= Login.eLevel.Operator) ? Visibility.Visible : Visibility.Collapsed;
+            engineerTab.Visibility = (m_engineer.m_login.p_eLevel >= Login.eLevel.Operator) ? Visibility.Visible : Visibility.Collapsed;
             ReviewTab.Visibility = (m_engineer.m_login.p_eLevel >= Login.eLevel.Operator) ? Visibility.Visible : Visibility.Collapsed;
             RunTab.Visibility = (m_engineer.m_login.p_eLevel >= Login.eLevel.Operator) ? Visibility.Visible : Visibility.Collapsed;
         }

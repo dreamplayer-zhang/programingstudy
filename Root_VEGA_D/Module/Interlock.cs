@@ -247,7 +247,7 @@ namespace Root_VEGA_D.Module
             m_alidVisionFFU_Door.Run(!m_diVisionFFU_Door.p_bIn, "Vision FFU Door Open");
             m_alidVisionTop_Door.Run(!m_diVisionTop_Door.p_bIn, "Vision Top Door Open");
             m_alidVisionBtm_Door.Run(!m_diVisionBtm_Door.p_bIn, "Vision Bottom Door Open");
-            m_alidVisionSlide_Door.Run(!m_diVisionSlide_Door.p_bIn, "Vision Slide Door Open");
+            m_alidVisionSlide_Door.Run(m_diVisionSlide_Door.p_bIn, "Vision Slide Door Open");
 
             m_alidFP_Isolator.Run(!m_diFP_Isolator.p_bIn, "Factory Pressure Isolator Alarm");
             m_alidIsolator_VPre.Run(!m_diIsolator_VPre.p_bIn, "Isolator V Alarm");

@@ -430,8 +430,13 @@ namespace RootTools.Memory
                     case 2:
                         for (int x = 0, ix = 0; x < sz.X; x++, ix += 2)
                         {
-                            aBuf[ix + iy] = *(pSrc + aX[x]);
-                            aBuf[ix + iy + 1] = *(pSrc + aX[x] + 1);
+                            //aBuf[ix + iy] = *(pSrc + aX[x]);
+                            //aBuf[ix + iy + 1] = *(pSrc + aX[x] + 1);
+
+                            byte b1 = (byte)(*(pSrc + aX[x]) >> 4);
+                            byte b2 = (byte)(*(pSrc + aX[x] + 1) << 4);
+                            aBuf[ix + iy] = 0;
+                            aBuf[ix + iy + 1] = (byte)(b1 | b2);
                         }
                         break;
                     case 3:

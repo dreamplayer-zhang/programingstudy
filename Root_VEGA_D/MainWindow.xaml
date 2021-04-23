@@ -1493,9 +1493,9 @@
                                  Style="{StaticResource ResourceKey=WizardTabItem}">
                             <Button Content="test"/>
                         </TabItem>
-                        <TabItem Header="Engineer" x:Name="engineerUI"
+                        <TabItem Header="Engineer" x:Name="engineerTab"
                                  Style="{StaticResource ResourceKey=WizardTabItem}">
-                            <engineer:VEGA_D_Engineer_UI />
+                            <engineer:VEGA_D_Engineer_UI x:Name="engineerUI"/>
                         </TabItem>
                         <TabItem Header="Recipe Manager"
                                  Style="{StaticResource ResourceKey=WizardTabItem}" Visibility="Collapsed">
