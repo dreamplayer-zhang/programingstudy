@@ -63,7 +63,7 @@ namespace Root_Rinse_Loader.Module
             }
         }
 
-        Storage.eMagazine _eMagazine = Storage.eMagazine.Magazine1; 
+        Storage.eMagazine _eMagazine = Storage.eMagazine.Magazine4; 
         public Storage.eMagazine p_eMagazine
         {
             get { return _eMagazine; }

@@ -81,6 +81,7 @@ namespace Root_CAMELLIA.Data
 
             return false;
         }
+
         public void RecipeSave()
         {
             if (TeachingRecipePath == null)
