@@ -423,7 +423,10 @@ namespace Root_CAMELLIA.Module
             }
 
             MeasureDone = true;
-            while (!m_CalcThicknessDone) ;
+            while (!m_CalcThicknessDone)
+            {
+                Thread.Sleep(1);
+            }
 
             //? 세이브?
 

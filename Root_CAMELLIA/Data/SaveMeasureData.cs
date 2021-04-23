@@ -26,7 +26,7 @@ namespace Root_CAMELLIA.Data
         {
             while (m_bThread)
             {
-                if (m_bStartSave)
+                if (m_bStartSave) 
                 {
                     //m_metDM.SaveResultFileSlot(,);
                 }

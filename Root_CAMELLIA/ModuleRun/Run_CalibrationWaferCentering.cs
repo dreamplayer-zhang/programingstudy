@@ -20,6 +20,7 @@ namespace Root_CAMELLIA.Module
     {
         Module_Camellia m_module;
         DataManager m_DataManager;
+        MainWindow_ViewModel m_Lamp;
         (Met.SettingData, Met.Nanoview.ERRORCODE_NANOVIEW) m_SettingDataWithErrorCode;
         RPoint m_WaferLT_pulse = new RPoint(); // Pulse
         RPoint m_WaferRT_pulse = new RPoint(); // Pulse
@@ -47,6 +48,7 @@ namespace Root_CAMELLIA.Module
         {
             m_module = module;
             m_DataManager = module.m_DataManager;
+            
             InitModuleRun(module);
         }
 
@@ -140,6 +142,9 @@ namespace Root_CAMELLIA.Module
 
             if (m_useCal)
             {
+                //Lamp Check
+                //m_Lamp.sp.Write
+            
                 if (m_useCentering)
                 {
                     if (m_DataManager.m_calibration.Run(m_InitialCal, m_isPM) != "OK")
@@ -209,17 +214,18 @@ namespace Root_CAMELLIA.Module
 
             //ImageData asdv = new ImageData(VRS.p_ImageViewer.p_ImageData.m_MemData);
 
-            if (VRS.Grab() == "OK")
-            {
-                //asdv.SetData(VRS.p_ImageViewer.p_ImageData.GetPtr(), new CRect(0,0, 2044, 2044), (int)VRS.p_ImageViewer.p_ImageData.p_Stride, 3);
-                //strVRSImageFullPath = string.Format(strVRSImageDir + "VRSImage_{0}.bmp", 0);
-                //img.SaveImageSync(strVRSImageFullPath);
-                //Grab error
-            }
-            else
-            {
-                return "Grab Error";
-            }
+            //if (VRS.Grab() == "OK")
+            //{
+            //    //asdv.SetData(VRS.p_ImageViewer.p_ImageData.GetPtr(), new CRect(0,0, 2044, 2044), (int)VRS.p_ImageViewer.p_ImageData.p_Stride, 3);
+            //    //strVRSImageFullPath = string.Format(strVRSImageDir + "VRSImage_{0}.bmp", 0);
+            //    //img.SaveImageSync(strVRSImageFullPath);
+            //    //Grab error
+            //}
+            //else
+            //{
+            //    return "Grab Error";
+            //}
+            VRS.GrabOneShot();
 
             
 
@@ -255,17 +261,18 @@ namespace Root_CAMELLIA.Module
 
 
 
-            if (VRS.Grab() == "OK")
-            {
-                //strVRSImageFullPath = string.Format(strVRSImageDir + "VRSImage_{0}.bmp", 1);
-                //img.SaveImageSync(strVRSImageFullPath);
-                //Grab error
-            }
-            else
-            {
-                return "Grab Error";
-            }
+            //if (VRS.Grab() == "OK")
+            //{
+            //    //strVRSImageFullPath = string.Format(strVRSImageDir + "VRSImage_{0}.bmp", 1);
+            //    //img.SaveImageSync(strVRSImageFullPath);
+            //    //Grab error
+            //}
+            //else
+            //{
+            //    return "Grab Error";
+            //}
 
+            VRS.GrabOneShot();
 
             param = new CenteringParam(img, VRS.GetRoiSize(), m_EdgeSearchRange, m_EdgeSearchLevel, WaferCentering.eDir.RT);
             ThreadPool.QueueUserWorkItem(m_DataManager.m_waferCentering.FindEdge, param);
@@ -293,16 +300,17 @@ namespace Root_CAMELLIA.Module
                     return p_sInfo;
             }
 
-            if (VRS.Grab() == "OK")
-            {
-                //strVRSImageFullPath = string.Format(strVRSImageDir + "VRSImage_{0}.bmp", 2);
-                //img.SaveImageSync(strVRSImageFullPath);
-                //Grab error
-            }
-            else
-            {
-                return "Grab Error";
-            }
+            //if (VRS.Grab() == "OK")
+            //{
+            //    //strVRSImageFullPath = string.Format(strVRSImageDir + "VRSImage_{0}.bmp", 2);
+            //    //img.SaveImageSync(strVRSImageFullPath);
+            //    //Grab error
+            //}
+            //else
+            //{
+            //    return "Grab Error";
+            //}
+            VRS.GrabOneShot();
 
 
             param = new CenteringParam(img, VRS.GetRoiSize(), m_EdgeSearchRange, m_EdgeSearchLevel, WaferCentering.eDir.RB);

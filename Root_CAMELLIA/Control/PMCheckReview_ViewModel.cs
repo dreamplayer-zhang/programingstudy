@@ -55,7 +55,7 @@ namespace Root_CAMELLIA
         #region Page ViewModel
         public PM_Reflectance_ViewModel m_pmReflectance_VM;
         public PM_SensorCameraTilt_ViewModel m_pmSensorTilt_VM;
-        PM_SensorHoleOffset_ViewModel m_pmSensorHoleOffset_VM;
+        public PM_SensorHoleOffset_ViewModel m_pmSensorHoleOffset_VM;
         PM_Thickness_ViewModel m_pmThickness_VM;
         #endregion
 

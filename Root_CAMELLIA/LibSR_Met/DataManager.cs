@@ -184,6 +184,8 @@ namespace Root_CAMELLIA.LibSR_Met
         public bool bViewCalRGraph = true;
         public int nThicknessDataNum = 0;
         public float nStartWavelegth = 0;
+        public double[] BackGroundCalWavelength;
+        public double [] BackGroundCalCountData;
         public SettingData m_SettngData;
 
 
@@ -701,9 +703,14 @@ namespace Root_CAMELLIA.LibSR_Met
                 sw.WriteLine(sDataRange);
 
                 sHeader = "Site #";
-                for (int n = 0; n < m_LayerData.Count - 1; n++)
+                for (int n = 1; n < m_LayerData.Count - 1; n++)
                 {
-                    sHeader += "," + m_LayerData[n].hostname;
+                    sHeader += ",";
+                    for (int s = 0; s < m_LayerData[n].hostname.Length; s++)
+                    {
+                        sHeader += m_LayerData[n].hostname[s];
+                    }
+
                 }
                 sHeader += ",NGOF,Sum,X,Y,OFFSET X,OFFSET Y";
                 sw.WriteLine(sHeader);
@@ -964,9 +971,14 @@ namespace Root_CAMELLIA.LibSR_Met
                     sHeader += ",T_" + T.p_waveLength.ToString("0.####");
                 }
                 sHeader += ",GOF";
-                for (int n = 0; n < m_LayerData.Count - 1; n++)
+                for (int n = 1; n < m_LayerData.Count -1; n++)
                 {
-                    sHeader += "," + m_LayerData[n].hostname;
+                    sHeader += ",";
+                    for (int s = 0; s < m_LayerData[n].hostname.Length; s++)
+                    {
+                        sHeader += m_LayerData[n].hostname[s];
+                    }
+
                 }
                 sw.WriteLine(sHeader);
 
@@ -985,8 +997,9 @@ namespace Root_CAMELLIA.LibSR_Met
                             sData += "," + m_ContourMapDataT[i].HoleData[n].Value.ToString("0.####");
                         }
                         sData += "," + m_RawData[n].dGoF.ToString("0.####");
-                        for (int i = 0; i < m_RawData[n].Thickness.Count; i++)
+                        for (int i = 1; i < m_RawData[n].Thickness.Count-1; i++)
                         {
+                            // Si 기판, Air 제외
                             sData += "," + m_RawData[n].Thickness[i].ToString("0.####");
                         }
                         sw.WriteLine(sData);
@@ -1206,9 +1219,14 @@ namespace Root_CAMELLIA.LibSR_Met
                     sHeader += ",T_" + T.p_waveLength.ToString("0.####");
                 }
                 sHeader += ",GOF";
-                for (int n = 0; n < m_LayerData.Count - 1; n++)
+                for (int n = 1; n < m_LayerData.Count - 1; n++)
                 {
-                    sHeader += "," + m_LayerData[n].sRefName;
+                    sHeader += ",";
+                    for (int s = 0; s < m_LayerData[n].hostname.Length; s++)
+                    {
+                        sHeader += m_LayerData[n].hostname[s];
+                    }
+
                 }
                 sw.WriteLine(sHeader);
 
@@ -1230,7 +1248,7 @@ namespace Root_CAMELLIA.LibSR_Met
                                 sData += "," + m_ContourMapDataT[i].HoleData[n].Value.ToString("0.####");
                             }
                             sData += "," + m_RawData[n].dGoF.ToString("0.####");
-                            for (int i = 0; i < m_RawData[n].Thickness.Count; i++)
+                            for (int i = 1; i < m_RawData[n].Thickness.Count-1; i++)
                             {
                                 sData += "," + m_RawData[n].Thickness[i].ToString("0.####");
                             }
@@ -1397,14 +1415,19 @@ namespace Root_CAMELLIA.LibSR_Met
                     sHeader += ",T_" + T.p_waveLength.ToString("0.####");
                 }
                 sHeader += ",GOF";
-                for (n = 0; n < m_LayerData.Count - 1; n++)// Recipe 설정 Model data (박막 물질)
+                for (n = 1; n < m_LayerData.Count - 1; n++)// Recipe 설정 Model data (박막 물질)
                 {
-                    sHeader += "," + m_LayerData [n].hostname;
+                    sHeader += ",";
+                    for ( int s = 0; s < m_LayerData[n].hostname.Length; s++ )
+                    {
+                        sHeader += m_LayerData[n].hostname[s];
+                    }
+                    
                 }
                 sw.WriteLine(sHeader);
 
                 string sData;
-                for (n = 0; n < 13; n++)
+                for (n = 0; n < m_RawData.Length; n++)
                 {
                     if (m_RawData[n].Wavelength.Length != 0)// 수정? .count 였는데 .length 사용
                     {
@@ -1420,7 +1443,7 @@ namespace Root_CAMELLIA.LibSR_Met
                         }
                         sData += "," + m_RawData[n].dGoF.ToString("0.####");
 
-                        for (int i = 0; i < m_RawData[n].Thickness.Count; i++)
+                        for (int i = 1; i < m_RawData[n].Thickness.Count-1; i++)
                         {
                             sData += "," + m_RawData[n].Thickness[i].ToString("0.####");
                         }
@@ -1458,9 +1481,14 @@ namespace Root_CAMELLIA.LibSR_Met
                     sHeader += ",T_" + T.p_waveLength.ToString("0.####");
                 }
                 sHeader += ",GOF";
-                for (n = 0; n < m_LayerData.Count - 1; n++)
+                for (n = 1; n < m_LayerData.Count - 1; n++)
                 {
-                    sHeader += "," + m_LayerData[n].hostname;
+                    sHeader += ",";
+                    for (int s = 0; s < m_LayerData[n].hostname.Length; s++)
+                    {
+                        sHeader += m_LayerData[n].hostname[s];
+                    }
+
                 }
                 sw.WriteLine(sHeader);
 
@@ -1485,7 +1513,7 @@ namespace Root_CAMELLIA.LibSR_Met
                             }
                             sData += "," + m_RawData[n].dGoF.ToString("0.####");
 
-                            for (int i = 0; i < m_RawData[n].Thickness.Count; i++)
+                            for (int i = 1; i < m_RawData[n].Thickness.Count-1; i++)
                             {
                                 sData += "," + m_RawData[n].Thickness[i].ToString("0.####");
                             }
@@ -1618,6 +1646,80 @@ namespace Root_CAMELLIA.LibSR_Met
               
         }
         #endregion
+        //public MainWindow_ViewModel mwvm;
+        //Test  
+        //PMDatas m_PMData = new PMDatas();
+        //public void LampCheck()
+        //{
+        //    PMDatas m_PMData = new PMDatas();
+            
+        //    string sLampT = m_PMData.UpdateSR(false,"4");
+        //    string sLampH = m_PMData.UpdateSR(false, "3");
+        //    string sVISLampLux = m_PMData.UpdateSR(false, "0");
+        //    string sIRLampLux = m_PMData.UpdateSR(false, "1");
+        //    string sControlT = m_PMData.UpdateSR(false, "6");
+        //    string sControlH = m_PMData.UpdateSR(false, "5");
 
+        //    string sPath = @"C:\Users\ATI\Desktop\MeasureData\SRData";
+
+
+        //    if (!Directory.Exists(sPath))
+        //    {
+        //        Directory.CreateDirectory(sPath);
+        //    }
+        //    string sFileName = sPath;
+        //    //sFileName += "\\";
+        //    //sFileName += DateTime.Now.ToString("yyyyMMdd");
+        //    sPath = sFileName;
+        //    if (Path.GetExtension(sPath) != ".txt")
+        //        sPath += ".txt";
+        //    StreamWriter writer;
+        //    writer = File.AppendText(sPath);
+        //    writer.WriteLine("[" + DateTime.Now.ToString("yyyyMMdd") + "_" + DateTime.Now.ToString("HH-mm-ss") + "]" + "," + "Lamp T" + "," + sLampT + "," + "Lamp H" + "," + sLampH + "," + "Control T" + "," + sControlT + "," + "Control H" + "," + sControlH + "," + "VISLampLux" + "," + sVISLampLux + "," + "IRLampLux" + "," + sIRLampLux);
+        //    writer.Close();
+
+
+        //}
+
+        public void CalibrationBackCountSave()
+        {
+            try
+            {
+                if (BackGroundCalCountData[0] ==0)
+                {
+                    throw new Exception(" Data is not exist.");
+                }
+                string sPath = @"C:\Users\ATI\Desktop\MeasureData\SampleCalCountData";
+
+                
+                if (!Directory.Exists(sPath))
+                {
+                    Directory.CreateDirectory(sPath);
+                }
+                string sFileName = sPath;
+                sFileName += "\\";
+                sFileName += DateTime.Now.ToString("yyyyMMdd");
+                sFileName += "_";
+                sFileName += DateTime.Now.ToString("HH-mm-ss");
+                sPath = sFileName;
+                if (Path.GetExtension(sPath) != ".csv")
+                    sPath += ".csv";
+                StreamWriter sw = new StreamWriter(sPath);
+                //StreamWriter sw = new StreamWriter(sFileName);
+                
+                sw.WriteLine("Wavelength[nm],CountData");
+                for (int n = 0; n <425 ; n++)
+                {
+                    sw.WriteLine("{0},{1}", BackGroundCalWavelength[n], BackGroundCalCountData[n]);
+                }
+                sw.Close();
+
+                m_Log.WriteLog(LogType.Datas,"SampleCal: BackGraoung Count data saved.");
+            }
+            catch
+            {
+
+            }
+        }
     }
 }

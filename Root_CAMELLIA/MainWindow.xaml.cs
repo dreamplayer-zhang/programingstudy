@@ -155,7 +155,7 @@ namespace Root_CAMELLIA
         {
             if (IsEnable_Initial() == false) return;
             EQ.p_bStop = false;
-            m_handler.m_process.ClearInfoWafer();
+            //m_handler.m_process.ClearInfoWafer();
             EQ.p_eState = EQ.eState.Home;
             //Camellia Camera Connect
         }
