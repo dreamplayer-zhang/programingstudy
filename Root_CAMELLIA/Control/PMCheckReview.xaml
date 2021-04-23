@@ -43,13 +43,11 @@
                         <RowDefinition/>
                         <RowDefinition/>
                         <RowDefinition/>
-                        <RowDefinition/>
                     </Grid.RowDefinitions>
                     <Button Content="Reflectance Repeatability" Grid.Row="0" Margin="5" Command="{Binding CmdReflectanceRepeatability}"/>
                     <Button Content="Thickness Repeatability" Grid.Row="1" Margin="5" Command="{Binding CmdThicknessRepeatability}" />
                     <Button Content="Stage-Sensor Offset" Grid.Row="2" Margin="5" Command="{Binding CmdSensorStageAlign}" />
                     <Button Content="Camera-Sensor Tilt" Grid.Row="3" Margin="5" Command="{Binding CmdSensorCameraTilt}" />
-                    <Button Content="Vacuum Variation" Grid.Row="4" Margin="5"/>
                 </Grid>
             </GroupBox>
             <GroupBox Header ="PM View" Grid.Column="1">

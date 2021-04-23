@@ -4,6 +4,7 @@ using RootTools;
 using System;
 using System.Collections.ObjectModel;
 using System.Windows;
+using System.IO.Ports;
 using System.Windows.Input;
 using System.Windows.Threading;
 using Root_CAMELLIA.Module;
@@ -23,7 +24,7 @@ namespace Root_CAMELLIA
     public class MainWindow_ViewModel : ObservableObject
     {
         private MainWindow m_MainWindow;
-
+        Met.PMDatas m_PMData = new Met.PMDatas();
         private DataManager _DataManager;
         public DataManager DataManager {
             get
@@ -177,8 +178,10 @@ namespace Root_CAMELLIA
        
             ViewModelInit();
             DialogInit(mainwindow);
-
+            //UpdateLampTime(true);
+            //UserControl_Loaded();
             Run_Measure measure = (Run_Measure)p_Module_Camellia.CloneModuleRun("Measure");
+            
             this.p_StageCenterPulse = measure.m_StageCenterPos_pulse;
 
             //if(p_Module_Camellia.p_CamVRS != null)
@@ -197,23 +200,125 @@ namespace Root_CAMELLIA
             p_Module_Camellia.p_CamVRS.Captured += GetImage;
         }
 
+        #region Lamp Check Parameter
+        Thread m_thread;
+        public string m_LampTImeError= "";
+        public string p_LampTimeError
+        {
+            get
+            {
+                return m_LampTImeError;
+            }
+            set
+            {
+                SetProperty(ref m_LampTImeError, value);
+            }
+        }
+
+        private void LampPMCheck(double dLeftLampTime)
+        {
+            if (dLeftLampTime >= 0)
+            {
+                string sLeftLampTime = dLeftLampTime.ToString();
+                p_LampTimeError = sLeftLampTime + " Hours Left until PM !";
+
+            }
+            else
+            {
+                p_LampTimeError = "Please, Do Lamp PM";
+            }
+        }
+
+        public double m_LampUseTime = 0.0;
+        public double p_LampTimeCount
+        {
+            get
+            {
+                return m_LampUseTime;
+            }
+            set
+            {
+                SetProperty(ref m_LampUseTime, value);
+            }
+        }
+        
+
+        public void UpdateLampTime(bool initialize)
+        {
+            
+            string InputData = "t";
+            string OutputData = m_PMData.UpdateSR(initialize, InputData);
+            
+                string[] strtext = new string[7] { "H0:", "T0:", "L0:", "H1:", "T1:", "L1:", "Time:" };
+                string[] arr = OutputData.Split(':');
+                string[] strarr = arr[1].Split(',');
+                double LampUseTime = 0.0;
+            if (OutputData.Contains("Time:"))
+            {
+                //형식 월, 일, 시간, 분, 초
+                double Month = Convert.ToDouble(strarr[0]);
+                double Day = Convert.ToDouble(strarr[1]);
+                double Hour = Convert.ToDouble(strarr[2]);
+
+                //LampUseTime = (Month * 30 * 24) + (Day * 24) + Hour; 
+                LampUseTime = 2582 + (Day * 24) + Hour;
+                //string Time = string.Format("{0}:{1}:{2}:{3}:{4}", strarr[0], strarr[1], strarr[2], strarr[3], strarr[4]);
+            }
+            else if (string.IsNullOrEmpty(OutputData))
+            {
+                MessageBox.Show("Time이 없습니다.");
+            }
+
+            p_LampTimeCount = LampUseTime;
+
+
+            if (LampUseTime > 9500)
+            {
+                LampPMCheck(10000 - LampUseTime);
+            }
+        }
+        readonly object lockobj = new object();
+        bool m_bThread = false;
+        void RunThread()
+        {
+            m_bThread = true;
+            while (m_bThread)
+            {
+                Thread.Sleep(3600000);
+                lock (lockobj)
+                {
+                    UpdateLampTime(false);
+                }
+            }
+        }
+        private void UserControl_Loaded()
+        {
+            m_thread = new Thread(new ThreadStart(RunThread));
+            m_thread.Start();
+        }
+
+        #endregion
         private void GetImage(object obj, EventArgs e)
         {
-            Thread.Sleep(100);
-            RootTools.Camera.BaslerPylon.Camera_Basler p_CamVRS = p_Module_Camellia.p_CamVRS;
-            Mat mat = new Mat(new System.Drawing.Size(p_CamVRS.GetRoiSize().X, p_CamVRS.GetRoiSize().Y), Emgu.CV.CvEnum.DepthType.Cv8U, 3, p_CamVRS.p_ImageViewer.p_ImageData.GetPtr(), (int)p_CamVRS.p_ImageViewer.p_ImageData.p_Stride * 3);
-            Image<Bgra, byte> img = mat.ToImage<Bgra, byte>();
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                Thread.Sleep(100);
+                RootTools.Camera.BaslerPylon.Camera_Basler p_CamVRS = p_Module_Camellia.p_CamVRS;
+                Mat mat = new Mat(new System.Drawing.Size(p_CamVRS.GetRoiSize().X, p_CamVRS.GetRoiSize().Y), Emgu.CV.CvEnum.DepthType.Cv8U, 3, p_CamVRS.p_ImageViewer.p_ImageData.GetPtr(), (int)p_CamVRS.p_ImageViewer.p_ImageData.p_Stride * 3);
+                Image<Bgra, byte> img = mat.ToImage<Bgra, byte>();
 
-            //CvInvoke.Imshow("aa",img.Mat);
-            //CvInvoke.WaitKey(0);
-            //CvInvoke.DestroyAllWindows();
-            //p_rootViewer.p_ImageData = new ImageData(p_CamVRS.p_ImageViewer.p_ImageData);
-            //lock (lockObject)
-            //{
+                //CvInvoke.Imshow("aa",img.Mat);
+                //CvInvoke.WaitKey(0);
+                //CvInvoke.DestroyAllWindows();
+                //p_rootViewer.p_ImageData = new ImageData(p_CamVRS.p_ImageViewer.p_ImageData);
+                //lock (lockObject)
+                //{
 
-            p_imageSource = ImageHelper.ToBitmapSource(img);
-            //}
-            //p_rootViewer.SetImageSource();
+                p_imageSource = ImageHelper.ToBitmapSource(img);
+                //}
+                //p_rootViewer.SetImageSource();
+            });
+           
         }
 
         public double p_ArrowX1
@@ -1384,5 +1489,7 @@ namespace Root_CAMELLIA
                 RaisePropertyChanged("p_rowIndex");
             }
         }
+
+        
     }
 }
