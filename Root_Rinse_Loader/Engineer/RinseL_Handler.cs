@@ -42,10 +42,10 @@ namespace Root_Rinse_Loader.Engineer
             InitModule(m_rinse);
             m_rail = new Rail("Rail", m_engineer, m_rinse);
             InitModule(m_rail);
-            m_storage = new Storage("Storage", m_engineer, m_rinse, m_rail);
-            InitModule(m_storage);
             m_roller = new Roller("Roller", m_engineer, m_rinse);
             InitModule(m_roller);
+            m_storage = new Storage("Storage", m_engineer, m_rinse, m_rail, m_roller);
+            InitModule(m_storage);
             m_loader = new Loader("Loader", m_engineer, m_rinse, m_storage, m_roller);
             InitModule(m_loader);
         }
@@ -126,8 +126,11 @@ namespace Root_Rinse_Loader.Engineer
 
         void Reset(GAF gaf, ModuleList moduleList)
         {
+            EQ.p_bStop = true; 
             gaf?.ClearALID();
             foreach (ModuleBase module in moduleList.m_aModule.Keys) module.Reset();
+            Thread.Sleep(100); 
+            EQ.p_bStop = false; 
         }
         #endregion
 

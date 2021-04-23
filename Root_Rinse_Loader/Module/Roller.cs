@@ -94,6 +94,7 @@ namespace Root_Rinse_Loader.Module
 
         public override void Reset()
         {
+            RunRotate(false); 
             base.Reset();
         }
         #endregion
@@ -116,6 +117,7 @@ namespace Root_Rinse_Loader.Module
 
         public override void ThreadStop()
         {
+            RunRotate(false);
             base.ThreadStop();
         }
 
