@@ -337,6 +337,7 @@ namespace Root_VEGA_D.Module
             if (!m_diMaskProtrude1.p_bIn) return "Mask Protrude 1 = "+ m_diMaskProtrude1.p_bIn;
             if (!m_diMaskProtrude2.p_bIn) return "Mask Protrude 2 = "+ m_diMaskProtrude2.p_bIn;
             if (!m_diRobotHandProtrude.p_bIn) return "Mask Protrude 1 = "+ m_diRobotHandProtrude.p_bIn;
+            Thread.Sleep(1000);
             return "OK";
         }
         public string StageReticleCheck(bool bOn)

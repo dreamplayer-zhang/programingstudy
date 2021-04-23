@@ -108,6 +108,7 @@ namespace Root_VEGA_D.Module
         public string BuzzerOff()
         {
             m_doBuzzerBtnLamp.Write(false);
+            Thread.Sleep(10);
             m_doBuzzer.AllOff();
             return "OK";
         }

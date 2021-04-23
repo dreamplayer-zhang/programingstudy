@@ -283,42 +283,59 @@
                     <Grid Grid.Column="2">
                         <Grid.RowDefinitions>
                             <RowDefinition />
-                            <RowDefinition />
                         </Grid.RowDefinitions>
                         <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="0.5*"/>
                             <ColumnDefinition />
-                            <ColumnDefinition />
-                            <ColumnDefinition Width="0.7*" />
                         </Grid.ColumnDefinitions>
-                        <!--<GroupBox Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="1">-->
-                            <!--<UniformGrid>-->
-                                <!--<Border Grid.Column="0" Grid.Row="0" BorderBrush="#FF707070" BorderThickness="1">-->
+                        <Border BorderThickness="0.5" BorderBrush="#FF707070">
+                            <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition/>
+                                <RowDefinition/>
+                            </Grid.RowDefinitions>
                                 <TextBlock Text="EQ"
-                                           FontWeight="SemiBold"/>
-                                <!--</Border>-->
-                                <!--<Border Grid.Column="0" Grid.Row="1" BorderBrush="#FF707070" BorderThickness="1">-->
+                                   FontWeight="SemiBold"/>
                                 <TextBlock x:Name="EQState" Grid.Row="1"
-                               FontWeight="SemiBold"/>
-                            <!--</UniformGrid>-->
-                            <!--</Border>-->
-                        <!--</GroupBox>-->
-                        
-                        <TextBlock Grid.Column="1"
+                                   FontWeight="SemiBold"/>
+                            </Grid>
+                        </Border>
+                        <Border BorderThickness="0.5" BorderBrush="#FF707070" Grid.Column="1">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition/>
+                                    <RowDefinition/>
+                                </Grid.RowDefinitions>
+                                <TextBlock Grid.Column="0"
                                    Grid.Row="0" 
+                                   HorizontalAlignment="Left"
+                                   Padding="10,0,0,0"
                                    Text="INSPECTION TIME"
                                    FontWeight="Bold" />
-                        <TextBlock Grid.Column="1"
+                        <TextBlock Grid.Column="0"
                                    Grid.Row="1"
+                                   HorizontalAlignment="Left"
+                                   Padding="10,0,0,0"
                                    Text="RNR COUNT"
                                    FontWeight="Bold" />
-                        <TextBlock Grid.Column="2"
+                        <TextBlock Grid.Column="1"
                                    Grid.Row="0"
                                    x:Name="InspectTime"
+                                   HorizontalAlignment="Left"
+                                   Padding="10,0,0,0"
                                    FontWeight="Bold" />
-                        <TextBlock Grid.Column="2"
+                        <TextBlock Grid.Column="1"
                                    Grid.Row="1"
                                    x:Name="RNRCount"
+                                   HorizontalAlignment="Left"
+                                   Padding="10,0,0,0"
                                    FontWeight="Bold" />
+                            </Grid>
+                        </Border>
                     </Grid>
                     <Grid Grid.Column="4">
                         <Viewbox Margin="5">
@@ -1103,10 +1120,12 @@
                                                   Grid.Column="1">
                                             <Grid Margin="5,2">
                                                 <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition/>
-                                                    <ColumnDefinition/>
-                                                    <ColumnDefinition/>
-                                                    <ColumnDefinition/>
+                                                    <ColumnDefinition Width="2*"/>
+                                                    <ColumnDefinition Width="0.65*"/>
+                                                    <ColumnDefinition Width="1*"/>
+                                                    <ColumnDefinition Width="2*"/>
+                                                    <ColumnDefinition Width="0.65*"/>
+                                                    <ColumnDefinition Width="1*"/>
                                                 </Grid.ColumnDefinitions>
                                                 <TextBlock Grid.Column="0" Text="EFEM CDA"
                                                            HorizontalAlignment="Center"/>
@@ -1114,12 +1133,16 @@
                                                            HorizontalAlignment="Left"
                                                            x:Name="FDC_CDA1"
                                                            Text="{Binding p_CDA1_Value}"/>
-                                                <TextBlock Grid.Column="2" Text="INSPECT CDA"
+                                                <TextBlock Grid.Column="2" Text="MPa"
+                                                           HorizontalAlignment="Left"/>
+                                                <TextBlock Grid.Column="3" Text="INSPECT CDA"
                                                            HorizontalAlignment="Center"/>
-                                                <TextBlock Grid.Column="3"
+                                                <TextBlock Grid.Column="4"
                                                            x:Name="FDC_CDA2"
                                                            Text="{Binding p_CDA2_Value}"
                                                            HorizontalAlignment="Left" />
+                                                <TextBlock Grid.Column="5" Text="MPa"
+                                                           HorizontalAlignment="Left"/>
                                             </Grid>
                                         </GroupBox>
                                         <Grid Grid.Column="0"

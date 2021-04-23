@@ -394,6 +394,7 @@ namespace Root_VEGA_D.Engineer
                 {
                     case EQ.eState.Home: StateHome(); break;
                     case EQ.eState.Run:
+                        m_engineer.m_handler.m_bIsPossible_Recovery = false;
                         if (!m_wtr.m_diArmClose.p_bIn)
                         {
                             m_wtr.m_alidRTRArmError.Run(true, "RTR Arm is open in Cycle");

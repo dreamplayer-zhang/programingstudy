@@ -205,8 +205,8 @@ namespace Root_VEGA_D.Module
 			{
 				try
 				{
-                    p_CDA1_Value = Math.Truncate(m_ACS.GetAnalogData((int)eAnalog_CDA.CDA1) / 32768 * 100) / 100;
-                    p_CDA2_Value = Math.Truncate(m_ACS.GetAnalogData((int)eAnalog_CDA.CDA2) / 32768 * 100) / 100;
+                    p_CDA1_Value = Math.Truncate(m_ACS.GetAnalogData((int)eAnalog_CDA.CDA1) / 32768 * 1000) / 1000;
+                    p_CDA2_Value = Math.Truncate(m_ACS.GetAnalogData((int)eAnalog_CDA.CDA2) / 32768 * 1000) / 1000;
                 }
 				catch (Exception e) { m_log.Info("FDC Error " + e.Message); }
 				if (p_CDA1_Value < m_mmLimitCDA1.X)
