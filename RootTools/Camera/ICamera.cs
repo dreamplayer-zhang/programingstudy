@@ -15,6 +15,7 @@ namespace RootTools.Camera
         public int nScanOffsetY = 0;
         public bool bInvY = false;
         public int ReverseOffsetY = 0;
+        public double m_dScale = 1; //Gray
         public double m_dScaleR = 1;
         public double m_dScaleG = 1;
         public double m_dScaleB = 1;

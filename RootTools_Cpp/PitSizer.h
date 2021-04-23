@@ -19,9 +19,11 @@ private:
 	int PathNum;
 	float PitSize, DiscolorSize;
 	RECT m_rcPitRect;
+	int m_nGV;
 
 public:
 	RECT GetPitRect();
+	int GetGV();
 	int GetDefectMapLength();
 	POINT* GetDefectMapPath();
 	int m_nMaxDefectMapLength;

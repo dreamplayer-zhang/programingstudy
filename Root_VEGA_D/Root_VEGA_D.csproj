@@ -61,6 +61,10 @@
     <Reference Include="EasyModbus">
       <HintPath>bin\x64\EasyModbus.dll</HintPath>
     </Reference>
+    <Reference Include="Interop.SPIIPLUSCOM660Lib">
+      <HintPath>..\RootTools\obj\x64\Debug\Interop.SPIIPLUSCOM660Lib.dll</HintPath>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </Reference>
     <Reference Include="MahApps.Metro.IconPacks, Version=4.0.0.0, Culture=neutral, PublicKeyToken=0c0d510f9915137a, processorArchitecture=MSIL">
       <HintPath>..\packages\MahApps.Metro.IconPacks.4.8.0\lib\net47\MahApps.Metro.IconPacks.dll</HintPath>
     </Reference>
@@ -278,13 +282,13 @@
     <Compile Include="ManualJobSchedule\ManualJobSchedule_UI.xaml.cs">
       <DependentUpon>ManualJobSchedule_UI.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Module\FDC.cs" />
     <Compile Include="Module\FFU.cs" />
     <Compile Include="Module\FFU_Fan_UI.xaml.cs">
       <DependentUpon>FFU_Fan_UI.xaml</DependentUpon>
     </Compile>
     <Compile Include="Module\GrabMode.cs" />
     <Compile Include="Module\Interlock.cs" />
+    <Compile Include="Module\Reicpe\ADIRecipe.cs" />
     <Compile Include="Module\Reicpe\PosRecipeData.cs" />
     <Compile Include="Module\TowerLamp.cs" />
     <Compile Include="Module\Vision\Run_GrabLineScan.cs" />
@@ -358,7 +362,17 @@
       <Name>Root_VEGA_D_IPU</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <COMReference Include="SPIIPLUSCOM660Lib">
+      <Guid>{A50D9364-B5CE-4F09-BED2-E460B41671F6}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </COMReference>
+  </ItemGroup>
   <ItemGroup>
     <Resource Include="Resource\Reticle.png" />
   </ItemGroup>

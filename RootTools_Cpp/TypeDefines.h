@@ -26,6 +26,7 @@ typedef struct _DefectDataStruct
 	LONG nHeight;
 	LONG nInspMode;
 	LONG nFOV;
+	LONG GV;
 	double fPosX;
 	double fPosY;
 } DefectDataStruct;

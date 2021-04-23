@@ -12,10 +12,21 @@ namespace Root_WIND2
         public override void Initilize()
         {
             // Regiseter Recipe Items
+            RegisterRecipeItem<OriginRecipe>();
             RegisterRecipeItem<EdgeSurfaceRecipe>();
 
             // Regiseter Parameter Items
             RegisterParameterItem<EdgeSurfaceParameter>();
+            RegisterParameterItem<ProcessDefectEdgeParameter>();
+
+            CreateMap();
+        }
+
+        public void CreateMap()
+        {
+            this.WaferMap.MapSizeX = 1;
+            this.WaferMap.MapSizeY = 1;
+            this.WaferMap.CreateWaferMap(this.WaferMap.MapSizeX, this.WaferMap.MapSizeY, CHIP_TYPE.NORMAL);
         }
     }
 }

@@ -49,7 +49,7 @@ namespace Root_Rinse_Unloader.Module
                 if (bInit)
                 {
                     m_dioVacuum.Write(false);
-                    m_doBlow.Write(false); 
+                    m_doBlow.Write(false);
                 }
             }
 
@@ -142,6 +142,8 @@ namespace Root_Rinse_Unloader.Module
 
         public string MoveLoader(ePos ePos)
         {
+            if ((m_rail.m_dioPusherDown.p_bOut == false) || (m_rail.m_dioPusherDown.p_bDone == false))  return "Check Pusher Down";
+            if ((m_dioPickerDown.p_bOut) || (m_dioPickerDown.p_bDone == false)) return "Check Picker Down";
             m_axis.StartMove(ePos);
             return m_axis.WaitReady();
         }
@@ -197,14 +199,30 @@ namespace Root_Rinse_Unloader.Module
                 Thread.Sleep(10);
                 if (EQ.IsStop()) return "EQ Stop"; 
             }
+            if (Run(RunPickerLoad())) return p_sInfo; 
+            if (RunCheckStrip() != "OK")
+            {
+                if (Run(RunPickerLoad())) return p_sInfo;
+            }
+            if (RunCheckStrip() != "OK")
+            {
+                EQ.p_bStop = true;
+                EQ.p_eState = EQ.eState.Error; 
+                m_alidRollerStripCheck.p_bSet = true;
+                return "Load Strip Error"; 
+            }
+            m_roller.p_eStep = Roller.eStep.Empty;
+            if (Run(m_roller.RunRotate(true))) return p_sInfo;
+            return "OK";
+        }
+
+        string RunPickerLoad()
+        {
             if (Run(RunVacuum(true))) return p_sInfo;
             if (Run(RunPickerDown(true))) return p_sInfo;
             Thread.Sleep((int)(1000 * m_secVac));
             if (Run(RunPickerDown(false))) return p_sInfo;
-            if (Run(RunCheckStrip())) return p_sInfo;
-            m_roller.p_eStep = Roller.eStep.Empty;
-            if (Run(m_roller.RunRotate(true))) return p_sInfo;
-            return "OK";
+            return "OK"; 
         }
 
         public string RunUnload()
@@ -242,13 +260,7 @@ namespace Root_Rinse_Unloader.Module
             string sResult = "OK";
             foreach (Roller.Line line in m_roller.m_aLine)
             {
-                if (line.m_diCheck[2].p_bIn)
-                {
-                    EQ.p_bStop = true;
-                    EQ.p_eState = EQ.eState.Error; 
-                    m_alidRollerStripCheck.p_bSet = true;
-                    return "Roller Check Strip";
-                }
+                if (line.m_diCheck[2].p_bIn) return "Roller Check Strip";
             }
             return sResult;
         }
@@ -360,12 +372,14 @@ namespace Root_Rinse_Unloader.Module
 
         RinseU m_rinse;
         Storage m_storage;
+        Rail m_rail; 
         Roller m_roller;
-        public Loader(string id, IEngineer engineer, RinseU rinse, Storage storage, Roller roller)
+        public Loader(string id, IEngineer engineer, RinseU rinse, Storage storage, Rail rail, Roller roller)
         {
             p_id = id;
             m_rinse = rinse;
             m_storage = storage;
+            m_rail = rail; 
             m_roller = roller;
             InitPickers();
             InitBase(id, engineer);

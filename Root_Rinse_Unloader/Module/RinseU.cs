@@ -327,10 +327,21 @@ namespace Root_Rinse_Unloader.Module
         public void RunBuzzer(eBuzzer eBuzzer)
         {
             m_doBuzzer.Write(eBuzzer);
+            m_swBuzzer.Start();
         }
 
         public void RunBuzzerOff()
         {
+            m_doBuzzer.AllOff();
+            //AddProtocol(p_id, eCmd.BuzzerOff, "Off");
+        }
+
+        StopWatch m_swBuzzer = new StopWatch();
+        int m_secBuzzerOff = 10;
+        void AutoBuzzerOff()
+        {
+            if (m_swBuzzer.ElapsedMilliseconds < (1000 * m_secBuzzerOff)) return;
+            m_swBuzzer.Start();
             m_doBuzzer.AllOff();
         }
 
@@ -365,6 +376,8 @@ namespace Root_Rinse_Unloader.Module
         
         void RunThreadDIO()
         {
+            AutoBuzzerOff();
+            CheckFinish(); 
             p_bEMG = m_diEMG.p_bIn;
             p_bAir = m_diAir.p_bIn;
             p_bDoorOpen = !m_diDoorLock.p_bIn || !m_diLightCurtain.p_bIn;
@@ -373,16 +386,20 @@ namespace Root_Rinse_Unloader.Module
             if (m_swBlick.ElapsedMilliseconds < 500) return;
             m_swBlick.Start();
             m_bBlink = !m_bBlink;
-            if (m_bBlink == false) m_doLamp.AllOff();
-            else
+            switch (EQ.p_eState)
             {
-                switch (EQ.p_eState)
-                {
-                    case EQ.eState.Ready: m_doLamp.Write(eLamp.Yellow); break;
-                    case EQ.eState.Run: m_doLamp.Write(eLamp.Green); break;
-                    case EQ.eState.Error: m_doLamp.Write(eLamp.Red); break;
-                    default: m_doLamp.AllOff(); break;
-                }
+                case EQ.eState.Init:
+                    m_doLamp.AllOff();
+                    m_doLamp.Write(eLamp.Yellow, m_bBlink);
+                    break;
+                case EQ.eState.Home:
+                    m_doLamp.Write(eLamp.Yellow, true);
+                    m_doLamp.Write(eLamp.Green, true);
+                    m_doLamp.Write(eLamp.Red, true);
+                    break;
+                case EQ.eState.Ready: m_doLamp.Write(eLamp.Yellow); break;
+                case EQ.eState.Run: m_doLamp.Write(eLamp.Green); break;
+                case EQ.eState.Error: m_doLamp.Write(eLamp.Red); break;
             }
         }
         #endregion
@@ -400,7 +417,8 @@ namespace Root_Rinse_Unloader.Module
             StripReceive,
             ResultClear,
             SetRotateSpeed,
-            BuzzerOff
+            BuzzerOff,
+            Finish,
         }
         public string[] m_asCmd = Enum.GetNames(typeof(eCmd)); 
 
@@ -528,6 +546,10 @@ namespace Root_Rinse_Unloader.Module
                         case eCmd.BuzzerOff:
                             AddProtocol(asRead[0], eCmd, asRead[2]);
                             RunBuzzerOff();
+                            break;
+                        case eCmd.Finish:
+                            AddProtocol(asRead[0], eCmd, asRead[2]);
+                            RunFinishTimer(); 
                             break; 
                     }
                 }
@@ -603,12 +625,34 @@ namespace Root_Rinse_Unloader.Module
         }
         #endregion
 
+        #region Finish
+        StopWatch m_swFinish = new StopWatch(); 
+        bool m_bCheckFinish = false; 
+        void RunFinishTimer()
+        {
+            m_swFinish.Start(); 
+            m_bCheckFinish = true; 
+        }
+
+        int m_minFinish = 7; 
+        void CheckFinish()
+        {
+            if (m_bCheckFinish == false) return;
+            if (m_swFinish.ElapsedMilliseconds < (60000 * m_minFinish)) return;
+            m_bCheckFinish = false;
+            EQ.p_bStop = true;
+            EQ.p_eState = EQ.eState.Ready; 
+        }
+        #endregion
+
         #region Tree
         public override void RunTree(Tree tree)
         {
             base.RunTree(tree);
             p_eMode = (eRunMode)tree.Set(p_eMode, p_eMode, "Mode", "RunMode", true, true);
             p_widthStrip = tree.Set(p_widthStrip, p_widthStrip, "Width", "Strip Width (mm)", true, true);
+            m_secBuzzerOff = tree.Set(m_secBuzzerOff, m_secBuzzerOff, "Buzzer Off", "Buzzer Off Delay (sec)");
+            m_minFinish = tree.Set(m_minFinish, m_minFinish, "Finish", "Finish Delay (min)");
         }
         #endregion
 

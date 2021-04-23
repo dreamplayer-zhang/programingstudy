@@ -48,6 +48,7 @@ namespace Root_Rinse_Loader
             tabControlStorage.SelectedIndex = (int)m_handler.m_rinse.p_eMode;
             progressUI.Init(m_handler.m_rinse); 
             textBoxRotateSpeed.DataContext = m_handler.m_rinse;
+            checkBoxEQStop.DataContext = EQ.m_EQ; 
         }
         #endregion
 
@@ -134,7 +135,11 @@ namespace Root_Rinse_Loader
                 borderUnloadState.Background = (rinse.p_eStateUnloader == EQ.eState.Ready || rinse.p_eStateUnloader == EQ.eState.Run) ? Brushes.SeaGreen : Brushes.Gold;
                 textBlockUnloadState.Text = rinse.p_eStateUnloader.ToString();
             }
-            else { borderUnloadState.Background = Brushes.Crimson; }
+            else 
+            { 
+                borderUnloadState.Background = Brushes.Crimson;
+                if (rinse.m_tcpip.p_bConnect == false) rinse.Reset(); 
+            }
 
             gridRed.Background = (bBlink && (EQ.p_eState == EQ.eState.Error)) ? Brushes.Crimson : Brushes.DarkRed;
             gridYellow.Background = (bBlink && (EQ.p_eState == EQ.eState.Ready)) ? Brushes.Gold : Brushes.YellowGreen;
@@ -170,7 +175,7 @@ namespace Root_Rinse_Loader
         private void buttonReset_Click(object sender, RoutedEventArgs e)
         {
             m_handler.m_rinse.RunBuzzerOff();
-            m_handler.m_rinse.Reset(); 
+            m_handler.Reset(); 
             EQ.p_eState = EQ.eState.Ready;
         }
 

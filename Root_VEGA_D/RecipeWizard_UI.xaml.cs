@@ -34,7 +34,35 @@ namespace Root_VEGA_D
             viewerVM = new RootViewer_ViewModel();
             viewerVM.init(new ImageData(m_engineer.ClassMemoryTool().GetMemory("Vision.Memory", "Vision", "Main")));
             Viewer_UI.DataContext = viewerVM;
+
+            HelpCollapsed();
             return true;
+        }
+        private void CalcSize()
+        {
+            Int32.TryParse(tb_a.Text, out int a);
+            Int32.TryParse(tb_b.Text, out int b);
+            Int32.TryParse(tb_c.Text, out int c);
+            Int32.TryParse(tb_d.Text, out int d);
+            Int32.TryParse(tb_e.Text, out int ee);
+            Int32.TryParse(tb_f.Text, out int f);
+            Int32.TryParse(tb_g.Text, out int g);
+            Int32.TryParse(tb_h.Text, out int h);
+            tb_dieSize.Text = (b - a).ToString() + "," + (ee - f).ToString();
+            tb_laneSize.Text = (c - b).ToString() + "," + (f - g).ToString();
+            tb_shotSize.Text = (c - a).ToString() + "," + (ee - g).ToString();
+            tb_shot.Text = (d - a).ToString() + "," + (d - h).ToString();
+        }
+        private void HelpCollapsed()
+        {
+            Arrow_a.Visibility = Visibility.Collapsed;
+            Arrow_b.Visibility = Visibility.Collapsed;
+            Arrow_c.Visibility = Visibility.Collapsed;
+            Arrow_d.Visibility = Visibility.Collapsed;
+            Arrow_e.Visibility = Visibility.Collapsed;
+            Arrow_f.Visibility = Visibility.Collapsed;
+            Arrow_g.Visibility = Visibility.Collapsed;
+            Arrow_h.Visibility = Visibility.Collapsed;
         }
 
         private void Viewer_UI_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -97,27 +125,11 @@ namespace Root_VEGA_D
             }
 
         }
-        private void CalcSize()
-        {
-            Int32.TryParse(tb_a.Text, out int a);
-            Int32.TryParse(tb_b.Text, out int b);
-            Int32.TryParse(tb_c.Text, out int c);
-            Int32.TryParse(tb_d.Text, out int d);
-            Int32.TryParse(tb_e.Text, out int ee);
-            Int32.TryParse(tb_f.Text, out int f);
-            Int32.TryParse(tb_g.Text, out int g);
-            Int32.TryParse(tb_h.Text, out int h);
-            tb_dieSize.Text = (b - a).ToString() + "," + (ee - f).ToString();
-            tb_laneSize.Text = (c - b).ToString() + "," + (f - g).ToString();
-            tb_shotSize.Text = (c - a).ToString() + "," + (ee - g).ToString();
-            tb_shot.Text = (d - a).ToString() + "," + (d - h).ToString();
-        }
         private void GroupBox_GotFocus(object sender, RoutedEventArgs e)
         {
             rb_AlignPt1.IsChecked = false;
             rb_AlignPt2.IsChecked = false;
         }
-
         private void GroupBox_GotFocus_1(object sender, RoutedEventArgs e)
         {
             HelpCollapsed();
@@ -130,19 +142,6 @@ namespace Root_VEGA_D
             rb_g.IsChecked = false;
             rb_h.IsChecked = false;
         }
-
-        private void HelpCollapsed()
-        {
-            Arrow_a.Visibility = Visibility.Collapsed;
-            Arrow_b.Visibility = Visibility.Collapsed;
-            Arrow_c.Visibility = Visibility.Collapsed;
-            Arrow_d.Visibility = Visibility.Collapsed;
-            Arrow_e.Visibility = Visibility.Collapsed;
-            Arrow_f.Visibility = Visibility.Collapsed;
-            Arrow_g.Visibility = Visibility.Collapsed;
-            Arrow_h.Visibility = Visibility.Collapsed;
-        }
-
         private void Coordinate_Checked(object sender, RoutedEventArgs e)
         {
             HelpCollapsed();
