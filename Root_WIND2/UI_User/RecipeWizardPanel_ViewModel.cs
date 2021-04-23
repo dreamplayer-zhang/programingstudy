@@ -75,9 +75,9 @@ namespace Root_WIND2.UI_User
         public readonly UI_User.BacksideSetup backsideSetup = new UI_User.BacksideSetup();
         public readonly UI_User.BacksideInspect backsideInspect = new UI_User.BacksideInspect();
 
-        // EDGE
-        public readonly UI_User.EdgesideSetup edgesideSetup = new UI_User.EdgesideSetup();
-        public readonly UI_User.EdgesideInspect edgesideInspect = new UI_User.EdgesideInspect();
+		// EDGE
+		public readonly UI_User.EdgesideSetup edgesideSetup = new UI_User.EdgesideSetup();
+		public readonly UI_User.EdgesideInspect edgesideInspect = new UI_User.EdgesideInspect();
 
         // EBR
         public readonly UI_User.EBRSetup ebrSetup = new UI_User.EBRSetup();
@@ -169,9 +169,9 @@ namespace Root_WIND2.UI_User
         #region [Edge ViewModels]
         private UI_User.EdgesideSetup_ViewModel edgesideSetupVM = new UI_User.EdgesideSetup_ViewModel();
         public UI_User.EdgesideSetup_ViewModel EdgesideSetupVM
-		{
+        {
             get => edgesideSetupVM;
-		}
+        }
         private UI_User.EdgesideInspect_ViewModel edgesideInspectionVM = new UI_User.EdgesideInspect_ViewModel();
         public UI_User.EdgesideInspect_ViewModel EdgesideInspectionVM
         {
@@ -778,7 +778,7 @@ namespace Root_WIND2.UI_User
         }
         #endregion
 
-            #region [Command Back]
+        #region [Command Back]
         public ICommand btnBackSetup
         {
             get

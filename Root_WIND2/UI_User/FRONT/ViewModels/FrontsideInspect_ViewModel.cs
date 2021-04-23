@@ -188,7 +188,7 @@ namespace Root_WIND2.UI_User
                     GlobalObjects.Instance.GetNamed<WorkManager>("frontInspection").WorkplaceStateChanged += WorkplaceStateChanged_Callback;
                     WIND2EventManager.SnapDone += SnapDone_Callback;
                 }
-
+                    
                 //if (GlobalObjects.Instance.Get<InspectionManagerFrontside>() != null)
                 //{
                 //    GlobalObjects.Instance.Get<InspectionManagerFrontside>().WorkplaceStateChanged += WorkplaceStateChanged_Callback;

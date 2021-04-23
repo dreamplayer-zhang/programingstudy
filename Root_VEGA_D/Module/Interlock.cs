@@ -6,6 +6,7 @@ using RootTools.Trees;
 using Root_VEGA_D.Engineer;
 using RootTools.Control.ACS;
 using System.Threading;
+using System;
 
 namespace Root_VEGA_D.Module
 {
@@ -21,6 +22,16 @@ namespace Root_VEGA_D.Module
         DIO_I m_diEFEMLeft_Door;
         DIO_I m_diEFEMRight_Door;
         DIO_I m_diActiveIsolator_Alarm;
+        public DIO_I m_diFP_Isolator;
+        public DIO_I m_diIsolator_VPre;
+        public DIO_I m_diFactory_Air_PadPre;
+        public DIO_I m_diAir_TankPre;
+        public DIO_I m_diX_BottomPre;
+        public DIO_I m_diX_SideMasterPre;
+        public DIO_I m_diX_SideSlavePre;
+        public DIO_I m_diY_BottomPre;
+        public DIO_I m_diY_SideMasterPre;
+        public DIO_I m_diY_SideSlavePre;
         DIO_I m_diVisionFFU_Door;
         DIO_I m_diVisionTop_Door;
         DIO_I m_diVisionBtm_Door;
@@ -46,6 +57,16 @@ namespace Root_VEGA_D.Module
             p_sInfo = m_toolBox.GetDIO(ref m_diEFEMLeft_Door, this, "EFEM Left Door");
             p_sInfo = m_toolBox.GetDIO(ref m_diEFEMRight_Door, this, "EFEM Right Door");
             p_sInfo = m_toolBox.GetDIO(ref m_diActiveIsolator_Alarm, this, "Active Isolator Alarm");
+            p_sInfo = m_toolBox.GetDIO(ref m_diFP_Isolator, this, "Factory Pressure Isolator Indicator");
+            p_sInfo = m_toolBox.GetDIO(ref m_diIsolator_VPre, this, "Isolator V Pressure Indicator");
+            p_sInfo = m_toolBox.GetDIO(ref m_diFactory_Air_PadPre, this, "Factory Air Pad Pressure Indicator");
+            p_sInfo = m_toolBox.GetDIO(ref m_diAir_TankPre, this, "Air Tank Pressure Indicator");
+            p_sInfo = m_toolBox.GetDIO(ref m_diX_BottomPre, this, "X Bottom Pressure Indicator");
+            p_sInfo = m_toolBox.GetDIO(ref m_diX_SideMasterPre, this, "X Side Master Pressure Indicator");
+            p_sInfo = m_toolBox.GetDIO(ref m_diX_SideSlavePre, this, "X Side Slave Pressure Indicator");
+            p_sInfo = m_toolBox.GetDIO(ref m_diY_BottomPre, this, "Y Bottom Pressure Indicator");
+            p_sInfo = m_toolBox.GetDIO(ref m_diY_SideMasterPre, this, "Y Side Master Pressure Indicator");
+            p_sInfo = m_toolBox.GetDIO(ref m_diY_SideSlavePre, this, "Y Side Slave Pressure Indicator");
             p_sInfo = m_toolBox.GetDIO(ref m_diVisionFFU_Door, this, "Vision FFU Door");
             p_sInfo = m_toolBox.GetDIO(ref m_diVisionTop_Door, this, "Vision Top Door");
             p_sInfo = m_toolBox.GetDIO(ref m_diVisionBtm_Door, this, "Vision Bottom Door");
@@ -72,8 +93,10 @@ namespace Root_VEGA_D.Module
         ALID m_alidMCReset_EMS;
         ALID m_alidMCReset_EMO;
         ALID m_alidDoorLock;
+        ALID m_alidCDA1_digital;
         ALID m_alidCDA1_Low;
         ALID m_alidCDA1_High;
+        ALID m_alidCDA2_digital;
         ALID m_alidCDA2_Low;
         ALID m_alidCDA2_High;
         ALID m_alidEFEMLeft_Door;
@@ -97,8 +120,10 @@ namespace Root_VEGA_D.Module
             m_alidMCReset_EMS = m_gaf.GetALID(this, "MC Reset (EMS)", "MC Reset Error");
             m_alidMCReset_EMO = m_gaf.GetALID(this, "MC Reset (EMO)", "MC Reset Error");
             m_alidDoorLock = m_gaf.GetALID(this, "Door Lock", "Door Lock Error");
+            m_alidCDA1_digital = m_gaf.GetALID(this, "CDA2 Pressure Digital", "CDA1 Pressure Error(Digital)");
             m_alidCDA1_Low = m_gaf.GetALID(this, "CDA1 Pressure Low Alarm", "CDA1 Pressure Low Error");
             m_alidCDA1_High = m_gaf.GetALID(this, "CDA1 Pressure Low Alarm", "CDA1 Pressure Low Error");
+            m_alidCDA2_digital = m_gaf.GetALID(this, "CDA2 Pressure Digital", "CDA2 Pressure Error(Digital)");
             m_alidCDA2_Low = m_gaf.GetALID(this, "CDA2 Pressure", "CDA2 Pressure Low Error");
             m_alidCDA2_High = m_gaf.GetALID(this, "CDA2 Pressure", "CDA2 Pressure High Error");
             m_alidEFEMLeft_Door = m_gaf.GetALID(this, "EFEM Left Door", "EFEM Left Door Open");
@@ -119,31 +144,73 @@ namespace Root_VEGA_D.Module
         }
         #endregion
         #region FDC
-        double CDA1_Value;
-        double CDA2_Value;
+        enum eAnalog_CDA
+        {
+            CDA1 =0,
+            CDA2
+        }
+
+        public double m_CDA1_Value;
+        public double p_CDA1_Value
+        {
+            get
+            {
+                return m_CDA1_Value;
+            }
+            set
+            {
+                if (Math.Abs(m_CDA1_Value - value) < 0.05) return;
+                m_CDA1_Value = value;
+                OnPropertyChanged();
+            }
+        }
+        public double p_CDA2_Value
+        {
+            get
+            {
+                return m_CDA2_Value;
+            }
+            set
+            {
+                if (Math.Abs(m_CDA2_Value - value) < 0.05) return;
+                m_CDA2_Value = value;
+                OnPropertyChanged();
+            }
+        }
+        public double m_CDA2_Value;
         public void CheckFDC()
 		{
-            //CDA1_Value = m_ACS.GetAnalogData(m_diCDA1.m_bitDI.m_nID);
-            //CDA2_Value = m_ACS.GetAnalogData(m_diCDA2.m_bitDI.m_nID);
-            //if (CDA1_Value < m_mmLimitCDA1.X)
-            //{ m_alidCDA1_Low.Run(true, "CDA1_Value Pressure Lower than Limit"); }
-            //if (CDA1_Value > m_mmLimitCDA1.Y)
-            //{ m_alidCDA1_High.Run(true, "CDA1_Value Pressure Higher than Limit"); }
-            //if (CDA2_Value < m_mmLimitCDA2.X)
-            //{ m_alidCDA2_Low.Run(true, "CDA2_Value Pressure Lower than Limit"); }
-            //if (CDA2_Value > m_mmLimitCDA2.Y)
-            //{ m_alidCDA2_High.Run(true, "CDA2_Value Pressure Higher than Limit"); }
-        }
+			Thread.Sleep(10);
+			if (m_ACS.p_id != null)
+			{
+				try
+				{
+					p_CDA1_Value = m_ACS.GetAnalogData((int)eAnalog_CDA.CDA1);
+					p_CDA2_Value = m_ACS.GetAnalogData((int)eAnalog_CDA.CDA2);
+				}
+				catch (Exception e) { m_log.Info("FDC Error " + e.Message); }
+				if (p_CDA1_Value < m_mmLimitCDA1.X)
+				{ m_alidCDA1_Low.Run(true, "CDA1_Value Pressure Lower than Limit"); }
+				if (p_CDA1_Value > m_mmLimitCDA1.Y)
+				{ m_alidCDA1_High.Run(true, "CDA1_Value Pressure Higher than Limit"); }
+				if (p_CDA2_Value < m_mmLimitCDA2.X)
+				{ m_alidCDA2_Low.Run(true, "CDA2_Value Pressure Lower than Limit"); }
+				if (p_CDA2_Value > m_mmLimitCDA2.Y)
+				{ m_alidCDA2_High.Run(true, "CDA2_Value Pressure Higher than Limit"); }
+			}
+		}
         #endregion
         #region Thread
+        EQ.eState m_eStateLast;
         protected override void RunThread()
         {
             base.RunThread();
-            m_alidEmergency.Run(!m_diEmergency.p_bIn, "Please Check Emergency Sensor");
-            if (!m_diMCReset.p_bIn)
+            //m_alidEmergency.Run(!m_diEmergency.p_bIn, "Please Check Emergency Sensor");
+            if (!m_diMCReset.p_bIn && !m_diEmergency.p_bIn)
             {
+                m_alidEmergency.Run(true, "Please Check Emergency Sensor");
                 Thread.Sleep(100);
-                if (!m_diCDA1.p_bIn) m_alidMCReset_EMO.Run(!m_diMCReset.p_bIn, "Please Check M/C Reset (EMO)");
+                if (m_ACS.p_bConnect == false) m_alidMCReset_EMO.Run(!m_diMCReset.p_bIn, "Please Check M/C Reset (EMO)");
                 else m_alidMCReset_EMS.Run(!m_diMCReset.p_bIn, "Please Check M/C Reset (EMS)");
             }
             if (m_diInterlock_key.p_bIn)
@@ -152,8 +219,8 @@ namespace Root_VEGA_D.Module
             }
             CheckFDC();
 
-            //m_alidCDA1.Run(!m_diCDA1.p_bIn, "Please Check CDA1 Pressure Sensor");
-            //m_alidCDA2.Run(!m_diCDA2.p_bIn, "Please Check CDA2 Pressure Sensor");
+            m_alidCDA1_digital.Run(!m_diCDA1.p_bIn, "Please Check CDA1 Pressure Sensor");
+            m_alidCDA1_digital.Run(!m_diCDA2.p_bIn, "Please Check CDA2 Pressure Sensor");
 
             m_alidEFEMLeft_Door.Run(!m_diEFEMLeft_Door.p_bIn, "EFEM Left Door Open");
             m_alidEFEMRight_Door.Run(!m_diEFEMRight_Door.p_bIn, "EFEM Right Door Open");
@@ -170,6 +237,13 @@ namespace Root_VEGA_D.Module
             m_alidElecRackFan_Alarm.Run(!m_diELECRackFan_Alarm.p_bIn, "Elec Rack Fan Alarm");
             m_alidPiezo_Alarm.Run(!m_diPiezo_Alarm.p_bIn, "Piezo Alarm");
 
+            m_eStateLast = EQ.p_eState;
+            if (m_bDoorlock_Use == true && (m_eStateLast != EQ.p_eState))
+            {
+                if (EQ.p_eState == EQ.eState.Run) m_doDoorLock.Write(true);
+                else m_doDoorLock.Write(false);
+            }
+
             if (m_bLightCurtain_Use)
             {
                 m_alidLightCurtain.Run(!m_diLightCurtain.p_bIn, "Light Curtain Detect Error"); 
@@ -182,6 +256,7 @@ namespace Root_VEGA_D.Module
         #endregion
 
         #region Tree
+        bool m_bDoorlock_Use = false;
         bool m_bLightCurtain_Use = false;
         bool m_bProtectionbar_Use = false;
         public override void RunTree(Tree tree)
@@ -192,6 +267,7 @@ namespace Root_VEGA_D.Module
         }
         void RunTreeFDC(Tree tree)
         {
+            m_bDoorlock_Use = tree.Set(m_bDoorlock_Use, m_bDoorlock_Use, "Doorlock Use", "Doorlock Use");
             m_mmLimitCDA1 = tree.Set(m_mmLimitCDA1, m_mmLimitCDA1, "Limit", "FDC CDA1 Lower & Upper Limit");
             m_mmLimitCDA2 = tree.Set(m_mmLimitCDA2, m_mmLimitCDA2, "Limit", "FDC CDA2 Lower & Upper Limit");
         }

@@ -207,8 +207,8 @@ namespace Root_VEGA_P.Module
                     if (EQ.IsStop()) return "EQ Stop";
                     if (IsSeal(eDoorSeal)) return "OK"; 
                 }
-                //return "Door Seal Timeover"; 
-                return "OK";
+                return "Door Seal Timeover";
+                //return "OK";
             }
 
             bool IsSeal(eDoorSeal eDoorSeal)
@@ -429,18 +429,18 @@ namespace Root_VEGA_P.Module
                     m_infoPods.p_ePresentSensor = GemCarrierBase.ePresent.Exist;
                     m_infoPods.p_sCarrierID = "Simulation"; 
                 }
-                //else
-                //{
-                //    switch (m_infoPods.p_eState)
-                //    {
-                //        case InfoPods.eState.Dock: return "OK";
-                //        case InfoPods.eState.Empty: return "Pod not Exist";
-                //    }
-                //    string sRFID = ""; 
-                //    m_RFID.Read(out sRFID);
-                //    m_infoPods.p_sCarrierID = sRFID; 
-                //}
-                //m_infoPods.SendCarrierID(m_infoPods.p_sCarrierID); 
+                else
+                {
+                    switch (m_infoPods.p_eState)
+                    {
+                        case InfoPods.eState.Dock: return "OK";
+                        case InfoPods.eState.Empty: return "Pod not Exist";
+                    }
+                    string sRFID = "";
+                    m_RFID.Read(out sRFID);
+                    m_infoPods.p_sCarrierID = sRFID;
+                }
+                m_infoPods.SendCarrierID(m_infoPods.p_sCarrierID);
                 m_bDocking = true; 
                 if (m_stage.p_bPlaced == false) return "Not Placed";
                 if (m_stage.p_bPresent == false) return "Not Present";
@@ -533,9 +533,10 @@ namespace Root_VEGA_P.Module
 
         public void RunTreeTeach(Tree tree)
         {
+            Tree treeTeach = tree.GetTree(p_id); 
             for (int n = 0; n < 4; n++)
             {
-                m_teachRTR[n] = tree.Set(m_teachRTR[n], m_teachRTR[n], ((InfoPod.ePod)n).ToString(), "RND RTR Teach"); 
+                m_teachRTR[n] = treeTeach.Set(m_teachRTR[n], m_teachRTR[n], ((InfoPod.ePod)n).ToString(), "RND RTR Teach"); 
             }
         }
         #endregion
@@ -632,7 +633,7 @@ namespace Root_VEGA_P.Module
 
             public override ModuleRunBase Clone()
             {
-                Run_Docking run = new Run_Docking(m_module);
+                Run_Undocking run = new Run_Undocking(m_module);
                 return run;
             }
 

@@ -75,17 +75,19 @@ namespace RootTools_Vision
 			else if (this.currentWorkplace.MapIndexX == (int)EdgeMapPositionX.Btm)
 				param = parameterEdge.EdgeParamBaseBtm;
 			
-			// 연구소WIND R채널만 검사
-			DoColorInspection(this.GetWorkplaceBuffer(IMAGE_CHANNEL.R_GRAY), param);
-			//DoColorInspection(this.GetWorkplaceBuffer(IMAGE_CHANNEL.G), param);
-			//DoColorInspection(this.GetWorkplaceBuffer(IMAGE_CHANNEL.B), param);
+			if (param.ChR)
+				DoColorInspection(this.GetWorkplaceBuffer(IMAGE_CHANNEL.R_GRAY), param);
+			if (param.ChG)
+				DoColorInspection(this.GetWorkplaceBuffer(IMAGE_CHANNEL.G), param);
+			if (param.ChB)
+				DoColorInspection(this.GetWorkplaceBuffer(IMAGE_CHANNEL.B), param);
 
 			WorkEventManager.OnInspectionDone(this.currentWorkplace, new InspectionDoneEventArgs(new List<CRect>())); // 나중에 ProcessDefect쪽 EVENT로...
 		}
 
 		private void DoColorInspection(byte[] arrSrc, EdgeSurfaceParameterBase param)
 		{
-			int roiWidth = param.ROIWidth;
+			int roiWidth = 500;//param.ROIWidth;
 			int roiHeight = param.ROIHeight;
 			int threshold = param.Threshold;
 			int defectSizeMin = param.DefectSizeMin;

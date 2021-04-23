@@ -12,6 +12,7 @@ using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
+using RootTools_Vision.WorkManager3;
 
 namespace Root_WIND2.UI_User
 {
@@ -84,8 +85,9 @@ namespace Root_WIND2.UI_User
 				this.ImageViewerBtmVM.ClearObjects();
 				Progress = 0;
 
-				if (GlobalObjects.Instance.Get<InspectionManagerEdge>() != null)
-					GlobalObjects.Instance.Get<InspectionManagerEdge>().Start();
+				if (GlobalObjects.Instance.GetNamed<WorkManager>("edgeTopInspection") != null)
+					GlobalObjects.Instance.GetNamed<WorkManager>("edgeTopInspection").Start();
+				return;
 			});
 		}
 
@@ -110,8 +112,8 @@ namespace Root_WIND2.UI_User
 		{
 			get => new RelayCommand(() =>
 			{
-				if (GlobalObjects.Instance.Get<InspectionManagerEdge>() != null)
-					GlobalObjects.Instance.Get<InspectionManagerEdge>().Stop();
+				if (GlobalObjects.Instance.GetNamed<WorkManager>("edgeTopInspection") != null)
+					GlobalObjects.Instance.GetNamed<WorkManager>("edgeTopInspection").Stop();
 			});
 		}
 
@@ -138,10 +140,10 @@ namespace Root_WIND2.UI_User
 			dataViewerVM = new Database_DataView_VM();
 			this.DataViewerVM.SelectedCellsChanged += SelectedCellsChanged_Callback;
 
-			if (GlobalObjects.Instance.Get<InspectionManagerEdge>() != null)
-            {
-				GlobalObjects.Instance.Get<InspectionManagerEdge>().InspectionDone += WorkEventManager_InspectionDone;
-				GlobalObjects.Instance.Get<InspectionManagerEdge>().IntegratedProcessDefectDone += WorkEventManager_IntegratedProcessDefectDone;
+			if (GlobalObjects.Instance.GetNamed<WorkManager>("edgeTopInspection") != null)
+			{
+				GlobalObjects.Instance.GetNamed<WorkManager>("edgeTopInspection").InspectionDone += WorkEventManager_InspectionDone;
+				GlobalObjects.Instance.GetNamed<WorkManager>("edgeTopInspection").IntegratedProcessDefectDone += WorkEventManager_IntegratedProcessDefectDone;
 			}
 		}
 
@@ -250,7 +252,7 @@ namespace Root_WIND2.UI_User
 			sDefectimagePath = Path.Combine(sDefectimagePath, sInspectionID, sDefectImageName);
 			if (File.Exists(sDefectimagePath))
 			{
-				Bitmap defectImage = (Bitmap)Bitmap.FromFile(sDefectimagePath);
+				Bitmap defectImage = (Bitmap)Image.FromFile(sDefectimagePath);
 				DefectImage = ImageHelper.GetBitmapSourceFromBitmap(defectImage);
 			}
 			else

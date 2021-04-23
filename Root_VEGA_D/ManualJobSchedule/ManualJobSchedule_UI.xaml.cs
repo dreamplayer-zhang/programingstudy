@@ -14,6 +14,10 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using Root_VEGA_D.Engineer;
+using Root_EFEM.Module;
+using System.Globalization;
+using RootTools.Module;
 
 namespace Root_VEGA_D
 {
@@ -25,6 +29,8 @@ namespace Root_VEGA_D
         static public bool m_bShow = false;
         InfoCarrier m_infoCarrier = null;
         InfoWafer m_infoWafer = null;
+        VEGA_D_Engineer m_engineer;
+        VEGA_D_Handler m_handler;
         public ManualJobSchedule_UI(InfoCarrier infoCarrier)
         {
             InitializeComponent();
@@ -32,11 +38,20 @@ namespace Root_VEGA_D
             m_infoWafer = infoCarrier.GetInfoWafer(0);
         }
 
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            m_bShow = false;
+        }
         ManualJobSchedule m_Manualjob;
-        public void Init(ManualJobSchedule manualJob)
+        Loadport_Cymechs m_loadport;
+        public void Init(ManualJobSchedule manualJob, IEngineer engineer, Loadport_Cymechs loadport)
         {
             m_Manualjob = manualJob;
             this.DataContext = manualJob;
+            m_engineer = (VEGA_D_Engineer)engineer;
+            m_handler = m_engineer.m_handler;
+            btnRun.DataContext = loadport;
+            m_loadport = loadport;
             //InitInfo();
             InitRecipe();
         }
@@ -58,6 +73,7 @@ namespace Root_VEGA_D
                 asRecipeFile.Add(fileInfo.Name);
             }
             comboRecipeID.ItemsSource = asRecipeFile;
+            comboRecipeID.SelectedIndex = 0;
         }
 
         private void comboRecipeID_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -89,32 +105,51 @@ namespace Root_VEGA_D
                 m_infoCarrier.p_sLotID = textboxLotID.Text;
                 m_infoCarrier.p_sCarrierID = textboxCstID.Text;
             }
-            else return;
-
-            if (m_infoWafer != null)
+            InfoWafer infoWafer = m_infoCarrier.GetInfoWafer(0);
+            if (infoWafer != null)
             {
-                m_infoWafer.p_eState = GemSlotBase.eState.Select;
-                m_infoWafer.p_sWaferID = "ReticleID";
-                //m_infoWafer.RecipeOpen("C:\\Recipe\\" + m_infoWafer.p_sRecipe);
-                m_infoWafer.RecipeOpen("C:\\Recipe\\" + "OnlyOne");//단일 레시피 적용
-                m_infoCarrier.StartProcess(m_infoWafer.p_id);
+                infoWafer.RecipeOpen("C:\\Recipe\\VEGA_D\\" + "OnlyOne.Vega_D");
+                //m_handler.m_RNRinfoWafer = infoWafer;
+                m_handler.AddSequence(infoWafer);
+                m_handler.CalcSequence();
             }
-            else return;
-
             EQ.p_nRnR = (bool)checkRnR.IsChecked ? Convert.ToInt32(textboxRnR.Text) : 0;
+            //if (m_infoWafer != null)
+            //{
+            //m_infoWafer.p_eState = GemSlotBase.eState.Select;
+            //m_infoWafer.p_sWaferID = "ReticleID";
+            //m_infoWafer.RecipeOpen("C:\\Recipe\\" + m_infoWafer.p_sRecipe);
+            //m_infoWafer.RecipeOpen("C:\\Recipe\\VEGA_D\\" + "OnlyOne.Vega_D");//단일 레시피 적용
+            //m_infoCarrier.StartProcess(m_infoWafer.p_id);
+            //}
             this.DialogResult = true;
+            //this.Close();
         }
 
         private void Button_Click_1(object sender, RoutedEventArgs e)
         {
             m_infoCarrier.SetInfoWafer(0, null);
+            ModuleRunBase UnDocking = m_loadport.m_runUndocking.Clone();
+            m_loadport.StartRun(UnDocking);
             this.Close();
         }
-
-        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+    }
+    class BooltoVisibleConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            e.Cancel = true;
-            this.Hide();
+            {
+                if ((bool)value == true)
+                    return Visibility.Visible;
+                else
+                    return Visibility.Collapsed;
+            }
+
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return value;
         }
     }
 }
