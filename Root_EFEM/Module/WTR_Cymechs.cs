@@ -41,12 +41,14 @@ namespace Root_EFEM.Module
 
         #region ToolBox
         public DIO_I m_diReticleCheck;
+        public DIO_I m_diArmClose;
         TCPIPClient m_tcpip; 
         RS232 m_rs232;
         public override void GetTools(bool bInit)
         {
             InitALID();
             p_sInfo = m_toolBox.GetDIO(ref m_diReticleCheck, this, "Reticle Check Sensor");
+            p_sInfo = m_toolBox.GetDIO(ref m_diArmClose, this, "ArmClose");
             switch (p_eComm)
             {
                 case eComm.TCPIP:
@@ -534,10 +536,13 @@ namespace Root_EFEM.Module
 
         #region GAF
         public ALID m_alidRTRCmdError;
+        public ALID m_alidRTRArmError;
         void InitALID()
 		{
             m_alidRTRCmdError = m_gaf.GetALID(this, "Cymechs", "RTR CMD ERROR");
-		}
+            m_alidRTRArmError = m_gaf.GetALID(this, "Cymechs", "RTR Arm ERROR");
+
+        }
         #endregion
 
         #region Protocol
