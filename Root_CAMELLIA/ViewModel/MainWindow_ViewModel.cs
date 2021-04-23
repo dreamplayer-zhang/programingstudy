@@ -840,6 +840,19 @@ namespace Root_CAMELLIA
                 //RaisePropertyChanged("GaugeListItems");
             }
         }
+
+        string _PointCount = "0";
+        public string PointCount
+        {
+            get
+            {
+                return _PointCount;
+            }
+            set
+            {
+                SetProperty(ref _PointCount, value);
+            }
+        }
         #endregion
 
         #region ICommand
@@ -865,6 +878,7 @@ namespace Root_CAMELLIA
                         p_DrawPointElement = new ObservableCollection<UIElement>(RecipeViewModel.p_DrawPointElement);
                         //PointListItem = RecipeViewModel.PointListItem;
                         PointListItem = RecipeViewModel.PointListItem.Copy();
+                        PointCount = RecipeViewModel.PointCount;
                         DrawMeasureRoute();
                         p_Progress = 0;
                     }
@@ -901,6 +915,11 @@ namespace Root_CAMELLIA
 
                     if (!isRecipeLoad)
                         RecipeViewModel.ClearData();
+
+                    if (RecipeViewModel.p_isCustomize)
+                    {
+                        RecipeViewModel.p_isCustomize = false;
+                    }
                     RecipeViewModel.UpdateListView(isRecipeLoad);
                     try
                     {

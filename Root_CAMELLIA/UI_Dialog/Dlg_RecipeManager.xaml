@@ -99,10 +99,10 @@
                 <ColumnDefinition/>
             </Grid.ColumnDefinitions>
             <UniformGrid Columns="4">
-                <Button BorderBrush="{x:Null}" BorderThickness="0" Content="New" Command="{Binding CmdRecipeNew}"/>
-                <Button BorderBrush="{x:Null}" BorderThickness="0" Content="Open" Command="{Binding CmdRecipeOpen}"/>
-                <Button BorderBrush="{x:Null}" BorderThickness="0" Content="Save" Command="{Binding CmdRecipeSave}"/>
-                <Button BorderBrush="{x:Null}" BorderThickness="0" Content="Save As" Command="{Binding CmdRecipeSaveAs}"/>
+                <Button BorderBrush="{x:Null}" BorderThickness="0" Content="New" Command="{Binding CmdRecipeNew}" IsEnabled="{Binding p_isCustomize, Converter={StaticResource BoolConverter}}"/>
+                <Button BorderBrush="{x:Null}" BorderThickness="0" Content="Open" Command="{Binding CmdRecipeOpen}" IsEnabled="{Binding p_isCustomize, Converter={StaticResource BoolConverter}}"/>
+                <Button BorderBrush="{x:Null}" BorderThickness="0" Content="Save" Command="{Binding CmdRecipeSave}" IsEnabled="{Binding p_isCustomize, Converter={StaticResource BoolConverter}}"/>
+                <Button BorderBrush="{x:Null}" BorderThickness="0" Content="Save As" Command="{Binding CmdRecipeSaveAs}" IsEnabled="{Binding p_isCustomize, Converter={StaticResource BoolConverter}}"/>
             </UniformGrid>
         </Grid>
 
@@ -141,10 +141,10 @@
                             <RowDefinition/>
                             <RowDefinition/>
                         </Grid.RowDefinitions>
-                        <Button Content="13 Point" Grid.Column="0" Grid.Row="0" Margin="5" Command="{Binding Cmd13Point}"/>
-                        <Button Content="25 Point"  Grid.Column="1" Grid.Row="0" Margin="5" Command="{Binding Cmd25Point}"/>
-                        <Button Content="49 Point" Grid.Column="0" Grid.Row="1" Margin="5" Command="{Binding Cmd49Point}"/>
-                        <Button Content="73 Point"  Grid.Column="1" Grid.Row="1" Margin="5" Command="{Binding Cmd73Point}"/>
+                        <Button Content="13 Point" Grid.Column="0" Grid.Row="0" Margin="5" Command="{Binding Cmd13Point}" IsEnabled="{Binding p_isCustomize, Converter={StaticResource BoolConverter}}"/>
+                        <Button Content="25 Point"  Grid.Column="1" Grid.Row="0" Margin="5" Command="{Binding Cmd25Point}" IsEnabled="{Binding p_isCustomize, Converter={StaticResource BoolConverter}}"/>
+                        <Button Content="49 Point" Grid.Column="0" Grid.Row="1" Margin="5" Command="{Binding Cmd49Point}" IsEnabled="{Binding p_isCustomize, Converter={StaticResource BoolConverter}}"/>
+                        <Button Content="73 Point"  Grid.Column="1" Grid.Row="1" Margin="5" Command="{Binding Cmd73Point}" IsEnabled="{Binding p_isCustomize, Converter={StaticResource BoolConverter}}"/>
                     </Grid>
                 </GroupBox>
                 <GroupBox Header="Select Using Measurement" Grid.Row="1">
@@ -552,19 +552,20 @@
                             <ColumnDefinition/>
                         </Grid.ColumnDefinitions>
                         <GroupBox Header="Point Setting">
-                            <UniformGrid Columns="4" Rows="1">
-                                <Button Content="Reset" Margin="5" Command="{Binding CmdReset}"/>
-                                <Button Content="Preset 1" Margin="5" Command="{Binding CmdPreset1}"/>
-                                <Button Content="Preset 2" Margin="5" Command="{Binding CmdPreset2}" />
-                                <Button Content="Customize" Margin="5" Command="{Binding CmdCustomize}"/>
+                            <UniformGrid Columns="5" Rows="1">
+                                <Button Content="Reset" Margin="2,5,2,5" Command="{Binding CmdReset}"/>
+                                <Button Content="Preset 1" Margin="2,5,2,5" Command="{Binding CmdPreset1}"/>
+                                <Button Content="Preset 2" Margin="2,5,2,5" Command="{Binding CmdPreset2}" />
+                                <Button Content="Preset Load" Margin="2,5,2,5" Command="{Binding CmdPresetLoad}"/>
+                                <Button Content="Customize" Margin="2,5,2,5" Command="{Binding CmdCustomize}"/>
                             </UniformGrid>
                         </GroupBox>
                         <GroupBox Header="Point Selector" Grid.Column="1">
                             <UniformGrid Columns="4" Rows="1">
-                                <TextBox Text="{Binding Percentage}" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Margin="5"/>
-                                <Button Content="Select %" Margin="5" Command="{Binding CmdSelectPercentage}"/>
-                                <Button Content="Select All" Margin="5" Command="{Binding CmdSelectAll}"/>
-                                <Button Content="Delete All" Margin="5" Command="{Binding CmdDeleteAll}"/>
+                                <TextBox Text="{Binding Percentage}" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Margin="5" IsEnabled="{Binding p_isCustomize, Converter={StaticResource BoolConverter}}"/>
+                                <Button Content="Select %" Margin="5" Command="{Binding CmdSelectPercentage}" IsEnabled="{Binding p_isCustomize, Converter={StaticResource BoolConverter}}"/>
+                                <Button Content="Select All" Margin="5" Command="{Binding CmdSelectAll}" IsEnabled="{Binding p_isCustomize, Converter={StaticResource BoolConverter}}"/>
+                                <Button Content="Delete All" Margin="5" Command="{Binding CmdDeleteAll}" IsEnabled="{Binding p_isCustomize, Converter={StaticResource BoolConverter}}"/>
                             </UniformGrid>
                         </GroupBox>
                     </Grid>
@@ -732,8 +733,8 @@
                         </Grid.ColumnDefinitions>
                         <GroupBox Header="Tool Plus">
                             <UniformGrid Columns="4">
-                                <Button Margin="5" x:Name="LockBtn" Content="{Binding LockState}" Background="{Binding LockBrush}" Command="{Binding CmdUILock}"/>
-                                <Button Margin="5" x:Name="ShowBtn" Content="ShowIndex" Background="{Binding ShowIndexBrush}" Command="{Binding CmdShowIndex}"/>
+                                <Button Margin="5" x:Name="LockBtn" Content="{Binding LockState}" Background="{Binding LockBrush}" Command="{Binding CmdUILock}" IsEnabled="{Binding p_isCustomize, Converter={StaticResource BoolConverter}}"/>
+                                <Button Margin="5" x:Name="ShowBtn" Content="ShowIndex" Background="{Binding ShowIndexBrush}" Command="{Binding CmdShowIndex}" IsEnabled="{Binding p_isCustomize, Converter={StaticResource BoolConverter}}"/>
                             </UniformGrid>
                         </GroupBox>
                         <GroupBox Header="Key State" Grid.Column="1">
@@ -769,8 +770,8 @@
                     <RowDefinition Height="103*"/>
                     <RowDefinition Height="413*"/>
                 </Grid.RowDefinitions>
-                <TabControl Grid.RowSpan="2">
-                    <TabItem Header="Measure Point">
+                <TabControl Grid.RowSpan="2" SelectedIndex="{Binding p_TabIndex, UpdateSourceTrigger=PropertyChanged}">
+                    <TabItem Header="Measure Point" IsEnabled="{Binding p_isCustomize, Converter={StaticResource BoolConverter}}">
                         <Grid>
                             <GroupBox Header="Measurement Point List" Grid.RowSpan="2">
                                 <Grid>
@@ -860,11 +861,11 @@
                             </GroupBox>
                         </Grid>
                     </TabItem>
-                    <TabItem Header="Customize Item">
+                    <TabItem Header="Customize Item" IsEnabled="{Binding p_isCustomize}">
                         <Grid>
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="60"/>
-                                <RowDefinition Height="0.7*"/>
+                                <RowDefinition Height="60"/>
                                 <RowDefinition Height="*"/>
                             </Grid.RowDefinitions>
                             <GroupBox Header="Mode">
@@ -879,18 +880,16 @@
                                     </UniformGrid>
                                 </Grid>
                             </GroupBox>
-                            <GroupBox Header="General" Grid.Row="1">
+                            <GroupBox Header="Tools" Grid.Row="1">
                                 <Grid>
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition/>
                                         <ColumnDefinition/>
                                         <ColumnDefinition/>
                                     </Grid.ColumnDefinitions>
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition/>
-                                        <RowDefinition/>
-                                    </Grid.RowDefinitions>
                                     <Button Margin="3" Content="Point Delete" Command="{Binding CmdPointDelete}"></Button>
+                                    <Button Margin="3" Content="Preset Save" Command="{Binding CmdPresetSave}" Grid.Column="1"></Button>
+                                    <!--<Button Margin="3" Content="Preset Load" Command="{Binding CmdPresetLoad}" Grid.Column="2"></Button>-->
                                 </Grid>
                             </GroupBox>
                             <GroupBox Header="Numerical Setting" Grid.Row="2">
@@ -909,7 +908,36 @@
                                     </Grid>
                                     <TabControl Grid.Row="1">
                                         <TabItem Header="Point">
-                                            
+                                            <Grid>
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="40"/>
+                                                    <RowDefinition Height="40"/>
+                                                    <RowDefinition/>
+                                                </Grid.RowDefinitions>
+                                                <Grid Background="Gainsboro" Margin="2">
+                                                    <Grid>
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition/>
+                                                            <ColumnDefinition/>
+                                                        </Grid.ColumnDefinitions>
+                                                        <TextBlock  Text="X (mm)" Margin="3" TextAlignment="Center" VerticalAlignment="Center"/>
+                                                        <TextBox Grid.Column="1" Margin="3" TextAlignment="Center" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Text="{Binding p_SettingPointX, UpdateSourceTrigger=PropertyChanged}"></TextBox>
+                                                    </Grid>
+                                                </Grid>
+                                                <Grid Background="Gainsboro" Grid.Row="1" Margin="2">
+                                                    <Grid>
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition/>
+                                                            <ColumnDefinition/>
+                                                        </Grid.ColumnDefinitions>
+                                                        <TextBlock  Text="Y (mm)" Margin="3" TextAlignment="Center" VerticalAlignment="Center"/>
+                                                        <TextBox Grid.Column="1" Margin="3" TextAlignment="Center" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Text="{Binding p_SettingPointY, UpdateSourceTrigger=PropertyChanged}"></TextBox>
+                                                    </Grid>
+                                                </Grid>
+                                                <Grid Background="Gainsboro" Grid.Row="2" Margin="2">
+                                                    <Button Margin="3" Content="Set" Command="{Binding CmdSetCandidatePoint}"/>
+                                                </Grid>
+                                            </Grid>
                                         </TabItem>
                                         <TabItem Header="Line">
                                             
