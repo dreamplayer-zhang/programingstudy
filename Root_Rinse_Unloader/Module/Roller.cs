@@ -248,7 +248,9 @@ namespace Root_Rinse_Unloader.Module
             while ((EQ.IsStop() == false) && (EQ.p_eState == EQ.eState.Run))
             {
                 if (Run(WaitExist())) return p_sInfo;
+                if (EQ.p_eState != EQ.eState.Run) return "OK";
                 if (Run(WaitArrived())) return p_sInfo;
+                if (EQ.p_eState != EQ.eState.Run) return "OK";
                 string sReceive = "";
                 foreach (Line line in m_aLine) sReceive += (line.p_eSensor == Line.eSensor.Arrived) ? 'O' : '.';
                 m_rinse.AddStripReceive(sReceive);
@@ -272,9 +274,10 @@ namespace Root_Rinse_Unloader.Module
 
         string WaitExist()
         {
-            while ((EQ.IsStop() == false) && (EQ.p_eState == EQ.eState.Run))
+            while (EQ.IsStop() == false)
             {
-                Thread.Sleep(10); 
+                Thread.Sleep(10);
+                if (EQ.p_eState != EQ.eState.Run) return "OK"; 
                 if (p_eStep == eStep.Empty)
                 {
                     foreach (Line line in m_aLine)
@@ -290,11 +293,21 @@ namespace Root_Rinse_Unloader.Module
             return "EQ Stop"; 
         }
 
+        double m_secArriveTimeout = 8; 
         string WaitArrived()
         {
-            while ((EQ.IsStop() == false) && (EQ.p_eState == EQ.eState.Run))
+            StopWatch sw = new StopWatch();
+            int msArriveTimeout = (int)(1000 * m_secArriveTimeout); 
+            while (EQ.IsStop() == false)
             {
                 Thread.Sleep(10);
+                if (EQ.p_eState != EQ.eState.Run) return "OK";
+                if (sw.ElapsedMilliseconds > msArriveTimeout)
+                {
+                    RunRotate(false);
+                    EQ.p_eState = EQ.eState.Error; 
+                    return "Arrive Timeout";
+                }
                 int nExist = 0;
                 foreach (Line line in m_aLine)
                 {
@@ -370,6 +383,7 @@ namespace Root_Rinse_Unloader.Module
         void RunTreeAlign(Tree tree)
         {
             m_secArrived = tree.Set(m_secArrived, m_secArrived, "Arrived", "Arrived Delay (sec)");
+            m_secArriveTimeout = tree.Set(m_secArriveTimeout, m_secArriveTimeout, "Arrive Timeout", "Arrived Delay (sec)");
             m_secSend = tree.Set(m_secSend, m_secSend, "Send", "Send Delay (sec)");
             m_mmAlignBack = tree.Set(m_mmAlignBack, m_mmAlignBack, "Align Back", "Align Back Length (mm)"); 
         }
@@ -395,6 +409,7 @@ namespace Root_Rinse_Unloader.Module
         public override void Reset()
         {
             base.Reset();
+            RunRotate(false); 
         }
         #endregion
 

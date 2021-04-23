@@ -232,16 +232,20 @@ namespace Root_Rinse_Unloader.Module
 
         double m_secWaitPush = 4;
         double m_secArrive = 2;
+        double m_secArriveTimeout = 8; 
         public string RunRun()
         {
+            StopWatch sw = new StopWatch();
+            int msWaitPush = (int)(1000 * m_secWaitPush); 
             if (Run(RunPusherDown(false))) return p_sInfo; 
-            RunRotate(true); 
+            RunRotate(true);
             while (IsExist() == false)
             {
                 Thread.Sleep(10);
                 if (EQ.IsStop()) return "EQ Stop"; 
             }
             RunRotate(true);
+            while (sw.ElapsedMilliseconds < msWaitPush) Thread.Sleep(10); 
             while (IsArrived() == false)
             {
                 RunRotate(true);
@@ -249,11 +253,18 @@ namespace Root_Rinse_Unloader.Module
                 if (EQ.IsStop()) return "EQ Stop";
             }
             RunRotate(true);
-            Thread.Sleep((int)(1000 * m_secWaitPush)); 
+            sw.Start(); 
+            int msArriveTimeout = (int)(1000 * m_secArriveTimeout); 
             while (IsReadyPush() == false)
             {
                 Thread.Sleep(10);
                 if (EQ.IsStop()) return "EQ Stop";
+                if (sw.ElapsedMilliseconds > msArriveTimeout)
+                {
+                    RunRotate(false);
+                    EQ.p_eState = EQ.eState.Error;
+                    return "Arrive Timeout";
+                }
             }
             Thread.Sleep((int)(1000 * m_secArrive));
             string sRun = RunPusher();
@@ -299,6 +310,7 @@ namespace Root_Rinse_Unloader.Module
         {
             m_secWaitPush = tree.Set(m_secWaitPush, m_secWaitPush, "Move", "Wait Push (sec)");
             m_secArrive = tree.Set(m_secArrive, m_secArrive, "Arrive", "Wait Arrive (sec)");
+            m_secArriveTimeout = tree.Set(m_secArriveTimeout, m_secArriveTimeout, "Arrive Timeout", "Arrive Timeout (sec)");
         }
         #endregion
 

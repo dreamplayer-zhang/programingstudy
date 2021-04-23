@@ -177,6 +177,7 @@ namespace Root_Rinse_Unloader
 
         private void buttonStart_Click(object sender, RoutedEventArgs e)
         {
+            foreach (Storage.Magazine magazine in m_handler.m_storage.m_aMagazine) magazine.RunClamp(magazine.p_bCheck);
             EQ.p_bStop = false; 
             EQ.p_eState = EQ.eState.Run;
         }
