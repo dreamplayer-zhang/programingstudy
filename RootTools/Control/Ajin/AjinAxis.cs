@@ -663,7 +663,7 @@ namespace RootTools.Control.Ajin
             }
             if (p_vaccumDIO_I != null)
             {
-                if (p_vaccumDIO_I.p_bIn)
+                if (!p_IsLifterDown && p_vaccumDIO_I.p_bIn)
                 {
                     string[] id = p_vaccumDIO_I.m_id.Split('.');
                     return " : " + id[1] + "Interlock Error";

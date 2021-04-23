@@ -347,9 +347,11 @@
                 <GroupBox Header="Camera" Grid.Row="0">
                     <Grid>
                         <GroupBox Header="Captured Image">
-                            <Canvas Background="Black" ClipToBounds="True" x:Name="canvas" >
-                                <Image Source="{Binding p_imageSource, UpdateSourceTrigger=PropertyChanged}" Width="{Binding Path=ActualWidth, ElementName=canvas}" Height="{Binding Path=ActualHeight, ElementName=canvas}"  Stretch="Fill"></Image>
-                            </Canvas>
+                            <Border BorderBrush="Black" BorderThickness="1">
+                                <Canvas Background="Black" ClipToBounds="True" x:Name="canvas" >
+                                    <Image Source="{Binding p_imageSource, UpdateSourceTrigger=PropertyChanged}" Width="{Binding Path=ActualWidth, ElementName=canvas}" Height="{Binding Path=ActualHeight, ElementName=canvas}"  Stretch="Fill"></Image>
+                                </Canvas>
+                            </Border>
                         </GroupBox>
                     </Grid>
                 </GroupBox>
@@ -815,7 +817,11 @@
                 </TabItem>
             </TabControl>
             <Grid Grid.Column="3">
-                <StackPanel Margin="10,45,10,15">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="7*"/>
+                    <RowDefinition Height="2*"/>
+                </Grid.RowDefinitions>
+                <StackPanel Margin="10,45,10,15" Grid.Column="3" Grid.Row="0">
                     <Button Content="Resume" x:Name="buttonResume" Margin="0,0,0,15" 
                             Style="{StaticResource SetupPanelBtn}" 
                             Height="40"
@@ -841,6 +847,36 @@
                             Height="40"
                             Click="buttonOHT_Click"/>
                 </StackPanel>
+
+                <GroupBox Grid.Column="3" Grid.Row="1" Header="Lamp">
+                    <Grid Grid.Row="1" Grid.Column="3">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="1*"/>
+                            <RowDefinition Height="1*"/>
+                            <RowDefinition Height="1*"/>
+                            <RowDefinition Height="1*"/>
+                            <RowDefinition Height="1*"/>
+                        </Grid.RowDefinitions>
+
+                        <TextBlock Grid.Row="0" Text="Lamp Use Time" FontSize="15" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="5,10,5,10" />
+                        <Grid Grid.Row="1">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="7*"/>
+                                <ColumnDefinition Width="3*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBox Grid.Row="1" Grid.Column="0" Text="{Binding p_LampTimeCount ,UpdateSourceTrigger=PropertyChanged}" Margin="5,0,0,0" VerticalAlignment="Center" HorizontalAlignment="Center" Width="80" FontSize="15"/>
+                            <TextBlock Grid.Row="1" Grid.Column="1" Text="Hours"  Margin="0,0,5,0" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="13"/>
+                        </Grid>
+                        <TextBlock Grid.Row="2" Text="{Binding p_LampTimeError ,UpdateSourceTrigger=PropertyChanged}" Margin="5,0,5,0" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="10" Foreground="Red" />
+                        <TextBlock Grid.Row="3" Text="Lamp States" FontSize="15" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="5,10,5,10" />
+
+                        <Border x:Name="LampStateColor" Grid.Row="4">
+                            <TextBlock Text="{Binding p_LampStates, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center" HorizontalAlignment="Center" />
+                        </Border>
+
+                    </Grid>
+                </GroupBox>
+                    
             </Grid>
         </Grid>
 
