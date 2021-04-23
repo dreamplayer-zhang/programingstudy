@@ -92,25 +92,32 @@ namespace Root_Rinse_Loader.Module
         double m_secBlow = 0.5;
         public string RunVacuum(bool bOn)
         {
-            p_bVacuum = bOn;
-            for (int n = 0; n < 4; n++)
+            try
             {
-                m_aPicker[n].m_dioVacuum.Write(bOn && m_storage.m_stack.m_diCheck[n].p_bIn); 
-            }
-            if (bOn)
-            {
-                Thread.Sleep((int)(1000 * m_secVac));
-                foreach (Picker picker in m_aPicker) picker.m_dioVacuum.Write(picker.m_dioVacuum.p_bIn);
+                p_bVacuum = bOn;
+                for (int n = 0; n < 4; n++)
+                {
+                    m_aPicker[n].m_dioVacuum.Write(bOn && m_storage.m_stack.m_diCheck[n].p_bIn);
+                }
+                if (bOn)
+                {
+                    Thread.Sleep((int)(1000 * m_secVac));
+                    foreach (Picker picker in m_aPicker) picker.m_dioVacuum.Write(picker.m_dioVacuum.p_bIn);
+                    return "OK";
+                }
+                else
+                {
+                    m_bCheckStrip = false;
+                    foreach (Picker picker in m_aPicker) picker.m_doBlow.Write(true);
+                    Thread.Sleep((int)(1000 * m_secBlow));
+                    foreach (Picker picker in m_aPicker) picker.m_doBlow.Write(false);
+                }
                 return "OK";
             }
-            else
+            finally
             {
-                m_bCheckStrip = false; 
-                foreach (Picker picker in m_aPicker) picker.m_doBlow.Write(true);
-                Thread.Sleep((int)(1000 * m_secBlow));
                 foreach (Picker picker in m_aPicker) picker.m_doBlow.Write(false);
             }
-            return "OK";
         }
 
         public bool m_bPickerDown = false;

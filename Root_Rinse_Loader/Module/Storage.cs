@@ -288,8 +288,6 @@ namespace Root_Rinse_Loader.Module
                     {
                         case eMagazine.Magazine1:
                             Thread.Sleep(10000);
-                            m_roller.RunRotate(false);
-                            m_rail.RunRotate(false); 
                             m_rinse.SendFinish();
                             EQ.p_eState = EQ.eState.Ready;
 
@@ -300,7 +298,7 @@ namespace Root_Rinse_Loader.Module
                     }
                 }
             }
-            return "EQ Stop";
+            return (EQ.p_eState == EQ.eState.Run) ? "EQ Stop" : "OK";
         }
 
         string RunMagazine(eMagazine eMagazine, int iMagazine)
@@ -308,10 +306,23 @@ namespace Root_Rinse_Loader.Module
             if (m_aMagazine[(int)eMagazine].p_bCheck == false) return "OK";
             if (m_aMagazine[(int)eMagazine].p_bClamp == false) return "OK";
             if (Run(MoveMagazine(eMagazine, iMagazine, true))) return p_sInfo;
-            Thread.Sleep((int)(500 * m_secRunDelay));
+            if (IsStopMagazine()) return (EQ.p_eState == EQ.eState.Run) ? "EQ Stop" : "OK";
             if (Run(RunPusher())) return p_sInfo;
-            Thread.Sleep((int)(500 * m_secRunDelay));
+            if (IsStopMagazine()) return (EQ.p_eState == EQ.eState.Run) ? "EQ Stop" : "OK";
             return "OK"; 
+        }
+
+        bool IsStopMagazine()
+        {
+            StopWatch sw = new StopWatch();
+            int msDelay = (int)(500 * m_secRunDelay);
+            while (sw.ElapsedMilliseconds < msDelay)
+            {
+                Thread.Sleep(100);
+                if (EQ.p_eState != EQ.eState.Run) return true;
+                if (EQ.p_bStop) return true;
+            }
+            return false; 
         }
         #endregion
 
