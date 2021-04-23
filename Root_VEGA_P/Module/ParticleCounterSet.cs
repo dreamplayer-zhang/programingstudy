@@ -77,8 +77,8 @@ namespace Root_VEGA_P.Module
         public void RunTree(Tree tree)
         {
             m_nozzleSet.RunTreeSetup(tree.GetTree("NozzleSet"));
-            RunTreeFlow(tree.GetTree("Flow Sensor"));
-            RunTreeLasair(tree.GetTree("Lasair"));
+            //RunTreeFlow(tree.GetTree("Flow Sensor"));
+            //RunTreeLasair(tree.GetTree("Lasair"));
         }
         #endregion
 
