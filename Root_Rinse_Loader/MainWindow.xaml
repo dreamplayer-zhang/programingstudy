@@ -285,6 +285,7 @@
                                                    HorizontalAlignment="Center" />
                                         </Border>
                                     </GroupBox>
+                                    <CheckBox Grid.Column="3" x:Name="checkBoxEQStop" Content="EQ.Stop" IsChecked="{Binding p_bStop}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                 </Grid>
                                 <Grid Grid.Row="2"
                                   Grid.Column="1">

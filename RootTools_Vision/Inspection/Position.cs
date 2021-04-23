@@ -73,7 +73,7 @@ namespace RootTools_Vision
 
         public CPoint ConvertRelToAbs_Chip(CPoint ptRel)
         {
-            return new CPoint(this.currentWorkplace.PositionX + ptRel.X, this.currentWorkplace.PositionY + this.recipeOrigin.DiePitchY + ptRel.Y);
+            return new CPoint(this.currentWorkplace.PositionX + ptRel.X, this.currentWorkplace.PositionY + this.recipeOrigin.OriginHeight + ptRel.Y);
         }
 
         public bool DoPosition()
@@ -208,13 +208,19 @@ namespace RootTools_Vision
                     string sInspectionID = DatabaseManager.Instance.GetInspectionID();
 
                     this.currentWorkplace.AddDefect(sInspectionID,
-                       90001,
+                       90000,
                        0,
                        0,
-                       this.currentWorkplace.PositionX,
-                       this.currentWorkplace.PositionY,
-                       this.currentWorkplace.Width,
-                       this.currentWorkplace.Height,
+                       maxStartX,
+                       maxStartY,
+                       maxEndX,
+                       maxEndY,
+                       maxEndX - maxStartX,
+                       maxEndY - maxStartY,
+                       //this.currentWorkplace.PositionX,
+                       //this.currentWorkplace.PositionY,
+                       //this.currentWorkplace.Width,
+                       //this.currentWorkplace.Height,
                        this.currentWorkplace.MapIndexX,
                        this.currentWorkplace.MapIndexY
                        );

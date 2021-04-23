@@ -98,17 +98,9 @@ namespace Root_VEGA_D
             RecipeWizard_UI.init(m_engineer);
             InitTimer();
             InitFFU();
-            TextBlockRetID.DataContext = m_handler.m_aLoadport[0].p_infoCarrier.m_aGemSlot[0];
-            Is_InLP.Background = (m_handler.m_aLoadport[0].p_infoCarrier.m_aInfoWafer[0] != null)||(m_handler.m_aLoadport[0].p_infoCarrier.m_aInfoWafer[1] != null) ? Brushes.MediumBlue: Brushes.Gray;
-            Is_InRTR.Background = m_handler.m_wtr.m_dicArm[0].p_infoWafer!= null ? Brushes.MediumBlue : Brushes.Gray;
-            Is_InVS.Background = m_handler.m_vision.p_infoWafer != null ? Brushes.MediumBlue : Brushes.Gray;
+            //TextBlockRetID.DataContext = m_handler.m_aLoadport[0].p_infoCarrier.m_aGemSlot[0];
         }
-
         //bool m_blogin = false;
-
-
-
-
 
         void ThreadStop()
         {
@@ -144,8 +136,19 @@ namespace Root_VEGA_D
             FanUI1.DataContext = m_handler.m_FFU.p_aUnit[0].p_aFan[1];
             FanUI2.DataContext = m_handler.m_FFU.p_aUnit[0].p_aFan[2];
             FanUI3.DataContext = m_handler.m_FFU.p_aUnit[0].p_aFan[3];
-            FanUI4.DataContext = m_handler.m_FFU.p_aUnit[0].p_aFan[4];
-            FanUI5.DataContext = m_handler.m_FFU.p_aUnit[0].p_aFan[5];
+            FDC_CDA1.DataContext = m_handler.m_interlock;
+            FDC_CDA2.DataContext = m_handler.m_interlock;
+            
+            btnFP_Isolator.DataContext = m_handler.m_interlock.m_diFP_Isolator;
+            btnIsolator_V.DataContext = m_handler.m_interlock.m_diIsolator_VPre;
+            btn_Factory_Air_Pad.DataContext = m_handler.m_interlock.m_diFactory_Air_PadPre;
+            btn_Air_Tank.DataContext = m_handler.m_interlock.m_diAir_TankPre;
+            btn_X_Bottom.DataContext = m_handler.m_interlock.m_diX_BottomPre;
+            btn_X_Side_Master.DataContext = m_handler.m_interlock.m_diX_SideMasterPre;
+            btn_X_Side_Slave.DataContext = m_handler.m_interlock.m_diX_SideSlavePre;
+            btn_Y_Bottom.DataContext = m_handler.m_interlock.m_diY_BottomPre;
+            btn_Y_Side_Master.DataContext = m_handler.m_interlock.m_diY_SideMasterPre;
+            btn_Y_Side_Slave.DataContext = m_handler.m_interlock.m_diY_SideSlavePre;
         }
 
         bool IsRunModule(ModuleBase module)
@@ -215,7 +218,11 @@ namespace Root_VEGA_D
         {
             TimerUI();
             TimerLamp();
-
+            NowTime.Text = "Date : " + DateTime.Now.ToString("yyyy.MM.dd tt hh:mm:ss", CultureInfo.InvariantCulture);
+            LoadportABack.Background = m_handler.m_aLoadport[0].p_infoCarrier.m_aInfoWafer[0] != null && m_handler.m_aLoadport[0].p_bPlaced && m_handler.m_aLoadport[0].p_bPresent ? Brushes.MediumSlateBlue : Brushes.AliceBlue;
+            LoadportBBack.Background = m_handler.m_aLoadport[1].p_infoCarrier.m_aInfoWafer[0] != null && m_handler.m_aLoadport[1].p_bPlaced && m_handler.m_aLoadport[1].p_bPresent ? Brushes.MediumSlateBlue : Brushes.AliceBlue;
+            RobotBack.Background = m_handler.m_wtr.m_dicArm[0].p_infoWafer != null ? Brushes.MediumSlateBlue : Brushes.AliceBlue;
+            VisionBack.Background = m_handler.m_vision.p_infoWafer != null ? Brushes.MediumSlateBlue : Brushes.AliceBlue;
             buttonResume.IsEnabled = IsEnable_Resume();
             buttonPause.IsEnabled = IsEnable_Pause();
             buttonInitialize.IsEnabled = IsEnable_Initial();
@@ -225,8 +232,12 @@ namespace Root_VEGA_D
         {
             if (EQ.p_eState != EQ.eState.Run) EQ.p_bRecovery = false;
             //textState.Text = m_bRecovery ? "Recovery" : EQ.p_eState.ToString();
-            textState.Text = EQ.p_bRecovery ? "Recovery" : EQ.p_eState.ToString();
-            textState.Text = string.Format("State : {0}", textState.Text);
+            EQState.Foreground = EQ.p_eState.ToString() == "Error" ? Brushes.Red : Brushes.Green;
+            EQState.Text = EQ.p_bRecovery ? "Recovery" : EQ.p_eState.ToString();
+            LoadportAState.DataContext = m_handler.m_loadport[0];
+            LoadportBState.DataContext = m_handler.m_loadport[1];
+            RobotState.DataContext = m_handler.m_wtr;
+            VisionState.DataContext = m_handler.m_vision;
         }
 
         void TimerLamp()
@@ -237,5 +248,26 @@ namespace Root_VEGA_D
             lampGreen.Background = EQ.p_eState == EQ.eState.Run ? Brushes.SeaGreen : Brushes.Honeydew;
         }
         #endregion
+        
+    }
+    public class StateToColorConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if ((string)value.ToString() != "Error")
+            {
+                return Brushes.Black;
+            }
+            else
+            {
+                return Brushes.Red;
+            }
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
+

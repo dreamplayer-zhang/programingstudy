@@ -7,6 +7,8 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading;
+using RootTools.GAFs;
+
 
 namespace Root_EFEM.Module
 {
@@ -36,14 +38,14 @@ namespace Root_EFEM.Module
             p_eComm = (eComm)m_reg.Read("Comm", (int)p_eComm); 
         }
         #endregion
-        #region DIO
-        #endregion
+
         #region ToolBox
         public DIO_I m_diReticleCheck;
         TCPIPClient m_tcpip; 
         RS232 m_rs232;
         public override void GetTools(bool bInit)
         {
+            InitALID();
             p_sInfo = m_toolBox.GetDIO(ref m_diReticleCheck, this, "Reticle Check Sensor");
             switch (p_eComm)
             {
@@ -480,6 +482,7 @@ namespace Root_EFEM.Module
                 Thread.Sleep(10);
                 if ((m_protocolSend == null) && (m_qProtocol.Count > 0))
                 {
+                    Thread.Sleep(50);
                     m_protocolSend = m_qProtocol.Dequeue();
                     p_sInfo = m_protocolSend.SendCmd();
                     if (p_sInfo != "OK")
@@ -497,6 +500,8 @@ namespace Root_EFEM.Module
             if (m_protocolSend != null)
             {
                 bool bDone = m_protocolSend.OnReceive(sRead);
+                string[] sreads = sRead.Split(' ');
+                m_alidRTRCmdError.Run(sreads[0] == "_ERR", "Cymechs Robot Error, Error Code : " + sreads[1]);
                 if (bDone) m_protocolSend = null;
             }
         }
@@ -508,6 +513,8 @@ namespace Root_EFEM.Module
             if (m_protocolSend != null)
             {
                 bool bDone = m_protocolSend.OnReceive(sRead);
+                string[] sreads = sRead.Split(' ');
+                m_alidRTRCmdError.Run(sreads[0] == "_ERR", "Cymechs Robot Error, Error Code : " + sreads[1]);
                 if (bDone) m_protocolSend = null;
             }
         }
@@ -523,6 +530,14 @@ namespace Root_EFEM.Module
             }
             return "SendCmd Comm Type Error : " + p_eComm.ToString(); 
         }
+        #endregion
+
+        #region GAF
+        public ALID m_alidRTRCmdError;
+        void InitALID()
+		{
+            m_alidRTRCmdError = m_gaf.GetALID(this, "Cymechs", "RTR CMD ERROR");
+		}
         #endregion
 
         #region Protocol
@@ -1027,6 +1042,7 @@ namespace Root_EFEM.Module
                     child.p_bLock = true;
                     if (m_module.Run(m_module.CmdPick(posWTR, m_nChildID + 1, m_eArm))) return p_sInfo;
                     child.p_bLock = false;
+                    child.AfterGet(m_nChildID);
                 }
                 finally
                 {
@@ -1105,6 +1121,7 @@ namespace Root_EFEM.Module
                     child.p_bLock = true;
                     if (m_module.Run(m_module.CmdPlace(posWTR, m_nChildID + 1, m_eArm))) return p_sInfo;
                     child.p_bLock = false;
+                    child.AfterPut(m_nChildID);
                 }
                 finally
                 {

@@ -66,8 +66,8 @@ namespace Root_Rinse_Loader.Module
         {
             if (bRotate)
             {
-                m_axisRotate[0].Jog(m_rinse.p_fRotateSpeed);
-                m_axisRotate[1].Jog(m_rinse.p_fRotateSpeed);
+                m_axisRotate[0].Jog(m_rinse.p_fRotateSpeed, "Move");
+                m_axisRotate[1].Jog(m_rinse.p_fRotateSpeed, "Move");
             }
             else
             {
@@ -94,6 +94,7 @@ namespace Root_Rinse_Loader.Module
 
         public override void Reset()
         {
+            RunRotate(false); 
             base.Reset();
         }
         #endregion
@@ -116,6 +117,7 @@ namespace Root_Rinse_Loader.Module
 
         public override void ThreadStop()
         {
+            RunRotate(false);
             base.ThreadStop();
         }
 

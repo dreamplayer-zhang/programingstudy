@@ -191,8 +191,7 @@
                                   Height="1"
                                   Margin="0,0"
                                   Background="Black"/>
-                                <TextBlock Text="상태"
-                                       Grid.Row="0"
+                                <TextBlock Grid.Row="0" Text="상태"
                                        FontSize="35"
                                        FontWeight="Bold"
                                        FontFamily="Arial"
@@ -205,7 +204,7 @@
                                        FontFamily="Arial"
                                        VerticalAlignment="Center"
                                        HorizontalAlignment="Center" />
-                                <TextBlock Text="롤러"
+                                <TextBlock Text="스트립"
                                        Grid.Row="4"
                                        FontSize="35"
                                        FontWeight="Bold"
@@ -253,8 +252,8 @@
                                                    HorizontalAlignment="Center"/>
                                         </Border>
                                     </GroupBox>
+                                    <CheckBox Grid.Column="2" x:Name="checkBoxEQStop" Content="EQ.Stop" IsChecked="{Binding p_bStop}" VerticalAlignment="Center" HorizontalAlignment="Center"/>
                                 </Grid>
-
                                 <Grid Grid.Row="2" Grid.Column="1">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition />
@@ -332,8 +331,12 @@
                                         <ColumnDefinition />
                                         <ColumnDefinition />
                                         <ColumnDefinition />
+                                        <ColumnDefinition />
+                                        <ColumnDefinition />
+                                        <ColumnDefinition />
+                                        <ColumnDefinition />
                                     </Grid.ColumnDefinitions>
-                                    <GroupBox Header="자제 상태 1"
+                                    <GroupBox Header="롤러 1"
                                           Grid.Column="0"
                                           Style="{StaticResource group}"
                                           Margin="5,10"
@@ -349,8 +352,24 @@
                                                    HorizontalAlignment="Center"/>
                                         </Border>
                                     </GroupBox>
-                                    <GroupBox Header="자제 상태 2"
+                                    <GroupBox Header="레일 1"
                                           Grid.Column="1"
+                                          Style="{StaticResource group}"
+                                          Margin="5,10"
+                                          BorderThickness="0">
+                                        <Border Margin="5"
+                                            CornerRadius="5"
+                                            Background="AntiqueWhite">
+                                            <TextBlock x:Name="textBlockRailState0" Text="{Binding p_eSensor}"
+                                                   FontSize="30"
+                                                   FontWeight="Bold"
+                                                   FontFamily="Arial"
+                                                   VerticalAlignment="Center"
+                                                   HorizontalAlignment="Center"/>
+                                        </Border>
+                                    </GroupBox>
+                                    <GroupBox Header="롤러 2"
+                                          Grid.Column="2"
                                           Style="{StaticResource group}"
                                           Margin="5,10"
                                           BorderThickness="0">
@@ -365,8 +384,24 @@
                                                    HorizontalAlignment="Center"/>
                                         </Border>
                                     </GroupBox>
-                                    <GroupBox Header="자제 상태 3"
-                                          Grid.Column="2"
+                                    <GroupBox Header="레일 2"
+                                          Grid.Column="3"
+                                          Style="{StaticResource group}"
+                                          Margin="5,10"
+                                          BorderThickness="0">
+                                        <Border Margin="5"
+                                            CornerRadius="5"
+                                            Background="AntiqueWhite">
+                                            <TextBlock x:Name="textBlockRailState1" Text="{Binding p_eSensor}"
+                                                   FontSize="30"
+                                                   FontWeight="Bold"
+                                                   FontFamily="Arial"
+                                                   VerticalAlignment="Center"
+                                                   HorizontalAlignment="Center"/>
+                                        </Border>
+                                    </GroupBox>
+                                    <GroupBox Header="롤러 3"
+                                          Grid.Column="4"
                                           Style="{StaticResource group}"
                                           Margin="5,10"
                                           BorderThickness="0">
@@ -381,8 +416,24 @@
                                                    HorizontalAlignment="Center"/>
                                         </Border>
                                     </GroupBox>
-                                    <GroupBox Header="자제 상태 4"
-                                          Grid.Column="3"
+                                    <GroupBox Header="레일 3"
+                                          Grid.Column="5"
+                                          Style="{StaticResource group}"
+                                          Margin="5,10"
+                                          BorderThickness="0">
+                                        <Border Margin="5"
+                                            CornerRadius="5"
+                                            Background="AntiqueWhite">
+                                            <TextBlock x:Name="textBlockRailState2" Text="{Binding p_eSensor}"
+                                                   FontSize="30"
+                                                   FontWeight="Bold"
+                                                   FontFamily="Arial"
+                                                   VerticalAlignment="Center"
+                                                   HorizontalAlignment="Center"/>
+                                        </Border>
+                                    </GroupBox>
+                                    <GroupBox Header="롤러 4"
+                                          Grid.Column="6"
                                           Style="{StaticResource group}"
                                           Margin="5,10"
                                           BorderThickness="0">
@@ -390,6 +441,22 @@
                                             CornerRadius="5"
                                             Background="#FFDDDDDD">
                                             <TextBlock x:Name="textBlockStripState3" Text="{Binding p_eSensor}"
+                                                   FontSize="30"
+                                                   FontWeight="Bold"
+                                                   FontFamily="Arial"
+                                                   VerticalAlignment="Center"
+                                                   HorizontalAlignment="Center"/>
+                                        </Border>
+                                    </GroupBox>
+                                    <GroupBox Header="레일 4"
+                                          Grid.Column="7"
+                                          Style="{StaticResource group}"
+                                          Margin="5,10"
+                                          BorderThickness="0">
+                                        <Border Margin="5"
+                                            CornerRadius="5"
+                                            Background="AntiqueWhite">
+                                            <TextBlock x:Name="textBlockRailState3" Text="{Binding p_eSensor}"
                                                    FontSize="30"
                                                    FontWeight="Bold"
                                                    FontFamily="Arial"

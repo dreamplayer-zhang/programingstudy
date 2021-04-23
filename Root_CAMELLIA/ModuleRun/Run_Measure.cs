@@ -425,7 +425,12 @@ namespace Root_CAMELLIA.Module
             MeasureDone = true;
             while (!m_CalcThicknessDone)
             {
-                Thread.Sleep(1);
+                if (EQ.IsStop())
+                {
+                    m_bStart = false;
+                    isEQStop = false;
+                    return "EQ Stop";
+                }
             }
 
             //? 세이브?

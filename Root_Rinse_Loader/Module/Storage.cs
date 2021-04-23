@@ -275,7 +275,7 @@ namespace Root_Rinse_Loader.Module
         double m_secRunDelay = 0; 
         public string RunMagazine()
         {
-            while (EQ.p_bStop == false)
+            while ((EQ.p_bStop == false) && (EQ.p_eState == EQ.eState.Run))
             {
                 Thread.Sleep(1);
                 if (Run(RunMagazine(m_rinse.p_eMagazine, m_rinse.p_iMagazine))) return p_sInfo;
@@ -286,7 +286,14 @@ namespace Root_Rinse_Loader.Module
                     eMagazine eMagazine = m_rinse.p_eMagazine; 
                     switch(eMagazine)
                     {
-                        case eMagazine.Magazine1: return "OK";
+                        case eMagazine.Magazine1:
+                            Thread.Sleep(10000);
+                            m_roller.RunRotate(false);
+                            m_rail.RunRotate(false); 
+                            m_rinse.SendFinish();
+                            EQ.p_eState = EQ.eState.Ready;
+
+                            return "OK";
                         case eMagazine.Magazine2: m_rinse.p_eMagazine = eMagazine.Magazine1; break;
                         case eMagazine.Magazine3: m_rinse.p_eMagazine = eMagazine.Magazine2; break;
                         case eMagazine.Magazine4: m_rinse.p_eMagazine = eMagazine.Magazine3; break;
@@ -360,12 +367,14 @@ namespace Root_Rinse_Loader.Module
         #endregion
 
         RinseL m_rinse;
-        Rail m_rail; 
-        public Storage(string id, IEngineer engineer, RinseL rinse, Rail rail)
+        Rail m_rail;
+        Roller m_roller; 
+        public Storage(string id, IEngineer engineer, RinseL rinse, Rail rail, Roller roller)
         {
             p_id = id;
             m_rinse = rinse;
             m_rail = rail;
+            m_roller = roller; 
             InitMagazine();
             InitStack(); 
             InitBase(id, engineer);

@@ -262,7 +262,7 @@ namespace RootTools.Control
 
             public void RunTree(Tree tree, string sUnit)
             {
-                m_v = tree.Set(m_v, -1, "Velocity", "Axis Moving Velocity (" + sUnit + " / sec)");
+                m_v = tree.Set(m_v, -1.0, "Velocity", "Axis Moving Velocity (" + sUnit + " / sec)");
                 m_acc = tree.Set(m_acc, m_acc, "Accelation", "Accelation Time (sec)");
                 m_dec = tree.Set(m_dec, m_dec, "Decelation", "Decelation Time (sec)");
             }

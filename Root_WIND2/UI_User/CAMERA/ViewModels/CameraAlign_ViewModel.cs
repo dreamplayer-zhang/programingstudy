@@ -29,6 +29,16 @@ namespace Root_WIND2.UI_User
             }
         }
 
+        private MotionController_ViewModel motionControllerVM;
+        public MotionController_ViewModel MotionControllerVM
+        {
+            get => this.motionControllerVM;
+            set
+            {
+                SetProperty(ref this.motionControllerVM, value);
+            }
+        }
+
         private Vision visionModule;
         public Vision VisionModule
         {
@@ -66,10 +76,7 @@ namespace Root_WIND2.UI_User
             {
                 this.visionModule = GlobalObjects.Instance.Get<WIND2_Engineer>().m_handler.p_Vision;
 
-                p_axisX = VisionModule.AxisXY.p_axisX;
-                p_axisY = VisionModule.AxisXY.p_axisY;
-                p_axisZ = VisionModule.AxisZ;
-                p_axisRotate = VisionModule.AxisRotate;
+                motionControllerVM = new MotionController_ViewModel(VisionModule.AxisXY.p_axisX, VisionModule.AxisXY.p_axisY, VisionModule.AxisRotate, VisionModule.AxisZ);
 
                 this.ImageViewerVM.SetImageData(visionModule.p_CamAlign.p_ImageViewer.p_ImageData);
 
@@ -227,146 +234,7 @@ namespace Root_WIND2.UI_User
         }
 
 
-        public ICommand CmdAxisXMoveLeft
-        {
-            get
-            {
-                return new RelayCommand(() =>
-                {
-                    if (!p_IsSlowCheck)
-                    {
-                        p_axisX.Jog(-1);
-                    }
-                    else
-                    {
-                        p_axisX.Jog(-0.31);
-                    }
-                });
-            }
-        }
-
-        public ICommand CmdAxisXMoveRight
-        {
-            get
-            {
-                return new RelayCommand(() =>
-                {
-                    if (!p_IsSlowCheck)
-                    {
-                        p_axisX.Jog(1);
-                    }
-                    else
-                    {
-                        p_axisX.Jog(0.31);
-                    }
-                });
-            }
-        }
-
-        public ICommand CmdAxisYMoveUp
-        {
-            get
-            {
-                return new RelayCommand(() =>
-                {
-                    if (!p_IsSlowCheck)
-                    {
-                        p_axisY.Jog(1);
-                    }
-                    else
-                    {
-                        p_axisY.Jog(0.31);
-                    }
-                });
-            }
-        }
-
-        public ICommand CmdAxisYMoveDown
-        {
-            get
-            {
-                return new RelayCommand(() =>
-                {
-                    if (!p_IsSlowCheck)
-                    {
-                        p_axisY.Jog(-1);
-                    }
-                    else
-                    {
-                        p_axisY.Jog(-0.31);
-                    }
-                });
-            }
-        }
-
-        public ICommand CmdAxisZMoveUp
-        {
-            get
-            {
-                return new RelayCommand(() =>
-                {
-                    if (!p_IsSlowCheck)
-                    {
-                        p_axisZ.Jog(-1);
-                    }
-                    else
-                    {
-                        p_axisZ.Jog(-0.31);
-                    }
-                });
-            }
-        }
-
-        public ICommand CmdAxisZMoveDown
-        {
-            get
-            {
-                return new RelayCommand(() =>
-                {
-                    if (!p_IsSlowCheck)
-                    {
-                        p_axisZ.Jog(1);
-                    }
-                    else
-                    {
-                        p_axisZ.Jog(0.31);
-                    }
-                });
-            }
-        }
-
-        public ICommand CmdXStop
-        {
-            get
-            {
-                return new RelayCommand(() =>
-                {
-                    p_axisX.StopAxis();
-                });
-            }
-        }
-
-        public ICommand CmdYStop
-        {
-            get
-            {
-                return new RelayCommand(() =>
-                {
-                    p_axisY.StopAxis();
-                });
-            }
-        }
-
-        public ICommand CmdZStop
-        {
-            get
-            {
-                return new RelayCommand(() =>
-                {
-                    p_axisZ.StopAxis();
-                });
-            }
-        }
+       
         #endregion
 
         #region [Method]

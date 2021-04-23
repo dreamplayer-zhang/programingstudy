@@ -321,7 +321,7 @@ namespace RootTools.Camera.BaslerPylon
                 sw.Start();
                 List<ICameraInfo> allCameras = CameraFinder.Enumerate();    //SEHException 에러 나는경우 Lib/BaslerRuntime 내 파일들을 실행위치로 복사 요망
                 sw.Stop();
-                Debug.WriteLine(sw.ElapsedMilliseconds);
+                Debug.WriteLine("Connect >> " + sw.ElapsedMilliseconds);
                 ICameraInfo ConnectCamInfo = null;
                 foreach (ICameraInfo cameraInfo in allCameras)
                 {

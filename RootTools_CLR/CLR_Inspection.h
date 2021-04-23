@@ -88,6 +88,7 @@ namespace RootTools_CLR
 						local[i]->nLength = vTempResult[i].nLength;
 						local[i]->nWidth = vTempResult[i].nWidth;
 						local[i]->nHeight = vTempResult[i].nHeight;
+						local[i]->nGV = vTempResult[i].GV;
 						local[i]->nFOV = vTempResult[i].nFOV;
 						local[i]->fPosX = vTempResult[i].fPosX + targetRect.left;//데이터를 던져주기 직전에 rect의 top/left 정보를 더해서 던져준다
 						local[i]->fPosY = vTempResult[i].fPosY + targetRect.top;//데이터를 던져주기 직전에 rect의 top/left 정보를 더해서 던져준다
@@ -121,6 +122,7 @@ namespace RootTools_CLR
 							local[i]->nWidth = vTempResult[i].nWidth;
 							local[i]->nHeight = vTempResult[i].nHeight;
 							local[i]->nFOV = vTempResult[i].nFOV;
+							local[i]->nGV = vTempResult[i].GV;
 							local[i]->fPosX = vTempResult[i].fPosX + targetRect.left;//데이터를 던져주기 직전에 rect의 top/left 정보를 더해서 던져준다
 							local[i]->fPosY = vTempResult[i].fPosY + targetRect.top;//데이터를 던져주기 직전에 rect의 top/left 정보를 더해서 던져준다
 						}
@@ -130,9 +132,9 @@ namespace RootTools_CLR
 							//DB Open성공
 
 							System::String^ query;
-							query = query->Format("INSERT INTO tempdata (ClassifyCode, AreaSize, Length, Width, Height, FOV, PosX, PosY, memPOOL, memGROUP, memMEMORY) VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}', '{7}', '{8}', '{9}', '{10}');",
+							query = query->Format("INSERT INTO tempdata (ClassifyCode, AreaSize, Length, Width, Height, FOV, PosX, PosY, memPOOL, memGROUP, memMEMORY, GV) VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}', '{7}', '{8}', '{9}', '{10}', '{11}');",
 								local[i]->nClassifyCode, local[i]->fAreaSize, local[i]->nLength, local[i]->nWidth, local[i]->nHeight, local[i]->nFOV, local[i]->fPosX, local[i]->fPosY,
-								poolName, groupName, memoryName);
+								poolName, groupName, memoryName, local[i]->nGV);
 
 							errorCode = connector->RunQuery(query);
 
@@ -144,14 +146,14 @@ namespace RootTools_CLR
 							{
 								//table이 없음
 								//table생성 후 재시도
-								query = query->Format("CREATE TABLE tempdata(idx INT NOT NULL AUTO_INCREMENT, ClassifyCode INT NULL, AreaSize DOUBLE NULL,  Length INT NULL,  Width INT NULL, Height INT NULL, FOV INT NULL, PosX DOUBLE NULL, PosY DOUBLE NULL, memPOOL longtext DEFAULT NULL, memGROUP longtext DEFAULT NULL, memMEMORY longtext DEFAULT NULL, PRIMARY KEY (idx), UNIQUE INDEX idx_UNIQUE (idx ASC) VISIBLE);");
+								query = query->Format("CREATE TABLE tempdata(idx INT NOT NULL AUTO_INCREMENT, ClassifyCode INT NULL, AreaSize DOUBLE NULL,  GV INT NULL,  Length INT NULL,  Width INT NULL, Height INT NULL, FOV INT NULL, PosX DOUBLE NULL, PosY DOUBLE NULL, memPOOL longtext DEFAULT NULL, memGROUP longtext DEFAULT NULL, memMEMORY longtext DEFAULT NULL, PRIMARY KEY (idx), UNIQUE INDEX idx_UNIQUE (idx ASC) VISIBLE);");
 								errorCode = connector->RunQuery(query);
 								if (errorCode == 0)
 								{
 									//insert재실행
-									query = query->Format("INSERT INTO tempdata (ClassifyCode, AreaSize, Length, Width, Height, FOV, PosX, PosY, memPOOL, memGROUP, memMEMORY) VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}', '{7}', '{8}', '{9}', '{10}');",
+									query = query->Format("INSERT INTO tempdata (ClassifyCode, AreaSize, Length, Width, Height, FOV, PosX, PosY, memPOOL, memGROUP, memMEMORY, GV) VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}', '{7}', '{8}', '{9}', '{10}');",
 										local[i]->nClassifyCode, local[i]->fAreaSize, local[i]->nLength, local[i]->nWidth, local[i]->nHeight, local[i]->nFOV, local[i]->fPosX, local[i]->fPosY,
-										poolName, groupName, memoryName);
+										poolName, groupName, memoryName, local[i]->nGV);
 
 									errorCode = connector->RunQuery(query);
 									if (errorCode != 0)

@@ -71,9 +71,9 @@ namespace Root_EFEM.Module
             Axis m_axisX;
             Axis m_axisZ;
             Axis m_axisRotate;
-            DIO_IO m_dioVacuum; 
+            DIO_IO m_dioVacuum;
             DIO_O m_doBlow;
-            DIO_I2O2 m_dioGuide; 
+            DIO_I2O2 m_dioGuide;
             public void GetTools(ToolBox toolBox, Aligner_ATI module, bool bInit)
             {
                 module.p_sInfo = toolBox.GetDIO(ref m_dioVacuum, module, p_id + "Vacuum");
@@ -82,17 +82,17 @@ namespace Root_EFEM.Module
                 module.p_sInfo = toolBox.GetAxis(ref m_axisX, module, p_id + "AxisX");
                 module.p_sInfo = toolBox.GetAxis(ref m_axisZ, module, p_id + "AxisZ");
                 module.p_sInfo = toolBox.GetAxis(ref m_axisRotate, module, p_id + "AxisRotate");
-                if  (bInit)
+                if (bInit)
                 {
                     InitPosX();
                     InitPosZ();
-                    InitPosRotate(); 
+                    InitPosRotate();
                 }
             }
 
             #region Vacuum
             double m_secBlow = 0.5;
-            double m_secVac = 1; 
+            double m_secVac = 1;
             public string RunVacuum(bool bOn)
             {
                 m_dioVacuum.Write(bOn);
@@ -118,21 +118,20 @@ namespace Root_EFEM.Module
             public string RunGuide(bool bGuide)
             {
                 m_dioGuide.Write(bGuide);
-                return m_dioGuide.WaitDone(); 
+                return m_dioGuide.WaitDone();
             }
             #endregion
 
             #region AxisX
-            public double m_xOffset = 150000;
-            public double m_guideOffset = 1000;
+            public double m_xOffset = 15000; // Forward + m_xOffset = 1620000
             public enum ePosX
             {
-                Backward,
-                Forward
+                Backward, // 0
+                Forward // 1605000
             }
             void InitPosX()
             {
-                m_axisX.AddPos(Enum.GetNames(typeof(ePosX))); 
+                m_axisX.AddPos(Enum.GetNames(typeof(ePosX)));
             }
 
             public string RunMoveX(ePosX ePosX, double fOffset)
@@ -145,10 +144,14 @@ namespace Root_EFEM.Module
             #region AxisZ
             public enum ePosZ
             {
-                GetReady,
-                GetUp,
-                PutReady,
-                PutUp
+                PutReady, // -180636
+                PutDown, //-145930
+                GetReady, // 0
+                GetUp, // -121992
+                InversePutReady, // -180636
+                InversePutDown, // -180636
+                InverseGetReady, //-262386
+                InverseGetDown // -155636
             }
             void InitPosZ()
             {
@@ -165,8 +168,8 @@ namespace Root_EFEM.Module
             #region AxisRotate
             public enum ePosRotate
             {
-                UpSide,
-                DownSide
+                UpSide, // 0
+                DownSide // 100000
             }
             void InitPosRotate()
             {
@@ -186,90 +189,134 @@ namespace Root_EFEM.Module
                 m_secBlow = tree.Set(m_secBlow, m_secBlow, "Blow", "Vaccum Blow Time (sec)");
                 m_secVac = tree.Set(m_secVac, m_secVac, "Vacuum", "Vacuum On Timeout (sec)");
                 m_xOffset = tree.Set(m_xOffset, m_xOffset, "X Offset", "Axis X Moving Offset");
-                m_guideOffset = tree.Set(m_guideOffset, m_guideOffset, "Guide Offset", "Axis X Guide Offset");
             }
             #endregion
 
             public string p_id { get; set; }
             public Flipper(string id)
             {
-                p_id = id; 
+                p_id = id;
             }
 
         }
         Flipper m_flipper = new Flipper("Flipper");
 
-        public string RunGet()
+        public string RunPut()
         {
-            /*if (Run(m_flipper.RunVacuum(false))) return p_sInfo;
-            if (Run(m_flipper.RunMoveX(Flipper.ePosX.Backward, 0))) return p_sInfo; // 0값 대신 값 구하기
-            if (Run(m_flipper.RunMoveRotate(Flipper.ePosRotate.UpSide))) return p_sInfo;
-            if (Run(m_flipper.RunMoveZ(Flipper.ePosZ.GetReady))) return p_sInfo;
-            if (Run(m_flipper.RunMoveX(Flipper.ePosX.Forward, m_flipper.m_xOffset))) return p_sInfo; // X offset 값 구하기
+            // Start Init
             if (Run(RunVacuum(false))) return p_sInfo;
-            if (Run(m_flipper.RunMoveZ(Flipper.ePosZ.GetUp))) return p_sInfo; // up offset 값 구하기
             if (Run(m_flipper.RunGuide(true))) return p_sInfo;
             if (Run(m_flipper.RunVacuum(true))) return p_sInfo;
-            if (Run(m_flipper.RunMoveX(Flipper.ePosX.Backward, 0))) return p_sInfo; // 0값 대신 값 구하기*/
-
-            // Start Init
-            if (Run(m_flipper.RunVacuum(false))) return p_sInfo;
-            if (Run(m_flipper.RunMoveX(Flipper.ePosX.Backward, 0))) return p_sInfo; // Home으로 이동
-            if (Run(m_flipper.RunMoveZ(Flipper.ePosZ.GetReady))) return p_sInfo; // 얼라이너척에 올려진 웨이퍼 높이가 가이드 지지대에 걸리지 않는 위치가 Ready Position
+            if (Run(m_flipper.RunMoveZ(Flipper.ePosZ.PutReady))) return p_sInfo;
+            if (Run(m_flipper.RunMoveX(Flipper.ePosX.Backward, 0))) return p_sInfo;
+            if (Run(m_flipper.RunMoveRotate(Flipper.ePosRotate.UpSide))) return p_sInfo;
             // End Init
 
-            // Start Rotate
-            if (Run(m_flipper.RunMoveRotate(Flipper.ePosRotate.UpSide))) return p_sInfo; // 뒤로 완전히 빠지고 올라온 후 Rotate
-            // End Rotate
+            // Start Put
+            if (Run(m_flipper.RunMoveX(Flipper.ePosX.Forward, 0))) return p_sInfo;
+            if (Run(m_flipper.RunVacuum(false))) return p_sInfo;
+            if (Run(m_flipper.RunGuide(false))) return p_sInfo;
+            if (Run(m_flipper.RunMoveZ(Flipper.ePosZ.PutDown))) return p_sInfo;
+            if (Run(RunVacuum(true))) return p_sInfo;
+            if (Run(m_flipper.RunMoveX(Flipper.ePosX.Forward, m_flipper.m_xOffset))) return p_sInfo;
+            if (Run(m_flipper.RunMoveZ(Flipper.ePosZ.GetReady))) return p_sInfo;
+            if (Run(m_flipper.RunMoveX(Flipper.ePosX.Backward, 0))) return p_sInfo;
+            // End Put
+
+            return "OK";
+        }
+
+        public string RunGet()
+        {
+            // Start Init
+            if (Run(RunVacuum(true))) return p_sInfo;
+            if (Run(m_flipper.RunVacuum(false))) return p_sInfo;
+            if (Run(m_flipper.RunMoveZ(Flipper.ePosZ.GetReady))) return p_sInfo;
+            if (Run(m_flipper.RunMoveX(Flipper.ePosX.Backward, 0))) return p_sInfo;
+            if (Run(m_flipper.RunMoveRotate(Flipper.ePosRotate.UpSide))) return p_sInfo;
+            if (Run(m_flipper.RunGuide(false))) return p_sInfo;
+            // End Init
 
             // Start Get
-            if (Run(m_flipper.RunMoveX(Flipper.ePosX.Forward, m_flipper.m_xOffset))) return p_sInfo; // X offset 만큼 이동
-            if (Run(RunVacuum(false))) return p_sInfo;
-            if (Run(m_flipper.RunMoveZ(Flipper.ePosZ.GetUp))) return p_sInfo; // 플리퍼바닥과 가이드 지지대 높이차 정도 위로
-            if (Run(m_flipper.RunMoveX(Flipper.ePosX.Backward, m_flipper.m_guideOffset))) return p_sInfo;
+            if (Run(m_flipper.RunMoveX(Flipper.ePosX.Forward, m_flipper.m_xOffset))) return p_sInfo;
+            if (Run(m_flipper.RunMoveZ(Flipper.ePosZ.GetUp))) return p_sInfo;
             if (Run(m_flipper.RunGuide(true))) return p_sInfo;
+            if (Run(RunVacuum(false))) return p_sInfo;
+            if (Run(m_flipper.RunMoveZ(Flipper.ePosZ.InversePutReady))) return p_sInfo;
             if (Run(m_flipper.RunVacuum(true))) return p_sInfo;
-            if (Run(m_flipper.RunMoveX(Flipper.ePosX.Backward, 0))) return p_sInfo; // Home으로 이동
+            if (Run(m_flipper.RunMoveX(Flipper.ePosX.Backward, 0))) return p_sInfo;
             // End Get
 
             return "OK";
         }
 
-        public string RunPut()
+        public string RunInversePut()
         {
-            /*if (Run(m_flipper.RunVacuum(true))) return p_sInfo;
+            // Start Init
+            if (Run(RunVacuum(false))) return p_sInfo;
+            if (Run(m_flipper.RunGuide(true))) return p_sInfo;
+            if (Run(m_flipper.RunVacuum(true))) return p_sInfo;
+            if (Run(m_flipper.RunMoveZ(Flipper.ePosZ.InversePutReady))) return p_sInfo;
             if (Run(m_flipper.RunMoveX(Flipper.ePosX.Backward, 0))) return p_sInfo;
             if (Run(m_flipper.RunMoveRotate(Flipper.ePosRotate.DownSide))) return p_sInfo;
-            if (Run(m_flipper.RunMoveZ(Flipper.ePosZ.PutReady))) return p_sInfo;
-            if (Run(m_flipper.RunMoveX(Flipper.ePosX.Forward, m_flipper.m_xOffset))) return p_sInfo;
-            if (Run(m_flipper.RunMoveZ(Flipper.ePosZ.PutUp))) return p_sInfo;
-            if (Run(m_flipper.RunVacuum(false))) return p_sInfo;
-            if (Run(RunVacuum(true))) return p_sInfo;
-            if (Run(m_flipper.RunGuide(false))) return p_sInfo;
-            if (Run(m_flipper.RunMoveX(Flipper.ePosX.Forward, m_flipper.m_guideOffset))) return p_sInfo;
-            if (Run(m_flipper.RunMoveZ(Flipper.ePosZ.PutReady))) return p_sInfo;
-            if (Run(m_flipper.RunMoveX(Flipper.ePosX.Backward, 0))) return p_sInfo;
-            //if (Run(m_flipper.RunMoveRotate(Flipper.ePosRotate.UpSide))) return p_sInfo;*/
-
-            // Start Init
-            if (Run(m_flipper.RunVacuum(true))) return p_sInfo;
-            if (Run(m_flipper.RunMoveX(Flipper.ePosX.Backward, 0))) return p_sInfo; // Home으로 이동
-            if (Run(m_flipper.RunMoveZ(Flipper.ePosZ.PutReady))) return p_sInfo; // 플리퍼에 올려진 웨이퍼 높이가 얼라이너척보다 살짝 높게 Put Position
             // End Init
 
-            // Start Rotate
-            if (Run(m_flipper.RunMoveRotate(Flipper.ePosRotate.DownSide))) return p_sInfo; // 뒤로 완전히 빠지고 올라온 후 Rotate
-            // End Rotate
-
-            // Start Put
-            if (Run(m_flipper.RunMoveX(Flipper.ePosX.Forward, m_flipper.m_xOffset))) return p_sInfo; // X offset 만큼 이동
-            if (Run(RunVacuum(true))) return p_sInfo;
+            // Start InversePut
+            if (Run(m_flipper.RunMoveX(Flipper.ePosX.Forward, 0))) return p_sInfo;
             if (Run(m_flipper.RunVacuum(false))) return p_sInfo;
             if (Run(m_flipper.RunGuide(false))) return p_sInfo;
-            if (Run(m_flipper.RunMoveX(Flipper.ePosX.Forward, m_flipper.m_guideOffset))) return p_sInfo;
-            if (Run(m_flipper.RunMoveZ(Flipper.ePosZ.PutUp))) return p_sInfo; // 플리퍼바닥과 가이드 지지대 높이차 정도 위로
-            if (Run(m_flipper.RunMoveX(Flipper.ePosX.Backward, 0))) return p_sInfo; // Home으로 이동
-            // End Put
+            if (Run(m_flipper.RunMoveZ(Flipper.ePosZ.InversePutDown))) return p_sInfo;
+            if (Run(RunVacuum(true))) return p_sInfo;
+            if (Run(m_flipper.RunMoveX(Flipper.ePosX.Forward, m_flipper.m_xOffset))) return p_sInfo;
+            if (Run(m_flipper.RunMoveZ(Flipper.ePosZ.InverseGetReady))) return p_sInfo;
+            if (Run(m_flipper.RunMoveX(Flipper.ePosX.Backward, 0))) return p_sInfo;
+            // End InversePut
+
+            return "OK";
+        }
+
+        public string RunInverseGet()
+        {
+            // Start Init
+            if (Run(RunVacuum(true))) return p_sInfo;
+            if (Run(m_flipper.RunVacuum(false))) return p_sInfo;
+            if (Run(m_flipper.RunMoveZ(Flipper.ePosZ.InverseGetReady))) return p_sInfo;
+            if (Run(m_flipper.RunMoveX(Flipper.ePosX.Backward, 0))) return p_sInfo;
+            if (Run(m_flipper.RunMoveRotate(Flipper.ePosRotate.DownSide))) return p_sInfo;
+            if (Run(m_flipper.RunGuide(false))) return p_sInfo;
+            // End Init
+
+            // Start RunInverseGet
+            if (Run(m_flipper.RunMoveX(Flipper.ePosX.Forward, m_flipper.m_xOffset))) return p_sInfo;
+            if (Run(m_flipper.RunMoveZ(Flipper.ePosZ.InversePutDown))) return p_sInfo;
+            if (Run(m_flipper.RunMoveX(Flipper.ePosX.Forward, 0))) return p_sInfo;
+            if (Run(RunVacuum(false))) return p_sInfo;
+            if (Run(m_flipper.RunGuide(true))) return p_sInfo;
+            if (Run(m_flipper.RunMoveZ(Flipper.ePosZ.InverseGetDown))) return p_sInfo;
+            if (Run(m_flipper.RunGuide(false))) return p_sInfo; // JEONG
+            if (Run(m_flipper.RunVacuum(true))) return p_sInfo;
+            if (Run(m_flipper.RunGuide(true))) return p_sInfo; // JEONG
+            if (Run(m_flipper.RunVacuum(true))) return p_sInfo; // JEONG : Vacuum ON 확인 위해서
+            if (Run(m_flipper.RunMoveZ(Flipper.ePosZ.PutReady))) return p_sInfo;
+            if (Run(m_flipper.RunMoveX(Flipper.ePosX.Backward, 0))) return p_sInfo;
+            // End RunInverseGet
+
+            return "OK";
+        }
+
+        public string RunRNR()
+        {
+            int count = 0;
+
+            while (true)
+            {
+                if (RunPut() != "OK") break;
+                if (RunGet() != "OK") break;
+                if (RunInversePut() != "OK") break;
+                if (RunInverseGet() != "OK") break;
+
+                count = count + 1;
+            }
 
             return "OK"; 
         }
@@ -407,17 +454,17 @@ namespace Root_EFEM.Module
 
         #region Axis Rotate
         int m_lRotate = 40000;
-        int m_nRotateBack = 0; 
+        int m_nRotateBack = 0;
         string Rotate(double fPulse)
         {
             double fNow = m_axisRotate.p_posCommand;
             while ((fNow - fPulse) > m_lRotate / 2) fNow -= m_lRotate;
             while ((fPulse - fNow) > m_lRotate / 2) fNow += m_lRotate;
-            SetRotatePosition(fNow); 
+            SetRotatePosition(fNow);
             if (fPulse < fNow)
             {
                 m_axisRotate.StartMove(fPulse - m_nRotateBack);
-                if (Run(m_axisRotate.WaitReady())) return p_sInfo; 
+                if (Run(m_axisRotate.WaitReady())) return p_sInfo;
             }
             m_axisRotate.StartMove(fPulse);
             if (Run(m_axisRotate.WaitReady())) return p_sInfo;
@@ -442,7 +489,7 @@ namespace Root_EFEM.Module
             m_lRotate = tree.Set(m_lRotate, m_lRotate, "PpR", "Pulse per Round (pulse)");
             m_nRotateBack = tree.Set(m_nRotateBack, m_nRotateBack, "Rotate Back", "Rotate Back Pulse (pulse)");
             m_secVac = tree.Set(m_secVac, m_secVac, "Vacuum", "Stage Vacuum On Timeout (sec)");
-            m_secBlow = tree.Set(m_secBlow, m_secBlow, "Blow", "Stage Vacuum Blow Time (sec)"); 
+            m_secBlow = tree.Set(m_secBlow, m_secBlow, "Blow", "Stage Vacuum Blow Time (sec)");
             RunTreeAlign(tree.GetTree("Grab"));
         }
         #endregion
@@ -484,7 +531,7 @@ namespace Root_EFEM.Module
         public string IsGetOK(int nID)
         {
             if (p_eState != eState.Ready) return p_id + " eState not Ready";
-            if (p_infoWafer == null) return p_id + " IsGetOK - InfoWafer not Exist"; 
+            if (p_infoWafer == null) return p_id + " IsGetOK - InfoWafer not Exist";
             return "OK";
         }
 
@@ -498,7 +545,7 @@ namespace Root_EFEM.Module
 
         public int GetTeachWTR(InfoWafer infoWafer = null)
         {
-            if (infoWafer == null) infoWafer = p_infoWafer; 
+            if (infoWafer == null) infoWafer = p_infoWafer;
             return m_waferSize.GetData(infoWafer.p_eSize).m_teachWTR;
         }
 
@@ -511,7 +558,7 @@ namespace Root_EFEM.Module
         public string BeforePut(int nID)
         {
             if (p_infoWafer != null) return p_id + " BeforePut : InfoWafer != null";
-            SetRotatePosition(0); 
+            SetRotatePosition(0);
             return CheckGetPut();
         }
 
@@ -536,7 +583,7 @@ namespace Root_EFEM.Module
             InfoWafer,
             Sensor
         }
-        eCheckWafer m_eCheckWafer = eCheckWafer.Sensor; 
+        eCheckWafer m_eCheckWafer = eCheckWafer.Sensor;
         public bool IsWaferExist(int nID)
         {
             switch (m_eCheckWafer)
@@ -562,7 +609,7 @@ namespace Root_EFEM.Module
 
         void RunTreeSetup(Tree tree)
         {
-            m_eCheckWafer = (eCheckWafer)tree.Set(m_eCheckWafer, m_eCheckWafer, "CheckWafer", "CheckWafer"); 
+            m_eCheckWafer = (eCheckWafer)tree.Set(m_eCheckWafer, m_eCheckWafer, "CheckWafer", "CheckWafer");
             m_szAlignROI = tree.Set(m_szAlignROI, m_szAlignROI, "Cameara AOI", "Camera AOI (pixel)");
             RunTreeWafer(tree.GetTree("Default Wafer", false));
             RunTreeRotate(tree.GetTree("Rotate", false));
@@ -621,12 +668,12 @@ namespace Root_EFEM.Module
         double m_secGrab = 5;
         public string AlignGrab(Aligner_ATI_AOI.Data data)
         {
-            m_aoi.m_data = data; 
+            m_aoi.m_data = data;
             m_aoiMax = null;
             StopWatch stopWatch = new StopWatch();
             double vGrabPulse = m_lRotate / m_secGrab;
             double pulseAcc = vGrabPulse * (m_secGrabAcc + 0.1) / 2;
-            SetRotatePosition(-pulseAcc); 
+            SetRotatePosition(-pulseAcc);
             m_doLightSide.Write(true);
             m_doLightCoaxial.Write(false);
             if (Run(AxisMoveAlign(ePosAlign.Align, true))) return p_sInfo;
@@ -680,15 +727,15 @@ namespace Root_EFEM.Module
         public string RunAlignExact(double degAccuracy)
         {
             if (m_aoiMax == null) return "Need Find Notch";
-            m_camAlign.SetMemoryData(m_memoryExact); 
+            m_camAlign.SetMemoryData(m_memoryExact);
             for (int n = 0; n < c_lExact; n++)
             {
                 double posAlign = m_aoiMax.GetNotchPos(m_lRotate);
                 string sRotate = Rotate(posAlign);
                 if (sRotate != "OK") return "Run Align Exact Rotate : " + sRotate;
                 m_aExactAOI[n].m_posGrab = m_axisRotate.p_posCommand;
-                m_camAlign.GrabOne(n); 
-                m_aoi.Inspect(m_aExactAOI[n]); 
+                m_camAlign.GrabOne(n);
+                m_aoi.Inspect(m_aExactAOI[n]);
                 m_aoiMax = m_aExactAOI[n];
             }
             return "Can't Find Notch"; //forget
@@ -719,7 +766,7 @@ namespace Root_EFEM.Module
             m_waferSize = new InfoWafer.WaferSize(id, false, false);
             m_aoi = new Aligner_ATI_AOI(m_log);
             base.InitBase(id, engineer);
-            InitInfoWaferUI(); 
+            InitInfoWaferUI();
         }
 
         public override void ThreadStop()
@@ -777,8 +824,11 @@ namespace Root_EFEM.Module
 
             enum eFlipper
             {
+                Put,
                 Get,
-                Put
+                InversePut,
+                InverseGet,
+                RnR
             }
             eFlipper m_eFlipper = eFlipper.Get; 
             public override ModuleRunBase Clone()
@@ -797,8 +847,11 @@ namespace Root_EFEM.Module
                 if (EQ.p_bSimulate) return "OK"; 
                 switch (m_eFlipper)
                 {
+                    case eFlipper.Put: return m_module.RunPut();
                     case eFlipper.Get: return m_module.RunGet();
-                    case eFlipper.Put: return m_module.RunPut(); 
+                    case eFlipper.InversePut: return m_module.RunInversePut();
+                    case eFlipper.InverseGet: return m_module.RunInverseGet();
+                    case eFlipper.RnR: return m_module.RunRNR();
                 }
                 return "OK";
             }
@@ -849,7 +902,7 @@ namespace Root_EFEM.Module
                 if (EQ.p_bSimulate) return "OK";
                 Aligner_ATI_AOI.AOI aoi = GetAOI();
                 if (aoi == null) return "AOI not Selected";
-                m_module.m_aoi.m_data = m_aoiData; 
+                m_module.m_aoi.m_data = m_aoiData;
                 aoi.m_maxNotch = null;
                 return m_module.m_aoi.Inspect(aoi);
             }
@@ -911,7 +964,7 @@ namespace Root_EFEM.Module
             public override string Run() //forget
             {
                 if (EQ.p_bSimulate) return "OK";
-                m_module.RunVacuum(true); 
+                m_module.RunVacuum(true);
                 m_module.p_bLightCoaxial = true;
 
                 if (m_module.Run(m_module.m_axisCamAlign.StartMove(ePosAlign.Align))) return p_sInfo;
