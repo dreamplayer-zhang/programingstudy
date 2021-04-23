@@ -4,6 +4,7 @@ using RootTools;
 using System;
 using System.Collections.ObjectModel;
 using System.Windows;
+using System.IO.Ports;
 using System.Windows.Input;
 using System.Windows.Threading;
 using Root_CAMELLIA.Module;
@@ -16,13 +17,14 @@ using System.Windows.Media.Imaging;
 using Emgu.CV;
 using System.Threading;
 using Emgu.CV.Structure;
+using System.Data;
 
 namespace Root_CAMELLIA
 {
     public class MainWindow_ViewModel : ObservableObject
     {
         private MainWindow m_MainWindow;
-
+        Met.PMDatas m_PMData = new Met.PMDatas();
         private DataManager _DataManager;
         public DataManager DataManager {
             get
@@ -176,18 +178,21 @@ namespace Root_CAMELLIA
        
             ViewModelInit();
             DialogInit(mainwindow);
-
+            //UpdateLampTime(true);
+            //UserControl_Loaded();
             Run_Measure measure = (Run_Measure)p_Module_Camellia.CloneModuleRun("Measure");
+            
             this.p_StageCenterPulse = measure.m_StageCenterPos_pulse;
 
             //if(p_Module_Camellia.p_CamVRS != null)
             //    p_Module_Camellia.p_CamVRS.Connect();
-
+            SplashScreenHelper.ShowText("NanoView Initialize...");
             InitNanoView();
             if (p_InitNanoview)
             {
                 InitTimer();
             }
+           
 
             p_ContourMapCollection.Add(p_ContourMapGraph);
 
@@ -195,23 +200,125 @@ namespace Root_CAMELLIA
             p_Module_Camellia.p_CamVRS.Captured += GetImage;
         }
 
+        #region Lamp Check Parameter
+        Thread m_thread;
+        public string m_LampTImeError= "";
+        public string p_LampTimeError
+        {
+            get
+            {
+                return m_LampTImeError;
+            }
+            set
+            {
+                SetProperty(ref m_LampTImeError, value);
+            }
+        }
+
+        private void LampPMCheck(double dLeftLampTime)
+        {
+            if (dLeftLampTime >= 0)
+            {
+                string sLeftLampTime = dLeftLampTime.ToString();
+                p_LampTimeError = sLeftLampTime + " Hours Left until PM !";
+
+            }
+            else
+            {
+                p_LampTimeError = "Please, Do Lamp PM";
+            }
+        }
+
+        public double m_LampUseTime = 0.0;
+        public double p_LampTimeCount
+        {
+            get
+            {
+                return m_LampUseTime;
+            }
+            set
+            {
+                SetProperty(ref m_LampUseTime, value);
+            }
+        }
+        
+
+        public void UpdateLampTime(bool initialize)
+        {
+            
+            string InputData = "t";
+            string OutputData = m_PMData.UpdateSR(initialize, InputData);
+            
+                string[] strtext = new string[7] { "H0:", "T0:", "L0:", "H1:", "T1:", "L1:", "Time:" };
+                string[] arr = OutputData.Split(':');
+                string[] strarr = arr[1].Split(',');
+                double LampUseTime = 0.0;
+            if (OutputData.Contains("Time:"))
+            {
+                //형식 월, 일, 시간, 분, 초
+                double Month = Convert.ToDouble(strarr[0]);
+                double Day = Convert.ToDouble(strarr[1]);
+                double Hour = Convert.ToDouble(strarr[2]);
+
+                //LampUseTime = (Month * 30 * 24) + (Day * 24) + Hour; 
+                LampUseTime = 2582 + (Day * 24) + Hour;
+                //string Time = string.Format("{0}:{1}:{2}:{3}:{4}", strarr[0], strarr[1], strarr[2], strarr[3], strarr[4]);
+            }
+            else if (string.IsNullOrEmpty(OutputData))
+            {
+                MessageBox.Show("Time이 없습니다.");
+            }
+
+            p_LampTimeCount = LampUseTime;
+
+
+            if (LampUseTime > 9500)
+            {
+                LampPMCheck(10000 - LampUseTime);
+            }
+        }
+        readonly object lockobj = new object();
+        bool m_bThread = false;
+        void RunThread()
+        {
+            m_bThread = true;
+            while (m_bThread)
+            {
+                Thread.Sleep(3600000);
+                lock (lockobj)
+                {
+                    UpdateLampTime(false);
+                }
+            }
+        }
+        private void UserControl_Loaded()
+        {
+            m_thread = new Thread(new ThreadStart(RunThread));
+            m_thread.Start();
+        }
+
+        #endregion
         private void GetImage(object obj, EventArgs e)
         {
-            Thread.Sleep(100);
-            RootTools.Camera.BaslerPylon.Camera_Basler p_CamVRS = p_Module_Camellia.p_CamVRS;
-            Mat mat = new Mat(new System.Drawing.Size(p_CamVRS.GetRoiSize().X, p_CamVRS.GetRoiSize().Y), Emgu.CV.CvEnum.DepthType.Cv8U, 3, p_CamVRS.p_ImageViewer.p_ImageData.GetPtr(), (int)p_CamVRS.p_ImageViewer.p_ImageData.p_Stride * 3);
-            Image<Bgra, byte> img = mat.ToImage<Bgra, byte>();
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                Thread.Sleep(100);
+                RootTools.Camera.BaslerPylon.Camera_Basler p_CamVRS = p_Module_Camellia.p_CamVRS;
+                Mat mat = new Mat(new System.Drawing.Size(p_CamVRS.GetRoiSize().X, p_CamVRS.GetRoiSize().Y), Emgu.CV.CvEnum.DepthType.Cv8U, 3, p_CamVRS.p_ImageViewer.p_ImageData.GetPtr(), (int)p_CamVRS.p_ImageViewer.p_ImageData.p_Stride * 3);
+                Image<Bgra, byte> img = mat.ToImage<Bgra, byte>();
 
-            //CvInvoke.Imshow("aa",img.Mat);
-            //CvInvoke.WaitKey(0);
-            //CvInvoke.DestroyAllWindows();
-            //p_rootViewer.p_ImageData = new ImageData(p_CamVRS.p_ImageViewer.p_ImageData);
-            //lock (lockObject)
-            //{
+                //CvInvoke.Imshow("aa",img.Mat);
+                //CvInvoke.WaitKey(0);
+                //CvInvoke.DestroyAllWindows();
+                //p_rootViewer.p_ImageData = new ImageData(p_CamVRS.p_ImageViewer.p_ImageData);
+                //lock (lockObject)
+                //{
 
-            p_imageSource = ImageHelper.ToBitmapSource(img);
-            //}
-            //p_rootViewer.SetImageSource();
+                p_imageSource = ImageHelper.ToBitmapSource(img);
+                //}
+                //p_rootViewer.SetImageSource();
+            });
+           
         }
 
         public double p_ArrowX1
@@ -402,6 +509,20 @@ namespace Root_CAMELLIA
         }
         private ObservableCollection<UIElement> m_DrawCandidatePointElement = new ObservableCollection<UIElement>();
 
+        public DataTable PointListItem
+        {
+            get
+            {
+                return _PointListItem;
+            }
+            set
+            {
+                SetProperty(ref _PointListItem, value);
+            }
+        }
+        private DataTable _PointListItem = new DataTable();
+
+
         public double p_Progress
         {
             get
@@ -474,6 +595,11 @@ namespace Root_CAMELLIA
                 {
                     p_InitNanoview = true;
                     SettingViewModel.LoadParameter();
+                    SplashScreenHelper.ShowText("NanoView Initialize Done");
+                }
+                else
+                {
+                    SplashScreenHelper.ShowText("NanoView Initialize Error");
                 }
             }
             SettingViewModel.LoadSettingData();
@@ -673,6 +799,8 @@ namespace Root_CAMELLIA
             RecipeViewModel = new Dlg_RecipeManager_ViewModel(this);   
             PMViewModel = new Dlg_PM_ViewModel(this);
             ReviewViewModel = new Dlg_Review_ViewModel(this);
+            LoginViewModel = new Dlg_Login_ViewModel(this);
+            //StageMapViewModel = new Dlg_StageMapSetting_ViewModel(this);
         }
 
         private void DialogInit(MainWindow main)
@@ -683,6 +811,8 @@ namespace Root_CAMELLIA
             dialogService.Register<Dlg_Setting_ViewModel, Dlg_Setting>();
             dialogService.Register<Dlg_PM_ViewModel, Dlg_PM>();
             dialogService.Register<Dlg_Review_ViewModel, Dlg_Review>();
+            dialogService.Register<Dlg_Login_ViewModel, Dlg_Login>();
+            dialogService.Register<Dlg_StageMapSetting_ViewModel, Dlg_StageMapSetting>();
         }
 
         private void DrawMeasureRoute()
@@ -713,6 +843,8 @@ namespace Root_CAMELLIA
         public Dlg_Setting_ViewModel SettingViewModel;
         public Dlg_Engineer_ViewModel EngineerViewModel;
         public Dlg_Review_ViewModel ReviewViewModel;
+        public Dlg_Login_ViewModel LoginViewModel;
+        public Dlg_StageMapSetting_ViewModel StageMapViewModel;
         public Dlg_RecipeManager_ViewModel RecipeViewModel
         {
             get
@@ -813,6 +945,19 @@ namespace Root_CAMELLIA
                 //RaisePropertyChanged("GaugeListItems");
             }
         }
+
+        string _PointCount = "0";
+        public string PointCount
+        {
+            get
+            {
+                return _PointCount;
+            }
+            set
+            {
+                SetProperty(ref _PointCount, value);
+            }
+        }
         #endregion
 
         #region ICommand
@@ -836,6 +981,9 @@ namespace Root_CAMELLIA
                         RecipeViewModel.UpdateView(true);
                         p_DrawCandidatePointElement = new ObservableCollection<UIElement>(RecipeViewModel.p_DrawCandidatePointElement);
                         p_DrawPointElement = new ObservableCollection<UIElement>(RecipeViewModel.p_DrawPointElement);
+                        //PointListItem = RecipeViewModel.PointListItem;
+                        PointListItem = RecipeViewModel.PointListItem.Copy();
+                        PointCount = RecipeViewModel.PointCount;
                         DrawMeasureRoute();
                         p_Progress = 0;
                     }
@@ -849,6 +997,10 @@ namespace Root_CAMELLIA
             {
                 return new RelayCommand(() =>
                 {
+                    if (!Login())
+                    {
+                        return;
+                    }
                     //var viewModel = new Dlg_RecipeManager_ViewModel(this);
                     ////viewModel.dataManager = RecipeViewModel.dataManager;
                     bool isRecipeLoad = false;
@@ -868,6 +1020,11 @@ namespace Root_CAMELLIA
 
                     if (!isRecipeLoad)
                         RecipeViewModel.ClearData();
+
+                    if (RecipeViewModel.p_isCustomize)
+                    {
+                        RecipeViewModel.p_isCustomize = false;
+                    }
                     RecipeViewModel.UpdateListView(isRecipeLoad);
                     try
                     {
@@ -882,6 +1039,7 @@ namespace Root_CAMELLIA
                     if (isRecipeLoad)
                     {
                         p_DrawCandidatePointElement = new ObservableCollection<UIElement>(RecipeViewModel.p_DrawCandidatePointElement);
+                        PointListItem = RecipeViewModel.PointListItem.Copy();
                     }
                     p_DrawPointElement = new ObservableCollection<UIElement>(RecipeViewModel.p_DrawPointElement);
                     DrawMeasureRoute();
@@ -889,12 +1047,58 @@ namespace Root_CAMELLIA
                 });
             }
         }
+
+        public ICommand CmdLogin
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    if (!BaseDefine.Configuration.LoginSuccess)
+                        Login();
+                });
+            }
+        }
+
+        public ICommand CmdLogout
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    BaseDefine.Configuration.LoginSuccess = false;
+                });
+            }
+        }
+
+        bool Login()
+        {
+            if (BaseDefine.Configuration.LoginSuccess)
+            {
+                return true;
+            }
+            var loginViewmodel = LoginViewModel;
+            var loginDialog = dialogService.GetDialog(loginViewmodel) as Dlg_Login;
+            Nullable<bool> LoginResult = loginDialog.ShowDialog();
+            if (!(bool)LoginResult)
+            {
+                return false;
+            }
+            BaseDefine.Configuration.LoginSuccess = true;
+            return true;
+        }
+
         public ICommand CmdEngineer
         {
             get
             {
                 return new RelayCommand(() =>
                 {
+                    if (!Login())
+                    {
+                        return;
+                    }
+
                     var viewModel = EngineerViewModel;
                     var dialog = dialogService.GetDialog(viewModel) as Dlg_Engineer;
                     viewModel.p_pmParameter.SetRecipeData(DataManager.recipeDM.MeasurementRD);
@@ -920,7 +1124,7 @@ namespace Root_CAMELLIA
             }
         }
 
-        public ICommand CmdTest
+        public ICommand CmdReview
         {
             get
             {
@@ -990,6 +1194,11 @@ namespace Root_CAMELLIA
             {
                 return new RelayCommand(() =>
                 {
+                    if (!Login())
+                    {
+                        return;
+                    }
+
                     var viewModel = SettingViewModel;
                     if (m_InitNanoview)
                     {
@@ -1280,5 +1489,7 @@ namespace Root_CAMELLIA
                 RaisePropertyChanged("p_rowIndex");
             }
         }
+
+        
     }
 }

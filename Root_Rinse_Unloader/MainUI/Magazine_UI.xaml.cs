@@ -82,6 +82,7 @@ namespace Root_Rinse_Unloader.MainUI
 
         private void buttonMove_Click(object sender, RoutedEventArgs e)
         {
+            EQ.p_bStop = false; 
             m_storage.MoveMagazine(m_rinse.p_eMagazine, m_rinse.p_iMagazine, false);
         }
     }

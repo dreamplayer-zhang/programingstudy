@@ -96,6 +96,11 @@ namespace Root_Rinse_Unloader
             textBlockStripState1.DataContext = m_handler.m_roller.m_aLine[1];
             textBlockStripState2.DataContext = m_handler.m_roller.m_aLine[2];
             textBlockStripState3.DataContext = m_handler.m_roller.m_aLine[3];
+            textBlockRailState0.DataContext = m_handler.m_rail.m_aLine[0];
+            textBlockRailState1.DataContext = m_handler.m_rail.m_aLine[1];
+            textBlockRailState2.DataContext = m_handler.m_rail.m_aLine[2];
+            textBlockRailState3.DataContext = m_handler.m_rail.m_aLine[3];
+            checkBoxEQStop.DataContext = EQ.m_EQ; 
             progressUI.Init(m_handler.m_rinse);
         }
         #endregion
@@ -172,6 +177,8 @@ namespace Root_Rinse_Unloader
 
         private void buttonStart_Click(object sender, RoutedEventArgs e)
         {
+            foreach (Storage.Magazine magazine in m_handler.m_storage.m_aMagazine) magazine.RunClamp(magazine.p_bCheck);
+            EQ.p_bStop = false; 
             EQ.p_eState = EQ.eState.Run;
         }
 
@@ -184,6 +191,8 @@ namespace Root_Rinse_Unloader
         {
             foreach (Roller.Line line in m_handler.m_roller.m_aLine) line.p_eSensor = Roller.Line.eSensor.Empty;
             m_handler.m_rinse.RunBuzzerOff();
+            m_handler.Reset();
+            EQ.p_bStop = false; 
             EQ.p_eState = EQ.eState.Ready;
         }
 

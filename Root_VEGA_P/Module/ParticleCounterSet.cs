@@ -4,6 +4,7 @@ using RootTools.Control;
 using RootTools.Module;
 using RootTools.ParticleCounter;
 using RootTools.ToolBoxs;
+using RootTools.Trees;
 using System.Threading;
 
 namespace Root_VEGA_P.Module
@@ -70,11 +71,17 @@ namespace Root_VEGA_P.Module
 
         #region NozzleSet
         NozzleSet m_nozzleSet;
-        void InitNozzleSet()
+        #endregion
+
+        #region Tree
+        public void RunTree(Tree tree)
         {
-            
+            m_nozzleSet.RunTreeSetup(tree.GetTree("NozzleSet"));
+            //RunTreeFlow(tree.GetTree("Flow Sensor"));
+            //RunTreeLasair(tree.GetTree("Lasair"));
         }
         #endregion
+
 
         ModuleBase m_module; 
         public ParticleCounterSet(ModuleBase module)

@@ -66,7 +66,7 @@ namespace RootTools
             {
                 if ((m_Size.X != value.X) && (m_Size.Y != value.Y) && m_eMode == eMode.ImageBuffer)
                 {
-                    ReAllocate(value, p_nByte);
+                    ReAllocate(value, p_nByte * p_nPlane);
                 }
                 SetProperty(ref m_Size, value);
             }
@@ -196,6 +196,33 @@ namespace RootTools
             p_nByte = nByte;
             p_Size = new CPoint(40000, 40000);
             m_ToolMemory = tool;
+        }
+        public ImageData(ImageData copyData)
+        {
+            //this.m_aBuf = copyData.m_aBuf;
+            m_aBuf = new byte[copyData.m_aBuf.Length];
+            Buffer.BlockCopy(copyData.m_aBuf, 0, m_aBuf, 0, copyData.m_aBuf.Length);
+            if(copyData.m_aBufFileOpen != null)
+            {
+                m_aBufFileOpen = new byte[copyData.m_aBufFileOpen.Length];
+                Buffer.BlockCopy(copyData.m_aBufFileOpen, 0, m_aBufFileOpen, 0, copyData.m_aBufFileOpen.Length);
+            }
+            this.m_element = copyData.m_element;
+            this.m_eMode = copyData.m_eMode;
+            this.p_id = copyData.p_id;
+            if(copyData.m_MemData != null)
+                this.m_MemData = copyData.m_MemData;
+            this.m_nPlane = copyData.m_nPlane;
+            //this.m_ptrImg =
+            //this.m_Size = copyData.m_Size;
+            this.m_sPool = copyData.m_sPool;
+            this.m_ToolMemory = copyData.m_ToolMemory;
+            //this.p_Stride = copyData.p_Stride;
+            this.p_nPlane = copyData.p_nPlane;
+            this.p_Size = copyData.p_Size;
+            this.p_nByte = copyData.p_nByte;
+            
+            //this.m_aBufFileOpen
         }
 
         public byte[] GetData(System.Drawing.Rectangle View_Rect, int CanvasWidth, int CanvasHeight)
