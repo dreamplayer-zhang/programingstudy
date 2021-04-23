@@ -805,7 +805,7 @@ namespace RootTools
                                     {
                                         long pix_x = rectX + xx * rectWidth / p_CanvasWidth;
                                         /*byte pixel = ((byte*)ptrMem)[pix_x + (long)pix_y * sizeX];*/
-                                        byte* arrByte = (byte * )ptrMem.ToPointer();
+                                        byte* arrByte = (byte*)ptrMem.ToPointer();
                                         long idx = pix_x + (long)pix_y * sizeX;
                                         byte pixel = arrByte[idx];
                                         viewptr[yy, xx, 0] = ApplyContrastAndBrightness(pixel);

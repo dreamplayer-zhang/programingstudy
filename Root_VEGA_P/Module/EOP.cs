@@ -1,6 +1,7 @@
 ﻿using Root_VEGA_P_Vision.Module;
 using RootTools;
 using RootTools.Camera.BaslerPylon;
+using RootTools.Camera.CognexOCR;
 using RootTools.Control;
 using RootTools.Light;
 using RootTools.Module;
