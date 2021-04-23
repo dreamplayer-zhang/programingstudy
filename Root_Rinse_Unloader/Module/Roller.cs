@@ -245,7 +245,7 @@ namespace Root_Rinse_Unloader.Module
         public string RunWaitArrived()
         {
             InitWaitArrived();
-            while (EQ.IsStop() == false)
+            while ((EQ.IsStop() == false) && (EQ.p_eState == EQ.eState.Run))
             {
                 if (Run(WaitExist())) return p_sInfo;
                 if (Run(WaitArrived())) return p_sInfo;
@@ -272,7 +272,7 @@ namespace Root_Rinse_Unloader.Module
 
         string WaitExist()
         {
-            while (EQ.IsStop() == false)
+            while ((EQ.IsStop() == false) && (EQ.p_eState == EQ.eState.Run))
             {
                 Thread.Sleep(10); 
                 if (p_eStep == eStep.Empty)
@@ -292,7 +292,7 @@ namespace Root_Rinse_Unloader.Module
 
         string WaitArrived()
         {
-            while (EQ.IsStop() == false)
+            while ((EQ.IsStop() == false) && (EQ.p_eState == EQ.eState.Run))
             {
                 Thread.Sleep(10);
                 int nExist = 0;
@@ -337,10 +337,8 @@ namespace Root_Rinse_Unloader.Module
                     m_rail.StartRun(m_bExist);
                     Thread.Sleep(100);
                     p_eStep = eStep.Send;
-                    //if (Run(WaitSending())) return p_sInfo;
                     Thread.Sleep((int)(1000 * m_secSend)); 
                     RunStopperUp(true);
-                    //foreach (Line line in m_aLine) line.p_eSensor = Line.eSensor.Empty;
                     p_eStep = eStep.Empty; 
                     break;
                 case RinseU.eRunMode.Stack:
