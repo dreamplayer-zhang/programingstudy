@@ -1,9 +1,9 @@
-﻿<UserControl x:Class="Root_VEGA_P.RecipeMangerPanel"
+﻿<UserControl x:Class="Root_VEGA_P_Vision.RecipeManagerPanel"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:local="clr-namespace:Root_VEGA_P.UI"
+             xmlns:local="clr-namespace:Root_VEGA_P_Vision"
              xmlns:Tools="clr-namespace:RootTools;assembly=RootTools"
              mc:Ignorable="d"
              d:DesignHeight="818"
@@ -18,14 +18,14 @@
                 BorderThickness="0,0,1,0">
             <StackPanel Margin="0,10,0,0">
                 <ToggleButton Content="Recipe Manager"
-                              IsChecked="False"
+                              IsChecked="True"
                               Style="{StaticResource SetupPanelToggleBtn}" />
             </StackPanel>
         </Border>
 
         <Grid Grid.Column="1"
               x:Name="SubPanel">
-            <GroupBox Header="Pod Manager" Visibility="Visible">
+            <GroupBox Header="Recipe Manager" Visibility="Visible">
                 <Grid Grid.Row="1">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="25*" />

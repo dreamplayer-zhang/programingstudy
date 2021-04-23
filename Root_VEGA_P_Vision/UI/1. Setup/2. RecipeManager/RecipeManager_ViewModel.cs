@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 
 namespace Root_VEGA_P_Vision
 {
-    class RecipeManager_ViewModel:ObservableObject
+    public class RecipeManager_ViewModel:ObservableObject
     {
         public Setup_ViewModel m_Setup;
-        public RecipeMangerPanel Main;
+        public RecipeManagerPanel Main;
 
         public RecipeManager_ViewModel(Setup_ViewModel setup)
         {

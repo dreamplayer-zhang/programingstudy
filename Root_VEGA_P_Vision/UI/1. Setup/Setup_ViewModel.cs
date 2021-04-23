@@ -45,7 +45,7 @@ namespace Root_VEGA_P_Vision
         #endregion
 
         private Home_ViewModel homeVM;
-        private RecipeManager_ViewModel RecipeManagerVM;
+        private RecipeManager_ViewModel recipeManagerVM;
         public Maintenance_ViewModel maintVM;
 
         public Setup_ViewModel()
@@ -63,7 +63,7 @@ namespace Root_VEGA_P_Vision
         private void InitAllPanel()
         {
             homeVM = new Home_ViewModel(this);
-            RecipeManagerVM = new RecipeManager_ViewModel(this);
+            recipeManagerVM = new RecipeManager_ViewModel(this);
             maintVM = new Maintenance_ViewModel(this);
         }
         private void InitAllNaviBtn()
@@ -203,8 +203,8 @@ namespace Root_VEGA_P_Vision
 
             //Wizard.SetPage(Wizard.Summary);
 
-            p_CurrentPanel = Wizard.Main;
-            p_CurrentPanel.DataContext = Wizard;
+            p_CurrentPanel = recipeManagerVM.Main;
+            p_CurrentPanel.DataContext = recipeManagerVM;
         }
         public void SetMaintenance()
         {

@@ -178,8 +178,8 @@
       <DependentUpon>HomePanel.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\1. Setup\1.Home\Home_ViewModel.cs" />
-    <Compile Include="UI\1. Setup\2. RecipeManager\RecipeMangerPanel.xaml.cs">
-      <DependentUpon>RecipeMangerPanel.xaml</DependentUpon>
+    <Compile Include="UI\1. Setup\2. RecipeManager\RecipeManagerPanel.xaml.cs">
+      <DependentUpon>RecipeManagerPanel.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\1. Setup\2. RecipeManager\RecipeManager_ViewModel.cs" />
     <Compile Include="UI\1. Setup\Setup.xaml.cs">
@@ -246,9 +246,9 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="UI\1. Setup\2. RecipeManager\RecipeMangerPanel.xaml">
-      <Generator>MSBuild:Compile</Generator>
+    <Page Include="UI\1. Setup\2. RecipeManager\RecipeManagerPanel.xaml">
       <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UI\1. Setup\Setup.xaml">
       <Generator>MSBuild:Compile</Generator>

@@ -30,6 +30,9 @@ namespace Root_VEGA_P.Module
 
         public void RunTreeOpen(Tree tree, List<bool> aOpen)
         {
+            if (aOpen.Count <= 0)
+                return;
+
             for (int n = 0; n < p_nNozzle; n++)
             {
                 aOpen[n] = tree.Set(aOpen[n], aOpen[n], (n + 1).ToString("00"), "Nozzle Open");
