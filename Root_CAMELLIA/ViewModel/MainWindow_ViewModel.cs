@@ -183,12 +183,13 @@ namespace Root_CAMELLIA
 
             //if(p_Module_Camellia.p_CamVRS != null)
             //    p_Module_Camellia.p_CamVRS.Connect();
-
+            SplashScreenHelper.ShowText("NanoView Initialize...");
             InitNanoView();
             if (p_InitNanoview)
             {
                 InitTimer();
             }
+           
 
             p_ContourMapCollection.Add(p_ContourMapGraph);
 
@@ -489,6 +490,11 @@ namespace Root_CAMELLIA
                 {
                     p_InitNanoview = true;
                     SettingViewModel.LoadParameter();
+                    SplashScreenHelper.ShowText("NanoView Initialize Done");
+                }
+                else
+                {
+                    SplashScreenHelper.ShowText("NanoView Initialize Error");
                 }
             }
             SettingViewModel.LoadSettingData();

@@ -84,7 +84,8 @@ namespace Root_CAMELLIA.LibSR_Met
                     m_sConfigPath = nConfigureFilePath;
                     m_bSRInitialized = true;
                     m_DM.m_Log.WriteLog(LogType.Operating, "SR Initialize Done");
-                    MessageBox.Show("Initialize Done"); //추후 제거
+                    SplashScreenHelper.ShowText("SR Initialize Done!");
+                    //MessageBox.Show("Initialize Done"); //추후 제거
 
                     //double Boxcar_VIS = m_SR.Boxcar_VIS;
                     //double Average_VIS = m_SR.Average_VIS;
@@ -101,7 +102,8 @@ namespace Root_CAMELLIA.LibSR_Met
                 {
                     string sErr = Enum.GetName(typeof(ERRORCODE_NANOVIEW), rst);
                     m_DM.m_Log.WriteLog(LogType.Error, sErr);
-                    MessageBox.Show(sErr); //추후 제거
+                    SplashScreenHelper.ShowText("SR Initialize Error!");
+                    //MessageBox.Show(sErr); //추후 제거
                 }
 
                 return rst;
@@ -109,7 +111,8 @@ namespace Root_CAMELLIA.LibSR_Met
             catch (Exception ex)
             {
                 m_DM.m_Log.WriteLog(LogType.Error, ex.Message);
-                MessageBox.Show(ex.Message);
+                //MessageBox.Show(ex.Message);
+                SplashScreenHelper.ShowText("SR Initialize Error!");
                 return ERRORCODE_NANOVIEW.NANOVIEW_ERROR;
             }
         }

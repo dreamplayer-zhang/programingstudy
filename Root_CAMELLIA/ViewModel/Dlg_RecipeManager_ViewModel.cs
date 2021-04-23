@@ -1168,6 +1168,7 @@ namespace Root_CAMELLIA
                         CurrentCandidatePoint = -1;
                     }
                 }
+
                 bSelected = false;
                 idx = 0;
                 int nDummyIdx = -1;
@@ -1284,37 +1285,57 @@ namespace Root_CAMELLIA
                 se.SetBrush(GeneralTools.StageHoleBrush);
             }
             int idx = 0;
-            foreach(ShapeEllipse se in listSelectedPoint)
+            if (p_isCustomize)
             {
-                if (SetStartEndPointMode)
+                foreach(ShapeEllipse se in listCandidateSelectedPoint)
                 {
-                    int nDummyidx = -1;
-                    CCircle circle = dataManager.recipeDM.TeachingRD.DataSelectedPoint[idx];
-                    if (ContainsData(ListReorderPoint, circle, out nDummyidx))
+                    se.SetBrush(GeneralTools.CustomSelectBrush);
+                }
+
+                foreach (ShapeEllipse se in listPreviewCandidatePoint)
+                {
+                    se.SetBrush(GeneralTools.StageHoleBrush);
+                }
+                foreach (ShapeEllipse se in listPreviewCandidateSelectedPoint)
+                {
+                    se.SetBrush(GeneralTools.CustomSelectBrush);
+                }
+            }
+            else
+            {
+                foreach (ShapeEllipse se in listSelectedPoint)
+                {
+                    if (SetStartEndPointMode)
                     {
-                        se.SetBrush(System.Windows.Media.Brushes.Cyan);
-                        listPreviewSelectedPoint[idx].SetBrush(System.Windows.Media.Brushes.Cyan);
+                        int nDummyidx = -1;
+                        CCircle circle = dataManager.recipeDM.TeachingRD.DataSelectedPoint[idx];
+                        if (ContainsData(ListReorderPoint, circle, out nDummyidx))
+                        {
+                            se.SetBrush(System.Windows.Media.Brushes.Cyan);
+                            listPreviewSelectedPoint[idx].SetBrush(System.Windows.Media.Brushes.Cyan);
+                        }
+                        else
+                        {
+                            se.SetBrush(System.Windows.Media.Brushes.DarkBlue);
+                            listPreviewSelectedPoint[idx].SetBrush(System.Windows.Media.Brushes.DarkBlue);
+                        }
                     }
                     else
                     {
-                        se.SetBrush(System.Windows.Media.Brushes.DarkBlue);
-                        listPreviewSelectedPoint[idx].SetBrush(System.Windows.Media.Brushes.DarkBlue);
+                        se.SetBrush(GeneralTools.GbHole);
                     }
+                    idx++;
                 }
-                else
+                foreach (ShapeEllipse se in listPreviewCandidatePoint)
+                {
+                    se.SetBrush(GeneralTools.StageHoleBrush);
+                }
+                foreach (ShapeEllipse se in listPreviewSelectedPoint)
                 {
                     se.SetBrush(GeneralTools.GbHole);
                 }
-                idx++;
             }
-            foreach(ShapeEllipse se in listPreviewCandidatePoint)
-            {
-                se.SetBrush(GeneralTools.StageHoleBrush);
-            }
-            foreach(ShapeEllipse se in listPreviewSelectedPoint)
-            {
-                se.SetBrush(GeneralTools.GbHole);
-            }
+           
         }
         public void OnMouseMove(object sender, System.Windows.Input.MouseEventArgs e)
         {
@@ -1341,11 +1362,83 @@ namespace Root_CAMELLIA
                 return;
             }
 
-            //if (p_isCustomize)
-            //{
+            if (p_isCustomize)
+            {
+                if (p_mapMode == MapMode.Select)
+                {
+                    bool bSelected = false;
 
-            //}
-            //else
+                    int nIndex = 0;
+                    double dMin = 9999;
+                    int nMinIndex = 0;
+
+                    foreach (ShapeEllipse se in listCandidatePoint)
+                    {
+                        double dDistance = GetDistance(se, new System.Windows.Point(MousePoint.X, MousePoint.Y));
+
+                        if (dDistance < dMin)
+                        {
+                            dMin = dDistance;
+                            nMinIndex = nIndex;
+                        }
+                        nIndex++;
+                    }
+                    //if(nIndex == listCandidatePoint.Count)
+                    //{
+                    //    return;
+                    //}
+                    int idx = 0;
+
+                    foreach (ShapeEllipse se in listCandidatePoint)
+                    {
+                        if (se.Equals(listCandidatePoint[nMinIndex]))
+                        {
+                            bSelected = true;
+                            se.SetBrush(GeneralTools.GbSelect);
+                            listPreviewCandidatePoint[nMinIndex].SetBrush(GeneralTools.GbSelect);
+                            shape = se;
+                        }
+                        else
+                        {
+                            se.SetBrush(GeneralTools.StageHoleBrush);
+                            listPreviewCandidatePoint[idx].SetBrush(GeneralTools.StageHoleBrush);
+                        }
+                        idx++;
+                    }
+                    if (bSelected)
+                    {
+                        CurrentCandidatePoint = listCandidatePoint.IndexOf(shape);
+                    }
+                    else
+                    {
+                        CurrentCandidatePoint = -1;
+                    }
+
+                    bSelected = false;
+                    idx = 0;
+                    int nDummyIdx = -1;
+                    foreach (ShapeEllipse se in listCandidateSelectedPoint)
+                    {
+                        if (se.CenterX == listCandidatePoint[nMinIndex].CenterX && se.CenterY == listCandidatePoint[nMinIndex].CenterY)
+                        {
+                            bSelected = true;
+                            se.SetBrush(GeneralTools.SelectedOverBrush);
+                            listPreviewCandidateSelectedPoint[idx].SetBrush(GeneralTools.SelectedOverBrush);
+                            shape = se;
+                        }
+                        else
+                        {
+                            {
+                                se.SetBrush(GeneralTools.CustomSelectBrush);
+                                listPreviewCandidateSelectedPoint[idx].SetBrush(GeneralTools.CustomSelectBrush);
+
+                            }
+                        }
+                        idx++;
+                    }
+                }
+            }
+            else
             {
                 if (StageMouseHover)
                 {
@@ -1395,6 +1488,8 @@ namespace Root_CAMELLIA
                             CurrentCandidatePoint = -1;
                         }
                     }
+
+
                     bSelected = false;
                     idx = 0;
                     int nDummyIdx = -1;
@@ -1440,6 +1535,17 @@ namespace Root_CAMELLIA
                         }
                         idx++;
                     }
+                    if (bSelected)
+                    {
+                        CurrentCandidatePoint = -1;
+                        CurrentSelectPoint = listSelectedPoint.IndexOf(shape);
+                    }
+                    else
+                    {
+                        CurrentSelectPoint = -1;
+                    }
+
+
                     if (bSelected)
                     {
                         CurrentCandidatePoint = -1;
@@ -1690,8 +1796,58 @@ namespace Root_CAMELLIA
                 }
                 else if(p_mapMode == MapMode.Select)
                 {
+                    if (Math.Abs(SelectStartPoint.X - SelectEndPoint.X) > Limit || Math.Abs(SelectStartPoint.Y - SelectEndPoint.Y) > Limit)
+                    {
+                        if (ShiftKeyDown == false && CtrlKeyDown == false)
+                        {
+                            //test.DataMeasurementRoute.Clear();
+                            test.DataCandidateSelectedPoint.Clear();
+                        }
 
-                  
+
+                        double dStartSelectX = (SelectStartPoint.X - CenterX - OffsetX) / ZoomScale / RatioX;
+                        double dStartSelectY = (-SelectStartPoint.Y + CenterY - OffsetY) / ZoomScale / RatioY;
+                        double dEndSelectX = (SelectEndPoint.X - CenterX - OffsetX) / ZoomScale / RatioX;
+                        double dEndSelectY = (-SelectEndPoint.Y + CenterY - OffsetY) / ZoomScale / RatioY;
+
+                        double top = Math.Max(dStartSelectY, dEndSelectY);
+                        double bottom = Math.Min(dStartSelectY, dEndSelectY);
+                        double left = Math.Min(dStartSelectX, dEndSelectX);
+                        double right = Math.Max(dStartSelectX, dEndSelectX);
+
+                        foreach (CCircle circle in test.DataCandidatePoint)
+                        {
+                            if (circle.x > left && circle.x < right && circle.y > bottom && circle.y < top)
+                            {
+                                int _index = -1;
+                                if (ContainsData(test.DataCandidateSelectedPoint, circle, out _index) && ((ShiftKeyDown && CtrlKeyDown) || !CtrlKeyDown))
+                                {
+                                    DeletePointNotInvalidateCustomize(_index, 1);
+                                }
+                                if (!ShiftKeyDown)
+                                {
+                                    if (!ContainsData(test.DataCandidateSelectedPoint, circle, out _index))
+                                    {
+                                        //dataManager.recipeDM.TeachingRD.DataMeasurementRoute.Add(dataManager.recipeDM.TeachingRD.DataSelectedPoint.Count);
+                                         test.DataCandidateSelectedPoint.Add(circle);
+                                        //RouteOrder.Add(dataManager.recipeDM.TeachingRD.DataSelectedPoint.Count - 1);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        if (CurrentCandidatePoint == -1 && CurrentSelectPoint == -1)
+                        {
+                            MethodPointSelect(pt);
+                        }
+                        else
+                        {
+                            MethodCircleSelectCustomize();
+                        }
+                    }
+
                 }
 
                 SelectStartPoint = new System.Windows.Point(pt.X, pt.Y);
@@ -2202,7 +2358,7 @@ namespace Root_CAMELLIA
 
                    // else
                     {
-                        dataSelectedPoint.SetBrush(GeneralTools.GbHole);
+                        dataSelectedPoint.SetBrush(GeneralTools.CustomSelectBrush);
                     }
 
                     Shapes[shapeIndex] = dataSelectedPoint;
@@ -2376,7 +2532,15 @@ namespace Root_CAMELLIA
             {
                 StopWatch sw = new StopWatch();
                 sw.Start();
-                RecipeData data = dataManager.recipeDM.TeachingRD;
+                RecipeData data;
+                if (!p_isCustomize)
+                {
+                    data = dataManager.recipeDM.TeachingRD;
+                }
+                else
+                {
+                    data = test;
+                }
                 sw.Stop();
                 System.Diagnostics.Debug.WriteLine("데이터 불러옴" + sw.ElapsedMilliseconds);
                 if (MeasurementLoad)
@@ -2736,7 +2900,7 @@ namespace Root_CAMELLIA
                     int nDummyIdx = -1;
                     for (int i = 0; i < recipe.DataCandidateSelectedPoint.Count; i++)
                     {
-                        dataPoint = new ShapeEllipse(GeneralTools.GbHole);
+                        dataPoint = new ShapeEllipse(GeneralTools.CustomSelectBrush);
                         ShapeEllipse dataSelectedPoint = dataPoint as ShapeEllipse;
                         CCircle circle = new CCircle(recipe.DataCandidateSelectedPoint[i].x, recipe.DataCandidateSelectedPoint[i].y, recipe.DataCandidateSelectedPoint[i].width,
                             recipe.DataCandidateSelectedPoint[i].height, recipe.DataCandidateSelectedPoint[i].MeasurementOffsetX, recipe.DataCandidateSelectedPoint[i].MeasurementOffsetY);
@@ -2753,6 +2917,7 @@ namespace Root_CAMELLIA
                         {
                             Shapes.Add(dataSelectedPoint);
                             listCandidateSelectedPoint.Add(dataSelectedPoint);
+                            temp.Add(dataSelectedPoint.UIElement);
                         }
                         else
                         {
@@ -3145,6 +3310,14 @@ namespace Root_CAMELLIA
             }
         }
 
+        public void DeletePointNotInvalidateCustomize(int nIndex, int nRange)
+        {
+            for (int i = nIndex; i < nIndex + nRange; i++)
+            {
+                test.DataCandidateSelectedPoint.RemoveAt(nIndex);
+            }
+        }
+
         private void CustomizeStageMap(System.Windows.Point pt)
         {
             if (CheckActiveTest(pt))
@@ -3190,6 +3363,58 @@ namespace Root_CAMELLIA
                         SetStartEndPointMode = false;
                         ReorderCnt = 0;
                         ReorderBrush = normalBrush;
+                    }
+                }
+            }
+        }
+
+        private void MethodCircleSelectCustomize()
+        {
+            double dOffsetX = 0;
+            double dOffsetY = 0;
+            if (CurrentCandidatePoint != -1)
+            {
+                CCircle circle = test.DataCandidatePoint[CurrentCandidatePoint];
+                circle.MeasurementOffsetX = dOffsetX;
+                circle.MeasurementOffsetY = dOffsetY;
+
+                int _index = -1;
+                if (ContainsSelectedData(test.DataCandidateSelectedPoint, circle, out _index) && ((ShiftKeyDown && CtrlKeyDown) || !CtrlKeyDown))
+                {
+                    DeletePointCumstomize(_index, 1);
+                }
+                else
+                {
+                    if (!ShiftKeyDown)
+                    {
+                        if (!ContainsData(test.DataCandidateSelectedPoint, circle, out _index))
+                        {
+                            //dataManager.recipeDM.TeachingRD.DataMeasurementRoute.Add(dataManager.recipeDM.TeachingRD.DataSelectedPoint.Count);
+                            test.DataCandidateSelectedPoint.Add(circle);
+                            //RouteOrder.Add(dataManager.recipeDM.TeachingRD.DataSelectedPoint.Count - 1);
+                        }
+                    }
+                }
+            }
+            if (CurrentSelectPoint != -1)
+            {
+                CCircle circle = test.DataCandidateSelectedPoint[CurrentSelectPoint];
+
+                int _index = -1;
+                if (ContainsSelectedData(test.DataCandidateSelectedPoint, circle, out _index) && ((ShiftKeyDown && CtrlKeyDown) || !CtrlKeyDown))
+                {
+                    DeletePointCumstomize(_index, 1);
+                }
+                else
+                {
+                    if (!ShiftKeyDown)
+                    {
+                        if (!ContainsData(test.DataCandidateSelectedPoint, circle, out _index))
+                        {
+                            //dataManager.recipeDM.TeachingRD.DataMeasurementRoute.Add(dataManager.recipeDM.TeachingRD.DataSelectedPoint.Count);
+                            test.DataCandidateSelectedPoint.Add(circle);
+                            //RouteOrder.Add(dataManager.recipeDM.TeachingRD.DataSelectedPoint.Count - 1);
+                        }
                     }
                 }
             }
@@ -3275,6 +3500,26 @@ namespace Root_CAMELLIA
                 {
                     DeletePoint(_index, 1);
                 }
+            }
+        }
+
+        public void DeletePointCumstomize(int nIndex, int nRange)
+        {
+            for (int i = nIndex; i < nIndex + nRange; i++)
+            {
+                double dPointX = test.DataCandidateSelectedPoint[nIndex].x;
+                double dPointY = test.DataCandidateSelectedPoint[nIndex].y;
+
+                test.DataCandidateSelectedPoint.RemoveAt(nIndex);
+                //int nDeleteIndex = dataManager.recipeDM.TeachingRD.DataMeasurementRoute.FindIndex(s => s.Equals(nIndex));
+                //dataManager.recipeDM.TeachingRD.DataMeasurementRoute.RemoveAt(nDeleteIndex);
+                //for (int j = 0; j < dataManager.recipeDM.TeachingRD.DataMeasurementRoute.Count; j++)
+                //{
+                //    if (dataManager.recipeDM.TeachingRD.DataMeasurementRoute[j] > nIndex)
+                //    {
+                //        dataManager.recipeDM.TeachingRD.DataMeasurementRoute[j] = dataManager.recipeDM.TeachingRD.DataMeasurementRoute[j] - 1;
+                //    }
+                //}
             }
         }
 
@@ -3494,6 +3739,42 @@ namespace Root_CAMELLIA
                         ReorderBrush = normalBrush;
                         PointAddMode = "Normal";
                     }
+                });
+            }
+        }
+
+        public ICommand CmdPointDelete
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    //for(int i = 0; i < test.DataCandidatePoint.Count; i++)
+                    //{
+                    //    for(int j = 0; j < test.DataCandidateSelectedPoint.Count; j++)
+                    //    {
+                    //        if(test.DataCandidatePoint[i].x == test.DataCandidateSelectedPoint[j].x
+                    //        && test.DataCandidatePoint[i].y == test.DataCandidateSelectedPoint[j].y)
+                    //        {
+                    //            //test.DataCandidatePoint[i].x = -1;
+                    //        }
+                    //    }
+                    //}
+                    for(int i = 0; i < test.DataCandidateSelectedPoint.Count; i++)
+                    {
+                        for(int j = 0; j < test.DataCandidatePoint.Count; j++)
+                        {
+                            if (test.DataCandidateSelectedPoint[i].x == test.DataCandidatePoint[j].x
+                            && test.DataCandidateSelectedPoint[i].y == test.DataCandidatePoint[j].y)
+                            {
+                                test.DataCandidatePoint.RemoveAt(j);
+                                //test.DataCandidatePoint[i].x = -1;
+                            }
+                        }
+                    }
+                    test.DataCandidateSelectedPoint.Clear();
+                    UpdateView();
+                    InitCandidatePoint(test);
                 });
             }
         }
@@ -3901,6 +4182,83 @@ namespace Root_CAMELLIA
             }
         }
 
+        const double Eps = 0.000000000000001; // 추후 추가
+        void CheckSelectPoint() // 여기 고쳐야함
+        {
+            //bool bFind = false;
+            //for(int i = 0; i < test.DataSelectedPoint.Count; i++)
+            //{
+            //    bFind = false;
+            //    for (int j = 0; j < test.DataCandidatePoint.Count; j++)
+            //    {
+            //        if(test.DataSelectedPoint[i].x == test.DataCandidatePoint[j].x
+            //            && test.DataSelectedPoint[i].y == test.DataCandidatePoint[j].y)
+            //        {
+            //            bFind = true;
+            //            break;
+            //        }
+            //    }
+            //    if (!bFind)
+            //    {
+            //        test.DataSelectedPoint[i] = new CCircle(-1, -1, -1 ,-1 ,-1 ,-1);
+            //        //i = 0;
+            //    }
+            //}
+
+            bool bFind = false;
+            int idx = 0;
+            while (idx < test.DataSelectedPoint.Count)
+            {
+                bFind = false;
+                for (int j = 0; j < test.DataCandidatePoint.Count; j++)
+                {
+                    if (test.DataSelectedPoint[idx].x == test.DataCandidatePoint[j].x
+                        && test.DataSelectedPoint[idx].y == test.DataCandidatePoint[j].y)
+                    {
+                        bFind = true;
+                        break;
+                    }
+                }
+                if (!bFind)
+                {
+                    //test.DataSelectedPoint[idx] = new CCircle(-1, -1, -1, -1, -1, -1);
+                    test.DataSelectedPoint.RemoveAt(idx);
+                    int nDeleteIndex = test.DataMeasurementRoute.FindIndex(s => s.Equals(idx));
+                    test.DataMeasurementRoute.RemoveAt(nDeleteIndex);
+                    for (int j = 0; j < test.DataMeasurementRoute.Count; j++)
+                    {
+                        if (test.DataMeasurementRoute[j] > idx)
+                        {
+                           test.DataMeasurementRoute[j] = test.DataMeasurementRoute[j] - 1;
+                        }
+                    }
+                    //i = 0;
+                }
+                else
+                {
+                    idx++;
+                }
+            }
+
+            //bool bFind = false;
+            //for(int i = 0; i < test.DataCandidatePoint.Count; i++)
+            //{
+            //    bFind = false;
+            //    for(int j = 0; j < test.DataSelectedPoint.Count; j++)
+            //    {
+            //        if(test.DataCandidatePoint[i].x == test.DataSelectedPoint[j].x 
+            //            && test.DataCandidatePoint[i].y == test.DataSelectedPoint[j].y)
+            //        {
+            //            bFind = true;
+            //            break;
+            //        }
+            //    }
+            //    if(!bFind)
+            //        test.DataSelectedPoint
+            //}
+
+        }
+
         public ICommand CmdCustomize
         {
             get
@@ -3916,6 +4274,7 @@ namespace Root_CAMELLIA
                     else
                     {
                         p_isCustomize = false;
+                        CheckSelectPoint();
                         test.Clone(dataManager.recipeDM.TeachingRD);
                     }
                     UpdateListView();

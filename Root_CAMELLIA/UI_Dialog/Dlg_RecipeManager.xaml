@@ -880,7 +880,18 @@
                                 </Grid>
                             </GroupBox>
                             <GroupBox Header="General" Grid.Row="1">
-                                
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition/>
+                                        <ColumnDefinition/>
+                                        <ColumnDefinition/>
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition/>
+                                        <RowDefinition/>
+                                    </Grid.RowDefinitions>
+                                    <Button Margin="3" Content="Point Delete" Command="{Binding CmdPointDelete}"></Button>
+                                </Grid>
                             </GroupBox>
                             <GroupBox Header="Numerical Setting" Grid.Row="2">
                                 <Grid>

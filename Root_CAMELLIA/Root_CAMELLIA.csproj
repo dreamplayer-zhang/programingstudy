@@ -295,6 +295,9 @@
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
     <Reference Include="WindowsFormsIntegration" />
+    <Reference Include="WpfAnimatedGif, Version=2.0.0.0, Culture=neutral, PublicKeyToken=9e7cd3b544a090dc, processorArchitecture=MSIL">
+      <HintPath>..\packages\WpfAnimatedGif.2.0.0\lib\net40\WpfAnimatedGif.dll</HintPath>
+    </Reference>
     <Reference Include="WriteableBitmapEx.Wpf, Version=1.5.0.0, Culture=neutral, PublicKeyToken=50375ca6144f1c69, processorArchitecture=MSIL">
       <HintPath>..\packages\WriteableBitmapEx.1.5.1.0\lib\net40\WriteableBitmapEx.Wpf.dll</HintPath>
     </Reference>
@@ -406,6 +409,9 @@
     <Compile Include="UI_Dialog\Dlg_Review.xaml.cs">
       <DependentUpon>Dlg_Review.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UI_Dialog\Dlg_SplashScreen.xaml.cs">
+      <DependentUpon>Dlg_SplashScreen.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI_Dialog\Dlg_StageMapSetting.xaml.cs">
       <DependentUpon>Dlg_StageMapSetting.xaml</DependentUpon>
     </Compile>
@@ -446,6 +452,7 @@
     <Compile Include="UI_UserControl\Loadport_UI.xaml.cs">
       <DependentUpon>Loadport_UI.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Utility\SplashScreenHelper.cs" />
     <Compile Include="ViewModel\Dlg_Login_ViewModel.cs" />
     <Compile Include="ViewModel\Dlg_Review_ViewModel.cs" />
     <Compile Include="ViewModel\Dlg_Setting_ViewModel.cs" />
@@ -478,6 +485,7 @@
       <DependentUpon>Dlg_PM.xaml</DependentUpon>
     </Compile>
     <Compile Include="Draw\GeneralTools.cs" />
+    <Compile Include="ViewModel\Dlg_SplashScreen_ViewModel.cs" />
     <Compile Include="ViewModel\Dlg_StageMapSetting_ViewModel.cs" />
     <Compile Include="ViewModel\MainWindow_ViewModel.cs" />
     <Compile Include="Measurement\Measurement.cs" />
@@ -576,6 +584,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UI_Dialog\Dlg_Review.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI_Dialog\Dlg_SplashScreen.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -772,6 +784,9 @@
       <ProductName>.NET Framework 3.5 SP1</ProductName>
       <Install>false</Install>
     </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resource\splash.gif" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\EMGU.CV.4.1.1.3497\build\EMGU.CV.targets" Condition="Exists('..\packages\EMGU.CV.4.1.1.3497\build\EMGU.CV.targets')" />
