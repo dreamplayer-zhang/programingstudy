@@ -7,7 +7,7 @@
              xmlns:tools="clr-namespace:RootTools;assembly=RootTools"
              xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
              mc:Ignorable="d"
-             d:DesignHeight="1000" d:DesignWidth="1600">
+             d:DesignHeight="1200" d:DesignWidth="2000">
     <UserControl.Resources>
         <Style x:Key="button_selectmode" TargetType="Button">
             <Setter Property="Background" Value="#333366"/>
@@ -87,6 +87,7 @@
               HorizontalAlignment="Left">
             <Grid.RowDefinitions>
                 <RowDefinition  Height="160"/>
+                <RowDefinition  Height="300"/>
                 <RowDefinition  Height="260"/>
                 <RowDefinition  Height="*"/>
             </Grid.RowDefinitions>
@@ -130,7 +131,14 @@
                     </Grid>
                 </StackPanel>
             </GroupBox>
-            <local:MotionController Grid.Row="1"/>
+            <GroupBox Grid.Row="1" 
+                      Margin="4" 
+                      Header="Motion Control Viewer"
+                      Style="{StaticResource main_view_groupbox}">
+                <local:MotionControlViewer />
+            </GroupBox>
+            
+            <local:MotionController Grid.Row="2" DataContext="{Binding MotionControllerVM}"/>
             <!--<GroupBox Grid.Row="1"
                       Header="Motion Controller"
                       Style="{StaticResource main_view_groupbox}" Margin="4">

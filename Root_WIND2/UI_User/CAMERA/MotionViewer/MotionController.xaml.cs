@@ -27,7 +27,7 @@ namespace Root_WIND2
 
         private void TextBox_PreviewKeyDown(object sender, KeyEventArgs e)
         {
-            if (!Char.IsDigit((char)KeyInterop.VirtualKeyFromKey(e.Key)) & e.Key != Key.Back | e.Key == Key.Space) 
+            if (!Char.IsDigit((char)KeyInterop.VirtualKeyFromKey(e.Key)) & e.Key != Key.Back & e.Key != Key.OemPeriod | e.Key == Key.Space ) 
             { 
                 e.Handled = true; 
                 //MessageBox.Show("숫자만 입력해주세요.\n단위는 분(min)입니다.", "오류", MessageBoxButton.OK, MessageBoxImage.Error); 

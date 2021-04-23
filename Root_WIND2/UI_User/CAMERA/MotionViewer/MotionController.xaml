@@ -164,10 +164,10 @@
                                 Grid.ColumnSpan="3"
                                 VerticalAlignment="Stretch"
                                 Orientation="Horizontal">
-                        <TextBlock Text="Pulse" Padding="4,0,0,0" Margin="4" Style="{StaticResource group_box_item_name_text}"></TextBlock>
-                        <TextBox Width="80" TextAlignment="Right" Padding="0,0,4,0" VerticalContentAlignment="Center" Margin="4" Height="26" IsEnabled="{Binding ElementName=xy_auto, Path=IsChecked}" PreviewKeyDown="TextBox_PreviewKeyDown" />
-                        <CheckBox x:Name="xy_auto" Margin="4" Style="{StaticResource auto_checkbox_button}"/>
-                        <CheckBox x:Name="xy_fast" Margin="4" Style="{StaticResource fast_checkbox_button}" IsEnabled="{Binding ElementName=xy_auto, Path=IsChecked, Converter={StaticResource InverseBooleanConverter}}"/>
+                        <TextBlock Text="XY/Th" Padding="4,0,0,0" Margin="4" Style="{StaticResource group_box_item_name_text}"></TextBlock>
+                        <TextBox Width="80" Text="{Binding ManualSpeed}" TextAlignment="Right" Padding="0,0,4,0" VerticalContentAlignment="Center" Margin="4" Height="26" IsEnabled="{Binding ElementName=xy_auto, Path=IsChecked}" PreviewKeyDown="TextBox_PreviewKeyDown" />
+                        <CheckBox x:Name="xy_auto" Margin="4" IsChecked="{Binding IsManual}" Style="{StaticResource auto_checkbox_button}"/>
+                        <CheckBox x:Name="xy_fast" Margin="4" Style="{StaticResource fast_checkbox_button}" IsChecked="{Binding IsFast}" IsEnabled="{Binding ElementName=xy_auto, Path=IsChecked, Converter={StaticResource InverseBooleanConverter}}"/>
 
                     </StackPanel>
                     <Border Grid.Row="1" Grid.RowSpan="2" Grid.ColumnSpan="3" BorderBrush="White" BorderThickness="1"/>
@@ -175,7 +175,7 @@
                                 Grid.Column="4"
                                 Orientation="Horizontal">
                         <TextBlock Text="Z" Margin="4" Style="{StaticResource group_box_item_name_text}"></TextBlock>
-                        <TextBox Width="64" TextAlignment="Right" Padding="0,0,4,0" VerticalContentAlignment="Center" Margin="4" Height="26" PreviewKeyDown="TextBox_PreviewKeyDown"/>
+                        <TextBox Width="64" Text="{Binding AxisZSpeed}" TextAlignment="Right" Padding="0,0,4,0" VerticalContentAlignment="Center" Margin="4" Height="26" PreviewKeyDown="TextBox_PreviewKeyDown"/>
                     </StackPanel>
                     
                     <Border Grid.Row="1" Grid.Column="4" Grid.RowSpan="2" BorderBrush="White" BorderThickness="1"/>
@@ -244,10 +244,10 @@
                     <Button Grid.Row="1" Grid.Column="0" Margin="3" Style="{StaticResource button_selectmode_circle}">
                         <i:Interaction.Triggers>
                             <i:EventTrigger EventName="PreviewMouseLeftButtonDown">
-                                <i:InvokeCommandAction Command="{Binding CmdAxisXMoveRight}" />
+                                <i:InvokeCommandAction Command="{Binding CmdAxisThetaMoveUp}" />
                             </i:EventTrigger>
                             <i:EventTrigger EventName="PreviewMouseLeftButtonUp">
-                                <i:InvokeCommandAction Command="{Binding CmdXStop}" />
+                                <i:InvokeCommandAction Command="{Binding CmdThetaStop}" />
                             </i:EventTrigger>
                         </i:Interaction.Triggers>
                     </Button>
@@ -256,10 +256,10 @@
                     <Button Grid.Row="1" Grid.Column="2" Margin="3" Style="{StaticResource button_selectmode_circle}">
                         <i:Interaction.Triggers>
                             <i:EventTrigger EventName="PreviewMouseLeftButtonDown">
-                                <i:InvokeCommandAction Command="{Binding CmdAxisXMoveRight}" />
+                                <i:InvokeCommandAction Command="{Binding CmdAxisThetaMoveDown}" />
                             </i:EventTrigger>
                             <i:EventTrigger EventName="PreviewMouseLeftButtonUp">
-                                <i:InvokeCommandAction Command="{Binding CmdXStop}" />
+                                <i:InvokeCommandAction Command="{Binding CmdThetaStop}" />
                             </i:EventTrigger>
                         </i:Interaction.Triggers>
                     </Button>

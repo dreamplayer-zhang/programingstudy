@@ -96,10 +96,11 @@ namespace Root_Rinse_Unloader.Module
             return m_axisAlign.WaitReady();
         }
 
+        int m_mmAlignBack = 20; 
         public string RunMoveAlign(bool bAlign)
         {
             double fWidth = m_rinse.p_widthStrip;
-            if (bAlign == false) fWidth += 5; 
+            if (bAlign == false) fWidth += m_mmAlignBack; 
             return RunMoveAlign(fWidth); 
         }
         #endregion
@@ -311,6 +312,7 @@ namespace Root_Rinse_Unloader.Module
 
         #region Align
         double m_secArrived = 1;
+        double m_secSend = 1; 
         public List<bool> m_bExist = new List<bool>();
         public string RunAlign()
         {
@@ -335,8 +337,11 @@ namespace Root_Rinse_Unloader.Module
                     m_rail.StartRun(m_bExist);
                     Thread.Sleep(100);
                     p_eStep = eStep.Send;
-                    foreach (Line line in m_aLine) line.p_eSensor = Line.eSensor.Empty;
-                    if (Run(WaitSending())) return p_sInfo; 
+                    //if (Run(WaitSending())) return p_sInfo;
+                    Thread.Sleep((int)(1000 * m_secSend)); 
+                    RunStopperUp(true);
+                    //foreach (Line line in m_aLine) line.p_eSensor = Line.eSensor.Empty;
+                    p_eStep = eStep.Empty; 
                     break;
                 case RinseU.eRunMode.Stack:
                     p_eStep = eStep.Picker;
@@ -367,6 +372,8 @@ namespace Root_Rinse_Unloader.Module
         void RunTreeAlign(Tree tree)
         {
             m_secArrived = tree.Set(m_secArrived, m_secArrived, "Arrived", "Arrived Delay (sec)");
+            m_secSend = tree.Set(m_secSend, m_secSend, "Send", "Send Delay (sec)");
+            m_mmAlignBack = tree.Set(m_mmAlignBack, m_mmAlignBack, "Align Back", "Align Back Length (mm)"); 
         }
         #endregion
 

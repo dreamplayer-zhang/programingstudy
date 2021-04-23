@@ -1,0 +1,177 @@
+﻿<Window x:Class="Root_CAMELLIA.Dlg_StageMapSetting"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Root_CAMELLIA"
+        xmlns:Icon="clr-namespace:Root_CAMELLIA.Control.Icon"
+        xmlns:stage ="clr-namespace:Camellia2Stage"
+        xmlns:i="http://schemas.microsoft.com/xaml/behaviors" 
+        mc:Ignorable="d"
+        Title="Dlg_StageMapSetting"  WindowStyle="None"
+        ResizeMode="NoResize"
+        WindowStartupLocation="CenterScreen"
+        WindowState="Normal"
+        Width="1320"
+        Height="1020"
+        BorderBrush="Black"
+        Background="{StaticResource PanelBackGround}"
+        BorderThickness="1">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+        <Grid Grid.Row="0"
+              Name="TitleBar"
+              Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}"
+              MouseLeftButtonDown="TitleBar_MouseLeftButtonDown" Grid.ColumnSpan="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <Icon:AtiLogo Width="30"
+                          Height="21"
+                          VerticalAlignment="Center"
+                          Margin="2"/>
+            <Grid Grid.Column="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="auto"/>
+                    <ColumnDefinition Width="auto"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" Text="{Binding Path=Version, Source={x:Static local:BaseDefine.Configuration}}"  FontSize="11" Foreground="Black" VerticalAlignment="Center" Margin="5,0,0,0"/>
+                <TextBlock Text="{Binding RecipePath}"
+                       FontSize="11"
+                       Foreground="Black"
+                       VerticalAlignment="Center"
+                       Margin="5,0,0,0"
+                       Grid.Column="1" />
+            </Grid>
+            <TextBlock Text="Setting Stage Map"
+                       FontSize="14"
+                       FontWeight="Bold"
+                       Foreground="Black"
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Center"
+                       Margin="5,0,0,0"
+                       Grid.Column="1" />
+            <StackPanel WindowChrome.IsHitTestVisibleInChrome="True"
+                        Orientation="Horizontal"
+                        Grid.Column="2">
+                <Button Style="{StaticResource SystemButton}"
+                        x:Name="CloseButton"
+                        Width="30"
+                        Height="25"
+                        Margin="2,0,0,0"
+                        VerticalAlignment="Bottom"
+                        Command="{Binding CmdClose}">
+                    <Path Style="{StaticResource CloseIconKey}" />
+                </Button>
+            </StackPanel>
+        </Grid>
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition Width="300"/>
+            </Grid.ColumnDefinitions>
+            <GroupBox Header="Stage Map" BorderBrush="Black">
+                <Grid>
+                    <Viewbox>
+                        <stage:CamelliaStage  ClipToBounds="True" Background="#01FFFFFF"/>
+                    </Viewbox>
+                    <Viewbox Margin="10" Width="auto" Grid.Row="0">
+                        <ItemsControl ItemsSource="{Binding p_DrawPointElement}"
+                              Width="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualWidth}"
+                              Height="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualHeight}" BorderBrush="Black" BorderThickness="1">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <Canvas ClipToBounds="True"  Width="{x:Static local:BaseDefine.CanvasWidth}" Height="{x:Static local:BaseDefine.CanvasHeight}"/>
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                        </ItemsControl>
+                    </Viewbox>
+                    <Viewbox>
+                        <Canvas ClipToBounds="True"  Width="{x:Static local:BaseDefine.CanvasWidth}" Height="{x:Static local:BaseDefine.CanvasHeight}" Background="#01FFfFFF" Focusable="True">
+                            <i:Interaction.Triggers>
+                                <i:EventTrigger EventName="MouseDown">
+                                    <i:CallMethodAction TargetObject="{Binding}" MethodName="OnMouseDown" />
+                                </i:EventTrigger>
+                            </i:Interaction.Triggers>
+                        </Canvas>
+                    </Viewbox>
+                </Grid>
+            </GroupBox>
+            <Grid Grid.Column="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="0.8*"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="0.3*"/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+                <GroupBox Header="Mode" BorderBrush="Black">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                        </Grid.RowDefinitions>
+                        <Button Margin="3" Content="Select"></Button>
+                        <Button Grid.Row="1" Margin="3" Content="One"></Button>
+                        <Button Grid.Row="2" Margin="3" Content="Line"></Button>
+                    </Grid>
+                </GroupBox>
+                <GroupBox Grid.Row="1" Header="Numerical Setting" BorderBrush="Black">
+                    
+                </GroupBox>
+                <GroupBox Grid.Row="2" Header="Position Information" BorderBrush="Black">
+                    <UniformGrid Columns="2" Rows="2">
+                        <Grid Margin="3" Background="Gainsboro">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="2*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="2*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="X" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                            <TextBlock Text=":" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="1"/>
+                            <TextBlock Text="{Binding XPosition}" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="2"/>
+                        </Grid>
+                        <Grid Margin="3" Background="Gainsboro">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="2*"/>
+                                <ColumnDefinition/>
+                                <ColumnDefinition Width="2*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="Y" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                            <TextBlock Text=":" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="1"/>
+                            <TextBlock Text="{Binding YPosition}" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="2"/>
+                        </Grid>
+                        <Grid Margin="3" Background="Gainsboro">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="2*"/>
+                                <ColumnDefinition/>
+                                <ColumnDefinition Width="2*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="R" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                            <TextBlock Text=":" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="1"/>
+                            <TextBlock Text="{Binding CurrentRadius}" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="2"/>
+                        </Grid>
+                        <Grid Margin="3" Background="Gainsboro">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="2*"/>
+                                <ColumnDefinition/>
+                                <ColumnDefinition Width="2*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="∠" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                            <TextBlock Text=":" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="1"/>
+                            <TextBlock Text="{Binding CurrentTheta}" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="2"/>
+                        </Grid>
+                    </UniformGrid>
+                </GroupBox>
+                <Viewbox Grid.Row="3">
+                    <stage:CamelliaStage  ClipToBounds="True" Background="#01FFFFFF"/>
+                </Viewbox>
+            </Grid>
+        </Grid>
+    </Grid>
+</Window>

@@ -295,12 +295,15 @@ namespace Root_WIND2
             {
                 if (wp.WorkState >= WORK_TYPE.SNAP) continue;
 
-                Rect checkArea = new Rect(new Point(wp.PositionX, wp.PositionY + wp.Width), new Point(wp.PositionX + wp.Width, wp.PositionY));
 
-                if (snapArea.Contains(checkArea) == true)
-                {
-                    wp.WorkState = WORK_TYPE.SNAP;
-                }
+                wp.CheckSnapDone_Line(new CRect(0, 0, args.endPosition.X, args.endPosition.Y));
+
+                //Rect checkArea = new Rect(new Point(wp.PositionX, wp.PositionY + wp.Width), new Point(wp.PositionX + wp.Width, wp.PositionY));
+
+                //if (snapArea.Contains(checkArea) == true)
+                //{
+                //    wp.WorkState = WORK_TYPE.SNAP;
+                //}
             }
         }
 

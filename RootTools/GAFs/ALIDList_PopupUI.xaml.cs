@@ -28,14 +28,26 @@ namespace RootTools.GAFs
         IEngineer m_engineer;
         public void Init(ALIDList listALID, IEngineer engineer)
         {
-            m_listALID = listALID;
-            m_engineer = engineer; 
+            m_listALID = new ALIDList();
+            m_engineer = engineer;
             DataContext = listALID;
             listViewALID.ItemsSource = listALID.p_aSetALID;
-            if(m_listALID.p_aSetALID.Count != 0)
+            for (int n = 0; n <= 5; n++)//MAX LEVEL이 5로 설정
+            {
+                foreach (ALID alid in listALID.p_aSetALID)
+                {
+                    if (alid.p_nErrorLevel == n)
+                    {
+                        m_listALID.p_aSetALID.Add(alid);
+                    }
+                }
+            }
+            listViewALID.ItemsSource = m_listALID.p_aSetALID;
+            if (m_listALID.p_aSetALID.Count != 0)
             {
                 ALID alid = (ALID)listViewALID.Items[m_listALID.p_aSetALID.Count - 1];
                 SetLableBinding(alid);
+                listViewALID.SelectedItem = alid;
             }
         }
 

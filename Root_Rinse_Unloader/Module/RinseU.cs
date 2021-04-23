@@ -333,7 +333,7 @@ namespace Root_Rinse_Unloader.Module
         public void RunBuzzerOff()
         {
             m_doBuzzer.AllOff();
-            AddProtocol(p_id, eCmd.BuzzerOff, "Off");
+            //AddProtocol(p_id, eCmd.BuzzerOff, "Off");
         }
 
         StopWatch m_swBuzzer = new StopWatch();

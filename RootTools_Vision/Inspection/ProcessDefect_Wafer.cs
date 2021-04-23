@@ -17,6 +17,10 @@ namespace RootTools_Vision
 {
     public class ProcessDefect_Wafer : WorkBase
     {
+        public ProcessDefect_Wafer()
+        {
+
+        }
         //BacksideRecipe recipeBackside;
         string sDefectimagePath = @"D:\DefectImage";
         /// <summary>
@@ -85,13 +89,18 @@ namespace RootTools_Vision
             //// Add Defect to DB
             if (MergeDefectList.Count > 0)
             {
-                DatabaseManager.Instance.AddDefectDataList(MergeDefectList, TableName);
+                DatabaseManager.Instance.AddDefectDataList(MergeDefectList, "defect");
             }
 
             Settings settings = new Settings();
             SettingItem_SetupFrontside settings_frontside = settings.GetItem<SettingItem_SetupFrontside>();
 
-            Tools.SaveDefectImage(Path.Combine(settings_frontside.DefectImagePath, sInspectionID), MergeDefectList, this.currentWorkplace.SharedBufferInfo, this.currentWorkplace.SharedBufferByteCnt);
+            StopWatch sw = new StopWatch();
+            sw.Start();
+            //Tools.SaveDefectImage(Path.Combine(settings_frontside.DefectImagePath, sInspectionID), MergeDefectList, this.currentWorkplace.SharedBufferInfo, this.currentWorkplace.SharedBufferByteCnt);
+            Tools.SaveDefectImageParallel(Path.Combine(settings_frontside.DefectImagePath, sInspectionID), MergeDefectList, this.currentWorkplace.SharedBufferInfo, this.currentWorkplace.SharedBufferByteCnt);
+            sw.Stop();
+            //MessageBox.Show(sw.ElapsedMilliseconds.ToString());
 
             if (settings_frontside.UseKlarf)
             {
