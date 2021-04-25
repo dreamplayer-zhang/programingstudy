@@ -6,6 +6,8 @@ namespace Root_VEGA_P_Vision
     {
         public override void Initilize()
         {
+            RegisterRecipeItem<OriginRecipe>();
+            RegisterRecipeItem<PositionRecipe>();
             RegisterRecipeItem<MaskRecipe>();
             RegisterRecipeItem<SurfaceRecipe>();
         }

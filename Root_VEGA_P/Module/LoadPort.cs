@@ -81,6 +81,10 @@ namespace Root_VEGA_P.Module
                 return m_dioPodOpen.WaitDone(); 
             }
 
+            public string RunWeigh()
+            {
+                return m_loadCell.Run_GetWeight();
+            }
             bool _bPlaced = false; 
             public bool p_bPlaced
             {
@@ -414,16 +418,16 @@ namespace Root_VEGA_P.Module
         {
             Loadport m_loadPort;
             RS232 m_rs232;
-            double weight; //단위 kg
 
             public void GetTools(ToolBox toolBox, bool bInit)
             {
                 toolBox.GetComm(ref m_rs232, m_loadPort, "LoadCell");
 
+                ConnectRS232();
+
                 if (bInit)
                     m_rs232.p_bConnect = true;
                 
-                ConnectRS232();
             }
             public string Run_GetWeight()
             {
@@ -437,7 +441,7 @@ namespace Root_VEGA_P.Module
                 string str = sRead.Trim();
 
                 m_rs232.m_commLog.Add(CommLog.eType.Receive, "CAS Receive = " + str);
-                weight = int.Parse(str);
+                //m_loadPort.m_infoPods. = int.Parse(str);
             }
 
             string ConnectRS232()

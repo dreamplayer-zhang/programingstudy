@@ -138,8 +138,11 @@ namespace Root_VEGA_P_Vision
                         {
 							List<IntPtr> li = new List<IntPtr>();
                             string memstr = v.ToString() + "." + v2.ToString() + "." + v3.ToString();
+							string maskstr = memstr + ".MaskImage";
 							MemoryData memData = engineer.ClassMemoryTool().GetMemory(App.mPool, App.mGroup, memstr);
+
                             ImageData Data = GlobalObjects.Instance.RegisterNamed<ImageData>(memstr, memoryTool.GetMemory(App.mPool,App.mGroup,memstr));
+                            ImageData maskLayer = GlobalObjects.Instance.RegisterNamed<ImageData>(maskstr, memoryTool.GetMemory(App.mPool, App.mGroup, maskstr));
 							if(Data.m_MemData!=null)
                             {
 								Data.p_nByte = memData.p_nByte;
@@ -169,8 +172,11 @@ namespace Root_VEGA_P_Vision
 					foreach(var v2 in Enum.GetValues(SideType))
                     {
 						string memstr = v.ToString() + "." + v2.ToString();
+						string maskstr = memstr + ".MaskImage";
+
 						MemoryData memData = engineer.ClassMemoryTool().GetMemory(App.mPool, App.mGroup, memstr);
 						ImageData Data = GlobalObjects.Instance.RegisterNamed<ImageData>(memstr, memoryTool.GetMemory(App.mPool, App.mGroup, memstr));
+						ImageData maskLayer = GlobalObjects.Instance.RegisterNamed<ImageData>(maskstr, memoryTool.GetMemory(App.mPool, App.mGroup, maskstr));
 						List<IntPtr> li = new List<IntPtr>();
 						if(Data.m_MemData!=null)
                         {
@@ -195,8 +201,9 @@ namespace Root_VEGA_P_Vision
 								li)) ;
                         }
                     }
-
-            }
+				//DialogService
+				dialogService.Register<Dialog_ImageOpenViewModel, Dialog_ImageOpen>();
+			}
 			catch (Exception ex)
             {
 				MessageBox.Show(ex.Message);
