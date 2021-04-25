@@ -47,7 +47,7 @@ namespace Root_Rinse_Unloader.Engineer
             InitModule(m_rail);
             m_roller = new Roller("Roller", m_engineer, m_rinse, m_rail, m_storage);
             InitModule(m_roller);
-            m_loader = new Loader("Loader", m_engineer, m_rinse, m_storage, m_roller);
+            m_loader = new Loader("Loader", m_engineer, m_rinse, m_storage, m_rail, m_roller);
             InitModule(m_loader);
         }
 
@@ -87,6 +87,7 @@ namespace Root_Rinse_Unloader.Engineer
 
         protected string StateHome(List<ModuleBase> aModule)
         {
+            m_rail.RunPusherDown(true); 
             foreach (ModuleBase module in aModule) module.StartHome();
             bool bHoming = true;
             while (bHoming)
@@ -114,7 +115,10 @@ namespace Root_Rinse_Unloader.Engineer
         #region Reset
         public string Reset()
         {
+            EQ.p_bStop = true; 
             Reset(m_gaf, p_moduleList);
+            Thread.Sleep(100); 
+            EQ.p_bStop = false; 
             return "OK";
         }
 

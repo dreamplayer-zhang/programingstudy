@@ -233,7 +233,7 @@ namespace Root_CAMELLIA.Data
                 {
                     CvInvoke.Circle(matTest, tempList[i], 20, new MCvScalar(0, 0, 255),4);
                 }
-                matTest.Save(@"C:\Users\ATI\Desktop\CenteringTest\Image\" + DateTime.Now.ToString("yyMMddhhmmssff") + test + ".bmp");
+                matTest.Save(@"C:\Users\cgkim\Desktop\CenteringTest\" + DateTime.Now.ToString("yyMMddhhmmssff") + test + ".bmp");
             }
             catch(Exception ex)
             {

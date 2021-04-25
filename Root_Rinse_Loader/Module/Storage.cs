@@ -239,12 +239,12 @@ namespace Root_Rinse_Loader.Module
             if (m_axis.p_posCommand > m_posStackReady - m_pulseDown) MoveStack();
             if (m_stack.p_bLevel)
             {
-                m_axis.Jog(-m_fJogScale, "Move");
+                m_axis.Jog(-m_fJogScale);
                 while (m_stack.p_bLevel && (EQ.IsStop() == false)) Thread.Sleep(10);
                 m_axis.StopAxis();
                 Thread.Sleep(500);
             }
-            m_axis.Jog(m_fJogScale, "Move");
+            m_axis.Jog(m_fJogScale);
             while (!m_stack.p_bLevel && (EQ.IsStop() == false)) Thread.Sleep(10);
             m_posStackReady = m_axis.p_posCommand;
             m_axis.StopAxis();
@@ -275,7 +275,7 @@ namespace Root_Rinse_Loader.Module
         double m_secRunDelay = 0; 
         public string RunMagazine()
         {
-            while (EQ.p_bStop == false)
+            while ((EQ.p_bStop == false) && (EQ.p_eState == EQ.eState.Run))
             {
                 Thread.Sleep(1);
                 if (Run(RunMagazine(m_rinse.p_eMagazine, m_rinse.p_iMagazine))) return p_sInfo;
@@ -286,14 +286,19 @@ namespace Root_Rinse_Loader.Module
                     eMagazine eMagazine = m_rinse.p_eMagazine; 
                     switch(eMagazine)
                     {
-                        case eMagazine.Magazine1: return "OK";
+                        case eMagazine.Magazine1:
+                            Thread.Sleep(10000);
+                            m_rinse.SendFinish();
+                            EQ.p_eState = EQ.eState.Ready;
+
+                            return "OK";
                         case eMagazine.Magazine2: m_rinse.p_eMagazine = eMagazine.Magazine1; break;
                         case eMagazine.Magazine3: m_rinse.p_eMagazine = eMagazine.Magazine2; break;
                         case eMagazine.Magazine4: m_rinse.p_eMagazine = eMagazine.Magazine3; break;
                     }
                 }
             }
-            return "EQ Stop";
+            return (EQ.p_eState == EQ.eState.Run) ? "EQ Stop" : "OK";
         }
 
         string RunMagazine(eMagazine eMagazine, int iMagazine)
@@ -301,10 +306,23 @@ namespace Root_Rinse_Loader.Module
             if (m_aMagazine[(int)eMagazine].p_bCheck == false) return "OK";
             if (m_aMagazine[(int)eMagazine].p_bClamp == false) return "OK";
             if (Run(MoveMagazine(eMagazine, iMagazine, true))) return p_sInfo;
-            Thread.Sleep((int)(500 * m_secRunDelay));
+            if (IsStopMagazine()) return (EQ.p_eState == EQ.eState.Run) ? "EQ Stop" : "OK";
             if (Run(RunPusher())) return p_sInfo;
-            Thread.Sleep((int)(500 * m_secRunDelay));
+            if (IsStopMagazine()) return (EQ.p_eState == EQ.eState.Run) ? "EQ Stop" : "OK";
             return "OK"; 
+        }
+
+        bool IsStopMagazine()
+        {
+            StopWatch sw = new StopWatch();
+            int msDelay = (int)(500 * m_secRunDelay);
+            while (sw.ElapsedMilliseconds < msDelay)
+            {
+                Thread.Sleep(100);
+                if (EQ.p_eState != EQ.eState.Run) return true;
+                if (EQ.p_bStop) return true;
+            }
+            return false; 
         }
         #endregion
 
@@ -360,12 +378,14 @@ namespace Root_Rinse_Loader.Module
         #endregion
 
         RinseL m_rinse;
-        Rail m_rail; 
-        public Storage(string id, IEngineer engineer, RinseL rinse, Rail rail)
+        Rail m_rail;
+        Roller m_roller; 
+        public Storage(string id, IEngineer engineer, RinseL rinse, Rail rail, Roller roller)
         {
             p_id = id;
             m_rinse = rinse;
             m_rail = rail;
+            m_roller = roller; 
             InitMagazine();
             InitStack(); 
             InitBase(id, engineer);

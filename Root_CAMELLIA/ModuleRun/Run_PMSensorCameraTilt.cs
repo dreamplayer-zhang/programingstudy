@@ -52,6 +52,7 @@ namespace Root_CAMELLIA.Module
         public override string Run()
         {
             Met.PMDatas m_PMData = new Met.PMDatas();
+            Met.Nanoview m_nanoview = new Met.Nanoview();
             Met.CheckResult rst;
             Axis axisLifter = m_module.p_axisLifter;
             // PM 동작 하기전에 lifter 내려가 있는지 체크
@@ -78,6 +79,17 @@ namespace Root_CAMELLIA.Module
             m_module.SetLight(false);
             m_log.Info("[CheckCSSAlign] Camera Light Off");
             //셔터 오픈 확인// 셔터가 열려져 있는 상태에서 또 열으라는 명령어를 내린가면 이상 없을 까?
+            bool bCheckShutter = m_nanoview.CheckShutter();
+            bool bShutterOpen = false;
+
+            if (!bCheckShutter)
+            {
+                bShutterOpen = m_nanoview.ShutterMotion(bCheckShutter);
+            }
+            else
+            {
+                bShutterOpen = bCheckShutter;
+            }
             m_log.Info("[CheckCSSAlign] Sensor Light Open Ready");
             //카메라 연결 확인 // 조명값 0
             string strVRSImageDir = "D:\\Temp\\";
@@ -145,7 +157,7 @@ namespace Root_CAMELLIA.Module
             //return "OK";
             //수정 ! 획득한 좌표로 바꿀것
             //m_HolePoints.Add(new OpenCvSharp.CPlusPlus.Point(InHolePos.X, InHolePos.Y ));
-            bool bCalcTopRst = m_PMData.CalcCenterPoint( true,Topmat);
+            bool bCalcTopRst = m_PMData.CalcCenterPoint( true,Topmat, true);
             if (bCalcTopRst == true)
             {
                 m_log.Info("[CheckCSSAlign] Calculate Center Point <Top> Done");
@@ -181,7 +193,7 @@ namespace Root_CAMELLIA.Module
             }));
 
             
-            bool bCalcBotRst = m_PMData.CalcCenterPoint(false, Botmat);
+            bool bCalcBotRst = m_PMData.CalcCenterPoint(false, Botmat, true);
             if (bCalcBotRst == true)
             {
                 m_log.Info("[CheckCSSAlign] Calculate Center Point <Bottom> Done");

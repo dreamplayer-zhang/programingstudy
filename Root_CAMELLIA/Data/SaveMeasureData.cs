@@ -24,13 +24,13 @@ namespace Root_CAMELLIA.Data
 
         void RunThread()
         {
-            while (m_bThread)
-            {
-                if (m_bStartSave)
-                {
-                    //m_metDM.SaveResultFileSlot(,);
-                }
-            }
+            //while (m_bThread)
+            //{
+            //    if (m_bStartSave)
+            //    {
+            //        //m_metDM.SaveResultFileSlot(,);
+            //    }
+            //}
         }
 
         public void ThreadStop()
