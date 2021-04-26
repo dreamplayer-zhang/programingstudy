@@ -66,10 +66,10 @@ namespace RootTools.ParticleCounter
                 return sample; 
             }
 
-            public void RunTree(Tree tree)
+            public void RunTree(Tree tree, bool bVisible)
             {
-                m_secSample = tree.Set(m_secSample, m_secSample, "Sample", "Sample Time (sec)");
-                m_secHold = tree.Set(m_secHold, m_secHold, "Hold", "Hold Time (sec)");
+                m_secSample = tree.Set(m_secSample, m_secSample, "Sample", "Sample Time (sec)", bVisible);
+                m_secHold = tree.Set(m_secHold, m_secHold, "Hold", "Hold Time (sec)", bVisible);
             }
         }
         public Sample m_sample = new Sample(); 
@@ -229,7 +229,7 @@ namespace RootTools.ParticleCounter
         {
             m_treeRoot.p_eMode = mode;
             RunTreeModbus(m_treeRoot.GetTree("Modbus"));
-            m_sample.RunTree(m_treeRoot.GetTree("Sample")); 
+            m_sample.RunTree(m_treeRoot.GetTree("Sample"), true); 
         }
         #endregion
 

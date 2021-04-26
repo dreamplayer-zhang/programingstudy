@@ -315,7 +315,7 @@ namespace Root_VEGA_P.Module
             public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
             {
                 m_hPa = tree.Set(m_hPa, m_hPa, "hPa", "Pump Power (1 ~ 5 hPa)", bVisible);
-                m_sample.RunTree(tree.GetTree("Sample"));
+                m_sample.RunTree(tree.GetTree("Sample"), bVisible);
                 m_module.m_nozzleSet.RunTreeOpen(tree.GetTree("Nozzle"), m_aOpen); 
             }
 
