@@ -103,7 +103,13 @@ namespace Root_CAMELLIA.Module
                 //}
                 if (EQ.IsStop())
                 {
-                    while (thicknessQueue.TryDequeue(out index)) ;
+                    while (thicknessQueue.TryDequeue(out index))
+                    {
+                        if (EQ.IsStop())
+                        {
+                            break;
+                        }
+                    }
                     m_CalcThicknessDone = true;
                     break;
                 }
@@ -173,10 +179,11 @@ namespace Root_CAMELLIA.Module
                     return true;
                 }
                 string[] path = rootPath.Split('\\');
-                if (System.IO.Directory.Exists(rootPath))
-                {
-                    rootPath = rootPath.Replace(path[path.Length - 1],DateTime.Now.ToString("yyyy-MM-dd") + "T" + DateTime.Now.ToString("HH-mm-ss"));
-                }
+                //if (System.IO.Directory.Exists(rootPath))
+                //{
+                //    rootPath = rootPath.Replace(path[path.Length - 1],DateTime.Now.ToString("yyyy-MM-dd") + "T" + DateTime.Now.ToString("HH-mm-ss"));
+                //}
+                rootPath += "T" + DateTime.Now.ToString("HH-mm-ss");
                 m_summaryPath = rootPath + "\\ResultData_Summary";
                 GeneralTools.MakeDirectory(m_summaryPath);
                 m_resultPath = rootPath + "\\ResultData";
@@ -423,6 +430,8 @@ namespace Root_CAMELLIA.Module
             }
 
             MeasureDone = true;
+
+            m_log.Warn("Calc Thickness 대기 >> " + test.ElapsedMilliseconds);
             while (!m_CalcThicknessDone)
             {
                 if (EQ.IsStop())
@@ -432,6 +441,7 @@ namespace Root_CAMELLIA.Module
                     return "EQ Stop";
                 }
             }
+            m_log.Warn("Calc Thickness 끝 >> " + test.ElapsedMilliseconds);
 
             //? 세이브?
 
