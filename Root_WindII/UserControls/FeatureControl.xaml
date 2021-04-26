@@ -1,0 +1,35 @@
+﻿<UserControl x:Class="Root_WindII.FeatureControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Root_WindII"
+             mc:Ignorable="d" 
+             Background="Transparent" MouseDoubleClick="UserControl_MouseDoubleClick">
+    <UserControl.Resources>
+        <local:StringConverter x:Key="StringConverter"/>
+    </UserControl.Resources>
+    <Grid Width="120" Height="140" Margin="10,0,0,0">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="86*"/>
+            <RowDefinition Height="14*"/>
+        </Grid.RowDefinitions>
+        <Grid Background="Transparent" Grid.Row="0">
+            <Image x:Name="image"/>
+        </Grid>
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition Width="2*"/>
+            </Grid.ColumnDefinitions>
+            <TextBlock Text="Offset" HorizontalAlignment="Center" Grid.Column="0"
+                       VerticalAlignment="Center"
+                       FontSize="12" FontFamily="Arial"
+                       Foreground="White"/>
+            <TextBlock x:Name="offset" HorizontalAlignment="Center" Grid.Column="1"
+                       VerticalAlignment="Center"
+                       FontSize="12" FontFamily="Arial"
+                       Foreground="White"/>
+        </Grid>
+    </Grid>
+</UserControl>

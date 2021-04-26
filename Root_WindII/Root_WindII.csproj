@@ -35,7 +35,34 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x64\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <LangVersion>7.3</LangVersion>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
+    <OutputPath>bin\x64\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <LangVersion>7.3</LangVersion>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>true</Prefer32Bit>
+  </PropertyGroup>
   <ItemGroup>
+    <Reference Include="LiveCharts, Version=0.9.7.0, Culture=neutral, PublicKeyToken=0bc1f845d1ebb8df, processorArchitecture=MSIL">
+      <HintPath>..\packages\LiveCharts.0.9.7\lib\net45\LiveCharts.dll</HintPath>
+    </Reference>
+    <Reference Include="LiveCharts.Wpf, Version=0.9.7.0, Culture=neutral, PublicKeyToken=0bc1f845d1ebb8df, processorArchitecture=MSIL">
+      <HintPath>..\packages\LiveCharts.Wpf.0.9.7\lib\net45\LiveCharts.Wpf.dll</HintPath>
+    </Reference>
     <Reference Include="MahApps.Metro.IconPacks, Version=4.0.0.0, Culture=neutral, PublicKeyToken=0c0d510f9915137a, processorArchitecture=MSIL">
       <HintPath>..\packages\MahApps.Metro.IconPacks.4.8.0\lib\net47\MahApps.Metro.IconPacks.dll</HintPath>
     </Reference>
@@ -145,8 +172,25 @@
       <HintPath>..\packages\MahApps.Metro.IconPacks.4.8.0\lib\net47\MahApps.Metro.IconPacks.Zondicons.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Microsoft.Expression.Interactions, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Windows.Interactivity.WPF.2.0.20525\lib\net40\Microsoft.Expression.Interactions.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.WindowsAPICodePack, Version=1.1.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\WindowsAPICodePack-Core.1.1.2\lib\Microsoft.WindowsAPICodePack.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.WindowsAPICodePack.Shell, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\WindowsAPICodePack-Shell.1.1.1\lib\Microsoft.WindowsAPICodePack.Shell.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Xaml.Behaviors, Version=1.1.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Xaml.Behaviors.Wpf.1.1.31\lib\net45\Microsoft.Xaml.Behaviors.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Activities" />
+    <Reference Include="System.Activities.Presentation" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Windows.Interactivity, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Windows.Interactivity.WPF.2.0.20525\lib\net40\System.Windows.Interactivity.dll</HintPath>
+    </Reference>
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
@@ -165,6 +209,110 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="MainWindow_ViewModel.cs" />
+    <Compile Include="MvvmTools\Converter.cs" />
+    <Compile Include="MvvmTools\Helper.cs" />
+    <Compile Include="MvvmTools\ObservableObject.cs" />
+    <Compile Include="MvvmTools\PropertySupport.cs" />
+    <Compile Include="MvvmTools\RelayCommand.cs" />
+    <Compile Include="MvvmTools\SizeObserver.cs" />
+    <Compile Include="UI\SelectMode.xaml.cs">
+      <DependentUpon>SelectMode.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\SelectMode_ViewModel.cs" />
+    <Compile Include="UI\SETUP\BACK\BacksideInspect.xaml.cs">
+      <DependentUpon>BacksideInspect.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\SETUP\BACK\BacksideSetup.xaml.cs">
+      <DependentUpon>BacksideSetup.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\SETUP\CAMERA\CameraAlign.xaml.cs">
+      <DependentUpon>CameraAlign.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\SETUP\CAMERA\CameraVRS.xaml.cs">
+      <DependentUpon>CameraVRS.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\SETUP\CAMERA\MotionViewer\MotionController.xaml.cs">
+      <DependentUpon>MotionController.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\SETUP\CAMERA\MotionViewer\MotionController_ViewModel.cs" />
+    <Compile Include="UI\SETUP\CAMERA\MotionViewer\MotionControlViewer.xaml.cs">
+      <DependentUpon>MotionControlViewer.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\SETUP\EBR\EBRSetup.xaml.cs">
+      <DependentUpon>EBRSetup.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\SETUP\EDGE\EdgesideInspect.xaml.cs">
+      <DependentUpon>EdgesideInspect.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\SETUP\EDGE\EdgesideModuleSetup.xaml.cs">
+      <DependentUpon>EdgesideModuleSetup.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\SETUP\EDGE\EdgesideSetup.xaml.cs">
+      <DependentUpon>EdgesideSetup.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\SETUP\EDGE\EdgesideSetupModule.xaml.cs">
+      <DependentUpon>EdgesideSetupModule.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\SETUP\FRONT\FrontsideAlignment.xaml.cs">
+      <DependentUpon>FrontsideAlignment.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\SETUP\FRONT\FrontsideInspect.xaml.cs">
+      <DependentUpon>FrontsideInspect.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\SETUP\FRONT\FrontsideMask.xaml.cs">
+      <DependentUpon>FrontsideMask.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\SETUP\FRONT\FrontsideOrigin.xaml.cs">
+      <DependentUpon>FrontsideOrigin.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\SETUP\FRONT\FrontsideProduct.xaml.cs">
+      <DependentUpon>FrontsideProduct.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\SETUP\FRONT\FrontsideSpec.xaml.cs">
+      <DependentUpon>FrontsideSpec.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\SETUP\FRONT\FrontsideSummary.xaml.cs">
+      <DependentUpon>FrontsideSummary.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\SETUP\HOME\HomeRecipe.xaml.cs">
+      <DependentUpon>HomeRecipe.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\SETUP\HOME\ModuleView.xaml.cs">
+      <DependentUpon>ModuleView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\SETUP\Interfaces\IPage.cs" />
+    <Compile Include="UI\SETUP\Setup.xaml.cs">
+      <DependentUpon>Setup.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\SETUP\SetupMenuPanel.xaml.cs">
+      <DependentUpon>SetupMenuPanel.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\SETUP\SetupMenuPanel_ViewModel.cs" />
+    <Compile Include="UI\SETUP\Setup_ViewModel.cs" />
+    <Compile Include="UserControls\AtiLogo.xaml.cs">
+      <DependentUpon>AtiLogo.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UserControls\Calendar.xaml.cs">
+      <DependentUpon>Calendar.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UserControls\Class\ItemMask.cs" />
+    <Compile Include="UserControls\ColorPicker.xaml.cs">
+      <DependentUpon>ColorPicker.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UserControls\DateTimePicker.xaml.cs">
+      <DependentUpon>DateTimePicker.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UserControls\FeatureControl.xaml.cs">
+      <DependentUpon>FeatureControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UserControls\LoadingBlock.xaml.cs">
+      <DependentUpon>LoadingBlock.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UserControls\LoadingControl.xaml.cs">
+      <DependentUpon>LoadingControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UserControls\WpfPropertyGrid.cs" />
     <Page Include="Engineer\WindII_Engineer_UI.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -200,6 +348,126 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="UI\SelectMode.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\SETUP\BACK\BacksideInspect.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\SETUP\BACK\BacksideSetup.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\SETUP\CAMERA\CameraAlign.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\SETUP\CAMERA\CameraVRS.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\SETUP\CAMERA\MotionViewer\MotionController.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\SETUP\CAMERA\MotionViewer\MotionControlViewer.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\SETUP\EBR\EBRSetup.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\SETUP\EDGE\EdgesideInspect.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\SETUP\EDGE\EdgesideModuleSetup.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\SETUP\EDGE\EdgesideSetup.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\SETUP\EDGE\EdgesideSetupModule.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\SETUP\FRONT\FrontsideAlignment.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\SETUP\FRONT\FrontsideInspect.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\SETUP\FRONT\FrontsideMask.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\SETUP\FRONT\FrontsideOrigin.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\SETUP\FRONT\FrontsideProduct.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\SETUP\FRONT\FrontsideSpec.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\SETUP\FRONT\FrontsideSummary.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\SETUP\HOME\HomeRecipe.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\SETUP\HOME\ModuleView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\SETUP\Setup.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\SETUP\SetupMenuPanel.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UserControls\AtiLogo.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UserControls\Calendar.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UserControls\ColorPicker.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UserControls\DateTimePicker.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UserControls\FeatureControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UserControls\LoadingBlock.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UserControls\LoadingControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs">
@@ -218,6 +486,7 @@
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
@@ -233,6 +502,10 @@
       <Project>{ce787353-5e00-4574-9f49-7cee7f087a86}</Project>
       <Name>RootTools</Name>
     </ProjectReference>
+    <ProjectReference Include="..\RootTools_Vision\RootTools_Vision.csproj">
+      <Project>{b9fa8faa-0522-41f3-99ad-eb307e385f76}</Project>
+      <Name>RootTools_Vision</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Root_EFEM\Root_EFEM.csproj">
       <Project>{23175072-261b-4601-8909-152ee93b78f0}</Project>
       <Name>Root_EFEM</Name>
@@ -242,5 +515,6 @@
       <Name>Root_WindII_Option</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
