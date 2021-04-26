@@ -142,7 +142,7 @@ namespace Root_VEGA_P_Vision
 							MemoryData memData = engineer.ClassMemoryTool().GetMemory(App.mPool, App.mGroup, memstr);
 
                             ImageData Data = GlobalObjects.Instance.RegisterNamed<ImageData>(memstr, memoryTool.GetMemory(App.mPool,App.mGroup,memstr));
-                            ImageData maskLayer = GlobalObjects.Instance.RegisterNamed<ImageData>(maskstr, memoryTool.GetMemory(App.mPool, App.mGroup, maskstr));
+                            //ImageData maskLayer = GlobalObjects.Instance.RegisterNamed<ImageData>(maskstr, memoryTool.GetMemory(App.mPool, App.mGroup, maskstr));
 							if(Data.m_MemData!=null)
                             {
 								Data.p_nByte = memData.p_nByte;
@@ -176,7 +176,7 @@ namespace Root_VEGA_P_Vision
 
 						MemoryData memData = engineer.ClassMemoryTool().GetMemory(App.mPool, App.mGroup, memstr);
 						ImageData Data = GlobalObjects.Instance.RegisterNamed<ImageData>(memstr, memoryTool.GetMemory(App.mPool, App.mGroup, memstr));
-						ImageData maskLayer = GlobalObjects.Instance.RegisterNamed<ImageData>(maskstr, memoryTool.GetMemory(App.mPool, App.mGroup, maskstr));
+						//ImageData maskLayer = GlobalObjects.Instance.RegisterNamed<ImageData>(maskstr, memoryTool.GetMemory(App.mPool, App.mGroup, maskstr));
 						List<IntPtr> li = new List<IntPtr>();
 						if(Data.m_MemData!=null)
                         {

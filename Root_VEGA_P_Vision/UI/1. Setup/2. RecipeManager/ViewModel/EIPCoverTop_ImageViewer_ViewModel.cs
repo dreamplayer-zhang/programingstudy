@@ -252,7 +252,7 @@ namespace Root_VEGA_P_Vision
             //p_VisibleMenu = Visibility.Collapsed;
             BufferInspROI.CollectionChanged += BufferInspROI_CollectionChanged;
             SetBackGroundWorker();
-            p_ROILayer = GlobalObjects.Instance.GetNamed<ImageData>("MaskImage");
+            //p_ROILayer = GlobalObjects.Instance.GetNamed<ImageData>("MaskImage");
             InitializeUIlements();
         }
 

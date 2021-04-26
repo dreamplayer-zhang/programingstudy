@@ -81,8 +81,10 @@ namespace Root_VEGA_P_Vision.Module
 
                 //가로 총 Pixel 갯수 : PodWidth * 1000 / camera res X
                 //가로 횟수 : 총 Pixel 갯수 / CamWidth
-                int nXCount = (int)Math.Ceiling((double)(nPodSizeY_px / nCamWidth)) + 1;
-                int nYCount = nPodSizeY_px / nCamHeight;
+                //int nXCount = (int)Math.Ceiling((double)(nPodSizeY_px / nCamWidth)) + 1;
+                //int nYCount = nPodSizeY_px / nCamHeight;
+                int nXCount = 3;
+                int nYCount = 3;
                 #endregion
 
                 List<int> illumList = new List<int>();
