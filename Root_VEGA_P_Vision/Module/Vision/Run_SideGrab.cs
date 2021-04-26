@@ -5,12 +5,13 @@ using RootTools.Memory;
 using RootTools.Module;
 using RootTools.Trees;
 using System;
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 
 namespace Root_VEGA_P_Vision.Module
 {
-    class Run_SideGrab:ModuleRunBase
+    class Run_SideGrab : ModuleRunBase
     {
         Vision m_module;
         Vision.SideOptic sideOpt;
@@ -18,7 +19,7 @@ namespace Root_VEGA_P_Vision.Module
         Camera_Basler camSide;
         string sSideGrabMode;
         Vision.SideOptic.eSide side;
-
+        double rowPos, colPos;
         public Run_SideGrab(Vision module)
         {
             m_module = module;
@@ -42,15 +43,20 @@ namespace Root_VEGA_P_Vision.Module
         {
             Run_SideGrab run = new Run_SideGrab(m_module);
             run.p_sSideGrabMode = p_sSideGrabMode;
-
+            run.side = side;
+            run.rowPos = rowPos;
+            run.colPos = colPos;
             return run;
         }
 
         public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
         {
-            p_sSideGrabMode = tree.Set(p_sSideGrabMode, p_sSideGrabMode, m_module.p_asGrabMode, 
+            p_sSideGrabMode = tree.Set(p_sSideGrabMode, p_sSideGrabMode, m_module.p_asGrabMode,
                 "Grab Mode : Side Grab", "Select GrabMode", bVisible);
             side = (Vision.SideOptic.eSide)tree.Set(side, side, "Scan Direction", "Side Scan Direction", bVisible);
+            rowPos = tree.Set(rowPos, rowPos, "Side Row Scan Pos", "Side Row Scan Pos", bVisible);
+            colPos = tree.Set(colPos, colPos, "Side Col Scan Pos", "Side Col Scan Pos", bVisible);
+
         }
 
         public override string Run()
@@ -62,6 +68,7 @@ namespace Root_VEGA_P_Vision.Module
                 #region [Local Variable]
                 AxisXY axisXY = m_module.m_stage.m_axisXY;
                 Axis axisZ = sideOpt.axisZ;
+                Axis axisR = m_module.m_stage.m_axisR;
 
                 CPoint cpMemoryOffset = new CPoint(SidegrabMode.m_cpMemoryOffset);
 
@@ -74,42 +81,102 @@ namespace Root_VEGA_P_Vision.Module
 
                 //가로 총 Pixel 갯수 : PodWidth * 1000 / camera res X
                 //가로 횟수 : 총 Pixel 갯수 / CamWidth
-                int nXCount = nPodSizeY_px / nCamWidth;
+                //int nXCount = nPodSizeY_px / nCamWidth;
+                int nXCount = 10;
                 int nYCount = nPodSizeY_px / nCamHeight;
-                int lightcnt = SidegrabMode.m_lightSet.m_aLight.Count;
+                List<int> illumList = new List<int>();
+                for (int i = 0; i < SidegrabMode.m_lightSet.m_aLight.Count; i++)
+                    if (SidegrabMode.GetLight(i) > 0) illumList.Add(i);
 
-                InfoPod.ePod parts = m_module.p_infoPod.p_ePod;
+                int lightcnt = illumList.Count;
+
+                //InfoPod.ePod parts = m_module.p_infoPod.p_ePod;
+                InfoPod.ePod parts = InfoPod.ePod.EIP_Cover;
                 //-> 찍는거 확인한다음에 어떻게 집어넣을지 확인해야됨 (계획 : p_bTurn + grabcount(어차피 두번직으니까))
                 //Vision.eUpDown upDown = (Vision.eUpDown)Enum.ToObject(typeof(Vision.eUpDown), m_module.p_infoPod.p_bTurn);
-                //Vision.SideOptic.eSide side = SidegrabMode.side;
-                MemoryData mem = sideOpt.GetMemoryData(parts, side);
+
                 #endregion
 
-                if (m_module.Run(m_module.Move(axisZ, SidegrabMode.m_nFocusPosZ)))
+                //if (m_module.Run(m_module.Move(m_module.m_stage.m_axisXY.p_axisX, SidegrabMode.m_rpAxisCenter.X)))
+                //    return p_sInfo;
+
+                //if (m_module.Run(m_module.Move(axisZ, SidegrabMode.m_nFocusPosZ)))
+                //    return p_sInfo;
+
+
+                if (m_module.Run(axisZ.StartMove(SidegrabMode.m_nFocusPosZ)))
+                    return p_sInfo;
+                if (m_module.Run(axisZ.WaitReady()))
                     return p_sInfo;
 
-                //enum 순서 고려해야됨
-                for (int x=0;x<nXCount;x++)
+                int scannum = 0;
+
+                if (side.Equals(Vision.SideOptic.eSide.All))
+                    scannum = 4;
+                else
+                    scannum = 1;
+
+
+
+                for (int j = 0; j < scannum; j++)
                 {
-                    for(int lc=0;lc<lightcnt;lc++)
-                    {
-                        SidegrabMode.SetLight(lc,true);
+                    SidegrabMode.SetLight(false);
 
-                        double dPosY = SidegrabMode.m_rpAxisCenter.Y - nPulsePerWidth*(nXCount / 2 + x);
+                    MemoryData mem;
+                    if (scannum == 1)
+                        mem = sideOpt.GetMemoryData(parts, side);
+                    else
+                        mem = sideOpt.GetMemoryData(parts, (Vision.SideOptic.eSide)j);
 
-                        if (m_module.Run(m_module.Move(m_module.m_stage.m_axisXY.p_axisY, dPosY)))
-                            return p_sInfo;
+                    double posX = 0;
 
-                        camSide.Grab();
-                        IntPtr ptr = mem.GetPtr(lc);
+                    if (((int)side) % 2 == 0)
+                        posX = rowPos;
+                    else
+                        posX = colPos;
 
-                        Parallel.For(0, nCamHeight, (i) => {
-                            Marshal.Copy(camSide.p_ImageData.m_aBuf, 0, (IntPtr)((long)ptr + (x * nCamWidth) + (i * mem.W)), nCamWidth);
-                        });
+                    if (m_module.Run(axisR.StartMove(90000 * j)))
+                        return p_sInfo;
+                    if (m_module.Run(axisXY.p_axisY.WaitReady()))
+                        return p_sInfo;
 
-                        SidegrabMode.SetLight(false);
-                    }
+                    if (m_module.Run(axisXY.p_axisX.StartMove(posX)))
+                        return p_sInfo;
+                    if (m_module.Run(axisXY.p_axisY.WaitReady()))
+                        return p_sInfo;
+
+
+                    //for (int lc = 0; lc < lightcnt; lc++)
+                    //{
+                        SidegrabMode.SetLight(illumList[1], true);
+                        
+                        IntPtr ptr = mem.GetPtr(0);
+
+                        for (int x = 0; x < nXCount; x++)
+                        {
+                            double dPosY = SidegrabMode.m_rpAxisCenter.Y - nPulsePerWidth * (-nXCount / 2 + x);
+
+                            //if (m_module.Run(m_module.Move(m_module.m_stage.m_axisXY.p_axisY, dPosY)))
+                            //    return p_sInfo;
+
+                            if (m_module.Run(axisXY.p_axisY.StartMove(dPosY)))
+                                return p_sInfo;
+                            if (m_module.Run(axisXY.p_axisY.WaitReady()))
+                                return p_sInfo;
+
+
+                            camSide.Grab();
+
+                            Parallel.For(0, nCamHeight, (i) =>
+                            {
+                                Marshal.Copy(camSide.p_ImageData.m_aBuf, i * nCamWidth, (IntPtr)((long)ptr + ((nCamWidth * x) + (mem.W * i))), nCamWidth);
+                            });
+                        }
+
+                    //}
                 }
+                //enum 순서 고려해야됨
+
             }
             finally
             {
