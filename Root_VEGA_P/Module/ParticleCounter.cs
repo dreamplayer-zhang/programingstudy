@@ -87,7 +87,7 @@ namespace Root_VEGA_P.Module
 
         #region Flow Sensor
         int m_nUnitFlow = 1;
-        VEGA_P.FlowSensor m_flowSensor;
+        FlowSensor m_flowSensor;
         public string RunReadFlow()
         {
             return "OK"; //forget
@@ -152,10 +152,7 @@ namespace Root_VEGA_P.Module
             using (StreamWriter sw = new StreamWriter(sFile, true, Encoding.Default))
             {
                 sw.Write(sTime);
-                foreach (ParticleCounterBase.ParticleCount pc in m_particleCounter.m_aParticleCount)
-                {
-                    foreach (int nParticle in pc.m_aCount) sw.Write("\t" + nParticle.ToString());
-                }
+                foreach (int nCount in m_particleCounter.m_aCount) sw.Write("\t" + nCount.ToString());
                 sw.WriteLine("\t" + (bBackFlow ? "BackFlow" : "OK"));
             }
         }
@@ -186,7 +183,7 @@ namespace Root_VEGA_P.Module
         }
         #endregion
 
-        public ParticleCounter(string id, IEngineer engineer, VEGA_P.FlowSensor flowSensor)
+        public ParticleCounter(string id, IEngineer engineer, FlowSensor flowSensor)
         {
             p_id = id;
             m_flowSensor = flowSensor; 
@@ -311,7 +308,7 @@ namespace Root_VEGA_P.Module
                 Run_Run run = new Run_Run(m_module);
                 run.m_hPa = m_hPa;
                 for (int n = 0; n < m_aOpen.Count; n++) run.m_aOpen[n] = m_aOpen[n]; 
-                run.m_sample = new ParticleCounterBase.Sample(m_sample); 
+                run.m_sample = m_sample.Clone(); 
                 return run;
             }
 
