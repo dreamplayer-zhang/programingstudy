@@ -98,15 +98,13 @@ namespace RootTools_Vision.WorkManager3
             }
         }
 
-        public static ConcurrentQueue<Workplace> ConvertToQueue(RecipeType_WaferMap waferMap, OriginRecipe originRecipe, SharedBufferInfo bufferInfo)
+        public static ConcurrentQueue<Workplace> ConvertToQueue(RecipeType_WaferMap waferMap, OriginRecipe originRecipe, SharedBufferInfo bufferInfo, CameraInfo cameraInfo = new CameraInfo())
         {
             ConcurrentQueue<Workplace> queue = new ConcurrentQueue<Workplace>();
             WorkplaceBundle bundle = new WorkplaceBundle();
 
             try
             {
-
-
                 var mapData = waferMap.Data;
                 int mapSizeX = waferMap.MapSizeX;
                 int mapSizeY = waferMap.MapSizeY;
@@ -219,6 +217,7 @@ namespace RootTools_Vision.WorkManager3
                 {
                     temp.ParentBundle = bundle;
                     temp.SetSharedBuffer(bufferInfo);
+                    temp.SetCameraInfo(cameraInfo);
                 }
 
                 return queue;

@@ -9,7 +9,51 @@
         Loaded="Window_Loaded"
         Closing="Window_Closing"
         Title="MainWindow" Height="450" Width="800" WindowState="Maximized">
+
+    <Window.Resources>
+        <!-- SelectMode -->
+        <ControlTemplate x:Key="selectmode">
+            <local:SelectMode DataContext="{Binding SelectModeVM}"/>
+        </ControlTemplate>
+        <!-- Setup -->
+        <ControlTemplate x:Key="setup">
+            <local:Setup DataContext="{Binding SetupVM}"/>
+        </ControlTemplate>
+    </Window.Resources>
     <Grid>
-        <engineer:WindII_Engineer_UI x:Name="engineerUI"/>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="8*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="2*"/>
+        </Grid.RowDefinitions>
+        
+        <!--<engineer:WindII_Engineer_UI x:Name="engineerUI"/>-->
+
+        <Grid Grid.Row="0">
+            <ContentControl>
+                <ContentControl.Style>
+                    <Style TargetType="ContentControl">
+                        <Style.Triggers>
+                             <!--SelectMode--> 
+                            <DataTrigger Binding="{Binding SelectedModeIndex}"
+                                         Value="0">
+                                <Setter Property="Template" Value="{StaticResource selectmode}"/>
+                            </DataTrigger>
+                             <!--Setup--> 
+                            <DataTrigger Binding="{Binding SelectedModeIndex}"
+                                         Value="1">
+                                <Setter Property="Template" Value="{StaticResource setup}"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </ContentControl.Style>
+            </ContentControl>
+        </Grid>
+
+        <GridSplitter Grid.Row="1" 
+                      Height="5"
+                      HorizontalAlignment="Stretch"
+                      VerticalAlignment="Stretch"
+                      ShowsPreview="True"/>
     </Grid>
 </Window>
