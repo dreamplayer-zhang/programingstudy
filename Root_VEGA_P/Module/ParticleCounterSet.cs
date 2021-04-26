@@ -70,10 +70,6 @@ namespace Root_VEGA_P.Module
         Regulator m_regulator;
         #endregion
 
-        #region NozzleSet
-        NozzleSet m_nozzleSet;
-        #endregion
-
         #region FlowSensor
         FlowSensor m_flowSensor;
         int m_nUnitFlowSensor = 1;
@@ -147,9 +143,8 @@ void SaveResult(string sFile, string sTime, bool bBackFlow)
 
             public void RunTree(Tree tree, bool bVisible)
             {
-                RunTreeNozzle(tree.GetTree("Nozzle Open", bVisible), bVisible); 
-                m_hPa = tree.GetTree("Regulator", bVisible).Set(m_hPa, m_hPa, "Pressure", "Regulator Pressure (hPa)", bVisible); 
-                m_sample.RunTree(tree.GetTree("Sampling", bVisible), bVisible); 
+                RunTreeNozzle(tree.GetTree("Nozzle Open", true, bVisible), bVisible);
+                m_hPa = tree.GetTree("Regulator", true, bVisible).Set(m_hPa, m_hPa, "Pressure", "Regulator Pressure (hPa)", bVisible); 
             }
 
             void RunTreeNozzle(Tree tree, bool bVisible)
@@ -168,7 +163,7 @@ void SaveResult(string sFile, string sTime, bool bBackFlow)
             {
                 m_set = particleCounterSet;
                 m_aOpen = particleCounterSet.m_nozzleSet.GetCloneOpen();
-                m_sample = particleCounterSet.m_particleCounter.m_sample.Clone(); 
+                m_sample = particleCounterSet.m_sample; 
             }
         }
         #endregion
@@ -181,19 +176,22 @@ void SaveResult(string sFile, string sTime, bool bBackFlow)
         }
         #endregion
 
-        ModuleBase m_module; 
-        public ParticleCounterSet(ModuleBase module, FlowSensor flowSensor)
+        string m_sID = ""; 
+        ModuleBase m_module;
+        NozzleSet m_nozzleSet;
+        ParticleCounterBase.Sample m_sample; 
+        public ParticleCounterSet(ModuleBase module, FlowSensor flowSensor, ParticleCounterBase.Sample sample, string sID = "")
         {
             m_module = module;
             m_regulator = new Regulator(m_module);
             m_nozzleSet = new NozzleSet(m_module);
-            m_flowSensor = flowSensor; 
+            m_flowSensor = flowSensor;
+            m_sample = sample; 
+            m_sID = sID; 
         }
 
         public void ThreadStop()
         {
-            m_regulator.RunPump(0);
-            m_nozzleSet.RunCloseAllNozzle(); 
         }
 
         #region ModuleRun
@@ -201,7 +199,7 @@ void SaveResult(string sFile, string sTime, bool bBackFlow)
         {
             m_module.AddModuleRunList(new Run_Pump(this), false, "Run Pump");
             m_module.AddModuleRunList(new Run_ReadFlow(this), false, "Read Flow Sensor");
-            m_module.AddModuleRunList(new Run_Run(this), true, "Run Particle Counter");
+            m_module.AddModuleRunList(new Run_ParticleCount(this), true, "Run Particle Counter");
         }
 
         public class Run_Pump : ModuleRunBase
@@ -210,7 +208,7 @@ void SaveResult(string sFile, string sTime, bool bBackFlow)
             public Run_Pump(ParticleCounterSet particleCounterSet)
             {
                 m_particleCounterSet = particleCounterSet;
-                InitModuleRun(particleCounterSet.m_module);
+                InitModuleRun(particleCounterSet.m_module, m_particleCounterSet.m_sID);
             }
 
             int m_secDelay = 1;
@@ -244,7 +242,7 @@ void SaveResult(string sFile, string sTime, bool bBackFlow)
             public Run_ReadFlow(ParticleCounterSet particleCounterSet)
             {
                 m_particleCounterSet = particleCounterSet;
-                InitModuleRun(particleCounterSet.m_module);
+                InitModuleRun(particleCounterSet.m_module, m_particleCounterSet.m_sID);
             }
 
             public override ModuleRunBase Clone()
@@ -271,20 +269,20 @@ void SaveResult(string sFile, string sTime, bool bBackFlow)
             }
         }
 
-        public class Run_Run : ModuleRunBase
+        public class Run_ParticleCount : ModuleRunBase
         {
             ParticleCounterSet m_particleCounterSet;
-            public Run_Run(ParticleCounterSet particleCounterSet)
+            public Run_ParticleCount(ParticleCounterSet particleCounterSet)
             {
                 m_particleCounterSet = particleCounterSet;
-                m_runCount = new RunCount(particleCounterSet); 
-                InitModuleRun(particleCounterSet.m_module);
+                m_runCount = new RunCount(particleCounterSet);
+                InitModuleRun(particleCounterSet.m_module, m_particleCounterSet.m_sID);
             }
 
             RunCount m_runCount; 
             public override ModuleRunBase Clone()
             {
-                Run_Run run = new Run_Run(m_particleCounterSet);
+                Run_ParticleCount run = new Run_ParticleCount(m_particleCounterSet);
                 run.m_runCount = new RunCount(m_particleCounterSet); 
                 return run;
             }
