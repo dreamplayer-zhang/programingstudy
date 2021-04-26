@@ -97,7 +97,7 @@ namespace Root_Rinse_Unloader.Module
             }
         }
 
-        List<Line> m_aLine = new List<Line>();
+        public List<Line> m_aLine = new List<Line>();
         void InitLines()
         {
             for (int n = 0; n < 4; n++) m_aLine.Add(new Line("Line" + n.ToString(), this));
@@ -139,8 +139,8 @@ namespace Root_Rinse_Unloader.Module
 
         #region Pusher
         DIO_I2O m_dioPusher;
-        DIO_I2O2 m_dioPusherDown;
-        DIO_I m_diPusherOverload; 
+        public DIO_I2O2 m_dioPusherDown;
+        DIO_I m_diPusherOverload;
 
         public string RunPusherDown(bool bDown)
         {
@@ -171,16 +171,21 @@ namespace Root_Rinse_Unloader.Module
                         return "Run Pusher overload Check Error";
                     }
                 }
-                if (Run(m_dioPusher.RunSol(false))) return p_sInfo;
+                m_dioPusher.Write(false);
                 if (Run(RunPusherDown(false))) return p_sInfo;
+                if (Run(m_dioPusher.RunSol(false))) return p_sInfo;
                 foreach (Line line in m_aLine) line.p_eSensor = Line.eSensor.Empty;
+                foreach (Line line in m_aLine)
+                {
+                    if (line.m_diCheck[2].p_bIn) return "Check Strip after Push"; 
+                }
                 m_storage.StartMoveMagazine(true);
                 return "OK";
             }
             finally
             {
                 m_dioPusherDown.Write(false);
-                m_dioPusher.Write(false); 
+                m_dioPusher.Write(false);
             }
         }
         #endregion
@@ -210,6 +215,7 @@ namespace Root_Rinse_Unloader.Module
 
         public override void Reset()
         {
+            foreach (Line line in m_aLine) line.p_eSensor = Line.eSensor.Empty; 
             base.Reset();
         }
         #endregion
@@ -224,26 +230,43 @@ namespace Root_Rinse_Unloader.Module
             return "OK";
         }
 
-        public string RunRun(double secArrive)
+        double m_secWaitPush = 4;
+        double m_secArrive = 2;
+        double m_secArriveTimeout = 8; 
+        public string RunRun()
         {
+            StopWatch sw = new StopWatch();
+            int msWaitPush = (int)(1000 * m_secWaitPush); 
             if (Run(RunPusherDown(false))) return p_sInfo; 
-            RunRotate(true); 
+            RunRotate(true);
             while (IsExist() == false)
             {
                 Thread.Sleep(10);
                 if (EQ.IsStop()) return "EQ Stop"; 
             }
+            RunRotate(true);
+            while (sw.ElapsedMilliseconds < msWaitPush) Thread.Sleep(10); 
             while (IsArrived() == false)
             {
+                RunRotate(true);
                 Thread.Sleep(10);
                 if (EQ.IsStop()) return "EQ Stop";
             }
+            RunRotate(true);
+            sw.Start(); 
+            int msArriveTimeout = (int)(1000 * m_secArriveTimeout); 
             while (IsReadyPush() == false)
             {
                 Thread.Sleep(10);
                 if (EQ.IsStop()) return "EQ Stop";
+                if (sw.ElapsedMilliseconds > msArriveTimeout)
+                {
+                    RunRotate(false);
+                    EQ.p_eState = EQ.eState.Error;
+                    return "Arrive Timeout";
+                }
             }
-            Thread.Sleep((int)(1000 * secArrive));
+            Thread.Sleep((int)(1000 * m_secArrive));
             string sRun = RunPusher();
             m_alidPusher.p_bSet = (sRun != "OK");
             RunRotate(false); 
@@ -282,11 +305,19 @@ namespace Root_Rinse_Unloader.Module
             }
             return true;
         }
+
+        void RunTreePush(Tree tree)
+        {
+            m_secWaitPush = tree.Set(m_secWaitPush, m_secWaitPush, "Move", "Wait Push (sec)");
+            m_secArrive = tree.Set(m_secArrive, m_secArrive, "Arrive", "Wait Arrive (sec)");
+            m_secArriveTimeout = tree.Set(m_secArriveTimeout, m_secArriveTimeout, "Arrive Timeout", "Arrive Timeout (sec)");
+        }
         #endregion
 
         #region Tree
         public override void RunTree(Tree tree)
         {
+            RunTreePush(tree.GetTree("Time Wait")); 
             base.RunTree(tree);
         }
         #endregion
@@ -347,6 +378,7 @@ namespace Root_Rinse_Unloader.Module
             AddModuleRunList(new Run_MoveWidth(this), false, "Move Rail Width");
             AddModuleRunList(new Run_Rotate(this), false, "Rail Rotate");
             AddModuleRunList(new Run_PusherDown(this), false, "Pusher Down");
+            AddModuleRunList(new Run_Pusher(this), false, "Pusher Down");
             m_runRun = AddModuleRunList(new Run_Run(this), false, "Rail Run");
         }
 
@@ -445,7 +477,40 @@ namespace Root_Rinse_Unloader.Module
             }
         }
 
+        public class Run_Pusher : ModuleRunBase
+        {
+            Rail m_module;
+            public Run_Pusher(Rail module)
+            {
+                m_module = module;
+                InitModuleRun(module);
+            }
 
+            bool m_bRepeat = false;
+            public override ModuleRunBase Clone()
+            {
+                Run_Pusher run = new Run_Pusher(m_module);
+                run.m_bRepeat = m_bRepeat;
+                return run;
+            }
+
+            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
+            {
+                m_bRepeat = tree.Set(m_bRepeat, m_bRepeat, "Repeat", "Pusher Up Down Repeat", bVisible);
+            }
+
+            public override string Run()
+            {
+                m_module.RunPusher();
+                while (m_bRepeat)
+                {
+                    Thread.Sleep(1000);
+                    m_module.RunPusher(); 
+                    if (EQ.IsStop()) return "OK";
+                }
+                return "OK";
+            }
+        }
         public class Run_Run : ModuleRunBase
         {
             Rail m_module;
@@ -455,22 +520,19 @@ namespace Root_Rinse_Unloader.Module
                 InitModuleRun(module);
             }
 
-            double m_secArrive = 2;
             public override ModuleRunBase Clone()
             {
                 Run_Run run = new Run_Run(m_module);
-                run.m_secArrive = m_secArrive; 
                 return run;
             }
 
             public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
             {
-                m_secArrive = tree.Set(m_secArrive, m_secArrive, "Arrive", "Arrive Delay (sec)", bVisible); 
             }
 
             public override string Run()
             {
-                return m_module.RunRun(m_secArrive);
+                return m_module.RunRun();
             }
         }
         #endregion

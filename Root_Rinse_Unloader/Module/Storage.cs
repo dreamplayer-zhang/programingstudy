@@ -175,19 +175,22 @@ namespace Root_Rinse_Unloader.Module
         double m_fJogScale = 1;
         public string MoveStackReady()
         {
+            return MoveStack(); 
+            /*
             if (m_stack.p_bLevel)
             {
-                m_axis.Jog(-m_fJogScale, "Move");
+                m_axis.Jog(-m_fJogScale);
                 while (m_stack.p_bLevel && (EQ.IsStop() == false)) Thread.Sleep(10);
                 m_axis.StopAxis();
                 Thread.Sleep(500);
             }
-            m_axis.Jog(m_fJogScale, "Move");
+            m_axis.Jog(m_fJogScale);
             while (!m_stack.p_bLevel && (EQ.IsStop() == false)) Thread.Sleep(10);
             m_axis.StopAxis();
             m_axis.WaitReady();
             Thread.Sleep(500);
             return "OK";
+            */
         }
 
         void RunTreeElevator(Tree tree)
@@ -301,16 +304,17 @@ namespace Root_Rinse_Unloader.Module
 
         public string MoveMagazine(bool bNext)
         {
-            if (bNext)
+            if (bNext) m_rinse.p_iMagazine++;
+            if (IsMagazineExist(m_rinse.p_eMagazine) == false)
             {
-                m_rinse.p_iMagazine++;
-                if (m_rinse.p_iMagazine >= 20)
-                {
-                    m_rinse.p_iMagazine = 0;
-                    if (Run(SetNextMagazine(m_rinse.p_eMagazine))) return p_sInfo;
-                }
+                if (Run(SetNextMagazine(m_rinse.p_eMagazine))) return p_sInfo;
             }
-            return MoveMagazine(m_rinse.p_eMagazine, m_rinse.p_iMagazine, true); 
+            if (m_rinse.p_iMagazine >= 20)
+            {
+                m_rinse.p_iMagazine = 0;
+                if (Run(SetNextMagazine(m_rinse.p_eMagazine))) return p_sInfo;
+            }
+            return MoveMagazine(m_rinse.p_eMagazine, m_rinse.p_iMagazine, true);
         }
 
         string SetNextMagazine(eMagazine eMagazine)
@@ -322,10 +326,15 @@ namespace Root_Rinse_Unloader.Module
                 case eMagazine.Magazine3: m_rinse.p_eMagazine = eMagazine.Magazine2; break;
                 case eMagazine.Magazine4: m_rinse.p_eMagazine = eMagazine.Magazine3; break;
             }
-            bool bCheck = m_aMagazine[(int)m_rinse.p_eMagazine].p_bCheck;
-            bool bClamp = m_aMagazine[(int)m_rinse.p_eMagazine].p_bClamp; 
-            if (bCheck && bClamp) return "OK";
+            if (IsMagazineExist(m_rinse.p_eMagazine)) return "OK"; 
             return SetNextMagazine(m_rinse.p_eMagazine); 
+        }
+
+        bool IsMagazineExist(eMagazine eMagazine)
+        {
+            bool bCheck = m_aMagazine[(int)eMagazine].p_bCheck;
+            bool bClamp = m_aMagazine[(int)eMagazine].p_bClamp;
+            return (bCheck && bClamp); 
         }
 
         ModuleRunBase m_runReady;

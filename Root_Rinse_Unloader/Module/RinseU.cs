@@ -60,7 +60,7 @@ namespace Root_Rinse_Unloader.Module
             }
         }
 
-        Storage.eMagazine _eMagazine = Storage.eMagazine.Magazine1;
+        Storage.eMagazine _eMagazine = Storage.eMagazine.Magazine4;
         public Storage.eMagazine p_eMagazine
         {
             get { return _eMagazine; }
@@ -333,7 +333,7 @@ namespace Root_Rinse_Unloader.Module
         public void RunBuzzerOff()
         {
             m_doBuzzer.AllOff();
-            AddProtocol(p_id, eCmd.BuzzerOff, "Off");
+            //AddProtocol(p_id, eCmd.BuzzerOff, "Off");
         }
 
         StopWatch m_swBuzzer = new StopWatch();

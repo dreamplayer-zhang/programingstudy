@@ -451,28 +451,37 @@ namespace Root_CAMELLIA.Module
 
         public string LifterDown()
         {
-            if (p_axisLifter.IsInPos(eAxisPos.Home))
+            try
             {
-                if (!m_vacuum.p_bIn)
+                if (p_axisLifter.IsInPos(eAxisPos.Home))
                 {
-                    VaccumOnOff(true);
+                    if (!m_vacuum.p_bIn)
+                    {
+                        VaccumOnOff(true);
+                    }
+                    return "OK";
                 }
-                return "OK";
+                else
+                {
+                    if (!m_vacuum.p_bIn)
+                    {
+                        VaccumOnOff(true);
+                    }
+                    //p_axisLifter.p_vaccumDIO_I.p_bIn = false;
+                    p_axisLifter.p_IsLifterDown = true;
+                    if (p_axisLifter.StartMove(eAxisPos.Home) != "OK")
+                    {
+                        return p_sInfo;
+                    }
+                    if (p_axisLifter.WaitReady() != "OK")
+                        return p_sInfo;
+                }
             }
-            else
+            finally
             {
-                if (!m_vacuum.p_bIn)
-                {
-                    VaccumOnOff(true);
-                }
-
-                if (p_axisLifter.StartMove(eAxisPos.Ready) != "OK")
-                {
-                    return p_sInfo;
-                }
-                if (p_axisLifter.WaitReady() != "OK")
-                    return p_sInfo;
+                p_axisLifter.p_IsLifterDown = false;
             }
+          
 
            // if (m_loadExistWafer.p_bIn)
             {
@@ -678,7 +687,7 @@ namespace Root_CAMELLIA.Module
 
         public string AfterPut(int nID)
         {
-            p_dataSavePath = BaseDefine.Dir_MeasureSaveRootPath + p_infoWafer.p_sRecipe + @"\" + DateTime.Now.ToString("yyyy-MM-dd") + "T" + DateTime.Now.ToString("HH-mm-ss");
+            p_dataSavePath = BaseDefine.Dir_MeasureSaveRootPath + p_infoWafer.p_sRecipe + @"\" + DateTime.Now.ToString("yyyy-MM-dd");// + "T" + DateTime.Now.ToString("HH-mm-ss");
             GeneralTools.MakeDirectory(p_dataSavePath);
             return "OK";
         }

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 
@@ -16,5 +17,43 @@ namespace Root_CAMELLIA
     {
         public static CAMELLIA_Engineer m_engineer = new CAMELLIA_Engineer();
         public static Nanoview m_nanoView = new Nanoview();
+
+        private void Application_Startup(object sender, StartupEventArgs e)
+        {
+            //base.OnStartup(e);
+            Thread thread = new Thread(
+                new System.Threading.ThreadStart(
+                    delegate ()
+                    {
+                        SplashScreenHelper.SplashScreen = new Dlg_SplashScreen();
+                        SplashScreenHelper.Show();
+                        System.Windows.Threading.Dispatcher.Run();
+                    }
+                ));
+            thread.SetApartmentState(ApartmentState.STA);
+            thread.IsBackground = true;
+            thread.Start();
+
+            Task.Factory.StartNew(() =>
+            {
+                //simulate some work being done
+                //System.Threading.Thread.Sleep(3000);
+
+                //since we're not on the UI thread
+                //once we're done we need to use the Dispatcher
+                //to create and show the main window
+                this.Dispatcher.Invoke(() =>
+                {
+                    //initialize the main window, set it as the application main window
+                    //and close the splash screen
+                    var mainWindow = new MainWindow();
+                    this.MainWindow = mainWindow;
+                    mainWindow.Show();
+                    SplashScreenHelper.Hide();
+                });
+            });
+
+            //thread.Join();
+        }
     }
 }
