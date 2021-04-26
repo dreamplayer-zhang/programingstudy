@@ -27,8 +27,7 @@ namespace RootTools
         public static eState p_eState
         {
             get { return m_EQ.p_eState; }
-            set { m_EQ.p_eState = value;
-            }
+            set { m_EQ.p_eState = value; }
         }
 
         public static string p_sInfo

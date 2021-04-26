@@ -53,6 +53,7 @@ namespace Root_CAMELLIA
         public void Init(CAMELLIA_Handler handler)
         {
             m_handler = handler;
+            //this.Owner
             InitTimer();
         }
 
@@ -64,6 +65,7 @@ namespace Root_CAMELLIA
         private void MinizimeButton_Click(object sender, RoutedEventArgs e)
         {
             this.WindowState = WindowState.Minimized;
+            //this.Close();
         }
 
         private void CloseButton_Click(object sender, RoutedEventArgs e)
@@ -92,6 +94,19 @@ namespace Root_CAMELLIA
 
         private void M_timer_Tick(object sender, EventArgs e)
         {
+            if (EQ.p_eState != EQ.eState.Home)
+            {
+                if (bShow)
+                {
+
+                }
+                else
+                {
+                    this.Close();
+                }
+                //return;
+            }
+
             if (bShow)
             {
                 this.Show();
@@ -113,6 +128,8 @@ namespace Root_CAMELLIA
             else if (m_handler.m_wtr.p_eState == ModuleBase.eState.Error)
             {
                 progressWTR.Foreground = Brushes.Red;
+                //progressWTR.Background = Brushes.Crimson;
+                //progressWTR.Value = 0;
                 //progressWTR.Value = 0;    //working
             }
             else progressWTR.Value = 0;

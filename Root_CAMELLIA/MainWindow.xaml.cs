@@ -105,6 +105,7 @@ namespace Root_CAMELLIA
             //{
 
             //}
+            //m_handler.m_HomeProgress.Owner = this;
         }
 
         DispatcherTimer m_timer = new DispatcherTimer();
@@ -114,7 +115,8 @@ namespace Root_CAMELLIA
             m_timer.Tick += M_timer_Tick;
             m_timer.Start();
         }
-
+        // EQ.eState oldstate = EQ.eState.Init;
+        bool isClearInfoWafer = false;
         private void M_timer_Tick(object sender, EventArgs e)
         {
             tbTime.Text = DateTime.Now.ToString("yyyy-MM-dd HH-mm-ss");
@@ -125,6 +127,12 @@ namespace Root_CAMELLIA
             buttonPause.IsEnabled = IsEnable_Pause();
             buttonInit.IsEnabled = IsEnable_Initial();
             buttonRecovery.IsEnabled = IsEnable_Recovery();
+
+            if (EQ.p_eState == EQ.eState.Ready && isClearInfoWafer)
+            {
+                m_handler.m_process.ClearInfoWafer();
+                isClearInfoWafer = false;
+            }
         }
 
         void TimerUI()
@@ -182,26 +190,28 @@ namespace Root_CAMELLIA
             }
             return true;
         }
-
         private void buttonInit_Click(object sender, RoutedEventArgs e)
         {
             if (IsEnable_Initial() == false) return;
+
             EQ.p_bStop = false;
             EQ.p_eState = EQ.eState.Home;
+            isClearInfoWafer = true;
 
 
-            Application.Current.Dispatcher.Invoke(delegate ()
-            {
-                while(EQ.p_eState == EQ.eState.Home)
-                {
-                    if (EQ.IsStop())
-                    {
-                        EQ.p_eState = EQ.eState.Error;
-                    }
-                }
-                m_handler.m_process.ClearInfoWafer();
-            });
-           
+
+
+            //Application.Current.Dispatcher.Invoke(delegate ()
+            //{
+            //    while(EQ.p_eState == EQ.eState.Home)
+            //    {
+            //        if (EQ.IsStop())
+            //        {
+            //            EQ.p_eState = EQ.eState.Error;
+            //        }
+            //    }
+            //});
+
             //Camellia Camera Connect
         }
 

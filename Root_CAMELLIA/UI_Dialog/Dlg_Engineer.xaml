@@ -273,6 +273,9 @@
                                                             </TextBlock>
                                                         </Button>
                                                         <Button Grid.Column="2" Grid.Row="0" Margin="5" Command="{Binding CmdInit}" Content="Initialize" IsEnabled="{Binding ModuleCamellia.p_eState, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource ModuleStateToEnableConverter} }"/>
+
+                                                        <CheckBox Content="EQ Stop" Grid.Column="3" HorizontalAlignment="Center" VerticalAlignment="Center" IsChecked="{Binding Path=p_bStop, Source={x:Static tools:EQ.m_EQ} , UpdateSourceTrigger=PropertyChanged}"/>
+
                                                         <Button
                                                     Margin="5"
                                                     Grid.Column="1" Grid.Row="1"
