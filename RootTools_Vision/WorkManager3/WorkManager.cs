@@ -16,7 +16,8 @@ namespace RootTools_Vision.WorkManager3
     public class WorkManager
     {
         #region [Attributes]
-        private SharedBufferInfo sharedBuffer;
+        private SharedBufferInfo sharedBuffer = new SharedBufferInfo();
+        private CameraInfo cameraInfo = new CameraInfo();
         private RecipeBase recipe;
 
         private WorkPipeLine pipeLine;
@@ -25,8 +26,6 @@ namespace RootTools_Vision.WorkManager3
         #endregion
 
         #region [Event]
-        public event WorkManagerAllWorkDoneEvent AllWorkDone;
-
         public event EventHandler<PositionDoneEventArgs> PositionDone;
 
         public event EventHandler<InspectionStartArgs> InspectionStart;
@@ -116,6 +115,11 @@ namespace RootTools_Vision.WorkManager3
             this.sharedBuffer = bufferInfo;
         }
 
+        public void SetCameraInfo(CameraInfo cameraInfo)
+        {
+            this.cameraInfo = cameraInfo;
+        }
+
         #region [Method]
 
         public bool OpenRecipe(string recipePath)
@@ -150,7 +154,7 @@ namespace RootTools_Vision.WorkManager3
             }
 
             this.currentWorkplaceQueue = 
-                RecipeToWorkplaceConverter.ConvertToQueue(this.recipe.WaferMap, this.recipe.GetItem<OriginRecipe>(), this.sharedBuffer);
+                RecipeToWorkplaceConverter.ConvertToQueue(this.recipe.WaferMap, this.recipe.GetItem<OriginRecipe>(), this.sharedBuffer, this.cameraInfo);
 
             pipeLine.Start(
                 this.currentWorkplaceQueue, 
