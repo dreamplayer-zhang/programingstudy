@@ -102,7 +102,7 @@ namespace Root_WIND2.UI_User
             }
         }
 
-        private int downSamplingRatio = 1;
+        private int downSamplingRatio = 20;
         public int DownSamplingRatio
         {
             get => this.downSamplingRatio;
@@ -350,11 +350,15 @@ namespace Root_WIND2.UI_User
             if (mapData == null || mapData.Length == 0) return;
 
             BacksideRecipe backsideRecipe = GlobalObjects.Instance.Get<RecipeBack>().GetItem<BacksideRecipe>();
+            OriginRecipe originRecipe = GlobalObjects.Instance.Get<RecipeBack>().GetItem<OriginRecipe>();
             // Map Data Recipe 생성
-            backsideRecipe.OriginX = this.originPointX;
-            backsideRecipe.OriginY = this.originPointY;
-            backsideRecipe.DiePitchX = this.mapUnitWidth;
-            backsideRecipe.DiePitchY = this.mapUnitHeight;
+            originRecipe.OriginX = this.originPointX;
+            originRecipe.OriginY = this.originPointY;
+            originRecipe.OriginWidth = this.mapUnitWidth;
+            originRecipe.OriginHeight = this.mapUnitHeight;
+            originRecipe.DiePitchX = this.mapUnitWidth;
+            originRecipe.DiePitchY = this.mapUnitHeight;
+
             backsideRecipe.CenterX = this.SearchedCenterPointY;
             backsideRecipe.CenterY = this.SearchedCenterPointY;
             backsideRecipe.Radius = this.SearchedCircleRadius;

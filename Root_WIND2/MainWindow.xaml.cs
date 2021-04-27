@@ -43,6 +43,8 @@ namespace Root_WIND2
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             Init();
+
+            MessageBox.Show("DDD");
         }
 
         private void Window_Closing(object sender, CancelEventArgs e)
@@ -207,7 +209,6 @@ namespace Root_WIND2
                     maskLayer = GlobalObjects.Instance.RegisterNamed<ImageData>("MaskImage", memoryTool.GetMemory(memoryFrontPool, memoryFrontGroup, memoryMask));
                 }
 
-
                 ImageData backImage = GlobalObjects.Instance.RegisterNamed<ImageData>("BackImage", memoryTool.GetMemory(memoryBackPool, memoryBackGroup, memoryBack));
 
                 ImageData edgeTopImage = GlobalObjects.Instance.RegisterNamed<ImageData>("EdgeTopImage", memoryTool.GetMemory(memoryEdgePool, memoryEdgeGroup, memoryEdgeTop));
@@ -299,11 +300,24 @@ namespace Root_WIND2
                 }
                 else
                 {
-                    InspectionManagerBackside inspectionBack = GlobalObjects.Instance.Register<InspectionManagerBackside>
-                    (
-                    recipeBack,
-                    new SharedBufferInfo(backImage.GetPtr(0), backImage.p_Size.X, backImage.p_Size.Y, backImage.GetBytePerPixel(), backImage.GetPtr(1), backImage.GetPtr(2))
-                    );
+                    RootTools_Vision.WorkManager3.WorkManager backInspection = GlobalObjects.Instance.RegisterNamed<RootTools_Vision.WorkManager3.WorkManager>("backInspection", 4);
+
+                    backInspection.SetRecipe(recipeBack);
+                    backInspection.SetSharedBuffer(new SharedBufferInfo(
+                            backImage.GetPtr(0),
+                            backImage.p_Size.X,
+                            backImage.p_Size.Y,
+                            backImage.GetBytePerPixel(),
+                            backImage.GetPtr(1),
+                            backImage.GetPtr(2),
+                                new MemoryID(memoryFrontPool, memoryFrontGroup, memoryFront)));
+
+
+                    //InspectionManagerBackside inspectionBack = GlobalObjects.Instance.Register<InspectionManagerBackside>
+                    //(
+                    //recipeBack,
+                    //new SharedBufferInfo(backImage.GetPtr(0), backImage.p_Size.X, backImage.p_Size.Y, backImage.GetBytePerPixel(), backImage.GetPtr(1), backImage.GetPtr(2))
+                    //);
                 }
 
                 if (edgeTopImage.GetPtr() != IntPtr.Zero)

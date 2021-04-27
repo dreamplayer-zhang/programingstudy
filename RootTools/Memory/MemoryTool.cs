@@ -682,8 +682,10 @@ namespace RootTools.Memory
             string str = "GET" + Splitter + GetSerializeString(View_Rect) + Splitter + CanvasWidth + Splitter + CanvasHeight + Splitter + sPool+ Splitter + sGourp + Splitter + sMem + Splitter + nByte;
            
             _bRecieve = true;
-            if(m_Server!=null)
+            if (m_Server != null)
                 m_Server.Send(str);
+            else
+                return m_abuf;
         
             while (_bRecieve)
             {
@@ -693,6 +695,28 @@ namespace RootTools.Memory
             }
             _bRecieve = false;
               m_log.Warn(watch.ElapsedMilliseconds.ToString());
+            return m_abuf;
+        }
+
+
+        public async Task<byte[]> GetOtherMemoryAsync(System.Drawing.Rectangle View_Rect, int CanvasWidth, int CanvasHeight, string sPool, string sGourp, string sMem, int nByte)
+        {
+            Stopwatch watch = new Stopwatch();
+            watch.Start();
+            string str = "GET" + Splitter + GetSerializeString(View_Rect) + Splitter + CanvasWidth + Splitter + CanvasHeight + Splitter + sPool + Splitter + sGourp + Splitter + sMem + Splitter + nByte;
+
+            _bRecieve = true;
+            if (m_Server != null)
+                m_Server.Send(str);
+
+            while (_bRecieve)
+            {
+                await Task.Delay(5);
+                if (watch.ElapsedMilliseconds > 10000)
+                    return m_abuf;
+            }
+            _bRecieve = false;
+            m_log.Warn(watch.ElapsedMilliseconds.ToString());
             return m_abuf;
         }
         private void M_Server_EventReciveData(byte[] aBuf, int nSize)
