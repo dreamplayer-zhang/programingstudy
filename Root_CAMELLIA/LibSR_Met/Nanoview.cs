@@ -113,7 +113,7 @@ namespace Root_CAMELLIA.LibSR_Met
                     SplashScreenHelper.ShowText("SR Initialize Error!");
                     //MessageBox.Show(sErr); //추후 제거
                 }
-                m_PMDatas.UpdateSR(true, "1");
+               
                 return rst;
             }
             catch (Exception ex)
@@ -453,7 +453,7 @@ namespace Root_CAMELLIA.LibSR_Met
             try
             {
                 //Shutter 체크 기능 추가
-                bool bShutterOpen = false;
+                bool bShutterOpen = true;
                 if (nPointIndex == 0)
                 {
                     //ShutterMotion(true);
@@ -686,6 +686,10 @@ namespace Root_CAMELLIA.LibSR_Met
 
                         data.dGoF = m_Calculation.CalcGoF(data.VIS_Reflectance, data.CalcReflectance, 0, nWLCount, 0, nWLCount - 1, dAvgR);
 
+                        if(data.dGoF==1)
+                        {
+                            data.dGoF = 0.9999;
+                        }
 
                         if (rst == ERRORCODE_NANOVIEW.SR_NO_ERROR)
                         {
@@ -1129,26 +1133,33 @@ namespace Root_CAMELLIA.LibSR_Met
         ///</summary>
         public ERRORCODE_NANOVIEW GetLightSourceStatus(ref bool bLampOperation, ref bool bControllerOperation, ref bool bLampOn, ref bool bLaserOn)
         {
+            //Lamp fault/controller  o:NG/1:OK
+            //Lamp On/ Laser ON 0:OFF/ 1:ON
             try
             {
                 int[] LightSignal = new int[4];
                 int pixelDepth = m_SR.PixelDepth;
-                ERRORCODE_NANOVIEW rst = (ERRORCODE_NANOVIEW)m_SR.CheckLight(LightSignal);
+                m_SR.CheckLight(LightSignal);
 
                 if (LightSignal[0] == 0)
-                    bLampOperation = true;
-                else
                 {
                     bLampOperation = false;
                     m_DM.m_Log.WriteLog(LogType.Error, "Lamp Fault!");
                 }
+                else
+                {
+                    bLampOperation = true;
+                }
 
                 if (LightSignal[1] == 0)
-                    bControllerOperation = true;
-                else
                 {
                     bControllerOperation = false;
                     m_DM.m_Log.WriteLog(LogType.Error, "Lamp Controller Fault!");
+                }
+                else
+                {
+                    bControllerOperation = true;
+                   
                 }
 
                 if (LightSignal[2] == 0)
@@ -1172,7 +1183,7 @@ namespace Root_CAMELLIA.LibSR_Met
                     m_DM.m_Log.WriteLog(LogType.Operating, "LaserOn: " + bLaserOn.ToString());
                     m_bPreLaserOn = bLaserOn;
                 }
-                return rst;
+                return ERRORCODE_NANOVIEW.SR_NO_ERROR;
             }
             catch (Exception ex)
             {

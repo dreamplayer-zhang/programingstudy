@@ -947,56 +947,56 @@ namespace Root_CAMELLIA.LibSR_Met
         #endregion
 
         #region Lamp Controller  Check
-        public SerialPort sp = new SerialPort();
-        public string UpdateSR(bool initialize, string CheckWord)
-        {
-            if (initialize)
-            {
+        //public SerialPort sp = new SerialPort();
+        //public string UpdateSR(bool initialize, string CheckWord)
+        //{
+        //    if (initialize)
+        //    {
 
 
-                sp.PortName = "COM2";
-                sp.BaudRate = 9600;
-                sp.DataBits = 8;
-                sp.StopBits = StopBits.One;
-                sp.Parity = Parity.None;
-                //sp.DataReceived += new SerialDataReceivedEventHandler(serialPort1_DataReceived);
-                sp.Open();
-            }
-            sp.Write(CheckWord);
-            string OutputData = sp.ReadLine();
-            return OutputData;
-        }
-        public void LampCheck()
-        {
+        //        sp.PortName = "COM2";
+        //        sp.BaudRate = 9600;
+        //        sp.DataBits = 8;
+        //        sp.StopBits = StopBits.One;
+        //        sp.Parity = Parity.None;
+        //        //sp.DataReceived += new SerialDataReceivedEventHandler(serialPort1_DataReceived);
+        //        sp.Open();
+        //    }
+        //    sp.Write(CheckWord);
+        //    string OutputData = sp.ReadLine();
+        //    return OutputData;
+        //}
+        //public void LampCheck()
+        //{
             
 
-            string sLampT = UpdateSR(false, "4");
-            string sLampH = UpdateSR(false, "3");
-            string sVISLampLux = UpdateSR(false, "0");
-            string sIRLampLux = UpdateSR(false, "1");
-            string sControlT = UpdateSR(false, "6");
-            string sControlH = UpdateSR(false, "5");
+        //    string sLampT = UpdateSR(false, "4");
+        //    string sLampH = UpdateSR(false, "3");
+        //    string sVISLampLux = UpdateSR(false, "0");
+        //    string sIRLampLux = UpdateSR(false, "1");
+        //    string sControlT = UpdateSR(false, "6");
+        //    string sControlH = UpdateSR(false, "5");
 
-            string sPath = @"C:\Users\ATI\Desktop\MeasureData\SRData";
-
-
-            if (!Directory.Exists(sPath))
-            {
-                Directory.CreateDirectory(sPath);
-            }
-            string sFileName = sPath;
-            //sFileName += "\\";
-            //sFileName += DateTime.Now.ToString("yyyyMMdd");
-            sPath = sFileName;
-            if (Path.GetExtension(sPath) != ".txt")
-                sPath += ".txt";
-            StreamWriter writer;
-            writer = File.AppendText(sPath);
-            writer.WriteLine("[" + DateTime.Now.ToString("yyyyMMdd") + "_" + DateTime.Now.ToString("HH-mm-ss") + "]" + "," + "Lamp T" + "," + sLampT + "," + "Lamp H" + "," + sLampH + "," + "Control T" + "," + sControlT + "," + "Control H" + "," + sControlH + "," + "VISLampLux" + "," + sVISLampLux + "," + "IRLampLux" + "," + sIRLampLux);
-            writer.Close();
+        //    string sPath = @"C:\Users\ATI\Desktop\MeasureData\SRData";
 
 
-        }
+        //    if (!Directory.Exists(sPath))
+        //    {
+        //        Directory.CreateDirectory(sPath);
+        //    }
+        //    string sFileName = sPath;
+        //    //sFileName += "\\";
+        //    //sFileName += DateTime.Now.ToString("yyyyMMdd");
+        //    sPath = sFileName;
+        //    if (Path.GetExtension(sPath) != ".txt")
+        //        sPath += ".txt";
+        //    StreamWriter writer;
+        //    writer = File.AppendText(sPath);
+        //    writer.WriteLine("[" + DateTime.Now.ToString("yyyyMMdd") + "_" + DateTime.Now.ToString("HH-mm-ss") + "]" + "," + "Lamp T" + "," + sLampT + "," + "Lamp H" + "," + sLampH + "," + "Control T" + "," + sControlT + "," + "Control H" + "," + sControlH + "," + "VISLampLux" + "," + sVISLampLux + "," + "IRLampLux" + "," + sIRLampLux);
+        //    writer.Close();
+
+
+        //}
 
         #endregion
     }
