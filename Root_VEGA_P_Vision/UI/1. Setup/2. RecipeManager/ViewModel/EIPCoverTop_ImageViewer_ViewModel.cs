@@ -239,7 +239,8 @@ namespace Root_VEGA_P_Vision
         {
             public static SolidColorBrush OriginBoxColor = Brushes.Blue;
         }
-        CPoint OriginOffset;
+        CPoint OriginOffset = new CPoint(0, 0);
+
         Grid OriginBox;
         TShape CurrentShape;
         TShape CropShape;
