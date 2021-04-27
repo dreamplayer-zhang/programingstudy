@@ -96,21 +96,20 @@ namespace Root_VEGA_P.Module
                     if (Run(m_set.m_regulator.RunPump(m_hPa))) return m_sInfo;
                     if (Run(m_set.m_particleCounter.StartRun(m_sample))) return m_sInfo;
                     bool bBackFlow = false;
-                    double fFlow = 0;
-                    List<double> m_aFlow = new List<double>(); 
+                    double fSumFlow = 0;
+                    int nSumFlow = 0; 
                     while (m_set.m_particleCounter.IsBusy())
                     {
                         Thread.Sleep(100);
                         bBackFlow |= m_set.m_regulator.IsBackFlow();
-                        if (Run(m_set.ReadFlowSensor(ref fFlow))) return m_sInfo;
-                        m_aFlow.Add(fFlow); 
+                        if (Run(m_set.ReadFlowSensor(ref fSumFlow))) return m_sInfo;
+                        fSumFlow += fSumFlow;
+                        nSumFlow++; 
                         if (EQ.IsStop()) return "EQ Stop";
                     }
                     if (bBackFlow) return "BackFlow Sensor Check";
                     if (Run(m_set.m_regulator.RunPump(0))) return m_sInfo;
-                    fFlow = 0;
-                    foreach (double value in m_aFlow) fFlow += value;
-                    if (m_aFlow.Count > 0) fFlow /= m_aFlow.Count; 
+                    if (nSumFlow > 0) fSumFlow /= nSumFlow; 
                     //forget Result ??
                     return "OK";
                 }
@@ -151,7 +150,7 @@ void SaveResult(string sFile, string sTime, bool bBackFlow)
             {
                 for (int n = 0; n < m_aOpen.Count; n++)
                 {
-                    m_aOpen[n] = tree.Set(m_aOpen[n], m_aOpen[n], n.ToString("00"), "Nozzle Open", bVisible); 
+                    m_aOpen[n] = tree.Set(m_aOpen[n], m_aOpen[n], (n + 1).ToString("00"), "Nozzle Open", bVisible); 
                 }
             }
 

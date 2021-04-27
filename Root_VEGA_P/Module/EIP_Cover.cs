@@ -193,12 +193,12 @@ namespace Root_VEGA_P.Module
         }
         #endregion
 
-        VEGA_P m_vegaP;
+        
         ParticleCounterSet m_particleCounterSet;
         public EIP_Cover(string id, IEngineer engineer)
         {
-            m_vegaP = ((VEGA_P_Handler)engineer.ClassHandler()).m_VEGA;
-            m_particleCounterSet = new ParticleCounterSet(this, m_vegaP.m_flowSensor, m_vegaP.m_sample);
+            VEGA_P vegaP = ((VEGA_P_Handler)engineer.ClassHandler()).m_VEGA;
+            m_particleCounterSet = new ParticleCounterSet(this, vegaP.m_flowSensor, vegaP.m_sample);
             InitBase(id, engineer);
         }
 
