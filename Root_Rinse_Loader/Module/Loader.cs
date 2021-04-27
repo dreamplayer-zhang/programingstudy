@@ -103,15 +103,14 @@ namespace Root_Rinse_Loader.Module
                 {
                     Thread.Sleep((int)(1000 * m_secVac));
                     foreach (Picker picker in m_aPicker) picker.m_dioVacuum.Write(picker.m_dioVacuum.p_bIn);
-                    return "OK";
                 }
                 else
                 {
                     m_bCheckStrip = false;
                     foreach (Picker picker in m_aPicker) picker.m_doBlow.Write(true);
                     Thread.Sleep((int)(1000 * m_secBlow));
-                    foreach (Picker picker in m_aPicker) picker.m_doBlow.Write(false);
                 }
+                foreach (Picker picker in m_aPicker) picker.m_doBlow.Write(false);
                 return "OK";
             }
             finally

@@ -266,6 +266,11 @@ namespace Root_Rinse_Unloader.Module
             m_rail.RunMoveWidth(m_rinse.p_widthStrip);
             m_rail.RunPusherDown(m_rinse.p_eMode == RinseU.eRunMode.Stack);
             RunMoveAlign(false);
+            while (m_storage.IsBusy())
+            {
+                if (EQ.IsStop()) return "EQ Stop"; 
+                Thread.Sleep(10);
+            }
             p_bAlignerUp = (m_rinse.p_eMode == RinseU.eRunMode.Magazine);
             RunStopperUp(true);
             RunRotate(true);

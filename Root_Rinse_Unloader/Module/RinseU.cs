@@ -193,9 +193,11 @@ namespace Root_Rinse_Unloader.Module
 
         #region GAF
         ALID m_alidAirEmergency;
+        ALID m_alidLightCurtain; 
         void InitALID()
         {
             m_alidAirEmergency = m_gaf.GetALID(this, "Air Emergency", "Air Emergency");
+            m_alidLightCurtain = m_gaf.GetALID(this, "Light Curtain", "Light Curtain");
         }
         #endregion
 
@@ -359,11 +361,13 @@ namespace Root_Rinse_Unloader.Module
         }
         void CheckLightCurtan()
         {
-            if (m_diLightCurtain.p_bIn == true) m_swLightCurtain.Start();
+            if ((m_diLightCurtain.p_bIn == true) || (p_eMode == eRunMode.Magazine)) m_swLightCurtain.Start();
             if (EQ.p_eState != EQ.eState.Run) return;
             if (m_diLightCurtain.p_bIn == true) return;
             if (m_swLightCurtain.ElapsedMilliseconds > _msLightCurtain)
             {
+                m_swLightCurtain.Start();
+                m_alidLightCurtain.p_bSet = true; 
                 EQ.p_bStop = true;
                 EQ.p_eState = EQ.eState.Error; 
                 p_eState = eState.Error;

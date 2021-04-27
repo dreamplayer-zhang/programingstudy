@@ -88,6 +88,15 @@ namespace Root_Rinse_Unloader.Module
                 return "OK";
             }
 
+            public void CheckInitRunSensor()
+            {
+                if (p_eSensor == eSensor.Empty) return;
+                if (m_diCheck[0].p_bIn) return;
+                if (m_diCheck[1].p_bIn) return;
+                if (m_diCheck[2].p_bIn) return;
+                p_eSensor = eSensor.Empty; 
+            }
+
             string m_id;
             Rail m_rail;
             public Line(string id, Rail rail)
@@ -172,6 +181,7 @@ namespace Root_Rinse_Unloader.Module
                     }
                 }
                 m_dioPusher.Write(false);
+                Thread.Sleep(400); 
                 if (Run(RunPusherDown(false))) return p_sInfo;
                 if (Run(m_dioPusher.RunSol(false))) return p_sInfo;
                 foreach (Line line in m_aLine) line.p_eSensor = Line.eSensor.Empty;
@@ -232,20 +242,21 @@ namespace Root_Rinse_Unloader.Module
 
         double m_secWaitPush = 4;
         double m_secArrive = 2;
-        double m_secArriveTimeout = 8; 
+        double m_secArriveTimeout = 8;
         public string RunRun()
         {
+            foreach (Line line in m_aLine) line.CheckInitRunSensor();
             StopWatch sw = new StopWatch();
-            int msWaitPush = (int)(1000 * m_secWaitPush); 
-            if (Run(RunPusherDown(false))) return p_sInfo; 
+            int msWaitPush = (int)(1000 * m_secWaitPush);
+            if (Run(RunPusherDown(false))) return p_sInfo;
             RunRotate(true);
             while (IsExist() == false)
             {
                 Thread.Sleep(10);
-                if (EQ.IsStop()) return "EQ Stop"; 
+                if (EQ.IsStop()) return "EQ Stop";
             }
             RunRotate(true);
-            while (sw.ElapsedMilliseconds < msWaitPush) Thread.Sleep(10); 
+            while (sw.ElapsedMilliseconds < msWaitPush) Thread.Sleep(10);
             while (IsArrived() == false)
             {
                 RunRotate(true);
@@ -253,8 +264,8 @@ namespace Root_Rinse_Unloader.Module
                 if (EQ.IsStop()) return "EQ Stop";
             }
             RunRotate(true);
-            sw.Start(); 
-            int msArriveTimeout = (int)(1000 * m_secArriveTimeout); 
+            sw.Start();
+            int msArriveTimeout = (int)(1000 * m_secArriveTimeout);
             while (IsReadyPush() == false)
             {
                 Thread.Sleep(10);
@@ -269,8 +280,8 @@ namespace Root_Rinse_Unloader.Module
             Thread.Sleep((int)(1000 * m_secArrive));
             string sRun = RunPusher();
             m_alidPusher.p_bSet = (sRun != "OK");
-            RunRotate(false); 
-            return sRun; 
+            RunRotate(false);
+            return sRun;
         }
 
         bool IsExist()
