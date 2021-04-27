@@ -178,8 +178,8 @@ namespace Root_CAMELLIA
        
             ViewModelInit();
             DialogInit(mainwindow);
-            //UpdateLampTime(true);
-            //UserControl_Loaded();
+            UpdateLampTime(true);
+            LampTimeCount();
             Run_Measure measure = (Run_Measure)p_Module_Camellia.CloneModuleRun("Measure");
             
             this.p_StageCenterPulse = measure.m_StageCenterPos_pulse;
@@ -241,33 +241,9 @@ namespace Root_CAMELLIA
                 SetProperty(ref m_LampUseTime, value);
             }
         }
-        
-
-        public void UpdateLampTime(bool initialize)
+        private void UpdateLampTime(bool Initialize)
         {
-            
-            string InputData = "t";
-            string OutputData = m_PMData.UpdateSR(initialize, InputData);
-            
-                string[] strtext = new string[7] { "H0:", "T0:", "L0:", "H1:", "T1:", "L1:", "Time:" };
-                string[] arr = OutputData.Split(':');
-                string[] strarr = arr[1].Split(',');
-                double LampUseTime = 0.0;
-            if (OutputData.Contains("Time:"))
-            {
-                //형식 월, 일, 시간, 분, 초
-                double Month = Convert.ToDouble(strarr[0]);
-                double Day = Convert.ToDouble(strarr[1]);
-                double Hour = Convert.ToDouble(strarr[2]);
-
-                //LampUseTime = (Month * 30 * 24) + (Day * 24) + Hour; 
-                LampUseTime = 2582 + (Day * 24) + Hour;
-                //string Time = string.Format("{0}:{1}:{2}:{3}:{4}", strarr[0], strarr[1], strarr[2], strarr[3], strarr[4]);
-            }
-            else if (string.IsNullOrEmpty(OutputData))
-            {
-                MessageBox.Show("Time이 없습니다.");
-            }
+            double LampUseTime = UpdateLampData(Initialize, "t");
 
             p_LampTimeCount = LampUseTime;
 
@@ -276,6 +252,57 @@ namespace Root_CAMELLIA
             {
                 LampPMCheck(10000 - LampUseTime);
             }
+        }
+
+        public SerialPort sp = new SerialPort();
+        
+        public double UpdateLampData(bool initialize, string CheckWord)
+        {
+            
+            if (initialize)
+            {
+                sp.PortName = "COM2";
+                sp.BaudRate = 9600;
+                sp.DataBits = 8;
+                sp.StopBits = StopBits.One;
+                sp.Parity = Parity.None;
+                //sp.DataReceived += new SerialDataReceivedEventHandler(serialPort1_DataReceived);
+                sp.Open();
+                sp.Write("c");
+                
+            }
+
+            sp.Write(CheckWord);
+            string OutputData = sp.ReadLine();           
+            string[] strtext = new string[7] { "H0:", "T0:", "L0:", "H1:", "T1:", "L1:", "Time:" };    
+            string[] arr = OutputData.Split(':');
+            string[] strarr = arr[1].Split(',');
+            double LampUseTime = 0.0;
+            double value = 0.0;
+            foreach (string str in strtext)
+            {
+                if (OutputData.Contains(str))
+                {
+                    if (OutputData.Contains("Time:"))
+                    {
+                        //형식 월, 일, 시간, 분, 초
+                        double Month = Convert.ToDouble(strarr[0]);
+                        double Day = Convert.ToDouble(strarr[1]);
+                        double Hour = Convert.ToDouble(strarr[2]);
+
+                        //LampUseTime = (Month * 30 * 24) + (Day * 24) + Hour; 
+                        LampUseTime = 2582 + (Day * 24) + Hour;
+                        value = LampUseTime;
+                       
+                    }
+                    else 
+                    {
+                        MessageBox.Show("Time Data is Null.");
+                    }
+                }
+            }
+            return value;
+           
         }
         readonly object lockobj = new object();
         bool m_bThread = false;
@@ -291,10 +318,51 @@ namespace Root_CAMELLIA
                 }
             }
         }
-        private void UserControl_Loaded()
+        private void LampTimeCount()
         {
             m_thread = new Thread(new ThreadStart(RunThread));
             m_thread.Start();
+        }
+
+        //LampStageCheck/////////////////////////////////////
+
+        private void LampStage ()
+        {
+            bool LampFault = false;
+            bool Controller = false;
+            bool LampON = false;
+            bool LaserON = false;
+            bool VISLightON = false;
+            bool NIRLightON = false;
+
+            if(UpdateLampData(false, "1")>0)
+            {
+                VISLightON = true;
+            }
+            else
+            {
+                VISLightON = false;
+            }
+            if (UpdateLampData(false, "2") > 0)
+            {
+                NIRLightON = true;
+            }
+            else
+            {
+                NIRLightON = false;
+            }
+
+            if (App.m_nanoView.GetLightSourceStatus(ref LampFault, ref Controller, ref LampON, ref LaserON) != Met.Nanoview.ERRORCODE_NANOVIEW.SR_NO_ERROR)
+            {
+              
+            }
+        }
+        public enum CheckLampState
+        {
+            Error = 0,  
+            ON = 1, 
+            WarmUP = 2,
+            OFF = 3
         }
 
         #endregion

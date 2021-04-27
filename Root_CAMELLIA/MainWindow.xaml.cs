@@ -190,17 +190,17 @@ namespace Root_CAMELLIA
             EQ.p_eState = EQ.eState.Home;
 
 
-            Application.Current.Dispatcher.Invoke(delegate ()
-            {
-                while(EQ.p_eState == EQ.eState.Home)
-                {
-                    if (EQ.IsStop())
-                    {
-                        EQ.p_eState = EQ.eState.Error;
-                    }
-                }
-                m_handler.m_process.ClearInfoWafer();
-            });
+            //Application.Current.Dispatcher.Invoke(delegate ()
+            //{
+            //    while(EQ.p_eState == EQ.eState.Home)
+            //    {
+            //        if (EQ.IsStop())
+            //        {
+            //            EQ.p_eState = EQ.eState.Error;
+            //        }
+            //    }
+            //    m_handler.m_process.ClearInfoWafer();
+            //});
            
             //Camellia Camera Connect
         }
