@@ -151,7 +151,7 @@ namespace Root_Rinse_Unloader.Module
         {
             try
             {
-                if (Run(m_storage.MoveMagazine(false))) return p_sInfo; //forget
+                if (Run(m_storage.MoveMagazine(false))) return p_sInfo; 
                 if (Run(m_dioPusher.RunSol(false))) return p_sInfo;
                 if (Run(RunPusherDown(true))) return p_sInfo;
                 while (m_storage.IsBusy())
@@ -172,6 +172,7 @@ namespace Root_Rinse_Unloader.Module
                     }
                 }
                 m_dioPusher.Write(false);
+                Thread.Sleep(300); 
                 if (Run(RunPusherDown(false))) return p_sInfo;
                 if (Run(m_dioPusher.RunSol(false))) return p_sInfo;
                 foreach (Line line in m_aLine) line.p_eSensor = Line.eSensor.Empty;
