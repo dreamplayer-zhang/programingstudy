@@ -103,7 +103,13 @@ namespace Root_CAMELLIA.Module
                 //}
                 if (EQ.IsStop())
                 {
-                    while (thicknessQueue.TryDequeue(out index)) ;
+                    while (thicknessQueue.TryDequeue(out index))
+                    {
+                        if (EQ.IsStop())
+                        {
+                            break;
+                        }
+                    }
                     m_CalcThicknessDone = true;
                     break;
                 }
@@ -424,6 +430,8 @@ namespace Root_CAMELLIA.Module
             }
 
             MeasureDone = true;
+
+            m_log.Warn("Calc Thickness 대기 >> " + test.ElapsedMilliseconds);
             while (!m_CalcThicknessDone)
             {
                 if (EQ.IsStop())
@@ -433,6 +441,7 @@ namespace Root_CAMELLIA.Module
                     return "EQ Stop";
                 }
             }
+            m_log.Warn("Calc Thickness 끝 >> " + test.ElapsedMilliseconds);
 
             //? 세이브?
 

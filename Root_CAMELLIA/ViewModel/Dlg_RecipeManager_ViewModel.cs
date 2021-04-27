@@ -3886,7 +3886,7 @@ namespace Root_CAMELLIA
                     dialog.InitialDirectory = BaseDefine.Dir_Recipe;
                     if (dialog.ShowDialog() == true)
                     {
-                        dialog.FileName = AddFolderPath(dialog.FileName);
+                        //dialog.FileName = AddFolderPath(dialog.FileName);
 
                         customizePath = System.IO.Path.GetFileName(dialog.FileName);
                         customizePath = customizePath.Remove(customizePath.Length - 4);

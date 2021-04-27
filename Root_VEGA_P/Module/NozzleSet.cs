@@ -75,6 +75,12 @@ namespace Root_VEGA_P.Module
             for (int n = 0; n < p_nNozzle; n++) m_doNozzle.Write(n, n == nNozzle); 
             return "OK";
         }
+
+        public string RunCloseAllNozzle()
+        {
+            for (int n = 0; n < p_nNozzle; n++) m_doNozzle.Write(n, false);
+            return "OK";
+        }
         #endregion
 
         #region Tree

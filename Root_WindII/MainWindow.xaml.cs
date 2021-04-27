@@ -18,9 +18,9 @@ namespace Root_WindII
         WindII_Engineer m_engineer = new WindII_Engineer();
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            if (!Directory.Exists(@"C:\Recipe\Wind2")) Directory.CreateDirectory(@"C:\Recipe\Wind2");
-            m_engineer.Init("Wind2");
-            engineerUI.Init(m_engineer);
+            //if (!Directory.Exists(@"C:\Recipe\Wind2")) Directory.CreateDirectory(@"C:\Recipe\Wind2");
+            //m_engineer.Init("Wind2");
+            //engineerUI.Init(m_engineer);
         }
 
         private void Window_Closing(object sender, CancelEventArgs e)

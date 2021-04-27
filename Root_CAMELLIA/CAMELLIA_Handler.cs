@@ -244,7 +244,7 @@ namespace Root_CAMELLIA
         void InitAligner()
         {
             
-            switch (m_eAligner)
+         switch (m_eAligner)
             {
                 case eAligner.ATI: m_Aligner = new Aligner_ATI("Aligner", m_engineer); break;
                 case eAligner.RND: m_Aligner = new Aligner_RND("Aligner", m_engineer); break;

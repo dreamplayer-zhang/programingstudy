@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:Root_CAMELLIA"
         mc:Ignorable="d"
         WindowStyle="None"
-        WindowStartupLocation="CenterScreen"
+        WindowStartupLocation="CenterScreen" ResizeMode="NoResize"
         Background="#FFEEEEEE"
         Title="HomeProgress_UI" 
         Topmost="True"
