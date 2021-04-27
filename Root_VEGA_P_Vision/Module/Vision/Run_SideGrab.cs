@@ -20,6 +20,7 @@ namespace Root_VEGA_P_Vision.Module
         string sSideGrabMode;
         Vision.SideOptic.eSide side;
         double rowPos, colPos;
+        long BFExpose,Expose45,ringExpose;
         public Run_SideGrab(Vision module)
         {
             m_module = module;
@@ -46,6 +47,9 @@ namespace Root_VEGA_P_Vision.Module
             run.side = side;
             run.rowPos = rowPos;
             run.colPos = colPos;
+            run.Expose45 = Expose45;
+            run.BFExpose = BFExpose;
+            run.ringExpose = ringExpose;
             return run;
         }
 
@@ -56,7 +60,9 @@ namespace Root_VEGA_P_Vision.Module
             side = (Vision.SideOptic.eSide)tree.Set(side, side, "Scan Direction", "Side Scan Direction", bVisible);
             rowPos = tree.Set(rowPos, rowPos, "Side Row Scan Pos", "Side Row Scan Pos", bVisible);
             colPos = tree.Set(colPos, colPos, "Side Col Scan Pos", "Side Col Scan Pos", bVisible);
-
+            Expose45 = tree.Set(Expose45, Expose45, "45 Degree Exposure Time", "45 Degree Exposure Time", bVisible);
+            BFExpose = tree.Set(BFExpose, BFExpose, "BF Exposure Time", "BF Exposure Time", bVisible);
+            ringExpose = tree.Set(ringExpose, ringExpose, "Ring Exposure Time", "Ring Exposure Time", bVisible);
         }
 
         public override string Run()
@@ -117,16 +123,22 @@ namespace Root_VEGA_P_Vision.Module
                     scannum = 1;
 
 
+                SidegrabMode.SetLight(false);
 
                 for (int j = 0; j < scannum; j++)
                 {
-                    SidegrabMode.SetLight(false);
-
                     MemoryData mem;
+                    double rotate = 0;
                     if (scannum == 1)
+                    {
                         mem = sideOpt.GetMemoryData(parts, side);
+                        rotate = 90000 * (int)side;
+                    }
                     else
+                    {
                         mem = sideOpt.GetMemoryData(parts, (Vision.SideOptic.eSide)j);
+                        rotate = 90000 * j;
+                    }
 
                     double posX = 0;
 
@@ -135,9 +147,9 @@ namespace Root_VEGA_P_Vision.Module
                     else
                         posX = colPos;
 
-                    if (m_module.Run(axisR.StartMove(90000 * j)))
+                    if (m_module.Run(axisR.StartMove(rotate)))
                         return p_sInfo;
-                    if (m_module.Run(axisXY.p_axisY.WaitReady()))
+                    if (m_module.Run(axisR.WaitReady()))
                         return p_sInfo;
 
                     if (m_module.Run(axisXY.p_axisX.StartMove(posX)))
@@ -146,11 +158,27 @@ namespace Root_VEGA_P_Vision.Module
                         return p_sInfo;
 
 
-                    //for (int lc = 0; lc < lightcnt; lc++)
-                    //{
-                        SidegrabMode.SetLight(illumList[1], true);
-                        
-                        IntPtr ptr = mem.GetPtr(0);
+                    for (int lc = 0; lc < lightcnt; lc++)
+                    {
+                        long expose = 0;
+                        switch(SidegrabMode.m_lightSet.m_aLight[illumList[lc]].m_sName)
+                        {
+                            case "Side BF":
+                                expose = BFExpose;
+                                break;
+                            case "Side Power":
+                                expose = Expose45;
+                                break;
+                            case "Side Ring":
+                                expose = ringExpose;
+                                break;
+                        }
+
+                        camSide.SetExposureTime(expose);
+
+                        SidegrabMode.SetLight(illumList[lc], true);
+
+                        IntPtr ptr = mem.GetPtr(lc);
 
                         for (int x = 0; x < nXCount; x++)
                         {
@@ -172,8 +200,8 @@ namespace Root_VEGA_P_Vision.Module
                                 Marshal.Copy(camSide.p_ImageData.m_aBuf, i * nCamWidth, (IntPtr)((long)ptr + ((nCamWidth * x) + (mem.W * i))), nCamWidth);
                             });
                         }
-
-                    //}
+                        SidegrabMode.SetLight(false);
+                    }
                 }
                 //enum 순서 고려해야됨
 
