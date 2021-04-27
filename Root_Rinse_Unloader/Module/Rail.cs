@@ -272,8 +272,8 @@ namespace Root_Rinse_Unloader.Module
                 if (EQ.IsStop()) return "EQ Stop";
                 if (sw.ElapsedMilliseconds > msArriveTimeout)
                 {
+                    m_alidArrived.p_bSet = true; 
                     RunRotate(false);
-                    EQ.p_eState = EQ.eState.Error;
                     return "Arrive Timeout";
                 }
             }
@@ -363,19 +363,11 @@ namespace Root_Rinse_Unloader.Module
             {
                 case RinseU.eRunMode.Magazine:
                     RunMoveWidth(m_rinse.p_widthStrip);
-                    if (RunPusherDown(false) != "OK")
-                    {
-                        EQ.p_bStop = true;
-                        p_eState = eState.Error; 
-                    }
+                    if (RunPusherDown(false) != "OK") m_alidPusher.p_bSet = true; 
                     RunRotate(true);
                     break;
                 case RinseU.eRunMode.Stack:
-                    if (RunPusherDown(true) != "OK")
-                    {
-                        EQ.p_bStop = true;
-                        p_eState = eState.Error;
-                    }
+                    if (RunPusherDown(true) != "OK") m_alidPusher.p_bSet = true; 
                     RunRotate(false);
                     break;
             }

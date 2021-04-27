@@ -273,12 +273,7 @@ namespace Root_Rinse_Unloader.Module
                 if (_bEMG == value) return;
                 _bEMG = value;
                 OnPropertyChanged();
-                if (value)
-                {
-                    EQ.p_bStop = true;
-                    EQ.p_eState = EQ.eState.Error;
-                    m_alidAirEmergency.p_bSet = true;
-                }
+                if (value) m_alidAirEmergency.p_bSet = true;
             }
         }
 
@@ -291,12 +286,7 @@ namespace Root_Rinse_Unloader.Module
                 if (_bAir == value) return;
                 _bAir = value;
                 OnPropertyChanged();
-                if (value)
-                {
-                    EQ.p_bStop = true;
-                    EQ.p_eState = EQ.eState.Error;
-                    m_alidAirEmergency.p_bSet = true;
-                }
+                if (value) m_alidAirEmergency.p_bSet = true;
             }
         }
 
@@ -368,8 +358,6 @@ namespace Root_Rinse_Unloader.Module
             {
                 m_swLightCurtain.Start();
                 m_alidLightCurtain.p_bSet = true; 
-                EQ.p_bStop = true;
-                EQ.p_eState = EQ.eState.Error; 
                 p_eState = eState.Error;
                 p_sInfo = "Light Curtain Check Timeout";
             }

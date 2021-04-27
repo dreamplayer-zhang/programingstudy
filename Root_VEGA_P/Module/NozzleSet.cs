@@ -38,7 +38,7 @@ namespace Root_VEGA_P.Module
         #endregion
 
         #region Property
-        string[] m_asNozzle = new string[1] { "1" };
+        string[] m_asNozzle = new string[1] { "01" };
         int _nNozzle = 1; 
         public int p_nNozzle
         {
