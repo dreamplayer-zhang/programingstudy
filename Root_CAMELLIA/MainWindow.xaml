@@ -29,9 +29,11 @@
         <local:AxisToStageUIConverter x:Key="AxisToStageConverter"/>
         <local:MeasurePointToStageUIConverter x:Key="PointToStageConverter"/>
         <local:DoubleToProgressConverter x:Key="ProgressConverter"/>
-        <local:LampStateToColorConverter x:Key="LampStateConverter"/>
+        <local:OpticLampStateColorConverter x:Key="OpticLampStateColorConverter"/>
         <local:BoolToLoginStateConverter x:Key="LoginStateConverter"/>
         <local:BoolToBrushConverter x:Key="LoginStateBrushConverter"/>
+        <local:OpticLampStatusEnumToStringConverter x:Key="OpticLampStatusEnumConverter"/>
+        <local:OpticLampTimeToStringConverter x:Key="OpticLampTimeToStringConverter"/>
     </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
@@ -691,6 +693,16 @@
                                                                 </Style>
                                                             </DataGridComboBoxColumn.EditingElementStyle>
                                                         </DataGridComboBoxColumn>
+                                                        <DataGridTextColumn Width="50" Binding="{Binding ThicknessScale, StringFormat=N1, UpdateSourceTrigger=LostFocus, Mode=TwoWay}">
+                                                            <DataGridTextColumn.Header>
+                                                                <TextBlock Text="Scale" Style="{StaticResource GridHeaderStyle}" />
+                                                            </DataGridTextColumn.Header>
+                                                        </DataGridTextColumn>
+                                                        <DataGridTextColumn Width="50" Binding="{Binding ThicknessOffset, StringFormat=N1, UpdateSourceTrigger=LostFocus, Mode=TwoWay}">
+                                                            <DataGridTextColumn.Header>
+                                                                <TextBlock Text="Offset" Style="{StaticResource GridHeaderStyle}" />
+                                                            </DataGridTextColumn.Header>
+                                                        </DataGridTextColumn>
                                                     </DataGrid.Columns>
                                                 </DataGrid>
                                                 <UniformGrid Columns="2" Grid.Row="1">
@@ -849,7 +861,7 @@
                             Click="buttonOHT_Click"/>
                 </StackPanel>
 
-                <GroupBox Grid.Column="3" Grid.Row="1" Header="Lamp" Margin="3">
+                <GroupBox Grid.Column="3" Grid.Row="1" Header="Lamp" Margin="3" BorderBrush="Black">
                     <Grid Grid.Row="1" Grid.Column="3">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="1*"/>
@@ -865,18 +877,18 @@
                                 <ColumnDefinition Width="6*"/>
                                 <ColumnDefinition Width="4*"/>
                             </Grid.ColumnDefinitions>
-                            <TextBlock Grid.Row="1" Grid.Column="0" Text="{Binding p_LampTimeCount ,UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,0" VerticalAlignment="Center" TextAlignment="Right" HorizontalAlignment="Center" Width="80" FontSize="15"/>
+                            <TextBlock Grid.Row="1" Grid.Column="0" Text="{Binding p_lampUsetime ,UpdateSourceTrigger=PropertyChanged}" FontWeight="Bold" FontStyle="Italic" Margin="0,0,0,0" VerticalAlignment="Center" TextAlignment="Right" HorizontalAlignment="Center" Width="80" FontSize="15"/>
                             <TextBlock Grid.Row="1" Grid.Column="1" Text="Hours"  Margin="0,0,0,0" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="15" FontWeight="Bold"/>
                         </Grid>
-                        <TextBlock Grid.Row="2" Text="{Binding p_LampTimeError ,UpdateSourceTrigger=PropertyChanged}" Margin="5,0,5,0" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="10" Foreground="Red" />
+                        <TextBlock Grid.Row="2" Text="{Binding p_lampUsetime, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource OpticLampTimeToStringConverter}}" Margin="5,0,5,0" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="10" FontWeight="Bold" Foreground="Red" />
                         <TextBlock Grid.Row="3" Text="Lamp Status" FontSize="15" ToolTip="Lamp Status" TextTrimming="WordEllipsis" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="5,10,5,10" />
                         <Grid Grid.Row="4">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition/>
                                 <ColumnDefinition/>
                             </Grid.ColumnDefinitions>
-                            <PackIcon:PackIconMaterial Margin="25,0,0,0" Width="auto" Height="auto" Kind="LightbulbOn" Foreground="Crimson" />
-                            <TextBlock Grid.Column="1" FontSize="15" FontWeight="Bold" Text="Error" HorizontalAlignment="Center" VerticalAlignment="Center" TextAlignment="Center"/>
+                            <PackIcon:PackIconMaterial Margin="25,0,0,0" Width="auto" Height="auto" Kind="LightbulbOn" Foreground="{Binding p_lampStatus, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource OpticLampStateColorConverter}}" />
+                            <TextBlock Grid.Column="1" FontSize="15" FontWeight="Bold" Text="{Binding p_lampStatus, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource OpticLampStatusEnumConverter}}" HorizontalAlignment="Center" VerticalAlignment="Center" TextAlignment="Center"/>
                         </Grid>
                        
 

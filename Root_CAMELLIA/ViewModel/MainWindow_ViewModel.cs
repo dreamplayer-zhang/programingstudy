@@ -24,7 +24,6 @@ namespace Root_CAMELLIA
     public class MainWindow_ViewModel : ObservableObject
     {
         private MainWindow m_MainWindow;
-        Met.PMDatas m_PMData = new Met.PMDatas();
         private DataManager _DataManager;
         public DataManager DataManager {
             get
@@ -178,8 +177,7 @@ namespace Root_CAMELLIA
        
             ViewModelInit();
             DialogInit(mainwindow);
-            UpdateLampTime(true);
-            LampTimeCount();
+            
             Run_Measure measure = (Run_Measure)p_Module_Camellia.CloneModuleRun("Measure");
             
             this.p_StageCenterPulse = measure.m_StageCenterPos_pulse;
@@ -200,172 +198,6 @@ namespace Root_CAMELLIA
             p_Module_Camellia.p_CamVRS.Captured += GetImage;
         }
 
-        #region Lamp Check Parameter
-        Thread m_thread;
-        public string m_LampTImeError= "";
-        public string p_LampTimeError
-        {
-            get
-            {
-                return m_LampTImeError;
-            }
-            set
-            {
-                SetProperty(ref m_LampTImeError, value);
-            }
-        }
-
-        private void LampPMCheck(double dLeftLampTime)
-        {
-            if (dLeftLampTime >= 0)
-            {
-                string sLeftLampTime = dLeftLampTime.ToString();
-                p_LampTimeError = sLeftLampTime + " Hours Left until PM !";
-
-            }
-            else
-            {
-                p_LampTimeError = "Please, Do Lamp PM";
-            }
-        }
-
-        public double m_LampUseTime = 0.0;
-        public double p_LampTimeCount
-        {
-            get
-            {
-                return m_LampUseTime;
-            }
-            set
-            {
-                SetProperty(ref m_LampUseTime, value);
-            }
-        }
-        private void UpdateLampTime(bool Initialize)
-        {
-            double LampUseTime = UpdateLampData(Initialize, "t");
-
-            p_LampTimeCount = LampUseTime;
-
-
-            if (LampUseTime > 9500)
-            {
-                LampPMCheck(10000 - LampUseTime);
-            }
-        }
-
-        public SerialPort sp = new SerialPort();
-        
-        public double UpdateLampData(bool initialize, string CheckWord)
-        {
-            
-            if (initialize)
-            {
-                sp.PortName = "COM2";
-                sp.BaudRate = 9600;
-                sp.DataBits = 8;
-                sp.StopBits = StopBits.One;
-                sp.Parity = Parity.None;
-                //sp.DataReceived += new SerialDataReceivedEventHandler(serialPort1_DataReceived);
-                sp.Open();
-                sp.Write("c");
-                
-            }
-
-            sp.Write(CheckWord);
-            string OutputData = sp.ReadLine();           
-            string[] strtext = new string[7] { "H0:", "T0:", "L0:", "H1:", "T1:", "L1:", "Time:" };    
-            string[] arr = OutputData.Split(':');
-            string[] strarr = arr[1].Split(',');
-            double LampUseTime = 0.0;
-            double value = 0.0;
-            foreach (string str in strtext)
-            {
-                if (OutputData.Contains(str))
-                {
-                    if (OutputData.Contains("Time:"))
-                    {
-                        //형식 월, 일, 시간, 분, 초
-                        double Month = Convert.ToDouble(strarr[0]);
-                        double Day = Convert.ToDouble(strarr[1]);
-                        double Hour = Convert.ToDouble(strarr[2]);
-
-                        //LampUseTime = (Month * 30 * 24) + (Day * 24) + Hour; 
-                        LampUseTime = 2582 + (Day * 24) + Hour;
-                        value = LampUseTime;
-                       
-                    }
-                    else 
-                    {
-                        MessageBox.Show("Time Data is Null.");
-                    }
-                }
-            }
-            return value;
-           
-        }
-        readonly object lockobj = new object();
-        bool m_bThread = false;
-        void RunThread()
-        {
-            m_bThread = true;
-            while (m_bThread)
-            {
-                Thread.Sleep(3600000);
-                lock (lockobj)
-                {
-                    UpdateLampTime(false);
-                }
-            }
-        }
-        private void LampTimeCount()
-        {
-            m_thread = new Thread(new ThreadStart(RunThread));
-            m_thread.Start();
-        }
-
-        //LampStageCheck/////////////////////////////////////
-
-        private void LampStage ()
-        {
-            bool LampFault = false;
-            bool Controller = false;
-            bool LampON = false;
-            bool LaserON = false;
-            bool VISLightON = false;
-            bool NIRLightON = false;
-
-            if(UpdateLampData(false, "1")>0)
-            {
-                VISLightON = true;
-            }
-            else
-            {
-                VISLightON = false;
-            }
-            if (UpdateLampData(false, "2") > 0)
-            {
-                NIRLightON = true;
-            }
-            else
-            {
-                NIRLightON = false;
-            }
-
-            if (App.m_nanoView.GetLightSourceStatus(ref LampFault, ref Controller, ref LampON, ref LaserON) != Met.Nanoview.ERRORCODE_NANOVIEW.SR_NO_ERROR)
-            {
-              
-            }
-        }
-        public enum CheckLampState
-        {
-            Error = 0,  
-            ON = 1, 
-            WarmUP = 2,
-            OFF = 3
-        }
-
-        #endregion
         private void GetImage(object obj, EventArgs e)
         {
             Application.Current.Dispatcher.Invoke(() =>
@@ -385,6 +217,8 @@ namespace Root_CAMELLIA
                 p_imageSource = ImageHelper.ToBitmapSource(img);
                 //}
                 //p_rootViewer.SetImageSource();
+                
+              
             });
            
         }
@@ -933,40 +767,75 @@ namespace Root_CAMELLIA
 
         #region Timer
         DispatcherTimer m_timer = new DispatcherTimer();
-        private DispatcherTimer m_LightSourcetimer = new DispatcherTimer();
-        private string m_LightSourcePath = "";
+        DispatcherTimer m_statusTimer = new DispatcherTimer();
+        //private DispatcherTimer m_LightSourcetimer = new DispatcherTimer();
+        //private string m_LightSourcePath = "";
         public string p_LightSourcePath { get; set; }
         public void InitTimer()
         {
-            //m_timer.Interval = TimeSpan.FromMilliseconds(100);
-            //m_timer.Tick += M_timer_Tick;
-            //m_timer.Start();
-            p_LightSourcePath = SettingViewModel.m_reg.Read(BaseDefine.RegLightSourcePath, m_LightSourcePath);
+            //m_timer.Interval = TimeSpan.FromMinutes(60);
+            p_lampUsetime = App.m_nanoView.UpdateLampData("t");
+            p_lampStatus = App.m_nanoView.LampState();
 
-            m_LightSourcetimer.Interval = TimeSpan.FromMinutes(5);
-            m_LightSourcetimer.Tick += LightSourceTimer_Tick;
-            m_LightSourcetimer.Start();
+            m_timer.Interval = TimeSpan.FromMinutes(60);
+            m_timer.Tick += M_timer_Tick;
+            m_timer.Start();
+
+            m_statusTimer.Interval = TimeSpan.FromMinutes(5);
+            m_statusTimer.Tick += M_timer_StatusTick;
+            m_statusTimer.Start();
+            ////m_timer.Interval = TimeSpan.FromMilliseconds(100);
+            ////m_timer.Tick += M_timer_Tick;
+            ////m_timer.Start();
+            //p_LightSourcePath = SettingViewModel.m_reg.Read(BaseDefine.RegLightSourcePath, m_LightSourcePath);
+
+            //m_LightSourcetimer.Interval = TimeSpan.FromMinutes(5);
+            //m_LightSourcetimer.Tick += LightSourceTimer_Tick;
+            //m_LightSourcetimer.Start();
 
             //p_LightSourcePath = SettingViewModel.p_LightSourceLogPath;
             //p_LightSourcePath = SettingViewModel.m_reg.Read(BaseDefine.RegLightSourcePath, m_LightSourcePath);
         }
 
+        private double m_lampUseTime = 0;
+        public double p_lampUsetime
+        {
+            get
+            {
+                return m_lampUseTime;
+            }
+            set
+            {
+                SetProperty(ref m_lampUseTime, value);
+            }
+        }
+
+        private Met.Nanoview.CheckLampState m_lampStatus;
+        public Met.Nanoview.CheckLampState p_lampStatus
+        {
+            get
+            {
+                return m_lampStatus;
+            }
+            set
+            {
+                SetProperty(ref m_lampStatus, value);
+            }
+        }
+        private void M_timer_StatusTick(object sender, EventArgs e)
+        {
+            p_lampStatus = App.m_nanoView.LampState();
+        }
         private void M_timer_Tick(object sender, EventArgs e)
         {
-
+            p_lampUsetime = App.m_nanoView.UpdateLampData("t");
+            //p_LampStatus = App.m_nanoView.GetLightSourceStatus();
             //tbTime.Text = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
-        }
-        private void LightSourceTimer_Tick(object sender, EventArgs e)
-        {
-            if(p_LightSourcePath != "")
-            {
-                 App.m_nanoView.LightSourceLogging(p_LightSourcePath);
-            }
         }
 
         public void LightSourceTimer_Stop()
         {
-            m_LightSourcetimer.Stop();
+            //m_LightSourcetimer.Stop();
         }
 
         GaugeChart m_Test = new GaugeChart();
@@ -1286,6 +1155,8 @@ namespace Root_CAMELLIA
                 {
                     
                     m_MainWindow.Close();
+                    m_timer.Stop();
+                    m_statusTimer.Stop();
                     App.m_engineer.ThreadStop();
                     DataManager.Instance.m_SaveMeasureData.ThreadStop();
                     App.m_engineer.BuzzerOff();

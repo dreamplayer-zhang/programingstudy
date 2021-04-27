@@ -119,6 +119,14 @@ namespace Root_CAMELLIA
                         if (child.IsWaferExist(0) == false) return false;
                         if (child.IsWaferExist(0) == true) return true;
                     }
+                    else
+                    {
+                        //if (!child.IsWaferExist(0))
+                        //{
+                        //    child.SetAlarm();
+                        //    return false;
+                        //}
+                    }
                 }
                 else if (child.p_infoWafer == null)
                 {
@@ -133,7 +141,14 @@ namespace Root_CAMELLIA
                 }
                 else if(child.p_infoWafer != null)
                 {
-                    
+                    //if (!child.p_id.Contains("Loadport"))
+                    //{
+                    //    if (!child.IsWaferExist(0))
+                    //    {
+                    //        child.SetAlarm();
+                    //        return false;
+                    //    }
+                    //}
                 }
             }
             return iWTR.IsEnableRecovery();
