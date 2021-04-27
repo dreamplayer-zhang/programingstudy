@@ -7,7 +7,7 @@
         xmlns:local="clr-namespace:Root_CAMELLIA"
         xmlns:Icon ="clr-namespace:Root_CAMELLIA.Control.Icon"
         mc:Ignorable="d"
-        WindowStyle="None"
+        WindowStyle="None" Topmost="True"
         WindowStartupLocation="CenterScreen" ShowInTaskbar="False"
         ResizeMode="NoResize"
         Title="Login" Height="290" Width="300" Background="Transparent" AllowsTransparency="True">

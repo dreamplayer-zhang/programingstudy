@@ -1,5 +1,6 @@
 ﻿using RootTools;
 using RootTools.Control;
+using RootTools.GAFs;
 using RootTools.Module;
 using RootTools.ToolBoxs;
 using RootTools.Trees;
@@ -21,8 +22,19 @@ namespace Root_Rinse_Loader.Module
             p_sInfo = m_toolBox.GetAxis(ref m_axis, this, "Elevator"); 
             if (bInit) 
             {
+                InitALID(); 
                 InitPosElevator(); 
             }
+        }
+        #endregion
+
+        #region GAF
+        ALID m_alidPusherOverload;
+        ALID m_alidPickerDrop;
+        void InitALID()
+        {
+            m_alidPusherOverload = m_gaf.GetALID(this, "PusherOverload", "Pusher Overload Error");
+            m_alidPickerDrop = m_gaf.GetALID(this, "PickerDrop", "Picker Drop Strip");
         }
         #endregion
 
@@ -184,7 +196,7 @@ namespace Root_Rinse_Loader.Module
                 if (m_diOverload.p_bIn)
                 {
                     m_dioPusher.Write(false);
-                    EQ.p_bStop = true;
+                    m_alidPusherOverload.p_bSet = true; 
                     return "Overload Sensor Check";
                 }
                 if (sw.ElapsedMilliseconds > msWait)

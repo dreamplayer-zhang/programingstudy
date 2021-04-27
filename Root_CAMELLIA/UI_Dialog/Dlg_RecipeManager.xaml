@@ -261,28 +261,28 @@
                                         <TextBlock Text="fit" Style="{StaticResource GridHeaderStyle}" />
                                     </DataGridCheckBoxColumn.Header>
                                 </DataGridCheckBoxColumn>
-                                <DataGridComboBoxColumn Width="*"  SelectedValueBinding="{Binding SelectedGuest2, UpdateSourceTrigger=PropertyChanged}" DisplayMemberPath="Name" SelectedValuePath="FullPath">
+                                <DataGridComboBoxColumn Width="*" SelectedValueBinding="{Binding SelectedEmm, UpdateSourceTrigger=PropertyChanged}">
                                     <DataGridComboBoxColumn.Header>
-                                        <TextBlock Text="Guest2" Style="{StaticResource GridHeaderStyle}" />
+                                        <TextBlock Text="Emm" Style="{StaticResource GridHeaderStyle}" />
                                     </DataGridComboBoxColumn.Header>
                                     <DataGridComboBoxColumn.ElementStyle>
                                         <Style TargetType="ComboBox">
-                                            <Setter Property="ItemsSource" Value="{Binding Guest2, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                            <Setter Property="ItemsSource" Value="{Binding Emm, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                                             <Setter Property="IsReadOnly" Value="True"/>
                                         </Style>
                                     </DataGridComboBoxColumn.ElementStyle>
                                     <DataGridComboBoxColumn.EditingElementStyle>
                                         <Style TargetType="ComboBox">
-                                            <Setter Property="ItemsSource" Value="{Binding Guest2, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                            <Setter Property="ItemsSource" Value="{Binding Emm, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                                         </Style>
                                     </DataGridComboBoxColumn.EditingElementStyle>
                                 </DataGridComboBoxColumn>
-                                <DataGridTextColumn Width="50" Binding="{Binding Scale, StringFormat=N1, UpdateSourceTrigger=LostFocus, Mode=TwoWay}">
+                                <DataGridTextColumn Width="50" Binding="{Binding ThicknessScale, StringFormat=N1, UpdateSourceTrigger=LostFocus, Mode=TwoWay}">
                                     <DataGridTextColumn.Header>
                                         <TextBlock Text="Scale" Style="{StaticResource GridHeaderStyle}" />
                                     </DataGridTextColumn.Header>
                                 </DataGridTextColumn>
-                                <DataGridTextColumn Width="50" Binding="{Binding Offset, StringFormat=N1, UpdateSourceTrigger=LostFocus, Mode=TwoWay}">
+                                <DataGridTextColumn Width="50" Binding="{Binding ThicknessOffset, StringFormat=N1, UpdateSourceTrigger=LostFocus, Mode=TwoWay}">
                                     <DataGridTextColumn.Header>
                                         <TextBlock Text="Offset" Style="{StaticResource GridHeaderStyle}" />
                                     </DataGridTextColumn.Header>

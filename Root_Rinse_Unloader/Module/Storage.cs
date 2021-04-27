@@ -1,5 +1,6 @@
 ﻿using RootTools;
 using RootTools.Control;
+using RootTools.GAFs;
 using RootTools.Module;
 using RootTools.ToolBoxs;
 using RootTools.Trees;
@@ -19,8 +20,17 @@ namespace Root_Rinse_Unloader.Module
             p_sInfo = m_toolBox.GetAxis(ref m_axis, this, "Elevator");
             if (bInit)
             {
+                InitALID(); 
                 InitPosElevator();
             }
+        }
+        #endregion
+
+        #region GAF
+        ALID m_alidMagazineFull;
+        void InitALID()
+        {
+            m_alidMagazineFull = m_gaf.GetALID(this, "MagazineFull", "MagazineFull Error");
         }
         #endregion
 
@@ -321,7 +331,10 @@ namespace Root_Rinse_Unloader.Module
         {
             switch (eMagazine)
             {
-                case eMagazine.Magazine1: return "Magazine Full";
+                case eMagazine.Magazine1:
+                    m_alidMagazineFull.p_bSet = true; 
+                    m_rinse.RunBuzzer(RinseU.eBuzzer.Finish); 
+                    return "Magazine Full";
                 case eMagazine.Magazine2: m_rinse.p_eMagazine = eMagazine.Magazine1; break;
                 case eMagazine.Magazine3: m_rinse.p_eMagazine = eMagazine.Magazine2; break;
                 case eMagazine.Magazine4: m_rinse.p_eMagazine = eMagazine.Magazine3; break;

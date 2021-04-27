@@ -21,6 +21,7 @@ namespace Root_CAMELLIA.Module
         bool m_useCalWafer = true;
         bool m_useRefWafer = true;
         bool m_InitialCal = true;
+        int m_nCalibrationCnt = 1;
 
         (Met.SettingData, Met.Nanoview.ERRORCODE_NANOVIEW) m_SettingDataWithErrorCode;
         public bool m_isPM = false;
@@ -40,6 +41,7 @@ namespace Root_CAMELLIA.Module
             run.m_useCalWafer = m_useCalWafer;
             run.m_useRefWafer = m_useRefWafer;
             run.m_InitialCal = m_InitialCal;
+            run.m_nCalibrationCnt = m_nCalibrationCnt;
             return run;
         }
 
@@ -50,6 +52,7 @@ namespace Root_CAMELLIA.Module
             m_useCalWafer = tree.Set(m_useCalWafer, m_useCalWafer, "Use Cal Wafer", "Use Cal Wafer", bVisible);
             m_useRefWafer = tree.Set(m_useRefWafer, m_useRefWafer, "Use Ref Wafer", "Use Ref Wafer", bVisible);
             m_InitialCal = tree.Set(m_InitialCal, m_InitialCal, "Initial Calibration", "Initial Calibration", bVisible);
+            m_nCalibrationCnt = tree.Set(m_nCalibrationCnt, m_nCalibrationCnt, "Calibration Retry Count", "Calibration Retry", bVisible);
 
         }
 
@@ -73,18 +76,18 @@ namespace Root_CAMELLIA.Module
                 if (m_module.Run(axisXY.WaitReady()))
                     return p_sInfo;
 
-                //if (!m_isPM)
-                //{
-                //    m_SettingDataWithErrorCode = App.m_nanoView.LoadSettingParameters();
-                //    if (m_SettingDataWithErrorCode.Item2 != Met.Nanoview.ERRORCODE_NANOVIEW.SR_NO_ERROR)
-                //    {
-                //        return "Load Parameter Error";
-                //    }
-                //    LibSR_Met.DataManager.GetInstance().m_SettngData = m_SettingDataWithErrorCode.Item1;
-                //}
-
+                if (!m_isPM)
+                {
+                    m_SettingDataWithErrorCode = App.m_nanoView.LoadSettingParameters();
+                    if (m_SettingDataWithErrorCode.Item2 != Met.Nanoview.ERRORCODE_NANOVIEW.SR_NO_ERROR)
+                    {
+                        return "Load Parameter Error";
+                    }
+                    LibSR_Met.DataManager.GetInstance().m_SettngData = m_SettingDataWithErrorCode.Item1;
+                }
+                m_dataManager.m_calibration.Run(m_InitialCal, m_isPM, false, m_nCalibrationCnt);
                 //App.m_nanoView.Calibration(m_InitialCal);
-                System.Threading.Thread.Sleep(8000);
+                //System.Threading.Thread.Sleep(8000);
             }
 
             if (m_useRefWafer)
@@ -105,7 +108,7 @@ namespace Root_CAMELLIA.Module
                     LibSR_Met.DataManager.GetInstance().m_SettngData = m_SettingDataWithErrorCode.Item1;
                 }
 
-                App.m_nanoView.Calibration(m_InitialCal);
+                m_dataManager.m_calibration.Run(m_InitialCal, m_isPM, false, m_nCalibrationCnt);
             }
 
             return "OK";

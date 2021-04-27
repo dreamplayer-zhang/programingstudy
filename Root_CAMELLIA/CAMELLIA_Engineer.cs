@@ -182,7 +182,7 @@ namespace Root_CAMELLIA
         public void ThreadStop()
         {
             m_gaf.ThreadStop();
-            m_handler.ThreadStop();
+            m_handler.ThreadStop(); 
             m_toolBox.ThreadStop();
             m_login.ThreadStop();
             LogView.ThreadStop();

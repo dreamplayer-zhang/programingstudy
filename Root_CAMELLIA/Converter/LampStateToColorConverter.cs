@@ -10,58 +10,73 @@ using System.Windows.Media;
 
 namespace Root_CAMELLIA
 {
-    class LampStateToColorConverter : IValueConverter
+    public class OpticLampStateColorConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if(EQ.p_eState == EQ.eState.Error)
+            switch (value)
             {
-                if((string)parameter == "top")
-                {
-                    return new SolidColorBrush(Color.FromArgb(255, 221, 221, 221));
-                    
-                }
-                else if((string)parameter == "middle")
-                {
-                    return new SolidColorBrush(Color.FromArgb(255, 221, 221, 221));
-                }
-                else
-                {
+                case LibSR_Met.Nanoview.CheckLampState.Error_Controller_Power_OFF:
+                case LibSR_Met.Nanoview.CheckLampState.Error_Lamp_Switch_OFF:
+                case LibSR_Met.Nanoview.CheckLampState.Error_Lamp_Temperature_High:
                     return Brushes.Crimson;
-                }
-            }
-            else if(EQ.p_eState == EQ.eState.Run)
-            {
-                if ((string)parameter == "top")
-                {
+                case LibSR_Met.Nanoview.CheckLampState.OFF:
+                    return Brushes.LightGray;
+                case LibSR_Met.Nanoview.CheckLampState.ON:
                     return Brushes.ForestGreen;
+                case LibSR_Met.Nanoview.CheckLampState.WarmUP:
+                    return Brushes.Orange;
+                case LibSR_Met.Nanoview.CheckLampState.SignalError:
+                    return Brushes.Purple;
+                default:
+                    return Brushes.Black;
+            }
+        }
 
-                }
-                else if ((string)parameter == "middle")
-                {
-                    return new SolidColorBrush(Color.FromArgb(255, 221, 221, 221));
-                }
-                else
-                {
-                    return new SolidColorBrush(Color.FromArgb(255, 221, 221, 221));
-                }
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public class OpticLampTimeToStringConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            int time = System.Convert.ToInt32(value);
+            string LampPMCheck = "";
+            if (time >= 9500 && time < 10000)
+            {
+                LampPMCheck = 10000 - time + "Hours Left Until PM";
+            }
+            else if (time > 10000)
+            {
+                LampPMCheck = "Check Lamp";
             }
             else
             {
-                if ((string)parameter == "top")
-                {
-                    return new SolidColorBrush(Color.FromArgb(255, 221, 221, 221));
-
-                }
-                else if ((string)parameter == "middle")
-                {
-                    return Brushes.Gold;   
-                }
-                else
-                {
-                    return new SolidColorBrush(Color.FromArgb(255, 221, 221, 221));
-                }
+                LampPMCheck = "";
             }
+            return LampPMCheck;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public class OpticLampStatusEnumToStringConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            string name = Enum.GetName(typeof(LibSR_Met.Nanoview.CheckLampState), value);
+            if (name.Contains("Error"))
+            {
+                name = "Error";
+            }
+            return name;
+            //throw new NotImplementedException();
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Windows.Forms;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -18,6 +19,7 @@ namespace Root_CAMELLIA.LibSR_Met
     //여기서 PM prarmeter 로드하고
     // 계산하고
     // 판정 내리고
+
     public enum CheckResult
     {
         Error = 0,  //PM결과 하드웨어에 이상이 있음
@@ -73,7 +75,7 @@ namespace Root_CAMELLIA.LibSR_Met
         public List<OpenCvSharp.CPlusPlus.Point> FittingPoints = new List<OpenCvSharp.CPlusPlus.Point>();
         public List<PMResult> Result;
         public List<SensorTiltDatas> SensorTiltData;
-         //Sensor Tilt
+        //Sensor Tilt
         public int nCheckRangeStart; //350[nm] 반사율 반복성 체크 시작 파장
         public int nCheckRangeEnd;  //1500[nm] 반사율 반복성 체크 끝 파장
 
@@ -140,6 +142,8 @@ namespace Root_CAMELLIA.LibSR_Met
             {
                 m_CalPMReflectance[i] = new CalPMReflectance();
             }
+
+            //InitLamp();
         }
         public void LoadPMData()
         {
@@ -159,7 +163,7 @@ namespace Root_CAMELLIA.LibSR_Met
                 {
                     string str = sr.ReadLine();
                     string[] datas = str.Split(':');
-                    
+
 
                     if (datas[1] == string.Empty)
                         continue;
@@ -260,10 +264,10 @@ namespace Root_CAMELLIA.LibSR_Met
         }
         public CheckResult CheckSensorTilt(int nCurrentNum)
         {
-            if(nCurrentNum==0)
+            if (nCurrentNum == 0)
             {
                 arrCheckWavelength = sCheckResultWavelength.Split(',');
-                for(int n=0; n< arrCheckWavelength.Length; n++)
+                for (int n = 0; n < arrCheckWavelength.Length; n++)
                 {
                     m_CalPMReflectance[n].dWavelength = Convert.ToDouble(arrCheckWavelength[n]);
                 }
@@ -284,13 +288,13 @@ namespace Root_CAMELLIA.LibSR_Met
 
             if (Math.Abs(m_DM.m_RawData[0].Wavelength[0] - WavelengthRef[0]) > 0.1)
             {
-                
+
                 m_DM.m_Log.WriteLog(LogType.PM, "[CheckError]PM & Monitoring - Cal data and measurement data number do not match");
                 return CheckResult.CheckError;
             }
-            if(double.IsNaN(m_DM.m_RawData[0].Reflectance[0]) ==true)
+            if (double.IsNaN(m_DM.m_RawData[0].Reflectance[0]) == true)
             {
-                m_DM.m_Log.WriteLog(LogType.PM, "[Error]CheckSensorTilt - MeasureData Error:" );
+                m_DM.m_Log.WriteLog(LogType.PM, "[Error]CheckSensorTilt - MeasureData Error:");
                 rstPM.Error = true;
                 return CheckResult.CheckError;
             }
@@ -305,14 +309,14 @@ namespace Root_CAMELLIA.LibSR_Met
                     m_CalPMReflectance[nCheckNum].dDiffReflectance[nCurrentNum] = ReflectanceRef[n] - m_DM.m_RawData[0].Reflectance[n];
                     nCheckNum++;
                 }
-                
+
                 tiltData.Wavelength.Add(WavelengthRef[n]);
                 tiltData.Diff.Add(Math.Abs(ReflectanceRef[n] - m_DM.m_RawData[0].Reflectance[n]));
                 dDiffSum += (Math.Abs(ReflectanceRef[n] - m_DM.m_RawData[0].Reflectance[n]));
             }
-            if(nCheckNum== arrCheckWavelength.Length)
+            if (nCheckNum == arrCheckWavelength.Length)
             {
-                m_DM.m_Log.WriteLog(LogType.PM, "All Check Wavelengh Cal done["+nCurrentNum.ToString()+"]");
+                m_DM.m_Log.WriteLog(LogType.PM, "All Check Wavelengh Cal done[" + nCurrentNum.ToString() + "]");
             }
             else
             {
@@ -321,7 +325,7 @@ namespace Root_CAMELLIA.LibSR_Met
             SensorTiltData.Add(tiltData);
             dAvg = dDiffSum / (double)nCheckPMRange;
             rstPM.Measured = dAvg;
-            m_CalPMReflectance[nCheckNum].dDiffReflectance[nCurrentNum]= dAvg;
+            m_CalPMReflectance[nCheckNum].dDiffReflectance[nCurrentNum] = dAvg;
             if (Math.Abs(dAvg) > dSensorTiltError)
             {
                 m_DM.m_Log.WriteLog(LogType.PM, "[Error]CheckSensorTilt - RDiffAvg:" + dAvg.ToString() + "/SensorTiltError:" + dSensorTiltError.ToString());
@@ -330,46 +334,46 @@ namespace Root_CAMELLIA.LibSR_Met
             }
             m_DM.m_Log.WriteLog(LogType.PM, "[OK]CheckSensorTilt - RDiffAvg:" + dAvg.ToString() + "/SensorTiltError:" + dSensorTiltError.ToString());
             rstPM.Error = false;
-            if(nCurrentNum == nSensorTiltRepeatNum-1)
+            if (nCurrentNum == nSensorTiltRepeatNum - 1)
             {
-                bool bCalDone = CalPMReflectanceResult(arrCheckWavelength.Length+1);
-               // m_DM.m_Log.WriteLog(LogType.PM, "Pm Result Data Save Done");
-                
+                bool bCalDone = CalPMReflectanceResult(arrCheckWavelength.Length + 1);
+                // m_DM.m_Log.WriteLog(LogType.PM, "Pm Result Data Save Done");
+
 
             }
             else
             {
-               
+
             }
 
             return CheckResult.OK;
         }
         private bool CalPMReflectanceResult(int nCalResultNum)
         {
-            for (int n = 0; n < nCalResultNum ; n++)
+            for (int n = 0; n < nCalResultNum; n++)
             {
 
-                m_CalPMReflectance[n].dMin = Math.Round( m_CalPMReflectance[n].dDiffReflectance.Min(),3);
-                m_CalPMReflectance[n].dMax = Math.Round(m_CalPMReflectance[n].dDiffReflectance.Max(),3);
+                m_CalPMReflectance[n].dMin = Math.Round(m_CalPMReflectance[n].dDiffReflectance.Min(), 3);
+                m_CalPMReflectance[n].dMax = Math.Round(m_CalPMReflectance[n].dDiffReflectance.Max(), 3);
                 if (m_CalPMReflectance[n].dMin > 0 && m_CalPMReflectance[n].dMax > 0)
                 {
-                    m_CalPMReflectance[n].dCop = Math.Round(-m_CalPMReflectance[n].dMin + m_CalPMReflectance[n].dMax,3);
+                    m_CalPMReflectance[n].dCop = Math.Round(-m_CalPMReflectance[n].dMin + m_CalPMReflectance[n].dMax, 3);
                 }
                 else if (m_CalPMReflectance[n].dMin < 0 && m_CalPMReflectance[n].dMax < 0)
                 {
-                    m_CalPMReflectance[n].dCop = Math.Round(-Math.Abs(m_CalPMReflectance[n].dMin) + Math.Abs(m_CalPMReflectance[n].dMax),3);
+                    m_CalPMReflectance[n].dCop = Math.Round(-Math.Abs(m_CalPMReflectance[n].dMin) + Math.Abs(m_CalPMReflectance[n].dMax), 3);
                 }
                 else
                 {
-                    m_CalPMReflectance[n].dCop = Math.Round(Math.Abs(m_CalPMReflectance[n].dMin) + Math.Abs(m_CalPMReflectance[n].dMax),3);
+                    m_CalPMReflectance[n].dCop = Math.Round(Math.Abs(m_CalPMReflectance[n].dMin) + Math.Abs(m_CalPMReflectance[n].dMax), 3);
                 }
-                m_CalPMReflectance[n].dAvg = Math.Round(m_CalPMReflectance[n].dDiffReflectance.Average(),3);
+                m_CalPMReflectance[n].dAvg = Math.Round(m_CalPMReflectance[n].dDiffReflectance.Average(), 3);
 
-                m_CalPMReflectance[n].dSTD = Math.Round(CalReflectanceSTD(n, m_CalPMReflectance[n].dAvg),3);
+                m_CalPMReflectance[n].dSTD = Math.Round(CalReflectanceSTD(n, m_CalPMReflectance[n].dAvg), 3);
             }
             return true;
         }
-        
+
         private double CalReflectanceSTD(int nCurrentResultNum, double nDataAvg)
         {
             double[] DataDeviation = new double[nSensorTiltRepeatNum];
@@ -377,7 +381,7 @@ namespace Root_CAMELLIA.LibSR_Met
             double AvgDoubleDeviation = 0.0;
             double ResultSTD_P = 0.0;
 
-            for(int n=0; n < nSensorTiltRepeatNum; n++)
+            for (int n = 0; n < nSensorTiltRepeatNum; n++)
             {
                 DataDeviation[n] = m_CalPMReflectance[nCurrentResultNum].dDiffReflectance[n] - m_CalPMReflectance[nCurrentResultNum].dAvg;
 
@@ -464,7 +468,7 @@ namespace Root_CAMELLIA.LibSR_Met
                     double RealPulse = ConstValue.PM_STAGE_PULSE; //um -> pulse
 
                     dCalcSensorOffsetX = Math.Round((X - ImageX) * Realum * RealPulse); //pulse
-                    dCalcSensorOffsetY = Math.Round((ImageY-Y) * Realum * RealPulse); //pulse
+                    dCalcSensorOffsetY = Math.Round((ImageY - Y) * Realum * RealPulse); //pulse
                 }
 
                 return true;
@@ -480,7 +484,7 @@ namespace Root_CAMELLIA.LibSR_Met
             try
             {
                 double dX = Math.Sqrt(Math.Pow(Align_CenterPosTop.X - Align_CenterPosBot.X, 2) + Math.Pow(Align_CenterPosTop.Y - Align_CenterPosBot.Y, 2)) * 1.098;
-                double dY = dDistSensorCamera  - (double)((nAlignAxisPosZ + dCameraAxisOffsetZ) / 10.0);
+                double dY = dDistSensorCamera - (double)((nAlignAxisPosZ + dCameraAxisOffsetZ) / 10.0);
 
                 if (dX > 0.0 && dY > 0.0)
                 {
@@ -893,40 +897,41 @@ namespace Root_CAMELLIA.LibSR_Met
             double HolCenterPointX, HoleCenterPointY, SensorCenterPointX, SensorCenterPointY;
             double Pixelum = ConstValue.PM_CAMERA_PIXEL_RESOLUTION;
             double PulseResolution = ConstValue.PM_STAGE_PULSE;
-            
-                //Hole Center Check
-                
+
+            //Hole Center Check
 
 
-           
-                //Sensor Center Check
-                
+
+
+            //Sensor Center Check
+
 
 
             OpenCvSharp.CPlusPlus.Mat MatCenterImg = new Mat(ReadyImage.Rows, ReadyImage.Cols, MatType.CV_8UC3);
             MatCenterImg = ReadyImage.Clone();
-           
+
             int nWindowWidth = (ReadyImage.Width) / 2;
             int nWindowHeight = (ReadyImage.Height) / 2;
             SensorCenterPointX = nWindowWidth + Math.Round((dCalcSensorOffsetX / Pixelum) / PulseResolution);
             SensorCenterPointY = nWindowHeight + Math.Round((-dCalcSensorOffsetY / Pixelum) / PulseResolution);
-            HolCenterPointX = nWindowWidth-Math.Round((dCalcHoleCenterOffsetX / Pixelum) / PulseResolution);
-            HoleCenterPointY = nWindowHeight-Math.Round((-dCalcHoleCenterOffsetY / Pixelum) / PulseResolution);
+            HolCenterPointX = nWindowWidth - Math.Round((dCalcHoleCenterOffsetX / Pixelum) / PulseResolution);
+            HoleCenterPointY = nWindowHeight - Math.Round((-dCalcHoleCenterOffsetY / Pixelum) / PulseResolution);
 
             Cv2.Line(MatCenterImg, new OpenCvSharp.CPlusPlus.Point(HolCenterPointX - 20, HoleCenterPointY - 20), new OpenCvSharp.CPlusPlus.Point(HolCenterPointX + 20, HoleCenterPointY + 20), Scalar.Red, 20);
-                Cv2.Line(MatCenterImg, new OpenCvSharp.CPlusPlus.Point(HolCenterPointX - 20, HoleCenterPointY + 20), new OpenCvSharp.CPlusPlus.Point(HolCenterPointX + 20, HoleCenterPointY - 20), Scalar.Red, 20);
-            
-                Cv2.Line(MatCenterImg, new OpenCvSharp.CPlusPlus.Point(SensorCenterPointX - 20, SensorCenterPointY - 20), new OpenCvSharp.CPlusPlus.Point(SensorCenterPointX + 20, SensorCenterPointY + 20), Scalar.Blue, 20);
-                Cv2.Line(MatCenterImg, new OpenCvSharp.CPlusPlus.Point(SensorCenterPointX - 20, SensorCenterPointY + 20), new OpenCvSharp.CPlusPlus.Point(SensorCenterPointX + 20, SensorCenterPointY - 20), Scalar.Blue, 20);
-            
-            
+            Cv2.Line(MatCenterImg, new OpenCvSharp.CPlusPlus.Point(HolCenterPointX - 20, HoleCenterPointY + 20), new OpenCvSharp.CPlusPlus.Point(HolCenterPointX + 20, HoleCenterPointY - 20), Scalar.Red, 20);
+
+            Cv2.Line(MatCenterImg, new OpenCvSharp.CPlusPlus.Point(SensorCenterPointX - 20, SensorCenterPointY - 20), new OpenCvSharp.CPlusPlus.Point(SensorCenterPointX + 20, SensorCenterPointY + 20), Scalar.Blue, 20);
+            Cv2.Line(MatCenterImg, new OpenCvSharp.CPlusPlus.Point(SensorCenterPointX - 20, SensorCenterPointY + 20), new OpenCvSharp.CPlusPlus.Point(SensorCenterPointX + 20, SensorCenterPointY - 20), Scalar.Blue, 20);
+
+
             Cv2.Line(MatCenterImg, new OpenCvSharp.CPlusPlus.Point(nWindowWidth - 20, nWindowHeight - 20), new OpenCvSharp.CPlusPlus.Point(nWindowWidth + 20, nWindowHeight + 20), Scalar.Yellow, 20);
             Cv2.Line(MatCenterImg, new OpenCvSharp.CPlusPlus.Point(nWindowWidth - 20, nWindowHeight + 20), new OpenCvSharp.CPlusPlus.Point(nWindowWidth + 20, nWindowHeight - 20), Scalar.Yellow, 20);
             Cv2.ImWrite(@"D:\Temp\EdgeAF_" + ".jpg", MatCenterImg);
             return MatCenterImg;
 
         }
-
+    }
+}
         //public Emgu.CV.Mat CenterPointCheck (Emgu.CV.Mat ReadyImage)
         //{
         //    Emgu.CV.Mat Result = new Emgu.CV.Mat();
@@ -946,58 +951,347 @@ namespace Root_CAMELLIA.LibSR_Met
 
         #endregion
 
-        #region Lamp Controller  Check
-        public SerialPort sp = new SerialPort();
-        public string UpdateSR(bool initialize, string CheckWord)
-        {
-            if (initialize)
-            {
+    //    #region Lamp Controller  Check
+    //    public SerialPort sp = new SerialPort();
+    //    public void CloseLampSignal()
+    //    {
+    //        sp.Write("t");
+    //        string OutputData = sp.ReadLine();
+    //        string[] strtext = new string[7] { "H0:", "T0:", "L0:", "H1:", "T1:", "L1:", "Time:" };
+    //        string[] arr = OutputData.Split(':');
+    //        //string[] strarr = arr[1].Split(',');
+    //        double LampUseTime = 0.0;
+    //        double value = 0.0;
+    //        int Hr, Min, Sec;
+    //        int m_Hr_Org, m_Min_Org, m_Sec_Org;
+    //        int m_Hr, m_Min, m_Sec;
+    //        string filepath, timedata, strtime;
+    //        foreach (string str in strtext)
+    //        {
+    //            if (OutputData.Contains(str))
+    //            {
+    //                if (OutputData.Contains("Time:"))
+    //                {
+    //                    filepath = Application.StartupPath + "\\Timedata.txt";
+
+    //                    FileInfo fi = new FileInfo(filepath);
+
+    //                    m_Hr_Org = m_Min_Org = m_Sec_Org = 0;
+    //                    m_Hr = m_Min = m_Sec = 0;
+
+    //                    if (fi.Exists)
+    //                    {
+    //                        timedata = File.ReadAllText(@filepath);
+    //                        char sp = ':';
+    //                        string[] spstring = timedata.Split(sp);
+
+    //                        m_Hr_Org = Convert.ToInt32(spstring[0]);
+    //                        m_Min_Org = Convert.ToInt32(spstring[1]);
+    //                        m_Sec_Org = Convert.ToInt32(spstring[2]);
+
+    //                    }
+    //                    Sec = Convert.ToInt32(arr[1]);
+
+    //                    m_Sec = Sec + m_Sec_Org;
+
+    //                    if (m_Sec >= 60)
+    //                    {
+    //                        m_Min = (m_Sec / 60) + m_Min_Org;
+
+    //                        m_Sec = m_Sec % 60;
+    //                    }
+    //                    else
+    //                    {
+    //                        m_Min = m_Min_Org;
+    //                    }
+
+    //                    if (m_Min >= 60)
+    //                    {
+    //                        m_Hr = (m_Min / 60) + m_Hr_Org;
+
+    //                        m_Min = m_Min % 60;
+    //                    }
+    //                    else
+    //                    {
+    //                        m_Hr = m_Hr_Org;
+    //                    }
+    //                    value = m_Hr;
+    //                    strtime = string.Format("{0}:{1}:{2}", m_Hr, m_Min, m_Sec);
+    //                    using (StreamWriter SW = new StreamWriter(filepath))
+    //                    {
+    //                        SW.WriteLine(strtime);
+    //                    }
+    //                }
+
+    //            }
+    //        }
+    //        sp.Write("c");
+    //    }
+    //    void InitLamp()
+    //    {
+    //        sp.PortName = "COM2";
+    //        sp.BaudRate = 9600;
+    //        sp.DataBits = 8;
+    //        sp.StopBits = StopBits.One;
+    //        sp.Parity = Parity.None;
+    //        //sp.DataReceived += new SerialDataReceivedEventHandler(serialPort1_DataReceived);
+    //        sp.Open();
+
+    //        sp.Write("t");
+    //        string OutputData = sp.ReadLine();
+    //        string[] strtext = new string[7] { "H0:", "T0:", "L0:", "H1:", "T1:", "L1:", "Time:" };
+    //        string[] arr = OutputData.Split(':');
+    //        //string[] strarr = arr[1].Split(',');
+    //        double LampUseTime = 0.0;
+    //        double value = 0.0;
+    //        int Hr, Min, Sec;
+    //        int m_Hr_Org, m_Min_Org, m_Sec_Org;
+    //        int m_Hr, m_Min, m_Sec;
+    //        string filepath, timedata, strtime;
+    //        foreach (string str in strtext)
+    //        {
+    //            if (OutputData.Contains(str))
+    //            {
+    //                if (OutputData.Contains("Time:"))
+    //                {
+    //                    filepath = Application.StartupPath + "\\Timedata.txt";
+
+    //                    FileInfo fi = new FileInfo(filepath);
+
+    //                    m_Hr_Org = m_Min_Org = m_Sec_Org = 0;
+    //                    m_Hr = m_Min = m_Sec = 0;
+
+    //                    if (fi.Exists)
+    //                    {
+    //                        timedata = File.ReadAllText(@filepath);
+    //                        char sp = ':';
+    //                        string[] spstring = timedata.Split(sp);
+
+    //                        m_Hr_Org = Convert.ToInt32(spstring[0]);
+    //                        m_Min_Org = Convert.ToInt32(spstring[1]);
+    //                        m_Sec_Org = Convert.ToInt32(spstring[2]);
+
+    //                    }
+    //                    Sec = Convert.ToInt32(arr[1]);
+
+    //                    m_Sec = Sec + m_Sec_Org;
+
+    //                    if (m_Sec >= 60)
+    //                    {
+    //                        m_Min = (m_Sec / 60) + m_Min_Org;
+
+    //                        m_Sec = m_Sec % 60;
+    //                    }
+    //                    else
+    //                    {
+    //                        m_Min = m_Min_Org;
+    //                    }
+
+    //                    if (m_Min >= 60)
+    //                    {
+    //                        m_Hr = (m_Min / 60) + m_Hr_Org;
+
+    //                        m_Min = m_Min % 60;
+    //                    }
+    //                    else
+    //                    {
+    //                        m_Hr = m_Hr_Org;
+    //                    }
+    //                    value = m_Hr;
+    //                    strtime = string.Format("{0}:{1}:{2}", m_Hr, m_Min, m_Sec);
+    //                    using (StreamWriter SW = new StreamWriter(filepath))
+    //                    {
+    //                        SW.WriteLine(strtime);
+    //                    }
+    //                }
+
+    //            }
+    //        }
+    //                sp.Write("c");
+    //    }
+
+    //    public double UpdateLampData(string CheckWord)
+    //    {
+    //        sp.Write(CheckWord);
+    //        string OutputData = sp.ReadLine();
+    //        string[] strtext = new string[7] { "H0:", "T0:", "L0:", "H1:", "T1:", "L1:", "Time:" };
+    //        string[] arr = OutputData.Split(':');
+    //        //string[] strarr = arr[1].Split(',');
+    //        double LampUseTime = 0.0;
+    //        double value = 0.0;
+    //        int Hr, Min, Sec;
+    //        int m_Hr_Org, m_Min_Org, m_Sec_Org;
+    //        int m_Hr, m_Min, m_Sec;
+    //        string filepath, timedata, strtime;
+    //        foreach (string str in strtext)
+    //        {
+    //            if (OutputData.Contains(str))
+    //            {
+    //                if (OutputData.Contains("Time:"))
+    //                {
+    //                    filepath = Application.StartupPath + "\\Timedata.txt";
+
+    //                    FileInfo fi = new FileInfo(filepath);
+
+    //                    m_Hr_Org = m_Min_Org = m_Sec_Org = 0;
+    //                    m_Hr = m_Min = m_Sec = 0;
+
+    //                    if (fi.Exists)
+    //                    {
+    //                        timedata = File.ReadAllText(@filepath);
+    //                        char sp = ':';
+    //                        string[] spstring = timedata.Split(sp);
+
+    //                        m_Hr_Org = Convert.ToInt32(spstring[0]);
+    //                        m_Min_Org = Convert.ToInt32(spstring[1]);
+    //                        m_Sec_Org = Convert.ToInt32(spstring[2]);
+
+    //                    }
+    //                    Sec = Convert.ToInt32(arr[1]);
+
+    //                    m_Sec = Sec + m_Sec_Org;
+
+    //                    if (m_Sec >= 60)
+    //                    {
+    //                        m_Min = (m_Sec / 60) + m_Min_Org;
+
+    //                        m_Sec = m_Sec % 60;
+    //                    }
+    //                    else
+    //                    {
+    //                        m_Min = m_Min_Org;
+    //                    }
+
+    //                    if (m_Min >= 60)
+    //                    {
+    //                        m_Hr = (m_Min / 60) + m_Hr_Org;
+
+    //                        m_Min = m_Min % 60;
+    //                    }
+    //                    else
+    //                    {
+    //                        m_Hr = m_Hr_Org;
+    //                    }
+    //                    value = m_Hr;
+    //                    strtime = string.Format("{0}:{1}:{2}", m_Hr, m_Min, m_Sec);
+    //                    using (StreamWriter SW = new StreamWriter(filepath))
+    //                    {
+    //                        SW.WriteLine(strtime);
+    //                    }
+    //                    sp.Write("c");
+    //                }
+    //                else
+    //                {
+    //                    decimal number1 = 0;
+    //                    bool canConvert = decimal.TryParse(arr[1], out number1);
+    //                    if (canConvert == true)
+    //                        value = Convert.ToDouble(number1);
+    //                }
+
+                    
+    //            }
+
+    //        }
+    //        return value;
+    //    }
+    //    private void UpdateLampTime(bool Initialize)
+    //    {
+    //        double LampUseTime = UpdateLampData("t");
+
+    //        //p_LampTimeCount = LampUseTime;
+
+    //        if (LampUseTime > 9500)
+    //        {
+    //            LampPMCheck(10000 - LampUseTime);
+    //        }
+    //    }
+    //    private void LampPMCheck(double dLeftLampTime)
+    //    {
+    //        //if (dLeftLampTime >= 0)
+    //        //{
+    //        //    string sLeftLampTime = dLeftLampTime.ToString();
+    //        //    p_LampTimeError = sLeftLampTime + " Hours Left until PM !";
+
+    //        //}
+    //        //else
+    //        //{
+    //        //    p_LampTimeError = "Please, Do Lamp PM";
+    //        //}
+    //    }
 
 
-                sp.PortName = "COM2";
-                sp.BaudRate = 9600;
-                sp.DataBits = 8;
-                sp.StopBits = StopBits.One;
-                sp.Parity = Parity.None;
-                //sp.DataReceived += new SerialDataReceivedEventHandler(serialPort1_DataReceived);
-                sp.Open();
-            }
-            sp.Write(CheckWord);
-            string OutputData = sp.ReadLine();
-            return OutputData;
-        }
-        public void LampCheck()
-        {
-            
+    //    #endregion
 
-            string sLampT = UpdateSR(false, "4");
-            string sLampH = UpdateSR(false, "3");
-            string sVISLampLux = UpdateSR(false, "0");
-            string sIRLampLux = UpdateSR(false, "1");
-            string sControlT = UpdateSR(false, "6");
-            string sControlH = UpdateSR(false, "5");
+    //    #region 램프 상태 체크
+    //    private double LampStage()
+    //    {
+    //        bool LampFault = false;
+    //        bool Controller = false;
+    //        bool LampON = false;
+    //        bool LaserON = false;
+    //        bool VISLightON = false;
+    //        bool NIRLightON = false;
+    //        double rst = 0.0;
 
-            string sPath = @"C:\Users\ATI\Desktop\MeasureData\SRData";
+    //        if (UpdateLampData("1") > 0)
+    //        {
+    //            VISLightON = true;
+    //        }
+    //        else
+    //        {
+    //            VISLightON = false;
+    //        }
+    //        if (UpdateLampData("2") > 0)
+    //        {
+    //            NIRLightON = true;
+    //        }
+    //        else
+    //        {
+    //            NIRLightON = false;
+    //        }
 
+    //        if (App.m_nanoView.GetLightSourceStatus(ref LampFault, ref Controller, ref LampON, ref LaserON) != Nanoview.ERRORCODE_NANOVIEW.SR_NO_ERROR)
+    //        {
+    //            // 나머지 작업할 항목
+    //            if (LaserON==true && LampON==false)
+    //            {
+    //                rst = (double)CheckLampState.WarmUP;    
+    //            }
+    //            else if (LaserON == true && LampON ==true)
+    //            {
+    //                rst = (double)CheckLampState.ON;
+    //            }
+    //            else if (LampFault==false || Controller==false)
+    //            {
+    //                if(!LampFault)
+    //                {
+    //                    rst = (double)CheckLampState.Error_Lamp_Switch_OFF;
+    //                }
+    //                if(!Controller)
+    //                {
+    //                    rst = (double)CheckLampState.Error_Lamp_Temperature_High;
+    //                }
+    //            }
 
-            if (!Directory.Exists(sPath))
-            {
-                Directory.CreateDirectory(sPath);
-            }
-            string sFileName = sPath;
-            //sFileName += "\\";
-            //sFileName += DateTime.Now.ToString("yyyyMMdd");
-            sPath = sFileName;
-            if (Path.GetExtension(sPath) != ".txt")
-                sPath += ".txt";
-            StreamWriter writer;
-            writer = File.AppendText(sPath);
-            writer.WriteLine("[" + DateTime.Now.ToString("yyyyMMdd") + "_" + DateTime.Now.ToString("HH-mm-ss") + "]" + "," + "Lamp T" + "," + sLampT + "," + "Lamp H" + "," + sLampH + "," + "Control T" + "," + sControlT + "," + "Control H" + "," + sControlH + "," + "VISLampLux" + "," + sVISLampLux + "," + "IRLampLux" + "," + sIRLampLux);
-            writer.Close();
+    //            else if (LampFault == false && Controller == false && LampON==true)
+    //            {
+    //                rst = (double)CheckLampState.Error_Controller_Power_OFF;
+    //            }
+    //            else
+    //            {
+    //                if (VISLightON == true && NIRLightON == true)
+    //                {
+    //                    rst = (double)CheckLampState.SignalError;
+    //                }
+    //                else if (VISLightON==false&& NIRLightON==false)
+    //                {
+    //                    rst = (double)CheckLampState.OFF;
+    //                }
+    //            }
 
-
-        }
-
-        #endregion
-    }
-}
+    //        }
+    //        return rst;
+    //    }
+    //}
+    //#endregion
+//}

@@ -330,7 +330,7 @@ namespace Root_CAMELLIA
                         m_reg.Write(BaseDefine.RegNanoViewConfig, m_ConfigPath);
                         m_reg.Write(BaseDefine.RegNanoViewPort, m_NanoviewPort);
                         m_Main.p_InitNanoview = false;
-                        m_Main.LightSourceTimer_Stop();
+                        //m_Main.LightSourceTimer_Stop();
                     }
                 });
             }
