@@ -41,13 +41,13 @@ namespace Root_AOP01_Inspection.Module
         public DIO_I m_diReticleFrameCheck;
         public DIO_O m_do45DTrigger;
         MemoryPool m_memoryPool;
-        //MemoryGroup m_memoryGroup;
+        MemoryGroup m_memoryGroup;
         //MemoryData m_memoryMain;
         //MemoryData m_memorySideLeft;
         //MemoryData m_memorySideRight;
         //MemoryData m_memorySideTop;
         //MemoryData m_memorySideBottom;
-        //MemoryData m_memoryTDI45;
+        MemoryData m_memoryTDI45;
         //MemoryData m_memoryLADS;
 
         LightSet m_lightSet;
@@ -315,8 +315,7 @@ namespace Root_AOP01_Inspection.Module
         #region override
         public override void InitMemorys()
         {
-            //BacksideVision.Main.
-            //m_memoryGroup = m_memoryPool.GetGroup(p_id);
+            m_memoryGroup = m_memoryPool.GetGroup(p_id);
             //m_memoryMain = m_memoryGroup.CreateMemory(App.mMainMem, 1, 1, 1000, 1000);
 
             //m_memorySideLeft = m_memoryGroup.CreateMemory(App.mSideLeftMem, 1, 1, 1000, 1000);
@@ -324,7 +323,7 @@ namespace Root_AOP01_Inspection.Module
             //m_memorySideRight = m_memoryGroup.CreateMemory(App.mSideRightMem, 1, 1, 1000, 1000);
             //m_memorySideTop = m_memoryGroup.CreateMemory(App.mSideTopMem, 1, 1, 1000, 1000);
 
-            //m_memoryTDI45 = m_memoryGroup.CreateMemory("TDI45", 1, 1, 1000, 1000);
+            m_memoryTDI45 = m_memoryGroup.CreateMemory("TDI45", 1, 1, 1000, 1000);
             //m_memoryLADS = m_memoryGroup.CreateMemory("LADS", 1, 1, 1000, 1000);
         }
         #endregion
@@ -587,7 +586,8 @@ namespace Root_AOP01_Inspection.Module
         {
             AddModuleRunList(new Run_TestGlass(this), true, "Run Delay");
             AddModuleRunList(new Run_GrabSideScan(this), true, "Run Side Scan");
-            AddModuleRunList(new Run_GrabBacksideScan(this), true, "Run Backside Scan");            
+            AddModuleRunList(new Run_GrabBacksideScan(this), true, "Run Backside Scan");
+            AddModuleRunList(new Run_GrabBackside45Scan(this), true, "Run Backside 45 Scan");
         }
 
         #region Run_Test
@@ -1173,14 +1173,14 @@ namespace Root_AOP01_Inspection.Module
             m_axisSideZ = mainvision.m_axisSideZ;
             m_axisZ = mainvision.m_axisZ;
             m_axisXY = mainvision.m_axisXY;
-            m_memoryPool = mainvision.m_memoryPool;
+            //m_memoryPool = mainvision.m_memoryPool;
             m_lightSet = mainvision.m_lightSet;
             m_CamTDI90 = mainvision.m_CamTDI90;
             m_CamTDI45 = mainvision.m_CamTDI45;
             m_CamTDISide = mainvision.m_CamTDISide;
             m_CamLADS = mainvision.m_CamLADS;
 
-            //InitMemorys();
+            InitMemorys();
             //InitPosAlign();
         }
 
