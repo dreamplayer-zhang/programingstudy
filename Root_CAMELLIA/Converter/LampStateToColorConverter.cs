@@ -18,8 +18,7 @@ namespace Root_CAMELLIA
             {
                 if((string)parameter == "top")
                 {
-                    return new SolidColorBrush(Color.FromArgb(255, 221, 221, 221));
-                    
+                    return Brushes.Crimson;   
                 }
                 else if((string)parameter == "middle")
                 {
@@ -27,23 +26,22 @@ namespace Root_CAMELLIA
                 }
                 else
                 {
-                    return Brushes.Crimson;
+                    return new SolidColorBrush(Color.FromArgb(255, 221, 221, 221));
                 }
             }
             else if(EQ.p_eState == EQ.eState.Run)
             {
                 if ((string)parameter == "top")
                 {
-                    return Brushes.ForestGreen;
-
+                    return new SolidColorBrush(Color.FromArgb(255, 221, 221, 221));
                 }
                 else if ((string)parameter == "middle")
                 {
                     return new SolidColorBrush(Color.FromArgb(255, 221, 221, 221));
                 }
                 else
-                {
-                    return new SolidColorBrush(Color.FromArgb(255, 221, 221, 221));
+                {  
+                    return Brushes.ForestGreen;
                 }
             }
             else

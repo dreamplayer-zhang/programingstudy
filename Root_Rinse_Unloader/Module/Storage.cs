@@ -321,7 +321,11 @@ namespace Root_Rinse_Unloader.Module
         {
             switch (eMagazine)
             {
-                case eMagazine.Magazine1: return "Magazine Full";
+                case eMagazine.Magazine1:
+                    EQ.p_bStop = true;
+                    EQ.p_eState = EQ.eState.Error;
+                    m_rinse.RunBuzzer(RinseU.eBuzzer.Finish); 
+                    return "Magazine Full";
                 case eMagazine.Magazine2: m_rinse.p_eMagazine = eMagazine.Magazine1; break;
                 case eMagazine.Magazine3: m_rinse.p_eMagazine = eMagazine.Magazine2; break;
                 case eMagazine.Magazine4: m_rinse.p_eMagazine = eMagazine.Magazine3; break;
