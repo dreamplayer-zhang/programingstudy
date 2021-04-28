@@ -2747,6 +2747,7 @@ namespace Root_CAMELLIA
         public void InitLayer()
         {
             App.m_nanoView.m_LayerList.Clear();
+            LibSR_Met.DataManager.GetInstance().m_ThicknessData.Clear();
             dataManager.recipeDM.ModelData.AddLayer();
             dataManager.recipeDM.ModelData.AddLayer();
         }
@@ -3886,7 +3887,7 @@ namespace Root_CAMELLIA
                     dialog.InitialDirectory = BaseDefine.Dir_Recipe;
                     if (dialog.ShowDialog() == true)
                     {
-                        dialog.FileName = AddFolderPath(dialog.FileName);
+                        //dialog.FileName = AddFolderPath(dialog.FileName);
 
                         customizePath = System.IO.Path.GetFileName(dialog.FileName);
                         customizePath = customizePath.Remove(customizePath.Length - 4);

@@ -404,58 +404,43 @@ namespace RootTools.Memory
 
             m_szImage = new CPoint((int)(p_memoryData.p_sz.X * p_fZoom), (int)(p_memoryData.p_sz.Y * p_fZoom));
 
+            int nByte = p_memoryData.p_nByte;
             int nBytePerPixel = p_memoryData.p_nByte * p_memoryData.p_nCount;
             CPoint sz = m_szBitmapSource = new CPoint(Math.Min(p_szWindow.X, m_szImage.X), Math.Min(p_szWindow.Y, m_szImage.Y));
-            byte[] aBuf = m_aBufDisplay = new byte[(long)nBytePerPixel * sz.Y * sz.X];
+            byte[] aBuf = m_aBufDisplay = new byte[(long)nByte * sz.Y * sz.X];
+
             FixOffset();
 
             int[] aX = new int[sz.X];
             for (int x = 0; x < sz.X; x++)
             {
-                aX[x] = nBytePerPixel * (m_cpOffset.X + (int)Math.Round(x / p_fZoom));
+                aX[x] = nByte * (m_cpOffset.X + (int)Math.Round(x / p_fZoom));
             }
 
-            for (int y = 0, iy = 0; y < sz.Y; y++, iy += nBytePerPixel * sz.X)
+            for (int y = 0, iy = 0; y < sz.Y; y++, iy += nByte * sz.X)
             {
                 int pY = m_cpOffset.Y + (int)Math.Round(y / p_fZoom);
                 byte* pSrc = (byte*)p_memoryData.GetPtr(p_nMemoryIndex, 0, pY).ToPointer();
-                switch (nBytePerPixel)
+
+                for (int x = 0, ix = 0; x < sz.X; x++, ix += nByte)
                 {
-                    case 1:
-                        for (int x = 0; x < sz.X; x++)
-                        {
-                            aBuf[x + iy] = *(pSrc + aX[x]);
-                        }   
-                        break;
-                    case 2:
-                        for (int x = 0, ix = 0; x < sz.X; x++, ix += 2)
-                        {
-                            aBuf[ix + iy] = *(pSrc + aX[x]);
-                            aBuf[ix + iy + 1] = *(pSrc + aX[x] + 1);
-                        }
-                        break;
-                    case 3:
-                    case 4:
-                        for (int x = 0, ix = 0; x < sz.X; x++, ix += 3)
-                        {
-                            aBuf[ix + iy] = *(pSrc + aX[x]);
-                            aBuf[ix + iy + 1] = *(pSrc + aX[x] + 1);
-                            aBuf[ix + iy + 2] = *(pSrc + aX[x] + 2);
-                        }
-                        break;
+                    for (int i = 0; i < nByte; i++)
+                    {
+                        aBuf[ix + iy + i] = *(pSrc + aX[x] + i);
+                    }
                 }
             }
+
             PixelFormat pixelFormat;
-            int bytePerPixel = p_memoryData.p_nByte * p_memoryData.p_nCount;
-            switch (bytePerPixel)
+            switch (nByte)
             {
-                case 1: pixelFormat = PixelFormats.Gray8;   break;
-                case 2: pixelFormat = PixelFormats.Gray16;  break;
+                case 1: pixelFormat = PixelFormats.Gray8; break;
+                case 2: pixelFormat = PixelFormats.Gray16; break;
                 case 3:
-                case 4: pixelFormat = PixelFormats.Bgr24;   break;
-                default:    return;
+                case 4: pixelFormat = PixelFormats.Bgr24; break;
+                default: return;
             }
-            p_bitmapSrc = BitmapSource.Create(sz.X, sz.Y, 96, 96, pixelFormat, null, aBuf, nBytePerPixel * sz.X);
+            p_bitmapSrc = BitmapSource.Create(sz.X, sz.Y, 96, 96, pixelFormat, null, aBuf, nByte * sz.X);
         }
 
         void FixOffset()

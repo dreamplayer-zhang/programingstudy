@@ -38,6 +38,7 @@ using RootTools.Inspects;
 using RootTools.GAFs;
 using System.Runtime.ExceptionServices;
 using System.Security;
+using RootTools.Comm;
 
 namespace Root_AOP01_Inspection.Module
 {
@@ -76,6 +77,8 @@ namespace Root_AOP01_Inspection.Module
         public Camera_Dalsa m_CamTDISide;
         public Camera_Basler m_CamLADS;
 
+        public RS232 m_rs232;
+
         class LADSInfo//한 줄에 대한 정보
         {
             public double[] m_Heightinfo;
@@ -109,6 +112,7 @@ namespace Root_AOP01_Inspection.Module
             p_sInfo = m_toolBox.GetCamera(ref m_CamTDI45, this, "TDI 45");
             p_sInfo = m_toolBox.GetCamera(ref m_CamTDISide, this, "TDI Side");
             p_sInfo = m_toolBox.GetCamera(ref m_CamLADS, this, "LADS");
+            p_sInfo = m_toolBox.GetComm(ref m_rs232, this, "RS232");
             m_axisRotate.StartMove(1000);
         }
         #endregion
@@ -2472,6 +2476,8 @@ namespace Root_AOP01_Inspection.Module
                     m_grabMode = m_module.GetGrabMode(value);
                 }
             }
+            public int m_nUserSetNum = 1;
+
             public Run_Grab45(MainVision module)
             {
                 m_module = module;
@@ -2489,6 +2495,8 @@ namespace Root_AOP01_Inspection.Module
                 run.m_nMaxFrame = m_nMaxFrame;
                 run.m_nScanRate = m_nScanRate;
                 run.p_sGrabMode = p_sGrabMode;
+                run.m_nUserSetNum = m_nUserSetNum;
+
                 return run;
             }
             public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
@@ -2502,6 +2510,7 @@ namespace Root_AOP01_Inspection.Module
                 m_nMaxFrame = (tree.GetTree("Scan Velocity", false, bVisible)).Set(m_nMaxFrame, m_nMaxFrame, "Max Frame", "Camera Max Frame Spec", bVisible);
                 m_nScanRate = (tree.GetTree("Scan Velocity", false, bVisible)).Set(m_nScanRate, m_nScanRate, "Scan Rate", "카메라 Frame 사용률 1~ 100 %", bVisible);
                 p_sGrabMode = tree.Set(p_sGrabMode, p_sGrabMode, m_module.p_asGrabMode, "Grab Mode", "Select GrabMode", bVisible);
+                m_nUserSetNum = tree.Set(m_nUserSetNum, m_nUserSetNum, "UserSet Number", "UserSet Number", bVisible);
             }
             public override string Run()
             {
@@ -2513,6 +2522,14 @@ namespace Root_AOP01_Inspection.Module
                     Axis axisZ = m_module.m_axisZ;
                     Axis axisRotate = m_module.m_axisRotate;
                     m_grabMode.SetLight(true);
+
+                    // UserSet Update
+                    // 신형카메라 UserSet 변경
+                    //((Camera_Dalsa)(m_grabMode.m_camera)).p_CamParam.p_nUserSetNum = m_nUserSetNum;   
+                    // 구형카메라 UserSet 변경
+                    string strUserSetChange = string.Format("lpc %d\r", m_nUserSetNum);
+                    m_module.m_rs232.Send(strUserSetChange);
+
                     m_module.m_do45DTrigger.Write(true);
                     if (m_grabMode.pUseRADS)
                     {

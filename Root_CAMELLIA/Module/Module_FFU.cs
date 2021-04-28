@@ -632,7 +632,7 @@ namespace Root_CAMELLIA.Module
 			if (m_bThreadFan)
 			{
 				m_bThreadFan = false;
-				m_threadFan.Join();
+				//m_threadFan.Join();
 			}
 			base.ThreadStop();
 		}

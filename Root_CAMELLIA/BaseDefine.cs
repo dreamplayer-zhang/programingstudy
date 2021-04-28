@@ -57,7 +57,7 @@ namespace Root_CAMELLIA
             {
                 string fileVersion = FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location).FileVersion;
                 _Version = fileVersion;
-                return "Camellia Ⅱ - Version " + _Version;
+                return "Camellia2 - Version " + _Version;
             }
         }
 

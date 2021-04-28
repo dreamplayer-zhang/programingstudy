@@ -279,12 +279,9 @@ namespace Root_WIND2.Module
                 }
                 m_grabMode.m_camera.StopGrab();
 
-//#endif
 
-                //  Check
-                
-            if (workManager.WaitWorkDone(ref EQ.m_EQ.StopToken(), 60 * 1) == false)
-                    {
+                if (workManager.WaitWorkDone(ref EQ.m_EQ.StopToken(), 60 * 3 /*3 minutes*/) == false)
+                {
                         inspectionTimeWatcher.Stop();
 
                         TempLogger.Write("Inspection", "Time out!!!");
@@ -294,7 +291,6 @@ namespace Root_WIND2.Module
                 inspectionTimeWatcher.Stop();
                 TempLogger.Write("Inspection", string.Format("{0:F3}", (double)inspectionTimeWatcher.ElapsedMilliseconds / (double)1000));
                 return "OK";
-//#if TEST_ONLY_INSPECTION
             }
 
 
@@ -302,7 +298,6 @@ namespace Root_WIND2.Module
             {
                 m_grabMode.SetLight(false);
             }
-//#endif
         }
     }
 }

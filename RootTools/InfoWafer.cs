@@ -108,8 +108,8 @@ namespace RootTools
 
         void RunTreeWaferInfo(Tree tree)
         {
-            _eSize = (eWaferSize)tree.Set(p_eSize, p_eSize, "Size", "WaferSize");
-            _umThickness = tree.Set(p_umThickness, p_umThickness, "Thickness", "Wafer Thickness (um)");
+            p_eSize = (eWaferSize)tree.Set(p_eSize, p_eSize, "Size", "WaferSize");
+            p_umThickness = tree.Set(p_umThickness, p_umThickness, "Thickness", "Wafer Thickness (um)");
         }
         #endregion
 

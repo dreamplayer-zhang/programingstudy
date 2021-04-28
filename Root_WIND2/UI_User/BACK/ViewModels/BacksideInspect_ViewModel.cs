@@ -1,6 +1,7 @@
 ﻿using RootTools;
 using RootTools.Database;
 using RootTools_Vision;
+using RootTools_Vision.WorkManager3;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -66,18 +67,7 @@ namespace Root_WIND2.UI_User
             // Initialize ImageViewer
             this.imageViewerVM = new BacksideInspect_ImageViewer_ViewModel();
             this.imageViewerVM.init(GlobalObjects.Instance.GetNamed<ImageData>("BackImage"), GlobalObjects.Instance.Get<DialogService>());
-
-
-            if(GlobalObjects.Instance.Get<InspectionManagerBackside>() != null)
-            {
-                GlobalObjects.Instance.Get<InspectionManagerBackside>().InspectionStart += InspectionStart_Callback;
-                GlobalObjects.Instance.Get<InspectionManagerBackside>().PositionDone += PositionDone_Callback;
-                GlobalObjects.Instance.Get<InspectionManagerBackside>().InspectionDone += InspectionDone_Callback;
-                GlobalObjects.Instance.Get<InspectionManagerBackside>().ProcessDefectWaferStart += ProcessDefectWaferStart_Callback;
-                GlobalObjects.Instance.Get<InspectionManagerBackside>().IntegratedProcessDefectDone += ProcessDefectWaferDone_Callback;
-            }
             
-
             // Initialize MapViewer
             this.mapViewerVM = new MapViewer_ViewModel();
         }
@@ -85,7 +75,7 @@ namespace Root_WIND2.UI_User
         private string currentRecipe = "";
         public void LoadRecipe()
         {
-            if (GlobalObjects.Instance.Get<InspectionManagerBackside>() == null) return;
+            if (GlobalObjects.Instance.GetNamed<WorkManager>("backInspection") == null) return;
 
             if (currentRecipe != GlobalObjects.Instance.Get<RecipeBack>().Name)
             {
@@ -163,19 +153,36 @@ namespace Root_WIND2.UI_User
         {
             get => new RelayCommand(() =>
             {
-                if (GlobalObjects.Instance.Get<InspectionManagerBackside>() == null) return;
-                LoadRecipe();                
+                if (GlobalObjects.Instance.GetNamed<WorkManager>("backInspection") != null)
+                {
+                    LoadRecipe();
 
-                GlobalObjects.Instance.Get<InspectionManagerBackside>().WorkplaceStateChanged += WorkplaceStateChanged_Callback;
+                    WorkManager workManager = GlobalObjects.Instance.GetNamed<WorkManager>("backInspection");
+                    workManager.InspectionStart += InspectionStart_Callback;
+                    workManager.PositionDone += PositionDone_Callback;
+                    workManager.InspectionDone += InspectionDone_Callback;
+                    workManager.ProcessDefectWaferStart += ProcessDefectWaferStart_Callback;
+                    workManager.IntegratedProcessDefectDone += ProcessDefectWaferDone_Callback;
+                    workManager.WorkplaceStateChanged += WorkplaceStateChanged_Callback;
+                }
             });
         }
         public RelayCommand UnloadedCommand
         {
             get => new RelayCommand(() =>
             {
-                if (GlobalObjects.Instance.Get<InspectionManagerBackside>() == null) return;
+                if (GlobalObjects.Instance.GetNamed<WorkManager>("backInspection") != null)
+                {
+                    LoadRecipe();
 
-                GlobalObjects.Instance.Get<InspectionManagerBackside>().WorkplaceStateChanged -= WorkplaceStateChanged_Callback;
+                    WorkManager workManager = GlobalObjects.Instance.GetNamed<WorkManager>("backInspection");
+                    workManager.InspectionStart -= InspectionStart_Callback;
+                    workManager.PositionDone -= PositionDone_Callback;
+                    workManager.InspectionDone -= InspectionDone_Callback;
+                    workManager.ProcessDefectWaferStart -= ProcessDefectWaferStart_Callback;
+                    workManager.IntegratedProcessDefectDone -= ProcessDefectWaferDone_Callback;
+                    workManager.WorkplaceStateChanged -= WorkplaceStateChanged_Callback;
+                }
             });
         }
 
@@ -184,7 +191,10 @@ namespace Root_WIND2.UI_User
             get => new RelayCommand(() =>
             {
                 this.ImageViewerVM.ClearObjects();
-                GlobalObjects.Instance.Get<InspectionManagerBackside>().Start(WORK_TYPE.SNAP);
+                if (GlobalObjects.Instance.GetNamed<WorkManager>("backInspection") != null)
+                {
+                    GlobalObjects.Instance.GetNamed<WorkManager>("backInspection").Start();
+                }
             });
         }
 
@@ -200,7 +210,10 @@ namespace Root_WIND2.UI_User
         {
             get => new RelayCommand(() =>
             {
-                GlobalObjects.Instance.Get<InspectionManagerBackside>().Stop();
+                if (GlobalObjects.Instance.GetNamed<WorkManager>("backInspection") != null)
+                {
+                    GlobalObjects.Instance.GetNamed<WorkManager>("backInspection").Stop();
+                }
             });
         }
 

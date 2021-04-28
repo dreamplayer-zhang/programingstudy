@@ -62,7 +62,7 @@ namespace Root_CAMELLIA.Module
             {
                 return p_sInfo;
             }
-
+            m_module.mwvm.EngineerViewModel.p_PMCheckReview_ViewModel.PMLogData("[CheckCameraSensorOffset] Hole Ready Image Capture Done");
             //Camera Light Off // 조명값 0
             m_module.SetLight(false);
             m_log.Info("[CheckCameraSensorOffset] Camera Light Off");

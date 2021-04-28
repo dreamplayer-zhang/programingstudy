@@ -188,6 +188,7 @@
     <Compile Include="Module\EIP_Cover.cs" />
     <Compile Include="Module\EIP_Plate.cs" />
     <Compile Include="Module\EOP.cs" />
+    <Compile Include="Module\FlowSensor.cs" />
     <Compile Include="Module\ParticleCounterSet.cs" />
     <Compile Include="Module\VEGA_P.cs" />
     <Compile Include="UI\1. Setup\Panel_RecipeManger.xaml.cs">
@@ -266,7 +267,6 @@
     <Compile Include="Module\InfoPods.cs" />
     <Compile Include="Module\Loadport.cs" />
     <Compile Include="Module\NozzleSet.cs" />
-    <Compile Include="Module\ParticleCounter.cs" />
     <Compile Include="Module\RTR.cs" />
     <Compile Include="MVVM\Helper.cs" />
     <Compile Include="MVVM\ObservableObject.cs" />

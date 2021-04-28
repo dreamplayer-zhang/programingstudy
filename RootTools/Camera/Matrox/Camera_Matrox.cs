@@ -103,7 +103,7 @@ namespace RootTools.Camera.Matrox
             }
         }
 
-        byte[] bufarr;
+        byte[] bufarr = null;
         public byte[] p_aBuf
         {
             get

@@ -29,17 +29,17 @@ namespace Root_CAMELLIA
         //    m_DataManager = module.m_DataManager;
         //}
 
-        public string Run(bool bInitialCal,  bool isPM = false, bool bUseThread = true)
+        public string Run(bool bInitialCal,  bool isPM = false, bool bUseThread = true, int retryCount = 1)
         {
 
-            //if (bInitialCal)
-            //{
-            //    bInitialCal = false;
-            //}
-            //else
-            //{
-            //    CalDone = false;
-            //}
+            if (bInitialCal)
+            {
+                InItCalDone = false;
+            }
+            else
+            {
+                CalDone = false;
+            }
 
             if (!isPM)
 
@@ -61,35 +61,50 @@ namespace Root_CAMELLIA
 
             if (bUseThread)
             {
-                ThreadPool.QueueUserWorkItem(o => RunThreadPool(bInitialCal));
+                ThreadPool.QueueUserWorkItem(o => RunThreadPool(bInitialCal, retryCount));
             }
             else
             {
-                if (App.m_nanoView.Calibration(bInitialCal) != LibSR_Met.Nanoview.ERRORCODE_NANOVIEW.SR_NO_ERROR)
+                string rst = "OK";
+                for (int i = 0; i < retryCount; i++)
                 {
-                    return "Calibration Fail";
+                    if (App.m_nanoView.Calibration(bInitialCal) != LibSR_Met.Nanoview.ERRORCODE_NANOVIEW.SR_NO_ERROR)
+                    {
+                        rst = "Error";
+                    }
+                    else
+                    {
+                        rst = "OK";
+                        break;
+                    }
                 }
+                return rst;
             }
 
             return "OK";
         }
 
-        public void RunThreadPool(bool bInitialCal)
+        public void RunThreadPool(bool bInitialCal, int nRetryCount)
         {
-            if(App.m_nanoView.Calibration(bInitialCal) == Met.Nanoview.ERRORCODE_NANOVIEW.SR_NO_ERROR)
+            for(int i = 0; i < nRetryCount; i++)
             {
-                if (bInitialCal)
+                if (App.m_nanoView.Calibration(bInitialCal) == Met.Nanoview.ERRORCODE_NANOVIEW.SR_NO_ERROR)
                 {
-                    InItCalDone = true;
+                    ErrorString = "OK";
+                    break;
                 }
                 else
                 {
-                    CalDone = true;
+                    ErrorString = "Error";
                 }
+            }
+            if (bInitialCal)
+            {
+                InItCalDone = true;
             }
             else
             {
-                 
+                CalDone = true;
             }
         }
     }
