@@ -236,5 +236,29 @@ namespace Root_VEGA_D
             lampGreen.Background = EQ.p_eState == EQ.eState.Run ? Brushes.SeaGreen : Brushes.Honeydew;
         }
         #endregion
+
+        private void buttonGetDeviceInfo_Click(object sender, RoutedEventArgs e)
+        {
+            m_engineer.m_handler.m_vision.m_RADSControl.UpdateDeviceInfo();
+        }
+
+        private void buttonStartRADS_Click(object sender, RoutedEventArgs e)
+        {
+            m_engineer.m_handler.m_vision.m_RADSControl.m_timer.Start();
+            m_engineer.m_handler.m_vision.m_RADSControl.p_IsRun = true;
+            m_engineer.m_handler.m_vision.m_RADSControl.StartRADS();
+        }
+
+        private void buttonStopRADS_Click(object sender, RoutedEventArgs e)
+        {
+            m_engineer.m_handler.m_vision.m_RADSControl.m_timer.Stop();
+            m_engineer.m_handler.m_vision.m_RADSControl.p_IsRun = false;
+            m_engineer.m_handler.m_vision.m_RADSControl.StopRADS();
+        }
+
+        private void buttonResetRADS_Click(object sender, RoutedEventArgs e)
+        {
+            m_engineer.m_handler.m_vision.m_RADSControl.ResetController();
+        }
     }
 }

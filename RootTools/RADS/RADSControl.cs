@@ -176,13 +176,13 @@ namespace RootTools.RADS
 				{
 					p_IsRun = true;
                     p_nAdsData = p_connect.p_CurrentController.p_ADS_data * -1;
-                    //Console.WriteLine("AdsData : {0}", p_nAdsData);
+                    Console.WriteLine("AdsData : {0}", p_nAdsData);
 				}
 				else
 				{
 					p_IsRun = true;
                     p_nAdsData = p_connect.p_CurrentController.p_ADS_data;
-                    //Console.WriteLine("AdsData : {0}", p_nAdsData);
+                    Console.WriteLine("AdsData : {0}", p_nAdsData);
 				}
 
 			}

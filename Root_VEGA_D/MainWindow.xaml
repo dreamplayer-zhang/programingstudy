@@ -2502,6 +2502,7 @@
                         <Grid.RowDefinitions>
                             <RowDefinition/>
                             <RowDefinition/>
+                            <RowDefinition/>
                         </Grid.RowDefinitions>
                         <Grid Grid.Row="0">
                             <Grid.ColumnDefinitions>
@@ -2540,12 +2541,43 @@
                                     Margin="5"
                                     Style="{StaticResource SetupPanelBtn}"
                                     Click="buttonRecovery_Click"/>
+                            <Button Grid.Column="1"
+                                    x:Name="buttonResetRADS"
+                                    Content="Reset RADS"
+                                    Margin="5"
+                                    Style="{StaticResource SetupPanelBtn}"
+                                    Click="buttonResetRADS_Click"/>
                             <Button Grid.Column="2"
                                     x:Name="buttonBuzzOff"
                                     Content="Buzzer Off"
                                     Margin="5"
                                     Style="{StaticResource SetupPanelBtn}"
                                     Click="buttonBuzzOff_Click"/>
+                        </Grid>
+                        <Grid Grid.Row="2">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition/>
+                                <ColumnDefinition/>
+                                <ColumnDefinition/>
+                            </Grid.ColumnDefinitions>
+                            <Button Grid.Column="0"
+                                    x:Name="buttonGetDeviceInfo"
+                                    Content="Get Device Info"
+                                    Margin="5"
+                                    Style="{StaticResource SetupPanelBtn}"
+                                    Click="buttonGetDeviceInfo_Click"/>
+                            <Button Grid.Column="1"
+                                    x:Name="buttonStartRADS"
+                                    Content="Start RADS"
+                                    Margin="5"
+                                    Style="{StaticResource SetupPanelBtn}"
+                                    Click="buttonStartRADS_Click"/>
+                            <Button Grid.Column="2"
+                                    x:Name="buttonStopRADS"
+                                    Content="Stop RADS"
+                                    Margin="5"
+                                    Style="{StaticResource SetupPanelBtn}"
+                                    Click="buttonStopRADS_Click"/>
                         </Grid>
                     </Grid>
 

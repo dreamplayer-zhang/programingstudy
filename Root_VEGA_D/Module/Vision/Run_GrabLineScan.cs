@@ -1,6 +1,7 @@
 ﻿using Root_VEGA_D_IPU.Module;
 using RootTools;
 using RootTools.Camera;
+using RootTools.Camera.BaslerPylon;
 using RootTools.Camera.Dalsa;
 using RootTools.Control;
 using RootTools.Control.ACS;
@@ -81,7 +82,8 @@ namespace Root_VEGA_D.Module
             Axis axisZ = m_module.AxisZ;
             Axis axisRotate = m_module.AxisRotate;
 
-            Camera_Dalsa camera = (Camera_Dalsa)m_grabMode.m_camera;
+            Camera_Dalsa camMain = (Camera_Dalsa)m_grabMode.m_camera;
+            Camera_Basler camRADS = (Camera_Basler)m_module.CamRADS;
             GrabData grabData = m_grabMode.m_GD;
 
             // IPU와 연결 시, 이미지 검사 완료되었을 때의 변수
@@ -90,11 +92,32 @@ namespace Root_VEGA_D.Module
 
             try
             {
+                // RADS 연결
+                if (m_grabMode.pUseRADS && m_module.m_RADSControl.p_IsRun == false)
+                {
+                    m_module.m_RADSControl.m_timer.Start();
+                    m_module.m_RADSControl.p_IsRun = true;
+                    m_module.m_RADSControl.StartRADS();
+                    StopWatch sw = new StopWatch();
+                    if (camRADS.p_CamInfo._OpenStatus == false) camRADS.Connect();
+                    while(camRADS.p_CamInfo._OpenStatus == false)
+                    {
+                        if (sw.ElapsedMilliseconds > 15000)
+                        {
+                            sw.Stop();
+                            return "RADS Camera Not Connected";
+                        }
+                    }
+                    sw.Stop();
+                    camRADS.SetMulticast();
+                    camRADS.GrabContinuousShot();
+                }
+
                 // 카메라 연결 시도
-                camera.Connect();
+                camMain.Connect();
 
                 int nTimeOut = TIMEOUT_50MS / TIMEOUT_INTERVAL;
-                while (camera.p_CamInfo.p_eState != eCamState.Ready)
+                while (camMain.p_CamInfo.p_eState != eCamState.Ready)
                 {
                     if(nTimeOut-- == 0)
                     {
@@ -257,6 +280,13 @@ namespace Root_VEGA_D.Module
             finally
             {
                 m_grabMode.SetLight(false);
+                if (m_grabMode.pUseRADS && m_module.m_RADSControl.p_IsRun == true)
+                {
+                    m_module.m_RADSControl.m_timer.Stop();
+                    m_module.m_RADSControl.p_IsRun = false;
+                    m_module.m_RADSControl.StopRADS();
+                    if (camRADS.p_CamInfo._IsGrabbing == true) camRADS.StopGrab();
+                }
             }
         }
     }

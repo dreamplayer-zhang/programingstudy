@@ -218,6 +218,30 @@ namespace RootTools
             //     }
             //);
         }
+
+        public unsafe void SetData_12bit(IntPtr ptr, CRect rect, int stride, int nByte = 2)
+        {
+            // variable
+            byte* memPtr = (byte*)ptr.ToPointer();
+
+            //implement
+            for (int y = 0; y < rect.Height; y++)
+            {
+                byte[] arrByte = new byte[rect.Width];
+                for (int x = 0; x < rect.Width; x++)
+                {
+                    byte b1 = memPtr[(((long)rect.Top + y) * stride + (long)rect.Left + x) * 2 + 0];
+                    byte b2 = memPtr[(((long)rect.Top + y) * stride + (long)rect.Left + x) * 2 + 1];
+                    ushort us = BitConverter.ToUInt16(new byte[] { b1, b2 }, 0);
+                    byte b = (byte)(((double)us / (Math.Pow(2, 16) - 1)) * (Math.Pow(2, 8) - 1));
+                    arrByte[x] = b;
+                }
+                arrByte.CopyTo(m_aBuf, y * rect.Width);
+            }
+
+            return;
+        }
+
         public void GetRectData(TRect rect, ImageData boxImage)
         {
             byte[] viewptr = boxImage.m_aBuf;
