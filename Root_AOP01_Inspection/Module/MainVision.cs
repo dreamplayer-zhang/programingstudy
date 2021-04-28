@@ -38,6 +38,7 @@ using RootTools.Inspects;
 using RootTools.GAFs;
 using System.Runtime.ExceptionServices;
 using System.Security;
+using RootTools.Comm;
 
 namespace Root_AOP01_Inspection.Module
 {
@@ -76,6 +77,8 @@ namespace Root_AOP01_Inspection.Module
         public Camera_Dalsa m_CamTDISide;
         public Camera_Basler m_CamLADS;
 
+        public RS232 m_rs232;
+
         class LADSInfo//한 줄에 대한 정보
         {
             public double[] m_Heightinfo;
@@ -109,6 +112,7 @@ namespace Root_AOP01_Inspection.Module
             p_sInfo = m_toolBox.GetCamera(ref m_CamTDI45, this, "TDI 45");
             p_sInfo = m_toolBox.GetCamera(ref m_CamTDISide, this, "TDI Side");
             p_sInfo = m_toolBox.GetCamera(ref m_CamLADS, this, "LADS");
+            p_sInfo = m_toolBox.GetComm(ref m_rs232, this, "RS232");
             m_axisRotate.StartMove(1000);
         }
         #endregion
