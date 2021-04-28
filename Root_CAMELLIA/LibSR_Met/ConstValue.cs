@@ -9,7 +9,7 @@ namespace Root_CAMELLIA.LibSR_Met
     public class ConstValue
     {
         //PM
-        public const string PATH_LOG = @"C:\Log\Camellia\";
+        public const string PATH_LOG = @"C:\Log\";
         public const string PATH_PM_RESULT_FOLDER = @"C:\Camellia\PM\PM_Result\";
         public const string PATH_PM_FILE = @"C:\Camellia\Init\PM.cpm";
         public const string PATH_PM_REFLECTANCE_FILE = @"C:\Camellia\Init\PMReflectance.csv";

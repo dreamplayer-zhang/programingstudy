@@ -572,7 +572,7 @@ namespace RootTools.Memory
             int paletteSize = (nByte == 1 ? (256 * 4) : 0);
 
             int size = 14 + 40 + paletteSize + rowSize * height;
-            int offbit = 14 + 40 + paletteSize;
+            int offbit = 14 + 40 + (nByte == 1 ? (256 * 4) : 0);
 
             bw.Write(Convert.ToUInt16(0x4d42));                     // bfType;
             bw.Write(Convert.ToUInt32((uint)size));                 // bfSize
@@ -587,7 +587,16 @@ namespace RootTools.Memory
             if (bw == null)
                 return false;
 
-            int biBitCount = (isGrayScale == true ? nByte : p_nByte) * p_nCount * 8;
+            int biBitCount;
+            if(isGrayScale)
+            {
+                biBitCount = nByte * 8;
+            }
+            else
+            {
+                biBitCount = p_nByte * p_nCount * 8;
+            }
+            //int biBitCount = (isGrayScale ? nByte : p_nByte) * p_nCount * 8;
 
             bw.Write(Convert.ToUInt32(40));                         // biSize
             bw.Write(Convert.ToInt32(width));                       // biWidth

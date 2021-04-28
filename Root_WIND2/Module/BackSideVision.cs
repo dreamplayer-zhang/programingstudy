@@ -342,6 +342,7 @@ namespace Root_WIND2.Module
         {
             AddModuleRunList(new Run_GrabBackside(this), true, "Run Grab Backside");
             AddModuleRunList(new Run_LADS(this), true, "Run LADS");
+            AddModuleRunList(new Run_InspectBackside(this), true, "Run BackInspection");
 
         }
         public ImageData GetMemoryData(ScanMemory mem)

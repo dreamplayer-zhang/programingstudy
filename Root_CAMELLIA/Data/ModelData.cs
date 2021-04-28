@@ -9,6 +9,8 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Root_CAMELLIA.LibSR_Met;
+
 namespace Root_CAMELLIA.Data
 {
     public class ModelData
@@ -65,22 +67,26 @@ namespace Root_CAMELLIA.Data
         public void AddLayer(int index = -1)
         {
             Layer layerData = new Layer();
-
-            if(index == -1)
+            //App.m_nanoView.ThicknessScaleOffset thickData = new App.m_nanoView.ThicknessScaleOffset();
+            ThicknessScaleOffset thicknessData = new ThicknessScaleOffset();
+            if (index == -1)
             {
                 //MetDataManager.m_LayerData.Add(layerData);
                 App.m_nanoView.m_LayerList.Add(layerData);
+                Met.DataManager.GetInstance().m_ThicknessData.Add(thicknessData);
             }
             else
             {
                // MetDataManager.m_LayerData.Insert(index, layerData);
                 App.m_nanoView.m_LayerList.Insert(index, layerData);
+                Met.DataManager.GetInstance().m_ThicknessData.Insert(index,thicknessData);
             }
         }
 
         public void DeleteLayer(int index = -1)
         {
             App.m_nanoView.m_LayerList.RemoveAt(index);
+            Met.DataManager.GetInstance().m_ThicknessData.RemoveAt(index);
         }
 
         public class LayerData : ObservableObject
@@ -99,6 +105,8 @@ namespace Root_CAMELLIA.Data
                 this.Fv2 = 0.0f;
                 this.Fv1Fit = false;
                 this.Fv2Fit = false;
+                this.ThicknessScale = 0.0;
+                this.ThicknessOffset = 0.0;
                 this.Emm.Add("1. Bruggeman");
                 this.Emm.Add("2. Maxwell Ganett-LL");
                 this.Emm.Add("3. Maxwell Garnett");
@@ -314,6 +322,32 @@ namespace Root_CAMELLIA.Data
                 }
             }
 
+            private double _thicknessScale = 0.0;
+            public double ThicknessScale
+            {
+                get
+                {
+                    return _thicknessScale;
+                }
+                set
+                {
+                    SetProperty(ref _thicknessScale, value);
+                }
+            }
+
+            private double _thicknessOffset = 0.0;
+            public double ThicknessOffset
+            {
+                get
+                {
+                    return _thicknessOffset;
+                }
+                set
+                {
+                    SetProperty(ref _thicknessOffset, value);
+                }
+            }
+
             private string _seletedEmm;
             public string SelectedEmm
             {
@@ -347,6 +381,10 @@ namespace Root_CAMELLIA.Data
             {
                 Layer layerData;
                 layerData = App.m_nanoView.m_LayerList.ElementAt(currentLayer);
+
+                ThicknessScaleOffset thicknessData;
+                thicknessData = Met.DataManager.GetInstance().m_ThicknessData.ElementAt(currentLayer);
+
                 if(layerData.m_Host == null)
                 {
                     SelectedHost1 = Host1[0].FullPath;
@@ -402,6 +440,9 @@ namespace Root_CAMELLIA.Data
                     this.ThicknessFit = false;
                 }
 
+                this.ThicknessOffset = thicknessData.m_dThicknessOffset;
+                this.ThicknessScale = thicknessData.m_dThicknessScale;
+
                 switch (layerData.m_Emm)
                 {
                     case 1:
@@ -432,6 +473,8 @@ namespace Root_CAMELLIA.Data
             {
                 Layer layerData;
                 layerData = App.m_nanoView.m_LayerList.ElementAt(currentLayer);
+                ThicknessScaleOffset thicknessData;
+                thicknessData = Met.DataManager.GetInstance().m_ThicknessData.ElementAt(currentLayer);
 
                 layerData.m_Host = App.m_nanoView.GetMaterialFromName(Path.GetFileNameWithoutExtension(SelectedHost1));
                 layerData.m_Guest1 = App.m_nanoView.GetMaterialFromName(Path.GetFileNameWithoutExtension(SelectedGuest1));
@@ -465,6 +508,10 @@ namespace Root_CAMELLIA.Data
                 {
                     layerData.m_bFitThickness = false;
                 }
+
+                thicknessData.m_dThicknessScale = Convert.ToDouble(ThicknessScale);
+                thicknessData.m_dThicknessOffset = Convert.ToDouble(ThicknessOffset);
+
                 switch (SelectedEmm)
                 {
                     case "1. Bruggeman":
