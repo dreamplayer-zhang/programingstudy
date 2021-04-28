@@ -465,7 +465,7 @@ namespace RootTools.Memory
         //TCPAsyncServer m_Server;
 
         bool bServer = true;
-        int nPort = 5000;
+        //int nPort = 5000;
 
         public void InitThreadProcess()
         {
