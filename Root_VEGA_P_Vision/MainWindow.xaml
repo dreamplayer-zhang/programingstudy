@@ -205,7 +205,7 @@
                                     <MenuItem Header="Recipe Summary"/>
                                     <MenuItem Header="Recipe Spec"/>
                                 </MenuItem>
-                                <MenuItem Header="Matienance"/>
+                                <MenuItem Header="Matienance" Command="{Binding l}"/>
                                 <MenuItem Header="GEM"/>
                             </MenuItem>
                             <MenuItem Header="Review">
@@ -216,7 +216,7 @@
                         <MenuItem Background="{StaticResource ControlBackGround}"
                                   BorderBrush="#FF707070"
                                   Width="110"
-                                  BorderThickness="0,0,0,0" Padding="0">
+                                  BorderThickness="0,0,0,0" Padding="0" Command="{Binding ModeSelectCommand}">
                             <MenuItem.Header>
                                 <Grid Width="110">
                                     <TextBlock Text="Mode Select"

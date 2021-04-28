@@ -41,7 +41,7 @@
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-	<LangVersion>preview</LangVersion>
+    <LangVersion>preview</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -52,7 +52,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-	<LangVersion>preview</LangVersion>
+    <LangVersion>preview</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
     <DebugSymbols>true</DebugSymbols>
@@ -237,6 +237,27 @@
       <DependentUpon>ViewerTest.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\1. Setup\4. Maintenance\ViewerTest_ViewModel.cs" />
+    <Compile Include="UI\2. Review\NozzleRes.xaml.cs">
+      <DependentUpon>NozzleRes.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\2. Review\ParticleReview_Panel.xaml.cs">
+      <DependentUpon>ParticleReview_Panel.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\2. Review\ResultSummary_Panel.xaml.cs">
+      <DependentUpon>ResultSummary_Panel.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\2. Review\Review_Panel.xaml.cs">
+      <DependentUpon>Review_Panel.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\2. Review\ScrewReview_Panel.xaml.cs">
+      <DependentUpon>ScrewReview_Panel.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\2. Review\screwUI.xaml.cs">
+      <DependentUpon>screwUI.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\2. Review\VisionReview_Panel.xaml.cs">
+      <DependentUpon>VisionReview_Panel.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI\SelectMode.xaml.cs">
       <DependentUpon>SelectMode.xaml</DependentUpon>
     </Compile>
@@ -304,6 +325,34 @@
     <Page Include="UI\1. Setup\4. Maintenance\ViewerTest.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\2. Review\NozzleRes.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\2. Review\ParticleReview_Panel.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\2. Review\ResultSummary_Panel.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\2. Review\Review_Panel.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\2. Review\ScrewReview_Panel.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\2. Review\screwUI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\2. Review\VisionReview_Panel.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UI\SelectMode.xaml">
       <SubType>Designer</SubType>
@@ -383,7 +432,6 @@
     <Resource Include="Control\Icon\Resource\system_task_127px.png" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="UI\2. Review\" />
     <Folder Include="UI\3. Operation\" />
   </ItemGroup>
   <ItemGroup>
@@ -415,6 +463,10 @@
       <ProductName>.NET Framework 3.5 SP1</ProductName>
       <Install>false</Install>
     </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\dome_low.jpg" />
+    <Resource Include="Resources\door_low.jpg" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

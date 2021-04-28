@@ -5,10 +5,82 @@
              StartupUri="MainWindow.xaml">
 
     <Application.Resources>
+        <Style x:Key="BorderLine" TargetType="Border">
+            <Setter Property="BorderBrush" Value="Black"/>
+            <Setter Property="BorderThickness" Value="1"/>
+        </Style>
         <Style TargetType="TextBlock">
             <Setter Property="FontFamily" Value="Arial"/>
         </Style>
-
+        <Style TargetType="DataGrid" x:Key="DatagridStyle">
+            <Setter Property="Background" Value="Transparent"/>
+            <!--<Setter Property="GridLinesVisibility" Value="All"/>-->
+            <Setter Property="VerticalGridLinesBrush" Value="White"/>
+            <Setter Property="HorizontalGridLinesBrush" Value="White"/>
+            <Setter Property="HorizontalScrollBarVisibility" Value="Auto"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+        </Style>
+        <Style TargetType="Border" x:Key="textblockborder">
+            <Setter Property="BorderBrush" Value="White"/>
+            <Setter Property="BorderThickness" Value="1"/>
+        </Style>
+        <Style TargetType="Grid" x:Key="GridHeader">
+            <Setter Property="Background" Value="DarkGray"/>
+        </Style>
+        <Style TargetType="TextBlock" x:Key="GridHeaderText">
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="TextAlignment" Value="Center"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+        </Style>
+        <Style TargetType="TextBlock" x:Key="NozzleResultsText">
+            <Setter Property="TextAlignment" Value="Center"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+        <Style TargetType="TextBlock" x:Key="PodInfo">
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="Margin" Value="20,0,0,0"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="HorizontalAlignment" Value="Left"/>
+        </Style>
+        <Style TargetType="Button" x:Key="ScrewBtn">
+            <Setter Property="Background" Value="MidnightBlue"/>
+            <Setter Property="BorderThickness" Value="0"/>
+        </Style>
+        <Style TargetType="TextBlock" x:Key="ScrewInfo">
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+        <Style TargetType="TextBlock" x:Key="ScrewContent">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="HorizontalAlignment" Value="Stretch"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+        </Style>
+        <Style TargetType="DataGridRow" x:Key="DataGridRowStyle">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="TextBlock.TextAlignment" Value="Center"/>
+            <Setter Property="FontSize" Value="13"/>
+        </Style>
+        <Style TargetType="DataGridColumnHeader" x:Key="DataGridHeaderStyle">
+            <Setter Property="Background" Value="DarkGray"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Padding" Value="3"/>
+            <Setter Property="HorizontalAlignment" Value="Stretch"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+        </Style>
+        <Style TargetType="TextBlock" x:Key="ResultHeader">
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="Margin" Value="20,0,0,0"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="HorizontalAlignment" Value="Left"/>
+        </Style>
         <Style TargetType="GroupBox" x:Key="GroupBoxStyle">
             <Style.Triggers>
                 <Trigger Property="IsMouseOver" Value="True">

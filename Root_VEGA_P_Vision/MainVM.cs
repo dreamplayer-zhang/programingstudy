@@ -25,6 +25,10 @@ namespace Root_VEGA_P_Vision
             set => SetProperty(ref mainWindowState, value);
         }
         #region [Relay Command]
+        public ICommand ModeSelectCommand
+        {
+            get => new RelayCommand(() => UIManager.Instance.ChangeMainUI(UIManager.Instance.ModeWindow));
+        }
         public ICommand ChangeUISetupCommand
         {
             get => new RelayCommand(() => UIManager.Instance.ChangeUISetup());

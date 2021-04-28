@@ -71,6 +71,9 @@ namespace Root_VEGA_P_Vision.Module
 
             try
             {
+                if (!camSide.IsConnected())
+                    camSide.Connect();
+
                 #region [Local Variable]
                 AxisXY axisXY = m_module.m_stage.m_axisXY;
                 Axis axisZ = sideOpt.axisZ;
@@ -103,25 +106,12 @@ namespace Root_VEGA_P_Vision.Module
 
                 #endregion
 
-                //if (m_module.Run(m_module.Move(m_module.m_stage.m_axisXY.p_axisX, SidegrabMode.m_rpAxisCenter.X)))
-                //    return p_sInfo;
-
-                //if (m_module.Run(m_module.Move(axisZ, SidegrabMode.m_nFocusPosZ)))
-                //    return p_sInfo;
-
-
                 if (m_module.Run(axisZ.StartMove(SidegrabMode.m_nFocusPosZ)))
                     return p_sInfo;
                 if (m_module.Run(axisZ.WaitReady()))
                     return p_sInfo;
 
-                int scannum = 0;
-
-                if (side.Equals(Vision.SideOptic.eSide.All))
-                    scannum = 4;
-                else
-                    scannum = 1;
-
+                int scannum = side.Equals(Vision.SideOptic.eSide.All) ? 4 : 1;
 
                 SidegrabMode.SetLight(false);
 
@@ -140,12 +130,7 @@ namespace Root_VEGA_P_Vision.Module
                         rotate = 90000 * j;
                     }
 
-                    double posX = 0;
-
-                    if (((int)side) % 2 == 0)
-                        posX = rowPos;
-                    else
-                        posX = colPos;
+                    double posX = (((int)side) % 2 == 0) ? rowPos : colPos;
 
                     if (m_module.Run(axisR.StartMove(rotate)))
                         return p_sInfo;
@@ -184,14 +169,10 @@ namespace Root_VEGA_P_Vision.Module
                         {
                             double dPosY = SidegrabMode.m_rpAxisCenter.Y - nPulsePerWidth * (-nXCount / 2 + x);
 
-                            //if (m_module.Run(m_module.Move(m_module.m_stage.m_axisXY.p_axisY, dPosY)))
-                            //    return p_sInfo;
-
                             if (m_module.Run(axisXY.p_axisY.StartMove(dPosY)))
                                 return p_sInfo;
                             if (m_module.Run(axisXY.p_axisY.WaitReady()))
                                 return p_sInfo;
-
 
                             camSide.Grab();
 
@@ -203,8 +184,6 @@ namespace Root_VEGA_P_Vision.Module
                         SidegrabMode.SetLight(false);
                     }
                 }
-                //enum 순서 고려해야됨
-
             }
             finally
             {

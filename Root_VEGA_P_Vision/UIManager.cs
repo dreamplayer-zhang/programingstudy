@@ -37,6 +37,7 @@ namespace Root_VEGA_P_Vision
         #region [UI]
         private SelectMode modeWindow;
         private Setup setupWindow;
+        private Review_Panel reviewPanel;
         #endregion
 
         #region [ViewModel]
@@ -46,11 +47,16 @@ namespace Root_VEGA_P_Vision
         {
             InitModeSelect();
             InitSetupMode();
+            InitReviewMode();
             return true;
         }
         void InitModeSelect()
         {
             modeWindow = new SelectMode();
+        }
+        void InitReviewMode()
+        {
+            reviewPanel = new Review_Panel();
         }
         void InitSetupMode()
         {
@@ -76,7 +82,7 @@ namespace Root_VEGA_P_Vision
 
         public void ChangeUIReview()
         {
-
+            ChangeMainUI(reviewPanel);
         }
 
         public void ChangeUISetup()
