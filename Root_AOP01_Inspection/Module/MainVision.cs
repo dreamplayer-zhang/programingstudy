@@ -1389,6 +1389,10 @@ namespace Root_AOP01_Inspection.Module
 			bottom.m_sModuleRun = App.SideBotModuleName;
 			AddModuleRunList(bottom, true, "Run " + App.SideBotModuleName);
 
+            var glass = new Run_GlassInspection(this, App.BackRecipeRegName, App.BackInspMgRegName);
+            glass.m_sModuleRun = App.BackModuleName;
+            AddModuleRunList(glass, true, "Run " + App.BackModuleName);
+
 
             AddModuleRunList(new Run_TestPellicle(this), true, "Run Delay");
         }
@@ -1476,9 +1480,15 @@ namespace Root_AOP01_Inspection.Module
 			public Run_PellSideInspection(MainVision module, string rcpName, string inspMgmName) : base(module, rcpName, inspMgmName)
 			{
 			}
-		}
+        }
+        public class Run_GlassInspection : Run_SurfaceInspection
+        {
+            public Run_GlassInspection(MainVision module, string rcpName, string inspMgmName) : base(module, rcpName, inspMgmName)
+            {
+            }
+        }
 
-		public class Run_SurfaceInspection : ModuleRunBase
+        public class Run_SurfaceInspection : ModuleRunBase
 		{
 
 			MainVision m_module;

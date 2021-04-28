@@ -30,9 +30,11 @@ namespace Root_AOP01_Inspection
 		public static string mBackSideTopMem = "BackSideTop";
 		public static string mBackSideBotMem = "BackSideBot";
 		public static string m45DMem = "TDI45";
+		public static string m45DGlassMem = "TDI45";
 
 		public const string MainRegName = "imageMain";
 		public const string PellRegName = "image45D";
+		public const string GlassRegName = "imageGlass45D";
 		public const string SideLeftRegName = "imageSideLeft";
 		public const string SideTopRegName = "imageSideTop";
 		public const string SideRightRegName = "imageSideRight";
