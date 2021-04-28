@@ -140,8 +140,8 @@ namespace RootTools.Control.ACS
                 p_eState = eState.Init;
                 return p_sInfo; 
             }
-            Thread.Sleep(100);
             p_eState = eState.Move;
+            Thread.Sleep(100);
             return "OK";
         }
 
@@ -167,8 +167,8 @@ namespace RootTools.Control.ACS
                 p_eState = eState.Init;
                 return p_sInfo;
             }
-            Thread.Sleep(100);
             p_eState = eState.Move;
+            Thread.Sleep(100);
             return "OK";
         }
         #endregion
@@ -195,8 +195,8 @@ namespace RootTools.Control.ACS
                 p_eState = eState.Init;
                 return p_sInfo;
             }
-            Thread.Sleep(100);
             p_eState = eState.Move;
+            Thread.Sleep(100);
             return "OK";
         }
 
@@ -223,8 +223,8 @@ namespace RootTools.Control.ACS
                 p_eState = eState.Init;
                 return p_sInfo;
             }
-            Thread.Sleep(100);
             p_eState = eState.Move;
+            Thread.Sleep(100);
             return "OK";
         }
         #endregion
@@ -242,8 +242,8 @@ namespace RootTools.Control.ACS
             if (p_sInfo != "OK") return p_sInfo;
             p_sInfo = m_acs.m_aBuffer[m_nHomeBuffer].Run();
             if (p_sInfo != "OK") return p_sInfo;
-            Thread.Sleep(100);
             p_eState = eState.Home;
+            Thread.Sleep(100);
             return "OK";
         }
 
@@ -258,8 +258,8 @@ namespace RootTools.Control.ACS
                 p_log.Info(p_id + " Servo On = " + bOn.ToString());
             }
             catch (Exception e) { p_sInfo = p_id + " ServoOn Error : " + e.Message; }
-            Thread.Sleep(100);
             if (bOn == false) p_eState = eState.Init;
+            Thread.Sleep(100);
         }
         #endregion
 
@@ -321,8 +321,8 @@ namespace RootTools.Control.ACS
                 p_channel.WriteVariable(dTriggerUpTime, "TriggerUpTime", p_channel.ACSC_BUFFER_3);      // Trigger UpTime
 
                 // 이벤트 설정
-                p_channel.SetInterruptMask(p_channel.ACSC_INTR_PROGRAM_END, p_channel.ACSC_BUFFER_3);
-                p_channel.EnableEvent(p_channel.ACSC_INTR_PROGRAM_END);
+                p_channel.EnableEvent(p_channel.ACSC_INTR_PROGRAM_END);         // 스크립트 프로그램 종료
+                p_channel.SetInterruptMask(p_channel.ACSC_INTR_PROGRAM_END, p_channel.ACSC_MASK_BUFFER_3);
                 p_channel.PROGRAMEND += P_channel_PROGRAMEND;
 
                 // 스크립트 실행
@@ -344,8 +344,8 @@ namespace RootTools.Control.ACS
                 p_log.Info("Trigger On : " + sTrigger + ", " + dUpTime.ToString());
 
                 // Axis 상태 변경
-                Thread.Sleep(100);
                 p_eState = eState.Move;
+                Thread.Sleep(100);
             }
             else
             {
@@ -356,16 +356,14 @@ namespace RootTools.Control.ACS
                 m_acs.m_aBuffer[3].Stop();
 
                 // 이벤트 설정
-                p_channel.SetInterruptMask(p_channel.ACSC_INTR_PROGRAM_END, p_channel.ACSC_BUFFER_3);
-                p_channel.DisableEvent(p_channel.ACSC_INTR_PROGRAM_END);
                 p_channel.PROGRAMEND -= P_channel_PROGRAMEND;
 
                 // 로그
                 p_log.Info("Trigger Off");
 
                 // Axis 상태 변경
-                Thread.Sleep(100);
                 p_eState = eState.Ready;
+                Thread.Sleep(100);
             }
 
             m_bTriggerOn = bOn;
@@ -405,15 +403,14 @@ namespace RootTools.Control.ACS
         {
             // 이벤트 설정
             p_channel.SetInterruptMask(p_channel.ACSC_INTR_PROGRAM_END, p_channel.ACSC_BUFFER_3);
-            p_channel.DisableEvent(p_channel.ACSC_INTR_PROGRAM_END);
             p_channel.PROGRAMEND -= P_channel_PROGRAMEND;
 
             // 로그
             p_log.Info("Trigger Off");
 
             // Axis 상태 변경
-            Thread.Sleep(100);
             p_eState = eState.Ready;
+            Thread.Sleep(100);
 
             m_bTriggerOn = false;
         }
@@ -555,8 +552,8 @@ namespace RootTools.Control.ACS
             //}
             if (p_sensorEmergency || p_sensorEmergency)
             {
-                Thread.Sleep(100);
                 p_eState = eState.Init;
+                Thread.Sleep(100);
             }
         }
 

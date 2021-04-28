@@ -103,7 +103,7 @@ namespace Root_VEGA_D.Module
             bool bUseRADS = false;
             if (m_CamRADS.p_CamInfo != null)
             {
-                if(m_CamRADS.p_CamInfo.OpenStatus == true)
+                //if(m_CamRADS.p_CamInfo.OpenStatus == true)
                     bUseRADS = true;
             }
             p_sInfo = m_toolBox.Get(ref m_RADSControl, this, "RADSControl", bUseRADS);

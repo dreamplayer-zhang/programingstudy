@@ -167,8 +167,9 @@ namespace Root_VEGA_D.Module
                         double dNextPosX = dPosX - (dfov_mm - dOverlap_mm);
                         double dPosZ = m_grabMode.m_dFocusPosZ;
 
+                        double marginY = m_grabMode.m_nWaferSize_mm * 0.2;
                         double dTriggerStartPosY = m_grabMode.m_rpAxisCenter.Y + m_grabMode.m_ptXYAlignData.Y - m_grabMode.m_nWaferSize_mm * 0.5;
-                        double dTriggerEndPosY = m_grabMode.m_rpAxisCenter.Y + m_grabMode.m_ptXYAlignData.Y + m_grabMode.m_nWaferSize_mm * 0.5;
+                        double dTriggerEndPosY = m_grabMode.m_rpAxisCenter.Y + m_grabMode.m_ptXYAlignData.Y + m_grabMode.m_nWaferSize_mm * 0.5 + marginY;
                         double dStartPosY = dTriggerStartPosY - nScanOffset_pulse;
                         double dEndPosY = dTriggerEndPosY + nScanOffset_pulse;
 
