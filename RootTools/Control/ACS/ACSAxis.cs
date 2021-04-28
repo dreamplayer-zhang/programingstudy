@@ -140,8 +140,8 @@ namespace RootTools.Control.ACS
                 p_eState = eState.Init;
                 return p_sInfo; 
             }
-            p_eState = eState.Move;
             Thread.Sleep(100);
+            p_eState = eState.Move;
             return "OK";
         }
 
@@ -167,8 +167,8 @@ namespace RootTools.Control.ACS
                 p_eState = eState.Init;
                 return p_sInfo;
             }
-            p_eState = eState.Move;
             Thread.Sleep(100);
+            p_eState = eState.Move;
             return "OK";
         }
         #endregion
@@ -195,8 +195,8 @@ namespace RootTools.Control.ACS
                 p_eState = eState.Init;
                 return p_sInfo;
             }
-            p_eState = eState.Move;
             Thread.Sleep(100);
+            p_eState = eState.Move;
             return "OK";
         }
 
@@ -223,8 +223,8 @@ namespace RootTools.Control.ACS
                 p_eState = eState.Init;
                 return p_sInfo;
             }
-            p_eState = eState.Move;
             Thread.Sleep(100);
+            p_eState = eState.Move;
             return "OK";
         }
         #endregion
@@ -242,8 +242,8 @@ namespace RootTools.Control.ACS
             if (p_sInfo != "OK") return p_sInfo;
             p_sInfo = m_acs.m_aBuffer[m_nHomeBuffer].Run();
             if (p_sInfo != "OK") return p_sInfo;
-            p_eState = eState.Home;
             Thread.Sleep(100);
+            p_eState = eState.Home;
             return "OK";
         }
 
@@ -258,8 +258,8 @@ namespace RootTools.Control.ACS
                 p_log.Info(p_id + " Servo On = " + bOn.ToString());
             }
             catch (Exception e) { p_sInfo = p_id + " ServoOn Error : " + e.Message; }
-            if (bOn == false) p_eState = eState.Init;
             Thread.Sleep(100);
+            if (bOn == false) p_eState = eState.Init;
         }
         #endregion
 
@@ -344,8 +344,8 @@ namespace RootTools.Control.ACS
                 p_log.Info("Trigger On : " + sTrigger + ", " + dUpTime.ToString());
 
                 // Axis 상태 변경
-                p_eState = eState.Move;
                 Thread.Sleep(100);
+                p_eState = eState.Move;
             }
             else
             {
@@ -364,8 +364,8 @@ namespace RootTools.Control.ACS
                 p_log.Info("Trigger Off");
 
                 // Axis 상태 변경
-                p_eState = eState.Ready;
                 Thread.Sleep(100);
+                p_eState = eState.Ready;
             }
 
             m_bTriggerOn = bOn;
@@ -412,8 +412,8 @@ namespace RootTools.Control.ACS
             p_log.Info("Trigger Off");
 
             // Axis 상태 변경
-            p_eState = eState.Ready;
             Thread.Sleep(100);
+            p_eState = eState.Ready;
 
             m_bTriggerOn = false;
         }
@@ -555,8 +555,8 @@ namespace RootTools.Control.ACS
             //}
             if (p_sensorEmergency || p_sensorEmergency)
             {
-                p_eState = eState.Init;
                 Thread.Sleep(100);
+                p_eState = eState.Init;
             }
         }
 

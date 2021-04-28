@@ -153,11 +153,9 @@ namespace RootTools.Memory
            
             Parallel.For(0, tttt.p_sz.Y, new ParallelOptions { MaxDegreeOfParallelism = 4 }, (y) =>
             {
-                Marshal.Copy(pBuf, 0, (IntPtr)((long)tttt.GetPtr(0) + (long)p_Size.X * y), p_Size.X * tttt.p_nByte);
-                if (tttt.p_nCount == 3)
+                for (int i = 0; i < tttt.p_nCount; i++)
                 {
-                    Marshal.Copy(pBuf, 0, (IntPtr)((long)tttt.GetPtr(1) + (long)p_Size.X * y), p_Size.X);
-                    Marshal.Copy(pBuf, 0, (IntPtr)((long)tttt.GetPtr(2) + (long)p_Size.X * y), p_Size.X);
+                    Marshal.Copy(pBuf, 0, (IntPtr)((long)tttt.GetPtr(i) + (long)p_Size.X * tttt.p_nByte * y), p_Size.X * tttt.p_nByte);
                 }
             });
         }

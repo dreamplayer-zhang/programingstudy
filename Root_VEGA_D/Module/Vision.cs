@@ -101,7 +101,11 @@ namespace Root_VEGA_D.Module
             //m_remote.GetTools(bInit);
 
             bool bUseRADS = false;
-            if (m_CamRADS.p_CamInfo != null) bUseRADS = true;
+            if (m_CamRADS.p_CamInfo != null)
+            {
+                if(m_CamRADS.p_CamInfo.OpenStatus == true)
+                    bUseRADS = true;
+            }
             p_sInfo = m_toolBox.Get(ref m_RADSControl, this, "RADSControl", bUseRADS);
         }
         #endregion

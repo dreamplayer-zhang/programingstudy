@@ -310,6 +310,15 @@ namespace RootTools.Memory
                 switch (p_memoryData.p_nByte)
                 {
                     case 1: p_sGV = m_aBufDisplay[nAdd].ToString(); break;
+                    case 2:
+                        unsafe
+                        {
+                            int b1 = *((byte*)p_memoryData.GetPtr(p_nMemoryIndex, p_cpImage.X, p_cpImage.Y).ToPointer());
+                            int b2 = *((byte*)p_memoryData.GetPtr(p_nMemoryIndex, p_cpImage.X, p_cpImage.Y).ToPointer() + 1);
+                            int gv = b1 | (b2 << 8);
+                            p_sGV = gv.ToString();
+                        }
+                        break;
                     case 3:
                     case 4:
                         p_sGV = m_aBufDisplay[nAdd + 2].ToString() + ", " + m_aBufDisplay[nAdd + 1].ToString() + ", " + m_aBufDisplay[nAdd].ToString();

@@ -225,7 +225,14 @@ namespace RootTools.Control.ACS
             RunTree(Tree.eMode.RegRead);
             RunTree(Tree.eMode.Init);
             p_bConnect = true; 
-            InitThread(); 
+            InitThread();
+
+            // Enable Event 
+            m_channel.EnableEvent(m_channel.ACSC_INTR_ACSPL_PROGRAM);       // 프로그램 시작
+            m_channel.EnableEvent(m_channel.ACSC_INTR_ACSPL_PROGRAM_EX);    // 프로그램 시작
+            m_channel.EnableEvent(m_channel.ACSC_INTR_LOGICAL_MOTION_END);  // 논리적 모션 종료
+            m_channel.EnableEvent(m_channel.ACSC_INTR_PHYSICAL_MOTION_END); // 물리적 모션 종료
+            m_channel.EnableEvent(m_channel.ACSC_INTR_PROGRAM_END);         // 스크립트 프로그램 종료
         }
 
         public void ThreadStop()
