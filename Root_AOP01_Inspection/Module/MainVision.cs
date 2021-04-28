@@ -2524,7 +2524,11 @@ namespace Root_AOP01_Inspection.Module
                     m_grabMode.SetLight(true);
 
                     // UserSet Update
-                    ((Camera_Dalsa)(m_grabMode.m_camera)).p_CamParam.p_nUserSetNum = m_nUserSetNum;
+                    // 신형카메라 UserSet 변경
+                    //((Camera_Dalsa)(m_grabMode.m_camera)).p_CamParam.p_nUserSetNum = m_nUserSetNum;   
+                    // 구형카메라 UserSet 변경
+                    string strUserSetChange = string.Format("lpc %d\r", m_nUserSetNum);
+                    m_module.m_rs232.Send(strUserSetChange);
 
                     m_module.m_do45DTrigger.Write(true);
                     if (m_grabMode.pUseRADS)
