@@ -75,7 +75,7 @@ namespace Root_VEGA_D.Module
             const int TIMEOUT_50MS = 50000;     // ms
             const int TIMEOUT_INTERVAL = 10;    // ms
             const int RESCAN_MAX = 3;
-            int MM_PER_UM = 1000;
+            int MM_TO_UM = 1000;
 
             // 축 가져오기
             AxisXY axisXY = m_module.AxisXY;
@@ -93,11 +93,11 @@ namespace Root_VEGA_D.Module
             try
             {
                 // RADS 연결
-                if (m_grabMode.pUseRADS && m_module.m_RADSControl.p_IsRun == false)
+                if (m_grabMode.pUseRADS && m_module.RADSControl.p_IsRun == false)
                 {
-                    m_module.m_RADSControl.m_timer.Start();
-                    m_module.m_RADSControl.p_IsRun = true;
-                    m_module.m_RADSControl.StartRADS();
+                    m_module.RADSControl.m_timer.Start();
+                    m_module.RADSControl.p_IsRun = true;
+                    m_module.RADSControl.StartRADS();
                     StopWatch sw = new StopWatch();
                     if (camRADS.p_CamInfo._OpenStatus == false) camRADS.Connect();
                     while(camRADS.p_CamInfo._OpenStatus == false)
@@ -139,7 +139,7 @@ namespace Root_VEGA_D.Module
 
                 m_grabMode.m_dTrigger = Math.Round(m_grabMode.m_dResY_um * m_grabMode.m_dCamTriggerRatio, 1);     // 트리거 (1 pulse = 3.0 mm)
 
-                int nWaferSizeY_px = (int)Math.Round(m_grabMode.m_nWaferSize_mm * MM_PER_UM / m_grabMode.m_dResY_um);  // 웨이퍼 영역의 Y픽셀 갯수
+                int nWaferSizeY_px = (int)Math.Round(m_grabMode.m_nWaferSize_mm * MM_TO_UM / m_grabMode.m_dResY_um);  // 웨이퍼 영역의 Y픽셀 갯수
                 int nTotalTriggerCount = Convert.ToInt32(m_grabMode.m_dTrigger * nWaferSizeY_px);   // 스캔영역 중 웨이퍼 스캔 구간에서 발생할 Trigger 갯수
 
                 while (m_grabMode.m_ScanLineNum > m_nCurScanLine)
@@ -167,9 +167,8 @@ namespace Root_VEGA_D.Module
                         double dNextPosX = dPosX - (dfov_mm - dOverlap_mm);
                         double dPosZ = m_grabMode.m_dFocusPosZ;
 
-                        double dMarginY = m_grabMode.m_nWaferSize_mm * 0.1;
-                        double dTriggerStartPosY = m_grabMode.m_rpAxisCenter.Y + m_grabMode.m_ptXYAlignData.Y - m_grabMode.m_nWaferSize_mm * 0.5 - dMarginY;
-                        double dTriggerEndPosY = m_grabMode.m_rpAxisCenter.Y + m_grabMode.m_ptXYAlignData.Y + m_grabMode.m_nWaferSize_mm * 0.5 + dMarginY;
+                        double dTriggerStartPosY = m_grabMode.m_rpAxisCenter.Y + m_grabMode.m_ptXYAlignData.Y - m_grabMode.m_nWaferSize_mm * 0.5;
+                        double dTriggerEndPosY = m_grabMode.m_rpAxisCenter.Y + m_grabMode.m_ptXYAlignData.Y + m_grabMode.m_nWaferSize_mm * 0.5;
                         double dStartPosY = dTriggerStartPosY - nScanOffset_pulse;
                         double dEndPosY = dTriggerEndPosY + nScanOffset_pulse;
 
@@ -279,12 +278,15 @@ namespace Root_VEGA_D.Module
             }
             finally
             {
+                // 조명 off
                 m_grabMode.SetLight(false);
-                if (m_grabMode.pUseRADS && m_module.m_RADSControl.p_IsRun == true)
+
+                // RADS 기능 off
+                if (m_grabMode.pUseRADS && m_module.RADSControl.p_IsRun == true)
                 {
-                    m_module.m_RADSControl.m_timer.Stop();
-                    m_module.m_RADSControl.p_IsRun = false;
-                    m_module.m_RADSControl.StopRADS();
+                    m_module.RADSControl.m_timer.Stop();
+                    m_module.RADSControl.p_IsRun = false;
+                    m_module.RADSControl.StopRADS();
                     if (camRADS.p_CamInfo._IsGrabbing == true) camRADS.StopGrab();
                 }
             }

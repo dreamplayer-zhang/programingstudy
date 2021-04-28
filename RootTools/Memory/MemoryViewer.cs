@@ -393,10 +393,6 @@ namespace RootTools.Memory
         byte[] m_aBufDisplay = null; 
         unsafe void UpdateBitmapSource()
         {
-            Parallel.For(0, 4, new ParallelOptions { MaxDegreeOfParallelism = 12 }, (i) =>
-            {
-                Debug.WriteLine(i.ToString());
-            });
             if (p_memoryData == null) return;
             if (p_memoryData.GetPtr(p_nMemoryIndex) == null) return;
             if (p_szWindow.X * p_szWindow.Y == 0) return;

@@ -239,26 +239,26 @@ namespace Root_VEGA_D
 
         private void buttonGetDeviceInfo_Click(object sender, RoutedEventArgs e)
         {
-            m_engineer.m_handler.m_vision.m_RADSControl.UpdateDeviceInfo();
+            m_engineer.m_handler.m_vision.RADSControl.UpdateDeviceInfo();
         }
 
         private void buttonStartRADS_Click(object sender, RoutedEventArgs e)
         {
-            m_engineer.m_handler.m_vision.m_RADSControl.m_timer.Start();
-            m_engineer.m_handler.m_vision.m_RADSControl.p_IsRun = true;
-            m_engineer.m_handler.m_vision.m_RADSControl.StartRADS();
+            m_engineer.m_handler.m_vision.RADSControl.m_timer.Start();
+            m_engineer.m_handler.m_vision.RADSControl.p_IsRun = true;
+            m_engineer.m_handler.m_vision.RADSControl.StartRADS();
         }
 
         private void buttonStopRADS_Click(object sender, RoutedEventArgs e)
         {
-            m_engineer.m_handler.m_vision.m_RADSControl.m_timer.Stop();
-            m_engineer.m_handler.m_vision.m_RADSControl.p_IsRun = false;
-            m_engineer.m_handler.m_vision.m_RADSControl.StopRADS();
+            m_engineer.m_handler.m_vision.RADSControl.m_timer.Stop();
+            m_engineer.m_handler.m_vision.RADSControl.p_IsRun = false;
+            m_engineer.m_handler.m_vision.RADSControl.StopRADS();
         }
 
         private void buttonResetRADS_Click(object sender, RoutedEventArgs e)
         {
-            m_engineer.m_handler.m_vision.m_RADSControl.ResetController();
+            m_engineer.m_handler.m_vision.RADSControl.ResetController();
         }
     }
 }
