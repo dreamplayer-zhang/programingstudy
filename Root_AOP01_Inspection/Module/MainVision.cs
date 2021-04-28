@@ -1498,11 +1498,21 @@ namespace Root_AOP01_Inspection.Module
             public Run_SurfaceInspection(MainVision module, string rcpName, string inspMgmName)
 			{
                 EdgeList = new TRect[6];
+                EdgeListLeftSide = new TRect[6];
+                EdgeListRightSide = new TRect[6];
                 for (int j = 0; j < 6; j++)
 				{
 					EdgeList[j] = new TRect();
-				}
-				currentRcpName = rcpName;
+                }
+                for (int j = 0; j < 6; j++)
+                {
+                    EdgeListLeftSide[j] = new TRect();
+                }
+                for (int j = 0; j < 6; j++)
+                {
+                    EdgeListRightSide[j] = new TRect();
+                }
+                currentRcpName = rcpName;
                 currentMgmName = inspMgmName;
                 m_module = module;
 				InitModuleRun(module);
@@ -1550,40 +1560,46 @@ namespace Root_AOP01_Inspection.Module
 			public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
 			{
                 string defeaultName = currentMgmName + " EdgeBox #{0}";
-				for (int i = 0; i < 6; i++)
+                string edgeboxName = "EdgeBox List #{0}";
+                string edgeboxRootName = "Main EdgeBox List";
+                for (int i = 0; i < 6; i++)
 				{
 					defeaultName = currentMgmName + " EdgeBox #{0} Left";
-					EdgeList[i].MemoryRect.Left = tree.Set(EdgeList[i].MemoryRect.Left, EdgeList[i].MemoryRect.Left, string.Format(defeaultName, i), "EdgeBox's Left Position (pixel. MemoryRect)", bVisible);
+					EdgeList[i].MemoryRect.Left = ((tree.GetTree(edgeboxRootName, false, bVisible)).GetTree(string.Format(edgeboxName, i), false, bVisible)).Set(EdgeList[i].MemoryRect.Left, EdgeList[i].MemoryRect.Left, string.Format(defeaultName, i), "EdgeBox's Left Position (pixel. MemoryRect)", bVisible);
 					defeaultName = currentMgmName + " EdgeBox #{0} Top";
-					EdgeList[i].MemoryRect.Top = tree.Set(EdgeList[i].MemoryRect.Top, EdgeList[i].MemoryRect.Top, string.Format(defeaultName, i), "EdgeBox's Top Position (pixel. MemoryRect)", bVisible);
+					EdgeList[i].MemoryRect.Top = ((tree.GetTree(edgeboxRootName, false, bVisible)).GetTree(string.Format(edgeboxName, i), false, bVisible)).Set(EdgeList[i].MemoryRect.Top, EdgeList[i].MemoryRect.Top, string.Format(defeaultName, i), "EdgeBox's Top Position (pixel. MemoryRect)", bVisible);
 					defeaultName = currentMgmName + " EdgeBox #{0} Width";
-					EdgeList[i].MemoryRect.Width = tree.Set(EdgeList[i].MemoryRect.Width, EdgeList[i].MemoryRect.Width, string.Format(defeaultName, i), "EdgeBox's Width (pixel. MemoryRect)", bVisible);
+					EdgeList[i].MemoryRect.Width = ((tree.GetTree(edgeboxRootName, false, bVisible)).GetTree(string.Format(edgeboxName, i), false, bVisible)).Set(EdgeList[i].MemoryRect.Width, EdgeList[i].MemoryRect.Width, string.Format(defeaultName, i), "EdgeBox's Width (pixel. MemoryRect)", bVisible);
 					defeaultName = currentMgmName + " EdgeBox #{0} Height";
-					EdgeList[i].MemoryRect.Height = tree.Set(EdgeList[i].MemoryRect.Height, EdgeList[i].MemoryRect.Height, string.Format(defeaultName, i), "EdgeBox's Height (pixel. MemoryRect)", bVisible);
+					EdgeList[i].MemoryRect.Height = ((tree.GetTree(edgeboxRootName, false, bVisible)).GetTree(string.Format(edgeboxName, i), false, bVisible)).Set(EdgeList[i].MemoryRect.Height, EdgeList[i].MemoryRect.Height, string.Format(defeaultName, i), "EdgeBox's Height (pixel. MemoryRect)", bVisible);
                 }
                 defeaultName = currentMgmName + " EdgeBox Left#{0}";
+                edgeboxName = "Left EdgeBox List #{0}";
+                edgeboxRootName = "Left EdgeBox List";
                 for (int i = 0; i < 6; i++)
                 {
                     defeaultName = currentMgmName + " EdgeBox #{0} Left";
-                    EdgeListLeftSide[i].MemoryRect.Left = tree.Set(EdgeListLeftSide[i].MemoryRect.Left, EdgeListLeftSide[i].MemoryRect.Left, string.Format(defeaultName, i), "EdgeBox's Left Position (pixel. MemoryRect)", bVisible);
+                    EdgeListLeftSide[i].MemoryRect.Left = ((tree.GetTree(edgeboxRootName, false, bVisible)).GetTree(string.Format(edgeboxName, i), false, bVisible)).Set(EdgeListLeftSide[i].MemoryRect.Left, EdgeListLeftSide[i].MemoryRect.Left, string.Format(defeaultName, i), "EdgeBox's Left Position (pixel. MemoryRect)", bVisible);
                     defeaultName = currentMgmName + " EdgeBox #{0} Top";
-                    EdgeListLeftSide[i].MemoryRect.Top = tree.Set(EdgeListLeftSide[i].MemoryRect.Top, EdgeListLeftSide[i].MemoryRect.Top, string.Format(defeaultName, i), "EdgeBox's Top Position (pixel. MemoryRect)", bVisible);
+                    EdgeListLeftSide[i].MemoryRect.Top = ((tree.GetTree(edgeboxRootName, false, bVisible)).GetTree(string.Format(edgeboxName, i), false, bVisible)).Set(EdgeListLeftSide[i].MemoryRect.Top, EdgeListLeftSide[i].MemoryRect.Top, string.Format(defeaultName, i), "EdgeBox's Top Position (pixel. MemoryRect)", bVisible);
                     defeaultName = currentMgmName + " EdgeBox #{0} Width";
-                    EdgeListLeftSide[i].MemoryRect.Width = tree.Set(EdgeListLeftSide[i].MemoryRect.Width, EdgeListLeftSide[i].MemoryRect.Width, string.Format(defeaultName, i), "EdgeBox's Width (pixel. MemoryRect)", bVisible);
+                    EdgeListLeftSide[i].MemoryRect.Width = ((tree.GetTree(edgeboxRootName, false, bVisible)).GetTree(string.Format(edgeboxName, i), false, bVisible)).Set(EdgeListLeftSide[i].MemoryRect.Width, EdgeListLeftSide[i].MemoryRect.Width, string.Format(defeaultName, i), "EdgeBox's Width (pixel. MemoryRect)", bVisible);
                     defeaultName = currentMgmName + " EdgeBox #{0} Height";
-                    EdgeListLeftSide[i].MemoryRect.Height = tree.Set(EdgeListLeftSide[i].MemoryRect.Height, EdgeListLeftSide[i].MemoryRect.Height, string.Format(defeaultName, i), "EdgeBox's Height (pixel. MemoryRect)", bVisible);
+                    EdgeListLeftSide[i].MemoryRect.Height = ((tree.GetTree(edgeboxRootName, false, bVisible)).GetTree(string.Format(edgeboxName, i), false, bVisible)).Set(EdgeListLeftSide[i].MemoryRect.Height, EdgeListLeftSide[i].MemoryRect.Height, string.Format(defeaultName, i), "EdgeBox's Height (pixel. MemoryRect)", bVisible);
                 }
                 defeaultName = currentMgmName + " EdgeBox Right#{0}";
+                edgeboxName = "Right EdgeBox List #{0}";
+                edgeboxRootName = "Right EdgeBox List";
                 for (int i = 0; i < 6; i++)
                 {
                     defeaultName = currentMgmName + " EdgeBox #{0} Left";
-                    EdgeListRightSide[i].MemoryRect.Left = tree.Set(EdgeListRightSide[i].MemoryRect.Left, EdgeListRightSide[i].MemoryRect.Left, string.Format(defeaultName, i), "EdgeBox's Left Position (pixel. MemoryRect)", bVisible);
+                    EdgeListRightSide[i].MemoryRect.Left = ((tree.GetTree(edgeboxRootName, false, bVisible)).GetTree(string.Format(edgeboxName, i), false, bVisible)).Set(EdgeListRightSide[i].MemoryRect.Left, EdgeListRightSide[i].MemoryRect.Left, string.Format(defeaultName, i), "EdgeBox's Left Position (pixel. MemoryRect)", bVisible);
                     defeaultName = currentMgmName + " EdgeBox #{0} Top";
-                    EdgeListRightSide[i].MemoryRect.Top = tree.Set(EdgeListRightSide[i].MemoryRect.Top, EdgeListRightSide[i].MemoryRect.Top, string.Format(defeaultName, i), "EdgeBox's Top Position (pixel. MemoryRect)", bVisible);
+                    EdgeListRightSide[i].MemoryRect.Top = ((tree.GetTree(edgeboxRootName, false, bVisible)).GetTree(string.Format(edgeboxName, i), false, bVisible)).Set(EdgeListRightSide[i].MemoryRect.Top, EdgeListRightSide[i].MemoryRect.Top, string.Format(defeaultName, i), "EdgeBox's Top Position (pixel. MemoryRect)", bVisible);
                     defeaultName = currentMgmName + " EdgeBox #{0} Width";
-                    EdgeListRightSide[i].MemoryRect.Width = tree.Set(EdgeListRightSide[i].MemoryRect.Width, EdgeListRightSide[i].MemoryRect.Width, string.Format(defeaultName, i), "EdgeBox's Width (pixel. MemoryRect)", bVisible);
+                    EdgeListRightSide[i].MemoryRect.Width = ((tree.GetTree(edgeboxRootName, false, bVisible)).GetTree(string.Format(edgeboxName, i), false, bVisible)).Set(EdgeListRightSide[i].MemoryRect.Width, EdgeListRightSide[i].MemoryRect.Width, string.Format(defeaultName, i), "EdgeBox's Width (pixel. MemoryRect)", bVisible);
                     defeaultName = currentMgmName + " EdgeBox #{0} Height";
-                    EdgeListRightSide[i].MemoryRect.Height = tree.Set(EdgeListRightSide[i].MemoryRect.Height, EdgeListRightSide[i].MemoryRect.Height, string.Format(defeaultName, i), "EdgeBox's Height (pixel. MemoryRect)", bVisible);
+                    EdgeListRightSide[i].MemoryRect.Height = ((tree.GetTree(edgeboxRootName, false, bVisible)).GetTree(string.Format(edgeboxName, i), false, bVisible)).Set(EdgeListRightSide[i].MemoryRect.Height, EdgeListRightSide[i].MemoryRect.Height, string.Format(defeaultName, i), "EdgeBox's Height (pixel. MemoryRect)", bVisible);
                 }
                 BrightGV = tree.Set(BrightGV, BrightGV, "Use Bright Inspection", "Use Bright Inspection", bVisible);
                 SurfaceGV = tree.Set(SurfaceGV, SurfaceGV, "Target Inspection GV", "Target Inspection GV", bVisible);
@@ -1962,9 +1978,10 @@ namespace Root_AOP01_Inspection.Module
                     }
 
                     _StartRecipeTeaching(EdgeList, targetViewModel);
-                    if(currentMgmName==App.MainInspMgRegName)
+                    if(currentMgmName == App.MainInspMgRegName)
                     {
-                        _StartRecipeTeaching(EdgeList, targetViewModel);
+                        _StartRecipeTeaching(EdgeListRightSide, targetViewModel);
+                        _StartRecipeTeaching(EdgeListLeftSide, targetViewModel);
                     }
 
                     ReticleSurfaceParameter surParam = GlobalObjects.Instance.GetNamed<AOP_RecipeSurface>(currentRcpName).GetItem<ReticleSurfaceParameter>();
