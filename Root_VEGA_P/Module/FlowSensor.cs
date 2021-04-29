@@ -10,7 +10,7 @@ namespace Root_VEGA_P.Module
         public Modbus m_modbus;
         public string GetTools(VEGA_P vegaP)
         {
-            return vegaP.m_toolBox.GetComm(ref m_modbus, vegaP, "Modbus");
+            return vegaP.m_toolBox.GetComm(ref m_modbus, vegaP, "Flow Sensor");
         }
 
         public class Channel

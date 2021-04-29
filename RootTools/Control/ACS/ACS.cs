@@ -216,14 +216,11 @@ namespace RootTools.Control.ACS
             if (portnum == 0)
             {
                 Data = m_channel.ReadVariable("CDA1", -1);
-                System.Diagnostics.Debug.WriteLine(Data);
             }
             else if (portnum == 1)
             {
                 Data = m_channel.ReadVariable("CDA2", -1);
-                System.Diagnostics.Debug.WriteLine(Data);
             }
-            m_channel.GetAnalogInputNT(portnum, out Data);
             return Data;
         }
         #endregion

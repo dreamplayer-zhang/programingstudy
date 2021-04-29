@@ -37,16 +37,11 @@ namespace Root_VEGA_D.Module
         #region GAF
         public ALID m_visionHomeError;
         public ALID m_visionInspectError;
+        public ALID m_alidShutterSensor;
+        public ALID m_alidReticleLocateInfoError;
         public ALID m_alidShutterDownError;
         public ALID m_alidShutterUpError;
         ALID m_alid_WaferExist;
-        void InitGAF()
-        {
-            m_visionHomeError = m_gaf.GetALID(this, "Vision Home Error", "Vision Home Error");
-            m_visionInspectError = m_gaf.GetALID(this, "Vision Inspect Error", "Vision Inspect Error");
-            m_alidShutterDownError = m_gaf.GetALID(this, "VS Shutter Error", "Shutter is not down");
-            m_alidShutterUpError = m_gaf.GetALID(this, "VS Shutter Error", "Shutter is not up");
-        }
         public void SetAlarm()
         {
             m_alid_WaferExist.Run(true, "Vision Wafer Exist Error");
@@ -59,10 +54,17 @@ namespace Root_VEGA_D.Module
         AxisXY m_axisXY;
         DIO_O m_doVac;
         DIO_O m_doBlow;
+        DIO_I m_diMaskProtrude1;//docking shutter에 존재하는 센서
+        DIO_I m_diMaskProtrude2;//docking shutter에 존재하는 센서
+        DIO_I m_diRobotHandProtrude;//docking shutter에 존재하는 센서
         DIO_O m_doShutterDown;
         DIO_O m_doShutterUp;
         DIO_I m_diShutterDownCheck;
         DIO_I m_diShutterUpCheck;
+        DIO_I m_diStageReticleCheck;
+        DIO_I m_diStageReticleTilt1;
+        DIO_I m_diStageReticleTilt2;
+
         MemoryPool m_memoryPool;
         MemoryGroup m_memoryGroup;
         MemoryData m_memoryMain;
@@ -107,10 +109,16 @@ namespace Root_VEGA_D.Module
             p_sInfo = m_toolBox.GetAxis(ref m_axisXY, this, "Axis XY");
             p_sInfo = m_toolBox.GetDIO(ref m_doVac, this, "Stage Vacuum");
             p_sInfo = m_toolBox.GetDIO(ref m_doBlow, this, "Stage Blow");
+            p_sInfo = m_toolBox.GetDIO(ref m_diMaskProtrude1, this, "Shutter Mask Protrude 1");
+            p_sInfo = m_toolBox.GetDIO(ref m_diMaskProtrude2, this, "Shutter Mask Protrude 2");
+            p_sInfo = m_toolBox.GetDIO(ref m_diRobotHandProtrude, this, "Shutter Robot Hand Protrude");
             p_sInfo = m_toolBox.GetDIO(ref m_doShutterUp, this, "Shutter Up");
             p_sInfo = m_toolBox.GetDIO(ref m_doShutterDown, this, "Shutter Down");
             p_sInfo = m_toolBox.GetDIO(ref m_diShutterUpCheck, this, "Shutter Up Check");
             p_sInfo = m_toolBox.GetDIO(ref m_diShutterDownCheck, this, "Shutter Down Check");
+            p_sInfo = m_toolBox.GetDIO(ref m_diStageReticleCheck, this, "Stage Reticle Check");
+            p_sInfo = m_toolBox.GetDIO(ref m_diStageReticleTilt1, this, "Stage Reticle Tilt Check 1");
+            p_sInfo = m_toolBox.GetDIO(ref m_diStageReticleTilt2, this, "Stage Reticle Tilt Check 2");
             p_sInfo = m_toolBox.Get(ref m_lightSet, this);
             p_sInfo = m_toolBox.GetCamera(ref m_CamMain, this, "MainCam");
             p_sInfo = m_toolBox.GetCamera(ref m_CamAlign, this, "AlignCam");
@@ -122,6 +130,7 @@ namespace Root_VEGA_D.Module
             m_alid_WaferExist = m_gaf.GetALID(this, "Vision Wafer Exist", "Vision Wafer Exist");
             //m_remote.GetTools(bInit);
 
+            InitALID();
             bool bUseRADS = false;
             if (m_CamRADS.p_CamInfo != null)
             {
@@ -129,6 +138,15 @@ namespace Root_VEGA_D.Module
                     bUseRADS = true;
             }
             p_sInfo = m_toolBox.Get(ref m_RADSControl, this, "RADSControl", bUseRADS);
+        }
+        void InitALID()
+        {
+            m_visionHomeError = m_gaf.GetALID(this, "Vision Home Error", "Vision Home Error");
+            m_visionInspectError = m_gaf.GetALID(this, "Vision Inspect Error", "Vision Inspect Error");
+            m_alidShutterSensor = m_gaf.GetALID(this, "Shutter Sensor Error", "Shutter Sensor is detected");
+            m_alidShutterDownError = m_gaf.GetALID(this, "VS Shutter Error", "Shutter is not down");
+            m_alidShutterUpError = m_gaf.GetALID(this, "VS Shutter Error", "Shutter is not up");
+            m_alidReticleLocateInfoError = m_gaf.GetALID(this, "Reticle Locate Info is not Correct", "Reticle Locate Info is not Correct");
         }
         #endregion
 
@@ -178,6 +196,10 @@ namespace Root_VEGA_D.Module
             while (m_aGrabMode.Count > m_lGrabMode) m_aGrabMode.RemoveAt(m_aGrabMode.Count - 1);
             foreach (GrabMode grabMode in m_aGrabMode) grabMode.RunTreeName(tree.GetTree("Name", false));
             foreach (GrabMode grabMode in m_aGrabMode) grabMode.RunTree(tree.GetTree(grabMode.p_sName, false), true, false);
+        }
+        void RunTreeSetup(Tree tree)
+        {
+            m_eCheckWafer = (eCheckWafer)tree.Set(m_eCheckWafer, m_eCheckWafer, "CheckWafer", "CheckWafer");
         }
         #endregion
 
@@ -326,30 +348,63 @@ namespace Root_VEGA_D.Module
             return m_waferSize.GetData(infoWafer.p_eSize).m_teachWTR;
         }
 
+        public string ShutterSafety()
+		{
+            if (!m_diMaskProtrude1.p_bIn) return "Mask Protrude 1 = "+ m_diMaskProtrude1.p_bIn;
+            if (!m_diMaskProtrude2.p_bIn) return "Mask Protrude 2 = "+ m_diMaskProtrude2.p_bIn;
+            if (!m_diRobotHandProtrude.p_bIn) return "Mask Protrude 1 = "+ m_diRobotHandProtrude.p_bIn;
+            Thread.Sleep(1000);
+            return "OK";
+        }
+        public string StageReticleCheck(bool bOn)
+        {
+            if (m_diStageReticleCheck.p_bIn == bOn) return "Reticle Check = " + m_diStageReticleCheck.p_bIn;
+            if (m_diStageReticleTilt1.p_bIn == bOn) return "Reticle Tilt 1 = " + m_diStageReticleTilt1.p_bIn;
+            if (m_diStageReticleTilt2.p_bIn == bOn) return "Reticle Tilt 2 = " + m_diStageReticleTilt2.p_bIn;
+            return "OK";
+        }
+
         public string BeforeGet(int nID)
         {
-            ////shutter
-            //m_doShutterUp.Write(false);
-            //Thread.Sleep(100);
-            //m_doShutterDown.Write(true);
-            //StopWatch sw = new StopWatch();
-            //sw.Start();
-            //while (!m_diShutterDownCheck.p_bIn || m_diShutterUpCheck.p_bIn)
-            //{
-            //    if (sw.ElapsedMilliseconds > 5000)
-            //    {
-            //        m_alidShutterDownError.Run(true, "Shutter error in Beforeget");
-            //    }
-            //}
-            ////
+            //shutter 
+            p_sInfo = ShutterSafety();
+            if (p_sInfo != "OK")
+            {
+                m_alidShutterSensor.Run(true, p_sInfo);
+                return p_sInfo;
+            }
+            m_doShutterUp.Write(false);
+            Thread.Sleep(100);
+            m_doShutterDown.Write(true);
+            StopWatch sw = new StopWatch();
+            sw.Start();
+            while (!m_diShutterDownCheck.p_bIn || m_diShutterUpCheck.p_bIn)
+            {
+                if (sw.ElapsedMilliseconds > 5000)
+                {
+                    m_alidShutterDownError.Run(true, "Shutter error in Beforeget");
+                }
+            }
+            //
+
+            // 레티클 유무 체크
+            p_sInfo = StageReticleCheck(false);//shutter Sensor check
+            if (p_sInfo != "OK")
+            {
+                m_alidReticleLocateInfoError.Run(true, p_sInfo);
+                return p_sInfo;
+            }
+
             if (p_eRemote == eRemote.Client) return RemoteRun(eRemoteRun.BeforeGet, eRemote.Client, nID);
             else
             {
                 if (Run(m_axisZ.StartMove(eAxisPosZ.Ready))) return p_sInfo;
                 if (Run(m_axisRotate.StartMove(eAxisPosRotate.Ready))) return p_sInfo;
-                if (Run(m_axisXY.StartMove(eAxisPosX.Ready))) return p_sInfo;
-
-                if (Run(m_axisXY.WaitReady()))
+                if (Run(m_axisXY.p_axisX.StartMove(eAxisPosX.Ready))) return p_sInfo;
+                if (Run(m_axisXY.p_axisY.StartMove(eAxisPosY.Ready))) return p_sInfo;
+                if (Run(m_axisXY.p_axisX.WaitReady()))
+                    return p_sInfo;
+                if (Run(m_axisXY.p_axisY.WaitReady()))
                     return p_sInfo;
                 if (Run(m_axisRotate.WaitReady()))
                     return p_sInfo;
@@ -371,28 +426,44 @@ namespace Root_VEGA_D.Module
 
         public string BeforePut(int nID)
         {
-            ////shutter
-            //m_doShutterUp.Write(false);
-            //Thread.Sleep(100);
-            //m_doShutterDown.Write(true);
-            //StopWatch sw = new StopWatch();
-            //sw.Start();
-            //while (!m_diShutterDownCheck.p_bIn || m_diShutterUpCheck.p_bIn)
-            //{
-            //    if (sw.ElapsedMilliseconds > 5000)
-            //    {
-            //        m_alidShutterDownError.Run(true, "Shutter error in Beforeput");
-            //    }
-            //}
-            ////
+            //shutter
+            p_sInfo = ShutterSafety();
+            if (p_sInfo != "OK")
+            {
+                m_alidShutterSensor.Run(true, p_sInfo);
+                return p_sInfo;
+            }
+            m_doShutterUp.Write(false);
+            Thread.Sleep(100);
+            m_doShutterDown.Write(true);
+            StopWatch sw = new StopWatch();
+            sw.Start();
+            while (!m_diShutterDownCheck.p_bIn || m_diShutterUpCheck.p_bIn)
+            {
+                if (sw.ElapsedMilliseconds > 5000)
+                {
+                    m_alidShutterDownError.Run(true, "Shutter error in Beforeput");
+                }
+            }
+            // 레티클 유무 체크
+            p_sInfo = StageReticleCheck(true);//shutter Sensor check
+            if (p_sInfo != "OK")
+            {
+                m_alidReticleLocateInfoError.Run(true, p_sInfo);
+                return p_sInfo;
+            }
+
             if (p_eRemote == eRemote.Client) return RemoteRun(eRemoteRun.BeforePut, eRemote.Client, nID);
             else
             {
                 if (Run(m_axisZ.StartMove(eAxisPosZ.Ready))) return p_sInfo;
                 if (Run(m_axisRotate.StartMove(eAxisPosRotate.Ready))) return p_sInfo;
-                if (Run(m_axisXY.StartMove(eAxisPosX.Ready))) return p_sInfo;
+                if (Run(m_axisXY.p_axisX.StartMove(eAxisPosX.Ready))) return p_sInfo;
+                if (Run(m_axisXY.p_axisY.StartMove(eAxisPosY.Ready))) return p_sInfo;
 
-                if (Run(m_axisXY.WaitReady()))
+                if (Run(m_axisXY.p_axisX.WaitReady()))
+                    return p_sInfo;
+                if (Run(m_axisXY.p_axisY.WaitReady()))
                     return p_sInfo;
                 if (Run(m_axisRotate.WaitReady()))
                     return p_sInfo;
@@ -412,39 +483,61 @@ namespace Root_VEGA_D.Module
 
         public string AfterGet(int nID)
         {
+            p_sInfo = StageReticleCheck(true);
+            if (p_sInfo != "OK")
+            {
+                m_alidReticleLocateInfoError.Run(true, p_sInfo);
+                return p_sInfo;
+            }
             ////shutter
-            //m_doShutterDown.Write(false);
-            //Thread.Sleep(100);
-            //m_doShutterUp.Write(true);
-            //StopWatch sw = new StopWatch();
-            //sw.Start();
-            //while (m_diShutterDownCheck.p_bIn || !m_diShutterUpCheck.p_bIn)
-            //{
-            //    if (sw.ElapsedMilliseconds > 5000)
-            //    {
-            //        m_alidShutterDownError.Run(true, "Shutter error in Afterget");
-            //    }
-            //}
-            ////
+            p_sInfo = ShutterSafety();
+            if (p_sInfo != "OK")
+            {
+                m_alidShutterSensor.Run(true, p_sInfo);
+                return p_sInfo;
+            }
+            m_doShutterDown.Write(false);
+            Thread.Sleep(100);
+            m_doShutterUp.Write(true);
+            StopWatch sw = new StopWatch();
+            sw.Start();
+            while (m_diShutterDownCheck.p_bIn || !m_diShutterUpCheck.p_bIn)
+            {
+                if (sw.ElapsedMilliseconds > 5000)
+                {
+                    m_alidShutterDownError.Run(true, "Shutter error in Afterget");
+                }
+            }
             return "OK";
         }
 
         public string AfterPut(int nID)
         {
+            p_sInfo = StageReticleCheck(false);
+            if (p_sInfo != "OK")
+            {
+                m_alidReticleLocateInfoError.Run(true, p_sInfo);
+                return p_sInfo;
+            }
             ////shutter
-            //m_doShutterDown.Write(false);
-            //Thread.Sleep(100);
-            //m_doShutterUp.Write(true);
-            //StopWatch sw = new StopWatch();
-            //sw.Start();
-            //while (m_diShutterDownCheck.p_bIn || !m_diShutterUpCheck.p_bIn)
-            //{
-            //    if (sw.ElapsedMilliseconds > 5000)
-            //    {
-            //        m_alidShutterDownError.Run(true, "Shutter error in Afterput");
-            //    }
-            //}
-            ////
+            p_sInfo = ShutterSafety();
+            if (p_sInfo != "OK")
+            {
+                m_alidShutterSensor.Run(true, p_sInfo);
+                return p_sInfo;
+            }
+            m_doShutterDown.Write(false);
+            Thread.Sleep(100);
+            m_doShutterUp.Write(true);
+            StopWatch sw = new StopWatch();
+            sw.Start();
+            while (m_diShutterDownCheck.p_bIn || !m_diShutterUpCheck.p_bIn)
+            {
+                if (sw.ElapsedMilliseconds > 5000)
+                {
+                    m_alidShutterDownError.Run(true, "Shutter error in Afterput");
+                }
+            }
             return "OK";
         }
 
@@ -458,7 +551,12 @@ namespace Root_VEGA_D.Module
         {
             switch (m_eCheckWafer)
             {
-                case eCheckWafer.Sensor: return false; // m_diWaferExist.p_bIn;
+                case eCheckWafer.Sensor:
+                    if (!(m_diStageReticleCheck.p_bIn == m_diStageReticleCheck.p_bIn && m_diStageReticleCheck.p_bIn == m_diStageReticleCheck.p_bIn))
+                    {
+                        m_alidReticleLocateInfoError.Run(true, "Reticle Sensor value is not same.");
+                    }
+                    return m_diStageReticleCheck.p_bIn || m_diStageReticleCheck.p_bIn || m_diStageReticleCheck.p_bIn;//jws tilt체크필요
                 default: return (p_infoWafer != null);
             }
         }
@@ -526,6 +624,7 @@ namespace Root_VEGA_D.Module
             base.RunTree(tree);
             RunTreeAxis(tree.GetTree("Axis", false));
             RunTreeGrabMode(tree.GetTree("Grab Mode", false));
+            RunTreeSetup(tree.GetTree("Setup", false));
         }
         #endregion
 

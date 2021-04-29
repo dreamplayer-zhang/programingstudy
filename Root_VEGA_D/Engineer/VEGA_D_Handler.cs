@@ -195,6 +195,7 @@ namespace Root_VEGA_D.Engineer
         #endregion
 
         #region StateHome
+        public bool m_bIsPossible_Recovery = false;
         public string StateHome()
         {
             m_HomeProgress.HomeProgressShow();
@@ -207,10 +208,10 @@ namespace Root_VEGA_D.Engineer
                 EQ.p_eState = EQ.eState.Init;
                 return sInfo;
             }
+            if(!m_wtr.m_diArmClose.p_bIn) m_wtr.m_alidRTRArmError.Run(true, "RTR Arm is not close in home motion");
             sInfo = StateHome(m_interlock, (ModuleBase)m_aLoadport[0], (ModuleBase)m_aLoadport[1], m_vision, m_towerlamp, (RFID_Brooks)m_aRFID[0], (RFID_Brooks)m_aRFID[1], m_FFU);
             if (sInfo == "OK") EQ.p_eState = EQ.eState.Ready;
-            //if (sInfo == "OK") m_bIsPossible_Recovery = true;
-            if (sInfo == "OK") EQ.p_eState = EQ.eState.Ready;
+            if (sInfo == "OK") m_bIsPossible_Recovery = true;
             return sInfo;
         }
 
@@ -389,15 +390,18 @@ namespace Root_VEGA_D.Engineer
                 {
                     case EQ.eState.Home: StateHome(); break;
                     case EQ.eState.Run:
+                        m_engineer.m_handler.m_bIsPossible_Recovery = false;
+                        if (!m_wtr.m_diArmClose.p_bIn)
+                        {
+                            m_wtr.m_alidRTRArmError.Run(true, "RTR Arm is open in Cycle");
+                            break;
+                        }
                         if (p_moduleList.m_qModuleRun.Count == 0)
                         {
                             m_process.p_sInfo = m_process.RunNextSequence();
                             if ((EQ.p_nRnR > 1) && (m_process.m_qSequence.Count == 0))
                             {
                                 while (m_aLoadport[EQ.p_nRunLP].p_infoCarrier.p_eState != InfoCarrier.eState.Placed) Thread.Sleep(10);
-                                //m_process.p_sInfo = m_process.AddInfoWafer(m_infoRnRSlot);
-                                m_infoRnRSlot.RecipeOpen("C:\\Recipe\\VEGA_D\\" + "OnlyOne.Vega_D");
-                                //AddSequence(m_infoRnRSlot);
                                 m_process.p_sInfo = m_process.AddInfoWafer(m_infoRnRSlot);
                                 CalcSequence();
                                 //m_nRnR--;

@@ -430,7 +430,7 @@ namespace RootTools.Control
             return "OK"; 
         }
 
-        public string WaitReady(double dInPos = -1)
+        public virtual string WaitReady(double dInPos = -1)
         {
             while (p_eState == eState.Move || p_eState == eState.Home)
             {

@@ -570,8 +570,8 @@ namespace Root_EFEM.Module
                 if ((m_protocolSend == null) && (m_qProtocol.Count > 0))
                 {
                     m_protocolSend = m_qProtocol.Dequeue();
-                    p_sInfo = m_protocolSend.SendCmd(); 
-                    if (p_sInfo != "OK")
+                    //p_sInfo = m_protocolSend.SendCmd(); 
+                    if (m_protocolSend.SendCmd() != "OK")
                     {
                         m_protocolSend = null;
                         m_qProtocol.Clear(); 
@@ -779,7 +779,7 @@ namespace Root_EFEM.Module
         bool m_bNeedHome = true;
         public override string StateHome()
         {
-
+            m_swLotTime.Stop();
             if (EQ.p_bSimulate == false)
             {
                 if (Run(CmdResetCPU()))
@@ -927,7 +927,9 @@ namespace Root_EFEM.Module
             InitEvent();
             InitGAF();
             if (m_gem != null) m_gem.OnGemRemoteCommand += M_gem_OnRemoteCommand;
-            InitThread(); 
+            InitThread();
+
+            m_swLotTime.Reset();
         }
 
         public override void ThreadStop()
@@ -946,6 +948,7 @@ namespace Root_EFEM.Module
         }
 
         #region ModuleRun
+        public StopWatch m_swLotTime =new StopWatch();
         public ModuleRunBase m_runDocking;
         public ModuleRunBase m_runUndocking;
 
@@ -1037,31 +1040,7 @@ namespace Root_EFEM.Module
                     m_module.m_alidLoad.Run(true, p_sInfo);
                     return p_sInfo;
                 }
-                //InfoCarrier infoCarrier = m_infoCarrier;
-                //List<GemSlotBase.eState> aSlot = new List<GemSlotBase.eState>();
-                //string sMap = "1000000000000000000000000";
-                //foreach (char ch in sMap)
-                //{
-                //    switch (ch)
-                //    {
-                //        case '0':
-                //            aSlot.Add(GemSlotBase.eState.Empty);
-                //            break;
-                //        case '1':
-                //            aSlot.Add(GemSlotBase.eState.Exist);
-                //            break;
-                //        case 'D':
-                //            aSlot.Add(GemSlotBase.eState.Double);
-                //            break;
-                //        case 'C':
-                //            aSlot.Add(GemSlotBase.eState.Cross);
-                //            break;
-                //        default:
-                //            aSlot.Add(GemSlotBase.eState.Undefined);
-                //            break;
-                //    }
-                //}
-                //if (!EQ.p_bRecovery) infoCarrier.SetMapData(aSlot);
+
                 m_infoCarrier.SendSlotMap();
                 while (m_infoCarrier.p_eStateSlotMap != GemCarrierBase.eGemState.VerificationOK)
                 {
@@ -1074,28 +1053,12 @@ namespace Root_EFEM.Module
 
                 if (m_module.m_diOpen.p_bIn == true && m_module.m_diRun.p_bIn ==false) m_module.p_open = true;
                 else m_module.p_open = false;
+
+                m_module.m_swLotTime.Restart();
+
                 return "OK";
 
-                //m_module.m_bUnLoadCheck = false;
-                //if (m_infoCarrier.p_eState == InfoCarrier.eState.Dock) return "OK";
-                //if (m_infoCarrier.p_eState != InfoCarrier.eState.Placed)
-                //{
-                //    m_module.m_alidLoad.Run(true, p_id + " RunLoad, InfoCarrier.p_eState = " + m_infoCarrier.p_eState.ToString());
-                //    return p_id + " RunLoad, InfoCarrier.p_eState = " + m_infoCarrier.p_eState.ToString();
-                //}
-                //if (m_module.Run(m_module.CmdLoad()))
-                //{
-                //    m_module.m_alidLoad.Run(true, p_sInfo);
-                //    return p_sInfo;
-                //}
-                //if (m_infoCarrier.m_aInfoWafer[0] == null)
-                //{
-                //    m_module.m_alidInforeticle.Run(true, "There is No Reticle");
-                //}
-                //m_infoCarrier.p_eState = InfoCarrier.eState.Dock;
-                //m_module.m_ceidDocking.Send();
-                //m_module.m_bLoadCheck = true;
-                //return "OK";
+
             }
         }
 
@@ -1161,6 +1124,7 @@ namespace Root_EFEM.Module
                     }
                 }
                 m_infoCarrier.p_eState = InfoCarrier.eState.Placed;
+                m_module.m_swLotTime.Stop();
                 return "OK";
 
                 //m_module.m_bLoadCheck = false;
@@ -1234,7 +1198,6 @@ namespace Root_EFEM.Module
                 return sResult;
             }
         }
-
         #endregion
     }
 }

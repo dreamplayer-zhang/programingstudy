@@ -19,6 +19,7 @@ namespace Root_VEGA_P.Module
             p_sInfo = m_toolBox.GetDIO(ref m_doCover, this, p_id + ".Cover", Enum.GetNames(typeof(eCover)));
             p_sInfo = m_toolBox.GetDIO(ref m_diCover[0], this, p_id + ".Cover Open", new string[] { "0", "1" });
             p_sInfo = m_toolBox.GetDIO(ref m_diCover[1], this, p_id + ".Cover Close", new string[] { "0", "1" });
+            m_particleCounterSet.GetTools(m_toolBox, bInit);
             if (bInit) { }
         }
         #endregion

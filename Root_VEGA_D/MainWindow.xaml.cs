@@ -19,6 +19,7 @@ namespace Root_VEGA_D
     /// </summary>
     public partial class MainWindow : Window
     {
+        Version assemblyVersion = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
         #region TitleBar
         private void MinimizeButton_Click(object sender, RoutedEventArgs e)
         {
@@ -84,6 +85,9 @@ namespace Root_VEGA_D
 
         VEGA_D_Handler m_handler;
         VEGA_D_Engineer m_engineer = new VEGA_D_Engineer();
+        Loadport_Cymechs[] m_loadport_Cymechs = new Loadport_Cymechs[2];
+        Login_UI m_login;
+        Login.eLevel m_level;
         public MainWindow()
         {
             InitializeComponent();
@@ -98,6 +102,19 @@ namespace Root_VEGA_D
             RecipeWizard_UI.init(m_engineer);
             InitTimer();
             InitFFU();
+            m_loadport_Cymechs[0] = (Loadport_Cymechs)m_handler.m_aLoadport[0];
+            m_loadport_Cymechs[1] = (Loadport_Cymechs)m_handler.m_aLoadport[1];
+            VersionInfo.Text = "Ver " + assemblyVersion.ToString();
+            btnLogin.Content = "User";
+            LoadportAState.DataContext = m_handler.m_loadport[0];
+            LoadportBState.DataContext = m_handler.m_loadport[1];
+            RobotState.DataContext = m_handler.m_wtr;
+            VisionState.DataContext = m_handler.m_vision;
+            btnLogin.DataContext = m_engineer.m_login;
+            engineerTab.Visibility = (m_engineer.m_login.p_eLevel >= Login.eLevel.Operator) ? Visibility.Visible : Visibility.Collapsed;
+            ReviewTab.Visibility = (m_engineer.m_login.p_eLevel >= Login.eLevel.Operator) ? Visibility.Visible : Visibility.Collapsed;
+            RunTab.Visibility = (m_engineer.m_login.p_eLevel >= Login.eLevel.Operator) ? Visibility.Visible : Visibility.Collapsed;
+
             //TextBlockRetID.DataContext = m_handler.m_aLoadport[0].p_infoCarrier.m_aGemSlot[0];
         }
         //bool m_blogin = false;
@@ -176,21 +193,39 @@ namespace Root_VEGA_D
         bool IsEnable_Recovery()
         {
             if (IsRunModule()) return false;
+            if (IsErrorModule()) return false;
             if (EQ.p_eState != EQ.eState.Ready) return false;
+            if (m_handler.m_bIsPossible_Recovery == false) return false;
+
             if (EQ.p_bStop == true) return false;
             return m_handler.IsEnableRecovery();
         }
         private void buttonRecovery_Click(object sender, RoutedEventArgs e)
         {
             if (IsEnable_Recovery() == false) return;
+            m_handler.m_bIsPossible_Recovery = false;
             m_handler.CalcRecover();
-            EQ.p_bStop = false;
             EQ.p_eState = EQ.eState.Run;
             EQ.p_bRecovery = true;
         }
         private void buttonBuzzOff_Click(object sender, RoutedEventArgs e)
         {
             m_engineer.BuzzerOff();
+        }
+        bool IsErrorModule()
+        {
+            if (IsErrorModule(m_handler.m_loadport[0]) || IsErrorModule(m_handler.m_loadport[1]) || 
+                IsErrorModule(m_handler.m_wtr) || IsErrorModule(m_handler.m_vision))
+                return true;
+            else
+                return false;
+        }
+        bool IsErrorModule(ModuleBase module)
+        {
+            if (module.p_eState == ModuleBase.eState.Error)
+                return true;
+            else
+                return false;
         }
 
         #region Timer
@@ -215,6 +250,21 @@ namespace Root_VEGA_D
             buttonPause.IsEnabled = IsEnable_Pause();
             buttonInitialize.IsEnabled = IsEnable_Initial();
             buttonRecovery.IsEnabled = IsEnable_Recovery();
+            if (m_loadport_Cymechs[0].m_swLotTime.IsRunning)
+                InspectTime.Text = String.Format("{0:00}:{1:00}:{2:00}", m_loadport_Cymechs[0].m_swLotTime.Elapsed.Hours, m_loadport_Cymechs[0].m_swLotTime.Elapsed.Minutes, m_loadport_Cymechs[0].m_swLotTime.Elapsed.Seconds);
+            else
+                InspectTime.Text = String.Format("{0:00}:{1:00}:{2:00}", m_loadport_Cymechs[1].m_swLotTime.Elapsed.Hours, m_loadport_Cymechs[1].m_swLotTime.Elapsed.Minutes, m_loadport_Cymechs[1].m_swLotTime.Elapsed.Seconds);
+            RNRCount.Text = EQ.p_nRnR < 1 ? "0" : EQ.p_nRnR.ToString();
+            btnFP_Isolator.IsChecked = m_handler.m_interlock.m_diFP_Isolator.p_bIn;
+            btnIsolator_V.IsChecked = m_handler.m_interlock.m_diIsolator_VPre.p_bIn;
+            btn_Factory_Air_Pad.IsChecked = m_handler.m_interlock.m_diFactory_Air_PadPre.p_bIn;
+            btn_Air_Tank.IsChecked = m_handler.m_interlock.m_diAir_TankPre.p_bIn;
+            btn_X_Bottom.IsChecked = m_handler.m_interlock.m_diX_BottomPre.p_bIn;
+            btn_X_Side_Master.IsChecked = m_handler.m_interlock.m_diX_SideMasterPre.p_bIn;
+            btn_X_Side_Slave.IsChecked = m_handler.m_interlock.m_diX_SideSlavePre.p_bIn;
+            btn_Y_Bottom.IsChecked = m_handler.m_interlock.m_diY_BottomPre.p_bIn;
+            btn_Y_Side_Master.IsChecked = m_handler.m_interlock.m_diY_SideMasterPre.p_bIn;
+            btn_Y_Side_Slave.IsChecked = m_handler.m_interlock.m_diY_SideSlavePre.p_bIn;
         }
         void TimerUI()
         {
@@ -222,10 +272,6 @@ namespace Root_VEGA_D
             //textState.Text = m_bRecovery ? "Recovery" : EQ.p_eState.ToString();
             EQState.Foreground = EQ.p_eState.ToString() == "Error" ? Brushes.Red : Brushes.Green;
             EQState.Text = EQ.p_bRecovery ? "Recovery" : EQ.p_eState.ToString();
-            LoadportAState.DataContext = m_handler.m_loadport[0];
-            LoadportBState.DataContext = m_handler.m_loadport[1];
-            RobotState.DataContext = m_handler.m_wtr;
-            VisionState.DataContext = m_handler.m_vision;
         }
 
         void TimerLamp()
@@ -235,9 +281,18 @@ namespace Root_VEGA_D
             lampYellow.Background = EQ.p_eState == EQ.eState.Ready ? Brushes.Gold : Brushes.Ivory;
             lampGreen.Background = EQ.p_eState == EQ.eState.Run ? Brushes.SeaGreen : Brushes.Honeydew;
         }
-        #endregion
-    }
-    public class StateToColorConverter : IValueConverter
+		#endregion
+
+		private void btnLogin_Click(object sender, RoutedEventArgs e)
+		{
+            m_login = new Login_UI(m_engineer);
+            m_login.ShowDialog();
+            engineerTab.Visibility = (m_engineer.m_login.p_eLevel >= Login.eLevel.Operator) ? Visibility.Visible : Visibility.Collapsed;
+            ReviewTab.Visibility = (m_engineer.m_login.p_eLevel >= Login.eLevel.Operator) ? Visibility.Visible : Visibility.Collapsed;
+            RunTab.Visibility = (m_engineer.m_login.p_eLevel >= Login.eLevel.Operator) ? Visibility.Visible : Visibility.Collapsed;
+        }
+	}
+	public class StateToColorConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
