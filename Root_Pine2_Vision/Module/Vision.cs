@@ -36,6 +36,7 @@ namespace Root_Pine2_Vision.Module
 
         public override void InitMemorys()
         {
+            if (p_eRemote == eRemote.Client) return;
             memoryGroup = memoryPool.GetGroup(p_id);
         }
         #endregion
@@ -121,6 +122,7 @@ namespace Root_Pine2_Vision.Module
                 m_eRemote = (eRemote)tree.Set(m_eRemote, m_eRemote, "Remote", "Remote", false);
                 switch (m_eRemoteRun)
                 {
+                    default: break; 
                 }
             }
 
@@ -141,6 +143,7 @@ namespace Root_Pine2_Vision.Module
         {
             AddModuleRunList(new Run_Remote(this), true, "Remote Run");
             AddModuleRunList(new Run_Delay(this), true, "Time Delay");
+            AddModuleRunList(new Run_Grab(this), true, "Time Delay");
         }
 
         public class Run_Delay : ModuleRunBase
@@ -171,6 +174,41 @@ namespace Root_Pine2_Vision.Module
                 return "OK";
             }
         }
+
+        public class Run_Grab : ModuleRunBase
+        {
+            Vision m_module;
+            public Run_Grab(Vision module)
+            {
+                m_module = module;
+                InitModuleRun(module);
+            }
+
+            enum eBoat
+            {
+                Boat1,
+                Boat2
+            }
+            eBoat m_eBoat = eBoat.Boat1; 
+            public override ModuleRunBase Clone()
+            {
+                Run_Grab run = new Run_Grab(m_module);
+                run.m_eBoat = m_eBoat;
+                return run;
+            }
+
+            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
+            {
+                m_eBoat = (eBoat)tree.Set(m_eBoat, m_eBoat, "Boat", "Boat ID", bVisible);
+            }
+
+            public override string Run()
+            {
+                //forget
+                return "OK";
+            }
+        }
+
         #endregion
 
     }
