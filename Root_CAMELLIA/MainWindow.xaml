@@ -12,6 +12,7 @@
         xmlns:arrow="clr-namespace:Petzold.Media2D"
         xmlns:ctrl="clr-namespace:Root_CAMELLIA.Control"
         xmlns:stage="clr-namespace:Camellia2Stage"
+        xmlns:PackIcon="http://metro.mahapps.com/winfx/xaml/iconpacks"
         xmlns:TemplateSelector="clr-namespace:Root_CAMELLIA.TemplateSelector"
         mc:Ignorable="d"
         WindowStyle="None"
@@ -28,6 +29,11 @@
         <local:AxisToStageUIConverter x:Key="AxisToStageConverter"/>
         <local:MeasurePointToStageUIConverter x:Key="PointToStageConverter"/>
         <local:DoubleToProgressConverter x:Key="ProgressConverter"/>
+        <local:OpticLampStateColorConverter x:Key="OpticLampStateColorConverter"/>
+        <local:BoolToLoginStateConverter x:Key="LoginStateConverter"/>
+        <local:BoolToBrushConverter x:Key="LoginStateBrushConverter"/>
+        <local:OpticLampStatusEnumToStringConverter x:Key="OpticLampStatusEnumConverter"/>
+        <local:OpticLampTimeToStringConverter x:Key="OpticLampTimeToStringConverter"/>
     </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
@@ -103,20 +109,50 @@
                 <ColumnDefinition Width="1.8*"/>
                 <ColumnDefinition Width="1.2*"/>
             </Grid.ColumnDefinitions>
-            <StackPanel Grid.Column="0"
+            <!--<StackPanel Grid.Column="0"
                         Orientation="Horizontal" >
-                <Button Content="Load" VerticalAlignment="Center" Height="40" Width="60" Margin="5"     Command="{Binding CmdLoad}"/>
-                <Button Content="Recipe" VerticalAlignment="Center" Height="40" Width="60" Margin="5"   Command="{Binding CmdRecipe}"/>
-                <Button Content="Engineer" VerticalAlignment="Center" Height="40" Width="60" Margin="5" Command="{Binding CmdEngineer}"/>
-                <Button Content="Test" VerticalAlignment="Center" Height="40" Width="60" Margin="5" Command="{Binding CmdTest}"/>
-            </StackPanel>
+                <Button Content="Load" VerticalAlignment="Center" Height="40" Width="auto" Margin="5"     Command="{Binding CmdLoad}"/>
+                <Button Content="Recipe" VerticalAlignment="Center" Height="40" Width="auto" Margin="5"   Command="{Binding CmdRecipe}"/>
+                <Button Content="Engineer" VerticalAlignment="Center" Height="40" Width="auto" Margin="5" Command="{Binding CmdEngineer}"/>
+                <Button Content="Review" VerticalAlignment="Center" Height="40" Width="auto" Margin="5" Command="{Binding CmdReview}"/>
+            </StackPanel>-->
+            <UniformGrid Columns="4">
+                <Button Content="Load" VerticalAlignment="Center" Height="40" Width="auto"  Margin="4,0,4,0"  Command="{Binding CmdLoad}"/>
+                <Button Content="Recipe" VerticalAlignment="Center" Height="40" Width="auto" Margin="4,0,4,0"   Command="{Binding CmdRecipe}"/>
+                <Button VerticalAlignment="Center" Height="40" Width="auto" Command="{Binding CmdEngineer}"  Margin="4,0,4,0">
+                    <TextBlock TextWrapping="Wrap" TextAlignment="Center">
+                        Engineer
+                    </TextBlock>
+                </Button>
+                <Button Content="Review" VerticalAlignment="Center" Height="40" Width="auto" Margin="4,0,4,0" Command="{Binding CmdReview}"/>
+            </UniformGrid>
             <Grid Grid.Column="1">
-                <TextBlock x:Name="tbTime"
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Margin="10,0,0,0" Text="User State : " FontSize="15"
+                           FontWeight="Bold"
+                           VerticalAlignment="Center"
+                           HorizontalAlignment="Center"></TextBlock>
+                        <!--Source={x:Static local:BaseDefine.Configuration}}-->
+                        <TextBlock Text="{Binding Mode=TwoWay, Path=LoginSuccess, Source={x:Static local:BaseDefine.Configuration}, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource LoginStateConverter}}" FontSize="15"
+                           Foreground="{Binding Mode=TwoWay, Path=LoginSuccess, Source={x:Static local:BaseDefine.Configuration}, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource LoginStateBrushConverter}}"
+                                   FontWeight="Bold"
+                           VerticalAlignment="Center"
+                           HorizontalAlignment="Center"></TextBlock>
+                    </StackPanel>
+                    <Rectangle Grid.Column="1" VerticalAlignment="Stretch" Width="1" Margin="2" Stroke="Black" />
+                    <TextBlock Grid.Column="2" x:Name="tbTime"
                            Text="2020-10-10 15:39:47"
                            FontSize="15"
                            FontWeight="Bold"
                            VerticalAlignment="Center"
                            HorizontalAlignment="Center"/>
+                </Grid>
             </Grid>
             <Border Grid.Column="2" 
                     CornerRadius="0,0,50,50">
@@ -159,13 +195,14 @@
                             <RowDefinition/>
                         </Grid.RowDefinitions>
                         <Border BorderThickness="0,0,0,1" BorderBrush="#FF707070">
-                            <Grid Background="#FFDDDDDD"/>
+                            <!--<Grid Background="#FFDDDDDD"/>-->
+                            <Grid x:Name="LampTop"/>
                         </Border>
                         <Border BorderThickness="0,0,0,1" BorderBrush="#FF707070" Grid.Row="1">
-                            <Grid Background="Gold"/>
+                            <Grid  x:Name="LampMid"/>
                         </Border>
                         <Border BorderThickness="0,0,0,0" BorderBrush="#FF707070" Grid.Row="2">
-                            <Grid Background="#FFDDDDDD" />
+                            <Grid x:Name="LampBot"/>
                         </Border>
                     </Grid>
                 </Border>
@@ -177,23 +214,19 @@
               Background="{DynamicResource ControlBackGround}"
               Height="25">
             <MenuItem Header="File" Height="25">
-                <MenuItem Header="Load Recipe"/>
-                <MenuItem Header="Recipe Manager"/>
+                <MenuItem Header="Load Recipe" Command="{Binding CmdLoad}"/>
+                <MenuItem Header="Recipe Manager" Command="{Binding CmdRecipe}"/>
             </MenuItem>
             <MenuItem Header="Edit">
-                <MenuItem Header="Setting"/>
+                <MenuItem Header="Setting" Command="{Binding CmdSetting}"/>
             </MenuItem>
             <MenuItem Header="User">
-                <MenuItem Header="Login"/>
-                <MenuItem Header="Logout"/>
-                <MenuItem Header="Authorization" IsEnabled="False"/>
+                <MenuItem Header="Login" Command="{Binding CmdLogin}"/>
+                <MenuItem Header="Logout" Command="{Binding CmdLogout}"/>
             </MenuItem>
             <MenuItem Header="Test">
                 <MenuItem Header="Send Test"/>
                 <MenuItem Header="Filmetrics Test"/>
-            </MenuItem>
-            <MenuItem Header="PM">
-
             </MenuItem>
         </Menu>
 
@@ -307,7 +340,7 @@
                 </Grid>
 
             </Grid>
-            
+
             <Grid Grid.Column="1">
                 <Grid.RowDefinitions>
                     <RowDefinition/>
@@ -317,9 +350,11 @@
                 <GroupBox Header="Camera" Grid.Row="0">
                     <Grid>
                         <GroupBox Header="Captured Image">
-                            <Canvas Background="Black" ClipToBounds="True" x:Name="canvas" >
-                                <Image Source="{Binding p_imageSource, UpdateSourceTrigger=PropertyChanged}" Width="{Binding Path=ActualWidth, ElementName=canvas}" Height="{Binding Path=ActualHeight, ElementName=canvas}"  Stretch="Fill"></Image>
-                            </Canvas>
+                            <Border BorderBrush="Black" BorderThickness="1">
+                                <Canvas Background="Black" ClipToBounds="True" x:Name="canvas" >
+                                    <Image Source="{Binding p_imageSource, UpdateSourceTrigger=PropertyChanged}" Width="{Binding Path=ActualWidth, ElementName=canvas}" Height="{Binding Path=ActualHeight, ElementName=canvas}"  Stretch="Fill"></Image>
+                                </Canvas>
+                            </Border>
                         </GroupBox>
                     </Grid>
                 </GroupBox>
@@ -488,6 +523,9 @@
                 </GroupBox>
             </Grid>
             <TabControl Grid.Column="2" Background="Transparent">
+                <TabItem Header="RT Graph">
+                    <met:RTGraph DataContext="{Binding p_RTGraph, UpdateSourceTrigger=PropertyChanged}"/>
+                </TabItem>
                 <TabItem Header="Review" Width="100">
                     <Grid Grid.Column="2">
                         <Grid.RowDefinitions>
@@ -526,10 +564,11 @@
                                         <UniformGrid Grid.Row="0" Margin="3" Background="Gainsboro" Columns="3" Grid.ColumnSpan="2">
                                             <TextBlock Text="Count" VerticalAlignment="Center" HorizontalAlignment="Center"/>
                                             <TextBlock Text=":" VerticalAlignment="Center" HorizontalAlignment="Left"/>
-                                            <TextBlock Text="{Binding RecipeViewModel.PointCount}" VerticalAlignment="Center" HorizontalAlignment="Left"/>
+                                            <TextBlock Text="{Binding PointCount}" VerticalAlignment="Center" HorizontalAlignment="Left"/>
                                         </UniformGrid>
-                                        <DataGrid Grid.Row="1" ItemsSource="{Binding RecipeViewModel.PointListItem}" AutoGenerateColumns="False" CanUserAddRows="False" CanUserSortColumns="False" EnableColumnVirtualization="True" 
-                                  EnableRowVirtualization="True" Grid.ColumnSpan="2" SelectionMode="Single" CanUserDeleteRows="False">
+                                        <DataGrid Grid.Row="1" ItemsSource="{Binding PointListItem}" AutoGenerateColumns="False" CanUserAddRows="False" CanUserSortColumns="False" EnableColumnVirtualization="True" 
+                                  EnableRowVirtualization="True" Grid.ColumnSpan="2" SelectionMode="Single" CanUserDeleteRows="False"
+                                                  VirtualizingStackPanel.VirtualizationMode ="Recycling" VirtualizingStackPanel.IsVirtualizing = "true">
                                             <DataGrid.Resources>
                                                 <Style TargetType="DataGridColumnHeader">
                                                     <Setter Property="HorizontalAlignment" Value="Stretch"/>
@@ -657,6 +696,16 @@
                                                                 </Style>
                                                             </DataGridComboBoxColumn.EditingElementStyle>
                                                         </DataGridComboBoxColumn>
+                                                        <DataGridTextColumn Width="50" Binding="{Binding ThicknessScale, StringFormat=N1, UpdateSourceTrigger=LostFocus, Mode=TwoWay}">
+                                                            <DataGridTextColumn.Header>
+                                                                <TextBlock Text="Scale" Style="{StaticResource GridHeaderStyle}" />
+                                                            </DataGridTextColumn.Header>
+                                                        </DataGridTextColumn>
+                                                        <DataGridTextColumn Width="50" Binding="{Binding ThicknessOffset, StringFormat=N1, UpdateSourceTrigger=LostFocus, Mode=TwoWay}">
+                                                            <DataGridTextColumn.Header>
+                                                                <TextBlock Text="Offset" Style="{StaticResource GridHeaderStyle}" />
+                                                            </DataGridTextColumn.Header>
+                                                        </DataGridTextColumn>
                                                     </DataGrid.Columns>
                                                 </DataGrid>
                                                 <UniformGrid Columns="2" Grid.Row="1">
@@ -779,12 +828,13 @@
                 <TabItem Header="Log" Width="80">
                     <tools:LogView_UI x:Name="LogUI" Margin="2"/>
                 </TabItem>
-                <TabItem Header="RT Graph">
-                    <met:RTGraph DataContext="{Binding p_RTGraph, UpdateSourceTrigger=PropertyChanged}"/>
-                </TabItem>
             </TabControl>
             <Grid Grid.Column="3">
-                <StackPanel Margin="10,45,10,15">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="7*"/>
+                    <RowDefinition Height="2*"/>
+                </Grid.RowDefinitions>
+                <StackPanel Margin="10,45,10,15" Grid.Column="3" Grid.Row="0">
                     <Button Content="Resume" x:Name="buttonResume" Margin="0,0,0,15" 
                             Style="{StaticResource SetupPanelBtn}" 
                             Height="40"
@@ -810,6 +860,46 @@
                             Height="40"
                             Click="buttonOHT_Click"/>
                 </StackPanel>
+
+                <GroupBox Grid.Column="3" Grid.Row="1" Header="Lamp" Margin="3" BorderBrush="Black">
+                    <Grid Grid.Row="1" Grid.Column="3">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="1*"/>
+                            <RowDefinition Height="1*"/>
+                            <RowDefinition Height="1*"/>
+                            <RowDefinition Height="1*"/>
+                            <RowDefinition Height="1*"/>
+                        </Grid.RowDefinitions>
+
+                        <TextBlock Grid.Row="0" Text="Lamp Use Time" TextTrimming="WordEllipsis" ToolTip="Lamp Use Time" FontSize="15" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="5,10,5,10" />
+                        <Grid Grid.Row="1">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="6*"/>
+                                <ColumnDefinition Width="4*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Row="1" Grid.Column="0" Text="{Binding p_lampUsetime ,UpdateSourceTrigger=PropertyChanged}" FontWeight="Bold" FontStyle="Italic" Margin="0,0,0,0" VerticalAlignment="Center" TextAlignment="Right" HorizontalAlignment="Center" Width="80" FontSize="15"/>
+                            <TextBlock Grid.Row="1" Grid.Column="1" Text="Hours"  Margin="0,0,0,0" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="15" FontWeight="Bold"/>
+                        </Grid>
+                        <TextBlock Grid.Row="2" Text="{Binding p_lampUsetime, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource OpticLampTimeToStringConverter}}" Margin="5,0,5,0" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="10" FontWeight="Bold" Foreground="Red" />
+                        <TextBlock Grid.Row="3" Text="Lamp Status" FontSize="15" ToolTip="Lamp Status" TextTrimming="WordEllipsis" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="5,10,5,10" />
+                        <Grid Grid.Row="4">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition/>
+                                <ColumnDefinition/>
+                            </Grid.ColumnDefinitions>
+                            <PackIcon:PackIconMaterial Margin="25,0,0,0" Width="auto" Height="auto" Kind="LightbulbOn" Foreground="{Binding p_lampStatus, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource OpticLampStateColorConverter}}" />
+                            <TextBlock Grid.Column="1" FontSize="15" FontWeight="Bold" Text="{Binding p_lampStatus, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource OpticLampStatusEnumConverter}}" HorizontalAlignment="Center" VerticalAlignment="Center" TextAlignment="Center"/>
+                        </Grid>
+                       
+
+                        <!--<Border x:Name="LampStateColor" Grid.Row="4">
+                            <TextBlock Text="{Binding p_LampStates, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center" HorizontalAlignment="Center" />
+                            
+                        </Border>-->
+
+                    </Grid>
+                </GroupBox>
+
             </Grid>
         </Grid>
 

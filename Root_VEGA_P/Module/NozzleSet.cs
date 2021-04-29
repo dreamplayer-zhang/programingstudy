@@ -38,7 +38,7 @@ namespace Root_VEGA_P.Module
         #endregion
 
         #region Property
-        string[] m_asNozzle = new string[1] { "1" };
+        string[] m_asNozzle = new string[1] { "01" };
         int _nNozzle = 1; 
         public int p_nNozzle
         {
@@ -73,6 +73,12 @@ namespace Root_VEGA_P.Module
         public string RunNozzle(int nNozzle)
         {
             for (int n = 0; n < p_nNozzle; n++) m_doNozzle.Write(n, n == nNozzle); 
+            return "OK";
+        }
+
+        public string RunCloseAllNozzle()
+        {
+            for (int n = 0; n < p_nNozzle; n++) m_doNozzle.Write(n, false);
             return "OK";
         }
         #endregion

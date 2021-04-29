@@ -1,4 +1,5 @@
-﻿using Root_VEGA_P_Vision.Module;
+﻿using Root_VEGA_P.Engineer;
+using Root_VEGA_P_Vision.Module;
 using RootTools;
 using RootTools.Control;
 using RootTools.Module;
@@ -18,6 +19,7 @@ namespace Root_VEGA_P.Module
             p_sInfo = m_toolBox.GetDIO(ref m_doCover, this, p_id + ".Cover", Enum.GetNames(typeof(eCover)));
             p_sInfo = m_toolBox.GetDIO(ref m_diCover[0], this, p_id + ".Cover Open", new string[] { "0", "1" });
             p_sInfo = m_toolBox.GetDIO(ref m_diCover[1], this, p_id + ".Cover Close", new string[] { "0", "1" });
+            m_particleCounterSet.GetTools(m_toolBox, bInit); 
             if (bInit) { }
         }
         #endregion
@@ -188,16 +190,22 @@ namespace Root_VEGA_P.Module
         {
             base.RunTree(tree);
             RunTreeCover(tree.GetTree("Cover"));
+            m_particleCounterSet.RunTree(tree.GetTree("Particle Counter")); 
         }
         #endregion
 
+        
+        ParticleCounterSet m_particleCounterSet;
         public EIP_Cover(string id, IEngineer engineer)
         {
+            VEGA_P vegaP = ((VEGA_P_Handler)engineer.ClassHandler()).m_VEGA;
+            m_particleCounterSet = new ParticleCounterSet(this, vegaP.m_flowSensor, vegaP.m_sample);
             InitBase(id, engineer);
         }
 
         public override void ThreadStop()
         {
+            m_particleCounterSet.ThreadStop(); 
             base.ThreadStop();
         }
 
@@ -207,6 +215,7 @@ namespace Root_VEGA_P.Module
             AddModuleRunList(new Run_Delay(this), true, "Time Delay");
             AddModuleRunList(new Run_Run(this), true, "Run Particle Counter");
             AddModuleRunList(new Run_RunCover(this), false, "Run Cover Sol Test");
+            m_particleCounterSet.InitModuleRuns(); 
         }
 
         public class Run_Delay : ModuleRunBase

@@ -9,6 +9,7 @@ namespace Root_CAMELLIA.Data
     public class RecipeData
     {
         public List<CCircle> DataCandidatePoint { get; set; } = new List<CCircle>();
+        public List<CCircle> DataCandidateSelectedPoint { get; set; } = new List<CCircle>();
         public List<CCircle> DataSelectedPoint { get; set; } = new List<CCircle>();
         public List<int> DataMeasurementRoute { get; set; } = new List<int>();
         public float LowerWaveLength { get; set; } = 350;

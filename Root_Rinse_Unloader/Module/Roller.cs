@@ -96,10 +96,11 @@ namespace Root_Rinse_Unloader.Module
             return m_axisAlign.WaitReady();
         }
 
+        int m_mmAlignBack = 20; 
         public string RunMoveAlign(bool bAlign)
         {
             double fWidth = m_rinse.p_widthStrip;
-            if (bAlign == false) fWidth += 5; 
+            if (bAlign == false) fWidth += m_mmAlignBack; 
             return RunMoveAlign(fWidth); 
         }
         #endregion
@@ -244,10 +245,12 @@ namespace Root_Rinse_Unloader.Module
         public string RunWaitArrived()
         {
             InitWaitArrived();
-            while (EQ.IsStop() == false)
+            while ((EQ.IsStop() == false) && (EQ.p_eState == EQ.eState.Run))
             {
                 if (Run(WaitExist())) return p_sInfo;
+                if (EQ.p_eState != EQ.eState.Run) return "OK";
                 if (Run(WaitArrived())) return p_sInfo;
+                if (EQ.p_eState != EQ.eState.Run) return "OK";
                 string sReceive = "";
                 foreach (Line line in m_aLine) sReceive += (line.p_eSensor == Line.eSensor.Arrived) ? 'O' : '.';
                 m_rinse.AddStripReceive(sReceive);
@@ -263,6 +266,11 @@ namespace Root_Rinse_Unloader.Module
             m_rail.RunMoveWidth(m_rinse.p_widthStrip);
             m_rail.RunPusherDown(m_rinse.p_eMode == RinseU.eRunMode.Stack);
             RunMoveAlign(false);
+            while (m_storage.IsBusy())
+            {
+                if (EQ.IsStop()) return "EQ Stop"; 
+                Thread.Sleep(10);
+            }
             p_bAlignerUp = (m_rinse.p_eMode == RinseU.eRunMode.Magazine);
             RunStopperUp(true);
             RunRotate(true);
@@ -273,7 +281,8 @@ namespace Root_Rinse_Unloader.Module
         {
             while (EQ.IsStop() == false)
             {
-                Thread.Sleep(10); 
+                Thread.Sleep(10);
+                if (EQ.p_eState != EQ.eState.Run) return "OK"; 
                 if (p_eStep == eStep.Empty)
                 {
                     foreach (Line line in m_aLine)
@@ -289,11 +298,21 @@ namespace Root_Rinse_Unloader.Module
             return "EQ Stop"; 
         }
 
+        double m_secArriveTimeout = 8; 
         string WaitArrived()
         {
+            StopWatch sw = new StopWatch();
+            int msArriveTimeout = (int)(1000 * m_secArriveTimeout); 
             while (EQ.IsStop() == false)
             {
                 Thread.Sleep(10);
+                if (EQ.p_eState != EQ.eState.Run) return "OK";
+                if (sw.ElapsedMilliseconds > msArriveTimeout)
+                {
+                    RunRotate(false);
+                    EQ.p_eState = EQ.eState.Error; 
+                    return "Arrive Timeout";
+                }
                 int nExist = 0;
                 foreach (Line line in m_aLine)
                 {
@@ -311,6 +330,7 @@ namespace Root_Rinse_Unloader.Module
 
         #region Align
         double m_secArrived = 1;
+        double m_secSend = 1; 
         public List<bool> m_bExist = new List<bool>();
         public string RunAlign()
         {
@@ -335,8 +355,9 @@ namespace Root_Rinse_Unloader.Module
                     m_rail.StartRun(m_bExist);
                     Thread.Sleep(100);
                     p_eStep = eStep.Send;
-                    foreach (Line line in m_aLine) line.p_eSensor = Line.eSensor.Empty;
-                    if (Run(WaitSending())) return p_sInfo; 
+                    Thread.Sleep((int)(1000 * m_secSend)); 
+                    RunStopperUp(true);
+                    p_eStep = eStep.Empty; 
                     break;
                 case RinseU.eRunMode.Stack:
                     p_eStep = eStep.Picker;
@@ -367,6 +388,9 @@ namespace Root_Rinse_Unloader.Module
         void RunTreeAlign(Tree tree)
         {
             m_secArrived = tree.Set(m_secArrived, m_secArrived, "Arrived", "Arrived Delay (sec)");
+            m_secArriveTimeout = tree.Set(m_secArriveTimeout, m_secArriveTimeout, "Arrive Timeout", "Arrived Delay (sec)");
+            m_secSend = tree.Set(m_secSend, m_secSend, "Send", "Send Delay (sec)");
+            m_mmAlignBack = tree.Set(m_mmAlignBack, m_mmAlignBack, "Align Back", "Align Back Length (mm)"); 
         }
         #endregion
 
@@ -390,6 +414,7 @@ namespace Root_Rinse_Unloader.Module
         public override void Reset()
         {
             base.Reset();
+            RunRotate(false); 
         }
         #endregion
 

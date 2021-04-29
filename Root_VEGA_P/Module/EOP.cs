@@ -1,4 +1,5 @@
-﻿using Root_VEGA_P_Vision.Module;
+﻿using Root_VEGA_P.Engineer;
+using Root_VEGA_P_Vision.Module;
 using RootTools;
 using RootTools.Control;
 using RootTools.Module;
@@ -92,6 +93,7 @@ namespace Root_VEGA_P.Module
                 toolBox.GetDIO(ref m_diClamp[1], m_EOP, p_id + ".Clamp", new string[] { "0", "1", "2", "3" });
                 toolBox.GetDIO(ref m_diCoverDown[0], m_EOP, p_id + ".CoverUp", new string[] { "0", "1" });
                 toolBox.GetDIO(ref m_diCoverDown[1], m_EOP, p_id + ".CoverDown", new string[] { "0", "1" });
+                m_particleCounterSet.GetTools(toolBox, bInit);
                 if (bInit) InitPos();
             }
             #endregion
@@ -264,15 +266,24 @@ namespace Root_VEGA_P.Module
             public void RunTree(Tree tree)
             {
                 m_secClamp = tree.Set(m_secClamp, m_secClamp, "Clamp", "Run Clamp Timeout (sec)");
+                m_particleCounterSet.RunTree(tree.GetTree("Particle Counter"));
             }
             #endregion
 
             public string p_id { get; set; }
-            EOP m_EOP; 
+            EOP m_EOP;
+            public ParticleCounterSet m_particleCounterSet;
             public Dome(string id, EOP EOP)
             {
                 p_id = id;
-                m_EOP = EOP; 
+                m_EOP = EOP;
+                VEGA_P vegaP = EOP.m_handler.m_VEGA;
+                m_particleCounterSet = new ParticleCounterSet(EOP, vegaP.m_flowSensor, vegaP.m_sample, "Dome.");
+            }
+
+            public void ThreadStop()
+            {
+                m_particleCounterSet.ThreadStop();
             }
         }
         public Dome m_dome; 
@@ -295,6 +306,7 @@ namespace Root_VEGA_P.Module
                 toolBox.GetDIO(ref m_doCylinder, m_EOP, p_id + ".Cylinder", Enum.GetNames(typeof(eCylinder)));
                 toolBox.GetDIO(ref m_diCylinder[0], m_EOP, p_id + ".Cylinder Down", new string[] { "0", "1" });
                 toolBox.GetDIO(ref m_diCylinder[1], m_EOP, p_id + ".Cylinder Up", new string[] { "0", "1" });
+                m_particleCounterSet.GetTools(toolBox, bInit);
                 if (bInit) { }
             }
             #endregion
@@ -444,15 +456,24 @@ namespace Root_VEGA_P.Module
             public void RunTree(Tree tree)
             {
                 m_secUp = tree.Set(m_secUp, m_secUp, "Cylinder Up", "Run Cylinder UpDown Timeout (sec)");
+                m_particleCounterSet.RunTree(tree.GetTree("Particle Counter"));
             }
             #endregion
 
             public string p_id { get; set; }
             EOP m_EOP;
+            public ParticleCounterSet m_particleCounterSet;
             public Door(string id, EOP EOP)
             {
                 p_id = id;
                 m_EOP = EOP;
+                VEGA_P vegaP = EOP.m_handler.m_VEGA;
+                m_particleCounterSet = new ParticleCounterSet(EOP, vegaP.m_flowSensor, vegaP.m_sample, "Door.");
+            }
+
+            public void ThreadStop()
+            {
+                m_particleCounterSet.ThreadStop();
             }
         }
         public Door m_door;
@@ -534,8 +555,10 @@ namespace Root_VEGA_P.Module
         }
         #endregion
 
+        VEGA_P_Handler m_handler; 
         public EOP(string id, IEngineer engineer)
         {
+            m_handler = (VEGA_P_Handler)engineer.ClassHandler(); 
             InitDome();
             InitDoor(); 
             InitBase(id, engineer);
@@ -543,6 +566,8 @@ namespace Root_VEGA_P.Module
 
         public override void ThreadStop()
         {
+            m_dome.ThreadStop();
+            m_door.ThreadStop(); 
             base.ThreadStop();
         }
 
@@ -552,6 +577,8 @@ namespace Root_VEGA_P.Module
             AddModuleRunList(new Run_Delay(this), true, "Time Delay");
             AddModuleRunList(new Run_Run(this), true, "Run Particle Counter");
             AddModuleRunList(new Run_RunSol(this), false, "Run Sol Test");
+            m_dome.m_particleCounterSet.InitModuleRuns(); 
+            m_door.m_particleCounterSet.InitModuleRuns();
         }
 
         public class Run_Delay : ModuleRunBase

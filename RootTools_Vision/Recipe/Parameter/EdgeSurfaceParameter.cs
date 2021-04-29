@@ -74,78 +74,79 @@ namespace RootTools_Vision
 	public class EdgeSurfaceParameterBase : ObservableObject
 	{
 		#region [Parameter]
-		private int roiWidth = 500;
+		private int startPosition = 0;
 		private int roiHeight = 1000;
 		private int threshold = 10;
 		private int defectSizeMin = 1;
 		private int defectSizeMax = 10000;
 		private int mergeDist = 1;
 		private int edgeSearchLevel = 20;
+
+		private bool chR = false;
+		private bool chG = false;
+		private bool chB = false;
 		#endregion
 
 		#region [Getter/Setter]
 		[Category("Parameter")]
-		public int ROIWidth
+		public int StartPosition
 		{
-			get => this.roiWidth;
-			set
-			{
-				SetProperty<int>(ref this.roiWidth, value);
-			}
+			get => this.startPosition;
+			set => SetProperty(ref startPosition, value);
 		}
 		[Category("Parameter")]
 		public int ROIHeight
 		{
 			get => this.roiHeight;
-			set
-			{
-				SetProperty<int>(ref this.roiHeight, value);
-			}
+			set => SetProperty(ref roiHeight, value);
 		}
 		[Category("Parameter")]
 		public int Threshold
 		{
 			get => this.threshold;
-			set
-			{
-				SetProperty<int>(ref this.threshold, value);
-			}
+			set => SetProperty(ref threshold, value);
 		}
 		[Category("Parameter")]
 		public int DefectSizeMin
 		{
 			get => this.defectSizeMin;
-			set
-			{
-				SetProperty<int>(ref this.defectSizeMin, value);
-			}
+			set => SetProperty(ref defectSizeMin, value);
 		}
 		[Category("Parameter")]
 		public int DefectSizeMax
 		{
 			get => this.defectSizeMax;
-			set
-			{
-				SetProperty<int>(ref this.defectSizeMax, value);
-			}
+			set => SetProperty(ref defectSizeMax, value);
 		}
 		[Category("Parameter")]
 		public int MergeDist
 		{
 			get => this.mergeDist;
-			set
-			{
-				SetProperty<int>(ref this.mergeDist, value);
-			}
+			set => SetProperty(ref mergeDist, value);
 		}
 		[Category("Parameter")]
 		public int EdgeSearchLevel
 		{
 			get => this.edgeSearchLevel;
-			set
-			{
-				SetProperty<int>(ref this.edgeSearchLevel, value);
-			}
+			set => SetProperty(ref edgeSearchLevel, value);
+		}
+		[Category("Parameter")]
+		public bool ChR
+		{
+			get => this.chR;
+			set => SetProperty(ref chR, value);
+		}
+		[Category("Parameter")]
+		public bool ChG
+		{
+			get => this.chG;
+			set => SetProperty(ref chG, value);
+		}
+		[Category("Parameter")]
+		public bool ChB
+		{
+			get => this.chB;
+			set => SetProperty(ref chB, value);
 		}
 		#endregion
 	}

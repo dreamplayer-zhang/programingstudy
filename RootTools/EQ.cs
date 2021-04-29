@@ -27,8 +27,7 @@ namespace RootTools
         public static eState p_eState
         {
             get { return m_EQ.p_eState; }
-            set { m_EQ.p_eState = value;
-            }
+            set { m_EQ.p_eState = value; }
         }
 
         public static string p_sInfo
@@ -234,6 +233,11 @@ namespace RootTools
                 _nRunLP = value;
                 OnPropertyChanged();
             }
+        }
+
+        public ref bool StopToken()
+        {
+            return ref this._bStop;
         }
     }
 }

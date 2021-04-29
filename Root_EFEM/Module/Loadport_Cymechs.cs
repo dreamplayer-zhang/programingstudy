@@ -15,7 +15,6 @@ namespace Root_EFEM.Module
 {
     public class Loadport_Cymechs : ModuleBase, IWTRChild, ILoadport
     {
-        ALID m_alid_WaferExist;
         public void SetAlarm()
         {
             m_alid_WaferExist.Run(true, "Aligner Wafer Exist Error");
@@ -158,15 +157,16 @@ namespace Root_EFEM.Module
         #endregion
 
         #region GAF
-        ALID alid_Cymechs;
-        ALID alid_LoadportOpenCloseError;
-        ALID alid_LoadportRunReadyError;
-
+        ALID m_alid_Cymechs;
+        ALID m_alid_LoadportOpenCloseError;
+        ALID m_alid_LoadportRunReadyError;
+        ALID m_alid_WaferExist; 
         void InitALID()
         {
-            alid_Cymechs = m_gaf.GetALID(this, "Cymechs", "LOADPORT CYMECHS ERROR");
-            alid_LoadportOpenCloseError = m_gaf.GetALID(this, "Cymechs", "LOADPORT Open Or Close State Error");
-            alid_LoadportRunReadyError = m_gaf.GetALID(this, "Cymechs", "LOADPORT Run Or Ready State Error");
+            m_alid_Cymechs = m_gaf.GetALID(this, "Cymechs", "LOADPORT CYMECHS ERROR");
+            m_alid_LoadportOpenCloseError = m_gaf.GetALID(this, "OpenClose", "LOADPORT Open Or Close State Error");
+            m_alid_LoadportRunReadyError = m_gaf.GetALID(this, "State", "LOADPORT Run Or Ready State Error");
+            m_alid_WaferExist = m_gaf.GetALID(this, "Wafer Exist", "Wafer Check Error");
         }
         #endregion
         //forget
@@ -243,7 +243,7 @@ namespace Root_EFEM.Module
 
         public string BeforeGet(int nID)
         {
-            alid_LoadportOpenCloseError.Run(!m_diOpen.p_bIn || m_diRun.p_bIn, "m_diOpen.p_bIn : "+ m_diOpen.p_bIn + ", m_diReady.p_bIn : " + m_diRun.p_bIn);
+            m_alid_LoadportOpenCloseError.Run(!m_diOpen.p_bIn || m_diRun.p_bIn, "m_diOpen.p_bIn : "+ m_diOpen.p_bIn + ", m_diReady.p_bIn : " + m_diRun.p_bIn);
             if (GetInfoWafer(nID) == null)
             {
                 m_alidGetOK.Run(true, p_id + nID.ToString("00") + " BeforeGet : InfoWafer = null");
@@ -254,7 +254,7 @@ namespace Root_EFEM.Module
 
         public string BeforePut(int nID)
         {
-            alid_LoadportOpenCloseError.Run(!m_diOpen.p_bIn || m_diRun.p_bIn, "m_diOpen.p_bIn : " + m_diOpen.p_bIn + ", m_diRun.p_bIn : " + m_diRun.p_bIn);
+            m_alid_LoadportOpenCloseError.Run(!m_diOpen.p_bIn || m_diRun.p_bIn, "m_diOpen.p_bIn : " + m_diOpen.p_bIn + ", m_diRun.p_bIn : " + m_diRun.p_bIn);
             if (GetInfoWafer(nID) != null)
             {
                 m_alidPutOK.Run(true, p_id + nID.ToString("00") + " BeforePut : InfoWafer != null");
@@ -604,7 +604,7 @@ namespace Root_EFEM.Module
                 case 'E':
                     p_eState = eState.Error;
                     p_sInfo = "Cymech Error " + sRead + " : " + GetErrorString(sRead);
-                    alid_Cymechs.Run(true, p_sInfo);
+                    m_alid_Cymechs.Run(true, p_sInfo);
                     //0207 alid run p_sinfo 
                     break;
                 case 'C':

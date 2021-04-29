@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Windows;
 using System.Collections.Generic;
 using System.Data;
@@ -14,6 +15,7 @@ using Root_CAMELLIA.Module;
 using Emgu.CV;
 using Emgu.CV.Structure;
 using System.Windows.Media.Imaging;
+using System.Collections.ObjectModel;
 
 namespace Root_CAMELLIA
 {
@@ -55,7 +57,7 @@ namespace Root_CAMELLIA
         #region Page ViewModel
         public PM_Reflectance_ViewModel m_pmReflectance_VM;
         public PM_SensorCameraTilt_ViewModel m_pmSensorTilt_VM;
-        PM_SensorHoleOffset_ViewModel m_pmSensorHoleOffset_VM;
+        public PM_SensorHoleOffset_ViewModel m_pmSensorHoleOffset_VM;
         PM_Thickness_ViewModel m_pmThickness_VM;
         #endregion
 
@@ -70,16 +72,66 @@ namespace Root_CAMELLIA
         public void Init()
         {
             ModuleCamellia = ((CAMELLIA_Handler)App.m_engineer.ClassHandler()).m_camellia;
-            //pointListItem = new DataTable();
+
             p_DataTable.Columns.Add(new DataColumn("TIme"));
             p_DataTable.Columns.Add(new DataColumn("List"));
             p_DataTable.Columns.Add(new DataColumn("Result"));
 
-            //p_rootViewer.p_ImgSource
-            //p_rootViewer.p_ImageData = ModuleCamellia.p_CamVRS.p_ImageViewer.p_ImageData;
-            //ModuleCamellia.p_CamVRS.p_ImageViewer.p_ImageData;
-            //p_rootViewer.p_ImgSource = ImageHelper.GetBitmapSourceFromBitmap();
             ModuleCamellia.p_CamVRS.Captured += GetImage;
+        }
+        public void PMLog(string List, string Result)
+        {
+            string CurrentTime = DateTime.Now.ToString("yyyyMMdd_HHmmss");
+            DataRow row;
+            row = p_DataTable.NewRow();
+            row["Time"] = CurrentTime;
+            row["List"] = List + "]";
+            row["Result"] = Result;
+            p_DataTable.Rows.Add(row);
+
+            LogWrite(CurrentTime, List, Result);
+        }
+
+        public void PMLogData(String str)
+        {
+            String[] arrstr = str.Split(']');
+            PMLog(arrstr[0], arrstr[1]);
+        }
+        private void LogWrite(string CurrentTime, string List, string Result)
+        {
+            string DirPath = Environment.CurrentDirectory + @"\\PMLog";
+            string FilePath = DirPath + "\\Log" + DateTime.Now.ToString("yyyyMMdd_HHmmss") + ".txt";
+            string Temp;
+
+            DirectoryInfo di = new DirectoryInfo(DirPath);
+            FileInfo Fi = new FileInfo(FilePath);
+            try
+            {
+                if (!di.Exists) Directory.CreateDirectory(DirPath);
+                if (!Fi.Exists)
+                {
+                    using (StreamWriter SW = new StreamWriter(FilePath))
+                    {
+                        Temp = string.Format("|{0}| {1}] {2}", CurrentTime, List, Result);
+                        SW.WriteLine(Temp);
+                        SW.Close();
+                    }
+                }
+                else
+                {
+                    using (StreamWriter sw = File.AppendText(FilePath))
+                    {
+                        Temp = string.Format("|{0}| {1}] {2}", CurrentTime, List, Result);
+                        sw.WriteLine(Temp);
+                        sw.Close();
+                    }
+                }
+
+            }
+            catch (Exception e)
+            {
+
+            }
         }
 
         BitmapSource m_imageSource;

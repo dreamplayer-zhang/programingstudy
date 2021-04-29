@@ -49,21 +49,25 @@ namespace Root_WIND2.Module
 				if (EQ.IsStop())
 					return "OK";
 
-				InspectionManagerEdge inspectionEdge = GlobalObjects.Instance.Get<InspectionManagerEdge>();
-
-				if (inspectionEdge.Recipe.Read(recipeName) == false)
-					return "Recipe Open Fail";
-
-				inspectionEdge.Start();
-
-				while (inspectionEdge.CheckAllWorkDone() == false)
+				RootTools_Vision.WorkManager3.WorkManager workManager = GlobalObjects.Instance.GetNamed<RootTools_Vision.WorkManager3.WorkManager>("edgeTopInspection");
+				if (workManager == null)
 				{
-					if (EQ.IsStop())
-						return "OK";
-
-					Task.Delay(1000);
+					throw new ArgumentException("WorkManager가 초기화되지 않았습니다(null)");
 				}
+				workManager.Stop();
 
+				if (EQ.IsStop() == false)
+				{
+					if (workManager.OpenRecipe(recipeName) == false)
+						return "Recipe Open Fail";
+
+					workManager.Start(false);
+
+				}
+				else
+				{
+					workManager.Stop();
+				}
 				return "OK";
 			}
 			finally

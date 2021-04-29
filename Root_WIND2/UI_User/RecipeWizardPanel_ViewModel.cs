@@ -75,9 +75,9 @@ namespace Root_WIND2.UI_User
         public readonly UI_User.BacksideSetup backsideSetup = new UI_User.BacksideSetup();
         public readonly UI_User.BacksideInspect backsideInspect = new UI_User.BacksideInspect();
 
-        // EDGE
-        public readonly UI_User.EdgesideSetup edgesideSetup = new UI_User.EdgesideSetup();
-        public readonly UI_User.EdgesideInspect edgesideInspect = new UI_User.EdgesideInspect();
+		// EDGE
+		public readonly UI_User.EdgesideSetup edgesideSetup = new UI_User.EdgesideSetup();
+		public readonly UI_User.EdgesideInspect edgesideInspect = new UI_User.EdgesideInspect();
 
         // EBR
         public readonly UI_User.EBRSetup ebrSetup = new UI_User.EBRSetup();
@@ -169,9 +169,9 @@ namespace Root_WIND2.UI_User
         #region [Edge ViewModels]
         private UI_User.EdgesideSetup_ViewModel edgesideSetupVM = new UI_User.EdgesideSetup_ViewModel();
         public UI_User.EdgesideSetup_ViewModel EdgesideSetupVM
-		{
+        {
             get => edgesideSetupVM;
-		}
+        }
         private UI_User.EdgesideInspect_ViewModel edgesideInspectionVM = new UI_User.EdgesideInspect_ViewModel();
         public UI_User.EdgesideInspect_ViewModel EdgesideInspectionVM
         {
@@ -253,6 +253,80 @@ namespace Root_WIND2.UI_User
 
         #region [Command]
 
+        #region [Command Parent RadioButton]
+        public ICommand btnHomeClickedCommand
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    SetPage(homeRecipe);
+                    homeRecipe.DataContext = homeRecipeVM;
+                });
+            }
+        }
+        public ICommand btnFrontClickedCommand
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    SetPage(frontsideProduct);
+                    frontsideProduct.DataContext = frontsideProductVM;
+                });
+            }
+        }
+
+        public ICommand btnBackClickedCommand
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    SetPage(backsideSetup);
+                    backsideSetup.DataContext = backsideSetupVM;
+                });
+            }
+        }
+
+        public ICommand btnEdgeClickedCommand
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    SetPage(edgesideSetup);
+                    edgesideSetup.DataContext = edgesideSetupVM;
+                });
+            }
+        }
+
+        public ICommand btnEBRClickedCommand
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    SetPage(ebrSetup);
+                    ebrSetup.DataContext = ebrSetupVM;
+                });
+            }
+        }
+
+        public ICommand btnCameraClickedCommand
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    SetPage(cameraVrs);
+                    cameraVrs.DataContext = cameraVrsVM;
+                });
+            }
+        }
+
+        #endregion
+
         #region [Command Home]
         public ICommand btnHomeRecipe
         {
@@ -279,6 +353,8 @@ namespace Root_WIND2.UI_User
                 });
             }
         }
+
+
 
         public ICommand btnFrontProduct
         {
@@ -702,7 +778,7 @@ namespace Root_WIND2.UI_User
         }
         #endregion
 
-            #region [Command Back]
+        #region [Command Back]
         public ICommand btnBackSetup
         {
             get

@@ -340,6 +340,7 @@ namespace RootTools.Control
         public List<DIO_I> m_aDIO_I = new List<DIO_I>();
         public List<bool> m_bDIO_I = new List<bool>();
         public DIO_I p_vaccumDIO_I { get; set; }
+        public bool p_IsLifterDown { get; set; } = false;
 
         public void AddIO(DIO_I io)
         {

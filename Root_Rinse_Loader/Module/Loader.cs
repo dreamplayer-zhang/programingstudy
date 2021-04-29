@@ -30,17 +30,11 @@ namespace Root_Rinse_Loader.Module
 
         #region GAF
         ALID m_alidPickerDown;
-        ALID m_alidPickerStripCheck0;
-        ALID m_alidPickerStripCheck1;
-        ALID m_alidPickerStripCheck2;
-        ALID m_alidPickerStripCheck3;
+        ALID m_alidPickerDrop;
         void InitALID()
         {
             m_alidPickerDown = m_gaf.GetALID(this, "PickerDown", "Picker Up & Down Error");
-            m_alidPickerStripCheck0 = m_gaf.GetALID(this, "Picker Strip Check0", "Picker0 Strip Check Error");
-            m_alidPickerStripCheck1 = m_gaf.GetALID(this, "Picker Strip Check1", "Picker1 Strip Check Error");
-            m_alidPickerStripCheck2 = m_gaf.GetALID(this, "Picker Strip Check2", "Picker2 Strip Check Error");
-            m_alidPickerStripCheck3 = m_gaf.GetALID(this, "Picker Strip Check3", "Picker3 Strip Check Error");
+            m_alidPickerDrop = m_gaf.GetALID(this, "PickerDrop", "Picker Drop Strip");
         }
         #endregion
 
@@ -92,25 +86,31 @@ namespace Root_Rinse_Loader.Module
         double m_secBlow = 0.5;
         public string RunVacuum(bool bOn)
         {
-            p_bVacuum = bOn;
-            for (int n = 0; n < 4; n++)
+            try
             {
-                m_aPicker[n].m_dioVacuum.Write(bOn && m_storage.m_stack.m_diCheck[n].p_bIn); 
-            }
-            if (bOn)
-            {
-                Thread.Sleep((int)(1000 * m_secVac));
-                foreach (Picker picker in m_aPicker) picker.m_dioVacuum.Write(picker.m_dioVacuum.p_bIn);
+                p_bVacuum = bOn;
+                for (int n = 0; n < 4; n++)
+                {
+                    m_aPicker[n].m_dioVacuum.Write(bOn && m_storage.m_stack.m_diCheck[n].p_bIn);
+                }
+                if (bOn)
+                {
+                    Thread.Sleep((int)(1000 * m_secVac));
+                    foreach (Picker picker in m_aPicker) picker.m_dioVacuum.Write(picker.m_dioVacuum.p_bIn);
+                }
+                else
+                {
+                    m_bCheckStrip = false;
+                    foreach (Picker picker in m_aPicker) picker.m_doBlow.Write(true);
+                    Thread.Sleep((int)(1000 * m_secBlow));
+                }
+                foreach (Picker picker in m_aPicker) picker.m_doBlow.Write(false);
                 return "OK";
             }
-            else
+            finally
             {
-                m_bCheckStrip = false; 
-                foreach (Picker picker in m_aPicker) picker.m_doBlow.Write(true);
-                Thread.Sleep((int)(1000 * m_secBlow));
                 foreach (Picker picker in m_aPicker) picker.m_doBlow.Write(false);
             }
-            return "OK";
         }
 
         public bool m_bPickerDown = false;
@@ -119,9 +119,13 @@ namespace Root_Rinse_Loader.Module
         {
             m_bPickerDown = bDown;
             m_dioPickerDown.Write(bDown);
-            string sRun = m_dioPickerDown.WaitDone();
-            m_alidPickerDown.p_bSet = (sRun != "OK"); 
-            return sRun; 
+            if (!EQ.IsStop())
+            {
+                string sRun = m_dioPickerDown.WaitDone();
+                m_alidPickerDown.p_bSet = (sRun != "OK");
+                return sRun;
+            }
+            return "OK"; 
         }
 
         int m_nShake = 0;
@@ -302,9 +306,7 @@ namespace Root_Rinse_Loader.Module
                     {
                         if (picker.IsDrop())
                         {
-                            EQ.p_bStop = true;
-                            EQ.p_eState = EQ.eState.Ready;
-                            m_rinse.RunBuzzer(RinseL.eBuzzer.Error);
+                            m_alidPickerDrop.p_bSet = true; 
                             picker.m_dioVacuum.Write(false); 
                             p_sInfo = picker.m_id + " : Picker drop Strip";
                             m_bCheckStrip = false; 
