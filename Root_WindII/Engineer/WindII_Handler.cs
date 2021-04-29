@@ -39,7 +39,7 @@ namespace Root_WindII.Engineer
             p_moduleList = new ModuleList(m_engineer);
             InitWTR();
             InitLoadport();
-            InitBackside(ModuleBase.eRemote.Client);
+            //InitBackside(ModuleBase.eRemote.Client);
 
             m_wtr.RunTree(Tree.eMode.RegRead);
             m_wtr.RunTree(Tree.eMode.Init);
@@ -405,8 +405,12 @@ namespace Root_WindII.Engineer
                 EQ.p_bStop = true;
                 m_thread.Join();
             }
-            p_moduleList.ThreadStop();
-            foreach (ModuleBase module in p_moduleList.m_aModule.Keys) module.ThreadStop();
+
+            if (p_moduleList != null)
+            {
+                p_moduleList.ThreadStop();
+                foreach (ModuleBase module in p_moduleList.m_aModule.Keys) module.ThreadStop();
+            }
         }
     }
 }

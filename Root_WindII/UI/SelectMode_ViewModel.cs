@@ -18,7 +18,6 @@ namespace Root_WindII
         public event ModeSelectedHandler SetupSelected;
         public event ModeSelectedHandler ReviewSelected;
         public event ModeSelectedHandler OperationSelected;
-
         public event ModeSelectedHandler EngineerSelected;
 
         #endregion
