@@ -54,6 +54,7 @@ namespace Root_WindII
             this.selectModeVM.SetupSelected += SetupSelected_Callback;
             this.selectModeVM.ReviewSelected += ReviewSelected_Callback;
             this.selectModeVM.OperationSelected += OperationSelected_Callback;
+            this.selectModeVM.EngineerSelected += EngineerSelected_Callback;
 
             this.SetupVM = new Setup_ViewModel();
         }
@@ -71,6 +72,11 @@ namespace Root_WindII
         private void OperationSelected_Callback()
         {
             this.SelectedModeIndex = 3;
+        }
+
+        private void EngineerSelected_Callback()
+        {
+            this.SelectedModeIndex = 4;
         }
     }
 }
