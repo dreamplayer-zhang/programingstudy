@@ -253,7 +253,7 @@ namespace Root_VEGA_P_Vision
             //p_VisibleMenu = Visibility.Collapsed;
             BufferInspROI.CollectionChanged += BufferInspROI_CollectionChanged;
             SetBackGroundWorker();
-            //p_ROILayer = GlobalObjects.Instance.GetNamed<ImageData>("MaskImage");
+            p_ROILayer = GlobalObjects.Instance.GetNamed<ImageData>("EIP_Cover.Stain.Front.MaskImage");
             InitializeUIlements();
         }
 
@@ -285,9 +285,7 @@ namespace Root_VEGA_P_Vision
             }
 
             if (p_cInspROI.Count > 0)
-            {
                 p_SelectedROI = p_cInspROI.First();
-            }
         }
 
         #region General Draw Method

@@ -223,6 +223,9 @@
       <DependentUpon>RecipeManagerPanel.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\1. Setup\2. RecipeManager\RecipeManager_ViewModel.cs" />
+    <Compile Include="UI\1. Setup\2. RecipeManager\ViewModel\EIPBaseBottom_ImageViewer_ViewModel.cs" />
+    <Compile Include="UI\1. Setup\2. RecipeManager\ViewModel\EIPBaseTop_ImageViewer_ViewModel.cs" />
+    <Compile Include="UI\1. Setup\2. RecipeManager\ViewModel\EIPCoverBottom_ImageViewer_ViewModel.cs" />
     <Compile Include="UI\1. Setup\2. RecipeManager\ViewModel\EIPCoverTop_ImageViewer_ViewModel.cs" />
     <Compile Include="UI\1. Setup\2. RecipeManager\ViewModel\ItemMask.cs" />
     <Compile Include="UI\1. Setup\Setup.xaml.cs">
