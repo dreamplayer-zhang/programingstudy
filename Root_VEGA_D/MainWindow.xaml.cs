@@ -138,17 +138,6 @@ namespace Root_VEGA_D
             FanUI3.DataContext = m_handler.m_FFU.p_aUnit[0].p_aFan[3];
             FDC_CDA1.DataContext = m_handler.m_interlock;
             FDC_CDA2.DataContext = m_handler.m_interlock;
-            
-            btnFP_Isolator.DataContext = m_handler.m_interlock.m_diFP_Isolator;
-            btnIsolator_V.DataContext = m_handler.m_interlock.m_diIsolator_VPre;
-            btn_Factory_Air_Pad.DataContext = m_handler.m_interlock.m_diFactory_Air_PadPre;
-            btn_Air_Tank.DataContext = m_handler.m_interlock.m_diAir_TankPre;
-            btn_X_Bottom.DataContext = m_handler.m_interlock.m_diX_BottomPre;
-            btn_X_Side_Master.DataContext = m_handler.m_interlock.m_diX_SideMasterPre;
-            btn_X_Side_Slave.DataContext = m_handler.m_interlock.m_diX_SideSlavePre;
-            btn_Y_Bottom.DataContext = m_handler.m_interlock.m_diY_BottomPre;
-            btn_Y_Side_Master.DataContext = m_handler.m_interlock.m_diY_SideMasterPre;
-            btn_Y_Side_Slave.DataContext = m_handler.m_interlock.m_diY_SideSlavePre;
         }
 
         bool IsRunModule(ModuleBase module)

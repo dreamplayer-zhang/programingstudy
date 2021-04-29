@@ -207,7 +207,7 @@ namespace Root_VEGA_D.Engineer
                 EQ.p_eState = EQ.eState.Init;
                 return sInfo;
             }
-            sInfo = StateHome(m_interlock, (ModuleBase)m_aLoadport[0], (ModuleBase)m_aLoadport[1], m_vision, m_visionIPU, m_towerlamp, (RFID_Brooks)m_aRFID[0], (RFID_Brooks)m_aRFID[1], m_FFU);
+            sInfo = StateHome(m_interlock, (ModuleBase)m_aLoadport[0], (ModuleBase)m_aLoadport[1], m_vision, m_towerlamp, (RFID_Brooks)m_aRFID[0], (RFID_Brooks)m_aRFID[1], m_FFU);
             if (sInfo == "OK") EQ.p_eState = EQ.eState.Ready;
             //if (sInfo == "OK") m_bIsPossible_Recovery = true;
             if (sInfo == "OK") EQ.p_eState = EQ.eState.Ready;
