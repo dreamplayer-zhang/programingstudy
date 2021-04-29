@@ -151,7 +151,7 @@ namespace Root_CAMELLIA.Module
                     //    m_DataManager.recipeDM.MeasurementRD.UpperWaveLength);
                     LibSR_Met.DataManager.GetInstance().SaveResultFileSlot(m_slotSpectraDataPath + "\\" +index+"_"+DateTime.Now.ToString("HHmmss"), m_module.p_infoWafer, m_DataManager.recipeDM, index);
                     //SaveRT
-                    LibSR_Met.DataManager.GetInstance().SaveRT(@"C:\Users\ATI\Desktop\SaveTest\RT\" + index + "_" + DateTime.Now.ToString("HHmmss") + "test.csv", index);
+                    LibSR_Met.DataManager.GetInstance().SaveRT(m_historyRTDataPath + "\\" + index + "_" + DateTime.Now.ToString("HHmmss") + "RawData.csv", index);
 
                     //foreach (LibSR_Met.ContourMapData mapdata in MetData.m_ContourMapDataR)
                     //    LibSR_Met.DataManager.GetInstance().SaveContourMapData(@"C:\Users\ATI\Desktop\SaveTest\" + index + "_R_" + mapdata.Wavelength.ToString() + "_" + DateTime.Now.ToString("HHmmss") + "_ContourMapData.csv", mapdata);
@@ -203,7 +203,8 @@ namespace Root_CAMELLIA.Module
                 GeneralTools.MakeDirectory(m_slotContourMapPath);
                 m_slotSpectraDataPath = rootPath + "\\Slot." + m_module.p_infoWafer.m_nSlot + "\\SpectraData";
                 GeneralTools.MakeDirectory(m_slotSpectraDataPath);
-                ////m_historyRTDataPath = BaseDefine.Dir_HistorySaveRootPath + ""
+                m_historyRTDataPath = BaseDefine.Dir_HistorySaveRootPath + m_module.p_infoWafer.p_sRecipe + "\\RawData\\" + DateTime.Now.ToString("yyyy-MM-dd") + "T" + DateTime.Now.ToString("HH-mm-ss");
+                GeneralTools.MakeDirectory(m_historyRTDataPath);
             }
             catch(Exception e)
             {
@@ -452,6 +453,7 @@ namespace Root_CAMELLIA.Module
             m_log.Warn("Calc Thickness 대기 >> " + test.ElapsedMilliseconds);
             while (!m_CalcThicknessDone)
             {
+                Thread.Sleep(0);
                 if (EQ.IsStop())
                 {
                     return "EQ Stop";

@@ -554,7 +554,7 @@ namespace Root_CAMELLIA.LibSR_Met
             writer.WriteLine("GoF," + Math.Round(raw.dGoF, 6).ToString());
             for (int n = 1; n < raw.Thickness.Count-1; n++)
             {
-                writer.WriteLine(m_LayerData[n].sRefName + "," + (raw.Thickness[n]* m_ThicknessData[n].m_dThicknessScale + m_ThicknessData[n].m_dThicknessOffset).ToString());
+                writer.WriteLine(m_LayerData[n].sRefName + "," + (raw.Thickness[n]).ToString());
             }
             writer.WriteLine("Wavelength,Reflectance,Transmittance");
             for (int n = 0; n < raw.nNIRDataNum; n++)

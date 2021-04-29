@@ -523,6 +523,9 @@
                 </GroupBox>
             </Grid>
             <TabControl Grid.Column="2" Background="Transparent">
+                <TabItem Header="RT Graph">
+                    <met:RTGraph DataContext="{Binding p_RTGraph, UpdateSourceTrigger=PropertyChanged}"/>
+                </TabItem>
                 <TabItem Header="Review" Width="100">
                     <Grid Grid.Column="2">
                         <Grid.RowDefinitions>
@@ -824,9 +827,6 @@
                 </TabItem>
                 <TabItem Header="Log" Width="80">
                     <tools:LogView_UI x:Name="LogUI" Margin="2"/>
-                </TabItem>
-                <TabItem Header="RT Graph">
-                    <met:RTGraph DataContext="{Binding p_RTGraph, UpdateSourceTrigger=PropertyChanged}"/>
                 </TabItem>
             </TabControl>
             <Grid Grid.Column="3">

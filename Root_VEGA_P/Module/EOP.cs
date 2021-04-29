@@ -93,6 +93,7 @@ namespace Root_VEGA_P.Module
                 toolBox.GetDIO(ref m_diClamp[1], m_EOP, p_id + ".Clamp", new string[] { "0", "1", "2", "3" });
                 toolBox.GetDIO(ref m_diCoverDown[0], m_EOP, p_id + ".CoverUp", new string[] { "0", "1" });
                 toolBox.GetDIO(ref m_diCoverDown[1], m_EOP, p_id + ".CoverDown", new string[] { "0", "1" });
+                m_particleCounterSet.GetTools(toolBox, bInit);
                 if (bInit) InitPos();
             }
             #endregion
@@ -305,6 +306,7 @@ namespace Root_VEGA_P.Module
                 toolBox.GetDIO(ref m_doCylinder, m_EOP, p_id + ".Cylinder", Enum.GetNames(typeof(eCylinder)));
                 toolBox.GetDIO(ref m_diCylinder[0], m_EOP, p_id + ".Cylinder Down", new string[] { "0", "1" });
                 toolBox.GetDIO(ref m_diCylinder[1], m_EOP, p_id + ".Cylinder Up", new string[] { "0", "1" });
+                m_particleCounterSet.GetTools(toolBox, bInit);
                 if (bInit) { }
             }
             #endregion
@@ -556,6 +558,7 @@ namespace Root_VEGA_P.Module
         VEGA_P_Handler m_handler; 
         public EOP(string id, IEngineer engineer)
         {
+            p_id = id; 
             m_handler = (VEGA_P_Handler)engineer.ClassHandler(); 
             InitDome();
             InitDoor(); 

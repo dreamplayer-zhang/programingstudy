@@ -200,7 +200,6 @@ namespace Root_Vega
         private void M_treeRootReticle_UpdateTree()
         {
             RunTreeReticle(Tree.eMode.Update);
-            if (p_infoReticle != null) p_infoReticle.RegWrite(); 
             RunTreeReticle(Tree.eMode.Init); 
         }
 
