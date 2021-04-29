@@ -208,6 +208,11 @@
     <Compile Include="Module\InspectionManager_AOP.cs" />
     <Compile Include="Recipe\AOP_RecipeSurface.cs" />
     <Compile Include="UIManager.cs" />
+    <Compile Include="UI\1. SETUP\2. RecipeWizard\Panel\Recipe45DGlass_Panel.xaml.cs">
+      <DependentUpon>Recipe45DGlass_Panel.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\1. SETUP\2. RecipeWizard\ViewModel\Recipe45DGlass_ImageViewer_ViewModel.cs" />
+    <Compile Include="UI\1. SETUP\2. RecipeWizard\ViewModel\Recipe45DGlass_ViewModel.cs" />
     <Compile Include="UI\1. SETUP\2. RecipeWizard\ViewModel\RecipeEdge_Viewer_ViewModel.cs" />
     <Compile Include="UI\1. SETUP\2. RecipeWizard\ViewModel\RecipeFrontside_Viewer_ViewModel.cs" />
     <Compile Include="Engineer\AOP01_Process.cs" />
@@ -319,6 +324,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Module\FFU_Fan_UI.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\1. SETUP\2. RecipeWizard\Panel\Recipe45DGlass_Panel.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

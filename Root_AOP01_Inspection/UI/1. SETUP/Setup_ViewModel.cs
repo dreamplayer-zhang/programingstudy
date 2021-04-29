@@ -49,6 +49,7 @@ namespace Root_AOP01_Inspection
         }
         private RecipeSpec_ViewModel m_RecipeSpec;
         public Recipe45D_ViewModel m_Recipe45D { get; private set; }
+        public Recipe45DGlass_ViewModel m_Recipe45DGlass { get; private set; }
         public RecipeFrontside_ViewModel m_RecipeFrontSide { get; private set; }
         public RecipeEdge_ViewModel m_RecipeEdge { get; private set; }
         private RecipeLADS_ViewModel m_RecipeLADS;
@@ -69,6 +70,7 @@ namespace Root_AOP01_Inspection
             m_GEM = new GEM_ViewModel(this);
 
             m_Recipe45D = new Recipe45D_ViewModel(this);
+            m_Recipe45DGlass = new Recipe45DGlass_ViewModel(this);
             m_RecipeFrontSide = new RecipeFrontside_ViewModel(this, m_RecipeWizard.RecipeFrontside.canvas.Dispatcher);
             m_RecipeEdge = new RecipeEdge_ViewModel(this);
             m_RecipeLADS = new RecipeLADS_ViewModel(this);
@@ -98,6 +100,8 @@ namespace Root_AOP01_Inspection
             Navi_RecipeSummary.Btn.Click += NaviRecipeSummaryBtn_Click;
             Navi_45D = new NaviBtn("45D");
             Navi_45D.Btn.Click += Navi45DBtn_Click;
+            Navi_45DGlass = new NaviBtn("Glass");
+            Navi_45DGlass.Btn.Click += Navi45DGlassBtn_Click;
             Navi_Frontside = new NaviBtn("Frontside");
             Navi_Frontside.Btn.Click += NaviFrontsideBtn_Click;
             Navi_Edge = new NaviBtn("Edge");
@@ -124,6 +128,7 @@ namespace Root_AOP01_Inspection
         public NaviBtn Navi_RecipeSummary;
         public NaviBtn Navi_RecipeSpec;
         public NaviBtn Navi_45D;
+        public NaviBtn Navi_45DGlass;
         public NaviBtn Navi_Frontside;
         public NaviBtn Navi_Edge;
         public NaviBtn Navi_LADS;
@@ -156,6 +161,10 @@ namespace Root_AOP01_Inspection
         private void Navi45DBtn_Click(object sender, RoutedEventArgs e)
         {
             Set_Recipe45DPanel();
+        }
+        private void Navi45DGlassBtn_Click(object sender, RoutedEventArgs e)
+        {
+            Set_Recipe45DGlassPanel();
         }
         private void NaviRecipeSummaryBtn_Click(object sender, RoutedEventArgs e)
         {
@@ -233,6 +242,16 @@ namespace Root_AOP01_Inspection
 
             CurrentPanel = m_RecipeWizard.Recipe45D;
             CurrentPanel.DataContext = m_Recipe45D;
+        }
+        public void Set_Recipe45DGlassPanel()
+        {
+            NaviButtons.Clear();
+            NaviButtons.Add(Navi_Setup);
+            NaviButtons.Add(Navi_RecipeWizard);
+            NaviButtons.Add(Navi_45DGlass);
+
+            CurrentPanel = m_RecipeWizard.Recipe45DGlass;
+            CurrentPanel.DataContext = m_Recipe45DGlass;
         }
         public void Set_RecipeFrontsidePanel()
         {

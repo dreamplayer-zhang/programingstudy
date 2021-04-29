@@ -171,6 +171,7 @@ namespace Root_AOP01_Inspection
 				//이미지 데이터 초기화 및 등록
 				ImageData imageMain = GlobalObjects.Instance.RegisterNamed<ImageData>(App.MainRegName, memoryTool.GetMemory(App.mPool, App.mGroup, App.mMainMem));
 				ImageData image45D = GlobalObjects.Instance.RegisterNamed<ImageData>(App.PellRegName, memoryTool.GetMemory(App.mPool, App.mGroup, App.m45DMem));
+				ImageData image45DGlass = GlobalObjects.Instance.RegisterNamed<ImageData>(App.GlassRegName, memoryTool.GetMemory(App.mPool, App.mGroup, App.m45DGlassMem));
 
 				ImageData imageSideLeft = GlobalObjects.Instance.RegisterNamed<ImageData>(App.SideLeftRegName, memoryTool.GetMemory(App.mPool, App.mGroup, App.mSideLeftMem));
 				ImageData imageSideTop = GlobalObjects.Instance.RegisterNamed<ImageData>(App.SideTopRegName, memoryTool.GetMemory(App.mPool, App.mGroup, App.mSideTopMem));
@@ -182,6 +183,8 @@ namespace Root_AOP01_Inspection
 					imageMain.p_nByte = engineer.ClassMemoryTool().GetMemory(App.mPool, App.mGroup, App.mMainMem).p_nByte;
 				if (image45D.m_MemData != null) 
 					image45D.p_nByte = engineer.ClassMemoryTool().GetMemory(App.mPool, App.mGroup, App.m45DMem).p_nByte;
+				if (image45DGlass.m_MemData != null)
+					image45DGlass.p_nByte = engineer.ClassMemoryTool().GetMemory(App.mPool, App.mGroup, App.m45DGlassMem).p_nByte;
 
 				if (imageSideLeft.m_MemData != null) 
 					imageSideLeft.p_nByte = engineer.ClassMemoryTool().GetMemory(App.mPool, App.mGroup, App.mSideLeftMem).p_nByte;
@@ -282,7 +285,7 @@ namespace Root_AOP01_Inspection
 				else
 				{
 					// Inspection Manager
-					var back_info = new SharedBufferInfo(imageMain.GetPtr(0), imageMain.p_Size.X, imageMain.p_Size.Y, imageMain.p_nByte, imageMain.GetPtr(1), imageMain.GetPtr(2));//Main을 그대로 사용
+					var back_info = new SharedBufferInfo(image45DGlass.GetPtr(0), image45DGlass.p_Size.X, image45DGlass.p_Size.Y, image45DGlass.p_nByte, image45DGlass.GetPtr(1), image45DGlass.GetPtr(2));//Main을 그대로 사용
 
 					InspectionManager_AOP inspectionBack = GlobalObjects.Instance.RegisterNamed<InspectionManager_AOP>
 						(App.BackInspMgRegName, backSurface, back_info);
