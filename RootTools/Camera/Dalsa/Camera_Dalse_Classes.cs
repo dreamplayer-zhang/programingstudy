@@ -165,7 +165,19 @@ namespace RootTools.Camera.Dalsa
         //    }
         //}
 
-
+        int _nUserSetNum = 0;
+        public int p_nUserSetNum
+        {
+            get => _nUserSetNum;
+            set
+            {
+                if(value<17&&value>0)
+                {
+                    _nUserSetNum = value;
+                    SetUserset(value);
+                }
+            }
+        }
         eDir m_eDir = eDir.Forward;
         public eDir p_eDir
         {
@@ -330,6 +342,13 @@ namespace RootTools.Camera.Dalsa
             if (!res.Equals("Internal"))
                 m_sapCam.SetFeatureValue("TriggerMode", "Internal");
             p_eTriggerMode = eTriggerMode.Internal;
+        }
+        void SetUserset(int num)
+        {
+            string str;
+            m_sapCam.GetFeatureValue("UserSetSelector", out str);
+            if (!str.Contains(num.ToString()))
+                m_sapCam.SetFeatureValue("UserSetSelector", "UserSet" + num.ToString());
         }
         public void SetCamHandle(SapAcqDevice device, SapAcquisition acquisition)
         {

@@ -33,6 +33,11 @@ namespace Root_CAMELLIA
 
         public const string TOOL_NAME = "Camellia2";
 
+        public const string USERNAME = "0a50ffc00ab87ec51cd41269a8820b1ba28c04fbbf51208803e073824b612fa3";
+        public const string PASSWORD = "e664ff11431cd8eaf28ec5c5a43a4633e8c338306522d73efc9882bea7ee2640";
+
+
+
         private static ConfigModel _configModel = new ConfigModel();
         public static ConfigModel Configuration
         {
@@ -52,7 +57,21 @@ namespace Root_CAMELLIA
             {
                 string fileVersion = FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location).FileVersion;
                 _Version = fileVersion;
-                return "Camellia Ⅱ - Version " + _Version;
+                return "Camellia2 - Version " + _Version;
+            }
+        }
+
+        private bool _loginSuccess = false;
+        public bool LoginSuccess
+        {
+            get
+            {
+                return _loginSuccess;
+            }
+            set
+            {
+                //_loginSuccess = value;
+                SetProperty(ref _loginSuccess, value);
             }
         }
     }

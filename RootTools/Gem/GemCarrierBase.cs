@@ -395,7 +395,6 @@ namespace RootTools.Gem
         public void InitBase()
         {
             m_gem?.AddGemCarrier(this);
-            foreach (GemSlotBase slot in m_aGemSlot) slot.RegRead();
             m_treeRoot = new TreeRoot(p_sLocID + ".Gem", m_log);
             m_treeRoot.UpdateTree += M_treeRoot_UpdateTree;
 

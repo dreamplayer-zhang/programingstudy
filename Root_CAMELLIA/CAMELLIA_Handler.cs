@@ -119,6 +119,14 @@ namespace Root_CAMELLIA
                         if (child.IsWaferExist(0) == false) return false;
                         if (child.IsWaferExist(0) == true) return true;
                     }
+                    else
+                    {
+                        //if (!child.IsWaferExist(0))
+                        //{
+                        //    child.SetAlarm();
+                        //    return false;
+                        //}
+                    }
                 }
                 else if (child.p_infoWafer == null)
                 {
@@ -133,7 +141,14 @@ namespace Root_CAMELLIA
                 }
                 else if(child.p_infoWafer != null)
                 {
-                    
+                    //if (!child.p_id.Contains("Loadport"))
+                    //{
+                    //    if (!child.IsWaferExist(0))
+                    //    {
+                    //        child.SetAlarm();
+                    //        return false;
+                    //    }
+                    //}
                 }
             }
             return iWTR.IsEnableRecovery();
@@ -244,7 +259,7 @@ namespace Root_CAMELLIA
         void InitAligner()
         {
             
-            switch (m_eAligner)
+         switch (m_eAligner)
             {
                 case eAligner.ATI: m_Aligner = new Aligner_ATI("Aligner", m_engineer); break;
                 case eAligner.RND: m_Aligner = new Aligner_RND("Aligner", m_engineer); break;

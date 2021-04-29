@@ -1495,9 +1495,11 @@ std::vector<Point> IP::FindWaferEdge(BYTE* pSrc, float& inoutCenterX, float& ino
     Mat CircleMask = Mat(nH / downScale, nW / downScale, CV_8UC1);
     CircleMask = Scalar(0);
 
+
     circle(CircleMask, Point(inoutCenterX, inoutCenterY), inoutRadius, 255, -1);
 
     // 1. Wafer 중심의 일정 영역 평균 값으로 후보 영역 검출
+    // 버그 : 50보다 작은 경우 음수가 들어감
     Mat CenterROI(imgSubSample, Rect(inoutCenterX - 50, inoutCenterY - 50, 100, 100));
     float avg = (cv::sum(cv::sum(CenterROI)))[0] / ((uint64)100 * 100) * 0.8f;
     cv::threshold(imgSubSample, imgSubSample, avg, 255, CV_THRESH_BINARY);

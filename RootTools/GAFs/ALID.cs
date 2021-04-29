@@ -79,7 +79,19 @@ namespace RootTools.GAFs
                 OnPropertyChanged(); 
             }
         }
-
+        int _nErrorLevel = 0;
+        int m_nmaxlevel = 5;
+        public int p_nErrorLevel
+        {
+            get { return _nErrorLevel; }
+            set
+            {
+                if (_nErrorLevel == value) return;
+                if (value > m_nmaxlevel) value = 5;
+                _nErrorLevel = value;
+                OnPropertyChanged();
+            }
+        }
         public void Run(bool bSet, string sMsg)
         {
             p_sMsg = sMsg; 
@@ -152,7 +164,8 @@ namespace RootTools.GAFs
             p_nID = tree.Set(p_nID, nDefaultID, "Number", "SVID Number");
             p_sImageFile = tree.SetFile(p_sImageFile, "", "jpg", "Image", "Image File Name");
             p_sDesc = tree.Set(p_sDesc, p_sDesc, "Descrition", "ALID Description");
-            p_bEQError = tree.Set(p_bEQError, p_bEQError, "EQ Error", "EQ Error when Set"); 
+            p_bEQError = tree.Set(p_bEQError, p_bEQError, "EQ Error", "EQ Error when Set");
+            p_nErrorLevel = tree.Set(p_nErrorLevel, p_nErrorLevel, "Error Level", "Error Level");
         }
 
         public void Save(StreamWriter sw)

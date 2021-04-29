@@ -568,7 +568,7 @@ namespace RootTools.OHT.Semi
             bool bDoneOld = bDone;
             bool bpresent= false;
             if (m_module.p_eState == ModuleBase.eState.Error) return;
-            GemCarrierBase.ePresent present;            
+            //GemCarrierBase.ePresent present;            
             switch (m_carrier.p_eTransfer)
             {
                 case GemCarrierBase.eTransfer.ReadyToLoad:

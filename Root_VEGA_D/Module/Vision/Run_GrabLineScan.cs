@@ -256,6 +256,26 @@ namespace Root_VEGA_D.Module
                         m_nCurScanLine++;
                         cpMemoryOffset.X += grabData.m_nFovSize;
                     }
+                    
+                    m_grabMode.StartGrab(mem, tmpMemOffset, nWaferSizeY_px, grabData);
+
+                    // Y축 트리거 발생
+                    axisXY.p_axisY.SetTrigger(dTriggerStartPosY, dTriggerEndPosY, m_grabMode.m_dTrigger, 0.001, true);
+                    
+                    // 라인스캔 완료 대기
+                    if (m_module.Run(axisXY.p_axisY.WaitReady()))
+                        return p_sInfo;
+
+                    // IPU PC와 연결된 상태라면 스캔 종료 메세지 전달
+                    if (m_module.TcpipCommServer.server.IsConnected())
+                        m_module.TcpipCommServer.SendMessage(TCPIPComm_VEGA_D.Command.end);
+
+                    // X축을 미리 움직임
+                    //axisXY.p_axisX.StartMove(dNextPosX);
+
+                    // 다음 이미지 획득을 위해 변수 값 변경
+                    nScanLine++;
+                    cpMemoryOffset.X += grabData.m_nFovSize;
                 }
                 m_grabMode.m_camera.StopGrab();
 

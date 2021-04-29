@@ -49,7 +49,7 @@ namespace Root_Rinse_Unloader.Module
                 if (bInit)
                 {
                     m_dioVacuum.Write(false);
-                    m_doBlow.Write(false); 
+                    m_doBlow.Write(false);
                 }
             }
 
@@ -121,9 +121,13 @@ namespace Root_Rinse_Unloader.Module
         {
             m_bPickerDown = bDown;
             m_dioPickerDown.Write(bDown);
-            string sRun = m_dioPickerDown.WaitDone();
-            m_alidPickerDown.p_bSet = (sRun != "OK");
-            return sRun;
+            if (!EQ.IsStop())
+            {
+                string sRun = m_dioPickerDown.WaitDone();
+                m_alidPickerDown.p_bSet = (sRun != "OK");
+                return sRun;
+            }
+            return "OK";
         }
         #endregion
 
@@ -142,6 +146,8 @@ namespace Root_Rinse_Unloader.Module
 
         public string MoveLoader(ePos ePos)
         {
+            if ((m_rail.m_dioPusherDown.p_bOut == false) || (m_rail.m_dioPusherDown.p_bDone == false))  return "Check Pusher Down";
+            if ((m_dioPickerDown.p_bOut) || (m_dioPickerDown.p_bDone == false)) return "Check Picker Down";
             m_axis.StartMove(ePos);
             return m_axis.WaitReady();
         }
@@ -204,8 +210,6 @@ namespace Root_Rinse_Unloader.Module
             }
             if (RunCheckStrip() != "OK")
             {
-                EQ.p_bStop = true;
-                EQ.p_eState = EQ.eState.Error; 
                 m_alidRollerStripCheck.p_bSet = true;
                 return "Load Strip Error"; 
             }
@@ -370,12 +374,14 @@ namespace Root_Rinse_Unloader.Module
 
         RinseU m_rinse;
         Storage m_storage;
+        Rail m_rail; 
         Roller m_roller;
-        public Loader(string id, IEngineer engineer, RinseU rinse, Storage storage, Roller roller)
+        public Loader(string id, IEngineer engineer, RinseU rinse, Storage storage, Rail rail, Roller roller)
         {
             p_id = id;
             m_rinse = rinse;
             m_storage = storage;
+            m_rail = rail; 
             m_roller = roller;
             InitPickers();
             InitBase(id, engineer);

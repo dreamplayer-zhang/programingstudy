@@ -290,7 +290,7 @@ namespace Root_VEGA_D.Module
 				//}
 			}
 
-			int m_lFan = 6;
+			int m_lFan = 4;
 			public void RunTreeUnit(Tree tree)
 			{
 				p_sUnit = tree.Set(p_sUnit, p_sUnit, "Unit ID", "Unit ID");

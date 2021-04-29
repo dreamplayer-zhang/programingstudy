@@ -98,18 +98,13 @@ namespace RootTools_Vision.WorkManager3
             }
         }
 
-        public static ConcurrentQueue<Workplace> ConvertToQueue(RecipeType_WaferMap waferMap, OriginRecipe originRecipe, SharedBufferInfo bufferInfo)
+        public static ConcurrentQueue<Workplace> ConvertToQueue(RecipeType_WaferMap waferMap, OriginRecipe originRecipe, SharedBufferInfo bufferInfo, CameraInfo cameraInfo = new CameraInfo())
         {
             ConcurrentQueue<Workplace> queue = new ConcurrentQueue<Workplace>();
             WorkplaceBundle bundle = new WorkplaceBundle();
 
             try
             {
-                Workplace wp = new Workplace(-1, -1, 0, 0, 0, 0, queue.Count);
-
-                bundle.Add(wp);
-                queue.Enqueue(wp);
-
                 var mapData = waferMap.Data;
                 int mapSizeX = waferMap.MapSizeX;
                 int mapSizeY = waferMap.MapSizeY;
@@ -122,7 +117,15 @@ namespace RootTools_Vision.WorkManager3
                 int diePitchY = originRecipe.DiePitchY;
 
                 int originAbsX = originRecipe.OriginX;
-                int originAbsY = originRecipe.OriginY - originRecipe.DiePitchY; // 좌상단 기준
+                int originAbsY = originRecipe.OriginY - originRecipe.OriginHeight; // 좌상단 기준
+
+                int originWidth = originRecipe.OriginWidth;
+                int originHeight = originRecipe.OriginHeight;
+
+                Workplace wp = new Workplace(-1, -1, originAbsX, originAbsY, originWidth, originHeight, queue.Count);
+
+                bundle.Add(wp);
+                queue.Enqueue(wp);
 
                 // Right
                 for (int x = masterX; x < mapSizeX; x++)
@@ -137,7 +140,7 @@ namespace RootTools_Vision.WorkManager3
                             int dieAbsX = originAbsX + dx * diePitchX;
                             int dieAbsY = originAbsY + dy * diePitchY;
 
-                            Workplace workplace = new Workplace(x, y, dieAbsX, dieAbsY, diePitchX, diePitchY, queue.Count);
+                            Workplace workplace = new Workplace(x, y, dieAbsX, dieAbsY, originWidth, originHeight, queue.Count);
                             if (y == masterY)
                             {
                                 workplace.SetSubState(WORKPLACE_SUB_STATE.LINE_FIRST_CHIP, true);
@@ -158,7 +161,7 @@ namespace RootTools_Vision.WorkManager3
                             int dieAbsX = originAbsX + dx * diePitchX;
                             int dieAbsY = originAbsY + dy * diePitchY;
 
-                            Workplace workplace = new Workplace(x, y, dieAbsX, dieAbsY, diePitchX, diePitchY, queue.Count);
+                            Workplace workplace = new Workplace(x, y, dieAbsX, dieAbsY, originWidth, originHeight, queue.Count);
 
                             bundle.Add(workplace);
                             queue.Enqueue(workplace);
@@ -180,7 +183,7 @@ namespace RootTools_Vision.WorkManager3
                             int dieAbsX = originAbsX + dx * diePitchX;
                             int dieAbsY = originAbsY + dy * diePitchY;
 
-                            Workplace workplace = new Workplace(x, y, dieAbsX, dieAbsY, diePitchX, diePitchY, queue.Count);
+                            Workplace workplace = new Workplace(x, y, dieAbsX, dieAbsY, originWidth, originHeight, queue.Count);
 
                             if (y == masterY)
                             {
@@ -202,7 +205,7 @@ namespace RootTools_Vision.WorkManager3
                             int dieAbsX = originAbsX + dx * diePitchX;
                             int dieAbsY = originAbsY + dy * diePitchY;
 
-                            Workplace workplace = new Workplace(x, y, dieAbsX, dieAbsY, diePitchX, diePitchY, queue.Count);
+                            Workplace workplace = new Workplace(x, y, dieAbsX, dieAbsY, originWidth, originHeight, queue.Count);
                             
                             bundle.Add(workplace);
                             queue.Enqueue(workplace);
@@ -214,6 +217,7 @@ namespace RootTools_Vision.WorkManager3
                 {
                     temp.ParentBundle = bundle;
                     temp.SetSharedBuffer(bufferInfo);
+                    temp.SetCameraInfo(cameraInfo);
                 }
 
                 return queue;

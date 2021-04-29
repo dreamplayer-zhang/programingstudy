@@ -30,7 +30,7 @@ namespace Root_WIND2
             m_cInspMethod = new ObservableCollection<ParameterBase>();
             p_cInspMethod = ParameterBase.GetFrontSideClass();
 
-            this.p_InspMethod = this.m_cInspMethod[1]; // Position
+            this.p_InspMethod = this.m_cInspMethod[0]; // Position
             this.p_InspChannel = IMAGE_CHANNEL.R_GRAY;
 
             // Mask
@@ -48,6 +48,15 @@ namespace Root_WIND2
 
             if (this.p_cInspROI.Count > 0)
                 this.p_InspROI = this.p_cInspROI[0];
+        }
+
+        public InspectionItem(ParameterBase param)
+        {
+            // Method
+            //m_cInspMethod = new ObservableCollection<ParameterBase>();
+            //p_cInspMethod = ParameterBase.GetFrontSideClass();
+
+            this.p_InspMethod = param; // Position
         }
 
         public int p_Index

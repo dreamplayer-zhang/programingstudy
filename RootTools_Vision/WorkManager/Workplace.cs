@@ -59,6 +59,10 @@ namespace RootTools_Vision
 
         private WorkplaceBundle parentBundle;
 
+        private bool snapDone = false;
+
+        private CameraInfo cameraInfo;
+
         [NonSerialized] private List<Defect> defectList = new List<Defect>();
         [NonSerialized] private List<Measurement> measureList = new List<Measurement>();
         [NonSerialized] private Dictionary<PREWORKDATA_KEY, object> preworkdataDicitonary = new Dictionary<PREWORKDATA_KEY, object>();
@@ -90,6 +94,8 @@ namespace RootTools_Vision
             this.measureList = (List<Measurement>)info.GetValue(nameof(measureList), typeof(List<Measurement>));
             this.preworkdataDicitonary = (Dictionary<PREWORKDATA_KEY, object>)info.GetValue(nameof(preworkdataDicitonary), typeof(Dictionary<PREWORKDATA_KEY, object>));
             this.parentBundle = (WorkplaceBundle)info.GetValue(nameof(parentBundle), typeof(WorkplaceBundle));
+            this.snapDone = (bool)info.GetValue(nameof(snapDone), typeof(bool));
+            this.cameraInfo = (CameraInfo)info.GetValue(nameof(cameraInfo), typeof(CameraInfo));
         }
 
         public void GetObjectData(SerializationInfo info, StreamingContext context)
@@ -116,6 +122,8 @@ namespace RootTools_Vision
             info.AddValue(nameof(measureList), measureList, typeof(List<Measurement>));
             info.AddValue(nameof(preworkdataDicitonary), preworkdataDicitonary, typeof(Dictionary<PREWORKDATA_KEY, object>));
             info.AddValue(nameof(parentBundle), parentBundle, typeof(WorkplaceBundle));
+            info.AddValue(nameof(snapDone), snapDone, typeof(bool));
+            info.AddValue(nameof(CameraInfo), cameraInfo, typeof(CameraInfo));
         }
         #endregion
 
@@ -223,6 +231,11 @@ namespace RootTools_Vision
             get => this.height;
         }
 
+        public bool SnapDone
+        {
+            get => this.snapDone;
+        }
+
         public WORK_TYPE WorkState
         {
             get => this.workState;
@@ -283,6 +296,11 @@ namespace RootTools_Vision
             set => this.parentBundle = value;
         }
 
+        public CameraInfo CameraInfo
+        {
+            get => this.cameraInfo;
+        }
+
         
         
         public List<Defect> DefectList
@@ -320,6 +338,16 @@ namespace RootTools_Vision
             this.width = width;
             this.height = height;
             this.index = index;
+        }
+
+        public void CheckSnapDone_Line(CRect snapArea)
+        {
+            if (this.positionX + this.width <= snapArea.Right)
+            {
+                this.snapDone = true;
+            }
+            else
+                this.snapDone = false;
         }
 
         /// <summary>
@@ -377,6 +405,14 @@ namespace RootTools_Vision
                 sharedBufferB = IntPtr.Zero;
                 sharedBufferG = IntPtr.Zero;
             }
+        }
+
+        public void SetCameraInfo(CameraInfo cameraInfo)
+        {
+            this.cameraInfo.RealResX = cameraInfo.RealResX;
+            this.cameraInfo.RealResY = cameraInfo.RealResY;
+            this.cameraInfo.TargetResX = cameraInfo.TargetResX;
+            this.cameraInfo.TargetResY = cameraInfo.TargetResY;
         }
 
         public void SetSharedBuffer(SharedBufferInfo info)

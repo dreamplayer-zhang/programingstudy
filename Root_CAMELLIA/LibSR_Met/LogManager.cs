@@ -42,7 +42,7 @@ namespace Root_CAMELLIA.LibSR_Met
             sTimeLog += sCallerName + "() - ";
             sTimeLog += sLog;
 
-            string sLogFileName = DateTime.Now.ToShortDateString() + @"LibSR_Met.txt";
+            string sLogFileName = DateTime.Now.ToShortDateString() + @"_LibSR_Met.txt";
 
             lock (m_Lock)
             {

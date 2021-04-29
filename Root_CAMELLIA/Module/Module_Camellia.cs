@@ -264,10 +264,14 @@ namespace Root_CAMELLIA.Module
         ALID m_alid_WaferExist;
         public void SetAlarm()
         {
-            if(m_loadExistWafer.p_bIn)
-                m_alid_WaferExist.Run(true, "Vision Load Position Wafer Exist Error");
-            else if(m_homeExistWafer.p_bIn)
-                m_alid_WaferExist.Run(true, "Vision Home Position Wafer Exist Error");
+            if (m_loadExistWafer.p_bIn)
+                m_alid_WaferExist.Run(true, "Vision Load Position Wafer Exist");
+            else if (p_infoWafer != null && !m_loadExistWafer.p_bIn)
+                m_alid_WaferExist.Run(true, "Vision Load Position Wafer Not Exist!");
+            else if (m_homeExistWafer.p_bIn)
+                m_alid_WaferExist.Run(true, "Vision Home Position Wafer Exist");
+            else if (p_infoWafer != null && !m_homeExistWafer.p_bIn)
+                m_alid_WaferExist.Run(true, "Vision Home Position Wafer Not Exist");
         }
 
 
@@ -302,6 +306,7 @@ namespace Root_CAMELLIA.Module
             {
                 infoCarrier[i] = loadports[i].p_infoCarrier;
                 CanInitCal[i] = false;
+                CheckDocking[i] = false;
             }
            // try
             //{
@@ -332,8 +337,11 @@ namespace Root_CAMELLIA.Module
 
 
         bool m_isHomeRun = false;
+
+        public bool p_isClearInfoWafer { get; set; } = false;
         public override string StateHome()
         {
+            p_isClearInfoWafer = true;
             m_isHomeRun = true;
             try
             {
@@ -412,10 +420,12 @@ namespace Root_CAMELLIA.Module
             {
                 m_isHomeRun = false;
             }  
+            
         }
 
 
         bool[] CanInitCal = new bool[2];
+        bool[] CheckDocking = new bool[2];
         bool m_InitCalDone = false;
         protected override void RunThread()
         {
@@ -427,7 +437,7 @@ namespace Root_CAMELLIA.Module
                     if (!CanInitCal[EQ.p_nRunLP] && infoCarrier[EQ.p_nRunLP].p_eState == InfoCarrier.eState.Dock)
                     {
                         CanInitCal[EQ.p_nRunLP] = true;
-                        
+
                         if (((Run_InitCalibration)CloneModuleRun("InitCalibration")).Run() != "OK")
                         {
                             p_sInfo = "Init Cal Error";
@@ -447,32 +457,56 @@ namespace Root_CAMELLIA.Module
                     }
                 }
             }
+            else
+            {
+                if (EQ.p_eState == EQ.eState.Run && !EQ.p_bRecovery)
+                {
+                    if (!CheckDocking[EQ.p_nRunLP] && infoCarrier[EQ.p_nRunLP].p_eState == InfoCarrier.eState.Dock)
+                    {
+                        CheckDocking[EQ.p_nRunLP] = true;
+                        MoveReadyPos();
+                    }
+                    else if (CheckDocking[EQ.p_nRunLP] && infoCarrier[EQ.p_nRunLP].p_eState != InfoCarrier.eState.Dock)
+                    {
+                        CheckDocking[EQ.p_nRunLP] = false;
+                    }
+                }
+            }
         }
 
         public string LifterDown()
         {
-            if (p_axisLifter.IsInPos(eAxisPos.Home))
+            try
             {
-                if (!m_vacuum.p_bIn)
+                if (p_axisLifter.IsInPos(eAxisPos.Home))
                 {
-                    VaccumOnOff(true);
+                    if (!m_vacuum.p_bIn)
+                    {
+                        VaccumOnOff(true);
+                    }
+                    return "OK";
                 }
-                return "OK";
+                else
+                {
+                    if (!m_vacuum.p_bIn)
+                    {
+                        VaccumOnOff(true);
+                    }
+                    //p_axisLifter.p_vaccumDIO_I.p_bIn = false;
+                    p_axisLifter.p_IsLifterDown = true;
+                    if (p_axisLifter.StartMove(eAxisPos.Home) != "OK")
+                    {
+                        return p_sInfo;
+                    }
+                    if (p_axisLifter.WaitReady() != "OK")
+                        return p_sInfo;
+                }
             }
-            else
+            finally
             {
-                if (!m_vacuum.p_bIn)
-                {
-                    VaccumOnOff(true);
-                }
-
-                if (p_axisLifter.StartMove(eAxisPos.Ready) != "OK")
-                {
-                    return p_sInfo;
-                }
-                if (p_axisLifter.WaitReady() != "OK")
-                    return p_sInfo;
+                p_axisLifter.p_IsLifterDown = false;
             }
+          
 
            // if (m_loadExistWafer.p_bIn)
             {
@@ -678,7 +712,7 @@ namespace Root_CAMELLIA.Module
 
         public string AfterPut(int nID)
         {
-            p_dataSavePath = BaseDefine.Dir_MeasureSaveRootPath + p_infoWafer.p_sRecipe + @"\" + DateTime.Now.ToString("yyyy-MM-dd") + "T" + DateTime.Now.ToString("HH-mm-ss");
+            p_dataSavePath = BaseDefine.Dir_MeasureSaveRootPath + p_infoWafer.p_sRecipe;// + @"\" + DateTime.Now.ToString("yyyy-MM-dd") + "T" + DateTime.Now.ToString("HH-mm-ss");
             GeneralTools.MakeDirectory(p_dataSavePath);
             return "OK";
         }
@@ -695,6 +729,7 @@ namespace Root_CAMELLIA.Module
             //{
             //    StateHome();
             //}
+            //SetAlarm();
             switch (m_eCheckWafer)
             {
                 case eCheckWafer.Sensor:

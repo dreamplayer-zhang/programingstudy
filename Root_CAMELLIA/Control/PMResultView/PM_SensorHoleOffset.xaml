@@ -6,7 +6,95 @@
              xmlns:local="clr-namespace:Root_CAMELLIA"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-    <Grid Background="LightPink">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="5*"/>
+            <RowDefinition Height="4*"/>
+        </Grid.RowDefinitions>
+        <Grid Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="3*"/>
+                <ColumnDefinition Width="7*"/>
+            </Grid.ColumnDefinitions>
+            <GroupBox Header="Fix Parameter" Grid.Row="0" Grid.Column="0">
+                <Grid Grid.Row="0" Grid.Column="0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
+                </Grid>
+            </GroupBox>
+            <Canvas x:Name="canvas" Grid.Row="0" Grid.Column="1">
+                <Image Source="{Binding p_imageSource, UpdateSourceTrigger=PropertyChanged}" Width="{Binding Path=ActualWidth, ElementName=canvas}" Height="{Binding Path=ActualHeight, ElementName=canvas}"  Stretch="Uniform"></Image>
+            </Canvas>
+        </Grid>
+        <GroupBox Header="Sensor-Hole-Camera Align Result" Grid.Row="1">
+            <Grid Grid.Row="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="1*"/>
+                    <RowDefinition Height="1*"/>
+                    <RowDefinition Height="1*"/>
+                    <RowDefinition Height="1*"/>
+                    <RowDefinition Height="1*"/>
+                    <RowDefinition Height="1*"/>
+                </Grid.RowDefinitions>
+                <Grid Grid.Row="0" >
+                    <TextBlock Text="Hole Center Offset" VerticalAlignment="Center" Margin="5" />
+                </Grid>
+                <Grid Grid.Row="1">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition />
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Grid.Row="1" Grid.Column="0" HorizontalAlignment="Center">
+                        <TextBlock Text="X :"  TextAlignment="Center" VerticalAlignment="Center" Margin="10,0,0,0" />
+                        <TextBox Width="100"  VerticalAlignment="Center" Margin="3,0,13,0"  TextAlignment="Center" Text="{Binding p_pmSensorHoleAlign.p_HoleOffsetX, UpdateSourceTrigger=LostFocus, Mode=TwoWay}"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Center">
+                        <TextBlock Text="Y :"  TextAlignment="Center" VerticalAlignment="Center"/>
+                        <TextBox Width="100" Margin="3,0"  VerticalAlignment="Center" TextAlignment="Center" Text="{Binding p_pmSensorHoleAlign.p_HoleOffsetY, UpdateSourceTrigger=LostFocus, Mode=TwoWay}"/>
+                    </StackPanel>
+                </Grid>
+                <Grid Grid.Row="2" >
+                    <TextBlock Text="Navigation-Sensor Offset" VerticalAlignment="Center" Margin="5" />
+                </Grid>
+                <Grid Grid.Row="3">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition />
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Grid.Row="3" Grid.Column="0" HorizontalAlignment="Center">
+                        <TextBlock Text="X :"  TextAlignment="Center" VerticalAlignment="Center" Margin="10,0,0,0" />
+                        <TextBox Width="100"  VerticalAlignment="Center" Margin="3,0,13,0"  TextAlignment="Center" Text="{Binding p_pmSensorHoleAlign.p_SensorOffsetX, UpdateSourceTrigger=LostFocus, Mode=TwoWay}"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Grid.Row="3" Grid.Column="1" HorizontalAlignment="Center">
+                        <TextBlock Text="Y :"  TextAlignment="Center" VerticalAlignment="Center"/>
+                        <TextBox Width="100" Margin="3,0"  VerticalAlignment="Center" TextAlignment="Center" Text="{Binding p_pmSensorHoleAlign.p_SensorOffsetY, UpdateSourceTrigger=LostFocus, Mode=TwoWay}"/>
+                    </StackPanel>
+                </Grid>
+                <Grid Grid.Row="4" >
+                    <TextBlock Text="Camera-Hole-Sensor Offset" VerticalAlignment="Center" Margin="5" />
+                </Grid>
+                <Grid Grid.Row="5">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition />
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Grid.Row="5" Grid.Column="0" HorizontalAlignment="Center">
+                        <TextBlock Text="X :"  TextAlignment="Center" VerticalAlignment="Center" Margin="10,0,0,0" />
+                        <TextBox Width="100"  VerticalAlignment="Center" Margin="3,0,13,0"  TextAlignment="Center" Text="{Binding p_pmSensorHoleAlign.p_TotalOffsetX, UpdateSourceTrigger=LostFocus, Mode=TwoWay}"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Grid.Row="5" Grid.Column="1" HorizontalAlignment="Center">
+                        <TextBlock Text="Y :"  TextAlignment="Center" VerticalAlignment="Center"/>
+                        <TextBox Width="100" Margin="3,0"  VerticalAlignment="Center" TextAlignment="Center" Text="{Binding p_pmSensorHoleAlign.p_TotalOffsetY, UpdateSourceTrigger=LostFocus, Mode=TwoWay}"/>
+                    </StackPanel>
+                </Grid>
+            </Grid>
+        </GroupBox>
 
     </Grid>
 </UserControl>

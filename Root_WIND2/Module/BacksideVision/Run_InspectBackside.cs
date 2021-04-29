@@ -62,34 +62,46 @@ namespace Root_WIND2.Module
 
         public override string Run()
         {
+            StopWatch inspectionTimeWatcher = new StopWatch();
+            inspectionTimeWatcher.Start();
+
             //레시피에 GrabMode 저장하고 있어야함
-            InspectionManagerBackside inspectionBackside = GlobalObjects.Instance.Get<InspectionManagerBackside>();
-            inspectionBackside.Stop();
+
+            RootTools_Vision.WorkManager3.WorkManager workManager = GlobalObjects.Instance.GetNamed<RootTools_Vision.WorkManager3.WorkManager>("backInspection");
+            if (workManager == null)
+            {
+                throw new ArgumentException("WorkManager가 초기화되지 않았습니다(null)");
+            }
+
+            workManager.Stop();
+
 
             if (m_grabMode == null) return "Grab Mode == null";
 
             if (EQ.IsStop() == false)
             {
-                if (inspectionBackside.Recipe.Read(m_sRecipeName) == false)
+                if (workManager.OpenRecipe(m_sRecipeName) == false)
                     return "Recipe Open Fail";
 
-                inspectionBackside.Start();
+                workManager.Start(false);
 
             }
             else
             {
-                inspectionBackside.Stop();
+                workManager.Stop();
             }
 
-            while (inspectionBackside.CheckAllWorkDone() == false)
+            if (workManager.WaitWorkDone(ref EQ.m_EQ.StopToken(), 60 * 3 /* 3 minutes */) == false)
             {
-                if (EQ.IsStop())
-                    return "OK";
+                inspectionTimeWatcher.Stop();
 
-                Task.Delay(1000);
-            }
+                TempLogger.Write("Inspection", "Time out!!!");
+                return "OK";
+            } // 5 minutes
 
-            m_grabMode.SetLight(false);
+            inspectionTimeWatcher.Stop();
+            TempLogger.Write("Inspection", string.Format("{0:F3}", (double)inspectionTimeWatcher.ElapsedMilliseconds / (double)1000));
+
             return "OK";
         }
     }

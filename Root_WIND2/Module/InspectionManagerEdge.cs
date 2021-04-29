@@ -69,7 +69,7 @@ namespace Root_WIND2
 			edgeSurface.SetGrabMode(((WIND2_Handler)GlobalObjects.Instance.Get<WIND2_Engineer>().ClassHandler()).p_EdgeSideVision.m_aGrabMode[recipe.GetItem<EdgeSurfaceRecipe>().EdgeRecipeBaseTop.GrabModeIndex],
 									((WIND2_Handler)GlobalObjects.Instance.Get<WIND2_Engineer>().ClassHandler()).p_EdgeSideVision.m_aGrabMode[recipe.GetItem<EdgeSurfaceRecipe>().EdgeRecipeBaseSide.GrabModeIndex],
 									((WIND2_Handler)GlobalObjects.Instance.Get<WIND2_Engineer>().ClassHandler()).p_EdgeSideVision.m_aGrabMode[recipe.GetItem<EdgeSurfaceRecipe>().EdgeRecipeBaseBtm.GrabModeIndex]);
-
+				
 			processDefect_Edge.SetGrabMode(((WIND2_Handler)GlobalObjects.Instance.Get<WIND2_Engineer>().ClassHandler()).p_EdgeSideVision.m_aGrabMode[recipe.GetItem<EdgeSurfaceRecipe>().EdgeRecipeBaseTop.GrabModeIndex],
 										   ((WIND2_Handler)GlobalObjects.Instance.Get<WIND2_Engineer>().ClassHandler()).p_EdgeSideVision.m_aGrabMode[recipe.GetItem<EdgeSurfaceRecipe>().EdgeRecipeBaseSide.GrabModeIndex],
 										   ((WIND2_Handler)GlobalObjects.Instance.Get<WIND2_Engineer>().ClassHandler()).p_EdgeSideVision.m_aGrabMode[recipe.GetItem<EdgeSurfaceRecipe>().EdgeRecipeBaseBtm.GrabModeIndex]);
@@ -116,7 +116,7 @@ namespace Root_WIND2
 			int startY = heightPerDegree * grabMode.m_nCameraPositionOffset;
 			int endY = (heightPerDegree * 360) + startY;
 
-			int roiWidth = param.ROIWidth;
+			int roiWidth = 500;/*param.ROIWidth;*/
 			int roiHeight = param.ROIHeight;
 
 			for (int i = 0; i < endY / roiHeight; i++)

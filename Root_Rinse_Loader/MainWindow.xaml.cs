@@ -48,6 +48,7 @@ namespace Root_Rinse_Loader
             tabControlStorage.SelectedIndex = (int)m_handler.m_rinse.p_eMode;
             progressUI.Init(m_handler.m_rinse); 
             textBoxRotateSpeed.DataContext = m_handler.m_rinse;
+            checkBoxEQStop.DataContext = EQ.m_EQ; 
         }
         #endregion
 
@@ -163,6 +164,8 @@ namespace Root_Rinse_Loader
 
         private void buttonStart_Click(object sender, RoutedEventArgs e)
         {
+            EQ.p_bStop = false;
+            foreach (Storage.Magazine magazine in m_handler.m_storage.m_aMagazine) magazine.RunClamp(magazine.p_bCheck); 
             EQ.p_eState = EQ.eState.Run;
         }
 
@@ -174,7 +177,7 @@ namespace Root_Rinse_Loader
         private void buttonReset_Click(object sender, RoutedEventArgs e)
         {
             m_handler.m_rinse.RunBuzzerOff();
-            m_handler.m_rinse.Reset(); 
+            m_handler.Reset(); 
             EQ.p_eState = EQ.eState.Ready;
         }
 

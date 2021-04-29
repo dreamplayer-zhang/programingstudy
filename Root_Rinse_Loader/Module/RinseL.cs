@@ -63,7 +63,7 @@ namespace Root_Rinse_Loader.Module
             }
         }
 
-        Storage.eMagazine _eMagazine = Storage.eMagazine.Magazine1; 
+        Storage.eMagazine _eMagazine = Storage.eMagazine.Magazine4; 
         public Storage.eMagazine p_eMagazine
         {
             get { return _eMagazine; }
@@ -250,7 +250,6 @@ namespace Root_Rinse_Loader.Module
         #endregion
 
         #region ToolBox
-        DIO_I m_diAirEmergency;
         public TCPIPClient m_tcpip; 
         public override void GetTools(bool bInit)
         {
@@ -663,7 +662,7 @@ namespace Root_Rinse_Loader.Module
             InitTimer(); 
             AddProtocol(p_id, eCmd.SetMode, p_eMode);
             AddProtocol(p_id, eCmd.SetWidth, p_widthStrip);
-            AddProtocol(p_id, eCmd.SetRotateSpeed, p_fRotateSpeed); 
+            AddProtocol(p_id, eCmd.SetRotateSpeed, p_fRotateSpeed);
         }
 
         public override void ThreadStop()

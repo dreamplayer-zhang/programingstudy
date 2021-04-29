@@ -61,7 +61,7 @@ namespace RootTools_Vision
             }
             else
             {
-                MessageBox.Show("객체가 등록되지 않았습니다.\nRegister 메서드를 통해 등록하세요.\n"+ typeof(T).Name);
+                MessageBox.Show("객체가 등록되지 않았습니다.\nRegister 메서드를 통해 등록하세요.\n"+ name + "(type:"+ typeof(T).Name+")");
                 return default(T);
             }
         }
