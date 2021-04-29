@@ -18,7 +18,7 @@ namespace Root_VEGA_P.Module
         {
             m_regulator.GetTools(toolBox, bInit);
             m_nozzleSet.GetTools(toolBox);
-            toolBox.Get(ref m_particleCounter, m_module, "LasAir3");
+            toolBox.Get(ref m_particleCounter, m_module, m_sID + "LasAir3");
             if (bInit) { }
         }
         #endregion
@@ -30,8 +30,8 @@ namespace Root_VEGA_P.Module
             RS232 m_rs232;
             public void GetTools(ToolBox toolBox, bool bInit)
             {
-                toolBox.GetDIO(ref m_diBackFlow, m_module, "Back Flow");
-                toolBox.GetComm(ref m_rs232, m_module, "Regulator");
+                toolBox.GetDIO(ref m_diBackFlow, m_module, m_sID + "Back Flow");
+                toolBox.GetComm(ref m_rs232, m_module, m_sID + "Regulator");
                 if (bInit) m_rs232.p_bConnect = true;
             }
 
@@ -61,10 +61,12 @@ namespace Root_VEGA_P.Module
                 return m_rs232.p_bConnect ? "OK" : "RS232 Connect Error";
             }
 
+            string m_sID; 
             ModuleBase m_module;
-            public Regulator(ModuleBase module)
+            public Regulator(ModuleBase module, string sID)
             {
                 m_module = module;
+                m_sID = sID; 
             }
         }
         Regulator m_regulator;
@@ -182,8 +184,8 @@ void SaveResult(string sFile, string sTime, bool bBackFlow)
         public ParticleCounterSet(ModuleBase module, FlowSensor flowSensor, ParticleCounterBase.Sample sample, string sID = "")
         {
             m_module = module;
-            m_regulator = new Regulator(m_module);
-            m_nozzleSet = new NozzleSet(m_module);
+            m_regulator = new Regulator(m_module, sID);
+            m_nozzleSet = new NozzleSet(m_module, sID);
             m_flowSensor = flowSensor;
             m_sample = sample; 
             m_sID = sID; 
