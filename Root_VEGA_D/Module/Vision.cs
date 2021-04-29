@@ -728,7 +728,6 @@ namespace Root_VEGA_D.Module
             m_tcpipCommServer = new TCPIPComm_VEGA_D(server);
             m_tcpipCommServer.EventReceiveData += EventReceiveData;
             m_tcpipCommServer.EventAccept += EventAccept;
-            InitGAF();
         }
 
         private void Vision_OnChangeState(eState eState)
