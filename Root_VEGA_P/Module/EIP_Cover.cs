@@ -198,6 +198,7 @@ namespace Root_VEGA_P.Module
         ParticleCounterSet m_particleCounterSet;
         public EIP_Cover(string id, IEngineer engineer)
         {
+            p_id = id; 
             VEGA_P vegaP = ((VEGA_P_Handler)engineer.ClassHandler()).m_VEGA;
             m_particleCounterSet = new ParticleCounterSet(this, vegaP.m_flowSensor, vegaP.m_sample);
             InitBase(id, engineer);

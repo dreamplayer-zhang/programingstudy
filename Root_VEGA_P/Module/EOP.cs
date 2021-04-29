@@ -558,6 +558,7 @@ namespace Root_VEGA_P.Module
         VEGA_P_Handler m_handler; 
         public EOP(string id, IEngineer engineer)
         {
+            p_id = id; 
             m_handler = (VEGA_P_Handler)engineer.ClassHandler(); 
             InitDome();
             InitDoor(); 
