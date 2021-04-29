@@ -11,9 +11,13 @@
             <ColumnDefinition/>
             <ColumnDefinition/>
             <ColumnDefinition/>
+            <ColumnDefinition/>
         </Grid.ColumnDefinitions>
+        
+        
         <Button Content="Setup" Command="{Binding btnSetupCommand}" FontSize="40" FontWeight="Bold" FontFamily="Arial"/>
         <Button Grid.Column="1" Command="{Binding btnReviewCommand}" Content="Review" FontSize="40" FontWeight="Bold" FontFamily="Arial"/>
         <Button Grid.Column="2" Command="{Binding btnOperationCommand}" Content="Operation" FontSize="40" FontWeight="Bold" FontFamily="Arial"/>
+        <Button Grid.Column="3" Command="{Binding btnEngineerCommand}" Content="Engineer" FontSize="40" FontWeight="Bold" FontFamily="Arial"/>
     </Grid>
 </UserControl>

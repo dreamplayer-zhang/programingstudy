@@ -19,6 +19,10 @@
         <ControlTemplate x:Key="setup">
             <local:Setup DataContext="{Binding SetupVM}"/>
         </ControlTemplate>
+
+        <ControlTemplate x:Key="engineer">
+            <engineer:WindII_Engineer_UI DataContext="{Binding EngineerVM}"/>
+        </ControlTemplate>
     </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
@@ -27,8 +31,6 @@
             <RowDefinition Height="2*"/>
         </Grid.RowDefinitions>
         
-        <!--<engineer:WindII_Engineer_UI x:Name="engineerUI"/>-->
-
         <Grid Grid.Row="0">
             <ContentControl>
                 <ContentControl.Style>
@@ -43,6 +45,10 @@
                             <DataTrigger Binding="{Binding SelectedModeIndex}"
                                          Value="1">
                                 <Setter Property="Template" Value="{StaticResource setup}"/>
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding SelectedModeIndex}"
+                                         Value="4">
+                                <Setter Property="Template" Value="{StaticResource engineer}"/>
                             </DataTrigger>
                         </Style.Triggers>
                     </Style>
