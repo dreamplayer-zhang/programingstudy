@@ -264,23 +264,45 @@ namespace RootTools
     }
     public class TEllipse : TShape
     {
-        public Ellipse CanvasEllipse;
-        public int CanvasLeft;
-        public int CanvasTop;
+        public Grid _grid;
 
+        public Ellipse _CanvasEllipse;
+        public Ellipse CanvasEllipse
+        {
+            get
+            {
+                return _CanvasEllipse;
+            }
+            set
+            {
+                base.UIElement = value;
+                base.UIElement.Tag = this;
+                _CanvasEllipse = value;
+            }
+        }
+
+
+        
+        public CPoint MemPointBuffer;
         public List<PointLine> Data;
+
         public TEllipse()
         {
             CanvasEllipse = new Ellipse();
+            MemPointBuffer = new CPoint();
             Data = new List<PointLine>();
         }
-        public TEllipse(Brush brush, double thickness)
+        public TEllipse(Brush brush, double thickness, double opacity)
         {
             CanvasEllipse = new Ellipse();
-            CanvasEllipse.Stroke = brush;
-            CanvasEllipse.StrokeThickness = thickness;
-
             Data = new List<PointLine>();
+
+            _grid.Children.Add(CanvasEllipse);
+            CanvasEllipse.Stroke = Brushes.Red;
+            CanvasEllipse.Stroke = brush;
+            CanvasEllipse.Fill = brush;
+            CanvasEllipse.StrokeThickness = thickness;
+            CanvasEllipse.Opacity = opacity;
         }
 
     }
