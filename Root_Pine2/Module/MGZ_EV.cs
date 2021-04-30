@@ -39,7 +39,13 @@ namespace Root_Pine2.Module
             {
                 if (_eStep == value) return; 
                 _eStep = value; 
-                //forget LED
+                switch (value)
+                {
+                    case eStep.Ready: m_pine2.m_display.Write(m_nID, "REDY"); break;
+                    case eStep.Load: m_pine2.m_display.Write(m_nID, "LOAD"); break;
+                    case eStep.Run: m_pine2.m_display.Write(m_nID, "RUN "); break;
+                    case eStep.Unload: m_pine2.m_display.Write(m_nID, "UNLD"); break;
+                }
             }
         }
         #endregion
@@ -292,12 +298,14 @@ namespace Root_Pine2.Module
         }
         #endregion
 
+        int m_nID = 1;
         Pine2 m_pine2; 
-        public MGZ_EV(string id, IEngineer engineer, Pine2 pine2)
+        public MGZ_EV(string id, int nID, IEngineer engineer, Pine2 pine2)
         {
-            p_id = id;
+            m_nID = nID + 1;
+            p_id = id + m_nID.ToString();
             m_pine2 = pine2; 
-            base.InitBase(id, engineer);
+            base.InitBase(p_id, engineer);
         }
 
         public override void ThreadStop()

@@ -179,6 +179,8 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Module\InfoStrip.cs" />
+    <Compile Include="Module\LoadEV.cs" />
     <Compile Include="Module\MGZ_EV.cs" />
     <Compile Include="Module\Pine2.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
@@ -212,10 +214,6 @@
     <ProjectReference Include="..\RootTools\RootTools.csproj">
       <Project>{ce787353-5e00-4574-9f49-7cee7f087a86}</Project>
       <Name>RootTools</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Root_ASIS\Root_ASIS.csproj">
-      <Project>{a1f831c0-f0f4-4ef1-b9b4-e7c424735f65}</Project>
-      <Name>Root_ASIS</Name>
     </ProjectReference>
     <ProjectReference Include="..\Root_Pine2_Vision\Root_Pine2_Vision.csproj">
       <Project>{6a259040-506f-468c-8e24-93c44988a8ef}</Project>
