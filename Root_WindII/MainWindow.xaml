@@ -21,7 +21,7 @@
         </ControlTemplate>
         <!-- Engineer -->
         <ControlTemplate x:Key="engineer">
-            <engineer:WindII_Engineer_UI DataContext="{Binding EngineerUI}"/>
+            <engineer:WindII_Engineer_UI DataContext="{Binding MaintVM}"/>
         </ControlTemplate>
     </Window.Resources>
     
@@ -33,7 +33,7 @@
         </Grid.RowDefinitions>
         
         <Grid Grid.Row="0">
-            <ContentControl>
+            <ContentControl Content="{Binding p_CurrentPanel}">
                 <ContentControl.Style>
                     <Style TargetType="ContentControl">
                         <Style.Triggers>
@@ -50,7 +50,7 @@
                             <!-- Engineer -->
                             <DataTrigger Binding="{Binding SelectedModeIndex}"
                                          Value="4">
-                                <Setter Property="Template" Value="{StaticResource engineer}"/>
+                                <!--<Setter Property="Template" Value="{StaticResource engineer}"/>-->
                             </DataTrigger>
                         </Style.Triggers>
                     </Style>

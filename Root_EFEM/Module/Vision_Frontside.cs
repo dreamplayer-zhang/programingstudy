@@ -1,4 +1,5 @@
 using Root_EFEM.Module;
+using Root_EFEM.Module.FrontsideVision;
 using RootTools;
 using RootTools.Camera.BaslerPylon;
 using RootTools.Camera.Dalsa;
@@ -14,9 +15,9 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Threading;
 
-namespace Root_WIND2.Module
+namespace Root_EFEM
 {
-    public class Vision : ModuleBase, IWTRChild
+    public class Vision_Frontside : ModuleBase, IWTRChild
     {
         ALID m_alid_WaferExist;
         public void SetAlarm()
@@ -420,7 +421,7 @@ namespace Root_WIND2.Module
         }
         #endregion
 
-        public Vision(string id, IEngineer engineer, eRemote eRemote)
+        public Vision_Frontside(string id, IEngineer engineer, eRemote eRemote)
         {
             //            InitLineScan();+
             //            InitAreaScan();
@@ -487,8 +488,8 @@ namespace Root_WIND2.Module
 
         public class Run_Remote : ModuleRunBase
         {
-            Vision m_module;
-            public Run_Remote(Vision module)
+            Vision_Frontside m_module;
+            public Run_Remote(Vision_Frontside module)
             {
                 m_module = module;
                 InitModuleRun(module);
@@ -541,13 +542,13 @@ namespace Root_WIND2.Module
         protected override void InitModuleRuns()
         {
             AddModuleRunList(new Run_Remote(this), true, "Remote Run");
-            //AddModuleRunList(new Run_Delay(this), true, "Time Delay");
-            //AddModuleRunList(new Run_Rotate(this), false, "Rotate Axis");
-            //AddModuleRunList(new Run_GrabLineScan(this), true, "Run Grab LineScan Camera");
-            //AddModuleRunList(new Run_Inspect(this), true, "Run Inspect");
-            //AddModuleRunList(new Run_VisionAlign(this), true, "Run VisionAlign");
-            //AddModuleRunList(new Run_AutoFocus(this), false, "Run AutoFocus");
-        }
+			//AddModuleRunList(new Run_Delay(this), true, "Time Delay");
+			//AddModuleRunList(new Run_Rotate(this), false, "Rotate Axis");
+			AddModuleRunList(new Run_GrabLineScan(this), true, "Run Grab LineScan Camera");
+			AddModuleRunList(new Run_Inspect(this), true, "Run Inspect");
+			//AddModuleRunList(new Run_VisionAlign(this), true, "Run VisionAlign");
+			//AddModuleRunList(new Run_AutoFocus(this), false, "Run AutoFocus");
+		}
         #endregion
     }
 }
