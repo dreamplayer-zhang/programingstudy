@@ -607,6 +607,12 @@ namespace RootTools
                 SetProperty(ref m_VisibleMenu, value);
             }
         }
+        private Visibility m_VisibleSlider = Visibility.Visible;
+        public Visibility p_VisibleSlider
+        {
+            get => m_VisibleSlider;
+            set => SetProperty(ref m_VisibleSlider, value);
+        }
 
         #endregion
 

@@ -16,14 +16,13 @@ using System.Windows.Shapes;
 namespace Root_VEGA_P_Vision
 {
     /// <summary>
-    /// screwUI.xaml에 대한 상호 작용 논리
+    /// Recipe6um_Panel.xaml에 대한 상호 작용 논리
     /// </summary>
-    public partial class screwUI : UserControl
+    public partial class Recipe6um_Panel : UserControl
     {
-        public screwUI()
+        public Recipe6um_Panel()
         {
             InitializeComponent();
-            DataContext = new ScrewUI_ViewModel(this);
         }
     }
 }

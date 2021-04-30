@@ -175,6 +175,7 @@
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Windows.Interactivity, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Windows.Interactivity.WPF.2.0.20525\lib\net40\System.Windows.Interactivity.dll</HintPath>
     </Reference>
@@ -219,6 +220,15 @@
       <DependentUpon>HomePanel.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\1. Setup\1.Home\Home_ViewModel.cs" />
+    <Compile Include="UI\1. Setup\2. RecipeManager\Panel\Recipe1um_Panel.xaml.cs">
+      <DependentUpon>Recipe1um_Panel.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\1. Setup\2. RecipeManager\Panel\Recipe6um_Panel.xaml.cs">
+      <DependentUpon>Recipe6um_Panel.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\1. Setup\2. RecipeManager\Panel\RecipeStain_Panel.xaml.cs">
+      <DependentUpon>RecipeStain_Panel.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI\1. Setup\2. RecipeManager\RecipeManagerPanel.xaml.cs">
       <DependentUpon>RecipeManagerPanel.xaml</DependentUpon>
     </Compile>
@@ -228,6 +238,7 @@
     <Compile Include="UI\1. Setup\2. RecipeManager\ViewModel\EIPCoverBottom_ImageViewer_ViewModel.cs" />
     <Compile Include="UI\1. Setup\2. RecipeManager\ViewModel\EIPCoverTop_ImageViewer_ViewModel.cs" />
     <Compile Include="UI\1. Setup\2. RecipeManager\ViewModel\ItemMask.cs" />
+    <Compile Include="UI\1. Setup\2. RecipeManager\ViewModel\RecipeStain_ViewModel.cs" />
     <Compile Include="UI\1. Setup\Setup.xaml.cs">
       <DependentUpon>Setup.xaml</DependentUpon>
     </Compile>
@@ -258,6 +269,10 @@
     <Compile Include="UI\2. Review\screwUI.xaml.cs">
       <DependentUpon>screwUI.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UI\2. Review\ViewModel\Review_ViewModel.cs" />
+    <Compile Include="UI\2. Review\ViewModel\ScrewUI_ImageViewer_ViewModel.cs" />
+    <Compile Include="UI\2. Review\ViewModel\ScrewUI_ViewModel.cs" />
+    <Compile Include="UI\2. Review\ViewModel\VisionReview_ViewModel.cs" />
     <Compile Include="UI\2. Review\VisionReview_Panel.xaml.cs">
       <DependentUpon>VisionReview_Panel.xaml</DependentUpon>
     </Compile>
@@ -312,6 +327,18 @@
     <Page Include="UI\1. Setup\1.Home\HomePanel.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\1. Setup\2. RecipeManager\Panel\Recipe1um_Panel.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\1. Setup\2. RecipeManager\Panel\Recipe6um_Panel.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\1. Setup\2. RecipeManager\Panel\RecipeStain_Panel.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UI\1. Setup\2. RecipeManager\RecipeManagerPanel.xaml">
       <SubType>Designer</SubType>
@@ -470,6 +497,16 @@
   <ItemGroup>
     <Resource Include="Resources\dome_low.jpg" />
     <Resource Include="Resources\door_low.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\EIPBasePlateBottom.jpg" />
+    <Resource Include="Resources\EIPBasePlateTop.jpg" />
+    <Resource Include="Resources\EIPCoverBottom.jpg" />
+    <Resource Include="Resources\EIPCoverTop.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\domearea.png" />
+    <Resource Include="Resources\doorarea.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

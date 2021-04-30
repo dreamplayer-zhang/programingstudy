@@ -46,6 +46,7 @@ namespace Root_VEGA_P_Vision
 
         private Home_ViewModel homeVM;
         private RecipeManager_ViewModel recipeManagerVM;
+        private RecipeStain_ViewModel recipeStainVM;
         public Maintenance_ViewModel maintVM;
 
         public Setup_ViewModel()
@@ -64,6 +65,7 @@ namespace Root_VEGA_P_Vision
         {
             homeVM = new Home_ViewModel(this);
             recipeManagerVM = new RecipeManager_ViewModel(this);
+            recipeStainVM = new RecipeStain_ViewModel(this);
             maintVM = new Maintenance_ViewModel(this);
         }
         private void InitAllNaviBtn()
@@ -71,8 +73,8 @@ namespace Root_VEGA_P_Vision
             m_btnNaviInspection = new NaviBtn("Inspection");
             m_btnNaviInspection.Btn.Click += Navi_InspectionClick;
 
-            //m_btnNaviRecipeWizard = new NaviBtn("Recipe Wizard");
-            //m_btnNaviRecipeWizard.Btn.Click += Navi_RecipeWizardClick;
+            m_btnNaviRecipeWizard = new NaviBtn("Recipe Wizard");
+            m_btnNaviRecipeWizard.Btn.Click += Navi_RecipeWizardClick;
 
             m_btnNaviMaintenance = new NaviBtn("Maintenance");
             m_btnNaviMaintenance.Btn.Click += Navi_MaintClick;
@@ -174,7 +176,6 @@ namespace Root_VEGA_P_Vision
             }
         }
 
-       
         #endregion
 
         #region Panel Change Method
@@ -229,58 +230,21 @@ namespace Root_VEGA_P_Vision
 
         #endregion
 
-        //#region Recipe Wizard
-        //public void SetWizardFrontSide()
-        //{
-        //    p_NaviButtons.Clear();
-        //    p_NaviButtons.Add(m_btnNaviRecipeWizard);
-        //    p_NaviButtons.Add(m_btnNaviFrontSide);
+        #region Recipe Wizard
+        public void SetStain()
+        {
+            p_NaviButtons.Clear();
+            p_NaviButtons.Add(m_btnNaviRecipeWizard);
 
-        //    frontsideVM.SetPage(frontsideVM.Summary);
-
-        //    p_CurrentPanel = frontsideVM.Main;
-        //    p_CurrentPanel.DataContext = frontsideVM;
-        //}
-        //public void SetWizardBackSide()
-        //{
-        //    p_NaviButtons.Clear();
-        //    p_NaviButtons.Add(m_btnNaviRecipeWizard);
-        //    p_NaviButtons.Add(m_btnNaviBackSide);
-
-        //    p_CurrentPanel = backsideVM.Main;
-        //    p_CurrentPanel.DataContext = backsideVM;
-        //}
-        //public void SetWizardEBR()
-        //{
-        //    p_NaviButtons.Clear();
-        //    p_NaviButtons.Add(m_btnNaviRecipeWizard);
-        //    p_NaviButtons.Add(m_btnNaviEBR);
-
-        //    p_CurrentPanel = ebrVM.Main;
-        //    p_CurrentPanel.DataContext = ebrVM;
-        //}
-        //public void SetWizardEdge()
-        //{
-        //    p_NaviButtons.Clear();
-        //    p_NaviButtons.Add(m_btnNaviRecipeWizard);
-        //    p_NaviButtons.Add(m_btnNaviEdge);
-
-        //    p_CurrentPanel = edgeVM.Main;
-        //    p_CurrentPanel.DataContext = edgeVM;
-        //}
-
-        //public void SetBacksideInspTest()
-        //{
-        //    p_NaviButtons.Clear();
-        //    p_NaviButtons.Add(m_btnNaviRecipeWizard);
-        //    p_NaviButtons.Add(m_btnNaviBackSide);
-        //}
-
-        //public void Dispose()
-        //{
-        //    throw new NotImplementedException();
-        //}
-        //#endregion
+            p_CurrentPanel = recipeStainVM.Main;
+            p_CurrentPanel.DataContext = recipeStainVM;
+        }
+        public void Set6um()
+        {
+            p_NaviButtons.Clear();
+            p_NaviButtons.Add(m_btnNaviRecipeWizard);            
+        }
+        #endregion
 
         #endregion
         #endregion
