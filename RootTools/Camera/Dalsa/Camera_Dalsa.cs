@@ -252,7 +252,9 @@ namespace RootTools.Camera.Dalsa
             p_CamInfo.p_sFile = tree.SetFile(p_CamInfo.p_sFile, p_CamInfo.p_sFile, "ccf", "CamFile", "Cam File");
             p_CamInfo.p_sAreaCamFile = tree.SetFile(p_CamInfo.p_sAreaCamFile, p_CamInfo.p_sAreaCamFile, "ccf", "Area Cam file", "Area Cam File");
             p_CamInfo.p_nResourceIdx = tree.Set(p_CamInfo.p_nResourceIdx, p_CamInfo.p_nResourceIdx, "Resource Count", "Resource Count");
-            p_CamParam.p_nUserSetNum = tree.Set(p_CamParam.p_nUserSetNum, p_CamParam.p_nUserSetNum, "UserSet Number", "UserSet Number");
+
+            //p_CamInfo._DeviceUserID = tree.Set(p_CamInfo._DeviceUserID, "Basler", "ID", "Device User ID");
+            //m_nGrabTimeout = tree.Set(m_nGrabTimeout, 2000, "Timeout", "Grab Timeout (ms)");
         }
 
         void RunImageRoiTree(Tree tree)
@@ -548,21 +550,21 @@ namespace RootTools.Camera.Dalsa
 
             int nMul = 0,nDiv = 0;
             m_sapDevice.GetFeatureValue("rotaryEncoderMultiplier", out nMul); Debug.WriteLine("Multiplier 0 = " + nMul.ToString());
-          //  m_sapDevice.SetFeatureValue("rotaryEncoderMultiplier", 1);
+            m_sapDevice.SetFeatureValue("rotaryEncoderMultiplier", 1);
             m_sapDevice.GetFeatureValue("rotaryEncoderMultiplier", out nMul); Debug.WriteLine("Multiplier 1 = " + nMul.ToString());
 
             m_sapDevice.GetFeatureValue("rotaryEncoderDivider", out nDiv); Debug.WriteLine("Divider 0 = "+nDiv.ToString());
-         //   m_sapDevice.SetFeatureValue("rotaryEncoderDivider", 1);
+            m_sapDevice.SetFeatureValue("rotaryEncoderDivider", 1);
             m_sapDevice.GetFeatureValue("rotaryEncoderDivider", out nDiv); Debug.WriteLine("Divider 1 = " + nDiv.ToString());
 
             m_sapDevice.GetFeatureValue("rotaryEncoderMultiplier", out nMul); Debug.WriteLine("Multiplier 15 = " + nMul.ToString());
-          //  m_sapDevice.SetFeatureValue("rotaryEncoderMultiplier", 16);
+            m_sapDevice.SetFeatureValue("rotaryEncoderMultiplier", 16);
             m_sapDevice.GetFeatureValue("rotaryEncoderMultiplier", out nMul); Debug.WriteLine("Multiplier 16 = " + nMul.ToString());
 
 
-            m_sapDevice.GetFeatureValue("rotaryEncoderMultiplier", out nDiv); Debug.WriteLine("Divider 15 = " + nDiv.ToString());
-        //    m_sapDevice.SetFeatureValue("rotaryEncoderMultiplier", 23);
-            m_sapDevice.GetFeatureValue("rotaryEncoderMultiplier", out nDiv); Debug.WriteLine("Divider 16 = " + nDiv.ToString());
+            m_sapDevice.GetFeatureValue("rotaryEncoderDivider", out nDiv); Debug.WriteLine("Divider 22 = " + nDiv.ToString());
+            m_sapDevice.SetFeatureValue("rotaryEncoderDivider", 23);
+            m_sapDevice.GetFeatureValue("rotaryEncoderDivider", out nDiv); Debug.WriteLine("Divider 23 = " + nDiv.ToString());
 
             m_sapXfer.Snap((int)(m_nGrabCount));
 
