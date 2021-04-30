@@ -18,6 +18,7 @@ namespace Root_WindII
         public event ModeSelectedHandler SetupSelected;
         public event ModeSelectedHandler ReviewSelected;
         public event ModeSelectedHandler OperationSelected;
+        public event ModeSelectedHandler EngineerSelected;
 
         #endregion
 
@@ -51,6 +52,16 @@ namespace Root_WindII
             {
                 if (this.OperationSelected != null)
                     this.OperationSelected();
+
+            });
+        }
+
+        public ICommand btnEngineerCommand
+        {
+            get => new RelayCommand(() =>
+            {
+                if (this.EngineerSelected != null)
+                    this.EngineerSelected();
 
             });
         }

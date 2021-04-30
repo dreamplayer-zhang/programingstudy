@@ -108,7 +108,7 @@ namespace Root_EFEM.Module
                 {
                     Thread.Sleep(10);
                     if (EQ.IsStop()) return p_id + " EQ Stop";
-                    if (m_dioVacuum.m_swWrite.ElapsedMilliseconds > msVac) return "Vacuum Sensor Timeout";
+                    if (m_dioVacuum.m_swWrite.ElapsedMilliseconds > msVac) return "Flipper Vacuum Sensor Timeout";
                 }
                 return "OK";
             }
@@ -145,11 +145,11 @@ namespace Root_EFEM.Module
             public enum ePosZ
             {
                 PutReady, // -180636
-                PutDown, //-145930
+                PutDown, //-126000
                 GetReady, // 0
-                GetUp, // -121992
+                GetUp, // -126992
                 InversePutReady, // -180636
-                InversePutDown, // -180636
+                InversePutDown, // -165636
                 InverseGetReady, //-262386
                 InverseGetDown // -155636
             }
@@ -168,8 +168,8 @@ namespace Root_EFEM.Module
             #region AxisRotate
             public enum ePosRotate
             {
-                UpSide, // 0
-                DownSide // 100000
+                UpSide, // 0 -230
+                DownSide // 100000 -230
             }
             void InitPosRotate()
             {
@@ -240,8 +240,8 @@ namespace Root_EFEM.Module
             // Start Get
             if (Run(m_flipper.RunMoveX(Flipper.ePosX.Forward, m_flipper.m_xOffset))) return p_sInfo;
             if (Run(m_flipper.RunMoveZ(Flipper.ePosZ.GetUp))) return p_sInfo;
-            if (Run(m_flipper.RunGuide(true))) return p_sInfo;
             if (Run(RunVacuum(false))) return p_sInfo;
+            if (Run(m_flipper.RunGuide(true))) return p_sInfo;
             if (Run(m_flipper.RunMoveZ(Flipper.ePosZ.InversePutReady))) return p_sInfo;
             if (Run(m_flipper.RunVacuum(true))) return p_sInfo;
             if (Run(m_flipper.RunMoveX(Flipper.ePosX.Backward, 0))) return p_sInfo;
@@ -263,12 +263,12 @@ namespace Root_EFEM.Module
 
             // Start InversePut
             if (Run(m_flipper.RunMoveX(Flipper.ePosX.Forward, 0))) return p_sInfo;
+            if (Run(m_flipper.RunMoveZ(Flipper.ePosZ.InversePutDown))) return p_sInfo;
             if (Run(m_flipper.RunVacuum(false))) return p_sInfo;
             if (Run(m_flipper.RunGuide(false))) return p_sInfo;
-            if (Run(m_flipper.RunMoveZ(Flipper.ePosZ.InversePutDown))) return p_sInfo;
-            if (Run(RunVacuum(true))) return p_sInfo;
             if (Run(m_flipper.RunMoveX(Flipper.ePosX.Forward, m_flipper.m_xOffset))) return p_sInfo;
             if (Run(m_flipper.RunMoveZ(Flipper.ePosZ.InverseGetReady))) return p_sInfo;
+            if (Run(RunVacuum(true))) return p_sInfo;
             if (Run(m_flipper.RunMoveX(Flipper.ePosX.Backward, 0))) return p_sInfo;
             // End InversePut
 
@@ -292,11 +292,12 @@ namespace Root_EFEM.Module
             if (Run(m_flipper.RunMoveX(Flipper.ePosX.Forward, 0))) return p_sInfo;
             if (Run(RunVacuum(false))) return p_sInfo;
             if (Run(m_flipper.RunGuide(true))) return p_sInfo;
-            if (Run(m_flipper.RunMoveZ(Flipper.ePosZ.InverseGetDown))) return p_sInfo;
+            Thread.Sleep(10);
             if (Run(m_flipper.RunGuide(false))) return p_sInfo; // JEONG
+            if (Run(m_flipper.RunMoveZ(Flipper.ePosZ.InverseGetDown))) return p_sInfo;
             if (Run(m_flipper.RunVacuum(true))) return p_sInfo;
             if (Run(m_flipper.RunGuide(true))) return p_sInfo; // JEONG
-            if (Run(m_flipper.RunVacuum(true))) return p_sInfo; // JEONG : Vacuum ON 확인 위해서
+            //if (Run(m_flipper.RunVacuum(true))) return p_sInfo; // JEONG : Vacuum ON 확인 위해서
             if (Run(m_flipper.RunMoveZ(Flipper.ePosZ.PutReady))) return p_sInfo;
             if (Run(m_flipper.RunMoveX(Flipper.ePosX.Backward, 0))) return p_sInfo;
             // End RunInverseGet
@@ -310,15 +311,42 @@ namespace Root_EFEM.Module
 
             while (true)
             {
-                if (RunPut() != "OK") break;
-                if (RunGet() != "OK") break;
-                if (RunInversePut() != "OK") break;
-                if (RunInverseGet() != "OK") break;
+                if (EQ.IsStop())
+                {
+                    return p_id + " EQ Stop (RNR: " + count.ToString() + "counts)";
+                }
+
+                if (RunPut() != "OK")
+                {
+                    return "RNR RunPut failed at " + count.ToString() + " counts";
+                }
+                if (RunGet() != "OK")
+                {
+                    return "RNR RunGet failed at " + count.ToString() + " counts";
+                }
+                if (RunInversePut() != "OK")
+                {
+                    return "RNR RunInversePut failed at " + count.ToString() + " counts";
+                }
+                if (RunInverseGet() != "OK")
+                {
+                    return "RNR RunInverseGet failed at " + count.ToString() + " counts";
+                }
 
                 count = count + 1;
             }
+        }
 
-            return "OK"; 
+        public string RunRecovery()
+        {
+            if (Run(m_flipper.RunMoveZ(Flipper.ePosZ.PutReady))) return p_sInfo;
+            if (Run(m_flipper.RunMoveX(Flipper.ePosX.Backward, 0))) return p_sInfo;
+            if (Run(m_flipper.RunMoveRotate(Flipper.ePosRotate.UpSide))) return p_sInfo;
+            if (Run(RunVacuum(false))) return p_sInfo;
+            if (Run(m_flipper.RunVacuum(false))) return p_sInfo;
+            if (Run(m_flipper.RunGuide(false))) return p_sInfo;
+
+            return "OK";
         }
         #endregion
 
@@ -358,7 +386,7 @@ namespace Root_EFEM.Module
             {
                 Thread.Sleep(10);
                 if (EQ.IsStop()) return p_id + " EQ Stop";
-                if (m_dioVac.m_swWrite.ElapsedMilliseconds > msVac) return "Vacuum Sensor Timeout";
+                if (m_dioVac.m_swWrite.ElapsedMilliseconds > msVac) return "Aligner Vacuum Sensor Timeout";
             }
             return "OK";
         }
@@ -828,9 +856,10 @@ namespace Root_EFEM.Module
                 Get,
                 InversePut,
                 InverseGet,
-                RnR
+                RnR,
+                Recovery
             }
-            eFlipper m_eFlipper = eFlipper.Get; 
+            eFlipper m_eFlipper = eFlipper.Get;
             public override ModuleRunBase Clone()
             {
                 Run_Flipper run = new Run_Flipper(m_module);
@@ -844,7 +873,7 @@ namespace Root_EFEM.Module
             }
             public override string Run()
             {
-                if (EQ.p_bSimulate) return "OK"; 
+                if (EQ.p_bSimulate) return "OK";
                 switch (m_eFlipper)
                 {
                     case eFlipper.Put: return m_module.RunPut();
@@ -852,6 +881,7 @@ namespace Root_EFEM.Module
                     case eFlipper.InversePut: return m_module.RunInversePut();
                     case eFlipper.InverseGet: return m_module.RunInverseGet();
                     case eFlipper.RnR: return m_module.RunRNR();
+                    case eFlipper.Recovery: return m_module.RunRecovery();
                 }
                 return "OK";
             }

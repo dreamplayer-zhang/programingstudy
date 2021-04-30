@@ -31,6 +31,8 @@ namespace Root_CAMELLIA.Module
         double m_dResY_um = 1;
         double m_dFocusZ = 0;
 
+        int m_nCalibrationCnt = 1;
+
         bool m_bUseCustomSpeed = false;
         double m_dMoveSpeedX = 0;
         double m_dMoveSpeedY = 0;
@@ -74,6 +76,7 @@ namespace Root_CAMELLIA.Module
             run.m_dMoveDecX = m_dMoveDecX;
             run.m_dMoveDecY = m_dMoveDecY;
             run.m_bUseCustomSpeed = m_bUseCustomSpeed;
+            run.m_nCalibrationCnt = m_nCalibrationCnt;
             return run;
         }
 
@@ -107,7 +110,9 @@ namespace Root_CAMELLIA.Module
             m_useCal = tree.Set(m_useCal, m_useCal, "Use Calibration", "Use Calibration", bVisible);
             m_useCentering = tree.Set(m_useCentering, m_useCentering, "Use Centering", "Use Centering", bVisible);
             m_dFocusZ = tree.Set(m_dFocusZ, m_dFocusZ, "Focus Z Pos", "Focus Z Pos", bVisible);
-            
+
+            m_nCalibrationCnt = tree.Set(m_nCalibrationCnt, m_nCalibrationCnt, "Calibration Retry Count", "Calibration Retry", bVisible);
+
             m_dMoveSpeedX = tree.Set(m_dMoveSpeedX, m_dMoveSpeedX, "Move Speed X", "Move Speed X", bVisible);
             m_dMoveSpeedY = tree.Set(m_dMoveSpeedY, m_dMoveSpeedY, "Move Speed Y", "Move Speed Y", bVisible);
             m_dMoveAccX = tree.Set(m_dMoveAccX, m_dMoveAccX, "Move Acc X", "Move Acc X", bVisible);
@@ -142,22 +147,27 @@ namespace Root_CAMELLIA.Module
 
             if (m_useCal)
             {
-                //Lamp Check
-                //m_Lamp.sp.Write
-            
                 if (m_useCentering)
                 {
-                    if (m_DataManager.m_calibration.Run(m_InitialCal, m_isPM) != "OK")
+                    if (m_DataManager.m_calibration.Run(m_InitialCal, m_isPM, retryCount:m_nCalibrationCnt) != "OK")
                     {
                         return "Calibration fail";
                     }
                 }
                 else
                 {
-                    if (m_DataManager.m_calibration.Run(m_InitialCal, m_isPM, false) != "OK")
+                    for(int i = 0; i < m_nCalibrationCnt; i++)
                     {
-                        return "Calibration fail";
+                        if (m_DataManager.m_calibration.Run(m_InitialCal, m_isPM, false) != "OK")
+                        {
+                            return "Calibration fail";
+                        }
+                        else
+                        {
+                            break;
+                        }
                     }
+
                 }
             }
 
@@ -328,16 +338,35 @@ namespace Root_CAMELLIA.Module
                 }
             }
 
-
             m_DataManager.m_waferCentering.CalCenterPoint(VRS.GetRoiSize(), m_dResX_um, m_dResY_um, m_WaferLT_pulse, m_WaferRT_pulse, m_WaferRB_pulse);
 
-            while (!m_DataManager.m_calibration.CalDone && m_useCal)
+            if (m_InitialCal)
             {
-                if (EQ.IsStop())
+                while (!m_DataManager.m_calibration.InItCalDone && m_useCal)
                 {
-                    return "EQ Stop";
+                    if (EQ.IsStop())
+                    {
+                        return "EQ Stop";
+                    }
                 }
             }
+            else
+            {
+                while (!m_DataManager.m_calibration.CalDone && m_useCal)
+                {
+                    if (EQ.IsStop())
+                    {
+                        return "EQ Stop";
+                    }
+                }
+            }
+
+            if (m_DataManager.m_calibration.ErrorString != "OK" && m_useCal)
+            {
+                return "Calibration Fail";
+            }
+
+
 
             if (m_module.Run(axisZ.StartMove(0)))
                 return p_sInfo;

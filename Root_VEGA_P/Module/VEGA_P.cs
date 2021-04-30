@@ -34,6 +34,7 @@ namespace Root_VEGA_P.Module
         {
             base.RunTree(tree);
             m_sample.RunTree(tree.GetTree("Particle Counter"), true);
+            m_flowSensor.RunTree(tree.GetTree("Flow Sensor")); 
         }
         #endregion
 

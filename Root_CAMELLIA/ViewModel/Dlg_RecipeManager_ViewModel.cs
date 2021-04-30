@@ -2747,6 +2747,7 @@ namespace Root_CAMELLIA
         public void InitLayer()
         {
             App.m_nanoView.m_LayerList.Clear();
+            LibSR_Met.DataManager.GetInstance().m_ThicknessData.Clear();
             dataManager.recipeDM.ModelData.AddLayer();
             dataManager.recipeDM.ModelData.AddLayer();
         }

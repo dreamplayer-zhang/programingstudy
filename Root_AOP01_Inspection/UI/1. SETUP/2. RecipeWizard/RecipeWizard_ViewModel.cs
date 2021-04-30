@@ -10,6 +10,7 @@ namespace Root_AOP01_Inspection
         public RecipeSummary_Page RecipeSummary = new RecipeSummary_Page();
         public RecipeSpec_Page RecipeSpec = new RecipeSpec_Page();
 
+        public Recipe45DGlass_Panel Recipe45DGlass = new Recipe45DGlass_Panel();
         public Recipe45D_Panel Recipe45D = new Recipe45D_Panel();
         public RecipeFrontside_Panel RecipeFrontside = new RecipeFrontside_Panel();
         public RecipeEdge_Panel RecipeEdge = new RecipeEdge_Panel();
@@ -202,6 +203,16 @@ namespace Root_AOP01_Inspection
                 return new RelayCommand(() =>
                 {
                     m_Setup.Set_Recipe45DPanel();
+                });
+            }
+        }
+        public ICommand btn45DGlass
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    m_Setup.Set_Recipe45DGlassPanel();
                 });
             }
         }

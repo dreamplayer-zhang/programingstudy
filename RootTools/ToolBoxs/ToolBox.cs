@@ -86,7 +86,7 @@ namespace RootTools.ToolBoxs
             if (value == null) value = new DIO_Os(m_toolDIO, module.p_id + "." + id, bLog ? module.m_log : null, bEnableRun, asDO);
             string sInfo = value.RunTree(module.m_treeRootTool.GetTree(id));
             if (sInfo != "OK") return sInfo;
-            for (int n = 0; n < asDO.Length; n++) module.m_listDO.AddBit(value.m_aBitDO[n]);
+            for (int n = 0; n < value.m_aBitDO.Count; n++) module.m_listDO.AddBit(value.m_aBitDO[n]);
             return "OK";
         }
 

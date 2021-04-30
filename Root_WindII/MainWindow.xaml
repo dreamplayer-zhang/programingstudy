@@ -8,7 +8,7 @@
         mc:Ignorable="d"
         Loaded="Window_Loaded"
         Closing="Window_Closing"
-        Title="MainWindow" Height="450" Width="800" WindowState="Maximized">
+        Title="MainWindow" Height="450" Width="800">
 
     <Window.Resources>
         <!-- SelectMode -->
@@ -19,7 +19,12 @@
         <ControlTemplate x:Key="setup">
             <local:Setup DataContext="{Binding SetupVM}"/>
         </ControlTemplate>
+        <!-- Engineer -->
+        <ControlTemplate x:Key="engineer">
+            <engineer:WindII_Engineer_UI DataContext="{Binding MaintVM}"/>
+        </ControlTemplate>
     </Window.Resources>
+    
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="8*"/>
@@ -27,10 +32,8 @@
             <RowDefinition Height="2*"/>
         </Grid.RowDefinitions>
         
-        <!--<engineer:WindII_Engineer_UI x:Name="engineerUI"/>-->
-
         <Grid Grid.Row="0">
-            <ContentControl>
+            <ContentControl Content="{Binding p_CurrentPanel}">
                 <ContentControl.Style>
                     <Style TargetType="ContentControl">
                         <Style.Triggers>
@@ -43,6 +46,11 @@
                             <DataTrigger Binding="{Binding SelectedModeIndex}"
                                          Value="1">
                                 <Setter Property="Template" Value="{StaticResource setup}"/>
+                            </DataTrigger>
+                            <!-- Engineer -->
+                            <DataTrigger Binding="{Binding SelectedModeIndex}"
+                                         Value="4">
+                                <!--<Setter Property="Template" Value="{StaticResource engineer}"/>-->
                             </DataTrigger>
                         </Style.Triggers>
                     </Style>

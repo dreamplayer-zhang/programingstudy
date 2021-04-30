@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Windows;
+using System.IO;
+using System.IO.Ports;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
@@ -94,6 +96,11 @@ namespace Root_CAMELLIA
             SplashScreenHelper.ShowText("Log View Initialize Done");
             SplashScreenHelper.ShowProgress(60);
 
+            //SplashScreenHelper.ShowText("Optic Lamp Initialize");
+            //App.m_nanoView.m_PMDatas.InitLamp();
+            //SplashScreenHelper.ShowText("Optic Lamp Initialize Done");
+            //SplashScreenHelper.ShowProgress(70);
+
             SplashScreenHelper.ShowText("Log View Initialize Done");
             SplashScreenHelper.ShowProgress(80);
             InitTimer();
@@ -116,7 +123,6 @@ namespace Root_CAMELLIA
             m_timer.Start();
         }
         // EQ.eState oldstate = EQ.eState.Init;
-        bool isClearInfoWafer = false;
         private void M_timer_Tick(object sender, EventArgs e)
         {
             tbTime.Text = DateTime.Now.ToString("yyyy-MM-dd HH-mm-ss");
@@ -128,10 +134,10 @@ namespace Root_CAMELLIA
             buttonInit.IsEnabled = IsEnable_Initial();
             buttonRecovery.IsEnabled = IsEnable_Recovery();
 
-            if (EQ.p_eState == EQ.eState.Ready && isClearInfoWafer)
+            if (EQ.p_eState == EQ.eState.Ready && m_handler.m_camellia.p_isClearInfoWafer)
             {
                 m_handler.m_process.ClearInfoWafer();
-                isClearInfoWafer = false;
+                m_handler.m_camellia.p_isClearInfoWafer = false;
             }
         }
 
@@ -146,15 +152,15 @@ namespace Root_CAMELLIA
         {
             if(EQ.p_eState == EQ.eState.Error)
             {
-                LampTop.Background = new SolidColorBrush(Color.FromArgb(255, 221, 221, 221));
+                LampTop.Background = Brushes.Red;
                 LampMid.Background = new SolidColorBrush(Color.FromArgb(255, 221, 221, 221));
-                LampBot.Background = Brushes.Red;
+                LampBot.Background = new SolidColorBrush(Color.FromArgb(255, 221, 221, 221));
             }
             else if(EQ.p_eState == EQ.eState.Run)
             {
-                LampTop.Background = Brushes.ForestGreen;
+                LampTop.Background = new SolidColorBrush(Color.FromArgb(255, 221, 221, 221));
                 LampMid.Background = new SolidColorBrush(Color.FromArgb(255, 221, 221, 221));
-                LampBot.Background = new SolidColorBrush(Color.FromArgb(255, 221, 221, 221));
+                LampBot.Background = Brushes.ForestGreen;
             }
             else
             {
@@ -196,10 +202,9 @@ namespace Root_CAMELLIA
 
             EQ.p_bStop = false;
             EQ.p_eState = EQ.eState.Home;
-            isClearInfoWafer = true;
-
-
-
+            
+            //isClearInfoWafer = true;
+            //m_handler.m_camellia
 
             //Application.Current.Dispatcher.Invoke(delegate ()
             //{
@@ -210,6 +215,7 @@ namespace Root_CAMELLIA
             //            EQ.p_eState = EQ.eState.Error;
             //        }
             //    }
+            //    m_handler.m_process.ClearInfoWafer();
             //});
 
             //Camellia Camera Connect
@@ -273,5 +279,136 @@ namespace Root_CAMELLIA
         {
             dlgOHT.Show();
         }
+
+        #region Lamp Check Parameter
+
+        private void LampPMCheck(double dLeftLampTime)
+        {
+            //if (dLeftLampTime >= 0)
+            //{
+            //    string sLeftLampTime = dLeftLampTime.ToString();
+            //    p_LampTimeError = sLeftLampTime + " Hours Left until PM !";
+
+            //}
+            //else
+            //{
+            //    p_LampTimeError = "Please, Do Lamp PM";
+            //}
+        }
+
+        //private void UpdateLampTime(bool Initialize)
+        //{
+        //    double LampUseTime = UpdateLampData(Initialize, "t");
+
+        //    //p_LampTimeCount = LampUseTime;
+
+        //    // App.m_nanoView.m_PMDatas.
+        //    if (LampUseTime > 9500)
+        //    {
+        //        LampPMCheck(10000 - LampUseTime);
+        //    }
+        //}
+
+        //public SerialPort sp = new SerialPort();
+
+        //public double UpdateLampData(bool initialize, string CheckWord)
+        //{
+
+        //    if (initialize)
+        //    {
+        //        sp.PortName = "COM2";
+        //        sp.BaudRate = 9600;
+        //        sp.DataBits = 8;
+        //        sp.StopBits = StopBits.One;
+        //        sp.Parity = Parity.None;
+        //        //sp.DataReceived += new SerialDataReceivedEventHandler(serialPort1_DataReceived);
+        //        sp.Open();
+        //        sp.Write("c");
+
+        //    }
+
+        //    sp.Write(CheckWord);
+        //    string OutputData = sp.ReadExisting();
+        //    string[] strtext = new string[7] { "H0:", "T0:", "L0:", "H1:", "T1:", "L1:", "Time:" };
+        //    string[] arr = OutputData.Split(':');
+        //    string[] strarr = arr[1].Split(',');
+        //    double LampUseTime = 0.0;
+        //    double value = 0.0;
+        //    int Hr, Min, Sec;
+        //    int m_Hr_Org, m_Min_Org, m_Sec_Org;
+        //    int m_Hr, m_Min, m_Sec;
+        //    string filepath;
+        //    foreach (string str in strtext)
+        //    {
+        //        if (OutputData.Contains(str))
+        //        {
+        //            if (OutputData.Contains("Time:"))
+        //            {
+        //                filepath = Application.StartupPath + "\\Timedata.txt";
+
+        //                FileInfo fi = new FileInfo(filepath);
+
+        //                m_Hr_Org = m_Min_Org = m_Sec_Org = 0;
+        //                m_Hr = m_Min = m_Sec = 0;
+
+        //                if (fi.Exists)
+        //                {
+        //                    timedata = File.ReadAllText(@filepath);
+        //                    char sp = ':';
+        //                    string[] spstring = timedata.Split(sp);
+
+        //                    m_Hr_Org = Convert.ToInt32(spstring[0]);
+        //                    m_Min_Org = Convert.ToInt32(spstring[1]);
+        //                    m_Sec_Org = Convert.ToInt32(spstring[2]);
+
+
+        //                    Sec = Convert.ToInt32(arr[1]);
+
+        //                    m_Sec = Sec + m_Sec_Org;
+
+        //                    if (m_Sec >= 60)
+        //                    {
+        //                        m_Min = (m_Sec / 60) + m_Min_Org;
+
+        //                        m_Sec = m_Sec % 60;
+        //                    }
+        //                    else
+        //                    {
+        //                        m_Min = m_Min_Org;
+        //                    }
+
+        //                    if (m_Min >= 60)
+        //                    {
+        //                        m_Hr = (m_Min / 60) + m_Hr_Org;
+
+        //                        m_Min = m_Min % 60;
+        //                    }
+        //                    else
+        //                    {
+        //                        m_Hr = m_Hr_Org;
+        //                    }
+
+        //                    // strtime = string.Format("{0}:{1}:{2}", m_Hr, m_Min, m_Sec);
+
+
+        //                    value = m_Hr;
+
+        //                }
+        //                else
+        //                {
+        //                    decimal number1 = 0;
+        //                    bool canConvert = decimal.TryParse(arr[1], out number1);
+        //                    if (canConvert == true)
+        //                        value = Convert.ToDouble(number1);
+        //                }
+        //            }
+        //        }
+        //        return value;
+
+        //    }
+
+        //}
+
+        #endregion
     }
 }

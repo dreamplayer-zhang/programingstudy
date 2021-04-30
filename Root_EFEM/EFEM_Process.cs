@@ -42,7 +42,11 @@ namespace Root_EFEM
             public void ClearInfoWafer()
             {
                 if (p_infoWafer == null) return;
-                if (IsWaferExist() == false) p_infoWafer = null;
+                if (IsWaferExist() == false)
+                {
+                    m_child.SetAlarm();
+                    p_infoWafer = null;
+                }
             }
 
             bool IsWaferExist()

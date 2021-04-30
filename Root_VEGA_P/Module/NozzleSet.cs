@@ -13,7 +13,7 @@ namespace Root_VEGA_P.Module
         DIO_Os m_doNozzle; 
         public string GetTools(ToolBox toolBox)
         {
-            toolBox.GetDIO(ref m_doNozzle, m_module, "Nozzle", m_asNozzle); 
+            toolBox.GetDIO(ref m_doNozzle, m_module, m_sID + "Nozzle", m_asNozzle); 
             return "OK";
         }
         #endregion
@@ -38,7 +38,7 @@ namespace Root_VEGA_P.Module
         #endregion
 
         #region Property
-        string[] m_asNozzle = new string[1] { "1" };
+        string[] m_asNozzle = new string[1] { "01" };
         int _nNozzle = 1; 
         public int p_nNozzle
         {
@@ -51,7 +51,7 @@ namespace Root_VEGA_P.Module
                 for (int n = 0; n < value; n++) m_asNozzle[n] = (n + 1).ToString("00");
                 m_aOpen.Clear();
                 for (int n = 0; n < value; n++) m_aOpen.Add(false);
-                m_reg.Write("nNozzle", value);
+                m_reg.Write(m_sID + "nNozzle", value);
             }
         }
 
@@ -59,7 +59,7 @@ namespace Root_VEGA_P.Module
         void InitNozzle(string id)
         {
             m_reg = new Registry(id);
-            p_nNozzle = m_reg.Read("nNozzle", 1);
+            p_nNozzle = m_reg.Read(m_sID + "nNozzle", 1);
         }
         #endregion
 
@@ -90,10 +90,12 @@ namespace Root_VEGA_P.Module
         }
         #endregion
 
+        string m_sID; 
         ModuleBase m_module;
-        public NozzleSet(ModuleBase module)
+        public NozzleSet(ModuleBase module, string sID)
         {
             m_module = module;
+            m_sID = sID; 
             InitNozzle(module.p_id);
         }
     }
