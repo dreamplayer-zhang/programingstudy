@@ -273,8 +273,7 @@ namespace Root_WIND2
                         {
                             BufferInspROI.Remove(CropShape);
                             CropShape = null;
-                        }
-                        
+                        }                       
                     }
                     break;
                 case ToolProcess.Drawing:
