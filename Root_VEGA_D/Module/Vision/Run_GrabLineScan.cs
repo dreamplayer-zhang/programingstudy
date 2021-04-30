@@ -87,8 +87,7 @@ namespace Root_VEGA_D.Module
             GrabData grabData = m_grabMode.m_GD;
 
             // IPU와 연결 시, 이미지 검사 완료되었을 때의 변수
-            if (m_module.TcpipCommServer.IsConnected())
-                m_bIPUCompleted = false;
+            m_bIPUCompleted = false;
 
             try
             {
@@ -156,8 +155,8 @@ namespace Root_VEGA_D.Module
                         }
 
                         // 이동 위치 계산
-                        int nScanSpeed = Convert.ToInt32((double)m_grabMode.m_nMaxFrame * m_grabMode.m_dTrigger * (double)m_grabMode.m_nScanRate / 100);
-                        int nScanOffset_pulse = (int)((double)nScanSpeed * axisXY.p_axisY.GetSpeedValue(Axis.eSpeed.Move).m_acc * 0.5) * 2;
+                        //int nScanSpeed = Convert.ToInt32((double)m_grabMode.m_nMaxFrame * m_grabMode.m_dTrigger * (double)m_grabMode.m_nScanRate / 100);
+                        //int nScanOffset_pulse = (int)((double)nScanSpeed * axisXY.p_axisY.GetSpeedValue(Axis.eSpeed.Move).m_acc * 0.5) * 2;
 
                         int nLineIndex = m_grabMode.m_ScanStartLine + m_nCurScanLine;
 
@@ -167,21 +166,33 @@ namespace Root_VEGA_D.Module
                         double dNextPosX = dPosX - (dfov_mm - dOverlap_mm);
                         double dPosZ = m_grabMode.m_dFocusPosZ;
 
-                        double marginY = m_grabMode.m_nWaferSize_mm * 0.2;
                         double dTriggerStartPosY = m_grabMode.m_rpAxisCenter.Y + m_grabMode.m_ptXYAlignData.Y - m_grabMode.m_nWaferSize_mm * 0.5;
-                        double dTriggerEndPosY = m_grabMode.m_rpAxisCenter.Y + m_grabMode.m_ptXYAlignData.Y + m_grabMode.m_nWaferSize_mm * 0.5 + marginY;
-                        double dStartPosY = dTriggerStartPosY - nScanOffset_pulse;
-                        double dEndPosY = dTriggerEndPosY + nScanOffset_pulse;
+                        double dTriggerEndPosY = m_grabMode.m_rpAxisCenter.Y + m_grabMode.m_ptXYAlignData.Y + m_grabMode.m_nWaferSize_mm * 0.5;
+
+                        Axis.Speed speedY = axisXY.p_axisY.GetSpeedValue(Axis.eSpeed.Move);
+
+                        double accDistance = speedY.m_acc * speedY.m_v * 0.5 * 2.0;
+                        double decDistance = speedY.m_dec * speedY.m_v * 0.5 * 2.0;
+                        
+                        double dStartPosY, dEndPosY;
 
                         // Grab 방향 및 시작, 종료 위치 설정
                         m_grabMode.m_eGrabDirection = eGrabDirection.Forward;
                         if (m_grabMode.m_bUseBiDirectionScan && m_nCurScanLine % 2 == 1)
                         {
-                            // dStartPosY <--> dEndPosY 바꿈.
-                            (dStartPosY, dEndPosY) = (dEndPosY, dStartPosY);
+                            // 역방향 (아래 -> 위)
                             (dTriggerStartPosY, dTriggerEndPosY) = (dTriggerEndPosY, dTriggerStartPosY);
 
+                            dStartPosY = dTriggerStartPosY + accDistance;
+                            dEndPosY = dTriggerEndPosY - decDistance;
+                            
                             m_grabMode.m_eGrabDirection = eGrabDirection.BackWard;
+                        }
+                        else
+                        {
+                            // 정방향 (위 -> 아래)
+                            dStartPosY = dTriggerStartPosY - accDistance;
+                            dEndPosY = dTriggerEndPosY + decDistance;
                         }
 
                         if (m_grabMode.m_dVRSFocusPos != 0)
@@ -239,14 +250,25 @@ namespace Root_VEGA_D.Module
                             long offset = remain % grabData.m_nFovSize;
                             tmpMemOffset.X = (int)(remain - offset);
                         }
+
+                        // Y축 트리거 발생 설정
+                        axisXY.p_axisY.SetTrigger(dTriggerStartPosY, dTriggerEndPosY, m_grabMode.m_dTrigger, 0.001, true);
+
+                        // 카메라 스냅 시작
                         m_grabMode.StartGrab(mem, tmpMemOffset, nWaferSizeY_px, grabData);
 
-                        // Y축 트리거 발생
-                        axisXY.p_axisY.SetTrigger(dTriggerStartPosY, dTriggerEndPosY, m_grabMode.m_dTrigger, 0.001, true);
+                        // Y축 목표 위치로 이동
+                        if (m_module.Run(axisXY.p_axisY.StartMove(dEndPosY)))
+                            return p_sInfo;
 
                         // 라인스캔 완료 대기
                         if (m_module.Run(axisXY.p_axisY.WaitReady()))
                             return p_sInfo;
+
+                        // 이미지 스냅 스레드 동작중이라면 중지
+                        Camera_Dalsa dalsaCam = m_grabMode.m_camera as Camera_Dalsa;
+                        if (dalsaCam != null)
+                            dalsaCam.AbortGrabThread();
 
                         // IPU PC와 연결된 상태라면 'LineEnd' 메세지 전달
                         if (m_module.TcpipCommServer.IsConnected())

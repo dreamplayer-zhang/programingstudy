@@ -252,7 +252,9 @@ namespace RootTools.Camera.Dalsa
             p_CamInfo.p_sFile = tree.SetFile(p_CamInfo.p_sFile, p_CamInfo.p_sFile, "ccf", "CamFile", "Cam File");
             p_CamInfo.p_sAreaCamFile = tree.SetFile(p_CamInfo.p_sAreaCamFile, p_CamInfo.p_sAreaCamFile, "ccf", "Area Cam file", "Area Cam File");
             p_CamInfo.p_nResourceIdx = tree.Set(p_CamInfo.p_nResourceIdx, p_CamInfo.p_nResourceIdx, "Resource Count", "Resource Count");
-            p_CamParam.p_nUserSetNum = tree.Set(p_CamParam.p_nUserSetNum, p_CamParam.p_nUserSetNum, "UserSet Number", "UserSet Number");
+
+            //p_CamInfo._DeviceUserID = tree.Set(p_CamInfo._DeviceUserID, "Basler", "ID", "Device User ID");
+            //m_nGrabTimeout = tree.Set(m_nGrabTimeout, 2000, "Timeout", "Grab Timeout (ms)");
         }
 
         void RunImageRoiTree(Tree tree)
@@ -545,6 +547,25 @@ namespace RootTools.Camera.Dalsa
             //m_iBlock = -1;
             m_sapBuf.Index = (int)(0);
             m_nGrabTrigger = 0;
+
+            int nMul = 0,nDiv = 0;
+            m_sapDevice.GetFeatureValue("rotaryEncoderMultiplier", out nMul); Debug.WriteLine("Multiplier 0 = " + nMul.ToString());
+            m_sapDevice.SetFeatureValue("rotaryEncoderMultiplier", 1);
+            m_sapDevice.GetFeatureValue("rotaryEncoderMultiplier", out nMul); Debug.WriteLine("Multiplier 1 = " + nMul.ToString());
+
+            m_sapDevice.GetFeatureValue("rotaryEncoderDivider", out nDiv); Debug.WriteLine("Divider 0 = "+nDiv.ToString());
+            m_sapDevice.SetFeatureValue("rotaryEncoderDivider", 1);
+            m_sapDevice.GetFeatureValue("rotaryEncoderDivider", out nDiv); Debug.WriteLine("Divider 1 = " + nDiv.ToString());
+
+            m_sapDevice.GetFeatureValue("rotaryEncoderMultiplier", out nMul); Debug.WriteLine("Multiplier 15 = " + nMul.ToString());
+            m_sapDevice.SetFeatureValue("rotaryEncoderMultiplier", 16);
+            m_sapDevice.GetFeatureValue("rotaryEncoderMultiplier", out nMul); Debug.WriteLine("Multiplier 16 = " + nMul.ToString());
+
+
+            m_sapDevice.GetFeatureValue("rotaryEncoderDivider", out nDiv); Debug.WriteLine("Divider 22 = " + nDiv.ToString());
+            m_sapDevice.SetFeatureValue("rotaryEncoderDivider", 23);
+            m_sapDevice.GetFeatureValue("rotaryEncoderDivider", out nDiv); Debug.WriteLine("Divider 23 = " + nDiv.ToString());
+
             m_sapXfer.Snap((int)(m_nGrabCount));
 
             p_CamInfo.p_eState = eCamState.GrabMem;
@@ -747,38 +768,71 @@ namespace RootTools.Camera.Dalsa
             long lMemoryWidth = (long)m_Memory.W;
             int nMemoryOffsetX = m_cpScanOffset.X;
             int nMemoryOffsetY = m_cpScanOffset.Y;
-            while (iBlock < m_nGrabCount)
+
+            const int nTimeOut_10s = 10000; //ms            
+            const int nTimeOutInterval = 10; // ms
+            int nScanAxisTimeOut = nTimeOut_10s / nTimeOutInterval;
+            int previBlock = 0;
+
+            try
             {
-                if (iBlock < m_nGrabTrigger)
+                while (iBlock < m_nGrabCount)
                 {
-                    IntPtr ipSrc = m_pSapBuf[(iBlock) % c_nBuf];
-                    Parallel.For(0, nCamHeight, new ParallelOptions { MaxDegreeOfParallelism = 12 }, (y) =>
+                    if (previBlock == iBlock)
                     {
-                        int yp;
-                        if (Scandir)
-                            yp = lY - (y + (iBlock) * nCamHeight) + m_nInverseYOffset;
-                        else
-                            yp = y + (iBlock) * nCamHeight;
+                        Thread.Sleep(nTimeOutInterval);
+                        if (--nScanAxisTimeOut <= 0)
+                        {
+                            m_log.Info("TimeOut - RunGrabLineScanOverlapThread");
+                            m_nGrabTrigger = m_nGrabCount;
+                        }
+                    }
+                    else
+                    {
+                        previBlock = iBlock;
+                        nScanAxisTimeOut = nTimeOut_10s / nTimeOutInterval;
+                    }
 
-                        IntPtr srcPtr = ipSrc + nCamWidth * y * nByteCnt;
-                        IntPtr dstPtr = (IntPtr)((long)m_MemPtr + nMemoryOffsetX * nByteCnt + (yp + nMemoryOffsetY) * lMemoryWidth);
+                    if (iBlock < m_nGrabTrigger)
+                    {
+                        IntPtr ipSrc = m_pSapBuf[(iBlock) % c_nBuf];
+                        Parallel.For(0, nCamHeight, new ParallelOptions { MaxDegreeOfParallelism = 12 }, (y) =>
+                        {
+                            int yp;
+                            if (Scandir)
+                                yp = lY - (y + (iBlock) * nCamHeight) + m_nInverseYOffset;
+                            else
+                                yp = y + (iBlock) * nCamHeight;
 
-                        long lDataWidth = nCamWidth * nByteCnt;
-                        Buffer.MemoryCopy((void*)srcPtr, (void*)dstPtr, lDataWidth, lDataWidth);
-                    });
-                    iBlock++;
+                            IntPtr srcPtr = ipSrc + nCamWidth * y * nByteCnt;
+                            IntPtr dstPtr = (IntPtr)((long)m_MemPtr + nMemoryOffsetX * nByteCnt + (yp + nMemoryOffsetY) * lMemoryWidth);
 
-                    m_LastROI.Left = nMemoryOffsetX;
-                    m_LastROI.Right = nMemoryOffsetX + nCamWidth;
-                    m_LastROI.Top = nMemoryOffsetY;
-                    m_LastROI.Bottom = nMemoryOffsetY + nCamHeight;
-                    GrabEvent();
+                            long lDataWidth = nCamWidth * nByteCnt;
+                            Buffer.MemoryCopy((void*)srcPtr, (void*)dstPtr, lDataWidth, lDataWidth);
+                        });
+                        iBlock++;
 
-                    //if (m_nGrabCount != 0)
-                    //    p_nGrabProgress = Convert.ToInt32((double)iBlock * 100 / m_nGrabCount);
+                        m_LastROI.Left = nMemoryOffsetX;
+                        m_LastROI.Right = nMemoryOffsetX + nCamWidth;
+                        m_LastROI.Top = nMemoryOffsetY;
+                        m_LastROI.Bottom = nMemoryOffsetY + nCamHeight;
+                        GrabEvent();
+
+                        //if (m_nGrabCount != 0)
+                        //    p_nGrabProgress = Convert.ToInt32((double)iBlock * 100 / m_nGrabCount);
+                    }
                 }
             }
-            p_CamInfo.p_eState = eCamState.Ready;
+            catch(Exception e)
+            {
+                m_log.Info(e.Message);
+            }
+            finally
+            {
+                m_sapXfer.Freeze();
+                m_sapXfer.Abort();
+                p_CamInfo.p_eState = eCamState.Ready;
+            }
         }
         void SetTheadBusy(int n)
         {

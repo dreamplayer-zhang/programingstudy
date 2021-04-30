@@ -751,7 +751,7 @@ namespace Root_VEGA_D.Module
         }
 
         bool m_bDisconnectedGrabLineScanning = false;    // 이미지 스캔 도중 소켓통신 연결이 끊어졌을 때의 상태값
-        int m_nDisconnectedStateResetTime = 20000;              // IPU와 연결이 끊어지고 재개될때까지 대기하는 시간
+        int m_nDisconnectedStateResetTime = 300 * 1000;              // IPU와 연결이 끊어지고 재개될때까지 대기하는 시간
         private void ResetDisconnectedStateTimerTick(object sender, EventArgs e)
         {
             // 소켓 연결 해제 이후 m_nDisconnectedStateResetTime (ms) 만큼 시간 뒤 호출되는 콜백함수
@@ -777,6 +777,19 @@ namespace Root_VEGA_D.Module
         }
         private void EventAccept(Socket socket)
         {
+            Run_GrabLineScan runGrabLineScan = PeekModuleRun() as Run_GrabLineScan;
+            if (runGrabLineScan != null)
+            {
+                // 현재 GrabLineScan 진행중이었다면
+                if (runGrabLineScan.p_eRunState == ModuleRunBase.eRunState.Run)
+                {
+                    // EQ Stop 상태로 변경하고 이미지그랩 중에 중단되었다는 상태값 설정
+                    m_bDisconnectedGrabLineScanning = true;
+
+                    // 재연결 시까지 RunGrabLineScan은 대기
+                    runGrabLineScan.m_bWaitRun = false;
+                }
+            }
         }
         private void EventReceiveData(byte[] aBuf, int nSize, Socket socket)
         {

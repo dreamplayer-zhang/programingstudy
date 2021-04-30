@@ -331,8 +331,8 @@ namespace RootTools.Control.ACS
 
             if (bOn)
             {
-                if (m_bTriggerOn)
-                    return;
+                //if (m_bTriggerOn)
+                //    return;
 
                 // 이동 방향 여부
                 bool isIncrease = (trigger.m_aPos[0] < trigger.m_aPos[1]);
@@ -375,12 +375,12 @@ namespace RootTools.Control.ACS
                 p_channel.WriteVariable(dTriggerUpTime, "TriggerUpTime", p_channel.ACSC_BUFFER_3);      // Trigger UpTime
 
                 // 이벤트 설정
-                p_channel.EnableEvent(p_channel.ACSC_INTR_PROGRAM_END);         // 스크립트 프로그램 종료
-                p_channel.SetInterruptMask(p_channel.ACSC_INTR_PROGRAM_END, p_channel.ACSC_MASK_BUFFER_3);
-                p_channel.PROGRAMEND += P_channel_PROGRAMEND;
+                //p_channel.EnableEvent(p_channel.ACSC_INTR_PROGRAM_END);         // 스크립트 프로그램 종료
+                //p_channel.SetInterruptMask(p_channel.ACSC_INTR_PROGRAM_END, p_channel.ACSC_MASK_BUFFER_3);
+                //p_channel.PROGRAMEND += P_channel_PROGRAMEND;
 
                 // 스크립트 실행
-                m_acs.m_aBuffer[3].Run();
+                //m_acs.m_aBuffer[3].Run();
 
                 // 버퍼 내 스크립트 내용 .NET 라이브러리로 구현 한 코드 (수정이 필요)
                 //p_channel.AssignPegNT(p_channel.ACSC_AXIS_1, 0x0b101, 0xb0001);
@@ -388,39 +388,51 @@ namespace RootTools.Control.ACS
                 //p_channel.Enable(p_channel.ACSC_AXIS_2);
 
                 //p_channel.ToPoint(0, m_nAxis, dStartAxisPos);
+                //p_channel.WaitMotionEnd(m_nAxis, -1);
 
-                //p_channel.PegInc(0, p_channel.ACSC_AXIS_1, dTriggerUpTime, dStartTriggerPos, dTriggerInterval, dEndAxisPos, p_channel.ACSC_NONE, p_channel.ACSC_NONE);
+                //p_channel.PegIncNT(0, p_channel.ACSC_AXIS_1, dTriggerUpTime, dStartTriggerPos, dTriggerInterval, dEndTriggerPos, p_channel.ACSC_NONE, p_channel.ACSC_NONE);
+
+                //p_channel.ToPoint(0, m_nAxis, dEndAxisPos);
+                //p_channel.WaitMotionEnd(m_nAxis, -1);
+
+                // 버퍼 내 스크립트에 PEG만 발생할 때
 
                 //p_channel.ToPoint(0, m_nAxis, dStartAxisPos);
+                //p_channel.WaitMotionEnd(m_nAxis, -1);
+
+                m_acs.m_aBuffer[3].Run();
+
+                //p_channel.ToPoint(0, m_nAxis, dEndAxisPos);
+                //p_channel.WaitMotionEnd(m_nAxis, -1);
 
                 // 로그
                 string sTrigger = trigger.m_aPos[0].ToString() + " ~ " + trigger.m_aPos[1].ToString() + ", " + trigger.m_dPos.ToString();
                 p_log.Info("Trigger On : " + sTrigger + ", " + dUpTime.ToString());
 
                 // Axis 상태 변경
-                p_eState = eState.Move;
-                Thread.Sleep(100);
+                //p_eState = eState.Move;
+                //Thread.Sleep(100);
             }
             else
             {
-                if (!m_bTriggerOn)
-                    return;
+                //if (!m_bTriggerOn)
+                //    return;
 
                 // 스크립트 수행 중지
                 m_acs.m_aBuffer[3].Stop();
 
                 // 이벤트 설정
-                p_channel.PROGRAMEND -= P_channel_PROGRAMEND;
+                //p_channel.PROGRAMEND -= P_channel_PROGRAMEND;
 
                 // 로그
                 p_log.Info("Trigger Off");
 
                 // Axis 상태 변경
-                p_eState = eState.Ready;
-                Thread.Sleep(100);
+                //p_eState = eState.Ready;
+                //Thread.Sleep(100);
             }
 
-            m_bTriggerOn = bOn;
+            //m_bTriggerOn = bOn;
 
             //if (trigger == null) trigger = m_trigger;
             //double dUpTime = (trigger.m_dUpTime < 0) ? m_dTrigTime : trigger.m_dUpTime; 
