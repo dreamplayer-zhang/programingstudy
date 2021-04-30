@@ -372,6 +372,10 @@ namespace RootTools.Camera.BaslerPylon
             m_cam.Parameters[PLStream.TransmissionType].TrySetValue(PLStream.TransmissionType.Multicast);
             string strTemp = m_cam.Parameters[PLStream.TransmissionType].GetValue();
             UpdateCamInfo(ConnectCamInfo, m_cam);
+
+            m_cam.Parameters[PLCamera.GevSCPSPacketSize].SetValue(576);
+            m_cam.Parameters[PLCamera.GevSCBWRA].SetValue(10);
+         
         }
 
         void bgw_Connect_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
