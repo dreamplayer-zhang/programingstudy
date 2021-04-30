@@ -77,23 +77,34 @@ namespace Root_WIND2.Module
             inspectionTimeWatcher.Start();
 
             //레시피에 GrabMode 저장하고 있어야함
-            InspectionManagerFrontside inspectionFront = GlobalObjects.Instance.Get<InspectionManagerFrontside>();
-            inspectionFront.Stop();
+
+            RootTools_Vision.WorkManager3.WorkManager workManager = GlobalObjects.Instance.GetNamed<RootTools_Vision.WorkManager3.WorkManager>("frontInspection");
+            if(workManager == null)
+            {
+                throw new ArgumentException("WorkManager가 초기화되지 않았습니다(null)");
+            }
+            workManager.Stop();
+
+            //InspectionManagerFrontside inspectionFront = GlobalObjects.Instance.Get<InspectionManagerFrontside>();
+            //inspectionFront.Stop();
 
             if (m_grabMode == null) return "Grab Mode == null";
 
             if (EQ.IsStop() == false)
             {
-                if (inspectionFront.Recipe.Read(m_sRecipeName) == false)
+                if (workManager.OpenRecipe(m_sRecipeName) == false)
                     return "Recipe Open Fail";
 
-                inspectionFront.Start();
+                workManager.Start(false);
 
             }
             else
             {
-                inspectionFront.Stop();
+                workManager.Stop();
             }
+
+//#define TEST_ONLY_INSPECTION
+//#if TEST_ONLY_INSPECTION
 
             //ImageData frontImage = GlobalObjects.Instance.GetNamed<ImageData>("FrontImage");
             //frontImage.ClearImage();
@@ -245,8 +256,7 @@ namespace Root_WIND2.Module
                     if (bNormal == true)
                     {
                         //WIND2EventManager.OnSnapDone(this, new SnapDoneArgs(new CPoint(startOffsetX, startOffsetY), cpMemoryOffset + new CPoint(m_grabMode.m_GD.m_nFovSize, nWaferSizeY_px)));
-                        WIND2EventManager.OnSnapDone(this, new SnapDoneArgs(new CPoint(startOffsetX, startOffsetY), cpMemoryOffset + new CPoint(m_grabMode.m_GD.m_nFovSize, nWaferSizeY_px)));
-
+                        workManager.CheckSnapDone(new Rect(new Point(startOffsetX, startOffsetY), new Point(cpMemoryOffset.X + m_grabMode.m_GD.m_nFovSize, cpMemoryOffset.Y + nWaferSizeY_px)));
                         nScanLine++;
                         cpMemoryOffset.X += m_grabMode.m_GD.m_nFovSize;
                     }
@@ -266,45 +276,24 @@ namespace Root_WIND2.Module
                             cpMemoryOffset.X -= m_grabMode.m_GD.m_nFovSize;
                         }
                     }
-
-                    
-
                 }
                 m_grabMode.m_camera.StopGrab();
 
 
-                //  Check
-                
-                int timeOutMinutes = 60 * 10;
-                StopWatch timeOutWatcher = new StopWatch();
-                timeOutWatcher.Start();
-                while(inspectionFront.CheckAllWorkDone() == false)
+                if (workManager.WaitWorkDone(ref EQ.m_EQ.StopToken(), 60 * 3 /*3 minutes*/) == false)
                 {
-                    if(EQ.IsStop())
-                    {
                         inspectionTimeWatcher.Stop();
-                        timeOutWatcher.Stop();
-                        return "OK";
-                    }
 
-                    if (timeOutMinutes < timeOutWatcher.ElapsedMilliseconds / 1000)
-                    {
-                        timeOutWatcher.Stop();
-                        inspectionTimeWatcher.Stop();
                         TempLogger.Write("Inspection", "Time out!!!");
                         return "OK";
-                    }
+                } // 5 minutes
 
-                    Thread.Sleep(1000);
-                }
-
-                timeOutWatcher.Stop();
                 inspectionTimeWatcher.Stop();
-
                 TempLogger.Write("Inspection", string.Format("{0:F3}", (double)inspectionTimeWatcher.ElapsedMilliseconds / (double)1000));
-
                 return "OK";
             }
+
+
             finally
             {
                 m_grabMode.SetLight(false);

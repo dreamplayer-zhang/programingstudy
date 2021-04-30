@@ -27,6 +27,7 @@
         <local:ImageConverter x:Key="ImageConverter"/>
         <local:PathConverter x:Key="PathConverter"/>
         <local:BoolConverter x:Key="BoolConverter"/>
+        <local:MapModeToBoolConverter x:Key="ModeConverter"/>
     </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
@@ -61,7 +62,7 @@
                        Margin="5,0,0,0"
                        Grid.Column="1" />
             </Grid>
-            <TextBlock Text="RECIPE MANGER"
+            <TextBlock Text="Recipe Manager"
                        FontSize="14"
                        FontWeight="Bold"
                        Foreground="Black"
@@ -98,10 +99,10 @@
                 <ColumnDefinition/>
             </Grid.ColumnDefinitions>
             <UniformGrid Columns="4">
-                <Button BorderBrush="{x:Null}" BorderThickness="0" Content="New" Command="{Binding CmdRecipeNew}"/>
-                <Button BorderBrush="{x:Null}" BorderThickness="0" Content="Open" Command="{Binding CmdRecipeOpen}"/>
-                <Button BorderBrush="{x:Null}" BorderThickness="0" Content="Save" Command="{Binding CmdRecipeSave}"/>
-                <Button BorderBrush="{x:Null}" BorderThickness="0" Content="Save As" Command="{Binding CmdRecipeSaveAs}"/>
+                <Button BorderBrush="{x:Null}" BorderThickness="0" Content="New" Command="{Binding CmdRecipeNew}" IsEnabled="{Binding p_isCustomize, Converter={StaticResource BoolConverter}}"/>
+                <Button BorderBrush="{x:Null}" BorderThickness="0" Content="Open" Command="{Binding CmdRecipeOpen}" IsEnabled="{Binding p_isCustomize, Converter={StaticResource BoolConverter}}"/>
+                <Button BorderBrush="{x:Null}" BorderThickness="0" Content="Save" Command="{Binding CmdRecipeSave}" IsEnabled="{Binding p_isCustomize, Converter={StaticResource BoolConverter}}"/>
+                <Button BorderBrush="{x:Null}" BorderThickness="0" Content="Save As" Command="{Binding CmdRecipeSaveAs}" IsEnabled="{Binding p_isCustomize, Converter={StaticResource BoolConverter}}"/>
             </UniformGrid>
         </Grid>
 
@@ -140,10 +141,10 @@
                             <RowDefinition/>
                             <RowDefinition/>
                         </Grid.RowDefinitions>
-                        <Button Content="13 Point" Grid.Column="0" Grid.Row="0" Margin="5" Command="{Binding Cmd13Point}"/>
-                        <Button Content="25 Point"  Grid.Column="1" Grid.Row="0" Margin="5" Command="{Binding Cmd25Point}"/>
-                        <Button Content="49 Point" Grid.Column="0" Grid.Row="1" Margin="5" Command="{Binding Cmd49Point}"/>
-                        <Button Content="73 Point"  Grid.Column="1" Grid.Row="1" Margin="5" Command="{Binding Cmd73Point}"/>
+                        <Button Content="13 Point" Grid.Column="0" Grid.Row="0" Margin="5" Command="{Binding Cmd13Point}" IsEnabled="{Binding p_isCustomize, Converter={StaticResource BoolConverter}}"/>
+                        <Button Content="25 Point"  Grid.Column="1" Grid.Row="0" Margin="5" Command="{Binding Cmd25Point}" IsEnabled="{Binding p_isCustomize, Converter={StaticResource BoolConverter}}"/>
+                        <Button Content="49 Point" Grid.Column="0" Grid.Row="1" Margin="5" Command="{Binding Cmd49Point}" IsEnabled="{Binding p_isCustomize, Converter={StaticResource BoolConverter}}"/>
+                        <Button Content="73 Point"  Grid.Column="1" Grid.Row="1" Margin="5" Command="{Binding Cmd73Point}" IsEnabled="{Binding p_isCustomize, Converter={StaticResource BoolConverter}}"/>
                     </Grid>
                 </GroupBox>
                 <GroupBox Header="Select Using Measurement" Grid.Row="1">
@@ -260,28 +261,28 @@
                                         <TextBlock Text="fit" Style="{StaticResource GridHeaderStyle}" />
                                     </DataGridCheckBoxColumn.Header>
                                 </DataGridCheckBoxColumn>
-                                <DataGridComboBoxColumn Width="*"  SelectedValueBinding="{Binding SelectedGuest2, UpdateSourceTrigger=PropertyChanged}" DisplayMemberPath="Name" SelectedValuePath="FullPath">
+                                <DataGridComboBoxColumn Width="*" SelectedValueBinding="{Binding SelectedEmm, UpdateSourceTrigger=PropertyChanged}">
                                     <DataGridComboBoxColumn.Header>
-                                        <TextBlock Text="Guest2" Style="{StaticResource GridHeaderStyle}" />
+                                        <TextBlock Text="Emm" Style="{StaticResource GridHeaderStyle}" />
                                     </DataGridComboBoxColumn.Header>
                                     <DataGridComboBoxColumn.ElementStyle>
                                         <Style TargetType="ComboBox">
-                                            <Setter Property="ItemsSource" Value="{Binding Guest2, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                            <Setter Property="ItemsSource" Value="{Binding Emm, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                                             <Setter Property="IsReadOnly" Value="True"/>
                                         </Style>
                                     </DataGridComboBoxColumn.ElementStyle>
                                     <DataGridComboBoxColumn.EditingElementStyle>
                                         <Style TargetType="ComboBox">
-                                            <Setter Property="ItemsSource" Value="{Binding Guest2, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                            <Setter Property="ItemsSource" Value="{Binding Emm, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                                         </Style>
                                     </DataGridComboBoxColumn.EditingElementStyle>
                                 </DataGridComboBoxColumn>
-                                <DataGridTextColumn Width="50" Binding="{Binding Scale, StringFormat=N1, UpdateSourceTrigger=LostFocus, Mode=TwoWay}">
+                                <DataGridTextColumn Width="50" Binding="{Binding ThicknessScale, StringFormat=N1, UpdateSourceTrigger=LostFocus, Mode=TwoWay}">
                                     <DataGridTextColumn.Header>
                                         <TextBlock Text="Scale" Style="{StaticResource GridHeaderStyle}" />
                                     </DataGridTextColumn.Header>
                                 </DataGridTextColumn>
-                                <DataGridTextColumn Width="50" Binding="{Binding Offset, StringFormat=N1, UpdateSourceTrigger=LostFocus, Mode=TwoWay}">
+                                <DataGridTextColumn Width="50" Binding="{Binding ThicknessOffset, StringFormat=N1, UpdateSourceTrigger=LostFocus, Mode=TwoWay}">
                                     <DataGridTextColumn.Header>
                                         <TextBlock Text="Offset" Style="{StaticResource GridHeaderStyle}" />
                                     </DataGridTextColumn.Header>
@@ -551,18 +552,20 @@
                             <ColumnDefinition/>
                         </Grid.ColumnDefinitions>
                         <GroupBox Header="Point Setting">
-                            <UniformGrid Columns="4" Rows="1">
-                                <Button Content="Reset" Margin="5" Command="{Binding CmdReset}"/>
-                                <Button Content="Preset 1" Margin="5" Command="{Binding CmdPreset1}"/>
-                                <Button Content="Preset 2" Margin="5" Command="{Binding CmdPreset2}" />
+                            <UniformGrid Columns="5" Rows="1">
+                                <Button Content="Reset" Margin="2,5,2,5" Command="{Binding CmdReset}"/>
+                                <Button Content="Preset 1" Margin="2,5,2,5" Command="{Binding CmdPreset1}"/>
+                                <Button Content="Preset 2" Margin="2,5,2,5" Command="{Binding CmdPreset2}" />
+                                <Button Content="Preset Load" Margin="2,5,2,5" Command="{Binding CmdPresetLoad}"/>
+                                <Button Content="Customize" Margin="2,5,2,5" Command="{Binding CmdCustomize}"/>
                             </UniformGrid>
                         </GroupBox>
                         <GroupBox Header="Point Selector" Grid.Column="1">
                             <UniformGrid Columns="4" Rows="1">
-                                <TextBox Text="{Binding Percentage}" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Margin="5"/>
-                                <Button Content="Select %" Margin="5" Command="{Binding CmdSelectPercentage}"/>
-                                <Button Content="Select All" Margin="5" Command="{Binding CmdSelectAll}"/>
-                                <Button Content="Delete All" Margin="5" Command="{Binding CmdDeleteAll}"/>
+                                <TextBox Text="{Binding Percentage}" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Margin="5" IsEnabled="{Binding p_isCustomize, Converter={StaticResource BoolConverter}}"/>
+                                <Button Content="Select %" Margin="5" Command="{Binding CmdSelectPercentage}" IsEnabled="{Binding p_isCustomize, Converter={StaticResource BoolConverter}}"/>
+                                <Button Content="Select All" Margin="5" Command="{Binding CmdSelectAll}" IsEnabled="{Binding p_isCustomize, Converter={StaticResource BoolConverter}}"/>
+                                <Button Content="Delete All" Margin="5" Command="{Binding CmdDeleteAll}" IsEnabled="{Binding p_isCustomize, Converter={StaticResource BoolConverter}}"/>
                             </UniformGrid>
                         </GroupBox>
                     </Grid>
@@ -648,6 +651,7 @@
                                     </ItemsControl.ItemsPanel>
                                 </ItemsControl>
                             </Viewbox>
+                            <!--p_DrawArrowElement-->
                             <Viewbox Margin="10" Width="auto" Grid.Row="0">
                                 <ItemsControl ItemsSource="{Binding p_DrawPointElement}"
                               Width="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualWidth}"
@@ -660,6 +664,19 @@
                                     </ItemsControl.ItemsPanel>
                                 </ItemsControl>
                             </Viewbox>
+                            <Viewbox Margin="10" Width="auto" Grid.Row="0">
+                                <ItemsControl ItemsSource="{Binding p_DrawArrowElement}"
+                              Width="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualWidth}"
+                              Height="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualHeight}" BorderBrush="Black" BorderThickness="1">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <Canvas ClipToBounds="True"  Width="{x:Static local:BaseDefine.CanvasWidth}" Height="{x:Static local:BaseDefine.CanvasHeight}">
+                                            </Canvas>
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                </ItemsControl>
+                            </Viewbox>
+
                             <Viewbox Margin="10" Width="auto" Grid.Row="0">
                                 <ItemsControl ItemsSource="{Binding p_DrawSelectElement}"
                               Width="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualWidth}"
@@ -716,8 +733,8 @@
                         </Grid.ColumnDefinitions>
                         <GroupBox Header="Tool Plus">
                             <UniformGrid Columns="4">
-                                <Button Margin="5" x:Name="LockBtn" Content="{Binding LockState}" Background="{Binding LockBrush}" Command="{Binding CmdUILock}"/>
-                                <Button Margin="5" x:Name="ShowBtn" Content="ShowIndex" Background="{Binding ShowIndexBrush}" Command="{Binding CmdShowIndex}"/>
+                                <Button Margin="5" x:Name="LockBtn" Content="{Binding LockState}" Background="{Binding LockBrush}" Command="{Binding CmdUILock}" IsEnabled="{Binding p_isCustomize, Converter={StaticResource BoolConverter}}"/>
+                                <Button Margin="5" x:Name="ShowBtn" Content="ShowIndex" Background="{Binding ShowIndexBrush}" Command="{Binding CmdShowIndex}" IsEnabled="{Binding p_isCustomize, Converter={StaticResource BoolConverter}}"/>
                             </UniformGrid>
                         </GroupBox>
                         <GroupBox Header="Key State" Grid.Column="1">
@@ -753,103 +770,195 @@
                     <RowDefinition Height="103*"/>
                     <RowDefinition Height="413*"/>
                 </Grid.RowDefinitions>
-                <GroupBox Header="Measurement Point List" Grid.RowSpan="2">
-                    <Grid>
-                        <Grid.RowDefinitions>
-                            <RowDefinition/>
-                            <RowDefinition Height="7*"/>
-                            <RowDefinition Height="2*"/>
-                        </Grid.RowDefinitions>
-                        <UniformGrid Grid.Row="0" Margin="2" Background="Gainsboro" Columns="3">
-                            <TextBlock Text="Count" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                            <TextBlock Text=":" VerticalAlignment="Center" HorizontalAlignment="Left"/>
-                            <TextBlock Text="{Binding PointCount}" VerticalAlignment="Center" HorizontalAlignment="Left"/>
-                        </UniformGrid>
-                        <DataGrid Grid.Row="1" ItemsSource="{Binding PointListItem}" AutoGenerateColumns="False" CanUserAddRows="False" CanUserSortColumns="True" EnableColumnVirtualization="True"  CanUserDeleteRows="False"
-                                  EnableRowVirtualization="True" ScrollViewer.CanContentScroll="True" SelectionMode="Single">
-                            <DataGrid.Columns>
-                                <DataGridTextColumn Header="Index" Width="*" Binding="{Binding ListIndex}" IsReadOnly="True"/>
-                                <DataGridTextColumn Header="X (mm)" Width="*" Binding="{Binding ListX}" IsReadOnly="True"/>
-                                <DataGridTextColumn Header="Y (mm)" Width="*" Binding="{Binding ListY}" IsReadOnly="True"/>
-                                <DataGridTextColumn Header="Route" Width="*" Binding="{Binding ListRoute}" IsReadOnly="True"/>
-                            </DataGrid.Columns>
-                        </DataGrid>
-                        <Grid Grid.Row="2" Grid.Column="3">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition/>
-                                <ColumnDefinition/>
-                                <ColumnDefinition/>
-                            </Grid.ColumnDefinitions>
-                            <Grid.RowDefinitions>
-                                <RowDefinition/>
-                                <RowDefinition/>
-                            </Grid.RowDefinitions>
-                            <Button Grid.Column="0" Grid.RowSpan="2" Content="Reorder Route" Margin="5" Command="{Binding CmdReorderPoint}" Background="{Binding ReorderBrush}" />
-                            <Button Grid.Column="1" Grid.RowSpan="2" Margin="5" Command="{Binding CmdRouteOptimizaion}">
-                                <TextBlock TextAlignment="Center">Find Nearest<LineBreak/>Next Point</TextBlock>
-                            </Button>
+                <TabControl Grid.RowSpan="2" SelectedIndex="{Binding p_TabIndex, UpdateSourceTrigger=PropertyChanged}">
+                    <TabItem Header="Measure Point" IsEnabled="{Binding p_isCustomize, Converter={StaticResource BoolConverter}}">
+                        <Grid>
+                            <GroupBox Header="Measurement Point List" Grid.RowSpan="2">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition/>
+                                        <RowDefinition Height="7*"/>
+                                        <RowDefinition Height="2*"/>
+                                    </Grid.RowDefinitions>
+                                    <UniformGrid Grid.Row="0" Margin="2" Background="Gainsboro" Columns="3">
+                                        <TextBlock Text="Count" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                        <TextBlock Text=":" VerticalAlignment="Center" HorizontalAlignment="Left"/>
+                                        <TextBlock Text="{Binding PointCount}" VerticalAlignment="Center" HorizontalAlignment="Left"/>
+                                    </UniformGrid>
+                                    <DataGrid Grid.Row="1" ItemsSource="{Binding PointListItem}" AutoGenerateColumns="False" CanUserAddRows="False" CanUserSortColumns="True" EnableColumnVirtualization="True"  CanUserDeleteRows="False"
+                                  EnableRowVirtualization="True" ScrollViewer.CanContentScroll="True" SelectionMode="Single"
+                                  VirtualizingStackPanel.VirtualizationMode ="Recycling" >
+                                        <DataGrid.Columns>
+                                            <DataGridTextColumn Header="Index" Width="*" Binding="{Binding ListIndex}" IsReadOnly="True"/>
+                                            <DataGridTextColumn Header="X (mm)" Width="*" Binding="{Binding ListX}" IsReadOnly="True"/>
+                                            <DataGridTextColumn Header="Y (mm)" Width="*" Binding="{Binding ListY}" IsReadOnly="True"/>
+                                            <DataGridTextColumn Header="Route" Width="*" Binding="{Binding ListRoute}" IsReadOnly="True"/>
+                                        </DataGrid.Columns>
+                                    </DataGrid>
+                                    <Grid Grid.Row="2" Grid.Column="3">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition/>
+                                            <ColumnDefinition/>
+                                            <ColumnDefinition/>
+                                        </Grid.ColumnDefinitions>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition/>
+                                            <RowDefinition/>
+                                        </Grid.RowDefinitions>
+                                        <Button Grid.Column="0" Grid.RowSpan="2" Content="Reorder Route" Margin="5" Command="{Binding CmdReorderPoint}" Background="{Binding ReorderBrush}" />
+                                        <Button Grid.Column="1" Grid.RowSpan="2" Margin="5" Command="{Binding CmdRouteOptimizaion}">
+                                            <TextBlock TextAlignment="Center">Find Nearest<LineBreak/>Next Point</TextBlock>
+                                        </Button>
 
-                            <Grid Grid.Column="2" Grid.RowSpan="2">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition/>
-                                    <ColumnDefinition/>
-                                </Grid.ColumnDefinitions>
-                                <Grid.RowDefinitions>
-                                    <RowDefinition/>
-                                    <RowDefinition/>
-                                </Grid.RowDefinitions>
-                                <Border Margin="5" Background="#FFDDDDDD"
+                                        <Grid Grid.Column="2" Grid.RowSpan="2">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition/>
+                                                <ColumnDefinition/>
+                                            </Grid.ColumnDefinitions>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition/>
+                                                <RowDefinition/>
+                                            </Grid.RowDefinitions>
+                                            <Border Margin="5" Background="#FFDDDDDD"
                                     BorderBrush="#FF707070" BorderThickness="1" Grid.ColumnSpan="2">
-                                    <CheckBox x:Name="checkRoot" Content="Show Route" 
+                                                <CheckBox x:Name="checkRoot" Content="Show Route" 
                                              VerticalAlignment="Center"
                                              HorizontalAlignment="Center" IsChecked="{Binding ShowRoute}">
-                                        <i:Interaction.Triggers>
-                                            <i:EventTrigger EventName="Checked" >
-                                                <i:CallMethodAction TargetObject="{Binding Path=DataContext,ElementName=checkRoot, Mode=OneWay}" MethodName="OnCheckboxChange" />
-                                            </i:EventTrigger>
-                                            <i:EventTrigger EventName="Unchecked" >
-                                                <i:CallMethodAction TargetObject="{Binding Path=DataContext,ElementName=checkRoot, Mode=OneWay}" MethodName="OnCheckboxChange" />
-                                            </i:EventTrigger>
-                                        </i:Interaction.Triggers>
-                                    </CheckBox>
-                                </Border>
-                                <UniformGrid Grid.Row="1" Grid.ColumnSpan="2" Rows="1" Columns="3">
-                                    <cp:ColorPicker x:Name="colorPicker" DisplayColorAndName="False" Margin="5" AvailableColorsSortingMode="HueSaturationBrightness" ColorMode="ColorCanvas"
+                                                    <i:Interaction.Triggers>
+                                                        <i:EventTrigger EventName="Checked" >
+                                                            <i:CallMethodAction TargetObject="{Binding Path=DataContext,ElementName=checkRoot, Mode=OneWay}" MethodName="OnCheckboxChange" />
+                                                        </i:EventTrigger>
+                                                        <i:EventTrigger EventName="Unchecked" >
+                                                            <i:CallMethodAction TargetObject="{Binding Path=DataContext,ElementName=checkRoot, Mode=OneWay}" MethodName="OnCheckboxChange" />
+                                                        </i:EventTrigger>
+                                                    </i:Interaction.Triggers>
+                                                </CheckBox>
+                                            </Border>
+                                            <UniformGrid Grid.Row="1" Grid.ColumnSpan="2" Rows="1" Columns="3">
+                                                <cp:ColorPicker x:Name="colorPicker" DisplayColorAndName="False" Margin="5" AvailableColorsSortingMode="HueSaturationBrightness" ColorMode="ColorCanvas"
                                                       SelectedColor="{Binding RouteBrush, Mode=TwoWay, Converter={StaticResource ColorToBrushConverter}, UpdateSourceTrigger=PropertyChanged}" Resources="{StaticResource theme}">
-                                        <i:Interaction.Triggers>
-                                            <i:EventTrigger EventName="SelectedColorChanged" >
-                                                <i:CallMethodAction TargetObject="{Binding Path=DataContext,ElementName=colorPicker, Mode=OneWay}" MethodName="ColorPicker_SelectedColorChanged" />
-                                            </i:EventTrigger>
-                                            <i:EventTrigger EventName="GotFocus" >
-                                                <i:CallMethodAction TargetObject="{Binding Path=DataContext,ElementName=colorPicker, Mode=OneWay}" MethodName="colorPicker_Opened" />
-                                            </i:EventTrigger>
-                                        </i:Interaction.Triggers>
-                                    </cp:ColorPicker>
-                                    <TextBlock Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Center" Text="Thick"/>
-                                    <TextBox x:Name="thicknessTextBox" Text="{Binding RouteThickness, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"  Grid.Row="1" Grid.Column="1" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" TextAlignment="Center" VerticalContentAlignment="Center" Margin="5">
-                                        <i:Interaction.Triggers>
-                                            <i:EventTrigger EventName="TextChanged" >
-                                                <i:CallMethodAction TargetObject="{Binding Path=DataContext,ElementName=thicknessTextBox, Mode=OneWay}" MethodName="OnThicknessChanged" />
-                                            </i:EventTrigger>
-                                        </i:Interaction.Triggers>
-                                    </TextBox>
-                                </UniformGrid>
-                            </Grid>
+                                                    <i:Interaction.Triggers>
+                                                        <i:EventTrigger EventName="SelectedColorChanged" >
+                                                            <i:CallMethodAction TargetObject="{Binding Path=DataContext,ElementName=colorPicker, Mode=OneWay}" MethodName="ColorPicker_SelectedColorChanged" />
+                                                        </i:EventTrigger>
+                                                        <i:EventTrigger EventName="GotFocus" >
+                                                            <i:CallMethodAction TargetObject="{Binding Path=DataContext,ElementName=colorPicker, Mode=OneWay}" MethodName="colorPicker_Opened" />
+                                                        </i:EventTrigger>
+                                                    </i:Interaction.Triggers>
+                                                </cp:ColorPicker>
+                                                <TextBlock Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Center" Text="Thick"/>
+                                                <TextBox x:Name="thicknessTextBox" Text="{Binding RouteThickness, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"  Grid.Row="1" Grid.Column="1" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" TextAlignment="Center" VerticalContentAlignment="Center" Margin="5">
+                                                    <i:Interaction.Triggers>
+                                                        <i:EventTrigger EventName="TextChanged" >
+                                                            <i:CallMethodAction TargetObject="{Binding Path=DataContext,ElementName=thicknessTextBox, Mode=OneWay}" MethodName="OnThicknessChanged" />
+                                                        </i:EventTrigger>
+                                                    </i:Interaction.Triggers>
+                                                </TextBox>
+                                            </UniformGrid>
+                                        </Grid>
+                                    </Grid>
+                                </Grid>
+                            </GroupBox>
                         </Grid>
-                    </Grid>
-                </GroupBox>
+                    </TabItem>
+                    <TabItem Header="Customize Item" IsEnabled="{Binding p_isCustomize}">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="60"/>
+                                <RowDefinition Height="60"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            <GroupBox Header="Mode">
+                                <Grid>
+                                    <UniformGrid Columns="3">
+                                        <!--<Button Margin="3" Content="Select"/>
+                                        <Button Margin="3" Content="One"/>
+                                        <Button Margin="3" Content="Line"/>-->
+                                        <RadioButton GroupName="Mode" Style="{StaticResource CustomRadio}" Content="Select" IsChecked="{Binding Path=p_mapMode, Converter={StaticResource ModeConverter}, ConverterParameter=Select}"></RadioButton>
+                                        <RadioButton GroupName="Mode" Style="{StaticResource CustomRadio}" Content="Point" IsChecked="{Binding Path=p_mapMode, Converter={StaticResource ModeConverter}, ConverterParameter=Point}"></RadioButton>
+                                        <RadioButton GroupName="Mode" Style="{StaticResource CustomRadio}" Content="Line" IsChecked="{Binding Path=p_mapMode, Converter={StaticResource ModeConverter}, ConverterParameter=Line}"></RadioButton>
+                                    </UniformGrid>
+                                </Grid>
+                            </GroupBox>
+                            <GroupBox Header="Tools" Grid.Row="1">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition/>
+                                        <ColumnDefinition/>
+                                        <ColumnDefinition/>
+                                    </Grid.ColumnDefinitions>
+                                    <Button Margin="3" Content="Point Delete" Command="{Binding CmdPointDelete}"></Button>
+                                    <Button Margin="3" Content="Preset Save" Command="{Binding CmdPresetSave}" Grid.Column="1"></Button>
+                                    <!--<Button Margin="3" Content="Preset Load" Command="{Binding CmdPresetLoad}" Grid.Column="2"></Button>-->
+                                </Grid>
+                            </GroupBox>
+                            <GroupBox Header="Numerical Setting" Grid.Row="2">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="30"/>
+                                        <RowDefinition/>
+                                    </Grid.RowDefinitions>
+                                    <Grid Background="Gainsboro">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition/>
+                                            <ColumnDefinition/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Text="Circle Size (mm)" Margin="3" TextAlignment="Center" VerticalAlignment="Center"/>
+                                        <TextBox Grid.Column="1" Margin="3" TextAlignment="Center" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Text="{Binding p_circleSize, UpdateSourceTrigger=PropertyChanged}"></TextBox>
+                                    </Grid>
+                                    <TabControl Grid.Row="1">
+                                        <TabItem Header="Point">
+                                            <Grid>
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="40"/>
+                                                    <RowDefinition Height="40"/>
+                                                    <RowDefinition/>
+                                                </Grid.RowDefinitions>
+                                                <Grid Background="Gainsboro" Margin="2">
+                                                    <Grid>
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition/>
+                                                            <ColumnDefinition/>
+                                                        </Grid.ColumnDefinitions>
+                                                        <TextBlock  Text="X (mm)" Margin="3" TextAlignment="Center" VerticalAlignment="Center"/>
+                                                        <TextBox Grid.Column="1" Margin="3" TextAlignment="Center" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Text="{Binding p_SettingPointX, UpdateSourceTrigger=PropertyChanged}"></TextBox>
+                                                    </Grid>
+                                                </Grid>
+                                                <Grid Background="Gainsboro" Grid.Row="1" Margin="2">
+                                                    <Grid>
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition/>
+                                                            <ColumnDefinition/>
+                                                        </Grid.ColumnDefinitions>
+                                                        <TextBlock  Text="Y (mm)" Margin="3" TextAlignment="Center" VerticalAlignment="Center"/>
+                                                        <TextBox Grid.Column="1" Margin="3" TextAlignment="Center" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Text="{Binding p_SettingPointY, UpdateSourceTrigger=PropertyChanged}"></TextBox>
+                                                    </Grid>
+                                                </Grid>
+                                                <Grid Background="Gainsboro" Grid.Row="2" Margin="2">
+                                                    <Button Margin="3" Content="Set" Command="{Binding CmdSetCandidatePoint}"/>
+                                                </Grid>
+                                            </Grid>
+                                        </TabItem>
+                                        <TabItem Header="Line">
+                                            
+                                        </TabItem>
+                                    </TabControl>
+                                </Grid>
+                            </GroupBox>
+                        </Grid>
+                    </TabItem>
+                </TabControl>
                 <GroupBox Header="Position Information" Grid.Row="2">
                     <UniformGrid Columns="2" Rows="2">
                         <Grid Margin="5" Background="Gainsboro">
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition/>
-                                <ColumnDefinition Width="11*"/>
-                                <ColumnDefinition Width="6*"/>
-                                <ColumnDefinition Width="12*"/>
+                                <ColumnDefinition Width="2*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="2*"/>
                             </Grid.ColumnDefinitions>
-                            <TextBlock Text="X" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="1"/>
-                            <TextBlock Text=":" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="2"/>
-                            <TextBlock Text="{Binding XPosition}" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="3"/>
+                            <TextBlock Text="X" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                            <TextBlock Text=":" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="1"/>
+                            <TextBlock Text="{Binding XPosition}" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="2"/>
                         </Grid>
                         <Grid Margin="5" Background="Gainsboro">
                             <Grid.ColumnDefinitions>

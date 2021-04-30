@@ -19,10 +19,10 @@ namespace RootTools.ImageProcess
 
         public MemoryData memData;
         public string sDirPath = @"C:\Recipe\VEGA_P\";
-        public bool bTest;
-        public int nTest_afterAvg;
-        public int nTest_beforeAvg;
-        public double dGammaValue;
+        public bool bTest = false;
+        public int nTest_afterAvg = 0;
+        public int nTest_beforeAvg = 0;
+        public double dGammaValue = 0;
 
         //마스크 사이즈.
         //한 점을 만드는데 그 점을 기준으로 MaskSize by MaskSize 만큼의 영역을 연산.

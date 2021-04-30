@@ -24,7 +24,10 @@
                     <Button Content="45D"
                             Command="{Binding btn45D}"
                             Style="{StaticResource SetupPanelBtn}"/>
-                    <Button Content="Frontside"
+					<Button Content="Glass"
+                            Command="{Binding btn45DGlass}"
+                            Style="{StaticResource SetupPanelBtn}"/>
+					<Button Content="Frontside"
                             Command="{Binding btnFrontside}"
                             Style="{StaticResource SetupPanelBtn}"/>
                     <Button Content="Edge"

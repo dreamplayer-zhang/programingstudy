@@ -68,11 +68,11 @@ namespace RootTools.Module
         }
 
         #region virtual 
-        protected virtual void InitModuleRun(ModuleBase module)
+        protected virtual void InitModuleRun(ModuleBase module, string sID = "")
         {
             m_moduleBase = module;
             string[] asName = this.GetType().Name.Split('_');
-            m_sModuleRun = asName[asName.Length - 1];
+            m_sModuleRun = sID + asName[asName.Length - 1];
             p_id = module.p_id + "." + m_sModuleRun;
             m_log = module.m_log;
         }

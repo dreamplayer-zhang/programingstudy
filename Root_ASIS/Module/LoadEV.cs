@@ -15,7 +15,8 @@ namespace Root_ASIS.Module
         DIO_I m_diBlowAlarm; 
         DIO_I m_diPaper;
         DIO_I m_diPaperCheck;
-        DIO_I m_diPaperFull; 
+        DIO_I m_diPaperFull;
+        DIO_O m_doBlow;
         DIO_O m_doIonBlow;
         DIO_O m_doAlignBlow;
 
@@ -28,6 +29,7 @@ namespace Root_ASIS.Module
             p_sInfo = m_toolBox.GetDIO(ref m_diPaper, this, "Paper");
             p_sInfo = m_toolBox.GetDIO(ref m_diPaperCheck, this, "PaperCheck");
             p_sInfo = m_toolBox.GetDIO(ref m_diPaperFull, this, "PaperFull");
+            p_sInfo = m_toolBox.GetDIO(ref m_doBlow, this, "Blow");
             p_sInfo = m_toolBox.GetDIO(ref m_doIonBlow, this, "IonBlow");
             p_sInfo = m_toolBox.GetDIO(ref m_doAlignBlow, this, "AlignBlow");
             if (bInit) InitTools();
@@ -78,6 +80,9 @@ namespace Root_ASIS.Module
             }
         }
 
+        bool m_bUseBlow = true;
+        bool m_bUseIonBlow = true;
+        bool m_bUseAlignBlow = true;
         bool _bBlow = false; 
         public bool p_bBlow
         {
@@ -88,6 +93,7 @@ namespace Root_ASIS.Module
                 _bBlow = value;
                 m_log.Info("p_bBlow = " + value.ToString());
                 OnPropertyChanged();
+                m_doBlow.Write(value); 
                 m_doAlignBlow.Write(value);
                 m_doIonBlow.Write(value); 
             }
@@ -103,6 +109,13 @@ namespace Root_ASIS.Module
                 _bDone = value;
                 OnPropertyChanged(); 
             }
+        }
+
+        void RunTreeBlow(Tree tree)
+        {
+            m_bUseBlow = tree.Set(m_bUseBlow, m_bUseBlow, "Blow", "Use Blow");
+            m_bUseIonBlow = tree.Set(m_bUseIonBlow, m_bUseIonBlow, "Ion Blow", "Use Blow");
+            m_bUseAlignBlow = tree.Set(m_bUseAlignBlow, m_bUseAlignBlow, "Align Blow", "Use Blow");
         }
         #endregion
 
@@ -242,7 +255,8 @@ namespace Root_ASIS.Module
         public override void RunTree(Tree tree)
         {
             base.RunTree(tree);
-            RunTreeSetup(tree.GetTree("Setup", false));
+            RunTreeSetup(tree.GetTree("Setup"));
+            RunTreeBlow(tree.GetTree("Use Blow")); 
         }
 
         void RunTreeSetup(Tree tree)

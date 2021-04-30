@@ -22,7 +22,7 @@ namespace Root_VEGA_D.Module
     public class Run_GrabLineScan : ModuleRunBase
     {
         Vision m_module;
-        
+
         //bool m_bInvDir = false;
         public GrabMode m_grabMode = null;
         double m_dTDIToVRSOffsetZ = 0;
@@ -56,9 +56,9 @@ namespace Root_VEGA_D.Module
         }
 
         public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
-        { 
+        {
             p_sGrabMode = tree.Set(p_sGrabMode, p_sGrabMode, m_module.p_asGrabMode, "Grab Mode", "Select GrabMode", bVisible);
-            m_dTDIToVRSOffsetZ = tree.Set(m_dTDIToVRSOffsetZ, m_dTDIToVRSOffsetZ,"TDI To VRS Offset Z", "TDI To VRS Offset Z", bVisible);
+            m_dTDIToVRSOffsetZ = tree.Set(m_dTDIToVRSOffsetZ, m_dTDIToVRSOffsetZ, "TDI To VRS Offset Z", "TDI To VRS Offset Z", bVisible);
             //if (m_grabMode != null) m_grabMode.RunTree(tree.GetTree("Grab Mode", false), bVisible, true);
         }
 
@@ -99,7 +99,7 @@ namespace Root_VEGA_D.Module
                     m_module.RADSControl.StartRADS();
                     StopWatch sw = new StopWatch();
                     if (camRADS.p_CamInfo._OpenStatus == false) camRADS.Connect();
-                    while(camRADS.p_CamInfo._OpenStatus == false)
+                    while (camRADS.p_CamInfo._OpenStatus == false)
                     {
                         if (sw.ElapsedMilliseconds > 15000)
                         {
@@ -118,13 +118,13 @@ namespace Root_VEGA_D.Module
                 int nTimeOut = TIMEOUT_50MS / TIMEOUT_INTERVAL;
                 while (camMain.p_CamInfo.p_eState != eCamState.Ready)
                 {
-                    if(nTimeOut-- == 0)
+                    if (nTimeOut-- == 0)
                     {
                         throw new Exception("Camera Connect Error");
                     }
                     Thread.Sleep(TIMEOUT_INTERVAL);
                 }
-               
+
                 // 스캔 라인 초기화
                 m_nCurScanLine = 0;
 
@@ -146,7 +146,7 @@ namespace Root_VEGA_D.Module
                     if (EQ.IsStop())
                         return "OK";
 
-                    lock(m_lockWaitRun)
+                    lock (m_lockWaitRun)
                     {
                         if (m_bWaitRun)
                         {
@@ -294,7 +294,7 @@ namespace Root_VEGA_D.Module
 
                 return "OK";
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 m_log.Info(e.Message);
                 return "OK";

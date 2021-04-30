@@ -12,10 +12,11 @@ namespace Root_WIND2
         public override void Initilize()
         {
             // Register Recipe Items
+            RegisterRecipeItem<OriginRecipe>();
             RegisterRecipeItem<BacksideRecipe>();
 
             // Regiseter Parameter Items
-            RegisterParameterItem<PositionParameter>();
+            //RegisterParameterItem<PositionParameter>();
             RegisterParameterItem<BacksideSurfaceParameter>();
         }
     }

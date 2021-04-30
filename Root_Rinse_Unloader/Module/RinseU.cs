@@ -60,7 +60,7 @@ namespace Root_Rinse_Unloader.Module
             }
         }
 
-        Storage.eMagazine _eMagazine = Storage.eMagazine.Magazine1;
+        Storage.eMagazine _eMagazine = Storage.eMagazine.Magazine4;
         public Storage.eMagazine p_eMagazine
         {
             get { return _eMagazine; }
@@ -193,9 +193,11 @@ namespace Root_Rinse_Unloader.Module
 
         #region GAF
         ALID m_alidAirEmergency;
+        ALID m_alidLightCurtain; 
         void InitALID()
         {
             m_alidAirEmergency = m_gaf.GetALID(this, "Air Emergency", "Air Emergency");
+            m_alidLightCurtain = m_gaf.GetALID(this, "Light Curtain", "Light Curtain");
         }
         #endregion
 
@@ -271,12 +273,7 @@ namespace Root_Rinse_Unloader.Module
                 if (_bEMG == value) return;
                 _bEMG = value;
                 OnPropertyChanged();
-                if (value)
-                {
-                    EQ.p_bStop = true;
-                    EQ.p_eState = EQ.eState.Error;
-                    m_alidAirEmergency.p_bSet = true;
-                }
+                if (value) m_alidAirEmergency.p_bSet = true;
             }
         }
 
@@ -289,12 +286,7 @@ namespace Root_Rinse_Unloader.Module
                 if (_bAir == value) return;
                 _bAir = value;
                 OnPropertyChanged();
-                if (value)
-                {
-                    EQ.p_bStop = true;
-                    EQ.p_eState = EQ.eState.Error;
-                    m_alidAirEmergency.p_bSet = true;
-                }
+                if (value) m_alidAirEmergency.p_bSet = true;
             }
         }
 
@@ -333,7 +325,7 @@ namespace Root_Rinse_Unloader.Module
         public void RunBuzzerOff()
         {
             m_doBuzzer.AllOff();
-            AddProtocol(p_id, eCmd.BuzzerOff, "Off");
+            //AddProtocol(p_id, eCmd.BuzzerOff, "Off");
         }
 
         StopWatch m_swBuzzer = new StopWatch();
@@ -359,13 +351,13 @@ namespace Root_Rinse_Unloader.Module
         }
         void CheckLightCurtan()
         {
-            if (m_diLightCurtain.p_bIn == true) m_swLightCurtain.Start();
+            if ((m_diLightCurtain.p_bIn == true) || (p_eMode == eRunMode.Magazine)) m_swLightCurtain.Start();
             if (EQ.p_eState != EQ.eState.Run) return;
             if (m_diLightCurtain.p_bIn == true) return;
             if (m_swLightCurtain.ElapsedMilliseconds > _msLightCurtain)
             {
-                EQ.p_bStop = true;
-                EQ.p_eState = EQ.eState.Error; 
+                m_swLightCurtain.Start();
+                m_alidLightCurtain.p_bSet = true; 
                 p_eState = eState.Error;
                 p_sInfo = "Light Curtain Check Timeout";
             }

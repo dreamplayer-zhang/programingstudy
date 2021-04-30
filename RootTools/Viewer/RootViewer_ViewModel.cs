@@ -724,6 +724,7 @@ namespace RootTools
             {
                 if (p_ImageData != null)
                 {
+
                     if (p_ImageData.m_eMode == ImageData.eMode.OtherPCMem)
                     {
                         if (p_ImageData.GetBytePerPixel() == 1)
@@ -924,7 +925,9 @@ namespace RootTools
                                 }
                                 else if (p_ImageData.m_eMode == ImageData.eMode.ImageBuffer)
                                 {
-                                    Image<Rgb, byte> view = new Image<Rgb, byte>(p_CanvasWidth, p_CanvasHeight);
+                                    int canvasWidth = p_CanvasWidth; // 여기 잠시 수정
+                                    int canvasHeight = p_CanvasHeight;
+                                    Image<Rgb, byte> view = new Image<Rgb, byte>(canvasWidth, canvasHeight);
 
                                     if (this.p_ImageData == null)
                                         return;
@@ -938,13 +941,13 @@ namespace RootTools
                                     int viewrectWidth = p_View_Rect.Width;
                                     int sizeX = p_ImageData.p_Size.X;
 
-                                    Parallel.For(0, p_CanvasHeight, (yy) =>
+                                    Parallel.For(0, canvasHeight, (yy) =>
                                     {
                                         {
-                                            long pix_y = viewrectY + yy * viewrectHeight / p_CanvasHeight;
-                                            for (int xx = 0; xx < p_CanvasWidth; xx++)
+                                            long pix_y = viewrectY + yy * viewrectHeight / canvasHeight;
+                                            for (int xx = 0; xx < canvasWidth; xx++)
                                             {
-                                                long pix_x = viewrectX + xx * viewrectWidth / p_CanvasWidth;
+                                                long pix_x = viewrectX + xx * viewrectWidth / canvasWidth;
 
                                                 viewPtr[yy, xx, 0] = ApplyContrastAndBrightness(imageptr[(pix_x * this.p_ImageData.GetBytePerPixel() + 2) + (long)pix_y * (sizeX * 3)]);
                                                 viewPtr[yy, xx, 1] = ApplyContrastAndBrightness(imageptr[(pix_x * this.p_ImageData.GetBytePerPixel() + 1) + (long)pix_y * (sizeX * 3)]);

@@ -13,7 +13,7 @@ namespace Root_CAMELLIA
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (ModuleBase.eState.Run == (ModuleBase.eState)value || RootTools.EQ.p_eState == RootTools.EQ.eState.Run)
+            if (ModuleBase.eState.Run == (ModuleBase.eState)value || RootTools.EQ.m_EQ.p_eState == RootTools.EQ.eState.Run)
             {
                 return 1.0;
             }

@@ -357,7 +357,7 @@ namespace RootTools.Module
         public List<string> m_asRecipe = new List<string>();
         /// <summary> m_aModuleRun : ModuleBase가 등록된 ModuleRun들의 List (for Clone) </summary>
         protected List<ModuleRunBase> m_aModuleRun = new List<ModuleRunBase>();
-        protected ModuleRunBase AddModuleRunList(ModuleRunBase moduleRun, bool bRecipe, string sDesc)
+        public ModuleRunBase AddModuleRunList(ModuleRunBase moduleRun, bool bRecipe, string sDesc)
         {
             m_aModuleRun.Add(moduleRun);
             m_asModuleRun.Add(moduleRun.m_sModuleRun);

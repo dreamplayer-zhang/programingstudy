@@ -123,13 +123,13 @@ namespace RootTools_Vision
 				int btm = (int)(grabModeTop.m_nCameraPositionOffset - grabModeBtm.m_nCameraPositionOffset + defect.m_fRelY) * heightPerDegree;
 
 				Rect defectRect = defect.GetRect();
-				int edge = FindEdge(sharedBufferInfo_Top, new Rect(0, defectRect.Y, parameterEdge.EdgeParamBaseTop.ROIWidth, parameterEdge.EdgeParamBaseTop.ROIHeight));
-				int width = parameterEdge.EdgeParamBaseTop.ROIWidth - edge;
+				int edge = FindEdge(sharedBufferInfo_Top, new Rect(0, defectRect.Y, 500/*parameterEdge.EdgeParamBaseTop.ROIWidth*/, parameterEdge.EdgeParamBaseTop.ROIHeight));
+				int width = 500/*parameterEdge.EdgeParamBaseTop.ROIWidth*/ - edge;
 
 				Rect calcDefectRect_Top = new Rect(edge, defectRect.Y - (parameterEdge.EdgeParamBaseTop.ROIHeight / 2), width, parameterEdge.EdgeParamBaseTop.ROIHeight);
 				//Rect calcDefectRect_Top = new Rect(0, defectRect.Y - (parameterEdge.EdgeParamBaseTop.ROIHeight /2), parameterEdge.EdgeParamBaseTop.ROIWidth, parameterEdge.EdgeParamBaseTop.ROIHeight);
-				Rect calcDefectRect_Side = new Rect(0, side - (parameterEdge.EdgeParamBaseTop.ROIHeight / 2), parameterEdge.EdgeParamBaseTop.ROIWidth, parameterEdge.EdgeParamBaseTop.ROIHeight);
-				Rect calcDefectRect_Btm = new Rect(0, btm - (parameterEdge.EdgeParamBaseTop.ROIHeight / 2), parameterEdge.EdgeParamBaseTop.ROIWidth, parameterEdge.EdgeParamBaseTop.ROIHeight);
+				Rect calcDefectRect_Side = new Rect(0, side - (parameterEdge.EdgeParamBaseTop.ROIHeight / 2), 500/*parameterEdge.EdgeParamBaseTop.ROIWidth*/, parameterEdge.EdgeParamBaseTop.ROIHeight);
+				Rect calcDefectRect_Btm = new Rect(0, btm - (parameterEdge.EdgeParamBaseTop.ROIHeight / 2), 500/*parameterEdge.EdgeParamBaseTop.ROIWidth*/, parameterEdge.EdgeParamBaseTop.ROIHeight);
 
 				Bitmap bitmapTop = Tools.CovertBufferToBitmap(sharedBufferInfo_Top, calcDefectRect_Top);
 				Bitmap bitmapSide = Tools.CovertBufferToBitmap(sharedBufferInfo_Side, calcDefectRect_Side);
