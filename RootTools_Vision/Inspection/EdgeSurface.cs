@@ -74,7 +74,14 @@ namespace RootTools_Vision
 				param = parameterEdge.EdgeParamBaseSide;
 			else if (this.currentWorkplace.MapIndexX == (int)EdgeMapPositionX.Btm)
 				param = parameterEdge.EdgeParamBaseBtm;
-			
+
+			// test
+			if (this.currentWorkplace.Index == 1)
+			{ 
+				DoColorInspection(param);
+				return;
+			}	
+
 			if (param.ChR)
 				DoColorInspection(this.GetWorkplaceBuffer(IMAGE_CHANNEL.R_GRAY), param);
 			if (param.ChG)
@@ -83,6 +90,31 @@ namespace RootTools_Vision
 				DoColorInspection(this.GetWorkplaceBuffer(IMAGE_CHANNEL.B), param);
 
 			WorkEventManager.OnInspectionDone(this.currentWorkplace, new InspectionDoneEventArgs(new List<CRect>())); // 나중에 ProcessDefect쪽 EVENT로...
+		}
+
+		private void DoColorInspection(EdgeSurfaceParameterBase param)
+		{
+			OriginRecipe originRecipe = recipe.GetItem<OriginRecipe>();
+
+			int startX = originRecipe.OriginX;
+			int startY = param.StartPosition;
+			int width = originRecipe.OriginWidth;
+			int height = param.ROIHeight;
+			int length = width - startX;
+
+			byte[] roi = new byte[length * height];
+
+			for (int i = startY; i < startY + height; i++)
+			{
+				int startIdx = (width * i) + originRecipe.OriginX;
+				int dstIdx = length * (i - startY);
+
+				//for (int j = startX; j < originRecipe.OriginWidth; j++)
+				Array.Copy(this.GetWorkplaceBuffer(IMAGE_CHANNEL.R_GRAY), startIdx, roi, dstIdx, length);
+			}
+
+			System.Drawing.Bitmap bitmap = Tools.CovertArrayToBitmap(roi, length, height, 1);
+			Tools.SaveImageJpg(bitmap, @"D:\test.jpg", 50);
 		}
 
 		private void DoColorInspection(byte[] arrSrc, EdgeSurfaceParameterBase param)
