@@ -9,7 +9,6 @@
              d:DesignHeight="818"
              d:DesignWidth="1683"
              Background="{StaticResource PanelBackGround}">
-
     <Grid Grid.Column="1">
         <GroupBox Header="Pod Manager"
                   Visibility="Visible">
@@ -150,6 +149,7 @@
                                                 <ComboBoxItem Content="15" />
                                             </ComboBox>
                                         </GroupBox>
+
                                         <RadioButton Content="Pen"
                                                       Margin="5" 
                                                       Style="{StaticResource {x:Type ToggleButton}}"
@@ -204,6 +204,9 @@
                                                       Margin="5"
                                                      Style="{StaticResource {x:Type ToggleButton}}"
                                                       IsChecked="{Binding bThresholdCheck}" />
+                                        <Grid>
+                                            <Ellipse  Stroke="Red" StrokeThickness="2"/>
+                                        </Grid>
                                     </Grid>
                                 </GroupBox>
                                 <GroupBox Header="Inspection Parameter"

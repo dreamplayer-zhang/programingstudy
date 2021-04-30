@@ -264,6 +264,8 @@ namespace RootTools
     }
     public class TEllipse : TShape
     {
+        public Grid _grid;
+
         public Ellipse _CanvasEllipse;
         public Ellipse CanvasEllipse
         {
@@ -279,6 +281,8 @@ namespace RootTools
             }
         }
 
+
+        
         public CPoint MemPointBuffer;
         public List<PointLine> Data;
 
@@ -293,6 +297,8 @@ namespace RootTools
             CanvasEllipse = new Ellipse();
             Data = new List<PointLine>();
 
+            _grid.Children.Add(CanvasEllipse);
+            CanvasEllipse.Stroke = Brushes.Red;
             CanvasEllipse.Stroke = brush;
             CanvasEllipse.Fill = brush;
             CanvasEllipse.StrokeThickness = thickness;

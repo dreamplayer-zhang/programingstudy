@@ -81,7 +81,6 @@ namespace Root_VEGA_P_Vision
                             break;
                         case ToolType.Rect:
                             Start_Rect(memPt);
-                            Debug.WriteLine("Start Draw Rect@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
                             m_eToolProcess = ToolProcess.Drawing;
                             break;
                         case ToolType.Circle:
@@ -90,7 +89,6 @@ namespace Root_VEGA_P_Vision
                             break;
                         case ToolType.Threshold:
                             Start_Rect(memPt);
-                            Debug.WriteLine("Start Draw Threshold@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
                             m_eToolProcess = ToolProcess.Drawing;
                             break;
                     }
@@ -195,6 +193,7 @@ namespace Root_VEGA_P_Vision
         {
             Debug.WriteLine("Mouse Up");
             switch (m_eToolProcess)
+
             {
                 case ToolProcess.None:
                     break;
@@ -211,7 +210,6 @@ namespace Root_VEGA_P_Vision
                             break;
                         case ToolType.Rect:
                             Done_Rect();
-                            Debug.WriteLine("Done Rect");
                             m_eToolProcess = ToolProcess.None;
                             break;
                         case ToolType.Circle:
@@ -362,6 +360,7 @@ namespace Root_VEGA_P_Vision
 
             CPoint LT = new CPoint(rect.MemoryRect.Left, rect.MemoryRect.Top);
             CPoint RB = new CPoint(rect.MemoryRect.Right, rect.MemoryRect.Bottom);
+
             Point canvasLT = new Point(GetCanvasDoublePoint(LT).X, GetCanvasDoublePoint(LT).Y);
             Point canvasRB = new Point(GetCanvasDoublePoint(RB).X, GetCanvasDoublePoint(RB).Y);
 
@@ -389,6 +388,7 @@ namespace Root_VEGA_P_Vision
                   }
               });
             SetLayerSource();
+            m_History.Push(m_CurrentWork);
             p_UIElement.Remove(rect.CanvasRect);
         }
         private unsafe void Done_Threshold()
@@ -425,32 +425,7 @@ namespace Root_VEGA_P_Vision
             }
             SetLayerSource();
 
-            //ImageData rectImage = new ImageData(ThresholdRect.Width, ThresholdRect.Height, p_ImageData.p_nByte);
-            //rectImage.SetData(p_ImageData, ThresholdRect, (int)p_ImageData.p_Stride, p_ImageData.GetBytePerPixel());
-            //var sdf = rectImage.m_aBuf;
-            //rect.Left* nByte +((long)i + rect.Top) * stride)
-            //for (int i = 0; i < rectImage.m_aBuf.Length; i++)
-            //{
-            //    if (rectImage.m_aBuf[i] < 50)
-            //    {
-            //        //0,0 /0,1 /1,0 /1,1
-            //        //시작점
-            //        var asdf = (ThresholdRect.Top * p_ROILayer.p_Size.X + ThresholdRect.Left);
-            //    }
-            //}
-
-
-            //Parallel.For(rect.MemoryRect.Top, rect.MemoryRect.Bottom + 1, y =>
-            //{
-            //    for (int x = rect.MemoryRect.Left; x <= rect.MemoryRect.Right; x++)
-            //    {
-            //        CPoint pixelPt = new CPoint(x, y);
-
-
-            //        m_CurrentWork.Points.Add(pixelPt);
-            //       
-            //    }
-            //});
+          
 
             p_UIElement.Remove(rect.CanvasRect);
         }
@@ -495,7 +470,7 @@ namespace Root_VEGA_P_Vision
                 return _nThreshold;
             }
             set
-            {                
+            {
                 SetProperty(ref _nThreshold, value);
             }
         }
@@ -623,8 +598,7 @@ namespace Root_VEGA_P_Vision
         }
         private bool _bThresholdCheck;
 
-        
-
+       
         #endregion
 
         #region Pen/Eraser Cursor
