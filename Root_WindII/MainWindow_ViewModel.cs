@@ -12,38 +12,13 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 
 namespace Root_WindII
 {
     public class MainWindow_ViewModel : ObservableObject
     {
-        #region [Event]
-
-        #endregion
-
-
         #region [ViewModel]
-
-        private int selectedModeIndex = 0;
-        public int SelectedModeIndex
-        {
-            get => this.selectedModeIndex;
-            set
-            {
-                SetProperty(ref this.selectedModeIndex, value);
-            }
-        }
-
-        private SelectMode_ViewModel selectModeVM;
-        public SelectMode_ViewModel SelectModeVM
-        {
-            get => this.selectModeVM;
-            set
-            {
-                SetProperty(ref this.selectModeVM, value);
-            }
-        }
-
         private Setup_ViewModel setupVM;
         public Setup_ViewModel SetupVM
         {
@@ -75,14 +50,166 @@ namespace Root_WindII
         }
         #endregion
 
+        #region [MenuBar]
+
+        #region [Properties]
+
+        private bool isCheckModeMain = true;
+        public bool IsCheckModeMain
+        {
+            get => this.isCheckModeMain;
+            set
+            {
+                if (value == true)
+                {
+                    SetProperty(ref this.isCheckModeSetup, false, "IsCheckModeSetup");
+                    SetProperty(ref this.isCheckModeReview, false, "IsCheckModeReview");
+                    SetProperty(ref this.isCheckModeOperation, false, "IsCheckModeOperation");
+                    SetProperty(ref this.isCheckModeEngineer, false, "IsCheckModeEngineer");
+                }
+                else if (value == false && this.isCheckModeMain == true)
+                {
+                    return;
+                }
+
+                SetProperty(ref this.isCheckModeMain, value);
+            }
+        }
+
+        private bool isCheckModeSetup = false;
+        public bool IsCheckModeSetup
+        {
+            get => this.isCheckModeSetup;
+            set
+            {
+                if (value == true)
+                {
+                    SetProperty(ref this.isCheckModeMain, false, "IsCheckModeMain");
+                    SetProperty(ref this.isCheckModeReview, false, "IsCheckModeReview");
+                    SetProperty(ref this.isCheckModeOperation, false, "IsCheckModeOperation");
+                    SetProperty(ref this.isCheckModeEngineer, false, "IsCheckModeEngineer");
+                }
+                else if (value == false && this.isCheckModeSetup == true)
+                {
+                    return;
+                }
+
+                SetProperty(ref this.isCheckModeSetup, value);
+            }
+        }
+
+        private bool isCheckModeReview = false;
+        public bool IsCheckModeReview
+        {
+            get => this.isCheckModeReview;
+            set
+            {
+                if (value == true)
+                {
+                    SetProperty(ref this.isCheckModeMain, false, "IsCheckModeMain");
+                    SetProperty(ref this.isCheckModeSetup, false, "IsCheckModeSetup");
+                    SetProperty(ref this.isCheckModeOperation, false, "IsCheckModeOperation");
+                    SetProperty(ref this.isCheckModeEngineer, false, "IsCheckModeEngineer");
+                }
+                else if (value == false && this.isCheckModeReview == true)
+                {
+                    return;
+                }
+                SetProperty(ref this.isCheckModeReview, value);
+            }
+        }
+
+        private bool isCheckModeOperation = false;
+        public bool IsCheckModeOperation
+        {
+            get => this.isCheckModeOperation;
+            set
+            {
+                if (value == true)
+                {
+                    SetProperty(ref this.isCheckModeMain, false, "IsCheckModeMain");
+                    SetProperty(ref this.isCheckModeSetup, false, "IsCheckModeSetup");
+                    SetProperty(ref this.isCheckModeReview, false, "IsCheckModeReview");
+                    SetProperty(ref this.isCheckModeEngineer, false, "IsCheckModeEngineer");
+                }
+                else if (value == false && this.isCheckModeOperation == true)
+                {
+                    return;
+                }
+                SetProperty(ref this.isCheckModeOperation, value);
+            }
+        }
+
+        private bool isCheckModeEngineer = false;
+        public bool IsCheckModeEngineer
+        {
+            get => this.isCheckModeEngineer;
+            set
+            {
+                if (value == true)
+                {
+                    SetProperty(ref this.isCheckModeMain, false, "IsCheckModeMain");
+                    SetProperty(ref this.isCheckModeSetup, false, "IsCheckModeSetup");
+                    SetProperty(ref this.isCheckModeReview, false, "IsCheckModeReview");
+                    SetProperty(ref this.isCheckModeOperation, false, "IsCheckModeOperation");
+
+                    p_CurrentPanel = maintVM.Main;
+                    p_CurrentPanel.DataContext = maintVM;
+                    this.MaintVM.SetPage(this.MaintVM.EngineerUI);
+                }
+                else if (value == false && this.isCheckModeEngineer == true)
+                {
+                    return;
+                }
+                SetProperty(ref this.isCheckModeEngineer, value);
+            }
+        }
+
+        #endregion
+        #region [Command]
+
+        #endregion
+        #endregion
+
+        #region [Mode Selection Panel]
+        #region [Command]
+        public ICommand btnSetupCommand
+        {
+            get => new RelayCommand(() =>
+            {
+                this.IsCheckModeSetup = true;
+            });
+        }
+
+        public ICommand btnReviewCommand
+        {
+            get => new RelayCommand(() =>
+            {
+                this.IsCheckModeReview = true;
+            });
+        }
+
+        public ICommand btnOperationCommand
+        {
+            get => new RelayCommand(() =>
+            {
+                this.IsCheckModeOperation= true;
+
+            });
+        }
+
+        public ICommand btnEngineerCommand
+        {
+            get => new RelayCommand(() =>
+            {
+                this.IsCheckModeEngineer = true;
+            });
+        }
+        #endregion
+        #endregion
+
         public MainWindow_ViewModel()
         {
-            this.SelectModeVM = new SelectMode_ViewModel();
-            this.selectModeVM.SetupSelected += SetupSelected_Callback;
-            this.selectModeVM.ReviewSelected += ReviewSelected_Callback;
-            this.selectModeVM.OperationSelected += OperationSelected_Callback;
-            this.selectModeVM.EngineerSelected += EngineerSelected_Callback;
-
             Init();
 
             this.SetupVM = new Setup_ViewModel();
@@ -294,30 +421,6 @@ namespace Root_WindII
                 return false;
             }
             return true;
-        }
-
-        private void SetupSelected_Callback()
-        {
-            this.SelectedModeIndex = 1;
-        }
-
-        private void ReviewSelected_Callback()
-        {
-            this.SelectedModeIndex = 2;
-        }
-
-        private void OperationSelected_Callback()
-        {
-            this.SelectedModeIndex = 3;
-        }
-
-        private void EngineerSelected_Callback()
-        {
-			this.SelectedModeIndex = 4;
-
-            p_CurrentPanel = maintVM.Main;
-            p_CurrentPanel.DataContext = maintVM;
-            this.MaintVM.SetPage(this.MaintVM.EngineerUI);
         }
     }
 }

@@ -216,14 +216,13 @@
     <Compile Include="MvvmTools\PropertySupport.cs" />
     <Compile Include="MvvmTools\RelayCommand.cs" />
     <Compile Include="MvvmTools\SizeObserver.cs" />
+    <Compile Include="UI\SelectMode.xaml.cs">
+      <DependentUpon>SelectMode.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI\MAINTENANCE\MaintenancePanel.xaml.cs">
       <DependentUpon>MaintenancePanel.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\MAINTENANCE\MaintenancePanel_ViewModel.cs" />
-    <Compile Include="UI\SelectMode.xaml.cs">
-      <DependentUpon>SelectMode.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\SelectMode_ViewModel.cs" />
     <Compile Include="UI\SETUP\BACK\BacksideInspect.xaml.cs">
       <DependentUpon>BacksideInspect.xaml</DependentUpon>
     </Compile>
@@ -352,13 +351,13 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Page Include="UI\MAINTENANCE\MaintenancePanel.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
     <Page Include="UI\SelectMode.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\MAINTENANCE\MaintenancePanel.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="UI\SETUP\BACK\BacksideInspect.xaml">
       <Generator>MSBuild:Compile</Generator>
