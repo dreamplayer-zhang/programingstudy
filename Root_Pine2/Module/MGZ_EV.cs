@@ -39,7 +39,13 @@ namespace Root_Pine2.Module
             {
                 if (_eStep == value) return; 
                 _eStep = value; 
-                //forget LED
+                switch (value)
+                {
+                    case eStep.Ready: m_pine2.m_display.Write(m_nID, "REDY"); break;
+                    case eStep.Load: m_pine2.m_display.Write(m_nID, "LOAD"); break;
+                    case eStep.Run: m_pine2.m_display.Write(m_nID, "RUN "); break;
+                    case eStep.Unload: m_pine2.m_display.Write(m_nID, "UNLD"); break;
+                }
             }
         }
         #endregion
@@ -81,6 +87,22 @@ namespace Root_Pine2.Module
                 }
             }
 
+            public string WaitSwitch()
+            {
+                while (m_dioSwitch.p_bIn == false)
+                {
+                    Thread.Sleep(10);
+                    if (EQ.IsStop()) return "EQ Stop"; 
+                }
+                StopWatch sw = new StopWatch();
+                while (m_dioSwitch.p_bIn)
+                {
+                    Thread.Sleep(10);
+                    if (EQ.IsStop()) return "EQ Stop";
+                }
+                return (sw.ElapsedMilliseconds < 1500) ? "OK" : "Cancel";
+            }
+
             public void RunMove(eMove eMove)
             {
                 m_doMove.AllOff(); 
@@ -93,7 +115,7 @@ namespace Root_Pine2.Module
                 m_doMove.AllOff(); 
             }
 
-            bool IsCheckExist()
+            public bool IsCheckExist()
             {
                 for (int n = 0; n < 3; n++)
                 {
@@ -105,6 +127,27 @@ namespace Root_Pine2.Module
             public bool IsCheckUnload()
             {
                 return m_diCheck.ReadDI(eCheck.Unload); 
+            }
+
+            public string WaitUnload()
+            {
+                while (m_diCheck.ReadDI(eCheck.Unload) == false)
+                {
+                    Thread.Sleep(10);
+                    if (EQ.IsStop()) return "EQ Stop"; 
+                    if (IsCheckExist() == false)
+                    {
+                        RunMoveStop();
+                        return "OK"; 
+                    }
+                }
+                RunMoveStop(); 
+                while (IsCheckExist())
+                {
+                    Thread.Sleep(10);
+                    if (EQ.IsStop()) return "EQ Stop";
+                }
+                return "OK"; 
             }
         }
         Conveyor m_conveyor = new Conveyor(); 
@@ -207,6 +250,19 @@ namespace Root_Pine2.Module
             #endregion
 
             #region Product & Protrude
+            double m_secProduct = 10; 
+            public string WaitProduct(eMGZ eMGZ)
+            {
+                StopWatch sw = new StopWatch();
+                int msWait = (int)(1000 * m_secProduct); 
+                while (sw.ElapsedMilliseconds < msWait)
+                {
+                    Thread.Sleep(10);
+                    if (m_diProduct.ReadDI(eMGZ)) return "OK";
+                }
+                return "Wait Product Timeout"; 
+            }
+
             public bool IsProduct(eMGZ eMGZ)
             {
                 return m_diProduct.ReadDI(eMGZ); 
@@ -221,7 +277,8 @@ namespace Root_Pine2.Module
             public void RunTree(Tree tree)
             {
                 m_dSlot = tree.Set(m_dSlot, m_dSlot, "Slot Interval", "Magazine Slot Interval (pulse)");
-                m_secAlign = tree.Set(m_secAlign, m_secAlign, "Align Timeout", "Align Timeout (sec)"); 
+                m_secAlign = tree.Set(m_secAlign, m_secAlign, "Align Timeout", "Align Timeout (sec)");
+                m_secProduct = tree.Set(m_secProduct, m_secProduct, "Wait Product", "Wait Product (sec)"); 
             }
         }
         Elevator m_elevator = new Elevator(); 
@@ -258,15 +315,39 @@ namespace Root_Pine2.Module
         #region Load
         string StartLoad()
         {
+            if (m_elevator.IsProduct(Elevator.eMGZ.Up)) return "Magazine Up Sensor Checked";
+            if (m_elevator.IsProduct(Elevator.eMGZ.Down)) return "Magazine Down Sensor Checked";
             p_eStep = eStep.Load;
             return StartRun(m_runLoad);
         }
 
         public string RunLoad()
         {
-            //forget
+            switch (m_pine2.p_eMode)
+            {
+                case Pine2.eRunMode.Magazine:
+                    if (Run(RunLoad(Elevator.eMGZ.Up))) return p_sInfo;
+                    if (Run(RunLoad(Elevator.eMGZ.Down))) return p_sInfo;
+                    break;
+                case Pine2.eRunMode.Stack:
+                    if (Run(RunLoad(Elevator.eMGZ.Up))) return p_sInfo;
+                    break; 
+            }
             p_eStep = eStep.Run; 
-            return "OK"; //forget
+            return "OK";
+        }
+
+        string RunLoad(Elevator.eMGZ eMGZ)
+        {
+            if (Run(m_elevator.MoveConveyor(eMGZ))) return p_sInfo;
+            if (Run(m_conveyor.WaitSwitch())) return p_sInfo;
+            if (m_conveyor.IsCheckExist() == false) return "OK"; 
+            if (Run(m_elevator.RunAlign(false))) return p_sInfo;
+            m_conveyor.RunMove(Conveyor.eMove.Forward);
+            if (Run(m_elevator.WaitProduct(eMGZ))) return p_sInfo;
+            m_conveyor.RunMoveStop();
+            if (Run(m_elevator.RunAlign(true))) return p_sInfo;
+            return "OK";
         }
         #endregion
 
@@ -279,8 +360,30 @@ namespace Root_Pine2.Module
 
         public string RunUnload()
         {
+            switch (m_pine2.p_eMode)
+            {
+                case Pine2.eRunMode.Magazine:
+                    if (Run(RunUnload(Elevator.eMGZ.Down))) return p_sInfo;
+                    if (Run(RunUnload(Elevator.eMGZ.Up))) return p_sInfo;
+                    break;
+                case Pine2.eRunMode.Stack:
+                    if (Run(RunUnload(Elevator.eMGZ.Up))) return p_sInfo;
+                    break;
+            }
             p_eStep = eStep.Ready; 
-            return "OK"; //forget
+            return "OK"; 
+        }
+
+        string RunUnload(Elevator.eMGZ eMGZ)
+        {
+            if (m_elevator.IsProduct(eMGZ) == false) return "OK"; 
+            if (Run(m_elevator.RunAlign(true))) return p_sInfo;
+            if (Run(m_elevator.MoveConveyor(eMGZ))) return p_sInfo;
+            if (Run(m_elevator.RunAlign(false))) return p_sInfo;
+            m_conveyor.RunMove(Conveyor.eMove.Backward);
+            Thread.Sleep(1000);
+            if (Run(m_conveyor.WaitUnload())) return p_sInfo; 
+            return "OK";
         }
         #endregion
 
@@ -292,12 +395,14 @@ namespace Root_Pine2.Module
         }
         #endregion
 
+        int m_nID = 1;
         Pine2 m_pine2; 
-        public MGZ_EV(string id, IEngineer engineer, Pine2 pine2)
+        public MGZ_EV(string id, int nID, IEngineer engineer, Pine2 pine2)
         {
-            p_id = id;
+            m_nID = nID + 1;
+            p_id = id + m_nID.ToString();
             m_pine2 = pine2; 
-            base.InitBase(id, engineer);
+            base.InitBase(p_id, engineer);
         }
 
         public override void ThreadStop()
@@ -312,6 +417,7 @@ namespace Root_Pine2.Module
         {
             m_runLoad = AddModuleRunList(new Run_Load(this), false, "Load Magazine or Stack");
             m_runUnload = AddModuleRunList(new Run_Unload(this), false, "Unload Magazine or Stack");
+            AddModuleRunList(new Run_Align(this), false, "Run Align");
         }
 
         public class Run_Load : ModuleRunBase
@@ -361,6 +467,34 @@ namespace Root_Pine2.Module
             public override string Run()
             {
                 return m_module.RunUnload();
+            }
+        }
+
+        public class Run_Align : ModuleRunBase
+        {
+            MGZ_EV m_module;
+            public Run_Align(MGZ_EV module)
+            {
+                m_module = module;
+                InitModuleRun(module);
+            }
+
+            bool m_bAlign = false; 
+            public override ModuleRunBase Clone()
+            {
+                Run_Align run = new Run_Align(m_module);
+                run.m_bAlign = m_bAlign; 
+                return run;
+            }
+
+            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
+            {
+                m_bAlign = tree.Set(m_bAlign, m_bAlign, "Align", "Run Align", bVisible); 
+            }
+
+            public override string Run()
+            {
+                return m_module.m_elevator.RunAlign(m_bAlign); 
             }
         }
         #endregion

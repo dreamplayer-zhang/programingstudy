@@ -17,10 +17,7 @@ namespace Root_WIND2.UI_User
 		public OriginRecipe OriginRecipe
 		{
 			get => originRecipe;
-			set
-			{
-				SetProperty(ref originRecipe, value);
-			}
+			set => SetProperty(ref originRecipe, value);
 		}
 
 		private EdgeSurfaceRecipeBase recipe;

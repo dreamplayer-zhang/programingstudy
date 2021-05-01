@@ -282,7 +282,7 @@ namespace Root_WindII
                 WindII_Engineer engineer = GlobalObjects.Instance.Register<WindII_Engineer>();
                 //DialogService dialogService = GlobalObjects.Instance.Register<DialogService>(this);
                 //WIND2_Warning warning = GlobalObjects.Instance.Register<WIND2_Warning>();
-                engineer.Init("WIND2F#1");
+                engineer.Init("WIND2F");
 
                 MemoryTool memoryTool = engineer.ClassMemoryTool();
                 ImageData frontImage;
