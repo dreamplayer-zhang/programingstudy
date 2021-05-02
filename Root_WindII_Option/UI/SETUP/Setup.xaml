@@ -1,38 +1,38 @@
-﻿<Window x:Class="Root_WindII_Option.MainWindow"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:Root_WindII_Option"
-        xmlns:engineer="clr-namespace:Root_WindII_Option.Engineer"
-        mc:Ignorable="d"
-        Loaded="Window_Loaded"
-        Closing="Window_Closing"
-        Title="MainWindow" Height="450" Width="800">
-
-    <Window.Resources>
-        <!-- SelectMode -->
-        <ControlTemplate x:Key="selectmode">
-            <local:SelectMode />
-        </ControlTemplate>
-        <!-- Setup -->
-        <ControlTemplate x:Key="setup">
-            <local:Setup DataContext="{Binding SetupVM}"/>
-        </ControlTemplate>
-        <!-- Engineer -->
-        <!--<ControlTemplate x:Key="engineer">
-            <local:MaintenancePanel DataContext="{Binding MaintVM}"/>
-        </ControlTemplate>-->
-    </Window.Resources>
-
-    <Grid>
+﻿<UserControl x:Class="Root_WindII_Option.Setup"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Root_WindII_Option"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid Background="{StaticResource main_background}">
         <Grid.RowDefinitions>
-            <RowDefinition Height="28"/>
-            <RowDefinition Height="85*"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="15*"/>
+            <!--<RowDefinition Height="30"/>-->
+            <!--<RowDefinition Height="30"/>-->
+            <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        <Border Grid.Row="0"
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="215"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <!--<Button Grid.Row="0"
+                Grid.RowSpan="2"
+                BorderThickness="0"
+                Command="{Binding btnMode}"
+                Background="{StaticResource main_background}">
+            <Button.Content>
+                <TextBlock Text="WIND2" 
+                       VerticalAlignment="Center"
+                       HorizontalAlignment="Center"
+                       FontSize="32"
+                       FontStyle="Italic"
+                       FontWeight="Bold"
+                       Foreground="White"/>
+            </Button.Content>
+        </Button>-->
+        <!-- Menubar -->
+        <!--<Border Grid.Row="0"
                 Grid.Column="1"
                 Background="{StaticResource main_background}">
             <StackPanel Orientation="Horizontal">
@@ -95,6 +95,9 @@
                         <MenuItem Header="Loadport"  Foreground="Black">
 
                         </MenuItem>
+                        <MenuItem Header="Setting"  Foreground="Black">
+
+                        </MenuItem>
                     </MenuItem>
                     <MenuItem>
                         <MenuItem.Header>
@@ -121,6 +124,34 @@
                         <MenuItem.Header>
                             <Grid Width="100"
                                   Height="25">
+                                <TextBlock Text="Navigation"
+                                           FontSize="13"
+                                           FontWeight="Bold"
+                                           VerticalAlignment="Center"
+                                           HorizontalAlignment="Center" />
+                            </Grid>
+                        </MenuItem.Header>
+                        <MenuItem Header="Setup Home"  Foreground="Black"/>
+                        <MenuItem Header="Inspction"  Foreground="Black"/>
+                        <MenuItem Header="Recipe Wizard" Foreground="Black">
+                            <MenuItem Header="Recipe Summary"  Foreground="Black"/>
+                            <MenuItem Header="PreAlign"  Foreground="Black" />
+                            <MenuItem Header="FrontSide"  Foreground="Black">
+                                <MenuItem Header="Front Summary"  Foreground="Black" />
+                                <MenuItem Header="Alignment"  Foreground="Black" />
+                                <MenuItem Header="General"   Foreground="Black"/>
+                            </MenuItem>
+                            <MenuItem Header="BackSide"  Foreground="Black"/>
+                            <MenuItem Header="EBR"  Foreground="Black"/>
+                            <MenuItem Header="Edge" Foreground="Black" />
+                        </MenuItem>
+                        <MenuItem Header="Matienance"  Foreground="Black"/>
+                        <MenuItem Header="GEM"  Foreground="Black"/>
+                    </MenuItem>
+                    <MenuItem Command="{Binding btnMode}">
+                        <MenuItem.Header>
+                            <Grid Width="100"
+                                  Height="25">
                                 <TextBlock Text="Mode Select"
                                            FontSize="13"
                                            FontWeight="Bold"
@@ -128,11 +159,6 @@
                                            HorizontalAlignment="Center" />
                             </Grid>
                         </MenuItem.Header>
-                        <MenuItem Header="Main" x:Name="mode_main" IsCheckable="True" IsChecked="{Binding IsCheckModeMain, Mode=TwoWay}"  Foreground="Black"/>
-                        <MenuItem Header="Setup" x:Name="mode_setup" IsCheckable="True" IsChecked="{Binding IsCheckModeSetup, Mode=TwoWay}" Foreground="Black"/>
-                        <MenuItem Header="Review" x:Name="mode_review" IsCheckable="True" IsChecked="{Binding IsCheckModeReview}" Foreground="Black"/>
-                        <MenuItem Header="Operation" x:Name="mode_operation" IsCheckable="True" IsChecked="{Binding IsCheckModeOperation}" Foreground="Black"/>
-                        <MenuItem Header="Engineer" x:Name="mode_engineer" IsCheckable="True" IsChecked="{Binding IsCheckModeEngineer}" Foreground="Black"/>
                     </MenuItem>
                     <MenuItem Command="{Binding btnPopUpSetting}">
                         <MenuItem.Header>
@@ -148,42 +174,21 @@
                     </MenuItem>
                 </Menu>
             </StackPanel>
-        </Border>
-        <Grid Grid.Row="1">
-            <ContentControl Content="{Binding p_CurrentPanel}">
-                <ContentControl.Style>
-                    <Style TargetType="ContentControl">
-                        <Style.Triggers>
-                            <!--Main-->
-                            <DataTrigger Binding="{Binding ElementName=mode_main, Path=IsChecked}"
-                                         Value="true">
-                                <Setter Property="Template" Value="{StaticResource selectmode}"/>
-                            </DataTrigger>
-                            <!--Setup-->
-                            <DataTrigger Binding="{Binding ElementName=mode_setup, Path=IsChecked}"
-                                         Value="true">
-                                <Setter Property="Template" Value="{StaticResource setup}"/>
-                            </DataTrigger>
-                            <!--Setup-->
-                            <!--<DataTrigger Binding="{Binding ElementName=mode_review, Path=IsChecked}"
-                                         Value="true">
-                                <Setter Property="Template" Value="{StaticResource review}"/>
-                            </DataTrigger>-->
-                            <!-- Engineer -->
-                            <!--<DataTrigger Binding="{Binding ElementName=mode_engineer, Path=IsChecked}"
-                                         Value="true">
-                                <Setter Property="Template" Value="{StaticResource engineer}"/>
-                            </DataTrigger>-->
-                        </Style.Triggers>
-                    </Style>
-                </ContentControl.Style>
-            </ContentControl>
-        </Grid>
+        </Border>-->
+        <Border Grid.Row="1"
+                Grid.Column="1"
+                Background="{StaticResource main_background}">
 
-        <GridSplitter Grid.Row="2" 
-                      Height="5"
-                      HorizontalAlignment="Stretch"
-                      VerticalAlignment="Stretch"
-                      ShowsPreview="True"/>
+        </Border>
+        <!--Panel-->
+        <Border Grid.Row="2" 
+                Grid.Column="0" 
+                Grid.ColumnSpan="2"
+                Background="{StaticResource main_view_background}">
+            <Grid>
+                <ContentControl Content="{Binding p_CurrentPanel}" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"/>
+            </Grid>
+        </Border>
+        <!--End Panel-->
     </Grid>
-</Window>
+</UserControl>
