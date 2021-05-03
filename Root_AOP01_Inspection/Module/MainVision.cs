@@ -44,6 +44,12 @@ namespace Root_AOP01_Inspection.Module
 {
     public class MainVision : ModuleBase, IWTRChild
     {
+        public enum PatternEdge
+		{
+            Center,
+            Left,
+            Right,
+		}
         public Dispatcher dispatcher;   // RecipeLADS_ViewModel 페이지에서 LADS Heatmap 바인딩을 하려면 Dispatcher 필요
         ALID m_alid_WaferExist;
         public void SetAlarm()
@@ -477,7 +483,7 @@ namespace Root_AOP01_Inspection.Module
             }
         }
 
-		internal void SetRectInfo(ObservableCollection<TRect> rectList, string mainModuleName)
+		internal void SetRectInfo(ObservableCollection<TRect> rectList, string mainModuleName, PatternEdge edge = PatternEdge.Center)
 		{
 			//TODO 여기서 직접 가져와서 수정하자!
 			var targetidx = -1;
@@ -494,9 +500,27 @@ namespace Root_AOP01_Inspection.Module
 				return;
 			}
 
-			for (int i = 0; i < ((Run_SurfaceInspection)m_aModuleRun[targetidx]).EdgeList.Length; i++)
+			switch (edge)
 			{
-				((Run_SurfaceInspection)m_aModuleRun[targetidx]).EdgeList[i] = new TRect(rectList[i]);
+				case PatternEdge.Left:
+                    for (int i = 0; i < ((Run_SurfaceInspection)m_aModuleRun[targetidx]).EdgeList.Length; i++)
+                    {
+                        ((Run_SurfaceInspection)m_aModuleRun[targetidx]).EdgeListLeftSide[i] = new TRect(rectList[i]);
+                    }
+                    break;
+				case PatternEdge.Right:
+                    for (int i = 0; i < ((Run_SurfaceInspection)m_aModuleRun[targetidx]).EdgeList.Length; i++)
+                    {
+                        ((Run_SurfaceInspection)m_aModuleRun[targetidx]).EdgeListRightSide[i] = new TRect(rectList[i]);
+                    }
+                    break;
+                case PatternEdge.Center:
+                default:
+                    for (int i = 0; i < ((Run_SurfaceInspection)m_aModuleRun[targetidx]).EdgeList.Length; i++)
+                    {
+                        ((Run_SurfaceInspection)m_aModuleRun[targetidx]).EdgeList[i] = new TRect(rectList[i]);
+                    }
+                    break;
 			}
 			((Run_SurfaceInspection)m_aModuleRun[targetidx]).UpdeteTree();
 		}
