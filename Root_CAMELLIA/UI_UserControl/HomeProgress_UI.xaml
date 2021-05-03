@@ -12,7 +12,7 @@
         Topmost="True"
         Height="650" 
         Closing="Window_Closing"
-        Width="800">
+        Width="800" BorderBrush="Black" BorderThickness="1">
     <Window.Resources>
         <LinearGradientBrush x:Key="ProgressBarBorderBrush"
                      EndPoint="0,1"
@@ -179,9 +179,9 @@
                                     <Rectangle x:Name="Indicator"
                                        Fill="{TemplateBinding Foreground}"/>
                                     <Grid x:Name="Animation" ClipToBounds="true">
-                                        <Rectangle x:Name="PART_GlowRect" Width="100" 
+                                        <Rectangle x:Name="PART_GlowRect" Width="300" 
                                             Fill="{StaticResource ProgressBarIndicatorAnimatedFill}"
-                                            Margin="-100,0,0,0"
+                                            Margin="-300,0,0,0"
                                             HorizontalAlignment="Left">
                                         </Rectangle>
                                     </Grid>
@@ -359,7 +359,6 @@
             <RowDefinition/>
             <RowDefinition/>
         </Grid.RowDefinitions>
-        
         <Grid Grid.Row="0"
               Background="#FFDDDDDD"
               MouseLeftButtonDown="Grid_MouseLeftButtonDown">
@@ -413,7 +412,7 @@
                 <RowDefinition Height="6*"/>
             </Grid.RowDefinitions>
             <TextBlock Grid.Row="0"
-                       Text="WTR Home Progress"
+                       Text="WTR"
                        VerticalAlignment="Center"
                        HorizontalAlignment="Left"
                        FontSize="20"
@@ -426,9 +425,14 @@
                 </Grid.ColumnDefinitions>-->
                 <ProgressBar Grid.Column="0"
                              Margin="15,0,15,10"
-                             x:Name="progressWTR" Style="{StaticResource CustomProgress}"/>
-                <TextBlock Grid.Column="1"
+                             x:Name="progressWTR" Style="{StaticResource CustomProgress}" IsIndeterminate="True"/>
+                <!--<TextBlock Grid.Column="1"
                            Text="{Binding ElementName=progressWTR, Path=Value, StringFormat={}{0:0}%}"
+                           VerticalAlignment="Center"
+                           HorizontalAlignment="Center"
+                           FontSize="20"
+                           Margin="-10,0,0,10"/>-->
+                <TextBlock x:Name="strProgressWTR" Grid.Column="1"
                            VerticalAlignment="Center"
                            HorizontalAlignment="Center"
                            FontSize="20"
@@ -441,7 +445,7 @@
                 <RowDefinition Height="6*"/>
             </Grid.RowDefinitions>
             <TextBlock Grid.Row="0"
-                       Text="Loadport1 Home Progress"
+                       Text="Loadport1"
                        VerticalAlignment="Center"
                        HorizontalAlignment="Left"
                        FontSize="20"
@@ -454,9 +458,14 @@
                 </Grid.ColumnDefinitions>-->
                 <ProgressBar Grid.Column="0"
                              Margin="15,0,15,10"
-                             x:Name="progressLP1" Style="{StaticResource CustomProgress}"/>
-                <TextBlock Grid.Column="1"
+                             x:Name="progressLP1" Style="{StaticResource CustomProgress}" IsIndeterminate="True"/>
+                <!--<TextBlock Grid.Column="1"
                            Text="{Binding ElementName=progressLP1, Path=Value, StringFormat={}{0:0}%}"
+                           VerticalAlignment="Center"
+                           HorizontalAlignment="Center"
+                           FontSize="20"
+                           Margin="-10,0,0,10"/>-->
+                <TextBlock Grid.Column="1" x:Name="strProgressLP1"
                            VerticalAlignment="Center"
                            HorizontalAlignment="Center"
                            FontSize="20"
@@ -469,7 +478,7 @@
                 <RowDefinition Height="6*"/>
             </Grid.RowDefinitions>
             <TextBlock Grid.Row="0"
-                       Text="Loadport2 Home Progress"
+                       Text="Loadport2"
                        VerticalAlignment="Center"
                        HorizontalAlignment="Left"
                        FontSize="20"
@@ -482,9 +491,14 @@
                 </Grid.ColumnDefinitions>-->
                 <ProgressBar Grid.Column="0"
                              Margin="15,0,15,10"
-                             x:Name="progressLP2" Style="{StaticResource CustomProgress}"/>
-                <TextBlock Grid.Column="1"
+                             x:Name="progressLP2" Style="{StaticResource CustomProgress}"  IsIndeterminate="True"/>
+                <!--<TextBlock Grid.Column="1"
                            Text="{Binding ElementName=progressLP2, Path=Value, StringFormat={}{0:0}%}"
+                           VerticalAlignment="Center"
+                           HorizontalAlignment="Center"
+                           FontSize="20"
+                           Margin="-10,0,0,10"/>-->
+                <TextBlock Grid.Column="1" x:Name="strProgressLP2"
                            VerticalAlignment="Center"
                            HorizontalAlignment="Center"
                            FontSize="20"
@@ -497,7 +511,7 @@
                 <RowDefinition Height="6*"/>
             </Grid.RowDefinitions>
             <TextBlock Grid.Row="0"
-                       Text="Aligner Home Progress"
+                       Text="Aligner"
                        VerticalAlignment="Center"
                        HorizontalAlignment="Left"
                        FontSize="20"
@@ -510,9 +524,14 @@
                 </Grid.ColumnDefinitions>-->
                 <ProgressBar Grid.Column="0"
                              Margin="15,0,15,10"
-                             x:Name="progressAL" Style="{StaticResource CustomProgress}"/>
-                <TextBlock Grid.Column="1"
+                             x:Name="progressAL" Style="{StaticResource CustomProgress}"  IsIndeterminate="True"/>
+                <!--<TextBlock Grid.Column="1"
                            Text="{Binding ElementName=progressAL, Path=Value, StringFormat={}{0:0}%}"
+                           VerticalAlignment="Center"
+                           HorizontalAlignment="Center"
+                           FontSize="20"
+                           Margin="-10,0,0,10"/>-->
+                <TextBlock Grid.Column="1" x:Name="strProgressAL"
                            VerticalAlignment="Center"
                            HorizontalAlignment="Center"
                            FontSize="20"
@@ -525,7 +544,7 @@
                 <RowDefinition Height="6*"/>
             </Grid.RowDefinitions>
             <TextBlock Grid.Row="0"
-                       Text="Vision Home Progress"
+                       Text="Vision"
                        VerticalAlignment="Center"
                        HorizontalAlignment="Left"
                        FontSize="20"
@@ -538,9 +557,14 @@
                 </Grid.ColumnDefinitions>-->
                 <ProgressBar Grid.Column="0"
                              Margin="15,0,15,10"
-                             x:Name="progressVS" Style="{StaticResource CustomProgress}"/>
-                <TextBlock Grid.Column="1"
+                             x:Name="progressVS" Style="{StaticResource CustomProgress}"  IsIndeterminate="True"/>
+                <!--<TextBlock Grid.Column="1"
                            Text="{Binding ElementName=progressVS, Path=Value, StringFormat={}{0:0}%}"
+                           VerticalAlignment="Center"
+                           HorizontalAlignment="Center"
+                           FontSize="20"
+                           Margin="-10,0,0,10"/>-->
+                <TextBlock Grid.Column="1" x:Name="strProgressVS"
                            VerticalAlignment="Center"
                            HorizontalAlignment="Center"
                            FontSize="20"

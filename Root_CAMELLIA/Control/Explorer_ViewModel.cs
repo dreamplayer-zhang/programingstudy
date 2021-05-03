@@ -221,7 +221,8 @@ namespace Root_CAMELLIA
             }
             catch(Exception ex)
             {
-                System.Windows.Forms.MessageBox.Show(ex.Message);
+                //System.Windows.Forms.MessageBox.Show(ex.Message);
+                CustomMessageBox.Show(ex.Message);
             }
             
         }
@@ -249,7 +250,8 @@ namespace Root_CAMELLIA
                 }
             }catch(Exception ex)
             {
-                System.Windows.Forms.MessageBox.Show(ex.Message);
+                //System.Windows.Forms.MessageBox.Show(ex.Message);
+                CustomMessageBox.Show(ex.Message);
             }
 
         }

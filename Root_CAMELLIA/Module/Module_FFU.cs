@@ -46,8 +46,8 @@ namespace Root_CAMELLIA.Module
 					{
                         if (_nRPM == value) return;
 
-                        m_alidSetted_RPMLow.Run(m_mmLimit.X > _nRPM, "FFU RPM Lower than Low Limit.");
-                        m_alidSetted_RPMHigh.Run(m_mmLimit.Y < _nRPM, "FFU RPM Higher than High Limit.");
+                        m_alidSetted_RPMLow.Run(m_mmLimit.X > _nRPM, p_sFan + " FFU RPM Lower than Low Limit.");
+                        m_alidSetted_RPMHigh.Run(m_mmLimit.Y < _nRPM, p_sFan + " FFU RPM Higher than High Limit.");
 
                         _nRPM = value;
                         OnPropertyChanged();
@@ -62,8 +62,8 @@ namespace Root_CAMELLIA.Module
 					{
 						if (_fPressure == value) return;
 
-						m_alidSetted_PreLow.Run(m_mmPressureLimit.X > _fPressure, "FFU Pressure Lower than Low Limit.");
-						m_alidSetted_PreHigh.Run(m_mmPressureLimit.Y < _fPressure, "FFU Pressure Higher than High Limit.");
+						m_alidSetted_PreLow.Run(m_mmPressureLimit.X > _fPressure, p_sFan + " FFU Pressure Lower than Low Limit.");
+						m_alidSetted_PreHigh.Run(m_mmPressureLimit.Y < _fPressure, p_sFan + " FFU Pressure Higher than High Limit.");
 
 						_fPressure = value;
 						OnPropertyChanged();
@@ -374,8 +374,8 @@ namespace Root_CAMELLIA.Module
 					set
 					{
 						if (_nTemp == value) return;
-						m_alidTempLow.Run(m_mmLimit.X > _nTemp, "FFU Temp Lower than Low Limit.");
-						m_alidTempHigh.Run(m_mmLimit.Y < _nTemp, "FFU Temp Higher than High Limit.");
+						m_alidTempLow.Run(m_mmLimit.X > _nTemp, p_sTemp + " FFU Temp Lower than Low Limit.");
+						m_alidTempHigh.Run(m_mmLimit.Y < _nTemp, p_sTemp + " FFU Temp Higher than High Limit.");
 						_nTemp = value;
 						OnPropertyChanged();
 					}
@@ -427,8 +427,8 @@ namespace Root_CAMELLIA.Module
 					set
 					{
 						if (_nHumidity == value) return;
-						m_alidHumidityLow.Run(m_mmLimit.X > _nHumidity, "FFU Humidity Lower than Low Limit.");
-						m_alidHumidityHigh.Run(m_mmLimit.Y < _nHumidity, "FFU Humidity Higher than High Limit.");
+						m_alidHumidityLow.Run(m_mmLimit.X > _nHumidity, p_sHumidity + " FFU Humidity Lower than Low Limit.");
+						m_alidHumidityHigh.Run(m_mmLimit.Y < _nHumidity, p_sHumidity + " FFU Humidity Higher than High Limit.");
 						_nHumidity = value;
 						OnPropertyChanged();
 					}

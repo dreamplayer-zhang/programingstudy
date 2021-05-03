@@ -3,24 +3,48 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:Root_CAMELLIA.UI_UserControl"
+             xmlns:local="clr-namespace:Root_CAMELLIA"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="700" Background="WhiteSmoke">
+             d:DesignHeight="450" d:DesignWidth="700">
+    <UserControl.Resources>
+        <local:EnumToStringConverter x:Key="EnumConverter"/>
+        <local:BoolToDIBrushConverter x:Key="DIBrushConverter"/>
+    </UserControl.Resources>
     <Grid>
-        <GroupBox Header="{Binding p_id}">
+        <Border>
+            <Border BorderThickness="1" BorderBrush="White" Margin="3" CornerRadius="5">
+                <Border.Effect>
+                    <DropShadowEffect ShadowDepth="2" Opacity="0.5"/>
+                </Border.Effect>
+            </Border>
+        </Border>
+        <GroupBox Header="{Binding p_id}" Background="White" Margin="5" BorderThickness="0">
+            <GroupBox.HeaderTemplate>
+                <DataTemplate>
+                    <Grid>
+                        <Border CornerRadius="2" Background="White" Width="70" Height="auto">
+                        </Border>
+                        <TextBlock Text="{Binding}" FontWeight="Bold" TextAlignment="Center"/>
+                    </Grid>
+                </DataTemplate>
+            </GroupBox.HeaderTemplate>
+            <!--<GroupBox.Effect>
+                <DropShadowEffect ShadowDepth="1" Color="Black" Opacity="0.5"/>
+            </GroupBox.Effect>-->
             <Grid Grid.Row="0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition/>
                     <ColumnDefinition/>
                 </Grid.ColumnDefinitions>
                 <Grid Grid.Column="0">
-                    <GroupBox Header="Slot">
-                        <DataGrid x:Name="datagridSlot" Background="White">
+                    <GroupBox Header="Slot" BorderThickness="0">
+                        <DataGrid ItemsSource="{Binding p_waferList}" Background="White" AutoGenerateColumns="False" CanUserAddRows="False" CanUserSortColumns="True" EnableColumnVirtualization="True"  CanUserDeleteRows="False"
+                                  EnableRowVirtualization="True" ScrollViewer.CanContentScroll="True" SelectionMode="Single" IsReadOnly="True" VirtualizingStackPanel.VirtualizationMode ="Recycling" IsHitTestVisible="True" ClipToBounds="True">
                             <DataGrid.Columns>
-                                <DataGridTextColumn Header="No" Width="1*"/>
-                                <DataGridTextColumn Header="Wafer ID" Width="3.5*"/>
-                                <DataGridTextColumn Header="Recipe ID" Width="3.5*"/>
-                                <DataGridTextColumn Header="State" Width="2*"/>
+                                <DataGridTextColumn Header="No" Binding="{Binding p_Index}" Width="1*"/>
+                                <DataGridTextColumn Header="Wafer ID" Binding="{Binding p_waferId}" Width="3.5*"/>
+                                <DataGridTextColumn Header="Recipe ID" Binding="{Binding p_recipeID}" Width="3.5*"/>
+                                <DataGridTextColumn Header="State" Binding="{Binding p_state}" Width="2*"/>
                             </DataGrid.Columns>
                         </DataGrid>
                     </GroupBox>
@@ -29,82 +53,65 @@
                     <Grid.RowDefinitions>
                         <RowDefinition Height="3*"/>
                         <RowDefinition Height="2*"/>
-                        <RowDefinition Height="1.5*"/>
-                        <RowDefinition Height="3.5*"/>
+                        <RowDefinition Height="0.8*"/>
+                        <RowDefinition Height="3*"/>
                     </Grid.RowDefinitions>
-                    <GroupBox Grid.Row="0" Header="Information">
+                    <GroupBox Grid.Row="0" Header="Information" BorderThickness="0">
                         <UniformGrid Columns="2" Margin="0,1">
-                            <Border BorderBrush="Gray" BorderThickness="1">
-                                <TextBlock Text="Carrier ID" VerticalAlignment="Center" Margin="10,0"/>
+                            <TextBlock Text="Carrier ID" VerticalAlignment="Center" Margin="10,0"/>
+                            <Border  Background="#eeeeee" BorderThickness="1,1,1,0" CornerRadius="5" Margin="1">
+                                <TextBlock Text="{Binding p_infoCarrier.p_sCarrierID}" VerticalAlignment="Center" TextAlignment="Center"/>
                             </Border>
-                            <Border BorderBrush="Gray" BorderThickness="1">
-                                <TextBlock Text="{Binding p_sCarrierID}" VerticalAlignment="Center" Margin="10,0"/>
+                            <TextBlock Text="Lot ID" VerticalAlignment="Center" Margin="10,0"/>
+                            <Border Background="#eeeeee" BorderThickness="1,1,1,0" CornerRadius="5" Margin="1">
+                                <TextBlock Text="{Binding p_infoCarrier.p_sLotID}" VerticalAlignment="Center" TextAlignment="Center"/>
                             </Border>
-                            <Border BorderBrush="Gray" BorderThickness="1">
-                                <TextBlock Text="Lot ID" VerticalAlignment="Center" Margin="10,0"/>
+                            <TextBlock Text="Recipe ID" VerticalAlignment="Center" Margin="10,0"/>
+                            <Border Background="#eeeeee" BorderThickness="1,1,1,0" CornerRadius="5" Margin="1">
+                                <TextBlock Text="{Binding p_infoCarrier.p_sRecipeID}" VerticalAlignment="Center" TextAlignment="Center"/>
                             </Border>
-                            <Border BorderBrush="Gray" BorderThickness="1">
-                                <TextBlock Text="{Binding p_sLotID}" VerticalAlignment="Center" Margin="10,0"/>
-                            </Border>
-                            <Border BorderBrush="Gray" BorderThickness="1">
-                                <TextBlock Text="Recipe ID" VerticalAlignment="Center" Margin="10,0"/>
-                            </Border>
-                            <Border BorderBrush="Gray" BorderThickness="1">
-                                <TextBlock Text="{Binding p_sRecipeID}" VerticalAlignment="Center" Margin="10,0"/>
-                            </Border>
-                            <Border BorderBrush="Gray" BorderThickness="1">
-                                <TextBlock Text="Loadport State" VerticalAlignment="Center" Margin="10,0"/>
-                            </Border>
-                            <Border BorderBrush="Gray" BorderThickness="1">
-                                <TextBlock Text="{Binding p_sState}" VerticalAlignment="Center" Margin="10,0"/>
+                            <TextBlock Text="Loadport State" VerticalAlignment="Center" Margin="10,0"/>
+                            <Border Background="#eeeeee" BorderThickness="1" CornerRadius="5" Margin="1">
+                                <TextBlock Text="{Binding p_infoCarrier.p_eState, Converter={StaticResource EnumConverter}}" VerticalAlignment="Center" TextAlignment="Center"/>
                             </Border>
                         </UniformGrid>
                     </GroupBox>
-                    <GroupBox Grid.Row="1" Header="State">
+                    <GroupBox Grid.Row="1" Header="State" BorderThickness="0">
                         <Border BorderBrush="Gray" BorderThickness="1">
                             <UniformGrid Columns="4" Rows="2">
-                                <Border>
+                                <Border CornerRadius="10" Margin="1">
                                     <TextBlock Text="Auto" VerticalAlignment="Center" HorizontalAlignment="Center"/>
                                 </Border>
-                                <Border Background="SeaGreen">
+                                <Border CornerRadius="10"  Background="SeaGreen"  Margin="1">
                                     <TextBlock Text="Manual" VerticalAlignment="Center" HorizontalAlignment="Center"/>
                                 </Border>
-                                <Border>
+                                <Border CornerRadius="10"  Margin="1" Background="{Binding m_loadport.m_diPlaced.p_bIn, Converter={StaticResource DIBrushConverter}}">
                                     <TextBlock Text="Placed" VerticalAlignment="Center" HorizontalAlignment="Center"/>
                                 </Border>
-                                <Border>
+                                <Border CornerRadius="10"  Margin="1" Background="{Binding m_loadport.m_diPresent.p_bIn, Converter={StaticResource DIBrushConverter}}">
                                     <TextBlock Text="Present" VerticalAlignment="Center" HorizontalAlignment="Center"/>
                                 </Border>
-                                <Border>
+                                <Border CornerRadius="10"  Margin="1" Background="{Binding m_loadport.m_diLoad.p_bIn, Converter={StaticResource DIBrushConverter}}">
                                     <TextBlock Text="Load" VerticalAlignment="Center" HorizontalAlignment="Center"/>
                                 </Border>
-                                <Border>
+                                <Border CornerRadius="10"  Margin="1" Background="{Binding m_loadport.m_diUnload.p_bIn, Converter={StaticResource DIBrushConverter}}">
                                     <TextBlock Text="Unload" VerticalAlignment="Center" HorizontalAlignment="Center"/>
                                 </Border>
-                                <Border>
+                                <Border CornerRadius="10"  Margin="1">
                                     <TextBlock Text="Reserve" VerticalAlignment="Center" HorizontalAlignment="Center"/>
                                 </Border>
-                                <Border Background="Crimson">
+                                <Border CornerRadius="10"  Background="Transparent"  Margin="1">
                                     <TextBlock Text="Alarm" VerticalAlignment="Center" HorizontalAlignment="Center"/>
                                 </Border>
                             </UniformGrid>
                         </Border>
                     </GroupBox>
-                    <GroupBox Grid.Row="2" Header="Progress">
-                        <Grid>
-                            <Grid.RowDefinitions>
-                                <RowDefinition/>
-                                <RowDefinition Height="1.5*"/>
-                            </Grid.RowDefinitions>
-                            <Grid Grid.Row="0">
-                                <TextBlock Text="0%" VerticalAlignment="Bottom" Margin="10,0"/>
-                                <TextBlock Text="0 / 0" VerticalAlignment="Bottom" Margin="10,0" HorizontalAlignment="Right"/>
-                            </Grid>
-                            <Grid Grid.Row="1">
-                                <ProgressBar/>
-                            </Grid>
-                        </Grid>
-                    </GroupBox>
+                    <Grid Grid.Row="2" Margin="5,0,5,3">
+                            <ProgressBar Style="{StaticResource CustomProgress}"/>
+                            <TextBlock Text="0%" VerticalAlignment="Center" Margin="10,0"/>
+                            <TextBlock Text="0 / 0" VerticalAlignment="Center" Margin="10,0" HorizontalAlignment="Right"/>
+                     </Grid>
+
                     <Grid Grid.Row="3">
                         <Grid.RowDefinitions>
                             <RowDefinition/>
@@ -118,10 +125,10 @@
                                 <ColumnDefinition/>
                             </Grid.ColumnDefinitions>
                             <Grid Grid.Column="0">
-                                <Button Content="Manual" Style="{StaticResource SetupPanelBtn}"   Margin="3"/>
+                                <Button Content="Manual" Style="{StaticResource customButton}" FontSize="15" Margin="3" FontWeight="Bold"/>
                             </Grid>
                             <Grid Grid.Column="1">
-                                <Button Content="Auto" Style="{StaticResource SetupPanelBtn}"   Margin="3"/>
+                                <Button Content="Auto" Style="{StaticResource customButton}"  FontSize="15" Margin="3" FontWeight="Bold"/>
                             </Grid>
                         </Grid>
                         <Grid Grid.Row="1">
@@ -130,23 +137,21 @@
                                 <ColumnDefinition/>
                             </Grid.ColumnDefinitions>
                             <Grid Grid.Column="0">
-                                <Button Content="In Service" Style="{StaticResource SetupPanelBtn}"   Margin="3"/>
+                                <Button Content="In Service" Style="{StaticResource customButton}"  FontSize="15"  Margin="3" FontWeight="Bold"/>
                             </Grid>
                             <Grid Grid.Column="1">
-                                <Button Content="Out Of Service" Style="{StaticResource SetupPanelBtn}"   Margin="3"/>
+                                <Button Content="Out Of Service" Style="{StaticResource customButton}"   FontSize="15"  Margin="3" FontWeight="Bold"/>
                             </Grid>
                         </Grid>
                         <Grid Grid.Row="2">
                             <Button x:Name="buttonLoad" Content="Load" 
-                                    Style="{StaticResource SetupPanelBtn}"   
-                                    Margin="3"
-                                    Click="buttonLoad_Click"/>
+                                    Style="{StaticResource customButton}" IsEnabled="{Binding p_isEnableLoad, UpdateSourceTrigger=PropertyChanged}"
+                                    Margin="3"  FontSize="15" FontWeight="Bold" Command="{Binding CmdLoadClick}"/>
                         </Grid>
                         <Button x:Name="buttonUnloadReq" 
-                                Content="Unload Request" 
-                                Style="{StaticResource SetupPanelBtn}"  
-                                Margin="2" Grid.Row="4"
-                                Click="buttonUnloadReq_Click"/>
+                                Content="Unload Request" IsEnabled="{Binding p_isEnableUnload, UpdateSourceTrigger=PropertyChanged}"
+                                Style="{StaticResource customButton}" FontSize="15" 
+                                Margin="2" Grid.Row="4" FontWeight="Bold" Command="{Binding CmdUnloadClick}"/>
                     </Grid>
                 </Grid>
             </Grid>
