@@ -213,6 +213,7 @@
     <Compile Include="UI\2. REVIEW\Review_Panel.xaml.cs">
       <DependentUpon>Review_Panel.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UI\3. RUN\Dlg_RunStepViewModel.cs" />
     <Compile Include="UI\3. RUN\Run_ViewModel.cs" />
     <Compile Include="UI\1. SETUP\1. Home\Home_ViewModel.cs" />
     <Compile Include="MVVM\ObservableObject.cs" />
