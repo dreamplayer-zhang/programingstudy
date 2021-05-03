@@ -8,15 +8,15 @@
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid Background="{StaticResource main_background}">
         <Grid.RowDefinitions>
-            <RowDefinition Height="30"/>
-            <RowDefinition Height="30"/>
+            <!--<RowDefinition Height="30"/>-->
+            <!--<RowDefinition Height="30"/>-->
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="215"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
-        <Button Grid.Row="0"
+        <!--<Button Grid.Row="0"
                 Grid.RowSpan="2"
                 BorderThickness="0"
                 Command="{Binding btnMode}"
@@ -30,9 +30,9 @@
                        FontWeight="Bold"
                        Foreground="White"/>
             </Button.Content>
-        </Button>
+        </Button>-->
         <!-- Menubar -->
-        <Border Grid.Row="0"
+        <!--<Border Grid.Row="0"
                 Grid.Column="1"
                 Background="{StaticResource main_background}">
             <StackPanel Orientation="Horizontal">
@@ -174,7 +174,7 @@
                     </MenuItem>
                 </Menu>
             </StackPanel>
-        </Border>
+        </Border>-->
         <Border Grid.Row="1"
                 Grid.Column="1"
                 Background="{StaticResource main_background}">

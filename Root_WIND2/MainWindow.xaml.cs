@@ -44,7 +44,7 @@ namespace Root_WIND2
         {
             Init();
 
-            MessageBox.Show("DDD");
+            //MessageBox.Show("DDD");
         }
 
         private void Window_Closing(object sender, CancelEventArgs e)

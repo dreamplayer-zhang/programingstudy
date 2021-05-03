@@ -359,7 +359,7 @@ namespace Root_VEGA_P.Module
             DIO_Os m_doLED;
             public void GetTools(ToolBox toolBox, Loadport module)
             {
-                module.p_sInfo = toolBox.GetDIO(ref m_doLED, module, p_id, Enum.GetNames(typeof(eLED)));
+                module.p_sInfo = toolBox.GetDIO(ref m_doLED, module, p_id, Enum.GetNames(typeof(eLED)), false);
             }
 
             public void RunLED(eLED eLED, bool bOn)

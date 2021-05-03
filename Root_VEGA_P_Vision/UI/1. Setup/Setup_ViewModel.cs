@@ -16,8 +16,6 @@ namespace Root_VEGA_P_Vision
 {
     public class Setup_ViewModel : ObservableObject, IDisposable
     {
-        #region Property
-        private UserControl m_CurrentPanel;
         public UserControl p_CurrentPanel
         {
             get
@@ -29,8 +27,8 @@ namespace Root_VEGA_P_Vision
                 SetProperty(ref m_CurrentPanel, value);
             }
         }
+        private UserControl m_CurrentPanel;
 
-        private ObservableCollection<UIElement> m_NaviButtons = new ObservableCollection<UIElement>();
         public ObservableCollection<UIElement> p_NaviButtons
         {
             get
@@ -42,12 +40,14 @@ namespace Root_VEGA_P_Vision
                 SetProperty(ref m_NaviButtons, value);
             }
         }
-        #endregion
+        private ObservableCollection<UIElement> m_NaviButtons = new ObservableCollection<UIElement>();
 
         private Home_ViewModel homeVM;
         private RecipeManager_ViewModel recipeManagerVM;
         public Maintenance_ViewModel maintVM;
         private RecipeSetting_ViewModel recipeSettingVM;
+        public RecipeWizard_VM recipeVM;
+
         public Setup_ViewModel()
         {
             init();
@@ -66,6 +66,7 @@ namespace Root_VEGA_P_Vision
             recipeManagerVM = new RecipeManager_ViewModel(this);
             recipeSettingVM = recipeManagerVM.recipeSettingVM;
             maintVM = new Maintenance_ViewModel(this);
+            recipeVM = new RecipeWizard_VM(this);
         }
         private void InitAllNaviBtn()
         {
@@ -210,12 +211,17 @@ namespace Root_VEGA_P_Vision
         {
             p_CurrentPanel = recipeSettingVM.Main;
             p_CurrentPanel.DataContext = recipeSettingVM;
+            homeVM.SetPage(recipeVM.RecipeWizard_UI);
+            recipeVM.RecipeWizard_UI.DataContext = recipeVM;
+            //p_CurrentPanel = recipeVM.RecipeWizard_UI;
+            //p_CurrentPanel.DataContext = recipeVM;
         }
         public void SetMaintenance()
         {
             p_NaviButtons.Clear();
             p_NaviButtons.Add(m_btnNaviMaintenance);
 
+            p_CurrentPanel =
             p_CurrentPanel = maintVM.Main;
             p_CurrentPanel.DataContext = maintVM;
         }
