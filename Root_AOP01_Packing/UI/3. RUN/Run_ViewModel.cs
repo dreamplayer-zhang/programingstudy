@@ -470,6 +470,28 @@ namespace Root_AOP01_Packing
                 });
             }
         }
+
+        public ICommand cmdRunStep
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    Nullable<bool> result = m_Mainwindow.dialogService.ShowDialog(m_Mainwindow.m_Dlg_RunStepViewModel);
+                    if (result.HasValue)
+                    {
+                        if (result.Value)
+                        {
+
+                        }
+                        else
+                        {
+
+                        }
+                    }
+                });
+            }
+        }
         private void BgwWaitInit_DoWork(object sender, DoWorkEventArgs e)
         {
             while (true)
