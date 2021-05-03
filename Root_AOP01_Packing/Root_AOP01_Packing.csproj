@@ -73,6 +73,10 @@
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="EasyModbus, Version=5.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Lib\EasyModbus.dll</HintPath>
+    </Reference>
     <Reference Include="MahApps.Metro.IconPacks, Version=4.0.0.0, Culture=neutral, PublicKeyToken=0c0d510f9915137a, processorArchitecture=MSIL">
       <HintPath>..\packages\MahApps.Metro.IconPacks.4.8.0\lib\net47\MahApps.Metro.IconPacks.dll</HintPath>
     </Reference>
@@ -192,6 +196,10 @@
     <Compile Include="Control\UserControl\LoadingControl.xaml.cs">
       <DependentUpon>LoadingControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Module\FFU.cs" />
+    <Compile Include="Module\FFU_Fan_UI.xaml.cs">
+      <DependentUpon>FFU_Fan_UI.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI\3. RUN\Dlg_RunStep.xaml.cs">
       <DependentUpon>Dlg_RunStep.xaml</DependentUpon>
     </Compile>
@@ -213,6 +221,7 @@
     <Compile Include="UI\2. REVIEW\Review_Panel.xaml.cs">
       <DependentUpon>Review_Panel.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UI\3. RUN\Dlg_RunStepViewModel.cs" />
     <Compile Include="UI\3. RUN\Run_ViewModel.cs" />
     <Compile Include="UI\1. SETUP\1. Home\Home_ViewModel.cs" />
     <Compile Include="MVVM\ObservableObject.cs" />
@@ -241,6 +250,10 @@
       <DependentUpon>Setup_Panel.xaml</DependentUpon>
     </Compile>
     <Compile Include="Module\Vision_AOP.cs" />
+    <Page Include="Module\FFU_Fan_UI.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="UI\3. RUN\Dlg_RunStep.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

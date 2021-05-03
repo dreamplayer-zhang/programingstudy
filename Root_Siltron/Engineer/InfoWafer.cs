@@ -71,8 +71,8 @@ namespace Root_Siltron
 
         void RunTreeWaferInfo(Tree tree)
         {
-            _eSize = (eWaferSize)tree.Set(p_eSize, p_eSize, "Size", "WaferSize");
-            _umThickness = tree.Set(p_umThickness, p_umThickness, "Thickness", "Wafer Thickness (um)");
+            p_eSize = (eWaferSize)tree.Set(p_eSize, p_eSize, "Size", "WaferSize");
+            p_umThickness = tree.Set(p_umThickness, p_umThickness, "Thickness", "Wafer Thickness (um)");
         }
         #endregion
 
@@ -94,7 +94,7 @@ namespace Root_Siltron
         protected override void RunTreeProperty(Tree tree)
         {
             base.RunTreeProperty(tree);
-            _sFrameID = tree.Set(p_sFrameID, p_sFrameID, "Frame", "Frame ID");
+            p_sFrameID = tree.Set(p_sFrameID, p_sFrameID, "Frame", "Frame ID");
             m_degNotch = tree.Set(m_degNotch, m_degNotch, "Notch Degree", "Notch Degree (Deg)", true, true); 
         }
         #endregion

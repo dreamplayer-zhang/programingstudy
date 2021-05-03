@@ -217,17 +217,17 @@ namespace RootTools.Gem
         #endregion
 
         #region Registry
-        TreeRoot m_treeRoot; 
-        public void RegWrite()
+        TreeRoot m_treeRootForRegistry; 
+        protected void RegWrite()
         {
-            m_treeRoot.p_eMode = Tree.eMode.RegWrite;
-            RunTree(m_treeRoot); 
+            m_treeRootForRegistry.p_eMode = Tree.eMode.RegWrite;
+            RunTree(m_treeRootForRegistry); 
         }
 
-        public void RegRead()
+        protected void RegRead()
         {
-            m_treeRoot.p_eMode = Tree.eMode.RegRead;
-            RunTree(m_treeRoot); 
+            m_treeRootForRegistry.p_eMode = Tree.eMode.RegRead;
+            RunTree(m_treeRootForRegistry); 
         }
         #endregion
 
@@ -240,7 +240,8 @@ namespace RootTools.Gem
             m_engineer = engineer;
             m_log = LogView.GetLog(id, "InfoSlot");
             m_gem = engineer.ClassGem();
-            m_treeRoot = new TreeRoot(id, m_log); 
+            m_treeRootForRegistry = new TreeRoot(id, m_log);
+            RegRead(); 
         }
     }
 }

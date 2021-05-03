@@ -16,7 +16,6 @@ namespace Root_VEGA_P_Vision
         private void Init()
         {
             Main = new HomePanel();
-
             //SetPage(Main);
         }
 

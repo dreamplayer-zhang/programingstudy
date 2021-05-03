@@ -9,6 +9,7 @@ using RootTools;
 using RootTools.Camera;
 using RootTools.Camera.BaslerPylon;
 using RootTools.Camera.Dalsa;
+using RootTools.Comm;
 using RootTools.Control;
 using RootTools.Control.Ajin;
 using RootTools.GAFs;
@@ -55,6 +56,8 @@ namespace Root_AOP01_Inspection.Module
         Camera_Dalsa m_CamTDI45;
         Camera_Dalsa m_CamTDISide;
         Camera_Basler m_CamLADS;
+
+        public RS232 m_rs232;
 
         ALID m_alid_WaferExist;
         public void SetAlarm()
@@ -1049,9 +1052,14 @@ namespace Root_AOP01_Inspection.Module
                     Axis axisZ = m_module.m_axisZ;
                     Axis axisRotate = m_module.m_axisRotate;
                     m_grabMode.SetLight(true);
-                    
+
                     // UserSet Update
-                    ((Camera_Dalsa)(m_grabMode.m_camera)).p_CamParam.p_nUserSetNum = m_nUserSetNum;
+                    // 신형카메라 UserSet 변경
+                    //((Camera_Dalsa)(m_grabMode.m_camera)).p_CamParam.p_nUserSetNum = m_nUserSetNum;   
+
+                    // 구형카메라 UserSet 변경
+                    string strUserSetChange = string.Format("lpc %d\r", m_nUserSetNum);
+                    m_module.m_rs232.Send(strUserSetChange);
 
                     m_module.m_do45DTrigger.Write(true);
                     if (m_grabMode.pUseRADS)
@@ -1179,6 +1187,8 @@ namespace Root_AOP01_Inspection.Module
             m_CamTDI45 = mainvision.m_CamTDI45;
             m_CamTDISide = mainvision.m_CamTDISide;
             m_CamLADS = mainvision.m_CamLADS;
+
+            m_rs232 = mainvision.m_rs232;
 
             InitMemorys();
             //InitPosAlign();
