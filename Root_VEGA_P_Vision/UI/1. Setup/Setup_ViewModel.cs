@@ -46,9 +46,8 @@ namespace Root_VEGA_P_Vision
 
         private Home_ViewModel homeVM;
         private RecipeManager_ViewModel recipeManagerVM;
-        private RecipeStain_ViewModel recipeStainVM;
         public Maintenance_ViewModel maintVM;
-
+        private RecipeSetting_ViewModel recipeSettingVM;
         public Setup_ViewModel()
         {
             init();
@@ -65,7 +64,7 @@ namespace Root_VEGA_P_Vision
         {
             homeVM = new Home_ViewModel(this);
             recipeManagerVM = new RecipeManager_ViewModel(this);
-            recipeStainVM = new RecipeStain_ViewModel(this);
+            recipeSettingVM = recipeManagerVM.recipeSettingVM;
             maintVM = new Maintenance_ViewModel(this);
         }
         private void InitAllNaviBtn()
@@ -138,7 +137,7 @@ namespace Root_VEGA_P_Vision
         {
             get
             {
-                return new RelayCommand(()=>
+                return new RelayCommand(() =>
                 {
                     MessageBox.Show("WIND2 전체 레시피 저장하는거 구현해줘요");
                 });
@@ -169,7 +168,7 @@ namespace Root_VEGA_P_Vision
         {
             get
             {
-                return new RelayCommand(()=>
+                return new RelayCommand(() =>
                 {
                     MessageBox.Show("WIND2 전체 레시피 로드하는거 구현해줘요");
                 });
@@ -207,6 +206,11 @@ namespace Root_VEGA_P_Vision
             p_CurrentPanel = recipeManagerVM.Main;
             p_CurrentPanel.DataContext = recipeManagerVM;
         }
+        public void SetRecipeSetting()
+        {
+            p_CurrentPanel = recipeSettingVM.Main;
+            p_CurrentPanel.DataContext = recipeSettingVM;
+        }
         public void SetMaintenance()
         {
             p_NaviButtons.Clear();
@@ -230,21 +234,6 @@ namespace Root_VEGA_P_Vision
 
         #endregion
 
-        #region Recipe Wizard
-        public void SetStain()
-        {
-            p_NaviButtons.Clear();
-            p_NaviButtons.Add(m_btnNaviRecipeWizard);
-
-            p_CurrentPanel = recipeStainVM.Main;
-            p_CurrentPanel.DataContext = recipeStainVM;
-        }
-        public void Set6um()
-        {
-            p_NaviButtons.Clear();
-            p_NaviButtons.Add(m_btnNaviRecipeWizard);            
-        }
-        #endregion
 
         #endregion
         #endregion

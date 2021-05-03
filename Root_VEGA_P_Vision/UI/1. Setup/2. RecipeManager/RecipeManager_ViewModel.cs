@@ -13,6 +13,7 @@ namespace Root_VEGA_P_Vision
     {
         public Setup_ViewModel m_Setup;
         public RecipeManagerPanel Main;
+        public RecipeSetting_ViewModel recipeSettingVM;
 
         public RecipeManager_ViewModel(Setup_ViewModel setup)
         {
@@ -22,7 +23,7 @@ namespace Root_VEGA_P_Vision
         private void Init()
         {
             Main = new RecipeManagerPanel();
-
+            recipeSettingVM = new RecipeSetting_ViewModel(this);
             //SetPage(Main);
         }
         public enum ModifyType
@@ -44,7 +45,32 @@ namespace Root_VEGA_P_Vision
         #region [RelayCommand]
         public ICommand btnStain
         {
-            get => new RelayCommand(()=> { m_Setup.SetStain(); });
+            get => new RelayCommand(()=> {
+                m_Setup.SetRecipeSetting();
+                recipeSettingVM.SetStain();
+            });
+        }
+        public ICommand btn6um
+        {
+            get => new RelayCommand(()=> {
+                m_Setup.SetRecipeSetting();
+                recipeSettingVM.Set6um();
+            });
+        }
+        public ICommand btn1um
+        {
+            get => new RelayCommand(()=> {
+                m_Setup.SetRecipeSetting();
+                recipeSettingVM.Set1um();
+            });
+        }
+        public ICommand btnSide
+        {
+            get => new RelayCommand(()=>
+            {
+                m_Setup.SetRecipeSetting();
+                recipeSettingVM.SetSide();
+            });
         }
         public ICommand btnBack
         {

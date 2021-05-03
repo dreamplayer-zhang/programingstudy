@@ -42,6 +42,7 @@ namespace Root_VEGA_P_Vision
 
         #region [ViewModel]
         private Setup_ViewModel setupViewModel;
+        private Review_ViewModel reviewViewModel;
         #endregion
         public bool Initialize()
         {
@@ -57,7 +58,8 @@ namespace Root_VEGA_P_Vision
         void InitReviewMode()
         {
             reviewPanel = new Review_Panel();
-            reviewPanel.DataContext = new Review_ViewModel(reviewPanel);
+            reviewViewModel = new Review_ViewModel();
+            reviewPanel.DataContext = reviewViewModel;
         }
         void InitSetupMode()
         {

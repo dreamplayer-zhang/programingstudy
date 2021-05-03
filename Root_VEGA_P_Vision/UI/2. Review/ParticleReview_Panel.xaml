@@ -20,14 +20,16 @@
                     <RowDefinition/>
                 </Grid.RowDefinitions>
                 <GroupBox Grid.Row="0" Header="Dome">
-                    <Tools:RootViewer/>
+                    <!--<Image Source="../../Resources/domearea.png"/>-->
+                    <Tools:RootViewer DataContext="{Binding domeViewer_VM}"/>
                 </GroupBox>
                 <GroupBox Grid.Row="1" Header="Door">
-                    <Tools:RootViewer/>
+                    <!--<Image Source="../../Resources/doorarea.png"/>-->
+                    <Tools:RootViewer DataContext="{Binding doorViewer_VM}"/>
                 </GroupBox>
             </Grid>
         </GroupBox>
-        <Grid Grid.Column="1">
+        <Grid Grid.Column="1" Background="White">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition/>
@@ -37,81 +39,88 @@
                 <GroupBox Grid.Column="0" Header="Outer Pod">
                     <Grid>
                         <Grid.RowDefinitions>
-                            <RowDefinition Height="0.4*"/>
-                            <RowDefinition Height="0.6*"/>
+                            <RowDefinition Height="0.3*"/>
+                            <RowDefinition Height="0.7*"/>
                         </Grid.RowDefinitions>
                         <Grid Grid.Row="0">
                             <Grid>
-                                <Grid.RowDefinitions>
-                                    <RowDefinition/>
-                                    <RowDefinition/>
-                                </Grid.RowDefinitions>
-                                <Grid Grid.Row="0">
-                                    <Image Source="../../Resources/doom.png" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                </Grid.ColumnDefinitions>
+                                <Grid Grid.Column="0">
+                                    <Image Source="../../Resources/dome.jpg" VerticalAlignment="Center" HorizontalAlignment="Center" RenderTransformOrigin="0.5,0.5">
+                                        <Image.RenderTransform>
+                                            <ScaleTransform ScaleY="-1"/>
+                                        </Image.RenderTransform>
+                                    </Image>
+                                
                                 </Grid>
-                                <Grid Grid.Row="1">
-                                    <Image Source="../../Resources/door.png" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                <Grid Grid.Column="1">
+                                    <Image Source="../../Resources/door.jpg" VerticalAlignment="Center" HorizontalAlignment="Center" RenderTransformOrigin="0.5,0.5">
+                                        <Image.RenderTransform>
+                                            <ScaleTransform ScaleX="-1" ScaleY="-1"/>
+                                        </Image.RenderTransform>
+                                    </Image>
                                 </Grid>
                             </Grid>
                         </Grid>
                         <Grid Grid.Row="1" >
-                            <Grid>
-                                <Grid.RowDefinitions>
-                                    <RowDefinition/>
-                                    <RowDefinition/>
-                                    <RowDefinition/>
-                                    <RowDefinition/>
-                                    <RowDefinition/>
-                                    <RowDefinition/>
-                                    <RowDefinition/>
-                                    <RowDefinition/>
-                                    <RowDefinition/>
-                                    <RowDefinition/>
-                                    <RowDefinition/>
-                                    <RowDefinition/>
-                                    <RowDefinition/>
-                                    <RowDefinition/>
-                                    <RowDefinition/>
-                                    <RowDefinition/>
-                                    <RowDefinition/>
-                                    <RowDefinition/>
-                                    <RowDefinition/>
-                                    <RowDefinition/>
-                                </Grid.RowDefinitions>
-                                <Grid Grid.Row="0" Style="{StaticResource GridHeader}">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition/>
-                                        <ColumnDefinition/>
-                                        <ColumnDefinition/>
-                                    </Grid.ColumnDefinitions>
-                                    <TextBlock Text="Nozzle No." Grid.Column="0" Style="{StaticResource GridHeaderText}"/>
-                                    <TextBlock Text="Count" Grid.Column="1" Style="{StaticResource GridHeaderText}"/>
-                                    <TextBlock Text="Cycle" Grid.Column="2" Style="{StaticResource GridHeaderText}"/>
-                                </Grid>
-                                <Grid Grid.Row="1">
-                                    <local:NozzleRes/>
-                                </Grid>
-                            </Grid>
+                            <Border BorderThickness="0">
+                                <DataGrid IsReadOnly="True" HeadersVisibility="Column" Style="{StaticResource DatagridStyle}" RowStyle="{StaticResource DataGridRowStyle}">
+                                    <DataGrid.Columns>
+                                        <DataGridTextColumn Header="Nozzle No." Binding="{Binding Path=a}" HeaderStyle="{StaticResource DataGridHeaderStyle}" Width="1*"/>
+                                        <DataGridTextColumn Header="Count" Binding="{Binding Path=b}" HeaderStyle="{StaticResource DataGridHeaderStyle}" Width="1*"/>
+                                        <DataGridTextColumn Header="Cycle" Binding="{Binding Path=c}" HeaderStyle="{StaticResource DataGridHeaderStyle}" Width="1*"/>
+                                    </DataGrid.Columns>
+                                    <local:Dummy a="01" b="0" c="8"/>
+                                    <local:Dummy a="02" b="0" c="8"/>
+                                    <local:Dummy a="03" b="0" c="8"/>
+                                    <local:Dummy a="04" b="0" c="8"/>
+                                    <local:Dummy a="05" b="0" c="8"/>
+                                    <local:Dummy a="06" b="0" c="8"/>
+                                    <local:Dummy a="07" b="0" c="8"/>
+                                    <local:Dummy a="08" b="0" c="8"/>
+                                    <local:Dummy a="09" b="0" c="8"/>
+                                    <local:Dummy a="10" b="0" c="8"/>
+                                    <local:Dummy a="11" b="0" c="8"/>
+                                    <local:Dummy a="12" b="0" c="8"/>
+                                    <local:Dummy a="13" b="0" c="8"/>
+                                    <local:Dummy a="14" b="0" c="8"/>
+                                    <local:Dummy a="15" b="0" c="8"/>
+                                    <local:Dummy a="16" b="0" c="8"/>
+                                    <local:Dummy a="17" b="0" c="8"/>
+                                </DataGrid>
+
+                            </Border>
                         </Grid>
                     </Grid>
                 </GroupBox>
                 <GroupBox Grid.Column="1" Header="Inner Pod Cover">
                     <Grid>
                         <Grid.RowDefinitions>
-                            <RowDefinition Height="0.4*"/>
-                            <RowDefinition Height="0.6*"/>
+                            <RowDefinition Height="0.3*"/>
+                            <RowDefinition Height="0.7*"/>
                         </Grid.RowDefinitions>
                         <Grid Grid.Row="0">
                             <Grid>
-                                <Grid.RowDefinitions>
-                                    <RowDefinition/>
-                                    <RowDefinition/>
-                                </Grid.RowDefinitions>
-                                <Grid Grid.Row="0">
-                                    <Image Source="../../Resources/covertop.png" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                </Grid.ColumnDefinitions>
+                                <Grid Grid.Column="0">
+                                    <Image Source="../../Resources/EIPBasePlateTop.jpg" VerticalAlignment="Center" HorizontalAlignment="Center" RenderTransformOrigin="0.5,0.5">
+                                        <Image.RenderTransform>
+                                            <ScaleTransform ScaleX="-1" ScaleY="-1"/>
+                                        </Image.RenderTransform>
+                                    </Image>
                                 </Grid>
-                                <Grid Grid.Row="1">
-                                    <Image Source="../../Resources/coverbot.png" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                <Grid Grid.Column="1">
+                                    <Image Source="../../Resources/EIPBasePlateBottom.jpg" VerticalAlignment="Center" HorizontalAlignment="Center" RenderTransformOrigin="0.5,0.5">
+                                        <Image.RenderTransform>
+                                            <ScaleTransform ScaleX="-1" ScaleY="-1"/>
+                                        </Image.RenderTransform>
+                                    </Image>
                                 </Grid>
                             </Grid>
                         </Grid>
@@ -146,20 +155,24 @@
                 <GroupBox Grid.Column="2" Header="Inner Base Plate">
                     <Grid>
                         <Grid.RowDefinitions>
-                            <RowDefinition Height="0.4*"/>
-                            <RowDefinition Height="0.6*"/>
+                            <RowDefinition Height="0.3*"/>
+                            <RowDefinition Height="0.7*"/>
                         </Grid.RowDefinitions>
                         <Grid Grid.Row="0">
                             <Grid>
-                                <Grid.RowDefinitions>
-                                    <RowDefinition/>
-                                    <RowDefinition/>
-                                </Grid.RowDefinitions>
-                                <Grid Grid.Row="0">
-                                    <Image Source="../../Resources/basetop.png" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                </Grid.ColumnDefinitions>
+                                <Grid Grid.Column="0">
+                                    <Image Source="../../Resources/EIPCoverTop.jpg" VerticalAlignment="Center" HorizontalAlignment="Center" RenderTransformOrigin="0.5,0.5">
+                                        <Image.RenderTransform>
+                                            <ScaleTransform ScaleX="-1" ScaleY="-1"/>
+                                        </Image.RenderTransform>
+                                    </Image>
                                 </Grid>
-                                <Grid Grid.Row="1">
-                                    <Image Source="../../Resources/basebot.png" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                <Grid Grid.Column="1">
+                                    <Image Source="../../Resources/EIPCoverBottom.jpg" VerticalAlignment="Center" HorizontalAlignment="Center"/>
                                 </Grid>
                             </Grid>
                         </Grid>

@@ -8,18 +8,17 @@ namespace Root_VEGA_P_Vision
 {
     public class Review_ViewModel
     {
-        Review_Panel reviewPanel;
         VisionReview_Panel visionReviewPanel;
         ParticleReview_Panel particleReviewPanel;
         ResultSummary_Panel resultSummaryPanel;
 
-        public Review_ViewModel(Review_Panel reviewPanel)
+        public Review_ViewModel()
         {
-            this.reviewPanel = reviewPanel;
             visionReviewPanel = new VisionReview_Panel();
             particleReviewPanel = new ParticleReview_Panel();
             resultSummaryPanel = new ResultSummary_Panel();
-            visionReviewPanel.DataContext = new VisionReview_ViewModel(reviewPanel);
+            visionReviewPanel.DataContext = new VisionReview_ViewModel(this);
+            particleReviewPanel.DataContext = new ParticleReview_ViewModel(this);
         }
     }
 }

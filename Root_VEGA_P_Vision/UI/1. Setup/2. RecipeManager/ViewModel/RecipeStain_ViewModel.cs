@@ -11,7 +11,7 @@ namespace Root_VEGA_P_Vision
 {
     class RecipeStain_ViewModel: ObservableObject
     {
-        public Setup_ViewModel setup;
+        public RecipeSetting_ViewModel recipeSetting;
         public RecipeStain_Panel Main;
 
         #region [ImageViewer ViewModel]
@@ -38,9 +38,9 @@ namespace Root_VEGA_P_Vision
         }
         #endregion
 
-        public RecipeStain_ViewModel(Setup_ViewModel setup)
+        public RecipeStain_ViewModel(RecipeSetting_ViewModel recipeSetting)
         {
-            this.setup = setup;
+            this.recipeSetting = recipeSetting;
             Main = new RecipeStain_Panel();
 
             EIPcovertop_ImageViewerVM = new EIPCoverTop_ImageViewer_ViewModel();
@@ -59,7 +59,7 @@ namespace Root_VEGA_P_Vision
         public ICommand btnBack
         {
             get => new RelayCommand(()=> {
-                setup.SetRecipeWizard();
+                //recipeSetting.SetRecipeWizard();
             });
         }
 

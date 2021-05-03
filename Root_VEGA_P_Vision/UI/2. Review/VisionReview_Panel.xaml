@@ -239,9 +239,9 @@
                     </TabItem>
                 </TabControl>
             </Grid>
-            <Grid Grid.Row="1">
-
-            </Grid>
+            <!--<Grid Grid.Row="1">-->
+                <Image Grid.Row="1" Source="../../Resources/graphex.jpg"/>
+            <!--</Grid>-->
         </Grid>
     </Grid>
 </UserControl>

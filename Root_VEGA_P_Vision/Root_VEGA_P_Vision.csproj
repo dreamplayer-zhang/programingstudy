@@ -226,6 +226,15 @@
     <Compile Include="UI\1. Setup\2. RecipeManager\Panel\Recipe6um_Panel.xaml.cs">
       <DependentUpon>Recipe6um_Panel.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UI\1. Setup\2. RecipeManager\Panel\RecipeSetting_Panel.xaml.cs">
+      <DependentUpon>RecipeSetting_Panel.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\1. Setup\2. RecipeManager\Panel\RecipeSideImageViewers_Panel.xaml.cs">
+      <DependentUpon>RecipeSideImageViewers_Panel.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\1. Setup\2. RecipeManager\Panel\RecipeSide_Panel.xaml.cs">
+      <DependentUpon>RecipeSide_Panel.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI\1. Setup\2. RecipeManager\Panel\RecipeStain_Panel.xaml.cs">
       <DependentUpon>RecipeStain_Panel.xaml</DependentUpon>
     </Compile>
@@ -233,11 +242,16 @@
       <DependentUpon>RecipeManagerPanel.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\1. Setup\2. RecipeManager\RecipeManager_ViewModel.cs" />
-    <Compile Include="UI\1. Setup\2. RecipeManager\ViewModel\EIPBaseBottom_ImageViewer_ViewModel.cs" />
-    <Compile Include="UI\1. Setup\2. RecipeManager\ViewModel\EIPBaseTop_ImageViewer_ViewModel.cs" />
-    <Compile Include="UI\1. Setup\2. RecipeManager\ViewModel\EIPCoverBottom_ImageViewer_ViewModel.cs" />
-    <Compile Include="UI\1. Setup\2. RecipeManager\ViewModel\EIPCoverTop_ImageViewer_ViewModel.cs" />
+    <Compile Include="UI\1. Setup\2. RecipeManager\ViewModel\ImageViewer\EIPBaseBottom_ImageViewer_ViewModel.cs" />
+    <Compile Include="UI\1. Setup\2. RecipeManager\ViewModel\ImageViewer\EIPBaseTop_ImageViewer_ViewModel.cs" />
+    <Compile Include="UI\1. Setup\2. RecipeManager\ViewModel\ImageViewer\EIPCoverBottom_ImageViewer_ViewModel.cs" />
+    <Compile Include="UI\1. Setup\2. RecipeManager\ViewModel\ImageViewer\EIPCoverTop_ImageViewer_ViewModel.cs" />
+    <Compile Include="UI\1. Setup\2. RecipeManager\ViewModel\ImageViewer\RecipeSideImageViewers_ViewModel.cs" />
     <Compile Include="UI\1. Setup\2. RecipeManager\ViewModel\ItemMask.cs" />
+    <Compile Include="UI\1. Setup\2. RecipeManager\ViewModel\Recipe1um_ViewModel.cs" />
+    <Compile Include="UI\1. Setup\2. RecipeManager\ViewModel\Recipe6um_ViewModel.cs" />
+    <Compile Include="UI\1. Setup\2. RecipeManager\ViewModel\RecipeSetting_ViewModel.cs" />
+    <Compile Include="UI\1. Setup\2. RecipeManager\ViewModel\RecipeSide_ViewModel.cs" />
     <Compile Include="UI\1. Setup\2. RecipeManager\ViewModel\RecipeStain_ViewModel.cs" />
     <Compile Include="UI\1. Setup\Setup.xaml.cs">
       <DependentUpon>Setup.xaml</DependentUpon>
@@ -269,6 +283,7 @@
     <Compile Include="UI\2. Review\screwUI.xaml.cs">
       <DependentUpon>screwUI.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UI\2. Review\ViewModel\ParticleReview_ViewModel.cs" />
     <Compile Include="UI\2. Review\ViewModel\Review_ViewModel.cs" />
     <Compile Include="UI\2. Review\ViewModel\ScrewUI_ImageViewer_ViewModel.cs" />
     <Compile Include="UI\2. Review\ViewModel\ScrewUI_ViewModel.cs" />
@@ -333,6 +348,18 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UI\1. Setup\2. RecipeManager\Panel\Recipe6um_Panel.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\1. Setup\2. RecipeManager\Panel\RecipeSetting_Panel.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\1. Setup\2. RecipeManager\Panel\RecipeSideImageViewers_Panel.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\1. Setup\2. RecipeManager\Panel\RecipeSide_Panel.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -477,12 +504,6 @@
     <Resource Include="Resources\covertop.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Resources\doom.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Resources\door.png" />
-  </ItemGroup>
-  <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.7.2">
       <Visible>False</Visible>
       <ProductName>Microsoft .NET Framework 4.7.2%28x86 및 x64%29</ProductName>
@@ -507,6 +528,13 @@
   <ItemGroup>
     <Resource Include="Resources\domearea.png" />
     <Resource Include="Resources\doorarea.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\graphex.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\dome.jpg" />
+    <Resource Include="Resources\door.jpg" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
