@@ -177,7 +177,7 @@
                               Style="{StaticResource groupbox_selectmode}"
                               MouseEnter="GroupBox_MouseEnter"
                               MouseLeave="GroupBox_MouseLeave"
-                              MouseLeftButtonDown="Setup_MouseLeftB+uttonDown" 
+                              MouseLeftButtonDown="Setup_MouseLeftButtonDown" 
                               Cursor="Hand">
                         <GroupBox.Header>
                             <Grid>
