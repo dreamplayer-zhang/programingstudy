@@ -1,9 +1,4 @@
 ﻿using RootTools;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Root_Pine2.Module
 {
@@ -13,6 +8,11 @@ namespace Root_Pine2.Module
         public InfoStrip(string id)
         {
             p_id = id; 
+        }
+
+        public InfoStrip(int nStrip)
+        {
+            p_id = "Strip " + nStrip.ToString("000"); 
         }
     }
 }

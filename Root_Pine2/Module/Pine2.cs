@@ -1,16 +1,12 @@
 ﻿using RootTools;
 using RootTools.Comm;
 using RootTools.Control;
-using RootTools.GAFs;
 using RootTools.Module;
 using RootTools.ToolBoxs;
 using RootTools.Trees;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Threading;
 
 namespace Root_Pine2.Module
