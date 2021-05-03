@@ -235,6 +235,12 @@
     <Compile Include="Module\Aligner_ATI.cs" />
     <Compile Include="Module\Aligner_ATI_AOI.cs" />
     <Compile Include="Module\Aligner_RND.cs" />
+    <Compile Include="Module\BacksideVision\Run_GrabBackside.cs" />
+    <Compile Include="Module\BacksideVision\Run_InspectBackside.cs" />
+    <Compile Include="Module\EdgesideVision\Run_GrabEBR.cs" />
+    <Compile Include="Module\EdgesideVision\Run_GrabEdge.cs" />
+    <Compile Include="Module\EdgesideVision\Run_InspectEBR.cs" />
+    <Compile Include="Module\EdgesideVision\Run_InspectEdge.cs" />
     <Compile Include="Module\EFEM_AOP.cs" />
     <Compile Include="Module\FrontsideVision\Run_GrabLineScan.cs" />
     <Compile Include="Module\FrontsideVision\Run_Inspect.cs" />
@@ -243,6 +249,7 @@
     <Compile Include="Module\Loadport_Cymechs.cs" />
     <Compile Include="Module\RFID_Brooks.cs" />
     <Compile Include="Module\RFID_Ceyon.cs" />
+    <Compile Include="Module\Vision_Edgeside.cs" />
     <Compile Include="Module\Vision_Frontside.cs" />
     <Compile Include="Module\Vision_AOP.cs" />
     <Compile Include="Module\Vision_Backside.cs" />
@@ -289,5 +296,6 @@
       <Name>RootTools_Vision</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
