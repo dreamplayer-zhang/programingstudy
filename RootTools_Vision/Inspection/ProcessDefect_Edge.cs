@@ -17,7 +17,12 @@ namespace RootTools_Vision
 {
 	public class ProcessDefect_Edge : WorkBase
 	{
-        string TableName;
+		public ProcessDefect_Edge()
+		{
+
+		}
+
+		string TableName = "defect";
 		public ProcessDefect_Edge(string tableName)
 		{
             TableName = tableName;
