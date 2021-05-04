@@ -2114,3 +2114,218 @@ void IP::FitEllipse(BYTE* pSrc, BYTE* pDst, int nW, int nH)
     Mat imgSrc = Mat(nH, nW, CV_8UC1, pSrc);
     RotatedRect ellipses = fitEllipse(imgSrc);
 }
+
+// Edge Box
+int IP::FindEdge(BYTE* pSrc, int nMemW, int nMemH, Point ptLT, Point ptRB, int nDir, int nSearchLevel)
+{
+    // nDir : 0 (To Right), 1 (To Left), 2 (To Bottom), 3 (To Top)
+
+    if (nSearchLevel > 100)
+    {
+        nSearchLevel = 100;
+    }
+    else if (nSearchLevel < 0)
+    {
+        nSearchLevel = 0;
+    }
+
+    int nLineNum, nCount, nAverage, nProx;
+    int* pnLineAverage;
+    int nX1 = ptLT.x;
+    int nX2 = ptRB.x;
+    int nY1 = ptLT.y;
+    int nY2 = ptRB.y;
+    int nMin = 255;
+    int nMax = 0;
+    int nEdge = 0;
+
+    switch (nDir)
+    {
+    case 0:     // To Right
+    {
+        nLineNum = nX2 - nX1 + 1;
+        nCount = nY2 - nY1 + 1;
+        pnLineAverage = new int[nLineNum];
+
+        for (int c = nX1; c <= nX2; c++)
+        {
+            nAverage = 0;
+
+            for (int r = nY1; r <= nY2; r++)
+            {
+                nAverage += pSrc[r * nMemW + c];
+            }
+
+            nAverage /= nCount;
+
+            if (nAverage > nMax)
+            {
+                nMax = nAverage;
+            }
+            if (nAverage < nMin)
+            {
+                nMin = nAverage;
+            }
+
+            pnLineAverage[c - nX1] = nAverage;
+        }
+
+        nProx = nMin + (int)((nMax - nMin) * nSearchLevel * 0.01);
+        nEdge = nLineNum - 1;
+
+        for (int c = 0; c < nLineNum - 1; c++)
+        {
+            if ((pnLineAverage[c] >= nProx && pnLineAverage[c + 1] < nProx) || (pnLineAverage[c] <= nProx && pnLineAverage[c + 1] > nProx))
+            {
+                nEdge = c;
+                c = nLineNum - 1;
+            }
+        }
+
+        nEdge += nX1;
+
+        delete[] pnLineAverage;
+        break;
+    }
+    case 1:     // To Left
+    {
+        nLineNum = nX2 - nX1 + 1;
+        nCount = nY2 - nY1 + 1;
+        pnLineAverage = new int[nLineNum];
+
+        for (int c = nX2; c >= nX1; c--)
+        {
+            nAverage = 0;
+
+            for (int r = nY1; r <= nY2; r++)
+            {
+                nAverage += pSrc[r * nMemW + c];
+            }
+
+            nAverage /= nCount;
+
+            if (nAverage > nMax)
+            {
+                nMax = nAverage;
+            }
+            if (nAverage < nMin)
+            {
+                nMin = nAverage;
+            }
+
+            pnLineAverage[c - nX1] = nAverage;
+        }
+
+        nProx = nMin + (int)((nMax - nMin) * nSearchLevel * 0.01);
+        nEdge = 0;
+
+        for (int c = nLineNum - 1; c > 0; c--)
+        {
+            if ((pnLineAverage[c] >= nProx && pnLineAverage[c - 1] < nProx) || (pnLineAverage[c] <= nProx && pnLineAverage[c - 1] > nProx))
+            {
+                nEdge = c;
+                c = 0;
+            }
+        }
+
+        nEdge += nX1;
+
+        delete[] pnLineAverage;
+        break;
+    }
+    case 2:     // To Bottom
+    {
+        nLineNum = nY2 - nY1 + 1;
+        nCount = nX2 - nX1 + 1;
+        pnLineAverage = new int[nLineNum];
+
+        for (int r = nY1; r <= nY2; r++)
+        {
+            nAverage = 0;
+
+            for (int c = nX1; c <= nX2; c++)
+            {
+                nAverage += pSrc[r * nMemW + c];
+            }
+
+            nAverage /= nCount;
+
+            if (nAverage > nMax)
+            {
+                nMax = nAverage;
+            }
+            if (nAverage < nMin)
+            {
+                nMin = nAverage;
+            }
+
+            pnLineAverage[r - nY1] = nAverage;
+        }
+
+        nProx = nMin + (int)((nMax - nMin) * nSearchLevel * 0.01);
+        nEdge = nLineNum - 1;
+
+        for (int r = 0; r < nLineNum - 1; r++)
+        {
+            if ((pnLineAverage[r] >= nProx && pnLineAverage[r + 1] < nProx) || (pnLineAverage[r] <= nProx && pnLineAverage[r + 1] > nProx))
+            {
+                nEdge = r;
+                r = nLineNum - 1;
+            }
+        }
+
+        nEdge += nY1;
+
+        delete[] pnLineAverage;
+        break;
+    }
+    case 3:     // To Top
+    {
+        nLineNum = nY2 - nY1 + 1;
+        nCount = nX2 - nX1 + 1;
+        pnLineAverage = new int[nLineNum];
+
+        for (int r = nY2; r >= nY1; r--)
+        {
+            nAverage = 0;
+
+            for (int c = nX1; c <= nX2; c++)
+            {
+                nAverage += pSrc[r * nMemW + c];
+            }
+
+            nAverage /= nCount;
+
+            if (nAverage > nMax)
+            {
+                nMax = nAverage;
+            }
+            if (nAverage < nMin)
+            {
+                nMin = nAverage;
+            }
+
+            pnLineAverage[r - nY1] = nAverage;
+        }
+
+        nProx = nMin + (int)((nMax - nMin) * nSearchLevel * 0.01);
+        nEdge = 0;
+
+        for (int r = nLineNum - 1; r > 0; r--)
+        {
+            if ((pnLineAverage[r] >= nProx && pnLineAverage[r - 1] < nProx) || (pnLineAverage[r] <= nProx && pnLineAverage[r - 1] > nProx))
+            {
+                nEdge = r;
+                r = 0;
+            }
+        }
+
+        nEdge += nY1;
+
+        delete[] pnLineAverage;
+        break;
+    }
+    }
+
+    return nEdge;
+}

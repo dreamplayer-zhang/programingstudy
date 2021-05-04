@@ -836,5 +836,14 @@ namespace RootTools_CLR
 		m_ResizeSSE[i].ProcessInterpolation(thid, pSrcImg, nSrcHeight, nSrcWidth, nFovWidth, pTarget);
 	}
 
+	int CLR_IP::Cpp_FindEdge(byte* pSrcImg, int  nMemW, int  nMemH, int nROIL, int nROIT, int nROIR, int nROIB, int nDir, int nSearchLevel)
+	{
+		pin_ptr<byte> pSrc = &pSrcImg[0];
 
+		int nEdge = IP::FindEdge(pSrc, nMemW, nMemH, Point(nROIL, nROIT), Point(nROIR, nROIB), nDir, nSearchLevel);
+
+		pSrc = nullptr;
+
+		return nEdge;
+	}
 }
