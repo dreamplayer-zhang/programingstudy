@@ -290,17 +290,8 @@ namespace Root_WindII
 
                 
                 // ImageData
-                //if (engineer.m_eMode == WIND2_Engineer.eMode.EFEM)
-                {
-                    MemoryData memoryData = memoryTool.GetMemory(memoryFrontPool, memoryFrontGroup, memoryFront);
-                    frontImage = GlobalObjects.Instance.RegisterNamed<ImageData>("FrontImage", memoryFrontPool, memoryFrontGroup, memoryFront, memoryTool, memoryData.p_nCount, memoryData.p_nByte);
-                    maskLayer = GlobalObjects.Instance.RegisterNamed<ImageData>("MaskImage", memoryTool.GetMemory(memoryFrontPool, memoryFrontGroup, memoryMask));
-                }
-                //else
-                //{
-                //    frontImage = GlobalObjects.Instance.RegisterNamed<ImageData>("FrontImage", memoryTool.GetMemory(memoryFrontPool, memoryFrontGroup, memoryFront));
-                //    maskLayer = GlobalObjects.Instance.RegisterNamed<ImageData>("MaskImage", memoryTool.GetMemory(memoryFrontPool, memoryFrontGroup, memoryMask));
-                //}
+                frontImage = GlobalObjects.Instance.RegisterNamed<ImageData>("FrontImage", memoryTool.GetMemory(memoryFrontPool, memoryFrontGroup, memoryFront));
+                maskLayer = GlobalObjects.Instance.RegisterNamed<ImageData>("MaskImage", memoryTool.GetMemory(memoryFrontPool, memoryFrontGroup, memoryMask));
 
                 //ImageData backImage = GlobalObjects.Instance.RegisterNamed<ImageData>("BackImage", memoryTool.GetMemory(memoryBackPool, memoryBackGroup, memoryBack));
                 //ImageData edgeTopImage = GlobalObjects.Instance.RegisterNamed<ImageData>("EdgeTopImage", memoryTool.GetMemory(memoryEdgePool, memoryEdgeGroup, memoryEdgeTop));
@@ -338,7 +329,6 @@ namespace Root_WindII
                 //    ebrImage.p_nPlane = engineer.ClassMemoryTool().GetMemory(memoryEdgePool, memoryEdgeGroup, memoryEdgeEBR).p_nCount;
                 //}
                 
-                /*
                 // Recipe
                 RecipeFront recipeFront = GlobalObjects.Instance.Register<RecipeFront>();
                 RecipeBack recipeBack = GlobalObjects.Instance.Register<RecipeBack>();
@@ -360,7 +350,7 @@ namespace Root_WindII
                                 new MemoryID(memoryFrontPool, memoryFrontGroup, memoryFront)));
                 }
 
-                if (backImage.GetPtr() == IntPtr.Zero)
+                /*if (backImage.GetPtr() == IntPtr.Zero)
                 {
                     //MessageBox.Show("Back Inspection 생성 실패, 메모리 할당 없음");
                 }

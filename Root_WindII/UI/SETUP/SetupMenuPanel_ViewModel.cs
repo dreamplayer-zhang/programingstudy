@@ -136,11 +136,11 @@ namespace Root_WindII
         //    get => frontsideSpecVM;
         //}
 
-        //private .FrontsideInspect_ViewModel frontsideInspectVM = new .FrontsideInspect_ViewModel();
-        //public .FrontsideInspect_ViewModel FrontsideInspectVM
-        //{
-        //    get => frontsideInspectVM;
-        //}
+        private FrontsideInspect_ViewModel frontsideInspectVM = new FrontsideInspect_ViewModel();
+        public FrontsideInspect_ViewModel FrontsideInspectVM
+        {
+            get => frontsideInspectVM;
+        }
 
         //#region [Camera ViewModes]
         //private .CameraVRS_ImageViewer_ViewModel cameraVrsVM = new .CameraVRS_ImageViewer_ViewModel();
@@ -425,7 +425,7 @@ namespace Root_WindII
                 return new RelayCommand(() =>
                 {
                     SetPage(frontsideInspect);
-                    //frontsideInspect.DataContext = frontsideInspectVM;
+                    frontsideInspect.DataContext = frontsideInspectVM;
                 });
             }
         }
