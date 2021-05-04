@@ -488,6 +488,7 @@ namespace RootTools.Camera.Dalsa
             if (m_sapDevice != null)
                 m_sapDevice.UpdateFeaturesToDevice();
             m_sapXfer.Freeze();
+            Debug.WriteLine("XferTrigger : " + m_nGrabTrigger);
             return "OK";
         }
 
@@ -549,22 +550,22 @@ namespace RootTools.Camera.Dalsa
             m_nGrabTrigger = 0;
 
             int nMul = 0,nDiv = 0;
-            m_sapDevice.GetFeatureValue("rotaryEncoderMultiplier", out nMul); Debug.WriteLine("Multiplier 0 = " + nMul.ToString());
-            m_sapDevice.SetFeatureValue("rotaryEncoderMultiplier", 1);
-            m_sapDevice.GetFeatureValue("rotaryEncoderMultiplier", out nMul); Debug.WriteLine("Multiplier 1 = " + nMul.ToString());
+            //m_sapDevice.GetFeatureValue("rotaryEncoderMultiplier", out nMul); Debug.WriteLine("Multiplier 0 = " + nMul.ToString());
+            //m_sapDevice.SetFeatureValue("rotaryEncoderMultiplier", 1);
+            //m_sapDevice.GetFeatureValue("rotaryEncoderMultiplier", out nMul); Debug.WriteLine("Multiplier 1 = " + nMul.ToString());
 
-            m_sapDevice.GetFeatureValue("rotaryEncoderDivider", out nDiv); Debug.WriteLine("Divider 0 = "+nDiv.ToString());
-            m_sapDevice.SetFeatureValue("rotaryEncoderDivider", 1);
-            m_sapDevice.GetFeatureValue("rotaryEncoderDivider", out nDiv); Debug.WriteLine("Divider 1 = " + nDiv.ToString());
+            //m_sapDevice.GetFeatureValue("rotaryEncoderDivider", out nDiv); Debug.WriteLine("Divider 0 = "+nDiv.ToString());
+            //m_sapDevice.SetFeatureValue("rotaryEncoderDivider", 1);
+            //m_sapDevice.GetFeatureValue("rotaryEncoderDivider", out nDiv); Debug.WriteLine("Divider 1 = " + nDiv.ToString());
 
-            m_sapDevice.GetFeatureValue("rotaryEncoderMultiplier", out nMul); Debug.WriteLine("Multiplier 15 = " + nMul.ToString());
-            m_sapDevice.SetFeatureValue("rotaryEncoderMultiplier", 16);
-            m_sapDevice.GetFeatureValue("rotaryEncoderMultiplier", out nMul); Debug.WriteLine("Multiplier 16 = " + nMul.ToString());
+            //m_sapDevice.GetFeatureValue("rotaryEncoderMultiplier", out nMul); Debug.WriteLine("Multiplier 15 = " + nMul.ToString());
+            //m_sapDevice.SetFeatureValue("rotaryEncoderMultiplier", 16);
+            //m_sapDevice.GetFeatureValue("rotaryEncoderMultiplier", out nMul); Debug.WriteLine("Multiplier 16 = " + nMul.ToString());
 
 
-            m_sapDevice.GetFeatureValue("rotaryEncoderDivider", out nDiv); Debug.WriteLine("Divider 22 = " + nDiv.ToString());
-            m_sapDevice.SetFeatureValue("rotaryEncoderDivider", 23);
-            m_sapDevice.GetFeatureValue("rotaryEncoderDivider", out nDiv); Debug.WriteLine("Divider 23 = " + nDiv.ToString());
+            //m_sapDevice.GetFeatureValue("rotaryEncoderDivider", out nDiv); Debug.WriteLine("Divider 22 = " + nDiv.ToString());
+            //m_sapDevice.SetFeatureValue("rotaryEncoderDivider", 23);
+            //m_sapDevice.GetFeatureValue("rotaryEncoderDivider", out nDiv); Debug.WriteLine("Divider 23 = " + nDiv.ToString());
 
             m_sapXfer.Snap((int)(m_nGrabCount));
 
@@ -1284,7 +1285,7 @@ namespace RootTools.Camera.Dalsa
         {
             Camera_Dalsa cam = args.Context as Camera_Dalsa;
             cam.m_nGrabTrigger++;
-            Debug.WriteLine("XferTrigger : " + cam.m_nGrabTrigger);
+           // Debug.WriteLine("XferTrigger : " + cam.m_nGrabTrigger);
         }
         #endregion
 
