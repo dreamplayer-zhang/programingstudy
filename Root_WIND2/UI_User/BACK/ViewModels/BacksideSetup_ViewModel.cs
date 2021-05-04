@@ -223,6 +223,8 @@ namespace Root_WIND2.UI_User
             get => new RelayCommand(() =>
             {
                 this.LoadRecipe();
+
+                this.ImageViewerVM.ReadExclusivePolygon();
             });
         }
 

@@ -125,6 +125,15 @@ namespace Root_WIND2.Module
             return null;
         }
 
+        public GrabModeFront GetGrabMode(int  index)
+        {
+            if(m_aGrabMode?.Count > 0)
+            {
+                return m_aGrabMode[index];
+            }
+            return null;
+        }
+
         public void ClearData()
         {
             foreach (GrabModeFront grabMode in m_aGrabMode)

@@ -214,6 +214,10 @@
       <DependentUpon>RecipeSelectionViewer.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\RecipeSelectionViewer_ViewModel.cs" />
+    <Compile Include="UserControls\DataListView.xaml.cs">
+      <DependentUpon>DataListView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UserControls\DataListView_ViewModel.cs" />
     <Compile Include="UserControls\MapViewer.xaml.cs">
       <DependentUpon>MapViewer.xaml</DependentUpon>
     </Compile>
@@ -279,6 +283,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UI\RecipeSelectionViewer.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UserControls\DataListView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
