@@ -112,11 +112,11 @@ namespace Root_WindII
         //    get => frontsideProductVM;
         //}
 
-        //private .FrontsideOrigin_ViewModel frontsideOriginVM = new .FrontsideOrigin_ViewModel();
-        //public .FrontsideOrigin_ViewModel FrontsideOriginVM
-        //{
-        //    get => frontsideOriginVM;
-        //}
+        private FrontsideOrigin_ViewModel frontsideOriginVM = new FrontsideOrigin_ViewModel();
+        public FrontsideOrigin_ViewModel FrontsideOriginVM
+        {
+            get => frontsideOriginVM;
+        }
 
         //private .FrontsideAlignment_ViewModel frontsideAlignmentVM = new .FrontsideAlignment_ViewModel();
         //public .FrontsideAlignment_ViewModel FrontsideAlignmentVM
@@ -377,7 +377,7 @@ namespace Root_WindII
                 return new RelayCommand(() =>
                 {
                     SetPage(frontsideOrigin);
-                    //frontsideOrigin.DataContext = frontsideOriginVM;
+                    frontsideOrigin.DataContext = frontsideOriginVM;
                 });
             }
         }

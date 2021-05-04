@@ -10,14 +10,15 @@ using System.Windows.Input;
 
 namespace Root_WindII
 {
-    class FrontsideOrigin_ViewModel : ObservableObject, IPage
+    public class FrontsideOrigin_ViewModel : ObservableObject, IPage
     {
+        #region [Properites]
         private readonly FrontsideOrigin_ImageViewer_ViewModel imageViewerVM;
         public FrontsideOrigin_ImageViewer_ViewModel ImageViewerVM
         {
             get => this.imageViewerVM;
         }
-
+        #endregion
 
         public FrontsideOrigin_ViewModel()
         {

@@ -24,7 +24,7 @@ namespace Root_WindII
     public delegate void EventOriginBoxReset();
     public delegate void EventPitchPointDone();
 
-    class FrontsideOrigin_ImageViewer_ViewModel : RootViewer_ViewModel
+    public class FrontsideOrigin_ImageViewer_ViewModel : RootViewer_ViewModel
     {
         #region [Color]
 
