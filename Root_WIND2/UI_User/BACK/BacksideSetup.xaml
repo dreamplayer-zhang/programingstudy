@@ -42,9 +42,14 @@
 
                     <TextBlock Text="Tool" Margin="12,0,4,0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
                     <CheckBox Content="ROI" IsChecked="{Binding IsROIChecked, Mode=TwoWay}" Command="{Binding btnROICommand}" Style="{StaticResource imageViewer_toolbar_checkbox}"/>
+
+                    <TextBlock Text="Exclusive Region" Margin="12,0,4,0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                    <CheckBox Content="Poly" IsChecked="{Binding IsPolyChecked, Mode=TwoWay}" Command="{Binding btnPolyCommand}" Style="{StaticResource imageViewer_toolbar_checkbox}"/>
+                    <Button Content="Save" Command="{Binding btnSavePolyCommand}" Style="{StaticResource imageViewer_toolbar_button}"/>
+                    <Button Content="Cancel" Command="{Binding btnCancelPolyCommand}" Style="{StaticResource imageViewer_toolbar_button}"/>
+                    <Button Content="Clear" Command="{Binding btnClearPolyCommand}" Style="{StaticResource imageViewer_toolbar_button}"/>
                 </StackPanel>
                 <Grid Grid.Row="1" >
-
                     <tools:RootViewer />
                 </Grid>
             </Grid>

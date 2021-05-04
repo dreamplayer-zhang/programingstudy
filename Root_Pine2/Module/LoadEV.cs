@@ -134,7 +134,7 @@ namespace Root_Pine2.Module
 
         public InfoStrip GetNewInfoStrip()
         {
-            InfoStrip infoStrip = new InfoStrip("Strip " + p_iStrip.ToString("000"));
+            InfoStrip infoStrip = new InfoStrip(p_iStrip);
             p_iStrip++;
             return infoStrip;
         }

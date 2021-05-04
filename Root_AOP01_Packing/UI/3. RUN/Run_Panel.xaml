@@ -553,7 +553,7 @@
                         <Button Content="{Binding p_sStepbtn}"
                                 IsEnabled="{Binding p_bEnableStepBtn}"
                                 Style="{StaticResource SetupPanelBtn}"
-                                Click="Button_Click_1"/>
+                                Command="{Binding cmdRunStep}"/>
                         <Button Content="{Binding p_sInitBtn}"
                                 IsEnabled="{Binding p_bEnableInitBtn}"
                                 Style="{StaticResource SetupPanelBtn}"
