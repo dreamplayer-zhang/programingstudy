@@ -516,17 +516,17 @@ namespace Root_AOP01_Inspection
                 if(EdgeDrawMode)
                 {
                     MainVision mainVision = ((AOP01_Handler)m_Engineer.ClassHandler()).m_mainVision;
-                    mainVision.SetRectInfo(m_ImageViewer_VM.TRectList, App.MainModuleName, MainVision.PatternEdge.Center);
+                    mainVision.SetRectInfo(m_ImageViewer_VM.TRectList, App.MainModuleName);
                 }
                 else if(EdgeDrawModeLeft)
                 {
                     MainVision mainVision = ((AOP01_Handler)m_Engineer.ClassHandler()).m_mainVision;
-                    mainVision.SetRectInfo(m_ImageViewer_VM.TRectList, App.MainModuleName, MainVision.PatternEdge.Left);
+                    mainVision.SetRectInfo(m_ImageViewer_VM.TRectList, App.MainLeftModuleName);
                 }
                 else if(EdgeDrawModeRight)
                 {
                     MainVision mainVision = ((AOP01_Handler)m_Engineer.ClassHandler()).m_mainVision;
-                    mainVision.SetRectInfo(m_ImageViewer_VM.TRectList, App.MainModuleName, MainVision.PatternEdge.Right);
+                    mainVision.SetRectInfo(m_ImageViewer_VM.TRectList, App.MainRightModuleName);
                 }
             }
 		}
