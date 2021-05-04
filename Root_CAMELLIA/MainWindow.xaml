@@ -19,11 +19,11 @@
         AllowsTransparency="False"
         WindowStartupLocation="CenterScreen"
         ResizeMode="CanResizeWithGrip"
-        Height="1080"
+        Height="1020"  MinHeight="920" MinWidth="1820"
         Width="1920"
         Title="CAMELLIA2"
-        Loaded="Window_Loaded"
-        Background="{StaticResource PanelBackGround}">
+        Loaded="Window_Loaded" Icon="CamelIcon.ico"
+        Background="White">
     <Window.Resources>
         <local:AxisToPositionConverter x:Key="AxisToPositionConverter"/>
         <local:AxisToStageUIConverter x:Key="AxisToStageConverter"/>
@@ -117,14 +117,14 @@
                 <Button Content="Review" VerticalAlignment="Center" Height="40" Width="auto" Margin="5" Command="{Binding CmdReview}"/>
             </StackPanel>-->
             <UniformGrid Columns="4">
-                <Button Content="Load" VerticalAlignment="Center" Height="40" Width="auto"  Margin="4,0,4,0"  Command="{Binding CmdLoad}"/>
-                <Button Content="Recipe" VerticalAlignment="Center" Height="40" Width="auto" Margin="4,0,4,0"   Command="{Binding CmdRecipe}"/>
-                <Button VerticalAlignment="Center" Height="40" Width="auto" Command="{Binding CmdEngineer}"  Margin="4,0,4,0">
+                <Button Content="Load" VerticalAlignment="Center" Height="40" Width="auto"  Margin="4,0,4,0"  Command="{Binding CmdLoad}" Style="{StaticResource customButton}"/>
+                <Button Content="Recipe" VerticalAlignment="Center" Height="40" Width="auto" Margin="4,0,4,0"   Command="{Binding CmdRecipe}" Style="{StaticResource customButton}"/>
+                <Button VerticalAlignment="Center" Height="40" Width="auto" Command="{Binding CmdEngineer}"  Margin="4,0,4,0"  Style="{StaticResource customButton}">
                     <TextBlock TextWrapping="Wrap" TextAlignment="Center">
                         Engineer
                     </TextBlock>
                 </Button>
-                <Button Content="Review" VerticalAlignment="Center" Height="40" Width="auto" Margin="4,0,4,0" Command="{Binding CmdReview}"/>
+                <Button Content="Review" VerticalAlignment="Center" Height="40" Width="auto" Margin="4,0,4,0" Command="{Binding CmdReview}"  Style="{StaticResource customButton}"/>
             </UniformGrid>
             <Grid Grid.Column="1">
                 <Grid>
@@ -185,8 +185,8 @@
             <StackPanel Grid.Column="4"
                         Orientation="Horizontal"
                         HorizontalAlignment="Right">
-                <Button Content="Setting" VerticalAlignment="Center" Height="40" Width="60" Margin="5" Command="{Binding CmdSetting}"/>
-                <Button Content="Exit" VerticalAlignment="Center" Height="40" Width="60" Margin="5" Command="{Binding CmdExit}"/>
+                <Button Content="Setting" VerticalAlignment="Center" Height="40" Width="60" Margin="5" Command="{Binding CmdSetting}"  Style="{StaticResource customButton}"/>
+                <Button Content="Exit" VerticalAlignment="Center" Height="40" Width="60" Margin="5" Command="{Binding CmdExit}"  Style="{StaticResource customButton}"/>
                 <Border Width="60" Margin="5" BorderBrush="#FF707070" BorderThickness="1">
                     <Grid Opacity="0.8">
                         <Grid.RowDefinitions>
@@ -221,12 +221,11 @@
                 <MenuItem Header="Setting" Command="{Binding CmdSetting}"/>
             </MenuItem>
             <MenuItem Header="User">
-                <MenuItem Header="Login" Command="{Binding CmdLogin}"/>
+                <MenuItem Header="Login" Command="{Binding CmdLogin}" />
                 <MenuItem Header="Logout" Command="{Binding CmdLogout}"/>
             </MenuItem>
             <MenuItem Header="Test">
-                <MenuItem Header="Send Test"/>
-                <MenuItem Header="Filmetrics Test"/>
+                <MenuItem Header="Engineer Test" Command="{Binding CmdEngineerTest}"/>
             </MenuItem>
         </Menu>
 
@@ -240,16 +239,29 @@
             </Grid.ColumnDefinitions>
             <Grid Grid.Column="0">
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="14*"/>
+                    <RowDefinition Height="0.72*"/>
+                    <RowDefinition Height="2*"/>
                 </Grid.RowDefinitions>
-                <GroupBox Header="Monitoring" Grid.Row="0">
+                <GroupBox Header="Monitoring" Grid.Row="0" BorderBrush="Transparent" BorderThickness="1" Margin="1,0,3,0"  Background="White">
+                    <GroupBox.HeaderTemplate>
+                        <DataTemplate>
+                            <Border CornerRadius="2" Background="White" Width="100" Height="auto">
+                                <TextBlock Text="{Binding}" FontWeight="Bold" TextAlignment="Center"/>
+                            </Border>
+                        </DataTemplate>
+                    </GroupBox.HeaderTemplate>
+                    <GroupBox.Effect>
+                        <DropShadowEffect ShadowDepth="1" Color="Black" Opacity="0.5"/>
+                    </GroupBox.Effect>
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="60*"/>
                             <ColumnDefinition Width="40*"/>
                         </Grid.ColumnDefinitions>
-                        <GroupBox Header="FDC" BorderBrush="Black" BorderThickness="1">
+                        <GroupBox Header="FDC" BorderThickness="1" BorderBrush="Black" Background="White" Margin="0,0,5,0">
+                            <!--<GroupBox.Effect>
+                                <DropShadowEffect ShadowDepth="1" Color="Black" Opacity="0.5"/>
+                            </GroupBox.Effect>-->
                             <ItemsControl ItemsSource="{Binding GaugeListItems, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
                                 <ItemsControl.ItemsPanel>
                                     <ItemsPanelTemplate>
@@ -283,7 +295,7 @@
                                 </ItemsControl.ItemTemplate>
                             </ItemsControl>
                         </GroupBox>
-                        <GroupBox Grid.Column="1" BorderBrush="Black" BorderThickness="1" Header="FFU">
+                        <GroupBox Grid.Column="1" Header="FFU" BorderThickness="1" BorderBrush="Black" Background="White"  Margin="5,0,0,0">
                             <ItemsControl x:Name="FFUList" ItemsSource="{Binding FFUListItems}" ItemTemplateSelector="{DynamicResource FFUTemplateSelector}">
                                 <!--ItemsSource="{Binding FanListItems, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">-->
                                 <ItemsControl.ItemsPanel>
@@ -332,10 +344,10 @@
                         <RowDefinition/>
                     </Grid.RowDefinitions>
                     <Grid Grid.Row="0">
-                        <lp:Loadport_UI x:Name="loadportA"/>
+                        <lp:Loadport_UI DataContext="{Binding loadportA_ViewModel}"/>
                     </Grid>
                     <Grid Grid.Row="1">
-                        <lp:Loadport_UI x:Name="loadportB"/>
+                        <lp:Loadport_UI DataContext="{Binding loadportB_ViewModel}"/>
                     </Grid>
                 </Grid>
 
@@ -347,58 +359,80 @@
                     <RowDefinition Height="2*"/>
                 </Grid.RowDefinitions>
 
-                <GroupBox Header="Camera" Grid.Row="0">
-                    <Grid>
-                        <GroupBox Header="Captured Image">
-                            <Border BorderBrush="Black" BorderThickness="1">
-                                <Canvas Background="Black" ClipToBounds="True" x:Name="canvas" >
-                                    <Image Source="{Binding p_imageSource, UpdateSourceTrigger=PropertyChanged}" Width="{Binding Path=ActualWidth, ElementName=canvas}" Height="{Binding Path=ActualHeight, ElementName=canvas}"  Stretch="Fill"></Image>
-                                </Canvas>
-                            </Border>
-                        </GroupBox>
-                    </Grid>
-                </GroupBox>
-                <GroupBox Header="Stage Map" Grid.Row="1">
-                    <Grid>
+                <Grid>
+                    <GroupBox Header="Captured Image" BorderThickness="1" Background="White" BorderBrush="Transparent" Margin="3">
+                        <GroupBox.HeaderTemplate>
+                            <DataTemplate>
+                                <Border CornerRadius="2" Background="White" Width="100" Height="auto">
+                                    <TextBlock Text="{Binding}" FontWeight="Bold" TextAlignment="Center"/>
+                                </Border>
+                            </DataTemplate>
+                        </GroupBox.HeaderTemplate>
+                        <GroupBox.Effect>
+                                <DropShadowEffect ShadowDepth="1" Color="Black" Opacity="0.5"/>
+                        </GroupBox.Effect>
+                        <Border BorderBrush="Black" BorderThickness="0">
+                            <Canvas Background="Black" ClipToBounds="True" x:Name="canvas" >
+                                <Image Source="{Binding p_imageSource, UpdateSourceTrigger=PropertyChanged}" Width="{Binding Path=ActualWidth, ElementName=canvas}" Height="{Binding Path=ActualHeight, ElementName=canvas}"  Stretch="Fill"></Image>
+                            </Canvas>
+                        </Border>
+                    </GroupBox>
+                </Grid>
+                <Grid Grid.Row="1">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="55"/>
                             <RowDefinition/>
                         </Grid.RowDefinitions>
-                        <GroupBox Header="Current Position Information" Grid.Row="0" Margin="3">
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition/>
-                                    <ColumnDefinition/>
-                                </Grid.ColumnDefinitions>
-                                <UniformGrid Grid.Column="0" Columns="3" Background="Gainsboro" Margin="2">
-                                    <TextBlock Text="X" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="1"/>
-                                    <TextBlock Text=":" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="2"/>
-                                    <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="3">
-                                        <TextBlock.Text>
-                                            <MultiBinding Converter="{StaticResource AxisToPositionConverter}" ConverterParameter="AxisX">
-                                                <Binding Path="p_Module_Camellia.p_axisXY.p_axisX"/>
-                                                <Binding Path="p_Module_Camellia.p_axisXY.p_axisX.p_posActual"/>
-                                                <Binding Path="p_StageCenterPulse.X"/>
-                                            </MultiBinding>
-                                        </TextBlock.Text>
-                                    </TextBlock>
-                                </UniformGrid>
-                                <UniformGrid Grid.Column="1" Columns="3" Background="Gainsboro" Margin="2">
-                                    <TextBlock Text="Y" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="1"/>
-                                    <TextBlock Text=":" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="2"/>
-                                    <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="3">
-                                        <TextBlock.Text>
-                                            <MultiBinding Converter="{StaticResource AxisToPositionConverter}" ConverterParameter="AxisY">
-                                                <Binding Path="p_Module_Camellia.p_axisXY.p_axisY"/>
-                                                <Binding Path="p_Module_Camellia.p_axisXY.p_axisY.p_posActual"/>
-                                                <Binding Path="p_StageCenterPulse.Y"/>
-                                            </MultiBinding>
-                                        </TextBlock.Text>
-                                    </TextBlock>
-                                </UniformGrid>
-                            </Grid>
-                        </GroupBox>
-                        <Viewbox Margin="3"
+                    <Border Grid.Row="0" BorderThickness="1" BorderBrush="White" Margin="3,1,3,1" CornerRadius="3">
+                        <Border.Effect>
+                            <DropShadowEffect ShadowDepth="2" Opacity="0.5"/>
+                        </Border.Effect>
+                    </Border>
+                    <GroupBox Header="Current Position Information" Grid.Row="0" Margin="7,3,7,1" BorderThickness="1" Background="White" BorderBrush="White">
+                        <GroupBox.HeaderTemplate>
+                            <DataTemplate>
+                                <Border CornerRadius="2" Background="White" Width="170" Height="auto" Margin="0,2,0,0">
+                                    <TextBlock Text="{Binding}" FontWeight="Bold" TextAlignment="Center"/>
+                                </Border>
+                            </DataTemplate>
+                        </GroupBox.HeaderTemplate>
+                        <!--<GroupBox.Effect>
+                            <DropShadowEffect ShadowDepth="1" Color="Black" Opacity="0.5"/>
+                        </GroupBox.Effect>-->
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition/>
+                                <ColumnDefinition/>
+                            </Grid.ColumnDefinitions>
+                            <UniformGrid Grid.Column="0" Columns="3" Background="Gainsboro" Margin="2">
+                                <TextBlock Text="X" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="1"/>
+                                <TextBlock Text=":" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="2"/>
+                                <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="3">
+                                    <TextBlock.Text>
+                                        <MultiBinding Converter="{StaticResource AxisToPositionConverter}" ConverterParameter="AxisX">
+                                            <Binding Path="p_Module_Camellia.p_axisXY.p_axisX"/>
+                                            <Binding Path="p_Module_Camellia.p_axisXY.p_axisX.p_posActual"/>
+                                            <Binding Path="p_StageCenterPulse.X"/>
+                                        </MultiBinding>
+                                    </TextBlock.Text>
+                                </TextBlock>
+                            </UniformGrid>
+                            <UniformGrid Grid.Column="1" Columns="3" Background="Gainsboro" Margin="2">
+                                <TextBlock Text="Y" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="1"/>
+                                <TextBlock Text=":" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="2"/>
+                                <TextBlock VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="3">
+                                    <TextBlock.Text>
+                                        <MultiBinding Converter="{StaticResource AxisToPositionConverter}" ConverterParameter="AxisY">
+                                            <Binding Path="p_Module_Camellia.p_axisXY.p_axisY"/>
+                                            <Binding Path="p_Module_Camellia.p_axisXY.p_axisY.p_posActual"/>
+                                            <Binding Path="p_StageCenterPulse.Y"/>
+                                        </MultiBinding>
+                                    </TextBlock.Text>
+                                </TextBlock>
+                            </UniformGrid>
+                        </Grid>
+                    </GroupBox>
+                    <Viewbox Margin="3"
                                  Grid.Row="1">
                             <stage:CamelliaStage/>
                         </Viewbox>
@@ -520,20 +554,22 @@
                             </ItemsControl>
                         </Viewbox>-->
                     </Grid>
-                </GroupBox>
             </Grid>
-            <TabControl Grid.Column="2" Background="Transparent">
-                <TabItem Header="RT Graph">
+            <TabControl Grid.Column="2" Background="White" Margin="5">
+                <!--<TabControl.Effect>
+                    <DropShadowEffect ShadowDepth="1" Opacity="0.5"/>
+                </TabControl.Effect>-->
+                <TabItem Header="RT Graph" Style="{StaticResource customTabitem}">
                     <met:RTGraph DataContext="{Binding p_RTGraph, UpdateSourceTrigger=PropertyChanged}"/>
                 </TabItem>
-                <TabItem Header="Review" Width="100">
+                <TabItem Header="Review" Width="100" Style="{StaticResource customTabitem}">
                     <Grid Grid.Column="2">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="1*"/>
                             <RowDefinition Height="1*"/>
                             <RowDefinition Height="0.1*"/>
                         </Grid.RowDefinitions>
-                        <GroupBox Header="Contour Map">
+                        <GroupBox Header="Contour Map" BorderThickness="0">
                             <Border BorderBrush="Black" BorderThickness="1">
                                 <ItemsControl ItemsSource="{Binding p_ContourMapCollection}">
                                     <ItemsControl.ItemsPanel>
@@ -549,9 +585,9 @@
                                 </ItemsControl>
                             </Border>
                         </GroupBox>
-                        <GroupBox Header="Measurement Data" Grid.Row="1">
+                        <GroupBox Header="Measurement Data" Grid.Row="1" BorderThickness="0">
                             <TabControl Background="Transparent">
-                                <TabItem Header="Point List">
+                                <TabItem Header="Point List" Style="{StaticResource customTabitem}">
                                     <Grid>
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition/>
@@ -568,7 +604,7 @@
                                         </UniformGrid>
                                         <DataGrid Grid.Row="1" ItemsSource="{Binding PointListItem}" AutoGenerateColumns="False" CanUserAddRows="False" CanUserSortColumns="False" EnableColumnVirtualization="True" 
                                   EnableRowVirtualization="True" Grid.ColumnSpan="2" SelectionMode="Single" CanUserDeleteRows="False"
-                                                  VirtualizingStackPanel.VirtualizationMode ="Recycling" VirtualizingStackPanel.IsVirtualizing = "true">
+                                                  VirtualizingStackPanel.VirtualizationMode ="Recycling" VirtualizingStackPanel.IsVirtualizing = "true" Background="White">
                                             <DataGrid.Resources>
                                                 <Style TargetType="DataGridColumnHeader">
                                                     <Setter Property="HorizontalAlignment" Value="Stretch"/>
@@ -585,14 +621,14 @@
                                         </DataGrid>
                                     </Grid>
                                 </TabItem>
-                                <TabItem Header="Parameter">
+                                <TabItem Header="Parameter" Style="{StaticResource customTabitem}">
                                     <Grid>
                                         <Grid.RowDefinitions>
                                             <RowDefinition Height="2.5*"/>
                                             <RowDefinition Height="1.5*"/>
                                             <RowDefinition Height="1*"/>
                                         </Grid.RowDefinitions>
-                                        <GroupBox Header="Measurement Parameter">
+                                        <GroupBox Header="Measurement Parameter" BorderThickness="0">
                                             <Grid>
                                                 <Grid.RowDefinitions>
                                                     <RowDefinition Height="2*"/>
@@ -709,7 +745,7 @@
                                                     </DataGrid.Columns>
                                                 </DataGrid>
                                                 <UniformGrid Columns="2" Grid.Row="1">
-                                                    <Grid Margin="5" Background="Gainsboro">
+                                                    <Grid Margin="3" Background="Gainsboro">
                                                         <Grid.ColumnDefinitions>
                                                             <ColumnDefinition Width="18*"/>
                                                             <ColumnDefinition Width="12*"/>
@@ -717,7 +753,7 @@
                                                         <TextBlock Text="Integration Time (VIS)" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="0"/>
                                                         <TextBox Grid.Column="1" Margin="1" Text="{Binding RecipeViewModel.VISIntegrationTime, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}" IsEnabled="False" TextAlignment="Center" VerticalContentAlignment="Center"></TextBox>
                                                     </Grid>
-                                                    <Grid Margin="5" Background="Gainsboro">
+                                                    <Grid Margin="3" Background="Gainsboro">
                                                         <Grid.ColumnDefinitions>
                                                             <ColumnDefinition Width="18*"/>
                                                             <ColumnDefinition Width="12*"/>
@@ -728,19 +764,19 @@
                                                 </UniformGrid>
                                             </Grid>
                                         </GroupBox>
-                                        <GroupBox Header="WaveLength Data" Grid.Row="1">
+                                        <GroupBox Header="WaveLength Data" Grid.Row="1" BorderThickness="0">
                                             <Grid>
                                                 <Grid.ColumnDefinitions>
                                                     <ColumnDefinition/>
                                                     <ColumnDefinition/>
                                                 </Grid.ColumnDefinitions>
-                                                <Grid Margin="5">
+                                                <Grid Margin="3">
                                                     <Grid>
                                                         <Grid.RowDefinitions>
                                                             <RowDefinition Height="0.2*"/>
                                                             <RowDefinition/>
                                                         </Grid.RowDefinitions>
-                                                        <Border Background="White" BorderBrush="#ABADB3" BorderThickness="1">
+                                                        <Border Background="White" BorderBrush="#ABADB3">
                                                             <TextBlock Grid.Row="0" Text="Reflectance" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="0,2" TextAlignment="Center"/>
                                                         </Border>
                                                         <!--<ListBox Grid.Row="1" ItemsSource="{Binding RecipeViewModel.ReflectanceListItem, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}" IsSynchronizedWithCurrentItem="True" HorizontalContentAlignment="Center"/>-->
@@ -754,13 +790,13 @@
                                                         </DataGrid>
                                                     </Grid>
                                                 </Grid>
-                                                <Grid Grid.Column="1" Margin="5">
+                                                <Grid Grid.Column="1" Margin="3">
                                                     <Grid>
                                                         <Grid.RowDefinitions>
                                                             <RowDefinition Height="0.2*"/>
                                                             <RowDefinition/>
                                                         </Grid.RowDefinitions>
-                                                        <Border Background="White" BorderBrush="#ABADB3" BorderThickness="1">
+                                                        <Border Background="White" BorderBrush="#ABADB3">
                                                             <TextBlock Grid.Row="0" Text="Transmittance" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="0,2" TextAlignment="Center"/>
                                                         </Border>
                                                         <DataGrid Grid.Row="1" ItemsSource="{Binding RecipeViewModel.TransmittanceListItem}" AutoGenerateColumns="False" CanUserAddRows="False" CanUserSortColumns="True" EnableColumnVirtualization="True"  CanUserDeleteRows="False"
@@ -775,10 +811,10 @@
                                                 </Grid>
                                             </Grid>
                                         </GroupBox>
-                                        <GroupBox Header="Thickness Parameter" Grid.Row="2">
+                                        <GroupBox Header="Thickness Parameter" Grid.Row="2" BorderThickness="0">
                                             <Grid>
                                                 <UniformGrid Columns="2" Rows="2">
-                                                    <Grid Margin="5" Background="Gainsboro">
+                                                    <Grid Margin="3" Background="Gainsboro">
                                                         <Grid.ColumnDefinitions>
                                                             <ColumnDefinition Width="18*"/>
                                                             <ColumnDefinition Width="12*"/>
@@ -786,7 +822,7 @@
                                                         <TextBlock Text="Lower WaveLength" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="0"/>
                                                         <TextBox Grid.Column="1" Margin="1" Text="{Binding RecipeViewModel.LowerWaveLength, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" TextAlignment="Center" VerticalContentAlignment="Center" IsEnabled="False"></TextBox>
                                                     </Grid>
-                                                    <Grid Margin="5" Background="Gainsboro">
+                                                    <Grid Margin="3" Background="Gainsboro">
                                                         <Grid.ColumnDefinitions>
                                                             <ColumnDefinition Width="18*"/>
                                                             <ColumnDefinition Width="12*"/>
@@ -794,7 +830,7 @@
                                                         <TextBlock Text="Upper WaveLength" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="0"/>
                                                         <TextBox Grid.Column="1" Margin="1" Text="{Binding RecipeViewModel.UpperWaveLength, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" TextAlignment="Center" VerticalContentAlignment="Center" IsEnabled="False"></TextBox>
                                                     </Grid>
-                                                    <Grid Margin="5" Background="Gainsboro">
+                                                    <Grid Margin="3" Background="Gainsboro">
                                                         <Grid.ColumnDefinitions>
                                                             <ColumnDefinition Width="18*"/>
                                                             <ColumnDefinition Width="12*"/>
@@ -802,7 +838,7 @@
                                                         <TextBlock Text="Thickness LM Iteration" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="0"/>
                                                         <TextBox Grid.Column="1" Margin="1" Text="{Binding RecipeViewModel.ThicknessLMIteration, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" TextAlignment="Center" VerticalContentAlignment="Center" IsEnabled="False"></TextBox>
                                                     </Grid>
-                                                    <Grid Margin="5" Background="Gainsboro">
+                                                    <Grid Margin="3" Background="Gainsboro">
                                                         <Grid.ColumnDefinitions>
                                                             <ColumnDefinition Width="18*"/>
                                                             <ColumnDefinition Width="12*"/>
@@ -817,7 +853,7 @@
                                 </TabItem>
                             </TabControl>
                         </GroupBox>
-                        <GroupBox Header="Current Progress" Grid.Row="2">
+                        <GroupBox Header="Current Progress" Grid.Row="2" BorderThickness="0">
                             <Grid>
                                 <ProgressBar Minimum="0" Maximum="100" Margin="2" Value="{Binding p_Progress, UpdateSourceTrigger=PropertyChanged}" Foreground="{Binding p_ProgressColor}" Style="{StaticResource CustomProgress}"/>
                                 <TextBlock Text="{Binding p_Progress, Converter={StaticResource ProgressConverter}, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Center" VerticalAlignment="Center" ></TextBlock>
@@ -825,7 +861,7 @@
                         </GroupBox>
                     </Grid>
                 </TabItem>
-                <TabItem Header="Log" Width="80">
+                <TabItem Header="Log" Width="80" Style="{StaticResource customTabitem}">
                     <tools:LogView_UI x:Name="LogUI" Margin="2"/>
                 </TabItem>
             </TabControl>
@@ -836,70 +872,85 @@
                 </Grid.RowDefinitions>
                 <StackPanel Margin="10,45,10,15" Grid.Column="3" Grid.Row="0">
                     <Button Content="Resume" x:Name="buttonResume" Margin="0,0,0,15" 
-                            Style="{StaticResource SetupPanelBtn}" 
+                            Style="{StaticResource customButton}" FontSize="15" FontWeight="Bold"
                             Height="40"
                             Click="buttonResume_Click"/>
-                    <Button Content="Pause" x:Name="buttonPause" Margin="0,0,0,15" 
-                            Style="{StaticResource SetupPanelBtn}" 
+                    <Button Content="Pause" x:Name="buttonPause" Margin="0,0,0,15"  FontSize="15" FontWeight="Bold"
+                            Style="{StaticResource customButton}" 
                             Height="40"
                             Click="buttonPause_Click"/>
-                    <Button Content="Initial" x:Name="buttonInit" Margin="0,0,0,15" 
-                            Style="{StaticResource SetupPanelBtn}" 
+                    <Button Content="Initial" x:Name="buttonInit" Margin="0,0,0,15" FontSize="15" FontWeight="Bold"
+                            Style="{StaticResource customButton}" 
                             Height="40"
                             Click="buttonInit_Click"/>
-                    <Button Content="Recovery" x:Name="buttonRecovery" Margin="0,0,0,15" 
-                            Style="{StaticResource SetupPanelBtn}" 
+                    <Button Content="Recovery" x:Name="buttonRecovery" Margin="0,0,0,15"  FontSize="15" FontWeight="Bold"
+                            Style="{StaticResource customButton}" 
                             Height="40"
                             Click="buttonRecovery_Click"/>
-                    <Button Content="Buzzer Off" x:Name="buttonBuzzerOff" Margin="0,0,0,15" 
-                            Style="{StaticResource SetupPanelBtn}" 
+                    <Button Content="Buzzer Off" x:Name="buttonBuzzerOff" Margin="0,0,0,15" FontSize="15" FontWeight="Bold"
+                            Style="{StaticResource customButton}" 
                             Height="40"
                             Click="buttonBuzzerOff_Click"/>
-                    <Button Content="OHT" x:Name="buttonOHT" Margin="0,200,0,0"
-                            Style="{StaticResource SetupPanelBtn}"
+                    <Button Content="OHT" x:Name="buttonOHT" Margin="0,200,0,0" FontSize="15" FontWeight="Bold"
+                            Style="{StaticResource customButton}"
                             Height="40"
                             Click="buttonOHT_Click"/>
                 </StackPanel>
 
-                <GroupBox Grid.Column="3" Grid.Row="1" Header="Lamp" Margin="3" BorderBrush="Black">
-                    <Grid Grid.Row="1" Grid.Column="3">
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="1*"/>
-                            <RowDefinition Height="1*"/>
-                            <RowDefinition Height="1*"/>
-                            <RowDefinition Height="1*"/>
-                            <RowDefinition Height="1*"/>
-                        </Grid.RowDefinitions>
+                <Grid Grid.Column="3" Grid.Row="1" Margin="7">
+                    <Border BorderThickness="1" BorderBrush="White" CornerRadius="2">
+                            <Border.Effect>
+                                <DropShadowEffect ShadowDepth="2" Opacity="0.5"/>
+                            </Border.Effect>
+                    </Border>
+                    <GroupBox Header="Lamp" Background="White" Margin="5" BorderThickness="0">
+                        <GroupBox.HeaderTemplate>
+                            <DataTemplate>
+                                <Grid>
+                                    <Border  CornerRadius="2" Background="White" Width="30" Height="auto" BorderBrush="White" BorderThickness="0">
+                                    </Border>
+                                    <TextBlock Background="White" Text="{Binding}" FontWeight="Bold" TextAlignment="Center" TextOptions.TextRenderingMode="ClearType"/>
+                                </Grid>
+                            </DataTemplate>
+                        </GroupBox.HeaderTemplate>
+                        <Grid>
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="1*"/>
+                                    <RowDefinition Height="1*"/>
+                                    <RowDefinition Height="1*"/>
+                                    <RowDefinition Height="1*"/>
+                                    <RowDefinition Height="1*"/>
+                                </Grid.RowDefinitions>
 
-                        <TextBlock Grid.Row="0" Text="Lamp Use Time" TextTrimming="WordEllipsis" ToolTip="Lamp Use Time" FontSize="15" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="5,10,5,10" />
-                        <Grid Grid.Row="1">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="6*"/>
-                                <ColumnDefinition Width="4*"/>
-                            </Grid.ColumnDefinitions>
-                            <TextBlock Grid.Row="1" Grid.Column="0" Text="{Binding p_lampUsetime ,UpdateSourceTrigger=PropertyChanged}" FontWeight="Bold" FontStyle="Italic" Margin="0,0,0,0" VerticalAlignment="Center" TextAlignment="Right" HorizontalAlignment="Center" Width="80" FontSize="15"/>
-                            <TextBlock Grid.Row="1" Grid.Column="1" Text="Hours"  Margin="0,0,0,0" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="15" FontWeight="Bold"/>
+                                <TextBlock Grid.Row="0" Text="Lamp Use Time" TextTrimming="WordEllipsis" ToolTip="Lamp Use Time" FontSize="15" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="5,10,0,10" TextOptions.TextRenderingMode="ClearType" />
+                                <Grid Grid.Row="1">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="6*"/>
+                                        <ColumnDefinition Width="4*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Grid.Row="1" Grid.Column="0" Text="{Binding p_lampUsetime ,UpdateSourceTrigger=PropertyChanged}" FontWeight="Bold" FontStyle="Italic" Margin="0,0,0,0" VerticalAlignment="Center" TextAlignment="Right" HorizontalAlignment="Center" Width="60" FontSize="15"/>
+                                    <TextBlock Grid.Row= "1" Grid.Column="1" Text="Hours"  Margin="0,0,0,0" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="15" FontWeight="Bold"/>
+                                </Grid>
+                                <TextBlock Grid.Row="2" Text="{Binding p_lampUsetime, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource OpticLampTimeToStringConverter}}" Margin="5,0,5,0" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="10" FontWeight="Bold" Foreground="Red" />
+                                <TextBlock Grid.Row="3" Text="Lamp Status" FontSize="15" ToolTip="Lamp Status" TextTrimming="WordEllipsis" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="5,10,5,10" />
+                                <Grid Grid.Row="4">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition/>
+                                        <ColumnDefinition/>
+                                    </Grid.ColumnDefinitions>
+                                    <PackIcon:PackIconMaterial Margin="25,0,0,0" Width="auto" Height="auto" Kind="LightbulbOn" Foreground="{Binding p_lampStatus, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource OpticLampStateColorConverter}}" />
+                                    <TextBlock Grid.Column="1" FontSize="15" FontWeight="Bold" Text="{Binding p_lampStatus, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource OpticLampStatusEnumConverter}}" HorizontalAlignment="Center" VerticalAlignment="Center" TextAlignment="Center"/>
+                                </Grid>
+
+                                <Border x:Name="LampStateColor" Grid.Row="4">
+                                    <TextBlock Text="{Binding p_LampStates, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center" HorizontalAlignment="Center" />
+                                </Border>
+
+                            </Grid>
                         </Grid>
-                        <TextBlock Grid.Row="2" Text="{Binding p_lampUsetime, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource OpticLampTimeToStringConverter}}" Margin="5,0,5,0" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="10" FontWeight="Bold" Foreground="Red" />
-                        <TextBlock Grid.Row="3" Text="Lamp Status" FontSize="15" ToolTip="Lamp Status" TextTrimming="WordEllipsis" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="5,10,5,10" />
-                        <Grid Grid.Row="4">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition/>
-                                <ColumnDefinition/>
-                            </Grid.ColumnDefinitions>
-                            <PackIcon:PackIconMaterial Margin="25,0,0,0" Width="auto" Height="auto" Kind="LightbulbOn" Foreground="{Binding p_lampStatus, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource OpticLampStateColorConverter}}" />
-                            <TextBlock Grid.Column="1" FontSize="15" FontWeight="Bold" Text="{Binding p_lampStatus, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource OpticLampStatusEnumConverter}}" HorizontalAlignment="Center" VerticalAlignment="Center" TextAlignment="Center"/>
-                        </Grid>
-                       
-
-                        <!--<Border x:Name="LampStateColor" Grid.Row="4">
-                            <TextBlock Text="{Binding p_LampStates, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center" HorizontalAlignment="Center" />
-                            
-                        </Border>-->
-
-                    </Grid>
-                </GroupBox>
-
+                    </GroupBox>
+                </Grid>
             </Grid>
         </Grid>
 

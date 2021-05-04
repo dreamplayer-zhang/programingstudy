@@ -1067,48 +1067,6 @@ namespace Root_CAMELLIA
         }
         private SolidColorBrush routeBrush = new SolidColorBrush(System.Windows.Media.Color.FromArgb(128, 0, 0, 255));
 
-        public SolidColorBrush ReorderBrush
-        {
-            get
-            {
-                return _ReorderBrush;
-            }
-            set
-            {
-                _ReorderBrush = value;
-                RaisePropertyChanged("ReorderBrush");
-            }
-        }
-        private SolidColorBrush _ReorderBrush = new SolidColorBrush(System.Windows.Media.Color.FromArgb(208, 221, 221, 221));
-
-        public SolidColorBrush LockBrush
-        {
-            get
-            {
-                return _LockBrush;
-            }
-            set
-            {
-                _LockBrush = value;
-                RaisePropertyChanged("LockBrush");
-            }
-        }
-        private SolidColorBrush _LockBrush = new SolidColorBrush(System.Windows.Media.Color.FromArgb(208, 221, 221, 221));
-
-        public SolidColorBrush ShowIndexBrush
-        {
-            get
-            {
-                return _ShowIndexBrush;
-            }
-            set
-            {
-                _ShowIndexBrush = value;
-                RaisePropertyChanged("ShowIndexBrush");
-            }
-        }
-        private SolidColorBrush _ShowIndexBrush = new SolidColorBrush(System.Windows.Media.Color.FromArgb(208, 221, 221, 221));
-
         public SolidColorBrush ShiftBrush
         {
             get
@@ -3484,7 +3442,7 @@ namespace Root_CAMELLIA
                     {
                         SetStartEndPointMode = false;
                         ReorderCnt = 0;
-                        ReorderBrush = normalBrush;
+                       // ReorderBrush = normalBrush;
                     }
                 }
             }
@@ -3858,7 +3816,36 @@ namespace Root_CAMELLIA
                     if (SetStartEndPointMode)
                     {
                         SetStartEndPointMode = false;
-                        ReorderBrush = normalBrush;
+                       // ReorderBrush = normalBrush;
+                        PointAddMode = "Normal";
+                    }
+                    if (IsLockUI)
+                    {
+                        IsLockUI = false;
+                    }
+
+                    if (IsShowIndex)
+                    {
+                        IsShowIndex = false;
+                    }
+
+                    if (ShiftKeyDown)
+                    {
+                        ShiftKeyDown = false;
+                        ShiftBrush = normalBrush;
+                        PointAddMode = "Normal";
+                    }
+                    if(CtrlKeyDown)
+                    {
+                        CtrlKeyDown = false;
+                        CtrlBrush = normalBrush;
+                        PointAddMode = "Normal";
+                    }
+
+                    if(IsKeyboardShowIndex)
+                    {
+                        IsKeyboardShowIndex = false;
+                        SBrush = normalBrush;
                         PointAddMode = "Normal";
                     }
 
@@ -4036,13 +4023,13 @@ namespace Root_CAMELLIA
                         ListReorderPoint.Clear();
                         ReorderCnt = 0;
                         SetStartEndPointMode = true;
-                        ReorderBrush = buttonSelectBrush;
+                      //  ReorderBrush = buttonSelectBrush;
                         PointAddMode = "Reorder Mode";
                     }
                     else
                     {
                         SetStartEndPointMode = false;
-                        ReorderBrush = normalBrush;
+                    //    ReorderBrush = normalBrush;
                         PointAddMode = "Normal";
                     }
                     UpdateView();
@@ -4057,12 +4044,12 @@ namespace Root_CAMELLIA
                 {
                     if (IsShowIndex)
                     {
-                        ShowIndexBrush = normalBrush;
+                       // ShowIndexBrush = normalBrush;
                         IsShowIndex = false;
                     }
                     else
                     {
-                        ShowIndexBrush = buttonSelectBrush;
+                       // ShowIndexBrush = buttonSelectBrush;
                         IsShowIndex = true;
 
                     }
@@ -4079,13 +4066,13 @@ namespace Root_CAMELLIA
                 {
                     if (IsLockUI)
                     {
-                        LockBrush = normalBrush;
+                       // LockBrush = normalBrush;
                         LockState = "Lock UI";
                         IsLockUI = false;
                     }
                     else
                     {
-                        LockBrush = buttonSelectBrush;
+                      //  LockBrush = buttonSelectBrush;
                         LockState = "UnLock UI";
                         IsLockUI = true;
 

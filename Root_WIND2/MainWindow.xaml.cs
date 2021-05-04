@@ -268,6 +268,10 @@ namespace Root_WIND2
                             frontImage.GetPtr(1), 
                             frontImage.GetPtr(2), 
                                 new MemoryID(memoryFrontPool, memoryFrontGroup, memoryFront)));
+
+
+                    CameraInfo camInfo = DataConverter.GrabModeToCameraInfo(engineer.m_handler.p_Vision.GetGrabMode(recipeFront.CameraInfoIndex));
+                    frontInspection.SetCameraInfo(camInfo);
                 }
 
                 //if (frontImage.GetPtr() == IntPtr.Zero)
