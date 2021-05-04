@@ -72,6 +72,8 @@ namespace Root_WIND2.UI_User
         public readonly UI_User.FrontsideInspect frontsideInspect = new UI_User.FrontsideInspect();
 
         // BACK
+        //btnBackProduct
+        public readonly UI_User.BacksideProduct backsideProduct = new UI_User.BacksideProduct();
         public readonly UI_User.BacksideSetup backsideSetup = new UI_User.BacksideSetup();
         public readonly UI_User.BacksideInspect backsideInspect = new UI_User.BacksideInspect();
 
@@ -153,6 +155,12 @@ namespace Root_WIND2.UI_User
         #endregion
 
         #region [Back ViewModels]
+        private UI_User.BacksideProduct_ViewModel backsideProductVM = new BacksideProduct_ViewModel();
+        public UI_User.BacksideProduct_ViewModel BacksideProductVM
+        {
+            get => this.backsideProductVM;
+        }
+
         private UI_User.BacksideSetup_ViewModel backsideSetupVM = new UI_User.BacksideSetup_ViewModel();
         public UI_User.BacksideSetup_ViewModel BacksideROIVM
         {
@@ -779,6 +787,18 @@ namespace Root_WIND2.UI_User
         #endregion
 
         #region [Command Back]
+
+        public ICommand btnBackProduct
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    SetPage(backsideProduct);
+                    backsideProduct.DataContext = backsideProductVM;
+                });
+            }
+        }
         public ICommand btnBackSetup
         {
             get

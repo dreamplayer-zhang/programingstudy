@@ -1,4 +1,4 @@
-﻿using Root_WIND2.Module;
+﻿using Root_WindII.Engineer;
 using RootTools;
 using RootTools.Database;
 using RootTools.Module;
@@ -12,7 +12,7 @@ using System.Windows.Threading;
 using System.Data;
 using RootTools_Vision.WorkManager3;
 
-namespace Root_WIND2.UI_User
+namespace Root_WindII
 {
     public class FrontsideInspect_ViewModel : ObservableObject, IPage
     {
@@ -104,7 +104,6 @@ namespace Root_WIND2.UI_User
                 GlobalObjects.Instance.GetNamed<WorkManager>("frontInspection").InspectionDone += InspectionDone_Callback;
                 GlobalObjects.Instance.GetNamed<WorkManager>("frontInspection").ProcessDefectWaferStart += ProcessDefectWaferStart_Callback;
                 GlobalObjects.Instance.GetNamed<WorkManager>("frontInspection").IntegratedProcessDefectDone += ProcessDefectWaferDone_Callback;
-                GlobalObjects.Instance.GetNamed<WorkManager>("frontInspection").ProcessDefectDone += ProcessDefectDone_Callback;
             }
 
 
@@ -182,7 +181,7 @@ namespace Root_WIND2.UI_User
         {
             get => new RelayCommand(() =>
             {
-                LoadRecipe();
+                //LoadRecipe(); // jhan
 
                 if (GlobalObjects.Instance.GetNamed<WorkManager>("frontInspection") != null)
                 {
@@ -242,7 +241,7 @@ namespace Root_WIND2.UI_User
         {
             get => new RelayCommand(() =>
             {
-                EQ.p_bStop = false;
+                /*EQ.p_bStop = false;
                 Vision vision = ((WIND2_Handler)GlobalObjects.Instance.Get<WIND2_Engineer>().ClassHandler()).p_Vision;
                 if (vision.p_eState != ModuleBase.eState.Ready)
                 {
@@ -263,7 +262,7 @@ namespace Root_WIND2.UI_User
                     {
 
                     }
-                }
+                }*/
             });
         }
 
@@ -296,8 +295,8 @@ namespace Root_WIND2.UI_User
         {
             get => new RelayCommand(() =>
             {
-                GlobalObjects.Instance.Get<InspectionManagerFrontside>().RemoteProcessStart();
-                GlobalObjects.Instance.Get<InspectionManagerFrontside>().RemoteProcessStartWork();
+                //GlobalObjects.Instance.Get<InspectionManagerFrontside>().RemoteProcessStart();
+                //GlobalObjects.Instance.Get<InspectionManagerFrontside>().RemoteProcessStartWork();
             });
         }
         #endregion
@@ -332,8 +331,6 @@ namespace Root_WIND2.UI_User
 
         private void InspectionDone_Callback(object obj, InspectionDoneEventArgs args)
         {
-            return;
-
             Workplace workplace = args.workplace;
             if (workplace == null || workplace.DefectList == null) return;
             List<String> textList = new List<String>();
@@ -368,28 +365,6 @@ namespace Root_WIND2.UI_User
             {
                 DatabaseManager.Instance.SelectData();
                 m_DataViewer_VM.pDataTable = DatabaseManager.Instance.pDefectTable;
-            }));
-        }
-
-        private void ProcessDefectDone_Callback(object obj, ProcessDefectDoneEventArgs args)
-        {
-            Workplace workplace = obj as Workplace;
-            if (workplace == null || workplace.DefectList == null) return;
-            List<String> textList = new List<String>();
-            List<CRect> rectList = new List<CRect>();
-
-
-            foreach (RootTools.Database.Defect defectInfo in workplace.DefectList)
-            {
-                String text = "";
-
-                rectList.Add(new CRect((int)defectInfo.p_rtDefectBox.Left, (int)defectInfo.p_rtDefectBox.Top, (int)defectInfo.p_rtDefectBox.Right, (int)defectInfo.p_rtDefectBox.Bottom));
-                textList.Add(text);
-            }
-
-            Application.Current.Dispatcher.Invoke(DispatcherPriority.Normal, new Action(delegate
-            {
-                DrawRectDefect(rectList, textList);
             }));
         }
 

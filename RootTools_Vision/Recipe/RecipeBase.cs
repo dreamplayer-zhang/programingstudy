@@ -21,11 +21,19 @@ namespace RootTools_Vision
 
         private List<RecipeItemBase> recipeItemList;
         private List<ParameterBase> parameterItemList;
+
+        private int cameraInfoIndex = 0;
         #endregion
 
         #region [Getter Setter]
         public string Name { get => name; set => name = value; }
         public RecipeType_WaferMap WaferMap { get => waferMap; set => waferMap = value; }
+
+        public int CameraInfoIndex
+        {
+            get => this.cameraInfoIndex;
+            set => this.cameraInfoIndex = value;
+        }
 
         [XmlIgnore]
         public List<RecipeItemBase> RecipeItemList { get => recipeItemList; set => recipeItemList = value; }

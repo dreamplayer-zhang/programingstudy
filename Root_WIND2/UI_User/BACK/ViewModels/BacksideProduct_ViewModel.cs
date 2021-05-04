@@ -1,5 +1,4 @@
-﻿using Root_WIND2.Module;
-using RootTools;
+﻿using RootTools;
 using RootTools_Vision;
 using System;
 using System.Collections.Generic;
@@ -15,7 +14,7 @@ using System.Windows.Shapes;
 
 namespace Root_WIND2.UI_User
 {
-    class FrontsideProduct_ViewModel : ObservableObject, IPage
+    class BacksideProduct_ViewModel : ObservableObject
     {
         #region [Members]
         int nWaferSize = 300;
@@ -83,25 +82,12 @@ namespace Root_WIND2.UI_User
             set;
         }
 
-        private DataListView_ViewModel camInfoDataListVM;
-
-        public DataListView_ViewModel CamInfoDataListVM
-        {
-            get => this.camInfoDataListVM;
-            set
-            {
-                SetProperty(ref this.camInfoDataListVM, value);
-            }
-        }
-        
-
-
         public List<string> GrabModeList
         {
             get
             {
                 return ((WIND2_Handler)GlobalObjects.Instance.Get<WIND2_Engineer>().ClassHandler()).p_Vision.p_asGrabMode;
-            } 
+            }
             set
             {
 
@@ -138,17 +124,6 @@ namespace Root_WIND2.UI_User
                 this.CamResolutionX = mode.m_dTargetResX_um;
                 this.CamResolutionY = mode.m_dTargetResY_um;
                 this.WaferSize = mode.m_nWaferSize_mm;
-
-                WIND2_Engineer engineer = GlobalObjects.Instance.Get<WIND2_Engineer>();
-                RecipeFront recipeFront = GlobalObjects.Instance.Get<RecipeFront>();
-
-                recipeFront.CameraInfoIndex = value;
-
-                CameraInfo camInfo = DataConverter.GrabModeToCameraInfo(engineer.m_handler.p_Vision.GetGrabMode(recipeFront.CameraInfoIndex));
-
-                this.CamInfoDataListVM.Init(camInfo);
-
-
                 SetProperty<int>(ref this.selectedGrabModeIndex, value);
             }
         }
@@ -173,7 +148,7 @@ namespace Root_WIND2.UI_User
         {
             get
             {
-                return new RelayCommand(()=>
+                return new RelayCommand(() =>
                 {
                     CreateWaferMap();
                 });
@@ -190,7 +165,7 @@ namespace Root_WIND2.UI_User
                 });
             }
         }
-        
+
 
         public ICommand SizeChangedCommand
         {
@@ -233,25 +208,16 @@ namespace Root_WIND2.UI_User
                 0,0,0,0,0,1,1,1,1,0,0,0,0,0,//14
         };
 
-        public FrontsideProduct_ViewModel()
+        public BacksideProduct_ViewModel()
         {
             chipItems = new ObservableCollection<Rectangle>();
-
-            this.camInfoDataListVM = new DataListView_ViewModel();
         }
 
         public void LoadRecipe()
         {
-            RecipeType_WaferMap wafermap = GlobalObjects.Instance.Get<RecipeFront>().WaferMap;
+            RecipeType_WaferMap wafermap = GlobalObjects.Instance.Get<RecipeBack>().WaferMap;
 
             CreateRecipeWaferMap(wafermap.MapSizeX, wafermap.MapSizeY, wafermap.Data);
-
-            WIND2_Engineer engineer = GlobalObjects.Instance.Get<WIND2_Engineer>();
-            RecipeFront recipeFront = GlobalObjects.Instance.Get<RecipeFront>();
-
-            CameraInfo camInfo = DataConverter.GrabModeToCameraInfo(engineer.m_handler.p_Vision.GetGrabMode(recipeFront.CameraInfoIndex));
-
-            this.CamInfoDataListVM.Init(camInfo);
         }
 
         #region [Properties]
@@ -308,13 +274,13 @@ namespace Root_WIND2.UI_User
         {
             ChipItems.Clear();
 
-            RecipeType_WaferMap waferMap = GlobalObjects.Instance.Get<RecipeFront>().WaferMap;
+            RecipeType_WaferMap waferMap = GlobalObjects.Instance.Get<RecipeBack>().WaferMap;
 
             int sizeX = waferMap.MapSizeX;
             int sizeY = waferMap.MapSizeY;
 
             double chipWidth = (double)CanvasWidth / (double)sizeX;
-            double chipHeight = (double)CanvasHeight/ (double)sizeY;
+            double chipHeight = (double)CanvasHeight / (double)sizeY;
 
             Point originPt = new Point(0, 0);
 
@@ -327,7 +293,7 @@ namespace Root_WIND2.UI_User
                     rect.Height = chipHeight;
                     Canvas.SetLeft(rect, originPt.X + (chipWidth * x));
                     Canvas.SetTop(rect, originPt.Y + (chipHeight * y));
- 
+
                     rect.Tag = new CPoint(x, y);
                     rect.ToolTip = string.Format("({0}, {1})", x, y); // chip index
                     rect.Stroke = Brushes.Transparent;
@@ -371,32 +337,32 @@ namespace Root_WIND2.UI_User
 
         private void CreateRecipeWaferMap(int mapSizeX, int mapSizeY, CHIP_TYPE type)
         {
-            RecipeType_WaferMap waferMap = GlobalObjects.Instance.Get<RecipeFront>().WaferMap;
+            RecipeType_WaferMap waferMap = GlobalObjects.Instance.Get<RecipeBack>().WaferMap;
             waferMap.CreateWaferMap(mapSizeX, mapSizeY, type);
         }
 
         private void CreateRecipeWaferMap(int mapSizeX, int mapSizeY, int[] mapdata)
         {
-            RecipeType_WaferMap waferMap = GlobalObjects.Instance.Get<RecipeFront>().WaferMap;
+            RecipeType_WaferMap waferMap = GlobalObjects.Instance.Get<RecipeBack>().WaferMap;
             waferMap.CreateWaferMap(mapSizeX, mapSizeY, mapdata);
         }
 
         private void ClearRecipeWaferMap()
         {
-            RecipeType_WaferMap waferMap = GlobalObjects.Instance.Get<RecipeFront>().WaferMap;
+            RecipeType_WaferMap waferMap = GlobalObjects.Instance.Get<RecipeBack>().WaferMap;
             waferMap.Clear();
         }
 
         private void UpdateRecipeWaferMap(int x, int y, CHIP_TYPE type)
         {
-            RecipeType_WaferMap waferMap = GlobalObjects.Instance.Get<RecipeFront>().WaferMap;
+            RecipeType_WaferMap waferMap = GlobalObjects.Instance.Get<RecipeBack>().WaferMap;
 
             waferMap.Data[y * waferMap.MapSizeX + x] = (int)type;
         }
 
         private CHIP_TYPE GetRecipeChipType(int x, int y)
         {
-            RecipeType_WaferMap waferMap = GlobalObjects.Instance.Get<RecipeFront>().WaferMap;
+            RecipeType_WaferMap waferMap = GlobalObjects.Instance.Get<RecipeBack>().WaferMap;
 
             return (CHIP_TYPE)waferMap.Data[y * waferMap.MapSizeX + x];
         }

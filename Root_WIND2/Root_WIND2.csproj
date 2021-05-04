@@ -228,6 +228,7 @@
     </Compile>
     <Compile Include="Controls\UserControl\ViewModel\MapControl_ViewModel.cs" />
     <Compile Include="Controls\UserControl\ViewModel\FeatureControl_ViewModel.cs" />
+    <Compile Include="DataConverter.cs" />
     <Compile Include="Dialog\Dialog_Scan.xaml.cs">
       <DependentUpon>Dialog_Scan.xaml</DependentUpon>
     </Compile>
@@ -273,6 +274,9 @@
     </Compile>
     <Compile Include="UI\Interfaces\IRecipeUILoadable.cs" />
     <Compile Include="Module\WIND2.cs" />
+    <Compile Include="UI_User\BACK\BacksideProduct.xaml.cs">
+      <DependentUpon>BacksideProduct.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI_User\BACK\BacksideSetup.xaml.cs">
       <DependentUpon>BacksideSetup.xaml</DependentUpon>
     </Compile>
@@ -281,6 +285,7 @@
     </Compile>
     <Compile Include="UI_User\BACK\ViewModels\BacksideInspect_ImageViewer_ViewModel.cs" />
     <Compile Include="UI_User\BACK\ViewModels\BacksideInspect_ViewModel.cs" />
+    <Compile Include="UI_User\BACK\ViewModels\BacksideProduct_ViewModel.cs" />
     <Compile Include="UI_User\BACK\ViewModels\BacksideSetup_ImageViewer_ViewModel.cs" />
     <Compile Include="UI_User\BACK\ViewModels\BacksideSetup_ViewModel.cs" />
     <Compile Include="UI_User\CAMERA\CameraAlign.xaml.cs">
@@ -716,6 +721,10 @@
     <Page Include="UI\1. Setup\4. Maintenance\WIND2_Recipe_UI.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI_User\BACK\BacksideProduct.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UI_User\BACK\BacksideSetup.xaml">
       <SubType>Designer</SubType>
