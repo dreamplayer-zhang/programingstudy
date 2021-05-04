@@ -127,6 +127,7 @@ namespace Root_WIND2
 
         void Init()
         {
+            /**/
             CreateGlobalPaths();
 
             if (RegisterGlobalObjects() == false)
