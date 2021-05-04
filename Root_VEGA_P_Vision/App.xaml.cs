@@ -15,5 +15,7 @@ namespace Root_VEGA_P_Vision
     {
         public const string mPool = "Vision.Memory";
         public const string mGroup = "Vision";
+        public const string mMaskLayer = "MaskLayer";
+
     }
 }

@@ -22,10 +22,6 @@ namespace Root_VEGA_P_Vision
             screwUIIllum = new screwUI();
             vm1 = (ScrewUI_ViewModel)screwUITime.DataContext;
             vm2 = (ScrewUI_ViewModel)screwUIIllum.DataContext;
-            ImageData img = new ImageData(1000, 1000);
-            img.LoadImageSync(@"D:\03_Projects\Root\Root_VEGA_P_Vision\Resources\screwbf.bmp", new CPoint(0,0));
-            vm1.ImageDatas.Add(img);
-            vm1.SetCurrentImage(0);
         }
     }
 }

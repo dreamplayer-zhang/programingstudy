@@ -131,18 +131,19 @@ namespace Root_VEGA_P_Vision
 				int insplen = Enum.GetValues(InspType).Length;
 
 				RecipeVision recipe_VegaP = GlobalObjects.Instance.Register<RecipeVision>();
+				GlobalObjects.Instance.RegisterNamed<ImageData>(App.mMaskLayer, memoryTool.GetMemory(App.mPool, App.mGroup, App.mMaskLayer));
 
-                foreach (var v in Enum.GetValues(partstype))
+				foreach (var v in Enum.GetValues(partstype))
                     foreach (var v2 in Enum.GetValues(InspType))
                         foreach (var v3 in Enum.GetValues(UpdownType))
                         {
 							List<IntPtr> li = new List<IntPtr>();
                             string memstr = v.ToString() + "." + v2.ToString() + "." + v3.ToString();
-							string maskstr = memstr + ".MaskImage";
+							//string maskstr = memstr + ".MaskImage";
 							MemoryData memData = engineer.ClassMemoryTool().GetMemory(App.mPool, App.mGroup, memstr);
 
                             ImageData Data = GlobalObjects.Instance.RegisterNamed<ImageData>(memstr, memoryTool.GetMemory(App.mPool,App.mGroup,memstr));
-                            ImageData maskLayer = GlobalObjects.Instance.RegisterNamed<ImageData>(maskstr, memoryTool.GetMemory(App.mPool, App.mGroup, maskstr));
+                            //ImageData maskLayer = GlobalObjects.Instance.RegisterNamed<ImageData>(maskstr, memoryTool.GetMemory(App.mPool, App.mGroup, maskstr));
                             if (Data.m_MemData!=null)
                             {
 								Data.p_nByte = memData.p_nByte;
@@ -172,11 +173,11 @@ namespace Root_VEGA_P_Vision
 					foreach(var v2 in Enum.GetValues(SideType))
                     {
 						string memstr = v.ToString() + "." + v2.ToString();
-						string maskstr = memstr + ".MaskImage";
+						//string maskstr = memstr + ".MaskImage";
 
 						MemoryData memData = engineer.ClassMemoryTool().GetMemory(App.mPool, App.mGroup, memstr);
                         ImageData Data = GlobalObjects.Instance.RegisterNamed<ImageData>(memstr, memoryTool.GetMemory(App.mPool, App.mGroup, memstr));
-                        ImageData maskLayer = GlobalObjects.Instance.RegisterNamed<ImageData>(maskstr, memoryTool.GetMemory(App.mPool, App.mGroup, maskstr));
+                        //ImageData maskLayer = GlobalObjects.Instance.RegisterNamed<ImageData>(maskstr, memoryTool.GetMemory(App.mPool, App.mGroup, maskstr));
                         List<IntPtr> li = new List<IntPtr>();
 						if(Data.m_MemData!=null)
                         {

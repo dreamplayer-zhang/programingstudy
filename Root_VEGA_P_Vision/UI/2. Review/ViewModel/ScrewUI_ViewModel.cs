@@ -1,4 +1,5 @@
-﻿using RootTools;
+﻿using Root_VEGA_P_Vision.Engineer;
+using RootTools;
 using RootTools_Vision;
 using System;
 using System.Collections.Generic;
@@ -12,19 +13,21 @@ namespace Root_VEGA_P_Vision
 {
     public class ScrewUI_ViewModel:ObservableObject
     {
-        private readonly ScrewUI_ImageViewer_ViewModel screwUI_ImageViewer_ViewModel;
+        private readonly RootViewer_ViewModel screwUI_ImageViewer_ViewModel;
         screwUI screwUI;
         int idx = 0;
         public List<ImageData> ImageDatas;
-        public ScrewUI_ImageViewer_ViewModel ScrewUI_ImageViewerVM
+        public RootViewer_ViewModel ScrewUI_ImageViewerVM
         {
             get => screwUI_ImageViewer_ViewModel;
         }
         public ScrewUI_ViewModel(screwUI screwUI)
         {
             this.screwUI = screwUI;
-            screwUI_ImageViewer_ViewModel = new ScrewUI_ImageViewer_ViewModel(this);
-            screwUI_ImageViewer_ViewModel.init(null, GlobalObjects.Instance.Get<DialogService>());
+            screwUI_ImageViewer_ViewModel = new RootViewer_ViewModel();
+            screwUI_ImageViewer_ViewModel.p_VisibleMenu = Visibility.Collapsed;
+            screwUI_ImageViewer_ViewModel.p_VisibleSlider = Visibility.Collapsed;
+            screwUI_ImageViewer_ViewModel.init(new ImageData(GlobalObjects.Instance.Get<VEGA_P_Vision_Engineer>().ClassMemoryTool().GetMemory("Vision.Memory", "Vision", "EIP_Plate.Main.Front")), GlobalObjects.Instance.Get<DialogService>());
 
             ImageDatas = new List<ImageData>();
         }

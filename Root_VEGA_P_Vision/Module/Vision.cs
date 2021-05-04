@@ -376,6 +376,7 @@ namespace Root_VEGA_P_Vision.Module
         public override void InitMemorys()
         {
             memoryGroup = memoryPool.GetGroup(p_id);
+            memoryGroup.CreateMemory(App.mMaskLayer, 1, 1, 1000, 1000);
             m_mainOptic.InitMemorys();
             m_sideOptic.InitMemorys(); 
         }
