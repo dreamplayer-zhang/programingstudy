@@ -41,11 +41,23 @@ namespace Root_Pine2.Module
                 _eStep = value; 
                 switch (value)
                 {
-                    case eStep.Ready: m_pine2.m_display.Write(m_nID, "REDY"); break;
-                    case eStep.Load: m_pine2.m_display.Write(m_nID, "LOAD"); break;
-                    case eStep.Run: m_pine2.m_display.Write(m_nID, "RUN "); break;
-                    case eStep.Unload: m_pine2.m_display.Write(m_nID, "UNLD"); break;
+                    case eStep.Ready: p_sLED = "REDY"; break;
+                    case eStep.Load: p_sLED = "LOAD"; break;
+                    case eStep.Run: p_sLED = "RUN "; break;
+                    case eStep.Unload: p_sLED = "UNLD"; break;
                 }
+            }
+        }
+
+        string _sLED = "";
+        public string p_sLED
+        {
+            get { return _sLED; }
+            set
+            {
+                if (_sLED == value) return;
+                _sLED = value;
+                m_pine2.m_display.Write(m_nID, value); 
             }
         }
         #endregion

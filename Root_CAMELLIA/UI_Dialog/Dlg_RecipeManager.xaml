@@ -15,7 +15,7 @@
         WindowState="Normal"
         Width="1820" Height="980"
         BorderBrush="Black" BorderThickness="1"
-        Background="{StaticResource PanelBackGround}"
+        Background="White"
         mc:Ignorable="d">
     <i:Interaction.Triggers>
         <i:EventTrigger EventName="Unloaded">
@@ -141,10 +141,10 @@
                             <RowDefinition/>
                             <RowDefinition/>
                         </Grid.RowDefinitions>
-                        <Button Content="13 Point" Grid.Column="0" Grid.Row="0" Margin="5" Command="{Binding Cmd13Point}" IsEnabled="{Binding p_isCustomize, Converter={StaticResource BoolConverter}}"/>
-                        <Button Content="25 Point"  Grid.Column="1" Grid.Row="0" Margin="5" Command="{Binding Cmd25Point}" IsEnabled="{Binding p_isCustomize, Converter={StaticResource BoolConverter}}"/>
-                        <Button Content="49 Point" Grid.Column="0" Grid.Row="1" Margin="5" Command="{Binding Cmd49Point}" IsEnabled="{Binding p_isCustomize, Converter={StaticResource BoolConverter}}"/>
-                        <Button Content="73 Point"  Grid.Column="1" Grid.Row="1" Margin="5" Command="{Binding Cmd73Point}" IsEnabled="{Binding p_isCustomize, Converter={StaticResource BoolConverter}}"/>
+                        <Button Content="13 Point" Grid.Column="0" Grid.Row="0" Margin="5" Command="{Binding Cmd13Point}" IsEnabled="{Binding p_isCustomize, Converter={StaticResource BoolConverter}}" Style="{StaticResource customButton}"/>
+                        <Button Content="25 Point"  Grid.Column="1" Grid.Row="0" Margin="5" Command="{Binding Cmd25Point}" IsEnabled="{Binding p_isCustomize, Converter={StaticResource BoolConverter}}" Style="{StaticResource customButton}"/>
+                        <Button Content="49 Point" Grid.Column="0" Grid.Row="1" Margin="5" Command="{Binding Cmd49Point}" IsEnabled="{Binding p_isCustomize, Converter={StaticResource BoolConverter}}"  Style="{StaticResource customButton}"/>
+                        <Button Content="73 Point"  Grid.Column="1" Grid.Row="1" Margin="5" Command="{Binding Cmd73Point}" IsEnabled="{Binding p_isCustomize, Converter={StaticResource BoolConverter}}"  Style="{StaticResource customButton}"/>
                     </Grid>
                 </GroupBox>
                 <GroupBox Header="Select Using Measurement" Grid.Row="1">
@@ -362,14 +362,14 @@
                                     </i:Interaction.Triggers>
                                 </ListView>
                                 <UniformGrid Grid.Column="2" Columns="1" Rows="2">
-                                    <Button Content="Add material"  Margin="7" Command="{Binding CmdAddMaterial}" IsEnabled="{Binding p_UseThickness}"/>
-                                    <Button Content="Delete material" Margin="7" Command="{Binding CmdDeleteMaterial}" IsEnabled="{Binding p_UseThickness}"/>
+                                    <Button Content="Add material"  Margin="7" Command="{Binding CmdAddMaterial}" IsEnabled="{Binding p_UseThickness}" Style="{StaticResource customButton}"/>
+                                    <Button Content="Delete material" Margin="7" Command="{Binding CmdDeleteMaterial}" IsEnabled="{Binding p_UseThickness}" Style="{StaticResource customButton}"/>
                                 </UniformGrid>
                                 <UniformGrid Grid.Column="3" Columns="2" Rows="2" Margin="2">
-                                    <Button Content="Insert Layer" Margin="5" Command="{Binding CmdInsertLayer}" IsEnabled="{Binding p_UseThickness}"/>
-                                    <Button Content="Delete Layer" Margin="5" Command="{Binding CmdDeleteLayer}" IsEnabled="{Binding p_UseThickness}"/>
-                                    <Button Content="Open Model" Margin="5" Command="{Binding CmdOpenModel}" IsEnabled="{Binding p_UseThickness}"/>
-                                    <Button Content="Save Model" Margin="5" Command="{Binding CmdSaveModel}" IsEnabled="{Binding p_UseThickness}"/>
+                                    <Button Content="Insert Layer" Margin="5" Command="{Binding CmdInsertLayer}" IsEnabled="{Binding p_UseThickness}" Style="{StaticResource customButton}"/>
+                                    <Button Content="Delete Layer" Margin="5" Command="{Binding CmdDeleteLayer}" IsEnabled="{Binding p_UseThickness}" Style="{StaticResource customButton}"/>
+                                    <Button Content="Open Model" Margin="5" Command="{Binding CmdOpenModel}" IsEnabled="{Binding p_UseThickness}" Style="{StaticResource customButton}"/>
+                                    <Button Content="Save Model" Margin="5" Command="{Binding CmdSaveModel}" IsEnabled="{Binding p_UseThickness}" Style="{StaticResource customButton}"/>
                                 </UniformGrid>
                                 <TextBlock Text="Model File" Grid.Row="1" Grid.Column="2" VerticalAlignment="Center"
                                            HorizontalAlignment="Center" Height="14" Width="Auto" Margin="8,8,42,8"/>
@@ -489,8 +489,8 @@
                                 </Grid>
                             </Grid>
                             <UniformGrid Rows="1" Columns="2" Grid.Row="2">
-                                <Button Content="Add" Margin="0,5,2,5" Command="{Binding CmdAddWaveLength}"/>
-                                <Button Content="Delete" Margin="2,5,1,5" Command="{Binding CmdDeleteWaveLength}"/>
+                                <Button Content="Add" Margin="0,5,2,5" Command="{Binding CmdAddWaveLength}" Style="{StaticResource customButton}"/>
+                                <Button Content="Delete" Margin="2,5,1,5" Command="{Binding CmdDeleteWaveLength}" Style="{StaticResource customButton}"/>
                             </UniformGrid>
                         </Grid>
                     </Grid>
@@ -553,19 +553,20 @@
                         </Grid.ColumnDefinitions>
                         <GroupBox Header="Point Setting">
                             <UniformGrid Columns="5" Rows="1">
-                                <Button Content="Reset" Margin="2,5,2,5" Command="{Binding CmdReset}"/>
-                                <Button Content="Preset 1" Margin="2,5,2,5" Command="{Binding CmdPreset1}"/>
-                                <Button Content="Preset 2" Margin="2,5,2,5" Command="{Binding CmdPreset2}" />
-                                <Button Content="Preset Load" Margin="2,5,2,5" Command="{Binding CmdPresetLoad}"/>
-                                <Button Content="Customize" Margin="2,5,2,5" Command="{Binding CmdCustomize}"/>
+                                <Button Content="Reset" Margin="2,5,2,5" Command="{Binding CmdReset}" Style="{StaticResource customButton}"/>
+                                <Button Content="Preset 1" Margin="2,5,2,5" Command="{Binding CmdPreset1}" Style="{StaticResource customButton}"/>
+                                <Button Content="Preset 2" Margin="2,5,2,5" Command="{Binding CmdPreset2}" Style="{StaticResource customButton}"/>
+                                <Button Content="Preset Load" Margin="2,5,2,5" Command="{Binding CmdPresetLoad}" Style="{StaticResource customButton}"/>
+                                <!--<Button Content="Customize" Margin="2,5,2,5" Command="{Binding CmdCustomize}"/>-->
+                                <CheckBox Content="Customize" Margin="2,5,2,5" Command="{Binding CmdCustomize}" Style="{StaticResource customCheckButton}"/>
                             </UniformGrid>
                         </GroupBox>
                         <GroupBox Header="Point Selector" Grid.Column="1">
                             <UniformGrid Columns="4" Rows="1">
                                 <TextBox Text="{Binding Percentage}" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Margin="5" IsEnabled="{Binding p_isCustomize, Converter={StaticResource BoolConverter}}"/>
-                                <Button Content="Select %" Margin="5" Command="{Binding CmdSelectPercentage}" IsEnabled="{Binding p_isCustomize, Converter={StaticResource BoolConverter}}"/>
-                                <Button Content="Select All" Margin="5" Command="{Binding CmdSelectAll}" IsEnabled="{Binding p_isCustomize, Converter={StaticResource BoolConverter}}"/>
-                                <Button Content="Delete All" Margin="5" Command="{Binding CmdDeleteAll}" IsEnabled="{Binding p_isCustomize, Converter={StaticResource BoolConverter}}"/>
+                                <Button Content="Select %" Margin="5" Command="{Binding CmdSelectPercentage}" IsEnabled="{Binding p_isCustomize, Converter={StaticResource BoolConverter}}" Style="{StaticResource customButton}"/>
+                                <Button Content="Select All" Margin="5" Command="{Binding CmdSelectAll}" IsEnabled="{Binding p_isCustomize, Converter={StaticResource BoolConverter}}" Style="{StaticResource customButton}"/>
+                                <Button Content="Delete All" Margin="5" Command="{Binding CmdDeleteAll}" IsEnabled="{Binding p_isCustomize, Converter={StaticResource BoolConverter}}" Style="{StaticResource customButton}"/>
                             </UniformGrid>
                         </GroupBox>
                     </Grid>
@@ -733,8 +734,8 @@
                         </Grid.ColumnDefinitions>
                         <GroupBox Header="Tool Plus">
                             <UniformGrid Columns="4">
-                                <Button Margin="5" x:Name="LockBtn" Content="{Binding LockState}" Background="{Binding LockBrush}" Command="{Binding CmdUILock}" IsEnabled="{Binding p_isCustomize, Converter={StaticResource BoolConverter}}"/>
-                                <Button Margin="5" x:Name="ShowBtn" Content="ShowIndex" Background="{Binding ShowIndexBrush}" Command="{Binding CmdShowIndex}" IsEnabled="{Binding p_isCustomize, Converter={StaticResource BoolConverter}}"/>
+                                <CheckBox Margin="5" x:Name="LockBtn" Content="{Binding LockState}" Command="{Binding CmdUILock}" IsEnabled="{Binding p_isCustomize, Converter={StaticResource BoolConverter}}" Style="{StaticResource customCheckButton}"/>
+                                <CheckBox Margin="5" x:Name="ShowBtn" Content="Show Index" Command="{Binding CmdShowIndex}" IsEnabled="{Binding p_isCustomize, Converter={StaticResource BoolConverter}}" Style="{StaticResource customCheckButton}"/>
                             </UniformGrid>
                         </GroupBox>
                         <GroupBox Header="Key State" Grid.Column="1">
@@ -744,19 +745,39 @@
                                     <ColumnDefinition/>
                                 </Grid.ColumnDefinitions>
                                 <UniformGrid Columns="3" Grid.Column="0">
-                                    <Border Margin="5" BorderThickness="1" Background="{Binding ShiftBrush}" BorderBrush="Black">
+                                    <Grid>
+                                        <Border Margin="5" Background="{Binding ShiftBrush}"  CornerRadius="5">
+                                            <Border.Effect>
+                                                <DropShadowEffect ShadowDepth="1"/>
+                                            </Border.Effect>
+                                        </Border>
                                         <TextBlock Text="Shift" VerticalAlignment="Center" HorizontalAlignment="Center"></TextBlock>
-                                    </Border>
-                                    <Border Margin="5" BorderThickness="1" Background="{Binding CtrlBrush}" BorderBrush="Black">
+                                    </Grid>
+                                    <Grid>
+                                        <Border Margin="5" Background="{Binding CtrlBrush}" CornerRadius="5">
+                                            <Border.Effect>
+                                                <DropShadowEffect ShadowDepth="1"/>
+                                            </Border.Effect>
+                                        </Border>
                                         <TextBlock Text="Ctrl" VerticalAlignment="Center" HorizontalAlignment="Center"></TextBlock>
-                                    </Border>
-                                    <Border Margin="5" BorderThickness="1" Background="{Binding SBrush}" BorderBrush="Black">
+                                    </Grid>
+                                    <Grid>
+                                        <Border Margin="5" Background="{Binding SBrush}" CornerRadius="5">
+                                            <Border.Effect>
+                                                <DropShadowEffect ShadowDepth="1"/>
+                                            </Border.Effect>
+                                        </Border>
                                         <TextBlock Text="S" VerticalAlignment="Center" HorizontalAlignment="Center"></TextBlock>
-                                    </Border>
+                                    </Grid>
                                 </UniformGrid>
-                                <Border Grid.Column="1" BorderThickness="1" Background="AliceBlue"  BorderBrush="Black">
+                                <Grid  Grid.Column="1" >
+                                    <Border Background="AliceBlue">
+                                        <Border.Effect>
+                                            <DropShadowEffect ShadowDepth="1"/>
+                                        </Border.Effect>
+                                    </Border>
                                     <TextBlock Text="{Binding PointAddMode}" VerticalAlignment="Center" HorizontalAlignment="Center"></TextBlock>
-                                </Border>
+                                </Grid>
                             </Grid>
                         </GroupBox>
                     </Grid>
@@ -771,7 +792,7 @@
                     <RowDefinition Height="413*"/>
                 </Grid.RowDefinitions>
                 <TabControl Grid.RowSpan="2" SelectedIndex="{Binding p_TabIndex, UpdateSourceTrigger=PropertyChanged}">
-                    <TabItem Header="Measure Point" IsEnabled="{Binding p_isCustomize, Converter={StaticResource BoolConverter}}">
+                    <TabItem Header="Measure Point" IsEnabled="{Binding p_isCustomize, Converter={StaticResource BoolConverter}}" Style="{StaticResource customTabitem}">
                         <Grid>
                             <GroupBox Header="Measurement Point List" Grid.RowSpan="2">
                                 <Grid>
@@ -805,8 +826,8 @@
                                             <RowDefinition/>
                                             <RowDefinition/>
                                         </Grid.RowDefinitions>
-                                        <Button Grid.Column="0" Grid.RowSpan="2" Content="Reorder Route" Margin="5" Command="{Binding CmdReorderPoint}" Background="{Binding ReorderBrush}" />
-                                        <Button Grid.Column="1" Grid.RowSpan="2" Margin="5" Command="{Binding CmdRouteOptimizaion}">
+                                        <CheckBox Grid.Column="0" Grid.RowSpan="2" Content="Reorder Route" Margin="5" Command="{Binding CmdReorderPoint}" Style="{StaticResource customCheckButton}" />
+                                        <Button Grid.Column="1" Grid.RowSpan="2" Margin="5" Command="{Binding CmdRouteOptimizaion}" Style="{StaticResource customButton}">
                                             <TextBlock TextAlignment="Center">Find Nearest<LineBreak/>Next Point</TextBlock>
                                         </Button>
 
@@ -819,11 +840,9 @@
                                                 <RowDefinition/>
                                                 <RowDefinition/>
                                             </Grid.RowDefinitions>
-                                            <Border Margin="5" Background="#FFDDDDDD"
-                                    BorderBrush="#FF707070" BorderThickness="1" Grid.ColumnSpan="2">
-                                                <CheckBox x:Name="checkRoot" Content="Show Route" 
-                                             VerticalAlignment="Center"
-                                             HorizontalAlignment="Center" IsChecked="{Binding ShowRoute}">
+                                            <!--<Border Margin="5" Background="#FFDDDDDD"
+                                    BorderBrush="#FF707070" BorderThickness="1" Grid.ColumnSpan="2">-->
+                                                <CheckBox Margin="5" Grid.ColumnSpan="2" x:Name="checkRoot" Content="Show Route" IsChecked="{Binding ShowRoute}" Style="{StaticResource customCheckButton}">
                                                     <i:Interaction.Triggers>
                                                         <i:EventTrigger EventName="Checked" >
                                                             <i:CallMethodAction TargetObject="{Binding Path=DataContext,ElementName=checkRoot, Mode=OneWay}" MethodName="OnCheckboxChange" />
@@ -833,7 +852,7 @@
                                                         </i:EventTrigger>
                                                     </i:Interaction.Triggers>
                                                 </CheckBox>
-                                            </Border>
+                                            <!--</Border>-->
                                             <UniformGrid Grid.Row="1" Grid.ColumnSpan="2" Rows="1" Columns="3">
                                                 <cp:ColorPicker x:Name="colorPicker" DisplayColorAndName="False" Margin="5" AvailableColorsSortingMode="HueSaturationBrightness" ColorMode="ColorCanvas"
                                                       SelectedColor="{Binding RouteBrush, Mode=TwoWay, Converter={StaticResource ColorToBrushConverter}, UpdateSourceTrigger=PropertyChanged}" Resources="{StaticResource theme}">
@@ -861,7 +880,7 @@
                             </GroupBox>
                         </Grid>
                     </TabItem>
-                    <TabItem Header="Customize Item" IsEnabled="{Binding p_isCustomize}">
+                    <TabItem Header="Customize Item" IsEnabled="{Binding p_isCustomize}" Style="{StaticResource customTabitem}">
                         <Grid>
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="60"/>
@@ -887,8 +906,8 @@
                                         <ColumnDefinition/>
                                         <ColumnDefinition/>
                                     </Grid.ColumnDefinitions>
-                                    <Button Margin="3" Content="Point Delete" Command="{Binding CmdPointDelete}"></Button>
-                                    <Button Margin="3" Content="Preset Save" Command="{Binding CmdPresetSave}" Grid.Column="1"></Button>
+                                    <Button Margin="3" Content="Point Delete" Command="{Binding CmdPointDelete}" Style="{StaticResource customButton}"></Button>
+                                    <Button Margin="3" Content="Preset Save" Command="{Binding CmdPresetSave}" Grid.Column="1" Style="{StaticResource customButton}"></Button>
                                     <!--<Button Margin="3" Content="Preset Load" Command="{Binding CmdPresetLoad}" Grid.Column="2"></Button>-->
                                 </Grid>
                             </GroupBox>
@@ -935,7 +954,7 @@
                                                     </Grid>
                                                 </Grid>
                                                 <Grid Background="Gainsboro" Grid.Row="2" Margin="2">
-                                                    <Button Margin="3" Content="Set" Command="{Binding CmdSetCandidatePoint}"/>
+                                                    <Button Margin="3" Content="Set" Command="{Binding CmdSetCandidatePoint}" Style="{StaticResource customButton}"/>
                                                 </Grid>
                                             </Grid>
                                         </TabItem>

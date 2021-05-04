@@ -15,17 +15,17 @@ namespace Root_WindII_Option
             InitializeComponent();
         }
 
-        WindII_Option_Engineer m_engineer = new WindII_Option_Engineer();
+        //WindII_Option_Engineer m_engineer = new WindII_Option_Engineer();
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            if (!Directory.Exists(@"C:\Recipe\Wind2Option")) Directory.CreateDirectory(@"C:\Recipe\Wind2Option");
-            m_engineer.Init("Wind2_Option");
-            engineerUI.Init(m_engineer);
+            //if (!Directory.Exists(@"C:\Recipe\Wind2Option")) Directory.CreateDirectory(@"C:\Recipe\Wind2Option");
+            //m_engineer.Init("Wind2_Option");
+            //engineerUI.Init(m_engineer);
         }
 
         private void Window_Closing(object sender, CancelEventArgs e)
         {
-            m_engineer.ThreadStop();
+            //m_engineer.ThreadStop();
         }
     }
 }

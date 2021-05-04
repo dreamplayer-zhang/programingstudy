@@ -1531,85 +1531,93 @@ namespace Root_CAMELLIA.LibSR_Met
         }
         void InitLamp()
         {
-            sp.PortName = "COM2";
-            sp.BaudRate = 9600;
-            sp.DataBits = 8;
-            sp.StopBits = StopBits.One;
-            sp.Parity = Parity.None;
-            //sp.DataReceived += new SerialDataReceivedEventHandler(serialPort1_DataReceived);
-            sp.Open();
-
-            sp.Write("t");
-            string OutputData = sp.ReadLine();
-            string[] strtext = new string[7] { "H0:", "T0:", "L0:", "H1:", "T1:", "L1:", "Time:" };
-            string[] arr = OutputData.Split(':');
-            //string[] strarr = arr[1].Split(',');
-            double LampUseTime = 0.0;
-            double value = 0.0;
-            int Hr, Min, Sec;
-            int m_Hr_Org, m_Min_Org, m_Sec_Org;
-            int m_Hr, m_Min, m_Sec;
-            string filepath, timedata, strtime;
-            foreach (string str in strtext)
+            try
             {
-                if (OutputData.Contains(str))
+                sp.PortName = "COM2";
+                sp.BaudRate = 9600;
+                sp.DataBits = 8;
+                sp.StopBits = StopBits.One;
+                sp.Parity = Parity.None;
+                //sp.DataReceived += new SerialDataReceivedEventHandler(serialPort1_DataReceived);
+                sp.Open();
+
+                sp.Write("t");
+                string OutputData = sp.ReadLine();
+                string[] strtext = new string[7] { "H0:", "T0:", "L0:", "H1:", "T1:", "L1:", "Time:" };
+                string[] arr = OutputData.Split(':');
+                //string[] strarr = arr[1].Split(',');
+                double LampUseTime = 0.0;
+                double value = 0.0;
+                int Hr, Min, Sec;
+                int m_Hr_Org, m_Min_Org, m_Sec_Org;
+                int m_Hr, m_Min, m_Sec;
+                string filepath, timedata, strtime;
+                foreach (string str in strtext)
                 {
-                    if (OutputData.Contains("Time:"))
+                    if (OutputData.Contains(str))
                     {
-                        filepath = Application.StartupPath + "\\Timedata.txt";
-
-                        FileInfo fi = new FileInfo(filepath);
-
-                        m_Hr_Org = m_Min_Org = m_Sec_Org = 0;
-                        m_Hr = m_Min = m_Sec = 0;
-
-                        if (fi.Exists)
+                        if (OutputData.Contains("Time:"))
                         {
-                            timedata = File.ReadAllText(@filepath);
-                            char sp = ':';
-                            string[] spstring = timedata.Split(sp);
+                            filepath = Application.StartupPath + "\\Timedata.txt";
 
-                            m_Hr_Org = Convert.ToInt32(spstring[0]);
-                            m_Min_Org = Convert.ToInt32(spstring[1]);
-                            m_Sec_Org = Convert.ToInt32(spstring[2]);
+                            FileInfo fi = new FileInfo(filepath);
 
+                            m_Hr_Org = m_Min_Org = m_Sec_Org = 0;
+                            m_Hr = m_Min = m_Sec = 0;
+
+                            if (fi.Exists)
+                            {
+                                timedata = File.ReadAllText(@filepath);
+                                char sp = ':';
+                                string[] spstring = timedata.Split(sp);
+
+                                m_Hr_Org = Convert.ToInt32(spstring[0]);
+                                m_Min_Org = Convert.ToInt32(spstring[1]);
+                                m_Sec_Org = Convert.ToInt32(spstring[2]);
+
+                            }
+                            Sec = Convert.ToInt32(arr[1]);
+
+                            m_Sec = Sec + m_Sec_Org;
+
+                            if (m_Sec >= 60)
+                            {
+                                m_Min = (m_Sec / 60) + m_Min_Org;
+
+                                m_Sec = m_Sec % 60;
+                            }
+                            else
+                            {
+                                m_Min = m_Min_Org;
+                            }
+
+                            if (m_Min >= 60)
+                            {
+                                m_Hr = (m_Min / 60) + m_Hr_Org;
+
+                                m_Min = m_Min % 60;
+                            }
+                            else
+                            {
+                                m_Hr = m_Hr_Org;
+                            }
+                            value = m_Hr;
+                            strtime = string.Format("{0}:{1}:{2}", m_Hr, m_Min, m_Sec);
+                            using (StreamWriter SW = new StreamWriter(filepath))
+                            {
+                                SW.WriteLine(strtime);
+                            }
                         }
-                        Sec = Convert.ToInt32(arr[1]);
 
-                        m_Sec = Sec + m_Sec_Org;
-
-                        if (m_Sec >= 60)
-                        {
-                            m_Min = (m_Sec / 60) + m_Min_Org;
-
-                            m_Sec = m_Sec % 60;
-                        }
-                        else
-                        {
-                            m_Min = m_Min_Org;
-                        }
-
-                        if (m_Min >= 60)
-                        {
-                            m_Hr = (m_Min / 60) + m_Hr_Org;
-
-                            m_Min = m_Min % 60;
-                        }
-                        else
-                        {
-                            m_Hr = m_Hr_Org;
-                        }
-                        value = m_Hr;
-                        strtime = string.Format("{0}:{1}:{2}", m_Hr, m_Min, m_Sec);
-                        using (StreamWriter SW = new StreamWriter(filepath))
-                        {
-                            SW.WriteLine(strtime);
-                        }
                     }
-
                 }
+                sp.Write("c");
             }
-            sp.Write("c");
+            catch
+            {
+                
+            }
+          
         }
 
         public double UpdateLampData(string CheckWord)
