@@ -74,41 +74,40 @@ namespace RootTools_Vision
 
 			OriginRecipe originRecipe = recipe.GetItem<OriginRecipe>();
 			// Top
-			int countTop = (int)(originRecipe.OriginHeight / paramTop.ROIHeight); // 검사 영역 개수
+			int countTop = (int)((originRecipe.OriginHeight - paramTop.StartPosition) / paramTop.ROIHeight); // 검사 영역 개수
 			for(int i = 0; i < countTop; i++)
 			{
 				if (paramTop.ChR)
-					DoColorInspectionNew(i, paramTop, 0);  //R
+					DoColorInspection(i, paramTop, 0);  //R
 				if (paramTop.ChG)
-					DoColorInspectionNew(i, paramTop, 1);  //G
+					DoColorInspection(i, paramTop, 1);  //G
 				if (paramTop.ChB)
-					DoColorInspectionNew(i, paramTop, 2);  //B
+					DoColorInspection(i, paramTop, 2);  //B
 			}
 
 			// Bottom
-			int countBottom = (int)(originRecipe.OriginHeight / paramBottom.ROIHeight); // 검사 영역 개수
+			int countBottom = (int)((originRecipe.OriginHeight - paramBottom.StartPosition) / paramBottom.ROIHeight); // 검사 영역 개수
 			for (int i = 0; i < countBottom; i++)
 			{
 				if (paramBottom.ChR)
-					DoColorInspectionNew(i, paramBottom, 3); //R
+					DoColorInspection(i, paramBottom, 3); //R
 				if (paramBottom.ChG)
-					DoColorInspectionNew(i, paramBottom, 4); //G
+					DoColorInspection(i, paramBottom, 4); //G
 				if (paramBottom.ChB)
-					DoColorInspectionNew(i, paramBottom, 5); //B
+					DoColorInspection(i, paramBottom, 5); //B
 			}
 
 			// Side
-			int countSide = (int)(originRecipe.OriginHeight / paramSide.ROIHeight); // 검사 영역 개수			
+			int countSide = (int)((originRecipe.OriginHeight - paramSide.StartPosition) / paramSide.ROIHeight); // 검사 영역 개수			
 			for (int i = 0; i < countSide; i++)
 			{
 				if (paramSide.ChR)
-					DoColorInspectionNew(i, paramSide, 6); //R
+					DoColorInspection(i, paramSide, 6); //R
 				if (paramSide.ChG)
-					DoColorInspectionNew(i, paramSide, 7); //G
+					DoColorInspection(i, paramSide, 7); //G
 				if (paramSide.ChB)
-					DoColorInspectionNew(i, paramSide, 8); //B
+					DoColorInspection(i, paramSide, 8); //B
 			}
-
 
 			WorkEventManager.OnInspectionDone(this.currentWorkplace, new InspectionDoneEventArgs(new List<CRect>())); // 나중에 ProcessDefect쪽 EVENT로...
 
@@ -122,19 +121,21 @@ namespace RootTools_Vision
 			else if (this.currentWorkplace.MapIndexX == (int)EdgeMapPositionX.Btm)
 				param = parameterEdge.EdgeParamBaseBtm;
 
+			if (this.currentWorkplace.Index == 1)
+				DoColorInspection(0, param, IMAGE_CHANNEL.R_GRAY);
 
-			OriginRecipe originRecipe = recipe.GetItem<OriginRecipe>();
-			int count = (int)(originRecipe.OriginHeight / param.ROIHeight);	// 검사 영역 개수
+			//OriginRecipe originRecipe = recipe.GetItem<OriginRecipe>();
+			//int count = (int)(originRecipe.OriginHeight / param.ROIHeight);	// 검사 영역 개수
 
-			for (int i = 0; i < count; i++)
-			{
-				if (param.ChR)
-					DoColorInspection(i, param, IMAGE_CHANNEL.R_GRAY);
-				if (param.ChG)
-					DoColorInspection(i, param, IMAGE_CHANNEL.G);
-				if (param.ChB)
-					DoColorInspection(i, param, IMAGE_CHANNEL.B);
-			}
+			//for (int i = 0; i < count; i++)
+			//{
+			//	if (param.ChR)
+			//		DoColorInspection(i, param, IMAGE_CHANNEL.R_GRAY);
+			//	if (param.ChG)
+			//		DoColorInspection(i, param, IMAGE_CHANNEL.G);
+			//	if (param.ChB)
+			//		DoColorInspection(i, param, IMAGE_CHANNEL.B);
+			//}
 
 			//if (param.ChR)
 			//	DoColorInspection(this.GetWorkplaceBuffer(IMAGE_CHANNEL.R_GRAY), param);
@@ -147,31 +148,40 @@ namespace RootTools_Vision
 			*/
 		}
 
-		private void DoColorInspectionNew(int index, EdgeSurfaceParameterBase param, int channelIndex)
+		private void DoColorInspection(int index, EdgeSurfaceParameterBase param, int channelIndex)
         {
+			if (this.GetWorkplaceBufferByIndex(channelIndex) == null) return;
+			
 			OriginRecipe originRecipe = recipe.GetItem<OriginRecipe>();
 
 			int width = originRecipe.OriginWidth;
 			int height = param.ROIHeight;
-			byte[] inspectionROI = new byte[width * height];
 
-			int startY = (index * height) + param.StartPosition;
-			for (int i = startY; i < startY + height; i++)
+			int ptLeft = 0;
+			int ptTop = param.StartPosition + (index * height);
+			int ptBtm = ptTop + height;
+
+			// 검사영역이 Origin Height를 넘어가는 경우
+			if (ptBtm > originRecipe.OriginHeight)
+			{
+				height = originRecipe.OriginHeight - ptTop;
+				ptBtm = originRecipe.OriginHeight;
+			}
+
+			byte[] inspectionROI = new byte[width * height];
+			for (int i = ptTop; i < ptBtm; i++)
 			{
 				int startIdx = width * i;
-				int dstIdx = width * (i - startY);
-
-				if (this.GetWorkplaceBufferByIndex(channelIndex) == null) return;
+				int dstIdx = width * (i - ptTop);
 
 				Array.Copy(this.GetWorkplaceBufferByIndex(channelIndex), startIdx, inspectionROI, dstIdx, width);
 
-				DoColorInspection(inspectionROI, param);
+				//System.Drawing.Bitmap bitmap = Tools.CovertArrayToBitmap(inspectionROI, width, height, 1);
+				//Tools.SaveImageJpg(bitmap, @"D:\test.jpg", 50);
+
+				//DoColorInspection(inspectionROI, param);
+				DoColorInspection(inspectionROI, width, height, ptLeft, ptTop, param);
 			}
-
-
-			// 확인 좀 : 이거 여기 있으면 마지막 이미지만 검사하는거 같은딩?
-
-			//DoColorInspection(inspectionROI, param); // index 같이 보내야하눈데...
 		}
 
 
@@ -192,9 +202,86 @@ namespace RootTools_Vision
 				Array.Copy(this.GetWorkplaceBufferByColorChannel(channel), startIdx, inspectionROI, dstIdx, width);
 			}
 
-			//System.Drawing.Bitmap bitmap = Tools.CovertArrayToBitmap(roi, width, height, 1);
+			//System.Drawing.Bitmap bitmap = Tools.CovertArrayToBitmap(inspectionROI, width, height, 1);
 			//Tools.SaveImageJpg(bitmap, @"D:\test.jpg", 50);
-			DoColorInspection(inspectionROI, param); // index 같이 보내야하눈데...
+
+			//DoColorInspection(inspectionROI, 0, startY + height, param);
+		}
+
+		private void DoColorInspection(byte[] arrSrc, int width, int height, int ptLeft, int ptTop, EdgeSurfaceParameterBase param)
+		{
+			//OriginRecipe originRecipe = recipe.GetItem<OriginRecipe>();
+			//int width = originRecipe.OriginWidth;
+			//int height = param.ROIHeight;
+
+			int inspectionROI = width * height;
+
+			int threshold = param.Threshold;
+			int defectSizeMin = param.DefectSizeMin;
+			int defectSizeMax = param.DefectSizeMax;
+			int searchLevel = param.EdgeSearchLevel;
+			double resolution = 1;
+
+			// Search Wafer Edge
+			int lastEdge = CLR_IP.Cpp_FindEdge(arrSrc, width, height, 0, 0, width, height, 0, searchLevel);
+			//int lastEdge = FindEdge(arrSrc, width, height, searchLevel);
+			int startPtX = lastEdge;    // Edge부터 검사 시작
+
+			// profile 생성
+			List<int> temp = new List<int>();
+			List<int> profile = new List<int>();
+			for (long j = 0; j < width; j++)
+			{
+				temp.Clear();
+				for (long i = 0; i < inspectionROI; i += width)
+				{
+					temp.Add(arrSrc[j + i]);
+				}
+				temp.Sort();
+				profile.Add(temp[temp.Count / 2]);  // 중앙값
+			}
+
+			// Calculate diff image (original - profile)
+			byte[] diff = new byte[inspectionROI];
+			for (int j = 0; j < height; j++)
+			{
+				for (int i = startPtX; i < width; i++)
+				{
+					diff[(j * width) + i] = (byte)(Math.Abs(arrSrc[(j * width) + i] - profile[i]));
+				}
+			}
+
+			// Threshold and Labeling
+			byte[] thresh = new byte[inspectionROI];
+			CLR_IP.Cpp_Threshold(diff, thresh, width, height, false, threshold);
+			var label = CLR_IP.Cpp_Labeling(diff, thresh, width, height, true);
+
+			// Add defect
+			string sInspectionID = DatabaseManager.Instance.GetInspectionID();
+			for (int i = 0; i < label.Length; i++)
+			{
+				if ((label[i].area * resolution) > defectSizeMin || (label[i].area * resolution) < defectSizeMax)
+				{
+					int defectLeft = ptLeft + label[i].boundLeft;
+					int defectTop = ptTop - label[i].boundTop;
+					int defectWidth = Math.Abs(label[i].boundRight - label[i].boundLeft);
+					int defectHeight = Math.Abs(label[i].boundBottom - label[i].boundTop);
+
+					this.currentWorkplace.AddDefect(sInspectionID,
+						10001,
+						(float)(label[i].area * resolution),
+						label[i].value,
+						0,
+						CalcDegree(defectLeft + (defectHeight / 2), param),
+						defectLeft,
+						defectTop,
+						(float)(defectWidth * resolution),
+						(float)(defectHeight * resolution),
+						this.currentWorkplace.MapIndexX,
+						this.currentWorkplace.MapIndexY
+						);
+				}
+			}
 		}
 
 		private void DoColorInspection(byte[] arrSrc, EdgeSurfaceParameterBase param)
@@ -212,7 +299,8 @@ namespace RootTools_Vision
 			double resolution = 1;
 
 			// Search Wafer Edge
-			int lastEdge = FindEdge(arrSrc, width, height, searchLevel);
+			int lastEdge = CLR_IP.Cpp_FindEdge(arrSrc, width, height, 0, 0, width, height, 0, searchLevel);
+			//int lastEdge = FindEdge(arrSrc, width, height, searchLevel);
 			int startPtX = lastEdge;    // Edge부터 검사 시작
 
 			// profile 생성

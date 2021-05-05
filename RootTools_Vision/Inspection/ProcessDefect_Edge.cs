@@ -96,20 +96,22 @@ namespace RootTools_Vision
 				Tools.SaveDefectImage(Path.Combine(settings_edgeside.DefectImagePath, sInspectionID), MergeDefectList[i], sharedBufferInfo, i + 1);
 			}
 
+			/*
 			if (settings_edgeside.UseKlarf)
 			{
 				KlarfData_Lot klarfData = new KlarfData_Lot();
 				Directory.CreateDirectory(settings_edgeside.KlarfSavePath);
 
-				//klarfData.AddSlot(recipe.WaferMap, MergeDefectList, this.recipe.GetItem<OriginRecipe>());
-				//klarfData.WaferStart(recipe.WaferMap, DateTime.Now);
-				//klarfData.SetResultTimeStamp();
+				klarfData.AddSlot(recipe.WaferMap, MergeDefectList, this.recipe.GetItem<OriginRecipe>());
+				klarfData.WaferStart(recipe.WaferMap, DateTime.Now);
+				klarfData.SetResultTimeStamp();
+				klarfData.SaveKlarf(settings_edgeside.KlarfSavePath, false);
 
-				//klarfData.SaveKlarf(settings_edgeside.KlarfSavePath, false);
-
-				//SaveEdgesideTiff(settings_edgeside.KlarfSavePath, MergeDefectList, this.currentWorkplace.SharedBufferInfo);
+				SaveEdgesideTiff(settings_edgeside.KlarfSavePath, MergeDefectList, this.currentWorkplace.SharedBufferInfo);
 				Tools.SaveTiffImage(settings_edgeside.KlarfSavePath, MergeDefectList, this.currentWorkplace.SharedBufferInfo);
 			}
+			*/
+
 			//WorkEventManager.OnInspectionDone(this.currentWorkplace, new InspectionDoneEventArgs(new List<CRect>(), true));
 			WorkEventManager.OnIntegratedProcessDefectDone(this.currentWorkplace, new IntegratedProcessDefectDoneEventArgs());
 		}
