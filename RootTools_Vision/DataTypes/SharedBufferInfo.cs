@@ -16,6 +16,8 @@ namespace RootTools_Vision
         public int Height;
         public int ByteCnt;
 
+        public List<IntPtr> PtrList;
+
         public MemoryID MemoryID;
 
         /// <summary>
@@ -38,6 +40,11 @@ namespace RootTools_Vision
             this.ByteCnt = byteCnt;
 
             this.MemoryID = new MemoryID();
+
+            PtrList = new List<IntPtr>();
+            PtrList.Add(this.PtrR_GRAY);
+            PtrList.Add(this.PtrG);
+            PtrList.Add(this.PtrB);
         }
         public SharedBufferInfo(IntPtr sharedBufferR_GRAY, int width, int height, int byteCnt, IntPtr sharedBufferG, IntPtr sharedBufferB, MemoryID memoryID)
         {
@@ -50,6 +57,37 @@ namespace RootTools_Vision
             this.ByteCnt = byteCnt;
 
             this.MemoryID = memoryID;
+
+            PtrList = new List<IntPtr>();
+            PtrList.Add(this.PtrR_GRAY);
+            PtrList.Add(this.PtrG);
+            PtrList.Add(this.PtrB);
+        }
+
+        public SharedBufferInfo(int width, int height, int byteCnt, List<IntPtr> ptrList)
+        {
+            if (ptrList.Count > 0)
+                this.PtrR_GRAY = ptrList[0];
+            else
+                this.PtrR_GRAY = IntPtr.Zero;
+
+            if (ptrList.Count > 1)
+                this.PtrG = ptrList[1];
+            else
+                this.PtrG = IntPtr.Zero;
+
+            if (ptrList.Count > 2)
+                this.PtrB = ptrList[2];
+            else
+                this.PtrB = IntPtr.Zero;
+
+            this.Width = width;
+            this.Height = height;
+            this.ByteCnt = byteCnt;
+
+            this.MemoryID = new MemoryID();
+
+            PtrList = ptrList;
         }
     }
 }

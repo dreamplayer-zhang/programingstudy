@@ -123,6 +123,17 @@ namespace Root_WIND2.UI_User
         }
         #endregion
 
+
+        public void HitTest()
+        {
+            PathGeometry geometry = new PathGeometry();
+            PathFigure path = new PathFigure();
+            path.Segments.Add(new PolyLineSegment(this.exclusivePolyMemPointsList[0].ToList(), true));
+            
+            geometry.Figures.Add(path);
+
+        }
+
         #region [Draw Method]
         private enum CIRCLE_DRAW_STATE
         {
@@ -164,7 +175,7 @@ namespace Root_WIND2.UI_User
 
         // Exclusive Region
         private List<Polygon> ExclusivePolyList;
-        private List<List<CPoint>> exclusivePolyMemPointsList = new List<List<CPoint>>();
+        private List<List<Point>> exclusivePolyMemPointsList = new List<List<Point>>();
 
 
         #region [Initilize UIElements]
@@ -407,10 +418,23 @@ namespace Root_WIND2.UI_User
         }
 
 
-
         public void AddExclusivePolygonPoint(CPoint memPt)
         {
-            CPoint canvasPt = GetCanvasPoint(memPt);
+            CPoint canvasPt = GetCanvasPoint(new CPoint((int)memPt.X, (int)memPt.Y));
+
+            int lastIndex = this.exclusivePolyMemPointsList.Count - 1;
+
+            this.exclusivePolyMemPointsList[lastIndex].Add(new Point(memPt.X, memPt.Y));
+            this.ExclusivePolyList[lastIndex].Points.Add(new Point(canvasPt.X, canvasPt.Y));
+
+            if (this.p_UIElement.Contains(this.ExclusivePolyList[lastIndex]) == false)
+                this.p_UIElement.Add(this.ExclusivePolyList[lastIndex]);
+        }
+
+
+        public void AddExclusivePolygonPoint(Point memPt)
+        {
+            CPoint canvasPt = GetCanvasPoint(new CPoint((int)memPt.X, (int)memPt.Y));
 
             int lastIndex = this.exclusivePolyMemPointsList.Count - 1;
 
@@ -430,7 +454,7 @@ namespace Root_WIND2.UI_User
             polygon.Opacity = 0.3;
 
             this.ExclusivePolyList.Add(polygon);
-            this.exclusivePolyMemPointsList.Add(new List<CPoint>());
+            this.exclusivePolyMemPointsList.Add(new List<Point>());
         }
 
         public void ClearExclusivePolygon()
@@ -455,7 +479,7 @@ namespace Root_WIND2.UI_User
             foreach (Polygon polygon in this.ExclusivePolyList)
             {
                 polygon.Points.Clear();
-                foreach (CPoint pt in this.exclusivePolyMemPointsList[i])
+                foreach (Point pt in this.exclusivePolyMemPointsList[i])
                 {
                     CPoint canvasPt = GetCanvasPoint(pt);
                     polygon.Points.Add(new Point(canvasPt.X, canvasPt.Y));
@@ -878,9 +902,9 @@ namespace Root_WIND2.UI_User
                 using (var sr = new StreamReader(Constants.RootPath.RootSetupPath + ExclusivePolygonListFilePath))
                 {
                     XmlSerializer xs = new XmlSerializer(typeof(List<List<CPoint>>));
-                    this.exclusivePolyMemPointsList = (List<List<CPoint>>)xs.Deserialize(sr);
+                    this.exclusivePolyMemPointsList = (List<List<Point>>)xs.Deserialize(sr);
 
-                    foreach (List<CPoint> pointList in this.exclusivePolyMemPointsList)
+                    foreach (List<Point> pointList in this.exclusivePolyMemPointsList)
                     {
                         Polygon polygon = new Polygon();
 
@@ -890,7 +914,7 @@ namespace Root_WIND2.UI_User
                         polygon.Opacity = 0.3;
                         this.ExclusivePolyList.Add(polygon);
 
-                        foreach (CPoint pt in pointList)
+                        foreach (Point pt in pointList)
                         {
                             CPoint canvasPt = GetCanvasPoint(pt);
                             polygon.Points.Add(new Point(canvasPt.X, canvasPt.Y));
