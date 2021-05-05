@@ -85,7 +85,27 @@ namespace RootTools_Vision.WorkManager3
         }
         #endregion
 
-        public WorkManager(int inspectionThreadNum = 4)
+
+        public WorkManager()
+        {
+            pipeLine = new WorkPipeLine(1);
+
+            WorkEventManager.PositionDone += PositionDone_Callback;
+
+            WorkEventManager.InspectionStart += InspectionStart_Callback;
+            WorkEventManager.InspectionDone += InspectionDone_Callback;
+
+            WorkEventManager.ProcessDefectDone += ProcessDefectDone_Callback;
+
+            WorkEventManager.ProcessDefectWaferStart += ProcessDefectWaferStart_Callback;
+            WorkEventManager.IntegratedProcessDefectDone += IntegratedProcessDefectDone_Callback;
+
+            WorkEventManager.ProcessMeasurementDone += ProcessMeasurementDone_Callback;
+
+            WorkEventManager.WorkplaceStateChanged += WorkplaceStateChanged_Callback;
+        }
+
+        public WorkManager(int inspectionThreadNum)
         {
             pipeLine = new WorkPipeLine(inspectionThreadNum);
 

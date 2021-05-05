@@ -67,6 +67,53 @@ namespace RootTools_Vision
 			if (this.currentWorkplace.Index == 0)
 				return;
 
+			// New - 이거 새로 변경된 Sharedbuffer로 바꾼거 테스트 안해봄
+			EdgeSurfaceParameterBase paramTop = parameterEdge.EdgeParamBaseTop;
+			EdgeSurfaceParameterBase paramBottom = parameterEdge.EdgeParamBaseBtm;
+			EdgeSurfaceParameterBase paramSide = parameterEdge.EdgeParamBaseSide;
+
+			OriginRecipe originRecipe = recipe.GetItem<OriginRecipe>();
+			// Top
+			int countTop = (int)(originRecipe.OriginHeight / paramTop.ROIHeight); // 검사 영역 개수
+			for(int i = 0; i < countTop; i++)
+			{
+				if (paramTop.ChR)
+					DoColorInspectionNew(i, paramTop, 0);  //R
+				if (paramTop.ChG)
+					DoColorInspectionNew(i, paramTop, 1);  //G
+				if (paramTop.ChB)
+					DoColorInspectionNew(i, paramTop, 2);  //B
+			}
+
+			// Bottom
+			int countBottom = (int)(originRecipe.OriginHeight / paramBottom.ROIHeight); // 검사 영역 개수
+			for (int i = 0; i < countBottom; i++)
+			{
+				if (paramBottom.ChR)
+					DoColorInspectionNew(i, paramBottom, 3); //R
+				if (paramBottom.ChG)
+					DoColorInspectionNew(i, paramBottom, 4); //G
+				if (paramBottom.ChB)
+					DoColorInspectionNew(i, paramBottom, 5); //B
+			}
+
+			// Side
+			int countSide = (int)(originRecipe.OriginHeight / paramSide.ROIHeight); // 검사 영역 개수			
+			for (int i = 0; i < countSide; i++)
+			{
+				if (paramSide.ChR)
+					DoColorInspectionNew(i, paramSide, 6); //R
+				if (paramSide.ChG)
+					DoColorInspectionNew(i, paramSide, 7); //G
+				if (paramSide.ChB)
+					DoColorInspectionNew(i, paramSide, 8); //B
+			}
+
+
+			WorkEventManager.OnInspectionDone(this.currentWorkplace, new InspectionDoneEventArgs(new List<CRect>())); // 나중에 ProcessDefect쪽 EVENT로...
+
+			/*
+			// 기존
 			EdgeSurfaceParameterBase param = parameterEdge.EdgeParamBaseTop;
 			if (this.currentWorkplace.MapIndexX == (int)EdgeMapPositionX.Top)
 				param = parameterEdge.EdgeParamBaseTop;
@@ -97,7 +144,36 @@ namespace RootTools_Vision
 			//	DoColorInspection(this.GetWorkplaceBuffer(IMAGE_CHANNEL.B), param);
 
 			WorkEventManager.OnInspectionDone(this.currentWorkplace, new InspectionDoneEventArgs(new List<CRect>())); // 나중에 ProcessDefect쪽 EVENT로...
+			*/
 		}
+
+		private void DoColorInspectionNew(int index, EdgeSurfaceParameterBase param, int channelIndex)
+        {
+			OriginRecipe originRecipe = recipe.GetItem<OriginRecipe>();
+
+			int width = originRecipe.OriginWidth;
+			int height = param.ROIHeight;
+			byte[] inspectionROI = new byte[width * height];
+
+			int startY = (index * height) + param.StartPosition;
+			for (int i = startY; i < startY + height; i++)
+			{
+				int startIdx = width * i;
+				int dstIdx = width * (i - startY);
+
+				if (this.GetWorkplaceBufferByIndex(channelIndex) == null) return;
+
+				Array.Copy(this.GetWorkplaceBufferByIndex(channelIndex), startIdx, inspectionROI, dstIdx, width);
+
+				DoColorInspection(inspectionROI, param);
+			}
+
+
+			// 확인 좀 : 이거 여기 있으면 마지막 이미지만 검사하는거 같은딩?
+
+			//DoColorInspection(inspectionROI, param); // index 같이 보내야하눈데...
+		}
+
 
 		private void DoColorInspection(int index, EdgeSurfaceParameterBase param, IMAGE_CHANNEL channel)
 		{
@@ -113,7 +189,7 @@ namespace RootTools_Vision
 				int startIdx = width * i;
 				int dstIdx = width * (i - startY);
 
-				Array.Copy(this.GetWorkplaceBuffer(channel), startIdx, inspectionROI, dstIdx, width);
+				Array.Copy(this.GetWorkplaceBufferByColorChannel(channel), startIdx, inspectionROI, dstIdx, width);
 			}
 
 			//System.Drawing.Bitmap bitmap = Tools.CovertArrayToBitmap(roi, width, height, 1);
