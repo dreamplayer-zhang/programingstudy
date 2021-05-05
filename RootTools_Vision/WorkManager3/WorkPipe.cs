@@ -330,7 +330,7 @@ namespace RootTools_Vision.WorkManager3
 
                     WorkBase clone = work.Clone();
 
-                    if(work.Type == WORK_TYPE.INSPECTION || buffer != null)
+                    if(work.Type == WORK_TYPE.INSPECTION && buffer != null)
                     {
                         clone.SetWorkplaceBuffer(buffer.BufferList);
                     }

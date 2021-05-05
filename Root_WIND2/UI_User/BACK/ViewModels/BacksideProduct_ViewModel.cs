@@ -14,8 +14,10 @@ using System.Windows.Shapes;
 
 namespace Root_WIND2.UI_User
 {
-    class BacksideProduct_ViewModel : ObservableObject
+    public class BacksideProduct_ViewModel : ObservableObject
     {
+        public event DataItemValueChangedHandler DataItemValueChanged;
+
         #region [Members]
         int nWaferSize = 300;
         int mapSizeX = 14;
@@ -128,6 +130,16 @@ namespace Root_WIND2.UI_User
             }
         }
 
+        private DataListView_ViewModel productInfoViewVM;
+        public DataListView_ViewModel ProductInfoViewVM
+        {
+            get => this.productInfoViewVM;
+            set
+            {
+                SetProperty(ref this.productInfoViewVM, value);
+            }
+        }
+
         #endregion
 
         #region Command Btn
@@ -211,6 +223,11 @@ namespace Root_WIND2.UI_User
         public BacksideProduct_ViewModel()
         {
             chipItems = new ObservableCollection<Rectangle>();
+
+            this.productInfoViewVM = new DataListView_ViewModel();
+            this.productInfoViewVM.Init(GlobalObjects.Instance.Get<RecipeBack>().WaferMap, true);
+
+            this.productInfoViewVM.DataItemChanged += ProductInfoDataChanged_Callback;
         }
 
         public void LoadRecipe()
@@ -218,6 +235,22 @@ namespace Root_WIND2.UI_User
             RecipeType_WaferMap wafermap = GlobalObjects.Instance.Get<RecipeBack>().WaferMap;
 
             CreateRecipeWaferMap(wafermap.MapSizeX, wafermap.MapSizeY, wafermap.Data);
+            this.ProductInfoViewVM.Init(GlobalObjects.Instance.Get<RecipeBack>().WaferMap, true);
+        }
+
+        public void ProductInfoDataChanged_Callback(DataItem item)
+        {
+            OriginRecipe originRecipe = GlobalObjects.Instance.Get<RecipeBack>().GetItem<OriginRecipe>();
+            RecipeType_WaferMap wafermap = GlobalObjects.Instance.Get<RecipeBack>().WaferMap;
+
+            originRecipe.OriginX = wafermap.MasterDieX;
+            originRecipe.OriginY = wafermap.MasterDieY;
+            
+            originRecipe.OriginWidth = (int)wafermap.ChipWidth;
+            originRecipe.OriginHeight = (int)wafermap.ChipHeight;
+            
+            originRecipe.DiePitchX = (int)wafermap.DiePitchX;
+            originRecipe.DiePitchY = (int)wafermap.DiePitchY;
         }
 
         #region [Properties]

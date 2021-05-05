@@ -23,6 +23,9 @@ namespace RootTools_Vision
         private List<ParameterBase> parameterItemList;
 
         private int cameraInfoIndex = 0;
+
+        private bool useExclusiveRegion = false;
+        private string exclusiveRegionFilePath = "";
         #endregion
 
         #region [Getter Setter]
@@ -34,6 +37,19 @@ namespace RootTools_Vision
             get => this.cameraInfoIndex;
             set => this.cameraInfoIndex = value;
         }
+
+        public bool UseExclusiveRegion
+        {
+            get => this.useExclusiveRegion;
+            set => this.useExclusiveRegion = value;
+        }
+
+        public string ExclusiveRegionFilePath
+        {
+            get => this.exclusiveRegionFilePath;
+            set => this.exclusiveRegionFilePath = value;
+        }
+
 
         [XmlIgnore]
         public List<RecipeItemBase> RecipeItemList { get => recipeItemList; set => recipeItemList = value; }

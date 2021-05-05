@@ -180,7 +180,7 @@ namespace RootTools_Vision.WorkManager3
             }
 
             this.currentWorkplaceQueue = 
-                RecipeToWorkplaceConverter.ConvertToQueue(this.recipe.WaferMap, this.recipe.GetItem<OriginRecipe>(), this.sharedBuffer, this.cameraInfo);
+                RecipeToWorkplaceConverter.ConvertToQueue(this.recipe, this.sharedBuffer, this.cameraInfo);
 
             pipeLine.Start(
                 this.currentWorkplaceQueue,

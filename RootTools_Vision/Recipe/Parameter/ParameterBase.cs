@@ -18,6 +18,7 @@ namespace RootTools_Vision
     [XmlInclude(typeof(SurfaceParameter))]
     [XmlInclude(typeof(PositionParameter))]
     [XmlInclude(typeof(EdgeSurfaceParameter))]
+    [XmlInclude(typeof(BacksideSurfaceParameter))]
     [XmlInclude(typeof(EBRParameter))]
     [XmlInclude(typeof(ProcessDefectEdgeParameter))]
     [XmlInclude(typeof(ProcessDefectParameter))]

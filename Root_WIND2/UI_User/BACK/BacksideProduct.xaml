@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Root_WIND2"
              xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+             xmlns:vision ="clr-namespace:RootTools_Vision;assembly=RootTools_Vision"
              mc:Ignorable="d" 
              d:DesignHeight="900" d:DesignWidth="1400">
     <i:Interaction.Triggers>
@@ -130,27 +131,30 @@
                     </StackPanel>
                 </StackPanel>
             </GroupBox>
-            <GroupBox Grid.Row="1"
+            <GroupBox Header="Product Infomation" Style="{StaticResource main_view_groupbox}">
+                <vision:DataListView Margin="4" DataContext="{Binding ProductInfoViewVM}" />
+            </GroupBox>
+            <!--<GroupBox Grid.Row="1"
                   Grid.Column="1"
                   Header="Product Info"
                   Margin="4"
                   Style="{StaticResource main_view_groupbox}">
                 <Grid  Margin="12, 12, 12, 12" IsEnabled="False">
-                    <!-- StackPanel로 수정하자 카메라 레졸루션도 넣어야함 -->
+                    --><!-- StackPanel로 수정하자 카메라 레졸루션도 넣어야함 --><!--
                     <Grid.RowDefinitions>
                         <RowDefinition Height="30"/>
-                        <!-- 0 -->
+                        --><!-- 0 --><!--
                         <RowDefinition Height="30"/>
                         <RowDefinition Height="30"/>
                         <RowDefinition Height="30"/>
                         <RowDefinition Height="30"/>
-                        <!-- 4 -->
+                        --><!-- 4 --><!--
                         <RowDefinition Height="30"/>
                         <RowDefinition Height="30"/>
                         <RowDefinition Height="30"/>
                         <RowDefinition Height="30"/>
                         <RowDefinition Height="30"/>
-                        <!-- 9 -->
+                        --><!-- 9 --><!--
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
@@ -188,7 +192,7 @@
                     <TextBlock Grid.Row="5" Grid.Column="3" Text="Y" VerticalAlignment="Center" HorizontalAlignment="Center"/>
                     <TextBox Grid.Row="5" Grid.Column="4" Height="20"/>
 
-                    <!-- Shot -->
+                    --><!-- Shot --><!--
                     <TextBlock Grid.Row="6" Grid.Column="0" Text="Shot Origin[um]" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="6,0,0,0"/>
                     <TextBlock Grid.Row="6" Grid.Column="1" Text="X" VerticalAlignment="Center" HorizontalAlignment="Center"/>
                     <TextBox Grid.Row="6" Grid.Column="2" Height="20"/>
@@ -218,8 +222,8 @@
                         <Button Content="Load" Width ="120" Style="{StaticResource groupbox_button}"/>
                         <Button Content="Clear" Width ="120" Style="{StaticResource groupbox_button}"/>
                     </StackPanel>
-                </Grid>
-            </GroupBox>
+                </Grid>-->
+            <!--</GroupBox>-->
         </StackPanel>
         <StackPanel Orientation="Vertical" Grid.Column="2">
             <GroupBox Header="Scan Information"

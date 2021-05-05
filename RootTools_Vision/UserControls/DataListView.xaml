@@ -96,7 +96,7 @@
                             <ColumnDefinition />
                         </Grid.ColumnDefinitions>
                         <TextBox Text="{Binding Path=Name}" IsReadOnly="True" Style="{StaticResource dataview_textbox1}"/>
-                        <TextBox Grid.Column="1" Text="{Binding Path=Value}" IsReadOnly="True" Style="{StaticResource dataview_textbox2}"/>
+                        <TextBox Grid.Column="1" Text="{Binding Path=Value, UpdateSourceTrigger=PropertyChanged}" KeyDown="TextBox_KeyDown" PreviewTextInput="TextBox_PreviewTextInput" Style="{StaticResource dataview_textbox2}"/>
                     </Grid>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>

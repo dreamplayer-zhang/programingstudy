@@ -861,7 +861,7 @@ namespace Root_WIND2.UI_User
             {
                 return new RelayCommand(() =>
                 {
-                    RecipeFront recipe = GlobalObjects.Instance.Get<RecipeFront>();
+                    RecipeBack recipe = GlobalObjects.Instance.Get<RecipeBack>();
                     if (recipe.RecipePath != "")
                     {
                         recipe.Save(recipe.RecipePath);
@@ -916,7 +916,7 @@ namespace Root_WIND2.UI_User
                         if (!dir.Exists)
                             dir.Create();
 
-                        RecipeFront recipe = GlobalObjects.Instance.Get<RecipeFront>();
+                        RecipeBack recipe = GlobalObjects.Instance.Get<RecipeBack>();
                         recipe.Read(sFullPath);
 
                         UpdateCurrentPanel();

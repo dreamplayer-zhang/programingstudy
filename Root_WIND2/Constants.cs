@@ -30,6 +30,7 @@ namespace Root_WIND2
         public static class FilePath
         {
             public const string SettingFilePath = @"C:\Root\Setting.ini";
+            public const string BacksideExclusiveRegionFilePath = Constants.RootPath.RootSetupPath + "Backside_ExclusivePolygonList.xml";
         }
     }
 }

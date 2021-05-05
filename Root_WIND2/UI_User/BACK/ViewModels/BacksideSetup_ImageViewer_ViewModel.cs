@@ -124,14 +124,38 @@ namespace Root_WIND2.UI_User
         #endregion
 
 
-        public void HitTest()
+        public bool HitTest(Point hitPt)
         {
-            PathGeometry geometry = new PathGeometry();
-            PathFigure path = new PathFigure();
-            path.Segments.Add(new PolyLineSegment(this.exclusivePolyMemPointsList[0].ToList(), true));
-            
-            geometry.Figures.Add(path);
+            //PathGeometry geometry = new PathGeometry();
+            //PathFigure path = new PathFigure();
+            //path.Segments.Add(new PolyLineSegment(this.exclusivePolyMemPointsList[0].ToList(), true));
+            //geometry.Figures.Add(path);
 
+            PathGeometry pathGeometry = new PathGeometry();
+
+            foreach (List<Point> points in this.exclusivePolyMemPointsList)
+            {
+                PathFigure figure = new PathFigure();
+                figure.StartPoint = points[0];
+
+                PathSegmentCollection segments = new PathSegmentCollection();
+
+                foreach (Point pt in points)
+                {
+                    if (points[0] == pt) continue;
+
+                    LineSegment lineSegment = new LineSegment();
+                    lineSegment.Point = pt;
+
+                    segments.Add(lineSegment);
+                }
+
+                figure.Segments = segments;
+
+                pathGeometry.Figures.Add(figure);
+            }
+
+            return pathGeometry.FillContains(hitPt);
         }
 
         #region [Draw Method]
@@ -592,7 +616,11 @@ namespace Root_WIND2.UI_User
             CPoint canvasPt = new CPoint(p_MouseX, p_MouseY);
             CPoint memPt = GetMemPoint(canvasPt);
 
-            if(this.IsPolyChecked == true)
+
+            //if (HitTest(new Point(memPt.X, memPt.Y)) == true)
+            //    MessageBox.Show("Hit!!");
+
+            if (this.IsPolyChecked == true)
             {
                 AddExclusivePolygonPoint(memPt);
             }
@@ -844,28 +872,6 @@ namespace Root_WIND2.UI_User
             });
         }
 
-
-        public void TesT()
-        {
-
-        }
-
-        public void CalcTwoLinesIntersection(
-            int sx1, int sy1, int ex1, int ey1, // line 1
-            int sx2, int sy2, int ex2, int ey2) // line 2
-        {
-            double a1 = sy1 - ey1;
-            double b1 = ex1 - sx1;
-            double c1 = sx1 * ey1 - sy1 * ex1;
-
-            double a2 = sy2 - ey2;
-            double b2 = ex2 - sx2;
-            double c2 = sx2 * ey2 - sy2 * ex2;
-
-
-
-        }
-
         public RelayCommand btnClearPolyCommand
         {
             get => new RelayCommand(() =>
@@ -877,52 +883,72 @@ namespace Root_WIND2.UI_User
 
         private readonly string ExclusivePolygonListFilePath = "Backside_ExclusivePolygonList.xml";
 
+        private object lockObj = new object();
         public void SaveExclusivePolygon()
         {
-            if (File.Exists(Constants.RootPath.RootSetupPath + ExclusivePolygonListFilePath))
+            try
             {
-                string strTime = DateTime.Now.ToString("yyyyMMddhhmmss");
+                lock (lockObj)
+                {
+                    if (File.Exists(Constants.RootPath.RootSetupPath + ExclusivePolygonListFilePath))
+                    {
+                        string strTime = DateTime.Now.ToString("yyyyMMddhhmmss");
+                        if (!File.Exists(Constants.RootPath.RootSetupPath + strTime + "_" + ExclusivePolygonListFilePath))
+                        {
+                            File.Move(Constants.RootPath.RootSetupPath + ExclusivePolygonListFilePath, Constants.RootPath.RootSetupPath + strTime + "_" + ExclusivePolygonListFilePath);
+                        }
+                    }
 
-                File.Move(Constants.RootPath.RootSetupPath + ExclusivePolygonListFilePath, Constants.RootPath.RootSetupPath + strTime + "_" + ExclusivePolygonListFilePath);
+                    using (StreamWriter wr = new StreamWriter(Constants.RootPath.RootSetupPath + ExclusivePolygonListFilePath))
+                    {
+                        XmlSerializer xs = new XmlSerializer(typeof(List<List<Point>>));
+                        xs.Serialize(wr, this.exclusivePolyMemPointsList);
+                    }
+                }
             }
-
-            using (StreamWriter wr = new StreamWriter(Constants.RootPath.RootSetupPath + ExclusivePolygonListFilePath))
+            catch(Exception ex)
             {
-                XmlSerializer xs = new XmlSerializer(typeof(List<List<CPoint>>));
-                xs.Serialize(wr, this.exclusivePolyMemPointsList);
+                MessageBox.Show(ex.Message);
             }
         }
 
         public void ReadExclusivePolygon()
         {
-            if(File.Exists(Constants.RootPath.RootSetupPath + ExclusivePolygonListFilePath))
+            try
             {
-                ClearExclusivePolygon();
-
-                using (var sr = new StreamReader(Constants.RootPath.RootSetupPath + ExclusivePolygonListFilePath))
+                if (File.Exists(Constants.RootPath.RootSetupPath + ExclusivePolygonListFilePath))
                 {
-                    XmlSerializer xs = new XmlSerializer(typeof(List<List<CPoint>>));
-                    this.exclusivePolyMemPointsList = (List<List<Point>>)xs.Deserialize(sr);
+                    ClearExclusivePolygon();
 
-                    foreach (List<Point> pointList in this.exclusivePolyMemPointsList)
+                    using (var sr = new StreamReader(Constants.RootPath.RootSetupPath + ExclusivePolygonListFilePath))
                     {
-                        Polygon polygon = new Polygon();
+                        XmlSerializer xs = new XmlSerializer(typeof(List<List<Point>>));
+                        this.exclusivePolyMemPointsList = (List<List<Point>>)xs.Deserialize(sr);
 
-                        polygon.Stroke = ColorDefines.ExclusivePolyStroke;
-                        polygon.StrokeThickness = 2;
-                        polygon.Fill = ColorDefines.ExclusivePolyFill;
-                        polygon.Opacity = 0.3;
-                        this.ExclusivePolyList.Add(polygon);
-
-                        foreach (Point pt in pointList)
+                        foreach (List<Point> pointList in this.exclusivePolyMemPointsList)
                         {
-                            CPoint canvasPt = GetCanvasPoint(pt);
-                            polygon.Points.Add(new Point(canvasPt.X, canvasPt.Y));
-                        }
+                            Polygon polygon = new Polygon();
 
-                        this.p_UIElement.Add(polygon);
+                            polygon.Stroke = ColorDefines.ExclusivePolyStroke;
+                            polygon.StrokeThickness = 2;
+                            polygon.Fill = ColorDefines.ExclusivePolyFill;
+                            polygon.Opacity = 0.3;
+                            this.ExclusivePolyList.Add(polygon);
+
+                            foreach (Point pt in pointList)
+                            {
+                                CPoint canvasPt = GetCanvasPoint(pt);
+                                polygon.Points.Add(new Point(canvasPt.X, canvasPt.Y));
+                            }
+
+                            this.p_UIElement.Add(polygon);
+                        }
                     }
                 }
+            }
+            catch(Exception ex)
+            {
+                MessageBox.Show(ex.Message);
             }
         }
 

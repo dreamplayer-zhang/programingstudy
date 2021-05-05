@@ -227,6 +227,7 @@
     <Compile Include="Utility\KlarfData.cs" />
     <Compile Include="Utility\KlarfData_Lot.cs" />
     <Compile Include="SingleObject.cs" />
+    <Compile Include="Utility\PolygonController.cs" />
     <Compile Include="Utility\TempLogger.cs" />
     <Compile Include="Utility\Tools.Inspection.cs" />
     <Compile Include="WorkManager3\FixedSizeList.cs" />

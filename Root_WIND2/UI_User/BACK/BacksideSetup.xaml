@@ -56,6 +56,26 @@
         </GroupBox>
         <Grid  Grid.Column="1">
             <Grid.RowDefinitions>
+                <RowDefinition />
+                <RowDefinition />
+            </Grid.RowDefinitions>
+            <GroupBox Header="MapViewer" Margin="4" Style="{StaticResource main_view_groupbox}">
+                <vision:MapViewer DataContext="{Binding MapViewerVM}"  Margin="4"/>
+            </GroupBox>
+            <GroupBox Header="" 
+                      Grid.Row="1"
+                      Style="{StaticResource main_view_groupbox}">
+                <StackPanel Orientation="Vertical">
+                    <Button Content="Create ROI"
+                        Command="{Binding btnCreateROICommand}"
+                        Style="{StaticResource groupbox_button}"/>
+                </StackPanel>
+            </GroupBox>
+            
+                
+            
+            
+            <!--<Grid.RowDefinitions>
                 <RowDefinition Height="500" />
                 <RowDefinition Height="226"/>
                 <RowDefinition />
@@ -188,7 +208,7 @@
                     </Grid>
                     <Button Content="Create ROI" Command="{Binding btnCreateROICommand}" Style="{StaticResource groupbox_button}"/>
                 </StackPanel>
-            </GroupBox>
+            </GroupBox>-->
         </Grid>
     </Grid>
 </UserControl>
