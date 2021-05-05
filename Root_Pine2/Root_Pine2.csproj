@@ -186,6 +186,7 @@
     <Compile Include="Module\Picker.cs" />
     <Compile Include="Module\Loader.cs" />
     <Compile Include="Module\Pine2.cs" />
+    <Compile Include="Module\Transfer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>

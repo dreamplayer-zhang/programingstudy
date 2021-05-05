@@ -46,6 +46,8 @@ namespace Root_AOP01_Inspection
 		public const string BackRecipeRegName = "backSurfaceRcp";
 
 		public const string MainInspMgRegName = "InspectionFront";
+		public const string MainInspLeftMgRegName = "InspectionFrontLeft";
+		public const string MainInspRightMgRegName = "InspectionFrontRight";
 		public const string SideLeftInspMgRegName = "InspectionSideLeft";
 		public const string SideTopInspMgRegName = "InspectionSideTop";
 		public const string SideRightInspMgRegName = "InspectionSideRight";
@@ -58,6 +60,8 @@ namespace Root_AOP01_Inspection
 		public static string AOPImageRootPath = @"D:\DefectImage";
 
 		public static string MainModuleName = "MainSurfaceInspection";
+		public static string MainLeftModuleName = "MainLeftSurfaceInspection";
+		public static string MainRightModuleName = "MainRightSurfaceInspection";
 		public static string SideLeftModuleName = "SideLeftSurfaceInspection";
 		public static string SideRightModuleName = "SideRightSurfaceInspection";
 		public static string SideTopModuleName = "SideTopSurfaceInspection";
