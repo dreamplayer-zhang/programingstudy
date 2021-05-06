@@ -181,7 +181,7 @@ namespace Root_WindII
         {
             get => new RelayCommand(() =>
             {
-                //LoadRecipe(); // jhan
+                LoadRecipe();
 
                 if (GlobalObjects.Instance.GetNamed<WorkManager>("frontInspection") != null)
                 {
