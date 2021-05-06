@@ -4,22 +4,18 @@ using RootTools.Module;
 using RootTools.ToolBoxs;
 using RootTools.Trees;
 using System;
+using System.Collections.Generic;
 using System.Threading;
 
 namespace Root_Pine2.Module
 {
-    public class MGZ_EV : ModuleBase
+    public class MagazineEV : ModuleBase
     {
         #region ToolBox
         public override void GetTools(bool bInit)
         {
             m_conveyor.GetTools(m_toolBox, this, bInit);
             m_elevator.GetTools(m_toolBox, this, bInit); 
-            if (bInit) InitTools();
-        }
-
-        void InitTools()
-        {
         }
         #endregion
 
@@ -49,6 +45,7 @@ namespace Root_Pine2.Module
             }
         }
 
+        int m_nUnitLED = 0; 
         string _sLED = "";
         public string p_sLED
         {
@@ -57,8 +54,13 @@ namespace Root_Pine2.Module
             {
                 if (_sLED == value) return;
                 _sLED = value;
-                m_pine2.m_display.Write(m_nID, value); 
+                m_pine2.m_display.Write(m_nUnitLED, value); 
             }
+        }
+
+        void RunTreeLED(Tree tree)
+        {
+            m_nUnitLED = tree.Set(m_nUnitLED, m_nUnitLED, "Unit", "LED Display Modbus Unit ID");
         }
         #endregion
 
@@ -86,7 +88,7 @@ namespace Root_Pine2.Module
                 toolBox.GetDIO(ref m_diCheck, module, "Check", Enum.GetNames(typeof(eCheck)));
             }
 
-            public void RunSwitch(MGZ_EV module, int nBlink)
+            public void RunSwitch(MagazineEV module, int nBlink)
             {
                 if (module.p_eStep == eStep.Ready)
                 {
@@ -168,11 +170,6 @@ namespace Root_Pine2.Module
         #region Elevator
         public class Elevator
         {
-            public enum eMGZ
-            {
-                Up,
-                Down
-            }
             Axis m_axis; 
             DIO_Os m_doAlign;
             DIO_Is m_diAlign;
@@ -183,7 +180,7 @@ namespace Root_Pine2.Module
                 toolBox.GetAxis(ref m_axis, module, "Elevator");
                 toolBox.GetDIO(ref m_doAlign, module, "Align", new string[2] { "Backward", "Forward" });
                 toolBox.GetDIO(ref m_diAlign, module, "Align", new string[4] { "Backward", "95", "74, 77", "Check" });
-                toolBox.GetDIO(ref m_diProduct, module, "Product", Enum.GetNames(typeof(eMGZ)));
+                toolBox.GetDIO(ref m_diProduct, module, "Product", Enum.GetNames(typeof(InfoStrip.eMagazinePos)));
                 toolBox.GetDIO(ref m_diProtrude, module, "Protrude");
                 if (bInit)
                 {
@@ -205,17 +202,17 @@ namespace Root_Pine2.Module
                 m_axis.AddPos(Enum.GetNames(typeof(ePos)));
             }
 
-            public string MoveConveyor(eMGZ eMGZ, bool bWait = true)
+            public string MoveConveyor(InfoStrip.eMagazinePos eMagazinePos, bool bWait = true)
             {
-                m_axis.StartMove((eMGZ == eMGZ.Up) ? ePos.ConveyorUp : ePos.ConveyorDown);
+                m_axis.StartMove((eMagazinePos == InfoStrip.eMagazinePos.Up) ? ePos.ConveyorUp : ePos.ConveyorDown);
                 if (bWait == false) return "OK";
                 return m_axis.WaitReady();
             }
 
             double m_dSlot = 6000; 
-            public string MoveTransfer(eMGZ eMGZ, int nSlot, bool bWait = true)
+            public string MoveTransfer(InfoStrip.eMagazinePos eMagazinePos, int nSlot, bool bWait = true)
             {
-                m_axis.StartMove((eMGZ == eMGZ.Up) ? ePos.TransferUp : ePos.TransferDown, -nSlot * m_dSlot);
+                m_axis.StartMove((eMagazinePos == InfoStrip.eMagazinePos.Up) ? ePos.TransferUp : ePos.TransferDown, -nSlot * m_dSlot);
                 if (bWait == false) return "OK";
                 return m_axis.WaitReady();
             }
@@ -263,21 +260,21 @@ namespace Root_Pine2.Module
 
             #region Product & Protrude
             double m_secProduct = 10; 
-            public string WaitProduct(eMGZ eMGZ)
+            public string WaitProduct(InfoStrip.eMagazinePos eMagazinePos)
             {
                 StopWatch sw = new StopWatch();
                 int msWait = (int)(1000 * m_secProduct); 
                 while (sw.ElapsedMilliseconds < msWait)
                 {
                     Thread.Sleep(10);
-                    if (m_diProduct.ReadDI(eMGZ)) return "OK";
+                    if (m_diProduct.ReadDI(eMagazinePos)) return "OK";
                 }
                 return "Wait Product Timeout"; 
             }
 
-            public bool IsProduct(eMGZ eMGZ)
+            public bool IsProduct(InfoStrip.eMagazinePos eMagazinePos)
             {
-                return m_diProduct.ReadDI(eMGZ); 
+                return m_diProduct.ReadDI(eMagazinePos); 
             }
 
             public bool IsProtrude()
@@ -293,7 +290,78 @@ namespace Root_Pine2.Module
                 m_secProduct = tree.Set(m_secProduct, m_secProduct, "Wait Product", "Wait Product (sec)"); 
             }
         }
-        Elevator m_elevator = new Elevator(); 
+        Elevator m_elevator = new Elevator();
+        #endregion
+
+        #region Stack
+        public class Stack : NotifyProperty
+        {
+            InfoStrip.eResult _eResult = InfoStrip.eResult.Init;
+            public InfoStrip.eResult p_eResult
+            {
+                get { return _eResult; }
+                set
+                {
+                    if (_eResult == value) return;
+                    _eResult = value;
+                    OnPropertyChanged();
+                    WriteResultLED(); 
+                }
+            }
+
+            public void WriteResultLED()
+            {
+                switch (p_eResult)
+                {
+                    case InfoStrip.eResult.Init: m_magazineEV.p_sLED = "INIT"; break;
+                    case InfoStrip.eResult.Good: m_magazineEV.p_sLED = "GOOD"; break;
+                    case InfoStrip.eResult.XOut: m_magazineEV.p_sLED = "XOUT"; break;
+                    case InfoStrip.eResult.Rework: m_magazineEV.p_sLED = "WORK"; break;
+                    case InfoStrip.eResult.Error: m_magazineEV.p_sLED = "ERRR"; break;
+                    case InfoStrip.eResult.Paper: m_magazineEV.p_sLED = "PAPR"; break;
+                }
+            }
+
+            int _nStack = 0; 
+            public int p_nStack
+            {
+                get { return _nStack; }
+                set
+                {
+                    _nStack = value;
+                    OnPropertyChanged(); 
+                }
+            }
+
+            MagazineEV m_magazineEV; 
+            public Stack(MagazineEV magazineEV)
+            {
+                m_magazineEV = magazineEV;
+            }
+        }
+        public Stack m_stack = null;
+        #endregion
+
+        #region Magazine
+        public class Magazine
+        {
+            public List<InfoStrip> m_aInfoStrip = new List<InfoStrip>(); 
+
+            public Magazine(InfoStrip.eMagazine eMagazine, InfoStrip.eMagazinePos eMagazinePos)
+            {
+                for (int n = 0; n < 20; n++)
+                {
+                    InfoStrip infoStrip = new InfoStrip(eMagazine, eMagazinePos, n);
+                    infoStrip.OnDispose += InfoStrip_OnDispose;
+                    m_aInfoStrip.Add(infoStrip); 
+                }
+            }
+
+            private void InfoStrip_OnDispose(InfoStrip infoStrip)
+            {
+                
+            }
+        }
         #endregion
 
         #region override
@@ -327,8 +395,8 @@ namespace Root_Pine2.Module
         #region Load
         string StartLoad()
         {
-            if (m_elevator.IsProduct(Elevator.eMGZ.Up)) return "Magazine Up Sensor Checked";
-            if (m_elevator.IsProduct(Elevator.eMGZ.Down)) return "Magazine Down Sensor Checked";
+            if (m_elevator.IsProduct(InfoStrip.eMagazinePos.Up)) return "Magazine Up Sensor Checked";
+            if (m_elevator.IsProduct(InfoStrip.eMagazinePos.Down)) return "Magazine Down Sensor Checked";
             p_eStep = eStep.Load;
             return StartRun(m_runLoad);
         }
@@ -338,25 +406,26 @@ namespace Root_Pine2.Module
             switch (m_pine2.p_eMode)
             {
                 case Pine2.eRunMode.Magazine:
-                    if (Run(RunLoad(Elevator.eMGZ.Up))) return p_sInfo;
-                    if (Run(RunLoad(Elevator.eMGZ.Down))) return p_sInfo;
+                    if (Run(RunLoad(InfoStrip.eMagazinePos.Up))) return p_sInfo;
+                    if (Run(RunLoad(InfoStrip.eMagazinePos.Down))) return p_sInfo;
                     break;
                 case Pine2.eRunMode.Stack:
-                    if (Run(RunLoad(Elevator.eMGZ.Up))) return p_sInfo;
+                    if (Run(RunLoad(InfoStrip.eMagazinePos.Up))) return p_sInfo;
+                    m_stack = new Stack(this);
                     break; 
             }
             p_eStep = eStep.Run; 
             return "OK";
         }
 
-        string RunLoad(Elevator.eMGZ eMGZ)
+        string RunLoad(InfoStrip.eMagazinePos eMagazinePos)
         {
-            if (Run(m_elevator.MoveConveyor(eMGZ))) return p_sInfo;
+            if (Run(m_elevator.MoveConveyor(eMagazinePos))) return p_sInfo;
             if (Run(m_conveyor.WaitSwitch())) return p_sInfo;
             if (m_conveyor.IsCheckExist() == false) return "OK"; 
             if (Run(m_elevator.RunAlign(false))) return p_sInfo;
             m_conveyor.RunMove(Conveyor.eMove.Forward);
-            if (Run(m_elevator.WaitProduct(eMGZ))) return p_sInfo;
+            if (Run(m_elevator.WaitProduct(eMagazinePos))) return p_sInfo;
             m_conveyor.RunMoveStop();
             if (Run(m_elevator.RunAlign(true))) return p_sInfo;
             return "OK";
@@ -375,26 +444,27 @@ namespace Root_Pine2.Module
             switch (m_pine2.p_eMode)
             {
                 case Pine2.eRunMode.Magazine:
-                    if (Run(RunUnload(Elevator.eMGZ.Down))) return p_sInfo;
-                    if (Run(RunUnload(Elevator.eMGZ.Up))) return p_sInfo;
+                    if (Run(RunUnload(InfoStrip.eMagazinePos.Down))) return p_sInfo;
+                    if (Run(RunUnload(InfoStrip.eMagazinePos.Up))) return p_sInfo;
                     break;
                 case Pine2.eRunMode.Stack:
-                    if (Run(RunUnload(Elevator.eMGZ.Up))) return p_sInfo;
+                    if (Run(RunUnload(InfoStrip.eMagazinePos.Up))) return p_sInfo;
                     break;
             }
             p_eStep = eStep.Ready; 
             return "OK"; 
         }
 
-        string RunUnload(Elevator.eMGZ eMGZ)
+        string RunUnload(InfoStrip.eMagazinePos eMagazinePos)
         {
-            if (m_elevator.IsProduct(eMGZ) == false) return "OK"; 
+            if (m_elevator.IsProduct(eMagazinePos) == false) return "OK"; 
             if (Run(m_elevator.RunAlign(true))) return p_sInfo;
-            if (Run(m_elevator.MoveConveyor(eMGZ))) return p_sInfo;
+            if (Run(m_elevator.MoveConveyor(eMagazinePos))) return p_sInfo;
             if (Run(m_elevator.RunAlign(false))) return p_sInfo;
             m_conveyor.RunMove(Conveyor.eMove.Backward);
             Thread.Sleep(1000);
-            if (Run(m_conveyor.WaitUnload())) return p_sInfo; 
+            if (Run(m_conveyor.WaitUnload())) return p_sInfo;
+            m_stack?.WriteResultLED(); 
             return "OK";
         }
         #endregion
@@ -403,16 +473,18 @@ namespace Root_Pine2.Module
         public override void RunTree(Tree tree)
         {
             base.RunTree(tree);
+            RunTreeLED(tree.GetTree("LED")); 
             m_elevator.RunTree(tree.GetTree("Elevator")); 
         }
         #endregion
 
-        int m_nID = 1;
+        InfoStrip.eMagazine p_eMagazine { get; set; }
         Pine2 m_pine2; 
-        public MGZ_EV(string id, int nID, IEngineer engineer, Pine2 pine2)
+        public MagazineEV(InfoStrip.eMagazine eMagazine, IEngineer engineer, Pine2 pine2)
         {
-            m_nID = nID + 1;
-            p_id = id + m_nID.ToString();
+            p_eMagazine = eMagazine;
+            p_id = eMagazine.ToString(); 
+            m_nUnitLED = (int)eMagazine + 1; 
             m_pine2 = pine2; 
             base.InitBase(p_id, engineer);
         }
@@ -434,8 +506,8 @@ namespace Root_Pine2.Module
 
         public class Run_Load : ModuleRunBase
         {
-            MGZ_EV m_module;
-            public Run_Load(MGZ_EV module)
+            MagazineEV m_module;
+            public Run_Load(MagazineEV module)
             {
                 m_module = module;
                 InitModuleRun(module);
@@ -459,8 +531,8 @@ namespace Root_Pine2.Module
 
         public class Run_Unload : ModuleRunBase
         {
-            MGZ_EV m_module;
-            public Run_Unload(MGZ_EV module)
+            MagazineEV m_module;
+            public Run_Unload(MagazineEV module)
             {
                 m_module = module;
                 InitModuleRun(module);
@@ -484,8 +556,8 @@ namespace Root_Pine2.Module
 
         public class Run_Align : ModuleRunBase
         {
-            MGZ_EV m_module;
-            public Run_Align(MGZ_EV module)
+            MagazineEV m_module;
+            public Run_Align(MagazineEV module)
             {
                 m_module = module;
                 InitModuleRun(module);
