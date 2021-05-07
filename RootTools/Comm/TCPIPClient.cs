@@ -51,6 +51,12 @@ namespace RootTools.Comm
                 if (value == _bUse) return;
                 _bUse = value;
                 OnPropertyChanged();
+                if ((value == false) && (m_socket != null))
+                {
+                    m_socket.Close();
+                    m_socket.Dispose();
+                    m_socket = null;
+                }
             }
         }
 
@@ -251,12 +257,6 @@ namespace RootTools.Comm
                         else m_commLog.Add(CommLog.eType.Info, sSend);
                     }
                 }
-                //else if (m_socket != null)
-                //{
-                //    m_socket.Close();
-                //    m_socket.Dispose();
-                //    m_socket = null; 
-                //}
             }
         }
         #endregion
