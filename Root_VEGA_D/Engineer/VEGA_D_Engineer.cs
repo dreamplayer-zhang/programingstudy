@@ -183,7 +183,6 @@ namespace Root_VEGA_D.Engineer
             if (IsRunModule((Loadport_Cymechs)m_handler.m_aLoadport[1])) return true;
             if (IsRunModule(m_handler.m_wtr)) return true;
             if (IsRunModule(m_handler.m_vision)) return true;
-            if (IsRunModule(m_handler.m_visionIPU)) return true;
             return false;
         }
         bool IsRunModule(ModuleBase module)
