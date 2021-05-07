@@ -774,11 +774,8 @@ namespace Root_Pine2.Module
 
             public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
             {
-                if (m_infoStrip == null) return; 
-                m_infoStrip.p_eMagazinePos = (InfoStrip.eMagazinePos)tree.Set(m_infoStrip.p_eMagazinePos, m_infoStrip.p_eMagazinePos, "Magazine", "Magazine Position", bVisible);
-                m_infoStrip.p_nStrip = tree.Set(m_infoStrip.p_nStrip, m_infoStrip.p_nStrip, "Strip", "Magazine Strip Slot ID (0 ~ 19)", bVisible);
-                if (m_infoStrip.p_nStrip < 0) m_infoStrip.p_nStrip = 0;
-                if (m_infoStrip.p_nStrip > 19) m_infoStrip.p_nStrip = 19; 
+                if (m_infoStrip == null) return;
+                m_infoStrip.RunTreeMagazine(tree, bVisible); 
             }
 
             public override string Run()
