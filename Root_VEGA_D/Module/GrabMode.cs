@@ -216,6 +216,25 @@ namespace Root_VEGA_D.Module
 
         #endregion
 
+        #region AF
+
+        public bool m_bUseAF = false;
+        public double m_dAFStartZ = 0;
+        public double m_dAFEndZ = 0;
+        public double m_dAFOffset = 0;
+        public int m_nAFLaserThreshold = 100;
+
+        void RunTreeAF(Tree tree, bool bVisible, bool bReadOnly)
+        {
+            m_bUseAF = tree.Set(m_bUseAF, m_bUseAF, "Use", "Using AF", bVisible, false);
+            m_dAFStartZ = tree.Set(m_dAFStartZ, m_dAFStartZ, "AF Start Z", "Start Z Position of AF Scan Range", bVisible, false);
+            m_dAFEndZ = tree.Set(m_dAFEndZ, m_dAFEndZ, "AF End Z", "End Z Position of AF Scan Range", bVisible, false);
+            m_dAFOffset = tree.Set(m_dAFOffset, m_dAFOffset, "AF Offset", "Applied Offset Value to Found Z Position", bVisible, false);
+            m_nAFLaserThreshold = tree.Set(m_nAFLaserThreshold, m_nAFLaserThreshold, "AF Laser Threshold", "AF Laser Threshold", bVisible, false);
+        }
+
+        #endregion
+
         public eScanPos m_eScanPos = eScanPos.Bottom;
 
         public string p_id
@@ -289,6 +308,7 @@ namespace Root_VEGA_D.Module
             RunTreeMemory(tree.GetTree("Memory", false), bVisible, bReadOnly);
             RunTreeScanPos(tree.GetTree("ScanPos", false), bVisible, bReadOnly);
             RunTreeRADS(tree.GetTree("RADS", false), bVisible, bReadOnly);
+            RunTreeAF(tree.GetTree("AF", false), bVisible, bReadOnly);
         }
 
         public void RunTreeLADS(Tree tree)

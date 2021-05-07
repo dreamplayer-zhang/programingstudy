@@ -100,6 +100,7 @@ namespace RootTools.Control
 
         public virtual void SetCommandPosition(double fPos) { }
         public virtual void SetActualPosition(double fPos) { }
+        public virtual double GetActualPosition() { return 0; }
         public virtual void OverrideVelocity(double v) { }
         #endregion
 
