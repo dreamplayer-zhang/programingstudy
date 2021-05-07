@@ -101,7 +101,7 @@ namespace Root_Pine2.Module
                 }
             }
 
-            public string WaitSwitch()
+            public string WaitSwitch(ref double msWait)
             {
                 while (m_dioSwitch.p_bIn == false)
                 {
@@ -114,7 +114,8 @@ namespace Root_Pine2.Module
                     Thread.Sleep(10);
                     if (EQ.IsStop()) return "EQ Stop";
                 }
-                return (sw.ElapsedMilliseconds < 1500) ? "OK" : "Cancel";
+                msWait = sw.ElapsedMilliseconds; 
+                return "OK";
             }
 
             public void RunMove(eMove eMove)
@@ -209,10 +210,11 @@ namespace Root_Pine2.Module
                 return m_axis.WaitReady();
             }
 
-            double m_dSlot = 6000; 
-            public string MoveTransfer(InfoStrip.eMagazinePos eMagazinePos, int nSlot, bool bWait = true)
+            double m_dSlot = 6000;
+            public string MoveTransfer(InfoStrip infoStrip, bool bWait = true)
             {
-                m_axis.StartMove((eMagazinePos == InfoStrip.eMagazinePos.Up) ? ePos.TransferUp : ePos.TransferDown, -nSlot * m_dSlot);
+                ePos ePos = (infoStrip.p_eMagazinePos == InfoStrip.eMagazinePos.Up) ? ePos.TransferUp : ePos.TransferDown;
+                m_axis.StartMove(ePos, -m_dSlot * infoStrip.p_nStrip);
                 if (bWait == false) return "OK";
                 return m_axis.WaitReady();
             }
@@ -322,6 +324,7 @@ namespace Root_Pine2.Module
                 }
             }
 
+            static int m_nStackMax = 50;
             int _nStack = 0; 
             public int p_nStack
             {
@@ -331,6 +334,17 @@ namespace Root_Pine2.Module
                     _nStack = value;
                     OnPropertyChanged(); 
                 }
+            }
+
+            public void PutInfoStrip(InfoStrip infoStrip)
+            {
+                p_nStack++;
+                if (p_nStack >= m_nStackMax) m_magazineEV.StartUnload(); 
+            }
+
+            public void RunTree(Tree tree)
+            {
+                m_nStackMax = tree.Set(m_nStackMax, m_nStackMax, "Max Strip", "Max Stack Strip Count"); 
             }
 
             MagazineEV m_magazineEV; 
@@ -345,22 +359,91 @@ namespace Root_Pine2.Module
         #region Magazine
         public class Magazine
         {
-            public List<InfoStrip> m_aInfoStrip = new List<InfoStrip>(); 
-
-            public Magazine(InfoStrip.eMagazine eMagazine, InfoStrip.eMagazinePos eMagazinePos)
-            {
-                for (int n = 0; n < 20; n++)
-                {
-                    InfoStrip infoStrip = new InfoStrip(eMagazine, eMagazinePos, n);
-                    infoStrip.OnDispose += InfoStrip_OnDispose;
-                    m_aInfoStrip.Add(infoStrip); 
-                }
-            }
-
+            List<InfoStrip> m_aInfoStrip = new List<InfoStrip>();
             private void InfoStrip_OnDispose(InfoStrip infoStrip)
             {
-                
+                m_aInfoStrip.Remove(infoStrip); 
             }
+
+            public InfoStrip GetInfoStrip(bool bPeek)
+            {
+                if (m_qInfoStrip.Count == 0) return null;
+                if (bPeek) return m_qInfoStrip.Peek(); 
+                InfoStrip infoStrip = m_qInfoStrip.Dequeue();
+                m_aInfoStrip.Add(infoStrip);
+                return infoStrip; 
+            }
+
+            public void PutInfoStrip(InfoStrip infoStrip)
+            {
+                m_aInfoStrip.Remove(infoStrip);
+                m_magazineEV.CheckMagazineDone(); 
+            }
+
+            public bool IsDone()
+            {
+                if (m_qInfoStrip.Count > 0) return false;
+                if (m_aInfoStrip.Count > 0) return false;
+                return true; 
+            }
+
+            MagazineEV m_magazineEV; 
+            Queue<InfoStrip> m_qInfoStrip = new Queue<InfoStrip>(); 
+            public Magazine(MagazineEV magazineEV, InfoStrip.eMagazinePos eMagazinePos)
+            {
+                m_magazineEV = magazineEV; 
+                for (int n = 0; n < 20; n++)
+                {
+                    InfoStrip infoStrip = new InfoStrip(magazineEV.p_eMagazine, eMagazinePos, n);
+                    infoStrip.OnDispose += InfoStrip_OnDispose;
+                    m_qInfoStrip.Enqueue(infoStrip); 
+                }
+            }
+        }
+        Dictionary<InfoStrip.eMagazinePos, Magazine> m_aMagazine = new Dictionary<InfoStrip.eMagazinePos, Magazine>(); 
+        void InitMagazine()
+        {
+            m_aMagazine.Add(InfoStrip.eMagazinePos.Up, null);
+            m_aMagazine.Add(InfoStrip.eMagazinePos.Down, null); 
+        }
+        #endregion
+
+        #region InfoStrip
+        public InfoStrip GetInfoStrip(bool bPeek)
+        {
+            switch (m_pine2.p_eMode)
+            {
+                case Pine2.eRunMode.Stack: return null;
+                case Pine2.eRunMode.Magazine:
+                    InfoStrip infoStrip = GetInfoStrip(m_aMagazine[InfoStrip.eMagazinePos.Down], bPeek);
+                    if (infoStrip != null) return infoStrip; 
+                    return GetInfoStrip(m_aMagazine[InfoStrip.eMagazinePos.Up], bPeek);
+            }
+            return null; 
+        }
+
+        InfoStrip GetInfoStrip(Magazine magazine, bool bPeek)
+        {
+            if (magazine == null) return null;
+            return magazine.GetInfoStrip(bPeek); 
+        }
+
+        public void PutInfoStrip(InfoStrip infoStrip)
+        {
+            switch (m_pine2.p_eMode)
+            {
+                case Pine2.eRunMode.Stack: m_stack?.PutInfoStrip(infoStrip); break;
+                case Pine2.eRunMode.Magazine: m_aMagazine[infoStrip.p_eMagazinePos]?.PutInfoStrip(infoStrip); break;
+            }
+        }
+
+        public void CheckMagazineDone()
+        {
+            foreach (Magazine magazine in m_aMagazine.Values)
+            {
+                if ((magazine != null) && (magazine.IsDone() == false)) return; 
+            }
+            StartUnload();
         }
         #endregion
 
@@ -389,6 +472,17 @@ namespace Root_Pine2.Module
         public void StartRun()
         {
             if (EQ.p_bPickerSet) return;
+            switch (m_pine2.p_eMode)
+            {
+                case Pine2.eRunMode.Stack:
+                    m_elevator.MoveStack();
+                    break;
+                case Pine2.eRunMode.Magazine:
+                    InfoStrip infoStrip = GetInfoStrip(true);
+                    if (infoStrip == null) return;
+                    m_elevator.MoveTransfer(infoStrip);
+                    break; 
+            }
         }
         #endregion
 
@@ -403,14 +497,27 @@ namespace Root_Pine2.Module
 
         public string RunLoad()
         {
+            double msWait = 0;
             switch (m_pine2.p_eMode)
             {
                 case Pine2.eRunMode.Magazine:
+                    if (Run(m_conveyor.WaitSwitch(ref msWait))) return p_sInfo;
+                    if (msWait > 1500) return "Cancel";
                     if (Run(RunLoad(InfoStrip.eMagazinePos.Up))) return p_sInfo;
-                    if (Run(RunLoad(InfoStrip.eMagazinePos.Down))) return p_sInfo;
+                    m_aMagazine[InfoStrip.eMagazinePos.Up] = new Magazine(this, InfoStrip.eMagazinePos.Up);
+                    if (Run(m_conveyor.WaitSwitch(ref msWait))) return p_sInfo;
+                    if (msWait <= 1500)
+                    {
+                        if (Run(RunLoad(InfoStrip.eMagazinePos.Down))) return p_sInfo;
+                        m_aMagazine[InfoStrip.eMagazinePos.Down] = new Magazine(this, InfoStrip.eMagazinePos.Down);
+                    }
+                    MoveTransfer();
                     break;
                 case Pine2.eRunMode.Stack:
+                    if (Run(m_conveyor.WaitSwitch(ref msWait))) return p_sInfo;
+                    if (msWait > 1500) return "Cancel"; 
                     if (Run(RunLoad(InfoStrip.eMagazinePos.Up))) return p_sInfo;
+                    if (Run(m_elevator.MoveStack())) return p_sInfo;
                     m_stack = new Stack(this);
                     break; 
             }
@@ -421,7 +528,6 @@ namespace Root_Pine2.Module
         string RunLoad(InfoStrip.eMagazinePos eMagazinePos)
         {
             if (Run(m_elevator.MoveConveyor(eMagazinePos))) return p_sInfo;
-            if (Run(m_conveyor.WaitSwitch())) return p_sInfo;
             if (m_conveyor.IsCheckExist() == false) return "OK"; 
             if (Run(m_elevator.RunAlign(false))) return p_sInfo;
             m_conveyor.RunMove(Conveyor.eMove.Forward);
@@ -433,8 +539,9 @@ namespace Root_Pine2.Module
         #endregion
 
         #region Unload
-        string StartUnload()
+        public string StartUnload()
         {
+            Thread.Sleep(100); 
             p_eStep = eStep.Unload; 
             return StartRun(m_runUnload);
         }
@@ -445,10 +552,13 @@ namespace Root_Pine2.Module
             {
                 case Pine2.eRunMode.Magazine:
                     if (Run(RunUnload(InfoStrip.eMagazinePos.Down))) return p_sInfo;
+                    m_aMagazine[InfoStrip.eMagazinePos.Down] = null; 
                     if (Run(RunUnload(InfoStrip.eMagazinePos.Up))) return p_sInfo;
+                    m_aMagazine[InfoStrip.eMagazinePos.Up] = null; 
                     break;
                 case Pine2.eRunMode.Stack:
                     if (Run(RunUnload(InfoStrip.eMagazinePos.Up))) return p_sInfo;
+                    m_stack = null; 
                     break;
             }
             p_eStep = eStep.Ready; 
@@ -469,12 +579,35 @@ namespace Root_Pine2.Module
         }
         #endregion
 
+        #region Move Transfer
+        public string StartMoveTransfer(InfoStrip infoStrip)
+        {
+            Run_MoveTransfer run = (Run_MoveTransfer)m_runMoveTransfer.Clone();
+            run.m_infoStrip = infoStrip; 
+            return StartRun(run); 
+        }
+
+        public string MoveTransfer(bool bWait = true)
+        {
+            InfoStrip infoStrip = GetInfoStrip(true);
+            if (infoStrip == null) return "InfoStrip not Found";
+            return m_elevator.MoveTransfer(infoStrip, bWait); 
+        }
+
+        public string MoveTransfer(InfoStrip infoStrip, bool bWait = true)
+        {
+            if (infoStrip == null) return "InfoStrip not Found";
+            return m_elevator.MoveTransfer(infoStrip, bWait);
+        }
+        #endregion
+
         #region Tree
         public override void RunTree(Tree tree)
         {
             base.RunTree(tree);
             RunTreeLED(tree.GetTree("LED")); 
-            m_elevator.RunTree(tree.GetTree("Elevator")); 
+            m_elevator.RunTree(tree.GetTree("Elevator"));
+            m_stack.RunTree(tree.GetTree("Stack")); 
         }
         #endregion
 
@@ -482,6 +615,7 @@ namespace Root_Pine2.Module
         Pine2 m_pine2; 
         public MagazineEV(InfoStrip.eMagazine eMagazine, IEngineer engineer, Pine2 pine2)
         {
+            InitMagazine(); 
             p_eMagazine = eMagazine;
             p_id = eMagazine.ToString(); 
             m_nUnitLED = (int)eMagazine + 1; 
@@ -497,11 +631,14 @@ namespace Root_Pine2.Module
         #region ModuleRun
         ModuleRunBase m_runLoad;
         ModuleRunBase m_runUnload;
+        ModuleRunBase m_runMoveTransfer; 
         protected override void InitModuleRuns()
         {
             m_runLoad = AddModuleRunList(new Run_Load(this), false, "Load Magazine or Stack");
             m_runUnload = AddModuleRunList(new Run_Unload(this), false, "Unload Magazine or Stack");
             AddModuleRunList(new Run_Align(this), false, "Run Align");
+            AddModuleRunList(new Run_MoveStack(this), false, "Move Stack Position");
+            m_runMoveTransfer = AddModuleRunList(new Run_MoveTransfer(this), false, "Move Transfer Position");
         }
 
         public class Run_Load : ModuleRunBase
@@ -525,7 +662,17 @@ namespace Root_Pine2.Module
 
             public override string Run()
             {
-                return m_module.RunLoad();
+                string sRun = m_module.RunLoad();
+                switch (sRun)
+                {
+                    case "OK": return "OK";
+                    case "Cancel":
+                        m_module.p_eStep = eStep.Ready;
+                        return "OK";
+                    default:
+                        m_module.p_eStep = eStep.Ready;
+                        return sRun; 
+                }
             }
         }
 
@@ -579,6 +726,65 @@ namespace Root_Pine2.Module
             public override string Run()
             {
                 return m_module.m_elevator.RunAlign(m_bAlign); 
+            }
+        }
+
+        public class Run_MoveStack : ModuleRunBase
+        {
+            MagazineEV m_module;
+            public Run_MoveStack(MagazineEV module)
+            {
+                m_module = module;
+                InitModuleRun(module);
+            }
+
+            public override ModuleRunBase Clone()
+            {
+                Run_MoveStack run = new Run_MoveStack(m_module);
+                return run;
+            }
+
+            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
+            {
+            }
+
+            public override string Run()
+            {
+                return m_module.m_elevator.MoveStack();
+            }
+        }
+
+        public class Run_MoveTransfer : ModuleRunBase
+        {
+            MagazineEV m_module;
+            public Run_MoveTransfer(MagazineEV module)
+            {
+                m_module = module;
+                m_infoStrip = new InfoStrip(module.p_eMagazine, InfoStrip.eMagazinePos.Up, 0); 
+                InitModuleRun(module);
+            }
+
+            public InfoStrip m_infoStrip;
+            public override ModuleRunBase Clone()
+            {
+                Run_MoveTransfer run = new Run_MoveTransfer(m_module);
+                run.m_infoStrip = m_infoStrip.Clone(); 
+                return run;
+            }
+
+            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
+            {
+                if (m_infoStrip == null) return; 
+                m_infoStrip.p_eMagazinePos = (InfoStrip.eMagazinePos)tree.Set(m_infoStrip.p_eMagazinePos, m_infoStrip.p_eMagazinePos, "Magazine", "Magazine Position", bVisible);
+                m_infoStrip.p_nStrip = tree.Set(m_infoStrip.p_nStrip, m_infoStrip.p_nStrip, "Strip", "Magazine Strip Slot ID (0 ~ 19)", bVisible);
+                if (m_infoStrip.p_nStrip < 0) m_infoStrip.p_nStrip = 0;
+                if (m_infoStrip.p_nStrip > 19) m_infoStrip.p_nStrip = 19; 
+            }
+
+            public override string Run()
+            {
+                if (m_infoStrip == null) return m_module.MoveTransfer();
+                else return m_module.MoveTransfer(m_infoStrip); 
             }
         }
         #endregion

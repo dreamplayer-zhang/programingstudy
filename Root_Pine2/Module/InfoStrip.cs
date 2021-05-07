@@ -1,4 +1,5 @@
 ﻿using RootTools;
+using RootTools.Trees;
 
 namespace Root_Pine2.Module
 {
@@ -55,6 +56,11 @@ namespace Root_Pine2.Module
             p_eMagazine = eMagazine;
             p_eMagazinePos = eMagazinePos;
             p_nStrip = nStrip;
+        }
+
+        public InfoStrip Clone()
+        {
+            return new InfoStrip(p_eMagazine, p_eMagazinePos, p_nStrip); 
         }
 
         public delegate void dgOnDispose(InfoStrip infoStrip);
