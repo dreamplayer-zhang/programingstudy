@@ -52,10 +52,12 @@ namespace Root_Rinse_Loader.Module
         {
             DIO_I m_diCheck;
             DIO_IO m_dioClamp;
+            DIO_I m_diProtrusion; 
             public void GetTools(ToolBox toolBox)
             {
                 m_storage.p_sInfo = toolBox.GetDIO(ref m_diCheck, m_storage, m_id + ".Check");
                 m_storage.p_sInfo = toolBox.GetDIO(ref m_dioClamp, m_storage, m_id + ".Clamp");
+                m_storage.p_sInfo = toolBox.GetDIO(ref m_diProtrusion, m_storage, m_id + ".Protrusion");
             }
 
             bool _bCheck = false; 
@@ -80,6 +82,11 @@ namespace Root_Rinse_Loader.Module
                     _bClamp = value;
                     OnPropertyChanged(); 
                 }
+            }
+
+            public bool IsProtrusion()
+            {
+                return m_diProtrusion.p_bIn; 
             }
 
             public void CheckSensor()
@@ -119,6 +126,15 @@ namespace Root_Rinse_Loader.Module
                 if (magazine.p_bCheck && (magazine.p_bClamp != bClamp)) return "Clamp Sensor Error"; 
             }
             return "OK"; 
+        }
+
+        public bool IsMagazineProtrusion()
+        {
+            foreach (Magazine magazine in m_aMagazine)
+            {
+                if (magazine.IsProtrusion()) return true; 
+            }
+            return false; 
         }
         #endregion
 
@@ -225,7 +241,8 @@ namespace Root_Rinse_Loader.Module
         int m_dZ = 6000;
         public string MoveMagazine(eMagazine eMagazine, int iIndex, bool bWait)
         {
-            if ((iIndex < 0) || (iIndex >= 20)) return "Invalid Index"; 
+            if ((iIndex < 0) || (iIndex >= 20)) return "Invalid Index";
+            if (IsMagazineProtrusion()) return "Check Storage : Strip Protrusion"; 
             m_axis.StartMove(eMagazine, -iIndex * m_dZ);
             if (bWait) return m_axis.WaitReady();
             return "OK";
