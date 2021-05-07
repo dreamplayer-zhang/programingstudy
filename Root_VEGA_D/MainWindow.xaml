@@ -140,7 +140,7 @@
                     <ColumnDefinition Width="auto" />
                     <ColumnDefinition Width="6.2*" />
                     <ColumnDefinition Width="auto" />
-                    <ColumnDefinition Width="1.8*" />
+                    <ColumnDefinition Width="2.2*" />
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="8*" />
@@ -156,7 +156,7 @@
                       Margin="-1,0,-1,0"
                       X2="1" />
                 <Line Grid.Column="1"
-                      Grid.RowSpan="3"
+                      Grid.RowSpan="1"
                       Stroke="{StaticResource Splitter}"
                       StrokeThickness="1"
                       Stretch="Fill"
@@ -210,7 +210,7 @@
                     </Grid.ColumnDefinitions>
                     <Line Grid.Column="1"
                           Stroke="{StaticResource Splitter}"
-                          StrokeThickness="0.5"
+                          StrokeThickness="1"
                           Stretch="Fill"
                           Margin="0,-1,0,-1"
                           Y2="1" />
@@ -398,425 +398,9 @@
                     </Grid>
                 </Grid>
                 <!--Left Panel-->
-                <Grid Grid.Column="0"
-                      Grid.Row="2">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="3*" />
-                        <RowDefinition Height="4*" />
-                        <RowDefinition Height="3*" />
-                    </Grid.RowDefinitions>
-                    <Grid Grid.Row="0">
-                        <GroupBox Header="TDI View">
-                            <Grid Background="Black" />
-                        </GroupBox>
-                        <TextBlock Text="TDI View(Align Key/Defect/Snap)"
-                                   Foreground="White" />
-                    </Grid>
-                    <Grid Grid.Row="1">
-                        <GroupBox Header="Map">
-                            <Grid Background="Black">
-                                <!--<Image Source="Resource/ReticleMap2.PNG"
-                                       Margin="20,10"
-                                       Stretch="Fill" />-->
-                            </Grid>
-                        </GroupBox>
-                    </Grid>
-                    <Grid Grid.Row="2">
-                        <GroupBox Header="Control">
-                            <Grid>
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="25" />
-                                    <RowDefinition Height="2.5*" />
-                                    <RowDefinition Height="2" />
-                                    <RowDefinition Height="40" />
-                                </Grid.RowDefinitions>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition />
-                                    <ColumnDefinition Width="2" />
-                                    <ColumnDefinition Width="3*" />
-                                </Grid.ColumnDefinitions>
-                                <Grid Grid.RowSpan="2"
-                                      Background="White">
-                                    <Border BorderBrush="#FFACACAC"
-                                            BorderThickness="1">
-                                        <Grid Grid.Column="0">
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition />
-                                                <ColumnDefinition />
-                                                <ColumnDefinition />
-                                            </Grid.ColumnDefinitions>
-                                            <Grid.RowDefinitions>
-                                                <RowDefinition />
-                                                <RowDefinition Height="8*" />
-                                                <RowDefinition />
-                                            </Grid.RowDefinitions>
-
-                                            <TextBlock Text="{Binding ElementName=red, Path=Value, StringFormat=N0}"
-                                                       Grid.Column="0" />
-                                            <TextBlock Text="{Binding ElementName=green, Path=Value, StringFormat=N0}"
-                                                       Grid.Column="1" />
-                                            <TextBlock Text="{Binding ElementName=blue, Path=Value, StringFormat=N0}"
-                                                       Grid.Column="2" />
-                                            <Slider Orientation="Vertical"
-                                                    HorizontalAlignment="Center"
-                                                    Grid.Row="1"
-                                                    Grid.Column="0"
-                                                    Minimum="0"
-                                                    Maximum="255"
-                                                    x:Name="red"
-                                                    SmallChange="1" />
-                                            <Slider Orientation="Vertical"
-                                                    HorizontalAlignment="Center"
-                                                    Grid.Row="1"
-                                                    Grid.Column="1"
-                                                    Minimum="0"
-                                                    Maximum="255"
-                                                    x:Name="green"
-                                                    SmallChange="1" />
-                                            <Slider Orientation="Vertical"
-                                                    HorizontalAlignment="Center"
-                                                    Grid.Row="1"
-                                                    Grid.Column="2"
-                                                    Minimum="0"
-                                                    Maximum="255"
-                                                    x:Name="blue"
-                                                    SmallChange="1" />
-                                            <TextBlock Text="R"
-                                                       Grid.Column="0"
-                                                       Grid.Row="2" />
-                                            <TextBlock Text="G"
-                                                       Grid.Column="1"
-                                                       Grid.Row="2" />
-                                            <TextBlock Text="B"
-                                                       Grid.Column="2"
-                                                       Grid.Row="2" />
-                                        </Grid>
-                                    </Border>
-
-                                </Grid>
-                                <Border Grid.Column="2"
-                                        Grid.Row="0"
-                                        BorderBrush="#FFACACAC"
-                                        BorderThickness="1"
-                                        Margin="0,0,0,2"
-                                        Background="White">
-                                    <Grid Margin="5,0,0,0">
-                                        <Grid.Resources>
-                                            <Style TargetType="TextBlock">
-                                                <Setter Property="FontSize"
-                                                        Value="10" />
-                                                <Setter Property="VerticalAlignment"
-                                                        Value="Center" />
-                                                <Setter Property="HorizontalAlignment"
-                                                        Value="Left" />
-                                            </Style>
-                                        </Grid.Resources>
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition />
-                                            <ColumnDefinition Width="2*" />
-                                            <ColumnDefinition />
-                                            <ColumnDefinition Width="2*" />
-                                            <ColumnDefinition />
-                                            <ColumnDefinition Width="2*" />
-                                            <ColumnDefinition />
-                                            <ColumnDefinition Width="2*" />
-                                        </Grid.ColumnDefinitions>
-                                        <TextBlock Text="X"
-                                                   Grid.Column="0" />
-                                        <TextBlock Text="0"
-                                                   Grid.Column="1" />
-                                        <TextBlock Text="Y"
-                                                   Grid.Column="2" />
-                                        <TextBlock Text="0"
-                                                   Grid.Column="3" />
-                                        <TextBlock Text="Z"
-                                                   Grid.Column="4" />
-                                        <TextBlock Text="0"
-                                                   Grid.Column="5" />
-                                        <TextBlock Text="Th"
-                                                   Grid.Column="6" />
-                                        <TextBlock Text="0"
-                                                   Grid.Column="7" />
-                                    </Grid>
-                                </Border>
-
-                                <TabControl Grid.Column="2"
-                                            Grid.Row="1"
-                                            Background="White">
-                                    <TabItem Header="Jog">
-                                        <Grid>
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="0.5*" />
-                                                <ColumnDefinition />
-                                                <ColumnDefinition />
-                                            </Grid.ColumnDefinitions>
-                                            <Grid.RowDefinitions>
-                                                <RowDefinition />
-                                                <RowDefinition />
-                                                <RowDefinition />
-                                                <RowDefinition />
-                                            </Grid.RowDefinitions>
-
-                                            <Button Content="←"
-                                                    Grid.Column="1"
-                                                    Grid.Row="0"
-                                                    Margin="5" />
-                                            <TextBlock Grid.Column="0"
-                                                       Grid.Row="0"
-                                                       Text="X" />
-                                            <Button Content="→"
-                                                    Grid.Column="2"
-                                                    Grid.Row="0"
-                                                    Margin="5" />
-                                            <Button Content="←"
-                                                    Grid.Column="1"
-                                                    Grid.Row="1"
-                                                    Margin="5" />
-                                            <TextBlock Grid.Column="0"
-                                                       Grid.Row="1"
-                                                       Text="Y" />
-                                            <Button Content="→"
-                                                    Grid.Column="2"
-                                                    Grid.Row="1"
-                                                    Margin="5" />
-                                            <Button Content="←"
-                                                    Grid.Column="1"
-                                                    Grid.Row="2"
-                                                    Margin="5" />
-                                            <TextBlock Grid.Column="0"
-                                                       Grid.Row="2"
-                                                       Text="Z" />
-                                            <Button Content="→"
-                                                    Grid.Column="2"
-                                                    Grid.Row="2"
-                                                    Margin="5" />
-                                            <Button Content="←"
-                                                    Grid.Column="1"
-                                                    Grid.Row="3"
-                                                    Margin="5" />
-                                            <TextBlock Grid.Column="0"
-                                                       Grid.Row="3"
-                                                       Text="Theta" />
-                                            <Button Content="→"
-                                                    Grid.Column="2"
-                                                    Grid.Row="3"
-                                                    Margin="5" />
-
-                                        </Grid>
-                                    </TabItem>
-                                    <TabItem Header="Absolute">
-                                        <Grid>
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="0.5*" />
-                                                <ColumnDefinition />
-                                                <ColumnDefinition />
-                                                <ColumnDefinition />
-                                            </Grid.ColumnDefinitions>
-                                            <Grid.RowDefinitions>
-                                                <RowDefinition />
-                                                <RowDefinition />
-                                                <RowDefinition />
-                                                <RowDefinition />
-                                            </Grid.RowDefinitions>
-
-                                            <TextBlock Grid.Column="0"
-                                                       Grid.Row="0"
-                                                       Text="X" />
-                                            <Button Content="←"
-                                                    Grid.Column="1"
-                                                    Grid.Row="0"
-                                                    Margin="5" />
-                                            <TextBox Grid.Column="2"
-                                                     Grid.Row="0"
-                                                     Margin="0,5,0,5"
-                                                     Text="0"
-                                                     TextAlignment="Center"
-                                                     VerticalContentAlignment="Center" />
-                                            <Button Content="→"
-                                                    Grid.Column="3"
-                                                    Grid.Row="0"
-                                                    Margin="5" />
-
-                                            <TextBlock Grid.Column="0"
-                                                       Grid.Row="1"
-                                                       Text="Y" />
-                                            <Button Content="←"
-                                                    Grid.Column="1"
-                                                    Grid.Row="1"
-                                                    Margin="5" />
-                                            <TextBox Grid.Column="2"
-                                                     Grid.Row="1"
-                                                     Margin="0,5,0,5"
-                                                     Text="0"
-                                                     TextAlignment="Center"
-                                                     VerticalContentAlignment="Center" />
-                                            <Button Content="→"
-                                                    Grid.Column="3"
-                                                    Grid.Row="1"
-                                                    Margin="5" />
-
-                                            <TextBlock Grid.Column="0"
-                                                       Grid.Row="2"
-                                                       Text="Z" />
-                                            <Button Content="←"
-                                                    Grid.Column="1"
-                                                    Grid.Row="2"
-                                                    Margin="5" />
-                                            <TextBox Grid.Column="2"
-                                                     Grid.Row="2"
-                                                     Margin="0,5,0,5"
-                                                     Text="0"
-                                                     TextAlignment="Center"
-                                                     VerticalContentAlignment="Center" />
-                                            <Button Content="→"
-                                                    Grid.Column="3"
-                                                    Grid.Row="2"
-                                                    Margin="5" />
-
-                                            <TextBlock Grid.Column="0"
-                                                       Grid.Row="3"
-                                                       Text="Theta" />
-                                            <Button Content="←"
-                                                    Grid.Column="1"
-                                                    Grid.Row="3"
-                                                    Margin="5" />
-                                            <TextBox Grid.Column="2"
-                                                     Grid.Row="3"
-                                                     Margin="0,5,0,5"
-                                                     Text="0"
-                                                     TextAlignment="Center"
-                                                     VerticalContentAlignment="Center" />
-                                            <Button Content="→"
-                                                    Grid.Column="3"
-                                                    Grid.Row="3"
-                                                    Margin="5" />
-
-                                        </Grid>
-                                    </TabItem>
-                                    <TabItem Header="Reference">
-                                        <Grid>
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="0.5*" />
-                                                <ColumnDefinition />
-                                                <ColumnDefinition />
-                                                <ColumnDefinition />
-                                            </Grid.ColumnDefinitions>
-                                            <Grid.RowDefinitions>
-                                                <RowDefinition />
-                                                <RowDefinition />
-                                                <RowDefinition />
-                                                <RowDefinition />
-                                            </Grid.RowDefinitions>
-
-                                            <TextBlock Grid.Column="0"
-                                                       Grid.Row="0"
-                                                       Text="X" />
-                                            <Button Content="←"
-                                                    Grid.Column="1"
-                                                    Grid.Row="0"
-                                                    Margin="5" />
-                                            <TextBox Grid.Column="2"
-                                                     Grid.Row="0"
-                                                     Margin="0,5,0,5"
-                                                     Text="0"
-                                                     TextAlignment="Center"
-                                                     VerticalContentAlignment="Center" />
-                                            <Button Content="→"
-                                                    Grid.Column="3"
-                                                    Grid.Row="0"
-                                                    Margin="5" />
-
-                                            <TextBlock Grid.Column="0"
-                                                       Grid.Row="1"
-                                                       Text="Y" />
-                                            <Button Content="←"
-                                                    Grid.Column="1"
-                                                    Grid.Row="1"
-                                                    Margin="5" />
-                                            <TextBox Grid.Column="2"
-                                                     Grid.Row="1"
-                                                     Margin="0,5,0,5"
-                                                     Text="0"
-                                                     TextAlignment="Center"
-                                                     VerticalContentAlignment="Center" />
-                                            <Button Content="→"
-                                                    Grid.Column="3"
-                                                    Grid.Row="1"
-                                                    Margin="5" />
-
-                                            <TextBlock Grid.Column="0"
-                                                       Grid.Row="2"
-                                                       Text="Z" />
-                                            <Button Content="←"
-                                                    Grid.Column="1"
-                                                    Grid.Row="2"
-                                                    Margin="5" />
-                                            <TextBox Grid.Column="2"
-                                                     Grid.Row="2"
-                                                     Margin="0,5,0,5"
-                                                     Text="0"
-                                                     TextAlignment="Center"
-                                                     VerticalContentAlignment="Center" />
-                                            <Button Content="→"
-                                                    Grid.Column="3"
-                                                    Grid.Row="2"
-                                                    Margin="5" />
-
-                                            <TextBlock Grid.Column="0"
-                                                       Grid.Row="3"
-                                                       Text="Theta" />
-                                            <Button Content="←"
-                                                    Grid.Column="1"
-                                                    Grid.Row="3"
-                                                    Margin="5" />
-                                            <TextBox Grid.Column="2"
-                                                     Grid.Row="3"
-                                                     Margin="0,5,0,5"
-                                                     Text="0"
-                                                     TextAlignment="Center"
-                                                     VerticalContentAlignment="Center" />
-                                            <Button Content="→"
-                                                    Grid.Column="3"
-                                                    Grid.Row="3"
-                                                    Margin="5" />
-
-                                        </Grid>
-                                    </TabItem>
-                                    <TabItem Header="Option">
-                                        <Grid>
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition />
-                                                <ColumnDefinition />
-                                            </Grid.ColumnDefinitions>
-
-                                            <TextBlock Text="Speed Sacle" />
-                                            <ComboBox Grid.Column="1"
-                                                      Margin="5"
-                                                      VerticalAlignment="Center">
-                                                <ComboBoxItem Content="1.0x" />
-                                                <ComboBoxItem Content="1.5x" />
-                                                <ComboBoxItem Content="2.0x" />
-                                                <ComboBoxItem Content="2.5x" />
-                                                <ComboBoxItem Content="3.0x" />
-                                            </ComboBox>
-                                        </Grid>
-                                    </TabItem>
-                                </TabControl>
-                                <Grid Grid.ColumnSpan="4"
-                                      Grid.Row="3">
-                                    <UniformGrid Columns="2">
-                                        <Button Content="Auto Focus"
-                                                Margin="3" />
-                                        <Button Content="Scan"
-                                                Margin="3" />
-                                    </UniformGrid>
-                                </Grid>
-                            </Grid>
-                        </GroupBox>
-                    </Grid>
-                </Grid>
+                
                 <!--Tab Area-->
-                <Grid Grid.Column="2"
+                <Grid Grid.Column="0" Grid.ColumnSpan="3"
                       Grid.Row="2">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="5" />
@@ -1519,6 +1103,428 @@
                         <TabItem Header="Engineer" x:Name="engineerTab"
                                  Style="{StaticResource ResourceKey=WizardTabItem}">
                             <engineer:VEGA_D_Engineer_UI x:Name="engineerUI"/>
+                        </TabItem>
+                        <TabItem Header="Viewer" x:Name="ViewerTab"
+                                 Style="{StaticResource ResourceKey=WizardTabItem}">
+                            <Grid Grid.Column="0" Grid.Row="2">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="5*" />
+                                    <RowDefinition Height="3*" />
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="1*" />
+                                    <ColumnDefinition Width="1*" />
+                                </Grid.ColumnDefinitions>
+                                <Grid Grid.Row="0">
+                                    <GroupBox Header="TDI View">
+                                        <Grid Background="Black" />
+                                    </GroupBox>
+                                    <TextBlock Text="TDI View(Align Key/Defect/Snap)"
+                                   Foreground="White" />
+                                </Grid>
+                                <Grid Grid.Column="1">
+                                    <GroupBox Header="Map">
+                                        <Grid Background="Black">
+                                            <!--<Image Source="Resource/ReticleMap2.PNG"
+                                       Margin="20,10"
+                                       Stretch="Fill" />-->
+                                        </Grid>
+                                    </GroupBox>
+                                </Grid>
+                                <Grid Grid.Row="1" Grid.ColumnSpan="2">
+                                    <GroupBox Header="Control">
+                                        <Grid>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="25" />
+                                                <RowDefinition Height="2.5*" />
+                                                <RowDefinition Height="2" />
+                                                <RowDefinition Height="40" />
+                                            </Grid.RowDefinitions>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition />
+                                                <ColumnDefinition Width="2" />
+                                                <ColumnDefinition Width="3*" />
+                                            </Grid.ColumnDefinitions>
+                                            <Grid Grid.RowSpan="2"
+                                      Background="White">
+                                                <Border BorderBrush="#FFACACAC"
+                                            BorderThickness="1">
+                                                    <Grid Grid.Column="0">
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition />
+                                                            <ColumnDefinition />
+                                                            <ColumnDefinition />
+                                                        </Grid.ColumnDefinitions>
+                                                        <Grid.RowDefinitions>
+                                                            <RowDefinition />
+                                                            <RowDefinition Height="8*" />
+                                                            <RowDefinition />
+                                                        </Grid.RowDefinitions>
+
+                                                        <TextBlock Text="{Binding ElementName=red, Path=Value, StringFormat=N0}"
+                                                       Grid.Column="0" />
+                                                        <TextBlock Text="{Binding ElementName=green, Path=Value, StringFormat=N0}"
+                                                       Grid.Column="1" />
+                                                        <TextBlock Text="{Binding ElementName=blue, Path=Value, StringFormat=N0}"
+                                                       Grid.Column="2" />
+                                                        <Slider Orientation="Vertical"
+                                                    HorizontalAlignment="Center"
+                                                    Grid.Row="1"
+                                                    Grid.Column="0"
+                                                    Minimum="0"
+                                                    Maximum="255"
+                                                    x:Name="red"
+                                                    SmallChange="1" />
+                                                        <Slider Orientation="Vertical"
+                                                    HorizontalAlignment="Center"
+                                                    Grid.Row="1"
+                                                    Grid.Column="1"
+                                                    Minimum="0"
+                                                    Maximum="255"
+                                                    x:Name="green"
+                                                    SmallChange="1" />
+                                                        <Slider Orientation="Vertical"
+                                                    HorizontalAlignment="Center"
+                                                    Grid.Row="1"
+                                                    Grid.Column="2"
+                                                    Minimum="0"
+                                                    Maximum="255"
+                                                    x:Name="blue"
+                                                    SmallChange="1" />
+                                                        <TextBlock Text="R"
+                                                       Grid.Column="0"
+                                                       Grid.Row="2" />
+                                                        <TextBlock Text="G"
+                                                       Grid.Column="1"
+                                                       Grid.Row="2" />
+                                                        <TextBlock Text="B"
+                                                       Grid.Column="2"
+                                                       Grid.Row="2" />
+                                                    </Grid>
+                                                </Border>
+
+                                            </Grid>
+                                            <Border Grid.Column="2"
+                                        Grid.Row="0"
+                                        BorderBrush="#FFACACAC"
+                                        BorderThickness="1"
+                                        Margin="0,0,0,2"
+                                        Background="White">
+                                                <Grid Margin="5,0,0,0">
+                                                    <Grid.Resources>
+                                                        <Style TargetType="TextBlock">
+                                                            <Setter Property="FontSize"
+                                                        Value="10" />
+                                                            <Setter Property="VerticalAlignment"
+                                                        Value="Center" />
+                                                            <Setter Property="HorizontalAlignment"
+                                                        Value="Left" />
+                                                        </Style>
+                                                    </Grid.Resources>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition />
+                                                        <ColumnDefinition Width="2*" />
+                                                        <ColumnDefinition />
+                                                        <ColumnDefinition Width="2*" />
+                                                        <ColumnDefinition />
+                                                        <ColumnDefinition Width="2*" />
+                                                        <ColumnDefinition />
+                                                        <ColumnDefinition Width="2*" />
+                                                    </Grid.ColumnDefinitions>
+                                                    <TextBlock Text="X"
+                                                   Grid.Column="0" />
+                                                    <TextBlock Text="0"
+                                                   Grid.Column="1" />
+                                                    <TextBlock Text="Y"
+                                                   Grid.Column="2" />
+                                                    <TextBlock Text="0"
+                                                   Grid.Column="3" />
+                                                    <TextBlock Text="Z"
+                                                   Grid.Column="4" />
+                                                    <TextBlock Text="0"
+                                                   Grid.Column="5" />
+                                                    <TextBlock Text="Th"
+                                                   Grid.Column="6" />
+                                                    <TextBlock Text="0"
+                                                   Grid.Column="7" />
+                                                </Grid>
+                                            </Border>
+
+                                            <TabControl Grid.Column="2"
+                                            Grid.Row="1"
+                                            Background="White">
+                                                <TabItem Header="Jog">
+                                                    <Grid>
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="0.5*" />
+                                                            <ColumnDefinition />
+                                                            <ColumnDefinition />
+                                                        </Grid.ColumnDefinitions>
+                                                        <Grid.RowDefinitions>
+                                                            <RowDefinition />
+                                                            <RowDefinition />
+                                                            <RowDefinition />
+                                                            <RowDefinition />
+                                                        </Grid.RowDefinitions>
+
+                                                        <Button Content="←"
+                                                    Grid.Column="1"
+                                                    Grid.Row="0"
+                                                    Margin="5" />
+                                                        <TextBlock Grid.Column="0"
+                                                       Grid.Row="0"
+                                                       Text="X" />
+                                                        <Button Content="→"
+                                                    Grid.Column="2"
+                                                    Grid.Row="0"
+                                                    Margin="5" />
+                                                        <Button Content="←"
+                                                    Grid.Column="1"
+                                                    Grid.Row="1"
+                                                    Margin="5" />
+                                                        <TextBlock Grid.Column="0"
+                                                       Grid.Row="1"
+                                                       Text="Y" />
+                                                        <Button Content="→"
+                                                    Grid.Column="2"
+                                                    Grid.Row="1"
+                                                    Margin="5" />
+                                                        <Button Content="←"
+                                                    Grid.Column="1"
+                                                    Grid.Row="2"
+                                                    Margin="5" />
+                                                        <TextBlock Grid.Column="0"
+                                                       Grid.Row="2"
+                                                       Text="Z" />
+                                                        <Button Content="→"
+                                                    Grid.Column="2"
+                                                    Grid.Row="2"
+                                                    Margin="5" />
+                                                        <Button Content="←"
+                                                    Grid.Column="1"
+                                                    Grid.Row="3"
+                                                    Margin="5" />
+                                                        <TextBlock Grid.Column="0"
+                                                       Grid.Row="3"
+                                                       Text="Theta" />
+                                                        <Button Content="→"
+                                                    Grid.Column="2"
+                                                    Grid.Row="3"
+                                                    Margin="5" />
+
+                                                    </Grid>
+                                                </TabItem>
+                                                <TabItem Header="Absolute">
+                                                    <Grid>
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="0.5*" />
+                                                            <ColumnDefinition />
+                                                            <ColumnDefinition />
+                                                            <ColumnDefinition />
+                                                        </Grid.ColumnDefinitions>
+                                                        <Grid.RowDefinitions>
+                                                            <RowDefinition />
+                                                            <RowDefinition />
+                                                            <RowDefinition />
+                                                            <RowDefinition />
+                                                        </Grid.RowDefinitions>
+
+                                                        <TextBlock Grid.Column="0"
+                                                       Grid.Row="0"
+                                                       Text="X" />
+                                                        <Button Content="←"
+                                                    Grid.Column="1"
+                                                    Grid.Row="0"
+                                                    Margin="5" />
+                                                        <TextBox Grid.Column="2"
+                                                     Grid.Row="0"
+                                                     Margin="0,5,0,5"
+                                                     Text="0"
+                                                     TextAlignment="Center"
+                                                     VerticalContentAlignment="Center" />
+                                                        <Button Content="→"
+                                                    Grid.Column="3"
+                                                    Grid.Row="0"
+                                                    Margin="5" />
+
+                                                        <TextBlock Grid.Column="0"
+                                                       Grid.Row="1"
+                                                       Text="Y" />
+                                                        <Button Content="←"
+                                                    Grid.Column="1"
+                                                    Grid.Row="1"
+                                                    Margin="5" />
+                                                        <TextBox Grid.Column="2"
+                                                     Grid.Row="1"
+                                                     Margin="0,5,0,5"
+                                                     Text="0"
+                                                     TextAlignment="Center"
+                                                     VerticalContentAlignment="Center" />
+                                                        <Button Content="→"
+                                                    Grid.Column="3"
+                                                    Grid.Row="1"
+                                                    Margin="5" />
+
+                                                        <TextBlock Grid.Column="0"
+                                                       Grid.Row="2"
+                                                       Text="Z" />
+                                                        <Button Content="←"
+                                                    Grid.Column="1"
+                                                    Grid.Row="2"
+                                                    Margin="5" />
+                                                        <TextBox Grid.Column="2"
+                                                     Grid.Row="2"
+                                                     Margin="0,5,0,5"
+                                                     Text="0"
+                                                     TextAlignment="Center"
+                                                     VerticalContentAlignment="Center" />
+                                                        <Button Content="→"
+                                                    Grid.Column="3"
+                                                    Grid.Row="2"
+                                                    Margin="5" />
+
+                                                        <TextBlock Grid.Column="0"
+                                                       Grid.Row="3"
+                                                       Text="Theta" />
+                                                        <Button Content="←"
+                                                    Grid.Column="1"
+                                                    Grid.Row="3"
+                                                    Margin="5" />
+                                                        <TextBox Grid.Column="2"
+                                                     Grid.Row="3"
+                                                     Margin="0,5,0,5"
+                                                     Text="0"
+                                                     TextAlignment="Center"
+                                                     VerticalContentAlignment="Center" />
+                                                        <Button Content="→"
+                                                    Grid.Column="3"
+                                                    Grid.Row="3"
+                                                    Margin="5" />
+
+                                                    </Grid>
+                                                </TabItem>
+                                                <TabItem Header="Reference">
+                                                    <Grid>
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="0.5*" />
+                                                            <ColumnDefinition />
+                                                            <ColumnDefinition />
+                                                            <ColumnDefinition />
+                                                        </Grid.ColumnDefinitions>
+                                                        <Grid.RowDefinitions>
+                                                            <RowDefinition />
+                                                            <RowDefinition />
+                                                            <RowDefinition />
+                                                            <RowDefinition />
+                                                        </Grid.RowDefinitions>
+
+                                                        <TextBlock Grid.Column="0"
+                                                       Grid.Row="0"
+                                                       Text="X" />
+                                                        <Button Content="←"
+                                                    Grid.Column="1"
+                                                    Grid.Row="0"
+                                                    Margin="5" />
+                                                        <TextBox Grid.Column="2"
+                                                     Grid.Row="0"
+                                                     Margin="0,5,0,5"
+                                                     Text="0"
+                                                     TextAlignment="Center"
+                                                     VerticalContentAlignment="Center" />
+                                                        <Button Content="→"
+                                                    Grid.Column="3"
+                                                    Grid.Row="0"
+                                                    Margin="5" />
+
+                                                        <TextBlock Grid.Column="0"
+                                                       Grid.Row="1"
+                                                       Text="Y" />
+                                                        <Button Content="←"
+                                                    Grid.Column="1"
+                                                    Grid.Row="1"
+                                                    Margin="5" />
+                                                        <TextBox Grid.Column="2"
+                                                     Grid.Row="1"
+                                                     Margin="0,5,0,5"
+                                                     Text="0"
+                                                     TextAlignment="Center"
+                                                     VerticalContentAlignment="Center" />
+                                                        <Button Content="→"
+                                                    Grid.Column="3"
+                                                    Grid.Row="1"
+                                                    Margin="5" />
+
+                                                        <TextBlock Grid.Column="0"
+                                                       Grid.Row="2"
+                                                       Text="Z" />
+                                                        <Button Content="←"
+                                                    Grid.Column="1"
+                                                    Grid.Row="2"
+                                                    Margin="5" />
+                                                        <TextBox Grid.Column="2"
+                                                     Grid.Row="2"
+                                                     Margin="0,5,0,5"
+                                                     Text="0"
+                                                     TextAlignment="Center"
+                                                     VerticalContentAlignment="Center" />
+                                                        <Button Content="→"
+                                                    Grid.Column="3"
+                                                    Grid.Row="2"
+                                                    Margin="5" />
+
+                                                        <TextBlock Grid.Column="0"
+                                                       Grid.Row="3"
+                                                       Text="Theta" />
+                                                        <Button Content="←"
+                                                    Grid.Column="1"
+                                                    Grid.Row="3"
+                                                    Margin="5" />
+                                                        <TextBox Grid.Column="2"
+                                                     Grid.Row="3"
+                                                     Margin="0,5,0,5"
+                                                     Text="0"
+                                                     TextAlignment="Center"
+                                                     VerticalContentAlignment="Center" />
+                                                        <Button Content="→"
+                                                    Grid.Column="3"
+                                                    Grid.Row="3"
+                                                    Margin="5" />
+
+                                                    </Grid>
+                                                </TabItem>
+                                                <TabItem Header="Option">
+                                                    <Grid>
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition />
+                                                            <ColumnDefinition />
+                                                        </Grid.ColumnDefinitions>
+
+                                                        <TextBlock Text="Speed Sacle" />
+                                                        <ComboBox Grid.Column="1"
+                                                      Margin="5"
+                                                      VerticalAlignment="Center">
+                                                            <ComboBoxItem Content="1.0x" />
+                                                            <ComboBoxItem Content="1.5x" />
+                                                            <ComboBoxItem Content="2.0x" />
+                                                            <ComboBoxItem Content="2.5x" />
+                                                            <ComboBoxItem Content="3.0x" />
+                                                        </ComboBox>
+                                                    </Grid>
+                                                </TabItem>
+                                            </TabControl>
+                                            <Grid Grid.ColumnSpan="4"
+                                      Grid.Row="3">
+                                                <UniformGrid Columns="2">
+                                                    <Button Content="Auto Focus"
+                                                Margin="3" />
+                                                    <Button Content="Scan"
+                                                Margin="3" />
+                                                </UniformGrid>
+                                            </Grid>
+                                        </Grid>
+                                    </GroupBox>
+                                </Grid>
+                            </Grid>
                         </TabItem>
                         <TabItem Header="Recipe Manager"
                                  Style="{StaticResource ResourceKey=WizardTabItem}" Visibility="Collapsed">
