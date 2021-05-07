@@ -307,7 +307,7 @@ namespace Root_Pine2.Module
                     if (_eResult == value) return;
                     _eResult = value;
                     OnPropertyChanged();
-                    WriteResultLED(); 
+                    WriteResultLED();
                 }
             }
 
@@ -324,27 +324,23 @@ namespace Root_Pine2.Module
                 }
             }
 
-            static int m_nStackMax = 50;
-            int _nStack = 0; 
+            int _nStack = 0;
             public int p_nStack
             {
                 get { return _nStack; }
                 set
                 {
                     _nStack = value;
-                    OnPropertyChanged(); 
+                    OnPropertyChanged();
                 }
             }
+
+            int p_lStack { get { return m_magazineEV.m_pine2.p_lStack; } }
 
             public void PutInfoStrip(InfoStrip infoStrip)
             {
                 p_nStack++;
-                if (p_nStack >= m_nStackMax) m_magazineEV.StartUnload(); 
-            }
-
-            public void RunTree(Tree tree)
-            {
-                m_nStackMax = tree.Set(m_nStackMax, m_nStackMax, "Max Strip", "Max Stack Strip Count"); 
+                if (p_nStack >= p_lStack) m_magazineEV.StartUnload(); 
             }
 
             MagazineEV m_magazineEV; 
@@ -607,7 +603,6 @@ namespace Root_Pine2.Module
             base.RunTree(tree);
             RunTreeLED(tree.GetTree("LED")); 
             m_elevator.RunTree(tree.GetTree("Elevator"));
-            m_stack.RunTree(tree.GetTree("Stack")); 
         }
         #endregion
 
