@@ -447,10 +447,10 @@ namespace RootTools.Control.ACS
                         break;
                     case eState.Move:
                         {
-                            //int nMotor = p_channel.GetMotorState(m_nAxis);
-                            //bool bMove = ((nMotor & p_channel.ACSC_MST_MOVE) != 0);
-                            //bool bInPos = ((nMotor & p_channel.ACSC_MST_INPOS) != 0);
-                            //if (!bMove && bInPos) p_eState = eState.Ready;
+                            int nMotor = p_channel.GetMotorState(m_nAxis);
+                            bool bMove = ((nMotor & p_channel.ACSC_MST_MOVE) != 0);
+                            bool bInPos = ((nMotor & p_channel.ACSC_MST_INPOS) != 0);
+                            if (!bMove && bInPos) p_eState = eState.Ready;
                             //if (p_sensorInPos) p_eState = eState.Ready;
                         }
                         break;
