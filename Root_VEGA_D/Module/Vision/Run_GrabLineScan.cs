@@ -11,6 +11,7 @@ using RootTools.Trees;
 using RootTools_Vision;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -118,10 +119,10 @@ namespace Root_VEGA_D.Module
         string RunAutoFocus()
         {
             if (!m_grabMode.m_bUseAF)
+            {
+                m_dAFBestFocusPosY = m_grabMode.m_dFocusPosZ;
                 return "OK";
-
-            if (m_grabMode.m_dAFStartZ >= m_grabMode.m_dAFEndZ)
-                return "Auto focus Start Z Pos must be smaller than End Z Pos.";
+            }
 
             if (m_grabMode.m_nAFLaserThreshold <= 0)
                 return "Auto focus Threadhold value must be bigger than zero.";
@@ -159,22 +160,21 @@ namespace Root_VEGA_D.Module
                     camRADS.GrabContinuousShot();
 
                 // Z축 목표위치로 이동
-                if (m_module.Run(axisZ.StartMove(m_grabMode.m_dAFEndZ)))
+                if (m_module.Run(axisZ.StartMove(m_grabMode.m_dAFEndZ, 1)))
                     return p_sInfo;
                 if (m_module.Run(axisZ.WaitReady()))
                     return p_sInfo;
 
                 camRADS.Grabed -= m_camera_Grabed;
 
+                camRADS.GrabStop();
+
                 // 중앙에 RADS 레이저가 맞춰진적이 없다면
                 if (m_nAFBestGVSum <= 0)
                     return "Cannot find best Y position by auto focusing";
 
-                // 최적의 포커싱 위치로 이동
-                if (m_module.Run(axisZ.StartMove(m_dAFBestFocusPosY + m_grabMode.m_dAFOffset)))
-                    return p_sInfo;
-                if (m_module.Run(axisZ.WaitReady()))
-                    return p_sInfo;
+                // Offset 적용
+                m_dAFBestFocusPosY += m_grabMode.m_dAFOffset;
             }
             catch (Exception e)
             {
@@ -190,6 +190,7 @@ namespace Root_VEGA_D.Module
 
         void m_camera_Grabed(object sender, System.EventArgs e)
         {
+            Debug.WriteLine("m_camera_Grabed");
             Camera_Basler camRADS = m_module.CamRADS;
             IntPtr intPtr = camRADS.p_ImageData.GetPtr();  // R 채널 데이터
             
@@ -332,7 +333,7 @@ namespace Root_VEGA_D.Module
                         double dOverlap_mm = grabData.m_nOverlap * m_grabMode.m_dResX_um * 0.001;
                         double dPosX = m_grabMode.m_rpAxisCenter.X + m_grabMode.m_nWaferSize_mm * 0.5 - nLineIndex * (dfov_mm - dOverlap_mm);
                         double dNextPosX = dPosX - (dfov_mm - dOverlap_mm);
-                        double dPosZ = m_grabMode.m_dFocusPosZ;
+                        double dPosZ = m_dAFBestFocusPosY;//m_grabMode.m_dFocusPosZ;
 
                         double dTriggerStartPosY = m_grabMode.m_rpAxisCenter.Y + m_grabMode.m_ptXYAlignData.Y - m_grabMode.m_nWaferSize_mm * 0.5;
                         double dTriggerEndPosY = m_grabMode.m_rpAxisCenter.Y + m_grabMode.m_ptXYAlignData.Y + m_grabMode.m_nWaferSize_mm * 0.5;
