@@ -134,6 +134,8 @@ namespace Root_VEGA_D.Module
 
             try
             {
+                if (camRADS.p_CamInfo._OpenStatus == false) camRADS.Connect();
+
                 // RADS Voltage Reset
                 m_module.RADSControl.ResetController();
 
@@ -151,6 +153,10 @@ namespace Root_VEGA_D.Module
                 m_nAFBestGVSum = 0;
 
                 camRADS.Grabed += m_camera_Grabed;
+
+
+                if(camRADS.p_CamInfo._IsGrabbing == false)
+                    camRADS.GrabContinuousShot();
 
                 // Z축 목표위치로 이동
                 if (m_module.Run(axisZ.StartMove(m_grabMode.m_dAFEndZ)))
@@ -185,13 +191,14 @@ namespace Root_VEGA_D.Module
         void m_camera_Grabed(object sender, System.EventArgs e)
         {
             Camera_Basler camRADS = m_module.CamRADS;
-            IntPtr intPtr = camRADS.p_ImageData.GetPtr(0);  // R 채널 데이터
-            if (intPtr != null && camRADS != null)
+            IntPtr intPtr = camRADS.p_ImageData.GetPtr();  // R 채널 데이터
+            
+            unsafe
             {
-                unsafe
+                CPoint size = camRADS.p_ImageData.p_Size;
+                byte* arrImg = (byte*)intPtr.ToPointer();
+                if (arrImg != null && camRADS != null)
                 {
-                    CPoint size = camRADS.p_ImageData.p_Size;
-                    byte* arrImg = (byte*)intPtr.ToPointer();
                     int[] profile = new int[size.Y];
 
                     // 각 행별로 모든 GV값 더하기
