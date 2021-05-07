@@ -206,7 +206,7 @@ namespace Root_CAMELLIA.ManualJob
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             m_JobSchedule.p_ManualJobBlink = false;
-            e.Cancel = true;
+            //e.Cancel = true;
             this.Hide();
         }
 
@@ -242,7 +242,8 @@ namespace Root_CAMELLIA.ManualJob
 
                 if (infoWafer != null)
                 {
-                    infoWafer.p_eState = (m_tblockState[i].Text == "Select") ? GemSlotBase.eState.Select : GemSlotBase.eState.Empty;
+                    infoWafer.p_eState = (m_tblockState[i].Text == "Select") ? GemSlotBase.eState.Select : GemSlotBase.eState.Exist;
+                    m_infoCarrier.m_aGemSlot[i].p_eState = infoWafer.p_eState;
                     infoWafer.p_sWaferID = m_tboxWaferID[i].Text;
                     if (infoWafer.p_eState == GemSlotBase.eState.Select)
                     {

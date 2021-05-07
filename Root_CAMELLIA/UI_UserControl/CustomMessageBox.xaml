@@ -71,7 +71,7 @@
             <Image Name="img" Margin="15,5,5,5" Grid.Row="1" 
             Grid.Column="0" Width="50" 
             Height="50"  Stretch="Fill" />
-            <TextBlock Margin="15,5,10,5"   
+            <TextBlock Margin="15,5,30,5"   
             VerticalAlignment="Center" 
             TextWrapping="Wrap" Name="txtMsg" FontFamily="consolas" FontWeight="Light"
             Grid.Row="1" 

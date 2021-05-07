@@ -40,8 +40,6 @@ namespace Root_CAMELLIA
         public DataManager dataManager { get; set; }
         ShapeEllipse shape = new ShapeEllipse();
 
-        Dlg_StageMapSetting_ViewModel StageMapSetting_ViewModel;
-        Dlg_StageMapSetting dlg_stageMap;
         public Dlg_RecipeManager_ViewModel(MainWindow_ViewModel main)
         {
             MainViewModel = main;
@@ -56,10 +54,6 @@ namespace Root_CAMELLIA
             SetViewRect();
             InitLayer();
             UpdateLayerGridView();
-
-            StageMapSetting_ViewModel = new Dlg_StageMapSetting_ViewModel();
-            dlg_stageMap = new Dlg_StageMapSetting();
-            dlg_stageMap.DataContext = StageMapSetting_ViewModel;
             //DialogService dialogService = new DialogService(this);
 
         }
@@ -971,7 +965,7 @@ namespace Root_CAMELLIA
             {
                 if (!p_UseThickness && value)
                 {
-                    MessageBox.Show("Need Using Thickness Measurement", "Check Thickness", MessageBoxButton.OK, MessageBoxImage.Exclamation);
+                    CustomMessageBox.Show("Check Thickness", "Need Thickness Measurement", MessageBoxButton.OK, CustomMessageBox.MessageBoxImage.Error);
                     return;
                 }
                 if (IsTransmittanceCheck)
@@ -1373,7 +1367,7 @@ namespace Root_CAMELLIA
 
             if (p_isCustomize)
             {
-                if (p_mapMode == MapMode.Select)
+                if (p_isSelect)
                 {
                     bool bSelected = false;
 
@@ -1733,7 +1727,7 @@ namespace Root_CAMELLIA
             {
                 return;
             }
-            if (p_isCustomize && p_mapMode != MapMode.Select)
+            if (p_isCustomize && !p_isSelect)
             {
                 return;
             }
@@ -1782,12 +1776,12 @@ namespace Root_CAMELLIA
             }
             else if (p_isCustomize)
             {
-                if(p_mapMode == MapMode.Point)
+                if(p_isPoint)
                 {
                     CustomizeStageMap(pt);
                   
                 }
-                else if(p_mapMode == MapMode.Select)
+                else if(p_isSelect)
                 {
                     if (Math.Abs(SelectStartPoint.X - SelectEndPoint.X) > Limit || Math.Abs(SelectStartPoint.Y - SelectEndPoint.Y) > Limit)
                     {
@@ -4378,21 +4372,60 @@ namespace Root_CAMELLIA
             Line
         }
 
-        private MapMode m_mapMode = MapMode.Select;
-        public MapMode p_mapMode
+        //private MapMode m_mapMode = MapMode.Select;
+        //public MapMode p_mapMode
+        //{
+        //    get
+        //    {
+        //        return m_mapMode;
+        //    }
+        //    set
+        //    {
+        //        SetProperty(ref m_mapMode, value);
+        //        if(m_mapMode != MapMode.Select)
+        //        {
+        //            test.DataCandidateSelectedPoint.Clear();
+        //            UpdateView();
+        //        }
+        //    }
+        //}
+
+        bool m_isSelect = false;
+        public bool p_isSelect
         {
             get
             {
-                return m_mapMode;
+                return m_isSelect;
             }
             set
             {
-                SetProperty(ref m_mapMode, value);
-                if(m_mapMode != MapMode.Select)
-                {
-                    test.DataCandidateSelectedPoint.Clear();
-                    UpdateView();
-                }
+                SetProperty(ref m_isSelect, value);
+            }
+        }
+
+        bool m_isPoint = false;
+        public bool p_isPoint
+        {
+            get
+            {
+                return m_isPoint;
+            }
+            set
+            {
+                SetProperty(ref m_isPoint, value);
+            }
+        }
+
+        bool m_isLine = false;
+        public bool p_isLine
+        {
+            get
+            {
+                return m_isLine;
+            }
+            set
+            {
+                SetProperty(ref m_isLine, value);
             }
         }
 

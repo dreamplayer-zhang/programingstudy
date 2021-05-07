@@ -692,8 +692,10 @@ namespace Root_CAMELLIA
             PMViewModel = new Dlg_PM_ViewModel(this);
             ReviewViewModel = new Dlg_Review_ViewModel(this);
             LoginViewModel = new Dlg_Login_ViewModel(this);
+            RecipeCreatorViewModel = new Dlg_Recipe_ViewModel(this);
             loadportA_ViewModel = new Loadport_ViewModel(0);
             loadportB_ViewModel = new Loadport_ViewModel(1);
+             
             //StageMapViewModel = new Dlg_StageMapSetting_ViewModel(this);
         }
 
@@ -701,12 +703,12 @@ namespace Root_CAMELLIA
         {
             dialogService = new DialogService(main);
             dialogService.Register<Dlg_Engineer_ViewModel, Dlg_Engineer>();
-            dialogService.Register<Dlg_RecipeManager_ViewModel, Dlg_RecipeManager>();
+            //dialogService.Register<Dlg_RecipeManager_ViewModel, Dlg_RecipeManager>();
             dialogService.Register<Dlg_Setting_ViewModel, Dlg_Setting>();
             dialogService.Register<Dlg_PM_ViewModel, Dlg_PM>();
             dialogService.Register<Dlg_Review_ViewModel, Dlg_Review>();
             dialogService.Register<Dlg_Login_ViewModel, Dlg_Login>();
-            dialogService.Register<Dlg_StageMapSetting_ViewModel, Dlg_StageMapSetting>();
+            dialogService.Register<Dlg_Recipe_ViewModel, Dlg_Recipe>();
         }
 
         private void DrawMeasureRoute()
@@ -738,7 +740,7 @@ namespace Root_CAMELLIA
         public Dlg_Engineer_ViewModel EngineerViewModel;
         public Dlg_Review_ViewModel ReviewViewModel;
         public Dlg_Login_ViewModel LoginViewModel;
-        public Dlg_StageMapSetting_ViewModel StageMapViewModel;
+        public Dlg_Recipe_ViewModel RecipeCreatorViewModel;
         Loadport_ViewModel _loadportA_ViewModel;
         public Loadport_ViewModel loadportA_ViewModel
         {
@@ -923,6 +925,8 @@ namespace Root_CAMELLIA
             {
                 return new RelayCommand(() =>
                 {
+                    loadportA_ViewModel.p_loadport.p_infoCarrier.m_aGemSlot[23].p_eState = RootTools.Gem.GemSlotBase.eState.Run;
+                    //loadportA_ViewModel.p_waferList[1].p_state = RootTools.Gem.GemSlotBase.eState.Done;
                     //Module_FFU.Unit.Fan fan = FFUListItems[1].Unit as Module_FFU.Unit.Fan;
                     //fan.p_nRPM = 1000;
                     //App.m_engineer.m_handler.m_aLoadport[0].p_bPlaced = true;
@@ -965,12 +969,12 @@ namespace Root_CAMELLIA
             {
                 return new RelayCommand(() =>
                 {
-                    if (!Login())
-                    {
-                        return;
-                    }
-                    //var viewModel = new Dlg_RecipeManager_ViewModel(this);
-                    ////viewModel.dataManager = RecipeViewModel.dataManager;
+
+                    //if (!Login())
+                    //{
+                    //    return;
+                    //}
+
                     bool isRecipeLoad = false;
                     if (DataManager.Instance.recipeDM.TeachRecipeName != "")
                     {
@@ -978,8 +982,16 @@ namespace Root_CAMELLIA
                     }
                     RecipeViewModel.UpdateListView(isRecipeLoad);
                     RecipeViewModel.UpdateView(isRecipeLoad, true);
-                    Nullable<bool> result = dialogService.ShowDialog(RecipeViewModel);
+                    var viewModel = new Dlg_Recipe_ViewModel(this);
+                    var dialog = dialogService.GetDialog(viewModel) as Dlg_Recipe;
+                    Nullable<bool> result = dialog.ShowDialog();
                    
+                    //var viewModel = new Dlg_RecipeManager_ViewModel(this);
+                    ////viewModel.dataManager = RecipeViewModel.dataManager;
+                   
+                    
+                    //Nullable<bool> result = dialogService.ShowDialog(RecipeViewModel);
+
                     isRecipeLoad = false;
                     if (DataManager.Instance.recipeDM.TeachRecipeName != "")
                     {
@@ -996,7 +1008,7 @@ namespace Root_CAMELLIA
                     RecipeViewModel.UpdateListView(isRecipeLoad);
                     try
                     {
-                       RecipeViewModel.UpdateLayerGridView();
+                        RecipeViewModel.UpdateLayerGridView();
                     }
                     catch
                     {

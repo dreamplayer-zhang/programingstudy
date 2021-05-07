@@ -12,8 +12,8 @@
         xmlns:met="clr-namespace:Root_CAMELLIA.LibSR_Met"
         xmlns:stage="clr-namespace:Camellia2Stage"
         xmlns:System="clr-namespace:System;assembly=mscorlib"
-        WindowStyle="None"
-        ResizeMode="CanResize"
+        WindowStyle="None" ShowInTaskbar="False"
+        ResizeMode="NoResize"
         WindowStartupLocation="CenterScreen"
         WindowState="Normal"
         Width="1820"
@@ -28,6 +28,11 @@
         </i:EventTrigger>
         <i:EventTrigger EventName="Unloaded">
             <i:InvokeCommandAction Command="{Binding UnloadedCommand}" />
+        </i:EventTrigger>
+        <i:EventTrigger EventName="PreviewKeyDown">
+            <i:CallMethodAction MethodName="OnKeyDown" TargetObject="{Binding}"/>
+
+
         </i:EventTrigger>
     </i:Interaction.Triggers>
     <Window.Resources>

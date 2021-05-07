@@ -1,10 +1,26 @@
 ﻿using RootTools.Trees;
+using System;
 using System.Collections.Generic;
 
 namespace RootTools.Gem
 {
     public class GemSlotBase : NotifyProperty
     {
+        #region event
+        public event EventHandler StateChanged;
+        void StateChange()
+        {
+            if (StateChanged != null)
+                OnStateChanged(new EventArgs());
+
+        }
+        protected virtual void OnStateChanged(EventArgs e)
+        {
+            if (StateChanged != null)
+                StateChanged.Invoke(this, e);
+        }
+        #endregion
+
         #region Property
         public string p_id { get; set; }
         #endregion
@@ -20,7 +36,9 @@ namespace RootTools.Gem
             Cross,
             Select,
             Run,
+            Done
         }
+
         eState _eState = eState.Empty;
         public eState p_eState
         {
@@ -30,6 +48,7 @@ namespace RootTools.Gem
                 if (_eState == value) return;
                 m_log?.Info(p_id + " State : " + _eState.ToString() + " -> " + value.ToString());
                 _eState = value;
+                StateChange();
                 OnPropertyChanged();
                 RegWrite(); 
             }
