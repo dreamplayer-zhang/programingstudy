@@ -62,6 +62,185 @@ namespace Root_VEGA_D.Module
             //if (m_grabMode != null) m_grabMode.RunTree(tree.GetTree("Grab Mode", false), bVisible, true);
         }
 
+        string ConnectRADS()
+        {
+            Camera_Basler camRADS = (Camera_Basler)m_module.CamRADS;
+
+            if (m_grabMode.pUseRADS && m_module.RADSControl.p_IsRun == false)
+            {
+                m_module.RADSControl.m_timer.Start();
+                m_module.RADSControl.p_IsRun = true;
+                m_module.RADSControl.StartRADS();
+
+                StopWatch sw = new StopWatch();
+                if (camRADS.p_CamInfo._OpenStatus == false) camRADS.Connect();
+                while (camRADS.p_CamInfo._OpenStatus == false)
+                {
+                    if (sw.ElapsedMilliseconds > 15000)
+                    {
+                        sw.Stop();
+                        return "RADS Camera Not Connected";
+                    }
+                }
+                sw.Stop();
+
+                camRADS.SetMulticast();
+                camRADS.GrabContinuousShot();
+            }
+
+            return "OK";
+        }
+
+        string ConnectMainCam()
+        {
+            const int TIMEOUT_50MS = 50000;     // ms
+            const int TIMEOUT_INTERVAL = 10;    // ms
+
+            Camera_Dalsa camMain = (Camera_Dalsa)m_grabMode.m_camera;
+
+            camMain.Connect();
+
+            int nTimeOut = TIMEOUT_50MS / TIMEOUT_INTERVAL;
+            while (camMain.p_CamInfo.p_eState != eCamState.Ready)
+            {
+                if (nTimeOut-- == 0)
+                {
+                    throw new Exception("Camera Connect Error");
+                }
+                Thread.Sleep(TIMEOUT_INTERVAL);
+            }
+
+            return "OK";
+        }
+
+        double m_dAFBestFocusPosY;
+        int m_nAFBestGVSum;
+        string RunAutoFocus()
+        {
+            if (!m_grabMode.m_bUseAF)
+                return "OK";
+
+            if (m_grabMode.m_dAFStartZ >= m_grabMode.m_dAFEndZ)
+                return "Auto focus Start Z Pos must be smaller than End Z Pos.";
+
+            if (m_grabMode.m_nAFLaserThreshold <= 0)
+                return "Auto focus Threadhold value must be bigger than zero.";
+
+            Camera_Basler camRADS = (Camera_Basler)m_module.CamRADS;
+            AxisXY axisXY = m_module.AxisXY;
+            Axis axisZ = m_module.AxisZ;
+
+            m_grabMode.SetLight(true);
+
+            try
+            {
+                // RADS Voltage Reset
+                m_module.RADSControl.ResetController();
+
+                // 레티클 중심 XY위치, Z축 시작위치로 이동
+                if (m_module.Run(axisXY.StartMove(m_grabMode.m_rpAxisCenter.X, m_grabMode.m_rpAxisCenter.Y)))
+                    return p_sInfo;
+                if (m_module.Run(axisZ.StartMove(m_grabMode.m_dAFStartZ)))
+                    return p_sInfo;
+                if (m_module.Run(axisXY.WaitReady()))
+                    return p_sInfo;
+                if (m_module.Run(axisZ.WaitReady()))
+                    return p_sInfo;
+
+                // 중앙 위치의 GV 합 리셋
+                m_nAFBestGVSum = 0;
+
+                camRADS.Grabed += m_camera_Grabed;
+
+                // Z축 목표위치로 이동
+                if (m_module.Run(axisZ.StartMove(m_grabMode.m_dAFEndZ)))
+                    return p_sInfo;
+                if (m_module.Run(axisZ.WaitReady()))
+                    return p_sInfo;
+
+                camRADS.Grabed -= m_camera_Grabed;
+
+                // 중앙에 RADS 레이저가 맞춰진적이 없다면
+                if (m_nAFBestGVSum <= 0)
+                    return "Cannot find best Y position by auto focusing";
+
+                // 최적의 포커싱 위치로 이동
+                if (m_module.Run(axisZ.StartMove(m_dAFBestFocusPosY + m_grabMode.m_dAFOffset)))
+                    return p_sInfo;
+                if (m_module.Run(axisZ.WaitReady()))
+                    return p_sInfo;
+            }
+            catch (Exception e)
+            {
+                m_log.Info(e.Message);
+            }
+            finally
+            {
+                m_grabMode.SetLight(false);
+            }
+
+            return "OK";
+        }
+
+        void m_camera_Grabed(object sender, System.EventArgs e)
+        {
+            Camera_Basler camRADS = m_module.CamRADS;
+            IntPtr intPtr = camRADS.p_ImageData.GetPtr(0);  // R 채널 데이터
+            if (intPtr != null && camRADS != null)
+            {
+                unsafe
+                {
+                    CPoint size = camRADS.p_ImageData.p_Size;
+                    byte* arrImg = (byte*)intPtr.ToPointer();
+                    int[] profile = new int[size.Y];
+
+                    // 각 행별로 모든 GV값 더하기
+                    Parallel.For(0, size.Y, (y) =>
+                    {
+                        for (int x = 0; x < size.X; x++)
+                        {
+                            int pixel = arrImg[size.X * y + x];
+                            if (pixel >= m_grabMode.m_nAFLaserThreshold)     // 설정된 Threshold 이상의 값만 계산에 사용
+                                profile[y] += pixel;
+                        }
+                    });
+
+                    // RADS laser의 위치 찾기
+                    int laserY = 0;
+                    int nSum = profile[0];
+                    for (int i = 1; i < size.Y; i++)
+                    {
+                        if (nSum <= profile[i])
+                        {
+                            laserY = i;
+                            nSum = profile[i];
+                        }
+                    }
+
+                    // 이전 RADS laser 정보와 비교하여 중심에 가까울 때의 Z축 위치 찾기
+                    int nCenterOnImg = size.Y / 2;
+                    Axis axisZ = m_module.AxisZ;
+                    ACSAxis acsAxisZ = axisZ as ACSAxis;
+                    if (acsAxisZ != null)
+                    {
+                        if (nSum > m_grabMode.m_nAFLaserThreshold)
+                        {
+                            double curPosZ = acsAxisZ.GetActualPosition();
+                            double diffPast = Math.Abs(nCenterOnImg - m_dAFBestFocusPosY);
+                            double diffNew = Math.Abs(nCenterOnImg - curPosZ);
+
+                            // 새로 발견한 위치가 중심에 더 가까울 경우
+                            if (diffPast > diffNew)
+                            {
+                                m_dAFBestFocusPosY = curPosZ;
+                                m_nAFBestGVSum = nSum;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
         public override string Run()
         {
             if (m_grabMode == null) return "Grab Mode == null";
@@ -71,10 +250,6 @@ namespace Root_VEGA_D.Module
             snapTimeWatcher.Start();
 
             // 상수 값
-            const int TIMEOUT_10MS = 10000;     // ms
-            const int TIMEOUT_50MS = 50000;     // ms
-            const int TIMEOUT_INTERVAL = 10;    // ms
-            const int RESCAN_MAX = 3;
             int MM_TO_UM = 1000;
 
             // 축 가져오기
@@ -91,39 +266,17 @@ namespace Root_VEGA_D.Module
 
             try
             {
+                // Z축 Auto Focus
+                if (m_module.Run(RunAutoFocus()))
+                    return p_sInfo;
+
                 // RADS 연결
-                if (m_grabMode.pUseRADS && m_module.RADSControl.p_IsRun == false)
-                {
-                    m_module.RADSControl.m_timer.Start();
-                    m_module.RADSControl.p_IsRun = true;
-                    m_module.RADSControl.StartRADS();
-                    StopWatch sw = new StopWatch();
-                    if (camRADS.p_CamInfo._OpenStatus == false) camRADS.Connect();
-                    while (camRADS.p_CamInfo._OpenStatus == false)
-                    {
-                        if (sw.ElapsedMilliseconds > 15000)
-                        {
-                            sw.Stop();
-                            return "RADS Camera Not Connected";
-                        }
-                    }
-                    sw.Stop();
-                    camRADS.SetMulticast();
-                    camRADS.GrabContinuousShot();
-                }
+                if (m_module.Run(ConnectRADS()))
+                    return p_sInfo;
 
                 // 카메라 연결 시도
-                camMain.Connect();
-
-                int nTimeOut = TIMEOUT_50MS / TIMEOUT_INTERVAL;
-                while (camMain.p_CamInfo.p_eState != eCamState.Ready)
-                {
-                    if (nTimeOut-- == 0)
-                    {
-                        throw new Exception("Camera Connect Error");
-                    }
-                    Thread.Sleep(TIMEOUT_INTERVAL);
-                }
+                if (m_module.Run(ConnectMainCam()))
+                    return p_sInfo;
 
                 // 스캔 라인 초기화
                 m_nCurScanLine = 0;
@@ -157,6 +310,14 @@ namespace Root_VEGA_D.Module
                         // 이동 위치 계산
                         //int nScanSpeed = Convert.ToInt32((double)m_grabMode.m_nMaxFrame * m_grabMode.m_dTrigger * (double)m_grabMode.m_nScanRate / 100);
                         //int nScanOffset_pulse = (int)((double)nScanSpeed * axisXY.p_axisY.GetSpeedValue(Axis.eSpeed.Move).m_acc * 0.5) * 2;
+
+                        // 분주비 재설정
+                        int nEncoderMul = camMain.GetEncoderMultiplier();
+                        int nEncoderDiv = camMain.GetEncoderDivider();
+                        camMain.SetEncoderMultiplier(1);
+                        camMain.SetEncoderDivider(1);
+                        camMain.SetEncoderMultiplier(nEncoderMul);
+                        camMain.SetEncoderDivider(nEncoderDiv);
 
                         int nLineIndex = m_grabMode.m_ScanStartLine + m_nCurScanLine;
 
@@ -255,20 +416,27 @@ namespace Root_VEGA_D.Module
                         axisXY.p_axisY.SetTrigger(dTriggerStartPosY, dTriggerEndPosY, m_grabMode.m_dTrigger, 0.001, true);
 
                         // 카메라 스냅 시작
-                        m_grabMode.StartGrab(mem, tmpMemOffset, nWaferSizeY_px, grabData);
-
+                        m_grabMode.StartGrab(mem, tmpMemOffset, (int)(nWaferSizeY_px * 0.98), grabData);
+                        
                         // Y축 목표 위치로 이동
                         if (m_module.Run(axisXY.p_axisY.StartMove(dEndPosY)))
                             return p_sInfo;
 
-                        // 라인스캔 완료 대기
+                        //// 라인스캔 완료 대기
                         if (m_module.Run(axisXY.p_axisY.WaitReady()))
                             return p_sInfo;
 
                         // 이미지 스냅 스레드 동작중이라면 중지
                         Camera_Dalsa dalsaCam = m_grabMode.m_camera as Camera_Dalsa;
-                        if (dalsaCam != null)
-                            dalsaCam.AbortGrabThread();
+                        if (dalsaCam == null)
+                            return "OK";
+                        else
+                        {
+                            while (dalsaCam.p_CamInfo.p_eState != eCamState.Ready && !EQ.IsStop())
+                            {
+                                Thread.Sleep(10);
+                            }
+                        }
 
                         // IPU PC와 연결된 상태라면 'LineEnd' 메세지 전달
                         if (m_module.TcpipCommServer.IsConnected())

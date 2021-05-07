@@ -52,6 +52,13 @@ namespace RootTools.Control.Ajin
             AXM("AxmStatusSetActPos", CAXM.AxmStatusSetActPos(m_nAxis, fPos * p_pulsepUnit));
         }
 
+        public override double GetActualPosition()
+        {
+            double fPos = 0;
+            AXM("AxmStatusGetActPos", CAXM.AxmStatusGetActPos(m_nAxis, ref fPos));
+            return fPos / p_pulsepUnit;
+        }
+
         public override void OverrideVelocity(double v)
         {
             AXM("AxmOverrideVel", CAXM.AxmOverrideVel(m_nAxis, v * p_pulsepUnit));
