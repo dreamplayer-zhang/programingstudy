@@ -105,6 +105,8 @@ namespace Root_AOP01_Inspection
 		}
 
 		public bool EdgeDrawMode { get; internal set; }
+		public bool EdgeDrawModeLeft { get; internal set; }
+		public bool EdgeDrawModeRight { get; internal set; }
 		#endregion
 
 		#region Command

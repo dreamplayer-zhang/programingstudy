@@ -49,7 +49,7 @@ namespace RootTools_Vision
 			}
 
             this.inspectionSharedBuffer = this.currentWorkplace.GetSharedBufferInfo(this.parameterBackside.IndexChannel);
-            byte[] workplaceBuffer = GetWorkplaceBuffer(this.parameterBackside.IndexChannel);
+            byte[] workplaceBuffer = GetWorkplaceBufferByColorChannel(this.parameterBackside.IndexChannel);
 
             // Inspection Param
             bool isDarkInsp = !parameterBackside.IsBright; // Option

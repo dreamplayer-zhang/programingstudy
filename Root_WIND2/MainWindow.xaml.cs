@@ -268,6 +268,10 @@ namespace Root_WIND2
                             frontImage.GetPtr(1), 
                             frontImage.GetPtr(2), 
                                 new MemoryID(memoryFrontPool, memoryFrontGroup, memoryFront)));
+
+
+                    CameraInfo camInfo = DataConverter.GrabModeToCameraInfo(engineer.m_handler.p_Vision.GetGrabMode(recipeFront.CameraInfoIndex));
+                    frontInspection.SetCameraInfo(camInfo);
                 }
 
                 //if (frontImage.GetPtr() == IntPtr.Zero)
@@ -333,6 +337,28 @@ namespace Root_WIND2
                                 edgeTopImage.GetPtr(1),
                                 edgeTopImage.GetPtr(2),
                                 new MemoryID(memoryFrontPool, memoryFrontGroup, memoryFront)));
+
+                    // Ex) 다중 이미지 버퍼 할당
+                    RootTools_Vision.WorkManager3.WorkManager edgeInspection = GlobalObjects.Instance.RegisterNamed<RootTools_Vision.WorkManager3.WorkManager>("edgeInspection");
+
+                    edgeInspection.SetRecipe(recipeEdge);
+                    edgeInspection.SetSharedBuffer(new SharedBufferInfo(
+                                edgeTopImage.p_Size.X,
+                                edgeTopImage.p_Size.Y,
+                                edgeTopImage.GetBytePerPixel(),
+                                new List<IntPtr>()
+                                {
+                                    edgeTopImage.GetPtr(0),
+                                    edgeTopImage.GetPtr(1),
+                                    edgeTopImage.GetPtr(2),
+                                    edgeBottomImage.GetPtr(0),
+                                    edgeBottomImage.GetPtr(1),
+                                    edgeBottomImage.GetPtr(2),
+                                    edgeSideImage.GetPtr(0),
+                                    edgeSideImage.GetPtr(1),
+                                    edgeSideImage.GetPtr(2),
+                                }
+                                ));
                 }
 
                 /*

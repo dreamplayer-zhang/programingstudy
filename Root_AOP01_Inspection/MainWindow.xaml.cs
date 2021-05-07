@@ -213,7 +213,15 @@ namespace Root_AOP01_Inspection
 
 					InspectionManager_AOP inspectionFront = GlobalObjects.Instance.RegisterNamed<InspectionManager_AOP>
 						(App.MainInspMgRegName, frontSurface, front_info);
-				}
+					var frontLeft_info = new SharedBufferInfo(imageMain.GetPtr(0), imageMain.p_Size.X, imageMain.p_Size.Y, imageMain.p_nByte, imageMain.GetPtr(1), imageMain.GetPtr(2));
+
+					InspectionManager_AOP inspectionFrontLeft = GlobalObjects.Instance.RegisterNamed<InspectionManager_AOP>
+						(App.MainInspLeftMgRegName, frontSurface, front_info);
+					var frontRight_info = new SharedBufferInfo(imageMain.GetPtr(0), imageMain.p_Size.X, imageMain.p_Size.Y, imageMain.p_nByte, imageMain.GetPtr(1), imageMain.GetPtr(2));
+
+					InspectionManager_AOP inspectionFrontRight = GlobalObjects.Instance.RegisterNamed<InspectionManager_AOP>
+						(App.MainInspRightMgRegName, frontSurface, front_info);
+			}
 				if (imageSideLeft.GetPtr() == IntPtr.Zero)
 				{
 					//MessageBox.Show("Front Inspection 생성 실패, 메모리 할당 없음");

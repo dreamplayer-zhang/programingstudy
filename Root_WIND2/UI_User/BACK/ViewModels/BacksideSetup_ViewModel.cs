@@ -207,7 +207,8 @@ namespace Root_WIND2.UI_User
 
         public void LoadRecipe()
         {
-
+            RecipeType_WaferMap waferMap = GlobalObjects.Instance.Get<RecipeBack>().WaferMap;
+            this.MapViewerVM.CreateMap(waferMap.MapSizeX, waferMap.MapSizeY, waferMap.Data);
         }
 
         private void ROIDone_Callback(CPoint centerPt, int radius)
@@ -223,6 +224,8 @@ namespace Root_WIND2.UI_User
             get => new RelayCommand(() =>
             {
                 this.LoadRecipe();
+
+                this.ImageViewerVM.ReadExclusivePolygon();
             });
         }
 
@@ -297,6 +300,7 @@ namespace Root_WIND2.UI_User
                         );
                 }
 
+                
                 // Param Up Scale
                 centerX *= DownSample; centerY *= DownSample;
                 outRadius *= DownSample;
@@ -306,7 +310,11 @@ namespace Root_WIND2.UI_User
                 List<CPoint> points = new List<CPoint>();
 
                 for (int i = 0; i < WaferEdge.Length; i++)
-                    points.Add(new CPoint(WaferEdge[i].x * DownSample, WaferEdge[i].y * DownSample));
+                {
+                    if(i%10 == 0)
+                        points.Add(new CPoint(WaferEdge[i].x * DownSample, WaferEdge[i].y * DownSample));
+                }
+                    
 
                 this.mapSizeX = outMapX;
                 this.mapSizeY = outMapY;
@@ -321,6 +329,11 @@ namespace Root_WIND2.UI_User
                 this.ImageViewerVM.SetSearchedCenter(new CPoint((int)centerX, (int)centerY));
                 this.ImageViewerVM.SetSearchedCirclePoints(points);
 
+                // New
+                DrawMapRectNew(SearchedCenterPointX, SearchedCenterPointY);
+
+                // Old
+                return;
                 this.MapViewerVM.CreateMap(this.mapSizeX, this.mapSizeY);
 
                 for(int i = 0; i < this.mapSizeY; i++)
@@ -365,9 +378,57 @@ namespace Root_WIND2.UI_User
             backsideRecipe.IsEdgeIncluded = (this.SearchROIOptions == SEARCH_ROI_OPTIONS.IncludeWaferEdge) ? true : false;
 
 
-            GlobalObjects.Instance.Get<RecipeBack>().WaferMap = new RecipeType_WaferMap(this.MapSizeX, this.MapSizeY, this.MapData);
+            //GlobalObjects.Instance.Get<RecipeBack>().WaferMap = new RecipeType_WaferMap(this.MapSizeX, this.MapSizeY, this.MapData);
         }
 
+        public void DrawMapRectNew(int centerX, int centerY)
+        {
+            RecipeType_WaferMap waferMap = GlobalObjects.Instance.Get<RecipeBack>().WaferMap;
+            OriginRecipe originRecipe = GlobalObjects.Instance.Get<RecipeBack>().GetItem<OriginRecipe>();
+            mapData = waferMap.Data;
+
+            int MasterDieX = waferMap.MasterDieX;
+            int MasterDieY = waferMap.MasterDieY;
+
+            int originDieX = waferMap.OriginDieX;
+            int originDieY = waferMap.OriginDieY;
+
+            int mapSizeX = waferMap.MapSizeX;
+            int mapSizeY = waferMap.MapSizeY;
+            double diePitchX = waferMap.DiePitchX;
+            double diePitchY = waferMap.DiePitchY;
+            double sampleCenterX = waferMap.SampleCenterLocationX;
+            double sampleCenterY = waferMap.SampleCenterLocationY;
+
+            List<CRect> rectList = new List<CRect>();
+ 
+            int originX = (int)(centerX + sampleCenterX);
+            int originY = (int)(centerY - sampleCenterY);
+
+            for (int x = 0; x < mapSizeX; x++)
+            {
+                for (int y = 0; y < mapSizeY; y++)
+                {
+                    if (mapData[y * mapSizeX + x] == 1)
+                    {
+                        int left = (int)(originX - (originDieX - x) * diePitchX);
+                        int right = (int)(originX - (originDieX - x - 1) * diePitchX);
+                        int top = (int)(originY - (originDieY - y) * diePitchY);
+                        int bottom = (int)(originY - (originDieY - y - 1) * diePitchY);
+
+                        rectList.Add(new CRect(left, top, right, bottom));
+
+                        if (x == MasterDieX && y == MasterDieY)
+                        {
+                            originRecipe.OriginX = left;
+                            originRecipe.OriginY = bottom;
+                        }
+                    }
+                }
+            }
+
+            this.ImageViewerVM.SetMapRectList(rectList);
+        }
 
         public void DrawMapRect(int[] mapData, int mapX, int mapY, int orgX, int orgY, int chipW, int chipH)
         {
