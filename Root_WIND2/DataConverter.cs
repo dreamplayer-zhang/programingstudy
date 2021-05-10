@@ -13,6 +13,12 @@ namespace Root_WIND2
         public static CameraInfo GrabModeToCameraInfo(GrabModeBase grabMode)
         {
             CameraInfo camInfo = new CameraInfo();
+
+            if (grabMode == null)
+            {
+                return camInfo;
+            }
+
             camInfo.RealResX = grabMode.m_dRealResX_um;
             camInfo.RealResY = grabMode.m_dRealResY_um;
             camInfo.TargetResX = grabMode.m_dTargetResX_um;
