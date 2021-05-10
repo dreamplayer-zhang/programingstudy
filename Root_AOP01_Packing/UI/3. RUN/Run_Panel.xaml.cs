@@ -55,11 +55,6 @@ namespace Root_AOP01_Packing
             //else
             //    (sender as ToggleButton).Content = "OFFLINE";
         }
-        private void Button_Click_1(object sender, RoutedEventArgs e)
-        {
-            Dlg_RunStep dlg = new Dlg_RunStep();
-            dlg.ShowDialog();
-        }
 
         private void PauseButton_Click(object sender, RoutedEventArgs e)
         {

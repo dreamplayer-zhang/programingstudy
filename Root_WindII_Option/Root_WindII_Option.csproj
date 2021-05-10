@@ -201,6 +201,29 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="MainWindow_ViewModel.cs" />
+    <Compile Include="MvvmTools\Converter.cs" />
+    <Compile Include="MvvmTools\Helper.cs" />
+    <Compile Include="MvvmTools\ObservableObject.cs" />
+    <Compile Include="MvvmTools\PropertySupport.cs" />
+    <Compile Include="MvvmTools\RelayCommand.cs" />
+    <Compile Include="MvvmTools\SizeObserver.cs" />
+    <Compile Include="UI\MAINTENANCE\MaintenancePanel.xaml.cs">
+      <DependentUpon>MaintenancePanel.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\MAINTENANCE\MaintenancePanel_ViewModel.cs" />
+    <Compile Include="UI\SelectMode.xaml.cs">
+      <DependentUpon>SelectMode.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\SETUP\Interfaces\IPage.cs" />
+    <Compile Include="UI\SETUP\Setup.xaml.cs">
+      <DependentUpon>Setup.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\SETUP\SetupMenuPanel.xaml.cs">
+      <DependentUpon>SetupMenuPanel.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\SETUP\SetupMenuPanel_ViewModel.cs" />
+    <Compile Include="UI\SETUP\Setup_ViewModel.cs" />
     <Page Include="Engineer\WindII_Option_Engineer_UI.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -236,6 +259,22 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="UI\MAINTENANCE\MaintenancePanel.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\SelectMode.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\SETUP\Setup.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\SETUP\SetupMenuPanel.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Module\Backside.cs" />
@@ -270,10 +309,44 @@
       <Project>{ce787353-5e00-4574-9f49-7cee7f087a86}</Project>
       <Name>RootTools</Name>
     </ProjectReference>
+    <ProjectReference Include="..\RootTools_Vision\RootTools_Vision.csproj">
+      <Project>{b9fa8faa-0522-41f3-99ad-eb307e385f76}</Project>
+      <Name>RootTools_Vision</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Root_EFEM\Root_EFEM.csproj">
       <Project>{23175072-261b-4601-8909-152ee93b78f0}</Project>
       <Name>Root_EFEM</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>copy /Y "$(SolutionDir)Lib\CRT_Runtime\10.0.18362.0\x64_bin\ucrt\ucrtbased.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\ucrtbased.dll"
+copy /Y "$(SolutionDir)SQLite\sqlite3.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\sqlite3.dll"
+copy /Y "$(SolutionDir)Lib\opencv_world347d.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\opencv_world347d.dll"
+copy /Y "$(SolutionDir)Lib\opencv_world347.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\opencv_world347.dll"
+IF NOT EXIST "$(SolutionDir)$(ProjectName)\$(OutDir)\x64" (mkdir "$(SolutionDir)$(ProjectName)\$(OutDir)\x64")
+copy /Y "$(SolutionDir)Lib\EMGU.CV\x64\concrt140.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\x64\concrt140.dll"
+copy /Y "$(SolutionDir)Lib\EMGU.CV\x64\cvextern.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\x64\cvextern.dll"
+copy /Y "$(SolutionDir)Lib\EMGU.CV\x64\msvcp140.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\x64\msvcp140.dll"
+copy /Y "$(SolutionDir)Lib\EMGU.CV\x64\opencv_videoio_ffmpeg411_64.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\x64\opencv_videoio_ffmpeg411_64.dll"
+copy /Y "$(SolutionDir)Lib\EMGU.CV\x64\vcruntime140.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\x64\vcruntime140.dll"
+IF NOT EXIST "C:\vsdb\init" (mkdir "C:\vsdb\init")
+copy /Y "$(SolutionDir)Init\vsdb.txt" "C:\vsdb\init\vsdb.txt"
+copy /Y "$(SolutionDir)RootTools\Control\Ajin\DLL\x86_x64\AXL.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\AXL.dll"
+copy /Y "$(SolutionDir)RootTools\Control\Ajin\DLL\x86_x64\AXL.lib" "$(SolutionDir)$(ProjectName)\$(OutDir)\AXL.lib"
+copy /Y "$(SolutionDir)RootTools\Control\Ajin\DLL\x86_x64\EzBasicAxl.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\EzBasicAxl.dll"
+IF NOT EXIST "$(SolutionDir)$(ProjectName)\$(OutDir)\plugin" (mkdir "$(SolutionDir)$(ProjectName)\$(OutDir)\plugin")
+copy /Y "$(SolutionDir)Lib\mariadb-connector-c\lib\mariadb\libmariadb.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\libmariadb.dll"
+copy /Y "$(SolutionDir)Lib\mariadb-connector-c\lib\mariadb\libmariadb.lib" "$(SolutionDir)$(ProjectName)\$(OutDir)\libmariadb.lib"
+copy /Y "$(SolutionDir)Lib\mariadb-connector-c\lib\mariadb\libmariadb.pdb" "$(SolutionDir)$(ProjectName)\$(OutDir)\libmariadb.pdb"
+copy /Y "$(SolutionDir)Lib\mariadb-connector-c\lib\mariadb\mariadbclient.lib" "$(SolutionDir)$(ProjectName)\$(OutDir)\mariadbclient.lib"
+copy /Y "$(SolutionDir)Lib\mariadb-connector-c\lib\mariadb\plugin\auth_gssapi_client.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\plugin\auth_gssapi_client.dll"
+copy /Y "$(SolutionDir)Lib\mariadb-connector-c\lib\mariadb\plugin\caching_sha2_password.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\plugin\caching_sha2_password.dll"
+copy /Y "$(SolutionDir)Lib\mariadb-connector-c\lib\mariadb\plugin\client_ed25519.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\plugin\client_ed25519.dll"
+copy /Y "$(SolutionDir)Lib\mariadb-connector-c\lib\mariadb\plugin\dialog.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\plugin\dialog.dll"
+copy /Y "$(SolutionDir)Lib\mariadb-connector-c\lib\mariadb\plugin\mysql_clear_password.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\plugin\mysql_clear_password.dll"
+copy /Y "$(SolutionDir)Lib\mariadb-connector-c\lib\mariadb\plugin\pvio_npipe.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\plugin\pvio_npipe.dll"
+copy /Y "$(SolutionDir)Lib\mariadb-connector-c\lib\mariadb\plugin\pvio_shmem.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\plugin\pvio_shmem.dll"
+copy /Y "$(SolutionDir)Lib\mariadb-connector-c\lib\mariadb\plugin\sha256_password.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\plugin\sha256_password.dll"</PostBuildEvent>
+  </PropertyGroup>
 </Project>

@@ -79,7 +79,8 @@ namespace Root_CAMELLIA
         {
             if (p_password == null)
             {
-                MessageBox.Show("Check ID / Password", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                CustomMessageBox.Show("Error", "Check ID or Password", MessageBoxButton.OK, CustomMessageBox.MessageBoxImage.Error );
+                //MessageBox.Show("Check ID / Password", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 return false ;
             }
             IntPtr pStr = Marshal.SecureStringToCoTaskMemUnicode(p_password);

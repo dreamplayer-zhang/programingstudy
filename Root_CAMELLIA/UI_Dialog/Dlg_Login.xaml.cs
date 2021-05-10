@@ -31,7 +31,8 @@ namespace Root_CAMELLIA
             //e.Handled = true;
             try
             {
-                this.DragMove();
+                if(e.LeftButton == MouseButtonState.Pressed)
+                    this.DragMove();
             }
             catch
             {

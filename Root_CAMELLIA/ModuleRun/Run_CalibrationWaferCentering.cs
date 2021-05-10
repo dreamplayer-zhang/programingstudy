@@ -138,7 +138,7 @@ namespace Root_CAMELLIA.Module
                 return p_sInfo;
             }
 
-            if (m_module.Run(axisZ.StartMove(491453)))
+            if (m_module.Run(axisZ.StartMove(m_dFocusZ)))
             {
                 return p_sInfo;
             }

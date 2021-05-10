@@ -1,4 +1,5 @@
-﻿using Root_WindII_Option.Module;
+﻿using Root_EFEM.Module;
+using Root_WindII_Option.Module;
 using RootTools;
 using RootTools.GAFs;
 using RootTools.Gem;
@@ -11,7 +12,7 @@ using System.Windows.Media;
 
 namespace Root_WindII_Option.Engineer
 {
-    public class WindII_Option_Handler : IHandler
+    public class WindII_Option_Handler : ObservableObject, IHandler
     {
         #region UI Binding
         public Brush p_brushHandler
@@ -29,11 +30,30 @@ namespace Root_WindII_Option.Engineer
 
         #region Module
         public ModuleList p_moduleList { get; set; }
-        
+
+        private Vision_Edgeside m_visionEdge;
+        public Vision_Edgeside p_VisionEdge
+        {
+            get => m_visionEdge;
+            set => SetProperty(ref m_visionEdge, value);
+        }
+
+        private Vision_Backside m_visionBack;
+        public Vision_Backside p_VisionBack
+        {
+            get => m_visionBack;
+            set => SetProperty(ref m_visionBack, value);
+        }
+
         void InitModule()
         {
             p_moduleList = new ModuleList(m_engineer);
-            InitBackside(ModuleBase.eRemote.Server); 
+            m_visionEdge = new Vision_Edgeside("EdgeVision", m_engineer);
+            InitModule(m_visionEdge);
+            m_visionBack = new Vision_Backside("BackVision", m_engineer);
+            InitModule(m_visionBack);
+
+            //InitBackside(ModuleBase.eRemote.Server); 
         }
 
         void InitModule(ModuleBase module)

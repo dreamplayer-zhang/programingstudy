@@ -15,7 +15,7 @@ namespace Root_WindII
             InitializeComponent();
         }
 
-        WindII_Engineer m_engineer = new WindII_Engineer();
+        //WindII_Engineer m_engineer = new WindII_Engineer();
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             //if (!Directory.Exists(@"C:\Recipe\Wind2")) Directory.CreateDirectory(@"C:\Recipe\Wind2");
@@ -25,7 +25,7 @@ namespace Root_WindII
 
         private void Window_Closing(object sender, CancelEventArgs e)
         {
-            m_engineer.ThreadStop();
+            //m_engineer.ThreadStop();
         }
     }
 }

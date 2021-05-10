@@ -1,6 +1,7 @@
 ﻿using RootTools;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -9,6 +10,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shapes;
+using System.Xml.Serialization;
 
 namespace Root_WIND2.UI_User
 {
@@ -25,6 +27,9 @@ namespace Root_WIND2.UI_User
             public static SolidColorBrush SearchCircle = Brushes.Yellow;
             public static SolidColorBrush Map = Brushes.YellowGreen;
             public static SolidColorBrush MapFill = Brushes.Transparent;
+
+            public static SolidColorBrush ExclusivePolyStroke = Brushes.Red;
+            public static SolidColorBrush ExclusivePolyFill = Brushes.Red;
         }
 
         #endregion
@@ -46,7 +51,42 @@ namespace Root_WIND2.UI_User
             get => this.isROIChecked;
             set
             {
+                if(value == true)
+                {
+                    this.IsPolyChecked = false;
+                }
                 SetProperty<bool>(ref this.isROIChecked, value);
+            }
+        }
+
+        private bool isPolyChecked = false;
+        public bool IsPolyChecked
+        {
+            get => this.isPolyChecked;
+            set
+            {
+                if (value == true)
+                {
+                    this.IsROIChecked = false;
+
+                    AddExclusivePolygon();
+                }
+                else
+                {
+                    int lastIndex = this.exclusivePolyMemPointsList.Count - 1;
+                    if (lastIndex >= 0)
+                    {
+                        Polygon lastPoly = this.ExclusivePolyList[lastIndex];
+                        if (lastPoly.Points.Count == 0)
+                        {
+                            this.p_UIElement.Remove(lastPoly);
+                            this.ExclusivePolyList.Remove(lastPoly);
+                            this.exclusivePolyMemPointsList.Remove(this.exclusivePolyMemPointsList[lastIndex]);
+                        }
+                    }
+                }
+
+                SetProperty<bool>(ref this.isPolyChecked, value);
             }
         }
 
@@ -82,6 +122,41 @@ namespace Root_WIND2.UI_User
             get => this.p_UIElement.Contains(this.CircleUI);
         }
         #endregion
+
+
+        public bool HitTest(Point hitPt)
+        {
+            //PathGeometry geometry = new PathGeometry();
+            //PathFigure path = new PathFigure();
+            //path.Segments.Add(new PolyLineSegment(this.exclusivePolyMemPointsList[0].ToList(), true));
+            //geometry.Figures.Add(path);
+
+            PathGeometry pathGeometry = new PathGeometry();
+
+            foreach (List<Point> points in this.exclusivePolyMemPointsList)
+            {
+                PathFigure figure = new PathFigure();
+                figure.StartPoint = points[0];
+
+                PathSegmentCollection segments = new PathSegmentCollection();
+
+                foreach (Point pt in points)
+                {
+                    if (points[0] == pt) continue;
+
+                    LineSegment lineSegment = new LineSegment();
+                    lineSegment.Point = pt;
+
+                    segments.Add(lineSegment);
+                }
+
+                figure.Segments = segments;
+
+                pathGeometry.Figures.Add(figure);
+            }
+
+            return pathGeometry.FillContains(hitPt);
+        }
 
         #region [Draw Method]
         private enum CIRCLE_DRAW_STATE
@@ -121,6 +196,10 @@ namespace Root_WIND2.UI_User
         private List<CPoint> searchedCirclePoints = new List<CPoint>();
 
         private List<TRect> mapRectList = new List<TRect>();
+
+        // Exclusive Region
+        private List<Polygon> ExclusivePolyList;
+        private List<List<Point>> exclusivePolyMemPointsList = new List<List<Point>>();
 
 
         #region [Initilize UIElements]
@@ -231,6 +310,12 @@ namespace Root_WIND2.UI_User
             SearchedCircleUI.Stroke = ColorDefines.SearchCircle;
             SearchedCircleUI.StrokeThickness = 2;
             #endregion
+
+
+            #region [Exclusive Polygon]
+            ExclusivePolyList = new List<Polygon>();
+            #endregion
+
         }
 
         private void MouseLeftButtonDown_CircleEditUI_Center(object sender, MouseEventArgs e)
@@ -356,6 +441,77 @@ namespace Root_WIND2.UI_User
             }
         }
 
+
+        public void AddExclusivePolygonPoint(CPoint memPt)
+        {
+            CPoint canvasPt = GetCanvasPoint(new CPoint((int)memPt.X, (int)memPt.Y));
+
+            int lastIndex = this.exclusivePolyMemPointsList.Count - 1;
+
+            this.exclusivePolyMemPointsList[lastIndex].Add(new Point(memPt.X, memPt.Y));
+            this.ExclusivePolyList[lastIndex].Points.Add(new Point(canvasPt.X, canvasPt.Y));
+
+            if (this.p_UIElement.Contains(this.ExclusivePolyList[lastIndex]) == false)
+                this.p_UIElement.Add(this.ExclusivePolyList[lastIndex]);
+        }
+
+
+        public void AddExclusivePolygonPoint(Point memPt)
+        {
+            CPoint canvasPt = GetCanvasPoint(new CPoint((int)memPt.X, (int)memPt.Y));
+
+            int lastIndex = this.exclusivePolyMemPointsList.Count - 1;
+
+            this.exclusivePolyMemPointsList[lastIndex].Add(memPt);
+            this.ExclusivePolyList[lastIndex].Points.Add(new Point(canvasPt.X, canvasPt.Y));
+
+            if(this.p_UIElement.Contains(this.ExclusivePolyList[lastIndex]) == false)
+                this.p_UIElement.Add(this.ExclusivePolyList[lastIndex]);
+        }
+
+        public void AddExclusivePolygon()
+        {
+            Polygon polygon = new Polygon();
+            polygon.Stroke = ColorDefines.ExclusivePolyStroke;
+            polygon.StrokeThickness = 2;
+            polygon.Fill = ColorDefines.ExclusivePolyFill;
+            polygon.Opacity = 0.3;
+
+            this.ExclusivePolyList.Add(polygon);
+            this.exclusivePolyMemPointsList.Add(new List<Point>());
+        }
+
+        public void ClearExclusivePolygon()
+        {
+            if(this.IsPolyChecked == true)
+                this.IsPolyChecked = false;
+
+            foreach(Polygon polygon in this.ExclusivePolyList)
+            {
+                if(this.p_UIElement.Contains(polygon))
+                {
+                    this.p_UIElement.Remove(polygon);
+                }
+            }
+            this.ExclusivePolyList.Clear();
+            this.exclusivePolyMemPointsList.Clear();
+        }
+
+        public void DrawExclusivePolygon()
+        {
+            int i = 0;
+            foreach (Polygon polygon in this.ExclusivePolyList)
+            {
+                polygon.Points.Clear();
+                foreach (Point pt in this.exclusivePolyMemPointsList[i])
+                {
+                    CPoint canvasPt = GetCanvasPoint(pt);
+                    polygon.Points.Add(new Point(canvasPt.X, canvasPt.Y));
+                }
+                i++;
+            }
+        }
+
         public void SetMapRectList(List<CRect> rectList)
         {
             this.mapRectList.Clear();
@@ -441,6 +597,9 @@ namespace Root_WIND2.UI_User
             DrawCircleEdit();
             DrawSearchedCircle();
             DrawMapRectList();
+
+            // Polygon
+            DrawExclusivePolygon();
         }
 
         #endregion
@@ -456,6 +615,15 @@ namespace Root_WIND2.UI_User
 
             CPoint canvasPt = new CPoint(p_MouseX, p_MouseY);
             CPoint memPt = GetMemPoint(canvasPt);
+
+
+            //if (HitTest(new Point(memPt.X, memPt.Y)) == true)
+            //    MessageBox.Show("Hit!!");
+
+            if (this.IsPolyChecked == true)
+            {
+                AddExclusivePolygonPoint(memPt);
+            }
 
             if(this.circleEditState == CIRCLE_EDIT_STATE.None)
             {
@@ -505,6 +673,9 @@ namespace Root_WIND2.UI_User
             CPoint canvasPt = new CPoint(p_MouseX, p_MouseY);
             CPoint memPt = GetMemPoint(canvasPt);
 
+
+            Line line = new Line();
+            
             if (isDrawing == true)
             {
                 circleEndMemoryPoint.X = memPt.X;
@@ -665,6 +836,122 @@ namespace Root_WIND2.UI_User
                 });
             }
         }
+
+
+        public RelayCommand btnSavePolyCommand
+        {
+            get => new RelayCommand(() =>
+             {
+                 this.IsPolyChecked = false;
+
+                 SaveExclusivePolygon();
+             });
+        }
+
+        public RelayCommand btnCancelPolyCommand
+        {
+            get => new RelayCommand(() =>
+            {
+                if(this.IsPolyChecked == true)
+                {
+                    this.IsPolyChecked = false;
+
+                    if (this.exclusivePolyMemPointsList.Count != 0)
+                    {
+                        int lastIndex = this.exclusivePolyMemPointsList.Count - 1;
+                        Polygon lastPoly = this.ExclusivePolyList[lastIndex];
+
+                        if (lastPoly.Points.Count > 0)
+                        {
+                            this.p_UIElement.Remove(lastPoly);
+                            this.ExclusivePolyList.Remove(lastPoly);
+                            this.exclusivePolyMemPointsList.Remove(this.exclusivePolyMemPointsList[lastIndex]);
+                        }
+                    }
+                }
+            });
+        }
+
+        public RelayCommand btnClearPolyCommand
+        {
+            get => new RelayCommand(() =>
+            {
+                ClearExclusivePolygon();
+            });
+        }
+
+
+        private readonly string ExclusivePolygonListFilePath = "Backside_ExclusivePolygonList.xml";
+
+        private object lockObj = new object();
+        public void SaveExclusivePolygon()
+        {
+            try
+            {
+                lock (lockObj)
+                {
+                    if (File.Exists(Constants.RootPath.RootSetupPath + ExclusivePolygonListFilePath))
+                    {
+                        string strTime = DateTime.Now.ToString("yyyyMMddhhmmss");
+                        if (!File.Exists(Constants.RootPath.RootSetupPath + strTime + "_" + ExclusivePolygonListFilePath))
+                        {
+                            File.Move(Constants.RootPath.RootSetupPath + ExclusivePolygonListFilePath, Constants.RootPath.RootSetupPath + strTime + "_" + ExclusivePolygonListFilePath);
+                        }
+                    }
+
+                    using (StreamWriter wr = new StreamWriter(Constants.RootPath.RootSetupPath + ExclusivePolygonListFilePath))
+                    {
+                        XmlSerializer xs = new XmlSerializer(typeof(List<List<Point>>));
+                        xs.Serialize(wr, this.exclusivePolyMemPointsList);
+                    }
+                }
+            }
+            catch(Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+
+        public void ReadExclusivePolygon()
+        {
+            try
+            {
+                if (File.Exists(Constants.RootPath.RootSetupPath + ExclusivePolygonListFilePath))
+                {
+                    ClearExclusivePolygon();
+
+                    using (var sr = new StreamReader(Constants.RootPath.RootSetupPath + ExclusivePolygonListFilePath))
+                    {
+                        XmlSerializer xs = new XmlSerializer(typeof(List<List<Point>>));
+                        this.exclusivePolyMemPointsList = (List<List<Point>>)xs.Deserialize(sr);
+
+                        foreach (List<Point> pointList in this.exclusivePolyMemPointsList)
+                        {
+                            Polygon polygon = new Polygon();
+
+                            polygon.Stroke = ColorDefines.ExclusivePolyStroke;
+                            polygon.StrokeThickness = 2;
+                            polygon.Fill = ColorDefines.ExclusivePolyFill;
+                            polygon.Opacity = 0.3;
+                            this.ExclusivePolyList.Add(polygon);
+
+                            foreach (Point pt in pointList)
+                            {
+                                CPoint canvasPt = GetCanvasPoint(pt);
+                                polygon.Points.Add(new Point(canvasPt.X, canvasPt.Y));
+                            }
+
+                            this.p_UIElement.Add(polygon);
+                        }
+                    }
+                }
+            }
+            catch(Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+
         #endregion
     }
 }

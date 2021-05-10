@@ -14,7 +14,7 @@ using System.Windows.Media;
 
 namespace Root_WindII.Engineer
 {
-    public class WindII_Handler : IHandler
+    public class WindII_Handler : ObservableObject, IHandler
     {
         #region UI Binding
         public Brush p_brushHandler
@@ -33,13 +33,25 @@ namespace Root_WindII.Engineer
         #region Module
         public ModuleList p_moduleList { get; set; }
         public EFEM_Recipe m_recipe;
-        public EFEM_Process m_process; 
+        public EFEM_Process m_process;
+        
+        private Vision_Frontside m_visionFront;
+        public Vision_Frontside p_VisionFront
+		{
+            get => m_visionFront;
+            set => SetProperty(ref m_visionFront, value);
+        }
+
         void InitModule()
         {
             p_moduleList = new ModuleList(m_engineer);
             InitWTR();
             InitLoadport();
-            InitBackside(ModuleBase.eRemote.Client);
+
+            m_visionFront = new Vision_Frontside("Vision", m_engineer, ModuleBase.eRemote.Server);
+            InitModule(m_visionFront);
+
+            //InitBackside(ModuleBase.eRemote.Client);
 
             m_wtr.RunTree(Tree.eMode.RegRead);
             m_wtr.RunTree(Tree.eMode.Init);
@@ -405,8 +417,12 @@ namespace Root_WindII.Engineer
                 EQ.p_bStop = true;
                 m_thread.Join();
             }
-            p_moduleList.ThreadStop();
-            foreach (ModuleBase module in p_moduleList.m_aModule.Keys) module.ThreadStop();
+
+            if (p_moduleList != null)
+            {
+                p_moduleList.ThreadStop();
+                foreach (ModuleBase module in p_moduleList.m_aModule.Keys) module.ThreadStop();
+            }
         }
     }
 }

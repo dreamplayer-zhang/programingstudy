@@ -25,6 +25,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -34,6 +35,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
     <DebugSymbols>true</DebugSymbols>
@@ -41,9 +43,10 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <DebugType>full</DebugType>
     <PlatformTarget>x64</PlatformTarget>
-    <LangVersion>7.3</LangVersion>
+    <LangVersion>9.0</LangVersion>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
     <OutputPath>bin\x64\Release\</OutputPath>
@@ -51,12 +54,20 @@
     <Optimize>true</Optimize>
     <DebugType>pdbonly</DebugType>
     <PlatformTarget>x64</PlatformTarget>
-    <LangVersion>7.3</LangVersion>
+    <LangVersion>9.0</LangVersion>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <Prefer32Bit>true</Prefer32Bit>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Emgu.CV.UI">
+      <HintPath>..\packages\EMGU.CV.4.1.1.3497\lib\net35\Emgu.CV.UI.dll</HintPath>
+    </Reference>
+    <Reference Include="Emgu.CV.World, Version=4.1.1.3497, Culture=neutral, PublicKeyToken=7281126722ab4438, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\EMGU.CV.4.1.1.3497\lib\net35\Emgu.CV.World.dll</HintPath>
+    </Reference>
     <Reference Include="LiveCharts, Version=0.9.7.0, Culture=neutral, PublicKeyToken=0bc1f845d1ebb8df, processorArchitecture=MSIL">
       <HintPath>..\packages\LiveCharts.0.9.7\lib\net45\LiveCharts.dll</HintPath>
     </Reference>
@@ -188,6 +199,8 @@
     <Reference Include="System.Activities" />
     <Reference Include="System.Activities.Presentation" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Windows.Interactivity, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Windows.Interactivity.WPF.2.0.20525\lib\net40\System.Windows.Interactivity.dll</HintPath>
     </Reference>
@@ -209,6 +222,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Constants.cs" />
+    <Compile Include="DataConverter.cs" />
+    <Compile Include="Engineer\WIND2EventArgs.cs" />
+    <Compile Include="Engineer\WIND2EventManager.cs" />
     <Compile Include="MainWindow_ViewModel.cs" />
     <Compile Include="MvvmTools\Converter.cs" />
     <Compile Include="MvvmTools\Helper.cs" />
@@ -216,10 +233,17 @@
     <Compile Include="MvvmTools\PropertySupport.cs" />
     <Compile Include="MvvmTools\RelayCommand.cs" />
     <Compile Include="MvvmTools\SizeObserver.cs" />
+    <Compile Include="Recipe\RecipeBack.cs" />
+    <Compile Include="Recipe\RecipeEBR.cs" />
+    <Compile Include="Recipe\RecipeEdge.cs" />
+    <Compile Include="Recipe\RecipeFront.cs" />
     <Compile Include="UI\SelectMode.xaml.cs">
       <DependentUpon>SelectMode.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI\SelectMode_ViewModel.cs" />
+    <Compile Include="UI\MAINTENANCE\MaintenancePanel.xaml.cs">
+      <DependentUpon>MaintenancePanel.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\MAINTENANCE\MaintenancePanel_ViewModel.cs" />
     <Compile Include="UI\SETUP\BACK\BacksideInspect.xaml.cs">
       <DependentUpon>BacksideInspect.xaml</DependentUpon>
     </Compile>
@@ -275,6 +299,19 @@
     <Compile Include="UI\SETUP\FRONT\FrontsideSummary.xaml.cs">
       <DependentUpon>FrontsideSummary.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UI\SETUP\FRONT\ViewModels\FrontsideAlignment_ImageViewer_ViewModel.cs" />
+    <Compile Include="UI\SETUP\FRONT\ViewModels\FrontsideAlignment_ViewModel.cs" />
+    <Compile Include="UI\SETUP\FRONT\ViewModels\FrontsideInspect_ImageViewer_ViewModel.cs" />
+    <Compile Include="UI\SETUP\FRONT\ViewModels\FrontsideInspect_ViewModel.cs" />
+    <Compile Include="UI\SETUP\FRONT\ViewModels\FrontsideMask_ViewModel.cs" />
+    <Compile Include="UI\SETUP\FRONT\ViewModels\FrontsideOrigin_ImageViewer_ViewModel.cs" />
+    <Compile Include="UI\SETUP\FRONT\ViewModels\FrontsideOrigin_ViewModel.cs" />
+    <Compile Include="UI\SETUP\FRONT\ViewModels\FrontsideProduct_ViewModel.cs" />
+    <Compile Include="UI\SETUP\FRONT\ViewModels\FrontsideSpec_ImageViewer_ViewModel.cs" />
+    <Compile Include="UI\SETUP\FRONT\ViewModels\FrontsideSpec_ViewModel.cs" />
+    <Compile Include="UI\SETUP\FRONT\ViewModels\FrontsideSummary_ViewModel.cs" />
+    <Compile Include="UI\SETUP\FRONT\ViewModels\Items\InspectionItem.cs" />
+    <Compile Include="UI\SETUP\FRONT\ViewModels\Items\Mask.cs" />
     <Compile Include="UI\SETUP\HOME\HomeRecipe.xaml.cs">
       <DependentUpon>HomeRecipe.xaml</DependentUpon>
     </Compile>
@@ -351,6 +388,10 @@
     <Page Include="UI\SelectMode.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\MAINTENANCE\MaintenancePanel.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="UI\SETUP\BACK\BacksideInspect.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -517,4 +558,34 @@
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>copy /Y "$(SolutionDir)Lib\CRT_Runtime\10.0.18362.0\x64_bin\ucrt\ucrtbased.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\ucrtbased.dll"
+copy /Y "$(SolutionDir)SQLite\sqlite3.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\sqlite3.dll"
+copy /Y "$(SolutionDir)Lib\opencv_world347d.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\opencv_world347d.dll"
+copy /Y "$(SolutionDir)Lib\opencv_world347.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\opencv_world347.dll"
+IF NOT EXIST "$(SolutionDir)$(ProjectName)\$(OutDir)\x64" (mkdir "$(SolutionDir)$(ProjectName)\$(OutDir)\x64")
+copy /Y "$(SolutionDir)Lib\EMGU.CV\x64\concrt140.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\x64\concrt140.dll"
+copy /Y "$(SolutionDir)Lib\EMGU.CV\x64\cvextern.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\x64\cvextern.dll"
+copy /Y "$(SolutionDir)Lib\EMGU.CV\x64\msvcp140.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\x64\msvcp140.dll"
+copy /Y "$(SolutionDir)Lib\EMGU.CV\x64\opencv_videoio_ffmpeg411_64.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\x64\opencv_videoio_ffmpeg411_64.dll"
+copy /Y "$(SolutionDir)Lib\EMGU.CV\x64\vcruntime140.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\x64\vcruntime140.dll"
+IF NOT EXIST "C:\vsdb\init" (mkdir "C:\vsdb\init")
+copy /Y "$(SolutionDir)Init\vsdb.txt" "C:\vsdb\init\vsdb.txt"
+copy /Y "$(SolutionDir)RootTools\Control\Ajin\DLL\x86_x64\AXL.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\AXL.dll"
+copy /Y "$(SolutionDir)RootTools\Control\Ajin\DLL\x86_x64\AXL.lib" "$(SolutionDir)$(ProjectName)\$(OutDir)\AXL.lib"
+copy /Y "$(SolutionDir)RootTools\Control\Ajin\DLL\x86_x64\EzBasicAxl.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\EzBasicAxl.dll"
+IF NOT EXIST "$(SolutionDir)$(ProjectName)\$(OutDir)\plugin" (mkdir "$(SolutionDir)$(ProjectName)\$(OutDir)\plugin")
+copy /Y "$(SolutionDir)Lib\mariadb-connector-c\lib\mariadb\libmariadb.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\libmariadb.dll"
+copy /Y "$(SolutionDir)Lib\mariadb-connector-c\lib\mariadb\libmariadb.lib" "$(SolutionDir)$(ProjectName)\$(OutDir)\libmariadb.lib"
+copy /Y "$(SolutionDir)Lib\mariadb-connector-c\lib\mariadb\libmariadb.pdb" "$(SolutionDir)$(ProjectName)\$(OutDir)\libmariadb.pdb"
+copy /Y "$(SolutionDir)Lib\mariadb-connector-c\lib\mariadb\mariadbclient.lib" "$(SolutionDir)$(ProjectName)\$(OutDir)\mariadbclient.lib"
+copy /Y "$(SolutionDir)Lib\mariadb-connector-c\lib\mariadb\plugin\auth_gssapi_client.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\plugin\auth_gssapi_client.dll"
+copy /Y "$(SolutionDir)Lib\mariadb-connector-c\lib\mariadb\plugin\caching_sha2_password.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\plugin\caching_sha2_password.dll"
+copy /Y "$(SolutionDir)Lib\mariadb-connector-c\lib\mariadb\plugin\client_ed25519.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\plugin\client_ed25519.dll"
+copy /Y "$(SolutionDir)Lib\mariadb-connector-c\lib\mariadb\plugin\dialog.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\plugin\dialog.dll"
+copy /Y "$(SolutionDir)Lib\mariadb-connector-c\lib\mariadb\plugin\mysql_clear_password.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\plugin\mysql_clear_password.dll"
+copy /Y "$(SolutionDir)Lib\mariadb-connector-c\lib\mariadb\plugin\pvio_npipe.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\plugin\pvio_npipe.dll"
+copy /Y "$(SolutionDir)Lib\mariadb-connector-c\lib\mariadb\plugin\pvio_shmem.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\plugin\pvio_shmem.dll"
+copy /Y "$(SolutionDir)Lib\mariadb-connector-c\lib\mariadb\plugin\sha256_password.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\plugin\sha256_password.dll"</PostBuildEvent>
+  </PropertyGroup>
 </Project>

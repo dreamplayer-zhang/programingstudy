@@ -13,7 +13,6 @@ using System.Windows.Input;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using RootTools_Vision.WorkManager3;
-
 namespace Root_WIND2.UI_User
 {
 	public class EdgesideInspect_ViewModel : ObservableObject
@@ -85,8 +84,12 @@ namespace Root_WIND2.UI_User
 				this.ImageViewerBtmVM.ClearObjects();
 				Progress = 0;
 
-				if (GlobalObjects.Instance.GetNamed<WorkManager>("edgeTopInspection") != null)
-					GlobalObjects.Instance.GetNamed<WorkManager>("edgeTopInspection").Start();
+				//if (GlobalObjects.Instance.GetNamed<WorkManager>("edgeTopInspection") != null)
+				//	GlobalObjects.Instance.GetNamed<WorkManager>("edgeTopInspection").Start();
+
+				if (GlobalObjects.Instance.GetNamed<WorkManager>("edgeInspection") != null)
+					GlobalObjects.Instance.GetNamed<WorkManager>("edgeInspection").Start();
+				
 				return;
 			});
 		}

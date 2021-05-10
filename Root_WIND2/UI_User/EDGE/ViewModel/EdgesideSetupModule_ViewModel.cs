@@ -17,10 +17,7 @@ namespace Root_WIND2.UI_User
 		public OriginRecipe OriginRecipe
 		{
 			get => originRecipe;
-			set
-			{
-				SetProperty(ref originRecipe, value);
-			}
+			set => SetProperty(ref originRecipe, value);
 		}
 
 		private EdgeSurfaceRecipeBase recipe;
@@ -137,6 +134,7 @@ namespace Root_WIND2.UI_User
 				SetProperty(ref originX, value);
 			}
 		}
+
 		private int originY;
 		public int OriginY
 		{
@@ -179,6 +177,7 @@ namespace Root_WIND2.UI_User
 		public EdgesideSetupModule_ViewModel()
 		{
 			RecipeEdge recipe = GlobalObjects.Instance.Get<RecipeEdge>();
+			OriginRecipe = recipe.GetItem<OriginRecipe>();
 			Recipe = recipe.GetItem<EdgeSurfaceRecipe>().EdgeRecipeBaseTop;
 			Parameter = recipe.GetItem<EdgeSurfaceParameter>().EdgeParamBaseTop;
 		}
@@ -210,9 +209,6 @@ namespace Root_WIND2.UI_User
 			int heightPerDegree = (int)(imageHeight / mode.m_nScanDegree);
 			int startPosition = heightPerDegree * positionOffset;
 
-			OriginX = 0;
-			OriginY = imageHeight;
-			OriginHeight = imageHeight;
 			Parameter.StartPosition = startPosition;
 		}
 
@@ -222,7 +218,10 @@ namespace Root_WIND2.UI_User
 			this.Parameter = param;
 			this.SelectedGrabModeIndex = recipe.GrabModeIndex;
 
+			this.OriginX = OriginRecipe.OriginX;
+			this.OriginY = OriginRecipe.OriginY;
 			this.OriginWidth = OriginRecipe.OriginWidth;
+			this.OriginHeight = OriginRecipe.OriginHeight;
 		}
 
 		public void SetName(string name)

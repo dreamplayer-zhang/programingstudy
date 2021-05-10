@@ -22,6 +22,17 @@ namespace RootTools_Vision
         private int masterDieX = 0;
         private int masterDieY = 0;
 
+        private int originDieX = 0;
+        private int originDieY = 0;
+        private double chipWidth = 0;
+        private double chipHeight = 0;
+        private double diePitchX = 0;
+        private double diePitchY = 0;
+        private double scribeLaneX = 0;
+        private double scribeLaneY = 0;
+        private double sampleCenterLocationX = 0;
+        private double sampleCenterLocationY = 0;
+
         #region [Getter Setter]
         public int MapSizeX
         {
@@ -121,6 +132,17 @@ namespace RootTools_Vision
                
             }
         }
+
+        public double ChipWidth { get => chipWidth; set => chipWidth = value; }
+        public double ChipHeight { get => chipHeight; set => chipHeight = value; }
+        public double DiePitchX { get => diePitchX; set => diePitchX = value; }
+        public double DiePitchY { get => diePitchY; set => diePitchY = value; }
+        public double ScribeLaneX { get => scribeLaneX; set => scribeLaneX = value; }
+        public double ScribeLaneY { get => scribeLaneY; set => scribeLaneY = value; }
+        public double SampleCenterLocationX { get => sampleCenterLocationX; set => sampleCenterLocationX = value; }
+        public double SampleCenterLocationY { get => sampleCenterLocationY; set => sampleCenterLocationY = value; }
+        public int OriginDieX { get => originDieX; set => originDieX = value; }
+        public int OriginDieY { get => originDieY; set => originDieY = value; }
 
         #endregion
 
