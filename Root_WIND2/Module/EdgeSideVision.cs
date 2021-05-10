@@ -442,6 +442,7 @@ namespace Root_WIND2.Module
 		}
 
 		public EdgeSideVision(string id, IEngineer engineer)
+
 		{ 
 			base.InitBase(id, engineer);
 			m_waferSize = new InfoWafer.WaferSize(id, false, false);
