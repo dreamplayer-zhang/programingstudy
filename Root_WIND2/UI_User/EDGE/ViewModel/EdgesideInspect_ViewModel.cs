@@ -143,11 +143,17 @@ namespace Root_WIND2.UI_User
 			dataViewerVM = new Database_DataView_VM();
 			this.DataViewerVM.SelectedCellsChanged += SelectedCellsChanged_Callback;
 
-			if (GlobalObjects.Instance.GetNamed<WorkManager>("edgeTopInspection") != null)
+			if (GlobalObjects.Instance.GetNamed<WorkManager>("edgeInspection") != null)
 			{
-				GlobalObjects.Instance.GetNamed<WorkManager>("edgeTopInspection").InspectionDone += WorkEventManager_InspectionDone;
-				GlobalObjects.Instance.GetNamed<WorkManager>("edgeTopInspection").IntegratedProcessDefectDone += WorkEventManager_IntegratedProcessDefectDone;
+				GlobalObjects.Instance.GetNamed<WorkManager>("edgeInspection").InspectionDone += WorkEventManager_InspectionDone;
+				GlobalObjects.Instance.GetNamed<WorkManager>("edgeInspection").IntegratedProcessDefectDone += WorkEventManager_IntegratedProcessDefectDone;
 			}
+
+			//if (GlobalObjects.Instance.GetNamed<WorkManager>("edgeTopInspection") != null)
+			//{
+			//	GlobalObjects.Instance.GetNamed<WorkManager>("edgeTopInspection").InspectionDone += WorkEventManager_InspectionDone;
+			//	GlobalObjects.Instance.GetNamed<WorkManager>("edgeTopInspection").IntegratedProcessDefectDone += WorkEventManager_IntegratedProcessDefectDone;
+			//}
 		}
 
 		private void WorkEventManager_InspectionDone(object sender, InspectionDoneEventArgs e)
@@ -161,6 +167,13 @@ namespace Root_WIND2.UI_User
 
 		private void UpdateProgress()
 		{
+			if (GlobalObjects.Instance.GetNamed<WorkManager>("edgeInspection") != null)
+			{
+				Percentage = "100";
+			}
+
+			/*
+			// 기존
 			if (GlobalObjects.Instance.Get<InspectionManagerEdge>() != null)
 			{
 				int workplaceCount = GlobalObjects.Instance.Get<InspectionManagerEdge>().GetWorkplaceCount();
@@ -172,6 +185,7 @@ namespace Root_WIND2.UI_User
 					Percentage = "Processing";
 				Percentage = proc.ToString();
 			}
+			*/
 		}
 
 		private void WorkEventManager_IntegratedProcessDefectDone(object sender, IntegratedProcessDefectDoneEventArgs e)

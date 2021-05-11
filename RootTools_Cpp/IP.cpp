@@ -2129,12 +2129,12 @@ int IP::FindEdge(BYTE* pSrc, int nMemW, int nMemH, Point ptLT, Point ptRB, int n
         nSearchLevel = 0;
     }
 
-    int nLineNum, nCount, nAverage, nProx;
-    int* pnLineAverage;
-    int nX1 = ptLT.x;
-    int nX2 = ptRB.x;
-    int nY1 = ptLT.y;
-    int nY2 = ptRB.y;
+    long nLineNum, nCount, nAverage, nProx;
+    long* pnLineAverage;
+    long nX1 = ptLT.x;
+    long nX2 = ptRB.x;
+    long nY1 = ptLT.y;
+    long nY2 = ptRB.y;
     int nMin = 255;
     int nMax = 0;
     int nEdge = 0;
@@ -2145,13 +2145,13 @@ int IP::FindEdge(BYTE* pSrc, int nMemW, int nMemH, Point ptLT, Point ptRB, int n
     {
         nLineNum = nX2 - nX1 + 1;
         nCount = nY2 - nY1 + 1;
-        pnLineAverage = new int[nLineNum];
+        pnLineAverage = new long[nLineNum];
 
-        for (int c = nX1; c <= nX2; c++)
+        for (long c = nX1; c <= nX2; c++)
         {
             nAverage = 0;
 
-            for (int r = nY1; r <= nY2; r++)
+            for (long r = nY1; r <= nY2; r++)
             {
                 nAverage += pSrc[r * nMemW + c];
             }
@@ -2170,10 +2170,10 @@ int IP::FindEdge(BYTE* pSrc, int nMemW, int nMemH, Point ptLT, Point ptRB, int n
             pnLineAverage[c - nX1] = nAverage;
         }
 
-        nProx = nMin + (int)((nMax - nMin) * nSearchLevel * 0.01);
+        nProx = nMin + (long)((nMax - nMin) * nSearchLevel * 0.01);
         nEdge = nLineNum - 1;
 
-        for (int c = 0; c < nLineNum - 1; c++)
+        for (long c = 0; c < nLineNum - 1; c++)
         {
             if ((pnLineAverage[c] >= nProx && pnLineAverage[c + 1] < nProx) || (pnLineAverage[c] <= nProx && pnLineAverage[c + 1] > nProx))
             {
@@ -2191,13 +2191,13 @@ int IP::FindEdge(BYTE* pSrc, int nMemW, int nMemH, Point ptLT, Point ptRB, int n
     {
         nLineNum = nX2 - nX1 + 1;
         nCount = nY2 - nY1 + 1;
-        pnLineAverage = new int[nLineNum];
+        pnLineAverage = new long[nLineNum];
 
-        for (int c = nX2; c >= nX1; c--)
+        for (long c = nX2; c >= nX1; c--)
         {
             nAverage = 0;
 
-            for (int r = nY1; r <= nY2; r++)
+            for (long r = nY1; r <= nY2; r++)
             {
                 nAverage += pSrc[r * nMemW + c];
             }
@@ -2216,10 +2216,10 @@ int IP::FindEdge(BYTE* pSrc, int nMemW, int nMemH, Point ptLT, Point ptRB, int n
             pnLineAverage[c - nX1] = nAverage;
         }
 
-        nProx = nMin + (int)((nMax - nMin) * nSearchLevel * 0.01);
+        nProx = nMin + (long)((nMax - nMin) * nSearchLevel * 0.01);
         nEdge = 0;
 
-        for (int c = nLineNum - 1; c > 0; c--)
+        for (long c = nLineNum - 1; c > 0; c--)
         {
             if ((pnLineAverage[c] >= nProx && pnLineAverage[c - 1] < nProx) || (pnLineAverage[c] <= nProx && pnLineAverage[c - 1] > nProx))
             {
@@ -2237,13 +2237,13 @@ int IP::FindEdge(BYTE* pSrc, int nMemW, int nMemH, Point ptLT, Point ptRB, int n
     {
         nLineNum = nY2 - nY1 + 1;
         nCount = nX2 - nX1 + 1;
-        pnLineAverage = new int[nLineNum];
+        pnLineAverage = new long[nLineNum];
 
-        for (int r = nY1; r <= nY2; r++)
+        for (long r = nY1; r <= nY2; r++)
         {
             nAverage = 0;
 
-            for (int c = nX1; c <= nX2; c++)
+            for (long c = nX1; c <= nX2; c++)
             {
                 nAverage += pSrc[r * nMemW + c];
             }
@@ -2262,10 +2262,10 @@ int IP::FindEdge(BYTE* pSrc, int nMemW, int nMemH, Point ptLT, Point ptRB, int n
             pnLineAverage[r - nY1] = nAverage;
         }
 
-        nProx = nMin + (int)((nMax - nMin) * nSearchLevel * 0.01);
+        nProx = nMin + (long)((nMax - nMin) * nSearchLevel * 0.01);
         nEdge = nLineNum - 1;
 
-        for (int r = 0; r < nLineNum - 1; r++)
+        for (long r = 0; r < nLineNum - 1; r++)
         {
             if ((pnLineAverage[r] >= nProx && pnLineAverage[r + 1] < nProx) || (pnLineAverage[r] <= nProx && pnLineAverage[r + 1] > nProx))
             {
@@ -2283,13 +2283,13 @@ int IP::FindEdge(BYTE* pSrc, int nMemW, int nMemH, Point ptLT, Point ptRB, int n
     {
         nLineNum = nY2 - nY1 + 1;
         nCount = nX2 - nX1 + 1;
-        pnLineAverage = new int[nLineNum];
+        pnLineAverage = new long[nLineNum];
 
-        for (int r = nY2; r >= nY1; r--)
+        for (long r = nY2; r >= nY1; r--)
         {
             nAverage = 0;
 
-            for (int c = nX1; c <= nX2; c++)
+            for (long c = nX1; c <= nX2; c++)
             {
                 nAverage += pSrc[r * nMemW + c];
             }
@@ -2308,10 +2308,10 @@ int IP::FindEdge(BYTE* pSrc, int nMemW, int nMemH, Point ptLT, Point ptRB, int n
             pnLineAverage[r - nY1] = nAverage;
         }
 
-        nProx = nMin + (int)((nMax - nMin) * nSearchLevel * 0.01);
+        nProx = nMin + (long)((nMax - nMin) * nSearchLevel * 0.01);
         nEdge = 0;
 
-        for (int r = nLineNum - 1; r > 0; r--)
+        for (long r = nLineNum - 1; r > 0; r--)
         {
             if ((pnLineAverage[r] >= nProx && pnLineAverage[r - 1] < nProx) || (pnLineAverage[r] <= nProx && pnLineAverage[r - 1] > nProx))
             {
