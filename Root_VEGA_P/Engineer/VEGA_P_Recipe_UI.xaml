@@ -9,20 +9,35 @@
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="2*"/>
+            <ColumnDefinition Width="1*"/>
             <ColumnDefinition Width="Auto"/>
-            <ColumnDefinition Width="5*"/>
+            <ColumnDefinition Width="2*"/>
         </Grid.ColumnDefinitions>
-        <StackPanel Grid.Column="0" Orientation="Vertical">
-            <Label Content="Recipe" Margin="2"/>
-            <Button x:Name="buttonOpen" Content="Open" Margin="2" Click="buttonOpen_Click"/>
-            <Button x:Name="buttonSave" Content="Save" Margin="2" Click="buttonSave_Click"/>
-            <Button x:Name="buttonClear" Content="Clear" Margin="2" Click="buttonClear_Click"/>
-            <ComboBox x:Name="comboBoxModule" Margin="2,12,2,2" SelectionChanged="comboBoxModule_SelectionChanged"/>
-            <ComboBox x:Name="comboBoxModuleRun" Margin="2" SelectionChanged="comboBoxModuleRun_SelectionChanged"/>
-            <Button x:Name="buttonAdd" Content="Add" Margin="2" Visibility="Hidden" Click="buttonAdd_Click"/>
-        </StackPanel>
+        <GroupBox Grid.Column="0" BorderBrush="Black" BorderThickness="1" Margin="3">
+            <GroupBox.Header>
+                <TextBlock Text="Recipe" Foreground="Black" FontWeight="Bold" />
+            </GroupBox.Header>
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Button Grid.Column="0" x:Name="buttonOpen" Content="Open" Height="24" Margin="2" Click="buttonOpen_Click"/>
+                    <Button Grid.Column="1" x:Name="buttonSave" Content="Save" Height="24" Margin="2" Click="buttonSave_Click"/>
+                    <Button Grid.Column="2" x:Name="buttonClear" Content="Clear" Height="24" Margin="2" Click="buttonClear_Click"/>
+                </Grid>
+                <tree:TreeUI Grid.Row="1" x:Name="treeRootUI" Margin="2"/>
+            </Grid>
+        </GroupBox>
         <GridSplitter Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="AliceBlue" ShowsPreview="True" Width="3"/>
-        <tree:TreeUI Grid.Column="2" x:Name="treeRootUI" Margin="2"/>
+        <Grid Grid.Column="2"  Background="AliceBlue">
+            <Grid x:Name="gridDrawing" HorizontalAlignment="Center" VerticalAlignment="Center" Background="AliceBlue"/>
+        </Grid>
     </Grid>
 </UserControl>
