@@ -39,13 +39,19 @@ namespace Root_VEGA_P.Engineer
             ui.AddInfoPod(InfoPod.ePod.EIP_Cover.ToString(), true, m_handler.m_loadport);
             ui.AddInfoPod(InfoPod.ePod.EIP_Plate.ToString(), true, m_handler.m_loadport);
             ui.AddInfoPod(InfoPod.ePod.EOP_Door.ToString(), true, m_handler.m_loadport);
-            ui = InitModule(m_handler.m_EIP_Cover, -250, -100);
+            ui = InitModule(m_handler.m_EIP_Cover, -300, -120);
             ui.AddInfoPod(InfoPod.ePod.EIP_Cover.ToString(), false, m_handler.m_EIP_Cover);
-            ui = InitModule(m_handler.m_EIP_Plate, -250, 0);
+            ui = InitModule(m_handler.m_EIP_Plate, -300, 0);
             ui.AddInfoPod(InfoPod.ePod.EIP_Plate.ToString(), false, m_handler.m_EIP_Plate);
-            ui = InitModule(m_handler.m_EOP, -250, 100);
+            ui = InitModule(m_handler.m_EOP, -300, 120);
             ui.AddInfoPod(InfoPod.ePod.EOP_Dome.ToString(), false, m_handler.m_EOP.m_dome);
             ui.AddInfoPod(InfoPod.ePod.EOP_Door.ToString(), false, m_handler.m_EOP.m_door);
+            ui = InitModule(m_handler.m_holder, 300, -100);
+            ui.AddInfoPod(InfoPod.ePod.EIP_Cover.ToString(), false, m_handler.m_holder);
+            ui.AddInfoPod(InfoPod.ePod.EIP_Plate.ToString(), false, m_handler.m_holder);
+            ui = InitModule(m_handler.m_vision, 300, 50);
+            ui.AddInfoPod(InfoPod.ePod.EIP_Cover.ToString(), false, m_handler.m_vision);
+            ui.AddInfoPod(InfoPod.ePod.EIP_Plate.ToString(), false, m_handler.m_vision);
         }
 
         Recipe_Module_UI InitModule(ModuleBase module, int px, int py)
