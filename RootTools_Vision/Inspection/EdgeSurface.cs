@@ -71,12 +71,15 @@ namespace RootTools_Vision
 			EdgeSurfaceParameterBase paramBottom = parameterEdge.EdgeParamBaseBtm;
 			EdgeSurfaceParameterBase paramSide = parameterEdge.EdgeParamBaseSide;
 
+			WorkEventManager.OnInspectionStart(this.currentWorkplace, new InspectionStartArgs());
+
 			if (paramTop.ChR)
 				DoColorInspection_New(paramTop, 0);
 			if (paramTop.ChG)
 				DoColorInspection_New(paramTop, 1);
 			if (paramTop.ChB)
 				DoColorInspection_New(paramTop, 2);
+			WorkEventManager.OnInspectionDone(this.currentWorkplace, new InspectionDoneEventArgs(new List<CRect>())); // 나중에 ProcessDefect쪽 EVENT로...
 
 			if (paramBottom.ChR)
 				DoColorInspection_New(paramBottom, 3);
@@ -84,6 +87,7 @@ namespace RootTools_Vision
 				DoColorInspection_New(paramBottom, 4);
 			if (paramBottom.ChB)
 				DoColorInspection_New(paramBottom, 5);
+			WorkEventManager.OnInspectionDone(this.currentWorkplace, new InspectionDoneEventArgs(new List<CRect>())); // 나중에 ProcessDefect쪽 EVENT로...
 
 			if (paramSide.ChR)
 				DoColorInspection_New(paramSide, 6);
@@ -91,8 +95,6 @@ namespace RootTools_Vision
 				DoColorInspection_New(paramSide, 7);
 			if (paramSide.ChB)
 				DoColorInspection_New(paramSide, 8);
-
-
 			WorkEventManager.OnInspectionDone(this.currentWorkplace, new InspectionDoneEventArgs(new List<CRect>())); // 나중에 ProcessDefect쪽 EVENT로...
 			return;
 

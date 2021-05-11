@@ -65,7 +65,7 @@
         <Border VerticalAlignment="Center" HorizontalAlignment="Center" Width="200" Height="35"
                 Visibility="{Binding Path=Progress, Converter= {StaticResource ConverterVisibleProgresss}}">
             <TextBlock TextElement.Foreground="Black"
-                    Text="{Binding Percentage, StringFormat={}{0:0}%}"
+                    Text="{Binding Percentage}"
                     TextAlignment="Center" FontSize="30"></TextBlock>
         </Border>
 
