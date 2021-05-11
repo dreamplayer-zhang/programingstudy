@@ -227,6 +227,8 @@
     <Compile Include="Engineer\WIND2EventArgs.cs" />
     <Compile Include="Engineer\WIND2EventManager.cs" />
     <Compile Include="MainWindow_ViewModel.cs" />
+    <Compile Include="Module\InspectionManagerFrontside.cs" />
+    <Compile Include="Module\Vision.cs" />
     <Compile Include="MvvmTools\Converter.cs" />
     <Compile Include="MvvmTools\Helper.cs" />
     <Compile Include="MvvmTools\ObservableObject.cs" />
