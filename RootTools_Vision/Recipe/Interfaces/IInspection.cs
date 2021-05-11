@@ -6,8 +6,7 @@ using System.Threading.Tasks;
 
 namespace RootTools_Vision
 {
-    public interface IFrontsideInspection : IInspection
+    public interface IInspection
     {
-
     }
 }

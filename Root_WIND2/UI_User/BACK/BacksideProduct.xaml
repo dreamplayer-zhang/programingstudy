@@ -229,7 +229,11 @@
             <GroupBox Header="Scan Information"
                   Margin="0,4,4,4"
                   Style="{StaticResource main_view_groupbox}">
-                <StackPanel Orientation="Vertical"  Margin="12, 12, 12, 12">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition />
+                        <RowDefinition />
+                    </Grid.RowDefinitions>
                     <Grid HorizontalAlignment="Stretch" Style="{StaticResource group_box_grid_item}">
                         <Grid.ColumnDefinitions >
                             <ColumnDefinition Width="120"/>
@@ -240,31 +244,8 @@
                         </ComboBox>
                     </Grid>
 
-                    <Grid HorizontalAlignment="Stretch" Style="{StaticResource group_box_grid_item}">
-                        <Grid.ColumnDefinitions >
-                            <ColumnDefinition Width="120"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
-                        <TextBlock Text="Wafer Size[mm]" Style="{StaticResource group_box_item_name_text}"/>
-                        <TextBox Grid.Column="1" IsEnabled="False" Text="{Binding WaferSize}" HorizontalContentAlignment="Center"/>
-                    </Grid>
-
-                    <Grid HorizontalAlignment="Stretch" Style="{StaticResource group_box_grid_item}">
-                        <Grid.ColumnDefinitions >
-                            <ColumnDefinition Width="120"/>
-                            <ColumnDefinition Width="24"/>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="24"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
-                        <TextBlock Text="Resolution[um]" Style="{StaticResource group_box_item_name_text}"/>
-                        <TextBlock Text="X" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                        <TextBox Grid.Column="2" IsEnabled="False" Text="{Binding CamResolutionX}" HorizontalContentAlignment="Center"/>
-                        <TextBlock Text="Y" Grid.Column="3"  HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                        <TextBox Grid.Column="4" IsEnabled="False" Text="{Binding CamResolutionY}" HorizontalContentAlignment="Center"/>
-                    </Grid>
-                </StackPanel>
-
+                    <vision:DataListView Grid.Row="1" Margin="4" DataContext="{Binding CamInfoDataListVM}" />
+                </Grid>
             </GroupBox>
         </StackPanel>
     </Grid>

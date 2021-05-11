@@ -8,6 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace RootTools_Vision
 {
@@ -287,14 +288,38 @@ namespace RootTools_Vision
                 di.Create();
 
             ArrayList inputImage = new ArrayList();
-            for (int i = 0; i < defectList.Count; i++)
+            int tiffWidth = 640;
+            int tiffHeight = 480;
+
+            //Parallel.ForEach(defectList, defect =>
+            foreach(Defect defect in defectList)
             {
-				MemoryStream image = new MemoryStream();
-                System.Drawing.Bitmap bitmap = Tools.CovertBufferToBitmap(sharedBuffer, defectList[i].GetRect());
+                Rect defectRect = new Rect(
+                    (defect.p_rtDefectBox.Left + defect.p_rtDefectBox.Right) / 2 - tiffWidth / 2,
+                    (defect.p_rtDefectBox.Top + defect.p_rtDefectBox.Bottom) / 2 - tiffHeight / 2,
+                    tiffWidth,
+                    tiffHeight);
+
+                MemoryStream image = new MemoryStream();
+                System.Drawing.Bitmap bitmap = Tools.CovertBufferToBitmap(sharedBuffer, defectRect);
                 //System.Drawing.Bitmap NewImg = new System.Drawing.Bitmap(bitmap);
                 bitmap.Save(image, ImageFormat.Tiff);
                 inputImage.Add(image);
             }
+            //for (int i = 0; i < defectList.Count; i++)
+            //{
+            //    Rect defectRect = new Rect(
+            //        (defectList[i].p_rtDefectBox.Left + defectList[i].p_rtDefectBox.Right) / 2 - tiffWidth / 2,
+            //        (defectList[i].p_rtDefectBox.Top + defectList[i].p_rtDefectBox.Bottom) / 2 - tiffHeight / 2,
+            //        tiffWidth,
+            //        tiffHeight);
+
+            //    MemoryStream image = new MemoryStream();
+            //    System.Drawing.Bitmap bitmap = Tools.CovertBufferToBitmap(sharedBuffer, defectRect);
+            //    //System.Drawing.Bitmap NewImg = new System.Drawing.Bitmap(bitmap);
+            //    bitmap.Save(image, ImageFormat.Tiff);
+            //    inputImage.Add(image);
+            //}
 
             ImageCodecInfo info = null;
             foreach (ImageCodecInfo ice in ImageCodecInfo.GetImageEncoders())
