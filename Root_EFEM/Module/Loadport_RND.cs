@@ -578,6 +578,7 @@ namespace Root_EFEM.Module
         {
             get
             {
+                return true;
                 return m_diPlaced.p_bIn;
             }
         }
@@ -585,6 +586,7 @@ namespace Root_EFEM.Module
         {
             get
             {
+                return true;
                 return m_diPresent.p_bIn;
             }
         }

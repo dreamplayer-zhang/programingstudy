@@ -33,6 +33,12 @@
 					<ToggleButton Content="Draw Edge Box" 
 								  Style="{StaticResource SetupPanelToggleBtn}"
 								  IsChecked="{Binding EdgeDrawMode}"/>
+					<ToggleButton Content="Draw Edge Box(Left)" 
+								  Style="{StaticResource SetupPanelToggleBtn}"
+								  IsChecked="{Binding EdgeDrawModeLeft}"/>
+					<ToggleButton Content="Draw Edge Box(Right)" 
+								  Style="{StaticResource SetupPanelToggleBtn}"
+								  IsChecked="{Binding EdgeDrawModeRight}"/>
 					<Button Content="Save Edge Box"
                             Command="{Binding commandSaveEdgeBox}"
                             Style="{StaticResource SetupPanelBtn}"/>

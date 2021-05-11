@@ -67,6 +67,80 @@ namespace RootTools_Vision
 			if (this.currentWorkplace.Index == 0)
 				return;
 
+			EdgeSurfaceParameterBase paramTop = parameterEdge.EdgeParamBaseTop;
+			EdgeSurfaceParameterBase paramBottom = parameterEdge.EdgeParamBaseBtm;
+			EdgeSurfaceParameterBase paramSide = parameterEdge.EdgeParamBaseSide;
+
+			WorkEventManager.OnInspectionStart(this.currentWorkplace, new InspectionStartArgs());
+
+			if (paramTop.ChR)
+				DoColorInspection_New(paramTop, 0);
+			if (paramTop.ChG)
+				DoColorInspection_New(paramTop, 1);
+			if (paramTop.ChB)
+				DoColorInspection_New(paramTop, 2);
+			WorkEventManager.OnInspectionDone(this.currentWorkplace, new InspectionDoneEventArgs(new List<CRect>())); // 나중에 ProcessDefect쪽 EVENT로...
+
+			if (paramBottom.ChR)
+				DoColorInspection_New(paramBottom, 3);
+			if (paramBottom.ChG)
+				DoColorInspection_New(paramBottom, 4);
+			if (paramBottom.ChB)
+				DoColorInspection_New(paramBottom, 5);
+			WorkEventManager.OnInspectionDone(this.currentWorkplace, new InspectionDoneEventArgs(new List<CRect>())); // 나중에 ProcessDefect쪽 EVENT로...
+
+			if (paramSide.ChR)
+				DoColorInspection_New(paramSide, 6);
+			if (paramSide.ChG)
+				DoColorInspection_New(paramSide, 7);
+			if (paramSide.ChB)
+				DoColorInspection_New(paramSide, 8);
+			WorkEventManager.OnInspectionDone(this.currentWorkplace, new InspectionDoneEventArgs(new List<CRect>())); // 나중에 ProcessDefect쪽 EVENT로...
+			return;
+
+			// Old
+			OriginRecipe originRecipe = recipe.GetItem<OriginRecipe>();
+
+			// Top
+			int countTop = (int)((originRecipe.OriginHeight - paramTop.StartPosition) / paramTop.ROIHeight); // 검사 영역 개수
+			Parallel.For(0, countTop, i =>
+			{
+				if (paramTop.ChR)
+					DoColorInspection(i, paramTop, 0);  //R
+				if (paramTop.ChG)
+					DoColorInspection(i, paramTop, 1);  //G
+				if (paramTop.ChB)
+					DoColorInspection(i, paramTop, 2);  //B
+			});
+
+			// Bottom
+			int countBottom = (int)((originRecipe.OriginHeight - paramBottom.StartPosition) / paramBottom.ROIHeight); // 검사 영역 개수
+			Parallel.For(0, countBottom, i =>
+			{
+				if (paramBottom.ChR)
+					DoColorInspection(i, paramBottom, 3); //R
+				if (paramBottom.ChG)
+					DoColorInspection(i, paramBottom, 4); //G
+				if (paramBottom.ChB)
+					DoColorInspection(i, paramBottom, 5); //B
+			});
+
+			// Side
+			int countSide = (int)((originRecipe.OriginHeight - paramSide.StartPosition) / paramSide.ROIHeight); // 검사 영역 개수			
+			Parallel.For(0, countSide, i =>
+			{
+				if (paramSide.ChR)
+					DoColorInspection(i, paramSide, 6); //R
+				if (paramSide.ChG)
+					DoColorInspection(i, paramSide, 7); //G
+				if (paramSide.ChB)
+					DoColorInspection(i, paramSide, 8); //B
+			});
+
+			WorkEventManager.OnInspectionDone(this.currentWorkplace, new InspectionDoneEventArgs(new List<CRect>())); // 나중에 ProcessDefect쪽 EVENT로...
+
+			/*
+			// 기존
 			EdgeSurfaceParameterBase param = parameterEdge.EdgeParamBaseTop;
 			if (this.currentWorkplace.MapIndexX == (int)EdgeMapPositionX.Top)
 				param = parameterEdge.EdgeParamBaseTop;
@@ -75,74 +149,195 @@ namespace RootTools_Vision
 			else if (this.currentWorkplace.MapIndexX == (int)EdgeMapPositionX.Btm)
 				param = parameterEdge.EdgeParamBaseBtm;
 
-			// test
 			if (this.currentWorkplace.Index == 1)
-			{ 
-				DoColorInspection(param);
-				return;
-			}	
+				DoColorInspection(0, param, IMAGE_CHANNEL.R_GRAY);
 
-			if (param.ChR)
-				DoColorInspection(this.GetWorkplaceBuffer(IMAGE_CHANNEL.R_GRAY), param);
-			if (param.ChG)
-				DoColorInspection(this.GetWorkplaceBuffer(IMAGE_CHANNEL.G), param);
-			if (param.ChB)
-				DoColorInspection(this.GetWorkplaceBuffer(IMAGE_CHANNEL.B), param);
+			//OriginRecipe originRecipe = recipe.GetItem<OriginRecipe>();
+			//int count = (int)(originRecipe.OriginHeight / param.ROIHeight);	// 검사 영역 개수
+
+			//for (int i = 0; i < count; i++)
+			//{
+			//	if (param.ChR)
+			//		DoColorInspection(i, param, IMAGE_CHANNEL.R_GRAY);
+			//	if (param.ChG)
+			//		DoColorInspection(i, param, IMAGE_CHANNEL.G);
+			//	if (param.ChB)
+			//		DoColorInspection(i, param, IMAGE_CHANNEL.B);
+			//}
+
+			//if (param.ChR)
+			//	DoColorInspection(this.GetWorkplaceBuffer(IMAGE_CHANNEL.R_GRAY), param);
+			//if (param.ChG)
+			//	DoColorInspection(this.GetWorkplaceBuffer(IMAGE_CHANNEL.G), param);
+			//if (param.ChB)
+			//	DoColorInspection(this.GetWorkplaceBuffer(IMAGE_CHANNEL.B), param);
 
 			WorkEventManager.OnInspectionDone(this.currentWorkplace, new InspectionDoneEventArgs(new List<CRect>())); // 나중에 ProcessDefect쪽 EVENT로...
+			*/
 		}
 
-		private void DoColorInspection(EdgeSurfaceParameterBase param)
+		private void DoColorInspection_New(EdgeSurfaceParameterBase param, int channelIndex)
 		{
-			OriginRecipe originRecipe = recipe.GetItem<OriginRecipe>();
+			if (this.GetWorkplaceBufferByIndex(channelIndex) == null)
+				return;
 
-			int startX = originRecipe.OriginX;
-			int startY = param.StartPosition;
+			OriginRecipe originRecipe = recipe.GetItem<OriginRecipe>();
 			int width = originRecipe.OriginWidth;
 			int height = param.ROIHeight;
-			int length = width - startX;
 
-			byte[] roi = new byte[length * height];
-
-			for (int i = startY; i < startY + height; i++)
+			int countTop = (int)((originRecipe.OriginHeight - param.StartPosition) / param.ROIHeight); // 검사 영역 개수
+			Parallel.For(0, countTop, i =>
 			{
-				int startIdx = (width * i) + originRecipe.OriginX;
-				int dstIdx = length * (i - startY);
+				int ptLeft = 0;
+				int ptTop = param.StartPosition + (i * height);
+				int ptBtm = ptTop + height;
 
-				//for (int j = startX; j < originRecipe.OriginWidth; j++)
-				Array.Copy(this.GetWorkplaceBuffer(IMAGE_CHANNEL.R_GRAY), startIdx, roi, dstIdx, length);
-			}
+				// 검사영역이 Origin Height를 넘어가는 경우
+				if (ptBtm > originRecipe.OriginHeight)
+				{
+					height = originRecipe.OriginHeight - ptTop;
+					ptBtm = originRecipe.OriginHeight;
+				}
 
-			System.Drawing.Bitmap bitmap = Tools.CovertArrayToBitmap(roi, length, height, 1);
-			Tools.SaveImageJpg(bitmap, @"D:\test.jpg", 50);
+				int bufferLength = width * height;
+				byte[] inspectionROI = new byte[bufferLength];
+				for (int y = ptTop; y < ptBtm; y++)
+				{
+					int startIdx = width * y;
+					int dstIdx = width * (y - ptTop);
+					Array.Copy(this.GetWorkplaceBufferByIndex(channelIndex), startIdx, inspectionROI, dstIdx, width);
+				}
+
+				#region [Inspection]
+
+				int lastEdge = CLR_IP.Cpp_FindEdge(inspectionROI, width, height, 0, 0, (width - 1), (height - 1), 0, param.EdgeSearchLevel);
+				//int lastEdge = FindEdge(arrSrc, width, height, searchLevel);
+				int startPtX = lastEdge;    // Edge부터 검사 시작
+
+				// profile 생성
+				List<int> temp = new List<int>();
+				List<int> profile = new List<int>();
+				for (long x = 0; x < width; x++)
+				{
+					temp.Clear();
+					for (long y = 0; y < bufferLength; y += width)
+					{
+						temp.Add(inspectionROI[x + y]);
+					}
+					temp.Sort();
+					profile.Add(temp[temp.Count / 2]);  // 중앙값
+				}
+
+				// Calculate diff image (original - profile)
+				byte[] diff = new byte[bufferLength];
+				for (int y = 0; y < height; y++)
+				{
+					for (int x = startPtX; x < width; x++)
+					{
+						diff[(y * width) + x] = (byte)(Math.Abs(inspectionROI[(y * width) + x] - profile[x]));
+					}
+				}
+
+				// Threshold and Labeling
+				byte[] thresh = new byte[bufferLength];
+				CLR_IP.Cpp_Threshold(diff, thresh, width, height, false, param.Threshold);
+				var label = CLR_IP.Cpp_Labeling(diff, thresh, width, height, true);
+
+				double resolution = 1.67; //this.currentWorkplace.CameraInfo.TargetResX;
+				int defectSizeMin = param.DefectSizeMin;
+				int defectSizeMax = param.DefectSizeMax;
+				// Add defect
+				string sInspectionID = DatabaseManager.Instance.GetInspectionID();
+				for (int l = 0; l < label.Length; l++)
+				{
+					if ((label[l].area * resolution) > defectSizeMin 
+						&& (label[l].area * resolution) < defectSizeMax)
+					{
+						int defectLeft = ptLeft + label[l].boundLeft;
+						int defectTop = ptTop - label[l].boundTop;
+						int defectWidth = Math.Abs(label[l].boundRight - label[l].boundLeft);
+						int defectHeight = Math.Abs(label[l].boundBottom - label[l].boundTop);
+
+						this.currentWorkplace.AddDefect(sInspectionID,
+							10000 + (channelIndex * 100),
+							(float)(label[l].area * resolution),
+							label[l].value,
+							0,
+							CalcDegree(defectLeft + (defectHeight / 2), param),
+							defectLeft,
+							defectTop,
+							(float)(defectWidth * resolution),
+							(float)(defectHeight * resolution),
+							this.currentWorkplace.MapIndexX,
+							this.currentWorkplace.MapIndexY
+							);
+					}
+				}
+				#endregion
+			});
 		}
 
-		private void DoColorInspection(byte[] arrSrc, EdgeSurfaceParameterBase param)
+
+		private void DoColorInspection(int index, EdgeSurfaceParameterBase param, int channelIndex)
+        {
+			if (this.GetWorkplaceBufferByIndex(channelIndex) == null) 
+				return;
+			
+			OriginRecipe originRecipe = recipe.GetItem<OriginRecipe>();
+
+			int width = originRecipe.OriginWidth;
+			int height = param.ROIHeight;
+
+			int ptLeft = 0;
+			int ptTop = param.StartPosition + (index * height);
+			int ptBtm = ptTop + height;
+
+			// 검사영역이 Origin Height를 넘어가는 경우
+			if (ptBtm > originRecipe.OriginHeight)
+			{
+				height = originRecipe.OriginHeight - ptTop;
+				ptBtm = originRecipe.OriginHeight;
+			}
+
+			byte[] inspectionROI = new byte[width * height];
+			for (int i = ptTop; i < ptBtm; i++)
+			{
+				int startIdx = width * i;
+				int dstIdx = width * (i - ptTop);
+				Array.Copy(this.GetWorkplaceBufferByIndex(channelIndex), startIdx, inspectionROI, dstIdx, width);
+			}
+
+			//System.Drawing.Bitmap bitmap = Tools.CovertArrayToBitmap(inspectionROI, width, height, 1);
+			//Tools.SaveImageJpg(bitmap, @"D:\test.jpg", 50);
+			DoColorInspection(inspectionROI, ptLeft, ptTop, width, height, param);
+		}
+
+		private void DoColorInspection(byte[] arrSrc, int ptLeft, int ptTop, int width, int height, EdgeSurfaceParameterBase param)
 		{
-			int roiWidth = 500;//param.ROIWidth;
-			int roiHeight = param.ROIHeight;
+			//OriginRecipe originRecipe = recipe.GetItem<OriginRecipe>();
+			//int width = originRecipe.OriginWidth;
+			//int height = param.ROIHeight;
+
+			int inspectionROI = width * height;
+
 			int threshold = param.Threshold;
 			int defectSizeMin = param.DefectSizeMin;
 			int defectSizeMax = param.DefectSizeMax;
 			int searchLevel = param.EdgeSearchLevel;
-			double resolution = 1.67;//param.Resolution;
-
-			if (this.currentWorkplace.Height < roiHeight)
-				roiHeight = this.currentWorkplace.Height;
-
-			int roiSize = roiWidth * roiHeight;
+			double resolution = 1;
 
 			// Search Wafer Edge
-			int lastEdge = FindEdge(arrSrc, roiWidth, roiHeight, searchLevel);
+			int lastEdge = CLR_IP.Cpp_FindEdge(arrSrc, width, height, 0, 0, (width - 1), (height - 1), 0, searchLevel);
+			//int lastEdge = FindEdge(arrSrc, width, height, searchLevel);
 			int startPtX = lastEdge;    // Edge부터 검사 시작
 
 			// profile 생성
 			List<int> temp = new List<int>();
 			List<int> profile = new List<int>();
-			for (long j = 0; j < roiWidth; j++)
+			for (long j = 0; j < width; j++)
 			{
 				temp.Clear();
-				for (long i = 0; i < roiSize; i += roiWidth)
+				for (long i = 0; i < inspectionROI; i += width)
 				{
 					temp.Add(arrSrc[j + i]);
 				}
@@ -151,28 +346,28 @@ namespace RootTools_Vision
 			}
 
 			// Calculate diff image (original - profile)
-			byte[] diff = new byte[roiSize];
-			for (int j = 0; j < roiHeight; j++)
+			byte[] diff = new byte[inspectionROI];
+			for (int j = 0; j < height; j++)
 			{
-				for (int i = startPtX; i < roiWidth; i++)
+				for (int i = startPtX; i < width; i++)
 				{
-					diff[(j * roiWidth) + i] = (byte)(Math.Abs(arrSrc[(j * roiWidth) + i] - profile[i]));
+					diff[(j * width) + i] = (byte)(Math.Abs(arrSrc[(j * width) + i] - profile[i]));
 				}
 			}
 
 			// Threshold and Labeling
-			byte[] thresh = new byte[roiSize];
-			CLR_IP.Cpp_Threshold(diff, thresh, roiWidth, roiHeight, false, threshold);
-			var label = CLR_IP.Cpp_Labeling(diff, thresh, roiWidth, roiHeight, true);
+			byte[] thresh = new byte[inspectionROI];
+			CLR_IP.Cpp_Threshold(diff, thresh, width, height, false, threshold);
+			var label = CLR_IP.Cpp_Labeling(diff, thresh, width, height, true);
 
 			// Add defect
 			string sInspectionID = DatabaseManager.Instance.GetInspectionID();
 			for (int i = 0; i < label.Length; i++)
 			{
-				if ((label[i].area * resolution) > defectSizeMin || (label[i].area * resolution) < defectSizeMax)
+				if ((label[i].area * resolution) > defectSizeMin && (label[i].area * resolution) < defectSizeMax)
 				{
-					int defectLeft = this.currentWorkplace.PositionX + label[i].boundLeft;
-					int defectTop = this.currentWorkplace.PositionY + label[i].boundTop;
+					int defectLeft = ptLeft + label[i].boundLeft;
+					int defectTop = ptTop - label[i].boundTop;
 					int defectWidth = Math.Abs(label[i].boundRight - label[i].boundLeft);
 					int defectHeight = Math.Abs(label[i].boundBottom - label[i].boundTop);
 
@@ -181,7 +376,7 @@ namespace RootTools_Vision
 						(float)(label[i].area * resolution),
 						label[i].value,
 						0,
-						CalcDegree(defectLeft + (defectHeight/2), param),
+						CalcDegree(defectLeft + (defectHeight / 2), param),
 						defectLeft,
 						defectTop,
 						(float)(defectWidth * resolution),
@@ -204,50 +399,6 @@ namespace RootTools_Vision
 			//float heightPerDegree = (param.EndNotch - param.StartNotch) / 540000;
 			//float degree = (defectY - param.StartNotch) * heightPerDegree;
 			return degree;
-		}
-
-		public int FindEdge(byte[] arrSrc, int width, int height, int searchLevel = 70)
-		{
-			int min = 256;
-			int max = 0;
-			int prox = min + (int)((max - min) * searchLevel * 0.01);
-
-			if (searchLevel >= 100)
-				prox = max;
-			else if (searchLevel <= 0)
-				prox = min;
-
-			int startPtX = 0;
-			int startPtY = 0;
-			int avg, avgNext;
-			int edge = width;
-			
-			avgNext = MeanOfYCoordinates(arrSrc, startPtY, startPtX, width, height);
-			for (int x = startPtX + 1; x < width; x++)
-			{
-				avg = avgNext;
-				avgNext = MeanOfYCoordinates(arrSrc, startPtY, x, width, height);
-
-				if ((avg >= prox && prox > avgNext) || (avg <= prox && prox < avgNext))
-				{
-					edge = x;
-					x = width + 1;
-				}
-			}
-			return edge;
-		}
-
-		public int MeanOfYCoordinates(byte[] arrSrc, int startPtY, int findPtX, int width, int height)
-		{
-			int avg = 0;
-
-			for (int y = startPtY; y < width*height; y += width)
-				avg += arrSrc[y + findPtX];
-			
-			if (avg != 0)
-				avg /= (height - startPtY + 1);
-
-			return avg;
 		}
 	}
 }

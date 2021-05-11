@@ -92,7 +92,7 @@ namespace Root_CAMELLIA.Data
             {
                 GeneralFunction.Save(dataManager.recipeDM.TeachingRD, TeachingRecipePath);
                 dataManager.recipeDM.TeachingRD.Clone(dataManager.recipeDM.MeasurementRD);
-                MessageBox.Show("Save Done!");
+                CustomMessageBox.Show("Save Done!");
             }
         }
         public void RecipeSaveAs(string path = null)
@@ -110,7 +110,7 @@ namespace Root_CAMELLIA.Data
 
                 GeneralFunction.Save(dataManager.recipeDM.TeachingRD, dialog.FileName);
                 dataManager.recipeDM.TeachingRD.Clone(dataManager.recipeDM.MeasurementRD);
-                MessageBox.Show("Save Done!");
+                CustomMessageBox.Show("Save Done!");
             }
         }
 

@@ -93,11 +93,13 @@ namespace Root_AOP01_Packing
         public Setup_Panel Setup;
         public Review_Panel Review;
         public Run_Panel Run;
+        public Dlg_RunStep Dlg_RunStep_Panel;
         #endregion
 
         #region ViewModel
         private Setup_ViewModel m_Setup;
         private Run_ViewModel m_Run;
+        public Dlg_RunStepViewModel m_Dlg_RunStepViewModel;
         #endregion
 
         public IDialogService dialogService;
@@ -114,6 +116,7 @@ namespace Root_AOP01_Packing
             dialogService.Register<Dialog_ImageOpenViewModel, Dialog_ImageOpen>();
             dialogService.Register<TK4S, TK4SModuleUI>();
             dialogService.Register<FFUModule, FFUModuleUI>();
+            dialogService.Register<Dlg_RunStepViewModel, Dlg_RunStep>();
 
             m_engineer.Init("AOP01",dialogService);
             Init_ViewModel();
@@ -127,6 +130,7 @@ namespace Root_AOP01_Packing
         {
             m_Setup = new Setup_ViewModel(this, m_engineer);
             m_Run = new Run_ViewModel(this, m_engineer);
+            m_Dlg_RunStepViewModel = new Dlg_RunStepViewModel(this, m_engineer);
         }
         void Init_UI()
         {
@@ -141,6 +145,9 @@ namespace Root_AOP01_Packing
 
             Run = new Run_Panel();
             Run.DataContext = m_Run;
+
+            Dlg_RunStep_Panel = new Dlg_RunStep();
+            Dlg_RunStep_Panel.DataContext = m_Dlg_RunStepViewModel;
 
             MainPanel.Children.Clear();
             MainPanel.Children.Add(ModeSelect);

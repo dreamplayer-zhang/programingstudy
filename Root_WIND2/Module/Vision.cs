@@ -125,6 +125,15 @@ namespace Root_WIND2.Module
             return null;
         }
 
+        public GrabModeFront GetGrabMode(int  index)
+        {
+            if(m_aGrabMode?.Count > 0)
+            {
+                return m_aGrabMode[index];
+            }
+            return null;
+        }
+
         public void ClearData()
         {
             foreach (GrabModeFront grabMode in m_aGrabMode)
@@ -200,7 +209,7 @@ namespace Root_WIND2.Module
         {
             m_memoryGroup = m_memoryPool.GetGroup(p_id);
             m_memoryMain = m_memoryGroup.CreateMemory("Main", 3, 1, 40000, 40000);
-            m_memoryMain = m_memoryGroup.CreateMemory("Layer", 1, 4, 30000, 30000); // Chip 크기 최대 30,000 * 30,000 고정 Origin ROI 메모리 할당 20.11.02 JTL 
+            m_memoryLayer = m_memoryGroup.CreateMemory("Layer", 1, 4, 30000, 30000); // Chip 크기 최대 30,000 * 30,000 고정 Origin ROI 메모리 할당 20.11.02 JTL 
         }
         #endregion
 
@@ -548,6 +557,9 @@ namespace Root_WIND2.Module
             AddModuleRunList(new Run_VisionAlign(this), true, "Run VisionAlign");
             AddModuleRunList(new Run_AutoFocus(this), false, "Run AutoFocus");
         }
+
+        
+
         #endregion
     }
 }

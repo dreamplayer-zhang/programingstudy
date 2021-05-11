@@ -214,6 +214,10 @@
       <DependentUpon>RecipeSelectionViewer.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\RecipeSelectionViewer_ViewModel.cs" />
+    <Compile Include="UserControls\DataListView.xaml.cs">
+      <DependentUpon>DataListView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UserControls\DataListView_ViewModel.cs" />
     <Compile Include="UserControls\MapViewer.xaml.cs">
       <DependentUpon>MapViewer.xaml</DependentUpon>
     </Compile>
@@ -223,6 +227,7 @@
     <Compile Include="Utility\KlarfData.cs" />
     <Compile Include="Utility\KlarfData_Lot.cs" />
     <Compile Include="SingleObject.cs" />
+    <Compile Include="Utility\PolygonController.cs" />
     <Compile Include="Utility\TempLogger.cs" />
     <Compile Include="Utility\Tools.Inspection.cs" />
     <Compile Include="WorkManager3\FixedSizeList.cs" />
@@ -279,6 +284,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UI\RecipeSelectionViewer.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UserControls\DataListView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

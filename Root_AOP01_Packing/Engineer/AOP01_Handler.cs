@@ -45,6 +45,8 @@ namespace Root_AOP01_Packing
 
         public RFID_Brooks m_RFID;
 
+        public FFU m_FFU;
+
         void InitModule()
         {
             p_moduleList = new ModuleList(m_engineer);
@@ -55,6 +57,9 @@ namespace Root_AOP01_Packing
 
             m_RFID = new RFID_Brooks("RFID", m_engineer, null);
             InitModule(m_RFID);
+
+            m_FFU = new FFU("FFU", m_engineer);
+            InitModule(m_FFU);
 
             m_tapePacker = new TapePacker("TapePacker", m_engineer);
             InitModule(m_tapePacker);
