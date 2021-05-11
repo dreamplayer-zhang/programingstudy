@@ -359,6 +359,9 @@ namespace Root_WIND2
                                     edgeSideImage.GetPtr(2),
                                 }
                                 ));
+
+                    CameraInfo camInfo = DataConverter.GrabModeToCameraInfo(engineer.m_handler.p_EdgeSideVision.GetGrabMode(recipeEdge.CameraInfoIndex));
+                    edgeInspection.SetCameraInfo(camInfo);
                 }
 
                 /*

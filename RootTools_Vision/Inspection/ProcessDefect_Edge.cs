@@ -56,8 +56,59 @@ namespace RootTools_Vision
 
 		protected override bool Execution()
 		{
-			DoProcessDefect_Edge();
+			DoProcessDefect_Edge_New();
+			//DoProcessDefect_Edge();
 			return true;
+		}
+
+		public void DoProcessDefect_Edge_New()
+		{
+			if (this.currentWorkplace.Index != 0)
+				return;
+
+			List<Defect> defectList = CollectDefectData();
+			List<Defect> mergeDefectList;
+
+			// merge dist 파라미터 통일하자
+			mergeDefectList = Tools.MergeDefect(defectList, this.recipe.GetItem<EdgeSurfaceParameter>().EdgeParamBaseTop.MergeDist);
+			foreach (Defect defect in mergeDefectList)
+				this.currentWorkplace.DefectList.Add(defect);
+
+			if (mergeDefectList.Count > 0)
+				DatabaseManager.Instance.AddDefectDataList(mergeDefectList, TableName);
+
+			string sInspectionID = DatabaseManager.Instance.GetInspectionID();
+			Settings settings = new Settings();
+			SettingItem_SetupEdgeside settings_edgeside = settings.GetItem<SettingItem_SetupEdgeside>();
+
+			// Defect Image 저장
+			////SharedBufferInfo sharedBufferInfo = GetSharedBufferInfo(int defectCode)
+			//Tools.SaveDefectImageParallel(Path.Combine(settings_edgeside.DefectImagePath, sInspectionID), mergeDefectList, sharedBufferInfo, sharedBufferInfo.ByteCnt);
+
+			if (settings_edgeside.UseKlarf)
+			{
+				KlarfData_Lot klarfData = new KlarfData_Lot();
+				Directory.CreateDirectory(settings_edgeside.KlarfSavePath);
+
+				klarfData.AddSlot(recipe.WaferMap, mergeDefectList, this.recipe.GetItem<OriginRecipe>());
+				klarfData.WaferStart(recipe.WaferMap, DateTime.Now);
+				klarfData.SetResultTimeStamp();
+				klarfData.SaveKlarf(settings_edgeside.KlarfSavePath, false);
+			}
+
+			//WorkEventManager.OnInspectionDone(this.currentWorkplace, new InspectionDoneEventArgs(new List<CRect>(), true));
+			WorkEventManager.OnIntegratedProcessDefectDone(this.currentWorkplace, new IntegratedProcessDefectDoneEventArgs());
+		}
+
+
+		private SharedBufferInfo GetSharedBufferInfo(int defectCode)
+		{
+			//int index = (defectCode / 100) - 10000;
+			//this.currentWorkplace.SharedBufferInfo.PtrList[index];
+
+			//SharedBufferInfo sharedBufferInfo = new SharedBufferInfo()
+
+			return new SharedBufferInfo();
 		}
 
 		public void DoProcessDefect_Edge()
@@ -96,7 +147,6 @@ namespace RootTools_Vision
 				Tools.SaveDefectImage(Path.Combine(settings_edgeside.DefectImagePath, sInspectionID), MergeDefectList[i], sharedBufferInfo, i + 1);
 			}
 
-			/*
 			if (settings_edgeside.UseKlarf)
 			{
 				KlarfData_Lot klarfData = new KlarfData_Lot();
@@ -110,7 +160,6 @@ namespace RootTools_Vision
 				SaveEdgesideTiff(settings_edgeside.KlarfSavePath, MergeDefectList, this.currentWorkplace.SharedBufferInfo);
 				Tools.SaveTiffImage(settings_edgeside.KlarfSavePath, MergeDefectList, this.currentWorkplace.SharedBufferInfo);
 			}
-			*/
 
 			//WorkEventManager.OnInspectionDone(this.currentWorkplace, new InspectionDoneEventArgs(new List<CRect>(), true));
 			WorkEventManager.OnIntegratedProcessDefectDone(this.currentWorkplace, new IntegratedProcessDefectDoneEventArgs());
@@ -284,6 +333,24 @@ namespace RootTools_Vision
 
 			ep.Param[1] = new EncoderParameter(System.Drawing.Imaging.Encoder.SaveFlag, Convert.ToInt32(EncoderValue.Flush));
 			img.SaveAdd(ep);
+		}
+
+		public List<Defect> CollectDefectData()
+		{
+			List<Defect> DefectList = new List<Defect>();
+
+			int index = 0;
+			foreach (Workplace workplace in workplaceBundle)
+			{
+				if (workplace.DefectList == null) continue;
+
+				foreach (Defect defect in workplace.DefectList)
+				{
+					defect.m_nDefectIndex = index++;
+					DefectList.Add(defect);
+				}
+			}
+			return DefectList;
 		}
 
 		public List<Defect> CollectDefectData(int chipX)

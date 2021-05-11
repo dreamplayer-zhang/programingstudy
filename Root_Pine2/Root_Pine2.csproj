@@ -182,7 +182,8 @@
     <Compile Include="Module\Boats.cs" />
     <Compile Include="Module\InfoStrip.cs" />
     <Compile Include="Module\LoadEV.cs" />
-    <Compile Include="Module\MGZ_EV.cs" />
+    <Compile Include="Module\MagazineEV.cs" />
+    <Compile Include="Module\MagazineEVSet.cs" />
     <Compile Include="Module\Picker.cs" />
     <Compile Include="Module\Loader.cs" />
     <Compile Include="Module\Pine2.cs" />

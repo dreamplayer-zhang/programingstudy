@@ -185,6 +185,12 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Engineer\Recipe_InfoPod_UI.xaml.cs">
+      <DependentUpon>Recipe_InfoPod_UI.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Engineer\Recipe_Module_UI.xaml.cs">
+      <DependentUpon>Recipe_Module_UI.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Module\EIP_Cover.cs" />
     <Compile Include="Module\EIP_Plate.cs" />
     <Compile Include="Module\EOP.cs" />
@@ -200,11 +206,19 @@
     <Compile Include="UI\SelectMode.xaml.cs">
       <DependentUpon>SelectMode.xaml</DependentUpon>
     </Compile>
+    <Page Include="Engineer\Recipe_Module_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Engineer\VEGA_P_Engineer_UI.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Engineer\VEGA_P_Handler_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Engineer\Recipe_InfoPod_UI.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
