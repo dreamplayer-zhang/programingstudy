@@ -63,56 +63,6 @@ namespace Root_VEGA_D.Module
             //if (m_grabMode != null) m_grabMode.RunTree(tree.GetTree("Grab Mode", false), bVisible, true);
         }
 
-        string ConnectRADS()
-        {
-            Camera_Basler camRADS = (Camera_Basler)m_module.CamRADS;
-
-            if (m_grabMode.pUseRADS && m_module.RADSControl.p_IsRun == false)
-            {
-                m_module.RADSControl.m_timer.Start();
-                m_module.RADSControl.p_IsRun = true;
-                m_module.RADSControl.StartRADS();
-
-                StopWatch sw = new StopWatch();
-                if (camRADS.p_CamInfo._OpenStatus == false) camRADS.Connect();
-                while (camRADS.p_CamInfo._OpenStatus == false)
-                {
-                    if (sw.ElapsedMilliseconds > 15000)
-                    {
-                        sw.Stop();
-                        return "RADS Camera Not Connected";
-                    }
-                }
-                sw.Stop();
-
-                camRADS.SetMulticast();
-                camRADS.GrabContinuousShot();
-            }
-
-            return "OK";
-        }
-
-        string ConnectMainCam()
-        {
-            const int TIMEOUT_50MS = 50000;     // ms
-            const int TIMEOUT_INTERVAL = 10;    // ms
-
-            Camera_Dalsa camMain = (Camera_Dalsa)m_grabMode.m_camera;
-
-            camMain.Connect();
-
-            int nTimeOut = TIMEOUT_50MS / TIMEOUT_INTERVAL;
-            while (camMain.p_CamInfo.p_eState != eCamState.Ready)
-            {
-                if (nTimeOut-- == 0)
-                {
-                    throw new Exception("Camera Connect Error");
-                }
-                Thread.Sleep(TIMEOUT_INTERVAL);
-            }
-
-            return "OK";
-        }
 
         double m_dAFBestFocusPosY;
         int m_nAFBestGVSum;
@@ -155,8 +105,8 @@ namespace Root_VEGA_D.Module
 
                 camRADS.Grabed += m_camera_Grabed;
 
-
-                if(camRADS.p_CamInfo._IsGrabbing == false)
+                bool bPastGrabbingState = camRADS.p_CamInfo._IsGrabbing;
+                if (bPastGrabbingState == false)
                     camRADS.GrabContinuousShot();
 
                 // Z축 목표위치로 이동
@@ -167,7 +117,8 @@ namespace Root_VEGA_D.Module
 
                 camRADS.Grabed -= m_camera_Grabed;
 
-                camRADS.GrabStop();
+                if (bPastGrabbingState == false)
+                    camRADS.GrabStop();
 
                 // 중앙에 RADS 레이저가 맞춰진적이 없다면
                 if (m_nAFBestGVSum <= 0)
@@ -193,7 +144,7 @@ namespace Root_VEGA_D.Module
             Debug.WriteLine("m_camera_Grabed");
             Camera_Basler camRADS = m_module.CamRADS;
             IntPtr intPtr = camRADS.p_ImageData.GetPtr();  // R 채널 데이터
-            
+
             unsafe
             {
                 CPoint size = camRADS.p_ImageData.p_Size;
@@ -247,6 +198,61 @@ namespace Root_VEGA_D.Module
                     }
                 }
             }
+        }
+
+        string ConnectRADS()
+        {
+            Camera_Basler camRADS = (Camera_Basler)m_module.CamRADS;
+
+            if (m_grabMode.pUseRADS && m_module.RADSControl.p_IsRun == false)
+            {
+                m_module.RADSControl.m_timer.Start();
+                m_module.RADSControl.p_IsRun = true;
+                m_module.RADSControl.StartRADS();
+
+                StopWatch sw = new StopWatch();
+                if (camRADS.p_CamInfo._OpenStatus == false) camRADS.Connect();
+                while (camRADS.p_CamInfo._OpenStatus == false)
+                {
+                    if (sw.ElapsedMilliseconds > 15000)
+                    {
+                        sw.Stop();
+                        return "RADS Camera Not Connected";
+                    }
+                }
+                sw.Stop();
+
+                // Offset 설정
+                m_module.RADSControl.p_connect.SetADSOffset(m_grabMode.pRADSOffset);
+
+                // RADS 카메라 설정
+                camRADS.SetMulticast();
+                camRADS.GrabContinuousShot();
+            }
+
+            return "OK";
+        }
+
+        string ConnectMainCam()
+        {
+            const int TIMEOUT_50MS = 50000;     // ms
+            const int TIMEOUT_INTERVAL = 10;    // ms
+
+            Camera_Dalsa camMain = (Camera_Dalsa)m_grabMode.m_camera;
+
+            camMain.Connect();
+
+            int nTimeOut = TIMEOUT_50MS / TIMEOUT_INTERVAL;
+            while (camMain.p_CamInfo.p_eState != eCamState.Ready)
+            {
+                if (nTimeOut-- == 0)
+                {
+                    throw new Exception("Camera Connect Error");
+                }
+                Thread.Sleep(TIMEOUT_INTERVAL);
+            }
+
+            return "OK";
         }
 
         public override string Run()

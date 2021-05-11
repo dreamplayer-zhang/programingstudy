@@ -209,9 +209,22 @@ namespace Root_VEGA_D.Module
                 m_bUseRADS = value;
             }
         }
+        int m_nRADSOffset = 0;
+        public int pRADSOffset
+        {
+            get
+            {
+                return m_nRADSOffset;
+            }
+            set
+            {
+                m_nRADSOffset = value;
+            }
+        }
         void RunTreeRADS(Tree tree, bool bVisible, bool bReadOnly)
         {
             m_bUseRADS = tree.Set(pUseRADS, pUseRADS, "Use", "Using RADS", bVisible, false);
+            m_nRADSOffset = tree.Set(pRADSOffset, pRADSOffset, "Offset", "Offset of RADS", bVisible, false);
         }
 
         #endregion
