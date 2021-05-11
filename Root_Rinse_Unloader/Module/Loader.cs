@@ -151,6 +151,17 @@ namespace Root_Rinse_Unloader.Module
             m_axis.StartMove(ePos);
             return m_axis.WaitReady();
         }
+        public bool IsLoaderDanger()
+        {
+            if (IsLoaderDanger(m_axis.p_posCommand)) return true;
+            return IsLoaderDanger(m_axis.m_posDst);
+        }
+
+        bool IsLoaderDanger(double fPos)
+        {
+            double dPos = Math.Abs(fPos - m_axis.GetPosValue(ePos.Stotage));
+            return (dPos < Math.Abs(fPos - m_axis.GetPosValue(ePos.Roller)));
+        }
         #endregion
 
         #region Tact Time
