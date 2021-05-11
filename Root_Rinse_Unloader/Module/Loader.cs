@@ -146,11 +146,13 @@ namespace Root_Rinse_Unloader.Module
 
         public string MoveLoader(ePos ePos)
         {
+            if ((ePos == ePos.Stotage) && m_storage.IsHighPos()) return "Check Storage Position";
             if ((m_rail.m_dioPusherDown.p_bOut == false) || (m_rail.m_dioPusherDown.p_bDone == false))  return "Check Pusher Down";
             if ((m_dioPickerDown.p_bOut) || (m_dioPickerDown.p_bDone == false)) return "Check Picker Down";
             m_axis.StartMove(ePos);
             return m_axis.WaitReady();
         }
+        
         public bool IsLoaderDanger()
         {
             if (IsLoaderDanger(m_axis.p_posCommand)) return true;

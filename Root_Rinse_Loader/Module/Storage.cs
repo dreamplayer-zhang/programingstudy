@@ -277,7 +277,8 @@ namespace Root_Rinse_Loader.Module
         }
 
         double m_pulseDown = 10000; 
-        double m_posStackReady = -100000; 
+        double m_posStackReady = -100000;
+        public double m_posStackTop = 0; 
         double m_fJogScale = 1; 
         public string MoveStackReady()
         {
@@ -291,12 +292,17 @@ namespace Root_Rinse_Loader.Module
                 Thread.Sleep(500);
             }
             m_axis.Jog(m_fJogScale);
-            while (!m_stack.p_bLevel && (EQ.IsStop() == false)) Thread.Sleep(10);
+            while (!m_stack.p_bLevel && (EQ.IsStop() == false) && (m_axis.p_posCommand < m_posStackTop)) Thread.Sleep(10);
             m_posStackReady = m_axis.p_posCommand;
             m_axis.StopAxis();
             m_axis.WaitReady();
             Thread.Sleep(500);
             return "OK";
+        }
+
+        public bool IsHighPos()
+        {
+            return m_axis.p_posCommand > (m_posStackTop + 1000); 
         }
 
         public void StartStackDown()
@@ -313,7 +319,8 @@ namespace Root_Rinse_Loader.Module
         {
             m_dZ = tree.Set(m_dZ, m_dZ, "dZ", "Magazine Slot Pitch (pulse)");
             m_fJogScale = tree.Set(m_fJogScale, m_fJogScale, "Jog Scale", "Jog Move Scale (0 ~ 1)");
-            m_pulseDown = tree.Set(m_pulseDown, m_pulseDown, "Stack Down", "Stack Down (pulse)"); 
+            m_pulseDown = tree.Set(m_pulseDown, m_pulseDown, "Stack Down", "Stack Down (pulse)");
+            m_posStackTop = tree.Set(m_posStackTop, m_posStackTop, "Stack Top", "Stack Top Position (pulse)"); 
         }
         #endregion
 

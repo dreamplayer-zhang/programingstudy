@@ -215,6 +215,11 @@ namespace Root_Rinse_Unloader.Module
             return m_axis.WaitReady();
         }
 
+        public bool IsHighPos()
+        {
+            return m_axis.p_posCommand > (m_axis.GetPosValue("Stack") + 1000);
+        }
+
         double m_fJogScale = 1;
         public string MoveStackReady()
         {

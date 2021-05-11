@@ -186,6 +186,7 @@ namespace Root_Rinse_Loader.Module
 
         public string MoveLoader(ePos ePos, bool bWait = true)
         {
+            if ((ePos == ePos.Stotage) && m_storage.IsHighPos()) return "Check Storage Position"; 
             m_axis.StartMove(ePos);
             if (bWait == false) return "OK"; 
             return m_axis.WaitReady(); 
