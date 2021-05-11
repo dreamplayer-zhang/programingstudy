@@ -107,14 +107,14 @@ namespace Root_WindII
             }
 
 
-            //if (GlobalObjects.Instance.Get<InspectionManagerFrontside>() != null)
-            //{
-            //    GlobalObjects.Instance.Get<InspectionManagerFrontside>().InspectionStart += InspectionStart_Callback;
-            //    GlobalObjects.Instance.Get<InspectionManagerFrontside>().PositionDone += PositionDone_Callback;
-            //    GlobalObjects.Instance.Get<InspectionManagerFrontside>().InspectionDone += InspectionDone_Callback;
-            //    GlobalObjects.Instance.Get<InspectionManagerFrontside>().ProcessDefectWaferStart += ProcessDefectWaferStart_Callback;
-            //    GlobalObjects.Instance.Get<InspectionManagerFrontside>().IntegratedProcessDefectDone += ProcessDefectWaferDone_Callback;
-            //}
+            if (GlobalObjects.Instance.Get<InspectionManagerFrontside>() != null)
+            {
+                GlobalObjects.Instance.Get<InspectionManagerFrontside>().InspectionStart += InspectionStart_Callback;
+                GlobalObjects.Instance.Get<InspectionManagerFrontside>().PositionDone += PositionDone_Callback;
+                GlobalObjects.Instance.Get<InspectionManagerFrontside>().InspectionDone += InspectionDone_Callback;
+                GlobalObjects.Instance.Get<InspectionManagerFrontside>().ProcessDefectWaferStart += ProcessDefectWaferStart_Callback;
+                GlobalObjects.Instance.Get<InspectionManagerFrontside>().IntegratedProcessDefectDone += ProcessDefectWaferDone_Callback;
+            }
 
             this.p_DataViewer_VM.SelectedCellsChanged += SelectedCellsChanged_Callback;
 
@@ -189,11 +189,11 @@ namespace Root_WindII
                     WIND2EventManager.SnapDone += SnapDone_Callback;
                 }
                     
-                //if (GlobalObjects.Instance.Get<InspectionManagerFrontside>() != null)
-                //{
-                //    GlobalObjects.Instance.Get<InspectionManagerFrontside>().WorkplaceStateChanged += WorkplaceStateChanged_Callback;
-                //    WIND2EventManager.SnapDone += SnapDone_Callback;
-                //}
+                if (GlobalObjects.Instance.Get<InspectionManagerFrontside>() != null)
+                {
+                    GlobalObjects.Instance.Get<InspectionManagerFrontside>().WorkplaceStateChanged += WorkplaceStateChanged_Callback;
+                    WIND2EventManager.SnapDone += SnapDone_Callback;
+                }
                     
             });
         }
@@ -207,11 +207,11 @@ namespace Root_WindII
                     WIND2EventManager.SnapDone -= SnapDone_Callback;
                 }
 
-                //if (GlobalObjects.Instance.Get<InspectionManagerFrontside>() != null)
-                //{
-                //    GlobalObjects.Instance.Get<InspectionManagerFrontside>().WorkplaceStateChanged -= WorkplaceStateChanged_Callback;
-                //    WIND2EventManager.SnapDone -= SnapDone_Callback;
-                //}
+                if (GlobalObjects.Instance.Get<InspectionManagerFrontside>() != null)
+                {
+                    GlobalObjects.Instance.Get<InspectionManagerFrontside>().WorkplaceStateChanged -= WorkplaceStateChanged_Callback;
+                    WIND2EventManager.SnapDone -= SnapDone_Callback;
+                }
             });
         }
 
@@ -229,11 +229,11 @@ namespace Root_WindII
                 return;
 
                 //GlobalObjects.Instance.Get<InspectionManagerFrontside>().RemoteStart();
-                //this.ImageViewerVM.ClearObjects();
-                //if (GlobalObjects.Instance.Get<InspectionManagerFrontside>() != null)
-                //{
-                //    GlobalObjects.Instance.Get<InspectionManagerFrontside>().Start(WORK_TYPE.SNAP);
-                //}
+                this.ImageViewerVM.ClearObjects();
+                if (GlobalObjects.Instance.Get<InspectionManagerFrontside>() != null)
+                {
+                    GlobalObjects.Instance.Get<InspectionManagerFrontside>().Start(WORK_TYPE.SNAP);
+                }
             });
         }
 
@@ -276,10 +276,10 @@ namespace Root_WindII
                     GlobalObjects.Instance.GetNamed<WorkManager>("frontInspection").Stop();
                 }
 
-                //if (GlobalObjects.Instance.Get<InspectionManagerFrontside>() != null)
-                //{
-                //   GlobalObjects.Instance.Get<InspectionManagerFrontside>().Stop();
-                //}
+                if (GlobalObjects.Instance.Get<InspectionManagerFrontside>() != null)
+                {
+                   GlobalObjects.Instance.Get<InspectionManagerFrontside>().Stop();
+                }
             });
         }
 
@@ -295,8 +295,8 @@ namespace Root_WindII
         {
             get => new RelayCommand(() =>
             {
-                //GlobalObjects.Instance.Get<InspectionManagerFrontside>().RemoteProcessStart();
-                //GlobalObjects.Instance.Get<InspectionManagerFrontside>().RemoteProcessStartWork();
+                GlobalObjects.Instance.Get<InspectionManagerFrontside>().RemoteProcessStart();
+                GlobalObjects.Instance.Get<InspectionManagerFrontside>().RemoteProcessStartWork();
             });
         }
         #endregion
@@ -361,6 +361,25 @@ namespace Root_WindII
 
         private void ProcessDefectWaferDone_Callback(object obj, IntegratedProcessDefectDoneEventArgs args)
         {
+            Workplace workplace = obj as Workplace;
+
+            if (workplace == null || workplace.DefectList == null) return;
+            List<String> textList = new List<String>();
+            List<CRect> rectList = new List<CRect>();
+
+            foreach (RootTools.Database.Defect defectInfo in workplace.DefectList)
+            {
+                String text = "";
+
+                rectList.Add(new CRect((int)defectInfo.p_rtDefectBox.Left, (int)defectInfo.p_rtDefectBox.Top, (int)defectInfo.p_rtDefectBox.Right, (int)defectInfo.p_rtDefectBox.Bottom));
+                textList.Add(text);
+            }
+
+            Application.Current.Dispatcher.Invoke(DispatcherPriority.Normal, new Action(delegate
+            {
+                DrawRectDefect(rectList, textList);
+            }));
+
             Application.Current.Dispatcher.Invoke(DispatcherPriority.Normal, new Action(delegate
             {
                 DatabaseManager.Instance.SelectData();
