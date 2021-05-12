@@ -236,14 +236,16 @@ namespace Root_VEGA_D.Module
         public double m_dAFEndZ = 0;
         public double m_dAFOffset = 0;
         public int m_nAFLaserThreshold = 100;
+        public double m_dAFSearchSpeed = 1;
 
         void RunTreeAF(Tree tree, bool bVisible, bool bReadOnly)
         {
             m_bUseAF = tree.Set(m_bUseAF, m_bUseAF, "Use", "Using AF", bVisible, false);
-            m_dAFStartZ = tree.Set(m_dAFStartZ, m_dAFStartZ, "AF Start Z", "Start Z Position of AF Scan Range", bVisible, false);
-            m_dAFEndZ = tree.Set(m_dAFEndZ, m_dAFEndZ, "AF End Z", "End Z Position of AF Scan Range", bVisible, false);
-            m_dAFOffset = tree.Set(m_dAFOffset, m_dAFOffset, "AF Offset", "Applied Offset Value to Found Z Position", bVisible, false);
-            m_nAFLaserThreshold = tree.Set(m_nAFLaserThreshold, m_nAFLaserThreshold, "AF Laser Threshold", "AF Laser Threshold", bVisible, false);
+            m_dAFStartZ = tree.Set(m_dAFStartZ, m_dAFStartZ, "Start Z", "Start Z Position of AF Scan Range", bVisible, false);
+            m_dAFEndZ = tree.Set(m_dAFEndZ, m_dAFEndZ, "End Z", "End Z Position of AF Scan Range", bVisible, false);
+            m_dAFOffset = tree.Set(m_dAFOffset, m_dAFOffset, "Offset", "Applied Offset Value to Found Z Position", bVisible, false);
+            m_nAFLaserThreshold = tree.Set(m_nAFLaserThreshold, m_nAFLaserThreshold, "Laser Threshold", "AF Laser Threshold", bVisible, false);
+            m_dAFSearchSpeed = tree.Set(m_dAFSearchSpeed, m_dAFSearchSpeed, "Search Speed", "Search Speed", bVisible, false);
         }
 
         #endregion

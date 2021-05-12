@@ -119,8 +119,7 @@ namespace Root_VEGA_D.Module
             m_alid_WaferExist = m_gaf.GetALID(this, "Vision Wafer Exist", "Vision Wafer Exist");
             //m_remote.GetTools(bInit);
 
-            bool bUseRADS = false;
-            if (m_CamRADS.p_CamInfo.m_Cam != null) bUseRADS = true;
+            bool bUseRADS = true;
             p_sInfo = m_toolBox.Get(ref m_RADSControl, this, "RADSControl", bUseRADS);
         }
         #endregion

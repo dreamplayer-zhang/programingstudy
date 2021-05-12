@@ -110,7 +110,7 @@ namespace Root_VEGA_D.Module
                     camRADS.GrabContinuousShot();
 
                 // Z축 목표위치로 이동
-                if (m_module.Run(axisZ.StartMove(m_grabMode.m_dAFEndZ, 1)))
+                if (m_module.Run(axisZ.StartMove(m_grabMode.m_dAFEndZ, m_grabMode.m_dAFSearchSpeed)))
                     return p_sInfo;
                 if (m_module.Run(axisZ.WaitReady()))
                     return p_sInfo;
@@ -126,6 +126,11 @@ namespace Root_VEGA_D.Module
 
                 // Offset 적용
                 m_dAFBestFocusPosY += m_grabMode.m_dAFOffset;
+
+                if (m_module.Run(axisZ.StartMove(m_dAFBestFocusPosY)))
+                    return p_sInfo;
+                if (m_module.Run(axisZ.WaitReady()))
+                    return p_sInfo;
             }
             catch (Exception e)
             {
@@ -141,7 +146,6 @@ namespace Root_VEGA_D.Module
 
         void m_camera_Grabed(object sender, System.EventArgs e)
         {
-            Debug.WriteLine("m_camera_Grabed");
             Camera_Basler camRADS = m_module.CamRADS;
             IntPtr intPtr = camRADS.p_ImageData.GetPtr();  // R 채널 데이터
 
@@ -189,7 +193,8 @@ namespace Root_VEGA_D.Module
                             double diffNew = Math.Abs(nCenterOnImg - curPosZ);
 
                             // 새로 발견한 위치가 중심에 더 가까울 경우
-                            if (diffPast > diffNew)
+                            if (diffPast > diffNew && nSum > m_nAFBestGVSum)
+                            //if(diffPast > diffNew)
                             {
                                 m_dAFBestFocusPosY = curPosZ;
                                 m_nAFBestGVSum = nSum;
