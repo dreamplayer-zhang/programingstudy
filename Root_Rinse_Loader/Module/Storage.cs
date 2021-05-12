@@ -241,8 +241,9 @@ namespace Root_Rinse_Loader.Module
         }
         bool IsLoaderDanger()
         {
-            if (p_loader == null) return true;
-            return p_loader.IsLoaderDanger(); 
+            return false; 
+            //if (p_loader == null) return true;
+            //return p_loader.IsLoaderDanger(); 
         }
 
         Axis m_axis;
