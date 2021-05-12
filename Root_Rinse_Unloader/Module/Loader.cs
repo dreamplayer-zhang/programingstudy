@@ -233,8 +233,8 @@ namespace Root_Rinse_Unloader.Module
 
         string RunPickerLoad()
         {
-            if (Run(RunVacuum(true))) return p_sInfo;
             if (Run(RunPickerDown(true))) return p_sInfo;
+            if (Run(RunVacuum(true))) return p_sInfo;
             Thread.Sleep((int)(1000 * m_secVac));
             if (Run(RunPickerDown(false))) return p_sInfo;
             return "OK"; 
