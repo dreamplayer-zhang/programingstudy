@@ -16,6 +16,7 @@ namespace Root_VEGA_P.Engineer
             InitializeComponent();
         }
 
+        public bool m_bInitExist = false; 
         bool _bExist = false; 
         public bool p_bExist
         {
@@ -28,16 +29,24 @@ namespace Root_VEGA_P.Engineer
             }
         }
 
+        VEGA_P_Recipe m_recipe; 
         IRTRChild m_child; 
-        public void Init(string id, bool bExist, IRTRChild child)
+        public void Init(string id, bool bExist, VEGA_P_Recipe recipe, IRTRChild child)
         {
             textBlock.Text = id;
             textBlock.Foreground = Brushes.LightGray;
+            m_bInitExist = bExist; 
             p_bExist = bExist;
+            m_recipe = recipe; 
             m_child = child; 
             textBlock.PreviewMouseLeftButtonDown += TextBlock_PreviewMouseLeftButtonDown;
             textBlock.PreviewMouseMove += TextBlock_PreviewMouseMove;
             textBlock.Drop += TextBlock_Drop;
+        }
+
+        public void ClearRecipe()
+        {
+            p_bExist = m_bInitExist;
         }
 
         bool m_bDrag = false; 
@@ -62,7 +71,8 @@ namespace Root_VEGA_P.Engineer
             if (from.p_bExist == false) return; 
             if (p_bExist) return; 
             from.p_bExist = false;
-            p_bExist = true; 
+            p_bExist = true;
+            m_recipe.AddRunGetPut(from.m_child.p_id, m_child.p_id); 
         }
     }
 }

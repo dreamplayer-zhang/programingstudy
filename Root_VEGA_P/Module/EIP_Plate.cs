@@ -214,7 +214,7 @@ namespace Root_VEGA_P.Module
         {
             AddModuleRunList(new Run_Delay(this), true, "Time Delay");
             AddModuleRunList(new Run_Run(this), true, "Run Particle Counter");
-            AddModuleRunList(new Run_RunCover(this), false, "Run Cover Sol Test");
+            AddModuleRunList(new Run_RunCover(this), true, "Run Cover Sol Test");
             m_particleCounterSet.InitModuleRuns();
         }
 

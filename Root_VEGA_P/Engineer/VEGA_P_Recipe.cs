@@ -1,5 +1,7 @@
-﻿using RootTools;
+﻿using Root_VEGA_P.Module;
+using RootTools;
 using RootTools.Module;
+using RootTools.Trees;
 using System.Collections.Generic;
 
 namespace Root_VEGA_P.Engineer
@@ -21,15 +23,24 @@ namespace Root_VEGA_P.Engineer
         }
         #endregion
 
-        public ModuleRunList m_moduleRunList;
+        public void AddRunGetPut(string sChildGet, string sChildPut)
+        {
+            RTR.Run_GetPut run = m_rtr.GetModuleRunGetPut(sChildGet, sChildPut);
+            if (run == null) return; 
+            m_moduleRunList.Add(m_rtr, run);
+            m_moduleRunList.RunTree(Tree.eMode.Init); 
+        }
 
+        public ModuleRunList m_moduleRunList;
         public string m_id;
         IEngineer m_engineer;
+        RTR m_rtr; 
         Log m_log;
         public VEGA_P_Recipe(string id, IEngineer engineer)
         {
             m_id = id;
             m_engineer = engineer;
+            m_rtr = ((VEGA_P_Handler)engineer.ClassHandler()).m_rtr; 
             m_log = LogView.GetLog(id);
             m_moduleRunList = new ModuleRunList(id, engineer);
         }

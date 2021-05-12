@@ -1,5 +1,6 @@
 ﻿using Root_VEGA_P_Vision.Module;
 using RootTools.Module;
+using RootTools.Trees;
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
@@ -22,7 +23,7 @@ namespace Root_VEGA_P.Engineer
         {
             m_recipe = recipe; 
             m_module = module;
-            comboBox.ItemsSource = module.m_asModuleRun;
+            comboBox.ItemsSource = module.m_asRecipe;
             textBlockHeader.Text = module.p_id;
         }
 
@@ -30,14 +31,21 @@ namespace Root_VEGA_P.Engineer
         public void AddInfoPod(string id, bool bExist, IRTRChild child)
         {
             Recipe_InfoPod_UI ui = new Recipe_InfoPod_UI();
-            ui.Init(id, bExist, child);
+            ui.Init(id, bExist, m_recipe, child);
             m_aInfoPod.Add(ui);
             stackPanelInfoPod.Children.Add(ui); 
         }
 
+        public void ClearRecipe()
+        {
+            foreach (Recipe_InfoPod_UI ui in m_aInfoPod) ui.ClearRecipe(); 
+        }
+
         private void buttonRun_Click(object sender, RoutedEventArgs e)
         {
-            //forget
+            string sRun = (string)comboBox.SelectedItem;
+            m_recipe.m_moduleRunList.Add(m_module, sRun);
+            m_recipe.m_moduleRunList.RunTree(Tree.eMode.Init); 
         }
     }
 }
