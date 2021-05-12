@@ -159,6 +159,7 @@ namespace RootTools.Memory
             switch (p_nByte)
             {
                 case 1:
+                case 2:
                 case 3:
                 case 4: break;
                 default: return "p_nByte = " + p_nByte.ToString();
