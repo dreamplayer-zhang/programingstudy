@@ -70,15 +70,17 @@ namespace Root_WIND2.UI_User
         public readonly UI_User.FrontsideMask frontsideMask = new UI_User.FrontsideMask();
         public readonly UI_User.FrontsideSpec frontsideSpec = new UI_User.FrontsideSpec();
         public readonly UI_User.FrontsideInspect frontsideInspect = new UI_User.FrontsideInspect();
+        
 
         // BACK
         //btnBackProduct
         public readonly UI_User.BacksideProduct backsideProduct = new UI_User.BacksideProduct();
         public readonly UI_User.BacksideSetup backsideSetup = new UI_User.BacksideSetup();
         public readonly UI_User.BacksideInspect backsideInspect = new UI_User.BacksideInspect();
+        public readonly UI_User.BacksideSpec backsideSpec = new BacksideSpec();
 
-		// EDGE
-		public readonly UI_User.EdgesideSetup edgesideSetup = new UI_User.EdgesideSetup();
+        // EDGE
+        public readonly UI_User.EdgesideSetup edgesideSetup = new UI_User.EdgesideSetup();
 		public readonly UI_User.EdgesideInspect edgesideInspect = new UI_User.EdgesideInspect();
 
         // EBR
@@ -165,6 +167,12 @@ namespace Root_WIND2.UI_User
         public UI_User.BacksideSetup_ViewModel BacksideROIVM
         {
             get => this.backsideSetupVM;
+        }
+
+        private UI_User.BacksideSpec_ViewModel backsideSpecVM = new UI_User.BacksideSpec_ViewModel();
+        public UI_User.BacksideSpec_ViewModel BacksideSpecVM
+        {
+            get => this.backsideSpecVM;
         }
 
         private UI_User.BacksideInspect_ViewModel backsideInspectVM = new UI_User.BacksideInspect_ViewModel();
@@ -807,6 +815,18 @@ namespace Root_WIND2.UI_User
                 {
                     SetPage(backsideSetup);
                     backsideSetup.DataContext = backsideSetupVM;
+                });
+            }
+        }
+
+        public ICommand btnBackSpec
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    SetPage(backsideSpec);
+                    backsideSpec.DataContext = backsideSpecVM;
                 });
             }
         }

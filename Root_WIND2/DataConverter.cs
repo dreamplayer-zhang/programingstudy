@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace Root_WIND2
 {
@@ -12,6 +13,8 @@ namespace Root_WIND2
     {
         public static CameraInfo GrabModeToCameraInfo(GrabModeBase grabMode)
         {
+            if (grabMode == null) return default(CameraInfo);
+
             CameraInfo camInfo = new CameraInfo();
 
             if (grabMode == null)
@@ -25,6 +28,26 @@ namespace Root_WIND2
             camInfo.TargetResY = grabMode.m_dTargetResY_um;
 
             return camInfo;
+        }
+
+        public static List<Point> CppPointArrayToPointList(Cpp_Point[] points)
+        {
+            List<Point> result = new List<Point>();
+            foreach(var pt in points)
+            {
+                result.Add(new Point(pt.x, pt.y));
+            }
+            return result;
+        }
+
+        public static List<Point> CPointListToPointList(List<CPoint> points)
+        {
+            List<Point> result = new List<Point>();
+            foreach (var pt in points)
+            {
+                result.Add(new Point(pt.X, pt.Y));
+            }
+            return result;
         }
     }
 }

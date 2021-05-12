@@ -144,6 +144,8 @@ namespace Root_Pine2_Vision.Module
             AddModuleRunList(new Run_Remote(this), true, "Remote Run");
             AddModuleRunList(new Run_Delay(this), true, "Time Delay");
             AddModuleRunList(new Run_Grab(this), true, "Time Delay");
+            AddModuleRunList(new Run_StartVision(this), true, "Start Vision");
+            AddModuleRunList(new Run_KillVision(this), true, "Start Vision");
         }
 
         public class Run_Delay : ModuleRunBase
@@ -205,6 +207,140 @@ namespace Root_Pine2_Vision.Module
             public override string Run()
             {
                 //forget
+                return "OK";
+            }
+        }
+
+
+        System.Diagnostics.Process VisionWorks2_A = null;
+        System.Diagnostics.Process VisionWorks2_B = null;
+
+        public class Run_StartVision : ModuleRunBase
+        {
+            Vision m_module;
+
+            public Run_StartVision(Vision module)
+            {
+                m_module = module;
+                InitModuleRun(module);
+            }
+
+            string m_strVisionWorks2Path_A = "C:\\WisVision\\VisionWorks2.exe";
+            string m_strVisionWorks2Path_B = "C:\\WisVision\\VisionWorks2.exe";
+            public override ModuleRunBase Clone()
+            {
+                Run_StartVision run = new Run_StartVision(m_module);
+                run.m_strVisionWorks2Path_A = m_strVisionWorks2Path_A;
+                run.m_strVisionWorks2Path_B = m_strVisionWorks2Path_B;
+                return run;
+            }
+
+            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
+            {
+                m_strVisionWorks2Path_A = tree.Set(m_strVisionWorks2Path_A, m_strVisionWorks2Path_A, "VisionWorks2_A Path", "VisionWorks2_A Path(Full Path)", bVisible);
+                m_strVisionWorks2Path_B = tree.Set(m_strVisionWorks2Path_B, m_strVisionWorks2Path_B, "VisionWorks2_B Path", "VisionWorks2_B Path(Full Path)", bVisible);
+            }
+
+            public override string Run()
+            {
+                // 1. VisionWorks2_A
+                if (!System.IO.File.Exists(m_strVisionWorks2Path_A))
+                {
+                    System.Windows.MessageBox.Show("VisionWorks2_A 파일이 해당 경로에 없습니다.");
+                }
+                else
+                {
+                    if (m_module.VisionWorks2_A == null)
+                    {
+                        m_module.VisionWorks2_A = System.Diagnostics.Process.Start(m_strVisionWorks2Path_A);
+                        System.Windows.MessageBox.Show("VisionWorks2_A 실행 - Process ID : " + m_module.VisionWorks2_A.Id);
+                    }
+                    else
+                    {
+                        System.Windows.MessageBox.Show("VisionWorks2_A 이미 실행 중 - Process ID : " + m_module.VisionWorks2_A.Id);
+                    }
+                }
+
+                // 2. VisionWorks2_B
+                if (!System.IO.File.Exists(m_strVisionWorks2Path_B))
+                {
+                    System.Windows.MessageBox.Show("VisionWorks2_B 파일이 해당 경로에 없습니다.");
+                }
+                else
+                {
+                    if (m_module.VisionWorks2_B == null)
+                    {
+                        m_module.VisionWorks2_B = System.Diagnostics.Process.Start(m_strVisionWorks2Path_B);
+                        System.Windows.MessageBox.Show("VisionWorks2_B 실행 - Process ID : " + m_module.VisionWorks2_B.Id);
+                    }
+                    else
+                    {
+                        System.Windows.MessageBox.Show("VisionWorks2_B 이미 실행 중 - Process ID : " + m_module.VisionWorks2_B.Id);
+                    }
+                }
+
+                return "OK";
+            }
+        }
+
+        public class Run_KillVision : ModuleRunBase
+        {
+            Vision m_module;
+
+            public Run_KillVision(Vision module)
+            {
+                m_module = module;
+                InitModuleRun(module);
+            }
+
+            bool m_bKillVisionWorks2_A = true;
+            bool m_bKillVisionWorks2_B = true;
+            public override ModuleRunBase Clone()
+            {
+                Run_KillVision run = new Run_KillVision(m_module);
+                run.m_bKillVisionWorks2_A = m_bKillVisionWorks2_A;
+                run.m_bKillVisionWorks2_B = m_bKillVisionWorks2_B;
+                return run;
+            }
+
+            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
+            {
+                m_bKillVisionWorks2_A = tree.Set(m_bKillVisionWorks2_A, m_bKillVisionWorks2_A, "Kill VisionWorks2_A", "Kill VisionWorks2_A", bVisible);
+                m_bKillVisionWorks2_B = tree.Set(m_bKillVisionWorks2_B, m_bKillVisionWorks2_B, "Kill VisionWorks2_B", "Kill VisionWorks2_B", bVisible);
+            }
+
+            public override string Run()
+            {
+                // 1. VisionWorks2_A
+                if(m_bKillVisionWorks2_A)
+                {
+                    if(m_module.VisionWorks2_A != null)
+                    {
+                        m_module.VisionWorks2_A.Kill();
+                        m_module.VisionWorks2_A = null;
+                        System.Windows.MessageBox.Show("VisionWorks2_A 프로그램 종료");
+                    }
+                    else
+                    {
+                        System.Windows.MessageBox.Show("종료할 VisionWorks2_A 프로그램이 없음");
+                    }
+                }
+
+                // 2. VisionWorks2_B
+                if (m_bKillVisionWorks2_B)
+                {
+                    if (m_module.VisionWorks2_B != null)
+                    {
+                        m_module.VisionWorks2_B.Kill();
+                        m_module.VisionWorks2_B = null;
+                        System.Windows.MessageBox.Show("VisionWorks2_B 프로그램 종료");
+                    }
+                    else
+                    {
+                        System.Windows.MessageBox.Show("종료할 VisionWorks2_B 프로그램이 없음");
+                    }
+                }
+
                 return "OK";
             }
         }

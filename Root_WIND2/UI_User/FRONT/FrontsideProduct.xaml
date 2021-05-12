@@ -5,7 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Root_WIND2.UI_User"
              xmlns:WIND2="clr-namespace:Root_WIND2"
-             xmlns:Vision="clr-namespace:RootTools_Vision;assembly=RootTools_Vision"
+             xmlns:vision="clr-namespace:RootTools_Vision;assembly=RootTools_Vision"
              xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
              mc:Ignorable="d" 
              d:DesignHeight="900" d:DesignWidth="1400">
@@ -244,7 +244,7 @@
                         <TextBox Grid.Column="1" IsEnabled="False" Text="{Binding WaferSize}" HorizontalContentAlignment="Center"/>
                     </Grid>-->
 
-                    <Vision:DataListView Margin="0,14,0,0" DataContext="{Binding CamInfoDataListVM}" />
+                    <vision:DataListView Margin="0,14,0,0" DataContext="{Binding CamInfoDataListVM}" />
                     <!--<Grid HorizontalAlignment="Stretch" Style="{StaticResource group_box_grid_item}">
                         <Grid.ColumnDefinitions >
                             <ColumnDefinition Width="120"/>
