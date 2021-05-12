@@ -113,16 +113,16 @@
                                                HorizontalAlignment="Center"/>
                                 </Grid>
                             </MenuItem.Header>
-                            <MenuItem Header="New">
+                            <MenuItem Header="New" Command="{Binding MenuFileNew}">
 
                             </MenuItem>
-                            <MenuItem Header="Load">
+                            <MenuItem Header="Load" Command="{Binding MenuFileLoad}">
 
                             </MenuItem>
-                            <MenuItem Header="Save">
+                            <MenuItem Header="Save" Command="{Binding MenuFileSave}">
 
                             </MenuItem>
-                            <MenuItem Header="Save As">
+                            <MenuItem Header="Save As" Command="{Binding MenuFileSaveAs}">
 
                             </MenuItem>
                         </MenuItem>

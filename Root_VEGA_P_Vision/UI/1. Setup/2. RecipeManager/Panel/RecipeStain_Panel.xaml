@@ -19,19 +19,19 @@
             <TabItem Header="EIP Cover Bottom"
                                  Width="120">
                 <GroupBox Header="Viewer">
-                    <Tools:RootViewer DataContext="{Binding EIPCoverTop_ImageViewerVM}"/>
+                    <Tools:RootViewer DataContext="{Binding EIPCoverBottom_ImaageViewerVM}"/>
                 </GroupBox>
             </TabItem>
             <TabItem Header="EIP Base Top"
                                  Width="120">
                 <GroupBox Header="Viewer">
-                    <Tools:RootViewer DataContext="{Binding EIPCoverTop_ImageViewerVM}"/>
+                    <Tools:RootViewer DataContext="{Binding EIPBaseTop_ImageViewerVM}"/>
                 </GroupBox>
             </TabItem>
             <TabItem Header="EIP Base Bottom"
                                  Width="120">
                 <GroupBox Header="Viewer">
-                    <Tools:RootViewer DataContext="{Binding EIPCoverTop_ImageViewerVM}"/>
+                    <Tools:RootViewer DataContext="{Binding EIPBaseBottom_ImageViewerVM}"/>
                 </GroupBox>
             </TabItem>
         </TabControl>

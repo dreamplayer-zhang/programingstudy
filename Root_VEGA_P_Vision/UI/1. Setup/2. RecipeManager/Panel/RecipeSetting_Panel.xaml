@@ -14,18 +14,18 @@
         <Border Grid.Row="0" BorderBrush="{StaticResource Splitter}"
                 BorderThickness="0,0,1,0">
             <StackPanel Margin="0,10,0,0">
-                <Button Content="Snap" Style="{StaticResource SetupPanelBtn2}" />
-                <Button Content="Inspection" Style="{StaticResource SetupPanelBtn2}" />
+                <Button Content="Snap" Style="{StaticResource SetupPanelBtn2}" Command="{Binding p_SubPanel.DataContext.btnSnap}" />
+                <Button Content="Inspection" Style="{StaticResource SetupPanelBtn2}" Command="{Binding p_SubPanel.DataContext.btnInsp}"/>
             </StackPanel>
         </Border>
         <Grid Grid.Column="1">
             <Grid>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="0.4*"/>
                     <ColumnDefinition Width="1.4*"/>
                     <ColumnDefinition Width="0.3*"/>
+                    <!--<ColumnDefinition Width="0.3*"/>-->
                 </Grid.ColumnDefinitions>
-                <GroupBox Grid.Column="0" Header="Pod info">
+                <!--<GroupBox Grid.Column="0" Header="Pod info">
                     <Grid Margin="5">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="1*" />
@@ -107,151 +107,194 @@
                                         b="3.1" />
                         </ListView>
                     </Grid>
-                </GroupBox>
-                <Grid Grid.Column="1">
+                </GroupBox>-->
+                <Grid Grid.Column="0">
                     <ContentControl Content="{Binding p_SubPanel}"/>
                 </Grid>
-                <Grid Grid.Column="2">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="1.2*" />
-                        <RowDefinition Height="*" />
-                        <RowDefinition Height="Auto" />
-                    </Grid.RowDefinitions>
-                    <GroupBox Header="Tools">
-                        <Grid>
-                            <Grid.RowDefinitions>
-                                <RowDefinition />
-                                <RowDefinition />
-                                <RowDefinition />
-                                <RowDefinition />
-                                <RowDefinition />
-                                <RowDefinition />
-                                <RowDefinition />
-                                <RowDefinition />
-                            </Grid.RowDefinitions>
-                            <GroupBox Margin="3,5">
-                                <GroupBox.Header>
-                                    <TextBlock Text="Thickness(Pixel)"
+                <Grid Grid.Column="1">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="1.3*" />
+                            <RowDefinition Height="0.7*" />
+                            <RowDefinition Height="0.7*" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+                        <GroupBox Header="Tools">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition />
+                                    <RowDefinition />
+                                    <RowDefinition />
+                                    <RowDefinition />
+                                    <RowDefinition />
+                                    <RowDefinition />
+                                    <RowDefinition />
+                                    <RowDefinition />
+                                </Grid.RowDefinitions>
+                                <GroupBox Margin="3,5">
+                                    <GroupBox.Header>
+                                        <TextBlock Text="Thickness(Pixel)"
                                                            FontSize="11" />
-                                </GroupBox.Header>
-                                <ComboBox HorizontalContentAlignment="Left"
+                                    </GroupBox.Header>
+                                    <ComboBox HorizontalContentAlignment="Left"
                                                       SelectedIndex="{Binding p_nThickness}">
-                                    <ComboBoxItem Content="0" Visibility="Collapsed"/>
-                                    <ComboBoxItem Content="1" />
-                                    <ComboBoxItem Content="2" />
-                                    <ComboBoxItem Content="3" />
-                                    <ComboBoxItem Content="4" />
-                                    <ComboBoxItem Content="5" />
-                                    <ComboBoxItem Content="6" />
-                                    <ComboBoxItem Content="7" />
-                                    <ComboBoxItem Content="8" />
-                                    <ComboBoxItem Content="9" />
-                                    <ComboBoxItem Content="10" />
-                                    <ComboBoxItem Content="11" />
-                                    <ComboBoxItem Content="12" />
-                                    <ComboBoxItem Content="13" />
-                                    <ComboBoxItem Content="14" />
-                                    <ComboBoxItem Content="15" />
-                                </ComboBox>
-                            </GroupBox>
+                                        <ComboBoxItem Content="0" Visibility="Collapsed"/>
+                                        <ComboBoxItem Content="1" />
+                                        <ComboBoxItem Content="2" />
+                                        <ComboBoxItem Content="3" />
+                                        <ComboBoxItem Content="4" />
+                                        <ComboBoxItem Content="5" />
+                                        <ComboBoxItem Content="6" />
+                                        <ComboBoxItem Content="7" />
+                                        <ComboBoxItem Content="8" />
+                                        <ComboBoxItem Content="9" />
+                                        <ComboBoxItem Content="10" />
+                                        <ComboBoxItem Content="11" />
+                                        <ComboBoxItem Content="12" />
+                                        <ComboBoxItem Content="13" />
+                                        <ComboBoxItem Content="14" />
+                                        <ComboBoxItem Content="15" />
+                                    </ComboBox>
+                                </GroupBox>
 
-                            <RadioButton Content="Pen"
+                                <RadioButton Content="Pen"
                                                       Margin="5" 
                                                       Style="{StaticResource {x:Type ToggleButton}}"
                                                       Grid.Row="1"
                                                       IsChecked="{Binding bPenCheck}"/>
-                            <RadioButton Content="Eraser"
+                                <RadioButton Content="Eraser"
                                                       Grid.Row="2"
                                                       Margin="5"
                                                      Style="{StaticResource {x:Type ToggleButton}}"
                                                       IsChecked="{Binding bEraserCheck}" />
-                            <RadioButton Content="Rect"
+                                <RadioButton Content="Rect"
                                                       Grid.Row="3"
                                                       Margin="5"
                                                      Style="{StaticResource {x:Type ToggleButton}}"
                                                       IsChecked="{Binding bRectCheck}" />
-                            <RadioButton Content="Circle"
+                                <RadioButton Content="Circle"
                                                       Grid.Row="4"
                                                       Margin="5"
                                                      Style="{StaticResource {x:Type ToggleButton}}"
                                                       IsChecked="{Binding bPolygonCheck}" />
-                            <RadioButton Content="Crop"
+                                <RadioButton Content="Crop"
                                                       Grid.Row="5"
                                                       Margin="5"
                                                      Style="{StaticResource {x:Type ToggleButton}}"
                                                       IsChecked="{Binding bCropCheck}" />
-                            <GroupBox Margin="3,5"
+                                <GroupBox Margin="3,5"
                                                   Grid.Row="6">
-                                <GroupBox.Header>
-                                    <TextBlock Text="Threshold(Gv)"
+                                    <GroupBox.Header>
+                                        <TextBlock Text="Threshold(Gv)"
                                                            FontSize="11" />
-                                </GroupBox.Header>
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="2*"/>
-                                        <ColumnDefinition />
-                                    </Grid.ColumnDefinitions>
-                                    <TextBox Margin="2.5,0" 
+                                    </GroupBox.Header>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="2*"/>
+                                            <ColumnDefinition />
+                                        </Grid.ColumnDefinitions>
+                                        <TextBox Margin="2.5,0" 
                                                          HorizontalContentAlignment="Center"
                                                          Text="{Binding p_nThreshold}"/>
 
-                                    <ComboBox Grid.Column="1" Margin="2.5,0"
+                                        <ComboBox Grid.Column="1" Margin="2.5,0"
                                                           HorizontalContentAlignment="Center"
                                                           SelectedIndex="{Binding p_nThresholdMode}">
-                                        <ComboBoxItem Content="Down" />
-                                        <ComboBoxItem Content="Up" />
-                                    </ComboBox>
-                                </Grid>
-                            </GroupBox>
-                            <RadioButton Content="Threshold"
+                                            <ComboBoxItem Content="Down" />
+                                            <ComboBoxItem Content="Up" />
+                                        </ComboBox>
+                                    </Grid>
+                                </GroupBox>
+                                <RadioButton Content="Threshold"
                                                       Grid.Row="7"
                                                       Margin="5"
                                                      Style="{StaticResource {x:Type ToggleButton}}"
                                                       IsChecked="{Binding bThresholdCheck}" />
-                        </Grid>
-                    </GroupBox>
-                    <GroupBox Header="Inspection Parameter"
+                            </Grid>
+                        </GroupBox>
+                        <GroupBox Header="Inspection Parameter"
                                           Grid.Row="1"
                                           VerticalAlignment="Top">
-                        <DataGrid RowHeaderWidth="0"
+                            <DataGrid RowHeaderWidth="0"
                                               GridLinesVisibility="Vertical"
                                               AlternatingRowBackground="AliceBlue">
-                            <DataGrid.Columns>
-                                <DataGridTextColumn Header="Parameter"
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="Parameter"
                                                                 Width="1.5*"
                                                                 Binding="{Binding a}" />
-                                <DataGridTemplateColumn Header="Value"
+                                    <DataGridTemplateColumn Header="Value"
                                                                     Width="*">
-                                    <DataGridTemplateColumn.CellTemplate>
-                                        <DataTemplate>
-                                            <TextBox Text="{Binding b}" />
-                                        </DataTemplate>
-                                    </DataGridTemplateColumn.CellTemplate>
-                                </DataGridTemplateColumn>
-                            </DataGrid.Columns>
-                            <local:Data a="Absolute"
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <TextBox Text="{Binding b}" />
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+                                </DataGrid.Columns>
+                                <local:Data a="Absolute"
                                                         b="True" />
-                            <local:Data a="Pit Level (GV)"
+                                <local:Data a="Pit Level (GV)"
                                                         b="0" />
-                            <local:Data a="Level Min (GV)"
+                                <local:Data a="Level Min (GV)"
                                                         b="0" />
-                            <local:Data a="Level Max (GV)"
+                                <local:Data a="Level Max (GV)"
                                                         b="0" />
-                            <local:Data a="Pit Size (Pxl)"
+                                <local:Data a="Pit Size (Pxl)"
                                                         b="0" />
-                            <local:Data a="Size Max (Pxl)"
+                                <local:Data a="Size Max (Pxl)"
                                                         b="0" />
-                            <local:Data a="Size Min (Pxl)"
+                                <local:Data a="Size Min (Pxl)"
                                                         b="0" />
 
-                        </DataGrid>
-                    </GroupBox>
-                    <Grid Grid.Row="2">
-                        <Button Content="Clear"
+                            </DataGrid>
+                        </GroupBox>
+                        <Button Content="Draw Box" Visibility="Visible" Grid.Row="2" VerticalAlignment="Bottom" Height="35" Margin="0,0,10,168" />
+
+                        <GroupBox Grid.Row="2" Header="Similarity" Visibility="Collapsed">
+                            <!--{Binding pGBsimilar}-->
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition/>
+                                    <RowDefinition/>
+                                    <RowDefinition/>
+                                </Grid.RowDefinitions>
+                                <GroupBox Grid.Row="0" Header="Horizontal">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="3*"/>
+                                            <ColumnDefinition Width="7*"/>
+                                            <ColumnDefinition Width="3*"/>
+                                            <ColumnDefinition Width="7*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Text="X" Grid.Column="0" VerticalAlignment="Center" Margin="10,0,0,0"/>
+                                        <TextBox Grid.Column="1" Margin="0,10,0,10"/>
+                                        <TextBlock Text="Y" Grid.Column="2" VerticalAlignment="Center" Margin="10,0,0,0"/>
+                                        <TextBox Grid.Column="3" Margin="0,10,0,10"/>
+                                    </Grid>
+                                </GroupBox>
+                                <GroupBox Grid.Row="1" Header="Vertical">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="3*"/>
+                                            <ColumnDefinition Width="7*"/>
+                                            <ColumnDefinition Width="3*"/>
+                                            <ColumnDefinition Width="7*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Text="X" Grid.Column="0" VerticalAlignment="Center" Margin="10,0,0,0"/>
+                                        <TextBox Grid.Column="1" Margin="0,10,0,10"/>
+                                        <TextBlock Text="Y" Grid.Column="2" VerticalAlignment="Center" Margin="10,0,0,0"/>
+                                        <TextBox Grid.Column="3" Margin="0,10,0,10"/>
+                                    </Grid>
+                                </GroupBox>
+                            </Grid>
+                        </GroupBox>
+                        <Grid Grid.Row="3">
+                            <Button Content="Clear"
                                             Command="{Binding cmdClear}"
                                             VerticalAlignment="Bottom"
                                             Height="35"
                                             Margin="5" />
+                        </Grid>
                     </Grid>
                 </Grid>
             </Grid>

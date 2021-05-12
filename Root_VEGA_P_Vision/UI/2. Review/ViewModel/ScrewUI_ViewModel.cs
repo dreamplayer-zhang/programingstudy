@@ -13,22 +13,26 @@ namespace Root_VEGA_P_Vision
 {
     public class ScrewUI_ViewModel:ObservableObject
     {
-        private readonly RootViewer_ViewModel screwUI_ImageViewer_ViewModel;
+        RootViewer_ViewModel screwUI_ImageViewer_ViewModel;
         screwUI screwUI;
         int idx = 0;
         public List<ImageData> ImageDatas;
         public RootViewer_ViewModel ScrewUI_ImageViewerVM
         {
             get => screwUI_ImageViewer_ViewModel;
+            set => SetProperty(ref screwUI_ImageViewer_ViewModel, value);
         }
-        public ScrewUI_ViewModel(screwUI screwUI)
+        public ScrewUI_ViewModel(string memstr)
         {
-            this.screwUI = screwUI;
-            screwUI_ImageViewer_ViewModel = new RootViewer_ViewModel();
-            screwUI_ImageViewer_ViewModel.p_VisibleMenu = Visibility.Collapsed;
-            screwUI_ImageViewer_ViewModel.p_VisibleSlider = Visibility.Collapsed;
-            screwUI_ImageViewer_ViewModel.init(new ImageData(GlobalObjects.Instance.Get<VEGA_P_Vision_Engineer>().ClassMemoryTool().GetMemory("Vision.Memory", "Vision", "EIP_Plate.Main.Front")), GlobalObjects.Instance.Get<DialogService>());
+            screwUI = new screwUI();
+            ScrewUI_ImageViewerVM = new RootViewer_ViewModel();
+            ScrewUI_ImageViewerVM.p_VisibleMenu = Visibility.Collapsed;
+            ScrewUI_ImageViewerVM.p_VisibleSlider = Visibility.Collapsed;
+            ScrewUI_ImageViewerVM.init(new ImageData(GlobalObjects.Instance.Get<VEGA_P_Vision_Engineer>().ClassMemoryTool().GetMemory(App.mPool, App.mGroup, memstr)));
 
+            //p_VisibleMenu = Visibility.Collapsed;
+            //p_VisibleSlider = Visibility.Collapsed;
+            //init(new ImageData(GlobalObjects.Instance.Get<VEGA_P_Vision_Engineer>().ClassMemoryTool().GetMemory(App.mPool, App.mGroup, memstr)));
             ImageDatas = new List<ImageData>();
         }
 

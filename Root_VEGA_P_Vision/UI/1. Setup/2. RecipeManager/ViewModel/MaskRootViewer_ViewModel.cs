@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using System.Windows;
@@ -8,6 +10,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shapes;
+using System.Windows.Threading;
 using Root_VEGA_P_Vision.Engineer;
 using RootTools;
 using RootTools.Memory;
@@ -36,6 +39,9 @@ namespace Root_VEGA_P_Vision
             init(p_ImageData);
 
             m_History = new Stack<Work>();
+
+            rectList = new List<TRect>();
+            boxList = new List<TRect>();
 
             Init_PenCursor();
         }
@@ -67,6 +73,8 @@ namespace Root_VEGA_P_Vision
                             break;
                         case ToolType.Pen:
                             m_CurrentWork.Points.Add(memPt);
+                            //if (m_timer.IsBusy == false) 
+                            //    m_timer.RunWorkerAsync();
                             Pen(memPt, _nThickness);
                             m_eToolProcess = ToolProcess.Drawing;
                             break;
@@ -131,7 +139,7 @@ namespace Root_VEGA_P_Vision
             CPoint memPt = new CPoint(p_MouseMemX, p_MouseMemY);
 
             m_eToolType = recipeSetting.m_eToolType;
-
+            p_nThickness = recipeSetting.p_nThickness;
             PenCursor.Visibility = Visibility.Collapsed;
 
             switch (m_eToolProcess)
@@ -149,7 +157,7 @@ namespace Root_VEGA_P_Vision
                         case ToolType.None:
                             break;
                         case ToolType.Pen:
-
+                            PenCursor.Visibility = Visibility.Visible;
                             Draw_PenCursor();
                             if (e.LeftButton == MouseButtonState.Pressed)
                             {
@@ -158,6 +166,8 @@ namespace Root_VEGA_P_Vision
                             }
                             break;
                         case ToolType.Eraser:
+                            PenCursor.Visibility = Visibility.Visible;
+
                             Draw_PenCursor();
                             if (e.LeftButton == MouseButtonState.Pressed)
                             {
@@ -217,6 +227,8 @@ namespace Root_VEGA_P_Vision
                         case ToolType.Crop:
                             break;
                         case ToolType.Threshold:
+                            m_eThresholdMode = (ThresholdMode)recipeSetting.p_nThresholdMode;
+                            p_nThreshold = recipeSetting.p_nThreshold;
                             Done_Threshold();
                             m_eToolProcess = ToolProcess.None;
                             break;
@@ -239,18 +251,72 @@ namespace Root_VEGA_P_Vision
         }
         #endregion
 
+        Queue<CPoint> pointsq = new Queue<CPoint>();
+
         #region Tool
-        private void Pen(CPoint cPt, int size)
+        private unsafe void Pen(CPoint cPt, int size)
         {
+            IntPtr ptrMem = p_ROILayer.GetPtr();
+            if (ptrMem == IntPtr.Zero)
+                return;
+            byte* imagePtr = (byte*)ptrMem.ToPointer();
+            uint* fPtr = (uint*)imagePtr;
+
+            //pointsq.Enqueue(cPt);
+
             Parallel.For(cPt.X, cPt.X + size, i =>
             {
                 for (int j = cPt.Y; j < cPt.Y + size; j++)
                 {
                     CPoint pixelPt = new CPoint(i, j);
-                    DrawPixelBitmap(pixelPt, m_Color.R, m_Color.G, m_Color.B, m_Color.A);
+
+                    int pos = (j * p_ROILayer.p_Size.X + i) /** 4*/;
+                    uint clr = m_Color.A;
+                    clr = clr << 8;
+                    clr += m_Color.R;
+                    clr = clr << 8;
+                    clr += m_Color.G;
+                    clr = clr << 8;
+                    clr += m_Color.B;
+                    fPtr[pos] += clr;
                 }
             });
-            SetLayerSource();
+            SetMaskLayerSource();
+
+        }
+
+        private unsafe void M_timer_Tick(object sender, EventArgs e)
+        {
+            if(pointsq.Count>0)
+            {
+                IntPtr ptrMem = p_ROILayer.GetPtr();
+                if (ptrMem == IntPtr.Zero)
+                    return;
+                byte* imagePtr = (byte*)ptrMem.ToPointer();
+                uint* fPtr = (uint*)imagePtr;
+
+                CPoint cPt = pointsq.Dequeue();
+
+                Parallel.For(cPt.X, cPt.X + _nThickness, i =>
+                {
+                    for (int j = cPt.Y; j < cPt.Y + _nThickness; j++)
+                    {
+                        CPoint pixelPt = new CPoint(i, j);
+
+                        int pos = (j * p_ROILayer.p_Size.X + i) /** 4*/;
+                        uint clr = m_Color.A;
+                        clr = clr << 8;
+                        clr += m_Color.R;
+                        clr = clr << 8;
+                        clr += m_Color.G;
+                        clr = clr << 8;
+                        clr += m_Color.B;
+                        fPtr[pos] += clr;
+                    }
+                });
+
+                SetMaskLayerSource();
+            }
         }
         private void Eraser(CPoint cPt, int size)
         {
@@ -460,6 +526,112 @@ namespace Root_VEGA_P_Vision
                 });
             }
         }
+        #endregion
+
+        #region Draw Method
+        List<TRect> rectList;
+        List<TRect> boxList;
+
+        public void RemoveObjectsByTag(string tag)
+        {
+            p_DrawElement.Clear();
+
+            List<TRect> newRectList = new List<TRect>();
+
+            foreach (TRect rt in rectList)
+            {
+                if ((string)rt.UIElement.Tag != tag)
+                {
+                    newRectList.Add(rt);
+                    p_DrawElement.Add(rt.UIElement);
+                }
+            }
+
+            rectList = newRectList;
+        }
+        public void ClearObjects()
+        {
+            rectList.Clear();
+            p_DrawElement.Clear();
+        }
+        public class DrawDefines
+        {
+            public static int RectTickness = 4;
+            public static int BoxTickness = 1;
+        }
+        public void AddDrawRect(CPoint leftTop, CPoint rightBottom, SolidColorBrush color = null, string tag = "")
+        {
+            if (color == null)
+            {
+                color = Brushes.Yellow;
+            }
+
+            CPoint canvasLeftTop = GetCanvasPoint(leftTop);
+            CPoint canvasRightBottom = GetCanvasPoint(new CPoint(rightBottom));
+
+            Rectangle rt = new Rectangle();
+            rt.Width = canvasRightBottom.X - canvasLeftTop.X;
+            rt.Height = canvasRightBottom.Y - canvasLeftTop.Y;
+
+            rt.Stroke = color;
+            rt.StrokeThickness = DrawDefines.RectTickness;
+            rt.Opacity = 1;
+            rt.Tag = tag.Clone();
+
+            Canvas.SetLeft(rt, canvasLeftTop.X);
+            Canvas.SetTop(rt, canvasLeftTop.Y);
+
+            TRect tRect = new TRect();
+            tRect.UIElement = rt;
+            tRect.MemoryRect.Left = leftTop.X;
+            tRect.MemoryRect.Top = leftTop.Y;
+            tRect.MemoryRect.Right = rightBottom.X;
+            tRect.MemoryRect.Bottom = rightBottom.Y;
+
+            rectList.Add(tRect);
+
+            p_DrawElement.Add(rt);
+        }
+        public void AddDrawRectList(List<CRect> rectList, SolidColorBrush color = null, string tag = "")
+        {
+            foreach (CRect rect in rectList)
+            {
+                AddDrawRect(rect, color, tag);
+            }
+        }
+        public void AddDrawRect(CRect rect, SolidColorBrush color = null, string tag = "")
+        {
+            if (color == null)
+            {
+                color = Brushes.Yellow;
+            }
+
+            CPoint canvasLeftTop = GetCanvasPoint(new CPoint(rect.Left, rect.Top));
+            CPoint canvasRightBottom = GetCanvasPoint(new CPoint(rect.Right, rect.Bottom));
+
+            Rectangle rt = new Rectangle();
+            rt.Width = canvasRightBottom.X - canvasLeftTop.X;
+            rt.Height = canvasRightBottom.Y - canvasLeftTop.Y;
+
+            rt.Stroke = color;
+            rt.StrokeThickness = DrawDefines.RectTickness;
+            rt.Opacity = 1;
+            rt.Tag = tag.Clone();
+
+            Canvas.SetLeft(rt, canvasLeftTop.X);
+            Canvas.SetTop(rt, canvasLeftTop.Y);
+
+            TRect tRect = new TRect();
+            tRect.UIElement = rt;
+            tRect.MemoryRect.Left = rect.Left;
+            tRect.MemoryRect.Top = rect.Top;
+            tRect.MemoryRect.Right = rect.Right;
+            tRect.MemoryRect.Bottom = rect.Bottom;
+
+            rectList.Add(tRect);
+            p_DrawElement.Add(rt);
+        }
+
         #endregion
     }
 }

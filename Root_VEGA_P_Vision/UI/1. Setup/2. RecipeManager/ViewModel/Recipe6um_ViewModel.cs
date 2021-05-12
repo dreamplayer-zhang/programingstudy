@@ -3,8 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Input;
+using Root_VEGA_P_Vision.Engineer;
+using Root_VEGA_P_Vision.Module;
 using RootTools;
+using RootTools.Module;
+using RootTools_Vision;
 
 namespace Root_VEGA_P_Vision
 {
@@ -43,9 +48,30 @@ namespace Root_VEGA_P_Vision
             this.recipeSetting = recipeSetting;
             Main = new Recipe6um_Panel();
             coverTop_ImageViewer = new MaskRootViewer_ViewModel("EIP_Cover.Main.Front",recipeSetting);
-            coverBottom_ImageViewer = new MaskRootViewer_ViewModel("EIP_Cover.Main.Front", recipeSetting);
-            baseTop_ImageViewer = new MaskRootViewer_ViewModel("EIP_Cover.Main.Front", recipeSetting);
-            baseBottom_ImageViewer = new MaskRootViewer_ViewModel("EIP_Cover.Main.Front", recipeSetting);
+            coverBottom_ImageViewer = new MaskRootViewer_ViewModel("EIP_Cover.Main.Back", recipeSetting);
+            baseTop_ImageViewer = new MaskRootViewer_ViewModel("EIP_Plate.Main.Front", recipeSetting);
+            baseBottom_ImageViewer = new MaskRootViewer_ViewModel("EIP_Plate.Main.Back", recipeSetting);
+        }
+        public ICommand btnSnap
+        {
+            get => new RelayCommand(() => Snap());
+        }
+        public ICommand btnInsp
+        {
+            get => new RelayCommand(() => { });
+        }
+
+        void Snap()
+        {
+            EQ.p_bStop = false;
+            Vision vision = GlobalObjects.Instance.Get<VEGA_P_Vision_Engineer>().m_handler.m_vision;
+            if (vision.p_eState != ModuleBase.eState.Ready)
+            {
+                MessageBox.Show("Vision Home이 완료 되지 않았습니다.");
+                return;
+            }
+
+            vision.StartRun((Run_MainGrab)vision.CloneModuleRun(App.mMainGrab));
         }
     }
 }

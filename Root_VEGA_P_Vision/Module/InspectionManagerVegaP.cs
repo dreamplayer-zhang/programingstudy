@@ -12,6 +12,8 @@ namespace Root_VEGA_P_Vision
         private readonly RecipeVision recipe;
         private readonly Vision vision;
 
+        WorkplaceBundle workplaceBundle;
+
         #endregion
 
         #region [Properties]
@@ -19,7 +21,7 @@ namespace Root_VEGA_P_Vision
         {
             get => recipe;
         }
-        public List<SharedBufferInfo> SharedBufferInfoList
+        public List<SharedBufferInfo> SharedBufferInfoList //stain, side,tdi,stacking 
         {
             get => sharedBufferInfoList;
         }
@@ -59,24 +61,13 @@ namespace Root_VEGA_P_Vision
 
         protected override WorkplaceBundle CreateWorkplaceBundle()
         {
-            if (recipe.WaferMap == null)
-            {
-                MessageBox.Show("Map 정보가 없습니다.");
-                return null;
-            }
-            if (recipe.WaferMap.MapSizeX == 0 || recipe.WaferMap.MapSizeY == 0)
-            {
-                MessageBox.Show("Map 정보가 없습니다.");
-                return null;
-            }
-
-            return CreateWorkplaceBundle_WaferMap();
+            return CreateWorkplace_Pod();
         }
 
         protected override void Initialize()
         {
-            CreateWorkManager(WORK_TYPE.SNAP);
-            CreateWorkManager(WORK_TYPE.ALIGNMENT);
+            //CreateWorkManager(WORK_TYPE.SNAP);
+            //CreateWorkManager(WORK_TYPE.ALIGNMENT);
             CreateWorkManager(WORK_TYPE.INSPECTION, 6);
             CreateWorkManager(WORK_TYPE.DEFECTPROCESS, 6);
             CreateWorkManager(WORK_TYPE.DEFECTPROCESS_ALL, 1, true);
@@ -91,9 +82,44 @@ namespace Root_VEGA_P_Vision
         }
         #endregion
 
-        public WorkplaceBundle CreateWorkplaceBundle_WaferMap()
+        public WorkplaceBundle CreateWorkplace_Pod()
         {
-            return null;
+            workplaceBundle = new WorkplaceBundle();
+
+            GrabMode grabMode = null;
+            foreach(GrabMode grab in vision.m_aGrabMode)
+            {
+                if (grab.p_id.Contains("Stain"))
+                {
+                    grabMode = grab;
+                    break;
+                }
+            }
+            //여기여기
+            Workplace workplace = new Workplace(0, 0, 0, 0, 350/*grabMode.m_camera.p_sz.X*3*/, 180/*grabMode.m_camera.p_sz.Y*3*/, workplaceBundle.Count);
+            workplace.SetSharedBuffer(sharedBufferInfoList[0]);
+            workplaceBundle.Add(workplace);
+
+            return workplaceBundle;
+        }
+        public new void Start()
+        {
+            if (this.Recipe == null)
+                return;
+
+            DateTime inspectionStart = DateTime.Now;
+            DateTime inspectionEnd = DateTime.Now;
+            string lotId = "Lotid";
+            string partId = "Partid";
+            string setupId = "SetupID";
+            string cstId = "CSTid";
+            string waferId = "WaferID";
+            //string sRecipe = "RecipeID";
+            string recipeName = recipe.Name;
+
+            //DatabaseManager.Instance.SetLotinfo(inspectionStart, inspectionEnd, lotId, partId, setupId, cstId, waferId, recipeName);
+
+            base.Start();
         }
         public void SnapDone_Callback(object obj, SnapDoneArgs args)
         {

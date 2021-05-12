@@ -221,7 +221,6 @@ namespace Root_VEGA_P_Vision
             p_NaviButtons.Clear();
             p_NaviButtons.Add(m_btnNaviMaintenance);
 
-            p_CurrentPanel =
             p_CurrentPanel = maintVM.Main;
             p_CurrentPanel.DataContext = maintVM;
         }

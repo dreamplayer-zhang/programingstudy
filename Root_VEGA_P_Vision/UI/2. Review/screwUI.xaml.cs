@@ -23,7 +23,6 @@ namespace Root_VEGA_P_Vision
         public screwUI()
         {
             InitializeComponent();
-            DataContext = new ScrewUI_ViewModel(this);
         }
     }
 }

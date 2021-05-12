@@ -5,10 +5,11 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Root_VEGA_P_Vision"
              mc:Ignorable="d" 
+             xmlns:Tools="clr-namespace:RootTools;assembly=RootTools"
              d:DesignHeight="818"
              d:DesignWidth="1912"
-             xmlns:Tools="clr-namespace:RootTools;assembly=RootTools"
              Background="{StaticResource PanelBackGround}">
+
     <TabControl>
         <TabItem Header="EIP Cover">
             <local:RecipeSideImageViewers_Panel DataContext="{Binding EIPCoverViewers}"/>

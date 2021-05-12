@@ -16,11 +16,11 @@ using System.Windows.Shapes;
 namespace Root_VEGA_P_Vision
 {
     /// <summary>
-    /// ScrewReview_Panel.xaml에 대한 상호 작용 논리
+    /// RecipeSummary.xaml에 대한 상호 작용 논리
     /// </summary>
-    public partial class ScrewReview_Panel : UserControl
+    public partial class RecipeSummary : UserControl
     {
-        public ScrewReview_Panel()
+        public RecipeSummary()
         {
             InitializeComponent();
         }

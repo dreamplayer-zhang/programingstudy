@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Root_VEGA_P_Vision
 {
-    public class Review_ViewModel
+    public class Review_ViewModel : ObservableObject
     {
         VisionReview_Panel visionReviewPanel;
         ParticleReview_Panel particleReviewPanel;

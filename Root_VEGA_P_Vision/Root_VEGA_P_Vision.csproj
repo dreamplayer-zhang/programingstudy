@@ -235,7 +235,12 @@
     <Compile Include="MVVM\ObservableObject.cs" />
     <Compile Include="MVVM\PropertySupport.cs" />
     <Compile Include="MVVM\RelayCommand.cs" />
-    <Compile Include="UI\1. Setup\MaskRootViewer\MaskRootViewer_ViewModel.cs" />
+    <Compile Include="Recipe\VisionSurfaceRecipe.cs" />
+    <Compile Include="UI\1. Setup\2. RecipeManager\Panel\RecipeSummary.xaml.cs">
+      <DependentUpon>RecipeSummary.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\1. Setup\2. RecipeManager\ViewModel\MaskRootViewer_ViewModel.cs" />
+    <Compile Include="UI\1. Setup\2. RecipeManager\ViewModel\RecipeSummary_ViewModel.cs" />
     <Compile Include="UI\1. Setup\RecipeWizard\RecipeWizard_VM.cs" />
     <Compile Include="UI\1. Setup\RecipeWizard\Page_RecipeWizard.xaml.cs">
       <DependentUpon>Page_RecipeWizard.xaml</DependentUpon>
@@ -267,11 +272,7 @@
       <DependentUpon>RecipeManagerPanel.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\1. Setup\2. RecipeManager\RecipeManager_ViewModel.cs" />
-    <Compile Include="UI\1. Setup\2. RecipeManager\ViewModel\ImageViewer\EIPBaseBottom_ImageViewer_ViewModel.cs" />
-    <Compile Include="UI\1. Setup\2. RecipeManager\ViewModel\ImageViewer\EIPBaseTop_ImageViewer_ViewModel.cs" />
-    <Compile Include="UI\1. Setup\2. RecipeManager\ViewModel\ImageViewer\EIPCoverBottom_ImageViewer_ViewModel.cs" />
-    <Compile Include="UI\1. Setup\2. RecipeManager\ViewModel\ImageViewer\EIPCoverTop_ImageViewer_ViewModel.cs" />
-    <Compile Include="UI\1. Setup\2. RecipeManager\ViewModel\ImageViewer\RecipeSideImageViewers_ViewModel.cs" />
+    <Compile Include="UI\1. Setup\2. RecipeManager\ViewModel\RecipeSideImageViewers_ViewModel.cs" />
     <Compile Include="UI\1. Setup\2. RecipeManager\ViewModel\ItemMask.cs" />
     <Compile Include="UI\1. Setup\2. RecipeManager\ViewModel\Recipe1um_ViewModel.cs" />
     <Compile Include="UI\1. Setup\2. RecipeManager\ViewModel\Recipe6um_ViewModel.cs" />
@@ -301,9 +302,6 @@
     </Compile>
     <Compile Include="UI\2. Review\Review_Panel.xaml.cs">
       <DependentUpon>Review_Panel.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\2. Review\ScrewReview_Panel.xaml.cs">
-      <DependentUpon>ScrewReview_Panel.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\2. Review\screwUI.xaml.cs">
       <DependentUpon>screwUI.xaml</DependentUpon>
@@ -363,6 +361,10 @@
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
     </Compile>
+    <Page Include="UI\1. Setup\2. RecipeManager\Panel\RecipeSummary.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="UI\1. Setup\RecipeWizard\Page_RecipeWizard.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -424,10 +426,6 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UI\2. Review\Review_Panel.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="UI\2. Review\ScrewReview_Panel.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -517,6 +515,7 @@
     <Resource Include="Control\Icon\Resource\system_task_127px.png" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Dialog\" />
     <Folder Include="UI\3. Operation\" />
   </ItemGroup>
   <ItemGroup>

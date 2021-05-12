@@ -235,7 +235,18 @@
                         </Grid>
                     </TabItem>
                     <TabItem Header="Screw Image">
-                        <local:ScrewReview_Panel/>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition/>
+                                <ColumnDefinition/>
+                            </Grid.ColumnDefinitions>
+                            <GroupBox Grid.Column="0" Header="Time">
+                                <local:screwUI DataContext="{Binding ScrewUITime}"/>
+                            </GroupBox>
+                            <GroupBox Grid.Column="1" Header="Illumination">
+                                <local:screwUI DataContext="{Binding ScrewUIIllum}"/>
+                            </GroupBox>
+                        </Grid>
                     </TabItem>
                 </TabControl>
             </Grid>

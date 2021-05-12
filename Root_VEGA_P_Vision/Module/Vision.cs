@@ -608,10 +608,10 @@ namespace Root_VEGA_P_Vision.Module
         protected override void InitModuleRuns()
         {
             AddModuleRunList(new Run_Rotate(this), true, "Rotate");
-            AddModuleRunList(new Run_MainGrab(this), true, "Main Grab");
-            AddModuleRunList(new Run_SideGrab(this), true, "Side Grab");
-            AddModuleRunList(new Run_StainGrab(this), true, "Stain Grab");
-            AddModuleRunList(new Run_ZStack(this), true, "Z Stack Grab");
+            AddModuleRunList(new Run_MainGrab(this), true, App.mMainGrab);
+            AddModuleRunList(new Run_SideGrab(this), true, App.mSideGrab);
+            AddModuleRunList(new Run_StainGrab(this), true, App.mStainGrab);
+            AddModuleRunList(new Run_ZStack(this), true, App.mZStack);
             AddModuleRunList(new Run_Remote(this), true, "Remote Run");
             AddModuleRunList(new Run_Delay(this), true, "Time Delay");
         }        

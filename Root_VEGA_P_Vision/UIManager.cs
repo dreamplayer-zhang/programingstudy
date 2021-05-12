@@ -59,7 +59,9 @@ namespace Root_VEGA_P_Vision
         {
             reviewPanel = new Review_Panel();
             reviewViewModel = new Review_ViewModel();
-            reviewPanel.DataContext = reviewViewModel;
+            //reviewPanel.DataContext = reviewViewModel;
+            var vm = new VisionReview_ViewModel(reviewViewModel);
+            reviewPanel.DataContext = vm;
         }
         void InitSetupMode()
         {

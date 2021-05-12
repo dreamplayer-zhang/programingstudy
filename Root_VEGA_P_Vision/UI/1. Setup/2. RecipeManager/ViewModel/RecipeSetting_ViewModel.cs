@@ -1,4 +1,9 @@
-﻿using System;
+﻿using Root_VEGA_P_Vision.Engineer;
+using Root_VEGA_P_Vision.Module;
+using RootTools;
+using RootTools.Module;
+using RootTools_Vision;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -10,7 +15,7 @@ using System.Windows.Input;
 
 namespace Root_VEGA_P_Vision
 {
-    public class RecipeSetting_ViewModel:ObservableObject
+    public class RecipeSetting_ViewModel : ObservableObject
     {
         public RecipeManager_ViewModel RecipeManager;
         public RecipeSetting_Panel Main;
@@ -28,6 +33,7 @@ namespace Root_VEGA_P_Vision
             recipe6umVM = new Recipe6um_ViewModel(this);
             recipe1umVM = new Recipe1um_ViewModel(this);
             recipeSideVM = new RecipeSide_ViewModel(this);
+            recipeSummaryVM = new RecipeSummary_ViewModel(this);
         }
 
 
@@ -36,26 +42,37 @@ namespace Root_VEGA_P_Vision
         private Recipe6um_ViewModel recipe6umVM;
         private Recipe1um_ViewModel recipe1umVM;
         private RecipeSide_ViewModel recipeSideVM;
+        private RecipeSummary_ViewModel recipeSummaryVM;
         public void SetStain()
         {
             p_SubPanel = recipeStainVM.Main;
             p_SubPanel.DataContext = recipeStainVM;
+            pGBsimilar = Visibility.Collapsed;
         }
         public void Set6um()
         {
             p_SubPanel = recipe6umVM.Main;
             p_SubPanel.DataContext = recipe6umVM;
+            pGBsimilar = Visibility.Collapsed;
         }
 
         public void Set1um()
         {
             p_SubPanel = recipe1umVM.Main;
             p_SubPanel.DataContext = recipe1umVM;
+            pGBsimilar = Visibility.Collapsed;
         }
         public void SetSide()
         {
             p_SubPanel = recipeSideVM.Main;
             p_SubPanel.DataContext = recipeSideVM;
+            pGBsimilar = Visibility.Visible;
+        }
+
+        public void SetSummary()
+        {
+            p_SubPanel = recipeSummaryVM.Main;
+            p_SubPanel.DataContext = recipeSummaryVM;
         }
         #endregion
 
@@ -231,15 +248,20 @@ namespace Root_VEGA_P_Vision
         private bool _bThresholdCheck;
 
         public bool bPenVisibility;
+
+        private Visibility _bGBsimilar;
+        public Visibility pGBsimilar
+        {
+            get => _bGBsimilar;
+            set => SetProperty(ref _bGBsimilar, value);
+        }
         #endregion
 
         void UncheckTool(ToolType type)
         {
-            //PenCursor.Visibility = Visibility.Collapsed;
             switch (type)
             {
                 case ToolType.Pen:
-                    //PenCursor.Visibility = Visibility.Visible;
                     bEraserCheck = false;
                     bRectCheck = false;
                     bCircleCheck = false;
@@ -247,7 +269,6 @@ namespace Root_VEGA_P_Vision
                     bThresholdCheck = false;
                     break;
                 case ToolType.Eraser:
-                    //PenCursor.Visibility = Visibility.Visible;
                     bPenCheck = false;
                     bRectCheck = false;
                     bCircleCheck = false;
@@ -283,9 +304,6 @@ namespace Root_VEGA_P_Vision
                     bCropCheck = false;
                     break;
             }
-
-
         }
-
     }
 }

@@ -9,33 +9,56 @@
              d:DesignHeight="836" d:DesignWidth="1912" 
              Background="{StaticResource PanelBackGround}">
     <Grid>
-        <TabControl Grid.Column="1">
-            <TabItem Header="EIP Cover Top"
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+        <GroupBox Header="Viewer" Grid.Column="0">
+            <TabControl Grid.Column="1">
+                <TabItem Header="EIP Cover Bottom"
                                  Width="120">
-                <GroupBox Header="Viewer">
-                    <Tools:RootViewer DataContext="{Binding EIPCoverTop_ImageViewerVM}"/>
-                </GroupBox>
-            </TabItem>
-            <TabItem Header="EIP Cover Bottom"
+                    <Tools:RootViewer DataContext="{Binding EIPCoverBottom}"/>
+                </TabItem>
+                <TabItem Header="EIP Base Top"
                                  Width="120">
-                <GroupBox Header="Viewer">
-                    <Tools:RootViewer DataContext="{Binding EIPCoverTop_ImageViewerVM}"/>
-                </GroupBox>
-            </TabItem>
-            <TabItem Header="EIP Base Top"
-                                 Width="120">
-                <GroupBox Header="Viewer">
-                    <Tools:RootViewer DataContext="{Binding EIPCoverTop_ImageViewerVM}"/>
-                </GroupBox>
-            </TabItem>
-            <TabItem Header="EIP Base Bottom"
-                                 Width="120">
-                <GroupBox Header="Viewer">
-                    <Tools:RootViewer DataContext="{Binding EIPCoverTop_ImageViewerVM}"/>
-                </GroupBox>
-            </TabItem>
-        </TabControl>
-
+                    <Tools:RootViewer DataContext="{Binding EIPBasePlateTop}"/>
+                </TabItem>
+            </TabControl>
+        </GroupBox>
+        <Grid Grid.Column="1">
+            <Grid.RowDefinitions>
+                <RowDefinition/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+            <GroupBox Grid.Row="0" Header="Sample Image">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+                    <GroupBox Grid.Column="0" Header="EIP Cover Bottom">
+                        <Tools:RootViewer DataContext="{Binding EIPCoverBottom_Teach}"/>
+                    </GroupBox>
+                    <GroupBox Grid.Column="1" Header="EIP BasePlate Top">
+                        <Tools:RootViewer DataContext="{Binding EIPBasePlateTop_Teach}"/>
+                    </GroupBox>
+                </Grid>
+            </GroupBox>
+            <GroupBox Grid.Row="1" Header="Step Image">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+                    <GroupBox Grid.Column="0" Header="EIP Cover Bottom">
+                        <local:screwUI/>
+                    </GroupBox>
+                    <GroupBox Grid.Column="1" Header="EIP BasePlate Top">
+                        <local:screwUI/>
+                    </GroupBox>
+                </Grid>
+            </GroupBox>
+        </Grid>
     </Grid>
 
 </UserControl>
