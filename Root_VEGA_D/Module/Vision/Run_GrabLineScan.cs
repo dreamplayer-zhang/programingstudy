@@ -11,6 +11,7 @@ using RootTools.Trees;
 using RootTools_Vision;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -62,66 +63,16 @@ namespace Root_VEGA_D.Module
             //if (m_grabMode != null) m_grabMode.RunTree(tree.GetTree("Grab Mode", false), bVisible, true);
         }
 
-        string ConnectRADS()
-        {
-            Camera_Basler camRADS = (Camera_Basler)m_module.CamRADS;
-
-            if (m_grabMode.pUseRADS && m_module.RADSControl.p_IsRun == false)
-            {
-                m_module.RADSControl.m_timer.Start();
-                m_module.RADSControl.p_IsRun = true;
-                m_module.RADSControl.StartRADS();
-
-                StopWatch sw = new StopWatch();
-                if (camRADS.p_CamInfo._OpenStatus == false) camRADS.Connect();
-                while (camRADS.p_CamInfo._OpenStatus == false)
-                {
-                    if (sw.ElapsedMilliseconds > 15000)
-                    {
-                        sw.Stop();
-                        return "RADS Camera Not Connected";
-                    }
-                }
-                sw.Stop();
-
-                camRADS.SetMulticast();
-                camRADS.GrabContinuousShot();
-            }
-
-            return "OK";
-        }
-
-        string ConnectMainCam()
-        {
-            const int TIMEOUT_50MS = 50000;     // ms
-            const int TIMEOUT_INTERVAL = 10;    // ms
-
-            Camera_Dalsa camMain = (Camera_Dalsa)m_grabMode.m_camera;
-
-            camMain.Connect();
-
-            int nTimeOut = TIMEOUT_50MS / TIMEOUT_INTERVAL;
-            while (camMain.p_CamInfo.p_eState != eCamState.Ready)
-            {
-                if (nTimeOut-- == 0)
-                {
-                    throw new Exception("Camera Connect Error");
-                }
-                Thread.Sleep(TIMEOUT_INTERVAL);
-            }
-
-            return "OK";
-        }
 
         double m_dAFBestFocusPosY;
         int m_nAFBestGVSum;
         string RunAutoFocus()
         {
             if (!m_grabMode.m_bUseAF)
+            {
+                m_dAFBestFocusPosY = m_grabMode.m_dFocusPosZ;
                 return "OK";
-
-            if (m_grabMode.m_dAFStartZ >= m_grabMode.m_dAFEndZ)
-                return "Auto focus Start Z Pos must be smaller than End Z Pos.";
+            }
 
             if (m_grabMode.m_nAFLaserThreshold <= 0)
                 return "Auto focus Threadhold value must be bigger than zero.";
@@ -134,6 +85,8 @@ namespace Root_VEGA_D.Module
 
             try
             {
+                if (camRADS.p_CamInfo._OpenStatus == false) camRADS.Connect();
+
                 // RADS Voltage Reset
                 m_module.RADSControl.ResetController();
 
@@ -152,20 +105,29 @@ namespace Root_VEGA_D.Module
 
                 camRADS.Grabed += m_camera_Grabed;
 
+                bool bPastGrabbingState = camRADS.p_CamInfo._IsGrabbing;
+                if (bPastGrabbingState == false)
+                    camRADS.GrabContinuousShot();
+
                 // Z축 목표위치로 이동
-                if (m_module.Run(axisZ.StartMove(m_grabMode.m_dAFEndZ)))
+                if (m_module.Run(axisZ.StartMove(m_grabMode.m_dAFEndZ, m_grabMode.m_dAFSearchSpeed)))
                     return p_sInfo;
                 if (m_module.Run(axisZ.WaitReady()))
                     return p_sInfo;
 
                 camRADS.Grabed -= m_camera_Grabed;
 
+                if (bPastGrabbingState == false)
+                    camRADS.GrabStop();
+
                 // 중앙에 RADS 레이저가 맞춰진적이 없다면
                 if (m_nAFBestGVSum <= 0)
                     return "Cannot find best Y position by auto focusing";
 
-                // 최적의 포커싱 위치로 이동
-                if (m_module.Run(axisZ.StartMove(m_dAFBestFocusPosY + m_grabMode.m_dAFOffset)))
+                // Offset 적용
+                m_dAFBestFocusPosY += m_grabMode.m_dAFOffset;
+
+                if (m_module.Run(axisZ.StartMove(m_dAFBestFocusPosY)))
                     return p_sInfo;
                 if (m_module.Run(axisZ.WaitReady()))
                     return p_sInfo;
@@ -185,13 +147,14 @@ namespace Root_VEGA_D.Module
         void m_camera_Grabed(object sender, System.EventArgs e)
         {
             Camera_Basler camRADS = m_module.CamRADS;
-            IntPtr intPtr = camRADS.p_ImageData.GetPtr(0);  // R 채널 데이터
-            if (intPtr != null && camRADS != null)
+            IntPtr intPtr = camRADS.p_ImageData.GetPtr();  // R 채널 데이터
+
+            unsafe
             {
-                unsafe
+                CPoint size = camRADS.p_ImageData.p_Size;
+                byte* arrImg = (byte*)intPtr.ToPointer();
+                if (arrImg != null && camRADS != null)
                 {
-                    CPoint size = camRADS.p_ImageData.p_Size;
-                    byte* arrImg = (byte*)intPtr.ToPointer();
                     int[] profile = new int[size.Y];
 
                     // 각 행별로 모든 GV값 더하기
@@ -230,7 +193,8 @@ namespace Root_VEGA_D.Module
                             double diffNew = Math.Abs(nCenterOnImg - curPosZ);
 
                             // 새로 발견한 위치가 중심에 더 가까울 경우
-                            if (diffPast > diffNew)
+                            if (diffPast > diffNew && nSum > m_nAFBestGVSum)
+                            //if(diffPast > diffNew)
                             {
                                 m_dAFBestFocusPosY = curPosZ;
                                 m_nAFBestGVSum = nSum;
@@ -239,6 +203,61 @@ namespace Root_VEGA_D.Module
                     }
                 }
             }
+        }
+
+        string ConnectRADS()
+        {
+            Camera_Basler camRADS = (Camera_Basler)m_module.CamRADS;
+
+            if (m_grabMode.pUseRADS && m_module.RADSControl.p_IsRun == false)
+            {
+                m_module.RADSControl.m_timer.Start();
+                m_module.RADSControl.p_IsRun = true;
+                m_module.RADSControl.StartRADS();
+
+                StopWatch sw = new StopWatch();
+                if (camRADS.p_CamInfo._OpenStatus == false) camRADS.Connect();
+                while (camRADS.p_CamInfo._OpenStatus == false)
+                {
+                    if (sw.ElapsedMilliseconds > 15000)
+                    {
+                        sw.Stop();
+                        return "RADS Camera Not Connected";
+                    }
+                }
+                sw.Stop();
+
+                // Offset 설정
+                m_module.RADSControl.p_connect.SetADSOffset(m_grabMode.pRADSOffset);
+
+                // RADS 카메라 설정
+                camRADS.SetMulticast();
+                camRADS.GrabContinuousShot();
+            }
+
+            return "OK";
+        }
+
+        string ConnectMainCam()
+        {
+            const int TIMEOUT_50MS = 50000;     // ms
+            const int TIMEOUT_INTERVAL = 10;    // ms
+
+            Camera_Dalsa camMain = (Camera_Dalsa)m_grabMode.m_camera;
+
+            camMain.Connect();
+
+            int nTimeOut = TIMEOUT_50MS / TIMEOUT_INTERVAL;
+            while (camMain.p_CamInfo.p_eState != eCamState.Ready)
+            {
+                if (nTimeOut-- == 0)
+                {
+                    throw new Exception("Camera Connect Error");
+                }
+                Thread.Sleep(TIMEOUT_INTERVAL);
+            }
+
+            return "OK";
         }
 
         public override string Run()
@@ -325,7 +344,7 @@ namespace Root_VEGA_D.Module
                         double dOverlap_mm = grabData.m_nOverlap * m_grabMode.m_dResX_um * 0.001;
                         double dPosX = m_grabMode.m_rpAxisCenter.X + m_grabMode.m_nWaferSize_mm * 0.5 - nLineIndex * (dfov_mm - dOverlap_mm);
                         double dNextPosX = dPosX - (dfov_mm - dOverlap_mm);
-                        double dPosZ = m_grabMode.m_dFocusPosZ;
+                        double dPosZ = m_dAFBestFocusPosY;//m_grabMode.m_dFocusPosZ;
 
                         double dTriggerStartPosY = m_grabMode.m_rpAxisCenter.Y + m_grabMode.m_ptXYAlignData.Y - m_grabMode.m_nWaferSize_mm * 0.5;
                         double dTriggerEndPosY = m_grabMode.m_rpAxisCenter.Y + m_grabMode.m_ptXYAlignData.Y + m_grabMode.m_nWaferSize_mm * 0.5;

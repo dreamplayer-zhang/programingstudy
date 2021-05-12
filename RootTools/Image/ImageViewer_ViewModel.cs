@@ -813,6 +813,7 @@ namespace RootTools
 
 			Parallel.For(0, canvasHeight, new ParallelOptions { MaxDegreeOfParallelism = 12 }, (yy) =>
 			{
+				try
 				{
 					long pix_y = (long)(rect.Y + yy * rect.Height / canvasHeight);
 					for (int xx = 0; xx < canvasWidth; xx++)
@@ -832,6 +833,10 @@ namespace RootTools
 							viewPtr[yy, xx, 0] = imageptr[(pix_x * nBytePerPixel + 2) + (long)pix_y * (imgData.p_Size.X * 3)];
 						}
 					}
+				}
+				catch (Exception ex)
+				{
+
 				}
 			});
 
