@@ -228,6 +228,7 @@
     </Compile>
     <Compile Include="Controls\UserControl\ViewModel\MapControl_ViewModel.cs" />
     <Compile Include="Controls\UserControl\ViewModel\FeatureControl_ViewModel.cs" />
+    <Compile Include="DataConverter.cs" />
     <Compile Include="Dialog\Dialog_Scan.xaml.cs">
       <DependentUpon>Dialog_Scan.xaml</DependentUpon>
     </Compile>
@@ -273,16 +274,24 @@
     </Compile>
     <Compile Include="UI\Interfaces\IRecipeUILoadable.cs" />
     <Compile Include="Module\WIND2.cs" />
+    <Compile Include="UI_User\BACK\BacksideProduct.xaml.cs">
+      <DependentUpon>BacksideProduct.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI_User\BACK\BacksideSetup.xaml.cs">
       <DependentUpon>BacksideSetup.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI_User\BACK\BacksideInspect.xaml.cs">
       <DependentUpon>BacksideInspect.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UI_User\BACK\BacksideSpec.xaml.cs">
+      <DependentUpon>BacksideSpec.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI_User\BACK\ViewModels\BacksideInspect_ImageViewer_ViewModel.cs" />
     <Compile Include="UI_User\BACK\ViewModels\BacksideInspect_ViewModel.cs" />
+    <Compile Include="UI_User\BACK\ViewModels\BacksideProduct_ViewModel.cs" />
     <Compile Include="UI_User\BACK\ViewModels\BacksideSetup_ImageViewer_ViewModel.cs" />
     <Compile Include="UI_User\BACK\ViewModels\BacksideSetup_ViewModel.cs" />
+    <Compile Include="UI_User\BACK\ViewModels\BacksideSpec_ViewModel.cs" />
     <Compile Include="UI_User\CAMERA\CameraAlign.xaml.cs">
       <DependentUpon>CameraAlign.xaml</DependentUpon>
     </Compile>
@@ -717,11 +726,19 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="UI_User\BACK\BacksideProduct.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="UI_User\BACK\BacksideSetup.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UI_User\BACK\BacksideInspect.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI_User\BACK\BacksideSpec.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

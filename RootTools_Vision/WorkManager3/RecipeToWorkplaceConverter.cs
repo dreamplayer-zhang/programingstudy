@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Media;
 
 namespace RootTools_Vision.WorkManager3
 {
@@ -98,8 +100,17 @@ namespace RootTools_Vision.WorkManager3
             }
         }
 
-        public static ConcurrentQueue<Workplace> ConvertToQueue(RecipeType_WaferMap waferMap, OriginRecipe originRecipe, SharedBufferInfo bufferInfo, CameraInfo cameraInfo = new CameraInfo())
+        public static ConcurrentQueue<Workplace> ConvertToQueue(RecipeBase recipe, SharedBufferInfo bufferInfo, CameraInfo cameraInfo = new CameraInfo())
         {
+            RecipeType_WaferMap waferMap = recipe.WaferMap;
+            OriginRecipe originRecipe = recipe.GetItem<OriginRecipe>();
+            bool useExclusiveRegion = recipe.UseExclusiveRegion;
+            PathGeometry exRegion = null;
+            if(useExclusiveRegion == true)
+            {
+                exRegion = PolygonController.CreatePolygonGeometry(PolygonController.ReadPolygonFile(recipe.ExclusiveRegionFilePath));
+            }
+
             ConcurrentQueue<Workplace> queue = new ConcurrentQueue<Workplace>();
             WorkplaceBundle bundle = new WorkplaceBundle();
 
@@ -140,6 +151,16 @@ namespace RootTools_Vision.WorkManager3
                             int dieAbsX = originAbsX + dx * diePitchX;
                             int dieAbsY = originAbsY + dy * diePitchY;
 
+                            if(useExclusiveRegion == true)
+                            {
+                                if(PolygonController.HitTest(exRegion, 
+                                    new Rect(new Point(dieAbsX, dieAbsY), 
+                                    new Point(dieAbsX + originWidth, dieAbsY + originHeight))) == true)
+                                {
+                                    continue;
+                                }
+                            }
+
                             Workplace workplace = new Workplace(x, y, dieAbsX, dieAbsY, originWidth, originHeight, queue.Count);
                             if (y == masterY)
                             {
@@ -160,6 +181,16 @@ namespace RootTools_Vision.WorkManager3
                             int dy = y - masterY;
                             int dieAbsX = originAbsX + dx * diePitchX;
                             int dieAbsY = originAbsY + dy * diePitchY;
+
+                            if (useExclusiveRegion == true)
+                            {
+                                if (PolygonController.HitTest(exRegion,
+                                    new Rect(new Point(dieAbsX, dieAbsY),
+                                    new Point(dieAbsX + originWidth, dieAbsY + originHeight))) == true)
+                                {
+                                    continue;
+                                }
+                            }
 
                             Workplace workplace = new Workplace(x, y, dieAbsX, dieAbsY, originWidth, originHeight, queue.Count);
 
@@ -185,6 +216,16 @@ namespace RootTools_Vision.WorkManager3
 
                             Workplace workplace = new Workplace(x, y, dieAbsX, dieAbsY, originWidth, originHeight, queue.Count);
 
+                            if (useExclusiveRegion == true)
+                            {
+                                if (PolygonController.HitTest(exRegion,
+                                    new Rect(new Point(dieAbsX, dieAbsY),
+                                    new Point(dieAbsX + originWidth, dieAbsY + originHeight))) == true)
+                                {
+                                    continue;
+                                }
+                            }
+
                             if (y == masterY)
                             {
                                 workplace.SetSubState(WORKPLACE_SUB_STATE.LINE_FIRST_CHIP, true);
@@ -204,6 +245,16 @@ namespace RootTools_Vision.WorkManager3
                             int dy = y - masterY;
                             int dieAbsX = originAbsX + dx * diePitchX;
                             int dieAbsY = originAbsY + dy * diePitchY;
+
+                            if (useExclusiveRegion == true)
+                            {
+                                if (PolygonController.HitTest(exRegion,
+                                    new Rect(new Point(dieAbsX, dieAbsY),
+                                    new Point(dieAbsX + originWidth, dieAbsY + originHeight))) == true)
+                                {
+                                    continue;
+                                }
+                            }
 
                             Workplace workplace = new Workplace(x, y, dieAbsX, dieAbsY, originWidth, originHeight, queue.Count);
                             

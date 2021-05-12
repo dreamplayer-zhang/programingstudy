@@ -1926,6 +1926,17 @@ namespace RootTools
             }
             return new CPoint(0, 0);
         }
+
+        public CPoint GetCanvasPoint(Point memPt)
+        {
+            if (p_View_Rect.Width > 0 && p_View_Rect.Height > 0)
+            {
+                int nX = ((int)memPt.X - p_View_Rect.X) * p_CanvasWidth / p_View_Rect.Width + (p_CanvasWidth / p_View_Rect.Width) / 2;
+                int nY = ((int)memPt.Y - p_View_Rect.Y) * p_CanvasHeight / p_View_Rect.Height + (p_CanvasHeight / p_View_Rect.Height) / 2;
+                return new CPoint(nX, nY);
+            }
+            return new CPoint(0, 0);
+        }
         protected Point GetCanvasDoublePoint(CPoint memPt)
         {
             if (p_View_Rect.Width > 0 && p_View_Rect.Height > 0)

@@ -29,7 +29,7 @@ namespace RootTools_Vision.WorkManager3
 
         private Task task;
 
-        private List<ColorBuffer> bufferList;
+        private List<CopiedBuffer> bufferList;
 
         #region [Properties]
 
@@ -55,13 +55,17 @@ namespace RootTools_Vision.WorkManager3
         #endregion
 
         #region [ColorBuffer]
-        private class ColorBuffer
+        private class CopiedBuffer
         {
             int width;
             int height;
             byte[] bufferR_GRAY;
             byte[] bufferG;
             byte[] bufferB;
+
+            List<byte[]> bufferList;
+
+            int count;
 
             public byte[] BufferR_GRAY 
             { 
@@ -88,30 +92,52 @@ namespace RootTools_Vision.WorkManager3
                 set => height = value; 
             }
 
-            public ColorBuffer()
+            public List<byte[]> BufferList
+            {
+                get => this.bufferList;
+            }
+
+            public CopiedBuffer()
             {
                 this.width = 0;
                 this.height = 0;
+                this.bufferList = new List<byte[]>();
             }
 
-            public ColorBuffer(int width, int height)
+            public CopiedBuffer(int w, int h, int cnt)
             {
-                this.width = width;
-                this.height = height;
+                this.width = w;
+                this.height = h;
+                this.count = cnt;
 
-                BufferR_GRAY = new byte[width * height];
-                BufferG = new byte[width * height];
-                BufferB = new byte[width * height];
+                this.bufferList = new List<byte[]>();
+                for (int i = 0; i < cnt; i++)
+                {
+                    this.bufferList.Add(new byte[w * h]);
+
+                    if (i == 0) BufferR_GRAY = this.bufferList[0];
+                    if (i == 1) BufferG = this.bufferList[1];
+                    if (i == 2) BufferB = this.bufferList[2];
+                }
             }
 
-            public void Realloc(int width, int height)
+            public void Realloc(int w, int h)
             {
-                this.width = width;
-                this.height = height;
+                if(this.width != w || this.height != h)
+                {
+                    this.width = w;
+                    this.height = h;
 
-                BufferR_GRAY = new byte[width * height];
-                BufferG = new byte[width * height];
-                BufferB = new byte[width * height];
+                    this.bufferList.Clear();
+                    for (int i = 0; i < this.count; i++)
+                    {
+                        this.bufferList.Add(new byte[w * h]);
+
+                        if (i == 0) BufferR_GRAY = this.bufferList[0];
+                        if (i == 1) BufferG = this.bufferList[1];
+                        if (i == 2) BufferB = this.bufferList[2];
+                    }
+                }
             }
         }
         #endregion
@@ -130,8 +156,7 @@ namespace RootTools_Vision.WorkManager3
 
 
             // task 개수랑 같으니깐 task 인덱스로?
-            this.bufferList = new List<ColorBuffer>();
-            this.bufferList.Add(new ColorBuffer(1, 1));
+            this.bufferList = new List<CopiedBuffer>();
         }
 
         public void SetNextPipe(WorkPipe pipe)
@@ -289,12 +314,13 @@ namespace RootTools_Vision.WorkManager3
         {
             return new Task<Workplace>(() =>
             {
-                ColorBuffer buffer = new ColorBuffer();
+                // 이거 나중에 버퍼 재활용하도록 변경해얄함
+                CopiedBuffer buffer = null;
                 if (works.Count > 0 && works[0].Type == WORK_TYPE.INSPECTION)
                 {
-                    buffer.Realloc(workplace.Width, workplace.Height);
+                    //buffer.Realloc(workplace.Width, workplace.Height);
 
-                    CopyBuffer(workplace, ref buffer);
+                    CopyBuffer(workplace, out buffer);
                 }
 
                 foreach (WorkBase work in works)
@@ -304,9 +330,9 @@ namespace RootTools_Vision.WorkManager3
 
                     WorkBase clone = work.Clone();
 
-                    if(work.Type == WORK_TYPE.INSPECTION)
+                    if(work.Type == WORK_TYPE.INSPECTION && buffer != null)
                     {
-                        clone.SetWorkplaceBuffer(buffer.BufferR_GRAY, buffer.BufferG, buffer.BufferB);
+                        clone.SetWorkplaceBuffer(buffer.BufferList);
                     }
                     
                     clone.SetWorkplace(workplace);
@@ -357,15 +383,25 @@ namespace RootTools_Vision.WorkManager3
             });
         }
 
-        private static void CopyBuffer(Workplace workplace, ref ColorBuffer buffer)
+        private static void CopyBuffer(Workplace workplace, out CopiedBuffer buffer)
         {
+            buffer = null;
             if (workplace.Width == 0 || workplace.Height == 0) return;
 
             if (workplace.SharedBufferInfo.PtrR_GRAY == IntPtr.Zero)
                 return;
 
-            Tools.ParallelImageCopy(
-                workplace.SharedBufferInfo.PtrR_GRAY,
+            int channelCount = workplace.SharedBufferInfo.PtrList.Count;
+
+            buffer = new CopiedBuffer(workplace.Width, workplace.Height, channelCount);
+
+            
+            for(int i = 0; i  < channelCount; i++)
+            {
+                IntPtr ptr = workplace.SharedBufferInfo.PtrList[i];
+
+                Tools.ParallelImageCopy(
+                workplace.SharedBufferInfo.PtrList[i],
                 workplace.SharedBufferInfo.Width,
                 workplace.SharedBufferInfo.Height,
                 new CRect
@@ -374,41 +410,56 @@ namespace RootTools_Vision.WorkManager3
                     workplace.PositionY + workplace.Height,
                     workplace.PositionX + workplace.Width,
                     workplace.PositionY),
-                buffer.BufferR_GRAY);
-
-
-            if (workplace.SharedBufferInfo.PtrG == IntPtr.Zero ||
-               workplace.SharedBufferInfo.PtrB == IntPtr.Zero)
-            {
-                return;
+                    buffer.BufferList[i]);
             }
 
-            if (workplace.SharedBufferInfo.ByteCnt == 3)
-            {
-                Tools.ParallelImageCopy(
-                    workplace.SharedBufferInfo.PtrG,
-                    workplace.SharedBufferInfo.Width,
-                    workplace.SharedBufferInfo.Height,
-                    new CRect
-                    (
-                        workplace.PositionX,
-                        workplace.PositionY + workplace.Height,
-                        workplace.PositionX + workplace.Width,
-                        workplace.PositionY),
-                    buffer.BufferG);
+            //Old
 
-                Tools.ParallelImageCopy(
-                    workplace.SharedBufferInfo.PtrB,
-                    workplace.SharedBufferInfo.Width,
-                    workplace.SharedBufferInfo.Height,
-                    new CRect
-                    (
-                        workplace.PositionX,
-                        workplace.PositionY + workplace.Height,
-                        workplace.PositionX + workplace.Width,
-                        workplace.PositionY),
-                   buffer.BufferB);
-            }
+            //Tools.ParallelImageCopy(
+            //    workplace.SharedBufferInfo.PtrR_GRAY,
+            //    workplace.SharedBufferInfo.Width,
+            //    workplace.SharedBufferInfo.Height,
+            //    new CRect
+            //    (
+            //        workplace.PositionX,
+            //        workplace.PositionY + workplace.Height,
+            //        workplace.PositionX + workplace.Width,
+            //        workplace.PositionY),
+            //    buffer.BufferR_GRAY);
+
+
+            //if (workplace.SharedBufferInfo.PtrG == IntPtr.Zero ||
+            //   workplace.SharedBufferInfo.PtrB == IntPtr.Zero)
+            //{
+            //    return;
+            //}
+
+            //if (workplace.SharedBufferInfo.ByteCnt == 3)
+            //{
+            //    Tools.ParallelImageCopy(
+            //        workplace.SharedBufferInfo.PtrG,
+            //        workplace.SharedBufferInfo.Width,
+            //        workplace.SharedBufferInfo.Height,
+            //        new CRect
+            //        (
+            //            workplace.PositionX,
+            //            workplace.PositionY + workplace.Height,
+            //            workplace.PositionX + workplace.Width,
+            //            workplace.PositionY),
+            //        buffer.BufferG);
+
+            //    Tools.ParallelImageCopy(
+            //        workplace.SharedBufferInfo.PtrB,
+            //        workplace.SharedBufferInfo.Width,
+            //        workplace.SharedBufferInfo.Height,
+            //        new CRect
+            //        (
+            //            workplace.PositionX,
+            //            workplace.PositionY + workplace.Height,
+            //            workplace.PositionX + workplace.Width,
+            //            workplace.PositionY),
+            //       buffer.BufferB);
+            //}
         }
     }
 }

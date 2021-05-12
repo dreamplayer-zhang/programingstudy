@@ -8,6 +8,7 @@ using RootTools.ToolBoxs;
 using RootTools.Trees;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Net.Sockets;
 using System.Text;
@@ -103,6 +104,16 @@ namespace RootTools.Module
         /// <summary> InitModuleRuns() : ModuleBase.m_aModuleRun 에 ModuleRun을 등록한다 </summary>
         protected virtual void InitModuleRuns() { }
 
+        public virtual ObservableCollection<string> GetModuleruns()
+        {
+            ObservableCollection<string> result = new ObservableCollection<string>();
+            for (int i = 0; i < m_asModuleRun.Count; i++)
+            {
+                result.Add(m_asModuleRun[i]);
+            }
+            return result;
+        }
+        
         public virtual void GetTools(bool bInit) { }
         public virtual void InitMemorys() { }
 

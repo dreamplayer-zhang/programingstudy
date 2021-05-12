@@ -13,6 +13,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using RootTools.Database;
 
 namespace Root_WindII
 {
@@ -221,6 +222,8 @@ namespace Root_WindII
             GlobalObjects.Instance.Get<WindII_Engineer>().ThreadStop();
         }
 
+        public IDialogService dialogService;
+
         private void Init()
         {
             CreateGlobalPaths();
@@ -241,7 +244,10 @@ namespace Root_WindII
             //UIManager.Instance.MainPanel = this.MainPanel;
             //UIManager.Instance.ChangeUIMode();
 
-            //SettingItem_Database frontSettings = GlobalObjects.Instance.Get<Settings>().GetItem<SettingItem_Database>();
+            SettingItem_Database frontSettings = GlobalObjects.Instance.Get<Settings>().GetItem<SettingItem_Database>();
+            DatabaseManager.Instance.SetDatabase(1, frontSettings.SerevrName, frontSettings.DBName, frontSettings.DBUserID, frontSettings.DBPassword);
+            DatabaseManager.Instance.ValidateDatabase();
+
             //logView.Init(LogView._logView);
             //WarningUI.Init(GlobalObjects.Instance.Get<WIND2_Warning>());
             //InitTimer();
@@ -290,17 +296,8 @@ namespace Root_WindII
 
                 
                 // ImageData
-                //if (engineer.m_eMode == WIND2_Engineer.eMode.EFEM)
-                {
-                    MemoryData memoryData = memoryTool.GetMemory(memoryFrontPool, memoryFrontGroup, memoryFront);
-                    frontImage = GlobalObjects.Instance.RegisterNamed<ImageData>("FrontImage", memoryFrontPool, memoryFrontGroup, memoryFront, memoryTool, memoryData.p_nCount, memoryData.p_nByte);
-                    maskLayer = GlobalObjects.Instance.RegisterNamed<ImageData>("MaskImage", memoryTool.GetMemory(memoryFrontPool, memoryFrontGroup, memoryMask));
-                }
-                //else
-                //{
-                //    frontImage = GlobalObjects.Instance.RegisterNamed<ImageData>("FrontImage", memoryTool.GetMemory(memoryFrontPool, memoryFrontGroup, memoryFront));
-                //    maskLayer = GlobalObjects.Instance.RegisterNamed<ImageData>("MaskImage", memoryTool.GetMemory(memoryFrontPool, memoryFrontGroup, memoryMask));
-                //}
+                frontImage = GlobalObjects.Instance.RegisterNamed<ImageData>("FrontImage", memoryTool.GetMemory(memoryFrontPool, memoryFrontGroup, memoryFront));
+                maskLayer = GlobalObjects.Instance.RegisterNamed<ImageData>("MaskImage", memoryTool.GetMemory(memoryFrontPool, memoryFrontGroup, memoryMask));
 
                 //ImageData backImage = GlobalObjects.Instance.RegisterNamed<ImageData>("BackImage", memoryTool.GetMemory(memoryBackPool, memoryBackGroup, memoryBack));
                 //ImageData edgeTopImage = GlobalObjects.Instance.RegisterNamed<ImageData>("EdgeTopImage", memoryTool.GetMemory(memoryEdgePool, memoryEdgeGroup, memoryEdgeTop));
@@ -338,7 +335,6 @@ namespace Root_WindII
                 //    ebrImage.p_nPlane = engineer.ClassMemoryTool().GetMemory(memoryEdgePool, memoryEdgeGroup, memoryEdgeEBR).p_nCount;
                 //}
                 
-                /*
                 // Recipe
                 RecipeFront recipeFront = GlobalObjects.Instance.Register<RecipeFront>();
                 RecipeBack recipeBack = GlobalObjects.Instance.Register<RecipeBack>();
@@ -358,9 +354,12 @@ namespace Root_WindII
                             frontImage.GetPtr(1),
                             frontImage.GetPtr(2),
                                 new MemoryID(memoryFrontPool, memoryFrontGroup, memoryFront)));
+
+                    CameraInfo camInfo = DataConverter.GrabModeToCameraInfo(engineer.m_handler.p_VisionFront.GetGrabMode(recipeFront.CameraInfoIndex));
+                    frontInspection.SetCameraInfo(camInfo);
                 }
 
-                if (backImage.GetPtr() == IntPtr.Zero)
+                /*if (backImage.GetPtr() == IntPtr.Zero)
                 {
                     //MessageBox.Show("Back Inspection 생성 실패, 메모리 할당 없음");
                 }

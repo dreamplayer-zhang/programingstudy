@@ -186,7 +186,7 @@ namespace Root_CAMELLIA.ManualJob
 
         void InitInfo()
         {
-            textboxLocID.Text = m_infoCarrier.p_sLocID;
+            //textboxLocID.Text = m_infoCarrier.p_sLocID;
             textboxLotID.Text = m_infoCarrier.p_sLotID;
             textboxCstID.Text = m_infoCarrier.p_sCarrierID;
         }
@@ -233,12 +233,13 @@ namespace Root_CAMELLIA.ManualJob
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             if (m_infoCarrier == null) return;
-            m_infoCarrier.p_sLocID = textboxLocID.Text;
+            //m_infoCarrier.p_sLocID = textboxLocID.Text;
             m_infoCarrier.p_sLotID = textboxLotID.Text;
             m_infoCarrier.p_sCarrierID = textboxCstID.Text;
             for(int i=0; i<nSlot; i++)
             {
                 InfoWafer infoWafer = m_infoCarrier.GetInfoWafer(i); 
+
                 if (infoWafer != null)
                 {
                     infoWafer.p_eState = (m_tblockState[i].Text == "Select") ? GemSlotBase.eState.Select : GemSlotBase.eState.Empty;

@@ -337,7 +337,7 @@ namespace Root_VEGA_P_Vision.Module
         #region ModuleRun
         protected override void InitModuleRuns()
         {
-            AddModuleRunList(new Run_Remote(this), true, "Remote Run");
+            AddModuleRunList(new Run_Remote(this), false, "Remote Run");
             AddModuleRunList(new Run_Delay(this), true, "Time Delay");
         }
 

@@ -612,7 +612,7 @@ namespace Root_VEGA_P_Vision.Module
             AddModuleRunList(new Run_SideGrab(this), true, App.mSideGrab);
             AddModuleRunList(new Run_StainGrab(this), true, App.mStainGrab);
             AddModuleRunList(new Run_ZStack(this), true, App.mZStack);
-            AddModuleRunList(new Run_Remote(this), true, "Remote Run");
+            AddModuleRunList(new Run_Remote(this), false, "Remote Run");
             AddModuleRunList(new Run_Delay(this), true, "Time Delay");
         }        
             

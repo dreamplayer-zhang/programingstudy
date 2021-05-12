@@ -72,47 +72,31 @@ namespace Root_CAMELLIA
                 NormalizeButton.Visibility = Visibility.Collapsed;
             }
             this.DataContext = new MainWindow_ViewModel(this);
-            SplashScreenHelper.ShowProgress(20);
         }
 
         CAMELLIA_Engineer m_engineer;
         CAMELLIA_Handler m_handler;
+       
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            //App.m_engineer.Init("Camellia");
             SplashScreenHelper.ShowText("Handler Initialize");
             m_engineer = App.m_engineer;
             m_handler = m_engineer.m_handler;
-            loadportA.Init(m_handler.m_aLoadport[0], m_handler, m_handler.m_aRFID[0]);
-            loadportB.Init(m_handler.m_aLoadport[1], m_handler, m_handler.m_aRFID[1]);
+            //loadportA.Init(m_handler.m_aLoadport[0], m_handler, m_handler.m_aRFID[0]);
+            //loadportB.Init(m_handler.m_aLoadport[1], m_handler, m_handler.m_aRFID[1]);
 
             int nLPNum = m_handler.m_aLoadport.Count;
             for (int i = 0; i < nLPNum; i++) dlgOHT.Init(m_handler.m_aLoadport[i].m_OHTNew);
             SplashScreenHelper.ShowText("Handler Initialize Done");
-            SplashScreenHelper.ShowProgress(40);
 
             SplashScreenHelper.ShowText("Log View Initialize");
             LogUI.Init(LogView._logView);
             SplashScreenHelper.ShowText("Log View Initialize Done");
-            SplashScreenHelper.ShowProgress(60);
-
-            //SplashScreenHelper.ShowText("Optic Lamp Initialize");
-            //App.m_nanoView.m_PMDatas.InitLamp();
-            //SplashScreenHelper.ShowText("Optic Lamp Initialize Done");
-            //SplashScreenHelper.ShowProgress(70);
 
             SplashScreenHelper.ShowText("Log View Initialize Done");
-            SplashScreenHelper.ShowProgress(80);
             InitTimer();
 
             SplashScreenHelper.ShowText("Camellia2 Initialize Done");
-            SplashScreenHelper.ShowProgress(100);
-            //m_handler.m_camellia.p_CamVRS.Connect();
-            //while (!m_handler.m_camellia.p_CamVRS.m_ConnectDone)
-            //{
-
-            //}
-            //m_handler.m_HomeProgress.Owner = this;
         }
 
         DispatcherTimer m_timer = new DispatcherTimer();

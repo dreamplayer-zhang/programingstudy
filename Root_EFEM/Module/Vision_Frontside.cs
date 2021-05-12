@@ -125,6 +125,14 @@ namespace Root_EFEM
             }
             return null;
         }
+        public GrabModeFront GetGrabMode(int index)
+        {
+            if (m_aGrabMode?.Count > 0)
+            {
+                return m_aGrabMode[index];
+            }
+            return null;
+        }
 
         public void ClearData()
         {

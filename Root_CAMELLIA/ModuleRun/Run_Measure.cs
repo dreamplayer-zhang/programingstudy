@@ -256,30 +256,15 @@ namespace Root_CAMELLIA.Module
                 Met.DataManager.GetInstance().m_SettngData.nMeasureIntTime_VIS = m_DataManager.recipeDM.MeasurementRD.VISIntegrationTime;
             }
 
-            //m_module.p_eState = (eState)5;
             AxisXY axisXY = m_module.p_axisXY;
             Axis axisZ = m_module.p_axisZ;
 
-            // stage 48724 , wafer 47932
-            //if (m_module.Run(axisZ.StartMove(m_dFocusZ_pulse)))
-            //{
-            //    return p_sInfo;
-            //}
-            //if (m_module.Run(axisZ.WaitReady()))
-            //    return p_sInfo;
-
-            //return "OK";
-
-            Camera_Basler VRS = m_module.p_CamVRS;
-            ImageData img = VRS.p_ImageViewer.p_ImageData;
-            //string strVRSImageDir = "D:\\";
-            //string strVRSImageFullPath = "";
             RPoint MeasurePoint;
 
 
             Met.DataManager dm = Met.DataManager.GetInstance();
-            //App.m_nanoView.UpdateModel();
             dm.ClearRawData();
+
             if (!m_bUseTestSequence && !m_isPointMeasure)
             {
                 double centerX;
@@ -354,19 +339,6 @@ namespace Root_CAMELLIA.Module
                     sw.Start();
 
                     thicknessQueue.Enqueue(i);
-    //                    if (App.m_nanoView.SampleMeasure(i, x, y,
-    //m_mwvm.SettingViewModel.p_ExceptNIR, m_DataManager.recipeDM.MeasurementRD.UseTransmittance, m_DataManager.recipeDM.MeasurementRD.UseThickness,
-    //m_DataManager.recipeDM.MeasurementRD.LowerWaveLength, m_DataManager.recipeDM.MeasurementRD.UpperWaveLength) != Met.Nanoview.ERRORCODE_NANOVIEW.SR_NO_ERROR)
-    //                    {
-    //                        isEQStop = false;
-    //                        return "Layer Model Not Ready";
-    //                    }
-
-    //                //pp.m_nanoView.
-    //                StopWatch sw = new StopWatch();
-    //                sw.Start();
-
-    //                thicknessQueue.Enqueue(i);
 
                     if (i < m_DataManager.recipeDM.MeasurementRD.DataSelectedPoint.Count - 1)
                     {
@@ -392,19 +364,9 @@ namespace Root_CAMELLIA.Module
                             m_mwvm.p_ArrowVisible = Visibility.Visible;
                         }
                     }
-                    //obj = i;
-                    //ThreadPool.QueueUserWorkItem(SaveRawData, obj);
+
                     if (m_module.Run(axisXY.WaitReady()))
                         return p_sInfo;
-                    //if (VRS.Grab() == "OK")
-                    //{
-                    //    strVRSImageFullPath = string.Format(strVRSImageDir + "VRSImage_{0}.bmp", i);
-                    //    img.SaveImageSync(strVRSImageFullPath);
-                    //    //Grab error
-                    //}
-                    ////Thread.Sleep(600);
-
-                    //m_mwvm.p_Progress = (((double)(i + 1) / m_DataManager.recipeDM.MeasurementRD.DataSelectedPoint.Count) * 100);
                 }
                 m_mwvm.p_ArrowVisible = Visibility.Hidden;
 
@@ -437,16 +399,7 @@ namespace Root_CAMELLIA.Module
                     return "Layer Model Not Ready";
                 }
                 thicknessQueue.Enqueue(0);
-                //App.m_nanoView.GetThickness(0, m_DataManager.recipeDM.MeasurementRD.LMIteration, m_DataManager.recipeDM.MeasurementRD.DampingFactor);
-                //object obj;
-                //obj = 0;
-                //ThreadPool.QueueUserWorkItem(SaveRawData, obj);
             }
-
-            //if (isEQStop)
-            //{
-            //    return "Get Tickness Error";
-            //}
 
             MeasureDone = true;
 
@@ -495,26 +448,6 @@ namespace Root_CAMELLIA.Module
             LibSR_Met.DataManager.GetInstance().SaveResultFileSummary(m_summaryPath + "\\" + DateTime.Now.ToString("HHmmss") + "Summary.csv", m_module.p_infoWafer.p_sLotID, m_module.p_infoWafer.p_sSlotID, m_DataManager.recipeDM.MeasurementRD.DataSelectedPoint.Count) ;
 
             return "OK";
-        }
-
-        void SaveRawData(object obj)
-        {
-            int i = (int)obj;
-            
-            if (m_module.p_infoWafer != null)
-            {
-                Met.DataManager.GetInstance().SaveRawData(@"C:\Users\ATI\Desktop\MeasureData\" + m_module.p_infoWafer.p_id + "_" + DateTime.Now.ToString("HH-mm-ss") + "_" + i, i);
-                //Thread.Sleep(3000);
-            }
-            else
-            {
-                Met.DataManager.GetInstance().SaveRawData(@"C:\Users\ATI\Desktop\MeasureData\" + "test_" + DateTime.Now.ToString("HH-mm-ss") + "_" + i, i);
-                //Thread.Sleep(3000);
-            }
-            //20210308
-            //m_mwvm.p_RTGraph.DrawReflectanceGraph(i, "Wavelength(nm)", "Reflectance(%)");
-            //m_mwvm.p_RTGraph.DrawTransmittanceGraph(i, "Wavelength(nm)", "Reflectance(%)");
-            //isSaveDone = true;
         }
 
         void SaveRawData(int index)

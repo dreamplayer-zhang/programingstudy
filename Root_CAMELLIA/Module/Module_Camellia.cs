@@ -373,7 +373,7 @@ namespace Root_CAMELLIA.Module
                 {
                     p_eState = eState.Error;
                     p_sInfo = "Vacuum is not turn off";
-                    MessageBox.Show(p_sInfo);
+                    CustomMessageBox.Show(p_sInfo);
                     return p_sInfo;
                 }
                 p_axisLifter.StartHome();
@@ -381,7 +381,7 @@ namespace Root_CAMELLIA.Module
                 {
                     p_eState = eState.Error;
                     p_sInfo = "Lifter Home Error";
-                    MessageBox.Show(p_sInfo);
+                    CustomMessageBox.Show(p_sInfo);
                     return p_sInfo;
                 }
 

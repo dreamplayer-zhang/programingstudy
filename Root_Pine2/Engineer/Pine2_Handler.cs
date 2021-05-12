@@ -32,9 +32,9 @@ namespace Root_Pine2.Engineer
         public ModuleList p_moduleList { get; set; }
         public Pine2 m_pine2;
         public LoadEV m_loadEV;
-        public MGZ_EV[] m_MGZEV = new MGZ_EV[8]; 
+        public MagazineEVSet m_magazineEV = new MagazineEVSet();
+        public Transfer m_transfer; 
         public Vision[] m_vision = new Vision[3]; 
-
         void InitModule()
         {
             p_moduleList = new ModuleList(m_engineer);
@@ -42,13 +42,11 @@ namespace Root_Pine2.Engineer
             InitModule(m_pine2);
             m_loadEV = new LoadEV("LoadEV", m_engineer);
             InitModule(m_loadEV);
-            for (int n = 0; n < 8; n++)
-            {
-                m_MGZEV[n] = new MGZ_EV("MGZ ", n, m_engineer, m_pine2);
-                InitModule(m_MGZEV[n]); 
-            }
-            m_vision[0] = new Vision("Vision Top", m_engineer, ModuleBase.eRemote.Client);
-            m_vision[1] = new Vision("Vision 3D", m_engineer, ModuleBase.eRemote.Client);
+            InitMagazineEV();
+            m_transfer = new Transfer("Transter", m_engineer, m_pine2, m_magazineEV);
+            InitModule(m_transfer); 
+            m_vision[0] = new Vision("Vision 3D", m_engineer, ModuleBase.eRemote.Client);
+            m_vision[1] = new Vision("Vision Top", m_engineer, ModuleBase.eRemote.Client);
             m_vision[2] = new Vision("Vision Bottom", m_engineer, ModuleBase.eRemote.Client);
             InitModule(m_vision[0]);
             InitModule(m_vision[1]);
@@ -60,6 +58,16 @@ namespace Root_Pine2.Engineer
             ModuleBase_UI ui = new ModuleBase_UI();
             ui.Init(module);
             p_moduleList.AddModule(module, ui);
+        }
+
+        void InitMagazineEV()
+        {
+            foreach (InfoStrip.eMagazine eMagazine in Enum.GetValues(typeof(InfoStrip.eMagazine)))
+            {
+                MagazineEV magazineEV = new MagazineEV(eMagazine, m_engineer, m_pine2);
+                m_magazineEV.m_aEV.Add(eMagazine, magazineEV);
+                InitModule(magazineEV); 
+            }
         }
         #endregion
 

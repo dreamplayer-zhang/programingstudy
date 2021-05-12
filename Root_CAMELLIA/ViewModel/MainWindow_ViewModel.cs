@@ -25,7 +25,8 @@ namespace Root_CAMELLIA
     {
         private MainWindow m_MainWindow;
         private DataManager _DataManager;
-        public DataManager DataManager {
+        public DataManager DataManager
+        {
             get
             {
                 return _DataManager;
@@ -207,18 +208,7 @@ namespace Root_CAMELLIA
                 Mat mat = new Mat(new System.Drawing.Size(p_CamVRS.GetRoiSize().X, p_CamVRS.GetRoiSize().Y), Emgu.CV.CvEnum.DepthType.Cv8U, 3, p_CamVRS.p_ImageViewer.p_ImageData.GetPtr(), (int)p_CamVRS.p_ImageViewer.p_ImageData.p_Stride * 3);
                 Image<Bgra, byte> img = mat.ToImage<Bgra, byte>();
 
-                //CvInvoke.Imshow("aa",img.Mat);
-                //CvInvoke.WaitKey(0);
-                //CvInvoke.DestroyAllWindows();
-                //p_rootViewer.p_ImageData = new ImageData(p_CamVRS.p_ImageViewer.p_ImageData);
-                //lock (lockObject)
-                //{
-
-                p_imageSource = ImageHelper.ToBitmapSource(img);
-                //}
-                //p_rootViewer.SetImageSource();
-                
-              
+                p_imageSource = ImageHelper.ToBitmapSource(img);    
             });
            
         }
@@ -702,6 +692,8 @@ namespace Root_CAMELLIA
             PMViewModel = new Dlg_PM_ViewModel(this);
             ReviewViewModel = new Dlg_Review_ViewModel(this);
             LoginViewModel = new Dlg_Login_ViewModel(this);
+            loadportA_ViewModel = new Loadport_ViewModel(0);
+            loadportB_ViewModel = new Loadport_ViewModel(1);
             //StageMapViewModel = new Dlg_StageMapSetting_ViewModel(this);
         }
 
@@ -747,6 +739,33 @@ namespace Root_CAMELLIA
         public Dlg_Review_ViewModel ReviewViewModel;
         public Dlg_Login_ViewModel LoginViewModel;
         public Dlg_StageMapSetting_ViewModel StageMapViewModel;
+        Loadport_ViewModel _loadportA_ViewModel;
+        public Loadport_ViewModel loadportA_ViewModel
+        {
+            get
+            {
+                return _loadportA_ViewModel;
+            }
+            set
+            {
+                SetProperty(ref _loadportA_ViewModel, value);
+            }
+        }
+        Loadport_ViewModel _loadportB_ViewModel;
+        public Loadport_ViewModel loadportB_ViewModel
+        {
+            get
+            {
+                return _loadportB_ViewModel;
+            }
+            set
+            {
+                SetProperty(ref _loadportB_ViewModel, value);
+            }
+        }
+
+
+
         public Dlg_RecipeManager_ViewModel RecipeViewModel
         {
             get
@@ -898,6 +917,18 @@ namespace Root_CAMELLIA
         #endregion
 
         #region ICommand
+        public ICommand CmdEngineerTest
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    //Module_FFU.Unit.Fan fan = FFUListItems[1].Unit as Module_FFU.Unit.Fan;
+                    //fan.p_nRPM = 1000;
+                    //App.m_engineer.m_handler.m_aLoadport[0].p_bPlaced = true;
+                });
+            }
+        }
         public ICommand CmdLoad
         {
             get
@@ -977,6 +1008,7 @@ namespace Root_CAMELLIA
                     {
                         p_DrawCandidatePointElement = new ObservableCollection<UIElement>(RecipeViewModel.p_DrawCandidatePointElement);
                         PointListItem = RecipeViewModel.PointListItem.Copy();
+                        PointCount = RecipeViewModel.PointCount;
                     }
                     p_DrawPointElement = new ObservableCollection<UIElement>(RecipeViewModel.p_DrawPointElement);
                     DrawMeasureRoute();
@@ -1153,14 +1185,20 @@ namespace Root_CAMELLIA
             {
                 return new RelayCommand(() =>
                 {
+                    MessageBoxResult res = CustomMessageBox.Show("Exit", "Do you want Exit?", MessageBoxButton.OKCancel, CustomMessageBox.MessageBoxImage.Question);
+
+                    //MessageBoxResult res = MessageBox.Show("Exit?", "Exit", MessageBoxButton.OKCancel, MessageBoxImage.Question);
                     
-                    m_MainWindow.Close();
-                    m_timer.Stop();
-                    m_statusTimer.Stop();
-                    App.m_engineer.ThreadStop();
-                    DataManager.Instance.m_SaveMeasureData.ThreadStop();
-                    App.m_engineer.BuzzerOff();
-                    Application.Current.Shutdown();
+                    if(res == MessageBoxResult.OK)
+                    {
+                        m_MainWindow.Close();
+                        m_timer.Stop();
+                        m_statusTimer.Stop();
+                        App.m_engineer.ThreadStop();
+                        DataManager.Instance.m_SaveMeasureData.ThreadStop();
+                        App.m_engineer.BuzzerOff();
+                        Application.Current.Shutdown();
+                    }
                 });
             }
         }

@@ -85,7 +85,27 @@ namespace RootTools_Vision.WorkManager3
         }
         #endregion
 
-        public WorkManager(int inspectionThreadNum = 4)
+
+        public WorkManager()
+        {
+            pipeLine = new WorkPipeLine(1);
+
+            WorkEventManager.PositionDone += PositionDone_Callback;
+
+            WorkEventManager.InspectionStart += InspectionStart_Callback;
+            WorkEventManager.InspectionDone += InspectionDone_Callback;
+
+            WorkEventManager.ProcessDefectDone += ProcessDefectDone_Callback;
+
+            WorkEventManager.ProcessDefectWaferStart += ProcessDefectWaferStart_Callback;
+            WorkEventManager.IntegratedProcessDefectDone += IntegratedProcessDefectDone_Callback;
+
+            WorkEventManager.ProcessMeasurementDone += ProcessMeasurementDone_Callback;
+
+            WorkEventManager.WorkplaceStateChanged += WorkplaceStateChanged_Callback;
+        }
+
+        public WorkManager(int inspectionThreadNum)
         {
             pipeLine = new WorkPipeLine(inspectionThreadNum);
 
@@ -150,22 +170,28 @@ namespace RootTools_Vision.WorkManager3
             // 레시피 기반으로 work/workplace 생성
             if(inspOnly == false)
             {
-                RecipeToWorkConverter.Convert(this.recipe);
+                works.Add(new Snap());
+                
+            }
+            WorkBundle temp = RecipeToWorkConverter.Convert(this.recipe);
+            foreach(WorkBase work in temp)
+            {
+                works.Add(work);
             }
 
             this.currentWorkplaceQueue = 
-                RecipeToWorkplaceConverter.ConvertToQueue(this.recipe.WaferMap, this.recipe.GetItem<OriginRecipe>(), this.sharedBuffer, this.cameraInfo);
+                RecipeToWorkplaceConverter.ConvertToQueue(this.recipe, this.sharedBuffer, this.cameraInfo);
 
             pipeLine.Start(
-                this.currentWorkplaceQueue, 
-                RecipeToWorkConverter.Convert(this.recipe)
+                this.currentWorkplaceQueue,
+                works
                 );
         }
 
 
         public void CheckSnapDone(Rect snapArea)
         {
-            if (this.currentWorkplaceQueue == null) return;
+            if (this.currentWorkplaceQueue == null || this.currentWorkplaceQueue.Count == 0) return;
 
             foreach (Workplace wp in this.currentWorkplaceQueue)
             {

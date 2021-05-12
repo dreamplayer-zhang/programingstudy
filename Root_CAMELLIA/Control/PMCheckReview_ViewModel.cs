@@ -252,7 +252,8 @@ namespace Root_CAMELLIA
             EQ.p_bStop = false;
             if (ModuleCamellia.p_eState != ModuleBase.eState.Ready)
             {
-                MessageBox.Show("Vision Home이 완료 되지 않았습니다.");
+                //MessageBox.Show("Vision Home이 완료 되지 않았습니다.");
+                CustomMessageBox.Show("Vision Home이 완료 되지 않았습니다.");
                 return;
             }
             Thread thread = new Thread(() =>
@@ -268,7 +269,7 @@ namespace Root_CAMELLIA
             EQ.p_bStop = false;
             if (ModuleCamellia.p_eState != ModuleBase.eState.Ready)
             {
-                MessageBox.Show("Vision Home이 완료 되지 않았습니다.");
+                CustomMessageBox.Show("Vision Home이 완료 되지 않았습니다.");
                 return;
             }
             Thread thread = new Thread(() =>
@@ -283,7 +284,7 @@ namespace Root_CAMELLIA
             EQ.p_bStop = false;
             if (ModuleCamellia.p_eState != ModuleBase.eState.Ready)
             {
-                MessageBox.Show("Vision Home이 완료 되지 않았습니다.");
+                CustomMessageBox.Show("Vision Home이 완료 되지 않았습니다.");
                 return;
             }
             Thread thread = new Thread(() =>
@@ -298,7 +299,7 @@ namespace Root_CAMELLIA
             EQ.p_bStop = false;
             if (ModuleCamellia.p_eState != ModuleBase.eState.Ready)
             {
-                MessageBox.Show("Vision Home이 완료 되지 않았습니다.");
+                CustomMessageBox.Show("Vision Home이 완료 되지 않았습니다.");
                 return;
             }
             Thread thread = new Thread(() =>

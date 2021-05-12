@@ -135,7 +135,7 @@ namespace Root_CAMELLIA.Module
             m_alidEFEMPC_FanAlarm = m_gaf.GetALID(this, "EFEM PC Fan", "EFEM PC Fan Alarm");
             m_alidEFEMWTR_FanAlarm = m_gaf.GetALID(this, "EFEM WTR Fan", "EFEM WTR Fan Alarm");
             m_alidVision4Ch_FanAlarm = m_gaf.GetALID(this, "Vision 4Ch Fan", "Vision 4Ch Fan Alarm");
-            m_alidVisionPC_FanAlarm = m_gaf.GetALID(this, "Vision PC Fan", "Vision PC Fan Alarm");
+            m_alidVisionPC_FanAlarm = m_gaf.GetALID(this, "Vision PC Door Fan", "Vision PC Door Fan Alarm");
             m_alidVisionTop_FanAlarm = m_gaf.GetALID(this, "Vision Top Fan", "Vision Top Fan Alarm");
             m_alidVisionBtm_FanAlarm = m_gaf.GetALID(this, "Vision Btm Fan", "Vision Bottom Fan Alarm");
 

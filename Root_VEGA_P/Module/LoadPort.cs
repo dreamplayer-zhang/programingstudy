@@ -654,8 +654,8 @@ namespace Root_VEGA_P.Module
         #region ModuleRun
         protected override void InitModuleRuns()
         {
-            AddModuleRunList(new Run_Docking(this), false, "Docking Pod to Work Position");
-            AddModuleRunList(new Run_Undocking(this), false, "Undocking Pod from Work Position");
+            AddModuleRunList(new Run_Docking(this), true, "Docking Pod to Work Position");
+            AddModuleRunList(new Run_Undocking(this), true, "Undocking Pod from Work Position");
         }
 
         public class Run_Docking : ModuleRunBase
