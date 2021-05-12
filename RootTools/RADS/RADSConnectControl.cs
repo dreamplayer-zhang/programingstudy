@@ -83,7 +83,7 @@ namespace RootTools.RADS
 		/// 물리적으로 연결된 모든 네트워크에서 Piezo Controller를 탐색
 		/// </summary>
 		/// <param name="dest_ip">Broadcast IP. 기본값은 Piezo Broadcast IP인 100.11.255.255. 그 외 전역 탐색의 경우 255.255.255.255 사용 권장</param>
-		public void GetDeviceInfo(string dest_ip = "255.255.255.255")
+		public void GetDeviceInfo(string dest_ip = "255.255.255.255", int nMsTimeout = 3000)
 		{
 			//100.11.0.12 Default IP Dest
 			//Broadcast Address : 100.11.255.255
@@ -110,8 +110,13 @@ namespace RootTools.RADS
 			listen.EnableBroadcast = true;
 			listen.Send(bytes, bytes.Length, new IPEndPoint(IPAddress.Parse(dest_ip), RADSControlInfo.ADSCP_PORT));
 
+			// Timeout 체크용
+			StopWatch sw = new StopWatch();
+			sw.p_msTimeout = nMsTimeout;
+			sw.Start();
+
 			IPEndPoint from = new IPEndPoint(0, 0);
-			while (true)
+			while (!sw.IsTimeover())
 			{
 				//Receive가 중복해서 여러개 날아오기 때문에 어쩔 수 없음
 				//var echoBuffer = listen.Receive(ref from);
@@ -133,8 +138,7 @@ namespace RootTools.RADS
 						int ADSCP_value = (int)uint.Parse(echoBuffer[10].ToString("X2") + echoBuffer[11].ToString("X2"), System.Globalization.NumberStyles.HexNumber);
 
 						Console.WriteLine("Response IP Address : {0}", from);
-						Console.WriteLine("Echo Data Received : {0} {1} {2} {3} {4} {5}",
-							ADSCP_Type, ADSCP_Opcode, ADSCP_Length, ADSCP_seqNumber, ADSCP_address, ADSCP_value);
+						//Console.WriteLine("Echo Data Received : {0} {1} {2} {3} {4} {5}", ADSCP_Type, ADSCP_Opcode, ADSCP_Length, ADSCP_seqNumber, ADSCP_address, ADSCP_value);
 
 						if (ADSCP_Type == "0000" && ADSCP_Opcode == RADSControlInfo.ADSCP_OPCODE_PONG) //Controller Discovery Pong!
 						{
