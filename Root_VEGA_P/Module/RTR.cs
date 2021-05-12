@@ -810,6 +810,14 @@ namespace Root_VEGA_P.Module
         }
 
         #region ModuleRun
+        ModuleRunBase m_runPut;
+        public Run_Put GetModuleRunPut(string sChildPut)
+        {
+            Run_Put run = (Run_Put)m_runPut.Clone();
+            run.m_sChild = sChildPut;
+            return run;
+        }
+
         ModuleRunBase m_runGetPut; 
         public Run_GetPut GetModuleRunGetPut(string sChildGet, string sChildPut)
         {
@@ -824,7 +832,7 @@ namespace Root_VEGA_P.Module
             AddModuleRunList(new Run_ResetCPU(this), false, "Reset RTR CPU");
             AddModuleRunList(new Run_Grip(this), false, "Run Grip RTR Arm");
             AddModuleRunList(new Run_Get(this), false, "RTR Run Get Motion");
-            AddModuleRunList(new Run_Put(this), false, "RTR Run Put Motion");
+            m_runPut = AddModuleRunList(new Run_Put(this), false, "RTR Run Put Motion");
             m_runGetPut = AddModuleRunList(new Run_GetPut(this), false, "RTR Run Get & Put Motion");
         }
 

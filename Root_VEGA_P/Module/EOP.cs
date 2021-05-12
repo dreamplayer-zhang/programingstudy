@@ -575,7 +575,7 @@ namespace Root_VEGA_P.Module
         #region ModuleRun
         protected override void InitModuleRuns()
         {
-            AddModuleRunList(new Run_Delay(this), true, "Time Delay");
+            AddModuleRunList(new Run_Delay(this), false, "Time Delay");
             AddModuleRunList(new Run_Run(this), true, "Run Particle Counter");
             AddModuleRunList(new Run_RunSol(this), false, "Run Sol Test");
             m_dome.m_particleCounterSet.InitModuleRuns(); 

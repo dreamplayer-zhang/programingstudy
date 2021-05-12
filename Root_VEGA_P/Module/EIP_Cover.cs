@@ -164,16 +164,6 @@ namespace Root_VEGA_P.Module
         }
         #endregion
 
-        #region RunParticleCounter
-        public string RunParticleCounter(bool bCheckPod)
-        {
-            if (bCheckPod && (p_infoPod == null)) return "EIP Plate Check Error";
-            if (Run(RunCover(true))) return p_sInfo;
-            // Particle Count
-            return "OK";
-        }
-        #endregion
-
         #region State Home
         public override string StateHome()
         {
@@ -213,9 +203,8 @@ namespace Root_VEGA_P.Module
         #region ModuleRun
         protected override void InitModuleRuns()
         {
-            AddModuleRunList(new Run_Delay(this), true, "Time Delay");
-            AddModuleRunList(new Run_Run(this), true, "Run Particle Counter");
-            AddModuleRunList(new Run_RunCover(this), true, "Run Cover Sol Test");
+            AddModuleRunList(new Run_Delay(this), false, "Time Delay");
+            AddModuleRunList(new Run_RunCover(this), false, "Run Cover Sol Test");
             m_particleCounterSet.InitModuleRuns(); 
         }
 
@@ -245,34 +234,6 @@ namespace Root_VEGA_P.Module
             {
                 Thread.Sleep((int)(1000 * m_secDelay / 2));
                 return "OK";
-            }
-        }
-
-        public class Run_Run : ModuleRunBase
-        {
-            EIP_Cover m_module;
-            public Run_Run(EIP_Cover module)
-            {
-                m_module = module;
-                InitModuleRun(module);
-            }
-
-            bool m_bCheckPod = true;
-            public override ModuleRunBase Clone()
-            {
-                Run_Run run = new Run_Run(m_module);
-                run.m_bCheckPod = m_bCheckPod;
-                return run;
-            }
-
-            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
-            {
-                m_bCheckPod = tree.Set(m_bCheckPod, m_bCheckPod, "Check Pod", "Check Pod State", bVisible);
-            }
-
-            public override string Run()
-            {
-                return m_module.RunParticleCounter(m_bCheckPod);
             }
         }
 
