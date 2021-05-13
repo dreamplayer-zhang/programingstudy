@@ -73,12 +73,11 @@ namespace Root_VEGA_P.Module
         #endregion
 
         #region FlowSensor
-        FlowSensor m_flowSensor;
         int m_nUnitFlowSensor = 1;
 
         public string ReadFlowSensor(ref double fFlow)
         {
-            return m_flowSensor.Read(m_nUnitFlowSensor, ref fFlow); 
+            return m_vegaP.m_flowSensor.Read(m_nUnitFlowSensor, ref fFlow); 
         }
 
         public void RunTreeFlowSensor(Tree tree)
@@ -96,7 +95,7 @@ namespace Root_VEGA_P.Module
                 {
                     if (Run(m_set.m_nozzleSet.RunNozzle(m_aOpen))) return m_sInfo;
                     if (Run(m_set.m_regulator.RunPump(m_hPa))) return m_sInfo;
-                    if (Run(m_set.m_particleCounter.StartRun(m_sample))) return m_sInfo;
+                    if (Run(m_set.m_particleCounter.StartRun(m_set.m_vegaP.m_sample))) return m_sInfo;
                     bool bBackFlow = false;
                     double fSumFlow = 0;
                     int nSumFlow = 0; 
@@ -159,12 +158,10 @@ void SaveResult(string sFile, string sTime, bool bBackFlow)
             List<bool> m_aOpen;
             double m_hPa = 3;
             ParticleCounterSet m_set;
-            ParticleCounterBase.Sample m_sample;
             public RunCount(ParticleCounterSet particleCounterSet)
             {
                 m_set = particleCounterSet;
                 m_aOpen = particleCounterSet.m_nozzleSet.GetCloneOpen();
-                m_sample = particleCounterSet.m_sample; 
             }
         }
         #endregion
@@ -179,15 +176,14 @@ void SaveResult(string sFile, string sTime, bool bBackFlow)
 
         string m_sID = ""; 
         ModuleBase m_module;
-        NozzleSet m_nozzleSet;
-        ParticleCounterBase.Sample m_sample; 
-        public ParticleCounterSet(ModuleBase module, FlowSensor flowSensor, ParticleCounterBase.Sample sample, string sID = "")
+        public NozzleSet m_nozzleSet;
+        VEGA_P m_vegaP; 
+        public ParticleCounterSet(ModuleBase module, VEGA_P vegaP, string sID = "")
         {
             m_module = module;
             m_regulator = new Regulator(m_module, sID);
             m_nozzleSet = new NozzleSet(m_module, sID);
-            m_flowSensor = flowSensor;
-            m_sample = sample; 
+            m_vegaP = vegaP; 
             m_sID = sID; 
         }
 
@@ -196,11 +192,11 @@ void SaveResult(string sFile, string sTime, bool bBackFlow)
         }
 
         #region ModuleRun
-        public void InitModuleRuns()
+        public void InitModuleRuns(bool bRecipe)
         {
             m_module.AddModuleRunList(new Run_Pump(this), false, "Run Pump");
             m_module.AddModuleRunList(new Run_ReadFlow(this), false, "Read Flow Sensor");
-            m_module.AddModuleRunList(new Run_ParticleCount(this), true, "Run Particle Counter");
+            m_module.AddModuleRunList(new Run_ParticleCount(this), bRecipe, "Run Particle Counter");
         }
 
         public class Run_Pump : ModuleRunBase

@@ -197,6 +197,9 @@
     <Compile Include="Engineer\Recipe_Module_UI.xaml.cs">
       <DependentUpon>Recipe_Module_UI.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Engineer\Recipe_Nozzle_UI.xaml.cs">
+      <DependentUpon>Recipe_Nozzle_UI.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Engineer\VEGA_P_Process.cs" />
     <Compile Include="Engineer\VEGA_P_Process_UI.xaml.cs">
       <DependentUpon>VEGA_P_Process_UI.xaml</DependentUpon>
@@ -205,6 +208,9 @@
     <Compile Include="Module\EIP_Plate.cs" />
     <Compile Include="Module\EOP.cs" />
     <Compile Include="Module\FlowSensor.cs" />
+    <Compile Include="Module\NozzleSet_UI.xaml.cs">
+      <DependentUpon>NozzleSet_UI.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Module\ParticleCounterSet.cs" />
     <Compile Include="Module\VEGA_P.cs" />
     <Compile Include="UI\1. Setup\Panel_RecipeManger.xaml.cs">
@@ -225,6 +231,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Engineer\Recipe_Module_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Engineer\Recipe_Nozzle_UI.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -286,6 +296,10 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="Module\NozzleSet_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="UI\1. Setup\Panel_RecipeManger.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

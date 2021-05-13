@@ -279,7 +279,7 @@ namespace Root_VEGA_P.Module
                 p_id = id;
                 m_EOP = EOP;
                 VEGA_P vegaP = EOP.m_handler.m_VEGA;
-                m_particleCounterSet = new ParticleCounterSet(EOP, vegaP.m_flowSensor, vegaP.m_sample, "Dome.");
+                m_particleCounterSet = new ParticleCounterSet(EOP, vegaP, "Dome.");
             }
 
             public void ThreadStop()
@@ -470,7 +470,7 @@ namespace Root_VEGA_P.Module
                 p_id = id;
                 m_EOP = EOP;
                 VEGA_P vegaP = EOP.m_handler.m_VEGA;
-                m_particleCounterSet = new ParticleCounterSet(EOP, vegaP.m_flowSensor, vegaP.m_sample, "Door.");
+                m_particleCounterSet = new ParticleCounterSet(EOP, vegaP, "Door.");
             }
 
             public void ThreadStop()
@@ -578,10 +578,10 @@ namespace Root_VEGA_P.Module
         protected override void InitModuleRuns()
         {
             AddModuleRunList(new Run_Delay(this), false, "Time Delay");
-            AddModuleRunList(new Run_Run(this), true, "Run Particle Counter");
+            AddModuleRunList(new Run_ParticleCount(this), true, "Run Particle Counter");
             AddModuleRunList(new Run_RunSol(this), false, "Run Sol Test");
-            m_dome.m_particleCounterSet.InitModuleRuns(); 
-            m_door.m_particleCounterSet.InitModuleRuns();
+            m_dome.m_particleCounterSet.InitModuleRuns(false); 
+            m_door.m_particleCounterSet.InitModuleRuns(false);
         }
 
         public class Run_Delay : ModuleRunBase
@@ -613,19 +613,19 @@ namespace Root_VEGA_P.Module
             }
         }
 
-        public class Run_Run : ModuleRunBase
+        public class Run_ParticleCount : ModuleRunBase
         {
             EOP m_module;
-            public Run_Run(EOP module)
+            public Run_ParticleCount(EOP module)
             {
                 m_module = module;
                 InitModuleRun(module);
             }
 
-            bool m_bCheckPod = true; 
+            bool m_bCheckPod = true;
             public override ModuleRunBase Clone()
             {
-                Run_Run run = new Run_Run(m_module);
+                Run_ParticleCount run = new Run_ParticleCount(m_module);
                 run.m_bCheckPod = m_bCheckPod; 
                 return run;
             }
