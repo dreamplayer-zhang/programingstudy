@@ -255,6 +255,7 @@ namespace RootTools.Comm
         public void Init()
         {
             if (!p_bUse) return;
+            m_bRun = true;
             m_socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             m_socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
             m_socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.KeepAlive, true);
