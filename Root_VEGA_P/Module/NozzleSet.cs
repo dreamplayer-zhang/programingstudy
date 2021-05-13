@@ -196,7 +196,7 @@ namespace Root_VEGA_P.Module
         {
             m_module = module;
             m_sID = sID;
-            m_sExt = "Nozzle" + module.p_id;
+            m_sExt = module.p_id;
             if (sID != "") m_sExt += sID.Substring(0, sID.Length - 1);
             InitFileTree(); 
             InitNozzle(module.p_id);
