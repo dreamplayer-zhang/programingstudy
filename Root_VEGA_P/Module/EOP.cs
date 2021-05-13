@@ -190,6 +190,7 @@ namespace Root_VEGA_P.Module
             {
                 m_reg = new Registry("InfoPod");
                 int nPod = m_reg.Read(p_id, -1);
+                if (nPod < 0) return; 
                 p_infoPod = new InfoPod((InfoPod.ePod)nPod);
                 p_infoPod.ReadReg();
             }
@@ -380,6 +381,7 @@ namespace Root_VEGA_P.Module
             {
                 m_reg = new Registry("InfoPod");
                 int nPod = m_reg.Read(p_id, -1);
+                if (nPod < 0) return;
                 p_infoPod = new InfoPod((InfoPod.ePod)nPod);
                 p_infoPod.ReadReg();
             }

@@ -66,5 +66,8 @@
             <tree:TreeUI Grid.Row="3" x:Name="treeRootUI" Margin="3"/>
         </Grid>
         <GridSplitter Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="AliceBlue" ShowsPreview="True" Width="3"/>
+        <Grid Grid.Column="2"  Background="AliceBlue">
+            <Grid x:Name="gridDrawing" HorizontalAlignment="Center" VerticalAlignment="Center" Background="AliceBlue"/>
+        </Grid>
     </Grid>
 </UserControl>

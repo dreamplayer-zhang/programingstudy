@@ -1,4 +1,6 @@
-﻿using RootTools;
+﻿using Root_VEGA_P_Vision.Module;
+using RootTools;
+using RootTools.Module;
 using RootTools.Trees;
 using System;
 using System.Windows;
@@ -17,24 +19,64 @@ namespace Root_VEGA_P.Engineer
             InitializeComponent();
         }
 
+        VEGA_P_Handler m_handler;
         VEGA_P_Process m_process; 
-        public void Init(VEGA_P_Process process)
+        public void Init(VEGA_P_Handler handler)
         {
-            m_process = process;
-            DataContext = process;
+            m_handler = handler; 
+            m_process = handler.m_process;
+            DataContext = m_process;
 
             labelEQState.DataContext = EQ.m_EQ;
             checkBoxStop.DataContext = EQ.m_EQ;
             checkBoxPause.DataContext = EQ.m_EQ;
             checkBoxSimulate.DataContext = EQ.m_EQ;
 
-            treeRootUI.Init(process.m_treeRoot);
-            process.RunTree(Tree.eMode.Init);
+            treeRootUI.Init(m_process.m_treeRoot);
+            m_process.RunTree(Tree.eMode.Init);
+
+            InitModule(); 
 
             buttonSetRecover.IsEnabled = false;
             InitTimer();
         }
 
+        void InitModule()
+        {
+            Process_Module_UI ui = InitModule(m_handler.m_loadport, 0, 300);
+            ui.AddInfoPod(InfoPod.ePod.EOP_Dome, m_handler.m_loadport);
+            ui.AddInfoPod(InfoPod.ePod.EIP_Cover, m_handler.m_loadport);
+            ui.AddInfoPod(InfoPod.ePod.EIP_Plate, m_handler.m_loadport);
+            ui.AddInfoPod(InfoPod.ePod.EOP_Door, m_handler.m_loadport);
+            ui = InitModule(m_handler.m_rtr, 0, 0);
+            ui.AddInfoPod(InfoPod.ePod.EOP_Dome, m_handler.m_rtr);
+            ui.AddInfoPod(InfoPod.ePod.EIP_Cover, m_handler.m_rtr);
+            ui.AddInfoPod(InfoPod.ePod.EIP_Plate, m_handler.m_rtr);
+            ui.AddInfoPod(InfoPod.ePod.EOP_Door, m_handler.m_rtr);
+            ui = InitModule(m_handler.m_EIP_Cover, -400, -20);
+            ui.AddInfoPod(InfoPod.ePod.EIP_Cover, m_handler.m_EIP_Cover);
+            ui = InitModule(m_handler.m_EIP_Plate, -400, 170);
+            ui.AddInfoPod(InfoPod.ePod.EIP_Plate, m_handler.m_EIP_Plate);
+            ui = InitModule(m_handler.m_EOP, -400, 360);
+            ui.AddInfoPod(InfoPod.ePod.EOP_Dome, m_handler.m_EOP.m_dome);
+            ui.AddInfoPod(InfoPod.ePod.EOP_Door, m_handler.m_EOP.m_door);
+            ui = InitModule(m_handler.m_holder, 400, 20);
+            ui.AddInfoPod(InfoPod.ePod.EIP_Cover, m_handler.m_holder);
+            ui.AddInfoPod(InfoPod.ePod.EIP_Plate, m_handler.m_holder);
+            ui = InitModule(m_handler.m_vision, 400, 250);
+            ui.AddInfoPod(InfoPod.ePod.EIP_Cover, m_handler.m_vision);
+            ui.AddInfoPod(InfoPod.ePod.EIP_Plate, m_handler.m_vision);
+
+        }
+
+        Process_Module_UI InitModule(ModuleBase module, int px, int py)
+        {
+            Process_Module_UI ui = new Process_Module_UI();
+            ui.Init(module);
+            ui.Margin = new Thickness(px, py, 0, 0);
+            gridDrawing.Children.Add(ui);
+            return ui; 
+        }
         #region Timer
         DispatcherTimer m_timer = new DispatcherTimer();
 
