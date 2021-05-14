@@ -84,9 +84,6 @@ namespace Root_WIND2.UI_User
 				this.ImageViewerBtmVM.ClearObjects();
 				Progress = 0;
 
-				//if (GlobalObjects.Instance.GetNamed<WorkManager>("edgeTopInspection") != null)
-				//	GlobalObjects.Instance.GetNamed<WorkManager>("edgeTopInspection").Start();
-
 				if (GlobalObjects.Instance.GetNamed<WorkManager>("edgeInspection") != null)
 					GlobalObjects.Instance.GetNamed<WorkManager>("edgeInspection").Start();
 				
@@ -115,8 +112,8 @@ namespace Root_WIND2.UI_User
 		{
 			get => new RelayCommand(() =>
 			{
-				if (GlobalObjects.Instance.GetNamed<WorkManager>("edgeTopInspection") != null)
-					GlobalObjects.Instance.GetNamed<WorkManager>("edgeTopInspection").Stop();
+				if (GlobalObjects.Instance.GetNamed<WorkManager>("edgeInspection") != null)
+					GlobalObjects.Instance.GetNamed<WorkManager>("edgeInspection").Stop();
 			});
 		}
 

@@ -25,6 +25,9 @@ namespace RootTools_Vision
 			return true;
 		}
 
+		/// <summary>
+		/// EBR Measurement Data Processing
+		/// </summary>
         public void DoProcessMeasurement()
         {
             if (this.currentWorkplace.Index != 0)
@@ -39,7 +42,6 @@ namespace RootTools_Vision
             foreach (Measurement measure in measureList)
                 this.currentWorkplace.MeasureList.Add(measure);
 
-            // TO DO 이거 측정마다 다를건데 어떻게 할거임
             int measureItem = Enum.GetValues(typeof(Measurement.EBRMeasureItem)).Length;
 
             for (int i = 0, index = 0; i < measureList.Count; i += measureItem, index++)
@@ -49,51 +51,36 @@ namespace RootTools_Vision
 			if (measureList.Count > 0)
 				DatabaseManager.Instance.AddMeasurementDataList(measureList);
 
-            SettingItem_SetupEBR settings = GlobalObjects.Instance.Get<Settings>().GetItem<SettingItem_SetupEBR>();
-            string sInspectionID = DatabaseManager.Instance.GetInspectionID();
+			#region Klarf / Defect Image 저장
 
-            Tools.SaveDefectImage(Path.Combine(settings.MeasureImagePath, sInspectionID), measureList.Cast<Data>().ToList(), currentWorkplace.SharedBufferInfo);
-
-			/*
-            if (GlobalObjects.Instance.Get<KlarfData_Lot>() != null)
-            {
-				List<string> dataStringList = ConvertDataListToStringList(measureList, Measurement.EBRMeasureItem.EBR.ToString());
-				GlobalObjects.Instance.Get<KlarfData_Lot>().AddSlot(recipe.WaferMap, dataStringList, null);
-				GlobalObjects.Instance.Get<KlarfData_Lot>().WaferStart(recipe.WaferMap, DateTime.Now);
-				GlobalObjects.Instance.Get<KlarfData_Lot>().SetResultTimeStamp();
-				GlobalObjects.Instance.Get<KlarfData_Lot>().SaveKlarf(settings.KlarfSavePath, false);
-
-				//Tools.SaveTiffImage(settings.KlarfSavePath, measureList.Cast<Data>().ToList(), sharedBufferInfo);
-			}
-			*/
-
-            WorkEventManager.OnProcessMeasurementDone(this.currentWorkplace, new ProcessMeasurementDoneEventArgs());
-        }
-
-		private List<string> ConvertDataListToStringList(List<Measurement> measureList, string measureItem = null)
-		{
-			List<string> stringList = new List<string>();
+			// Klarf에만 표시되는 Data
+			List<Measurement> realKlarfData = new List<Measurement>();
 			for (int i = 0; i < measureList.Count; i++)
 			{
-				if (measureItem != null && measureList[i].m_strMeasureItem != measureItem)
-					continue;
-
-				string str = string.Format("{0} {1} {2} {3} {4} {5} {6} {7} {8} {9} {10} {11} {12} {13} {14} {15} {16}",
-											(measureList[i].m_nMeasurementIndex + 1),
-											measureList[i].m_fRelX,
-											measureList[i].m_fRelY,
-											0, 0,
-											measureList[i].m_fData, 0,
-											measureList[i].m_fData,
-											measureList[i].m_fData,
-											0, 1, 0,
-											measureList[i].m_fData,
-											measureList[i].m_fAngle,
-											0, 1, 1);
-				stringList.Add(str);
+				if (measureList[i].m_strMeasureItem == Measurement.EBRMeasureItem.EBR.ToString())
+					realKlarfData.Add(measureList[i]);
 			}
-			return stringList;
-		}
 
+			string sInspectionID = DatabaseManager.Instance.GetInspectionID();
+			Settings settings = new Settings();
+			SettingItem_SetupEBR settings_ebr = settings.GetItem<SettingItem_SetupEBR>();
+			
+			//Tools.SaveDefectImageParallel(Path.Combine(settings_ebr.MeasureImagePath, sInspectionID), measureList, this.currentWorkplace.SharedBufferInfo, this.currentWorkplace.SharedBufferInfo.ByteCnt);
+
+			if (settings_ebr.UseKlarf)
+			{
+				KlarfData_Lot klarfData = new KlarfData_Lot();
+				Directory.CreateDirectory(settings_ebr.KlarfSavePath);
+
+				//klarfData.AddSlot(recipe.WaferMap, measureList, this.recipe.GetItem<OriginRecipe>());
+				klarfData.AddSlot(recipe.WaferMap, realKlarfData, this.recipe.GetItem<OriginRecipe>());
+				klarfData.WaferStart(recipe.WaferMap, DateTime.Now);
+				klarfData.SetResultTimeStamp();
+				klarfData.SaveKlarf(settings_ebr.KlarfSavePath, false);
+			}
+
+			#endregion
+            WorkEventManager.OnProcessMeasurementDone(this.currentWorkplace, new ProcessMeasurementDoneEventArgs());
+        }
 	}
 }
