@@ -6,6 +6,7 @@ using RootTools.Module;
 using RootTools.ToolBoxs;
 using RootTools.Trees;
 using System;
+using System.Collections.Generic;
 using System.Threading;
 
 namespace Root_VEGA_P.Module
@@ -486,9 +487,9 @@ namespace Root_VEGA_P.Module
         #endregion
 
         #region Particle Counter
-        public string RunParticleCounter(bool bCheckPod)
+        public string RunParticleCounter(Run_ParticleCount runCount)
         {
-            if (bCheckPod)
+            if (runCount.m_bCheckPod)
             {
                 if (m_dome.IsCheckDome() == false) return "Dome Check Error";
                 if (m_door.IsCheckDoor() == false) return "Door Check Error";
@@ -501,7 +502,8 @@ namespace Root_VEGA_P.Module
                 if (Run(m_door.RunCylinderUp(false))) return p_sInfo;
                 if (Run(RunMove(ePos.Forward))) return p_sInfo;
                 if (Run(RunCoverDown(true))) return p_sInfo;
-                // Particle Count
+                if (Run(m_dome.m_particleCounterSet.RunParticleCounter(runCount.m_dataDome.m_asNozzle))) return p_sInfo;
+                if (Run(m_door.m_particleCounterSet.RunParticleCounter(runCount.m_dataDoor.m_asNozzle))) return p_sInfo;
                 if (Run(RunCoverDown(false))) return p_sInfo;
                 if (Run(RunMove(ePos.Backward))) return p_sInfo;
                 if (Run(m_door.RunCylinderUp(true))) return p_sInfo;
@@ -622,22 +624,56 @@ namespace Root_VEGA_P.Module
                 InitModuleRun(module);
             }
 
-            bool m_bCheckPod = true;
+            public class Data
+            {
+                public int m_nCount = 0;
+                public List<string> m_asNozzle = new List<string>();
+                public Data Clone()
+                {
+                    Data data = new Data();
+                    data.m_nCount = m_nCount;
+                    foreach (string sNozzle in m_asNozzle) data.m_asNozzle.Add(sNozzle);
+                    return data; 
+                }
+
+                public void RunTree(Tree tree, List<string> asFile, bool bVisible)
+                {
+                    m_nCount = tree.Set(m_nCount, m_nCount, "Count", "Particle Count Repeat Count", bVisible);
+                    while (m_asNozzle.Count < m_nCount) m_asNozzle.Add("");
+                    while (m_asNozzle.Count > m_nCount) m_asNozzle.RemoveAt(m_asNozzle.Count - 1);
+                    RunTreeNozzle(tree.GetTree("NozzleSet", false, bVisible), asFile, bVisible);
+                }
+
+                void RunTreeNozzle(Tree tree, List<string> asFile, bool bVisible)
+                {
+                    for (int n = 0; n < m_asNozzle.Count; n++)
+                    {
+                        m_asNozzle[n] = tree.Set(m_asNozzle[n], m_asNozzle[n], asFile, (n + 1).ToString("00"), "NozzleSet Name", bVisible);
+                    }
+                }
+            }
+            public Data m_dataDome = new Data();
+            public Data m_dataDoor = new Data(); 
+            public bool m_bCheckPod = true;
             public override ModuleRunBase Clone()
             {
                 Run_ParticleCount run = new Run_ParticleCount(m_module);
-                run.m_bCheckPod = m_bCheckPod; 
+                run.m_bCheckPod = m_bCheckPod;
+                run.m_dataDome = m_dataDome.Clone();
+                run.m_dataDoor = m_dataDoor.Clone(); 
                 return run;
             }
 
             public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
             {
                 m_bCheckPod = tree.Set(m_bCheckPod, m_bCheckPod, "Check Pod", "Check Pod State", bVisible);
+                m_dataDome.RunTree(tree.GetTree("Dome", true, bVisible), m_module.m_dome.m_particleCounterSet.m_nozzleSet.p_asFile, bVisible);
+                m_dataDoor.RunTree(tree.GetTree("Door", true, bVisible), m_module.m_door.m_particleCounterSet.m_nozzleSet.p_asFile, bVisible);
             }
 
             public override string Run()
             {
-                return m_module.RunParticleCounter(m_bCheckPod);
+                return m_module.RunParticleCounter(this);
             }
         }
 

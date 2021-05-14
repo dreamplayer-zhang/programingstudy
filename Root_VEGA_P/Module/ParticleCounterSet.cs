@@ -126,11 +126,11 @@ namespace Root_VEGA_P.Module
         #endregion
 
         #region Run
-        public string RunParticleCounter(Run_ParticleCount moduleRun)
+        public string RunParticleCounter(List<string> asNozzle)
         {
             try
             {
-                foreach (string sFile in moduleRun.m_asNozzle)
+                foreach (string sFile in asNozzle)
                 {
                     if (m_nozzleSet.RunNozzle(sFile) == "OK")
                     {
@@ -309,7 +309,7 @@ namespace Root_VEGA_P.Module
 
             public override string Run()
             {
-                return m_particleCounterSet.RunParticleCounter(this);
+                return m_particleCounterSet.RunParticleCounter(m_asNozzle);
             }
         }
         #endregion
