@@ -49,21 +49,25 @@ namespace Root_WIND2.Module
 				if (EQ.IsStop())
 					return "OK";
 
-				InspectionManagerEBR inspectionEBR = GlobalObjects.Instance.Get<InspectionManagerEBR>();
-
-				if (inspectionEBR.Recipe.Read(recipeName) == false)
-					return "Recipe Open Fail";
-
-				inspectionEBR.Start();
-				
-				while (inspectionEBR.CheckAllWorkDone() == false)
+				RootTools_Vision.WorkManager3.WorkManager workManager = GlobalObjects.Instance.GetNamed<RootTools_Vision.WorkManager3.WorkManager>("ebrInspection");
+				if (workManager == null)
 				{
-					if (EQ.IsStop())
-						return "OK";
-
-					Task.Delay(1000);
+					throw new ArgumentException("WorkManager가 초기화되지 않았습니다(null)");
 				}
+				workManager.Stop();
 
+				if (EQ.IsStop() == false)
+				{
+					if (workManager.OpenRecipe(recipeName) == false)
+						return "Recipe Open Fail";
+
+					workManager.Start(false);
+
+				}
+				else
+				{
+					workManager.Stop();
+				}
 				return "OK";
 			}
 			finally
