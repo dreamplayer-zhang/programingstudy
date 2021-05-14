@@ -87,50 +87,58 @@ namespace Root_VEGA_D.Module
             {
                 if (camRADS.p_CamInfo._OpenStatus == false) camRADS.Connect();
 
-                // RADS Voltage Reset
-                m_module.RADSControl.ResetController();
+                int nTryCount = 0;
+                while(nTryCount < 3)
+                {
+                    // RADS Voltage Reset
+                    m_module.RADSControl.ResetController();
 
-                // 레티클 중심 XY위치, Z축 시작위치로 이동
-                if (m_module.Run(axisXY.StartMove(m_grabMode.m_rpAxisCenter.X, m_grabMode.m_rpAxisCenter.Y)))
-                    return p_sInfo;
-                if (m_module.Run(axisZ.StartMove(m_grabMode.m_dAFStartZ)))
-                    return p_sInfo;
-                if (m_module.Run(axisXY.WaitReady()))
-                    return p_sInfo;
-                if (m_module.Run(axisZ.WaitReady()))
-                    return p_sInfo;
+                    // 레티클 중심 XY위치, Z축 시작위치로 이동
+                    if (m_module.Run(axisXY.StartMove(m_grabMode.m_rpAxisCenter.X, m_grabMode.m_rpAxisCenter.Y)))
+                        return p_sInfo;
+                    if (m_module.Run(axisZ.StartMove(m_grabMode.m_dAFStartZ)))
+                        return p_sInfo;
+                    if (m_module.Run(axisXY.WaitReady()))
+                        return p_sInfo;
+                    if (m_module.Run(axisZ.WaitReady()))
+                        return p_sInfo;
 
-                // 중앙 위치의 GV 합 리셋
-                m_nAFBestGVSum = 0;
+                    // 중앙 위치의 GV 합 리셋
+                    m_nAFBestGVSum = 0;
 
-                camRADS.Grabed += m_camera_Grabed;
+                    camRADS.Grabed += m_camera_Grabed;
 
-                bool bPastGrabbingState = camRADS.p_CamInfo._IsGrabbing;
-                if (bPastGrabbingState == false)
-                    camRADS.GrabContinuousShot();
+                    bool bPastGrabbingState = camRADS.p_CamInfo._IsGrabbing;
+                    if (bPastGrabbingState == false)
+                        camRADS.GrabContinuousShot();
 
-                // Z축 목표위치로 이동
-                if (m_module.Run(axisZ.StartMove(m_grabMode.m_dAFEndZ, m_grabMode.m_dAFSearchSpeed)))
-                    return p_sInfo;
-                if (m_module.Run(axisZ.WaitReady()))
-                    return p_sInfo;
+                    // Z축 목표위치로 이동
+                    if (m_module.Run(axisZ.StartMove(m_grabMode.m_dAFEndZ, m_grabMode.m_dAFSearchSpeed)))
+                        return p_sInfo;
+                    if (m_module.Run(axisZ.WaitReady()))
+                        return p_sInfo;
 
-                camRADS.Grabed -= m_camera_Grabed;
+                    camRADS.Grabed -= m_camera_Grabed;
 
-                if (bPastGrabbingState == false)
-                    camRADS.GrabStop();
+                    if (bPastGrabbingState == false)
+                        camRADS.GrabStop();
 
-                // 중앙에 RADS 레이저가 맞춰진적이 없다면
-                if (m_nAFBestGVSum <= 0)
-                    return "Cannot find best Y position by auto focusing";
+                    // 중앙에 RADS 레이저가 맞춰진적이 없다면
+                    if (m_nAFBestGVSum <= 0)
+                    {
+                        m_log.Info(string.Format("AutoFocus Try {0} - Cannot find best Y position by auto focusing", nTryCount));
+                        nTryCount++;
+                        continue;
+                    }
 
-                // Offset 적용
-                m_dAFBestFocusPosY += m_grabMode.m_dAFOffset;
+                    // Offset 적용
+                    m_dAFBestFocusPosY += m_grabMode.m_dAFOffset;
 
-                if (m_module.Run(axisZ.StartMove(m_dAFBestFocusPosY)))
-                    return p_sInfo;
-                if (m_module.Run(axisZ.WaitReady()))
-                    return p_sInfo;
+                    if (m_module.Run(axisZ.StartMove(m_dAFBestFocusPosY)))
+                        return p_sInfo;
+                    if (m_module.Run(axisZ.WaitReady()))
+                        return p_sInfo;
+                }
             }
             catch (Exception e)
             {
@@ -139,6 +147,9 @@ namespace Root_VEGA_D.Module
             finally
             {
                 m_grabMode.SetLight(false);
+
+                if(m_nAFBestGVSum <= 0)
+                    m_log.Info(string.Format("AutoFocus is Failed, Z Pos is set to {0}", m_grabMode.m_dFocusPosZ));
             }
 
             return "OK";
@@ -194,7 +205,6 @@ namespace Root_VEGA_D.Module
 
                             // 새로 발견한 위치가 중심에 더 가까울 경우
                             if (diffPast > diffNew && nSum > m_nAFBestGVSum)
-                            //if(diffPast > diffNew)
                             {
                                 m_dAFBestFocusPosY = curPosZ;
                                 m_nAFBestGVSum = nSum;
