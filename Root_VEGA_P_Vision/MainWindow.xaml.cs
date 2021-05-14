@@ -158,13 +158,9 @@ namespace Root_VEGA_P_Vision
 								WorkManager Insp = GlobalObjects.Instance.RegisterNamed<WorkManager>(memstr + ".Inspection",4);
 								Insp.SetRecipe(recipe_VegaP);
 								Insp.SetSharedBuffer(new SharedBufferInfo(
-									Data.GetPtr(0),
 									Data.p_Size.X,
 									Data.p_Size.Y,
-									Data.GetBytePerPixel(),
-									Data.GetPtr(1),
-									Data.GetPtr(2),
-									new MemoryID(App.mPool,App.mGroup,memstr),
+									1,
 									li));
                             }
 						}
@@ -192,13 +188,9 @@ namespace Root_VEGA_P_Vision
 							WorkManager Insp = GlobalObjects.Instance.RegisterNamed<WorkManager>(memstr + ".Inspection", 4);
 							Insp.SetRecipe(recipe_VegaP);
 							Insp.SetSharedBuffer(new SharedBufferInfo(
-								Data.GetPtr(0),
 								Data.p_Size.X,
 								Data.p_Size.Y,
-								Data.GetBytePerPixel(),
-								Data.GetPtr(1),
-								Data.GetPtr(2),
-								new MemoryID(App.mPool,App.mGroup,memstr),
+								1,
 								li)) ;
                         }
                     }

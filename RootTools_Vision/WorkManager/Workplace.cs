@@ -463,7 +463,7 @@ namespace RootTools_Vision
 
         public IntPtr GetSharedBufferInfo(int memnum)
         {
-            return sharedBufferInfo.liPtr[memnum];
+            return sharedBufferInfo.PtrList[memnum];
         }
         public void SetOffset(int _offsetX, int _offsetY)
         {

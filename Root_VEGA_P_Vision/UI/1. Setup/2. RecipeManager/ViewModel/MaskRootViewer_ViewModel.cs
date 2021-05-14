@@ -36,7 +36,7 @@ namespace Root_VEGA_P_Vision
             p_ImageData = new ImageData(Memory.GetMemory(App.mPool, App.mGroup, imagedata));
             p_ROILayer = new ImageData(Memory.GetMemory(App.mPool, App.mGroup, App.mMaskLayer));
             this.recipeSetting = recipeSetting;
-            init(p_ImageData);
+            base.init(p_ImageData);
 
             m_History = new Stack<Work>();
 
@@ -281,42 +281,8 @@ namespace Root_VEGA_P_Vision
                     fPtr[pos] += clr;
                 }
             });
-            SetMaskLayerSource();
-
-        }
-
-        private unsafe void M_timer_Tick(object sender, EventArgs e)
-        {
-            if(pointsq.Count>0)
-            {
-                IntPtr ptrMem = p_ROILayer.GetPtr();
-                if (ptrMem == IntPtr.Zero)
-                    return;
-                byte* imagePtr = (byte*)ptrMem.ToPointer();
-                uint* fPtr = (uint*)imagePtr;
-
-                CPoint cPt = pointsq.Dequeue();
-
-                Parallel.For(cPt.X, cPt.X + _nThickness, i =>
-                {
-                    for (int j = cPt.Y; j < cPt.Y + _nThickness; j++)
-                    {
-                        CPoint pixelPt = new CPoint(i, j);
-
-                        int pos = (j * p_ROILayer.p_Size.X + i) /** 4*/;
-                        uint clr = m_Color.A;
-                        clr = clr << 8;
-                        clr += m_Color.R;
-                        clr = clr << 8;
-                        clr += m_Color.G;
-                        clr = clr << 8;
-                        clr += m_Color.B;
-                        fPtr[pos] += clr;
-                    }
-                });
-
-                SetMaskLayerSource();
-            }
+            SetLayerSource();
+            //SetMaskLayerSource();
         }
         private void Eraser(CPoint cPt, int size)
         {

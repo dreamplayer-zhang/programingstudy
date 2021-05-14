@@ -1,4 +1,6 @@
-﻿using RootTools_CLR;
+﻿using RootTools;
+using RootTools.Database;
+using RootTools_CLR;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -35,23 +37,36 @@ namespace RootTools_Vision
             return true;
         }
 
-        void DoInspection()
+        unsafe void DoInspection()
         {
             if (currentWorkplace.Index == 0) 
                 return;
 
             inspectionSharedBuffer = currentWorkplace.GetSharedBufferInfo(0);
-            byte[] workplaceBuffer = GetWorkplaceBuffer(0);
-            uint nGVLevel = parameterPod.PodStain.PitLevel;
-            uint nDefectsz = parameterPod.PodStain.PitSize;
+            byte[] workplaceBuffer = GetWorkplaceBufferByIndex(0);
+            uint nGVLevel = parameterPod.PodStain.PitLevel = 200;
+            uint nDefectsz = parameterPod.PodStain.PitSize = 2;
 
-            int width = 350;
-            int height = 180;
-            //int width = currentWorkplace.Width;
-            //int height = currentWorkplace.Height;
+            IntPtr ptr = currentWorkplace.GetSharedBufferInfo(1);
+
+            int width = currentWorkplace.Width;
+            int height = currentWorkplace.Height;
             byte[] arrBinImg = new byte[width*height];
 
-            CLR_IP.Cpp_Threshold(workplaceBuffer, arrBinImg, width, height, false, (int)nGVLevel);
+            byte* pptr = (byte*)ptr.ToPointer();
+            
+            CLR_IP.Cpp_Threshold(workplaceBuffer, arrBinImg, width, height, false, (int)100);
+            //System.Drawing.Bitmap bitmap = Tools.CovertBufferToBitmap(currentWorkplace.SharedBufferInfo, new System.Windows.Rect(0, 0, width, height));
+
+
+            for (int i = 0; i < height; i++)
+            {
+                for (int j = 0; j < width; j++)
+                    pptr[(i * width) + j] = arrBinImg[(i * width) + j];
+                //Buffer.MemoryCopy((void*)arrBinImg, (void*)ptr, i * width, i * width);
+
+            }
+
 
             // Filter
             switch (parameterPod.PodStain.DiffFilter)
@@ -71,26 +86,56 @@ namespace RootTools_Vision
                 default:
                     break;
             }
+
+
             MaskRecipe mask = recipe.GetItem<MaskRecipe>();
 
-            Cpp_Point[] maskStartPoint = new Cpp_Point[mask.MaskList[parameterPod.PodStain.MaskIndex].PointLines.Count];
-            int[] maskLength = new int[mask.MaskList[parameterPod.PodStain.MaskIndex].PointLines.Count];
+            //Cpp_Point[] maskStartPoint = new Cpp_Point[mask.MaskList[parameterPod.PodStain.MaskIndex].PointLines.Count];
+            //int[] maskLength = new int[mask.MaskList[parameterPod.PodStain.MaskIndex].PointLines.Count];
 
-            Cpp_Point tempPt = new Cpp_Point();
-            for (int i = 0; i < mask.MaskList[parameterPod.PodStain.MaskIndex].PointLines.Count; i++)
-            {
-                maskStartPoint[i] = new Cpp_Point();
-                maskStartPoint[i].x = mask.MaskList[parameterPod.PodStain.MaskIndex].PointLines[i].StartPoint.X;
-                maskStartPoint[i].y = mask.MaskList[parameterPod.PodStain.MaskIndex].PointLines[i].StartPoint.Y;
-                maskLength[i] = mask.MaskList[parameterPod.PodStain.MaskIndex].PointLines[i].Length;
-            }
+            //Cpp_Point tempPt = new Cpp_Point();
+            //for (int i = 0; i < mask.MaskList[parameterPod.PodStain.MaskIndex].PointLines.Count; i++)
+            //{
+            //    maskStartPoint[i] = new Cpp_Point();
+            //    maskStartPoint[i].x = mask.MaskList[parameterPod.PodStain.MaskIndex].PointLines[i].StartPoint.X;
+            //    maskStartPoint[i].y = mask.MaskList[parameterPod.PodStain.MaskIndex].PointLines[i].StartPoint.Y;
+            //    maskLength[i] = mask.MaskList[parameterPod.PodStain.MaskIndex].PointLines[i].Length;
+            //}
 
-            CLR_IP.Cpp_Masking(arrBinImg, arrBinImg, maskStartPoint.ToArray(), maskLength.ToArray(), width, height);
-
-
+            //CLR_IP.Cpp_Masking(arrBinImg, arrBinImg, maskStartPoint.ToArray(), maskLength.ToArray(), width, height);
 
             // Labeling
-            var Label = CLR_IP.Cpp_Labeling(workplaceBuffer, arrBinImg, width, height, false);
+            var Label = CLR_IP.Cpp_Labeling(workplaceBuffer, arrBinImg, width, height, true);
+
+
+
+            List<Defect> li = new List<Defect>();
+            if (Label.Length > 0)
+            {
+                this.currentWorkplace.SetSubState(WORKPLACE_SUB_STATE.BAD_CHIP, true);
+
+                //Add Defect
+                for (int i = 0; i < Label.Length; i++)
+                {
+                    if (Label[i].area > 1)
+                    {
+
+                        Defect defect = new Defect(i.ToString(),
+10001,
+                            Label[i].area,
+                            Label[i].value,
+                            this.currentWorkplace.PositionX + Label[i].boundLeft,
+                            this.currentWorkplace.PositionY + Label[i].boundTop,
+                            Label[i].width,
+                            Label[i].height,
+                            this.currentWorkplace.MapIndexX,
+                            this.currentWorkplace.MapIndexY);
+                        li.Add(defect);
+                    }
+                }
+            }
+            Tools.SaveDefectImageParallel(@"C:\Defects", li, currentWorkplace.SharedBufferInfo, currentWorkplace.SharedBufferByteCnt);
+
             //var Label = CLR_IP.Cpp_Labeling_SubPix(workplaceBuffer, arrBinImg, chipW, chipH, isDarkInsp, nGrayLevel, 3);
 
             //string sInspectionID = DatabaseManager.Instance.GetInspectionID();

@@ -259,10 +259,11 @@ namespace Root_VEGA_P_Vision
         {
             if (GlobalObjects.Instance.GetNamed<WorkManager>("EIP_Cover.Stain.Front.Inspection") != null)
             {
+                EIPCoverTop_ImageViewerVM.p_ImageData.GetPtr(0);
                 OriginRecipe originRecipe = GlobalObjects.Instance.Get<RecipeVision>().GetItem<OriginRecipe>();
 
-                originRecipe.OriginWidth = 350;
-                originRecipe.OriginHeight = 180;
+                originRecipe.OriginWidth = 1500;
+                originRecipe.OriginHeight = 1300;
                 GlobalObjects.Instance.GetNamed<WorkManager>("EIP_Cover.Stain.Front.Inspection").Start();
             }
         }
