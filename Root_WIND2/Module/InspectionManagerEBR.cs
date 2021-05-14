@@ -57,15 +57,15 @@ namespace Root_WIND2
 
 			int width = recipe.GetItem<EBRParameter>().ROIWidth;
 			int height = recipe.GetItem<EBRParameter>().ROIHeight;
-			int stepDegree = recipe.GetItem<EBRParameter>().StepDegree;
-			int workplaceCnt = 360 / stepDegree;
+			double stepDegree = recipe.GetItem<EBRParameter>().StepDegree;
+			int workplaceCnt = (int)(360 / stepDegree);
 
 			workplaceBundle = new WorkplaceBundle();
 			workplaceBundle.Add(new Workplace(0, 0, 0, 0, 0, 0, workplaceBundle.Count));
 			
 			for (int i = 1; i < workplaceCnt; i++)
 			{
-				int posY = (bufferHeightPerDegree * stepDegree * i) - (height / 2);
+				int posY = (int)((bufferHeightPerDegree * stepDegree * i) - (height / 2));
 				Workplace workplace = new Workplace(0, 0, 0, posY, width, height, workplaceBundle.Count);
 				workplaceBundle.Add(workplace);
 			}
