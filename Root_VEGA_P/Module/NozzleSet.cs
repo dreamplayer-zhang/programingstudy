@@ -54,6 +54,8 @@ namespace Root_VEGA_P.Module
             {
                 if (_hPa == value) return;
                 _hPa = value;
+                if (_hPa < 0) _hPa = 0;
+                if (_hPa > 5) _hPa = 5; 
                 OnPropertyChanged(); 
             }
         }
@@ -65,13 +67,6 @@ namespace Root_VEGA_P.Module
 
         #region Nozzle Open
         public List<bool> m_aOpen = new List<bool>();
-
-        public List<bool> GetCloneOpen()
-        {
-            List<bool> aOpen = new List<bool>();
-            foreach (bool bOpen in m_aOpen) aOpen.Add(bOpen);
-            return aOpen; 
-        }
 
         public void RunTreeOpen(Tree tree)
         {
@@ -198,6 +193,7 @@ namespace Root_VEGA_P.Module
             m_sID = sID;
             m_sExt = module.p_id;
             if (sID != "") m_sExt += sID.Substring(0, sID.Length - 1);
+            m_sExt = m_sExt.Replace(" ", ""); 
             InitFileTree(); 
             InitNozzle(module.p_id);
         }

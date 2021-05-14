@@ -5,6 +5,7 @@ using RootTools.Module;
 using RootTools.ParticleCounter;
 using RootTools.ToolBoxs;
 using RootTools.Trees;
+using System;
 using System.Collections.Generic;
 using System.Threading;
 
@@ -40,14 +41,12 @@ namespace Root_VEGA_P.Module
                 return m_diBackFlow.p_bIn;
             }
 
-            public double m_hPa = 0;
             public string RunPump(double hPa)
             {
                 string sInfo = ConnectRS232();
                 if (sInfo != "OK") return sInfo;
                 if (hPa < 0) hPa = 0;
                 if (hPa > 5) hPa = 5;
-                m_hPa = hPa;
                 int nPower = (int)(200 * hPa);
                 m_rs232.Send("SET " + nPower.ToString());
                 return "OK";
@@ -75,9 +74,29 @@ namespace Root_VEGA_P.Module
         #region FlowSensor
         int m_nUnitFlowSensor = 1;
 
-        public string ReadFlowSensor(ref double fFlow)
+        string ReadFlowSensor(ref double fFlow)
         {
             return m_vegaP.m_flowSensor.Read(m_nUnitFlowSensor, ref fFlow); 
+        }
+
+        double m_fFlow = 0;
+        double m_fFlowSum = 0;
+        int m_nFlowCount = 0; 
+        public void ClearFlowSensorData()
+        {
+            m_fFlow = 0;
+            m_fFlowSum = 0;
+            m_nFlowCount = 0; 
+        }
+
+        public string ReadFlowSensor()
+        {
+            double fFlow = 0;
+            string sRead = ReadFlowSensor(ref fFlow);
+            m_fFlowSum += fFlow;
+            m_nFlowCount++;
+            m_fFlow = m_fFlowSum / m_nFlowCount;
+            return sRead; 
         }
 
         public void RunTreeFlowSensor(Tree tree)
@@ -86,83 +105,68 @@ namespace Root_VEGA_P.Module
         }
         #endregion
 
-        #region Run
-        public class RunCount
+        #region Result
+        public class Result
         {
-            public string Run()
+            public DateTime m_dateTime = DateTime.Now;
+            public bool m_bBackFlow = false;
+            public double m_fFlow = 0;
+            public List<string> m_asSize = new List<string>();
+            public List<int> m_aCount = new List<int>(); 
+
+            public Result(bool bBackFlow, double fFlow, LasairIII lasairIII)
             {
-                try
+                m_bBackFlow = bBackFlow;
+                m_fFlow = fFlow;
+                foreach (string sSize in lasairIII.m_asParticleSize) m_asSize.Add(sSize);
+                foreach (int nCount in lasairIII.m_aCount) m_aCount.Add(nCount); 
+            }
+        }
+        public List<Result> m_aResult = new List<Result>(); 
+        #endregion
+
+        #region Run
+        public string RunParticleCounter(Run_ParticleCount moduleRun)
+        {
+            try
+            {
+                foreach (string sFile in moduleRun.m_asNozzle)
                 {
-                    if (Run(m_set.m_nozzleSet.RunNozzle(m_aOpen))) return m_sInfo;
-                    if (Run(m_set.m_regulator.RunPump(m_hPa))) return m_sInfo;
-                    if (Run(m_set.m_particleCounter.StartRun(m_set.m_vegaP.m_sample))) return m_sInfo;
-                    bool bBackFlow = false;
-                    double fSumFlow = 0;
-                    int nSumFlow = 0; 
-                    while (m_set.m_particleCounter.IsBusy())
+                    if (m_nozzleSet.RunNozzle(sFile) == "OK")
                     {
-                        Thread.Sleep(100);
-                        bBackFlow |= m_set.m_regulator.IsBackFlow();
-                        if (Run(m_set.ReadFlowSensor(ref fSumFlow))) return m_sInfo;
-                        fSumFlow += fSumFlow;
-                        nSumFlow++; 
-                        if (EQ.IsStop()) return "EQ Stop";
+                        if (Run(m_regulator.RunPump(m_nozzleSet.p_hPa))) return m_sInfo;
+                        Thread.Sleep((int)(1000 * m_vegaP.m_secPumpDelay));
+                        if (Run(m_particleCounter.StartRun(m_vegaP.m_sample))) return m_sInfo;
+                        bool bBackFlow = false;
+                        while (m_particleCounter.IsBusy())
+                        {
+                            Thread.Sleep(100);
+                            if (EQ.IsStop()) return "EQ Stop";
+                            bBackFlow |= m_regulator.IsBackFlow();
+                            if (Run(ReadFlowSensor())) return m_sInfo;
+                        }
+                        Thread.Sleep((int)(1000 * m_vegaP.m_secPumpDelay));
+                        Result result = new Result(bBackFlow, m_fFlow, m_particleCounter);
+                        m_aResult.Add(result);
+                        if (Run(m_regulator.RunPump(0))) return m_sInfo;
+                        Thread.Sleep((int)(1000 * m_vegaP.m_secPumpDelay));
                     }
-                    if (bBackFlow) return "BackFlow Sensor Check";
-                    if (Run(m_set.m_regulator.RunPump(0))) return m_sInfo;
-                    if (nSumFlow > 0) fSumFlow /= nSumFlow; 
-                    //forget Result ??
-                    return "OK";
                 }
-                finally
-                {
-                    m_set.m_regulator.RunPump(0);
-                    m_set.m_nozzleSet.RunCloseAllNozzle(); 
-                }
+                return "OK";
             }
-
-            string m_sInfo = "";
-            bool Run(string sInfo)
+            finally
             {
-                if (EQ.IsStop()) sInfo = "EQ Stop";
-                m_sInfo = sInfo;
-                return sInfo != "OK";
+                m_regulator.RunPump(0);
+                m_nozzleSet.RunCloseAllNozzle();
             }
+        }
 
-/*
-void SaveResult(string sFile, string sTime, bool bBackFlow)
-{
-    using (StreamWriter sw = new StreamWriter(sFile, true, Encoding.Default))
-    {
-        sw.Write(sTime);
-        foreach (int nCount in m_particleCounter.m_aCount) sw.Write("\t" + nCount.ToString());
-        sw.WriteLine("\t" + (bBackFlow ? "BackFlow" : "OK"));
-    }
-}
-*/
-
-            public void RunTree(Tree tree, bool bVisible)
-            {
-                RunTreeNozzle(tree.GetTree("Nozzle Open", true, bVisible), bVisible);
-                m_hPa = tree.GetTree("Regulator", true, bVisible).Set(m_hPa, m_hPa, "Pressure", "Regulator Pressure (hPa)", bVisible); 
-            }
-
-            void RunTreeNozzle(Tree tree, bool bVisible)
-            {
-                for (int n = 0; n < m_aOpen.Count; n++)
-                {
-                    m_aOpen[n] = tree.Set(m_aOpen[n], m_aOpen[n], (n + 1).ToString("00"), "Nozzle Open", bVisible); 
-                }
-            }
-
-            List<bool> m_aOpen;
-            double m_hPa = 3;
-            ParticleCounterSet m_set;
-            public RunCount(ParticleCounterSet particleCounterSet)
-            {
-                m_set = particleCounterSet;
-                m_aOpen = particleCounterSet.m_nozzleSet.GetCloneOpen();
-            }
+        string m_sInfo = "";
+        bool Run(string sInfo)
+        {
+            if (EQ.IsStop()) sInfo = "EQ Stop";
+            m_sInfo = sInfo;
+            return sInfo != "OK";
         }
         #endregion
 
@@ -272,26 +276,40 @@ void SaveResult(string sFile, string sTime, bool bBackFlow)
             public Run_ParticleCount(ParticleCounterSet particleCounterSet)
             {
                 m_particleCounterSet = particleCounterSet;
-                m_runCount = new RunCount(particleCounterSet);
                 InitModuleRun(particleCounterSet.m_module, m_particleCounterSet.m_sID);
             }
 
-            RunCount m_runCount; 
+            public int m_nCount = 0;
+            public List<string> m_asNozzle = new List<string>(); 
             public override ModuleRunBase Clone()
             {
                 Run_ParticleCount run = new Run_ParticleCount(m_particleCounterSet);
-                run.m_runCount = new RunCount(m_particleCounterSet); 
+                run.m_nCount = m_nCount;
+                run.m_asNozzle.Clear();
+                foreach (string sNozzle in m_asNozzle) run.m_asNozzle.Add(sNozzle); 
                 return run;
             }
 
             public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
             {
-                m_runCount.RunTree(tree, bVisible); 
+                m_nCount = tree.Set(m_nCount, m_nCount, "Count", "Particle Count Repeat Count", bVisible);
+                while (m_asNozzle.Count < m_nCount) m_asNozzle.Add("");
+                while (m_asNozzle.Count > m_nCount) m_asNozzle.RemoveAt(m_asNozzle.Count - 1);
+                RunTreeNozzle(tree.GetTree("NozzleSet", false, bVisible), bVisible);
+            }
+
+            void RunTreeNozzle(Tree tree, bool bVisible)
+            {
+                List<string> asFile = m_particleCounterSet.m_nozzleSet.p_asFile; 
+                for (int n = 0; n < m_asNozzle.Count; n++)
+                {
+                    m_asNozzle[n] = tree.Set(m_asNozzle[n], m_asNozzle[n], asFile, (n + 1).ToString("00"), "NozzleSet Name", bVisible); 
+                }
             }
 
             public override string Run()
             {
-                return m_runCount.Run();
+                return m_particleCounterSet.RunParticleCounter(this);
             }
         }
         #endregion
