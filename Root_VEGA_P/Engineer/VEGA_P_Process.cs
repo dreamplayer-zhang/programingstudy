@@ -93,6 +93,7 @@ namespace Root_VEGA_P.Engineer
             if (run is RTR.Run_GetPut)
             {
                 RTR.Run_GetPut runRTR = run as RTR.Run_GetPut;
+                if (runRTR.m_moduleBase.IsBusy()) return "OK"; 
                 string sGet = CheckChild(runRTR.m_sChildGet);
                 if (sGet != "OK") return sGet;
                 string sPut = CheckChild(runRTR.m_sChildPut);
