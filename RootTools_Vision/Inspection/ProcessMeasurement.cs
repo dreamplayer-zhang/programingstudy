@@ -64,8 +64,8 @@ namespace RootTools_Vision
 			string sInspectionID = DatabaseManager.Instance.GetInspectionID();
 			Settings settings = new Settings();
 			SettingItem_SetupEBR settings_ebr = settings.GetItem<SettingItem_SetupEBR>();
-			
-			//Tools.SaveDefectImageParallel(Path.Combine(settings_ebr.MeasureImagePath, sInspectionID), measureList, this.currentWorkplace.SharedBufferInfo, this.currentWorkplace.SharedBufferInfo.ByteCnt);
+
+			Tools.SaveDefectImageParallel(Path.Combine(settings_ebr.MeasureImagePath, sInspectionID), measureList, this.currentWorkplace.SharedBufferInfo, this.currentWorkplace.SharedBufferInfo.ByteCnt);
 
 			if (settings_ebr.UseKlarf)
 			{
