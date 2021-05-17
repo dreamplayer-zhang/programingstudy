@@ -696,7 +696,7 @@ namespace RootTools.Control.Ajin
         
         void RunTreeInterlockAxis(Tree tree)
         {
-            for (int i = 0; i < m_aSensors.Count; i++)
+            for (int i = 0; i < m_listAxis.m_aAxis.Count; i++)
             {
                 CSensor sensor = new CSensor(m_listAxis.m_aAxis[i].p_id);
                 int iIndex = m_aSensors.FindIndex(x => x.m_strAxisName == m_listAxis.m_aAxis[i].p_id);

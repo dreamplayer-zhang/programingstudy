@@ -351,14 +351,10 @@ namespace Root_CAMELLIA.Module
             AddModuleRunList(new Run_PMSensorCameraTilt (this), true, "PM Sensor_Camera Tilt");
         }
 
-
-        bool m_isHomeRun = false;
-
         public bool p_isClearInfoWafer { get; set; } = false;
         public override string StateHome()
         {
             p_isClearInfoWafer = true;
-            m_isHomeRun = true;
             try
             {
                 p_sInfo = "OK";
@@ -431,12 +427,7 @@ namespace Root_CAMELLIA.Module
                 p_eState = (p_sInfo == "OK") ? eState.Ready : eState.Error;
 
                 return p_sInfo;
-            }
-            finally
-            {
-                m_isHomeRun = false;
-            }  
-            
+            }            
         }
 
 
@@ -572,12 +563,12 @@ namespace Root_CAMELLIA.Module
             {
                 if (!m_vacuum.p_bIn)
                 {
-                    if (p_axisLifter.IsInPos(ePosition.Position_0))
+                    if (p_axisLifter.IsInPos(eAxisPos.Ready))
                     {
                         return "OK";
                     }
 
-                    if (Run(p_axisLifter.StartMove(ePosition.Position_0)))
+                    if (Run(p_axisLifter.StartMove(eAxisPos.Ready)))
                     {
                         return p_sInfo;
                     }
