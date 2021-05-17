@@ -303,7 +303,7 @@
                                                    FontFamily="Arial" />
                                         </Grid>
                                     </GroupBox>
-                                    <GroupBox Header="롤러 속도"
+                                    <GroupBox Header="롤러 속도" Visibility="Hidden"
                                           Grid.Column="2"
                                           Style="{StaticResource group}"
                                           BorderThickness="0"

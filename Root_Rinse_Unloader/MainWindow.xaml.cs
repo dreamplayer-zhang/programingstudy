@@ -38,6 +38,7 @@ namespace Root_Rinse_Unloader
             RinseU rinse = m_handler.m_rinse;
             bool bBlink = rinse.m_bBlink;
 
+            buttonMode.IsEnabled = EQ.p_eState == EQ.eState.Ready;
             buttonHome.IsEnabled = EQ.p_eState != EQ.eState.Run;
             buttonStart.IsEnabled = EQ.p_eState == EQ.eState.Ready;
             buttonPause.IsEnabled = EQ.p_eState == EQ.eState.Run;

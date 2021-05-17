@@ -270,6 +270,7 @@ namespace Root_Rinse_Unloader.Module
         public string RunRun()
         {
             if (EQ.p_bPickerSet) return "OK";
+            if (EQ.p_eState != EQ.eState.Run) return "OK";
             return p_bVacuum ? RunUnload() : RunLoad();
         }
 

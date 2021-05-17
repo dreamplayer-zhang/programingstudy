@@ -191,7 +191,7 @@ namespace Root_Rinse_Unloader.Module
             return p_loader.IsLoaderDanger();
         }
 
-        Axis m_axis;
+        public Axis m_axis;
         void InitPosElevator()
         {
             m_axis.AddPos(Enum.GetNames(typeof(eMagazine)));

@@ -277,7 +277,7 @@
                                                    FontFamily="Arial"
                                                    VerticalAlignment="Center"
                                                    HorizontalAlignment="Center"
-                                                   Click="buttonEQUReady_Click"/>
+                                                    Click="buttonEQUReady_Click"/>
                                             </Grid>
                                         </Border>
                                     </GroupBox>
