@@ -144,7 +144,7 @@ namespace Root_VEGA_P.Module
                 int nPod = (value != null) ? (int)value.p_ePod : -1;
                 _infoPod = value;
                 m_reg.Write("InfoPod." + p_id, nPod);
-                value.WriteReg();
+                value?.WriteReg();
                 OnPropertyChanged();
             }
         }
@@ -154,8 +154,11 @@ namespace Root_VEGA_P.Module
         {
             m_reg = new Registry("InfoPod"); 
             int nPod = m_reg.Read(p_id, -1);
-            p_infoPod = new InfoPod((InfoPod.ePod)nPod);
-            p_infoPod.ReadReg();
+            if (nPod >= 0)
+            {
+                p_infoPod = new InfoPod((InfoPod.ePod)nPod);
+                p_infoPod.ReadReg();
+            }
             foreach (IRTRChild child in p_aChild) child.ReadPod_Registry();
         }
         #endregion
@@ -810,6 +813,14 @@ namespace Root_VEGA_P.Module
         }
 
         #region ModuleRun
+        ModuleRunBase m_runPut;
+        public Run_Put GetModuleRunPut(string sChildPut)
+        {
+            Run_Put run = (Run_Put)m_runPut.Clone();
+            run.m_sChild = sChildPut;
+            return run;
+        }
+
         ModuleRunBase m_runGetPut; 
         public Run_GetPut GetModuleRunGetPut(string sChildGet, string sChildPut)
         {
@@ -824,7 +835,7 @@ namespace Root_VEGA_P.Module
             AddModuleRunList(new Run_ResetCPU(this), false, "Reset RTR CPU");
             AddModuleRunList(new Run_Grip(this), false, "Run Grip RTR Arm");
             AddModuleRunList(new Run_Get(this), false, "RTR Run Get Motion");
-            AddModuleRunList(new Run_Put(this), false, "RTR Run Put Motion");
+            m_runPut = AddModuleRunList(new Run_Put(this), false, "RTR Run Put Motion");
             m_runGetPut = AddModuleRunList(new Run_GetPut(this), false, "RTR Run Get & Put Motion");
         }
 

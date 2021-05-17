@@ -28,10 +28,10 @@ namespace Root_VEGA_P.Engineer
         }
 
         List<Recipe_InfoPod_UI> m_aInfoPod = new List<Recipe_InfoPod_UI>(); 
-        public void AddInfoPod(string id, bool bExist, IRTRChild child)
+        public void AddInfoPod(InfoPod.ePod ePod, bool bExist, bool bRunFlip, IRTRChild child)
         {
             Recipe_InfoPod_UI ui = new Recipe_InfoPod_UI();
-            ui.Init(id, bExist, m_recipe, child);
+            ui.Init(ePod, bExist, bRunFlip, m_recipe, child);
             m_aInfoPod.Add(ui);
             stackPanelInfoPod.Children.Add(ui); 
         }

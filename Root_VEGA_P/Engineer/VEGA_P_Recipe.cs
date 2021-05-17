@@ -1,4 +1,5 @@
-﻿using Root_VEGA_P.Module;
+﻿using Microsoft.Win32;
+using Root_VEGA_P.Module;
 using RootTools;
 using RootTools.Module;
 using RootTools.Trees;
@@ -20,6 +21,31 @@ namespace Root_VEGA_P.Engineer
                 m_asModule.Add(module.p_id);
                 m_aModule.Add(module);
             }
+        }
+        #endregion
+
+        #region File
+        string m_sPath = "c:\\Recipe\\";
+        public void RecipeOpen(ModuleRunList runList = null)
+        {
+            if (runList == null) runList = m_moduleRunList; 
+            string sModel = EQ.m_sModel;
+            OpenFileDialog dlg = new OpenFileDialog();
+            dlg.InitialDirectory = m_sPath;
+            dlg.DefaultExt = "." + sModel;
+            dlg.Filter = sModel + " Recipe (." + sModel + ")|*." + sModel;
+            if (dlg.ShowDialog() == true) runList.OpenJob(dlg.FileName);
+        }
+
+        public void RecipeSave(ModuleRunList runList = null)
+        {
+            if (runList == null) runList = m_moduleRunList;
+            string sModel = EQ.m_sModel;
+            SaveFileDialog dlg = new SaveFileDialog();
+            dlg.InitialDirectory = m_sPath;
+            dlg.DefaultExt = "." + sModel;
+            dlg.Filter = sModel + " Recipe (." + sModel + ")|*." + sModel;
+            if (dlg.ShowDialog() == true) runList.SaveJob(dlg.FileName);
         }
         #endregion
 

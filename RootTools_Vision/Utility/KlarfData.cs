@@ -409,7 +409,44 @@ namespace RootTools_Vision.Utility
 
 		}
 
-		public void SetDefectInfor_SRLine(RecipeType_WaferMap _mapdata, List<string> _dataStringList, OriginRecipe recipe)
+		public void SetDefectInfor_SRLine(RecipeType_WaferMap _mapdata, List<Measurement> _defectdata, OriginRecipe recipe)
+		{
+			StringBuilder builder = new StringBuilder();
+
+			builder.AppendLine("DefectRecordSpec 17 DEFECTID XREL YREL XINDEX YINDEX XSIZE YSIZE DEFECTAREA DSIZE CLASSNUMBER TEST CLUSTERNUMBER ROUGHBINNUMBER FINEBINNUMBER REVIEWSAMPLE IMAGECOUNT IMAGELIST;");
+			builder.AppendLine("DefectList");
+
+			for (int i = 0; i < _defectdata.Count; i++)
+			{
+				builder.Append(_defectdata[i].m_nMeasurementIndex + " ");
+				builder.Append(_defectdata[i].m_fRelX + " ");
+				builder.Append(_defectdata[i].m_fRelY + " ");
+				builder.Append(_defectdata[i].m_nChipIndexX + " ");
+				builder.Append(_defectdata[i].m_nChipIndexY + " ");
+				builder.Append(_defectdata[i].m_fData + " ");
+				builder.Append(0 + " ");
+				builder.Append(_defectdata[i].m_fData + " ");
+				builder.Append(_defectdata[i].m_fData + " ");
+				builder.Append(0 + " ");
+				builder.Append(0 + " ");
+				builder.Append(0 + " ");
+				builder.Append(0 + " ");
+				builder.Append(0 + " ");
+				builder.Append(0 + " ");
+				builder.Append(1 + " ");
+				builder.Append(1 + "\n");
+			}
+
+			builder.AppendLine("SummarySpec 5" + " TESTNO NDEFECT DEFDENSITY NDIE NDEFDIE;");
+			builder.AppendLine("SummaryList");
+			builder.AppendFormat("{0} {1} {2} {3} {4};\n", 0, _defectdata.Count, 0, 0, 0);
+
+			defectListInfor += builder.ToString();
+
+			return;
+		}
+
+			public void SetDefectInfor_SRLine(RecipeType_WaferMap _mapdata, List<string> _dataStringList, OriginRecipe recipe)
 		{
 			string defectList;
 			defectList = string.Format("DefectRecordSpec 17 DEFECTID XREL YREL XINDEX YINDEX XSIZE YSIZE DEFECTAREA DSIZE CLASSNUMBER TEST CLUSTERNUMBER ROUGHBINNUMBER FINEBINNUMBER REVIEWSAMPLE IMAGECOUNT IMAGELIST;\n");

@@ -42,6 +42,7 @@ namespace Root_CAMELLIA.LibSR_Met
 
         public ARCNIR m_SR = null;
         Model m_Model = null;
+        Model m_ModelSave = null;
         DataManager m_DM = DataManager.GetInstance();
         Calculation m_Calculation = new Calculation();
         public PMDatas m_PMDatas = new PMDatas();
@@ -61,6 +62,7 @@ namespace Root_CAMELLIA.LibSR_Met
         {
             m_SR = new ARCNIR();
             m_Model = new Model();
+            m_ModelSave = new Model();
             m_MaterialList = m_Model.m_MaterialList;
             m_LayerList = m_Model.m_LayerList;
 

@@ -152,6 +152,7 @@
     <Compile Include="Recipe\Parameter\ProcessDefectEdgeParameter.cs" />
     <Compile Include="Recipe\Parameter\ProcessDefectParameter.cs" />
     <Compile Include="Recipe\Parameter\ProcessDefectWaferParameter.cs" />
+    <Compile Include="Recipe\Parameter\ProcessMeasurementParameter.cs" />
     <Compile Include="Recipe\Parameter\ReticleSurfaceParameter.cs" />
     <Compile Include="Recipe\Parameter\D2DParameter.cs" />
     <Compile Include="Recipe\Interfaces\IBacksideInspection.cs" />

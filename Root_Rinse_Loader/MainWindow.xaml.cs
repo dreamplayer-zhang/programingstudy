@@ -118,6 +118,7 @@ namespace Root_Rinse_Loader
             RinseL rinse = m_handler.m_rinse;
             bool bBlink = rinse.m_bBlink; 
 
+            buttonMode.IsEnabled = (EQ.p_eState == EQ.eState.Run) && (m_handler.m_rinse.p_eStateUnloader == EQ.eState.Ready);
             buttonHome.IsEnabled = EQ.p_eState != EQ.eState.Run;
             buttonStart.IsEnabled = m_handler.m_rinse.IsEnableStart();
             buttonPause.IsEnabled = EQ.p_eState == EQ.eState.Run;
@@ -158,6 +159,7 @@ namespace Root_Rinse_Loader
 
         private void buttonHome_Click(object sender, RoutedEventArgs e)
         {
+            m_handler.m_rinse.InitSendProtocol(); 
             EQ.p_bStop = false; 
             EQ.p_eState = EQ.eState.Home;
         }

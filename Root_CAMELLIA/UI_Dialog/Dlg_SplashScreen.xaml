@@ -24,8 +24,13 @@
             <!--<Grid Background="#000033">
 
             </Grid>-->
-            <Grid Background="Black">
-
+            <Grid>
+                <Grid.Background>
+                    <LinearGradientBrush>
+                        <GradientStop Color="Black" Offset="0.6"/>
+                        <GradientStop Color="White" Offset="1" />
+                    </LinearGradientBrush>
+                </Grid.Background>
             </Grid>
             <Grid Grid.Column="1" Background="AliceBlue">
                 <Border BorderBrush="AliceBlue" BorderThickness="0">
@@ -44,10 +49,20 @@
         <!--</Border>-->
         <!--<TextBlock Text="Wafer Thickness Measure System" FontSize="12" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="8,43,367,341" FontWeight="Heavy" Foreground="#3366ff" Width="auto"></TextBlock>
         <TextBlock Text="Camellia2" FontSize="23" HorizontalAlignment="Center" VerticalAlignment="Center" Width="auto" Height="auto" Margin="8,57,464,315" FontWeight="Heavy" TextDecorations="Underline" Foreground="#3366ff"></TextBlock>-->
-        <!--<Image Source="pack://application:,,/Resource/ati2000.png" Margin="193,339,353,10" />-->
-        <TextBlock Text="Wafer Thickness Measure System" FontSize="12" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="8,67,368,317" FontWeight="Heavy" Foreground="AliceBlue" Width="auto"></TextBlock>
-        <TextBlock Text="Camellia2" FontSize="23" HorizontalAlignment="Center" VerticalAlignment="Center" Width="auto" Height="auto" Margin="8,81,464,291" FontWeight="Heavy" TextDecorations="Underline" Foreground="AliceBlue"></TextBlock>
+        <TextBlock Text="Wafer Thickness Measurement System" FontSize="11" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="10,72,354,313" FontWeight="Heavy" Foreground="AliceBlue" Width="auto"></TextBlock>
+        <TextBlock Text="Camellia2" FontSize="23" HorizontalAlignment="Center" VerticalAlignment="Center" Width="auto" Height="auto" Margin="8,88,464,284" FontWeight="Heavy" TextDecorations="Underline" Foreground="AliceBlue"></TextBlock>
         <!--<TextBlock Text="{Binding Path=Version2, Source={x:Static local:BaseDefine.Configuration}}"  FontSize="13" HorizontalAlignment="Center" VerticalAlignment="Center" Width="auto" Height="auto" Margin="62,107,482,276" FontWeight="Bold" Foreground="AliceBlue"></TextBlock>-->
-        <TextBlock Text="{Binding Path=Version2, Source={x:Static local:BaseDefine.Configuration}}" FontSize="13" HorizontalAlignment="Center" VerticalAlignment="Center" Width="auto" Height="auto" Margin="12,107,432,276" FontWeight="Bold" Foreground="AliceBlue"></TextBlock>
+        <TextBlock Text="{Binding Path=Version2, Source={x:Static local:BaseDefine.Configuration}}" FontSize="13" HorizontalAlignment="Center" VerticalAlignment="Center" Width="126" TextAlignment="Right" Height="auto" Margin="7,114,465,269" FontWeight="Bold" Foreground="AliceBlue"></TextBlock>
+        <Image Source="/Root_CAMELLIA;component/Resource/camellia2.png" Margin="191,328,349,-1" RenderTransformOrigin="0.5,0.5" Opacity="0.1" >
+            <Image.RenderTransform>
+                <TransformGroup>
+                    <ScaleTransform/>
+                    <SkewTransform/>
+                    <RotateTransform Angle="-10.956"/>
+                    <TranslateTransform/>
+                </TransformGroup>
+            </Image.RenderTransform>
+        </Image>
+
     </Grid>
 </Window>
