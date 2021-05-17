@@ -318,6 +318,20 @@ namespace Root_Rinse_Loader.Module
             get { return Math.Abs(m_posStackReady - m_axis.p_posCommand) < 10; }
         }
 
+        public void RunLoadUp()
+        {
+            MoveMagazine(eMagazine.Magazine3, 10, true);
+            m_aMagazine[0].RunClamp(false);
+            m_aMagazine[1].RunClamp(false); 
+        }
+
+        public void RunLoadDown()
+        {
+            MoveMagazine(eMagazine.Magazine1, 0, true);
+            m_aMagazine[2].RunClamp(false);
+            m_aMagazine[3].RunClamp(false);
+        }
+
         void RunTreeElevator(Tree tree)
         {
             m_dZ = tree.Set(m_dZ, m_dZ, "dZ", "Magazine Slot Pitch (pulse)");

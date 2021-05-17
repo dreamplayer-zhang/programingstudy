@@ -641,8 +641,15 @@ namespace Root_Rinse_Loader.Module
         }
         #endregion
 
+        public void InitSendProtocol()
+        {
+            m_qProtocolSend.Clear();
+            m_protocolSend = null;
+        }
+
         public override void Reset()
         {
+            InitSendProtocol();
             if (m_tcpip.p_bConnect == false) m_tcpip.Connect();
             Thread.Sleep(10); 
             if (m_tcpip.p_bConnect == false) return;
