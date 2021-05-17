@@ -32,7 +32,7 @@ namespace Root_Pine2.Engineer
         public ModuleList p_moduleList { get; set; }
         public Pine2 m_pine2;
         public LoadEV m_loadEV;
-        public MagazineEVSet m_magazineEV;
+        public MagazineEVSet m_magazineEV = new MagazineEVSet();
         public Transfer m_transfer; 
         public Vision[] m_vision = new Vision[3]; 
         void InitModule()
@@ -45,8 +45,8 @@ namespace Root_Pine2.Engineer
             InitMagazineEV();
             m_transfer = new Transfer("Transter", m_engineer, m_pine2, m_magazineEV);
             InitModule(m_transfer); 
-            m_vision[0] = new Vision("Vision Top", m_engineer, ModuleBase.eRemote.Client);
-            m_vision[1] = new Vision("Vision 3D", m_engineer, ModuleBase.eRemote.Client);
+            m_vision[0] = new Vision("Vision 3D", m_engineer, ModuleBase.eRemote.Client);
+            m_vision[1] = new Vision("Vision Top", m_engineer, ModuleBase.eRemote.Client);
             m_vision[2] = new Vision("Vision Bottom", m_engineer, ModuleBase.eRemote.Client);
             InitModule(m_vision[0]);
             InitModule(m_vision[1]);

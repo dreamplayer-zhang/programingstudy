@@ -76,5 +76,13 @@ namespace Root_Pine2.Module
             if (p_eMagazinePos != infoStrip.p_eMagazinePos) return false;
             return (p_nStrip == infoStrip.p_nStrip); 
         }
+
+        public void RunTreeMagazine(Tree tree, bool bVisible)
+        {
+            p_eMagazinePos = (eMagazinePos)tree.Set(p_eMagazinePos, p_eMagazinePos, "Magazine", "Magazine Position", bVisible);
+            p_nStrip = tree.Set(p_nStrip, p_nStrip, "Strip", "Magazine Strip Slot ID (0 ~ 19)", bVisible);
+            if (p_nStrip < 0) p_nStrip = 0;
+            if (p_nStrip > 19) p_nStrip = 19;
+        }
     }
 }

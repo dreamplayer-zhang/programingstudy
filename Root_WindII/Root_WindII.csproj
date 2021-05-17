@@ -17,6 +17,7 @@
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
+    <LangVersion>9.0</LangVersion>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -29,6 +30,7 @@
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
+    <LangVersion>9.0</LangVersion>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
@@ -227,6 +229,8 @@
     <Compile Include="Engineer\WIND2EventArgs.cs" />
     <Compile Include="Engineer\WIND2EventManager.cs" />
     <Compile Include="MainWindow_ViewModel.cs" />
+    <Compile Include="Module\InspectionManagerFrontside.cs" />
+    <Compile Include="Module\Vision.cs" />
     <Compile Include="MvvmTools\Converter.cs" />
     <Compile Include="MvvmTools\Helper.cs" />
     <Compile Include="MvvmTools\ObservableObject.cs" />

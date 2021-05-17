@@ -557,6 +557,9 @@ namespace Root_WIND2.Module
             AddModuleRunList(new Run_VisionAlign(this), true, "Run VisionAlign");
             AddModuleRunList(new Run_AutoFocus(this), false, "Run AutoFocus");
         }
+
+        
+
         #endregion
     }
 }

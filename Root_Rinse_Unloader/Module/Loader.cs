@@ -146,10 +146,23 @@ namespace Root_Rinse_Unloader.Module
 
         public string MoveLoader(ePos ePos)
         {
+            if ((ePos == ePos.Stotage) && m_storage.IsHighPos()) return "Check Storage Position";
             if ((m_rail.m_dioPusherDown.p_bOut == false) || (m_rail.m_dioPusherDown.p_bDone == false))  return "Check Pusher Down";
             if ((m_dioPickerDown.p_bOut) || (m_dioPickerDown.p_bDone == false)) return "Check Picker Down";
             m_axis.StartMove(ePos);
             return m_axis.WaitReady();
+        }
+        
+        public bool IsLoaderDanger()
+        {
+            if (IsLoaderDanger(m_axis.p_posCommand)) return true;
+            return IsLoaderDanger(m_axis.m_posDst);
+        }
+
+        bool IsLoaderDanger(double fPos)
+        {
+            double dPos = Math.Abs(fPos - m_axis.GetPosValue(ePos.Stotage));
+            return (dPos < Math.Abs(fPos - m_axis.GetPosValue(ePos.Roller)));
         }
         #endregion
 
@@ -220,8 +233,8 @@ namespace Root_Rinse_Unloader.Module
 
         string RunPickerLoad()
         {
-            if (Run(RunVacuum(true))) return p_sInfo;
             if (Run(RunPickerDown(true))) return p_sInfo;
+            if (Run(RunVacuum(true))) return p_sInfo;
             Thread.Sleep((int)(1000 * m_secVac));
             if (Run(RunPickerDown(false))) return p_sInfo;
             return "OK"; 

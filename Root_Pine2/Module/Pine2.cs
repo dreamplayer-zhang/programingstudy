@@ -243,6 +243,17 @@ namespace Root_Pine2.Module
                 OnPropertyChanged();
             }
         }
+
+        int _lStack = 50; 
+        public int p_lStack
+        {
+            get { return _lStack; }
+            set
+            {
+                _lStack = value;
+                OnPropertyChanged(); 
+            }
+        }
         #endregion
 
         #region Thread DIO

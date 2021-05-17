@@ -464,7 +464,8 @@ namespace Root_Rinse_Unloader.Module
         {
             p_eStep = eStep.Empty; 
             RunStopperUp(true);
-            p_bAlignerUp = (m_rinse.p_eMode == RinseU.eRunMode.Magazine); 
+            p_bAlignerUp = (m_rinse.p_eMode == RinseU.eRunMode.Magazine);
+            RunAlignerUp(m_rinse.p_eMode == RinseU.eRunMode.Magazine); 
             RunRotate(true);
             foreach (Line line in m_aLine) line.p_eSensor = Line.eSensor.Empty;
             StartRun(m_runWaitArrive); 

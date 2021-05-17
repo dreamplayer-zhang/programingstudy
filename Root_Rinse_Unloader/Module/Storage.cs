@@ -1,4 +1,5 @@
-﻿using RootTools;
+﻿using Root_Rinse_Unloader.Engineer;
+using RootTools;
 using RootTools.Control;
 using RootTools.GAFs;
 using RootTools.Module;
@@ -176,6 +177,20 @@ namespace Root_Rinse_Unloader.Module
         #endregion
 
         #region Elevator
+        Loader p_loader
+        {
+            get
+            {
+                RinseU_Handler handler = (RinseU_Handler)m_engineer.ClassHandler();
+                return (handler == null) ? null : handler.m_loader;
+            }
+        }
+        bool IsLoaderDanger()
+        {
+            if (p_loader == null) return true;
+            return p_loader.IsLoaderDanger();
+        }
+
         Axis m_axis;
         void InitPosElevator()
         {
@@ -188,6 +203,7 @@ namespace Root_Rinse_Unloader.Module
         {
             if ((iIndex < 0) || (iIndex >= 20)) return "Invalid Index";
             if (IsMagazineProtrusion()) return "Check Storage : Strip Protrusion";
+            if (IsLoaderDanger()) return "Check Loader Position";
             m_axis.StartMove(eMagazine, -iIndex * m_dZ);
             if (bWait) return m_axis.WaitReady();
             return "OK"; 
@@ -197,6 +213,11 @@ namespace Root_Rinse_Unloader.Module
         {
             m_axis.StartMove("Stack");
             return m_axis.WaitReady();
+        }
+
+        public bool IsHighPos()
+        {
+            return m_axis.p_posCommand > (m_axis.GetPosValue("Stack") + 1000);
         }
 
         double m_fJogScale = 1;

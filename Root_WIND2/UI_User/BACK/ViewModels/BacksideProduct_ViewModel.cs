@@ -86,14 +86,8 @@ namespace Root_WIND2.UI_User
 
         public List<string> GrabModeList
         {
-            get
-            {
-                return ((WIND2_Handler)GlobalObjects.Instance.Get<WIND2_Engineer>().ClassHandler()).p_Vision.p_asGrabMode;
-            }
-            set
-            {
-
-            }
+            get;
+            set;     
         }
 
         private double camResolutionX;
@@ -140,6 +134,17 @@ namespace Root_WIND2.UI_User
             }
         }
 
+        private DataListView_ViewModel camInfoDataListVM;
+
+        public DataListView_ViewModel CamInfoDataListVM
+        {
+            get => this.camInfoDataListVM;
+            set
+            {
+                SetProperty(ref this.camInfoDataListVM, value);
+            }
+        }
+
         #endregion
 
         #region Command Btn
@@ -150,6 +155,12 @@ namespace Root_WIND2.UI_User
             {
                 return new RelayCommand(() =>
                 {
+                    WIND2_Engineer engineer = GlobalObjects.Instance.Get<WIND2_Engineer>();
+                    RecipeBack recipe = GlobalObjects.Instance.Get<RecipeBack>();
+
+                    CameraInfo camInfo = DataConverter.GrabModeToCameraInfo(engineer.m_handler.p_BackSideVision.GetGrabMode(recipe.CameraInfoIndex));
+                    this.CamInfoDataListVM.Init(camInfo);
+
                     LoadRecipe();
                     DrawMap();
                 });
@@ -228,6 +239,8 @@ namespace Root_WIND2.UI_User
             this.productInfoViewVM.Init(GlobalObjects.Instance.Get<RecipeBack>().WaferMap, true);
 
             this.productInfoViewVM.DataItemChanged += ProductInfoDataChanged_Callback;
+
+            this.CamInfoDataListVM = new DataListView_ViewModel();
         }
 
         public void LoadRecipe()
@@ -236,21 +249,25 @@ namespace Root_WIND2.UI_User
 
             CreateRecipeWaferMap(wafermap.MapSizeX, wafermap.MapSizeY, wafermap.Data);
             this.ProductInfoViewVM.Init(GlobalObjects.Instance.Get<RecipeBack>().WaferMap, true);
+
+            this.GrabModeList = ((WIND2_Handler)GlobalObjects.Instance.Get<WIND2_Engineer>().ClassHandler()).p_BackSideVision.p_asGrabMode;
         }
 
         public void ProductInfoDataChanged_Callback(DataItem item)
         {
-            OriginRecipe originRecipe = GlobalObjects.Instance.Get<RecipeBack>().GetItem<OriginRecipe>();
-            RecipeType_WaferMap wafermap = GlobalObjects.Instance.Get<RecipeBack>().WaferMap;
+            CameraInfo camInfo = DataConverter.GrabModeToCameraInfo(GlobalObjects.Instance.Get<WIND2_Engineer>().m_handler.p_BackSideVision.GetGrabMode(GlobalObjects.Instance.Get<RecipeBack>().CameraInfoIndex));
 
-            originRecipe.OriginX = wafermap.MasterDieX;
-            originRecipe.OriginY = wafermap.MasterDieY;
-            
-            originRecipe.OriginWidth = (int)wafermap.ChipWidth;
-            originRecipe.OriginHeight = (int)wafermap.ChipHeight;
-            
-            originRecipe.DiePitchX = (int)wafermap.DiePitchX;
-            originRecipe.DiePitchY = (int)wafermap.DiePitchY;
+            RecipeType_WaferMap waferMap = GlobalObjects.Instance.Get<RecipeBack>().WaferMap;
+            OriginRecipe originRecipe = GlobalObjects.Instance.Get<RecipeBack>().GetItem<OriginRecipe>();
+
+            originRecipe.OriginX = waferMap.MasterDieX;
+            originRecipe.OriginY = waferMap.MasterDieY;
+
+            originRecipe.OriginWidth = (int)(waferMap.ChipWidth / camInfo.TargetResX);
+            originRecipe.OriginHeight = (int)(waferMap.ChipHeight / camInfo.TargetResY);
+
+            originRecipe.DiePitchX = (int)(waferMap.DiePitchX / camInfo.TargetResX);
+            originRecipe.DiePitchY = (int)(waferMap.DiePitchY / camInfo.TargetResY);
         }
 
         #region [Properties]
@@ -293,6 +310,28 @@ namespace Root_WIND2.UI_User
 
         public void CreateDefaultMap()
         {
+            CameraInfo camInfo = DataConverter.GrabModeToCameraInfo(GlobalObjects.Instance.Get<WIND2_Engineer>().m_handler.p_BackSideVision.GetGrabMode(GlobalObjects.Instance.Get<RecipeBack>().CameraInfoIndex));
+
+            RecipeType_WaferMap waferMap = GlobalObjects.Instance.Get<RecipeBack>().WaferMap;
+
+            waferMap.OriginDieX = 7;
+            waferMap.OriginDieY = 7;
+            waferMap.DiePitchX = 20000;
+            waferMap.DiePitchY = 20000;
+            waferMap.ChipWidth = 20000;
+            waferMap.ChipHeight = 20000;
+
+            OriginRecipe originRecipe = GlobalObjects.Instance.Get<RecipeBack>().GetItem<OriginRecipe>();
+
+            originRecipe.OriginX = waferMap.MasterDieX;
+            originRecipe.OriginY = waferMap.MasterDieY;
+
+            originRecipe.OriginWidth = (int)(waferMap.ChipWidth / camInfo.TargetResX);
+            originRecipe.OriginHeight = (int)(waferMap.ChipHeight / camInfo.TargetResY);
+
+            originRecipe.DiePitchX = (int)(waferMap.DiePitchX / camInfo.TargetResX);
+            originRecipe.DiePitchY = (int)(waferMap.DiePitchY / camInfo.TargetResY);
+
             CreateRecipeWaferMap(defaultMapSizeX, defaultMapSizeY, defaultWaferMap);
             DrawMap();
         }
@@ -372,12 +411,16 @@ namespace Root_WIND2.UI_User
         {
             RecipeType_WaferMap waferMap = GlobalObjects.Instance.Get<RecipeBack>().WaferMap;
             waferMap.CreateWaferMap(mapSizeX, mapSizeY, type);
+
+            this.ProductInfoViewVM.Init(waferMap, true);
         }
 
         private void CreateRecipeWaferMap(int mapSizeX, int mapSizeY, int[] mapdata)
         {
             RecipeType_WaferMap waferMap = GlobalObjects.Instance.Get<RecipeBack>().WaferMap;
             waferMap.CreateWaferMap(mapSizeX, mapSizeY, mapdata);
+
+            this.ProductInfoViewVM.Init(waferMap, true);
         }
 
         private void ClearRecipeWaferMap()

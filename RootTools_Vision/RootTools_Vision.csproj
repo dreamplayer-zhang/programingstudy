@@ -141,12 +141,16 @@
     <Compile Include="MainWindow_ViewModel.cs" />
     <Compile Include="MVVM\Converter.cs" />
     <Compile Include="Recipe\CloneableRecipe.cs" />
+    <Compile Include="Recipe\Interfaces\IBackInspection.cs" />
+    <Compile Include="Recipe\Interfaces\IInspection.cs" />
     <Compile Include="Recipe\Interfaces\IOptionParameter.cs" />
     <Compile Include="Recipe\Interfaces\IRecipe.cs" />
     <Compile Include="Recipe\Parameter\BacksideSurfaceParameter.cs" />
+    <Compile Include="Recipe\Parameter\ProcessDefectBacksideParameter.cs" />
     <Compile Include="Recipe\Parameter\ProcessDefectEdgeParameter.cs" />
     <Compile Include="Recipe\Parameter\ProcessDefectParameter.cs" />
     <Compile Include="Recipe\Parameter\ProcessDefectWaferParameter.cs" />
+    <Compile Include="Recipe\Parameter\ProcessMeasurementParameter.cs" />
     <Compile Include="Recipe\Parameter\ReticleSurfaceParameter.cs" />
     <Compile Include="Recipe\Parameter\D2DParameter.cs" />
     <Compile Include="Recipe\Interfaces\IBacksideInspection.cs" />
@@ -229,6 +233,7 @@
     <Compile Include="SingleObject.cs" />
     <Compile Include="Utility\PolygonController.cs" />
     <Compile Include="Utility\TempLogger.cs" />
+    <Compile Include="Utility\Tools.ImageProcess.cs" />
     <Compile Include="Utility\Tools.Inspection.cs" />
     <Compile Include="WorkManager3\FixedSizeList.cs" />
     <Compile Include="WorkManager3\TaskManager.cs" />

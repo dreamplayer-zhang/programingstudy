@@ -389,7 +389,7 @@ namespace RootTools.Control
             return StartMove(fPos, sSpeed);
         }
 
-        double m_posDst = 0;
+        public double m_posDst = 0;
         int m_msMoveTime = 0;
         public virtual string StartMove(double fPos, string sSpeed = null)
         {

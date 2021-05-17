@@ -113,7 +113,7 @@ namespace RootTools_Vision
                 klarfData.AddSlot(recipe.WaferMap, mergeDefectList, this.recipe.GetItem<OriginRecipe>());
                 klarfData.WaferStart(recipe.WaferMap, DateTime.Now);
                 klarfData.SetResultTimeStamp();
-
+                klarfData.AddSlot(recipe.WaferMap, defectList, recipe.GetItem<OriginRecipe>());
                 klarfData.SaveKlarf(settings_frontside.KlarfSavePath, false);
 
                 Tools.SaveTiffImage(settings_frontside.KlarfSavePath, mergeDefectList, this.currentWorkplace.SharedBufferInfo);
