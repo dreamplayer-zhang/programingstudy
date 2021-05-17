@@ -64,6 +64,8 @@ namespace Root_Rinse_Loader.MainUI
             m_bBlink = !m_bBlink;
             foreach (MagazineClamp_UI ui in m_aMagazine) ui.OnTimer(m_bBlink);
             groupBoxMagazine.IsEnabled = (EQ.p_eState == EQ.eState.Ready);
+            buttonLoadUp.IsEnabled = EQ.p_eState == EQ.eState.Ready;
+            buttonLoadDown.IsEnabled = EQ.p_eState == EQ.eState.Ready; 
         }
 
         private void buttonNew_Click(object sender, RoutedEventArgs e)
@@ -83,6 +85,16 @@ namespace Root_Rinse_Loader.MainUI
         private void buttonMove_Click(object sender, RoutedEventArgs e)
         {
             m_storage.MoveMagazine(m_rinse.p_eMagazine, m_rinse.p_iMagazine, false); 
+        }
+
+        private void buttonLoadUp_Click(object sender, RoutedEventArgs e)
+        {
+            m_storage.RunLoadUp(); 
+        }
+
+        private void buttonLoadDown_Click(object sender, RoutedEventArgs e)
+        {
+            m_storage.RunLoadDown();
         }
     }
 }

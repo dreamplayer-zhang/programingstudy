@@ -29,6 +29,7 @@ namespace RootTools_Vision
         /// <param name="byteCnt"></param>
         /// <param name="sharedBufferG">없을 경우 IntPtr.Zero</param>
         /// <param name="sharedBufferB">없을 경우 IntPtr.Zero</param>
+
         public SharedBufferInfo(IntPtr sharedBufferR_GRAY, int width, int height, int byteCnt, IntPtr sharedBufferG, IntPtr sharedBufferB)
         {
             this.PtrR_GRAY = sharedBufferR_GRAY;

@@ -1,0 +1,102 @@
+﻿<UserControl x:Class="Root_VEGA_P_Vision.Review_Panel"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Root_VEGA_P_Vision"
+             mc:Ignorable="d" 
+             d:DesignHeight="866" d:DesignWidth="1912" Background="{StaticResource PanelBackGround}">
+    <!--<ScrollViewer>-->
+    <StackPanel>
+        <Grid Height="866">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1.5*"/>
+                <ColumnDefinition Width="8*"/>
+            </Grid.ColumnDefinitions>
+            <Grid Grid.Column="0">
+                <GroupBox Grid.Row="1"  Header="Result List">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition/>
+                            <RowDefinition Height="3*"/>
+                        </Grid.RowDefinitions>
+                        <GroupBox Grid.Row="0">
+                            <GroupBox.Header>
+                                <TextBlock Text="Search Option"/>
+                            </GroupBox.Header>
+                            <Grid Grid.Row="1">
+                                <StackPanel Margin="10,0,10,0">
+                                    <StackPanel VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+                                        <CheckBox Content="Start Date" VerticalAlignment="Center" Margin="0,5,0,0"
+                                                  FontSize="12" x:Name="cbStart"/>
+                                        <DatePicker/>
+                                        <CheckBox Content="End Date" VerticalAlignment="Center" Margin="0,10,0,0"
+                                                  FontSize="12" x:Name="cbEnd"/>
+                                        <DatePicker/>
+                                        <Grid Margin="0,8,0,0">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition/>
+                                                <ColumnDefinition Width="1.5*"/>
+                                            </Grid.ColumnDefinitions>
+                                            <CheckBox Content="POD ID" VerticalAlignment="Center" x:Name="cbWafer"/>
+                                            <TextBox Grid.Column="1" IsEnabled="{Binding ElementName=cbWafer, Path=IsChecked}"/>
+                                        </Grid>
+                                        <Grid Margin="0,8,0,0">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition/>
+                                                <ColumnDefinition Width="1.5*"/>
+                                            </Grid.ColumnDefinitions>
+                                        </Grid>
+                                        <Button 
+                                                    Content="Search" 
+                                                    Margin="0,12,0,0"
+                                                    Height="30"
+                                                    Command="{Binding btnSearch}"
+                                                    Style="{StaticResource SetupPanelBtn}"/>
+                                    </StackPanel>
+                                </StackPanel>
+
+                            </Grid>
+                        </GroupBox>
+                        <DataGrid IsReadOnly="True" Grid.Row="1" HeadersVisibility="Column">
+                            <DataGrid.Resources>
+                                <Style TargetType="DataGridRowHeader">
+                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                </Style>
+                                <Style TargetType="DataGridColumnHeader">
+                                    <Setter Property="HorizontalAlignment" Value="Stretch"/>
+                                    <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                                </Style>
+                            </DataGrid.Resources>
+                            <DataGrid.Columns>
+                                <DataGridTextColumn  Header="No." Binding="{Binding Path=a}" Width="0.4*"/>
+                                <DataGridTextColumn  Header="Date" Binding="{Binding Path=b}" Width="1.2*"/>
+                                <DataGridTextColumn  Header="POD" Binding="{Binding Path=c}" Width="1*"/>
+                                <DataGridTextColumn Header="Error" Binding="{Binding Path=d}" Width="1*"/>
+                            </DataGrid.Columns>
+                            <local:Dummy a="0" b="2020-11-27-05:55" c="POD001" d="Mask Exist"/>
+                            <local:Dummy a="1" b="2020-11-27-07:05" c="POD002" d="No Error"/>
+                            <local:Dummy a="2" b="2020-11-27-08:12" c="POD003" d="No Error"/>
+                            <local:Dummy a="3" b="2020-11-27-11:34" c="POD004" d="Mask Exist"/>
+                        </DataGrid>
+                    </Grid>
+                </GroupBox>
+            </Grid>
+            <Grid Grid.Column="1">
+                <TabControl Background="{StaticResource PanelBackGround}">
+                    <TabItem Header="Result Summary">
+                        <local:ResultSummary_Panel DataContext="{Binding ResultSummary}"/>
+                    </TabItem>
+                    <TabItem Header="Particle Count">
+                        <local:ParticleReview_Panel DataContext="{Binding ParticleReview}"/>
+                    </TabItem>
+                    <TabItem Header="Vision Inspection">
+                        <local:VisionReview_Panel DataContext="{Binding VisionReview}"/>
+                    </TabItem>
+                </TabControl>
+            </Grid>
+
+        </Grid>
+    </StackPanel>
+    <!--</ScrollViewer>-->
+</UserControl>
