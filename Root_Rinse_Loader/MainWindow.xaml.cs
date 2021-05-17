@@ -135,10 +135,12 @@ namespace Root_Rinse_Loader
             {    
                 borderUnloadState.Background = (rinse.p_eStateUnloader == EQ.eState.Ready || rinse.p_eStateUnloader == EQ.eState.Run) ? Brushes.SeaGreen : Brushes.Gold;
                 textBlockUnloadState.Text = rinse.p_eStateUnloader.ToString();
+                buttonEQUReady.IsEnabled = (rinse.p_eStateUnloader == EQ.eState.Run); 
             }
             else 
             { 
                 borderUnloadState.Background = Brushes.Crimson;
+                buttonEQUReady.IsEnabled = false; 
                 if (rinse.m_tcpip.p_bConnect == false) rinse.Reset(); 
             }
 
@@ -204,5 +206,10 @@ namespace Root_Rinse_Loader
             if (binding != null) binding.UpdateSource();
         }
         #endregion
+
+        private void buttonEQUReady_Click(object sender, RoutedEventArgs e)
+        {
+            m_handler.m_rinse.SendEQUReady();
+        }
     }
 }

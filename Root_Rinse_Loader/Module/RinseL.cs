@@ -448,7 +448,8 @@ namespace Root_Rinse_Loader.Module
             ResultClear,
             SetRotateSpeed,
             BuzzerOff,
-            Finish, 
+            Finish,
+            EQUReady
         }
         public string[] m_asCmd = Enum.GetNames(typeof(eCmd));
 
@@ -623,11 +624,16 @@ namespace Root_Rinse_Loader.Module
         }
         #endregion
 
-        #region SendFinish
+        #region SendFinish & EQU Ready
         public void SendFinish()
         {
             RunBuzzer(eBuzzer.Finish);
             AddProtocol(p_id, eCmd.Finish, 0); 
+        }
+
+        public void SendEQUReady()
+        {
+            AddProtocol(p_id, eCmd.EQUReady, 0);
         }
         #endregion
 

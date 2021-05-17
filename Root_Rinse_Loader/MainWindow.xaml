@@ -259,13 +259,26 @@
                                             x:Name="borderUnloadState"
                                             CornerRadius="10"
                                             Background="SeaGreen">
-                                            <TextBlock x:Name="textBlockUnloadState"
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="2*"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock Grid.Column="0" x:Name="textBlockUnloadState"
                                                    Text="{Binding p_eStateUnloader}"
                                                    FontSize="30"
                                                    FontWeight="Bold"
                                                    FontFamily="Arial"
                                                    VerticalAlignment="Center"
                                                    HorizontalAlignment="Center"/>
+                                                <Button Grid.Column="1" x:Name="buttonEQUReady" 
+                                                   FontSize="30"
+                                                   FontWeight="Bold"
+                                                   FontFamily="Arial"
+                                                   VerticalAlignment="Center"
+                                                   HorizontalAlignment="Center"
+                                                   Click="buttonEQUReady_Click"/>
+                                            </Grid>
                                         </Border>
                                     </GroupBox>
                                     <GroupBox Header="수세기"

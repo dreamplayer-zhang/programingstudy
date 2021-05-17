@@ -385,7 +385,8 @@ namespace Root_Rinse_Unloader.Module
             {
                 case eMagazine.Magazine1:
                     m_alidMagazineFull.p_bSet = true; 
-                    m_rinse.RunBuzzer(RinseU.eBuzzer.Finish); 
+                    m_rinse.RunBuzzer(RinseU.eBuzzer.Finish);
+                    EQ.p_eState = EQ.eState.Ready; 
                     return "Magazine Full";
                 case eMagazine.Magazine2: m_rinse.p_eMagazine = eMagazine.Magazine1; break;
                 case eMagazine.Magazine3: m_rinse.p_eMagazine = eMagazine.Magazine2; break;

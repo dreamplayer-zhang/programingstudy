@@ -87,6 +87,7 @@ namespace Root_Rinse_Unloader
         {
             textBlockState.DataContext = EQ.m_EQ;
             textBlockLoadState.DataContext = m_handler.m_rinse;
+            textBoxRotateSpeed.DataContext = m_handler.m_rinse; 
             buttonMode.DataContext = m_handler.m_rinse;
             textBoxWidth.DataContext = m_handler.m_rinse;
             magazineUI.Init(m_handler.m_rinse, m_handler.m_storage);
