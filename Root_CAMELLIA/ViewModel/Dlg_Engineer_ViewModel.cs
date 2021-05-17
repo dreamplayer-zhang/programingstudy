@@ -530,6 +530,14 @@ namespace Root_CAMELLIA
         //    }
         //}
 
+        public void OnKeyDown(object sender, KeyEventArgs e)
+        {
+            if(e.Key == Key.Escape)
+            {
+                CloseWindow();
+            }
+        }
+
         public void OnMouseLeave(object sender, MouseEventArgs e)
         {
             foreach (ShapeEllipse se in listCandidatePoint)
@@ -1111,10 +1119,7 @@ namespace Root_CAMELLIA
             {
                 return new RelayCommand(() =>
                 {
-                    Run_Measure measure = (Run_Measure)ModuleCamellia.CloneModuleRun("Measure");
-                    ModuleCamellia.mwvm.p_StageCenterPulse = measure.m_StageCenterPos_pulse;
-
-                    CloseRequested(this, new DialogCloseRequestedEventArgs(true));
+                    CloseWindow();
                 });
             }
         }
@@ -1143,6 +1148,15 @@ namespace Root_CAMELLIA
         #endregion
 
         #region Function
+
+        void CloseWindow()
+        {
+            Run_Measure measure = (Run_Measure)ModuleCamellia.CloneModuleRun("Measure");
+            ModuleCamellia.mwvm.p_StageCenterPulse = measure.m_StageCenterPos_pulse;
+
+            CloseRequested(this, new DialogCloseRequestedEventArgs(true));
+        }
+
         public void UpdateParameter()
         {
             LibSR_Met.DataManager dataManager = LibSR_Met.DataManager.GetInstance();

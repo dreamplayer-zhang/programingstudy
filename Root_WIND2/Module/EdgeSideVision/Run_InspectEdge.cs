@@ -49,7 +49,7 @@ namespace Root_WIND2.Module
 				if (EQ.IsStop())
 					return "OK";
 
-				RootTools_Vision.WorkManager3.WorkManager workManager = GlobalObjects.Instance.GetNamed<RootTools_Vision.WorkManager3.WorkManager>("edgeTopInspection");
+				RootTools_Vision.WorkManager3.WorkManager workManager = GlobalObjects.Instance.GetNamed<RootTools_Vision.WorkManager3.WorkManager>("edgeInspection");
 				if (workManager == null)
 				{
 					throw new ArgumentException("WorkManager가 초기화되지 않았습니다(null)");

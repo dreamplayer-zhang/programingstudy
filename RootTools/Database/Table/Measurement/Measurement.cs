@@ -7,6 +7,7 @@ using System.Windows;
 
 namespace RootTools.Database
 {
+    // EBR
     [Serializable]
     public class Measurement : Data
     {

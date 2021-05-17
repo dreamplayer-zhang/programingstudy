@@ -144,7 +144,7 @@ namespace Root_VEGA_P.Module
                 int nPod = (value != null) ? (int)value.p_ePod : -1;
                 _infoPod = value;
                 m_reg.Write("InfoPod." + p_id, nPod);
-                value.WriteReg();
+                value?.WriteReg();
                 OnPropertyChanged();
             }
         }
@@ -154,8 +154,11 @@ namespace Root_VEGA_P.Module
         {
             m_reg = new Registry("InfoPod"); 
             int nPod = m_reg.Read(p_id, -1);
-            p_infoPod = new InfoPod((InfoPod.ePod)nPod);
-            p_infoPod.ReadReg();
+            if (nPod >= 0)
+            {
+                p_infoPod = new InfoPod((InfoPod.ePod)nPod);
+                p_infoPod.ReadReg();
+            }
             foreach (IRTRChild child in p_aChild) child.ReadPod_Registry();
         }
         #endregion

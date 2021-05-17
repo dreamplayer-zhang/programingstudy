@@ -18,7 +18,7 @@ namespace RootTools_Vision
 		private int roiWidth;
 		private int roiHeight;
 		private int notchY;
-		private int stepDegree;
+		private double stepDegree;
 		private int xRange;
 		private int diffEdge;
 		private int diffBevel;
@@ -34,7 +34,7 @@ namespace RootTools_Vision
 			get => this.roiWidth;
 			set
 			{
-				SetProperty<int>(ref this.roiWidth, value);
+				SetProperty(ref this.roiWidth, value);
 			}
 		}
 		[Category("Parameter")]
@@ -43,7 +43,7 @@ namespace RootTools_Vision
 			get => this.roiHeight;
 			set
 			{
-				SetProperty<int>(ref this.roiHeight, value);
+				SetProperty(ref this.roiHeight, value);
 			}
 		}
 		[Category("Parameter")]
@@ -52,16 +52,16 @@ namespace RootTools_Vision
 			get => this.notchY;
 			set
 			{
-				SetProperty<int>(ref this.notchY, value);
+				SetProperty(ref this.notchY, value);
 			}
 		}
 		[Category("Parameter")]
-		public int StepDegree
+		public double StepDegree
 		{
 			get => this.stepDegree;
 			set
 			{
-				SetProperty<int>(ref this.stepDegree, value);
+				SetProperty(ref this.stepDegree, value);
 			}
 		}
 		[Category("Parameter")]
@@ -70,7 +70,7 @@ namespace RootTools_Vision
 			get => this.xRange;
 			set
 			{
-				SetProperty<int>(ref this.xRange, value);
+				SetProperty(ref this.xRange, value);
 			}
 		}
 		[Category("Parameter")]
@@ -79,7 +79,7 @@ namespace RootTools_Vision
 			get => this.diffEdge;
 			set
 			{
-				SetProperty<int>(ref this.diffEdge, value);
+				SetProperty(ref this.diffEdge, value);
 			}
 		}
 		[Category("Parameter")]
@@ -88,7 +88,7 @@ namespace RootTools_Vision
 			get => this.diffBevel;
 			set
 			{
-				SetProperty<int>(ref this.diffBevel, value);
+				SetProperty(ref this.diffBevel, value);
 			}
 		}
 		[Category("Parameter")]
@@ -97,7 +97,7 @@ namespace RootTools_Vision
 			get => this.diffEBR;
 			set
 			{
-				SetProperty<int>(ref this.diffEBR, value);
+				SetProperty(ref this.diffEBR, value);
 			}
 		}
 		[Category("Parameter")]
@@ -106,7 +106,7 @@ namespace RootTools_Vision
 			get => this.offsetBevel;
 			set
 			{
-				SetProperty<int>(ref this.offsetBevel, value);
+				SetProperty(ref this.offsetBevel, value);
 			}
 		}
 		[Category("Parameter")]
@@ -115,7 +115,7 @@ namespace RootTools_Vision
 			get => this.offsetEBR;
 			set
 			{
-				SetProperty<int>(ref this.offsetEBR, value);
+				SetProperty(ref this.offsetEBR, value);
 			}
 		}
 

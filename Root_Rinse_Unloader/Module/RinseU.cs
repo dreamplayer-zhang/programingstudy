@@ -541,7 +541,7 @@ namespace Root_Rinse_Unloader.Module
                             break;
                         case eCmd.Finish:
                             AddProtocol(asRead[0], eCmd, asRead[2]);
-                            RunFinishTimer(); 
+                            //RunFinishTimer(); 
                             break; 
                     }
                 }

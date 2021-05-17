@@ -419,7 +419,7 @@ namespace Root_VEGA_P.Module
         #endregion
 
         #region Docking
-        bool m_bDocking = false; 
+        bool m_bDocking = false;
         public string RunDocking()
         {
             try
@@ -427,21 +427,20 @@ namespace Root_VEGA_P.Module
                 if (EQ.p_bSimulate)
                 {
                     m_infoPods.p_ePresentSensor = GemCarrierBase.ePresent.Exist;
-                    m_infoPods.p_sCarrierID = "Simulation"; 
+                    m_infoPods.p_sCarrierID = "Simulation";
+                    m_infoPods.NewInfoPod(4);
+                    return "OK";
                 }
-                else
+                switch (m_infoPods.p_eState)
                 {
-                    switch (m_infoPods.p_eState)
-                    {
-                        case InfoPods.eState.Dock: return "OK";
-                        case InfoPods.eState.Empty: return "Pod not Exist";
-                    }
-                    string sRFID = "";
-                    m_RFID.Read(out sRFID);
-                    m_infoPods.p_sCarrierID = sRFID;
+                    case InfoPods.eState.Dock: return "OK";
+                    case InfoPods.eState.Empty: return "Pod not Exist";
                 }
+                string sRFID = "";
+                m_RFID.Read(out sRFID);
+                m_infoPods.p_sCarrierID = sRFID;
                 m_infoPods.SendCarrierID(m_infoPods.p_sCarrierID);
-                m_bDocking = true; 
+                m_bDocking = true;
                 if (m_stage.p_bPlaced == false) return "Not Placed";
                 if (m_stage.p_bPresent == false) return "Not Present";
                 if (Run(m_stage.RunVacuum(true))) return p_sInfo;

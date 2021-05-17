@@ -34,6 +34,17 @@ namespace Root_CAMELLIA.UI_UserControl
             InitializeComponent();
         }
 
+        private void DataGrid_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            e.Handled = true;
+            //if (e.LeftButton == MouseButtonState.Pressed || e.RightButton == MouseButtonState.Pressed)
+            //{
+            //    e.Handled = true;
+            //}
+        }
+
+
+
         //Loadport_RND m_loadport;
         //CAMELLIA_Handler m_handler;
         //BackgroundWorker m_bgwLoad = new BackgroundWorker();
@@ -142,6 +153,6 @@ namespace Root_CAMELLIA.UI_UserControl
 
         //#endregion
 
-        
+
     }
 }

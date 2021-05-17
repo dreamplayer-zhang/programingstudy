@@ -5,6 +5,7 @@ using RootTools.Module;
 using RootTools.Trees;
 using System;
 using System.Collections.Generic;
+using System.Threading;
 
 namespace Root_VEGA_P.Engineer
 {
@@ -47,7 +48,6 @@ namespace Root_VEGA_P.Engineer
         {
             m_qModuleRun.Clear();
             foreach (ModuleRunBase run in m_runList.p_aModuleRun) m_qModuleRun.Enqueue(run);
-            RunTree(Tree.eMode.Init);
         }
 
         public int p_nQueue { get { return m_qModuleRun.Count; } }
@@ -88,8 +88,33 @@ namespace Root_VEGA_P.Engineer
 
         public string RunProcess()
         {
-
+            if (m_qModuleRun.Count == 0) return "OK";
+            ModuleRunBase run = m_qModuleRun.Peek();
+            if (run is RTR.Run_GetPut)
+            {
+                RTR.Run_GetPut runRTR = run as RTR.Run_GetPut;
+                if (runRTR.m_moduleBase.IsBusy()) return "OK"; 
+                string sGet = CheckChild(runRTR.m_sChildGet);
+                if (sGet != "OK") return sGet;
+                string sPut = CheckChild(runRTR.m_sChildPut);
+                if (sPut != "OK") return sPut;
+            }
+            run.StartRun();
+            m_qModuleRun.Dequeue();
+            Thread.Sleep(200);
             return "OK";
+        }
+
+        string CheckChild(string sChild)
+        {
+            ModuleBase moduleGet = m_handler.p_moduleList.GetModule(sChild);
+            if (moduleGet == null) return "Child not Exist : " + sChild;
+            switch (moduleGet.p_eState)
+            {
+                case ModuleBase.eState.Ready: return "OK";
+                case ModuleBase.eState.Run: return "Run";
+                default: EQ.p_eState = EQ.eState.Error; return "Error";
+            }
         }
         #endregion
 

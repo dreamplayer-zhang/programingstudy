@@ -14,6 +14,9 @@
                 <TabItem Header="ModuleList" Background="{Binding p_brushHandler}">
                     <module:ModuleList_UI x:Name="moduleListUI"/>
                 </TabItem>
+                <TabItem Header="NozzleSet" Background="{Binding p_brushHandler}">
+                    <local:Recipe_Nozzle_UI x:Name="nozzleUI"/>
+                </TabItem>
                 <TabItem Header="Recipe" Background="{Binding p_brushHandler}">
                     <local:VEGA_P_Recipe_UI x:Name="recipeUI"/>
                 </TabItem>

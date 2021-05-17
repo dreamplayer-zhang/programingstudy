@@ -82,6 +82,7 @@ namespace Root_VEGA_P.Module
         {
             m_reg = new Registry("InfoPod");
             int nPod = m_reg.Read(p_id, -1);
+            if (nPod < 0) return;
             p_infoPod = new InfoPod((InfoPod.ePod)nPod);
             p_infoPod.ReadReg();
         }
@@ -184,12 +185,12 @@ namespace Root_VEGA_P.Module
         }
         #endregion
 
-        ParticleCounterSet m_particleCounterSet;
+        public ParticleCounterSet m_particleCounterSet;
         public EIP_Plate(string id, IEngineer engineer)
         {
             p_id = id; 
             VEGA_P vegaP = ((VEGA_P_Handler)engineer.ClassHandler()).m_VEGA;
-            m_particleCounterSet = new ParticleCounterSet(this, vegaP.m_flowSensor, vegaP.m_sample);
+            m_particleCounterSet = new ParticleCounterSet(this, vegaP);
             InitBase(id, engineer); 
         }
 
@@ -204,7 +205,7 @@ namespace Root_VEGA_P.Module
         {
             AddModuleRunList(new Run_Delay(this), false, "Time Delay");
             AddModuleRunList(new Run_RunCover(this), false, "Run Cover Sol Test");
-            m_particleCounterSet.InitModuleRuns();
+            m_particleCounterSet.InitModuleRuns(true);
         }
 
         public class Run_Delay : ModuleRunBase

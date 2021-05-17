@@ -12,8 +12,12 @@ namespace Root_WIND2
         public override void Initilize()
         {
             // Regiseter Recipe Items
+            RegisterRecipeItem<OriginRecipe>();
             RegisterRecipeItem<EBRRecipe>();
+
+            // Regiseter Parameter Items
             RegisterParameterItem<EBRParameter>();
+            RegisterParameterItem<ProcessDefectEdgeParameter>();
         }
     }
 }
