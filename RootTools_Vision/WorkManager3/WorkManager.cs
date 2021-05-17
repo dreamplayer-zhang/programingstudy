@@ -158,8 +158,15 @@ namespace RootTools_Vision.WorkManager3
 
             return true;
         }
+        //temp
+        private Workplace workplaceTemp;
+        public Workplace WorkplaceTemp
+		{
+            get => this.workplaceTemp;
 
-        public void Start(bool inspOnly = true)
+        }
+
+        public void Start(bool inspOnly = true, bool inspSave = false)
         {
             if(this.sharedBuffer.PtrR_GRAY == IntPtr.Zero)
             {
@@ -181,6 +188,8 @@ namespace RootTools_Vision.WorkManager3
 
             this.currentWorkplaceQueue = 
                 RecipeToWorkplaceConverter.ConvertToQueue(this.recipe, this.sharedBuffer, this.cameraInfo);
+
+            this.workplaceTemp = this.currentWorkplaceQueue.ToArray()[0];
 
             pipeLine.Start(
                 this.currentWorkplaceQueue,
@@ -222,7 +231,7 @@ namespace RootTools_Vision.WorkManager3
         public bool WaitWorkDone(ref bool isCanceled, int timeoutSecond = 60)
         {
             int sec = 0;
-            while(pipeLine.CheckPipeDone() == false && sec < timeoutSecond && isCanceled == false)
+            while (pipeLine.CheckPipeDone() == false && sec < timeoutSecond && isCanceled == false)
             {
                 Thread.Sleep(1000);
                 sec++;

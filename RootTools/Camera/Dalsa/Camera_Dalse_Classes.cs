@@ -171,7 +171,7 @@ namespace RootTools.Camera.Dalsa
             get => _nUserSetNum;
             set
             {
-                if(value<17&&value>0)
+                if (value < 17 && value > 0) 
                 {
                     _nUserSetNum = value;
                     SetUserset(value);

@@ -359,6 +359,7 @@ namespace RootTools_Vision
         /// <param name="sharedBufferByteCnt">버퍼 채널 수</param>
         /// <param name="sharedBufferG">G채널 버퍼 포인터(없을 경우 IntPtr.Zero로 셋팅)</param>
         /// <param name="sharedBufferB">B채널 버퍼 포인터(없을 경우 IntPtr.Zero로 셋팅)</param>
+        
         public void SetSharedBuffer(IntPtr sharedBufferR_GRAY, int sharedBufferWidth, int sharedBufferHeight, int sharedBufferByteCnt, IntPtr sharedBufferG, IntPtr sharedBufferB)
         {
             this.sharedBufferInfo.PtrR_GRAY = sharedBufferR_GRAY;
@@ -460,6 +461,10 @@ namespace RootTools_Vision
             return sharedBufferInfo.PtrR_GRAY;
         }
 
+        public IntPtr GetSharedBufferInfo(int memnum)
+        {
+            return sharedBufferInfo.PtrList[memnum];
+        }
         public void SetOffset(int _offsetX, int _offsetY)
         {
             this.offsetX = _offsetX;

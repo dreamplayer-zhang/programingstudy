@@ -1060,9 +1060,9 @@
                                     <TextBlock Grid.Column="1" FontSize="15" FontWeight="Bold" Text="{Binding p_lampStatus, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource OpticLampStatusEnumConverter}}" HorizontalAlignment="Center" VerticalAlignment="Center" TextAlignment="Center"/>
                                 </Grid>
 
-                                <Border x:Name="LampStateColor" Grid.Row="4">
-                                    <TextBlock Text="{Binding p_LampStates, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center" HorizontalAlignment="Center" />
-                                </Border>
+                                <!--<Border x:Name="LampStateColor" Grid.Row="4">
+                                    <TextBlock Text="{Binding p_LampStatus, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center" HorizontalAlignment="Center" />
+                                </Border>-->
 
                             </Grid>
                         </Grid>

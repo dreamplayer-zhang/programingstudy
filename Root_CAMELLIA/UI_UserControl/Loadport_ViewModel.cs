@@ -178,6 +178,45 @@ namespace Root_CAMELLIA
             }
         }
 
+        int m_totalSelect = 0;
+        public int p_totalSelect
+        {
+            get
+            {
+                return m_totalSelect;
+            }
+            set
+            {
+                SetProperty(ref m_totalSelect, value);
+            }
+        }
+
+        int m_totalDone = 0;
+        public int p_totalDone
+        {
+            get
+            {
+                return m_totalDone;
+            }
+            set
+            {
+                SetProperty(ref m_totalDone, value);
+            }
+        }
+
+        double m_progressValue = 0;
+        public double p_progressValue
+        {
+            get
+            {
+                return m_progressValue;
+            }
+            set
+            {
+                SetProperty(ref m_progressValue, value);
+            }
+        }
+
         Dlg_ManualJob_ViewModel manualJob_ViewModel;
         DialogService dialogService;
         #endregion
@@ -215,6 +254,12 @@ namespace Root_CAMELLIA
                     return;
                 }
                 p_waferList[24 - ((InfoWafer)sender).m_nSlot].p_state = ((InfoWafer)sender).p_eState;
+                if(((InfoWafer)sender).p_eState == GemSlotBase.eState.Done)
+                {
+                    p_totalDone++;
+
+                    p_progressValue = (p_totalDone / p_totalSelect) * 100;
+                }
                 p_dataSelectIndex = 24 - ((InfoWafer)sender).m_nSlot;
             }));
         }
@@ -318,7 +363,9 @@ namespace Root_CAMELLIA
                         p_waferList.Clear();
                         p_CurrentRecipeID = "";
                         p_dataSelectIndex = 0;
-
+                        p_totalSelect = 0;
+                        p_totalDone = 0;
+                        p_progressValue = 0;
                         var viewModel = manualJob_ViewModel;
                         viewModel.InitData(p_infoCarrier);
                         var dialog = dialogService.GetDialog(viewModel) as Dlg_ManualJob;
@@ -342,10 +389,14 @@ namespace Root_CAMELLIA
                                     if (val != null)
                                     {
                                         temp.Insert(0, new DataGridWaferInfo(idx++, val.p_sWaferID, val.p_sRecipe, val.p_eState));
+                                        if(val.p_eState == GemSlotBase.eState.Select)
+                                        {
+                                            p_totalSelect++;
+                                        }
                                         if(p_CurrentRecipeID == "" && val.p_sRecipe != "")
                                         {
                                             p_CurrentRecipeID = val.p_sRecipe.Replace(Path.GetExtension(val.p_sRecipe), "");
-                                            firstIdx = idx;
+                                            firstIdx = idx - 1;
                                         }
                                         //object[] obj = { val.m_nSlot, val.p_sWaferID, val.p_sRecipe, val.p_eState };
                                         //datagridSlot.Items.Add(obj);
@@ -353,7 +404,7 @@ namespace Root_CAMELLIA
                                 }
                                 p_waferList = temp;
 
-                                p_dataSelectIndex = 24 - firstIdx;
+                                p_dataSelectIndex = 24 - firstIdx + 1;
                             }
                         }
                     }
@@ -404,9 +455,15 @@ namespace Root_CAMELLIA
 
         bool IsEnableLoad()
         {
+            if (p_loadport.p_diDocked.p_bIn)
+            {
+                return false;
+            }
             bool bReadyLoadport = (p_loadport.p_eState == ModuleBase.eState.Ready);
-            bool bReadyToLoad = (p_loadport.p_infoCarrier.p_eTransfer == GemCarrierBase.eTransfer.ReadyToLoad);
-            //bReadyToLoad = true;
+            bool bReadyToLoad = true;
+            if (App.m_engineer.p_bUseXGem)
+                bReadyToLoad = (p_loadport.p_infoCarrier.p_eTransfer == GemCarrierBase.eTransfer.ReadyToLoad);
+
             bool bReadyState = (p_loadport.m_qModuleRun.Count == 0);
             bool bEQReadyState = (EQ.p_eState == EQ.eState.Ready);
             //if (m_loadport.p_infoCarrier.p_eState != InfoCarrier.eState.Placed) return false;
@@ -418,7 +475,9 @@ namespace Root_CAMELLIA
         bool IsEnableUnloadReq()
         {
             bool bReadyLoadport = (p_loadport.p_eState == ModuleBase.eState.Ready);
-            bool bReadyToUnload = (p_loadport.p_infoCarrier.p_eTransfer == GemCarrierBase.eTransfer.ReadyToUnload);
+            bool bReadyToUnload = true;
+            if(App.m_engineer.p_bUseXGem)
+                bReadyToUnload = (p_loadport.p_infoCarrier.p_eTransfer == GemCarrierBase.eTransfer.ReadyToUnload);
             bool bAccess = (p_loadport.p_infoCarrier.p_eAccessLP == GemCarrierBase.eAccessLP.Auto);
             bool bPlaced = p_loadport.CheckPlaced();
             return bReadyLoadport && bReadyToUnload && bAccess && bPlaced;

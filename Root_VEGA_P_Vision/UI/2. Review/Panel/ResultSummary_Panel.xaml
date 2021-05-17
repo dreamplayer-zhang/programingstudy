@@ -1,0 +1,283 @@
+﻿<UserControl x:Class="Root_VEGA_P_Vision.ResultSummary_Panel"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Root_VEGA_P_Vision"
+             mc:Ignorable="d" 
+             d:DesignHeight="866" d:DesignWidth="1912" Background="{StaticResource PanelBackGround}">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="7*"/>
+            <RowDefinition Height="11*"/>
+        </Grid.RowDefinitions>
+        <GroupBox Grid.Row="0" Header="Pod Info">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="5*"/>
+                    <RowDefinition Height="3*"/>
+                </Grid.RowDefinitions>
+                <GroupBox Grid.Row="0" Header="ID">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <Grid Grid.Row="0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="3.8*"/>
+                                <ColumnDefinition Width="7*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="* POD" Grid.Column="0" Style="{StaticResource PodInfo}"/>
+                            <TextBlock Text="3EN0525820500017" Grid.Column="1" Style="{StaticResource PodInfo}"/>
+                        </Grid>
+
+                        <Grid Grid.Row="1">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="3.8*"/>
+                                <ColumnDefinition Width="7*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="* EOP Dome" Grid.Column="0" Style="{StaticResource PodInfo}"/>
+                            <TextBlock Text="3EN05258" Grid.Column="1" Style="{StaticResource PodInfo}"/>
+                        </Grid>
+                        <Grid Grid.Row="2">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="3.8*"/>
+                                <ColumnDefinition Width="7*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="* EOP Door" Grid.Column="0" Style="{StaticResource PodInfo}"/>
+                            <TextBlock Text="20500017" Grid.Column="1" Style="{StaticResource PodInfo}"/>
+                        </Grid>
+                        <Grid Grid.Row="3">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="3.8*"/>
+                                <ColumnDefinition Width="7*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="* EIP Cover" Grid.Column="0" Style="{StaticResource PodInfo}"/>
+                            <TextBlock Text="10600045" Grid.Column="1" Style="{StaticResource PodInfo}"/>
+                        </Grid>
+                        <Grid Grid.Row="4">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="3.8*"/>
+                                <ColumnDefinition Width="7*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="* EIP Baseplate" Grid.Column="0" Style="{StaticResource PodInfo}"/>
+                            <TextBlock Text="20500017" Grid.Column="1" Style="{StaticResource PodInfo}"/>
+                        </Grid>
+                    </Grid >
+                </GroupBox>
+                <GroupBox Grid.Row="1" Header="Information">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <Grid Grid.Row="0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="3.8*"/>
+                                <ColumnDefinition Width="7*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="* Weight" Grid.Column="0" Style="{StaticResource PodInfo}"/>
+                            <TextBlock Text="2.45kg" Grid.Column="1" Style="{StaticResource PodInfo}"/>
+                        </Grid>
+
+                        <Grid Grid.Row="1">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="3.8*"/>
+                                <ColumnDefinition Width="7*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="* Start Time" Grid.Column="0" Style="{StaticResource PodInfo}"/>
+                            <TextBlock Text="2021.06.17 12:34" Grid.Column="1" Style="{StaticResource PodInfo}"/>
+                        </Grid>
+                        <Grid Grid.Row="2">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="3.8*"/>
+                                <ColumnDefinition Width="7*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="* Error" Grid.Column="0" Style="{StaticResource PodInfo}"/>
+                            <TextBlock Text="No Error" Grid.Column="1" Style="{StaticResource PodInfo}"/>
+                        </Grid>
+                    </Grid >
+                </GroupBox>
+            </Grid>
+        </GroupBox>
+        <GroupBox Grid.Row="1" Header="Inspection Results">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="1.2*"/>
+                    <RowDefinition Height="2*"/>
+                </Grid.RowDefinitions>
+                <GroupBox Grid.Row="0" Header="Particle Count">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="1*"/>
+                            <RowDefinition Height="2*"/>
+                            <RowDefinition Height="2*"/>
+                            <RowDefinition Height="2*"/>
+                            <RowDefinition Height="2*"/>
+                        </Grid.RowDefinitions>
+                        <Grid Grid.Row="0" Background="DarkGray">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="1.5*"/>
+                                <ColumnDefinition Width="1*"/>
+                                <ColumnDefinition Width="1*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="Pod Part" Grid.Column="0" Style="{StaticResource ResultHeader}"/>
+                            <TextBlock Text="Count" Grid.Column="1" Style="{StaticResource ResultHeader}"/>
+                            <TextBlock Text="Result" Grid.Column="2" Style="{StaticResource ResultHeader}"/>
+                        </Grid>
+                        <Grid Grid.Row="1">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="1.5*"/>
+                                <ColumnDefinition Width="1*"/>
+                                <ColumnDefinition Width="1*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="* Outer Pod Dome" Grid.Column="0" Style="{StaticResource PodInfo}"/>
+                            <TextBlock Text="44" Grid.Column="1" Style="{StaticResource PodInfo}"/>
+                            <TextBlock Text="Fail" Grid.Column="2" Style="{StaticResource PodInfo}" Foreground="Red" FontWeight="Bold" />
+                        </Grid>
+                        <Grid Grid.Row="2">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="1.5*"/>
+                                <ColumnDefinition Width="1*"/>
+                                <ColumnDefinition Width="1*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="* Outer Pod Door" Grid.Column="0" Style="{StaticResource PodInfo}"/>
+                            <TextBlock Text="2" Grid.Column="1" Style="{StaticResource PodInfo}"/>
+                            <TextBlock Text="Fail" Grid.Column="2" Style="{StaticResource PodInfo}" Foreground="Red" FontWeight="Bold"/>
+                        </Grid>
+                        <Grid Grid.Row="3">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="1.5*"/>
+                                <ColumnDefinition Width="1*"/>
+                                <ColumnDefinition Width="1*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="* Inner Pod Cover" Grid.Column="0" Style="{StaticResource PodInfo}"/>
+                            <TextBlock Text="0" Grid.Column="1" Style="{StaticResource PodInfo}"/>
+                            <TextBlock Text="Pass" Grid.Column="2" Style="{StaticResource PodInfo}" Foreground="Green" FontWeight="Bold"/>
+                        </Grid>
+                        <Grid Grid.Row="4">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="1.5*"/>
+                                <ColumnDefinition Width="1*"/>
+                                <ColumnDefinition Width="1*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="* Inner Pod BasePlate" Grid.Column="0" Style="{StaticResource PodInfo}"/>
+                            <TextBlock Text="3" Grid.Column="1" Style="{StaticResource PodInfo}"/>
+                            <TextBlock Text="Fail" Grid.Column="2" Style="{StaticResource PodInfo}" Foreground="Red" FontWeight="Bold"/>
+                        </Grid>
+                    </Grid >
+                </GroupBox>
+                <GroupBox Grid.Row="1" Header="Vision">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="1*"/>
+                            <RowDefinition Height="2*"/>
+                            <RowDefinition Height="2*"/>
+                            <RowDefinition Height="2*"/>
+                            <RowDefinition Height="2*"/>
+                            <RowDefinition Height="2*"/>
+                            <RowDefinition Height="2*"/>
+                            <RowDefinition Height="2*"/>
+                            <RowDefinition Height="2*"/>
+                        </Grid.RowDefinitions>
+                        <Grid Grid.Row="0" Background="DarkGray">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="1.5*"/>
+                                <ColumnDefinition Width="1*"/>
+                                <ColumnDefinition Width="1*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="Pod Part" Grid.Column="0" Style="{StaticResource ResultHeader}"/>
+                            <TextBlock Text="Defect" Grid.Column="1" Style="{StaticResource ResultHeader}"/>
+                            <TextBlock Text="Result" Grid.Column="2" Style="{StaticResource ResultHeader}"/>
+                        </Grid>
+                        <Grid Grid.Row="1">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="1.5*"/>
+                                <ColumnDefinition Width="1*"/>
+                                <ColumnDefinition Width="1*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="* Outer Pod Dome" Grid.Column="0" Style="{StaticResource PodInfo}"/>
+                            <TextBlock Text="" Grid.Column="1" Style="{StaticResource PodInfo}"/>
+                            <TextBlock Text="View" Grid.Column="2" Style="{StaticResource PodInfo}" Foreground="MidnightBlue" FontWeight="Bold" />
+                        </Grid>
+                        <Grid Grid.Row="2">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="1.5*"/>
+                                <ColumnDefinition Width="1*"/>
+                                <ColumnDefinition Width="1*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="* Outer Pod Door" Grid.Column="0" Style="{StaticResource PodInfo}"/>
+                            <TextBlock Text="" Grid.Column="1" Style="{StaticResource PodInfo}"/>
+                            <TextBlock Text="View" Grid.Column="2" Style="{StaticResource PodInfo}" Foreground="MidnightBlue" FontWeight="Bold"/>
+                        </Grid>
+                        <Grid Grid.Row="3">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="1.5*"/>
+                                <ColumnDefinition Width="1*"/>
+                                <ColumnDefinition Width="1*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="* Inner Pod Cover Top" Grid.Column="0" Style="{StaticResource PodInfo}"/>
+                            <TextBlock Text="0" Grid.Column="1" Style="{StaticResource PodInfo}"/>
+                            <TextBlock Text="Pass" Grid.Column="2" Style="{StaticResource PodInfo}" Foreground="Green" FontWeight="Bold"/>
+                        </Grid>
+                        <Grid Grid.Row="4">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="1.5*"/>
+                                <ColumnDefinition Width="1*"/>
+                                <ColumnDefinition Width="1*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="* Inner Pod Cover Bottom" Grid.Column="0" Style="{StaticResource PodInfo}"/>
+                            <TextBlock Text="0" Grid.Column="1" Style="{StaticResource PodInfo}"/>
+                            <TextBlock Text="Pass" Grid.Column="2" Style="{StaticResource PodInfo}" Foreground="Green" FontWeight="Bold"/>
+                        </Grid>
+                        <Grid Grid.Row="5">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="1.5*"/>
+                                <ColumnDefinition Width="1*"/>
+                                <ColumnDefinition Width="1*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="* Inner Pod Cover Side" Grid.Column="0" Style="{StaticResource PodInfo}"/>
+                            <TextBlock Text="0" Grid.Column="1" Style="{StaticResource PodInfo}"/>
+                            <TextBlock Text="Pass" Grid.Column="2" Style="{StaticResource PodInfo}" Foreground="Green" FontWeight="Bold"/>
+                        </Grid>
+                        <Grid Grid.Row="6">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="1.5*"/>
+                                <ColumnDefinition Width="1*"/>
+                                <ColumnDefinition Width="1*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="* Inner Pod BasePlate Top" Grid.Column="0" Style="{StaticResource PodInfo}"/>
+                            <TextBlock Text="0" Grid.Column="1" Style="{StaticResource PodInfo}"/>
+                            <TextBlock Text="Pass" Grid.Column="2" Style="{StaticResource PodInfo}" Foreground="Green" FontWeight="Bold"/>
+                        </Grid>
+                        <Grid Grid.Row="7">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="1.5*"/>
+                                <ColumnDefinition Width="1*"/>
+                                <ColumnDefinition Width="1*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="* Inner Pod BasePlate Bottom" Grid.Column="0" Style="{StaticResource PodInfo}"/>
+                            <TextBlock Text="0" Grid.Column="1" Style="{StaticResource PodInfo}"/>
+                            <TextBlock Text="Pass" Grid.Column="2" Style="{StaticResource PodInfo}" Foreground="Green" FontWeight="Bold"/>
+                        </Grid>
+                        <Grid Grid.Row="8">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="1.5*"/>
+                                <ColumnDefinition Width="1*"/>
+                                <ColumnDefinition Width="1*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="* Inner Pod BasePlate Side" Grid.Column="0" Style="{StaticResource PodInfo}"/>
+                            <TextBlock Text="11" Grid.Column="1" Style="{StaticResource PodInfo}"/>
+                            <TextBlock Text="Fail" Grid.Column="2" Style="{StaticResource PodInfo}" Foreground="Red" FontWeight="Bold"/>
+                        </Grid>
+                    </Grid >
+                </GroupBox>
+            </Grid>
+        </GroupBox>
+    </Grid>
+</UserControl>

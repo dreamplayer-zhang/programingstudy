@@ -401,7 +401,7 @@ namespace Root_VEGA_D.Engineer
                                 while (m_aLoadport[EQ.p_nRunLP].p_infoCarrier.p_eState != InfoCarrier.eState.Placed) Thread.Sleep(10);
                                 //m_process.p_sInfo = m_process.AddInfoWafer(m_infoRnRSlot);
                                 m_infoRnRSlot.RecipeOpen("C:\\Recipe\\VEGA_D\\" + "OnlyOne.Vega_D");
-                                //AddSequence(m_infoRnRSlot);
+                                AddSequence(m_infoRnRSlot);
                                 m_process.p_sInfo = m_process.AddInfoWafer(m_infoRnRSlot);
                                 CalcSequence();
                                 //m_nRnR--;

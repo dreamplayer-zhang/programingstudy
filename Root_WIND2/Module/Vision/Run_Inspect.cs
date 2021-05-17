@@ -95,7 +95,7 @@ namespace Root_WIND2.Module
                 if (workManager.OpenRecipe(m_sRecipeName) == false)
                     return "Recipe Open Fail";
 
-                workManager.Start(false);
+                workManager.Start(false); // 클라프 전으로 자르고
 
             }
             else
@@ -139,6 +139,7 @@ namespace Root_WIND2.Module
                 const int nTimeOutInterval = 10; // ms
                 int nRescanCount = 0;
                 const int nRescanTotal = 3;
+                double dFocusPosZ = m_grabMode.m_nFocusPosZ;
                 while (nWholeWaferScanLineNumber > nScanLine)
                 {
                     if (EQ.IsStop())
@@ -165,13 +166,13 @@ namespace Root_WIND2.Module
                     double dPosX = m_grabMode.m_rpAxisCenter.X + m_grabMode.m_ptXYAlignData.X + nWaferSizeY_px * (double)m_grabMode.m_dTrigger / 2 - (nScanLine + m_grabMode.m_ScanStartLine) * m_grabMode.m_GD.m_nFovSize * dXScale;
                     double dNextPosX = m_grabMode.m_rpAxisCenter.X + m_grabMode.m_ptXYAlignData.X + nWaferSizeY_px * (double)m_grabMode.m_dTrigger / 2 - (nScanLine + 1 + m_grabMode.m_ScanStartLine) * m_grabMode.m_GD.m_nFovSize * dXScale;
 
-                    double dPosZ = m_grabMode.m_nFocusPosZ;
+                   
                     if (m_grabMode.m_dVRSFocusPos != 0)
                     {
-                        dPosZ = m_grabMode.m_dVRSFocusPos + m_dTDIToVRSOffsetZ;
+                        dFocusPosZ = m_grabMode.m_dVRSFocusPos + m_dTDIToVRSOffsetZ;
                     }
                     //포커스 높이로 이동
-                    if (m_module.Run(axisZ.StartMove(dPosZ)))
+                    if (m_module.Run(axisZ.StartMove(dFocusPosZ)))
                         return p_sInfo;
 
                     // XY 찍는 위치로 이동
@@ -256,7 +257,7 @@ namespace Root_WIND2.Module
                     if (bNormal == true)
                     {
                         //WIND2EventManager.OnSnapDone(this, new SnapDoneArgs(new CPoint(startOffsetX, startOffsetY), cpMemoryOffset + new CPoint(m_grabMode.m_GD.m_nFovSize, nWaferSizeY_px)));
-                        workManager.CheckSnapDone(new Rect(new Point(startOffsetX, startOffsetY), new Point(cpMemoryOffset.X + m_grabMode.m_GD.m_nFovSize, cpMemoryOffset.Y + nWaferSizeY_px)));
+                        //workManager.CheckSnapDone(new Rect(new Point(startOffsetX, startOffsetY), new Point(cpMemoryOffset.X + m_grabMode.m_GD.m_nFovSize, cpMemoryOffset.Y + nWaferSizeY_px)));
                         nScanLine++;
                         cpMemoryOffset.X += m_grabMode.m_GD.m_nFovSize;
                     }
@@ -282,11 +283,43 @@ namespace Root_WIND2.Module
 
                 if (workManager.WaitWorkDone(ref EQ.m_EQ.StopToken(), 60 * 3 /*3 minutes*/) == false)
                 {
+                    // Save Result
+                    workManager.Start(false, true);
                         inspectionTimeWatcher.Stop();
 
                         TempLogger.Write("Inspection", "Time out!!!");
                         return "OK";
                 } // 5 minutes
+                else
+				{
+                    // ColorVrs
+
+                    // 계산
+                    List<RootTools.Database.Defect> dList = workManager.WorkplaceTemp.DefectList;
+                    for (int n = 0; n < workManager.WorkplaceTemp.DefectList.Count; n++)
+                    {
+                        double dPosZ, dPosX, dPosY;
+
+                        dPosZ = dFocusPosZ - m_dTDIToVRSOffsetZ;
+                        dPosX = dList[n].m_fAbsX ;
+                        dPosY = dList[n].m_fAbsY ;
+
+                        if (m_module.Run(axisZ.StartMove(dPosZ)))
+                            return p_sInfo;
+
+                        // XY 찍는 위치로 이동
+                        if (m_module.Run(axisXY.WaitReady()))
+                            return p_sInfo;
+                        if (m_module.Run(axisXY.StartMove(new RPoint(dPosX, dPosY))))
+                            return p_sInfo;
+                        if (m_module.Run(axisXY.WaitReady()))
+                            return p_sInfo;
+
+                        if (m_module.Run(axisZ.WaitReady()))
+                            return p_sInfo;
+                    }
+                  
+                }
 
                 inspectionTimeWatcher.Stop();
                 TempLogger.Write("Inspection", string.Format("{0:F3}", (double)inspectionTimeWatcher.ElapsedMilliseconds / (double)1000));

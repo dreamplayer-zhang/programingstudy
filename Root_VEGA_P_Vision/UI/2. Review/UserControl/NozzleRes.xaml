@@ -1,0 +1,25 @@
+﻿<UserControl x:Class="Root_VEGA_P_Vision.NozzleRes"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Root_VEGA_P_Vision"
+             mc:Ignorable="d" 
+             d:DesignHeight="20" d:DesignWidth="300" Background="{StaticResource PanelBackGround}">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+        <Border Grid.Column="0" Style="{StaticResource textblockborder}">
+            <TextBlock x:Name="nozzlenum"  Style="{StaticResource NozzleResultsText}"/>
+        </Border>
+        <Border Grid.Column="1" Style="{StaticResource textblockborder}">
+            <TextBlock x:Name="pccount"  Style="{StaticResource NozzleResultsText}"/>
+        </Border>
+        <Border Grid.Column="2" Style="{StaticResource textblockborder}">
+            <TextBlock x:Name="cyclenum" Style="{StaticResource NozzleResultsText}"/>
+        </Border>
+    </Grid>
+</UserControl>

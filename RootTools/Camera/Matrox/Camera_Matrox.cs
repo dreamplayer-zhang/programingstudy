@@ -490,7 +490,68 @@ namespace RootTools.Camera.Matrox
             m_GrabThread.Start();
             return;
         }
+        public void GrabZScan(MemoryData memory, int GrabCnt)
+        {
+            m_nGrabCount = GrabCnt;
+            m_nGrabTrigger = 0;
+            m_Memory = memory;
 
+            p_CamInfo.p_eState = eCamState.GrabMem;
+
+            MIL_INT licenseModules = 0;
+            MIL_INT frameCount = 0;
+            MIL_INT frameMissed = 0;
+            MIL_INT compressAttribute = 0;
+
+            // implement
+            if (m_MilApplication == MIL.M_NULL)
+                return;
+            if (m_MilSystem == MIL.M_NULL)
+                return;
+            if (m_MilDisplay == MIL.M_NULL)
+                return;
+            if (m_MilDigitizer == MIL.M_NULL)
+                return;
+            for (int i = 0; i < p_nBuf; i++)
+            {
+                if (m_MilBuffers[i] == MIL.M_NULL)
+                    return;
+            }
+            userObjectHandle = GCHandle.Alloc(this);
+            MIL.MdigControl(m_MilDigitizer, MIL.M_GRAB_TIMEOUT, MIL.M_INFINITE); // Grab 대기 시간
+            MIL.MdigControl(m_MilDigitizer, MIL.M_GRAB_MODE, MIL.M_ASYNCHRONOUS);
+            MIL.MdigProcess(m_MilDigitizer, m_MilBuffers, m_nGrabCount, MIL.M_SEQUENCE + MIL.M_COUNT(m_nGrabCount), MIL.M_ASYNCHRONOUS + MIL.M_TRIGGER_FOR_FIRST_GRAB, grabStartDelegate, GCHandle.ToIntPtr(userObjectHandle));
+
+            m_GrabThread = new Thread(new ParameterizedThreadStart(RunGrabZScanThread));
+            m_GrabThread.Start(memory);
+            return;
+        }
+        unsafe void RunGrabZScanThread(object mem)
+        {
+            Stopwatch swGrab = new Stopwatch();
+            int DelayGrab = 1000 * m_nGrabCount;
+            byte[] srcarr = new byte[p_nWidth * p_nHeight];
+
+            int iBlock = 0;
+            MemoryData m = (MemoryData)mem;
+            while (iBlock<m_nGrabCount)
+            {
+                if (iBlock >= m_nGrabTrigger) continue;
+
+                m_MemPtr = m.GetPtr(iBlock);
+                MIL.MbufGet2d(m_MilBuffers[(iBlock) % p_nBuf], 0, 0, p_nWidth, p_nHeight, srcarr);
+                Parallel.For(0, p_nHeight, (y) =>
+                {
+                    fixed (byte* p = srcarr)
+                    {
+                        IntPtr srcPtr = (IntPtr)p + p_nWidth * y;
+                        IntPtr dstPtr = (IntPtr)((long)m_MemPtr + m_cpScanOffset.X + m_cpScanOffset.Y * m_Memory.W);
+                        Buffer.MemoryCopy((void*)srcPtr, (void*)dstPtr, p_nWidth, p_nWidth);
+                    }
+                });
+                iBlock++;
+            }
+        }
         unsafe void RunGrabLineScanThread()
         {
             StopWatch swGrab = new StopWatch();

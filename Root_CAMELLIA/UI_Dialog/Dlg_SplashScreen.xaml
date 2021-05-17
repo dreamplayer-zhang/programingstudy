@@ -11,7 +11,7 @@
     <Window.Resources>
         <local:ValueToProgressColorConverter x:Key="ColorConverter"/>
     </Window.Resources>
-    <Grid>
+    <Grid PreviewMouseDown="Grid_PreviewMouseDown">
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition/>

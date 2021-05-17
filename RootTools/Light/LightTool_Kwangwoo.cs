@@ -82,8 +82,8 @@ namespace RootTools.Light
             private void M_rs232_OnReceive(string sRead)
             {
                 m_lightTool.p_sInfo = Receive(sRead);
-                if (m_lightTool.p_sInfo == "OK") p_fGetPower = p_fSetPower;
-                else m_lightTool.m_log.Warn(m_sSend + " -> " + sRead);
+                //if (m_lightTool.p_sInfo == "OK") p_fGetPower = p_fSetPower;
+                //else m_lightTool.m_log.Warn(m_sSend + " -> " + sRead);
             }
 
             string Receive(string sRead)
