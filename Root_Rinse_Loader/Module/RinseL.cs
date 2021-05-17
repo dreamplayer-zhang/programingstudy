@@ -276,7 +276,12 @@ namespace Root_Rinse_Loader.Module
             switch (eEQ)
             {
                 case _EQ.eEQ.State:
-                    AddProtocol(p_id, eCmd.EQLeState, value);
+                    if (value == EQ.eState.Run)
+                    {
+                        AddProtocol(p_id, eCmd.SetMode, p_eMode);
+                        AddProtocol(p_id, eCmd.SetWidth, p_widthStrip);
+                    }
+                    if (!EQ.p_bPickerSet || value != EQ.eState.Run) AddProtocol(p_id, eCmd.EQLeState, value);
                     switch ((EQ.eState)value)
                     {
                         case EQ.eState.Error: RunBuzzer(eBuzzer.Error); break;
