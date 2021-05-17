@@ -15,8 +15,10 @@ namespace Root_VEGA_P_Vision
 {
     public class Recipe6um_ViewModel:ObservableObject
     {
-        RecipeSetting_ViewModel recipeSetting;
+        RecipeMask_ViewModel recipeSetting;
         RootViewer_ViewModel coverTop_ImageViewer, coverBottom_ImageViewer, baseTop_ImageViewer, baseBottom_ImageViewer;
+        int selectedTab = 0;
+        RootViewer_ViewModel selectedViewer;
         #region Property
         public RootViewer_ViewModel CoverTop_ImageViewer
         {
@@ -43,10 +45,11 @@ namespace Root_VEGA_P_Vision
         public Recipe6um_Panel Main;
 
         
-        public Recipe6um_ViewModel(RecipeSetting_ViewModel recipeSetting)
+        public Recipe6um_ViewModel(RecipeMask_ViewModel recipeSetting)
         {
             this.recipeSetting = recipeSetting;
             Main = new Recipe6um_Panel();
+            Main.DataContext = this;
             coverTop_ImageViewer = new MaskRootViewer_ViewModel("EIP_Cover.Main.Front",recipeSetting);
             coverBottom_ImageViewer = new MaskRootViewer_ViewModel("EIP_Cover.Main.Back", recipeSetting);
             baseTop_ImageViewer = new MaskRootViewer_ViewModel("EIP_Plate.Main.Front", recipeSetting);
@@ -59,6 +62,12 @@ namespace Root_VEGA_P_Vision
         public ICommand btnInsp
         {
             get => new RelayCommand(() => { });
+        }
+        public ICommand TabChanged
+        {
+            get => new RelayCommand(() => {
+                selectedTab = 10;
+            });
         }
 
         void Snap()

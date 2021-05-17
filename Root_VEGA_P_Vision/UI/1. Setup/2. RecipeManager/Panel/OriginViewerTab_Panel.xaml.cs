@@ -16,11 +16,11 @@ using System.Windows.Shapes;
 namespace Root_VEGA_P_Vision
 {
     /// <summary>
-    /// RecipeSetting_Panel.xaml에 대한 상호 작용 논리
+    /// OriginViewerTab_Panel.xaml에 대한 상호 작용 논리
     /// </summary>
-    public partial class RecipeSetting_Panel : UserControl
+    public partial class OriginViewerTab_Panel : UserControl
     {
-        public RecipeSetting_Panel()
+        public OriginViewerTab_Panel()
         {
             InitializeComponent();
         }

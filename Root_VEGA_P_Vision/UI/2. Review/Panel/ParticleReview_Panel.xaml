@@ -20,12 +20,10 @@
                     <RowDefinition/>
                 </Grid.RowDefinitions>
                 <GroupBox Grid.Row="0" Header="Dome">
-                    <!--<Image Source="../../Resources/domearea.png"/>-->
-                    <Tools:RootViewer DataContext="{Binding domeViewer_VM}"/>
+                    <Tools:RootViewer DataContext="{Binding DomeViewer}"/>
                 </GroupBox>
                 <GroupBox Grid.Row="1" Header="Door">
-                    <!--<Image Source="../../Resources/doorarea.png"/>-->
-                    <Tools:RootViewer DataContext="{Binding doorViewer_VM}"/>
+                    <Tools:RootViewer DataContext="{Binding DoorViewer}"/>
                 </GroupBox>
             </Grid>
         </GroupBox>
@@ -49,7 +47,7 @@
                                     <ColumnDefinition/>
                                 </Grid.ColumnDefinitions>
                                 <Grid Grid.Column="0">
-                                    <Image Source="../../Resources/dome.jpg" VerticalAlignment="Center" HorizontalAlignment="Center" RenderTransformOrigin="0.5,0.5">
+                                    <Image Source="../../../Resources/dome.jpg" VerticalAlignment="Center" HorizontalAlignment="Center" RenderTransformOrigin="0.5,0.5">
                                         <Image.RenderTransform>
                                             <ScaleTransform ScaleY="-1"/>
                                         </Image.RenderTransform>
@@ -57,7 +55,7 @@
                                 
                                 </Grid>
                                 <Grid Grid.Column="1">
-                                    <Image Source="../../Resources/door.jpg" VerticalAlignment="Center" HorizontalAlignment="Center" RenderTransformOrigin="0.5,0.5">
+                                    <Image Source="../../../Resources/door.jpg" VerticalAlignment="Center" HorizontalAlignment="Center" RenderTransformOrigin="0.5,0.5">
                                         <Image.RenderTransform>
                                             <ScaleTransform ScaleX="-1" ScaleY="-1"/>
                                         </Image.RenderTransform>
@@ -109,14 +107,14 @@
                                     <ColumnDefinition/>
                                 </Grid.ColumnDefinitions>
                                 <Grid Grid.Column="0">
-                                    <Image Source="../../Resources/EIPBasePlateTop.jpg" VerticalAlignment="Center" HorizontalAlignment="Center" RenderTransformOrigin="0.5,0.5">
+                                    <Image Source="../../../Resources/EIPBasePlateTop.jpg" VerticalAlignment="Center" HorizontalAlignment="Center" RenderTransformOrigin="0.5,0.5">
                                         <Image.RenderTransform>
                                             <ScaleTransform ScaleX="-1" ScaleY="-1"/>
                                         </Image.RenderTransform>
                                     </Image>
                                 </Grid>
                                 <Grid Grid.Column="1">
-                                    <Image Source="../../Resources/EIPBasePlateBottom.jpg" VerticalAlignment="Center" HorizontalAlignment="Center" RenderTransformOrigin="0.5,0.5">
+                                    <Image Source="../../../Resources/EIPBasePlateBottom.jpg" VerticalAlignment="Center" HorizontalAlignment="Center" RenderTransformOrigin="0.5,0.5">
                                         <Image.RenderTransform>
                                             <ScaleTransform ScaleX="-1" ScaleY="-1"/>
                                         </Image.RenderTransform>
@@ -165,14 +163,14 @@
                                     <ColumnDefinition/>
                                 </Grid.ColumnDefinitions>
                                 <Grid Grid.Column="0">
-                                    <Image Source="../../Resources/EIPCoverTop.jpg" VerticalAlignment="Center" HorizontalAlignment="Center" RenderTransformOrigin="0.5,0.5">
+                                    <Image Source="../../../Resources/EIPCoverTop.jpg" VerticalAlignment="Center" HorizontalAlignment="Center" RenderTransformOrigin="0.5,0.5">
                                         <Image.RenderTransform>
                                             <ScaleTransform ScaleX="-1" ScaleY="-1"/>
                                         </Image.RenderTransform>
                                     </Image>
                                 </Grid>
                                 <Grid Grid.Column="1">
-                                    <Image Source="../../Resources/EIPCoverBottom.jpg" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                    <Image Source="../../../Resources/EIPCoverBottom.jpg" VerticalAlignment="Center" HorizontalAlignment="Center"/>
                                 </Grid>
                             </Grid>
                         </Grid>

@@ -1,9 +1,4 @@
-﻿using Root_VEGA_P_Vision.Engineer;
-using Root_VEGA_P_Vision.Module;
-using RootTools;
-using RootTools.Module;
-using RootTools_Vision;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -14,76 +9,78 @@ using System.Windows.Controls;
 using System.Windows.Input;
 
 namespace Root_VEGA_P_Vision
-{
-    public class RecipeSetting_ViewModel : ObservableObject
+{ 
+    public class RecipeMask_ViewModel:ObservableObject
     {
-        public RecipeManager_ViewModel RecipeManager;
-        public RecipeSetting_Panel Main;
+        Recipe6um_ViewModel recipeTDIVM;
+        Recipe1um_ViewModel recipeStackingVM;
+        RecipeSide_ViewModel recipeSideVM;
+        RecipeStain_ViewModel recipeStainVM;
+
+        public RecipeMask_Panel Main;
         private UserControl m_CurrentPanel;
-        public UserControl p_SubPanel
+        RecipeManager_ViewModel recipeManager;
+        public UserControl p_MaskPanel
         {
             get => m_CurrentPanel;
             set => SetProperty(ref m_CurrentPanel, value);
         }
-        public RecipeSetting_ViewModel(RecipeManager_ViewModel RecipeManager)
+
+        public RecipeMask_ViewModel(RecipeManager_ViewModel recipeManager)
         {
-            this.RecipeManager = RecipeManager;
-            Main = new RecipeSetting_Panel();
+            this.recipeManager = recipeManager;
+            Main = new RecipeMask_Panel();
+            Main.DataContext = this;
             recipeStainVM = new RecipeStain_ViewModel(this);
-            recipe6umVM = new Recipe6um_ViewModel(this);
-            recipe1umVM = new Recipe1um_ViewModel(this);
+            recipeTDIVM = new Recipe6um_ViewModel(this);
             recipeSideVM = new RecipeSide_ViewModel(this);
-            recipeSummaryVM = new RecipeSummary_ViewModel(this);
+            recipeStackingVM = new Recipe1um_ViewModel(this);
         }
 
-
-        #region Recipe Wizard
-        private RecipeStain_ViewModel recipeStainVM;
-        private Recipe6um_ViewModel recipe6umVM;
-        private Recipe1um_ViewModel recipe1umVM;
-        private RecipeSide_ViewModel recipeSideVM;
-        private RecipeSummary_ViewModel recipeSummaryVM;
+        #region RelayCommand
         public void SetStain()
         {
-            p_SubPanel = recipeStainVM.Main;
-            p_SubPanel.DataContext = recipeStainVM;
-            pGBsimilar = Visibility.Collapsed;
+            p_MaskPanel = recipeStainVM.Main;
+            p_MaskPanel.DataContext = recipeStainVM;
         }
-        public void Set6um()
+        public void SetTDI()
         {
-            p_SubPanel = recipe6umVM.Main;
-            p_SubPanel.DataContext = recipe6umVM;
-            pGBsimilar = Visibility.Collapsed;
+            p_MaskPanel = recipeTDIVM.Main;
+            p_MaskPanel.DataContext = recipeTDIVM;
         }
-
-        public void Set1um()
+        public void SetStacking()
         {
-            p_SubPanel = recipe1umVM.Main;
-            p_SubPanel.DataContext = recipe1umVM;
-            pGBsimilar = Visibility.Collapsed;
+            p_MaskPanel = recipeStackingVM.Main;
+            p_MaskPanel.DataContext = recipeStackingVM;
         }
         public void SetSide()
         {
-            p_SubPanel = recipeSideVM.Main;
-            p_SubPanel.DataContext = recipeSideVM;
-            pGBsimilar = Visibility.Visible;
+            p_MaskPanel = recipeSideVM.Main;
+            p_MaskPanel.DataContext = recipeSideVM;              
         }
-
-        public void SetSummary()
+        public ICommand btnStain
         {
-            p_SubPanel = recipeSummaryVM.Main;
-            p_SubPanel.DataContext = recipeSummaryVM;
+            get => new RelayCommand(() => SetStain());
         }
-        #endregion
-
-        #region RelayCommand
+        public ICommand btn6um
+        {
+            get => new RelayCommand(() => SetTDI());
+        }
+        public ICommand btn1um
+        {
+            get => new RelayCommand(() => SetStacking());
+        }
+        public ICommand btnSide
+        {
+            get => new RelayCommand(() => SetSide());
+        }
         public ICommand btnBack
         {
-            get => new RelayCommand(() => { RecipeManager.m_Setup.SetRecipeWizard(); });
+            get => new RelayCommand(()=>recipeManager.setup.SetRecipeWizard());
         }
         #endregion
 
-        #region Property
+        #region Mask
         public ToolType m_eToolType;
         ThresholdMode m_eThresholdMode;
         public ObservableCollection<UIElement> p_UIElements
@@ -255,8 +252,6 @@ namespace Root_VEGA_P_Vision
             get => _bGBsimilar;
             set => SetProperty(ref _bGBsimilar, value);
         }
-        #endregion
-
         void UncheckTool(ToolType type)
         {
             switch (type)
@@ -305,5 +300,7 @@ namespace Root_VEGA_P_Vision
                     break;
             }
         }
+
+        #endregion
     }
 }

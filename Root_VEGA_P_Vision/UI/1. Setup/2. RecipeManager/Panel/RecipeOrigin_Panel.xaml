@@ -1,0 +1,160 @@
+﻿<UserControl x:Class="Root_VEGA_P_Vision.RecipeOrigin_Panel"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Root_VEGA_P_Vision"
+             xmlns:Tools="clr-namespace:RootTools;assembly=RootTools"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800"
+             Background="{StaticResource PanelBackGround}">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="60*"/>
+            <ColumnDefinition Width="40*"/>
+        </Grid.ColumnDefinitions>
+        <Grid Grid.Column="0">
+            <local:ImageViewerBase_Panel DataContext="{Binding p_BaseViewer}"/>
+        </Grid>
+            <Grid Grid.Column="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="2*"/>
+                    <RowDefinition Height="2*"/>
+                    <RowDefinition Height="2*"/>
+                    <RowDefinition Height="15*"/>
+                </Grid.RowDefinitions>
+                <GroupBox Header="2D TDI Origin" Grid.Row="0">
+                    <StackPanel>
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition/>
+                                <RowDefinition/>
+                            </Grid.RowDefinitions>
+                            <Grid Grid.Row="0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="Origin" Grid.Column="0"/>
+                                <TextBlock Text="X" Grid.Column="1"/>
+                                <TextBox Grid.Column="2"/>
+                                <TextBlock Text="Y" Grid.Column="3"/>
+                                <TextBox Grid.Column="4"/>
+                            </Grid>
+                            <Grid Grid.Row="1">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="Origin Size" Grid.Column="0"/>
+                                <TextBlock Text="X" Grid.Column="1"/>
+                                <TextBox Grid.Column="2"/>
+                                <TextBlock Text="Y" Grid.Column="3"/>
+                                <TextBox Grid.Column="4"/>
+                            </Grid>
+                        </Grid>
+                    </StackPanel>
+                </GroupBox>
+                <GroupBox Header="Stain Origin" Grid.Row="1">
+                    <StackPanel>
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition/>
+                                <RowDefinition/>
+                            </Grid.RowDefinitions>
+                            <Grid Grid.Row="0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="Origin" Grid.Column="0"/>
+                                <TextBlock Text="X" Grid.Column="1"/>
+                                <TextBox Grid.Column="2"/>
+                                <TextBlock Text="Y" Grid.Column="3"/>
+                                <TextBox Grid.Column="4"/>
+                            </Grid>
+                            <Grid Grid.Row="1">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="Origin Size" Grid.Column="0"/>
+                                <TextBlock Text="X" Grid.Column="1"/>
+                                <TextBox Grid.Column="2"/>
+                                <TextBlock Text="Y" Grid.Column="3"/>
+                                <TextBox Grid.Column="4"/>
+                            </Grid>
+                        </Grid>
+                    </StackPanel>
+                </GroupBox>
+                <GroupBox Header="Side Origin" Grid.Row="2">
+                    <StackPanel>
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition/>
+                                <RowDefinition/>
+                            </Grid.RowDefinitions>
+                            <Grid Grid.Row="0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="Origin" Grid.Column="0"/>
+                                <TextBlock Text="X" Grid.Column="1"/>
+                                <TextBox Grid.Column="2"/>
+                                <TextBlock Text="Y" Grid.Column="3"/>
+                                <TextBox Grid.Column="4"/>
+                            </Grid>
+                            <Grid Grid.Row="1">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="Origin Size" Grid.Column="0"/>
+                                <TextBlock Text="X" Grid.Column="1"/>
+                                <TextBox Grid.Column="2"/>
+                                <TextBlock Text="Y" Grid.Column="3"/>
+                                <TextBox Grid.Column="4"/>
+                            </Grid>
+                            
+                        </Grid>
+                    </StackPanel>
+                </GroupBox>
+                <GroupBox Header="Feautre Info" Grid.Row="3">
+                    <TabControl>
+                        <TabItem Header="EIP Cover Top">
+                            <local:AlignFeatureInfo/>
+                        </TabItem>
+                        <TabItem Header="EIP Cover Bottom">
+                            <local:AlignFeatureInfo/>
+                        </TabItem>
+                        <TabItem Header="EIP Base Top">
+                            <local:AlignFeatureInfo/>
+                        </TabItem>
+                        <TabItem Header="EIP Base Bottom">
+                            <local:AlignFeatureInfo/>
+                        </TabItem>
+                    </TabControl>
+                </GroupBox>
+
+            </Grid>
+    </Grid>
+</UserControl>

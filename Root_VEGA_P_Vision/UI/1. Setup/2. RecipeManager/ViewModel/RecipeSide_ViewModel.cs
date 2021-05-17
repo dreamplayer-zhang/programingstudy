@@ -16,7 +16,7 @@ namespace Root_VEGA_P_Vision
     public class RecipeSide_ViewModel:ObservableObject
     {
         public RecipeSide_Panel Main;
-        public RecipeSetting_ViewModel recipeSetting;
+        public RecipeMask_ViewModel recipeSetting;
         RecipeSideImageViewers_ViewModel EIPcoverViewers, EIPbaseViewers;
 
         #region Property
@@ -31,10 +31,11 @@ namespace Root_VEGA_P_Vision
             set => SetProperty(ref EIPbaseViewers, value);
         }
         #endregion
-        public RecipeSide_ViewModel(RecipeSetting_ViewModel recipeSetting)
+        public RecipeSide_ViewModel(RecipeMask_ViewModel recipeSetting)
         {
             this.recipeSetting = recipeSetting;
             Main = new RecipeSide_Panel();
+            Main.DataContext = this;
 
             EIPcoverViewers = new RecipeSideImageViewers_ViewModel("EIP_Cover",this);
             EIPbaseViewers = new RecipeSideImageViewers_ViewModel("EIP_Plate",this);

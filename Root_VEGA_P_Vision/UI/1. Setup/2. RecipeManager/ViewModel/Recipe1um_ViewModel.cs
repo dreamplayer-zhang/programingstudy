@@ -15,7 +15,7 @@ namespace Root_VEGA_P_Vision
 {
     public class Recipe1um_ViewModel : ObservableObject
     {
-        public RecipeSetting_ViewModel recipeSetting;
+        public RecipeMask_ViewModel recipeSetting;
         public Recipe1um_Panel Main;
 
         RootViewer_ViewModel EIPcoverBottom, EIPcoverBottom_Teach, EIPbaseplateTop, EIPbaseplateTop_Teach;
@@ -52,11 +52,11 @@ namespace Root_VEGA_P_Vision
             set => SetProperty(ref EIPbaseplate_step, value);
         }
         #endregion
-        public Recipe1um_ViewModel(RecipeSetting_ViewModel recipeSetting)
+        public Recipe1um_ViewModel(RecipeMask_ViewModel recipeSetting)
         {
             this.recipeSetting = recipeSetting;
             Main = new Recipe1um_Panel();
-
+            Main.DataContext = this;
             EIPcoverBottom = new MaskRootViewer_ViewModel("EIP_Cover.Stack.Front", recipeSetting);
             EIPcoverBottom_Teach = new MaskRootViewer_ViewModel("EIP_Cover.Stack.Bottom", recipeSetting);
             EIPbaseplateTop = new MaskRootViewer_ViewModel("EIP_Plate.Stack.Front", recipeSetting);

@@ -4,12 +4,18 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Root_VEGA_P_Vision"
+             xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
              mc:Ignorable="d" 
              xmlns:Tools="clr-namespace:RootTools;assembly=RootTools"
              d:DesignHeight="836" d:DesignWidth="1912" 
              Background="{StaticResource PanelBackGround}">
     <Grid>
         <TabControl Grid.Column="1">
+            <i:Interaction.Triggers>
+                <i:EventTrigger EventName="SelectedIndexChanged">
+                    <i:InvokeCommandAction Command="{Binding TabChanged}"/>
+                </i:EventTrigger>
+            </i:Interaction.Triggers>
             <TabItem Header="EIP Cover Top"
                                  Width="120">
                 <GroupBox Header="Viewer">

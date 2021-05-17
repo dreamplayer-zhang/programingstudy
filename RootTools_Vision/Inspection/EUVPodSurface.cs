@@ -54,10 +54,16 @@ namespace RootTools_Vision
             byte[] arrBinImg = new byte[width*height];
 
             byte* pptr = (byte*)ptr.ToPointer();
-            
-            CLR_IP.Cpp_Threshold(workplaceBuffer, arrBinImg, width, height, false, (int)100);
-            //System.Drawing.Bitmap bitmap = Tools.CovertBufferToBitmap(currentWorkplace.SharedBufferInfo, new System.Windows.Rect(0, 0, width, height));
+            byte* p = (byte*)inspectionSharedBuffer.ToPointer();
+            for (int i = 0; i < height; i++)
+            {
+                for (int j = 0; j < width; j++)
+                    workplaceBuffer[(i * width) + j] = p[(i * width) + j];
+                //Buffer.MemoryCopy((void*)arrBinImg, (void*)ptr, i * width, i * width);
+            }
 
+            CLR_IP.Cpp_Threshold(workplaceBuffer, arrBinImg, width, height, false, (int)250);
+            //System.Drawing.Bitmap bitmap = Tools.CovertBufferToBitmap(currentWorkplace.SharedBufferInfo, new System.Windows.Rect(0, 0, width, height));
 
             for (int i = 0; i < height; i++)
             {
@@ -66,7 +72,6 @@ namespace RootTools_Vision
                 //Buffer.MemoryCopy((void*)arrBinImg, (void*)ptr, i * width, i * width);
 
             }
-
 
             // Filter
             switch (parameterPod.PodStain.DiffFilter)
@@ -87,27 +92,30 @@ namespace RootTools_Vision
                     break;
             }
 
-
             MaskRecipe mask = recipe.GetItem<MaskRecipe>();
 
-            //Cpp_Point[] maskStartPoint = new Cpp_Point[mask.MaskList[parameterPod.PodStain.MaskIndex].PointLines.Count];
-            //int[] maskLength = new int[mask.MaskList[parameterPod.PodStain.MaskIndex].PointLines.Count];
+            Cpp_Point[] maskStartPoint = new Cpp_Point[mask.MaskList[0].PointLines.Count];
+            int[] maskLength = new int[mask.MaskList[0].PointLines.Count];
 
-            //Cpp_Point tempPt = new Cpp_Point();
-            //for (int i = 0; i < mask.MaskList[parameterPod.PodStain.MaskIndex].PointLines.Count; i++)
-            //{
-            //    maskStartPoint[i] = new Cpp_Point();
-            //    maskStartPoint[i].x = mask.MaskList[parameterPod.PodStain.MaskIndex].PointLines[i].StartPoint.X;
-            //    maskStartPoint[i].y = mask.MaskList[parameterPod.PodStain.MaskIndex].PointLines[i].StartPoint.Y;
-            //    maskLength[i] = mask.MaskList[parameterPod.PodStain.MaskIndex].PointLines[i].Length;
-            //}
+            Cpp_Point tempPt = new Cpp_Point();
+            for (int i = 0; i < mask.MaskList[0].PointLines.Count; i++)
+            {
+                maskStartPoint[i] = new Cpp_Point();
+                maskStartPoint[i].x = mask.MaskList[0].PointLines[i].StartPoint.X;
+                maskStartPoint[i].y = mask.MaskList[0].PointLines[i].StartPoint.Y;
+                maskLength[i] = mask.MaskList[0].PointLines[i].Length;
+            }
 
-            //CLR_IP.Cpp_Masking(arrBinImg, arrBinImg, maskStartPoint.ToArray(), maskLength.ToArray(), width, height);
+            CLR_IP.Cpp_Masking(arrBinImg, arrBinImg, maskStartPoint.ToArray(), maskLength.ToArray(), width, height);
+
+            for (int i = 0; i < height; i++)
+            {
+                for (int j = 0; j < width; j++)
+                    pptr[(i * width) + j] = arrBinImg[(i * width) + j];
+            }
 
             // Labeling
             var Label = CLR_IP.Cpp_Labeling(workplaceBuffer, arrBinImg, width, height, true);
-
-
 
             List<Defect> li = new List<Defect>();
             if (Label.Length > 0)
@@ -121,20 +129,21 @@ namespace RootTools_Vision
                     {
 
                         Defect defect = new Defect(i.ToString(),
-10001,
+                            10001,
                             Label[i].area,
                             Label[i].value,
-                            this.currentWorkplace.PositionX + Label[i].boundLeft,
-                            this.currentWorkplace.PositionY + Label[i].boundTop,
+                            Label[i].boundLeft,
+                            Label[i].boundTop,
                             Label[i].width,
                             Label[i].height,
                             this.currentWorkplace.MapIndexX,
                             this.currentWorkplace.MapIndexY);
-                        li.Add(defect);
+                        currentWorkplace.DefectList.Add(defect);
+                        //li.Add(defect);
                     }
                 }
             }
-            Tools.SaveDefectImageParallel(@"C:\Defects", li, currentWorkplace.SharedBufferInfo, currentWorkplace.SharedBufferByteCnt);
+            Tools.SaveDefectImageParallel(@"C:\Defects", currentWorkplace.DefectList, currentWorkplace.SharedBufferInfo, 1, new System.Windows.Point(100,100));
 
             //var Label = CLR_IP.Cpp_Labeling_SubPix(workplaceBuffer, arrBinImg, chipW, chipH, isDarkInsp, nGrayLevel, 3);
 

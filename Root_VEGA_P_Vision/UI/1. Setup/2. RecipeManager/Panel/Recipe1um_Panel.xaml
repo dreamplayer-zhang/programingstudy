@@ -51,10 +51,10 @@
                         <ColumnDefinition/>
                     </Grid.ColumnDefinitions>
                     <GroupBox Grid.Column="0" Header="EIP Cover Bottom">
-                        <local:screwUI/>
+                        <local:screwUI DataContext="{Binding EIPCoverBottom_Step}"/>
                     </GroupBox>
                     <GroupBox Grid.Column="1" Header="EIP BasePlate Top">
-                        <local:screwUI/>
+                        <local:screwUI DataContext="{Binding EIPBasePlate_Step}"/>
                     </GroupBox>
                 </Grid>
             </GroupBox>

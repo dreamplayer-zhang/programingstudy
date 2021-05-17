@@ -49,14 +49,14 @@
                                             VerticalAlignment="Center"
                                             Fill="Navy" Canvas.Left="204" Canvas.Top="169"/>
                                         <Canvas.Background>
-                                            <ImageBrush ImageSource="../../Resources/EIPCoverTop.jpg"/>
+                                            <ImageBrush ImageSource="../../../Resources/EIPCoverTop.jpg"/>
                                         </Canvas.Background>
                                     </Canvas>
                                 </GroupBox>
                                 <GroupBox Grid.Column="1" Header="Bottom">
                                     <Canvas>
                                         <Canvas.Background>
-                                            <ImageBrush ImageSource="../../Resources/EIPCoverBottom.jpg"/>
+                                            <ImageBrush ImageSource="../../../Resources/EIPCoverBottom.jpg"/>
                                         </Canvas.Background>
                                     </Canvas>
                                 </GroupBox>
@@ -90,7 +90,7 @@
                                 <GroupBox Grid.Column="0" Header="Top">
                                     <Canvas>
                                         <Canvas.Background>
-                                            <ImageBrush ImageSource="../../Resources/EIPBasePlateTop.jpg"/>
+                                            <ImageBrush ImageSource="../../../Resources/EIPBasePlateTop.jpg"/>
                                         </Canvas.Background>
                                     </Canvas>
                                 </GroupBox>
@@ -107,7 +107,7 @@
                                             VerticalAlignment="Center"
                                             Fill="Crimson" Canvas.Left="97" Canvas.Top="165"/>
                                         <Canvas.Background>
-                                            <ImageBrush ImageSource="../../Resources/EIPBasePlateBottom.jpg"/>
+                                            <ImageBrush ImageSource="../../../Resources/EIPBasePlateBottom.jpg"/>
                                         </Canvas.Background>
                                     </Canvas>
                                 </GroupBox>
@@ -230,8 +230,8 @@
                                 <ColumnDefinition/>
                                 <ColumnDefinition/>
                             </Grid.ColumnDefinitions>
-                            <Tools:RootViewer Grid.Column="0"/>
-                            <Tools:RootViewer Grid.Column="1"/>
+                            <Tools:RootViewer Grid.Column="0" DataContext="{Binding DefectImage}"/>
+                            <Tools:RootViewer Grid.Column="1" DataContext="{Binding ReviewImage}"/>
                         </Grid>
                     </TabItem>
                     <TabItem Header="Screw Image">
@@ -251,7 +251,7 @@
                 </TabControl>
             </Grid>
             <!--<Grid Grid.Row="1">-->
-                <Image Grid.Row="1" Source="../../Resources/graphex.jpg"/>
+                <Image Grid.Row="1" Source="../../../Resources/graphex.jpg"/>
             <!--</Grid>-->
         </Grid>
     </Grid>

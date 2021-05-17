@@ -97,7 +97,7 @@
             <Setter Property="Cursor" Value="Hand"/>
         </Style>
 
-        <BooleanToVisibilityConverter x:Key="BooleanToVisiblity"/>
+        <local:BooleanToVisiblityConverter x:Key="BooleanToVisiblity"/>
         <BorderGapMaskConverter x:Key="BorderGapMaskConverter"/>
         <local:VisibilityToWindowStateConverter x:Key="VisibilityToWindowState"/>
         <!--Color-->
@@ -197,6 +197,26 @@
                          Color="#FFEAEAEA" />
         <!--#endregion-->
 
+        <Style x:Key="ImageBaseBtn" TargetType="Button">
+            <Setter Property="Padding" Value="8,1,8,1"/>
+            <Setter Property="Foreground" Value="DarkSlateGray"/>
+            <Setter Property="BorderBrush" Value="Transparent"/>
+            <Setter Property="Margin" Value="2,0,2,0"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border CornerRadius="5" Background="Gainsboro" BorderBrush="#ccc" BorderThickness="0,1,1,0" >
+                            <ContentPresenter x:Name="contentPresenter" ContentTemplate="{TemplateBinding ContentTemplate}" Content="{TemplateBinding Content}" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" Margin="{TemplateBinding Padding}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="ImageText" TargetType="TextBlock">
+            <Setter Property="Padding" Value="8,1,8,1"/>
+            <Setter Property="Foreground" Value="DarkSlateGray"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
         <Style x:Key="main_view_groupbox" TargetType="GroupBox">
             <Setter Property="BorderBrush" Value="Gray"/>
             <Setter Property="Foreground" Value="White"/>
@@ -961,7 +981,7 @@
 
                         <ControlTemplate.Triggers>
                             <Trigger  Property="IsChecked" Value="True">
-                                <Setter Property="Background" Value="PaleTurquoise"/>
+                                <Setter Property="Background" Value="MediumTurquoise"/>
                             </Trigger>
                             <Trigger  Property="IsMouseOver" Value="True">
                                 <Setter Property="Background" Value="PaleTurquoise"/>
@@ -971,6 +991,7 @@
                 </Setter.Value>
             </Setter>
         </Style>
+
         <Style TargetType="Button" x:Key="SetupPanelBtn2">
             <Setter Property="Margin" Value="8,8,8,8"/>
             <Setter Property="FontSize" Value="15"/>

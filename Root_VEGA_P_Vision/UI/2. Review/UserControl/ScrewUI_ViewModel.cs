@@ -29,7 +29,6 @@ namespace Root_VEGA_P_Vision
             ScrewUI_ImageViewerVM.p_VisibleMenu = Visibility.Collapsed;
             ScrewUI_ImageViewerVM.p_VisibleSlider = Visibility.Collapsed;
             ScrewUI_ImageViewerVM.init(new ImageData(GlobalObjects.Instance.Get<VEGA_P_Vision_Engineer>().ClassMemoryTool().GetMemory(App.mPool, App.mGroup, memstr)));
-
             //p_VisibleMenu = Visibility.Collapsed;
             //p_VisibleSlider = Visibility.Collapsed;
             //init(new ImageData(GlobalObjects.Instance.Get<VEGA_P_Vision_Engineer>().ClassMemoryTool().GetMemory(App.mPool, App.mGroup, memstr)));

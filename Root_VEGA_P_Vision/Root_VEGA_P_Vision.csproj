@@ -236,10 +236,37 @@
     <Compile Include="MVVM\PropertySupport.cs" />
     <Compile Include="MVVM\RelayCommand.cs" />
     <Compile Include="Recipe\VisionSurfaceRecipe.cs" />
+    <Compile Include="UI\1. Setup\2. RecipeManager\Panel\ImageViewerBase_Panel.xaml.cs">
+      <DependentUpon>ImageViewerBase_Panel.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\1. Setup\2. RecipeManager\Panel\MaskViewer_Panel.xaml.cs">
+      <DependentUpon>MaskViewer_Panel.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\1. Setup\2. RecipeManager\Panel\OriginViewerTab_Panel.xaml.cs">
+      <DependentUpon>OriginViewerTab_Panel.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\1. Setup\2. RecipeManager\Panel\PositionViewerTab_Panel.xaml.cs">
+      <DependentUpon>PositionViewerTab_Panel.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\1. Setup\2. RecipeManager\Panel\RecipeMask_Panel.xaml.cs">
+      <DependentUpon>RecipeMask_Panel.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\1. Setup\2. RecipeManager\Panel\RecipeOrigin_Panel.xaml.cs">
+      <DependentUpon>RecipeOrigin_Panel.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI\1. Setup\2. RecipeManager\Panel\RecipeSummary.xaml.cs">
       <DependentUpon>RecipeSummary.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UI\1. Setup\2. RecipeManager\UserControl\AlignFeatureInfo.xaml.cs">
+      <DependentUpon>AlignFeatureInfo.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\1. Setup\2. RecipeManager\ViewModel\ImageViewerBase_ViewModel.cs" />
     <Compile Include="UI\1. Setup\2. RecipeManager\ViewModel\MaskRootViewer_ViewModel.cs" />
+    <Compile Include="UI\1. Setup\2. RecipeManager\ViewModel\MaskViewer_ViewModel.cs" />
+    <Compile Include="UI\1. Setup\2. RecipeManager\ViewModel\OriginViewerTab_ViewModel.cs" />
+    <Compile Include="UI\1. Setup\2. RecipeManager\ViewModel\PositionViewerTab_ViewModel.cs" />
+    <Compile Include="UI\1. Setup\2. RecipeManager\ViewModel\RecipeMask_ViewModel.cs" />
+    <Compile Include="UI\1. Setup\2. RecipeManager\ViewModel\RecipeOrigin_ViewModel.cs" />
     <Compile Include="UI\1. Setup\2. RecipeManager\ViewModel\RecipeSummary_ViewModel.cs" />
     <Compile Include="UI\1. Setup\RecipeWizard\RecipeWizard_VM.cs" />
     <Compile Include="UI\1. Setup\RecipeWizard\Page_RecipeWizard.xaml.cs">
@@ -255,9 +282,6 @@
     </Compile>
     <Compile Include="UI\1. Setup\2. RecipeManager\Panel\Recipe6um_Panel.xaml.cs">
       <DependentUpon>Recipe6um_Panel.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\1. Setup\2. RecipeManager\Panel\RecipeSetting_Panel.xaml.cs">
-      <DependentUpon>RecipeSetting_Panel.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\1. Setup\2. RecipeManager\Panel\RecipeSideImageViewers_Panel.xaml.cs">
       <DependentUpon>RecipeSideImageViewers_Panel.xaml</DependentUpon>
@@ -276,7 +300,6 @@
     <Compile Include="UI\1. Setup\2. RecipeManager\ViewModel\ItemMask.cs" />
     <Compile Include="UI\1. Setup\2. RecipeManager\ViewModel\Recipe1um_ViewModel.cs" />
     <Compile Include="UI\1. Setup\2. RecipeManager\ViewModel\Recipe6um_ViewModel.cs" />
-    <Compile Include="UI\1. Setup\2. RecipeManager\ViewModel\RecipeSetting_ViewModel.cs" />
     <Compile Include="UI\1. Setup\2. RecipeManager\ViewModel\RecipeSide_ViewModel.cs" />
     <Compile Include="UI\1. Setup\2. RecipeManager\ViewModel\RecipeStain_ViewModel.cs" />
     <Compile Include="UI\1. Setup\Setup.xaml.cs">
@@ -291,26 +314,27 @@
       <DependentUpon>ViewerTest.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\1. Setup\4. Maintenance\ViewerTest_ViewModel.cs" />
-    <Compile Include="UI\2. Review\NozzleRes.xaml.cs">
+    <Compile Include="UI\2. Review\UserControl\NozzleRes.xaml.cs">
       <DependentUpon>NozzleRes.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI\2. Review\ParticleReview_Panel.xaml.cs">
+    <Compile Include="UI\2. Review\Panel\ParticleReview_Panel.xaml.cs">
       <DependentUpon>ParticleReview_Panel.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI\2. Review\ResultSummary_Panel.xaml.cs">
+    <Compile Include="UI\2. Review\Panel\ResultSummary_Panel.xaml.cs">
       <DependentUpon>ResultSummary_Panel.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\2. Review\Review_Panel.xaml.cs">
       <DependentUpon>Review_Panel.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI\2. Review\screwUI.xaml.cs">
+    <Compile Include="UI\2. Review\UserControl\screwUI.xaml.cs">
       <DependentUpon>screwUI.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\2. Review\ViewModel\ParticleReview_ViewModel.cs" />
-    <Compile Include="UI\2. Review\ViewModel\Review_ViewModel.cs" />
-    <Compile Include="UI\2. Review\ViewModel\ScrewUI_ViewModel.cs" />
+    <Compile Include="UI\2. Review\Review_ViewModel.cs" />
+    <Compile Include="UI\2. Review\UserControl\ScrewUI_ViewModel.cs" />
+    <Compile Include="UI\2. Review\ViewModel\ResultSummary_ViewModel.cs" />
     <Compile Include="UI\2. Review\ViewModel\VisionReview_ViewModel.cs" />
-    <Compile Include="UI\2. Review\VisionReview_Panel.xaml.cs">
+    <Compile Include="UI\2. Review\Panel\VisionReview_Panel.xaml.cs">
       <DependentUpon>VisionReview_Panel.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\SelectMode.xaml.cs">
@@ -361,7 +385,35 @@
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
     </Compile>
+    <Page Include="UI\1. Setup\2. RecipeManager\Panel\ImageViewerBase_Panel.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\1. Setup\2. RecipeManager\Panel\MaskViewer_Panel.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\1. Setup\2. RecipeManager\Panel\OriginViewerTab_Panel.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\1. Setup\2. RecipeManager\Panel\PositionViewerTab_Panel.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\1. Setup\2. RecipeManager\Panel\RecipeMask_Panel.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\1. Setup\2. RecipeManager\Panel\RecipeOrigin_Panel.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="UI\1. Setup\2. RecipeManager\Panel\RecipeSummary.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\1. Setup\2. RecipeManager\UserControl\AlignFeatureInfo.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -378,10 +430,6 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UI\1. Setup\2. RecipeManager\Panel\Recipe6um_Panel.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="UI\1. Setup\2. RecipeManager\Panel\RecipeSetting_Panel.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -413,15 +461,15 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="UI\2. Review\NozzleRes.xaml">
+    <Page Include="UI\2. Review\UserControl\NozzleRes.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UI\2. Review\ParticleReview_Panel.xaml">
+    <Page Include="UI\2. Review\Panel\ParticleReview_Panel.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UI\2. Review\ResultSummary_Panel.xaml">
+    <Page Include="UI\2. Review\Panel\ResultSummary_Panel.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -429,11 +477,11 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UI\2. Review\screwUI.xaml">
+    <Page Include="UI\2. Review\UserControl\screwUI.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UI\2. Review\VisionReview_Panel.xaml">
+    <Page Include="UI\2. Review\Panel\VisionReview_Panel.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

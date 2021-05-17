@@ -85,13 +85,13 @@
             <Grid Grid.Column="1">
                 <TabControl Background="{StaticResource PanelBackGround}">
                     <TabItem Header="Result Summary">
-                        <local:ResultSummary_Panel x:Name="ResultSummaryUI"/>
+                        <local:ResultSummary_Panel DataContext="{Binding ResultSummary}"/>
                     </TabItem>
                     <TabItem Header="Particle Count">
-                        <local:ParticleReview_Panel x:Name="ParticleCountResUI"/>
+                        <local:ParticleReview_Panel DataContext="{Binding ParticleReview}"/>
                     </TabItem>
                     <TabItem Header="Vision Inspection">
-                        <local:VisionReview_Panel x:Name="VisionInspectionResUI"/>
+                        <local:VisionReview_Panel DataContext="{Binding VisionReview}"/>
                     </TabItem>
                 </TabControl>
             </Grid>

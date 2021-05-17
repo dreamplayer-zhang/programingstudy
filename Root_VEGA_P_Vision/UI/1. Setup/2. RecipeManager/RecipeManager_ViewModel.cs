@@ -5,76 +5,83 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 
 namespace Root_VEGA_P_Vision
 {
     public class RecipeManager_ViewModel:ObservableObject
     {
-        public Setup_ViewModel m_Setup;
+        public Setup_ViewModel setup;
         public RecipeManagerPanel Main;
-        public RecipeSetting_ViewModel recipeSettingVM;
 
+        private UserControl m_CurrentPanel;
+
+        public UserControl p_SubPanel
+        {
+            get => m_CurrentPanel;
+            set => SetProperty(ref m_CurrentPanel, value);
+        }
+        public RecipeOrigin_ViewModel recipeOriginVM;
+        public RecipeMask_ViewModel recipeMaskVM;
         public RecipeManager_ViewModel(Setup_ViewModel setup)
         {
-            m_Setup = setup;
-            Init();
-        }
-        private void Init()
-        {
+            this.setup = setup;
             Main = new RecipeManagerPanel();
-            recipeSettingVM = new RecipeSetting_ViewModel(this);
-            //SetPage(Main);
+            Main.DataContext = this;
+            recipeOriginVM = new RecipeOrigin_ViewModel(this);
+            recipeMaskVM = new RecipeMask_ViewModel(this);
         }
-        public enum ModifyType
-        {
-            None,
-            LineStart,
-            LineEnd,
-            ScrollAll,
-            Left,
-            Right,
-            Top,
-            Bottom,
-            LeftTop,
-            RightTop,
-            LeftBottom,
-            RightBottom,
-        }
+        //public enum ModifyType
+        //{
+        //    None,
+        //    LineStart,
+        //    LineEnd,
+        //    ScrollAll,
+        //    Left,
+        //    Right,
+        //    Top,
+        //    Bottom,
+        //    LeftTop,
+        //    RightTop,
+        //    LeftBottom,
+        //    RightBottom,
+        //}
 
+        public void SetOrigin()
+        {
+            p_SubPanel = recipeOriginVM.Main;
+            recipeOriginVM.SetOriginViewerTab();
+        }
+        public void SetPosition()
+        {
+            p_SubPanel = recipeOriginVM.Main;
+            recipeOriginVM.SetPositionViewerTab();
+        }
+        public void SetRecipeMask()
+        {
+            setup.SetRecipeMask();
+            setup.p_CurrentPanel = recipeMaskVM.Main;
+            recipeMaskVM.Main.radiobtnStain.IsChecked = true;
+            recipeMaskVM.SetStain();
+        }
         #region [RelayCommand]
-        public ICommand btnStain
+        public ICommand btnOrigin
         {
-            get => new RelayCommand(()=> {
-                m_Setup.SetRecipeSetting();
-                recipeSettingVM.SetStain();
-            });
+            get => new RelayCommand(() => SetOrigin());
         }
-        public ICommand btn6um
+        public ICommand btnPosition
         {
-            get => new RelayCommand(()=> {
-                m_Setup.SetRecipeSetting();
-                recipeSettingVM.Set6um();
-            });
+            get => new RelayCommand(()=>SetPosition());
         }
-        public ICommand btn1um
+        public ICommand btnMask
         {
-            get => new RelayCommand(()=> {
-                m_Setup.SetRecipeSetting();
-                recipeSettingVM.Set1um();
-            });
-        }
-        public ICommand btnSide
-        {
-            get => new RelayCommand(()=>
-            {
-                m_Setup.SetRecipeSetting();
-                recipeSettingVM.SetSide();
-            });
+            get => new RelayCommand(()=>SetRecipeMask());
         }
         public ICommand btnBack
         {
-            get => new RelayCommand(() => { m_Setup.SetHome(); });
+            get => new RelayCommand(() => { setup.SetHome(); });
         }
         #endregion
     }

@@ -40,7 +40,7 @@ namespace Root_VEGA_P_Vision
         public RecipeSideImageViewers_ViewModel(string parts,RecipeSide_ViewModel recipeSide)
         {
             Main = new RecipeSideImageViewers_Panel();
-
+            Main.DataContext = this;
             top_ViewerVM = new MaskRootViewer_ViewModel(parts + ".Top", recipeSide.recipeSetting);
 
             bottom_ViewerVM = new MaskRootViewer_ViewModel(parts+".Bottom",recipeSide.recipeSetting);

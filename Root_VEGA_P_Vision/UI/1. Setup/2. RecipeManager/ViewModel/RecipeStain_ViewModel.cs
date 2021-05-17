@@ -17,7 +17,7 @@ using System.Windows.Threading;
 
 namespace Root_VEGA_P_Vision
 {
-    class RecipeStain_ViewModel: ObservableObject
+    public class RecipeStain_ViewModel : ObservableObject
     {
 
         #region [ColorDefines]
@@ -64,9 +64,11 @@ namespace Root_VEGA_P_Vision
         }
         #endregion
 
-        public RecipeSetting_ViewModel recipeSetting;
+        public RecipeMask_ViewModel recipeSetting;
         public RecipeStain_Panel Main;
-
+        string selectedTab;
+        int selectedidx;
+        RootViewer_ViewModel selectedViewer;
         #region [ImageViewer ViewModel]
         RootViewer_ViewModel EIPcovertop_ImageViewerVM, EIPcoverbottom_ImageViewerVM;
         RootViewer_ViewModel EIPbasetop_ImageViewerVM, EIPbasebottom_ImageViewerVM;
@@ -74,7 +76,7 @@ namespace Root_VEGA_P_Vision
         public RootViewer_ViewModel EIPCoverTop_ImageViewerVM
         {
             get => EIPcovertop_ImageViewerVM;
-            set => SetProperty(ref EIPcovertop_ImageViewerVM,value);
+            set => SetProperty(ref EIPcovertop_ImageViewerVM, value);
         }
         public RootViewer_ViewModel EIPCoverBottom_ImaageViewerVM
         {
@@ -93,33 +95,35 @@ namespace Root_VEGA_P_Vision
         }
         #endregion
 
-        public RecipeStain_ViewModel(RecipeSetting_ViewModel recipeSetting)
+        public RecipeStain_ViewModel(RecipeMask_ViewModel recipeSetting)
         {
             this.recipeSetting = recipeSetting;
             Main = new RecipeStain_Panel();
+            Main.DataContext = this;
 
-            EIPcovertop_ImageViewerVM = new MaskRootViewer_ViewModel("EIP_Cover.Stain.Front",recipeSetting);
+            EIPcovertop_ImageViewerVM = new MaskRootViewer_ViewModel("EIP_Cover.Stain.Front", recipeSetting);
+            EIPcoverbottom_ImageViewerVM = new MaskRootViewer_ViewModel("EIP_Cover.Stain.Back", recipeSetting);
+            EIPbasetop_ImageViewerVM = new MaskRootViewer_ViewModel("EIP_Plate.Stain.Front", recipeSetting);
+            EIPbasebottom_ImageViewerVM = new MaskRootViewer_ViewModel("EIP_Plate.Stain.Back", recipeSetting);
 
-            EIPcoverbottom_ImageViewerVM = new MaskRootViewer_ViewModel("EIP_Cover.Stain.Back",recipeSetting);
-
-            EIPbasetop_ImageViewerVM = new MaskRootViewer_ViewModel("EIP_Plate.Stain.Front",recipeSetting);
-
-            EIPbasebottom_ImageViewerVM = new MaskRootViewer_ViewModel("EIP_Plate.Stain.Back",recipeSetting);
+            selectedTab = "EIP_Cover.Stain.Front.Inspection";
+            selectedidx = 0;
+            selectedViewer = EIPCoverTop_ImageViewerVM;
 
             InitInspMgr();
         }
 
-        //InitInspectionWorkManager
+        #region Inspection
         void InitInspMgr()
         {
             //Vision.eParts
-            foreach(var v in Enum.GetValues(typeof(Vision.eParts)))
+            foreach (var v in Enum.GetValues(typeof(Vision.eParts)))
             {
-                foreach(var v2 in Enum.GetValues(typeof(Vision.eUpDown)))
+                foreach (var v2 in Enum.GetValues(typeof(Vision.eUpDown)))
                 {
                     string insp = v.ToString() + ".Stain." + v2.ToString() + ".Inspection";
 
-                    if (GlobalObjects.Instance.GetNamed<WorkManager>(insp)!=null)
+                    if (GlobalObjects.Instance.GetNamed<WorkManager>(insp) != null)
                     {
                         GlobalObjects.Instance.GetNamed<WorkManager>(insp).InspectionStart += InspectionStart_Callback;
                         GlobalObjects.Instance.GetNamed<WorkManager>(insp).PositionDone += PositionDone_Callback;
@@ -144,7 +148,7 @@ namespace Root_VEGA_P_Vision
         {
             Application.Current.Dispatcher.Invoke(DispatcherPriority.Normal, new Action(delegate
             {
-                ((MaskRootViewer_ViewModel)EIPcovertop_ImageViewerVM).RemoveObjectsByTag("defect");
+                ((MaskRootViewer_ViewModel)selectedViewer).RemoveObjectsByTag("defect");
             }));
         }
 
@@ -187,15 +191,15 @@ namespace Root_VEGA_P_Vision
         {
             Application.Current.Dispatcher.Invoke(DispatcherPriority.Normal, new Action(delegate
             {
-                ((MaskRootViewer_ViewModel)EIPcovertop_ImageViewerVM).ClearObjects();
+                ((MaskRootViewer_ViewModel)selectedViewer).ClearObjects();
             }));
 
         }
 
         public void DrawRectMasterFeature(CPoint ptOldStart, CPoint ptOldEnd, CPoint ptNewStart, CPoint ptNewEnd, String text, bool bSuccess)
         {
-            ((MaskRootViewer_ViewModel)EIPcovertop_ImageViewerVM).AddDrawRect(ptOldStart, ptOldEnd, ImageViewerColorDefines.MasterPosition, "position");
-            ((MaskRootViewer_ViewModel)EIPcovertop_ImageViewerVM).AddDrawRect(ptNewStart, ptNewEnd, bSuccess ? ImageViewerColorDefines.MasterPostionMove : ImageViewerColorDefines.PostionFail, "position");
+            ((MaskRootViewer_ViewModel)selectedViewer).AddDrawRect(ptOldStart, ptOldEnd, ImageViewerColorDefines.MasterPosition, "position");
+            ((MaskRootViewer_ViewModel)selectedViewer).AddDrawRect(ptNewStart, ptNewEnd, bSuccess ? ImageViewerColorDefines.MasterPostionMove : ImageViewerColorDefines.PostionFail, "position");
             //ImageViewerVM.DrawText(ptNew)
         }
 
@@ -218,31 +222,114 @@ namespace Root_VEGA_P_Vision
         }
         public void LoadRecipe()
         {
-            if(currentRecipe!= GlobalObjects.Instance.Get<RecipeVision>().Name)
-                currentRecipe = GlobalObjects.Instance.Get<RecipeVision>().Name;            
+            if (currentRecipe != GlobalObjects.Instance.Get<RecipeVision>().Name)
+                currentRecipe = GlobalObjects.Instance.Get<RecipeVision>().Name;
         }
 
-        public void DrawRectDefect(List<CRect> rectList, List<String> text)
+        public void DrawRectDefect(List<CRect> rectList, List<string> text)
         {
-            ((MaskRootViewer_ViewModel)EIPcovertop_ImageViewerVM).AddDrawRectList(rectList, ImageViewerColorDefines.Defect, "defect");
+            ((MaskRootViewer_ViewModel)selectedViewer).AddDrawRectList(rectList, ImageViewerColorDefines.Defect, "defect");
         }
+        unsafe void SetMaskInspROI()
+        {
+            OriginRecipe originRecipe = GlobalObjects.Instance.Get<RecipeVision>().GetItem<OriginRecipe>();
+            int originWidth = originRecipe.OriginWidth;
+            int originHeight = originRecipe.OriginHeight;
+
+            IntPtr ptrMem = selectedViewer.p_ROILayer.GetPtr();
+            if (ptrMem == IntPtr.Zero)
+                return;
+            byte* bitmapPtr = (byte*)ptrMem.ToPointer();
+
+            List<PointLine> tempPointLines = new List<PointLine>();
+            bool bStart = false;
+            CPoint size = selectedViewer.p_ImageData.p_Size;
+            PointLine pointLine = null;
+            for (int j = 0; j < originHeight; j++)
+            {
+                for (int i = 0; i < originWidth; i++)
+                {
+                    byte a = bitmapPtr[(j * selectedViewer.p_ROILayer.p_Size.X + i) * 4 + 3];
+                    if (a > 0)
+                    {
+                        if (!bStart)
+                        {
+                            pointLine = new PointLine();
+                            pointLine.StartPt = new CPoint(i, j);
+                            bStart = true;
+                        }
+                    }
+                    if (a == 0 || i == originWidth - 1)
+                    {
+                        if (bStart)
+                        {
+                            pointLine.Width = i - pointLine.StartPt.X + 1;
+                            bStart = false;
+                            tempPointLines.Add(pointLine);
+                        }
+                    }
+                }
+            }
+            ((MaskRootViewer_ViewModel)selectedViewer).p_cInspROI.p_Data = tempPointLines;
+            SetRecipeData();
+        }
+        public void SetRecipeData()
+        {
+            //Stain은 Origin Recipe 영역을 전부다 쓸꺼임
+            RecipeVision recipe = GlobalObjects.Instance.Get<RecipeVision>();
+            OriginRecipe originRecipe = GlobalObjects.Instance.Get<RecipeVision>().GetItem<OriginRecipe>();
+
+            recipe.GetItem<MaskRecipe>().OriginPoint = new CPoint(originRecipe.OriginX, originRecipe.OriginY);
+            if (recipe.GetItem<MaskRecipe>().MaskList.Count > 0)
+                recipe.GetItem<MaskRecipe>().MaskList.Clear();
+
+            recipe.GetItem<MaskRecipe>().MaskList.Add(new RecipeType_Mask(((MaskRootViewer_ViewModel)selectedViewer).p_cInspROI.p_Data, Color.FromArgb(255, 255, 0, 0)));
+        }
+        #endregion
+
 
         #region RelayCommand
         public ICommand btnBack
         {
-            get => new RelayCommand(()=> {
-                //recipeSetting.SetRecipeWizard();
+            get => new RelayCommand(() =>
+            {
             });
         }
         public ICommand btnSnap
         {
-            get => new RelayCommand(()=> Snap());
+            get => new RelayCommand(() => Snap());
         }
         public ICommand btnInsp
         {
             get => new RelayCommand(() => Inspection());
         }
+        public ICommand TabChanged
+        {
+            get => new RelayCommand(() => {
+                selectedidx = Main.MaskViewerTab.SelectedIndex;
+                switch (selectedidx)
+                {
+                    case 0:
+                        selectedTab = "EIP_Cover.Stain.Front";
+                        selectedViewer = EIPCoverTop_ImageViewerVM;
+                        break;
+                    case 1:
+                        selectedTab = "EIP_Cover.Stain.Back";
+                        selectedViewer = EIPCoverBottom_ImaageViewerVM;
+                        break;
+                    case 2:
+                        selectedTab = "EIP_Plate.Stain.Front";
+                        selectedViewer = EIPBaseTop_ImageViewerVM;
+                        break;
+                    case 3:
+                        selectedTab = "EIP_Plate.Stain.Back";
+                        selectedViewer = EIPBaseBottom_ImageViewerVM;
+                        break;
+                }
 
+                selectedTab += ".Inspection";
+            });
+        }
         void Snap()
         {
             EQ.p_bStop = false;
@@ -257,16 +344,22 @@ namespace Root_VEGA_P_Vision
         }
         void Inspection()
         {
-            if (GlobalObjects.Instance.GetNamed<WorkManager>("EIP_Cover.Stain.Front.Inspection") != null)
+
+            if (GlobalObjects.Instance.GetNamed<WorkManager>(selectedTab) != null)
             {
-                EIPCoverTop_ImageViewerVM.p_ImageData.GetPtr(0);
+                selectedViewer.p_ImageData.GetPtr(0);
                 OriginRecipe originRecipe = GlobalObjects.Instance.Get<RecipeVision>().GetItem<OriginRecipe>();
 
                 originRecipe.OriginWidth = 1500;
                 originRecipe.OriginHeight = 1300;
-                GlobalObjects.Instance.GetNamed<WorkManager>("EIP_Cover.Stain.Front.Inspection").Start();
+
+                SetMaskInspROI();
+
+                GlobalObjects.Instance.GetNamed<WorkManager>(selectedTab).Start();
             }
         }
         #endregion
+
+
     }
 }

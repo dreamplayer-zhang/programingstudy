@@ -9,10 +9,8 @@ namespace Root_VEGA_P_Vision
     public class RecipeSummary_ViewModel: ObservableObject
     {
         public RecipeSummary Main;
-        RecipeSetting_ViewModel recipeSetting;
-        public RecipeSummary_ViewModel(RecipeSetting_ViewModel recipeSetting)
+        public RecipeSummary_ViewModel()
         {
-            this.recipeSetting = recipeSetting;
         }
     }
 }

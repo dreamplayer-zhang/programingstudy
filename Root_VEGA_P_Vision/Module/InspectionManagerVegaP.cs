@@ -107,15 +107,15 @@ namespace Root_VEGA_P_Vision
             if (this.Recipe == null)
                 return;
 
-            DateTime inspectionStart = DateTime.Now;
-            DateTime inspectionEnd = DateTime.Now;
-            string lotId = "Lotid";
-            string partId = "Partid";
-            string setupId = "SetupID";
-            string cstId = "CSTid";
-            string waferId = "WaferID";
-            //string sRecipe = "RecipeID";
-            string recipeName = recipe.Name;
+            //DateTime inspectionStart = DateTime.Now;
+            //DateTime inspectionEnd = DateTime.Now;
+            //string lotId = "Lotid";
+            //string partId = "Partid";
+            //string setupId = "SetupID";
+            //string cstId = "CSTid";
+            //string waferId = "WaferID";
+            ////string sRecipe = "RecipeID";
+            //string recipeName = recipe.Name;
 
             //DatabaseManager.Instance.SetLotinfo(inspectionStart, inspectionEnd, lotId, partId, setupId, cstId, waferId, recipeName);
 

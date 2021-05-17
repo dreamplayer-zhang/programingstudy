@@ -43,13 +43,13 @@ namespace Root_VEGA_P_Vision
         private ObservableCollection<UIElement> m_NaviButtons = new ObservableCollection<UIElement>();
 
         private Home_ViewModel homeVM;
-        private RecipeManager_ViewModel recipeManagerVM;
+        public RecipeManager_ViewModel recipeManagerVM;
         public Maintenance_ViewModel maintVM;
-        private RecipeSetting_ViewModel recipeSettingVM;
-        public RecipeWizard_VM recipeVM;
 
+        public Setup Main;
         public Setup_ViewModel()
         {
+            Main = new Setup();
             init();
         }
 
@@ -64,9 +64,7 @@ namespace Root_VEGA_P_Vision
         {
             homeVM = new Home_ViewModel(this);
             recipeManagerVM = new RecipeManager_ViewModel(this);
-            recipeSettingVM = recipeManagerVM.recipeSettingVM;
             maintVM = new Maintenance_ViewModel(this);
-            recipeVM = new RecipeWizard_VM(this);
         }
         private void InitAllNaviBtn()
         {
@@ -76,11 +74,11 @@ namespace Root_VEGA_P_Vision
             m_btnNaviRecipeWizard = new NaviBtn("Recipe Wizard");
             m_btnNaviRecipeWizard.Btn.Click += Navi_RecipeWizardClick;
 
+            m_btnNaviRecipeMask = new NaviBtn("Recipe Mask");
+            m_btnNaviRecipeMask.Btn.Click += Navi_RecipeMaskClick; ;
+
             m_btnNaviMaintenance = new NaviBtn("Maintenance");
             m_btnNaviMaintenance.Btn.Click += Navi_MaintClick;
-
-            //m_btnNaviGEM = new NaviBtn("GEM");
-            //m_btnNaviGEM.Btn.Click += Navi_GEMClick;
         }
 
         #region Navi Buttons
@@ -88,6 +86,7 @@ namespace Root_VEGA_P_Vision
         // SetupHome Navi Buttons
         public NaviBtn m_btnNaviInspection;
         public NaviBtn m_btnNaviRecipeWizard;
+        public NaviBtn m_btnNaviRecipeMask;
         public NaviBtn m_btnNaviMaintenance;
         public NaviBtn m_btnNaviGEM;
 
@@ -104,6 +103,10 @@ namespace Root_VEGA_P_Vision
         void Navi_RecipeWizardClick(object sender, RoutedEventArgs e)
         {
             SetRecipeWizard();
+        }
+        void Navi_RecipeMaskClick(object sender, RoutedEventArgs e)
+        {
+            SetRecipeMask();
         }
         void Navi_MaintClick(object sender, RoutedEventArgs e)
         {
@@ -184,37 +187,27 @@ namespace Root_VEGA_P_Vision
         public void SetHome()
         {
             p_NaviButtons.Clear();
-
-            //homeVM.SetPage(homeVM.Main);
             p_CurrentPanel = homeVM.Main;
-            p_CurrentPanel.DataContext = homeVM;
         }
         public void SetInspection()
         {
             p_NaviButtons.Clear();
             p_NaviButtons.Add(m_btnNaviInspection);
-
-            //p_CurrentPanel = inspectionVM.Main;
-            //p_CurrentPanel.DataContext = inspectionVM;
         }
         public void SetRecipeWizard()
         {
             p_NaviButtons.Clear();
             p_NaviButtons.Add(m_btnNaviRecipeWizard);
-
-            //Wizard.SetPage(Wizard.Summary);
-
             p_CurrentPanel = recipeManagerVM.Main;
-            p_CurrentPanel.DataContext = recipeManagerVM;
+            recipeManagerVM.Main.radiobtnOrigin.IsChecked = true;
+            recipeManagerVM.SetOrigin();
         }
-        public void SetRecipeSetting()
+        public void SetRecipeMask()
         {
-            p_CurrentPanel = recipeSettingVM.Main;
-            p_CurrentPanel.DataContext = recipeSettingVM;
-            homeVM.SetPage(recipeVM.RecipeWizard_UI);
-            recipeVM.RecipeWizard_UI.DataContext = recipeVM;
-            //p_CurrentPanel = recipeVM.RecipeWizard_UI;
-            //p_CurrentPanel.DataContext = recipeVM;
+            p_NaviButtons.Clear();
+            p_NaviButtons.Add(m_btnNaviRecipeWizard);
+            p_NaviButtons.Add(m_btnNaviRecipeMask);
+
         }
         public void SetMaintenance()
         {

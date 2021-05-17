@@ -28,9 +28,15 @@ namespace Root_VEGA_P_Vision
         Stack<Work> m_History;
         Work m_CurrentWork;
         TShape m_CurrentShape;
-        RecipeSetting_ViewModel recipeSetting;
+        RecipeMask_ViewModel recipeSetting;
+        ItemMask m_cInspROI;
+        public ItemMask p_cInspROI
+        {
+            get => m_cInspROI;
+            set => SetProperty(ref m_cInspROI, value);
+        }
 
-        public MaskRootViewer_ViewModel(string imagedata,RecipeSetting_ViewModel recipeSetting)
+        public MaskRootViewer_ViewModel(string imagedata,RecipeMask_ViewModel recipeSetting)
         {
             MemoryTool Memory = GlobalObjects.Instance.Get<VEGA_P_Vision_Engineer>().ClassMemoryTool();
             p_ImageData = new ImageData(Memory.GetMemory(App.mPool, App.mGroup, imagedata));
@@ -38,6 +44,7 @@ namespace Root_VEGA_P_Vision
             this.recipeSetting = recipeSetting;
             base.init(p_ImageData);
 
+            m_cInspROI = new ItemMask();
             m_History = new Stack<Work>();
 
             rectList = new List<TRect>();
@@ -597,6 +604,10 @@ namespace Root_VEGA_P_Vision
             rectList.Add(tRect);
             p_DrawElement.Add(rt);
         }
+
+        #endregion
+
+        #region Mask
 
         #endregion
     }

@@ -9,11 +9,23 @@ namespace Root_VEGA_P_Vision
 {
     public class ParticleReview_ViewModel: ObservableObject
     {
+        public ParticleReview_Panel Main;
         RootViewer_ViewModel domeViewer_VM,doorViewer_VM;
-        Review_ViewModel reviewVM;
-        public ParticleReview_ViewModel(Review_ViewModel reviewVM)
+        #region Property
+        public RootViewer_ViewModel DomeViewer
         {
-            this.reviewVM = reviewVM;
+            get => domeViewer_VM;
+            set => SetProperty(ref domeViewer_VM, value);
+        }
+        public RootViewer_ViewModel DoorViewer
+        {
+            get => doorViewer_VM;
+            set => SetProperty(ref doorViewer_VM, value);
+        }
+        #endregion
+        public ParticleReview_ViewModel()
+        {
+            Main = new ParticleReview_Panel();
             domeViewer_VM = new RootViewer_ViewModel();
             doorViewer_VM = new RootViewer_ViewModel();
         }
