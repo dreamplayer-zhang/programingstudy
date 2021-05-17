@@ -216,6 +216,7 @@ namespace Root_Rinse_Loader.Engineer
             {
                 EQ.p_eState = EQ.eState.Ready;
                 p_moduleList.m_qModuleRun.Clear();
+                m_loader.RunVacuum(false); 
                 m_storage.MoveStack();
                 m_loader.MoveLoader(Loader.ePos.Roller); 
                 EQ.p_bPickerSet = false; 
