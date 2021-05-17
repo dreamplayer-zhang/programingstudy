@@ -4,13 +4,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace RootTools_Vision
 {
-    #region [Parameter]
-    #endregion
-    #region [Getter Setter]
-    #endregion
+
     public class EUVPodSurfaceRecipe : RecipeItemBase
     {
         EUVPodSurfaceRecipeBase podStain;
@@ -50,6 +48,7 @@ namespace RootTools_Vision
         #endregion
         public override void Clear()
         {
+
         }
 
         public override bool Read(string recipePath)

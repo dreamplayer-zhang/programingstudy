@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Root_VEGA_P_Vision"
+             xmlns:toolsVision ="clr-namespace:RootTools_Vision;assembly=RootTools_Vision"
              xmlns:Tools="clr-namespace:RootTools;assembly=RootTools"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800"
@@ -20,17 +21,17 @@
                 <Grid.RowDefinitions>
                     <RowDefinition Height="2*"/>
                     <RowDefinition Height="2*"/>
-                    <RowDefinition Height="2*"/>
+                    <RowDefinition Height="4*"/>
                     <RowDefinition Height="15*"/>
                 </Grid.RowDefinitions>
-                <GroupBox Header="2D TDI Origin" Grid.Row="0">
-                    <StackPanel>
+            <GroupBox Header="2D TDI Origin" Grid.Row="0" DataContext="{Binding p_OriginRecipe.TDIOrigin}">
+                    <StackPanel >
                         <Grid>
                             <Grid.RowDefinitions>
                                 <RowDefinition/>
                                 <RowDefinition/>
                             </Grid.RowDefinitions>
-                            <Grid Grid.Row="0">
+                        <Grid Grid.Row="0" >
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition/>
                                     <ColumnDefinition/>
@@ -39,12 +40,12 @@
                                     <ColumnDefinition/>
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Text="Origin" Grid.Column="0"/>
-                                <TextBlock Text="X" Grid.Column="1"/>
-                                <TextBox Grid.Column="2"/>
+                            <TextBlock Text="X" Grid.Column="1" />
+                            <TextBox Grid.Column="2" Text="{Binding Origin.X}"/>
                                 <TextBlock Text="Y" Grid.Column="3"/>
-                                <TextBox Grid.Column="4"/>
+                            <TextBox Grid.Column="4" Text="{Binding Origin.Y}"/>
                             </Grid>
-                            <Grid Grid.Row="1">
+                        <Grid Grid.Row="1">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition/>
                                     <ColumnDefinition/>
@@ -53,15 +54,15 @@
                                     <ColumnDefinition/>
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Text="Origin Size" Grid.Column="0"/>
-                                <TextBlock Text="X" Grid.Column="1"/>
-                                <TextBox Grid.Column="2"/>
-                                <TextBlock Text="Y" Grid.Column="3"/>
-                                <TextBox Grid.Column="4"/>
+                            <TextBlock Text="X" Grid.Column="1" />
+                            <TextBox Grid.Column="2" Text="{Binding OriginSize.X}"/>
+                                <TextBlock Text="Y" Grid.Column="3"/>   
+                            <TextBox Grid.Column="4" Text="{Binding OriginSize.Y}"/>
                             </Grid>
                         </Grid>
                     </StackPanel>
                 </GroupBox>
-                <GroupBox Header="Stain Origin" Grid.Row="1">
+            <GroupBox Header="Stain Origin" Grid.Row="1" DataContext="{Binding p_OriginRecipe.StainOrigin}">
                     <StackPanel>
                         <Grid>
                             <Grid.RowDefinitions>
@@ -77,10 +78,10 @@
                                     <ColumnDefinition/>
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Text="Origin" Grid.Column="0"/>
-                                <TextBlock Text="X" Grid.Column="1"/>
-                                <TextBox Grid.Column="2"/>
+                                <TextBlock Text="X" Grid.Column="1" />
+                            <TextBox Grid.Column="2" Text="{Binding Origin.X}"/>
                                 <TextBlock Text="Y" Grid.Column="3"/>
-                                <TextBox Grid.Column="4"/>
+                            <TextBox Grid.Column="4" Text="{Binding Origin.Y}"/>
                             </Grid>
                             <Grid Grid.Row="1">
                                 <Grid.ColumnDefinitions>
@@ -91,52 +92,102 @@
                                     <ColumnDefinition/>
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Text="Origin Size" Grid.Column="0"/>
-                                <TextBlock Text="X" Grid.Column="1"/>
-                                <TextBox Grid.Column="2"/>
+                                <TextBlock Text="X" Grid.Column="1" />
+                            <TextBox Grid.Column="2" Text="{Binding OriginSize.X}"/>
                                 <TextBlock Text="Y" Grid.Column="3"/>
-                                <TextBox Grid.Column="4"/>
+                            <TextBox Grid.Column="4" Text="{Binding OriginSize.Y}"/>
                             </Grid>
                         </Grid>
                     </StackPanel>
                 </GroupBox>
                 <GroupBox Header="Side Origin" Grid.Row="2">
-                    <StackPanel>
-                        <Grid>
-                            <Grid.RowDefinitions>
-                                <RowDefinition/>
-                                <RowDefinition/>
-                            </Grid.RowDefinitions>
-                            <Grid Grid.Row="0">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition/>
-                                    <ColumnDefinition/>
-                                    <ColumnDefinition/>
-                                    <ColumnDefinition/>
-                                    <ColumnDefinition/>
-                                </Grid.ColumnDefinitions>
-                                <TextBlock Text="Origin" Grid.Column="0"/>
-                                <TextBlock Text="X" Grid.Column="1"/>
-                                <TextBox Grid.Column="2"/>
-                                <TextBlock Text="Y" Grid.Column="3"/>
-                                <TextBox Grid.Column="4"/>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
+                    <GroupBox Header="Top Bottom" Grid.Row="0" DataContext="{Binding p_OriginRecipe.SideTBOrigin}">
+                        <StackPanel>
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition/>
+                                    <RowDefinition/>
+                                </Grid.RowDefinitions>
+                                <Grid Grid.Row="0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition/>
+                                        <ColumnDefinition/>
+                                        <ColumnDefinition/>
+                                        <ColumnDefinition/>
+                                        <ColumnDefinition/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="Origin" Grid.Column="0"/>
+                                    <TextBlock Text="X" Grid.Column="1"/>
+                                    <TextBox Grid.Column="2" Text="{Binding Origin.X}"/>
+                                    <TextBlock Text="Y" Grid.Column="3"/>
+                                    <TextBox Grid.Column="4" Text="{Binding Origin.Y}"/>
+                                </Grid>
+                                <Grid Grid.Row="1">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition/>
+                                        <ColumnDefinition/>
+                                        <ColumnDefinition/>
+                                        <ColumnDefinition/>
+                                        <ColumnDefinition/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="Origin Size" Grid.Column="0"/>
+                                    <TextBlock Text="X" Grid.Column="1"/>
+                                    <TextBox Grid.Column="2" Text="{Binding OriginSize.X}"/>
+                                    <TextBlock Text="Y" Grid.Column="3"/>
+                                    <TextBox Grid.Column="4" Text="{Binding OriginSize.Y}"/>
+                                </Grid>
+
                             </Grid>
-                            <Grid Grid.Row="1">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition/>
-                                    <ColumnDefinition/>
-                                    <ColumnDefinition/>
-                                    <ColumnDefinition/>
-                                    <ColumnDefinition/>
-                                </Grid.ColumnDefinitions>
-                                <TextBlock Text="Origin Size" Grid.Column="0"/>
-                                <TextBlock Text="X" Grid.Column="1"/>
-                                <TextBox Grid.Column="2"/>
-                                <TextBlock Text="Y" Grid.Column="3"/>
-                                <TextBox Grid.Column="4"/>
+                        </StackPanel>
+                    </GroupBox>
+                    <GroupBox Header="Left Right" Grid.Row="1" DataContext="{Binding p_OriginRecipe.SideLROrigin}">
+                        <StackPanel>
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition/>
+                                    <RowDefinition/>
+                                </Grid.RowDefinitions>
+                                <Grid Grid.Row="0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition/>
+                                        <ColumnDefinition/>
+                                        <ColumnDefinition/>
+                                        <ColumnDefinition/>
+                                        <ColumnDefinition/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="Origin" Grid.Column="0"/>
+                                    <TextBlock Text="X" Grid.Column="1"/>
+                                    <TextBox Grid.Column="2" Text="{Binding Origin.X}"/>
+                                    <TextBlock Text="Y" Grid.Column="3"/>
+                                    <TextBox Grid.Column="4" Text="{Binding Origin.Y}"/>
+                                </Grid>
+                                <Grid Grid.Row="1">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition/>
+                                        <ColumnDefinition/>
+                                        <ColumnDefinition/>
+                                        <ColumnDefinition/>
+                                        <ColumnDefinition/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="Origin Size" Grid.Column="0"/>
+                                    <TextBlock Text="X" Grid.Column="1"/>
+                                    <TextBox Grid.Column="2" Text="{Binding OriginSize.X}"/>
+                                    <TextBlock Text="Y" Grid.Column="3"/>
+                                    <TextBox Grid.Column="4" Text="{Binding OriginSize.Y}"/>
+                                </Grid>
+
                             </Grid>
-                            
-                        </Grid>
-                    </StackPanel>
+                        </StackPanel>
+
+                    </GroupBox>
+
+                </Grid>
+                    
                 </GroupBox>
                 <GroupBox Header="Feautre Info" Grid.Row="3">
                     <TabControl>

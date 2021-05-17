@@ -91,7 +91,9 @@ namespace Root_VEGA_P.Module
                 List<string> asFile = new List<string>();
                 string sExt = "." + m_sExt; 
                 string sPath = EQ.c_sPathRecipe + "\\Nozzle";
-                DirectoryInfo directory = new DirectoryInfo(sPath); 
+                DirectoryInfo directory = new DirectoryInfo(sPath);
+                if (!directory.Exists)
+                    directory.Create();
                 foreach (FileInfo file in directory.GetFiles())
                 {
                     if (file.Extension == sExt) asFile.Add(GetFileTitle(file.Name)); 

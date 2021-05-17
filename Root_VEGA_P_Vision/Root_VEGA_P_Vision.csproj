@@ -263,6 +263,7 @@
     <Compile Include="UI\1. Setup\2. RecipeManager\ViewModel\ImageViewerBase_ViewModel.cs" />
     <Compile Include="UI\1. Setup\2. RecipeManager\ViewModel\MaskRootViewer_ViewModel.cs" />
     <Compile Include="UI\1. Setup\2. RecipeManager\ViewModel\MaskViewer_ViewModel.cs" />
+    <Compile Include="UI\1. Setup\2. RecipeManager\ViewModel\OriginImageViewer_ViewModel.cs" />
     <Compile Include="UI\1. Setup\2. RecipeManager\ViewModel\OriginViewerTab_ViewModel.cs" />
     <Compile Include="UI\1. Setup\2. RecipeManager\ViewModel\PositionViewerTab_ViewModel.cs" />
     <Compile Include="UI\1. Setup\2. RecipeManager\ViewModel\RecipeMask_ViewModel.cs" />

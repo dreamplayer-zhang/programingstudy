@@ -26,6 +26,7 @@ namespace Root_VEGA_P_Vision
         public OriginViewerTab_Panel Main;
         RootViewer_ViewModel m2DTDIViewer, mStainViewer, mSideTopBtmViewer,mSideLeftRightViewer;
         RootViewer_ViewModel selectedViewer;
+        EUVOriginRecipe originRecipe;
 
         int selectedIdx, sideselectedIdx;
 
@@ -55,26 +56,122 @@ namespace Root_VEGA_P_Vision
         {
             Main = new OriginViewerTab_Panel();
             Main.DataContext = this;
-            m2DTDIViewer = new RootViewer_ViewModel();
-            mStainViewer = new RootViewer_ViewModel();
-            mSideTopBtmViewer = new RootViewer_ViewModel();
-            mSideLeftRightViewer = new RootViewer_ViewModel();
+            m2DTDIViewer = new OriginImageViewer_ViewModel();
+            mStainViewer = new OriginImageViewer_ViewModel();
+            mSideTopBtmViewer = new OriginImageViewer_ViewModel();
+            mSideLeftRightViewer = new OriginImageViewer_ViewModel();
 
             ImageData TDIimage = GlobalObjects.Instance.GetNamed<ImageData>("EIP_Cover.Main.Front");
             ImageData Stainimage = GlobalObjects.Instance.GetNamed<ImageData>("EIP_Cover.Stain.Front");
             ImageData SideTBimage = GlobalObjects.Instance.GetNamed<ImageData>("EIP_Cover.Top");
             ImageData SideLRimage = GlobalObjects.Instance.GetNamed<ImageData>("EIP_Cover.Left");
 
-            p_2DOriginViewer.init(TDIimage);
-            p_StainOriginViewer.init(Stainimage);
-            p_SideOriginTopBtmViewer.init(SideTBimage);
-            p_SideOriginLeftRightViewer.init(SideLRimage);
+            InitOriginViewer((OriginImageViewer_ViewModel)p_2DOriginViewer, TDIimage);
+            InitOriginViewer((OriginImageViewer_ViewModel)p_StainOriginViewer, Stainimage);
+            InitOriginViewer((OriginImageViewer_ViewModel)p_SideOriginTopBtmViewer, SideTBimage);
+            InitOriginViewer((OriginImageViewer_ViewModel)p_SideOriginLeftRightViewer, SideLRimage);
+
+            originRecipe = GlobalObjects.Instance.Get<RecipeVision>().GetItem<EUVOriginRecipe>();
 
             selectedIdx = 0;
             sideselectedIdx = 0;
             selectedViewer = p_2DOriginViewer;
         }
 
+        void InitOriginViewer(OriginImageViewer_ViewModel viewer,ImageData image)
+        {
+            viewer.init(image, GlobalObjects.Instance.Get<DialogService>());
+            viewer.OriginBoxReset += OriginBoxReset_Callback;
+            viewer.OriginPointDone += OriginPointDone_Callback;
+            viewer.OriginBoxDone += OriginBoxDone_Callback;
+        }
+
+        public void LoadRecipe()
+        {
+            TDIOrigin = originRecipe.TDIOrigin;
+            StainOrigin = originRecipe.StainOrigin;
+            SideLROrigin = originRecipe.SideLROrigin;
+            SideTBOrigin = originRecipe.SideTBOrigin;
+
+            ((OriginImageViewer_ViewModel)p_2DOriginViewer).SetOriginBox(TDIOrigin.Origin, TDIOrigin.OriginSize);
+            ((OriginImageViewer_ViewModel)p_StainOriginViewer).SetOriginBox(StainOrigin.Origin, StainOrigin.OriginSize);
+            ((OriginImageViewer_ViewModel)p_SideOriginTopBtmViewer).SetOriginBox(SideTBOrigin.Origin, SideTBOrigin.OriginSize);
+            ((OriginImageViewer_ViewModel)p_SideOriginLeftRightViewer).SetOriginBox(SideLROrigin.Origin, SideLROrigin.OriginSize);
+
+            VegaPEventManager.OnRecipeUpdated(this, new RecipeEventArgs());
+        }
+        #region CallbackFunc
+        public void OriginBoxReset_Callback()
+        {
+            Clear();
+        }
+
+        public void OriginPointDone_Callback()
+        {
+            TDIOrigin = originRecipe.TDIOrigin;
+            StainOrigin = originRecipe.StainOrigin;
+            SideLROrigin = originRecipe.SideLROrigin;
+            SideTBOrigin = originRecipe.SideTBOrigin;
+        }
+
+        public void OriginBoxDone_Callback()
+        {
+            TDIOrigin = originRecipe.TDIOrigin;
+            StainOrigin = originRecipe.StainOrigin;
+            SideLROrigin = originRecipe.SideLROrigin;
+            SideTBOrigin = originRecipe.SideTBOrigin;
+            VegaPEventManager.OnRecipeUpdated(this, new RecipeEventArgs());
+        }
+
+        public void Clear()
+        {
+            ((OriginImageViewer_ViewModel)selectedViewer).ClearObjects(true);
+
+            //originRecipe.Clear();
+            VegaPEventManager.OnRecipeUpdated(this, new RecipeEventArgs());
+        }
+        #endregion
+        #region [Properties]
+        private OriginInfo tdiOrigin = new OriginInfo(new CPoint(0, 0), new CPoint(0, 0));
+        public OriginInfo TDIOrigin
+        {
+            get => tdiOrigin;
+            set
+            {
+                SetProperty(ref tdiOrigin, value);
+            }
+        }
+
+        private OriginInfo stainOrigin = new OriginInfo(new CPoint(0, 0), new CPoint(0, 0));
+        public OriginInfo StainOrigin
+        {
+            get => stainOrigin;
+            set
+            {
+                SetProperty(ref stainOrigin, value);
+            }
+        }
+
+        private OriginInfo sideTBOrigin = new OriginInfo(new CPoint(0, 0), new CPoint(0, 0));
+        public OriginInfo SideTBOrigin
+        {
+            get => sideTBOrigin;
+            set
+            {
+                SetProperty(ref sideTBOrigin, value);
+            }
+        }
+
+        private OriginInfo sideLROrigin = new OriginInfo(new CPoint(0, 0), new CPoint(0, 0));
+        public OriginInfo SideLROrigin
+        {
+            get => sideLROrigin;
+            set
+            {
+                SetProperty(ref sideLROrigin, value);
+            }
+        }
+        #endregion
         #region RelayCommand
         public ICommand TabChanged
         {
@@ -91,9 +188,13 @@ namespace Root_VEGA_P_Vision
                         break;
                     case 2:
                         if (selectedIdx + sideselectedIdx == 2)
+                        {
                             selectedViewer = p_SideOriginTopBtmViewer;
+                        }
                         else if (selectedIdx + sideselectedIdx == 3)
+                        {
                             selectedViewer = p_SideOriginLeftRightViewer;
+                        }
                         break;
                 }
             });

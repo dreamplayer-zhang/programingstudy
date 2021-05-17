@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-
+using RootTools_Vision;
 namespace Root_VEGA_P_Vision
 {
     public class RecipeOrigin_ViewModel : ObservableObject
@@ -17,6 +17,8 @@ namespace Root_VEGA_P_Vision
         ImageViewerBase_ViewModel mBase;
         OriginViewerTab_ViewModel originviewerTab;
         PositionViewerTab_ViewModel positionviewerTab;
+        EUVOriginRecipe originRecipe;
+
         #region Property
         public OriginViewerTab_ViewModel OriginViewerTab
         {
@@ -38,6 +40,14 @@ namespace Root_VEGA_P_Vision
             get => m_panel;
             set => SetProperty(ref m_panel, value);
         }
+
+        public EUVOriginRecipe p_OriginRecipe
+        {
+            get => originRecipe;
+            set => SetProperty(ref originRecipe, value);
+        }
+
+
         #endregion
         public RecipeOrigin_ViewModel(RecipeManager_ViewModel recipeManager)
         {
@@ -47,6 +57,7 @@ namespace Root_VEGA_P_Vision
             mBase = new ImageViewerBase_ViewModel();
             originviewerTab = new OriginViewerTab_ViewModel();
             positionviewerTab = new PositionViewerTab_ViewModel();
+            originRecipe = GlobalObjects.Instance.Get<RecipeVision>().GetItem<EUVOriginRecipe>();
         }
         public void SetOriginViewerTab()
         {
