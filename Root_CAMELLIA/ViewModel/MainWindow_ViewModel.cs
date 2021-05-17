@@ -886,16 +886,17 @@ namespace Root_CAMELLIA
         public void InitTimer()
         {
             //m_timer.Interval = TimeSpan.FromMinutes(60);
-            p_lampUsetime = App.m_nanoView.UpdateLampData("t");
-            p_lampStatus = App.m_nanoView.LampState();
+          //  p_lampUsetime = App.m_nanoView.UpdateLampData("t");
+          //  p_lampStatus = App.m_nanoView.LampState();
 
             m_timer.Interval = TimeSpan.FromMinutes(60);
             m_timer.Tick += M_timer_Tick;
             m_timer.Start();
 
-            m_statusTimer.Interval = TimeSpan.FromMinutes(5);
-            m_statusTimer.Tick += M_timer_StatusTick;
-            m_statusTimer.Start();
+            //m_statusTimer.Interval = TimeSpan.FromMinutes(5);
+            //m_statusTimer.Tick += M_timer_StatusTick;
+            //m_statusTimer.Start();
+
             ////m_timer.Interval = TimeSpan.FromMilliseconds(100);
             ////m_timer.Tick += M_timer_Tick;
             ////m_timer.Start();
