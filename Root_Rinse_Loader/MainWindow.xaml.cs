@@ -127,7 +127,7 @@ namespace Root_Rinse_Loader
 
             bool bRun = bBlink && (EQ.p_eState == EQ.eState.Run); 
             buttonStart.Foreground = (bRun && EQ.p_bPickerSet == false) ? Brushes.Red : Brushes.Black;
-            buttonPickerSet.Foreground = (bRun && EQ.p_bPickerSet) ? Brushes.Red : Brushes.Black;
+            buttonPickerSet.Foreground = (bBlink && EQ.p_bPickerSet) ? Brushes.Red : Brushes.Black;
 
             borderState.Background = (EQ.p_eState == EQ.eState.Ready || EQ.p_eState == EQ.eState.Run) ? Brushes.SeaGreen : Brushes.Gold;
 

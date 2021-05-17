@@ -93,7 +93,7 @@ namespace RootTools_Vision
             }
         }
               
-        public static Bitmap CovertBufferToBitmap(SharedBufferInfo info, Rect rect)
+        public unsafe static Bitmap CovertBufferToBitmap(SharedBufferInfo info, Rect rect)
         {
             try
             {
@@ -135,11 +135,23 @@ namespace RootTools_Vision
                 IntPtr pointer = bmpData.Scan0;
                 if (_byteCount == 1)
                 {
-                   
-                    for (int i = 0; i < _height; i++)
+                    int h = (int)rect.Height;
+                    byte[] src = new byte[_width * _height];
+                    byte* ptr = (byte*)pointer.ToPointer();
+                    Marshal.Copy(info.PtrList[0], src, 0, _width * _height);
+                    for (int i = 0; i < h; i++)
                     {
-                        CopyMemory(info.PtrR_GRAY + i * _width, pointer + i * bmpData.Stride, (uint)_width);
+                        for(int j=0;j<rect.Width;j++)
+                        {
+                            ptr[i * bmpData.Stride + j] = src[(int)((i+rect.Top) * _width + (j+rect.Left))];
+                        }
                     }
+
+                    //for (int i = 0; i < _height; i++)
+                    //{
+                    //    Buffer.MemoryCopy(info.PtrList[0].ToPointer()[i * _width], pointer.ToPointer()[i * bmpData.Stride], bmpData.Stride, bmpData.Stride);
+                    //    //CopyMemory(info.PtrR_GRAY + i * _width, pointer + i * bmpData.Stride, (uint)_width);
+                    //}
                 }
                 else if (_byteCount == 3)
                 {

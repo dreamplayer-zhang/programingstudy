@@ -1,6 +1,7 @@
 ﻿using Root_VEGA_P.Engineer;
 using Root_VEGA_P_Vision.Module;
 using RootTools;
+using RootTools.Camera.CognexOCR;
 using RootTools.Control;
 using RootTools.Module;
 using RootTools.Trees;
@@ -12,10 +13,12 @@ namespace Root_VEGA_P.Module
     public class EIP_Plate : ModuleBase, IRTRChild
     {
         #region ToolBox
+        Camera_CognexOCR camBarcode;
         DIO_Os m_doCover;
         DIO_Is[] m_diCover = new DIO_Is[2] { null, null };
         public override void GetTools(bool bInit)
         {
+            p_sInfo = m_toolBox.GetCamera(ref camBarcode, this, p_id + ".Cam Barcode");
             p_sInfo = m_toolBox.GetDIO(ref m_doCover, this, p_id + ".Cover", Enum.GetNames(typeof(eCover)));
             p_sInfo = m_toolBox.GetDIO(ref m_diCover[0], this, p_id + ".Cover Open", new string[] { "0", "1" });
             p_sInfo = m_toolBox.GetDIO(ref m_diCover[1], this, p_id + ".Cover Close", new string[] { "0", "1" });

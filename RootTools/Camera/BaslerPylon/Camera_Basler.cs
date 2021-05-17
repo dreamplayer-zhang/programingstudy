@@ -417,7 +417,10 @@ namespace RootTools.Camera.BaslerPylon
             get { return new CPoint(Convert.ToInt32(m_CamParam._Width), Convert.ToInt32(m_CamParam._Height)); }
             set { }
         }
-
+        public void SetExposureTime(long dtime)
+        {
+            p_CamParam._ExposureTimeRaw = dtime;
+        }
         public string Grab()
         {
             if (!m_cam.IsOpen)

@@ -109,12 +109,13 @@ namespace Root_VEGA_P_Vision.Module
                 return bWait ? m_axisR.WaitReady() : "OK";
             }
 
-            double m_pulsePermm = 10000; 
-
+            double m_pulsePermm = 10000;
+            public double m_thetaOffset = 0;
             public void RunTree(Tree tree)
             {
                 m_pulsePermm = tree.Set(m_pulsePermm, m_pulsePermm, "Pulse / mm", "Stage XY Pulse per 1mm (pulse)"); 
-                p_pulsePerRound = tree.Set(p_pulsePerRound, p_pulsePerRound, "Pulse / Round", "Stage Rotate Pulse per Round (pulse)"); 
+                p_pulsePerRound = tree.Set(p_pulsePerRound, p_pulsePerRound, "Pulse / Round", "Stage Rotate Pulse per Round (pulse)");
+                m_thetaOffset = tree.Set(m_thetaOffset, m_thetaOffset, "Theta Offset / Pulse", "Stage Theta Offset (pulse)");
             }
 
             Vision m_vision; 
@@ -206,7 +207,7 @@ namespace Root_VEGA_P_Vision.Module
 
             public enum eSide
             {
-                Top,Left,Bottom,Right
+                Left,Bottom,Right,Top,All
             }
 
             public void GetTools(ToolBox toolBox, bool bInit)
@@ -375,6 +376,7 @@ namespace Root_VEGA_P_Vision.Module
         public override void InitMemorys()
         {
             memoryGroup = memoryPool.GetGroup(p_id);
+            memoryGroup.CreateMemory(App.mMaskLayer, 1, 1, 1000, 1000);
             m_mainOptic.InitMemorys();
             m_sideOptic.InitMemorys(); 
         }
@@ -392,7 +394,12 @@ namespace Root_VEGA_P_Vision.Module
                 m_mainOptic.CameraInit();
                 m_sideOptic.CameraInit();
 
+                p_sInfo = m_sideOptic.axisZ.StartHome();
+                m_sideOptic.axisZ.WaitReady();
+
                 p_sInfo = base.StateHome();
+                m_stage.m_axisR.StartMove(m_stage.m_thetaOffset);
+                m_stage.m_axisR.WaitReady();
                 p_eState = (p_sInfo == "OK") ? eState.Ready : eState.Error;
                 return "OK";
             }
@@ -601,10 +608,10 @@ namespace Root_VEGA_P_Vision.Module
         protected override void InitModuleRuns()
         {
             AddModuleRunList(new Run_Rotate(this), true, "Rotate");
-            AddModuleRunList(new Run_MainGrab(this), true, "Main Grab");
-            AddModuleRunList(new Run_SideGrab(this), true, "Side Grab");
-            AddModuleRunList(new Run_StainGrab(this), true, "Stain Grab");
-            AddModuleRunList(new Run_ZStack(this), true, "Z Stack Grab");
+            AddModuleRunList(new Run_MainGrab(this), true, App.mMainGrab);
+            AddModuleRunList(new Run_SideGrab(this), true, App.mSideGrab);
+            AddModuleRunList(new Run_StainGrab(this), true, App.mStainGrab);
+            AddModuleRunList(new Run_ZStack(this), true, App.mZStack);
             AddModuleRunList(new Run_Remote(this), false, "Remote Run");
             AddModuleRunList(new Run_Delay(this), true, "Time Delay");
         }        
