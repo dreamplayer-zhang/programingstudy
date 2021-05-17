@@ -185,6 +185,34 @@ namespace RootTools_Vision
             });
         }
 
+        public static void SaveDefectImageParallel(String path, List<Measurement> measurementList, SharedBufferInfo sharedBuffer, int nByteCnt)
+        {
+            path += "\\";
+            DirectoryInfo di = new DirectoryInfo(path);
+            if (!di.Exists)
+                di.Create();
+
+            if (measurementList.Count < 1)
+                return;
+
+            Parallel.ForEach(measurementList, measure =>
+            {
+                double cx = (measure.p_rtDefectBox.Left + measure.p_rtDefectBox.Right) / 2;
+                double cy = (measure.p_rtDefectBox.Top + measure.p_rtDefectBox.Bottom) / 2;
+                int startX = (int)cx - 320;
+                int startY = (int)cy - 240;
+                //int endX = startX + 640;
+                //int endY = startY + 480;
+
+                System.Drawing.Bitmap bitmap = CovertBufferToBitmap(sharedBuffer, new System.Windows.Rect(startX, startY, 640, 480));
+
+                if (System.IO.File.Exists(path + measure.m_nMeasurementIndex + ".bmp"))
+                    System.IO.File.Delete(path + measure.m_nMeasurementIndex + ".bmp");
+
+                bitmap.Save(path + measure.m_nMeasurementIndex + ".bmp");
+            });
+        }
+
         public static void SaveDefectImage(String path, List<Data> dataList, SharedBufferInfo sharedBuffer)
         {
             path += "\\";
@@ -305,6 +333,12 @@ namespace RootTools_Vision
                 //System.Drawing.Bitmap NewImg = new System.Drawing.Bitmap(bitmap);
                 bitmap.Save(image, ImageFormat.Tiff);
                 inputImage.Add(image);
+
+                //210517
+    //            if (defect.m_bUseColorVRS)
+				//{
+    //                inputImage.Add(defect.ImgColorVRS);                    
+    //            }
             }
             //for (int i = 0; i < defectList.Count; i++)
             //{

@@ -324,8 +324,8 @@ namespace RootTools_Vision.Utility
 
 			builder.AppendLine("DefectRecordSpec 17 DEFECTID XREL YREL XINDEX YINDEX XSIZE YSIZE DEFECTAREA DSIZE CLASSNUMBER TEST CLUSTERNUMBER ROUGHBINNUMBER FINEBINNUMBER REVIEWSAMPLE IMAGECOUNT IMAGELIST;");
 			builder.AppendLine("DefectList");
-			
 
+			int nImageIdx = 0;
 			for (int i = 0; i < _defectdata.Count; i++)
 			{
 				builder.Append(_defectdata[i].m_nDefectIndex + " ");
@@ -345,6 +345,13 @@ namespace RootTools_Vision.Utility
 				builder.Append(0 + " ");
 				builder.Append(_defectdata[i].m_nDefectIndex + " ");
 				builder.Append(_defectdata[i].m_nDefectIndex + "\n");
+
+				//210517 IMAGE INDEX 
+				builder.Append(nImageIdx++ + " 0;\n");
+				//if(_defectdata[i].m_bUseColorVRS)
+				//{
+				//	builder.Append(nImageIdx++ + " 0;\n");
+				//}	
 			}
 
 			builder.AppendLine("SummarySpec 5" + " TESTNO NDEFECT DEFDENSITY NDIE NDEFDIE;");
