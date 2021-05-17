@@ -9,7 +9,7 @@
         xmlns:cp="clr-namespace:ColorPickerLib.Controls;assembly=ColorPickerLib"
         xmlns:stage ="clr-namespace:Camellia2Stage"
         xmlns:data="clr-namespace:Root_CAMELLIA.Data"
-        Width="1820" Height="980"
+        Width="1620" Height="880"
         Background="White"
         mc:Ignorable="d">
     <i:Interaction.Triggers>
@@ -106,7 +106,7 @@
                                 <ColumnDefinition Width="3*"/>
                                 <ColumnDefinition/>
                             </Grid.ColumnDefinitions>
-                            <TextBlock Text="Use Thickness Measurement" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="0"/>
+                            <TextBlock Text="Use Thickness" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="0"/>
                             <ToggleButton Grid.Column="1" Style="{StaticResource CustomToggleButton}" IsChecked="{Binding p_UseThickness, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                         </Grid>
                         <Grid Grid.Column="1" Background="Gainsboro" Margin="3">
@@ -114,7 +114,7 @@
                                 <ColumnDefinition Width="3*"/>
                                 <ColumnDefinition/>
                             </Grid.ColumnDefinitions>
-                            <TextBlock Text="Use Transmittance Measurement" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="0"/>
+                            <TextBlock Text="Use Transmittance" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="0"/>
                             <ToggleButton Grid.Column="1" Style="{StaticResource CustomToggleButton}" IsChecked="{Binding p_UseTransmittance, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                         </Grid>
                     </Grid>
@@ -312,7 +312,13 @@
                                 </ListView>
                                 <UniformGrid Grid.Column="2" Columns="1" Rows="2">
                                     <Button Content="Add material"  Margin="7" Command="{Binding CmdAddMaterial}" IsEnabled="{Binding p_UseThickness}" Style="{StaticResource customButton}"/>
-                                    <Button Content="Delete material" Margin="7" Command="{Binding CmdDeleteMaterial}" IsEnabled="{Binding p_UseThickness}" Style="{StaticResource customButton}"/>
+                                    <Button Margin="7" Command="{Binding CmdDeleteMaterial}" IsEnabled="{Binding p_UseThickness}" Style="{StaticResource customButton}">
+                                        <Button.Content>
+                                            <TextBlock TextAlignment="Center">
+                                                 Delete <LineBreak/> material
+                                            </TextBlock>
+                                        </Button.Content>
+                                    </Button>
                                 </UniformGrid>
                                 <UniformGrid Grid.Column="3" Columns="2" Rows="2" Margin="2">
                                     <Button Content="Insert Layer" Margin="5" Command="{Binding CmdInsertLayer}" IsEnabled="{Binding p_UseThickness}" Style="{StaticResource customButton}"/>
@@ -321,8 +327,8 @@
                                     <Button Content="Save Model" Margin="5" Command="{Binding CmdSaveModel}" IsEnabled="{Binding p_UseThickness}" Style="{StaticResource customButton}"/>
                                 </UniformGrid>
                                 <TextBlock Text="Model File" Grid.Row="1" Grid.Column="2" VerticalAlignment="Center"
-                                           HorizontalAlignment="Center" Height="14" Width="Auto" Margin="8,8,42,8"/>
-                                <TextBox Grid.Row="1" Grid.Column="2" TextAlignment="Center" VerticalContentAlignment="Center" IsReadOnly="True" IsReadOnlyCaretVisible="True" Margin="70,2,2,2" Grid.ColumnSpan="2" Text="{Binding ModelPath}" IsEnabled="{Binding p_UseThickness}"/>
+                                           HorizontalAlignment="Center" Height="14" Width="Auto" Margin="8,8,25,8"/>
+                                <TextBox Grid.Row="1" Grid.Column="2" TextAlignment="Center" VerticalContentAlignment="Center" IsReadOnly="True" IsReadOnlyCaretVisible="True" Margin="75,2,2,2" Grid.ColumnSpan="2" Text="{Binding ModelPath}" IsEnabled="{Binding p_UseThickness}"/>
                             </Grid>
                         </Grid>
                         <UniformGrid Columns="2" Grid.Row="3">
@@ -379,9 +385,9 @@
                                     </ListView.ItemContainerStyle>
                                     <ListView.View>
                                         <GridView AllowsColumnReorder="False">
-                                            <GridViewColumn Width="54" Header="Wave" DisplayMemberBinding="{Binding p_waveLength}"/>
-                                            <GridViewColumn Width="54" Header="Scale" DisplayMemberBinding="{Binding p_scale}"/>
-                                            <GridViewColumn Width="54" Header="Offset" DisplayMemberBinding="{Binding p_offset}"/>
+                                            <GridViewColumn Width="47" Header="Wave" DisplayMemberBinding="{Binding p_waveLength}"/>
+                                            <GridViewColumn Width="47" Header="Scale" DisplayMemberBinding="{Binding p_scale}"/>
+                                            <GridViewColumn Width="47" Header="Offset" DisplayMemberBinding="{Binding p_offset}"/>
                                         </GridView>
                                     </ListView.View>
                                 </ListView>
@@ -422,9 +428,9 @@
                                     </ListView.ItemContainerStyle>
                                     <ListView.View>
                                         <GridView AllowsColumnReorder="False">
-                                            <GridViewColumn Width="54" Header="Wave" DisplayMemberBinding="{Binding p_waveLength}"/>
-                                            <GridViewColumn Width="54" Header="Scale" DisplayMemberBinding="{Binding p_scale}"/>
-                                            <GridViewColumn Width="54" Header="Offset" DisplayMemberBinding="{Binding p_offset}"/>
+                                            <GridViewColumn Width="47" Header="Wave" DisplayMemberBinding="{Binding p_waveLength}"/>
+                                            <GridViewColumn Width="47" Header="Scale" DisplayMemberBinding="{Binding p_scale}"/>
+                                            <GridViewColumn Width="47" Header="Offset" DisplayMemberBinding="{Binding p_offset}"/>
                                         </GridView>
                                     </ListView.View>
                                 </ListView>
@@ -806,9 +812,9 @@
                                         <ListView.View >
                                             <GridView AllowsColumnReorder="False">
                                                 <GridViewColumn Width="80" Header="Index"  DisplayMemberBinding="{Binding ListIndex}"/>
-                                                <GridViewColumn Width="110" Header="X (mm)" DisplayMemberBinding="{Binding ListX}"/>
-                                                <GridViewColumn Width="110" Header="Y (mm)" DisplayMemberBinding="{Binding ListY}"/>
-                                                <GridViewColumn Width="110" Header="Route" DisplayMemberBinding="{Binding ListRoute}"/>
+                                                <GridViewColumn Width="100" Header="X (mm)" DisplayMemberBinding="{Binding ListX}"/>
+                                                <GridViewColumn Width="100" Header="Y (mm)" DisplayMemberBinding="{Binding ListY}"/>
+                                                <GridViewColumn Width="100" Header="Route" DisplayMemberBinding="{Binding ListRoute}"/>
                                             </GridView>
                                         </ListView.View>
                                     </ListView>
