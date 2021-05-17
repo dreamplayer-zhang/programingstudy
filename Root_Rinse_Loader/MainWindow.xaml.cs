@@ -123,7 +123,7 @@ namespace Root_Rinse_Loader
             buttonStart.IsEnabled = m_handler.m_rinse.IsEnableStart();
             buttonPause.IsEnabled = EQ.p_eState == EQ.eState.Run;
             buttonReset.IsEnabled = (EQ.p_eState == EQ.eState.Error) || (EQ.p_eState == EQ.eState.Ready);
-            buttonPickerSet.IsEnabled = EQ.p_eState == EQ.eState.Ready;
+            buttonPickerSet.IsEnabled = EQ.p_bPickerSet || ((EQ.p_eState == EQ.eState.Ready) && (m_handler.m_rinse.p_eMode == RinseL.eRunMode.Stack));
 
             bool bRun = bBlink && (EQ.p_eState == EQ.eState.Run); 
             buttonStart.Foreground = (bRun && EQ.p_bPickerSet == false) ? Brushes.Red : Brushes.Black;
@@ -159,7 +159,7 @@ namespace Root_Rinse_Loader
 
         private void buttonHome_Click(object sender, RoutedEventArgs e)
         {
-            m_handler.m_rinse.InitSendProtocol(); 
+            //m_handler.m_rinse.InitSendProtocol(); 
             EQ.p_bStop = false; 
             EQ.p_eState = EQ.eState.Home;
         }
