@@ -188,6 +188,9 @@ namespace Root_CAMELLIA.Module
         DIO_I m_homeExistWafer;
         DIO_I m_loadExistWafer;
         DIO_O m_vacuumOnOff;
+        DIO_I m_axisLifterReady1;
+        DIO_I m_axisLifterReady2;
+        DIO_I m_axisLifterReady3;
 
 
         private Camera_Basler m_CamVRS;
@@ -252,6 +255,15 @@ namespace Root_CAMELLIA.Module
             m_axisLifter.AddPos(Enum.GetNames(typeof(eAxisPos)));
             m_axisLifter.AddIO(m_axisXReady);
             m_axisLifter.AddIO(m_axisYReady);
+
+            m_axisXY.p_axisX.AddIO(m_axisLifterReady1);
+            m_axisXY.p_axisX.AddIO(m_axisLifterReady2);
+            m_axisXY.p_axisX.AddIO(m_axisLifterReady3);
+
+            m_axisXY.p_axisY.AddIO(m_axisLifterReady1);
+            m_axisXY.p_axisY.AddIO(m_axisLifterReady2);
+            m_axisXY.p_axisY.AddIO(m_axisLifterReady3);
+
             //m_axisLifter.AddIO(m_vaccum);
             m_axisLifter.p_vaccumDIO_I = m_vacuum;
         }
@@ -285,7 +297,11 @@ namespace Root_CAMELLIA.Module
             p_sInfo = m_toolBox.GetCamera(ref m_CamVRS, this, "VRS");
             p_sInfo = m_toolBox.Get(ref m_lightSet, this);
             p_sInfo = m_toolBox.GetDIO(ref m_axisXReady, this, "Stage X Ready");
-            p_sInfo = m_toolBox.GetDIO(ref m_axisYReady, this, "Stage Y Ready");   
+            p_sInfo = m_toolBox.GetDIO(ref m_axisYReady, this, "Stage Y Ready");
+            p_sInfo = m_toolBox.GetDIO(ref m_axisLifterReady1, this, "Lifter 1 Ready");
+            p_sInfo = m_toolBox.GetDIO(ref m_axisLifterReady2, this, "Lifter 2 Ready");
+            p_sInfo = m_toolBox.GetDIO(ref m_axisLifterReady3, this, "Lifter 3 Ready");
+
             p_sInfo = m_toolBox.GetDIO(ref m_vacuum, this, "Vaccum On");
             p_sInfo = m_toolBox.GetDIO(ref m_vacuumOnOff, this, "Vaccum OnOff");
             p_sInfo = m_toolBox.GetDIO(ref m_homeExistWafer, this, "Home Wafer Exist");

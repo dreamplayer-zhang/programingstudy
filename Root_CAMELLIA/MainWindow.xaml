@@ -138,7 +138,7 @@
                         <RowDefinition/>
                         <RowDefinition/>
                     </Grid.RowDefinitions>
-                    <Border BorderBrush="White" BorderThickness="2,0,1,1" Margin="10,0,0,0">
+                    <Border BorderBrush="White" BorderThickness="2,0,1,1" Margin="10,0,0,0"> 
                         <TextBlock FontWeight="Bold" FontSize="16" Text="Comm State" FontFamily="consolas" TextAlignment="Center" VerticalAlignment="Center"/>
                     </Border>
                     <Border Grid.Row="1" BorderBrush="White" BorderThickness="2,1,1,0" Margin="10,0,0,0">
