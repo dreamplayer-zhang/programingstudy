@@ -23,6 +23,9 @@ namespace Root_CAMELLIA
         public const string RegNanoViewExceptNIR = "ExceptNIR";
         public const string RegNanoViewUseThickness = "Use Thickness"; 
         public const string RegLightSourcePath = "LightSourcePath";
+        public const string Dir_SequenceInitialPath = @"C:\Recipe\";
+        public const string Dir_InitialPath = @"C:\Recipe\CAMELLIA2";
+        public const string Dir_InitialLayerPath = @"C:\Recipe\LAYER\";
         public const string Dir_Preset = @"C:\Camellia\Preset\";
         public const string Dir_StageMap = @"C:\Camellia\StageMap\";
         public const string Dir_Recipe = @"C:\Camellia\Recipe\PRD\15Line\"; // 변경해야함

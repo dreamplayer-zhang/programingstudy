@@ -48,8 +48,12 @@
                     <ColumnDefinition/>
                 </Grid.ColumnDefinitions>
                 <Grid Grid.Column="0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="0.1*"/>
+                    </Grid.RowDefinitions>
                     <GroupBox Header="Slot" BorderThickness="0">
-                        <DataGrid ItemsSource="{Binding p_waferList}" Background="White" AutoGenerateColumns="False" CanUserAddRows="False" CanUserSortColumns="True" EnableColumnVirtualization="True"  CanUserDeleteRows="False" HorizontalScrollBarVisibility="Hidden"
+                        <DataGrid ItemsSource="{Binding p_waferList, UpdateSourceTrigger=PropertyChanged}" Background="White" AutoGenerateColumns="False" CanUserAddRows="False" CanUserSortColumns="True" EnableColumnVirtualization="True"  CanUserDeleteRows="False" HorizontalScrollBarVisibility="Hidden"
                              ScrollViewer.CanContentScroll="True" SelectionMode="Single" IsReadOnly="True" IsHitTestVisible="True" VirtualizingPanel.IsVirtualizing ="False"  local:CustomDataGrid.SelectingItem="{Binding p_dataSelectIndex, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                                   PreviewMouseDown="DataGrid_PreviewMouseDown" GridLinesVisibility="None" PreviewMouseRightButtonDown="DataGrid_PreviewMouseDown" PreviewMouseRightButtonUp="DataGrid_PreviewMouseDown">
                             <DataGrid.ItemContainerStyle>
@@ -101,7 +105,7 @@
                                     </DataGridTextColumn.ElementStyle>
 
                                 </DataGridTextColumn>
-                                <DataGridTextColumn Header="Wafer ID" Binding="{Binding p_waferId}" Width="3.5*" HeaderStyle="{StaticResource CustomColumnHeader}" CellStyle="{StaticResource CustomCellStyle}">
+                                <DataGridTextColumn Header="Wafer ID" Binding="{Binding p_waferId}" Width="2*" HeaderStyle="{StaticResource CustomColumnHeader}" CellStyle="{StaticResource CustomCellStyle}">
                                     <DataGridTextColumn.ElementStyle>
                                         <Style TargetType="TextBlock">
                                             <Setter Property="Background" Value="{Binding p_state, Converter={StaticResource DataGridColorConverter}, ConverterParameter=Background}"/>
@@ -111,7 +115,7 @@
                                         </Style>
                                     </DataGridTextColumn.ElementStyle>
                                 </DataGridTextColumn>
-                                <DataGridTextColumn Header="Recipe ID" Binding="{Binding p_recipeID}" Width="3.5*" HeaderStyle="{StaticResource CustomColumnHeader}" CellStyle="{StaticResource CustomCellStyle}">
+                                <DataGridTextColumn Header="Recipe ID" Binding="{Binding p_recipeID}" Width="4*" HeaderStyle="{StaticResource CustomColumnHeader}" CellStyle="{StaticResource CustomCellStyle}">
                                     <DataGridTextColumn.ElementStyle>
                                         <Style TargetType="TextBlock">
                                             <Setter Property="Background" Value="{Binding p_state, Converter={StaticResource DataGridColorConverter}, ConverterParameter=Background}"/>
@@ -121,7 +125,7 @@
                                         </Style>
                                     </DataGridTextColumn.ElementStyle>
                                 </DataGridTextColumn>
-                                <DataGridTextColumn Header="State" Binding="{Binding p_state}" Width="2*" HeaderStyle="{StaticResource CustomColumnHeader}">
+                                <DataGridTextColumn Header="State" Binding="{Binding p_state, UpdateSourceTrigger=PropertyChanged}" Width="2*" HeaderStyle="{StaticResource CustomColumnHeader}">
                                     <DataGridTextColumn.CellStyle>
                                         <Style TargetType="DataGridCell" BasedOn="{StaticResource {x:Type DataGridCell}}">
                                             <Setter Property="BorderBrush" Value="Black"/>
@@ -145,6 +149,11 @@
                             </i:EventTrigger>
                         </i:Interaction.Triggers>
                     </GroupBox>
+                    <Grid Grid.Row="2" Margin="5,0,5,3">
+                        <ProgressBar Style="{StaticResource CustomProgress}"/>
+                        <TextBlock Text="0%" VerticalAlignment="Center" Margin="10,0"/>
+                        <TextBlock Text="0 / 0" VerticalAlignment="Center" Margin="10,0" HorizontalAlignment="Right"/>
+                    </Grid>
                 </Grid>
                 <Grid Grid.Column="1">
                     <Grid.RowDefinitions>
@@ -154,24 +163,34 @@
                         <RowDefinition Height="3*"/>
                     </Grid.RowDefinitions>
                     <GroupBox Grid.Row="0" Header="Information" BorderThickness="0">
-                        <UniformGrid Columns="2" Margin="0,1">
-                            <TextBlock Text="Carrier ID" VerticalAlignment="Center" Margin="10,0"/>
-                            <Border  Background="#eeeeee" BorderThickness="1,1,1,0" CornerRadius="5" Margin="1">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="2*"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition/>
+                                <RowDefinition/>
+                                <RowDefinition/>
+                                <RowDefinition/>
+                            </Grid.RowDefinitions>
+                            <TextBlock Grid.Row="0" Grid.Column="0" Text="Carrier ID"  VerticalAlignment="Center" Margin="10,0"/>
+                            <Border  Grid.Row="0" Grid.Column="1" Background="#eeeeee" BorderThickness="1,1,1,0" CornerRadius="5" Margin="1">
                                 <TextBlock Text="{Binding p_infoCarrier.p_sCarrierID}" VerticalAlignment="Center" TextAlignment="Center"/>
                             </Border>
-                            <TextBlock Text="Lot ID" VerticalAlignment="Center" Margin="10,0"/>
-                            <Border Background="#eeeeee" BorderThickness="1,1,1,0" CornerRadius="5" Margin="1">
+                            <TextBlock  Grid.Row="1" Grid.Column="0" Text="Lot ID" VerticalAlignment="Center" Margin="10,0"/>
+                            <Border Grid.Row="1" Grid.Column="1" Background="#eeeeee" BorderThickness="1,1,1,0" CornerRadius="5" Margin="1">
                                 <TextBlock Text="{Binding p_infoCarrier.p_sLotID}" VerticalAlignment="Center" TextAlignment="Center"/>
                             </Border>
-                            <TextBlock Text="Recipe ID" VerticalAlignment="Center" Margin="10,0"/>
-                            <Border Background="#eeeeee" BorderThickness="1,1,1,0" CornerRadius="5" Margin="1">
-                                <TextBlock Text="{Binding p_infoCarrier.p_sRecipeID}" VerticalAlignment="Center" TextAlignment="Center"/>
+                            <TextBlock Grid.Row="2" Grid.Column="0" Text="Recipe ID" VerticalAlignment="Center" Margin="10,0"/>
+                            <Border Grid.Row="2" Grid.Column="1" Background="#eeeeee" BorderThickness="1,1,1,0" CornerRadius="5" Margin="1">
+                                <TextBlock Text="{Binding p_CurrentRecipeID, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center" TextAlignment="Center"/>
                             </Border>
-                            <TextBlock Text="Loadport State" VerticalAlignment="Center" Margin="10,0"/>
-                            <Border Background="#eeeeee" BorderThickness="1" CornerRadius="5" Margin="1">
+                            <TextBlock Grid.Row="3" Grid.Column="0" Text="Loadport State" VerticalAlignment="Center" Margin="10,0"/>
+                            <Border Grid.Row="3" Grid.Column="1" Background="#eeeeee" BorderThickness="1" CornerRadius="5" Margin="1">
                                 <TextBlock Text="{Binding p_infoCarrier.p_eState, Converter={StaticResource EnumConverter}}" VerticalAlignment="Center" TextAlignment="Center"/>
                             </Border>
-                        </UniformGrid>
+                        </Grid>
                     </GroupBox>
                     <GroupBox Grid.Row="1" Header="State" BorderThickness="0">
                         <Border BorderBrush="Gray" BorderThickness="1">
@@ -276,10 +295,17 @@
                         </Border>
                     </GroupBox>
                     <Grid Grid.Row="2" Margin="5,0,5,3">
-                            <ProgressBar Style="{StaticResource CustomProgress}"/>
-                            <TextBlock Text="0%" VerticalAlignment="Center" Margin="10,0"/>
-                            <TextBlock Text="0 / 0" VerticalAlignment="Center" Margin="10,0" HorizontalAlignment="Right"/>
-                     </Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="1.2*"/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+                        <Border Margin="5" VerticalAlignment="Center">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="Loadport State : " TextAlignment="Center"/>
+                                <TextBlock Text="Out of Service" TextAlignment="Center"/>
+                            </StackPanel>
+                        </Border>
+                    </Grid>
 
                     <Grid Grid.Row="3">
                         <Grid.RowDefinitions>
@@ -294,10 +320,10 @@
                                 <ColumnDefinition/>
                             </Grid.ColumnDefinitions>
                             <Grid Grid.Column="0">
-                                <Button Content="Manual" Style="{StaticResource customButton}" FontSize="15" Margin="3" FontWeight="Bold"/>
+                                <Button Content="Manual" Style="{StaticResource customButton}" Command="{Binding CmdOHTManual}" FontSize="15" Margin="3" FontWeight="Bold"/>
                             </Grid>
                             <Grid Grid.Column="1">
-                                <Button Content="Auto" Style="{StaticResource customButton}"  FontSize="15" Margin="3" FontWeight="Bold"/>
+                                <Button Content="Auto" Style="{StaticResource customButton}" Command="{Binding CmdOHTAuto}" FontSize="15" Margin="3" FontWeight="Bold"/>
                             </Grid>
                         </Grid>
                         <Grid Grid.Row="1">
@@ -306,10 +332,10 @@
                                 <ColumnDefinition/>
                             </Grid.ColumnDefinitions>
                             <Grid Grid.Column="0">
-                                <Button Content="In Service" Style="{StaticResource customButton}"  FontSize="15"  Margin="3" FontWeight="Bold"/>
+                                <Button Content="In Service" Style="{StaticResource customButton}"  FontSize="15"  Margin="3" FontWeight="Bold" Command="{Binding CmdInService}"/>
                             </Grid>
                             <Grid Grid.Column="1">
-                                <Button Content="Out Of Service" Style="{StaticResource customButton}"   FontSize="15"  Margin="3" FontWeight="Bold"/>
+                                <Button Content="Out Of Service" Style="{StaticResource customButton}"   FontSize="15"  Margin="3" FontWeight="Bold" Command="{Binding CmdOutOfService}"/>
                             </Grid>
                         </Grid>
                         <Grid Grid.Row="2">

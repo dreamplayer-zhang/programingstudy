@@ -266,6 +266,9 @@
     <Reference Include="ScottPlot.WPF, Version=4.0.39.0, Culture=neutral, PublicKeyToken=e53b06131e34a3aa, processorArchitecture=MSIL">
       <HintPath>..\packages\ScottPlot.WPF.4.0.39\lib\net472\ScottPlot.WPF.dll</HintPath>
     </Reference>
+    <Reference Include="SSLNet">
+      <HintPath>..\Lib\MarsLog\SSLNet.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Activities" />
     <Reference Include="System.Activities.Presentation" />
@@ -352,6 +355,10 @@
     <Compile Include="Control\ReviewGraph.xaml.cs">
       <DependentUpon>ReviewGraph.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Control\SequenceRecipe.xaml.cs">
+      <DependentUpon>SequenceRecipe.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Control\SequenceRecipe_ViewModel.cs" />
     <Compile Include="Control\StageViewControl.xaml.cs">
       <DependentUpon>StageViewControl.xaml</DependentUpon>
     </Compile>
@@ -388,6 +395,9 @@
       <DependentUpon>PMRGraph.xaml</DependentUpon>
     </Compile>
     <Compile Include="LibSR_Met\RTGraph.xaml.cs" />
+    <Compile Include="UI_Dialog\Dlg_ManualJob.xaml.cs">
+      <DependentUpon>Dlg_ManualJob.xaml</DependentUpon>
+    </Compile>
     <Compile Include="ModuleRun\Run_AutoFocus.cs" />
     <Compile Include="ModuleRun\Run_CalibrationWaferCentering.cs" />
     <Compile Include="ModuleRun\Run_Delay.cs" />
@@ -457,6 +467,7 @@
     <Compile Include="UI_UserControl\Loadport_ViewModel.cs" />
     <Compile Include="Utility\SplashScreenHelper.cs" />
     <Compile Include="ViewModel\Dlg_Login_ViewModel.cs" />
+    <Compile Include="ViewModel\Dlg_ManualJob_ViewModel.cs" />
     <Compile Include="ViewModel\Dlg_Recipe_ViewModel.cs" />
     <Compile Include="ViewModel\Dlg_Review_ViewModel.cs" />
     <Compile Include="ViewModel\Dlg_Setting_ViewModel.cs" />
@@ -554,6 +565,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Control\SequenceRecipe.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Control\StageViewControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -577,6 +592,10 @@
     <Page Include="LibSR_Met\RTGraph.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI_Dialog\Dlg_ManualJob.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UI_Dialog\Dlg_Recipe.xaml">
       <SubType>Designer</SubType>
@@ -819,6 +838,8 @@
 copy /Y "$(SolutionDir)SQLite\sqlite3.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\sqlite3.dll"
 copy /Y "$(SolutionDir)Lib\opencv_world347d.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\opencv_world347d.dll"
 copy /Y "$(SolutionDir)Lib\opencv_world347.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\opencv_world347.dll"
+copy /Y "$(SolutionDir)Lib\XGEM\XSmNet_M40_01_64.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\XSmNet_M40_01_64.dll"
+copy /Y "$(SolutionDir)Lib\MarsLog\SSL.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\SSL.dll"
 IF NOT EXIST "$(SolutionDir)$(ProjectName)\$(OutDir)\x64" (mkdir "$(SolutionDir)$(ProjectName)\$(OutDir)\x64")
 copy /Y "$(SolutionDir)Lib\EMGU.CV\x64\concrt140.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\x64\concrt140.dll"
 copy /Y "$(SolutionDir)Lib\EMGU.CV\x64\cvextern.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\x64\cvextern.dll"

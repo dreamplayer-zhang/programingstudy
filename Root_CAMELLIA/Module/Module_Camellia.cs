@@ -670,6 +670,7 @@ namespace Root_CAMELLIA.Module
 
         public string BeforeGet(int nID)
         {
+            //App.m_SSLoggerNet.WriteXFRLog(nID, SSLNet.XFR_EVENTID.GET, SSLNet.STATUS.START,);
             //m_CamVRS.FunctionConnect();
             string info = MoveReadyPos();
             if (info != "OK")
@@ -706,7 +707,7 @@ namespace Root_CAMELLIA.Module
         public string AfterGet(int nID)
         {
             // Make Directory
-           
+            //App.m_SSLoggerNet.WriteXFRLog(nID, SSLNet.XFR_EVENTID.GET, SSLNet.STATUS.END,);
             return "OK";
         }
 

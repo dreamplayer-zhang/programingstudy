@@ -42,7 +42,24 @@ namespace Root_CAMELLIA
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            return Enum.GetName(typeof(InfoCarrier.eState), value);
+            Type type = value.GetType();
+            if(type == typeof(RootTools.Gem.XGem.XGem.eControl))
+            {
+                string val = Enum.GetName(type, value);
+                if (val == "ONLINEREMOTE")
+                {
+                    return "Online Remote";
+                }
+                else if (val == "LOCAL")
+                {
+                    return "Online Local";
+                }
+                else
+                {
+                    return "Offline";
+                }
+            }
+            return Enum.GetName(type, value);
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -164,9 +165,24 @@ namespace Root_CAMELLIA
             }
         }
 
+        string m_CurrentRecipeID = "";
+        public string p_CurrentRecipeID
+        {
+            get
+            {
+                return m_CurrentRecipeID;
+            }
+            set
+            {
+                SetProperty(ref m_CurrentRecipeID, value);
+            }
+        }
+
+        Dlg_ManualJob_ViewModel manualJob_ViewModel;
+        DialogService dialogService;
         #endregion
 
-        public Loadport_ViewModel(int nIdx)
+        public Loadport_ViewModel(int nIdx, MainWindow_ViewModel main)
         {
             m_handler = App.m_engineer.m_handler;
             p_loadport = (Loadport_RND)m_handler.m_aLoadport[nIdx];
@@ -183,6 +199,9 @@ namespace Root_CAMELLIA
             {
                 p_loadport.p_infoCarrier.m_aGemSlot[i].StateChanged += StateChange;
             }
+
+            manualJob_ViewModel = main.ManualJobViewModel;
+            dialogService = main.dialogService;
         }
 
         #region Event
@@ -226,6 +245,54 @@ namespace Root_CAMELLIA
             }
         }
 
+        public ICommand CmdOHTManual
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    if (EQ.p_bSimulate)
+                        p_loadport.m_OHTNew.m_carrier.p_eAccessLP = GemCarrierBase.eAccessLP.Manual;
+                    p_loadport.m_OHTNew.m_carrier.p_eReqAccessLP = GemCarrierBase.eAccessLP.Manual;
+                });
+            }
+        }
+
+        public ICommand CmdOHTAuto
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    if (EQ.p_bSimulate)
+                        p_loadport.m_OHTNew.m_carrier.p_eAccessLP = GemCarrierBase.eAccessLP.Auto;
+                    p_loadport.m_OHTNew.m_carrier.p_eReqAccessLP = GemCarrierBase.eAccessLP.Auto;
+                });
+            }
+        }
+
+        public ICommand CmdInService
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    //p_infoCarrier.p_eReqTransfer = GemCarrierBase.eTransfer.OutOfService;
+                });
+            }
+        }
+
+        public ICommand CmdOutOfService
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    p_infoCarrier.p_eReqTransfer = GemCarrierBase.eTransfer.OutOfService;
+                });
+            }
+        }
+
         #endregion
 
         #region Function
@@ -245,41 +312,73 @@ namespace Root_CAMELLIA
             switch (p_loadport.p_eState)
             {
                 case ModuleBase.eState.Ready:
-                    //m_loadport.p_infoCarrier.p_eState = InfoCarrier.eState.Dock;
-                    if (EQ.p_bRecovery == false)
+                    if (!EQ.p_bRecovery)
                     {
                         p_infoCarrier = p_loadport.p_infoCarrier;
-                        ManualJobSchedule manualJobSchedule = new ManualJobSchedule(p_infoCarrier);
                         p_waferList.Clear();
+                        p_CurrentRecipeID = "";
                         p_dataSelectIndex = 0;
-                        if (!manualJobSchedule.ShowPopup())
+
+                        var viewModel = manualJob_ViewModel;
+                        viewModel.InitData(p_infoCarrier);
+                        var dialog = dialogService.GetDialog(viewModel) as Dlg_ManualJob;
+                        Nullable<bool> result = dialog.ShowDialog();
+
+                        int firstIdx = 0;
+                        if (result.HasValue)
                         {
-                            p_loadport.StartRun(p_loadport.GetModuleRunUndocking().Clone());
-                            return;
-                        }
-                        //p_waferList = new ObservableCollection<InfoWafer>(infoCarrier.m_aInfoWafer.ToList());
-                        StopWatch sw = new StopWatch();
-                        sw.Start();
-                        int idx = 1;
-                        ObservableCollection<DataGridWaferInfo> temp = new ObservableCollection<DataGridWaferInfo>();
-                        
-                        foreach (InfoWafer val in p_infoCarrier.m_aGemSlot)
-                        {
-                            if (val != null)
+                            if (!result.Value)
                             {
-                                temp.Insert(0, new DataGridWaferInfo(idx++, val.p_sWaferID, val.p_sRecipe, val.p_eState));
-                                //object[] obj = { val.m_nSlot, val.p_sWaferID, val.p_sRecipe, val.p_eState };
-                                //datagridSlot.Items.Add(obj);
+                                p_loadport.StartRun(p_loadport.GetModuleRunUndocking().Clone());
+                                return;
+                            }
+                            else
+                            {
+                                int idx = 1;
+                                ObservableCollection<DataGridWaferInfo> temp = new ObservableCollection<DataGridWaferInfo>();
+
+                                foreach (InfoWafer val in p_infoCarrier.m_aGemSlot)
+                                {
+                                    if (val != null)
+                                    {
+                                        temp.Insert(0, new DataGridWaferInfo(idx++, val.p_sWaferID, val.p_sRecipe, val.p_eState));
+                                        if(p_CurrentRecipeID == "" && val.p_sRecipe != "")
+                                        {
+                                            p_CurrentRecipeID = val.p_sRecipe.Replace(Path.GetExtension(val.p_sRecipe), "");
+                                            firstIdx = idx;
+                                        }
+                                        //object[] obj = { val.m_nSlot, val.p_sWaferID, val.p_sRecipe, val.p_eState };
+                                        //datagridSlot.Items.Add(obj);
+                                    }
+                                }
+                                p_waferList = temp;
+
+                                p_dataSelectIndex = 24 - firstIdx;
                             }
                         }
-                        p_waferList = temp;
-
-                        p_dataSelectIndex = temp.Count - 1;
-                        sw.Stop();
-                        System.Diagnostics.Debug.WriteLine(sw.ElapsedMilliseconds);
                     }
-                    
-                 
+                   
+
+                    //if (EQ.p_bRecovery == false)
+                    //{
+                    //    p_infoCarrier = p_loadport.p_infoCarrier;
+                    //    ManualJobSchedule manualJobSchedule = new ManualJobSchedule(p_infoCarrier);
+                    //    p_waferList.Clear();
+                    //    p_dataSelectIndex = 0;
+                    //    if (!manualJobSchedule.ShowPopup())
+                    //    {
+                    //        p_loadport.StartRun(p_loadport.GetModuleRunUndocking().Clone());
+                    //        return;
+                    //    }
+                    //    //p_waferList = new ObservableCollection<InfoWafer>(infoCarrier.m_aInfoWafer.ToList());
+                    //    StopWatch sw = new StopWatch();
+                    //    sw.Start();
+                       
+                    //    sw.Stop();
+                    //    System.Diagnostics.Debug.WriteLine(sw.ElapsedMilliseconds);
+                    //}
+
+
                     //EQ.p_nRnR = 0;
                     EQ.p_eState = EQ.eState.Run;
                     break;
@@ -307,14 +406,12 @@ namespace Root_CAMELLIA
         {
             bool bReadyLoadport = (p_loadport.p_eState == ModuleBase.eState.Ready);
             bool bReadyToLoad = (p_loadport.p_infoCarrier.p_eTransfer == GemCarrierBase.eTransfer.ReadyToLoad);
-            bReadyToLoad = true;
+            //bReadyToLoad = true;
             bool bReadyState = (p_loadport.m_qModuleRun.Count == 0);
             bool bEQReadyState = (EQ.p_eState == EQ.eState.Ready);
             //if (m_loadport.p_infoCarrier.p_eState != InfoCarrier.eState.Placed) return false;
             bool bPlaced = p_loadport.CheckPlaced();
-
             if (m_handler.IsEnableRecovery() == true) return false;
-            //return true;
             return bReadyLoadport && bReadyToLoad && bReadyState && bEQReadyState && bPlaced;
         }
 
@@ -342,7 +439,7 @@ namespace Root_CAMELLIA
             p_isEnableUnload = IsEnableUnloadReq();
         }
 
-        #endregion
+#endregion
 
         public class DataGridWaferInfo : ObservableObject
         {
@@ -351,7 +448,11 @@ namespace Root_CAMELLIA
             {
                 p_Index = idx;
                 p_waferId = waferID;
-                p_recipeID = recipeID;
+                if (recipeID != "")
+                    p_recipeID = recipeID.Replace(Path.GetExtension(recipeID), "");
+                else
+                    p_recipeID = recipeID;
+
                 p_state = state;
             }
 

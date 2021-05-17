@@ -23,6 +23,8 @@
         <local:PathConverter x:Key="PathConverter"/>
         <local:BoolConverter x:Key="BoolConverter"/>
         <local:MapModeToBoolConverter x:Key="ModeConverter"/>
+
+
     </UserControl.Resources>
     <Grid>
         <Grid.RowDefinitions>
@@ -38,7 +40,7 @@
             <MenuItem x:Name="RecipeSave" Header="Save" Command="{Binding CmdRecipeSave}"/>
             <MenuItem x:Name="RecipeSaveAs" Header="Save As" Command="{Binding CmdRecipeSaveAs}"/>
         </Menu>-->
-        <Grid Grid.Row="1" Background="{DynamicResource ControlBackGround}" Grid.ColumnSpan="2" Height="25">
+        <!--<Grid Grid.Row="1" Background="{DynamicResource ControlBackGround}" Grid.ColumnSpan="2" Height="25">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="230"/>
                 <ColumnDefinition/>
@@ -50,7 +52,7 @@
                 <Button BorderBrush="{x:Null}" BorderThickness="0" Content="Save" Command="{Binding CmdRecipeSave}" IsEnabled="{Binding p_isCustomize, Converter={StaticResource BoolConverter}}"/>
                 <Button BorderBrush="{x:Null}" BorderThickness="0" Content="Save As" Command="{Binding CmdRecipeSaveAs}" IsEnabled="{Binding p_isCustomize, Converter={StaticResource BoolConverter}}"/>
             </UniformGrid>
-        </Grid>
+        </Grid>-->
 
         <Grid Grid.Row="2">
             <Grid.ColumnDefinitions>
@@ -125,7 +127,8 @@
                             <RowDefinition Height="0.3*"/>
                         </Grid.RowDefinitions>
                         <DataGrid Margin="2" AutoGenerateColumns="False" CanUserAddRows="False" CanUserSortColumns="False" EnableColumnVirtualization="True" CanUserDeleteRows="False"
-                                  EnableRowVirtualization="True" ScrollViewer.CanContentScroll="True" SelectionMode="Single" ItemsSource="{Binding GridLayerData}"
+                                  EnableRowVirtualization="True" ScrollViewer.CanContentScroll="True" SelectionMode="Single" ItemsSource="{Binding GridLayerData}" VirtualizingPanel.IsVirtualizing="True"
+                                  VirtualizingPanel.VirtualizationMode="Recycling" 
                                   SelectedIndex="{Binding GridLayerIndex}" IsEnabled="{Binding p_UseThickness}">
                             <DataGrid.Columns>
                                 <DataGridTextColumn Header="" Width="40" Binding="{Binding LayerHeader}" IsReadOnly="True" Foreground="Blue" FontWeight="ExtraBold"/>
@@ -363,14 +366,33 @@
                                         <TextBlock Grid.Row="0" Text="Reflectance" TextAlignment="Center" Margin="0,2"/>
                                     </Border>
                                 </Grid>
-                                <DataGrid Grid.Row="1" ItemsSource="{Binding ReflectanceListItem}" AutoGenerateColumns="False" CanUserAddRows="False" CanUserSortColumns="True" EnableColumnVirtualization="True"  CanUserDeleteRows="False"
+                                <ListView Grid.Row="1" ItemsSource="{Binding ReflectanceListItem}" SelectedIndex="{Binding ReflectanceSelectedIndex}" SelectionMode="Single"
+                                          ScrollViewer.CanContentScroll="True"  ScrollViewer.HorizontalScrollBarVisibility="Hidden">
+                                    <ListView.ItemContainerStyle>
+                                        <Style TargetType="ListViewItem">
+                                            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                                            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                                            <Setter Property="Height" Value="20"/>
+                                            <Setter Property="BorderBrush" Value="Gray"></Setter>
+                                            <Setter Property="BorderThickness" Value="0,0,0,1"></Setter>
+                                        </Style>
+                                    </ListView.ItemContainerStyle>
+                                    <ListView.View>
+                                        <GridView AllowsColumnReorder="False">
+                                            <GridViewColumn Width="54" Header="Wave" DisplayMemberBinding="{Binding p_waveLength}"/>
+                                            <GridViewColumn Width="54" Header="Scale" DisplayMemberBinding="{Binding p_scale}"/>
+                                            <GridViewColumn Width="54" Header="Offset" DisplayMemberBinding="{Binding p_offset}"/>
+                                        </GridView>
+                                    </ListView.View>
+                                </ListView>
+                                <!--<DataGrid Grid.Row="1" ItemsSource="{Binding ReflectanceListItem}" AutoGenerateColumns="False" CanUserAddRows="False" CanUserSortColumns="True" EnableColumnVirtualization="True"  CanUserDeleteRows="False"
                                   EnableRowVirtualization="True" ScrollViewer.CanContentScroll="True" SelectionMode="Single" SelectedIndex="{Binding ReflectanceSelectedIndex}">
                                     <DataGrid.Columns>
                                         <DataGridTextColumn Header="Wave" Width="*" Binding="{Binding p_waveLength}" IsReadOnly="True"/>
                                         <DataGridTextColumn Header="Scale" Width="*" Binding="{Binding p_scale}" IsReadOnly="True"/>
                                         <DataGridTextColumn Header="Offset" Width="*" Binding="{Binding p_offset}" IsReadOnly="True"/>
                                     </DataGrid.Columns>
-                                </DataGrid>
+                                </DataGrid>-->
                             </Grid>
                         </Grid>
                         <Grid Grid.Column="1" Margin="5">
@@ -387,14 +409,33 @@
                                         <TextBlock Grid.Row="0" Text="Transmittance" VerticalAlignment="Top" HorizontalAlignment="Center" Margin="0,2"/>
                                     </Border>
                                 </Grid>
-                                <DataGrid Grid.Row="1" ItemsSource="{Binding TransmittanceListItem}" AutoGenerateColumns="False" CanUserAddRows="False" CanUserSortColumns="True" EnableColumnVirtualization="True"  CanUserDeleteRows="False"
+                                <ListView Grid.Row="1" ItemsSource="{Binding TransmittanceListItem}" SelectedIndex="{Binding TransmittanceSelectedIndex}" SelectionMode="Single"
+                                          ScrollViewer.CanContentScroll="True" ScrollViewer.HorizontalScrollBarVisibility="Hidden">
+                                    <ListView.ItemContainerStyle>
+                                        <Style TargetType="ListViewItem">
+                                            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                                            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                                            <Setter Property="Height" Value="20"/>
+                                            <Setter Property="BorderBrush" Value="Gray"></Setter>
+                                            <Setter Property="BorderThickness" Value="0,0,0,1"></Setter>
+                                        </Style>
+                                    </ListView.ItemContainerStyle>
+                                    <ListView.View>
+                                        <GridView AllowsColumnReorder="False">
+                                            <GridViewColumn Width="54" Header="Wave" DisplayMemberBinding="{Binding p_waveLength}"/>
+                                            <GridViewColumn Width="54" Header="Scale" DisplayMemberBinding="{Binding p_scale}"/>
+                                            <GridViewColumn Width="54" Header="Offset" DisplayMemberBinding="{Binding p_offset}"/>
+                                        </GridView>
+                                    </ListView.View>
+                                </ListView>
+                                <!--<DataGrid Grid.Row="1" ItemsSource="{Binding TransmittanceListItem}" AutoGenerateColumns="False" CanUserAddRows="False" CanUserSortColumns="True" EnableColumnVirtualization="True"  CanUserDeleteRows="False"
                                   EnableRowVirtualization="True" ScrollViewer.CanContentScroll="True" SelectionMode="Single" SelectedIndex="{Binding TransmittanceSelectedIndex}">
                                     <DataGrid.Columns>
                                         <DataGridTextColumn Header="Wave" Width="*" Binding="{Binding p_waveLength}" IsReadOnly="True"/>
                                         <DataGridTextColumn Header="Scale" Width="*" Binding="{Binding p_scale}" IsReadOnly="True"/>
                                         <DataGridTextColumn Header="Offset" Width="*" Binding="{Binding p_offset}" IsReadOnly="True"/>
                                     </DataGrid.Columns>
-                                </DataGrid>
+                                </DataGrid>-->
                             </Grid>
                         </Grid>
                         <Grid Grid.Column="2" Margin="5">
@@ -752,7 +793,26 @@
                                         <TextBlock Text=":" VerticalAlignment="Center" HorizontalAlignment="Left"/>
                                         <TextBlock Text="{Binding PointCount}" VerticalAlignment="Center" HorizontalAlignment="Left"/>
                                     </UniformGrid>
-                                    <DataGrid Grid.Row="1" ItemsSource="{Binding PointListItem}" AutoGenerateColumns="False" CanUserAddRows="False" CanUserSortColumns="True" EnableColumnVirtualization="True"  CanUserDeleteRows="False"
+                                    <ListView Grid.Row="1" ItemsSource="{Binding PointListItem}">
+                                        <ListView.ItemContainerStyle>
+                                            <Style TargetType="ListViewItem">
+                                                <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                                                <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                                                <Setter Property="Height" Value="20"/>
+                                                <Setter Property="BorderBrush" Value="Gray"></Setter>
+                                                <Setter Property="BorderThickness" Value="0,0,0,1"></Setter>
+                                            </Style>
+                                        </ListView.ItemContainerStyle>
+                                        <ListView.View >
+                                            <GridView AllowsColumnReorder="False">
+                                                <GridViewColumn Width="80" Header="Index"  DisplayMemberBinding="{Binding ListIndex}"/>
+                                                <GridViewColumn Width="110" Header="X (mm)" DisplayMemberBinding="{Binding ListX}"/>
+                                                <GridViewColumn Width="110" Header="Y (mm)" DisplayMemberBinding="{Binding ListY}"/>
+                                                <GridViewColumn Width="110" Header="Route" DisplayMemberBinding="{Binding ListRoute}"/>
+                                            </GridView>
+                                        </ListView.View>
+                                    </ListView>
+                                    <!--<DataGrid Grid.Row="1" ItemsSource="{Binding PointListItem}" AutoGenerateColumns="False" CanUserAddRows="False" CanUserSortColumns="True" EnableColumnVirtualization="True"  CanUserDeleteRows="False"
                                   EnableRowVirtualization="True" ScrollViewer.CanContentScroll="True" SelectionMode="Single"
                                   VirtualizingStackPanel.VirtualizationMode ="Recycling" >
                                         <DataGrid.Columns>
@@ -761,7 +821,7 @@
                                             <DataGridTextColumn Header="Y (mm)" Width="*" Binding="{Binding ListY}" IsReadOnly="True"/>
                                             <DataGridTextColumn Header="Route" Width="*" Binding="{Binding ListRoute}" IsReadOnly="True"/>
                                         </DataGrid.Columns>
-                                    </DataGrid>
+                                    </DataGrid>-->
                                     <Grid Grid.Row="2" Grid.Column="3">
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition/>
@@ -1044,6 +1104,6 @@
             </Grid>
 
         </Grid>
-
+        <!--<local:LoadingControl x:Name="LoadingCtrl" Width="300" Height="300" Grid.Row="2" Opacity="0.0"/>-->
     </Grid>
 </UserControl>

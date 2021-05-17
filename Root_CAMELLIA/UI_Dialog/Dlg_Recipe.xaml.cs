@@ -23,7 +23,6 @@ namespace Root_CAMELLIA
         public Dlg_Recipe()
         {
             InitializeComponent();
-            this.SizeToContent = SizeToContent.Manual;
         }
 
         private void TitleBar_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)

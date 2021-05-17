@@ -220,11 +220,13 @@ namespace Root_EFEM.Module
 
         public string AfterGet(int nID)
         {
+            p_infoCarrier.m_aGemSlot[nID].p_eState = GemSlotBase.eState.Run;
             return IsRunOK();
         }
 
         public string AfterPut(int nID)
         {
+            p_infoCarrier.m_aGemSlot[nID].p_eState = GemSlotBase.eState.Done;
             return IsRunOK();
         }
 

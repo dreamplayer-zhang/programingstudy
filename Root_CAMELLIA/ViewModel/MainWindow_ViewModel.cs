@@ -18,6 +18,9 @@ using Emgu.CV;
 using System.Threading;
 using Emgu.CV.Structure;
 using System.Data;
+using System.Collections.Generic;
+using RootTools.Gem;
+using RootTools.Gem.XGem;
 
 namespace Root_CAMELLIA
 {
@@ -170,14 +173,40 @@ namespace Root_CAMELLIA
             }
         }
 
+        private string m_LoadRecipe = "";
+        public string p_LoadRecipe
+        {
+            get
+            {
+                return m_LoadRecipe;
+            }
+            set
+            {
+                SetProperty(ref m_LoadRecipe,value);
+            }
+        }
+
+        MainViewRecipeData m_mainRecipeData = new MainViewRecipeData();
+        public MainViewRecipeData p_mainRecipeData
+        {
+            get
+            {
+                return m_mainRecipeData;
+            }
+            set
+            {
+                SetProperty(ref m_mainRecipeData, value);
+            }
+        }
+
         public MainWindow_ViewModel(MainWindow mainwindow)
         {
             m_MainWindow = mainwindow;
 
             Init();
        
-            ViewModelInit();
             DialogInit(mainwindow);
+            ViewModelInit();
             
             Run_Measure measure = (Run_Measure)p_Module_Camellia.CloneModuleRun("Measure");
             
@@ -197,8 +226,55 @@ namespace Root_CAMELLIA
 
 
             p_Module_Camellia.p_CamVRS.Captured += GetImage;
+            DataManager.Instance.recipeDM.RecipeLoaded += RecipeLoadDone;
+
+            //((XGem)p_XGem).p_eComm;
+            p_XGem = (XGem)App.m_engineer.ClassGem();
         }
 
+        XGem m_XGem;
+        public XGem p_XGem
+        {
+            get
+            {
+                return m_XGem;
+            }
+            set
+            {
+                SetProperty(ref m_XGem, value);
+            }
+        }
+
+        private void RecipeLoadDone(object sender, EventArgs e)
+        {
+            p_DrawCandidatePointElement = RecipeViewModel.GetCandidatePoint();
+            PointListItem = RecipeViewModel.GetPointListItem();
+            PointCount = PointListItem.Rows.Count.ToString();
+
+            p_DrawPointElement = RecipeViewModel.GetPoint();
+            DrawMeasureRoute();
+
+            p_LoadRecipe = DataManager.recipeDM.LoadRecipeName;
+
+            p_mainRecipeData = SetRecipeData();
+        }
+
+        MainViewRecipeData SetRecipeData()
+        {
+            MainViewRecipeData tempData = new MainViewRecipeData();
+            RecipeData measurementRD = DataManager.recipeDM.MeasurementRD;
+            tempData.p_dampingFactor = measurementRD.DampingFactor.ToString();
+            tempData.p_lowerWaveLength = measurementRD.LowerWaveLength;
+            tempData.p_upperWaveLength = measurementRD.UpperWaveLength;
+            tempData.p_useThickness = measurementRD.UseThickness;
+            tempData.p_useThickness = measurementRD.UseTransmittance;
+            tempData.p_VISIntegrationTime = measurementRD.VISIntegrationTime.ToString();
+            tempData.p_NIRIntegrationTime = measurementRD.NIRIntegrationTime.ToString();
+            tempData.p_reflectanceListItem = measurementRD.WaveLengthReflectance;
+            tempData.p_transmittanceListItem = measurementRD.WaveLengthTransmittance;
+            tempData.p_thicknessLMIteration = measurementRD.LMIteration;
+            return tempData;
+        }
         private void GetImage(object obj, EventArgs e)
         {
             Application.Current.Dispatcher.Invoke(() =>
@@ -688,14 +764,15 @@ namespace Root_CAMELLIA
         {
             EngineerViewModel = new Dlg_Engineer_ViewModel(this);
             SettingViewModel = new Dlg_Setting_ViewModel(this);
-            RecipeViewModel = new Dlg_RecipeManager_ViewModel(this);   
+            RecipeViewModel = new Dlg_RecipeManager_ViewModel(this);
+            SequenceViewModel = new SequenceRecipe_ViewModel(this);
             PMViewModel = new Dlg_PM_ViewModel(this);
             ReviewViewModel = new Dlg_Review_ViewModel(this);
             LoginViewModel = new Dlg_Login_ViewModel(this);
             RecipeCreatorViewModel = new Dlg_Recipe_ViewModel(this);
-            loadportA_ViewModel = new Loadport_ViewModel(0);
-            loadportB_ViewModel = new Loadport_ViewModel(1);
-             
+            ManualJobViewModel = new Dlg_ManualJob_ViewModel();
+            loadportA_ViewModel = new Loadport_ViewModel(0, this);
+            loadportB_ViewModel = new Loadport_ViewModel(1, this);
             //StageMapViewModel = new Dlg_StageMapSetting_ViewModel(this);
         }
 
@@ -709,6 +786,7 @@ namespace Root_CAMELLIA
             dialogService.Register<Dlg_Review_ViewModel, Dlg_Review>();
             dialogService.Register<Dlg_Login_ViewModel, Dlg_Login>();
             dialogService.Register<Dlg_Recipe_ViewModel, Dlg_Recipe>();
+            dialogService.Register<Dlg_ManualJob_ViewModel, Dlg_ManualJob>();
         }
 
         private void DrawMeasureRoute()
@@ -720,8 +798,8 @@ namespace Root_CAMELLIA
             {
                 ShapeManager dataRoute = new ShapeArrowLine(RouteBrush, 8);
                 ShapeArrowLine arrowLine = dataRoute as ShapeArrowLine;
-                CCircle from = DataManager.recipeDM.MeasurementRD.DataSelectedPoint[DataManager.recipeDM.TeachingRD.DataMeasurementRoute[i]];
-                CCircle to = DataManager.recipeDM.MeasurementRD.DataSelectedPoint[DataManager.recipeDM.TeachingRD.DataMeasurementRoute[i + 1]];
+                CCircle from = DataManager.recipeDM.MeasurementRD.DataSelectedPoint[DataManager.recipeDM.MeasurementRD.DataMeasurementRoute[i]];
+                CCircle to = DataManager.recipeDM.MeasurementRD.DataSelectedPoint[DataManager.recipeDM.MeasurementRD.DataMeasurementRoute[i + 1]];
 
                 from.Transform(RatioX, RatioY);
                 to.Transform(RatioX, RatioY);
@@ -738,9 +816,10 @@ namespace Root_CAMELLIA
         public Dlg_PM_ViewModel PMViewModel;
         public Dlg_Setting_ViewModel SettingViewModel;
         public Dlg_Engineer_ViewModel EngineerViewModel;
+        public SequenceRecipe_ViewModel SequenceViewModel;
         public Dlg_Review_ViewModel ReviewViewModel;
         public Dlg_Login_ViewModel LoginViewModel;
-        public Dlg_Recipe_ViewModel RecipeCreatorViewModel;
+        public Dlg_ManualJob_ViewModel ManualJobViewModel;
         Loadport_ViewModel _loadportA_ViewModel;
         public Loadport_ViewModel loadportA_ViewModel
         {
@@ -767,7 +846,19 @@ namespace Root_CAMELLIA
         }
 
 
+        public Dlg_Recipe_ViewModel RecipeCreatorViewModel
+        {
+            get
+            {
+                return _RecipeCreatorViewModel;
+            }
+            set
+            {
+                SetProperty(ref _RecipeCreatorViewModel, value);
+            }
+        }
 
+        Dlg_Recipe_ViewModel _RecipeCreatorViewModel;
         public Dlg_RecipeManager_ViewModel RecipeViewModel
         {
             get
@@ -783,7 +874,7 @@ namespace Root_CAMELLIA
         #endregion
 
         #region Dialog
-        DialogService dialogService;
+        public DialogService dialogService;
         #endregion
 
         #region Timer
@@ -916,16 +1007,59 @@ namespace Root_CAMELLIA
                 SetProperty(ref _PointCount, value);
             }
         }
+
+        public bool RecipeOpen { get; set; } = false;
         #endregion
 
         #region ICommand
+        public ICommand CmdOffline
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    m_XGem.p_eReqControl = XGem.eControl.OFFLINE;
+                });
+            }
+        }
+
+        public ICommand CmdOnlineRemote
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    m_XGem.p_eReqControl = XGem.eControl.ONLINEREMOTE;
+                });
+            }
+        }
+
+        public ICommand CmdOnlineLocal
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    m_XGem.p_eReqControl = XGem.eControl.LOCAL;
+                });
+            }
+        }
+
         public ICommand CmdEngineerTest
         {
             get
             {
                 return new RelayCommand(() =>
                 {
-                    loadportA_ViewModel.p_loadport.p_infoCarrier.m_aGemSlot[23].p_eState = RootTools.Gem.GemSlotBase.eState.Run;
+                    if (DataManager.recipeDM.RecipeLoad(@"C:\Recipe\CAMELLIA2\테스트7\테스트7.aco", true))
+                    {
+                        //if(DataManager.Instance.recipeDM.LoadRecipeName != "")
+                        //{
+                       
+                        //}
+                    }
+
+                    //loadportA_ViewModel.p_loadport.p_infoCarrier.m_aGemSlot[23].p_eState = RootTools.Gem.GemSlotBase.eState.Run;
                     //loadportA_ViewModel.p_waferList[1].p_state = RootTools.Gem.GemSlotBase.eState.Done;
                     //Module_FFU.Unit.Fan fan = FFUListItems[1].Unit as Module_FFU.Unit.Fan;
                     //fan.p_nRPM = 1000;
@@ -939,8 +1073,10 @@ namespace Root_CAMELLIA
             {
                 return new RelayCommand(() =>
                 {
-                    if (RecipeViewModel.dataManager.recipeDM.RecipeOpen())
+                    if (RecipeCreatorViewModel.RecipeLoad())
                     {
+
+                        // MeasurementRD꺼 그려야함.
                         RecipeViewModel.UpdateListView(true);
                         try
                         {
@@ -951,6 +1087,9 @@ namespace Root_CAMELLIA
 
                         }
                         RecipeViewModel.UpdateView(true);
+
+                        RecipeOpen = true;
+
                         p_DrawCandidatePointElement = new ObservableCollection<UIElement>(RecipeViewModel.p_DrawCandidatePointElement);
                         p_DrawPointElement = new ObservableCollection<UIElement>(RecipeViewModel.p_DrawPointElement);
                         //PointListItem = RecipeViewModel.PointListItem;
@@ -958,7 +1097,32 @@ namespace Root_CAMELLIA
                         PointCount = RecipeViewModel.PointCount;
                         DrawMeasureRoute();
                         p_Progress = 0;
+
+                        p_LoadRecipe = DataManager.recipeDM.LoadRecipeName;
                     }
+                    //if (RecipeViewModel.dataManager.recipeDM.RecipeOpen())
+                    //{
+                    //    RecipeViewModel.UpdateListView(true);
+                    //    try
+                    //    {
+                    //        RecipeViewModel.UpdateLayerGridView();
+                    //    }
+                    //    catch
+                    //    {
+
+                    //    }
+                    //    RecipeViewModel.UpdateView(true);
+
+                    //    RecipeOpen = true;
+
+                    //    p_DrawCandidatePointElement = new ObservableCollection<UIElement>(RecipeViewModel.p_DrawCandidatePointElement);
+                    //    p_DrawPointElement = new ObservableCollection<UIElement>(RecipeViewModel.p_DrawPointElement);
+                    //    //PointListItem = RecipeViewModel.PointListItem;
+                    //    PointListItem = RecipeViewModel.PointListItem.Copy();
+                    //    PointCount = RecipeViewModel.PointCount;
+                    //    DrawMeasureRoute();
+                    //    p_Progress = 0;
+                    //}
 
                 });
             }
@@ -976,54 +1140,67 @@ namespace Root_CAMELLIA
                     //}
 
                     bool isRecipeLoad = false;
-                    if (DataManager.Instance.recipeDM.TeachRecipeName != "")
+                    if (DataManager.Instance.recipeDM.LoadRecipeName != "")
                     {
                         isRecipeLoad = true;
                     }
                     RecipeViewModel.UpdateListView(isRecipeLoad);
                     RecipeViewModel.UpdateView(isRecipeLoad, true);
-                    var viewModel = new Dlg_Recipe_ViewModel(this);
+                    var viewModel = RecipeCreatorViewModel;
                     var dialog = dialogService.GetDialog(viewModel) as Dlg_Recipe;
                     Nullable<bool> result = dialog.ShowDialog();
+
+
+                    // MeasurementRD 꺼 가져와서 그려야함.
+
+                    //if(DataManager.Instance.recipeDM.LoadRecipeName != "")
+                    //{
+                    //    p_DrawCandidatePointElement = RecipeViewModel.GetCandidatePoint();
+                    //    PointListItem = RecipeViewModel.GetPointListItem();
+                    //    PointCount = PointListItem.Rows.Count.ToString();
+
+                    //    p_DrawPointElement = RecipeViewModel.GetPoint();
+                    //    DrawMeasureRoute();
+
+                    //    p_LoadRecipe = DataManager.recipeDM.LoadRecipeName;
+                    //}
                    
-                    //var viewModel = new Dlg_RecipeManager_ViewModel(this);
-                    ////viewModel.dataManager = RecipeViewModel.dataManager;
-                   
-                    
-                    //Nullable<bool> result = dialogService.ShowDialog(RecipeViewModel);
 
-                    isRecipeLoad = false;
-                    if (DataManager.Instance.recipeDM.TeachRecipeName != "")
-                    {
-                        isRecipeLoad = true;
-                    }
 
-                    if (!isRecipeLoad)
-                        RecipeViewModel.ClearData();
 
-                    if (RecipeViewModel.p_isCustomize)
-                    {
-                        RecipeViewModel.p_isCustomize = false;
-                    }
-                    RecipeViewModel.UpdateListView(isRecipeLoad);
-                    try
-                    {
-                        RecipeViewModel.UpdateLayerGridView();
-                    }
-                    catch
-                    {
 
-                    }
-                    RecipeViewModel.UpdateView(isRecipeLoad, true);
+                    //isRecipeLoad = false;
+                    //if (DataManager.Instance.recipeDM.LoadRecipeName != "")
+                    //{
+                    //    isRecipeLoad = true;
+                    //}
 
-                    if (isRecipeLoad)
-                    {
-                        p_DrawCandidatePointElement = new ObservableCollection<UIElement>(RecipeViewModel.p_DrawCandidatePointElement);
-                        PointListItem = RecipeViewModel.PointListItem.Copy();
-                        PointCount = RecipeViewModel.PointCount;
-                    }
-                    p_DrawPointElement = new ObservableCollection<UIElement>(RecipeViewModel.p_DrawPointElement);
-                    DrawMeasureRoute();
+                    //if (!isRecipeLoad)
+                    //    RecipeViewModel.ClearData();
+
+                    //if (RecipeViewModel.p_isCustomize)
+                    //{
+                    //    RecipeViewModel.p_isCustomize = false;
+                    //}
+                    //RecipeViewModel.UpdateListView(isRecipeLoad);
+                    //try
+                    //{
+                    //    RecipeViewModel.UpdateLayerGridView();
+                    //}
+                    //catch
+                    //{
+
+                    //}
+                    //RecipeViewModel.UpdateView(isRecipeLoad, true);
+
+                    //if (isRecipeLoad)
+                    //{
+                    //    p_DrawCandidatePointElement = new ObservableCollection<UIElement>(RecipeViewModel.p_DrawCandidatePointElement);
+                    //    PointListItem = RecipeViewModel.PointListItem.Copy();
+                    //    PointCount = RecipeViewModel.PointCount;
+                    //}
+                    //p_DrawPointElement = new ObservableCollection<UIElement>(RecipeViewModel.p_DrawPointElement);
+                    //DrawMeasureRoute();
 
                 });
             }
@@ -1477,8 +1654,21 @@ namespace Root_CAMELLIA
                 SetProperty(ref m_rowIndex, value);
                 RaisePropertyChanged("p_rowIndex");
             }
-        }
+        }        
+    }
 
-        
+    public class MainViewRecipeData : ObservableObject
+    {
+        //public List<ModelData.LayerData> p_gridLayerData { get; set; }
+        public bool p_useThickness { get; set; }
+        public bool p_useTransmittance { get; set; }
+        public string p_VISIntegrationTime { get; set; }
+        public string p_NIRIntegrationTime { get; set; }
+        public List<WavelengthItem> p_reflectanceListItem { get; set; }
+        public List<WavelengthItem> p_transmittanceListItem { get; set; }
+        public float p_lowerWaveLength { get; set; }
+        public float p_upperWaveLength { get; set; }
+        public int p_thicknessLMIteration { get; set; }
+        public string p_dampingFactor { get; set; }
     }
 }

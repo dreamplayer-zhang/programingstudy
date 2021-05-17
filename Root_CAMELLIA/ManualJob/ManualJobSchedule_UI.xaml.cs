@@ -158,7 +158,7 @@ namespace Root_CAMELLIA.ManualJob
 
         void InitSlotRecipeList()
         {
-            DirectoryInfo info = new DirectoryInfo("C:\\Recipe\\");
+            DirectoryInfo info = new DirectoryInfo(BaseDefine.Dir_InitialPath);
             FileInfo[] files = info.GetFiles("*.Camellia");
             List<string> asRecipeFile = new List<string>();
             foreach (FileInfo fileInfo in files)
@@ -193,13 +193,23 @@ namespace Root_CAMELLIA.ManualJob
 
         void InitRecipeList()
         {
-            DirectoryInfo info = new DirectoryInfo("C:\\Recipe\\");
-            FileInfo[] files = info.GetFiles("*.Camellia");
+            DirectoryInfo info = new DirectoryInfo(BaseDefine.Dir_InitialPath);
             List<string> asRecipeFile = new List<string>();
-            foreach(FileInfo fileInfo in files)
+            foreach (var dir in info.GetDirectories())
             {
-                asRecipeFile.Add(fileInfo.Name);
+                FileInfo[] fileInfos = dir.GetFiles("*." + EQ.m_sModel);
+
+                foreach (FileInfo fileinfo in fileInfos)
+                {
+                    asRecipeFile.Add(fileinfo.Name);
+                }
             }
+            //FileInfo[] files = info.GetFiles("*.Camellia");
+         
+            //foreach(FileInfo fileInfo in files)
+            //{
+            //    asRecipeFile.Add(fileInfo.Name);
+            //}
             comboRecipeID.ItemsSource = asRecipeFile;
         }
 
@@ -230,6 +240,7 @@ namespace Root_CAMELLIA.ManualJob
             }
         }
 
+        //? 여기 수정해야함 -> Recipe 오픈하고 이것저것...
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             if (m_infoCarrier == null) return;

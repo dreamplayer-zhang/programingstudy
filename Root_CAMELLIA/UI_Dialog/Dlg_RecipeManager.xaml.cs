@@ -24,7 +24,7 @@ namespace Root_CAMELLIA
     public partial class Dlg_RecipeManager : UserControl
     {
         public Dlg_RecipeManager()
-        {         
+        {
             InitializeComponent();
         }
         //private void TitleBar_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)

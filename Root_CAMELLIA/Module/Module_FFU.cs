@@ -574,33 +574,56 @@ namespace Root_CAMELLIA.Module
 		void InitThreadFan()
 		{
 			if (m_bThreadFan) return;
-			m_threadFan = new Thread(new ThreadStart(RunThreadFan));
-			m_threadFan.Start();
+			//m_threadFan = new Thread(new ThreadStart(RunThreadFan));
+			//m_threadFan.Start();
 		}
-		static readonly object m_csLock = new object();
-		void RunThreadFan()
-		{
-			m_bThreadFan = true;
-			Thread.Sleep(10000);
-			while (m_bThreadFan)
-			{
-				Thread.Sleep(10);
 
-				if (!m_modbus.m_client.Connected)
+
+
+		static readonly object m_csLock = new object();
+
+        protected override void RunThread()
+        {
+            base.RunThread();
+			Thread.Sleep(10);
+
+			if (!m_modbus.m_client.Connected)
+			{
+				Thread.Sleep(1000);
+				p_sInfo = m_modbus.Connect();
+			}
+			else
+			{
+				lock (m_csLock)
 				{
-					Thread.Sleep(1000);
-					p_sInfo = m_modbus.Connect();
-				}
-				else
-				{
-					lock (m_csLock)
-					{
-						foreach (Unit unit in p_aUnit) unit.RunThreadFan();
-						m_bResetFan = false;
-					}
+					foreach (Unit unit in p_aUnit) unit.RunThreadFan();
+					m_bResetFan = false;
 				}
 			}
 		}
+  //      void RunThreadFan()
+		//{
+		//	m_bThreadFan = true;
+		//	Thread.Sleep(10000);
+		//	while (m_bThreadFan)
+		//	{
+		//		Thread.Sleep(10);
+
+		//		if (!m_modbus.m_client.Connected)
+		//		{
+		//			Thread.Sleep(1000);
+		//			p_sInfo = m_modbus.Connect();
+		//		}
+		//		else
+		//		{
+		//			lock (m_csLock)
+		//			{
+		//				foreach (Unit unit in p_aUnit) unit.RunThreadFan();
+		//				m_bResetFan = false;
+		//			}
+		//		}
+		//	}
+		//}
 		#endregion
 
 		#region Functions
@@ -624,16 +647,16 @@ namespace Root_CAMELLIA.Module
 		{
 			p_id = id;
 			InitBase(id, engineer);
-			InitThreadFan();
+			//InitThreadFan();
 		}
 
 		public override void ThreadStop()
 		{
-			if (m_bThreadFan)
-			{
-				m_bThreadFan = false;
-				//m_threadFan.Join();
-			}
+			//if (m_bThreadFan)
+			//{
+			//	m_bThreadFan = false;
+			//	//m_threadFan.Join();
+			//}
 			base.ThreadStop();
 		}
 	}
