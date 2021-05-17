@@ -289,8 +289,8 @@ namespace Root_Rinse_Loader.Module
         public string RunRun()
         {
             if (EQ.p_bPickerSet) return "OK";
-            if (m_rinse.p_eStateRinse != RinseL.eRinseRun.Run) return "Rinse State not Run";
-            if (m_rinse.p_eStateUnloader != EQ.eState.Run) return "Rinse Unloader State not Run";
+            //if (m_rinse.p_eStateRinse != RinseL.eRinseRun.Run) return "Rinse State not Run";
+            //if (m_rinse.p_eStateUnloader != EQ.eState.Run) return "Rinse Unloader State not Run";
             return p_bVacuum ? RunUnload() : RunLoad(); 
         }
         #endregion

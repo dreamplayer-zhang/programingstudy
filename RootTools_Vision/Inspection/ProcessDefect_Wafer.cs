@@ -49,10 +49,9 @@ namespace RootTools_Vision
                 return true;
 
             DoProcessDefect_Wafer();
-
             return true;
         }
-
+        
         public void DoProcessDefect_Wafer()
         {
             if (!(this.currentWorkplace.MapIndexX == -1 && this.currentWorkplace.MapIndexY == -1))
@@ -96,7 +95,8 @@ namespace RootTools_Vision
                 DatabaseManager.Instance.AddDefectDataList(mergeDefectList, "defect");
             }
 
-
+            // 210517
+            /*
             Settings settings = new Settings();
             SettingItem_SetupFrontside settings_frontside = settings.GetItem<SettingItem_SetupFrontside>();
 
@@ -122,9 +122,10 @@ namespace RootTools_Vision
             //GlobalObjects.Instance.Get<Settings>
             //string sTiffImagePath = ;
             //SaveTiffImage(sTiffImagePath, MergeDefectList, 3);
-
+            
             WorkEventManager.OnInspectionDone(this.currentWorkplace, new InspectionDoneEventArgs(new List<CRect>(), this.currentWorkplace));
             WorkEventManager.OnIntegratedProcessDefectDone(this.currentWorkplace, new IntegratedProcessDefectDoneEventArgs());
+            */
         }
 
         public override WorkBase Clone()
