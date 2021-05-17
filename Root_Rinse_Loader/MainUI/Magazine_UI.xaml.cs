@@ -89,11 +89,15 @@ namespace Root_Rinse_Loader.MainUI
 
         private void buttonLoadUp_Click(object sender, RoutedEventArgs e)
         {
+            buttonLoadUp.IsEnabled = false;
+            buttonLoadDown.IsEnabled = false; 
             m_storage.RunLoadUp(); 
         }
 
         private void buttonLoadDown_Click(object sender, RoutedEventArgs e)
         {
+            buttonLoadUp.IsEnabled = false;
+            buttonLoadDown.IsEnabled = false;
             m_storage.RunLoadDown();
         }
     }

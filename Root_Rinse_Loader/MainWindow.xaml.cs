@@ -116,14 +116,14 @@ namespace Root_Rinse_Loader
         private void M_timer_Tick(object sender, EventArgs e)
         {
             RinseL rinse = m_handler.m_rinse;
-            bool bBlink = rinse.m_bBlink; 
+            bool bBlink = rinse.m_bBlink;
 
-            buttonMode.IsEnabled = (EQ.p_eState == EQ.eState.Run) && (m_handler.m_rinse.p_eStateUnloader == EQ.eState.Ready);
+            buttonMode.IsEnabled = (EQ.p_eState == EQ.eState.Ready) && (m_handler.m_rinse.p_eStateUnloader == EQ.eState.Ready);
             buttonHome.IsEnabled = EQ.p_eState != EQ.eState.Run;
             buttonStart.IsEnabled = m_handler.m_rinse.IsEnableStart();
             buttonPause.IsEnabled = EQ.p_eState == EQ.eState.Run;
             buttonReset.IsEnabled = (EQ.p_eState == EQ.eState.Error) || (EQ.p_eState == EQ.eState.Ready);
-            buttonPickerSet.IsEnabled = EQ.p_eState == EQ.eState.Ready;
+            buttonPickerSet.IsEnabled = EQ.p_bPickerSet || ((EQ.p_eState == EQ.eState.Ready) && (m_handler.m_rinse.p_eMode == RinseL.eRunMode.Stack));
 
             bool bRun = bBlink && (EQ.p_eState == EQ.eState.Run); 
             buttonStart.Foreground = (bRun && EQ.p_bPickerSet == false) ? Brushes.Red : Brushes.Black;
@@ -134,11 +134,14 @@ namespace Root_Rinse_Loader
             if (rinse.m_tcpip.p_bConnect)
             {    
                 borderUnloadState.Background = (rinse.p_eStateUnloader == EQ.eState.Ready || rinse.p_eStateUnloader == EQ.eState.Run) ? Brushes.SeaGreen : Brushes.Gold;
+                textBlockEQUReady.Background = (rinse.p_eStateUnloader == EQ.eState.Ready || rinse.p_eStateUnloader == EQ.eState.Run) ? Brushes.SeaGreen : Brushes.Gold;
                 textBlockUnloadState.Text = rinse.p_eStateUnloader.ToString();
+                textBlockEQUReady.Text = (rinse.p_eStateUnloader == EQ.eState.Run) ? "Stop" : ""; 
             }
             else 
             { 
                 borderUnloadState.Background = Brushes.Crimson;
+                textBlockEQUReady.Text = ""; 
                 if (rinse.m_tcpip.p_bConnect == false) rinse.Reset(); 
             }
 
@@ -159,7 +162,7 @@ namespace Root_Rinse_Loader
 
         private void buttonHome_Click(object sender, RoutedEventArgs e)
         {
-            m_handler.m_rinse.InitSendProtocol(); 
+            //m_handler.m_rinse.InitSendProtocol(); 
             EQ.p_bStop = false; 
             EQ.p_eState = EQ.eState.Home;
         }
@@ -204,5 +207,10 @@ namespace Root_Rinse_Loader
             if (binding != null) binding.UpdateSource();
         }
         #endregion
+
+        private void textBlockEQUReady_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            m_handler.m_rinse.SendEQUReady();
+        }
     }
 }
