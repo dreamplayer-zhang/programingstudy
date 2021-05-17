@@ -34,7 +34,38 @@ namespace RootTools_Vision
 		protected override bool Execution()
 		{
 			DoInspection();
+			//DoInspection_New()
 			return true;
+		}
+
+		public void DoInspection_New()
+		{
+			if (this.currentWorkplace.Index == 0)
+				return;
+
+			OriginRecipe originRecipe = recipe.GetItem<OriginRecipe>();
+			
+			int firstNotch = recipeEBR.FirstNotch;
+			int lastNotch = recipeEBR.LastNotch;
+
+			int bufferHeight = lastNotch - firstNotch;
+			int bufferHeightPerDegree = bufferHeight / 360;
+
+			double stepDegree = parameterEBR.StepDegree;
+			int cnt = (int)(360 / stepDegree);
+
+			int height = parameterEBR.ROIHeight;
+			int width = parameterEBR.ROIWidth;
+
+			for (int i = 0; i < cnt; i++)
+			{
+				int posY = (int)((bufferHeightPerDegree * stepDegree * i) - (height / 2));
+				//Workplace workplace = new Workplace(0, 0, 0, posY, width, height, workplaceBundle.Count);
+
+				int[] arrDiff;
+				arrDiff = GetDiffArr(this.currentWorkplace.SharedBufferInfo.PtrR_GRAY, 0, posY, width, height);
+				FindEdge(arrDiff);
+			}
 		}
 
 		public void DoInspection()
