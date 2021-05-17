@@ -116,9 +116,9 @@ namespace Root_Rinse_Loader
         private void M_timer_Tick(object sender, EventArgs e)
         {
             RinseL rinse = m_handler.m_rinse;
-            bool bBlink = rinse.m_bBlink; 
+            bool bBlink = rinse.m_bBlink;
 
-            buttonMode.IsEnabled = (EQ.p_eState == EQ.eState.Run) && (m_handler.m_rinse.p_eStateUnloader == EQ.eState.Ready);
+            buttonMode.IsEnabled = (EQ.p_eState == EQ.eState.Ready) && (m_handler.m_rinse.p_eStateUnloader == EQ.eState.Ready);
             buttonHome.IsEnabled = EQ.p_eState != EQ.eState.Run;
             buttonStart.IsEnabled = m_handler.m_rinse.IsEnableStart();
             buttonPause.IsEnabled = EQ.p_eState == EQ.eState.Run;
@@ -127,7 +127,7 @@ namespace Root_Rinse_Loader
 
             bool bRun = bBlink && (EQ.p_eState == EQ.eState.Run); 
             buttonStart.Foreground = (bRun && EQ.p_bPickerSet == false) ? Brushes.Red : Brushes.Black;
-            buttonPickerSet.Foreground = (bRun && EQ.p_bPickerSet) ? Brushes.Red : Brushes.Black;
+            buttonPickerSet.Foreground = (bBlink && EQ.p_bPickerSet) ? Brushes.Red : Brushes.Black;
 
             borderState.Background = (EQ.p_eState == EQ.eState.Ready || EQ.p_eState == EQ.eState.Run) ? Brushes.SeaGreen : Brushes.Gold;
 

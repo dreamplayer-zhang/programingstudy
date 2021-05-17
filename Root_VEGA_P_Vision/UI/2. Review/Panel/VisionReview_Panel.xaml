@@ -1,0 +1,258 @@
+﻿<UserControl x:Class="Root_VEGA_P_Vision.VisionReview_Panel"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Root_VEGA_P_Vision"
+             xmlns:Tools="clr-namespace:RootTools;assembly=RootTools"
+             
+             mc:Ignorable="d" 
+             d:DesignHeight="866" d:DesignWidth="1912" Background="{StaticResource PanelBackGround}">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+        <Grid Grid.Column="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="7*"/>
+                <RowDefinition Height="3*"/>
+            </Grid.RowDefinitions>
+            <GroupBox Grid.Row="0" Header="Defect Map">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="9*"/>
+                        <RowDefinition Height="0.3*"/>
+                    </Grid.RowDefinitions>
+                    <Grid Grid.Row="0">
+                        <Grid.RowDefinitions>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                        </Grid.RowDefinitions>
+                        <GroupBox Grid.Row="0" Header="EIP Cover">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                </Grid.ColumnDefinitions>
+                                <GroupBox Grid.Column="0" Header="Top">
+                                    <Canvas>
+                                        <Ellipse Width="15"
+                                             Height="15"
+                                             HorizontalAlignment="Center"
+                                             VerticalAlignment="Center"
+                                             Fill="ForestGreen" Canvas.Left="85" Canvas.Top="74"/>
+                                        <Ellipse Width="8"
+                                            Height="8"
+                                            HorizontalAlignment="Center"
+                                            VerticalAlignment="Center"
+                                            Fill="Navy" Canvas.Left="204" Canvas.Top="169"/>
+                                        <Canvas.Background>
+                                            <ImageBrush ImageSource="../../../Resources/EIPCoverTop.jpg"/>
+                                        </Canvas.Background>
+                                    </Canvas>
+                                </GroupBox>
+                                <GroupBox Grid.Column="1" Header="Bottom">
+                                    <Canvas>
+                                        <Canvas.Background>
+                                            <ImageBrush ImageSource="../../../Resources/EIPCoverBottom.jpg"/>
+                                        </Canvas.Background>
+                                    </Canvas>
+                                </GroupBox>
+                                <GroupBox Grid.Column="2" Header="Side">
+                                    <Grid>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition/>
+                                            <RowDefinition/>
+                                            <RowDefinition/>
+                                            <RowDefinition/>
+                                        </Grid.RowDefinitions>
+                                        <GroupBox Grid.Row="0" Header="Top">
+                                        </GroupBox>
+                                        <GroupBox Grid.Row="1" Header="Bottom">
+                                        </GroupBox>
+                                        <GroupBox Grid.Row="2" Header="Left">
+                                        </GroupBox>
+                                        <GroupBox Grid.Row="3" Header="Right">
+                                        </GroupBox>
+                                    </Grid>
+                                </GroupBox>
+                            </Grid>
+                        </GroupBox>
+                        <GroupBox Grid.Row="1" Header="EIP BasePlate">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                </Grid.ColumnDefinitions>
+                                <GroupBox Grid.Column="0" Header="Top">
+                                    <Canvas>
+                                        <Canvas.Background>
+                                            <ImageBrush ImageSource="../../../Resources/EIPBasePlateTop.jpg"/>
+                                        </Canvas.Background>
+                                    </Canvas>
+                                </GroupBox>
+                                <GroupBox Grid.Column="1" Header="Bottom">
+                                    <Canvas>
+                                        <Ellipse Width="15"
+                                             Height="15"
+                                             HorizontalAlignment="Center"
+                                             VerticalAlignment="Center"
+                                             Fill="ForestGreen" Canvas.Left="212" Canvas.Top="89"/>
+                                        <Ellipse Width="23"
+                                            Height="23"
+                                            HorizontalAlignment="Center"
+                                            VerticalAlignment="Center"
+                                            Fill="Crimson" Canvas.Left="97" Canvas.Top="165"/>
+                                        <Canvas.Background>
+                                            <ImageBrush ImageSource="../../../Resources/EIPBasePlateBottom.jpg"/>
+                                        </Canvas.Background>
+                                    </Canvas>
+                                </GroupBox>
+                                <GroupBox Grid.Column="2" Header="Side">
+                                    <Grid>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition/>
+                                            <RowDefinition/>
+                                            <RowDefinition/>
+                                            <RowDefinition/>
+                                        </Grid.RowDefinitions>
+                                        <GroupBox Grid.Row="0" Header="Top">
+                                        </GroupBox>
+                                        <GroupBox Grid.Row="1" Header="Bottom">
+                                        </GroupBox>
+                                        <GroupBox Grid.Row="2" Header="Left">
+                                        </GroupBox>
+                                        <GroupBox Grid.Row="3" Header="Right">
+                                        </GroupBox>
+                                    </Grid>
+                                </GroupBox>
+                            </Grid>
+                        </GroupBox>
+                    </Grid>
+                    <Grid Grid.Row="1" >
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition/>
+                                <ColumnDefinition/>
+                                <ColumnDefinition/>
+                                <ColumnDefinition/>
+                                <ColumnDefinition/>
+                            </Grid.ColumnDefinitions>
+                            <Grid Grid.Column="0" VerticalAlignment="Center">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="2*"/>
+                                    <ColumnDefinition Width="1*"/>
+                                    <ColumnDefinition Width="2*"/>
+                                    <ColumnDefinition Width="2*"/>
+                                </Grid.ColumnDefinitions>
+                                <CheckBox Grid.Column="0" Content="Stain" VerticalAlignment="Stretch" HorizontalAlignment="Center"/>
+                                <Canvas Grid.Column="1">
+                                    <Ellipse Width="8"
+                                             Height="8"
+                                             HorizontalAlignment="Center"
+                                             VerticalAlignment="Center"
+                                             Fill="Crimson" Canvas.Left="16" Canvas.Top="3"/>
+                                </Canvas>
+                                <TextBlock Grid.Column="2" Text="1EA" VerticalAlignment="Stretch" HorizontalAlignment="Left"/>
+                            </Grid>
+
+                            <Grid Grid.Column="1" VerticalAlignment="Center">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="2*"/>
+                                    <ColumnDefinition Width="1*"/>
+                                    <ColumnDefinition Width="2*"/>
+                                    <ColumnDefinition Width="2*"/>
+                                </Grid.ColumnDefinitions>
+                                <CheckBox Grid.Column="0" Content="6um" VerticalAlignment="Stretch" HorizontalAlignment="Center"/>
+                                <Canvas Grid.Column="1">
+                                    <Ellipse Width="8"
+                                             Height="8"
+                                             HorizontalAlignment="Center"
+                                             VerticalAlignment="Center"
+                                             Fill="ForestGreen" Canvas.Left="16" Canvas.Top="3"/>
+                                </Canvas>
+                                <TextBlock Grid.Column="2" Text="2EA" VerticalAlignment="Stretch" HorizontalAlignment="Left"/>
+                            </Grid>
+                            <Grid Grid.Column="2" VerticalAlignment="Center">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="2*"/>
+                                    <ColumnDefinition Width="1*"/>
+                                    <ColumnDefinition Width="2*"/>
+                                    <ColumnDefinition Width="2*"/>
+                                </Grid.ColumnDefinitions>
+                                <CheckBox Grid.Column="0" Content="1um" VerticalAlignment="Stretch" HorizontalAlignment="Center"/>
+                                <Canvas Grid.Column="1">
+                                    <Ellipse Width="8"
+                                             Height="8"
+                                             HorizontalAlignment="Center"
+                                             VerticalAlignment="Center"
+                                             Fill="Navy" Canvas.Left="16" Canvas.Top="3"/>
+                                </Canvas>
+                                <TextBlock Grid.Column="2" Text="1EA"  VerticalAlignment="Stretch" HorizontalAlignment="Left"/>
+                            </Grid>
+
+                        </Grid>
+
+                    </Grid>
+                </Grid>
+            </GroupBox>
+            <GroupBox Grid.Row="1" Header="Defect List">
+                <DataGrid IsReadOnly="True" HeadersVisibility="Column" Style="{StaticResource DatagridStyle}" RowStyle="{StaticResource DataGridRowStyle}">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="No." Binding="{Binding Path=a}" HeaderStyle="{StaticResource DataGridHeaderStyle}" Width="1*"/>
+                        <DataGridTextColumn Header="District" Binding="{Binding Path=b}" HeaderStyle="{StaticResource DataGridHeaderStyle}" Width="1*"/>
+                        <DataGridTextColumn Header="PosX" Binding="{Binding Path=c}" HeaderStyle="{StaticResource DataGridHeaderStyle}" Width="1*"/>
+                        <DataGridTextColumn Header="PosY" Binding="{Binding Path=d}" HeaderStyle="{StaticResource DataGridHeaderStyle}" Width="1*"/>
+                        <DataGridTextColumn Header="Size" Binding="{Binding Path=e}" HeaderStyle="{StaticResource DataGridHeaderStyle}" Width="1*"/>
+                        <DataGridTextColumn Header="Intensity" Binding="{Binding Path=f}" HeaderStyle="{StaticResource DataGridHeaderStyle}" Width="1*"/>
+                    </DataGrid.Columns>
+                    <local:Dummy a="01" b="EIP Cover Top" c="1163" d="1200" e="3" f="30"/>
+                    <local:Dummy a="02" b="EIP Cover Top" c="2163" d="2222" e="1" f="10"/>
+                    <local:Dummy a="03" b="EIP BasePlate Bottom" c="2263" d="1453" e="2" f="30"/>
+                    <local:Dummy a="04" b="EIP BasePlate Bottom" c="1163" d="2400" e="4" f="30"/>
+
+                </DataGrid>
+            </GroupBox>
+        </Grid>
+        <Grid Grid.Column="1">
+            <Grid.RowDefinitions>
+                <RowDefinition/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+            <Grid Grid.Row="0">
+                <TabControl>
+                    <TabItem Header="Defect Image">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition/>
+                                <ColumnDefinition/>
+                            </Grid.ColumnDefinitions>
+                            <Tools:RootViewer Grid.Column="0" DataContext="{Binding DefectImage}"/>
+                            <Tools:RootViewer Grid.Column="1" DataContext="{Binding ReviewImage}"/>
+                        </Grid>
+                    </TabItem>
+                    <TabItem Header="Screw Image">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition/>
+                                <ColumnDefinition/>
+                            </Grid.ColumnDefinitions>
+                            <GroupBox Grid.Column="0" Header="Time">
+                                <local:screwUI DataContext="{Binding ScrewUITime}"/>
+                            </GroupBox>
+                            <GroupBox Grid.Column="1" Header="Illumination">
+                                <local:screwUI DataContext="{Binding ScrewUIIllum}"/>
+                            </GroupBox>
+                        </Grid>
+                    </TabItem>
+                </TabControl>
+            </Grid>
+            <!--<Grid Grid.Row="1">-->
+                <Image Grid.Row="1" Source="../../../Resources/graphex.jpg"/>
+            <!--</Grid>-->
+        </Grid>
+    </Grid>
+</UserControl>

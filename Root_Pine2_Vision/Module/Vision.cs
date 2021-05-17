@@ -16,7 +16,6 @@ namespace Root_Pine2_Vision.Module
         MemoryPool memoryPool;
         MemoryGroup memoryGroup;
         TCPAsyncClient[] m_tcpip = new TCPAsyncClient[2] { null, null };
-        TCPAsyncClient m_tcpipB;
         public override void GetTools(bool bInit)
         {
             if (p_eRemote == eRemote.Server)

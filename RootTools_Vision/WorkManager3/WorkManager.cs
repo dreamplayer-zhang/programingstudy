@@ -222,7 +222,7 @@ namespace RootTools_Vision.WorkManager3
         public bool WaitWorkDone(ref bool isCanceled, int timeoutSecond = 60)
         {
             int sec = 0;
-            while(pipeLine.CheckPipeDone() == false && sec < timeoutSecond && isCanceled == false)
+            while (pipeLine.CheckPipeDone() == false && sec < timeoutSecond && isCanceled == false)
             {
                 Thread.Sleep(1000);
                 sec++;

@@ -128,6 +128,7 @@
     <Compile Include="DataTypes\SharedBufferInfo.cs" />
     <Compile Include="Inspection\BacksideAlignment.cs" />
     <Compile Include="Inspection\BacksideSurface.cs" />
+    <Compile Include="Inspection\EUVPodSurface.cs" />
     <Compile Include="Inspection\ProcessDefect_Backside.cs" />
     <Compile Include="Inspection\ReticleSurface.cs" />
     <Compile Include="GlobalObjects.cs" />
@@ -146,6 +147,7 @@
     <Compile Include="Recipe\Interfaces\IOptionParameter.cs" />
     <Compile Include="Recipe\Interfaces\IRecipe.cs" />
     <Compile Include="Recipe\Parameter\BacksideSurfaceParameter.cs" />
+    <Compile Include="Recipe\Parameter\EUVPodSurfaceParameter.cs" />
     <Compile Include="Recipe\Parameter\ProcessDefectBacksideParameter.cs" />
     <Compile Include="Recipe\Parameter\ProcessDefectEdgeParameter.cs" />
     <Compile Include="Recipe\Parameter\ProcessDefectParameter.cs" />
@@ -171,6 +173,7 @@
     <Compile Include="Recipe\Recipe\D2DRecipe.cs" />
     <Compile Include="Recipe\Recipe\EBRRecipe.cs" />
     <Compile Include="Recipe\Recipe\EdgeSurfaceRecipe.cs" />
+    <Compile Include="Recipe\Recipe\EUVPodSurfaceRecipe.cs" />
     <Compile Include="Recipe\Recipe\OriginRecipe.cs" />
     <Compile Include="Recipe\Recipe\PositionRecipe.cs" />
     <Compile Include="Recipe\Recipe\RecipeItemBase.cs" />
