@@ -1018,7 +1018,10 @@ namespace Root_CAMELLIA
             {
                 return new RelayCommand(() =>
                 {
-                    m_XGem.p_eReqControl = XGem.eControl.OFFLINE;
+                    if (m_XGem.p_eComm == XGem.eCommunicate.COMMUNICATING)
+                        m_XGem.p_eReqControl = XGem.eControl.OFFLINE;
+                    else
+                        CustomMessageBox.Show("Error", "Comm State is Not Communicating", MessageBoxButton.OK, CustomMessageBox.MessageBoxImage.Error); 
                 });
             }
         }
@@ -1029,7 +1032,10 @@ namespace Root_CAMELLIA
             {
                 return new RelayCommand(() =>
                 {
-                    m_XGem.p_eReqControl = XGem.eControl.ONLINEREMOTE;
+                    if (m_XGem.p_eComm == XGem.eCommunicate.COMMUNICATING)
+                        m_XGem.p_eReqControl = XGem.eControl.ONLINEREMOTE;
+                    else
+                        CustomMessageBox.Show("Error", "Comm State is Not Communicating", MessageBoxButton.OK, CustomMessageBox.MessageBoxImage.Error);
                 });
             }
         }
@@ -1040,7 +1046,10 @@ namespace Root_CAMELLIA
             {
                 return new RelayCommand(() =>
                 {
-                    m_XGem.p_eReqControl = XGem.eControl.LOCAL;
+                    if(m_XGem.p_eComm == XGem.eCommunicate.COMMUNICATING)
+                        m_XGem.p_eReqControl = XGem.eControl.LOCAL;
+                    else
+                        CustomMessageBox.Show("Error", "Comm State is Not Communicating", MessageBoxButton.OK, CustomMessageBox.MessageBoxImage.Error);
                 });
             }
         }
