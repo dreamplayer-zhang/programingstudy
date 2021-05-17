@@ -231,7 +231,8 @@ namespace RootTools
         {
             m_sManualRecipe = sRecipe;
             p_sRecipe = sRecipe;
-            m_moduleRunList.OpenJob(sRecipe, true);
+            if(m_moduleRunList != null)
+                m_moduleRunList.OpenJob(sRecipe, true);
             m_qProcess.Clear();
         }
 
@@ -301,6 +302,16 @@ namespace RootTools
             string id = sModule + "." + ((nSlot >= 0) ? (nSlot + 1).ToString("00") : "Recover"); 
             InitBase(id, engineer);
             m_moduleRunList = new ModuleRunList(id, engineer);
+            m_moduleRunList.Clear();
+        }
+
+        public InfoWafer(InfoWafer info)
+        {
+            m_sModule = info.m_sModule;
+            m_nSlot = info.m_nSlot;
+            string id = m_sModule + "." + ((m_nSlot >= 0) ? (m_nSlot + 1).ToString("00") : "Recover");
+            InitBase(id, info.m_engineer);
+            m_moduleRunList = new ModuleRunList(id, m_engineer);
             m_moduleRunList.Clear();
         }
     }

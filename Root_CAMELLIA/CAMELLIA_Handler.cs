@@ -614,11 +614,12 @@ namespace Root_CAMELLIA
 
         public void ThreadStop()
         {
+
             if (p_bThread)
             {
                 p_bThread = false;
                 EQ.p_bStop = true;
-                m_thread.Join();
+                //m_thread.Join(); // 여기서 멈춰 프로그램 종료되지 않는 현상 있음.
             }
             if (m_moduleList != null)
             {
@@ -626,6 +627,7 @@ namespace Root_CAMELLIA
                 foreach (ModuleBase module in m_moduleList.m_aModule.Keys)
                     module.ThreadStop();
             }
+           
         }
     }
 }

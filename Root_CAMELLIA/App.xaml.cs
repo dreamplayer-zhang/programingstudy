@@ -1,4 +1,5 @@
 ﻿using Root_CAMELLIA.LibSR_Met;
+using SSLNet;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -17,6 +18,7 @@ namespace Root_CAMELLIA
     {
         public static CAMELLIA_Engineer m_engineer = new CAMELLIA_Engineer();
         public static Nanoview m_nanoView = new Nanoview();
+        public static SSLoggerNet m_SSLoggerNet = new SSLoggerNet();
 
         private void Application_Startup(object sender, StartupEventArgs e)
         {

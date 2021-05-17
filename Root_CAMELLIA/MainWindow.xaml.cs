@@ -10,12 +10,16 @@ using Root_EFEM.Module;
 using RootTools;
 using RootTools.Memory;
 using RootTools.Module;
+using System.Runtime.InteropServices;
+using SSLNet;
 
 namespace Root_CAMELLIA
 {
     /// <summary>
     /// MainWindow.xaml에 대한 상호 작용 논리
     /// </summary>
+    ///
+
     public partial class MainWindow : Window
     {
         #region Title Bar
@@ -97,6 +101,13 @@ namespace Root_CAMELLIA
             InitTimer();
 
             SplashScreenHelper.ShowText("Camellia2 Initialize Done");
+
+            //SSLoggerNet sSLoggerNet = new SSLoggerNet();
+            //DataFormatter data = new DataFormatter();
+            //sSLoggerNet.WriteFNCLog(1, "1", "1", STATUS.START);
+            //data.AddData("test", 1);
+            //data.Serialize();
+        
         }
 
         DispatcherTimer m_timer = new DispatcherTimer();
@@ -109,7 +120,7 @@ namespace Root_CAMELLIA
         // EQ.eState oldstate = EQ.eState.Init;
         private void M_timer_Tick(object sender, EventArgs e)
         {
-            tbTime.Text = DateTime.Now.ToString("yyyy-MM-dd HH-mm-ss");
+            tbTime.Text = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
             TimerUI();
             TimerLamp();
 
@@ -129,7 +140,8 @@ namespace Root_CAMELLIA
         {
             if (EQ.p_eState != EQ.eState.Run) EQ.p_bRecovery = false;
             //textState.Text = m_bRecovery ? "Recovery" : EQ.p_eState.ToString();
-            textState.Text = EQ.p_bRecovery ? "Recovery" : EQ.p_eState.ToString();
+            //textState.Text = EQ.p_bRecovery ? "Recovery" : EQ.p_eState.ToString();
+            //textState.Text = "asgasgsdagsdg";
         }
 
         void TimerLamp()
