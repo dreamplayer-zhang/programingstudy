@@ -166,7 +166,6 @@ namespace RootTools_Vision
             if (defectList.Count < 1)
                 return;
 
-
             Parallel.ForEach(defectList, defect =>
             {
                 double cx = (defect.p_rtDefectBox.Left + defect.p_rtDefectBox.Right) / 2;
@@ -178,11 +177,44 @@ namespace RootTools_Vision
 
                 System.Drawing.Bitmap bitmap = CovertBufferToBitmap(sharedBuffer, new System.Windows.Rect(startX, startY, 640, 480));
 
-                if(System.IO.File.Exists(path + defect.m_nDefectIndex + ".bmp"))
+                if (System.IO.File.Exists(path + defect.m_nDefectIndex + ".bmp"))
                     System.IO.File.Delete(path + defect.m_nDefectIndex + ".bmp");
 
                 bitmap.Save(path + defect.m_nDefectIndex + ".bmp");
             });
+        }
+
+        public static void SaveDefectImageParallel(string path, List<Defect> defectList, SharedBufferInfo sharedBuffer, int nByteCnt,Point size)
+        {
+            path += "\\";
+            DirectoryInfo di = new DirectoryInfo(path);
+            if (!di.Exists)
+                di.Create();
+
+            if (defectList.Count < 1)
+                return;
+
+            int width = (int)size.X;
+            int height = (int)size.Y;
+
+            int idx = 0;
+
+            foreach (Defect defect in defectList)
+            {
+                double cx = (defect.p_rtDefectBox.Left + defect.p_rtDefectBox.Right) / 2;
+                double cy = (defect.p_rtDefectBox.Top + defect.p_rtDefectBox.Bottom) / 2;
+                int startX = (cx - width/2) > 0 ? (int)(cx - width / 2) : 0;
+                int startY = (cy - height/2) > 0 ? (int)(cy - height / 2) : 0;
+
+                System.Drawing.Bitmap bitmap = CovertBufferToBitmap(sharedBuffer, new System.Windows.Rect(startX, startY, width, height));
+
+                //if(System.IO.File.Exists(path + defect.m_nDefectIndex + ".bmp"))
+                //    System.IO.File.Delete(path + defect.m_nDefectIndex + ".bmp");
+
+                bitmap.Save(path + idx++ + ".bmp");
+            }
+
+            //});
         }
 
         public static void SaveDefectImage(String path, List<Data> dataList, SharedBufferInfo sharedBuffer)

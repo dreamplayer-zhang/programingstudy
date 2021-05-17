@@ -14,9 +14,24 @@
     <WarningLevel>4</WarningLevel>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <Deterministic>true</Deterministic>
+    <PublishUrl>게시\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
+    <PlatformTarget>x64</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -26,6 +41,7 @@
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <LangVersion>preview</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -35,6 +51,8 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <LangVersion>preview</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
     <DebugSymbols>true</DebugSymbols>
@@ -43,7 +61,28 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <DebugType>full</DebugType>
     <PlatformTarget>x64</PlatformTarget>
-    <LangVersion>7.3</LangVersion>
+    <LangVersion>preview</LangVersion>
+    <ErrorReport>prompt</ErrorReport>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
+    <OutputPath>bin\x64\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <LangVersion>preview</LangVersion>
+    <ErrorReport>prompt</ErrorReport>
+    <Prefer32Bit>true</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x64\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <LangVersion>preview</LangVersion>
     <ErrorReport>prompt</ErrorReport>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
@@ -52,7 +91,7 @@
     <Optimize>true</Optimize>
     <DebugType>pdbonly</DebugType>
     <PlatformTarget>x64</PlatformTarget>
-    <LangVersion>7.3</LangVersion>
+    <LangVersion>preview</LangVersion>
     <ErrorReport>prompt</ErrorReport>
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
@@ -156,6 +195,7 @@
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Windows.Interactivity, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Windows.Interactivity.WPF.2.0.20525\lib\net40\System.Windows.Interactivity.dll</HintPath>
     </Reference>
@@ -190,10 +230,44 @@
       <DependentUpon>VEGA_P_Vision_ToolBox_UI.xaml</DependentUpon>
     </Compile>
     <Compile Include="MainVM.cs" />
+    <Compile Include="Module\InspectionManagerVegaP.cs" />
     <Compile Include="MVVM\Helper.cs" />
     <Compile Include="MVVM\ObservableObject.cs" />
     <Compile Include="MVVM\PropertySupport.cs" />
     <Compile Include="MVVM\RelayCommand.cs" />
+    <Compile Include="Recipe\VisionSurfaceRecipe.cs" />
+    <Compile Include="UI\1. Setup\2. RecipeManager\Panel\ImageViewerBase_Panel.xaml.cs">
+      <DependentUpon>ImageViewerBase_Panel.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\1. Setup\2. RecipeManager\Panel\MaskViewer_Panel.xaml.cs">
+      <DependentUpon>MaskViewer_Panel.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\1. Setup\2. RecipeManager\Panel\OriginViewerTab_Panel.xaml.cs">
+      <DependentUpon>OriginViewerTab_Panel.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\1. Setup\2. RecipeManager\Panel\PositionViewerTab_Panel.xaml.cs">
+      <DependentUpon>PositionViewerTab_Panel.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\1. Setup\2. RecipeManager\Panel\RecipeMask_Panel.xaml.cs">
+      <DependentUpon>RecipeMask_Panel.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\1. Setup\2. RecipeManager\Panel\RecipeOrigin_Panel.xaml.cs">
+      <DependentUpon>RecipeOrigin_Panel.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\1. Setup\2. RecipeManager\Panel\RecipeSummary.xaml.cs">
+      <DependentUpon>RecipeSummary.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\1. Setup\2. RecipeManager\UserControl\AlignFeatureInfo.xaml.cs">
+      <DependentUpon>AlignFeatureInfo.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\1. Setup\2. RecipeManager\ViewModel\ImageViewerBase_ViewModel.cs" />
+    <Compile Include="UI\1. Setup\2. RecipeManager\ViewModel\MaskRootViewer_ViewModel.cs" />
+    <Compile Include="UI\1. Setup\2. RecipeManager\ViewModel\MaskViewer_ViewModel.cs" />
+    <Compile Include="UI\1. Setup\2. RecipeManager\ViewModel\OriginViewerTab_ViewModel.cs" />
+    <Compile Include="UI\1. Setup\2. RecipeManager\ViewModel\PositionViewerTab_ViewModel.cs" />
+    <Compile Include="UI\1. Setup\2. RecipeManager\ViewModel\RecipeMask_ViewModel.cs" />
+    <Compile Include="UI\1. Setup\2. RecipeManager\ViewModel\RecipeOrigin_ViewModel.cs" />
+    <Compile Include="UI\1. Setup\2. RecipeManager\ViewModel\RecipeSummary_ViewModel.cs" />
     <Compile Include="UI\1. Setup\RecipeWizard\RecipeWizard_VM.cs" />
     <Compile Include="UI\1. Setup\RecipeWizard\Page_RecipeWizard.xaml.cs">
       <DependentUpon>Page_RecipeWizard.xaml</DependentUpon>
@@ -203,6 +277,31 @@
       <DependentUpon>HomePanel.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\1. Setup\1.Home\Home_ViewModel.cs" />
+    <Compile Include="UI\1. Setup\2. RecipeManager\Panel\Recipe1um_Panel.xaml.cs">
+      <DependentUpon>Recipe1um_Panel.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\1. Setup\2. RecipeManager\Panel\Recipe6um_Panel.xaml.cs">
+      <DependentUpon>Recipe6um_Panel.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\1. Setup\2. RecipeManager\Panel\RecipeSideImageViewers_Panel.xaml.cs">
+      <DependentUpon>RecipeSideImageViewers_Panel.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\1. Setup\2. RecipeManager\Panel\RecipeSide_Panel.xaml.cs">
+      <DependentUpon>RecipeSide_Panel.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\1. Setup\2. RecipeManager\Panel\RecipeStain_Panel.xaml.cs">
+      <DependentUpon>RecipeStain_Panel.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\1. Setup\2. RecipeManager\RecipeManagerPanel.xaml.cs">
+      <DependentUpon>RecipeManagerPanel.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\1. Setup\2. RecipeManager\RecipeManager_ViewModel.cs" />
+    <Compile Include="UI\1. Setup\2. RecipeManager\ViewModel\RecipeSideImageViewers_ViewModel.cs" />
+    <Compile Include="UI\1. Setup\2. RecipeManager\ViewModel\ItemMask.cs" />
+    <Compile Include="UI\1. Setup\2. RecipeManager\ViewModel\Recipe1um_ViewModel.cs" />
+    <Compile Include="UI\1. Setup\2. RecipeManager\ViewModel\Recipe6um_ViewModel.cs" />
+    <Compile Include="UI\1. Setup\2. RecipeManager\ViewModel\RecipeSide_ViewModel.cs" />
+    <Compile Include="UI\1. Setup\2. RecipeManager\ViewModel\RecipeStain_ViewModel.cs" />
     <Compile Include="UI\1. Setup\Setup.xaml.cs">
       <DependentUpon>Setup.xaml</DependentUpon>
     </Compile>
@@ -215,9 +314,34 @@
       <DependentUpon>ViewerTest.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\1. Setup\4. Maintenance\ViewerTest_ViewModel.cs" />
+    <Compile Include="UI\2. Review\UserControl\NozzleRes.xaml.cs">
+      <DependentUpon>NozzleRes.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\2. Review\Panel\ParticleReview_Panel.xaml.cs">
+      <DependentUpon>ParticleReview_Panel.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\2. Review\Panel\ResultSummary_Panel.xaml.cs">
+      <DependentUpon>ResultSummary_Panel.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\2. Review\Review_Panel.xaml.cs">
+      <DependentUpon>Review_Panel.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\2. Review\UserControl\screwUI.xaml.cs">
+      <DependentUpon>screwUI.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\2. Review\ViewModel\ParticleReview_ViewModel.cs" />
+    <Compile Include="UI\2. Review\Review_ViewModel.cs" />
+    <Compile Include="UI\2. Review\UserControl\ScrewUI_ViewModel.cs" />
+    <Compile Include="UI\2. Review\ViewModel\ResultSummary_ViewModel.cs" />
+    <Compile Include="UI\2. Review\ViewModel\VisionReview_ViewModel.cs" />
+    <Compile Include="UI\2. Review\Panel\VisionReview_Panel.xaml.cs">
+      <DependentUpon>VisionReview_Panel.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI\SelectMode.xaml.cs">
       <DependentUpon>SelectMode.xaml</DependentUpon>
     </Compile>
+    <Compile Include="VegaPEventArgs.cs" />
+    <Compile Include="VegaPEventManager.cs" />
     <Page Include="Control\Button\NaviBtn.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -261,6 +385,38 @@
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
     </Compile>
+    <Page Include="UI\1. Setup\2. RecipeManager\Panel\ImageViewerBase_Panel.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\1. Setup\2. RecipeManager\Panel\MaskViewer_Panel.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\1. Setup\2. RecipeManager\Panel\OriginViewerTab_Panel.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\1. Setup\2. RecipeManager\Panel\PositionViewerTab_Panel.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\1. Setup\2. RecipeManager\Panel\RecipeMask_Panel.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\1. Setup\2. RecipeManager\Panel\RecipeOrigin_Panel.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\1. Setup\2. RecipeManager\Panel\RecipeSummary.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\1. Setup\2. RecipeManager\UserControl\AlignFeatureInfo.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="UI\1. Setup\RecipeWizard\Page_RecipeWizard.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -268,6 +424,30 @@
     <Page Include="UI\1. Setup\1.Home\HomePanel.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\1. Setup\2. RecipeManager\Panel\Recipe1um_Panel.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\1. Setup\2. RecipeManager\Panel\Recipe6um_Panel.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\1. Setup\2. RecipeManager\Panel\RecipeSideImageViewers_Panel.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\1. Setup\2. RecipeManager\Panel\RecipeSide_Panel.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\1. Setup\2. RecipeManager\Panel\RecipeStain_Panel.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\1. Setup\2. RecipeManager\RecipeManagerPanel.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UI\1. Setup\Setup.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -280,6 +460,30 @@
     <Page Include="UI\1. Setup\4. Maintenance\ViewerTest.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\2. Review\UserControl\NozzleRes.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\2. Review\Panel\ParticleReview_Panel.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\2. Review\Panel\ResultSummary_Panel.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\2. Review\Review_Panel.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\2. Review\UserControl\screwUI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\2. Review\Panel\VisionReview_Panel.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UI\SelectMode.xaml">
       <SubType>Designer</SubType>
@@ -319,6 +523,7 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
+    <Compile Include="Recipe\RecipeVision.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -358,8 +563,53 @@
     <Resource Include="Control\Icon\Resource\system_task_127px.png" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="UI\2. Review\" />
+    <Folder Include="Dialog\" />
     <Folder Include="UI\3. Operation\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\basebot.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\basetop.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\coverbot.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\covertop.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include=".NETFramework,Version=v4.7.2">
+      <Visible>False</Visible>
+      <ProductName>Microsoft .NET Framework 4.7.2%28x86 및 x64%29</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\dome_low.jpg" />
+    <Resource Include="Resources\door_low.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\EIPBasePlateBottom.jpg" />
+    <Resource Include="Resources\EIPBasePlateTop.jpg" />
+    <Resource Include="Resources\EIPCoverBottom.jpg" />
+    <Resource Include="Resources\EIPCoverTop.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\domearea.png" />
+    <Resource Include="Resources\doorarea.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\graphex.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\dome.jpg" />
+    <Resource Include="Resources\door.jpg" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
