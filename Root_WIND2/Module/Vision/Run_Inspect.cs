@@ -284,7 +284,7 @@ namespace Root_WIND2.Module
                 if (workManager.WaitWorkDone(ref EQ.m_EQ.StopToken(), 60 * 3 /*3 minutes*/) == false)
                 {
                     // Save Result
-                    workManager.Start(false, true);
+                    //workManager.Start(false, true);
                         inspectionTimeWatcher.Stop();
 
                         TempLogger.Write("Inspection", "Time out!!!");
