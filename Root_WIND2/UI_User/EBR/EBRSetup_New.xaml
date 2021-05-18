@@ -142,7 +142,6 @@
                         <TextBlock Grid.Column="0" Text="Last Notch" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="6,0,0,0"/>
                         <TextBox Grid.Column="1" Text="{Binding LastNotch, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Height="20" HorizontalContentAlignment="Center"/>
                     </Grid>
-                    <Button Content="Create Map" Command="{Binding btnCreateMap}" Width ="120" Style="{StaticResource groupbox_button}"/>
                 </StackPanel>
             </GroupBox>
             
