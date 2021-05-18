@@ -12,6 +12,7 @@ namespace RootTools_Vision
 {
 	public class ProcessMeasurement : WorkBase
 	{
+		string TableName = "measurement";
 		public override WORK_TYPE Type => WORK_TYPE.DEFECTPROCESS_ALL;
 
 		protected override bool Preparation()
