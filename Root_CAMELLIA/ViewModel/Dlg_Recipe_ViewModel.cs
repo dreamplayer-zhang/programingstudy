@@ -182,7 +182,14 @@ namespace Root_CAMELLIA
             {
                 return new RelayCommand(() =>
                 {
-                    CloseRequested(this, new DialogCloseRequestedEventArgs(false));
+                    if (p_isEnableSave && !recipeManager_ViewModel.CheckSaveLayerData())
+                    {
+                        return;
+                    }
+                    else
+                    {
+                        CloseRequested(this, new DialogCloseRequestedEventArgs(false));
+                    }
                 });
             }
         }

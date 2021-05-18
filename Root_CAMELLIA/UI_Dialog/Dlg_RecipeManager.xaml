@@ -128,7 +128,7 @@
                         </Grid.RowDefinitions>
                         <DataGrid Margin="2" AutoGenerateColumns="False" CanUserAddRows="False" CanUserSortColumns="False" EnableColumnVirtualization="True" CanUserDeleteRows="False"
                                   EnableRowVirtualization="True" ScrollViewer.CanContentScroll="True" SelectionMode="Single" ItemsSource="{Binding GridLayerData}" VirtualizingPanel.IsVirtualizing="True"
-                                  VirtualizingPanel.VirtualizationMode="Recycling" 
+                                  VirtualizingPanel.VirtualizationMode="Recycling"
                                   SelectedIndex="{Binding GridLayerIndex}" IsEnabled="{Binding p_UseThickness}">
                             <DataGrid.Columns>
                                 <DataGridTextColumn Header="" Width="40" Binding="{Binding LayerHeader}" IsReadOnly="True" Foreground="Blue" FontWeight="ExtraBold"/>
@@ -237,6 +237,11 @@
                                     </DataGridTextColumn.Header>
                                 </DataGridTextColumn>
                             </DataGrid.Columns>
+                            <i:Interaction.Triggers>
+                                <i:EventTrigger EventName="CellEditEnding">
+                                    <i:CallMethodAction TargetObject="{Binding}" MethodName="OnCellEditEnd"/>
+                                </i:EventTrigger>
+                            </i:Interaction.Triggers>
                         </DataGrid>
                         <Grid Grid.Row="1">
                             <Grid.RowDefinitions>
@@ -271,7 +276,7 @@
                                     </ListView.ItemTemplate>
                                     <ListView.ItemContainerStyle>
                                         <Style TargetType="ListViewItem">
-                                            <Setter Property="Margin" Value="5,5,5,5"/>
+                                            <Setter Property="Margin" Value="1"/>
                                             <Setter Property="Padding" Value="0,0,0,0"/>
                                             <Setter Property="HorizontalAlignment" Value="Left"/>
                                             <Setter Property="Template">

@@ -352,79 +352,76 @@ namespace Root_CAMELLIA.Module
         public override string StateHome()
         {
             p_isClearInfoWafer = true;
-            try
+            p_sInfo = "OK";
+            if (EQ.p_bSimulate)
+                return "OK";
+
+            m_tiltAxisXY.p_axisX.p_eState = Axis.eState.Ready;
+            m_tiltAxisXY.p_axisY.p_eState = Axis.eState.Ready;
+            m_stageAxisZ.p_eState = Axis.eState.Ready;
+
+            Thread.Sleep(200);
+            if (m_listAxis.Count == 0) return "OK";
+            if (p_eState == eState.Run) return "Invalid State : Run";
+            if (EQ.IsStop()) return "Home Stop";
+
+            foreach (Axis axis in m_listAxis)
             {
-                p_sInfo = "OK";
-                if (EQ.p_bSimulate)
-                    return "OK";
+                if (axis != null) axis.ServoOn(true);
+            }
+            Thread.Sleep(200);
+            if (EQ.IsStop()) return "Home Stop";
 
-                m_tiltAxisXY.p_axisX.p_eState = Axis.eState.Ready;
-                m_tiltAxisXY.p_axisY.p_eState = Axis.eState.Ready;
-                m_stageAxisZ.p_eState = Axis.eState.Ready;
-
-                Thread.Sleep(200);
-                if (m_listAxis.Count == 0) return "OK";
-                if (p_eState == eState.Run) return "Invalid State : Run";
-                if (EQ.IsStop()) return "Home Stop";
-
-                foreach (Axis axis in m_listAxis)
-                {
-                    if (axis != null) axis.ServoOn(true);
-                }
-                Thread.Sleep(200);
-                if (EQ.IsStop()) return "Home Stop";
-
-                for (int i = 0; i < p_axisLifter.m_bDIO_I.Count; i++)
-                {
-                    p_axisLifter.m_bDIO_I[i] = false;
-                }
-                if (!LifterMoveVacuumCheck())
-                {
-                    p_eState = eState.Error;
-                    p_sInfo = "Vacuum is not turn off";
-                    CustomMessageBox.Show(p_sInfo);
-                    return p_sInfo;
-                }
-                p_axisLifter.StartHome();
-                if (p_axisLifter.WaitReady() != "OK")
-                {
-                    p_eState = eState.Error;
-                    p_sInfo = "Lifter Home Error";
-                    CustomMessageBox.Show(p_sInfo);
-                    return p_sInfo;
-                }
-
-                for (int i = 0; i < p_axisLifter.m_bDIO_I.Count; i++)
-                {
-                    p_axisLifter.m_bDIO_I[i] = true;
-                }
-
-
-                p_axisXY.p_axisX.StartHome();
-                p_axisXY.p_axisY.StartHome();
-                p_axisZ.StartHome();
-
-                if (p_axisXY.p_axisX.WaitReady() != "OK")
-                {
-                    p_eState = eState.Error;
-                    return "AxisX Home Error";
-                }
-
-                if (p_axisXY.p_axisY.WaitReady() != "OK")
-                {
-                    p_eState = eState.Error;
-                    return "AxisY Home Error";
-                }
-
-                if (p_axisZ.WaitReady() != "OK")
-                {
-                    p_eState = eState.Error;
-                    return "AxisZ Home Error";
-                }
-                p_eState = (p_sInfo == "OK") ? eState.Ready : eState.Error;
-
+            for (int i = 0; i < p_axisLifter.m_bDIO_I.Count; i++)
+            {
+                p_axisLifter.m_bDIO_I[i] = false;
+            }
+            if (!LifterMoveVacuumCheck())
+            {
+                p_eState = eState.Error;
+                p_sInfo = "Vacuum is not turn off";
+                CustomMessageBox.Show(p_sInfo);
                 return p_sInfo;
-            }            
+            }
+            p_axisLifter.StartHome();
+            if (p_axisLifter.WaitReady() != "OK")
+            {
+                p_eState = eState.Error;
+                p_sInfo = "Lifter Home Error";
+                CustomMessageBox.Show(p_sInfo);
+                return p_sInfo;
+            }
+
+            for (int i = 0; i < p_axisLifter.m_bDIO_I.Count; i++)
+            {
+                p_axisLifter.m_bDIO_I[i] = true;
+            }
+
+
+            p_axisXY.p_axisX.StartHome();
+            p_axisXY.p_axisY.StartHome();
+            p_axisZ.StartHome();
+
+            if (p_axisXY.p_axisX.WaitReady() != "OK")
+            {
+                p_eState = eState.Error;
+                return "AxisX Home Error";
+            }
+
+            if (p_axisXY.p_axisY.WaitReady() != "OK")
+            {
+                p_eState = eState.Error;
+                return "AxisY Home Error";
+            }
+
+            if (p_axisZ.WaitReady() != "OK")
+            {
+                p_eState = eState.Error;
+                return "AxisZ Home Error";
+            }
+            p_eState = (p_sInfo == "OK") ? eState.Ready : eState.Error;
+
+            return p_sInfo;
         }
 
 

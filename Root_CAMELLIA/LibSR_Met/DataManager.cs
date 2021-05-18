@@ -181,6 +181,7 @@ namespace Root_CAMELLIA.LibSR_Met
         public List<WavelengthItem> m_ScalesListT;
         public List<LayerData> m_LayerData;
         public List<ThicknessScaleOffset> m_ThicknessData;
+        public List<ThicknessScaleOffset> m_ThicknessDataSave;
         public bool bExcept_NIR = false;
         public bool bThickness = true;
         public bool bTransmittance = true;
@@ -228,6 +229,7 @@ namespace Root_CAMELLIA.LibSR_Met
             m_ScalesListT = new List<WavelengthItem>();
             m_LayerData = new List<LayerData>();
             m_ThicknessData = new List<ThicknessScaleOffset>();
+            m_ThicknessDataSave = new List<ThicknessScaleOffset>();
             m_SettngData = new SettingData();
 
             for (int i = 0; i < ConstValue.RAWDATA_POINT_MAX_SIZE; i++)
