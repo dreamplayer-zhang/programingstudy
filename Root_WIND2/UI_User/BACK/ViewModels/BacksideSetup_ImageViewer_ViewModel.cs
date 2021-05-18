@@ -551,7 +551,7 @@ namespace Root_WIND2.UI_User
             this.mapRectList.Clear();
             this.p_DrawElement.Clear();
 
-            foreach(CRect rt in rectList)
+            foreach (CRect rt in rectList)
             {
                 CPoint canvasLeftTop = GetCanvasPoint(new CPoint(rt.Left, rt.Top));
                 CPoint canvasRightBottom = GetCanvasPoint(new CPoint(rt.Right, rt.Bottom));
@@ -583,13 +583,14 @@ namespace Root_WIND2.UI_User
 
         public void DrawMapRectList()
         {
-            if(this.mapRectList.Count > 0)
+            if (this.mapRectList.Count > 0)
             {
                 foreach (TRect rt in mapRectList)
                 {
                     if (p_DrawElement.Contains(rt.UIElement) == true)
                     {
                         Rectangle rectangle = rt.UIElement as Rectangle;
+
                         CPoint canvasLeftTop = GetCanvasPoint(new CPoint(rt.MemoryRect.Left, rt.MemoryRect.Top));
                         CPoint canvasRightBottom = GetCanvasPoint(new CPoint(rt.MemoryRect.Right, rt.MemoryRect.Bottom));
 
@@ -994,7 +995,7 @@ namespace Root_WIND2.UI_User
                 this.SetSearchedCenter(new CPoint((int)centerPt.X, (int)centerPt.Y));
                 this.SetSearchedCirclePoints(points);
 
-                List<CRect> rectList = this.CalcDiePosition((int)centerPt.X, (int)centerPt.Y);
+                List<CRect> rectList = this.CalcDiePosition((int)centerPt.X, (int)centerPt.Y, true);
 
                 this.SetMapRectList(rectList);
             }
@@ -1043,6 +1044,181 @@ namespace Root_WIND2.UI_User
                         {
                             originRecipe.OriginX = left;
                             originRecipe.OriginY = bottom;
+                        }
+                    }
+                }
+            }
+
+            return rectList;
+        }
+
+        public List<CRect> CalcDiePosition(int centerX, int centerY, bool isPartialDie)
+        {
+            CameraInfo camInfo = DataConverter.GrabModeToCameraInfo(GlobalObjects.Instance.Get<WIND2_Engineer>().m_handler.p_BackSideVision.GetGrabMode(GlobalObjects.Instance.Get<RecipeBack>().CameraInfoIndex));
+
+            RecipeType_WaferMap waferMap = GlobalObjects.Instance.Get<RecipeBack>().WaferMap;
+            OriginRecipe originRecipe = GlobalObjects.Instance.Get<RecipeBack>().GetItem<OriginRecipe>();
+            int[] mapData = waferMap.Data;
+
+            int MasterDieX = waferMap.MasterDieX;
+            int MasterDieY = waferMap.MasterDieY;
+
+            int originDieX = waferMap.OriginDieX;
+            int originDieY = waferMap.OriginDieY;
+
+            double diePitchX = waferMap.DiePitchX / camInfo.RealResX;
+            double diePitchY = waferMap.DiePitchY / camInfo.RealResY;
+            double sampleCenterX = waferMap.SampleCenterLocationX;
+            double sampleCenterY = waferMap.SampleCenterLocationY;
+
+            int mapSizeX = waferMap.MapSizeX;
+            int mapSizeY = waferMap.MapSizeY;
+
+            double radius = 150000 / camInfo.RealResX;
+            double radius_2 = radius * radius;
+
+
+            List<CRect> rectList = new List<CRect>();
+
+            int originX = (int)(centerX + sampleCenterX);
+            int originY = (int)(centerY - sampleCenterY);
+
+            if(isPartialDie)
+            {
+                double left_remain_X = (centerX - sampleCenterX) - (originDieX * diePitchX);
+                double top_remain_y = (centerY - sampleCenterY) - (originDieY * diePitchY);
+
+                double right_remain_X = (centerX - sampleCenterX) - ((mapSizeX - originDieX + 1) * diePitchX);
+                double bottom_remain_y = (centerY - sampleCenterY) - ((mapSizeY - originDieY + 1) * diePitchY);
+
+
+                int dieLeftCount = 0, dieRightCount = 0, dieTopCount = 0, dieBottomCount = 0;
+                if (left_remain_X > 0)
+                {
+                    dieLeftCount = (int)Math.Ceiling(left_remain_X / diePitchX);
+                }
+
+                if (top_remain_y > 0)
+                {
+                    dieTopCount = (int)Math.Ceiling(top_remain_y / diePitchY);
+                }
+
+                if (right_remain_X > 0)
+                {
+                    dieRightCount = (int)Math.Ceiling(right_remain_X / diePitchX);
+                }
+
+                if (bottom_remain_y > 0)
+                {
+                    dieBottomCount = (int)Math.Ceiling(bottom_remain_y / diePitchY);
+                }
+
+
+                int originMapSizeX = mapSizeX;
+                int originMapSizeY = mapSizeY;
+                mapSizeX += (dieLeftCount + dieRightCount);
+                mapSizeY += (dieTopCount + dieBottomCount);
+
+                originDieX += dieLeftCount;
+                originDieY += dieTopCount;
+
+                for (int x = 0; x < mapSizeX; x++)
+                {
+                    for (int y = 0; y < mapSizeY; y++)
+                    {
+                        int rel_x = (x - originDieX); // 원점 중심좌표로 Right/Top방향이 +
+                        int rel_y = (originDieY - y);
+
+                        int left = (int)(originX + rel_x * diePitchX);
+                        int right = (int)(originX + (rel_x + 1) * diePitchX);
+                        int top = (int)(originY - (rel_y) * diePitchY);
+                        int bottom = (int)(originY - (rel_y - 1) * diePitchY);
+
+
+                        int map_x = x - dieLeftCount;
+                        int map_y = y - dieTopCount;
+                        if(map_x >= 0 && map_y >= 0 && 
+                            map_x < originMapSizeX && map_y < originMapSizeY)
+                        {
+                            if (mapData[map_y * originMapSizeX + map_x] == 1)
+                                continue;
+                        }
+
+                        if (rel_x >= 0 && rel_y >= 0) // 제 1사분면
+                        {
+                            // 다이의 좌하단이 포함
+                            if( Math.Pow(left - centerX, 2) + Math.Pow(bottom - centerY, 2) < radius_2)
+                            {
+                                rectList.Add(new CRect(left, top, right, bottom));
+                            }
+
+                        }
+                        else if(rel_x < 0 && rel_y >= 0) // 제 2사분면
+                        {
+                            // 다이의 우하단이 포함
+                            if (Math.Pow(right - centerX, 2) + Math.Pow(bottom - centerY, 2) < radius_2)
+                            {
+                                rectList.Add(new CRect(left, top, right, bottom));
+                            }
+                        }
+                        else if(rel_x < 0 && rel_y < 0) // 제 3사분면
+                        {
+                            // 다이의 우상단이 포함
+                            if (Math.Pow(right - centerX, 2) + Math.Pow(top - centerY, 2) < radius_2)
+                            {
+                                rectList.Add(new CRect(left, top, right, bottom));
+                            }
+                        }
+                        else //제 4사분면
+                        {
+                            // 다이의 좌상단이 포함
+                            if (Math.Pow(left - centerX, 2) + Math.Pow(top - centerY, 2) < radius_2)
+                            {
+                                rectList.Add(new CRect(left, top, right, bottom));
+                            }
+                        }
+
+
+                        //int map_x = x - dieLeftCount;
+                        //int map_y = y - dieTopCount;
+
+
+                        //if (mapData[y * mapSizeX + x] == 1)
+                        //{
+
+
+                        //    rectList.Add(new CRect(left, top, right, bottom));
+
+                        //    if (x == MasterDieX && y == MasterDieY)
+                        //    {
+                        //        originRecipe.OriginX = left;
+                        //        originRecipe.OriginY = bottom;
+                        //    }
+                        //}
+                    }
+                }
+
+            }
+            else
+            {
+                for (int x = 0; x < mapSizeX; x++)
+                {
+                    for (int y = 0; y < mapSizeY; y++)
+                    {
+                        if (mapData[y * mapSizeX + x] == 1)
+                        {
+                            int left = (int)(originX - (originDieX - x) * diePitchX);
+                            int right = (int)(originX - (originDieX - x - 1) * diePitchX);
+                            int top = (int)(originY - (originDieY - y) * diePitchY);
+                            int bottom = (int)(originY - (originDieY - y - 1) * diePitchY);
+
+                            rectList.Add(new CRect(left, top, right, bottom));
+
+                            if (x == MasterDieX && y == MasterDieY)
+                            {
+                                originRecipe.OriginX = left;
+                                originRecipe.OriginY = bottom;
+                            }
                         }
                     }
                 }

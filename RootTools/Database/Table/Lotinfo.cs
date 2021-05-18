@@ -50,6 +50,18 @@ namespace RootTools.Database
             sRecipeID = recipeid;
         }
 
+        public void SetLotinfo(Lotinfo lotInfo)
+        {
+            InspectionStart = lotInfo.InspectionStart;
+            InspectionEnd = lotInfo.InspectionEnd;
+            sLotID = lotInfo.sLotID;
+            sPartID = lotInfo.sPartID;
+            sSetupID = lotInfo.sSetupID;
+            sCSTID = lotInfo.sCSTID;
+            sWaferID = lotInfo.sWaferID;
+            sRecipeID = lotInfo.sRecipeID;
+        }
+
         public string GetLotID() { return sLotID; }
         public string GetCSTID() { return sCSTID; }
         public string GetWaferID() { return sWaferID; }
