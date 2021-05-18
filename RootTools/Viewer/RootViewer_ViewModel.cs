@@ -785,7 +785,7 @@ namespace RootTools
                     else
                     {
                         object o = new object();
-                        if (p_ImageData.GetBytePerPixel() == 1|| p_ImageData.p_nPlane ==1)
+                        if (p_ImageData.GetBytePerPixel() == 1 && p_ImageData.p_nByte==1)
                         {
                             Image<Gray, byte> view = new Image<Gray, byte>(p_CanvasWidth, p_CanvasHeight);
 

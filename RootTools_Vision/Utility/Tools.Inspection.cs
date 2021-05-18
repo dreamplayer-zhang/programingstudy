@@ -166,16 +166,20 @@ namespace RootTools_Vision
             if (defectList.Count < 1)
                 return;
 
+
+            int imageSizeX = 160;
+            int imageSizeY = 120;
+
             Parallel.ForEach(defectList, defect =>
             {
                 double cx = (defect.p_rtDefectBox.Left + defect.p_rtDefectBox.Right) / 2;
                 double cy = (defect.p_rtDefectBox.Top + defect.p_rtDefectBox.Bottom) / 2;
-                int startX = (int)cx - 320;
-                int startY = (int)cy - 240;
+                int startX = (int)cx - imageSizeX / 2;
+                int startY = (int)cy - imageSizeY / 2;
                 //int endX = startX + 640;
                 //int endY = startY + 480;
 
-                System.Drawing.Bitmap bitmap = CovertBufferToBitmap(sharedBuffer, new System.Windows.Rect(startX, startY, 640, 480));
+                System.Drawing.Bitmap bitmap = CovertBufferToBitmap(sharedBuffer, new System.Windows.Rect(startX, startY, imageSizeX, imageSizeY));
 
                 if (System.IO.File.Exists(path + defect.m_nDefectIndex + ".bmp"))
                     System.IO.File.Delete(path + defect.m_nDefectIndex + ".bmp");
@@ -315,8 +319,8 @@ namespace RootTools_Vision
                 di.Create();
 
             ArrayList inputImage = new ArrayList();
-            int tiffWidth = 640;
-            int tiffHeight = 480;
+            int tiffWidth = 160;
+            int tiffHeight = 120;
 
             //Parallel.ForEach(defectList, defect =>
             foreach(Defect defect in defectList)

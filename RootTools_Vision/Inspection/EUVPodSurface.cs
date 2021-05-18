@@ -143,7 +143,8 @@ namespace RootTools_Vision
                     }
                 }
             }
-            Tools.SaveDefectImageParallel(@"C:\Defects", currentWorkplace.DefectList, currentWorkplace.SharedBufferInfo, 1, new System.Windows.Point(100,100));
+
+            //Tools.SaveDefectImageParallel(@"C:\Defects", currentWorkplace.DefectList, currentWorkplace.SharedBufferInfo, 1, new System.Windows.Point(100,100));
 
             //var Label = CLR_IP.Cpp_Labeling_SubPix(workplaceBuffer, arrBinImg, chipW, chipH, isDarkInsp, nGrayLevel, 3);
 

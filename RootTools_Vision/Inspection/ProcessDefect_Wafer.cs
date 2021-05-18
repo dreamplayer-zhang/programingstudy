@@ -72,16 +72,20 @@ namespace RootTools_Vision
                 mergeDefectList = Tools.MergeDefect(defectList, param.MergeDefectDistnace);
                 TempLogger.Write("Defect", string.Format("Merge : {0}", mergeDefectList.Count));
 
+                OriginRecipe originRecipe = this.recipe.GetItem<OriginRecipe>();
+
                 foreach (Defect defect in mergeDefectList)
                 {
-                    OriginRecipe originRecipe = this.recipe.GetItem<OriginRecipe>();
-                    defect.CalcAbsToRelPos(originRecipe.OriginX, originRecipe.OriginY); // Frontside
+                    Workplace wp = this.workplaceBundle.GetWorkplace(defect.m_nChipIndexX, defect.m_nChipIndexY);
+                    defect.CalcAbsToRelPos(wp.PositionX, wp.PositionY + originRecipe.OriginHeight); // Frontside
                 }
             }
             else
             {
                 mergeDefectList = defectList;
             }
+
+
 
             foreach (Defect defect in mergeDefectList)
             {
@@ -92,7 +96,7 @@ namespace RootTools_Vision
             //// Add Defect to DB
             if (mergeDefectList.Count > 0)
             {
-                DatabaseManager.Instance.AddDefectDataList(mergeDefectList, "defect");
+                DatabaseManager.Instance.AddDefectDataListNoAutoCount(mergeDefectList, "defect");
             }
 
             // 210517
