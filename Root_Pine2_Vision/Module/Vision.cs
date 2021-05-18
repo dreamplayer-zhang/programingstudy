@@ -3,7 +3,11 @@ using RootTools.Comm;
 using RootTools.Light;
 using RootTools.Memory;
 using RootTools.Module;
+using RootTools.ToolBoxs;
 using RootTools.Trees;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.Net.Sockets;
 using System.Threading;
 
@@ -13,47 +17,127 @@ namespace Root_Pine2_Vision.Module
     {
         #region ToolBox
         LightSet lightSet;
-        MemoryPool memoryPool;
-        MemoryGroup memoryGroup;
-        TCPAsyncClient[] m_tcpip = new TCPAsyncClient[2] { null, null };
         public override void GetTools(bool bInit)
         {
             if (p_eRemote == eRemote.Server)
             {
-                p_sInfo = m_toolBox.Get(ref memoryPool, this, "Memory", 1);
                 p_sInfo = m_toolBox.Get(ref lightSet, this);
-                p_sInfo = m_toolBox.GetComm(ref m_tcpip[0], this, "VisionWorksA");
-                p_sInfo = m_toolBox.GetComm(ref m_tcpip[1], this, "VisionWorksB");
-            }
-            if (bInit)
-            {
-                m_tcpip[0].EventReciveData += M_tcpipA_EventReciveData;
-                m_tcpip[1].EventReciveData += M_tcpipB_EventReciveData;
+                m_aVisionWorks[0].GetTools(m_toolBox, bInit);
+                m_aVisionWorks[1].GetTools(m_toolBox, bInit);
             }
             m_remote.GetTools(bInit);
         }
         #endregion
 
-        #region ReadMsg
-        private void M_tcpipA_EventReciveData(byte[] aBuf, int nSize, Socket socket)
+        #region VisionWorks
+        public class VisionWorks
         {
-        }
+            MemoryPool m_memoryPool;
+            TCPAsyncClient m_tcpip; 
+            public void GetTools(ToolBox toolBox, bool bInit)
+            {
+                toolBox.Get(ref m_memoryPool, m_vision, p_id, 1); 
+                toolBox.GetComm(ref m_tcpip, m_vision, p_id);
+                if (bInit)
+                {
+                    InitMemory(); 
+                    m_tcpip.EventReciveData += M_tcpip_EventReciveData;
+                }
+            }
 
-        private void M_tcpipB_EventReciveData(byte[] aBuf, int nSize, Socket socket)
-        {
-            
-        }
-        #endregion
+            #region Memory
+            MemoryGroup m_memoryGroup;
+            MemoryData m_memColor; 
+            void InitMemory()
+            {
+                m_memoryGroup = m_memoryPool.GetGroup("Vision");
+                m_memColor = m_memoryGroup.CreateMemory("Color", 1, 3, new CPoint(1000, 1000)); 
+            }
+            #endregion
 
-        #region Process Start
-        string m_strVisionWorks2Path_A = "C:\\WisVision\\VisionWorks2.exe";
-        string m_strVisionWorks2Path_B = "C:\\WisVision\\VisionWorks2.exe";
-        public void RunTreeProcess(Tree tree)
+            #region TCPIP
+            private void M_tcpip_EventReciveData(byte[] aBuf, int nSize, Socket socket)
+            {
+            }
+            #endregion
+
+            #region Process
+            string m_sFileVisionWorks = "C:\\WisVision\\VisionWorks2.exe";
+            bool m_bThreadProcess = false;
+            Thread m_threadProcess = null;
+            void InitThreadProcess()
+            {
+                m_threadProcess = new Thread(new ThreadStart(RunThreadProcess));
+                m_threadProcess.Start();
+            }
+
+            bool m_bStartProcess = false;
+            int m_nProcessID = -1;
+            void RunThreadProcess()
+            {
+                m_bThreadProcess = true;
+                Thread.Sleep(10000);
+                while (m_bThreadProcess)
+                {
+                    Thread.Sleep(100);
+                    if (m_bStartProcess)
+                    {
+                        try
+                        {
+                            if (IsProcessRun() == false)
+                            {
+                                Process process = Process.Start(m_sFileVisionWorks, p_id);
+                                m_nProcessID = process.Id;
+                            }
+                        }
+                        catch (Exception e) { m_vision.p_sInfo = p_id + " StartProcess Error : " + e.Message; }
+                    }
+                }
+            }
+
+            public string m_idProcess = "VisionWorks";
+            bool IsProcessRun()
+            {
+                Process[] aProcess = Process.GetProcessesByName(m_idProcess);
+                if (aProcess.Length == 0) return false;
+                foreach (Process process in aProcess)
+                {
+                    if (process.Id == m_nProcessID) return true;
+                }
+                return false;
+            }
+            #endregion
+
+            public void RunTree(Tree tree)
+            {
+                m_idProcess = tree.Set(m_idProcess, m_idProcess, "ID", "VisionWorks Process ID");
+                m_sFileVisionWorks = tree.SetFile(m_sFileVisionWorks, m_sFileVisionWorks, ".exe", "File", "VisionWorks File Name");
+                m_bStartProcess = tree.Set(m_bStartProcess, m_bStartProcess, "Start", "Start Memory Process");
+            }
+
+            public string p_id { get; set; }
+            Vision m_vision; 
+            public VisionWorks(string id, Vision vision)
+            {
+                p_id = id;
+                m_vision = vision; 
+                InitThreadProcess(); 
+            }
+
+            public void ThreadStop()
+            {
+                if (m_bThreadProcess)
+                {
+                    m_bStartProcess = false;
+                    m_threadProcess.Join(); 
+                }
+            }
+        }
+        List<VisionWorks> m_aVisionWorks = new List<VisionWorks>(); 
+        void InitVisionWorks()
         {
-            //m_tcpip[0].p_nPort
-            //m_tcpip[0].p_bConnect
-            m_strVisionWorks2Path_A = tree.Set(m_strVisionWorks2Path_A, m_strVisionWorks2Path_A, "VisionWorks2_A Path", "VisionWorks2_A Path(Full Path)");
-            m_strVisionWorks2Path_B = tree.Set(m_strVisionWorks2Path_B, m_strVisionWorks2Path_B, "VisionWorks2_B Path", "VisionWorks2_B Path(Full Path)");
+            m_aVisionWorks.Add(new VisionWorks("VisionWorksA", this));
+            m_aVisionWorks.Add(new VisionWorks("VisionWorksB", this));
         }
         #endregion
 
@@ -65,12 +149,6 @@ namespace Root_Pine2_Vision.Module
             {
                 base.Reset();
             }
-        }
-
-        public override void InitMemorys()
-        {
-            if (p_eRemote == eRemote.Client) return;
-            memoryGroup = memoryPool.GetGroup(p_id);
         }
         #endregion
 
@@ -87,17 +165,20 @@ namespace Root_Pine2_Vision.Module
         public override void RunTree(Tree tree)
         {
             base.RunTree(tree);
-            RunTreeProcess(tree.GetTree("Process")); 
+            m_aVisionWorks[0].RunTree(tree.GetTree(m_aVisionWorks[0].p_id));
+            m_aVisionWorks[1].RunTree(tree.GetTree(m_aVisionWorks[1].p_id));
         }
         #endregion
 
         public Vision(string id, IEngineer engineer, eRemote eRemote)
         {
+            InitVisionWorks(); 
             InitBase(id, engineer, eRemote);
         }
 
         public override void ThreadStop()
         {
+            foreach (VisionWorks visionWorks in m_aVisionWorks) visionWorks.ThreadStop(); 
             base.ThreadStop();
         }
 
@@ -178,8 +259,6 @@ namespace Root_Pine2_Vision.Module
             AddModuleRunList(new Run_Remote(this), true, "Remote Run");
             AddModuleRunList(new Run_Delay(this), true, "Time Delay");
             AddModuleRunList(new Run_Grab(this), true, "Time Delay");
-            AddModuleRunList(new Run_StartVision(this), true, "Start Vision");
-            AddModuleRunList(new Run_KillVision(this), true, "Start Vision");
         }
 
         public class Run_Delay : ModuleRunBase
@@ -244,141 +323,6 @@ namespace Root_Pine2_Vision.Module
                 return "OK";
             }
         }
-
-
-        System.Diagnostics.Process VisionWorks2_A = null;
-        System.Diagnostics.Process VisionWorks2_B = null;
-
-        public class Run_StartVision : ModuleRunBase
-        {
-            Vision m_module;
-
-            public Run_StartVision(Vision module)
-            {
-                m_module = module;
-                InitModuleRun(module);
-            }
-
-            string m_strVisionWorks2Path_A = "C:\\WisVision\\VisionWorks2.exe";
-            string m_strVisionWorks2Path_B = "C:\\WisVision\\VisionWorks2.exe";
-            public override ModuleRunBase Clone()
-            {
-                Run_StartVision run = new Run_StartVision(m_module);
-                run.m_strVisionWorks2Path_A = m_strVisionWorks2Path_A;
-                run.m_strVisionWorks2Path_B = m_strVisionWorks2Path_B;
-                return run;
-            }
-
-            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
-            {
-                m_strVisionWorks2Path_A = tree.Set(m_strVisionWorks2Path_A, m_strVisionWorks2Path_A, "VisionWorks2_A Path", "VisionWorks2_A Path(Full Path)", bVisible);
-                m_strVisionWorks2Path_B = tree.Set(m_strVisionWorks2Path_B, m_strVisionWorks2Path_B, "VisionWorks2_B Path", "VisionWorks2_B Path(Full Path)", bVisible);
-            }
-
-            public override string Run()
-            {
-                // 1. VisionWorks2_A
-                if (!System.IO.File.Exists(m_strVisionWorks2Path_A))
-                {
-                    System.Windows.MessageBox.Show("VisionWorks2_A 파일이 해당 경로에 없습니다.");
-                }
-                else
-                {
-                    if (m_module.VisionWorks2_A == null)
-                    {
-                        m_module.VisionWorks2_A = System.Diagnostics.Process.Start(m_strVisionWorks2Path_A);
-                        System.Windows.MessageBox.Show("VisionWorks2_A 실행 - Process ID : " + m_module.VisionWorks2_A.Id);
-                    }
-                    else
-                    {
-                        System.Windows.MessageBox.Show("VisionWorks2_A 이미 실행 중 - Process ID : " + m_module.VisionWorks2_A.Id);
-                    }
-                }
-
-                // 2. VisionWorks2_B
-                if (!System.IO.File.Exists(m_strVisionWorks2Path_B))
-                {
-                    System.Windows.MessageBox.Show("VisionWorks2_B 파일이 해당 경로에 없습니다.");
-                }
-                else
-                {
-                    if (m_module.VisionWorks2_B == null)
-                    {
-                        m_module.VisionWorks2_B = System.Diagnostics.Process.Start(m_strVisionWorks2Path_B);
-                        System.Windows.MessageBox.Show("VisionWorks2_B 실행 - Process ID : " + m_module.VisionWorks2_B.Id);
-                    }
-                    else
-                    {
-                        System.Windows.MessageBox.Show("VisionWorks2_B 이미 실행 중 - Process ID : " + m_module.VisionWorks2_B.Id);
-                    }
-                }
-
-                return "OK";
-            }
-        }
-
-        public class Run_KillVision : ModuleRunBase
-        {
-            Vision m_module;
-
-            public Run_KillVision(Vision module)
-            {
-                m_module = module;
-                InitModuleRun(module);
-            }
-
-            bool m_bKillVisionWorks2_A = true;
-            bool m_bKillVisionWorks2_B = true;
-            public override ModuleRunBase Clone()
-            {
-                Run_KillVision run = new Run_KillVision(m_module);
-                run.m_bKillVisionWorks2_A = m_bKillVisionWorks2_A;
-                run.m_bKillVisionWorks2_B = m_bKillVisionWorks2_B;
-                return run;
-            }
-
-            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
-            {
-                m_bKillVisionWorks2_A = tree.Set(m_bKillVisionWorks2_A, m_bKillVisionWorks2_A, "Kill VisionWorks2_A", "Kill VisionWorks2_A", bVisible);
-                m_bKillVisionWorks2_B = tree.Set(m_bKillVisionWorks2_B, m_bKillVisionWorks2_B, "Kill VisionWorks2_B", "Kill VisionWorks2_B", bVisible);
-            }
-
-            public override string Run()
-            {
-                // 1. VisionWorks2_A
-                if(m_bKillVisionWorks2_A)
-                {
-                    if(m_module.VisionWorks2_A != null)
-                    {
-                        m_module.VisionWorks2_A.Kill();
-                        m_module.VisionWorks2_A = null;
-                        System.Windows.MessageBox.Show("VisionWorks2_A 프로그램 종료");
-                    }
-                    else
-                    {
-                        System.Windows.MessageBox.Show("종료할 VisionWorks2_A 프로그램이 없음");
-                    }
-                }
-
-                // 2. VisionWorks2_B
-                if (m_bKillVisionWorks2_B)
-                {
-                    if (m_module.VisionWorks2_B != null)
-                    {
-                        m_module.VisionWorks2_B.Kill();
-                        m_module.VisionWorks2_B = null;
-                        System.Windows.MessageBox.Show("VisionWorks2_B 프로그램 종료");
-                    }
-                    else
-                    {
-                        System.Windows.MessageBox.Show("종료할 VisionWorks2_B 프로그램이 없음");
-                    }
-                }
-
-                return "OK";
-            }
-        }
-
         #endregion
 
     }
