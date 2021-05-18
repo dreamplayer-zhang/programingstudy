@@ -129,9 +129,9 @@ namespace RootTools_Vision
 				klarfData.SetResultTimeStamp();
 				klarfData.SaveKlarf(settings_edgeside.KlarfSavePath, false);
 
-				Tools.SaveTiffImage(settings_edgeside.KlarfSavePath, topMergeDefectList, topSharedBufferInfo);
-				Tools.SaveTiffImage(settings_edgeside.KlarfSavePath, btmMergeDefectList, btmSharedBufferInfo);
-				Tools.SaveTiffImage(settings_edgeside.KlarfSavePath, sideMergeDefectList, sideSharedBufferInfo);
+				Tools.SaveTiffImage(settings_edgeside.KlarfSavePath, "edgetop"+ sInspectionID, topMergeDefectList, topSharedBufferInfo);
+				Tools.SaveTiffImage(settings_edgeside.KlarfSavePath, "edgeBttom" + sInspectionID, btmMergeDefectList, btmSharedBufferInfo);
+				Tools.SaveTiffImage(settings_edgeside.KlarfSavePath, "edgeSide" + sInspectionID, sideMergeDefectList, sideSharedBufferInfo);
 			}
 			#endregion
 

@@ -3,6 +3,7 @@ using RootTools.Database;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Data;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
@@ -736,6 +737,24 @@ namespace RootTools_Vision
             Bitmap dest = new Bitmap(source);
             dest.RotateFlip(RotateFlipType.RotateNoneFlipY);
             return dest;
+        }
+
+        public static List<Defect> DataTableToDefectList(DataTable table)
+        {
+            List<Defect> defects = new List<Defect>();
+            FieldInfo[] fields = typeof(Defect).GetFields();
+            
+            foreach(DataRow row in table.Rows)
+            {
+                Defect defect = new Defect();
+                foreach (FieldInfo info in fields)
+                {
+                    info.SetValue(defect, Convert.ChangeType(row[info.Name], info.FieldType));
+                }
+                defects.Add(defect);
+            }
+
+            return defects;
         }
     }
 }
