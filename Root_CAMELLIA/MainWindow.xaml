@@ -9,6 +9,7 @@
         xmlns:i="http://schemas.microsoft.com/xaml/behaviors" 
         xmlns:met="clr-namespace:Root_CAMELLIA.LibSR_Met"
         xmlns:tools="clr-namespace:RootTools;assembly=RootTools"
+        xmlns:gem="clr-namespace:RootTools.Gem.XGem;assembly=RootTools"
         xmlns:arrow="clr-namespace:Petzold.Media2D"
         xmlns:ctrl="clr-namespace:Root_CAMELLIA.Control"
         xmlns:stage="clr-namespace:Camellia2Stage"
@@ -34,12 +35,13 @@
         <local:BoolToBrushConverter x:Key="LoginStateBrushConverter"/>
         <local:OpticLampStatusEnumToStringConverter x:Key="OpticLampStatusEnumConverter"/>
         <local:OpticLampTimeToStringConverter x:Key="OpticLampTimeToStringConverter"/>
+        <local:EnumToStringConverter x:Key="EnumConverter"/>
     </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="50"/>
+            <RowDefinition Height="60"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         <!--Title Bar-->
@@ -57,7 +59,7 @@
                           VerticalAlignment="Center"
                           Margin="2"/>
             <TextBlock Grid.Column="1" Text="{Binding Path=Version, Source={x:Static local:BaseDefine.Configuration}}"  FontSize="11" Foreground="Black" VerticalAlignment="Center" Margin="5,0,0,0"/>
-            <TextBlock Text="{Binding RecipeViewModel.RecipePath}"
+            <TextBlock Text="{Binding p_LoadRecipe, UpdateSourceTrigger=PropertyChanged}"
                        FontSize="12"
                        FontWeight="Bold"
                        Foreground="Black"
@@ -105,7 +107,7 @@
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="1.5*"/>
                 <ColumnDefinition Width="1.8*"/>
-                <ColumnDefinition Width="4*"/>
+                <ColumnDefinition Width="3*"/>
                 <ColumnDefinition Width="1.8*"/>
                 <ColumnDefinition Width="1.2*"/>
             </Grid.ColumnDefinitions>
@@ -129,29 +131,42 @@
             <Grid Grid.Column="1">
                 <Grid>
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="auto"/>
-                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
                     </Grid.ColumnDefinitions>
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock Margin="10,0,0,0" Text="User State : " FontSize="15"
-                           FontWeight="Bold"
-                           VerticalAlignment="Center"
-                           HorizontalAlignment="Center"></TextBlock>
-                        <!--Source={x:Static local:BaseDefine.Configuration}}-->
-                        <TextBlock Text="{Binding Mode=TwoWay, Path=LoginSuccess, Source={x:Static local:BaseDefine.Configuration}, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource LoginStateConverter}}" FontSize="15"
-                           Foreground="{Binding Mode=TwoWay, Path=LoginSuccess, Source={x:Static local:BaseDefine.Configuration}, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource LoginStateBrushConverter}}"
-                                   FontWeight="Bold"
-                           VerticalAlignment="Center"
-                           HorizontalAlignment="Center"></TextBlock>
-                    </StackPanel>
-                    <Rectangle Grid.Column="1" VerticalAlignment="Stretch" Width="1" Margin="2" Stroke="Black" />
-                    <TextBlock Grid.Column="2" x:Name="tbTime"
-                           Text="2020-10-10 15:39:47"
-                           FontSize="15"
-                           FontWeight="Bold"
-                           VerticalAlignment="Center"
-                           HorizontalAlignment="Center"/>
+                    <Grid.RowDefinitions>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
+                    <Border BorderBrush="White" BorderThickness="2,0,1,1" Margin="10,0,0,0"> 
+                        <TextBlock FontWeight="Bold" FontSize="16" Text="Comm State" FontFamily="consolas" TextAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                    <Border Grid.Row="1" BorderBrush="White" BorderThickness="2,1,1,0" Margin="10,0,0,0">
+                        <TextBlock  FontWeight="Bold" FontSize="16" Text="Control State" FontFamily="consolas" TextAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                    <Border Grid.Column="1" Grid.Row="0" BorderBrush="White" BorderThickness="1,0,2,1" Margin="0,0,10,0" >
+                        <TextBlock  FontWeight="Bold" FontSize="18" Text="{Binding Path=p_XGem.p_eComm, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource EnumConverter}}" FontFamily="consolas" TextAlignment="Center" VerticalAlignment="Center">
+                        </TextBlock>
+                    </Border>
+                    <Border Grid.Column="1" Grid.Row="1" BorderBrush="White" BorderThickness="1,1,2,0" Margin="0,0,10,0" >
+                        <TextBlock  FontWeight="Bold" FontSize="18" Text="{Binding Path=p_XGem.p_eReqControl, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource EnumConverter}}" FontFamily="consolas" TextAlignment="Center" VerticalAlignment="Center">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding Path=p_XGem.p_eReqControl, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource EnumConverter}}" Value="Offline">
+                                            <Setter Property="Foreground" Value="Red"/>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding Path=p_XGem.p_eReqControl, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource EnumConverter}}" Value="Online Local">
+                                            <Setter Property="Foreground" Value="#22b14c"/>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding Path=p_XGem.p_eReqControl, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource EnumConverter}}" Value="Online Remote">
+                                            <Setter Property="Foreground" Value="#22b14c"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+                    </Border>
                 </Grid>
             </Grid>
             <Border Grid.Column="2" 
@@ -163,24 +178,57 @@
                     </LinearGradientBrush>
                 </Border.Background>
                 <TextBlock Text="CAMELLIA Ⅱ" VerticalAlignment="Center" HorizontalAlignment="Center"
-                           FontSize="32" FontWeight="Bold"/>
+                           FontSize="32" FontWeight="Bold" Foreground="AliceBlue"/>
             </Border>
             <Grid Grid.Column="3">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition/>
-                    <ColumnDefinition/>
-                </Grid.ColumnDefinitions>
-                <TextBlock Grid.Column="0"  Text="State :  " 
-                           FontSize="15"
+                <StackPanel VerticalAlignment="Center">
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                        <TextBlock Margin="10,0,0,0" Text="User State : " FontSize="16"
+                           FontWeight="Bold" FontFamily="consolas"
+                           VerticalAlignment="Center"
+                           HorizontalAlignment="Center"></TextBlock>
+                        <!--Source={x:Static local:BaseDefine.Configuration}}-->
+                        <TextBlock Text="{Binding Mode=TwoWay, Path=LoginSuccess, Source={x:Static local:BaseDefine.Configuration}, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource LoginStateConverter}}" FontSize="18"
+                                   FontWeight="Bold" FontFamily="consolas"
+                           VerticalAlignment="Center" 
+                           HorizontalAlignment="Center">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding Mode=TwoWay, Path=LoginSuccess, Source={x:Static local:BaseDefine.Configuration} ,UpdateSourceTrigger=PropertyChanged}" Value="True">
+                                            <Setter Property="Foreground" Value="#22b14c"/>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding Mode=TwoWay, Path=LoginSuccess, Source={x:Static local:BaseDefine.Configuration} ,UpdateSourceTrigger=PropertyChanged}" Value="False">
+                                            <Setter Property="Foreground" Value="Red"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+                    </StackPanel>
+                    <StackPanel HorizontalAlignment="Center" Orientation="Horizontal" Grid.Column="1">
+                        <TextBlock Text="Equipment State :  "  FontFamily="consolas"
+                           FontSize="16"
                            FontWeight="Bold"
                            VerticalAlignment="Center"
-                           HorizontalAlignment="Right"/>
-                <TextBlock Grid.Column="1" Text=" " 
-                           x:Name="textState"
-                           FontSize="15"
+                           HorizontalAlignment="left"/>
+                        <TextBlock Text="{Binding Mode=TwoWay, Path=p_eState, Source={x:Static tools:EQ.m_EQ}, UpdateSourceTrigger=PropertyChanged}"   FontFamily="consolas"
+                           FontSize="20"
                            FontWeight="Bold"
                            VerticalAlignment="Center"
-                           HorizontalAlignment="Left"/>
+                           HorizontalAlignment="Left">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding Mode=TwoWay, Path=p_eState, Source={x:Static tools:EQ.m_EQ}, UpdateSourceTrigger=PropertyChanged}" Value="Error">
+                                            <Setter Property="Foreground" Value="Red"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+                    </StackPanel>
+                </StackPanel>
             </Grid>
             <StackPanel Grid.Column="4"
                         Orientation="Horizontal"
@@ -239,7 +287,7 @@
             </Grid.ColumnDefinitions>
             <Grid Grid.Column="0">
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="0.72*"/>
+                    <RowDefinition Height="0.75*"/>
                     <RowDefinition Height="2*"/>
                 </Grid.RowDefinitions>
                 <GroupBox Header="Monitoring" Grid.Row="0" BorderBrush="Transparent" BorderThickness="1" Margin="1,0,3,0"  Background="White">
@@ -255,8 +303,8 @@
                     </GroupBox.Effect>
                     <Grid>
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="60*"/>
-                            <ColumnDefinition Width="40*"/>
+                            <ColumnDefinition Width="6*"/>
+                            <ColumnDefinition Width="4*"/>
                         </Grid.ColumnDefinitions>
                         <GroupBox Header="FDC" BorderThickness="1" BorderBrush="Black" Background="White" Margin="0,0,5,0">
                             <!--<GroupBox.Effect>
@@ -358,8 +406,11 @@
                     <RowDefinition/>
                     <RowDefinition Height="2*"/>
                 </Grid.RowDefinitions>
-
                 <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
                     <GroupBox Header="Captured Image" BorderThickness="1" Background="White" BorderBrush="Transparent" Margin="3">
                         <GroupBox.HeaderTemplate>
                             <DataTemplate>
@@ -369,11 +420,28 @@
                             </DataTemplate>
                         </GroupBox.HeaderTemplate>
                         <GroupBox.Effect>
-                                <DropShadowEffect ShadowDepth="1" Color="Black" Opacity="0.5"/>
+                            <DropShadowEffect ShadowDepth="1" Color="Black" Opacity="0.5"/>
+                        </GroupBox.Effect>
+                        <Border BorderBrush="Black" BorderThickness="0">
+                            <Canvas Background="Black" ClipToBounds="True">
+                                <Image Source="{Binding p_imageSource, UpdateSourceTrigger=PropertyChanged}" Width="{Binding Path=ActualWidth, ElementName=canvas}" Height="{Binding Path=ActualHeight, ElementName=canvas}"  Stretch="Fill"></Image>
+                            </Canvas>
+                        </Border>
+                    </GroupBox>
+                    <GroupBox Grid.Column="1" Header="Captured Image" BorderThickness="1" Background="White" BorderBrush="Transparent" Margin="3">
+                        <GroupBox.HeaderTemplate>
+                            <DataTemplate>
+                                <Border CornerRadius="2" Background="White" Width="100" Height="auto">
+                                    <TextBlock Text="{Binding}" FontWeight="Bold" TextAlignment="Center"/>
+                                </Border>
+                            </DataTemplate>
+                        </GroupBox.HeaderTemplate>
+                        <GroupBox.Effect>
+                            <DropShadowEffect ShadowDepth="1" Color="Black" Opacity="0.5"/>
                         </GroupBox.Effect>
                         <Border BorderBrush="Black" BorderThickness="0">
                             <Canvas Background="Black" ClipToBounds="True" x:Name="canvas" >
-                                <Image Source="{Binding p_imageSource, UpdateSourceTrigger=PropertyChanged}" Width="{Binding Path=ActualWidth, ElementName=canvas}" Height="{Binding Path=ActualHeight, ElementName=canvas}"  Stretch="Fill"></Image>
+                                <Image Source="{Binding p_imageSource2, UpdateSourceTrigger=PropertyChanged}" Width="{Binding Path=ActualWidth, ElementName=canvas}" Height="{Binding Path=ActualHeight, ElementName=canvas}"  Stretch="Fill"></Image>
                             </Canvas>
                         </Border>
                     </GroupBox>
@@ -555,322 +623,353 @@
                         </Viewbox>-->
                     </Grid>
             </Grid>
-            <TabControl Grid.Column="2" Background="White" Margin="5">
-                <!--<TabControl.Effect>
+            <Grid Grid.Column="2">
+                <Grid.RowDefinitions>
+                    <RowDefinition/>
+                    <RowDefinition Height="0.06*"/>
+                </Grid.RowDefinitions>
+                <TabControl Grid.Column="2" Background="White" Margin="5">
+                    <!--<TabControl.Effect>
                     <DropShadowEffect ShadowDepth="1" Opacity="0.5"/>
                 </TabControl.Effect>-->
-                <TabItem Header="RT Graph" Style="{StaticResource customTabitem}">
-                    <met:RTGraph DataContext="{Binding p_RTGraph, UpdateSourceTrigger=PropertyChanged}"/>
-                </TabItem>
-                <TabItem Header="Review" Width="100" Style="{StaticResource customTabitem}">
-                    <Grid Grid.Column="2">
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="1*"/>
-                            <RowDefinition Height="1*"/>
-                            <RowDefinition Height="0.1*"/>
-                        </Grid.RowDefinitions>
-                        <GroupBox Header="Contour Map" BorderThickness="0">
-                            <Border BorderBrush="Black" BorderThickness="1">
-                                <ItemsControl ItemsSource="{Binding p_ContourMapCollection}">
-                                    <ItemsControl.ItemsPanel>
-                                        <ItemsPanelTemplate>
-                                            <Grid/>
-                                        </ItemsPanelTemplate>
-                                    </ItemsControl.ItemsPanel>
-                                    <ItemsControl.ItemTemplate>
-                                        <DataTemplate>
-                                            <met:ContourMap DataContext="{Binding p_ContourMapGraph, UpdateSourceTrigger=PropertyChanged}"/>
-                                        </DataTemplate>
-                                    </ItemsControl.ItemTemplate>
-                                </ItemsControl>
-                            </Border>
-                        </GroupBox>
-                        <GroupBox Header="Measurement Data" Grid.Row="1" BorderThickness="0">
-                            <TabControl Background="Transparent">
-                                <TabItem Header="Point List" Style="{StaticResource customTabitem}">
-                                    <Grid>
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition/>
-                                            <ColumnDefinition Width="5*"/>
-                                        </Grid.ColumnDefinitions>
-                                        <Grid.RowDefinitions>
-                                            <RowDefinition Height="30"/>
-                                            <RowDefinition/>
-                                        </Grid.RowDefinitions>
-                                        <UniformGrid Grid.Row="0" Margin="3" Background="Gainsboro" Columns="3" Grid.ColumnSpan="2">
-                                            <TextBlock Text="Count" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                                            <TextBlock Text=":" VerticalAlignment="Center" HorizontalAlignment="Left"/>
-                                            <TextBlock Text="{Binding PointCount}" VerticalAlignment="Center" HorizontalAlignment="Left"/>
-                                        </UniformGrid>
-                                        <DataGrid Grid.Row="1" ItemsSource="{Binding PointListItem}" AutoGenerateColumns="False" CanUserAddRows="False" CanUserSortColumns="False" EnableColumnVirtualization="True" 
+                    <TabItem Header="RT Graph" Style="{StaticResource customTabitem}">
+                        <met:RTGraph DataContext="{Binding p_RTGraph, UpdateSourceTrigger=PropertyChanged}"/>
+                    </TabItem>
+                    <TabItem Header="Review" Width="100" Style="{StaticResource customTabitem}">
+                        <Grid Grid.Column="2">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="0.9*"/>
+                                <RowDefinition Height="1*"/>
+                            </Grid.RowDefinitions>
+                            <GroupBox Header="Contour Map" BorderThickness="0">
+                                <Border BorderBrush="Black" BorderThickness="1">
+                                    <ItemsControl ItemsSource="{Binding p_ContourMapCollection}">
+                                        <ItemsControl.ItemsPanel>
+                                            <ItemsPanelTemplate>
+                                                <Grid/>
+                                            </ItemsPanelTemplate>
+                                        </ItemsControl.ItemsPanel>
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <met:ContourMap DataContext="{Binding p_ContourMapGraph, UpdateSourceTrigger=PropertyChanged}"/>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </Border>
+                            </GroupBox>
+                            <GroupBox Header="Measurement Data" Grid.Row="1" BorderThickness="0">
+                                <TabControl Background="Transparent">
+                                    <TabItem Header="Point List" Style="{StaticResource customTabitem}">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition/>
+                                                <ColumnDefinition Width="5*"/>
+                                            </Grid.ColumnDefinitions>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="30"/>
+                                                <RowDefinition/>
+                                            </Grid.RowDefinitions>
+                                            <UniformGrid Grid.Row="0" Margin="3" Background="Gainsboro" Columns="3" Grid.ColumnSpan="2">
+                                                <TextBlock Text="Count" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                                <TextBlock Text=":" VerticalAlignment="Center" HorizontalAlignment="Left"/>
+                                                <TextBlock Text="{Binding PointCount}" VerticalAlignment="Center" HorizontalAlignment="Left"/>
+                                            </UniformGrid>
+                                            <DataGrid Grid.Row="1" ItemsSource="{Binding PointListItem}" AutoGenerateColumns="False" CanUserAddRows="False" CanUserSortColumns="False" EnableColumnVirtualization="True" 
                                   EnableRowVirtualization="True" Grid.ColumnSpan="2" SelectionMode="Single" CanUserDeleteRows="False"
                                                   VirtualizingStackPanel.VirtualizationMode ="Recycling" VirtualizingStackPanel.IsVirtualizing = "true" Background="White">
-                                            <DataGrid.Resources>
-                                                <Style TargetType="DataGridColumnHeader">
-                                                    <Setter Property="HorizontalAlignment" Value="Stretch"/>
-                                                    <Setter Property="HorizontalContentAlignment" Value="Center"/>
-                                                    <Setter Property="ScrollViewer.CanContentScroll" Value="True"/>
-                                                </Style>
-                                            </DataGrid.Resources>
-                                            <DataGrid.Columns>
-                                                <DataGridTextColumn Header="Index" Width="*" Binding="{Binding ListIndex}" IsReadOnly="True"/>
-                                                <DataGridTextColumn Header="X (mm)" Width="*" Binding="{Binding ListX}" IsReadOnly="True"/>
-                                                <DataGridTextColumn Header="Y (mm)" Width="*" Binding="{Binding ListY}" IsReadOnly="True"/>
-                                                <DataGridTextColumn Header="Route" Width="*" Binding="{Binding ListRoute}" IsReadOnly="True"/>
-                                            </DataGrid.Columns>
-                                        </DataGrid>
-                                    </Grid>
-                                </TabItem>
-                                <TabItem Header="Parameter" Style="{StaticResource customTabitem}">
-                                    <Grid>
-                                        <Grid.RowDefinitions>
-                                            <RowDefinition Height="2.5*"/>
-                                            <RowDefinition Height="1.5*"/>
-                                            <RowDefinition Height="1*"/>
-                                        </Grid.RowDefinitions>
-                                        <GroupBox Header="Measurement Parameter" BorderThickness="0">
-                                            <Grid>
-                                                <Grid.RowDefinitions>
-                                                    <RowDefinition Height="2*"/>
-                                                    <RowDefinition Height="0.4*"/>
-                                                </Grid.RowDefinitions>
-                                                <DataGrid Margin="5" AutoGenerateColumns="False" CanUserAddRows="False" CanUserSortColumns="False" EnableColumnVirtualization="True" 
-                                  EnableRowVirtualization="True" ScrollViewer.CanContentScroll="True" SelectionMode="Single" ItemsSource="{Binding RecipeViewModel.GridLayerData}" IsReadOnly="True" IsEnabled="{Binding RecipeViewModel.p_UseThickness}">
-                                                    <DataGrid.Columns>
-                                                        <DataGridTextColumn Header="" Width="40" Binding="{Binding LayerHeader}" IsReadOnly="True" Foreground="Blue" FontWeight="ExtraBold"/>
-                                                        <DataGridComboBoxColumn Width="*" SelectedValueBinding="{Binding SelectedHost1, UpdateSourceTrigger=PropertyChanged}" DisplayMemberPath="Name" SelectedValuePath="FullPath">
-                                                            <DataGridComboBoxColumn.Header>
-                                                                <TextBlock Text="Host" Style="{StaticResource GridHeaderStyle}"/>
-                                                            </DataGridComboBoxColumn.Header>
-                                                            <DataGridComboBoxColumn.ElementStyle>
-                                                                <Style TargetType="ComboBox">
-                                                                    <Setter Property="ItemsSource" Value="{Binding Host1, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-                                                                    <Setter Property="IsReadOnly" Value="True"/>
-                                                                </Style>
-                                                            </DataGridComboBoxColumn.ElementStyle>
-                                                            <DataGridComboBoxColumn.EditingElementStyle>
-                                                                <Style TargetType="ComboBox">
-                                                                    <Setter Property="ItemsSource" Value="{Binding Host1, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-                                                                </Style>
-                                                            </DataGridComboBoxColumn.EditingElementStyle>
-                                                        </DataGridComboBoxColumn>
-                                                        <DataGridComboBoxColumn Width="*"  SelectedValueBinding="{Binding SelectedGuest1, UpdateSourceTrigger=PropertyChanged}" DisplayMemberPath="Name" SelectedValuePath="FullPath">
-                                                            <DataGridComboBoxColumn.Header>
-                                                                <TextBlock Text="Guest1" Style="{StaticResource GridHeaderStyle}" />
-                                                            </DataGridComboBoxColumn.Header>
-                                                            <DataGridComboBoxColumn.ElementStyle>
-                                                                <Style TargetType="ComboBox">
-                                                                    <Setter Property="ItemsSource" Value="{Binding Guest1, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-                                                                    <Setter Property="IsReadOnly" Value="True"/>
-                                                                </Style>
-                                                            </DataGridComboBoxColumn.ElementStyle>
-                                                            <DataGridComboBoxColumn.EditingElementStyle>
-                                                                <Style TargetType="ComboBox">
-                                                                    <Setter Property="ItemsSource" Value="{Binding Guest1, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-                                                                </Style>
-                                                            </DataGridComboBoxColumn.EditingElementStyle>
-                                                        </DataGridComboBoxColumn>
-                                                        <DataGridTextColumn Width="50" Binding="{Binding Fv1, StringFormat=N3, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
-                                                            <DataGridTextColumn.Header>
-                                                                <TextBlock Text="fv1" Style="{StaticResource GridHeaderStyle}" />
-                                                            </DataGridTextColumn.Header>
-                                                        </DataGridTextColumn>
-                                                        <DataGridCheckBoxColumn Width="25" Binding="{Binding Fv1Fit, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
-                                                            <DataGridCheckBoxColumn.Header>
-                                                                <TextBlock Text="fit" Style="{StaticResource GridHeaderStyle}" />
-                                                            </DataGridCheckBoxColumn.Header>
-                                                        </DataGridCheckBoxColumn>
-                                                        <DataGridComboBoxColumn Width="*"  SelectedValueBinding="{Binding SelectedGuest2, UpdateSourceTrigger=PropertyChanged}" DisplayMemberPath="Name" SelectedValuePath="FullPath">
-                                                            <DataGridComboBoxColumn.Header>
-                                                                <TextBlock Text="Guest2" Style="{StaticResource GridHeaderStyle}" />
-                                                            </DataGridComboBoxColumn.Header>
-                                                            <DataGridComboBoxColumn.ElementStyle>
-                                                                <Style TargetType="ComboBox">
-                                                                    <Setter Property="ItemsSource" Value="{Binding Guest2, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-                                                                    <Setter Property="IsReadOnly" Value="True"/>
-                                                                </Style>
-                                                            </DataGridComboBoxColumn.ElementStyle>
-                                                            <DataGridComboBoxColumn.EditingElementStyle>
-                                                                <Style TargetType="ComboBox">
-                                                                    <Setter Property="ItemsSource" Value="{Binding Guest2, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-                                                                </Style>
-                                                            </DataGridComboBoxColumn.EditingElementStyle>
-                                                        </DataGridComboBoxColumn>
-                                                        <DataGridTextColumn Width="50" Binding="{Binding Fv2, StringFormat=N3, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
-                                                            <DataGridTextColumn.Header>
-                                                                <TextBlock Text="fv2" Style="{StaticResource GridHeaderStyle}" />
-                                                            </DataGridTextColumn.Header>
-                                                        </DataGridTextColumn>
-                                                        <DataGridCheckBoxColumn Width="25" Binding="{Binding Fv2Fit, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
-                                                            <DataGridCheckBoxColumn.Header>
-                                                                <TextBlock Text="fit" Style="{StaticResource GridHeaderStyle}" />
-                                                            </DataGridCheckBoxColumn.Header>
-                                                        </DataGridCheckBoxColumn>
-                                                        <DataGridTextColumn Width="50" Binding="{Binding Thickness, StringFormat=N2, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
-                                                            <DataGridTextColumn.Header>
-                                                                <TextBlock Text="Thick." Style="{StaticResource GridHeaderStyle}" />
-                                                            </DataGridTextColumn.Header>
-                                                        </DataGridTextColumn>
-                                                        <DataGridCheckBoxColumn Width="25" Binding="{Binding ThicknessFit, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
-                                                            <DataGridCheckBoxColumn.Header>
-                                                                <TextBlock Text="fit" Style="{StaticResource GridHeaderStyle}" />
-                                                            </DataGridCheckBoxColumn.Header>
-                                                        </DataGridCheckBoxColumn>
-                                                        <DataGridComboBoxColumn Width="*" SelectedValueBinding="{Binding SelectedEmm, UpdateSourceTrigger=PropertyChanged}">
-                                                            <DataGridComboBoxColumn.Header>
-                                                                <TextBlock Text="Emm" Style="{StaticResource GridHeaderStyle}" />
-                                                            </DataGridComboBoxColumn.Header>
-                                                            <DataGridComboBoxColumn.ElementStyle>
-                                                                <Style TargetType="ComboBox">
-                                                                    <Setter Property="ItemsSource" Value="{Binding Emm, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-                                                                    <Setter Property="IsReadOnly" Value="True"/>
-                                                                </Style>
-                                                            </DataGridComboBoxColumn.ElementStyle>
-                                                            <DataGridComboBoxColumn.EditingElementStyle>
-                                                                <Style TargetType="ComboBox">
-                                                                    <Setter Property="ItemsSource" Value="{Binding Emm, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
-                                                                </Style>
-                                                            </DataGridComboBoxColumn.EditingElementStyle>
-                                                        </DataGridComboBoxColumn>
-                                                        <DataGridTextColumn Width="50" Binding="{Binding ThicknessScale, StringFormat=N1, UpdateSourceTrigger=LostFocus, Mode=TwoWay}">
-                                                            <DataGridTextColumn.Header>
-                                                                <TextBlock Text="Scale" Style="{StaticResource GridHeaderStyle}" />
-                                                            </DataGridTextColumn.Header>
-                                                        </DataGridTextColumn>
-                                                        <DataGridTextColumn Width="50" Binding="{Binding ThicknessOffset, StringFormat=N1, UpdateSourceTrigger=LostFocus, Mode=TwoWay}">
-                                                            <DataGridTextColumn.Header>
-                                                                <TextBlock Text="Offset" Style="{StaticResource GridHeaderStyle}" />
-                                                            </DataGridTextColumn.Header>
-                                                        </DataGridTextColumn>
-                                                    </DataGrid.Columns>
-                                                </DataGrid>
-                                                <UniformGrid Columns="2" Grid.Row="1">
-                                                    <Grid Margin="3" Background="Gainsboro">
-                                                        <Grid.ColumnDefinitions>
-                                                            <ColumnDefinition Width="18*"/>
-                                                            <ColumnDefinition Width="12*"/>
-                                                        </Grid.ColumnDefinitions>
-                                                        <TextBlock Text="Integration Time (VIS)" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="0"/>
-                                                        <TextBox Grid.Column="1" Margin="1" Text="{Binding RecipeViewModel.VISIntegrationTime, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}" IsEnabled="False" TextAlignment="Center" VerticalContentAlignment="Center"></TextBox>
-                                                    </Grid>
-                                                    <Grid Margin="3" Background="Gainsboro">
-                                                        <Grid.ColumnDefinitions>
-                                                            <ColumnDefinition Width="18*"/>
-                                                            <ColumnDefinition Width="12*"/>
-                                                        </Grid.ColumnDefinitions>
-                                                        <TextBlock Text="Integration Time (NIR)" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="0"/>
-                                                        <TextBox Grid.Column="1" Margin="1" Text="{Binding RecipeViewModel.NIRIntegrationTime, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}" IsEnabled="False" TextAlignment="Center" VerticalContentAlignment="Center"></TextBox>
-                                                    </Grid>
-                                                </UniformGrid>
-                                            </Grid>
-                                        </GroupBox>
-                                        <GroupBox Header="WaveLength Data" Grid.Row="1" BorderThickness="0">
-                                            <Grid>
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition/>
-                                                    <ColumnDefinition/>
-                                                </Grid.ColumnDefinitions>
-                                                <Grid Margin="3">
-                                                    <Grid>
-                                                        <Grid.RowDefinitions>
-                                                            <RowDefinition Height="0.2*"/>
-                                                            <RowDefinition/>
-                                                        </Grid.RowDefinitions>
-                                                        <Border Background="White" BorderBrush="#ABADB3">
-                                                            <TextBlock Grid.Row="0" Text="Reflectance" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="0,2" TextAlignment="Center"/>
-                                                        </Border>
-                                                        <!--<ListBox Grid.Row="1" ItemsSource="{Binding RecipeViewModel.ReflectanceListItem, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}" IsSynchronizedWithCurrentItem="True" HorizontalContentAlignment="Center"/>-->
-                                                        <DataGrid Grid.Row="1" ItemsSource="{Binding RecipeViewModel.ReflectanceListItem}" AutoGenerateColumns="False" CanUserAddRows="False" CanUserSortColumns="True" EnableColumnVirtualization="True"  CanUserDeleteRows="False"
+                                                <DataGrid.Resources>
+                                                    <Style TargetType="DataGridColumnHeader">
+                                                        <Setter Property="HorizontalAlignment" Value="Stretch"/>
+                                                        <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                                                        <Setter Property="ScrollViewer.CanContentScroll" Value="True"/>
+                                                    </Style>
+                                                </DataGrid.Resources>
+                                                <DataGrid.Columns>
+                                                    <DataGridTextColumn Header="Index" Width="*" Binding="{Binding ListIndex}" IsReadOnly="True"/>
+                                                    <DataGridTextColumn Header="X (mm)" Width="*" Binding="{Binding ListX}" IsReadOnly="True"/>
+                                                    <DataGridTextColumn Header="Y (mm)" Width="*" Binding="{Binding ListY}" IsReadOnly="True"/>
+                                                    <DataGridTextColumn Header="Route" Width="*" Binding="{Binding ListRoute}" IsReadOnly="True"/>
+                                                </DataGrid.Columns>
+                                            </DataGrid>
+                                        </Grid>
+                                    </TabItem>
+                                    <TabItem Header="Parameter" Style="{StaticResource customTabitem}">
+                                        <Grid>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="2.5*"/>
+                                                <RowDefinition Height="1.5*"/>
+                                                <RowDefinition Height="1*"/>
+                                            </Grid.RowDefinitions>
+                                            <GroupBox Header="Measurement Parameter" BorderThickness="0">
+                                                <Grid>
+                                                    <Grid.RowDefinitions>
+                                                        <RowDefinition Height="2*"/>
+                                                        <RowDefinition Height="0.4*"/>
+                                                    </Grid.RowDefinitions>
+                                                    <DataGrid Margin="5" AutoGenerateColumns="False" CanUserAddRows="False" CanUserSortColumns="False" EnableColumnVirtualization="True" 
+                                  EnableRowVirtualization="True" ScrollViewer.CanContentScroll="True" SelectionMode="Single" ItemsSource="{Binding RecipeViewModel.GridLayerData}" IsReadOnly="True" IsEnabled="{Binding p_mainRecipeData.p_useThickness}">
+                                                        <DataGrid.Columns>
+                                                            <DataGridTextColumn Header="" Width="40" Binding="{Binding LayerHeader}" IsReadOnly="True" Foreground="Blue" FontWeight="ExtraBold"/>
+                                                            <DataGridComboBoxColumn Width="*" SelectedValueBinding="{Binding SelectedHost1, UpdateSourceTrigger=PropertyChanged}" DisplayMemberPath="Name" SelectedValuePath="FullPath">
+                                                                <DataGridComboBoxColumn.Header>
+                                                                    <TextBlock Text="Host" Style="{StaticResource GridHeaderStyle}"/>
+                                                                </DataGridComboBoxColumn.Header>
+                                                                <DataGridComboBoxColumn.ElementStyle>
+                                                                    <Style TargetType="ComboBox">
+                                                                        <Setter Property="ItemsSource" Value="{Binding Host1, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                                                        <Setter Property="IsReadOnly" Value="True"/>
+                                                                    </Style>
+                                                                </DataGridComboBoxColumn.ElementStyle>
+                                                                <DataGridComboBoxColumn.EditingElementStyle>
+                                                                    <Style TargetType="ComboBox">
+                                                                        <Setter Property="ItemsSource" Value="{Binding Host1, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                                                    </Style>
+                                                                </DataGridComboBoxColumn.EditingElementStyle>
+                                                            </DataGridComboBoxColumn>
+                                                            <DataGridComboBoxColumn Width="*"  SelectedValueBinding="{Binding SelectedGuest1, UpdateSourceTrigger=PropertyChanged}" DisplayMemberPath="Name" SelectedValuePath="FullPath">
+                                                                <DataGridComboBoxColumn.Header>
+                                                                    <TextBlock Text="Guest1" Style="{StaticResource GridHeaderStyle}" />
+                                                                </DataGridComboBoxColumn.Header>
+                                                                <DataGridComboBoxColumn.ElementStyle>
+                                                                    <Style TargetType="ComboBox">
+                                                                        <Setter Property="ItemsSource" Value="{Binding Guest1, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                                                        <Setter Property="IsReadOnly" Value="True"/>
+                                                                    </Style>
+                                                                </DataGridComboBoxColumn.ElementStyle>
+                                                                <DataGridComboBoxColumn.EditingElementStyle>
+                                                                    <Style TargetType="ComboBox">
+                                                                        <Setter Property="ItemsSource" Value="{Binding Guest1, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                                                    </Style>
+                                                                </DataGridComboBoxColumn.EditingElementStyle>
+                                                            </DataGridComboBoxColumn>
+                                                            <DataGridTextColumn Width="50" Binding="{Binding Fv1, StringFormat=N3, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
+                                                                <DataGridTextColumn.Header>
+                                                                    <TextBlock Text="fv1" Style="{StaticResource GridHeaderStyle}" />
+                                                                </DataGridTextColumn.Header>
+                                                            </DataGridTextColumn>
+                                                            <DataGridCheckBoxColumn Width="25" Binding="{Binding Fv1Fit, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
+                                                                <DataGridCheckBoxColumn.Header>
+                                                                    <TextBlock Text="fit" Style="{StaticResource GridHeaderStyle}" />
+                                                                </DataGridCheckBoxColumn.Header>
+                                                            </DataGridCheckBoxColumn>
+                                                            <DataGridComboBoxColumn Width="*"  SelectedValueBinding="{Binding SelectedGuest2, UpdateSourceTrigger=PropertyChanged}" DisplayMemberPath="Name" SelectedValuePath="FullPath">
+                                                                <DataGridComboBoxColumn.Header>
+                                                                    <TextBlock Text="Guest2" Style="{StaticResource GridHeaderStyle}" />
+                                                                </DataGridComboBoxColumn.Header>
+                                                                <DataGridComboBoxColumn.ElementStyle>
+                                                                    <Style TargetType="ComboBox">
+                                                                        <Setter Property="ItemsSource" Value="{Binding Guest2, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                                                        <Setter Property="IsReadOnly" Value="True"/>
+                                                                    </Style>
+                                                                </DataGridComboBoxColumn.ElementStyle>
+                                                                <DataGridComboBoxColumn.EditingElementStyle>
+                                                                    <Style TargetType="ComboBox">
+                                                                        <Setter Property="ItemsSource" Value="{Binding Guest2, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                                                    </Style>
+                                                                </DataGridComboBoxColumn.EditingElementStyle>
+                                                            </DataGridComboBoxColumn>
+                                                            <DataGridTextColumn Width="50" Binding="{Binding Fv2, StringFormat=N3, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
+                                                                <DataGridTextColumn.Header>
+                                                                    <TextBlock Text="fv2" Style="{StaticResource GridHeaderStyle}" />
+                                                                </DataGridTextColumn.Header>
+                                                            </DataGridTextColumn>
+                                                            <DataGridCheckBoxColumn Width="25" Binding="{Binding Fv2Fit, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
+                                                                <DataGridCheckBoxColumn.Header>
+                                                                    <TextBlock Text="fit" Style="{StaticResource GridHeaderStyle}" />
+                                                                </DataGridCheckBoxColumn.Header>
+                                                            </DataGridCheckBoxColumn>
+                                                            <DataGridTextColumn Width="50" Binding="{Binding Thickness, StringFormat=N2, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
+                                                                <DataGridTextColumn.Header>
+                                                                    <TextBlock Text="Thick." Style="{StaticResource GridHeaderStyle}" />
+                                                                </DataGridTextColumn.Header>
+                                                            </DataGridTextColumn>
+                                                            <DataGridCheckBoxColumn Width="25" Binding="{Binding ThicknessFit, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
+                                                                <DataGridCheckBoxColumn.Header>
+                                                                    <TextBlock Text="fit" Style="{StaticResource GridHeaderStyle}" />
+                                                                </DataGridCheckBoxColumn.Header>
+                                                            </DataGridCheckBoxColumn>
+                                                            <DataGridComboBoxColumn Width="*" SelectedValueBinding="{Binding SelectedEmm, UpdateSourceTrigger=PropertyChanged}">
+                                                                <DataGridComboBoxColumn.Header>
+                                                                    <TextBlock Text="Emm" Style="{StaticResource GridHeaderStyle}" />
+                                                                </DataGridComboBoxColumn.Header>
+                                                                <DataGridComboBoxColumn.ElementStyle>
+                                                                    <Style TargetType="ComboBox">
+                                                                        <Setter Property="ItemsSource" Value="{Binding Emm, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                                                        <Setter Property="IsReadOnly" Value="True"/>
+                                                                    </Style>
+                                                                </DataGridComboBoxColumn.ElementStyle>
+                                                                <DataGridComboBoxColumn.EditingElementStyle>
+                                                                    <Style TargetType="ComboBox">
+                                                                        <Setter Property="ItemsSource" Value="{Binding Emm, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                                                                    </Style>
+                                                                </DataGridComboBoxColumn.EditingElementStyle>
+                                                            </DataGridComboBoxColumn>
+                                                            <DataGridTextColumn Width="50" Binding="{Binding ThicknessScale, StringFormat=N1, UpdateSourceTrigger=LostFocus, Mode=TwoWay}">
+                                                                <DataGridTextColumn.Header>
+                                                                    <TextBlock Text="Scale" Style="{StaticResource GridHeaderStyle}" />
+                                                                </DataGridTextColumn.Header>
+                                                            </DataGridTextColumn>
+                                                            <DataGridTextColumn Width="50" Binding="{Binding ThicknessOffset, StringFormat=N1, UpdateSourceTrigger=LostFocus, Mode=TwoWay}">
+                                                                <DataGridTextColumn.Header>
+                                                                    <TextBlock Text="Offset" Style="{StaticResource GridHeaderStyle}" />
+                                                                </DataGridTextColumn.Header>
+                                                            </DataGridTextColumn>
+                                                        </DataGrid.Columns>
+                                                    </DataGrid>
+                                                    <UniformGrid Columns="2" Grid.Row="1">
+                                                        <Grid Margin="3" Background="Gainsboro">
+                                                            <Grid.ColumnDefinitions>
+                                                                <ColumnDefinition Width="18*"/>
+                                                                <ColumnDefinition Width="12*"/>
+                                                            </Grid.ColumnDefinitions>
+                                                            <TextBlock Text="Integration Time (VIS)" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="0"/>
+                                                            <TextBox Grid.Column="1" Margin="1" Text="{Binding p_mainRecipeData.p_VISIntegrationTime, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}" IsEnabled="False" TextAlignment="Center" VerticalContentAlignment="Center"></TextBox>
+                                                        </Grid>
+                                                        <Grid Margin="3" Background="Gainsboro">
+                                                            <Grid.ColumnDefinitions>
+                                                                <ColumnDefinition Width="18*"/>
+                                                                <ColumnDefinition Width="12*"/>
+                                                            </Grid.ColumnDefinitions>
+                                                            <TextBlock Text="Integration Time (NIR)" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="0"/>
+                                                            <TextBox Grid.Column="1" Margin="1" Text="{Binding p_mainRecipeData.p_NIRIntegrationTime, UpdateSourceTrigger=PropertyChanged}" IsEnabled="False" TextAlignment="Center" VerticalContentAlignment="Center"></TextBox>
+                                                        </Grid>
+                                                    </UniformGrid>
+                                                </Grid>
+                                            </GroupBox>
+                                            <GroupBox Header="WaveLength Data" Grid.Row="1" BorderThickness="0">
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition/>
+                                                        <ColumnDefinition/>
+                                                    </Grid.ColumnDefinitions>
+                                                    <Grid Margin="3">
+                                                        <Grid>
+                                                            <Grid.RowDefinitions>
+                                                                <RowDefinition Height="0.2*"/>
+                                                                <RowDefinition/>
+                                                            </Grid.RowDefinitions>
+                                                            <Border Background="White" BorderBrush="#ABADB3">
+                                                                <TextBlock Grid.Row="0" Text="Reflectance" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="0,2" TextAlignment="Center"/>
+                                                            </Border>
+                                                            <!--<ListBox Grid.Row="1" ItemsSource="{Binding RecipeViewModel.ReflectanceListItem, UpdateSourceTrigger=PropertyChanged, Mode=OneWay}" IsSynchronizedWithCurrentItem="True" HorizontalContentAlignment="Center"/>-->
+                                                            <DataGrid Grid.Row="1" ItemsSource="{Binding p_mainRecipeData.p_reflectanceListItem}" AutoGenerateColumns="False" CanUserAddRows="False" CanUserSortColumns="True" EnableColumnVirtualization="True"  CanUserDeleteRows="False"
                                   EnableRowVirtualization="True" ScrollViewer.CanContentScroll="True" SelectionMode="Single">
-                                                            <DataGrid.Columns>
-                                                                <DataGridTextColumn Header="Wave" Width="*" Binding="{Binding p_waveLength}" IsReadOnly="True"/>
-                                                                <DataGridTextColumn Header="Scale" Width="*" Binding="{Binding p_scale}" IsReadOnly="True"/>
-                                                                <DataGridTextColumn Header="Offset" Width="*" Binding="{Binding p_offset}" IsReadOnly="True"/>
-                                                            </DataGrid.Columns>
-                                                        </DataGrid>
+                                                                <DataGrid.Columns>
+                                                                    <DataGridTextColumn Header="Wave" Width="*" Binding="{Binding p_waveLength}" IsReadOnly="True"/>
+                                                                    <DataGridTextColumn Header="Scale" Width="*" Binding="{Binding p_scale}" IsReadOnly="True"/>
+                                                                    <DataGridTextColumn Header="Offset" Width="*" Binding="{Binding p_offset}" IsReadOnly="True"/>
+                                                                </DataGrid.Columns>
+                                                            </DataGrid>
+                                                        </Grid>
+                                                    </Grid>
+                                                    <Grid Grid.Column="1" Margin="3">
+                                                        <Grid>
+                                                            <Grid.RowDefinitions>
+                                                                <RowDefinition Height="0.2*"/>
+                                                                <RowDefinition/>
+                                                            </Grid.RowDefinitions>
+                                                            <Border Background="White" BorderBrush="#ABADB3">
+                                                                <TextBlock Grid.Row="0" Text="Transmittance" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="0,2" TextAlignment="Center"/>
+                                                            </Border>
+                                                            <DataGrid Grid.Row="1" ItemsSource="{Binding p_mainRecipeData.p_transmittanceListItem}" AutoGenerateColumns="False" CanUserAddRows="False" CanUserSortColumns="True" EnableColumnVirtualization="True"  CanUserDeleteRows="False"
+                                  EnableRowVirtualization="True" ScrollViewer.CanContentScroll="True" SelectionMode="Single">
+                                                                <DataGrid.Columns>
+                                                                    <DataGridTextColumn Header="Wave" Width="*" Binding="{Binding p_waveLength}" IsReadOnly="True"/>
+                                                                    <DataGridTextColumn Header="Scale" Width="*" Binding="{Binding p_scale}" IsReadOnly="True"/>
+                                                                    <DataGridTextColumn Header="Offset" Width="*" Binding="{Binding p_offset}" IsReadOnly="True"/>
+                                                                </DataGrid.Columns>
+                                                            </DataGrid>
+                                                        </Grid>
                                                     </Grid>
                                                 </Grid>
-                                                <Grid Grid.Column="1" Margin="3">
-                                                    <Grid>
-                                                        <Grid.RowDefinitions>
-                                                            <RowDefinition Height="0.2*"/>
-                                                            <RowDefinition/>
-                                                        </Grid.RowDefinitions>
-                                                        <Border Background="White" BorderBrush="#ABADB3">
-                                                            <TextBlock Grid.Row="0" Text="Transmittance" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="0,2" TextAlignment="Center"/>
-                                                        </Border>
-                                                        <DataGrid Grid.Row="1" ItemsSource="{Binding RecipeViewModel.TransmittanceListItem}" AutoGenerateColumns="False" CanUserAddRows="False" CanUserSortColumns="True" EnableColumnVirtualization="True"  CanUserDeleteRows="False"
-                                  EnableRowVirtualization="True" ScrollViewer.CanContentScroll="True" SelectionMode="Single">
-                                                            <DataGrid.Columns>
-                                                                <DataGridTextColumn Header="Wave" Width="*" Binding="{Binding p_waveLength}" IsReadOnly="True"/>
-                                                                <DataGridTextColumn Header="Scale" Width="*" Binding="{Binding p_scale}" IsReadOnly="True"/>
-                                                                <DataGridTextColumn Header="Offset" Width="*" Binding="{Binding p_offset}" IsReadOnly="True"/>
-                                                            </DataGrid.Columns>
-                                                        </DataGrid>
-                                                    </Grid>
+                                            </GroupBox>
+                                            <GroupBox Header="Thickness Parameter" Grid.Row="2" BorderThickness="0">
+                                                <Grid>
+                                                    <UniformGrid Columns="2" Rows="2">
+                                                        <Grid Margin="3" Background="Gainsboro">
+                                                            <Grid.ColumnDefinitions>
+                                                                <ColumnDefinition Width="18*"/>
+                                                                <ColumnDefinition Width="12*"/>
+                                                            </Grid.ColumnDefinitions>
+                                                            <TextBlock Text="Lower WaveLength" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="0"/>
+                                                            <TextBox Grid.Column="1" Margin="1" Text="{Binding p_mainRecipeData.p_lowerWaveLength, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" TextAlignment="Center" VerticalContentAlignment="Center" IsEnabled="False"></TextBox>
+                                                        </Grid>
+                                                        <Grid Margin="3" Background="Gainsboro">
+                                                            <Grid.ColumnDefinitions>
+                                                                <ColumnDefinition Width="18*"/>
+                                                                <ColumnDefinition Width="12*"/>
+                                                            </Grid.ColumnDefinitions>
+                                                            <TextBlock Text="Upper WaveLength" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="0"/>
+                                                            <TextBox Grid.Column="1" Margin="1" Text="{Binding p_mainRecipeData.p_upperWaveLength, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" TextAlignment="Center" VerticalContentAlignment="Center" IsEnabled="False"></TextBox>
+                                                        </Grid>
+                                                        <Grid Margin="3" Background="Gainsboro">
+                                                            <Grid.ColumnDefinitions>
+                                                                <ColumnDefinition Width="18*"/>
+                                                                <ColumnDefinition Width="12*"/>
+                                                            </Grid.ColumnDefinitions>
+                                                            <TextBlock Text="Thickness LM Iteration" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="0"/>
+                                                            <TextBox Grid.Column="1" Margin="1" Text="{Binding p_mainRecipeData.p_thicknessLMIteration, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" TextAlignment="Center" VerticalContentAlignment="Center" IsEnabled="False"></TextBox>
+                                                        </Grid>
+                                                        <Grid Margin="3" Background="Gainsboro">
+                                                            <Grid.ColumnDefinitions>
+                                                                <ColumnDefinition Width="18*"/>
+                                                                <ColumnDefinition Width="12*"/>
+                                                            </Grid.ColumnDefinitions>
+                                                            <TextBlock Text="Damping Factor" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="0"/>
+                                                            <TextBox Grid.Column="1" Margin="1" Text="{Binding p_mainRecipeData.p_dampingFactor, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" TextAlignment="Center" VerticalContentAlignment="Center" IsEnabled="False"></TextBox>
+                                                        </Grid>
+                                                    </UniformGrid>
                                                 </Grid>
-                                            </Grid>
-                                        </GroupBox>
-                                        <GroupBox Header="Thickness Parameter" Grid.Row="2" BorderThickness="0">
-                                            <Grid>
-                                                <UniformGrid Columns="2" Rows="2">
-                                                    <Grid Margin="3" Background="Gainsboro">
-                                                        <Grid.ColumnDefinitions>
-                                                            <ColumnDefinition Width="18*"/>
-                                                            <ColumnDefinition Width="12*"/>
-                                                        </Grid.ColumnDefinitions>
-                                                        <TextBlock Text="Lower WaveLength" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="0"/>
-                                                        <TextBox Grid.Column="1" Margin="1" Text="{Binding RecipeViewModel.LowerWaveLength, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" TextAlignment="Center" VerticalContentAlignment="Center" IsEnabled="False"></TextBox>
-                                                    </Grid>
-                                                    <Grid Margin="3" Background="Gainsboro">
-                                                        <Grid.ColumnDefinitions>
-                                                            <ColumnDefinition Width="18*"/>
-                                                            <ColumnDefinition Width="12*"/>
-                                                        </Grid.ColumnDefinitions>
-                                                        <TextBlock Text="Upper WaveLength" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="0"/>
-                                                        <TextBox Grid.Column="1" Margin="1" Text="{Binding RecipeViewModel.UpperWaveLength, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" TextAlignment="Center" VerticalContentAlignment="Center" IsEnabled="False"></TextBox>
-                                                    </Grid>
-                                                    <Grid Margin="3" Background="Gainsboro">
-                                                        <Grid.ColumnDefinitions>
-                                                            <ColumnDefinition Width="18*"/>
-                                                            <ColumnDefinition Width="12*"/>
-                                                        </Grid.ColumnDefinitions>
-                                                        <TextBlock Text="Thickness LM Iteration" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="0"/>
-                                                        <TextBox Grid.Column="1" Margin="1" Text="{Binding RecipeViewModel.ThicknessLMIteration, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" TextAlignment="Center" VerticalContentAlignment="Center" IsEnabled="False"></TextBox>
-                                                    </Grid>
-                                                    <Grid Margin="3" Background="Gainsboro">
-                                                        <Grid.ColumnDefinitions>
-                                                            <ColumnDefinition Width="18*"/>
-                                                            <ColumnDefinition Width="12*"/>
-                                                        </Grid.ColumnDefinitions>
-                                                        <TextBlock Text="Damping Factor" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="0"/>
-                                                        <TextBox Grid.Column="1" Margin="1" Text="{Binding RecipeViewModel.DampingFactor, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" TextAlignment="Center" VerticalContentAlignment="Center" IsEnabled="False"></TextBox>
-                                                    </Grid>
-                                                </UniformGrid>
-                                            </Grid>
-                                        </GroupBox>
-                                    </Grid>
-                                </TabItem>
-                            </TabControl>
-                        </GroupBox>
-                        <GroupBox Header="Current Progress" Grid.Row="2" BorderThickness="0">
+                                            </GroupBox>
+                                        </Grid>
+                                    </TabItem>
+                                </TabControl>
+                            </GroupBox>
+                        </Grid>
+                    </TabItem>
+                    <TabItem Header="Log" Width="80" Style="{StaticResource customTabitem}">
+                        <tools:LogView_UI x:Name="LogUI" Margin="2"/>
+                    </TabItem>
+                </TabControl>
+                <GroupBox Header="Current Measure Progress" Grid.Row="1" BorderThickness="0" Background="White" Margin="1">
+                    <GroupBox.HeaderTemplate>
+                        <DataTemplate>
                             <Grid>
-                                <ProgressBar Minimum="0" Maximum="100" Margin="2" Value="{Binding p_Progress, UpdateSourceTrigger=PropertyChanged}" Foreground="{Binding p_ProgressColor}" Style="{StaticResource CustomProgress}"/>
-                                <TextBlock Text="{Binding p_Progress, Converter={StaticResource ProgressConverter}, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Center" VerticalAlignment="Center" ></TextBlock>
+                                <Border  CornerRadius="2" Background="White" Width="170" Height="auto" BorderBrush="White" BorderThickness="0">
+                                    <TextBlock Background="White" Text="{Binding}" FontWeight="Bold" TextAlignment="Center" TextOptions.TextRenderingMode="ClearType"/>
+                                </Border>
+
                             </Grid>
-                        </GroupBox>
+                        </DataTemplate>
+                    </GroupBox.HeaderTemplate>
+                    <Grid>
+                        <ProgressBar Minimum="0" Maximum="100" Margin="2" Value="{Binding p_Progress, UpdateSourceTrigger=PropertyChanged}" Foreground="{Binding p_ProgressColor}" Style="{StaticResource CustomProgress}"/>
+                        <TextBlock Text="{Binding p_Progress, Converter={StaticResource ProgressConverter}, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Center" VerticalAlignment="Center" ></TextBlock>
                     </Grid>
-                </TabItem>
-                <TabItem Header="Log" Width="80" Style="{StaticResource customTabitem}">
-                    <tools:LogView_UI x:Name="LogUI" Margin="2"/>
-                </TabItem>
-            </TabControl>
+                </GroupBox>
+            </Grid>
             <Grid Grid.Column="3">
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="7*"/>
+                    <RowDefinition Height="3.7*"/>
+                    <RowDefinition Height="3*"/>
                     <RowDefinition Height="2*"/>
                 </Grid.RowDefinitions>
-                <StackPanel Margin="10,45,10,15" Grid.Column="3" Grid.Row="0">
+                <StackPanel  Grid.Row="0">
+                    <Border Height="50" Margin="0,20,3,10" Background="AliceBlue" CornerRadius="10">
+                        <TextBlock Grid.Column="2" x:Name="tbTime"
+                           Text="2021-05-14 15:39:47"
+                           FontSize="15" 
+                           FontWeight="Bold"
+                           VerticalAlignment="Center"
+                           HorizontalAlignment="Center"/>
+                    </Border>
+                    <Border  Background="LightGray" CornerRadius="10" Margin="0,0,0,10">
+                        <TextBlock Grid.Column="2" Text="Module" 
+                           FontSize="15" 
+                           FontWeight="Bold"
+                           VerticalAlignment="Center"
+                           HorizontalAlignment="Center"/>
+                    </Border>
                     <Button Content="Resume" x:Name="buttonResume" Margin="0,0,0,15" 
                             Style="{StaticResource customButton}" FontSize="15" FontWeight="Bold"
                             Height="40"
@@ -891,13 +990,31 @@
                             Style="{StaticResource customButton}" 
                             Height="40"
                             Click="buttonBuzzerOff_Click"/>
-                    <Button Content="OHT" x:Name="buttonOHT" Margin="0,200,0,0" FontSize="15" FontWeight="Bold"
-                            Style="{StaticResource customButton}"
-                            Height="40"
-                            Click="buttonOHT_Click"/>
                 </StackPanel>
 
-                <Grid Grid.Column="3" Grid.Row="1" Margin="7">
+                <StackPanel Grid.Row="1" Margin="0,20,0,0">
+                    <Border  Background="LightGray" CornerRadius="10" Margin="0,0,0,10">
+                        <TextBlock Grid.Column="2" Text="Automation" 
+                           FontSize="15" 
+                           FontWeight="Bold"
+                           VerticalAlignment="Center"
+                           HorizontalAlignment="Center"/>
+                    </Border>
+                    <Button Content="OHT" x:Name="buttonOHT"  FontSize="15" FontWeight="Bold"
+                            Style="{StaticResource customButton}"
+                            Height="40" Margin="0,0,0,15"
+                            Click="buttonOHT_Click"/>
+                    <Button Content="Offline" FontSize="15" FontWeight="Bold" Margin="0,0,0,15"
+                            Style="{StaticResource customButton}" Command="{Binding CmdOffline}"
+                            Height="40" />
+                    <Button Content="Online Local" FontSize="15" FontWeight="Bold" Margin="0,0,0,15"
+                            Style="{StaticResource customButton}" Command="{Binding CmdOnlineLocal}"
+                            Height="40" />
+                    <Button Content="Online Remote" FontSize="15" FontWeight="Bold" Margin="0,0,0,15"
+                            Style="{StaticResource customButton}" Command="{Binding CmdOnlineRemote}"
+                            Height="40" />
+                </StackPanel>
+                <Grid  Grid.Row="2" Margin="7">
                     <Border BorderThickness="1" BorderBrush="White" CornerRadius="2">
                             <Border.Effect>
                                 <DropShadowEffect ShadowDepth="2" Opacity="0.5"/>
@@ -923,7 +1040,7 @@
                                     <RowDefinition Height="1*"/>
                                 </Grid.RowDefinitions>
 
-                                <TextBlock Grid.Row="0" Text="Lamp Use Time" TextTrimming="WordEllipsis" ToolTip="Lamp Use Time" FontSize="15" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="5,10,0,10" TextOptions.TextRenderingMode="ClearType" />
+                                <TextBlock Grid.Row="0" Text="Lamp Use Time" TextTrimming="WordEllipsis" ToolTip="Lamp Use Time" FontSize="15" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="5,10,0,5" TextOptions.TextRenderingMode="ClearType" />
                                 <Grid Grid.Row="1">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="6*"/>
@@ -933,7 +1050,7 @@
                                     <TextBlock Grid.Row= "1" Grid.Column="1" Text="Hours"  Margin="0,0,0,0" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="15" FontWeight="Bold"/>
                                 </Grid>
                                 <TextBlock Grid.Row="2" Text="{Binding p_lampUsetime, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource OpticLampTimeToStringConverter}}" Margin="5,0,5,0" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="10" FontWeight="Bold" Foreground="Red" />
-                                <TextBlock Grid.Row="3" Text="Lamp Status" FontSize="15" ToolTip="Lamp Status" TextTrimming="WordEllipsis" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="5,10,5,10" />
+                                <TextBlock Grid.Row="3" Text="Lamp Status" FontSize="15" ToolTip="Lamp Status" TextTrimming="WordEllipsis" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="5,10,5,5" />
                                 <Grid Grid.Row="4">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition/>
@@ -943,9 +1060,9 @@
                                     <TextBlock Grid.Column="1" FontSize="15" FontWeight="Bold" Text="{Binding p_lampStatus, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource OpticLampStatusEnumConverter}}" HorizontalAlignment="Center" VerticalAlignment="Center" TextAlignment="Center"/>
                                 </Grid>
 
-                                <Border x:Name="LampStateColor" Grid.Row="4">
-                                    <TextBlock Text="{Binding p_LampStates, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center" HorizontalAlignment="Center" />
-                                </Border>
+                                <!--<Border x:Name="LampStateColor" Grid.Row="4">
+                                    <TextBlock Text="{Binding p_LampStatus, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center" HorizontalAlignment="Center" />
+                                </Border>-->
 
                             </Grid>
                         </Grid>

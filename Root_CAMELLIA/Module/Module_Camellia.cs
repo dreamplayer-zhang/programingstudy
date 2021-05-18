@@ -188,7 +188,9 @@ namespace Root_CAMELLIA.Module
         DIO_I m_homeExistWafer;
         DIO_I m_loadExistWafer;
         DIO_O m_vacuumOnOff;
-
+        DIO_I m_axisLifterHome1;
+        DIO_I m_axisLifterHome2;
+        DIO_I m_axisLifterHome3;
 
         private Camera_Basler m_CamVRS;
         public Camera_Basler p_CamVRS
@@ -252,6 +254,14 @@ namespace Root_CAMELLIA.Module
             m_axisLifter.AddPos(Enum.GetNames(typeof(eAxisPos)));
             m_axisLifter.AddIO(m_axisXReady);
             m_axisLifter.AddIO(m_axisYReady);
+
+            m_axisXY.p_axisX.AddIO(m_axisLifterHome1);
+            m_axisXY.p_axisX.AddIO(m_axisLifterHome2);
+            m_axisXY.p_axisX.AddIO(m_axisLifterHome3);
+
+            m_axisXY.p_axisY.AddIO(m_axisLifterHome1);
+            m_axisXY.p_axisY.AddIO(m_axisLifterHome2);
+            m_axisXY.p_axisY.AddIO(m_axisLifterHome3);
             //m_axisLifter.AddIO(m_vaccum);
             m_axisLifter.p_vaccumDIO_I = m_vacuum;
         }
@@ -285,7 +295,10 @@ namespace Root_CAMELLIA.Module
             p_sInfo = m_toolBox.GetCamera(ref m_CamVRS, this, "VRS");
             p_sInfo = m_toolBox.Get(ref m_lightSet, this);
             p_sInfo = m_toolBox.GetDIO(ref m_axisXReady, this, "Stage X Ready");
-            p_sInfo = m_toolBox.GetDIO(ref m_axisYReady, this, "Stage Y Ready");   
+            p_sInfo = m_toolBox.GetDIO(ref m_axisYReady, this, "Stage Y Ready");
+            p_sInfo = m_toolBox.GetDIO(ref m_axisLifterHome1, this, "Lifter 1 Home");
+            p_sInfo = m_toolBox.GetDIO(ref m_axisLifterHome2, this, "Lifter 2 Home");
+            p_sInfo = m_toolBox.GetDIO(ref m_axisLifterHome3, this, "Lifter 3 Home");
             p_sInfo = m_toolBox.GetDIO(ref m_vacuum, this, "Vaccum On");
             p_sInfo = m_toolBox.GetDIO(ref m_vacuumOnOff, this, "Vaccum OnOff");
             p_sInfo = m_toolBox.GetDIO(ref m_homeExistWafer, this, "Home Wafer Exist");
@@ -335,14 +348,10 @@ namespace Root_CAMELLIA.Module
             AddModuleRunList(new Run_PMSensorCameraTilt (this), true, "PM Sensor_Camera Tilt");
         }
 
-
-        bool m_isHomeRun = false;
-
         public bool p_isClearInfoWafer { get; set; } = false;
         public override string StateHome()
         {
             p_isClearInfoWafer = true;
-            m_isHomeRun = true;
             try
             {
                 p_sInfo = "OK";
@@ -415,12 +424,7 @@ namespace Root_CAMELLIA.Module
                 p_eState = (p_sInfo == "OK") ? eState.Ready : eState.Error;
 
                 return p_sInfo;
-            }
-            finally
-            {
-                m_isHomeRun = false;
-            }  
-            
+            }            
         }
 
 
@@ -556,12 +560,12 @@ namespace Root_CAMELLIA.Module
             {
                 if (!m_vacuum.p_bIn)
                 {
-                    if (p_axisLifter.IsInPos(ePosition.Position_0))
+                    if (p_axisLifter.IsInPos(eAxisPos.Ready))
                     {
                         return "OK";
                     }
 
-                    if (Run(p_axisLifter.StartMove(ePosition.Position_0)))
+                    if (Run(p_axisLifter.StartMove(eAxisPos.Ready)))
                     {
                         return p_sInfo;
                     }
@@ -670,6 +674,7 @@ namespace Root_CAMELLIA.Module
 
         public string BeforeGet(int nID)
         {
+            //App.m_SSLoggerNet.WriteXFRLog(nID, SSLNet.XFR_EVENTID.GET, SSLNet.STATUS.START,);
             //m_CamVRS.FunctionConnect();
             string info = MoveReadyPos();
             if (info != "OK")
@@ -706,7 +711,7 @@ namespace Root_CAMELLIA.Module
         public string AfterGet(int nID)
         {
             // Make Directory
-           
+            //App.m_SSLoggerNet.WriteXFRLog(nID, SSLNet.XFR_EVENTID.GET, SSLNet.STATUS.END,);
             return "OK";
         }
 

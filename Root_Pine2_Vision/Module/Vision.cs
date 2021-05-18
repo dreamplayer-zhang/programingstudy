@@ -1,8 +1,10 @@
 ﻿using RootTools;
+using RootTools.Comm;
 using RootTools.Light;
 using RootTools.Memory;
 using RootTools.Module;
 using RootTools.Trees;
+using System.Net.Sockets;
 using System.Threading;
 
 namespace Root_Pine2_Vision.Module
@@ -13,14 +15,45 @@ namespace Root_Pine2_Vision.Module
         LightSet lightSet;
         MemoryPool memoryPool;
         MemoryGroup memoryGroup;
+        TCPAsyncClient[] m_tcpip = new TCPAsyncClient[2] { null, null };
         public override void GetTools(bool bInit)
         {
             if (p_eRemote == eRemote.Server)
             {
                 p_sInfo = m_toolBox.Get(ref memoryPool, this, "Memory", 1);
                 p_sInfo = m_toolBox.Get(ref lightSet, this);
+                p_sInfo = m_toolBox.GetComm(ref m_tcpip[0], this, "VisionWorksA");
+                p_sInfo = m_toolBox.GetComm(ref m_tcpip[1], this, "VisionWorksB");
+            }
+            if (bInit)
+            {
+                m_tcpip[0].EventReciveData += M_tcpipA_EventReciveData;
+                m_tcpip[1].EventReciveData += M_tcpipB_EventReciveData;
             }
             m_remote.GetTools(bInit);
+        }
+        #endregion
+
+        #region ReadMsg
+        private void M_tcpipA_EventReciveData(byte[] aBuf, int nSize, Socket socket)
+        {
+        }
+
+        private void M_tcpipB_EventReciveData(byte[] aBuf, int nSize, Socket socket)
+        {
+            
+        }
+        #endregion
+
+        #region Process Start
+        string m_strVisionWorks2Path_A = "C:\\WisVision\\VisionWorks2.exe";
+        string m_strVisionWorks2Path_B = "C:\\WisVision\\VisionWorks2.exe";
+        public void RunTreeProcess(Tree tree)
+        {
+            //m_tcpip[0].p_nPort
+            //m_tcpip[0].p_bConnect
+            m_strVisionWorks2Path_A = tree.Set(m_strVisionWorks2Path_A, m_strVisionWorks2Path_A, "VisionWorks2_A Path", "VisionWorks2_A Path(Full Path)");
+            m_strVisionWorks2Path_B = tree.Set(m_strVisionWorks2Path_B, m_strVisionWorks2Path_B, "VisionWorks2_B Path", "VisionWorks2_B Path(Full Path)");
         }
         #endregion
 
@@ -54,6 +87,7 @@ namespace Root_Pine2_Vision.Module
         public override void RunTree(Tree tree)
         {
             base.RunTree(tree);
+            RunTreeProcess(tree.GetTree("Process")); 
         }
         #endregion
 

@@ -42,6 +42,7 @@ namespace Root_CAMELLIA.LibSR_Met
 
         public ARCNIR m_SR = null;
         Model m_Model = null;
+        Model m_ModelSave = null;
         DataManager m_DM = DataManager.GetInstance();
         Calculation m_Calculation = new Calculation();
         public PMDatas m_PMDatas = new PMDatas();
@@ -61,6 +62,7 @@ namespace Root_CAMELLIA.LibSR_Met
         {
             m_SR = new ARCNIR();
             m_Model = new Model();
+            m_ModelSave = new Model();
             m_MaterialList = m_Model.m_MaterialList;
             m_LayerList = m_Model.m_LayerList;
 
@@ -1533,7 +1535,7 @@ namespace Root_CAMELLIA.LibSR_Met
         {
             try
             {
-                sp.PortName = "COM2";
+                sp.PortName = "COM6";
                 sp.BaudRate = 9600;
                 sp.DataBits = 8;
                 sp.StopBits = StopBits.One;
@@ -1565,17 +1567,27 @@ namespace Root_CAMELLIA.LibSR_Met
                             m_Hr_Org = m_Min_Org = m_Sec_Org = 0;
                             m_Hr = m_Min = m_Sec = 0;
 
-                            if (fi.Exists)
+                            if (!fi.Exists)
                             {
-                                timedata = File.ReadAllText(@filepath);
-                                char sp = ':';
-                                string[] spstring = timedata.Split(sp);
-
-                                m_Hr_Org = Convert.ToInt32(spstring[0]);
-                                m_Min_Org = Convert.ToInt32(spstring[1]);
-                                m_Sec_Org = Convert.ToInt32(spstring[2]);
-
+                                fi.Create();
+                                using (StreamWriter SW = new StreamWriter(filepath))
+                                {
+                                    SW.WriteLine("00:00:00");
+                                    SW.Close();
+                                }
+                                return;
                             }
+
+                            timedata = File.ReadAllText(@filepath);
+
+                            char split = ':';
+                            string[] spstring = timedata.Split(split);
+
+                            m_Hr_Org = Convert.ToInt32(spstring[0]);
+                            m_Min_Org = Convert.ToInt32(spstring[1]);
+                            m_Sec_Org = Convert.ToInt32(spstring[2]);
+
+
                             Sec = Convert.ToInt32(arr[1]);
 
                             m_Sec = Sec + m_Sec_Org;
@@ -1645,18 +1657,26 @@ namespace Root_CAMELLIA.LibSR_Met
 
                         m_Hr_Org = m_Min_Org = m_Sec_Org = 0;
                         m_Hr = m_Min = m_Sec = 0;
-
-                        if (fi.Exists)
+                        
+                        if (!fi.Exists)
                         {
-                            timedata = File.ReadAllText(@filepath);
-                            char sp = ':';
-                            string[] spstring = timedata.Split(sp);
-
-                            m_Hr_Org = Convert.ToInt32(spstring[0]);
-                            m_Min_Org = Convert.ToInt32(spstring[1]);
-                            m_Sec_Org = Convert.ToInt32(spstring[2]);
-
+                            fi.Create();
+                            using (StreamWriter SW = new StreamWriter(filepath))
+                            {
+                                SW.WriteLine("00:00:00");
+                                SW.Close();
+                            }
+                            return value;
                         }
+
+                        timedata = File.ReadAllText(@filepath);
+                        char split = ':';
+                        string[] spstring = timedata.Split(split);
+
+                        m_Hr_Org = Convert.ToInt32(spstring[0]);
+                        m_Min_Org = Convert.ToInt32(spstring[1]);
+                        m_Sec_Org = Convert.ToInt32(spstring[2]);
+
                         Sec = Convert.ToInt32(arr[1]);
 
                         m_Sec = Sec + m_Sec_Org;

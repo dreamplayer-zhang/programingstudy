@@ -31,7 +31,7 @@ namespace Root_VEGA_P.Engineer
         #region Module
         public ModuleList p_moduleList { get; set; }
         public VEGA_P_Recipe m_recipe;
-        //public EFEM_Process m_process; //forgetVegaP
+        public VEGA_P_Process m_process; 
         public VEGA_P m_VEGA; 
         public RTR m_rtr;
         public Loadport m_loadport;
@@ -68,7 +68,9 @@ namespace Root_VEGA_P.Engineer
 
             m_recipe = new VEGA_P_Recipe("Recipe", m_engineer);
             foreach (ModuleBase module in p_moduleList.m_aModule.Keys) m_recipe.AddModule(module);
-            //m_process = new EFEM_Process("Process", m_engineer, iWTR, m_aLoadport);
+
+            m_process = new VEGA_P_Process("Process", m_engineer);
+            m_process.CalcRecover(); 
         }
 
         void InitModule(ModuleBase module)
@@ -80,11 +82,7 @@ namespace Root_VEGA_P.Engineer
 
         public bool IsEnableRecovery()
         {
-            foreach (IRTRChild child in m_rtr.p_aChild)
-            {
-                if (child.IsEnableRecovery()) return true;
-            }
-            return m_rtr.IsEnableRecovery();
+            return m_process.IsEnableRecover(); 
         }
         #endregion
 
@@ -97,7 +95,6 @@ namespace Root_VEGA_P.Engineer
                 EQ.p_eState = EQ.eState.Init;
                 return sInfo;
             }
-            //sInfo = StateHome((ModuleBase)m_aLoadport[0], (ModuleBase)m_aLoadport[1]);
             if (sInfo == "OK") EQ.p_eState = EQ.eState.Ready;
             return sInfo;
         }
@@ -156,79 +153,11 @@ namespace Root_VEGA_P.Engineer
         }
         #endregion
 
-        #region Calc Sequence
-        dynamic m_infoRnRSlot;
-        public string AddSequence(dynamic infoSlot)
-        {
-            m_infoRnRSlot = infoSlot;
-            //m_process.p_sInfo = m_process.AddInfoWafer(infoSlot); //forgetVegaP
-            return "OK";
-        }
-
-        public void CalcSequence()
-        {
-            //m_process.ReCalcSequence(); //forgetVegaP
-            //CalcDockingUndocking();
-        }
-
-        public void CalcRecover()
-        {
-            //m_process.CalcRecover(); //forgetVegaP
-            //CalcDockingUndocking();
-        }
-/*
-        void CalcDockingUndocking()
-        {
-            List<EFEM_Process.Sequence> aSequence = new List<EFEM_Process.Sequence>();
-            while (m_process.m_qSequence.Count > 0) aSequence.Add(m_process.m_qSequence.Dequeue());
-            List<ILoadport> aDock = new List<ILoadport>();
-            foreach (ILoadport loadport in m_aLoadport)
-            {
-                if (CalcDocking(loadport, aSequence)) aDock.Add(loadport);
-            }
-            while (aSequence.Count > 0)
-            {
-                EFEM_Process.Sequence sequence = aSequence[0];
-                m_process.m_qSequence.Enqueue(sequence);
-                aSequence.RemoveAt(0);
-                for (int n = aDock.Count - 1; n >= 0; n--)
-                {
-                    if (CalcUnload(aDock[n], aSequence))
-                    {
-                        ModuleRunBase runUndocking = aDock[n].GetModuleRunUndocking().Clone();
-                        EFEM_Process.Sequence sequenceUndock = new EFEM_Process.Sequence(runUndocking, sequence.m_infoWafer);
-                        m_process.m_qSequence.Enqueue(sequenceUndock);
-                        aDock.RemoveAt(n);
-                    }
-                }
-            }
-            m_process.RunTree(Tree.eMode.Init);
-        }
-
-        bool CalcDocking(ILoadport loadport, List<EFEM_Process.Sequence> aSequence)
-        {
-            foreach (EFEM_Process.Sequence sequence in aSequence)
-            {
-                if (loadport.p_id == sequence.m_infoWafer.m_sModule) return true; 
-            }
-            return false;
-        }
-
-        bool CalcUnload(ILoadport loadport, List<EFEM_Process.Sequence> aSequence)
-        {
-            foreach (EFEM_Process.Sequence sequence in aSequence)
-            {
-                if (loadport.p_id == sequence.m_infoWafer.m_sModule) return false;
-            }
-            return true;
-        } */
-        #endregion
-
         #region IHandler
         public void CheckFinish()
         {
             if (m_gem.p_cjRun == null) return;
-            //if (m_process.m_qSequence.Count > 0) return;
+
             foreach (GemPJ pj in m_gem.p_cjRun.m_aPJ)
             {
                 m_gem?.SendPJComplete(pj.m_sPJobID);
@@ -236,9 +165,28 @@ namespace Root_VEGA_P.Engineer
             }
         }
 
+        public bool IsFinish()
+        {
+            if (m_process.p_nQueue > 0) return false;
+            foreach (ModuleBase module in p_moduleList.m_aModule.Keys)
+            {
+                if (module.IsBusy()) return false; 
+            }
+            return true; 
+        }
+
         public dynamic GetGemSlot(string sSlot)
         {
             return null;
+        }
+
+        public string AddSequence(dynamic infoSlot)
+        {
+            return "OK";
+        }
+
+        public void CalcSequence()
+        {
         }
         #endregion
 
@@ -261,21 +209,7 @@ namespace Root_VEGA_P.Engineer
                 switch (EQ.p_eState)
                 {
                     case EQ.eState.Home: StateHome(); break;
-                    case EQ.eState.Run:
-                        if (p_moduleList.m_qModuleRun.Count == 0)
-                        {
-                            //CheckLoad();
-                            //m_process.p_sInfo = m_process.RunNextSequence();
-                            //CheckUnload();
-                            //if ((EQ.p_nRnR > 1) && (m_process.m_qSequence.Count == 0))
-                            //{
-                                //m_process.p_sInfo = m_process.AddInfoWafer(m_infoRnRSlot);
-                                //CalcSequence();
-                                //EQ.p_nRnR--;
-                                //EQ.p_eState = EQ.eState.Run;
-                            //}
-                        }
-                        break;
+                    case EQ.eState.Run: m_process.RunProcess(); break; 
                 }
             }
         }
@@ -314,6 +248,5 @@ namespace Root_VEGA_P.Engineer
             p_moduleList.ThreadStop();
             foreach (ModuleBase module in p_moduleList.m_aModule.Keys) module.ThreadStop();
         }
-
     }
 }

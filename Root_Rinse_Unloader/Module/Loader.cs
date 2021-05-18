@@ -111,6 +111,7 @@ namespace Root_Rinse_Unloader.Module
         {
             m_secVac = tree.Set(m_secVac, m_secVac, "Vacuum", "Vacuum On Time Delay (sec)");
             m_secBlow = tree.Set(m_secBlow, m_secBlow, "Blow", "Blow Time (sec)");
+            m_secPickerDown = tree.Set(m_secPickerDown, m_secPickerDown, "PickerDown", "PickrDown Delay (sec)");
         }
         #endregion
 
@@ -231,10 +232,12 @@ namespace Root_Rinse_Unloader.Module
             return "OK";
         }
 
+        double m_secPickerDown = 0.2; 
         string RunPickerLoad()
         {
-            if (Run(RunVacuum(true))) return p_sInfo;
             if (Run(RunPickerDown(true))) return p_sInfo;
+            Thread.Sleep((int)(1000 * m_secPickerDown)); 
+            if (Run(RunVacuum(true))) return p_sInfo;
             Thread.Sleep((int)(1000 * m_secVac));
             if (Run(RunPickerDown(false))) return p_sInfo;
             return "OK"; 
@@ -267,6 +270,7 @@ namespace Root_Rinse_Unloader.Module
         public string RunRun()
         {
             if (EQ.p_bPickerSet) return "OK";
+            if (EQ.p_eState != EQ.eState.Run) return "OK";
             return p_bVacuum ? RunUnload() : RunLoad();
         }
 

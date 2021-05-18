@@ -25,5 +25,11 @@ namespace Root_CAMELLIA
             InitializeComponent();
             DataContext = m_splashViewModel;
         }
+
+        private void Grid_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            if(e.RightButton != MouseButtonState.Pressed)
+                this.DragMove();
+        }
     }
 }

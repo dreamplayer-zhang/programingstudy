@@ -524,9 +524,9 @@ namespace RootTools.Camera.BaslerPylon
                 if (m_Cam.Parameters[PLCamera.PixelFormat].GetValue().Equals(PLCamera.PixelFormat.Mono8))
                 {
                     //GrayScale인 경우 frame rate를 60 이상 사용하지 않도록 제한
-                    if (value < 16638)
-                        m_Cam.Parameters[PLCamera.ExposureTimeRaw].TrySetValue(16638, IntegerValueCorrection.Nearest);
-                    else
+                    //if (value < 16638)
+                    //    m_Cam.Parameters[PLCamera.ExposureTimeRaw].TrySetValue(16638, IntegerValueCorrection.Nearest);
+                    //else
                         m_Cam.Parameters[PLCamera.ExposureTimeRaw].TrySetValue(value, IntegerValueCorrection.Nearest);
             }
                 else

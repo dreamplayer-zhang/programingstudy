@@ -241,8 +241,9 @@ namespace Root_Rinse_Loader.Module
         }
         bool IsLoaderDanger()
         {
-            if (p_loader == null) return true;
-            return p_loader.IsLoaderDanger(); 
+            return false; 
+            //if (p_loader == null) return true;
+            //return p_loader.IsLoaderDanger(); 
         }
 
         Axis m_axis;
@@ -315,6 +316,20 @@ namespace Root_Rinse_Loader.Module
         public bool p_bIsEnablePick
         {
             get { return Math.Abs(m_posStackReady - m_axis.p_posCommand) < 10; }
+        }
+
+        public void RunLoadUp()
+        {
+            MoveMagazine(eMagazine.Magazine3, 10, true);
+            m_aMagazine[0].RunClamp(false);
+            m_aMagazine[1].RunClamp(false); 
+        }
+
+        public void RunLoadDown()
+        {
+            MoveMagazine(eMagazine.Magazine1, 0, true);
+            m_aMagazine[2].RunClamp(false);
+            m_aMagazine[3].RunClamp(false);
         }
 
         void RunTreeElevator(Tree tree)

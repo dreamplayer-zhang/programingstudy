@@ -1,4 +1,4 @@
-﻿<Window x:Class="Root_CAMELLIA.Dlg_RecipeManager"
+﻿<UserControl x:Class="Root_CAMELLIA.Dlg_RecipeManager"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -9,12 +9,7 @@
         xmlns:cp="clr-namespace:ColorPickerLib.Controls;assembly=ColorPickerLib"
         xmlns:stage ="clr-namespace:Camellia2Stage"
         xmlns:data="clr-namespace:Root_CAMELLIA.Data"
-        WindowStyle="None"
-        ResizeMode="CanResize"
-        WindowStartupLocation="CenterScreen"
-        WindowState="Normal"
-        Width="1820" Height="980"
-        BorderBrush="Black" BorderThickness="1"
+        Width="1620" Height="880"
         Background="White"
         mc:Ignorable="d">
     <i:Interaction.Triggers>
@@ -22,68 +17,21 @@
             <i:InvokeCommandAction Command="{Binding UnloadedCommand}" />
         </i:EventTrigger>
     </i:Interaction.Triggers>
-    <Window.Resources>
+    <UserControl.Resources>
         <local:ColorToBrushConverter x:Key="ColorToBrushConverter"/>
         <local:ImageConverter x:Key="ImageConverter"/>
         <local:PathConverter x:Key="PathConverter"/>
         <local:BoolConverter x:Key="BoolConverter"/>
         <local:MapModeToBoolConverter x:Key="ModeConverter"/>
-    </Window.Resources>
+
+
+    </UserControl.Resources>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        <!--Title Bar-->
-        <Grid Grid.Row="0"
-              Name="TitleBar"
-              Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}"
-              MouseLeftButtonDown="TitleBar_MouseLeftButtonDown" Grid.ColumnSpan="2">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="Auto" />
-            </Grid.ColumnDefinitions>
-            <Icon:AtiLogo Width="30"
-                          Height="21"
-                          VerticalAlignment="Center"
-                          Margin="2"/>
-            <Grid Grid.Column="1">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="auto"/>
-                    <ColumnDefinition Width="auto"/>
-                </Grid.ColumnDefinitions>
-               <TextBlock Grid.Column="0" Text="{Binding Path=Version, Source={x:Static local:BaseDefine.Configuration}}"  FontSize="11" Foreground="Black" VerticalAlignment="Center" Margin="5,0,0,0"/>
-                <TextBlock Text="{Binding RecipePath}"
-                       FontSize="11"
-                       Foreground="Black"
-                       VerticalAlignment="Center"
-                       Margin="5,0,0,0"
-                       Grid.Column="1" />
-            </Grid>
-            <TextBlock Text="Recipe Manager"
-                       FontSize="14"
-                       FontWeight="Bold"
-                       Foreground="Black"
-                       HorizontalAlignment="Center"
-                       VerticalAlignment="Center"
-                       Margin="5,0,0,0"
-                       Grid.Column="1" />
-            <StackPanel WindowChrome.IsHitTestVisibleInChrome="True"
-                        Orientation="Horizontal"
-                        Grid.Column="2">
-                <Button Style="{StaticResource SystemButton}"
-                        x:Name="CloseButton"
-                        Width="30"
-                        Height="25"
-                        Margin="2,0,0,0"
-                        VerticalAlignment="Bottom"
-                        Command="{Binding CmdClose}">
-                    <Path Style="{StaticResource CloseIconKey}" />
-                </Button>
-            </StackPanel>
-        </Grid>
         <!--Menu-->
         <!--<Menu Grid.Row="1" Background="{DynamicResource ControlBackGround}" Grid.ColumnSpan="2"
               Height="25">
@@ -92,7 +40,7 @@
             <MenuItem x:Name="RecipeSave" Header="Save" Command="{Binding CmdRecipeSave}"/>
             <MenuItem x:Name="RecipeSaveAs" Header="Save As" Command="{Binding CmdRecipeSaveAs}"/>
         </Menu>-->
-        <Grid Grid.Row="1" Background="{DynamicResource ControlBackGround}" Grid.ColumnSpan="2" Height="25">
+        <!--<Grid Grid.Row="1" Background="{DynamicResource ControlBackGround}" Grid.ColumnSpan="2" Height="25">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="230"/>
                 <ColumnDefinition/>
@@ -104,7 +52,7 @@
                 <Button BorderBrush="{x:Null}" BorderThickness="0" Content="Save" Command="{Binding CmdRecipeSave}" IsEnabled="{Binding p_isCustomize, Converter={StaticResource BoolConverter}}"/>
                 <Button BorderBrush="{x:Null}" BorderThickness="0" Content="Save As" Command="{Binding CmdRecipeSaveAs}" IsEnabled="{Binding p_isCustomize, Converter={StaticResource BoolConverter}}"/>
             </UniformGrid>
-        </Grid>
+        </Grid>-->
 
         <Grid Grid.Row="2">
             <Grid.ColumnDefinitions>
@@ -158,7 +106,7 @@
                                 <ColumnDefinition Width="3*"/>
                                 <ColumnDefinition/>
                             </Grid.ColumnDefinitions>
-                            <TextBlock Text="Use Thickness Measurement" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="0"/>
+                            <TextBlock Text="Use Thickness" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="0"/>
                             <ToggleButton Grid.Column="1" Style="{StaticResource CustomToggleButton}" IsChecked="{Binding p_UseThickness, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                         </Grid>
                         <Grid Grid.Column="1" Background="Gainsboro" Margin="3">
@@ -166,7 +114,7 @@
                                 <ColumnDefinition Width="3*"/>
                                 <ColumnDefinition/>
                             </Grid.ColumnDefinitions>
-                            <TextBlock Text="Use Transmittance Measurement" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="0"/>
+                            <TextBlock Text="Use Transmittance" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="0"/>
                             <ToggleButton Grid.Column="1" Style="{StaticResource CustomToggleButton}" IsChecked="{Binding p_UseTransmittance, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                         </Grid>
                     </Grid>
@@ -179,7 +127,8 @@
                             <RowDefinition Height="0.3*"/>
                         </Grid.RowDefinitions>
                         <DataGrid Margin="2" AutoGenerateColumns="False" CanUserAddRows="False" CanUserSortColumns="False" EnableColumnVirtualization="True" CanUserDeleteRows="False"
-                                  EnableRowVirtualization="True" ScrollViewer.CanContentScroll="True" SelectionMode="Single" ItemsSource="{Binding GridLayerData}"
+                                  EnableRowVirtualization="True" ScrollViewer.CanContentScroll="True" SelectionMode="Single" ItemsSource="{Binding GridLayerData}" VirtualizingPanel.IsVirtualizing="True"
+                                  VirtualizingPanel.VirtualizationMode="Recycling" 
                                   SelectedIndex="{Binding GridLayerIndex}" IsEnabled="{Binding p_UseThickness}">
                             <DataGrid.Columns>
                                 <DataGridTextColumn Header="" Width="40" Binding="{Binding LayerHeader}" IsReadOnly="True" Foreground="Blue" FontWeight="ExtraBold"/>
@@ -363,7 +312,13 @@
                                 </ListView>
                                 <UniformGrid Grid.Column="2" Columns="1" Rows="2">
                                     <Button Content="Add material"  Margin="7" Command="{Binding CmdAddMaterial}" IsEnabled="{Binding p_UseThickness}" Style="{StaticResource customButton}"/>
-                                    <Button Content="Delete material" Margin="7" Command="{Binding CmdDeleteMaterial}" IsEnabled="{Binding p_UseThickness}" Style="{StaticResource customButton}"/>
+                                    <Button Margin="7" Command="{Binding CmdDeleteMaterial}" IsEnabled="{Binding p_UseThickness}" Style="{StaticResource customButton}">
+                                        <Button.Content>
+                                            <TextBlock TextAlignment="Center">
+                                                 Delete <LineBreak/> material
+                                            </TextBlock>
+                                        </Button.Content>
+                                    </Button>
                                 </UniformGrid>
                                 <UniformGrid Grid.Column="3" Columns="2" Rows="2" Margin="2">
                                     <Button Content="Insert Layer" Margin="5" Command="{Binding CmdInsertLayer}" IsEnabled="{Binding p_UseThickness}" Style="{StaticResource customButton}"/>
@@ -372,8 +327,8 @@
                                     <Button Content="Save Model" Margin="5" Command="{Binding CmdSaveModel}" IsEnabled="{Binding p_UseThickness}" Style="{StaticResource customButton}"/>
                                 </UniformGrid>
                                 <TextBlock Text="Model File" Grid.Row="1" Grid.Column="2" VerticalAlignment="Center"
-                                           HorizontalAlignment="Center" Height="14" Width="Auto" Margin="8,8,42,8"/>
-                                <TextBox Grid.Row="1" Grid.Column="2" TextAlignment="Center" VerticalContentAlignment="Center" IsReadOnly="True" IsReadOnlyCaretVisible="True" Margin="70,2,2,2" Grid.ColumnSpan="2" Text="{Binding ModelPath}" IsEnabled="{Binding p_UseThickness}"/>
+                                           HorizontalAlignment="Center" Height="14" Width="Auto" Margin="8,8,25,8"/>
+                                <TextBox Grid.Row="1" Grid.Column="2" TextAlignment="Center" VerticalContentAlignment="Center" IsReadOnly="True" IsReadOnlyCaretVisible="True" Margin="75,2,2,2" Grid.ColumnSpan="2" Text="{Binding ModelPath}" IsEnabled="{Binding p_UseThickness}"/>
                             </Grid>
                         </Grid>
                         <UniformGrid Columns="2" Grid.Row="3">
@@ -417,14 +372,33 @@
                                         <TextBlock Grid.Row="0" Text="Reflectance" TextAlignment="Center" Margin="0,2"/>
                                     </Border>
                                 </Grid>
-                                <DataGrid Grid.Row="1" ItemsSource="{Binding ReflectanceListItem}" AutoGenerateColumns="False" CanUserAddRows="False" CanUserSortColumns="True" EnableColumnVirtualization="True"  CanUserDeleteRows="False"
+                                <ListView Grid.Row="1" ItemsSource="{Binding ReflectanceListItem}" SelectedIndex="{Binding ReflectanceSelectedIndex}" SelectionMode="Single"
+                                          ScrollViewer.CanContentScroll="True"  ScrollViewer.HorizontalScrollBarVisibility="Hidden">
+                                    <ListView.ItemContainerStyle>
+                                        <Style TargetType="ListViewItem">
+                                            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                                            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                                            <Setter Property="Height" Value="20"/>
+                                            <Setter Property="BorderBrush" Value="Gray"></Setter>
+                                            <Setter Property="BorderThickness" Value="0,0,0,1"></Setter>
+                                        </Style>
+                                    </ListView.ItemContainerStyle>
+                                    <ListView.View>
+                                        <GridView AllowsColumnReorder="False">
+                                            <GridViewColumn Width="47" Header="Wave" DisplayMemberBinding="{Binding p_waveLength}"/>
+                                            <GridViewColumn Width="47" Header="Scale" DisplayMemberBinding="{Binding p_scale}"/>
+                                            <GridViewColumn Width="47" Header="Offset" DisplayMemberBinding="{Binding p_offset}"/>
+                                        </GridView>
+                                    </ListView.View>
+                                </ListView>
+                                <!--<DataGrid Grid.Row="1" ItemsSource="{Binding ReflectanceListItem}" AutoGenerateColumns="False" CanUserAddRows="False" CanUserSortColumns="True" EnableColumnVirtualization="True"  CanUserDeleteRows="False"
                                   EnableRowVirtualization="True" ScrollViewer.CanContentScroll="True" SelectionMode="Single" SelectedIndex="{Binding ReflectanceSelectedIndex}">
                                     <DataGrid.Columns>
                                         <DataGridTextColumn Header="Wave" Width="*" Binding="{Binding p_waveLength}" IsReadOnly="True"/>
                                         <DataGridTextColumn Header="Scale" Width="*" Binding="{Binding p_scale}" IsReadOnly="True"/>
                                         <DataGridTextColumn Header="Offset" Width="*" Binding="{Binding p_offset}" IsReadOnly="True"/>
                                     </DataGrid.Columns>
-                                </DataGrid>
+                                </DataGrid>-->
                             </Grid>
                         </Grid>
                         <Grid Grid.Column="1" Margin="5">
@@ -441,14 +415,33 @@
                                         <TextBlock Grid.Row="0" Text="Transmittance" VerticalAlignment="Top" HorizontalAlignment="Center" Margin="0,2"/>
                                     </Border>
                                 </Grid>
-                                <DataGrid Grid.Row="1" ItemsSource="{Binding TransmittanceListItem}" AutoGenerateColumns="False" CanUserAddRows="False" CanUserSortColumns="True" EnableColumnVirtualization="True"  CanUserDeleteRows="False"
+                                <ListView Grid.Row="1" ItemsSource="{Binding TransmittanceListItem}" SelectedIndex="{Binding TransmittanceSelectedIndex}" SelectionMode="Single"
+                                          ScrollViewer.CanContentScroll="True" ScrollViewer.HorizontalScrollBarVisibility="Hidden">
+                                    <ListView.ItemContainerStyle>
+                                        <Style TargetType="ListViewItem">
+                                            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                                            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                                            <Setter Property="Height" Value="20"/>
+                                            <Setter Property="BorderBrush" Value="Gray"></Setter>
+                                            <Setter Property="BorderThickness" Value="0,0,0,1"></Setter>
+                                        </Style>
+                                    </ListView.ItemContainerStyle>
+                                    <ListView.View>
+                                        <GridView AllowsColumnReorder="False">
+                                            <GridViewColumn Width="47" Header="Wave" DisplayMemberBinding="{Binding p_waveLength}"/>
+                                            <GridViewColumn Width="47" Header="Scale" DisplayMemberBinding="{Binding p_scale}"/>
+                                            <GridViewColumn Width="47" Header="Offset" DisplayMemberBinding="{Binding p_offset}"/>
+                                        </GridView>
+                                    </ListView.View>
+                                </ListView>
+                                <!--<DataGrid Grid.Row="1" ItemsSource="{Binding TransmittanceListItem}" AutoGenerateColumns="False" CanUserAddRows="False" CanUserSortColumns="True" EnableColumnVirtualization="True"  CanUserDeleteRows="False"
                                   EnableRowVirtualization="True" ScrollViewer.CanContentScroll="True" SelectionMode="Single" SelectedIndex="{Binding TransmittanceSelectedIndex}">
                                     <DataGrid.Columns>
                                         <DataGridTextColumn Header="Wave" Width="*" Binding="{Binding p_waveLength}" IsReadOnly="True"/>
                                         <DataGridTextColumn Header="Scale" Width="*" Binding="{Binding p_scale}" IsReadOnly="True"/>
                                         <DataGridTextColumn Header="Offset" Width="*" Binding="{Binding p_offset}" IsReadOnly="True"/>
                                     </DataGrid.Columns>
-                                </DataGrid>
+                                </DataGrid>-->
                             </Grid>
                         </Grid>
                         <Grid Grid.Column="2" Margin="5">
@@ -806,7 +799,26 @@
                                         <TextBlock Text=":" VerticalAlignment="Center" HorizontalAlignment="Left"/>
                                         <TextBlock Text="{Binding PointCount}" VerticalAlignment="Center" HorizontalAlignment="Left"/>
                                     </UniformGrid>
-                                    <DataGrid Grid.Row="1" ItemsSource="{Binding PointListItem}" AutoGenerateColumns="False" CanUserAddRows="False" CanUserSortColumns="True" EnableColumnVirtualization="True"  CanUserDeleteRows="False"
+                                    <ListView Grid.Row="1" ItemsSource="{Binding PointListItem}">
+                                        <ListView.ItemContainerStyle>
+                                            <Style TargetType="ListViewItem">
+                                                <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                                                <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                                                <Setter Property="Height" Value="20"/>
+                                                <Setter Property="BorderBrush" Value="Gray"></Setter>
+                                                <Setter Property="BorderThickness" Value="0,0,0,1"></Setter>
+                                            </Style>
+                                        </ListView.ItemContainerStyle>
+                                        <ListView.View >
+                                            <GridView AllowsColumnReorder="False">
+                                                <GridViewColumn Width="80" Header="Index"  DisplayMemberBinding="{Binding ListIndex}"/>
+                                                <GridViewColumn Width="100" Header="X (mm)" DisplayMemberBinding="{Binding ListX}"/>
+                                                <GridViewColumn Width="100" Header="Y (mm)" DisplayMemberBinding="{Binding ListY}"/>
+                                                <GridViewColumn Width="100" Header="Route" DisplayMemberBinding="{Binding ListRoute}"/>
+                                            </GridView>
+                                        </ListView.View>
+                                    </ListView>
+                                    <!--<DataGrid Grid.Row="1" ItemsSource="{Binding PointListItem}" AutoGenerateColumns="False" CanUserAddRows="False" CanUserSortColumns="True" EnableColumnVirtualization="True"  CanUserDeleteRows="False"
                                   EnableRowVirtualization="True" ScrollViewer.CanContentScroll="True" SelectionMode="Single"
                                   VirtualizingStackPanel.VirtualizationMode ="Recycling" >
                                         <DataGrid.Columns>
@@ -815,7 +827,7 @@
                                             <DataGridTextColumn Header="Y (mm)" Width="*" Binding="{Binding ListY}" IsReadOnly="True"/>
                                             <DataGridTextColumn Header="Route" Width="*" Binding="{Binding ListRoute}" IsReadOnly="True"/>
                                         </DataGrid.Columns>
-                                    </DataGrid>
+                                    </DataGrid>-->
                                     <Grid Grid.Row="2" Grid.Column="3">
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition/>
@@ -893,9 +905,9 @@
                                         <!--<Button Margin="3" Content="Select"/>
                                         <Button Margin="3" Content="One"/>
                                         <Button Margin="3" Content="Line"/>-->
-                                        <RadioButton GroupName="Mode" Style="{StaticResource CustomRadio}" Content="Select" IsChecked="{Binding Path=p_mapMode, Converter={StaticResource ModeConverter}, ConverterParameter=Select}"></RadioButton>
-                                        <RadioButton GroupName="Mode" Style="{StaticResource CustomRadio}" Content="Point" IsChecked="{Binding Path=p_mapMode, Converter={StaticResource ModeConverter}, ConverterParameter=Point}"></RadioButton>
-                                        <RadioButton GroupName="Mode" Style="{StaticResource CustomRadio}" Content="Line" IsChecked="{Binding Path=p_mapMode, Converter={StaticResource ModeConverter}, ConverterParameter=Line}"></RadioButton>
+                                        <RadioButton Style="{StaticResource CustomRadio}" Content="Select" IsChecked="{Binding p_isSelect}"></RadioButton>
+                                        <RadioButton Style="{StaticResource CustomRadio}" Content="Point" IsChecked="{Binding p_isPoint}"></RadioButton>
+                                        <RadioButton Style="{StaticResource CustomRadio}" Content="Line" IsChecked="{Binding p_isLine}"></RadioButton>
                                     </UniformGrid>
                                 </Grid>
                             </GroupBox>
@@ -1098,6 +1110,6 @@
             </Grid>
 
         </Grid>
-
+        <!--<local:LoadingControl x:Name="LoadingCtrl" Width="300" Height="300" Grid.Row="2" Opacity="0.0"/>-->
     </Grid>
-</Window>
+</UserControl>

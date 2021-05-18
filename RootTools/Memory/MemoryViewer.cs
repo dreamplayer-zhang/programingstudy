@@ -182,11 +182,12 @@ namespace RootTools.Memory
         {
             if (p_memoryData == null) return;
             p_memoryData.UpdateOpenProgress += P_memoryData_UpdateOpenProgress1;
-            switch (GetUpperExt(sFile))
-            {
-                case "BMP": p_memoryData.p_sInfo = p_memoryData.FileSaveBMP(sFile, p_nMemoryIndex, nByte); break;
-                case "JPG": p_memoryData.p_sInfo = p_memoryData.FileSaveJPG(sFile, p_nMemoryIndex); break; 
-            }
+            p_memoryData.FileSave(sFile, p_nMemoryIndex, nByte);
+            //switch (GetUpperExt(sFile))
+            //{
+            //    case "BMP": p_memoryData.p_sInfo = p_memoryData.FileSaveBMP(sFile, p_nMemoryIndex, nByte); break;
+            //    case "JPG": p_memoryData.p_sInfo = p_memoryData.FileSaveJPG(sFile, p_nMemoryIndex); break; 
+            //}
         }
 
         string GetUpperExt(string sFile)

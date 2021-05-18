@@ -1,4 +1,5 @@
-﻿using RootTools.Control;
+﻿using RootTools;
+using RootTools.Control;
 using RootTools.Module;
 using RootTools.ToolBoxs;
 using RootTools.Trees;
@@ -6,11 +7,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Root_Pine2.Module
 {
-    public class Boats : ModuleBase //forget
+    public class Boats : ModuleBase
     {
         #region ToolBox
         public override void GetTools(bool bInit)
@@ -52,8 +54,8 @@ namespace Root_Pine2.Module
             #region Axis
             public enum ePos
             {
-                LoadPicker,
-                VisionPicker,
+                Ready,
+                Done,
             }
             void InitPosition()
             {
@@ -88,9 +90,14 @@ namespace Root_Pine2.Module
                 for (int n = 0; n < Math.Min(4, aVacuum.Length); n++) m_doVacuum.Write(n, aVacuum[n]); 
             }
 
+            double m_secBlow = 0.2;
             public void RunVacuum(bool bOn)
             {
-                //forget
+                m_doVacuumPump.Write(bOn);
+                if (bOn) return;
+                m_doBlow.Write(true);
+                Thread.Sleep((int)(1000 * m_secBlow));
+                m_doBlow.Write(false);
             }
             #endregion
 
@@ -111,15 +118,68 @@ namespace Root_Pine2.Module
             }
             #endregion
 
-            public string p_id { get; set; }
-            public Boat(string id)
+            public void Reset()
             {
-                p_id = id; 
+                p_infoStrip = null; 
+            }
+
+            public InfoStrip p_infoStrip { get; set; }
+            public string p_id { get; set; }
+            Boats m_boats; 
+            public Boat(string id, Boats boats)
+            {
+                p_id = id;
+                m_boats = boats; 
             }
         }
-        Boat[] m_aBoat = new Boat[2] { new Boat("BoatA"), new Boat("BoatB") };
+        Boat[] m_aBoat;
+        void InitBoat(string id)
+        {
+            m_aBoat = new Boat[2];
+            m_aBoat[0] = new Boat(id + "A", this);
+            m_aBoat[1] = new Boat(id + "B", this);
+        }
         #endregion
 
+        #region State Home
+        public override string StateHome()
+        {
+            if (EQ.p_bSimulate)
+            {
+                p_eState = eState.Ready;
+                return "OK";
+            }
+            p_sInfo = base.StateHome();
+            p_eState = (p_sInfo == "OK") ? eState.Ready : eState.Error;
+            return p_sInfo;
+        }
 
+        public override void Reset()
+        {
+            m_aBoat[0].Reset();
+            m_aBoat[1].Reset(); 
+            base.Reset();
+        }
+        #endregion
+
+        #region Tree
+        public override void RunTree(Tree tree)
+        {
+            base.RunTree(tree);
+        }
+        #endregion
+
+        Pine2 m_pine2;
+        public Boats(string id, IEngineer engineer, Pine2 pine2)
+        {
+            p_id = id;
+            InitBoat(id); 
+            InitBase(id, engineer); 
+        }
+
+        public override void ThreadStop()
+        {
+            base.ThreadStop();
+        }
     }
 }

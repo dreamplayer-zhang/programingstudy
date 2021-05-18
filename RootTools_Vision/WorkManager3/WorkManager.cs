@@ -165,6 +165,13 @@ namespace RootTools_Vision.WorkManager3
 
             return true;
         }
+        //temp
+        private Workplace workplaceTemp;
+        public Workplace WorkplaceTemp
+		{
+            get => this.workplaceTemp;
+
+        }
 
         public void Start(bool inspOnly = true, Lotinfo lotInfo = null)
         {
@@ -199,6 +206,8 @@ namespace RootTools_Vision.WorkManager3
             else
                 DatabaseManager.Instance.SetLotinfo(lotInfo);
 
+            this.workplaceTemp = this.currentWorkplaceQueue.ToArray()[0];
+
             pipeLine.Start(
                 this.currentWorkplaceQueue,
                 works
@@ -232,7 +241,7 @@ namespace RootTools_Vision.WorkManager3
         public bool WaitWorkDone(ref bool isCanceled, int timeoutSecond = 60)
         {
             int sec = 0;
-            while(pipeLine.CheckPipeDone() == false && sec < timeoutSecond && isCanceled == false)
+            while (pipeLine.CheckPipeDone() == false && sec < timeoutSecond && isCanceled == false)
             {
                 Thread.Sleep(1000);
                 sec++;
