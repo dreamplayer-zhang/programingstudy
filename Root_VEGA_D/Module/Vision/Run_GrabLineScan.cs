@@ -128,17 +128,22 @@ namespace Root_VEGA_D.Module
                     {
                         m_log.Info(string.Format("AutoFocus Try {0} - Cannot find best Y position by auto focusing", nTryCount));
                         nTryCount++;
-                        continue;
                     }
+                    else
+                        break;
+                }
 
-                    // Offset 적용
+                // Offset 적용
+                if (m_nAFBestGVSum <= 0)
+                    m_dAFBestFocusPosY = m_grabMode.m_dFocusPosZ;
+                else
                     m_dAFBestFocusPosY += m_grabMode.m_dAFOffset;
 
-                    if (m_module.Run(axisZ.StartMove(m_dAFBestFocusPosY)))
-                        return p_sInfo;
-                    if (m_module.Run(axisZ.WaitReady()))
-                        return p_sInfo;
-                }
+                // 포커스 위치로 이동
+                if (m_module.Run(axisZ.StartMove(m_dAFBestFocusPosY)))
+                    return p_sInfo;
+                if (m_module.Run(axisZ.WaitReady()))
+                    return p_sInfo;
             }
             catch (Exception e)
             {
@@ -149,7 +154,9 @@ namespace Root_VEGA_D.Module
                 m_grabMode.SetLight(false);
 
                 if(m_nAFBestGVSum <= 0)
-                    m_log.Info(string.Format("AutoFocus is Failed, Z Pos is set to {0}", m_grabMode.m_dFocusPosZ));
+                    m_log.Info(string.Format("AutoFocus is failed, Z Pos is set to {0}", m_dAFBestFocusPosY));
+                else
+                    m_log.Info(string.Format("AutoFocus is successful, Z Pos is set to {0}", m_dAFBestFocusPosY));
             }
 
             return "OK";

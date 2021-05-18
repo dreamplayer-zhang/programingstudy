@@ -436,7 +436,6 @@ namespace RootTools.Memory
 
             m_szImage = new CPoint((int)(p_memoryData.p_sz.X * p_fZoom), (int)(p_memoryData.p_sz.Y * p_fZoom));
 
-            //int nBytePerPixel = p_memoryData.p_nByte * p_memoryData.p_nCount;
             CPoint sz = m_szBitmapSource = new CPoint(Math.Min(p_szWindow.X, m_szImage.X), Math.Min(p_szWindow.Y, m_szImage.Y));
             byte[] aBuf = m_aBufDisplay = new byte[(long)p_memoryData.p_nByte * sz.Y * sz.X];
             FixOffset();
@@ -445,6 +444,15 @@ namespace RootTools.Memory
             for (int x = 0; x < sz.X; x++)
             {
                 aX[x] = p_memoryData.p_nByte * (m_cpOffset.X + (int)Math.Round(x / p_fZoom));
+                if(m_bRemoveOverlapArea)
+                {
+                    int nDisplayLen = (m_nFov - m_nOverlap);
+                    int quotient = aX[x] / nDisplayLen;
+                    aX[x] = aX[x] + m_nOverlap * quotient;
+                    if (aX[x] >= p_memoryData.p_sz.X * p_memoryData.p_nByte)
+                        aX[x] = -1;
+                }
+                    
             }
 
             for (int y = 0, iy = 0; y < sz.Y; y++, iy += p_memoryData.p_nByte * sz.X)
@@ -463,25 +471,47 @@ namespace RootTools.Memory
                     case 1:
                         for (int x = 0; x < sz.X; x++)
                         {
-                            aBuf[x + iy] = *(pSrc + aX[x]);
+                            if (aX[x] != -1)
+                            {
+                                aBuf[x + iy] = *(pSrc + aX[x]);
+                            }
+                            else
+                                aBuf[x + iy] = 0;
                         }
                         break;
                     case 2:
                         for (int x = 0, ix = 0; x < sz.X; x++, ix += 2)
                         {
-                            byte b1 = (byte)(*(pSrc + aX[x]) >> m_nOffsetFromUpperBit);
-                            byte b2 = (byte)(*(pSrc + aX[x] + 1) << m_nOffsetFromUpperBit);
-                            aBuf[ix + iy] = 0;
-                            aBuf[ix + iy + 1] = (byte)(b1 | b2);
+                            if(aX[x] != -1)
+                            {
+                                byte b1 = (byte)(*(pSrc + aX[x]) >> m_nOffsetFromUpperBit);
+                                byte b2 = (byte)(*(pSrc + aX[x] + 1) << m_nOffsetFromUpperBit);
+                                aBuf[ix + iy] = 0;
+                                aBuf[ix + iy + 1] = (byte)(b1 | b2);
+                            }
+                            else
+                            {
+                                aBuf[ix + iy] = 0;
+                                aBuf[ix + iy + 1] = 0;
+                            }
                         }
                         break;
                     case 3:
                     case 4:
                         for (int x = 0, ix = 0; x < sz.X; x++, ix += 3)
                         {
-                            aBuf[ix + iy] = *(pSrc + aX[x]);
-                            aBuf[ix + iy + 1] = *(pSrc + aX[x] + 1);
-                            aBuf[ix + iy + 2] = *(pSrc + aX[x] + 2);
+                            if (aX[x] != -1)
+                            {
+                                aBuf[ix + iy] = *(pSrc + aX[x]);
+                                aBuf[ix + iy + 1] = *(pSrc + aX[x] + 1);
+                                aBuf[ix + iy + 2] = *(pSrc + aX[x] + 2);
+                            }
+                            else
+                            {
+                                aBuf[ix + iy] = 0;
+                                aBuf[ix + iy + 1] = 0;
+                                aBuf[ix + iy + 2] = 0;
+                            }
                         }
                         break;
                 }
