@@ -133,7 +133,6 @@ namespace RootTools_Vision
 				Tools.SaveTiffImage(settings_edgeside.KlarfSavePath, btmMergeDefectList, btmSharedBufferInfo);
 				Tools.SaveTiffImage(settings_edgeside.KlarfSavePath, sideMergeDefectList, sideSharedBufferInfo);
 			}
-
 			#endregion
 
 			//WorkEventManager.OnInspectionDone(this.currentWorkplace, new InspectionDoneEventArgs(new List<CRect>(), true));

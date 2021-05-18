@@ -205,6 +205,7 @@ namespace Root_CAMELLIA
             }
         }
         private ObservableCollection<UIElement> m_DrawSelectElement = new ObservableCollection<UIElement>();
+
         #endregion
 
         #region List Draw Object
@@ -316,6 +317,7 @@ namespace Root_CAMELLIA
             get; set;
         }
 
+        bool isLayerDataChange { get; set; } = false;
         public bool IsShowIndex { get; set; } = false;
         public bool IsKeyboardShowIndex { get; set; } = false;
         public bool IsLockUI { get; set; } = false;
@@ -585,6 +587,20 @@ namespace Root_CAMELLIA
 
         private ObservableCollection<string> _MaterialListItem = new ObservableCollection<string>();
 
+        public List<string> MaterialMeasureListItem
+        {
+            get
+            {
+                return _MaterialMeasureListItem;
+            }
+            set
+            {
+                _MaterialMeasureListItem = value;
+            }
+        }
+
+        private List<string> _MaterialMeasureListItem = new List<string>();
+
         public ObservableCollection<string> SelectedModels
         {
             get
@@ -613,7 +629,24 @@ namespace Root_CAMELLIA
             }
         }
 
+
         private ObservableCollection<ModelData.LayerData> _GridLayerData = new ObservableCollection<ModelData.LayerData>();
+
+        public ObservableCollection<ModelData.LayerData> GridMeasureLayerData
+        {
+            get
+            {
+                return _GridMeasureLayerData;
+            }
+            set
+            {
+                _GridMeasureLayerData = value;
+                SetProperty(ref _GridMeasureLayerData, value);
+            }
+        }
+
+
+        private ObservableCollection<ModelData.LayerData> _GridMeasureLayerData = new ObservableCollection<ModelData.LayerData>();
 
 
         CamelliaStage _camelliaStage = new CamelliaStage();
@@ -718,7 +751,7 @@ namespace Root_CAMELLIA
             }
         }
 
-        private float _UpperWaveLength = 0.0f;
+        private float _UpperWaveLength = 950.0f;
         public float UpperWaveLength
         {
             get
@@ -733,7 +766,7 @@ namespace Root_CAMELLIA
             }
         }
 
-        private int _ThicknessLMIteration = 0;
+        private int _ThicknessLMIteration = 10;
         public int ThicknessLMIteration
         {
             get
@@ -749,7 +782,7 @@ namespace Root_CAMELLIA
         }
 
         //private float _DampingFactor = 0.0f;
-        private string _DampingFactor = "0.00";
+        private string _DampingFactor = "0.01";
         public string DampingFactor
         {
             get
@@ -2476,6 +2509,13 @@ namespace Root_CAMELLIA
                 m_DrawSelectElement.Add(select.path);
         }
 
+      
+        public ObservableCollection<ModelData.LayerData> GetLayerData()
+        {
+            UpdateLayerGridView(false);
+
+            return GridMeasureLayerData;
+        }
         public DataTable GetPointListItem()
         {
 
@@ -2743,41 +2783,72 @@ namespace Root_CAMELLIA
             //System.Diagnostics.Debug.WriteLine("test " + sw.ElapsedMilliseconds);
         }
 
-        public void UpdateLayerGridView()
+        public void UpdateLayerGridView(bool isSave = true)
         {
-            MaterialListItem.Clear();
-            GridLayerData.Clear();
-            LayerCount = 2;
-            if (dataManager.recipeDM.TeachingRD.ModelRecipePath != "")
+            if (isSave)
             {
-                dataManager.recipeDM.LoadModel(dataManager.recipeDM.TeachingRD.ModelRecipePath);
-                MaterialListItem = new ObservableCollection<string>(dataManager.recipeDM.ModelData.MaterialList.ToArray());
-                ModelPath = dataManager.recipeDM.TeachingRD.ModelRecipePath;
+                MaterialListItem.Clear();
+                GridLayerData.Clear();
+                LayerCount = 2;
+                if (dataManager.recipeDM.TeachingRD.ModelRecipePath != "")
+                {
+                    dataManager.recipeDM.LoadModel(dataManager.recipeDM.TeachingRD.ModelRecipePath, true);
+                    MaterialListItem = new ObservableCollection<string>(dataManager.recipeDM.SaveModelData.MaterialList.ToArray());
+                    ModelPath = dataManager.recipeDM.TeachingRD.ModelRecipePath;
+                }
+                else
+                {
+                    dataManager.recipeDM.SaveModelData.MaterialList.Clear();
+                    App.m_nanoView.m_MaterialListSave.Clear();
+                    ModelPath = dataManager.recipeDM.TeachingRD.ModelRecipePath;
+                    //LibSR_Met.DataManager.GetInstance().m_LayerData.Clear();
+
+                    //App.m_nanoView..Clear();
+                    InitLayer();
+                }
+                InitLayerGrid();
+
+                DeleteGridCombo();
+                UpdateGridCombo();
+
+                UpdateLayerGrid();
             }
             else
             {
-                dataManager.recipeDM.ModelData.MaterialList.Clear();
-                App.m_nanoView.m_MaterialList.Clear();
-                ModelPath = dataManager.recipeDM.TeachingRD.ModelRecipePath;
-                //LibSR_Met.DataManager.GetInstance().m_LayerData.Clear();
+                MaterialMeasureListItem.Clear();
+                GridMeasureLayerData.Clear();
+                InitLayer(false);
+                if (dataManager.recipeDM.MeasurementRD.ModelRecipePath != "")
+                {
+                    dataManager.recipeDM.LoadModel(dataManager.recipeDM.MeasurementRD.ModelRecipePath);
+                    MaterialMeasureListItem = new List<string>(dataManager.recipeDM.MeasureModelData.MaterialList.ToArray());
+                    InitLayerGrid(false);
 
-                //App.m_nanoView..Clear();
-                InitLayer();
+                    DeleteGridCombo(false);
+                    UpdateGridCombo(false);
+
+                    UpdateLayerGrid(false);
+                }
             }
-            InitLayerGrid();    
-
-            DeleteGridCombo();
-            UpdateGridCombo();
-
-            UpdateLayerGrid();
         }
 
-        public void InitLayer()
+        public void InitLayer(bool isSave = true)
         {
-            App.m_nanoView.m_LayerList.Clear();
-            LibSR_Met.DataManager.GetInstance().m_ThicknessData.Clear();
-            dataManager.recipeDM.ModelData.AddLayer();
-            dataManager.recipeDM.ModelData.AddLayer();
+            if (isSave)
+            {
+                App.m_nanoView.m_LayerListSave.Clear();
+                LibSR_Met.DataManager.GetInstance().m_ThicknessDataSave.Clear();
+                dataManager.recipeDM.SaveModelData.AddLayer();
+                dataManager.recipeDM.SaveModelData.AddLayer();
+            }
+            else
+            {
+                App.m_nanoView.m_LayerList.Clear();
+                LibSR_Met.DataManager.GetInstance().m_ThicknessData.Clear();
+                dataManager.recipeDM.MeasureModelData.AddLayer(isSave : false);
+                dataManager.recipeDM.MeasureModelData.AddLayer(isSave : false);
+            }
+            
         }
 
         private void UpdateParameter()
@@ -3768,6 +3839,28 @@ namespace Root_CAMELLIA
             CurrentRadius = Math.Round((Math.Sqrt(Math.Pow(mouseX, 2) + Math.Pow(mouseY, 2))), 3).ToString("0.###") + " mm";
         }
 
+        public bool CheckSaveLayerData()
+        {
+            if(p_UseThickness && dataManager.recipeDM.SaveRecipeRD.ModelRecipePath == "")
+            {
+                CustomMessageBox.Show("Caution", "Model Not Saved!", MessageBoxButton.OK, CustomMessageBox.MessageBoxImage.Warning);
+                return false;
+            }
+
+            if (isLayerDataChange)
+            {
+                if (CustomMessageBox.Show("Caution", "Layer Data has been Changed, Not Saved Yet. Continue?", MessageBoxButton.OKCancel, CustomMessageBox.MessageBoxImage.Warning) == MessageBoxResult.OK)
+                {
+                    isLayerDataChange = false;
+                    return true;
+                }
+                else
+                    return false;
+            }
+
+            return true;
+        }
+
         public void Unloaded()
         {
             if (SetStartEndPointMode)
@@ -3815,48 +3908,94 @@ namespace Root_CAMELLIA
             UpdateView();
         }
 
-        public void UpdateGridCombo()
+        public void UpdateGridCombo(bool isSave = true)
         {
             string Material = "None";
             bool exist = false;
-
-            foreach (string str in MaterialListItem)
+            if (isSave)
             {
-                exist = false;
-                Material = Path.GetFileNameWithoutExtension(str);
-                for (int i = 0; i < GridLayerData[0].Host1.Count; i++)
+                foreach (string str in MaterialListItem)
                 {
-                    if (GridLayerData[0].Host1[i].Name == Material)
+                    exist = false;
+                    Material = Path.GetFileNameWithoutExtension(str);
+                    for (int i = 0; i < GridLayerData[0].Host1.Count; i++)
                     {
-                        exist = true;
+                        if (GridLayerData[0].Host1[i].Name == Material)
+                        {
+                            exist = true;
+                        }
                     }
-                }
 
-                if (!exist)
-                {
-                    for (int i = 0; i < GridLayerData.Count; i++)
+                    if (!exist)
                     {
+                        for (int i = 0; i < GridLayerData.Count; i++)
+                        {
 
-                        GridLayerData[i].Host1.Add(new ModelData.LayerData.PathEntity(str, Material));
-                        GridLayerData[i].Guest1.Add(new ModelData.LayerData.PathEntity(str, Material));
-                        GridLayerData[i].Guest2.Add(new ModelData.LayerData.PathEntity(str, Material));
+                            GridLayerData[i].Host1.Add(new ModelData.LayerData.PathEntity(str, Material));
+                            GridLayerData[i].Guest1.Add(new ModelData.LayerData.PathEntity(str, Material));
+                            GridLayerData[i].Guest2.Add(new ModelData.LayerData.PathEntity(str, Material));
+                        }
                     }
                 }
             }
+            else
+            {
+                foreach(string str in MaterialMeasureListItem)
+                {
+                    exist = false;
+                    Material = Path.GetFileNameWithoutExtension(str);
+                    for (int i = 0; i < GridMeasureLayerData[0].Host1.Count; i++)
+                    {
+                        if (GridMeasureLayerData[0].Host1[i].Name == Material)
+                        {
+                            exist = true;
+                        }
+                    }
+
+                    if (!exist)
+                    {
+                        for (int i = 0; i < GridMeasureLayerData.Count; i++)
+                        {
+
+                            GridMeasureLayerData[i].Host1.Add(new ModelData.LayerData.PathEntity(str, Material));
+                            GridMeasureLayerData[i].Guest1.Add(new ModelData.LayerData.PathEntity(str, Material));
+                            GridMeasureLayerData[i].Guest2.Add(new ModelData.LayerData.PathEntity(str, Material));
+                        }
+                    }
+                }
+            }
+           
         }
 
-        public void DeleteGridCombo()
+        public void DeleteGridCombo(bool isSave = true)
         {
-            int cnt = GridLayerData[0].Host1.Count;
-            for (int i = 0; i < GridLayerData.Count; i++)
+            if (isSave)
             {
-                for (int j = cnt - 1; j > 0; j--)
+                int cnt = GridLayerData[0].Host1.Count;
+                for (int i = 0; i < GridLayerData.Count; i++)
                 {
-                    GridLayerData[i].Host1.RemoveAt(j);
-                    GridLayerData[i].Guest1.RemoveAt(j);
-                    GridLayerData[i].Guest2.RemoveAt(j);
+                    for (int j = cnt - 1; j > 0; j--)
+                    {
+                        GridLayerData[i].Host1.RemoveAt(j);
+                        GridLayerData[i].Guest1.RemoveAt(j);
+                        GridLayerData[i].Guest2.RemoveAt(j);
+                    }
                 }
             }
+            else
+            {
+                int cnt = GridMeasureLayerData[0].Host1.Count;
+                for (int i = 0; i < GridMeasureLayerData.Count; i++)
+                {
+                    for (int j = cnt - 1; j > 0; j--)
+                    {
+                        GridMeasureLayerData[i].Host1.RemoveAt(j);
+                        GridMeasureLayerData[i].Guest1.RemoveAt(j);
+                        GridMeasureLayerData[i].Guest2.RemoveAt(j);
+                    }
+                }
+            }
+           
         }
 
         public bool CheckMaterialUse()
@@ -3870,21 +4009,34 @@ namespace Root_CAMELLIA
             {
                 if (GridLayerData[i].SelectedHost1 == material || GridLayerData[i].SelectedGuest1 == material || GridLayerData[i].SelectedGuest2 == material)
                 {
-                    MessageBox.Show("The material is in use, can't delete", "Error!", MessageBoxButton.OK, MessageBoxImage.Error);
+                    CustomMessageBox.Show("Error!", "The material is in use, can't delete", MessageBoxButton.OK, CustomMessageBox.MessageBoxImage.Error);
                     return true;
                 }
             }
             return false;
         }
 
-        private void UpdateLayerGrid()
+        private void UpdateLayerGrid(bool isSave = true)
         {
-            int cnt = LayerCount - 1;
-            for (int i = 0; i < GridLayerData.Count; i++)
+            if (isSave)
             {
-                GridLayerData[i].UpdateGridLayer(cnt);
-                cnt--;
+                int cnt = LayerCount - 1;
+                for (int i = 0; i < GridLayerData.Count; i++)
+                {
+                    GridLayerData[i].UpdateGridLayer(cnt);
+                    cnt--;
+                }
             }
+            else
+            {
+                int cnt = MeasureLayerCount - 1;
+                for (int i = 0; i < GridMeasureLayerData.Count; i++)
+                {
+                    GridMeasureLayerData[i].UpdateGridLayer(cnt, false);
+                    cnt--;
+                }
+            }
+           
         }
 
         private void UpdateLayerModel()
@@ -3924,25 +4076,62 @@ namespace Root_CAMELLIA
             }
         }
 
-        public void InitLayerGrid()
+        private int _MeasurelayerCount = 2;
+        public int MeasureLayerCount
         {
-            LayerCount = dataManager.recipeDM.ModelData.GetLayerCount();
-            if (LayerCount == 0)
+            get
             {
-                LayerCount = 2;
+                return _MeasurelayerCount;
             }
+            set
+            {
+                _MeasurelayerCount = value;
+            }
+        }
+
+        public void InitLayerGrid(bool isSave = true)
+        {
+            int loop;
+            if (isSave)
+            {
+                LayerCount = dataManager.recipeDM.SaveModelData.GetLayerCount();
+                if (LayerCount == 0)
+                {
+                    LayerCount = 2;
+                }
+                loop = LayerCount;
+            }
+            else
+            {
+                MeasureLayerCount = dataManager.recipeDM.MeasureModelData.GetLayerCount(false);
+                if(MeasureLayerCount == 0)
+                {
+                    MeasureLayerCount = 2;
+                }
+                loop = MeasureLayerCount;
+            }
+             
+
+           
             string[] strHeader = { "Sub.", "1st L.", "2nd L.", "3rd L.", "4th L.", "5th L.", "6th L.", "7th L.", "8th L.", "9th L.", "10th L." };
 
-            int rows = LayerCount - 1;
-            for (int i = 0; i < LayerCount; i++)
+            
+            int rows = loop - 1;
+            for (int i = 0; i < loop; i++)
             {
                 if (i == 0)
                 {
-                    GridLayerData.Add(new ModelData.LayerData("Amb."));
+                    if (isSave)
+                        GridLayerData.Add(new ModelData.LayerData("Amb."));
+                    else
+                        GridMeasureLayerData.Add(new ModelData.LayerData("Amb. "));
                 }
                 else
                 {
-                    GridLayerData.Add(new ModelData.LayerData(strHeader[rows]));
+                    if(isSave)
+                        GridLayerData.Add(new ModelData.LayerData(strHeader[rows]));
+                    else
+                        GridMeasureLayerData.Add(new ModelData.LayerData(strHeader[rows]));
                 }
 
                 rows--;
@@ -4725,23 +4914,34 @@ namespace Root_CAMELLIA
             }
         }
 
-        public void LoadRecipe(string path)
+        public void LoadRecipe(string path, bool isSave = true)
         {
             string recipePath = path.Replace(Path.GetExtension(path), ".aco");
-            if (dataManager.recipeDM.RecipeLoad(recipePath))
+            if (dataManager.recipeDM.RecipeLoad(recipePath, isSave))
             {
-                UpdateListView(true);
-                UpdateLayerGridView();
-                UpdateParameter();
-                UpdateView(true);
+                if (isSave)
+                {
+                    UpdateListView(true);
+                    UpdateLayerGridView();
+                    UpdateParameter();
+                    UpdateView(true);
 
-                RecipePath = dataManager.recipeDM.TeachingRecipePath;
-                MainViewModel.RecipeOpen = true;
+                    RecipePath = dataManager.recipeDM.TeachingRecipePath;
+                    MainViewModel.RecipeOpen = true;
+                }
             }
         }
 
         public void SaveRecipe(string path = null)
         {
+            if (isLayerDataChange)
+            {
+                if (CustomMessageBox.Show("Caution", "Layer Data has been Changed, Not Saved Yet. Continue?", MessageBoxButton.OKCancel, CustomMessageBox.MessageBoxImage.Warning) != MessageBoxResult.OK)
+                {
+                    return;
+                }
+            }
+            isLayerDataChange = false;
             if (p_SettingViewModel.p_ExceptNIR)
             {
                 dataManager.recipeDM.TeachingRD.NIRIntegrationTime = 0;
@@ -4923,7 +5123,7 @@ namespace Root_CAMELLIA
                     bool res = dataManager.recipeDM.AddMaterial();
                     if(res)
                     {
-                        MaterialListItem = new ObservableCollection<string>(dataManager.recipeDM.ModelData.MaterialList.ToArray());
+                        MaterialListItem = new ObservableCollection<string>(dataManager.recipeDM.SaveModelData.MaterialList.ToArray());
                     }
 
                     UpdateGridCombo();
@@ -4962,7 +5162,7 @@ namespace Root_CAMELLIA
                     if(dataManager.recipeDM.OpenModel() == true)
                     {
                         GridLayerData.Clear();
-                        MaterialListItem = new ObservableCollection<string>(dataManager.recipeDM.ModelData.MaterialList.ToArray());
+                        MaterialListItem = new ObservableCollection<string>(dataManager.recipeDM.SaveModelData.MaterialList.ToArray());
                         ModelPath = dataManager.recipeDM.TeachingRD.ModelRecipePath;
 
                         InitLayerGrid();
@@ -4991,6 +5191,7 @@ namespace Root_CAMELLIA
                     if (dataManager.recipeDM.SaveModel())
                     {
                         ModelPath = dataManager.recipeDM.TeachingRD.ModelRecipePath;
+                        isLayerDataChange = false;
                     }
                 });
             }
@@ -5016,7 +5217,7 @@ namespace Root_CAMELLIA
 
                     UpdateLayerModel();
                     int index = GridLayerData.Count - GridLayerIndex;
-                    dataManager.recipeDM.ModelData.AddLayer(index);
+                    dataManager.recipeDM.SaveModelData.AddLayer(index);
 
                     GridLayerData.Clear();
                     InitLayerGrid();
@@ -5051,7 +5252,7 @@ namespace Root_CAMELLIA
                     int selIdx = GridLayerIndex;
                     UpdateLayerModel();
                     int index = GridLayerData.Count - GridLayerIndex - 1;
-                    dataManager.recipeDM.ModelData.DeleteLayer(index);
+                    dataManager.recipeDM.SaveModelData.DeleteLayer(index);
 
                     GridLayerData.Clear();
                     InitLayerGrid();
@@ -5070,6 +5271,11 @@ namespace Root_CAMELLIA
         #endregion
 
         #region MethodAction
+        public void OnCellEditEnd(object sender, DataGridCellEditEndingEventArgs e)
+        {
+            isLayerDataChange = true;
+        }
+
         public void OnListViewMouseButtonDown(object sender, MouseButtonEventArgs e)
         {
             MaterialSelectIndex = -1;

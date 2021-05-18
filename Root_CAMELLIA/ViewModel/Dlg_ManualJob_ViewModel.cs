@@ -320,7 +320,7 @@ namespace Root_CAMELLIA
                         string visionPath = recipePath.Replace(Path.GetExtension(recipePath), ".aco");
                         m_infoCarrier.m_aGemSlot[i].p_sRecipe = infoWafer.p_sRecipe;
                         ((InfoWafer)m_infoCarrier.m_aGemSlot[i]).p_sWaferID = infoWafer.p_sWaferID;
-                        if (!isVisionRecipeOpen && !DataManager.Instance.recipeDM.RecipeLoad(BaseDefine.Dir_SequenceInitialPath + visionPath, true))
+                        if (!isVisionRecipeOpen && !DataManager.Instance.recipeDM.RecipeLoad(BaseDefine.Dir_SequenceInitialPath + visionPath, false))
                         {
                             CustomMessageBox.Show("Error", "Recipe Not Exist", MessageBoxButton.OK, CustomMessageBox.MessageBoxImage.Error);
                             return;

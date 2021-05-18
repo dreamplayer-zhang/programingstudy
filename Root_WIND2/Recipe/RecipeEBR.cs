@@ -17,7 +17,16 @@ namespace Root_WIND2
 
             // Regiseter Parameter Items
             RegisterParameterItem<EBRParameter>();
-            RegisterParameterItem<ProcessDefectEdgeParameter>();
+            RegisterParameterItem<ProcessMeasurementParameter>();
+
+            CreateMap();
+        }
+
+        public void CreateMap()
+        {
+            this.WaferMap.MapSizeX = 1;
+            this.WaferMap.MapSizeY = 1;
+            this.WaferMap.CreateWaferMap(this.WaferMap.MapSizeX, this.WaferMap.MapSizeY, CHIP_TYPE.NORMAL);
         }
     }
 }

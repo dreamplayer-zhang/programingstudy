@@ -49,6 +49,8 @@ namespace Root_CAMELLIA.LibSR_Met
 
         public MaterialList m_MaterialList;
         public LayerList m_LayerList;
+        public MaterialList m_MaterialListSave;
+        public LayerList m_LayerListSave;
         string m_sConfigPath = string.Empty;
 
         public bool isExceptNIR = false;
@@ -65,6 +67,8 @@ namespace Root_CAMELLIA.LibSR_Met
             m_ModelSave = new Model();
             m_MaterialList = m_Model.m_MaterialList;
             m_LayerList = m_Model.m_LayerList;
+            m_MaterialListSave = m_ModelSave.m_MaterialList;
+            m_LayerListSave = m_ModelSave.m_LayerList;
 
             InitLamp();
         }
@@ -158,8 +162,7 @@ namespace Root_CAMELLIA.LibSR_Met
         //}
 
 
-
-        public ERRORCODE_NANOVIEW LoadModel(string sRecipeFilePath)
+        public ERRORCODE_NANOVIEW LoadModel(string sRecipeFilePath, bool bFileOpen = false)
         {
             try
             {
@@ -171,10 +174,23 @@ namespace Root_CAMELLIA.LibSR_Met
                     MessageBox.Show("올바른 파일 형식이 아닙니다. - " + sExt);
                     return ERRORCODE_NANOVIEW.ATI_PARAMETER_ERROR;
                 }
+                ERRORCODE_NANOVIEW rst;
 
-                ERRORCODE_NANOVIEW rst = (ERRORCODE_NANOVIEW)m_Model.FillFromFile(sRecipeFilePath);
+                if (bFileOpen)
+                {
+                    //rst = (ERRORCODE_NANOVIEW)m_Model.FillFromFile(sRecipeFilePath);
+                    //m_DM.m_LayerData = m_LayerList.ToLayerData();
 
-                m_DM.m_LayerData = m_LayerList.ToLayerData();
+                    rst = (ERRORCODE_NANOVIEW)m_ModelSave.FillFromFile(sRecipeFilePath);
+                }
+                else
+                {
+                    // 레시피 파일 로드 시, DM 에 Nano-View dll 데이터 저장
+                    rst = (ERRORCODE_NANOVIEW)m_Model.FillFromFile(sRecipeFilePath);
+                    m_DM.m_LayerData = m_LayerList.ToLayerData();
+                    
+                }
+
                 if (rst == ERRORCODE_NANOVIEW.SR_NO_ERROR)
                 {
                     m_DM.m_Log.WriteLog(LogType.Operating, "Modelling Done");
@@ -182,17 +198,32 @@ namespace Root_CAMELLIA.LibSR_Met
                 }
                 else
                 {
-                    foreach (Material m in m_Model.m_MaterialList)
+                    if (bFileOpen)
                     {
-                        m_Model.m_MaterialList.Remove(m);
+                        foreach (Material m in m_ModelSave.m_MaterialList)
+                        {
+                            m_ModelSave.m_MaterialList.Remove(m);
+                        }
                     }
-
+                    else
+                    {
+                        foreach (Material m in m_Model.m_MaterialList)
+                        {
+                            m_Model.m_MaterialList.Remove(m);
+                        }
+                    }
                     string sErr = Enum.GetName(typeof(ERRORCODE_NANOVIEW), rst);
                     m_DM.m_Log.WriteLog(LogType.Error, sErr);
                     MessageBox.Show(sErr); //추후 제거
                 }
-
-                m_DM.m_ThicknessData = new List<ThicknessScaleOffset>();
+                if (bFileOpen)
+                {
+                    m_DM.m_ThicknessDataSave = new List<ThicknessScaleOffset>();
+                }
+                else
+                {
+                    m_DM.m_ThicknessData = new List<ThicknessScaleOffset>();
+                }
                 path_sclfile = Path.GetDirectoryName(sRecipeFilePath) + "\\" + Path.GetFileNameWithoutExtension(sRecipeFilePath) + ".scl";
                 if (File.Exists(path_sclfile))
                 {
@@ -202,17 +233,35 @@ namespace Root_CAMELLIA.LibSR_Met
                     {
                         string str = SR.ReadLine();
                         string[] res = str.Split(',');
-
-                        m_DM.m_ThicknessData.Add(new ThicknessScaleOffset(Convert.ToDouble(res[0]), Convert.ToDouble(res[1])));
+                        if (bFileOpen)
+                        {
+                            m_DM.m_ThicknessDataSave.Add(new ThicknessScaleOffset(Convert.ToDouble(res[0]), Convert.ToDouble(res[1])));
+                        }
+                        else
+                        {
+                            m_DM.m_ThicknessData.Add(new ThicknessScaleOffset(Convert.ToDouble(res[0]), Convert.ToDouble(res[1])));
+                        }
                     }
 
                     SR.Close();
                 }
                 else
                 {
-                    for(int i = 0; i < m_DM.m_LayerData.Count; i++)
+
+                    if (bFileOpen)
                     {
-                        m_DM.m_ThicknessData.Add(new ThicknessScaleOffset());
+                        for (int i = 0; i < m_LayerListSave.Count; i++)
+                        {
+                            m_DM.m_ThicknessDataSave.Add(new ThicknessScaleOffset());
+                        }
+                    }
+                    else
+                    {
+                        for (int i = 0; i < m_LayerList.Count; i++)
+                        {
+                            m_DM.m_ThicknessData.Add(new ThicknessScaleOffset());
+                        }
+                    
                     }
                 }
                 
@@ -251,6 +300,108 @@ namespace Root_CAMELLIA.LibSR_Met
             }
         }
 
+        //public ERRORCODE_NANOVIEW LoadModel(string sRecipeFilePath, bool bFileOpen)
+        //{
+        //    try
+        //    {
+        //        string path_sclfile = "";
+        //        string sExt = Path.GetExtension(sRecipeFilePath);
+        //        if (sExt != ".rcp" && sExt != ".erm")
+        //        {
+        //            m_DM.m_Log.WriteLog(LogType.Error, "올바른 파일 형식이 아닙니다. - " + sExt);
+        //            MessageBox.Show("올바른 파일 형식이 아닙니다. - " + sExt);
+        //            return ERRORCODE_NANOVIEW.ATI_PARAMETER_ERROR;
+        //        }
+        //        ERRORCODE_NANOVIEW rst;
+
+        //        if (bFileOpen)
+        //        {
+        //            // 레시피 파일 로드 시, DM 에 Nano-View dll 데이터 저장
+        //            rst = (ERRORCODE_NANOVIEW)m_Model.FillFromFile(sRecipeFilePath);
+        //            m_DM.m_LayerData = m_LayerList.ToLayerData();
+        //        }
+        //        else
+        //        {
+        //            rst = (ERRORCODE_NANOVIEW)m_ModelSave.FillFromFile(sRecipeFilePath);
+        //        }
+
+        //        m_DM.m_LayerData = m_LayerList.ToLayerData();
+        //        if (rst == ERRORCODE_NANOVIEW.SR_NO_ERROR)
+        //        {
+        //            m_DM.m_Log.WriteLog(LogType.Operating, "Modelling Done");
+        //            //MessageBox.Show("Modelling Done"); //추후 제거
+        //        }
+        //        else
+        //        {
+        //            foreach (Material m in m_Model.m_MaterialList)
+        //            {
+        //                m_Model.m_MaterialList.Remove(m);
+        //            }
+
+        //            string sErr = Enum.GetName(typeof(ERRORCODE_NANOVIEW), rst);
+        //            m_DM.m_Log.WriteLog(LogType.Error, sErr);
+        //            MessageBox.Show(sErr); //추후 제거
+        //        }
+
+        //        m_DM.m_ThicknessData = new List<ThicknessScaleOffset>();
+        //        path_sclfile = Path.GetDirectoryName(sRecipeFilePath) + "\\" + Path.GetFileNameWithoutExtension(sRecipeFilePath) + ".scl";
+        //        if (File.Exists(path_sclfile))
+        //        {
+        //            StreamReader SR = new StreamReader(path_sclfile);
+
+        //            while (!SR.EndOfStream)
+        //            {
+        //                string str = SR.ReadLine();
+        //                string[] res = str.Split(',');
+
+        //                m_DM.m_ThicknessData.Add(new ThicknessScaleOffset(Convert.ToDouble(res[0]), Convert.ToDouble(res[1])));
+        //            }
+
+        //            SR.Close();
+        //        }
+        //        else
+        //        {
+        //            for (int i = 0; i < m_DM.m_LayerData.Count; i++)
+        //            {
+        //                m_DM.m_ThicknessData.Add(new ThicknessScaleOffset());
+        //            }
+        //        }
+
+
+        //        //string[] line = new string[20];
+
+        //        //int linecnt = 0;
+
+        //        //while ((line[linecnt] = SR.ReadLine()) != null)
+        //        //{
+        //        //    linecnt++;
+        //        //}
+
+        //        ////m_thk_scl_linecnt = linecnt;
+
+        //        //for (int j = 0; j < linecnt; j++)
+        //        //{
+        //        //    string[] result = line[j].Split(new char[] { ',' });
+
+
+        //        //    m_thk_scale[j] = Convert.ToDouble(result[0]);
+        //        //    m_thk_offset[j] = Convert.ToDouble(result[1]);
+
+
+        //        //}
+
+
+
+        //        return rst;
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        m_DM.m_Log.WriteLog(LogType.Error, ex.Message);
+        //        MessageBox.Show(ex.Message);
+        //        return ERRORCODE_NANOVIEW.NANOVIEW_ERROR;
+        //    }
+        //}
+
         public bool SaveModel(string sRecipeFilePath) //저장하거나 불러올때 NanoView따위의 추가 string이 필요함
         {
             try
@@ -258,7 +409,7 @@ namespace Root_CAMELLIA.LibSR_Met
                 //_layer[] layers = m_DM.m_LayerData.To_layer();
 
                 //m_SR.Model(layers, layers.Length);
-                if (UpdateModel() == false)
+                if (UpdateModel(true) == false)
                 {
                     MessageBox.Show("Save Modeling Fail! Please check the log.");
                     return false;
@@ -267,7 +418,7 @@ namespace Root_CAMELLIA.LibSR_Met
                 if (Path.GetExtension(sRecipeFilePath) != ".rcp")
                     sRecipeFilePath += ".rcp";
 
-                File.WriteAllLines(sRecipeFilePath, m_Model.m_LayerList.ToString());
+                File.WriteAllLines(sRecipeFilePath, m_ModelSave.m_LayerList.ToString());
 
                 string path_sclfile = Path.GetDirectoryName(sRecipeFilePath) + "\\" + Path.GetFileNameWithoutExtension(sRecipeFilePath) + ".scl";
 
@@ -275,11 +426,11 @@ namespace Root_CAMELLIA.LibSR_Met
                 {
                     StreamWriter SW = new StreamWriter(path_sclfile);
 
-                    for (int j = 0; j < m_DM.m_ThicknessData.Count; j++)
+                    for (int j = 0; j < m_DM.m_ThicknessDataSave.Count; j++)
                     {
                         string strline;
 
-                        strline = string.Format("{0},{1}", m_DM.m_ThicknessData[j].m_dThicknessScale, m_DM.m_ThicknessData[j].m_dThicknessOffset);
+                        strline = string.Format("{0},{1}", m_DM.m_ThicknessDataSave[j].m_dThicknessScale, m_DM.m_ThicknessDataSave[j].m_dThicknessOffset);
 
                         SW.WriteLine(strline);
                     }
@@ -312,7 +463,7 @@ namespace Root_CAMELLIA.LibSR_Met
         {
             try
             {
-                Material material = m_Model.GetMaterialFromName(sMaterialName);
+                Material material = m_ModelSave.GetMaterialFromName(sMaterialName);
 
                 return material;
             }
@@ -723,7 +874,7 @@ namespace Root_CAMELLIA.LibSR_Met
                         //fitting할때 들어가야함
                         if (nPointIndex == 0)
                         {
-                            if (UpdateModel() == false)
+                            if (UpdateModel(false) == false)
                             {
                                 MessageBox.Show("Modeling Fail! Please check the log.");
                                 return ERRORCODE_NANOVIEW.SR_MODELING_FAIL;
@@ -832,12 +983,21 @@ namespace Root_CAMELLIA.LibSR_Met
             }
         }
 
-        public bool UpdateModel()
+        public bool UpdateModel(bool bFileSave)
         {
+            bool isSave = false;
             int i, count;
             string str = string.Empty;
-
-            count = m_Model.m_LayerList.Count;
+            Model LayerData;
+            if (bFileSave)
+            {
+                LayerData = m_ModelSave;
+            }
+            else
+            {
+                LayerData = m_Model;
+            }
+            count = LayerData.m_LayerList.Count;
             _layer[] layer = new _layer[count];
 
             for (i = 0; i < count; i++)
@@ -852,7 +1012,7 @@ namespace Root_CAMELLIA.LibSR_Met
 
             i = 0;
 
-            foreach (Layer l in m_Model.m_LayerList)
+            foreach (Layer l in LayerData.m_LayerList)
             {
                 if (l.m_Host == null)
                 {
@@ -896,27 +1056,40 @@ namespace Root_CAMELLIA.LibSR_Met
 
                 i++;
             }
-
-            int nRst = m_SR.Model(layer, count);
-            if (nRst == 0)
+            if (!bFileSave)
             {
-                m_DM.m_Log.WriteLog(LogType.Operating, "Modelling done");
-                return true;
+                ERRORCODE_NANOVIEW rst = (ERRORCODE_NANOVIEW)m_SR.Model(layer, count);
+                if (rst == 0)
+                {
+                    m_DM.m_Log.WriteLog(LogType.Operating, "Modelling done");
+                    isSave = true;
+                }
+                else
+                {
+                    m_DM.m_Log.WriteLog(LogType.Operating, "Modelling failed : " + m_SR.ErrorString);
+                    isSave = false;
+                }
             }
             else
             {
-                m_DM.m_Log.WriteLog(LogType.Operating, "Modelling failed : " + m_SR.ErrorString);
-                return false;
+                isSave = true;
             }
+
+
+            return isSave;
         }
 
-        public ERRORCODE_NANOVIEW LoadMaterial(string sMaterialFilePath)
+        public ERRORCODE_NANOVIEW LoadMaterial(string sMaterialFilePath, bool isSave = false)
         {
             try
             {
                 string sFileName = Path.GetFileName(sMaterialFilePath);
 
-                int nRst = m_Model.LoadMaterialFile(sMaterialFilePath);
+                int nRst = -1;
+                if (isSave)
+                    nRst = m_ModelSave.LoadMaterialFile(sMaterialFilePath);
+                else
+                    nRst = m_Model.LoadMaterialFile(sMaterialFilePath);
                 if (nRst == 0)
                 {
                     m_DM.m_Log.WriteLog(LogType.Operating, "Material(" + sFileName + ") file load done.");
