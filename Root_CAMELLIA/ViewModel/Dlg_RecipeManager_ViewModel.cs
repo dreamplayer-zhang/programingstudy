@@ -751,7 +751,7 @@ namespace Root_CAMELLIA
             }
         }
 
-        private float _UpperWaveLength = 0.0f;
+        private float _UpperWaveLength = 950.0f;
         public float UpperWaveLength
         {
             get
@@ -766,7 +766,7 @@ namespace Root_CAMELLIA
             }
         }
 
-        private int _ThicknessLMIteration = 0;
+        private int _ThicknessLMIteration = 10;
         public int ThicknessLMIteration
         {
             get
@@ -782,7 +782,7 @@ namespace Root_CAMELLIA
         }
 
         //private float _DampingFactor = 0.0f;
-        private string _DampingFactor = "0.00";
+        private string _DampingFactor = "0.01";
         public string DampingFactor
         {
             get
@@ -2845,8 +2845,8 @@ namespace Root_CAMELLIA
             {
                 App.m_nanoView.m_LayerList.Clear();
                 LibSR_Met.DataManager.GetInstance().m_ThicknessData.Clear();
-                dataManager.recipeDM.MeasureModelData.AddLayer();
-                dataManager.recipeDM.MeasureModelData.AddLayer();
+                dataManager.recipeDM.MeasureModelData.AddLayer(isSave : false);
+                dataManager.recipeDM.MeasureModelData.AddLayer(isSave : false);
             }
             
         }
@@ -4103,7 +4103,7 @@ namespace Root_CAMELLIA
             }
             else
             {
-                MeasureLayerCount = dataManager.recipeDM.MeasureModelData.GetLayerCount();
+                MeasureLayerCount = dataManager.recipeDM.MeasureModelData.GetLayerCount(false);
                 if(MeasureLayerCount == 0)
                 {
                     MeasureLayerCount = 2;
@@ -4914,23 +4914,34 @@ namespace Root_CAMELLIA
             }
         }
 
-        public void LoadRecipe(string path)
+        public void LoadRecipe(string path, bool isSave = true)
         {
             string recipePath = path.Replace(Path.GetExtension(path), ".aco");
-            if (dataManager.recipeDM.RecipeLoad(recipePath))
+            if (dataManager.recipeDM.RecipeLoad(recipePath, isSave))
             {
-                UpdateListView(true);
-                UpdateLayerGridView();
-                UpdateParameter();
-                UpdateView(true);
+                if (isSave)
+                {
+                    UpdateListView(true);
+                    UpdateLayerGridView();
+                    UpdateParameter();
+                    UpdateView(true);
 
-                RecipePath = dataManager.recipeDM.TeachingRecipePath;
-                MainViewModel.RecipeOpen = true;
+                    RecipePath = dataManager.recipeDM.TeachingRecipePath;
+                    MainViewModel.RecipeOpen = true;
+                }
             }
         }
 
         public void SaveRecipe(string path = null)
         {
+            if (isLayerDataChange)
+            {
+                if (CustomMessageBox.Show("Caution", "Layer Data has been Changed, Not Saved Yet. Continue?", MessageBoxButton.OKCancel, CustomMessageBox.MessageBoxImage.Warning) != MessageBoxResult.OK)
+                {
+                    return;
+                }
+            }
+            isLayerDataChange = false;
             if (p_SettingViewModel.p_ExceptNIR)
             {
                 dataManager.recipeDM.TeachingRD.NIRIntegrationTime = 0;

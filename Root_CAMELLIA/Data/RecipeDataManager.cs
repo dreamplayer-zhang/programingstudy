@@ -107,7 +107,7 @@ namespace Root_CAMELLIA.Data
 
         
 
-        public bool RecipeLoad(string path, bool isMeasure = false)
+        public bool RecipeLoad(string path, bool isSave = true)
         {
             //OpenFileDialog dialog = new OpenFileDialog();
             //dialog.DefaultExt = "aco";
@@ -122,7 +122,7 @@ namespace Root_CAMELLIA.Data
                 LoadRecipeName = Path.GetFileName(path);
                 LoadRecipeName = LoadRecipeName.Remove(LoadRecipeName.Length - 4);
 
-                if (!isMeasure)
+                if (isSave)
                 {
                     dataManager.recipeDM.SaveRecipeRD.ClearPoint();
                     dataManager.recipeDM.SaveRecipeRD = (RecipeData)GeneralFunction.Read(dataManager.recipeDM.SaveRecipeRD, path);

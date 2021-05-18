@@ -218,9 +218,9 @@ namespace Root_CAMELLIA
 
         public void SaveRecipe(string fileName)
         {
-            p_moduleRunList.p_aModuleRun = p_moduleTempList.CopyModuleRun();
-            p_moduleRunList.SaveJob(fileName);
-            p_moduleRunList.RunTree(Tree.eMode.Init);
+            //p_moduleRunList.p_aModuleRun = p_moduleTempList.CopyModuleRun();
+            p_moduleTempList.SaveJob(fileName);
+            p_moduleTempList.RunTree(Tree.eMode.Init);
         }
 
         public void SaveAsRecipe()
@@ -228,12 +228,18 @@ namespace Root_CAMELLIA
             
         }
 
-        public void LoadRecipe(string fileName)
+        public void LoadRecipe(string fileName, bool isSave = true)
         {
-            p_moduleTempList.OpenJob(fileName);
-            p_moduleTempList.RunTree(Tree.eMode.Init);
-            //p_moduleRunList.OpenJob(fileName);
-            //p_moduleRunList.RunTree(Tree.eMode.Init);
+            if (isSave)
+            {
+                p_moduleTempList.OpenJob(fileName);
+                p_moduleTempList.RunTree(Tree.eMode.Init);
+            }
+            else
+            {
+                p_moduleRunList.OpenJob(fileName);
+                p_moduleRunList.RunTree(Tree.eMode.Init);
+            }
         }
 
         #endregion

@@ -216,9 +216,14 @@ namespace Root_CAMELLIA.LibSR_Met
                     m_DM.m_Log.WriteLog(LogType.Error, sErr);
                     MessageBox.Show(sErr); //추후 제거
                 }
-
-                m_DM.m_ThicknessData = new List<ThicknessScaleOffset>();
-                m_DM.m_ThicknessDataSave = new List<ThicknessScaleOffset>();
+                if (bFileOpen)
+                {
+                    m_DM.m_ThicknessDataSave = new List<ThicknessScaleOffset>();
+                }
+                else
+                {
+                    m_DM.m_ThicknessData = new List<ThicknessScaleOffset>();
+                }
                 path_sclfile = Path.GetDirectoryName(sRecipeFilePath) + "\\" + Path.GetFileNameWithoutExtension(sRecipeFilePath) + ".scl";
                 if (File.Exists(path_sclfile))
                 {
@@ -242,16 +247,21 @@ namespace Root_CAMELLIA.LibSR_Met
                 }
                 else
                 {
-                    for(int i = 0; i < m_LayerListSave.Count; i++)
+
+                    if (bFileOpen)
                     {
-                        if(bFileOpen)
+                        for (int i = 0; i < m_LayerListSave.Count; i++)
                         {
                             m_DM.m_ThicknessDataSave.Add(new ThicknessScaleOffset());
                         }
-                        else
+                    }
+                    else
+                    {
+                        for (int i = 0; i < m_LayerList.Count; i++)
                         {
                             m_DM.m_ThicknessData.Add(new ThicknessScaleOffset());
                         }
+                    
                     }
                 }
                 

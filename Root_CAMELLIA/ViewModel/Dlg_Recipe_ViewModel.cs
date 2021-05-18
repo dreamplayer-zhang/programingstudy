@@ -327,7 +327,7 @@ namespace Root_CAMELLIA
             }
             return false;
         }
-        public bool RecipeLoad()
+        public bool RecipeLoad(bool isSave = true)
         {
             string sModel = EQ.m_sModel;
             OpenFileDialog dlg = new OpenFileDialog();
@@ -336,15 +336,20 @@ namespace Root_CAMELLIA
             if (dlg.ShowDialog() == true)
             {
                 string filename = dlg.FileName;
-                sequenceRecipe_ViewModel.LoadRecipe(filename);
+                sequenceRecipe_ViewModel.LoadRecipe(filename, isSave);
 
                 string path = dlg.FileName.Replace(Path.GetExtension(filename), "");
                 string file = Path.GetFileName(dlg.FileName);
                 path += "\\" + file.Replace(Path.GetExtension(file), ".aco");
-                recipeManager_ViewModel.LoadRecipe(path);
-          
-                p_recipePath = dlg.FileName;
-                p_isEnableSave = true;
+                recipeManager_ViewModel.LoadRecipe(path, isSave);
+
+
+                if (isSave)
+                {
+                    p_recipePath = dlg.FileName;
+                    p_isEnableSave = true;
+                    SetDisplayPath();
+                }
                 return true;
             }
             return false;

@@ -59,12 +59,15 @@ namespace Root_CAMELLIA.Data
             }
         }
 
-        public int GetLayerCount()
+        public int GetLayerCount(bool isSave = true)
         {
-            return App.m_nanoView.m_LayerListSave.Count;
+            if (isSave)
+                return App.m_nanoView.m_LayerListSave.Count;
+            else
+                return App.m_nanoView.m_LayerList.Count;
         }
 
-        public void AddLayer(int index = -1)
+        public void AddLayer(int index = -1, bool isSave = true)
         {
             Layer layerData = new Layer();
             //App.m_nanoView.ThicknessScaleOffset thickData = new App.m_nanoView.ThicknessScaleOffset();
@@ -72,14 +75,32 @@ namespace Root_CAMELLIA.Data
             if (index == -1)
             {
                 //MetDataManager.m_LayerData.Add(layerData);
-                App.m_nanoView.m_LayerListSave.Add(layerData);
-                Met.DataManager.GetInstance().m_ThicknessDataSave.Add(thicknessData);
+                if (isSave)
+                {
+                    App.m_nanoView.m_LayerListSave.Add(layerData);
+                    Met.DataManager.GetInstance().m_ThicknessDataSave.Add(thicknessData);
+                }
+                else
+                {
+                    App.m_nanoView.m_LayerList.Add(layerData);
+                    Met.DataManager.GetInstance().m_ThicknessData.Add(thicknessData);
+                }
+                
             }
             else
             {
-               // MetDataManager.m_LayerData.Insert(index, layerData);
-                App.m_nanoView.m_LayerListSave.Insert(index, layerData);
-                Met.DataManager.GetInstance().m_ThicknessDataSave.Insert(index,thicknessData);
+                // MetDataManager.m_LayerData.Insert(index, layerData);
+                if (isSave)
+                {
+                    App.m_nanoView.m_LayerListSave.Insert(index, layerData);
+                    Met.DataManager.GetInstance().m_ThicknessDataSave.Insert(index, thicknessData);
+                }
+                else
+                {
+                    App.m_nanoView.m_LayerList.Insert(index, layerData);
+                    Met.DataManager.GetInstance().m_ThicknessData.Insert(index, thicknessData);
+                }
+
             }
         }
 

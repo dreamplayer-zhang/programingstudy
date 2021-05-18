@@ -1108,7 +1108,7 @@ namespace Root_CAMELLIA
             {
                 return new RelayCommand(() =>
                 {
-                    if (DataManager.recipeDM.RecipeLoad(@"C:\Recipe\테스트용레시피2\테스트용레시피2.aco", true))
+                    if (DataManager.recipeDM.RecipeLoad(@"C:\Recipe\테스트용레시피2\테스트용레시피2.aco", false))
                     {
                         //if(DataManager.Instance.recipeDM.LoadRecipeName != "")
                         //{
@@ -1130,32 +1130,32 @@ namespace Root_CAMELLIA
             {
                 return new RelayCommand(() =>
                 {
-                    if (RecipeCreatorViewModel.RecipeLoad())
+                    if (RecipeCreatorViewModel.RecipeLoad(false))
                     {
 
-                        // MeasurementRD꺼 그려야함.
-                        RecipeViewModel.UpdateListView(true);
-                        try
-                        {
-                            RecipeViewModel.UpdateLayerGridView();
-                        }
-                        catch
-                        {
+                        //// MeasurementRD꺼 그려야함.
+                        //RecipeViewModel.UpdateListView(true);
+                        //try
+                        //{
+                        //    RecipeViewModel.UpdateLayerGridView();
+                        //}
+                        //catch
+                        //{
 
-                        }
-                        RecipeViewModel.UpdateView(true);
+                        //}
+                        //RecipeViewModel.UpdateView(true);
 
-                        RecipeOpen = true;
+                        //RecipeOpen = true;
 
-                        p_DrawCandidatePointElement = new ObservableCollection<UIElement>(RecipeViewModel.p_DrawCandidatePointElement);
-                        p_DrawPointElement = new ObservableCollection<UIElement>(RecipeViewModel.p_DrawPointElement);
-                        //PointListItem = RecipeViewModel.PointListItem;
-                        PointListItem = RecipeViewModel.PointListItem.Copy();
-                        PointCount = RecipeViewModel.PointCount;
-                        DrawMeasureRoute();
-                        p_Progress = 0;
+                        //p_DrawCandidatePointElement = new ObservableCollection<UIElement>(RecipeViewModel.p_DrawCandidatePointElement);
+                        //p_DrawPointElement = new ObservableCollection<UIElement>(RecipeViewModel.p_DrawPointElement);
+                        ////PointListItem = RecipeViewModel.PointListItem;
+                        //PointListItem = RecipeViewModel.PointListItem.Copy();
+                        //PointCount = RecipeViewModel.PointCount;
+                        //DrawMeasureRoute();
+                        //p_Progress = 0;
 
-                        p_LoadRecipe = DataManager.recipeDM.LoadRecipeName;
+                        //p_LoadRecipe = DataManager.recipeDM.LoadRecipeName;
                     }
                     //if (RecipeViewModel.dataManager.recipeDM.RecipeOpen())
                     //{

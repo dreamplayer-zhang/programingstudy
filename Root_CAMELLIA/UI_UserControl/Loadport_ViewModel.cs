@@ -322,6 +322,18 @@ namespace Root_CAMELLIA
             {
                 return new RelayCommand(() =>
                 {
+                    if (App.m_engineer.p_bUseXGem)
+                    {
+                        return;
+                    }
+                        if (EQ.p_eState != EQ.eState.Ready || p_loadport.p_diPlaced.p_bIn)
+                    {
+                        p_infoCarrier.p_eReqTransfer = GemCarrierBase.eTransfer.TransferBlocked;
+                    }
+                    else if(EQ.p_eState == EQ.eState.Ready && !p_loadport.p_diPlaced.p_bIn)
+                    {
+                        p_infoCarrier.p_eReqTransfer = GemCarrierBase.eTransfer.ReadyToLoad;
+                    }
                     //p_infoCarrier.p_eReqTransfer = GemCarrierBase.eTransfer.OutOfService;
                 });
             }
