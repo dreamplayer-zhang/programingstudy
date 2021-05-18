@@ -1,6 +1,7 @@
 ﻿using RootTools;
 using RootTools.Camera;
 using RootTools.Control;
+using RootTools.Database;
 using RootTools.Memory;
 using RootTools.Module;
 using RootTools.Trees;
@@ -8,6 +9,7 @@ using RootTools_Vision;
 using RootTools_Vision.Utility;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -166,7 +168,6 @@ namespace Root_WIND2.Module
                     double dPosX = m_grabMode.m_rpAxisCenter.X + m_grabMode.m_ptXYAlignData.X + nWaferSizeY_px * (double)m_grabMode.m_dTrigger / 2 - (nScanLine + m_grabMode.m_ScanStartLine) * m_grabMode.m_GD.m_nFovSize * dXScale;
                     double dNextPosX = m_grabMode.m_rpAxisCenter.X + m_grabMode.m_ptXYAlignData.X + nWaferSizeY_px * (double)m_grabMode.m_dTrigger / 2 - (nScanLine + 1 + m_grabMode.m_ScanStartLine) * m_grabMode.m_GD.m_nFovSize * dXScale;
 
-                   
                     if (m_grabMode.m_dVRSFocusPos != 0)
                     {
                         dFocusPosZ = m_grabMode.m_dVRSFocusPos + m_dTDIToVRSOffsetZ;
@@ -285,13 +286,22 @@ namespace Root_WIND2.Module
                 {
                     // Save Result
                     //workManager.Start(false, true);
-                        inspectionTimeWatcher.Stop();
+                    inspectionTimeWatcher.Stop();
 
-                        TempLogger.Write("Inspection", "Time out!!!");
-                        return "OK";
+                    RootTools_Vision.TempLogger.Write("Inspection", "Time out!!!");
+                    return "OK";
                 } // 5 minutes
                 else
 				{
+
+                    Settings settings = new Settings();
+                    SettingItem_SetupFrontside settings_frontside = settings.GetItem<SettingItem_SetupFrontside>();
+
+
+                    DataTable table = DatabaseManager.Instance.SelectCurrentInspectionDefect();
+
+                    //table
+
                     // ColorVrs
 
                     // 계산
@@ -301,12 +311,11 @@ namespace Root_WIND2.Module
                         double dPosZ, dPosX, dPosY;
 
                         dPosZ = dFocusPosZ - m_dTDIToVRSOffsetZ;
-                        dPosX = dList[n].m_fAbsX ;
-                        dPosY = dList[n].m_fAbsY ;
+                        dPosX = dList[n].m_fAbsX;
+                        dPosY = dList[n].m_fAbsY;
 
                         if (m_module.Run(axisZ.StartMove(dPosZ)))
                             return p_sInfo;
-
                         // XY 찍는 위치로 이동
                         if (m_module.Run(axisXY.WaitReady()))
                             return p_sInfo;
@@ -314,15 +323,43 @@ namespace Root_WIND2.Module
                             return p_sInfo;
                         if (m_module.Run(axisXY.WaitReady()))
                             return p_sInfo;
-
                         if (m_module.Run(axisZ.WaitReady()))
                             return p_sInfo;
                     }
-                  
-                }
 
+
+
+                    // Save Klarf
+                  
+
+                    RecipeFront recipe = GlobalObjects.Instance.Get<RecipeFront>();
+
+                    string sInspectionID = DatabaseManager.Instance.GetInspectionID();
+                    DatabaseManager.Instance.SelectCurrentInspectionDefect();
+
+
+                    //Tools.SaveDefectImageParallel(Path.Combine(settings_frontside.DefectImagePath, sInspectionID), mergeDefectList, this.currentWorkplace.SharedBufferInfo, this.currentWorkplace.SharedBufferByteCnt);
+
+                    //MessageBox.Show(sw.ElapsedMilliseconds.ToString());
+
+                    //if (settings_frontside.UseKlarf)
+                    //{
+                    //    KlarfData_Lot klarfData = new KlarfData_Lot();
+                    //    Directory.CreateDirectory(settings_frontside.KlarfSavePath);
+
+                    //    klarfData.AddSlot(recipe.WaferMap, mergeDefectList, this.recipe.GetItem<OriginRecipe>(), settings_frontside.UseTDIReview, settings_frontside.UseVrsReview);
+                    //    klarfData.WaferStart(recipe.WaferMap, DateTime.Now);
+                    //    klarfData.SetResultTimeStamp();
+                    //    klarfData.AddSlot(recipe.WaferMap, defectList, recipe.GetItem<OriginRecipe>());
+                    //    klarfData.SaveKlarf(settings_frontside.KlarfSavePath, false);
+
+                    //    Tools.SaveTiffImage(settings_frontside.KlarfSavePath, mergeDefectList, this.currentWorkplace.SharedBufferInfo);
+                    //}
+
+
+                }
                 inspectionTimeWatcher.Stop();
-                TempLogger.Write("Inspection", string.Format("{0:F3}", (double)inspectionTimeWatcher.ElapsedMilliseconds / (double)1000));
+                RootTools_Vision.TempLogger.Write("Inspection", string.Format("{0:F3}", (double)inspectionTimeWatcher.ElapsedMilliseconds / (double)1000));
                 return "OK";
             }
 

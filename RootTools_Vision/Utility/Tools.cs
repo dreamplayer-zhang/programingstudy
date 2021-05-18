@@ -136,17 +136,16 @@ namespace RootTools_Vision
                 if (_byteCount == 1)
                 {
                     int h = (int)rect.Height;
-                    byte[] src = new byte[_width * _height];
+
                     byte* ptr = (byte*)pointer.ToPointer();
-                    Marshal.Copy(info.PtrList[0], src, 0, _width * _height);
+
                     for (int i = 0; i < h; i++)
                     {
-                        for(int j=0;j<rect.Width;j++)
-                        {
-                            ptr[i * bmpData.Stride + j] = src[(int)((i+rect.Top) * _width + (j+rect.Left))];
-                        }
+                        //Marshal.Copy(info.PtrR_GRAY + (int)((i + rect.Top) * info.Width + rect.Left), ptr, (int)(i * _width),(int)rect.Width );                        
+                        CopyMemory(pointer + (i * bmpData.Stride), info.PtrR_GRAY + +(int)((i + rect.Top) * info.Width + rect.Left), (uint)rect.Width);
                     }
 
+                    
                     //for (int i = 0; i < _height; i++)
                     //{
                     //    Buffer.MemoryCopy(info.PtrList[0].ToPointer()[i * _width], pointer.ToPointer()[i * bmpData.Stride], bmpData.Stride, bmpData.Stride);
