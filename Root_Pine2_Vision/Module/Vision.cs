@@ -29,6 +29,16 @@ namespace Root_Pine2_Vision.Module
         }
         #endregion
 
+        #region GrabMode
+        public class GrabMode
+        {
+            public GrabMode()
+            {
+
+            }
+        }
+        #endregion
+
         #region VisionWorks
         public class VisionWorks
         {
