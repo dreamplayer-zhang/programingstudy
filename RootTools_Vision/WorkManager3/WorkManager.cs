@@ -29,6 +29,14 @@ namespace RootTools_Vision.WorkManager3
         private ConcurrentQueue<Workplace> currentWorkplaceQueue;
         #endregion
 
+
+        #region [Properties]
+        public SharedBufferInfo SharedBuffer
+        {
+            get => this.sharedBuffer;
+        }
+        #endregion
+
         #region [Event]
         public event EventHandler<PositionDoneEventArgs> PositionDone;
 
@@ -165,13 +173,6 @@ namespace RootTools_Vision.WorkManager3
 
             return true;
         }
-        //temp
-        private Workplace workplaceTemp;
-        public Workplace WorkplaceTemp
-		{
-            get => this.workplaceTemp;
-
-        }
 
         public void Start(bool inspOnly = true, Lotinfo lotInfo = null)
         {
@@ -205,8 +206,6 @@ namespace RootTools_Vision.WorkManager3
                 DatabaseManager.Instance.SetLotinfo(DateTime.Now, DateTime.Now, Path.GetFileName(this.recipe.RecipePath));
             else
                 DatabaseManager.Instance.SetLotinfo(lotInfo);
-
-            this.workplaceTemp = this.currentWorkplaceQueue.ToArray()[0];
 
             pipeLine.Start(
                 this.currentWorkplaceQueue,

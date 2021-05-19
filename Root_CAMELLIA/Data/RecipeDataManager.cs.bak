@@ -19,8 +19,7 @@ namespace Root_CAMELLIA.Data
         public RecipeData TeachingRD { get; set; }
         public RecipeData SaveRecipeRD { get; set; }
         public RecipeData MeasurementRD { get; set; }
-        public ModelData SaveModelData { get; set; }
-        public ModelData MeasureModelData { get; set; }
+        public ModelData ModelData { get; set; }
         public string TeachingRecipePath { get; set; }
         public string TeachRecipeName { get; set; } = "";
         public string LoadRecipePath { get; set; }
@@ -33,8 +32,7 @@ namespace Root_CAMELLIA.Data
             TeachingRD = new RecipeData();
             SaveRecipeRD = new RecipeData();
             MeasurementRD = new RecipeData();
-            SaveModelData = new ModelData();
-            MeasureModelData = new ModelData();
+            ModelData = new ModelData();
         }
         public bool RecipeNew()
         {
@@ -107,7 +105,7 @@ namespace Root_CAMELLIA.Data
 
         
 
-        public bool RecipeLoad(string path, bool isSave = true)
+        public bool RecipeLoad(string path, bool isMeasure = false)
         {
             //OpenFileDialog dialog = new OpenFileDialog();
             //dialog.DefaultExt = "aco";
@@ -122,7 +120,7 @@ namespace Root_CAMELLIA.Data
                 LoadRecipeName = Path.GetFileName(path);
                 LoadRecipeName = LoadRecipeName.Remove(LoadRecipeName.Length - 4);
 
-                if (isSave)
+                if (!isMeasure)
                 {
                     dataManager.recipeDM.SaveRecipeRD.ClearPoint();
                     dataManager.recipeDM.SaveRecipeRD = (RecipeData)GeneralFunction.Read(dataManager.recipeDM.SaveRecipeRD, path);
@@ -135,8 +133,7 @@ namespace Root_CAMELLIA.Data
                     dataManager.recipeDM.MeasurementRD = (RecipeData)GeneralFunction.Read(dataManager.recipeDM.MeasurementRD, path);
                     dataManager.recipeDM.MeasurementRD.CheckCircleSize();
                     LoadRecipePath = path;
-
-                    if (RecipeLoaded != null)
+                    if(RecipeLoaded != null)
                     {
                         RecipeLoaded.Invoke(this, new EventArgs());
                     }
@@ -245,10 +242,10 @@ namespace Root_CAMELLIA.Data
             {
                 foreach (string filename in fileDlg.FileNames)
                 {
-                    res = App.m_nanoView.LoadMaterial(filename, true);
+                    res = App.m_nanoView.LoadMaterial(filename);
                     if (res == LibSR_Met.Nanoview.ERRORCODE_NANOVIEW.SR_NO_ERROR)
                     {
-                        dataManager.recipeDM.SaveModelData.MaterialList.Add(filename);
+                        dataManager.recipeDM.ModelData.MaterialList.Add(filename);
                     }
                 }
                 return true;
@@ -258,43 +255,21 @@ namespace Root_CAMELLIA.Data
 
         public void DeleteMaterial(int nIndex)
         {
-            App.m_nanoView.m_MaterialListSave.RemoveAt(nIndex);
-            dataManager.recipeDM.SaveModelData.MaterialList.RemoveAt(nIndex);
+            App.m_nanoView.m_MaterialList.RemoveAt(nIndex);
+            dataManager.recipeDM.ModelData.MaterialList.RemoveAt(nIndex);
         }
 
-        public bool LoadModel(string path, bool isSave = false)
+        public bool LoadModel(string path)
         {
-            if (isSave)
+            App.m_nanoView.LoadModel(path);
+
+            dataManager.recipeDM.ModelData.MaterialList.Clear();
+
+            foreach (Material m in App.m_nanoView.m_MaterialList)
             {
-                App.m_nanoView.LoadModel(path, true);
-
-                dataManager.recipeDM.SaveModelData.MaterialList.Clear();
-
-                foreach (Material m in App.m_nanoView.m_MaterialListSave)
-                {
-                    dataManager.recipeDM.SaveModelData.MaterialList.Add(m.m_Path);
-                }
-                return true;
+                dataManager.recipeDM.ModelData.MaterialList.Add(m.m_Path);
             }
-            else
-            {
-                LibSR_Met.Nanoview.ERRORCODE_NANOVIEW res;
-                res = App.m_nanoView.LoadModel(path);
-                if(res == LibSR_Met.Nanoview.ERRORCODE_NANOVIEW.SR_NO_ERROR)
-                {
-                    dataManager.recipeDM.MeasureModelData.MaterialList.Clear();
-
-                    foreach (Material m in App.m_nanoView.m_MaterialList)
-                    {
-                        dataManager.recipeDM.MeasureModelData.MaterialList.Add(m.m_Path);
-                    }
-
-                    return true;
-                }
-               
-                return false;
-            }
-         
+            return true;
         }
 
         public bool OpenModel()
@@ -311,13 +286,13 @@ namespace Root_CAMELLIA.Data
             LibSR_Met.Nanoview.ERRORCODE_NANOVIEW res;
             if (fileDlg.ShowDialog() == true)
             {
-                res = App.m_nanoView.LoadModel(fileDlg.FileName, true);
+                res = App.m_nanoView.LoadModel(fileDlg.FileName);
                 if (res == LibSR_Met.Nanoview.ERRORCODE_NANOVIEW.SR_NO_ERROR)
                 {
-                    dataManager.recipeDM.SaveModelData.MaterialList.Clear();
-                    foreach (Material m in App.m_nanoView.m_MaterialListSave)
+                    dataManager.recipeDM.ModelData.MaterialList.Clear();
+                    foreach (Material m in App.m_nanoView.m_MaterialList)
                     {
-                        dataManager.recipeDM.SaveModelData.MaterialList.Add(m.m_Path);
+                        dataManager.recipeDM.ModelData.MaterialList.Add(m.m_Path);
                     }
                     dataManager.recipeDM.TeachingRD.ModelRecipePath = fileDlg.FileName;
                     return true;

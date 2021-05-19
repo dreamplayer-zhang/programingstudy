@@ -1914,6 +1914,29 @@ namespace RootTools
             p_Size.Y = 0;
         }
 
+
+        public void CopyToBuffer(out byte[] buffer, Rect rect = default(Rect))
+        {
+            int startX = (int)rect.Left;
+            int startY = (int)rect.Top;
+            int width = (int)rect.Width;
+            int height = (int)rect.Height;
+            int byteCount = GetBytePerPixel();
+
+            if (rect == default(Rect))
+            {
+                buffer = new byte[m_aBuf.Length];
+                Buffer.BlockCopy(m_aBuf, 0, buffer, 0, m_aBuf.Length);
+            }
+            else
+            {
+                buffer = new byte[(int)(rect.Width * rect.Height * byteCount)];
+
+                for (int i = 0; i < height; i++)
+                    Array.Copy(m_aBuf, (i + startY) * p_Stride + startX, buffer, i * width * byteCount, width * byteCount);
+            }    
+        }
+
         #region 주석
         //Bitmap bitmap = new Bitmap(sFile);
         //        if (bitmap == null) return "FileOpen Error"; 
@@ -2467,6 +2490,5 @@ namespace RootTools
         {
             CLR_IP.Cpp_SaveBMP(sFilePath, rawdata, nW, nH, nByteCnt);
         }
-
     }
 }

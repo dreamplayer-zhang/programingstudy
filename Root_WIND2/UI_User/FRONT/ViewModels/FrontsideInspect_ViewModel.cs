@@ -386,7 +386,11 @@ namespace Root_WIND2.UI_User
             Application.Current.Dispatcher.Invoke(DispatcherPriority.Normal, new Action(delegate
             {
                 m_DataViewer_VM.pDataTable = DatabaseManager.Instance.SelectCurrentInspectionDefect();
+
+              
             }));
+
+            //List<Defect> defects = Tools.DataTableToDefectList(m_DataViewer_VM.pDataTable);
         }
 
         private void ProcessDefectDone_Callback(object obj, ProcessDefectDoneEventArgs args)

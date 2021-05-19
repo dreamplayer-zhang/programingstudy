@@ -53,6 +53,19 @@ namespace Root_CAMELLIA
             }
         }
 
+        BitmapSource m_imageSourceSecond;
+        public BitmapSource p_imageSourceSecond
+        {
+            get
+            {
+                return m_imageSourceSecond;
+            }
+            set
+            {
+                SetProperty(ref m_imageSourceSecond, value);
+            }
+        }
+
         #region Property
         public Module_Camellia p_Module_Camellia
         {
@@ -245,11 +258,30 @@ namespace Root_CAMELLIA
             }
         }
 
+        ObservableCollection<ModelData.LayerData> m_gridMeasureLayerData = new ObservableCollection<ModelData.LayerData>();
+        public ObservableCollection<ModelData.LayerData> p_gridMeasureLayerData
+        {
+            get
+            {
+                return m_gridMeasureLayerData;
+            }
+            set
+            {
+                SetProperty(ref m_gridMeasureLayerData, value);
+            }
+        }
+
         private void RecipeLoadDone(object sender, EventArgs e)
         {
+
+            p_gridMeasureLayerData = RecipeViewModel.GetLayerData();
+
             p_DrawCandidatePointElement = RecipeViewModel.GetCandidatePoint();
             PointListItem = RecipeViewModel.GetPointListItem();
             PointCount = PointListItem.Rows.Count.ToString();
+
+            
+
 
             p_DrawPointElement = RecipeViewModel.GetPoint();
             DrawMeasureRoute();
@@ -263,18 +295,20 @@ namespace Root_CAMELLIA
         {
             MainViewRecipeData tempData = new MainViewRecipeData();
             RecipeData measurementRD = DataManager.recipeDM.MeasurementRD;
-            tempData.p_dampingFactor = measurementRD.DampingFactor.ToString();
+            tempData.p_dampingFactor = measurementRD.DampingFactor;
             tempData.p_lowerWaveLength = measurementRD.LowerWaveLength;
             tempData.p_upperWaveLength = measurementRD.UpperWaveLength;
             tempData.p_useThickness = measurementRD.UseThickness;
-            tempData.p_useThickness = measurementRD.UseTransmittance;
-            tempData.p_VISIntegrationTime = measurementRD.VISIntegrationTime.ToString();
-            tempData.p_NIRIntegrationTime = measurementRD.NIRIntegrationTime.ToString();
+            tempData.p_useTransmittance = measurementRD.UseTransmittance;
+            tempData.p_VISIntegrationTime = measurementRD.VISIntegrationTime;
+            tempData.p_NIRIntegrationTime = measurementRD.NIRIntegrationTime;
             tempData.p_reflectanceListItem = measurementRD.WaveLengthReflectance;
             tempData.p_transmittanceListItem = measurementRD.WaveLengthTransmittance;
             tempData.p_thicknessLMIteration = measurementRD.LMIteration;
             return tempData;
         }
+
+        int Idx = 0;
         private void GetImage(object obj, EventArgs e)
         {
             Application.Current.Dispatcher.Invoke(() =>
@@ -284,7 +318,20 @@ namespace Root_CAMELLIA
                 Mat mat = new Mat(new System.Drawing.Size(p_CamVRS.GetRoiSize().X, p_CamVRS.GetRoiSize().Y), Emgu.CV.CvEnum.DepthType.Cv8U, 3, p_CamVRS.p_ImageViewer.p_ImageData.GetPtr(), (int)p_CamVRS.p_ImageViewer.p_ImageData.p_Stride * 3);
                 Image<Bgra, byte> img = mat.ToImage<Bgra, byte>();
 
-                p_imageSource = ImageHelper.ToBitmapSource(img);    
+                if(Idx == 1)
+                {
+                    p_imageSourceSecond = ImageHelper.ToBitmapSource(img);
+                }
+                else
+                {
+                    p_imageSource = ImageHelper.ToBitmapSource(img);
+                }
+
+                Idx++;
+                if(Idx == 2)
+                {
+                    Idx = 0;
+                }
             });
            
         }
@@ -941,7 +988,7 @@ namespace Root_CAMELLIA
         }
         private void M_timer_Tick(object sender, EventArgs e)
         {
-            p_lampUsetime = App.m_nanoView.UpdateLampData("t");
+            //p_lampUsetime = App.m_nanoView.UpdateLampData("t");
             //p_LampStatus = App.m_nanoView.GetLightSourceStatus();
             //tbTime.Text = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
         }
@@ -1061,7 +1108,7 @@ namespace Root_CAMELLIA
             {
                 return new RelayCommand(() =>
                 {
-                    if (DataManager.recipeDM.RecipeLoad(@"C:\Recipe\CAMELLIA2\테스트7\테스트7.aco", true))
+                    if (DataManager.recipeDM.RecipeLoad(@"C:\Recipe\테스트용레시피2\테스트용레시피2.aco", false))
                     {
                         //if(DataManager.Instance.recipeDM.LoadRecipeName != "")
                         //{
@@ -1083,32 +1130,32 @@ namespace Root_CAMELLIA
             {
                 return new RelayCommand(() =>
                 {
-                    if (RecipeCreatorViewModel.RecipeLoad())
+                    if (RecipeCreatorViewModel.RecipeLoad(false))
                     {
 
-                        // MeasurementRD꺼 그려야함.
-                        RecipeViewModel.UpdateListView(true);
-                        try
-                        {
-                            RecipeViewModel.UpdateLayerGridView();
-                        }
-                        catch
-                        {
+                        //// MeasurementRD꺼 그려야함.
+                        //RecipeViewModel.UpdateListView(true);
+                        //try
+                        //{
+                        //    RecipeViewModel.UpdateLayerGridView();
+                        //}
+                        //catch
+                        //{
 
-                        }
-                        RecipeViewModel.UpdateView(true);
+                        //}
+                        //RecipeViewModel.UpdateView(true);
 
-                        RecipeOpen = true;
+                        //RecipeOpen = true;
 
-                        p_DrawCandidatePointElement = new ObservableCollection<UIElement>(RecipeViewModel.p_DrawCandidatePointElement);
-                        p_DrawPointElement = new ObservableCollection<UIElement>(RecipeViewModel.p_DrawPointElement);
-                        //PointListItem = RecipeViewModel.PointListItem;
-                        PointListItem = RecipeViewModel.PointListItem.Copy();
-                        PointCount = RecipeViewModel.PointCount;
-                        DrawMeasureRoute();
-                        p_Progress = 0;
+                        //p_DrawCandidatePointElement = new ObservableCollection<UIElement>(RecipeViewModel.p_DrawCandidatePointElement);
+                        //p_DrawPointElement = new ObservableCollection<UIElement>(RecipeViewModel.p_DrawPointElement);
+                        ////PointListItem = RecipeViewModel.PointListItem;
+                        //PointListItem = RecipeViewModel.PointListItem.Copy();
+                        //PointCount = RecipeViewModel.PointCount;
+                        //DrawMeasureRoute();
+                        //p_Progress = 0;
 
-                        p_LoadRecipe = DataManager.recipeDM.LoadRecipeName;
+                        //p_LoadRecipe = DataManager.recipeDM.LoadRecipeName;
                     }
                     //if (RecipeViewModel.dataManager.recipeDM.RecipeOpen())
                     //{
@@ -1672,13 +1719,13 @@ namespace Root_CAMELLIA
         //public List<ModelData.LayerData> p_gridLayerData { get; set; }
         public bool p_useThickness { get; set; }
         public bool p_useTransmittance { get; set; }
-        public string p_VISIntegrationTime { get; set; }
-        public string p_NIRIntegrationTime { get; set; }
+        public int p_VISIntegrationTime { get; set; }
+        public int p_NIRIntegrationTime { get; set; }
         public List<WavelengthItem> p_reflectanceListItem { get; set; }
         public List<WavelengthItem> p_transmittanceListItem { get; set; }
         public float p_lowerWaveLength { get; set; }
         public float p_upperWaveLength { get; set; }
         public int p_thicknessLMIteration { get; set; }
-        public string p_dampingFactor { get; set; }
+        public float p_dampingFactor { get; set; }
     }
 }
