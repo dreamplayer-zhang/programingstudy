@@ -1,14 +1,11 @@
-﻿using RootTools;
+﻿using Root_Pine2_Vision.Module;
+using RootTools;
 using RootTools.Control;
 using RootTools.Module;
 using RootTools.ToolBoxs;
 using RootTools.Trees;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace Root_Pine2.Module
 {
@@ -125,19 +122,21 @@ namespace Root_Pine2.Module
 
             public InfoStrip p_infoStrip { get; set; }
             public string p_id { get; set; }
-            Boats m_boats; 
-            public Boat(string id, Boats boats)
+            Boats m_boats;
+            Vision.VisionWorks m_visionWorks; 
+            public Boat(string id, Boats boats, Vision.VisionWorks visionWorks)
             {
                 p_id = id;
-                m_boats = boats; 
+                m_boats = boats;
+                m_visionWorks = visionWorks; 
             }
         }
         Boat[] m_aBoat;
         void InitBoat(string id)
         {
             m_aBoat = new Boat[2];
-            m_aBoat[0] = new Boat(id + "A", this);
-            m_aBoat[1] = new Boat(id + "B", this);
+            m_aBoat[0] = new Boat(id + "A", this, m_vision.m_aVisionWorks[0]);
+            m_aBoat[1] = new Boat(id + "B", this, m_vision.m_aVisionWorks[1]);
         }
         #endregion
 
@@ -170,9 +169,12 @@ namespace Root_Pine2.Module
         #endregion
 
         Pine2 m_pine2;
-        public Boats(string id, IEngineer engineer, Pine2 pine2)
+        Vision m_vision; 
+        public Boats(string id, IEngineer engineer, Pine2 pine2, Vision vision)
         {
             p_id = id;
+            m_pine2 = pine2;
+            m_vision = vision; 
             InitBoat(id); 
             InitBase(id, engineer); 
         }

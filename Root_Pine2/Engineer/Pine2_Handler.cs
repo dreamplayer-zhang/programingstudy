@@ -34,7 +34,8 @@ namespace Root_Pine2.Engineer
         public LoadEV m_loadEV;
         public MagazineEVSet m_magazineEV = new MagazineEVSet();
         public Transfer m_transfer; 
-        public Vision[] m_vision = new Vision[3]; 
+        public Vision[] m_vision = new Vision[3];
+        public Boats[] m_boats = new Boats[3]; 
         void InitModule()
         {
             p_moduleList = new ModuleList(m_engineer);
@@ -51,6 +52,12 @@ namespace Root_Pine2.Engineer
             InitModule(m_vision[0]);
             InitModule(m_vision[1]);
             InitModule(m_vision[2]);
+            m_boats[0] = new Boats("Boats 3D", m_engineer, m_pine2, m_vision[0]);
+            m_boats[1] = new Boats("Boats Top", m_engineer, m_pine2, m_vision[1]);
+            m_boats[2] = new Boats("Boats Bottom", m_engineer, m_pine2, m_vision[2]);
+            InitModule(m_boats[0]);
+            InitModule(m_boats[1]);
+            InitModule(m_boats[2]);
         }
 
         void InitModule(ModuleBase module)

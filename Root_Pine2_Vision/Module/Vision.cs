@@ -199,10 +199,13 @@ namespace Root_Pine2_Vision.Module
 
             public void RunTree(Tree tree)
             {
-                m_idProcess = tree.Set(m_idProcess, m_idProcess, "ID", "VisionWorks Process ID");
-                m_sFileVisionWorks = tree.SetFile(m_sFileVisionWorks, m_sFileVisionWorks, ".exe", "File", "VisionWorks File Name");
-                m_bStartProcess = tree.Set(m_bStartProcess, m_bStartProcess, "Start", "Start Memory Process");
-                RunTreeGrabMode(tree.GetTree("GrabMode", false)); 
+                if (m_vision.p_eRemote == eRemote.Server)
+                {
+                    m_idProcess = tree.Set(m_idProcess, m_idProcess, "ID", "VisionWorks Process ID");
+                    m_sFileVisionWorks = tree.SetFile(m_sFileVisionWorks, m_sFileVisionWorks, ".exe", "File", "VisionWorks File Name");
+                    m_bStartProcess = tree.Set(m_bStartProcess, m_bStartProcess, "Start", "Start Memory Process");
+                    RunTreeGrabMode(tree.GetTree("GrabMode", false));
+                }
             }
 
             public eVisionWorks m_eVisionWorks = eVisionWorks.VisionWorksA; 
@@ -225,7 +228,7 @@ namespace Root_Pine2_Vision.Module
                 }
             }
         }
-        List<VisionWorks> m_aVisionWorks = new List<VisionWorks>();
+        public List<VisionWorks> m_aVisionWorks = new List<VisionWorks>();
         List<string> m_asVisionWorks = new List<string>();
         void InitVisionWorks()
         {
