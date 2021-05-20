@@ -1,4 +1,6 @@
-﻿using Root_VEGA_D_IPU.Module;
+﻿using Emgu.CV;
+using Emgu.CV.Structure;
+using Root_VEGA_D_IPU.Module;
 using RootTools;
 using RootTools.Camera;
 using RootTools.Camera.BaslerPylon;
@@ -128,17 +130,22 @@ namespace Root_VEGA_D.Module
                     {
                         m_log.Info(string.Format("AutoFocus Try {0} - Cannot find best Y position by auto focusing", nTryCount));
                         nTryCount++;
-                        continue;
                     }
+                    else
+                        break;
+                }
 
-                    // Offset 적용
+                // Offset 적용
+                if (m_nAFBestGVSum <= 0)
+                    m_dAFBestFocusPosY = m_grabMode.m_dFocusPosZ;
+                else
                     m_dAFBestFocusPosY += m_grabMode.m_dAFOffset;
 
-                    if (m_module.Run(axisZ.StartMove(m_dAFBestFocusPosY)))
-                        return p_sInfo;
-                    if (m_module.Run(axisZ.WaitReady()))
-                        return p_sInfo;
-                }
+                // 포커스 위치로 이동
+                if (m_module.Run(axisZ.StartMove(m_dAFBestFocusPosY)))
+                    return p_sInfo;
+                if (m_module.Run(axisZ.WaitReady()))
+                    return p_sInfo;
             }
             catch (Exception e)
             {
@@ -149,7 +156,9 @@ namespace Root_VEGA_D.Module
                 m_grabMode.SetLight(false);
 
                 if(m_nAFBestGVSum <= 0)
-                    m_log.Info(string.Format("AutoFocus is Failed, Z Pos is set to {0}", m_grabMode.m_dFocusPosZ));
+                    m_log.Info(string.Format("AutoFocus is failed, Z Pos is set to {0}", m_dAFBestFocusPosY));
+                else
+                    m_log.Info(string.Format("AutoFocus is successful, Z Pos is set to {0}", m_dAFBestFocusPosY));
             }
 
             return "OK";
@@ -269,6 +278,167 @@ namespace Root_VEGA_D.Module
 
             return "OK";
         }
+        string RunAlign(MemoryData mem, int nSnapCount, double startPosY, double endPosY, double startTriggerY, double endTriggerY)
+        {
+            if (m_grabMode.m_bUseAlign == false)
+                return "OK";
+
+            m_grabMode.SetLight(true);
+
+            try
+            {
+                double dPosX = m_grabMode.m_rpAxisCenter.X + m_grabMode.m_nWaferSize_mm * 0.5 - (m_grabMode.m_nCenterX - m_grabMode.m_GD.m_nFovSize * 0.5) * m_grabMode.m_dResX_um * 0.001;
+                
+                CPoint memOffset = new CPoint(0, 0);
+                if (m_module.Run(RunLineScan(mem, memOffset, nSnapCount, dPosX, startPosY, endPosY, startTriggerY, endTriggerY)))
+                    return p_sInfo;
+
+                Image<Gray, byte> imgTop = new Image<Gray, byte>(m_grabMode.p_sTopTemplateFile);
+                Image<Gray, byte> imgBot = new Image<Gray, byte>(m_grabMode.p_sBottomTemplateFile);
+
+                CRect searchTopArea = new CRect(0, (int)(m_grabMode.m_nTopCenterY - m_grabMode.m_nSearchAreaSize * 0.5), m_grabMode.m_GD.m_nFovSize, (int)(m_grabMode.m_nTopCenterY + m_grabMode.m_nSearchAreaSize * 0.5));
+                CRect searchBotArea = new CRect(0, (int)(m_grabMode.m_nBottomCenterY - m_grabMode.m_nSearchAreaSize * 0.5), m_grabMode.m_GD.m_nFovSize, (int)(m_grabMode.m_nBottomCenterY + m_grabMode.m_nSearchAreaSize * 0.5));
+                Image<Gray, byte> imgTopArea = m_module.GetGrayByteImageFromMemory_12bit(mem, searchTopArea);
+                Image<Gray, byte> imgBotArea = m_module.GetGrayByteImageFromMemory_12bit(mem, searchBotArea);
+
+                Image<Gray, byte> imgTop_div4 = imgTop.Resize(0.25, Emgu.CV.CvEnum.Inter.Linear);
+                Image<Gray, byte> imgBot_div4 = imgBot.Resize(0.25, Emgu.CV.CvEnum.Inter.Linear);
+                Image<Gray, byte> imgTopArea_div4 = imgTopArea.Resize(0.25, Emgu.CV.CvEnum.Inter.Linear);
+                Image<Gray, byte> imgBotArea_div4 = imgBotArea.Resize(0.25, Emgu.CV.CvEnum.Inter.Linear);
+
+                // 1/16 다운스케일 이미지로 템플릿 매칭
+                CPoint ptCenterTop = new CPoint();
+                CPoint ptCenterBot = new CPoint();
+                bool bTopResult = TemplateMatch(imgTopArea_div4, imgTop_div4, m_grabMode.m_dMatchScore, out ptCenterTop);
+                bool bBotResult = TemplateMatch(imgBotArea_div4, imgBot_div4, m_grabMode.m_dMatchScore, out ptCenterBot);
+                if(bTopResult && bBotResult)
+                {
+                    ptCenterTop.X *= 4;
+                    ptCenterTop.Y *= 4;
+                    ptCenterBot.X *= 4;
+                    ptCenterBot.Y *= 4;
+
+                    searchTopArea = new CRect(new CPoint(searchTopArea.Left + ptCenterTop.X, searchTopArea.Top + ptCenterTop.Y), imgTop.Width + 8, imgTop.Height + 8);
+                    searchBotArea = new CRect(new CPoint(searchBotArea.Left + ptCenterBot.X, searchBotArea.Top + ptCenterBot.Y), imgBot.Width + 8, imgBot.Height + 8);
+                    
+                    imgTopArea = m_module.GetGrayByteImageFromMemory_12bit(mem, searchTopArea);
+                    imgBotArea = m_module.GetGrayByteImageFromMemory_12bit(mem, searchBotArea);
+
+                    // 좁혀진 영역에서 다시 템플릿 매칭
+                    bTopResult = TemplateMatch(imgTopArea, imgTop, m_grabMode.m_dMatchScore, out ptCenterTop);
+                    bBotResult = TemplateMatch(imgBotArea, imgBot, m_grabMode.m_dMatchScore, out ptCenterBot);
+
+                    if (bTopResult && bBotResult)
+                    {
+                        ptCenterTop = new CPoint(searchTopArea.Left + ptCenterTop.X, searchTopArea.Top + ptCenterTop.Y);
+                        ptCenterBot = new CPoint(searchBotArea.Left + ptCenterBot.X, searchBotArea.Top + ptCenterBot.Y);
+
+                        double dThetaRadian = Math.Atan2((double)(ptCenterBot.Y - ptCenterTop.Y), (double)(ptCenterBot.X - ptCenterTop.X));
+                        double dThetaDegree = dThetaRadian * (180 / Math.PI);
+                        dThetaDegree -= 90;
+
+                        // Rotate 축 Theta만큼 회전
+                        Axis axisRotate = m_module.AxisRotate;
+                        if (m_module.Run(axisRotate.StartMove(axisRotate.p_posActual + dThetaDegree * -1)))
+                            return p_sInfo;
+                        if (m_module.Run(axisRotate.WaitReady()))
+                            return p_sInfo;
+
+                        m_log.Info("Align Success");
+
+                        return "OK";
+                    }
+                }
+            }
+            catch(Exception ex)
+            {
+                m_log.Info(ex.Message);
+            }
+            finally
+            {
+                m_grabMode.SetLight(false);
+            }
+
+            m_log.Info("Align Failed");
+
+            return "Align Failed";
+        }
+        bool TemplateMatch(Image<Gray, byte> imgTargetArea, Image<Gray, byte> imgTemplate, double dMatchScore, out CPoint ptResult)
+        {
+            int nWidthDiff = 0;
+            int nHeightDiff = 0;
+            System.Windows.Point ptMaxRelative = new System.Windows.Point();
+            float fMaxScore = float.MinValue;
+            bool bFoundTemplate = false;
+
+            Image<Gray, float> imgResult = imgTargetArea.MatchTemplate(imgTemplate, Emgu.CV.CvEnum.TemplateMatchingType.CcorrNormed);
+            nWidthDiff = imgTargetArea.Width - imgResult.Width;
+            nHeightDiff = imgTargetArea.Height - imgResult.Height;
+            float[,,] matches = imgResult.Data;
+
+            for (int x = 0; x < matches.GetLength(1); x++)
+            {
+                for (int y = 0; y < matches.GetLength(0); y++)
+                {
+                    if (fMaxScore < matches[y, x, 0] && dMatchScore <= matches[y, x, 0])
+                    {
+                        fMaxScore = matches[y, x, 0];
+                        ptMaxRelative.X = x;
+                        ptMaxRelative.Y = y;
+                        bFoundTemplate = true;
+                    }
+                }
+            }
+            ptResult = new CPoint();
+            ptResult.X = (int)(ptMaxRelative.X) + (int)(nWidthDiff / 2);
+            ptResult.Y = (int)(ptMaxRelative.Y) + (int)(nHeightDiff / 2);
+
+            return bFoundTemplate;
+        }
+        public string RunLineScan(MemoryData mem, CPoint memOffset, int nSnapCount, double posX, double startPosY, double endPosY, double startTriggerY, double endTriggerY)
+        {
+            AxisXY axisXY = m_module.AxisXY;
+            Axis axisZ = m_module.AxisZ;
+
+            Camera_Dalsa camMain = m_grabMode.m_camera as Camera_Dalsa;
+            if (camMain == null)
+                return "Main Camara is null";
+
+            // 시작위치로 이동
+            if (m_module.Run(axisXY.StartMove(posX, startPosY)))
+                return p_sInfo;
+            if (m_module.Run(axisXY.WaitReady()))
+                return p_sInfo;
+
+            // 분주비 재설정
+            int nEncoderMul = camMain.GetEncoderMultiplier();
+            int nEncoderDiv = camMain.GetEncoderDivider();
+            camMain.SetEncoderMultiplier(1);
+            camMain.SetEncoderDivider(1);
+            camMain.SetEncoderMultiplier(nEncoderMul);
+            camMain.SetEncoderDivider(nEncoderDiv);
+
+            // 트리거 설정
+            axisXY.p_axisY.SetTrigger(startTriggerY, endTriggerY, m_grabMode.m_dTrigger, 0.001, true);
+
+            // 카메라 스냅 시작
+            m_grabMode.StartGrab(mem, memOffset, (int)(nSnapCount * 0.98), m_grabMode.m_GD);
+
+            // 이동하면서 그랩
+            if (m_module.Run(axisXY.p_axisY.StartMove(endPosY)))
+                return p_sInfo;
+
+            // 라인스캔 완료 대기
+            if (m_module.Run(axisXY.p_axisY.WaitReady()))
+                return p_sInfo;
+
+            // 이미지 스냅 스레드 동작중이라면 중지
+            while (camMain.p_CamInfo.p_eState != eCamState.Ready && !EQ.IsStop())
+            {
+                Thread.Sleep(10);
+            }
+            return "OK";
+        }
 
         public override string Run()
         {
@@ -318,10 +488,35 @@ namespace Root_VEGA_D.Module
                 CPoint cpMemoryOffset = new CPoint(m_grabMode.m_cpMemoryOffset);
                 cpMemoryOffset.X += m_grabMode.m_ScanStartLine * grabData.m_nFovSize;
 
+                // 변수 계산
                 m_grabMode.m_dTrigger = Math.Round(m_grabMode.m_dResY_um * m_grabMode.m_dCamTriggerRatio, 1);     // 트리거 (1 pulse = 3.0 mm)
 
                 int nWaferSizeY_px = (int)Math.Round(m_grabMode.m_nWaferSize_mm * MM_TO_UM / m_grabMode.m_dResY_um);  // 웨이퍼 영역의 Y픽셀 갯수
                 int nTotalTriggerCount = Convert.ToInt32(m_grabMode.m_dTrigger * nWaferSizeY_px);   // 스캔영역 중 웨이퍼 스캔 구간에서 발생할 Trigger 갯수
+
+                double dfov_mm = grabData.m_nFovSize * m_grabMode.m_dResX_um * 0.001;
+                double dOverlap_mm = grabData.m_nOverlap * m_grabMode.m_dResX_um * 0.001;
+                double dPosZ = m_dAFBestFocusPosY;//m_grabMode.m_dFocusPosZ;
+
+                double dTriggerStartPosY = m_grabMode.m_rpAxisCenter.Y + m_grabMode.m_ptXYAlignData.Y - m_grabMode.m_nWaferSize_mm * 0.5;
+                double dTriggerEndPosY = m_grabMode.m_rpAxisCenter.Y + m_grabMode.m_ptXYAlignData.Y + m_grabMode.m_nWaferSize_mm * 0.5;
+                
+                Axis.Speed speedY = axisXY.p_axisY.GetSpeedValue(Axis.eSpeed.Move);
+
+                double accDistance = speedY.m_acc * speedY.m_v * 0.5 * 2.0;
+                double decDistance = speedY.m_dec * speedY.m_v * 0.5 * 2.0;
+
+                double dStartPosY = dTriggerStartPosY - accDistance;
+                double dEndPosY = dTriggerEndPosY + decDistance;
+
+                string strPool = m_grabMode.m_memoryPool.p_id;
+                string strGroup = m_grabMode.m_memoryGroup.p_id;
+                string strMemory = m_grabMode.m_memoryData.p_id;
+                MemoryData mem = m_module.m_engineer.GetMemory(strPool, strGroup, strMemory);
+
+                // 얼라인
+                if (m_module.Run(RunAlign(mem, nWaferSizeY_px, dStartPosY, dEndPosY, dTriggerStartPosY, dTriggerEndPosY)))
+                    return p_sInfo;
 
                 while (m_grabMode.m_ScanLineNum > m_nCurScanLine)
                 {
@@ -340,31 +535,10 @@ namespace Root_VEGA_D.Module
                         //int nScanSpeed = Convert.ToInt32((double)m_grabMode.m_nMaxFrame * m_grabMode.m_dTrigger * (double)m_grabMode.m_nScanRate / 100);
                         //int nScanOffset_pulse = (int)((double)nScanSpeed * axisXY.p_axisY.GetSpeedValue(Axis.eSpeed.Move).m_acc * 0.5) * 2;
 
-                        // 분주비 재설정
-                        int nEncoderMul = camMain.GetEncoderMultiplier();
-                        int nEncoderDiv = camMain.GetEncoderDivider();
-                        camMain.SetEncoderMultiplier(1);
-                        camMain.SetEncoderDivider(1);
-                        camMain.SetEncoderMultiplier(nEncoderMul);
-                        camMain.SetEncoderDivider(nEncoderDiv);
-
                         int nLineIndex = m_grabMode.m_ScanStartLine + m_nCurScanLine;
 
-                        double dfov_mm = grabData.m_nFovSize * m_grabMode.m_dResX_um * 0.001;
-                        double dOverlap_mm = grabData.m_nOverlap * m_grabMode.m_dResX_um * 0.001;
                         double dPosX = m_grabMode.m_rpAxisCenter.X + m_grabMode.m_nWaferSize_mm * 0.5 - nLineIndex * (dfov_mm - dOverlap_mm);
                         double dNextPosX = dPosX - (dfov_mm - dOverlap_mm);
-                        double dPosZ = m_dAFBestFocusPosY;//m_grabMode.m_dFocusPosZ;
-
-                        double dTriggerStartPosY = m_grabMode.m_rpAxisCenter.Y + m_grabMode.m_ptXYAlignData.Y - m_grabMode.m_nWaferSize_mm * 0.5;
-                        double dTriggerEndPosY = m_grabMode.m_rpAxisCenter.Y + m_grabMode.m_ptXYAlignData.Y + m_grabMode.m_nWaferSize_mm * 0.5;
-
-                        Axis.Speed speedY = axisXY.p_axisY.GetSpeedValue(Axis.eSpeed.Move);
-
-                        double accDistance = speedY.m_acc * speedY.m_v * 0.5 * 2.0;
-                        double decDistance = speedY.m_dec * speedY.m_v * 0.5 * 2.0;
-                        
-                        double dStartPosY, dEndPosY;
 
                         // Grab 방향 및 시작, 종료 위치 설정
                         m_grabMode.m_eGrabDirection = eGrabDirection.Forward;
@@ -392,24 +566,19 @@ namespace Root_VEGA_D.Module
                         if (m_module.Run(axisZ.StartMove(dPosZ)))
                             return p_sInfo;
 
-                        // 시작 위치로 X, Y축 이동
-                        if (m_module.Run(axisXY.WaitReady()))
-                            return p_sInfo;
-                        if (m_module.Run(axisXY.StartMove(dPosX, dStartPosY)))
-                            return p_sInfo;
-
                         // 이동 대기
-                        if (m_module.Run(axisXY.WaitReady()))
-                            return p_sInfo;
                         if (m_module.Run(axisZ.WaitReady()))
                             return p_sInfo;
 
                         grabData.bInvY = m_grabMode.m_eGrabDirection == eGrabDirection.BackWard;
                         grabData.nScanOffsetY = nLineIndex * m_grabMode.m_nYOffset;
+                        
+                        CPoint tmpMemOffset = new CPoint(cpMemoryOffset);
 
-                        // IPU PC와 연결된 상태라면 'LineStart' 메세지 전달
+                        // IPU PC와 연결된 상태라면
                         if (m_module.TcpipCommServer.IsConnected())
                         {
+                            // 'LineStart' 메세지 전달
                             Dictionary<string, string> mapParam = new Dictionary<string, string>();
                             mapParam[TCPIPComm_VEGA_D.PARAM_NAME_OFFSETX] = cpMemoryOffset.X.ToString();
                             mapParam[TCPIPComm_VEGA_D.PARAM_NAME_OFFSETY] = cpMemoryOffset.Y.ToString();
@@ -422,17 +591,7 @@ namespace Root_VEGA_D.Module
                             mapParam[TCPIPComm_VEGA_D.PARAM_NAME_STARTSCANLINE] = m_grabMode.m_ScanStartLine.ToString();
 
                             m_module.TcpipCommServer.SendMessage(TCPIPComm_VEGA_D.Command.LineStart, mapParam);
-                        }
 
-                        // 카메라 그랩 시작
-                        string strPool = m_grabMode.m_memoryPool.p_id;
-                        string strGroup = m_grabMode.m_memoryGroup.p_id;
-                        string strMemory = m_grabMode.m_memoryData.p_id;
-                        MemoryData mem = m_module.m_engineer.GetMemory(strPool, strGroup, strMemory);
-
-                        CPoint tmpMemOffset = new CPoint(cpMemoryOffset);
-                        if (m_module.TcpipCommServer.IsConnected())
-                        {
                             // IPU PC와 연결된 상태에서는 이미지 데이터가 복사될 Main PC의 Memory 위치가
                             // Memory Width를 넘어가게 되면 다시 0부터 이미지를 얻어오도록 Memory Offset을 계산
                             long div = tmpMemOffset.X / mem.W;
@@ -441,31 +600,9 @@ namespace Root_VEGA_D.Module
                             tmpMemOffset.X = (int)(remain - offset);
                         }
 
-                        // Y축 트리거 발생 설정
-                        axisXY.p_axisY.SetTrigger(dTriggerStartPosY, dTriggerEndPosY, m_grabMode.m_dTrigger, 0.001, true);
-
-                        // 카메라 스냅 시작
-                        m_grabMode.StartGrab(mem, tmpMemOffset, (int)(nWaferSizeY_px * 0.98), grabData);
-                        
-                        // Y축 목표 위치로 이동
-                        if (m_module.Run(axisXY.p_axisY.StartMove(dEndPosY)))
+                        // 라인 스캔
+                        if (m_module.Run(RunLineScan(mem, tmpMemOffset, nWaferSizeY_px, dPosX, dStartPosY, dEndPosY, dTriggerStartPosY, dTriggerEndPosY)))
                             return p_sInfo;
-
-                        //// 라인스캔 완료 대기
-                        if (m_module.Run(axisXY.p_axisY.WaitReady()))
-                            return p_sInfo;
-
-                        // 이미지 스냅 스레드 동작중이라면 중지
-                        Camera_Dalsa dalsaCam = m_grabMode.m_camera as Camera_Dalsa;
-                        if (dalsaCam == null)
-                            return "OK";
-                        else
-                        {
-                            while (dalsaCam.p_CamInfo.p_eState != eCamState.Ready && !EQ.IsStop())
-                            {
-                                Thread.Sleep(10);
-                            }
-                        }
 
                         // IPU PC와 연결된 상태라면 'LineEnd' 메세지 전달
                         if (m_module.TcpipCommServer.IsConnected())
