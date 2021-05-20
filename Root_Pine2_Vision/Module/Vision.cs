@@ -1,4 +1,5 @@
 ﻿using RootTools;
+using RootTools.Camera.Dalsa;
 using RootTools.Comm;
 using RootTools.Light;
 using RootTools.Memory;
@@ -16,12 +17,14 @@ namespace Root_Pine2_Vision.Module
     public class Vision : ModuleBase
     {
         #region ToolBox
-        LightSet lightSet;
+        CameraDalsa m_camera;
+        public LightSet m_lightSet;
         public override void GetTools(bool bInit)
         {
             if (p_eRemote == eRemote.Server)
             {
-                p_sInfo = m_toolBox.Get(ref lightSet, this);
+                p_sInfo = m_toolBox.GetCamera(ref m_camera, this, "Camera"); 
+                p_sInfo = m_toolBox.Get(ref m_lightSet, this);
                 m_aVisionWorks[0].GetTools(m_toolBox, bInit);
                 m_aVisionWorks[1].GetTools(m_toolBox, bInit);
             }
@@ -32,14 +35,73 @@ namespace Root_Pine2_Vision.Module
         #region GrabMode
         public class GrabMode
         {
-            public GrabMode()
+            #region Light
+            public LightSet m_lightSet;
+            List<double> m_aPower = new List<double>();
+            void SetPowerList()
             {
+                while (m_aPower.Count < m_lightSet.m_aLight.Count) m_aPower.Add(0);
+                while (m_aPower.Count < m_lightSet.m_aLight.Count) m_aPower.RemoveAt(m_aPower.Count - 1); 
+            }
 
+            public void SetLight(bool bOn)
+            {
+                SetPowerList();
+                int n = 0; 
+                foreach (Light light in m_lightSet.m_aLight)
+                {
+                    if (light.m_light != null) light.m_light.p_fSetPower = bOn ? m_aPower[n] : 0;
+                    n++; 
+                }
+            }
+
+            void RunTreeLight(Tree tree)
+            {
+                if (m_lightSet == null) return;
+                SetPowerList(); 
+                for (int n = 0; n < m_aPower.Count; n++)
+                {
+                    m_aPower[n] = tree.Set(m_aPower[n], m_aPower[n], m_lightSet.m_aLight[n].m_sName, "Light Power (0 ~ 100 %%)");
+                }
+            }
+            #endregion
+
+            #region Memory
+            string m_sMemory = "";
+            public MemoryData m_memory;
+            void RunTreeMemory(Tree tree)
+            {
+                MemoryGroup memoryGroup = m_visionWorks.m_memoryGroup; 
+                m_sMemory = tree.Set(m_sMemory, m_sMemory, memoryGroup.m_asMemory, "Memory", "Memory Data Name");
+                m_memory = memoryGroup.GetMemory(m_sMemory); 
+            }
+            #endregion
+
+            public void RunTree(Tree tree)
+            {
+                RunTreeLight(tree.GetTree("Light"));
+                RunTreeMemory(tree.GetTree("Memory")); 
+            }
+
+            public string p_id { get; set; }
+            public string p_sName { get; set; }
+            public VisionWorks m_visionWorks; 
+            public GrabMode(string id, VisionWorks visionWorks)
+            {
+                p_id = id;
+                p_sName = id;
+                m_visionWorks = visionWorks;
+                m_lightSet = visionWorks.m_vision.m_lightSet; 
             }
         }
         #endregion
 
         #region VisionWorks
+        public enum eVisionWorks
+        {
+            VisionWorksA,
+            VisionWorksB,
+        }
         public class VisionWorks
         {
             MemoryPool m_memoryPool;
@@ -56,11 +118,11 @@ namespace Root_Pine2_Vision.Module
             }
 
             #region Memory
-            MemoryGroup m_memoryGroup;
+            public MemoryGroup m_memoryGroup;
             MemoryData m_memColor; 
             void InitMemory()
             {
-                m_memoryGroup = m_memoryPool.GetGroup("Vision");
+                m_memoryGroup = m_memoryPool.GetGroup("Pine2");
                 m_memColor = m_memoryGroup.CreateMemory("Color", 1, 3, new CPoint(1000, 1000)); 
             }
             #endregion
@@ -68,6 +130,23 @@ namespace Root_Pine2_Vision.Module
             #region TCPIP
             private void M_tcpip_EventReciveData(byte[] aBuf, int nSize, Socket socket)
             {
+            }
+            #endregion
+
+            #region GrabMode
+            int m_lGrabMode = 0;
+            public List<GrabMode> m_aGrabMode = new List<GrabMode>();
+            void InitGrabModeList()
+            {
+                while (m_aGrabMode.Count > m_lGrabMode) m_aGrabMode.RemoveAt(m_aGrabMode.Count - 1);
+                while (m_aGrabMode.Count < m_lGrabMode) m_aGrabMode.Add(new GrabMode(m_aGrabMode.Count.ToString("00"), this));
+            }
+
+            void RunTreeGrabMode(Tree tree)
+            {
+                m_lGrabMode = tree.Set(m_lGrabMode, m_lGrabMode, "Count", "Grab Mode Count");
+                InitGrabModeList();
+                foreach (GrabMode grabMode in m_aGrabMode) grabMode.RunTree(tree.GetTree(grabMode.p_id)); 
             }
             #endregion
 
@@ -123,13 +202,16 @@ namespace Root_Pine2_Vision.Module
                 m_idProcess = tree.Set(m_idProcess, m_idProcess, "ID", "VisionWorks Process ID");
                 m_sFileVisionWorks = tree.SetFile(m_sFileVisionWorks, m_sFileVisionWorks, ".exe", "File", "VisionWorks File Name");
                 m_bStartProcess = tree.Set(m_bStartProcess, m_bStartProcess, "Start", "Start Memory Process");
+                RunTreeGrabMode(tree.GetTree("GrabMode", false)); 
             }
 
+            public eVisionWorks m_eVisionWorks = eVisionWorks.VisionWorksA; 
             public string p_id { get; set; }
-            Vision m_vision; 
-            public VisionWorks(string id, Vision vision)
+            public Vision m_vision; 
+            public VisionWorks(eVisionWorks eVisionWorks, Vision vision)
             {
-                p_id = id;
+                m_eVisionWorks = eVisionWorks; 
+                p_id = eVisionWorks.ToString();
                 m_vision = vision; 
                 InitThreadProcess(); 
             }
@@ -138,16 +220,27 @@ namespace Root_Pine2_Vision.Module
             {
                 if (m_bThreadProcess)
                 {
-                    m_bStartProcess = false;
+                    m_bThreadProcess = false;
                     m_threadProcess.Join(); 
                 }
             }
         }
-        List<VisionWorks> m_aVisionWorks = new List<VisionWorks>(); 
+        List<VisionWorks> m_aVisionWorks = new List<VisionWorks>();
+        List<string> m_asVisionWorks = new List<string>();
         void InitVisionWorks()
         {
-            m_aVisionWorks.Add(new VisionWorks("VisionWorksA", this));
-            m_aVisionWorks.Add(new VisionWorks("VisionWorksB", this));
+            m_aVisionWorks.Add(new VisionWorks(eVisionWorks.VisionWorksA, this));
+            m_aVisionWorks.Add(new VisionWorks(eVisionWorks.VisionWorksB, this));
+            foreach (VisionWorks vision in m_aVisionWorks) m_asVisionWorks.Add(vision.p_id); 
+        }
+
+        VisionWorks GetVisionWorks(string sVisionWorks)
+        {
+            foreach (VisionWorks vision in m_aVisionWorks)
+            {
+                if (vision.p_id == sVisionWorks) return vision; 
+            }
+            return null; 
         }
         #endregion
 
