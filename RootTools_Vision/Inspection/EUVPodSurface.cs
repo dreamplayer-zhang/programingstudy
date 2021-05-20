@@ -37,23 +37,13 @@ namespace RootTools_Vision
             return true;
         }
 
-        unsafe void DoInspection()
+        unsafe void Inspection(byte[] workplaceBuffer,EUVPodSurfaceParameterBase ParamBase)
         {
-            if (currentWorkplace.Index == 0) 
-                return;
-
-            inspectionSharedBuffer = currentWorkplace.GetSharedBufferInfo(0);
-            byte[] workplaceBuffer = GetWorkplaceBufferByIndex(0);
-            uint nGVLevel = parameterPod.PodStain.PitLevel = 200;
-            uint nDefectsz = parameterPod.PodStain.PitSize = 2;
-
-            IntPtr ptr = currentWorkplace.GetSharedBufferInfo(1);
-
             int width = currentWorkplace.Width;
             int height = currentWorkplace.Height;
-            byte[] arrBinImg = new byte[width*height];
+            byte[] arrBinImg = new byte[width * height];
 
-            byte* pptr = (byte*)ptr.ToPointer();
+            //byte* pptr = (byte*)ptr.ToPointer();
             byte* p = (byte*)inspectionSharedBuffer.ToPointer();
             for (int i = 0; i < height; i++)
             {
@@ -62,16 +52,16 @@ namespace RootTools_Vision
                 //Buffer.MemoryCopy((void*)arrBinImg, (void*)ptr, i * width, i * width);
             }
 
-            CLR_IP.Cpp_Threshold(workplaceBuffer, arrBinImg, width, height, false, (int)250);
+            CLR_IP.Cpp_Threshold(workplaceBuffer, arrBinImg, width, height, false, (int)ParamBase.PitLevel);
             //System.Drawing.Bitmap bitmap = Tools.CovertBufferToBitmap(currentWorkplace.SharedBufferInfo, new System.Windows.Rect(0, 0, width, height));
 
-            for (int i = 0; i < height; i++)
-            {
-                for (int j = 0; j < width; j++)
-                    pptr[(i * width) + j] = arrBinImg[(i * width) + j];
-                //Buffer.MemoryCopy((void*)arrBinImg, (void*)ptr, i * width, i * width);
+            //for (int i = 0; i < height; i++)
+            //{
+            //    for (int j = 0; j < width; j++)
+            //        pptr[(i * width) + j] = arrBinImg[(i * width) + j];
+            //    //Buffer.MemoryCopy((void*)arrBinImg, (void*)ptr, i * width, i * width);
 
-            }
+            //}
 
             // Filter
             switch (parameterPod.PodStain.DiffFilter)
@@ -108,11 +98,11 @@ namespace RootTools_Vision
 
             CLR_IP.Cpp_Masking(arrBinImg, arrBinImg, maskStartPoint.ToArray(), maskLength.ToArray(), width, height);
 
-            for (int i = 0; i < height; i++)
-            {
-                for (int j = 0; j < width; j++)
-                    pptr[(i * width) + j] = arrBinImg[(i * width) + j];
-            }
+            //for (int i = 0; i < height; i++)
+            //{
+            //    for (int j = 0; j < width; j++)
+            //        pptr[(i * width) + j] = arrBinImg[(i * width) + j];
+            //}
 
             // Labeling
             var Label = CLR_IP.Cpp_Labeling(workplaceBuffer, arrBinImg, width, height, true);
@@ -125,29 +115,44 @@ namespace RootTools_Vision
                 //Add Defect
                 for (int i = 0; i < Label.Length; i++)
                 {
-                    if (Label[i].area > 1)
+                    if (Label[i].area > 1/*nDefectsz*/)
                     {
-
-                        Defect defect = new Defect(i.ToString(),
+                        currentWorkplace.DefectList.Add(new Defect(i.ToString(),
                             10001,
                             Label[i].area,
                             Label[i].value,
-                            Label[i].boundLeft,
-                            Label[i].boundTop,
+                            currentWorkplace.PositionX + Label[i].boundLeft,
+                            currentWorkplace.PositionY + Label[i].boundTop,
                             Label[i].width,
                             Label[i].height,
-                            this.currentWorkplace.MapIndexX,
-                            this.currentWorkplace.MapIndexY);
-                        currentWorkplace.DefectList.Add(defect);
-                        //li.Add(defect);
+                            currentWorkplace.MapIndexX,
+                            currentWorkplace.MapIndexY));
                     }
                 }
             }
-            Tools.SaveDefectImageParallel(@"C:\Defects", currentWorkplace.DefectList, currentWorkplace.SharedBufferInfo, 1, new System.Windows.Point(100,100));
+
+            WorkEventManager.OnInspectionDone(this.currentWorkplace, new InspectionDoneEventArgs(new List<CRect>())); // 나중에 ProcessDefect쪽 EVENT로...
+
+            //Tools.SaveDefectImageParallel(@"C:\Defects", currentWorkplace.DefectList, currentWorkplace.SharedBufferInfo, 1, new System.Windows.Point(100,100));
 
             //var Label = CLR_IP.Cpp_Labeling_SubPix(workplaceBuffer, arrBinImg, chipW, chipH, isDarkInsp, nGrayLevel, 3);
 
             //string sInspectionID = DatabaseManager.Instance.GetInspectionID();
+        }
+        unsafe void DoInspection()
+        {
+            if (currentWorkplace.Index == 0) 
+                return;
+
+            inspectionSharedBuffer = currentWorkplace.GetSharedBufferInfo(0);
+            byte[] workplaceBuffer = GetWorkplaceBufferByIndex(0);
+            uint nGVLevel = parameterPod.PodStain.PitLevel = 200;
+            uint nDefectsz = parameterPod.PodStain.PitSize = 2;
+
+            
+            IntPtr ptr = currentWorkplace.GetSharedBufferInfo(1);
+
+            //Inspection();
         }
     }
 }

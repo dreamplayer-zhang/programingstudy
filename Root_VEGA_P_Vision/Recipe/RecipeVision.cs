@@ -7,7 +7,8 @@ namespace Root_VEGA_P_Vision
         public override void Initilize()
         {
             RegisterRecipeItem<EUVOriginRecipe>();
-            RegisterRecipeItem<PositionRecipe>();
+            RegisterRecipeItem<OriginRecipe>();
+            RegisterRecipeItem<EUVPositionRecipe>();
             RegisterRecipeItem<MaskRecipe>();
             RegisterRecipeItem<EUVPodSurfaceRecipe>();
 

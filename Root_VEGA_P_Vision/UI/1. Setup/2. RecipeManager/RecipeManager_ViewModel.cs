@@ -33,21 +33,7 @@ namespace Root_VEGA_P_Vision
             recipeOriginVM = new RecipeOrigin_ViewModel(this);
             recipeMaskVM = new RecipeMask_ViewModel(this);
         }
-        //public enum ModifyType
-        //{
-        //    None,
-        //    LineStart,
-        //    LineEnd,
-        //    ScrollAll,
-        //    Left,
-        //    Right,
-        //    Top,
-        //    Bottom,
-        //    LeftTop,
-        //    RightTop,
-        //    LeftBottom,
-        //    RightBottom,
-        //}
+
 
         public void SetOrigin()
         {

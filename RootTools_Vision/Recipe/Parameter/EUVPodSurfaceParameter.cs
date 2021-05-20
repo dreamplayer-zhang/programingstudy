@@ -58,12 +58,18 @@ namespace RootTools_Vision
         #region [Parameter]
         bool absolute;
         uint pitLevel,levelMin,levelMax,pitSize,sizeMax,sizeMin;
+        int illumCondition;
         private DiffFilterMethod diffFilter = DiffFilterMethod.Average;
 
         #endregion
 
         #region [Getter/Setter]
         [Browsable(false)]
+        public int IllumCondition
+        {
+            get => illumCondition;
+            set => SetProperty(ref illumCondition, value);
+        }
         public int MaskIndex { get; set; }
 
         public bool Absolute
@@ -106,7 +112,7 @@ namespace RootTools_Vision
             get => this.diffFilter;
             set
             {
-                SetProperty<DiffFilterMethod>(ref this.diffFilter, value);
+                SetProperty(ref diffFilter, value);
             }
         }
         #endregion

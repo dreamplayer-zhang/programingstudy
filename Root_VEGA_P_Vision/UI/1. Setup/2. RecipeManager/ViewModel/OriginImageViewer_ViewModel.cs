@@ -62,7 +62,7 @@ namespace Root_VEGA_P_Vision
 
         public OriginImageViewer_ViewModel()
         {
-            p_VisibleMenu = System.Windows.Visibility.Collapsed;
+            p_VisibleMenu = Visibility.Collapsed;
             RecipeVision recipe = GlobalObjects.Instance.Get<RecipeVision>();
             originRecipe = recipe.GetItem<EUVOriginRecipe>();
             InitializeUIElement();
@@ -71,31 +71,13 @@ namespace Root_VEGA_P_Vision
         #endregion
         #region [Draw Method]
 
-        public void SetOriginBox(CPoint originPt, int originWidth, int originHeight)
-        {
-            originLeftBottom.X = originPt.X;
-            originLeftBottom.Y = originPt.Y;
-
-            originRightTop.X = originPt.X + originWidth;
-            originRightTop.Y = originPt.Y - originHeight;
-
-            originBox.Left = originLeftBottom.X;
-            originBox.Right = originRightTop.X;
-            originBox.Top = originRightTop.Y;
-            originBox.Bottom = originLeftBottom.Y;
-
-            DrawOriginLeftBottomPoint(originLeftBottom, true);
-            DrawOriginRightTopPoint(originRightTop, true);
-
-            DrawOriginBox();
-        }
         public void SetOriginBox(CPoint originPt, CPoint originSize)
         {
             originLeftBottom.X = originPt.X;
             originLeftBottom.Y = originPt.Y;
 
             originRightTop.X = originPt.X + originSize.X;
-            originRightTop.Y = originPt.Y + originSize.Y;
+            originRightTop.Y = originPt.Y - originSize.Y;
 
             originBox.Left = originLeftBottom.X;
             originBox.Right = originRightTop.X;
@@ -144,12 +126,6 @@ namespace Root_VEGA_P_Vision
             if (!p_UIElement.Contains(OriginLeftBottom_UI))
             {
                 p_UIElement.Add(OriginLeftBottom_UI);
-            }
-
-            if (bRecipeLoaded == false)
-            {
-                // Recipe
-                //originRecipe.Clear();                
             }
         }
 
@@ -346,20 +322,8 @@ namespace Root_VEGA_P_Vision
                     originBox.Top = originRightTop.Y;
                     originBox.Bottom = originLeftBottom.Y;
 
-                    if (originBox.Left > originBox.Right)
-                    {
-                        int tmp = originBox.Right;
-                        originBox.Right = originBox.Left;
-                        originBox.Left = tmp;
-                    }
-                    if(originBox.Top>originBox.Bottom)
-                    {
-                        int tmp = originBox.Bottom;
-                        originBox.Bottom = originBox.Top;
-                        originBox.Top = tmp;
-                    }
                     int w = originBox.Right - originBox.Left;
-                    int h = originBox.Top + originBox.Bottom;
+                    int h = originBox.Bottom - originBox.Top;
 
                     if (memid.Contains("Main"))
                         originRecipe.TDIOrigin.OriginSize = new CPoint(w,h);

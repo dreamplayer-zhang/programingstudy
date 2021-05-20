@@ -39,6 +39,8 @@
                     <StackPanel Grid.Row="0" Orientation="Horizontal">
                         <Button Content="Snap" Style="{StaticResource ImageBaseBtn}" Command="{Binding p_MaskPanel.DataContext.btnSnap}"/>
                         <Button Content="Inspection" Style="{StaticResource ImageBaseBtn}" Command="{Binding p_MaskPanel.DataContext.btnInsp}"/>
+                        <Button Content="Illum 1" Style="{StaticResource ImageBaseBtn}" Command="{Binding p_MaskPanel.DataContext.btnIllum1}"/>
+                        <Button Content="Illum 2" Style="{StaticResource ImageBaseBtn}" Command="{Binding p_MaskPanel.DataContext.btnIllum1}"/>
                     </StackPanel>
                     <ContentControl Grid.Row="1" Content="{Binding p_MaskPanel}"/>
                 </Grid>
@@ -54,8 +56,8 @@
                     <GroupBox Header="Tools" Grid.Row="0">
                         <Grid>
                             <Grid.RowDefinitions>
-                                <RowDefinition Height="3*"/>
-                                <RowDefinition Height="7*"/>
+                                <RowDefinition Height="2*"/>
+                                <RowDefinition Height="8*"/>
                             </Grid.RowDefinitions>
                             <GroupBox Grid.Row="0" Margin="3,5">
                                 <GroupBox.Header>
@@ -84,10 +86,10 @@
                             </GroupBox>
                             <Grid Grid.Row="1">
                                 <Grid.RowDefinitions>
-                                    <RowDefinition/>
-                                    <RowDefinition/>
+                                    <RowDefinition Height="7*"/>
+                                    <RowDefinition Height="3*"/>
                                 </Grid.RowDefinitions>
-                                <StackPanel Grid.Row="0" Orientation="Horizontal">
+                                <UniformGrid Grid.Row="0" Rows="1">
                                     <RadioButton Content="Pen"
                                                       Margin="5" 
                                                       Style="{StaticResource {x:Type ToggleButton}}"
@@ -101,19 +103,16 @@
                                                      Style="{StaticResource {x:Type ToggleButton}}"
                                                       IsChecked="{Binding bRectCheck}" />
                                     <RadioButton Content="Circle"
-                                                      Grid.Row="4"
                                                       Margin="5"
                                                      Style="{StaticResource {x:Type ToggleButton}}"
                                                       IsChecked="{Binding bPolygonCheck}" />
                                     <RadioButton Content="Crop"
-                                                      Grid.Row="5"
                                                       Margin="5"
                                                      Style="{StaticResource {x:Type ToggleButton}}"
                                                       IsChecked="{Binding bCropCheck}" />
-                                </StackPanel>
-                                <StackPanel Grid.Row="1" Orientation="Horizontal">
-                                    <GroupBox Margin="3,5"
-                                                  Grid.Row="6">
+                                </UniformGrid>
+                                <UniformGrid Grid.Row="1" Rows="1">
+                                    <GroupBox Margin="3,5" >
                                         <GroupBox.Header>
                                             <TextBlock Text="Threshold(Gv)"
                                                            FontSize="11" />
@@ -135,12 +134,11 @@
                                             </ComboBox>
                                         </Grid>
                                     </GroupBox>
-                                    <RadioButton Content="Threshold"
-                                                      Grid.Row="7"
+                                    <RadioButton Content="Threshold" Width="100"
                                                       Margin="5"
                                                      Style="{StaticResource {x:Type ToggleButton}}"
                                                       IsChecked="{Binding bThresholdCheck}" />
-                                </StackPanel>
+                                </UniformGrid>
 
 
 

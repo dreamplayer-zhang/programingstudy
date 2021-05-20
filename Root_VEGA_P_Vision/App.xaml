@@ -100,6 +100,7 @@
         <local:BooleanToVisiblityConverter x:Key="BooleanToVisiblity"/>
         <BorderGapMaskConverter x:Key="BorderGapMaskConverter"/>
         <local:VisibilityToWindowStateConverter x:Key="VisibilityToWindowState"/>
+        <local:ListToVisibilityConverter x:Key="ListToVisibility"/>
         <!--Color-->
         <SolidColorBrush x:Key="PanelBackGround" Color="{DynamicResource {x:Static SystemColors.ControlColorKey}}"/>
         <SolidColorBrush x:Key="ControlBackGround" Color="{DynamicResource {x:Static SystemColors.ControlLightColorKey}}"/>

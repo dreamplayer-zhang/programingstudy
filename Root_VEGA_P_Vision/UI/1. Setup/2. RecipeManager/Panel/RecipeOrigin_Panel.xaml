@@ -192,16 +192,16 @@
                 <GroupBox Header="Feautre Info" Grid.Row="3">
                     <TabControl>
                         <TabItem Header="EIP Cover Top">
-                            <local:AlignFeatureInfo/>
+                            <local:AlignFeatureInfo DataContext="{Binding EIPCoverTopFeatureInfo}"/>
                         </TabItem>
                         <TabItem Header="EIP Cover Bottom">
-                            <local:AlignFeatureInfo/>
+                            <local:AlignFeatureInfo DataContext="{Binding EIPCoverBtmFeatureInfo}"/>
                         </TabItem>
                         <TabItem Header="EIP Base Top">
-                            <local:AlignFeatureInfo/>
+                            <local:AlignFeatureInfo DataContext="{Binding EIPBaseTopFeatureInfo}"/>
                         </TabItem>
                         <TabItem Header="EIP Base Bottom">
-                            <local:AlignFeatureInfo/>
+                            <local:AlignFeatureInfo DataContext="{Binding EIPBaseBtmFeatureInfo}"/>
                         </TabItem>
                     </TabControl>
                 </GroupBox>

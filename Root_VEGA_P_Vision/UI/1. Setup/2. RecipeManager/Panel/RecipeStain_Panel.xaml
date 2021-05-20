@@ -10,7 +10,10 @@
              d:DesignHeight="836" d:DesignWidth="1912" 
              Background="{StaticResource PanelBackGround}">
     <Grid>
-        <TabControl Grid.Column="1" x:Name="MaskViewerTab">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="9*"/>
+        </Grid.RowDefinitions>
+        <TabControl Grid.Row="1" x:Name="MaskViewerTab">
             <i:Interaction.Triggers>
                 <i:EventTrigger EventName="SelectionChanged">
                     <i:InvokeCommandAction Command="{Binding TabChanged}"/>

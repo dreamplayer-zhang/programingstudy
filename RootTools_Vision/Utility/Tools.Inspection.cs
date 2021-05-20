@@ -197,8 +197,6 @@ namespace RootTools_Vision
             int width = (int)size.X;
             int height = (int)size.Y;
 
-            int idx = 0;
-
             foreach (Defect defect in defectList)
             {
                 double cx = (defect.p_rtDefectBox.Left + defect.p_rtDefectBox.Right) / 2;
@@ -206,15 +204,13 @@ namespace RootTools_Vision
                 int startX = (cx - width/2) > 0 ? (int)(cx - width / 2) : 0;
                 int startY = (cy - height/2) > 0 ? (int)(cy - height / 2) : 0;
 
-                System.Drawing.Bitmap bitmap = CovertBufferToBitmap(sharedBuffer, new System.Windows.Rect(startX, startY, width, height));
+                System.Drawing.Bitmap bitmap = CovertBufferToBitmap(sharedBuffer, new Rect(startX, startY, width, height));
 
-                //if(System.IO.File.Exists(path + defect.m_nDefectIndex + ".bmp"))
-                //    System.IO.File.Delete(path + defect.m_nDefectIndex + ".bmp");
+                if (File.Exists(path + defect.m_nDefectIndex + ".bmp"))
+                    File.Delete(path + defect.m_nDefectIndex + ".bmp");
 
-                bitmap.Save(path + idx++ + ".bmp");
+                bitmap.Save(path + defect.m_nDefectIndex + ".bmp");
             }
-
-            //});
         }
 
         public static void SaveDefectImage(String path, List<Data> dataList, SharedBufferInfo sharedBuffer)

@@ -93,13 +93,18 @@ namespace RootTools_Vision
             }
         }
               
-        public static Bitmap CovertBufferToBitmap(SharedBufferInfo info, Rect rect)
+        public unsafe static Bitmap CovertBufferToBitmap(SharedBufferInfo info, Rect rect)
         {
             try
             {
                 int _byteCount = info.ByteCnt;
                 int _width = info.Width;
                 int _height = info.Height;
+
+                int rtHeight = (int)rect.Height;
+                int rtWidth = (int)rect.Width;
+                int left = (int)rect.Left;
+                int top = (int)rect.Top;
 
                 System.Drawing.Imaging.PixelFormat format = System.Drawing.Imaging.PixelFormat.Format8bppIndexed;
                 if (_byteCount == 1)
@@ -117,7 +122,7 @@ namespace RootTools_Vision
                 }
 
                 int stride = (int)Math.Ceiling((double)_width / 4) * 4;
-                Bitmap bmp = new Bitmap((int)rect.Width, (int)rect.Height, format);
+                Bitmap bmp = new Bitmap(rtWidth, rtHeight, format);
 
                 ColorPalette palette = bmp.Palette;
 
@@ -129,16 +134,13 @@ namespace RootTools_Vision
                     bmp.Palette = palette;
                 }
 
-
-                BitmapData bmpData = bmp.LockBits(new Rectangle(0, 0, (int)rect.Width, (int)rect.Height), ImageLockMode.WriteOnly, format);
+                BitmapData bmpData = bmp.LockBits(new Rectangle(0, 0, rtWidth, rtHeight), ImageLockMode.WriteOnly, format);
 
                 IntPtr pointer = bmpData.Scan0;
                 if (_byteCount == 1)
-                {
-                    for (int i = 0; i < _height; i++)
-                    {
-                        CopyMemory(info.PtrR_GRAY + i * _width, pointer + i * bmpData.Stride, (uint)_width);
-                    }
+                {                    
+                    for (int i = 0; i < rtHeight; i++)
+                        CopyMemory(pointer + i * rtWidth, info.PtrR_GRAY + (top+i)*_width+left, (uint)rtWidth);
                 }
                 else if (_byteCount == 3)
                 {

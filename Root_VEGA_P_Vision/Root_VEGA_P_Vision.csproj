@@ -260,15 +260,24 @@
     <Compile Include="UI\1. Setup\2. RecipeManager\UserControl\AlignFeatureInfo.xaml.cs">
       <DependentUpon>AlignFeatureInfo.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UI\1. Setup\2. RecipeManager\UserControl\AlignFeatureInfo_ViewModel.cs" />
+    <Compile Include="UI\1. Setup\2. RecipeManager\UserControl\FeatureControl.xaml.cs">
+      <DependentUpon>FeatureControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI\1. Setup\2. RecipeManager\ViewModel\ImageViewerBase_ViewModel.cs" />
     <Compile Include="UI\1. Setup\2. RecipeManager\ViewModel\MaskRootViewer_ViewModel.cs" />
     <Compile Include="UI\1. Setup\2. RecipeManager\ViewModel\MaskViewer_ViewModel.cs" />
     <Compile Include="UI\1. Setup\2. RecipeManager\ViewModel\OriginImageViewer_ViewModel.cs" />
     <Compile Include="UI\1. Setup\2. RecipeManager\ViewModel\OriginViewerTab_ViewModel.cs" />
+    <Compile Include="UI\1. Setup\2. RecipeManager\ViewModel\PositionImageViewer_ViewModel.cs" />
     <Compile Include="UI\1. Setup\2. RecipeManager\ViewModel\PositionViewerTab_ViewModel.cs" />
     <Compile Include="UI\1. Setup\2. RecipeManager\ViewModel\RecipeMask_ViewModel.cs" />
     <Compile Include="UI\1. Setup\2. RecipeManager\ViewModel\RecipeOrigin_ViewModel.cs" />
     <Compile Include="UI\1. Setup\2. RecipeManager\ViewModel\RecipeSummary_ViewModel.cs" />
+    <Compile Include="UI\1. Setup\3. PodInfo\PodInfo_Panel.xaml.cs">
+      <DependentUpon>PodInfo_Panel.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\1. Setup\3. PodInfo\PodRecipe.cs" />
     <Compile Include="UI\1. Setup\RecipeWizard\RecipeWizard_VM.cs" />
     <Compile Include="UI\1. Setup\RecipeWizard\Page_RecipeWizard.xaml.cs">
       <DependentUpon>Page_RecipeWizard.xaml</DependentUpon>
@@ -415,6 +424,14 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UI\1. Setup\2. RecipeManager\UserControl\AlignFeatureInfo.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\1. Setup\2. RecipeManager\UserControl\FeatureControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\1. Setup\3. PodInfo\PodInfo_Panel.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

@@ -21,15 +21,13 @@
                         Visibility="Collapsed"
                         Command="{Binding btnInspection}"
                         Style="{StaticResource PanelBtn}"/>-->
+                <Button x:Name="PodInfoBtn" Content="Pod Info" Command="{Binding btnPodInfo}" Style="{StaticResource PanelBtn}"/>
                 <Button Content="Recipe Wizard"
                         Command="{Binding btnRecipeWizard}"
                         Style="{StaticResource PanelBtn}"/>
                 <Button Content="Maintenance"
                         Command="{Binding btnMaintenance}"
                         Style="{StaticResource PanelBtn}"/>
-                <!--<Button Content="GEM"
-                        Command="{Binding btnGEM}"
-                        Style="{StaticResource PanelBtn}"/>-->
             </StackPanel>
         </Border>
 

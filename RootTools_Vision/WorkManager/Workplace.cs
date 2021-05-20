@@ -465,6 +465,10 @@ namespace RootTools_Vision
         {
             return sharedBufferInfo.PtrList[memnum];
         }
+        public int GetSharedBufferInfoListSize()
+        {
+            return SharedBufferInfo.PtrList.Count;
+        }
         public void SetOffset(int _offsetX, int _offsetY)
         {
             this.offsetX = _offsetX;

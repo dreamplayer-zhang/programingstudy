@@ -11,125 +11,164 @@
             <RowDefinition/>
             <RowDefinition/>
         </Grid.RowDefinitions>
-        <GroupBox Header="Align Feature" Grid.Row="0">
+        <GroupBox Header="Align Feature" Grid.Row="0" >
             <Grid>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition/>
-                    <ColumnDefinition/>
+                    <ColumnDefinition Width="2*"/>
+                    <ColumnDefinition Width="8*"/>
                 </Grid.ColumnDefinitions>
-                <ScrollViewer Grid.Column="0" HorizontalScrollBarVisibility="Visible"
-                                          VerticalScrollBarVisibility="Disabled">
-                    <Grid >
-                        <TextBlock Text="Empty"
-                                           FontFamily="Arial"
-                                           FontSize="15"
-                                           VerticalAlignment="Center"
-                                           HorizontalAlignment="Center">
-                        </TextBlock>
-                        <ListBox Background="Transparent">
-                            <ListBox.ItemsPanel>
-                                <ItemsPanelTemplate>
-                                    <WrapPanel Orientation="Horizontal" />
-                                </ItemsPanelTemplate>
-                            </ListBox.ItemsPanel>
-                        </ListBox>
-                    </Grid>
-                </ScrollViewer>
-
-                <Grid Grid.Column="1" VerticalAlignment="Center" Margin="10">
+                <Grid Grid.Column="0">
                     <Grid.RowDefinitions>
                         <RowDefinition/>
                         <RowDefinition/>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                        <RowDefinition/>
                     </Grid.RowDefinitions>
-                    <Grid Grid.Row="0">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition/>
-                            <ColumnDefinition/>
-                            <ColumnDefinition/>
-                            <ColumnDefinition/>
-                            <ColumnDefinition/>
-                        </Grid.ColumnDefinitions>
-                        <TextBlock Text="Pos [Abs]" Grid.Column="0"/>
-                        <TextBlock Text="X" Grid.Column="1"/>
-                        <TextBox Grid.Column="2"/>
-                        <TextBlock Text="Y" Grid.Column="3"/>
-                        <TextBox Grid.Column="4"/>
+                    <Button Grid.Row="1" Content="Add" Command="{Binding btnAlignAdd}"/>
+                    <Button Grid.Row="2" Content="Delete" Command="{Binding btnAlignDelete}"/>
+                    <Button Grid.Row="3" Content="Clear" Command="{Binding btnAlignClear}"/>
+                </Grid>
+                <Grid Grid.Column="1">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+                    <ScrollViewer Grid.Column="0" HorizontalScrollBarVisibility="Visible"
+                                          VerticalScrollBarVisibility="Disabled">
+                        <Grid>
+                            <TextBlock Text="Empty"
+                                           FontFamily="Arial"
+                                           FontSize="15"
+                                           VerticalAlignment="Center"
+                                           HorizontalAlignment="Center" Visibility="{Binding AlignFeatureList.Count, Converter={StaticResource ListToVisibility}}">
+                            </TextBlock>
+                            <ListBox Background="Transparent" ItemsSource="{Binding AlignFeatureList}" SelectedIndex="{Binding AlignFeatureIdx}">
+                                <ListBox.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <WrapPanel Orientation="Horizontal" />
+                                    </ItemsPanelTemplate>
+                                </ListBox.ItemsPanel>
+                            </ListBox>
+                        </Grid>
+                    </ScrollViewer>
+                    <Grid Grid.Column="1" VerticalAlignment="Center" Margin="10" DataContext="{Binding CurAlignData}">
+                        <Grid.RowDefinitions>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                        </Grid.RowDefinitions>
+                        <Grid Grid.Row="0" >
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition/>
+                                <ColumnDefinition/>
+                                <ColumnDefinition/>
+                                <ColumnDefinition/>
+                                <ColumnDefinition/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="Pos [Abs]" Grid.Column="0"/>
+                            <TextBlock Text="X" Grid.Column="1"/>
+                            <TextBox Grid.Column="2" Text="{Binding PositionX}"/>
+                            <TextBlock Text="Y" Grid.Column="3"/>
+                            <TextBox Grid.Column="4" Text="{Binding PositionY}"/>
+                        </Grid>
+                        <Grid Grid.Row="1">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition/>
+                                <ColumnDefinition/>
+                                <ColumnDefinition/>
+                                <ColumnDefinition/>
+                                <ColumnDefinition/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="Size" Grid.Column="0"/>
+                            <TextBlock Text="Width" Grid.Column="1"/>
+                            <TextBox Grid.Column="2" Text="{Binding Width}"/>
+                            <TextBlock Text="Height" Grid.Column="3"/>
+                            <TextBox Grid.Column="4" Text="{Binding Height}"/>
+                        </Grid>
                     </Grid>
-                    <Grid Grid.Row="1">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition/>
-                            <ColumnDefinition/>
-                            <ColumnDefinition/>
-                            <ColumnDefinition/>
-                            <ColumnDefinition/>
-                        </Grid.ColumnDefinitions>
-                        <TextBlock Text="Size" Grid.Column="0"/>
-                        <TextBlock Text="Width" Grid.Column="1"/>
-                        <TextBox Grid.Column="2"/>
-                        <TextBlock Text="Height" Grid.Column="3"/>
-                        <TextBox Grid.Column="4"/>
-                    </Grid>
+
                 </Grid>
             </Grid>
-
         </GroupBox>
         <GroupBox Header="Position Feature" Grid.Row="1">
             <Grid>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition/>
-                    <ColumnDefinition/>
+                    <ColumnDefinition Width="2*"/>
+                    <ColumnDefinition Width="8*"/>
                 </Grid.ColumnDefinitions>
-                <ScrollViewer Grid.Column="0" HorizontalScrollBarVisibility="Visible"
+                <Grid Grid.Column="0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
+                    <Button Grid.Row="1" Content="Add" Command="{Binding btnPosAdd}"/>
+                    <Button Grid.Row="2" Content="Delete" Command="{Binding btnPosDelete}"/>
+                    <Button Grid.Row="3" Content="Clear" Command="{Binding btnPosClear}"/>
+                </Grid>
+                <Grid Grid.Column="1">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+                        <ScrollViewer Grid.Column="0" HorizontalScrollBarVisibility="Visible"
                                           VerticalScrollBarVisibility="Disabled">
-                    <Grid >
-                        <TextBlock Text="Empty"
+                            <Grid >
+                                <TextBlock Text="Empty"
                                            FontFamily="Arial"
                                            FontSize="15"
                                            VerticalAlignment="Center"
                                            HorizontalAlignment="Center">
-                        </TextBlock>
-                        <ListBox Background="Transparent">
-                            <ListBox.ItemsPanel>
-                                <ItemsPanelTemplate>
-                                    <WrapPanel Orientation="Horizontal" />
-                                </ItemsPanelTemplate>
-                            </ListBox.ItemsPanel>
-                        </ListBox>
+                                </TextBlock>
+                                <ListBox Background="Transparent" ItemsSource="{Binding PositionFeatureList}" SelectedIndex="{Binding PositionFeatureIdx}">
+                                    <ListBox.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <WrapPanel Orientation="Horizontal" />
+                                        </ItemsPanelTemplate>
+                                    </ListBox.ItemsPanel>
+                                </ListBox>
+                            </Grid>
+                        </ScrollViewer>
+                        <Grid Grid.Column="1" VerticalAlignment="Center" Margin="10" DataContext="{Binding CurPosData}">
+                            <Grid.RowDefinitions>
+                                <RowDefinition/>
+                                <RowDefinition/>
+                            </Grid.RowDefinitions>
+                            <Grid Grid.Row="0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="Pos [Abs]" Grid.Column="0"/>
+                                <TextBlock Text="X" Grid.Column="1"/>
+                                <TextBox Grid.Column="2" Text="{Binding PositionX, UpdateSourceTrigger=PropertyChanged}"/>
+                                <TextBlock Text="Y" Grid.Column="3"/>
+                                <TextBox Grid.Column="4" Text="{Binding PositionY, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+                            </Grid>
+                            <Grid Grid.Row="1">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="Size" Grid.Column="0"/>
+                                <TextBlock Text="Width" Grid.Column="1"/>
+                                <TextBox Grid.Column="2" Text="{Binding Width}"/>
+                                <TextBlock Text="Height" Grid.Column="3"/>
+                                <TextBox Grid.Column="4" Text="{Binding Height}"/>
+                            </Grid>
+                        </Grid>
                     </Grid>
-                </ScrollViewer>
-                <Grid Grid.Column="1" VerticalAlignment="Center" Margin="10">
-                    <Grid.RowDefinitions>
-                        <RowDefinition/>
-                        <RowDefinition/>
-                    </Grid.RowDefinitions>
-                    <Grid Grid.Row="0">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition/>
-                            <ColumnDefinition/>
-                            <ColumnDefinition/>
-                            <ColumnDefinition/>
-                            <ColumnDefinition/>
-                        </Grid.ColumnDefinitions>
-                        <TextBlock Text="Pos [Abs]" Grid.Column="0"/>
-                        <TextBlock Text="X" Grid.Column="1"/>
-                        <TextBox Grid.Column="2"/>
-                        <TextBlock Text="Y" Grid.Column="3"/>
-                        <TextBox Grid.Column="4"/>
-                    </Grid>
-                    <Grid Grid.Row="1">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition/>
-                            <ColumnDefinition/>
-                            <ColumnDefinition/>
-                            <ColumnDefinition/>
-                            <ColumnDefinition/>
-                        </Grid.ColumnDefinitions>
-                        <TextBlock Text="Size" Grid.Column="0"/>
-                        <TextBlock Text="Width" Grid.Column="1"/>
-                        <TextBox Grid.Column="2"/>
-                        <TextBlock Text="Height" Grid.Column="3"/>
-                        <TextBox Grid.Column="4"/>
-                    </Grid>
+                    
+
                 </Grid>
             </Grid>
             
