@@ -150,9 +150,13 @@
                         </i:Interaction.Triggers>
                     </GroupBox>
                     <Grid Grid.Row="2" Margin="5,0,5,3">
-                        <ProgressBar Style="{StaticResource CustomProgress}"/>
-                        <TextBlock Text="0%" VerticalAlignment="Center" Margin="10,0"/>
-                        <TextBlock Text="0 / 0" VerticalAlignment="Center" Margin="10,0" HorizontalAlignment="Right"/>
+                        <ProgressBar Style="{StaticResource CustomProgress}" Value="{Binding p_progressValue}"/>
+                        <TextBlock Text="{Binding p_progressValue, StringFormat={}{0}％}" VerticalAlignment="Center" Margin="10,0"/>
+                        <TextBlock VerticalAlignment="Center" Margin="10,0" HorizontalAlignment="Right">
+                            <Run Text="{Binding p_totalDone}"/>
+                            <Run Text=" / "/>
+                            <Run Text="{Binding p_totalSelect}"/>
+                        </TextBlock>
                     </Grid>
                 </Grid>
                 <Grid Grid.Column="1">

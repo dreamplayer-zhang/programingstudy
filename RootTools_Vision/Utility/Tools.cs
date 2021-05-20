@@ -3,6 +3,7 @@ using RootTools.Database;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Data;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
@@ -231,9 +232,9 @@ namespace RootTools_Vision
                 if (_byteCount == 1)
                 {
                     int h = (int)rect.Height;
-                    byte[] src = new byte[_width * _height];
+
                     byte* ptr = (byte*)pointer.ToPointer();
-                    Marshal.Copy(info.PtrList[0], src, 0, _width * _height);
+
                     for (int i = 0; i < h; i++)
                     {
                         for (int j = 0; j < rect.Width; j++)
@@ -242,6 +243,7 @@ namespace RootTools_Vision
                         }
                     }
 
+                    
                     //for (int i = 0; i < _height; i++)
                     //{
                     //    Buffer.MemoryCopy(info.PtrList[0].ToPointer()[i * _width], pointer.ToPointer()[i * bmpData.Stride], bmpData.Stride, bmpData.Stride);
@@ -832,6 +834,24 @@ namespace RootTools_Vision
             Bitmap dest = new Bitmap(source);
             dest.RotateFlip(RotateFlipType.RotateNoneFlipY);
             return dest;
+        }
+
+        public static List<Defect> DataTableToDefectList(DataTable table)
+        {
+            List<Defect> defects = new List<Defect>();
+            FieldInfo[] fields = typeof(Defect).GetFields();
+            
+            foreach(DataRow row in table.Rows)
+            {
+                Defect defect = new Defect();
+                foreach (FieldInfo info in fields)
+                {
+                    info.SetValue(defect, Convert.ChangeType(row[info.Name], info.FieldType));
+                }
+                defects.Add(defect);
+            }
+
+            return defects;
         }
     }
 }

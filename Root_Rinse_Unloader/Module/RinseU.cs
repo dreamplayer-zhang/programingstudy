@@ -411,6 +411,7 @@ namespace Root_Rinse_Unloader.Module
             SetRotateSpeed,
             BuzzerOff,
             Finish,
+            EQUReady
         }
         public string[] m_asCmd = Enum.GetNames(typeof(eCmd)); 
 
@@ -542,6 +543,10 @@ namespace Root_Rinse_Unloader.Module
                         case eCmd.Finish:
                             AddProtocol(asRead[0], eCmd, asRead[2]);
                             //RunFinishTimer(); 
+                            break;
+                        case eCmd.EQUReady:
+                            AddProtocol(asRead[0], eCmd, asRead[2]);
+                            EQ.p_eState = EQ.eState.Ready;
                             break; 
                     }
                 }

@@ -210,27 +210,6 @@ namespace Root_Pine2.Engineer
         }
         #endregion
 
-        #region PickerSet
-        public string StartPickerSet()
-        {
-            if (EQ.p_bPickerSet)
-            {
-                EQ.p_eState = EQ.eState.Ready;
-                p_moduleList.m_qModuleRun.Clear();
-                EQ.p_bPickerSet = false;
-                return "OK";
-            }
-            else
-            {
-                //if (m_loader.m_sFilePickerSet == "") return "PickerSet ModuleRun File ot Exist"; //forget
-                //EQ.p_bPickerSet = true;
-                //p_moduleList.m_moduleRunList.OpenJob(m_loader.m_sFilePickerSet);
-                //p_moduleList.StartModuleRuns();
-                return "OK";
-            }
-        }
-        #endregion
-
         string m_id;
         public Pine2_Engineer m_engineer;
         public GAF m_gaf;

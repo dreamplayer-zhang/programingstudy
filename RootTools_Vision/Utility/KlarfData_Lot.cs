@@ -176,7 +176,7 @@ namespace RootTools_Vision.Utility
 		}
 
         // 기존 210302
-        public bool AddSlot(RecipeType_WaferMap _mapdata, List<Defect> _defectlist, OriginRecipe _origin)
+        public bool AddSlot(RecipeType_WaferMap _mapdata, List<Defect> _defectlist, OriginRecipe _origin, bool useTDIReview = false, bool useVrsReview = false)
         {
             UpdateSampleCenterLocation(_mapdata/*, pRecipe->GetProductSetting()*/);
 
@@ -204,11 +204,11 @@ namespace RootTools_Vision.Utility
             data.dieOriginY = this.dieOriginY;
             data.sampleCenterLocationX = this.sampleCenterLocationX;
             data.sampleCenterLocationY = this.sampleCenterLocationY;
-            data.resX = this.resX;
-            data.resY = this.resY;
+            data.resolutionX = this.resX;
+            data.resolutionX = this.resY;
 
             data.SetSampleTestPlan(_mapdata);
-            data.SetDefectInfor_SRLine(_mapdata, _defectlist, _origin);
+            data.SetDefectInfor_SRLine(_mapdata, _defectlist, _origin, useTDIReview, useVrsReview);
             //	data.m_nDefectDieCnt = pResultMap->GetBadDieNum();
 
             data.SetMEMMAP(_mapdata);
@@ -245,8 +245,8 @@ namespace RootTools_Vision.Utility
 			data.dieOriginY = this.dieOriginY;
 			data.sampleCenterLocationX = this.sampleCenterLocationX;
 			data.sampleCenterLocationY = this.sampleCenterLocationY;
-			data.resX = this.resX;
-			data.resY = this.resY;
+			data.resolutionX = this.resX;
+			data.resolutionY = this.resY;
 
 			data.SetSampleTestPlan(_mapdata);
 			data.SetDefectInfor_SRLine(_mapdata, _list, _origin);
@@ -319,8 +319,8 @@ namespace RootTools_Vision.Utility
 			data.dieOriginY = this.dieOriginY;
 			data.sampleCenterLocationX = this.sampleCenterLocationX;
 			data.sampleCenterLocationY = this.sampleCenterLocationY;
-			data.resX = this.resX;
-			data.resY = this.resY;
+			data.resolutionX = this.resX;
+			data.resolutionY = this.resY;
 
 			data.SetSampleTestPlan(_mapdata);
 		//	data.m_nDefectDieCnt = pResultMap->GetBadDieNum();

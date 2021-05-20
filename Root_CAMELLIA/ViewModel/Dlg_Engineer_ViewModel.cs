@@ -662,6 +662,12 @@ namespace Root_CAMELLIA
             return Math.Round(dResult, 3);
         }
 
+        public void GrabStop()
+        {
+            if (ModuleCamellia.p_CamVRS.p_CamInfo._IsGrabbing)
+                ModuleCamellia.p_CamVRS.GrabStop();
+        }
+
         #region Cameara Command
         public ICommand ConnectCommand
         {
@@ -707,9 +713,7 @@ namespace Root_CAMELLIA
             {
                 return new RelayCommand(() =>
                 {
-
-                    ModuleCamellia.p_CamVRS.GrabStop();
-
+                    GrabStop();
                 });
             }
         }
@@ -1109,6 +1113,17 @@ namespace Root_CAMELLIA
 
                     Run_Measure measure = (Run_Measure)ModuleCamellia.CloneModuleRun("Measure");
                     StageCenterPos = measure.m_StageCenterPos_pulse;
+                });
+            }
+        }
+
+        public ICommand UnloadedCommand
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    GrabStop();
                 });
             }
         }

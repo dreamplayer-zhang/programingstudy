@@ -38,21 +38,25 @@ namespace RootTools_Vision
 
             ProcessDefectParameter param = this.recipe.GetItem<ProcessDefectParameter>();
 
-            if(param.UseMergeDefect)
+            List<Defect> MergeDefectList = null;
+            if (param.UseMergeDefect)
             {
-                List<Defect> MergeDefectList = Tools.MergeDefect(this.currentWorkplace.DefectList, param.MergeDefectDistnace);
-
-                //TempLogger.Write("Defect", string.Format("Merge : {0}", MergeDefectList.Count));
-
-                foreach (Defect defect in MergeDefectList)
-                {
-                    OriginRecipe originRecipe = this.recipe.GetItem<OriginRecipe>();
-                    defect.CalcAbsToRelPos(originRecipe.OriginX, originRecipe.OriginY); // Frontside
-                }
-
-                this.currentWorkplace.DefectList = MergeDefectList;
+                MergeDefectList = Tools.MergeDefect(this.currentWorkplace.DefectList, param.MergeDefectDistnace);
             }
-            
+            else
+            {
+                MergeDefectList = this.currentWorkplace.DefectList;
+            }
+
+            OriginRecipe originRecipe = this.recipe.GetItem<OriginRecipe>();
+
+            foreach (Defect defect in MergeDefectList)
+            {
+                defect.CalcAbsToRelPos(currentWorkplace.PositionX, currentWorkplace.PositionY + originRecipe.OriginHeight); // Frontside
+            }
+
+            this.currentWorkplace.DefectList = MergeDefectList;
+
 
             WorkEventManager.OnProcessDefectDone(this.currentWorkplace, new ProcessDefectDoneEventArgs());
         }

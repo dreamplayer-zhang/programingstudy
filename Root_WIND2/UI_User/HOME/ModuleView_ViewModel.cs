@@ -26,6 +26,7 @@ namespace Root_WIND2.UI_User
 
         public ModuleView_ViewModel(ModuleBase module)
         {
+            if (module == null) return;
             ModuleName = module.p_id;
             m_Module = module;
         }
