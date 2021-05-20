@@ -250,6 +250,30 @@ namespace Root_VEGA_D.Module
 
         #endregion
 
+        #region Align
+        public bool m_bUseAlign = false;
+        public double m_dMatchScore = 0.9;
+        public int m_nSearchAreaSize = 1000;
+        public int m_nCenterX = 0;
+        public int m_nTopCenterY = 0;
+        public int m_nBottomCenterY = 0;
+        public string p_sTopTemplateFile = "";
+        public string p_sBottomTemplateFile = "";
+
+        void RunTreeAlign(Tree tree, bool bVisible, bool bReadOnly)
+        {
+            m_bUseAlign = tree.Set(m_bUseAlign, m_bUseAlign, "Use", "Use Align", bVisible);
+            m_dMatchScore = tree.Set(m_dMatchScore, m_dMatchScore, "Score", "Template Matching Score", bVisible);
+            m_nSearchAreaSize = tree.Set(m_nSearchAreaSize, m_nSearchAreaSize, "Area Size", "Template Matching Search Area Size", bVisible);
+            m_nCenterX = tree.Set(m_nCenterX, m_nCenterX, "Center X", "Template Matching Search Target Center X", bVisible);
+            m_nTopCenterY = tree.Set(m_nTopCenterY, m_nTopCenterY, "Top Center Y", "Template Matching Search Target Top Center Y", bVisible);
+            m_nBottomCenterY = tree.Set(m_nBottomCenterY, m_nBottomCenterY, "Bottom Center Y", "Template Matching Search Target Bottom Center Y", bVisible);
+
+            p_sTopTemplateFile = tree.SetFile(p_sTopTemplateFile, p_sTopTemplateFile, "bmp", "Top File", "TopTemplate File");
+            p_sBottomTemplateFile = tree.SetFile(p_sBottomTemplateFile, p_sBottomTemplateFile, "bmp", "Bottom File", "BottomTemplate File");
+        }
+        #endregion
+
         public eScanPos m_eScanPos = eScanPos.Bottom;
 
         public string p_id
@@ -324,6 +348,7 @@ namespace Root_VEGA_D.Module
             RunTreeScanPos(tree.GetTree("ScanPos", false), bVisible, bReadOnly);
             RunTreeRADS(tree.GetTree("RADS", false), bVisible, bReadOnly);
             RunTreeAF(tree.GetTree("AF", false), bVisible, bReadOnly);
+            RunTreeAlign(tree.GetTree("Align", false), bVisible, bReadOnly);
         }
 
         public void RunTreeLADS(Tree tree)
