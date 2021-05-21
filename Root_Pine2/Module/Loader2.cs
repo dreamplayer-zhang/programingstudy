@@ -4,7 +4,6 @@ using RootTools;
 using RootTools.Control;
 using RootTools.Module;
 using RootTools.Trees;
-using System;
 using System.Threading;
 
 namespace Root_Pine2.Module
@@ -23,41 +22,38 @@ namespace Root_Pine2.Module
             if (bInit) InitPosition();
         }
 
-        public enum ePos
-        {
-            Ready,
-        }
+        const string c_sReady = "Ready"; 
         void InitPosition()
         {
-            m_axisXZ.AddPos(Enum.GetNames(typeof(ePos)));
-            m_axisXZ.AddPos(GetPosString(Vision.eVisionWorks.A));
-            m_axisXZ.AddPos(GetPosString(Vision.eVisionWorks.B));
+            m_axisXZ.AddPos(c_sReady);
+            m_axisXZ.AddPos(GetPosString(Vision.eWorks.A));
+            m_axisXZ.AddPos(GetPosString(Vision.eWorks.B));
         }
 
-        string GetPosString(Vision.eVisionWorks eVisionWorks)
+        string GetPosString(Vision.eWorks eVisionWorks)
         {
             return Vision.eVision.Bottom.ToString() + eVisionWorks.ToString(); 
         }
 
-        public string RunMoveX(ePos ePos, bool bWait = true)
+        public string RunMoveX(string sPos, bool bWait = true)
         {
-            m_axisXZ.p_axisX.StartMove(ePos);
+            m_axisXZ.p_axisX.StartMove(sPos);
             return bWait ? m_axisXZ.p_axisX.WaitReady() : "OK";
         }
 
-        public string RunMoveX(Vision.eVisionWorks ePos, bool bWait = true)
+        public string RunMoveX(Vision.eWorks ePos, bool bWait = true)
         {
             m_axisXZ.p_axisX.StartMove(GetPosString(ePos));
             return bWait ? m_axisXZ.p_axisX.WaitReady() : "OK";
         }
 
-        public string RunMoveZ(ePos ePos, bool bWait = true)
+        public string RunMoveZ(string sPos, bool bWait = true)
         {
-            m_axisXZ.p_axisY.StartMove(ePos);
+            m_axisXZ.p_axisY.StartMove(sPos);
             return bWait ? m_axisXZ.p_axisY.WaitReady() : "OK";
         }
 
-        public string RunMoveZ(Vision.eVisionWorks ePos, bool bWait = true)
+        public string RunMoveZ(Vision.eWorks ePos, bool bWait = true)
         {
             m_axisXZ.p_axisY.StartMove(GetPosString(ePos));
             return bWait ? m_axisXZ.p_axisY.WaitReady() : "OK";
@@ -82,14 +78,12 @@ namespace Root_Pine2.Module
         }
         #endregion
 
-        #region InfoStrip
-        public InfoStrip p_infoStrip { get; set; }
-        #endregion
-
         #region RunUnload
-        public string RunUnload(Vision.eVisionWorks eVisionWorks)
+        public string RunUnload(Vision.eWorks eVisionWorks)
         {
-            if (m_boats.m_aBoat[eVisionWorks].p_eStep != Boats.Boat.eStep.Ready) return "Boat not Ready";
+            Boats.Boat boat = m_boats.m_aBoat[eVisionWorks];
+            if (IsBoatReady() == false) return "Boats p_eState is not OK"; 
+            if (boat.p_eStep != Boats.Boat.eStep.Ready) return "Boat not Ready";
             try
             {
                 m_doVacuum.Write(true);
@@ -97,21 +91,31 @@ namespace Root_Pine2.Module
                 if (Run(RunMoveX(eVisionWorks))) return p_sInfo;
                 if (Run(RunMoveZ(eVisionWorks))) return p_sInfo;
                 m_doVacuum.Write(false);
-                m_boats.m_aBoat[eVisionWorks].RunVacuum(true);
+                boat.RunVacuum(true);
                 Thread.Sleep((int)(1000 * m_secVacuum));
-                m_boats.m_aBoat[eVisionWorks].p_infoStrip = p_infoStrip;
+                boat.p_infoStrip = p_infoStrip;
                 p_infoStrip = null;
-                if (Run(RunMoveZ(ePos.Ready))) return p_sInfo;
-                if (Run(RunMoveX(ePos.Ready))) return p_sInfo;
+                if (Run(RunMoveZ(c_sReady))) return p_sInfo;
+                if (Run(RunMoveX(c_sReady))) return p_sInfo;
                 if (Run(RunTurn(false))) return p_sInfo;
             }
             finally
             {
-                RunMoveZ(ePos.Ready);
-                RunMoveX(ePos.Ready);
+                RunMoveZ(c_sReady);
+                RunMoveX(c_sReady);
                 RunTurn(false);
             }
             return "OK";
+        }
+
+        bool IsBoatReady()
+        {
+            switch (m_boats.p_eState)
+            {
+                case eState.Ready:
+                case eState.Run: return true;
+                default: return false;
+            }
         }
         #endregion
 
@@ -124,15 +128,13 @@ namespace Root_Pine2.Module
 
         public string RunLoader2()
         {
+            if (p_infoStrip == null) return "InfoStrip == null";
             while (EQ.p_eState == EQ.eState.Run)
             {
-                Thread.Sleep(10); 
-                if (p_infoStrip != null)
+                Thread.Sleep(10);
+                if (IsBoatReady() && (m_boats.m_aBoat[p_infoStrip.m_eVisionWorks].p_eStep == Boats.Boat.eStep.Ready))
                 {
-                    if (m_boats.m_aBoat[p_infoStrip.m_eVisionWorks].p_eStep == Boats.Boat.eStep.Ready)
-                    {
-                        if (Run(RunUnload(p_infoStrip.m_eVisionWorks))) return p_sInfo; 
-                    }
+                    return RunUnload(p_infoStrip.m_eVisionWorks);
                 }
             }
             return "OK";
@@ -143,7 +145,10 @@ namespace Root_Pine2.Module
         public override void Reset()
         {
             base.Reset();
-            p_infoStrip = null; 
+            p_infoStrip = null;
+            RunMoveZ(c_sReady);
+            RunMoveX(c_sReady);
+            RunTurn(false); 
         }
         public override void RunTree(Tree tree)
         {
@@ -152,6 +157,7 @@ namespace Root_Pine2.Module
         }
         #endregion
 
+        public InfoStrip p_infoStrip { get; set; }
         Pine2 m_pine2 = null;
         Boats m_boats; 
         public Loader2(string id, IEngineer engineer, Pine2_Handler handler)
@@ -184,7 +190,7 @@ namespace Root_Pine2.Module
                 InitModuleRun(module);
             }
 
-            Vision.eVisionWorks m_ePos = Vision.eVisionWorks.A;
+            Vision.eWorks m_ePos = Vision.eWorks.A;
             public override ModuleRunBase Clone()
             {
                 Run_Unload run = new Run_Unload(m_module);
@@ -194,7 +200,7 @@ namespace Root_Pine2.Module
 
             public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
             {
-                m_ePos = (Vision.eVisionWorks)tree.Set(m_ePos, m_ePos, "Boat", "Select Boat", bVisible); 
+                m_ePos = (Vision.eWorks)tree.Set(m_ePos, m_ePos, "Boat", "Select Boat", bVisible); 
             }
 
             public override string Run()

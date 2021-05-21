@@ -32,8 +32,8 @@ namespace Root_Pine2_Vision.Module
             {
                 p_sInfo = m_toolBox.GetCamera(ref m_camera, this, "Camera"); 
                 p_sInfo = m_toolBox.Get(ref m_lightSet, this);
-                m_aVisionWorks[eVisionWorks.A].GetTools(m_toolBox, bInit);
-                m_aVisionWorks[eVisionWorks.B].GetTools(m_toolBox, bInit);
+                m_aVisionWorks[eWorks.A].GetTools(m_toolBox, bInit);
+                m_aVisionWorks[eWorks.B].GetTools(m_toolBox, bInit);
             }
             m_remote.GetTools(bInit);
         }
@@ -104,7 +104,7 @@ namespace Root_Pine2_Vision.Module
         #endregion
 
         #region VisionWorks
-        public enum eVisionWorks
+        public enum eWorks
         {
             A,
             B,
@@ -215,10 +215,10 @@ namespace Root_Pine2_Vision.Module
                 }
             }
 
-            public eVisionWorks m_eVisionWorks = eVisionWorks.A; 
+            public eWorks m_eVisionWorks = eWorks.A; 
             public string p_id { get; set; }
             public Vision m_vision; 
-            public VisionWorks(eVisionWorks eVisionWorks, Vision vision)
+            public VisionWorks(eWorks eVisionWorks, Vision vision)
             {
                 m_eVisionWorks = eVisionWorks; 
                 p_id = eVisionWorks.ToString();
@@ -235,12 +235,12 @@ namespace Root_Pine2_Vision.Module
                 }
             }
         }
-        public Dictionary<eVisionWorks, VisionWorks> m_aVisionWorks = new Dictionary<eVisionWorks, VisionWorks>(); 
+        public Dictionary<eWorks, VisionWorks> m_aVisionWorks = new Dictionary<eWorks, VisionWorks>(); 
         List<string> m_asVisionWorks = new List<string>();
         void InitVisionWorks()
         {
-            m_aVisionWorks.Add(eVisionWorks.A, new VisionWorks(eVisionWorks.A, this));
-            m_aVisionWorks.Add(eVisionWorks.B, new VisionWorks(eVisionWorks.B, this));
+            m_aVisionWorks.Add(eWorks.A, new VisionWorks(eWorks.A, this));
+            m_aVisionWorks.Add(eWorks.B, new VisionWorks(eWorks.B, this));
             foreach (VisionWorks vision in m_aVisionWorks.Values) m_asVisionWorks.Add(vision.p_id); 
         }
 
@@ -278,8 +278,8 @@ namespace Root_Pine2_Vision.Module
         public override void RunTree(Tree tree)
         {
             base.RunTree(tree);
-            m_aVisionWorks[eVisionWorks.A].RunTree(tree.GetTree(m_aVisionWorks[eVisionWorks.A].p_id));
-            m_aVisionWorks[eVisionWorks.B].RunTree(tree.GetTree(m_aVisionWorks[eVisionWorks.B].p_id));
+            m_aVisionWorks[eWorks.A].RunTree(tree.GetTree(m_aVisionWorks[eWorks.A].p_id));
+            m_aVisionWorks[eWorks.B].RunTree(tree.GetTree(m_aVisionWorks[eWorks.B].p_id));
         }
         #endregion
 

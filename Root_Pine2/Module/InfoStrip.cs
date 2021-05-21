@@ -27,7 +27,7 @@ namespace Root_Pine2.Module
             }
         }
 
-        public Vision.eVisionWorks m_eVisionWorks = Vision.eVisionWorks.A; 
+        public Vision.eWorks m_eVisionWorks = Vision.eWorks.A; 
 
         public int p_nStrip { get; set; }
         public InfoStrip(int nStrip)

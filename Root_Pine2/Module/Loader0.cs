@@ -38,10 +38,10 @@ namespace Root_Pine2.Module
         {
             m_axisXY.AddPos(Enum.GetNames(typeof(ePosLoad)));
             m_axisZ.AddPos(Enum.GetNames(typeof(ePosLoad)));
-            InitPosition(GetPosString(Vision.eVision.Top3D, Vision.eVisionWorks.A));
-            InitPosition(GetPosString(Vision.eVision.Top3D, Vision.eVisionWorks.B));
-            InitPosition(GetPosString(Vision.eVision.Top2D, Vision.eVisionWorks.A));
-            InitPosition(GetPosString(Vision.eVision.Top2D, Vision.eVisionWorks.B));
+            InitPosition(GetPosString(Vision.eVision.Top3D, Vision.eWorks.A));
+            InitPosition(GetPosString(Vision.eVision.Top3D, Vision.eWorks.B));
+            InitPosition(GetPosString(Vision.eVision.Top2D, Vision.eWorks.A));
+            InitPosition(GetPosString(Vision.eVision.Top2D, Vision.eWorks.B));
             InitPosition(c_sPaperTray); 
         }
         void InitPosition(string sPos)
@@ -50,7 +50,7 @@ namespace Root_Pine2.Module
             m_axisZ.AddPos(sPos); 
         }
 
-        string GetPosString(Vision.eVision eVision, Vision.eVisionWorks eVisionWorks)
+        string GetPosString(Vision.eVision eVision, Vision.eWorks eVisionWorks)
         {
             return eVision.ToString() + eVisionWorks.ToString(); 
         }
@@ -63,7 +63,7 @@ namespace Root_Pine2.Module
             return bWait ? m_axisXY.WaitReady() : "OK";
         }
 
-        public string RunMoveXY(Vision.eVision eVision, Vision.eVisionWorks eVisionWorks, bool bWait = true)
+        public string RunMoveXY(Vision.eVision eVision, Vision.eWorks eVisionWorks, bool bWait = true)
         {
             m_axisXY.StartMove(GetPosString(eVision, eVisionWorks));
             return bWait ? m_axisXY.WaitReady() : "OK";
@@ -96,7 +96,7 @@ namespace Root_Pine2.Module
             return bWait ? m_axisZ.WaitReady() : "OK";
         }
 
-        public string RunMoveZ(Vision.eVision eVision, Vision.eVisionWorks eVisionWorks, bool bWait = true)
+        public string RunMoveZ(Vision.eVision eVision, Vision.eWorks eVisionWorks, bool bWait = true)
         {
             m_axisZ.StartMove(GetPosString(eVision, eVisionWorks));
             return bWait ? m_axisZ.WaitReady() : "OK";

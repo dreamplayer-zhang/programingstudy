@@ -17,13 +17,14 @@ namespace Root_Pine2.Module
         public override void GetTools(bool bInit)
         {
             m_toolBox.GetAxis(ref m_axisCam, this, "Camera"); 
-            m_aBoat[Vision.eVisionWorks.A].GetTools(m_toolBox, this, bInit);
-            m_aBoat[Vision.eVisionWorks.B].GetTools(m_toolBox, this, bInit);
+            m_aBoat[Vision.eWorks.A].GetTools(m_toolBox, this, bInit);
+            m_aBoat[Vision.eWorks.B].GetTools(m_toolBox, this, bInit);
         }
         #endregion
 
         #region Cam Axis
         AxisXY m_axisCam; 
+        //forget
         #endregion
 
         #region Boat
@@ -67,8 +68,8 @@ namespace Root_Pine2.Module
 
             Axis m_axis; 
             DIO_O m_doVacuumPump; 
-            DIO_Os m_doVacuum;
-            DIO_O m_doBlow;
+            public DIO_Os m_doVacuum;
+            public DIO_O m_doBlow;
             DIO_I2O m_dioRollerDown;
             DIO_O m_doRollerPusher;
             DIO_O m_doCleanerBlow;
@@ -127,14 +128,14 @@ namespace Root_Pine2.Module
                 for (int n = 0; n < Math.Min(4, aVacuum.Length); n++) m_doVacuum.Write(n, aVacuum[n]); 
             }
 
-            double m_secBlow = 0.2;
             public void RunVacuum(bool bOn)
             {
                 m_doVacuumPump.Write(bOn);
-                if (bOn) return;
-                m_doBlow.Write(true);
-                Thread.Sleep((int)(1000 * m_secBlow));
-                m_doBlow.Write(false);
+            }
+
+            public void RunBlow(bool bBlow)
+            {
+                m_doBlow.Write(bBlow);
             }
             #endregion
 
@@ -173,11 +174,11 @@ namespace Root_Pine2.Module
                 m_visionWorks = visionWorks; 
             }
         }
-        public Dictionary<Vision.eVisionWorks, Boat> m_aBoat = new Dictionary<Vision.eVisionWorks, Boat>(); 
+        public Dictionary<Vision.eWorks, Boat> m_aBoat = new Dictionary<Vision.eWorks, Boat>(); 
         void InitBoat()
         {
-            m_aBoat.Add(Vision.eVisionWorks.A, new Boat(p_id, this, m_vision.m_aVisionWorks[Vision.eVisionWorks.A]));
-            m_aBoat.Add(Vision.eVisionWorks.B, new Boat(p_id, this, m_vision.m_aVisionWorks[Vision.eVisionWorks.B]));
+            m_aBoat.Add(Vision.eWorks.A, new Boat(p_id, this, m_vision.m_aVisionWorks[Vision.eWorks.A]));
+            m_aBoat.Add(Vision.eWorks.B, new Boat(p_id, this, m_vision.m_aVisionWorks[Vision.eWorks.B]));
         }
         #endregion
 
@@ -193,22 +194,22 @@ namespace Root_Pine2.Module
             if (p_sInfo == "OK")
             {
                 p_eState = eState.Ready;
-                m_aBoat[Vision.eVisionWorks.A].p_eStep = Boat.eStep.RunReady;
-                m_aBoat[Vision.eVisionWorks.B].p_eStep = Boat.eStep.RunReady;
+                m_aBoat[Vision.eWorks.A].p_eStep = Boat.eStep.RunReady;
+                m_aBoat[Vision.eWorks.B].p_eStep = Boat.eStep.RunReady;
             }
             else
             {
                 p_eState = eState.Error;
-                m_aBoat[Vision.eVisionWorks.A].p_eStep = Boat.eStep.Init;
-                m_aBoat[Vision.eVisionWorks.B].p_eStep = Boat.eStep.Init;
+                m_aBoat[Vision.eWorks.A].p_eStep = Boat.eStep.Init;
+                m_aBoat[Vision.eWorks.B].p_eStep = Boat.eStep.Init;
             }
             return p_sInfo;
         }
 
         public override void Reset()
         {
-            m_aBoat[Vision.eVisionWorks.A].Reset(p_eState);
-            m_aBoat[Vision.eVisionWorks.B].Reset(p_eState); 
+            m_aBoat[Vision.eWorks.A].Reset(p_eState);
+            m_aBoat[Vision.eWorks.B].Reset(p_eState); 
             base.Reset();
         }
         #endregion

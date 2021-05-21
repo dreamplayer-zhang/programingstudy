@@ -181,6 +181,7 @@
   <ItemGroup>
     <Compile Include="Module\Boats.cs" />
     <Compile Include="Module\InfoStrip.cs" />
+    <Compile Include="Module\Loader1.cs" />
     <Compile Include="Module\Loader2.cs" />
     <Compile Include="Module\LoadEV.cs" />
     <Compile Include="Module\MagazineEV.cs" />
