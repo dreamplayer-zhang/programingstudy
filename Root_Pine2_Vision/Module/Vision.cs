@@ -16,6 +16,13 @@ namespace Root_Pine2_Vision.Module
 {
     public class Vision : ModuleBase
     {
+        public enum eVision
+        {
+            Top3D,
+            Top2D,
+            Bottom
+        }
+
         #region ToolBox
         CameraDalsa m_camera;
         public LightSet m_lightSet;
@@ -25,8 +32,8 @@ namespace Root_Pine2_Vision.Module
             {
                 p_sInfo = m_toolBox.GetCamera(ref m_camera, this, "Camera"); 
                 p_sInfo = m_toolBox.Get(ref m_lightSet, this);
-                m_aVisionWorks[0].GetTools(m_toolBox, bInit);
-                m_aVisionWorks[1].GetTools(m_toolBox, bInit);
+                m_aVisionWorks[eVisionWorks.A].GetTools(m_toolBox, bInit);
+                m_aVisionWorks[eVisionWorks.B].GetTools(m_toolBox, bInit);
             }
             m_remote.GetTools(bInit);
         }
@@ -99,8 +106,8 @@ namespace Root_Pine2_Vision.Module
         #region VisionWorks
         public enum eVisionWorks
         {
-            VisionWorksA,
-            VisionWorksB,
+            A,
+            B,
         }
         public class VisionWorks
         {
@@ -208,7 +215,7 @@ namespace Root_Pine2_Vision.Module
                 }
             }
 
-            public eVisionWorks m_eVisionWorks = eVisionWorks.VisionWorksA; 
+            public eVisionWorks m_eVisionWorks = eVisionWorks.A; 
             public string p_id { get; set; }
             public Vision m_vision; 
             public VisionWorks(eVisionWorks eVisionWorks, Vision vision)
@@ -228,18 +235,18 @@ namespace Root_Pine2_Vision.Module
                 }
             }
         }
-        public List<VisionWorks> m_aVisionWorks = new List<VisionWorks>();
+        public Dictionary<eVisionWorks, VisionWorks> m_aVisionWorks = new Dictionary<eVisionWorks, VisionWorks>(); 
         List<string> m_asVisionWorks = new List<string>();
         void InitVisionWorks()
         {
-            m_aVisionWorks.Add(new VisionWorks(eVisionWorks.VisionWorksA, this));
-            m_aVisionWorks.Add(new VisionWorks(eVisionWorks.VisionWorksB, this));
-            foreach (VisionWorks vision in m_aVisionWorks) m_asVisionWorks.Add(vision.p_id); 
+            m_aVisionWorks.Add(eVisionWorks.A, new VisionWorks(eVisionWorks.A, this));
+            m_aVisionWorks.Add(eVisionWorks.B, new VisionWorks(eVisionWorks.B, this));
+            foreach (VisionWorks vision in m_aVisionWorks.Values) m_asVisionWorks.Add(vision.p_id); 
         }
 
         VisionWorks GetVisionWorks(string sVisionWorks)
         {
-            foreach (VisionWorks vision in m_aVisionWorks)
+            foreach (VisionWorks vision in m_aVisionWorks.Values)
             {
                 if (vision.p_id == sVisionWorks) return vision; 
             }
@@ -271,20 +278,28 @@ namespace Root_Pine2_Vision.Module
         public override void RunTree(Tree tree)
         {
             base.RunTree(tree);
-            m_aVisionWorks[0].RunTree(tree.GetTree(m_aVisionWorks[0].p_id));
-            m_aVisionWorks[1].RunTree(tree.GetTree(m_aVisionWorks[1].p_id));
+            m_aVisionWorks[eVisionWorks.A].RunTree(tree.GetTree(m_aVisionWorks[eVisionWorks.A].p_id));
+            m_aVisionWorks[eVisionWorks.B].RunTree(tree.GetTree(m_aVisionWorks[eVisionWorks.B].p_id));
         }
         #endregion
 
+        public eVision m_eVision = eVision.Top3D; 
+        public Vision(eVision eVision, IEngineer engineer, eRemote eRemote)
+        {
+            m_eVision = eVision; 
+            InitVisionWorks(); 
+            InitBase("Vision " + eVision.ToString(), engineer, eRemote);
+        }
+
         public Vision(string id, IEngineer engineer, eRemote eRemote)
         {
-            InitVisionWorks(); 
+            InitVisionWorks();
             InitBase(id, engineer, eRemote);
         }
 
         public override void ThreadStop()
         {
-            foreach (VisionWorks visionWorks in m_aVisionWorks) visionWorks.ThreadStop(); 
+            foreach (VisionWorks visionWorks in m_aVisionWorks.Values) visionWorks.ThreadStop(); 
             base.ThreadStop();
         }
 

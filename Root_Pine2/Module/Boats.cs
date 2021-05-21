@@ -5,6 +5,8 @@ using RootTools.Module;
 using RootTools.ToolBoxs;
 using RootTools.Trees;
 using System;
+using System.Collections.Generic;
+using System.ComponentModel;
 using System.Threading;
 
 namespace Root_Pine2.Module
@@ -15,8 +17,8 @@ namespace Root_Pine2.Module
         public override void GetTools(bool bInit)
         {
             m_toolBox.GetAxis(ref m_axisCam, this, "Camera"); 
-            m_aBoat[0].GetTools(m_toolBox, this, bInit);
-            m_aBoat[1].GetTools(m_toolBox, this, bInit);
+            m_aBoat[Vision.eVisionWorks.A].GetTools(m_toolBox, this, bInit);
+            m_aBoat[Vision.eVisionWorks.B].GetTools(m_toolBox, this, bInit);
         }
         #endregion
 
@@ -25,8 +27,44 @@ namespace Root_Pine2.Module
         #endregion
 
         #region Boat
-        public class Boat
+        public class Boat : NotifyProperty
         {
+            #region Step
+            public enum eStep
+            {
+                Init,
+                Ready,
+                Run,
+                Done,
+                RunReady,
+            }
+            eStep _eStep = eStep.Init; 
+            public eStep p_eStep 
+            { 
+                get { return _eStep; }
+                set
+                {
+                    if (_eStep == value) return;
+                    _eStep = value;
+                    OnPropertyChanged();
+                    if (value == eStep.RunReady) m_bgwRunReady.RunWorkerAsync();
+                }
+            }
+
+            BackgroundWorker m_bgwRunReady = new BackgroundWorker(); 
+            void InitBackgroundWorker()
+            {
+                p_ePosReady = ePos.Ready; 
+                m_bgwRunReady.DoWork += M_bgwRunReady_DoWork;
+            }
+
+            private void M_bgwRunReady_DoWork(object sender, DoWorkEventArgs e)
+            {
+                m_axis.StartMove(p_ePosReady);
+                p_eStep = (m_axis.WaitReady() == "OK") ? eStep.Ready : eStep.Init; 
+            }
+            #endregion
+
             Axis m_axis; 
             DIO_O m_doVacuumPump; 
             DIO_Os m_doVacuum;
@@ -59,6 +97,8 @@ namespace Root_Pine2.Module
                 m_axis.AddPos(Enum.GetNames(typeof(ePos)));
                 m_axis.AddSpeed("Grab"); 
             }
+
+            public ePos p_ePosReady { get; set; }
 
             public string RunMove(ePos ePos, bool bWait = true)
             {
@@ -115,9 +155,10 @@ namespace Root_Pine2.Module
             }
             #endregion
 
-            public void Reset()
+            public void Reset(eState eState)
             {
-                p_infoStrip = null; 
+                p_infoStrip = null;
+                if (eState == eState.Ready) p_eStep = eStep.RunReady; 
             }
 
             public InfoStrip p_infoStrip { get; set; }
@@ -126,17 +167,17 @@ namespace Root_Pine2.Module
             Vision.VisionWorks m_visionWorks; 
             public Boat(string id, Boats boats, Vision.VisionWorks visionWorks)
             {
-                p_id = id;
+                InitBackgroundWorker(); 
+                p_id = id + visionWorks.m_eVisionWorks.ToString();
                 m_boats = boats;
                 m_visionWorks = visionWorks; 
             }
         }
-        Boat[] m_aBoat;
-        void InitBoat(string id)
+        public Dictionary<Vision.eVisionWorks, Boat> m_aBoat = new Dictionary<Vision.eVisionWorks, Boat>(); 
+        void InitBoat()
         {
-            m_aBoat = new Boat[2];
-            m_aBoat[0] = new Boat(id + "A", this, m_vision.m_aVisionWorks[0]);
-            m_aBoat[1] = new Boat(id + "B", this, m_vision.m_aVisionWorks[1]);
+            m_aBoat.Add(Vision.eVisionWorks.A, new Boat(p_id, this, m_vision.m_aVisionWorks[Vision.eVisionWorks.A]));
+            m_aBoat.Add(Vision.eVisionWorks.B, new Boat(p_id, this, m_vision.m_aVisionWorks[Vision.eVisionWorks.B]));
         }
         #endregion
 
@@ -149,14 +190,25 @@ namespace Root_Pine2.Module
                 return "OK";
             }
             p_sInfo = base.StateHome();
-            p_eState = (p_sInfo == "OK") ? eState.Ready : eState.Error;
+            if (p_sInfo == "OK")
+            {
+                p_eState = eState.Ready;
+                m_aBoat[Vision.eVisionWorks.A].p_eStep = Boat.eStep.RunReady;
+                m_aBoat[Vision.eVisionWorks.B].p_eStep = Boat.eStep.RunReady;
+            }
+            else
+            {
+                p_eState = eState.Error;
+                m_aBoat[Vision.eVisionWorks.A].p_eStep = Boat.eStep.Init;
+                m_aBoat[Vision.eVisionWorks.B].p_eStep = Boat.eStep.Init;
+            }
             return p_sInfo;
         }
 
         public override void Reset()
         {
-            m_aBoat[0].Reset();
-            m_aBoat[1].Reset(); 
+            m_aBoat[Vision.eVisionWorks.A].Reset(p_eState);
+            m_aBoat[Vision.eVisionWorks.B].Reset(p_eState); 
             base.Reset();
         }
         #endregion
@@ -168,15 +220,17 @@ namespace Root_Pine2.Module
         }
         #endregion
 
+        Vision.eVision m_eVision = Vision.eVision.Top3D; 
         Pine2 m_pine2;
         Vision m_vision; 
-        public Boats(string id, IEngineer engineer, Pine2 pine2, Vision vision)
+        public Boats(Vision vision, IEngineer engineer, Pine2 pine2)
         {
-            p_id = id;
+            m_vision = vision;
+            m_eVision = vision.m_eVision; 
+            p_id = "Boats " + m_eVision.ToString();
             m_pine2 = pine2;
-            m_vision = vision; 
-            InitBoat(id); 
-            InitBase(id, engineer); 
+            InitBoat(); 
+            InitBase(p_id, engineer); 
         }
 
         public override void ThreadStop()

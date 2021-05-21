@@ -1,4 +1,5 @@
-﻿using RootTools;
+﻿using Root_Pine2_Vision.Module;
+using RootTools;
 using RootTools.Trees;
 
 namespace Root_Pine2.Module
@@ -25,6 +26,8 @@ namespace Root_Pine2.Module
                 OnPropertyChanged(); 
             }
         }
+
+        public Vision.eVisionWorks m_eVisionWorks = Vision.eVisionWorks.A; 
 
         public int p_nStrip { get; set; }
         public InfoStrip(int nStrip)

@@ -1,21 +1,21 @@
 ﻿using Root_Pine2.Engineer;
+using Root_Pine2_Vision.Module;
 using RootTools;
 using RootTools.Control;
 using RootTools.Module;
 using RootTools.Trees;
 using System;
-using System.Collections.Generic;
 
 namespace Root_Pine2.Module
 {
-    public class Loader : ModuleBase
+    public class Loader0 : ModuleBase
     {
         #region ToolBox
         AxisXY m_axisXY;
         Axis m_axisZ;
         public override void GetTools(bool bInit)
         {
-            m_toolBox.GetAxis(ref m_axisXY, this, "XY");
+            m_toolBox.GetAxis(ref m_axisXY, this, "Loader0");
             m_toolBox.GetAxis(ref m_axisZ, this, "Z");
             m_picker.GetTools(m_toolBox, this, bInit); 
             if (bInit) InitPosition();
@@ -33,21 +33,26 @@ namespace Root_Pine2.Module
             Transfer6,
             Transfer7,
         }
-        public enum ePosUnload
-        {
-            Boat_3A,
-            Boat_3B,
-            Boat_2A,
-            Boat_2B,
-            Tray7,
-        }
+        const string c_sPaperTray = "PaperTray"; 
         void InitPosition()
         {
             m_axisXY.AddPos(Enum.GetNames(typeof(ePosLoad)));
-            m_axisXY.AddPos(Enum.GetNames(typeof(ePosUnload)));
             m_axisZ.AddPos(Enum.GetNames(typeof(ePosLoad)));
-            m_axisZ.AddPos(Enum.GetNames(typeof(ePosUnload)));
+            InitPosition(GetPosString(Vision.eVision.Top3D, Vision.eVisionWorks.A));
+            InitPosition(GetPosString(Vision.eVision.Top3D, Vision.eVisionWorks.B));
+            InitPosition(GetPosString(Vision.eVision.Top2D, Vision.eVisionWorks.A));
+            InitPosition(GetPosString(Vision.eVision.Top2D, Vision.eVisionWorks.B));
+            InitPosition(c_sPaperTray); 
+        }
+        void InitPosition(string sPos)
+        {
+            m_axisXY.AddPos(sPos);
+            m_axisZ.AddPos(sPos); 
+        }
 
+        string GetPosString(Vision.eVision eVision, Vision.eVisionWorks eVisionWorks)
+        {
+            return eVision.ToString() + eVisionWorks.ToString(); 
         }
         #endregion
 
@@ -58,9 +63,15 @@ namespace Root_Pine2.Module
             return bWait ? m_axisXY.WaitReady() : "OK";
         }
 
-        public string RunMoveXY(ePosUnload ePos, bool bWait = true)
+        public string RunMoveXY(Vision.eVision eVision, Vision.eVisionWorks eVisionWorks, bool bWait = true)
         {
-            m_axisXY.StartMove(ePos);
+            m_axisXY.StartMove(GetPosString(eVision, eVisionWorks));
+            return bWait ? m_axisXY.WaitReady() : "OK";
+        }
+
+        public string RunMoveXYPaper(bool bWait = true)
+        {
+            m_axisXY.StartMove(c_sPaperTray);
             return bWait ? m_axisXY.WaitReady() : "OK";
         }
 
@@ -85,9 +96,15 @@ namespace Root_Pine2.Module
             return bWait ? m_axisZ.WaitReady() : "OK";
         }
 
-        public string RunMoveZ(ePosUnload ePos, bool bWait = true)
+        public string RunMoveZ(Vision.eVision eVision, Vision.eVisionWorks eVisionWorks, bool bWait = true)
         {
-            m_axisZ.StartMove(ePos);
+            m_axisZ.StartMove(GetPosString(eVision, eVisionWorks));
+            return bWait ? m_axisZ.WaitReady() : "OK";
+        }
+
+        public string RunMoveZPaper(bool bWait = true)
+        {
+            m_axisZ.StartMove(c_sPaperTray);
             return bWait ? m_axisZ.WaitReady() : "OK";
         }
 
@@ -137,15 +154,30 @@ namespace Root_Pine2.Module
         }
         #endregion
 
+        #region override
+        public override void RunTree(Tree tree)
+        {
+            base.RunTree(tree);
+            m_picker.RunTreeVacuum(tree.GetTree("Vacuum"));
+            RunTreeAxisXY(tree.GetTree("Axis")); 
+        }
+        #endregion
+
         Picker m_picker = null;
         LoadEV m_loadEV = null; 
         Pine2 m_pine2 = null; 
-        public Loader(string id, IEngineer engineer, Pine2_Handler handler)
+        public Loader0(string id, IEngineer engineer, Pine2_Handler handler)
         {
             m_picker = new Picker(id);
             m_pine2 = handler.m_pine2;
             m_loadEV = handler.m_loadEV; 
             base.InitBase(id, engineer);
+        }
+
+        public override void ThreadStop()
+        {
+            m_picker.ThreadStop(); 
+            base.ThreadStop();
         }
     }
 }

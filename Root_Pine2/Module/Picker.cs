@@ -98,5 +98,14 @@ namespace Root_Pine2.Module
             p_id = id;
             InitThreadCheck(); 
         }
+
+        public void ThreadStop()
+        {
+            if (m_bThread)
+            {
+                m_bThread = false;
+                m_threadCheck.Join(); 
+            }
+        }
     }
 }
