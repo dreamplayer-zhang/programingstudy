@@ -67,7 +67,7 @@
       <HintPath>..\..\..\..\..\..\..\Program Files\Basler\pylon 6\Development\Assemblies\Basler.Pylon\x64\Basler.Pylon.dll</HintPath>
     </Reference>
     <Reference Include="EasyModbus">
-      <HintPath>bin\x64\EasyModbus.dll</HintPath>
+      <HintPath>D:\Root_Cameliia2\Root\Lib\EasyModbus.dll</HintPath>
     </Reference>
     <Reference Include="Emgu.CV.UI, Version=4.1.1.3497, Culture=neutral, PublicKeyToken=7281126722ab4438, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -195,9 +195,11 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Converter\PointToStringConverter.cs" />
     <Compile Include="UI_UserControl\Login_UI.xaml.cs">
       <DependentUpon>Login_UI.xaml</DependentUpon>
     </Compile>
+    <Compile Include="ViewModel\MainWindow_ViewModel.cs" />
     <Page Include="Control\Arrow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

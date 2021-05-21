@@ -33,7 +33,7 @@ namespace Root_VEGA_D
             m_engineer = engineer;
             viewerVM = new RootViewer_ViewModel();
             viewerVM.init(new ImageData(m_engineer.ClassMemoryTool().GetMemory("Vision.Memory", "Vision", "Main")));
-            Viewer_UI.DataContext = viewerVM;
+            //Viewer_UI.DataContext = viewerVM;
 
             HelpCollapsed();
             return true;
@@ -67,16 +67,16 @@ namespace Root_VEGA_D
 
         private void Viewer_UI_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            if (rb_AlignPt1.IsChecked == true)
-            {
-                tb_AlignPt1.Text = viewerVM.p_MouseMemX.ToString() + "," + viewerVM.p_MouseMemY.ToString();
-                return;
-            }
-            if (rb_AlignPt2.IsChecked == true)
-            {
-                tb_AlignPt2.Text = viewerVM.p_MouseMemX.ToString() + "," + viewerVM.p_MouseMemY.ToString();
-                return;
-            }
+            //if (rb_AlignPt1.IsChecked == true)
+            //{
+            //    tb_AlignPt1.Text = viewerVM.p_MouseMemX.ToString() + "," + viewerVM.p_MouseMemY.ToString();
+            //    return;
+            //}
+            //if (rb_AlignPt2.IsChecked == true)
+            //{
+            //    tb_AlignPt2.Text = viewerVM.p_MouseMemX.ToString() + "," + viewerVM.p_MouseMemY.ToString();
+            //    return;
+            //}
             if (rb_a.IsChecked == true)
             {
                 tb_a.Text = viewerVM.p_MouseMemX.ToString();
@@ -127,8 +127,8 @@ namespace Root_VEGA_D
         }
         private void GroupBox_GotFocus(object sender, RoutedEventArgs e)
         {
-            rb_AlignPt1.IsChecked = false;
-            rb_AlignPt2.IsChecked = false;
+            //rb_AlignPt1.IsChecked = false;
+            //rb_AlignPt2.IsChecked = false;
         }
         private void GroupBox_GotFocus_1(object sender, RoutedEventArgs e)
         {

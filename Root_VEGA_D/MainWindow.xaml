@@ -1526,8 +1526,8 @@
                                 </Grid>
                             </Grid>
                         </TabItem>
-                        <TabItem Header="Recipe Manager"
-                                 Style="{StaticResource ResourceKey=WizardTabItem}" Visibility="Collapsed">
+                        <TabItem Header="Recipe Manager" x:Name="RecipeManagerTab"
+                                 Style="{StaticResource ResourceKey=WizardTabItem}" Visibility="Visible">
                             <local:RecipeManager_UI />
 
                             <!--<ScrollViewer Background="White">
@@ -2233,9 +2233,9 @@
                                 </StackPanel>
                             </ScrollViewer>-->
                         </TabItem>
-                        <TabItem Header="Recipe Wizard"
-                                 Style="{StaticResource WizardTabItem}" Visibility="Collapsed">
-                            <local:RecipeWizard_UI x:Name="RecipeWizard_UI" />
+                        <TabItem Header="Recipe Wizard" x:Name="RecipeWizardTab"
+                                 Style="{StaticResource WizardTabItem}" Visibility="Visible">
+                            <local:RecipeWizard_UI DataContext="{Binding p_recipeWizard_ViewModel}" />
                         </TabItem>
                         <!--<TabItem Header="Run"
                                  Style="{StaticResource ResourceKey=WizardTabItem}">

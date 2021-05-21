@@ -10,18 +10,23 @@
              mc:Ignorable="d"
              d:DesignHeight="848"
              d:DesignWidth="1056">
+    <UserControl.Resources>
+        <local:PointToStringConverter x:Key="PointToString"/>
+    </UserControl.Resources>
     <Grid Background="White">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="2*"/>
             <ColumnDefinition />
         </Grid.ColumnDefinitions>
         <GroupBox Header="Viewer">
-            <tools:RootViewer x:Name="Viewer_UI" MouseLeftButtonDown="Viewer_UI_MouseLeftButtonDown"/>
+            <!--<tools:RootViewer x:Name="Viewer_UI" MouseLeftButtonDown="Viewer_UI_MouseLeftButtonDown"/>-->
+            <tools:RootViewer/>
         </GroupBox>
         <Grid Grid.Column="1"
               Margin="0,10,0,0">
             <Grid.RowDefinitions>
                 <RowDefinition Height="45" />
+                <RowDefinition Height="55" />
                 <RowDefinition Height="12*" />
                 <RowDefinition Height="45*" />
                 <RowDefinition Height="43*" />
@@ -29,9 +34,19 @@
             <Button Content="Snap"
                     Margin="8,5"
                     Style="{StaticResource SetupPanelBtn}" />
-            <GroupBox Header="Manaul Algin"
+            <GroupBox Header="Setting Mode" Grid.Row="1">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+                    <RadioButton Style="{StaticResource CustomRadio}" Content="Align" Margin="3" IsChecked="{Binding p_isAlign}"></RadioButton>
+                    <RadioButton Style="{StaticResource CustomRadio}" Grid.Column="1" Content="Manual" Margin="3" IsChecked="{Binding p_isManual}"></RadioButton>
+                </Grid>
+            </GroupBox>
+            <GroupBox Header="Manaul Align"
                       GotFocus="GroupBox_GotFocus_1"
-                      Grid.Row="1">
+                      Grid.Row="2">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition />
@@ -44,29 +59,29 @@
                             <ColumnDefinition Width="2*" />
                             <ColumnDefinition Width="3*" />
                         </Grid.ColumnDefinitions>
-                        <RadioButton Content="Point 1" 
-                                     x:Name="rb_AlignPt1"
+                        <Label Content="Point 1" 
                                      VerticalAlignment="Center"
                                      HorizontalAlignment="Center"/>
-                        <TextBox Text="0,0"
+
+                        <TextBox
                                  x:Name="tb_AlignPt1"
                                  Grid.Column="1"
                                  IsReadOnly="True"
                                  Margin="5,0"
                                  HorizontalContentAlignment="Center"
-                                 VerticalAlignment="Center" />
-                        <RadioButton Content="Point 2"
-                                     x:Name="rb_AlignPt2"
+                                 VerticalAlignment="Center" Text="{Binding p_firstPoint, Converter={StaticResource PointToString}}">
+                          
+                        </TextBox>
+                        <Label Content="Point 2"
                                      VerticalAlignment="Center"
                                      HorizontalAlignment="Center"
                                      Grid.Column="2" />
-                        <TextBox Text="0,0"
-                                 x:Name="tb_AlignPt2"
+                        <TextBox 
                                  Grid.Column="3"
                                  IsReadOnly="True"
                                  Margin="5,0"
                                  HorizontalContentAlignment="Center"
-                                 VerticalAlignment="Center" />
+                                 VerticalAlignment="Center" Text="{Binding p_secondPoint, Converter={StaticResource PointToString}}" />
                     </Grid>
                     <Button Content="Align"
                             Margin="0"
@@ -76,7 +91,7 @@
             </GroupBox>
             <GroupBox Header="Coordinate"
                       GotFocus="GroupBox_GotFocus"
-                      Grid.Row="2">
+                      Grid.Row="3">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="25*" />
@@ -330,7 +345,7 @@
                     </Grid>
                 </Grid>
             </GroupBox>
-            <GroupBox Header="Help" Grid.Row="3">
+            <GroupBox Header="Help" Grid.Row="4">
                 <Grid>
                     <Image Source="Resource/Reticle.png"
                            Width="320"
