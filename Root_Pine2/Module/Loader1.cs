@@ -63,10 +63,6 @@ namespace Root_Pine2.Module
         }
         #endregion
 
-        #region Loader2
-
-        #endregion
-
         #region RunLoad
         public string RunLoad(Vision.eVision eVision, Vision.eWorks eVisionWorks)
         {
