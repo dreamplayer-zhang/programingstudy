@@ -41,6 +41,12 @@ namespace Root_Pine2.Module
             p_nStrip = nStrip;
         }
 
+        public bool m_bPaper = false; 
+        public InfoStrip(bool bPaper)
+        {
+            m_bPaper = bPaper; 
+        }
+
         public enum eMagazine
         {
             Magazine0,

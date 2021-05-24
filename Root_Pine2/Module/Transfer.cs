@@ -360,7 +360,7 @@ namespace Root_Pine2.Module
             public Pusher m_pusher = new Pusher();
             #endregion
         }
-        Buffer m_buffer = new Buffer();
+        public Buffer m_buffer = new Buffer();
         #endregion
 
         #region RunLoad

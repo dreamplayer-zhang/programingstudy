@@ -126,6 +126,11 @@ namespace RootTools.Control.Ajin
         {
             return m_listAxis.GetAxisXY(id, log);
         }
+
+        public Axis3D GetAxis3D(string id, Log log)
+        {
+            return m_listAxis.GetAxis3D(id, log);
+        }
         #endregion
 
         #region Tree

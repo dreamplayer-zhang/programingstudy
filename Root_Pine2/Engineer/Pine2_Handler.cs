@@ -37,6 +37,7 @@ namespace Root_Pine2.Engineer
         public Dictionary<Vision.eVision, Vision> m_aVision = new Dictionary<Vision.eVision, Vision>();
         public Dictionary<Vision.eVision, Boats> m_aBoats = new Dictionary<Vision.eVision, Boats>(); 
         public Loader0 m_loader0;
+        public Loader1 m_loader1;
         public Loader2 m_loader2;
         void InitModule()
         {
@@ -52,6 +53,7 @@ namespace Root_Pine2.Engineer
             InitBoats(Vision.eVision.Bottom);
             InitModule(m_transfer = new Transfer("Transter", m_engineer, m_pine2, m_magazineEV));
             InitModule(m_loader0 = new Loader0("Loader0", m_engineer, this));
+            InitModule(m_loader1 = new Loader1("Loader1", m_engineer, this));
             InitModule(m_loader2 = new Loader2("Loader2", m_engineer, this));
         }
 
