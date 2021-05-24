@@ -278,17 +278,21 @@ namespace Root_VEGA_D.Module
 
             return "OK";
         }
-        string RunAlign(MemoryData mem, int nSnapCount, double startPosY, double endPosY, double startTriggerY, double endTriggerY)
+        string RunAlign(MemoryData mem, int nSnapCount, double startPosY, double endPosY, double startTriggerY, double endTriggerY, out CRect rectBotMarker)
         {
+            rectBotMarker = new CRect(0, 0, 0, 0);
+
             if (m_grabMode.m_bUseAlign == false)
                 return "OK";
 
             m_grabMode.SetLight(true);
 
+            m_log.Info("Align Start");
+
             try
             {
                 double dPosX = m_grabMode.m_rpAxisCenter.X + m_grabMode.m_nWaferSize_mm * 0.5 - (m_grabMode.m_nCenterX - m_grabMode.m_GD.m_nFovSize * 0.5) * m_grabMode.m_dResX_um * 0.001;
-                
+
                 CPoint memOffset = new CPoint(0, 0);
                 if (m_module.Run(RunLineScan(mem, memOffset, nSnapCount, dPosX, startPosY, endPosY, startTriggerY, endTriggerY)))
                     return p_sInfo;
@@ -311,7 +315,7 @@ namespace Root_VEGA_D.Module
                 CPoint ptCenterBot = new CPoint();
                 bool bTopResult = TemplateMatch(imgTopArea_div4, imgTop_div4, m_grabMode.m_dMatchScore, out ptCenterTop);
                 bool bBotResult = TemplateMatch(imgBotArea_div4, imgBot_div4, m_grabMode.m_dMatchScore, out ptCenterBot);
-                if(bTopResult && bBotResult)
+                if (bTopResult && bBotResult)
                 {
                     ptCenterTop.X *= 4;
                     ptCenterTop.Y *= 4;
@@ -320,7 +324,7 @@ namespace Root_VEGA_D.Module
 
                     searchTopArea = new CRect(new CPoint(searchTopArea.Left + ptCenterTop.X, searchTopArea.Top + ptCenterTop.Y), imgTop.Width + 8, imgTop.Height + 8);
                     searchBotArea = new CRect(new CPoint(searchBotArea.Left + ptCenterBot.X, searchBotArea.Top + ptCenterBot.Y), imgBot.Width + 8, imgBot.Height + 8);
-                    
+
                     imgTopArea = m_module.GetGrayByteImageFromMemory_12bit(mem, searchTopArea);
                     imgBotArea = m_module.GetGrayByteImageFromMemory_12bit(mem, searchBotArea);
 
@@ -339,18 +343,60 @@ namespace Root_VEGA_D.Module
 
                         // Rotate 축 Theta만큼 회전
                         Axis axisRotate = m_module.AxisRotate;
-                        if (m_module.Run(axisRotate.StartMove(axisRotate.p_posActual + dThetaDegree * -1)))
+                        if (m_module.Run(axisRotate.StartMove(axisRotate.p_posActual + dThetaDegree * -1, 0.05)))
                             return p_sInfo;
                         if (m_module.Run(axisRotate.WaitReady()))
                             return p_sInfo;
 
-                        m_log.Info("Align Success");
+                        // IPU 연결된 상태라면 좌하단 Align Marker 위치 전달을 위해 찾아야함
+                        if (m_module.TcpipCommServer.IsConnected())
+                        {
+                            if (m_module.Run(RunLineScan(mem, memOffset, nSnapCount, dPosX, startPosY, endPosY, startTriggerY, endTriggerY)))
+                                return p_sInfo;
+
+                            searchBotArea = new CRect(0, (int)(m_grabMode.m_nBottomCenterY - m_grabMode.m_nSearchAreaSize * 0.5), m_grabMode.m_GD.m_nFovSize, (int)(m_grabMode.m_nBottomCenterY + m_grabMode.m_nSearchAreaSize * 0.5));
+                            imgBotArea = m_module.GetGrayByteImageFromMemory_12bit(mem, searchBotArea);
+                            imgBotArea_div4 = imgBotArea.Resize(0.25, Emgu.CV.CvEnum.Inter.Linear);
+
+                            ptCenterBot = new CPoint();
+                            bBotResult = TemplateMatch(imgBotArea_div4, imgBot_div4, m_grabMode.m_dMatchScore, out ptCenterBot);
+
+                            if (!bBotResult)
+                                return "Cannot get Bottom Align Marker Position";
+
+                            int botMarkerX = (int)(0 + m_grabMode.m_nCenterX - m_grabMode.m_GD.m_nFovSize * 0.5 + (ptCenterBot.X - imgBot_div4.Width * 0.5) * 4 - 4);
+                            int botMarkerY = (int)(m_grabMode.m_nBottomCenterY - m_grabMode.m_nSearchAreaSize * 0.5 + (ptCenterBot.Y - imgBot_div4.Height * 0.5) * 4 - 4);
+
+                            ptCenterBot.X *= 4;
+                            ptCenterBot.Y *= 4;
+
+                            searchBotArea = new CRect(new CPoint(searchBotArea.Left + ptCenterBot.X, searchBotArea.Top + ptCenterBot.Y), imgBot.Width + 8, imgBot.Height + 8);
+
+                            imgBotArea = m_module.GetGrayByteImageFromMemory_12bit(mem, searchBotArea);
+
+                            bBotResult = TemplateMatch(imgBotArea, imgBot, m_grabMode.m_dMatchScore, out ptCenterBot);
+
+                            if (!bBotResult)
+                                return "Cannot get Bottom Align Marker Position";
+
+                            botMarkerX += (int)(ptCenterBot.X - imgBot.Width * 0.5);
+                            botMarkerY += (int)(ptCenterBot.Y - imgBot.Height * 0.5);
+
+                            rectBotMarker.Left = botMarkerX;
+                            rectBotMarker.Top = botMarkerY;
+                            rectBotMarker.Right = rectBotMarker.Left + imgBot.Width;
+                            rectBotMarker.Bottom = rectBotMarker.Top + imgBot.Height;
+
+                            m_log.Info(string.Format("LeftBottom Align Marker is found - {0}, {1}", botMarkerX, botMarkerY));
+                        }
+
+                        m_log.Info(string.Format("Align Success, theta difference = {0}", dThetaDegree * -1));
 
                         return "OK";
                     }
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 m_log.Info(ex.Message);
             }
@@ -440,6 +486,23 @@ namespace Root_VEGA_D.Module
             return "OK";
         }
 
+        bool m_bContinuousConnectedIPU = false;
+        bool CheckIPUConnectStatus()
+        {
+            if (m_bContinuousConnectedIPU)
+            {
+                if(m_module.TcpipCommServer.IsConnected())
+                    return true;
+                else
+                {
+                    m_bContinuousConnectedIPU = false;
+                    return false;
+                }
+            }
+            else
+                return false;
+        }
+
         public override string Run()
         {
             if (m_grabMode == null) return "Grab Mode == null";
@@ -480,10 +543,6 @@ namespace Root_VEGA_D.Module
                 // 스캔 라인 초기화
                 m_nCurScanLine = 0;
 
-                // 기계 장치 설정
-                //m_grabMode.SetLens();
-                m_grabMode.SetLight(true);
-
                 // 메모리 오프셋
                 CPoint cpMemoryOffset = new CPoint(m_grabMode.m_cpMemoryOffset);
                 cpMemoryOffset.X += m_grabMode.m_ScanStartLine * grabData.m_nFovSize;
@@ -500,7 +559,7 @@ namespace Root_VEGA_D.Module
 
                 double dTriggerStartPosY = m_grabMode.m_rpAxisCenter.Y + m_grabMode.m_ptXYAlignData.Y - m_grabMode.m_nWaferSize_mm * 0.5;
                 double dTriggerEndPosY = m_grabMode.m_rpAxisCenter.Y + m_grabMode.m_ptXYAlignData.Y + m_grabMode.m_nWaferSize_mm * 0.5;
-                
+
                 Axis.Speed speedY = axisXY.p_axisY.GetSpeedValue(Axis.eSpeed.Move);
 
                 double accDistance = speedY.m_acc * speedY.m_v * 0.5 * 2.0;
@@ -515,8 +574,30 @@ namespace Root_VEGA_D.Module
                 MemoryData mem = m_module.m_engineer.GetMemory(strPool, strGroup, strMemory);
 
                 // 얼라인
-                if (m_module.Run(RunAlign(mem, nWaferSizeY_px, dStartPosY, dEndPosY, dTriggerStartPosY, dTriggerEndPosY)))
+                CRect rectBotMarker = new CRect(0, 0, 0, 0);
+                if (m_module.Run(RunAlign(mem, nWaferSizeY_px, dStartPosY, dEndPosY, dTriggerStartPosY, dTriggerEndPosY, out rectBotMarker)))
                     return p_sInfo;
+
+                // IPU 접속 대기
+                while (m_bWaitRun && !EQ.IsStop())
+                {
+                    Thread.Sleep(10);
+                }
+
+                // IPU에 Bottom Align Marker Position 전달
+                if (m_module.TcpipCommServer.IsConnected())
+                {
+                    // 'LineStart' 메세지 전달
+                    Dictionary<string, string> mapParam = new Dictionary<string, string>();
+                    mapParam["BOT_ALIGN_MARKER_POS_X"] = rectBotMarker.Left.ToString();
+                    mapParam["BOT_ALIGN_MARKER_POS_Y"] = rectBotMarker.Bottom.ToString();
+
+                    m_module.TcpipCommServer.SendMessage(TCPIPComm_VEGA_D.Command.RcpName, mapParam);
+                }
+
+                // 기계 장치 설정
+                //m_grabMode.SetLens();
+                m_grabMode.SetLight(true);
 
                 while (m_grabMode.m_ScanLineNum > m_nCurScanLine)
                 {
@@ -576,7 +657,8 @@ namespace Root_VEGA_D.Module
                         CPoint tmpMemOffset = new CPoint(cpMemoryOffset);
 
                         // IPU PC와 연결된 상태라면
-                        if (m_module.TcpipCommServer.IsConnected())
+                        m_bContinuousConnectedIPU = m_module.TcpipCommServer.IsConnected();
+                        if (CheckIPUConnectStatus())
                         {
                             // 'LineStart' 메세지 전달
                             Dictionary<string, string> mapParam = new Dictionary<string, string>();
@@ -605,8 +687,12 @@ namespace Root_VEGA_D.Module
                             return p_sInfo;
 
                         // IPU PC와 연결된 상태라면 'LineEnd' 메세지 전달
-                        if (m_module.TcpipCommServer.IsConnected())
+                        if (CheckIPUConnectStatus())
+                        {
+                            Thread.Sleep(3000); // IPU에서 검사로 인한 이미지 그랩 지연을 감안하여 LineEnd 메세지를 3초 후에 전달
+
                             m_module.TcpipCommServer.SendMessage(TCPIPComm_VEGA_D.Command.LineEnd);
+                        }
 
                         // 다음 이미지 획득을 위해 변수 값 변경
                         m_nCurScanLine++;
@@ -618,7 +704,7 @@ namespace Root_VEGA_D.Module
                 snapTimeWatcher.Stop();
 
                 // IPU와 연결상태에 이미지 검사가 끝나기까지 대기
-                while (m_module.TcpipCommServer.IsConnected() && !m_bIPUCompleted && !EQ.IsStop())
+                while (CheckIPUConnectStatus() && !m_bIPUCompleted && !EQ.IsStop())
                 {
                     Thread.Sleep(10);
                 }

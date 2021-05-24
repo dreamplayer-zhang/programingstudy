@@ -553,15 +553,20 @@ namespace Root_VEGA_D.Module
                 while (((crtROI.Width + nSpare) % 4) != 0) nSpare++;
                 crtROI = new CRect(crtROI.Left, crtROI.Top, crtROI.Right + nSpare, crtROI.Bottom);
             }
-            ImageData img = new ImageData(crtROI.Width, crtROI.Height, 1);
-            IntPtr p = mem.GetPtr();
-            img.SetData_12bit(p, crtROI, (int)(mem.W / mem.p_nByte));
+            string strTempFile = "D:\\AlignMarkTemplateImage\\TempAreaImage.bmp";
+            ImageData tempImgData = new ImageData(mem);
+            tempImgData.FileSaveGrayBMP(strTempFile, crtROI, 1);
 
-            byte[] barr = img.GetByteArray();
-            System.Drawing.Bitmap bmp = img.GetBitmapToArray(crtROI.Width, crtROI.Height, barr);
-            Image<Gray, byte> imgReturn = new Image<Gray, byte>(bmp);
+            return new Image<Gray, byte>(strTempFile);
+            //ImageData img = new ImageData(crtROI.Width, crtROI.Height, 1);
+            //IntPtr p = mem.GetPtr();
+            //img.SetData_12bit(p, crtROI, (int)(mem.W / mem.p_nByte));
 
-            return imgReturn;
+            //byte[] barr = img.GetByteArray();
+            //System.Drawing.Bitmap bmp = img.GetBitmapToArray(crtROI.Width, crtROI.Height, barr);
+            //Image<Gray, byte> imgReturn = new Image<Gray, byte>(bmp);
+
+            //return imgReturn;
         }
 
         public bool TemplateMatching(MemoryData mem, CRect crtSearchArea, Image<Gray, byte> imgSrc, Image<Gray, byte> imgTemplate, out CPoint cptCenter, double dMatchScore)
