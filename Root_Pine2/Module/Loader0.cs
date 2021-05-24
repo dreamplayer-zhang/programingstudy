@@ -208,6 +208,7 @@ namespace Root_Pine2.Module
             if (Run(m_picker.RunVacuum(false))) return p_sInfo;
             boat.p_infoStrip = m_picker.p_infoStrip;
             m_picker.p_infoStrip = null;
+            boat.p_infoStrip.m_eWorks = eWorks; 
             if (Run(RunMoveUp())) return p_sInfo;
             return "OK";
         }
@@ -226,24 +227,22 @@ namespace Root_Pine2.Module
         #region override
         public override string StateReady()
         {
-            if (EQ.p_eState == EQ.eState.Run)
+            if (EQ.p_eState != EQ.eState.Run) return "OK";
+            if (m_picker.p_infoStrip != null)
             {
-                if (m_picker.p_infoStrip != null)
+                if (m_picker.p_infoStrip.m_bPaper) return StartRun(m_runUnloadPaper);
+                return StartUnloadBoat();
+            }
+            else
+            {
+                switch (m_pine2.p_eMode)
                 {
-                    if (m_picker.p_infoStrip.m_bPaper) return StartRun(m_runUnloadPaper);
-                    return StartUnloadBoat(); 
-                }
-                else
-                {
-                    switch (m_pine2.p_eMode)
-                    {
-                        case Pine2.eRunMode.Stack:
-                            if (m_loadEV.p_bDone) return StartRun(m_runLoadEV);
-                            return "OK";
-                        case Pine2.eRunMode.Magazine:
-                            if (m_transfer.m_buffer.m_gripper.p_bEnable) return StartLoadTransfer();
-                            return "OK"; 
-                    }
+                    case Pine2.eRunMode.Stack:
+                        if (m_loadEV.p_bDone) return StartRun(m_runLoadEV);
+                        return "OK";
+                    case Pine2.eRunMode.Magazine:
+                        if (m_transfer.m_buffer.m_gripper.p_bEnable) return StartLoadTransfer();
+                        return "OK";
                 }
             }
             return "OK";

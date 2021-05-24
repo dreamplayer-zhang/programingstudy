@@ -108,30 +108,16 @@ namespace Root_Pine2.Module
         }
         #endregion
 
-        #region Run Loader2
-        public string StartLoader2()
+        #region override
+        public override string StateReady()
         {
             if (EQ.p_eState != EQ.eState.Run) return "OK";
-            StartRun(m_runLoader2);
-            return "OK";
+            if (p_infoStrip == null) return "OK";
+            Run_Unload run = (Run_Unload)m_runUnload.Clone();
+            run.m_eWorks = p_infoStrip.m_eWorks; 
+            return StartRun(run);
         }
 
-        public string RunLoader2()
-        {
-            if (p_infoStrip == null) return "InfoStrip == null";
-            while ((EQ.p_eState == EQ.eState.Run) && (EQ.IsStop() == false))
-            {
-                Thread.Sleep(10);
-                if (m_boats.m_aBoat[p_infoStrip.m_eWorks].p_eStep == Boats.Boat.eStep.Ready)
-                {
-                    if (Run(RunUnload(p_infoStrip.m_eWorks))) return p_sInfo; 
-                }
-            }
-            return "OK";
-        }
-        #endregion
-
-        #region override
         public override void Reset()
         {
             base.Reset();
@@ -164,11 +150,10 @@ namespace Root_Pine2.Module
         }
 
         #region ModuleRun
-        ModuleRunBase m_runLoader2; 
+        ModuleRunBase m_runUnload; 
         protected override void InitModuleRuns()
         {
-            AddModuleRunList(new Run_Unload(this), false, "Unload Strip to Boat");
-            m_runLoader2 = AddModuleRunList(new Run_Run(this), true, "Run Loader2");
+            m_runUnload = AddModuleRunList(new Run_Unload(this), true, "Unload Strip to Boat");
         }
 
         public class Run_Unload : ModuleRunBase
@@ -180,47 +165,22 @@ namespace Root_Pine2.Module
                 InitModuleRun(module);
             }
 
-            Vision.eWorks m_ePos = Vision.eWorks.A;
+            public Vision.eWorks m_eWorks = Vision.eWorks.A;
             public override ModuleRunBase Clone()
             {
                 Run_Unload run = new Run_Unload(m_module);
-                run.m_ePos = m_ePos; 
+                run.m_eWorks = m_eWorks; 
                 return run;
             }
 
             public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
             {
-                m_ePos = (Vision.eWorks)tree.Set(m_ePos, m_ePos, "Boat", "Select Boat", bVisible); 
+                m_eWorks = (Vision.eWorks)tree.Set(m_eWorks, m_eWorks, "Boat", "Select Boat", bVisible); 
             }
 
             public override string Run()
             {
-                return m_module.RunUnload(m_ePos);
-            }
-        }
-
-        public class Run_Run : ModuleRunBase
-        {
-            Loader2 m_module;
-            public Run_Run(Loader2 module)
-            {
-                m_module = module;
-                InitModuleRun(module);
-            }
-
-            public override ModuleRunBase Clone()
-            {
-                Run_Run run = new Run_Run(m_module);
-                return run;
-            }
-
-            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
-            {
-            }
-
-            public override string Run()
-            {
-                return m_module.RunLoader2(); 
+                return m_module.RunUnload(m_eWorks);
             }
         }
         #endregion

@@ -144,10 +144,10 @@ namespace Root_Pine2.Module
                 if (Run(RunMoveZ(ePos.Turnover))) return p_sInfo;
                 loader2.RunVacuum(true);
                 m_picker.RunVacuum(false);
-                loader2.p_infoStrip = m_picker.p_infoStrip;
-                m_picker.p_infoStrip = null;
                 if (Run(RunMoveZ(ePos.Ready))) return p_sInfo;
                 if (Run(RunMoveX(Vision.eVision.Top2D, Vision.eWorks.B))) return p_sInfo;
+                loader2.p_infoStrip = m_picker.p_infoStrip;
+                m_picker.p_infoStrip = null;
             }
             finally
             {
@@ -158,65 +158,66 @@ namespace Root_Pine2.Module
         }
         #endregion
 
-        #region Run Loader1
-        public string StartLoader1()
+        #region override
+        public override string StateReady()
         {
             if (EQ.p_eState != EQ.eState.Run) return "OK";
-            StartRun(m_runLoader1);
-            return "OK";
-        }
-
-        public string RunLoader1()
-        {
-            Boats boats3D = m_handler.m_aBoats[Vision.eVision.Top3D];
-            Boats boats2D = m_handler.m_aBoats[Vision.eVision.Top2D];
-            while ((EQ.p_eState == EQ.eState.Run) && (EQ.IsStop() == false))
+            if (m_picker.p_infoStrip != null)
             {
-                Thread.Sleep(10);
-                if (m_picker.p_infoStrip != null)
+                switch (m_picker.p_infoStrip.m_eVision)
                 {
-                    Vision.eWorks eWorks = m_picker.p_infoStrip.m_eWorks; 
-                    switch (m_picker.p_infoStrip.m_eVision)
+                    case Vision.eVision.Top3D: return StartUnloadBoat();
+                    case Vision.eVision.Top2D: return StartUnloadTurnover(); 
+                }
+            }
+            else
+            {
+                Boats boats3D = m_handler.m_aBoats[Vision.eVision.Top3D]; 
+                foreach (Vision.eWorks eWorks in Enum.GetValues(typeof(Vision.eWorks)))
+                {
+                    Boats.Boat boat = m_handler.m_aBoats[Vision.eVision.Top2D].m_aBoat[eWorks];
+                    switch (boat.p_eStep)
                     {
-                        case Vision.eVision.Top3D:
-                            if (boats2D.m_aBoat[eWorks].p_eStep == Boats.Boat.eStep.Ready)
-                            {
-                                if (Run(RunUnload(eWorks))) return p_sInfo;
-                            }
-                            break;
-                        case Vision.eVision.Top2D:
-                            if (m_handler.m_loader2.p_eState == eState.Ready)
-                            {
-                                if (Run(RunUnloadTurnover())) return p_sInfo;
-                            }
+                        case Boats.Boat.eStep.Done: return StartLoad(Vision.eVision.Top2D, eWorks);
+                        case Boats.Boat.eStep.Ready:
+                            if (boats3D.m_aBoat[eWorks].p_eStep == Boats.Boat.eStep.Done) return StartLoad(Vision.eVision.Top3D, eWorks);
                             break; 
                     }
                 }
-                else
-                {
-                    foreach (Vision.eWorks eWorks in Enum.GetValues(typeof(Vision.eWorks)))
-                    {
-                        Boats.Boat boat = boats2D.m_aBoat[eWorks]; 
-                        switch (boat.p_eStep)
-                        {
-                            case Boats.Boat.eStep.Done:
-                                if (Run(RunLoad(eLoad.Top2D, eWorks))) return p_sInfo;
-                                break;
-                            case Boats.Boat.eStep.Ready:
-                                if (boats3D.m_aBoat[eWorks].p_eStep == Boats.Boat.eStep.Done)
-                                {
-                                    if (Run(RunLoad(eLoad.Top3D, eWorks))) return p_sInfo; 
-                                }
-                                break; 
-                        }
-                    }
-                }
+                return "OK"; 
             }
             return "OK";
         }
-        #endregion
 
-        #region override
+        string StartUnloadBoat()
+        {
+            Boats boats = m_handler.m_aBoats[Vision.eVision.Top2D];
+            if (boats.m_aBoat[Vision.eWorks.A].p_eStep == Boats.Boat.eStep.Ready) return StartUnloadBoat(Vision.eWorks.A);
+            if (boats.m_aBoat[Vision.eWorks.B].p_eStep == Boats.Boat.eStep.Ready) return StartUnloadBoat(Vision.eWorks.B);
+            return "OK";
+        }
+
+        string StartUnloadBoat(Vision.eWorks eWorks)
+        {
+            Run_Unload run = (Run_Unload)m_runUnload.Clone();
+            run.m_eWorks = eWorks;
+            return StartRun(run);
+        }
+
+        string StartUnloadTurnover()
+        {
+            if (m_handler.m_loader2.p_eState != eState.Ready) return "OK";
+            return StartRun(m_runUnloadTurnover); 
+        }
+
+        string StartLoad(Vision.eVision eVision, Vision.eWorks eWorks)
+        {
+            Run_Load run = (Run_Load)m_runLoad.Clone();
+            run.m_eLoad = (eVision == Vision.eVision.Top3D) ? eLoad.Top3D : eLoad.Top2D;
+            run.m_eWorks = eWorks;
+            return StartRun(run); 
+        }
+
         public override void Reset()
         {
             base.Reset();
@@ -248,13 +249,14 @@ namespace Root_Pine2.Module
         }
 
         #region ModuleRun
-        ModuleRunBase m_runLoader1;
+        ModuleRunBase m_runLoad;
+        ModuleRunBase m_runUnload;
+        ModuleRunBase m_runUnloadTurnover;
         protected override void InitModuleRuns()
         {
-            AddModuleRunList(new Run_Load(this), false, "Load Strip from Boat");
-            AddModuleRunList(new Run_Unload(this), false, "Unload Strip to Boat");
-            AddModuleRunList(new Run_UnloadTurnover(this), false, "Unload Strip to Turnover");
-            m_runLoader1 = AddModuleRunList(new Run_Loader1(this), false, "Run Loader1");
+            m_runLoad = AddModuleRunList(new Run_Load(this), true, "Load Strip from Boat");
+            m_runUnload = AddModuleRunList(new Run_Unload(this), true, "Unload Strip to Boat");
+            m_runUnloadTurnover = AddModuleRunList(new Run_UnloadTurnover(this), true, "Unload Strip to Turnover");
         }
 
         public class Run_Load : ModuleRunBase
@@ -266,25 +268,25 @@ namespace Root_Pine2.Module
                 InitModuleRun(module);
             }
 
-            eLoad m_eLoad = eLoad.Top3D; 
-            Vision.eWorks m_ePos = Vision.eWorks.A;
+            public eLoad m_eLoad = eLoad.Top3D; 
+            public Vision.eWorks m_eWorks = Vision.eWorks.A;
             public override ModuleRunBase Clone()
             {
                 Run_Load run = new Run_Load(m_module);
                 run.m_eLoad = m_eLoad;
-                run.m_ePos = m_ePos;
+                run.m_eWorks = m_eWorks;
                 return run;
             }
 
             public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
             {
                 m_eLoad = (eLoad)tree.Set(m_eLoad, m_eLoad, "Vision", "Select Vision", bVisible); 
-                m_ePos = (Vision.eWorks)tree.Set(m_ePos, m_ePos, "Boat", "Select Boat", bVisible);
+                m_eWorks = (Vision.eWorks)tree.Set(m_eWorks, m_eWorks, "Boat", "Select Boat", bVisible);
             }
 
             public override string Run()
             {
-                return m_module.RunLoad(m_eLoad, m_ePos);
+                return m_module.RunLoad(m_eLoad, m_eWorks);
             }
         }
 
@@ -297,22 +299,22 @@ namespace Root_Pine2.Module
                 InitModuleRun(module);
             }
 
-            Vision.eWorks m_ePos = Vision.eWorks.A;
+            public Vision.eWorks m_eWorks = Vision.eWorks.A;
             public override ModuleRunBase Clone()
             {
                 Run_Unload run = new Run_Unload(m_module);
-                run.m_ePos = m_ePos;
+                run.m_eWorks = m_eWorks;
                 return run;
             }
 
             public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
             {
-                m_ePos = (Vision.eWorks)tree.Set(m_ePos, m_ePos, "Boat", "Select Boat", bVisible);
+                m_eWorks = (Vision.eWorks)tree.Set(m_eWorks, m_eWorks, "Boat", "Select Boat", bVisible);
             }
 
             public override string Run()
             {
-                return m_module.RunUnload(m_ePos);
+                return m_module.RunUnload(m_eWorks);
             }
         }
 
@@ -338,31 +340,6 @@ namespace Root_Pine2.Module
             public override string Run()
             {
                 return m_module.RunUnloadTurnover(); 
-            }
-        }
-
-        public class Run_Loader1 : ModuleRunBase
-        {
-            Loader1 m_module;
-            public Run_Loader1(Loader1 module)
-            {
-                m_module = module;
-                InitModuleRun(module);
-            }
-
-            public override ModuleRunBase Clone()
-            {
-                Run_Loader1 run = new Run_Loader1(m_module);
-                return run;
-            }
-
-            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
-            {
-            }
-
-            public override string Run()
-            {
-                return m_module.RunLoader1();
             }
         }
         #endregion
