@@ -21,7 +21,6 @@ namespace Root_Pine2.Module
 
         public enum ePosTransfer
         {
-            LoadEV,
             Transfer0,
             Transfer1,
             Transfer2,
@@ -143,7 +142,7 @@ namespace Root_Pine2.Module
         #endregion
 
         #region RunLoad
-        public string RunLoadEV(int nShake, int dzPulse)
+        public string RunLoadEV(int nShake, int dzShakeUp)
         {
             if (m_picker.p_infoStrip != null) return "InfoStrip != null";
             if (m_loadEV.p_bDone == false) return "LoadEV not Done";
@@ -151,7 +150,7 @@ namespace Root_Pine2.Module
             if (Run(RunMoveLoadEV())) return p_sInfo;
             if (Run(RunMoveZLoadEV())) return p_sInfo;
             if (Run(m_picker.RunVacuum(true))) return p_sInfo;
-            if (Run(RunShakeUp(nShake, dzPulse))) return p_sInfo;
+            if (Run(RunShakeUp(nShake, dzShakeUp))) return p_sInfo;
             if (m_picker.IsVacuum() == false) return p_sInfo;
             m_picker.p_infoStrip = m_loadEV.GetNewInfoStrip();
             return "OK";
@@ -225,6 +224,62 @@ namespace Root_Pine2.Module
         #endregion
 
         #region override
+        public override string StateReady()
+        {
+            if (EQ.p_eState == EQ.eState.Run)
+            {
+                if (m_picker.p_infoStrip != null)
+                {
+                    if (m_picker.p_infoStrip.m_bPaper) return StartRun(m_runUnloadPaper);
+                    return StartUnloadBoat(); 
+                }
+                else
+                {
+                    switch (m_pine2.p_eMode)
+                    {
+                        case Pine2.eRunMode.Stack:
+                            if (m_loadEV.p_bDone) return StartRun(m_runLoadEV);
+                            return "OK";
+                        case Pine2.eRunMode.Magazine:
+                            if (m_transfer.m_buffer.m_gripper.p_bEnable) return StartLoadTransfer();
+                            return "OK"; 
+                    }
+                }
+            }
+            return "OK";
+        }
+
+        string StartUnloadBoat()
+        {
+            Vision.eVision eVision = m_pine2.p_b3D ? Vision.eVision.Top3D : Vision.eVision.Top2D;
+            Boats boats = m_handler.m_aBoats[eVision];
+            if (boats.m_aBoat[Vision.eWorks.A].p_eStep == Boats.Boat.eStep.Ready) return StartUnloadBoat(eVision, Vision.eWorks.A);
+            if (boats.m_aBoat[Vision.eWorks.B].p_eStep == Boats.Boat.eStep.Ready) return StartUnloadBoat(eVision, Vision.eWorks.B);
+            return "OK"; 
+        }
+
+        string StartUnloadBoat(Vision.eVision eVision, Vision.eWorks eWorks)
+        {
+            Run_UnloadBoat run = (Run_UnloadBoat)m_runUnloadBoat.Clone();
+            run.m_eVision = (eVision == Vision.eVision.Top3D) ? eUnloadVision.Top3D : eUnloadVision.Top2D;
+            run.m_eWorks = eWorks;
+            return StartRun(run); 
+        }
+
+        string StartLoadTransfer()
+        {
+            Run_LoadTransfer run = (Run_LoadTransfer)m_runLoadTransfer.Clone();
+            run.m_ePos = (ePosTransfer)m_transfer.m_buffer.m_ePosDst;
+            return StartRun(run); 
+        }
+
+        public override void Reset()
+        {
+            m_picker.m_dioVacuum.Write(false);
+            m_picker.p_infoStrip = null; 
+            base.Reset();
+        }
+
         public override void RunTree(Tree tree)
         {
             base.RunTree(tree);
@@ -253,5 +308,134 @@ namespace Root_Pine2.Module
             m_picker.ThreadStop(); 
             base.ThreadStop();
         }
+
+        #region ModuleRun
+        ModuleRunBase m_runLoadEV;
+        ModuleRunBase m_runLoadTransfer;
+        ModuleRunBase m_runUnloadPaper;
+        ModuleRunBase m_runUnloadBoat;
+        protected override void InitModuleRuns()
+        {
+            m_runLoadEV = AddModuleRunList(new Run_LoadEV(this), true, "Load Strip from LoadEV");
+            m_runLoadTransfer = AddModuleRunList(new Run_LoadTransfer(this), true, "Load Strip from Transfer");
+            m_runUnloadPaper = AddModuleRunList(new Run_UnloadPaper(this), true, "Unload Paper to Paper Tray");
+            m_runUnloadBoat = AddModuleRunList(new Run_UnloadBoat(this), true, "Unload Paper to Boat");
+        }
+
+        public class Run_LoadEV : ModuleRunBase
+        {
+            Loader0 m_module;
+            public Run_LoadEV(Loader0 module)
+            {
+                m_module = module;
+                InitModuleRun(module);
+            }
+
+            int m_nShake = 2;
+            int m_dzShakeUp = 5000; 
+            public override ModuleRunBase Clone()
+            {
+                Run_LoadEV run = new Run_LoadEV(m_module);
+                run.m_nShake = m_nShake;
+                run.m_dzShakeUp = m_dzShakeUp;
+                return run;
+            }
+
+            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
+            {
+                m_nShake = tree.Set(m_nShake, m_nShake, "Shake", "Shake Count", bVisible);
+                m_dzShakeUp = tree.Set(m_dzShakeUp, m_dzShakeUp, "ShakeUp", "Shake Up (Pulse)", bVisible);
+            }
+
+            public override string Run()
+            {
+                return m_module.RunLoadEV(m_nShake, m_dzShakeUp);
+            }
+        }
+
+        public class Run_LoadTransfer : ModuleRunBase
+        {
+            Loader0 m_module;
+            public Run_LoadTransfer(Loader0 module)
+            {
+                m_module = module;
+                InitModuleRun(module);
+            }
+
+            public ePosTransfer m_ePos = ePosTransfer.Transfer0;
+            public override ModuleRunBase Clone()
+            {
+                Run_LoadTransfer run = new Run_LoadTransfer(m_module);
+                run.m_ePos = m_ePos;
+                return run;
+            }
+
+            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
+            {
+                m_ePos = (ePosTransfer)tree.Set(m_ePos, m_ePos, "Transfer", "Select Transfer", bVisible);
+            }
+
+            public override string Run()
+            {
+                return m_module.RunLoadTransfer(m_ePos);
+            }
+        }
+
+        public class Run_UnloadPaper : ModuleRunBase
+        {
+            Loader0 m_module;
+            public Run_UnloadPaper(Loader0 module)
+            {
+                m_module = module;
+                InitModuleRun(module);
+            }
+
+            public override ModuleRunBase Clone()
+            {
+                Run_UnloadPaper run = new Run_UnloadPaper(m_module);
+                return run;
+            }
+
+            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
+            {
+            }
+
+            public override string Run()
+            {
+                return m_module.RunUnloadPaper(); 
+            }
+        }
+
+        public class Run_UnloadBoat : ModuleRunBase
+        {
+            Loader0 m_module;
+            public Run_UnloadBoat(Loader0 module)
+            {
+                m_module = module;
+                InitModuleRun(module);
+            }
+
+            public eUnloadVision m_eVision = eUnloadVision.Top3D;
+            public Vision.eWorks m_eWorks = Vision.eWorks.A; 
+            public override ModuleRunBase Clone()
+            {
+                Run_UnloadBoat run = new Run_UnloadBoat(m_module);
+                run.m_eVision = m_eVision;
+                run.m_eWorks = m_eWorks;
+                return run;
+            }
+
+            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
+            {
+                m_eVision = (eUnloadVision)tree.Set(m_eVision, m_eVision, "Vision", "Select Vision", bVisible);
+                m_eWorks = (Vision.eWorks)tree.Set(m_eWorks, m_eWorks, "Boat", "Select Boat", bVisible);
+            }
+
+            public override string Run()
+            {
+                return m_module.RunUnloadBoat(m_eVision, m_eWorks); 
+            }
+        }
+        #endregion
     }
 }

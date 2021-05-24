@@ -120,11 +120,13 @@ namespace Root_Pine2.Module
             #endregion
 
             #region Axis
-            double m_dPulse = 0; 
+            double m_dPulse = 0;
+            public InfoStrip.eMagazine m_ePosDst = InfoStrip.eMagazine.Magazine0; 
             public string RunMove(InfoStrip.eMagazine ePos, bool bGripPos, bool bWait = true)
             {
                 if (m_pusher.p_bLock) return "Lock by Sorter Picker";
                 if (m_gripper.p_bLock) return "Lock by Loader Picker";
+                m_ePosDst = ePos; 
                 m_axis.StartMove(ePos, bGripPos ? 0 : m_dPulse); 
                 return bWait ? m_axis.WaitReady() : "OK";
             }
