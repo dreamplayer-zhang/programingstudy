@@ -82,7 +82,6 @@ namespace Root_Pine2.Module
         public string RunUnload(Vision.eWorks eVisionWorks)
         {
             Boats.Boat boat = m_boats.m_aBoat[eVisionWorks];
-            if (IsBoatReady() == false) return "Boats p_eState is not OK"; 
             if (boat.p_eStep != Boats.Boat.eStep.Ready) return "Boat not Ready";
             try
             {
@@ -107,21 +106,12 @@ namespace Root_Pine2.Module
             }
             return "OK";
         }
-
-        bool IsBoatReady()
-        {
-            switch (m_boats.p_eState)
-            {
-                case eState.Ready:
-                case eState.Run: return true;
-                default: return false;
-            }
-        }
         #endregion
 
         #region Run Loader2
         public string StartLoader2()
         {
+            if (EQ.p_eState != EQ.eState.Run) return "OK";
             StartRun(m_runLoader2);
             return "OK";
         }
@@ -129,12 +119,12 @@ namespace Root_Pine2.Module
         public string RunLoader2()
         {
             if (p_infoStrip == null) return "InfoStrip == null";
-            while (EQ.p_eState == EQ.eState.Run)
+            while ((EQ.p_eState == EQ.eState.Run) && (EQ.IsStop() == false))
             {
                 Thread.Sleep(10);
-                if (IsBoatReady() && (m_boats.m_aBoat[p_infoStrip.m_eVisionWorks].p_eStep == Boats.Boat.eStep.Ready))
+                if (m_boats.m_aBoat[p_infoStrip.m_eWorks].p_eStep == Boats.Boat.eStep.Ready)
                 {
-                    return RunUnload(p_infoStrip.m_eVisionWorks);
+                    if (Run(RunUnload(p_infoStrip.m_eWorks))) return p_sInfo; 
                 }
             }
             return "OK";
@@ -230,7 +220,7 @@ namespace Root_Pine2.Module
 
             public override string Run()
             {
-                return m_module.RunLoader2();
+                return m_module.RunLoader2(); 
             }
         }
         #endregion

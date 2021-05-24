@@ -6,6 +6,7 @@ namespace Root_Pine2.Module
 {
     public class InfoStrip : NotifyProperty
     {
+        #region Result
         public enum eResult
         {
             Init,
@@ -26,8 +27,12 @@ namespace Root_Pine2.Module
                 OnPropertyChanged(); 
             }
         }
+        #endregion
 
-        public Vision.eWorks m_eVisionWorks = Vision.eWorks.A; 
+        #region Boat Flow
+        public Vision.eVision m_eVision = Vision.eVision.Top3D; 
+        public Vision.eWorks m_eWorks = Vision.eWorks.A;
+        #endregion
 
         public int p_nStrip { get; set; }
         public InfoStrip(int nStrip)
