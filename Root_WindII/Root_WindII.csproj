@@ -285,6 +285,9 @@
     <Compile Include="UI\SETUP\FRONT\FrontsideAlignment.xaml.cs">
       <DependentUpon>FrontsideAlignment.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UI\SETUP\FRONT\FrontsideMeasurement.xaml.cs">
+      <DependentUpon>FrontsideMeasurement.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI\SETUP\FRONT\FrontsideInspect.xaml.cs">
       <DependentUpon>FrontsideInspect.xaml</DependentUpon>
     </Compile>
@@ -306,6 +309,7 @@
     <Compile Include="UI\SETUP\FRONT\ViewModels\FrontsideAlignment_ImageViewer_ViewModel.cs" />
     <Compile Include="UI\SETUP\FRONT\ViewModels\FrontsideAlignment_ViewModel.cs" />
     <Compile Include="UI\SETUP\FRONT\ViewModels\FrontsideInspect_ImageViewer_ViewModel.cs" />
+    <Compile Include="UI\SETUP\FRONT\ViewModels\FrontsideMeasurement_ViewModel.cs" />
     <Compile Include="UI\SETUP\FRONT\ViewModels\FrontsideInspect_ViewModel.cs" />
     <Compile Include="UI\SETUP\FRONT\ViewModels\FrontsideMask_ViewModel.cs" />
     <Compile Include="UI\SETUP\FRONT\ViewModels\FrontsideOrigin_ImageViewer_ViewModel.cs" />
@@ -442,6 +446,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="UI\SETUP\FRONT\FrontsideAlignment.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\SETUP\FRONT\FrontsideMeasurement.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
