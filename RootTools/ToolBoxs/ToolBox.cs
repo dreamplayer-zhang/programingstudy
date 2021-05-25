@@ -139,6 +139,15 @@ namespace RootTools.ToolBoxs
             module.m_listAxis.Add(value.p_axisY);
             return "OK";
         }
+
+        public string GetAxis(ref Axis3D value, ModuleBase module, string id)
+        {
+            if (value == null) value = m_control.GetAxis3D(module.p_id + "." + id, module.m_log);
+            module.m_listAxis.Add(value.p_axisX);
+            module.m_listAxis.Add(value.p_axisY);
+            module.m_listAxis.Add(value.p_axisZ);
+            return "OK";
+        }
         #endregion
 
         #region ITool Memory

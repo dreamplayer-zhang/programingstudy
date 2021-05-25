@@ -13,14 +13,14 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace Root_WIND2.UI_User
+namespace Root_WindII
 {
     /// <summary>
-    /// ModuleView.xaml에 대한 상호 작용 논리
+    /// FrontsideMeasurement.xaml에 대한 상호 작용 논리
     /// </summary>
-    public partial class ModuleView : UserControl
+    public partial class FrontsideMeasurement : UserControl
     {
-        public ModuleView()
+        public FrontsideMeasurement()
         {
             InitializeComponent();
         }

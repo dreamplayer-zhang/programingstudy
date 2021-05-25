@@ -1,4 +1,5 @@
 ﻿using Root_WindII.Engineer;
+using RootTools_Vision;
 using System.ComponentModel;
 using System.IO;
 using System.Windows;
@@ -25,7 +26,7 @@ namespace Root_WindII
 
         private void Window_Closing(object sender, CancelEventArgs e)
         {
-            //m_engineer.ThreadStop();
+            GlobalObjects.Instance.Get<WindII_Engineer>().ThreadStop();
         }
     }
 }

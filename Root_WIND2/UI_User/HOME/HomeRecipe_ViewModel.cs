@@ -64,22 +64,22 @@ namespace Root_WIND2.UI_User
             m_moduleRunList.Add(vision.p_id,  "GrabLineScan");
             m_moduleRunList.RunTree(Tree.eMode.Init);
 
-            ModuleList.Add(new ModuleView() { ModuleName = "FRONT" });
-            ModuleList.Add(new ModuleView() { ModuleName = "BACK" });
-            ModuleList.Add(new ModuleView() { ModuleName = "EDGE.EBR" });
+            ModuleList.Add(new ModuleView());
+            ModuleList.Add(new ModuleView());
+            ModuleList.Add(new ModuleView());
 
             ModuleView_ViewModel model = new ModuleView_ViewModel(vision);
-            model.AddMode("OnlySnap");
-            model.AddMode("Alignment");
-            model.AddMode("Inspection");
+            model.AddMode("OnlySnap", vision.GetModuleruns());
+            model.AddMode("Alignment", vision.GetModuleruns());
+            model.AddMode("Inspection", vision.GetModuleruns());
             ModuleViewModels.Add(model);
             model = new ModuleView_ViewModel(backside);
-            model.AddMode("OnlySnap");
-            model.AddMode("Inspection");
+            model.AddMode("OnlySnap", backside.GetModuleruns());
+            model.AddMode("Inspection", backside.GetModuleruns());
             ModuleViewModels.Add(model);
             model = new ModuleView_ViewModel(edgeside);
-            model.AddMode("OnlySnap");
-            model.AddMode("Inspection");
+            model.AddMode("OnlySnap", edgeside.GetModuleruns());
+            model.AddMode("Inspection", edgeside.GetModuleruns());
             ModuleViewModels.Add(model);
 
             for (int i = 0; i < moduleList.Count; i++)

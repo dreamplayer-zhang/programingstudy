@@ -12,7 +12,7 @@ namespace Root_Pine2.Module
     {
         #region ToolBox
         ALID m_alidDrop; 
-        DIO_IO m_dioVacuum;
+        public DIO_IO m_dioVacuum;
         DIO_O m_doBlow;
         public void GetTools(ToolBox toolBox, ModuleBase module, bool bInit)
         {
@@ -97,6 +97,15 @@ namespace Root_Pine2.Module
         {
             p_id = id;
             InitThreadCheck(); 
+        }
+
+        public void ThreadStop()
+        {
+            if (m_bThread)
+            {
+                m_bThread = false;
+                m_threadCheck.Join(); 
+            }
         }
     }
 }

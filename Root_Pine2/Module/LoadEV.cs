@@ -12,10 +12,7 @@ namespace Root_Pine2.Module
         DIO_I2O2 m_dioEV;
         DIO_I m_diTop;
         DIO_I m_diCheck;
-        DIO_I m_diBlowAlarm;
         DIO_I m_diPaper;
-        DIO_I m_diPaperCheck;
-        DIO_I m_diPaperFull;
         DIO_O m_doBlow;
         DIO_O m_doIonBlow;
         DIO_O m_doAlignBlow;
@@ -25,19 +22,13 @@ namespace Root_Pine2.Module
             p_sInfo = m_toolBox.GetDIO(ref m_dioEV, this, "Elevator", "Down", "Up");
             p_sInfo = m_toolBox.GetDIO(ref m_diTop, this, "Top");
             p_sInfo = m_toolBox.GetDIO(ref m_diCheck, this, "Check");
-            p_sInfo = m_toolBox.GetDIO(ref m_diBlowAlarm, this, "BlowAlarm");
             p_sInfo = m_toolBox.GetDIO(ref m_diPaper, this, "Paper");
-            p_sInfo = m_toolBox.GetDIO(ref m_diPaperCheck, this, "PaperCheck");
-            p_sInfo = m_toolBox.GetDIO(ref m_diPaperFull, this, "PaperFull");
             p_sInfo = m_toolBox.GetDIO(ref m_doBlow, this, "Blow");
             p_sInfo = m_toolBox.GetDIO(ref m_doIonBlow, this, "IonBlow");
             p_sInfo = m_toolBox.GetDIO(ref m_doAlignBlow, this, "AlignBlow");
             if (bInit) InitTools();
         }
-
-        void InitTools()
-        {
-        }
+        void InitTools() { }
         #endregion
 
         #region Property
@@ -93,9 +84,9 @@ namespace Root_Pine2.Module
                 _bBlow = value;
                 m_log.Info("p_bBlow = " + value.ToString());
                 OnPropertyChanged();
-                m_doBlow.Write(value);
-                m_doAlignBlow.Write(value);
-                m_doIonBlow.Write(value);
+                m_doBlow.Write(value && m_bUseBlow);
+                m_doAlignBlow.Write(value && m_bUseAlignBlow);
+                m_doIonBlow.Write(value && m_bUseIonBlow);
             }
         }
 
@@ -134,6 +125,7 @@ namespace Root_Pine2.Module
 
         public InfoStrip GetNewInfoStrip()
         {
+            if (p_bPaper) return new InfoStrip(true);
             InfoStrip infoStrip = new InfoStrip(p_iStrip);
             p_iStrip++;
             return infoStrip;
@@ -192,7 +184,6 @@ namespace Root_Pine2.Module
                 StopWatch sw = new StopWatch();
                 int msTimeout = (int)(1000 * secTimeout);
                 p_bCheck = m_diCheck.p_bIn;
-                if (m_diBlowAlarm.p_bIn) return "Blow Alarm DI Detected";
                 try
                 {
                     if (m_dioEV.m_aBitDI[1].p_bOn)
@@ -281,13 +272,6 @@ namespace Root_Pine2.Module
         {
             StartRun(m_runLoad);
         }
-
-        public void StartDown(double secDown)
-        {
-            Run_Down run = (Run_Down)m_runDown.Clone();
-            run.m_secDown = secDown;
-            StartRun(run);
-        }
         #endregion
 
         readonly object m_csLock = new object();
@@ -305,42 +289,11 @@ namespace Root_Pine2.Module
 
         #region ModuleRun
         ModuleRunBase m_runLoad;
-        ModuleRunBase m_runDown;
         protected override void InitModuleRuns()
         {
-            AddModuleRunList(new Run_Delay(this), false, "Just Time Delay");
             m_runLoad = AddModuleRunList(new Run_Load(this), false, "Run Elevator Load");
-            m_runDown = AddModuleRunList(new Run_Down(this), false, "Run Elevator Down");
+            AddModuleRunList(new Run_Down(this), false, "Run Elevator Down");
             AddModuleRunList(new Run_Blow(this), false, "Run Blow");
-        }
-
-        public class Run_Delay : ModuleRunBase
-        {
-            LoadEV m_module;
-            public Run_Delay(LoadEV module)
-            {
-                m_module = module;
-                InitModuleRun(module);
-            }
-
-            double m_secDelay = 2;
-            public override ModuleRunBase Clone()
-            {
-                Run_Delay run = new Run_Delay(m_module);
-                run.m_secDelay = m_secDelay;
-                return run;
-            }
-
-            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
-            {
-                m_secDelay = tree.Set(m_secDelay, m_secDelay, "Delay", "Time Delay (sec)", bVisible);
-            }
-
-            public override string Run()
-            {
-                Thread.Sleep((int)(1000 * m_secDelay));
-                return "OK";
-            }
         }
 
         public class Run_Load : ModuleRunBase
@@ -408,23 +361,24 @@ namespace Root_Pine2.Module
                 InitModuleRun(module);
             }
 
-            bool m_bBlow = true;
+            double m_secBlow = 1;
             public override ModuleRunBase Clone()
             {
                 Run_Blow run = new Run_Blow(m_module);
-                run.m_bBlow = m_bBlow;
+                run.m_secBlow = m_secBlow;
                 return run;
             }
 
             public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
             {
-                m_bBlow = tree.Set(m_bBlow, m_bBlow, "Blow", "Run Blow", bVisible);
+                m_secBlow = tree.Set(m_secBlow, m_secBlow, "Blow", "Run Blow (sec)", bVisible);
             }
 
             public override string Run()
             {
-                if (m_module.m_diBlowAlarm.p_bIn) return "Blow Alarm DI Detected";
-                m_module.p_bBlow = m_bBlow;
+                m_module.p_bBlow = true;
+                Thread.Sleep((int)(1000 * m_secBlow));
+                m_module.p_bBlow = false;
                 return "OK";
             }
         }

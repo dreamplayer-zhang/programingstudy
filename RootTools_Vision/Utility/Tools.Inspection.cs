@@ -208,14 +208,21 @@ namespace RootTools_Vision
                 //int endX = startX + 640;
                 //int endY = startY + 480;
 
+
                 System.Drawing.Bitmap bitmap = CovertBufferToBitmap(sharedBuffer, new System.Windows.Rect(startX, startY, 640, 480));
 
-                if (System.IO.File.Exists(path + measure.m_nMeasurementIndex + ".bmp"))
-                    System.IO.File.Delete(path + measure.m_nMeasurementIndex + ".bmp");
+                lock(lockObj)
+				{
+                    if (System.IO.File.Exists(path + measure.m_nMeasurementIndex + ".bmp"))
+                        System.IO.File.Delete(path + measure.m_nMeasurementIndex + ".bmp");
 
-                bitmap.Save(path + measure.m_nMeasurementIndex + ".bmp");
+
+                    bitmap.Save(path + measure.m_nMeasurementIndex + ".bmp");
+                }
             });
         }
+
+        private static object lockObj = new object();
 
         public static void SaveDefectImage(String path, List<Data> dataList, SharedBufferInfo sharedBuffer)
         {

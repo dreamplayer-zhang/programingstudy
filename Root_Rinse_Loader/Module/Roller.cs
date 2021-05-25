@@ -18,8 +18,19 @@ namespace Root_Rinse_Loader.Module
             foreach (Line line in m_aLine) line.GetTools(m_toolBox);
             if (bInit)
             {
-                m_axisRotate[1].SetSpeed("Jog", m_axisRotate[0].GetSpeedValue("Jog")); 
+                InitSpeed(); 
             }
+        }
+
+        public enum eSpeed
+        {
+            Stack,
+            Magazine
+        }
+        void InitSpeed()
+        {
+            m_axisRotate[0].AddSpeed(Enum.GetNames(typeof(eSpeed)));
+            m_axisRotate[1].AddSpeed(Enum.GetNames(typeof(eSpeed)));
         }
         #endregion
 
@@ -66,8 +77,9 @@ namespace Root_Rinse_Loader.Module
         {
             if (bRotate)
             {
-                m_axisRotate[0].Jog(m_rinse.p_fRotateSpeed, "Move");
-                m_axisRotate[1].Jog(m_rinse.p_fRotateSpeed, "Move");
+                eSpeed eSpeed = (m_rinse.p_eMode == RinseL.eRunMode.Stack) ? eSpeed.Stack : eSpeed.Magazine; 
+                m_axisRotate[0].Jog(m_rinse.p_fRotateSpeed, eSpeed.ToString());
+                m_axisRotate[1].Jog(m_rinse.p_fRotateSpeed, eSpeed.ToString());
             }
             else
             {
