@@ -51,6 +51,8 @@ namespace Root_WindII.Engineer
             m_visionFront = new Vision_Frontside("Vision", m_engineer, ModuleBase.eRemote.Server);
             InitModule(m_visionFront);
 
+
+            InitVision();
             //InitBackside(ModuleBase.eRemote.Client);
 
             m_wtr.RunTree(Tree.eMode.RegRead);
@@ -182,16 +184,92 @@ namespace Root_WindII.Engineer
         }
         #endregion
 
-        #region Backside
-        bool m_bBackside = true;
-        public Backside m_backside;
-        void InitBackside(ModuleBase.eRemote eRemote)
+
+
+        #region Module Vision
+        enum eVision
         {
-            if (m_bBackside == false) return;
-            m_backside = new Backside("Backside", m_engineer, eRemote);
-            InitModule(m_backside);
+            Backside,
+            EBR,
+            AOP,
+            EdgeSide
+        }
+        List<eVision> m_aVisionType = new List<eVision>();
+        int m_lVision = 1;
+        void InitVision()
+        {
+            ModuleBase module;
+            for (int n = 0; n < m_lVision; n++)
+            {
+                string sN = n.ToString("00");
+                string sID = "Vision" + sN;
+                switch (m_aVisionType[n])
+                {
+                    case eVision.Backside:
+                        module = new Vision_Backside(GetVisionID(n), m_engineer, ModuleBase.eRemote.Client);
+                        break;
+                    case eVision.EBR:
+                        module = new Vision_EBR(GetVisionID(n), m_engineer);
+                        break;
+                    case eVision.AOP:
+                        module = new Vision_AOP(GetVisionID(n), m_engineer);
+                        break;
+                    case eVision.EdgeSide:
+                        module = new Vision_Edgeside(GetVisionID(n), m_engineer, ModuleBase.eRemote.Client);
+                        break;
+                    default:
+                        module = new Vision_AOP(GetVisionID(n), m_engineer);
+                        break;
+                }
+                InitModule(module);
+                ((IWTR)m_wtr).AddChild((IWTRChild)module);
+            }
+        }
+
+        string GetVisionID(int n)
+        {
+            eVision eVision = m_aVisionType[n];
+            int nCount = 0;
+            foreach (eVision vision in m_aVisionType)
+            {
+                if (vision == eVision)
+                    nCount++;
+            }
+            if (nCount == 1)
+                return eVision.ToString();
+            nCount = 0;
+            for (int i = 0; i < n; i++)
+            {
+                if (m_aVisionType[i] == eVision)
+                    nCount++;
+            }
+            return eVision.ToString() + nCount.ToString();
+        }
+
+        public void RunTreeVision(Tree tree)
+        {
+            m_lVision = tree.Set(m_lVision, m_lVision, "Count", "Vision Count");
+            while (m_aVisionType.Count < m_lVision)
+                m_aVisionType.Add(eVision.AOP);
+            Tree treeType = tree.GetTree("Type");
+            for (int n = 0; n < m_lVision; n++)
+            {
+                m_aVisionType[n] = (eVision)treeType.Set(m_aVisionType[n], m_aVisionType[n], n.ToString("00"), "Vision Type");
+            }
         }
         #endregion
+
+
+        //#region Backside
+        //bool m_bBackside = true;
+        //public Backside m_backside;
+        //void InitBackside(ModuleBase.eRemote eRemote)
+        //{
+        //    if (m_bBackside == false) return;
+        //    m_backside = new Backside("Backside", m_engineer, eRemote);
+        //    InitModule(m_backside);
+        //}
+        //#endregion
 
         #region StateHome
         public string StateHome()
@@ -389,7 +467,8 @@ namespace Root_WindII.Engineer
         {
             RunTreeWTR(tree.GetTree("WTR"));
             RunTreeLoadport(tree.GetTree("Loadport"));
-            m_bBackside = tree.Set(m_bBackside, m_bBackside, "Backside", "Use Backside");
+            RunTreeVision(tree.GetTree("Vision"));
+            //m_bBackside = tree.Set(m_bBackside, m_bBackside, "Backside", "Use Backside");
         }
         #endregion
 
