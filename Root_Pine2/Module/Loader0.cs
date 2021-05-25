@@ -131,7 +131,7 @@ namespace Root_Pine2.Module
                 if (Run(RunShakeUp(0.9 * dzPulse))) return p_sInfo;
                 iShake++;
             }
-            return RunMoveUp(); 
+            return "OK"; 
         }
 
         string RunShakeUp(double dzPulse)
@@ -146,13 +146,28 @@ namespace Root_Pine2.Module
         {
             if (m_picker.p_infoStrip != null) return "InfoStrip != null";
             if (m_loadEV.p_bDone == false) return "LoadEV not Done";
-            if (Run(RunMoveUp())) return p_sInfo;
-            if (Run(RunMoveLoadEV())) return p_sInfo;
-            if (Run(RunMoveZLoadEV())) return p_sInfo;
-            if (Run(m_picker.RunVacuum(true))) return p_sInfo;
-            if (Run(RunShakeUp(nShake, dzShakeUp))) return p_sInfo;
-            if (m_picker.IsVacuum() == false) return p_sInfo;
-            m_picker.p_infoStrip = m_loadEV.GetNewInfoStrip();
+            try
+            {
+                if (Run(RunMoveUp())) return p_sInfo;
+                if (Run(RunMoveLoadEV())) return p_sInfo;
+                if (Run(RunMoveZLoadEV())) return p_sInfo;
+                m_loadEV.p_bBlow = true;
+                if (Run(m_picker.RunVacuum(true))) return p_sInfo;
+                m_loadEV.p_eMove = LoadEV.eMove.Down; 
+                if (Run(RunShakeUp(nShake, dzShakeUp))) return p_sInfo;
+                m_loadEV.p_eMove = LoadEV.eMove.Stop;
+                m_loadEV.p_bBlow = false;
+                if (Run(RunMoveUp())) return p_sInfo;
+                if (m_picker.IsVacuum() == false) return p_sInfo;
+                m_picker.p_infoStrip = m_loadEV.GetNewInfoStrip();
+                m_loadEV.StartLoad(); 
+            }
+            finally
+            {
+                m_loadEV.p_eMove = LoadEV.eMove.Stop;
+                m_loadEV.p_bBlow = false;
+                RunMoveUp();
+            }
             return "OK";
         }
 
@@ -175,7 +190,8 @@ namespace Root_Pine2.Module
             }
             finally
             {
-                gripper.p_bLock = false; 
+                RunMoveUp();
+                gripper.p_bLock = false;
             }
             return "OK"; 
         }
@@ -185,13 +201,20 @@ namespace Root_Pine2.Module
         public string RunUnloadPaper()
         {
             if (m_picker.p_infoStrip != null) return "InfoStrip != null";
-            if (Run(RunMoveUp())) return p_sInfo;
-            if (Run(RunMovePaperTray())) return p_sInfo;
-            if (Run(RunMoveZPaper())) return p_sInfo;
-            if (Run(m_picker.RunVacuum(false))) return p_sInfo;
-            m_picker.p_infoStrip = null;
-            if (Run(RunMoveUp())) return p_sInfo;
-            if (Run(RunMoveLoadEV())) return p_sInfo;
+            try
+            {
+                if (Run(RunMoveUp())) return p_sInfo;
+                if (Run(RunMovePaperTray())) return p_sInfo;
+                if (Run(RunMoveZPaper())) return p_sInfo;
+                if (Run(m_picker.RunVacuum(false))) return p_sInfo;
+                m_picker.p_infoStrip = null;
+                if (Run(RunMoveUp())) return p_sInfo;
+                if (Run(RunMoveLoadEV())) return p_sInfo;
+            }
+            finally
+            {
+                RunMoveUp();
+            }
             return "OK";
         }
 
@@ -201,15 +224,22 @@ namespace Root_Pine2.Module
             Boats boats = GetBoats(eVision);
             Boats.Boat boat = boats.m_aBoat[eWorks];
             if (boat.p_eStep != Boats.Boat.eStep.Ready) return "Boat not Ready";
-            if (Run(RunMoveUp())) return p_sInfo;
-            if (Run(RunMoveBoat(eVision, eWorks))) return p_sInfo;
-            if (Run(RunMoveZ(eVision, eWorks))) return p_sInfo;
-            boat.RunVacuum(true); 
-            if (Run(m_picker.RunVacuum(false))) return p_sInfo;
-            boat.p_infoStrip = m_picker.p_infoStrip;
-            m_picker.p_infoStrip = null;
-            boat.p_infoStrip.m_eWorks = eWorks; 
-            if (Run(RunMoveUp())) return p_sInfo;
+            try
+            {
+                if (Run(RunMoveUp())) return p_sInfo;
+                if (Run(RunMoveBoat(eVision, eWorks))) return p_sInfo;
+                if (Run(RunMoveZ(eVision, eWorks))) return p_sInfo;
+                boat.RunVacuum(true);
+                if (Run(m_picker.RunVacuum(false))) return p_sInfo;
+                boat.p_infoStrip = m_picker.p_infoStrip;
+                m_picker.p_infoStrip = null;
+                boat.p_infoStrip.m_eWorks = eWorks;
+                if (Run(RunMoveUp())) return p_sInfo;
+            }
+            finally
+            {
+                RunMoveUp();
+            }
             return "OK";
         }
 

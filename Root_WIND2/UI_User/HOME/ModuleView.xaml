@@ -1,34 +1,39 @@
 ﻿<UserControl x:Class="Root_WIND2.UI_User.ModuleView"
-             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:Root_WIND2"
-             mc:Ignorable="d" 
-             d:DesignHeight="150" d:DesignWidth="600">
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:Converter="clr-namespace:ViewConverter;assembly=RootTools"
+        xmlns:local="clr-namespace:Root_WIND2" mc:Ignorable="d" d:DesignHeight="150"
+        d:DesignWidth="600">
     <UserControl.Resources>
+        <Converter:VisibleToBoolConverter x:Key="VisibleToBoolConverters" />
+        <Converter:InverseVisibleToBoolConverter x:Key="InverseVisibleToBoolConverters" />
         <Style x:Key="use_checkbox_button" TargetType="CheckBox">
-            <Setter Property="FontSize" Value="24"/>
-            <Setter Property="FontWeight" Value="Bold"/>
-            <Setter Property="Foreground" Value="White"/>
-            <Setter Property="IsChecked" Value="{Binding IsChecked}"/>
+            <Setter Property="FontSize" Value="24" />
+            <Setter Property="FontWeight" Value="Bold" />
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="IsChecked" Value="{Binding IsChecked}" />
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="{x:Type CheckBox}">
                         <Border x:Name="bd" CornerRadius="10">
-                            <TextBlock x:Name="tb" Text="USE" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                            <TextBlock x:Name="tb" Text="USE" VerticalAlignment="Center"
+                                    HorizontalAlignment="Center" />
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsChecked" Value="True">
-                                <Setter TargetName="bd" Property="Background" Value="{StaticResource groupbox_button_normal}"/>
-                                <Setter TargetName="tb" Property="Text" Value="On"/>
+                                <Setter TargetName="bd" Property="Background"
+                                        Value="{StaticResource groupbox_button_normal}" />
+                                <Setter TargetName="tb" Property="Text" Value="On" />
                             </Trigger>
                             <Trigger Property="IsChecked" Value="False">
-                                <Setter TargetName="bd" Property="Background" Value="#222222"/>
-                                <Setter TargetName="tb" Property="Text" Value="Off"/>
+                                <Setter TargetName="bd" Property="Background" Value="#222222" />
+                                <Setter TargetName="tb" Property="Text" Value="Off" />
                             </Trigger>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="bd" Property="Background" Value="{StaticResource groupbox_button_mouseover}"/>
+                                <Setter TargetName="bd" Property="Background"
+                                        Value="{StaticResource groupbox_button_mouseover}" />
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -52,7 +57,8 @@
                         FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center" />
                 <CheckBox Style="{StaticResource use_checkbox_button}"
                         IsChecked="{Binding IsUseChecked}" Grid.Row="1" Margin="4" />
-                <Border Grid.Column="1" Grid.RowSpan="2" Margin="4">
+                <Border Grid.Column="1" Grid.RowSpan="2" Margin="4"
+                        Visibility="{Binding p_bSetting, Converter={StaticResource InverseVisibleToBoolConverters}}">
                     <ListBox ItemsSource="{Binding ModeList}">
                         <ListBox.Template>
                             <ControlTemplate>
@@ -97,8 +103,14 @@
                         </ListBox.ItemTemplate>
                     </ListBox>
                 </Border>
+                <Border Grid.Column="1" Grid.RowSpan="2" Margin="4"
+                        Visibility="{Binding p_bSetting, Converter={StaticResource VisibleToBoolConverters}}">
+                    <TabControl>
+                        
+                    </TabControl>
+                </Border>
                 <Button Grid.Column="2" Grid.RowSpan="2" Background="Transparent" Content="Setting"
-                        Foreground="White">
+                        Command="{Binding CommandSettingClick}" Foreground="White">
                 </Button>
             </Grid>
         </Border>

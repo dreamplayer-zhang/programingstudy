@@ -37,6 +37,18 @@ namespace Root_Pine2.Module
             return magazineEV.p_sInfo;
         }
 
+        public bool IsEnableStack(InfoStrip.eMagazine eMagazine, InfoStrip.eResult eResult, bool bMatch)
+        {
+            if (m_aEV[eMagazine].IsBusy()) return false; 
+            MagazineEV.Stack stack = m_aEV[eMagazine].m_stack;
+            if (stack == null) return false;
+            if (stack.p_eResult == eResult) return true;
+            if (bMatch) return false; 
+            if (stack.p_eResult != InfoStrip.eResult.Init) return false;
+            stack.p_eResult = eResult;
+            return true; 
+        }
+
         string m_sInfo = "OK";
         bool Run(string sRun)
         {
