@@ -386,6 +386,7 @@
                                 Content="OHT"
                                 Margin="0"
                                 Style="{StaticResource SetupPanelBtn}"
+                                Click="btnOHT_Click"
                                 />
                     </Grid>
                     <Grid Grid.Column="2"

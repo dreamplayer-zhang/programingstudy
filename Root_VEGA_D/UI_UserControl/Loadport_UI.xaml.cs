@@ -61,12 +61,13 @@ namespace Root_VEGA_D
             bool bReadyToLoad = (m_loadport.p_infoCarrier.p_eTransfer == GemCarrierBase.eTransfer.ReadyToLoad);
             bReadyToLoad = true;
             bool bReadyState = (m_loadport.m_qModuleRun.Count == 0);
+            bool bCheckInterlock = !m_loadport.m_OHT.p_bLightCurtain && !m_loadport.m_OHT.P_bProtectionBar;
             bool bEQReadyState = (EQ.p_eState == EQ.eState.Ready);
             //if (m_loadport.p_infoCarrier.p_eState != InfoCarrier.eState.Placed) return false;
             bool bPlaced = m_loadport.CheckPlaced();
 
             if (m_handler.IsEnableRecovery() == true) return false;
-            return bReadyLoadport && bReadyToLoad && bReadyState && bEQReadyState && bPlaced;
+            return bReadyLoadport && bReadyToLoad && bReadyState && bEQReadyState && bPlaced && bCheckInterlock;
         }
 
         bool IsEnableUnloadReq()
@@ -149,7 +150,26 @@ namespace Root_VEGA_D
 
         private void buttonUnloadReq_Click(object sender, RoutedEventArgs e)
         {
-
+            if (IsEnableUnloadReq() == false) return;
+            m_loadport.m_ceidUnloadReq.Send();
+            if (m_loadport.m_OHT.m_bAuto && m_loadport.m_OHT.p_eState == RootTools.OHT.Semi.OHT_Semi.eState.All_Off)
+            {
+                if (!m_loadport.m_diPlaced.p_bIn && !m_loadport.m_diPresent.p_bIn && !m_loadport.m_OHT.m_bOHTErr)
+                {
+                    m_loadport.m_OHT.m_carrier.p_eTransfer = RootTools.Gem.GemCarrierBase.eTransfer.ReadyToUnload;
+                    m_loadport.m_OHT.p_bHoAvailable = false;
+                    m_loadport.m_OHT.p_bES = false;
+                    m_loadport.m_OHT.m_bRFIDRead = true;
+                }
+            }
+            else if (!m_loadport.m_OHT.m_bAuto)
+            {
+                if (!m_loadport.m_diPlaced.p_bIn && !m_loadport.m_diPresent.p_bIn && !m_loadport.m_OHT.m_bOHTErr)
+                {
+                    m_loadport.m_OHT.m_carrier.p_eTransfer = RootTools.Gem.GemCarrierBase.eTransfer.ReadyToUnload;
+                    m_loadport.m_OHT.m_bRFIDRead = true;
+                }
+            }
         }
         #endregion
     }

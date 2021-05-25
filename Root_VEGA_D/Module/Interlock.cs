@@ -3,10 +3,14 @@ using RootTools.Control;
 using RootTools.GAFs;
 using RootTools.Module;
 using RootTools.Trees;
+using Root_EFEM.Module;
 using Root_VEGA_D.Engineer;
+using RootTools.OHT.Semi;
 using RootTools.Control.ACS;
 using System.Threading;
+using System.Collections.Generic;
 using System;
+using RootTools.OHTNew;
 
 namespace Root_VEGA_D.Module
 {
@@ -282,9 +286,29 @@ namespace Root_VEGA_D.Module
             {
                 m_alidProtectionbar.Run(!m_diProtectionbar.p_bIn, "Protectionbar Check Error");
             }
+            foreach (OHT_Semi OHT in p_aOHT)
+            {
+                OHT.p_bLightCurtain = !m_diLightCurtain.p_bIn;
+                OHT.P_bProtectionBar = !m_diProtectionbar.p_bIn;
+            }
         }
         #endregion
 
+        #region OHT
+        List<OHT_Semi> p_aOHT
+        {
+            get
+            {
+                List<OHT_Semi> aOHT = new List<OHT_Semi>();
+                VEGA_D_Handler handler = (VEGA_D_Handler)m_engineer.ClassHandler();
+                foreach (ILoadport loadport in handler.m_aLoadport)
+                {
+                    aOHT.Add(((Loadport_Cymechs)loadport).m_OHT);
+                }
+                return aOHT;
+            }
+        }
+        #endregion
         #region Tree
         bool m_bDoorlock_Use = false;
         bool m_bLightCurtain_Use = false;

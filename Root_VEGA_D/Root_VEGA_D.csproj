@@ -191,6 +191,12 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Module\OHTs_UI.xaml.cs">
+      <DependentUpon>OHTs_UI.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Module\OHT_UI.xaml.cs">
+      <DependentUpon>OHT_UI.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI_UserControl\Login_UI.xaml.cs">
       <DependentUpon>Login_UI.xaml</DependentUpon>
     </Compile>
@@ -231,6 +237,14 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Module\FFU_Fan_UI.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Module\OHTs_UI.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Module\OHT_UI.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -397,6 +411,13 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resource\Reticle.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resource\InPod.PNG" />
+    <Resource Include="Resource\OutPod.PNG" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\InPod.bmp" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
