@@ -189,6 +189,30 @@ namespace ViewConverter
         }
     }
 
+    public class InverseVisibleToBoolConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            bool bvalue = !(bool)value;
+            Visibility visible = Visibility.Visible;
+            switch (bvalue)
+            {
+                case true:
+                    visible = Visibility.Visible;
+                    break;
+                case false:
+                    visible = Visibility.Hidden;
+                    break;
+            }
+            return visible;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotSupportedException();
+        }
+    }
+
     public class HeightToBoolConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
