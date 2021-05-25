@@ -137,6 +137,8 @@ namespace Root_WIND2.UI_User
             {
                 return new RelayCommand(() =>
                 {
+                    if (p_Vision == null) return;
+
                     if (!p_Vision.p_CamAutoFocus.m_ConnectDone)
                     {
                         p_Vision.p_CamAutoFocus.FunctionConnect();
