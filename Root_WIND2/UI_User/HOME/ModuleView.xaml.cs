@@ -20,18 +20,6 @@ namespace Root_WIND2.UI_User
     /// </summary>
     public partial class ModuleView : UserControl
     {
-        public string ModuleName
-        {
-            get;
-            set;
-        }
-
-        public bool IsChecked
-        {
-            get;
-            set;
-        }
-
         public ModuleView()
         {
             InitializeComponent();
