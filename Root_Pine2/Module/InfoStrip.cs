@@ -34,11 +34,13 @@ namespace Root_Pine2.Module
         public Vision.eWorks m_eWorks = Vision.eWorks.A;
         #endregion
 
+        public string p_id { get; set; }
         public int p_nStrip { get; set; }
         public InfoStrip(int nStrip)
         {
             p_eMagazine = eMagazine.Magazine0; 
             p_nStrip = nStrip;
+            p_id = "Strip" + nStrip.ToString("000"); 
         }
 
         public bool m_bPaper = false; 
@@ -70,6 +72,7 @@ namespace Root_Pine2.Module
             p_eMagazine = eMagazine;
             p_eMagazinePos = eMagazinePos;
             p_nStrip = nStrip;
+            p_id = eMagazine.ToString() + "." + eMagazinePos.ToString() + "." + nStrip.ToString("00"); 
         }
 
         public InfoStrip Clone()

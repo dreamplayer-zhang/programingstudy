@@ -55,5 +55,46 @@ namespace Root_Pine2.Module
             m_sInfo = sRun;
             return sRun != "OK"; 
         }
+
+        #region Thread
+        bool m_bThread = false;
+        Thread m_thread; 
+        void initThread()
+        {
+            m_thread = new Thread(new ThreadStart(RunThread));
+            m_thread.Start();
+        }
+
+        void RunThread()
+        {
+            int nBlink = 0; 
+            m_bThread = true;
+            Thread.Sleep(1000); 
+            while (m_bThread)
+            {
+                Thread.Sleep(200);
+                foreach (MagazineEV magazine in m_aEV.Values)
+                {
+                    magazine.m_conveyor.RunSwitch(nBlink); 
+                }
+                nBlink = (nBlink + 1) % 8;
+            }
+        }
+
+        #endregion
+
+        public MagazineEVSet()
+        {
+            initThread(); 
+        }
+
+        public void ThreadStop()
+        {
+            if (m_bThread)
+            {
+                m_bThread = false;
+                m_thread.Join(); 
+            }
+        }
     }
 }

@@ -252,6 +252,7 @@ namespace Root_Pine2.Engineer
 
         public void ThreadStop()
         {
+            m_magazineEV.ThreadStop(); 
             if (m_bThread)
             {
                 m_bThread = false;
