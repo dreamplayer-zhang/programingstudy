@@ -464,6 +464,7 @@ namespace Root_Pine2.Module
         {
             if (m_elevator.IsProduct(InfoStrip.eMagazinePos.Up)) return "Magazine Up Sensor Checked";
             if (m_elevator.IsProduct(InfoStrip.eMagazinePos.Down)) return "Magazine Down Sensor Checked";
+            p_sLED = "LOAD";
             return StartRun(m_runLoad);
         }
 
@@ -523,6 +524,7 @@ namespace Root_Pine2.Module
         #region Unload
         public string StartUnload()
         {
+            p_sLED = "UNLD"; 
             return StartRun(m_runUnload);
         }
 
@@ -572,6 +574,7 @@ namespace Root_Pine2.Module
         public string RunMoveTransfer(InfoStrip infoStrip)
         {
             if (infoStrip == null) return "InfoStrip not Found";
+            p_sLED = infoStrip.m_sLED; 
             return m_elevator.MoveToTransfer(infoStrip);
         }
         #endregion
