@@ -58,8 +58,15 @@ namespace Root_WindII
             }
         }
 
-
-
+        private bool isEnableMeasurement = false;
+        public bool IsEnabledMeasurement
+        {
+            get => this.isEnableMeasurement;
+            set
+            {
+                SetProperty<bool>(ref this.isEnableMeasurement, value);
+            }
+        }
         #endregion
 
         #region [Views]
@@ -74,6 +81,7 @@ namespace Root_WindII
         public readonly FrontsideMask frontsideMask = new FrontsideMask();
         public readonly FrontsideSpec frontsideSpec = new FrontsideSpec();
         public readonly FrontsideInspect frontsideInspect = new FrontsideInspect();
+        public readonly FrontsideMeasurement frontsideMeasurement = new FrontsideMeasurement();
 
         // BACK
         public readonly BacksideSetup backsideSetup = new BacksideSetup();
@@ -142,6 +150,12 @@ namespace Root_WindII
         public FrontsideInspect_ViewModel FrontsideInspectVM
         {
             get => frontsideInspectVM;
+        }
+
+        private FrontsideMeasurement_ViewModel frontsideMeasurementVM = new FrontsideMeasurement_ViewModel();
+        public FrontsideMeasurement_ViewModel FrontsideMeasurementVM
+        {
+            get => frontsideMeasurementVM;
         }
         #endregion
 
@@ -245,6 +259,15 @@ namespace Root_WindII
             else
             {
                 this.IsEnabledSpec = true;
+            }
+
+            if (originRecipe.OriginWidth == 0 || originRecipe.OriginHeight == 0)
+            {
+                this.IsEnabledMeasurement = false;
+            }
+            else
+            {
+                this.IsEnabledMeasurement = true;
             }
         }
 
@@ -422,6 +445,18 @@ namespace Root_WindII
                 {
                     SetPage(frontsideInspect);
                     frontsideInspect.DataContext = frontsideInspectVM;
+                });
+            }
+        }
+
+        public ICommand btnFrontMeasurement
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    SetPage(frontsideMeasurement);
+                    frontsideMeasurement.DataContext = frontsideMeasurementVM;
                 });
             }
         }

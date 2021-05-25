@@ -438,14 +438,17 @@ namespace Root_CAMELLIA.Module
             m_mwvm.p_ContourMapGraph.InitializeContourMap();
             m_mwvm.p_ContourMapGraph.DrawAllDatas();
             //  DCOL 세이브 필요
-            LibSR_Met.DataManager MetData = LibSR_Met.DataManager.GetInstance();
-            foreach (LibSR_Met.ContourMapData mapdata in MetData.m_ContourMapDataR)
-                LibSR_Met.DataManager.GetInstance().SaveContourMapData(m_slotContourMapPath + "\\R_" + mapdata.Wavelength.ToString() + "_" + DateTime.Now.ToString("HHmmss") + "_ContourMapData.csv", mapdata);
+            if(m_module.p_infoWafer != null)
+            {
+                LibSR_Met.DataManager MetData = LibSR_Met.DataManager.GetInstance();
+                foreach (LibSR_Met.ContourMapData mapdata in MetData.m_ContourMapDataR)
+                    LibSR_Met.DataManager.GetInstance().SaveContourMapData(m_slotContourMapPath + "\\R_" + mapdata.Wavelength.ToString() + "_" + DateTime.Now.ToString("HHmmss") + "_ContourMapData.csv", mapdata);
 
-            foreach (LibSR_Met.ContourMapData mapdata in MetData.m_ContourMapDataT)
-                LibSR_Met.DataManager.GetInstance().SaveContourMapData(m_slotContourMapPath + "\\T_" + mapdata.Wavelength.ToString() + "_" + DateTime.Now.ToString("HHmmss") + "_ContourMapData.csv", mapdata);
-            //LibSR_Met.DataManager.GetInstance().AllContourMapDataFitting(m_DataManager.recipeDM.MeasurementRD.WaveLengthReflectance, m_DataManager.recipeDM.MeasurementRD.WaveLengthTransmittance);
-            LibSR_Met.DataManager.GetInstance().SaveResultFileSummary(m_summaryPath + "\\" + DateTime.Now.ToString("HHmmss") + "Summary.csv", m_module.p_infoWafer.p_sLotID, m_module.p_infoWafer.p_sSlotID, m_DataManager.recipeDM.MeasurementRD.DataSelectedPoint.Count) ;
+                foreach (LibSR_Met.ContourMapData mapdata in MetData.m_ContourMapDataT)
+                    LibSR_Met.DataManager.GetInstance().SaveContourMapData(m_slotContourMapPath + "\\T_" + mapdata.Wavelength.ToString() + "_" + DateTime.Now.ToString("HHmmss") + "_ContourMapData.csv", mapdata);
+                //LibSR_Met.DataManager.GetInstance().AllContourMapDataFitting(m_DataManager.recipeDM.MeasurementRD.WaveLengthReflectance, m_DataManager.recipeDM.MeasurementRD.WaveLengthTransmittance);
+                LibSR_Met.DataManager.GetInstance().SaveResultFileSummary(m_summaryPath + "\\" + DateTime.Now.ToString("HHmmss") + "Summary.csv", m_module.p_infoWafer.p_sLotID, m_module.p_infoWafer.p_sSlotID, m_DataManager.recipeDM.MeasurementRD.DataSelectedPoint.Count) ;
+            }
 
             return "OK";
         }

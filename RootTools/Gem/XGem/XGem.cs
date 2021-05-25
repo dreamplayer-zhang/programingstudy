@@ -1021,7 +1021,7 @@ namespace RootTools.Gem.XGem
         }
 
         void SendCJReqSelect(GemCJ cj)
-        {
+        {            
             LogSend(m_xGem.CJReqSelect(cj.m_sCJobID), "CJReqSelect", cj.m_sCJobID); 
         }
         
@@ -1148,9 +1148,10 @@ namespace RootTools.Gem.XGem
         string m_sPathConfig = "C:\\Init\\GEM300.cfg";
         void XGemConfigFile()
         {
+            long nError;
             try
             {
-                long nError = m_xGem.Initialize(m_sPathConfig);
+                nError = m_xGem.Initialize(m_sPathConfig);
                 LogSend(nError, "Initialize", m_sPathConfig);
                 if (nError == 0) m_bStart = true;
             }

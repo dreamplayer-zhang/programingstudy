@@ -1,7 +1,9 @@
 ﻿using RootTools;
+using RootTools.Database;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -22,7 +24,17 @@ namespace RootTools_Vision.WorkManager3
 
         private WorkPipeLine pipeLine;
 
+        private int threadNum;
+
         private ConcurrentQueue<Workplace> currentWorkplaceQueue;
+        #endregion
+
+
+        #region [Properties]
+        public SharedBufferInfo SharedBuffer
+        {
+            get => this.sharedBuffer;
+        }
         #endregion
 
         #region [Event]
@@ -90,6 +102,7 @@ namespace RootTools_Vision.WorkManager3
         {
             pipeLine = new WorkPipeLine(1);
 
+            this.threadNum = 1;
             WorkEventManager.PositionDone += PositionDone_Callback;
 
             WorkEventManager.InspectionStart += InspectionStart_Callback;
@@ -108,6 +121,8 @@ namespace RootTools_Vision.WorkManager3
         public WorkManager(int inspectionThreadNum)
         {
             pipeLine = new WorkPipeLine(inspectionThreadNum);
+
+            this.threadNum = inspectionThreadNum;
 
             WorkEventManager.PositionDone += PositionDone_Callback;
 
@@ -159,7 +174,7 @@ namespace RootTools_Vision.WorkManager3
             return true;
         }
 
-        public void Start(bool inspOnly = true)
+        public void Start(bool inspOnly = true, Lotinfo lotInfo = null)
         {
             if(this.sharedBuffer.PtrR_GRAY == IntPtr.Zero)
             {
@@ -182,6 +197,16 @@ namespace RootTools_Vision.WorkManager3
             this.currentWorkplaceQueue = 
                 RecipeToWorkplaceConverter.ConvertToQueue(this.recipe, this.sharedBuffer, this.cameraInfo);
 
+            if(pipeLine.Stop() == false)
+            {
+                this.pipeLine = new WorkPipeLine(this.threadNum);
+            }
+
+            if(lotInfo == null)
+                DatabaseManager.Instance.SetLotinfo(DateTime.Now, DateTime.Now, Path.GetFileName(this.recipe.RecipePath));
+            else
+                DatabaseManager.Instance.SetLotinfo(lotInfo);
+
             pipeLine.Start(
                 this.currentWorkplaceQueue,
                 works
@@ -199,13 +224,6 @@ namespace RootTools_Vision.WorkManager3
 
 
                 wp.CheckSnapDone_Line(new CRect(0, 0, (int)snapArea.Right, (int)snapArea.Bottom));
-
-                //Rect checkArea = new Rect(new Point(wp.PositionX, wp.PositionY + wp.Width), new Point(wp.PositionX + wp.Width, wp.PositionY));
-
-                //if (snapArea.Contains(checkArea) == true)
-                //{
-                //    wp.WorkState = WORK_TYPE.SNAP;
-                //}
             }
         }
 
@@ -222,7 +240,7 @@ namespace RootTools_Vision.WorkManager3
         public bool WaitWorkDone(ref bool isCanceled, int timeoutSecond = 60)
         {
             int sec = 0;
-            while(pipeLine.CheckPipeDone() == false && sec < timeoutSecond && isCanceled == false)
+            while (pipeLine.CheckPipeDone() == false && sec < timeoutSecond && isCanceled == false)
             {
                 Thread.Sleep(1000);
                 sec++;

@@ -13,6 +13,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using RootTools.Database;
 
 namespace Root_WindII
 {
@@ -221,6 +222,8 @@ namespace Root_WindII
             GlobalObjects.Instance.Get<WindII_Engineer>().ThreadStop();
         }
 
+        public IDialogService dialogService;
+
         private void Init()
         {
             CreateGlobalPaths();
@@ -241,7 +244,10 @@ namespace Root_WindII
             //UIManager.Instance.MainPanel = this.MainPanel;
             //UIManager.Instance.ChangeUIMode();
 
-            //SettingItem_Database frontSettings = GlobalObjects.Instance.Get<Settings>().GetItem<SettingItem_Database>();
+            SettingItem_Database frontSettings = GlobalObjects.Instance.Get<Settings>().GetItem<SettingItem_Database>();
+            DatabaseManager.Instance.SetDatabase(1, frontSettings.SerevrName, frontSettings.DBName, frontSettings.DBUserID, frontSettings.DBPassword);
+            DatabaseManager.Instance.ValidateDatabase();
+
             //logView.Init(LogView._logView);
             //WarningUI.Init(GlobalObjects.Instance.Get<WIND2_Warning>());
             //InitTimer();

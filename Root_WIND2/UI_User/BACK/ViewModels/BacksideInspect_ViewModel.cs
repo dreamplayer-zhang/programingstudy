@@ -165,6 +165,12 @@ namespace Root_WIND2.UI_User
                     workManager.IntegratedProcessDefectDone += ProcessDefectWaferDone_Callback;
                     workManager.WorkplaceStateChanged += WorkplaceStateChanged_Callback;
                 }
+
+                if(this.ImageViewerVM != null)
+                {
+                    this.ImageViewerVM.ReadCenterPoint();
+                    this.ImageViewerVM.ReadExclusivePolygon();
+                }
             });
         }
         public RelayCommand UnloadedCommand
@@ -297,6 +303,19 @@ namespace Root_WIND2.UI_User
 
         private void ProcessDefectWaferDone_Callback(object obj, IntegratedProcessDefectDoneEventArgs args)
         {
+            Workplace workplace = obj as Workplace;
+            List<String> textList = new List<String>();
+            List<CRect> rectList = new List<CRect>();
+
+
+            foreach (RootTools.Database.Defect defectInfo in workplace.DefectList)
+            {
+                String text = "";
+
+                rectList.Add(new CRect((int)defectInfo.p_rtDefectBox.Left, (int)defectInfo.p_rtDefectBox.Top, (int)defectInfo.p_rtDefectBox.Right, (int)defectInfo.p_rtDefectBox.Bottom));
+                textList.Add(text);
+            }
+
             Application.Current.Dispatcher.Invoke(DispatcherPriority.Normal, new Action(delegate
             {
                 DatabaseManager.Instance.SelectData();

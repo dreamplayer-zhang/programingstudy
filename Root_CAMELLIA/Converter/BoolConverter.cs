@@ -70,6 +70,12 @@ namespace Root_CAMELLIA
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
+            bool val = (bool)value;
+            if (val)
+            {
+                return Brushes.Red;
+            }
+
             return Brushes.Transparent;
             //throw new NotImplementedException();
         }

@@ -364,11 +364,33 @@ namespace Root_WIND2.UI_User
 
         private void ProcessDefectWaferDone_Callback(object obj, IntegratedProcessDefectDoneEventArgs args)
         {
+            Workplace workplace = obj as Workplace;
+
+            if (workplace == null || workplace.DefectList == null) return;
+            List<String> textList = new List<String>();
+            List<CRect> rectList = new List<CRect>();
+
+            foreach (RootTools.Database.Defect defectInfo in workplace.DefectList)
+            {
+                String text = "";
+
+                rectList.Add(new CRect((int)defectInfo.p_rtDefectBox.Left, (int)defectInfo.p_rtDefectBox.Top, (int)defectInfo.p_rtDefectBox.Right, (int)defectInfo.p_rtDefectBox.Bottom));
+                textList.Add(text);
+            }
+
             Application.Current.Dispatcher.Invoke(DispatcherPriority.Normal, new Action(delegate
             {
-                DatabaseManager.Instance.SelectData();
-                m_DataViewer_VM.pDataTable = DatabaseManager.Instance.pDefectTable;
+                DrawRectDefect(rectList, textList);
             }));
+
+            Application.Current.Dispatcher.Invoke(DispatcherPriority.Normal, new Action(delegate
+            {
+                m_DataViewer_VM.pDataTable = DatabaseManager.Instance.SelectCurrentInspectionDefect();
+
+              
+            }));
+
+            //List<Defect> defects = Tools.DataTableToDefectList(m_DataViewer_VM.pDataTable);
         }
 
         private void ProcessDefectDone_Callback(object obj, ProcessDefectDoneEventArgs args)

@@ -1,37 +1,75 @@
-﻿using RootTools.Control;
+﻿using Root_Pine2_Vision.Module;
+using RootTools;
+using RootTools.Control;
 using RootTools.Module;
 using RootTools.ToolBoxs;
 using RootTools.Trees;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.ComponentModel;
+using System.Threading;
 
 namespace Root_Pine2.Module
 {
-    public class Boats : ModuleBase //forget
+    public class Boats : ModuleBase
     {
         #region ToolBox
         public override void GetTools(bool bInit)
         {
             m_toolBox.GetAxis(ref m_axisCam, this, "Camera"); 
-            m_aBoat[0].GetTools(m_toolBox, this, bInit);
-            m_aBoat[1].GetTools(m_toolBox, this, bInit);
+            m_aBoat[Vision.eWorks.A].GetTools(m_toolBox, this, bInit);
+            m_aBoat[Vision.eWorks.B].GetTools(m_toolBox, this, bInit);
         }
         #endregion
 
         #region Cam Axis
         AxisXY m_axisCam; 
+        //forget
         #endregion
 
         #region Boat
-        public class Boat
+        public class Boat : NotifyProperty
         {
+            #region Step
+            public enum eStep
+            {
+                Init,
+                Ready,
+                Run,
+                Done,
+                RunReady,
+            }
+            eStep _eStep = eStep.Init; 
+            public eStep p_eStep 
+            { 
+                get { return _eStep; }
+                set
+                {
+                    if (_eStep == value) return;
+                    _eStep = value;
+                    OnPropertyChanged();
+                    if (value == eStep.RunReady) m_bgwRunReady.RunWorkerAsync();
+                }
+            }
+
+            BackgroundWorker m_bgwRunReady = new BackgroundWorker(); 
+            void InitBackgroundWorker()
+            {
+                p_ePosReady = ePos.Ready; 
+                m_bgwRunReady.DoWork += M_bgwRunReady_DoWork;
+            }
+
+            private void M_bgwRunReady_DoWork(object sender, DoWorkEventArgs e)
+            {
+                m_axis.StartMove(p_ePosReady);
+                p_eStep = (m_axis.WaitReady() == "OK") ? eStep.Ready : eStep.Init; 
+            }
+            #endregion
+
             Axis m_axis; 
             DIO_O m_doVacuumPump; 
-            DIO_Os m_doVacuum;
-            DIO_O m_doBlow;
+            public DIO_Os m_doVacuum;
+            public DIO_O m_doBlow;
             DIO_I2O m_dioRollerDown;
             DIO_O m_doRollerPusher;
             DIO_O m_doCleanerBlow;
@@ -52,14 +90,16 @@ namespace Root_Pine2.Module
             #region Axis
             public enum ePos
             {
-                LoadPicker,
-                VisionPicker,
+                Ready,
+                Done,
             }
             void InitPosition()
             {
                 m_axis.AddPos(Enum.GetNames(typeof(ePos)));
                 m_axis.AddSpeed("Grab"); 
             }
+
+            public ePos p_ePosReady { get; set; }
 
             public string RunMove(ePos ePos, bool bWait = true)
             {
@@ -90,7 +130,12 @@ namespace Root_Pine2.Module
 
             public void RunVacuum(bool bOn)
             {
-                //forget
+                m_doVacuumPump.Write(bOn);
+            }
+
+            public void RunBlow(bool bBlow)
+            {
+                m_doBlow.Write(bBlow);
             }
             #endregion
 
@@ -111,15 +156,87 @@ namespace Root_Pine2.Module
             }
             #endregion
 
-            public string p_id { get; set; }
-            public Boat(string id)
+            public void Reset(eState eState)
             {
-                p_id = id; 
+                p_infoStrip = null;
+                if (eState == eState.Ready) p_eStep = eStep.RunReady; 
+            }
+
+            public InfoStrip p_infoStrip { get; set; }
+            public string p_id { get; set; }
+            Boats m_boats;
+            Vision.VisionWorks m_visionWorks; 
+            public Boat(string id, Boats boats, Vision.VisionWorks visionWorks)
+            {
+                InitBackgroundWorker(); 
+                p_id = id + visionWorks.m_eVisionWorks.ToString();
+                m_boats = boats;
+                m_visionWorks = visionWorks; 
             }
         }
-        Boat[] m_aBoat = new Boat[2] { new Boat("BoatA"), new Boat("BoatB") };
+        public Dictionary<Vision.eWorks, Boat> m_aBoat = new Dictionary<Vision.eWorks, Boat>(); 
+        void InitBoat()
+        {
+            m_aBoat.Add(Vision.eWorks.A, new Boat(p_id, this, m_vision.m_aVisionWorks[Vision.eWorks.A]));
+            m_aBoat.Add(Vision.eWorks.B, new Boat(p_id, this, m_vision.m_aVisionWorks[Vision.eWorks.B]));
+        }
         #endregion
 
+        #region State Home
+        public override string StateHome()
+        {
+            if (EQ.p_bSimulate)
+            {
+                p_eState = eState.Ready;
+                return "OK";
+            }
+            p_sInfo = base.StateHome();
+            if (p_sInfo == "OK")
+            {
+                p_eState = eState.Ready;
+                m_aBoat[Vision.eWorks.A].p_eStep = Boat.eStep.RunReady;
+                m_aBoat[Vision.eWorks.B].p_eStep = Boat.eStep.RunReady;
+            }
+            else
+            {
+                p_eState = eState.Error;
+                m_aBoat[Vision.eWorks.A].p_eStep = Boat.eStep.Init;
+                m_aBoat[Vision.eWorks.B].p_eStep = Boat.eStep.Init;
+            }
+            return p_sInfo;
+        }
 
+        public override void Reset()
+        {
+            m_aBoat[Vision.eWorks.A].Reset(p_eState);
+            m_aBoat[Vision.eWorks.B].Reset(p_eState); 
+            base.Reset();
+        }
+        #endregion
+
+        #region Tree
+        public override void RunTree(Tree tree)
+        {
+            base.RunTree(tree);
+        }
+        #endregion
+
+        Vision.eVision m_eVision = Vision.eVision.Top3D; 
+        Pine2 m_pine2;
+        Vision m_vision; 
+        public Boats(Vision vision, IEngineer engineer, Pine2 pine2)
+        {
+            m_vision = vision;
+            m_eVision = vision.m_eVision; 
+            p_id = "Boats " + m_eVision.ToString();
+            m_pine2 = pine2;
+            InitBoat(); 
+            InitBase(p_id, engineer); 
+        }
+
+        public override void ThreadStop()
+        {
+            base.ThreadStop();
+        }
     }
 }

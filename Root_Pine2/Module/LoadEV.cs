@@ -14,8 +14,6 @@ namespace Root_Pine2.Module
         DIO_I m_diCheck;
         DIO_I m_diBlowAlarm;
         DIO_I m_diPaper;
-        DIO_I m_diPaperCheck;
-        DIO_I m_diPaperFull;
         DIO_O m_doBlow;
         DIO_O m_doIonBlow;
         DIO_O m_doAlignBlow;
@@ -27,8 +25,6 @@ namespace Root_Pine2.Module
             p_sInfo = m_toolBox.GetDIO(ref m_diCheck, this, "Check");
             p_sInfo = m_toolBox.GetDIO(ref m_diBlowAlarm, this, "BlowAlarm");
             p_sInfo = m_toolBox.GetDIO(ref m_diPaper, this, "Paper");
-            p_sInfo = m_toolBox.GetDIO(ref m_diPaperCheck, this, "PaperCheck");
-            p_sInfo = m_toolBox.GetDIO(ref m_diPaperFull, this, "PaperFull");
             p_sInfo = m_toolBox.GetDIO(ref m_doBlow, this, "Blow");
             p_sInfo = m_toolBox.GetDIO(ref m_doIonBlow, this, "IonBlow");
             p_sInfo = m_toolBox.GetDIO(ref m_doAlignBlow, this, "AlignBlow");
@@ -134,6 +130,7 @@ namespace Root_Pine2.Module
 
         public InfoStrip GetNewInfoStrip()
         {
+            if (p_bPaper) return new InfoStrip(true);
             InfoStrip infoStrip = new InfoStrip(p_iStrip);
             p_iStrip++;
             return infoStrip;

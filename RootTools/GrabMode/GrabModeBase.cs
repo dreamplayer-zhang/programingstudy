@@ -101,7 +101,7 @@ namespace RootTools
             m_camera.Grabed += m_camera_Grabed;
         }
 
-        void m_camera_Grabed(object sender, System.EventArgs e)
+        protected void m_camera_Grabed(object sender, System.EventArgs e)
         {
             if (Grabed != null)
                 Grabed.Invoke(sender, e);

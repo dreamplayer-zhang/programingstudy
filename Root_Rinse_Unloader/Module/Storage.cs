@@ -1,4 +1,5 @@
-﻿using RootTools;
+﻿using Root_Rinse_Unloader.Engineer;
+using RootTools;
 using RootTools.Control;
 using RootTools.GAFs;
 using RootTools.Module;
@@ -176,7 +177,21 @@ namespace Root_Rinse_Unloader.Module
         #endregion
 
         #region Elevator
-        Axis m_axis;
+        Loader p_loader
+        {
+            get
+            {
+                RinseU_Handler handler = (RinseU_Handler)m_engineer.ClassHandler();
+                return (handler == null) ? null : handler.m_loader;
+            }
+        }
+        bool IsLoaderDanger()
+        {
+            if (p_loader == null) return true;
+            return p_loader.IsLoaderDanger();
+        }
+
+        public Axis m_axis;
         void InitPosElevator()
         {
             m_axis.AddPos(Enum.GetNames(typeof(eMagazine)));
@@ -188,6 +203,7 @@ namespace Root_Rinse_Unloader.Module
         {
             if ((iIndex < 0) || (iIndex >= 20)) return "Invalid Index";
             if (IsMagazineProtrusion()) return "Check Storage : Strip Protrusion";
+            if (IsLoaderDanger()) return "Check Loader Position";
             m_axis.StartMove(eMagazine, -iIndex * m_dZ);
             if (bWait) return m_axis.WaitReady();
             return "OK"; 
@@ -197,6 +213,11 @@ namespace Root_Rinse_Unloader.Module
         {
             m_axis.StartMove("Stack");
             return m_axis.WaitReady();
+        }
+
+        public bool IsHighPos()
+        {
+            return m_axis.p_posCommand > (m_axis.GetPosValue("Stack") + 1000);
         }
 
         double m_fJogScale = 1;
@@ -218,6 +239,20 @@ namespace Root_Rinse_Unloader.Module
             Thread.Sleep(500);
             return "OK";
             */
+        }
+
+        public void RunLoadUp()
+        {
+            MoveMagazine(eMagazine.Magazine3, 10, true);
+            m_aMagazine[0].RunClamp(false);
+            m_aMagazine[1].RunClamp(false);
+        }
+
+        public void RunLoadDown()
+        {
+            MoveMagazine(eMagazine.Magazine1, 0, true);
+            m_aMagazine[2].RunClamp(false);
+            m_aMagazine[3].RunClamp(false);
         }
 
         void RunTreeElevator(Tree tree)
@@ -350,7 +385,8 @@ namespace Root_Rinse_Unloader.Module
             {
                 case eMagazine.Magazine1:
                     m_alidMagazineFull.p_bSet = true; 
-                    m_rinse.RunBuzzer(RinseU.eBuzzer.Finish); 
+                    m_rinse.RunBuzzer(RinseU.eBuzzer.Finish);
+                    EQ.p_eState = EQ.eState.Ready; 
                     return "Magazine Full";
                 case eMagazine.Magazine2: m_rinse.p_eMagazine = eMagazine.Magazine1; break;
                 case eMagazine.Magazine3: m_rinse.p_eMagazine = eMagazine.Magazine2; break;

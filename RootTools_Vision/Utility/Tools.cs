@@ -3,6 +3,7 @@ using RootTools.Database;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Data;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
@@ -93,7 +94,7 @@ namespace RootTools_Vision
             }
         }
               
-        public static Bitmap CovertBufferToBitmap(SharedBufferInfo info, Rect rect)
+        public unsafe static Bitmap CovertBufferToBitmap(SharedBufferInfo info, Rect rect)
         {
             try
             {
@@ -135,11 +136,22 @@ namespace RootTools_Vision
                 IntPtr pointer = bmpData.Scan0;
                 if (_byteCount == 1)
                 {
-                   
-                    for (int i = 0; i < _height; i++)
+                    int h = (int)rect.Height;
+
+                    byte* ptr = (byte*)pointer.ToPointer();
+
+                    for (int i = 0; i < h; i++)
                     {
-                        CopyMemory(info.PtrR_GRAY + i * _width, pointer + i * bmpData.Stride, (uint)_width);
+                        //Marshal.Copy(info.PtrR_GRAY + (int)((i + rect.Top) * info.Width + rect.Left), ptr, (int)(i * _width),(int)rect.Width );                        
+                        CopyMemory(pointer + (i * bmpData.Stride), info.PtrR_GRAY + +(int)((i + rect.Top) * info.Width + rect.Left), (uint)rect.Width);
                     }
+
+                    
+                    //for (int i = 0; i < _height; i++)
+                    //{
+                    //    Buffer.MemoryCopy(info.PtrList[0].ToPointer()[i * _width], pointer.ToPointer()[i * bmpData.Stride], bmpData.Stride, bmpData.Stride);
+                    //    //CopyMemory(info.PtrR_GRAY + i * _width, pointer + i * bmpData.Stride, (uint)_width);
+                    //}
                 }
                 else if (_byteCount == 3)
                 {
@@ -725,6 +737,24 @@ namespace RootTools_Vision
             Bitmap dest = new Bitmap(source);
             dest.RotateFlip(RotateFlipType.RotateNoneFlipY);
             return dest;
+        }
+
+        public static List<Defect> DataTableToDefectList(DataTable table)
+        {
+            List<Defect> defects = new List<Defect>();
+            FieldInfo[] fields = typeof(Defect).GetFields();
+            
+            foreach(DataRow row in table.Rows)
+            {
+                Defect defect = new Defect();
+                foreach (FieldInfo info in fields)
+                {
+                    info.SetValue(defect, Convert.ChangeType(row[info.Name], info.FieldType));
+                }
+                defects.Add(defect);
+            }
+
+            return defects;
         }
     }
 }

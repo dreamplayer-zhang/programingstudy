@@ -1,4 +1,5 @@
-﻿using RootTools;
+﻿using Root_Rinse_Loader.Engineer;
+using RootTools;
 using RootTools.Control;
 using RootTools.GAFs;
 using RootTools.Module;
@@ -230,19 +231,38 @@ namespace Root_Rinse_Loader.Module
         #endregion
 
         #region Elevator
+        Loader p_loader
+        {
+            get
+            {
+                RinseL_Handler handler = (RinseL_Handler)m_engineer.ClassHandler();
+                return (handler == null) ? null : handler.m_loader;
+            }
+        }
+        bool IsLoaderDanger()
+        {
+            return false; 
+            //if (p_loader == null) return true;
+            //return p_loader.IsLoaderDanger(); 
+        }
+
         Axis m_axis;
         void InitPosElevator()
         {
             m_axis.AddPos(Enum.GetNames(typeof(eMagazine)));
             m_axis.AddPos("Stack");
             m_axis.AddPos("Stack_Down");
+            m_axis.AddPos("StackTop");
         }
+
+        double p_posStackTop {  get { return m_axis.GetPosValue("StackTop"); } }
 
         int m_dZ = 6000;
         public string MoveMagazine(eMagazine eMagazine, int iIndex, bool bWait)
         {
             if ((iIndex < 0) || (iIndex >= 20)) return "Invalid Index";
-            if (IsMagazineProtrusion()) return "Check Storage : Strip Protrusion"; 
+            if (IsMagazineProtrusion()) return "Check Storage : Strip Protrusion";
+            if (IsLoaderDanger()) return "Check Loader Position"; 
             m_axis.StartMove(eMagazine, -iIndex * m_dZ);
             if (bWait) return m_axis.WaitReady();
             return "OK";
@@ -261,10 +281,11 @@ namespace Root_Rinse_Loader.Module
         }
 
         double m_pulseDown = 10000; 
-        double m_posStackReady = -100000; 
+        double m_posStackReady = -100000;
         double m_fJogScale = 1; 
         public string MoveStackReady()
         {
+            if (IsLoaderDanger()) return "Check Loader Position";
             if (m_axis.p_posCommand > m_posStackReady - m_pulseDown) MoveStack();
             if (m_stack.p_bLevel)
             {
@@ -274,12 +295,17 @@ namespace Root_Rinse_Loader.Module
                 Thread.Sleep(500);
             }
             m_axis.Jog(m_fJogScale);
-            while (!m_stack.p_bLevel && (EQ.IsStop() == false)) Thread.Sleep(10);
+            while (!m_stack.p_bLevel && (EQ.IsStop() == false) && (m_axis.p_posCommand < p_posStackTop)) Thread.Sleep(10);
             m_posStackReady = m_axis.p_posCommand;
             m_axis.StopAxis();
             m_axis.WaitReady();
             Thread.Sleep(500);
             return "OK";
+        }
+
+        public bool IsHighPos()
+        {
+            return m_axis.p_posCommand > (p_posStackTop + 1000); 
         }
 
         public void StartStackDown()
@@ -292,11 +318,25 @@ namespace Root_Rinse_Loader.Module
             get { return Math.Abs(m_posStackReady - m_axis.p_posCommand) < 10; }
         }
 
+        public void RunLoadUp()
+        {
+            MoveMagazine(eMagazine.Magazine3, 10, true);
+            m_aMagazine[0].RunClamp(false);
+            m_aMagazine[1].RunClamp(false); 
+        }
+
+        public void RunLoadDown()
+        {
+            MoveMagazine(eMagazine.Magazine1, 0, true);
+            m_aMagazine[2].RunClamp(false);
+            m_aMagazine[3].RunClamp(false);
+        }
+
         void RunTreeElevator(Tree tree)
         {
             m_dZ = tree.Set(m_dZ, m_dZ, "dZ", "Magazine Slot Pitch (pulse)");
             m_fJogScale = tree.Set(m_fJogScale, m_fJogScale, "Jog Scale", "Jog Move Scale (0 ~ 1)");
-            m_pulseDown = tree.Set(m_pulseDown, m_pulseDown, "Stack Down", "Stack Down (pulse)"); 
+            m_pulseDown = tree.Set(m_pulseDown, m_pulseDown, "Stack Down", "Stack Down (pulse)");
         }
         #endregion
 

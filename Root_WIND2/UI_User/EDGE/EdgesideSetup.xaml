@@ -40,8 +40,6 @@
                     <CheckBox Content="G" IsChecked="{Binding IsGChecked, Mode=TwoWay}" Command="{Binding btnChannelCommand}" Style="{StaticResource imageViewer_toolbar_checkbox}"/>
                     <CheckBox Content="B" IsChecked="{Binding IsBChecked, Mode=TwoWay}" Command="{Binding btnChannelCommand}" Style="{StaticResource imageViewer_toolbar_checkbox}"/>
 
-                    <TextBlock Text="Tool" Margin="12,0,4,0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                    <CheckBox Content="Orgin" IsChecked="{Binding IsOriginChecked, Mode=TwoWay}" Command="{Binding btnOriginCommand}" Style="{StaticResource imageViewer_toolbar_checkbox}"/>
                 </StackPanel>
 
                 <Grid Grid.Row="1">

@@ -63,6 +63,66 @@ namespace RootTools_Vision
         }
         private double wholeWaferImageCompressionRate = 1;
 
+        [Category("Klarf")]
+        [DisplayName("Whole Wafer Image Start X")]
+        public int WholeWaferImageStartX
+        {
+            get
+            {
+                return wholeWaferImageStartX;
+            }
+            set
+            {
+                wholeWaferImageStartX = value;
+            }
+        }
+        private int wholeWaferImageStartX = 0;
+
+        [Category("Klarf")]
+        [DisplayName("Whole Wafer Image Start Y")]
+        public int WholeWaferImageStartY
+        {
+            get
+            {
+                return wholeWaferImageStartY;
+            }
+            set
+            {
+                wholeWaferImageStartY = value;
+            }
+        }
+        private int wholeWaferImageStartY = 0;
+
+        [Category("Klarf")]
+        [DisplayName("Whole Wafer Image End X")]
+        public int WholeWaferImageEndX
+        {
+            get
+            {
+                return wholeWaferImageEndX;
+            }
+            set
+            {
+                wholeWaferImageEndX = value;
+            }
+        }
+        private int wholeWaferImageEndX = 1000;
+
+        [Category("Klarf")]
+        [DisplayName("Whole Wafer Image End Y")]
+        public int WholeWaferImageEndY
+        {
+            get
+            {
+                return wholeWaferImageEndY;
+            }
+            set
+            {
+                wholeWaferImageEndY = value;
+            }
+        }
+        private int wholeWaferImageEndY = 1000;
+
         [Category("Common")]
         [DisplayName("Defect Image Path")]
         public string DefectImagePath

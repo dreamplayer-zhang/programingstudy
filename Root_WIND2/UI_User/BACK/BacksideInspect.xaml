@@ -76,7 +76,23 @@
             <GroupBox Header="Image Viewer" 
                   Margin="4"
                   Style="{StaticResource main_view_groupbox}">
-                <tools:RootViewer DataContext="{Binding ImageViewerVM}"/>
+                <Grid DataContext="{Binding ImageViewerVM}">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="40"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <StackPanel Grid.Column="1"  Orientation="Horizontal">
+                        <TextBlock Text="Image" Margin="12,0,4,0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                        <Button Content="Open" Command="{Binding btnOpenCommand}" Style="{StaticResource imageViewer_toolbar_button}"/>
+                        <Button Content="Save" Command="{Binding btnSaveCommand}" Style="{StaticResource imageViewer_toolbar_button}"/>
+                        <Button Content="Clear" Command="{Binding btnClearCommand}" Style="{StaticResource imageViewer_toolbar_button}"/>
+                        <Button IsEnabled="False" Content="RGB" Style="{StaticResource imageViewer_toolbar_button}"/>
+                    </StackPanel>
+                    <Grid Grid.Row="1">
+                        <tools:RootViewer />
+                    </Grid>
+                </Grid>
             </GroupBox>
             <Grid Grid.Column="1">
                 <Grid.RowDefinitions>

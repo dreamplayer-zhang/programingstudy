@@ -252,7 +252,7 @@
                                                    HorizontalAlignment="Center"/>
                                         </Border>
                                     </GroupBox>
-                                    <CheckBox Grid.Column="2" x:Name="checkBoxEQStop" Content="EQ.Stop" IsChecked="{Binding p_bStop}" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                    <CheckBox Grid.Column="2" x:Name="checkBoxEQStop" Content="EQ.Stop" IsChecked="{Binding p_bStop}" FontSize="24" VerticalAlignment="Center" HorizontalAlignment="Center"/>
                                 </Grid>
                                 <Grid Grid.Row="2" Grid.Column="1">
                                     <Grid.ColumnDefinitions>
@@ -303,7 +303,7 @@
                                                    FontFamily="Arial" />
                                         </Grid>
                                     </GroupBox>
-                                    <GroupBox Header="롤러 속도"
+                                    <GroupBox Header="롤러 속도" Visibility="Hidden"
                                           Grid.Column="2"
                                           Style="{StaticResource group}"
                                           BorderThickness="0"

@@ -30,6 +30,7 @@ namespace Root_CAMELLIA
         }
         public string Recovery()
         {
+            
             return "OK";
         }
         public IGem ClassGem()

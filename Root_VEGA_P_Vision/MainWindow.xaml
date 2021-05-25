@@ -113,16 +113,16 @@
                                                HorizontalAlignment="Center"/>
                                 </Grid>
                             </MenuItem.Header>
-                            <MenuItem Header="New">
+                            <MenuItem Header="New" Command="{Binding MenuFileNew}">
 
                             </MenuItem>
-                            <MenuItem Header="Load">
+                            <MenuItem Header="Load" Command="{Binding MenuFileLoad}">
 
                             </MenuItem>
-                            <MenuItem Header="Save">
+                            <MenuItem Header="Save" Command="{Binding MenuFileSave}">
 
                             </MenuItem>
-                            <MenuItem Header="Save As">
+                            <MenuItem Header="Save As" Command="{Binding MenuFileSaveAs}">
 
                             </MenuItem>
                         </MenuItem>
@@ -205,7 +205,7 @@
                                     <MenuItem Header="Recipe Summary"/>
                                     <MenuItem Header="Recipe Spec"/>
                                 </MenuItem>
-                                <MenuItem Header="Matienance"/>
+                                <MenuItem Header="Matienance" Command="{Binding l}"/>
                                 <MenuItem Header="GEM"/>
                             </MenuItem>
                             <MenuItem Header="Review">
@@ -216,7 +216,7 @@
                         <MenuItem Background="{StaticResource ControlBackGround}"
                                   BorderBrush="#FF707070"
                                   Width="110"
-                                  BorderThickness="0,0,0,0" Padding="0">
+                                  BorderThickness="0,0,0,0" Padding="0" Command="{Binding ModeSelectCommand}">
                             <MenuItem.Header>
                                 <Grid Width="110">
                                     <TextBlock Text="Mode Select"

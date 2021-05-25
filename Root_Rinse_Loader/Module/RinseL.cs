@@ -276,7 +276,12 @@ namespace Root_Rinse_Loader.Module
             switch (eEQ)
             {
                 case _EQ.eEQ.State:
-                    AddProtocol(p_id, eCmd.EQLeState, value);
+                    if (value == EQ.eState.Run)
+                    {
+                        AddProtocol(p_id, eCmd.SetMode, p_eMode);
+                        AddProtocol(p_id, eCmd.SetWidth, p_widthStrip);
+                    }
+                    if (!EQ.p_bPickerSet || value != EQ.eState.Run) AddProtocol(p_id, eCmd.EQLeState, value);
                     switch ((EQ.eState)value)
                     {
                         case EQ.eState.Error: RunBuzzer(eBuzzer.Error); break;
@@ -448,7 +453,8 @@ namespace Root_Rinse_Loader.Module
             ResultClear,
             SetRotateSpeed,
             BuzzerOff,
-            Finish, 
+            Finish,
+            EQUReady
         }
         public string[] m_asCmd = Enum.GetNames(typeof(eCmd));
 
@@ -623,11 +629,16 @@ namespace Root_Rinse_Loader.Module
         }
         #endregion
 
-        #region SendFinish
+        #region SendFinish & EQU Ready
         public void SendFinish()
         {
             RunBuzzer(eBuzzer.Finish);
             AddProtocol(p_id, eCmd.Finish, 0); 
+        }
+
+        public void SendEQUReady()
+        {
+            AddProtocol(p_id, eCmd.EQUReady, 0);
         }
         #endregion
 
@@ -641,8 +652,15 @@ namespace Root_Rinse_Loader.Module
         }
         #endregion
 
+        public void InitSendProtocol()
+        {
+            m_qProtocolSend.Clear();
+            m_protocolSend = null;
+        }
+
         public override void Reset()
         {
+            InitSendProtocol();
             if (m_tcpip.p_bConnect == false) m_tcpip.Connect();
             Thread.Sleep(10); 
             if (m_tcpip.p_bConnect == false) return;

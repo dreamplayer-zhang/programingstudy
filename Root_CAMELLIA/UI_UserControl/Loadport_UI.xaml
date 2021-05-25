@@ -4,11 +4,22 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Root_CAMELLIA"
+             xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+             xmlns:ctrl="clr-namespace:RootTools.Control;assembly=RootTools"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="700">
     <UserControl.Resources>
         <local:EnumToStringConverter x:Key="EnumConverter"/>
         <local:BoolToDIBrushConverter x:Key="DIBrushConverter"/>
+        <local:ValueToDataGridColorConverter x:Key="DataGridColorConverter"/>
+        <Style x:Key="CustomColumnHeader" TargetType="DataGridColumnHeader">
+            <Setter Property="HorizontalContentAlignment" Value="Center" />
+        </Style>
+        <Style x:Key="CustomCellStyle" TargetType="DataGridCell">
+            <Setter Property="BorderBrush" Value="Black"/>
+            <Setter Property="BorderThickness" Value="0,0,0,1"/>
+            <Setter Property="Height" Value="20"/>
+        </Style>
     </UserControl.Resources>
     <Grid>
         <Border>
@@ -18,7 +29,7 @@
                 </Border.Effect>
             </Border>
         </Border>
-        <GroupBox Header="{Binding p_id}" Background="White" Margin="5" BorderThickness="0">
+        <GroupBox Header="{Binding p_loadport.p_id}" Background="White" Margin="5" BorderThickness="0">
             <GroupBox.HeaderTemplate>
                 <DataTemplate>
                     <Grid>
@@ -37,17 +48,116 @@
                     <ColumnDefinition/>
                 </Grid.ColumnDefinitions>
                 <Grid Grid.Column="0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="0.1*"/>
+                    </Grid.RowDefinitions>
                     <GroupBox Header="Slot" BorderThickness="0">
-                        <DataGrid ItemsSource="{Binding p_waferList}" Background="White" AutoGenerateColumns="False" CanUserAddRows="False" CanUserSortColumns="True" EnableColumnVirtualization="True"  CanUserDeleteRows="False"
-                                  EnableRowVirtualization="True" ScrollViewer.CanContentScroll="True" SelectionMode="Single" IsReadOnly="True" VirtualizingStackPanel.VirtualizationMode ="Recycling" IsHitTestVisible="True" ClipToBounds="True">
+                        <DataGrid ItemsSource="{Binding p_waferList, UpdateSourceTrigger=PropertyChanged}" Background="White" AutoGenerateColumns="False" CanUserAddRows="False" CanUserSortColumns="True" EnableColumnVirtualization="True"  CanUserDeleteRows="False" HorizontalScrollBarVisibility="Hidden"
+                             ScrollViewer.CanContentScroll="True" SelectionMode="Single" IsReadOnly="True" IsHitTestVisible="True" VirtualizingPanel.IsVirtualizing ="False"  local:CustomDataGrid.SelectingItem="{Binding p_dataSelectIndex, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                  PreviewMouseDown="DataGrid_PreviewMouseDown" GridLinesVisibility="None" PreviewMouseRightButtonDown="DataGrid_PreviewMouseDown" PreviewMouseRightButtonUp="DataGrid_PreviewMouseDown">
+                            <DataGrid.ItemContainerStyle>
+                                <Style TargetType="DataGridRow">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding p_state}" Value="Select">
+                                            <DataTrigger.EnterActions>
+                                                <BeginStoryboard x:Name="brinkingRow">
+                                                    <Storyboard>
+                                                        <ColorAnimation 
+                                        Storyboard.TargetProperty="(DataGridRow.Background).(SolidColorBrush.Color)" To="#FFFFcc" Duration="0:0:1" 
+                                        RepeatBehavior="Forever" AutoReverse="true"/>
+                                                    </Storyboard>
+                                                </BeginStoryboard>
+                                            </DataTrigger.EnterActions>
+                                            <DataTrigger.ExitActions>
+                                                <StopStoryboard BeginStoryboardName="brinkingRow">
+                                                </StopStoryboard>
+                                            </DataTrigger.ExitActions>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding p_state}" Value="Run">
+                                            <DataTrigger.EnterActions>
+                                                <BeginStoryboard x:Name="brinkingRowRun">
+                                                    <Storyboard>
+                                                        <ColorAnimation 
+                                        Storyboard.TargetProperty="(DataGridRow.Background).(SolidColorBrush.Color)" To="#86ff75" Duration="0:0:1" 
+                                        RepeatBehavior="Forever" AutoReverse="true"/>
+                                                    </Storyboard>
+                                                </BeginStoryboard>
+                                            </DataTrigger.EnterActions>
+                                            <DataTrigger.ExitActions>
+                                                <StopStoryboard BeginStoryboardName="brinkingRowRun">
+                                                </StopStoryboard>
+                                            </DataTrigger.ExitActions>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </DataGrid.ItemContainerStyle>
                             <DataGrid.Columns>
-                                <DataGridTextColumn Header="No" Binding="{Binding p_Index}" Width="1*"/>
-                                <DataGridTextColumn Header="Wafer ID" Binding="{Binding p_waferId}" Width="3.5*"/>
-                                <DataGridTextColumn Header="Recipe ID" Binding="{Binding p_recipeID}" Width="3.5*"/>
-                                <DataGridTextColumn Header="State" Binding="{Binding p_state}" Width="2*"/>
+                                <DataGridTextColumn Header="No" Binding="{Binding p_Index}" Width="1*"  HeaderStyle="{StaticResource CustomColumnHeader}" CellStyle="{StaticResource CustomCellStyle}">
+                                    <DataGridTextColumn.ElementStyle>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="Background" Value="{Binding p_state, Converter={StaticResource DataGridColorConverter}, ConverterParameter=Background}"/>
+                                            <Setter Property="TextAlignment" Value="Center"/>
+                                            <Setter Property="VerticalAlignment" Value="Stretch"/>
+                                            <Setter Property="Foreground" Value="{Binding p_state, Converter={StaticResource DataGridColorConverter}}"/>
+                                            <!--<Setter Property="Foreground" Value="Red"/>-->
+                                        </Style>
+                                    </DataGridTextColumn.ElementStyle>
+
+                                </DataGridTextColumn>
+                                <DataGridTextColumn Header="Wafer ID" Binding="{Binding p_waferId}" Width="2*" HeaderStyle="{StaticResource CustomColumnHeader}" CellStyle="{StaticResource CustomCellStyle}">
+                                    <DataGridTextColumn.ElementStyle>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="Background" Value="{Binding p_state, Converter={StaticResource DataGridColorConverter}, ConverterParameter=Background}"/>
+                                            <Setter Property="TextAlignment" Value="Center"/>
+                                            <Setter Property="VerticalAlignment" Value="Stretch"/>
+                                            <Setter Property="Foreground" Value="{Binding p_state, Converter={StaticResource DataGridColorConverter}}"/>
+                                        </Style>
+                                    </DataGridTextColumn.ElementStyle>
+                                </DataGridTextColumn>
+                                <DataGridTextColumn Header="Recipe ID" Binding="{Binding p_recipeID}" Width="4*" HeaderStyle="{StaticResource CustomColumnHeader}" CellStyle="{StaticResource CustomCellStyle}">
+                                    <DataGridTextColumn.ElementStyle>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="Background" Value="{Binding p_state, Converter={StaticResource DataGridColorConverter}, ConverterParameter=Background}"/>
+                                            <Setter Property="TextAlignment" Value="Center"/>
+                                            <Setter Property="VerticalAlignment" Value="Stretch"/>
+                                            <Setter Property="Foreground" Value="{Binding p_state, Converter={StaticResource DataGridColorConverter}}"/>
+                                        </Style>
+                                    </DataGridTextColumn.ElementStyle>
+                                </DataGridTextColumn>
+                                <DataGridTextColumn Header="State" Binding="{Binding p_state, UpdateSourceTrigger=PropertyChanged}" Width="2*" HeaderStyle="{StaticResource CustomColumnHeader}">
+                                    <DataGridTextColumn.CellStyle>
+                                        <Style TargetType="DataGridCell" BasedOn="{StaticResource {x:Type DataGridCell}}">
+                                            <Setter Property="BorderBrush" Value="Black"/>
+                                            <Setter Property="BorderThickness" Value="0,0,0,1"/>
+                                        </Style>
+                                    </DataGridTextColumn.CellStyle>
+                                    <DataGridTextColumn.ElementStyle>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="Background" Value="{Binding p_state, Converter={StaticResource DataGridColorConverter},ConverterParameter=Background}"/>
+                                            <Setter Property="TextAlignment" Value="Center"/>
+                                            <Setter Property="VerticalAlignment" Value="Stretch"/>
+                                            <Setter Property="Foreground" Value="{Binding p_state, Converter={StaticResource DataGridColorConverter}}"/>
+                                        </Style>
+                                    </DataGridTextColumn.ElementStyle>
+                                </DataGridTextColumn>
                             </DataGrid.Columns>
                         </DataGrid>
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger EventName="SelectionChanged">
+                                <i:CallMethodAction MethodName="OnSelectedCellChanged"/>
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
                     </GroupBox>
+                    <Grid Grid.Row="2" Margin="5,0,5,3">
+                        <ProgressBar Style="{StaticResource CustomProgress}" Value="{Binding p_progressValue}"/>
+                        <TextBlock Text="{Binding p_progressValue, StringFormat={}{0}％}" VerticalAlignment="Center" Margin="10,0"/>
+                        <TextBlock VerticalAlignment="Center" Margin="10,0" HorizontalAlignment="Right">
+                            <Run Text="{Binding p_totalDone}"/>
+                            <Run Text=" / "/>
+                            <Run Text="{Binding p_totalSelect}"/>
+                        </TextBlock>
+                    </Grid>
                 </Grid>
                 <Grid Grid.Column="1">
                     <Grid.RowDefinitions>
@@ -57,45 +167,127 @@
                         <RowDefinition Height="3*"/>
                     </Grid.RowDefinitions>
                     <GroupBox Grid.Row="0" Header="Information" BorderThickness="0">
-                        <UniformGrid Columns="2" Margin="0,1">
-                            <TextBlock Text="Carrier ID" VerticalAlignment="Center" Margin="10,0"/>
-                            <Border  Background="#eeeeee" BorderThickness="1,1,1,0" CornerRadius="5" Margin="1">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="2*"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition/>
+                                <RowDefinition/>
+                                <RowDefinition/>
+                                <RowDefinition/>
+                            </Grid.RowDefinitions>
+                            <TextBlock Grid.Row="0" Grid.Column="0" Text="Carrier ID"  VerticalAlignment="Center" Margin="10,0"/>
+                            <Border  Grid.Row="0" Grid.Column="1" Background="#eeeeee" BorderThickness="1,1,1,0" CornerRadius="5" Margin="1">
                                 <TextBlock Text="{Binding p_infoCarrier.p_sCarrierID}" VerticalAlignment="Center" TextAlignment="Center"/>
                             </Border>
-                            <TextBlock Text="Lot ID" VerticalAlignment="Center" Margin="10,0"/>
-                            <Border Background="#eeeeee" BorderThickness="1,1,1,0" CornerRadius="5" Margin="1">
+                            <TextBlock  Grid.Row="1" Grid.Column="0" Text="Lot ID" VerticalAlignment="Center" Margin="10,0"/>
+                            <Border Grid.Row="1" Grid.Column="1" Background="#eeeeee" BorderThickness="1,1,1,0" CornerRadius="5" Margin="1">
                                 <TextBlock Text="{Binding p_infoCarrier.p_sLotID}" VerticalAlignment="Center" TextAlignment="Center"/>
                             </Border>
-                            <TextBlock Text="Recipe ID" VerticalAlignment="Center" Margin="10,0"/>
-                            <Border Background="#eeeeee" BorderThickness="1,1,1,0" CornerRadius="5" Margin="1">
-                                <TextBlock Text="{Binding p_infoCarrier.p_sRecipeID}" VerticalAlignment="Center" TextAlignment="Center"/>
+                            <TextBlock Grid.Row="2" Grid.Column="0" Text="Recipe ID" VerticalAlignment="Center" Margin="10,0"/>
+                            <Border Grid.Row="2" Grid.Column="1" Background="#eeeeee" BorderThickness="1,1,1,0" CornerRadius="5" Margin="1">
+                                <TextBlock Text="{Binding p_CurrentRecipeID, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center" TextAlignment="Center"/>
                             </Border>
-                            <TextBlock Text="Loadport State" VerticalAlignment="Center" Margin="10,0"/>
-                            <Border Background="#eeeeee" BorderThickness="1" CornerRadius="5" Margin="1">
+                            <TextBlock Grid.Row="3" Grid.Column="0" Text="Loadport State" VerticalAlignment="Center" Margin="10,0"/>
+                            <Border Grid.Row="3" Grid.Column="1" Background="#eeeeee" BorderThickness="1" CornerRadius="5" Margin="1">
                                 <TextBlock Text="{Binding p_infoCarrier.p_eState, Converter={StaticResource EnumConverter}}" VerticalAlignment="Center" TextAlignment="Center"/>
                             </Border>
-                        </UniformGrid>
+                        </Grid>
                     </GroupBox>
                     <GroupBox Grid.Row="1" Header="State" BorderThickness="0">
                         <Border BorderBrush="Gray" BorderThickness="1">
                             <UniformGrid Columns="4" Rows="2">
+                                <Border CornerRadius="10"  Margin="1">
+                                    <TextBlock Text="Manual" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                    <Border.Style>
+                                        <Style TargetType="Border">
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding p_loadport.m_OHTNew.p_eAccessLP, UpdateSourceTrigger=PropertyChanged}" Value="Auto">
+                                                    <Setter Property="Background" Value="Transparent"/>
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding p_loadport.m_OHTNew.p_eAccessLP, UpdateSourceTrigger=PropertyChanged}" Value="Manual">
+                                                    <Setter Property="Background" Value="#86ff11"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Border.Style>
+                                </Border>
                                 <Border CornerRadius="10" Margin="1">
                                     <TextBlock Text="Auto" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                    <Border.Style>
+                                        <Style TargetType="Border">
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding p_loadport.m_OHTNew.p_eAccessLP, UpdateSourceTrigger=PropertyChanged}" Value="Auto">
+                                                    <Setter Property="Background" Value="#86ff11"/>
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding p_loadport.m_OHTNew.p_eAccessLP, UpdateSourceTrigger=PropertyChanged}" Value="Manual">
+                                                    <Setter Property="Background" Value="Transparent"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Border.Style>
                                 </Border>
-                                <Border CornerRadius="10"  Background="SeaGreen"  Margin="1">
-                                    <TextBlock Text="Manual" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                                </Border>
-                                <Border CornerRadius="10"  Margin="1" Background="{Binding m_loadport.m_diPlaced.p_bIn, Converter={StaticResource DIBrushConverter}}">
+                                <Border CornerRadius="10"  Margin="1">
                                     <TextBlock Text="Placed" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                    <Border.Style>
+                                        <Style TargetType="Border">
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding p_loadport.p_diPlaced.m_bitDI.p_bOn, UpdateSourceTrigger=PropertyChanged}" Value="True">
+                                                    <Setter Property="Background" Value="Yellow"/>
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding  p_loadport.p_diPlaced.m_bitDI.p_bOn, UpdateSourceTrigger=PropertyChanged}" Value="False">
+                                                    <Setter Property="Background" Value="Transparent"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Border.Style>
                                 </Border>
-                                <Border CornerRadius="10"  Margin="1" Background="{Binding m_loadport.m_diPresent.p_bIn, Converter={StaticResource DIBrushConverter}}">
+                                <Border CornerRadius="10"  Margin="1">
                                     <TextBlock Text="Present" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                    <Border.Style>
+                                        <Style TargetType="Border">
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding p_loadport.p_diPresent.m_bitDI.p_bOn, UpdateSourceTrigger=PropertyChanged}" Value="True">
+                                                    <Setter Property="Background" Value="Yellow"/>
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding  p_loadport.p_diPresent.m_bitDI.p_bOn, UpdateSourceTrigger=PropertyChanged}" Value="False">
+                                                    <Setter Property="Background" Value="Transparent"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Border.Style>
                                 </Border>
-                                <Border CornerRadius="10"  Margin="1" Background="{Binding m_loadport.m_diLoad.p_bIn, Converter={StaticResource DIBrushConverter}}">
+                                <Border CornerRadius="10"  Margin="1">
                                     <TextBlock Text="Load" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                    <Border.Style>
+                                        <Style TargetType="Border">
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding p_loadport.p_diLoad.m_bitDI.p_bOn, UpdateSourceTrigger=PropertyChanged}" Value="True">
+                                                    <Setter Property="Background" Value="Yellow"/>
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding  p_loadport.p_diLoad.m_bitDI.p_bOn, UpdateSourceTrigger=PropertyChanged}" Value="False">
+                                                    <Setter Property="Background" Value="Transparent"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Border.Style>
                                 </Border>
-                                <Border CornerRadius="10"  Margin="1" Background="{Binding m_loadport.m_diUnload.p_bIn, Converter={StaticResource DIBrushConverter}}">
+                                <Border CornerRadius="10"  Margin="1">
                                     <TextBlock Text="Unload" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                    <Border.Style>
+                                        <Style TargetType="Border">
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding p_loadport.p_diUnload.m_bitDI.p_bOn, UpdateSourceTrigger=PropertyChanged}" Value="True">
+                                                    <Setter Property="Background" Value="Yellow"/>
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding  p_loadport.p_diUnload.m_bitDI.p_bOn, UpdateSourceTrigger=PropertyChanged}" Value="False">
+                                                    <Setter Property="Background" Value="Transparent"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Border.Style>
                                 </Border>
                                 <Border CornerRadius="10"  Margin="1">
                                     <TextBlock Text="Reserve" VerticalAlignment="Center" HorizontalAlignment="Center"/>
@@ -107,10 +299,17 @@
                         </Border>
                     </GroupBox>
                     <Grid Grid.Row="2" Margin="5,0,5,3">
-                            <ProgressBar Style="{StaticResource CustomProgress}"/>
-                            <TextBlock Text="0%" VerticalAlignment="Center" Margin="10,0"/>
-                            <TextBlock Text="0 / 0" VerticalAlignment="Center" Margin="10,0" HorizontalAlignment="Right"/>
-                     </Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="1.2*"/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+                        <Border Margin="5" VerticalAlignment="Center">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="Loadport State : " TextAlignment="Center"/>
+                                <TextBlock Text="Out of Service" TextAlignment="Center"/>
+                            </StackPanel>
+                        </Border>
+                    </Grid>
 
                     <Grid Grid.Row="3">
                         <Grid.RowDefinitions>
@@ -125,10 +324,10 @@
                                 <ColumnDefinition/>
                             </Grid.ColumnDefinitions>
                             <Grid Grid.Column="0">
-                                <Button Content="Manual" Style="{StaticResource customButton}" FontSize="15" Margin="3" FontWeight="Bold"/>
+                                <Button Content="Manual" Style="{StaticResource customButton}" Command="{Binding CmdOHTManual}" FontSize="15" Margin="3" FontWeight="Bold"/>
                             </Grid>
                             <Grid Grid.Column="1">
-                                <Button Content="Auto" Style="{StaticResource customButton}"  FontSize="15" Margin="3" FontWeight="Bold"/>
+                                <Button Content="Auto" Style="{StaticResource customButton}" Command="{Binding CmdOHTAuto}" FontSize="15" Margin="3" FontWeight="Bold"/>
                             </Grid>
                         </Grid>
                         <Grid Grid.Row="1">
@@ -137,15 +336,15 @@
                                 <ColumnDefinition/>
                             </Grid.ColumnDefinitions>
                             <Grid Grid.Column="0">
-                                <Button Content="In Service" Style="{StaticResource customButton}"  FontSize="15"  Margin="3" FontWeight="Bold"/>
+                                <Button Content="In Service" Style="{StaticResource customButton}"  FontSize="15"  Margin="3" FontWeight="Bold" Command="{Binding CmdInService}"/>
                             </Grid>
                             <Grid Grid.Column="1">
-                                <Button Content="Out Of Service" Style="{StaticResource customButton}"   FontSize="15"  Margin="3" FontWeight="Bold"/>
+                                <Button Content="Out Of Service" Style="{StaticResource customButton}"   FontSize="15"  Margin="3" FontWeight="Bold" Command="{Binding CmdOutOfService}"/>
                             </Grid>
                         </Grid>
                         <Grid Grid.Row="2">
                             <Button x:Name="buttonLoad" Content="Load" 
-                                    Style="{StaticResource customButton}" IsEnabled="{Binding p_isEnableLoad, UpdateSourceTrigger=PropertyChanged}"
+                                    Style="{StaticResource customLoadButton}" IsEnabled="{Binding p_isEnableLoad, UpdateSourceTrigger=PropertyChanged}"
                                     Margin="3"  FontSize="15" FontWeight="Bold" Command="{Binding CmdLoadClick}"/>
                         </Grid>
                         <Button x:Name="buttonUnloadReq" 

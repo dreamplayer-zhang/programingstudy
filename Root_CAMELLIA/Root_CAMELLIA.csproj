@@ -266,6 +266,9 @@
     <Reference Include="ScottPlot.WPF, Version=4.0.39.0, Culture=neutral, PublicKeyToken=e53b06131e34a3aa, processorArchitecture=MSIL">
       <HintPath>..\packages\ScottPlot.WPF.4.0.39\lib\net472\ScottPlot.WPF.dll</HintPath>
     </Reference>
+    <Reference Include="SSLNet">
+      <HintPath>..\Lib\MarsLog\SSLNet.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Activities" />
     <Reference Include="System.Activities.Presentation" />
@@ -352,17 +355,23 @@
     <Compile Include="Control\ReviewGraph.xaml.cs">
       <DependentUpon>ReviewGraph.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Control\SequenceRecipe.xaml.cs">
+      <DependentUpon>SequenceRecipe.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Control\SequenceRecipe_ViewModel.cs" />
     <Compile Include="Control\StageViewControl.xaml.cs">
       <DependentUpon>StageViewControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="Control\Temp.xaml.cs">
       <DependentUpon>Temp.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Control\Util\CustomDataGrid.cs" />
     <Compile Include="Control\Util\GetIconUseDll.cs" />
     <Compile Include="Control\Util\GetImageFn.cs" />
     <Compile Include="Converter\BoolConverter.cs" />
     <Compile Include="Converter\HumidityToGradientOffsetConverter.cs" />
     <Compile Include="Converter\LampStateToColorConverter.cs" />
+    <Compile Include="Converter\ListToValueConverter.cs" />
     <Compile Include="Converter\ModuleStateToLoadingOpacityConverter.cs" />
     <Compile Include="Converter\ValueToColorConverter.cs" />
     <Compile Include="Converter\ValueToUIValueConverter.cs" />
@@ -386,6 +395,9 @@
       <DependentUpon>PMRGraph.xaml</DependentUpon>
     </Compile>
     <Compile Include="LibSR_Met\RTGraph.xaml.cs" />
+    <Compile Include="UI_Dialog\Dlg_ManualJob.xaml.cs">
+      <DependentUpon>Dlg_ManualJob.xaml</DependentUpon>
+    </Compile>
     <Compile Include="ModuleRun\Run_AutoFocus.cs" />
     <Compile Include="ModuleRun\Run_CalibrationWaferCentering.cs" />
     <Compile Include="ModuleRun\Run_Delay.cs" />
@@ -400,6 +412,9 @@
     <Compile Include="Module\Interlock.cs" />
     <Compile Include="Module\TowerLamp.cs" />
     <Compile Include="TemplateSelector\FFUTemplateSelector.cs" />
+    <Compile Include="UI_Dialog\Dlg_Recipe.xaml.cs">
+      <DependentUpon>Dlg_Recipe.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI_Dialog\Dlg_Login.xaml.cs">
       <DependentUpon>Dlg_Login.xaml</DependentUpon>
     </Compile>
@@ -411,12 +426,6 @@
     </Compile>
     <Compile Include="UI_Dialog\Dlg_SplashScreen.xaml.cs">
       <DependentUpon>Dlg_SplashScreen.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI_Dialog\Dlg_StageMapSetting.xaml.cs">
-      <DependentUpon>Dlg_StageMapSetting.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI_Dialog\test.xaml.cs">
-      <DependentUpon>test.xaml</DependentUpon>
     </Compile>
     <Compile Include="ManualJob\ManualJobSchedule.cs" />
     <Compile Include="ManualJob\ManualJobSchedule_UI.xaml.cs">
@@ -458,6 +467,8 @@
     <Compile Include="UI_UserControl\Loadport_ViewModel.cs" />
     <Compile Include="Utility\SplashScreenHelper.cs" />
     <Compile Include="ViewModel\Dlg_Login_ViewModel.cs" />
+    <Compile Include="ViewModel\Dlg_ManualJob_ViewModel.cs" />
+    <Compile Include="ViewModel\Dlg_Recipe_ViewModel.cs" />
     <Compile Include="ViewModel\Dlg_Review_ViewModel.cs" />
     <Compile Include="ViewModel\Dlg_Setting_ViewModel.cs" />
     <Compile Include="UI_Dialog\Dlg_Setting.xaml.cs">
@@ -490,7 +501,6 @@
     </Compile>
     <Compile Include="Draw\GeneralTools.cs" />
     <Compile Include="ViewModel\Dlg_SplashScreen_ViewModel.cs" />
-    <Compile Include="ViewModel\Dlg_StageMapSetting_ViewModel.cs" />
     <Compile Include="ViewModel\MainWindow_ViewModel.cs" />
     <Compile Include="Measurement\Measurement.cs" />
     <Compile Include="Measurement\MeasurementManager.cs" />
@@ -555,6 +565,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Control\SequenceRecipe.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Control\StageViewControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -579,6 +593,14 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="UI_Dialog\Dlg_ManualJob.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI_Dialog\Dlg_Recipe.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="UI_Dialog\Dlg_Login.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -592,14 +614,6 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UI_Dialog\Dlg_SplashScreen.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="UI_Dialog\Dlg_StageMapSetting.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="UI_Dialog\test.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -811,6 +825,12 @@
   <ItemGroup>
     <Resource Include="CamelIcon.ico" />
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resource\camellia.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resource\Camellia2.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\EMGU.CV.4.1.1.3497\build\EMGU.CV.targets" Condition="Exists('..\packages\EMGU.CV.4.1.1.3497\build\EMGU.CV.targets')" />
   <PropertyGroup>
@@ -818,6 +838,8 @@
 copy /Y "$(SolutionDir)SQLite\sqlite3.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\sqlite3.dll"
 copy /Y "$(SolutionDir)Lib\opencv_world347d.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\opencv_world347d.dll"
 copy /Y "$(SolutionDir)Lib\opencv_world347.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\opencv_world347.dll"
+copy /Y "$(SolutionDir)Lib\XGEM\XSmNet_M40_01_64.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\XSmNet_M40_01_64.dll"
+copy /Y "$(SolutionDir)Lib\MarsLog\SSL.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\SSL.dll"
 IF NOT EXIST "$(SolutionDir)$(ProjectName)\$(OutDir)\x64" (mkdir "$(SolutionDir)$(ProjectName)\$(OutDir)\x64")
 copy /Y "$(SolutionDir)Lib\EMGU.CV\x64\concrt140.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\x64\concrt140.dll"
 copy /Y "$(SolutionDir)Lib\EMGU.CV\x64\cvextern.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\x64\cvextern.dll"
@@ -859,4 +881,10 @@ copy /Y "$(SolutionDir)Lib\MetLib\NETOmniDriver-NET40.dll" $(SolutionDir)$(Proje
 copy /Y "$(SolutionDir)Lib\MetLib\OmniDriver64.dll" $(SolutionDir)$(ProjectName)\$(OutDir)\OmniDriver64.dll"
 copy /Y "$(SolutionDir)Lib\MetLib\r4nd_class.dll" $(SolutionDir)$(ProjectName)\$(OutDir)\r4nd_class.dll"</PostBuildEvent>
   </PropertyGroup>
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>이 프로젝트는 이 컴퓨터에 없는 NuGet 패키지를 참조합니다. 해당 패키지를 다운로드하려면 NuGet 패키지 복원을 사용하십시오. 자세한 내용은 http://go.microsoft.com/fwlink/?LinkID=322105를 참조하십시오. 누락된 파일은 {0}입니다.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\OpenCvSharp-AnyCPU.2.4.10.20170306\build\OpenCvSharp-AnyCPU.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\OpenCvSharp-AnyCPU.2.4.10.20170306\build\OpenCvSharp-AnyCPU.props'))" />
+  </Target>
 </Project>

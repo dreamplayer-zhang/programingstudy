@@ -1,11 +1,15 @@
 ﻿using Root_VEGA_P.Engineer;
 using Root_VEGA_P_Vision.Module;
 using RootTools;
+using RootTools.Camera.BaslerPylon;
+using RootTools.Camera.CognexOCR;
 using RootTools.Control;
+using RootTools.Light;
 using RootTools.Module;
 using RootTools.ToolBoxs;
 using RootTools.Trees;
 using System;
+using System.Collections.Generic;
 using System.Threading;
 
 namespace Root_VEGA_P.Module
@@ -13,11 +17,13 @@ namespace Root_VEGA_P.Module
     public class EOP : ModuleBase
     {
         #region ToolBox
+        LightSet lightSet;
         Axis m_axis;
         DIO_Os m_doCoverDown;
         DIO_Os m_doCoverDownX;
         public override void GetTools(bool bInit)
         {
+            p_sInfo = m_toolBox.Get(ref lightSet, this);
             p_sInfo = m_toolBox.GetAxis(ref m_axis, this, "Y");
             p_sInfo = m_toolBox.GetDIO(ref m_doCoverDown, this, "Cover", Enum.GetNames(typeof(eCover)));
             p_sInfo = m_toolBox.GetDIO(ref m_doCoverDownX, this, "Cover X", Enum.GetNames(typeof(eCover)));
@@ -77,6 +83,7 @@ namespace Root_VEGA_P.Module
         public class Dome : NotifyProperty, IRTRChild
         {
             #region ToolBox
+            CameraBasler camDome;
             public Axis m_axisRotate;
             DIO_Is m_diCheckRotate;
             DIO_Is m_diCheckDome;
@@ -85,6 +92,7 @@ namespace Root_VEGA_P.Module
             DIO_Is[] m_diCoverDown = new DIO_Is[2] { null, null };
             public void GetTools(ToolBox toolBox, bool bInit)
             {
+                toolBox.GetCamera(ref camDome, m_EOP, p_id + ".Cam Dome");
                 toolBox.GetAxis(ref m_axisRotate, m_EOP, p_id + ".Rotate");
                 toolBox.GetDIO(ref m_diCheckRotate, m_EOP, p_id + ".Rotate", new string[] { "0", "1" });
                 toolBox.GetDIO(ref m_diCheckDome, m_EOP, p_id + ".Check", new string[] { "0", "1" });
@@ -190,6 +198,7 @@ namespace Root_VEGA_P.Module
             {
                 m_reg = new Registry("InfoPod");
                 int nPod = m_reg.Read(p_id, -1);
+                if (nPod < 0) return; 
                 p_infoPod = new InfoPod((InfoPod.ePod)nPod);
                 p_infoPod.ReadReg();
             }
@@ -278,7 +287,7 @@ namespace Root_VEGA_P.Module
                 p_id = id;
                 m_EOP = EOP;
                 VEGA_P vegaP = EOP.m_handler.m_VEGA;
-                m_particleCounterSet = new ParticleCounterSet(EOP, vegaP.m_flowSensor, vegaP.m_sample, "Dome.");
+                m_particleCounterSet = new ParticleCounterSet(EOP, vegaP, "Dome.");
             }
 
             public void ThreadStop()
@@ -297,11 +306,13 @@ namespace Root_VEGA_P.Module
         public class Door : NotifyProperty, IRTRChild
         {
             #region ToolBox
+            CameraBasler camDoor;
             DIO_Is m_diCheckDoor;
             DIO_Os m_doCylinder;
             DIO_Is[] m_diCylinder = new DIO_Is[2] { null, null };
             public void GetTools(ToolBox toolBox, bool bInit)
             {
+                toolBox.GetCamera(ref camDoor, m_EOP, p_id + ".Cam Door");
                 toolBox.GetDIO(ref m_diCheckDoor, m_EOP, p_id + ".Check", new string[] { "0", "1" });
                 toolBox.GetDIO(ref m_doCylinder, m_EOP, p_id + ".Cylinder", Enum.GetNames(typeof(eCylinder)));
                 toolBox.GetDIO(ref m_diCylinder[0], m_EOP, p_id + ".Cylinder Down", new string[] { "0", "1" });
@@ -380,6 +391,7 @@ namespace Root_VEGA_P.Module
             {
                 m_reg = new Registry("InfoPod");
                 int nPod = m_reg.Read(p_id, -1);
+                if (nPod < 0) return;
                 p_infoPod = new InfoPod((InfoPod.ePod)nPod);
                 p_infoPod.ReadReg();
             }
@@ -468,7 +480,7 @@ namespace Root_VEGA_P.Module
                 p_id = id;
                 m_EOP = EOP;
                 VEGA_P vegaP = EOP.m_handler.m_VEGA;
-                m_particleCounterSet = new ParticleCounterSet(EOP, vegaP.m_flowSensor, vegaP.m_sample, "Door.");
+                m_particleCounterSet = new ParticleCounterSet(EOP, vegaP, "Door.");
             }
 
             public void ThreadStop()
@@ -484,9 +496,9 @@ namespace Root_VEGA_P.Module
         #endregion
 
         #region Particle Counter
-        public string RunParticleCounter(bool bCheckPod)
+        public string RunParticleCounter(Run_ParticleCount runCount)
         {
-            if (bCheckPod)
+            if (runCount.m_bCheckPod)
             {
                 if (m_dome.IsCheckDome() == false) return "Dome Check Error";
                 if (m_door.IsCheckDoor() == false) return "Door Check Error";
@@ -499,7 +511,8 @@ namespace Root_VEGA_P.Module
                 if (Run(m_door.RunCylinderUp(false))) return p_sInfo;
                 if (Run(RunMove(ePos.Forward))) return p_sInfo;
                 if (Run(RunCoverDown(true))) return p_sInfo;
-                // Particle Count
+                if (Run(m_dome.m_particleCounterSet.RunParticleCounter(runCount.m_dataDome.m_asNozzle))) return p_sInfo;
+                if (Run(m_door.m_particleCounterSet.RunParticleCounter(runCount.m_dataDoor.m_asNozzle))) return p_sInfo;
                 if (Run(RunCoverDown(false))) return p_sInfo;
                 if (Run(RunMove(ePos.Backward))) return p_sInfo;
                 if (Run(m_door.RunCylinderUp(true))) return p_sInfo;
@@ -575,11 +588,11 @@ namespace Root_VEGA_P.Module
         #region ModuleRun
         protected override void InitModuleRuns()
         {
-            AddModuleRunList(new Run_Delay(this), true, "Time Delay");
-            AddModuleRunList(new Run_Run(this), true, "Run Particle Counter");
+            AddModuleRunList(new Run_Delay(this), false, "Time Delay");
+            AddModuleRunList(new Run_ParticleCount(this), true, "Run Particle Counter");
             AddModuleRunList(new Run_RunSol(this), false, "Run Sol Test");
-            m_dome.m_particleCounterSet.InitModuleRuns(); 
-            m_door.m_particleCounterSet.InitModuleRuns();
+            m_dome.m_particleCounterSet.InitModuleRuns(false); 
+            m_door.m_particleCounterSet.InitModuleRuns(false);
         }
 
         public class Run_Delay : ModuleRunBase
@@ -611,31 +624,65 @@ namespace Root_VEGA_P.Module
             }
         }
 
-        public class Run_Run : ModuleRunBase
+        public class Run_ParticleCount : ModuleRunBase
         {
             EOP m_module;
-            public Run_Run(EOP module)
+            public Run_ParticleCount(EOP module)
             {
                 m_module = module;
                 InitModuleRun(module);
             }
 
-            bool m_bCheckPod = true; 
+            public class Data
+            {
+                public int m_nCount = 0;
+                public List<string> m_asNozzle = new List<string>();
+                public Data Clone()
+                {
+                    Data data = new Data();
+                    data.m_nCount = m_nCount;
+                    foreach (string sNozzle in m_asNozzle) data.m_asNozzle.Add(sNozzle);
+                    return data; 
+                }
+
+                public void RunTree(Tree tree, List<string> asFile, bool bVisible)
+                {
+                    m_nCount = tree.Set(m_nCount, m_nCount, "Count", "Particle Count Repeat Count", bVisible);
+                    while (m_asNozzle.Count < m_nCount) m_asNozzle.Add("");
+                    while (m_asNozzle.Count > m_nCount) m_asNozzle.RemoveAt(m_asNozzle.Count - 1);
+                    RunTreeNozzle(tree.GetTree("NozzleSet", false, bVisible), asFile, bVisible);
+                }
+
+                void RunTreeNozzle(Tree tree, List<string> asFile, bool bVisible)
+                {
+                    for (int n = 0; n < m_asNozzle.Count; n++)
+                    {
+                        m_asNozzle[n] = tree.Set(m_asNozzle[n], m_asNozzle[n], asFile, (n + 1).ToString("00"), "NozzleSet Name", bVisible);
+                    }
+                }
+            }
+            public Data m_dataDome = new Data();
+            public Data m_dataDoor = new Data(); 
+            public bool m_bCheckPod = true;
             public override ModuleRunBase Clone()
             {
-                Run_Run run = new Run_Run(m_module);
-                run.m_bCheckPod = m_bCheckPod; 
+                Run_ParticleCount run = new Run_ParticleCount(m_module);
+                run.m_bCheckPod = m_bCheckPod;
+                run.m_dataDome = m_dataDome.Clone();
+                run.m_dataDoor = m_dataDoor.Clone(); 
                 return run;
             }
 
             public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
             {
                 m_bCheckPod = tree.Set(m_bCheckPod, m_bCheckPod, "Check Pod", "Check Pod State", bVisible);
+                m_dataDome.RunTree(tree.GetTree("Dome", true, bVisible), m_module.m_dome.m_particleCounterSet.m_nozzleSet.p_asFile, bVisible);
+                m_dataDoor.RunTree(tree.GetTree("Door", true, bVisible), m_module.m_door.m_particleCounterSet.m_nozzleSet.p_asFile, bVisible);
             }
 
             public override string Run()
             {
-                return m_module.RunParticleCounter(m_bCheckPod);
+                return m_module.RunParticleCounter(this);
             }
         }
 

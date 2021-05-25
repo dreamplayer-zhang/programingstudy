@@ -20,8 +20,9 @@ namespace Root_VEGA_P.Engineer
             m_handler = handler;
             DataContext = handler;
             moduleListUI.Init(handler.p_moduleList);
-            recipeUI.Init(handler.m_recipe);
-            //processUI.Init(handler.m_process); //forgetVegaP
+            nozzleUI.Init(handler); 
+            recipeUI.Init(handler);
+            processUI.Init(handler); 
             gafUI.Init(handler.m_gaf);
             InitTabControl();
         }
