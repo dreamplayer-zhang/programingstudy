@@ -20,14 +20,10 @@ namespace Root_Pine2.Module
             if (bInit) InitPosition();
         }
 
-        public enum ePos
-        {
-            Ready,
-            Turnover
-        }
+        const string c_sTurnover = "Turnover"; 
         void InitPosition()
         {
-            m_axisXZ.AddPos(Enum.GetNames(typeof(ePos)));
+            m_axisXZ.AddPos(c_sTurnover);
             m_axisXZ.AddPos(GetPosString(Vision.eVision.Top3D, Vision.eWorks.A));
             m_axisXZ.AddPos(GetPosString(Vision.eVision.Top3D, Vision.eWorks.B));
             m_axisXZ.AddPos(GetPosString(Vision.eVision.Top2D, Vision.eWorks.A));
@@ -39,9 +35,9 @@ namespace Root_Pine2.Module
             return eVision.ToString() + eVisionWorks.ToString();
         }
 
-        public string RunMoveX(ePos ePos, bool bWait = true)
+        public string RunMoveX(string sPos, bool bWait = true)
         {
-            m_axisXZ.p_axisX.StartMove(ePos);
+            m_axisXZ.p_axisX.StartMove(sPos);
             return bWait ? m_axisXZ.p_axisX.WaitReady() : "OK";
         }
 
@@ -51,9 +47,9 @@ namespace Root_Pine2.Module
             return bWait ? m_axisXZ.p_axisX.WaitReady() : "OK";
         }
 
-        public string RunMoveZ(ePos ePos, bool bWait = true)
+        public string RunMoveZ(string sPos, bool bWait = true)
         {
-            m_axisXZ.p_axisY.StartMove(ePos);
+            m_axisXZ.p_axisY.StartMove(sPos);
             return bWait ? m_axisXZ.p_axisY.WaitReady() : "OK";
         }
 
@@ -61,6 +57,12 @@ namespace Root_Pine2.Module
         {
             m_axisXZ.p_axisY.StartMove(GetPosString(eVision, ePos));
             return bWait ? m_axisXZ.p_axisY.WaitReady() : "OK";
+        }
+
+        public string RunMoveUp(bool bWait = true)
+        {
+            m_axisXZ.p_axisY.StartMove(0);
+            return bWait ? m_axisXZ.WaitReady() : "OK";
         }
         #endregion
 
@@ -86,14 +88,14 @@ namespace Root_Pine2.Module
             {
                 boat.p_infoStrip.m_eVision = eVision;
                 boat.p_infoStrip.m_eWorks = eWorks; 
-                if (Run(RunMoveZ(ePos.Ready))) return p_sInfo;
+                if (Run(RunMoveUp())) return p_sInfo;
                 if (Run(RunMoveX(eVision, eWorks))) return p_sInfo;
                 if (Run(RunMoveZ(eVision, eWorks))) return p_sInfo;
                 boat.RunVacuum(false);
                 boat.RunBlow(true); 
                 if (Run(m_picker.RunVacuum(true))) return p_sInfo;
                 boat.RunBlow(false);
-                if (Run(RunMoveZ(ePos.Ready))) return p_sInfo;
+                if (Run(RunMoveUp())) return p_sInfo;
                 if (m_picker.IsVacuum() == false) return "Pick Strip Error";
                 m_picker.p_infoStrip = boat.p_infoStrip;
                 boat.p_infoStrip = null;
@@ -102,7 +104,7 @@ namespace Root_Pine2.Module
             finally
             {
                 boat.RunBlow(false);
-                RunMoveZ(ePos.Ready);
+                RunMoveUp();
             }
             return "OK";
         }
@@ -116,18 +118,18 @@ namespace Root_Pine2.Module
             if (boat.p_eStep != Boats.Boat.eStep.Ready) return "Boat not Ready";
             try
             {
-                if (Run(RunMoveZ(ePos.Ready))) return p_sInfo;
+                if (Run(RunMoveUp())) return p_sInfo;
                 if (Run(RunMoveX(Vision.eVision.Top2D, eVisionWorks))) return p_sInfo;
                 if (Run(RunMoveZ(Vision.eVision.Top2D, eVisionWorks))) return p_sInfo;
                 boat.RunVacuum(true);
                 m_picker.RunVacuum(false);
                 boat.p_infoStrip = m_picker.p_infoStrip;
                 m_picker.p_infoStrip = null;
-                if (Run(RunMoveZ(ePos.Ready))) return p_sInfo;
+                if (Run(RunMoveUp())) return p_sInfo;
             }
             finally
             {
-                RunMoveZ(ePos.Ready);
+                RunMoveUp();
             }
             return "OK";
         }
@@ -139,20 +141,18 @@ namespace Root_Pine2.Module
             if (loader2.m_qModuleRun.Count > 0) return "Loader1 is not Ready";
             try
             {
-                if (Run(RunMoveZ(ePos.Ready))) return p_sInfo;
-                if (Run(RunMoveX(ePos.Turnover))) return p_sInfo;
-                if (Run(RunMoveZ(ePos.Turnover))) return p_sInfo;
+                if (Run(RunMoveUp())) return p_sInfo;
+                if (Run(RunMoveX(c_sTurnover))) return p_sInfo;
+                if (Run(RunMoveZ(c_sTurnover))) return p_sInfo;
                 loader2.RunVacuum(true);
                 m_picker.RunVacuum(false);
-                if (Run(RunMoveZ(ePos.Ready))) return p_sInfo;
-                if (Run(RunMoveX(Vision.eVision.Top2D, Vision.eWorks.B))) return p_sInfo;
+                if (Run(RunMoveUp())) return p_sInfo;
                 loader2.p_infoStrip = m_picker.p_infoStrip;
                 m_picker.p_infoStrip = null;
             }
             finally
             {
-                RunMoveZ(ePos.Ready);
-                RunMoveX(Vision.eVision.Top2D, Vision.eWorks.B);
+                RunMoveUp();
             }
             return "OK";
         }
