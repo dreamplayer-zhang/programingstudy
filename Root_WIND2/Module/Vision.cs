@@ -37,16 +37,16 @@ namespace Root_WIND2.Module
 
         Camera_Dalsa m_CamMain;
         Camera_Basler m_CamAlign;
-        Camera_Basler m_CamAutoFocus;
-        public Camera_Basler p_CamAutoFocus
+        Camera_Basler m_CamVRS;
+        public Camera_Basler p_CamVRS
         {
             get
             {
-                return m_CamAutoFocus;
+                return m_CamVRS;
             }
             set
             {
-                m_CamAutoFocus = value;
+                m_CamVRS = value;
             }
         }
 
@@ -77,7 +77,7 @@ namespace Root_WIND2.Module
         public LightSet LightSet { get => m_lightSet; private set => m_lightSet = value; }
         public Camera_Dalsa CamMain { get => m_CamMain; private set => m_CamMain = value; }
         public Camera_Basler CamAlign { get => m_CamAlign; private set => m_CamAlign = value; }
-        public Camera_Basler CamAutoFocus { get => m_CamAutoFocus; private set => m_CamAutoFocus = value; }
+        public Camera_Basler CamAutoFocus { get => m_CamVRS; private set => m_CamVRS = value; }
 
         public KlarfData_Lot KlarfData_Lot { get => m_KlarfData_Lot; private set => m_KlarfData_Lot = value; }
         #endregion
@@ -94,7 +94,7 @@ namespace Root_WIND2.Module
                 p_sInfo = m_toolBox.Get(ref m_lightSet, this);
                 p_sInfo = m_toolBox.GetCamera(ref m_CamMain, this, "MainCam");
                 p_sInfo = m_toolBox.GetCamera(ref m_CamAlign, this, "AlignCam");
-                p_sInfo = m_toolBox.GetCamera(ref m_CamAutoFocus, this, "AutoFocusCam");
+                p_sInfo = m_toolBox.GetCamera(ref m_CamVRS, this, "AutoFocusCam");
                 p_sInfo = m_toolBox.Get(ref m_LensLinearTurret, this, "LensTurret");
             }
             p_sInfo = m_toolBox.Get(ref m_memoryPool, this, "Memory", 1);

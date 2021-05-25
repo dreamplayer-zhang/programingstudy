@@ -38,6 +38,7 @@ namespace RootTools_Vision.WorkManager3
         {
             get => (TaskCount < this.MaxTaskCount);
         }
+
         #endregion
 
         public TaskManager(int size)
@@ -46,21 +47,21 @@ namespace RootTools_Vision.WorkManager3
             // 여기서 쓰레드 실행 종료 관리
         }
 
-        private object countLockObj = new object();
-        public void IncreaseCount()
-        {
-            lock (countLockObj) this.completeCount++;
-        }
+        //private object countLockObj = new object();
+        //public void IncreaseCount()
+        //{
+        //    lock (countLockObj) this.completeCount++;
+        //}
 
-        public void DecreaseCount()
-        {
-            lock (countLockObj) this.completeCount--;
+        //public void DecreaseCount()
+        //{
+        //    lock (countLockObj) this.completeCount--;
 
-            if (this.completeCount < 0)
-            {
-                MessageBox.Show("Bug");
-            }
-        }
+        //    if (this.completeCount < 0)
+        //    {
+        //        MessageBox.Show("Bug");
+        //    }
+        //}
 
         public bool Invoke(Task<TResult> task)
         {
@@ -71,7 +72,7 @@ namespace RootTools_Vision.WorkManager3
                 result = tasks.Add(task);
                 if (result)
                 {
-                    IncreaseCount();
+                    //IncreaseCount();
                     task.Start();
                     task.ContinueWith((arg) =>
                     {
@@ -88,7 +89,8 @@ namespace RootTools_Vision.WorkManager3
             }
             catch(Exception ex)
             {
-                MessageBox.Show(ex.Message);
+                //MessageBox.Show(ex.Message);
+                TempLogger.Write("Worker", ex);
                 return false;
             }
         }
