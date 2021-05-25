@@ -15,6 +15,7 @@ namespace RootTools_Vision
         INSPECTION              = 3,
         DEFECTPROCESS           = 4,
         DEFECTPROCESS_ALL       = 5,
+        MEASUREMENT             = 6,
     }
 
     public enum WORKMANAGER_STATE
