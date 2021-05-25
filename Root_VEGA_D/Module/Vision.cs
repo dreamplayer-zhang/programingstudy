@@ -73,7 +73,6 @@ namespace Root_VEGA_D.Module
 
         Camera_Dalsa m_CamMain;
         Camera_Basler m_CamAlign;
-        Camera_Basler m_CamAutoFocus;
         Camera_Basler m_CamRADS;
 
         KlarfData_Lot m_KlarfData_Lot;
@@ -95,7 +94,6 @@ namespace Root_VEGA_D.Module
         public LightSet LightSet { get => m_lightSet; private set => m_lightSet = value; }
         public Camera_Dalsa CamMain { get => m_CamMain; private set => m_CamMain = value; }
         public Camera_Basler CamAlign { get => m_CamAlign; private set => m_CamAlign = value; }
-        public Camera_Basler CamAutoFocus { get => m_CamAutoFocus; private set => m_CamAutoFocus = value; }
         public Camera_Basler CamRADS { get => m_CamRADS; private set => m_CamRADS = value; }
         public KlarfData_Lot KlarfData_Lot { get => m_KlarfData_Lot; private set => m_KlarfData_Lot = value; }
         public TCPIPComm_VEGA_D TcpipCommServer { get => m_tcpipCommServer; private set => m_tcpipCommServer = value; }
@@ -122,7 +120,6 @@ namespace Root_VEGA_D.Module
             p_sInfo = m_toolBox.Get(ref m_lightSet, this);
             p_sInfo = m_toolBox.GetCamera(ref m_CamMain, this, "MainCam");
             p_sInfo = m_toolBox.GetCamera(ref m_CamAlign, this, "AlignCam");
-            p_sInfo = m_toolBox.GetCamera(ref m_CamAutoFocus, this, "AutoFocusCam");
             p_sInfo = m_toolBox.GetCamera(ref m_CamRADS, this, "RADS");
             p_sInfo = m_toolBox.Get(ref m_LensLinearTurret, this, "LensTurret");
 
@@ -131,12 +128,8 @@ namespace Root_VEGA_D.Module
             //m_remote.GetTools(bInit);
 
             InitALID();
-            bool bUseRADS = false;
-            if (m_CamRADS.p_CamInfo != null)
-            {
-                //if(m_CamRADS.p_CamInfo.OpenStatus == true)
-                    bUseRADS = false;
-            }
+
+            bool bUseRADS = true;
             p_sInfo = m_toolBox.Get(ref m_RADSControl, this, "RADSControl", bUseRADS);
         }
         void InitALID()

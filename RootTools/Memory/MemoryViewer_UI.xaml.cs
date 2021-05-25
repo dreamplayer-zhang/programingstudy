@@ -112,6 +112,11 @@ namespace RootTools.Memory
             if (m_viewer == null) return;
             m_viewer.p_bLBD = false;
         }
+        private void gridBitmapSource_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (m_viewer == null) return;
+            
+        }
         #endregion
 
         #region Select Memory
@@ -158,6 +163,34 @@ namespace RootTools.Memory
                     Marshal.Copy(pBuf, 0, (IntPtr)((long)tttt.GetPtr(i) + (long)p_Size.X * tttt.p_nByte * y), p_Size.X * tttt.p_nByte);
                 }
             });
+        }
+
+        private void memuOption_Click(object sender, RoutedEventArgs e)
+        {
+            MemoryViewerOption optionWindow = new MemoryViewerOption();
+            optionWindow.Owner = Window.GetWindow(this);
+            optionWindow.SetOverlapOption(m_viewer.p_bRemoveOverlapArea, m_viewer.p_nFov, m_viewer.p_nOverlap);
+            optionWindow.SetGVRangeOption(m_viewer.p_memoryData.p_nByte, m_viewer.p_nOffsetFromUpperBit);
+
+            Nullable<bool> result = optionWindow.ShowDialog();
+            if (result.HasValue && result.Value)
+            {
+                // Overlap
+                bool bRemoveOverlapArea;
+                int nFov, nOverlap;
+                optionWindow.GetOverlapOption(out bRemoveOverlapArea, out nFov, out nOverlap);
+                m_viewer.p_bRemoveOverlapArea = bRemoveOverlapArea;
+                m_viewer.p_nFov = nFov;
+                m_viewer.p_nOverlap = nOverlap;
+
+                // Offset from Upper bit
+                int nOffsetFromUpperBit;
+                optionWindow.GetGVRangeOption(out nOffsetFromUpperBit);
+                m_viewer.p_nOffsetFromUpperBit = nOffsetFromUpperBit;
+
+                m_viewer.UpdateBitmapSource();
+            }
+
         }
     }
 }
