@@ -244,7 +244,7 @@ namespace Root_VEGA_D.Module
             CheckFDC();
 
             m_alidCDA1_digital.Run(!m_diCDA1.p_bIn, "Please Check CDA1 Pressure Sensor");
-            m_alidCDA1_digital.Run(!m_diCDA2.p_bIn, "Please Check CDA2 Pressure Sensor");
+            m_alidCDA2_digital.Run(!m_diCDA2.p_bIn, "Please Check CDA2 Pressure Sensor");
 
             m_alidEFEMLeft_Door.Run(!m_diEFEMLeft_Door.p_bIn, "EFEM Left Door Open");
             m_alidEFEMRight_Door.Run(!m_diEFEMRight_Door.p_bIn, "EFEM Right Door Open");

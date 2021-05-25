@@ -118,8 +118,8 @@ namespace Root_EFEM.Module
 
         public DIO_I m_diPlaced;
         public DIO_I m_diPresent;
-        private DIO_I m_diOpen;
-        private DIO_I m_diClose;
+        public DIO_I m_diOpen;
+        public DIO_I m_diClose;
         private DIO_I m_diReady;
         private DIO_I m_diRun;
 
@@ -715,10 +715,11 @@ namespace Root_EFEM.Module
         DispatcherTimer m_timer = new DispatcherTimer();
         void InitTimer()
         {
-            m_timer.Interval = TimeSpan.FromMilliseconds(20);
+            m_timer.Interval = TimeSpan.FromMilliseconds(100);
             m_timer.Tick += M_timer_Tick;
             m_timer.Start();
         }
+        string tempOHTerr = "OK";
         public string p_swLotTime = "";
         private void M_timer_Tick(object sender, EventArgs e)
         {
@@ -750,6 +751,15 @@ namespace Root_EFEM.Module
             if (m_OHT.m_bOHTErr == true && m_OHT.p_sInfo != "OK")
             {
                 m_alidOHTError.Run(m_OHT.m_bOHTErr, m_OHT.p_sInfo);
+                if(tempOHTerr != m_OHT.p_sInfo)
+                {
+                    m_log.Info(this.p_id + " OHT Err : " + m_OHT.p_sInfo);
+                }
+                tempOHTerr = m_OHT.p_sInfo;
+            }
+            else
+            {
+                tempOHTerr = m_OHT.p_sInfo;
             }
         }
         #endregion
@@ -1058,6 +1068,7 @@ namespace Root_EFEM.Module
             InitGAF();
             if (m_gem != null) m_gem.OnGemRemoteCommand += M_gem_OnRemoteCommand;
             InitThread();
+            InitTimer();
 
             m_swLotTime.Reset();
         }

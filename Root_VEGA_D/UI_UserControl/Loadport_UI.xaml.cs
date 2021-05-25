@@ -58,25 +58,31 @@ namespace Root_VEGA_D
         bool IsEnableLoad()
         {
             bool bReadyLoadport = (m_loadport.p_eState == ModuleBase.eState.Ready);
-            bool bReadyToLoad = (m_loadport.p_infoCarrier.p_eTransfer == GemCarrierBase.eTransfer.ReadyToLoad);
-            bReadyToLoad = true;
+            bool bReadyToUnload = (m_loadport.p_infoCarrier.p_eTransfer == GemCarrierBase.eTransfer.ReadyToUnload);  //LYJ 210525 add
+            //bReadyToLoad = true;
             bool bReadyState = (m_loadport.m_qModuleRun.Count == 0);
             bool bCheckInterlock = !m_loadport.m_OHT.p_bLightCurtain && !m_loadport.m_OHT.P_bProtectionBar;
             bool bEQReadyState = (EQ.p_eState == EQ.eState.Ready);
             //if (m_loadport.p_infoCarrier.p_eState != InfoCarrier.eState.Placed) return false;
-            bool bPlaced = m_loadport.CheckPlaced();
+            bool bPodExist = (!m_loadport.m_diPlaced.p_bIn && !m_loadport.m_diPresent.p_bIn);  //LYJ 210525 add
+            //bool bCheckClose = m_loadport.m_diClose.p_bIn; //LYJ 210525 add
+            bool bCheckClose = !m_loadport.m_diOpen.p_bIn; //LYJ 210525 add
+            //bool bPlaced = m_loadport.CheckPlaced();
 
             if (m_handler.IsEnableRecovery() == true) return false;
-            return bReadyLoadport && bReadyToLoad && bReadyState && bEQReadyState && bPlaced && bCheckInterlock;
+            return bReadyLoadport && !bReadyToUnload && bReadyState && bEQReadyState && bPodExist && bCheckInterlock && bCheckClose;
         }
 
         bool IsEnableUnloadReq()
         {
             bool bReadyLoadport = (m_loadport.p_eState == ModuleBase.eState.Ready);
-            bool bReadyToUnload = (m_loadport.p_infoCarrier.p_eTransfer == GemCarrierBase.eTransfer.ReadyToUnload);
-            bool bAccess = (m_loadport.p_infoCarrier.p_eAccessLP == GemCarrierBase.eAccessLP.Auto);
-            bool bPlaced = m_loadport.CheckPlaced();
-            return bReadyLoadport && bReadyToUnload && bAccess & bPlaced;
+            bool bTransferBlock = (m_loadport.p_infoCarrier.p_eTransfer == GemCarrierBase.eTransfer.TransferBlocked);
+            bool bPodExist = (!m_loadport.m_diPlaced.p_bIn && !m_loadport.m_diPresent.p_bIn);
+            bool bCheckInterlock = !m_loadport.m_OHT.p_bLightCurtain && !m_loadport.m_OHT.P_bProtectionBar;
+            //bool bCheckClose = m_loadport.m_diClose.p_bIn; //LYJ 210525 add
+            bool bCheckClose = !m_loadport.m_diOpen.p_bIn; //LYJ 210525 add
+
+            return bReadyLoadport && bTransferBlock && bPodExist && bCheckInterlock && bCheckClose;
         }
         #endregion
         public void Init(ILoadport loadport, VEGA_D_Handler handler, IRFID rfid)
