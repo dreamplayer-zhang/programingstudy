@@ -131,7 +131,7 @@ namespace Root_Pine2.Module
                 if (Run(RunShakeUp(0.9 * dzPulse))) return p_sInfo;
                 iShake++;
             }
-            return RunMoveUp(); 
+            return "OK"; 
         }
 
         string RunShakeUp(double dzPulse)
@@ -151,13 +151,21 @@ namespace Root_Pine2.Module
                 if (Run(RunMoveUp())) return p_sInfo;
                 if (Run(RunMoveLoadEV())) return p_sInfo;
                 if (Run(RunMoveZLoadEV())) return p_sInfo;
+                m_loadEV.p_bBlow = true;
                 if (Run(m_picker.RunVacuum(true))) return p_sInfo;
+                m_loadEV.p_eMove = LoadEV.eMove.Down; 
                 if (Run(RunShakeUp(nShake, dzShakeUp))) return p_sInfo;
+                m_loadEV.p_eMove = LoadEV.eMove.Stop;
+                m_loadEV.p_bBlow = false;
+                if (Run(RunMoveUp())) return p_sInfo;
                 if (m_picker.IsVacuum() == false) return p_sInfo;
                 m_picker.p_infoStrip = m_loadEV.GetNewInfoStrip();
+                m_loadEV.StartLoad(); 
             }
             finally
             {
+                m_loadEV.p_eMove = LoadEV.eMove.Stop;
+                m_loadEV.p_bBlow = false;
                 RunMoveUp();
             }
             return "OK";

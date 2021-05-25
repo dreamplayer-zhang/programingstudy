@@ -444,6 +444,16 @@ namespace Root_Pine2.Module
         #endregion
 
         #region override
+        public override string StateReady()
+        {
+            switch (m_pine2.p_eMode)
+            {
+                case Pine2.eRunMode.Stack: break; 
+            }
+            if (EQ.p_eState != EQ.eState.Run) return "OK";
+            return "OK";
+        }
+
         public override void Reset()
         {
             base.Reset();
