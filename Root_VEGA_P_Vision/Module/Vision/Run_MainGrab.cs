@@ -48,7 +48,6 @@ namespace Root_VEGA_P_Vision.Module
         {
             Run_MainGrab run = new Run_MainGrab(m_module);
             run.p_sMainGrabMode = p_sMainGrabMode;
-
             return run;
         }
         public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
@@ -72,10 +71,10 @@ namespace Root_VEGA_P_Vision.Module
                 int nScanLine = 0;
                 int nMMPerUM = 1000;
                 MainGrabMode.m_dTrigger = Convert.ToInt32(10 * MainGrabMode.m_dResY_um);  // 1pulse = 0.1um -> 10pulse = 1um
-                int nCamWidth = MainGrabMode.m_camera.GetRoiSize().X;
+                int nFOV = MainGrabMode.m_GD.m_nFovSize;
                 int nCamHeight = MainGrabMode.m_camera.GetRoiSize().Y;
                 int nPodSizeY_px = Convert.ToInt32(MainGrabMode.m_nPodSize_mm * nMMPerUM / MainGrabMode.m_dResY_um);  //파드 영역의 Y픽셀 갯수
-                int nPulsePerWidth = nCamWidth * MainGrabMode.m_dTrigger;
+                int nPulsePerWidth = nFOV * MainGrabMode.m_dTrigger;
                 int nPulsePerHeight = nCamHeight * MainGrabMode.m_dTrigger;
                 double dXScale = MainGrabMode.m_dResX_um * 10;
                 int nTotalTriggerCount = Convert.ToInt32(MainGrabMode.m_dTrigger * nPodSizeY_px);
@@ -105,7 +104,7 @@ namespace Root_VEGA_P_Vision.Module
                 #endregion
 
                 MainGrabMode.SetLight(true);
-                cpMemoryOffset.X += MainGrabMode.m_ScanStartLine * nCamWidth;
+                cpMemoryOffset.X += MainGrabMode.m_ScanStartLine * nFOV;
 
                 if(m_module.Run(axisZ.StartMove(MainGrabMode.m_nFocusPosZ)))
                     return p_sInfo;
@@ -127,7 +126,7 @@ namespace Root_VEGA_P_Vision.Module
                     grabData.bInvY = MainGrabMode.m_eGrabDirection == eGrabDirection.Forward;
 
                     double dPosX = MainGrabMode.m_rpAxisCenter.X + nPodSizeY_px * (double)MainGrabMode.m_dTrigger / 2 - 
-                        (nScanLine + MainGrabMode.m_ScanStartLine) * nCamWidth * dXScale;
+                        (nScanLine + MainGrabMode.m_ScanStartLine) * nFOV * dXScale;
 
                     if (m_module.Run(axisXY.StartMove(new RPoint(dPosX, dStartPosY))))
                         return p_sInfo;
@@ -145,7 +144,7 @@ namespace Root_VEGA_P_Vision.Module
 
                     axisXY.p_axisY.RunTrigger(false);
                     nScanLine++;
-                    cpMemoryOffset.X += nCamWidth;
+                    cpMemoryOffset.X += nFOV;
                 }
 
                 MainGrabMode.m_camera.StopGrab();

@@ -137,7 +137,7 @@
         <SolidColorBrush x:Key="MainThema" Color="#FF363C58"/>
         <SolidColorBrush x:Key="TextBlack" Color="#FF222222"/>
         <SolidColorBrush x:Key="TextBodyColor" Color="#FF888888"/>
-        <SolidColorBrush x:Key="BorderColor" Color="#FFCCCCCC"/>
+        <!--<SolidColorBrush x:Key="BorderColor" Color="#FFCCCCCC"/>-->
         <SolidColorBrush x:Key="MainBackGroundColor" Color="#FFEDECEA"/>
         <SolidColorBrush x:Key="ButtonBackGroundColor" Color="#FFE7E5E5"/>
         

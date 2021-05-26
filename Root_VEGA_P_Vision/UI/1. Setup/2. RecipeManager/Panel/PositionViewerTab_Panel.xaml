@@ -9,7 +9,12 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
-        <TabControl x:Name="ViewerTab">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="1*"/>
+            <RowDefinition Height="9*"/>
+        </Grid.RowDefinitions>
+        <Button Content="AlignTest" Command="{Binding btnAlignTest}"/>
+        <TabControl x:Name="ViewerTab" Grid.Row="1">
             <i:Interaction.Triggers>
                 <i:EventTrigger EventName="SelectionChanged">
                     <i:InvokeCommandAction Command="{Binding TabChanged}"/>

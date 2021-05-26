@@ -98,8 +98,9 @@ namespace Root_VEGA_P_Vision.Module
                 AlignGrabMode.m_dTrigger = Convert.ToInt32(10 * AlignGrabMode.m_dResY_um);  // 1pulse = 0.1um -> 10pulse = 1um
                 int nCamWidth = AlignGrabMode.m_camera.GetRoiSize().X;
                 int nCamHeight = AlignGrabMode.m_camera.GetRoiSize().Y;
+                int nFOV = AlignGrabMode.m_GD.m_nFovSize;
                 int nPodSizeY_px = Convert.ToInt32(AlignGrabMode.m_nPodSize_mm * nMMPerUM / AlignGrabMode.m_dResY_um);  //파드 영역의 Y픽셀 갯수
-                int nPulsePerWidth = nCamWidth * AlignGrabMode.m_dTrigger;
+                int nPulsePerWidth = nFOV * AlignGrabMode.m_dTrigger;
                 int nPulsePerHeight = nCamHeight * AlignGrabMode.m_dTrigger;
                 double dXScale = AlignGrabMode.m_dResX_um * 10;
                 int nTotalTriggerCount = Convert.ToInt32(AlignGrabMode.m_dTrigger * nPodSizeY_px);
@@ -129,7 +130,7 @@ namespace Root_VEGA_P_Vision.Module
                 #endregion
 
                 AlignGrabMode.SetLight(true);
-                cpMemoryOffset.X += AlignGrabMode.m_ScanStartLine * nCamWidth;
+                cpMemoryOffset.X += AlignGrabMode.m_ScanStartLine * nFOV;
 
                 if (m_module.Run(axisZ.StartMove(AlignGrabMode.m_nFocusPosZ)))
                     return p_sInfo;
@@ -151,7 +152,7 @@ namespace Root_VEGA_P_Vision.Module
                     grabData.bInvY = AlignGrabMode.m_eGrabDirection == eGrabDirection.Forward;
 
                     double dPosX = AlignGrabMode.m_rpAxisCenter.X + nPodSizeY_px * (double)AlignGrabMode.m_dTrigger / 2 -
-                        (nScanLine + AlignGrabMode.m_ScanStartLine) * nCamWidth * dXScale;
+                        (nScanLine + AlignGrabMode.m_ScanStartLine) * nFOV * dXScale;
 
                     if (m_module.Run(axisXY.StartMove(new RPoint(dPosX, dStartPosY))))
                         return p_sInfo;
@@ -169,7 +170,7 @@ namespace Root_VEGA_P_Vision.Module
 
                     axisXY.p_axisY.RunTrigger(false);
                     nScanLine++;
-                    cpMemoryOffset.X += nCamWidth;
+                    cpMemoryOffset.X += nFOV;
                 }
 
                 AlignGrabMode.m_camera.StopGrab();

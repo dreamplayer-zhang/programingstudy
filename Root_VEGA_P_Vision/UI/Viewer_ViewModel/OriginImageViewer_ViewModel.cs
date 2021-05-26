@@ -308,12 +308,6 @@ namespace Root_VEGA_P_Vision
                 case PROCESS_ORIGIN_STATE.OriginRightBottom:
                     p_Cursor = Cursors.Arrow;
 
-                    if ((memPt.X - originLeftTop.X) > 30000 || (originLeftTop.Y - memPt.Y) > 30000)
-                    {
-                        MessageBox.Show("Origin(혹은 검사) 영역의 크기는 높이 30000(혹은 너비 30000)을 넘을 수 없습니다.");
-                        return;
-                    }
-
                     originRightBottom.X = memPt.X;
                     originRightBottom.Y = memPt.Y;
 

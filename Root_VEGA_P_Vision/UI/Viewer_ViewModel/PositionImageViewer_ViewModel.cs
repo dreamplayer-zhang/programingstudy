@@ -500,10 +500,10 @@ namespace Root_VEGA_P_Vision
             if (originWidth == 0 || originHeight == 0) return;
 
             int left = originRecipe.TDIOrigin.Origin.X;
-            int top = originRecipe.TDIOrigin.Origin.Y - originHeight;
+            int top = originRecipe.TDIOrigin.Origin.Y;
 
             int right = originRecipe.TDIOrigin.Origin.X + originWidth;
-            int bottom = originRecipe.TDIOrigin.Origin.Y;
+            int bottom = originRecipe.TDIOrigin.Origin.Y+originHeight;
 
             CPoint canvasLeftTop = GetCanvasPoint(new CPoint(left, top));
             CPoint canvasLeftBottom = GetCanvasPoint(new CPoint(left, bottom));
