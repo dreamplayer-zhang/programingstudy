@@ -194,6 +194,8 @@ namespace Root_EFEM.Module
         {
             if (p_eState != eState.Ready)
                 return p_id + " eState not Ready";
+            if (!m_diDoorOpen.p_bIn)
+                return p_id + "Door Close Error";
             return p_infoCarrier.IsGetOK(nID);
         }
 
@@ -201,6 +203,8 @@ namespace Root_EFEM.Module
         {
             if (p_eState != eState.Ready)
                 return p_id + " eState not Ready";
+            if (!m_diDoorOpen.p_bIn)
+                return p_id + "Door Close Error";
             return p_infoCarrier.IsPutOK(nID);
         }
 

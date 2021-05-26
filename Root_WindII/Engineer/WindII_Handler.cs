@@ -47,9 +47,10 @@ namespace Root_WindII.Engineer
             p_moduleList = new ModuleList(m_engineer);
             InitWTR();
             InitLoadport();
-
+            InitAligner();
             m_visionFront = new Vision_Frontside("Vision", m_engineer, ModuleBase.eRemote.Server);
             InitModule(m_visionFront);
+            ((IWTR)m_wtr).AddChild((IWTRChild)m_visionFront);
 
 
             InitVision();
@@ -184,7 +185,34 @@ namespace Root_WindII.Engineer
         }
         #endregion
 
+        #region Module Aligner
+        enum eAligner
+        {
+            None,
+            ATI,
+            RND
+        }
+        eAligner m_eAligner = eAligner.ATI;
+        void InitAligner()
+        {
+            ModuleBase module = null;
+            switch (m_eAligner)
+            {
+                case eAligner.ATI: module = new Aligner_ATI("Aligner", m_engineer); break;
+                case eAligner.RND: module = new Aligner_RND("Aligner", m_engineer); break;
+            }
+            if (module != null)
+            {
+                InitModule(module);
+                ((IWTR)m_wtr).AddChild((IWTRChild)module);
+            }
+        }
 
+        public void RunTreeAligner(Tree tree)
+        {
+            m_eAligner = (eAligner)tree.Set(m_eAligner, m_eAligner, "Type", "Aligner Type");
+        }
+        #endregion
 
         #region Module Vision
         enum eVision
@@ -467,6 +495,7 @@ namespace Root_WindII.Engineer
         {
             RunTreeWTR(tree.GetTree("WTR"));
             RunTreeLoadport(tree.GetTree("Loadport"));
+            RunTreeAligner(tree.GetTree("Aligner"));
             RunTreeVision(tree.GetTree("Vision"));
             //m_bBackside = tree.Set(m_bBackside, m_bBackside, "Backside", "Use Backside");
         }
