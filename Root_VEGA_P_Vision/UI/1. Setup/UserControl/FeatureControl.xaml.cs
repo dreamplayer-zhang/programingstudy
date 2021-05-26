@@ -34,10 +34,5 @@ namespace Root_VEGA_P_Vision
             fc.p_ImageSource = this.m_ImageSource;
             return fc;
         }
-
-        private void UserControl_MouseDoubleClick()
-        {
-            var asdf = this.DataContext;
-        }
     }
 }

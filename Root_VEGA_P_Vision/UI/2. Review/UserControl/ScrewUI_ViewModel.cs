@@ -30,7 +30,7 @@ namespace Root_VEGA_P_Vision
             ScrewUI_ImageViewerVM.p_VisibleMenu = Visibility.Collapsed;
             ScrewUI_ImageViewerVM.p_VisibleSlider = Visibility.Collapsed;
             ImageDatas = new List<ImageData>();
-            ScrewUI_ImageViewerVM.init(new ImageData(GlobalObjects.Instance.Get<VEGA_P_Vision_Engineer>().ClassMemoryTool().GetMemory(App.mPool, App.mGroup, memstr)));
+            ScrewUI_ImageViewerVM.init(GlobalObjects.Instance.GetNamed<ImageData>(memstr));
         }
 
         public ICommand btnPrev

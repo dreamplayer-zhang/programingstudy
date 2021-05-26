@@ -1,4 +1,5 @@
-﻿using System;
+﻿using RootTools_Vision;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -20,6 +21,24 @@ namespace Root_VEGA_P_Vision
         public RecipeMask_Panel Main;
         private UserControl m_CurrentPanel;
         RecipeManager_ViewModel recipeManager;
+        MaskTools_ViewModel maskTools;
+
+        EUVPodSurfaceRecipe surfaceRecipe;
+        EUVPodSurfaceParameter surfaceParameter;
+        EUVPodSurfaceParameterBase curBaseParam;
+        SurfaceParam_ViewModel darkParam, brightParam;
+
+        public SurfaceParam_ViewModel DarkParam
+        {
+            get => darkParam;
+            set => SetProperty(ref darkParam, value);
+        }
+        public SurfaceParam_ViewModel BrightParam
+        {
+            get => brightParam;
+            set => SetProperty(ref brightParam, value);
+        }
+        
         public UserControl p_MaskPanel
         {
             get => m_CurrentPanel;
@@ -31,32 +50,68 @@ namespace Root_VEGA_P_Vision
             this.recipeManager = recipeManager;
             Main = new RecipeMask_Panel();
             Main.DataContext = this;
+            surfaceRecipe = GlobalObjects.Instance.Get<RecipeVision>().GetItem<EUVPodSurfaceRecipe>();
+            surfaceParameter = GlobalObjects.Instance.Get<RecipeVision>().GetItem<EUVPodSurfaceParameter>();
+            maskTools = new MaskTools_ViewModel();
+
             recipeStainVM = new RecipeStain_ViewModel(this);
             recipeTDIVM = new Recipe6um_ViewModel(this);
             recipeSideVM = new RecipeSide_ViewModel(this);
             recipeStackingVM = new Recipe1um_ViewModel(this);
+
+            darkParam = new SurfaceParam_ViewModel(surfaceParameter.PodStain.DarkParam);
+            brightParam = new SurfaceParam_ViewModel(surfaceParameter.PodStain.BrightParam);
+
+            CurBaseParam = SurfaceParameter.PodStain;
         }
+
+        #region Property
+        public EUVPodSurfaceParameterBase CurBaseParam
+        {
+            get => curBaseParam;
+            set => SetProperty(ref curBaseParam, value);
+        }
+        public EUVPodSurfaceRecipe SurfaceRecipe
+        {
+            get => surfaceRecipe;
+            set => SetProperty(ref surfaceRecipe, value);
+        }
+        public EUVPodSurfaceParameter SurfaceParameter
+        {
+            get => surfaceParameter;
+            set => SetProperty(ref surfaceParameter, value);
+        }
+        public MaskTools_ViewModel MaskTools
+        {
+            get => maskTools;
+            set => SetProperty(ref maskTools, value);
+        }
+        #endregion
 
         #region RelayCommand
         public void SetStain()
         {
             p_MaskPanel = recipeStainVM.Main;
             p_MaskPanel.DataContext = recipeStainVM;
+            CurBaseParam = SurfaceParameter.PodStain;
         }
         public void SetTDI()
         {
             p_MaskPanel = recipeTDIVM.Main;
             p_MaskPanel.DataContext = recipeTDIVM;
+            CurBaseParam = SurfaceParameter.PodTDI;
         }
         public void SetStacking()
         {
             p_MaskPanel = recipeStackingVM.Main;
             p_MaskPanel.DataContext = recipeStackingVM;
+            CurBaseParam = SurfaceParameter.PodStacking;
         }
         public void SetSide()
         {
             p_MaskPanel = recipeSideVM.Main;
-            p_MaskPanel.DataContext = recipeSideVM;              
+            p_MaskPanel.DataContext = recipeSideVM;
+            CurBaseParam = surfaceParameter.PodSide;
         }
         public ICommand btnStain
         {
@@ -300,6 +355,7 @@ namespace Root_VEGA_P_Vision
                     break;
             }
         }
+
 
         #endregion
     }

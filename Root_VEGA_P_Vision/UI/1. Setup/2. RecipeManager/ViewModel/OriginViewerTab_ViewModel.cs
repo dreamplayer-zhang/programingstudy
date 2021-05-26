@@ -24,29 +24,29 @@ namespace Root_VEGA_P_Vision
     public class OriginViewerTab_ViewModel : ObservableObject
     {
         public OriginViewerTab_Panel Main;
-        RootViewer_ViewModel m2DTDIViewer, mStainViewer, mSideTopBtmViewer,mSideLeftRightViewer;
-        RootViewer_ViewModel selectedViewer;
+        OriginImageViewer_ViewModel m2DTDIViewer, mStainViewer, mSideTopBtmViewer,mSideLeftRightViewer;
+        OriginImageViewer_ViewModel selectedViewer;
         EUVOriginRecipe originRecipe;
 
         int selectedIdx, sideselectedIdx;
 
         #region Property
-        public RootViewer_ViewModel p_2DOriginViewer
+        public OriginImageViewer_ViewModel p_2DOriginViewer
         {
             get => m2DTDIViewer;
             set => SetProperty(ref m2DTDIViewer, value);
         }
-        public RootViewer_ViewModel p_StainOriginViewer
+        public OriginImageViewer_ViewModel p_StainOriginViewer
         {
             get => mStainViewer;
             set => SetProperty(ref mStainViewer, value);
         }
-        public RootViewer_ViewModel p_SideOriginTopBtmViewer
+        public OriginImageViewer_ViewModel p_SideOriginTopBtmViewer
         {
             get => mSideTopBtmViewer;
             set => SetProperty(ref mSideTopBtmViewer, value);
         }
-        public RootViewer_ViewModel p_SideOriginLeftRightViewer
+        public OriginImageViewer_ViewModel p_SideOriginLeftRightViewer
         {
             get => mSideLeftRightViewer;
             set => SetProperty(ref mSideLeftRightViewer, value);
@@ -56,20 +56,15 @@ namespace Root_VEGA_P_Vision
         {
             Main = new OriginViewerTab_Panel();
             Main.DataContext = this;
-            m2DTDIViewer = new OriginImageViewer_ViewModel();
-            mStainViewer = new OriginImageViewer_ViewModel();
-            mSideTopBtmViewer = new OriginImageViewer_ViewModel();
-            mSideLeftRightViewer = new OriginImageViewer_ViewModel();
+            m2DTDIViewer = new OriginImageViewer_ViewModel("EIP_Cover.Main.Front");
+            mStainViewer = new OriginImageViewer_ViewModel("EIP_Cover.Stain.Front");
+            mSideTopBtmViewer = new OriginImageViewer_ViewModel("EIP_Cover.Top");
+            mSideLeftRightViewer = new OriginImageViewer_ViewModel("EIP_Cover.Left");
 
-            ImageData TDIimage = GlobalObjects.Instance.GetNamed<ImageData>("EIP_Cover.Main.Front");
-            ImageData Stainimage = GlobalObjects.Instance.GetNamed<ImageData>("EIP_Cover.Stain.Front");
-            ImageData SideTBimage = GlobalObjects.Instance.GetNamed<ImageData>("EIP_Cover.Top");
-            ImageData SideLRimage = GlobalObjects.Instance.GetNamed<ImageData>("EIP_Cover.Left");
-
-            InitOriginViewer((OriginImageViewer_ViewModel)p_2DOriginViewer, TDIimage);
-            InitOriginViewer((OriginImageViewer_ViewModel)p_StainOriginViewer, Stainimage);
-            InitOriginViewer((OriginImageViewer_ViewModel)p_SideOriginTopBtmViewer, SideTBimage);
-            InitOriginViewer((OriginImageViewer_ViewModel)p_SideOriginLeftRightViewer, SideLRimage);
+            InitOriginViewer(p_2DOriginViewer);
+            InitOriginViewer(p_StainOriginViewer);
+            InitOriginViewer(p_SideOriginTopBtmViewer);
+            InitOriginViewer(p_SideOriginLeftRightViewer);
 
             originRecipe = GlobalObjects.Instance.Get<RecipeVision>().GetItem<EUVOriginRecipe>();
 
@@ -78,9 +73,8 @@ namespace Root_VEGA_P_Vision
             selectedViewer = p_2DOriginViewer;
         }
 
-        void InitOriginViewer(OriginImageViewer_ViewModel viewer,ImageData image)
+        void InitOriginViewer(OriginImageViewer_ViewModel viewer)
         {
-            viewer.init(image, GlobalObjects.Instance.Get<DialogService>());
             viewer.OriginBoxReset += OriginBoxReset_Callback;
             viewer.OriginPointDone += OriginPointDone_Callback;
             viewer.OriginBoxDone += OriginBoxDone_Callback;
@@ -93,10 +87,10 @@ namespace Root_VEGA_P_Vision
             SideLROrigin = originRecipe.SideLROrigin;
             SideTBOrigin = originRecipe.SideTBOrigin;
 
-            ((OriginImageViewer_ViewModel)p_2DOriginViewer).SetOriginBox(TDIOrigin.Origin, TDIOrigin.OriginSize);
-            ((OriginImageViewer_ViewModel)p_StainOriginViewer).SetOriginBox(StainOrigin.Origin, StainOrigin.OriginSize);
-            ((OriginImageViewer_ViewModel)p_SideOriginTopBtmViewer).SetOriginBox(SideTBOrigin.Origin, SideTBOrigin.OriginSize);
-            ((OriginImageViewer_ViewModel)p_SideOriginLeftRightViewer).SetOriginBox(SideLROrigin.Origin, SideLROrigin.OriginSize);
+            p_2DOriginViewer.SetOriginBox(TDIOrigin.Origin, TDIOrigin.OriginSize);
+            p_StainOriginViewer.SetOriginBox(StainOrigin.Origin, StainOrigin.OriginSize);
+            p_SideOriginTopBtmViewer.SetOriginBox(SideTBOrigin.Origin, SideTBOrigin.OriginSize);
+            p_SideOriginLeftRightViewer.SetOriginBox(SideLROrigin.Origin, SideLROrigin.OriginSize);
 
             VegaPEventManager.OnRecipeUpdated(this, new RecipeEventArgs());
         }
@@ -125,7 +119,7 @@ namespace Root_VEGA_P_Vision
 
         public void Clear()
         {
-            ((OriginImageViewer_ViewModel)selectedViewer).ClearObjects(true);
+            selectedViewer.ClearObjects(true);
 
             //originRecipe.Clear();
             VegaPEventManager.OnRecipeUpdated(this, new RecipeEventArgs());

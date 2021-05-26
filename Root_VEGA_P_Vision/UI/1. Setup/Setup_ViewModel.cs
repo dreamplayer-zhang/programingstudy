@@ -45,6 +45,7 @@ namespace Root_VEGA_P_Vision
         private Home_ViewModel homeVM;
         public RecipeManager_ViewModel recipeManagerVM;
         public Maintenance_ViewModel maintVM;
+        public PodInfo_ViewModel podInfoVM;
 
         public Setup Main;
         public Setup_ViewModel()
@@ -65,6 +66,7 @@ namespace Root_VEGA_P_Vision
             homeVM = new Home_ViewModel(this);
             recipeManagerVM = new RecipeManager_ViewModel(this);
             maintVM = new Maintenance_ViewModel(this);
+            podInfoVM = new PodInfo_ViewModel(this);
         }
         private void InitAllNaviBtn()
         {
@@ -79,6 +81,9 @@ namespace Root_VEGA_P_Vision
 
             m_btnNaviMaintenance = new NaviBtn("Maintenance");
             m_btnNaviMaintenance.Btn.Click += Navi_MaintClick;
+
+            m_btnNaviPodInfo = new NaviBtn("PodInfo");
+            m_btnNaviPodInfo.Btn.Click += Navi_PodInfoClick;
         }
 
         #region Navi Buttons
@@ -86,6 +91,7 @@ namespace Root_VEGA_P_Vision
         // SetupHome Navi Buttons
         public NaviBtn m_btnNaviInspection;
         public NaviBtn m_btnNaviRecipeWizard;
+        public NaviBtn m_btnNaviPodInfo;
         public NaviBtn m_btnNaviRecipeMask;
         public NaviBtn m_btnNaviMaintenance;
         public NaviBtn m_btnNaviGEM;
@@ -115,6 +121,10 @@ namespace Root_VEGA_P_Vision
         void Navi_GEMClick(object sender, RoutedEventArgs e)
         {
             SetGEM();
+        }
+        void Navi_PodInfoClick(object sender, RoutedEventArgs e)
+        {
+            SetPodInfo();
         }
         #endregion
 
@@ -209,6 +219,13 @@ namespace Root_VEGA_P_Vision
             p_NaviButtons.Add(m_btnNaviRecipeMask);
 
         }
+        public void SetPodInfo()
+        {
+            p_CurrentPanel = podInfoVM.Main;
+            p_NaviButtons.Clear();
+            p_NaviButtons.Add(m_btnNaviPodInfo);
+        }
+
         public void SetMaintenance()
         {
             p_NaviButtons.Clear();

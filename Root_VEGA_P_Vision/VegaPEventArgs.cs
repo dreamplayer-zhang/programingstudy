@@ -22,4 +22,12 @@ namespace Root_VEGA_P_Vision
 
         }
     }
+    public class ImageROIEventArgs:EventArgs
+    {
+        public readonly string memstr;
+        public ImageROIEventArgs(string memstr)
+        {
+            this.memstr = memstr;
+        }
+    }
 }

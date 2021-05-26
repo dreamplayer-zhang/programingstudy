@@ -41,13 +41,13 @@ namespace Root_VEGA_P_Vision
         {
             Main = new RecipeSideImageViewers_Panel();
             Main.DataContext = this;
-            top_ViewerVM = new MaskRootViewer_ViewModel(parts + ".Top", recipeSide.recipeSetting);
+            top_ViewerVM = new MaskRootViewer_ViewModel(parts + ".Top", recipeSide.recipeSetting.MaskTools);
 
-            bottom_ViewerVM = new MaskRootViewer_ViewModel(parts+".Bottom",recipeSide.recipeSetting);
+            bottom_ViewerVM = new MaskRootViewer_ViewModel(parts+".Bottom", recipeSide.recipeSetting.MaskTools);
 
-            left_ViewerVM = new MaskRootViewer_ViewModel(parts+".Left", recipeSide.recipeSetting);
+            left_ViewerVM = new MaskRootViewer_ViewModel(parts+".Left", recipeSide.recipeSetting.MaskTools);
 
-            right_ViewerVM = new MaskRootViewer_ViewModel(parts+".Right",recipeSide.recipeSetting);
+            right_ViewerVM = new MaskRootViewer_ViewModel(parts+".Right", recipeSide.recipeSetting.MaskTools);
         }
     }
 }

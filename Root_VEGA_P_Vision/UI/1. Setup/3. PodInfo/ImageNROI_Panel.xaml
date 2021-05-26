@@ -1,0 +1,68 @@
+﻿<UserControl x:Class="Root_VEGA_P_Vision.ImageNROI_Panel"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Root_VEGA_P_Vision"
+             xmlns:Tools="clr-namespace:RootTools;assembly=RootTools"
+             mc:Ignorable="d" 
+             d:DesignHeight="900" d:DesignWidth="1600" Background="{StaticResource PanelBackGround}">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="7*"/>
+            <ColumnDefinition Width="3*"/>
+        </Grid.ColumnDefinitions>
+        <Grid Grid.Column="0">
+            <Tools:RootViewer DataContext="{Binding SelectedViewer}"/>
+        </Grid>
+        <Grid Grid.Column="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="4*"/>
+                <RowDefinition Height="1*"/>
+                <RowDefinition Height="2*"/>
+                <RowDefinition Height="5*"/>
+            </Grid.RowDefinitions>
+            <local:MaskTools_Panel DataContext="{Binding MaskTools}"/>
+            <GroupBox Header="Master Image" Grid.Row="1">
+                <UniformGrid Rows="1">
+                    <Button Content="Save MasterImage" Command="{Binding btnSaveMasterImage}"/>
+                    <Button Content="Load MasterImage" Command="{Binding btnLoadMasterImage}"/>
+                </UniformGrid>
+            </GroupBox>
+            <GroupBox Header="ROI" Grid.Row="2">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
+                    <UniformGrid Grid.Row="0">
+                        <RadioButton Content="Capture Area" Grid.Row="0"/>
+                        <RadioButton Content="ROI" Grid.Row="1"/>
+                    </UniformGrid>
+                    <UniformGrid Grid.Row="1" Rows="1">
+                        <Button Content="Pen" Command="{Binding btnDot}"/>
+                        <Button Content="Rect" Command="{Binding btnRect}"/>
+                        <Button Content="Select" Command="{Binding btnSelect}"/>
+                    </UniformGrid>
+                </Grid>
+            </GroupBox>
+            <GroupBox Header="Inspection Param"  Grid.Row="3">
+                <TabControl>
+                    <TabItem Header="GrabMode">
+                    </TabItem>
+                    <TabItem Header="Inspection">
+                        <TreeView>
+                            <TreeViewItem Header="Bright">
+                                <local:SurfaceParam_Panel DataContext="{Binding BrightParam}"/>
+                            </TreeViewItem>
+                            <TreeViewItem Header="Dark">
+                                <local:SurfaceParam_Panel DataContext="{Binding DarkParam}"/>
+                            </TreeViewItem>
+                        </TreeView>
+                    </TabItem>
+                </TabControl>
+            </GroupBox>
+        </Grid>
+    </Grid>
+    
+</UserControl>

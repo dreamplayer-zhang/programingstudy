@@ -11,7 +11,6 @@ namespace Root_VEGA_P_Vision
             RegisterRecipeItem<EUVPositionRecipe>();
             RegisterRecipeItem<MaskRecipe>();
             RegisterRecipeItem<EUVPodSurfaceRecipe>();
-
             RegisterParameterItem<EUVPodSurfaceParameter>();
 
             WaferMap.MapSizeX = 1;

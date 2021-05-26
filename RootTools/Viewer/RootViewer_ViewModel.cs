@@ -450,8 +450,8 @@ namespace RootTools
                 SetProperty(ref m_Cursor, value);
             }
         }
-        private int m_MouseX = 0;
-        public int p_MouseX
+        protected int m_MouseX = 0;
+        public virtual int p_MouseX
         {
             get
             {
@@ -724,7 +724,7 @@ namespace RootTools
             SetRoiRect();
         }
 
-        public unsafe void SetImageSource()
+        public virtual unsafe void SetImageSource()
         {
             try
             {
@@ -785,7 +785,7 @@ namespace RootTools
                     else
                     {
                         object o = new object();
-                        if (p_ImageData.GetBytePerPixel() == 1 && p_ImageData.p_nByte==1)
+                        if (p_ImageData.GetBytePerPixel() == 1 && p_ImageData.p_nPlane==1)
                         {
                             Image<Gray, byte> view = new Image<Gray, byte>(p_CanvasWidth, p_CanvasHeight);
 

@@ -16,14 +16,14 @@ namespace Root_VEGA_P_Vision
     public delegate void EventOriginBoxDone();
     public delegate void EventOriginPointDone();
     public delegate void EventOriginBoxReset();
-    public class OriginImageViewer_ViewModel : RootViewer_ViewModel
+    public class OriginImageViewer_ViewModel : BaseViewer_ViewModel
     {
         #region [Color]
 
         public class DefineColors
         {
-            public static SolidColorBrush OriginColor = Brushes.Blue;
-            public static SolidColorBrush OriginBoxColor = Brushes.Blue;
+            public static SolidColorBrush OriginColor = new SolidColorBrush(Color.FromRgb(0,122,255));
+            public static SolidColorBrush OriginBoxColor = new SolidColorBrush(Color.FromRgb(0, 122,255));
         }
 
         #endregion
@@ -47,8 +47,8 @@ namespace Root_VEGA_P_Vision
                     }
                     else
                     {
-                        originLeftBottom.X = originBox.Left;
-                        originLeftBottom.Y = originBox.Bottom;
+                        originLeftTop.X = originBox.Left;
+                        originLeftTop.Y = originBox.Top;
                         RedrawShapes();
                     }
                 }
@@ -60,7 +60,7 @@ namespace Root_VEGA_P_Vision
         #region [ViewerState]
         EUVOriginRecipe originRecipe;
 
-        public OriginImageViewer_ViewModel()
+        public OriginImageViewer_ViewModel(string imageData):base(imageData)
         {
             p_VisibleMenu = Visibility.Collapsed;
             RecipeVision recipe = GlobalObjects.Instance.Get<RecipeVision>();
@@ -73,25 +73,25 @@ namespace Root_VEGA_P_Vision
 
         public void SetOriginBox(CPoint originPt, CPoint originSize)
         {
-            originLeftBottom.X = originPt.X;
-            originLeftBottom.Y = originPt.Y;
+            originLeftTop.X = originPt.X;
+            originLeftTop.Y = originPt.Y;
 
-            originRightTop.X = originPt.X + originSize.X;
-            originRightTop.Y = originPt.Y - originSize.Y;
+            originRightBottom.X = originPt.X + originSize.X;
+            originRightBottom.Y = originPt.Y + originSize.Y;
 
-            originBox.Left = originLeftBottom.X;
-            originBox.Right = originRightTop.X;
-            originBox.Top = originRightTop.Y;
-            originBox.Bottom = originLeftBottom.Y;
+            originBox.Left = originLeftTop.X;
+            originBox.Right = originRightBottom.X;
+            originBox.Top = originLeftTop.Y;
+            originBox.Bottom = originRightBottom.Y;
 
-            DrawOriginLeftBottomPoint(originLeftBottom, true);
-            DrawOriginRightTopPoint(originRightTop, true);
+            DrawOriginLeftTopPoint(originLeftTop, true);
+            DrawOriginRightBottomPoint(originRightBottom, true);
 
             DrawOriginBox();
         }
 
 
-        private void DrawOriginLeftBottomPoint(CPoint memPt, bool bRecipeLoaded = false)
+        private void DrawOriginLeftTopPoint(CPoint memPt, bool bRecipeLoaded = false)
         {
             if (memPt.X == 0 || memPt.Y == 0)
                 return;
@@ -99,19 +99,19 @@ namespace Root_VEGA_P_Vision
             CPoint viewPt = memPt;
             CPoint canvasPt = GetCanvasPoint(viewPt);
 
-            OriginLeftBottom_UI.Width = 40;
-            OriginLeftBottom_UI.Height = 40;
+            OriginLeftTop_UI.Width = 40;
+            OriginLeftTop_UI.Height = 40;
 
-            Line line1 = OriginLeftBottom_UI.Children[0] as Line;
+            Line line1 = OriginLeftTop_UI.Children[0] as Line;
             line1.X1 = 0;
-            line1.Y1 = -40;
+            line1.Y1 = 40;
             line1.X2 = 0;
-            line1.Y2 = 10;
-            line1.Stroke = Brushes.Red;
+            line1.Y2 = -10;
+            line1.Stroke = DefineColors.OriginBoxColor;
             line1.StrokeThickness = 3;
             line1.Opacity = 1;
 
-            Line line2 = OriginLeftBottom_UI.Children[1] as Line;
+            Line line2 = OriginLeftTop_UI.Children[1] as Line;
             line2.X1 = -10;
             line2.Y1 = 0;
             line2.X2 = 40;
@@ -120,16 +120,16 @@ namespace Root_VEGA_P_Vision
             line2.StrokeThickness = 3;
             line2.Opacity = 1;
 
-            Canvas.SetLeft(OriginLeftBottom_UI, canvasPt.X);
-            Canvas.SetTop(OriginLeftBottom_UI, canvasPt.Y);
+            Canvas.SetLeft(OriginLeftTop_UI, canvasPt.X);
+            Canvas.SetTop(OriginLeftTop_UI, canvasPt.Y);
 
-            if (!p_UIElement.Contains(OriginLeftBottom_UI))
+            if (!p_UIElement.Contains(OriginLeftTop_UI))
             {
-                p_UIElement.Add(OriginLeftBottom_UI);
+                p_UIElement.Add(OriginLeftTop_UI);
             }
         }
 
-        private void DrawOriginRightTopPoint(CPoint memPt, bool bRecipeLoaded = false)
+        private void DrawOriginRightBottomPoint(CPoint memPt, bool bRecipeLoaded = false)
         {
             if (memPt.X == 0 || memPt.Y == 0)
                 return;
@@ -137,20 +137,20 @@ namespace Root_VEGA_P_Vision
             CPoint viewPt = memPt;
             CPoint canvasPt = GetCanvasPoint(viewPt);
 
-            OriginRightTop_UI.Width = 40;
-            OriginRightTop_UI.Height = 40;
+            OriginRightBottom_UI.Width = 40;
+            OriginRightBottom_UI.Height = 40;
 
 
-            Line line1 = OriginRightTop_UI.Children[0] as Line;
+            Line line1 = OriginRightBottom_UI.Children[0] as Line;
             line1.X1 = 0;
-            line1.Y1 = -10;
+            line1.Y1 = 10;
             line1.X2 = 0;
-            line1.Y2 = 40;
+            line1.Y2 = -40;
             line1.Stroke = DefineColors.OriginColor;
             line1.StrokeThickness = 3;
             line1.Opacity = 1;
 
-            Line line2 = OriginRightTop_UI.Children[1] as Line;
+            Line line2 = OriginRightBottom_UI.Children[1] as Line;
             line2.X1 = -40;
             line2.Y1 = 0;
             line2.X2 = 10;
@@ -159,12 +159,12 @@ namespace Root_VEGA_P_Vision
             line2.StrokeThickness = 3;
             line2.Opacity = 1;
 
-            Canvas.SetLeft(OriginRightTop_UI, canvasPt.X);
-            Canvas.SetTop(OriginRightTop_UI, canvasPt.Y);
+            Canvas.SetLeft(OriginRightBottom_UI, canvasPt.X);
+            Canvas.SetTop(OriginRightBottom_UI, canvasPt.Y);
 
-            if (!p_UIElement.Contains(OriginRightTop_UI))
+            if (!p_UIElement.Contains(OriginRightBottom_UI))
             {
-                p_UIElement.Add(OriginRightTop_UI);
+                p_UIElement.Add(OriginRightBottom_UI);
             }
 
             if (bRecipeLoaded == false)
@@ -190,14 +190,14 @@ namespace Root_VEGA_P_Vision
             int offset = 40; // OriginPoint Line 길이
 
             OriginBox_UI.Width = Math.Abs(canvasRightTop.X - canvasLeftTop.X);
-            OriginBox_UI.Height = Math.Abs(canvasLeftBottom.Y - canvasLeftTop.Y);
+            OriginBox_UI.Height = Math.Abs(canvasRightTop.Y - canvasRightBottom.Y);
 
             // Left
             Line leftLine = OriginBox_UI.Children[0] as Line;
             leftLine.X1 = 0;
             leftLine.Y1 = 0;
             leftLine.X2 = 0;
-            leftLine.Y2 = OriginBox_UI.Height - offset;
+            leftLine.Y2 = OriginBox_UI.Height /*- offset*/;
             leftLine.Stroke = DefineColors.OriginBoxColor;
             leftLine.StrokeThickness = 1;
             leftLine.Opacity = 0.75;
@@ -207,7 +207,7 @@ namespace Root_VEGA_P_Vision
             Line topLine = OriginBox_UI.Children[1] as Line;
             topLine.X1 = 0;
             topLine.Y1 = 0;
-            topLine.X2 = OriginBox_UI.Width - offset;
+            topLine.X2 = OriginBox_UI.Width /*- offset*/;
             topLine.Y2 = 0;
             topLine.Stroke = DefineColors.OriginBoxColor;
             topLine.StrokeThickness = 1;
@@ -217,7 +217,7 @@ namespace Root_VEGA_P_Vision
             // Right
             Line rightLine = OriginBox_UI.Children[2] as Line;
             rightLine.X1 = OriginBox_UI.Width;
-            rightLine.Y1 = offset;
+            rightLine.Y1 = 0/*offset*/;
             rightLine.X2 = OriginBox_UI.Width;
             rightLine.Y2 = OriginBox_UI.Height;
             rightLine.Stroke = DefineColors.OriginBoxColor;
@@ -227,7 +227,7 @@ namespace Root_VEGA_P_Vision
 
             // bottom
             Line bottomLine = OriginBox_UI.Children[3] as Line;
-            bottomLine.X1 = offset;
+            bottomLine.X1 = 0/*offset*/;
             bottomLine.Y1 = OriginBox_UI.Height;
             bottomLine.X2 = OriginBox_UI.Width;
             bottomLine.Y2 = OriginBox_UI.Height;
@@ -247,13 +247,13 @@ namespace Root_VEGA_P_Vision
 
         private void RedrawShapes()
         {
-            if (p_UIElement.Contains(OriginLeftBottom_UI))
+            if (p_UIElement.Contains(OriginLeftTop_UI))
             {
-                DrawOriginLeftBottomPoint(originLeftBottom);
+                DrawOriginLeftTopPoint(originLeftTop);
             }
-            if (p_UIElement.Contains(OriginRightTop_UI))
+            if (p_UIElement.Contains(OriginRightBottom_UI))
             {
-                DrawOriginRightTopPoint(originRightTop);
+                DrawOriginRightBottomPoint(originRightBottom);
             }
             if (p_UIElement.Contains(OriginBox_UI))
             {
@@ -266,8 +266,8 @@ namespace Root_VEGA_P_Vision
         private enum PROCESS_ORIGIN_STATE
         {
             None,
-            OriginLeftBottom,
-            OriginRightTop,
+            OriginLeftTop,
+            OriginRightBottom,
         }
 
         PROCESS_ORIGIN_STATE originState = PROCESS_ORIGIN_STATE.None;
@@ -281,15 +281,15 @@ namespace Root_VEGA_P_Vision
             switch (originState)
             {
                 case PROCESS_ORIGIN_STATE.None:
-                    originState = PROCESS_ORIGIN_STATE.OriginLeftBottom;
+                    originState = PROCESS_ORIGIN_STATE.OriginLeftTop;
                     ProcessOrigin(e);
                     break;
-                case PROCESS_ORIGIN_STATE.OriginLeftBottom:
+                case PROCESS_ORIGIN_STATE.OriginLeftTop:
                     ClearObjects();
 
                     p_Cursor = Cursors.Arrow;
-                    originLeftBottom = memPt;
-                    DrawOriginLeftBottomPoint(originLeftBottom);
+                    originLeftTop = memPt;
+                    DrawOriginLeftTopPoint(originLeftTop);
 
                     if (memid.Contains("Main"))
                         originRecipe.TDIOrigin.Origin = memPt;
@@ -303,24 +303,24 @@ namespace Root_VEGA_P_Vision
                     if (OriginPointDone != null)
                         OriginPointDone();
 
-                    originState = PROCESS_ORIGIN_STATE.OriginRightTop;
+                    originState = PROCESS_ORIGIN_STATE.OriginRightBottom;
                     break;
-                case PROCESS_ORIGIN_STATE.OriginRightTop:
+                case PROCESS_ORIGIN_STATE.OriginRightBottom:
                     p_Cursor = Cursors.Arrow;
 
-                    if ((memPt.X - originLeftBottom.X) > 30000 || (originLeftBottom.Y - memPt.Y) > 30000)
+                    if ((memPt.X - originLeftTop.X) > 30000 || (originLeftTop.Y - memPt.Y) > 30000)
                     {
                         MessageBox.Show("Origin(혹은 검사) 영역의 크기는 높이 30000(혹은 너비 30000)을 넘을 수 없습니다.");
                         return;
                     }
 
-                    originRightTop.X = memPt.X;
-                    originRightTop.Y = memPt.Y;
+                    originRightBottom.X = memPt.X;
+                    originRightBottom.Y = memPt.Y;
 
-                    originBox.Left = originLeftBottom.X;
-                    originBox.Right = originRightTop.X;
-                    originBox.Top = originRightTop.Y;
-                    originBox.Bottom = originLeftBottom.Y;
+                    originBox.Left = originLeftTop.X;
+                    originBox.Right = originRightBottom.X;
+                    originBox.Top = originLeftTop.Y;
+                    originBox.Bottom = originRightBottom.Y;
 
                     int w = originBox.Right - originBox.Left;
                     int h = originBox.Bottom - originBox.Top;
@@ -334,7 +334,7 @@ namespace Root_VEGA_P_Vision
                     else if (memid.Contains("Left"))
                         originRecipe.SideLROrigin.OriginSize = new CPoint(w,h);
 
-                    DrawOriginRightTopPoint(originRightTop);
+                    DrawOriginRightBottomPoint(originRightBottom);
                     DrawOriginBox();
                     SetOrigin();
 
@@ -369,23 +369,23 @@ namespace Root_VEGA_P_Vision
 
         #region [Draw 관련 멤버]
 
-        Grid OriginLeftBottom_UI = null;
-        Grid OriginRightTop_UI = null;
+        Grid OriginLeftTop_UI = null;
+        Grid OriginRightBottom_UI = null;
         Grid OriginBox_UI = null;
 
-        CPoint originLeftBottom = new CPoint();
-        CPoint originRightTop = new CPoint();
+        CPoint originLeftTop = new CPoint();
+        CPoint originRightBottom = new CPoint();
         CRect originBox = new CRect();
 
         public void InitializeUIElement()
         {
-            OriginLeftBottom_UI = new Grid();
-            OriginLeftBottom_UI.Children.Add(new Line());
-            OriginLeftBottom_UI.Children.Add(new Line());
+            OriginLeftTop_UI = new Grid();
+            OriginLeftTop_UI.Children.Add(new Line());
+            OriginLeftTop_UI.Children.Add(new Line());
 
-            OriginRightTop_UI = new Grid();
-            OriginRightTop_UI.Children.Add(new Line());
-            OriginRightTop_UI.Children.Add(new Line());
+            OriginRightBottom_UI = new Grid();
+            OriginRightBottom_UI.Children.Add(new Line());
+            OriginRightBottom_UI.Children.Add(new Line());
 
             OriginBox_UI = new Grid();
             OriginBox_UI.Children.Add(new Line()); // Left
@@ -413,17 +413,17 @@ namespace Root_VEGA_P_Vision
             base.MouseMove(sender, e);
 
 
-            if (originState == PROCESS_ORIGIN_STATE.OriginLeftBottom)
+            if (originState == PROCESS_ORIGIN_STATE.OriginLeftTop)
             {
-                originLeftBottom.X = p_MouseMemX;
-                originLeftBottom.Y = p_MouseMemY;
-                DrawOriginLeftBottomPoint(originLeftBottom);
+                originLeftTop.X = p_MouseMemX;
+                originLeftTop.Y = p_MouseMemY;
+                DrawOriginLeftTopPoint(originLeftTop);
             }
-            else if (originState == PROCESS_ORIGIN_STATE.OriginRightTop)
+            else if (originState == PROCESS_ORIGIN_STATE.OriginRightBottom)
             {
-                originRightTop.X = p_MouseMemX;
-                originRightTop.Y = p_MouseMemY;
-                DrawOriginRightTopPoint(originRightTop);
+                originRightBottom.X = p_MouseMemX;
+                originRightBottom.Y = p_MouseMemY;
+                DrawOriginRightBottomPoint(originRightBottom);
             }
 
 

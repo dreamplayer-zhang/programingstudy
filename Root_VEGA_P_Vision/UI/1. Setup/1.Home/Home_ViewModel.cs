@@ -28,17 +28,15 @@ namespace Root_VEGA_P_Vision
         //}
         public ICommand btnRecipeWizard
         {
-            get
-            {
-                return new RelayCommand(m_Setup.SetRecipeWizard);
-            }
+            get => new RelayCommand(m_Setup.SetRecipeWizard);
         }
         public ICommand btnMaintenance
         {
-            get
-            {
-                return new RelayCommand(m_Setup.SetMaintenance);
-            }
+            get => new RelayCommand(m_Setup.SetMaintenance);
+        }
+        public ICommand btnPodInfo
+        {
+            get => new RelayCommand(m_Setup.SetPodInfo);
         }
     }
 }

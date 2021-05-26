@@ -14,17 +14,17 @@ using System.Windows.Shapes;
 namespace Root_VEGA_P_Vision
 {
     public delegate void FeatureBoxDoneEvent(object e);
-    public class PositionImageViewer_ViewModel:RootViewer_ViewModel
+    public class PositionImageViewer_ViewModel: BaseViewer_ViewModel
     {
         #region [Color]
         private class DefineColors
         {
-            public static SolidColorBrush OriginBoxColor = Brushes.Blue;
+            public static SolidColorBrush OriginBoxColor = new SolidColorBrush(Color.FromRgb(0, 122,255));
         }
         #endregion
         public event FeatureBoxDoneEvent FeatureBoxDone;
 
-        public PositionImageViewer_ViewModel()
+        public PositionImageViewer_ViewModel(string imageData):base(imageData)
         {
             p_VisibleMenu = Visibility.Collapsed;
             InitializeUIElements();
@@ -174,7 +174,7 @@ namespace Root_VEGA_P_Vision
         }
         private TShape StartDraw(TShape shape, CPoint memPt)
         {
-            shape = new TRect(Brushes.Blue, 2, 0.4);
+            shape = new TRect(DefineColors.OriginBoxColor, 2, 0.4);
             TRect rect = shape as TRect;
             rect.MemPointBuffer = memPt;
             rect.MemoryRect.Left = memPt.X;
@@ -464,6 +464,7 @@ namespace Root_VEGA_P_Vision
         #region [Draw Method]
         private void RedrawShapes()
         {
+            if (BOX == null) return;
             if (p_UIElement.Contains(BOX.UIElement))
             {
                 TRect rect = BOX as TRect;

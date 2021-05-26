@@ -64,4 +64,28 @@ namespace RootTools_Vision
             this.OriginSize = OriginSize;
         }
     }
+    public class Condition
+    {
+        bool doinspection;
+        int defectcode;
+        string defectName;
+        #region Property
+
+        public bool DoInspection
+        {
+            get => doinspection;
+            set => doinspection = value;
+        }
+        public int DefectCode
+        {
+            get => defectcode;
+            set => defectcode = value;
+        }
+        public string DefectName
+        {
+            get => defectName;
+            set => defectName = value;
+        }
+        #endregion
+    }
 }

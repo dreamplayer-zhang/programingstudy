@@ -16,26 +16,25 @@ namespace Root_VEGA_P_Vision
     public class Recipe6um_ViewModel:ObservableObject
     {
         RecipeMask_ViewModel recipeSetting;
-        RootViewer_ViewModel coverTop_ImageViewer, coverBottom_ImageViewer, baseTop_ImageViewer, baseBottom_ImageViewer;
-        int selectedTab = 0;
+        MaskRootViewer_ViewModel coverTop_ImageViewer, coverBottom_ImageViewer, baseTop_ImageViewer, baseBottom_ImageViewer;
         RootViewer_ViewModel selectedViewer;
         #region Property
-        public RootViewer_ViewModel CoverTop_ImageViewer
+        public MaskRootViewer_ViewModel CoverTop_ImageViewer
         {
             get => coverTop_ImageViewer;
             set => SetProperty(ref coverTop_ImageViewer, value);
         }
-        public RootViewer_ViewModel CoverBottom_ImageViewer
+        public MaskRootViewer_ViewModel CoverBottom_ImageViewer
         {
             get => coverBottom_ImageViewer;
             set => SetProperty(ref coverBottom_ImageViewer, value);
         }
-        public RootViewer_ViewModel BaseTop_ImageViewer
+        public MaskRootViewer_ViewModel BaseTop_ImageViewer
         {
             get => baseTop_ImageViewer;
             set => SetProperty(ref baseTop_ImageViewer, value);
         }
-        public RootViewer_ViewModel BaseBottom_ImageViewer
+        public MaskRootViewer_ViewModel BaseBottom_ImageViewer
         {
             get => baseBottom_ImageViewer;
             set => SetProperty(ref baseBottom_ImageViewer, value);
@@ -50,10 +49,10 @@ namespace Root_VEGA_P_Vision
             this.recipeSetting = recipeSetting;
             Main = new Recipe6um_Panel();
             Main.DataContext = this;
-            coverTop_ImageViewer = new MaskRootViewer_ViewModel("EIP_Cover.Main.Front",recipeSetting);
-            coverBottom_ImageViewer = new MaskRootViewer_ViewModel("EIP_Cover.Main.Back", recipeSetting);
-            baseTop_ImageViewer = new MaskRootViewer_ViewModel("EIP_Plate.Main.Front", recipeSetting);
-            baseBottom_ImageViewer = new MaskRootViewer_ViewModel("EIP_Plate.Main.Back", recipeSetting);
+            coverTop_ImageViewer = new MaskRootViewer_ViewModel("EIP_Cover.Main.Front",recipeSetting.MaskTools);
+            coverBottom_ImageViewer = new MaskRootViewer_ViewModel("EIP_Cover.Main.Back", recipeSetting.MaskTools);
+            baseTop_ImageViewer = new MaskRootViewer_ViewModel("EIP_Plate.Main.Front", recipeSetting.MaskTools);
+            baseBottom_ImageViewer = new MaskRootViewer_ViewModel("EIP_Plate.Main.Back", recipeSetting.MaskTools);
         }
         public ICommand btnSnap
         {
@@ -66,7 +65,6 @@ namespace Root_VEGA_P_Vision
         public ICommand TabChanged
         {
             get => new RelayCommand(() => {
-                selectedTab = 10;
             });
         }
 

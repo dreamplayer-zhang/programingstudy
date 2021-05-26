@@ -53,29 +53,32 @@ namespace RootTools_Vision
 
     }
 
-    public class EUVPodSurfaceParameterBase : ObservableObject, IMaskInspection
+    public class SurfaceParam : ObservableObject
     {
         #region [Parameter]
-        bool absolute;
-        uint pitLevel,levelMin,levelMax,pitSize,sizeMax,sizeMin;
-        int illumCondition;
+        bool isEnable;
+        string defectName;
+        uint pitLevel, levelMin, levelMax, pitSize, sizeMax, sizeMin, defectCode;
         private DiffFilterMethod diffFilter = DiffFilterMethod.Average;
 
         #endregion
 
         #region [Getter/Setter]
         [Browsable(false)]
-        public int IllumCondition
+        public string DefectName
         {
-            get => illumCondition;
-            set => SetProperty(ref illumCondition, value);
+            get => defectName;
+            set => SetProperty(ref defectName, value);
         }
-        public int MaskIndex { get; set; }
-
-        public bool Absolute
+        public uint DefectCode
         {
-            get => absolute;
-            set => SetProperty(ref absolute, value);
+            get => defectCode;
+            set => SetProperty(ref defectCode, value);
+        }
+        public bool IsEnable
+        {
+            get => isEnable;
+            set => SetProperty(ref isEnable, value);
         }
         public uint PitLevel
         {
@@ -109,11 +112,34 @@ namespace RootTools_Vision
         }
         public DiffFilterMethod DiffFilter
         {
-            get => this.diffFilter;
+            get => diffFilter;
             set
             {
                 SetProperty(ref diffFilter, value);
             }
+        }
+        #endregion
+    }
+    public class EUVPodSurfaceParameterBase : ObservableObject
+    {
+        SurfaceParam brightParam, darkParam;
+
+        #region Property
+        public SurfaceParam BrightParam
+        {
+            get => brightParam;
+            set => SetProperty(ref brightParam, value);
+        }
+        public SurfaceParam DarkParam
+        {
+            get => darkParam;
+            set => SetProperty(ref darkParam, value);
+        }
+
+        public EUVPodSurfaceParameterBase()
+        {
+            DarkParam = new SurfaceParam();
+            BrightParam = new SurfaceParam();
         }
         #endregion
     }
