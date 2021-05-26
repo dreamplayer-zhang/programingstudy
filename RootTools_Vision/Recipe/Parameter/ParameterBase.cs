@@ -80,7 +80,7 @@ namespace RootTools_Vision
             foreach (Type type in
                 Assembly.GetAssembly(typeof(ParameterBase)).GetTypes()
                 .Where(myType => myType.IsClass && !myType.IsAbstract && myType.IsSubclassOf(typeof(ParameterBase))
-                && myType.GetInterface("IFrontsideInspection") != null))
+                && (myType.GetInterface("IFrontsideInspection") != null || myType.GetInterface("IFrontsideMeasurement") != null)))
             {
                 objects.Add((ParameterBase)Activator.CreateInstance(type));
             }
