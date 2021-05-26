@@ -294,7 +294,7 @@ namespace Root_VEGA_D.Module
                 double dPosX = m_grabMode.m_rpAxisCenter.X + m_grabMode.m_nWaferSize_mm * 0.5 - (m_grabMode.m_nCenterX - m_grabMode.m_GD.m_nFovSize * 0.5) * m_grabMode.m_dResX_um * 0.001;
 
                 CPoint memOffset = new CPoint(0, 0);
-                if (m_module.Run(RunLineScan(mem, memOffset, nSnapCount, dPosX, startPosY, endPosY, startTriggerY, endTriggerY)))
+                if (m_module.Run(m_module.RunLineScan(m_grabMode, mem, memOffset, nSnapCount, dPosX, startPosY, endPosY, startTriggerY, endTriggerY)))
                     return p_sInfo;
 
                 Image<Gray, byte> imgTop = new Image<Gray, byte>(m_grabMode.p_sTopTemplateFile);
@@ -351,7 +351,7 @@ namespace Root_VEGA_D.Module
                         // IPU 연결된 상태라면 좌하단 Align Marker 위치 전달을 위해 찾아야함
                         if (m_module.TcpipCommServer.IsConnected())
                         {
-                            if (m_module.Run(RunLineScan(mem, memOffset, nSnapCount, dPosX, startPosY, endPosY, startTriggerY, endTriggerY)))
+                            if (m_module.Run(m_module.RunLineScan(m_grabMode, mem, memOffset, nSnapCount, dPosX, startPosY, endPosY, startTriggerY, endTriggerY)))
                                 return p_sInfo;
 
                             searchBotArea = new CRect(0, (int)(m_grabMode.m_nBottomCenterY - m_grabMode.m_nSearchAreaSize * 0.5), m_grabMode.m_GD.m_nFovSize, (int)(m_grabMode.m_nBottomCenterY + m_grabMode.m_nSearchAreaSize * 0.5));
@@ -440,50 +440,6 @@ namespace Root_VEGA_D.Module
             ptResult.Y = (int)(ptMaxRelative.Y) + (int)(nHeightDiff / 2);
 
             return bFoundTemplate;
-        }
-        public string RunLineScan(MemoryData mem, CPoint memOffset, int nSnapCount, double posX, double startPosY, double endPosY, double startTriggerY, double endTriggerY)
-        {
-            AxisXY axisXY = m_module.AxisXY;
-            Axis axisZ = m_module.AxisZ;
-
-            Camera_Dalsa camMain = m_grabMode.m_camera as Camera_Dalsa;
-            if (camMain == null)
-                return "Main Camara is null";
-
-            // 시작위치로 이동
-            if (m_module.Run(axisXY.StartMove(posX, startPosY)))
-                return p_sInfo;
-            if (m_module.Run(axisXY.WaitReady()))
-                return p_sInfo;
-
-            // 분주비 재설정
-            int nEncoderMul = camMain.GetEncoderMultiplier();
-            int nEncoderDiv = camMain.GetEncoderDivider();
-            camMain.SetEncoderMultiplier(1);
-            camMain.SetEncoderDivider(1);
-            camMain.SetEncoderMultiplier(nEncoderMul);
-            camMain.SetEncoderDivider(nEncoderDiv);
-
-            // 트리거 설정
-            axisXY.p_axisY.SetTrigger(startTriggerY, endTriggerY, m_grabMode.m_dTrigger, 0.001, true);
-
-            // 카메라 스냅 시작
-            m_grabMode.StartGrab(mem, memOffset, (int)(nSnapCount * 0.98), m_grabMode.m_GD);
-
-            // 이동하면서 그랩
-            if (m_module.Run(axisXY.p_axisY.StartMove(endPosY)))
-                return p_sInfo;
-
-            // 라인스캔 완료 대기
-            if (m_module.Run(axisXY.p_axisY.WaitReady()))
-                return p_sInfo;
-
-            // 이미지 스냅 스레드 동작중이라면 중지
-            while (camMain.p_CamInfo.p_eState != eCamState.Ready && !EQ.IsStop())
-            {
-                Thread.Sleep(10);
-            }
-            return "OK";
         }
 
         bool m_bContinuousConnectedIPU = false;
@@ -683,7 +639,7 @@ namespace Root_VEGA_D.Module
                         }
 
                         // 라인 스캔
-                        if (m_module.Run(RunLineScan(mem, tmpMemOffset, nWaferSizeY_px, dPosX, dStartPosY, dEndPosY, dTriggerStartPosY, dTriggerEndPosY)))
+                        if (m_module.Run(m_module.RunLineScan(m_grabMode, mem, tmpMemOffset, nWaferSizeY_px, dPosX, dStartPosY, dEndPosY, dTriggerStartPosY, dTriggerEndPosY)))
                             return p_sInfo;
 
                         // IPU PC와 연결된 상태라면 'LineEnd' 메세지 전달

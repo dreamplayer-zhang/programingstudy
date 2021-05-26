@@ -173,6 +173,26 @@ namespace Root_VEGA_D.Module
         }
         #endregion
 
+        #region Light
+        public List<string> p_asLightSet
+        {
+            get
+            {
+                List<string> asLight = new List<string>();
+                foreach (Light light in m_lightSet.m_aLight) asLight.Add(light.m_sName);
+                return asLight;
+            }
+        }
+        public Light GetLight(string sLight)
+        {
+            foreach (Light light in m_lightSet.m_aLight)
+            {
+                if (sLight == light.m_sName) return light;
+            }
+            return null;
+        }
+        #endregion
+
         #region DIO
         public bool p_bStageVac
         {
@@ -610,6 +630,49 @@ namespace Root_VEGA_D.Module
 
             return bFoundTemplate;
         }
+        public string RunLineScan(GrabMode grabmode, MemoryData mem, CPoint memOffset, int nSnapCount, double posX, double startPosY, double endPosY, double startTriggerY, double endTriggerY)
+        {
+            if (grabmode == null) return "Grabmode of RunLineScan is null.";
+
+            Camera_Dalsa camMain = grabmode.m_camera as Camera_Dalsa;
+            if (camMain == null)
+                return "Main Camara is null";
+
+            // 시작위치로 이동
+            if (Run(AxisXY.StartMove(posX, startPosY)))
+                return p_sInfo;
+            if (Run(AxisXY.WaitReady()))
+                return p_sInfo;
+
+            // 분주비 재설정
+            int nEncoderMul = camMain.GetEncoderMultiplier();
+            int nEncoderDiv = camMain.GetEncoderDivider();
+            camMain.SetEncoderMultiplier(1);
+            camMain.SetEncoderDivider(1);
+            camMain.SetEncoderMultiplier(nEncoderMul);
+            camMain.SetEncoderDivider(nEncoderDiv);
+
+            // 트리거 설정
+            AxisXY.p_axisY.SetTrigger(startTriggerY, endTriggerY, grabmode.m_dTrigger, 0.001, true);
+
+            // 카메라 스냅 시작
+            grabmode.StartGrab(mem, memOffset, (int)(nSnapCount * 0.98), grabmode.m_GD);
+
+            // 이동하면서 그랩
+            if (Run(AxisXY.p_axisY.StartMove(endPosY)))
+                return p_sInfo;
+
+            // 라인스캔 완료 대기
+            if (Run(AxisXY.p_axisY.WaitReady()))
+                return p_sInfo;
+
+            // 이미지 스냅 스레드 동작중이라면 중지
+            while (camMain.p_CamInfo.p_eState != eCamState.Ready && !EQ.IsStop())
+            {
+                Thread.Sleep(10);
+            }
+            return "OK";
+        }
         #endregion
 
         public Vision(string id, IEngineer engineer, eRemote eRemote = eRemote.Local)
@@ -934,6 +997,7 @@ namespace Root_VEGA_D.Module
             //AddModuleRunList(new Run_AutoFocus(this), false, "Run AutoFocus");
             AddModuleRunList(new Run_MakeTemplateImage(this), true, "Run Make TemplateImage");
             AddModuleRunList(new Run_PatternAlign(this), true, "Run Pattern Align");
+            AddModuleRunList(new Run_PM(this), true, "Run PM");
         }
         #endregion
     }

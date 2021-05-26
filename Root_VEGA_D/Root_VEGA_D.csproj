@@ -311,6 +311,7 @@
     <Compile Include="Module\Vision\Run_GrabLineScan.cs" />
     <Compile Include="Module\Vision\Run_MakeTemplateImage.cs" />
     <Compile Include="Module\Vision\Run_PatternAlign.cs" />
+    <Compile Include="Module\Vision\Run_PM.cs" />
     <Compile Include="RecipeManager_UI.xaml.cs">
       <DependentUpon>RecipeManager_UI.xaml</DependentUpon>
     </Compile>
