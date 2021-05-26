@@ -1,4 +1,5 @@
-﻿using RootTools.Control;
+﻿using RootTools;
+using RootTools.Control;
 using RootTools.Light;
 using RootTools.Memory;
 using RootTools.Module;
@@ -17,16 +18,15 @@ namespace Root_VEGA_D.Module
 
         public GrabMode m_grabMode = null;
         string m_sGrabMode = "";
-        //double m_dCenterX = 0;
-        //double m_dCenterY = 0;
         double m_dScanDistance = 0;
-        //double m_dFocusZ = 0;
         double m_dCheckPointFromCenterY = 0;
         int m_nCheckArea = 0;
-        string m_sLightFirst = "";
-        string m_sLightSecond = "";
-        int m_nFirstLightPower = 0;
-        int m_nSecondLightPower = 0;
+        string m_sCoaxialLight = "";
+        string m_sTransmittedLight = "";
+        int m_nCoaxialLightPower = 0;
+        int m_nTransmittedLightPower = 0;
+        int m_nUSL = 0;
+        int m_nLSL = 0;
         string m_sMemoryGroup = "";
         string m_sMemoryData = "";
 
@@ -52,10 +52,12 @@ namespace Root_VEGA_D.Module
             run.m_dScanDistance = m_dScanDistance;
             run.m_dCheckPointFromCenterY = m_dCheckPointFromCenterY;
             run.m_nCheckArea = m_nCheckArea;
-            run.m_sLightFirst = m_sLightFirst;
-            run.m_nFirstLightPower = m_nFirstLightPower;
-            run.m_sLightSecond = m_sLightSecond;
-            run.m_nSecondLightPower = m_nSecondLightPower;
+            run.m_sCoaxialLight = m_sCoaxialLight;
+            run.m_nCoaxialLightPower = m_nCoaxialLightPower;
+            run.m_sTransmittedLight = m_sTransmittedLight;
+            run.m_nTransmittedLightPower = m_nTransmittedLightPower;
+            run.m_nUSL = m_nUSL;
+            run.m_nLSL = m_nLSL;
             run.m_sMemoryGroup = m_sMemoryGroup;
             run.m_sMemoryData = m_sMemoryData;
 
@@ -68,13 +70,30 @@ namespace Root_VEGA_D.Module
             m_dScanDistance = tree.Set(m_dScanDistance, m_dScanDistance, "Scan Distance", "Scan Distance on Y Axis (mm)", bVisible);
             m_dCheckPointFromCenterY = tree.Set(m_dCheckPointFromCenterY, m_dCheckPointFromCenterY, "Check Point Y", "Check point distance from CenterY (mm)", bVisible);
             m_nCheckArea = tree.Set(m_nCheckArea, m_nCheckArea, "Check Area", "Check area length of width or height (px)", bVisible);
-            m_sLightFirst = tree.Set(m_sLightFirst, m_sLightFirst, m_module.p_asLightSet, "1st Light", "First Light for PM", bVisible);
-            m_nFirstLightPower = tree.Set(m_nFirstLightPower, m_nFirstLightPower, "1st Light Power", "First Light Power", bVisible);
-            m_sLightSecond = tree.Set(m_sLightSecond, m_sLightSecond, m_module.p_asLightSet, "2nd Light", "Second Light for PM", bVisible);
-            m_nSecondLightPower = tree.Set(m_nSecondLightPower, m_nSecondLightPower, "2nd Light Power", "Second Light Power", bVisible);
+            m_sCoaxialLight = tree.Set(m_sCoaxialLight, m_sCoaxialLight, m_module.p_asLightSet, "Coaxial Light", "Coaxial Light for PM", bVisible);
+            m_nCoaxialLightPower = tree.Set(m_nCoaxialLightPower, m_nCoaxialLightPower, "Coaxial Light Power", "Coaxial Light Power", bVisible);
+            m_sTransmittedLight = tree.Set(m_sTransmittedLight, m_sTransmittedLight, m_module.p_asLightSet, "Transmitted Light", "Transmitted Light for PM", bVisible);
+            m_nTransmittedLightPower = tree.Set(m_nTransmittedLightPower, m_nTransmittedLightPower, "Transmitted Light Power", "Transmitted Light Power", bVisible);
+            m_nUSL = tree.Set(m_nUSL, m_nUSL, "USL", "Upper Specification Limit", bVisible);
+            m_nLSL = tree.Set(m_nLSL, m_nLSL, "LSL", "Lower Specification Limit", bVisible);
             m_sMemoryGroup = tree.Set(m_sMemoryGroup, m_sMemoryGroup, m_module.MemoryPool.m_asGroup, "MemoryGroup", "Memory Group Name", bVisible);
             MemoryGroup memoryGroup = m_module.MemoryPool.GetGroup(m_sMemoryGroup);
             if (memoryGroup != null) m_sMemoryData = tree.Set(m_sMemoryData, m_sMemoryData, memoryGroup.m_asMemory, "MemoryData", "Memory Data Name", bVisible);
+        }
+
+        class PMData
+        {
+            public Light m_light = null;
+            public int m_power = 0;
+            public CRect m_rectCheckArea = null;
+            public int m_average = 0;
+
+            public PMData(Light light, int power, CRect rectArea)
+            {
+                m_light = light;
+                m_power = power;
+                m_rectCheckArea = rectArea;
+            }
         }
 
         public override string Run()
@@ -86,17 +105,18 @@ namespace Root_VEGA_D.Module
             if (mem == null) return "Set Memory Setting";
 
             // Light
-            Light lightFirst = m_module.GetLight(m_sLightFirst);
-            Light lightSecond = m_module.GetLight(m_sLightSecond);
-            if (lightFirst == null || lightSecond == null) return "Set First & Second Light";
+            Light lightCoaxial = m_module.GetLight(m_sCoaxialLight);
+            Light lightTransmitted = m_module.GetLight(m_sTransmittedLight);
+            if (lightCoaxial == null || lightTransmitted == null) return "Check Coaxial or Transmitted light setting";
 
-            List<KeyValuePair<Light, int>> listLight = new List<KeyValuePair<Light, int>>();
-            listLight.Add(new KeyValuePair<Light, int>(lightFirst, m_nFirstLightPower));
-            listLight.Add(new KeyValuePair<Light, int>(lightSecond, m_nSecondLightPower));
+            // USL & LSL Check
+            if (m_nLSL > m_nUSL) return "Check USL & LSL setting";
 
             // Position
             AxisXY axisXY = m_module.AxisXY;
             Axis.Speed speedY = axisXY.p_axisY.GetSpeedValue(Axis.eSpeed.Move);
+
+            double dPosX = m_grabMode.m_rpAxisCenter.X + m_grabMode.m_GD.m_nFovSize * m_grabMode.m_dResX_um * 0.001 * 0.5;
 
             double accDistance = speedY.m_acc * speedY.m_v * 0.5 * 2.0;
             double decDistance = speedY.m_dec * speedY.m_v * 0.5 * 2.0;
@@ -107,21 +127,36 @@ namespace Root_VEGA_D.Module
             double dStartPosY = dStartTriggerY - accDistance;
             double dEndPosY = dEndTriggerY + decDistance;
 
-            m_grabMode.m_dTrigger = Math.Round(m_grabMode.m_dResY_um * m_grabMode.m_dCamTriggerRatio, 1);
+            int centerY_px = (int)(m_dScanDistance * 1000 * 0.5 / m_grabMode.m_dResY_um);
 
             int nScanLen_px = (int)Math.Round(m_dScanDistance * 1000 / m_grabMode.m_dResY_um);
 
+            m_grabMode.m_dTrigger = Math.Round(m_grabMode.m_dResY_um * m_grabMode.m_dCamTriggerRatio, 1);
+
+            // Make PM Data List
+            int nCheckPointLenFromCenter_px = (int)(m_dCheckPointFromCenterY * 1000 * 0.5 / m_grabMode.m_dResY_um);
+            int nCoaxialCheckPosY_px = centerY_px + nCheckPointLenFromCenter_px;
+            int nTransmittedCheckPosY_px = centerY_px - nCheckPointLenFromCenter_px;
+
+            CRect rectCoaxial = new CRect((int)(m_grabMode.m_GD.m_nFovSize * 0.5), nCoaxialCheckPosY_px, m_nCheckArea);
+            CRect rectTransmitted = new CRect((int)(m_grabMode.m_GD.m_nFovSize * 0.5), nTransmittedCheckPosY_px, m_nCheckArea);
+
+            List<PMData> listPMData = new List<PMData>();
+            listPMData.Add(new PMData(lightCoaxial, m_nCoaxialLightPower, rectCoaxial));
+            listPMData.Add(new PMData(lightTransmitted, m_nTransmittedLightPower, rectTransmitted));
+
+            // Collect GV Value
             try
             {
-                foreach (KeyValuePair<Light, int> item in listLight)
+                foreach (PMData pmData in listPMData)
                 {
-                    if (item.Key == null) return "Set First & Second Light";
+                    if (pmData.m_light == null) return "Check Light Setting";
 
                     // Turn off lights
                     m_grabMode.SetLight(false);
 
                     // Turn on light
-                    item.Key.p_fPower = item.Value;
+                    pmData.m_light.p_fPower = pmData.m_power;
 
                     // 포커스 높이로 Z축 이동
                     Axis axisZ = m_module.AxisZ;
@@ -133,22 +168,47 @@ namespace Root_VEGA_D.Module
                         return p_sInfo;
 
                     // Scan Target Image
-                    double dPosX = m_grabMode.m_rpAxisCenter.X + m_grabMode.m_GD.m_nFovSize * m_grabMode.m_dResX_um * 0.001 * 0.5;
-                    if(m_module.Run(m_module.RunLineScan(m_grabMode, mem, new RootTools.CPoint(0, 0), nScanLen_px, dPosX, dStartPosY, dEndPosY, dStartTriggerY, dEndTriggerY)))
+                    if (m_module.Run(m_module.RunLineScan(m_grabMode, mem, new RootTools.CPoint(0, 0), nScanLen_px, dPosX, dStartPosY, dEndPosY, dStartTriggerY, dEndTriggerY)))
                         return p_sInfo;
 
-                    
+                    // Sum GV
+                    long sumGV = 0;
 
+                    IntPtr ptr = mem.GetPtr(0);
+                    for (int y = pmData.m_rectCheckArea.Top; y < pmData.m_rectCheckArea.Bottom; y++)
+                    {
+                        for (int x = pmData.m_rectCheckArea.Left; x < pmData.m_rectCheckArea.Right; x++)
+                        {
+                            unsafe
+                            {
+                                byte* arrData = (byte*)ptr.ToPointer();
+                                for (int i = 0; i < mem.p_nByte; i++)
+                                {
+                                    sumGV += arrData[(mem.p_sz.X * y + x) * mem.p_nByte + i];
+                                }
+                            }
+                        }
+                    }
+
+                    // Get Average GV
+                    int nAverageGV = (int)(sumGV / (m_nCheckArea * m_nCheckArea));
+                    pmData.m_average = nAverageGV;
                 }
             }
-            catch(Exception e)
+            catch (Exception e)
             {
-
             }
             finally
             {
                 m_grabMode.SetLight(false);
             }
+
+            // PM check result
+            bool bCoaxialResult = listPMData[0].m_average <= m_nUSL && listPMData[0].m_average >= m_nLSL;
+            bool bTransmittedResult = listPMData[1].m_average <= m_nUSL && listPMData[1].m_average >= m_nLSL;
+            
+            m_log.Info(string.Format("Coaxial Light PM result : {0} (Average = {1})", bCoaxialResult ? "OK" : "Fail", listPMData[0].m_average));
+            m_log.Info(string.Format("Transmitted Light PM result : {0} (Average = {1})", bTransmittedResult ? "OK" : "Fail", listPMData[1].m_average));
 
             return "OK";
         }
