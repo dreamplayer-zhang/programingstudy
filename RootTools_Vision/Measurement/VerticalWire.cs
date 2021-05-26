@@ -25,6 +25,11 @@ namespace RootTools_Vision
 
         protected override bool Preparation()
         {
+            if (this.parameterVerticalWire == null || this.recipeVerticalWire == null)
+            {
+                this.parameterVerticalWire = (VerticalWireParameter)this.parameter;
+                this.recipeVerticalWire = this.recipe.GetItem<VerticalWireRecipe>();
+            }
             return true;
         }
 
