@@ -382,7 +382,7 @@ namespace Root_EFEM.Module
 			//            p_bStageBlow = false;
 			//            p_bStageVac = true;
 
-			OpenCamera();
+			//OpenCamera();
 			p_bStageVac = true;
 
 			axisEdgeX.StartHome();
