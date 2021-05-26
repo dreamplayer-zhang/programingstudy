@@ -1,5 +1,6 @@
 ﻿using Root_EFEM.Module;
 using RootTools;
+using RootTools.Gem;
 using RootTools.Comm;
 using RootTools.Control;
 using RootTools.GAFs;
@@ -12,6 +13,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading;
 using System.Windows.Threading;
+using static RootTools.Gem.XGem.XGem;
 
 namespace Root_AOP01_Inspection.Module
 {
@@ -87,7 +89,7 @@ namespace Root_AOP01_Inspection.Module
 
 
 
-            if (bInit) InitALID();
+            if (bInit) InitGAF();
         }
         #endregion
         #region Tree
@@ -128,7 +130,36 @@ namespace Root_AOP01_Inspection.Module
         ALID m_alidETCDoorFan;
         ALID m_alidETCError;
 
-        void InitALID()
+        //SVID 생성
+        SVID m_svidMCReset;
+        SVID m_svidEmergency;
+        SVID m_svidDoorlock;
+        SVID m_svidInterlockKeySW;
+        SVID m_svidCDA1;
+        SVID m_svidCDA2;
+        SVID m_svidLightCurtain;
+        SVID m_svidProtectionBar;
+        SVID m_svid4CHFanAlarm;
+        SVID m_svid12CHFanAlarm;
+        SVID m_svidPCFanAlarm;
+        SVID m_svidGuidePinFanAlarm;
+        SVID m_svidElecPanelDoorOpen;
+        SVID m_svidETCDoorOpen;
+        SVID m_svidPCDoorOpen;
+        SVID m_svidSideDoorOpen;
+        SVID m_svidElecPanelFanAlarm;
+        SVID m_svidETCDoorFanAlarm;
+        SVID m_svidCDA1Power;
+        SVID m_svidCDA2Power;
+        SVID m_svidStageTemperature;
+        SVID m_svidStageElectrostatic;
+        SVID m_svidDoorLockStatus;
+        SVID m_svidCPURate1;
+        SVID m_svidMemoryRate1;
+        SVID m_svidCPURate2;
+        SVID m_svidMemoryRate2;
+
+        void InitGAF()
         {
             m_alidEMS = m_gaf.GetALID(this, "EMS", "EMS Error");
             m_alidEMO = m_gaf.GetALID(this, "EMO", "EMO Error");
@@ -148,6 +179,66 @@ namespace Root_AOP01_Inspection.Module
             m_alidELECPNLDoorFan = m_gaf.GetALID(this, "ELEC PNL Door Fan", "ELEC PNL Door Fan Error");
             m_alidETCDoorFan = m_gaf.GetALID(this, "ETC Door Fan", "ETC Door Fan Error");
             m_alidETCError = m_gaf.GetALID(this, "Fan", "Fan Error");
+
+            m_svidMCReset = m_gaf.GetSVID(this, "M/C Reset");
+            m_svidEmergency = m_gaf.GetSVID(this, "Emergency");
+            m_svidDoorlock = m_gaf.GetSVID(this, "Door Lock");
+            m_svidInterlockKeySW = m_gaf.GetSVID(this, "Interlock Key SW");
+            m_svidCDA1 = m_gaf.GetSVID(this, "CDA1");
+            m_svidCDA2 = m_gaf.GetSVID(this, "CDA2");
+            m_svidLightCurtain = m_gaf.GetSVID(this, "Light Curtain");
+            m_svidProtectionBar = m_gaf.GetSVID(this, "Protection Bar");
+            m_svid4CHFanAlarm = m_gaf.GetSVID(this, "4CH Light Fan Alarm");
+            m_svid12CHFanAlarm = m_gaf.GetSVID(this, "12CH Light Fan Alarm");
+            m_svidPCFanAlarm = m_gaf.GetSVID(this, "PC Fan Alarm");
+            m_svidGuidePinFanAlarm = m_gaf.GetSVID(this, "Guide Pin FFU Alarm");
+            m_svidElecPanelDoorOpen = m_gaf.GetSVID(this, "Elec Panel Door Open");
+            m_svidETCDoorOpen = m_gaf.GetSVID(this, "ETC Door Open");
+            m_svidPCDoorOpen = m_gaf.GetSVID(this, "PC Door Open");
+            m_svidSideDoorOpen = m_gaf.GetSVID(this, "Side Door Open");
+            m_svidElecPanelFanAlarm = m_gaf.GetSVID(this, "Elec Panel Fan Alarm");
+            m_svidETCDoorFanAlarm = m_gaf.GetSVID(this, "ETC Door Fan Alarm");
+            m_svidCDA1Power = m_gaf.GetSVID(this, "CDA1 Input Power");
+            m_svidCDA2Power = m_gaf.GetSVID(this, "CDA2 Input Power");
+            m_svidStageTemperature = m_gaf.GetSVID(this, "Stage Temperature");
+            m_svidStageElectrostatic = m_gaf.GetSVID(this, "Stage Elec Static");
+            m_svidDoorLockStatus = m_gaf.GetSVID(this, "Door Lock Status");
+            m_svidCPURate1 = m_gaf.GetSVID(this, "PC1 CPU Utilization");
+            m_svidMemoryRate1 = m_gaf.GetSVID(this, "PC1 Memory Utilization");
+            m_svidCPURate2 = m_gaf.GetSVID(this, "PC2 CPU Utilization");
+            m_svidMemoryRate2 = m_gaf.GetSVID(this, "PC2 Memory Utilization");
+        }
+
+        void UpdateSVID()
+        {
+            m_svidMCReset.p_value = m_diMCReset.p_bIn;
+            m_svidEmergency.p_value = m_diEMS.p_bIn;
+            m_svidDoorlock.p_value = m_diDoorLock.p_bIn;
+            m_svidInterlockKeySW.p_value = m_diInterlock_Key.p_bIn;
+            m_svidCDA1.p_value = m_diCDA1Low.p_bIn;
+            m_svidCDA2.p_value = m_diCDA2Low.p_bIn;
+            m_svidLightCurtain.p_value = m_diLightCurtain.p_bIn;
+            m_svidProtectionBar.p_value = m_diProtectionBar.p_bIn;
+            m_svid4CHFanAlarm.p_value = m_di4CH_LED_Cont_FAN.p_bIn;
+            m_svid12CHFanAlarm.p_value = m_di12CH_LED_Cont_FAN.p_bIn;
+            m_svidPCFanAlarm.p_value = m_diPC_FAN.p_bIn;
+            m_svidGuidePinFanAlarm.p_value = false;
+            m_svidElecPanelDoorOpen.p_value = m_diELECPNLDoor.p_bIn;
+            m_svidETCDoorOpen.p_value = m_diETCDoor.p_bIn;
+            m_svidPCDoorOpen.p_value = m_diPCDoor.p_bIn;
+            m_svidSideDoorOpen.p_value = m_disideDoor.p_bIn;
+            m_svidElecPanelFanAlarm.p_value = m_diELECPNLDoorFan.p_bIn;
+            m_svidETCDoorFanAlarm.p_value = m_diETCDoorFan.p_bIn;
+            m_svidCDA1Power.p_value = false;
+            m_svidCDA2Power.p_value = false;
+            m_svidStageTemperature.p_value = false;
+            m_svidStageElectrostatic.p_value = false;
+            m_svidDoorLockStatus.p_value = false;
+            m_svidCPURate1.p_value = false;
+            m_svidMemoryRate1.p_value = false;
+            m_svidCPURate2.p_value = false;
+            m_svidMemoryRate2.p_value = false;
+
         }
         #endregion
 
@@ -155,6 +246,7 @@ namespace Root_AOP01_Inspection.Module
         public EQ.eState m_eStatus = EQ.eState.Init;
         //int m_nLamp_count = 0;
         public bool m_bDoorAlarm = true;
+        
         protected override void RunThread()
         {
             base.RunThread();
@@ -192,6 +284,9 @@ namespace Root_AOP01_Inspection.Module
                     }
                     m_eStatus = EQ.p_eState;
                 }
+
+                UpdateSVID();
+
                 if (m_dioBuzzerOff.p_bIn || (m_gaf.m_listALID.p_aALID.Count < 1))
                     BuzzerOff();
 
@@ -264,12 +359,18 @@ namespace Root_AOP01_Inspection.Module
         }
         #endregion
 
+        public InfoCarrier p_infoCarrier { get; set; }
+
+
         public AOP01(string id, IEngineer engineer)
         {
             p_id = id;
             base.InitBase(id, engineer);
+            p_infoCarrier = new InfoCarrier(this, id, engineer, true, true);
             InitTimer();
         }
+
+        
 
         public override void ThreadStop()
         {

@@ -599,7 +599,7 @@ namespace RootTools.OHTNew
                 default: return;
             }
             if (m_carrier.p_ePresentSensor == present) return;
-            p_sInfo = p_id + " Illegal Prosent Sensor";
+            p_sInfo = p_id + " Illegal Present Sensor";
         }
 
         bool IsCS(bool bOn)
