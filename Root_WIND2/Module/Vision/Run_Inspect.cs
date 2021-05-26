@@ -1,13 +1,17 @@
 ﻿using RootTools;
 using RootTools.Camera;
+using RootTools.Camera.BaslerPylon;
 using RootTools.Control;
+using RootTools.Database;
 using RootTools.Memory;
 using RootTools.Module;
 using RootTools.Trees;
 using RootTools_Vision;
 using RootTools_Vision.Utility;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Data;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -79,6 +83,7 @@ namespace Root_WIND2.Module
             //레시피에 GrabMode 저장하고 있어야함
 
             RootTools_Vision.WorkManager3.WorkManager workManager = GlobalObjects.Instance.GetNamed<RootTools_Vision.WorkManager3.WorkManager>("frontInspection");
+
             if(workManager == null)
             {
                 throw new ArgumentException("WorkManager가 초기화되지 않았습니다(null)");
@@ -95,7 +100,7 @@ namespace Root_WIND2.Module
                 if (workManager.OpenRecipe(m_sRecipeName) == false)
                     return "Recipe Open Fail";
 
-                workManager.Start(false);
+                workManager.Start(false); // 클라프 전으로 자르고
 
             }
             else
@@ -103,13 +108,21 @@ namespace Root_WIND2.Module
                 workManager.Stop();
             }
 
-//#define TEST_ONLY_INSPECTION
-//#if TEST_ONLY_INSPECTION
+            //#define TEST_ONLY_INSPECTION
+            //#if TEST_ONLY_INSPECTION
 
             //ImageData frontImage = GlobalObjects.Instance.GetNamed<ImageData>("FrontImage");
             //frontImage.ClearImage();
+
             try
             {
+
+                #region [Snap sequence] 
+
+                // 210525 추가
+                RecipeFront recipe = GlobalObjects.Instance.Get<RecipeFront>();
+                m_grabMode = m_module.GetGrabMode(p_sGrabMode[recipe.CameraInfoIndex]);
+
                 m_grabMode.SetLens();
                 m_grabMode.SetLight(true);
 
@@ -139,6 +152,7 @@ namespace Root_WIND2.Module
                 const int nTimeOutInterval = 10; // ms
                 int nRescanCount = 0;
                 const int nRescanTotal = 3;
+                double dFocusPosZ = m_grabMode.m_nFocusPosZ;
                 while (nWholeWaferScanLineNumber > nScanLine)
                 {
                     if (EQ.IsStop())
@@ -165,13 +179,12 @@ namespace Root_WIND2.Module
                     double dPosX = m_grabMode.m_rpAxisCenter.X + m_grabMode.m_ptXYAlignData.X + nWaferSizeY_px * (double)m_grabMode.m_dTrigger / 2 - (nScanLine + m_grabMode.m_ScanStartLine) * m_grabMode.m_GD.m_nFovSize * dXScale;
                     double dNextPosX = m_grabMode.m_rpAxisCenter.X + m_grabMode.m_ptXYAlignData.X + nWaferSizeY_px * (double)m_grabMode.m_dTrigger / 2 - (nScanLine + 1 + m_grabMode.m_ScanStartLine) * m_grabMode.m_GD.m_nFovSize * dXScale;
 
-                    double dPosZ = m_grabMode.m_nFocusPosZ;
                     if (m_grabMode.m_dVRSFocusPos != 0)
                     {
-                        dPosZ = m_grabMode.m_dVRSFocusPos + m_dTDIToVRSOffsetZ;
+                        dFocusPosZ = m_grabMode.m_dVRSFocusPos + m_dTDIToVRSOffsetZ;
                     }
                     //포커스 높이로 이동
-                    if (m_module.Run(axisZ.StartMove(dPosZ)))
+                    if (m_module.Run(axisZ.StartMove(dFocusPosZ)))
                         return p_sInfo;
 
                     // XY 찍는 위치로 이동
@@ -256,7 +269,7 @@ namespace Root_WIND2.Module
                     if (bNormal == true)
                     {
                         //WIND2EventManager.OnSnapDone(this, new SnapDoneArgs(new CPoint(startOffsetX, startOffsetY), cpMemoryOffset + new CPoint(m_grabMode.m_GD.m_nFovSize, nWaferSizeY_px)));
-                        workManager.CheckSnapDone(new Rect(new Point(startOffsetX, startOffsetY), new Point(cpMemoryOffset.X + m_grabMode.m_GD.m_nFovSize, cpMemoryOffset.Y + nWaferSizeY_px)));
+                        //workManager.CheckSnapDone(new Rect(new Point(startOffsetX, startOffsetY), new Point(cpMemoryOffset.X + m_grabMode.m_GD.m_nFovSize, cpMemoryOffset.Y + nWaferSizeY_px)));
                         nScanLine++;
                         cpMemoryOffset.X += m_grabMode.m_GD.m_nFovSize;
                     }
@@ -279,17 +292,110 @@ namespace Root_WIND2.Module
                 }
                 m_grabMode.m_camera.StopGrab();
 
+                #endregion
 
                 if (workManager.WaitWorkDone(ref EQ.m_EQ.StopToken(), 60 * 3 /*3 minutes*/) == false)
                 {
-                        inspectionTimeWatcher.Stop();
+                    // Time out!!
 
-                        TempLogger.Write("Inspection", "Time out!!!");
-                        return "OK";
+
+                    // Save Result
+                    //workManager.Start(false, true);
+                    inspectionTimeWatcher.Stop();
+
+                    RootTools_Vision.TempLogger.Write("Inspection", "Time out!!!");
+                    return "OK";
                 } // 5 minutes
+                else
+				{
+                    #region [Klarf]
+
+                    Settings settings = new Settings();
+                    SettingItem_SetupFrontside settings_frontside = settings.GetItem<SettingItem_SetupFrontside>();
+
+                    if(settings_frontside.UseKlarf)
+                    {
+                        DataTable table = DatabaseManager.Instance.SelectCurrentInspectionDefect();
+                        List<Defect> defects = Tools.DataTableToDefectList(table);
+
+                        WIND2_Engineer engineer = GlobalObjects.Instance.Get<WIND2_Engineer>();
+                        CameraInfo camInfo = DataConverter.GrabModeToCameraInfo(engineer.m_handler.p_Vision.GetGrabMode(recipe.CameraInfoIndex));
+
+
+                        KlarfData_Lot klarfData = new KlarfData_Lot();
+                        Directory.CreateDirectory(settings_frontside.KlarfSavePath);
+                        klarfData.SetResolution((float)camInfo.RealResX, (float)camInfo.RealResY);
+                        klarfData.WaferStart(recipe.WaferMap, DateTime.Now);
+                        klarfData.SetResultTimeStamp();
+                        klarfData.AddSlot(recipe.WaferMap, defects, recipe.GetItem<OriginRecipe>(), settings_frontside.UseTDIReview, settings_frontside.UseVrsReview);
+                        klarfData.SaveKlarf(settings_frontside.KlarfSavePath, false);
+
+
+                        //***************** VRS Capture Sequence *********************//
+                        ConcurrentQueue<byte[]> vrsImageQueue = new System.Collections.Concurrent.ConcurrentQueue<byte[]>();
+                        Camera_Basler camVrs = GlobalObjects.Instance.Get<WIND2_Engineer>().m_handler.p_Vision.p_CamVRS;
+                        Rect vrsRect = new Rect(0, 0, camVrs.p_ImageData.p_Size.X, camVrs.p_ImageData.p_Size.Y);
+
+                        
+
+                        if (settings_frontside.UseVrsReview)
+                        {
+                            for (int i = 0; i < defects.Count; i++)
+                            {
+
+                                CPoint vrsPoint = PositionConverter.ConvertImageToVRS(m_module, new CPoint((int)defects[i].m_fAbsX, (int)defects[i].m_fAbsY));
+
+                                // XY 찍는 위치로 이동
+                                if (m_module.Run(axisXY.WaitReady()))
+                                    return p_sInfo;
+                                if (m_module.Run(axisXY.StartMove(new RPoint(vrsPoint.X, vrsPoint.Y))))
+                                    return p_sInfo;
+                                if (m_module.Run(axisXY.WaitReady()))
+                                    return p_sInfo;
+
+                                if (!m_module.p_CamVRS.m_ConnectDone)
+                                {
+                                    m_module.p_CamVRS.FunctionConnect();
+                                }
+                                else
+                                {
+                                    if (m_module.p_CamVRS.p_CamInfo._IsGrabbing == false)
+                                    {
+                                        m_module.p_CamVRS.GrabContinuousShot();
+                                    }
+                                }
+
+                                // Capture
+                                Thread.Sleep(1000); // 나중에 줄이기
+                                byte[] copyBuffer = null;
+                                camVrs.CopyToBuffer(out copyBuffer, vrsRect);
+                                vrsImageQueue.Enqueue(copyBuffer);
+                            }
+                        }
+
+                        //************************************************************//
+
+                        Thread.Sleep(2000);
+
+                        if (settings_frontside.UseTDIReview && settings_frontside.UseVrsReview)
+                        {
+                            Tools.SaveTiffImageBoth(settings_frontside.KlarfSavePath, klarfData.GetKlarfFileName(), defects, workManager.SharedBuffer, new Size(160, 120), vrsImageQueue, new Size(vrsRect.Width, vrsRect.Height));
+                        }
+                        else if(settings_frontside.UseTDIReview)
+                        {
+                            Tools.SaveTiffImageOnlyTDI(settings_frontside.KlarfSavePath, klarfData.GetKlarfFileName(), defects, workManager.SharedBuffer, new Size(160, 120));
+                        }
+                        else if(settings_frontside.UseVrsReview)
+                        {
+                            Tools.SaveTiffImageOnlyVRS(settings_frontside.KlarfSavePath, klarfData.GetKlarfFileName(), defects, vrsImageQueue, new Size(vrsRect.Width, vrsRect.Height));
+                        }
+                    }
+
+                    #endregion
+                }
 
                 inspectionTimeWatcher.Stop();
-                TempLogger.Write("Inspection", string.Format("{0:F3}", (double)inspectionTimeWatcher.ElapsedMilliseconds / (double)1000));
+                RootTools_Vision.TempLogger.Write("Inspection", string.Format("{0:F3}", (double)inspectionTimeWatcher.ElapsedMilliseconds / (double)1000));
                 return "OK";
             }
 

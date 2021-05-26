@@ -563,6 +563,7 @@ namespace RootTools.OHTNew
                     InvalidAccess(m_diBusy.p_bOn, "BUSY");
                     InvalidAccess(m_diComplete.p_bOn, "COMPT");
                 }
+                OnPropertyChanged();
             }
         }
 

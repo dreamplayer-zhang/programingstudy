@@ -91,7 +91,7 @@ namespace Root_WIND2.UI_User
                 if (parameterBase.GetType().GetInterface(nameof(IFrontsideInspection)) == null)
                     continue;
 
-                InspectionItem item = new InspectionItem();
+                InspectionItem item = new InspectionItem(nameof(IFrontsideInspection));
 
                 int selectMethod = 0;
                 for (int i = 0; i < item.p_cInspMethod.Count; i++)
@@ -325,7 +325,7 @@ namespace Root_WIND2.UI_User
             {
                 return new RelayCommand(() =>
                 {
-                    InspectionItem item = new InspectionItem();
+                    InspectionItem item = new InspectionItem(nameof(IFrontsideInspection));
                     //item.p_cInspROI = p_ROI_Viewer.p_cInspROI;
                     item.p_Index = p_cInspItem.Count();
                     item.ComboBoxItemChanged_Mask += ComboBoxItemChanged_Mask_Callback;

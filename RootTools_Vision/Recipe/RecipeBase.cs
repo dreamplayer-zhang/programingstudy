@@ -21,11 +21,35 @@ namespace RootTools_Vision
 
         private List<RecipeItemBase> recipeItemList;
         private List<ParameterBase> parameterItemList;
+
+        private int cameraInfoIndex = 0;
+
+        private bool useExclusiveRegion = false;
+        private string exclusiveRegionFilePath = "";
         #endregion
 
         #region [Getter Setter]
         public string Name { get => name; set => name = value; }
         public RecipeType_WaferMap WaferMap { get => waferMap; set => waferMap = value; }
+
+        public int CameraInfoIndex
+        {
+            get => this.cameraInfoIndex;
+            set => this.cameraInfoIndex = value;
+        }
+
+        public bool UseExclusiveRegion
+        {
+            get => this.useExclusiveRegion;
+            set => this.useExclusiveRegion = value;
+        }
+
+        public string ExclusiveRegionFilePath
+        {
+            get => this.exclusiveRegionFilePath;
+            set => this.exclusiveRegionFilePath = value;
+        }
+
 
         [XmlIgnore]
         public List<RecipeItemBase> RecipeItemList { get => recipeItemList; set => recipeItemList = value; }

@@ -172,7 +172,7 @@
             </GroupBox>
 
 
-            <GroupBox Grid.Row="1" Header="Inspection Item"
+            <GroupBox Grid.Row="1" Header="Inspection / Measurement Item"
                       Margin="4"
                       Background="{StaticResource GroupBoxBackground}"
                       Style="{StaticResource main_view_groupbox}">
@@ -254,7 +254,7 @@
                                                 </DataTemplate>
                                             </DataGridTemplateColumn.CellTemplate>
                                         </DataGridTemplateColumn>-->
-                            <DataGridTemplateColumn Header="Inspection Method" Width="1.5*">
+                            <DataGridTemplateColumn Header="Method" Width="1.5*">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
                                         <ComboBox ItemsSource="{Binding p_cInspMethod}"
@@ -315,7 +315,7 @@
                             </DataGridTemplateColumn>
                         </DataGrid.Columns>
                     </DataGrid>
-                    <Button Content="Add Inspection" 
+                    <Button Content="Add Inspection / Measurement" 
                             Margin="4" 
                             Height="30"
                             Command="{Binding btnAddInspItem}"

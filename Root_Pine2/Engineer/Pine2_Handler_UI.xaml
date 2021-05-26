@@ -20,7 +20,20 @@
             </TabControl>
         </TabItem>
         <TabItem Header="Module" Background="{Binding p_brushModule}">
-            <TabControl x:Name="tabModule"/>
+            <TabControl x:Name="tabModule">
+                <TabItem Header="Magazine">
+                    <TabControl x:Name="tabMagazine"/>
+                </TabItem>
+                <TabItem Header="Boats">
+                    <TabControl x:Name="tabBoats"/>
+                </TabItem>
+                <TabItem Header="Vision">
+                    <TabControl x:Name="tabVision"/>
+                </TabItem>
+                <TabItem Header="Loader">
+                    <TabControl x:Name="tabLoader"/>
+                </TabItem>
+            </TabControl>
         </TabItem>
     </TabControl>
 </UserControl>

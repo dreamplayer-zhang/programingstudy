@@ -16,22 +16,16 @@ namespace Root_VEGA_P_Vision
         private void Init()
         {
             Main = new HomePanel();
-            //SetPage(Main);
+            Main.DataContext = this;
         }
 
-        public void SetPage(UserControl page)
-        {
-            Main.SubPanel.Children.Clear();
-            Main.SubPanel.Children.Add(page);
-        }
-
-        public ICommand btnInspection
-        {
-            get
-            {
-                return new RelayCommand(m_Setup.SetInspection);
-            }
-        }
+        //public ICommand btnInspection
+        //{
+        //    get
+        //    {
+        //        return new RelayCommand(m_Setup.SetInspection);
+        //    }
+        //}
         public ICommand btnRecipeWizard
         {
             get
@@ -44,13 +38,6 @@ namespace Root_VEGA_P_Vision
             get
             {
                 return new RelayCommand(m_Setup.SetMaintenance);
-            }
-        }
-        public ICommand btnGEM
-        {
-            get
-            {
-                return new RelayCommand(m_Setup.SetGEM);
             }
         }
     }

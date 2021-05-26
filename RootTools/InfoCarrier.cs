@@ -235,7 +235,7 @@ namespace RootTools
         {
             if (nID < 0) return;
             if (nID >= p_lWafer) return;
-            m_aInfoWafer[nID] = (InfoWafer)m_aGemSlot[nID];
+            m_aInfoWafer[nID] = new InfoWafer((InfoWafer)m_aGemSlot[nID]);
             SaveInfoWafer(nID);
         }
         #endregion

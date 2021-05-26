@@ -33,8 +33,38 @@ namespace RootTools_Vision
 
 		protected override bool Execution()
 		{
-			DoInspection();
+			//DoInspection();
+			DoInspection_New();
 			return true;
+		}
+
+		public void DoInspection_New()
+		{
+			if (this.currentWorkplace.Index == 0)
+				return;
+
+			int firstNotch = recipeEBR.FirstNotch;
+			int lastNotch = recipeEBR.LastNotch;
+
+			int bufferHeight = lastNotch - firstNotch;
+			int bufferHeightPerDegree = bufferHeight / 360;
+
+			double stepDegree = parameterEBR.StepDegree;
+			int cnt = (int)(360 / stepDegree);
+
+			int height = parameterEBR.ROIHeight;
+			int width = parameterEBR.ROIWidth;
+
+			//Parallel.For(0, cnt, i =>
+			for (int i = 0; i < cnt; i++)
+			{
+				int posY = firstNotch + (int)((bufferHeightPerDegree * stepDegree * (i + 1)) - (height / 2));
+				int[] arrDiff;
+				arrDiff = GetDiffArr(this.currentWorkplace.SharedBufferInfo.PtrR_GRAY, 0, posY, width, height);
+				FindEdge(arrDiff, 0, posY, width, height);
+			}
+			//);
+			WorkEventManager.OnInspectionDone(this.currentWorkplace, new InspectionDoneEventArgs(new List<CRect>())); // 나중에 ProcessDefect쪽 EVENT로...
 		}
 
 		public void DoInspection()
@@ -98,13 +128,63 @@ namespace RootTools_Vision
 
 			// Raw data 저장
 			string sInspectionID = DatabaseManager.Instance.GetInspectionID();
-			string folderPath = @"D:\EBRRawData\" + sInspectionID.ToString();
-			StreamWriter swResult = new StreamWriter(folderPath + "_" + this.currentWorkplace.Index.ToString() + "_Result.csv");
+			string folderPath = @"D:\EBRRawData\";
+			Directory.CreateDirectory(folderPath);
+
+			//StreamWriter swResult = new StreamWriter(folderPath + "_" + this.currentWorkplace.Index.ToString() + "_Result.csv");
+			StreamWriter swResult = new StreamWriter(folderPath + sInspectionID.ToString() + "_" + top.ToString() + "_Result.csv");
 			for (int i = 0; i < arrDiff.Length; i++)
 				swResult.WriteLine(arrAvg[i] + "," + arrEqual[i] + "," + arrDiff[i]);
 			swResult.Close();
 
 			return arrDiff;
+		}
+
+		private void FindEdge(int[] arrDiff, int left, int top, int width, int height)
+		{
+			int xRange = this.parameterEBR.XRange;
+			int diffEdge = this.parameterEBR.DiffEdge;
+			int diffBevel = this.parameterEBR.DiffBevel;
+			int diffEBR = this.parameterEBR.DiffEBR;
+			double resolution = 1;//this.grabModeEdge.m_dTargetResX_um;
+
+			int[] arrDiffReverse = new int[arrDiff.Length];
+			for (int i = 0; i < arrDiff.Length; i++)
+				arrDiffReverse[i] = -arrDiff[i];
+
+			float waferEdgeX, bevelX, ebrX;
+			waferEdgeX = FindEdge(arrDiff, arrDiff.Length - (2 * xRange), diffEdge);
+			bevelX = FindEdge(arrDiffReverse, (int)Math.Round(waferEdgeX), diffBevel + this.parameterEBR.OffsetBevel);
+			ebrX = FindEdge(arrDiff, (int)Math.Round(bevelX), diffEBR + this.parameterEBR.OffsetEBR);
+
+			// Add measurement
+			string sInspectionID = DatabaseManager.Instance.GetInspectionID();
+
+			this.currentWorkplace.AddMeasurement(sInspectionID,
+								"EDGE",
+								Measurement.MeasureType.EBR,
+								Measurement.EBRMeasureItem.Bevel,
+								(float)((waferEdgeX - bevelX) * resolution),
+								width,
+								height,
+								CalculateAngle(this.currentWorkplace.Index),
+								left,
+								top,
+								this.currentWorkplace.MapIndexX,
+								this.currentWorkplace.MapIndexY);
+
+			this.currentWorkplace.AddMeasurement(sInspectionID,
+								"EDGE",
+								Measurement.MeasureType.EBR,
+								Measurement.EBRMeasureItem.EBR,
+								(float)((waferEdgeX - ebrX) * resolution),
+								width,
+								height,
+								CalculateAngle(this.currentWorkplace.Index),
+								left,
+								top,
+								this.currentWorkplace.MapIndexX,
+								this.currentWorkplace.MapIndexY);
 		}
 
 		private void FindEdge(int[] arrDiff)
@@ -113,7 +193,7 @@ namespace RootTools_Vision
 			int diffEdge = this.parameterEBR.DiffEdge;
 			int diffBevel = this.parameterEBR.DiffBevel;
 			int diffEBR = this.parameterEBR.DiffEBR;
-			double resolution = this.grabModeEdge.m_dTargetResX_um;
+			double resolution = 1;//this.grabModeEdge.m_dTargetResX_um;
 
 			int[] arrDiffReverse = new int[arrDiff.Length];
 			for (int i = 0; i < arrDiff.Length; i++)

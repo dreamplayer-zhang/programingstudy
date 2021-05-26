@@ -1,0 +1,43 @@
+﻿<UserControl x:Class="Root_VEGA_P_Vision.screwUI"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Root_VEGA_P_Vision"
+             xmlns:Tools="clr-namespace:RootTools;assembly=RootTools"
+             mc:Ignorable="d" 
+             d:DesignHeight="500" d:DesignWidth="500" Background="{StaticResource PanelBackGround}">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="9*"/>
+            <RowDefinition Height="0.5*"/>
+        </Grid.RowDefinitions>
+        <Tools:RootViewer Grid.Row="0" DataContext="{Binding ScrewUI_ImageViewerVM}"/>
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <Grid Grid.Column="0" >
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="9*"/>
+                    <ColumnDefinition Width="2*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" Visibility="Collapsed" Text="2021.05.09 18:12" Style="{StaticResource ScrewInfo}"/>
+                <TextBlock Grid.Column="1" Visibility="Collapsed" Text="98%" Style="{StaticResource ScrewInfo}" Padding="0,0,10,0"/>
+            </Grid>
+            <Grid Grid.Column="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+                <Button Grid.Column="0" Style="{StaticResource ScrewBtn}" Command="{Binding btnPrev}">
+                    <TextBlock Text="Prev" Style="{StaticResource ScrewContent}"/>
+                </Button>
+                <Button Grid.Column="1" Style="{StaticResource ScrewBtn}" Command="{Binding btnNext}">
+                    <TextBlock Text="Next" Style="{StaticResource ScrewContent}"/>
+                </Button>
+            </Grid>
+        </Grid>
+    </Grid>
+</UserControl>

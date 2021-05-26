@@ -417,7 +417,10 @@ namespace RootTools.Camera.BaslerPylon
             get { return new CPoint(Convert.ToInt32(m_CamParam._Width), Convert.ToInt32(m_CamParam._Height)); }
             set { }
         }
-
+        public void SetExposureTime(long dtime)
+        {
+            p_CamParam._ExposureTimeRaw = dtime;
+        }
         public string Grab()
         {
             if (!m_cam.IsOpen)
@@ -1082,6 +1085,60 @@ namespace RootTools.Camera.BaslerPylon
         public void GrabLineScanColor(MemoryData memory, CPoint cpScanOffset, int nLine, GrabData m_GrabData = null)
         {
             throw new NotImplementedException();
+        }
+
+        public void CopyToBuffer(out byte[] buffer, Rect rect = default(Rect))
+        {
+            int startX = (int)rect.Left;
+            int startY = (int)rect.Top;
+            int width = (int)rect.Width;
+            int height = (int)rect.Height;
+            int endX = startX + width;
+            int endY = startY + height;
+
+            int byteCount = m_ImageGrab.GetBytePerPixel();
+
+            byte[] copyBuf = new byte[width * height * byteCount];
+
+            ImageData imgData = this.m_threadBuf;
+
+            int stride = (int)imgData.p_Stride;
+
+            if (rect == default(Rect))
+            {
+                startX = 0;
+                startY = 0;
+                width = imgData.p_Size.X;
+                height = imgData.p_Size.Y;
+            }
+
+            IntPtr imgPtr = imgData.GetPtr();
+
+            Parallel.For(startY, endY, (i) =>
+            {
+                Marshal.Copy(imgPtr + (startY * stride + startX) * byteCount, copyBuf, i - startY, width);
+            });
+
+            buffer = copyBuf;
+
+            //if (imgData != null)
+            //{
+            //    if (nByte == 1)
+            //    {
+            //        m_ImageViewer.GetSamplingGrayImage(cam.m_threadBuf, rect, canvasWidth, canvasHeight);
+            //    }
+            //    else if (nByte == 3)
+            //    {
+            //        // 이미지 샘플링
+            //        Image<Rgb, byte> image = cam.m_ImageViewer.GetSamplingRgbImage(cam.m_threadBuf, rect, canvasWidth, canvasHeight, false);
+
+            //        // Dispatcher를 통해 메인스레드에서 화면표시
+            //        dispatcher.Invoke(new Action(delegate ()
+            //        {
+            //            cam.m_ImageViewer.SetImageSource(image);
+            //        }));
+            //    }
+            //}
         }
     }
 }

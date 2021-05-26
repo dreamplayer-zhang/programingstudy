@@ -70,17 +70,23 @@ namespace Root_WIND2.UI_User
         public readonly UI_User.FrontsideMask frontsideMask = new UI_User.FrontsideMask();
         public readonly UI_User.FrontsideSpec frontsideSpec = new UI_User.FrontsideSpec();
         public readonly UI_User.FrontsideInspect frontsideInspect = new UI_User.FrontsideInspect();
+        
 
         // BACK
+        //btnBackProduct
+        public readonly UI_User.BacksideProduct backsideProduct = new UI_User.BacksideProduct();
         public readonly UI_User.BacksideSetup backsideSetup = new UI_User.BacksideSetup();
         public readonly UI_User.BacksideInspect backsideInspect = new UI_User.BacksideInspect();
+        public readonly UI_User.BacksideSpec backsideSpec = new BacksideSpec();
 
-		// EDGE
-		public readonly UI_User.EdgesideSetup edgesideSetup = new UI_User.EdgesideSetup();
+        // EDGE
+        public readonly UI_User.EdgesideSetup edgesideSetup = new UI_User.EdgesideSetup();
 		public readonly UI_User.EdgesideInspect edgesideInspect = new UI_User.EdgesideInspect();
 
         // EBR
-        public readonly UI_User.EBRSetup ebrSetup = new UI_User.EBRSetup();
+        //public readonly UI_User.EBRSetup ebrSetup = new UI_User.EBRSetup();
+        public readonly UI_User.EBRSetup_New ebrSetup = new UI_User.EBRSetup_New();
+        public readonly UI_User.EBRInspect ebrInspect = new UI_User.EBRInspect();
 
         // Camera
         public readonly UI_User.CameraVRS cameraVrs = new UI_User.CameraVRS();
@@ -141,8 +147,8 @@ namespace Root_WIND2.UI_User
         }
 
         #region [Camera ViewModes]
-        private UI_User.CameraVRS_ImageViewer_ViewModel cameraVrsVM = new UI_User.CameraVRS_ImageViewer_ViewModel();
-        public UI_User.CameraVRS_ImageViewer_ViewModel CameraVrsVM
+        private UI_User.CameraVRS_ViewModel cameraVrsVM = new UI_User.CameraVRS_ViewModel();
+        public UI_User.CameraVRS_ViewModel CameraVrsVM
         {
             get => cameraVrsVM;
         }
@@ -153,10 +159,22 @@ namespace Root_WIND2.UI_User
         #endregion
 
         #region [Back ViewModels]
+        private UI_User.BacksideProduct_ViewModel backsideProductVM = new BacksideProduct_ViewModel();
+        public UI_User.BacksideProduct_ViewModel BacksideProductVM
+        {
+            get => this.backsideProductVM;
+        }
+
         private UI_User.BacksideSetup_ViewModel backsideSetupVM = new UI_User.BacksideSetup_ViewModel();
         public UI_User.BacksideSetup_ViewModel BacksideROIVM
         {
             get => this.backsideSetupVM;
+        }
+
+        private UI_User.BacksideSpec_ViewModel backsideSpecVM = new UI_User.BacksideSpec_ViewModel();
+        public UI_User.BacksideSpec_ViewModel BacksideSpecVM
+        {
+            get => this.backsideSpecVM;
         }
 
         private UI_User.BacksideInspect_ViewModel backsideInspectVM = new UI_User.BacksideInspect_ViewModel();
@@ -180,10 +198,16 @@ namespace Root_WIND2.UI_User
 		#endregion
 
 		#region [EBR ViewModels]
-		private UI_User.EBRSetup_ViewModel ebrSetupVM = new UI_User.EBRSetup_ViewModel();
-        public UI_User.EBRSetup_ViewModel EBRSetupVM
+        private UI_User.EBRSetup_New_ViewModel ebrSetupVM = new UI_User.EBRSetup_New_ViewModel();
+        public UI_User.EBRSetup_New_ViewModel EBRSetupVM
         {
             get => ebrSetupVM;
+        }
+
+        private UI_User.EBRInspect_ViewModel ebrInspectVM = new UI_User.EBRInspect_ViewModel();
+        public UI_User.EBRInspect_ViewModel EBRInspectVM
+        {
+            get => ebrInspectVM;
         }
         #endregion
 
@@ -193,6 +217,7 @@ namespace Root_WIND2.UI_User
         {
             get => cameraAlignVM;
         }
+
         #endregion
 
         #endregion
@@ -675,6 +700,18 @@ namespace Root_WIND2.UI_User
             }
         }
 
+        public ICommand btnEBRInspect
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    SetPage(ebrInspect);
+                    ebrInspect.DataContext = ebrInspectVM;
+                });
+            }
+        }
+        
         public ICommand btnNewRecipeEBR
         {
             get => new RelayCommand(() =>
@@ -779,6 +816,18 @@ namespace Root_WIND2.UI_User
         #endregion
 
         #region [Command Back]
+
+        public ICommand btnBackProduct
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    SetPage(backsideProduct);
+                    backsideProduct.DataContext = backsideProductVM;
+                });
+            }
+        }
         public ICommand btnBackSetup
         {
             get
@@ -787,6 +836,18 @@ namespace Root_WIND2.UI_User
                 {
                     SetPage(backsideSetup);
                     backsideSetup.DataContext = backsideSetupVM;
+                });
+            }
+        }
+
+        public ICommand btnBackSpec
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    SetPage(backsideSpec);
+                    backsideSpec.DataContext = backsideSpecVM;
                 });
             }
         }
@@ -841,7 +902,7 @@ namespace Root_WIND2.UI_User
             {
                 return new RelayCommand(() =>
                 {
-                    RecipeFront recipe = GlobalObjects.Instance.Get<RecipeFront>();
+                    RecipeBack recipe = GlobalObjects.Instance.Get<RecipeBack>();
                     if (recipe.RecipePath != "")
                     {
                         recipe.Save(recipe.RecipePath);
@@ -896,7 +957,7 @@ namespace Root_WIND2.UI_User
                         if (!dir.Exists)
                             dir.Create();
 
-                        RecipeFront recipe = GlobalObjects.Instance.Get<RecipeFront>();
+                        RecipeBack recipe = GlobalObjects.Instance.Get<RecipeBack>();
                         recipe.Read(sFullPath);
 
                         UpdateCurrentPanel();

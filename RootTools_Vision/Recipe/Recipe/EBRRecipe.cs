@@ -24,27 +24,27 @@ namespace RootTools_Vision
 		public int GrabModeIndex
 		{
 			get => this.grabModeIndex;
-			set => SetProperty<int>(ref this.grabModeIndex, value);
+			set => SetProperty(ref this.grabModeIndex, value);
 		}
 		public int FirstNotch
 		{
 			get => this.firstNotch;
-			set => SetProperty<int>(ref this.firstNotch, value);
+			set => SetProperty(ref this.firstNotch, value);
 		}
 		public int LastNotch
 		{
 			get => this.lastNotch;
-			set => SetProperty<int>(ref this.lastNotch, value);
+			set => SetProperty(ref this.lastNotch, value);
 		}
 		public int LightWhite
 		{
 			get => this.lightWhite;
-			set => SetProperty<int>(ref this.lightWhite, value);
+			set => SetProperty(ref this.lightWhite, value);
 		}
 		public int LightSide
 		{
 			get => this.lightSide;
-			set => SetProperty<int>(ref this.lightSide, value);
+			set => SetProperty(ref this.lightSide, value);
 		}
 		#endregion
 

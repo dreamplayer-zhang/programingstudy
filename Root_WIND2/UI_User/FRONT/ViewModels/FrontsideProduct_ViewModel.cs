@@ -83,6 +83,19 @@ namespace Root_WIND2.UI_User
             set;
         }
 
+        private DataListView_ViewModel camInfoDataListVM;
+
+        public DataListView_ViewModel CamInfoDataListVM
+        {
+            get => this.camInfoDataListVM;
+            set
+            {
+                SetProperty(ref this.camInfoDataListVM, value);
+            }
+        }
+        
+
+
         public List<string> GrabModeList
         {
             get
@@ -125,6 +138,17 @@ namespace Root_WIND2.UI_User
                 this.CamResolutionX = mode.m_dTargetResX_um;
                 this.CamResolutionY = mode.m_dTargetResY_um;
                 this.WaferSize = mode.m_nWaferSize_mm;
+
+                WIND2_Engineer engineer = GlobalObjects.Instance.Get<WIND2_Engineer>();
+                RecipeFront recipeFront = GlobalObjects.Instance.Get<RecipeFront>();
+
+                recipeFront.CameraInfoIndex = value;
+
+                CameraInfo camInfo = DataConverter.GrabModeToCameraInfo(engineer.m_handler.p_Vision.GetGrabMode(recipeFront.CameraInfoIndex));
+
+                this.CamInfoDataListVM.Init(camInfo);
+
+
                 SetProperty<int>(ref this.selectedGrabModeIndex, value);
             }
         }
@@ -212,6 +236,8 @@ namespace Root_WIND2.UI_User
         public FrontsideProduct_ViewModel()
         {
             chipItems = new ObservableCollection<Rectangle>();
+
+            this.camInfoDataListVM = new DataListView_ViewModel();
         }
 
         public void LoadRecipe()
@@ -219,6 +245,13 @@ namespace Root_WIND2.UI_User
             RecipeType_WaferMap wafermap = GlobalObjects.Instance.Get<RecipeFront>().WaferMap;
 
             CreateRecipeWaferMap(wafermap.MapSizeX, wafermap.MapSizeY, wafermap.Data);
+
+            WIND2_Engineer engineer = GlobalObjects.Instance.Get<WIND2_Engineer>();
+            RecipeFront recipeFront = GlobalObjects.Instance.Get<RecipeFront>();
+
+            CameraInfo camInfo = DataConverter.GrabModeToCameraInfo(engineer.m_handler.p_Vision.GetGrabMode(recipeFront.CameraInfoIndex));
+
+            this.CamInfoDataListVM.Init(camInfo);
         }
 
         #region [Properties]

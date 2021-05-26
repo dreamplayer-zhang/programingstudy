@@ -53,8 +53,19 @@ namespace Root_Rinse_Unloader.Module
             if (bInit) 
             {
                 InitPosWidth();
-                m_axisRotate[1].SetSpeed("Jog", m_axisRotate[0].GetSpeedValue("Jog"));
+                InitSpeed();
             }
+        }
+
+        public enum eSpeed
+        {
+            Stack,
+            Magazine
+        }
+        void InitSpeed()
+        {
+            m_axisRotate[0].AddSpeed(Enum.GetNames(typeof(eSpeed)));
+            m_axisRotate[1].AddSpeed(Enum.GetNames(typeof(eSpeed)));
         }
         #endregion
 
@@ -64,8 +75,9 @@ namespace Root_Rinse_Unloader.Module
         {
             if (bRotate)
             {
-                m_axisRotate[0].Jog(m_rinse.p_fRotateSpeed, "Move");
-                m_axisRotate[1].Jog(m_rinse.p_fRotateSpeed, "Move");
+                eSpeed eSpeed = (m_rinse.p_eMode == RinseU.eRunMode.Stack) ? eSpeed.Stack : eSpeed.Magazine;
+                m_axisRotate[0].Jog(m_rinse.p_fRotateSpeed, eSpeed.ToString());
+                m_axisRotate[1].Jog(m_rinse.p_fRotateSpeed, eSpeed.ToString());
             }
             else
             {
@@ -464,7 +476,8 @@ namespace Root_Rinse_Unloader.Module
         {
             p_eStep = eStep.Empty; 
             RunStopperUp(true);
-            p_bAlignerUp = (m_rinse.p_eMode == RinseU.eRunMode.Magazine); 
+            p_bAlignerUp = (m_rinse.p_eMode == RinseU.eRunMode.Magazine);
+            RunAlignerUp(m_rinse.p_eMode == RinseU.eRunMode.Magazine); 
             RunRotate(true);
             foreach (Line line in m_aLine) line.p_eSensor = Line.eSensor.Empty;
             StartRun(m_runWaitArrive); 

@@ -302,7 +302,7 @@ namespace RootTools.Gem
 
         #region Slot & PJ
         /// <summary> InfoWafer 와 비슷하지만 Wafer를 빼가도 null로 바꾸지 않는다. </summary>
-        public List<GemSlotBase> m_aGemSlot = new List<GemSlotBase>();
+        public List<GemSlotBase> m_aGemSlot { get; set; } = new List<GemSlotBase>();
 
         public void SendSlotMap()
         {

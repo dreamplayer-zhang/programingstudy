@@ -118,6 +118,10 @@ namespace RootTools_Vision.WorkManager3
 
             if (result == false) // 간헐적으로 Stop Fail하는 경우 있음... 
             {
+                foreach (WorkPipe pipe in pipes)
+                {
+                    pipe.Exit();
+                }
                 //MessageBox.Show("Fail Stop");
             }
                 

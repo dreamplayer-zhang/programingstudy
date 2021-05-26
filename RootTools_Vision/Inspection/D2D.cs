@@ -256,7 +256,7 @@ namespace RootTools_Vision
             }
 
             this.inspectionSharedBuffer = this.currentWorkplace.GetSharedBufferInfo(this.parameterD2D.IndexChannel);
-            this.inspectionWorkBuffer = this.GetWorkplaceBuffer(this.parameterD2D.IndexChannel);
+            this.inspectionWorkBuffer = this.GetWorkplaceBufferByColorChannel(this.parameterD2D.IndexChannel);
 
             int memH = this.currentWorkplace.SharedBufferInfo.Height;
             int memW = this.currentWorkplace.SharedBufferInfo.Width;

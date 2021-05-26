@@ -2,12 +2,14 @@
 using RootTools_CLR;
 using System;
 using System.Collections;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace RootTools_Vision
 {
@@ -166,23 +168,61 @@ namespace RootTools_Vision
                 return;
 
 
+            int imageSizeX = 160;
+            int imageSizeY = 120;
+
             Parallel.ForEach(defectList, defect =>
             {
                 double cx = (defect.p_rtDefectBox.Left + defect.p_rtDefectBox.Right) / 2;
                 double cy = (defect.p_rtDefectBox.Top + defect.p_rtDefectBox.Bottom) / 2;
-                int startX = (int)cx - 320;
-                int startY = (int)cy - 240;
+                int startX = (int)cx - imageSizeX / 2;
+                int startY = (int)cy - imageSizeY / 2;
                 //int endX = startX + 640;
                 //int endY = startY + 480;
 
-                System.Drawing.Bitmap bitmap = CovertBufferToBitmap(sharedBuffer, new System.Windows.Rect(startX, startY, 640, 480));
+                System.Drawing.Bitmap bitmap = CovertBufferToBitmap(sharedBuffer, new System.Windows.Rect(startX, startY, imageSizeX, imageSizeY));
 
-                if(System.IO.File.Exists(path + defect.m_nDefectIndex + ".bmp"))
+                if (System.IO.File.Exists(path + defect.m_nDefectIndex + ".bmp"))
                     System.IO.File.Delete(path + defect.m_nDefectIndex + ".bmp");
 
                 bitmap.Save(path + defect.m_nDefectIndex + ".bmp");
             });
         }
+
+        public static void SaveDefectImageParallel(String path, List<Measurement> measurementList, SharedBufferInfo sharedBuffer, int nByteCnt)
+        {
+            path += "\\";
+            DirectoryInfo di = new DirectoryInfo(path);
+            if (!di.Exists)
+                di.Create();
+
+            if (measurementList.Count < 1)
+                return;
+
+            Parallel.ForEach(measurementList, measure =>
+            {
+                double cx = (measure.p_rtDefectBox.Left + measure.p_rtDefectBox.Right) / 2;
+                double cy = (measure.p_rtDefectBox.Top + measure.p_rtDefectBox.Bottom) / 2;
+                int startX = (int)cx - 320;
+                int startY = (int)cy - 240;
+                //int endX = startX + 640;
+                //int endY = startY + 480;
+
+
+                System.Drawing.Bitmap bitmap = CovertBufferToBitmap(sharedBuffer, new System.Windows.Rect(startX, startY, 640, 480));
+
+                lock(lockObj)
+				{
+                    if (System.IO.File.Exists(path + measure.m_nMeasurementIndex + ".bmp"))
+                        System.IO.File.Delete(path + measure.m_nMeasurementIndex + ".bmp");
+
+
+                    bitmap.Save(path + measure.m_nMeasurementIndex + ".bmp");
+                }
+            });
+        }
+
+        private static object lockObj = new object();
 
         public static void SaveDefectImage(String path, List<Data> dataList, SharedBufferInfo sharedBuffer)
         {
@@ -278,8 +318,9 @@ namespace RootTools_Vision
             }
         }
 
-        // 지울거야
-        public static void SaveTiffImage(string Path, List<Defect> defectList, SharedBufferInfo sharedBuffer)
+
+        public static object lockTiffObj = new object();
+        public static void SaveTiffImage(string Path, string fileName, List<Defect> defectList, SharedBufferInfo sharedBuffer, Size imageSize = default(Size))
         {
             Path += "\\";
             DirectoryInfo di = new DirectoryInfo(Path);
@@ -287,10 +328,26 @@ namespace RootTools_Vision
                 di.Create();
 
             ArrayList inputImage = new ArrayList();
-            for (int i = 0; i < defectList.Count; i++)
+
+            int tiffWidth = 160;
+            int tiffHeight = 120;
+            if (imageSize != default(Size))
             {
-				MemoryStream image = new MemoryStream();
-                System.Drawing.Bitmap bitmap = Tools.CovertBufferToBitmap(sharedBuffer, defectList[i].GetRect());
+                tiffWidth = (int)imageSize.Width;
+                tiffHeight = (int)imageSize.Height;
+            }
+
+            //Parallel.ForEach(defectList, defect =>
+            foreach (Defect defect in defectList)
+            {
+                Rect defectRect = new Rect(
+                    defect.m_fAbsX - tiffWidth / 2,
+                    defect.m_fAbsY - tiffHeight / 2,
+                    tiffWidth,
+                    tiffHeight);
+
+                MemoryStream image = new MemoryStream();
+                System.Drawing.Bitmap bitmap = Tools.CovertBufferToBitmap(sharedBuffer, defectRect);
                 //System.Drawing.Bitmap NewImg = new System.Drawing.Bitmap(bitmap);
                 bitmap.Save(image, ImageFormat.Tiff);
                 inputImage.Add(image);
@@ -306,8 +363,7 @@ namespace RootTools_Vision
                 }
             }
 
-            string test = "test";
-            Path += test + ".tiff";
+            Path += fileName + ".tiff";
 
             EncoderParameters ep = new EncoderParameters(2);
 
@@ -332,24 +388,353 @@ namespace RootTools_Vision
                         img = img_src;
 
                         ep.Param[1] = new EncoderParameter(System.Drawing.Imaging.Encoder.SaveFlag, Convert.ToInt32(EncoderValue.MultiFrame));
-                        img.Save(Path, info, ep);
+                        lock (lockTiffObj) img.Save(Path, info, ep);
 
                         firstPage = false;
                         continue;
                     }
 
                     ep.Param[1] = new EncoderParameter(System.Drawing.Imaging.Encoder.SaveFlag, Convert.ToInt32(EncoderValue.FrameDimensionPage));
-                    img.SaveAdd(img_src, ep);
+                    lock (lockTiffObj) img.SaveAdd(img_src, ep);
                 }
             }
             if (inputImage.Count == 0)
             {
-                File.Create(Path);
+                lock (lockTiffObj) File.Create(Path);
                 return;
             }
 
             ep.Param[1] = new EncoderParameter(System.Drawing.Imaging.Encoder.SaveFlag, Convert.ToInt32(EncoderValue.Flush));
-            img.SaveAdd(ep);
+            lock (lockTiffObj) img.SaveAdd(ep);
+        }
+
+
+        public static void SaveTiffImageOnlyTDI(string Path, string fileName, List<Defect> defectList, SharedBufferInfo sharedBuffer, Size imageSize = default(Size))
+        {
+            Path += "\\";
+            DirectoryInfo di = new DirectoryInfo(Path);
+            if (!di.Exists)
+                di.Create();
+
+            ArrayList inputImage = new ArrayList();
+
+            int tiffWidth = 160;
+            int tiffHeight = 120;
+            if(imageSize != default(Size))
+            {
+                tiffWidth = (int)imageSize.Width;
+                tiffHeight = (int)imageSize.Height;
+            }
+
+            //Parallel.ForEach(defectList, defect =>
+            foreach (Defect defect in defectList)
+            {
+                Rect defectRect = new Rect(
+                    defect.m_fAbsX - tiffWidth / 2,
+                    defect.m_fAbsY - tiffHeight / 2,
+                    tiffWidth,
+                    tiffHeight);
+
+                MemoryStream image = new MemoryStream();
+                System.Drawing.Bitmap bitmap = Tools.CovertBufferToBitmap(sharedBuffer, defectRect);
+                //System.Drawing.Bitmap NewImg = new System.Drawing.Bitmap(bitmap);
+                bitmap.Save(image, ImageFormat.Tiff);
+                inputImage.Add(image);
+            }
+
+            ImageCodecInfo info = null;
+            foreach (ImageCodecInfo ice in ImageCodecInfo.GetImageEncoders())
+            {
+                if (ice.MimeType == "image/tiff")
+                {
+                    info = ice;
+                    break;
+                }
+            }
+
+            Path += fileName + ".tiff";
+
+            EncoderParameters ep = new EncoderParameters(2);
+
+            bool firstPage = true;
+
+            System.Drawing.Image img = null;
+            lock (lockTiffObj)
+            {
+                for (int i = 0; i < inputImage.Count; i++)
+                {
+                    System.Drawing.Image img_src = System.Drawing.Image.FromStream((Stream)inputImage[i]);
+                    Guid guid = img_src.FrameDimensionsList[0];
+                    System.Drawing.Imaging.FrameDimension dimension = new System.Drawing.Imaging.FrameDimension(guid);
+
+                    for (int nLoopFrame = 0; nLoopFrame < img_src.GetFrameCount(dimension); nLoopFrame++)
+                    {
+                        img_src.SelectActiveFrame(dimension, nLoopFrame);
+
+                        ep.Param[0] = new EncoderParameter(System.Drawing.Imaging.Encoder.Compression, Convert.ToInt32(EncoderValue.CompressionLZW));
+
+                        if (firstPage)
+                        {
+                            img = img_src;
+
+                            ep.Param[1] = new EncoderParameter(System.Drawing.Imaging.Encoder.SaveFlag, Convert.ToInt32(EncoderValue.MultiFrame));
+                            img.Save(Path, info, ep);
+
+                            firstPage = false;
+                            continue;
+                        }
+
+                        ep.Param[1] = new EncoderParameter(System.Drawing.Imaging.Encoder.SaveFlag, Convert.ToInt32(EncoderValue.FrameDimensionPage));
+                        lock (lockTiffObj) img.SaveAdd(img_src, ep);
+                    }
+                }
+                if (inputImage.Count == 0)
+                {
+                    File.Create(Path);
+                    return;
+                }
+
+                ep.Param[1] = new EncoderParameter(System.Drawing.Imaging.Encoder.SaveFlag, Convert.ToInt32(EncoderValue.Flush));
+                img.SaveAdd(ep);
+            }
+        }
+
+
+        // 지울거야
+        public static void SaveTiffImageBoth(string Path, string fileName, List<Defect> defectList, SharedBufferInfo sharedBuffer, Size imageSize, ConcurrentQueue<byte[]> vrsImageQueue, Size vrsImageSize)
+        {
+            Path += "\\";
+            DirectoryInfo di = new DirectoryInfo(Path);
+            if (!di.Exists)
+                di.Create();
+
+            ArrayList inputImage = new ArrayList();
+
+            int tiffWidth = (int)imageSize.Width;
+            int tiffHeight = (int)imageSize.Height;
+
+            if (vrsImageQueue == null)
+            {
+                MessageBox.Show("VRS Imaage Queue == null");
+                return;
+            }
+
+            if ((vrsImageQueue.Count != defectList.Count) || vrsImageSize == default(Size))
+            {
+                MessageBox.Show("VRS Review Image와 Defect의 수가 다릅니다.");
+                return;
+            }
+
+            if (vrsImageSize == default(Size))
+            {
+                MessageBox.Show("VRS Review Image Size를 설정해주어야합니다.");
+                return;
+            }
+
+            //Parallel.ForEach(defectList, defect =>
+            foreach (Defect defect in defectList)
+            {
+                Rect defectRect = new Rect(
+                    defect.m_fAbsX - tiffWidth / 2,
+                    defect.m_fAbsY - tiffHeight / 2,
+                    tiffWidth,
+                    tiffHeight);
+
+                MemoryStream image = new MemoryStream();
+                System.Drawing.Bitmap bitmap = Tools.CovertBufferToBitmap(sharedBuffer, defectRect);
+                //System.Drawing.Bitmap NewImg = new System.Drawing.Bitmap(bitmap);
+                bitmap.Save(image, ImageFormat.Tiff);
+                inputImage.Add(image);
+
+
+                byte[] colorImage = null;
+                if(vrsImageQueue.TryDequeue(out colorImage) == true)
+                {
+                    MemoryStream ms = new MemoryStream();
+                    System.Drawing.Bitmap vrsBmp = Tools.CovertArrayToBitmap(colorImage, (int)vrsImageSize.Width, (int)vrsImageSize.Height, 3);
+
+                    vrsBmp.Save(ms, ImageFormat.Tiff);
+                    inputImage.Add(ms);
+                }
+                else
+                {
+                    TempLogger.Write("Error", "Save Klarf image - VRS Image Dequeue Fail!!");
+                }
+            }
+            //for (int i = 0; i < defectList.Count; i++)
+            //{
+            //    Rect defectRect = new Rect(
+            //        (defectList[i].p_rtDefectBox.Left + defectList[i].p_rtDefectBox.Right) / 2 - tiffWidth / 2,
+            //        (defectList[i].p_rtDefectBox.Top + defectList[i].p_rtDefectBox.Bottom) / 2 - tiffHeight / 2,
+            //        tiffWidth,
+            //        tiffHeight);
+
+            //    MemoryStream image = new MemoryStream();
+            //    System.Drawing.Bitmap bitmap = Tools.CovertBufferToBitmap(sharedBuffer, defectRect);
+            //    //System.Drawing.Bitmap NewImg = new System.Drawing.Bitmap(bitmap);
+            //    bitmap.Save(image, ImageFormat.Tiff);
+            //    inputImage.Add(image);
+            //}
+
+            ImageCodecInfo info = null;
+            foreach (ImageCodecInfo ice in ImageCodecInfo.GetImageEncoders())
+            {
+                if (ice.MimeType == "image/tiff")
+                {
+                    info = ice;
+                    break;
+                }
+            }
+            
+            Path += fileName + ".tiff";
+
+            EncoderParameters ep = new EncoderParameters(2);
+
+            bool firstPage = true;
+
+            System.Drawing.Image img = null;
+            lock (lockTiffObj)
+            {
+                for (int i = 0; i < inputImage.Count; i++)
+                {
+                    System.Drawing.Image img_src = System.Drawing.Image.FromStream((Stream)inputImage[i]);
+                    Guid guid = img_src.FrameDimensionsList[0];
+                    System.Drawing.Imaging.FrameDimension dimension = new System.Drawing.Imaging.FrameDimension(guid);
+
+                    for (int nLoopFrame = 0; nLoopFrame < img_src.GetFrameCount(dimension); nLoopFrame++)
+                    {
+                        img_src.SelectActiveFrame(dimension, nLoopFrame);
+
+                        ep.Param[0] = new EncoderParameter(System.Drawing.Imaging.Encoder.Compression, Convert.ToInt32(EncoderValue.CompressionLZW));
+
+                        if (firstPage)
+                        {
+                            img = img_src;
+
+                            ep.Param[1] = new EncoderParameter(System.Drawing.Imaging.Encoder.SaveFlag, Convert.ToInt32(EncoderValue.MultiFrame));
+                            img.Save(Path, info, ep);
+
+                            firstPage = false;
+                            continue;
+                        }
+
+                        ep.Param[1] = new EncoderParameter(System.Drawing.Imaging.Encoder.SaveFlag, Convert.ToInt32(EncoderValue.FrameDimensionPage));
+                        img.SaveAdd(img_src, ep);
+                    }
+                }
+                if (inputImage.Count == 0)
+                {
+                    File.Create(Path);
+                    return;
+                }
+
+                ep.Param[1] = new EncoderParameter(System.Drawing.Imaging.Encoder.SaveFlag, Convert.ToInt32(EncoderValue.Flush));
+                img.SaveAdd(ep);
+            }
+ 
+        }
+
+        public static void SaveTiffImageOnlyVRS(string Path, string fileName, List<Defect> defectList, ConcurrentQueue<byte[]> vrsImageQueue, Size vrsImageSize)
+        {
+            Path += "\\";
+            DirectoryInfo di = new DirectoryInfo(Path);
+            if (!di.Exists)
+                di.Create();
+
+            ArrayList inputImage = new ArrayList();
+
+            if (vrsImageQueue == null)
+            {
+                MessageBox.Show("VRS Image == Null");
+                return;
+            }
+
+            if ((vrsImageQueue.Count != defectList.Count) || vrsImageSize == default(Size))
+            {
+                MessageBox.Show("VRS Review Image와 Defect의 수가 다릅니다.");
+                return;
+            }
+
+            if (vrsImageSize == default(Size))
+            {
+                MessageBox.Show("VRS Review Image Size를 설정해주어야합니다.");
+                return;
+            }
+
+            //Parallel.ForEach(defectList, defect =>
+            foreach (Defect defect in defectList)  // 이거 나중에 정보 필요할수 있음
+            {
+                byte[] colorImage = null;
+                if(vrsImageQueue.TryDequeue(out colorImage) == true)
+                {
+                    MemoryStream ms = new MemoryStream();
+                    System.Drawing.Bitmap vrsBmp = Tools.CovertArrayToBitmap(colorImage, (int)vrsImageSize.Width, (int)vrsImageSize.Height, 3);
+
+                    vrsBmp.Save(ms, ImageFormat.Tiff);
+                    inputImage.Add(ms);
+                }
+                else
+                {
+                    TempLogger.Write("Error", "Save Klarf image - VRS Image Dequeue Fail!!");
+                }
+            }
+
+            ImageCodecInfo info = null;
+            foreach (ImageCodecInfo ice in ImageCodecInfo.GetImageEncoders())
+            {
+                if (ice.MimeType == "image/tiff")
+                {
+                    info = ice;
+                    break;
+                }
+            }
+
+            string test = "test";
+            Path += test + ".tiff";
+
+            EncoderParameters ep = new EncoderParameters(2);
+
+            bool firstPage = true;
+
+            System.Drawing.Image img = null;
+            lock(lockTiffObj)
+            {
+                for (int i = 0; i < inputImage.Count; i++)
+                {
+                    System.Drawing.Image img_src = System.Drawing.Image.FromStream((Stream)inputImage[i]);
+                    Guid guid = img_src.FrameDimensionsList[0];
+                    System.Drawing.Imaging.FrameDimension dimension = new System.Drawing.Imaging.FrameDimension(guid);
+
+                    for (int nLoopFrame = 0; nLoopFrame < img_src.GetFrameCount(dimension); nLoopFrame++)
+                    {
+                        img_src.SelectActiveFrame(dimension, nLoopFrame);
+
+                        ep.Param[0] = new EncoderParameter(System.Drawing.Imaging.Encoder.Compression, Convert.ToInt32(EncoderValue.CompressionLZW));
+
+                        if (firstPage)
+                        {
+                            img = img_src;
+
+                            ep.Param[1] = new EncoderParameter(System.Drawing.Imaging.Encoder.SaveFlag, Convert.ToInt32(EncoderValue.MultiFrame));
+                            img.Save(Path, info, ep);
+
+                            firstPage = false;
+                            continue;
+                        }
+
+                        ep.Param[1] = new EncoderParameter(System.Drawing.Imaging.Encoder.SaveFlag, Convert.ToInt32(EncoderValue.FrameDimensionPage));
+                        img.SaveAdd(img_src, ep);
+                    }
+                }
+                if (inputImage.Count == 0)
+                {
+                    File.Create(Path);
+                    return;
+                }
+
+                ep.Param[1] = new EncoderParameter(System.Drawing.Imaging.Encoder.SaveFlag, Convert.ToInt32(EncoderValue.Flush));
+                img.SaveAdd(ep);
+            }
         }
 
         public static void SaveTiffImage(string Path, List<Data> dataList, SharedBufferInfo sharedBuffer)

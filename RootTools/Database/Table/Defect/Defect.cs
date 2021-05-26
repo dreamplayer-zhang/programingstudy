@@ -114,7 +114,7 @@ namespace RootTools.Database
         public void CalcAbsToRelPos(int nRefX, int nRefY)
         {
             m_fRelX = m_fAbsX - nRefX;
-            m_fRelY = m_fAbsY - nRefY;
+            m_fRelY = -(m_fAbsY - nRefY); // 칩의 좌하단 기준
         }
 
         public override Rect GetRect()

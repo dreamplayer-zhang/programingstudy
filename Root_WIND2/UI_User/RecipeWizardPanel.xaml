@@ -42,7 +42,9 @@
             <Border
                 Background="{StaticResource sidetap_child_background}">
                 <StackPanel Margin="0, 4, 0, 0" HorizontalAlignment="Stretch">
+                    <RadioButton Content="Product" Command="{Binding btnBackProduct}" Style="{StaticResource sidetap_child_radiobutton}"/>
                     <RadioButton Content="Setup" Command="{Binding btnBackSetup}" Style="{StaticResource sidetap_child_radiobutton}"/>
+                    <RadioButton Content="Spec" Command="{Binding btnBackSpec}" Style="{StaticResource sidetap_child_radiobutton}"/>
                     <RadioButton Content="Inspect" Command="{Binding btnBackInspect}" Style="{StaticResource sidetap_child_radiobutton}"/>
                     <Button Content="NEW" Command="{Binding btnNewRecipeBack}" Style="{StaticResource sidetap_child_button}"/>
                     <Button Content="SAVE" Command="{Binding btnSaveRecipeBack}" Style="{StaticResource sidetap_child_button}"/>
@@ -70,7 +72,7 @@
                 Background="{StaticResource sidetap_child_background}">
                 <StackPanel Margin="0, 4, 0, 0" HorizontalAlignment="Stretch">
                     <RadioButton Content="Setup" Command="{Binding btnEBRSetup}" Style="{StaticResource sidetap_child_radiobutton}"/>
-                    <!--<RadioButton Content="Inspect" Command="{Binding btnEBRInspect}" Style="{StaticResource sidetap_child_radiobutton}"/>-->
+                    <RadioButton Content="Inspect" Command="{Binding btnEBRInspect}" Style="{StaticResource sidetap_child_radiobutton}"/>
                     <Button Content="NEW" Command="{Binding btnNewRecipeEBR}" Style="{StaticResource sidetap_child_button}"/>
                     <Button Content="SAVE" Command="{Binding btnSaveRecipeEBR}" Style="{StaticResource sidetap_child_button}"/>
                     <Button Content="LOAD" Command="{Binding btnLoadRecipeEBR}" Style="{StaticResource sidetap_child_button}"/>

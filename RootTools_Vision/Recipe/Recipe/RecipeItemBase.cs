@@ -19,6 +19,7 @@ namespace RootTools_Vision
     [XmlInclude(typeof(MaskRecipe))]
     [XmlInclude(typeof(EdgeSurfaceRecipe))]
     [XmlInclude(typeof(EBRRecipe))]
+    [XmlInclude(typeof(PBIRecipe))]
     public abstract class RecipeItemBase : ObservableObject, IComparable<RecipeItemBase>, IRecipe
     {
         public int CompareTo(RecipeItemBase other)

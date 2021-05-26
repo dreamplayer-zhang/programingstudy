@@ -1,26 +1,256 @@
 ﻿using RootTools;
+using RootTools.Camera.Dalsa;
+using RootTools.Comm;
 using RootTools.Light;
 using RootTools.Memory;
 using RootTools.Module;
+using RootTools.ToolBoxs;
 using RootTools.Trees;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Net.Sockets;
 using System.Threading;
 
 namespace Root_Pine2_Vision.Module
 {
     public class Vision : ModuleBase
     {
+        public enum eVision
+        {
+            Top3D,
+            Top2D,
+            Bottom
+        }
+
         #region ToolBox
-        LightSet lightSet;
-        MemoryPool memoryPool;
-        MemoryGroup memoryGroup;
+        CameraDalsa m_camera;
+        public LightSet m_lightSet;
         public override void GetTools(bool bInit)
         {
             if (p_eRemote == eRemote.Server)
             {
-                p_sInfo = m_toolBox.Get(ref memoryPool, this, "Memory", 1);
-                p_sInfo = m_toolBox.Get(ref lightSet, this);
+                p_sInfo = m_toolBox.GetCamera(ref m_camera, this, "Camera"); 
+                p_sInfo = m_toolBox.Get(ref m_lightSet, this);
+                m_aVisionWorks[eWorks.A].GetTools(m_toolBox, bInit);
+                m_aVisionWorks[eWorks.B].GetTools(m_toolBox, bInit);
             }
             m_remote.GetTools(bInit);
+        }
+        #endregion
+
+        #region GrabMode
+        public class GrabMode
+        {
+            #region Light
+            public LightSet m_lightSet;
+            List<double> m_aPower = new List<double>();
+            void SetPowerList()
+            {
+                while (m_aPower.Count < m_lightSet.m_aLight.Count) m_aPower.Add(0);
+                while (m_aPower.Count < m_lightSet.m_aLight.Count) m_aPower.RemoveAt(m_aPower.Count - 1); 
+            }
+
+            public void SetLight(bool bOn)
+            {
+                SetPowerList();
+                int n = 0; 
+                foreach (Light light in m_lightSet.m_aLight)
+                {
+                    if (light.m_light != null) light.m_light.p_fSetPower = bOn ? m_aPower[n] : 0;
+                    n++; 
+                }
+            }
+
+            void RunTreeLight(Tree tree)
+            {
+                if (m_lightSet == null) return;
+                SetPowerList(); 
+                for (int n = 0; n < m_aPower.Count; n++)
+                {
+                    m_aPower[n] = tree.Set(m_aPower[n], m_aPower[n], m_lightSet.m_aLight[n].m_sName, "Light Power (0 ~ 100 %%)");
+                }
+            }
+            #endregion
+
+            #region Memory
+            string m_sMemory = "";
+            public MemoryData m_memory;
+            void RunTreeMemory(Tree tree)
+            {
+                MemoryGroup memoryGroup = m_visionWorks.m_memoryGroup; 
+                m_sMemory = tree.Set(m_sMemory, m_sMemory, memoryGroup.m_asMemory, "Memory", "Memory Data Name");
+                m_memory = memoryGroup.GetMemory(m_sMemory); 
+            }
+            #endregion
+
+            public void RunTree(Tree tree)
+            {
+                RunTreeLight(tree.GetTree("Light"));
+                RunTreeMemory(tree.GetTree("Memory")); 
+            }
+
+            public string p_id { get; set; }
+            public string p_sName { get; set; }
+            public VisionWorks m_visionWorks; 
+            public GrabMode(string id, VisionWorks visionWorks)
+            {
+                p_id = id;
+                p_sName = id;
+                m_visionWorks = visionWorks;
+                m_lightSet = visionWorks.m_vision.m_lightSet; 
+            }
+        }
+        #endregion
+
+        #region VisionWorks
+        public enum eWorks
+        {
+            A,
+            B,
+        }
+        public class VisionWorks
+        {
+            MemoryPool m_memoryPool;
+            TCPAsyncClient m_tcpip; 
+            public void GetTools(ToolBox toolBox, bool bInit)
+            {
+                toolBox.Get(ref m_memoryPool, m_vision, p_id, 1); 
+                toolBox.GetComm(ref m_tcpip, m_vision, p_id);
+                if (bInit)
+                {
+                    InitMemory(); 
+                    m_tcpip.EventReciveData += M_tcpip_EventReciveData;
+                }
+            }
+
+            #region Memory
+            public MemoryGroup m_memoryGroup;
+            MemoryData m_memColor; 
+            void InitMemory()
+            {
+                m_memoryGroup = m_memoryPool.GetGroup("Pine2");
+                m_memColor = m_memoryGroup.CreateMemory("Color", 1, 3, new CPoint(1000, 1000)); 
+            }
+            #endregion
+
+            #region TCPIP
+            private void M_tcpip_EventReciveData(byte[] aBuf, int nSize, Socket socket)
+            {
+            }
+            #endregion
+
+            #region GrabMode
+            int m_lGrabMode = 0;
+            public List<GrabMode> m_aGrabMode = new List<GrabMode>();
+            void InitGrabModeList()
+            {
+                while (m_aGrabMode.Count > m_lGrabMode) m_aGrabMode.RemoveAt(m_aGrabMode.Count - 1);
+                while (m_aGrabMode.Count < m_lGrabMode) m_aGrabMode.Add(new GrabMode(m_aGrabMode.Count.ToString("00"), this));
+            }
+
+            void RunTreeGrabMode(Tree tree)
+            {
+                m_lGrabMode = tree.Set(m_lGrabMode, m_lGrabMode, "Count", "Grab Mode Count");
+                InitGrabModeList();
+                foreach (GrabMode grabMode in m_aGrabMode) grabMode.RunTree(tree.GetTree(grabMode.p_id)); 
+            }
+            #endregion
+
+            #region Process
+            string m_sFileVisionWorks = "C:\\WisVision\\VisionWorks2.exe";
+            bool m_bThreadProcess = false;
+            Thread m_threadProcess = null;
+            void InitThreadProcess()
+            {
+                m_threadProcess = new Thread(new ThreadStart(RunThreadProcess));
+                m_threadProcess.Start();
+            }
+
+            bool m_bStartProcess = false;
+            int m_nProcessID = -1;
+            void RunThreadProcess()
+            {
+                m_bThreadProcess = true;
+                Thread.Sleep(10000);
+                while (m_bThreadProcess)
+                {
+                    Thread.Sleep(100);
+                    if (m_bStartProcess)
+                    {
+                        try
+                        {
+                            if (IsProcessRun() == false)
+                            {
+                                Process process = Process.Start(m_sFileVisionWorks, p_id);
+                                m_nProcessID = process.Id;
+                            }
+                        }
+                        catch (Exception e) { m_vision.p_sInfo = p_id + " StartProcess Error : " + e.Message; }
+                    }
+                }
+            }
+
+            public string m_idProcess = "VisionWorks";
+            bool IsProcessRun()
+            {
+                Process[] aProcess = Process.GetProcessesByName(m_idProcess);
+                if (aProcess.Length == 0) return false;
+                foreach (Process process in aProcess)
+                {
+                    if (process.Id == m_nProcessID) return true;
+                }
+                return false;
+            }
+            #endregion
+
+            public void RunTree(Tree tree)
+            {
+                if (m_vision.p_eRemote == eRemote.Server)
+                {
+                    m_idProcess = tree.Set(m_idProcess, m_idProcess, "ID", "VisionWorks Process ID");
+                    m_sFileVisionWorks = tree.SetFile(m_sFileVisionWorks, m_sFileVisionWorks, ".exe", "File", "VisionWorks File Name");
+                    m_bStartProcess = tree.Set(m_bStartProcess, m_bStartProcess, "Start", "Start Memory Process");
+                    RunTreeGrabMode(tree.GetTree("GrabMode", false));
+                }
+            }
+
+            public eWorks m_eVisionWorks = eWorks.A; 
+            public string p_id { get; set; }
+            public Vision m_vision; 
+            public VisionWorks(eWorks eVisionWorks, Vision vision)
+            {
+                m_eVisionWorks = eVisionWorks; 
+                p_id = eVisionWorks.ToString();
+                m_vision = vision; 
+                InitThreadProcess(); 
+            }
+
+            public void ThreadStop()
+            {
+                if (m_bThreadProcess)
+                {
+                    m_bThreadProcess = false;
+                    m_threadProcess.Join(); 
+                }
+            }
+        }
+        public Dictionary<eWorks, VisionWorks> m_aVisionWorks = new Dictionary<eWorks, VisionWorks>(); 
+        List<string> m_asVisionWorks = new List<string>();
+        void InitVisionWorks()
+        {
+            m_aVisionWorks.Add(eWorks.A, new VisionWorks(eWorks.A, this));
+            m_aVisionWorks.Add(eWorks.B, new VisionWorks(eWorks.B, this));
+            foreach (VisionWorks vision in m_aVisionWorks.Values) m_asVisionWorks.Add(vision.p_id); 
+        }
+
+        VisionWorks GetVisionWorks(string sVisionWorks)
+        {
+            foreach (VisionWorks vision in m_aVisionWorks.Values)
+            {
+                if (vision.p_id == sVisionWorks) return vision; 
+            }
+            return null; 
         }
         #endregion
 
@@ -32,12 +262,6 @@ namespace Root_Pine2_Vision.Module
             {
                 base.Reset();
             }
-        }
-
-        public override void InitMemorys()
-        {
-            if (p_eRemote == eRemote.Client) return;
-            memoryGroup = memoryPool.GetGroup(p_id);
         }
         #endregion
 
@@ -54,16 +278,28 @@ namespace Root_Pine2_Vision.Module
         public override void RunTree(Tree tree)
         {
             base.RunTree(tree);
+            m_aVisionWorks[eWorks.A].RunTree(tree.GetTree(m_aVisionWorks[eWorks.A].p_id));
+            m_aVisionWorks[eWorks.B].RunTree(tree.GetTree(m_aVisionWorks[eWorks.B].p_id));
         }
         #endregion
 
+        public eVision m_eVision = eVision.Top3D; 
+        public Vision(eVision eVision, IEngineer engineer, eRemote eRemote)
+        {
+            m_eVision = eVision; 
+            InitVisionWorks(); 
+            InitBase("Vision " + eVision.ToString(), engineer, eRemote);
+        }
+
         public Vision(string id, IEngineer engineer, eRemote eRemote)
         {
+            InitVisionWorks();
             InitBase(id, engineer, eRemote);
         }
 
         public override void ThreadStop()
         {
+            foreach (VisionWorks visionWorks in m_aVisionWorks.Values) visionWorks.ThreadStop(); 
             base.ThreadStop();
         }
 
@@ -208,7 +444,6 @@ namespace Root_Pine2_Vision.Module
                 return "OK";
             }
         }
-
         #endregion
 
     }

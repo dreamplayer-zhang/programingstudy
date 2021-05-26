@@ -33,13 +33,15 @@ namespace Root_VEGA_P.Module
         public override void RunTree(Tree tree)
         {
             base.RunTree(tree);
+            m_secPumpDelay = tree.Set(m_secPumpDelay, m_secPumpDelay, "Pump Delay", "Pump Delay (sec)"); 
             m_sample.RunTree(tree.GetTree("Particle Counter"), true);
             m_flowSensor.RunTree(tree.GetTree("Flow Sensor")); 
         }
         #endregion
 
         public FlowSensor m_flowSensor;
-        public ParticleCounterBase.Sample m_sample; 
+        public ParticleCounterBase.Sample m_sample;
+        public double m_secPumpDelay = 2; 
         public VEGA_P(string id, IEngineer engineer)
         {
             m_flowSensor = new FlowSensor("FlowSensor", this);

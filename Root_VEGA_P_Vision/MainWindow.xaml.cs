@@ -1,5 +1,5 @@
 ﻿using System;
-using System.ComponentModel;
+using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Windows;
@@ -7,8 +7,9 @@ using System.Windows.Input;
 using System.Windows.Threading;
 using Root_VEGA_P_Vision.Engineer;
 using RootTools;
+using RootTools.Memory;
 using RootTools_Vision;
-
+using RootTools_Vision.WorkManager3;
 namespace Root_VEGA_P_Vision
 {
     /// <summary>
@@ -98,9 +99,10 @@ namespace Root_VEGA_P_Vision
 
 			UIManager.Instance.MainPanel = MainPanel;
 			UIManager.Instance.ChangeUIMode();
+
+			logView.Init(LogView._logView);
 			InitTimer();
         }
-
 		void CreateGlobalPaths()
 		{
 			Type t = typeof(Constants.RootPath);
@@ -117,7 +119,85 @@ namespace Root_VEGA_P_Vision
 				VEGA_P_Vision_Engineer engineer = GlobalObjects.Instance.Register<VEGA_P_Vision_Engineer>();
 				DialogService dialogService = GlobalObjects.Instance.Register<DialogService>(this);
 				engineer.Init("Vega-P");
-            }catch(Exception ex)
+
+				MemoryTool memoryTool = engineer.ClassMemoryTool();
+				Type partstype = typeof(Module.Vision.eParts);
+				Type InspType = typeof(Module.Vision.MainOptic.eInsp);
+				Type UpdownType = typeof(Module.Vision.eUpDown);
+				Type SideType = typeof(Module.Vision.SideOptic.eSide);
+				int sidelen = Enum.GetValues(SideType).Length;
+				int partslen = Enum.GetValues(partstype).Length;
+				int updownlen = Enum.GetValues(UpdownType).Length;
+				int insplen = Enum.GetValues(InspType).Length;
+
+				RecipeVision recipe_VegaP = GlobalObjects.Instance.Register<RecipeVision>();
+				GlobalObjects.Instance.RegisterNamed<ImageData>(App.mMaskLayer, memoryTool.GetMemory(App.mPool, App.mGroup, App.mMaskLayer));
+
+				foreach (var v in Enum.GetValues(partstype))
+                    foreach (var v2 in Enum.GetValues(InspType))
+                        foreach (var v3 in Enum.GetValues(UpdownType))
+                        {
+							List<IntPtr> li = new List<IntPtr>();
+                            string memstr = v.ToString() + "." + v2.ToString() + "." + v3.ToString();
+							//string maskstr = memstr + ".MaskImage";
+							MemoryData memData = engineer.ClassMemoryTool().GetMemory(App.mPool, App.mGroup, memstr);
+
+                            ImageData Data = GlobalObjects.Instance.RegisterNamed<ImageData>(memstr, memoryTool.GetMemory(App.mPool,App.mGroup,memstr));
+                            //ImageData maskLayer = GlobalObjects.Instance.RegisterNamed<ImageData>(maskstr, memoryTool.GetMemory(App.mPool, App.mGroup, maskstr));
+                            if (Data.m_MemData!=null)
+                            {
+								Data.p_nByte = memData.p_nByte;
+								Data.p_nPlane = memData.p_nCount;
+                            }
+
+							for(int i=0;i<Data.p_nPlane;i++)
+								li.Add(Data.GetPtr(i));
+
+							if(Data.GetPtr()!=IntPtr.Zero)
+                            {
+								WorkManager Insp = GlobalObjects.Instance.RegisterNamed<WorkManager>(memstr + ".Inspection",4);
+								Insp.SetRecipe(recipe_VegaP);
+								Insp.SetSharedBuffer(new SharedBufferInfo(
+									Data.p_Size.X,
+									Data.p_Size.Y,
+									1,
+									li));
+                            }
+						}
+
+				foreach(var v in Enum.GetValues(partstype))
+					foreach(var v2 in Enum.GetValues(SideType))
+                    {
+						string memstr = v.ToString() + "." + v2.ToString();
+						//string maskstr = memstr + ".MaskImage";
+
+						MemoryData memData = engineer.ClassMemoryTool().GetMemory(App.mPool, App.mGroup, memstr);
+                        ImageData Data = GlobalObjects.Instance.RegisterNamed<ImageData>(memstr, memoryTool.GetMemory(App.mPool, App.mGroup, memstr));
+                        //ImageData maskLayer = GlobalObjects.Instance.RegisterNamed<ImageData>(maskstr, memoryTool.GetMemory(App.mPool, App.mGroup, maskstr));
+                        List<IntPtr> li = new List<IntPtr>();
+						if(Data.m_MemData!=null)
+                        {
+							Data.p_nByte = memData.p_nByte;
+							Data.p_nPlane = memData.p_nCount;
+                        }
+						for (int i = 0; i < Data.p_nPlane; i++)
+							li.Add(Data.GetPtr(i));
+
+						if(Data.GetPtr()!=IntPtr.Zero)
+                        {
+							WorkManager Insp = GlobalObjects.Instance.RegisterNamed<WorkManager>(memstr + ".Inspection", 4);
+							Insp.SetRecipe(recipe_VegaP);
+							Insp.SetSharedBuffer(new SharedBufferInfo(
+								Data.p_Size.X,
+								Data.p_Size.Y,
+								1,
+								li)) ;
+                        }
+                    }
+				//DialogService
+				dialogService.Register<Dialog_ImageOpenViewModel, Dialog_ImageOpen>();
+			}
+			catch (Exception ex)
             {
 				MessageBox.Show(ex.Message);
 				return false;

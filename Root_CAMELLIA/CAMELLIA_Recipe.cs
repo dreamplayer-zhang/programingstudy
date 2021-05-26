@@ -4,13 +4,24 @@ using System.Collections.Generic;
 
 namespace Root_CAMELLIA
 {
-    public class CAMELLIA_Recipe : NotifyProperty
+    public class CAMELLIA_Recipe : ObservableObject
     {
         #region ModuleBase
         /// <summary> Recipe 편집에 필요한 Module 이름 List </summary>
         public List<string> m_asModule = new List<string>();
         /// <summary> Recipe 편집에 필요한 Module List </summary>
         List<ModuleBase> m_aModule = new List<ModuleBase>();
+        public List<string> p_asModule
+        {
+            get 
+            {
+                return m_asModule;
+            }
+            set 
+            { 
+                SetProperty(ref m_asModule, value);
+            }
+        }
         public void AddModule(params ModuleBase[] modules)
         {
             foreach (ModuleBase module in modules)

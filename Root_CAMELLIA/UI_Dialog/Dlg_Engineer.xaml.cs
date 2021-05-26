@@ -25,15 +25,10 @@ namespace Root_CAMELLIA
             InitializeComponent();
 
         }
-        private void CloseButton_Click(object sender, RoutedEventArgs e)
-        {
-            this.Close();
-        }
         private void TitleBar_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             this.DragMove();
         }
-
 
     }
 }
