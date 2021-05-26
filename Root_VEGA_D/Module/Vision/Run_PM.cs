@@ -90,9 +90,9 @@ namespace Root_VEGA_D.Module
             Light lightSecond = m_module.GetLight(m_sLightSecond);
             if (lightFirst == null || lightSecond == null) return "Set First & Second Light";
 
-            Dictionary<Light, int> dictLight = new Dictionary<Light, int>();
-            dictLight.Add(lightFirst, m_nFirstLightPower);
-            dictLight.Add(lightSecond, m_nSecondLightPower);
+            List<KeyValuePair<Light, int>> listLight = new List<KeyValuePair<Light, int>>();
+            listLight.Add(new KeyValuePair<Light, int>(lightFirst, m_nFirstLightPower));
+            listLight.Add(new KeyValuePair<Light, int>(lightSecond, m_nSecondLightPower));
 
             // Position
             AxisXY axisXY = m_module.AxisXY;
@@ -113,7 +113,7 @@ namespace Root_VEGA_D.Module
 
             try
             {
-                foreach (KeyValuePair<Light, int> item in dictLight)
+                foreach (KeyValuePair<Light, int> item in listLight)
                 {
                     if (item.Key == null) return "Set First & Second Light";
 
