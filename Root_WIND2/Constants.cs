@@ -15,7 +15,8 @@ namespace Root_WIND2
 
         public static class RootPath
         {
-            public const string RecipeRootPath = @"C:\Root\\Recipe\";
+            public const string Root = @"C:\Root\";
+            public const string RecipeRootPath = @"C:\Root\Recipe\";
             public const string RecipeFrontRootPath = @"C:\Root\Recipe\Front\";
             public const string RecipeBackRootPath = @"C:\Root\Recipe\Back\";
             public const string RecipeEdgeRootPath = @"C:\Root\Recipe\Edge\";
@@ -23,11 +24,22 @@ namespace Root_WIND2
 
             public const string ImageRootPath = @"D:\Images\";
 
+            public const string RootSetupPath = Root + @"Setup\";
+        }
+
+        public static class FileName
+        {
+            public const string BacksideExclusiveRegionFileName = "Backside_ExclusivePolygonList.xml";
+            public const string BacksideCenterPointFileName = "Backside_CenterPoint.xml";
         }
 
         public static class FilePath
         {
             public const string SettingFilePath = @"C:\Root\Setting.ini";
+            public const string BacksideExclusiveRegionFilePath = Constants.RootPath.RootSetupPath + FileName.BacksideExclusiveRegionFileName;
+            public const string BacksideCenterPointFilePath = Constants.RootPath.RootSetupPath + FileName.BacksideCenterPointFileName;
         }
+
+
     }
 }

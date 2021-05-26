@@ -50,8 +50,8 @@ namespace RootTools_Vision.Utility
 		public int klarfCol = 0;
 
 		public String tempString;
-		public float resX;
-		public float resY;
+		public double resolutionX = 1;
+		public double resolutionY = 1;
 
 		#endregion
 
@@ -318,45 +318,169 @@ namespace RootTools_Vision.Utility
 		}
 
 		// 기존 210302
-		public void SetDefectInfor_SRLine(RecipeType_WaferMap _mapdata, List<Defect> _defectdata, OriginRecipe recipe)
+		public void SetDefectInfor_SRLine(RecipeType_WaferMap _mapdata, List<Defect> _defectdata, OriginRecipe recipe, bool useTDIReview = false, bool useVrsReview = false)
         {
-			string defectList;
-			defectList = string.Format("DefectRecordSpec 17 DEFECTID XREL YREL XINDEX YINDEX XSIZE YSIZE DEFECTAREA DSIZE CLASSNUMBER TEST CLUSTERNUMBER ROUGHBINNUMBER FINEBINNUMBER REVIEWSAMPLE IMAGECOUNT IMAGELIST;\n");
-			defectListInfor += defectList;
-			defectList = string.Format("DefectList\n");
-			defectListInfor += defectList;
+			StringBuilder builder = new StringBuilder();
 
+			builder.AppendLine("DefectRecordSpec 17 DEFECTID XREL YREL XINDEX YINDEX XSIZE YSIZE DEFECTAREA DSIZE CLASSNUMBER TEST CLUSTERNUMBER ROUGHBINNUMBER FINEBINNUMBER REVIEWSAMPLE IMAGECOUNT IMAGELIST;");
+			builder.AppendLine("DefectList");
 
-
-			//double diePitchX = recipe.DiePitchX;
-			//double diePitchY = recipe.DiePitchY;
-
-			//Point pt = new Point();
-			
-			
-			double diePitchX = this.diePitchX;
-
-			
+			int nImageIdx = 0;
 			for (int i = 0; i < _defectdata.Count; i++)
-            {
-				//defectList = string.Format("{0},{0},{0},{0},{0},{0},{0},{0},{0},{0},{0},{0},{0},{0},{0},{0},{0}",
-				//	i + 1, );
+			{
+				builder.Append(_defectdata[i].m_nDefectIndex + " ");  // Index
+				builder.Append(_defectdata[i].m_fRelX + " "); // Rel X
+				builder.Append(_defectdata[i].m_fRelY + " "); // Rel Y
+				builder.Append(_defectdata[i].m_nChipIndexX + " "); // Map X
+				builder.Append(_defectdata[i].m_nChipIndexY + " "); // Map Y
+				builder.Append(_defectdata[i].m_fWidth * resolutionX + " "); // Size X
+				builder.Append(_defectdata[i].m_fHeight * resolutionY + " "); // Size Y
+				builder.Append(0 + " "); // DEFECTAREA
+				builder.Append(_defectdata[i].m_fSize * resolutionX + " "); // Defect Size
+				builder.Append(0 + " "); // ClassNumber
+				builder.Append(0 + " "); // TEST
+				builder.Append(0 + " "); // CLUSTERNUMBER
+				builder.Append(0 + " "); // Rough Bin Number
+				builder.Append(0 + " "); // Find Bin Number
+				builder.Append(0 + " "); // Review Sample
 
-			}
+				if (useTDIReview && useVrsReview)  // 이미지 TDI VRS 둘다 저장할 때,
+				{
+					builder.Append(2 + " ");
+					builder.Append(2);
+				}
+				else if (useTDIReview || useVrsReview)// 둘 중 하나만 저장할 때,
+				{
+					builder.Append(1 + " ");
+					builder.Append(1);
+				}
+				else
+                {
+					builder.Append(0 + " ");
+					builder.Append(0);
+				}
 
-			 
-			defectList = string.Format("SummarySpec 5");
-			defectListInfor += defectList;
-			defectList = string.Format(" TESTNO NDEFECT DEFDENSITY NDIE NDEFDIE;\n");
-			defectListInfor += defectList;
-			defectList = string.Format("SummaryList\n");
-			defectListInfor += defectList;
+				//210517 IMAGE INDEX
+				if(useTDIReview)
+                {
+					builder.Append("\n" + nImageIdx++ + " 0");
+				}
+                if (useVrsReview)
+                {
+                    builder.Append("\n" + nImageIdx++ + " 0");
+                }
+
+				// End of Defect List
+				if(i == (_defectdata.Count-1))
+                {
+					builder.Append(";\n");
+				}
+				else
+                {
+					builder.Append("\n");
+				}
+            }
+
+			builder.AppendLine("SummarySpec 5" + " TESTNO NDEFECT DEFDENSITY NDIE NDEFDIE;");
+			builder.AppendLine("SummaryList");
+			builder.AppendFormat("{0} {1} {2} {3} {4};\n", 0, _defectdata.Count, 0, 0, 0);
+
+			defectListInfor += builder.ToString();
+
+			return;
+
+			// Old
+			//string defectList;
+			//defectList = string.Format("DefectRecordSpec 17 DEFECTID XREL YREL XINDEX YINDEX XSIZE YSIZE DEFECTAREA DSIZE CLASSNUMBER TEST CLUSTERNUMBER ROUGHBINNUMBER FINEBINNUMBER REVIEWSAMPLE IMAGECOUNT IMAGELIST;\n");
+			//defectListInfor += defectList;
+			//defectList = string.Format("DefectList\n");
+			//defectListInfor += defectList;
+
+
+
+			////double diePitchX = recipe.DiePitchX;
+			////double diePitchY = recipe.DiePitchY;
+
+			////Point pt = new Point();
+			
+			
+			//double diePitchX = this.diePitchX;
+
+			
+			//for (int i = 0; i < _defectdata.Count; i++)
+   //         {
+   //             defectList = "" + 
+   //                _defectdata[i].m_nDefectIndex + " " +
+			//	   _defectdata[i].m_fRelX + " " +
+			//	   _defectdata[i].m_fRelY + " " +
+			//	   _defectdata[i].m_nChipIndexX + " " +
+			//	   _defectdata[i].m_nChipIndexY + " " +
+			//	   _defectdata[i].m_fWidth + " " +
+			//	   _defectdata[i].m_fHeight + " " +
+			//	   _defectdata[i].m_fSize + " " +
+			//	   _defectdata[i].m_fSize + " " +
+			//	   0 + " " +// Class Number
+			//	   0 + " " + // TEST
+			//	   0 + " " +// Cluster Number
+			//	   0 + " " + // Rough Bin Number
+			//	   0 + " " + // Fine Bin Number
+			//	   0 + " " + //Review Sample
+			//	   _defectdata[i].m_nDefectIndex + " " +// Image Count
+			//	   _defectdata[i].m_nDefectIndex +  "\n"// Image List
+			//	   ;
+			//	defectListInfor += defectList;
+			//}
+
+
+			//defectList = string.Format("SummarySpec 5");
+			//defectListInfor += defectList;
+			//defectList = string.Format(" TESTNO NDEFECT DEFDENSITY NDIE NDEFDIE;\n");
+			//defectListInfor += defectList;
+			//defectList = string.Format("SummaryList\n");
+			//defectListInfor += defectList;
 			//m_sTemp.Format("%d %d %f %d %d;\n", 1, nDNum, fDensity, m_nSampleTestCnt, m_nDefectDieCnt);
 			//m_sDefectInfor += m_sTemp;
 
 		}
 
-		public void SetDefectInfor_SRLine(RecipeType_WaferMap _mapdata, List<string> _dataStringList, OriginRecipe recipe)
+		public void SetDefectInfor_SRLine(RecipeType_WaferMap _mapdata, List<Measurement> _defectdata, OriginRecipe recipe)
+		{
+			StringBuilder builder = new StringBuilder();
+
+			builder.AppendLine("DefectRecordSpec 17 DEFECTID XREL YREL XINDEX YINDEX XSIZE YSIZE DEFECTAREA DSIZE CLASSNUMBER TEST CLUSTERNUMBER ROUGHBINNUMBER FINEBINNUMBER REVIEWSAMPLE IMAGECOUNT IMAGELIST;");
+			builder.AppendLine("DefectList");
+
+			for (int i = 0; i < _defectdata.Count; i++)
+			{
+				builder.Append(_defectdata[i].m_nMeasurementIndex + " ");
+				builder.Append(_defectdata[i].m_fRelX + " ");
+				builder.Append(_defectdata[i].m_fRelY + " ");
+				builder.Append(_defectdata[i].m_nChipIndexX + " ");
+				builder.Append(_defectdata[i].m_nChipIndexY + " ");
+				builder.Append(_defectdata[i].m_fData + " ");
+				builder.Append(0 + " ");
+				builder.Append(_defectdata[i].m_fData + " ");
+				builder.Append(_defectdata[i].m_fData + " ");
+				builder.Append(0 + " ");
+				builder.Append(0 + " ");
+				builder.Append(0 + " ");
+				builder.Append(0 + " ");
+				builder.Append(0 + " ");
+				builder.Append(0 + " ");
+				builder.Append(1 + " ");
+				builder.Append(1 + "\n");
+			}
+
+			builder.AppendLine("SummarySpec 5" + " TESTNO NDEFECT DEFDENSITY NDIE NDEFDIE;");
+			builder.AppendLine("SummaryList");
+			builder.AppendFormat("{0} {1} {2} {3} {4};\n", 0, _defectdata.Count, 0, 0, 0);
+
+			defectListInfor += builder.ToString();
+
+			return;
+		}
+
+			public void SetDefectInfor_SRLine(RecipeType_WaferMap _mapdata, List<string> _dataStringList, OriginRecipe recipe)
 		{
 			string defectList;
 			defectList = string.Format("DefectRecordSpec 17 DEFECTID XREL YREL XINDEX YINDEX XSIZE YSIZE DEFECTAREA DSIZE CLASSNUMBER TEST CLUSTERNUMBER ROUGHBINNUMBER FINEBINNUMBER REVIEWSAMPLE IMAGECOUNT IMAGELIST;\n");

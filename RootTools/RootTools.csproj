@@ -270,6 +270,7 @@
     <Compile Include="Comm\TCPSyncServer_UI.xaml.cs">
       <DependentUpon>TCPSyncServer_UI.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Control\Axis3D.cs" />
     <Compile Include="Control\Xenax\Xenax.cs" />
     <Compile Include="Control\Xenax\XenaxAxis.cs" />
     <Compile Include="Control\Xenax\XenaxAxis_UI.xaml.cs">
@@ -411,6 +412,7 @@
       <DependentUpon>MiniViewer.xaml</DependentUpon>
     </Compile>
     <Compile Include="Image\MiniViewer_ViewModel.cs" />
+    <Compile Include="Image\R3Point.cs" />
     <Compile Include="InfoCarrier.cs" />
     <Compile Include="InfoCarrier_UI.xaml.cs">
       <DependentUpon>InfoCarrier_UI.xaml</DependentUpon>

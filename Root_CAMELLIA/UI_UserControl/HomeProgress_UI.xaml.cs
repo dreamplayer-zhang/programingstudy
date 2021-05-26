@@ -115,90 +115,125 @@ namespace Root_CAMELLIA
             {
                 return;
             }
+
+            //#01D328
             if (m_handler.m_wtr.p_eState == ModuleBase.eState.Home)
             {
-                progressWTR.Foreground = Brushes.Green;
-                progressWTR.Value = (int)(100 * Math.Min((double)((double)m_swWTR.ElapsedMilliseconds / (((WTR_RND)m_handler.m_wtr).m_secHome * 1000)), (double)1.0));
+                progressWTR.Foreground = new SolidColorBrush(Color.FromRgb(1,211,40));
+                //progressWTR.Value = (int)(100 * Math.Min((double)((double)m_swWTR.ElapsedMilliseconds / (((WTR_RND)m_handler.m_wtr).m_secHome * 1000)), (double)1.0));
+                progressWTR.IsIndeterminate = true;
             }
             else if (m_handler.m_wtr.p_eState == ModuleBase.eState.Ready)
             {
                 progressWTR.Foreground = Brushes.Blue;
                 progressWTR.Value = 100;
+                progressWTR.IsIndeterminate = false;
             }
             else if (m_handler.m_wtr.p_eState == ModuleBase.eState.Error)
             {
                 progressWTR.Foreground = Brushes.Red;
+                progressWTR.Value = 100;
+                progressWTR.IsIndeterminate = false;
                 //progressWTR.Background = Brushes.Crimson;
                 //progressWTR.Value = 0;
                 //progressWTR.Value = 0;    //working
             }
             else progressWTR.Value = 0;
 
+            strProgressWTR.Text = Enum.GetName(typeof(ModuleBase.eState), m_handler.m_wtr.p_eState);
+
+            //m_handler.m_loadport[0].p_eState;
+
             if (m_handler.m_loadport[0].p_eState == ModuleBase.eState.Home)
             {
-                progressLP1.Foreground = Brushes.Green;
-                progressLP1.Value = (int)(100 * Math.Min((double)((double)m_swLoadport[0].ElapsedMilliseconds / (m_handler.m_aLoadport[0].p_secHome * 1000)), (double)1.0));
+                progressLP1.Foreground = new SolidColorBrush(Color.FromRgb(1, 211, 40));
+                //progressLP1.Value = (int)(100 * Math.Min((double)((double)m_swLoadport[0].ElapsedMilliseconds / (m_handler.m_aLoadport[0].p_secHome * 1000)), (double)1.0));
+                progressLP1.IsIndeterminate = true;
             }
             else if (m_handler.m_loadport[0].p_eState == ModuleBase.eState.Ready)
             {
                 progressLP1.Foreground = Brushes.Blue;
                 progressLP1.Value = 100;
+                progressLP1.IsIndeterminate = false;
             }
             else if (m_handler.m_loadport[0].p_eState == ModuleBase.eState.Error)
             {
                 progressLP1.Foreground = Brushes.Red;
-               // progressLP1.Value = 0;    //working
+                progressLP1.Value = 100;
+                progressLP1.IsIndeterminate = false;
+                //progressLP1.Value = 0;    //working
             }
             else progressLP1.Value = 0;
 
+            strProgressLP1.Text = Enum.GetName(typeof(ModuleBase.eState), m_handler.m_loadport[0].p_eState);
+
             if (m_handler.m_loadport[1].p_eState == ModuleBase.eState.Home)
             {
-                progressLP2.Foreground = Brushes.Green;
-                progressLP2.Value = (int)(100 * Math.Min((double)((double)m_swLoadport[1].ElapsedMilliseconds / (m_handler.m_aLoadport[1].p_secHome * 1000)), (double)1.0));
+                progressLP2.Foreground = new SolidColorBrush(Color.FromRgb(1, 211, 40));
+                //progressLP2.Value = (int)(100 * Math.Min((double)((double)m_swLoadport[1].ElapsedMilliseconds / (m_handler.m_aLoadport[1].p_secHome * 1000)), (double)1.0));
+                progressLP2.IsIndeterminate = true;
             }
             else if (m_handler.m_loadport[1].p_eState == ModuleBase.eState.Ready)
             {
                 progressLP2.Foreground = Brushes.Blue;
                 progressLP2.Value = 100;
+                progressLP2.IsIndeterminate = false;
             }
             else if (m_handler.m_loadport[1].p_eState == ModuleBase.eState.Error)
             {
                 progressLP2.Foreground = Brushes.Red;
+                progressLP2.Value = 100;
+                progressLP2.IsIndeterminate = false;
                 //progressLP2.Value = 0;    //working
             }
             else progressLP2.Value = 0;
 
+            strProgressLP2.Text = Enum.GetName(typeof(ModuleBase.eState), m_handler.m_loadport[1].p_eState);
+
             if (m_handler.m_Aligner.p_eState == ModuleBase.eState.Home)
             {
-                progressAL.Foreground = Brushes.Green;
-                progressAL.Value = (int)(100 * Math.Min((double)((double)m_swAligner.ElapsedMilliseconds / (20 * 1000)), (double)1.0));
+                progressAL.Foreground = new SolidColorBrush(Color.FromRgb(1, 211, 40));
+                //progressAL.Value = (int)(100 * Math.Min((double)((double)m_swAligner.ElapsedMilliseconds / (20 * 1000)), (double)1.0));
+                //progressAL.Value = m_handler.m_Aligner.p_nProgress;
+                progressAL.IsIndeterminate = true;
             }
             else if (m_handler.m_Aligner.p_eState == ModuleBase.eState.Ready)
             {
                 progressAL.Foreground = Brushes.Blue;
                 progressAL.Value = 100;
+                progressAL.IsIndeterminate = false;
             }
             else if (m_handler.m_Aligner.p_eState == ModuleBase.eState.Error)
             {
                 progressAL.Foreground = Brushes.Red;
+                progressAL.Value = 100;
+                progressAL.IsIndeterminate = false;
             }
             else progressAL.Value = 0;
 
+            strProgressAL.Text = Enum.GetName(typeof(ModuleBase.eState), m_handler.m_Aligner.p_eState);
+
             if (m_handler.m_camellia.p_eState == ModuleBase.eState.Home)
             {
-                progressVS.Foreground = Brushes.Green;
-                progressVS.Value = (int)(100 * Math.Min((double)((double)m_swVision.ElapsedMilliseconds / (30 * 1000)), (double)1.0));
+                progressVS.Foreground = new SolidColorBrush(Color.FromRgb(1, 211, 40));
+                //progressVS.Value = (int)(100 * Math.Min((double)((double)m_swVision.ElapsedMilliseconds / (30 * 1000)), (double)1.0));
+                progressVS.IsIndeterminate = true;
             }
             else if (m_handler.m_camellia.p_eState == ModuleBase.eState.Ready)
             {
                 progressVS.Foreground = Brushes.Blue;
                 progressVS.Value = 100;
+                progressVS.IsIndeterminate = false;
             }
             else if (m_handler.m_camellia.p_eState == ModuleBase.eState.Error)
             {
                 progressVS.Foreground = Brushes.Red;
+                progressVS.Value = 100;
+                progressVS.IsIndeterminate = false;
             }
             else progressVS.Value = 0;
+
+            strProgressVS.Text = Enum.GetName(typeof(ModuleBase.eState), m_handler.m_camellia.p_eState);
 
             if (m_handler.m_wtr.p_eState == ModuleBase.eState.Ready && m_handler.m_loadport[0].p_eState == ModuleBase.eState.Ready &&
                 m_handler.m_loadport[1].p_eState == ModuleBase.eState.Ready && m_handler.m_Aligner.p_eState == ModuleBase.eState.Ready

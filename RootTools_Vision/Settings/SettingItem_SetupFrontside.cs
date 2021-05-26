@@ -33,6 +33,56 @@ namespace RootTools_Vision
         }
         private string klarfSavePath = "D:\\Klarf";
 
+        [Category("Klarf")]
+        [DisplayName("TDI Review")]
+        public bool UseTDIReview
+        {
+            get
+            {
+                return useTDIReview;
+            }
+            set
+            {
+                useTDIReview = value;
+            }
+        }
+
+
+        private bool useTDIReview = false;
+
+        [Category("Klarf")]
+        [DisplayName("VRS Review")]
+        public bool UseVrsReview
+        {
+            get
+            {
+                return useVrsReview;
+            }
+            set
+            {
+                useVrsReview = value;
+            }
+        }
+
+        private bool useVrsReview = false;
+
+
+
+        [Category("Klarf")]
+        [DisplayName("Defect Sampling Number")]
+        public int DefectSamplingNumber
+        {
+            get
+            {
+                return defectSamplingNumber;
+            }
+            set
+            {
+                defectSamplingNumber = value;
+            }
+        }
+        private int defectSamplingNumber = 0;
+
         [Category("Common")]
         [DisplayName("Defect Image Path")]
         public string DefectImagePath

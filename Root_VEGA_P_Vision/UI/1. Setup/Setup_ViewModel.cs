@@ -43,11 +43,13 @@ namespace Root_VEGA_P_Vision
         private ObservableCollection<UIElement> m_NaviButtons = new ObservableCollection<UIElement>();
 
         private Home_ViewModel homeVM;
+        public RecipeManager_ViewModel recipeManagerVM;
         public Maintenance_ViewModel maintVM;
-        public RecipeWizard_VM recipeVM;
 
+        public Setup Main;
         public Setup_ViewModel()
         {
+            Main = new Setup();
             init();
         }
 
@@ -61,22 +63,22 @@ namespace Root_VEGA_P_Vision
         private void InitAllPanel()
         {
             homeVM = new Home_ViewModel(this);
+            recipeManagerVM = new RecipeManager_ViewModel(this);
             maintVM = new Maintenance_ViewModel(this);
-            recipeVM = new RecipeWizard_VM(this);
         }
         private void InitAllNaviBtn()
         {
             m_btnNaviInspection = new NaviBtn("Inspection");
             m_btnNaviInspection.Btn.Click += Navi_InspectionClick;
 
-            //m_btnNaviRecipeWizard = new NaviBtn("Recipe Wizard");
-            //m_btnNaviRecipeWizard.Btn.Click += Navi_RecipeWizardClick;
+            m_btnNaviRecipeWizard = new NaviBtn("Recipe Wizard");
+            m_btnNaviRecipeWizard.Btn.Click += Navi_RecipeWizardClick;
+
+            m_btnNaviRecipeMask = new NaviBtn("Recipe Mask");
+            m_btnNaviRecipeMask.Btn.Click += Navi_RecipeMaskClick; ;
 
             m_btnNaviMaintenance = new NaviBtn("Maintenance");
             m_btnNaviMaintenance.Btn.Click += Navi_MaintClick;
-
-            //m_btnNaviGEM = new NaviBtn("GEM");
-            //m_btnNaviGEM.Btn.Click += Navi_GEMClick;
         }
 
         #region Navi Buttons
@@ -84,6 +86,7 @@ namespace Root_VEGA_P_Vision
         // SetupHome Navi Buttons
         public NaviBtn m_btnNaviInspection;
         public NaviBtn m_btnNaviRecipeWizard;
+        public NaviBtn m_btnNaviRecipeMask;
         public NaviBtn m_btnNaviMaintenance;
         public NaviBtn m_btnNaviGEM;
 
@@ -100,6 +103,10 @@ namespace Root_VEGA_P_Vision
         void Navi_RecipeWizardClick(object sender, RoutedEventArgs e)
         {
             SetRecipeWizard();
+        }
+        void Navi_RecipeMaskClick(object sender, RoutedEventArgs e)
+        {
+            SetRecipeMask();
         }
         void Navi_MaintClick(object sender, RoutedEventArgs e)
         {
@@ -134,7 +141,7 @@ namespace Root_VEGA_P_Vision
         {
             get
             {
-                return new RelayCommand(()=>
+                return new RelayCommand(() =>
                 {
                     MessageBox.Show("WIND2 전체 레시피 저장하는거 구현해줘요");
                 });
@@ -165,14 +172,13 @@ namespace Root_VEGA_P_Vision
         {
             get
             {
-                return new RelayCommand(()=>
+                return new RelayCommand(() =>
                 {
                     MessageBox.Show("WIND2 전체 레시피 로드하는거 구현해줘요");
                 });
             }
         }
 
-       
         #endregion
 
         #region Panel Change Method
@@ -181,35 +187,33 @@ namespace Root_VEGA_P_Vision
         public void SetHome()
         {
             p_NaviButtons.Clear();
-
-            //homeVM.SetPage(homeVM.Main);
             p_CurrentPanel = homeVM.Main;
-            p_CurrentPanel.DataContext = homeVM;
         }
         public void SetInspection()
         {
             p_NaviButtons.Clear();
             p_NaviButtons.Add(m_btnNaviInspection);
-
-            //p_CurrentPanel = inspectionVM.Main;
-            //p_CurrentPanel.DataContext = inspectionVM;
         }
         public void SetRecipeWizard()
         {
             p_NaviButtons.Clear();
             p_NaviButtons.Add(m_btnNaviRecipeWizard);
+            p_CurrentPanel = recipeManagerVM.Main;
+            recipeManagerVM.Main.radiobtnOrigin.IsChecked = true;
+            recipeManagerVM.SetOrigin();
+        }
+        public void SetRecipeMask()
+        {
+            p_NaviButtons.Clear();
+            p_NaviButtons.Add(m_btnNaviRecipeWizard);
+            p_NaviButtons.Add(m_btnNaviRecipeMask);
 
-            homeVM.SetPage(recipeVM.RecipeWizard_UI);
-            recipeVM.RecipeWizard_UI.DataContext = recipeVM;
-            //p_CurrentPanel = recipeVM.RecipeWizard_UI;
-            //p_CurrentPanel.DataContext = recipeVM;
         }
         public void SetMaintenance()
         {
             p_NaviButtons.Clear();
             p_NaviButtons.Add(m_btnNaviMaintenance);
 
-            p_CurrentPanel =
             p_CurrentPanel = maintVM.Main;
             p_CurrentPanel.DataContext = maintVM;
         }
@@ -228,58 +232,6 @@ namespace Root_VEGA_P_Vision
 
         #endregion
 
-        //#region Recipe Wizard
-        //public void SetWizardFrontSide()
-        //{
-        //    p_NaviButtons.Clear();
-        //    p_NaviButtons.Add(m_btnNaviRecipeWizard);
-        //    p_NaviButtons.Add(m_btnNaviFrontSide);
-
-        //    frontsideVM.SetPage(frontsideVM.Summary);
-
-        //    p_CurrentPanel = frontsideVM.Main;
-        //    p_CurrentPanel.DataContext = frontsideVM;
-        //}
-        //public void SetWizardBackSide()
-        //{
-        //    p_NaviButtons.Clear();
-        //    p_NaviButtons.Add(m_btnNaviRecipeWizard);
-        //    p_NaviButtons.Add(m_btnNaviBackSide);
-
-        //    p_CurrentPanel = backsideVM.Main;
-        //    p_CurrentPanel.DataContext = backsideVM;
-        //}
-        //public void SetWizardEBR()
-        //{
-        //    p_NaviButtons.Clear();
-        //    p_NaviButtons.Add(m_btnNaviRecipeWizard);
-        //    p_NaviButtons.Add(m_btnNaviEBR);
-
-        //    p_CurrentPanel = ebrVM.Main;
-        //    p_CurrentPanel.DataContext = ebrVM;
-        //}
-        //public void SetWizardEdge()
-        //{
-        //    p_NaviButtons.Clear();
-        //    p_NaviButtons.Add(m_btnNaviRecipeWizard);
-        //    p_NaviButtons.Add(m_btnNaviEdge);
-
-        //    p_CurrentPanel = edgeVM.Main;
-        //    p_CurrentPanel.DataContext = edgeVM;
-        //}
-
-        //public void SetBacksideInspTest()
-        //{
-        //    p_NaviButtons.Clear();
-        //    p_NaviButtons.Add(m_btnNaviRecipeWizard);
-        //    p_NaviButtons.Add(m_btnNaviBackSide);
-        //}
-
-        //public void Dispose()
-        //{
-        //    throw new NotImplementedException();
-        //}
-        //#endregion
 
         #endregion
         #endregion

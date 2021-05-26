@@ -1,16 +1,12 @@
 ﻿using RootTools;
 using RootTools.Comm;
 using RootTools.Control;
-using RootTools.GAFs;
 using RootTools.Module;
 using RootTools.ToolBoxs;
 using RootTools.Trees;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Threading;
 
 namespace Root_Pine2.Module
@@ -245,6 +241,29 @@ namespace Root_Pine2.Module
                 if (_widthStrip == value) return;
                 _widthStrip = value;
                 OnPropertyChanged();
+            }
+        }
+
+        int _lStack = 50; 
+        public int p_lStack
+        {
+            get { return _lStack; }
+            set
+            {
+                _lStack = value;
+                OnPropertyChanged(); 
+            }
+        }
+
+        bool _b3D = true; 
+        public bool p_b3D
+        {
+            get { return _b3D; }
+            set
+            {
+                if (_b3D == value) return;
+                _b3D = value;
+                OnPropertyChanged(); 
             }
         }
         #endregion

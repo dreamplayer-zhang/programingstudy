@@ -206,6 +206,8 @@ namespace RootTools.Control.Ajin
                 return "OK";
             }
             p_sInfo = base.StartHome();
+            if (m_nAxis == 3)
+                m_eHomeDir = eMoveDir.DIR_CW;
             if (p_sInfo != "OK") return p_sInfo;
             if (AXM("AxmHomeSetMethod", CAXM.AxmHomeSetMethod(m_nAxis, (int)m_eHomeDir, (uint)m_eHomeSignal, (uint)m_eHomeZPhase, 1000, 0)) != 0) return p_sInfo;
             Speed[] speed = new Speed[2] { GetSpeedValue(eSpeed.Home_First), GetSpeedValue(eSpeed.Home_Last) };
@@ -696,7 +698,7 @@ namespace RootTools.Control.Ajin
         
         void RunTreeInterlockAxis(Tree tree)
         {
-            for (int i = 0; i < m_aSensors.Count; i++)
+            for (int i = 0; i < m_listAxis.m_aAxis.Count; i++)
             {
                 CSensor sensor = new CSensor(m_listAxis.m_aAxis[i].p_id);
                 int iIndex = m_aSensors.FindIndex(x => x.m_strAxisName == m_listAxis.m_aAxis[i].p_id);

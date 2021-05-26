@@ -139,7 +139,7 @@ namespace RootTools.Gem
             m_log = log;
             m_sPJobID = sPJobID;
             m_eAutoStart = autoStart;
-            sRcpID = string.Format("C:\\Recipe\\{0}.Camellia", sRcpID);
+            sRcpID = string.Format("C:\\Recipe\\{0}\\{0}.Camellia", sRcpID);
             m_sRecipeID = sRcpID;
         }
     }

@@ -259,13 +259,26 @@
                                             x:Name="borderUnloadState"
                                             CornerRadius="10"
                                             Background="SeaGreen">
-                                            <TextBlock x:Name="textBlockUnloadState"
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="3*"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock Grid.Column="0" x:Name="textBlockUnloadState"
                                                    Text="{Binding p_eStateUnloader}"
                                                    FontSize="30"
                                                    FontWeight="Bold"
                                                    FontFamily="Arial"
                                                    VerticalAlignment="Center"
                                                    HorizontalAlignment="Center"/>
+                                                <TextBlock Grid.Column="1" x:Name="textBlockEQUReady" Text ="Stop"
+                                                   FontSize="30"
+                                                   FontWeight="Bold"
+                                                   FontFamily="Arial"
+                                                   VerticalAlignment="Center"
+                                                   HorizontalAlignment="Center"
+                                                   PreviewMouseLeftButtonDown="textBlockEQUReady_PreviewMouseLeftButtonDown"/>
+                                            </Grid>
                                         </Border>
                                     </GroupBox>
                                     <GroupBox Header="수세기"
@@ -285,7 +298,7 @@
                                                    HorizontalAlignment="Center" />
                                         </Border>
                                     </GroupBox>
-                                    <CheckBox Grid.Column="3" x:Name="checkBoxEQStop" Content="EQ.Stop" IsChecked="{Binding p_bStop}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                    <CheckBox Grid.Column="3" x:Name="checkBoxEQStop" Content="EQ.Stop" IsChecked="{Binding p_bStop}" FontSize="24" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                 </Grid>
                                 <Grid Grid.Row="2"
                                   Grid.Column="1">
@@ -343,18 +356,22 @@
                                                    Grid.Column="1" />
                                         </Grid>
                                     </GroupBox>
-                                    <GroupBox Header="롤러 속도"
+                                    <GroupBox Header="롤러 속도" Visibility="Hidden"
                                           Grid.Column="2"
                                           Style="{StaticResource group}"
                                           BorderThickness="0"
                                           Margin="5,10">
                                         <Grid Background="#FFDDDDDD"
                                           Margin="5,0">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="56*"/>
+                                                <ColumnDefinition Width="323*"/>
+                                            </Grid.ColumnDefinitions>
                                             <TextBox x:Name="textBoxRotateSpeed"
                                                  Text="{Binding p_fRotateSpeed}"
                                                  HorizontalAlignment="Center"
                                                  VerticalAlignment="Center"
-                                                 Margin="12,12,71,12"
+                                                 Margin="10,2,69,2"
                                                  Width="300"
                                                  Height="60"
                                                  FontSize="30"
@@ -362,7 +379,7 @@
                                                  FontFamily="Arial"
                                                  HorizontalContentAlignment="Center"
                                                  VerticalContentAlignment="Center"
-                                                 PreviewKeyDown="textBoxRotateSpeed_PreviewKeyDown"/>
+                                                 PreviewKeyDown="textBoxRotateSpeed_PreviewKeyDown" Grid.ColumnSpan="2"/>
                                         </Grid>
                                     </GroupBox>
                                 </Grid>

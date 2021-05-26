@@ -19,7 +19,7 @@ namespace Root_Rinse_Unloader.Module
             p_sInfo = m_toolBox.GetAxis(ref m_axisWidth, this, "Width");
             p_sInfo = m_toolBox.GetDIO(ref m_dioPusher, this, "Pusher", "Back", "Push");
             p_sInfo = m_toolBox.GetDIO(ref m_dioPusherDown, this, "PusherDown", "Up", "Down");
-            p_sInfo = m_toolBox.GetDIO(ref m_diPusherOverload, this, "PusherOverload");
+            p_sInfo = m_toolBox.GetDIO(ref m_diPusherOverload, this, "PusherOverload", new string[4] { "1", "2", "3", "4" });
             foreach (Line line in m_aLine) line.GetTools(m_toolBox);
             if (bInit)
             {
@@ -149,7 +149,7 @@ namespace Root_Rinse_Unloader.Module
         #region Pusher
         DIO_I2O m_dioPusher;
         public DIO_I2O2 m_dioPusherDown;
-        DIO_I m_diPusherOverload;
+        DIO_Is m_diPusherOverload;
 
         public string RunPusherDown(bool bDown)
         {
@@ -174,7 +174,7 @@ namespace Root_Rinse_Unloader.Module
                 {
                     Thread.Sleep(10);
                     if (m_dioPusher.m_swWrite.ElapsedMilliseconds > msTimeout) return "Run Push Timeout";
-                    if (m_diPusherOverload.p_bIn)
+                    if (IsPusherOverload())
                     {
                         m_dioPusher.Write(false);
                         return "Run Pusher overload Check Error";
@@ -197,6 +197,15 @@ namespace Root_Rinse_Unloader.Module
                 m_dioPusherDown.Write(false);
                 m_dioPusher.Write(false);
             }
+        }
+
+        bool IsPusherOverload()
+        {
+            for (int n = 0; n < 4; n++)
+            {
+                if (m_diPusherOverload.ReadDI(n)) return true; 
+            }
+            return false;
         }
         #endregion
 
@@ -257,9 +266,14 @@ namespace Root_Rinse_Unloader.Module
             }
             RunRotate(true);
             while (sw.ElapsedMilliseconds < msWaitPush) Thread.Sleep(10);
+            int nRotate = 0; 
             while (IsArrived() == false)
             {
-                RunRotate(true);
+                if (nRotate < (sw.ElapsedMilliseconds / 500))
+                {
+                    RunRotate(true);
+                    nRotate++; 
+                }
                 Thread.Sleep(10);
                 if (EQ.IsStop()) return "EQ Stop";
             }
@@ -272,14 +286,14 @@ namespace Root_Rinse_Unloader.Module
                 if (EQ.IsStop()) return "EQ Stop";
                 if (sw.ElapsedMilliseconds > msArriveTimeout)
                 {
-                    m_alidArrived.p_bSet = true; 
+                    m_alidArrived.Run(true, "Arrive Timeout"); 
                     RunRotate(false);
                     return "Arrive Timeout";
                 }
             }
             Thread.Sleep((int)(1000 * m_secArrive));
             string sRun = RunPusher();
-            m_alidPusher.p_bSet = (sRun != "OK");
+            if (sRun != "OK") m_alidPusher.Run(true, sRun); 
             RunRotate(false);
             return sRun;
         }

@@ -3,6 +3,7 @@ using System.Windows;
 
 namespace RootTools
 {
+    [Serializable]
     public class CPoint
     {
         int _x;

@@ -65,7 +65,10 @@ namespace Root_CAMELLIA.ModuleRun
             // Autofocus 진행.
             VRS.GrabContinuousShot();
 
-
+            while(nFrame != 0)
+            {
+                continue;
+            }
 
 
 

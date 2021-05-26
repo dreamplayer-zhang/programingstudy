@@ -1,4 +1,5 @@
-﻿using Root_WIND2.Module;
+﻿using Root_EFEM.Module;
+using Root_WIND2.Module;
 using RootTools.Module;
 using RootTools.Trees;
 using RootTools_Vision;
@@ -37,35 +38,54 @@ namespace Root_WIND2.UI_User
             }
         }
 
-        private ModuleView_ViewModel selectedModule;
-        public ModuleView_ViewModel SelectedModule
+        private ObservableCollection<ModuleView_ViewModel> moduleViewModels = new ObservableCollection<ModuleView_ViewModel>();
+        public ObservableCollection<ModuleView_ViewModel> ModuleViewModels
         {
-            get => this.selectedModule;
+            get => this.moduleViewModels;
             set
             {
-                SetProperty(ref selectedModule, value);
+                SetProperty(ref moduleViewModels, value);
             }
         }
         #endregion
 
         Vision vision = ((WIND2_Handler)GlobalObjects.Instance.Get<WIND2_Engineer>().ClassHandler()).p_Vision;
+        BackSideVision backside = ((WIND2_Handler)GlobalObjects.Instance.Get<WIND2_Engineer>().ClassHandler()).p_BackSideVision;
+        EdgeSideVision edgeside = ((WIND2_Handler)GlobalObjects.Instance.Get<WIND2_Engineer>().ClassHandler()).p_EdgeSideVision;
+        ModuleBase aligner =  (((WIND2_Handler)GlobalObjects.Instance.Get<WIND2_Engineer>().ClassHandler()).p_Aligner);
 
         WIND2_Recipe m_recipe;
         ModuleRunList m_moduleRunList;
-
 
         public HomeRecipe_ViewModel()
         {
             m_recipe = ((WIND2_Handler)GlobalObjects.Instance.Get<WIND2_Engineer>().ClassHandler()).m_recipe;
             m_moduleRunList = m_recipe.m_moduleRunList;
-
             m_moduleRunList.Add(vision.p_id,  "GrabLineScan");
             m_moduleRunList.RunTree(Tree.eMode.Init);
 
-            ModuleList.Add(new ModuleView() { ModuleName = "FRONT" });
-            ModuleList.Add(new ModuleView() { ModuleName = "BACK" });
-            ModuleList.Add(new ModuleView() { ModuleName = "EDGE" });
-            ModuleList.Add(new ModuleView() { ModuleName = "EBR" });
+            ModuleList.Add(new ModuleView());
+            ModuleList.Add(new ModuleView());
+            ModuleList.Add(new ModuleView());
+
+            ModuleView_ViewModel model = new ModuleView_ViewModel(vision);
+            model.AddMode("OnlySnap", vision.GetModuleruns());
+            model.AddMode("Alignment", vision.GetModuleruns());
+            model.AddMode("Inspection", vision.GetModuleruns());
+            ModuleViewModels.Add(model);
+            model = new ModuleView_ViewModel(backside);
+            model.AddMode("OnlySnap", backside.GetModuleruns());
+            model.AddMode("Inspection", backside.GetModuleruns());
+            ModuleViewModels.Add(model);
+            model = new ModuleView_ViewModel(edgeside);
+            model.AddMode("OnlySnap", edgeside.GetModuleruns());
+            model.AddMode("Inspection", edgeside.GetModuleruns());
+            ModuleViewModels.Add(model);
+
+            for (int i = 0; i < moduleList.Count; i++)
+            {
+                moduleList[i].DataContext = ModuleViewModels[i];
+            }
         }
 
 

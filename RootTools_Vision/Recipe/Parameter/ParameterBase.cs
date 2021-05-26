@@ -18,9 +18,15 @@ namespace RootTools_Vision
     [XmlInclude(typeof(SurfaceParameter))]
     [XmlInclude(typeof(PositionParameter))]
     [XmlInclude(typeof(EdgeSurfaceParameter))]
+    [XmlInclude(typeof(BacksideSurfaceParameter))]
     [XmlInclude(typeof(EBRParameter))]
+    [XmlInclude(typeof(PBIParameter))]
+    [XmlInclude(typeof(ProcessDefectEdgeParameter))]
     [XmlInclude(typeof(ProcessDefectParameter))]
     [XmlInclude(typeof(ProcessDefectWaferParameter))]
+    [XmlInclude(typeof(ProcessDefectBacksideParameter))]
+    [XmlInclude(typeof(ProcessMeasurementParameter))]
+
     //[XmlType(TypeName = "Parameter")]
     public abstract class ParameterBase : ObservableObject, IComparable<ParameterBase>, IRecipe
     {
@@ -74,6 +80,20 @@ namespace RootTools_Vision
                 Assembly.GetAssembly(typeof(ParameterBase)).GetTypes()
                 .Where(myType => myType.IsClass && !myType.IsAbstract && myType.IsSubclassOf(typeof(ParameterBase))
                 && myType.GetInterface("IFrontsideInspection") != null))
+            {
+                objects.Add((ParameterBase)Activator.CreateInstance(type));
+            }
+
+            return objects;
+        }
+
+        public static ObservableCollection<ParameterBase> GetParameters(string inspection)
+        {
+            ObservableCollection<ParameterBase> objects = new ObservableCollection<ParameterBase>();
+            foreach (Type type in
+                Assembly.GetAssembly(typeof(ParameterBase)).GetTypes()
+                .Where(myType => myType.IsClass && !myType.IsAbstract && myType.IsSubclassOf(typeof(ParameterBase))
+                && myType.GetInterface(inspection) != null))
             {
                 objects.Add((ParameterBase)Activator.CreateInstance(type));
             }

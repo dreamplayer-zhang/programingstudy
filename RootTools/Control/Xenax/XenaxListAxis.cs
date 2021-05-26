@@ -26,6 +26,15 @@ namespace RootTools.Control.Xenax
             axisXY.p_axisY = GetAxis(id + "Y", log);
             return axisXY;
         }
+
+        public Axis3D GetAxis3D(string id, Log log)
+        {
+            Axis3D axis = new Axis3D();
+            axis.p_axisX = GetAxis(id + "X", log);
+            axis.p_axisY = GetAxis(id + "Y", log);
+            axis.p_axisZ = GetAxis(id + "Z", log);
+            return axis;
+        }
         #endregion
 
         #region AXM Info

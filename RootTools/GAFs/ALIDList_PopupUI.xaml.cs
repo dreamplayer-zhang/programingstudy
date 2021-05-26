@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel;
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Media.Imaging;
 
 namespace RootTools.GAFs
 {
@@ -45,7 +46,16 @@ namespace RootTools.GAFs
             listViewALID.ItemsSource = m_listALID.p_aSetALID;
             if (m_listALID.p_aSetALID.Count != 0)
             {
-                ALID alid = (ALID)listViewALID.Items[m_listALID.p_aSetALID.Count - 1];
+                int idx = 0;
+                for(int i = 0; i < m_listALID.p_aSetALID.Count; i++)
+                {
+                    if(m_listALID.p_aSetALID[i].p_sMsg.Contains("EMO") || m_listALID.p_aSetALID[i].p_sMsg.Contains("EMS"))
+                    {
+                        idx = i;
+                        break;
+                    }
+                }
+                ALID alid = (ALID)listViewALID.Items[idx];
                 SetLableBinding(alid);
                 listViewALID.SelectedItem = alid;
             }
@@ -59,13 +69,24 @@ namespace RootTools.GAFs
         private void buttonClearALID_Click(object sender, RoutedEventArgs e)
         {
             m_listALID.ClearALID();
-            SetLableBinding(null);
+            //SetLableBinding(null);
             if(m_listALID.p_aSetALID.Count == 0)
             {
                 return;
             }
-            ALID alid = (ALID)listViewALID.Items[m_listALID.p_aSetALID.Count - 1];
-            SetLableBinding(alid);
+
+            //int idx = 0;
+            //for (int i = 0; i < m_listALID.p_aSetALID.Count; i++)
+            //{
+            //    if (m_listALID.p_aSetALID[i].p_sMsg.Contains("EMO") || m_listALID.p_aSetALID[i].p_sMsg.Contains("EMS"))
+            //    {
+            //        idx = i;
+            //        break;
+            //    }
+            //}
+
+            //ALID alid = (ALID)listViewALID.Items[idx];
+            //SetLableBinding(alid);
         }
 
         private void TextBlock_PreviewMouseUp(object sender, MouseButtonEventArgs e)
@@ -80,6 +101,7 @@ namespace RootTools.GAFs
             lableModule.DataContext = alid;
             lableDesc.DataContext = alid;
             lableMsg.DataContext = alid;
+            alidImage.Source = alid.p_image;
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)

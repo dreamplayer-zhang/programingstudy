@@ -1,18 +1,36 @@
 ﻿using RootTools;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shapes;
+using System.Xml.Serialization;
 
 namespace Root_WIND2.UI_User
 {
     public class BacksideInspect_ImageViewer_ViewModel : RootViewer_ViewModel
     {
+        #region [ColorDefines]
+        public class ColorDefines
+        {
+            public static SolidColorBrush Circle = Brushes.Blue;
+            public static SolidColorBrush SearchCenterPoint = Brushes.Magenta;
+            public static SolidColorBrush SearchCircle = Brushes.Yellow;
+            public static SolidColorBrush Map = Brushes.YellowGreen;
+            public static SolidColorBrush MapFill = Brushes.Transparent;
+
+            public static SolidColorBrush ExclusivePolyStroke = Brushes.Red;
+            public static SolidColorBrush ExclusivePolyFill = Brushes.Red;
+        }
+
+        #endregion
+
         public class DrawDefines
         {
             public static int RectTickness = 4;
@@ -26,8 +44,54 @@ namespace Root_WIND2.UI_User
             this.p_VisibleMenu = System.Windows.Visibility.Collapsed;
 
             rectList = new List<TRect>();
+
+            InitializeUIElements();
         }
 
+        #region [UI Members]
+        private CPoint searchedCenterMemoryPoint = new CPoint();
+        private Grid SearchedCenterPointUI;
+
+        private List<Polygon> ExclusivePolyList;
+        private List<List<Point>> exclusivePolyMemPointsList = new List<List<Point>>();
+        #endregion
+        private void InitializeUIElements()
+        {
+
+            #region [SearchedCircle]
+            SearchedCenterPointUI = new Grid();
+            SearchedCenterPointUI.Width = 30;
+            SearchedCenterPointUI.Height = 30;
+
+            Line line1 = new Line(); // H
+            line1.X1 = 0;
+            line1.Y1 = 0;
+            line1.X2 = 30;
+            line1.Y2 = 30;
+            line1.Stroke = ColorDefines.SearchCenterPoint;
+            line1.StrokeThickness = 3;
+
+            Line line2 = new Line(); // H
+            line2.X1 = 0;
+            line2.Y1 = 30;
+            line2.X2 = 30;
+            line2.Y2 = 0;
+            line2.Stroke = ColorDefines.SearchCenterPoint;
+            line2.StrokeThickness = 3;
+
+            Canvas.SetZIndex(line1, 98);
+            Canvas.SetZIndex(line2, 98);
+
+            SearchedCenterPointUI.Children.Add(line1);
+            SearchedCenterPointUI.Children.Add(line2);
+
+            #endregion
+
+
+            #region [Exclusive Polygon]
+            ExclusivePolyList = new List<Polygon>();
+            #endregion
+        }
         #region [Overrides]
 
         public override void PreviewMouseDown(object sender, MouseEventArgs e)
@@ -54,9 +118,121 @@ namespace Root_WIND2.UI_User
             RedrawShapes();
         }
 
+        public void ReadCenterPoint()
+        {
+            try
+            {
+                if (File.Exists(Constants.FilePath.BacksideCenterPointFilePath))
+                {
+                    using (var sr = new StreamReader(Constants.FilePath.BacksideCenterPointFilePath))
+                    {
+                        XmlSerializer xs = new XmlSerializer(typeof(CPoint));
+                        CPoint centerPt = (CPoint)xs.Deserialize(sr);
+
+                        SetSearchedCenter(centerPt);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+
+        public void ReadExclusivePolygon()
+        {
+            try
+            {
+                if (File.Exists(Constants.FilePath.BacksideExclusiveRegionFilePath))
+                {
+                    ClearExclusivePolygon();
+
+                    using (var sr = new StreamReader(Constants.FilePath.BacksideExclusiveRegionFilePath))
+                    {
+                        XmlSerializer xs = new XmlSerializer(typeof(List<List<Point>>));
+                        this.exclusivePolyMemPointsList = (List<List<Point>>)xs.Deserialize(sr);
+
+                        foreach (List<Point> pointList in this.exclusivePolyMemPointsList)
+                        {
+                            Polygon polygon = new Polygon();
+
+                            polygon.Stroke = ColorDefines.ExclusivePolyStroke;
+                            polygon.StrokeThickness = 2;
+                            polygon.Fill = ColorDefines.ExclusivePolyFill;
+                            polygon.Opacity = 0.3;
+                            this.ExclusivePolyList.Add(polygon);
+
+                            foreach (Point pt in pointList)
+                            {
+                                CPoint canvasPt = GetCanvasPoint(pt);
+                                polygon.Points.Add(new Point(canvasPt.X, canvasPt.Y));
+                            }
+
+                            this.p_UIElement.Add(polygon);
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+
         #endregion
 
         #region [Draw Method]
+        public void SetSearchedCenter(CPoint memPt)
+        {
+            this.searchedCenterMemoryPoint = memPt;
+            if (this.p_UIElement.Contains(SearchedCenterPointUI))
+                this.p_UIElement.Remove(SearchedCenterPointUI);
+
+            //Canvas.SetZIndex(this.SearchedCenterPointUI, 99);
+            this.p_UIElement.Add(SearchedCenterPointUI);
+
+            DrawSearchedCircle();
+        }
+
+        public void DrawSearchedCircle()
+        {
+            if (this.p_UIElement.Contains(SearchedCenterPointUI))
+            {
+                CPoint canvasPt = GetCanvasPoint(this.searchedCenterMemoryPoint);
+
+                Canvas.SetLeft(SearchedCenterPointUI, canvasPt.X - 15);
+                Canvas.SetTop(SearchedCenterPointUI, canvasPt.Y - 15);
+            }
+        }
+
+        public void DrawExclusivePolygon()
+        {
+            int i = 0;
+            foreach (Polygon polygon in this.ExclusivePolyList)
+            {
+                polygon.Points.Clear();
+                foreach (Point pt in this.exclusivePolyMemPointsList[i])
+                {
+                    CPoint canvasPt = GetCanvasPoint(pt);
+                    polygon.Points.Add(new Point(canvasPt.X, canvasPt.Y));
+                }
+                i++;
+            }
+        }
+
+        public void ClearExclusivePolygon()
+        {
+            foreach (Polygon polygon in this.ExclusivePolyList)
+            {
+                if (this.p_UIElement.Contains(polygon))
+                {
+                    this.p_UIElement.Remove(polygon);
+                }
+            }
+            this.ExclusivePolyList.Clear();
+            this.exclusivePolyMemPointsList.Clear();
+        }
+
 
         public void AddDrawRect(CRect rect, SolidColorBrush color = null, string tag = "")
         {
@@ -195,6 +371,9 @@ namespace Root_WIND2.UI_User
                     Canvas.SetTop(rectangle, canvasLeftTop.Y);
                 }
             }
+
+            DrawSearchedCircle();
+            DrawExclusivePolygon();
         }
 
         public void RemoveObjectsByTag(string tag)
@@ -219,6 +398,41 @@ namespace Root_WIND2.UI_User
         {
             rectList.Clear();
             p_DrawElement.Clear();
+        }
+        #endregion
+
+        #region [Command]
+        public RelayCommand btnOpenCommand
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    this._openImage();
+                });
+            }
+        }
+
+        public RelayCommand btnSaveCommand
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    this._saveImage();
+                });
+            }
+        }
+
+        public RelayCommand btnClearCommand
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    this._clearImage();
+                });
+            }
         }
         #endregion
     }
