@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace RootTools_Vision
 {
-    public class VerticalWireParameter : ParameterBase
+    public class VerticalWireParameter : ParameterBase, IFrontsideMeasurement
     {
         public VerticalWireParameter() : base(typeof(VerticalWire))
         {

@@ -145,6 +145,8 @@
     <Compile Include="MVVM\Converter.cs" />
     <Compile Include="Recipe\CloneableRecipe.cs" />
     <Compile Include="Recipe\Interfaces\IBackInspection.cs" />
+    <Compile Include="Recipe\Interfaces\IFrontsideMeasurement.cs" />
+    <Compile Include="Recipe\Interfaces\IMeasurement.cs" />
     <Compile Include="Recipe\Interfaces\IInspection.cs" />
     <Compile Include="Recipe\Interfaces\IOptionParameter.cs" />
     <Compile Include="Recipe\Interfaces\IRecipe.cs" />
