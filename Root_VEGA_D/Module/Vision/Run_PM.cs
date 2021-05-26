@@ -1,4 +1,5 @@
 ﻿using RootTools;
+using RootTools.Camera.BaslerPylon;
 using RootTools.Control;
 using RootTools.Light;
 using RootTools.Memory;
@@ -96,6 +97,39 @@ namespace Root_VEGA_D.Module
             }
         }
 
+        string ConnectRADS()
+        {
+            Camera_Basler camRADS = (Camera_Basler)m_module.CamRADS;
+
+            if (m_grabMode.pUseRADS && m_module.RADSControl.p_IsRun == false)
+            {
+                m_module.RADSControl.m_timer.Start();
+                m_module.RADSControl.p_IsRun = true;
+                m_module.RADSControl.StartRADS();
+
+                StopWatch sw = new StopWatch();
+                if (camRADS.p_CamInfo._OpenStatus == false) camRADS.Connect();
+                while (camRADS.p_CamInfo._OpenStatus == false)
+                {
+                    if (sw.ElapsedMilliseconds > 15000)
+                    {
+                        sw.Stop();
+                        return "RADS Camera Not Connected";
+                    }
+                }
+                sw.Stop();
+
+                // Offset 설정
+                m_module.RADSControl.p_connect.SetADSOffset(m_grabMode.pRADSOffset);
+
+                // RADS 카메라 설정
+                camRADS.SetMulticast();
+                camRADS.GrabContinuousShot();
+            }
+
+            return "OK";
+        }
+
         public override string Run()
         {
             if (m_grabMode == null) return "Grab Mode == null";
@@ -134,9 +168,9 @@ namespace Root_VEGA_D.Module
             m_grabMode.m_dTrigger = Math.Round(m_grabMode.m_dResY_um * m_grabMode.m_dCamTriggerRatio, 1);
 
             // Make PM Data List
-            int nCheckPointLenFromCenter_px = (int)(m_dLengthFromScanCenterY * 1000 * 0.5 / m_grabMode.m_dResY_um);
-            int nCoaxialCheckPosY_px = centerY_px + nCheckPointLenFromCenter_px;
-            int nTransmittedCheckPosY_px = centerY_px - nCheckPointLenFromCenter_px;
+            int nCheckPointLenFromCenter_px = (int)(m_dLengthFromScanCenterY * 1000 / m_grabMode.m_dResY_um);
+            int nCoaxialCheckPosY_px = centerY_px - nCheckPointLenFromCenter_px;
+            int nTransmittedCheckPosY_px = centerY_px + nCheckPointLenFromCenter_px;
 
             CRect rectCoaxial = new CRect((int)(m_grabMode.m_GD.m_nFovSize * 0.5), nCoaxialCheckPosY_px, m_nCheckArea);
             CRect rectTransmitted = new CRect((int)(m_grabMode.m_GD.m_nFovSize * 0.5), nTransmittedCheckPosY_px, m_nCheckArea);
@@ -148,6 +182,10 @@ namespace Root_VEGA_D.Module
             // Collect GV Value
             try
             {
+                // RADS 연결
+                if (m_module.Run(ConnectRADS()))
+                    return p_sInfo;
+
                 foreach (PMData pmData in listPMData)
                 {
                     if (pmData.m_light == null) return "Check Light Setting";
@@ -184,7 +222,10 @@ namespace Root_VEGA_D.Module
                                 byte* arrData = (byte*)ptr.ToPointer();
                                 for (int i = 0; i < mem.p_nByte; i++)
                                 {
-                                    sumGV += arrData[(mem.p_sz.X * y + x) * mem.p_nByte + i];
+                                    int val = arrData[((long)mem.p_sz.X * y + x) * mem.p_nByte + i];
+                                    long shiftedVal = val << (i * 8);
+
+                                    sumGV += shiftedVal;
                                 }
                             }
                         }
@@ -201,6 +242,16 @@ namespace Root_VEGA_D.Module
             finally
             {
                 m_grabMode.SetLight(false);
+
+                // RADS 기능 off
+                Camera_Basler camRADS = (Camera_Basler)m_module.CamRADS;
+                if (m_grabMode.pUseRADS && m_module.RADSControl.p_IsRun == true)
+                {
+                    m_module.RADSControl.m_timer.Stop();
+                    m_module.RADSControl.p_IsRun = false;
+                    m_module.RADSControl.StopRADS();
+                    if (camRADS.p_CamInfo._IsGrabbing == true) camRADS.StopGrab();
+                }
             }
 
             // PM check result
