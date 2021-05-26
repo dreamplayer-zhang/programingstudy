@@ -17,10 +17,12 @@ namespace Root_VEGA_D.Module
 
         public GrabMode m_grabMode = null;
         string m_sGrabMode = "";
-        double m_dCenterX = 0;
-        double m_dCenterY = 0;
+        //double m_dCenterX = 0;
+        //double m_dCenterY = 0;
         double m_dScanDistance = 0;
-        double m_dFocusZ = 0;
+        //double m_dFocusZ = 0;
+        double m_dCheckPointFromCenterY = 0;
+        int m_nCheckArea = 0;
         string m_sLightFirst = "";
         string m_sLightSecond = "";
         int m_nFirstLightPower = 0;
@@ -47,10 +49,9 @@ namespace Root_VEGA_D.Module
             Run_PM run = new Run_PM(m_module);
 
             run.p_sGrabMode = p_sGrabMode;
-            run.m_dCenterX = m_dCenterX;
-            run.m_dCenterY = m_dCenterY;
             run.m_dScanDistance = m_dScanDistance;
-            run.m_dFocusZ = m_dFocusZ;
+            run.m_dCheckPointFromCenterY = m_dCheckPointFromCenterY;
+            run.m_nCheckArea = m_nCheckArea;
             run.m_sLightFirst = m_sLightFirst;
             run.m_nFirstLightPower = m_nFirstLightPower;
             run.m_sLightSecond = m_sLightSecond;
@@ -64,13 +65,12 @@ namespace Root_VEGA_D.Module
         public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
         {
             p_sGrabMode = tree.Set(p_sGrabMode, p_sGrabMode, m_module.p_asGrabMode, "Grab Mode", "Select GrabMode", bVisible);
-            m_dCenterX = tree.Set(m_dCenterX, m_dCenterX, "Center X", "Center X Position", bVisible);
-            m_dCenterY = tree.Set(m_dCenterY, m_dCenterY, "Center Y", "Center Y Position", bVisible);
-            m_dScanDistance = tree.Set(m_dScanDistance, m_dScanDistance, "Scan Distance", "Scan Distance on Y Axis", bVisible);
-            m_dFocusZ = tree.Set(m_dFocusZ, m_dFocusZ, "Focus Z", "Select GrabMode", bVisible);
-            m_sLightFirst = tree.Set(m_sLightFirst, m_sLightFirst, m_module.p_asLightSet, "1st Light", "First Light Checked", bVisible);
+            m_dScanDistance = tree.Set(m_dScanDistance, m_dScanDistance, "Scan Distance", "Scan Distance on Y Axis (mm)", bVisible);
+            m_dCheckPointFromCenterY = tree.Set(m_dCheckPointFromCenterY, m_dCheckPointFromCenterY, "Check Point Y", "Check point distance from CenterY (mm)", bVisible);
+            m_nCheckArea = tree.Set(m_nCheckArea, m_nCheckArea, "Check Area", "Check area length of width or height (px)", bVisible);
+            m_sLightFirst = tree.Set(m_sLightFirst, m_sLightFirst, m_module.p_asLightSet, "1st Light", "First Light for PM", bVisible);
             m_nFirstLightPower = tree.Set(m_nFirstLightPower, m_nFirstLightPower, "1st Light Power", "First Light Power", bVisible);
-            m_sLightSecond = tree.Set(m_sLightSecond, m_sLightSecond, m_module.p_asLightSet, "2nd Light", "Second Light Checked", bVisible);
+            m_sLightSecond = tree.Set(m_sLightSecond, m_sLightSecond, m_module.p_asLightSet, "2nd Light", "Second Light for PM", bVisible);
             m_nSecondLightPower = tree.Set(m_nSecondLightPower, m_nSecondLightPower, "2nd Light Power", "Second Light Power", bVisible);
             m_sMemoryGroup = tree.Set(m_sMemoryGroup, m_sMemoryGroup, m_module.MemoryPool.m_asGroup, "MemoryGroup", "Memory Group Name", bVisible);
             MemoryGroup memoryGroup = m_module.MemoryPool.GetGroup(m_sMemoryGroup);
@@ -101,8 +101,8 @@ namespace Root_VEGA_D.Module
             double accDistance = speedY.m_acc * speedY.m_v * 0.5 * 2.0;
             double decDistance = speedY.m_dec * speedY.m_v * 0.5 * 2.0;
 
-            double dStartTriggerY = m_dCenterY - m_dScanDistance * 0.5;
-            double dEndTriggerY = m_dCenterY + m_dScanDistance * 0.5;
+            double dStartTriggerY = m_grabMode.m_rpAxisCenter.Y - m_dScanDistance * 0.5;
+            double dEndTriggerY = m_grabMode.m_rpAxisCenter.Y + m_dScanDistance * 0.5;
 
             double dStartPosY = dStartTriggerY - accDistance;
             double dEndPosY = dEndTriggerY + decDistance;
@@ -125,7 +125,7 @@ namespace Root_VEGA_D.Module
 
                     // 포커스 높이로 Z축 이동
                     Axis axisZ = m_module.AxisZ;
-                    if (m_module.Run(axisZ.StartMove(m_dFocusZ)))
+                    if (m_module.Run(axisZ.StartMove(m_grabMode.m_dFocusPosZ)))
                         return p_sInfo;
 
                     // 이동 대기
@@ -133,10 +133,11 @@ namespace Root_VEGA_D.Module
                         return p_sInfo;
 
                     // Scan Target Image
-                    double dPosX = m_dCenterX + m_grabMode.m_GD.m_nFovSize * m_grabMode.m_dResX_um * 0.001 * 0.5;
+                    double dPosX = m_grabMode.m_rpAxisCenter.X + m_grabMode.m_GD.m_nFovSize * m_grabMode.m_dResX_um * 0.001 * 0.5;
                     if(m_module.Run(m_module.RunLineScan(m_grabMode, mem, new RootTools.CPoint(0, 0), nScanLen_px, dPosX, dStartPosY, dEndPosY, dStartTriggerY, dEndTriggerY)))
                         return p_sInfo;
 
+                    
 
                 }
             }
