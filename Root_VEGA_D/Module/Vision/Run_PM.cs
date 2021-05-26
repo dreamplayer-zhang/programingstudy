@@ -19,7 +19,7 @@ namespace Root_VEGA_D.Module
         public GrabMode m_grabMode = null;
         string m_sGrabMode = "";
         double m_dScanDistance = 0;
-        double m_dCheckPointFromCenterY = 0;
+        double m_dLengthFromScanCenterY = 0;
         int m_nCheckArea = 0;
         string m_sCoaxialLight = "";
         string m_sTransmittedLight = "";
@@ -50,7 +50,7 @@ namespace Root_VEGA_D.Module
 
             run.p_sGrabMode = p_sGrabMode;
             run.m_dScanDistance = m_dScanDistance;
-            run.m_dCheckPointFromCenterY = m_dCheckPointFromCenterY;
+            run.m_dLengthFromScanCenterY = m_dLengthFromScanCenterY;
             run.m_nCheckArea = m_nCheckArea;
             run.m_sCoaxialLight = m_sCoaxialLight;
             run.m_nCoaxialLightPower = m_nCoaxialLightPower;
@@ -68,7 +68,7 @@ namespace Root_VEGA_D.Module
         {
             p_sGrabMode = tree.Set(p_sGrabMode, p_sGrabMode, m_module.p_asGrabMode, "Grab Mode", "Select GrabMode", bVisible);
             m_dScanDistance = tree.Set(m_dScanDistance, m_dScanDistance, "Scan Distance", "Scan Distance on Y Axis (mm)", bVisible);
-            m_dCheckPointFromCenterY = tree.Set(m_dCheckPointFromCenterY, m_dCheckPointFromCenterY, "Check Point Y", "Check point distance from CenterY (mm)", bVisible);
+            m_dLengthFromScanCenterY = tree.Set(m_dLengthFromScanCenterY, m_dLengthFromScanCenterY, "Length From Center Y", "Length from ScanCenterY for Check Area Center (mm)", bVisible);
             m_nCheckArea = tree.Set(m_nCheckArea, m_nCheckArea, "Check Area", "Check area length of width or height (px)", bVisible);
             m_sCoaxialLight = tree.Set(m_sCoaxialLight, m_sCoaxialLight, m_module.p_asLightSet, "Coaxial Light", "Coaxial Light for PM", bVisible);
             m_nCoaxialLightPower = tree.Set(m_nCoaxialLightPower, m_nCoaxialLightPower, "Coaxial Light Power", "Coaxial Light Power", bVisible);
@@ -134,7 +134,7 @@ namespace Root_VEGA_D.Module
             m_grabMode.m_dTrigger = Math.Round(m_grabMode.m_dResY_um * m_grabMode.m_dCamTriggerRatio, 1);
 
             // Make PM Data List
-            int nCheckPointLenFromCenter_px = (int)(m_dCheckPointFromCenterY * 1000 * 0.5 / m_grabMode.m_dResY_um);
+            int nCheckPointLenFromCenter_px = (int)(m_dLengthFromScanCenterY * 1000 * 0.5 / m_grabMode.m_dResY_um);
             int nCoaxialCheckPosY_px = centerY_px + nCheckPointLenFromCenter_px;
             int nTransmittedCheckPosY_px = centerY_px - nCheckPointLenFromCenter_px;
 
