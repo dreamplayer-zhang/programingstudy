@@ -34,7 +34,18 @@ namespace Root_WindII.Engineer
         public ModuleList p_moduleList { get; set; }
         public EFEM_Recipe m_recipe;
         public EFEM_Process m_process;
-        
+        WIND2 m_WIND2;
+        public WIND2 p_WIND2
+        {
+            get
+            {
+                return m_WIND2;
+            }
+            set
+            {
+                SetProperty(ref m_WIND2, value);
+            }
+        }
         private Vision_Frontside m_visionFront;
         public Vision_Frontside p_VisionFront
 		{
@@ -52,9 +63,13 @@ namespace Root_WindII.Engineer
             InitModule(m_visionFront);
             ((IWTR)m_wtr).AddChild((IWTRChild)m_visionFront);
 
+            
 
             InitVision();
             //InitBackside(ModuleBase.eRemote.Client);
+            p_WIND2 = new WIND2("WIND2", m_engineer);
+            InitModule(p_WIND2);
+
 
             m_wtr.RunTree(Tree.eMode.RegRead);
             m_wtr.RunTree(Tree.eMode.Init);

@@ -320,22 +320,19 @@ namespace Root_WIND2.Module
                 return "OK";
             //            p_bStageBlow = false;
             //            p_bStageVac = true;
-            if (p_eRemote == eRemote.Client) return RemoteRun(eRemoteRun.StateHome, eRemote.Client, null);
-            else
-            {
-                Thread.Sleep(200);
 
-                if (camMain != null && camMain.p_CamInfo.p_eState == eCamState.Init)
-                    camMain.Connect();
+            Thread.Sleep(200);
+
+            if (camMain != null && camMain.p_CamInfo.p_eState == eCamState.Init)
+                camMain.Connect();
 
 
-                base.StateHome();
+            base.StateHome();
 
-                p_eState = (p_sInfo == "OK") ? eState.Ready : eState.Error;
+            p_eState = (p_sInfo == "OK") ? eState.Ready : eState.Error;
 
-                if (diWaferExist.p_bIn == false)
-                    p_bStageVac = false;
-            }
+            if (diWaferExist.p_bIn == false)
+                p_bStageVac = false;
             return p_sInfo;
         }
         #endregion
