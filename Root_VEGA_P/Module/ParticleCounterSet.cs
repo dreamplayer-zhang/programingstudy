@@ -142,12 +142,12 @@ namespace Root_VEGA_P.Module
                         {
                             Thread.Sleep(100);
                             if (EQ.IsStop()) return "EQ Stop";
-                            bBackFlow |= m_regulator.IsBackFlow();
-                            if (Run(ReadFlowSensor())) return m_sInfo;
+                            //bBackFlow |= m_regulator.IsBackFlow(); //forget
+                            //if (Run(ReadFlowSensor())) return m_sInfo;
                         }
                         Thread.Sleep((int)(1000 * m_vegaP.m_secPumpDelay));
-                        Result result = new Result(bBackFlow, m_fFlow, m_particleCounter);
-                        m_aResult.Add(result);
+                        //Result result = new Result(bBackFlow, m_fFlow, m_particleCounter);
+                        //m_aResult.Add(result);
                         if (Run(m_regulator.RunPump(0))) return m_sInfo;
                         Thread.Sleep((int)(1000 * m_vegaP.m_secPumpDelay));
                     }
