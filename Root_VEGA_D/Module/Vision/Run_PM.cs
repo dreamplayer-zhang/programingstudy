@@ -52,9 +52,11 @@ namespace Root_VEGA_D.Module
             run.m_dScanDistance = m_dScanDistance;
             run.m_dFocusZ = m_dFocusZ;
             run.m_sLightFirst = m_sLightFirst;
-            run.m_sLightSecond = m_sLightSecond;
             run.m_nFirstLightPower = m_nFirstLightPower;
+            run.m_sLightSecond = m_sLightSecond;
             run.m_nSecondLightPower = m_nSecondLightPower;
+            run.m_sMemoryGroup = m_sMemoryGroup;
+            run.m_sMemoryData = m_sMemoryData;
 
             return run;
         }
@@ -105,6 +107,10 @@ namespace Root_VEGA_D.Module
             double dStartPosY = dStartTriggerY - accDistance;
             double dEndPosY = dEndTriggerY + decDistance;
 
+            m_grabMode.m_dTrigger = Math.Round(m_grabMode.m_dResY_um * m_grabMode.m_dCamTriggerRatio, 1);
+
+            int nScanLen_px = (int)Math.Round(m_dScanDistance * 1000 / m_grabMode.m_dResY_um);
+
             try
             {
                 foreach (KeyValuePair<Light, int> item in dictLight)
@@ -117,9 +123,18 @@ namespace Root_VEGA_D.Module
                     // Turn on light
                     item.Key.p_fPower = item.Value;
 
+                    // 포커스 높이로 Z축 이동
+                    Axis axisZ = m_module.AxisZ;
+                    if (m_module.Run(axisZ.StartMove(m_dFocusZ)))
+                        return p_sInfo;
+
+                    // 이동 대기
+                    if (m_module.Run(axisZ.WaitReady()))
+                        return p_sInfo;
+
                     // Scan Target Image
-                    double dPosX = m_dCenterX - m_grabMode.m_GD.m_nFovSize * m_grabMode.m_dResX_um * 0.5;
-                    if(m_module.Run(m_module.RunLineScan(m_grabMode, mem, new RootTools.CPoint(0, 0), 1, dPosX, dStartPosY, dEndPosY, dStartTriggerY, dEndTriggerY)))
+                    double dPosX = m_dCenterX + m_grabMode.m_GD.m_nFovSize * m_grabMode.m_dResX_um * 0.001 * 0.5;
+                    if(m_module.Run(m_module.RunLineScan(m_grabMode, mem, new RootTools.CPoint(0, 0), nScanLen_px, dPosX, dStartPosY, dEndPosY, dStartTriggerY, dEndTriggerY)))
                         return p_sInfo;
 
 
