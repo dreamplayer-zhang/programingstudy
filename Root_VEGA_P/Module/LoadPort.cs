@@ -458,6 +458,7 @@ namespace Root_VEGA_P.Module
             }
         }
         #endregion
+
         #region InfoPods
         InfoPods m_infoPods; 
         void InitInfoPods(string id, IEngineer engineer)
@@ -642,6 +643,7 @@ namespace Root_VEGA_P.Module
 
         public override void ThreadStop()
         {
+            m_stage.RunMove(Stage.ePos.Outside); 
             if (m_bThreadCheck)
             {
                 m_bThreadCheck = false;

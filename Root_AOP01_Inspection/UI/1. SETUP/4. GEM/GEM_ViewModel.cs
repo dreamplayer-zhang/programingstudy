@@ -10,7 +10,8 @@ namespace Root_AOP01_Inspection
     class GEM_ViewModel : ObservableObject
     {
         public GEM_Panel GEM = new GEM_Panel();
-
+        public Other_Panel Other = new Other_Panel();
+        
         Setup_ViewModel m_Setup;
         public GEM_ViewModel(Setup_ViewModel setup)
         {
@@ -23,6 +24,17 @@ namespace Root_AOP01_Inspection
                 return new RelayCommand(() =>
                 {
                     m_Setup.Set_HomePanel();
+                });
+            }
+        }
+
+        public ICommand btnOther
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    m_Setup.Set_GEMOtherPanel();
                 });
             }
         }

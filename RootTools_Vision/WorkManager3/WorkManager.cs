@@ -3,6 +3,7 @@ using RootTools.Database;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -174,9 +175,16 @@ namespace RootTools_Vision.WorkManager3
             return true;
         }
 
-        public void Start(bool inspOnly = true, Lotinfo lotInfo = null)
+
+        private bool block = false;
+
+        public async void Start(bool inspOnly = true, Lotinfo lotInfo = null)
         {
-            if(this.sharedBuffer.PtrR_GRAY == IntPtr.Zero)
+            if (block) return;
+
+            block = true;
+
+            if (this.sharedBuffer.PtrR_GRAY == IntPtr.Zero)
             {
                 throw new ArgumentException("SharedBuffer가 초기화되지 않았습니다.");
             }
@@ -199,10 +207,14 @@ namespace RootTools_Vision.WorkManager3
 
             if(pipeLine.Stop() == false)
             {
-                this.pipeLine = new WorkPipeLine(this.threadNum);
+                //this.pipeLine = new WorkPipeLine(this.threadNum);
+
+                TempLogger.Write("Worker", "PipeLine Initialize");
             }
 
-            if(lotInfo == null)
+            this.pipeLine = new WorkPipeLine(this.threadNum);
+
+            if (lotInfo == null)
                 DatabaseManager.Instance.SetLotinfo(DateTime.Now, DateTime.Now, Path.GetFileName(this.recipe.RecipePath));
             else
                 DatabaseManager.Instance.SetLotinfo(lotInfo);
@@ -211,6 +223,12 @@ namespace RootTools_Vision.WorkManager3
                 this.currentWorkplaceQueue,
                 works
                 );
+
+            WorkEventManager.OnInspectionStart(new object(), new InspectionStartArgs());
+
+            await Task.Delay(1000);
+
+            block = false;
         }
 
 
@@ -230,6 +248,8 @@ namespace RootTools_Vision.WorkManager3
         public void Stop()
         {
             pipeLine.Stop();
+
+            GC.Collect();
         }
 
         public void Exit()

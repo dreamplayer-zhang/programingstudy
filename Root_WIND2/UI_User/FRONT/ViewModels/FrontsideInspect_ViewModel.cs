@@ -11,6 +11,8 @@ using System.Windows.Media;
 using System.Windows.Threading;
 using System.Data;
 using RootTools_Vision.WorkManager3;
+using RootTools_Vision.Utility;
+using System.IO;
 
 namespace Root_WIND2.UI_User
 {
@@ -82,6 +84,16 @@ namespace Root_WIND2.UI_User
         {
             get { return this.m_DataViewer_VM; }
             set { SetProperty(ref m_DataViewer_VM, value); }
+        }
+
+        private string inspectionID;
+        public string InspectionID
+        {
+            get => this.inspectionID;
+            set
+            {
+                SetProperty(ref this.inspectionID, value);
+            }
         }
         #endregion
 
@@ -216,8 +228,6 @@ namespace Root_WIND2.UI_User
             });
         }
 
-        WorkManager workManager;
-
         public RelayCommand btnStart
         {
             get => new RelayCommand(() =>
@@ -226,6 +236,8 @@ namespace Root_WIND2.UI_User
                 if (GlobalObjects.Instance.GetNamed<WorkManager>("frontInspection") != null)
                 {
                     GlobalObjects.Instance.GetNamed<WorkManager>("frontInspection").Start();
+
+                    this.InspectionID = DatabaseManager.Instance.GetInspectionID();
                 }
                 return;
 
@@ -289,6 +301,48 @@ namespace Root_WIND2.UI_User
             get => new RelayCommand(() =>
             {
                 this.ImageViewerVM.ClearObjects();
+            });
+        }
+
+
+        public RelayCommand btnSaveKlarf
+        {
+            get => new RelayCommand(() =>
+            {
+
+                WorkManager workManager = GlobalObjects.Instance.GetNamed<WorkManager>("frontInspection");
+                RecipeFront recipe = GlobalObjects.Instance.Get<RecipeFront>();
+
+                WIND2_Engineer engineer = GlobalObjects.Instance.Get<WIND2_Engineer>();
+                CameraInfo camInfo = DataConverter.GrabModeToCameraInfo(engineer.m_handler.p_Vision.GetGrabMode(recipe.CameraInfoIndex));
+
+                Settings settings = new Settings();
+                SettingItem_SetupFrontside settings_frontside = settings.GetItem<SettingItem_SetupFrontside>();
+
+                DataTable table = DatabaseManager.Instance.SelectCurrentInspectionDefect();
+                List<Defect> defects = Tools.DataTableToDefectList(table);
+
+
+                KlarfData_Lot klarfData = new KlarfData_Lot();
+                Directory.CreateDirectory(settings_frontside.KlarfSavePath);
+
+                klarfData.SetResolution((float)camInfo.RealResX, (float)camInfo.RealResY);
+                klarfData.WaferStart(recipe.WaferMap, DateTime.Now);
+                klarfData.AddSlot(recipe.WaferMap, defects, recipe.GetItem<OriginRecipe>(), settings_frontside.UseTDIReview);
+                klarfData.SetResultTimeStamp();
+                klarfData.SaveKlarf(settings_frontside.KlarfSavePath, false);
+
+                //string inspectionID = DatabaseManager.Instance.GetInspectionID();
+
+                Tools.SaveTiffImageOnlyTDI(settings_frontside.KlarfSavePath, klarfData.GetKlarfFileName(), defects, workManager.SharedBuffer, new Size(160, 120));
+            });
+        }
+
+        public RelayCommand btnInspectionIDSearchCommand
+        {
+            get => new RelayCommand(() =>
+            {
+                m_DataViewer_VM.pDataTable = DatabaseManager.Instance.SelectTablewithInspectionID("defect", this.inspectionID);                
             });
         }
 

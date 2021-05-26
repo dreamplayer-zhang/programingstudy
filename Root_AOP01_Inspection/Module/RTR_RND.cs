@@ -35,7 +35,7 @@ namespace Root_AOP01_Inspection.Module
                 m_rs232.OnReceive += M_rs232_OnReceive;
                 m_rs232.p_bConnect = true;
             }
-            if (bInit) InitALID();
+            if (bInit) InitGAF();
         }
         #endregion
         #region GAF
@@ -47,15 +47,39 @@ namespace Root_AOP01_Inspection.Module
         public ALID m_alidCMD;
         public ALID m_alidConnect;
 
+        CEID m_ceidBlowStart;
+        CEID m_ceidBlowEnd;
+        CEID m_ceidPodMoveToVision;
+        CEID m_ceidPodMoveToUnload;
 
-        void InitALID()
+        SVID m_svidRTRArmCloseInterlock;
+        SVID m_svidCleaningReticleCheck;
+        SVID m_svidRTRPodCheck;
+        SVID m_svidReticleInverseCheck;
+        SVID m_svidCleanUnitWindValue;
+
+        void InitGAF()
         {
+            m_ceidBlowStart = m_gaf.GetCEID(this, "Blow Start");
+            m_ceidBlowEnd = m_gaf.GetCEID(this, "Blow End");
+            m_ceidPodMoveToVision = m_gaf.GetCEID(this, "Pod MoveToVision");
+            m_ceidPodMoveToUnload = m_gaf.GetCEID(this, "Pod MoveToUnload");
+
             m_alidGet = m_gaf.GetALID(this, "Get", "Get Motion Error");
             m_alidPut = m_gaf.GetALID(this, "Put", "Put Motion Error");
             m_alidClean = m_gaf.GetALID(this, "Clean", "Clean Motion Error");
             m_alidHome = m_gaf.GetALID(this, "Home_RTR", "Home Motion Error");
             m_alidCMD = m_gaf.GetALID(this, "CMD_RTR", "CMD Error");
             m_alidConnect = m_gaf.GetALID(this, "Connect_RTR", "Connect Error");
+
+            m_svidRTRArmCloseInterlock = m_gaf.GetSVID(this, "RTR Arm Close Interlock"); //m_diArmClose
+            m_svidCleaningReticleCheck = m_gaf.GetSVID(this, "Cleaning Reticle Check"); //m_diReticleCheck
+            m_svidRTRPodCheck = m_gaf.GetSVID(this, "RTR Pod Check"); //IsWaferExist
+
+            m_svidReticleInverseCheck = m_gaf.GetSVID(this, "Reticle Inverse Check");
+            m_svidCleanUnitWindValue = m_gaf.GetSVID(this, "CleanUnit Wind Value");
+
+            //m_diCheckVac; ?
         }
         #endregion
         #region Arm
@@ -1000,6 +1024,12 @@ namespace Root_AOP01_Inspection.Module
                     m_module.m_alidGet.Run(true, p_sInfo);
                     return p_sInfo;
                 }
+
+                //if (p_sChild.Contains("Vision"))
+                //{
+                //    child.p_infoWafer.STSProcessDone();
+                //}
+
                 if (p_sChild == "MainVision")
                 {
                     if (mainVision.m_diReticleFrameCheck.p_bIn == true)
@@ -1205,8 +1235,22 @@ namespace Root_AOP01_Inspection.Module
                         m_module.m_alidPut.Run(true, p_sInfo);
                         return p_sInfo;
                     }
+                    
                     child.p_bLock = false;
                     child.AfterPut(m_nChildID);
+                    //child.p_infoWafer.STSSetTransport(child.p_id, child.p_id.Contains("Loadport"));
+
+                    //Put 한 곳이 Main Vision 이면
+                    if (child.p_id.Contains("Vision"))
+                    {
+                        m_module.m_ceidPodMoveToVision.Send();
+                        //child.p_infoWafer.STSProcessing();
+                    }
+                    //Put 한 곳이 Unloader Unit 이면
+                    if (child.p_id.Contains("LoadPort"))
+                    {
+                        m_module.m_ceidPodMoveToUnload.Send();
+                    }
                 }
                 finally
                 {                
@@ -1301,6 +1345,9 @@ namespace Root_AOP01_Inspection.Module
 
                         }
                         m_module.m_doTopBlow.Write(true); //Blow On
+                        //Blow Start
+                        m_module.m_ceidBlowStart.Send();
+
                         if (m_module.Run(m_module.WriteCmdSetSpeed(eCmd.SetSpeed, sCleanSpeed)))
                         {
                             m_module.m_alidClean.Run(true, p_sInfo);
@@ -1362,6 +1409,8 @@ namespace Root_AOP01_Inspection.Module
                             return p_sInfo;
                         }
                         m_module.m_doTopBlow.Write(false); //Blow off
+                        //Blow End
+                        m_module.m_ceidBlowEnd.Send();
                     }
                     else if (m_sCleanPlane == "Bottom")
                     {
@@ -1389,7 +1438,10 @@ namespace Root_AOP01_Inspection.Module
                             m_module.m_bDoClean = false;
                             return p_sInfo;
                         }
+                        
                         m_module.m_doBottomBlow.Write(true); //Blow On
+                        //Blow Start
+                        m_module.m_ceidBlowStart.Send();
                         if (m_module.Run(m_module.WriteCmdSetSpeed(eCmd.SetSpeed, sCleanSpeed)))
                         {
                             m_module.m_alidClean.Run(true, p_sInfo);
@@ -1451,6 +1503,8 @@ namespace Root_AOP01_Inspection.Module
                             return p_sInfo;
                         }
                         m_module.m_doBottomBlow.Write(false); //Blow off
+                        //Blow End
+                        m_module.m_ceidBlowEnd.Send();
                     }
                 }
                 m_module.m_bDoClean = false;

@@ -8,7 +8,7 @@
              xmlns:vision="clr-namespace:RootTools_Vision;assembly=RootTools_Vision"
              xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
              mc:Ignorable="d"
-             d:DesignHeight="450" d:DesignWidth="800">
+             d:DesignHeight="450" d:DesignWidth="1200">
     <i:Interaction.Triggers>
         <i:EventTrigger EventName="Loaded">
             <i:InvokeCommandAction Command="{Binding LoadedCommand}" />
@@ -66,6 +66,7 @@
             <Button Content="Snap" Command="{Binding btnSnap}" Style="{StaticResource inspection_menu_button}"/>
             <Button Content="Stop" Command="{Binding btnStop}" Style="{StaticResource inspection_menu_button}"/>
             <Button Content="Clear" Command="{Binding btnClear}" Style="{StaticResource inspection_menu_button}"/>
+            <Button Content="Save Klarf" Command="{Binding btnSaveKlarf}" Style="{StaticResource inspection_menu_button}"/>
             <Button Content="Remote" Command="{Binding btnRemoteStart}" Style="{StaticResource inspection_menu_button}"/>
         </StackPanel>
         <Grid Grid.Row="1" Background="{StaticResource main_view_background}">
@@ -101,6 +102,9 @@
                         <CheckBox Content="R" IsChecked="{Binding IsRChecked, Mode=TwoWay}" Command="{Binding btnChannelCommand}" Style="{StaticResource imageViewer_toolbar_checkbox}"/>
                         <CheckBox Content="G" IsChecked="{Binding IsGChecked, Mode=TwoWay}" Command="{Binding btnChannelCommand}" Style="{StaticResource imageViewer_toolbar_checkbox}"/>
                         <CheckBox Content="B" IsChecked="{Binding IsBChecked, Mode=TwoWay}" Command="{Binding btnChannelCommand}" Style="{StaticResource imageViewer_toolbar_checkbox}"/>
+
+                        <TextBlock Text="View" Margin="12,0,4,0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                        <CheckBox Content="Defct" IsChecked="{Binding IsDefectChecked, Mode=TwoWay}" Style="{StaticResource imageViewer_toolbar_checkbox}"/>
                     </StackPanel>
                     <Grid Grid.Row="1" >
                         <tools:RootViewer/>
@@ -119,11 +123,36 @@
                     <vision:MapViewer DataContext="{Binding MapViewerVM}"  Margin="4"/>
                 </GroupBox>
                 <GroupBox Grid.Row="1" 
-                      Header="Defect List"
+                      Header="Defect Viewer"
                       Margin="4,0,4,4"
                       Style="{StaticResource main_view_groupbox}" >
-                    <tools:Database_DataView DataContext="{Binding p_DataViewer_VM}" Margin="4">
-                    </tools:Database_DataView>
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="32"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="120"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="80"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="Inspection ID"  
+                                   VerticalAlignment="Center" 
+                                   HorizontalAlignment="Center"/>
+                        <TextBox Margin="4,4,4,0"
+                                 Grid.Column="1"
+                                 VerticalContentAlignment="Center"
+                                 Text="{Binding InspectionID, Mode=TwoWay}"/>
+                        <Button Margin="4,4,4,0"
+                                Grid.Column="2"
+                                Content="Search"
+                                Command="{Binding btnInspectionIDSearchCommand}"
+                                Style="{StaticResource groupbox_griditem_button}"/>
+                        <tools:Database_DataView Grid.Row="1"
+                                                 Grid.ColumnSpan="3"
+                                                 DataContext="{Binding p_DataViewer_VM}" Margin="4">
+                        </tools:Database_DataView>
+                    </Grid>
                 </GroupBox>
             </Grid>
         </Grid>

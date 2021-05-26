@@ -50,8 +50,8 @@ namespace RootTools_Vision.Utility
 		public int klarfCol = 0;
 
 		public String tempString;
-		public double resolutionX;
-		public double resolutionY;
+		public double resolutionX = 1;
+		public double resolutionY = 1;
 
 		#endregion
 
@@ -328,21 +328,21 @@ namespace RootTools_Vision.Utility
 			int nImageIdx = 0;
 			for (int i = 0; i < _defectdata.Count; i++)
 			{
-				builder.Append(_defectdata[i].m_nDefectIndex + " ");
-				builder.Append(_defectdata[i].m_fRelX + " ");
-				builder.Append(_defectdata[i].m_fRelY + " ");
-				builder.Append(_defectdata[i].m_nChipIndexX + " ");
-				builder.Append(_defectdata[i].m_nChipIndexY + " ");
-				builder.Append(_defectdata[i].m_fWidth + " ");
-				builder.Append(_defectdata[i].m_fHeight + " ");
-				builder.Append(0 + " ");
-				builder.Append(_defectdata[i].m_fSize + " ");
-				builder.Append(0 + " ");
-				builder.Append(0 + " ");
-				builder.Append(0 + " ");
-				builder.Append(0 + " ");
-				builder.Append(0 + " ");
-				builder.Append(0 + " ");
+				builder.Append(_defectdata[i].m_nDefectIndex + " ");  // Index
+				builder.Append(_defectdata[i].m_fRelX + " "); // Rel X
+				builder.Append(_defectdata[i].m_fRelY + " "); // Rel Y
+				builder.Append(_defectdata[i].m_nChipIndexX + " "); // Map X
+				builder.Append(_defectdata[i].m_nChipIndexY + " "); // Map Y
+				builder.Append(_defectdata[i].m_fWidth * resolutionX + " "); // Size X
+				builder.Append(_defectdata[i].m_fHeight * resolutionY + " "); // Size Y
+				builder.Append(0 + " "); // DEFECTAREA
+				builder.Append(_defectdata[i].m_fSize * resolutionX + " "); // Defect Size
+				builder.Append(0 + " "); // ClassNumber
+				builder.Append(0 + " "); // TEST
+				builder.Append(0 + " "); // CLUSTERNUMBER
+				builder.Append(0 + " "); // Rough Bin Number
+				builder.Append(0 + " "); // Find Bin Number
+				builder.Append(0 + " "); // Review Sample
 
 				if (useTDIReview && useVrsReview)  // 이미지 TDI VRS 둘다 저장할 때,
 				{

@@ -312,6 +312,7 @@ namespace Root_Pine2.Module
                 }
 
                 public InfoStrip p_infoStrip { get; set; }
+                
                 public void Reset()
                 {
                     p_bEnable = false;

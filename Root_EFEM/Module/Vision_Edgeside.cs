@@ -411,8 +411,8 @@ namespace Root_EFEM.Module
 			else
 			{
 
-				OpenCamera();
-				p_bStageVac = true;
+			//OpenCamera();
+			p_bStageVac = true;
 
 				axisEdgeX.StartHome();
 				axisEbrX.StartHome();

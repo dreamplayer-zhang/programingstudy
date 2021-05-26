@@ -17,6 +17,7 @@ using RootTools.Memory;
 using RootTools.Module;
 using RootTools.Trees;
 using RootTools_Vision;
+using RootTools.GAFs;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -35,7 +36,6 @@ using DPoint = System.Drawing.Point;
 using RootTools_CLR;
 using System.Linq;
 using RootTools.Inspects;
-using RootTools.GAFs;
 using System.Runtime.ExceptionServices;
 using System.Security;
 using RootTools.Comm;
@@ -55,6 +55,58 @@ namespace Root_AOP01_Inspection.Module
         public void SetAlarm()
         {
             m_alid_WaferExist.Run(true, "Vision Wafer Exist Error");
+        }
+
+        public CEID m_ceidInspectionStart;
+        public CEID m_ceidInspectionEnd;
+
+        public CEID m_ceidResultData;
+
+        SVID m_svidStageXPos;
+        SVID m_svidStageYPos;
+
+        SVID m_svidBarcodeStratch;
+        SVID m_svidPatternShift;
+        SVID m_svidPatternRotation;
+        SVID m_svidPellicleShift;
+        SVID m_svidPellicleRotation;
+        SVID m_svidAlignKey;
+        SVID m_svidPatternSurface;
+        SVID m_svidPellicleSurface;
+        SVID m_svidSideCrack;
+        SVID m_svidPellicleScratch;
+        SVID m_svidPatternSide;
+        SVID m_svidGlassSurface;
+        SVID m_svidStageReticleTilt;
+        SVID m_svidStageReticleFrame;
+        SVID m_svidStageReticleCheck;
+
+        void InitGAF()
+        {
+            m_ceidInspectionStart = m_gaf.GetCEID(this, "Inspection Start");
+            m_ceidInspectionEnd = m_gaf.GetCEID(this, "Inspection End");
+
+            m_ceidResultData = m_gaf.GetCEID(this, "Result Data");
+
+            m_svidStageXPos = m_gaf.GetSVID(this, "Stage X Load/Unload Pos");
+            m_svidStageYPos = m_gaf.GetSVID(this, "Stage Y Load/Unload Pos");
+
+            m_svidBarcodeStratch = m_gaf.GetSVID(this, "Barcode Stratch");
+            m_svidPatternShift = m_gaf.GetSVID(this, "Pattern Shift");
+            m_svidPatternRotation = m_gaf.GetSVID(this, "Pattern Rotation");
+            m_svidPellicleShift = m_gaf.GetSVID(this, "Pellicle Shift");
+            m_svidPellicleRotation = m_gaf.GetSVID(this, "Pellicle Rotation");
+            m_svidAlignKey = m_gaf.GetSVID(this, "Align Key");
+            m_svidPatternSurface = m_gaf.GetSVID(this, "Pattern Surface");
+            m_svidPellicleSurface = m_gaf.GetSVID(this, "Pellicle Surface");
+            m_svidSideCrack = m_gaf.GetSVID(this, "Side Crack");
+            m_svidPellicleScratch = m_gaf.GetSVID(this, "Pellicle Scratch");
+            m_svidPatternSide = m_gaf.GetSVID(this, "Pattern Side");
+            m_svidGlassSurface = m_gaf.GetSVID(this, "Glass Surface");
+
+            m_svidStageReticleTilt = m_gaf.GetSVID(this, "Stage Reticle Tilt");
+            m_svidStageReticleFrame = m_gaf.GetSVID(this, "Stage Reticle Frame");
+            m_svidStageReticleCheck = m_gaf.GetSVID(this, "Stage Reticle Check");
         }
         #region ToolBox
         public Axis m_axisRotate;
@@ -120,6 +172,8 @@ namespace Root_AOP01_Inspection.Module
             p_sInfo = m_toolBox.GetCamera(ref m_CamLADS, this, "LADS");
             p_sInfo = m_toolBox.GetComm(ref m_rs232, this, "RS232");
             m_axisRotate.StartMove(1000);
+
+            if (bInit) InitGAF();
         }
         #endregion
 
@@ -1408,6 +1462,27 @@ namespace Root_AOP01_Inspection.Module
 
 
             AddModuleRunList(new Run_TestPellicle(this), true, "Run Delay");
+        }
+        #endregion
+
+        #region InspResult
+        public string UpdateInspResult()
+        {
+            //검사 결과 파일 저장 경로 확인 후 업데이트 하도록 수정.
+            m_svidBarcodeStratch.p_value   = true;
+            m_svidPatternShift.p_value     = 0.0;
+            m_svidPatternRotation.p_value  = 0.0;
+            m_svidPellicleShift.p_value    = 0.0;
+            m_svidPellicleRotation.p_value = 0.0;
+            m_svidAlignKey.p_value         = true;
+            m_svidPatternSurface.p_value   = 5;
+            m_svidPellicleSurface.p_value  = 5;
+            m_svidSideCrack.p_value        = 5;
+            m_svidPellicleScratch.p_value  = 5;
+            m_svidPatternSide.p_value      = 5;
+            m_svidGlassSurface.p_value     = 5;
+
+            return "OK";
         }
         #endregion
 

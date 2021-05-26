@@ -59,5 +59,7 @@ namespace RootTools.Gem
         void DeleteAllJobInfo();
 
         eControl p_eControl { get; set; }
+
+        eControl p_eReqControl { get; set; }
     }
 }
