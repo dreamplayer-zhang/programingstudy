@@ -1,12 +1,13 @@
 ﻿using RootTools.Comm;
 using RootTools.Trees;
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Windows.Controls;
 
 namespace RootTools.Light
 {
-    public class LightTool_DAWOO : NotifyProperty, ILightTool
+    public class LightTool_DAWOO_RGB : NotifyProperty, ILightTool
     {
         public delegate void dgOnChangeTool();
         public event dgOnChangeTool OnChangeTool;
@@ -34,7 +35,7 @@ namespace RootTools.Light
         {
             get
             {
-                LightTool_DAWOO_UI ui = new LightTool_DAWOO_UI();
+                LightTool_DAWOO_RGB_UI ui = new LightTool_DAWOO_RGB_UI();
                 ui.Init(this);
                 return ui;
             }
@@ -58,7 +59,7 @@ namespace RootTools.Light
         #endregion
 
         #region RS232
-        public RS232byte m_rs232; 
+        public RS232byte m_rs232;
         void InitRS232()
         {
             m_rs232 = new RS232byte(p_id, m_log);
@@ -69,11 +70,12 @@ namespace RootTools.Light
         {
             if (m_protocolSend == null) return;
             m_protocolSend.OnRecieve(aRead, nRead);
-            m_protocolSend = null; 
+            m_protocolSend = null;
         }
         #endregion
 
-        #region Protocol
+        #region Protocol 
+        //forget ========================
         public enum eCmd
         {
             Dimming = 1,
@@ -113,24 +115,24 @@ namespace RootTools.Light
                 byte nXor = 0;
                 for (int n = 0; n < i; n++) nXor ^= aSend[n];
                 aSend[i++] = nXor;
-                m_rs232.Send(aSend, i); 
-                return "OK"; 
+                m_rs232.Send(aSend, i);
+                return "OK";
             }
 
             public int m_nReadValue;
-            int m_nRead = 0; 
+            int m_nRead = 0;
             public string OnRecieve(byte[] aRead, int nRead)
             {
                 m_nRead = nRead;
-                int i = 0; 
-                if (aRead[i++] != 0xff) return "Invalid Header"; 
+                int i = 0;
+                if (aRead[i++] != 0xff) return "Invalid Header";
                 switch (m_eCmd)
                 {
                     case eCmd.Dimming:
                     case eCmd.OnOff:
                     case eCmd.SaveDimming:
                     case eCmd.Remote:
-                        if (m_lightTool.m_eSeial == eSerial.RS485) i++; 
+                        if (m_lightTool.m_eSeial == eSerial.RS485) i++;
                         if (aRead[i] != 0x06) return m_eCmd.ToString() + " Command Error : " + aRead[i].ToString();
                         break;
                     case eCmd.GetDimming:
@@ -182,21 +184,22 @@ namespace RootTools.Light
             }
 
             public eCmd m_eCmd;
-            int m_nValue; 
-            LightTool_DAWOO m_lightTool;
+            int m_nValue;
+            LightTool_DAWOO_RGB m_lightTool;
             Light m_light;
-            int m_nChannel = 0; 
-            RS232byte m_rs232; 
-            public Protocol(eCmd eCmd, int nValue, LightTool_DAWOO lightTool, Light light)
+            int m_nChannel = 0;
+            RS232byte m_rs232;
+            public Protocol(eCmd eCmd, int nValue, LightTool_DAWOO_RGB lightTool, Light light)
             {
                 m_eCmd = eCmd;
                 m_lightTool = lightTool;
-                m_light = light; 
+                m_light = light;
                 m_rs232 = lightTool.m_rs232;
                 m_nValue = nValue;
             }
         }
         Protocol m_protocolSend = null;
+        //forget =====================================
         #endregion
 
         #region Thread Send
@@ -230,21 +233,26 @@ namespace RootTools.Light
             }
         }
 
-        Light m_light; 
+        Light m_light;
         public Protocol AddProtocol(eCmd eCmd, int nSendValue, Light light)
         {
             m_light = light;
             Protocol protocol = new Protocol(eCmd, nSendValue, this, light);
-            m_qProtocol.Enqueue(protocol); 
-            return protocol; 
+            m_qProtocol.Enqueue(protocol);
+            return protocol;
         }
         #endregion
 
         #region Light
         public class Light : LightBase
         {
-            protected override void GetPower() 
+            protected override void GetPower()
             {
+                switch (m_eChannel)
+                {
+                    case eChannel.Red: m_lightTool.AddProtocol(eCmd.GetDimming, 0, this); break; 
+                        //forget
+                }
                 m_lightTool.AddProtocol(eCmd.GetDimming, 0, this);
             }
 
@@ -255,7 +263,7 @@ namespace RootTools.Light
             }
 
             const int c_maxPower = 3500;
-            const int m_msWaitReply = 2000; 
+            const int m_msWaitReply = 2000;
             public override void SetPower()
             {
                 double fPower = p_bOn ? p_fSetPower : 0;
@@ -264,22 +272,31 @@ namespace RootTools.Light
             }
 
             public int m_nCh = 0;
-            LightTool_DAWOO m_lightTool; 
-            public Light(string id, int nCh, LightTool_DAWOO lightTool)
+            public eChannel m_eChannel = eChannel.Red; 
+            LightTool_DAWOO_RGB m_lightTool;
+            public Light(string id, eChannel eChannel, LightTool_DAWOO_RGB lightTool)
             {
-                m_nCh = nCh;
+                m_eChannel = eChannel;
+                m_nCh = (int)eChannel; 
                 m_lightTool = lightTool;
-                Init(id + "." + nCh.ToString("00"), nCh);
+                Init(id + "." + m_nCh.ToString("00"), m_nCh);
             }
         }
 
+        const int c_lLight = 3; 
+        public enum eChannel
+        {
+            Red,
+            Green,
+            Blue,
+        }
         public List<LightBase> p_aLight { get; set; }
         void InitLight()
         {
             m_rs232.p_bConnect = true;
-            for (int n = 0; n < m_lLight; n++)
+            foreach (eChannel eChannel in Enum.GetValues(typeof(eChannel)))
             {
-                Light light = new Light(p_id, n, this);
+                Light light = new Light(p_id, eChannel, this);
                 p_aLight.Add(light);
             }
         }
@@ -287,9 +304,9 @@ namespace RootTools.Light
         public LightBase GetLight(int nCh, string sNewID)
         {
             if (nCh < 0) return null;
-            if (nCh >= m_lLight) return null;
+            if (nCh >= c_lLight) return null;
             if (p_aLight[nCh].p_sID != p_aLight[nCh].p_id) return null;
-            p_aLight[nCh].p_sID = sNewID;
+            p_aLight[nCh].p_sID = sNewID; 
             if (OnChangeTool != null) OnChangeTool();
             return p_aLight[nCh];
         }
@@ -320,13 +337,13 @@ namespace RootTools.Light
         public void RunTreeSetup(Tree.eMode eMode)
         {
             m_treeRootSetup.p_eMode = eMode;
-            RunTreeSerial(m_treeRootSetup.GetTree("Serial")); 
+            RunTreeSerial(m_treeRootSetup.GetTree("Serial"));
         }
         #endregion
 
         IEngineer m_engineer;
         Log m_log;
-        public LightTool_DAWOO(string id, IEngineer engineer)
+        public LightTool_DAWOO_RGB(string id, IEngineer engineer)
         {
             p_aLight = new List<LightBase>();
             p_id = id;
@@ -334,10 +351,10 @@ namespace RootTools.Light
             m_log = LogView.GetLog(id);
 
             InitRS232();
-            InitTreeSetup(); 
+            InitTreeSetup();
             InitLight();
 
-            InitThread(); 
+            InitThread();
         }
 
         public void ThreadStop()

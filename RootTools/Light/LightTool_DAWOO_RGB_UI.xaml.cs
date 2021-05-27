@@ -3,17 +3,17 @@
 namespace RootTools.Light
 {
     /// <summary>
-    /// LightTool_DAWOO_UI.xaml에 대한 상호 작용 논리
+    /// LightTool_DAWOO_RGB_UI.xaml에 대한 상호 작용 논리
     /// </summary>
-    public partial class LightTool_DAWOO_UI : UserControl
+    public partial class LightTool_DAWOO_RGB_UI : UserControl
     {
-        public LightTool_DAWOO_UI()
+        public LightTool_DAWOO_RGB_UI()
         {
             InitializeComponent();
         }
 
-        LightTool_DAWOO m_lightTool;
-        public void Init(LightTool_DAWOO lightTool)
+        LightTool_DAWOO_RGB m_lightTool;
+        public void Init(LightTool_DAWOO_RGB lightTool)
         {
             m_lightTool = lightTool;
             this.DataContext = lightTool;
