@@ -130,6 +130,37 @@ namespace Root_WIND2.UI_User
                 SetProperty<bool>(ref this.isRularChecked, value);
             }
         }
+
+        private bool isDefectChecked = true;
+        public bool IsDefectChecked
+        {
+            get => this.isDefectChecked;
+            set
+            {
+                if (value)
+                {
+                    foreach (TRect rt in rectList)
+                    {
+                        if (p_DrawElement.Contains(rt.UIElement) == false)
+                        {
+                            p_DrawElement.Add(rt.UIElement);
+                        }
+                    }
+                }
+                else
+                {
+                    foreach (TRect rt in rectList)
+                    {
+                        if (p_DrawElement.Contains(rt.UIElement) == true)
+                        {
+                            p_DrawElement.Remove(rt.UIElement);
+                        }
+                    }
+                }
+
+                SetProperty(ref this.isDefectChecked, value);
+            }
+        }
         #endregion
 
         #region [Command]
@@ -346,7 +377,9 @@ namespace Root_WIND2.UI_User
             tRect.MemoryRect.Bottom = rect.Bottom;
 
             rectList.Add(tRect);
-            p_DrawElement.Add(rt);
+
+            if(IsDefectChecked == true)
+                p_DrawElement.Add(rt);
         }
 
         public void AddDrawRectList(List<CRect> rectList, SolidColorBrush color = null, string tag = "")
@@ -388,7 +421,8 @@ namespace Root_WIND2.UI_User
 
             rectList.Add(tRect);
 
-            p_DrawElement.Add(rt);
+            if(IsDefectChecked == true)
+                p_DrawElement.Add(rt);
         }
 
 
@@ -412,7 +446,8 @@ namespace Root_WIND2.UI_User
             Canvas.SetLeft(grid, canvasLeftTop.X);
             Canvas.SetTop(grid, canvasLeftTop.Y);
 
-            p_DrawElement.Add(grid);
+            if(IsDefectChecked == true)
+                p_DrawElement.Add(grid);
         }
 
         public void AddDrawText(CPoint leftTop, CPoint rightBottom, string text, SolidColorBrush color = null)
@@ -433,24 +468,28 @@ namespace Root_WIND2.UI_User
             Canvas.SetLeft(grid, canvasLeftTop.X);
             Canvas.SetTop(grid, canvasLeftTop.Y);
 
-            p_DrawElement.Add(grid);
+            if (IsDefectChecked == true)
+                p_DrawElement.Add(grid);
         }
 
         private void RedrawShapes()
         {
-            foreach(TRect rt in rectList)
+            if(this.IsDefectChecked)
             {
-                if(p_DrawElement.Contains(rt.UIElement) == true)
+                foreach (TRect rt in rectList)
                 {
-                    Rectangle rectangle = rt.UIElement as Rectangle;
-                    CPoint canvasLeftTop = GetCanvasPoint(new CPoint(rt.MemoryRect.Left, rt.MemoryRect.Top));
-                    CPoint canvasRightBottom = GetCanvasPoint(new CPoint(rt.MemoryRect.Right, rt.MemoryRect.Bottom));
+                    if (p_DrawElement.Contains(rt.UIElement) == true)
+                    {
+                        Rectangle rectangle = rt.UIElement as Rectangle;
+                        CPoint canvasLeftTop = GetCanvasPoint(new CPoint(rt.MemoryRect.Left, rt.MemoryRect.Top));
+                        CPoint canvasRightBottom = GetCanvasPoint(new CPoint(rt.MemoryRect.Right, rt.MemoryRect.Bottom));
 
-                    rectangle.Width = canvasRightBottom.X - canvasLeftTop.X;
-                    rectangle.Height = canvasRightBottom.Y - canvasLeftTop.Y;
+                        rectangle.Width = canvasRightBottom.X - canvasLeftTop.X;
+                        rectangle.Height = canvasRightBottom.Y - canvasLeftTop.Y;
 
-                    Canvas.SetLeft(rectangle, canvasLeftTop.X);
-                    Canvas.SetTop(rectangle, canvasLeftTop.Y);
+                        Canvas.SetLeft(rectangle, canvasLeftTop.X);
+                        Canvas.SetTop(rectangle, canvasLeftTop.Y);
+                    }
                 }
             }
 

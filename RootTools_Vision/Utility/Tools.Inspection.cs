@@ -318,6 +318,8 @@ namespace RootTools_Vision
             }
         }
 
+
+        public static object lockTiffObj = new object();
         public static void SaveTiffImage(string Path, string fileName, List<Defect> defectList, SharedBufferInfo sharedBuffer, Size imageSize = default(Size))
         {
             Path += "\\";
@@ -386,24 +388,24 @@ namespace RootTools_Vision
                         img = img_src;
 
                         ep.Param[1] = new EncoderParameter(System.Drawing.Imaging.Encoder.SaveFlag, Convert.ToInt32(EncoderValue.MultiFrame));
-                        img.Save(Path, info, ep);
+                        lock (lockTiffObj) img.Save(Path, info, ep);
 
                         firstPage = false;
                         continue;
                     }
 
                     ep.Param[1] = new EncoderParameter(System.Drawing.Imaging.Encoder.SaveFlag, Convert.ToInt32(EncoderValue.FrameDimensionPage));
-                    img.SaveAdd(img_src, ep);
+                    lock (lockTiffObj) img.SaveAdd(img_src, ep);
                 }
             }
             if (inputImage.Count == 0)
             {
-                File.Create(Path);
+                lock (lockTiffObj) File.Create(Path);
                 return;
             }
 
             ep.Param[1] = new EncoderParameter(System.Drawing.Imaging.Encoder.SaveFlag, Convert.ToInt32(EncoderValue.Flush));
-            img.SaveAdd(ep);
+            lock (lockTiffObj) img.SaveAdd(ep);
         }
 
 
@@ -457,42 +459,44 @@ namespace RootTools_Vision
             bool firstPage = true;
 
             System.Drawing.Image img = null;
-
-            for (int i = 0; i < inputImage.Count; i++)
+            lock (lockTiffObj)
             {
-                System.Drawing.Image img_src = System.Drawing.Image.FromStream((Stream)inputImage[i]);
-                Guid guid = img_src.FrameDimensionsList[0];
-                System.Drawing.Imaging.FrameDimension dimension = new System.Drawing.Imaging.FrameDimension(guid);
-
-                for (int nLoopFrame = 0; nLoopFrame < img_src.GetFrameCount(dimension); nLoopFrame++)
+                for (int i = 0; i < inputImage.Count; i++)
                 {
-                    img_src.SelectActiveFrame(dimension, nLoopFrame);
+                    System.Drawing.Image img_src = System.Drawing.Image.FromStream((Stream)inputImage[i]);
+                    Guid guid = img_src.FrameDimensionsList[0];
+                    System.Drawing.Imaging.FrameDimension dimension = new System.Drawing.Imaging.FrameDimension(guid);
 
-                    ep.Param[0] = new EncoderParameter(System.Drawing.Imaging.Encoder.Compression, Convert.ToInt32(EncoderValue.CompressionLZW));
-
-                    if (firstPage)
+                    for (int nLoopFrame = 0; nLoopFrame < img_src.GetFrameCount(dimension); nLoopFrame++)
                     {
-                        img = img_src;
+                        img_src.SelectActiveFrame(dimension, nLoopFrame);
 
-                        ep.Param[1] = new EncoderParameter(System.Drawing.Imaging.Encoder.SaveFlag, Convert.ToInt32(EncoderValue.MultiFrame));
-                        img.Save(Path, info, ep);
+                        ep.Param[0] = new EncoderParameter(System.Drawing.Imaging.Encoder.Compression, Convert.ToInt32(EncoderValue.CompressionLZW));
 
-                        firstPage = false;
-                        continue;
+                        if (firstPage)
+                        {
+                            img = img_src;
+
+                            ep.Param[1] = new EncoderParameter(System.Drawing.Imaging.Encoder.SaveFlag, Convert.ToInt32(EncoderValue.MultiFrame));
+                            img.Save(Path, info, ep);
+
+                            firstPage = false;
+                            continue;
+                        }
+
+                        ep.Param[1] = new EncoderParameter(System.Drawing.Imaging.Encoder.SaveFlag, Convert.ToInt32(EncoderValue.FrameDimensionPage));
+                        lock (lockTiffObj) img.SaveAdd(img_src, ep);
                     }
-
-                    ep.Param[1] = new EncoderParameter(System.Drawing.Imaging.Encoder.SaveFlag, Convert.ToInt32(EncoderValue.FrameDimensionPage));
-                    img.SaveAdd(img_src, ep);
                 }
-            }
-            if (inputImage.Count == 0)
-            {
-                File.Create(Path);
-                return;
-            }
+                if (inputImage.Count == 0)
+                {
+                    File.Create(Path);
+                    return;
+                }
 
-            ep.Param[1] = new EncoderParameter(System.Drawing.Imaging.Encoder.SaveFlag, Convert.ToInt32(EncoderValue.Flush));
-            img.SaveAdd(ep);
+                ep.Param[1] = new EncoderParameter(System.Drawing.Imaging.Encoder.SaveFlag, Convert.ToInt32(EncoderValue.Flush));
+                img.SaveAdd(ep);
+            }
         }
 
 
@@ -589,42 +593,45 @@ namespace RootTools_Vision
             bool firstPage = true;
 
             System.Drawing.Image img = null;
-
-            for (int i = 0; i < inputImage.Count; i++)
+            lock (lockTiffObj)
             {
-                System.Drawing.Image img_src = System.Drawing.Image.FromStream((Stream)inputImage[i]);
-                Guid guid = img_src.FrameDimensionsList[0];
-                System.Drawing.Imaging.FrameDimension dimension = new System.Drawing.Imaging.FrameDimension(guid);
-
-                for (int nLoopFrame = 0; nLoopFrame < img_src.GetFrameCount(dimension); nLoopFrame++)
+                for (int i = 0; i < inputImage.Count; i++)
                 {
-                    img_src.SelectActiveFrame(dimension, nLoopFrame);
+                    System.Drawing.Image img_src = System.Drawing.Image.FromStream((Stream)inputImage[i]);
+                    Guid guid = img_src.FrameDimensionsList[0];
+                    System.Drawing.Imaging.FrameDimension dimension = new System.Drawing.Imaging.FrameDimension(guid);
 
-                    ep.Param[0] = new EncoderParameter(System.Drawing.Imaging.Encoder.Compression, Convert.ToInt32(EncoderValue.CompressionLZW));
-
-                    if (firstPage)
+                    for (int nLoopFrame = 0; nLoopFrame < img_src.GetFrameCount(dimension); nLoopFrame++)
                     {
-                        img = img_src;
+                        img_src.SelectActiveFrame(dimension, nLoopFrame);
 
-                        ep.Param[1] = new EncoderParameter(System.Drawing.Imaging.Encoder.SaveFlag, Convert.ToInt32(EncoderValue.MultiFrame));
-                        img.Save(Path, info, ep);
+                        ep.Param[0] = new EncoderParameter(System.Drawing.Imaging.Encoder.Compression, Convert.ToInt32(EncoderValue.CompressionLZW));
 
-                        firstPage = false;
-                        continue;
+                        if (firstPage)
+                        {
+                            img = img_src;
+
+                            ep.Param[1] = new EncoderParameter(System.Drawing.Imaging.Encoder.SaveFlag, Convert.ToInt32(EncoderValue.MultiFrame));
+                            img.Save(Path, info, ep);
+
+                            firstPage = false;
+                            continue;
+                        }
+
+                        ep.Param[1] = new EncoderParameter(System.Drawing.Imaging.Encoder.SaveFlag, Convert.ToInt32(EncoderValue.FrameDimensionPage));
+                        img.SaveAdd(img_src, ep);
                     }
-
-                    ep.Param[1] = new EncoderParameter(System.Drawing.Imaging.Encoder.SaveFlag, Convert.ToInt32(EncoderValue.FrameDimensionPage));
-                    img.SaveAdd(img_src, ep);
                 }
-            }
-            if (inputImage.Count == 0)
-            {
-                File.Create(Path);
-                return;
-            }
+                if (inputImage.Count == 0)
+                {
+                    File.Create(Path);
+                    return;
+                }
 
-            ep.Param[1] = new EncoderParameter(System.Drawing.Imaging.Encoder.SaveFlag, Convert.ToInt32(EncoderValue.Flush));
-            img.SaveAdd(ep);
+                ep.Param[1] = new EncoderParameter(System.Drawing.Imaging.Encoder.SaveFlag, Convert.ToInt32(EncoderValue.Flush));
+                img.SaveAdd(ep);
+            }
+ 
         }
 
         public static void SaveTiffImageOnlyVRS(string Path, string fileName, List<Defect> defectList, ConcurrentQueue<byte[]> vrsImageQueue, Size vrsImageSize)
@@ -690,42 +697,44 @@ namespace RootTools_Vision
             bool firstPage = true;
 
             System.Drawing.Image img = null;
-
-            for (int i = 0; i < inputImage.Count; i++)
+            lock(lockTiffObj)
             {
-                System.Drawing.Image img_src = System.Drawing.Image.FromStream((Stream)inputImage[i]);
-                Guid guid = img_src.FrameDimensionsList[0];
-                System.Drawing.Imaging.FrameDimension dimension = new System.Drawing.Imaging.FrameDimension(guid);
-
-                for (int nLoopFrame = 0; nLoopFrame < img_src.GetFrameCount(dimension); nLoopFrame++)
+                for (int i = 0; i < inputImage.Count; i++)
                 {
-                    img_src.SelectActiveFrame(dimension, nLoopFrame);
+                    System.Drawing.Image img_src = System.Drawing.Image.FromStream((Stream)inputImage[i]);
+                    Guid guid = img_src.FrameDimensionsList[0];
+                    System.Drawing.Imaging.FrameDimension dimension = new System.Drawing.Imaging.FrameDimension(guid);
 
-                    ep.Param[0] = new EncoderParameter(System.Drawing.Imaging.Encoder.Compression, Convert.ToInt32(EncoderValue.CompressionLZW));
-
-                    if (firstPage)
+                    for (int nLoopFrame = 0; nLoopFrame < img_src.GetFrameCount(dimension); nLoopFrame++)
                     {
-                        img = img_src;
+                        img_src.SelectActiveFrame(dimension, nLoopFrame);
 
-                        ep.Param[1] = new EncoderParameter(System.Drawing.Imaging.Encoder.SaveFlag, Convert.ToInt32(EncoderValue.MultiFrame));
-                        img.Save(Path, info, ep);
+                        ep.Param[0] = new EncoderParameter(System.Drawing.Imaging.Encoder.Compression, Convert.ToInt32(EncoderValue.CompressionLZW));
 
-                        firstPage = false;
-                        continue;
+                        if (firstPage)
+                        {
+                            img = img_src;
+
+                            ep.Param[1] = new EncoderParameter(System.Drawing.Imaging.Encoder.SaveFlag, Convert.ToInt32(EncoderValue.MultiFrame));
+                            img.Save(Path, info, ep);
+
+                            firstPage = false;
+                            continue;
+                        }
+
+                        ep.Param[1] = new EncoderParameter(System.Drawing.Imaging.Encoder.SaveFlag, Convert.ToInt32(EncoderValue.FrameDimensionPage));
+                        img.SaveAdd(img_src, ep);
                     }
-
-                    ep.Param[1] = new EncoderParameter(System.Drawing.Imaging.Encoder.SaveFlag, Convert.ToInt32(EncoderValue.FrameDimensionPage));
-                    img.SaveAdd(img_src, ep);
                 }
-            }
-            if (inputImage.Count == 0)
-            {
-                File.Create(Path);
-                return;
-            }
+                if (inputImage.Count == 0)
+                {
+                    File.Create(Path);
+                    return;
+                }
 
-            ep.Param[1] = new EncoderParameter(System.Drawing.Imaging.Encoder.SaveFlag, Convert.ToInt32(EncoderValue.Flush));
-            img.SaveAdd(ep);
+                ep.Param[1] = new EncoderParameter(System.Drawing.Imaging.Encoder.SaveFlag, Convert.ToInt32(EncoderValue.Flush));
+                img.SaveAdd(ep);
+            }
         }
 
         public static void SaveTiffImage(string Path, List<Data> dataList, SharedBufferInfo sharedBuffer)

@@ -25,6 +25,11 @@ namespace RootTools_Vision
 
         protected override bool Preparation()
         {
+            if (this.parameterPBI == null || this.recipePBI == null)
+            {
+                this.parameterPBI = (PBIParameter)this.parameter;
+                this.recipePBI = this.recipe.GetItem<PBIRecipe>();
+            }
             return true;
         }
 

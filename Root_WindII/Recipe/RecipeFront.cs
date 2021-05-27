@@ -17,6 +17,7 @@ namespace Root_WindII
             RegisterRecipeItem<D2DRecipe>();
             RegisterRecipeItem<SurfaceRecipe>();
             RegisterRecipeItem<PBIRecipe>();
+            RegisterRecipeItem<VerticalWireRecipe>();
 
             // Frontside에서 Parameter는 동적으로 추가되므로 생성하지 않음
             // 사용 예시) RegisterParameterItem<D2DParameter>();

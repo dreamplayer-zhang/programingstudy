@@ -208,7 +208,24 @@ namespace Root_WIND2.UI_User
 
 			foreach (RootTools.Database.Defect defect in workplace.DefectList)
 			{
-				//String text = "";
+				String text = "";
+
+				int index = (defect.m_nDefectCode - 10000) / 100;
+				if (index >= 0 && index < 3)
+				{
+					rectListTop.Add(new CRect((int)defect.p_rtDefectBox.Left, (int)defect.p_rtDefectBox.Top, (int)defect.p_rtDefectBox.Right, (int)defect.p_rtDefectBox.Bottom));
+					textListTop.Add(text);
+				}
+				if (index >= 3 && index < 6)
+				{
+					rectListBtm.Add(new CRect((int)defect.p_rtDefectBox.Left, (int)defect.p_rtDefectBox.Top, (int)defect.p_rtDefectBox.Right, (int)defect.p_rtDefectBox.Bottom));
+					textListBtm.Add(text);
+				}
+				if (index >= 6 && index < 10)
+				{
+					rectListSide.Add(new CRect((int)defect.p_rtDefectBox.Left, (int)defect.p_rtDefectBox.Top, (int)defect.p_rtDefectBox.Right, (int)defect.p_rtDefectBox.Bottom));
+					textListSide.Add(text);
+				}
 
 				//if (defect.m_nChipIndexX == (int)EdgeSurface.EdgeMapPositionX.Top)
 				//{
@@ -232,9 +249,9 @@ namespace Root_WIND2.UI_User
 				DatabaseManager.Instance.SelectData();
 				dataViewerVM.pDataTable = DatabaseManager.Instance.pDefectTable;
 
-				//DrawRectDefect(ImageViewerTopVM, rectListTop, textListTop);
-				//DrawRectDefect(imageViewerSideVM, rectListSide, textListSide);
-				//DrawRectDefect(ImageViewerBtmVM, rectListBtm, textListBtm);
+				DrawRectDefect(ImageViewerTopVM, rectListTop, textListTop);
+				DrawRectDefect(imageViewerSideVM, rectListSide, textListSide);
+				DrawRectDefect(ImageViewerBtmVM, rectListBtm, textListBtm);
 
 				Progress = 100;
 				Percentage = "Done";

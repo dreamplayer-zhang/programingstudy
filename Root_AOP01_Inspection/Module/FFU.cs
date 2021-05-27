@@ -32,6 +32,7 @@ namespace Root_AOP01_Inspection.Module
 					get { return _nRPM; }
 					set
 					{
+						m_svidFFUValue.p_value = value;
 						if (_nRPM == value)
 						{
 							m_alidSetted_RPMLow.Run(m_mmLimit.X > _nRPM, "FFU RPM Lower than Low Limit.");
@@ -48,7 +49,7 @@ namespace Root_AOP01_Inspection.Module
 						//	m_alidSetted_PreLow.Run(m_mmLimit.X > _nRPM, "FFU Pressure Lower than Low Limit.");
 						//	m_alidSetted_PreHigh.Run(m_mmLimit.Y < _nRPM, "FFU Pressure Higher than High Limit.");
 						//}
-
+						
 						_nRPM = value;
 						OnPropertyChanged();
 					}
@@ -66,7 +67,7 @@ namespace Root_AOP01_Inspection.Module
 					}
 				}
 
-				#region ALID
+				#region GAF
 				ALID m_alidFan;
 				ALID m_alidRPMHigh;
 				ALID m_alidRPMLow;
@@ -78,7 +79,10 @@ namespace Root_AOP01_Inspection.Module
 				ALID m_alidSetted_RPMLow;
 				ALID m_alidSetted_PreHigh;
 				ALID m_alidSetted_PreLow;
-				public void InitALID(FFU FFU)
+
+				SVID m_svidFFUValue;
+
+				public void InitGAF(FFU FFU)
 				{
 					GAF GAF = FFU.m_gaf;
 					m_alidFan = GAF.GetALID(FFU, m_id + " : Fan Error", "Fan Run Error");
@@ -91,6 +95,8 @@ namespace Root_AOP01_Inspection.Module
 					m_alidSetted_RPMLow = GAF.GetALID(FFU, m_id + " : RPM Low", "RPM Lower than Limit");
 					m_alidSetted_PreHigh = GAF.GetALID(FFU, m_id + " : Pressure High", "Pressure Higher than Limit");
 					m_alidSetted_PreLow = GAF.GetALID(FFU, m_id + " : Pressure Low", "Pressure Lower than Limit");
+
+					m_svidFFUValue = GAF.GetSVID(FFU, m_id + "Value");
 				}
 				#endregion
 
@@ -246,7 +252,7 @@ namespace Root_AOP01_Inspection.Module
 				{
 					m_id = id;
 					p_sFan = id;
-					InitALID(FFU);
+					InitGAF(FFU);
 				}
 			}
 			public List<Fan> m_aFan = new List<Fan>();
@@ -312,7 +318,8 @@ namespace Root_AOP01_Inspection.Module
 
 					Thread.Sleep(10);
 					m_FFU.m_modbus.ReadHoldingRegister(m_idUnit, 0, m_aFanRPM);
-					for (int n = 0; n < m_lFan; n++) m_aFan[n].p_nRPM = m_aFan[n].p_bRun ? m_aFanRPM[n] : 0;
+					
+					for (int n = 0; n < m_lFan; n++) m_aFan[n].p_nRPM = m_aFan[n].p_bRun ? m_aFanRPM[n] : 0; 
 
 					Thread.Sleep(10);
 					m_FFU.m_modbus.ReadHoldingRegister(m_idUnit, 128, m_aFanPressure);

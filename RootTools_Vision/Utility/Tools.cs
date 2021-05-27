@@ -173,13 +173,13 @@ namespace RootTools_Vision
                         pG += (int)rect.Left;
                         pB += (int)rect.Left;
 
-                        for (int i = 0; i < rect.Height; i++)
+                        for (long i = 0; i < rect.Height; i++)
                         {
-                            for (int j = 0; j < rect.Width; j++)
+                            for (long j = 0; j < rect.Width; j++)
                             {
-                                pDst[i * (bmpData.Stride) + j * _byteCount + 0] = *(pB + j);
-                                pDst[i * (bmpData.Stride) + j * _byteCount + 1] = *(pG + j);
-                                pDst[i * (bmpData.Stride) + j * _byteCount + 2] = *(pR + j);
+                                pDst[(long)((long)i * (bmpData.Stride) + (long)j * _byteCount + 0)] = *(pB + j);
+                                pDst[(long)((long)i * (bmpData.Stride) + (long)j * _byteCount + 1)] = *(pG + j);
+                                pDst[(long)((long)i * (bmpData.Stride) + (long)j * _byteCount + 2)] = *(pR + j);
                             }
 
                             pR += info.Width;
@@ -755,6 +755,19 @@ namespace RootTools_Vision
             }
 
             return defects;
+        }
+
+        public static Defect DataRowToDefect(DataRow row)
+        {            
+            FieldInfo[] fields = typeof(Defect).GetFields();
+
+            Defect defect = new Defect();
+            foreach (FieldInfo info in fields)
+            {
+                info.SetValue(defect, Convert.ChangeType(row[info.Name], info.FieldType));
+            }
+
+            return defect;
         }
     }
 }

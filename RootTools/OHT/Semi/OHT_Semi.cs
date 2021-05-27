@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Windows.Controls;
+using RootTools.GAFs;
 
 namespace RootTools.OHT.Semi
 {
@@ -38,6 +39,20 @@ namespace RootTools.OHT.Semi
             m_aDIO.Add(m_doHoAvailable);
             m_aDIO.Add(m_doES);
             //m_aDIO.Add(m_diLightCurtain);
+        }
+        #endregion
+
+
+        #region GAF
+        public CEID m_ceidOHTStart;
+        public CEID m_ceidOHTEnd;
+
+     
+
+        void InitGAF()
+        {
+            m_ceidOHTStart = m_module.m_gaf.GetCEID(m_module, "OHT Start");
+            m_ceidOHTEnd = m_module.m_gaf.GetCEID(m_module, "OHT End");
         }
         #endregion
 
@@ -420,6 +435,8 @@ namespace RootTools.OHT.Semi
                                 bool bCS = IsCS(true);
                                 if (bCS && m_diValid.p_bOn)
                                 {
+                                    //OHT Start
+                                    m_ceidOHTStart.Send();
                                     p_doLU_Req.p_bOn = true;
                                     p_eState = eState.LU_Req_On;
                                 }
@@ -492,13 +509,22 @@ namespace RootTools.OHT.Semi
                                     switch (m_carrier.p_eTransfer)
                                     {
                                         case GemCarrierBase.eTransfer.ReadyToLoad:
-                                            m_carrier.p_eTransfer = GemCarrierBase.eTransfer.TransferBlocked;
+                                            m_carrier.p_eReqTransfer = GemCarrierBase.eTransfer.TransferBlocked;
                                             break;
-                                        case GemCarrierBase.eTransfer.ReadyToUnload:
-                                            m_carrier.p_eTransfer = GemCarrierBase.eTransfer.ReadyToLoad;
-                                            break;
+                                        //case GemCarrierBase.eTransfer.ReadyToUnload:
+                                        //    m_carrier.p_eReqTransfer = GemCarrierBase.eTransfer.TransferBlocked;
+                                        //    break;
                                     }
-                                    p_eState = eState.All_Off;
+                                    
+                                    //OHT End
+                                    m_ceidOHTEnd.Send();
+                                    if (m_carrier.p_eTransfer == GemCarrierBase.eTransfer.ReadyToUnload)
+                                    {
+                                        m_carrier.p_eReqTransfer = GemCarrierBase.eTransfer.TransferBlocked;
+                                        m_carrier.p_eReqTransfer = GemCarrierBase.eTransfer.ReadyToLoad;
+                                    }
+
+                                    p_eState = eState.All_Off;   
                                 }
                                 CheckDI(m_diTrReq, false);
                                 CheckDI(m_diBusy, false);
@@ -687,6 +713,9 @@ namespace RootTools.OHT.Semi
             InitTP();
             InitDIO();
             InitBase(module, carrier, toolDIO);
+
+            InitGAF();
+
             InitThread();
             CheckChangeDIO(); 
         }

@@ -69,21 +69,24 @@ namespace Root_EFEM.Module
 
 		public override void GetTools(bool bInit)
 		{
-			p_sInfo = m_toolBox.GetAxis(ref axisRotate, this, "Axis Rotate");
-			p_sInfo = m_toolBox.GetAxis(ref axisEdgeX, this, "Axis Edge X");
-			p_sInfo = m_toolBox.GetAxis(ref axisEbrX, this, "Axis EBR X");
-			p_sInfo = m_toolBox.GetAxis(ref axisEbrZ, this, "Axis EBR Z");
-			p_sInfo = m_toolBox.GetDIO(ref doVac, this, "Stage Vacuum");
-			p_sInfo = m_toolBox.GetDIO(ref doBlow, this, "Stage Blow");
-			p_sInfo = m_toolBox.GetDIO(ref diWaferExist, this, "Wafer Exist");
-			p_sInfo = m_toolBox.GetDIO(ref diWaferExistVac, this, "Wafer Exist -Vac");
+			if (p_eRemote != eRemote.Client)
+			{
+				p_sInfo = m_toolBox.GetAxis(ref axisRotate, this, "Axis Rotate");
+				p_sInfo = m_toolBox.GetAxis(ref axisEdgeX, this, "Axis Edge X");
+				p_sInfo = m_toolBox.GetAxis(ref axisEbrX, this, "Axis EBR X");
+				p_sInfo = m_toolBox.GetAxis(ref axisEbrZ, this, "Axis EBR Z");
+				p_sInfo = m_toolBox.GetDIO(ref doVac, this, "Stage Vacuum");
+				p_sInfo = m_toolBox.GetDIO(ref doBlow, this, "Stage Blow");
+				p_sInfo = m_toolBox.GetDIO(ref diWaferExist, this, "Wafer Exist");
+				p_sInfo = m_toolBox.GetDIO(ref diWaferExistVac, this, "Wafer Exist -Vac");
 
+				p_sInfo = m_toolBox.GetCamera(ref camEdgeTop, this, "Cam EdgeTop");
+				p_sInfo = m_toolBox.GetCamera(ref camEdgeSide, this, "Cam EdgeSide");
+				p_sInfo = m_toolBox.GetCamera(ref camEdgeBtm, this, "Cam EdgeBottom");
+				p_sInfo = m_toolBox.GetCamera(ref camEBR, this, "Cam EBR");
+				p_sInfo = m_toolBox.Get(ref lightSet, this);
+			}
 			p_sInfo = m_toolBox.Get(ref memoryPool, this, "Memory", 1);
-			p_sInfo = m_toolBox.GetCamera(ref camEdgeTop, this, "Cam EdgeTop");
-			p_sInfo = m_toolBox.GetCamera(ref camEdgeSide, this, "Cam EdgeSide");
-			p_sInfo = m_toolBox.GetCamera(ref camEdgeBtm, this, "Cam EdgeBottom");
-			p_sInfo = m_toolBox.GetCamera(ref camEBR, this, "Cam EBR");
-			p_sInfo = m_toolBox.Get(ref lightSet, this);
 			memoryGroup = memoryPool.GetGroup(p_id);
 			alid_WaferExist = m_gaf.GetALID(this, "Wafer Exist", "Wafer Exist");
 			m_remote.GetTools(bInit);
@@ -250,6 +253,10 @@ namespace Root_EFEM.Module
 
 		public string IsGetOK(int nID)
 		{
+			if (p_eRemote == eRemote.Client)
+			{
+				return "OK";
+			}
 			if (p_eState != eState.Ready)
 				return p_id + " eState not Ready";
 			//if (p_infoWafer == null)
@@ -259,6 +266,10 @@ namespace Root_EFEM.Module
 
 		public string IsPutOK(InfoWafer infoWafer, int nID)
 		{
+			if (p_eRemote == eRemote.Client)
+			{
+				return "OK";
+			}
 			if (p_eState != eState.Ready)
 				return p_id + " eState not Ready";
 			//if (p_infoWafer != null)
@@ -279,30 +290,40 @@ namespace Root_EFEM.Module
 		{
 			//            string info = MoveReadyPos();
 			//            if (info != "OK") return info;
-			axisRotate.StartHome();
-			if (axisRotate.WaitReady() != "OK")
+			if (p_eRemote == eRemote.Client)
+				return RemoteRun(eRemoteRun.BeforeGet, eRemote.Client, nID);
+			else
 			{
+				axisRotate.StartHome();
+				if (axisRotate.WaitReady() != "OK")
+				{
+					p_bStageVac = false;
+					p_eState = eState.Error;
+					return "OK";
+				}
 				p_bStageVac = false;
-				p_eState = eState.Error;
 				return "OK";
 			}
-			p_bStageVac = false;
-			return "OK";
 		}
 
 		public string BeforePut(int nID)
 		{
-			//            string info = MoveReadyPos();
-			//            if (info != "OK") return info;
-			axisRotate.StartHome();
-			if (axisRotate.WaitReady() != "OK")
+			if (p_eRemote == eRemote.Client)
+				return RemoteRun(eRemoteRun.BeforeGet, eRemote.Client, nID);
+			else
 			{
+				//            string info = MoveReadyPos();
+				//            if (info != "OK") return info;
+				axisRotate.StartHome();
+				if (axisRotate.WaitReady() != "OK")
+				{
+					p_bStageVac = false;
+					p_eState = eState.Error;
+					return "OK";
+				}
 				p_bStageVac = false;
-				p_eState = eState.Error;
 				return "OK";
 			}
-			p_bStageVac = false;
-			return "OK";
 		}
 
 		public string AfterGet(int nID)
@@ -312,9 +333,10 @@ namespace Root_EFEM.Module
 
 		public string AfterPut(int nID)
 		{
-			doVac.Write(true);
-			if (!diWaferExist.p_bIn || !diWaferExistVac.p_bIn)
-				alid_WaferExist.Run(true, "Wafer Check Error");
+			
+			//doVac.Write(true);
+			//if (!diWaferExist.p_bIn || !diWaferExistVac.p_bIn)
+			//	alid_WaferExist.Run(true, "Wafer Check Error");
 			return "OK";
 		}
 
@@ -385,46 +407,50 @@ namespace Root_EFEM.Module
 			if (EQ.p_bSimulate) return "OK";
 			//            p_bStageBlow = false;
 			//            p_bStageVac = true;
+			if (p_eRemote == eRemote.Client) return RemoteRun(eRemoteRun.StateHome, eRemote.Client, null);
+			else
+			{
 
-			OpenCamera();
+			//OpenCamera();
 			p_bStageVac = true;
 
-			axisEdgeX.StartHome();
-			axisEbrX.StartHome();
-			axisEbrZ.StartHome();
-			if (axisEdgeX.WaitReady() != "OK")
-			{
-				p_bStageVac = false;
-				p_eState = eState.Error;
-				return "OK";
-			}
-			if (axisEbrX.WaitReady() != "OK")
-			{
-				p_bStageVac = false;
-				p_eState = eState.Error;
-				return "OK";
-			}
-			if (axisEbrZ.WaitReady() != "OK")
-			{
-				p_bStageVac = false;
-				p_eState = eState.Error;
-				return "OK";
+				axisEdgeX.StartHome();
+				axisEbrX.StartHome();
+				axisEbrZ.StartHome();
+				if (axisEdgeX.WaitReady() != "OK")
+				{
+					p_bStageVac = false;
+					p_eState = eState.Error;
+					return "OK";
+				}
+				if (axisEbrX.WaitReady() != "OK")
+				{
+					p_bStageVac = false;
+					p_eState = eState.Error;
+					return "OK";
+				}
+				if (axisEbrZ.WaitReady() != "OK")
+				{
+					p_bStageVac = false;
+					p_eState = eState.Error;
+					return "OK";
+				}
+
+				Thread.Sleep(200);
+				axisRotate.StartHome();
+				if (axisRotate.WaitReady() == "OK")
+				{
+					p_eState = eState.Ready;
+					return "OK";
+				}
+
+				p_eState = (p_sInfo == "OK") ? eState.Ready : eState.Error;
+
+				if (diWaferExist.p_bIn == false)
+					p_bStageVac = false;
+				return p_sInfo;
 			}
 
-			Thread.Sleep(200);
-			axisRotate.StartHome();
-			if (axisRotate.WaitReady() == "OK")
-			{
-				p_eState = eState.Ready;
-				return "OK";
-			}
-
-			p_eState = (p_sInfo == "OK") ? eState.Ready : eState.Error;
-
-			if (diWaferExist.p_bIn == false)
-				p_bStageVac = false;
-
-			return p_sInfo;
 		}
 		#endregion
 

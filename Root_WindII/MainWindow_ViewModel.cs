@@ -49,6 +49,21 @@ namespace Root_WindII
                 SetProperty(ref m_CurrentPanel, value);
             }
         }
+
+
+        Warning_UI warnui;
+        private UserControl m_CurrentSubPanel;
+        public UserControl p_CurrentSubPanel
+        {
+            get
+            {
+                return m_CurrentSubPanel;
+            }
+            set
+            {
+                SetProperty(ref m_CurrentSubPanel, value);
+            }
+        }
         #endregion
 
         #region [MenuBar]
@@ -156,6 +171,7 @@ namespace Root_WindII
 
                     p_CurrentPanel = maintVM.Main;
                     p_CurrentPanel.DataContext = maintVM;
+
                     this.MaintVM.SetPage(this.MaintVM.EngineerUI);
                 }
                 else if (value == false && this.isCheckModeEngineer == true)
@@ -215,7 +231,11 @@ namespace Root_WindII
 
             this.SetupVM = new Setup_ViewModel();
 			this.MaintVM = new MaintenancePanel_ViewModel();
-		}
+
+            warnui = new Warning_UI();
+            p_CurrentSubPanel = warnui;
+            p_CurrentSubPanel.DataContext = GlobalObjects.Instance.Get<WindII_Warning>();
+        }
 
         private void ThreadStop()
         {
@@ -249,7 +269,6 @@ namespace Root_WindII
             DatabaseManager.Instance.ValidateDatabase();
 
             //logView.Init(LogView._logView);
-            //WarningUI.Init(GlobalObjects.Instance.Get<WIND2_Warning>());
             //InitTimer();
         }
 
@@ -287,7 +306,7 @@ namespace Root_WindII
                 // Engineer
                 WindII_Engineer engineer = GlobalObjects.Instance.Register<WindII_Engineer>();
                 //DialogService dialogService = GlobalObjects.Instance.Register<DialogService>(this);
-                //WIND2_Warning warning = GlobalObjects.Instance.Register<WIND2_Warning>();
+                WindII_Warning warning = GlobalObjects.Instance.Register<WindII_Warning>();
                 engineer.Init("WIND2F");
 
                 MemoryTool memoryTool = engineer.ClassMemoryTool();

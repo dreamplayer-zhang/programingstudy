@@ -83,28 +83,30 @@ namespace Root_WIND2.UI_User
                 this.visionModule.p_CamAlign.Grabed += this.ImageViewerVM.OnUpdateImage;
             }
 
-            EQ.p_bStop = false;
-            Vision vision = ((WIND2_Handler)GlobalObjects.Instance.Get<WIND2_Engineer>().ClassHandler()).p_Vision;
-            if (vision.p_eState != ModuleBase.eState.Ready)
-            {
-                MessageBox.Show("Vision Home이 완료 되지 않았습니다.");
-                return;
-            }
+            //EQ.p_bStop = false;
+            //Vision vision = ((WIND2_Handler)GlobalObjects.Instance.Get<WIND2_Engineer>().ClassHandler()).p_Vision;
+            //if (vision.p_eState != ModuleBase.eState.Ready)
+            //{
+            //    MessageBox.Show("Vision Home이 완료 되지 않았습니다.");
+            //    return;
+            //}
 
-            Run_GrabLineScan Grab = (Run_GrabLineScan)vision.CloneModuleRun("GrabLineScan");
-            var viewModel = new Dialog_Scan_ViewModel(vision, Grab);
-            Nullable<bool> result = GlobalObjects.Instance.Get<DialogService>().ShowDialog(viewModel);
-            if (result.HasValue)
-            {
-                if (result.Value)
-                {
-                    vision.StartRun(Grab);
-                }
-                else
-                {
 
-                }
-            }
+            // 이거머냐
+            //Run_GrabLineScan Grab = (Run_GrabLineScan)visionModule.CloneModuleRun("GrabLineScan");
+            //var viewModel = new Dialog_Scan_ViewModel(visionModule, Grab);
+            //Nullable<bool> result = GlobalObjects.Instance.Get<DialogService>().ShowDialog(viewModel);
+            //if (result.HasValue)
+            //{
+            //    if (result.Value)
+            //    {
+            //        visionModule.StartRun(Grab);
+            //    }
+            //    else
+            //    {
+
+            //    }
+            //}
         }
 
         #region [Properties]
@@ -185,7 +187,13 @@ namespace Root_WIND2.UI_User
                     {
                         VisionModule.p_CamAlign.FunctionConnect();
                     }
-                    VisionModule.p_CamAlign.GrabContinuousShot();
+                    else
+                    {
+                        if(VisionModule.p_CamAlign.p_CamInfo._IsGrabbing == false)
+                        {
+                            VisionModule.p_CamAlign.GrabContinuousShot();
+                        }
+                    }
 
                     RefreshFeatureItemList();
                 });
@@ -196,7 +204,7 @@ namespace Root_WIND2.UI_User
         {
             get => new RelayCommand(() =>
             {
-                VisionModule.p_CamAlign.StopGrab();
+                //VisionModule.p_CamAlign.StopGrab();
             });
         }
 
