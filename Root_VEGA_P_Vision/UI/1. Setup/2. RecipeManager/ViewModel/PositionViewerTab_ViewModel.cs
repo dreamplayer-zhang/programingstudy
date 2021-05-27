@@ -66,12 +66,6 @@ namespace Root_VEGA_P_Vision
             curTab = PositionFeature.COVERTOP;
         }
 
-        private void MEIPBaseBtm_FeatureBoxDone(object e)
-        {
-         
-            MessageBox.Show(e.ToString());
-        }
-
         public void UpdateOriginBox()
         {
             p_EIPCoverTop.RedrawOriginBox();
@@ -120,9 +114,9 @@ namespace Root_VEGA_P_Vision
         {
             get => new RelayCommand(() => Snap());
         }
-        public ICommand btnAlignTest
+        public ICommand btnInsp
         {
-            get => new RelayCommand(() => ManualAlign());
+            get => new RelayCommand(() => GetAlignAngle());
         }
 
         public class Result
@@ -137,52 +131,9 @@ namespace Root_VEGA_P_Vision
             }
         }
 
-        unsafe double ManualAlign()
+        void GetAlignAngle()
         {
-            EUVPositionRecipe positionRecipe = GlobalObjects.Instance.Get<RecipeVision>().GetItem<EUVPositionRecipe>();
-            ImageData mem = GlobalObjects.Instance.GetNamed<ImageData>("EIP_Cover.Main.Front");
-            byte* srcPtr = (byte*)mem.GetPtr().ToPointer();
-
-            List<Result> resli = new List<Result>();
-            int idx = 0;
-
-            int trigger = 50;
-            int firstedge=0, secondEdge=0;
-            CPoint Abspt = new CPoint(0,0);
-            int[] arr = new int[positionRecipe.EIPCoverTopFeature.ListAlignFeature.Count];
-            foreach (RecipeType_ImageData template in positionRecipe.EIPCoverTopFeature.ListAlignFeature)
-            {
-                idx++;
-                int posX = 0, posY = 0; //results
-                template.Save(@"C:\AlignFeature\"+idx+".bmp");
-                Abspt = new CPoint(template.PositionX, template.PositionY);
-                //double result = CLR_IP.Cpp_TemplateMatching(srcPtr, template.RawData, &posX, &posY,
-                //    mem.p_Size.X, mem.p_Size.Y, template.Width, template.Height, Abspt.X - trigger, Abspt.Y - trigger, Abspt.X + template.Width +trigger, Abspt.Y+template.Height+trigger, 5, 1, 0);
-
-                firstedge = CLR_IP.Cpp_FindEdge(template.RawData, template.Width, template.Height, Abspt.X - trigger, Abspt.Y - trigger, Abspt.X + template.Width + trigger, Abspt.Y + template.Height + trigger, 0, 50);
-
-                arr[idx] = firstedge;
-            }
-
-            return CalcAngle(new CPoint(arr[0], Abspt.Y), new CPoint(arr[1], Abspt.Y));
-        }
-        public CPoint ConvertRelToAbs(CPoint ptRel)
-        {
-            EUVOriginRecipe originRecipe = GlobalObjects.Instance.Get<RecipeVision>().GetItem<EUVOriginRecipe>();
-
-            return new CPoint(originRecipe.TDIOrigin.Origin.X + ptRel.X, originRecipe.TDIOrigin.Origin.Y - originRecipe.TDIOrigin.OriginSize.Y + ptRel.Y);
-        }
-        private double CalcAngle(CPoint firstPos, CPoint secondPos)
-        {
-            double radian = Math.Atan2(secondPos.Y - firstPos.Y, secondPos.X - firstPos.X);
-            double angle = radian * (180 / Math.PI);
-            double resAngle;
-            if (secondPos.Y - firstPos.Y < 0)
-                resAngle = angle + 180;
-            else
-                resAngle = angle - 180;
-
-            return resAngle;
+            Calc.GetAlignAngle(selectedViewer.p_ImageData, 50);
         }
 
         void Snap()

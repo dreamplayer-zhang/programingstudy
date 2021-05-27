@@ -92,15 +92,14 @@
         <Style TargetType="GroupBox" x:Key="GroupBoxStyle">
             <Style.Triggers>
                 <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Background" Value="AliceBlue"/>
+                    <Setter Property="BorderBrush" Value="#FF363C58"/>
                 </Trigger>
                 <Trigger Property="IsMouseOver" Value="False">
-                    <Setter Property="Background" Value="Gainsboro"/>
+                    <Setter Property="BorderBrush" Value="#FFEDECEA"/>
                 </Trigger>
             </Style.Triggers>
-            <Setter Property="BorderBrush" Value="Black"/>
+            <Setter Property="BorderThickness" Value="5"/>
             <Setter Property="Margin" Value="40,120"/>
-            <Setter Property="Background" Value="{StaticResource ControlBackGround}"/>
             <Setter Property="Cursor" Value="Hand"/>
         </Style>
         <Style TargetType="Button" x:Key="ListViewHeader">
@@ -137,10 +136,9 @@
         <SolidColorBrush x:Key="MainThema" Color="#FF363C58"/>
         <SolidColorBrush x:Key="TextBlack" Color="#FF222222"/>
         <SolidColorBrush x:Key="TextBodyColor" Color="#FF888888"/>
-        <!--<SolidColorBrush x:Key="BorderColor" Color="#FFCCCCCC"/>-->
+        <SolidColorBrush x:Key="BorderSplitColor" Color="#FFCCCCCC"/>
         <SolidColorBrush x:Key="MainBackGroundColor" Color="#FFEDECEA"/>
-        <SolidColorBrush x:Key="ButtonBackGroundColor" Color="#FFE7E5E5"/>
-        
+        <SolidColorBrush x:Key="ButtonBackGroundColor" Color="#FF8FDAD6"/>
 
         <!--#region [Color Definition] -->
         <SolidColorBrush x:Key="main_background" Color="#080820"/>
@@ -233,24 +231,30 @@
         <!--#endregion-->
 
         <Style x:Key="ImageBaseBtn" TargetType="Button">
-            <Setter Property="Padding" Value="8,1,8,1"/>
-            <Setter Property="Foreground" Value="DarkSlateGray"/>
+            <Setter Property="Width" Value="90"/>
+            <Setter Property="Padding" Value="15,1,15,1"/>
+            <Setter Property="Foreground" Value="White"/>
             <Setter Property="BorderBrush" Value="Transparent"/>
             <Setter Property="Margin" Value="2,0,2,0"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
-                        <Border CornerRadius="5" Background="Gainsboro" BorderBrush="#ccc" BorderThickness="0,1,1,0" >
-                            <ContentPresenter x:Name="contentPresenter" ContentTemplate="{TemplateBinding ContentTemplate}" Content="{TemplateBinding Content}" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" Margin="{TemplateBinding Padding}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                        <Border CornerRadius="5" Background="{StaticResource MainThema}" BorderBrush="#ccc" BorderThickness="0,1,1,0" >
+                            <ContentPresenter x:Name="contentPresenter" ContentTemplate="{TemplateBinding ContentTemplate}" Content="{TemplateBinding Content}" 
+                                              HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" Margin="{TemplateBinding Padding}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
                         </Border>
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
         </Style>
         <Style x:Key="ImageText" TargetType="TextBlock">
-            <Setter Property="Padding" Value="8,1,8,1"/>
-            <Setter Property="Foreground" Value="DarkSlateGray"/>
+            <Setter Property="Padding" Value="15,1,15,1"/>
+            <Setter Property="Foreground" Value="{StaticResource MainThema}"/>
             <Setter Property="VerticalAlignment" Value="Center"/>
+            
+            
         </Style>
         <Style x:Key="main_view_groupbox" TargetType="GroupBox">
             <Setter Property="BorderBrush" Value="Gray"/>
@@ -997,29 +1001,39 @@
         <Style TargetType="RadioButton" x:Key="SetupPannelRadioBtn">
             <Setter Property="Margin" Value="8,8,8,8"/>
             <Setter Property="FontSize" Value="15"/>
-            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Foreground" Value="{StaticResource MainThema}"/>
             <Setter Property="HorizontalAlignment" Value="Stretch"/>
             <Setter Property="HorizontalContentAlignment" Value="Center"/>
             <Setter Property="VerticalAlignment" Value="Center"/>
-            <Setter Property="Background" Value="Gainsboro"/>
+            <Setter Property="Background" Value="Transparent"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="{x:Type RadioButton}">
-                        <Border BorderThickness="1" 
+                        <Border CornerRadius="10" BorderThickness="1.5" 
                                 Width="{TemplateBinding Width}"
                                 Height="40"
                                 Background="{TemplateBinding Background}"
-                                BorderBrush="Gray">
+                                BorderBrush="{TemplateBinding BorderBrush}">
                             <ContentPresenter  VerticalAlignment="{TemplateBinding VerticalAlignment}"
                                                HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"/>
                         </Border>
 
                         <ControlTemplate.Triggers>
                             <Trigger  Property="IsChecked" Value="True">
-                                <Setter Property="Background" Value="MediumTurquoise"/>
+                                <Setter Property="Background" Value="{StaticResource MainBackGroundColor}"/>
+                                <Setter Property="Foreground" Value="{StaticResource MainThema}"/>
+                                <Setter Property="IsEnabled" Value="False"/>
+                                <Setter Property="BorderBrush" Value="{StaticResource MainThema}"/>
+                                
+                            </Trigger>
+                            <Trigger  Property="IsChecked" Value="False">
+                                <Setter Property="Background" Value="{StaticResource MainThema}"/>
+                                <Setter Property="Foreground" Value="{StaticResource MainBackGroundColor}"/>
+                                <Setter Property="BorderBrush" Value="{StaticResource MainThema}"/>
                             </Trigger>
                             <Trigger  Property="IsMouseOver" Value="True">
-                                <Setter Property="Background" Value="PaleTurquoise"/>
+                                <Setter Property="BorderBrush" Value="{StaticResource MainThema}"/>
+                                <Setter Property="Background" Value="#FF515782"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>

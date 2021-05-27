@@ -170,6 +170,8 @@ namespace Root_VEGA_P_Vision
         public ICommand btnAlignAdd
         {
             get => new RelayCommand(() => {
+                if (recipeOrigin.memRect == null)
+                    return;
                 ImageData data = recipeOrigin.boxImage;
                 CRect memRect = recipeOrigin.memRect;
                 int width = memRect.Width;
@@ -188,6 +190,8 @@ namespace Root_VEGA_P_Vision
         public ICommand btnPosAdd
         {
             get => new RelayCommand(() => {
+                if (recipeOrigin.memRect == null)
+                    return;
                 ImageData data = recipeOrigin.boxImage;
                 CRect memRect = recipeOrigin.memRect;
                 int width = memRect.Width;

@@ -4,9 +4,9 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
-             mc:Ignorable="d" Background="{StaticResource PanelBackGround}" 
+             mc:Ignorable="d" Background="{StaticResource MainBackGroundColor}" 
              d:DesignHeight="887" d:DesignWidth="1912">
-    <ScrollViewer>
+
         <StackPanel>
             <Grid Height="887">
                 <Grid.ColumnDefinitions>
@@ -19,27 +19,24 @@
 
                 <GroupBox x:Name="groupBox" Grid.Column="0" 
                           Style="{StaticResource GroupBoxStyle}">
-                    <i:Interaction.Triggers>
-                        <i:EventTrigger EventName="MouseLeftButtonDown">
-                            <i:InvokeCommandAction Command="{Binding ChangeUISetupCommand}"/>
-                        </i:EventTrigger>
-                    </i:Interaction.Triggers>
-                    <GroupBox.Header>
-                        <Grid>
-                            <TextBlock Text="Setup" 
-                                       FontSize="35"
-                                       FontWeight="Bold">
-                            </TextBlock>
-                        </Grid>
-                    </GroupBox.Header>
-                    <Grid>
+                <i:Interaction.Triggers>
+                    <i:EventTrigger EventName="MouseLeftButtonDown">
+                        <i:InvokeCommandAction Command="{Binding ChangeUISetupCommand}"/>
+                    </i:EventTrigger>
+                </i:Interaction.Triggers>
+                <Grid>
                         <Grid.RowDefinitions>
                             <RowDefinition/>
                             <RowDefinition/>
                         </Grid.RowDefinitions>
-                        <Grid>
-                            <Image Source="/Root_VEGA_P_Vision;component/Control/Icon/Resource/file_settings_127px.png" Margin="70"/>
-                        </Grid>
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="8*"/>
+                            <RowDefinition Height="2*"/>
+                        </Grid.RowDefinitions>
+                        <Image Source="/Root_VEGA_P_Vision;component/Control/Icon/Resource/file_settings_127px.png" Margin="40"/>
+                        <TextBlock Text="Setup" Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="35"/>
+                    </Grid>
                         <Grid Grid.Row="1">
                             <Grid.RowDefinitions>
                                 <RowDefinition/>
@@ -57,7 +54,7 @@
                                        Margin="10,0,0,0"
                                        FontSize="18"
                                        Style="{StaticResource BasicTb}"
-                                       FontWeight="Bold"/>
+                                        />
                             <TextBlock Text="PB200034.NN000001.rcp" Grid.Row="1"
                                        Style="{StaticResource BasicTb}"/>
                             <TextBlock Text="2020-07-20 09:38" Grid.Row="1" Grid.Column="1"
@@ -84,32 +81,32 @@
                 </GroupBox>
                 <Line Grid.Column="1"
                       Stretch="Fill"
-                      Stroke="{StaticResource Splitter}"
+                      Stroke="{StaticResource BorderBrush}"
                       StrokeThickness="1"
                       Margin="20"
                       HorizontalAlignment="Center"
                       Y2="1"/>
                 <GroupBox Grid.Column="2"
                           Style="{StaticResource GroupBoxStyle}">
-                    <i:Interaction.Triggers>
-                        <i:EventTrigger EventName="MouseLeftButtonDown">
-                            <i:InvokeCommandAction Command="{Binding ChangeUIReviewCommand}"/>
-                        </i:EventTrigger>
-                    </i:Interaction.Triggers>
-                    <GroupBox.Header>
-                        <Grid>
-                            <TextBlock Text="Review" FontSize="35"
-                                   FontWeight="Bold"/>
-                        </Grid>
-                    </GroupBox.Header>
-                    <Grid>
+                <i:Interaction.Triggers>
+                    <i:EventTrigger EventName="MouseLeftButtonDown">
+                        <i:InvokeCommandAction Command="{Binding ChangeUIReviewCommand}"/>
+                    </i:EventTrigger>
+                </i:Interaction.Triggers>
+                <Grid>
                         <Grid.RowDefinitions>
                             <RowDefinition/>
                             <RowDefinition/>
                         </Grid.RowDefinitions>
                         <Grid Grid.Row="0">
-                            <Image Source="/Root_VEGA_P_Vision;component/Control/Icon/Resource/system_task_127px.png" Margin="70"/>
-                        </Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="8*"/>
+                            <RowDefinition Height="2*"/>
+
+                        </Grid.RowDefinitions>
+                            <Image Grid.Row="0" Source="/Root_VEGA_P_Vision;component/Control/Icon/Resource/system_task_127px.png" Margin="40"/>
+                        <TextBlock Text="Review" Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="35"/>
+                    </Grid>
                         <Grid Grid.Row="1">
                             <Grid.RowDefinitions>
                                 <RowDefinition/>
@@ -127,7 +124,7 @@
                                        Margin="10,0,0,0"
                                        FontSize="18"
                                        Style="{StaticResource BasicTb}"
-                                       FontWeight="Bold"/>
+                                        />
                             <TextBlock Text="Result1" Grid.Row="1"
                                        Style="{StaticResource BasicTb}"/>
                             <TextBlock Text="2020-07-20 09:38" Grid.Row="1" Grid.Column="1"
@@ -153,25 +150,19 @@
                 </GroupBox>
                 <Line Grid.Column="3"
                       Stretch="Fill"
-                      Stroke="{StaticResource Splitter}"
+                      Stroke="{StaticResource BorderBrush}"
                       StrokeThickness="1"
                       Margin="20"
                       HorizontalAlignment="Center"
                       Y2="1"/>
                 <GroupBox Grid.Column="4"
                           Style="{StaticResource GroupBoxStyle}">
-                    <i:Interaction.Triggers>
-                        <i:EventTrigger EventName="MouseLeftButtonDown">
-                            <i:InvokeCommandAction Command="{Binding ChangeUISetupCommand}"/>
-                        </i:EventTrigger>
-                    </i:Interaction.Triggers>
-                    <GroupBox.Header>
-                        <Grid>
-                            <TextBlock Text="Operation" FontSize="35"
-                                   FontWeight="Bold"/>
-                        </Grid>
-                    </GroupBox.Header>
-                    <Grid>
+                <i:Interaction.Triggers>
+                    <i:EventTrigger EventName="MouseLeftButtonDown">
+                        <i:InvokeCommandAction Command="{Binding ChangeUISetupCommand}"/>
+                    </i:EventTrigger>
+                </i:Interaction.Triggers>
+                <Grid>
                         <Grid.RowDefinitions>
                             <RowDefinition/>
                             <RowDefinition/>
@@ -192,5 +183,4 @@
                 </GroupBox>
             </Grid>
         </StackPanel>
-    </ScrollViewer>
 </UserControl>

@@ -175,7 +175,7 @@ namespace Root_VEGA_P_Vision.Module
 
                 AlignGrabMode.m_camera.StopGrab();
 
-                m_module.m_stage.Rotate(GetAlignAngle());
+                //m_module.m_stage.Rotate(GetAlignAngle());
 
                 return "OK";
             }
@@ -183,52 +183,6 @@ namespace Root_VEGA_P_Vision.Module
             {
                 AlignGrabMode.SetLight(false);
             }
-        }
-
-        public class Result
-        {
-            public CPoint Pos;
-            public double Score;
-
-            public Result(CPoint Pos,double Score)
-            {
-                this.Pos = Pos;
-                this.Score = Score;
-            }
-        }
-        unsafe double GetAlignAngle()
-        {
-            EUVPositionRecipe positionRecipe = GlobalObjects.Instance.Get<RecipeVision>().GetItem<EUVPositionRecipe>();
-            MemoryData mem = mainOpt.GetMemoryData(InfoPod.ePod.EIP_Cover, Vision.MainOptic.eInsp.Main, Vision.eUpDown.Front);
-            byte* srcPtr = (byte*)mem.GetPtr().ToPointer();
-
-            List<Result> resli = new List<Result>();
-            foreach (RecipeType_ImageData template in positionRecipe.EIPCoverTopFeature.ListAlignFeature)
-            {
-                int posX = 0, posY = 0; //results
-                CPoint Abspt = ConvertRelToAbs(new CPoint(template.PositionX,template.PositionY));
-                double result = CLR_IP.Cpp_TemplateMatching(srcPtr, template.RawData, &posX, &posY,
-                    (int)mem.W, mem.p_sz.Y, template.Width, template.Height,Abspt.X,Abspt.Y- template.Height,Abspt.X+template.Width,Abspt.Y,5,1,0);
-
-                if(result>=nScore)
-                    if (resli[0].Score < result)
-                        resli.Insert(0, new Result(Abspt, result));
-            }
-
-            return CalcAngle(resli[1].Pos, resli[0].Pos);
-        }
-
-        private double CalcAngle(CPoint firstPos, CPoint secondPos)
-        {
-            double radian = Math.Atan2(firstPos.Y - secondPos.Y, firstPos.X-secondPos.Y);
-            double angle = radian * (180 / Math.PI);
-            double resAngle;
-            if (secondPos.Y - firstPos.Y < 0)
-                resAngle = angle + 180;
-            else
-                resAngle = angle - 180;
-
-            return resAngle;
         }
 
         public CPoint ConvertRelToAbs(CPoint ptRel)

@@ -221,6 +221,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Calc.cs" />
     <Compile Include="Control\Button\NaviBtn.xaml.cs">
       <DependentUpon>NaviBtn.xaml</DependentUpon>
     </Compile>
