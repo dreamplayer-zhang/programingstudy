@@ -24,7 +24,7 @@ namespace Root_Pine2_Vision.Module
         }
 
         #region ToolBox
-        CameraDalsa m_camera;
+        Camera_Dalsa m_camera;
         public LightSet m_lightSet;
         public override void GetTools(bool bInit)
         {
@@ -39,67 +39,26 @@ namespace Root_Pine2_Vision.Module
         }
         #endregion
 
-        #region GrabMode
-        public class GrabMode
+        #region Light
+        public string SetLight()
         {
-            #region Light
-            public LightSet m_lightSet;
-            List<double> m_aPower = new List<double>();
-            void SetPowerList()
-            {
-                while (m_aPower.Count < m_lightSet.m_aLight.Count) m_aPower.Add(0);
-                while (m_aPower.Count < m_lightSet.m_aLight.Count) m_aPower.RemoveAt(m_aPower.Count - 1); 
-            }
+            List<double> aPower = new List<double>();
+            return SetLight(aPower); 
+        }
 
-            public void SetLight(bool bOn)
+        public string SetLight(List<double> aPower)
+        {
+            if (p_eRemote == eRemote.Client) RemoteRun(eRemoteRun.SetLight, eRemote.Client, aPower);
+            else
             {
-                SetPowerList();
-                int n = 0; 
-                foreach (Light light in m_lightSet.m_aLight)
+                while (aPower.Count < m_lightSet.m_aLight.Count) aPower.Add(0);
+                for (int n = 0; n < aPower.Count; n++)
                 {
-                    if (light.m_light != null) light.m_light.p_fSetPower = bOn ? m_aPower[n] : 0;
-                    n++; 
+                    LightBase light = m_lightSet.m_aLight[n].m_light;
+                    if (light != null) light.p_fSetPower = aPower[n];
                 }
             }
-
-            void RunTreeLight(Tree tree)
-            {
-                if (m_lightSet == null) return;
-                SetPowerList(); 
-                for (int n = 0; n < m_aPower.Count; n++)
-                {
-                    m_aPower[n] = tree.Set(m_aPower[n], m_aPower[n], m_lightSet.m_aLight[n].m_sName, "Light Power (0 ~ 100 %%)");
-                }
-            }
-            #endregion
-
-            #region Memory
-            string m_sMemory = "";
-            public MemoryData m_memory;
-            void RunTreeMemory(Tree tree)
-            {
-                MemoryGroup memoryGroup = m_visionWorks.m_memoryGroup; 
-                m_sMemory = tree.Set(m_sMemory, m_sMemory, memoryGroup.m_asMemory, "Memory", "Memory Data Name");
-                m_memory = memoryGroup.GetMemory(m_sMemory); 
-            }
-            #endregion
-
-            public void RunTree(Tree tree)
-            {
-                RunTreeLight(tree.GetTree("Light"));
-                RunTreeMemory(tree.GetTree("Memory")); 
-            }
-
-            public string p_id { get; set; }
-            public string p_sName { get; set; }
-            public VisionWorks m_visionWorks; 
-            public GrabMode(string id, VisionWorks visionWorks)
-            {
-                p_id = id;
-                p_sName = id;
-                m_visionWorks = visionWorks;
-                m_lightSet = visionWorks.m_vision.m_lightSet; 
-            }
+            return "OK";
         }
         #endregion
 
@@ -115,8 +74,8 @@ namespace Root_Pine2_Vision.Module
             TCPAsyncClient m_tcpip; 
             public void GetTools(ToolBox toolBox, bool bInit)
             {
-                toolBox.Get(ref m_memoryPool, m_vision, p_id, 1); 
-                toolBox.GetComm(ref m_tcpip, m_vision, p_id);
+                toolBox.Get(ref m_memoryPool, m_vision, "Memory" + p_id, 1); 
+                toolBox.GetComm(ref m_tcpip, m_vision, "TCPIP" + p_id);
                 if (bInit)
                 {
                     InitMemory(); 
@@ -126,34 +85,33 @@ namespace Root_Pine2_Vision.Module
 
             #region Memory
             public MemoryGroup m_memoryGroup;
-            MemoryData m_memColor; 
+            MemoryData m_memoryExt;
+            MemoryData m_memoryColor;
+            MemoryData[] m_memoryRGB = new MemoryData[3] { null, null, null };
+            MemoryData[] m_memoryConv = new MemoryData[3] { null, null, null };
+            MemoryData[] m_memoryHSI = new MemoryData[3] { null, null, null };
+            MemoryData m_memoryGerbber;
             void InitMemory()
             {
                 m_memoryGroup = m_memoryPool.GetGroup("Pine2");
-                m_memColor = m_memoryGroup.CreateMemory("Color", 1, 3, new CPoint(1000, 1000)); 
+                m_memoryExt = m_memoryGroup.CreateMemory("EXT", 2, 3, new CPoint(50000, 90000));
+                m_memoryColor = m_memoryGroup.CreateMemory("Color", 1, 3, new CPoint(50000, 90000));
+                m_memoryRGB[0] = m_memoryGroup.CreateMemory("Red", 1, 1, new CPoint(50000, 90000));
+                m_memoryRGB[1] = m_memoryGroup.CreateMemory("Green", 1, 1, new CPoint(50000, 90000));
+                m_memoryRGB[2] = m_memoryGroup.CreateMemory("Blue", 1, 1, new CPoint(50000, 90000));
+                m_memoryConv[0] = m_memoryGroup.CreateMemory("Axial", 1, 1, new CPoint(50000, 90000));
+                m_memoryConv[1] = m_memoryGroup.CreateMemory("Pad", 1, 1, new CPoint(50000, 90000));
+                m_memoryConv[2] = m_memoryGroup.CreateMemory("Side", 1, 1, new CPoint(50000, 90000));
+                m_memoryHSI[0] = m_memoryGroup.CreateMemory("Hui", 1, 1, new CPoint(50000, 90000));
+                m_memoryHSI[1] = m_memoryGroup.CreateMemory("Saturation", 1, 1, new CPoint(50000, 90000));
+                m_memoryHSI[2] = m_memoryGroup.CreateMemory("Intensity", 1, 1, new CPoint(50000, 90000));
+                m_memoryGerbber = m_memoryGroup.CreateMemory("Gerbber", 1, 3, new CPoint(50000, 90000));
             }
             #endregion
 
             #region TCPIP
             private void M_tcpip_EventReciveData(byte[] aBuf, int nSize, Socket socket)
             {
-            }
-            #endregion
-
-            #region GrabMode
-            int m_lGrabMode = 0;
-            public List<GrabMode> m_aGrabMode = new List<GrabMode>();
-            void InitGrabModeList()
-            {
-                while (m_aGrabMode.Count > m_lGrabMode) m_aGrabMode.RemoveAt(m_aGrabMode.Count - 1);
-                while (m_aGrabMode.Count < m_lGrabMode) m_aGrabMode.Add(new GrabMode(m_aGrabMode.Count.ToString("00"), this));
-            }
-
-            void RunTreeGrabMode(Tree tree)
-            {
-                m_lGrabMode = tree.Set(m_lGrabMode, m_lGrabMode, "Count", "Grab Mode Count");
-                InitGrabModeList();
-                foreach (GrabMode grabMode in m_aGrabMode) grabMode.RunTree(tree.GetTree(grabMode.p_id)); 
             }
             #endregion
 
@@ -211,7 +169,6 @@ namespace Root_Pine2_Vision.Module
                     m_idProcess = tree.Set(m_idProcess, m_idProcess, "ID", "VisionWorks Process ID");
                     m_sFileVisionWorks = tree.SetFile(m_sFileVisionWorks, m_sFileVisionWorks, ".exe", "File", "VisionWorks File Name");
                     m_bStartProcess = tree.Set(m_bStartProcess, m_bStartProcess, "Start", "Start Memory Process");
-                    RunTreeGrabMode(tree.GetTree("GrabMode", false));
                 }
             }
 
@@ -308,6 +265,7 @@ namespace Root_Pine2_Vision.Module
         {
             StateHome,
             Reset,
+            SetLight,
         }
 
         Run_Remote GetRemoteRun(eRemoteRun eRemoteRun, eRemote eRemote, dynamic value)
@@ -319,6 +277,7 @@ namespace Root_Pine2_Vision.Module
             {
                 case eRemoteRun.StateHome: break;
                 case eRemoteRun.Reset: break;
+                case eRemoteRun.SetLight: run.m_aPower = value; break; 
             }
             return run;
         }
@@ -345,10 +304,12 @@ namespace Root_Pine2_Vision.Module
             }
 
             public eRemoteRun m_eRemoteRun = eRemoteRun.StateHome;
+            public List<double> m_aPower = new List<double>(); 
             public override ModuleRunBase Clone()
             {
                 Run_Remote run = new Run_Remote(m_module);
                 run.m_eRemoteRun = m_eRemoteRun;
+                foreach (double fPower in m_aPower) run.m_aPower.Add(fPower); 
                 return run;
             }
 
@@ -358,6 +319,7 @@ namespace Root_Pine2_Vision.Module
                 m_eRemote = (eRemote)tree.Set(m_eRemote, m_eRemote, "Remote", "Remote", false);
                 switch (m_eRemoteRun)
                 {
+                    case eRemoteRun.SetLight: break;
                     default: break; 
                 }
             }
@@ -368,6 +330,7 @@ namespace Root_Pine2_Vision.Module
                 {
                     case eRemoteRun.StateHome: return m_module.StateHome();
                     case eRemoteRun.Reset: m_module.Reset(); break;
+                    case eRemoteRun.SetLight: m_module.SetLight(m_aPower); break;
                 }
                 return "OK";
             }
