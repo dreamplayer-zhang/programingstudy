@@ -7,6 +7,7 @@ using RootTools.Module;
 using RootTools.Trees;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -26,6 +27,8 @@ namespace Root_VEGA_D.Module
         string m_sTransmittedLight = "";
         int m_nCoaxialLightPower = 0;
         int m_nTransmittedLightPower = 0;
+        double m_dCoaxialZPos = 0;
+        double m_dTransmittedZPos = 0;
         int m_nUSL = 0;
         int m_nLSL = 0;
         string m_sMemoryGroup = "";
@@ -57,6 +60,8 @@ namespace Root_VEGA_D.Module
             run.m_nCoaxialLightPower = m_nCoaxialLightPower;
             run.m_sTransmittedLight = m_sTransmittedLight;
             run.m_nTransmittedLightPower = m_nTransmittedLightPower;
+            run.m_dCoaxialZPos = m_dCoaxialZPos;
+            run.m_dTransmittedZPos = m_dTransmittedZPos;
             run.m_nUSL = m_nUSL;
             run.m_nLSL = m_nLSL;
             run.m_sMemoryGroup = m_sMemoryGroup;
@@ -73,8 +78,10 @@ namespace Root_VEGA_D.Module
             m_nCheckArea = tree.Set(m_nCheckArea, m_nCheckArea, "Check Area", "Check area length of width or height (px)", bVisible);
             m_sCoaxialLight = tree.Set(m_sCoaxialLight, m_sCoaxialLight, m_module.p_asLightSet, "Coaxial Light", "Coaxial Light for PM", bVisible);
             m_nCoaxialLightPower = tree.Set(m_nCoaxialLightPower, m_nCoaxialLightPower, "Coaxial Light Power", "Coaxial Light Power", bVisible);
+            m_dCoaxialZPos = tree.Set(m_dCoaxialZPos, m_dCoaxialZPos, "Coaxial Z Pos", "Coaxial Z Pos", bVisible);
             m_sTransmittedLight = tree.Set(m_sTransmittedLight, m_sTransmittedLight, m_module.p_asLightSet, "Transmitted Light", "Transmitted Light for PM", bVisible);
             m_nTransmittedLightPower = tree.Set(m_nTransmittedLightPower, m_nTransmittedLightPower, "Transmitted Light Power", "Transmitted Light Power", bVisible);
+            m_dTransmittedZPos = tree.Set(m_dTransmittedZPos, m_dTransmittedZPos, "Transmitted Z Pos", "Transmitted Z Pos", bVisible);
             m_nUSL = tree.Set(m_nUSL, m_nUSL, "USL", "Upper Specification Limit", bVisible);
             m_nLSL = tree.Set(m_nLSL, m_nLSL, "LSL", "Lower Specification Limit", bVisible);
             m_sMemoryGroup = tree.Set(m_sMemoryGroup, m_sMemoryGroup, m_module.MemoryPool.m_asGroup, "MemoryGroup", "Memory Group Name", bVisible);
@@ -88,12 +95,14 @@ namespace Root_VEGA_D.Module
             public int m_power = 0;
             public CRect m_rectCheckArea = null;
             public int m_average = 0;
+            public double m_posZ = 0;
 
-            public PMData(Light light, int power, CRect rectArea)
+            public PMData(Light light, int power, CRect rectArea, double posZ)
             {
                 m_light = light;
                 m_power = power;
                 m_rectCheckArea = rectArea;
+                m_posZ = posZ;
             }
         }
 
@@ -128,6 +137,37 @@ namespace Root_VEGA_D.Module
             }
 
             return "OK";
+        }
+
+        enum ePMLogType
+        {
+            PM_Start,
+            PM_Error,
+            PM_End,
+            PM_CoaxialLight_Result,
+            PM_Transmitted_Result,
+        }
+        StreamWriter m_writerLog = null;
+        DateTime m_dtNow;
+        void PreparePMLog()
+        {
+            m_dtNow = DateTime.Now;
+            string sPath = LogView._logView.p_sPath;
+
+            Directory.CreateDirectory(sPath + "\\PM");
+
+            StreamWriter writer = new StreamWriter(sPath + "\\PM" + "\\" + m_dtNow.ToShortDateString() + ".txt", true, Encoding.Default);
+            if(writer != null)
+            {
+                m_writerLog = writer;
+            }
+        }
+        void WritePMLog(ePMLogType type, string strLog)
+        {
+            string log = m_dtNow.Hour.ToString("00") + '.' + m_dtNow.Minute.ToString("00") + '.' + m_dtNow.Second.ToString("00") + '.' + m_dtNow.Millisecond.ToString("000");
+            log += "\t" + type.ToString() + "\t" + strLog;
+            if(m_writerLog != null)
+                m_writerLog.WriteLine(log);
         }
 
         public override string Run()
@@ -176,8 +216,13 @@ namespace Root_VEGA_D.Module
             CRect rectTransmitted = new CRect((int)(m_grabMode.m_GD.m_nFovSize * 0.5), nTransmittedCheckPosY_px, m_nCheckArea);
 
             List<PMData> listPMData = new List<PMData>();
-            listPMData.Add(new PMData(lightCoaxial, m_nCoaxialLightPower, rectCoaxial));
-            listPMData.Add(new PMData(lightTransmitted, m_nTransmittedLightPower, rectTransmitted));
+            listPMData.Add(new PMData(lightCoaxial, m_nCoaxialLightPower, rectCoaxial, m_dCoaxialZPos));
+            listPMData.Add(new PMData(lightTransmitted, m_nTransmittedLightPower, rectTransmitted, m_dTransmittedZPos));
+
+            // Prepare Log
+            PreparePMLog();
+
+            WritePMLog(ePMLogType.PM_Start, "");
 
             // Collect GV Value
             try
@@ -188,7 +233,12 @@ namespace Root_VEGA_D.Module
 
                 foreach (PMData pmData in listPMData)
                 {
-                    if (pmData.m_light == null) return "Check Light Setting";
+                    if (pmData.m_light == null)
+                    {
+                        string sMsg = "Check Light Setting";
+                        WritePMLog(ePMLogType.PM_Error, sMsg);
+                        return sMsg;
+                    }
 
                     // Turn off lights
                     m_grabMode.SetLight(false);
@@ -198,7 +248,7 @@ namespace Root_VEGA_D.Module
 
                     // 포커스 높이로 Z축 이동
                     Axis axisZ = m_module.AxisZ;
-                    if (m_module.Run(axisZ.StartMove(m_grabMode.m_dFocusPosZ)))
+                    if (m_module.Run(axisZ.StartMove(pmData.m_posZ)))
                         return p_sInfo;
 
                     // 이동 대기
@@ -235,12 +285,28 @@ namespace Root_VEGA_D.Module
                     int nAverageGV = (int)(sumGV / (m_nCheckArea * m_nCheckArea));
                     pmData.m_average = nAverageGV;
                 }
+
+
+                // PM check result
+                bool bCoaxialResult = listPMData[0].m_average <= m_nUSL && listPMData[0].m_average >= m_nLSL;
+                bool bTransmittedResult = listPMData[1].m_average <= m_nUSL && listPMData[1].m_average >= m_nLSL;
+
+                m_log.Info(string.Format("Coaxial Light PM result : {0} (Average = {1})", bCoaxialResult ? "OK" : "Fail", listPMData[0].m_average));
+                m_log.Info(string.Format("Transmitted Light PM result : {0} (Average = {1})", bTransmittedResult ? "OK" : "Fail", listPMData[1].m_average));
+
+                WritePMLog(ePMLogType.PM_CoaxialLight_Result, bCoaxialResult.ToString() + "\t" + listPMData[0].m_average.ToString());
+                WritePMLog(ePMLogType.PM_Transmitted_Result, bTransmittedResult.ToString() + "\t" + listPMData[1].m_average.ToString());
             }
             catch (Exception e)
             {
             }
             finally
             {
+                // Log
+                WritePMLog(ePMLogType.PM_End, "");
+                m_writerLog.Close();
+
+                // Turn off light
                 m_grabMode.SetLight(false);
 
                 // RADS 기능 off
@@ -253,13 +319,6 @@ namespace Root_VEGA_D.Module
                     if (camRADS.p_CamInfo._IsGrabbing == true) camRADS.StopGrab();
                 }
             }
-
-            // PM check result
-            bool bCoaxialResult = listPMData[0].m_average <= m_nUSL && listPMData[0].m_average >= m_nLSL;
-            bool bTransmittedResult = listPMData[1].m_average <= m_nUSL && listPMData[1].m_average >= m_nLSL;
-            
-            m_log.Info(string.Format("Coaxial Light PM result : {0} (Average = {1})", bCoaxialResult ? "OK" : "Fail", listPMData[0].m_average));
-            m_log.Info(string.Format("Transmitted Light PM result : {0} (Average = {1})", bTransmittedResult ? "OK" : "Fail", listPMData[1].m_average));
 
             return "OK";
         }
