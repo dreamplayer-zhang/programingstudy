@@ -81,8 +81,8 @@ namespace Root_Pine2.Module
                 case eLoad.Top2D: eVision = Vision.eVision.Top2D; break;
             }
             Boats boats = m_handler.m_aBoats[eVision];
-            Boats.Boat boat = boats.m_aBoat[eWorks];
-            if (boat.p_eStep != Boats.Boat.eStep.Done) return "Boat not Done";
+            Boat boat = boats.m_aBoat[eWorks];
+            if (boat.p_eStep != Boat.eStep.Done) return "Boat not Done";
             if (m_picker.p_infoStrip != null) return "Picker has InfoStrip";
             try
             {
@@ -99,7 +99,7 @@ namespace Root_Pine2.Module
                 if (m_picker.IsVacuum() == false) return "Pick Strip Error";
                 m_picker.p_infoStrip = boat.p_infoStrip;
                 boat.p_infoStrip = null;
-                boat.p_eStep = Boats.Boat.eStep.RunReady; 
+                boat.p_eStep = Boat.eStep.RunReady; 
             }
             finally
             {
@@ -114,8 +114,8 @@ namespace Root_Pine2.Module
         public string RunUnload(Vision.eWorks eVisionWorks)
         {
             Boats boats = m_handler.m_aBoats[Vision.eVision.Top2D];
-            Boats.Boat boat = boats.m_aBoat[eVisionWorks];
-            if (boat.p_eStep != Boats.Boat.eStep.Ready) return "Boat not Ready";
+            Boat boat = boats.m_aBoat[eVisionWorks];
+            if (boat.p_eStep != Boat.eStep.Ready) return "Boat not Ready";
             try
             {
                 if (Run(RunMoveUp())) return p_sInfo;
@@ -175,12 +175,12 @@ namespace Root_Pine2.Module
                 Boats boats3D = m_handler.m_aBoats[Vision.eVision.Top3D]; 
                 foreach (Vision.eWorks eWorks in Enum.GetValues(typeof(Vision.eWorks)))
                 {
-                    Boats.Boat boat = m_handler.m_aBoats[Vision.eVision.Top2D].m_aBoat[eWorks];
+                    Boat boat = m_handler.m_aBoats[Vision.eVision.Top2D].m_aBoat[eWorks];
                     switch (boat.p_eStep)
                     {
-                        case Boats.Boat.eStep.Done: return StartLoad(Vision.eVision.Top2D, eWorks);
-                        case Boats.Boat.eStep.Ready:
-                            if (boats3D.m_aBoat[eWorks].p_eStep == Boats.Boat.eStep.Done) return StartLoad(Vision.eVision.Top3D, eWorks);
+                        case Boat.eStep.Done: return StartLoad(Vision.eVision.Top2D, eWorks);
+                        case Boat.eStep.Ready:
+                            if (boats3D.m_aBoat[eWorks].p_eStep == Boat.eStep.Done) return StartLoad(Vision.eVision.Top3D, eWorks);
                             break; 
                     }
                 }
@@ -192,8 +192,8 @@ namespace Root_Pine2.Module
         string StartUnloadBoat()
         {
             Boats boats = m_handler.m_aBoats[Vision.eVision.Top2D];
-            if (boats.m_aBoat[Vision.eWorks.A].p_eStep == Boats.Boat.eStep.Ready) return StartUnloadBoat(Vision.eWorks.A);
-            if (boats.m_aBoat[Vision.eWorks.B].p_eStep == Boats.Boat.eStep.Ready) return StartUnloadBoat(Vision.eWorks.B);
+            if (boats.m_aBoat[Vision.eWorks.A].p_eStep == Boat.eStep.Ready) return StartUnloadBoat(Vision.eWorks.A);
+            if (boats.m_aBoat[Vision.eWorks.B].p_eStep == Boat.eStep.Ready) return StartUnloadBoat(Vision.eWorks.B);
             return "OK";
         }
 
