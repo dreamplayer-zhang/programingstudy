@@ -69,9 +69,10 @@ namespace RootTools_Vision
 			List<Defect> btmDefectList = CollectDefectData(3, 5);
 			List<Defect> sideDefectList = CollectDefectData(6, 8);
 
-			List<Defect> topMergeDefectList = Tools.MergeDefect(topDefectList, this.recipe.GetItem<EdgeSurfaceParameter>().EdgeParamBaseTop.MergeDist);
-			List<Defect> btmMergeDefectList = Tools.MergeDefect(btmDefectList, this.recipe.GetItem<EdgeSurfaceParameter>().EdgeParamBaseBtm.MergeDist);
-			List<Defect> sideMergeDefectList = Tools.MergeDefect(sideDefectList, this.recipe.GetItem<EdgeSurfaceParameter>().EdgeParamBaseSide.MergeDist);
+			// merge할 때 각도 (RelY) 값 바뀜
+			List<Defect> topMergeDefectList = topDefectList; //Tools.MergeDefect(topDefectList, this.recipe.GetItem<EdgeSurfaceParameter>().EdgeParamBaseTop.MergeDist);
+			List<Defect> btmMergeDefectList = btmDefectList; //Tools.MergeDefect(btmDefectList, this.recipe.GetItem<EdgeSurfaceParameter>().EdgeParamBaseBtm.MergeDist);
+			List<Defect> sideMergeDefectList = sideDefectList; //Tools.MergeDefect(sideDefectList, this.recipe.GetItem<EdgeSurfaceParameter>().EdgeParamBaseSide.MergeDist);
 
 			List<Defect> mergeDefectList = new List<Defect>();
 			foreach (Defect defect in topMergeDefectList)
@@ -91,7 +92,7 @@ namespace RootTools_Vision
 				this.currentWorkplace.DefectList.Add(defect);
 
 			if (mergeDefectList.Count > 0)
-				DatabaseManager.Instance.AddDefectDataList(mergeDefectList, TableName);
+				DatabaseManager.Instance.AddDefectDataListNoAutoCount(mergeDefectList, TableName);
 
 			int index = 0;
 			foreach (Defect defect in mergeDefectList)
@@ -129,11 +130,10 @@ namespace RootTools_Vision
 				klarfData.SetResultTimeStamp();
 				klarfData.SaveKlarf(settings_edgeside.KlarfSavePath, false);
 
-				Tools.SaveTiffImage(settings_edgeside.KlarfSavePath, topMergeDefectList, topSharedBufferInfo);
-				Tools.SaveTiffImage(settings_edgeside.KlarfSavePath, btmMergeDefectList, btmSharedBufferInfo);
-				Tools.SaveTiffImage(settings_edgeside.KlarfSavePath, sideMergeDefectList, sideSharedBufferInfo);
+				Tools.SaveTiffImage(settings_edgeside.KlarfSavePath, "edgetop"+ sInspectionID, topMergeDefectList, topSharedBufferInfo);
+				Tools.SaveTiffImage(settings_edgeside.KlarfSavePath, "edgeBttom" + sInspectionID, btmMergeDefectList, btmSharedBufferInfo);
+				Tools.SaveTiffImage(settings_edgeside.KlarfSavePath, "edgeSide" + sInspectionID, sideMergeDefectList, sideSharedBufferInfo);
 			}
-
 			#endregion
 
 			//WorkEventManager.OnInspectionDone(this.currentWorkplace, new InspectionDoneEventArgs(new List<CRect>(), true));

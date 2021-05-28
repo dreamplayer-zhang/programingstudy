@@ -142,6 +142,7 @@ namespace RootTools_Vision.Utility
 
 			return true;
 		}
+
 		public void SetResultTimeStamp()
 		{
 			timeResultStamp = DateTime.Now;
@@ -176,7 +177,7 @@ namespace RootTools_Vision.Utility
 		}
 
         // 기존 210302
-        public bool AddSlot(RecipeType_WaferMap _mapdata, List<Defect> _defectlist, OriginRecipe _origin)
+        public bool AddSlot(RecipeType_WaferMap _mapdata, List<Defect> _defectlist, OriginRecipe _origin, bool useTDIReview = false, bool useVrsReview = false)
         {
             UpdateSampleCenterLocation(_mapdata/*, pRecipe->GetProductSetting()*/);
 
@@ -204,11 +205,11 @@ namespace RootTools_Vision.Utility
             data.dieOriginY = this.dieOriginY;
             data.sampleCenterLocationX = this.sampleCenterLocationX;
             data.sampleCenterLocationY = this.sampleCenterLocationY;
-            data.resX = this.resX;
-            data.resY = this.resY;
+            data.resolutionX = this.resX;
+            data.resolutionX = this.resY;
 
             data.SetSampleTestPlan(_mapdata);
-            data.SetDefectInfor_SRLine(_mapdata, _defectlist, _origin);
+            data.SetDefectInfor_SRLine(_mapdata, _defectlist, _origin, useTDIReview, useVrsReview);
             //	data.m_nDefectDieCnt = pResultMap->GetBadDieNum();
 
             data.SetMEMMAP(_mapdata);
@@ -245,8 +246,8 @@ namespace RootTools_Vision.Utility
 			data.dieOriginY = this.dieOriginY;
 			data.sampleCenterLocationX = this.sampleCenterLocationX;
 			data.sampleCenterLocationY = this.sampleCenterLocationY;
-			data.resX = this.resX;
-			data.resY = this.resY;
+			data.resolutionX = this.resX;
+			data.resolutionY = this.resY;
 
 			data.SetSampleTestPlan(_mapdata);
 			data.SetDefectInfor_SRLine(_mapdata, _list, _origin);
@@ -319,8 +320,8 @@ namespace RootTools_Vision.Utility
 			data.dieOriginY = this.dieOriginY;
 			data.sampleCenterLocationX = this.sampleCenterLocationX;
 			data.sampleCenterLocationY = this.sampleCenterLocationY;
-			data.resX = this.resX;
-			data.resY = this.resY;
+			data.resolutionX = this.resX;
+			data.resolutionY = this.resY;
 
 			data.SetSampleTestPlan(_mapdata);
 		//	data.m_nDefectDieCnt = pResultMap->GetBadDieNum();
@@ -332,7 +333,25 @@ namespace RootTools_Vision.Utility
 
 			return true;
 		}
-		public bool SaveKlarf(string strFilePath, bool bCollector)
+
+		public string GetKlarfFileName(bool bCollector = false)
+        {
+			if (bCollector)
+			{
+				tempString = string.Format(lotID + "_{0:d}", slot);
+			}
+			else
+			{
+				tempString = string.Format(recipeName + "_" + waferID + "_" + lotID + "_" + cassetteID);
+			}
+
+			tempString.Replace("\\\\", "\\");
+			tempString.Replace(".rcp", "");			
+
+			return tempString;
+		}
+
+		public bool SaveKlarf(string strFilePath, bool bCollector = false)
 		{
 			timeFile = DateTime.Now;
 
@@ -352,7 +371,7 @@ namespace RootTools_Vision.Utility
 			tempString.Replace(".rcp", "");
 			tempString += ".001";
 			tiffFileName = tempString;
-			tiffFileName.Replace(".001", ".tif");
+			//tiffFileName.Replace(".001", ".tif"); //이거모냐
 
 			FileStream fs = new FileStream(tiffFileName, FileMode.Create, FileAccess.Write);
 			StreamWriter sw = new StreamWriter(fs, System.Text.Encoding.UTF8);
@@ -469,6 +488,12 @@ namespace RootTools_Vision.Utility
 			this.chipSize.Width = (int)(this.diePitchX / 1.5);//_productInfor.m_fResolutionX);
 			this.chipSize.Height = (int)(this.diePitchY / 1.5);//_productInfor.m_fResolutionY);
 		}
+
+		public void SetResolution(float resolutionX, float resolutionY)
+        {
+			this.resX = resolutionX;
+			this.resY = resolutionY;
+        }
 
 		private void SetWaferInfo(/*CRecipeData_CurrentWFInfor _waferInfor*/)
         {

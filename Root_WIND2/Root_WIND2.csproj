@@ -260,6 +260,7 @@
     <Compile Include="Module\Vision\Run_AutoFocus.cs" />
     <Compile Include="Module\Vision\Run_VisionAlign.cs" />
     <Compile Include="MVVM\SizeObserver.cs" />
+    <Compile Include="PositionConverter.cs" />
     <Compile Include="Recipe\RecipeBack.cs" />
     <Compile Include="Recipe\RecipeEBR.cs" />
     <Compile Include="Recipe\RecipeEdge.cs" />
@@ -298,8 +299,8 @@
     <Compile Include="UI_User\CAMERA\CameraVRS.xaml.cs">
       <DependentUpon>CameraVRS.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI_User\CAMERA\CameraVRS_ImageViewer_ViewModel.cs" />
-    <Compile Include="UI_User\CAMERA\CameraVRS_ViewModel.cs" />
+    <Compile Include="UI_User\CAMERA\ViewModels\CameraVRS_ImageViewer_ViewModel.cs" />
+    <Compile Include="UI_User\CAMERA\ViewModels\CameraVRS_ViewModel.cs" />
     <Compile Include="UI_User\CAMERA\MotionViewer\MotionController.xaml.cs">
       <DependentUpon>MotionController.xaml</DependentUpon>
     </Compile>

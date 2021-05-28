@@ -20,10 +20,14 @@ namespace RootTools_Vision
     [XmlInclude(typeof(EdgeSurfaceParameter))]
     [XmlInclude(typeof(BacksideSurfaceParameter))]
     [XmlInclude(typeof(EBRParameter))]
+    [XmlInclude(typeof(PBIParameter))]
+    [XmlInclude(typeof(VerticalWireParameter))]
     [XmlInclude(typeof(ProcessDefectEdgeParameter))]
     [XmlInclude(typeof(ProcessDefectParameter))]
     [XmlInclude(typeof(ProcessDefectWaferParameter))]
     [XmlInclude(typeof(ProcessDefectBacksideParameter))]
+    [XmlInclude(typeof(ProcessMeasurementParameter))]
+
     //[XmlType(TypeName = "Parameter")]
     public abstract class ParameterBase : ObservableObject, IComparable<ParameterBase>, IRecipe
     {
@@ -76,7 +80,7 @@ namespace RootTools_Vision
             foreach (Type type in
                 Assembly.GetAssembly(typeof(ParameterBase)).GetTypes()
                 .Where(myType => myType.IsClass && !myType.IsAbstract && myType.IsSubclassOf(typeof(ParameterBase))
-                && myType.GetInterface("IFrontsideInspection") != null))
+                && (myType.GetInterface("IFrontsideInspection") != null || myType.GetInterface("IFrontsideMeasurement") != null)))
             {
                 objects.Add((ParameterBase)Activator.CreateInstance(type));
             }

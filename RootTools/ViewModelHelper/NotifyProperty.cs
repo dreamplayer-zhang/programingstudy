@@ -9,7 +9,8 @@ namespace RootTools
 
         public void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
-            if (PropertyChanged != null) PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+            if (PropertyChanged != null) 
+                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 }

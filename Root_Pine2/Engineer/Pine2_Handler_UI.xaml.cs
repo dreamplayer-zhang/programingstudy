@@ -32,7 +32,11 @@ namespace Root_Pine2.Engineer
                 tabItem.Header = kv.Key.p_id;
                 tabItem.Content = kv.Value;
                 tabItem.Background = m_handler.p_brushModule;
-                tabModule.Items.Add(tabItem);
+                if (kv.Key.p_id.Contains("Magazine")) tabMagazine.Items.Add(tabItem);
+                else if (kv.Key.p_id.Contains("Boats")) tabBoats.Items.Add(tabItem);
+                else if (kv.Key.p_id.Contains("Vision")) tabVision.Items.Add(tabItem);
+                else if (kv.Key.p_id.Contains("Loader")) tabLoader.Items.Add(tabItem);
+                else tabModule.Items.Add(tabItem);
             }
         }
     }

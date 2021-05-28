@@ -358,6 +358,32 @@ namespace RootTools.Database
 #endif
 		}
 
+		public void SelectData(string tableName)
+		{
+			if (m_MainConnectSession.IsConnected == false)
+				return;
+#if !DEBUG
+			try
+			{
+
+#endif
+			DataSet data = new DataSet();
+			string sSelectQuery = "SELECT * FROM wind2." + tableName; // Temp
+			MySqlDataAdapter ap = new MySqlDataAdapter();
+
+
+			ap.SelectCommand = new MySqlCommand(sSelectQuery, m_MainConnectSession.GetConnection());
+			ap.Fill(data); // DataSet으로 전체 데이터 복사.
+			m_DefectTable = data.Tables[0].Copy();
+#if !DEBUG
+			}
+			catch (Exception ex)
+			{
+				string sMsg = ex.Message;
+			}
+#endif
+		}
+
 
 		public DataTable SelectTable(string sTable)
 		{

@@ -2467,6 +2467,5 @@ namespace RootTools
         {
             CLR_IP.Cpp_SaveBMP(sFilePath, rawdata, nW, nH, nByteCnt);
         }
-
     }
 }

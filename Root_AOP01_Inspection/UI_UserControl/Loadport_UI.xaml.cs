@@ -137,7 +137,7 @@ namespace Root_AOP01_Inspection.UI_UserControl
         private void ButtonUnLoadReq_Click(object sender, RoutedEventArgs e)
         {
             if (IsEnableUnloadReq() == false) return;
-            m_loadport.m_ceidUnloadReq.Send();
+            //m_loadport.m_ceidUnloadReq.Send();
         }
     }
 }

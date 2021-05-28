@@ -322,7 +322,9 @@ namespace Root_CAMELLIA
                 path += "\\" + file.Replace(Path.GetExtension(file), ".aco");
                 sequenceRecipe_ViewModel.SaveRecipe(filename);
                 recipeManager_ViewModel.SaveRecipe(path);
-                
+
+                p_recipePath = filename.Replace(Path.GetExtension(path), "");
+                SetDisplayPath();
                 return true;
             }
             return false;

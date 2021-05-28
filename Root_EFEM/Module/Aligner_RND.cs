@@ -591,14 +591,14 @@ namespace Root_EFEM.Module
         public string IsGetOK(int nID)
         {
             if (p_eState != eState.Ready) return p_id + " eState not Ready";
-            if (p_infoWafer == null) return p_id + " IsGetOK - InfoWafer not Exist";
+            //if (p_infoWafer == null) return p_id + " IsGetOK - InfoWafer not Exist";
             return "OK";
         }
 
         public string IsPutOK(InfoWafer infoWafer, int nID)
         {
             if (p_eState != eState.Ready) return p_id + " eState not Ready";
-            if (p_infoWafer != null) return p_id + " IsPutOK - InfoWafer Exist";
+            //if (p_infoWafer != null) return p_id + " IsPutOK - InfoWafer Exist";
             if (m_waferSize.GetData(infoWafer.p_eSize).m_bEnable == false) return p_id + " not Enable Wafer Size";
             return "OK";
         }
@@ -616,7 +616,7 @@ namespace Root_EFEM.Module
 
         public string BeforePut(int nID)
         {
-            if (p_infoWafer != null) return p_id + " BeforePut : InfoWafer != null";
+            //if (p_infoWafer != null) return p_id + " BeforePut : InfoWafer != null";
             return SendCmd(eCmd.VacuumOn); 
         }
 

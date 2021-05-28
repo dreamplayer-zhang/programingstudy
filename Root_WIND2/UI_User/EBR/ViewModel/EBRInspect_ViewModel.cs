@@ -1,4 +1,5 @@
 ﻿using LiveCharts;
+using LiveCharts.Wpf;
 using Root_WIND2.Module;
 using RootTools;
 using RootTools.Database;
@@ -30,14 +31,14 @@ namespace Root_WIND2.UI_User
 		}
 
 		#region Measurement Graph
-		private SeriesCollection measurementGraph;
-		public SeriesCollection MeasurementGraph
+		private SeriesCollection ebrGraph;
+		public SeriesCollection EBRGraph
 		{
-			get => measurementGraph;
+			get => ebrGraph;
 			set
 			{
-				measurementGraph = value;
-				RaisePropertyChanged("MeasurementGraph");
+				ebrGraph = value;
+				RaisePropertyChanged("EBRGraph");
 			}
 		}
 
@@ -59,7 +60,7 @@ namespace Root_WIND2.UI_User
 			set
 			{
 				sizeYMinVal = value;
-				RaisePropertyChanged("sizeYMinVal");
+				RaisePropertyChanged("SizeYMinVal");
 			}
 		}
 
@@ -99,6 +100,28 @@ namespace Root_WIND2.UI_User
 		public Func<float, string> YLabel { get; set; }
 		public string XTitle { get; set; }
 		public string YTitle { get; set; }
+
+		private SeriesCollection bevelGraph;
+		public SeriesCollection BevelGraph
+		{
+			get => bevelGraph;
+			set
+			{
+				bevelGraph = value;
+				RaisePropertyChanged("BevelGraph");
+			}
+		}
+
+		private SeriesCollection rawGraph;
+		public SeriesCollection RawGraph
+		{
+			get => rawGraph;
+			set
+			{
+				rawGraph = value;
+				RaisePropertyChanged("RawGraph");
+			}
+		}
 		#endregion
 
 		private Database_DataView_VM dataViewerVM;
@@ -178,23 +201,20 @@ namespace Root_WIND2.UI_User
 			{
 				GlobalObjects.Instance.GetNamed<WorkManager>("ebrInspection").InspectionStart += EBRInspect_ViewModel_InspectionStart;
 				GlobalObjects.Instance.GetNamed<WorkManager>("ebrInspection").InspectionDone += EBRInspect_ViewModel_InspectionDone;
-				GlobalObjects.Instance.GetNamed<WorkManager>("ebrInspection").IntegratedProcessDefectDone += EBRInspect_ViewModel_IntegratedProcessDefectDone;
+				GlobalObjects.Instance.GetNamed<WorkManager>("ebrInspection").ProcessMeasurementDone += EBRInspect_ViewModel_ProcessMeasurementDone; ;
 			}
-
-			//RecipeEBR recipe = GlobalObjects.Instance.Get<RecipeEBR>();
 		}
 
 		private void EBRInspect_ViewModel_InspectionStart(object sender, InspectionStartArgs e)
 		{
-			throw new NotImplementedException();
 		}
 
 		private void EBRInspect_ViewModel_InspectionDone(object sender, InspectionDoneEventArgs e)
 		{
-			throw new NotImplementedException();
+			//throw new NotImplementedException();
 		}
 
-		private void EBRInspect_ViewModel_IntegratedProcessDefectDone(object sender, IntegratedProcessDefectDoneEventArgs e)
+		private void EBRInspect_ViewModel_ProcessMeasurementDone(object sender, ProcessMeasurementDoneEventArgs e)
 		{
 			Workplace workplace = sender as Workplace;
 			List<CRect> rectList = new List<CRect>();
@@ -210,71 +230,103 @@ namespace Root_WIND2.UI_User
 
 			Application.Current.Dispatcher.Invoke(DispatcherPriority.Normal, new Action(delegate
 			{
-				DatabaseManager.Instance.SelectData();
+				DatabaseManager.Instance.SelectData("measurement");
 				dataViewerVM.pDataTable = DatabaseManager.Instance.pDefectTable;
 
-				DrawGraph();
+				DrawEBRGraph();
+				DrawBevelGraph();
 				DrawRectMeasurementROI(rectList, textList);
 			}));
 		}
 
-		private void DrawGraph()
+		private void DrawEBRGraph()
 		{
-			//MeasurementGraph = null;
-			//if (MeasurementGraph == null)
+			EBRGraph = null;
+			if (EBRGraph == null)
+			{
+				EBRGraph = new SeriesCollection
+				{
+					new LineSeries
+					{
+						//Title = "EBR",
+						Fill = System.Windows.Media.Brushes.Transparent,
+					},
+				};
+			}
+
+			RecipeEBR recipeEBR = GlobalObjects.Instance.Get<RecipeEBR>();
+			EBRParameter parameter = recipeEBR.GetItem<EBRParameter>();
+
+			int binCount = dataViewerVM.pDataTable.Rows.Count;
+			XLabels = new string[binCount];
+			for (int i = 1; i <= binCount; i++)
+			{
+				XLabels[i - 1] = (parameter.StepDegree * i).ToString();
+			}
+			YLabel = value => value.ToString("N");
+
+			DataRow[] datas = (DataRow[])dataViewerVM.pDataTable.Select();
+			ChartValues<float> values = new ChartValues<float>();
+			foreach (DataRow table in datas)
+			{
+				if (table[5].ToString() == Measurement.EBRMeasureItem.EBR.ToString())
+				{
+					string data = table[6].ToString();
+					values.Add(float.Parse(data));
+				}
+			}
+			EBRGraph[0].Values = values;
+
+			//if (values != null)
 			//{
-			//	MeasurementGraph = new SeriesCollection
-			//	{
-			//		new LineSeries
-			//		{
-			//			Title = "Bevel",
-			//			Fill = Brushes.Transparent,
-
-			//		},
-			//		new LineSeries
-			//		{
-			//			Title = "EBR",
-			//			Fill = Brushes.Transparent,
-			//		},
-			//	};
+			//	SizeYMinVal = (int)values.Min();
+			//	SizeYMaxVal = (int)values.Max();
 			//}
+		}
 
-			//int binCount = measurementDataTable.Rows.Count;
-			//XLabels = new string[binCount];
-			//for (int i = 1; i <= binCount; i++)
-			//{
-			//	XLabels[i - 1] = (parameter.StepDegree * i).ToString();
-			//}
-			//YLabel = value => value.ToString("N");
+		private void DrawBevelGraph()
+		{
+			BevelGraph = null;
+			if (BevelGraph == null)
+			{
+				BevelGraph = new SeriesCollection
+				{
+					new LineSeries
+					{
+						//Title = "EBR",
+						Fill = System.Windows.Media.Brushes.Transparent,
+					},
+				};
+			}
 
-			//DataRow[] datas;
-			//datas = measurementDataTable.Select();
-			//ChartValues<float> bevels = new ChartValues<float>();
-			//foreach (DataRow table in datas)
-			//{
-			//	if (table[5].ToString() == Measurement.EBRMeasureItem.Bevel.ToString())
-			//	{
-			//		string data = table[6].ToString();
-			//		bevels.Add(float.Parse(data));
-			//	}
-			//}
-			//MeasurementGraph[0].Values = bevels;
+			RecipeEBR recipeEBR = GlobalObjects.Instance.Get<RecipeEBR>();
+			EBRParameter parameter = recipeEBR.GetItem<EBRParameter>();
 
-			//ChartValues<float> ebrs = new ChartValues<float>();
-			//foreach (DataRow table in datas)
-			//{
-			//	if (table[5].ToString() == Measurement.EBRMeasureItem.EBR.ToString())
-			//	{
-			//		string data = table[6].ToString();
-			//		ebrs.Add(float.Parse(data));
-			//	}
-			//}
-			//MeasurementGraph[1].Values = ebrs;
+			int binCount = dataViewerVM.pDataTable.Rows.Count;
+			XLabels = new string[binCount];
+			for (int i = 1; i <= binCount; i++)
+			{
+				XLabels[i - 1] = (parameter.StepDegree * i).ToString();
+			}
+			YLabel = value => value.ToString("N");
 
-			////if (bevels != null)
-			////	SizeYMinVal = (int)bevels.Min();
-			//if (ebrs != null)
-			//	SizeYMaxVal = (int)ebrs.Max();
+			DataRow[] datas = (DataRow[])dataViewerVM.pDataTable.Select();
+			ChartValues<float> values = new ChartValues<float>();
+			foreach (DataRow table in datas)
+			{
+				if (table[5].ToString() == Measurement.EBRMeasureItem.Bevel.ToString())
+				{
+					string data = table[6].ToString();
+					values.Add(float.Parse(data));
+				}
+			}
+			BevelGraph[0].Values = values;
+
+			if (values != null)
+			{
+				SizeYMinVal = (int)values.Min();
+				SizeYMaxVal = (int)values.Max();
+			}
 		}
 
 		private void DrawRectMeasurementROI(List<CRect> rectList, List<String> textList, bool reDraw = false)
@@ -292,6 +344,7 @@ namespace Root_WIND2.UI_User
 			string sInspectionID = (string)row["m_strInspectionID"];
 			string sFileName = nIndex.ToString() + ".bmp";
 			DisplayDefectImage(sInspectionID, sFileName);
+			DisplayRawData(sInspectionID, sFileName);
 
 			System.Drawing.Rectangle m_View_Rect = new System.Drawing.Rectangle((int)(double)row["m_fAbsX"] - imageViewerVM.p_View_Rect.Width / 2, (int)(double)row["m_fAbsY"] - imageViewerVM.p_View_Rect.Height / 2, imageViewerVM.p_View_Rect.Width, imageViewerVM.p_View_Rect.Height);
 			ImageViewerVM.p_View_Rect = m_View_Rect;
@@ -310,6 +363,12 @@ namespace Root_WIND2.UI_User
 			}
 			else
 				MeasurementImage = null;
+		}
+
+		private void DisplayRawData(string sInspectionID, string sDefectName)
+		{
+			string rawDataPath = @"D:\EBRRawData";
+			rawDataPath = Path.Combine(rawDataPath, sInspectionID, sDefectName);
 		}
 	}
 }

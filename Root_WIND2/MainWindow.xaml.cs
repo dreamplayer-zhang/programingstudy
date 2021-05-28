@@ -387,17 +387,14 @@ namespace Root_WIND2
 
                 if (ebrImage.GetPtr() != IntPtr.Zero)
                 {
-                    RootTools_Vision.WorkManager3.WorkManager ebrInspection = GlobalObjects.Instance.RegisterNamed<RootTools_Vision.WorkManager3.WorkManager>("ebrInspection", 3);
+                    RootTools_Vision.WorkManager3.WorkManager ebrInspection = GlobalObjects.Instance.RegisterNamed<RootTools_Vision.WorkManager3.WorkManager>("ebrInspection");
 
                     ebrInspection.SetRecipe(recipeEBR);
                     ebrInspection.SetSharedBuffer(new SharedBufferInfo(
                             ebrImage.GetPtr(0),
                             ebrImage.p_Size.X,
                             ebrImage.p_Size.Y,
-                            ebrImage.GetBytePerPixel(),
-                            ebrImage.GetPtr(1),
-                            ebrImage.GetPtr(2),
-                            new MemoryID(memoryEdgePool, memoryEdgeGroup, memoryEdgeEBR)));
+                            ebrImage.GetBytePerPixel()));
 
                     CameraInfo camInfo = DataConverter.GrabModeToCameraInfo(engineer.m_handler.p_Vision.GetGrabMode(recipeEBR.CameraInfoIndex));
                     ebrInspection.SetCameraInfo(camInfo);

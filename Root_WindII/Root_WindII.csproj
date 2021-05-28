@@ -63,6 +63,9 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="EasyModbus">
+      <HintPath>..\Lib\EasyModbus.dll</HintPath>
+    </Reference>
     <Reference Include="Emgu.CV.UI">
       <HintPath>..\packages\EMGU.CV.4.1.1.3497\lib\net35\Emgu.CV.UI.dll</HintPath>
     </Reference>
@@ -228,9 +231,11 @@
     <Compile Include="DataConverter.cs" />
     <Compile Include="Engineer\WIND2EventArgs.cs" />
     <Compile Include="Engineer\WIND2EventManager.cs" />
+    <Compile Include="Engineer\WindII_Warning.cs" />
     <Compile Include="MainWindow_ViewModel.cs" />
     <Compile Include="Module\InspectionManagerFrontside.cs" />
     <Compile Include="Module\Vision.cs" />
+    <Compile Include="Module\WIND2.cs" />
     <Compile Include="MvvmTools\Converter.cs" />
     <Compile Include="MvvmTools\Helper.cs" />
     <Compile Include="MvvmTools\ObservableObject.cs" />
@@ -285,6 +290,9 @@
     <Compile Include="UI\SETUP\FRONT\FrontsideAlignment.xaml.cs">
       <DependentUpon>FrontsideAlignment.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UI\SETUP\FRONT\FrontsideMeasurement.xaml.cs">
+      <DependentUpon>FrontsideMeasurement.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI\SETUP\FRONT\FrontsideInspect.xaml.cs">
       <DependentUpon>FrontsideInspect.xaml</DependentUpon>
     </Compile>
@@ -306,6 +314,7 @@
     <Compile Include="UI\SETUP\FRONT\ViewModels\FrontsideAlignment_ImageViewer_ViewModel.cs" />
     <Compile Include="UI\SETUP\FRONT\ViewModels\FrontsideAlignment_ViewModel.cs" />
     <Compile Include="UI\SETUP\FRONT\ViewModels\FrontsideInspect_ImageViewer_ViewModel.cs" />
+    <Compile Include="UI\SETUP\FRONT\ViewModels\FrontsideMeasurement_ViewModel.cs" />
     <Compile Include="UI\SETUP\FRONT\ViewModels\FrontsideInspect_ViewModel.cs" />
     <Compile Include="UI\SETUP\FRONT\ViewModels\FrontsideMask_ViewModel.cs" />
     <Compile Include="UI\SETUP\FRONT\ViewModels\FrontsideOrigin_ImageViewer_ViewModel.cs" />
@@ -354,6 +363,9 @@
       <DependentUpon>LoadingControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="UserControls\WpfPropertyGrid.cs" />
+    <Compile Include="Warning_UI.xaml.cs">
+      <DependentUpon>Warning_UI.xaml</DependentUpon>
+    </Compile>
     <Page Include="Engineer\WindII_Engineer_UI.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -445,6 +457,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="UI\SETUP\FRONT\FrontsideMeasurement.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="UI\SETUP\FRONT\FrontsideInspect.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -510,6 +526,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="UserControls\LoadingControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Warning_UI.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

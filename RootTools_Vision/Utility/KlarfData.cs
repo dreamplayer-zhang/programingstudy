@@ -50,8 +50,8 @@ namespace RootTools_Vision.Utility
 		public int klarfCol = 0;
 
 		public String tempString;
-		public float resX;
-		public float resY;
+		public double resolutionX = 1;
+		public double resolutionY = 1;
 
 		#endregion
 
@@ -318,7 +318,7 @@ namespace RootTools_Vision.Utility
 		}
 
 		// 기존 210302
-		public void SetDefectInfor_SRLine(RecipeType_WaferMap _mapdata, List<Defect> _defectdata, OriginRecipe recipe)
+		public void SetDefectInfor_SRLine(RecipeType_WaferMap _mapdata, List<Defect> _defectdata, OriginRecipe recipe, bool useTDIReview = false, bool useVrsReview = false)
         {
 			StringBuilder builder = new StringBuilder();
 
@@ -328,31 +328,58 @@ namespace RootTools_Vision.Utility
 			int nImageIdx = 0;
 			for (int i = 0; i < _defectdata.Count; i++)
 			{
-				builder.Append(_defectdata[i].m_nDefectIndex + " ");
-				builder.Append(_defectdata[i].m_fRelX + " ");
-				builder.Append(_defectdata[i].m_fRelY + " ");
-				builder.Append(_defectdata[i].m_nChipIndexX + " ");
-				builder.Append(_defectdata[i].m_nChipIndexY + " ");
-				builder.Append(_defectdata[i].m_fWidth + " ");
-				builder.Append(_defectdata[i].m_fHeight + " ");
-				builder.Append(_defectdata[i].m_fSize + " ");
-				builder.Append(_defectdata[i].m_fSize + " ");
-				builder.Append(0 + " ");
-				builder.Append(0 + " ");
-				builder.Append(0 + " ");
-				builder.Append(0 + " ");
-				builder.Append(0 + " ");
-				builder.Append(0 + " ");
-				builder.Append(_defectdata[i].m_nDefectIndex + " ");
-				builder.Append(_defectdata[i].m_nDefectIndex + "\n");
+				builder.Append(_defectdata[i].m_nDefectIndex + " ");  // Index
+				builder.Append(_defectdata[i].m_fRelX + " "); // Rel X
+				builder.Append(_defectdata[i].m_fRelY + " "); // Rel Y
+				builder.Append(_defectdata[i].m_nChipIndexX + " "); // Map X
+				builder.Append(_defectdata[i].m_nChipIndexY + " "); // Map Y
+				builder.Append(_defectdata[i].m_fWidth * resolutionX + " "); // Size X
+				builder.Append(_defectdata[i].m_fHeight * resolutionY + " "); // Size Y
+				builder.Append(0 + " "); // DEFECTAREA
+				builder.Append(_defectdata[i].m_fSize * resolutionX + " "); // Defect Size
+				builder.Append(0 + " "); // ClassNumber
+				builder.Append(0 + " "); // TEST
+				builder.Append(0 + " "); // CLUSTERNUMBER
+				builder.Append(0 + " "); // Rough Bin Number
+				builder.Append(0 + " "); // Find Bin Number
+				builder.Append(0 + " "); // Review Sample
 
-				//210517 IMAGE INDEX 
-				builder.Append(nImageIdx++ + " 0;\n");
-				//if(_defectdata[i].m_bUseColorVRS)
-				//{
-				//	builder.Append(nImageIdx++ + " 0;\n");
-				//}	
-			}
+				if (useTDIReview && useVrsReview)  // 이미지 TDI VRS 둘다 저장할 때,
+				{
+					builder.Append(2 + " ");
+					builder.Append(2);
+				}
+				else if (useTDIReview || useVrsReview)// 둘 중 하나만 저장할 때,
+				{
+					builder.Append(1 + " ");
+					builder.Append(1);
+				}
+				else
+                {
+					builder.Append(0 + " ");
+					builder.Append(0);
+				}
+
+				//210517 IMAGE INDEX
+				if(useTDIReview)
+                {
+					builder.Append("\n" + nImageIdx++ + " 0");
+				}
+                if (useVrsReview)
+                {
+                    builder.Append("\n" + nImageIdx++ + " 0");
+                }
+
+				// End of Defect List
+				if(i == (_defectdata.Count-1))
+                {
+					builder.Append(";\n");
+				}
+				else
+                {
+					builder.Append("\n");
+				}
+            }
 
 			builder.AppendLine("SummarySpec 5" + " TESTNO NDEFECT DEFDENSITY NDIE NDEFDIE;");
 			builder.AppendLine("SummaryList");

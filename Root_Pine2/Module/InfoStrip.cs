@@ -1,10 +1,12 @@
-﻿using RootTools;
+﻿using Root_Pine2_Vision.Module;
+using RootTools;
 using RootTools.Trees;
 
 namespace Root_Pine2.Module
 {
     public class InfoStrip : NotifyProperty
     {
+        #region Result
         public enum eResult
         {
             Init,
@@ -25,12 +27,26 @@ namespace Root_Pine2.Module
                 OnPropertyChanged(); 
             }
         }
+        #endregion
 
+        #region Boat Flow
+        public Vision.eVision m_eVision = Vision.eVision.Top3D; 
+        public Vision.eWorks m_eWorks = Vision.eWorks.A;
+        #endregion
+
+        public string p_id { get; set; }
         public int p_nStrip { get; set; }
         public InfoStrip(int nStrip)
         {
             p_eMagazine = eMagazine.Magazine0; 
             p_nStrip = nStrip;
+            p_id = "Strip" + nStrip.ToString("000"); 
+        }
+
+        public bool m_bPaper = false; 
+        public InfoStrip(bool bPaper)
+        {
+            m_bPaper = bPaper; 
         }
 
         public enum eMagazine
@@ -51,11 +67,14 @@ namespace Root_Pine2.Module
             Down
         }
         public eMagazinePos p_eMagazinePos { get; set; }
+        public string m_sLED; 
         public InfoStrip(eMagazine eMagazine, eMagazinePos eMagazinePos, int nStrip)
         {
             p_eMagazine = eMagazine;
             p_eMagazinePos = eMagazinePos;
             p_nStrip = nStrip;
+            p_id = eMagazine.ToString() + "." + eMagazinePos.ToString() + "." + nStrip.ToString("00"); 
+            m_sLED = ((p_eMagazinePos == eMagazinePos.Up) ? "Up" : "Dn") + p_nStrip.ToString("00");
         }
 
         public InfoStrip Clone()

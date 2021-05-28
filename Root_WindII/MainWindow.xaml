@@ -154,15 +154,15 @@
                 <ContentControl.Style>
                     <Style TargetType="ContentControl">
                         <Style.Triggers>
-                             <!--Main--> 
+                            <!--Main-->
                             <DataTrigger Binding="{Binding ElementName=mode_main, Path=IsChecked}"
-                                         Value="true">
-                                <Setter Property="Template" Value="{StaticResource selectmode}"/>
+                                    Value="true">
+                                <Setter Property="Template" Value="{StaticResource selectmode}" />
                             </DataTrigger>
-                             <!--Setup-->
+                            <!--Setup-->
                             <DataTrigger Binding="{Binding ElementName=mode_setup, Path=IsChecked}"
-                                         Value="true">
-                                <Setter Property="Template" Value="{StaticResource setup}"/>
+                                    Value="true">
+                                <Setter Property="Template" Value="{StaticResource setup}" />
                             </DataTrigger>
                             <!--Setup-->
                             <!--<DataTrigger Binding="{Binding ElementName=mode_review, Path=IsChecked}"
@@ -179,11 +179,21 @@
                 </ContentControl.Style>
             </ContentControl>
         </Grid>
-
-        <GridSplitter Grid.Row="2" 
-                      Height="5"
-                      HorizontalAlignment="Stretch"
-                      VerticalAlignment="Stretch"
-                      ShowsPreview="True"/>
+        <GridSplitter Grid.Row="2" Height="5" HorizontalAlignment="Stretch"
+                VerticalAlignment="Stretch" ShowsPreview="True" />
+        <Border Grid.Row="3" Grid.ColumnSpan="2" Panel.ZIndex="99" Margin="3">
+            <TabControl Grid.Row="2">
+                <TabItem Header="Log" FontSize="10">
+                </TabItem>
+                <TabItem Header="Warning" FontSize="10">
+                    <ContentControl Content="{Binding p_CurrentSubPanel}">
+                    </ContentControl>
+                </TabItem>
+                <TabItem Header="Inspection" FontSize="10" />
+                <TabItem Header="I/O" FontSize="10" />
+                <TabItem Header="Network" FontSize="10" />
+                <TabItem Header="Result" FontSize="10" />
+            </TabControl>
+        </Border>
     </Grid>
 </Window>
