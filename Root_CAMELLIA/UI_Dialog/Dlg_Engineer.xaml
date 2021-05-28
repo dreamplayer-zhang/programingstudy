@@ -42,10 +42,7 @@
         <local:AxisStateToEnableConverter x:Key="AxisStateToEnable" />
         <local:AxisStateToOpacityConverter x:Key="AxisStateToOpacity" />
         <local:AxisStateToLoadingOpacityConverter x:Key="AxisStateToLoadingOpacity" />
-        <local:AxisXToMotionUIConverter x:Key="AxisXToMotionUI"/>
-        <local:AxisYToMotionUIConverter x:Key="AxisYToMotionUI"/>
-        <local:AxisZToMotionUIConverter x:Key="AxisZToMotionUI"/>
-        <local:AxisLifterToMotionUIConverter x:Key="AxisLifterToMotionUI"/>
+        <local:AxisToMotionUIMultiConverter x:Key="AxisToMotionUIMultiConverter"/>
         <local:ModuleStateToLoadingOpacityConverter x:Key="ModuleStateConverter"/>
         <local:ModuleStateToLoadingEnableConverter x:Key="ModuleStateToEnableConverter"/>
         <viewConverter:ConnectStringToBoolConverter x:Key="ConnectStringToBoolConverters" />
@@ -662,8 +659,6 @@
                                                                     Width="10000" Height="10000">
                                                             <Border Width="3000"
                                                                         Height="3000"
-                                                                        Canvas.Left="{Binding AxisX.p_posActual, Converter={StaticResource AxisXToMotionUI}}"
-                                                                        Canvas.Top="{Binding AxisY.p_posActual, Converter={StaticResource AxisYToMotionUI}}"
                                                                         Background="Gray"
                                                                         Margin="5">
 
@@ -676,6 +671,28 @@
                                                                                    VerticalAlignment="Center"
                                                                                    HorizontalAlignment="Center" />
                                                                 </Grid>
+                                                                <Border.Style>
+                                                                    <Style TargetType="Border">
+                                                                        <Setter Property="Canvas.Left">
+                                                                            <Setter.Value>
+                                                                                <MultiBinding Converter="{StaticResource AxisToMotionUIMultiConverter}">
+                                                                                    <Binding Path="AxisX.p_posActual"/>
+                                                                                    <Binding Path="AxisX"/>
+                                                                                    <MultiBinding.ConverterParameter>AxisX</MultiBinding.ConverterParameter>
+                                                                                </MultiBinding>
+                                                                            </Setter.Value>
+                                                                        </Setter>
+                                                                        <Setter Property="Canvas.Top">
+                                                                            <Setter.Value>
+                                                                                <MultiBinding Converter="{StaticResource AxisToMotionUIMultiConverter}">
+                                                                                    <Binding Path="AxisY.p_posActual"/>
+                                                                                    <Binding Path="AxisY"/>
+                                                                                    <MultiBinding.ConverterParameter>AxisY</MultiBinding.ConverterParameter>
+                                                                                </MultiBinding>
+                                                                            </Setter.Value>
+                                                                        </Setter>
+                                                                    </Style>
+                                                                </Border.Style>
                                                             </Border>
                                                         </Canvas>
                                                     </Viewbox>
@@ -687,9 +704,22 @@
                                                                     Width="2000" Height="10000">
                                                             <Border Width="2000"
                                                                         Height="500"
-                                                                        Canvas.Top="{Binding AxisZ.p_posActual, Converter={StaticResource AxisZToMotionUI}}"
                                                                         Background="Gray"
-                                                                        Margin="5" />
+                                                                        Margin="5" >
+                                                                <Border.Style>
+                                                                    <Style TargetType="Border">
+                                                                        <Setter Property="Canvas.Top">
+                                                                            <Setter.Value>
+                                                                                <MultiBinding Converter="{StaticResource AxisToMotionUIMultiConverter}">
+                                                                                    <Binding Path="AxisZ.p_posActual"/>
+                                                                                    <Binding Path="AxisZ"/>
+                                                                                    <MultiBinding.ConverterParameter>AxisZ</MultiBinding.ConverterParameter>
+                                                                                </MultiBinding>
+                                                                            </Setter.Value>
+                                                                        </Setter>
+                                                                    </Style>
+                                                                </Border.Style>
+                                                            </Border>
                                                         </Canvas>
                                                     </Viewbox>
                                                 </GroupBox>
@@ -701,9 +731,22 @@
                                                                     Height="10000">
                                                             <Border Width="2000"
                                                                         Height="500"
-                                                                        Canvas.Top="{Binding AxisLifter.p_posActual, Converter={StaticResource AxisLifterToMotionUI}}"
                                                                         Background="Gray"
-                                                                        Margin="5" />
+                                                                        Margin="5" >
+                                                                <Border.Style>
+                                                                    <Style TargetType="Border">
+                                                                        <Setter Property="Canvas.Top">
+                                                                            <Setter.Value>
+                                                                                <MultiBinding Converter="{StaticResource AxisToMotionUIMultiConverter}">
+                                                                                    <Binding Path="AxisLifter.p_posActual"/>
+                                                                                    <Binding Path="AxisLifter"/>
+                                                                                    <MultiBinding.ConverterParameter>AxisLifter</MultiBinding.ConverterParameter>
+                                                                                </MultiBinding>
+                                                                            </Setter.Value>
+                                                                        </Setter>
+                                                                    </Style>
+                                                                </Border.Style>
+                                                            </Border>
                                                         </Canvas>
                                                     </Viewbox>
                                                 </GroupBox>
