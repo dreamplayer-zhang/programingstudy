@@ -188,11 +188,33 @@
                            VerticalAlignment="Center"
                            HorizontalAlignment="Center"></TextBlock>
                         <!--Source={x:Static local:BaseDefine.Configuration}}-->
-                        <TextBlock Text="{Binding Mode=TwoWay, Path=LoginSuccess, Source={x:Static local:BaseDefine.Configuration}, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource LoginStateConverter}}" FontSize="18"
+                        <TextBlock FontSize="18"
                                    FontWeight="Bold" FontFamily="consolas"
                            VerticalAlignment="Center" 
                            HorizontalAlignment="Center">
                             <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding p_curUserLevel, UpdateSourceTrigger=PropertyChanged}" Value="Logout">
+                                            <Setter Property="Foreground" Value="Gray"/>
+                                            <Setter Property="Text" Value="Offline"/>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding p_curUserLevel, UpdateSourceTrigger=PropertyChanged}" Value="Admin">
+                                            <Setter Property="Foreground" Value="#22b14c"/>
+                                            <Setter Property="Text" Value="{Binding p_curUser}"/>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding p_curUserLevel, UpdateSourceTrigger=PropertyChanged}" Value="Operator">
+                                            <Setter Property="Foreground" Value="CadetBlue"/>
+                                            <Setter Property="Text" Value="{Binding p_curUser}"/>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding p_curUserLevel, UpdateSourceTrigger=PropertyChanged}" Value="Worker">
+                                            <Setter Property="Foreground" Value="White"/>
+                                            <Setter Property="Text" Value="{Binding p_curUser}"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                            <!--<TextBlock.Style>
                                 <Style TargetType="TextBlock">
                                     <Style.Triggers>
                                         <DataTrigger Binding="{Binding Mode=TwoWay, Path=LoginSuccess, Source={x:Static local:BaseDefine.Configuration} ,UpdateSourceTrigger=PropertyChanged}" Value="True">
@@ -203,7 +225,7 @@
                                         </DataTrigger>
                                     </Style.Triggers>
                                 </Style>
-                            </TextBlock.Style>
+                            </TextBlock.Style>-->
                         </TextBlock>
                     </StackPanel>
                     <StackPanel HorizontalAlignment="Center" Orientation="Horizontal" Grid.Column="1">
@@ -572,7 +594,7 @@
                                                          Y1="{Binding p_ArrowY1, Converter={StaticResource PointToStageConverter}, ConverterParameter=Y, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                                          X2="{Binding p_ArrowX2, Converter={StaticResource PointToStageConverter}, ConverterParameter=X, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                                          Y2="{Binding p_ArrowY2, Converter={StaticResource PointToStageConverter}, ConverterParameter=Y, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                                         Visibility="{Binding p_ArrowVisible, UpdateSourceTrigger=PropertyChanged}"  Width="1000" Height="1000" StrokeThickness="8" ArrowLength="30" ArrowAngle="80" >
+                                                         Visibility="{Binding p_ArrowVisible, UpdateSourceTrigger=PropertyChanged}"  Width="{x:Static local:BaseDefine.CanvasWidth}" Height="{x:Static local:BaseDefine.CanvasHeight}" StrokeThickness="8" ArrowLength="30" ArrowAngle="80" >
                                             <arrow:ArrowLine.Stroke>
                                                 <LinearGradientBrush StartPoint="{Binding p_GradientStartPoint, UpdateSourceTrigger=PropertyChanged}" EndPoint="{Binding p_GradientEndPoint, UpdateSourceTrigger=PropertyChanged}">
                                                     <GradientStop x:Name="GradientStop1" Color="Yellow" Offset="0.0" />
@@ -902,23 +924,23 @@
                            VerticalAlignment="Center"
                            HorizontalAlignment="Center"/>
                     </Border>
-                    <Button Content="Resume" x:Name="buttonResume" Margin="0,0,0,15" 
+                    <Button Content="Resume" x:Name="buttonResume" Margin="0,0,3,15" 
                             Style="{StaticResource customButton}" FontSize="15" FontWeight="Bold"
                             Height="40"
                             Click="buttonResume_Click"/>
-                    <Button Content="Pause" x:Name="buttonPause" Margin="0,0,0,15"  FontSize="15" FontWeight="Bold"
+                    <Button Content="Pause" x:Name="buttonPause" Margin="0,0,3,15"  FontSize="15" FontWeight="Bold"
                             Style="{StaticResource customButton}" 
                             Height="40"
                             Click="buttonPause_Click"/>
-                    <Button Content="Initial" x:Name="buttonInit" Margin="0,0,0,15" FontSize="15" FontWeight="Bold"
+                    <Button Content="Initial" x:Name="buttonInit" Margin="0,0,3,15" FontSize="15" FontWeight="Bold"
                             Style="{StaticResource customButton}" 
                             Height="40"
                             Click="buttonInit_Click"/>
-                    <Button Content="Recovery" x:Name="buttonRecovery" Margin="0,0,0,15"  FontSize="15" FontWeight="Bold"
+                    <Button Content="Recovery" x:Name="buttonRecovery" Margin="0,0,3,15"  FontSize="15" FontWeight="Bold"
                             Style="{StaticResource customButton}" 
                             Height="40"
                             Click="buttonRecovery_Click"/>
-                    <Button Content="Buzzer Off" x:Name="buttonBuzzerOff" Margin="0,0,0,15" FontSize="15" FontWeight="Bold"
+                    <Button Content="Buzzer Off" x:Name="buttonBuzzerOff" Margin="0,0,3,15" FontSize="15" FontWeight="Bold"
                             Style="{StaticResource customButton}" 
                             Height="40"
                             Click="buttonBuzzerOff_Click"/>
@@ -934,15 +956,15 @@
                     </Border>
                     <Button Content="OHT" x:Name="buttonOHT"  FontSize="15" FontWeight="Bold"
                             Style="{StaticResource customButton}"
-                            Height="40" Margin="0,0,0,15"
+                            Height="40" Margin="0,0,3,15"
                             Click="buttonOHT_Click"/>
-                    <Button Content="Offline" FontSize="15" FontWeight="Bold" Margin="0,0,0,15"
+                    <Button Content="Offline" FontSize="15" FontWeight="Bold" Margin="0,0,3,15"
                             Style="{StaticResource customButton}" Command="{Binding CmdOffline}"
                             Height="40" />
-                    <Button Content="Online Local" FontSize="15" FontWeight="Bold" Margin="0,0,0,15"
+                    <Button Content="Online Local" FontSize="15" FontWeight="Bold" Margin="0,0,3,15"
                             Style="{StaticResource customButton}" Command="{Binding CmdOnlineLocal}"
                             Height="40" />
-                    <Button Content="Online Remote" FontSize="15" FontWeight="Bold" Margin="0,0,0,15"
+                    <Button Content="Online Remote" FontSize="15" FontWeight="Bold" Margin="0,0,3,15"
                             Style="{StaticResource customButton}" Command="{Binding CmdOnlineRemote}"
                             Height="40" />
                 </StackPanel>

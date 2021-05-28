@@ -18,6 +18,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Threading;
+using static RootTools.Control.Axis;
 
 namespace Root_CAMELLIA
 {

@@ -306,7 +306,7 @@
                         <Border Margin="5" VerticalAlignment="Center">
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock Text="Loadport State : " TextAlignment="Center"/>
-                                <TextBlock Text="Out of Service" TextAlignment="Center"/>
+                                <TextBlock Text="{Binding p_loadport.m_OHTNew.m_carrier.p_eTransfer}" TextAlignment="Center"/>
                             </StackPanel>
                         </Border>
                     </Grid>
