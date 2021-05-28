@@ -52,7 +52,7 @@ namespace RootTools.Light
             {
                 double fPower = p_fSetPower;
                 fPower *= p_fScalePower;
-                int nPower = (int)Math.Round(c_lMaxPower * fPower / 100);
+                int nPower = (int)Math.Round(fPower);
                 SetChannel();
                 Thread.Sleep(10);
                 SetPower(nPower);
@@ -73,7 +73,7 @@ namespace RootTools.Light
                 aSend[i++] = 0x00; //Op Write
                 aSend[i++] = 0x01; //DL
                 aSend[i++] = 0x20; //CSR(Addr)
-                aSend[i++] = BitConverter.GetBytes(m_nCh)[0];
+                aSend[i++] = (byte)(1 << m_nCh);
                 aSend[i++] = 0x04; //end
 
                 m_rs232.Send(aSend, nByteCnt);
