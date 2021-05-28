@@ -1,5 +1,6 @@
 ﻿using Root_EFEM.Module;
 using Root_VEGA_D.Engineer;
+using Root_VEGA_D.Module;
 using RootTools;
 using RootTools.Module;
 using System;
@@ -87,6 +88,7 @@ namespace Root_VEGA_D
         VEGA_D_Engineer m_engineer;
         Loadport_Cymechs[] m_loadport_Cymechs = new Loadport_Cymechs[2];
         Login_UI m_login;
+        OHTs_UI m_ohts= new OHTs_UI();
         Login.eLevel m_level;
 
         RecipeWizard_VM recipeWizardVM;
@@ -301,6 +303,17 @@ namespace Root_VEGA_D
             RunTab.Visibility = (m_engineer.m_login.p_eLevel >= Login.eLevel.Operator) ? Visibility.Visible : Visibility.Collapsed;
             RecipeManagerTab.Visibility = (m_engineer.m_login.p_eLevel >= Login.eLevel.Operator) ? Visibility.Visible : Visibility.Collapsed;
             RecipeWizardTab.Visibility = (m_engineer.m_login.p_eLevel >= Login.eLevel.Operator) ? Visibility.Visible : Visibility.Collapsed;
+        }
+
+		private void btnOHT_Click(object sender, RoutedEventArgs e)
+		{
+            if (m_ohts.IsLoaded == false)
+            {
+                m_ohts.Init((VEGA_D_Handler)m_engineer.ClassHandler());
+                m_ohts.Show();
+            }
+            else m_ohts.Show();
+
         }
 	}
 	public class StateToColorConverter : IValueConverter

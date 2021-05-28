@@ -3,10 +3,14 @@ using RootTools.Control;
 using RootTools.GAFs;
 using RootTools.Module;
 using RootTools.Trees;
+using Root_EFEM.Module;
 using Root_VEGA_D.Engineer;
+using RootTools.OHT.Semi;
 using RootTools.Control.ACS;
 using System.Threading;
+using System.Collections.Generic;
 using System;
+using RootTools.OHTNew;
 
 namespace Root_VEGA_D.Module
 {
@@ -130,7 +134,7 @@ namespace Root_VEGA_D.Module
             m_alidMCReset_EMS = m_gaf.GetALID(this, "MC Reset (EMS)", "MC Reset Error");
             m_alidMCReset_EMO = m_gaf.GetALID(this, "MC Reset (EMO)", "MC Reset Error");
             m_alidDoorLock = m_gaf.GetALID(this, "Door Lock", "Door Lock Error");
-            m_alidCDA1_digital = m_gaf.GetALID(this, "CDA2 Pressure Digital", "CDA1 Pressure Error(Digital)");
+            m_alidCDA1_digital = m_gaf.GetALID(this, "CDA1 Pressure Digital", "CDA1 Pressure Error(Digital)");
             m_alidCDA1_Low = m_gaf.GetALID(this, "CDA1 Pressure Low Alarm", "CDA1 Pressure Low Error");
             m_alidCDA1_High = m_gaf.GetALID(this, "CDA1 Pressure Low Alarm", "CDA1 Pressure Low Error");
             m_alidCDA2_digital = m_gaf.GetALID(this, "CDA2 Pressure Digital", "CDA2 Pressure Error(Digital)");
@@ -240,7 +244,7 @@ namespace Root_VEGA_D.Module
             CheckFDC();
 
             m_alidCDA1_digital.Run(!m_diCDA1.p_bIn, "Please Check CDA1 Pressure Sensor");
-            m_alidCDA1_digital.Run(!m_diCDA2.p_bIn, "Please Check CDA2 Pressure Sensor");
+            m_alidCDA2_digital.Run(!m_diCDA2.p_bIn, "Please Check CDA2 Pressure Sensor");
 
             m_alidEFEMLeft_Door.Run(!m_diEFEMLeft_Door.p_bIn, "EFEM Left Door Open");
             m_alidEFEMRight_Door.Run(!m_diEFEMRight_Door.p_bIn, "EFEM Right Door Open");
@@ -282,9 +286,29 @@ namespace Root_VEGA_D.Module
             {
                 m_alidProtectionbar.Run(!m_diProtectionbar.p_bIn, "Protectionbar Check Error");
             }
+            foreach (OHT_Semi OHT in p_aOHT)
+            {
+                OHT.p_bLightCurtain = !m_diLightCurtain.p_bIn;
+                OHT.P_bProtectionBar = !m_diProtectionbar.p_bIn;
+            }
         }
         #endregion
 
+        #region OHT
+        List<OHT_Semi> p_aOHT
+        {
+            get
+            {
+                List<OHT_Semi> aOHT = new List<OHT_Semi>();
+                VEGA_D_Handler handler = (VEGA_D_Handler)m_engineer.ClassHandler();
+                foreach (ILoadport loadport in handler.m_aLoadport)
+                {
+                    aOHT.Add(((Loadport_Cymechs)loadport).m_OHT);
+                }
+                return aOHT;
+            }
+        }
+        #endregion
         #region Tree
         bool m_bDoorlock_Use = false;
         bool m_bLightCurtain_Use = false;

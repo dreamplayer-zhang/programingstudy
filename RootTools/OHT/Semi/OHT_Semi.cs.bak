@@ -41,9 +41,8 @@ namespace RootTools.OHT.Semi
         }
         #endregion
         public bool m_bRFIDRead = false; //LYJ
-        //public bool m_bPIOComplete = false; //LYJ 210412
-        bool _bLightCurtain = false;
-        public bool m_bLoadportHome = false;
+        public bool m_bPIOComplete = false; //LYJ 210412
+        bool _bLightCurtain = false; 
         public bool p_bLightCurtain
         {
             get { return _bLightCurtain; }
@@ -306,8 +305,6 @@ namespace RootTools.OHT.Semi
         public bool m_bPODExist = false;
         public bool m_bPlaced = false;
         public bool m_bPresent = false;
-        public bool m_btempPlaced = false;
-        public bool m_btempPresent = false;
         public bool m_bAuto = false;
         bool m_bAuto_p = false;
         public bool m_bProtectError = false;
@@ -463,8 +460,7 @@ namespace RootTools.OHT.Semi
                             case eState.All_Off:
                                 CheckPresent(false);
                                 bool bCS = IsCS(true);
-                                //if (bCS && m_diValid.p_bOn)
-                                if (bCS && m_diValid.p_bOn && m_carrier.p_eTransfer != GemCarrierBase.eTransfer.TransferBlocked) //LYJ 210525 Modify 
+                                if (bCS && m_diValid.p_bOn)
                                 {
                                     p_doLU_Req.p_bOn = true;
                                     p_eState = eState.LU_Req_On;
@@ -480,7 +476,7 @@ namespace RootTools.OHT.Semi
                                 CheckPresent(false);
                                 CheckCS(true);
                                 CheckDI(m_diValid, true);
-                                if (m_diTrReq.p_bOn && m_carrier.p_eTransfer != GemCarrierBase.eTransfer.TransferBlocked) //LYJ 210525 Modify
+                                if (m_diTrReq.p_bOn)
                                 {
                                     m_doReady.p_bOn = true;
                                     p_eState = eState.Ready_On;
@@ -507,8 +503,8 @@ namespace RootTools.OHT.Semi
                                 CheckDI(m_diValid, true);
                                 CheckDI(m_diTrReq, true);
                                 CheckDI(m_diBusy, true);
-                                if (IsLUReqDone() && m_carrier.p_eTransfer != GemCarrierBase.eTransfer.TransferBlocked) //LYJ 210525 Modify
-                            {
+                                if (IsLUReqDone())
+                                {
                                     p_doLU_Req.p_bOn = false;
                                     p_eState = eState.LU_Req_Off;
                                     ResetTD3();
@@ -522,8 +518,8 @@ namespace RootTools.OHT.Semi
                                 CheckPresent(true);
                                 CheckCS(true);
                                 CheckDI(m_diValid, true);
-                                if ((m_diTrReq.p_bOn == false) && (m_diBusy.p_bOn == false) && m_diComplete.p_bOn && m_carrier.p_eTransfer != GemCarrierBase.eTransfer.TransferBlocked) //LYJ 210525 Modify
-                            {
+                                if ((m_diTrReq.p_bOn == false) && (m_diBusy.p_bOn == false) && m_diComplete.p_bOn)
+                                {
                                     m_doReady.p_bOn = false;
                                     p_eState = eState.Ready_Off;
                                 }
@@ -697,55 +693,16 @@ namespace RootTools.OHT.Semi
                             bpresent = true;
                         }
                     }
-                    break;
+                    
 
-                //if (!m_bPODExist) //KHD 210318 add
-                //{
-                //    bpresent = true;
-                //}
-                //else
-                //{
-                //    bpresent = false;
-                //}
-
-                //KHD 210420
-                case GemCarrierBase.eTransfer.TransferBlocked:
-                    m_btempPlaced = m_bPlaced;
-                    m_btempPresent = m_bPresent;
-                    //present = bDone ? GemCarrierBase.ePresent.Empty : GemCarrierBase.ePresent.Exist;   //KHD 210318 del
-                    //if (m_carrier.p_ePresentSensor == GemCarrierBase.ePresent.Empty)
-                    //{
-                    //    bpresent = false;
-                    //}
-                    //else if (m_carrier.p_ePresentSensor == GemCarrierBase.ePresent.Exist)
-                    //{
-                    //    bpresent = true;
-                    //}
-                    if (!m_bOHTErr && p_eState == eState.All_Off && !m_bLoadportHome)
-                    {
-                        if (m_bPresent || m_bPlaced)
-                        {
-                            bpresent = true;
-                        }
-                        else
-                        {
-                            bpresent = false;
-                        }
-                    }
-                    else
-                    {
-                        bpresent = false ;
-                    }
-
-
-                    //if (!m_bPODExist) //KHD 210318 add
-                    //{
-                    //    bpresent = true;
-                    //}
-                    //else
-                    //{
-                    //    bpresent = false;
-                    //}
+                   //if (!m_bPODExist) //KHD 210318 add
+                   //{
+                   //    bpresent = true;
+                   //}
+                   //else
+                   //{
+                   //    bpresent = false;
+                   //}
                     break;
                 default: return;
             }

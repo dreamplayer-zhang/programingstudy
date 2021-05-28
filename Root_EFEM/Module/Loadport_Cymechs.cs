@@ -10,6 +10,8 @@ using RootTools.Control;
 using RootTools.OHT.Semi;
 using RootTools.OHTNew;
 using static RootTools.Gem.XGem.XGem;
+using System.Windows.Threading;
+using System;
 
 namespace Root_EFEM.Module
 {
@@ -116,12 +118,12 @@ namespace Root_EFEM.Module
 
         public DIO_I m_diPlaced;
         public DIO_I m_diPresent;
-        private DIO_I m_diOpen;
-        private DIO_I m_diClose;
+        public DIO_I m_diOpen;
+        public DIO_I m_diClose;
         private DIO_I m_diReady;
         private DIO_I m_diRun;
 
-        //private OHT_Semi m_OHT;
+        public OHT_Semi m_OHT;
         OHT _OHT;
         public OHT m_OHTNew
         {
@@ -145,7 +147,7 @@ namespace Root_EFEM.Module
             p_sInfo = m_toolBox.GetDIO(ref m_diRun, this, "Run");
             p_sInfo = m_toolBox.GetComm(ref m_rs232, this, "RS232");
             //p_sInfo = m_toolBox.Get(ref m_OHT, this, p_infoCarrier, "OHT");
-            p_sInfo = m_toolBox.GetOHT(ref _OHT, this, p_infoCarrier, "OHT");
+            p_sInfo = m_toolBox.GetOHT(ref m_OHT, this, p_infoCarrier, "OHT");
             if (bInit)
             {
                 m_rs232.OnReceive += M_rs232_OnReceive;
@@ -172,9 +174,18 @@ namespace Root_EFEM.Module
         //forget
         #region DIO Function
         public bool m_bPlaced = false;
+        GemCarrierBase.ePresent present = GemCarrierBase.ePresent.Empty;
         public bool CheckPlaced()
         {
-            GemCarrierBase.ePresent present = m_bPlaced ? GemCarrierBase.ePresent.Exist : GemCarrierBase.ePresent.Empty;
+            //GemCarrierBase.ePresent present = m_bPlaced ? GemCarrierBase.ePresent.Exist : GemCarrierBase.ePresent.Empty;
+            if (!m_OHT.m_bAuto)
+            {
+                present = !m_diPlaced.p_bIn && !m_diPresent.p_bIn ? GemCarrierBase.ePresent.Exist : GemCarrierBase.ePresent.Empty; //LYJ add
+            }
+            else
+            {
+                present = m_OHT.m_bPODExist ? GemCarrierBase.ePresent.Exist : GemCarrierBase.ePresent.Empty; //LYJ add
+            }
             if (p_infoCarrier.CheckPlaced(present) != "OK") m_alidPlaced.Run(true, "Placed Sensor Remain Checked while Pod State = " + p_infoCarrier.p_eState);
             switch (p_infoCarrier.p_ePresentSensor)
             {
@@ -479,6 +490,8 @@ namespace Root_EFEM.Module
             Load,
             Unload,
             GetMap,
+            AUTO,
+            MANUAL,
         };
 
         Dictionary<eCmd, string> m_dicCmd = new Dictionary<eCmd, string>();
@@ -489,6 +502,8 @@ namespace Root_EFEM.Module
             m_dicCmd.Add(eCmd.Load, "LOAD");
             m_dicCmd.Add(eCmd.Unload, "UNLOAD");
             m_dicCmd.Add(eCmd.GetMap, "SCAN DN");
+            m_dicCmd.Add(eCmd.AUTO, "AUTO_MODE ON");
+            m_dicCmd.Add(eCmd.MANUAL, "AUTO_MODE OFF");
         }
 
         public class Protocol
@@ -696,6 +711,58 @@ namespace Root_EFEM.Module
         }
         #endregion
 
+        #region Timer
+        DispatcherTimer m_timer = new DispatcherTimer();
+        void InitTimer()
+        {
+            m_timer.Interval = TimeSpan.FromMilliseconds(100);
+            m_timer.Tick += M_timer_Tick;
+            m_timer.Start();
+        }
+        string tempOHTerr = "OK";
+        public string p_swLotTime = "";
+        private void M_timer_Tick(object sender, EventArgs e)
+        {
+            p_swLotTime = String.Format("{0:00}:{1:00}:{2:00}", m_swLotTime.Elapsed.Hours, m_swLotTime.Elapsed.Minutes, m_swLotTime.Elapsed.Seconds);
+            if (!EQ.IsStop())
+            {
+                if (p_infoCarrier.p_eReqAccessLP == GemCarrierBase.eAccessLP.Manual)
+                {
+                    Run(CmdSetManual());
+                    m_bReqAccessLPManual = true;
+                    m_bReqAccessLPAuto = false;
+                }
+                else if (p_infoCarrier.p_eReqAccessLP == GemCarrierBase.eAccessLP.Auto)
+                {
+                    Run(CmdSetAuto());
+
+                    m_bReqAccessLPAuto = true;
+                    m_bReqAccessLPManual = false;
+                }
+                if (m_OHT.m_bRFIDRead)
+                {
+                    m_OHT.m_bRFIDRead = false;
+                    if (this != null)
+                        this.p_infoCarrier.p_sCarrierID = "";
+                    ModuleRunBase moduleRun = m_RFID.m_runReadID.Clone();
+                    m_RFID.StartRun(moduleRun);
+                }
+            }
+            if (m_OHT.m_bOHTErr == true && m_OHT.p_sInfo != "OK")
+            {
+                m_alidOHTError.Run(m_OHT.m_bOHTErr, m_OHT.p_sInfo);
+                if(tempOHTerr != m_OHT.p_sInfo)
+                {
+                    m_log.Info(this.p_id + " OHT Err : " + m_OHT.p_sInfo);
+                }
+                tempOHTerr = m_OHT.p_sInfo;
+            }
+            else
+            {
+                tempOHTerr = m_OHT.p_sInfo;
+            }
+        }
+        #endregion
         //forget
         #region RS232 Commend
         string CmdHome()
@@ -743,7 +810,24 @@ namespace Root_EFEM.Module
             m_qProtocol.Enqueue(protocol);
             return protocol.WaitDone(m_secLoad);
         }
-
+        public bool m_bReqAccessLPManual = false;
+        public bool m_bReqAccessLPAuto = false;
+        public string CmdSetAuto()                  //LYJ add
+        {
+            if (m_bReqAccessLPAuto == true)
+                return "";
+            Protocol protocol = new Protocol(eCmd.AUTO, this);
+            m_qProtocol.Enqueue(protocol);
+            return protocol.WaitDone(m_secLoad);
+        }
+        public string CmdSetManual()                    //LYJ add
+        {
+            if (m_bReqAccessLPManual == true)
+                return "";
+            Protocol protocol = new Protocol(eCmd.MANUAL, this);
+            m_qProtocol.Enqueue(protocol);
+            return protocol.WaitDone(m_secLoad);
+        }
         #endregion
 
         #region override
@@ -777,8 +861,35 @@ namespace Root_EFEM.Module
         //forget
         #region StateHome
         bool m_bNeedHome = true;
+        public enum eOHTstate
+        {
+            TransferBlock,
+            ReadyToUnload,
+            ReadyToLoad,
+            OutOfService,
+        }
+        public int nOHTstate = 0;
         public override string StateHome()
         {
+            if (m_OHT.m_carrier.p_eTransfer == GemCarrierBase.eTransfer.TransferBlocked)
+            {
+                nOHTstate = (int)eOHTstate.TransferBlock;
+            }
+            else if (m_OHT.m_carrier.p_eTransfer == GemCarrierBase.eTransfer.ReadyToUnload)
+            {
+                nOHTstate = (int)eOHTstate.ReadyToUnload;
+            }
+            else if (m_OHT.m_carrier.p_eTransfer == GemCarrierBase.eTransfer.ReadyToLoad)
+            {
+                nOHTstate = (int)eOHTstate.ReadyToLoad;
+            }
+            else if (m_OHT.m_carrier.p_eTransfer == GemCarrierBase.eTransfer.OutOfService)
+            {
+                nOHTstate = (int)eOHTstate.OutOfService;
+            }
+            m_OHT.m_carrier.p_eTransfer = GemCarrierBase.eTransfer.TransferBlocked;
+
+
             m_swLotTime.Stop();
             if (EQ.p_bSimulate == false)
             {
@@ -818,6 +929,32 @@ namespace Root_EFEM.Module
             }
             p_eState = eState.Ready;
             p_infoCarrier.AfterHome();
+            if (nOHTstate == (int)eOHTstate.OutOfService)
+            {
+                if (m_diPlaced.p_bIn && m_diPresent.p_bIn)
+                {
+                    m_OHT.m_carrier.p_eTransfer = GemCarrierBase.eTransfer.ReadyToLoad;
+                }
+                else
+                {
+                    m_OHT.m_carrier.p_eTransfer = GemCarrierBase.eTransfer.TransferBlocked;
+                }
+            }
+            else
+            {
+                if (nOHTstate == (int)eOHTstate.TransferBlock)
+                {
+                    m_OHT.m_carrier.p_eTransfer = GemCarrierBase.eTransfer.TransferBlocked;
+                }
+                else if (nOHTstate == (int)eOHTstate.ReadyToLoad)
+                {
+                    m_OHT.m_carrier.p_eTransfer = GemCarrierBase.eTransfer.ReadyToLoad;
+                }
+                else if (nOHTstate == (int)eOHTstate.ReadyToUnload)
+                {
+                    m_OHT.m_carrier.p_eTransfer = GemCarrierBase.eTransfer.ReadyToUnload;
+                }
+            }
             return "OK";
         }
         #endregion
@@ -858,6 +995,7 @@ namespace Root_EFEM.Module
         public ALID m_alidInforeticle;
         public ALID m_alidGetOK;
         public ALID m_alidPutOK;
+        public ALID m_alidOHTError;
         public CEID m_ceidUnloadReq;
         void InitGAF() 
         {
@@ -873,6 +1011,7 @@ namespace Root_EFEM.Module
             m_alidCMD = m_gaf.GetALID(this, "CMD_Loadport", "CMD Error");
             m_alidGetOK = m_gaf.GetALID(this, "Get Err to Loadport", "Get Imposible Error");
             m_alidPutOK = m_gaf.GetALID(this, "Put Err to Loadport", "Put Imposible Error");
+            m_alidOHTError = m_gaf.GetALID(this, "OHT Error", "OHT Error");
         }
         #endregion
 
@@ -900,7 +1039,6 @@ namespace Root_EFEM.Module
         #endregion
 
         public InfoCarrier p_infoCarrier { get; set; }
-        //public IRFID m_rfid;
         IRFID _rfid;
         public IRFID m_rfid
         {
@@ -908,8 +1046,10 @@ namespace Root_EFEM.Module
             set
             {
                 _rfid = value;
+                m_RFID = (RFID_Brooks)_rfid;
             }
         }
+        RFID_Brooks m_RFID;
         public Loadport_Cymechs(string id, IEngineer engineer, bool bEnableWaferSize, bool bEnableWaferCount)
         {
             p_bLock = false;
@@ -928,6 +1068,7 @@ namespace Root_EFEM.Module
             InitGAF();
             if (m_gem != null) m_gem.OnGemRemoteCommand += M_gem_OnRemoteCommand;
             InitThread();
+            InitTimer();
 
             m_swLotTime.Reset();
         }
@@ -1013,10 +1154,10 @@ namespace Root_EFEM.Module
                     if (m_infoCarrier.p_eState == InfoCarrier.eState.Dock)
                         return p_id + " RunLoad, InfoCarrier.p_eState = " + m_infoCarrier.p_eState.ToString();
 
-                    if (m_bReadRFID)
+                    if (m_bReadRFID && m_module.p_infoCarrier.p_eReqAccessLP == GemCarrierBase.eAccessLP.Manual)
                     {
-                        sResult = m_module.m_rfid.ReadRFID();
-                        m_infoCarrier.p_sCarrierID = (sResult == "OK") ? m_module.m_rfid.m_sReadID : "";
+                        sResult = m_module.m_RFID.ReadRFID();
+                        m_infoCarrier.p_sCarrierID = (sResult == "OK") ? m_module.m_RFID.m_sReadID : "";
                     }
                     else m_infoCarrier.p_sCarrierID = m_sSimulCarrierID;
                 }
