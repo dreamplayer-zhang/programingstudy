@@ -38,6 +38,7 @@ namespace RootTools.Light
                 if (_bOn == value) return;
                 _bOn = value;
                 RaisePropertyChanged();
+                SetOnOff();
                 SetPower(); 
             }
         }
@@ -113,6 +114,9 @@ namespace RootTools.Light
         #region Virtual
         protected virtual void GetPower() { }
         public virtual void SetPower() { }
+
+        protected virtual void GetOnOff() { }
+        public virtual void SetOnOff() { }
 
         public string p_id { get; set; }
         public int p_nChannel { get; set; }
