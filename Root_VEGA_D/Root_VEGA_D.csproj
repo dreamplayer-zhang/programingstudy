@@ -196,6 +196,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Converter\PointToStringConverter.cs" />
+    <Compile Include="Converter\StringConverter.cs" />
     <Compile Include="UI_UserControl\Login_UI.xaml.cs">
       <DependentUpon>Login_UI.xaml</DependentUpon>
     </Compile>

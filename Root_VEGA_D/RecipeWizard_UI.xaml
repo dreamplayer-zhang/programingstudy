@@ -12,6 +12,8 @@
              d:DesignWidth="1056">
     <UserControl.Resources>
         <local:PointToStringConverter x:Key="PointToString"/>
+        <local:EnumToBoolConverter x:Key="EnumToBool"/>
+        <local:EnumToVisibilityConverter x:Key="EnumToVisibility"/>
     </UserControl.Resources>
     <Grid Background="White">
         <Grid.ColumnDefinitions>
@@ -45,7 +47,6 @@
                 </Grid>
             </GroupBox>
             <GroupBox Header="Manaul Align"
-                      GotFocus="GroupBox_GotFocus_1"
                       Grid.Row="2">
                 <Grid>
                     <Grid.RowDefinitions>
@@ -58,6 +59,7 @@
                             <ColumnDefinition Width="3*" />
                             <ColumnDefinition Width="2*" />
                             <ColumnDefinition Width="3*" />
+                            
                         </Grid.ColumnDefinitions>
                         <Label Content="Point 1" 
                                      VerticalAlignment="Center"
@@ -83,14 +85,25 @@
                                  HorizontalContentAlignment="Center"
                                  VerticalAlignment="Center" Text="{Binding p_secondPoint, Converter={StaticResource PointToString}}" />
                     </Grid>
-                    <Button Content="Align"
-                            Margin="0"
-                            Grid.Row="1"
+                    <Grid Grid.Row="1">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="3*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="2*"/>
+                        </Grid.ColumnDefinitions>
+                        <Button Content="Calc Angle"
+                            Margin="3"
+                            Grid.Row="1" Command="{Binding CmdCalcAlign}"
                             Style="{StaticResource SetupPanelBtn}" />
+                        <ToggleButton Content="Auto" FontWeight="Bold" Grid.Column="1" Margin="0,3,3,3" IsChecked="{Binding p_isAutoCalc}"/>
+                        <Label Content="Angle : " HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Column="2"/>
+                        <TextBox Margin="3" IsReadOnly="True" Grid.Column="3" Text="{Binding p_degree}" TextAlignment="Center" VerticalAlignment="Center"/>
+                    </Grid>
+                    
                 </Grid>
             </GroupBox>
             <GroupBox Header="Coordinate"
-                      GotFocus="GroupBox_GotFocus"
                       Grid.Row="3">
                 <Grid>
                     <Grid.RowDefinitions>
@@ -103,34 +116,43 @@
                                  Grid.Row="0">
                         <TextBlock Text="Die Size"
                                    HorizontalAlignment="Left" />
-                        <TextBlock Text="0, 0"
+                        <TextBlock Text="{Binding p_strDieSize, UpdateSourceTrigger=PropertyChanged}"
                                    x:Name="tb_dieSize"
                                    HorizontalAlignment="Left" />
                         <TextBlock Text="Scribe Lane Size"
                                    HorizontalAlignment="Left" />
-                        <TextBlock Text="0, 0"
+                        <TextBlock Text="{Binding p_strScribeLaneSize, UpdateSourceTrigger=PropertyChanged}"
                                    x:Name="tb_laneSize"
                                    HorizontalAlignment="Left" />
                         <TextBlock Text="Shot Size"
                                    HorizontalAlignment="Left" />
-                        <TextBlock Text="0, 0"
+                        <TextBlock Text="{Binding p_strShotSize, UpdateSourceTrigger=PropertyChanged}"
                                    x:Name="tb_shotSize"
                                    HorizontalAlignment="Left" />
                         <TextBlock Text="Shot"
                                    HorizontalAlignment="Left" />
-                        <TextBlock Text="0, 0"
+                        <TextBlock Text="{Binding p_strShot, UpdateSourceTrigger=PropertyChanged}"
                                    x:Name="tb_shot"
                                    HorizontalAlignment="Left" />
                     </UniformGrid>
-                    <CheckBox Content="Manual Input"
-                              Grid.ColumnSpan="2"
-                              x:Name="cbManualMap"
-                              Margin="0,5,0,0"
-                              Grid.Row="1" />
+                    <Grid Grid.Row="1">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+                        <CheckBox Content="Manual Input"
+                              x:Name="cbManualMap" IsChecked="{Binding p_isManualInput}"
+                              Margin="0,0,0,0" VerticalAlignment="Center"/>
+                        <CheckBox Content="Auto next" Grid.Column="1"
+                             IsChecked="{Binding p_isAutoNext}"
+                              Margin="0,0,0,0" VerticalAlignment="Center"/>
+                    </Grid>
+                  
                     <Grid Grid.Row="2">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="40" />
                             <ColumnDefinition Width="4*" />
+                            <ColumnDefinition Width="2*" />
                             <ColumnDefinition Width="3*" />
                             <ColumnDefinition Width="3*" />
                         </Grid.ColumnDefinitions>
@@ -148,119 +170,125 @@
                         </Grid.RowDefinitions>
                         <TextBlock Text="Index"
                                    Grid.Column="0"
-                                   HorizontalAlignment="Left"
+                                   HorizontalAlignment="Center"
                                    Margin="0,2" />
                         <TextBlock Text="Property"
                                    Grid.Column="1"
                                    Margin="0,2"
-                                   HorizontalAlignment="Left" />
-                        <TextBlock Text="X"
-                                   
-                                   Grid.Column="2"
+                                   HorizontalAlignment="Center" />
+                        <TextBlock Text="Color"
+                                   Grid.Column="2" HorizontalAlignment="Center"
                                    Margin="5,2" />
-                        <TextBlock Text="Y"
+                        <TextBlock Text="X" HorizontalAlignment="Center"
                                    Grid.Column="3"
+                                   Margin="5,2" />
+                        <TextBlock Text="Y" HorizontalAlignment="Center"
+                                   Grid.Column="4"
                                    Margin="5,2" />
                         <RadioButton Content="a."
                                      Tag="a"
-                                     Checked="Coordinate_Checked"
+                                     IsChecked="{Binding p_coordinateEnum, Converter={StaticResource EnumToBool},ConverterParameter=FIRSTDIELEFT}"
                                      x:Name="rb_a"
-                                   Grid.Row="1"
-                                   HorizontalAlignment="Left" />
-                        <RadioButton Content="b."
-                                     Tag="b"
-                                     Checked="Coordinate_Checked"
+                                   Grid.Row="1" VerticalContentAlignment="Center"
+                                   HorizontalAlignment="Left" VerticalAlignment="Center" />
+                        <RadioButton Content="b." VerticalContentAlignment="Center"
+                                     Tag="b"  IsChecked="{Binding p_coordinateEnum, Converter={StaticResource EnumToBool},ConverterParameter=FIRSTDIERIGHT}"
                                      x:Name="rb_b"
                                    Grid.Row="2"
                                    HorizontalAlignment="Left" />
-                        <RadioButton Content="c."
-                                     Tag="c"
-                                     Checked="Coordinate_Checked"
+                        <RadioButton Content="c." VerticalContentAlignment="Center"
+                                     Tag="c"  IsChecked="{Binding p_coordinateEnum, Converter={StaticResource EnumToBool},ConverterParameter=SECONDDIELEFT}"
                                      x:Name="rb_c"
                                    Grid.Row="3"
                                    HorizontalAlignment="Left" />
-                        <RadioButton Content="d."
-                                     Tag="d"
-                                     Checked="Coordinate_Checked"
+                        <RadioButton Content="d." VerticalContentAlignment="Center"
+                                     Tag="d"  IsChecked="{Binding p_coordinateEnum, Converter={StaticResource EnumToBool},ConverterParameter=LASTDIERIGHT}"
                                      x:Name="rb_d"
                                    Grid.Row="4"
                                    HorizontalAlignment="Left" />
-                        <RadioButton Content="e."
-                                     Tag="e"
-                                     Checked="Coordinate_Checked"
+                        <RadioButton Content="e." VerticalContentAlignment="Center"
+                                     Tag="e"  IsChecked="{Binding p_coordinateEnum, Converter={StaticResource EnumToBool},ConverterParameter=FIRSTDIEBOTTOM}"
                                      x:Name="rb_e"
                                    Grid.Row="5"
                                    HorizontalAlignment="Left" />
-                        <RadioButton Content="f."
-                                     Tag="f"
-                                     Checked="Coordinate_Checked"
+                        <RadioButton Content="f." VerticalContentAlignment="Center"
+                                     Tag="f"  IsChecked="{Binding p_coordinateEnum, Converter={StaticResource EnumToBool},ConverterParameter=FIRSTDIEUP}"
                                      x:Name="rb_f"
                                    Grid.Row="6"
                                    HorizontalAlignment="Left" />
-                        <RadioButton Content="g."
-                                     Tag="g"
-                                     Checked="Coordinate_Checked"
+                        <RadioButton Content="g." VerticalContentAlignment="Center"
+                                     Tag="g"  IsChecked="{Binding p_coordinateEnum, Converter={StaticResource EnumToBool},ConverterParameter=SECONDDIEBOTTOM}"
                                      x:Name="rb_g"
                                    Grid.Row="7"
                                    HorizontalAlignment="Left" />
-                        <RadioButton Content="h."
-                                     Tag="h"
-                                     Checked="Coordinate_Checked"
+                        <RadioButton Content="h." VerticalContentAlignment="Center"
+                                     Tag="h"  IsChecked="{Binding p_coordinateEnum, Converter={StaticResource EnumToBool},ConverterParameter=LASTDIEUP}"
                                      x:Name="rb_h"
                                    Grid.Row="8"
                                    HorizontalAlignment="Left" />
                         <TextBlock Text="FirstDieLeft"
                                    Grid.Column="1"
                                    Grid.Row="1"
-                                   HorizontalAlignment="Left" />
+                                   HorizontalAlignment="Center" />
                         <TextBlock Text="FirstDieRight"
                                    Grid.Column="1"
                                    Grid.Row="2"
-                                   HorizontalAlignment="Left" />
+                                   HorizontalAlignment="Center" />
                         <TextBlock Text="SecondDieLeft"
                                    Grid.Column="1"
                                    Grid.Row="3"
-                                   HorizontalAlignment="Left" />
+                                   HorizontalAlignment="Center" />
                         <TextBlock Text="LastDieRight"
                                    Grid.Column="1"
                                    Grid.Row="4"
-                                   HorizontalAlignment="Left" />
+                                   HorizontalAlignment="Center" />
                         <TextBlock Text="FirstDieBottom"
                                    Grid.Column="1"
                                    Grid.Row="5"
-                                   HorizontalAlignment="Left" />
+                                   HorizontalAlignment="Center" />
                         <TextBlock Text="FirstDieUp"
                                    Grid.Column="1"
                                    Grid.Row="6"
-                                   HorizontalAlignment="Left" />
+                                   HorizontalAlignment="Center" />
                         <TextBlock Text="SecondDieBottom"
                                    Grid.Column="1"
                                    Grid.Row="7"
-                                   HorizontalAlignment="Left" />
+                                   HorizontalAlignment="Center" />
                         <TextBlock Text="LastDieUp"
                                    Grid.Column="1"
                                    Grid.Row="8"
-                                   HorizontalAlignment="Left" />
-                        <TextBox Grid.Column="2"
-                                 x:Name="tb_a"
+                                   HorizontalAlignment="Center" />
+
+                        <Border Grid.Row="1" Grid.Column="2" Background="Red" Margin="25,3,25,3"/>
+                        <Border Grid.Row="2" Grid.Column="2" Background="Orange" Margin="25,3,25,3"/>
+                        <Border Grid.Row="3" Grid.Column="2" Background="Green" Margin="25,3,25,3"/>
+                        <Border Grid.Row="4" Grid.Column="2" Background="Blue" Margin="25,3,25,3"/>
+                        <Border Grid.Row="5" Grid.Column="2" Background="Yellow" Margin="25,3,25,3"/>
+                        <Border Grid.Row="6" Grid.Column="2" Background="Aqua" Margin="25,3,25,3"/>
+                        <Border Grid.Row="7" Grid.Column="2" Background="Brown" Margin="25,3,25,3"/>
+                        <Border Grid.Row="8" Grid.Column="2" Background="Indigo" Margin="25,3,25,3"/>
+
+
+                        <TextBox Grid.Column="3"
+                                 x:Name="tb_a" Text="{Binding p_firstDieLeft}"
                                  IsEnabled="{Binding ElementName=cbManualMap, Path=IsChecked}"
                                  Grid.Row="1"
                                  Margin="3,0"
                                  VerticalAlignment="Center" />
-                        <TextBox Grid.Column="2"
-                                 x:Name="tb_b"
+                        <TextBox Grid.Column="3"
+                                 x:Name="tb_b" Text="{Binding p_firstDieRight}"
                                  IsEnabled="{Binding ElementName=cbManualMap, Path=IsChecked}"
                                  Grid.Row="2"
                                  Margin="3,0"
                                  VerticalAlignment="Center" />
-                        <TextBox Grid.Column="2"
-                                 x:Name="tb_c"
+                        <TextBox Grid.Column="3"
+                                 x:Name="tb_c" Text="{Binding p_secondDieLeft}"
                                  IsEnabled="{Binding ElementName=cbManualMap, Path=IsChecked}"
                                  Grid.Row="3"
                                  Margin="3,0"
                                  VerticalAlignment="Center" />
-                        <TextBox Grid.Column="2"
-                                 x:Name="tb_d"
+                        <TextBox Grid.Column="3"
+                                 x:Name="tb_d"  Text="{Binding p_lastDieRight}"
                                  IsEnabled="{Binding ElementName=cbManualMap, Path=IsChecked}"
                                  Grid.Row="4"
                                  Margin="3,0"
@@ -271,74 +299,74 @@
                                  Visibility="Collapsed"
                                  Margin="3,0"
                                  VerticalAlignment="Center" />
-                        <TextBox Grid.Column="2"
+                        <TextBox Grid.Column="3" 
                                  IsEnabled="{Binding ElementName=cbManualMap, Path=IsChecked}"
                                  Grid.Row="6"
                                  Visibility="Collapsed"
                                  Margin="3,0"
                                  VerticalAlignment="Center" />
-                        <TextBox Grid.Column="2"
+                        <TextBox Grid.Column="3" 
                                  IsEnabled="{Binding ElementName=cbManualMap, Path=IsChecked}"
                                  Grid.Row="7"
                                  Visibility="Collapsed"
                                  Margin="3,0"
                                  VerticalAlignment="Center" />
-                        <TextBox Grid.Column="2"
+                        <TextBox Grid.Column="3"
                                  IsEnabled="{Binding ElementName=cbManualMap, Path=IsChecked}"
                                  Grid.Row="8"
                                  Visibility="Collapsed"
                                  Margin="3,0"
                                  VerticalAlignment="Center" />
-                        <TextBox Grid.Column="3"
+                        <TextBox Grid.Column="4"
                                  IsEnabled="{Binding ElementName=cbManualMap, Path=IsChecked}"
                                  Grid.Row="1"
                                  Visibility="Collapsed"
                                  Margin="3,0"
                                  VerticalAlignment="Center" />
-                        <TextBox Grid.Column="3"
+                        <TextBox Grid.Column="4"
                                  IsEnabled="{Binding ElementName=cbManualMap, Path=IsChecked}"
                                  Grid.Row="2"
                                  Visibility="Collapsed"
                                  Margin="3,0"
                                  VerticalAlignment="Center" />
-                        <TextBox Grid.Column="3"
+                        <TextBox Grid.Column="4"
                                  IsEnabled="{Binding ElementName=cbManualMap, Path=IsChecked}"
                                  Grid.Row="3"
                                  Visibility="Collapsed"
                                  Margin="3,0"
                                  VerticalAlignment="Center" />
-                        <TextBox Grid.Column="3"
+                        <TextBox Grid.Column="4"
                                  IsEnabled="{Binding ElementName=cbManualMap, Path=IsChecked}"
                                  Grid.Row="4"
                                  Visibility="Collapsed"
                                  Margin="3,0"
                                  VerticalAlignment="Center" />
-                        <TextBox Grid.Column="3"
-                                 x:Name="tb_e"
+                        <TextBox Grid.Column="4"
+                                 x:Name="tb_e"  Text="{Binding p_firstDieBottom}"
                                  IsEnabled="{Binding ElementName=cbManualMap, Path=IsChecked}"
                                  Grid.Row="5"
                                  Margin="3,0"
                                  VerticalAlignment="Center" />
-                        <TextBox Grid.Column="3"
-                                 x:Name="tb_f"
+                        <TextBox Grid.Column="4"
+                                 x:Name="tb_f" Text="{Binding p_firstDieUp}"
                                  IsEnabled="{Binding ElementName=cbManualMap, Path=IsChecked}"
                                  Grid.Row="6"
                                  Margin="3,0"
                                  VerticalAlignment="Center" />
-                        <TextBox Grid.Column="3"
-                                 x:Name="tb_g"
+                        <TextBox Grid.Column="4"
+                                 x:Name="tb_g" Text="{Binding p_secondDieBottom}"
                                  IsEnabled="{Binding ElementName=cbManualMap, Path=IsChecked}"
                                  Grid.Row="7"
                                  Margin="3,0"
                                  VerticalAlignment="Center" />
-                        <TextBox Grid.Column="3"
-                                 x:Name="tb_h"
+                        <TextBox Grid.Column="4"
+                                 x:Name="tb_h" Text="{Binding p_lastDieUp}"
                                  IsEnabled="{Binding ElementName=cbManualMap, Path=IsChecked}"
                                  Grid.Row="8"
                                  Margin="3,0"
                                  VerticalAlignment="Center" />
                         <Button Content="Save"
-                                Grid.ColumnSpan="4"
+                                Grid.ColumnSpan="5"
                                 Grid.Row="10"
                                 Margin="0,5"
                                 Style="{StaticResource SetupPanelBtn}"/>
@@ -356,35 +384,35 @@
                         <control:Arrow Text="a."
                                        x:Name="Arrow_a"
                                        Canvas.Left="46"
-                                       Canvas.Top="213"/>
+                                       Canvas.Top="213" Visibility="{Binding p_coordinateEnum, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource EnumToVisibility}, ConverterParameter=FIRSTDIELEFT}"/>
                         <control:Arrow Text="b."
                                        x:Name="Arrow_b"
                                        Canvas.Left="86"
-                                       Canvas.Top="213" />
+                                       Canvas.Top="213" Visibility="{Binding p_coordinateEnum, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource EnumToVisibility}, ConverterParameter=FIRSTDIERIGHT}" />
                         <control:Arrow Text="c."
                                        x:Name="Arrow_c"
                                        Canvas.Left="94"
-                                       Canvas.Top="213" />
+                                       Canvas.Top="213" Visibility="{Binding p_coordinateEnum, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource EnumToVisibility}, ConverterParameter=SECONDDIELEFT}"/>
                         <control:Arrow Text="d."
                                        x:Name="Arrow_d"
                                        Canvas.Left="229"
-                                       Canvas.Top="213" />
+                                       Canvas.Top="213" Visibility="{Binding p_coordinateEnum, UpdateSourceTrigger=PropertyChanged,Converter={StaticResource EnumToVisibility}, ConverterParameter=LASTDIERIGHT}"/>
                         <control:Arrow Text="e."
                                        x:Name="Arrow_e"
                                        Canvas.Left="229"
-                                       Canvas.Top="213" />
+                                       Canvas.Top="213" Visibility="{Binding p_coordinateEnum, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource EnumToVisibility}, ConverterParameter=FIRSTDIEBOTTOM}" />
                         <control:Arrow Text="f."
                                        x:Name="Arrow_f"
                                        Canvas.Left="229"
-                                       Canvas.Top="166" />
+                                       Canvas.Top="166" Visibility="{Binding p_coordinateEnum, UpdateSourceTrigger=PropertyChanged,Converter={StaticResource EnumToVisibility}, ConverterParameter=FIRSTDIEUP}"/>
                         <control:Arrow Text="g."
                                        x:Name="Arrow_g"
                                        Canvas.Left="229"
-                                       Canvas.Top="160" />
+                                       Canvas.Top="160" Visibility="{Binding p_coordinateEnum, UpdateSourceTrigger=PropertyChanged,Converter={StaticResource EnumToVisibility}, ConverterParameter=SECONDDIEBOTTOM}"/>
                         <control:Arrow Text="h."
                                        x:Name="Arrow_h"
                                        Canvas.Left="229"
-                                       Canvas.Top="7" />
+                                       Canvas.Top="7" Visibility="{Binding p_coordinateEnum, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource EnumToVisibility}, ConverterParameter=LASTDIEUP}"/>
                     </Canvas>
                 </Grid>
             </GroupBox>
