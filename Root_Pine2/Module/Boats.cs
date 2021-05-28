@@ -73,6 +73,26 @@ namespace Root_Pine2.Module
         }
         #endregion
 
+        #region ScanData
+        public class ScanData
+        {
+            public RPoint m_dpAxis = new RPoint();
+            public Vision.ScanData m_scanData = new Vision.ScanData();
+
+            public void RunTree(Tree tree, bool bVisible)
+            {
+                m_dpAxis = tree.Set(m_dpAxis, m_dpAxis, "Axis Offset", "Axis Offset (pulse)");
+                m_scanData.RunTree(tree, bVisible); 
+            }
+
+            Vision m_vision; 
+            public ScanData(Vision vision)
+            {
+                m_vision = vision; 
+            }
+        }
+        #endregion
+
         #region Boat
         public Dictionary<Vision.eWorks, Boat> m_aBoat = new Dictionary<Vision.eWorks, Boat>(); 
         void InitBoat()
@@ -188,7 +208,7 @@ namespace Root_Pine2.Module
 
             public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
             {
-                m_eWorks = (Vision.eWorks)tree.Set(m_eWorks, m_eWorks, "VisionWorks", "Select VisionWorks", bVisible);
+                m_eWorks = (Vision.eWorks)tree.Set(m_eWorks, m_eWorks, "Boat", "Select Boat", bVisible);
             }
 
             public override string Run()
