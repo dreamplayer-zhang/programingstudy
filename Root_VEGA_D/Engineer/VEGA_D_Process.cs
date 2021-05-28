@@ -399,13 +399,15 @@ namespace Root_VEGA_D.Engineer
                 return EQ.IsStop() ? "EQ Stop" : "OK";
             }
             Sequence sequence = m_qSequence.Peek();
+            ModuleBase module = sequence.m_moduleRun.m_moduleBase;
             //bool bLoadport = sequence.m_moduleRun.m_moduleBase is ILoadport;
-            //if ((sequence.m_moduleRun.m_moduleBase == wtr) || bLoadport)
-            //{
-            //    sequence.m_moduleRun.StartRun();
-            //    while (wtr.IsBusy() && (EQ.IsStop() == false)) Thread.Sleep(10);
-            //}
-            sequence.m_moduleRun.StartRun();
+			//if ((sequence.m_moduleRun.m_moduleBase == wtr) || bLoadport)
+			//{
+			//	sequence.m_moduleRun.StartRun();
+			//	while (wtr.IsBusy() && (EQ.IsStop() == false)) Thread.Sleep(10);
+			//}
+			sequence.m_moduleRun.StartRun();
+            while (module.IsBusy() && (EQ.IsStop() == false)) Thread.Sleep(10);
             m_qSequence.Dequeue();
             m_dSequencePercent += m_dOneSequencePercent;
             InfoWafer infoWafer = sequence.m_infoWafer;
