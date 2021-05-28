@@ -276,8 +276,8 @@ namespace Root_EFEM
             }
             if (p_eState != eState.Ready)
                 return p_id + " eState not Ready";
-            if (p_infoWafer == null)
-                return p_id + " IsGetOK - InfoWafer not Exist";
+            //if (p_infoWafer == null)
+            //    return p_id + " IsGetOK - InfoWafer not Exist";
             return "OK";
         }
 
@@ -289,10 +289,10 @@ namespace Root_EFEM
             }
             if (p_eState != eState.Ready)
                 return p_id + " eState not Ready";
-            if (p_infoWafer != null)
-                return p_id + " IsPutOK - InfoWafer Exist";
-            if (m_waferSize.GetData(infoWafer.p_eSize).m_bEnable == false)
-                return p_id + " not Enable Wafer Size";
+            //if (p_infoWafer != null)
+            //    return p_id + " IsPutOK - InfoWafer Exist";
+            //if (m_waferSize.GetData(infoWafer.p_eSize).m_bEnable == false)
+            //    return p_id + " not Enable Wafer Size";
             return "OK";
         }
 
@@ -308,10 +308,12 @@ namespace Root_EFEM
             if (p_eRemote == eRemote.Client) return RemoteRun(eRemoteRun.BeforeGet, eRemote.Client, nID);
             else
             {
-                m_axisXY.StartMove("Position_0");
-                m_axisRotate.StartMove("Position_0");
-                m_axisZ.StartMove("Position_0");
+                DoVac.Write(false);
+                m_axisXY.StartMove("Position_2");
+                m_axisRotate.StartMove("Position_2");
+                m_axisZ.StartMove("Position_2");
 
+                Thread.Sleep(1000);
                 m_axisXY.WaitReady();
                 m_axisRotate.WaitReady();
                 m_axisZ.WaitReady();
@@ -326,10 +328,12 @@ namespace Root_EFEM
             if (p_eRemote == eRemote.Client) return RemoteRun(eRemoteRun.BeforePut, eRemote.Client, nID);
             else
             {
-                m_axisXY.StartMove("Position_0");
-                m_axisRotate.StartMove("Position_0");
-                m_axisZ.StartMove("Position_0");
+                DoVac.Write(true);
+                m_axisXY.StartMove("Position_2");
+                m_axisRotate.StartMove("Position_2");
+                m_axisZ.StartMove("Position_2");
 
+                Thread.Sleep(1000);
                 m_axisXY.WaitReady();
                 m_axisRotate.WaitReady();
                 m_axisZ.WaitReady();

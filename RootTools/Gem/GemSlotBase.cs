@@ -1,6 +1,7 @@
 ﻿using RootTools.Trees;
 using System;
 using System.Collections.Generic;
+using RootTools.Module;
 
 namespace RootTools.Gem
 {
@@ -181,6 +182,11 @@ namespace RootTools.Gem
             if (sts == eSTS.atWork) p_eSTSProcess = eSTSProcess.NeedProcessing;
             m_gem?.STSSetTransport(sLocID, this, sts);
             return "OK";
+        }
+
+        public void STSProcessing()
+        {
+            m_gem.STSSetProcessing(this, eSTSProcess.InProcess);
         }
 
         public void STSProcessDone()

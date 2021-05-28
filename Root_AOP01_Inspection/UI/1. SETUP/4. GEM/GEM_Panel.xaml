@@ -17,6 +17,7 @@
                     <Button Content="Setup"
                             Style="{StaticResource SetupPanelBtn}"/>
                     <Button Content="Other"
+                            Command="{Binding btnOther}"
                             Style="{StaticResource SetupPanelBtn}"/>
                 </StackPanel>
                 <Button Content="Back"

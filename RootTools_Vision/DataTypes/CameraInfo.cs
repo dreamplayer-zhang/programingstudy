@@ -28,6 +28,10 @@ namespace RootTools_Vision
         /// </summary>
         public double RealResY;
 
+        //public int ScanDegree;
+        //public int ImageHeight;
+        //public int CameraHeight;
+        //public int CameraPositionOffset;
 
         /// <summary>
         /// Resolution 정보가 없을 경우 Resolution은 무조건 1로 하여 검사 결과에 영향을 주지않도록함.
@@ -42,6 +46,11 @@ namespace RootTools_Vision
             TargetResY = targetResY;
             RealResX = realResX;
             RealResY = realResY;
+
+            //ScanDegree = 0;
+            //ImageHeight = 0;
+            //CameraHeight = 0;
+            //CameraPositionOffset = 0;
         }
     }
 }

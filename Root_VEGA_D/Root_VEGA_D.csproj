@@ -59,7 +59,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="EasyModbus">
-      <HintPath>bin\x64\EasyModbus.dll</HintPath>
+      <HintPath>..\Lib\EasyModbus.dll</HintPath>
     </Reference>
     <Reference Include="Interop.SPIIPLUSCOM660Lib">
       <HintPath>..\RootTools\obj\x64\Debug\Interop.SPIIPLUSCOM660Lib.dll</HintPath>

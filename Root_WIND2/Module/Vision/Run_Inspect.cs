@@ -83,6 +83,7 @@ namespace Root_WIND2.Module
             //레시피에 GrabMode 저장하고 있어야함
 
             RootTools_Vision.WorkManager3.WorkManager workManager = GlobalObjects.Instance.GetNamed<RootTools_Vision.WorkManager3.WorkManager>("frontInspection");
+
             if(workManager == null)
             {
                 throw new ArgumentException("WorkManager가 초기화되지 않았습니다(null)");
@@ -113,14 +114,14 @@ namespace Root_WIND2.Module
             //ImageData frontImage = GlobalObjects.Instance.GetNamed<ImageData>("FrontImage");
             //frontImage.ClearImage();
 
-
-
             try
             {
 
                 #region [Snap sequence] 
 
-
+                // 210525 추가
+                RecipeFront recipe = GlobalObjects.Instance.Get<RecipeFront>();
+                m_grabMode = m_module.GetGrabMode(p_sGrabMode[recipe.CameraInfoIndex]);
 
                 m_grabMode.SetLens();
                 m_grabMode.SetLight(true);
@@ -317,71 +318,76 @@ namespace Root_WIND2.Module
                         DataTable table = DatabaseManager.Instance.SelectCurrentInspectionDefect();
                         List<Defect> defects = Tools.DataTableToDefectList(table);
 
-                        RecipeFront recipe = GlobalObjects.Instance.Get<RecipeFront>();
+                        WIND2_Engineer engineer = GlobalObjects.Instance.Get<WIND2_Engineer>();
+                        CameraInfo camInfo = DataConverter.GrabModeToCameraInfo(engineer.m_handler.p_Vision.GetGrabMode(recipe.CameraInfoIndex));
+
 
                         KlarfData_Lot klarfData = new KlarfData_Lot();
                         Directory.CreateDirectory(settings_frontside.KlarfSavePath);
-
-                        klarfData.AddSlot(recipe.WaferMap, defects, recipe.GetItem<OriginRecipe>(), settings_frontside.UseTDIReview, settings_frontside.UseVrsReview);
+                        klarfData.SetResolution((float)camInfo.RealResX, (float)camInfo.RealResY);
                         klarfData.WaferStart(recipe.WaferMap, DateTime.Now);
                         klarfData.SetResultTimeStamp();
-                        klarfData.AddSlot(recipe.WaferMap, defects, recipe.GetItem<OriginRecipe>());
+                        klarfData.AddSlot(recipe.WaferMap, defects, recipe.GetItem<OriginRecipe>(), settings_frontside.UseTDIReview, settings_frontside.UseVrsReview);
                         klarfData.SaveKlarf(settings_frontside.KlarfSavePath, false);
 
 
                         //***************** VRS Capture Sequence *********************//
                         ConcurrentQueue<byte[]> vrsImageQueue = new System.Collections.Concurrent.ConcurrentQueue<byte[]>();
-                        Camera_Basler camVrs = GlobalObjects.Instance.Get<WIND2_Engineer>().m_handler.p_Vision.p_CamAutoFocus;
-                        ImageData vrsImage = camVrs.p_ImageData;
+                        Camera_Basler camVrs = GlobalObjects.Instance.Get<WIND2_Engineer>().m_handler.p_Vision.p_CamVRS;
+                        Rect vrsRect = new Rect(0, 0, camVrs.p_ImageData.p_Size.X, camVrs.p_ImageData.p_Size.Y);
+
+                        
 
                         if (settings_frontside.UseVrsReview)
                         {
-                            double dPosZ = dFocusPosZ - m_dTDIToVRSOffsetZ;
-                            // Z축 이동
-                            if (m_module.Run(axisZ.StartMove(dPosZ)))
-                                return p_sInfo;
-                            if (m_module.Run(axisZ.WaitReady()))
-                                return p_sInfo;
-
-
                             for (int i = 0; i < defects.Count; i++)
                             {
-                                // Image to Axis 좌표 변환
-                                double dPosX = defects[i].m_fAbsX;
-                                double dPosY = defects[i].m_fAbsY;
 
-                                dPosX += m_grabMode.m_dTDIToVRSOffsetX;
-                                dPosY += m_grabMode.m_dTDIToVRSOffsetY;
+                                CPoint vrsPoint = PositionConverter.ConvertImageToVRS(m_module, new CPoint((int)defects[i].m_fAbsX, (int)defects[i].m_fAbsY));
 
                                 // XY 찍는 위치로 이동
                                 if (m_module.Run(axisXY.WaitReady()))
                                     return p_sInfo;
-                                if (m_module.Run(axisXY.StartMove(new RPoint(dPosX, dPosY))))
+                                if (m_module.Run(axisXY.StartMove(new RPoint(vrsPoint.X, vrsPoint.Y))))
                                     return p_sInfo;
                                 if (m_module.Run(axisXY.WaitReady()))
                                     return p_sInfo;
 
+                                if (!m_module.p_CamVRS.m_ConnectDone)
+                                {
+                                    m_module.p_CamVRS.FunctionConnect();
+                                }
+                                else
+                                {
+                                    if (m_module.p_CamVRS.p_CamInfo._IsGrabbing == false)
+                                    {
+                                        m_module.p_CamVRS.GrabContinuousShot();
+                                    }
+                                }
 
+                                // Capture
+                                Thread.Sleep(1000); // 나중에 줄이기
                                 byte[] copyBuffer = null;
-                                vrsImage.CopyToBuffer(out copyBuffer);
+                                camVrs.CopyToBuffer(out copyBuffer, vrsRect);
                                 vrsImageQueue.Enqueue(copyBuffer);
                             }
                         }
 
                         //************************************************************//
 
+                        Thread.Sleep(2000);
 
                         if (settings_frontside.UseTDIReview && settings_frontside.UseVrsReview)
                         {
-                            Tools.SaveTiffImageBoth(settings_frontside.KlarfSavePath, "TEST", defects, workManager.SharedBuffer, new Size(160, 120), vrsImageQueue, new Size(vrsImage.p_Size.X, vrsImage.p_Size.Y));
+                            Tools.SaveTiffImageBoth(settings_frontside.KlarfSavePath, klarfData.GetKlarfFileName(), defects, workManager.SharedBuffer, new Size(160, 120), vrsImageQueue, new Size(vrsRect.Width, vrsRect.Height));
                         }
                         else if(settings_frontside.UseTDIReview)
                         {
-                            Tools.SaveTiffImageOnlyTDI(settings_frontside.KlarfSavePath, "TEST", defects, workManager.SharedBuffer, new Size(160, 120));
+                            Tools.SaveTiffImageOnlyTDI(settings_frontside.KlarfSavePath, klarfData.GetKlarfFileName(), defects, workManager.SharedBuffer, new Size(160, 120));
                         }
                         else if(settings_frontside.UseVrsReview)
                         {
-                            Tools.SaveTiffImageOnlyVRS(settings_frontside.KlarfSavePath, "TEST", defects, vrsImageQueue, new Size(vrsImage.p_Size.X, vrsImage.p_Size.Y));
+                            Tools.SaveTiffImageOnlyVRS(settings_frontside.KlarfSavePath, klarfData.GetKlarfFileName(), defects, vrsImageQueue, new Size(vrsRect.Width, vrsRect.Height));
                         }
                     }
 

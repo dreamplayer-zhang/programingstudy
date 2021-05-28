@@ -185,5 +185,8 @@
                       HorizontalAlignment="Stretch"
                       VerticalAlignment="Stretch"
                       ShowsPreview="True"/>
+        <TabControl>
+           
+        </TabControl>
     </Grid>
 </Window>

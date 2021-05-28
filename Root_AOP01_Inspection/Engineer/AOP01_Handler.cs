@@ -145,7 +145,7 @@ namespace Root_AOP01_Inspection
             char cLP = 'A';
             for (int n = 0; n < m_lLoadport; n++, cLP++)
             {
-                string sID = "Loadport" + cLP;
+                string sID = "LoadPort" + cLP;
                 switch (m_aLoadportType[n])
                 {
                     case eLoadport.RND:
@@ -390,7 +390,7 @@ namespace Root_AOP01_Inspection
                     case EQ.eState.Recovery:
                         if (p_moduleList.m_qModuleRun.Count == 0)
                         {
-                            //CheckLoad();
+                            //CheckLoad(); 
                             m_process.p_sInfo = m_process.RunNextSequence();
                             //CheckUnload();
                             if((EQ.p_nRnR > 1) && (m_process.m_qSequence.Count == 0))

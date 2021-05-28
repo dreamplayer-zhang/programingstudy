@@ -54,17 +54,6 @@ namespace RootTools.Light
                 _fSetPower = Math.Round(100 * fSetPower / p_fScalePower) / 100.0; 
                 RaisePropertyChanged();
                 SetPower();
-                _nDifferent = 0; 
-            }
-        }
-
-        int _nDifferent = 0; 
-        public int p_nDifferent
-        {
-            get
-            {
-                _nDifferent = (p_fGetPower == p_fSetPower) ? 0 : _nDifferent + 1;
-                return _nDifferent; 
             }
         }
         #endregion
