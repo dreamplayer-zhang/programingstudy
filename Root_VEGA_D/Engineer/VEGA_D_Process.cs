@@ -391,7 +391,7 @@ namespace Root_VEGA_D.Engineer
         /// <summary> m_aSequence에 있는 ModuleRun을 가능한 동시 실행한다 </summary>
         public string RunNextSequence()
         {
-            ModuleBase wtr = (ModuleBase)m_wtr;
+            //ModuleBase wtr = (ModuleBase)m_wtr;
             if ((m_qSequence.Count == 0) || EQ.IsStop())
             {
                 EQ.p_eState = EQ.eState.Ready;
@@ -399,13 +399,13 @@ namespace Root_VEGA_D.Engineer
                 return EQ.IsStop() ? "EQ Stop" : "OK";
             }
             Sequence sequence = m_qSequence.Peek();
-            bool bLoadport = sequence.m_moduleRun.m_moduleBase is ILoadport;
+            //bool bLoadport = sequence.m_moduleRun.m_moduleBase is ILoadport;
             //if ((sequence.m_moduleRun.m_moduleBase == wtr) || bLoadport)
             //{
             //    sequence.m_moduleRun.StartRun();
             //    while (wtr.IsBusy() && (EQ.IsStop() == false)) Thread.Sleep(10);
             //}
-            else sequence.m_moduleRun.StartRun();
+            sequence.m_moduleRun.StartRun();
             m_qSequence.Dequeue();
             m_dSequencePercent += m_dOneSequencePercent;
             InfoWafer infoWafer = sequence.m_infoWafer;
