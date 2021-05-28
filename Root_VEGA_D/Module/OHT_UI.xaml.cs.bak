@@ -63,52 +63,49 @@ namespace Root_VEGA_D.Module
 
         private void buttonAccessAuto_Click(object sender, RoutedEventArgs e)
         {
-            if(!m_OHT.P_bProtectionBar && !m_OHT.p_bLightCurtain)
+            if (m_OHT.m_diCS[0].p_bOn || m_OHT.m_diValid.p_bOn || m_OHT.m_diTrReq.p_bOn || m_OHT.m_diBusy.p_bOn || m_OHT.m_diComplete.p_bOn || m_OHT.m_diContinue.p_bOn)
             {
-                if (m_OHT.m_diCS[0].p_bOn || m_OHT.m_diValid.p_bOn || m_OHT.m_diTrReq.p_bOn || m_OHT.m_diBusy.p_bOn || m_OHT.m_diComplete.p_bOn || m_OHT.m_diContinue.p_bOn)
+                m_OHT.AutoCheckDI(m_OHT.m_diCS[0]);
+                m_OHT.AutoCheckDI(m_OHT.m_diValid);
+                m_OHT.AutoCheckDI(m_OHT.m_diTrReq);
+                m_OHT.AutoCheckDI(m_OHT.m_diBusy);
+                m_OHT.AutoCheckDI(m_OHT.m_diComplete);
+                m_OHT.AutoCheckDI(m_OHT.m_diContinue);
+            }
+            else
+            {
+                m_loadport.p_infoCarrier.p_eReqAccessLP = GemCarrierBase.eAccessLP.Auto; //KHD 210317
+                                                                                         //changeLPState(GemCarrierBase.eAccessLP.Auto);
+                if (!m_loadport.m_diPresent.p_bIn && !m_loadport.m_diPlaced.p_bIn)
                 {
-                    m_OHT.AutoCheckDI(m_OHT.m_diCS[0]);
-                    m_OHT.AutoCheckDI(m_OHT.m_diValid);
-                    m_OHT.AutoCheckDI(m_OHT.m_diTrReq);
-                    m_OHT.AutoCheckDI(m_OHT.m_diBusy);
-                    m_OHT.AutoCheckDI(m_OHT.m_diComplete);
-                    m_OHT.AutoCheckDI(m_OHT.m_diContinue);
+                    m_OHT.m_bPODExist = true;
+                }
+                else if (m_loadport.m_diPlaced.p_bIn && m_loadport.m_diPlaced.p_bIn)
+                {
+                    m_OHT.m_bPODExist = false;
                 }
                 else
                 {
-                    m_loadport.p_infoCarrier.p_eReqAccessLP = GemCarrierBase.eAccessLP.Auto; //KHD 210317
-                                                                                             //changeLPState(GemCarrierBase.eAccessLP.Auto);
-                    if (!m_loadport.m_diPresent.p_bIn && !m_loadport.m_diPlaced.p_bIn)
-                    {
-                        m_OHT.m_bPODExist = true;
-                    }
-                    else if (m_loadport.m_diPlaced.p_bIn && m_loadport.m_diPlaced.p_bIn)
-                    {
-                        m_OHT.m_bPODExist = false;
-                    }
-                    else
-                    {
-                        m_OHT.m_bPODExist = true;
-                    }
-                    //if (!m_loadport.m_diPlaced.p_bIn || !m_loadport.m_diPresent.p_bIn)
-                    //{
-                    //    m_OHT.m_bPODExist = true;
-                    //}
-                    //else
-                    //{
-                    //    m_OHT.m_bPODExist = false;
-                    //}
-                    m_OHT.m_doLoadReq.p_bOn = false;
-                    m_OHT.m_doUnloadReq.p_bOn = false;
-                    m_OHT.m_doReady.p_bOn = false;
-                    m_OHT.m_doES.p_bOn = true;
-                    m_OHT.m_bAuto = true;
-                    //if((m_loadport.m_diPlaced.p_bIn || !m_loadport.m_diPresent.p_bIn) && m_OHT.p_eState == OHT_Semi.eState.All_Off) //KHD 210317
-                    //{
-                    //    m_carrier.p_eTransfer = GemCarrierBase.eTransfer.ReadyToUnload;
-                    //}
+                    m_OHT.m_bPODExist = true;
                 }
-            }        
+               //if (!m_loadport.m_diPlaced.p_bIn || !m_loadport.m_diPresent.p_bIn)
+               //{
+               //    m_OHT.m_bPODExist = true;
+               //}
+               //else
+               //{
+               //    m_OHT.m_bPODExist = false;
+               //}
+                m_OHT.m_doLoadReq.p_bOn = false;
+                m_OHT.m_doUnloadReq.p_bOn = false;
+                m_OHT.m_doReady.p_bOn = false;
+                m_OHT.m_doES.p_bOn = true;
+                m_OHT.m_bAuto = true;
+                //if((m_loadport.m_diPlaced.p_bIn || !m_loadport.m_diPresent.p_bIn) && m_OHT.p_eState == OHT_Semi.eState.All_Off) //KHD 210317
+                //{
+                //    m_carrier.p_eTransfer = GemCarrierBase.eTransfer.ReadyToUnload;
+                //}
+            }
         }
         #endregion
         #region OHT State
@@ -122,7 +119,7 @@ namespace Root_VEGA_D.Module
             m_OHT.m_bPlaced = m_loadport.m_diPlaced.p_bIn;
             m_OHT.m_bPresent = m_loadport.m_diPresent.p_bIn;
 
- /*           if (!m_OHT.m_bAuto && !m_OHT.m_bOHTErr)
+            if (!m_OHT.m_bAuto && !m_OHT.m_bOHTErr)
             {
                 if (m_loadport.p_eState == ModuleBase.eState.Home)
                 {
@@ -184,70 +181,6 @@ namespace Root_VEGA_D.Module
                     }
                 }   
             }
- */
-            if (!m_OHT.m_bAuto && !m_OHT.m_bOHTErr)
-            {
-                if (m_loadport.p_eState == ModuleBase.eState.Home)
-                {
-                    m_carrier.p_eTransfer = GemCarrierBase.eTransfer.TransferBlocked;
-                    if (m_OHT.P_bProtectionBar || m_OHT.p_bLightCurtain)
-                    {
-                        if (m_OHT.P_bProtectionBar)
-                        {
-                            m_OHT.p_sInfo = "ProtectionBar detect Error";
-
-                        }
-                        else
-                        {
-                            m_OHT.p_sInfo = "LightCurtain detect Error";
-
-                        }
-                    }
-                }
-                else
-                {
-                    if (m_OHT.P_bProtectionBar || m_OHT.p_bLightCurtain)
-                    {
-                        if (m_OHT.P_bProtectionBar)
-                        {
-                            m_OHT.p_sInfo = "ProtectionBar detect Error";
-                            //m_carrier.p_eTransfer = GemCarrierBase.eTransfer.TransferBlocked;
-                        }
-                        else
-                        {
-                            m_OHT.p_sInfo = "LightCurtain detect Error";
-                            //m_carrier.p_eTransfer = GemCarrierBase.eTransfer.TransferBlocked;
-                        }
-                    }
-                    else
-                    {
-                        if (!m_loadport.m_diPlaced.p_bIn && !m_loadport.m_diPresent.p_bIn && m_carrier.p_eTransfer != GemCarrierBase.eTransfer.ReadyToUnload)
-                        {
-                            if (m_carrier.eBeforTransfer == GemCarrierBase.eTransfer.ReadyToUnload)
-                            {
-                                m_carrier.p_eTransfer = GemCarrierBase.eTransfer.ReadyToUnload;
-                            }
-                            else
-                            {
-                               m_carrier.p_eTransfer = GemCarrierBase.eTransfer.TransferBlocked;
-                            }
-                        }
-                        else if (!m_loadport.m_diPlaced.p_bIn && !m_loadport.m_diPresent.p_bIn && m_carrier.p_eTransfer == GemCarrierBase.eTransfer.ReadyToUnload)
-                        {
-                        }
-                        else if (m_loadport.m_diPlaced.p_bIn && m_loadport.m_diPresent.p_bIn)
-                        {
-                            m_carrier.p_eTransfer = GemCarrierBase.eTransfer.ReadyToLoad;
-                        }
-                        else
-                        {
-                            m_carrier.p_eTransfer = GemCarrierBase.eTransfer.TransferBlocked;
-                        }
-                        m_OHT.p_sInfo = "OK";
-                    }
-                }
-            }
-
             if (/*m_OHT.p_eState == OHT_Semi.eState.All_Off &&*/ !m_OHT.m_bOHTErr && (!m_loadport.m_diPlaced.p_bIn && !m_loadport.m_diPresent.p_bIn)
                 && m_carrier.p_eTransfer == GemCarrierBase.eTransfer.ReadyToLoad && m_OHT.p_eState == OHT_Semi.eState.Busy_On)
             {
@@ -464,10 +397,10 @@ namespace Root_VEGA_D.Module
                     {
                         m_bErrorState = true;
                     }
-                    //else
-                    //{
-                    //    m_bErrorState = false;
-                    //}
+                    else
+                    {
+                        m_bErrorState = false;
+                    }
                     buttonRetry.IsEnabled = true;
                     m_OHT.m_doHoAvailable.p_bOn = false;
                     m_OHT.m_doES.p_bOn = false;
@@ -634,7 +567,6 @@ namespace Root_VEGA_D.Module
                 {
                     m_carrier.p_eTransfer = GemCarrierBase.eTransfer.ReadyToLoad;
                     m_OHT.m_bPODExist = false; //KHD 210407
-                    m_bErrorState = false;
                 }
                 else if (!m_loadport.m_diPlaced.p_bIn && !m_loadport.m_diPresent.p_bIn && m_OHT.p_eState == OHT_Semi.eState.All_Off)
                 {
@@ -645,17 +577,13 @@ namespace Root_VEGA_D.Module
                         m_carrier.p_eTransfer = GemCarrierBase.eTransfer.TransferBlocked;
                         m_OHT.m_bPODExist = true; //KHD 210407
                         m_OHT.m_bRFIDRead = true;
-                        //if (m_OHT.m_bAuto && m_loadport.m_bUseAutoLoad) //LYJ 210412
-                        //{
-                        //    m_OHT.m_bPIOComplete = true;
-                        //}
+
                     }
                     else
                     {
                         m_carrier.p_eTransfer = GemCarrierBase.eTransfer.ReadyToUnload;
                         m_OHT.m_bPODExist = true; //KHD 210407
                         m_OHT.m_bRFIDRead = true;
-                        m_bErrorState = false;
                     }
                 }
                 else if (!m_OHT.m_bPODExist && m_OHT.p_eState == OHT_Semi.eState.All_Off)
