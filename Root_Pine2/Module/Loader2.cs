@@ -81,8 +81,8 @@ namespace Root_Pine2.Module
         #region RunUnload
         public string RunUnload(Vision.eWorks eVisionWorks)
         {
-            Boats.Boat boat = m_boats.m_aBoat[eVisionWorks];
-            if (boat.p_eStep != Boats.Boat.eStep.Ready) return "Boat not Ready";
+            Boat boat = m_boats.m_aBoat[eVisionWorks];
+            if (boat.p_eStep != Boat.eStep.Ready) return "Boat not Ready";
             try
             {
                 m_doVacuum.Write(true);

@@ -2,11 +2,9 @@
 using RootTools;
 using RootTools.Control;
 using RootTools.Module;
-using RootTools.ToolBoxs;
 using RootTools.Trees;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 
 namespace Root_Pine2.Module
 {
@@ -45,195 +43,42 @@ namespace Root_Pine2.Module
         #endregion
 
         #region Boat AxisPos
-        public enum ePos
-        {
-            Handler,
-            Vision
-        }
-        public ePos p_ePosLoad 
+        public Boat.ePos p_ePosLoad 
         {
             get
             {
                 switch (m_vision.m_eVision)
                 {
-                    case Vision.eVision.Top3D: return ePos.Handler;
-                    case Vision.eVision.Top2D: return m_pine2.p_b3D ? ePos.Vision : ePos.Handler;
-                    case Vision.eVision.Bottom: return ePos.Vision; 
+                    case Vision.eVision.Top3D: return Boat.ePos.Handler;
+                    case Vision.eVision.Top2D: return m_pine2.p_b3D ? Boat.ePos.Vision : Boat.ePos.Handler;
+                    case Vision.eVision.Bottom: return Boat.ePos.Vision; 
                 }
-                return ePos.Handler; 
+                return Boat.ePos.Handler; 
             }
             set { }
         }
-        public ePos p_ePosUnload 
+        public Boat.ePos p_ePosUnload 
         {
             get
             {
                 switch(m_vision.m_eVision)
                 {
-                    case Vision.eVision.Top3D: return ePos.Vision;
-                    case Vision.eVision.Top2D: return ePos.Vision;
-                    case Vision.eVision.Bottom: return ePos.Handler;
+                    case Vision.eVision.Top3D: return Boat.ePos.Vision;
+                    case Vision.eVision.Top2D: return Boat.ePos.Vision;
+                    case Vision.eVision.Bottom: return Boat.ePos.Handler;
                 }
-                return ePos.Vision;
+                return Boat.ePos.Vision;
             } 
             set { }
         }
         #endregion
 
         #region Boat
-        public class Boat : NotifyProperty
-        {
-            #region Step
-            public enum eStep
-            {
-                Init,
-                Ready,
-                Run,
-                Done,
-                RunReady,
-            }
-            eStep _eStep = eStep.Init; 
-            public eStep p_eStep 
-            { 
-                get { return _eStep; }
-                set
-                {
-                    if (_eStep == value) return;
-                    _eStep = value;
-                    OnPropertyChanged();
-                    if (value == eStep.RunReady) m_bgwRunReady.RunWorkerAsync();
-                }
-            }
-
-            BackgroundWorker m_bgwRunReady = new BackgroundWorker(); 
-            private void M_bgwRunReady_DoWork(object sender, DoWorkEventArgs e)
-            {
-                m_axis.StartMove(m_boats.p_ePosLoad);
-                p_eStep = (m_axis.WaitReady() == "OK") ? eStep.Ready : eStep.Init; 
-            }
-            #endregion
-
-            #region ToolBox
-            Axis m_axis; 
-            DIO_O m_doVacuumPump; 
-            public DIO_Os m_doVacuum;
-            public DIO_O m_doBlow;
-            DIO_I2O m_dioRollerDown;
-            DIO_O m_doRollerPusher;
-            DIO_O m_doCleanerBlow;
-            DIO_O m_doCleanerSuction; 
-            public void GetTools(ToolBox toolBox, Boats boats, bool bInit)
-            {
-                toolBox.GetAxis(ref m_axis, boats, p_id + ".Scan"); 
-                toolBox.GetDIO(ref m_doVacuumPump, boats, p_id + ".Vacuum Pump");
-                toolBox.GetDIO(ref m_doVacuum, boats, p_id + ".Vacuum", new string[4] { "1", "2", "3", "4" });
-                toolBox.GetDIO(ref m_doBlow, boats, p_id + ".Blow");
-                toolBox.GetDIO(ref m_dioRollerDown, boats, p_id + ".Roller", "Up", "Down");
-                toolBox.GetDIO(ref m_doRollerPusher, boats, p_id + ".Roller Pusher");
-                toolBox.GetDIO(ref m_doCleanerBlow, boats, p_id + ".Cleaner Blow");
-                toolBox.GetDIO(ref m_doCleanerSuction, boats, p_id + ".Cleaner Suction");
-                if (bInit) InitPosition();
-            }
-            #endregion
-
-            #region Axis
-            void InitPosition()
-            {
-                m_axis.AddPos(Enum.GetNames(typeof(ePos)));
-                m_axis.AddSpeed("Grab"); 
-            }
-
-            public string RunMove(ePos ePos, bool bWait = true)
-            {
-                m_axis.RunTrigger(false); 
-                m_axis.StartMove(ePos);
-                return bWait ? m_axis.WaitReady() : "OK"; 
-            }
-
-            public string MoveScan(double dPosAcc)
-            {
-                m_axis.RunTrigger(false);
-                m_axis.StartMove(m_axis.m_trigger.m_aPos[0] + dPosAcc);
-                return m_axis.WaitReady(); 
-            }
-
-            public string StartScan()
-            {
-                m_axis.RunTrigger(true); 
-                return m_axis.StartMove(m_axis.m_trigger.m_aPos[1], "Grab"); 
-            }
-            #endregion
-
-            #region Vacuum
-            public void SetVacuum(bool[] aVacuum)
-            {
-                for (int n = 0; n < Math.Min(4, aVacuum.Length); n++) m_doVacuum.Write(n, aVacuum[n]); 
-            }
-
-            public void RunVacuum(bool bOn)
-            {
-                m_doVacuumPump.Write(bOn);
-            }
-
-            public void RunBlow(bool bBlow)
-            {
-                m_doBlow.Write(bBlow);
-            }
-            #endregion
-
-            #region Clean Roller
-            public string RunRoller(bool bDown)
-            {
-                m_doRollerPusher.Write(bDown);
-                m_dioRollerDown.Write(bDown);
-                return m_dioRollerDown.WaitDone(); 
-            }
-            #endregion
-
-            #region Cleaner
-            public void RunCleaner(bool bBlow, bool bSuction)
-            {
-                m_doCleanerBlow.Write(bBlow);
-                m_doCleanerSuction.Write(bSuction); 
-            }
-            #endregion
-
-            #region Scan
-            public class ScanData
-            {
-            }
-            public List<ScanData> m_aScanData = new List<ScanData>(); 
-            public string RunScan()
-            {
-                //forget
-                p_eStep = eStep.Done; 
-                return "OK";  
-            }
-            #endregion
-
-            public void Reset(eState eState)
-            {
-                p_infoStrip = null;
-                if (eState == eState.Ready) p_eStep = eStep.RunReady; 
-            }
-
-            public InfoStrip p_infoStrip { get; set; }
-            public string p_id { get; set; }
-            Boats m_boats;
-            Vision.VisionWorks m_visionWorks; 
-            public Boat(string id, Boats boats, Vision.VisionWorks visionWorks)
-            {
-                m_bgwRunReady.DoWork += M_bgwRunReady_DoWork;
-                p_id = id + visionWorks.m_eVisionWorks.ToString();
-                m_boats = boats;
-                m_visionWorks = visionWorks; 
-            }
-        }
         public Dictionary<Vision.eWorks, Boat> m_aBoat = new Dictionary<Vision.eWorks, Boat>(); 
         void InitBoat()
         {
-            m_aBoat.Add(Vision.eWorks.A, new Boat(p_id, this, m_vision.m_aVisionWorks[Vision.eWorks.A]));
-            m_aBoat.Add(Vision.eWorks.B, new Boat(p_id, this, m_vision.m_aVisionWorks[Vision.eWorks.B]));
+            m_aBoat.Add(Vision.eWorks.A, new Boat(p_id, this, m_vision.m_aWorks[Vision.eWorks.A]));
+            m_aBoat.Add(Vision.eWorks.B, new Boat(p_id, this, m_vision.m_aWorks[Vision.eWorks.B]));
         }
         #endregion
 
@@ -306,11 +151,12 @@ namespace Root_Pine2.Module
             try
             {
                 if (Run(RunMoveCamera(eWorks))) return p_sInfo;
-                if (Run(m_aBoat[eWorks].RunScan())) return p_sInfo; 
+                if (Run(m_aBoat[eWorks].RunScan())) return p_sInfo;
             }
             finally
             {
                 m_axisCam.StartMove((Vision.eWorks)(1 - (int)eWorks));
+                m_aBoat[eWorks].RunMove(p_ePosUnload); 
             }
             return "OK";
         }

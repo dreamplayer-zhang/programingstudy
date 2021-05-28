@@ -209,7 +209,10 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Module\IWorks.cs" />
     <Compile Include="Module\Vision.cs" />
+    <Compile Include="Module\Works2D.cs" />
+    <Compile Include="Module\Works3D.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
