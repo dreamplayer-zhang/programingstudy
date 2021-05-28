@@ -400,11 +400,11 @@ namespace Root_VEGA_D.Engineer
             }
             Sequence sequence = m_qSequence.Peek();
             bool bLoadport = sequence.m_moduleRun.m_moduleBase is ILoadport;
-            if ((sequence.m_moduleRun.m_moduleBase == wtr) || bLoadport)
-            {
-                sequence.m_moduleRun.StartRun();
-                while (wtr.IsBusy() && (EQ.IsStop() == false)) Thread.Sleep(10);
-            }
+            //if ((sequence.m_moduleRun.m_moduleBase == wtr) || bLoadport)
+            //{
+            //    sequence.m_moduleRun.StartRun();
+            //    while (wtr.IsBusy() && (EQ.IsStop() == false)) Thread.Sleep(10);
+            //}
             else sequence.m_moduleRun.StartRun();
             m_qSequence.Dequeue();
             m_dSequencePercent += m_dOneSequencePercent;

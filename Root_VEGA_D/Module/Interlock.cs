@@ -134,7 +134,7 @@ namespace Root_VEGA_D.Module
             m_alidMCReset_EMS = m_gaf.GetALID(this, "MC Reset (EMS)", "MC Reset Error");
             m_alidMCReset_EMO = m_gaf.GetALID(this, "MC Reset (EMO)", "MC Reset Error");
             m_alidDoorLock = m_gaf.GetALID(this, "Door Lock", "Door Lock Error");
-            m_alidCDA1_digital = m_gaf.GetALID(this, "CDA2 Pressure Digital", "CDA1 Pressure Error(Digital)");
+            m_alidCDA1_digital = m_gaf.GetALID(this, "CDA1 Pressure Digital", "CDA1 Pressure Error(Digital)");
             m_alidCDA1_Low = m_gaf.GetALID(this, "CDA1 Pressure Low Alarm", "CDA1 Pressure Low Error");
             m_alidCDA1_High = m_gaf.GetALID(this, "CDA1 Pressure Low Alarm", "CDA1 Pressure Low Error");
             m_alidCDA2_digital = m_gaf.GetALID(this, "CDA2 Pressure Digital", "CDA2 Pressure Error(Digital)");
@@ -244,7 +244,7 @@ namespace Root_VEGA_D.Module
             CheckFDC();
 
             m_alidCDA1_digital.Run(!m_diCDA1.p_bIn, "Please Check CDA1 Pressure Sensor");
-            m_alidCDA1_digital.Run(!m_diCDA2.p_bIn, "Please Check CDA2 Pressure Sensor");
+            m_alidCDA2_digital.Run(!m_diCDA2.p_bIn, "Please Check CDA2 Pressure Sensor");
 
             m_alidEFEMLeft_Door.Run(!m_diEFEMLeft_Door.p_bIn, "EFEM Left Door Open");
             m_alidEFEMRight_Door.Run(!m_diEFEMRight_Door.p_bIn, "EFEM Right Door Open");
