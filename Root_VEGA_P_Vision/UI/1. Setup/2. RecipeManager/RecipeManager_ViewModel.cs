@@ -39,11 +39,17 @@ namespace Root_VEGA_P_Vision
         {
             p_SubPanel = recipeOriginVM.Main;
             recipeOriginVM.SetOriginViewerTab();
+            recipeOriginVM.OriginInfoVisible = true;
+            recipeOriginVM.PositionInfoVisible = false;
+
         }
         public void SetPosition()
         {
             p_SubPanel = recipeOriginVM.Main;
             recipeOriginVM.SetPositionViewerTab();
+            recipeOriginVM.PositionInfoVisible = true;
+            recipeOriginVM.OriginInfoVisible = false;
+
         }
         public void SetRecipeMask()
         {
@@ -60,6 +66,10 @@ namespace Root_VEGA_P_Vision
         public ICommand btnPosition
         {
             get => new RelayCommand(()=>SetPosition());
+        }
+        public ICommand btnAlign
+        {
+            get => new RelayCommand(() => { }/*SetAlign()*/);
         }
         public ICommand btnMask
         {

@@ -5,26 +5,26 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Root_VEGA_P_Vision"
              mc:Ignorable="d" 
-             d:DesignHeight="200" d:DesignWidth="400" Background="{StaticResource MainBackGroundColor}">
+             d:DesignHeight="200" d:DesignWidth="400" Background="{StaticResource MainThema}">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="5*"/>
             <RowDefinition Height="1*"/>
         </Grid.RowDefinitions>
-        <UniformGrid Rows="4" Grid.Row="0">
-            <TextBlock Text="Condition " HorizontalAlignment="Right"/>
-            <TextBlock Text="{Binding ConditionCnt}"/>
-            <TextBlock Text="Enable"/>
-            <CheckBox IsChecked="{Binding IsEnable}"/>
-            <TextBlock Text="DefectCode"/>
-            <TextBox Text="{Binding DefectCode}"/>
-            <TextBlock Text="DefectName"/>
-            <TextBox Text="{Binding DefectName}"/>
+        <UniformGrid Rows="4" Grid.Row="0" Margin="5,0,0,5">
+            <TextBlock Foreground="White" Text="Condition " HorizontalAlignment="Right" Margin="3"/>
+            <TextBlock Foreground="White" Text="{Binding ConditionCnt}" Margin="3"/>
+            <TextBlock Foreground="White" Text="Enable" Margin="3"/>
+            <CheckBox IsChecked="{Binding IsEnable}" Margin="3"/>
+            <TextBlock Foreground="White" Text="DefectCode" Margin="3"/>
+            <TextBox Foreground="White" Text="{Binding DefectCode}" Margin="3"/>
+            <TextBlock Foreground="White" Text="DefectName" Margin="3"/>
+            <TextBox Foreground="White" Text="{Binding DefectName}" Margin="3"/>
         </UniformGrid>
-        <Button Grid.Row="1" Content="Image &amp; ROI"  Command="{Binding btnImagenROI}">
+        <Button Grid.Row="1" Content="Image &amp; ROI"  Command="{Binding btnImagenROI}" Margin="4,0,4,0">
             <Button.Template >
                 <ControlTemplate TargetType="{x:Type Button}">
-                    <Border CornerRadius="15" HorizontalAlignment="Stretch" Padding="5" VerticalAlignment="Stretch" Background="{StaticResource ButtonBackGroundColor}">
+                    <Border CornerRadius="10" HorizontalAlignment="Stretch" Padding="5" VerticalAlignment="Stretch" Background="{StaticResource ButtonBackGroundColor}">
                         <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" ContentTemplate="{TemplateBinding ContentTemplate}"/>
                     </Border>
                 </ControlTemplate>

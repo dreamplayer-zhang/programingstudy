@@ -88,6 +88,7 @@ namespace Root_VEGA_P_Vision
 
         public MaskRootViewer_ViewModel(string imagedata, MaskTools_ViewModel recipeSetting) : base(imagedata)
         {
+            p_VisibleMenu = Visibility.Collapsed;
             this.recipeSetting = recipeSetting;
 
             m_cInspROI = new ItemMask();

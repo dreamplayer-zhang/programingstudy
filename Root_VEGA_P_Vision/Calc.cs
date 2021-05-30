@@ -52,7 +52,7 @@ namespace Root_VEGA_P_Vision
 
         public static double CalcAngle(CPoint firstPos, CPoint secondPos)
         {
-            double radian = Math.Atan2(  secondPos.X - firstPos.X, secondPos.Y - firstPos.Y);
+            double radian = Math.Atan2( secondPos.X - firstPos.X, secondPos.Y - firstPos.Y);
             double angle = radian * (180 / Math.PI);
 
             return angle;

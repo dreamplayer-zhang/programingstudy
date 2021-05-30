@@ -14,6 +14,7 @@ using System.Windows.Shapes;
 namespace Root_VEGA_P_Vision
 {
     public delegate void FeatureBoxDoneEvent(object e);
+    
     public class PositionImageViewer_ViewModel: BaseViewer_ViewModel
     {
         #region [Color]
@@ -50,6 +51,11 @@ namespace Root_VEGA_P_Vision
             LeftBottom,
             RightBottom,
         }
+        public enum AlignProcess
+        {
+            Top,Bottom,
+        }
+        AlignProcess eAlignProcess;
         BoxProcess eBoxProcess;
         ModifyType eModifyType;
         CPoint mousePointBuffer;
@@ -78,6 +84,11 @@ namespace Root_VEGA_P_Vision
             if (m_KeyEvent != null)
                 if (m_KeyEvent.Key == Key.LeftShift && m_KeyEvent.IsDown)
                     return;
+            ProcessDrawBox(e);
+        }
+
+        public void ProcessDrawBox(MouseEventArgs e)
+        {
             CPoint CanvasPt = new CPoint(p_MouseX, p_MouseY);
             CPoint MemPt = GetMemPoint(CanvasPt);
             switch (eBoxProcess)
@@ -133,6 +144,8 @@ namespace Root_VEGA_P_Vision
                     break;
             }
         }
+
+
         public override void PreviewMouseUp(object sender, MouseEventArgs e)
         {
             switch (eBoxProcess)
@@ -574,8 +587,6 @@ namespace Root_VEGA_P_Vision
 
             RedrawShapes();
         }
-
-
         #endregion
 
     }

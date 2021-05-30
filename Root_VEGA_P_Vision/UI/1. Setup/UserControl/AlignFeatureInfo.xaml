@@ -5,173 +5,180 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Root_VEGA_P_Vision"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800" Background="{StaticResource PanelBackGround}">
-    <Grid>
+             d:DesignHeight="800" d:DesignWidth="450" Background="{StaticResource MainBackGroundColor}">
+    <Grid Margin="10">
         <Grid.RowDefinitions>
-            <RowDefinition/>
-            <RowDefinition/>
+            <RowDefinition Height="0.5*"/>
+            <RowDefinition Height="0.1*"/>
+            <RowDefinition Height="0.9*"/>
+            <RowDefinition Height="0.7*"/>
+            <RowDefinition Height="0.5*"/>
+            <RowDefinition Height="0.1*"/>
+            <RowDefinition Height="3*"/>
+            <RowDefinition Height="1.7*"/>
+            <RowDefinition Height="0.5*"/>
+            <RowDefinition Height="0.1*"/>
+            <RowDefinition Height="3*"/>
+            <RowDefinition Height="1.7*"/>
+            <RowDefinition Height="*"/>
+
         </Grid.RowDefinitions>
-        <GroupBox Header="Align Feature" Grid.Row="0" >
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="2*"/>
-                    <ColumnDefinition Width="8*"/>
-                </Grid.ColumnDefinitions>
-                <Grid Grid.Column="0">
-                    <Grid.RowDefinitions>
-                        <RowDefinition/>
-                        <RowDefinition/>
-                        <RowDefinition/>
-                        <RowDefinition/>
-                        <RowDefinition/>
-                    </Grid.RowDefinitions>
-                    <Button Grid.Row="1" Content="Add" Command="{Binding btnAlignAdd}"/>
-                    <Button Grid.Row="2" Content="Delete" Command="{Binding btnAlignDelete}"/>
-                    <Button Grid.Row="3" Content="Clear" Command="{Binding btnAlignClear}"/>
-                </Grid>
-                <Grid Grid.Column="1">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition/>
-                        <ColumnDefinition/>
-                    </Grid.ColumnDefinitions>
-                    <ScrollViewer Grid.Column="0" HorizontalScrollBarVisibility="Visible"
+        <TextBlock Grid.Row="0" Text="Select Mode" Style="{StaticResource HeaderTextBlock}"/>
+        <Line Height="1" Grid.Row="1"
+                      Stretch="Fill"
+                      Stroke="{StaticResource BorderBrush}"
+                      StrokeThickness="0.7"
+                      VerticalAlignment="Top"
+                      X2="1"/>
+        
+        <StackPanel Grid.Row="2" Orientation="Horizontal">
+            <RadioButton Width="70" Content="Align" Command="{Binding btnAlign}" Style="{StaticResource SelecteRadioBtn}"/>
+            <RadioButton Width="70" Content="Position" Command="{Binding btnPosition}" Style="{StaticResource SelecteRadioBtn}"/>
+            <RadioButton Width="100" Content="Manual Align" Command="{Binding ManualAlign}" Style="{StaticResource SelecteRadioBtn}"/>
+
+        </StackPanel>
+        <StackPanel HorizontalAlignment="Center" Grid.Row="3" Orientation="Horizontal">
+            <Button Content="Add" Command="{Binding btnAdd}" Style="{StaticResource ImageBaseBtn}"/>
+            <Button Content="Delete" Command="{Binding btnDelete}" Style="{StaticResource ImageBaseBtn}"/>
+            <Button Content="Clear" Command="{Binding btnClear}" Style="{StaticResource ImageBaseBtn}"/>
+        </StackPanel>
+        <TextBlock Grid.Row="4" Text="Align Feature" Style="{StaticResource HeaderTextBlock}"/>
+        <Line Height="1" Grid.Row="5"
+                      Stretch="Fill"
+                      Stroke="{StaticResource BorderBrush}"
+                      StrokeThickness="0.7"
+                      VerticalAlignment="Top"
+                      X2="1"/>
+        <ScrollViewer Grid.Row="6" HorizontalScrollBarVisibility="Visible"
                                           VerticalScrollBarVisibility="Disabled">
-                        <Grid>
-                            <TextBlock Text="Empty"
+            <Grid>
+                <TextBlock Text="Empty"
                                            FontFamily="Arial"
                                            FontSize="15"
                                            VerticalAlignment="Center"
                                            HorizontalAlignment="Center" Visibility="{Binding AlignFeatureList.Count, Converter={StaticResource ListToVisibility}}">
-                            </TextBlock>
-                            <ListBox Background="Transparent" ItemsSource="{Binding AlignFeatureList}" SelectedIndex="{Binding AlignFeatureIdx}">
-                                <ListBox.ItemsPanel>
-                                    <ItemsPanelTemplate>
-                                        <WrapPanel Orientation="Horizontal" />
-                                    </ItemsPanelTemplate>
-                                </ListBox.ItemsPanel>
-                            </ListBox>
-                        </Grid>
-                    </ScrollViewer>
-                    <Grid Grid.Column="1" VerticalAlignment="Center" Margin="10" DataContext="{Binding CurAlignData}">
-                        <Grid.RowDefinitions>
-                            <RowDefinition/>
-                            <RowDefinition/>
-                        </Grid.RowDefinitions>
-                        <Grid Grid.Row="0" >
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition/>
-                                <ColumnDefinition/>
-                                <ColumnDefinition/>
-                                <ColumnDefinition/>
-                                <ColumnDefinition/>
-                            </Grid.ColumnDefinitions>
-                            <TextBlock Text="Pos [Abs]" Grid.Column="0"/>
-                            <TextBlock Text="X" Grid.Column="1"/>
-                            <TextBox Grid.Column="2" Text="{Binding PositionX}"/>
-                            <TextBlock Text="Y" Grid.Column="3"/>
-                            <TextBox Grid.Column="4" Text="{Binding PositionY}"/>
-                        </Grid>
-                        <Grid Grid.Row="1">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition/>
-                                <ColumnDefinition/>
-                                <ColumnDefinition/>
-                                <ColumnDefinition/>
-                                <ColumnDefinition/>
-                            </Grid.ColumnDefinitions>
-                            <TextBlock Text="Size" Grid.Column="0"/>
-                            <TextBlock Text="Width" Grid.Column="1"/>
-                            <TextBox Grid.Column="2" Text="{Binding Width}"/>
-                            <TextBlock Text="Height" Grid.Column="3"/>
-                            <TextBox Grid.Column="4" Text="{Binding Height}"/>
-                        </Grid>
-                    </Grid>
-
-                </Grid>
+                </TextBlock>
+                <ListBox Background="Transparent" ItemsSource="{Binding AlignFeatureList}" SelectedIndex="{Binding AlignFeatureIdx}">
+                    <ListBox.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <WrapPanel Orientation="Horizontal" />
+                        </ItemsPanelTemplate>
+                    </ListBox.ItemsPanel>
+                </ListBox>
             </Grid>
-        </GroupBox>
-        <GroupBox Header="Position Feature" Grid.Row="1">
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="2*"/>
-                    <ColumnDefinition Width="8*"/>
-                </Grid.ColumnDefinitions>
-                <Grid Grid.Column="0">
-                    <Grid.RowDefinitions>
-                        <RowDefinition/>
-                        <RowDefinition/>
-                        <RowDefinition/>
-                        <RowDefinition/>
-                        <RowDefinition/>
-                    </Grid.RowDefinitions>
-                    <Button Grid.Row="1" Content="Add" Command="{Binding btnPosAdd}"/>
-                    <Button Grid.Row="2" Content="Delete" Command="{Binding btnPosDelete}"/>
-                    <Button Grid.Row="3" Content="Clear" Command="{Binding btnPosClear}"/>
-                </Grid>
-                <Grid Grid.Column="1">
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition/>
-                            <ColumnDefinition/>
-                        </Grid.ColumnDefinitions>
-                        <ScrollViewer Grid.Column="0" HorizontalScrollBarVisibility="Visible"
+        </ScrollViewer>
+        <UniformGrid Margin="30,0,30,0" Grid.Row="7" Rows="2" DataContext="{Binding CurAlignData}">
+            <TextBlock Text="Pos [Abs]" Style="{StaticResource InfoTextBlock}"/>
+            <Grid Margin="10,0,10,0">
+                <Grid.RowDefinitions>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+                <TextBlock Text="X" Grid.Row="0" VerticalAlignment="Bottom" Margin="5,0,0,0"/>
+                <Border Grid.Row="1" Style="{StaticResource InfoTextBox}">
+                    <TextBox Text="{Binding PositionX}" BorderBrush="White" Margin="6,2,6,2"/>
+                </Border>
+            </Grid>
+            <Grid  Margin="10,0,10,0">
+                <Grid.RowDefinitions>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+                <TextBlock Text="Y" Grid.Row="0" VerticalAlignment="Bottom" Margin="5,0,0,0"/>
+                <Border Grid.Row="1" Style="{StaticResource InfoTextBox}">
+                    <TextBox Text="{Binding PositionY}" BorderBrush="White" Margin="6,2,6,2"/>
+                </Border>
+            </Grid>
+            <TextBlock Text="Size" Grid.Column="0" Style="{StaticResource InfoTextBlock}"/>
+            <Grid  Margin="10,0,10,0">
+                <Grid.RowDefinitions>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+                <TextBlock Text="Width" Grid.Row="0" VerticalAlignment="Bottom" Margin="5,0,0,0"/>
+                <Border Grid.Row="1" Style="{StaticResource InfoTextBox}">
+                    <TextBox Text="{Binding Width}" BorderBrush="White" Margin="6,2,6,2"/>
+                </Border>
+            </Grid>
+            <Grid  Margin="10,0,10,0">
+                <Grid.RowDefinitions>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+                <TextBlock Text="Height" Grid.Row="0" VerticalAlignment="Bottom" Margin="5,0,0,0"/>
+                <Border Grid.Row="1" Style="{StaticResource InfoTextBox}">
+                    <TextBox Text="{Binding Height}" BorderBrush="White" Margin="6,2,6,2"/>
+                </Border>
+            </Grid>
+        </UniformGrid>
+        <TextBlock Grid.Row="8" Text="Position Feature" Style="{StaticResource HeaderTextBlock}"/>
+        <Line Height="1" Grid.Row="9"
+                      Stretch="Fill"
+                      Stroke="{StaticResource BorderBrush}"
+                      StrokeThickness="0.7"
+                      VerticalAlignment="Top"
+                      X2="1"/>
+        <ScrollViewer Grid.Row="10" HorizontalScrollBarVisibility="Visible"
                                           VerticalScrollBarVisibility="Disabled">
-                            <Grid >
-                                <TextBlock Text="Empty"
+            <Grid>
+                <TextBlock Text="Empty"
                                            FontFamily="Arial"
                                            FontSize="15"
                                            VerticalAlignment="Center"
                                            HorizontalAlignment="Center" Visibility="{Binding PositionFeatureList.Count, Converter={StaticResource ListToVisibility}}">
-                                </TextBlock>
-                                <ListBox Background="Transparent" ItemsSource="{Binding PositionFeatureList}" SelectedIndex="{Binding PositionFeatureIdx}">
-                                    <ListBox.ItemsPanel>
-                                        <ItemsPanelTemplate>
-                                            <WrapPanel Orientation="Horizontal" />
-                                        </ItemsPanelTemplate>
-                                    </ListBox.ItemsPanel>
-                                </ListBox>
-                            </Grid>
-                        </ScrollViewer>
-                        <Grid Grid.Column="1" VerticalAlignment="Center" Margin="10" DataContext="{Binding CurPosData}">
-                            <Grid.RowDefinitions>
-                                <RowDefinition/>
-                                <RowDefinition/>
-                            </Grid.RowDefinitions>
-                            <Grid Grid.Row="0">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition/>
-                                    <ColumnDefinition/>
-                                    <ColumnDefinition/>
-                                    <ColumnDefinition/>
-                                    <ColumnDefinition/>
-                                </Grid.ColumnDefinitions>
-                                <TextBlock Text="Pos [Abs]" Grid.Column="0"/>
-                                <TextBlock Text="X" Grid.Column="1"/>
-                                <TextBox Grid.Column="2" Text="{Binding PositionX, UpdateSourceTrigger=PropertyChanged}"/>
-                                <TextBlock Text="Y" Grid.Column="3"/>
-                                <TextBox Grid.Column="4" Text="{Binding PositionY, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
-                            </Grid>
-                            <Grid Grid.Row="1">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition/>
-                                    <ColumnDefinition/>
-                                    <ColumnDefinition/>
-                                    <ColumnDefinition/>
-                                    <ColumnDefinition/>
-                                </Grid.ColumnDefinitions>
-                                <TextBlock Text="Size" Grid.Column="0"/>
-                                <TextBlock Text="Width" Grid.Column="1"/>
-                                <TextBox Grid.Column="2" Text="{Binding Width}"/>
-                                <TextBlock Text="Height" Grid.Column="3"/>
-                                <TextBox Grid.Column="4" Text="{Binding Height}"/>
-                            </Grid>
-                        </Grid>
-                    </Grid>
-                    
-
-                </Grid>
+                </TextBlock>
+                <ListBox Background="Transparent" ItemsSource="{Binding PositionFeatureList}" SelectedIndex="{Binding PositionFeatureIdx}">
+                    <ListBox.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <WrapPanel Orientation="Horizontal" />
+                        </ItemsPanelTemplate>
+                    </ListBox.ItemsPanel>
+                </ListBox>
             </Grid>
-            
-        </GroupBox>
+        </ScrollViewer>
+        <UniformGrid Margin="30,0,30,0" Grid.Row="11" Rows="2" DataContext="{Binding CurPosData}">
+            <TextBlock Text="Pos [Abs]" Style="{StaticResource InfoTextBlock}"/>
+            <Grid Margin="10,0,10,0">
+                <Grid.RowDefinitions>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+                <TextBlock Text="X" Grid.Row="0" VerticalAlignment="Bottom" Margin="5,0,0,0"/>
+                <Border Grid.Row="1" Style="{StaticResource InfoTextBox}">
+                    <TextBox Text="{Binding PositionX}" BorderBrush="White" Margin="6,2,6,2"/>
+                </Border>
+            </Grid>
+            <Grid  Margin="10,0,10,0">
+                <Grid.RowDefinitions>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+                <TextBlock Text="Y" Grid.Row="0" VerticalAlignment="Bottom" Margin="5,0,0,0"/>
+                <Border Grid.Row="1" Style="{StaticResource InfoTextBox}">
+                    <TextBox Text="{Binding PositionY}" BorderBrush="White" Margin="6,2,6,2"/>
+                </Border>
+            </Grid>
+            <TextBlock Text="Size" Grid.Column="0" Style="{StaticResource InfoTextBlock}"/>
+            <Grid  Margin="10,0,10,0">
+                <Grid.RowDefinitions>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+                <TextBlock Text="Width" Grid.Row="0" VerticalAlignment="Bottom" Margin="5,0,0,0"/>
+                <Border Grid.Row="1" Style="{StaticResource InfoTextBox}">
+                    <TextBox Text="{Binding Width}" BorderBrush="White" Margin="6,2,6,2"/>
+                </Border>
+            </Grid>
+            <Grid  Margin="10,0,10,0">
+                <Grid.RowDefinitions>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+                <TextBlock Text="Height" Grid.Row="0" VerticalAlignment="Bottom" Margin="5,0,0,0"/>
+                <Border Grid.Row="1" Style="{StaticResource InfoTextBox}">
+                    <TextBox Text="{Binding Height}" BorderBrush="White" Margin="6,2,6,2"/>
+                </Border>
+            </Grid>
+        </UniformGrid>
     </Grid>
 </UserControl>

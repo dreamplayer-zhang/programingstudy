@@ -35,6 +35,7 @@ namespace Root_VEGA_P_Vision
             ToolBoxUI.Init(GlobalObjects.Instance.Get<VEGA_P_Vision_Engineer>().ClassToolBox());
 
             Init();
+            SetPage(EngineerUI);
         }
         public void Init()
         {
