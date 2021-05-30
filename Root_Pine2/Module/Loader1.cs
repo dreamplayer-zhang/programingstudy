@@ -5,7 +5,6 @@ using RootTools.Control;
 using RootTools.Module;
 using RootTools.Trees;
 using System;
-using System.Threading;
 
 namespace Root_Pine2.Module
 {

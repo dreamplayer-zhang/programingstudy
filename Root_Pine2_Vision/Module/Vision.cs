@@ -34,25 +34,76 @@ namespace Root_Pine2_Vision.Module
         #endregion
 
         #region Light
-        public string SetLight()
+        public class LightPower
         {
-            List<double> aPower = new List<double>();
-            return SetLight(aPower); 
-        }
+            public bool m_bOn = false; 
+            public List<double> m_aPower = new List<double>(); 
 
-        public string SetLight(List<double> aPower)
-        {
-            if (p_eRemote == eRemote.Client) RemoteRun(eRemoteRun.SetLight, eRemote.Client, aPower);
-            else
+            public void RunTree(Tree tree, bool bVisible)
             {
-                while (aPower.Count < m_lightSet.m_aLight.Count) aPower.Add(0);
-                for (int n = 0; n < aPower.Count; n++)
+                m_bOn = tree.Set(m_bOn, m_bOn, "Light On", "Light On", bVisible);
+                tree = tree.GetTree("Power");
+                for (int n = 0; n < m_aPower.Count; n++)
                 {
-                    LightBase light = m_lightSet.m_aLight[n].m_light;
-                    if (light != null) light.p_fSetPower = aPower[n];
+                    m_aPower[n] = tree.Set(m_aPower[n], m_aPower[n], n.ToString("00"), "Light Power (0 ~ 100)", bVisible);
                 }
             }
-            return "OK";
+
+            public LightPower(int nPower)
+            {
+                while (m_aPower.Count < nPower) m_aPower.Add(0);
+            }
+        }
+
+        public int p_nLight
+        {
+            get
+            {
+                switch (m_eVision)
+                {
+                    case eVision.Top3D: return 6;
+                    default: return 6; 
+                }
+            }
+        }
+
+        public void RunLight(LightPower lightPower)
+        {
+            for (int n = 0; n < lightPower.m_aPower.Count; n++)
+            {
+                Light light = m_lightSet.m_aLight[n];
+                if (light.m_light != null) light.m_light.p_fSetPower = lightPower.m_bOn ? lightPower.m_aPower[n] : 0;
+            }
+        }
+        #endregion
+
+        #region ScanData
+        public class ScanData
+        {
+            public enum eDirection
+            {
+                Forward,
+                Backward
+            }
+            public eDirection m_eDirection = eDirection.Forward;
+            public enum eEXT
+            {
+                EXT1,
+                EXT2,
+            }
+            public eEXT m_eEXT = eEXT.EXT1;
+            public CPoint m_cpMemory = new CPoint();
+            public int m_nOverlap = 0;
+            public LightPower m_lightPower;
+
+            public void RunTree(Tree tree, bool bVisible)
+            {
+                m_eDirection = (eDirection)tree.Set(m_eDirection, m_eDirection, "Direction", "Scan Direction", bVisible);
+                m_eEXT = (eEXT)tree.Set(m_eEXT, m_eEXT, "EXT", "Select EXT", bVisible);
+                m_cpMemory = tree.Set(m_cpMemory, m_cpMemory, "Memory Offset", "Memory Offset Address (pixel)", bVisible);
+                m_nOverlap = tree.Set(m_nOverlap, m_nOverlap, "Mmeory Overlap", "Memory Overlap Size (pixel)", bVisible);
+                m_lightPower.RunTree(tree.GetTree("Light", bVisible), bVisible); 
+            }
         }
         #endregion
 
@@ -143,7 +194,6 @@ namespace Root_Pine2_Vision.Module
         {
             StateHome,
             Reset,
-            SetLight,
         }
 
         Run_Remote GetRemoteRun(eRemoteRun eRemoteRun, eRemote eRemote, dynamic value)
@@ -155,7 +205,6 @@ namespace Root_Pine2_Vision.Module
             {
                 case eRemoteRun.StateHome: break;
                 case eRemoteRun.Reset: break;
-                case eRemoteRun.SetLight: run.m_aPower = value; break; 
             }
             return run;
         }
@@ -178,16 +227,16 @@ namespace Root_Pine2_Vision.Module
             public Run_Remote(Vision module)
             {
                 m_module = module;
+                m_lightPower = new LightPower(m_module.p_nLight); 
                 InitModuleRun(module);
             }
 
             public eRemoteRun m_eRemoteRun = eRemoteRun.StateHome;
-            public List<double> m_aPower = new List<double>(); 
+            public LightPower m_lightPower; 
             public override ModuleRunBase Clone()
             {
                 Run_Remote run = new Run_Remote(m_module);
                 run.m_eRemoteRun = m_eRemoteRun;
-                foreach (double fPower in m_aPower) run.m_aPower.Add(fPower); 
                 return run;
             }
 
@@ -197,7 +246,6 @@ namespace Root_Pine2_Vision.Module
                 m_eRemote = (eRemote)tree.Set(m_eRemote, m_eRemote, "Remote", "Remote", false);
                 switch (m_eRemoteRun)
                 {
-                    case eRemoteRun.SetLight: break;
                     default: break; 
                 }
             }
@@ -208,7 +256,6 @@ namespace Root_Pine2_Vision.Module
                 {
                     case eRemoteRun.StateHome: return m_module.StateHome();
                     case eRemoteRun.Reset: m_module.Reset(); break;
-                    case eRemoteRun.SetLight: m_module.SetLight(m_aPower); break;
                 }
                 return "OK";
             }
@@ -220,7 +267,7 @@ namespace Root_Pine2_Vision.Module
         {
             AddModuleRunList(new Run_Remote(this), true, "Remote Run");
             AddModuleRunList(new Run_Delay(this), true, "Time Delay");
-            AddModuleRunList(new Run_Grab(this), true, "Time Delay");
+            AddModuleRunList(new Run_Light(this), true, "Change Light Power");
         }
 
         public class Run_Delay : ModuleRunBase
@@ -252,36 +299,32 @@ namespace Root_Pine2_Vision.Module
             }
         }
 
-        public class Run_Grab : ModuleRunBase
+        public class Run_Light : ModuleRunBase
         {
             Vision m_module;
-            public Run_Grab(Vision module)
+            public Run_Light(Vision module)
             {
                 m_module = module;
+                m_lightPower = new LightPower(module.p_nLight); 
                 InitModuleRun(module);
             }
 
-            enum eBoat
-            {
-                Boat1,
-                Boat2
-            }
-            eBoat m_eBoat = eBoat.Boat1; 
+            LightPower m_lightPower; 
             public override ModuleRunBase Clone()
             {
-                Run_Grab run = new Run_Grab(m_module);
-                run.m_eBoat = m_eBoat;
+                Run_Light run = new Run_Light(m_module);
+                run.m_lightPower = m_lightPower; 
                 return run;
             }
 
             public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
             {
-                m_eBoat = (eBoat)tree.Set(m_eBoat, m_eBoat, "Boat", "Boat ID", bVisible);
+                m_lightPower.RunTree(tree, bVisible); 
             }
 
             public override string Run()
             {
-                //forget
+                m_module.RunLight(m_lightPower); 
                 return "OK";
             }
         }

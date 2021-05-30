@@ -141,6 +141,7 @@ namespace RootTools.Light
                 for (int n = 0; n < i; n++) nXor ^= aSend[n];
                 aSend[i++] = nXor;
                 m_rs232.Send(aSend, i);
+                m_bSend = true;
                 return "OK";
             }
 
@@ -186,6 +187,7 @@ namespace RootTools.Light
                     if (m_lightTool.m_rs232.p_bConnect == false) return "RS232 Connection Lost !!";
                     Thread.Sleep(10);
                 }
+                m_bSend = false;
                 m_nRead = 0;
                 StopWatch sw = new StopWatch();
                 while (true)
@@ -265,14 +267,17 @@ namespace RootTools.Light
         {
             protected override void GetPower()
             {
+                Protocol protocol = null;
                 switch (m_eChannel)
                 {
-                    case eChannel.Red:      m_lightTool.AddProtocol(eCmd.GetRedPower, 0, this);     break;
-                    case eChannel.Green:    m_lightTool.AddProtocol(eCmd.GetGreenPower, 0, this);   break;
-                    case eChannel.Blue:     m_lightTool.AddProtocol(eCmd.GetBluePower, 0, this);    break;
+                    case eChannel.Red: protocol = m_lightTool.AddProtocol(eCmd.GetRedPower, 0, this);     break;
+                    case eChannel.Green: protocol = m_lightTool.AddProtocol(eCmd.GetGreenPower, 0, this);   break;
+                    case eChannel.Blue: protocol = m_lightTool.AddProtocol(eCmd.GetBluePower, 0, this);    break;
                     default:
                         break;
                 }
+
+                if (protocol != null) protocol.WaitReply(1000);
             }
 
             public void SetGetPower(int nPower)
@@ -285,17 +290,36 @@ namespace RootTools.Light
             const int m_msWaitReply = 2000;
             public override void SetPower()
             {
+                Protocol protocol = null;
                 double fPower = p_bOn ? p_fSetPower : 0;
                 fPower *= p_fScalePower;
-                fPower = c_maxPower * fPower / 100;
+                fPower = Math.Round(fPower);
                 switch (m_eChannel)
                 {
-                    case eChannel.Red: m_lightTool.AddProtocol(eCmd.SetRedPower, (int)fPower, this); break;
-                    case eChannel.Green: m_lightTool.AddProtocol(eCmd.SetGreenPower, (int)fPower, this); break;
-                    case eChannel.Blue: m_lightTool.AddProtocol(eCmd.SetBluePower, (int)fPower, this); break;
+                    case eChannel.Red: protocol = m_lightTool.AddProtocol(eCmd.SetRedPower, (int)fPower, this); break;
+                    case eChannel.Green: protocol = m_lightTool.AddProtocol(eCmd.SetGreenPower, (int)fPower, this); break;
+                    case eChannel.Blue: protocol = m_lightTool.AddProtocol(eCmd.SetBluePower, (int)fPower, this); break;
                     default:
                         break;
                 }
+
+                if(protocol != null) protocol.WaitReply(1000);
+            }
+            protected override void GetOnOff() { }
+            public override void SetOnOff()
+            {
+                Protocol protocol = null;
+                int nVal = p_bOn ? 1 : 0;
+                switch (m_eChannel)
+                {
+                    case eChannel.Red: protocol = m_lightTool.AddProtocol(eCmd.SetRedOnOff, nVal, this); break;
+                    case eChannel.Green: protocol = m_lightTool.AddProtocol(eCmd.SetGreenOnOff, nVal, this); break;
+                    case eChannel.Blue: protocol = m_lightTool.AddProtocol(eCmd.SetBlueOnOff, nVal, this); break;
+                    default:
+                        break;
+                }
+
+                if (protocol != null) protocol.WaitReply(1000);
             }
 
             public int m_nCh = 0;
