@@ -401,7 +401,7 @@ namespace Root_VEGA_D.Engineer
             Sequence sequence = m_qSequence.Peek();
             if (sequence.m_moduleRun.p_id.Contains(".Docking"))
             {
-                ModuleRunBase VisionPM = handler.m_vision.m_RunPM.Clone();
+                ModuleRunBase VisionPM = handler.m_vision.m_runPM.Clone();
                 handler.m_vision.StartRun(VisionPM);
                 while (handler.m_vision.IsBusy() && (EQ.IsStop() == false)) Thread.Sleep(10);
                 if (EQ.IsStop()) return "EQ Stop";

@@ -1096,6 +1096,7 @@ namespace Root_VEGA_D.Module
         #endregion
 
         #region ModuleRun
+        public ModuleRunBase m_runPM;
         protected override void InitModuleRuns()
         {
             AddModuleRunList(new Run_Test(this), true, "Test");
@@ -1108,7 +1109,7 @@ namespace Root_VEGA_D.Module
             //AddModuleRunList(new Run_AutoFocus(this), false, "Run AutoFocus");
             AddModuleRunList(new Run_MakeTemplateImage(this), true, "Run Make TemplateImage");
             AddModuleRunList(new Run_PatternAlign(this), true, "Run Pattern Align");
-            AddModuleRunList(new Run_PM(this), true, "Run PM");
+            m_runPM = AddModuleRunList(new Run_PM(this), true, "Run PM");
         }
         #endregion
     }
