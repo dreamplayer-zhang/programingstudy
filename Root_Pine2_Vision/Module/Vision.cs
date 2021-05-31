@@ -36,34 +36,28 @@ namespace Root_Pine2_Vision.Module
         #region Light
         public class LightPower
         {
-            public bool m_bOn = false; 
             public List<double> m_aPower = new List<double>(); 
+
+            public LightPower Clone()
+            {
+                LightPower power = new LightPower(m_vision);
+                for (int n = 0; n < m_aPower.Count; n++) power.m_aPower[n] = m_aPower[n];
+                return power; 
+            }
 
             public void RunTree(Tree tree, bool bVisible)
             {
-                m_bOn = tree.Set(m_bOn, m_bOn, "Light On", "Light On", bVisible);
-                tree = tree.GetTree("Power");
+                while (m_aPower.Count < m_vision.m_lightSet.m_aLight.Count) m_aPower.Add(0);
                 for (int n = 0; n < m_aPower.Count; n++)
                 {
                     m_aPower[n] = tree.Set(m_aPower[n], m_aPower[n], n.ToString("00"), "Light Power (0 ~ 100)", bVisible);
                 }
             }
 
-            public LightPower(int nPower)
+            Vision m_vision; 
+            public LightPower(Vision vision)
             {
-                while (m_aPower.Count < nPower) m_aPower.Add(0);
-            }
-        }
-
-        public int p_nLight
-        {
-            get
-            {
-                switch (m_eVision)
-                {
-                    case eVision.Top3D: return 6;
-                    default: return 6; 
-                }
+                m_vision = vision; 
             }
         }
 
@@ -72,14 +66,26 @@ namespace Root_Pine2_Vision.Module
             for (int n = 0; n < lightPower.m_aPower.Count; n++)
             {
                 Light light = m_lightSet.m_aLight[n];
-                if (light.m_light != null) light.m_light.p_fSetPower = lightPower.m_bOn ? lightPower.m_aPower[n] : 0;
+                if (light.m_light != null) light.m_light.p_fSetPower = lightPower.m_aPower[n];
+            }
+        }
+
+        public void RunLightOff()
+        {
+            for (int n = 0; n < m_lightSet.m_aLight.Count; n++)
+            {
+                Light light = m_lightSet.m_aLight[n];
+                if (light.m_light != null) light.m_light.p_fSetPower = 0;
             }
         }
         #endregion
 
-        #region ScanData
-        public class ScanData
+        #region SnapData
+        public class SnapData
         {
+            public eWorks m_eWorks = eWorks.A;
+            public RPoint m_dpAxis = new RPoint();
+
             public enum eDirection
             {
                 Forward,
@@ -96,13 +102,45 @@ namespace Root_Pine2_Vision.Module
             public int m_nOverlap = 0;
             public LightPower m_lightPower;
 
+            public SnapData Clone()
+            {
+                SnapData scanData = new SnapData(m_vision);
+                scanData.m_eWorks = m_eWorks;
+                scanData.m_dpAxis = new RPoint(m_dpAxis);
+                scanData.m_eDirection = m_eDirection;
+                scanData.m_eEXT = m_eEXT;
+                scanData.m_cpMemory = new CPoint(m_cpMemory);
+                scanData.m_nOverlap = m_nOverlap;
+                scanData.m_lightPower = m_lightPower.Clone();
+                return scanData; 
+            }
+
             public void RunTree(Tree tree, bool bVisible)
             {
-                m_eDirection = (eDirection)tree.Set(m_eDirection, m_eDirection, "Direction", "Scan Direction", bVisible);
-                m_eEXT = (eEXT)tree.Set(m_eEXT, m_eEXT, "EXT", "Select EXT", bVisible);
-                m_cpMemory = tree.Set(m_cpMemory, m_cpMemory, "Memory Offset", "Memory Offset Address (pixel)", bVisible);
-                m_nOverlap = tree.Set(m_nOverlap, m_nOverlap, "Mmeory Overlap", "Memory Overlap Size (pixel)", bVisible);
+                RunTreeStage(tree.GetTree("Stage", bVisible), bVisible);
+                RunTreeMemory(tree.GetTree("Memory", bVisible), bVisible); 
                 m_lightPower.RunTree(tree.GetTree("Light", bVisible), bVisible); 
+            }
+
+            void RunTreeStage(Tree tree, bool bVisible)
+            {
+                m_eWorks = (eWorks)tree.Set(m_eWorks, m_eWorks, "Works", "Vision eWorks", bVisible);
+                m_dpAxis = tree.Set(m_dpAxis, m_dpAxis, "Offset", "Axis Offset (pulse)", bVisible);
+                m_eDirection = (eDirection)tree.Set(m_eDirection, m_eDirection, "Direction", "Scan Direction", bVisible);
+            }
+
+            void RunTreeMemory(Tree tree, bool bVisible)
+            {
+                m_eEXT = (eEXT)tree.Set(m_eEXT, m_eEXT, "EXT", "Select EXT", bVisible);
+                m_cpMemory = tree.Set(m_cpMemory, m_cpMemory, "Offset", "Memory Offset Address (pixel)", bVisible);
+                m_nOverlap = tree.Set(m_nOverlap, m_nOverlap, "Overlap", "Memory Overlap Size (pixel)", bVisible);
+            }
+
+            Vision m_vision; 
+            public SnapData(Vision vision)
+            {
+                m_vision = vision; 
+                m_lightPower = new LightPower(vision); 
             }
         }
         #endregion
@@ -170,17 +208,29 @@ namespace Root_Pine2_Vision.Module
         }
         #endregion
 
+        #region Vision_Snap_UI
+        Vision_Snap_UI m_ui;
+        void InitVision_Snap_UI()
+        {
+            m_ui = new Vision_Snap_UI();
+            m_ui.Init(this);
+            m_aTool.Add(m_ui);
+        }
+        #endregion
+
         public eVision m_eVision = eVision.Top3D; 
         public Vision(eVision eVision, IEngineer engineer, eRemote eRemote)
         {
-            m_eVision = eVision; 
-            InitVisionWorks(); 
+            m_eVision = eVision;
+            InitVisionWorks();
             InitBase("Vision " + eVision.ToString(), engineer, eRemote);
         }
 
         public Vision(string id, IEngineer engineer, eRemote eRemote)
         {
+            InitVisionWorks();
             InitBase(id, engineer, eRemote);
+            InitVision_Snap_UI();
         }
 
         public override void ThreadStop()
@@ -227,7 +277,7 @@ namespace Root_Pine2_Vision.Module
             public Run_Remote(Vision module)
             {
                 m_module = module;
-                m_lightPower = new LightPower(m_module.p_nLight); 
+                m_lightPower = new LightPower(m_module); 
                 InitModuleRun(module);
             }
 
@@ -267,7 +317,6 @@ namespace Root_Pine2_Vision.Module
         {
             AddModuleRunList(new Run_Remote(this), true, "Remote Run");
             AddModuleRunList(new Run_Delay(this), true, "Time Delay");
-            AddModuleRunList(new Run_Light(this), true, "Change Light Power");
         }
 
         public class Run_Delay : ModuleRunBase
@@ -295,36 +344,6 @@ namespace Root_Pine2_Vision.Module
             public override string Run()
             {
                 Thread.Sleep((int)(1000 * m_secDelay / 2));
-                return "OK";
-            }
-        }
-
-        public class Run_Light : ModuleRunBase
-        {
-            Vision m_module;
-            public Run_Light(Vision module)
-            {
-                m_module = module;
-                m_lightPower = new LightPower(module.p_nLight); 
-                InitModuleRun(module);
-            }
-
-            LightPower m_lightPower; 
-            public override ModuleRunBase Clone()
-            {
-                Run_Light run = new Run_Light(m_module);
-                run.m_lightPower = m_lightPower; 
-                return run;
-            }
-
-            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
-            {
-                m_lightPower.RunTree(tree, bVisible); 
-            }
-
-            public override string Run()
-            {
-                m_module.RunLight(m_lightPower); 
                 return "OK";
             }
         }

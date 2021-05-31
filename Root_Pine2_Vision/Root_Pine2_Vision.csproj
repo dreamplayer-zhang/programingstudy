@@ -207,10 +207,17 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="Module\Vision_Snap_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Module\IWorks.cs" />
     <Compile Include="Module\Vision.cs" />
+    <Compile Include="Module\Vision_Snap_UI.xaml.cs">
+      <DependentUpon>Vision_Snap_UI.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Module\Works2D.cs" />
     <Compile Include="Module\Works3D.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
