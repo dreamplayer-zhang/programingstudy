@@ -23,7 +23,7 @@ namespace Root_VEGA_P_Vision
     }
     public static class Calc
     {
-        public static unsafe double GetAlignAngle(ImageData imageData,int nScore)
+        public static unsafe double GetAlignAngle(ImageData imageData,int nScore,int trigger)
         {
             EUVPositionRecipe positionRecipe = GlobalObjects.Instance.Get<RecipeVision>().GetItem<EUVPositionRecipe>();
             
@@ -33,16 +33,26 @@ namespace Root_VEGA_P_Vision
             foreach (RecipeType_ImageData template in positionRecipe.EIPCoverTopFeature.ListAlignFeature)
             {
                 int posX = 0, posY = 0; //results
-                CPoint Abspt = new CPoint(template.PositionX, template.PositionY);
+                int left = template.PositionX - trigger;
+                int top = template.PositionY - trigger;
+                int right = template.PositionX + template.Width + trigger;
+                int bottom = template.PositionY + template.Height + trigger;
                 double result = CLR_IP.Cpp_TemplateMatching(srcPtr, template.RawData, &posX, &posY,
-                    imageData.p_Size.X, imageData.p_Size.Y, template.Width, template.Height, Abspt.X, Abspt.Y, Abspt.X + template.Width, Abspt.Y+template.Height, 5, 1, 0);
-
-                if (result >= nScore)
-                    resli.Insert(0, new Result(Abspt, result));
+                    imageData.p_Size.X, imageData.p_Size.Y, template.Width, template.Height,left,top,right,bottom, 5, 1, 0);
+                
+                //if (result >= nScore)
+                    resli.Insert(0, new Result(new CPoint(template.PositionX + posX, template.PositionY + posY), result));
             }
 
-            resli.Sort(CompareScore);
-            return CalcAngle(resli[1].Pos, resli[0].Pos);
+            if (resli.Count >= 2)
+            { 
+                resli.Sort(CompareScore);
+                return CalcAngle(resli[1].Pos, resli[0].Pos);
+            }
+            else
+            {
+                return double.MinValue;
+            }
         }
 
         public static int CompareScore(Result res1, Result res2)
