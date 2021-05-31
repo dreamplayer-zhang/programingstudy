@@ -834,7 +834,7 @@ namespace RootTools
         {
             None, R, G, B
         }
-        unsafe void FileSaveGrayBMP(string sFile, CRect rect, int nByte, eRgbChannel channel = eRgbChannel.None)
+        public unsafe void FileSaveGrayBMP(string sFile, CRect rect, int nByte, eRgbChannel channel = eRgbChannel.None)
         {
             FileStream fs = null;
             try
@@ -922,9 +922,10 @@ namespace RootTools
                                 {
                                     byte val1 = arrByte[idx + i * p_nByte + 0];
                                     byte val2 = arrByte[idx + i * p_nByte + 1];
-                                    byte[] arrb1b2 = new byte[2] { val1, val2 };
+                                    //byte[] arrb1b2 = new byte[2] { val1, val2 };
 
-                                    aBuf[i] = (byte)(BitConverter.ToUInt16(arrb1b2, 0) / (Math.Pow(2, 8 * p_nByte) - 1));
+                                    //aBuf[i] = (byte)(BitConverter.ToUInt16(arrb1b2, 0) / (Math.Pow(2, 8 * p_nByte) - 1));
+                                    aBuf[i] = val2;
                                 }
                                 else /*if(nByte == 2)*/ // 1byte -> 2byte
                                 {

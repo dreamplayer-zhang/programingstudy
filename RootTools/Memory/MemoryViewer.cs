@@ -315,8 +315,18 @@ namespace RootTools.Memory
                     case 2:
                         unsafe
                         {
-                            int b1 = *((byte*)p_memoryData.GetPtr(p_nMemoryIndex, p_cpImage.X, p_cpImage.Y).ToPointer());
-                            int b2 = *((byte*)p_memoryData.GetPtr(p_nMemoryIndex, p_cpImage.X, p_cpImage.Y).ToPointer() + 1);
+                            CPoint pt = new CPoint(p_cpImage);
+                            if (m_bRemoveOverlapArea)
+                            {
+                                int nDisplayLen = (m_nFov - m_nOverlap);
+                                int quotient = pt.X / nDisplayLen;
+                                pt.X = pt.X + m_nOverlap * quotient;
+                                if (pt.X >= p_memoryData.p_sz.X * p_memoryData.p_nByte)
+                                    pt.X = -1;
+                            }
+
+                            int b1 = *((byte*)p_memoryData.GetPtr(p_nMemoryIndex, pt.X, pt.Y).ToPointer());
+                            int b2 = *((byte*)p_memoryData.GetPtr(p_nMemoryIndex, pt.X, pt.Y).ToPointer() + 1);
                             int gv = b1 | (b2 << 8);
                             p_sGV = gv.ToString();
                         }
@@ -447,12 +457,11 @@ namespace RootTools.Memory
                 if(m_bRemoveOverlapArea)
                 {
                     int nDisplayLen = (m_nFov - m_nOverlap);
-                    int quotient = aX[x] / nDisplayLen;
-                    aX[x] = aX[x] + m_nOverlap * quotient;
+                    int quotient = aX[x] / (nDisplayLen * p_memoryData.p_nByte);
+                    aX[x] = aX[x] + m_nOverlap * quotient * p_memoryData.p_nByte;
                     if (aX[x] >= p_memoryData.p_sz.X * p_memoryData.p_nByte)
                         aX[x] = -1;
                 }
-                    
             }
 
             for (int y = 0, iy = 0; y < sz.Y; y++, iy += p_memoryData.p_nByte * sz.X)
