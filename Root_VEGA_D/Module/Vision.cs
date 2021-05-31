@@ -40,12 +40,17 @@ namespace Root_VEGA_D.Module
         public ALID m_alidShutterDownError;
         public ALID m_alidShutterUpError;
         ALID m_alid_WaferExist;
+        public ALID m_alidPMCoaxialError;
+        public ALID m_alidPMTransmittedError;
+
         void InitGAF()
         {
             m_visionHomeError = m_gaf.GetALID(this, "Vision Home Error", "Vision Home Error");
             m_visionInspectError = m_gaf.GetALID(this, "Vision Inspect Error", "Vision Inspect Error");
             m_alidShutterDownError = m_gaf.GetALID(this, "VS Shutter Error", "Shutter is not down");
             m_alidShutterUpError = m_gaf.GetALID(this, "VS Shutter Error", "Shutter is not up");
+            m_alidPMCoaxialError = m_gaf.GetALID(this, "PM Error", "Coaxial Light PM Test is failed");
+            m_alidPMTransmittedError = m_gaf.GetALID(this, "PM Error", "Transmitted Light PM Test is failed");
         }
         public void SetAlarm()
         {

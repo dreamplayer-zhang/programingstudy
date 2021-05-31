@@ -296,6 +296,10 @@ namespace Root_VEGA_D.Module
 
                 WritePMLog(ePMLogType.PM_CoaxialLight_Result, bCoaxialResult.ToString() + "\t" + listPMData[0].m_average.ToString());
                 WritePMLog(ePMLogType.PM_Transmitted_Result, bTransmittedResult.ToString() + "\t" + listPMData[1].m_average.ToString());
+
+                // Alarm
+                if (bCoaxialResult) m_module.m_alidPMCoaxialError.Run(true, m_module.m_alidPMCoaxialError.p_sDesc);
+                if (bTransmittedResult) m_module.m_alidPMTransmittedError.Run(true, m_module.m_alidPMTransmittedError.p_sDesc);
             }
             catch (Exception e)
             {
