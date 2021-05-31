@@ -20,6 +20,8 @@ namespace Root_VEGA_P_Vision
         public PositionViewerTab_Panel Main;
         public PositionFeature curTab;
         PositionImageViewer_ViewModel mEIPCoverTop, mEIPCoverBtm, mEIPBaseTop, mEIPBaseBtm;
+        EUVPositionRecipe positionRecipe;
+
         #region Property
         public PositionImageViewer_ViewModel p_EIPCoverTop
         {
@@ -48,20 +50,11 @@ namespace Root_VEGA_P_Vision
             Main = new PositionViewerTab_Panel();
             Main.DataContext = this;
             mEIPCoverTop = new PositionImageViewer_ViewModel("EIP_Cover.Main.Front");
-            mEIPCoverBtm = new PositionImageViewer_ViewModel("EIP_Cover.Main.Front");
-            mEIPBaseTop = new PositionImageViewer_ViewModel("EIP_Cover.Main.Front");
-            mEIPBaseBtm = new PositionImageViewer_ViewModel("EIP_Cover.Main.Front");
+            mEIPCoverBtm = new PositionImageViewer_ViewModel("EIP_Cover.Main.Back");
+            mEIPBaseTop = new PositionImageViewer_ViewModel("EIP_Plate.Main.Front");
+            mEIPBaseBtm = new PositionImageViewer_ViewModel("EIP_Plate.Main.Back");
 
-            //ImageData CoverTopimage = GlobalObjects.Instance.GetNamed<ImageData>("EIP_Cover.Main.Front");
-            //ImageData CoverBtmimage = GlobalObjects.Instance.GetNamed<ImageData>("EIP_Cover.Main.Back");
-            //ImageData BaseTopimage = GlobalObjects.Instance.GetNamed<ImageData>("EIP_Plate.Main.Front");
-            //ImageData BaseBtmimage = GlobalObjects.Instance.GetNamed<ImageData>("EIP_Plate.Main.Back");
-
-            //p_EIPCoverTop.init(CoverTopimage,GlobalObjects.Instance.Get<DialogService>());
-            //p_EIPCoverBtm.init(CoverBtmimage, GlobalObjects.Instance.Get<DialogService>());
-            //p_EIPBaseTop.init(BaseTopimage, GlobalObjects.Instance.Get<DialogService>());
-            //p_EIPBaseBtm.init(BaseBtmimage, GlobalObjects.Instance.Get<DialogService>());
-
+            positionRecipe = GlobalObjects.Instance.Get<RecipeVision>().GetItem<EUVPositionRecipe>();
             selectedViewer = mEIPCoverTop;
             curTab = PositionFeature.COVERTOP;
         }
@@ -76,7 +69,7 @@ namespace Root_VEGA_P_Vision
 
         #region ICommand
         public PositionImageViewer_ViewModel selectedViewer { get; set; } = new PositionImageViewer_ViewModel("EIP_Cover.Main.Front");
-        int selectedIdx;
+        public FeatureLists selectedLists { get; set; } = new FeatureLists();
         public ICommand TabChanged
         {
             get => new RelayCommand(() => {
@@ -85,15 +78,19 @@ namespace Root_VEGA_P_Vision
                 {
                     case PositionFeature.COVERTOP:
                         selectedViewer = p_EIPCoverTop;
+                        selectedLists = positionRecipe.EIPCoverTopFeature;
                         break;
                     case PositionFeature.COVERBTM:
                         selectedViewer = p_EIPCoverBtm;
+                        selectedLists = positionRecipe.EIPCoverBtmFeature;
                         break;
                     case PositionFeature.BASETOP:
                         selectedViewer = p_EIPBaseTop;
+                        selectedLists = positionRecipe.EIPBaseTopFeature;
                         break;
                     case PositionFeature.BASEBTM:
                         selectedViewer = p_EIPBaseBtm;
+                        selectedLists = positionRecipe.EIPBaseBtmFeature;
                         break;
                 }
             });

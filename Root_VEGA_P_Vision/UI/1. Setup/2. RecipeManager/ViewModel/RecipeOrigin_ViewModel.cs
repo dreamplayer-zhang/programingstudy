@@ -16,7 +16,6 @@ namespace Root_VEGA_P_Vision
     }
     public class RecipeOrigin_ViewModel : ObservableObject
     {
-
         public RecipeOrigin_Panel Main;
         RecipeManager_ViewModel recipeManager;
         UserControl m_panel;
@@ -26,29 +25,46 @@ namespace Root_VEGA_P_Vision
         EUVOriginRecipe originRecipe;
         EUVPositionRecipe positionRecipe;
 
-        AlignFeatureInfo_ViewModel EIPCoverTopfeatureInfo, EIPCoverBtmfeatureInfo, EIPBaseTopfeatureInfo, EIPBaseBtmfeatureInfo;
+        AlignFeatureInfo_ViewModel selectedFeatureInfo;
+        OriginInfo_ViewModel tdiOrigin, stainOrigin,sideTBOrigin,sideLROrigin;
         public ImageData boxImage;
         public CRect memRect;
+        bool originInfoVisible,positionInfoVisible;
         #region Property
-        public AlignFeatureInfo_ViewModel EIPCoverTopFeatureInfo
+        public bool OriginInfoVisible
         {
-            get => EIPCoverTopfeatureInfo;
-            set => SetProperty(ref EIPCoverTopfeatureInfo, value);
+            get => originInfoVisible;
+            set => SetProperty(ref originInfoVisible, value);
         }
-        public AlignFeatureInfo_ViewModel EIPCoverBtmFeatureInfo
+        public bool PositionInfoVisible
         {
-            get => EIPCoverBtmfeatureInfo;
-            set => SetProperty(ref EIPCoverBtmfeatureInfo, value);
+            get => positionInfoVisible;
+            set => SetProperty(ref positionInfoVisible, value);
         }
-        public AlignFeatureInfo_ViewModel EIPBaseTopFeatureInfo
+        public OriginInfo_ViewModel TDIOrigin
         {
-            get => EIPBaseTopfeatureInfo;
-            set => SetProperty(ref EIPBaseTopfeatureInfo, value);
+            get => tdiOrigin;
+            set => SetProperty(ref tdiOrigin, value);
         }
-        public AlignFeatureInfo_ViewModel EIPBaseBtmFeatureInfo
+        public OriginInfo_ViewModel StainOrigin
         {
-            get => EIPBaseBtmfeatureInfo;
-            set => SetProperty(ref EIPBaseBtmfeatureInfo, value);
+            get => stainOrigin;
+            set => SetProperty(ref stainOrigin, value);
+        }
+        public OriginInfo_ViewModel SideTBOrigin
+        {
+            get => sideTBOrigin;
+            set => SetProperty(ref sideTBOrigin, value);
+        }
+        public OriginInfo_ViewModel SideLROrigin
+        {
+            get => sideLROrigin;
+            set => SetProperty(ref sideLROrigin, value);
+        }
+        public AlignFeatureInfo_ViewModel SelectedFeatureInfo
+        {
+            get => selectedFeatureInfo;
+            set => SetProperty(ref selectedFeatureInfo, value);
         }
         public OriginViewerTab_ViewModel OriginViewerTab
         {
@@ -77,6 +93,7 @@ namespace Root_VEGA_P_Vision
             set => SetProperty(ref originRecipe, value);
         }
 
+
         #endregion
         public RecipeOrigin_ViewModel(RecipeManager_ViewModel recipeManager)
         {
@@ -89,28 +106,20 @@ namespace Root_VEGA_P_Vision
             originRecipe = GlobalObjects.Instance.Get<RecipeVision>().GetItem<EUVOriginRecipe>();
             positionRecipe = GlobalObjects.Instance.Get<RecipeVision>().GetItem<EUVPositionRecipe>();
 
-            EIPCoverTopfeatureInfo = new AlignFeatureInfo_ViewModel(this,positionRecipe.EIPCoverTopFeature);
-            EIPCoverBtmfeatureInfo = new AlignFeatureInfo_ViewModel(this,positionRecipe.EIPCoverBtmFeature);
-            EIPBaseTopfeatureInfo = new AlignFeatureInfo_ViewModel(this,positionRecipe.EIPBaseTopFeature);
-            EIPBaseBtmfeatureInfo = new AlignFeatureInfo_ViewModel(this,positionRecipe.EIPBaseBtmFeature);
+            SelectedFeatureInfo = new AlignFeatureInfo_ViewModel(this, positionviewerTab.selectedLists);
 
-            //var property = typeof(PositionViewerTab_ViewModel).GetProperties();
-            //int i = 0;
-            //foreach(var pro in property)
-            //{
-            //    if(pro.PropertyType == typeof(PositionImageViewer_ViewModel))
-            //    {
-            //        ((PositionImageViewer_ViewModel)pro).FeatureBoxDone += FeatureBoxDoneUpdate;
-            //    }
-            //}
+            tdiOrigin = new OriginInfo_ViewModel(originRecipe.TDIOrigin, "2D TDI Origin");
+            stainOrigin = new OriginInfo_ViewModel(originRecipe.StainOrigin, "Stain Origin");
+            sideTBOrigin = new OriginInfo_ViewModel(originRecipe.SideTBOrigin, "Side Top -Bottom Origin");
+            sideLROrigin = new OriginInfo_ViewModel(originRecipe.SideLROrigin,"Side Left - Right Origin");
 
-            ////positionviewerTab.selectedViewer.FeatureBoxDone += FeatureBoxDoneUpdate;
-            ///
             positionviewerTab.p_EIPBaseBtm.FeatureBoxDone += FeatureBoxDoneUpdate;
             positionviewerTab.p_EIPBaseTop.FeatureBoxDone += FeatureBoxDoneUpdate;
             positionviewerTab.p_EIPCoverBtm.FeatureBoxDone += FeatureBoxDoneUpdate;
             positionviewerTab.p_EIPCoverTop.FeatureBoxDone += FeatureBoxDoneUpdate;
 
+            originInfoVisible = true;
+            positionInfoVisible = false;
         }
 
         

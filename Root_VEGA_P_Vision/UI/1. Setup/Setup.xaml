@@ -14,7 +14,7 @@
 
         <!--Toolbar-->
         <Border Grid.Row="0"
-                Background="{StaticResource MainBackGroundColor}"
+                Background="{StaticResource MainThema}"
                 BorderBrush="DimGray"
                 BorderThickness="0,0,0,0">
             <Grid>
@@ -36,7 +36,7 @@
                                     BorderThickness="0,0,0,0"
                                     ToolTip="Back"
                                     Command="{Binding p_CurrentPanel.DataContext.btnBack}"
-                                    Background="{StaticResource MainBackGroundColor}">
+                                    Background="{StaticResource MainThema}">
                             <StackPanel Orientation="Horizontal">
                                 <PackIcon:PackIconMaterial Kind="ArrowLeftBold"/>
                             </StackPanel>
@@ -47,7 +47,7 @@
                                     BorderThickness="0,0,0,0"
                                     ToolTip="Setup Home"
                                     Command="{Binding btnNaviSetupHome}"
-                                    Background="{StaticResource MainBackGroundColor}">
+                                    Background="{StaticResource MainThema}">
                             <StackPanel Orientation="Horizontal">
                                 <!--<TextBlock Text="Home"/>-->
                                 <PackIcon:PackIconMaterial Kind="Home" />
@@ -58,7 +58,7 @@
                         <Button FontWeight="Bold" FontSize="13" 
                                     ToolTip="New Recipe"
                                     BorderThickness="0"
-                                    Background="{StaticResource MainBackGroundColor}"
+                                    Background="{StaticResource MainThema}"
                                     Command="{Binding btnNewRecipe}">
                             <Button.Content>
                                 <StackPanel Orientation="Horizontal">
@@ -71,7 +71,7 @@
                         <Button FontWeight="Bold" FontSize="13" 
                                     BorderThickness="0,0,0,0"
                                     ToolTip="Load Recipe"
-                                    Background="{StaticResource MainBackGroundColor}"
+                                    Background="{StaticResource MainThema}"
                                     Command="{Binding btnLoadRecipe}">
                             <StackPanel Orientation="Horizontal">
                                 <!--<TextBlock Text="Load"/>-->
@@ -84,7 +84,7 @@
                         <Button FontWeight="Bold" FontSize="13" 
                                     ToolTip="Save Recipe"
                                     BorderThickness="0"
-                                    Background="{StaticResource MainBackGroundColor}"
+                                    Background="{StaticResource MainThema}"
                                     Command="{Binding btnSaveRecipe}">
                             <Button.Content>
                                 <StackPanel Orientation="Horizontal">
@@ -102,6 +102,7 @@
                         <Button Width="120"
                                 Command="{Binding btnNaviSetupHome}"
                                 Cursor="Hand"
+                                Foreground="{StaticResource MainThema}"
                                 Background="{StaticResource ButtonBackGroundColor}"
                                 BorderBrush="{x:Null}"
                                 Content="Setup"/>

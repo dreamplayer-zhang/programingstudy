@@ -7,23 +7,23 @@
              xmlns:core="using:Microsoft.Xaml.Interactions.Core"
              xmlns:i="using:Microsoft.Xaml.Interactivity"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800" Background="{StaticResource MainBackGroundColor}">
+             d:DesignHeight="450" d:DesignWidth="800" Background="{StaticResource MainThema}">
     <StackPanel>
-        <Button BorderBrush="{StaticResource MainBackGroundColor}" Content="{Binding ItemName}" Style="{StaticResource ListViewHeader}" Command="{Binding btnHeader}" Margin="20,0,0,0"/>
+        <Button BorderBrush="{StaticResource MainThema}" Content="{Binding ItemName}" Style="{StaticResource ListViewHeader}" Command="{Binding btnHeader}" Margin="20,0,0,0"/>
         <StackPanel Visibility="{Binding IsOpenItem,Converter={StaticResource BooleanToVisiblity}}">
             <!--<Grid.RowDefinitions>
                 <RowDefinition Height="9*"/>
                 <RowDefinition Height="1*"/>
             </Grid.RowDefinitions>-->
-            <ListBox BorderBrush="{StaticResource MainBackGroundColor}" Background="{StaticResource MainBackGroundColor}" Visibility="{Binding ListItem.Count,Converter={StaticResource CountToVisibility}}" HorizontalContentAlignment="Stretch" Grid.Row="0" ItemsSource="{Binding ListItem}" SelectedIndex="{Binding ItemIdx}">
+            <ListBox BorderBrush="{StaticResource MainThema}" Background="{StaticResource MainThema}" Visibility="{Binding ListItem.Count,Converter={StaticResource CountToVisibility}}" HorizontalContentAlignment="Stretch" Grid.Row="0" ItemsSource="{Binding ListItem}" SelectedIndex="{Binding ItemIdx}">
             </ListBox>
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                <Image Height="19" Source="../../../Resources/add-plus-button.png" />
-                <TextBlock Text="Add" Margin="10,0,0,0" FontSize="20"/>
+
+            <Button BorderBrush="{StaticResource MainThema}" Grid.Row="1"  Command="{Binding btnAdd}" Background="{StaticResource MainThema}" Padding="2">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="3" VerticalAlignment="Center">
+                <Image Height="25" Source="../../../Resources/add_Plus.png" VerticalAlignment="Center"/>
+                <TextBlock Text="Add" Margin="10,0,0,0" FontSize="15" Foreground="White" VerticalAlignment="Center"/>
             </StackPanel>
-            <!--<Button BorderBrush="{StaticResource MainBackGroundColor}" Grid.Row="1"  Command="{Binding btnAdd}" Background="{StaticResource MainBackGroundColor}" Padding="5">
-                <Image Height="19" Source="../../../Resources/add-plus-button.png" />
-            </Button>-->
+            </Button>
         </StackPanel>
     </StackPanel>
 </UserControl>

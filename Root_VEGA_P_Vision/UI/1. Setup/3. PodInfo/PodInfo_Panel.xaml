@@ -11,7 +11,7 @@
             <ColumnDefinition Width="15*"/>
             <ColumnDefinition Width="85*"/>
         </Grid.ColumnDefinitions>
-        <Border BorderBrush="{StaticResource Splitter}" BorderThickness="0,0,1,0">
+        <Border Background="{StaticResource MainThema}" BorderBrush="{StaticResource Splitter}" BorderThickness="0,0,1,0">
             <StackPanel Grid.Column="0">
                 <Grid>
                     <Grid.ColumnDefinitions>

@@ -7,6 +7,73 @@
              StartupUri="MainWindow.xaml">
 
     <Application.Resources>
+        <Style x:Key="ImageViewerTabControlStyle" TargetType="TabControl">
+            <Setter Property="Background" Value="#FFEDECEA"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Margin" Value="2"/>
+        </Style>
+        <Style x:Key="HeaderTextBlock" TargetType="TextBlock">
+            <Setter Property="FontWeight" Value="ExtraBlack"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Margin" Value="20,0,0,0"/>
+        </Style>
+        <Style x:Key="InfoTextBlock" TargetType="TextBlock">
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="HorizontalAlignment" Value="Right"/>
+            <Setter Property="Margin" Value="0,0,20,0"/>
+        </Style>
+        <Style x:Key="InfoTextBox" TargetType="Border">
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="BorderBrush" Value="#FFCCCCCC"/>
+            <Setter Property="BorderThickness" Value="2"/>
+            <Setter Property="CornerRadius" Value="10"/>
+        </Style>
+        <Style x:Key="InspectionTabItemStyle" TargetType="TabItem">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TabItem">
+                        <Border Margin="0,2,0,2" Background="#FF363C58">
+                            <TextBlock Name="TB" FontSize="12" Foreground="#FF515782" VerticalAlignment="Center" HorizontalAlignment="Center">
+                                <ContentPresenter ContentSource="Header" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                            </TextBlock>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter TargetName="TB" Property="Foreground" Value="White"/>
+                            </Trigger>
+                            <Trigger Property="IsSelected" Value="False">
+                                <Setter TargetName="TB" Property="Foreground" Value="#FF515782"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="ImageViewerTabItemStyle" TargetType="TabItem">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TabItem">
+                        <Border Margin="0,2,0,2" Padding="19,12,18,12" Background="#FF363C58">
+                            <TextBlock Name="TB" FontSize="12" Foreground="#FF515782" VerticalAlignment="Center" HorizontalAlignment="Center">
+                                <ContentPresenter ContentSource="Header" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                            </TextBlock>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter TargetName="TB" Property="Foreground" Value="White"/>
+                            </Trigger>
+                            <Trigger Property="IsSelected" Value="False">
+                                <Setter TargetName="TB" Property="Foreground" Value="#FF515782"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="MenuItemStyle" TargetType="MenuItem">
+            <Setter Property="Background" Value="#FF363C58"/>
+            <Setter Property="Foreground" Value="White"/>
+        </Style>
         <Style x:Key="InspectionItemHeader" TargetType="Button">
             <Setter Property="Background" Value="Transparent"/>
             <Setter Property="HorizontalContentAlignment" Value="Left"/>
@@ -105,13 +172,14 @@
         <Style TargetType="Button" x:Key="ListViewHeader">
             <Style.Triggers>
                 <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="BorderBrush" Value="{StaticResource MainBackGroundColor}"/>
-                    <Setter Property="Background" Value="{StaticResource MainBackGroundColor}"/>
+                    <Setter Property="BorderBrush" Value="#FF363C58"/>
+                    <Setter Property="Background" Value="#FF363C58"/>
                 </Trigger>
             </Style.Triggers>
-            <Setter Property="BorderBrush" Value="#FFEDECEA"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderBrush" Value="#FF363C58"/>
             <Setter Property="Padding" Value="10"/>
-            <Setter Property="Background" Value="#FFEDECEA"/>
+            <Setter Property="Background" Value="#FF363C58"/>
             <Setter Property="HorizontalContentAlignment" Value="Left"/>
         </Style>
         <ObjectDataProvider x:Key="dataFromEnum" MethodName="GetValues"
@@ -133,7 +201,9 @@
         <SolidColorBrush x:Key="GroupBoxBackground" Color="Transparent"/>
         <SolidColorBrush x:Key="Splitter" Color="DimGray"/>
         <!-- ThemColor -->
+        <SolidColorBrush x:Key="ButtonSelectedColor" Color="#FF68B882"/>
         <SolidColorBrush x:Key="MainThema" Color="#FF363C58"/>
+        <SolidColorBrush x:Key="DisableMainThem" Color="#FF515782"/>
         <SolidColorBrush x:Key="TextBlack" Color="#FF222222"/>
         <SolidColorBrush x:Key="TextBodyColor" Color="#FF888888"/>
         <SolidColorBrush x:Key="BorderSplitColor" Color="#FFCCCCCC"/>
@@ -443,11 +513,11 @@
         <Style TargetType="{x:Type Button}" x:Key="PanelBtn">
             <Setter Property="FontFamily" Value="Arial"/>
             <Setter Property="FontSize" Value="15"/>
-            <Setter Property="FontWeight" Value="Bold"/>
             <Setter Property="Margin" Value="10"/>
             <Setter Property="Height" Value="40"/>
+            <Setter Property="Foreground" Value="White"/>
             <!--<Setter Property="BorderBrush" Value="{x:Null}"/>-->
-            <Setter Property="Background" Value="{StaticResource ControlBackGround}"/>
+            <Setter Property="Background" Value="{StaticResource MainThema}"/>
         </Style>
         <Style TargetType="{x:Type Button}"
                x:Key="BasicBtn">
@@ -998,8 +1068,64 @@
                 </Setter.Value>
             </Setter>
         </Style>
+        <Style TargetType="Button" x:Key="MaskButton">
+            <Setter Property="Width" Value="90"/>
+            <Setter Property="Height" Value="45"/>
+            <Setter Property="Margin" Value="4"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Border CornerRadius="10" BorderThickness="2" Width="{TemplateBinding Width}"
+                                Height="{TemplateBinding Height}" Background="{StaticResource ButtonBackGroundColor}">
+                            
+                        <ContentPresenter VerticalAlignment="Center"
+                                               HorizontalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style TargetType="RadioButton" x:Key="SelecteRadioBtn">
+            <Setter Property="Margin" Value="1,2,1,2"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="HorizontalAlignment" Value="Stretch"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type RadioButton}">
+                        <Border CornerRadius="10" BorderThickness="1.5" 
+                                Width="{TemplateBinding Width}"
+                                Height="40"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}">
+                            <ContentPresenter  VerticalAlignment="{TemplateBinding VerticalAlignment}"
+                                               HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger  Property="IsChecked" Value="True">
+                                <Setter Property="Foreground" Value="{StaticResource MainBackGroundColor}"/>
+                                <Setter Property="Background" Value="{StaticResource MainThema}"/>
+                                <Setter Property="IsEnabled" Value="False"/>
+                            </Trigger>
+                            <Trigger  Property="IsChecked" Value="False">
+                                <Setter Property="Foreground" Value="{StaticResource MainThema}"/>
+                                <Setter Property="BorderBrush" Value="{StaticResource MainThema}"/>
+                            </Trigger>
+                            <Trigger  Property="IsMouseOver" Value="True">
+                                <Setter Property="BorderBrush" Value="{StaticResource MainThema}"/>
+                                <Setter Property="Background" Value="#FF515782"/>
+                                <Setter Property="Foreground" Value="White"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
         <Style TargetType="RadioButton" x:Key="SetupPannelRadioBtn">
-            <Setter Property="Margin" Value="8,8,8,8"/>
+            <Setter Property="Margin" Value="4,3,4,3"/>
             <Setter Property="FontSize" Value="15"/>
             <Setter Property="Foreground" Value="{StaticResource MainThema}"/>
             <Setter Property="HorizontalAlignment" Value="Stretch"/>
@@ -1020,14 +1146,10 @@
 
                         <ControlTemplate.Triggers>
                             <Trigger  Property="IsChecked" Value="True">
-                                <Setter Property="Background" Value="{StaticResource MainBackGroundColor}"/>
-                                <Setter Property="Foreground" Value="{StaticResource MainThema}"/>
+                                <Setter Property="Foreground" Value="{StaticResource ButtonSelectedColor}"/>
                                 <Setter Property="IsEnabled" Value="False"/>
-                                <Setter Property="BorderBrush" Value="{StaticResource MainThema}"/>
-                                
                             </Trigger>
                             <Trigger  Property="IsChecked" Value="False">
-                                <Setter Property="Background" Value="{StaticResource MainThema}"/>
                                 <Setter Property="Foreground" Value="{StaticResource MainBackGroundColor}"/>
                                 <Setter Property="BorderBrush" Value="{StaticResource MainThema}"/>
                             </Trigger>

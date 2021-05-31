@@ -96,15 +96,16 @@
 
         <!--Menu-->
         <Border Grid.Row="1"
-                Background="{StaticResource MainBackGroundColor}"
+                Background="{StaticResource MainThema}"
                 BorderThickness="0,0,0,0" Grid.ColumnSpan="2">
             <Grid>
                 <StackPanel Orientation="Horizontal">
-                    <Menu Background="{StaticResource MainBackGroundColor}">
-                        <MenuItem Background="{StaticResource MainBackGroundColor}"
+                    <Menu Background="{StaticResource MainThema}">
+                        <MenuItem Background="{StaticResource MainThema}"
+                                  Foreground="White"
                                   Width="70" Height="30"
                                   Padding="0"
-                                  BorderBrush="#FF707070"
+                                  BorderBrush="{StaticResource MainThema}"
                                   BorderThickness="0,0,0,0">
                             <MenuItem.Header>
                                 <Grid Width="70">
@@ -114,20 +115,21 @@
                                                HorizontalAlignment="Center"/>
                                 </Grid>
                             </MenuItem.Header>
-                            <MenuItem Header="New" Command="{Binding MenuFileNew}">
+                            <MenuItem Header="New" Style="{StaticResource MenuItemStyle}" Command="{Binding MenuFileNew}">
 
                             </MenuItem>
-                            <MenuItem Header="Load" Command="{Binding MenuFileLoad}">
+                            <MenuItem Header="Load" Style="{StaticResource MenuItemStyle}" Command="{Binding MenuFileLoad}">
 
                             </MenuItem>
-                            <MenuItem Header="Save" Command="{Binding MenuFileSave}">
+                            <MenuItem Header="Save" Style="{StaticResource MenuItemStyle}" Command="{Binding MenuFileSave}">
 
                             </MenuItem>
-                            <MenuItem Header="Save As" Command="{Binding MenuFileSaveAs}">
+                            <MenuItem Header="Save As" Style="{StaticResource MenuItemStyle}" Command="{Binding MenuFileSaveAs}">
 
                             </MenuItem>
                         </MenuItem>
-                        <MenuItem Background="{StaticResource MainBackGroundColor}"                                
+                        <MenuItem Background="{StaticResource MainThema}"  
+                                  Foreground="White"
                                   BorderBrush="#FF707070"
                                   Width="70" 
                                   x:Name="ViewMenu"
@@ -141,12 +143,13 @@
                                                HorizontalAlignment="Center"/>
                                 </Grid>
                             </MenuItem.Header>
-                            <MenuItem Header="Log" IsCheckable="True" x:Name="viewLog"/>
-                            <MenuItem Header="FDC" IsCheckable="True" x:Name="viewFDC"/>
+                            <MenuItem Style="{StaticResource MenuItemStyle}" Header="Log" IsCheckable="True" x:Name="viewLog"/>
+                            <MenuItem  Style="{StaticResource MenuItemStyle}" Header="FDC" IsCheckable="True" x:Name="viewFDC"/>
 
 
                         </MenuItem>
-                        <MenuItem Background="{StaticResource MainBackGroundColor}"
+                        <MenuItem Background="{StaticResource MainThema}"
+                                  Foreground="White"
                                   BorderBrush="#FF707070"
                                   Width="70"
                                   BorderThickness="0,0,0,0" Padding="0">
@@ -164,7 +167,8 @@
                             <MenuItem Header="Setting">
                             </MenuItem>
                         </MenuItem>
-                        <MenuItem Background="{StaticResource MainBackGroundColor}"
+                        <MenuItem Background="{StaticResource MainThema}"
+                                  Foreground="White"
                                   BorderBrush="#FF707070"
                                   Width="100"
                                   BorderThickness="0,0,0,0" Padding="0">
@@ -188,7 +192,8 @@
                             </MenuItem>
 
                         </MenuItem>
-                        <MenuItem Background="{StaticResource MainBackGroundColor}"
+                        <MenuItem Background="{StaticResource MainThema}"
+                                  Foreground="White"
                                   BorderBrush="#FF707070"
                                   Width="100"
                                   BorderThickness="0,0,0,0" Padding="0">
@@ -214,7 +219,8 @@
                             <MenuItem Header="Run">
                             </MenuItem>
                         </MenuItem>
-                        <MenuItem Background="{StaticResource MainBackGroundColor}"
+                        <MenuItem Background="{StaticResource MainThema}"
+                                  Foreground="White"
                                   BorderBrush="#FF707070"
                                   Width="110"
                                   BorderThickness="0,0,0,0" Padding="0" Command="{Binding ModeSelectCommand}">
@@ -228,7 +234,8 @@
                                 </Grid>
                             </MenuItem.Header>
                         </MenuItem>
-                        <MenuItem Background="{StaticResource MainBackGroundColor}"
+                        <MenuItem Background="{StaticResource MainThema}"
+                                  Foreground="White"
                                   BorderBrush="#FF707070"
                                   Width="110"
                                   BorderThickness="0,0,0,0" Padding="0">

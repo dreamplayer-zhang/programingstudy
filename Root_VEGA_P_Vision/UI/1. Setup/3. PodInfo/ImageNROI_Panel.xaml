@@ -6,47 +6,94 @@
              xmlns:local="clr-namespace:Root_VEGA_P_Vision"
              xmlns:Tools="clr-namespace:RootTools;assembly=RootTools"
              mc:Ignorable="d" 
-             d:DesignHeight="900" d:DesignWidth="1600" Background="{StaticResource PanelBackGround}">
+             d:DesignHeight="900" d:DesignWidth="1600" Background="{StaticResource MainBackGroundColor}">
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="7*"/>
-            <ColumnDefinition Width="3*"/>
+            <ColumnDefinition Width="8*"/>
+            <ColumnDefinition Width="2*"/>
         </Grid.ColumnDefinitions>
         <Grid Grid.Column="0">
             <Tools:RootViewer DataContext="{Binding SelectedViewer}"/>
         </Grid>
         <Grid Grid.Column="1">
             <Grid.RowDefinitions>
-                <RowDefinition Height="4*"/>
+                <RowDefinition Height="3*"/>
                 <RowDefinition Height="1*"/>
                 <RowDefinition Height="2*"/>
                 <RowDefinition Height="5*"/>
             </Grid.RowDefinitions>
             <local:MaskTools_Panel DataContext="{Binding MaskTools}"/>
-            <GroupBox Header="Master Image" Grid.Row="1">
-                <UniformGrid Rows="1">
-                    <Button Content="Save MasterImage" Command="{Binding btnSaveMasterImage}"/>
-                    <Button Content="Load MasterImage" Command="{Binding btnLoadMasterImage}"/>
-                </UniformGrid>
-            </GroupBox>
-            <GroupBox Header="ROI" Grid.Row="2">
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition/>
-                        <RowDefinition/>
-                    </Grid.RowDefinitions>
-                    <UniformGrid Grid.Row="0">
-                        <RadioButton Content="Capture Area" Grid.Row="0"/>
-                        <RadioButton Content="ROI" Grid.Row="1"/>
-                    </UniformGrid>
-                    <UniformGrid Grid.Row="1" Rows="1">
-                        <Button Content="Pen" Command="{Binding btnDot}"/>
-                        <Button Content="Rect" Command="{Binding btnRect}"/>
-                        <Button Content="Select" Command="{Binding btnSelect}"/>
-                    </UniformGrid>
-                </Grid>
-            </GroupBox>
-            <GroupBox Header="Inspection Param"  Grid.Row="3">
+            <Grid Grid.Row="1" Margin="10,0,10,0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="0.8*"/>
+                    <RowDefinition Height="0.2*"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <TextBlock Grid.Row="0" Text="Master Image" Style="{StaticResource HeaderTextBlock}"/>
+                <Line Height="1" Grid.Row="1"
+                      Stretch="Fill"
+                      Stroke="{StaticResource BorderBrush}"
+                      StrokeThickness="0.7"
+                      VerticalAlignment="Top"
+                      X2="1"/>
+                <StackPanel Orientation="Horizontal" Grid.Row="2" HorizontalAlignment="Center">
+                    <Button Content="Save MasterImage" Width="150" Command="{Binding btnSaveMasterImage}" Style="{StaticResource ImageBaseBtn}"/>
+                    <Button Content="Load MasterImage" Width="150" Command="{Binding btnLoadMasterImage}" Style="{StaticResource ImageBaseBtn}"/>
+                </StackPanel>
+            </Grid>
+            <Grid Grid.Row="2" Margin="10,10,10,0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="0.3*"/>
+                    <RowDefinition Height="0.1*"/>
+                    <RowDefinition Height="0.6*"/>
+                    <RowDefinition Height="0.6*"/>
+                </Grid.RowDefinitions>
+                <TextBlock Grid.Row="0" Text="Master Image" Style="{StaticResource HeaderTextBlock}"/>
+                <Line Height="1" Grid.Row="1"
+                      Stretch="Fill"
+                      Stroke="{StaticResource BorderBrush}"
+                      StrokeThickness="0.7"
+                      VerticalAlignment="Top"
+                      X2="1"/>
+                <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center">
+                    <RadioButton Content="Capture Area" Width="145" Style="{StaticResource SelecteRadioBtn}"/>
+                    <RadioButton Content="ROI" Width="145" Style="{StaticResource SelecteRadioBtn}"/>
+                </StackPanel>
+                <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Center">
+                    <Button Content="Pen" Style="{StaticResource MaskButton}" Command="{Binding btnDot}"/>
+                    <Button Content="Rect" Style="{StaticResource MaskButton}" Command="{Binding btnRect}"/>
+                    <Button Content="Select" Style="{StaticResource MaskButton}" Command="{Binding btnSelect}"/>
+                </StackPanel>
+            </Grid>
+            <Grid Grid.Row="3" Margin="10,0,10,0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="0.4*"/>
+                    <RowDefinition Height="0.1*"/>
+                    <RowDefinition Height="5.5*"/>
+                </Grid.RowDefinitions>
+                <TextBlock Grid.Row="0" Text="Inspection Param" Style="{StaticResource HeaderTextBlock}"/>
+                <Line Height="1" Grid.Row="1"
+                      Stretch="Fill"
+                      Stroke="{StaticResource BorderBrush}"
+                      StrokeThickness="0.7"
+                      VerticalAlignment="Top"
+                      X2="1"/>
+                <TabControl Grid.Row="2" Style="{StaticResource ImageViewerTabControlStyle}">
+                    <TabItem Header="GrabMode" Height="30" Width="80" Style="{StaticResource InspectionTabItemStyle}">
+                    </TabItem>
+                    <TabItem Header="Inspection" Height="30" Width="80" Style="{StaticResource InspectionTabItemStyle}">
+                        <TreeView>
+                            <TreeViewItem Header="Bright">
+                                <local:SurfaceParam_Panel DataContext="{Binding BrightParam}"/>
+                            </TreeViewItem>
+                            <TreeViewItem Header="Dark">
+                                <local:SurfaceParam_Panel DataContext="{Binding DarkParam}"/>
+                            </TreeViewItem>
+                        </TreeView>
+                    </TabItem>
+                </TabControl>
+            </Grid>
+            <!--<GroupBox Header="Inspection Param"  Grid.Row="3">
                 <TabControl>
                     <TabItem Header="GrabMode">
                     </TabItem>
@@ -61,7 +108,7 @@
                         </TreeView>
                     </TabItem>
                 </TabControl>
-            </GroupBox>
+            </GroupBox>-->
         </Grid>
     </Grid>
     
