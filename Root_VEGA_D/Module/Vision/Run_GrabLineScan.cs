@@ -642,6 +642,7 @@ namespace Root_VEGA_D.Module
                         if (m_module.Run(m_module.RunLineScan(m_grabMode, mem, tmpMemOffset, nWaferSizeY_px, dPosX, dStartPosY, dEndPosY, dTriggerStartPosY, dTriggerEndPosY)))
                             return p_sInfo;
 
+
                         // IPU PC와 연결된 상태라면 'LineEnd' 메세지 전달
                         if (CheckIPUConnectStatus())
                         {

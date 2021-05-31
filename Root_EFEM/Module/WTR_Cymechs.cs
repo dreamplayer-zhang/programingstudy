@@ -516,6 +516,7 @@ namespace Root_EFEM.Module
             {
                 bool bDone = m_protocolSend.OnReceive(sRead);
                 string[] sreads = sRead.Split(' ');
+                if(sreads.Length>=2)
                 m_alidRTRCmdError.Run(sreads[0] == "_ERR", "Cymechs Robot Error, Error Code : " + sreads[1]);
                 if (bDone) m_protocolSend = null;
             }

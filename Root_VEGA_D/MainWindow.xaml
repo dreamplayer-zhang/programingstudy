@@ -290,13 +290,13 @@
                         </Grid.ColumnDefinitions>
                         <Border BorderThickness="0.5" BorderBrush="#FF707070">
                             <Grid>
-                            <Grid.RowDefinitions>
+                            <!--<Grid.RowDefinitions>
                                 <RowDefinition/>
                                 <RowDefinition/>
                             </Grid.RowDefinitions>
                                 <TextBlock Text="EQ"
-                                   FontWeight="SemiBold"/>
-                                <TextBlock x:Name="EQState" Grid.Row="1"
+                                   FontWeight="SemiBold"/>-->
+                                <TextBlock x:Name="EQState" Grid.Row="1" FontSize="22"
                                    FontWeight="SemiBold"/>
                             </Grid>
                         </Border>

@@ -70,6 +70,7 @@ namespace Root_VEGA_D.Module
 
         #region Thread
         public EQ.eState m_eState = EQ.eState.Init;
+        StopWatch sw = new StopWatch();
         protected override void RunThread()
         {
             base.RunThread();
@@ -78,12 +79,20 @@ namespace Root_VEGA_D.Module
                 {
                     case EQ.eState.Error:
                         m_doLamp.Write(eLamp.Red);
+                        if (!sw.IsRunning)
+                        {
+                            sw.Start(); 
+                        }
                         break;
                     case EQ.eState.Run:
                         m_doLamp.Write(eLamp.Green);
                         break;
                     case EQ.eState.Home:
                         m_doLamp.Write(eLamp.Green);
+                        if (!sw.IsRunning)
+                        {
+                            sw.Start();
+                        }
                         break;
                     case EQ.eState.Ready:
                         m_doLamp.Write(eLamp.Yellow);
@@ -94,7 +103,11 @@ namespace Root_VEGA_D.Module
                         break;
                 }
                 m_eState = EQ.p_eState;
-                if (m_diBuzzerOffBtn.p_bIn) BuzzerOff();
+                if (m_diBuzzerOffBtn.p_bIn || sw.ElapsedMilliseconds > 5000)
+                {
+                    BuzzerOff();
+                    sw.Reset();
+                }
             }
         }
         #endregion
