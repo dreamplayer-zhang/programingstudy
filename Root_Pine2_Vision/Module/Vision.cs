@@ -41,13 +41,13 @@ namespace Root_Pine2_Vision.Module
             public LightPower Clone()
             {
                 LightPower power = new LightPower(m_vision);
-                for (int n = 0; n < m_aPower.Count; n++) power.m_aPower[n] = m_aPower[n];
+                for (int n = 0; n < m_vision.p_lLight; n++) power.m_aPower[n] = m_aPower[n];
                 return power; 
             }
 
             public void RunTree(Tree tree, bool bVisible)
             {
-                while (m_aPower.Count < m_vision.m_lightSet.m_aLight.Count) m_aPower.Add(0);
+                while (m_aPower.Count < m_vision.p_lLight) m_aPower.Add(0);
                 for (int n = 0; n < m_aPower.Count; n++)
                 {
                     m_aPower[n] = tree.Set(m_aPower[n], m_aPower[n], n.ToString("00"), "Light Power (0 ~ 100)", bVisible);
@@ -61,9 +61,23 @@ namespace Root_Pine2_Vision.Module
             }
         }
 
+        int _lLight = 6; 
+        public int p_lLight
+        {
+            get
+            {
+                if (p_eRemote == eRemote.Client) return _lLight; 
+                return m_lightSet.m_aLight.Count; 
+            }
+            set
+            {
+                if (p_eRemote == eRemote.Client) _lLight = value; 
+            }
+        }
+
         public void RunLight(LightPower lightPower)
         {
-            for (int n = 0; n < lightPower.m_aPower.Count; n++)
+            for (int n = 0; n < p_lLight; n++)
             {
                 Light light = m_lightSet.m_aLight[n];
                 if (light.m_light != null) light.m_light.p_fSetPower = lightPower.m_aPower[n];
@@ -72,7 +86,7 @@ namespace Root_Pine2_Vision.Module
 
         public void RunLightOff()
         {
-            for (int n = 0; n < m_lightSet.m_aLight.Count; n++)
+            for (int n = 0; n < p_lLight; n++)
             {
                 Light light = m_lightSet.m_aLight[n];
                 if (light.m_light != null) light.m_light.p_fSetPower = 0;
@@ -202,9 +216,15 @@ namespace Root_Pine2_Vision.Module
         public override void RunTree(Tree tree)
         {
             base.RunTree(tree);
-            if (p_eRemote == eRemote.Client) return;
-            m_aWorks[eWorks.A].RunTree(tree.GetTree(m_aWorks[eWorks.A].p_id));
-            m_aWorks[eWorks.B].RunTree(tree.GetTree(m_aWorks[eWorks.B].p_id));
+            if (p_eRemote == eRemote.Client)
+            {
+                p_lLight = tree.GetTree("Light").Set(p_lLight, p_lLight, "Channel", "Light Channel Count");
+            }
+            else
+            {
+                m_aWorks[eWorks.A].RunTree(tree.GetTree(m_aWorks[eWorks.A].p_id));
+                m_aWorks[eWorks.B].RunTree(tree.GetTree(m_aWorks[eWorks.B].p_id));
+            }
         }
         #endregion
 
@@ -244,6 +264,7 @@ namespace Root_Pine2_Vision.Module
         {
             StateHome,
             Reset,
+            LightCount
         }
 
         Run_Remote GetRemoteRun(eRemoteRun eRemoteRun, eRemote eRemote, dynamic value)
