@@ -247,5 +247,23 @@ namespace RootTools_Vision
             return map;
         }
 
+        public void Invert()
+        {
+            for (int x = 0; x < this.MapSizeX; x++)
+            {
+                for (int y = 0; y < this.MapSizeY; y++)
+                {
+                    if (this.mapdata[x + y * this.MapSizeX] == (byte)CHIP_TYPE.NORMAL)
+                    {
+                        this.mapdata[x + y * this.MapSizeX] = (byte)CHIP_TYPE.NO_CHIP;
+                    }
+                    else
+                    {
+                        this.mapdata[x + y * this.MapSizeX] = (byte)CHIP_TYPE.NORMAL;
+                    }
+                }
+            }
+        }
+
     }
 }
