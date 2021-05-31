@@ -175,7 +175,13 @@ namespace Root_VEGA_P_Vision.Module
 
                 AlignGrabMode.m_camera.StopGrab();
 
-                //m_module.m_stage.Rotate(GetAlignAngle());
+                double AlignAngle = GlobalObjects.Instance.Get<RecipeVision>().GetItem<EUVPositionRecipe>().EIPCoverTopFeature.AlignAngle;
+                double resAngle = Calc.GetAlignAngle(GlobalObjects.Instance.GetNamed<ImageData>("EIP_Cover.Main.Front"), 50,300);
+
+                if (resAngle == double.MinValue)
+                    return "Angle계산이 잘못됐습니다.";
+                else
+                    m_module.m_stage.Rotate((m_module.m_stage.m_axisR.p_posActual/1000) + (resAngle- AlignAngle));
 
                 return "OK";
             }

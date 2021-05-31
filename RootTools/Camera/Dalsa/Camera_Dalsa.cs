@@ -683,7 +683,7 @@ namespace RootTools.Camera.Dalsa
                     {
                         int yp;
                         if (Scandir)
-                            yp = m_nLine - (y + (iBlock) * nCamHeight) + m_nInverseYOffset + m_nOffsetTest;
+                            yp = m_nLine - (y + iBlock * nCamHeight) + m_nInverseYOffset + m_nOffsetTest;
                         else
                             yp = y + iBlock * nCamHeight + nScanOffsetY + m_nOffsetTest;
 
@@ -744,8 +744,9 @@ namespace RootTools.Camera.Dalsa
             int nByteCnt = m_sapBuf.BytesPerPixel;
             int nCamHeight = p_CamParam.p_Height;
             int nCamWidth = p_CamParam.p_Width;
+            int nFOV = m_GD.m_nFovSize;
             long lMemoryWidth = (long)m_Memory.W;
-            int nMemoryOffsetX = m_cpScanOffset.X;
+            int nMemoryOffsetX = m_cpScanOffset.X ;
             int nMemoryOffsetY = m_cpScanOffset.Y;
             while (iBlock < m_nGrabCount)
             {
@@ -760,10 +761,10 @@ namespace RootTools.Camera.Dalsa
                         else
                             yp = y + (iBlock) * nCamHeight;
 
-                        IntPtr srcPtr = ipSrc + nCamWidth * y * nByteCnt;
+                        IntPtr srcPtr = ipSrc + nCamWidth * y * nByteCnt + m_GD.m_nFovStart;
                         IntPtr dstPtr = (IntPtr)((long)m_MemPtr + nMemoryOffsetX * nByteCnt + (yp + nMemoryOffsetY) * lMemoryWidth);
 
-                        long lDataWidth = nCamWidth * nByteCnt;
+                        long lDataWidth = nFOV * nByteCnt;
                         Buffer.MemoryCopy((void*)srcPtr, (void*)dstPtr, lDataWidth, lDataWidth);
                     });
                     iBlock++;

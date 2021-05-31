@@ -396,6 +396,8 @@ namespace Root_VEGA_P_Vision.Module
 
                 p_sInfo = m_sideOptic.axisZ.StartHome();
                 m_sideOptic.axisZ.WaitReady();
+                p_sInfo = m_mainOptic.m_axisZ.StartHome();
+                m_mainOptic.m_axisZ.WaitReady();
 
                 p_sInfo = base.StateHome();
                 m_stage.m_axisR.StartMove(m_stage.m_thetaOffset);
@@ -613,6 +615,7 @@ namespace Root_VEGA_P_Vision.Module
             AddModuleRunList(new Run_StainGrab(this), true, App.mStainGrab);
             AddModuleRunList(new Run_ZStack(this), true, App.mZStack);
             AddModuleRunList(new Run_Remote(this), false, "Remote Run");
+            AddModuleRunList(new Run_Align(this), false, "Vision Align");
             AddModuleRunList(new Run_Delay(this), true, "Time Delay");
         }        
             
