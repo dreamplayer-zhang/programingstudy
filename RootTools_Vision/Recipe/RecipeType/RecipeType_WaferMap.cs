@@ -177,7 +177,7 @@ namespace RootTools_Vision
 
         public void Clear()
         {
-            mapdata = new int[1] { (int)CHIP_TYPE.NORMAL };
+            mapdata = new int[1] { (int)CHIP_TYPE.NO_CHIP };
             mapSizeX = 1;
             mapSizeY = 1;
             masterDieX = 1;

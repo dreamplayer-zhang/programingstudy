@@ -69,7 +69,7 @@ namespace RootTools.Light
                 if (_fMaxPower == value) return;
                 _fMaxPower = value;
                 if (_fMaxPower < 0) _fMaxPower = 0;
-                if (_fMaxPower > 1000) _fMaxPower = 1000;
+                if (_fMaxPower > 10000) _fMaxPower = 10000;
                 RaisePropertyChanged();
                 m_reg.Write("MaxPower", p_fMaxPower);
             }
