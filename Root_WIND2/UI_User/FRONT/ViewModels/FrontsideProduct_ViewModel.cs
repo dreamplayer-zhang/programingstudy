@@ -224,6 +224,44 @@ namespace Root_WIND2.UI_User
                 return new RelayCommand(InvertMap);
             }
         }
+
+        public ICommand btnModeDrawCommand
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    if (this.IsDrawChecked == true)
+                    {
+                        this.IsEraseChecked = false;
+                    }
+                    else
+                    {
+                        this.IsEraseChecked = true;
+
+                    }
+                });
+            }
+        }
+
+        public ICommand btnModeEraseCommand
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    if (this.IsEraseChecked == true)
+                    {
+                        this.IsDrawChecked = false;
+                    }
+                    else
+                    {
+                        this.IsDrawChecked = true;
+
+                    }
+                });
+            }
+        }
         #endregion
 
         private int defaultMapSizeX = 14;
@@ -295,6 +333,25 @@ namespace Root_WIND2.UI_User
             public double Height { get; set; }
         }
 
+        private bool isDrawChecked = true;
+        public bool IsDrawChecked
+        {
+            get => this.isDrawChecked;
+            set
+            {
+                SetProperty<bool>(ref this.isDrawChecked, value);
+            }
+        }
+
+        private bool isEraseChecked = false;
+        public bool IsEraseChecked
+        {
+            get => this.isEraseChecked;
+            set
+            {
+                SetProperty<bool>(ref this.isEraseChecked, value);
+            }
+        }
         #endregion
 
 
@@ -377,14 +434,13 @@ namespace Root_WIND2.UI_User
             //int stride = (int)m_MapData.PartialMapSize.Height;
 
             CHIP_TYPE type = GetRecipeChipType(startPos.X, startPos.Y);
-            switch (type)
+            if (this.IsDrawChecked && type == CHIP_TYPE.NO_CHIP)
             {
-                case CHIP_TYPE.NO_CHIP:
-                    UpdateRecipeWaferMap(startPos.X, startPos.Y, CHIP_TYPE.NORMAL);
-                    break;
-                case CHIP_TYPE.NORMAL:
-                    UpdateRecipeWaferMap(startPos.X, startPos.Y, CHIP_TYPE.NO_CHIP);
-                    break;
+                UpdateRecipeWaferMap(startPos.X, startPos.Y, CHIP_TYPE.NORMAL);
+            }
+            else if (this.IsEraseChecked && type == CHIP_TYPE.NORMAL)
+            {
+                UpdateRecipeWaferMap(startPos.X, startPos.Y, CHIP_TYPE.NO_CHIP);
             }
 
             selected.Fill = ChipTypeToBrush(GetRecipeChipType(startPos.X, startPos.Y));
@@ -404,14 +460,13 @@ namespace Root_WIND2.UI_User
                     prevPos.Y = movingPos.Y;
 
                     CHIP_TYPE type = GetRecipeChipType(movingPos.X, movingPos.Y);
-                    switch (type)
+                    if (this.IsDrawChecked && type == CHIP_TYPE.NO_CHIP)
                     {
-                        case CHIP_TYPE.NO_CHIP:
-                            UpdateRecipeWaferMap(movingPos.X, movingPos.Y, CHIP_TYPE.NORMAL);
-                            break;
-                        case CHIP_TYPE.NORMAL:
-                            UpdateRecipeWaferMap(movingPos.X, movingPos.Y, CHIP_TYPE.NO_CHIP);
-                            break;
+                        UpdateRecipeWaferMap(startPos.X, startPos.Y, CHIP_TYPE.NORMAL);
+                    }
+                    else if (this.IsEraseChecked && type == CHIP_TYPE.NORMAL)
+                    {
+                        UpdateRecipeWaferMap(startPos.X, startPos.Y, CHIP_TYPE.NO_CHIP);
                     }
 
                     selected.Fill = ChipTypeToBrush(GetRecipeChipType(movingPos.X, movingPos.Y));
