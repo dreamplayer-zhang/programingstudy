@@ -235,7 +235,6 @@ namespace Root_Pine2.Module
                 m_picker.p_infoStrip = null;
                 boat.p_infoStrip.m_eWorks = eWorks;
                 if (Run(RunMoveUp())) return p_sInfo;
-                boats.StartScan(eWorks); 
             }
             finally
             {

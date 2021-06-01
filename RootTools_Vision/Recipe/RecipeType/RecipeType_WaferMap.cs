@@ -177,7 +177,7 @@ namespace RootTools_Vision
 
         public void Clear()
         {
-            mapdata = new int[1] { (int)CHIP_TYPE.NORMAL };
+            mapdata = new int[1] { (int)CHIP_TYPE.NO_CHIP };
             mapSizeX = 1;
             mapSizeY = 1;
             masterDieX = 1;
@@ -245,6 +245,24 @@ namespace RootTools_Vision
         {
             RecipeType_WaferMap map = new RecipeType_WaferMap(this.MapSizeX, this.MapSizeY, this.mapdata);
             return map;
+        }
+
+        public void Invert()
+        {
+            for (int x = 0; x < this.MapSizeX; x++)
+            {
+                for (int y = 0; y < this.MapSizeY; y++)
+                {
+                    if (this.mapdata[x + y * this.MapSizeX] == (byte)CHIP_TYPE.NORMAL)
+                    {
+                        this.mapdata[x + y * this.MapSizeX] = (byte)CHIP_TYPE.NO_CHIP;
+                    }
+                    else
+                    {
+                        this.mapdata[x + y * this.MapSizeX] = (byte)CHIP_TYPE.NORMAL;
+                    }
+                }
+            }
         }
 
     }

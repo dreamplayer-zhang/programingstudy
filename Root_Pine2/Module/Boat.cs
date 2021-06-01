@@ -52,7 +52,7 @@ namespace Root_Pine2.Module
         DIO_O m_doCleanerSuction;
         public void GetTools(ToolBox toolBox, Boats boats, bool bInit)
         {
-            toolBox.GetAxis(ref m_axis, boats, p_id + ".Scan");
+            toolBox.GetAxis(ref m_axis, boats, p_id + ".Snap");
             toolBox.GetDIO(ref m_doVacuumPump, boats, p_id + ".Vacuum Pump");
             toolBox.GetDIO(ref m_doVacuum, boats, p_id + ".Vacuum", new string[4] { "1", "2", "3", "4" });
             toolBox.GetDIO(ref m_doBlow, boats, p_id + ".Blow");
@@ -73,7 +73,7 @@ namespace Root_Pine2.Module
         void InitPosition()
         {
             m_axis.AddPos(Enum.GetNames(typeof(ePos)));
-            m_axis.AddSpeed("Grab");
+            m_axis.AddSpeed("Snap");
         }
 
         public string RunMove(ePos ePos, bool bWait = true)
@@ -83,17 +83,17 @@ namespace Root_Pine2.Module
             return bWait ? m_axis.WaitReady() : "OK";
         }
 
-        public string MoveScan(double dPosAcc)
+        public string MoveSnap(double dPosAcc)
         {
             m_axis.RunTrigger(false);
             m_axis.StartMove(m_axis.m_trigger.m_aPos[0] + dPosAcc);
             return m_axis.WaitReady();
         }
 
-        public string StartScan()
+        public string StartSnap()
         {
             m_axis.RunTrigger(true);
-            return m_axis.StartMove(m_axis.m_trigger.m_aPos[1], "Grab");
+            return m_axis.StartMove(m_axis.m_trigger.m_aPos[1], "Snap");
         }
         #endregion
 
@@ -128,18 +128,6 @@ namespace Root_Pine2.Module
         {
             m_doCleanerBlow.Write(bBlow);
             m_doCleanerSuction.Write(bSuction);
-        }
-        #endregion
-
-        #region Scan
-        public class ScanData
-        {
-        }
-        public string RunScan()
-        {
-            //forget
-            p_eStep = eStep.Done;
-            return "OK";
         }
         #endregion
 

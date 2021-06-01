@@ -12,6 +12,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shapes;
+using System.IO;
 
 namespace Root_WIND2.UI_User
 {
@@ -35,6 +36,10 @@ namespace Root_WIND2.UI_User
         //int nShotMatrixY = 1;
         //int nShotSizeX = 1;
         //int nShotSizeY = 1;
+
+        public bool dragAction = false;
+        CPoint startPos;
+        CPoint prevPos;
         #endregion
 
         #region [Get/Set]
@@ -180,7 +185,7 @@ namespace Root_WIND2.UI_User
             }
         }
 
-        public ICommand ClearMapCommand
+        public ICommand btnToolClearMapCommand
         {
             get
             {
@@ -204,11 +209,57 @@ namespace Root_WIND2.UI_User
         }
 
 
-        public ICommand CreateDefaultMapCommand
+        public ICommand btnToolCreateDefaultMapCommand
         {
             get
             {
                 return new RelayCommand(CreateDefaultMap);
+            }
+        }
+
+        public ICommand btnToolInvertCommand
+        {
+            get
+            {
+                return new RelayCommand(InvertMap);
+            }
+        }
+
+        public ICommand btnModeDrawCommand
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    if (this.IsDrawChecked == true)
+                    {
+                        this.IsEraseChecked = false;
+                    }
+                    else
+                    {
+                        this.IsEraseChecked = true;
+
+                    }
+                });
+            }
+        }
+
+        public ICommand btnModeEraseCommand
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    if (this.IsEraseChecked == true)
+                    {
+                        this.IsDrawChecked = false;
+                    }
+                    else
+                    {
+                        this.IsDrawChecked = true;
+
+                    }
+                });
             }
         }
         #endregion
@@ -282,6 +333,25 @@ namespace Root_WIND2.UI_User
             public double Height { get; set; }
         }
 
+        private bool isDrawChecked = true;
+        public bool IsDrawChecked
+        {
+            get => this.isDrawChecked;
+            set
+            {
+                SetProperty<bool>(ref this.isDrawChecked, value);
+            }
+        }
+
+        private bool isEraseChecked = false;
+        public bool IsEraseChecked
+        {
+            get => this.isEraseChecked;
+            set
+            {
+                SetProperty<bool>(ref this.isEraseChecked, value);
+            }
+        }
         #endregion
 
 
@@ -301,6 +371,12 @@ namespace Root_WIND2.UI_User
         public void ClearMap()
         {
             ClearRecipeWaferMap();
+            DrawMap();
+        }
+
+        public void InvertMap()
+        {
+            InvertWaferMap();
             DrawMap();
         }
 
@@ -342,6 +418,7 @@ namespace Root_WIND2.UI_User
 
                     Canvas.SetZIndex(rect, 99);
                     rect.MouseLeftButtonDown += ChipMouseLeftButtonDown;
+                    rect.MouseMove += ChipMouseMove;
 
                     ChipItems.Add(rect);
                 }
@@ -352,21 +429,54 @@ namespace Root_WIND2.UI_User
         private void ChipMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             Rectangle selected = (Rectangle)sender;
-            CPoint pos = (CPoint)selected.Tag;
+            startPos = (CPoint)selected.Tag;
+            prevPos = startPos;
             //int stride = (int)m_MapData.PartialMapSize.Height;
 
-            CHIP_TYPE type = GetRecipeChipType(pos.X, pos.Y);
-            switch (type)
+            CHIP_TYPE type = GetRecipeChipType(startPos.X, startPos.Y);
+            if (this.IsDrawChecked && type == CHIP_TYPE.NO_CHIP)
             {
-                case CHIP_TYPE.NO_CHIP:
-                    UpdateRecipeWaferMap(pos.X, pos.Y, CHIP_TYPE.NORMAL);
-                    break;
-                case CHIP_TYPE.NORMAL:
-                    UpdateRecipeWaferMap(pos.X, pos.Y, CHIP_TYPE.NO_CHIP);
-                    break;
+                UpdateRecipeWaferMap(startPos.X, startPos.Y, CHIP_TYPE.NORMAL);
+            }
+            else if (this.IsEraseChecked && type == CHIP_TYPE.NORMAL)
+            {
+                UpdateRecipeWaferMap(startPos.X, startPos.Y, CHIP_TYPE.NO_CHIP);
             }
 
-            selected.Fill = ChipTypeToBrush(GetRecipeChipType(pos.X, pos.Y));
+            selected.Fill = ChipTypeToBrush(GetRecipeChipType(startPos.X, startPos.Y));
+        }
+
+        private void ChipMouseMove(object sender, MouseEventArgs e)
+        {
+            if (e.LeftButton == MouseButtonState.Pressed)
+            {
+                Rectangle selected = (Rectangle)sender;
+                CPoint movingPos = (CPoint)selected.Tag;
+                //int stride = (int)m_MapData.PartialMapSize.Height;
+
+                if (prevPos.X != movingPos.X || prevPos.Y != movingPos.Y)
+                {
+                    prevPos.X = movingPos.X;
+                    prevPos.Y = movingPos.Y;
+
+                    CHIP_TYPE type = GetRecipeChipType(movingPos.X, movingPos.Y);
+                    if (this.IsDrawChecked && type == CHIP_TYPE.NO_CHIP)
+                    {
+                        UpdateRecipeWaferMap(startPos.X, startPos.Y, CHIP_TYPE.NORMAL);
+                    }
+                    else if (this.IsEraseChecked && type == CHIP_TYPE.NORMAL)
+                    {
+                        UpdateRecipeWaferMap(startPos.X, startPos.Y, CHIP_TYPE.NO_CHIP);
+                    }
+
+                    selected.Fill = ChipTypeToBrush(GetRecipeChipType(movingPos.X, movingPos.Y));
+                }
+            }
+        }
+
+        private void ChipMouseLeftButtonUp(object sender, MouseEventArgs e)
+        {
+            dragAction = false;
         }
 
         private void CreateRecipeWaferMap(int mapSizeX, int mapSizeY, CHIP_TYPE type)
@@ -392,6 +502,12 @@ namespace Root_WIND2.UI_User
             RecipeType_WaferMap waferMap = GlobalObjects.Instance.Get<RecipeFront>().WaferMap;
 
             waferMap.Data[y * waferMap.MapSizeX + x] = (int)type;
+        }
+
+        private void InvertWaferMap()
+        {
+            RecipeType_WaferMap waferMap = GlobalObjects.Instance.Get<RecipeFront>().WaferMap;
+            waferMap.Invert();
         }
 
         private CHIP_TYPE GetRecipeChipType(int x, int y)
