@@ -48,7 +48,7 @@ namespace Root_Pine2_Vision.Module
             m_aMemory.Add(m_memoryConv[0] = m_memoryGroup.CreateMemory("Axial", 1, 1, new CPoint(50000, 90000)));
             m_aMemory.Add(m_memoryConv[1] = m_memoryGroup.CreateMemory("Pad", 1, 1, new CPoint(50000, 90000)));
             m_aMemory.Add(m_memoryConv[2] = m_memoryGroup.CreateMemory("Side", 1, 1, new CPoint(50000, 90000)));
-            m_aMemory.Add(m_memoryHSI[0] = m_memoryGroup.CreateMemory("Hui", 1, 1, new CPoint(50000, 90000)));
+            m_aMemory.Add(m_memoryHSI[0] = m_memoryGroup.CreateMemory("Hue", 1, 1, new CPoint(50000, 90000)));
             m_aMemory.Add(m_memoryHSI[1] = m_memoryGroup.CreateMemory("Saturation", 1, 1, new CPoint(50000, 90000)));
             m_aMemory.Add(m_memoryHSI[2] = m_memoryGroup.CreateMemory("Intensity", 1, 1, new CPoint(50000, 90000)));
             m_aMemory.Add(m_memoryGerbber = m_memoryGroup.CreateMemory("Gerbber", 1, 3, new CPoint(50000, 90000)));
