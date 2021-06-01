@@ -1,11 +1,15 @@
 ﻿using Root_Pine2_Vision.Module;
 using RootTools;
+using RootTools.Comm;
 using RootTools.Control;
 using RootTools.Module;
 using RootTools.ToolBoxs;
 using RootTools.Trees;
 using System;
 using System.ComponentModel;
+using System.IO;
+using System.Net.Sockets;
+using System.Text;
 
 namespace Root_Pine2.Module
 {
@@ -60,8 +64,46 @@ namespace Root_Pine2.Module
             toolBox.GetDIO(ref m_doRollerPusher, boats, p_id + ".Roller Pusher");
             toolBox.GetDIO(ref m_doCleanerBlow, boats, p_id + ".Cleaner Blow");
             toolBox.GetDIO(ref m_doCleanerSuction, boats, p_id + ".Cleaner Suction");
+            m_remoteSnap.GetTools(toolBox, bInit); 
             if (bInit) InitPosition();
         }
+        #endregion
+
+        #region Remote Snap
+        public class RemoteSnap
+        {
+            TCPAsyncServer m_tcpip;
+            public void GetTools(ToolBox toolBox, bool bInit)
+            {
+                toolBox.GetComm(ref m_tcpip, m_boats, p_id + ".RemoteSnap"); 
+                if (bInit) m_tcpip.EventReciveData += M_tcpip_EventReciveData;
+            }
+
+            private void M_tcpip_EventReciveData(byte[] aBuf, int nSize, Socket socket)
+            {
+                string sSend = Encoding.Default.GetString(aBuf, 0, nSize);
+                if (sSend.Length <= 0) return;
+                MemoryStream memoryStream = new MemoryStream(Encoding.ASCII.GetBytes(sSend));
+                m_treeRoot.m_job = new Job(memoryStream, false, m_boats.m_log);
+                m_treeRoot.p_eMode = Tree.eMode.JobOpen;
+                m_snapData.RunTree(m_treeRoot, true);
+                m_treeRoot.m_job.Close();
+                m_boats.StartSnap(m_snapData); 
+            }
+
+            string p_id { get; set; }
+            Boats m_boats;
+            TreeRoot m_treeRoot;
+            Vision.SnapData m_snapData; 
+            public RemoteSnap(string id, Boats boats)
+            {
+                p_id = id; 
+                m_boats = boats;
+                m_treeRoot = new TreeRoot(id, boats.m_log);
+                m_snapData = new Vision.SnapData(boats.m_vision); 
+            }
+        }
+        public RemoteSnap m_remoteSnap; 
         #endregion
 
         #region Axis
@@ -188,6 +230,7 @@ namespace Root_Pine2.Module
         {
             m_bgwRunReady.DoWork += M_bgwRunReady_DoWork;
             p_id = id + works.p_eWorks.ToString();
+            m_remoteSnap = new RemoteSnap(p_id, boats); 
             m_boats = boats;
             m_works = works;
         }

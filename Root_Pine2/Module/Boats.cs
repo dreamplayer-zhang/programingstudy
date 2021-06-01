@@ -122,6 +122,37 @@ namespace Root_Pine2.Module
         }
         #endregion
 
+        #region Snap
+        public string StartSnap(Vision.SnapData snapData)
+        {
+            Run_Snap run = (Run_Snap)m_runSnap.Clone();
+            run.m_snapData = snapData;
+            return StartRun(run);
+        }
+
+        public string RunSnap(Vision.SnapData snapData)
+        {
+            StopWatch sw = new StopWatch();
+            try
+            {
+                m_vision.RunLight(snapData.m_lightPower);
+                if (Run(RunMoveSnapStart(snapData))) return p_sInfo;
+                m_vision.StartSnap(snapData);
+                if (Run(m_aBoat[snapData.m_eWorks].RunSnap())) return p_sInfo;
+                if (m_vision.IsBusy()) EQ.p_bStop = true;
+            }
+            catch (Exception e) { p_sInfo = e.Message; }
+            finally
+            {
+                m_axisCam.StartMove((Vision.eWorks)(1 - (int)snapData.m_eWorks));
+                m_aBoat[snapData.m_eWorks].RunMove(p_ePosUnload);
+            }
+
+            m_log.Info("Run Snap End : " + (sw.ElapsedMilliseconds / 1000.0).ToString("0.00") + " sec");
+            return "OK";
+        }
+        #endregion
+
         #region Tree
         public override void RunTree(Tree tree)
         {
@@ -131,7 +162,7 @@ namespace Root_Pine2.Module
         #endregion
 
         Pine2 m_pine2;
-        Vision m_vision; 
+        public Vision m_vision; 
         public Boats(Vision vision, IEngineer engineer, Pine2 pine2)
         {
             m_vision = vision;
@@ -145,37 +176,6 @@ namespace Root_Pine2.Module
         {
             base.ThreadStop();
         }
-
-        #region Snap
-        public string StartSnap(Vision.SnapData snapData)
-        {
-            Run_Snap run = (Run_Snap)m_runSnap.Clone();
-            run.m_snapData = snapData;
-            return StartRun(run); 
-        }
-
-        public string RunSnap(Vision.SnapData snapData)
-        {
-            StopWatch sw = new StopWatch(); 
-            try
-            {
-                m_vision.RunLight(snapData.m_lightPower);
-                if (Run(RunMoveSnapStart(snapData))) return p_sInfo;
-                m_vision.StartSnap(snapData); 
-                if (Run(m_aBoat[snapData.m_eWorks].RunSnap())) return p_sInfo;
-                if (m_vision.IsBusy()) EQ.p_bStop = true; 
-            }
-            catch (Exception e) { p_sInfo = e.Message; }
-            finally
-            {
-                m_axisCam.StartMove((Vision.eWorks)(1 - (int)snapData.m_eWorks));
-                m_aBoat[snapData.m_eWorks].RunMove(p_ePosUnload); 
-            }
-
-            m_log.Info("Run Snap End : " + (sw.ElapsedMilliseconds / 1000.0).ToString("0.00") + " sec"); 
-            return "OK";
-        }
-        #endregion
 
         #region ModuleRun
         ModuleRunBase m_runSnap;
