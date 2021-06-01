@@ -309,12 +309,16 @@ namespace Root_WIND2.UI_User
         {
             get => new RelayCommand(() =>
             {
-
                 WorkManager workManager = GlobalObjects.Instance.GetNamed<WorkManager>("frontInspection");
                 RecipeFront recipe = GlobalObjects.Instance.Get<RecipeFront>();
 
                 WIND2_Engineer engineer = GlobalObjects.Instance.Get<WIND2_Engineer>();
-                CameraInfo camInfo = DataConverter.GrabModeToCameraInfo(engineer.m_handler.p_Vision.GetGrabMode(recipe.CameraInfoIndex));
+                GrabModeFront grabMode = engineer.m_handler.p_Vision.GetGrabMode(recipe.CameraInfoIndex);
+                InfoWafer infoWafer = engineer.m_handler.p_Vision.p_infoWafer;
+                if(infoWafer == null)
+                {
+                    infoWafer = new InfoWafer("null", 0, engineer);
+                }
 
                 Settings settings = new Settings();
                 SettingItem_SetupFrontside settings_frontside = settings.GetItem<SettingItem_SetupFrontside>();
@@ -322,19 +326,15 @@ namespace Root_WIND2.UI_User
                 DataTable table = DatabaseManager.Instance.SelectCurrentInspectionDefect();
                 List<Defect> defects = Tools.DataTableToDefectList(table);
 
-
                 KlarfData_Lot klarfData = new KlarfData_Lot();
                 Directory.CreateDirectory(settings_frontside.KlarfSavePath);
 
-                klarfData.SetResolution((float)camInfo.RealResX, (float)camInfo.RealResY);
-                klarfData.WaferStart(recipe.WaferMap, DateTime.Now);
+                klarfData.LotStart(settings_frontside.KlarfSavePath, infoWafer, recipe.WaferMap, grabMode);
+                klarfData.WaferStart(recipe.WaferMap, infoWafer);
                 klarfData.AddSlot(recipe.WaferMap, defects, recipe.GetItem<OriginRecipe>(), settings_frontside.UseTDIReview);
                 klarfData.SetResultTimeStamp();
-                klarfData.SaveKlarf(settings_frontside.KlarfSavePath, false);
-
-                //string inspectionID = DatabaseManager.Instance.GetInspectionID();
-
-                Tools.SaveTiffImageOnlyTDI(settings_frontside.KlarfSavePath, klarfData.GetKlarfFileName(), defects, workManager.SharedBuffer, new Size(160, 120));
+                klarfData.SaveKlarf();
+                klarfData.SaveTiffImageOnlyTDI(defects, workManager.SharedBuffer, new Size(160, 120));
             });
         }
 
