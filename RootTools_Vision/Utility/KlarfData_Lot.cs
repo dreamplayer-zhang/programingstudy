@@ -1,4 +1,5 @@
-﻿using RootTools.Database;
+﻿using RootTools;
+using RootTools.Database;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -48,7 +49,7 @@ namespace RootTools_Vision.Utility
 			tiffFileName = "";
 			sampleCenterLocationX = 0.0f;
 			sampleCenterLocationY = 0.0f;
-			slot = 1;
+			slotID = 1;
 
 			klarfType = 0;
 		}
@@ -73,6 +74,9 @@ namespace RootTools_Vision.Utility
 		private String klarf_FileName;
 		private String cassetteID;
 
+
+		private DateTime timeLotStart;				  //210531 Lot Start 시간
+
 		private DateTime timeFile;                    // Klarf 생성 시간.
 		private DateTime timeResult;                  // 검사 종료 시간.
 		private DateTime timeRecipe;                  // Recipe 생성 시간.
@@ -91,10 +95,10 @@ namespace RootTools_Vision.Utility
 		private string tempString;
 
 		private string tempLotEndResultTimeStamp;
-		private float resX;
-		private float resY;
+		private double resX;
+		private double resY;
 
-		private int slot;
+		private int slotID;
 
 		private int klarfType;
 
@@ -103,7 +107,7 @@ namespace RootTools_Vision.Utility
 		private String recipeName;
 		private String tiffSpec;                        // Tiff Spec, 현재 모두 Color로 변환하여 저장. (ex 6.0 G R)
 		private String tiffFileName;                    // Tiff file 명.
-		//private String areaPerTest;                      // Area Per Test (사용안함)
+														//private String areaPerTest;                      // Area Per Test (사용안함)
 
 
 		//private int inspectionTest;                      // 검사 회수, ATI 검사 Mode가 1가지라서 1회만 검사하지요.
@@ -113,8 +117,42 @@ namespace RootTools_Vision.Utility
 		//private String sampleTestPlan;                  // 검사한 Die 좌표들.
 		//private int tmpSampleTestCnt;                    // 검사한 Die 수량을 임시로 저장해둠. Density 구하기 위함.
 
+
+		// 210531
+		string klarfPath;
+
 		#endregion
 
+
+
+		// 210531 New
+		public bool LotStart(string klarfPath, InfoWafer infoWafer , RecipeType_WaferMap mapData, GrabModeBase grabMode)
+        {
+			this.klarfData.Clear();
+
+			this.cassetteID = infoWafer.p_sCarrierID;
+			this.lotID = infoWafer.p_sLotID;
+			this.recipeName = infoWafer.p_sRecipe;
+			this.waferID = infoWafer.p_sWaferID;
+
+			this.deviceID = infoWafer.p_sRecipe.Split('.')[0];
+			this.partID = infoWafer.p_sRecipe.Split('.')[0];
+			this.stepID = infoWafer.p_sRecipe.Split('.')[1];
+
+			this.resX = grabMode.m_dRealResX_um;
+			this.resY = grabMode.m_dRealResY_um;
+
+			CalcSampleCenterLoc(mapData);
+
+			this.timeLotStart = DateTime.Now;
+
+			this.klarfPath = klarfPath;
+
+			return true;
+		}
+
+
+		// 이건 쓰지말자...
 		public bool LotStart(string _recipeName/*, CRecipeData_ProductSetting* _productInfor*/, RecipeType_WaferMap _mapdata, string _lotID, DateTime _lotStart)
 		{
 			this.klarfData.Clear();
@@ -147,6 +185,21 @@ namespace RootTools_Vision.Utility
 		{
 			timeResultStamp = DateTime.Now;
 		}
+
+
+
+		public bool WaferStart(RecipeType_WaferMap mapdata, InfoWafer infoWafer)
+        {
+			this.timeResult = DateTime.Now; 
+			this.timeRecipe = DateTime.Now;
+
+			this.slotID = infoWafer.m_nSlot;
+
+			return true;
+		}
+
+
+		// 이거 쓰지말자
 		public bool WaferStart(/*CRecipeData_CurrentWFInfor _waferInfor, CRecipeData_ProductSetting* _productInfor, */ RecipeType_WaferMap _mapdata, DateTime _waferStart)
 		{
 			//klarfData.Clear();
@@ -165,7 +218,7 @@ namespace RootTools_Vision.Utility
 				case 4: this.orientationMarkLocation = "DOWN"; break;
 			}
 			
-			this.slot = CheckSlotNo();
+			this.slotID = CheckSlotNo();
 			
 			CalcSampleCenterLoc(_mapdata);
 
@@ -186,7 +239,7 @@ namespace RootTools_Vision.Utility
             data.SetKlarfType(klarfType);
             data.tiffFileName = this.tiffFileName;
 
-            data.waferID_name = string.Format("{0:2d}", 0/*pMapdata->GetWaferID()*/);
+            data.waferID_name = string.Format("{0:2d}", this.slotID);
 
             //	data.m_nWaferID = AfxGetApp()->GetProfileIntA("ProductSetting", "SlotNum", data.m_nWaferID);  
             //	data.m_nSlot = AfxGetApp()->GetProfileIntA("ProductSetting", "SlotNum", data.m_nSlot); 
@@ -338,7 +391,7 @@ namespace RootTools_Vision.Utility
         {
 			if (bCollector)
 			{
-				tempString = string.Format(lotID + "_{0:d}", slot);
+				tempString = string.Format(lotID + "_{0:d}", slotID);
 			}
 			else
 			{
@@ -351,8 +404,11 @@ namespace RootTools_Vision.Utility
 			return tempString;
 		}
 
-		public bool SaveKlarf(string strFilePath, bool bCollector = false)
+		public bool SaveKlarf(string strFilePath ="", bool bCollector = false)
 		{
+
+			if (strFilePath == "") strFilePath = this.klarfPath;
+
 			timeFile = DateTime.Now;
 
 			if (!Directory.Exists(strFilePath))
@@ -360,7 +416,7 @@ namespace RootTools_Vision.Utility
 
 			if (bCollector)
 			{
-				tempString = string.Format(strFilePath + "\\" + lotID + "_{0:d}", slot);
+				tempString = string.Format(strFilePath + "\\" + lotID + "_{0:d}", slotID);
 			}
 			else
 			{
@@ -371,7 +427,6 @@ namespace RootTools_Vision.Utility
 			tempString.Replace(".rcp", "");
 			tempString += ".001";
 			tiffFileName = tempString;
-			//tiffFileName.Replace(".001", ".tif"); //이거모냐
 
 			FileStream fs = new FileStream(tiffFileName, FileMode.Create, FileAccess.Write);
 			StreamWriter sw = new StreamWriter(fs, System.Text.Encoding.UTF8);
@@ -396,8 +451,11 @@ namespace RootTools_Vision.Utility
 			return true;
 		}
 
-		public bool CreateLotEnd(string strFilePath)
+		public bool CreateLotEnd(string strFilePath = "")
 		{
+			if (strFilePath == "")
+				strFilePath = this.klarfPath;
+
 			timeFile = DateTime.Now;
 
 			FileStream fs = new FileStream(strFilePath, FileMode.Append, FileAccess.Write);

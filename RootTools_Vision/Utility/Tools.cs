@@ -721,7 +721,7 @@ namespace RootTools_Vision
                     if (byteDst == null)
                         return;
 
-                    Marshal.Copy(new IntPtr(ptrSrc.ToInt64() + (i * (Int64)srcStride + left)), byteDst, width * (i - top), width);
+                    Marshal.Copy((IntPtr)((long)ptrSrc + (long)(i * srcStride + left)), byteDst, width * (i - top), width);
 
                 });
 

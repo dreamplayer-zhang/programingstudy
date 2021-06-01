@@ -235,7 +235,7 @@ namespace Root_WIND2.UI_User
 
                 if (GlobalObjects.Instance.GetNamed<WorkManager>("frontInspection") != null)
                 {
-                    GlobalObjects.Instance.GetNamed<WorkManager>("frontInspection").Start();
+                    GlobalObjects.Instance.GetNamed<WorkManager>("frontInspection").Start();                    
 
                     this.InspectionID = DatabaseManager.Instance.GetInspectionID();
                 }
