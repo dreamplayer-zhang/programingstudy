@@ -19,6 +19,7 @@ namespace Root_AOP01_Inspection.Engineer
             public string m_id;
             public IWTRChild m_child = null;
             public WTRArm m_arm = null;
+            AOP01_Engineer m_Engineer;
 
             /// <summary> Sequence 계산용 InfoWafer </summary>
             InfoWafer _calcWafer = null;
@@ -378,10 +379,13 @@ namespace Root_AOP01_Inspection.Engineer
 
         #region RunSequence
 
+        public bool bBeforeVision = false;
         /// <summary> m_aSequence에 있는 ModuleRun을 가능한 동시 실행한다 </summary>
         public string RunNextSequence()
         {
             ModuleBase wtr = (ModuleBase)m_wtr;
+            MainVision mainVision = ((AOP01_Handler)m_engineer.ClassHandler()).m_mainVision;
+
             if ((m_qSequence.Count == 0) || EQ.IsStop())
             {
                 EQ.p_eState = EQ.eState.Ready;
@@ -389,13 +393,40 @@ namespace Root_AOP01_Inspection.Engineer
                 return EQ.IsStop() ? "EQ Stop" : "OK";
             }
             Sequence sequence = m_qSequence.Peek();
+
             bool bLoadport = sequence.m_moduleRun.m_moduleBase is ILoadport;
+
+            
+            bool bVision = sequence.m_moduleRun.p_id.Contains("Vision");
+
+            if (bVision == true && bBeforeVision == false)
+            {
+                mainVision.m_ceidInspectionStart.Send();
+                //sequence.m_infoWafer.STSProcessing();
+            }
+
+            if (bVision == false && bBeforeVision == true)
+            {
+                mainVision.m_ceidInspectionEnd.Send();
+                //sequence.m_infoWafer.STSProcessDone();
+                if (mainVision.UpdateInspResult() == "OK")
+                {
+                    mainVision.m_ceidResultData.Send();
+                }
+                else 
+                {
+                    return "Update Inspection Result Error";
+                }
+                
+            }
+            
             if ((sequence.m_moduleRun.m_moduleBase == wtr) || bLoadport)
             {
                 sequence.m_moduleRun.StartRun();
                 while (wtr.IsBusy() && (EQ.IsStop() == false)) Thread.Sleep(10);
             }
             else sequence.m_moduleRun.StartRun();
+            bBeforeVision = bVision;
             m_qSequence.Dequeue();
             m_dSequencePercent += m_dOneSequencePercent;
             InfoWafer infoWafer = sequence.m_infoWafer;

@@ -214,7 +214,7 @@ namespace RootTools.Module
         {
             if (m_qModuleRemote.Count == 0) return false;
             ModuleRunBase moduleRun = m_qModuleRemote.Peek();
-            if (moduleRun.m_eRemote == eRemote.Local) return false;
+            if (p_eRemote != eRemote.Client) return false;
             try
             {
                 m_swRun.Restart();
@@ -409,7 +409,7 @@ namespace RootTools.Module
         public string StartRun(ModuleRunBase moduleRun)
         {
             if (EQ.IsStop()) return "EQ Stop";
-            if ((moduleRun.m_eRemote != eRemote.Local) && (moduleRun.m_eRemote == p_eRemote)) m_qModuleRemote.Enqueue(moduleRun); 
+            if (((moduleRun.m_eRemote != eRemote.Local) && (moduleRun.m_eRemote == p_eRemote)) || p_eRemote == eRemote.Client) m_qModuleRemote.Enqueue(moduleRun); 
             else m_qModuleRun.Enqueue(moduleRun);
             p_sInfo = "StartRun : " + moduleRun.m_sModuleRun;
             return "OK";

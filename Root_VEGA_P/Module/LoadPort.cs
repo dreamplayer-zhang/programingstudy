@@ -62,6 +62,7 @@ namespace Root_VEGA_P.Module
             public enum ePos
             {
                 Outside,
+                Barcode,
                 Inside
             }
             void InitPos()
@@ -458,6 +459,7 @@ namespace Root_VEGA_P.Module
             }
         }
         #endregion
+
         #region InfoPods
         InfoPods m_infoPods; 
         void InitInfoPods(string id, IEngineer engineer)
@@ -504,6 +506,8 @@ namespace Root_VEGA_P.Module
                 if (m_stage.p_bPresent == false) return "Not Present";
                 if (Run(m_stage.RunVacuum(true))) return p_sInfo;
                 if (Run(m_door.RunDoor(true))) return p_sInfo;
+                if (Run(m_stage.RunMove(Stage.ePos.Barcode))) return p_sInfo;
+                //forget
                 if (Run(m_stage.RunMove(Stage.ePos.Inside))) return p_sInfo;
                 if (Run(m_door.RunDoor(false))) return p_sInfo;
                 if (Run(m_stage.RunPodOpen(true))) return p_sInfo;
@@ -642,6 +646,7 @@ namespace Root_VEGA_P.Module
 
         public override void ThreadStop()
         {
+            m_stage.RunMove(Stage.ePos.Outside); 
             if (m_bThreadCheck)
             {
                 m_bThreadCheck = false;

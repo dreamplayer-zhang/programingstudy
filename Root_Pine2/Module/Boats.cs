@@ -2,12 +2,9 @@
 using RootTools;
 using RootTools.Control;
 using RootTools.Module;
-using RootTools.ToolBoxs;
 using RootTools.Trees;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Threading;
 
 namespace Root_Pine2.Module
 {
@@ -19,170 +16,80 @@ namespace Root_Pine2.Module
             m_toolBox.GetAxis(ref m_axisCam, this, "Camera"); 
             m_aBoat[Vision.eWorks.A].GetTools(m_toolBox, this, bInit);
             m_aBoat[Vision.eWorks.B].GetTools(m_toolBox, this, bInit);
+            if (bInit) InitPosition(); 
         }
         #endregion
 
-        #region Cam Axis
-        AxisXY m_axisCam; 
-        //forget
+        #region Camera Axis
+        AxisXY m_axisCam;
+        const string c_sPosReady = "Ready";
+        void InitPosition()
+        {
+            m_axisCam.AddPos(c_sPosReady);
+            m_axisCam.AddPos(Enum.GetNames(typeof(Vision.eWorks))); 
+        }
+
+        public string RunMoveCamera(Vision.eWorks ePos, bool bWait = true)
+        {
+            m_axisCam.StartMove(ePos);
+            return bWait ? m_axisCam.p_axisX.WaitReady() : "OK";
+        }
+
+        public string RunMoveSnapStart(Vision.SnapData snapData, bool bWait = true)
+        {
+            m_axisCam.StartMove(snapData.m_eWorks, new RPoint(m_xCamScale * snapData.m_dpAxis.X, 0));
+            if (Run(m_aBoat[snapData.m_eWorks].RunMoveSnapStart(snapData, bWait))) return p_sInfo;
+            return bWait ? m_axisCam.p_axisX.WaitReady() : "OK";
+        }
+
+        double m_xCamScale = 1000; 
+        void RunTreeCamAxis(Tree tree)
+        {
+            m_xCamScale = tree.Set(m_xCamScale, m_xCamScale, "X Scale", "Camera X Axis Scale (pulse / mm)"); 
+        }
+        #endregion
+
+        #region Boat AxisPos
+        public Boat.ePos p_ePosLoad 
+        {
+            get
+            {
+                switch (m_vision.m_eVision)
+                {
+                    case Vision.eVision.Top3D: return Boat.ePos.Handler;
+                    case Vision.eVision.Top2D: return m_pine2.p_b3D ? Boat.ePos.Vision : Boat.ePos.Handler;
+                    case Vision.eVision.Bottom: return Boat.ePos.Vision; 
+                }
+                return Boat.ePos.Handler; 
+            }
+            set { }
+        }
+        public Boat.ePos p_ePosUnload 
+        {
+            get
+            {
+                switch(m_vision.m_eVision)
+                {
+                    case Vision.eVision.Top3D: return Boat.ePos.Vision;
+                    case Vision.eVision.Top2D: return Boat.ePos.Vision;
+                    case Vision.eVision.Bottom: return Boat.ePos.Handler;
+                }
+                return Boat.ePos.Vision;
+            } 
+            set { }
+        }
         #endregion
 
         #region Boat
-        public class Boat : NotifyProperty
-        {
-            #region Step
-            public enum eStep
-            {
-                Init,
-                Ready,
-                Run,
-                Done,
-                RunReady,
-            }
-            eStep _eStep = eStep.Init; 
-            public eStep p_eStep 
-            { 
-                get { return _eStep; }
-                set
-                {
-                    if (_eStep == value) return;
-                    _eStep = value;
-                    OnPropertyChanged();
-                    if (value == eStep.RunReady) m_bgwRunReady.RunWorkerAsync();
-                }
-            }
-
-            BackgroundWorker m_bgwRunReady = new BackgroundWorker(); 
-            void InitBackgroundWorker()
-            {
-                p_ePosReady = ePos.Ready; 
-                m_bgwRunReady.DoWork += M_bgwRunReady_DoWork;
-            }
-
-            private void M_bgwRunReady_DoWork(object sender, DoWorkEventArgs e)
-            {
-                m_axis.StartMove(p_ePosReady);
-                p_eStep = (m_axis.WaitReady() == "OK") ? eStep.Ready : eStep.Init; 
-            }
-            #endregion
-
-            Axis m_axis; 
-            DIO_O m_doVacuumPump; 
-            public DIO_Os m_doVacuum;
-            public DIO_O m_doBlow;
-            DIO_I2O m_dioRollerDown;
-            DIO_O m_doRollerPusher;
-            DIO_O m_doCleanerBlow;
-            DIO_O m_doCleanerSuction; 
-            public void GetTools(ToolBox toolBox, Boats boats, bool bInit)
-            {
-                toolBox.GetAxis(ref m_axis, boats, p_id + ".Scan"); 
-                toolBox.GetDIO(ref m_doVacuumPump, boats, p_id + ".Vacuum Pump");
-                toolBox.GetDIO(ref m_doVacuum, boats, p_id + ".Vacuum", new string[4] { "1", "2", "3", "4" });
-                toolBox.GetDIO(ref m_doBlow, boats, p_id + ".Blow");
-                toolBox.GetDIO(ref m_dioRollerDown, boats, p_id + ".Roller", "Up", "Down");
-                toolBox.GetDIO(ref m_doRollerPusher, boats, p_id + ".Roller Pusher");
-                toolBox.GetDIO(ref m_doCleanerBlow, boats, p_id + ".Cleaner Blow");
-                toolBox.GetDIO(ref m_doCleanerSuction, boats, p_id + ".Cleaner Suction");
-                if (bInit) InitPosition();
-            }
-
-            #region Axis
-            public enum ePos
-            {
-                Ready,
-                Done,
-            }
-            void InitPosition()
-            {
-                m_axis.AddPos(Enum.GetNames(typeof(ePos)));
-                m_axis.AddSpeed("Grab"); 
-            }
-
-            public ePos p_ePosReady { get; set; }
-
-            public string RunMove(ePos ePos, bool bWait = true)
-            {
-                m_axis.RunTrigger(false); 
-                m_axis.StartMove(ePos);
-                return bWait ? m_axis.WaitReady() : "OK"; 
-            }
-
-            public string RunMoveStartGrab(double dPosAcc)
-            {
-                m_axis.RunTrigger(false);
-                m_axis.StartMove(m_axis.m_trigger.m_aPos[0] + dPosAcc);
-                return m_axis.WaitReady(); 
-            }
-
-            public string StartGrab()
-            {
-                m_axis.RunTrigger(true); 
-                return m_axis.StartMove(m_axis.m_trigger.m_aPos[1], "Grab"); 
-            }
-            #endregion
-
-            #region Vacuum
-            public void SetVacuum(bool[] aVacuum)
-            {
-                for (int n = 0; n < Math.Min(4, aVacuum.Length); n++) m_doVacuum.Write(n, aVacuum[n]); 
-            }
-
-            public void RunVacuum(bool bOn)
-            {
-                m_doVacuumPump.Write(bOn);
-            }
-
-            public void RunBlow(bool bBlow)
-            {
-                m_doBlow.Write(bBlow);
-            }
-            #endregion
-
-            #region Clean Roller
-            public string RunRoller(bool bDown)
-            {
-                m_doRollerPusher.Write(bDown);
-                m_dioRollerDown.Write(bDown);
-                return m_dioRollerDown.WaitDone(); 
-            }
-            #endregion
-
-            #region Cleaner
-            public void RunCleaner(bool bBlow, bool bSuction)
-            {
-                m_doCleanerBlow.Write(bBlow);
-                m_doCleanerSuction.Write(bSuction); 
-            }
-            #endregion
-
-            public void Reset(eState eState)
-            {
-                p_infoStrip = null;
-                if (eState == eState.Ready) p_eStep = eStep.RunReady; 
-            }
-
-            public InfoStrip p_infoStrip { get; set; }
-            public string p_id { get; set; }
-            Boats m_boats;
-            Vision.VisionWorks m_visionWorks; 
-            public Boat(string id, Boats boats, Vision.VisionWorks visionWorks)
-            {
-                InitBackgroundWorker(); 
-                p_id = id + visionWorks.m_eVisionWorks.ToString();
-                m_boats = boats;
-                m_visionWorks = visionWorks; 
-            }
-        }
         public Dictionary<Vision.eWorks, Boat> m_aBoat = new Dictionary<Vision.eWorks, Boat>(); 
         void InitBoat()
         {
-            m_aBoat.Add(Vision.eWorks.A, new Boat(p_id, this, m_vision.m_aVisionWorks[Vision.eWorks.A]));
-            m_aBoat.Add(Vision.eWorks.B, new Boat(p_id, this, m_vision.m_aVisionWorks[Vision.eWorks.B]));
+            m_aBoat.Add(Vision.eWorks.A, new Boat(p_id, this, m_vision.m_aWorks[Vision.eWorks.A]));
+            m_aBoat.Add(Vision.eWorks.B, new Boat(p_id, this, m_vision.m_aWorks[Vision.eWorks.B]));
         }
         #endregion
 
-        #region State Home
+        #region State Home & Reset
         public override string StateHome()
         {
             if (EQ.p_bSimulate)
@@ -208,9 +115,41 @@ namespace Root_Pine2.Module
 
         public override void Reset()
         {
+            m_axisCam.StartMove(c_sPosReady); 
             m_aBoat[Vision.eWorks.A].Reset(p_eState);
-            m_aBoat[Vision.eWorks.B].Reset(p_eState); 
+            m_aBoat[Vision.eWorks.B].Reset(p_eState);
             base.Reset();
+        }
+        #endregion
+
+        #region Snap
+        public string StartSnap(Vision.SnapData snapData)
+        {
+            Run_Snap run = (Run_Snap)m_runSnap.Clone();
+            run.m_snapData = snapData;
+            return StartRun(run);
+        }
+
+        public string RunSnap(Vision.SnapData snapData)
+        {
+            StopWatch sw = new StopWatch();
+            try
+            {
+                m_vision.RunLight(snapData.m_lightPower);
+                if (Run(RunMoveSnapStart(snapData))) return p_sInfo;
+                m_vision.StartSnap(snapData);
+                if (Run(m_aBoat[snapData.m_eWorks].RunSnap())) return p_sInfo;
+                if (m_vision.IsBusy()) EQ.p_bStop = true;
+            }
+            catch (Exception e) { p_sInfo = e.Message; }
+            finally
+            {
+                m_axisCam.StartMove((Vision.eWorks)(1 - (int)snapData.m_eWorks));
+                m_aBoat[snapData.m_eWorks].RunMove(p_ePosUnload);
+            }
+
+            m_log.Info("Run Snap End : " + (sw.ElapsedMilliseconds / 1000.0).ToString("0.00") + " sec");
+            return "OK";
         }
         #endregion
 
@@ -218,17 +157,16 @@ namespace Root_Pine2.Module
         public override void RunTree(Tree tree)
         {
             base.RunTree(tree);
+            RunTreeCamAxis(tree.GetTree("Camera Axis"));
         }
         #endregion
 
-        Vision.eVision m_eVision = Vision.eVision.Top3D; 
         Pine2 m_pine2;
-        Vision m_vision; 
+        public Vision m_vision; 
         public Boats(Vision vision, IEngineer engineer, Pine2 pine2)
         {
             m_vision = vision;
-            m_eVision = vision.m_eVision; 
-            p_id = "Boats " + m_eVision.ToString();
+            p_id = "Boats " + vision.m_eVision.ToString();
             m_pine2 = pine2;
             InitBoat(); 
             InitBase(p_id, engineer); 
@@ -238,5 +176,42 @@ namespace Root_Pine2.Module
         {
             base.ThreadStop();
         }
+
+        #region ModuleRun
+        ModuleRunBase m_runSnap;
+        protected override void InitModuleRuns()
+        {
+            m_runSnap = AddModuleRunList(new Run_Snap(this), false, "Run Snap");
+        }
+
+        public class Run_Snap : ModuleRunBase
+        {
+            Boats m_module;
+            public Run_Snap(Boats module)
+            {
+                m_module = module;
+                m_snapData = new Vision.SnapData(module.m_vision); 
+                InitModuleRun(module);
+            }
+
+            public Vision.SnapData m_snapData; 
+            public override ModuleRunBase Clone()
+            {
+                Run_Snap run = new Run_Snap(m_module);
+                run.m_snapData = m_snapData.Clone();
+                return run;
+            }
+
+            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
+            {
+                m_snapData.RunTree(tree, bVisible); 
+            }
+
+            public override string Run()
+            {
+                return m_module.RunSnap(m_snapData); 
+            }
+        }
+        #endregion
     }
 }

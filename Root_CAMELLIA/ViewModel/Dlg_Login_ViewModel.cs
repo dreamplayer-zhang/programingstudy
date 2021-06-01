@@ -83,18 +83,28 @@ namespace Root_CAMELLIA
                 //MessageBox.Show("Check ID / Password", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 return false ;
             }
+
             IntPtr pStr = Marshal.SecureStringToCoTaskMemUnicode(p_password);
             //Debug.WriteLine(Marshal.PtrToStringUni(pStr));
             string pass = Marshal.PtrToStringUni(pStr);
-            Marshal.ZeroFreeCoTaskMemUnicode(pStr);
-            string username = GeneralTools.SHA256Hash(p_username);
-            pass = GeneralTools.SHA256Hash(pass);
-            if (username != BaseDefine.USERNAME || pass != BaseDefine.PASSWORD)
+            if(App.m_engineer.m_login.CheckLogin(p_username, pass))
             {
-                MessageBox.Show("Check ID / Password", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                return true;
+            }
+            else
+            {
+                CustomMessageBox.Show("Error", "Check ID / Password", MessageBoxButton.OK, CustomMessageBox.MessageBoxImage.Error);
                 return false;
             }
-            return true;
+           
+            //Marshal.ZeroFreeCoTaskMemUnicode(pStr);
+            //string username = GeneralTools.SHA256Hash(p_username);
+            //pass = GeneralTools.SHA256Hash(pass);
+            //if (username != BaseDefine.USERNAME || pass != BaseDefine.PASSWORD)
+            //{
+            //    MessageBox.Show("Check ID / Password", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            //    return false;
+            //}
         }
         #endregion
 

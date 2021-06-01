@@ -38,6 +38,7 @@ namespace RootTools.Light
                 if (_bOn == value) return;
                 _bOn = value;
                 RaisePropertyChanged();
+                SetOnOff();
                 SetPower(); 
             }
         }
@@ -54,17 +55,6 @@ namespace RootTools.Light
                 _fSetPower = Math.Round(100 * fSetPower / p_fScalePower) / 100.0; 
                 RaisePropertyChanged();
                 SetPower();
-                _nDifferent = 0; 
-            }
-        }
-
-        int _nDifferent = 0; 
-        public int p_nDifferent
-        {
-            get
-            {
-                _nDifferent = (p_fGetPower == p_fSetPower) ? 0 : _nDifferent + 1;
-                return _nDifferent; 
             }
         }
         #endregion
@@ -79,7 +69,7 @@ namespace RootTools.Light
                 if (_fMaxPower == value) return;
                 _fMaxPower = value;
                 if (_fMaxPower < 0) _fMaxPower = 0;
-                if (_fMaxPower > 1000) _fMaxPower = 1000;
+                if (_fMaxPower > 10000) _fMaxPower = 10000;
                 RaisePropertyChanged();
                 m_reg.Write("MaxPower", p_fMaxPower);
             }
@@ -124,6 +114,9 @@ namespace RootTools.Light
         #region Virtual
         protected virtual void GetPower() { }
         public virtual void SetPower() { }
+
+        protected virtual void GetOnOff() { }
+        public virtual void SetOnOff() { }
 
         public string p_id { get; set; }
         public int p_nChannel { get; set; }

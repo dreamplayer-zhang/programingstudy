@@ -106,9 +106,9 @@ namespace Root_Pine2.Module
         #region RunLoad
         public string RunLoad(Vision.eWorks eWorks)
         {
-            Boats.Boat boat = m_handler.m_aBoats[Vision.eVision.Bottom].m_aBoat[eWorks]; 
+            Boat boat = m_handler.m_aBoats[Vision.eVision.Bottom].m_aBoat[eWorks]; 
             if (m_picker.p_infoStrip != null) return "InfoStrip != null";
-            if (boat.p_eStep != Boats.Boat.eStep.Done) return "Boat not Done";
+            if (boat.p_eStep != Boat.eStep.Done) return "Boat not Done";
             try
             {
                 if (Run(RunMoveUp())) return p_sInfo;
@@ -122,7 +122,7 @@ namespace Root_Pine2.Module
                 if (m_picker.IsVacuum() == false) return p_sInfo;
                 m_picker.p_infoStrip = boat.p_infoStrip;
                 boat.p_infoStrip = null;
-                boat.p_eStep = Boats.Boat.eStep.RunReady;
+                boat.p_eStep = Boat.eStep.RunReady;
             }
             finally
             {
@@ -225,8 +225,8 @@ namespace Root_Pine2.Module
         string StartLoadBoat()
         {
             Boats boats = m_handler.m_aBoats[Vision.eVision.Bottom];
-            if (boats.m_aBoat[Vision.eWorks.A].p_eStep == Boats.Boat.eStep.Done) return StartLoadBoat(Vision.eWorks.A);
-            if (boats.m_aBoat[Vision.eWorks.B].p_eStep == Boats.Boat.eStep.Done) return StartLoadBoat(Vision.eWorks.B);
+            if (boats.m_aBoat[Vision.eWorks.A].p_eStep == Boat.eStep.Done) return StartLoadBoat(Vision.eWorks.A);
+            if (boats.m_aBoat[Vision.eWorks.B].p_eStep == Boat.eStep.Done) return StartLoadBoat(Vision.eWorks.B);
             return "OK";
         }
 

@@ -724,6 +724,7 @@ namespace RootTools
             SetRoiRect();
         }
 
+        bool isUpdate = false;
         public unsafe void SetImageSource()
         {
             try
@@ -929,8 +930,9 @@ namespace RootTools
 
                                     p_ImgSource = ImageHelper.ToBitmapSource(view);
                                 }
-                                else if (p_ImageData.m_eMode == ImageData.eMode.ImageBuffer)
+                                else if (!isUpdate && p_ImageData.m_eMode == ImageData.eMode.ImageBuffer)
                                 {
+                                    isUpdate = true;
                                     int canvasWidth = p_CanvasWidth; // 여기 잠시 수정
                                     int canvasHeight = p_CanvasHeight;
                                     Image<Rgb, byte> view = new Image<Rgb, byte>(canvasWidth, canvasHeight);
@@ -954,15 +956,25 @@ namespace RootTools
                                             for (int xx = 0; xx < canvasWidth; xx++)
                                             {
                                                 long pix_x = viewrectX + xx * viewrectWidth / canvasWidth;
-
-                                                viewPtr[yy, xx, 0] = ApplyContrastAndBrightness(imageptr[(pix_x * this.p_ImageData.GetBytePerPixel() + 2) + (long)pix_y * (sizeX * 3)]);
-                                                viewPtr[yy, xx, 1] = ApplyContrastAndBrightness(imageptr[(pix_x * this.p_ImageData.GetBytePerPixel() + 1) + (long)pix_y * (sizeX * 3)]);
-                                                viewPtr[yy, xx, 2] = ApplyContrastAndBrightness(imageptr[(pix_x * this.p_ImageData.GetBytePerPixel() + 0) + (long)pix_y * (sizeX * 3)]);
+                                                if (p_ImageData.m_aBuf.Length <= (pix_x * this.p_ImageData.GetBytePerPixel() + 2) + (long)pix_y * (sizeX * 3))
+                                                {
+                                                    viewPtr[yy, xx, 0] = 0;
+                                                    viewPtr[yy, xx, 1] = 0;
+                                                    viewPtr[yy, xx, 2] = 0;
+                                                }
+                                                else
+                                                {
+                                                    viewPtr[yy, xx, 0] = ApplyContrastAndBrightness(imageptr[(pix_x * this.p_ImageData.GetBytePerPixel() + 2) + (long)pix_y * (sizeX * 3)]);
+                                                    viewPtr[yy, xx, 1] = ApplyContrastAndBrightness(imageptr[(pix_x * this.p_ImageData.GetBytePerPixel() + 1) + (long)pix_y * (sizeX * 3)]);
+                                                    viewPtr[yy, xx, 2] = ApplyContrastAndBrightness(imageptr[(pix_x * this.p_ImageData.GetBytePerPixel() + 0) + (long)pix_y * (sizeX * 3)]);
+                                                }
+                                               
                                             }
                                         }
                                     });
 
                                     p_ImgSource = ImageHelper.ToBitmapSource(view);
+                                    isUpdate = false;
                                 }
                             }
                             else

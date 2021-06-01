@@ -8,12 +8,16 @@ namespace Root_Pine2.Module
     {
         public Dictionary<InfoStrip.eMagazine, MagazineEV> m_aEV = new Dictionary<InfoStrip.eMagazine, MagazineEV>();
 
+        InfoStrip.eMagazine m_eMagazineGet = InfoStrip.eMagazine.Magazine0; 
         public InfoStrip GetInfoStrip(bool bPeek)
         {
-            foreach (MagazineEV magazineEV in m_aEV.Values)
+            int iMagazine = (int)m_eMagazineGet; 
+            for (int n = 0; n < m_aEV.Count; n++)
             {
+                m_eMagazineGet = (InfoStrip.eMagazine)((n + iMagazine) % m_aEV.Count); 
+                MagazineEV magazineEV = m_aEV[m_eMagazineGet];
                 InfoStrip infoStrip = magazineEV.GetInfoStrip(bPeek);
-                if (infoStrip != null) return infoStrip; 
+                if (infoStrip != null) return infoStrip;
             }
             return null; 
         }
