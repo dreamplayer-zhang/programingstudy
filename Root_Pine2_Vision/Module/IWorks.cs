@@ -1,4 +1,5 @@
-﻿using RootTools.ToolBoxs;
+﻿using RootTools.Memory;
+using RootTools.ToolBoxs;
 using RootTools.Trees;
 
 namespace Root_Pine2_Vision.Module
@@ -12,6 +13,8 @@ namespace Root_Pine2_Vision.Module
         void ThreadStop(); 
 
         void GetTools(ToolBox toolBox, bool bInit);
+
+        MemoryData[] p_memSnap { get; }
 
         void RunTree(Tree tree);
     }

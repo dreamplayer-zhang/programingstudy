@@ -28,7 +28,7 @@ namespace Root_Pine2_Vision.Module
 
         #region Memory
         public MemoryGroup m_memoryGroup;
-        MemoryData m_memoryExt;
+        MemoryData[] m_memoryExt = new MemoryData[2] { null, null };
         MemoryData m_memoryColor;
         MemoryData[] m_memoryRGB = new MemoryData[3] { null, null, null };
         MemoryData[] m_memoryConv = new MemoryData[3] { null, null, null };
@@ -37,7 +37,8 @@ namespace Root_Pine2_Vision.Module
         void InitMemory()
         {
             m_memoryGroup = m_memoryPool.GetGroup("Pine2");
-            m_memoryExt = m_memoryGroup.CreateMemory("EXT", 2, 3, new CPoint(50000, 90000));
+            m_memoryExt[0] = m_memoryGroup.CreateMemory("EXT0", 1, 3, new CPoint(50000, 90000));
+            m_memoryExt[1] = m_memoryGroup.CreateMemory("EXT1", 1, 3, new CPoint(50000, 90000));
             m_memoryColor = m_memoryGroup.CreateMemory("Color", 1, 3, new CPoint(50000, 90000));
             m_memoryRGB[0] = m_memoryGroup.CreateMemory("Red", 1, 1, new CPoint(50000, 90000));
             m_memoryRGB[1] = m_memoryGroup.CreateMemory("Green", 1, 1, new CPoint(50000, 90000));
@@ -49,6 +50,11 @@ namespace Root_Pine2_Vision.Module
             m_memoryHSI[1] = m_memoryGroup.CreateMemory("Saturation", 1, 1, new CPoint(50000, 90000));
             m_memoryHSI[2] = m_memoryGroup.CreateMemory("Intensity", 1, 1, new CPoint(50000, 90000));
             m_memoryGerbber = m_memoryGroup.CreateMemory("Gerbber", 1, 3, new CPoint(50000, 90000));
+        }
+
+        public MemoryData[] p_memSnap
+        {
+            get { return m_memoryExt; }
         }
         #endregion
 

@@ -3,8 +3,8 @@ using RootTools;
 using RootTools.Control;
 using RootTools.Module;
 using RootTools.ToolBoxs;
+using RootTools.Trees;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 
 namespace Root_Pine2.Module
@@ -42,7 +42,7 @@ namespace Root_Pine2.Module
         #endregion
 
         #region ToolBox
-        Axis m_axis;
+        public Axis m_axis;
         DIO_O m_doVacuumPump;
         public DIO_Os m_doVacuum;
         public DIO_O m_doBlow;
@@ -68,7 +68,8 @@ namespace Root_Pine2.Module
         public enum ePos
         {
             Handler,
-            Vision
+            Vision,
+            SnapStart,
         }
         void InitPosition()
         {
@@ -78,22 +79,64 @@ namespace Root_Pine2.Module
 
         public string RunMove(ePos ePos, bool bWait = true)
         {
-            m_axis.RunTrigger(false);
             m_axis.StartMove(ePos);
             return bWait ? m_axis.WaitReady() : "OK";
         }
 
         public string MoveSnap(double dPosAcc)
         {
-            m_axis.RunTrigger(false);
             m_axis.StartMove(m_axis.m_trigger.m_aPos[0] + dPosAcc);
             return m_axis.WaitReady();
         }
 
-        public string StartSnap()
+        double[] m_pSnap = new double[2] { 0, 0 }; 
+        void CalcSnapPos(Vision.SnapData snapData)
         {
-            m_axis.RunTrigger(true);
-            return m_axis.StartMove(m_axis.m_trigger.m_aPos[1], "Snap");
+            double pStart = m_axis.GetPosValue(ePos.SnapStart) + m_yScale * snapData.m_dpAxis.Y;
+            double pEnd = m_pSnap[0] + m_yScale * m_mmSnap;
+            m_axis.m_trigger.m_aPos[0] = pStart;
+            m_axis.m_trigger.m_aPos[1] = pEnd; 
+            double dpAcc = m_yScale * m_mmAcc; 
+            switch (snapData.m_eDirection)
+            {
+                case Vision.SnapData.eDirection.Forward:
+                    m_pSnap[0] = pStart - dpAcc;
+                    m_pSnap[1] = pEnd + dpAcc;
+                    break;
+                case Vision.SnapData.eDirection.Backward:
+                    m_pSnap[0] = pEnd + dpAcc;
+                    m_pSnap[1] = pStart - dpAcc;
+                    break;
+            }
+        }
+
+        double m_yScale = 10000;
+        double m_mmSnap = 300;
+        double m_mmAcc = 20;
+        public string RunMoveSnapStart(Vision.SnapData snapData, bool bWait = true)
+        {
+            CalcSnapPos(snapData);
+            m_axis.StartMove(m_pSnap[0]);
+            return bWait ? m_axis.WaitReady() : "OK";
+        }
+
+        public string RunSnap()
+        {
+            try
+            {
+                m_axis.RunTrigger(true);
+                m_axis.StartMove(m_pSnap[1], "Snap");
+                return m_axis.WaitReady();
+
+            }
+            finally { m_axis.RunTrigger(false); }
+        }
+
+        public void RunTreeAxis(Tree tree)
+        {
+            m_yScale = tree.Set(m_yScale, m_yScale, "Scale", "Snap Axis Scale (pulse / mm)");
+            m_mmSnap = tree.Set(m_mmSnap, m_mmSnap, "Snap Length", "Snap Length (mm)");
+            m_mmAcc = tree.Set(m_mmAcc, m_mmAcc, "Acc Length", "Acceleration Length (mm)"); 
         }
         #endregion
 
