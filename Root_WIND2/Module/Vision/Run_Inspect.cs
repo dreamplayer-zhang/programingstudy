@@ -52,12 +52,6 @@ namespace Root_WIND2.Module
         {
             klarfData.CreateLotEnd();
         }
-
-
-        private void MoveKlarfFiles()
-        {
-
-        }
         #endregion
 
         Vision m_module;
@@ -359,17 +353,12 @@ namespace Root_WIND2.Module
                 else
 				{
                     #region [Klarf]
-
-
-
                     if(settings_frontside.UseKlarf)
                     {
                         DataTable table = DatabaseManager.Instance.SelectCurrentInspectionDefect();
                         List<Defect> defects = Tools.DataTableToDefectList(table);
 
                         WIND2_Engineer engineer = GlobalObjects.Instance.Get<WIND2_Engineer>();
-                        CameraInfo camInfo = DataConverter.GrabModeToCameraInfo(engineer.m_handler.p_Vision.GetGrabMode(recipe.CameraInfoIndex));
-
 
                         CreateKlarf(recipe, infoWafer, defects, settings_frontside.UseTDIReview, settings_frontside.UseVrsReview);
 
@@ -430,15 +419,15 @@ namespace Root_WIND2.Module
 
                         if (settings_frontside.UseTDIReview && settings_frontside.UseVrsReview)
                         {
-                            Tools.SaveTiffImageBoth(settings_frontside.KlarfSavePath, klarfData.GetKlarfFileName(), defects, workManager.SharedBuffer, new Size(160, 120), vrsImageQueue, new Size(vrsRect.Width, vrsRect.Height));
+                            klarfData.SaveTiffImageBoth(defects, workManager.SharedBuffer, new Size(160, 120), vrsImageQueue, new Size(vrsRect.Width, vrsRect.Height));
                         }
                         else if(settings_frontside.UseTDIReview)
                         {
-                            Tools.SaveTiffImageOnlyTDI(settings_frontside.KlarfSavePath, klarfData.GetKlarfFileName(), defects, workManager.SharedBuffer, new Size(160, 120));
+                            klarfData.SaveTiffImageOnlyTDI(defects, workManager.SharedBuffer, new Size(160, 120));
                         }
                         else if(settings_frontside.UseVrsReview)
                         {
-                            Tools.SaveTiffImageOnlyVRS(settings_frontside.KlarfSavePath, klarfData.GetKlarfFileName(), defects, vrsImageQueue, new Size(vrsRect.Width, vrsRect.Height));
+                            klarfData.SaveTiffImageOnlyVRS(defects, vrsImageQueue, new Size(vrsRect.Width, vrsRect.Height));
                         }
                     }
 
