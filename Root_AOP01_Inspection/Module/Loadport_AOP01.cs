@@ -478,6 +478,7 @@ namespace Root_AOP01_Inspection.Module
             if (m_gem == null || m_gem.p_eControl != eControl.ONLINEREMOTE) return;
             //CEID 보고
             
+            /*
             if (m_eAssociated != p_infoCarrier.p_eAssociated)
             {
                 switch (p_infoCarrier.p_eAssociated)
@@ -493,6 +494,7 @@ namespace Root_AOP01_Inspection.Module
                 }
                 m_eAssociated = p_infoCarrier.p_eAssociated;
             }
+            */
         }
 
         public void SetCEIDStatus()
@@ -854,9 +856,9 @@ namespace Root_AOP01_Inspection.Module
             m_ceidUnDockingEnd = m_gaf.GetCEID(this, "UnDocking End");
             m_ceidJobReserved = m_gaf.GetCEID(this, "Job Reserved");
 
-            m_ceidCarrierIDDeleted = m_gaf.GetCEID(this, "CarrierIDDeleted");
+            //m_ceidCarrierIDDeleted = m_gaf.GetCEID(this, "CarrierIDDeleted");
             //m_ceidLPNotAssociatedToAssociated = m_gaf.GetCEID(this, "LPNotAssociatedToAssociated");
-            m_ceidLPAssociatedToAssociated = m_gaf.GetCEID(this, "LP_AssociatedToAssociated");
+            //m_ceidLPAssociatedToAssociated = m_gaf.GetCEID(this, "LP_AssociatedToAssociated");
             
             m_alidPlaced = m_gaf.GetALID(this, "Placed Sensor Error", "Placed & Plesent Sensor Should be Checked");
             //m_ceidUnloadReq = m_gaf.GetCEID(this, "Unload Request");

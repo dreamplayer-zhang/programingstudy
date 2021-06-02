@@ -495,6 +495,8 @@ namespace RootTools.OHT.Semi
                                 CheckDI(m_diValid, true);
                                 if ((m_diTrReq.p_bOn == false) && (m_diBusy.p_bOn == false) && m_diComplete.p_bOn)
                                 {
+                                    //OHT End
+                                    m_ceidOHTEnd.Send();
                                     m_doReady.p_bOn = false;
                                     p_eState = eState.Ready_Off;
                                 }
@@ -509,21 +511,12 @@ namespace RootTools.OHT.Semi
                                     switch (m_carrier.p_eTransfer)
                                     {
                                         case GemCarrierBase.eTransfer.ReadyToLoad:
-                                            m_carrier.p_eReqTransfer = GemCarrierBase.eTransfer.TransferBlocked;
+                                            m_carrier.p_eTransfer = GemCarrierBase.eTransfer.TransferBlocked;
                                             break;
-                                        //case GemCarrierBase.eTransfer.ReadyToUnload:
-                                        //    m_carrier.p_eReqTransfer = GemCarrierBase.eTransfer.TransferBlocked;
-                                        //    break;
+                                        case GemCarrierBase.eTransfer.ReadyToUnload:
+                                            m_carrier.p_eTransfer = GemCarrierBase.eTransfer.ReadyToLoad;
+                                            break;
                                     }
-                                    
-                                    //OHT End
-                                    m_ceidOHTEnd.Send();
-                                    if (m_carrier.p_eTransfer == GemCarrierBase.eTransfer.ReadyToUnload)
-                                    {
-                                        m_carrier.p_eReqTransfer = GemCarrierBase.eTransfer.TransferBlocked;
-                                        m_carrier.p_eReqTransfer = GemCarrierBase.eTransfer.ReadyToLoad;
-                                    }
-
                                     p_eState = eState.All_Off;   
                                 }
                                 CheckDI(m_diTrReq, false);

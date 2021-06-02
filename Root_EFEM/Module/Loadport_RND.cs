@@ -591,6 +591,11 @@ namespace Root_EFEM.Module
                 p_infoCarrier.m_bReqLoad = false;
                 StartRun(m_runDocking);
             }
+            if (p_infoCarrier.m_bReqGem)
+            {
+                p_infoCarrier.m_bReqGem = false;
+                StartRun(m_runGem);
+            }    
             if (p_infoCarrier.m_bReqUnload && p_infoCarrier.p_eState == InfoCarrier.eState.Dock)
             {
                 p_infoCarrier.m_bReqUnload = false;
@@ -706,6 +711,7 @@ namespace Root_EFEM.Module
 
         #region ModuleRun
         ModuleRunBase m_runDocking;
+        ModuleRunBase m_runGem;
         ModuleRunBase m_runUndocking;
 
         public ModuleRunBase GetModuleRunUndocking()
@@ -716,11 +722,15 @@ namespace Root_EFEM.Module
         {
             return m_runDocking;
         }
+        public ModuleRunBase GetModuleRunGem()
+        {
+            return m_runGem;
+        }
 
         protected override void InitModuleRuns()
         {
             m_runDocking = AddModuleRunList(new Run_Docking(this), false, "Docking Carrier to Work Position");
-            AddModuleRunList(new Run_GemProcess(this), false, "Gem Slot Process Start");
+            m_runGem = AddModuleRunList(new Run_GemProcess(this), false, "Gem Slot Process Start");
             m_runUndocking = AddModuleRunList(new Run_Undocking(this), false, "Undocking Carrier from Work Position");
         }
 
@@ -905,6 +915,7 @@ namespace Root_EFEM.Module
                         return p_sInfo;
                 }
                 m_infoCarrier.p_eState = InfoCarrier.eState.Placed;
+                m_infoCarrier.p_eReqTransfer = GemCarrierBase.eTransfer.ReadyToUnload;
                 //m_module.m_ceidUnDocking.Send();
                 return sResult;
             }
