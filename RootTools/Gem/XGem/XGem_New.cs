@@ -11,9 +11,12 @@ using System.Threading;
 using System.Windows.Media;
 using System.Windows.Threading;
 
+//기존 XGem.cs와 차이점(시나리오에 맞추기 위해 따로 분리)
+//p_ePresentSensor 변경 될 경우, SendCarrierOnOff(Material On/Off) 후 SendCarrierPresentSensor On/Off(Transferblocked) 하기 위해 두개 순서 변경
+
 namespace RootTools.Gem.XGem
 {
-    public class XGem : NotifyProperty, IGem, IToolSet
+    public class XGem_New : NotifyProperty, IGem, IToolSet
     {
         #region eCommunicate
         public enum eCommunicate
@@ -32,12 +35,12 @@ namespace RootTools.Gem.XGem
             set
             {
                 if (_eComm == value) return;
-                p_sInfo = "eCommunicate : " + _eComm.ToString() + " -> " + value.ToString(); 
+                p_sInfo = "eCommunicate : " + _eComm.ToString() + " -> " + value.ToString();
                 _eComm = value;
-                OnPropertyChanged(); 
+                OnPropertyChanged();
             }
         }
-        
+
         void InitEventCommunicate()
         {
             m_xGem.OnGEMCommStateChanged += M_xGem_OnGEMCommStateChanged;
@@ -51,7 +54,7 @@ namespace RootTools.Gem.XGem
 
         void RunTreeCommunicate(Tree tree)
         {
-            tree.Set(p_eComm, p_eComm, "State", "Communicate State", true, true); 
+            tree.Set(p_eComm, p_eComm, "State", "Communicate State", true, true);
         }
         #endregion
 
@@ -66,58 +69,58 @@ namespace RootTools.Gem.XGem
             ONLINEREMOTE,
         }
 
-        eControl _eReqControl = eControl.OFFLINE;
+        XGem.eControl _eReqControl = XGem.eControl.OFFLINE;
 
-        public eControl p_eReqControl
+        public XGem.eControl p_eReqControl
         {
             get { return _eReqControl; }
             set
             {
-                if (m_treeRoot.p_eMode == Tree.eMode.RegRead) return; 
+                if (m_treeRoot.p_eMode == Tree.eMode.RegRead) return;
                 if (_eReqControl == value) return;
-                p_sInfo = "eReqControl : " + _eReqControl.ToString() + " -> " + value.ToString(); 
+                p_sInfo = "eReqControl : " + _eReqControl.ToString() + " -> " + value.ToString();
                 _eReqControl = value;
                 OnPropertyChanged();
                 long nError = 0;
                 switch (_eReqControl)
                 {
-                    case eControl.OFFLINE: nError = m_bStart ? m_xGem.GEMReqOffline() : 0; break;
-                    case eControl.LOCAL: nError = m_bStart ? m_xGem.GEMReqLocal() : 0; break;
-                    case eControl.ONLINEREMOTE: nError = m_bStart ? m_xGem.GEMReqRemote() : 0; break;
+                    case XGem.eControl.OFFLINE: nError = m_bStart ? m_xGem.GEMReqOffline() : 0; break;
+                    case XGem.eControl.LOCAL: nError = m_bStart ? m_xGem.GEMReqLocal() : 0; break;
+                    case XGem.eControl.ONLINEREMOTE: nError = m_bStart ? m_xGem.GEMReqRemote() : 0; break;
                     default: return;
                 }
                 LogSend(nError, "Change Control State = " + _eReqControl.ToString());
             }
         }
 
-        eControl _eControl = eControl.NULL;
-        public eControl p_eControl
+        XGem.eControl _eControl = XGem.eControl.NULL;
+        public XGem.eControl p_eControl
         {
             get { return _eControl; }
             set
             {
                 if (_eControl == value) return;
-                p_sInfo = "eControl : " + _eControl.ToString() + " -> " + value.ToString(); 
+                p_sInfo = "eControl : " + _eControl.ToString() + " -> " + value.ToString();
                 _eControl = value;
-                OnPropertyChanged(); 
+                OnPropertyChanged();
                 foreach (GemCarrierBase carrier in m_aCarrier)
                 {
-                    if (value == eControl.ONLINEREMOTE) carrier.p_eAccessLP = GemCarrierBase.eAccessLP.Auto;
-                    carrier.RunTree(Tree.eMode.Init); 
+                    if (value == XGem.eControl.ONLINEREMOTE) carrier.p_eAccessLP = GemCarrierBase.eAccessLP.Auto;
+                    carrier.RunTree(Tree.eMode.Init);
                 }
             }
         }
 
-        public bool p_bOffline 
-        { 
-            get 
+        public bool p_bOffline
+        {
+            get
             {
                 switch (p_eControl)
                 {
-                    case eControl.NULL:
-                    case eControl.OFFLINE:
-                    case eControl.LOCAL:
-                    case eControl.HOSTOFFLINE: return true;
+                    case XGem.eControl.NULL:
+                    case XGem.eControl.OFFLINE:
+                    case XGem.eControl.LOCAL:
+                    case XGem.eControl.HOSTOFFLINE: return true;
                     default: return false;
                 }
             }
@@ -131,12 +134,12 @@ namespace RootTools.Gem.XGem
         private void M_xGem_OnGEMControlStateChanged(long nState)
         {
             LogRcv("OnGEMControlStateChanged", nState);
-            p_eControl = (eControl)nState;
+            p_eControl = (XGem.eControl)nState;
         }
 
         void RunTreeControl(Tree tree)
         {
-            p_eReqControl = (eControl)tree.Set(p_eReqControl, p_eReqControl, "Request", "Control Request State");
+            p_eReqControl = (XGem.eControl)tree.Set(p_eReqControl, p_eReqControl, "Request", "Control Request State");
             tree.Set(p_eControl, p_eControl, "State", "Control State", true, true);
         }
         #endregion
@@ -157,7 +160,7 @@ namespace RootTools.Gem.XGem
             set
             {
                 if (_eState == value) return;
-                p_sInfo = "eState : " + _eState.ToString() + " -> " + value.ToString(); 
+                p_sInfo = "eState : " + _eState.ToString() + " -> " + value.ToString();
                 _eState = value;
             }
         }
@@ -181,7 +184,7 @@ namespace RootTools.Gem.XGem
             set
             {
                 if (_bEnable == value) return;
-                p_sInfo = "p_bEnable : " + _bEnable.ToString() + " -> " + value.ToString(); 
+                p_sInfo = "p_bEnable : " + _bEnable.ToString() + " -> " + value.ToString();
                 _bEnable = value;
                 int nEnable = _bEnable ? 1 : 0;
                 LogSend(m_xGem.GEMSetEstablish(nEnable), "GEMSetEstablish", nEnable);
@@ -190,8 +193,8 @@ namespace RootTools.Gem.XGem
 
         void RunTreeState(Tree tree)
         {
-            tree.Set(p_eState, p_eState, "Equipment", "Equipment State",true, true);
-            tree.Set(p_bEnable, p_bEnable, "Enable", "Equipment Enable", true, true); 
+            tree.Set(p_eState, p_eState, "Equipment", "Equipment State", true, true);
+            tree.Set(p_bEnable, p_bEnable, "Enable", "Equipment Enable", true, true);
         }
         #endregion
 
@@ -233,7 +236,7 @@ namespace RootTools.Gem.XGem
                 {
                     case eType.Send: _bColor = Brushes.Black; break;
                     case eType.Receive: _bColor = Brushes.DarkGreen; break;
-                    case eType.Info: _bColor = Brushes.Gray; break; 
+                    case eType.Info: _bColor = Brushes.Gray; break;
                     default: _bColor = Brushes.Red; break;
                 }
             }
@@ -281,7 +284,7 @@ namespace RootTools.Gem.XGem
                 if (value == "OK") return;
                 _sLastError = value;
                 m_log.Error("Error = " + _sLastError);
-                m_qLog.Enqueue(new LogData(eType.Error, _sLastError)); 
+                m_qLog.Enqueue(new LogData(eType.Error, _sLastError));
             }
         }
 
@@ -293,7 +296,7 @@ namespace RootTools.Gem.XGem
             m_qLog.Enqueue(new LogData(eType.Send, sLog));
             if (nError >= 0) return "OK";
             p_sLastError = sCmd + " Error # = " + nError.ToString() + " : " + GetErrerString(nError);
-            return p_sLastError; 
+            return p_sLastError;
         }
 
         void LogRcv(string sCmd, params object[] objs)
@@ -409,7 +412,7 @@ namespace RootTools.Gem.XGem
             long nError = p_bEnable ? m_xGem.GEMSetAlarm(alid.p_nID, nSet) : 0;
             LogSend(nError, "GEMSetAlarm", alid.p_nID, nSet);
             p_sInfo = "SetAlarm " + alid.p_sModule + "." + alid.p_id + " = " + nSet.ToString();
-            return nError; 
+            return nError;
         }
 
         public long SetCEID(CEID ecv)
@@ -418,8 +421,8 @@ namespace RootTools.Gem.XGem
             long nError = p_bEnable ? m_xGem.GEMSetEvent(ecv.p_nID) : 0;
             LogSend(nError, "GEMSetEvent", ecv.p_nID);
             p_sInfo = "SetCEID " + ecv.p_sModule + "." + ecv.p_id;
-            
-            return nError; 
+
+            return nError;
         }
 
         public long SetCEID(long nCEID)
@@ -428,7 +431,7 @@ namespace RootTools.Gem.XGem
             long nError = p_bEnable ? m_xGem.GEMSetEvent(nCEID) : 0;
             LogSend(nError, "GEMSetEvent", nCEID);
             p_sInfo = "SetCEID " + nCEID;
-            
+
             return nError;
         }
 
@@ -442,7 +445,7 @@ namespace RootTools.Gem.XGem
             long nError = p_bEnable ? m_xGem.GEMSetVariable(1, m_svID, m_svValue) : 0;
             LogSend(nError, "GEMSetVariable", m_svID[0], m_svValue[0]);
             //p_sInfo = "SetSV " + sv.p_sModule + "." + sv.p_id + " : " + sv.p_value.ToString() + " -> " + value.ToString(); 
-            return nError; 
+            return nError;
         }
         #endregion
 
@@ -456,6 +459,27 @@ namespace RootTools.Gem.XGem
 
         private void M_xGem_OnGEMTerminalMessage(long nTid, string sMsg)
         {
+            //TODO : Terminal Message Parsing해서 Job Reserved 처리하기.
+            //Terminal Message 예시
+            /*
+            -----------TKIN PASS------------------
+            JOBID = PJ001
+            CSTID = tstatd
+            RECIPE = asdfasdf
+            SLOT = 111110000000000
+            -------------------------------------- =
+
+            ----------JOB RESERVED------------ -
+
+            ---------------------------------------
+            // if (Job Reserved가 있으면) m_ceidJobReserved.Send();
+
+            */
+            if (sMsg.Contains("Reserved") == true)
+            {
+                SetCEID(8211);
+            }
+
             LogRcv("OnGEMTerminalMessage", nTid, sMsg);
         }
 
@@ -465,11 +489,11 @@ namespace RootTools.Gem.XGem
             for (int n = 0; n < nCount; n++) M_xGem_OnGEMTerminalMessage(nTid, psMsg[n]);
         }
 
-        public event dgGemSECSMessageReceived OnGemSECSMessageReceived; 
+        public event dgGemSECSMessageReceived OnGemSECSMessageReceived;
         private void M_xGem_OnSECSMessageReceived(long nObjectID, long nStream, long nFunction, long nSysbyte)
         {
             LogRcv("OnSECSMessageReceived", nObjectID, nStream, nFunction, nSysbyte);
-            OnGemSECSMessageReceived(nObjectID, nStream, nFunction, nSysbyte); 
+            OnGemSECSMessageReceived(nObjectID, nStream, nFunction, nSysbyte);
         }
         #endregion
 
@@ -500,7 +524,7 @@ namespace RootTools.Gem.XGem
             long nResult = 1;
             if (sSystemTime.Length == 14)
             {
-                SYSTEMTIME syetemTime = new SYSTEMTIME(); 
+                SYSTEMTIME syetemTime = new SYSTEMTIME();
                 syetemTime.wYear = Convert.ToUInt16(sSystemTime.Substring(0, 4));
                 syetemTime.wMonth = Convert.ToUInt16(sSystemTime.Substring(4, 2));
                 syetemTime.wDay = Convert.ToUInt16(sSystemTime.Substring(6, 2));
@@ -542,12 +566,12 @@ namespace RootTools.Gem.XGem
         #endregion
 
         #region GemCarrier
-        List<GemCarrierBase> m_aCarrier = new List<GemCarrierBase>(); 
+        List<GemCarrierBase> m_aCarrier = new List<GemCarrierBase>();
 
         public void AddGemCarrier(GemCarrierBase carrier)
         {
-            if (FindGemCarrier(carrier.p_sLocID) != null) return; 
-            m_aCarrier.Add(carrier); 
+            if (FindGemCarrier(carrier.p_sLocID) != null) return;
+            m_aCarrier.Add(carrier);
         }
 
         GemCarrierBase FindGemCarrier(string sLocID)
@@ -605,7 +629,7 @@ namespace RootTools.Gem.XGem
             //p_sInfo = "eGemState : " + carrier.p_eGemState.ToString() + " -> " + ((GemCarrierBase.eGemState)nState).ToString(); 
             p_sInfo = "eStateCarrierID : " + carrier.p_eStateCarrierID.ToString() + " -> " + ((GemCarrierBase.eGemState)nState).ToString();
             carrier.p_eStateCarrierID = (GemCarrierBase.eGemState)nState;
-            p_sInfo = "sCarrierID : " + carrier.p_sCarrierID + " -> " + sCarrierID; 
+            p_sInfo = "sCarrierID : " + carrier.p_sCarrierID + " -> " + sCarrierID;
             carrier.p_sCarrierID = sCarrierID;
         }
 
@@ -644,19 +668,19 @@ namespace RootTools.Gem.XGem
         {
             LogRcv("OnCMSCarrierVerifySucceeded", nVerifyType, sLocID, sCarrierID, sSlotMap, nCount, psLotID[0], psSubstrateID[0], sUsage);
             GemCarrierBase carrier = GetGemCarrier(sLocID);
-            if (carrier == null) return; 
+            if (carrier == null) return;
             switch (nVerifyType)
             {
                 case 0:
-                    carrier.m_bReqLoad = true;
+                    //carrier.m_bReqLoad = true; //Docking 시퀀스 내에 CarrierID Read 포함되어 있어 SetCarrierOn으로 이동.
                     break;
                 case 1:
-                    if (sSlotMap.Length < nCount) return; 
+                    if (sSlotMap.Length < nCount) return;
                     for (int n = 0; n < nCount; n++)
                     {
                         char ch = sSlotMap[n];
                         GemSlotBase.eState state = (GemSlotBase.eState)(ch - '0');
-                        p_sLastError = carrier.SetSlotInfo(n, state, psLotID[n], psSubstrateID[n]); 
+                        p_sLastError = carrier.SetSlotInfo(n, state, psLotID[n], psSubstrateID[n]);
                     }
                     break;
             }
@@ -683,15 +707,15 @@ namespace RootTools.Gem.XGem
             GemCarrierBase carrier = GetGemCarrier(sLocID);
             if (carrier == null) return;
             p_sInfo = "eAccess : " + carrier.p_eAccess.ToString() + " -> " + ((GemCarrierBase.eAccess)nState).ToString();
-            carrier.p_eAccess = (GemCarrierBase.eAccess)nState; 
+            carrier.p_eAccess = (GemCarrierBase.eAccess)nState;
         }
 
         public string SendCarrierAccessLP(GemCarrierBase carrier, GemCarrierBase.eAccessLP accessLP)
         {
-            if (carrier.p_eTransfer == GemCarrierBase.eTransfer.OutOfService) return "Invalid AccessLP when eTransfer.OutOfService"; 
+            if (carrier.p_eTransfer == GemCarrierBase.eTransfer.OutOfService) return "Invalid AccessLP when eTransfer.OutOfService";
             long nErr = m_xGem.CMSReqChangeAccess((long)accessLP, carrier.p_sLocID);
             LogSend(nErr, "CMSSetCarrierAccessing", accessLP, carrier.p_sLocID);
-            return "OK"; 
+            return "OK";
         }
 
         private void M_xGem_OnCMSAccessModeStateChanged(string sLocID, long nState)
@@ -705,11 +729,12 @@ namespace RootTools.Gem.XGem
 
         public string SendCarrierPresentSensor(GemCarrierBase carrier, bool bPresent)
         {
-            if (carrier.p_eAccessLP != GemCarrierBase.eAccessLP.Manual) return "Invalid Carrier PresentSensor when AccessLP = Auto"; 
+            if (carrier.p_eAccessLP != GemCarrierBase.eAccessLP.Manual) return "Invalid Carrier PresentSensor when AccessLP = Auto";
             long nPresent = bPresent ? 1 : 0;
-            long nError = m_xGem.CMSSetPresenceSensor(carrier.p_sLocID, nPresent);
-            
-            return LogSend(nError, "CMSSetPresenceSensor", carrier.p_sLocID, nPresent);
+            //long nError = m_xGem.CMSSetPresenceSensor(carrier.p_sLocID, nPresent);
+            long nError = m_xGem.CMSSetCarrierOnOff(carrier.p_sLocID, nPresent);
+
+            return LogSend(nError, "CMSSetCarrierOnOff", carrier.p_sLocID, nPresent);
         }
 
         public enum ePIOSignal
@@ -732,16 +757,32 @@ namespace RootTools.Gem.XGem
         {
             if (carrier.p_eAccessLP != GemCarrierBase.eAccessLP.Auto) return "Invalid Carrier PIO Signal When AccessLP = Manual";
             long bOn = bPIOReadyOn ? 1 : 0;
-            long nError = m_xGem.CMSSetPIOSignalState(carrier.p_sLocID, (long)ePIOSignal.READY, bOn);
+            //long nError = m_xGem.CMSSetPIOSignalState(carrier.p_sLocID, (long)ePIOSignal.READY, bOn);
+            long nError = m_xGem.CMSSetCarrierOnOff(carrier.p_sLocID, bOn);
 
-            return LogSend(nError, "CMSSetPIOSignalState", carrier.p_sLocID, bPIOReadyOn);
+            return LogSend(nError, "CMSSetCarrierOnOff", carrier.p_sLocID, bOn);
         }
 
         public void SendCarrierOn(GemCarrierBase carrier, bool bOn)
         {
             long nOn = bOn ? 1 : 0;
-            long nError = m_xGem.CMSSetCarrierOnOff(carrier.p_sLocID, nOn);
-            LogSend(nError, "CMSSetCarrierOnOff", carrier.p_sLocID, nOn);
+            //long nError = m_xGem.CMSSetCarrierOnOff(carrier.p_sLocID, nOn);
+            
+            if (carrier.p_eAccessLP == GemCarrierBase.eAccessLP.Manual)
+            {
+                long nError = m_xGem.CMSSetPresenceSensor(carrier.p_sLocID, nOn);
+                LogSend(nError, "CMSSetPresenceSensor", carrier.p_sLocID, nOn);
+            }
+            else
+            {
+                long nError = m_xGem.CMSSetPIOSignalState(carrier.p_sLocID, (long)ePIOSignal.READY, nOn);
+                LogSend(nError, "CMSSetPIOSignalState", carrier.p_sLocID, nOn);
+            }
+                        
+            if (nOn == 1)
+            {
+                carrier.m_bReqLoad = true;
+            }
         }
 
         public string CMSSetReadyToLoad(GemCarrierBase carrier)
@@ -789,21 +830,21 @@ namespace RootTools.Gem.XGem
         public void RemoveCarrierInfo(string sLocID)
         {
             long nMsgID = 0;
-            long nCarrier = 0; 
+            long nCarrier = 0;
             long nError = m_xGem.CMSGetAllCarrierInfo(ref nMsgID, ref nCarrier);
             LogSend(nError, "CMSGetAllCarrierInfo", nMsgID, nCarrier);
-            string sLoc = ""; 
+            string sLoc = "";
             for (int n = 0; n < nCarrier; n++)
             {
                 nError = m_xGem.GetCarrierLocID(nMsgID, n, ref sLoc);
                 LogSend(nError, "GetCarrierLocID", nMsgID, n, sLoc);
                 if (sLoc == sLocID)
                 {
-                    string sCarrierID = ""; 
+                    string sCarrierID = "";
                     nError = m_xGem.GetCarrierID(nMsgID, n, ref sCarrierID);
                     LogSend(nError, "GetCarrierID", nMsgID, n, sCarrierID);
                     m_xGem.CMSDelCarrierInfo(sCarrierID);
-                    return; 
+                    return;
                 }
             }
         }
@@ -816,9 +857,9 @@ namespace RootTools.Gem.XGem
         {
             foreach (GemPJ pj in m_aPJ)
             {
-                if (pj.m_sPJobID == sPJobID) return pj; 
+                if (pj.m_sPJobID == sPJobID) return pj;
             }
-            return null; 
+            return null;
         }
 
         void InitEventProcessJob()
@@ -833,9 +874,9 @@ namespace RootTools.Gem.XGem
 
         private void M_xGem_OnPJReqVerify(long nMsgID, long nPJobCount, string[] psPJobID, long[] pnMtrlFormat, long[] pnAutoStart, long[] pnMtrlOrder, long[] pnMtrlCount, string[] psMtrlID, string[] psSlotInfo, long[] pnRcpMethod, string[] psRcpID, long[] pnRcpParCount, string[] psRcpParName, string[] psRcpParValue)
         {
-            int iMtrl = 0; 
+            int iMtrl = 0;
             List<long> aErrorCode = new List<long>();
-            List<string> asErrorMsg = new List<string>(); 
+            List<string> asErrorMsg = new List<string>();
             LogRcv("OnPJReqVerify", nMsgID, nPJobCount);
             for (int n = 0; n < nPJobCount; n++)
             {
@@ -844,7 +885,7 @@ namespace RootTools.Gem.XGem
                 if (sFiles.Length <= 0)
                 {
                     aErrorCode.Add((long)GemPJ.eError.Invalid_AttibuteValue);
-                    p_sLastError = "RecipeID not Found : " + psRcpID[n]; 
+                    p_sLastError = "RecipeID not Found : " + psRcpID[n];
                     asErrorMsg.Add(p_sLastError);
                 }
                 for (int i = 0; i < pnMtrlCount[n]; i++, iMtrl++)
@@ -855,7 +896,7 @@ namespace RootTools.Gem.XGem
                     if (carrier == null)
                     {
                         aErrorCode.Add((long)GemPJ.eError.Invalid_AttibuteValue);
-                        p_sLastError = "MatrialID not Found : " + psMtrlID[iMtrl] + " in Recipe : " + psRcpID[n]; 
+                        p_sLastError = "MatrialID not Found : " + psMtrlID[iMtrl] + " in Recipe : " + psRcpID[n];
                         asErrorMsg.Add(p_sLastError);
                     }
                     /* //PJReqVerifySlot 함수 내부에선 PJCreate 된 후 Slot의 상태를 확인하여, 순서 상 맞지 않아 주석 처리함.
@@ -872,12 +913,12 @@ namespace RootTools.Gem.XGem
                     */
                 }
             }
-            long nResult = 1; 
+            long nResult = 1;
             if (aErrorCode.Count == 0)
             {
-                nResult = 0; 
+                nResult = 0;
                 aErrorCode.Add((long)GemPJ.eError.NO_ERROR);
-                asErrorMsg.Add("OnPJReqVerify Done"); 
+                asErrorMsg.Add("OnPJReqVerify Done");
             }
             long nError = m_xGem.PJRspVerify(nMsgID, nPJobCount, psPJobID, nResult, aErrorCode.Count, aErrorCode.ToArray(), asErrorMsg.ToArray());
             LogSend(nError, "PJRspVerify", nMsgID, nPJobCount, nResult, aErrorCode.Count);
@@ -889,7 +930,7 @@ namespace RootTools.Gem.XGem
             PJDelete(sPJobID);
             GemPJ pj = new GemPJ(sPJobID, (GemPJ.eAutoStart)nAutoStart, sRcpID, m_log, m_sRecipeExt);
             m_aPJ.Add(pj);
-            
+
             for (int n = 0; n < nMtrlCount; n++)
             {
                 GemCarrierBase carrier = GetGemCarrier(GetGemLocID(psMtrlID[n]));
@@ -908,7 +949,7 @@ namespace RootTools.Gem.XGem
 
         private void M_xGem_OnPJDeleted(string sPJobID)
         {
-            LogRcv("OnPJDeleted", sPJobID); 
+            LogRcv("OnPJDeleted", sPJobID);
             PJDelete(sPJobID);
 
             long nError = m_xGem.PJSetState(sPJobID, (long)GemPJ.eState.JobComplete);
@@ -926,9 +967,9 @@ namespace RootTools.Gem.XGem
         private void M_xGem_OnPJStateChanged(string sPJobID, long nState)
         {
             LogRcv("OnPJStateChanged", sPJobID, nState);
-            GemPJ pj = GetPJ(sPJobID); 
+            GemPJ pj = GetPJ(sPJobID);
             GemPJ.eState state = (GemPJ.eState)nState;
-            pj.p_eState = state; 
+            pj.p_eState = state;
             switch (state)
             {
                 case GemPJ.eState.SettingUp:
@@ -952,7 +993,7 @@ namespace RootTools.Gem.XGem
         {
             LogRcv("OnPJReqCommand", nMsgID, sPJobID, nCommand);
             GemPJ.eCommand cmd = (GemPJ.eCommand)nCommand;
-            GetPJ(sPJobID).p_eCommand = cmd; 
+            GetPJ(sPJobID).p_eCommand = cmd;
             PJRspCommand(nMsgID, cmd, sPJobID, 1, 0, 0, "");
             Thread.Sleep(20);
         }
@@ -984,12 +1025,12 @@ namespace RootTools.Gem.XGem
         #region Control Job
         GemCJ _cjRun = null;
         public GemCJ p_cjRun
-        { 
+        {
             get { return _cjRun; }
             set
             {
                 if (_cjRun == value) return;
-                _cjRun = value; 
+                _cjRun = value;
             }
         }
 
@@ -1000,13 +1041,13 @@ namespace RootTools.Gem.XGem
         {
             foreach (GemCJ cj in m_qCJ)
             {
-                if (cj.m_sCJobID == sCJobID) return cj; 
+                if (cj.m_sCJobID == sCJobID) return cj;
             }
-            return null; 
+            return null;
         }
 
         void InitEventControlJob()
-        {            
+        {
             m_xGem.OnCJCreated += M_xGem_OnCJCreated;
             m_xGem.OnCJDeleted += M_xGem_OnCJDeleted;
             m_xGem.OnCJStateChanged += M_xGem_OnCJStateChanged;
@@ -1021,13 +1062,13 @@ namespace RootTools.Gem.XGem
             GemCJ cj = new GemCJ(sCJobID, autoStart, m_log);
             for (int n = 0; n < nCountPRJob; n++) cj.m_aPJ.Add(GetPJ(psPRJobID[n]));
             m_qCJ.Enqueue(cj);
-            RunTree(Tree.eMode.Init); 
+            RunTree(Tree.eMode.Init);
         }
 
         private void M_xGem_OnCJDeleted(string sCJobID)
         {
             LogRcv("OnCJDeleted", sCJobID);
-            CJDeleted(sCJobID); 
+            CJDeleted(sCJobID);
             //m_xGem.CMSSetCarrierAccessing() //forget 종료조건 ?
             RunTree(Tree.eMode.Init);
         }
@@ -1042,10 +1083,10 @@ namespace RootTools.Gem.XGem
                 return;
             }
             GemCJ[] aCJ = m_qCJ.ToArray();
-            m_qCJ.Clear(); 
+            m_qCJ.Clear();
             foreach (GemCJ cj in aCJ)
             {
-                if (cj.m_sCJobID != sCJobID) m_qCJ.Enqueue(cj); 
+                if (cj.m_sCJobID != sCJobID) m_qCJ.Enqueue(cj);
             }
         }
 
@@ -1053,9 +1094,9 @@ namespace RootTools.Gem.XGem
         {
             LogRcv("OnCJStateChanged", sCJobID, nState);
             GemCJ.eState state = (GemCJ.eState)nState;
-            GemCJ cj = GetCJ(sCJobID); 
+            GemCJ cj = GetCJ(sCJobID);
             if (cj == null) return;
-            cj.p_eState = state; 
+            cj.p_eState = state;
             switch (state)
             {
                 case GemCJ.eState.Excuting:
@@ -1067,10 +1108,10 @@ namespace RootTools.Gem.XGem
         }
 
         void SendCJReqSelect(GemCJ cj)
-        {            
-            LogSend(m_xGem.CJReqSelect(cj.m_sCJobID), "CJReqSelect", cj.m_sCJobID); 
+        {
+            LogSend(m_xGem.CJReqSelect(cj.m_sCJobID), "CJReqSelect", cj.m_sCJobID);
         }
-        
+
         private void M_xGem_OnCJRspSelect(string sCJobID, long nResult)
         {
             LogRcv("OnCJRspSelect", sCJobID, nResult);
@@ -1093,20 +1134,20 @@ namespace RootTools.Gem.XGem
             m_xGem.OnSTSProcessingChanged += M_xGem_OnSTSProcessingChanged;
         }
 
-        List<GemSlotBase> m_aSTS = new List<GemSlotBase>(); 
+        List<GemSlotBase> m_aSTS = new List<GemSlotBase>();
         void AddSTS(GemSlotBase gemSlot)
         {
             foreach (GemSlotBase slot in m_aSTS)
             {
-                if (slot.p_id == gemSlot.p_id) return; 
+                if (slot.p_id == gemSlot.p_id) return;
             }
-            m_aSTS.Add(gemSlot); 
+            m_aSTS.Add(gemSlot);
         }
 
         public void STSSetTransport(string sSubstLocID, GemSlotBase gemSlot, GemSlotBase.eSTS state)
         {
             if (p_bUseSTS == false) return;
-            AddSTS(gemSlot); 
+            AddSTS(gemSlot);
             long nError = m_xGem.STSSetTransport(sSubstLocID, gemSlot.p_id, (long)state);
             LogSend(nError, "STSSetTransport", sSubstLocID, gemSlot.p_id, state);
         }
@@ -1118,14 +1159,14 @@ namespace RootTools.Gem.XGem
                 if (slot.p_id == sSubstrateID)
                 {
                     slot.p_sLocID = sSubstLocID;
-                    slot.p_eSTS = (GemSlotBase.eSTS)nState; 
+                    slot.p_eSTS = (GemSlotBase.eSTS)nState;
                 }
             }
         }
 
         private void M_xGem_OnSTSSubstLocStateChanged(string sSubstLocID, long nState)
         {
-            if (nState == 0) return; 
+            if (nState == 0) return;
             for (int n = m_aSTS.Count - 1; n >= 0; n--)
             {
                 GemSlotBase slot = m_aSTS[n];
@@ -1139,7 +1180,7 @@ namespace RootTools.Gem.XGem
                         case GemSlotBase.eSTS.atDestination:
                             m_handler.CheckFinish();
                             m_aSTS.RemoveAt(n);
-                            return; 
+                            return;
                     }
                 }
             }
@@ -1157,7 +1198,7 @@ namespace RootTools.Gem.XGem
             {
                 if (slot.p_sLocID == sSubstLocID)
                 {
-                    slot.p_eSTSProcess = (GemSlotBase.eSTSProcess)nState; 
+                    slot.p_eSTSProcess = (GemSlotBase.eSTSProcess)nState;
                 }
             }
         }
@@ -1168,7 +1209,7 @@ namespace RootTools.Gem.XGem
         {
             string[] sFindDll = Directory.GetFiles(Directory.GetCurrentDirectory(), "XLogCS_M40_01_64.dll");
             if (sFindDll.Length != 0) return;
-            if (CopyDllFile(@"C:\Program Files\Linkgenesis\XGem300Pro v3.x\SE\Bin", "XLogCS_M40_01_64.dll")) return;      
+            if (CopyDllFile(@"C:\Program Files\Linkgenesis\XGem300Pro v3.x\SE\Bin", "XLogCS_M40_01_64.dll")) return;
             return;
         }
 
@@ -1190,7 +1231,7 @@ namespace RootTools.Gem.XGem
             foreach (Process process in ProcessList) process.Kill();
         }
 
-        bool m_bStart = false; 
+        bool m_bStart = false;
         string m_sPathConfig = "C:\\Init\\GEM300.cfg";
         void XGemConfigFile()
         {
@@ -1223,21 +1264,21 @@ namespace RootTools.Gem.XGem
         {
             m_sPathConfig = tree.SetFile(m_sPathConfig, m_sPathConfig, "cfg", "File", "Config File Path");
             m_sRecipeExt = tree.Set(m_sRecipeExt, m_sRecipeExt, "File Extension", "Recipe File Extension");
-            p_bUseSTS = tree.Set(p_bUseSTS, p_bUseSTS, "STS", "Use STS"); 
+            p_bUseSTS = tree.Set(p_bUseSTS, p_bUseSTS, "STS", "Use STS");
         }
         #endregion
 
         #region Thread
-        bool m_bThread = false; 
-        Thread m_thread; 
+        bool m_bThread = false;
+        Thread m_thread;
         void InitThread()
         {
             m_thread = new Thread(new ThreadStart(RunThread));
-            m_thread.Start(); 
+            m_thread.Start();
         }
 
         enum eThreadStep
-        { 
+        {
             Ready,
             CheckPJ,
             InAccessing,
@@ -1254,7 +1295,7 @@ namespace RootTools.Gem.XGem
             InitLogTimer();
 
             Thread.Sleep(1000);
-            eThreadStep step = eThreadStep.Ready; 
+            eThreadStep step = eThreadStep.Ready;
             while (m_bThread)
             {
                 Thread.Sleep(20);
@@ -1280,15 +1321,25 @@ namespace RootTools.Gem.XGem
                                 carrier.p_eReqAccess = GemCarrierBase.eAccess.InAccessed;
                             }
                         }
-                        if(!EQ.p_bSimulate) m_engineer.ClassHandler().CalcSequence();
+                        
+                        //if (!EQ.p_bSimulate) m_engineer.ClassHandler().CalcSequence();
+                        
+                        foreach (GemPJ pj in p_cjRun.m_aPJ)
+                        {
+                            foreach (GemCarrierBase carrier in pj.m_aCarrier)
+                            {
+                                carrier.m_bReqGem = true;
+                            }
+                        }
+                        
                         step = eThreadStep.Processing;
                         break;
                     case eThreadStep.Processing:
-                        if (p_cjRun == null) 
+                        if (p_cjRun == null)
                             step = eThreadStep.Complete;
                         break;
                     case eThreadStep.Complete:
-                        GemCJ cj = m_aCJFinish[m_aCJFinish.Count - 1]; 
+                        GemCJ cj = m_aCJFinish[m_aCJFinish.Count - 1];
                         foreach (GemPJ pj in cj.m_aPJ)
                         {
                             foreach (GemCarrierBase carrier in pj.m_aCarrier)
@@ -1297,7 +1348,7 @@ namespace RootTools.Gem.XGem
                             }
                         }
                         step = eThreadStep.Ready;
-                        break; 
+                        break;
                 }
             }
         }
@@ -1306,9 +1357,9 @@ namespace RootTools.Gem.XGem
         {
             foreach (GemPJ pj in p_cjRun.m_aPJ)
             {
-                if (pj.p_eState != GemPJ.eState.Processing) return false; 
+                if (pj.p_eState != GemPJ.eState.Processing) return false;
             }
-            return true; 
+            return true;
         }
         #endregion
 
@@ -1336,14 +1387,14 @@ namespace RootTools.Gem.XGem
 
         XGem300ProNet m_xGem = new XGem300ProNet();
         IEngineer m_engineer;
-        IHandler m_handler; 
+        IHandler m_handler;
         string m_sRecipeExt = "ASL";
         Log m_log;
         public void Init(string id, IEngineer engineer)
         {
             p_id = id;
             m_engineer = engineer;
-            m_handler = engineer.ClassHandler(); 
+            m_handler = engineer.ClassHandler();
             m_log = LogView.GetLog(id, id);
 
             CopyDllFile();
@@ -1351,20 +1402,20 @@ namespace RootTools.Gem.XGem
 
             InitEventCommunicate();
             InitEventControl();
-            InitEventState(); 
+            InitEventState();
             InitEventMessage();
             InitEventDateTime();
             InitEventRemoteCommand();
             InitEventGemCarrier();
             InitEventControlJob();
             InitEventProcessJob();
-            InitEventSTS(); 
+            InitEventSTS();
 
             m_treeRoot = new TreeRoot(p_id, m_log);
             m_treeRoot.UpdateTree += M_treeRoot_UpdateTree;
             RunTree(Tree.eMode.RegRead);
 
-            InitThread(); 
+            InitThread();
         }
 
         public void ThreadStop()
@@ -1381,7 +1432,7 @@ namespace RootTools.Gem.XGem
                 m_xGem.Stop();
                 m_xGem.Close();
             }
-            catch (Exception) 
+            catch (Exception)
             {
             }
         }
