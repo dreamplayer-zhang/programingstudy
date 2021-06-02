@@ -24,10 +24,6 @@ namespace Root_VEGA_D.Module
         double m_dScanDistance = 0;
         double m_dLengthFromScanCenterY = 0;
         int m_nCheckArea = 0;
-        //string m_sCoaxialLight = "";
-        //string m_sTransmittedLight = "";
-        //int m_nCoaxialLightPower = 0;
-        //int m_nTransmittedLightPower = 0;
         double m_dCoaxialZPos = 0;
         double m_dTransmittedZPos = 0;
         int m_nUSL = 0;
@@ -65,10 +61,6 @@ namespace Root_VEGA_D.Module
             run.m_dScanDistance = m_dScanDistance;
             run.m_dLengthFromScanCenterY = m_dLengthFromScanCenterY;
             run.m_nCheckArea = m_nCheckArea;
-            //run.m_sCoaxialLight = m_sCoaxialLight;
-            //run.m_nCoaxialLightPower = m_nCoaxialLightPower;
-            //run.m_sTransmittedLight = m_sTransmittedLight;
-            //run.m_nTransmittedLightPower = m_nTransmittedLightPower;
             run.m_dCoaxialZPos = m_dCoaxialZPos;
             run.m_dTransmittedZPos = m_dTransmittedZPos;
             run.m_nUSL = m_nUSL;
@@ -132,7 +124,6 @@ namespace Root_VEGA_D.Module
             }
         }
 
-
         class PMData
         {
             public List<LightData> m_lLightData = new List<LightData>();
@@ -146,39 +137,6 @@ namespace Root_VEGA_D.Module
                 m_rectCheckArea = rectArea;
                 m_posZ = posZ;
             }
-        }
-
-        string ConnectRADS()
-        {
-            Camera_Basler camRADS = (Camera_Basler)m_module.CamRADS;
-
-            if (m_grabMode.pUseRADS && m_module.RADSControl.p_IsRun == false)
-            {
-                m_module.RADSControl.m_timer.Start();
-                m_module.RADSControl.p_IsRun = true;
-                m_module.RADSControl.StartRADS();
-
-                StopWatch sw = new StopWatch();
-                if (camRADS.p_CamInfo._OpenStatus == false) camRADS.Connect();
-                while (camRADS.p_CamInfo._OpenStatus == false)
-                {
-                    if (sw.ElapsedMilliseconds > 15000)
-                    {
-                        sw.Stop();
-                        return "RADS Camera Not Connected";
-                    }
-                }
-                sw.Stop();
-
-                // Offset 설정
-                m_module.RADSControl.p_connect.SetADSOffset(m_grabMode.pRADSOffset);
-
-                // RADS 카메라 설정
-                camRADS.SetMulticast();
-                camRADS.GrabContinuousShot();
-            }
-
-            return "OK";
         }
 
         enum ePMLogType
@@ -273,7 +231,7 @@ namespace Root_VEGA_D.Module
             try
             {
                 // RADS 연결
-                if (m_module.Run(ConnectRADS()))
+                if (m_module.Run(m_module.StartRADS()))
                     return p_sInfo;
 
                 foreach (PMData pmData in listPMData)
@@ -365,14 +323,7 @@ namespace Root_VEGA_D.Module
                 m_grabMode.SetLight(false);
 
                 // RADS 기능 off
-                Camera_Basler camRADS = (Camera_Basler)m_module.CamRADS;
-                if (m_grabMode.pUseRADS && m_module.RADSControl.p_IsRun == true)
-                {
-                    m_module.RADSControl.m_timer.Stop();
-                    m_module.RADSControl.p_IsRun = false;
-                    m_module.RADSControl.StopRADS();
-                    if (camRADS.p_CamInfo._IsGrabbing == true) camRADS.StopGrab();
-                }
+                m_module.StopRADS();
             }
 
             return "OK";
