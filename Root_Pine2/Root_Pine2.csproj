@@ -193,6 +193,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Module\LoadEV_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Module\MagazineEV_UI.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -216,6 +220,9 @@
       <DependentUpon>Loader_UI.xaml</DependentUpon>
     </Compile>
     <Compile Include="Module\LoadEV.cs" />
+    <Compile Include="Module\LoadEV_UI.xaml.cs">
+      <DependentUpon>LoadEV_UI.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Module\MagazineEV.cs" />
     <Compile Include="Module\MagazineEVSet.cs" />
     <Compile Include="Module\MagazineEV_UI.xaml.cs">

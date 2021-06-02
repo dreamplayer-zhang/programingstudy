@@ -3,18 +3,7 @@ using Root_Pine2_Vision.Module;
 using RootTools;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using System.Windows.Threading;
 
 namespace Root_Pine2.Engineer
@@ -45,7 +34,8 @@ namespace Root_Pine2.Engineer
             InitLoaderUI(handler.m_loader2, gridBoat, 0);
             InitLoaderUI(handler.m_loader3, gridLoader, 0);
             InitBoatsUI();
-            InitTransferUI(); 
+            InitTransferUI();
+            InitLoadEVUI(); 
         }
 
         List<MagazineEV_UI> m_aMagazineUI = new List<MagazineEV_UI>(); 
@@ -99,13 +89,24 @@ namespace Root_Pine2.Engineer
             m_transferUI = ui; 
         }
 
+        LoadEV_UI m_loadEVUI;
+        void InitLoadEVUI()
+        {
+            LoadEV_UI ui = new LoadEV_UI();
+            ui.Init(m_handler.m_loadEV);
+            Grid.SetColumn(ui, 7);
+            gridLoader.Children.Add(ui);
+            m_loadEVUI = ui;
+        }
+
         DispatcherTimer m_timer = new DispatcherTimer();
         private void M_timer_Tick(object sender, EventArgs e)
         {
             foreach (MagazineEV_UI ui in m_aMagazineUI) ui.OnTimer(); 
             foreach (Loader_UI ui in m_aLoaderUI) ui.OnTimer();
             foreach (Boats_UI ui in m_aBoatsUI) ui.OnTimer();
-            m_transferUI.OnTimer(); 
+            m_transferUI.OnTimer();
+            m_loadEVUI.OnTimer(); 
         }
     }
 }

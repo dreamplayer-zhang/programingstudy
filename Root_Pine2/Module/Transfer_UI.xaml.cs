@@ -34,8 +34,8 @@ namespace Root_Pine2.Module
                 case ModuleBase.eState.Run: Background = Brushes.Yellow; break;
                 case ModuleBase.eState.Error: Background = Brushes.OrangeRed; break;
             }
-            textBlockA.Text = (m_transfer.m_buffer.m_gripper.p_infoStrip != null) ? m_transfer.m_buffer.m_gripper.p_infoStrip.p_id : "";
-            textBlockB.Text = (m_transfer.m_buffer.m_pusher.p_infoStrip != null) ? m_transfer.m_buffer.m_pusher.p_infoStrip.p_id : "";
+            textBlockA.Text = (m_transfer.m_gripper.p_infoStrip != null) ? m_transfer.m_gripper.p_infoStrip.p_id : "";
+            textBlockB.Text = (m_transfer.m_pusher.p_infoStrip != null) ? m_transfer.m_pusher.p_infoStrip.p_id : "";
             OnRunTree();
         }
 
