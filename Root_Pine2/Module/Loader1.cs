@@ -230,6 +230,7 @@ namespace Root_Pine2.Module
         }
         #endregion
 
+        public InfoStrip p_infoStrip { get { return m_picker.p_infoStrip; } }
         Picker m_picker = null;
         Pine2 m_pine2 = null;
         Pine2_Handler m_handler = null; 

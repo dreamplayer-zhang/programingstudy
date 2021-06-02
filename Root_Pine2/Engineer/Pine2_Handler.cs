@@ -29,6 +29,7 @@ namespace Root_Pine2.Engineer
         #endregion
 
         #region Module
+        StopWatch m_swInit = new StopWatch(); 
         public ModuleList p_moduleList { get; set; }
         public Pine2 m_pine2;
         public LoadEV m_loadEV;
@@ -42,6 +43,7 @@ namespace Root_Pine2.Engineer
         public Loader3 m_loader3;
         void InitModule()
         {
+            m_swInit.Start(); 
             p_moduleList = new ModuleList(m_engineer);
             InitModule(m_pine2 = new Pine2("Pine2", m_engineer));
             InitModule(m_loadEV = new LoadEV("LoadEV", m_engineer));
@@ -59,11 +61,15 @@ namespace Root_Pine2.Engineer
             InitModule(m_loader3 = new Loader3("Loader3", m_engineer, this));
         }
 
+        long m_msInit = 0; 
         void InitModule(ModuleBase module)
         {
             ModuleBase_UI ui = new ModuleBase_UI();
             ui.Init(module);
             p_moduleList.AddModule(module, ui);
+            long ms = m_swInit.ElapsedMilliseconds; 
+            m_pine2.m_log.Info("InitModule " + module.p_id + " = " + (ms - m_msInit).ToString() + ", " + ms.ToString());
+            m_msInit = ms; 
         }
 
         void InitVision(Vision.eVision eVision)

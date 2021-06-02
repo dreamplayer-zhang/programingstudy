@@ -21,7 +21,7 @@ namespace Root_Pine2.Module
 
         #region LED Display
         int m_nUnitLED = 0; 
-        string _sLED = "";
+        string _sLED = "LED";
         public string p_sLED
         {
             get { return _sLED; }
@@ -29,6 +29,7 @@ namespace Root_Pine2.Module
             {
                 if (_sLED == value) return;
                 _sLED = value;
+                OnPropertyChanged(); 
                 m_pine2.m_display.Write(m_nUnitLED, value); 
             }
         }
