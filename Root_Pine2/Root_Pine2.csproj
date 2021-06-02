@@ -185,7 +185,15 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="Module\Boats_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Module\Loader_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Module\LoadEV_UI.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -193,10 +201,17 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Module\Transfer_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Module\Boat.cs" />
     <Compile Include="Module\Boats.cs" />
+    <Compile Include="Module\Boats_UI.xaml.cs">
+      <DependentUpon>Boats_UI.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Module\InfoStrip.cs" />
     <Compile Include="Module\Loader1.cs" />
     <Compile Include="Module\Loader2.cs" />
@@ -205,6 +220,9 @@
       <DependentUpon>Loader_UI.xaml</DependentUpon>
     </Compile>
     <Compile Include="Module\LoadEV.cs" />
+    <Compile Include="Module\LoadEV_UI.xaml.cs">
+      <DependentUpon>LoadEV_UI.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Module\MagazineEV.cs" />
     <Compile Include="Module\MagazineEVSet.cs" />
     <Compile Include="Module\MagazineEV_UI.xaml.cs">
@@ -214,6 +232,9 @@
     <Compile Include="Module\Loader0.cs" />
     <Compile Include="Module\Pine2.cs" />
     <Compile Include="Module\Transfer.cs" />
+    <Compile Include="Module\Transfer_UI.xaml.cs">
+      <DependentUpon>Transfer_UI.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>

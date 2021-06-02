@@ -136,23 +136,23 @@ namespace Root_Pine2.Module
         public string RunUnloadTransfer(ePosTransfer ePos)
         {
             if (m_picker.p_infoStrip != null) return "InfoStrip != null";
-            if (m_transfer.m_buffer.m_pusher.p_bEnable == false) return "Buffer Pusher not Enable";
+            if (m_transfer.m_pusher.p_bEnable == false) return "Buffer Pusher not Enable";
             try
             {
-                m_transfer.m_buffer.m_pusher.p_bLock = true;
+                m_transfer.m_pusher.p_bLock = true;
                 if (Run(RunMoveUp())) return p_sInfo;
                 if (Run(RunMoveTransfer(ePos))) return p_sInfo;
                 if (Run(RunMoveZ(ePos))) return p_sInfo;
                 if (Run(m_picker.RunVacuum(false))) return p_sInfo;
                 if (Run(RunMoveUp())) return p_sInfo;
-                m_transfer.m_buffer.m_pusher.p_infoStrip = m_picker.p_infoStrip;
+                m_transfer.m_pusher.p_infoStrip = m_picker.p_infoStrip;
                 m_picker.p_infoStrip = null;
-                m_transfer.m_buffer.m_pusher.p_bLock = false;
+                m_transfer.m_pusher.p_bLock = false;
             }
             finally
             {
                 RunMoveUp(); 
-                m_transfer.m_buffer.m_pusher.p_bLock = false;
+                m_transfer.m_pusher.p_bLock = false;
             }
             return "OK";
         }

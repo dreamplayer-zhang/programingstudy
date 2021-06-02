@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="Root_Pine2.Module.Loader_UI"
+﻿<UserControl x:Class="Root_Pine2.Module.Boats_UI"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -14,12 +14,16 @@
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
             <Grid Grid.Row="0" Background="Beige" Margin="3">
-                <TextBlock x:Name="textBlockStrip" Text="{Binding p_id}" HorizontalAlignment="Center"/>
+                <TextBlock x:Name="textBlockA" HorizontalAlignment="Center"/>
             </Grid>
-            <tree:TreeUI Grid.Row="1" x:Name="treeRootUI" IsEnabled="False"/>
+            <Grid Grid.Row="1" Background="Beige" Margin="3">
+                <TextBlock x:Name="textBlockB" HorizontalAlignment="Center"/>
+            </Grid>
+            <tree:TreeUI Grid.Row="2" x:Name="treeRootUI" IsEnabled="False"/>
         </Grid>
     </GroupBox>
 </UserControl>

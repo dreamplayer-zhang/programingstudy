@@ -19,7 +19,7 @@
             <Grid Grid.Row="0" Background="Beige" Margin="3">
                 <TextBlock Text="{Binding p_sLED}" HorizontalAlignment="Center"/>
             </Grid>
-            <tree:TreeUI Grid.Row="1" x:Name="treeRootUI" Margin="3" IsEnabled="False"/>
+            <tree:TreeUI Grid.Row="1" x:Name="treeRootUI" IsEnabled="False"/>
         </Grid>
     </GroupBox>
 </UserControl>

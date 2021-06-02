@@ -28,7 +28,7 @@ namespace Root_Pine2.Module
         {
             switch (m_magazineEV.p_eState)
             {
-                case ModuleBase.eState.Init: Background = Brushes.AntiqueWhite; break;
+                case ModuleBase.eState.Init: Background = Brushes.White; break;
                 case ModuleBase.eState.Home: Background = Brushes.MediumPurple; break;
                 case ModuleBase.eState.Ready: Background = Brushes.LightGreen; break;
                 case ModuleBase.eState.Run: Background = Brushes.Yellow; break;

@@ -408,6 +408,7 @@ namespace Root_Pine2.Module
                 case Pine2.eRunMode.Stack: m_stack?.PutInfoStrip(); break;
                 case Pine2.eRunMode.Magazine: m_aMagazine[infoStrip.p_eMagazinePos]?.PutInfoStrip(infoStrip); break;
             }
+            m_infoStripUnload = null; 
         }
 
         public void CheckMagazineDone()
