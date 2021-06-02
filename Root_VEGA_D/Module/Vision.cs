@@ -150,19 +150,10 @@ namespace Root_VEGA_D.Module
             m_alidShutterDownError = m_gaf.GetALID(this, "VS Shutter Error", "Shutter is not down");
             m_alidShutterUpError = m_gaf.GetALID(this, "VS Shutter Error", "Shutter is not up");
             m_alidReticleLocateInfoError = m_gaf.GetALID(this, "Reticle Locate Info is not Correct", "Reticle Locate Info is not Correct");
-        }
-        #endregion
-
-        void InitALID()
-        {
-            m_alid_WaferExist = m_gaf.GetALID(this, "Vision Wafer Exist", "Vision Wafer Exist");
-            m_visionHomeError = m_gaf.GetALID(this, "Vision Home Error", "Vision Home Error");
-            m_visionInspectError = m_gaf.GetALID(this, "Vision Inspect Error", "Vision Inspect Error");
-            m_alidShutterDownError = m_gaf.GetALID(this, "VS Shutter Error", "Shutter is not down");
-            m_alidShutterUpError = m_gaf.GetALID(this, "VS Shutter Error", "Shutter is not up");
             m_alidPMCoaxialError = m_gaf.GetALID(this, "PM Coaxial Check Error", "Coaxial Light PM Test is failed");
             m_alidPMTransmittedError = m_gaf.GetALID(this, "PM Transmitted Check Error", "Transmitted Light PM Test is failed");
         }
+        #endregion
 
         #region Grab Mode
         int m_lGrabMode = 0;
