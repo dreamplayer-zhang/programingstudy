@@ -912,7 +912,7 @@ namespace RootTools.Camera.BaslerPylon
             }
             catch (Exception exception)
             {
-                m_log.Info(exception.ToString());
+                m_log.Info(exception.Message);
             }
             finally
             {
