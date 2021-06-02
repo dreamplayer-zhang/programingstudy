@@ -296,7 +296,7 @@ namespace Root_Pine2_Vision.Module
         }
         #endregion
 
-        public eVision m_eVision = eVision.Top3D; 
+        public eVision m_eVision = eVision.Top2D; 
         public Vision(eVision eVision, IEngineer engineer, eRemote eRemote)
         {
             m_eVision = eVision;

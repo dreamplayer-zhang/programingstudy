@@ -38,8 +38,8 @@ namespace Root_WIND2.UI_User
         //int nShotSizeY = 1;
 
         public bool dragAction = false;
-        CPoint startPos;
-        CPoint prevPos;
+        CPoint startPos = new CPoint(-1, -1);
+        CPoint prevPos = new CPoint(-1, -1);
         #endregion
 
         #region [Get/Set]
@@ -225,6 +225,42 @@ namespace Root_WIND2.UI_User
             }
         }
 
+        public ICommand btnToolASCImportCommand
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    System.Windows.Forms.OpenFileDialog dlg = new System.Windows.Forms.OpenFileDialog();
+                    dlg.InitialDirectory = Constants.RootPath.RecipeFrontRootPath;
+                    dlg.Title = "Load ASC File";
+                    dlg.Filter = "ASC file (*.ASC)|*.ASC|MCTxt file (*.txt)|*.txt|CTMap (*.FAB)|*.FAB|ALPSMap (*.Alpsdata)|*.Alpsdata|Text file (*.txt)|*.txt|xml file (*.xml)|*.xml|dat file (*.dat)|*.dat|G85 Map (*.*)|*.*|TSK Map (*.*)|*.*|Klarf file (*.001,*.smf)|*.001;*.smf||";
+                    if (dlg.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                    {
+                        int count = 0;
+                        string line;
+                        int[] mapdata = new int[0];
+
+                        string sFolderPath = System.IO.Path.GetDirectoryName(dlg.FileName);
+                        string sFileNameNoExt = System.IO.Path.GetFileNameWithoutExtension(dlg.FileName);
+                        string sFileName = System.IO.Path.GetFileName(dlg.FileName);
+                        string sFullPath = System.IO.Path.Combine(sFolderPath, sFileName);
+
+                        try
+                        {
+                            RecipeType_WaferMap waferMap = GlobalObjects.Instance.Get<RecipeFront>().WaferMap;
+                            StreamReader sr = new StreamReader(sFullPath, Encoding.Default);
+                            OpenMapDataMap(sr);
+                        }
+                        catch (Exception ex)
+                        {
+                            MessageBox.Show(ex.Message);
+                        }
+                    }
+                });
+            }
+        }
+
         public ICommand btnModeDrawCommand
         {
             get
@@ -380,6 +416,13 @@ namespace Root_WIND2.UI_User
             DrawMap();
         }
 
+        public void OpenMapDataMap(StreamReader stdFile)
+        {
+            OpenMapDataWaferMap(stdFile);
+            ConvertACSMapDataToWaferMap();
+            DrawMap();
+        }
+
         public void DrawMap()
         {
             ChipItems.Clear();
@@ -425,7 +468,6 @@ namespace Root_WIND2.UI_User
             }
         }
 
-
         private void ChipMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             Rectangle selected = (Rectangle)sender;
@@ -454,7 +496,7 @@ namespace Root_WIND2.UI_User
                 CPoint movingPos = (CPoint)selected.Tag;
                 //int stride = (int)m_MapData.PartialMapSize.Height;
 
-                if (prevPos.X != movingPos.X || prevPos.Y != movingPos.Y)
+                if ((prevPos.X != -1 && prevPos.Y != -1) && (prevPos.X != movingPos.X || prevPos.Y != movingPos.Y))
                 {
                     prevPos.X = movingPos.X;
                     prevPos.Y = movingPos.Y;
@@ -508,6 +550,18 @@ namespace Root_WIND2.UI_User
         {
             RecipeType_WaferMap waferMap = GlobalObjects.Instance.Get<RecipeFront>().WaferMap;
             waferMap.Invert();
+        }
+
+        private void OpenMapDataWaferMap(StreamReader stdFile)
+        {
+            RecipeType_WaferMap waferMap = GlobalObjects.Instance.Get<RecipeFront>().WaferMap;
+            waferMap.OpenMapData(stdFile);
+        }
+
+        private void ConvertACSMapDataToWaferMap()
+        {
+            RecipeType_WaferMap waferMap = GlobalObjects.Instance.Get<RecipeFront>().WaferMap;
+            waferMap.ConvertACSMapDataToWaferMap();
         }
 
         private CHIP_TYPE GetRecipeChipType(int x, int y)
