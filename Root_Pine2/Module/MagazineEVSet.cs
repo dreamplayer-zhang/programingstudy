@@ -22,7 +22,7 @@ namespace Root_Pine2.Module
             return null; 
         }
 
-        public string PutRequest(InfoStrip infoStrip)
+        public string PutRequest(InfoStrip infoStrip) //forget
         {
             if (infoStrip == null) return "InfoStrip == null";
             m_aEV[infoStrip.p_eMagazine].m_infoStripUnload = infoStrip;

@@ -388,7 +388,6 @@ namespace Root_Pine2.Module
                 infoStrip = m_magazineEV.GetInfoStrip(false);
                 if (m_gripper.IsExist()) m_gripper.p_infoStrip = infoStrip;
                 else infoStrip.Dispose();
-                m_magazineEV.PutRequest(m_gripper.p_infoStrip);
                 return m_pusher.WaitUnlock();
             }
             finally
