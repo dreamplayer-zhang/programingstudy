@@ -295,7 +295,7 @@ namespace RootTools_Vision
             {
                 for (int x = 0; x < this.MapSizeX; x++)
                 {
-                    flipmapdata[x + (this.MapSizeY - y - 1) * this.MapSizeX] = this.mapdata[x + y * this.MapSizeY];
+                    flipmapdata[x + (this.MapSizeY - y - 1) * this.MapSizeX] = this.mapdata[x + y * this.MapSizeX];
                 }
             }
             this.mapdata = flipmapdata;
