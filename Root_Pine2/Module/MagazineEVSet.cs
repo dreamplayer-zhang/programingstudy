@@ -73,7 +73,7 @@ namespace Root_Pine2.Module
         {
             int nBlink = 0; 
             m_bThread = true;
-            Thread.Sleep(1000); 
+            Thread.Sleep(5000); 
             while (m_bThread)
             {
                 Thread.Sleep(200);
