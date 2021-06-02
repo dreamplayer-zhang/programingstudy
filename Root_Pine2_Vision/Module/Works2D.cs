@@ -53,14 +53,24 @@ namespace Root_Pine2_Vision.Module
             m_aMemory.Add(m_memoryHSI[2] = m_memoryGroup.CreateMemory("Intensity", 1, 1, new CPoint(50000, 90000)));
             m_aMemory.Add(m_memoryGerbber = m_memoryGroup.CreateMemory("Gerbber", 1, 3, new CPoint(50000, 90000)));
 
-            Registry reg = new Registry("MemoryOffset");
+            string regGroup = "MMF Data " + p_id;   // MMF Data A, MMF Data B
+            Registry reg = new Registry(false, regGroup, "MemoryOffset");
             foreach (MemoryData mem in m_aMemory) reg.Write(mem.p_id, mem.p_mbOffset);
-            reg = new Registry("MemoryDepth");
+            reg = new Registry(false, regGroup, "MemoryDepth");
             foreach (MemoryData mem in m_aMemory) reg.Write(mem.p_id, mem.p_nByte);
-            reg = new Registry("MemorySizeX");
+            reg = new Registry(false, regGroup, "MemorySizeX");
             foreach (MemoryData mem in m_aMemory) reg.Write(mem.p_id, mem.p_sz.X);
-            reg = new Registry("MemorySizeY");
+            reg = new Registry(false, regGroup, "MemorySizeY");
             foreach (MemoryData mem in m_aMemory) reg.Write(mem.p_id, mem.p_sz.Y);
+
+            //Registry reg = new Registry("MemoryOffset");
+            //foreach (MemoryData mem in m_aMemory) reg.Write(mem.p_id, mem.p_mbOffset);
+            //reg = new Registry("MemoryDepth");
+            //foreach (MemoryData mem in m_aMemory) reg.Write(mem.p_id, mem.p_nByte);
+            //reg = new Registry("MemorySizeX");
+            //foreach (MemoryData mem in m_aMemory) reg.Write(mem.p_id, mem.p_sz.X);
+            //reg = new Registry("MemorySizeY");
+            //foreach (MemoryData mem in m_aMemory) reg.Write(mem.p_id, mem.p_sz.Y);
         }
 
         public MemoryData[] p_memSnap

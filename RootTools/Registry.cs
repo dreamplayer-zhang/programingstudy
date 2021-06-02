@@ -13,6 +13,21 @@ namespace RootTools
             m_reg = Microsoft.Win32.Registry.CurrentUser.CreateSubKey("Software").CreateSubKey(sModel).CreateSubKey(sGroup);
         }
 
+        public Registry(bool bIncludeModel, params string[] strGroups)
+        {
+            // bIncludeModel : strGroups[0]에 Model Name 포함 유무.
+            if (strGroups.Length < 1)
+                return;
+
+            string sModel = (bIncludeModel == true) ? strGroups[0] : EQ.m_sModel;
+
+            m_reg = Microsoft.Win32.Registry.CurrentUser.CreateSubKey("Software").CreateSubKey(sModel);
+            foreach(string strGroup in strGroups)
+            {
+                m_reg = m_reg.CreateSubKey(strGroup);
+            }
+        }
+
         public void Write(string sSub, object obj)
         {
             if (m_reg == null) return;
