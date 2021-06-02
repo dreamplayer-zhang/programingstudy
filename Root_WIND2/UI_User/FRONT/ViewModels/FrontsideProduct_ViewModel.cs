@@ -225,6 +225,22 @@ namespace Root_WIND2.UI_User
             }
         }
 
+        public ICommand btnToolHorizontalFlipCommand
+        {
+            get
+            {
+                return new RelayCommand(HorizontalFlipMap);
+            }
+        }
+
+        public ICommand btnToolVerticalFlipCommand
+        {
+            get
+            {
+                return new RelayCommand(VerticalFlipMap);
+            }
+        }
+
         public ICommand btnToolASCImportCommand
         {
             get
@@ -415,6 +431,17 @@ namespace Root_WIND2.UI_User
             InvertWaferMap();
             DrawMap();
         }
+        public void HorizontalFlipMap()
+        {
+            HorizontalFlipWaferMap();
+            DrawMap();
+        }
+
+        public void VerticalFlipMap()
+        {
+            VerticalFlipWaferMap();
+            DrawMap();
+        }
 
         public void OpenMapDataMap(StreamReader stdFile)
         {
@@ -550,6 +577,18 @@ namespace Root_WIND2.UI_User
         {
             RecipeType_WaferMap waferMap = GlobalObjects.Instance.Get<RecipeFront>().WaferMap;
             waferMap.Invert();
+        }
+
+        private void HorizontalFlipWaferMap()
+        {
+            RecipeType_WaferMap waferMap = GlobalObjects.Instance.Get<RecipeFront>().WaferMap;
+            waferMap.HorizontalFlip();
+        }
+
+        private void VerticalFlipWaferMap()
+        {
+            RecipeType_WaferMap waferMap = GlobalObjects.Instance.Get<RecipeFront>().WaferMap;
+            waferMap.VerticalFlip();
         }
 
         private void OpenMapDataWaferMap(StreamReader stdFile)

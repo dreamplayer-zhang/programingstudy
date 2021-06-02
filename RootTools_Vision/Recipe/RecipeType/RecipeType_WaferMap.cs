@@ -273,6 +273,34 @@ namespace RootTools_Vision
             }
         }
 
+        public void HorizontalFlip() // LR
+        {
+            int[] flipmapdata = new int[MapSizeX * MapSizeY];
+
+            for (int x = 0; x < this.MapSizeX; x++)
+            {
+                for (int y = 0; y < this.MapSizeY; y++)
+                {
+                    flipmapdata[(this.MapSizeX - x - 1) + y * this.MapSizeX] = this.mapdata[x + y * this.MapSizeX];
+                }
+            }
+            this.mapdata = flipmapdata;
+        }
+
+        public void VerticalFlip() // UD
+        {
+            int[] flipmapdata = new int[MapSizeX * MapSizeY];
+
+            for (int y = 0; y < this.MapSizeY; y++)
+            {
+                for (int x = 0; x < this.MapSizeX; x++)
+                {
+                    flipmapdata[x + (this.MapSizeY - y - 1) * this.MapSizeX] = this.mapdata[x + y * this.MapSizeY];
+                }
+            }
+            this.mapdata = flipmapdata;
+        }
+
         public void OpenMapData(StreamReader stdFile)
         {
             // [ 2021-06-01 ] : Imported by jhan from VisionWorks2
