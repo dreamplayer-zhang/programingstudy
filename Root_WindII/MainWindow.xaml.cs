@@ -3,6 +3,7 @@ using RootTools_Vision;
 using System.ComponentModel;
 using System.IO;
 using System.Windows;
+using RootTools.Gem.XGem;
 
 namespace Root_WindII
 {
@@ -27,6 +28,21 @@ namespace Root_WindII
         private void Window_Closing(object sender, CancelEventArgs e)
         {
             GlobalObjects.Instance.Get<WindII_Engineer>().ThreadStop();
+        }
+
+        private void GemOffline_Click(object sender, RoutedEventArgs e)
+        {
+            GlobalObjects.Instance.Get<WindII_Engineer>().ClassGem().p_eReqControl = XGem.eControl.OFFLINE;
+        }
+
+        private void GemLocal_Click(object sender, RoutedEventArgs e)
+        {
+            GlobalObjects.Instance.Get<WindII_Engineer>().ClassGem().p_eReqControl = XGem.eControl.LOCAL;
+        }
+
+        private void GemOnline_Click(object sender, RoutedEventArgs e)
+        {
+            GlobalObjects.Instance.Get<WindII_Engineer>().ClassGem().p_eReqControl = XGem.eControl.ONLINEREMOTE;
         }
     }
 }

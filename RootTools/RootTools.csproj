@@ -349,6 +349,10 @@
       <DependentUpon>FFU_Group_UI.xaml</DependentUpon>
     </Compile>
     <Compile Include="Database\TempLogger.cs" />
+    <Compile Include="Gem\XGem\XGem_New.cs" />
+    <Compile Include="Gem\XGem\XGem_New_UI.xaml.cs">
+      <DependentUpon>XGem_New_UI.xaml</DependentUpon>
+    </Compile>
     <Compile Include="GeneralFunction.cs" />
     <Compile Include="GrabMode\GrabModeBase.cs" />
     <Compile Include="GrabMode\GrabModeBack.cs" />
@@ -962,6 +966,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="GAFs\SVIDList_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Gem\XGem\XGem_New_UI.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

@@ -133,6 +133,9 @@ namespace Root_AOP01_Inspection
                 {
                     case eGemTestStep.JobReserve:
                         {
+                            m_infoCarrier.p_eAccessLP = GemCarrierBase.eAccessLP.Manual;
+                            System.Threading.Thread.Sleep(100);
+
                             m_gem.SendLPInfo(m_infoCarrier);
                             m_gem.SetCEID(8211);
                             
@@ -140,14 +143,14 @@ namespace Root_AOP01_Inspection
                             //m_gem.CMSDelCarrierInfo(m_infoCarrier);
 
                             m_infoCarrier.p_ePresentSensor = GemCarrierBase.ePresent.Exist;
+                            //m_infoCarrier.p_eReqTransfer = GemCarrierBase.eTransfer.TransferBlocked;
                             System.Threading.Thread.Sleep(100);
                             p_eGemTestStep = eGemTestStep.MaterialRecieve;
                             break;
                         }
                     case eGemTestStep.MaterialRecieve:
                         {
-                            m_infoCarrier.p_eAccessLP = GemCarrierBase.eAccessLP.Manual;
-                            System.Threading.Thread.Sleep(100);
+                            
                             
                             //m_infoCarrier.p_eTransfer = GemCarrierBase.eTransfer.TransferBlocked;
                             System.Threading.Thread.Sleep(100);
@@ -172,7 +175,7 @@ namespace Root_AOP01_Inspection
                         }
                     case eGemTestStep.JobStart:
                         {
-                            m_infoCarrier.p_eAccess = GemCarrierBase.eAccess.InAccessed;
+                            //m_infoCarrier.p_eAccess = GemCarrierBase.eAccess.InAccessed;
                             p_eGemTestStep = eGemTestStep.CJCreate;
                             break;
                         }
@@ -249,10 +252,6 @@ namespace Root_AOP01_Inspection
 
                     case eGemTestStep.CheckFinish:
                         {
-                            while (m_infoCarrier.p_eAccess != GemCarrierBase.eAccess.InAccessed)
-                            {
-                                System.Threading.Thread.Sleep(10);
-                            }                        
 
                             if (m_gem.p_cjRun != null)
                             {
@@ -288,10 +287,12 @@ namespace Root_AOP01_Inspection
                             //Material Remove
                             m_infoCarrier.p_ePresentSensor = GemCarrierBase.ePresent.Empty; // -> MeterialRemove - CarrierID Deleted
 
+                            m_gem.SetCEID(8201); //OHT End
+
                             System.Threading.Thread.Sleep(100);
                             
                             //System.Threading.Thread.Sleep(100);
-                            m_gem.SetCEID(8201); //OHT End
+                            
                             
                             m_infoCarrier.p_eStateSlotMap = GemCarrierBase.eGemState.NotRead;
                             System.Threading.Thread.Sleep(500);
@@ -301,9 +302,9 @@ namespace Root_AOP01_Inspection
                     case eGemTestStep.Finish:
                         { 
                             //OHT에서 Pod 가져가면 ReadyToUnload
-                            m_infoCarrier.p_eReqTransfer = GemCarrierBase.eTransfer.TransferBlocked;
+                            //m_infoCarrier.p_eReqTransfer = GemCarrierBase.eTransfer.TransferBlocked;
                             System.Threading.Thread.Sleep(500);
-                            m_infoCarrier.p_eReqTransfer = GemCarrierBase.eTransfer.ReadyToLoad;
+                            //m_infoCarrier.p_eReqTransfer = GemCarrierBase.eTransfer.ReadyToLoad;
                             p_eGemTestStep = eGemTestStep.Ready;
                             break;
                         }

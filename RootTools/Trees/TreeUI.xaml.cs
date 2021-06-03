@@ -14,7 +14,19 @@ namespace RootTools.Trees
             InitializeComponent();
         }
 
-        TreeRoot m_treeRoot; 
+        TreeRoot m_treeRoot;
+        public TreeRoot p_treeRoot
+        {
+            get
+            {
+                return m_treeRoot;
+            }
+            set
+            {
+                m_treeRoot = value;
+            }
+        }
+
         public void Init(TreeRoot treeRoot)
         {
             m_treeRoot = treeRoot; 

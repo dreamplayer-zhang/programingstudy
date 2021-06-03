@@ -150,7 +150,6 @@ namespace Root_WIND2
 
             p_Summary_VM.ConnectInspItemDataGrid(p_Spec_VM);
 
-
         }
 
         private void P_Origin_VM_SetOrigin(object e)

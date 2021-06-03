@@ -28,7 +28,7 @@ namespace RootTools_Vision.Utility
 		public String waferID_name;
 		public String sampleOrientationMarkType;       // FLAT or NOTCH
 		public String orientationMarkLocation;         // Flat zone 방향 // UP, DOWN, LEFT, RIGHT
-		public String tiffFileName;                    // Tiff file 명
+		public String klarfFileName;                    // Tiff file 명
 
 		public double diePitchX, diePitchY;          // Die Pitch
 		public double dieOriginX, dieOriginY;        // 센터 기준. 무조건 0, 0 으로 보고 셋팅
@@ -241,7 +241,7 @@ namespace RootTools_Vision.Utility
 
 		private void PutTiffFileName(StreamWriter sw)
 		{
-			tempString = string.Format("TiffFilename " + tiffFileName + ";\n");
+			tempString = string.Format("TiffFilename " + klarfFileName +".tif" + ";\n");
 			sw.Write(tempString);
 		}
 

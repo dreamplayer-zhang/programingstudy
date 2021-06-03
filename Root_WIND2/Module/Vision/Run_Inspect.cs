@@ -23,6 +23,37 @@ namespace Root_WIND2.Module
 {
     public class Run_Inspect : ModuleRunBase
     {
+        #region [Klarf]
+        private static KlarfData_Lot klarfData = new KlarfData_Lot();
+
+
+        private static void LotStart(string klarfPath, RecipeBase recipe, InfoWafer infoWafer, GrabModeBase grabMode)
+        {
+            if (klarfData == null) klarfData = new KlarfData_Lot();
+
+            if(Directory.Exists(klarfPath)) Directory.CreateDirectory(klarfPath);
+
+
+            klarfData.LotStart(klarfPath, infoWafer, recipe.WaferMap, grabMode);
+        }
+
+        private void CreateKlarf(RecipeBase recipe, InfoWafer infoWafer, List<Defect> defectList, bool useTDIReview = false, bool useVrsReview = false)
+        {
+            //klarfData.SetResolution((float)camInfo.RealResX, (float)camInfo.RealResY);
+            // Product 정보 셋팅
+
+            klarfData.WaferStart(recipe.WaferMap, infoWafer);
+            klarfData.AddSlot(recipe.WaferMap, defectList, recipe.GetItem<OriginRecipe>(), useTDIReview, useVrsReview);
+            klarfData.SaveKlarf();
+
+        }
+
+        private void LotEnd(InfoWafer infoWafer)
+        {
+            klarfData.CreateLotEnd();
+        }
+        #endregion
+
         Vision m_module;
 
         string m_sRecipeName = string.Empty;
@@ -64,6 +95,7 @@ namespace Root_WIND2.Module
             run.p_sGrabMode = p_sGrabMode;
             run.RecipeName = this.RecipeName;
             run.m_dTDIToVRSOffsetZ = m_dTDIToVRSOffsetZ;
+
             return run;
         }
 
@@ -77,6 +109,19 @@ namespace Root_WIND2.Module
 
         public override string Run()
         {
+            Settings settings = new Settings();
+            SettingItem_SetupFrontside settings_frontside = settings.GetItem<SettingItem_SetupFrontside>();
+
+            InfoWafer infoWafer = m_module.GetInfoWafer(0);
+            RecipeFront recipe = GlobalObjects.Instance.Get<RecipeFront>();
+
+            m_grabMode = m_module.GetGrabMode(p_sGrabMode[recipe.CameraInfoIndex]);
+
+            // Check Lot Start
+            //if(infoWafer.IsLotStart ??)
+            LotStart(settings_frontside.KlarfSavePath, recipe, infoWafer, m_grabMode);
+
+
             StopWatch inspectionTimeWatcher = new StopWatch();
             inspectionTimeWatcher.Start();
 
@@ -120,8 +165,7 @@ namespace Root_WIND2.Module
                 #region [Snap sequence] 
 
                 // 210525 추가
-                RecipeFront recipe = GlobalObjects.Instance.Get<RecipeFront>();
-                m_grabMode = m_module.GetGrabMode(p_sGrabMode[recipe.CameraInfoIndex]);
+             
 
                 m_grabMode.SetLens();
                 m_grabMode.SetLight(true);
@@ -309,26 +353,22 @@ namespace Root_WIND2.Module
                 else
 				{
                     #region [Klarf]
-
-                    Settings settings = new Settings();
-                    SettingItem_SetupFrontside settings_frontside = settings.GetItem<SettingItem_SetupFrontside>();
-
                     if(settings_frontside.UseKlarf)
                     {
                         DataTable table = DatabaseManager.Instance.SelectCurrentInspectionDefect();
                         List<Defect> defects = Tools.DataTableToDefectList(table);
 
                         WIND2_Engineer engineer = GlobalObjects.Instance.Get<WIND2_Engineer>();
-                        CameraInfo camInfo = DataConverter.GrabModeToCameraInfo(engineer.m_handler.p_Vision.GetGrabMode(recipe.CameraInfoIndex));
 
+                        CreateKlarf(recipe, infoWafer, defects, settings_frontside.UseTDIReview, settings_frontside.UseVrsReview);
 
-                        KlarfData_Lot klarfData = new KlarfData_Lot();
-                        Directory.CreateDirectory(settings_frontside.KlarfSavePath);
-                        klarfData.SetResolution((float)camInfo.RealResX, (float)camInfo.RealResY);
-                        klarfData.WaferStart(recipe.WaferMap, DateTime.Now);
-                        klarfData.SetResultTimeStamp();
-                        klarfData.AddSlot(recipe.WaferMap, defects, recipe.GetItem<OriginRecipe>(), settings_frontside.UseTDIReview, settings_frontside.UseVrsReview);
-                        klarfData.SaveKlarf(settings_frontside.KlarfSavePath, false);
+                        //KlarfData_Lot klarfData = new KlarfData_Lot();
+                        //Directory.CreateDirectory(settings_frontside.KlarfSavePath);
+                        //klarfData.SetResolution((float)camInfo.RealResX, (float)camInfo.RealResY);
+                        //klarfData.WaferStart(recipe.WaferMap, DateTime.Now);
+                        //klarfData.SetResultTimeStamp();
+                        //klarfData.AddSlot(recipe.WaferMap, defects, recipe.GetItem<OriginRecipe>(), settings_frontside.UseTDIReview, settings_frontside.UseVrsReview);
+                        //klarfData.SaveKlarf(settings_frontside.KlarfSavePath, false);
 
 
                         //***************** VRS Capture Sequence *********************//
@@ -379,15 +419,15 @@ namespace Root_WIND2.Module
 
                         if (settings_frontside.UseTDIReview && settings_frontside.UseVrsReview)
                         {
-                            Tools.SaveTiffImageBoth(settings_frontside.KlarfSavePath, klarfData.GetKlarfFileName(), defects, workManager.SharedBuffer, new Size(160, 120), vrsImageQueue, new Size(vrsRect.Width, vrsRect.Height));
+                            klarfData.SaveTiffImageBoth(defects, workManager.SharedBuffer, new Size(160, 120), vrsImageQueue, new Size(vrsRect.Width, vrsRect.Height));
                         }
                         else if(settings_frontside.UseTDIReview)
                         {
-                            Tools.SaveTiffImageOnlyTDI(settings_frontside.KlarfSavePath, klarfData.GetKlarfFileName(), defects, workManager.SharedBuffer, new Size(160, 120));
+                            klarfData.SaveTiffImageOnlyTDI(defects, workManager.SharedBuffer, new Size(160, 120));
                         }
                         else if(settings_frontside.UseVrsReview)
                         {
-                            Tools.SaveTiffImageOnlyVRS(settings_frontside.KlarfSavePath, klarfData.GetKlarfFileName(), defects, vrsImageQueue, new Size(vrsRect.Width, vrsRect.Height));
+                            klarfData.SaveTiffImageOnlyVRS(defects, vrsImageQueue, new Size(vrsRect.Width, vrsRect.Height));
                         }
                     }
 
@@ -396,6 +436,13 @@ namespace Root_WIND2.Module
 
                 inspectionTimeWatcher.Stop();
                 RootTools_Vision.TempLogger.Write("Inspection", string.Format("{0:F3}", (double)inspectionTimeWatcher.ElapsedMilliseconds / (double)1000));
+
+
+
+                // LotEnd Check
+                //if(infoWafer.IsLotEnd)
+                LotEnd(infoWafer);
+
                 return "OK";
             }
 

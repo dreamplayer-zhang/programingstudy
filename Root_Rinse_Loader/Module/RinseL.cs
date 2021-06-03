@@ -86,6 +86,11 @@ namespace Root_Rinse_Loader.Module
                 OnPropertyChanged();
             }
         }
+
+        public void SendNewMagazine()
+        {
+            AddProtocol(p_id, eCmd.NewMagazine, 0);
+        }
         #endregion
 
         #region Strips
@@ -454,7 +459,8 @@ namespace Root_Rinse_Loader.Module
             SetRotateSpeed,
             BuzzerOff,
             Finish,
-            EQUReady
+            EQUReady,
+            NewMagazine,
         }
         public string[] m_asCmd = Enum.GetNames(typeof(eCmd));
 

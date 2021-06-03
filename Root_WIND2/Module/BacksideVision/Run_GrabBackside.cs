@@ -72,44 +72,54 @@ namespace Root_WIND2.Module
         {
             if (m_MaingrabMode == null) return "Grab Mode : Backside == null";
 
+            GrabModeBack m_grabMode = m_MaingrabMode;
+
             #region local variable
             AxisXY axisXY = m_module.AxisXY;
             Axis axisZ = m_module.AxisZ;
-            CPoint cpMemoryOffset = new CPoint(m_MaingrabMode.m_cpMemoryOffset);
+            CPoint cpMemoryOffset = new CPoint(m_grabMode.m_cpMemoryOffset);
+
+            const int nTimeOut_10s = 10000; //ms
+            const int nTimeOut_50s = 50000; //ms
+            const int nTimeOutInterval = 10; // ms
+            int nRescanCount = 0;
+            const int nRescanTotal = 3;
 
             int nScanLine = 0;
             int nMMPerUM = 1000;
-            int nCamWidth = m_MaingrabMode.m_camera.GetRoiSize().X;
-            int nCamHeight = m_MaingrabMode.m_camera.GetRoiSize().Y;
-            m_MaingrabMode.m_dTrigger = Convert.ToInt32(10 * m_MaingrabMode.m_dTargetResY_um);  // 1pulse = 0.1um -> 10pulse = 1um
-            double dXScale = m_MaingrabMode.m_dTargetResX_um * 10; //resolution to pulse
-            int nWaferSizeY_px = Convert.ToInt32(m_MaingrabMode.m_nWaferSize_mm * nMMPerUM / m_MaingrabMode.m_dTargetResY_um);  // 웨이퍼 영역의 Y픽셀 갯수
-            int nTotalTriggerCount = Convert.ToInt32(m_MaingrabMode.m_dTrigger * nWaferSizeY_px);   // 스캔영역 중 웨이퍼 스캔 구간의 Trigger pulse
-            int nScanSpeed = Convert.ToInt32((double)m_MaingrabMode.m_nMaxFrame * m_MaingrabMode.m_dTrigger * nCamHeight * m_MaingrabMode.m_nScanRate / 100);
-            int nScanOffset_pulse = 40000;
+            int nCamWidth = m_grabMode.m_camera.GetRoiSize().X;
+            int nCamHeight = m_grabMode.m_camera.GetRoiSize().Y;
+            m_grabMode.m_dTrigger = Convert.ToInt32(10 * m_grabMode.m_dTargetResY_um);  // 1pulse = 0.1um -> 10pulse = 1um
 
-            string strPool = m_MaingrabMode.m_memoryPool.p_id;
-            string strGroup = m_MaingrabMode.m_memoryGroup.p_id;
-            string strMemory = m_MaingrabMode.m_memoryData.p_id;
+            double dXScale = m_grabMode.m_dTargetResX_um * 10; //resolution to pulse
+            int nWaferSizeY_px = Convert.ToInt32(m_grabMode.m_nWaferSize_mm * nMMPerUM / m_grabMode.m_dTargetResY_um);  // 웨이퍼 영역의 Y픽셀 갯수
+            int nTotalTriggerCount = Convert.ToInt32(m_grabMode.m_dTrigger * nWaferSizeY_px);   // 스캔영역 중 웨이퍼 스캔 구간의 Trigger pulse
+            int nScanSpeed = Convert.ToInt32((double)m_grabMode.m_nMaxFrame * m_grabMode.m_dTrigger * nCamHeight * m_grabMode.m_nScanRate / 100);
+            
+            int nScanOffset_pulse = (int)((double)nScanSpeed * axisXY.p_axisY.GetSpeedValue(Axis.eSpeed.Move).m_acc * 0.5) * 2; // Old 40000
+
+            string strPool = m_grabMode.m_memoryPool.p_id;
+            string strGroup = m_grabMode.m_memoryGroup.p_id;
+            string strMemory = m_grabMode.m_memoryData.p_id;
 
             MemoryData Mainmem = m_module.m_engineer.GetMemory(strPool, strGroup, strMemory);
 
-            double dStartPosY = m_MaingrabMode.m_rpAxisCenter.Y - nTotalTriggerCount / 2 - nScanOffset_pulse;
-            double dEndPosY = m_MaingrabMode.m_rpAxisCenter.Y + nTotalTriggerCount / 2 + nScanOffset_pulse;
+            double dStartPosY = m_grabMode.m_rpAxisCenter.Y - nTotalTriggerCount / 2 - nScanOffset_pulse;
+            double dEndPosY = m_grabMode.m_rpAxisCenter.Y + nTotalTriggerCount / 2 + nScanOffset_pulse;
 
-            double dTriggerStartPosY = m_MaingrabMode.m_rpAxisCenter.Y - nTotalTriggerCount / 2;
-            double dTriggerEndPosY = m_MaingrabMode.m_rpAxisCenter.Y + nTotalTriggerCount / 2;
+            double dTriggerStartPosY = m_grabMode.m_rpAxisCenter.Y - nTotalTriggerCount / 2;
+            double dTriggerEndPosY = m_grabMode.m_rpAxisCenter.Y + nTotalTriggerCount / 2;
 
             if (Math.Abs(dTriggerEndPosY - dStartPosY) > Math.Abs(dTriggerStartPosY - dStartPosY))
                 dTriggerEndPosY += nScanOffset_pulse;
             else
                 dTriggerStartPosY -= nScanOffset_pulse;
 
-            GrabData grabData = m_MaingrabMode.m_GD;
-            grabData.ReverseOffsetY = m_MaingrabMode.m_nReverseOffsetY;
+            GrabData grabData = m_grabMode.m_GD;
+            grabData.ReverseOffsetY = m_grabMode.m_nReverseOffsetY;
             #endregion
 
-            if (m_MaingrabMode.m_bUseLADS && m_module.LadsInfos.Count == 0)
+            if (m_grabMode.m_bUseLADS && m_module.LadsInfos.Count == 0)
             {
                 MessageBox.Show("LADS 정보가 없습니다.");
                 return "Error";
@@ -117,73 +127,203 @@ namespace Root_WIND2.Module
 
             try
             {
-                m_MaingrabMode.SetLight(true);
+                m_grabMode.SetLight(true);
 
-                cpMemoryOffset.X += m_MaingrabMode.m_ScanStartLine * nCamWidth;
+                cpMemoryOffset.X += m_grabMode.m_ScanStartLine * nCamWidth;
 
-                while (m_MaingrabMode.m_ScanLineNum > nScanLine)
+                while (m_grabMode.m_ScanLineNum > nScanLine)
                 {
                     if (EQ.IsStop())
                         return "OK";
 
-                    if (m_MaingrabMode.m_bUseBiDirectionScan && (nScanLine % 2 != 0))
+                    // New
+                    bool bNormal = true;
+                    // 위에서 아래로 찍는것을 정방향으로 함, 즉 Y축 값이 큰쪽에서 작은쪽으로 찍는것이 정방향
+                    // Grab하기 위해 이동할 Y축의 시작 끝 점
+                    //ybkwon0113
+
+                    m_grabMode.m_eGrabDirection = eGrabDirection.Forward;
+                    if (m_grabMode.m_bUseBiDirectionScan && nScanLine % 2 == 1)
                     {
-                        GeneralFunction.Swap(ref dStartPosY, ref dEndPosY);
-                        m_MaingrabMode.m_eGrabDirection = eGrabDirection.BackWard;
+                        double dTemp = dStartPosY;  // dStartPosY <--> dEndPosY 바꿈.
+                        dStartPosY = dEndPosY;
+                        dEndPosY = dTemp;
+                        m_grabMode.m_eGrabDirection = eGrabDirection.BackWard;
                     }
-                    else
-                        m_MaingrabMode.m_eGrabDirection = eGrabDirection.Forward;
 
-                    grabData.bInvY = m_MaingrabMode.m_eGrabDirection == eGrabDirection.Forward;
-                    //grabData.nScanOffsetY = Convert.ToInt32( (nScanLine + m_MaingrabMode.m_ScanStartLine) * (4.0 / 22));  //* m_MaingrabMode.m_nYOffset;
+                    double dfovum = m_grabMode.m_GD.m_nFovSize * dXScale;
+                    double dPosX = m_grabMode.m_rpAxisCenter.X + nWaferSizeY_px * (double)m_grabMode.m_dTrigger / 2 - (nScanLine + m_grabMode.m_ScanStartLine) * m_grabMode.m_GD.m_nFovSize * dXScale;
+                    double dNextPosX = m_grabMode.m_rpAxisCenter.X + nWaferSizeY_px * (double)m_grabMode.m_dTrigger / 2 - (nScanLine + 1 + m_grabMode.m_ScanStartLine) * m_grabMode.m_GD.m_nFovSize * dXScale;
 
-                    double dPosX = m_MaingrabMode.m_rpAxisCenter.X - nWaferSizeY_px * (double)m_MaingrabMode.m_dTrigger / 2
-                        + (nScanLine + m_MaingrabMode.m_ScanStartLine) * nCamWidth * dXScale;
+                    double dPosZ = m_grabMode.m_nFocusPosZ;
 
-                    if (m_module.Run(axisZ.StartMove(m_MaingrabMode.m_nFocusPosZ)))
+                    //포커스 높이로 이동
+                    if (m_module.Run(axisZ.StartMove(dPosZ)))
+                        return p_sInfo;
+
+                    // XY 찍는 위치로 이동
+                    if (m_module.Run(axisXY.WaitReady()))
                         return p_sInfo;
                     if (m_module.Run(axisXY.StartMove(new RPoint(dPosX, dStartPosY))))
                         return p_sInfo;
                     if (m_module.Run(axisXY.WaitReady()))
                         return p_sInfo;
+
                     if (m_module.Run(axisZ.WaitReady()))
                         return p_sInfo;
 
-                    axisXY.p_axisY.SetTrigger(dTriggerStartPosY, dTriggerEndPosY, m_MaingrabMode.m_dTrigger, 5, true);
 
-                    if (m_MaingrabMode.m_bUseLADS)
+                    axisXY.p_axisY.SetTrigger(dTriggerStartPosY, dTriggerEndPosY, m_grabMode.m_dTrigger, true);
+
+                    MemoryData mem = m_module.m_engineer.GetMemory(strPool, strGroup, strMemory);
+
+                    GrabData gd = m_grabMode.m_GD;
+                    gd.bInvY = m_grabMode.m_eGrabDirection == eGrabDirection.BackWard;
+                    gd.nScanOffsetY = (nScanLine + m_grabMode.m_ScanStartLine) * m_grabMode.m_nYOffset;
+                    gd.ReverseOffsetY = m_grabMode.m_nReverseOffsetY;
+                    //카메라 그랩 시작
+                    m_grabMode.StartGrab(mem, cpMemoryOffset, nWaferSizeY_px, m_grabMode.m_GD);
+                    //Y축 트리거 발생
+                    if (m_module.Run(axisXY.p_axisY.StartMove(dEndPosY, nScanSpeed)))
+                        return p_sInfo;
+
+                    //스캔 축 타임 아웃
+                    int nScanAxisTimeOut = nTimeOut_50s / nTimeOutInterval;
+                    // 스캔 축이 트리거 설정 레이지에 도달했으면
+                    if (m_grabMode.m_eGrabDirection == eGrabDirection.Forward)
                     {
-                        int nLADSMaxScanNum = Convert.ToInt32((m_LADSgrabMode.m_nWaferSize_mm * nMMPerUM / m_LADSgrabMode.m_dTargetResY_um) / m_LADSgrabMode.m_camera.GetRoiSize().X);
-                        int nMainMaxScanNum = nWaferSizeY_px / m_MaingrabMode.m_camera.GetRoiSize().X;
-
-                        int ladsinfonum = nLADSMaxScanNum * (nScanLine+ m_MaingrabMode.m_ScanStartLine) / nMainMaxScanNum;
-                        SetFocusMap(((AjinAxis)axisXY.p_axisY).m_nAxis, ((AjinAxis)axisZ).m_nAxis, SetScanAxisPos(ladsinfonum, dTriggerStartPosY, dTriggerEndPosY),
-                            new List<double>(m_module.LadsInfos[ladsinfonum]), m_MaingrabMode.m_bUseBiDirectionScan && (nScanLine % 2 != 0), nScanSpeed);
+                        while (axisXY.p_axisY.p_posActual < dTriggerEndPosY)
+                        {
+                            System.Threading.Thread.Sleep(nTimeOutInterval);
+                            if (--nScanAxisTimeOut <= 0)
+                            {
+                                m_log.Info("TimeOut - Scan Axis Error Forward");
+                                bNormal = false;
+                                break;
+                            }
+                        }
                     }
-
-                    m_MaingrabMode.StartGrab(Mainmem, cpMemoryOffset, nWaferSizeY_px, grabData);
-                    m_MaingrabMode.Grabed += GrabMode_Grabed;
-
-                    string res = MoveAxisToEndPos(m_MaingrabMode.m_bUseLADS, axisXY, dEndPosY, nScanSpeed);
-
-                    if (!res.Equals("OK"))
-                        return res;
-
+                    else
+                    {
+                        while (axisXY.p_axisY.p_posActual > dTriggerStartPosY)
+                        {
+                            System.Threading.Thread.Sleep(nTimeOutInterval);
+                            if (--nScanAxisTimeOut <= 0)
+                            {
+                                m_log.Info("TimeOut - Scan Axis Error Reverse");
+                                bNormal = false;
+                                break;
+                            }
+                        }
+                    }
+                    // X축을 미리 움직임
+                    axisXY.p_axisX.StartMove(dNextPosX);
                     axisXY.p_axisY.RunTrigger(false);
 
-                    nScanLine++;
-                    cpMemoryOffset.X += nCamWidth;
+                    // 카메라 그랩 완료 대기
+                    int nCameraTimeOut = nTimeOut_10s / nTimeOutInterval;
+                    while (m_grabMode.m_camera.p_nGrabProgress != 100)
+                    {
+                        System.Threading.Thread.Sleep(nTimeOutInterval);
+                        m_log.Info("Wait Camera GrabProcess");
+                        if (--nCameraTimeOut <= 0)
+                        {
+                            m_log.Info("TimeOut Camera GrabProcess");
+                            bNormal = false;
+                            break;
+                        }
+                    }
+                    if (bNormal == true)
+                    {
+                        //WIND2EventManager.OnSnapDone(this, new SnapDoneArgs(new CPoint(startOffsetX, startOffsetY), cpMemoryOffset + new CPoint(m_grabMode.m_GD.m_nFovSize, nWaferSizeY_px)));
+
+                        nScanLine++;
+                        cpMemoryOffset.X += m_grabMode.m_GD.m_nFovSize;
+                    }
+                    else //비정상 스캔일때.
+                    {
+                        m_grabMode.m_camera.StopGrab();
+                        if (nRescanCount > nRescanTotal)
+                        {
+
+                            throw new Exception("Run_GrabLineScan Rescan Count Over");
+                        }
+                        nRescanCount++;
+
+                        if (nScanLine > 0)
+                        {
+                            nScanLine--;
+                            cpMemoryOffset.X -= m_grabMode.m_GD.m_nFovSize;
+                        }
+                    }
+
                 }
+                m_grabMode.m_camera.StopGrab();
 
-                m_MaingrabMode.m_camera.StopGrab();
 
-                return "OK";
+
+
+                // Old
+                //    if (m_MaingrabMode.m_bUseBiDirectionScan && (nScanLine % 2 != 0))
+                //        {
+                //            GeneralFunction.Swap(ref dStartPosY, ref dEndPosY);
+                //            m_MaingrabMode.m_eGrabDirection = eGrabDirection.BackWard;
+                //        }
+                //        else
+                //            m_MaingrabMode.m_eGrabDirection = eGrabDirection.Forward;
+
+                //        grabData.bInvY = m_MaingrabMode.m_eGrabDirection == eGrabDirection.Forward;
+                //        //grabData.nScanOffsetY = Convert.ToInt32( (nScanLine + m_MaingrabMode.m_ScanStartLine) * (4.0 / 22));  //* m_MaingrabMode.m_nYOffset;
+
+                //        double dPosX = m_MaingrabMode.m_rpAxisCenter.X - nWaferSizeY_px * (double)m_MaingrabMode.m_dTrigger / 2
+                //            + (nScanLine + m_MaingrabMode.m_ScanStartLine) * nCamWidth * dXScale;
+
+                //        if (m_module.Run(axisZ.StartMove(m_MaingrabMode.m_nFocusPosZ)))
+                //            return p_sInfo;
+                //        if (m_module.Run(axisXY.StartMove(new RPoint(dPosX, dStartPosY))))
+                //            return p_sInfo;
+                //        if (m_module.Run(axisXY.WaitReady()))
+                //            return p_sInfo;
+                //        if (m_module.Run(axisZ.WaitReady()))
+                //            return p_sInfo;
+
+                //        axisXY.p_axisY.SetTrigger(dTriggerStartPosY, dTriggerEndPosY, m_MaingrabMode.m_dTrigger, 5, true);
+
+                //        if (m_MaingrabMode.m_bUseLADS)
+                //        {
+                //            int nLADSMaxScanNum = Convert.ToInt32((m_LADSgrabMode.m_nWaferSize_mm * nMMPerUM / m_LADSgrabMode.m_dTargetResY_um) / m_LADSgrabMode.m_camera.GetRoiSize().X);
+                //            int nMainMaxScanNum = nWaferSizeY_px / m_MaingrabMode.m_camera.GetRoiSize().X;
+
+                //            int ladsinfonum = nLADSMaxScanNum * (nScanLine+ m_MaingrabMode.m_ScanStartLine) / nMainMaxScanNum;
+                //            SetFocusMap(((AjinAxis)axisXY.p_axisY).m_nAxis, ((AjinAxis)axisZ).m_nAxis, SetScanAxisPos(ladsinfonum, dTriggerStartPosY, dTriggerEndPosY),
+                //                new List<double>(m_module.LadsInfos[ladsinfonum]), m_MaingrabMode.m_bUseBiDirectionScan && (nScanLine % 2 != 0), nScanSpeed);
+                //        }
+
+                //        m_MaingrabMode.StartGrab(Mainmem, cpMemoryOffset, nWaferSizeY_px, grabData);
+                //        m_MaingrabMode.Grabed += GrabMode_Grabed;
+
+                //        string res = MoveAxisToEndPos(m_MaingrabMode.m_bUseLADS, axisXY, dEndPosY, nScanSpeed);
+
+                //        if (!res.Equals("OK"))
+                //            return res;
+
+                //        axisXY.p_axisY.RunTrigger(false);
+
+                //        nScanLine++;
+                //        cpMemoryOffset.X += nCamWidth;
+                //    }
+
+                //    m_MaingrabMode.m_camera.StopGrab();
+
+                //    return "OK";
             }
             finally
             {
                 m_MaingrabMode.SetLight(false);
             }
 
+
+            return "OK";
         }
 
         private void GrabMode_Grabed(object sender, EventArgs e)
