@@ -114,8 +114,13 @@
 
                         </MenuItem>
                         <MenuItem Header="GEM"  Foreground="Black">
+                            <MenuItem Header="Online" HorizontalAlignment="Left" x:Name="GemOnline" Click="GemOnline_Click"/>
+                            <MenuItem Header="Local" HorizontalAlignment="Left" x:Name="GemLocal" Click="GemLocal_Click"/>
+                            <MenuItem Header="Offline" HorizontalAlignment="Left" x:Name="GemOffline" Click="GemOffline_Click"/>
 
                         </MenuItem>
+
+
                     </MenuItem>
                     <MenuItem>
                         <MenuItem.Header>
@@ -148,6 +153,7 @@
                     </MenuItem>
                 </Menu>
             </StackPanel>
+
         </Border>
         <Grid Grid.Row="1">
             <ContentControl Content="{Binding p_CurrentPanel}">

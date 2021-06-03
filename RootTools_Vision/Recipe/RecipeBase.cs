@@ -237,7 +237,9 @@ namespace RootTools_Vision
                 MessageBox.Show("Recipe Open Error\nDetail : " + ex.Message);
                 rst = false;
             }
+
             
+
             return rst;
         }
 
@@ -294,6 +296,8 @@ namespace RootTools_Vision
                     XmlSerializer xml = new XmlSerializer(this.RecipeItemList.GetType());
                     xml.Serialize(tw, this.RecipeItemList);
                 }
+
+               
             }
             catch(Exception ex)
             {

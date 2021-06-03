@@ -191,3 +191,4 @@ Lib/opencv_world347.dll
 .sonarqube
 opencv_world347d.dll
 opencv_world347.dll
+Lib/Basler.Pylon.dll

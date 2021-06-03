@@ -646,6 +646,11 @@ namespace RootTools.Control
                 m_dUpTime = dUpTime; 
             }
 
+            public int GetLine()
+            {
+                return (int)Math.Round((m_aPos[1] - m_aPos[0]) / m_dPos);
+            }
+
             public void RunTree(Tree tree, string sUnit, bool bVisible = true)
             {
                 m_aPos[0] = tree.Set(m_aPos[0], m_aPos[0], "Start", "Start Position (" + sUnit + ")", bVisible);

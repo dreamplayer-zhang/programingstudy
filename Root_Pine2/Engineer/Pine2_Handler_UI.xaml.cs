@@ -21,6 +21,7 @@ namespace Root_Pine2.Engineer
             DataContext = handler;
             moduleListUI.Init(handler.p_moduleList);
             gafUI.Init(handler.m_gaf);
+            processUI.Init(handler); 
             InitTabControl();
         }
 

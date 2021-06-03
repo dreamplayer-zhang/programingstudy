@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:Root_WIND2"
+             xmlns:local="clr-namespace:Root_WIND2.UI_User"
              xmlns:vision="clr-namespace:RootTools_Vision;assembly=RootTools_Vision"
              xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
              mc:Ignorable="d" 
@@ -67,21 +67,24 @@
                 <vision:RecipeSelectionViewer Grid.Column="0" DataContext="{Binding RecipeSelectionViewerVM}"/>
                 <StackPanel Grid.Column="1"
                             Orientation="Vertical">
-                    <Button Content="Open" Style="{StaticResource RecipeListViewerButton}" Margin="0,4,4 4"/>
-                    <Button Content="New" Style="{StaticResource RecipeListViewerButton}" Margin="0,0,4,4"/>
-                    <Button Content="Save" Style="{StaticResource RecipeListViewerButton}" Margin="0,0,4,4"/>
+                    <Button Content="Open" Style="{StaticResource RecipeListViewerButton}" Margin="0,4,4 4" Command="{Binding CmdOpen}"/>
+                    <Button Content="New" Style="{StaticResource RecipeListViewerButton}" Command="{Binding CmdNew}" Margin="0,0,4,4"/>
+                    <Button Content="Save" Style="{StaticResource RecipeListViewerButton}" Command="{Binding CmdSave}" Margin="0,0,4,4"/>
                     <Button Content="Delete" Style="{StaticResource RecipeListViewerButton}" Margin="0,0,4,4"/>
                 </StackPanel>
             </Grid>
         </GroupBox>
 
-        <Grid Grid.Column="1" >
-            <ListBox Margin="4"
-                     ItemsSource="{Binding ModuleList}"
+        <Grid Grid.Column="1" Margin="4">
+            <GroupBox Header="Sequence List" Style="{StaticResource main_view_groupbox}">
+                <local:SequenceRecipe DataContext="{Binding SequenceRecipeVM}"/>
+            </GroupBox>
+            <!--<ListBox Margin="4"
+                     ItemsSource="{Binding ModuleList}" AllowDrop="True"
                      SelectedIndex="{Binding p_SelectedChipIndex}"
                      HorizontalContentAlignment="Stretch"
                      Background="Transparent">
-            </ListBox>
+            </ListBox>-->
         </Grid>
     </Grid>
 </UserControl>

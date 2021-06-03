@@ -145,7 +145,7 @@ namespace Root_AOP01_Inspection
             char cLP = 'A';
             for (int n = 0; n < m_lLoadport; n++, cLP++)
             {
-                string sID = "LoadPort" + cLP;
+                string sID = "Loadport" + cLP;
                 switch (m_aLoadportType[n])
                 {
                     case eLoadport.RND:

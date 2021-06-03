@@ -74,6 +74,11 @@ namespace Root_Rinse_Loader.MainUI
             m_rinse.p_iMagazine = 0; 
         }
 
+        private void buttonNewUnloader_Click(object sender, RoutedEventArgs e)
+        {
+            m_rinse.SendNewMagazine();
+        }
+
         private void TextBox_PreviewKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
             if (e.Key != Key.Enter) return;
@@ -100,5 +105,6 @@ namespace Root_Rinse_Loader.MainUI
             buttonLoadDown.IsEnabled = false;
             m_storage.RunLoadDown();
         }
+
     }
 }
