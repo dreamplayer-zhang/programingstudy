@@ -13,7 +13,7 @@ namespace Root_VEGA_P_Vision
 {
     public class RecipeManager_ViewModel:ObservableObject
     {
-        public RecipeManagerPanel Main;
+        public RecipeManagerPanel Main { get; set; }
         public Home_ViewModel home;
         private UserControl m_CurrentPanel;
 

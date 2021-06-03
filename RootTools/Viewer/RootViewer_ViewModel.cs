@@ -44,7 +44,7 @@ namespace RootTools
             }
             InitCrossLine();
         }
-        private IDialogService m_DialogService;
+        protected IDialogService m_DialogService;
 
         StopWatch m_swMouse = new StopWatch();
         CPoint m_ptViewBuffer = new CPoint();
@@ -1737,7 +1737,7 @@ namespace RootTools
             if (p_ImageData != null)
                 p_ImageData.ClearImage();
         }
-        void _CancelCopy()
+        protected void _CancelCopy()
         {
             if (p_ImageData.Worker_MemoryCopy.IsBusy)
             {

@@ -22,6 +22,24 @@ namespace Root_VEGA_P_Vision
         public RecipeMask_ViewModel recipeSetting;
         public RecipeStain_Panel Main;
         MaskRootViewer_ViewModel selectedViewer;
+
+        List<int> numList;
+        int selectedIdx;
+        public int SelectedIdx
+        {
+            get => selectedIdx;
+            set
+            {
+                SetProperty(ref selectedIdx, value);
+                selectedViewer.SelectedIdx = value;
+            }
+        }
+        public List<int> MemNumList
+        {
+            get => numList;
+            set => SetProperty(ref numList, value);
+        }
+
         #region [ImageViewer ViewModel]
         MaskRootViewer_ViewModel EIPcovertop_ImageViewerVM, EIPcoverbottom_ImageViewerVM;
         MaskRootViewer_ViewModel EIPbasetop_ImageViewerVM, EIPbasebottom_ImageViewerVM;
@@ -65,6 +83,9 @@ namespace Root_VEGA_P_Vision
             EIPbasebottom_ImageViewerVM = new MaskRootViewer_ViewModel("EIP_Plate.Stain.Back", recipeSetting.MaskTools);
 
             selectedViewer = EIPCoverTop_ImageViewerVM;
+            numList = new List<int>();
+            for (int i = 0; i < EIPcovertop_ImageViewerVM.p_ImageData.p_nPlane; i++)
+                MemNumList.Add(i+1);
         }
 
         #region RelayCommand
@@ -75,6 +96,19 @@ namespace Root_VEGA_P_Vision
             {
             });
         }
+        public ICommand ImageOpen
+        {
+            get => new RelayCommand(() => selectedViewer._openImage(SelectedIdx));
+        }
+        public ICommand ImageSave
+        {
+            get => new RelayCommand(() => selectedViewer._saveImage());
+        }
+        public ICommand ImageClear
+        {
+            get => new RelayCommand(() => selectedViewer._clearImage());
+        }
+
         public ICommand btnSnap
         {
             get => new RelayCommand(() => Snap());
@@ -103,6 +137,8 @@ namespace Root_VEGA_P_Vision
                 }
             });
         }
+
+
         void Snap()
         {
             EQ.p_bStop = false;

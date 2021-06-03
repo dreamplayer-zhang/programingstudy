@@ -20,6 +20,8 @@
             <Button Content="Clear" Style="{StaticResource ImageBaseBtn}" Command="{Binding p_SubViewer.DataContext.ImageClear}"/>
             <Button Content="Snap" Style="{StaticResource ImageBaseBtn}" Command="{Binding p_SubViewer.DataContext.btnSnap}"/>
             <Button Content="Insp" Visibility="{Binding InspBtnVisibility}" Style="{StaticResource ImageBaseBtn}" Command="{Binding p_SubViewer.DataContext.btnInsp}"/>
+            <TextBlock Text="Select Image" Style="{StaticResource ImageText}"/>
+            <ComboBox Style="{StaticResource ComboBoxStyle}" Width="50" Margin="0,8,0,8" ItemsSource="{Binding p_SubViewer.DataContext.MemNumList}" SelectedIndex="{Binding p_SubViewer.DataContext.SelectedIdx}"/>
         </StackPanel>
         <Grid Grid.Row="1">
             <ContentControl Content="{Binding p_SubViewer}"/>

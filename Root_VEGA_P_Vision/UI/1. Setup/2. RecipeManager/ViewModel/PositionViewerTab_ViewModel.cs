@@ -130,7 +130,7 @@ namespace Root_VEGA_P_Vision
 
         void GetAlignAngle()
         {
-            Calc.GetAlignAngle(selectedViewer.p_ImageData, 50);
+            //Calc.GetAlignAngle(selectedViewer.p_ImageData, 50);
         }
 
         void Snap()

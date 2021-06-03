@@ -15,40 +15,50 @@
             <ColumnDefinition Width="80*"/>
             <ColumnDefinition Width="20*"/>
         </Grid.ColumnDefinitions>
-        <Grid Grid.Column="0">
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="0.5*"/>
-                    <RowDefinition Height="9*"/>
-                </Grid.RowDefinitions>
-                <StackPanel Grid.Row="0" Orientation="Horizontal">
-                    <Button Content="Snap" Style="{StaticResource ImageBaseBtn}" Command="{Binding p_MaskPanel.DataContext.btnSnap}"/>
-                    <Button Content="Inspection" Style="{StaticResource ImageBaseBtn}" Command="{Binding p_MaskPanel.DataContext.btnInsp}"/>
-                    <Button Content="Illum 1" Style="{StaticResource ImageBaseBtn}" Command="{Binding p_MaskPanel.DataContext.SelectedViewer.btnIllum1}"/>
-                    <Button Content="Illum 2" Style="{StaticResource ImageBaseBtn}" Command="{Binding p_MaskPanel.DataContext.SelectedViewer.btnIllum2}"/>
-                </StackPanel>
-                <ContentControl Grid.Row="1" Content="{Binding p_MaskPanel}"/>
-            </Grid>
-        </Grid>
+        <local:ImageViewerBase_Panel Grid.Column="0" DataContext="{Binding p_BaseViewer}"/>
         <Grid Grid.Column="1">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="2.5*" />
                     <RowDefinition Height="3*" />
                     <RowDefinition Height="2*" />
-                    <RowDefinition Height="2*" />
+                    <RowDefinition Height="2.5*" />
                     <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
                 <local:MaskTools_Panel Grid.Row="0" DataContext="{Binding MaskTools}"/>
                 <local:SurfaceParam_Tree DataContext="{Binding SurfaceParamTree}" Grid.Row="1"/>
-                <Grid Grid.Row="2" Margin="10,0,10,0">
+                <Grid Visibility="{Binding IsHighRes,Converter={StaticResource BooleanToVisiblity}}" Grid.Row="2" Margin="10,10,10,0">
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="0.4*"/>
+                        <RowDefinition Height="0.3*"/>
                         <RowDefinition Height="0.1*"/>
-                        <RowDefinition Height="0.3*"/>
-                        <RowDefinition Height="0.7*"/>
-                        <RowDefinition Height="0.3*"/>
-                        <RowDefinition Height="0.7*"/>
+                        <RowDefinition Height="0.6*"/>
+                        <RowDefinition Height="0.6*"/>
+                    </Grid.RowDefinitions>
+                    <TextBlock Grid.Row="0" Text="ROI" Style="{StaticResource HeaderTextBlock}"/>
+                    <Line Height="1" Grid.Row="1"
+                      Stretch="Fill"
+                      Stroke="{StaticResource BorderBrush}"
+                      StrokeThickness="0.7"
+                      VerticalAlignment="Top"
+                      X2="1"/>
+                    <UniformGrid Grid.Row="2" Rows="1" HorizontalAlignment="Stretch">
+                        <RadioButton Content="Capture Area" IsChecked="True" Style="{StaticResource SelecteRadioBtn}"/>
+                        <RadioButton Content="ROI" Style="{StaticResource SelecteRadioBtn}"/>
+                    </UniformGrid>
+                    <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Center">
+                        <Button Content="Pen" Style="{StaticResource MaskButton}" Command="{Binding btnDot}"/>
+                        <Button Content="Rect" Style="{StaticResource MaskButton}" Command="{Binding btnRect}"/>
+                        <Button Content="Select" Style="{StaticResource MaskButton}" Command="{Binding btnSelect}"/>
+                    </StackPanel>
+                </Grid>
+
+                
+                <Grid Visibility="{Binding IsSide, Converter={StaticResource BooleanToVisiblity}}" Grid.Row="2" Margin="10,0,10,0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="0.2*"/>
+                        <RowDefinition Height="0.1*"/>
+                        <RowDefinition Height="0.5*"/>
+                        <RowDefinition Height="0.5*"/>
                     </Grid.RowDefinitions>
                     <TextBlock Grid.Row="0" Text="Similarity" Style="{StaticResource HeaderTextBlock}"/>
                     <Line Height="1" Grid.Row="1"
@@ -57,13 +67,14 @@
                       StrokeThickness="0.7"
                       VerticalAlignment="Top"
                       X2="1"/>
-                    <TextBlock Grid.Row="2" Text="Horizontal" Style="{StaticResource HeaderTextBlock}" HorizontalAlignment="Center"/>
-                    <Grid Grid.Row="3">
+                    <Grid Grid.Row="2">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition/>
                             <ColumnDefinition/>
+                            <ColumnDefinition/>
                         </Grid.ColumnDefinitions>
-                        <Grid Margin="10,0,10,0" Grid.Column="0">
+                        <TextBlock Grid.Column="0" Text="Horizontal" Style="{StaticResource HeaderTextBlock}" HorizontalAlignment="Center"/>
+                        <Grid Margin="10,0,10,0" Grid.Column="1">
                             <Grid.RowDefinitions>
                                 <RowDefinition/>
                                 <RowDefinition/>
@@ -73,7 +84,7 @@
                                 <TextBox Text="{Binding Origin.X}" BorderBrush="White" Margin="6,2,6,2"/>
                             </Border>
                         </Grid>
-                        <Grid Margin="10,0,10,0" Grid.Column="1">
+                        <Grid Margin="10,0,10,0" Grid.Column="2">
                             <Grid.RowDefinitions>
                                 <RowDefinition/>
                                 <RowDefinition/>
@@ -84,13 +95,14 @@
                             </Border>
                         </Grid>
                     </Grid>
-                    <TextBlock Grid.Row="4" Text="Vertical" Style="{StaticResource HeaderTextBlock}" HorizontalAlignment="Center"/>
                     <Grid Grid.Row="5">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition/>
                             <ColumnDefinition/>
+                            <ColumnDefinition/>
                         </Grid.ColumnDefinitions>
-                        <Grid Margin="10,0,10,0" Grid.Column="0">
+                    <TextBlock Grid.Column="0" Text="Vertical" Style="{StaticResource HeaderTextBlock}" HorizontalAlignment="Center"/>
+                        <Grid Margin="10,0,10,0" Grid.Column="1">
                             <Grid.RowDefinitions>
                                 <RowDefinition/>
                                 <RowDefinition/>
@@ -100,7 +112,7 @@
                                 <TextBox Text="{Binding Origin.X}" BorderBrush="White" Margin="6,2,6,2"/>
                             </Border>
                         </Grid>
-                        <Grid Margin="10,0,10,0" Grid.Column="1">
+                        <Grid Margin="10,0,10,0" Grid.Column="2">
                             <Grid.RowDefinitions>
                                 <RowDefinition/>
                                 <RowDefinition/>

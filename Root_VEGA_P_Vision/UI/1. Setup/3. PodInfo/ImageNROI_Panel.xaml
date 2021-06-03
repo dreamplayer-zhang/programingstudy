@@ -49,7 +49,7 @@
                     <RowDefinition Height="0.6*"/>
                     <RowDefinition Height="0.6*"/>
                 </Grid.RowDefinitions>
-                <TextBlock Grid.Row="0" Text="Master Image" Style="{StaticResource HeaderTextBlock}"/>
+                <TextBlock Grid.Row="0" Text="ROI" Style="{StaticResource HeaderTextBlock}"/>
                 <Line Height="1" Grid.Row="1"
                       Stretch="Fill"
                       Stroke="{StaticResource BorderBrush}"
@@ -57,12 +57,12 @@
                       VerticalAlignment="Top"
                       X2="1"/>
                 <UniformGrid Grid.Row="2" Rows="1" HorizontalAlignment="Stretch">
-                    <RadioButton Content="Capture Area"  Style="{StaticResource SelecteRadioBtn}"/>
+                    <RadioButton Content="Capture Area" IsChecked="True" Style="{StaticResource SelecteRadioBtn}"/>
                     <RadioButton Content="ROI" Style="{StaticResource SelecteRadioBtn}"/>
                 </UniformGrid>
                 <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Center">
                     <Button Content="Pen" Style="{StaticResource MaskButton}" Command="{Binding btnDot}"/>
-                    <Button Content="Rect" Style="{StaticResource MaskButton}" Command="{Binding btnRect}"/>
+                    <Button Content="Rect" Style="{StaticResource MaskButton}" Command="{Binding btnRect}" Margin="4,5,4,8"/>
                     <Button Content="Select" Style="{StaticResource MaskButton}" Command="{Binding btnSelect}"/>
                 </StackPanel>
             </Grid>

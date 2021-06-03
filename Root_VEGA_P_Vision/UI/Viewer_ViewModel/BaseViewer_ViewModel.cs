@@ -11,6 +11,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Forms;
 using System.Windows.Media;
 using System.Windows.Shapes;
 
@@ -24,7 +25,11 @@ namespace Root_VEGA_P_Vision
         public int SelectedIdx
         {
             get => selectedIdx;
-            set => SetProperty(ref selectedIdx, value);
+            set 
+            {
+                SetProperty(ref selectedIdx, value);
+                SetImageSource();
+            } 
         }
         public string TabName
         {
@@ -69,6 +74,34 @@ namespace Root_VEGA_P_Vision
                 SetProperty(ref m_MouseX, value);
             }
         }
+        public void _openImage(int ch)
+        {
+            if (p_ImageData == null)
+            {
+                System.Windows.Forms.MessageBox.Show("Image를 열어주세요");
+                return;
+            }
+            _CancelCopy();
+
+            OpenFileDialog ofd = new OpenFileDialog();
+            ofd.Filter = "Image Files(*.bmp;*.jpg)|*.bmp;*.jpg";
+
+            if (ofd.ShowDialog() == DialogResult.OK)
+            {
+                if (m_DialogService != null)
+                {
+                    var viewModel = new Dialog_ImageOpenViewModel(this as RootViewer_ViewModel);
+                    Nullable<bool> result = m_DialogService.ShowDialog(viewModel);
+                    if (!result.HasValue || !result.Value)
+                    {
+                        return;
+                    }
+                }
+
+                p_ImageData.OpenFile(ofd.FileName, p_CopyOffset, ch);
+            }
+        }
+
         public override unsafe void SetImageSource()
         {
             try
@@ -91,10 +124,8 @@ namespace Root_VEGA_P_Vision
 
                     IntPtr pointer = bmpData.Scan0;
                     IntPtr ptrMem;
-                    if (p_ImageData.GetBytePerPixel() >= 2)
-                        ptrMem = p_ImageData.GetPtr(selectedIdx);
-                    else
-                        ptrMem = p_ImageData.GetPtr();
+
+                    ptrMem = p_ImageData.GetPtr(SelectedIdx);
 
                     if (ptrMem == IntPtr.Zero)
                         return;

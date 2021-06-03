@@ -154,8 +154,8 @@ namespace RootTools_Vision
                 IntPtr pointer = bmpData.Scan0;
                 if (_byteCount == 1)
                 {                    
-                    for (int i = 0; i < rtHeight; i++)
-                        CopyMemory(pointer + i * rtWidth, info.PtrR_GRAY + (top+i)*_width+left, (uint)rtWidth);
+                    for (int i = 0; i < roiHeight; i++)
+                        CopyMemory(pointer + i * roiWidth, info.PtrR_GRAY + (((int)rect.Top+ i)*_width)+(int)rect.Left, (uint)roiWidth);
                 }
                 else if (_byteCount == 3)
                 {

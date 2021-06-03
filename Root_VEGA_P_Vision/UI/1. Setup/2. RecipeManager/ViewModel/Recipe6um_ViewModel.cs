@@ -18,6 +18,13 @@ namespace Root_VEGA_P_Vision
         RecipeMask_ViewModel recipeSetting;
         MaskRootViewer_ViewModel coverTop_ImageViewer, coverBottom_ImageViewer, baseTop_ImageViewer, baseBottom_ImageViewer;
         RootViewer_ViewModel selectedViewer;
+
+        List<int> numList;
+        public List<int> MemNumList
+        {
+            get => numList;
+            set => SetProperty(ref numList, value);
+        }
         #region Property
         public MaskRootViewer_ViewModel CoverTop_ImageViewer
         {
@@ -53,6 +60,10 @@ namespace Root_VEGA_P_Vision
             coverBottom_ImageViewer = new MaskRootViewer_ViewModel("EIP_Cover.Main.Back", recipeSetting.MaskTools);
             baseTop_ImageViewer = new MaskRootViewer_ViewModel("EIP_Plate.Main.Front", recipeSetting.MaskTools);
             baseBottom_ImageViewer = new MaskRootViewer_ViewModel("EIP_Plate.Main.Back", recipeSetting.MaskTools);
+
+            numList = new List<int>();
+            for(int i=0;i<coverTop_ImageViewer.p_ImageData.p_nPlane;i++)
+                MemNumList.Add(i+1);
         }
         public ICommand btnSnap
         {
