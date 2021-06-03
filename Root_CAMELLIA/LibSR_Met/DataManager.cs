@@ -1431,15 +1431,45 @@ namespace Root_CAMELLIA.LibSR_Met
                 writer.Close();
 
                 m_Log.WriteLog(LogType.Datas, "Saved Successfully.");
+                return true;
             }
             catch (Exception ex)
             {
                 m_Log.WriteLog(LogType.Error, ex.Message);
                 return false;
             }
-            return true;
+            
         }
+        public bool SaveCotourMapThicknessData(string sPath, int nLayerIndex, int nPointIndex)
+        {
+            try
+            {
+                if (Path.GetExtension(sPath) != ".csv")
+                {
+                    sPath += ".csv";
+                }
 
+                StreamWriter writer = new StreamWriter(sPath);
+                writer.WriteLine("X[mm],Y[mm],Value[]");
+                string sData = string.Empty;
+                string sThicknessData = string.Empty;
+                for (int i = 0; i < nPointIndex; i++)
+                {
+                    sThicknessData = (m_RawData[i].Thickness[nLayerIndex] * m_ThicknessData[nLayerIndex].m_dThicknessScale + m_ThicknessData[nLayerIndex].m_dThicknessOffset).ToString("0.####");
+                    writer.WriteLine(m_RawData[i].dX.ToString() + "," + m_RawData[i].dY.ToString() + "," + sThicknessData);
+                    
+                }
+                writer.Close();
+
+                m_Log.WriteLog(LogType.Datas, "Saved Successfully.");
+                return true;
+            }
+            catch(Exception ex)
+            {
+                m_Log.WriteLog(LogType.Error, ex.Message);
+                return false;
+            }
+        }
         public bool SaveResultFileSummary(string sPath, string sLotID, string sSlotID, int nPointCount)
         {
             int n = 0;
@@ -1607,8 +1637,8 @@ namespace Root_CAMELLIA.LibSR_Met
                 for (int k = 0; k < m_RawData[n].nNIRDataNum; k++)
                 {
 
-                    double dRawDataWaveLength = m_RawData[n].Wavelength[k];
-                    if (m_ScalesListR.Count != 0 && dRawDataWaveLength == m_ScalesListR[indexR].p_waveLength && !isDoneR)
+                    double dRawDataWaveLength = Math.Round(m_RawData[n].Wavelength[k]);
+                    if (!isDoneR && m_ScalesListR.Count != 0 && dRawDataWaveLength == m_ScalesListR[indexR].p_waveLength)
                     {
                         double dValue = m_RawData[n].Reflectance[k];
                         //double dWaveLength = m_ScalesListR[indexR].p_waveLength;
@@ -1623,12 +1653,12 @@ namespace Root_CAMELLIA.LibSR_Met
                         indexR++;
                     }
 
-                    if(indexR == m_ScalesListR.Count)
+                    if(!isDoneR && indexR == m_ScalesListR.Count)
                     {
                         isDoneR = true;
                     }
 
-                    if(m_ScalesListT.Count != 0 && dRawDataWaveLength == m_ScalesListT[indexT].p_waveLength && !isDoneT)
+                    if(!isDoneT && m_ScalesListT.Count != 0 && dRawDataWaveLength == m_ScalesListT[indexT].p_waveLength)
                     {
                         double dValue = m_RawData[n].Reflectance[k];
                         //double dWaveLength = m_ScalesListT[indexT].p_waveLength;
@@ -1645,7 +1675,7 @@ namespace Root_CAMELLIA.LibSR_Met
                         indexT++;
                     }
 
-                    if (indexT == m_ScalesListT.Count)
+                    if (!isDoneT && indexT == m_ScalesListT.Count)
                     {
                         isDoneT = true;
                     }

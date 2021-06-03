@@ -435,8 +435,8 @@ namespace Root_CAMELLIA.Module
 
             // 레드로 빼버림?  contour는 일단 보류..
             LibSR_Met.DataManager.GetInstance().AllContourMapDataFitting(m_DataManager.recipeDM.MeasurementRD.WaveLengthReflectance, m_DataManager.recipeDM.MeasurementRD.WaveLengthTransmittance, m_DataManager.recipeDM.MeasurementRD.DataSelectedPoint.Count);
-            m_mwvm.p_ContourMapGraph.InitializeContourMap();
-            m_mwvm.p_ContourMapGraph.DrawAllDatas();
+            //m_mwvm.p_ContourMapGraph.InitializeContourMap();
+           // m_mwvm.p_ContourMapGraph.DrawAllDatas();
             //  DCOL 세이브 필요
             if(m_module.p_infoWafer != null)
             {
@@ -446,8 +446,18 @@ namespace Root_CAMELLIA.Module
 
                 foreach (LibSR_Met.ContourMapData mapdata in MetData.m_ContourMapDataT)
                     LibSR_Met.DataManager.GetInstance().SaveContourMapData(m_slotContourMapPath + "\\T_" + mapdata.Wavelength.ToString() + "_" + DateTime.Now.ToString("HHmmss") + "_ContourMapData.csv", mapdata);
+                for (int n=1;n< MetData.m_LayerData.Count-1; n++)
+                {
+                    string sLayerName="";
+                    for(int s=0; s< MetData.m_LayerData[n].hostname.Length; s++)
+                    {
+                        sLayerName += MetData.m_LayerData[n].hostname[s];
+                    }
+                    LibSR_Met.DataManager.GetInstance().SaveCotourMapThicknessData(m_slotContourMapPath + "\\" + n.ToString() + "Layer_" + sLayerName + "_" + DateTime.Now.ToString("HHmmss") + "_ContourMapData.csv", n, m_DataManager.recipeDM.MeasurementRD.DataSelectedPoint.Count);
+                }
                 //LibSR_Met.DataManager.GetInstance().AllContourMapDataFitting(m_DataManager.recipeDM.MeasurementRD.WaveLengthReflectance, m_DataManager.recipeDM.MeasurementRD.WaveLengthTransmittance);
                 LibSR_Met.DataManager.GetInstance().SaveResultFileSummary(m_summaryPath + "\\" + DateTime.Now.ToString("HHmmss") + "Summary.csv", m_module.p_infoWafer.p_sLotID, m_module.p_infoWafer.p_sSlotID, m_DataManager.recipeDM.MeasurementRD.DataSelectedPoint.Count) ;
+               
             }
 
             return "OK";

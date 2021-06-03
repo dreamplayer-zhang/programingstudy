@@ -920,7 +920,7 @@ namespace Root_CAMELLIA.LibSR_Met
 
                         data.dGoF = m_Calculation.CalcGoF(data.VIS_Reflectance, data.CalcReflectance, 0, nWLCount, 0, nWLCount - 1, dAvgR);
 
-                        if (data.dGoF > 0.99999)
+                        if (data.dGoF > 0.9999)
                         {
                             data.dGoF = 0.9999;
                         }
