@@ -459,38 +459,58 @@ namespace Root_WIND2.UI_User
             int sizeX = waferMap.MapSizeX;
             int sizeY = waferMap.MapSizeY;
 
-            double chipWidth = (double)CanvasWidth / (double)sizeX;
-            double chipHeight = (double)CanvasHeight/ (double)sizeY;
+            double chipWidth = (double)CanvasWidth / (double)(sizeX + 1); // add 1 for row index line
+            double chipHeight = (double)CanvasHeight/ (double)(sizeY + 1); // add 1 for column index line
 
             Point originPt = new Point(0, 0);
 
-            for (int y = 0; y < sizeY; y++)
+            if (sizeX > 0 && sizeY > 0)
             {
-                for (int x = 0; x < sizeX; x++)
+                for (int y = -1; y < sizeY; y++) // start from -1 for column index line
                 {
-                    Rectangle rect = new Rectangle();
-                    rect.Width = chipWidth;
-                    rect.Height = chipHeight;
-                    Canvas.SetLeft(rect, originPt.X + (chipWidth * x));
-                    Canvas.SetTop(rect, originPt.Y + (chipHeight * y));
- 
-                    rect.Tag = new CPoint(x, y);
-                    rect.ToolTip = string.Format("({0}, {1})", x, y); // chip index
-                    rect.Stroke = Brushes.Transparent;
-                    rect.Fill = Brushes.Green;
-                    rect.Opacity = 0.7;
-                    rect.StrokeThickness = 2;
+                    for (int x = -1; x < sizeX; x++) // start from -1 for row index line
+                    {
+                        Rectangle rect = new Rectangle();
+                        rect.Width = chipWidth;
+                        rect.Height = chipHeight;
+                        Canvas.SetLeft(rect, originPt.X + (chipWidth * (x + 1)));
+                        Canvas.SetTop(rect, originPt.Y + (chipHeight * (y + 1)));
 
-                    if (waferMap.Data[y * sizeX + x] == 0) // No Chip
-                        rect.Fill = Brushes.DimGray;
-                    else
-                        rect.Fill = Brushes.Green;
+                        rect.Tag = new CPoint(x + 1, y + 1);
+                        rect.Stroke = Brushes.Transparent;
+                        rect.Opacity = 0.7;
+                        rect.StrokeThickness = 2;
 
-                    Canvas.SetZIndex(rect, 99);
-                    rect.MouseLeftButtonDown += ChipMouseLeftButtonDown;
-                    rect.MouseMove += ChipMouseMove;
+                        if (x == -1 || y == -1)
+                        {
+                            rect.Fill = Brushes.Blue;
 
-                    ChipItems.Add(rect);
+                            if (x == -1 && y != -1)
+                            {
+                                rect.ToolTip = string.Format("{0}", y + 1); // row index
+                            }
+                            else if (x != -1 && y == -1)
+                            {
+                                rect.ToolTip = string.Format("{0}", x + 1); // column index
+                            }
+                        }
+                        else
+                        {
+                            rect.ToolTip = string.Format("({0}, {1})", x, y); // chip index
+
+                            if (waferMap.Data[y * sizeX + x] == (int)CHIP_TYPE.NO_CHIP)
+                                rect.Fill = Brushes.DimGray;
+                            else if (waferMap.Data[y * sizeX + x] == (int)CHIP_TYPE.NORMAL)
+                                rect.Fill = Brushes.Green;
+                            else if (waferMap.Data[y * sizeX + x] == (int)CHIP_TYPE.FLAT_ZONE)
+                                rect.Fill = Brushes.Maroon;
+
+                            rect.MouseLeftButtonDown += ChipMouseLeftButtonDown;
+                            rect.MouseMove += ChipMouseMove;
+                        }
+                        Canvas.SetZIndex(rect, 99);
+                        ChipItems.Add(rect);
+                    }
                 }
             }
         }
@@ -502,17 +522,17 @@ namespace Root_WIND2.UI_User
             prevPos = startPos;
             //int stride = (int)m_MapData.PartialMapSize.Height;
 
-            CHIP_TYPE type = GetRecipeChipType(startPos.X, startPos.Y);
+            CHIP_TYPE type = GetRecipeChipType(startPos.X - 1, startPos.Y - 1);
             if (this.IsDrawChecked && type == CHIP_TYPE.NO_CHIP)
             {
-                UpdateRecipeWaferMap(startPos.X, startPos.Y, CHIP_TYPE.NORMAL);
+                UpdateRecipeWaferMap(startPos.X - 1, startPos.Y - 1, CHIP_TYPE.NORMAL);
             }
-            else if (this.IsEraseChecked && type == CHIP_TYPE.NORMAL)
+            else if (this.IsEraseChecked && type != CHIP_TYPE.NO_CHIP)
             {
-                UpdateRecipeWaferMap(startPos.X, startPos.Y, CHIP_TYPE.NO_CHIP);
+                UpdateRecipeWaferMap(startPos.X - 1, startPos.Y - 1, CHIP_TYPE.NO_CHIP);
             }
 
-            selected.Fill = ChipTypeToBrush(GetRecipeChipType(startPos.X, startPos.Y));
+            selected.Fill = ChipTypeToBrush(GetRecipeChipType(startPos.X - 1, startPos.Y - 1));
         }
 
         private void ChipMouseMove(object sender, MouseEventArgs e)
@@ -528,17 +548,17 @@ namespace Root_WIND2.UI_User
                     prevPos.X = movingPos.X;
                     prevPos.Y = movingPos.Y;
 
-                    CHIP_TYPE type = GetRecipeChipType(movingPos.X, movingPos.Y);
+                    CHIP_TYPE type = GetRecipeChipType(movingPos.X - 1, movingPos.Y - 1);
                     if (this.IsDrawChecked && type == CHIP_TYPE.NO_CHIP)
                     {
-                        UpdateRecipeWaferMap(startPos.X, startPos.Y, CHIP_TYPE.NORMAL);
+                        UpdateRecipeWaferMap(startPos.X - 1, startPos.Y - 1, CHIP_TYPE.NORMAL);
                     }
-                    else if (this.IsEraseChecked && type == CHIP_TYPE.NORMAL)
+                    else if (this.IsEraseChecked && type != CHIP_TYPE.NO_CHIP)
                     {
-                        UpdateRecipeWaferMap(startPos.X, startPos.Y, CHIP_TYPE.NO_CHIP);
+                        UpdateRecipeWaferMap(startPos.X - 1, startPos.Y - 1, CHIP_TYPE.NO_CHIP);
                     }
 
-                    selected.Fill = ChipTypeToBrush(GetRecipeChipType(movingPos.X, movingPos.Y));
+                    selected.Fill = ChipTypeToBrush(GetRecipeChipType(movingPos.X - 1, movingPos.Y - 1));
                 }
             }
         }
@@ -618,6 +638,8 @@ namespace Root_WIND2.UI_User
                     return Brushes.DimGray;
                 case CHIP_TYPE.NORMAL:
                     return Brushes.Green;
+                case CHIP_TYPE.FLAT_ZONE:
+                    return Brushes.Maroon;
             }
             return Brushes.DimGray;
             #endregion
