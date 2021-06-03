@@ -28,8 +28,6 @@ namespace RootTools.Gem
 
         string SendCarrierPresentSensor(GemCarrierBase carrier, bool bPresent);
 
-        string SendCarrierPIOSignal(GemCarrierBase Carrier, bool bOn);
-
         void SendCarrierOn(GemCarrierBase carrier, bool bOn);
 
         void SendCarrierID(GemCarrierBase carrier, string sCarrierID);

@@ -737,48 +737,14 @@ namespace RootTools.Gem.XGem
             return LogSend(nError, "CMSSetCarrierOnOff", carrier.p_sLocID, nPresent);
         }
 
-        public enum ePIOSignal
-        {
-            Valid = 1,
-            CS_0,
-            CS_1,
-            TR_REQ,
-            L_REQ,
-            U_REQ,
-            READY,
-            BUSY,
-            COMPT,
-            CONT,
-            H0_AVBL,
-            ES
-        }
-
-        public string SendCarrierPIOSignal(GemCarrierBase carrier, bool bPIOReadyOn)
-        {
-            if (carrier.p_eAccessLP != GemCarrierBase.eAccessLP.Auto) return "Invalid Carrier PIO Signal When AccessLP = Manual";
-            long bOn = bPIOReadyOn ? 1 : 0;
-            //long nError = m_xGem.CMSSetPIOSignalState(carrier.p_sLocID, (long)ePIOSignal.READY, bOn);
-            long nError = m_xGem.CMSSetCarrierOnOff(carrier.p_sLocID, bOn);
-
-            return LogSend(nError, "CMSSetCarrierOnOff", carrier.p_sLocID, bOn);
-        }
-
         public void SendCarrierOn(GemCarrierBase carrier, bool bOn)
         {
             long nOn = bOn ? 1 : 0;
             //long nError = m_xGem.CMSSetCarrierOnOff(carrier.p_sLocID, nOn);
             
-            if (carrier.p_eAccessLP == GemCarrierBase.eAccessLP.Manual)
-            {
-                long nError = m_xGem.CMSSetPresenceSensor(carrier.p_sLocID, nOn);
-                LogSend(nError, "CMSSetPresenceSensor", carrier.p_sLocID, nOn);
-            }
-            else
-            {
-                long nError = m_xGem.CMSSetPIOSignalState(carrier.p_sLocID, (long)ePIOSignal.READY, nOn);
-                LogSend(nError, "CMSSetPIOSignalState", carrier.p_sLocID, nOn);
-            }
-                        
+            long nError = m_xGem.CMSSetPresenceSensor(carrier.p_sLocID, nOn);
+            LogSend(nError, "CMSSetPresenceSensor", carrier.p_sLocID, nOn);
+            
             if (nOn == 1)
             {
                 carrier.m_bReqLoad = true;
