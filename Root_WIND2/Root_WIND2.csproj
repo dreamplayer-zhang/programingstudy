@@ -379,6 +379,10 @@
       <DependentUpon>RecipeWizardPanel.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI_User\RecipeWizardPanel_ViewModel.cs" />
+    <Compile Include="UI_User\HOME\SequenceRecipe.xaml.cs">
+      <DependentUpon>SequenceRecipe.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI_User\HOME\SequenceRecipe_ViewModel.cs" />
     <Compile Include="UI_User\Setup.xaml.cs">
       <DependentUpon>Setup.xaml</DependentUpon>
     </Compile>
@@ -826,6 +830,10 @@
     <Page Include="UI_User\RecipeWizardPanel.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI_User\HOME\SequenceRecipe.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UI_User\Setup.xaml">
       <SubType>Designer</SubType>

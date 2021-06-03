@@ -884,51 +884,51 @@ namespace RootTools
                             {
                                 if (p_ImageData.m_eMode == ImageData.eMode.MemoryRead)
                                 {
-                                    Image<Rgb, byte> view = new Image<Rgb, byte>(p_CanvasWidth, p_CanvasHeight);
-                                    IntPtr ptrMemR = p_ImageData.GetPtr(0);
-                                    IntPtr ptrMemG = p_ImageData.GetPtr(1);
-                                    IntPtr ptrMemB = p_ImageData.GetPtr(2);
+                                    //Image<Rgb, byte> view = new Image<Rgb, byte>(p_CanvasWidth, p_CanvasHeight);
+                                    //IntPtr ptrMemR = p_ImageData.GetPtr(0);
+                                    //IntPtr ptrMemG = p_ImageData.GetPtr(1);
+                                    //IntPtr ptrMemB = p_ImageData.GetPtr(2);
 
 
-                                    if (ptrMemR == IntPtr.Zero)
-                                        return;
+                                    //if (ptrMemR == IntPtr.Zero)
+                                    //    return;
 
-                                    byte[,,] viewPtr = view.Data;
-                                    byte* imageptrR = (byte*)ptrMemR.ToPointer();
-                                    byte* imageptrG = (byte*)ptrMemG.ToPointer();
-                                    byte* imageptrB = (byte*)ptrMemB.ToPointer();
+                                    //byte[,,] viewPtr = view.Data;
+                                    //byte* imageptrR = (byte*)ptrMemR.ToPointer();
+                                    //byte* imageptrG = (byte*)ptrMemG.ToPointer();
+                                    //byte* imageptrB = (byte*)ptrMemB.ToPointer();
 
-                                    int viewrectY = p_View_Rect.Y;
-                                    int viewrectX = p_View_Rect.X;
-                                    int viewrectHeight = p_View_Rect.Height;
-                                    int viewrectWidth = p_View_Rect.Width;
-                                    int sizeX = p_ImageData.p_Size.X;
+                                    //int viewrectY = p_View_Rect.Y;
+                                    //int viewrectX = p_View_Rect.X;
+                                    //int viewrectHeight = p_View_Rect.Height;
+                                    //int viewrectWidth = p_View_Rect.Width;
+                                    //int sizeX = p_ImageData.p_Size.X;
 
-                                    if (imageptrR == null)
-                                        return;
-                                    if (imageptrG == null)
-                                        return;
-                                    if (imageptrB == null)
-                                        return;
-                                    Parallel.For(0, p_CanvasHeight, (yy) =>
-                                    {
-                                        {
-                                            long pix_y = viewrectY + yy * viewrectHeight / p_CanvasHeight;
-                                            for (int xx = 0; xx < p_CanvasWidth; xx++)
-                                            {
-                                                long pix_x = viewrectX + xx * viewrectWidth / p_CanvasWidth;
+                                    //if (imageptrR == null)
+                                    //    return;
+                                    //if (imageptrG == null)
+                                    //    return;
+                                    //if (imageptrB == null)
+                                    //    return;
+                                    //Parallel.For(0, p_CanvasHeight, (yy) =>
+                                    //{
+                                    //    {
+                                    //        long pix_y = viewrectY + yy * viewrectHeight / p_CanvasHeight;
+                                    //        for (int xx = 0; xx < p_CanvasWidth; xx++)
+                                    //        {
+                                    //            long pix_x = viewrectX + xx * viewrectWidth / p_CanvasWidth;
 
-                                                if (pix_x + (long)pix_y * sizeX >= 0)
-                                                {
-                                                    viewPtr[yy, xx, 0] = ApplyContrastAndBrightness(imageptrR[pix_x + (long)pix_y * sizeX]);
-                                                    viewPtr[yy, xx, 1] = ApplyContrastAndBrightness(imageptrG[pix_x + (long)pix_y * sizeX]);
-                                                    viewPtr[yy, xx, 2] = ApplyContrastAndBrightness(imageptrB[pix_x + (long)pix_y * sizeX]);
-                                                }
-                                            }
-                                        }
-                                    });
+                                    //            if (pix_x + (long)pix_y * sizeX >= 0)
+                                    //            {
+                                    //                viewPtr[yy, xx, 0] = ApplyContrastAndBrightness(imageptrR[pix_x + (long)pix_y * sizeX]);
+                                    //                viewPtr[yy, xx, 1] = ApplyContrastAndBrightness(imageptrG[pix_x + (long)pix_y * sizeX]);
+                                    //                viewPtr[yy, xx, 2] = ApplyContrastAndBrightness(imageptrB[pix_x + (long)pix_y * sizeX]);
+                                    //            }
+                                    //        }
+                                    //    }
+                                    //});
 
-                                    p_ImgSource = ImageHelper.ToBitmapSource(view);
+                                    //p_ImgSource = ImageHelper.ToBitmapSource(view);
                                 }
                                 else if (!isUpdate && p_ImageData.m_eMode == ImageData.eMode.ImageBuffer)
                                 {
@@ -1366,6 +1366,7 @@ namespace RootTools
                 int pix_x = 0;
                 int pix_y = 0;
 
+                
                 for (int yy = 0; yy < p_ThumbHeight; yy++)
                 {
                     pix_y = yy * p_ImageData.p_Size.Y / p_ThumbHeight;

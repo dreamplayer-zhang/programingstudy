@@ -46,6 +46,7 @@ namespace RootTools.Memory
             catch (Exception e)
             {
                 m_log.Error(p_id + " Memory Pool Create Error (ReStart PC) : " + e.Message);
+                System.Windows.Forms.MessageBox.Show(p_id + " Memory Pool Create Error(ReStart PC) : " + e.Message);
                 return true;
             }
             m_log.Info(p_id + " Memory Pool Create Done " + sw.ElapsedMilliseconds.ToString() + " ms");
@@ -62,7 +63,8 @@ namespace RootTools.Memory
                     GetAddress();
                 }
             }
-            catch { return "Open Error"; }
+            catch(Exception e)
+            { return "Open Error" + e.ToString(); }
             m_log?.Info(p_id + " Memory Pool Open Done");
             return (m_MMF != null) ? "OK" : "Error"; 
         }
