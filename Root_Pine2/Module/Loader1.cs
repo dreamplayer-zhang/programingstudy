@@ -85,7 +85,7 @@ namespace Root_Pine2.Module
             if (m_picker.p_infoStrip != null) return "Picker has InfoStrip";
             try
             {
-                boat.p_infoStrip.m_eVision = eVision;
+                boat.p_infoStrip.m_eVisionLoad = eVision;
                 boat.p_infoStrip.m_eWorks = eWorks; 
                 if (Run(RunMoveUp())) return p_sInfo;
                 if (Run(RunMoveX(eVision, eWorks))) return p_sInfo;
@@ -163,7 +163,7 @@ namespace Root_Pine2.Module
             if (EQ.p_eState != EQ.eState.Run) return "OK";
             if (m_picker.p_infoStrip != null)
             {
-                switch (m_picker.p_infoStrip.m_eVision)
+                switch (m_picker.p_infoStrip.m_eVisionLoad)
                 {
                     case Vision.eVision.Top3D: return StartUnloadBoat();
                     case Vision.eVision.Top2D: return StartUnloadTurnover(); 
