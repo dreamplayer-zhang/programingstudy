@@ -18,8 +18,11 @@ namespace Root_CAMELLIA
     {
         //Module_Camellia m_module;
         //DataManager m_DataManager;
-        
+        #region event
+        public delegate void CalibrationDone();
+        public event CalibrationDone CalDoneEvent;
 
+        #endregion
         public bool CalDone { get; set; } = false;
         public bool InItCalDone { get; set; } = false;
         public string ErrorString { get; set; } = "OK";
@@ -106,6 +109,9 @@ namespace Root_CAMELLIA
             {
                 CalDone = true;
             }
+
+            if (CalDoneEvent != null)
+                CalDoneEvent();
         }
     }
 }
