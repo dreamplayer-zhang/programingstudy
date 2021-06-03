@@ -85,8 +85,14 @@ namespace Root_WIND2.UI_User
 				Progress = 0;
 
 				if (GlobalObjects.Instance.GetNamed<WorkManager>("edgeInspection") != null)
+				{
+					WIND2_Engineer engineer = GlobalObjects.Instance.Get<WIND2_Engineer>();
+					RecipeEdge recipeEdge = GlobalObjects.Instance.Get<RecipeEdge>();
+					CameraInfo camInfo = DataConverter.GrabModeToCameraInfo(engineer.m_handler.p_EdgeSideVision.GetGrabMode(recipeEdge.CameraInfoIndex));
+
+					GlobalObjects.Instance.GetNamed<WorkManager>("edgeInspection").SetCameraInfo(camInfo);
 					GlobalObjects.Instance.GetNamed<WorkManager>("edgeInspection").Start();
-				
+				}
 				return;
 			});
 		}
@@ -146,12 +152,6 @@ namespace Root_WIND2.UI_User
 				GlobalObjects.Instance.GetNamed<WorkManager>("edgeInspection").InspectionDone += EdgesideInspect_ViewModel_InspectionDone; ;
 				GlobalObjects.Instance.GetNamed<WorkManager>("edgeInspection").IntegratedProcessDefectDone += EdgesideInspect_ViewModel_IntegratedProcessDefectDone; ;
 			}
-
-			//if (GlobalObjects.Instance.GetNamed<WorkManager>("edgeTopInspection") != null)
-			//{
-			//	GlobalObjects.Instance.GetNamed<WorkManager>("edgeTopInspection").InspectionDone += WorkEventManager_InspectionDone;
-			//	GlobalObjects.Instance.GetNamed<WorkManager>("edgeTopInspection").IntegratedProcessDefectDone += WorkEventManager_IntegratedProcessDefectDone;
-			//}
 		}
 		private void EdgesideInspect_ViewModel_InspectionStart(object sender, InspectionStartArgs e)
 		{
@@ -208,23 +208,24 @@ namespace Root_WIND2.UI_User
 
 			foreach (RootTools.Database.Defect defect in workplace.DefectList)
 			{
-				//String text = "";
+				String text = "";
 
-				//if (defect.m_nChipIndexX == (int)EdgeSurface.EdgeMapPositionX.Top)
-				//{
-				//	rectListTop.Add(new CRect((int)defect.p_rtDefectBox.Left, (int)defect.p_rtDefectBox.Top, (int)defect.p_rtDefectBox.Right, (int)defect.p_rtDefectBox.Bottom));
-				//	textListTop.Add(text);
-				//}
-				//else if (defect.m_nChipIndexX == (int)EdgeSurface.EdgeMapPositionX.Side)
-				//{
-				//	rectListSide.Add(new CRect((int)defect.p_rtDefectBox.Left, (int)defect.p_rtDefectBox.Top, (int)defect.p_rtDefectBox.Right, (int)defect.p_rtDefectBox.Bottom));
-				//	textListSide.Add(text);
-				//}
-				//else if (defect.m_nChipIndexX == (int)EdgeSurface.EdgeMapPositionX.Btm)
-				//{
-				//	rectListBtm.Add(new CRect((int)defect.p_rtDefectBox.Left, (int)defect.p_rtDefectBox.Top, (int)defect.p_rtDefectBox.Right, (int)defect.p_rtDefectBox.Bottom));
-				//	textListBtm.Add(text);
-				//}
+				int index = (defect.m_nDefectCode - 10000) / 100;
+				if (index >= 0 && index < 3)
+				{
+					rectListTop.Add(new CRect((int)defect.p_rtDefectBox.Left, (int)defect.p_rtDefectBox.Top, (int)defect.p_rtDefectBox.Right, (int)defect.p_rtDefectBox.Bottom));
+					textListTop.Add(text);
+				}
+				if (index >= 3 && index < 6)
+				{
+					rectListBtm.Add(new CRect((int)defect.p_rtDefectBox.Left, (int)defect.p_rtDefectBox.Top, (int)defect.p_rtDefectBox.Right, (int)defect.p_rtDefectBox.Bottom));
+					textListBtm.Add(text);
+				}
+				if (index >= 6 && index < 10)
+				{
+					rectListSide.Add(new CRect((int)defect.p_rtDefectBox.Left, (int)defect.p_rtDefectBox.Top, (int)defect.p_rtDefectBox.Right, (int)defect.p_rtDefectBox.Bottom));
+					textListSide.Add(text);
+				}
 			}
 
 			Application.Current.Dispatcher.Invoke(DispatcherPriority.Normal, new Action(delegate
@@ -232,9 +233,9 @@ namespace Root_WIND2.UI_User
 				DatabaseManager.Instance.SelectData();
 				dataViewerVM.pDataTable = DatabaseManager.Instance.pDefectTable;
 
-				//DrawRectDefect(ImageViewerTopVM, rectListTop, textListTop);
-				//DrawRectDefect(imageViewerSideVM, rectListSide, textListSide);
-				//DrawRectDefect(ImageViewerBtmVM, rectListBtm, textListBtm);
+				DrawRectDefect(ImageViewerTopVM, rectListTop, textListTop);
+				DrawRectDefect(imageViewerSideVM, rectListSide, textListSide);
+				DrawRectDefect(ImageViewerBtmVM, rectListBtm, textListBtm);
 
 				Progress = 100;
 				Percentage = "Done";

@@ -254,6 +254,18 @@ namespace Root_Pine2.Module
                 OnPropertyChanged(); 
             }
         }
+
+        bool _b3D = true; 
+        public bool p_b3D
+        {
+            get { return _b3D; }
+            set
+            {
+                if (_b3D == value) return;
+                _b3D = value;
+                OnPropertyChanged(); 
+            }
+        }
         #endregion
 
         #region Thread DIO

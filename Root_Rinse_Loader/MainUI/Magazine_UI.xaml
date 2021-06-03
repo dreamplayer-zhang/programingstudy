@@ -20,8 +20,15 @@
                     <RowDefinition Height="*"/>
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
-                <GroupBox Grid.Row="0" Header="" Style="{StaticResource group}" Margin="5,10" BorderThickness="0">
-                    <Button x:Name="buttonNew" Content="New" Margin="5,0" FontSize="30" FontWeight="Bold" FontFamily="Arial" BorderBrush="{x:Null}" Click="buttonNew_Click"/>
+                <GroupBox Grid.Row="0" Header="New" Style="{StaticResource group}" Margin="5,10" BorderThickness="0">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Button Grid.Column="0" x:Name="buttonNew" Content="Loader" Margin="5,0" FontSize="24" FontWeight="Bold" FontFamily="Arial" BorderBrush="{x:Null}" Click="buttonNew_Click"/>
+                        <Button Grid.Column="1" x:Name="buttonNewUnloader" Content="Unloader" Margin="5,0" FontSize="24" FontWeight="Bold" FontFamily="Arial" BorderBrush="{x:Null}" Click="buttonNewUnloader_Click"/>
+                    </Grid>
                 </GroupBox>
                 <GroupBox Grid.Row="1" Header="Magazine" Style="{StaticResource group}" Margin="5,10" BorderThickness="0">
                     <ComboBox x:Name="comboBoxMagazine" SelectedValue="{Binding p_eMagazine}" Margin="5,0" FontSize="30" FontWeight="Bold" FontFamily="Arial" BorderBrush="{x:Null}"

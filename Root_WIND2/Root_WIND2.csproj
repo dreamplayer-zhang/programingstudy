@@ -213,7 +213,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="Constants.cs" />
+    <Compile Include="Tools\Constants.cs" />
     <Compile Include="Controls\UserControl\ColorPicker.xaml.cs">
       <DependentUpon>ColorPicker.xaml</DependentUpon>
     </Compile>
@@ -228,7 +228,7 @@
     </Compile>
     <Compile Include="Controls\UserControl\ViewModel\MapControl_ViewModel.cs" />
     <Compile Include="Controls\UserControl\ViewModel\FeatureControl_ViewModel.cs" />
-    <Compile Include="DataConverter.cs" />
+    <Compile Include="Tools\DataConverter.cs" />
     <Compile Include="Dialog\Dialog_Scan.xaml.cs">
       <DependentUpon>Dialog_Scan.xaml</DependentUpon>
     </Compile>
@@ -260,6 +260,8 @@
     <Compile Include="Module\Vision\Run_AutoFocus.cs" />
     <Compile Include="Module\Vision\Run_VisionAlign.cs" />
     <Compile Include="MVVM\SizeObserver.cs" />
+    <Compile Include="Tools\KlarfFileTransfer.cs" />
+    <Compile Include="Tools\PositionConverter.cs" />
     <Compile Include="Recipe\RecipeBack.cs" />
     <Compile Include="Recipe\RecipeEBR.cs" />
     <Compile Include="Recipe\RecipeEdge.cs" />
@@ -298,8 +300,8 @@
     <Compile Include="UI_User\CAMERA\CameraVRS.xaml.cs">
       <DependentUpon>CameraVRS.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI_User\CAMERA\CameraVRS_ImageViewer_ViewModel.cs" />
-    <Compile Include="UI_User\CAMERA\CameraVRS_ViewModel.cs" />
+    <Compile Include="UI_User\CAMERA\ViewModels\CameraVRS_ImageViewer_ViewModel.cs" />
+    <Compile Include="UI_User\CAMERA\ViewModels\CameraVRS_ViewModel.cs" />
     <Compile Include="UI_User\CAMERA\MotionViewer\MotionController.xaml.cs">
       <DependentUpon>MotionController.xaml</DependentUpon>
     </Compile>
@@ -378,6 +380,10 @@
       <DependentUpon>RecipeWizardPanel.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI_User\RecipeWizardPanel_ViewModel.cs" />
+    <Compile Include="UI_User\HOME\SequenceRecipe.xaml.cs">
+      <DependentUpon>SequenceRecipe.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI_User\HOME\SequenceRecipe_ViewModel.cs" />
     <Compile Include="UI_User\Setup.xaml.cs">
       <DependentUpon>Setup.xaml</DependentUpon>
     </Compile>
@@ -825,6 +831,10 @@
     <Page Include="UI_User\RecipeWizardPanel.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI_User\HOME\SequenceRecipe.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UI_User\Setup.xaml">
       <SubType>Designer</SubType>

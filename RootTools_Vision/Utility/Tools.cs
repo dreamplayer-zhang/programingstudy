@@ -94,7 +94,7 @@ namespace RootTools_Vision
             }
         }
               
-        public unsafe static Bitmap CovertBufferToBitmap(SharedBufferInfo info, Rect rect)
+        public unsafe static Bitmap CovertBufferToBitmap(SharedBufferInfo info, Rect rect, int outSizeX = 0, int outSizeY = 0)
         {
             try
             {
@@ -102,10 +102,23 @@ namespace RootTools_Vision
                 int _width = info.Width;
                 int _height = info.Height;
 
-                int rtHeight = (int)rect.Height;
-                int rtWidth = (int)rect.Width;
-                int left = (int)rect.Left;
-                int top = (int)rect.Top;
+                int roiWidth = (int)rect.Width;
+                int roiHeight = (int)rect.Height;
+
+                double samplingX = 1;
+                double samplingY = 1;
+                if (outSizeX != 0 && outSizeY != 0)
+                {
+                    if (outSizeX > roiWidth) outSizeX = roiWidth;
+                    if (outSizeY > roiHeight) outSizeY = roiHeight;
+
+                    roiWidth = outSizeX;
+                    roiHeight = outSizeY;
+
+                    samplingX = Math.Floor((double)(int)rect.Width / outSizeX);
+                    samplingY = Math.Floor((double)(int)rect.Height / outSizeY);
+                }
+
 
                 System.Drawing.Imaging.PixelFormat format = System.Drawing.Imaging.PixelFormat.Format8bppIndexed;
                 if (_byteCount == 1)
@@ -123,7 +136,7 @@ namespace RootTools_Vision
                 }
 
                 int stride = (int)Math.Ceiling((double)_width / 4) * 4;
-                Bitmap bmp = new Bitmap(rtWidth, rtHeight, format);
+                Bitmap bmp = new Bitmap((int)roiWidth, roiHeight, format);
 
                 ColorPalette palette = bmp.Palette;
 
@@ -135,7 +148,8 @@ namespace RootTools_Vision
                     bmp.Palette = palette;
                 }
 
-                BitmapData bmpData = bmp.LockBits(new Rectangle(0, 0, rtWidth, rtHeight), ImageLockMode.WriteOnly, format);
+
+                BitmapData bmpData = bmp.LockBits(new Rectangle(0, 0, (int)roiWidth, (int)roiHeight), ImageLockMode.WriteOnly, format);
 
                 IntPtr pointer = bmpData.Scan0;
                 if (_byteCount == 1)
@@ -163,18 +177,18 @@ namespace RootTools_Vision
                         pG += (int)rect.Left;
                         pB += (int)rect.Left;
 
-                        for (int i = 0; i < rect.Height; i++)
+                        for (long i = 0; i <roiHeight ; i++)
                         {
-                            for (int j = 0; j < rect.Width; j++)
+                            for (long j = 0; j < roiWidth; j++)
                             {
-                                pDst[i * (bmpData.Stride) + j * _byteCount + 0] = *(pB + j);
-                                pDst[i * (bmpData.Stride) + j * _byteCount + 1] = *(pG + j);
-                                pDst[i * (bmpData.Stride) + j * _byteCount + 2] = *(pR + j);
+                                pDst[(long)((long)i * (bmpData.Stride) + (long)j * _byteCount + 0)] = *(pB + (long)(j * samplingX));
+                                pDst[(long)((long)i * (bmpData.Stride) + (long)j * _byteCount + 1)] = *(pG + (long)(j * samplingX));
+                                pDst[(long)((long)i * (bmpData.Stride) + (long)j * _byteCount + 2)] = *(pR + (long)(j * samplingX));
                             }
 
-                            pR += info.Width;
-                            pG += info.Width;
-                            pB += info.Width;
+                            pR += (long)(info.Width * samplingY);
+                            pG += (long)(info.Width * samplingY);
+                            pB += (long)(info.Width * samplingY);
                         }
                     }
                 }
@@ -188,6 +202,7 @@ namespace RootTools_Vision
             }
             return null;
         }
+
 
         public static Bitmap CovertArrayToBitmap(byte[] rawdata, int _width, int _height, int _byteCount)
         {
@@ -432,9 +447,9 @@ namespace RootTools_Vision
             return null;
         }
         
-        public static bool SaveImageJpg(SharedBufferInfo info, Rect rect, string savePath, long compressRatio)
+        public static bool SaveImageJpg(SharedBufferInfo info, Rect rect, string savePath, long compressRatio, int outSizeX = 0, int outSizeY = 0)
         {
-            Bitmap bmp = CovertBufferToBitmap(info, rect);
+            Bitmap bmp = CovertBufferToBitmap(info, rect, outSizeX, outSizeY);
 
             SaveImageJpg(bmp, savePath, compressRatio);
 
@@ -711,7 +726,7 @@ namespace RootTools_Vision
                     if (byteDst == null)
                         return;
 
-                    Marshal.Copy(new IntPtr(ptrSrc.ToInt64() + (i * (Int64)srcStride + left)), byteDst, width * (i - top), width);
+                    Marshal.Copy((IntPtr)((long)ptrSrc + (long)(i * srcStride + left)), byteDst, width * (i - top), width);
 
                 });
 
@@ -745,6 +760,19 @@ namespace RootTools_Vision
             }
 
             return defects;
+        }
+
+        public static Defect DataRowToDefect(DataRow row)
+        {            
+            FieldInfo[] fields = typeof(Defect).GetFields();
+
+            Defect defect = new Defect();
+            foreach (FieldInfo info in fields)
+            {
+                info.SetValue(defect, Convert.ChangeType(row[info.Name], info.FieldType));
+            }
+
+            return defect;
         }
     }
 }

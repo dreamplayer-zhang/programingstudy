@@ -257,7 +257,7 @@ namespace Root_WIND2
 
                 if (frontImage.GetPtr() != IntPtr.Zero)
                 {
-                    RootTools_Vision.WorkManager3.WorkManager frontInspection = GlobalObjects.Instance.RegisterNamed<RootTools_Vision.WorkManager3.WorkManager>("frontInspection", 4);
+                    RootTools_Vision.WorkManager3.WorkManager frontInspection = GlobalObjects.Instance.RegisterNamed<RootTools_Vision.WorkManager3.WorkManager>("frontInspection", 4, true);
 
                     frontInspection.SetRecipe(recipeFront);
                     frontInspection.SetSharedBuffer(new SharedBufferInfo(
@@ -304,7 +304,7 @@ namespace Root_WIND2
                 }
                 else
                 {
-                    RootTools_Vision.WorkManager3.WorkManager backInspection = GlobalObjects.Instance.RegisterNamed<RootTools_Vision.WorkManager3.WorkManager>("backInspection", 4);
+                    RootTools_Vision.WorkManager3.WorkManager backInspection = GlobalObjects.Instance.RegisterNamed<RootTools_Vision.WorkManager3.WorkManager>("backInspection", 4, true);
 
                     backInspection.SetRecipe(recipeBack);
                     backInspection.SetSharedBuffer(new SharedBufferInfo(

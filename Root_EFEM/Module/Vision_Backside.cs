@@ -51,22 +51,25 @@ namespace Root_EFEM.Module
 
         public override void GetTools(bool bInit)
         {
-            p_sInfo = m_toolBox.GetAxis(ref axisZ, this, "Axis Z");
-            p_sInfo = m_toolBox.GetAxis(ref axisXY, this, "Axis XY");
-            p_sInfo = m_toolBox.GetDIO(ref doVac, this, "Stage Vacuum");
-            p_sInfo = m_toolBox.GetDIO(ref doBlow, this, "Stage Blow");
-            p_sInfo = m_toolBox.GetDIO(ref diWaferExist, this, "Wafer Exist");
-            p_sInfo = m_toolBox.GetDIO(ref diWaferExistVac, this, "Wafer Exist Vac Check");
+            if (p_eRemote != eRemote.Client)
+            {
+                p_sInfo = m_toolBox.GetAxis(ref axisZ, this, "Axis Z");
+                p_sInfo = m_toolBox.GetAxis(ref axisXY, this, "Axis XY");
+                p_sInfo = m_toolBox.GetDIO(ref doVac, this, "Stage Vacuum");
+                p_sInfo = m_toolBox.GetDIO(ref doBlow, this, "Stage Blow");
+                p_sInfo = m_toolBox.GetDIO(ref diWaferExist, this, "Wafer Exist");
+                p_sInfo = m_toolBox.GetDIO(ref diWaferExistVac, this, "Wafer Exist Vac Check");
 
+                p_sInfo = m_toolBox.Get(ref lightSet, this);
+                p_sInfo = m_toolBox.GetCamera(ref camMain, this, "MainCam");
+                p_sInfo = m_toolBox.GetCamera(ref camLADS, this, "LADSCam");
+                if (camLADS != null)
+                    camLADS.Connect();
+            }
             p_sInfo = m_toolBox.Get(ref memoryPool, this, "Memory", 1);
-            p_sInfo = m_toolBox.Get(ref lightSet, this);
-            p_sInfo = m_toolBox.GetCamera(ref camMain, this, "MainCam");
-            p_sInfo = m_toolBox.GetCamera(ref camLADS, this, "LADSCam");
             memoryGroup = memoryPool.GetGroup(p_id);
             alid_WaferExist = m_gaf.GetALID(this, "Wafer Exist", "Wafer Exist");
-
-            if (camLADS != null)
-                camLADS.Connect();
+            m_remote.GetTools(bInit);
         }
         #endregion
 
@@ -204,6 +207,11 @@ namespace Root_EFEM.Module
 
         public string IsGetOK(int nID)
         {
+            if (p_eRemote == eRemote.Client)
+            {
+                return "OK";
+            }
+
             if (p_eState != eState.Ready)
                 return p_id + " eState not Ready";
             //if (p_infoWafer == null)
@@ -213,6 +221,11 @@ namespace Root_EFEM.Module
 
         public string IsPutOK(InfoWafer infoWafer, int nID)
         {
+            if (p_eRemote == eRemote.Client)
+            {
+                return "OK";
+            }
+
             if (p_eState != eState.Ready)
                 return p_id + " eState not Ready";
             //if (p_infoWafer != null)
@@ -231,16 +244,26 @@ namespace Root_EFEM.Module
 
         public string BeforeGet(int nID)
         {
-            //            string info = MoveReadyPos();
-            //            if (info != "OK") return info;
-            return "OK";
+            if (p_eRemote == eRemote.Client)
+                return RemoteRun(eRemoteRun.BeforeGet, eRemote.Client, nID);
+            else
+            {
+                return "FALSE";
+                //if (p_infoWafer == null) return m_id + " BeforeGet : InfoWafer = null";
+                //return CheckGetPut();
+            }
         }
 
         public string BeforePut(int nID)
         {
-            //            string info = MoveReadyPos();
-            //            if (info != "OK") return info;
-            return "OK";
+            if (p_eRemote == eRemote.Client)
+                return RemoteRun(eRemoteRun.BeforePut, eRemote.Client, nID);
+            else
+            {
+                // Move to Ready Pos ?
+                // Vacuum Off ?
+                return "OK";
+            }
         }
 
         public string AfterGet(int nID)
@@ -250,8 +273,8 @@ namespace Root_EFEM.Module
 
         public string AfterPut(int nID)
         {
-            if (!diWaferExist.p_bIn || !diWaferExistVac.p_bIn)
-                alid_WaferExist.Run(true, "Wafer Check Error");
+            //if (!diWaferExist.p_bIn || !diWaferExistVac.p_bIn)
+            //    alid_WaferExist.Run(true, "Wafer Check Error");
             return "OK";
         }
 
@@ -308,22 +331,26 @@ namespace Root_EFEM.Module
         {
             if (EQ.p_bSimulate)
                 return "OK";
-            //            p_bStageBlow = false;
-            //            p_bStageVac = true;
-            Thread.Sleep(200);
+            if (p_eRemote == eRemote.Client) return RemoteRun(eRemoteRun.StateHome, eRemote.Client, null);
+            else
+            {
+                //            p_bStageBlow = false;
+                //            p_bStageVac = true;
+                Thread.Sleep(200);
 
-            if (camMain != null && camMain.p_CamInfo.p_eState == eCamState.Init)
-                camMain.Connect();
+                if (camMain != null && camMain.p_CamInfo.p_eState == eCamState.Init)
+                    camMain.Connect();
 
 
-            base.StateHome();
+                base.StateHome();
 
-            p_eState = (p_sInfo == "OK") ? eState.Ready : eState.Error;
+                p_eState = (p_sInfo == "OK") ? eState.Ready : eState.Error;
 
-            if (diWaferExist.p_bIn == false)
-                p_bStageVac = false;
+                if (diWaferExist.p_bIn == false)
+                    p_bStageVac = false;
 
-            return p_sInfo;
+                return p_sInfo;
+            }
         }
         #endregion
 
@@ -339,6 +366,7 @@ namespace Root_EFEM.Module
         #region ModuleRun
         protected override void InitModuleRuns()
         {
+            AddModuleRunList(new Run_Remote(this), true, "Remote Run");
             AddModuleRunList(new Run_GrabBackside(this), true, "Run Grab Backside");
             //AddModuleRunList(new Run_LADS(this), true, "Run LADS");
             AddModuleRunList(new Run_InspectBackside(this), true, "Run BackInspection");
@@ -350,18 +378,137 @@ namespace Root_EFEM.Module
         }
         #endregion
 
-        public Vision_Backside(string id, IEngineer engineer)
+        public Vision_Backside(string id, IEngineer engineer, eRemote remote)
         {
-            base.InitBase(id, engineer);
+            base.InitBase(id, engineer, remote);
             m_waferSize = new InfoWafer.WaferSize(id, false, false);
             ladsinfos = new List<List<double>>();
+            OnChangeState += Backside_OnChangeState;
             InitMemorys();
         }
+
+        private void Backside_OnChangeState(eState eState)
+        {
+            switch (p_eState)
+            {
+                case eState.Init:
+                case eState.Error:
+                    RemoteRun(eRemoteRun.ServerState, eRemote.Server, eState);
+                    break;
+            }
+        }
+
 
         public override void ThreadStop()
         {
             base.ThreadStop();
         }
+
+        #region RemoteRun
+        public enum eRemoteRun
+        {
+            ServerState,
+            StateHome,
+            Reset,
+            BeforeGet,
+            BeforePut,
+        }
+
+        Run_Remote GetRemoteRun(eRemoteRun eRemoteRun, eRemote eRemote, dynamic value)
+        {
+            Run_Remote run = new Run_Remote(this);
+            run.m_eRemoteRun = eRemoteRun;
+            run.m_eRemote = eRemote;
+            switch (eRemoteRun)
+            {
+                case eRemoteRun.ServerState:
+                    run.m_eState = value;
+                    break;
+                case eRemoteRun.StateHome:
+                    break;
+                case eRemoteRun.Reset:
+                    break;
+                case eRemoteRun.BeforeGet:
+                    run.m_nSlotID = value;
+                    break;
+                case eRemoteRun.BeforePut:
+                    run.m_nSlotID = value;
+                    break;
+            }
+            return run;
+        }
+
+        string RemoteRun(eRemoteRun eRemoteRun, eRemote eRemote, dynamic value)
+        {
+            Run_Remote run = GetRemoteRun(eRemoteRun, eRemote, value);
+            StartRun(run);
+            while (run.p_eRunState != ModuleRunBase.eRunState.Done)
+            {
+                Thread.Sleep(10);
+                if (EQ.IsStop())
+                    return "EQ Stop";
+            }
+            return p_sInfo;
+        }
+
+        public class Run_Remote : ModuleRunBase
+        {
+            Vision_Backside m_module;
+            public Run_Remote(Vision_Backside module)
+            {
+                m_module = module;
+                InitModuleRun(module);
+            }
+
+            public eRemoteRun m_eRemoteRun = eRemoteRun.StateHome;
+            public eState m_eState = eState.Init;
+            public int m_nSlotID = 0;
+            public override ModuleRunBase Clone()
+            {
+                Run_Remote run = new Run_Remote(m_module);
+                run.m_eRemoteRun = m_eRemoteRun;
+                run.m_eState = m_eState;
+                run.m_nSlotID = m_nSlotID;
+                return run;
+            }
+
+            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
+            {
+                m_eRemoteRun = (eRemoteRun)tree.Set(m_eRemoteRun, m_eRemoteRun, "RemoteRun", "Select Remote Run", bVisible);
+                m_eRemote = (eRemote)tree.Set(m_eRemote, m_eRemote, "Remote", "Remote", false);
+                switch (m_eRemoteRun)
+                {
+                    case eRemoteRun.ServerState:
+                        m_eState = (eState)tree.Set(m_eState, m_eState, "State", "Module State", bVisible);
+                        break;
+                    case eRemoteRun.BeforeGet:
+                    case eRemoteRun.BeforePut:
+                        m_nSlotID = tree.Set(m_nSlotID, m_nSlotID, "SlotID", "WTRChild SlotID", bVisible);
+                        break;
+                }
+            }
+
+            public override string Run()
+            {
+                switch (m_eRemoteRun)
+                {
+                    case eRemoteRun.ServerState:
+                        m_module.p_eState = m_eState;
+                        break;
+                    case eRemoteRun.StateHome:
+                        return m_module.StateHome();
+                    case eRemoteRun.Reset:
+                        m_module.Reset();
+                        break;
+                    case eRemoteRun.BeforeGet:
+                        return m_module.BeforeGet(m_nSlotID);
+                    case eRemoteRun.BeforePut:
+                        return m_module.BeforePut(m_nSlotID);
+                }
+                return "OK";
+            }
+        }
+        #endregion
 
 
         // 210502 이전 

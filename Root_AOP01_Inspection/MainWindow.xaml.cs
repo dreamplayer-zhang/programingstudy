@@ -16,6 +16,7 @@ using RootTools.Memory;
 using Root_AOP01_Inspection.Recipe;
 using System.Collections.Generic;
 using System.Reflection;
+using RootTools.Gem.XGem;
 
 namespace Root_AOP01_Inspection
 {
@@ -367,6 +368,13 @@ namespace Root_AOP01_Inspection
 
 		private void M_timer_Tick(object sender, EventArgs e)
 		{
+			string ControlState = m_engineer.m_handler.m_aop01.m_gem.p_eControl.ToString();
+			if (ControlState == "NULL")
+            {
+				ControlState = "OFFLINE";
+            }
+			textControlState.Text = ControlState;
+
 			if (m_engineer.m_handler.m_FDC.m_aData.Count > 0)
 			{
 				try
@@ -477,9 +485,6 @@ namespace Root_AOP01_Inspection
 						}
 					}
 				}
-
-
-
 			}
 			if (check == false)
 			{
@@ -492,6 +497,21 @@ namespace Root_AOP01_Inspection
 				ViewArea.Height = new GridLength(200);
 			}
 
+		}
+
+		private void GemOffline_Click(object sender, RoutedEventArgs e)
+        {
+			m_engineer.m_handler.m_aop01.m_gem.p_eReqControl = XGem.eControl.OFFLINE;
+		}
+
+		private void GemLocal_Click(object sender, RoutedEventArgs e)
+		{
+			m_engineer.m_handler.m_aop01.m_gem.p_eReqControl = XGem.eControl.LOCAL;
+		}
+
+		private void GemOnline_Click(object sender, RoutedEventArgs e)
+		{
+			m_engineer.m_handler.m_aop01.m_gem.p_eReqControl = XGem.eControl.ONLINEREMOTE;
 		}
 
 		private void btnPopUpSetting(object sender, RoutedEventArgs e)

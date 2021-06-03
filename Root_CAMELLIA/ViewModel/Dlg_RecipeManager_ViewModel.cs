@@ -3858,6 +3858,17 @@ namespace Root_CAMELLIA
                     return false;
             }
 
+            if (isModelPathChange)
+            {
+                if (CustomMessageBox.Show("Caution!", "Model Path has been Changed! Not Saved Yet. Continue?", MessageBoxButton.OKCancel, CustomMessageBox.MessageBoxImage.Warning) == MessageBoxResult.OK)
+                {
+                    isModelPathChange = false;
+                    return true;
+                }
+                else
+                    return false;
+            }
+
             return true;
         }
 
@@ -4904,6 +4915,7 @@ namespace Root_CAMELLIA
                 {
                     p_UseThickness = false;
                 }
+                ClearData();
                 UpdateListView(false);
                 UpdateLayerGridView();
                 UpdateParameter();
@@ -4941,6 +4953,7 @@ namespace Root_CAMELLIA
                     return;
                 }
             }
+            isModelPathChange = false;
             isLayerDataChange = false;
             if (p_SettingViewModel.p_ExceptNIR)
             {
@@ -5176,6 +5189,7 @@ namespace Root_CAMELLIA
             }
         }
 
+        public bool isModelPathChange = false;
         public ICommand CmdSaveModel
         {
             get
@@ -5190,7 +5204,14 @@ namespace Root_CAMELLIA
                     }
                     if (dataManager.recipeDM.SaveModel())
                     {
-                        ModelPath = dataManager.recipeDM.TeachingRD.ModelRecipePath;
+                        if(dataManager.recipeDM.SaveRecipeRD.ModelRecipePath != dataManager.recipeDM.TeachingRD.ModelRecipePath)
+                        {
+                            if(CustomMessageBox.Show("Caution!", "Model Path has been Changed! Change the Model Path?", MessageBoxButton.OKCancel, CustomMessageBox.MessageBoxImage.Warning) == MessageBoxResult.OK)
+                            {
+                                ModelPath = dataManager.recipeDM.TeachingRD.ModelRecipePath;
+                                isModelPathChange = true;
+                            }
+                        }
                         isLayerDataChange = false;
                     }
                 });

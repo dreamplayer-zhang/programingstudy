@@ -28,34 +28,23 @@ namespace RootTools_Vision
             TableName = tableName;
         }
 
-		private EdgeSurfaceParameter parameterEdge;
-		private EdgeSurfaceRecipe recipeEdge;
-
-		private GrabModeEdge grabModeTop;
-		private GrabModeEdge grabModeSide;
-		private GrabModeEdge grabModeBtm;
-
-		public void SetGrabMode(GrabModeBase top, GrabModeBase side, GrabModeBase btm)
-		{
-			grabModeTop = (GrabModeEdge)top;
-			grabModeSide = (GrabModeEdge)side;
-			grabModeBtm = (GrabModeEdge)btm;
-		}
-
 		public override WORK_TYPE Type => WORK_TYPE.DEFECTPROCESS_ALL;
 
 		protected override bool Preparation()
 		{
-			if (this.parameterEdge == null || this.recipeEdge == null)
-			{
-				this.parameterEdge = this.parameter as EdgeSurfaceParameter;
-				this.recipeEdge = recipe.GetItem<EdgeSurfaceRecipe>();
-			}
+			//if (this.parameterEdge == null || this.recipeEdge == null)
+			//{
+			//	this.parameterEdge = this.parameter as EdgeSurfaceParameter;
+			//	this.recipeEdge = recipe.GetItem<EdgeSurfaceRecipe>();
+			//}
 			return true;
 		}
 
 		protected override bool Execution()
 		{
+			ProcessDefectEdgeParameter param = this.recipe.GetItem<ProcessDefectEdgeParameter>();
+			if (param.Use == false) return true;
+
 			DoProcessDefect_Edge();
 			return true;
 		}
@@ -64,14 +53,30 @@ namespace RootTools_Vision
 		{
 			if (this.currentWorkplace.Index != 0)
 				return;
-			
+
+			ProcessDefectEdgeParameter param = this.recipe.GetItem<ProcessDefectEdgeParameter>();
+
 			List<Defect> topDefectList = CollectDefectData(0, 2);
 			List<Defect> btmDefectList = CollectDefectData(3, 5);
 			List<Defect> sideDefectList = CollectDefectData(6, 8);
 
-			List<Defect> topMergeDefectList = Tools.MergeDefect(topDefectList, this.recipe.GetItem<EdgeSurfaceParameter>().EdgeParamBaseTop.MergeDist);
-			List<Defect> btmMergeDefectList = Tools.MergeDefect(btmDefectList, this.recipe.GetItem<EdgeSurfaceParameter>().EdgeParamBaseBtm.MergeDist);
-			List<Defect> sideMergeDefectList = Tools.MergeDefect(sideDefectList, this.recipe.GetItem<EdgeSurfaceParameter>().EdgeParamBaseSide.MergeDist);
+			List<Defect> topMergeDefectList;
+			List<Defect> btmMergeDefectList;
+			List<Defect> sideMergeDefectList;
+
+			if (param.UseMergeDefect)
+			{
+				// merge할 때 각도 (RelY) 값 바뀜
+				topMergeDefectList = Tools.MergeDefect(topDefectList, param.MergeDefectDistnace);
+				btmMergeDefectList = Tools.MergeDefect(btmDefectList, param.MergeDefectDistnace);
+				sideMergeDefectList = Tools.MergeDefect(sideDefectList, param.MergeDefectDistnace);
+			}
+			else
+			{
+				topMergeDefectList = topDefectList;
+				btmMergeDefectList = btmDefectList;
+				sideMergeDefectList = sideDefectList;
+			}
 
 			List<Defect> mergeDefectList = new List<Defect>();
 			foreach (Defect defect in topMergeDefectList)
@@ -91,7 +96,7 @@ namespace RootTools_Vision
 				this.currentWorkplace.DefectList.Add(defect);
 
 			if (mergeDefectList.Count > 0)
-				DatabaseManager.Instance.AddDefectDataList(mergeDefectList, TableName);
+				DatabaseManager.Instance.AddDefectDataListNoAutoCount(mergeDefectList, TableName);
 
 			int index = 0;
 			foreach (Defect defect in mergeDefectList)

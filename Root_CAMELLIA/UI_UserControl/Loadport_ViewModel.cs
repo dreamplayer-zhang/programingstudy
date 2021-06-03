@@ -322,17 +322,17 @@ namespace Root_CAMELLIA
             {
                 return new RelayCommand(() =>
                 {
-                    if (App.m_engineer.p_bUseXGem)
+                    if (!App.m_engineer.p_bUseXGem)
                     {
                         return;
                     }
                         if (EQ.p_eState != EQ.eState.Ready || p_loadport.p_diPlaced.p_bIn)
                     {
-                        p_infoCarrier.p_eReqTransfer = GemCarrierBase.eTransfer.TransferBlocked;
+                        p_loadport.p_infoCarrier.p_eReqTransfer = GemCarrierBase.eTransfer.TransferBlocked;
                     }
                     else if(EQ.p_eState == EQ.eState.Ready && !p_loadport.p_diPlaced.p_bIn)
                     {
-                        p_infoCarrier.p_eReqTransfer = GemCarrierBase.eTransfer.ReadyToLoad;
+                        p_loadport.p_infoCarrier.p_eReqTransfer = GemCarrierBase.eTransfer.ReadyToLoad;
                     }
                     //p_infoCarrier.p_eReqTransfer = GemCarrierBase.eTransfer.OutOfService;
                 });
@@ -345,7 +345,8 @@ namespace Root_CAMELLIA
             {
                 return new RelayCommand(() =>
                 {
-                    p_infoCarrier.p_eReqTransfer = GemCarrierBase.eTransfer.OutOfService;
+                    if(App.m_engineer.p_bUseXGem)
+                        p_loadport.p_infoCarrier.p_eReqTransfer = GemCarrierBase.eTransfer.OutOfService;
                 });
             }
         }

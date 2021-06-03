@@ -249,6 +249,8 @@ namespace Root_VEGA_P.Module
 
             public string AfterPut()
             {
+                RunRotate(ePos.Rotate);
+                //forget
                 return "OK";
             }
 
@@ -442,6 +444,7 @@ namespace Root_VEGA_P.Module
 
             public string AfterPut()
             {
+                //forget
                 return "OK";
             }
 

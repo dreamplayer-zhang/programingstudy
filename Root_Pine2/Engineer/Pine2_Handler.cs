@@ -29,35 +29,65 @@ namespace Root_Pine2.Engineer
         #endregion
 
         #region Module
+        StopWatch m_swInit = new StopWatch(); 
         public ModuleList p_moduleList { get; set; }
         public Pine2 m_pine2;
         public LoadEV m_loadEV;
         public MagazineEVSet m_magazineEV = new MagazineEVSet();
-        public Transfer m_transfer; 
-        public Vision[] m_vision = new Vision[3]; 
+        public Transfer m_transfer;
+        public Dictionary<Vision.eVision, Vision> m_aVision = new Dictionary<Vision.eVision, Vision>();
+        public Dictionary<Vision.eVision, Boats> m_aBoats = new Dictionary<Vision.eVision, Boats>(); 
+        public Loader0 m_loader0;
+        public Loader1 m_loader1;
+        public Loader2 m_loader2;
+        public Loader3 m_loader3;
         void InitModule()
         {
+            m_swInit.Start(); 
             p_moduleList = new ModuleList(m_engineer);
-            m_pine2 = new Pine2("Pine2", m_engineer);
-            InitModule(m_pine2);
-            m_loadEV = new LoadEV("LoadEV", m_engineer);
-            InitModule(m_loadEV);
+            InitModule(m_pine2 = new Pine2("Pine2", m_engineer));
+            InitModule(m_loadEV = new LoadEV("LoadEV", m_engineer));
             InitMagazineEV();
-            m_transfer = new Transfer("Transter", m_engineer, m_pine2, m_magazineEV);
-            InitModule(m_transfer); 
-            m_vision[0] = new Vision("Vision 3D", m_engineer, ModuleBase.eRemote.Client);
-            m_vision[1] = new Vision("Vision Top", m_engineer, ModuleBase.eRemote.Client);
-            m_vision[2] = new Vision("Vision Bottom", m_engineer, ModuleBase.eRemote.Client);
-            InitModule(m_vision[0]);
-            InitModule(m_vision[1]);
-            InitModule(m_vision[2]);
+            InitVision(Vision.eVision.Top3D);
+            InitVision(Vision.eVision.Top2D);
+            InitVision(Vision.eVision.Bottom);
+            InitBoats(Vision.eVision.Top3D);
+            InitBoats(Vision.eVision.Top2D);
+            InitBoats(Vision.eVision.Bottom);
+            InitModule(m_transfer = new Transfer("Transter", m_engineer, m_pine2, m_magazineEV));
+            InitModule(m_loader0 = new Loader0("Loader0", m_engineer, this));
+            InitModule(m_loader1 = new Loader1("Loader1", m_engineer, this));
+            InitModule(m_loader2 = new Loader2("Loader2", m_engineer, this));
+            InitModule(m_loader3 = new Loader3("Loader3", m_engineer, this));
         }
 
+        long m_msInit = 0; 
         void InitModule(ModuleBase module)
         {
             ModuleBase_UI ui = new ModuleBase_UI();
             ui.Init(module);
             p_moduleList.AddModule(module, ui);
+            long ms = m_swInit.ElapsedMilliseconds; 
+            m_pine2.m_log.Info("InitModule " + module.p_id + " = " + (ms - m_msInit).ToString() + ", " + ms.ToString());
+            m_msInit = ms; 
+        }
+
+        void InitVision(Vision.eVision eVision)
+        {
+            Vision vision = new Vision(eVision, m_engineer, ModuleBase.eRemote.Client); 
+            ModuleBase_UI ui = new ModuleBase_UI();
+            ui.Init(vision);
+            p_moduleList.AddModule(vision, ui);
+            m_aVision.Add(eVision, vision);
+        }
+
+        void InitBoats(Vision.eVision eVision)
+        {
+            Boats boats = new Boats(m_aVision[eVision], m_engineer, m_pine2);
+            ModuleBase_UI ui = new ModuleBase_UI();
+            ui.Init(boats);
+            p_moduleList.AddModule(boats, ui);
+            m_aBoats.Add(eVision, boats); 
         }
 
         void InitMagazineEV()
@@ -228,6 +258,7 @@ namespace Root_Pine2.Engineer
 
         public void ThreadStop()
         {
+            m_magazineEV.ThreadStop(); 
             if (m_bThread)
             {
                 m_bThread = false;
