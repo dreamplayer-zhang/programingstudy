@@ -44,8 +44,8 @@
                     <Button Content="Default" Command="{Binding  btnToolCreateDefaultMapCommand}" Style="{StaticResource imageViewer_toolbar_button}"/>
                     <Button Content="Clear" Command="{Binding  btnToolClearMapCommand}" Style="{StaticResource imageViewer_toolbar_button}"/>
                     <Button Content="Invert" Command="{Binding btnToolInvertCommand}" Style="{StaticResource imageViewer_toolbar_button}"/>
-                    <Button Content="↔ Flip" Command="{Binding btnToolHorizontalFlipCommand}" Style="{StaticResource imageViewer_toolbar_button}"/>
-                    <Button Content="↕ Flip" Command="{Binding btnToolVerticalFlipCommand}" Style="{StaticResource imageViewer_toolbar_button}"/>
+                    <Button Content="H-Flip" Command="{Binding btnToolHorizontalFlipCommand}" Style="{StaticResource imageViewer_toolbar_button}"/>
+                    <Button Content="V-Flip" Command="{Binding btnToolVerticalFlipCommand}" Style="{StaticResource imageViewer_toolbar_button}"/>
                     <Button Content=" ASC&#xa;Import" Command="{Binding btnToolASCImportCommand}" Style="{StaticResource imageViewer_toolbar_button}"/>
                 </StackPanel>
                 <StackPanel Grid.Column="2"  Orientation="Horizontal">
