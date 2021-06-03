@@ -918,6 +918,12 @@ namespace Root_AOP01_Inspection.Module
             InitCmd();
 
             p_infoCarrier = new InfoCarrier(this, id, engineer, bEnableWaferSize, bEnableWaferCount);
+
+            if (id == "LoadportA")
+                p_infoCarrier.p_sLocID = "LP1";
+            else if (id == "LoadportB")
+                p_infoCarrier.p_sLocID = "LP2";
+
             m_aTool.Add(p_infoCarrier);
 
             m_swLotTime = new StopWatch();
