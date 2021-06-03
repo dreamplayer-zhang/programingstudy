@@ -1,4 +1,5 @@
-﻿using RootTools;
+﻿using Microsoft.Win32;
+using RootTools;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -23,7 +24,7 @@ namespace RootTools_Vision
     {
         #region [Event]
         public event RecipeSelectedHandler RecipeSelected;
-
+        public event RecipeSelectedHandler RecipeCreated;
         #endregion
 
         #region [Properties]
@@ -44,7 +45,29 @@ namespace RootTools_Vision
             set
             {
                 SetProperty(ref this.selectedProductItem, value);
+                if(value != null)
+                    CurrentPath = RecipeRootPath + "\\" + selectedProductItem.FolderName;
                 RefreshStepItemList();
+            }
+        }
+
+        string currentPath = @"C:\Root\Recipe";
+        public string CurrentPath
+        {
+            get => currentPath;
+            set
+            {
+                SetProperty(ref currentPath, value);
+            }
+        }
+
+        string currentOpenPath;
+        public string CurrentOpenPath
+        {
+            get => currentOpenPath;
+            set
+            {
+                SetProperty(ref currentOpenPath, value);
             }
         }
 
@@ -129,6 +152,39 @@ namespace RootTools_Vision
             }
         }
 
+        public void CreateStepFolder()
+        {
+            if (CurrentPath == RecipeRootPath)
+                return;
+
+            SaveFileDialog dlg = new SaveFileDialog();
+            dlg.InitialDirectory = CurrentPath;
+
+            if (dlg.ShowDialog() == false) return;
+
+            string[] lastPath = CurrentPath.Split('\\');
+
+            string path = CurrentPath + "\\" + lastPath[lastPath.Length - 1] + "." + Path.GetFileName(dlg.FileName);
+            Directory.CreateDirectory(path + "\\" + "Back");
+            Directory.CreateDirectory(path + "\\" + "EBR");
+            Directory.CreateDirectory(path + "\\" + "Edge");
+            Directory.CreateDirectory(path + "\\" + "Front");
+
+            RefreshStepItemList();
+
+            if (RecipeCreated != null)
+                RecipeCreated(path);
+        }
+
+        public bool CheckPath()
+        {
+            if(currentPath == RecipeRootPath)
+            {
+                return false;
+            }
+            return true;
+        }
+
         private void RefreshStepItemList()
         {
             if (this.SelectedProductItem != null)
@@ -204,7 +260,10 @@ namespace RootTools_Vision
                 try
                 {
                     if (RecipeSelected != null)
-                        RecipeSelected(this.SelectedProductItem + "." + this.SelectedStepItem);
+                    {
+                        CurrentOpenPath = CurrentPath + "\\" + this.SelectedStepItem.FolderName;
+                        RecipeSelected(CurrentOpenPath);
+                    }
 
                 }
                 catch (Exception ex)

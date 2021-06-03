@@ -36,6 +36,8 @@ namespace Root_WIND2.UI_User
 
         public void LoadRecipe()
         {
+            this.ImageViewerVM.ClearObjects(true);
+
             OriginRecipe originRecipe = GlobalObjects.Instance.Get<RecipeFront>().GetItem<OriginRecipe>();
 
             this.OriginX = originRecipe.OriginX;
