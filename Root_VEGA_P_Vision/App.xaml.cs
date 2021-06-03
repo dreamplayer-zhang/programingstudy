@@ -20,6 +20,7 @@ namespace Root_VEGA_P_Vision
         public const string mSideGrab = "Side Grab";
         public const string mStainGrab = "Stain Grab";
         public const string mZStack = "Z Stack Grab";
+        public const string mRotate = "Rotate";
 
     }
 }

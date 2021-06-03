@@ -293,9 +293,13 @@
       <DependentUpon>OriginInfo_UI.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\1. Setup\UserControl\OriginInfo_ViewModel.cs" />
+    <Compile Include="UI\1. Setup\UserControl\SurfaceParam_Tree.xaml.cs">
+      <DependentUpon>SurfaceParam_Tree.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI\1. Setup\UserControl\SurfaceParam_Panel.xaml.cs">
       <DependentUpon>SurfaceParam_Panel.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UI\1. Setup\UserControl\SurfaceParam_Tree_ViewModel.cs" />
     <Compile Include="UI\1. Setup\UserControl\SurfaceParam_ViewModel.cs" />
     <Compile Include="UI\1. Setup\2. RecipeManager\ViewModel\ImageViewerBase_ViewModel.cs" />
     <Compile Include="UI\1. Setup\3. PodInfo\ImageNROI_Panel.xaml.cs">
@@ -491,6 +495,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UI\1. Setup\UserControl\OriginInfo_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\1. Setup\UserControl\SurfaceParam_Tree.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

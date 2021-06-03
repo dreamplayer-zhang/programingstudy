@@ -14,16 +14,18 @@ using System.Windows.Shapes;
 namespace Root_VEGA_P_Vision
 {
     public delegate void FeatureBoxDoneEvent(object e);
-    
+    public delegate void ManualAlignDoneEvent(CPoint Top, CPoint Btm);
     public class PositionImageViewer_ViewModel: BaseViewer_ViewModel
     {
         #region [Color]
         private class DefineColors
         {
             public static SolidColorBrush OriginBoxColor = new SolidColorBrush(Color.FromRgb(0, 122,255));
+            public static SolidColorBrush ManualAlignColor = new SolidColorBrush(Color.FromRgb(88,86,214));
         }
         #endregion
         public event FeatureBoxDoneEvent FeatureBoxDone;
+        public event ManualAlignDoneEvent ManualAlignDone;
 
         public PositionImageViewer_ViewModel(string imageData):base(imageData)
         {
@@ -53,11 +55,12 @@ namespace Root_VEGA_P_Vision
         }
         public enum AlignProcess
         {
-            Top,Bottom,
+            Top,Bottom,None
         }
         AlignProcess eAlignProcess;
         BoxProcess eBoxProcess;
         ModifyType eModifyType;
+        public AlignBtnState btnState;
         CPoint mousePointBuffer;
 
         Grid OriginBox;
@@ -75,8 +78,126 @@ namespace Root_VEGA_P_Vision
             OriginBox.Children.Add(new Line()); // Bottom
 
             p_ViewElement.Add(OriginBox);
+
+            AlignTop = new Grid();
+            AlignTop.Children.Add(new Line());
+            AlignTop.Children.Add(new Line());
+
+            AlignBottom = new Grid();
+            AlignBottom.Children.Add(new Line());
+            AlignBottom.Children.Add(new Line());
+
+            AlignLine = new Grid();
+            AlignLine.Children.Add(new Line());
         }
 
+        CPoint AlignTopPt, AlignBtmPt;
+        Grid AlignTop, AlignBottom, AlignLine;
+        private void DrawAlignTopPoint(CPoint memPt, bool bRecipeLoaded = false)
+        {
+            if (memPt.X == 0 || memPt.Y == 0)
+                return;
+
+            CPoint viewPt = memPt;
+            CPoint canvasPt = GetCanvasPoint(viewPt);
+
+            AlignTop.Width = 40;
+            AlignTop.Height = 40;
+
+            Line line1 = AlignTop.Children[0] as Line;
+            line1.X1 = -20;
+            line1.Y1 = -20;
+            line1.X2 = 20;
+            line1.Y2 = 20;
+            line1.Stroke = DefineColors.ManualAlignColor;
+            line1.StrokeThickness = 3;
+            line1.Opacity = 1;
+
+            Line line2 = AlignTop.Children[1] as Line;
+            line2.X1 = 20;
+            line2.Y1 = -20;
+            line2.X2 = -20;
+            line2.Y2 = 20;
+            line2.Stroke = DefineColors.ManualAlignColor;
+            line2.StrokeThickness = 3;
+            line2.Opacity = 1;
+
+            Canvas.SetLeft(AlignTop, canvasPt.X);
+            Canvas.SetTop(AlignTop, canvasPt.Y);
+
+            if (!p_UIElement.Contains(AlignTop))
+            {
+                p_UIElement.Add(AlignTop);
+            }
+        }
+        private void DrawAlignResults(bool bRecipeLoaded = false)
+        {
+            CPoint canvasLTPt = GetCanvasPoint(AlignTopPt);
+            CPoint canvasRBPt = GetCanvasPoint(AlignBtmPt);
+
+            Line line1 = AlignLine.Children[0] as Line;
+            line1.X1 = canvasLTPt.X;
+            line1.Y1 = canvasLTPt.Y;
+            line1.X2 = canvasRBPt.X;
+            line1.Y2 = canvasRBPt.Y;
+            line1.Stroke = DefineColors.ManualAlignColor;
+            line1.StrokeThickness = 3;
+            line1.Opacity = 1;
+
+            if (!p_UIElement.Contains(AlignLine))
+            {
+                p_UIElement.Add(AlignLine);
+            }
+
+            if (bRecipeLoaded == false)
+            {
+                // Recipe
+
+            }
+        }
+        private void DrawAlignBottomPoint(CPoint memPt, bool bRecipeLoaded = false)
+        {
+            if (memPt.X == 0 || memPt.Y == 0)
+                return;
+
+            CPoint viewPt = memPt;
+            CPoint canvasPt = GetCanvasPoint(viewPt);
+
+            AlignBottom.Width = 40;
+            AlignBottom.Height = 40;
+
+            Line line1 = AlignBottom.Children[0] as Line;
+            line1.X1 = -20;
+            line1.Y1 = -20;
+            line1.X2 = 20;
+            line1.Y2 = 20;
+            line1.Stroke = DefineColors.ManualAlignColor;
+            line1.StrokeThickness = 3;
+            line1.Opacity = 1;
+
+            Line line2 = AlignBottom.Children[1] as Line;
+            line2.X1 = 20;
+            line2.Y1 = -20;
+            line2.X2 = -20;
+            line2.Y2 = 20;
+            line2.Stroke = DefineColors.ManualAlignColor;
+            line2.StrokeThickness = 3;
+            line2.Opacity = 1;
+
+            Canvas.SetLeft(AlignBottom, canvasPt.X);
+            Canvas.SetTop(AlignBottom, canvasPt.Y);
+
+            if (!p_UIElement.Contains(AlignBottom))
+            {
+                p_UIElement.Add(AlignBottom);
+            }
+
+            if (bRecipeLoaded == false)
+            {
+                // Recipe
+
+            }
+        }
         #region [Overrides]
         public override void PreviewMouseDown(object sender, MouseEventArgs e)
         {
@@ -84,9 +205,41 @@ namespace Root_VEGA_P_Vision
             if (m_KeyEvent != null)
                 if (m_KeyEvent.Key == Key.LeftShift && m_KeyEvent.IsDown)
                     return;
-            ProcessDrawBox(e);
+            if(btnState == AlignBtnState.ManualAlign)
+                ProcessDrawLine(e);
+            else
+                ProcessDrawBox(e);
         }
 
+        public void ProcessDrawLine(MouseEventArgs e)
+        {
+            CPoint CanvasPt = new CPoint(p_MouseX, p_MouseY);
+            CPoint MemPt = GetMemPoint(CanvasPt);
+            switch(eAlignProcess)
+            {
+                case AlignProcess.None:
+                    eAlignProcess = AlignProcess.Top;
+                    ProcessDrawLine(e);
+                    break;
+
+                case AlignProcess.Top:
+                    ClearObjects();
+                    AlignTopPt = MemPt;
+                    DrawAlignTopPoint(AlignTopPt);
+                    eAlignProcess = AlignProcess.Bottom;
+                    break;
+
+                case AlignProcess.Bottom:
+                    AlignBtmPt = MemPt;
+                    DrawAlignBottomPoint(AlignBtmPt);
+                    DrawAlignResults();
+
+                    if (ManualAlignDone != null)
+                        ManualAlignDone(AlignTopPt, AlignBtmPt);
+                    eAlignProcess = AlignProcess.None;
+                    break;
+            }
+        }
         public void ProcessDrawBox(MouseEventArgs e)
         {
             CPoint CanvasPt = new CPoint(p_MouseX, p_MouseY);
@@ -169,6 +322,9 @@ namespace Root_VEGA_P_Vision
                     }
                     break;
             }
+
+            CPoint CanvasPt = new CPoint(p_MouseX, p_MouseY);
+            CPoint MemPt = GetMemPoint(CanvasPt);
         }
         public override void SetRoiRect()
         {
@@ -500,9 +656,19 @@ namespace Root_VEGA_P_Vision
                     BOX.ModifyTool.Visibility = Visibility.Visible;
             }
 
-            RedrawOriginBox();
+            if(p_UIElement.Contains(AlignBottom))
+                DrawAlignBottomPoint(AlignBtmPt);
+            if(p_UIElement.Contains(AlignTop))
+                DrawAlignTopPoint(AlignTopPt);
+            if (p_UIElement.Contains(AlignLine))
+                DrawAlignResults();
+
         }
 
+        public void RedrawManualAlignLine()
+        {
+
+        }
         public void RedrawOriginBox()
         {
             EUVOriginRecipe originRecipe = GlobalObjects.Instance.Get<RecipeVision>().GetItem<EUVOriginRecipe>();

@@ -9,17 +9,19 @@
              Background="{StaticResource PanelBackGround}">
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="12*"/>
+            <ColumnDefinition Width="8*"/>
             <ColumnDefinition Width="88*"/>
         </Grid.ColumnDefinitions>
         <Border Background="{StaticResource MainThema}" BorderBrush="{StaticResource Splitter}" BorderThickness="0,0,1,0">
             <StackPanel Margin="0,30,0,0">
-                <RadioButton Content="Pod Info" Command="{Binding btnPodInfo}" Style="{StaticResource SetupPannelRadioBtn}"/>
+                <RadioButton IsChecked="True" Content="Pod Info" Command="{Binding btnPodInfo}" Style="{StaticResource SetupPannelRadioBtn}"/>
                 <RadioButton Content="Recipe Wizard" Command="{Binding btnRecipeWizard}" Style="{StaticResource SetupPannelRadioBtn}"/>
                 <RadioButton Content="Maintenance" Command="{Binding btnMaintenance}" Style="{StaticResource SetupPannelRadioBtn}"/>
             </StackPanel>
         </Border>
 
-        <Grid Grid.Column="1" x:Name="SubPanel"/>
+        <Grid Grid.Column="1">
+            <ContentControl Content="{Binding SubPanel}"/>
+        </Grid>
     </Grid>
 </UserControl>

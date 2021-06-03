@@ -14,7 +14,7 @@ namespace Root_VEGA_P_Vision
 {
     public enum AlignBtnState
     {
-        Align,Position
+        Align,Position,ManualAlign
     }
     public class AlignFeatureInfo_ViewModel:ObservableObject
     {
@@ -141,13 +141,13 @@ namespace Root_VEGA_P_Vision
         public ICommand btnAlign
         {
             get => new RelayCommand(() => {
-                btnState = AlignBtnState.Align;
+                recipeOrigin.PositionViewerTab.selectedViewer.btnState = btnState = AlignBtnState.Align;
             });
         }
         public ICommand btnPosition
         {
             get => new RelayCommand(() => {
-                btnState = AlignBtnState.Position;
+                recipeOrigin.PositionViewerTab.selectedViewer.btnState = btnState = AlignBtnState.Position;
             });
         }
         public ICommand btnAdd
@@ -162,7 +162,6 @@ namespace Root_VEGA_P_Vision
                         PosAdd();
                         break;
                 }
-
             });
         }
         public ICommand btnDelete
@@ -196,13 +195,15 @@ namespace Root_VEGA_P_Vision
         }
         public ICommand ManualAlign
         {
-            get => new RelayCommand(() => { 
+            get => new RelayCommand(() => {
+                recipeOrigin.PositionViewerTab.selectedViewer.btnState = btnState = AlignBtnState.ManualAlign;
             });
         }
         void AlignAdd()
         {
             if (recipeOrigin.memRect == null)
                 return;
+
             ImageData data = recipeOrigin.boxImage;
             CRect memRect = recipeOrigin.memRect;
             int width = memRect.Width;

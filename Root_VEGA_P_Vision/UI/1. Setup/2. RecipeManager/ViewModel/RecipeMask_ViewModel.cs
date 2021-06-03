@@ -26,18 +26,13 @@ namespace Root_VEGA_P_Vision
         EUVPodSurfaceRecipe surfaceRecipe;
         EUVPodSurfaceParameter surfaceParameter;
         EUVPodSurfaceParameterBase curBaseParam;
-        SurfaceParam_ViewModel darkParam, brightParam;
+        SurfaceParam_Tree_ViewModel surfaceParamTree;
+        public SurfaceParam_Tree_ViewModel SurfaceParamTree
+        {
+            get => surfaceParamTree;
+            set => SetProperty(ref surfaceParamTree, value);
+        }
 
-        public SurfaceParam_ViewModel DarkParam
-        {
-            get => darkParam;
-            set => SetProperty(ref darkParam, value);
-        }
-        public SurfaceParam_ViewModel BrightParam
-        {
-            get => brightParam;
-            set => SetProperty(ref brightParam, value);
-        }
         
         public UserControl p_MaskPanel
         {
@@ -58,11 +53,11 @@ namespace Root_VEGA_P_Vision
             recipeTDIVM = new Recipe6um_ViewModel(this);
             recipeSideVM = new RecipeSide_ViewModel(this);
             recipeStackingVM = new Recipe1um_ViewModel(this);
-
-            darkParam = new SurfaceParam_ViewModel(surfaceParameter.PodStain.DarkParam);
-            brightParam = new SurfaceParam_ViewModel(surfaceParameter.PodStain.BrightParam);
+            surfaceParamTree = new SurfaceParam_Tree_ViewModel();
 
             CurBaseParam = SurfaceParameter.PodStain;
+
+            SetStain();
         }
 
         #region Property
@@ -113,25 +108,9 @@ namespace Root_VEGA_P_Vision
             p_MaskPanel.DataContext = recipeSideVM;
             CurBaseParam = surfaceParameter.PodSide;
         }
-        public ICommand btnStain
-        {
-            get => new RelayCommand(() => SetStain());
-        }
-        public ICommand btn6um
-        {
-            get => new RelayCommand(() => SetTDI());
-        }
-        public ICommand btn1um
-        {
-            get => new RelayCommand(() => SetStacking());
-        }
-        public ICommand btnSide
-        {
-            get => new RelayCommand(() => SetSide());
-        }
         public ICommand btnBack
         {
-            get => new RelayCommand(()=>recipeManager.setup.SetRecipeWizard());
+            get => new RelayCommand(()=>recipeManager.home.m_Setup.SetRecipeWizard());
         }
         #endregion
 

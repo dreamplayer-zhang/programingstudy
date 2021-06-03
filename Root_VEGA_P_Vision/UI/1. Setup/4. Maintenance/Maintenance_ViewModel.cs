@@ -13,13 +13,15 @@ namespace Root_VEGA_P_Vision
         public VEGA_P_Vision_Handler_UI HandlerUI;
         VEGA_P_Vision_Engineer_UI EngineerUI;
         Setup_ViewModel m_Setup;
+        Home_ViewModel home;
         ToolBox_UI ToolBoxUI;
         ViewerTest ToolViewerTest;
         ViewerTest_ViewModel ToolViewerTest_VM;
 
-        public Maintenance_ViewModel(Setup_ViewModel setup)
+        public Maintenance_ViewModel(Home_ViewModel home)
         {
-            m_Setup = setup;
+            this.home = home;
+            m_Setup = home.m_Setup;
 
             HandlerUI = new VEGA_P_Vision_Handler_UI();
             EngineerUI = new VEGA_P_Vision_Engineer_UI();

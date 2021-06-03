@@ -43,9 +43,6 @@ namespace Root_VEGA_P_Vision
         private ObservableCollection<UIElement> m_NaviButtons = new ObservableCollection<UIElement>();
 
         private Home_ViewModel homeVM;
-        public RecipeManager_ViewModel recipeManagerVM;
-        public Maintenance_ViewModel maintVM;
-        public PodInfo_ViewModel podInfoVM;
 
         public Setup Main;
         public Setup_ViewModel()
@@ -64,9 +61,7 @@ namespace Root_VEGA_P_Vision
         private void InitAllPanel()
         {
             homeVM = new Home_ViewModel(this);
-            recipeManagerVM = new RecipeManager_ViewModel(this);
-            maintVM = new Maintenance_ViewModel(this);
-            podInfoVM = new PodInfo_ViewModel(this);
+
         }
         private void InitAllNaviBtn()
         {
@@ -208,11 +203,11 @@ namespace Root_VEGA_P_Vision
         {
             p_NaviButtons.Clear();
             p_NaviButtons.Add(m_btnNaviRecipeWizard);
-            p_CurrentPanel = recipeManagerVM.Main;
-            recipeManagerVM.Main.radiobtnOrigin.IsChecked = true;
-            recipeManagerVM.SetOrigin();
+            //p_CurrentPanel = recipeManagerVM.Main;
+            //recipeManagerVM.Main.radiobtnOrigin.IsChecked = true;
+            //recipeManagerVM.SetOrigin();
         }
-        public void SetRecipeMask()
+        public void SetRecipeMask() 
         {
             p_NaviButtons.Clear();
             p_NaviButtons.Add(m_btnNaviRecipeWizard);
@@ -221,7 +216,6 @@ namespace Root_VEGA_P_Vision
         }
         public void SetPodInfo()
         {
-            p_CurrentPanel = podInfoVM.Main;
             p_NaviButtons.Clear();
             p_NaviButtons.Add(m_btnNaviPodInfo);
         }
@@ -231,8 +225,8 @@ namespace Root_VEGA_P_Vision
             p_NaviButtons.Clear();
             p_NaviButtons.Add(m_btnNaviMaintenance);
 
-            p_CurrentPanel = maintVM.Main;
-            p_CurrentPanel.DataContext = maintVM;
+            //p_CurrentPanel = maintVM.Main;
+            //p_CurrentPanel.DataContext = maintVM;
         }
         public void SetGEM()
         {

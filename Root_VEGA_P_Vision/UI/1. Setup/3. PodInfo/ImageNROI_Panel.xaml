@@ -36,10 +36,11 @@
                       StrokeThickness="0.7"
                       VerticalAlignment="Top"
                       X2="1"/>
-                <StackPanel Orientation="Horizontal" Grid.Row="2" HorizontalAlignment="Center">
-                    <Button Content="Save MasterImage" Width="150" Command="{Binding btnSaveMasterImage}" Style="{StaticResource ImageBaseBtn}"/>
-                    <Button Content="Load MasterImage" Width="150" Command="{Binding btnLoadMasterImage}" Style="{StaticResource ImageBaseBtn}"/>
-                </StackPanel>
+                
+                <UniformGrid Rows="1" Grid.Row="2" HorizontalAlignment="Center">
+                    <Button Content="Save MasterImage"  Command="{Binding btnSaveMasterImage}" Style="{StaticResource ImageBaseBtn}"/>
+                    <Button Content="Load MasterImage"  Command="{Binding btnLoadMasterImage}" Style="{StaticResource ImageBaseBtn}"/>
+                </UniformGrid>
             </Grid>
             <Grid Grid.Row="2" Margin="10,10,10,0">
                 <Grid.RowDefinitions>
@@ -55,10 +56,10 @@
                       StrokeThickness="0.7"
                       VerticalAlignment="Top"
                       X2="1"/>
-                <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center">
-                    <RadioButton Content="Capture Area" Width="145" Style="{StaticResource SelecteRadioBtn}"/>
-                    <RadioButton Content="ROI" Width="145" Style="{StaticResource SelecteRadioBtn}"/>
-                </StackPanel>
+                <UniformGrid Grid.Row="2" Rows="1" HorizontalAlignment="Stretch">
+                    <RadioButton Content="Capture Area"  Style="{StaticResource SelecteRadioBtn}"/>
+                    <RadioButton Content="ROI" Style="{StaticResource SelecteRadioBtn}"/>
+                </UniformGrid>
                 <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Center">
                     <Button Content="Pen" Style="{StaticResource MaskButton}" Command="{Binding btnDot}"/>
                     <Button Content="Rect" Style="{StaticResource MaskButton}" Command="{Binding btnRect}"/>
@@ -82,33 +83,13 @@
                     <TabItem Header="GrabMode" Height="30" Width="80" Style="{StaticResource InspectionTabItemStyle}">
                     </TabItem>
                     <TabItem Header="Inspection" Height="30" Width="80" Style="{StaticResource InspectionTabItemStyle}">
-                        <TreeView>
-                            <TreeViewItem Header="Bright">
-                                <local:SurfaceParam_Panel DataContext="{Binding BrightParam}"/>
-                            </TreeViewItem>
-                            <TreeViewItem Header="Dark">
-                                <local:SurfaceParam_Panel DataContext="{Binding DarkParam}"/>
-                            </TreeViewItem>
-                        </TreeView>
+                        <local:SurfaceParam_Tree DataContext="{Binding SurfaceParamTree}"/>
+                    </TabItem>
+                    <TabItem Header="Captured Area" Height="30" Width="100" Style="{StaticResource InspectionTabItemStyle}">
+                        
                     </TabItem>
                 </TabControl>
             </Grid>
-            <!--<GroupBox Header="Inspection Param"  Grid.Row="3">
-                <TabControl>
-                    <TabItem Header="GrabMode">
-                    </TabItem>
-                    <TabItem Header="Inspection">
-                        <TreeView>
-                            <TreeViewItem Header="Bright">
-                                <local:SurfaceParam_Panel DataContext="{Binding BrightParam}"/>
-                            </TreeViewItem>
-                            <TreeViewItem Header="Dark">
-                                <local:SurfaceParam_Panel DataContext="{Binding DarkParam}"/>
-                            </TreeViewItem>
-                        </TreeView>
-                    </TabItem>
-                </TabControl>
-            </GroupBox>-->
         </Grid>
     </Grid>
     

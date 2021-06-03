@@ -12,7 +12,7 @@ namespace Root_VEGA_P_Vision
     public class PodInfo_ViewModel:ObservableObject
     {
         public PodInfo_Panel Main;
-        public Setup_ViewModel setup;
+        public Home_ViewModel home;
         ImageNROI_ViewModel imageNROI;
         InspectionItem_ViewModel cfItem,cbItem,bfItem,bbItem;
         UserControl subPanel;
@@ -44,22 +44,21 @@ namespace Root_VEGA_P_Vision
             set => SetProperty(ref bbItem, value);
         }
         #endregion
-        public PodInfo_ViewModel(Setup_ViewModel setup)
+        public PodInfo_ViewModel(Home_ViewModel home)
         {
-            this.setup = setup;
             Main = new PodInfo_Panel();
             Main.DataContext = this;
             imageNROI = new ImageNROI_ViewModel(this);
-            CFItem = new InspectionItem_ViewModel("EIP_Cover.Front");
+            CFItem = new InspectionItem_ViewModel("EIP_Cover.Front",false);
             CBItem = new InspectionItem_ViewModel("EIP_Cover.Back");
             BFItem = new InspectionItem_ViewModel("EIP_Plate.Front");
-            BBItem = new InspectionItem_ViewModel("EIP_Plate.Back");
+            BBItem = new InspectionItem_ViewModel("EIP_Plate.Back",false,false);
 
             SubPanel = imageNROI.Main;
         }
         public ICommand btnBack
         {
-            get => new RelayCommand(() => { setup.SetHome(); });
+            get => new RelayCommand(() => { home.m_Setup.SetHome(); });
         }
         public ICommand btnCoverFront
         {

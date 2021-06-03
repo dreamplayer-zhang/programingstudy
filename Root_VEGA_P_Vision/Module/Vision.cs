@@ -607,7 +607,7 @@ namespace Root_VEGA_P_Vision.Module
         #region ModuleRun
         protected override void InitModuleRuns()
         {
-            AddModuleRunList(new Run_Rotate(this), true, "Rotate");
+            AddModuleRunList(new Run_Rotate(this), true, App.mRotate);
             AddModuleRunList(new Run_MainGrab(this), true, App.mMainGrab);
             AddModuleRunList(new Run_SideGrab(this), true, App.mSideGrab);
             AddModuleRunList(new Run_StainGrab(this), true, App.mStainGrab);

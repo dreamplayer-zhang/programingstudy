@@ -9,7 +9,7 @@
              Background="{StaticResource MainBackGroundColor}">
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="12*"/>
+            <ColumnDefinition Width="6*"/>
             <ColumnDefinition Width="88*"/>
         </Grid.ColumnDefinitions>
         <Border Background="{StaticResource MainThema}" BorderBrush="{StaticResource Splitter}" BorderThickness="0,0,1,0">

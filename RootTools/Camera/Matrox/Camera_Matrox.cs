@@ -490,7 +490,7 @@ namespace RootTools.Camera.Matrox
             m_GrabThread.Start();
             return;
         }
-        public void GrabZScan(MemoryData memory, int GrabCnt)
+        public void GrabZScan(MemoryData memory, int GrabCnt,CPoint memoffset)
         {
             m_nGrabCount = GrabCnt;
             m_nGrabTrigger = 0;
@@ -523,17 +523,28 @@ namespace RootTools.Camera.Matrox
             MIL.MdigProcess(m_MilDigitizer, m_MilBuffers, m_nGrabCount, MIL.M_SEQUENCE + MIL.M_COUNT(m_nGrabCount), MIL.M_ASYNCHRONOUS + MIL.M_TRIGGER_FOR_FIRST_GRAB, grabStartDelegate, GCHandle.ToIntPtr(userObjectHandle));
 
             m_GrabThread = new Thread(new ParameterizedThreadStart(RunGrabZScanThread));
-            m_GrabThread.Start(memory);
+            m_GrabThread.Start(new ScanParam(memory,memoffset));
             return;
         }
-        unsafe void RunGrabZScanThread(object mem)
+        public class ScanParam
         {
+            public MemoryData mem;
+            public CPoint memoffset;
+            public ScanParam(MemoryData mem, CPoint memoffset)
+            {
+                this.mem = mem;
+                this.memoffset = memoffset;
+            }
+        }
+        unsafe void RunGrabZScanThread(object scanParam)
+        {
+            ScanParam param = (ScanParam)scanParam;
             Stopwatch swGrab = new Stopwatch();
             int DelayGrab = 1000 * m_nGrabCount;
             byte[] srcarr = new byte[p_nWidth * p_nHeight];
 
             int iBlock = 0;
-            MemoryData m = (MemoryData)mem;
+            MemoryData m = param.mem;
             while (iBlock<m_nGrabCount)
             {
                 if (iBlock >= m_nGrabTrigger) continue;
@@ -545,7 +556,7 @@ namespace RootTools.Camera.Matrox
                     fixed (byte* p = srcarr)
                     {
                         IntPtr srcPtr = (IntPtr)p + p_nWidth * y;
-                        IntPtr dstPtr = (IntPtr)((long)m_MemPtr + m_cpScanOffset.X + m_cpScanOffset.Y * m_Memory.W);
+                        IntPtr dstPtr = (IntPtr)((long)m_MemPtr + param.memoffset.X + param.memoffset.Y * m_Memory.W);
                         Buffer.MemoryCopy((void*)srcPtr, (void*)dstPtr, p_nWidth, p_nWidth);
                     }
                 });

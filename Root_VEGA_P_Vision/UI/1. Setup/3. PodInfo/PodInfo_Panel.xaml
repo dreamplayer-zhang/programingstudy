@@ -8,51 +8,53 @@
               d:DesignHeight="888" d:DesignWidth="1912" Background="{StaticResource MainBackGroundColor}">
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="15*"/>
-            <ColumnDefinition Width="85*"/>
+            <ColumnDefinition Width="13*"/>
+            <ColumnDefinition Width="87*"/>
         </Grid.ColumnDefinitions>
         <Border Background="{StaticResource MainThema}" BorderBrush="{StaticResource Splitter}" BorderThickness="0,0,1,0">
-            <StackPanel Grid.Column="0">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="9*"/>
-                        <ColumnDefinition Width="1*"/>
-                    </Grid.ColumnDefinitions>
-                    <Button Grid.Column="0" Content="EIP Cover Front" Command="{Binding btnCoverFront}" Style="{StaticResource ListViewHeader}"/>
-                    <Image Grid.Column="1" Margin="10" Source="../../../Resources/expand-button.png"/>
-                </Grid>
-                <local:InspectionItem Visibility="{Binding Visible,Converter={StaticResource BooleanToVisiblity}}" DataContext="{Binding CFItem}"/>
-                <Grid>
+            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                <StackPanel Grid.Column="0">
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="9*"/>
-                            <ColumnDefinition Width="1*"/>
+                            <ColumnDefinition Width="1.2*"/>
                         </Grid.ColumnDefinitions>
-                        <Button Content="EIP Cover Back" Command="{Binding btnCoverBack}" Style="{StaticResource ListViewHeader}"/>
+                        <Button Grid.Column="0" Content="EIP Cover Front" Command="{Binding btnCoverFront}" Style="{StaticResource ListViewHeader}"/>
                         <Image Grid.Column="1" Margin="10" Source="../../../Resources/expand-button.png"/>
                     </Grid>
-                    
-                </Grid>
-                <local:InspectionItem Visibility="{Binding Visible,Converter={StaticResource BooleanToVisiblity}}" DataContext="{Binding CBItem}"/>
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="9*"/>
-                        <ColumnDefinition Width="1*"/>
-                    </Grid.ColumnDefinitions>
-                    <Button Grid.Column="0" Content="EIP Base Plate Front" Command="{Binding btnPlateFront}" Style="{StaticResource ListViewHeader}"/>
-                    <Image Grid.Column="1" Margin="10" Source="../../../Resources/expand-button.png"/>
-                </Grid>
-                <local:InspectionItem Visibility="{Binding Visible,Converter={StaticResource BooleanToVisiblity}}" DataContext="{Binding BFItem}"/>
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="9*"/>
-                        <ColumnDefinition Width="1*"/>
-                    </Grid.ColumnDefinitions>
-                    <Button Grid.Column="0" Content="EIP Base Plate Back" Command="{Binding btnPlateBack}" Style="{StaticResource ListViewHeader}"/>
-                    <Image Grid.Column="1" Margin="10" Source="../../../Resources/expand-button.png"/>
-                </Grid>
-                <local:InspectionItem Visibility="{Binding Visible,Converter={StaticResource BooleanToVisiblity}}" DataContext="{Binding BBItem}"/>
-            </StackPanel>
+                    <local:InspectionItem Visibility="{Binding Visible,Converter={StaticResource BooleanToVisiblity}}" DataContext="{Binding CFItem}"/>
+                    <Grid>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="9*"/>
+                                <ColumnDefinition Width="1.2*"/>
+                            </Grid.ColumnDefinitions>
+                            <Button Content="EIP Cover Back" Command="{Binding btnCoverBack}" Style="{StaticResource ListViewHeader}"/>
+                            <Image Grid.Column="1" Margin="10" Source="../../../Resources/expand-button.png"/>
+                        </Grid>
+
+                    </Grid>
+                    <local:InspectionItem Visibility="{Binding Visible,Converter={StaticResource BooleanToVisiblity}}" DataContext="{Binding CBItem}"/>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="9*"/>
+                            <ColumnDefinition Width="1.2*"/>
+                        </Grid.ColumnDefinitions>
+                        <Button Grid.Column="0" Content="EIP Base Plate Front" Command="{Binding btnPlateFront}" Style="{StaticResource ListViewHeader}"/>
+                        <Image Grid.Column="1" Margin="10" Source="../../../Resources/expand-button.png"/>
+                    </Grid>
+                    <local:InspectionItem Visibility="{Binding Visible,Converter={StaticResource BooleanToVisiblity}}" DataContext="{Binding BFItem}"/>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="9*"/>
+                            <ColumnDefinition Width="1.2*"/>
+                        </Grid.ColumnDefinitions>
+                        <Button Grid.Column="0" Content="EIP Base Plate Back" Command="{Binding btnPlateBack}" Style="{StaticResource ListViewHeader}"/>
+                        <Image Grid.Column="1" Margin="10" Source="../../../Resources/expand-button.png"/>
+                    </Grid>
+                    <local:InspectionItem Visibility="{Binding Visible,Converter={StaticResource BooleanToVisiblity}}" DataContext="{Binding BBItem}"/>
+                </StackPanel>
+            </ScrollViewer>
         </Border>
         <Grid Grid.Column="1">
             <ContentControl Content="{Binding SubPanel}"/>

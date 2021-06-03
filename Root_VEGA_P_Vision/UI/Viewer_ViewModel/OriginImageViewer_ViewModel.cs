@@ -419,8 +419,6 @@ namespace Root_VEGA_P_Vision
                 originRightBottom.Y = p_MouseMemY;
                 DrawOriginRightBottomPoint(originRightBottom);
             }
-
-
         }
         public override void SetRoiRect()
         {

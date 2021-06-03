@@ -6,7 +6,10 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using Root_VEGA_P_Vision.Engineer;
+using Root_VEGA_P_Vision.Module;
 using RootTools;
+using RootTools.Module;
 using RootTools_Vision;
 namespace Root_VEGA_P_Vision
 {
@@ -30,6 +33,7 @@ namespace Root_VEGA_P_Vision
         public ImageData boxImage;
         public CRect memRect;
         bool originInfoVisible,positionInfoVisible;
+        double dRotateAngle;
         #region Property
         public bool OriginInfoVisible
         {
@@ -118,15 +122,34 @@ namespace Root_VEGA_P_Vision
             positionviewerTab.p_EIPCoverBtm.FeatureBoxDone += FeatureBoxDoneUpdate;
             positionviewerTab.p_EIPCoverTop.FeatureBoxDone += FeatureBoxDoneUpdate;
 
+            positionviewerTab.p_EIPBaseBtm.ManualAlignDone += ManualAlignDoneUpdate;
+            positionviewerTab.p_EIPBaseTop.ManualAlignDone += ManualAlignDoneUpdate;
+            positionviewerTab.p_EIPCoverBtm.ManualAlignDone += ManualAlignDoneUpdate;
+            positionviewerTab.p_EIPCoverTop.ManualAlignDone += ManualAlignDoneUpdate;
+
             originInfoVisible = true;
             positionInfoVisible = false;
         }
 
-        
+        public void ManualAlignDoneUpdate(CPoint Top, CPoint Btm)
+        {
+            dRotateAngle = Calc.CalcAngle(Top, Btm);
+
+            EQ.p_bStop = false;
+            Vision vision = GlobalObjects.Instance.Get<VEGA_P_Vision_Engineer>().m_handler.m_vision;
+            if (vision.p_eState != ModuleBase.eState.Ready)
+            {
+                MessageBox.Show("Vision Home이 완료 되지 않았습니다.");
+                return;
+            }
+
+            vision.m_stage.Rotate(dRotateAngle);
+        }
+
         public void FeatureBoxDoneUpdate(object e)
         {
             memRect = ((TRect)e).MemoryRect;
-            boxImage = new ImageData(memRect.Width,memRect.Height,1);
+            boxImage = new ImageData(memRect.Width, memRect.Height, 1);
             boxImage.SetData(positionviewerTab.selectedViewer.p_ImageData, new CRect(memRect.Left, memRect.Top, memRect.Right, memRect.Bottom), (int)positionviewerTab.selectedViewer.p_ImageData.p_Stride, 1);
         }
 
@@ -143,7 +166,7 @@ namespace Root_VEGA_P_Vision
         }
         public ICommand btnBack
         {
-            get => new RelayCommand(() => { recipeManager.setup.SetRecipeWizard(); });
+            get => new RelayCommand(() => { recipeManager.home.m_Setup.SetRecipeWizard(); });
         }
 
     }

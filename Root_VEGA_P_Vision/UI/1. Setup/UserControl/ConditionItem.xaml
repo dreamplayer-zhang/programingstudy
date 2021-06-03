@@ -12,8 +12,16 @@
             <RowDefinition Height="1*"/>
         </Grid.RowDefinitions>
         <UniformGrid Rows="4" Grid.Row="0" Margin="5,0,0,5">
-            <TextBlock Foreground="White" Text="Condition " HorizontalAlignment="Right" Margin="3"/>
-            <TextBlock Foreground="White" Text="{Binding ConditionCnt}" Margin="3"/>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" Foreground="White" Text="Condition " HorizontalAlignment="Right" Margin="3"/>
+                <TextBlock Grid.Column="1" Foreground="White" Text="{Binding ConditionCnt}" Margin="3"/>
+
+            </Grid>
+            <Button/>
             <TextBlock Foreground="White" Text="Enable" Margin="3"/>
             <CheckBox IsChecked="{Binding IsEnable}" Margin="3"/>
             <TextBlock Foreground="White" Text="DefectCode" Margin="3"/>

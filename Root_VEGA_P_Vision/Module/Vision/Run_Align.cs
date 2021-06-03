@@ -99,7 +99,7 @@ namespace Root_VEGA_P_Vision.Module
                 int nCamWidth = AlignGrabMode.m_camera.GetRoiSize().X;
                 int nCamHeight = AlignGrabMode.m_camera.GetRoiSize().Y;
                 int nFOV = AlignGrabMode.m_GD.m_nFovSize;
-                int nPodSizeY_px = Convert.ToInt32(AlignGrabMode.m_nPodSize_mm * nMMPerUM / AlignGrabMode.m_dResY_um);  //파드 영역의 Y픽셀 갯수
+                int nPodSizeY_px = Convert.ToInt32(AlignGrabMode.m_nPodYSize_mm * nMMPerUM / AlignGrabMode.m_dResY_um);  //파드 영역의 Y픽셀 갯수
                 int nPulsePerWidth = nFOV * AlignGrabMode.m_dTrigger;
                 int nPulsePerHeight = nCamHeight * AlignGrabMode.m_dTrigger;
                 double dXScale = AlignGrabMode.m_dResX_um * 10;

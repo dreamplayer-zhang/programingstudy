@@ -12,8 +12,18 @@ namespace Root_VEGA_P_Vision
     {
         public InspectionItem Main;
         InspectionOneItem_ViewModel particle, highres, stain, side;
-        bool visible;
+        bool visible, bhighRes, bside;
         #region Property
+        public bool bHighRes
+        {
+            get => bhighRes;
+            set => SetProperty(ref bhighRes, value);
+        }
+        public bool bSide
+        {
+            get => bside;
+            set => SetProperty(ref bside, value);
+        }
         public bool Visible
         {
             get => visible;
@@ -40,12 +50,14 @@ namespace Root_VEGA_P_Vision
             set => SetProperty(ref side, value);
         }
         #endregion
-        public InspectionItem_ViewModel(string memstr)
+        public InspectionItem_ViewModel(string memstr, bool bhighRes = true, bool bside = true)
         {
             Main = new InspectionItem();
             Main.DataContext = this;
 
             string[] PartSide = memstr.Split('.');
+            bHighRes = bhighRes;
+            bSide = bside;
             particle = new InspectionOneItem_ViewModel("Particle",PartSide[0]+".Main."+PartSide[1]);
             highres = new InspectionOneItem_ViewModel("HighRes", PartSide[0] + ".Stack." + PartSide[1]);
             stain = new InspectionOneItem_ViewModel("Stain", PartSide[0] + ".Stain." + PartSide[1]);

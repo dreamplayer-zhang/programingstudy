@@ -15,6 +15,12 @@ namespace Root_VEGA_P_Vision
         public PodInfo_ViewModel podInfo;
         MaskTools_ViewModel maskTools;
         MaskRootViewer_ViewModel selectedViewer;
+        SurfaceParam_Tree_ViewModel surfaceParamTree;
+        public SurfaceParam_Tree_ViewModel SurfaceParamTree
+        {
+            get => surfaceParamTree;
+            set => SetProperty(ref surfaceParamTree, value);
+        }
 
         public MaskRootViewer_ViewModel SelectedViewer
         {
@@ -33,6 +39,7 @@ namespace Root_VEGA_P_Vision
             Main.DataContext = this;
             maskTools = new MaskTools_ViewModel();
             SelectedViewer = new MaskRootViewer_ViewModel("EIP_Cover.Main.Front", maskTools);
+            surfaceParamTree = new SurfaceParam_Tree_ViewModel();
             VegaPEventManager.ImageROIBtn += VegaPEventManager_ImageROIBtn;
         }
 

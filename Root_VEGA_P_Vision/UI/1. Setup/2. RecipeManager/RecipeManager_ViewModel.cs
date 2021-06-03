@@ -13,9 +13,8 @@ namespace Root_VEGA_P_Vision
 {
     public class RecipeManager_ViewModel:ObservableObject
     {
-        public Setup_ViewModel setup;
         public RecipeManagerPanel Main;
-
+        public Home_ViewModel home;
         private UserControl m_CurrentPanel;
 
         public UserControl p_SubPanel
@@ -25,13 +24,15 @@ namespace Root_VEGA_P_Vision
         }
         public RecipeOrigin_ViewModel recipeOriginVM;
         public RecipeMask_ViewModel recipeMaskVM;
-        public RecipeManager_ViewModel(Setup_ViewModel setup)
+        public RecipeManager_ViewModel(Home_ViewModel home)
         {
-            this.setup = setup;
             Main = new RecipeManagerPanel();
             Main.DataContext = this;
+            this.home = home;
             recipeOriginVM = new RecipeOrigin_ViewModel(this);
             recipeMaskVM = new RecipeMask_ViewModel(this);
+            
+            SetOrigin();
         }
 
 
@@ -53,10 +54,9 @@ namespace Root_VEGA_P_Vision
         }
         public void SetRecipeMask()
         {
-            setup.SetRecipeMask();
-            setup.p_CurrentPanel = recipeMaskVM.Main;
-            recipeMaskVM.Main.radiobtnStain.IsChecked = true;
-            recipeMaskVM.SetStain();
+            p_SubPanel = recipeMaskVM.Main;
+            //home.m_Setup.SetRecipeMask();
+            //recipeMaskVM.SetStain();
         }
         #region [RelayCommand]
         public ICommand btnOrigin
@@ -77,7 +77,37 @@ namespace Root_VEGA_P_Vision
         }
         public ICommand btnBack
         {
-            get => new RelayCommand(() => { setup.SetHome(); });
+            get => new RelayCommand(() => { home.m_Setup.SetHome(); });
+        }
+        public ICommand btnStain
+        {
+            get => new RelayCommand(() =>
+            {
+                Main.MaskRadio.IsChecked = true;
+                recipeMaskVM.SetStain();
+            });
+        }
+        public ICommand btn6um
+        {
+            get => new RelayCommand(() => {
+                Main.MaskRadio.IsChecked = true;
+                recipeMaskVM.SetTDI();
+            });
+        }
+        public ICommand btn1um
+        {
+            get => new RelayCommand(() => {
+                Main.MaskRadio.IsChecked = true;
+                recipeMaskVM.SetStacking();
+            });
+
+        }
+        public ICommand btnSide
+        {
+            get => new RelayCommand(() => {
+                Main.MaskRadio.IsChecked = true;
+                recipeMaskVM.SetSide();
+            });
         }
         #endregion
     }

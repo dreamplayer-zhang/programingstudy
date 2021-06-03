@@ -86,7 +86,7 @@
                       Margin="20"
                       HorizontalAlignment="Center"
                       Y2="1"/>
-            <Border BorderBrush="{StaticResource MainThema}" Grid.Column="2" BorderThickness="2" Margin="40,120" CornerRadius="10">
+            <Border  BorderBrush="{StaticResource MainThema}" Grid.Column="2" BorderThickness="2" Margin="40,120" CornerRadius="10">
                 <Grid Grid.Column="2">
                 <i:Interaction.Triggers>
                     <i:EventTrigger EventName="MouseLeftButtonDown">
@@ -158,8 +158,7 @@
                       Y2="1"/>
             <Border BorderBrush="{StaticResource MainThema}" Grid.Column="4" BorderThickness="2" Margin="40,120" CornerRadius="10">
                 <Grid Grid.Column="4">
-
-                <i:Interaction.Triggers>
+                    <i:Interaction.Triggers>
                     <i:EventTrigger EventName="MouseLeftButtonDown">
                         <i:InvokeCommandAction Command="{Binding ChangeUISetupCommand}"/>
                     </i:EventTrigger>

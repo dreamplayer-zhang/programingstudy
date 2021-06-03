@@ -31,17 +31,17 @@
                       VerticalAlignment="Top"
                       X2="1"/>
         
-        <StackPanel Grid.Row="2" Orientation="Horizontal">
-            <RadioButton Width="70" Content="Align" Command="{Binding btnAlign}" Style="{StaticResource SelecteRadioBtn}"/>
-            <RadioButton Width="70" Content="Position" Command="{Binding btnPosition}" Style="{StaticResource SelecteRadioBtn}"/>
-            <RadioButton Width="100" Content="Manual Align" Command="{Binding ManualAlign}" Style="{StaticResource SelecteRadioBtn}"/>
+        <UniformGrid Grid.Row="2" Rows="1" HorizontalAlignment="Stretch">
+            <RadioButton  IsChecked="True" Content="Align" Command="{Binding btnAlign}" Style="{StaticResource SelecteRadioBtn}"/>
+            <RadioButton  Content="Position" Command="{Binding btnPosition}" Style="{StaticResource SelecteRadioBtn}"/>
+            <RadioButton  Content="Manual Align" Command="{Binding ManualAlign}" Style="{StaticResource SelecteRadioBtn}"/>
 
-        </StackPanel>
-        <StackPanel HorizontalAlignment="Center" Grid.Row="3" Orientation="Horizontal">
+        </UniformGrid>
+        <UniformGrid Rows="1" HorizontalAlignment="Stretch" Grid.Row="3">
             <Button Content="Add" Command="{Binding btnAdd}" Style="{StaticResource ImageBaseBtn}"/>
             <Button Content="Delete" Command="{Binding btnDelete}" Style="{StaticResource ImageBaseBtn}"/>
             <Button Content="Clear" Command="{Binding btnClear}" Style="{StaticResource ImageBaseBtn}"/>
-        </StackPanel>
+        </UniformGrid>
         <TextBlock Grid.Row="4" Text="Align Feature" Style="{StaticResource HeaderTextBlock}"/>
         <Line Height="1" Grid.Row="5"
                       Stretch="Fill"
