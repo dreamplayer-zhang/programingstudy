@@ -185,11 +185,11 @@ namespace RootTools_Vision
 
         public void Clear()
         {
-            mapdata = new int[1] { (int)CHIP_TYPE.NO_CHIP };
-            mapSizeX = 1;
-            mapSizeY = 1;
-            masterDieX = 1;
-            masterDieY = 1;
+            mapdata = new int[0];
+            mapSizeX = 0;
+            mapSizeY = 0;
+            masterDieX = 0;
+            masterDieY = 0;
         }
 
         public void CreateWaferMap(int mapSizeX, int mapSizeY, CHIP_TYPE type)
