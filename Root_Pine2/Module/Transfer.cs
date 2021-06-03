@@ -126,6 +126,8 @@ namespace Root_Pine2.Module
             {
                 if (m_transfer.m_pusher.p_bLock) return "Lock by Sorter Picker";
                 if (m_transfer.m_gripper.p_bLock) return "Lock by Loader Picker";
+                m_transfer.m_pusher.p_bEnable = false;
+                m_transfer.m_gripper.p_bEnable = false; 
                 m_ePosDst = ePos; 
                 m_axis.StartMove(ePos, bGripPos ? 0 : m_dPulse); 
                 return bWait ? m_axis.WaitReady() : "OK";

@@ -186,7 +186,7 @@ namespace Root_Pine2.Module
                 switch (m_pine2.p_eMode)
                 {
                     case Pine2.eRunMode.Stack: return StartUnloadTray();
-                    case Pine2.eRunMode.Magazine: return StartUnloadTransfer();
+                    case Pine2.eRunMode.Magazine: return m_transfer.m_pusher.p_bEnable ? StartUnloadTransfer() : "OK";
                 }
             }
             else return StartLoadBoat();

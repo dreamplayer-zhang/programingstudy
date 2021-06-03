@@ -373,16 +373,19 @@ namespace Root_Rinse_Unloader.Module
 
         string SetEnableMagazine()
         {
-            if (m_rinse.p_iMagazine >= 20)
+            while (IsMagazineExist(m_rinse.p_eMagazine, m_rinse.p_iMagazine) == false)
             {
-                m_rinse.p_iMagazine = 0;
                 if (Run(SetNextMagazine(m_rinse.p_eMagazine))) return p_sInfo;
             }
-            if (IsMagazineExist(m_rinse.p_eMagazine)) return "OK";
-            {
-                SetNextMagazine(m_rinse.p_eMagazine);
-                return SetEnableMagazine();
-            }
+            return "OK"; 
+        }
+
+        bool IsMagazineExist(eMagazine eMagazine, int iMagazine)
+        {
+            if (iMagazine >= 20) return false;
+            bool bCheck = m_aMagazine[(int)eMagazine].p_bCheck;
+            bool bClamp = m_aMagazine[(int)eMagazine].p_bClamp;
+            return (bCheck && bClamp);
         }
 
         string SetNextMagazine(eMagazine eMagazine)
@@ -400,13 +403,6 @@ namespace Root_Rinse_Unloader.Module
                 case eMagazine.Magazine4: m_rinse.p_eMagazine = eMagazine.Magazine3; break;
             }
             return "OK";
-        }
-
-        bool IsMagazineExist(eMagazine eMagazine)
-        {
-            bool bCheck = m_aMagazine[(int)eMagazine].p_bCheck;
-            bool bClamp = m_aMagazine[(int)eMagazine].p_bClamp;
-            return (bCheck && bClamp); 
         }
 
         ModuleRunBase m_runReady;

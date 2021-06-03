@@ -178,12 +178,9 @@ namespace Root_Pine2.Module
                     switch (boat.p_eStep)
                     {
                         case Boat.eStep.Done: return StartLoad(Vision.eVision.Top2D, eWorks);
-                        case Boat.eStep.Ready:
-                            if (boats3D.m_aBoat[eWorks].p_eStep == Boat.eStep.Done) return StartLoad(Vision.eVision.Top3D, eWorks);
-                            break; 
+                        case Boat.eStep.Ready: return (boats3D.m_aBoat[eWorks].p_eStep == Boat.eStep.Done) ? StartLoad(Vision.eVision.Top3D, eWorks) : "OK";
                     }
                 }
-                return "OK"; 
             }
             return "OK";
         }
