@@ -59,21 +59,10 @@ namespace RootTools.Gem
                 _ePresentSensor = value;
                 if (m_gem != null && !m_gem.p_bOffline)
                 {
-                    if (p_eAccessLP == eAccessLP.Manual)
+                    switch (value)
                     {
-                        switch (value)
-                        {
-                            case ePresent.Empty: m_module.p_sInfo = m_gem.SendCarrierPresentSensor(this, false); break;
-                            case ePresent.Exist: m_module.p_sInfo = m_gem.SendCarrierPresentSensor(this, true); break;
-                        }
-                    }
-                    else 
-                    {
-                        switch (value)
-                        {
-                            case ePresent.Empty: m_module.p_sInfo = m_gem.SendCarrierPIOSignal(this, false); break;
-                            case ePresent.Exist: m_module.p_sInfo = m_gem.SendCarrierPIOSignal(this, true); break;
-                        }
+                        case ePresent.Empty: m_module.p_sInfo = m_gem.SendCarrierPresentSensor(this, false); break;
+                        case ePresent.Exist: m_module.p_sInfo = m_gem.SendCarrierPresentSensor(this, true); break;
                     }
                     
                     SendCarrierOn();
