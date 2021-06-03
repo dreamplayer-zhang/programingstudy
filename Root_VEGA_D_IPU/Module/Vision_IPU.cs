@@ -90,7 +90,7 @@ namespace Root_VEGA_D_IPU.Module
             foreach (GrabMode grabMode in m_aGrabMode)
             {
                 grabMode.m_ptXYAlignData = new RPoint(0, 0);
-                grabMode.m_dVRSFocusPos = 0;
+                //grabMode.m_dVRSFocusPos = 0;
             }
             this.RunTree(Tree.eMode.RegWrite);
             this.RunTree(Tree.eMode.Init);

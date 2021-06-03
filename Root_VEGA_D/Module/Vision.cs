@@ -140,13 +140,11 @@ namespace Root_VEGA_D.Module
             p_sInfo = m_toolBox.Get(ref m_LensLinearTurret, this, "LensTurret");
 
             p_sInfo = m_toolBox.Get(ref m_memoryPool, this, "Memory", 1);
-            m_alid_WaferExist = m_gaf.GetALID(this, "Vision Wafer Exist", "Vision Wafer Exist");
             //m_remote.GetTools(bInit);
 
             InitALID();
 
-            bool bUseRADS = true;
-            p_sInfo = m_toolBox.Get(ref m_RADSControl, this, "RADSControl", bUseRADS);
+            p_sInfo = m_toolBox.Get(ref m_RADSControl, this, "RADSControl", true);
         }
         void InitALID()
         {
@@ -156,9 +154,10 @@ namespace Root_VEGA_D.Module
             m_alidShutterDownError = m_gaf.GetALID(this, "VS Shutter Error", "Shutter is not down");
             m_alidShutterUpError = m_gaf.GetALID(this, "VS Shutter Error", "Shutter is not up");
             m_alidReticleLocateInfoError = m_gaf.GetALID(this, "Reticle Locate Info is not Correct", "Reticle Locate Info is not Correct");
+            m_alidPMCoaxialError = m_gaf.GetALID(this, "PM Coaxial Check Error", "Coaxial Light PM Test is failed");
+            m_alidPMTransmittedError = m_gaf.GetALID(this, "PM Transmitted Check Error", "Transmitted Light PM Test is failed");
         }
         #endregion
-
 
         #region Grab Mode
         int m_lGrabMode = 0;
@@ -187,7 +186,7 @@ namespace Root_VEGA_D.Module
             foreach (GrabMode grabMode in m_aGrabMode)
             {
                 grabMode.m_ptXYAlignData = new RPoint(0, 0);
-                grabMode.m_dVRSFocusPos = 0;
+                //grabMode.m_dVRSFocusPos = 0;
             }
             this.RunTree(Tree.eMode.RegWrite);
             this.RunTree(Tree.eMode.Init);
@@ -787,6 +786,47 @@ namespace Root_VEGA_D.Module
             {
                 Thread.Sleep(10);
             }
+            return "OK";
+        }
+        public string StartRADS(int nOffset = 0)
+        {
+            if (CamRADS == null) return "RADS Cam is null";
+
+            RADSControl.m_timer.Start();
+            RADSControl.p_IsRun = true;
+            RADSControl.StartRADS();
+
+            StopWatch sw = new StopWatch();
+            if (CamRADS.p_CamInfo._OpenStatus == false) CamRADS.Connect();
+            while (CamRADS.p_CamInfo._OpenStatus == false)
+            {
+                if (sw.ElapsedMilliseconds > 15000)
+                {
+                    sw.Stop();
+                    return "RADS Camera Not Connected";
+                }
+            }
+            sw.Stop();
+
+            // Offset 설정
+            RADSControl.p_connect.SetADSOffset(nOffset);
+
+            // RADS 카메라 설정
+            CamRADS.SetMulticast();
+            CamRADS.GrabContinuousShot();
+
+            return "OK";
+        }
+
+        public string StopRADS()
+        {
+            if (CamRADS == null) return "RADS Cam is null";
+
+            RADSControl.m_timer.Stop();
+            RADSControl.p_IsRun = false;
+            RADSControl.StopRADS();
+            if (CamRADS.p_CamInfo._IsGrabbing == true) CamRADS.StopGrab();
+
             return "OK";
         }
         #endregion

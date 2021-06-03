@@ -28,7 +28,7 @@ namespace Root_VEGA_D.Module
 
         //bool m_bInvDir = false;
         public GrabMode m_grabMode = null;
-        double m_dTDIToVRSOffsetZ = 0;
+        //double m_dTDIToVRSOffsetZ = 0;
         string m_sGrabMode = "";
         public bool m_bIPUCompleted = true;
         public int m_nCurScanLine = 0;
@@ -54,14 +54,18 @@ namespace Root_VEGA_D.Module
         {
             Run_GrabLineScan run = new Run_GrabLineScan(m_module);
             run.p_sGrabMode = p_sGrabMode;
-            run.m_dTDIToVRSOffsetZ = m_dTDIToVRSOffsetZ;
+            run.m_bIPUCompleted = m_bIPUCompleted;
+            run.m_nCurScanLine = m_nCurScanLine;
+            run.m_bWaitRun = m_bWaitRun;
+            //run.m_dTDIToVRSOffsetZ = m_dTDIToVRSOffsetZ;
+
             return run;
         }
 
         public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
         {
             p_sGrabMode = tree.Set(p_sGrabMode, p_sGrabMode, m_module.p_asGrabMode, "Grab Mode", "Select GrabMode", bVisible);
-            m_dTDIToVRSOffsetZ = tree.Set(m_dTDIToVRSOffsetZ, m_dTDIToVRSOffsetZ, "TDI To VRS Offset Z", "TDI To VRS Offset Z", bVisible);
+            //m_dTDIToVRSOffsetZ = tree.Set(m_dTDIToVRSOffsetZ, m_dTDIToVRSOffsetZ, "TDI To VRS Offset Z", "TDI To VRS Offset Z", bVisible);
             //if (m_grabMode != null) m_grabMode.RunTree(tree.GetTree("Grab Mode", false), bVisible, true);
         }
 
@@ -90,7 +94,7 @@ namespace Root_VEGA_D.Module
                 if (camRADS.p_CamInfo._OpenStatus == false) camRADS.Connect();
 
                 int nTryCount = 0;
-                while(nTryCount < 3)
+                while(nTryCount < m_grabMode.m_nRetryCount)
                 {
                     // RADS Voltage Reset
                     m_module.RADSControl.ResetController();
@@ -128,7 +132,7 @@ namespace Root_VEGA_D.Module
                     // 중앙에 RADS 레이저가 맞춰진적이 없다면
                     if (m_nAFBestGVSum <= 0)
                     {
-                        m_log.Info(string.Format("AutoFocus Try {0} - Cannot find best Y position by auto focusing", nTryCount));
+                        m_log.Info(string.Format("AutoFocus Try ({0}/{1}) - Cannot find best Y position by auto focusing", nTryCount, m_grabMode.m_nRetryCount));
                         nTryCount++;
                     }
                     else
@@ -224,35 +228,18 @@ namespace Root_VEGA_D.Module
             }
         }
 
-        string ConnectRADS()
+        string StartRADS()
         {
-            Camera_Basler camRADS = (Camera_Basler)m_module.CamRADS;
-
             if (m_grabMode.pUseRADS && m_module.RADSControl.p_IsRun == false)
-            {
-                m_module.RADSControl.m_timer.Start();
-                m_module.RADSControl.p_IsRun = true;
-                m_module.RADSControl.StartRADS();
+                return m_module.StartRADS(m_grabMode.pRADSOffset);
 
-                StopWatch sw = new StopWatch();
-                if (camRADS.p_CamInfo._OpenStatus == false) camRADS.Connect();
-                while (camRADS.p_CamInfo._OpenStatus == false)
-                {
-                    if (sw.ElapsedMilliseconds > 15000)
-                    {
-                        sw.Stop();
-                        return "RADS Camera Not Connected";
-                    }
-                }
-                sw.Stop();
+            return "OK";
+        }
 
-                // Offset 설정
-                m_module.RADSControl.p_connect.SetADSOffset(m_grabMode.pRADSOffset);
-
-                // RADS 카메라 설정
-                camRADS.SetMulticast();
-                camRADS.GrabContinuousShot();
-            }
+        string StopRADS()
+        {
+            if (m_grabMode.pUseRADS && m_module.RADSControl.p_IsRun == true)
+                return m_module.StopRADS();
 
             return "OK";
         }
@@ -489,7 +476,7 @@ namespace Root_VEGA_D.Module
                     return p_sInfo;
 
                 // RADS 연결
-                if (m_module.Run(ConnectRADS()))
+                if (m_module.Run(StartRADS()))
                     return p_sInfo;
 
                 // 카메라 연결 시도
@@ -596,8 +583,8 @@ namespace Root_VEGA_D.Module
                             dEndPosY = dTriggerEndPosY + decDistance;
                         }
 
-                        if (m_grabMode.m_dVRSFocusPos != 0)
-                            dPosZ = m_grabMode.m_dVRSFocusPos + m_dTDIToVRSOffsetZ;
+                        //if (m_grabMode.m_dVRSFocusPos != 0)
+                        //    dPosZ = m_grabMode.m_dVRSFocusPos + m_dTDIToVRSOffsetZ;
 
                         //포커스 높이로 Z축 이동
                         if (m_module.Run(axisZ.StartMove(dPosZ)))
@@ -682,13 +669,7 @@ namespace Root_VEGA_D.Module
                 m_grabMode.SetLight(false);
 
                 // RADS 기능 off
-                if (m_grabMode.pUseRADS && m_module.RADSControl.p_IsRun == true)
-                {
-                    m_module.RADSControl.m_timer.Stop();
-                    m_module.RADSControl.p_IsRun = false;
-                    m_module.RADSControl.StopRADS();
-                    if (camRADS.p_CamInfo._IsGrabbing == true) camRADS.StopGrab();
-                }
+                StopRADS();
             }
         }
     }
