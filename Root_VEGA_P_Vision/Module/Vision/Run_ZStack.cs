@@ -172,6 +172,11 @@ namespace Root_VEGA_P_Vision.Module
                 if (m_module.Run(axisXY.WaitReady()))
                     return p_sInfo;
 
+                if (m_module.Run(axisZ.StartMove(dTriggerStartPosZ)))
+                    return p_sInfo;
+                if (m_module.Run(axisZ.WaitReady()))
+                    return p_sInfo;
+
                 //InfoPod.ePod parts = m_module.p_infoPod.p_ePod;
                 //Vision.eUpDown upDown = (Vision.eUpDown)Enum.ToObject(typeof(Vision.eUpDown), m_module.p_infoPod.p_bTurn);
                 //MemoryData mem = mainOpt.GetMemoryData(parts, Vision.MainOptic.eInsp.Stack, upDown);
@@ -185,9 +190,9 @@ namespace Root_VEGA_P_Vision.Module
                 int nCamWidth = ZStackGrabMode.m_camera.GetRoiSize().X;
                 int nCamHeight = ZStackGrabMode.m_camera.GetRoiSize().Y;
 
-                ZStackGrabMode.StartZGrab(mem, nstep); //여기선 진자 찍는것만
+                //ZStackGrabMode.StartZGrab(mem, nstep); //여기선 진자 찍는것만
 
-                /*double dstep = Math.Abs(nendPos - nstartPos) / nstep;  //area camera
+                //double dstep = Math.Abs(nendPos - nstartPos) / nstep;  //area camera
 
                 nstep = mem.p_nCount - 1;
                 for (int step = 0; step < nstep; step++)

@@ -13,9 +13,16 @@ namespace RootTools_Vision
         {
             listAlignFeature = new List<RecipeType_ImageData>();
             listPositionFeature = new List<RecipeType_ImageData>();
+            alignAngle = 0;
         }
         List<RecipeType_ImageData> listAlignFeature;
         List<RecipeType_ImageData> listPositionFeature;
+        double alignAngle;
+        public double AlignAngle
+        {
+            get => alignAngle;
+            set => alignAngle = value;
+        }
         public List<RecipeType_ImageData> ListAlignFeature { get => listAlignFeature; set => listAlignFeature = value; }
         public List<RecipeType_ImageData> ListPositionFeature { get => listPositionFeature; set => listPositionFeature = value; }
         public void AddAlignFeature(int positionX, int positionY, int featureWidth, int featureHeight, int byteCnt, byte[] rawData)
@@ -53,17 +60,12 @@ namespace RootTools_Vision
         #region Parameter
         FeatureLists EIPCoverTopfeature, EIPCoverBtmfeature, EIPBaseTopfeature, EIPBaseBtmfeature;
 
-        int idxMaxScoreAlignFeature;
-        int idxMaxScorePositionFeature;
         #endregion
         #region [Getter Setter]
         public FeatureLists EIPCoverTopFeature { get => EIPCoverTopfeature; set => EIPCoverTopfeature = value; }
         public FeatureLists EIPCoverBtmFeature { get => EIPCoverBtmfeature; set => EIPCoverBtmfeature = value; }
         public FeatureLists EIPBaseTopFeature { get => EIPBaseTopfeature; set => EIPBaseTopfeature = value; }
         public FeatureLists EIPBaseBtmFeature { get => EIPBaseBtmfeature; set => EIPBaseBtmfeature = value; }
-
-        public int IdxMaxScoreAlignFeature { get => idxMaxScoreAlignFeature; set => idxMaxScoreAlignFeature = value; }
-        public int IdxMaxScorePositionFeature { get => idxMaxScorePositionFeature; set => idxMaxScorePositionFeature = value; }
         #endregion
 
         public EUVPositionRecipe()
@@ -72,9 +74,6 @@ namespace RootTools_Vision
             EIPCoverBtmfeature = new FeatureLists();
             EIPBaseTopfeature = new FeatureLists();
             EIPBaseBtmfeature = new FeatureLists();
-
-            idxMaxScoreAlignFeature = -1;
-            idxMaxScorePositionFeature = -1;
         }
 
         public override void Clear()
@@ -83,9 +82,6 @@ namespace RootTools_Vision
             EIPCoverBtmfeature.Clear();
             EIPBaseTopfeature.Clear();
             EIPBaseBtmfeature.Clear();
-
-            IdxMaxScoreAlignFeature = -1;
-            IdxMaxScorePositionFeature = -1;
         }
 
         public override bool Read(string recipePath)
