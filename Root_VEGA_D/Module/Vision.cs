@@ -5,6 +5,7 @@ using Emgu.CV.Structure;
 using Emgu.CV.Util;
 using Root_EFEM.Module;
 using Root_VEGA_D_IPU.Module;
+using Root_VEGA_D.Engineer;
 using RootTools;
 using RootTools.Camera;
 using RootTools.Camera.BaslerPylon;
@@ -44,6 +45,7 @@ namespace Root_VEGA_D.Module
         ALID m_alid_WaferExist;
         public ALID m_alidPMCoaxialError;
         public ALID m_alidPMTransmittedError;
+        public ALID m_alidPMFail;
 
         void InitGAF()
         {
@@ -53,6 +55,7 @@ namespace Root_VEGA_D.Module
             m_alidShutterUpError = m_gaf.GetALID(this, "VS Shutter Error", "Shutter is not up");
             m_alidPMCoaxialError = m_gaf.GetALID(this, "PM Error", "Coaxial Light PM Test is failed");
             m_alidPMTransmittedError = m_gaf.GetALID(this, "PM Error", "Transmitted Light PM Test is failed");
+            m_alidPMFail = m_gaf.GetALID(this, "PM Fail", "PM is Fail, Pod is not load");
         }
         public void SetAlarm()
         {
@@ -92,6 +95,7 @@ namespace Root_VEGA_D.Module
 
         TCPIPComm_VEGA_D m_tcpipCommServer;
         RADSControl m_RADSControl;
+
 
         #region [Getter Setter]
         public Axis AxisRotate { get => m_axisRotate; private set => m_axisRotate = value; }
@@ -1109,7 +1113,7 @@ namespace Root_VEGA_D.Module
             //AddModuleRunList(new Run_AutoFocus(this), false, "Run AutoFocus");
             AddModuleRunList(new Run_MakeTemplateImage(this), true, "Run Make TemplateImage");
             AddModuleRunList(new Run_PatternAlign(this), true, "Run Pattern Align");
-            m_runPM = AddModuleRunList(new Run_PM(this), true, "Run PM");
+            m_runPM = AddModuleRunList(new Run_PM(this,(VEGA_D_Handler)m_engineer.ClassHandler()), true, "Run PM");
         }
         #endregion
     }

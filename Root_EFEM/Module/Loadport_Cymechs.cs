@@ -17,6 +17,8 @@ namespace Root_EFEM.Module
 {
     public class Loadport_Cymechs : ModuleBase, IWTRChild, ILoadport
     {
+        public delegate void CommonFunction();
+        public CommonFunction m_CommonFunction;
         public void SetAlarm()
         {
             m_alid_WaferExist.Run(true, "Aligner Wafer Exist Error");

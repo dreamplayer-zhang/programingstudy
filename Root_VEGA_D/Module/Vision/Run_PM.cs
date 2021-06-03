@@ -11,6 +11,8 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Root_VEGA_D.Engineer;
+using Root_EFEM.Module;
 
 namespace Root_VEGA_D.Module
 {
@@ -33,6 +35,7 @@ namespace Root_VEGA_D.Module
         int m_nLSL = 0;
         string m_sMemoryGroup = "";
         string m_sMemoryData = "";
+        VEGA_D_Handler m_handler;
 
         public string p_sGrabMode
         {
@@ -43,14 +46,15 @@ namespace Root_VEGA_D.Module
                 m_grabMode = m_module.GetGrabMode(value);
             }
         }
-        public Run_PM(Vision module)
+        public Run_PM(Vision module, VEGA_D_Handler handler)
         {
             m_module = module;
+            m_handler = handler;
             InitModuleRun(module);
         }
         public override ModuleRunBase Clone()
         {
-            Run_PM run = new Run_PM(m_module);
+            Run_PM run = new Run_PM(m_module,m_handler);
 
             run.p_sGrabMode = p_sGrabMode;
             run.m_dScanDistance = m_dScanDistance;
@@ -223,7 +227,8 @@ namespace Root_VEGA_D.Module
             PreparePMLog();
 
             WritePMLog(ePMLogType.PM_Start, "");
-
+            bool bCoaxialResult = true;
+            bool bTransmittedResult = true;
             // Collect GV Value
             try
             {
@@ -288,8 +293,8 @@ namespace Root_VEGA_D.Module
 
 
                 // PM check result
-                bool bCoaxialResult = listPMData[0].m_average <= m_nUSL && listPMData[0].m_average >= m_nLSL;
-                bool bTransmittedResult = listPMData[1].m_average <= m_nUSL && listPMData[1].m_average >= m_nLSL;
+                bCoaxialResult = listPMData[0].m_average <= m_nUSL && listPMData[0].m_average >= m_nLSL;
+                bTransmittedResult = listPMData[1].m_average <= m_nUSL && listPMData[1].m_average >= m_nLSL;
 
                 m_log.Info(string.Format("Coaxial Light PM result : {0} (Average = {1})", bCoaxialResult ? "OK" : "Fail", listPMData[0].m_average));
                 m_log.Info(string.Format("Transmitted Light PM result : {0} (Average = {1})", bTransmittedResult ? "OK" : "Fail", listPMData[1].m_average));
@@ -323,7 +328,8 @@ namespace Root_VEGA_D.Module
                     if (camRADS.p_CamInfo._IsGrabbing == true) camRADS.StopGrab();
                 }
             }
-
+            if (!bCoaxialResult && !bTransmittedResult) ((Loadport_Cymechs)m_handler.m_loadport[EQ.p_nRunLP]).m_CommonFunction();
+            else m_module.m_alidPMFail.Run(true, "PM is Fail");
             return "OK";
         }
     }

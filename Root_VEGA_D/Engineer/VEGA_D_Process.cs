@@ -399,7 +399,7 @@ namespace Root_VEGA_D.Engineer
                 return EQ.IsStop() ? "EQ Stop" : "OK";
             }
             Sequence sequence = m_qSequence.Peek();
-            if (sequence.m_moduleRun.p_id.Contains(".Docking"))
+            if (sequence.m_moduleRun.p_id.Contains(".Docking") && !EQ.p_bRecovery)
             {
                 ModuleRunBase VisionPM = handler.m_vision.m_runPM.Clone();
                 handler.m_vision.StartRun(VisionPM);
