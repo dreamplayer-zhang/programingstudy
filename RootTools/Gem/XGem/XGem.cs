@@ -456,27 +456,6 @@ namespace RootTools.Gem.XGem
 
         private void M_xGem_OnGEMTerminalMessage(long nTid, string sMsg)
         {
-            //TODO : Terminal Message Parsing해서 Job Reserved 처리하기.
-            //Terminal Message 예시
-            /*
-            -----------TKIN PASS------------------
-            JOBID = PJ001
-            CSTID = tstatd
-            RECIPE = asdfasdf
-            SLOT = 111110000000000
-            -------------------------------------- =
-
-            ----------JOB RESERVED------------ -
-
-            ---------------------------------------
-            // if (Job Reserved가 있으면) m_ceidJobReserved.Send();
-
-            */
-            if (sMsg.Contains("Reserved") == true)
-            {
-                SetCEID(8211);
-            }
-
             LogRcv("OnGEMTerminalMessage", nTid, sMsg);
         }
 
@@ -733,6 +712,31 @@ namespace RootTools.Gem.XGem
             return LogSend(nError, "CMSSetPresenceSensor", carrier.p_sLocID, nPresent);
         }
 
+        public enum ePIOSignal
+        {
+            Valid = 1,
+            CS_0,
+            CS_1,
+            TR_REQ,
+            L_REQ,
+            U_REQ,
+            READY,
+            BUSY,
+            COMPT,
+            CONT,
+            H0_AVBL,
+            ES
+        }
+
+        public string SendCarrierPIOSignal(GemCarrierBase carrier, bool bPIOReadyOn)
+        {
+            if (carrier.p_eAccessLP != GemCarrierBase.eAccessLP.Auto) return "Invalid Carrier PIO Signal When AccessLP = Manual";
+            long bOn = bPIOReadyOn ? 1 : 0;
+            long nError = m_xGem.CMSSetPIOSignalState(carrier.p_sLocID, (long)ePIOSignal.READY, bOn);
+
+            return LogSend(nError, "CMSSetPIOSignalState", carrier.p_sLocID, bPIOReadyOn);
+        }
+
         public void SendCarrierOn(GemCarrierBase carrier, bool bOn)
         {
             long nOn = bOn ? 1 : 0;
@@ -762,11 +766,9 @@ namespace RootTools.Gem.XGem
 
         private void M_xGem_OnCMSCarrierDeleted(string sCarrierID)
         {
-            
             LogRcv("OnCMSCarrierDeleted", sCarrierID);
             foreach (GemCarrierBase carrier in m_aCarrier)
             {
-                if (carrier.p_ePresentSensor == GemCarrierBase.ePresent.Exist) return;
                 if (carrier.p_sCarrierID == sCarrierID)
                 {
                     p_sInfo = "eReqTransfer : " + carrier.p_eReqTransfer.ToString() + " -> " + GemCarrierBase.eTransfer.ReadyToLoad.ToString();
@@ -1199,7 +1201,10 @@ namespace RootTools.Gem.XGem
                 LogSend(nError, "Initialize", m_sPathConfig);
                 if (nError == 0) m_bStart = true;
             }
-            catch { p_sInfo = "Initialize File Open Error : " + m_sPathConfig; }
+            catch (Exception e)
+            {
+                p_sInfo = "XGem Config File Open Error : " + e.Message + "Path : " + m_sPathConfig;
+            }
         }
 
         public void DeleteAllJobInfo()

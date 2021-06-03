@@ -82,7 +82,7 @@ namespace Root_Pine2.Module
         void RunThreadCheck()
         {
             m_bThread = true;
-            Thread.Sleep(2000);
+            Thread.Sleep(5000);
             while (m_bThread)
             {
                 Thread.Sleep(10);

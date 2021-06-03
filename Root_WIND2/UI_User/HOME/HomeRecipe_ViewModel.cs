@@ -74,7 +74,6 @@ namespace Root_WIND2.UI_User
 
         public HomeRecipe_ViewModel()
         {
-
             m_recipe = ((WIND2_Handler)GlobalObjects.Instance.Get<WIND2_Engineer>().ClassHandler()).m_recipe;
             m_moduleRunList = m_recipe.m_moduleRunList;
             m_moduleRunList.Add(vision.p_id, "GrabLineScan");
@@ -85,17 +84,17 @@ namespace Root_WIND2.UI_User
             ModuleList.Add(new ModuleView());
 
             ModuleView_ViewModel model = new ModuleView_ViewModel(vision);
-            model.AddMode("OnlySnap", vision.GetModuleruns());
-            model.AddMode("Alignment", vision.GetModuleruns());
-            model.AddMode("Inspection", vision.GetModuleruns());
+            //model.AddMode("OnlySnap", vision.GetModuleruns());
+            //model.AddMode("Alignment", vision.GetModuleruns());
+            //model.AddMode("Inspection", vision.GetModuleruns());
             ModuleViewModels.Add(model);
             model = new ModuleView_ViewModel(backside);
-            model.AddMode("OnlySnap", backside.GetModuleruns());
-            model.AddMode("Inspection", backside.GetModuleruns());
+            //model.AddMode("OnlySnap", backside.GetModuleruns());
+            //model.AddMode("Inspection", backside.GetModuleruns());
             ModuleViewModels.Add(model);
             model = new ModuleView_ViewModel(edgeside);
-            model.AddMode("OnlySnap", edgeside.GetModuleruns());
-            model.AddMode("Inspection", edgeside.GetModuleruns());
+            //model.AddMode("OnlySnap", edgeside.GetModuleruns());
+            //model.AddMode("Inspection", edgeside.GetModuleruns());
             ModuleViewModels.Add(model);
 
             for (int i = 0; i < moduleList.Count; i++)

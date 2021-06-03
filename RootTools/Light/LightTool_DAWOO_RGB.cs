@@ -128,7 +128,7 @@ namespace RootTools.Light
                 int i = 0;
                 aSend[i++] = 0xAA;                      // Head
                 aSend[i++] = (byte)(bIsGetCmd ? 6 : 8); // Len
-                aSend[i++] = 0x00;                      // ID
+                aSend[i++] = (byte)m_nDeviceID;         // ID
                 aSend[i++] = (byte)m_eCmd;              // CMD
                 aSend[i++] = 0X00;                      // Parameter
                 if (!bIsGetCmd)
@@ -137,10 +137,12 @@ namespace RootTools.Light
                     aSend[i++] = (byte)m_nValue;        // Data
                 }
 
+                // XOR Data
                 byte nXor = 0;
                 for (int n = 0; n < i; n++) nXor ^= aSend[n];
                 aSend[i++] = nXor;
                 m_rs232.Send(aSend, i);
+                
                 m_bSend = true;
                 return "OK";
             }
@@ -277,7 +279,12 @@ namespace RootTools.Light
                         break;
                 }
 
-                if (protocol != null) protocol.WaitReply(1000);
+                if (protocol != null)
+                {
+                    string sResult = protocol.WaitReply(m_msWaitReply);
+                    if (sResult == "Timeover")
+                        m_lightTool.m_protocolSend = null;
+                }
             }
 
             public void SetGetPower(int nPower)
@@ -303,7 +310,12 @@ namespace RootTools.Light
                         break;
                 }
 
-                if(protocol != null) protocol.WaitReply(1000);
+                if (protocol != null)
+                {
+                    string sResult = protocol.WaitReply(m_msWaitReply);
+                    if (sResult != "OK")
+                        m_lightTool.m_protocolSend = null;
+                }
             }
             protected override void GetOnOff() { }
             public override void SetOnOff()
@@ -319,7 +331,12 @@ namespace RootTools.Light
                         break;
                 }
 
-                if (protocol != null) protocol.WaitReply(1000);
+                if (protocol != null)
+                {
+                    string sResult = protocol.WaitReply(m_msWaitReply);
+                    if (sResult != "OK")
+                        m_lightTool.m_protocolSend = null;
+                }
             }
 
             public int m_nCh = 0;
@@ -344,6 +361,7 @@ namespace RootTools.Light
         public List<LightBase> p_aLight { get; set; }
         void InitLight()
         {
+            m_rs232.m_eHandshake = System.IO.Ports.Handshake.None;
             m_rs232.p_bConnect = true;
             foreach (eChannel eChannel in Enum.GetValues(typeof(eChannel)))
             {
@@ -401,11 +419,11 @@ namespace RootTools.Light
             m_engineer = engineer;
             m_log = LogView.GetLog(id);
 
+            InitThread();
+
             InitRS232();
             InitTreeSetup();
             InitLight();
-
-            InitThread();
         }
 
         public void ThreadStop()

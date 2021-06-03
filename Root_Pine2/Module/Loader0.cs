@@ -173,7 +173,7 @@ namespace Root_Pine2.Module
 
         public string RunLoadTransfer(ePosTransfer ePos)
         {
-            Transfer.Buffer.Gripper gripper = m_transfer.m_buffer.m_gripper;
+            Transfer.Gripper gripper = m_transfer.m_gripper;
             if (m_picker.p_infoStrip != null) return "InfoStrip != null";
             if (gripper.p_bEnable == false) return "Load from Transfer not Enable";
             try
@@ -235,7 +235,6 @@ namespace Root_Pine2.Module
                 m_picker.p_infoStrip = null;
                 boat.p_infoStrip.m_eWorks = eWorks;
                 if (Run(RunMoveUp())) return p_sInfo;
-                boats.StartScan(eWorks); 
             }
             finally
             {
@@ -272,7 +271,7 @@ namespace Root_Pine2.Module
                         if (m_loadEV.p_bDone) return StartRun(m_runLoadEV);
                         return "OK";
                     case Pine2.eRunMode.Magazine:
-                        if (m_transfer.m_buffer.m_gripper.p_bEnable) return StartLoadTransfer();
+                        if (m_transfer.m_gripper.p_bEnable) return StartLoadTransfer();
                         return "OK";
                 }
             }
@@ -318,6 +317,7 @@ namespace Root_Pine2.Module
         }
         #endregion
 
+        public InfoStrip p_infoStrip { get { return m_picker.p_infoStrip; } }
         Picker m_picker = null;
         Pine2 m_pine2 = null;
         LoadEV m_loadEV = null;

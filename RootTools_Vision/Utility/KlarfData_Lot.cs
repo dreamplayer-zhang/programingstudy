@@ -1,6 +1,11 @@
-﻿using RootTools.Database;
+﻿using RootTools;
+using RootTools.Database;
 using System;
+using System.Collections;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Drawing;
+using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -45,10 +50,10 @@ namespace RootTools_Vision.Utility
 			orientationMarkLocation = "DOWN";
 
 			timeFile = DateTime.Now;
-			tiffFileName = "";
+			klarfFileName = "";
 			sampleCenterLocationX = 0.0f;
 			sampleCenterLocationY = 0.0f;
-			slot = 1;
+			slotID = 1;
 
 			klarfType = 0;
 		}
@@ -73,6 +78,9 @@ namespace RootTools_Vision.Utility
 		private String klarf_FileName;
 		private String cassetteID;
 
+
+		private DateTime timeLotStart;				  //210531 Lot Start 시간
+
 		private DateTime timeFile;                    // Klarf 생성 시간.
 		private DateTime timeResult;                  // 검사 종료 시간.
 		private DateTime timeRecipe;                  // Recipe 생성 시간.
@@ -86,24 +94,24 @@ namespace RootTools_Vision.Utility
 		private double dieOriginX, dieOriginY;        // 센터 기준. 무조건 0, 0 으로 보고 셋팅
 		private double sampleCenterLocationX;         // 센터 Die의 Left,bottom와 실제 제품 Center간의 차이.
 		private double sampleCenterLocationY;         // 센터 Die의 Left,bottom와 실제 제품 Center간의 차이.
-		private Size chipSize;                        // pixel 기준 칩 크기
+		private System.Windows.Size chipSize;                        // pixel 기준 칩 크기
 		private int sampleSize;                       // 제품의 크기. (ex 1 300)
 		private string tempString;
 
 		private string tempLotEndResultTimeStamp;
-		private float resX;
-		private float resY;
+		private double resX;
+		private double resY;
 
-		private int slot;
+		private int slotID;
 
 		private int klarfType;
 
 		//private String mesLotID;                        // Lot ID : Product ID가 따로 있을 경우 (Tray/PCB경우 실제 LotID와 Prod.ID가 다른경우가 있음)
 
-		private String recipeName;
-		private String tiffSpec;                        // Tiff Spec, 현재 모두 Color로 변환하여 저장. (ex 6.0 G R)
-		private String tiffFileName;                    // Tiff file 명.
-		//private String areaPerTest;                      // Area Per Test (사용안함)
+		private string recipeName;
+		private string tiffSpec;                        // Tiff Spec, 현재 모두 Color로 변환하여 저장. (ex 6.0 G R)
+		private string klarfFileName;
+														//private String areaPerTest;                      // Area Per Test (사용안함)
 
 
 		//private int inspectionTest;                      // 검사 회수, ATI 검사 Mode가 1가지라서 1회만 검사하지요.
@@ -113,8 +121,52 @@ namespace RootTools_Vision.Utility
 		//private String sampleTestPlan;                  // 검사한 Die 좌표들.
 		//private int tmpSampleTestCnt;                    // 검사한 Die 수량을 임시로 저장해둠. Density 구하기 위함.
 
+
+		// 210531
+		string klarfPath;
+
 		#endregion
 
+
+
+		// 210531 New
+		public bool LotStart(string klarfPath, InfoWafer infoWafer , RecipeType_WaferMap mapData, GrabModeBase grabMode)
+        {
+			this.klarfData.Clear();
+
+			this.cassetteID = infoWafer.p_sCarrierID;
+			this.lotID = infoWafer.p_sLotID;
+			this.recipeName = infoWafer.p_sRecipe;
+			this.waferID = infoWafer.p_sWaferID;
+
+			string[] idArr = infoWafer.p_sRecipe.Split('.');
+			if(idArr.Length == 1)
+            {
+				this.deviceID = idArr[0];
+				this.partID = idArr[0];
+				this.stepID = idArr[0];
+			}
+			else
+            {
+				this.deviceID = idArr[0];
+				this.partID = idArr[0];
+				this.stepID = idArr[1];
+			}
+
+			this.resX = grabMode.m_dRealResX_um;
+			this.resY = grabMode.m_dRealResY_um;
+
+			CalcSampleCenterLoc(mapData);
+
+			this.timeLotStart = DateTime.Now;
+
+			this.klarfPath = klarfPath;
+
+			return true;
+		}
+
+
+		// 이건 쓰지말자...
 		public bool LotStart(string _recipeName/*, CRecipeData_ProductSetting* _productInfor*/, RecipeType_WaferMap _mapdata, string _lotID, DateTime _lotStart)
 		{
 			this.klarfData.Clear();
@@ -147,6 +199,21 @@ namespace RootTools_Vision.Utility
 		{
 			timeResultStamp = DateTime.Now;
 		}
+
+
+
+		public bool WaferStart(RecipeType_WaferMap mapdata, InfoWafer infoWafer)
+        {
+			this.timeResult = DateTime.Now; 
+			this.timeRecipe = DateTime.Now;
+
+			this.slotID = infoWafer.m_nSlot;
+
+			return true;
+		}
+
+
+		// 이거 쓰지말자
 		public bool WaferStart(/*CRecipeData_CurrentWFInfor _waferInfor, CRecipeData_ProductSetting* _productInfor, */ RecipeType_WaferMap _mapdata, DateTime _waferStart)
 		{
 			//klarfData.Clear();
@@ -165,7 +232,7 @@ namespace RootTools_Vision.Utility
 				case 4: this.orientationMarkLocation = "DOWN"; break;
 			}
 			
-			this.slot = CheckSlotNo();
+			this.slotID = CheckSlotNo();
 			
 			CalcSampleCenterLoc(_mapdata);
 
@@ -184,9 +251,9 @@ namespace RootTools_Vision.Utility
             KlarfData data = new KlarfData();
 
             data.SetKlarfType(klarfType);
-            data.tiffFileName = this.tiffFileName;
+            data.klarfFileName = this.klarfFileName;
 
-            data.waferID_name = string.Format("{0:2d}", 0/*pMapdata->GetWaferID()*/);
+            data.waferID_name = string.Format("{0:2d}", this.slotID);
 
             //	data.m_nWaferID = AfxGetApp()->GetProfileIntA("ProductSetting", "SlotNum", data.m_nWaferID);  
             //	data.m_nSlot = AfxGetApp()->GetProfileIntA("ProductSetting", "SlotNum", data.m_nSlot); 
@@ -225,7 +292,7 @@ namespace RootTools_Vision.Utility
 			KlarfData data = new KlarfData();
 
 			data.SetKlarfType(klarfType);
-			data.tiffFileName = this.tiffFileName;
+			data.klarfFileName = this.klarfFileName;
 
 			data.waferID_name = string.Format("{0:2d}", 0/*pMapdata->GetWaferID()*/);
 
@@ -300,7 +367,7 @@ namespace RootTools_Vision.Utility
 
 			KlarfData data = new KlarfData();
 			data.SetKlarfType(klarfType);
-			data.tiffFileName = this.tiffFileName;
+			data.klarfFileName = this.klarfFileName;
 
 			data.waferID_name = string.Format("{0:2d}", 0/*pMapdata->GetWaferID()*/); 
 
@@ -338,7 +405,7 @@ namespace RootTools_Vision.Utility
         {
 			if (bCollector)
 			{
-				tempString = string.Format(lotID + "_{0:d}", slot);
+				tempString = string.Format(lotID + "_{0:d}", slotID);
 			}
 			else
 			{
@@ -351,8 +418,11 @@ namespace RootTools_Vision.Utility
 			return tempString;
 		}
 
-		public bool SaveKlarf(string strFilePath, bool bCollector = false)
+		public bool SaveKlarf(string strFilePath ="", bool bCollector = false)
 		{
+
+			if (strFilePath == "") strFilePath = this.klarfPath;
+
 			timeFile = DateTime.Now;
 
 			if (!Directory.Exists(strFilePath))
@@ -360,7 +430,7 @@ namespace RootTools_Vision.Utility
 
 			if (bCollector)
 			{
-				tempString = string.Format(strFilePath + "\\" + lotID + "_{0:d}", slot);
+				tempString = string.Format(strFilePath + "\\" + lotID + "_{0:d}", slotID);
 			}
 			else
 			{
@@ -369,11 +439,10 @@ namespace RootTools_Vision.Utility
 
 			tempString.Replace("\\\\", "\\");
 			tempString.Replace(".rcp", "");
-			tempString += ".001";
-			tiffFileName = tempString;
-			//tiffFileName.Replace(".001", ".tif"); //이거모냐
+			klarfFileName = tempString;
+			string klarfFileFullPath = klarfFileName + ".001";
 
-			FileStream fs = new FileStream(tiffFileName, FileMode.Create, FileAccess.Write);
+			FileStream fs = new FileStream(klarfFileFullPath, FileMode.Create, FileAccess.Write);
 			StreamWriter sw = new StreamWriter(fs, System.Text.Encoding.UTF8);
 
 			if (sw != null)
@@ -396,8 +465,11 @@ namespace RootTools_Vision.Utility
 			return true;
 		}
 
-		public bool CreateLotEnd(string strFilePath)
+		public bool CreateLotEnd(string strFilePath = "")
 		{
+			if (strFilePath == "")
+				strFilePath = this.klarfPath;
+
 			timeFile = DateTime.Now;
 
 			FileStream fs = new FileStream(strFilePath, FileMode.Append, FileAccess.Write);
@@ -428,43 +500,43 @@ namespace RootTools_Vision.Utility
 			return true;
 		}
 
-		public bool SaveKlarfToServer(string strFilePath, int nError)
-		{
-			timeFile = DateTime.Now;
+		//public bool SaveKlarfToServer(string strFilePath, int nError)
+		//{
+		//	timeFile = DateTime.Now;
 
-			FileStream fs = new FileStream(strFilePath, FileMode.Append, FileAccess.Write);
-			StreamWriter sw = new StreamWriter(fs, System.Text.Encoding.UTF8);
+		//	FileStream fs = new FileStream(strFilePath, FileMode.Append, FileAccess.Write);
+		//	StreamWriter sw = new StreamWriter(fs, System.Text.Encoding.UTF8);
 
-			tempString = string.Format(strFilePath + "\\" + recipeName + "_" + cassetteID + "_" + "00-" + waferID);
-			tempString.Replace(".rcp", "");
-			tempString += ".001";
-			tiffFileName = tempString;
-			tiffFileName.Replace(".001", ".tif");
+		//	tempString = string.Format(strFilePath + "\\" + recipeName + "_" + cassetteID + "_" + "00-" + waferID);
+		//	tempString.Replace(".rcp", "");
+		//	klarfFileName = tempString;
+		//	tempString += ".001";
+			
 
-			try
-			{
-				if (fs != null)
-				{
-					SaveHeader(sw);
+		//	try
+		//	{
+		//		if (fs != null)
+		//		{
+		//			SaveHeader(sw);
 
-					for (int i = 0; i < (int)klarfData.Count; i++)
-					{
-						klarfData[i].SetKlarfType(klarfType);
-						klarfData[i].Save(sw);
-					}
-					sw.Write("EndOfFile;");
-					sw.Flush();
-					sw.Close();
-					fs.Close();
-					klarfData.Clear();
-				}
-			}
-			catch (Exception)
-			{
-			}
+		//			for (int i = 0; i < (int)klarfData.Count; i++)
+		//			{
+		//				klarfData[i].SetKlarfType(klarfType);
+		//				klarfData[i].Save(sw);
+		//			}
+		//			sw.Write("EndOfFile;");
+		//			sw.Flush();
+		//			sw.Close();
+		//			fs.Close();
+		//			klarfData.Clear();
+		//		}
+		//	}
+		//	catch (Exception)
+		//	{
+		//	}
 
-			return true;
-		}
+		//	return true;
+		//}
 
 		private void SetProductInfo(/*CRecipeData_ProductSetting* _productInfor*/)
 		{
@@ -681,6 +753,316 @@ namespace RootTools_Vision.Utility
 			// SampleCenterLocation
 			this.sampleCenterLocationX = realCenterX - CDCenterX;
 			this.sampleCenterLocationY = -(realCenterY - CDCenterY); //_hj : +->- 로 바꿈 칩 개수가 홀수인경우에는 - 여야 함 짝숟인경우에는 어짜피 0:17.12.11
+		}
+
+		private object lockTiffObj = new object();
+		public void SaveTiffImageOnlyTDI(List<Defect> defectList, SharedBufferInfo sharedBuffer, System.Windows.Size imageSize = default(System.Windows.Size))
+		{
+			string path = (string)klarfPath.Clone();
+			path = Path.Combine(path, this.klarfFileName + ".tif");
+
+			ArrayList inputImage = new ArrayList();
+
+			int tiffWidth = 160;
+			int tiffHeight = 120;
+			if (imageSize != default(System.Windows.Size))
+			{
+				tiffWidth = (int)imageSize.Width;
+				tiffHeight = (int)imageSize.Height;
+			}
+
+			//Parallel.ForEach(defectList, defect =>
+			foreach (Defect defect in defectList)
+			{
+				Rect defectRect = new Rect(
+					defect.m_fAbsX - tiffWidth / 2,
+					defect.m_fAbsY - tiffHeight / 2,
+					tiffWidth,
+					tiffHeight);
+
+				MemoryStream image = new MemoryStream();
+				System.Drawing.Bitmap bitmap = Tools.CovertBufferToBitmap(sharedBuffer, defectRect, 3000, 3000);
+				//System.Drawing.Bitmap NewImg = new System.Drawing.Bitmap(bitmap);
+				bitmap.Save(image, ImageFormat.Tiff);
+				inputImage.Add(image);
+			}
+
+			ImageCodecInfo info = null;
+			foreach (ImageCodecInfo ice in ImageCodecInfo.GetImageEncoders())
+			{
+				if (ice.MimeType == "image/tiff")
+				{
+					info = ice;
+					break;
+				}
+			}
+
+			EncoderParameters ep = new EncoderParameters(2);
+
+			bool firstPage = true;
+
+			System.Drawing.Image img = null;
+			lock (lockTiffObj)
+			{
+				for (int i = 0; i < inputImage.Count; i++)
+				{
+					System.Drawing.Image img_src = System.Drawing.Image.FromStream((Stream)inputImage[i]);
+					Guid guid = img_src.FrameDimensionsList[0];
+					System.Drawing.Imaging.FrameDimension dimension = new System.Drawing.Imaging.FrameDimension(guid);
+
+					for (int nLoopFrame = 0; nLoopFrame < img_src.GetFrameCount(dimension); nLoopFrame++)
+					{
+						img_src.SelectActiveFrame(dimension, nLoopFrame);
+
+						ep.Param[0] = new EncoderParameter(System.Drawing.Imaging.Encoder.Compression, Convert.ToInt32(EncoderValue.CompressionLZW));
+
+						if (firstPage)
+						{
+							img = img_src;
+
+							ep.Param[1] = new EncoderParameter(System.Drawing.Imaging.Encoder.SaveFlag, Convert.ToInt32(EncoderValue.MultiFrame));
+							img.Save(path, info, ep);
+
+							firstPage = false;
+							continue;
+						}
+
+						ep.Param[1] = new EncoderParameter(System.Drawing.Imaging.Encoder.SaveFlag, Convert.ToInt32(EncoderValue.FrameDimensionPage));
+						lock (lockTiffObj) img.SaveAdd(img_src, ep);
+					}
+				}
+				if (inputImage.Count == 0)
+				{
+					File.Create(path);
+					return;
+				}
+
+				ep.Param[1] = new EncoderParameter(System.Drawing.Imaging.Encoder.SaveFlag, Convert.ToInt32(EncoderValue.Flush));
+				img.SaveAdd(ep);
+			}
+		}
+
+
+		public void SaveTiffImageOnlyVRS(List<Defect> defectList, ConcurrentQueue<byte[]> vrsImageQueue, System.Windows.Size vrsImageSize)
+		{
+			string path = (string)this.klarfPath.Clone();
+			path = Path.Combine(path, this.klarfFileName + ".tif");
+
+			ArrayList inputImage = new ArrayList();
+
+			if (vrsImageQueue == null)
+			{
+				MessageBox.Show("VRS Image == Null");
+				return;
+			}
+
+			if ((vrsImageQueue.Count != defectList.Count) || vrsImageSize == default(System.Windows.Size))
+			{
+				MessageBox.Show("VRS Review Image와 Defect의 수가 다릅니다.");
+				return;
+			}
+
+			if (vrsImageSize == default(System.Windows.Size))
+			{
+				MessageBox.Show("VRS Review Image Size를 설정해주어야합니다.");
+				return;
+			}
+
+			//Parallel.ForEach(defectList, defect =>
+			foreach (Defect defect in defectList)  // 이거 나중에 정보 필요할수 있음
+			{
+				byte[] colorImage = null;
+				if (vrsImageQueue.TryDequeue(out colorImage) == true)
+				{
+					MemoryStream ms = new MemoryStream();
+					System.Drawing.Bitmap vrsBmp = Tools.CovertArrayToBitmap(colorImage, (int)vrsImageSize.Width, (int)vrsImageSize.Height, 3);
+
+					vrsBmp.Save(ms, ImageFormat.Tiff);
+					inputImage.Add(ms);
+				}
+				else
+				{
+					TempLogger.Write("Error", "Save Klarf image - VRS Image Dequeue Fail!!");
+				}
+			}
+
+			ImageCodecInfo info = null;
+			foreach (ImageCodecInfo ice in ImageCodecInfo.GetImageEncoders())
+			{
+				if (ice.MimeType == "image/tiff")
+				{
+					info = ice;
+					break;
+				}
+			}
+
+			EncoderParameters ep = new EncoderParameters(2);
+
+			bool firstPage = true;
+
+			System.Drawing.Image img = null;
+			lock (lockTiffObj)
+			{
+				for (int i = 0; i < inputImage.Count; i++)
+				{
+					System.Drawing.Image img_src = System.Drawing.Image.FromStream((Stream)inputImage[i]);
+					Guid guid = img_src.FrameDimensionsList[0];
+					System.Drawing.Imaging.FrameDimension dimension = new System.Drawing.Imaging.FrameDimension(guid);
+
+					for (int nLoopFrame = 0; nLoopFrame < img_src.GetFrameCount(dimension); nLoopFrame++)
+					{
+						img_src.SelectActiveFrame(dimension, nLoopFrame);
+
+						ep.Param[0] = new EncoderParameter(System.Drawing.Imaging.Encoder.Compression, Convert.ToInt32(EncoderValue.CompressionLZW));
+
+						if (firstPage)
+						{
+							img = img_src;
+
+							ep.Param[1] = new EncoderParameter(System.Drawing.Imaging.Encoder.SaveFlag, Convert.ToInt32(EncoderValue.MultiFrame));
+							img.Save(path, info, ep);
+
+							firstPage = false;
+							continue;
+						}
+
+						ep.Param[1] = new EncoderParameter(System.Drawing.Imaging.Encoder.SaveFlag, Convert.ToInt32(EncoderValue.FrameDimensionPage));
+						img.SaveAdd(img_src, ep);
+					}
+				}
+				if (inputImage.Count == 0)
+				{
+					File.Create(path);
+					return;
+				}
+
+				ep.Param[1] = new EncoderParameter(System.Drawing.Imaging.Encoder.SaveFlag, Convert.ToInt32(EncoderValue.Flush));
+				img.SaveAdd(ep);
+			}
+		}
+
+		public void SaveTiffImageBoth(List<Defect> defectList, SharedBufferInfo sharedBuffer, System.Windows.Size imageSize, ConcurrentQueue<byte[]> vrsImageQueue, System.Windows.Size vrsImageSize)
+		{
+			string path = (string)this.klarfPath.Clone();
+			path = Path.Combine(path, this.klarfFileName + ".tif");
+
+			ArrayList inputImage = new ArrayList();
+
+			int tiffWidth = (int)imageSize.Width;
+			int tiffHeight = (int)imageSize.Height;
+
+			if (vrsImageQueue == null)
+			{
+				MessageBox.Show("VRS Imaage Queue == null");
+				return;
+			}
+
+			if ((vrsImageQueue.Count != defectList.Count) || vrsImageSize == default(System.Windows.Size))
+			{
+				MessageBox.Show("VRS Review Image와 Defect의 수가 다릅니다.");
+				return;
+			}
+
+			if (vrsImageSize == default(System.Windows.Size))
+			{
+				MessageBox.Show("VRS Review Image Size를 설정해주어야합니다.");
+				return;
+			}
+
+			//Parallel.ForEach(defectList, defect =>
+			foreach (Defect defect in defectList)
+			{
+				Rect defectRect = new Rect(
+					defect.m_fAbsX - tiffWidth / 2,
+					defect.m_fAbsY - tiffHeight / 2,
+					tiffWidth,
+					tiffHeight);
+
+				MemoryStream image = new MemoryStream();
+				System.Drawing.Bitmap bitmap = Tools.CovertBufferToBitmap(sharedBuffer, defectRect);
+				//System.Drawing.Bitmap NewImg = new System.Drawing.Bitmap(bitmap);
+				bitmap.Save(image, ImageFormat.Tiff);
+				inputImage.Add(image);
+
+
+				byte[] colorImage = null;
+				if (vrsImageQueue.TryDequeue(out colorImage) == true)
+				{
+					MemoryStream ms = new MemoryStream();
+					System.Drawing.Bitmap vrsBmp = Tools.CovertArrayToBitmap(colorImage, (int)vrsImageSize.Width, (int)vrsImageSize.Height, 3);
+
+					vrsBmp.Save(ms, ImageFormat.Tiff);
+					inputImage.Add(ms);
+				}
+				else
+				{
+					TempLogger.Write("Error", "Save Klarf image - VRS Image Dequeue Fail!!");
+				}
+			}
+
+			ImageCodecInfo info = null;
+			foreach (ImageCodecInfo ice in ImageCodecInfo.GetImageEncoders())
+			{
+				if (ice.MimeType == "image/tiff")
+				{
+					info = ice;
+					break;
+				}
+			}
+
+			EncoderParameters ep = new EncoderParameters(2);
+
+			bool firstPage = true;
+
+			System.Drawing.Image img = null;
+			lock (lockTiffObj)
+			{
+				for (int i = 0; i < inputImage.Count; i++)
+				{
+					System.Drawing.Image img_src = System.Drawing.Image.FromStream((Stream)inputImage[i]);
+					Guid guid = img_src.FrameDimensionsList[0];
+					System.Drawing.Imaging.FrameDimension dimension = new System.Drawing.Imaging.FrameDimension(guid);
+
+					for (int nLoopFrame = 0; nLoopFrame < img_src.GetFrameCount(dimension); nLoopFrame++)
+					{
+						img_src.SelectActiveFrame(dimension, nLoopFrame);
+
+						ep.Param[0] = new EncoderParameter(System.Drawing.Imaging.Encoder.Compression, Convert.ToInt32(EncoderValue.CompressionLZW));
+
+						if (firstPage)
+						{
+							img = img_src;
+
+							ep.Param[1] = new EncoderParameter(System.Drawing.Imaging.Encoder.SaveFlag, Convert.ToInt32(EncoderValue.MultiFrame));
+							img.Save(path, info, ep);
+
+							firstPage = false;
+							continue;
+						}
+
+						ep.Param[1] = new EncoderParameter(System.Drawing.Imaging.Encoder.SaveFlag, Convert.ToInt32(EncoderValue.FrameDimensionPage));
+						img.SaveAdd(img_src, ep);
+					}
+				}
+				if (inputImage.Count == 0)
+				{
+					File.Create(path);
+					return;
+				}
+
+				ep.Param[1] = new EncoderParameter(System.Drawing.Imaging.Encoder.SaveFlag, Convert.ToInt32(EncoderValue.Flush));
+				img.SaveAdd(ep);
+			}
+
+		}
+
+		public bool SaveImageJpg(SharedBufferInfo info, Rect rect, long compressRatio, int outSizeX, int outSizeY)
+		{
+			Bitmap bmp = Tools.CovertBufferToBitmap(info, rect, outSizeX, outSizeY);
+
+			Tools.SaveImageJpg(bmp, this.klarfFileName + ".jpg", compressRatio);
+
+			return true;
 		}
 	}
 }

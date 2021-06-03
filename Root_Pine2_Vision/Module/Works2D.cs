@@ -5,6 +5,7 @@ using RootTools.Module;
 using RootTools.ToolBoxs;
 using RootTools.Trees;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Net.Sockets;
 using System.Threading;
@@ -28,27 +29,53 @@ namespace Root_Pine2_Vision.Module
 
         #region Memory
         public MemoryGroup m_memoryGroup;
-        MemoryData m_memoryExt;
+        MemoryData[] m_memoryExt = new MemoryData[2] { null, null };
         MemoryData m_memoryColor;
         MemoryData[] m_memoryRGB = new MemoryData[3] { null, null, null };
         MemoryData[] m_memoryConv = new MemoryData[3] { null, null, null };
         MemoryData[] m_memoryHSI = new MemoryData[3] { null, null, null };
         MemoryData m_memoryGerbber;
+        List<MemoryData> m_aMemory = new List<MemoryData>();
         void InitMemory()
         {
             m_memoryGroup = m_memoryPool.GetGroup("Pine2");
-            m_memoryExt = m_memoryGroup.CreateMemory("EXT", 2, 3, new CPoint(50000, 90000));
-            m_memoryColor = m_memoryGroup.CreateMemory("Color", 1, 3, new CPoint(50000, 90000));
-            m_memoryRGB[0] = m_memoryGroup.CreateMemory("Red", 1, 1, new CPoint(50000, 90000));
-            m_memoryRGB[1] = m_memoryGroup.CreateMemory("Green", 1, 1, new CPoint(50000, 90000));
-            m_memoryRGB[2] = m_memoryGroup.CreateMemory("Blue", 1, 1, new CPoint(50000, 90000));
-            m_memoryConv[0] = m_memoryGroup.CreateMemory("Axial", 1, 1, new CPoint(50000, 90000));
-            m_memoryConv[1] = m_memoryGroup.CreateMemory("Pad", 1, 1, new CPoint(50000, 90000));
-            m_memoryConv[2] = m_memoryGroup.CreateMemory("Side", 1, 1, new CPoint(50000, 90000));
-            m_memoryHSI[0] = m_memoryGroup.CreateMemory("Hui", 1, 1, new CPoint(50000, 90000));
-            m_memoryHSI[1] = m_memoryGroup.CreateMemory("Saturation", 1, 1, new CPoint(50000, 90000));
-            m_memoryHSI[2] = m_memoryGroup.CreateMemory("Intensity", 1, 1, new CPoint(50000, 90000));
-            m_memoryGerbber = m_memoryGroup.CreateMemory("Gerbber", 1, 3, new CPoint(50000, 90000));
+            m_aMemory.Add(m_memoryExt[0] = m_memoryGroup.CreateMemory("EXT0", 1, 3, new CPoint(50000, 90000)));
+            m_aMemory.Add(m_memoryExt[1] = m_memoryGroup.CreateMemory("EXT1", 1, 3, new CPoint(50000, 90000)));
+            m_aMemory.Add(m_memoryColor = m_memoryGroup.CreateMemory("Color", 1, 3, new CPoint(50000, 90000)));
+            m_aMemory.Add(m_memoryRGB[0] = m_memoryGroup.CreateMemory("Red", 1, 1, new CPoint(50000, 90000)));
+            m_aMemory.Add(m_memoryRGB[1] = m_memoryGroup.CreateMemory("Green", 1, 1, new CPoint(50000, 90000)));
+            m_aMemory.Add(m_memoryRGB[2] = m_memoryGroup.CreateMemory("Blue", 1, 1, new CPoint(50000, 90000)));
+            m_aMemory.Add(m_memoryConv[0] = m_memoryGroup.CreateMemory("Axial", 1, 1, new CPoint(50000, 90000)));
+            m_aMemory.Add(m_memoryConv[1] = m_memoryGroup.CreateMemory("Pad", 1, 1, new CPoint(50000, 90000)));
+            m_aMemory.Add(m_memoryConv[2] = m_memoryGroup.CreateMemory("Side", 1, 1, new CPoint(50000, 90000)));
+            m_aMemory.Add(m_memoryHSI[0] = m_memoryGroup.CreateMemory("Hue", 1, 1, new CPoint(50000, 90000)));
+            m_aMemory.Add(m_memoryHSI[1] = m_memoryGroup.CreateMemory("Saturation", 1, 1, new CPoint(50000, 90000)));
+            m_aMemory.Add(m_memoryHSI[2] = m_memoryGroup.CreateMemory("Intensity", 1, 1, new CPoint(50000, 90000)));
+            m_aMemory.Add(m_memoryGerbber = m_memoryGroup.CreateMemory("Gerbber", 1, 3, new CPoint(50000, 90000)));
+
+            string regGroup = "MMF Data " + p_id;   // MMF Data A, MMF Data B
+            Registry reg = new Registry(false, regGroup, "MemoryOffset");
+            foreach (MemoryData mem in m_aMemory) reg.Write(mem.p_id, mem.p_mbOffset);
+            reg = new Registry(false, regGroup, "MemoryDepth");
+            foreach (MemoryData mem in m_aMemory) reg.Write(mem.p_id, mem.p_nByte);
+            reg = new Registry(false, regGroup, "MemorySizeX");
+            foreach (MemoryData mem in m_aMemory) reg.Write(mem.p_id, mem.p_sz.X);
+            reg = new Registry(false, regGroup, "MemorySizeY");
+            foreach (MemoryData mem in m_aMemory) reg.Write(mem.p_id, mem.p_sz.Y);
+
+            //Registry reg = new Registry("MemoryOffset");
+            //foreach (MemoryData mem in m_aMemory) reg.Write(mem.p_id, mem.p_mbOffset);
+            //reg = new Registry("MemoryDepth");
+            //foreach (MemoryData mem in m_aMemory) reg.Write(mem.p_id, mem.p_nByte);
+            //reg = new Registry("MemorySizeX");
+            //foreach (MemoryData mem in m_aMemory) reg.Write(mem.p_id, mem.p_sz.X);
+            //reg = new Registry("MemorySizeY");
+            //foreach (MemoryData mem in m_aMemory) reg.Write(mem.p_id, mem.p_sz.Y);
+        }
+
+        public MemoryData[] p_memSnap
+        {
+            get { return m_memoryExt; }
         }
         #endregion
 

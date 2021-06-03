@@ -22,6 +22,13 @@ namespace Root_Pine2.Module
             return null; 
         }
 
+        public string PutRequest(InfoStrip infoStrip) //forget
+        {
+            if (infoStrip == null) return "InfoStrip == null";
+            m_aEV[infoStrip.p_eMagazine].m_infoStripUnload = infoStrip;
+            return "OK"; 
+        }
+
         public string PutInfoStrip(InfoStrip infoStrip)
         {
             if (infoStrip == null) return "InfoStrip == null";
@@ -73,7 +80,7 @@ namespace Root_Pine2.Module
         {
             int nBlink = 0; 
             m_bThread = true;
-            Thread.Sleep(1000); 
+            Thread.Sleep(5000); 
             while (m_bThread)
             {
                 Thread.Sleep(200);
