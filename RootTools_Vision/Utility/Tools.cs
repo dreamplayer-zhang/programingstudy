@@ -751,10 +751,10 @@ namespace RootTools_Vision
             }
         }
 
-        public static Bitmap FlipYImage(System.Drawing.Bitmap source)
+        public static Bitmap FlipXImage(System.Drawing.Bitmap source)
         {
             Bitmap dest = new Bitmap(source);
-            dest.RotateFlip(RotateFlipType.RotateNoneFlipY);
+            dest.RotateFlip(RotateFlipType.RotateNoneFlipX);
             return dest;
         }
 
