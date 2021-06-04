@@ -586,10 +586,11 @@ namespace Root_EFEM.Module
                             m_infoCarrier.m_bReqReadCarrierID = false;
                             StartRun(m_runReadPodID);
                         } */
+            bool bUseXGem = m_engineer.p_bUseXGem;
             if (p_infoCarrier.m_bReqLoad)
             {
                 p_infoCarrier.m_bReqLoad = false;
-                StartRun(m_runDocking);
+                if (bUseXGem) StartRun(m_runDocking);
             }
             if (p_infoCarrier.m_bReqGem)
             {

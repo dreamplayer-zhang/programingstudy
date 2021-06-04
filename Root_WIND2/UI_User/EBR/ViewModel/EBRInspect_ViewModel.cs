@@ -261,7 +261,7 @@ namespace Root_WIND2.UI_User
 			XLabels = new string[binCount];
 			for (int i = 1; i <= binCount; i++)
 			{
-				XLabels[i - 1] = (parameter.StepDegree * i).ToString();
+				XLabels[i - 1] = (/*parameter.StepDegree*/10 * i).ToString();
 			}
 			YLabel = value => value.ToString("N");
 
@@ -306,7 +306,7 @@ namespace Root_WIND2.UI_User
 			XLabels = new string[binCount];
 			for (int i = 1; i <= binCount; i++)
 			{
-				XLabels[i - 1] = (parameter.StepDegree * i).ToString();
+				XLabels[i - 1] = (/*parameter.StepDegree*/10 * i).ToString();
 			}
 			YLabel = value => value.ToString("N");
 

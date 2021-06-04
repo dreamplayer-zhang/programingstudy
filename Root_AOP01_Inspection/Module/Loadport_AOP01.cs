@@ -787,10 +787,11 @@ namespace Root_AOP01_Inspection.Module
             //    p_infoCarrier.m_bReqReadCarrierID = false;
             //    StartRun(m_runReadPodID);
             //}
+            bool bUseXGem = m_engineer.p_bUseXGem;
             if (p_infoCarrier.m_bReqLoad)
             {
                 p_infoCarrier.m_bReqLoad = false;
-                StartRun(m_runDocking);
+                if (bUseXGem) StartRun(m_runDocking);
             }
 
             if (p_infoCarrier.m_bReqGem)
@@ -799,7 +800,7 @@ namespace Root_AOP01_Inspection.Module
                 StartRun(m_runGem);
             }
             
-            if (p_infoCarrier.m_bReqUnload)
+            if (p_infoCarrier.m_bReqUnload && p_infoCarrier.p_eState == InfoCarrier.eState.Dock)
             {
                 p_infoCarrier.m_bReqUnload = false;
                 StartRun(m_runUndocking);

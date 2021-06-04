@@ -112,7 +112,8 @@ namespace RootTools_Vision
 				endPtY = originRecipe.OriginHeight;
 
 			int count = (int)((endPtY - startPtY) / param.ROIHeight);
-			Parallel.For(0, count, i =>
+			for (int i = 0; i < 2; i++)
+			//Parallel.For(0, count, i =>
 			{
 				int ptLeft = 0;
 				int ptTop = startPtY + (i * height);
@@ -213,8 +214,8 @@ namespace RootTools_Vision
 					}
 				}
 				#endregion
-
-			});
+			}
+			//);
 
 			// old
 			/*
