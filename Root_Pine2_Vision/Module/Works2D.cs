@@ -13,7 +13,7 @@ using System.Threading;
 
 namespace Root_Pine2_Vision.Module
 {
-    public class Works2D : IWorks
+    public class Works2D
     {
         MemoryPool m_memoryPool;
         TCPAsyncClient m_tcpip;

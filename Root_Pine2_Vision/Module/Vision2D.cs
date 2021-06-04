@@ -298,30 +298,11 @@ namespace Root_Pine2_Vision.Module
             A,
             B,
         }
-        public Dictionary<eWorks, IWorks> m_aWorks = new Dictionary<eWorks, IWorks>(); 
+        public Dictionary<eWorks, Works2D> m_aWorks = new Dictionary<eWorks, Works2D>(); 
         void InitVisionWorks()
         {
-            switch (m_eVision)
-            {
-                case eVision.Top2D:
-                case eVision.Bottom:
-                    m_aWorks.Add(eWorks.A, new Works2D(eWorks.A, this));
-                    m_aWorks.Add(eWorks.B, new Works2D(eWorks.B, this));
-                    break;
-                case eVision.Top3D:
-                    m_aWorks.Add(eWorks.A, new Works3D(eWorks.A, this));
-                    m_aWorks.Add(eWorks.B, new Works3D(eWorks.B, this));
-                    break;
-            }
-        }
-
-        IWorks GetVisionWorks(string sVisionWorks)
-        {
-            foreach (IWorks vision in m_aWorks.Values)
-            {
-                if (vision.p_id == sVisionWorks) return vision; 
-            }
-            return null; 
+            m_aWorks.Add(eWorks.A, new Works2D(eWorks.A, this));
+            m_aWorks.Add(eWorks.B, new Works2D(eWorks.B, this));
         }
         #endregion
 
@@ -437,7 +418,7 @@ namespace Root_Pine2_Vision.Module
 
         public override void ThreadStop()
         {
-            foreach (IWorks visionWorks in m_aWorks.Values) visionWorks.ThreadStop(); 
+            foreach (Works2D works in m_aWorks.Values) works.ThreadStop(); 
             base.ThreadStop();
         }
 

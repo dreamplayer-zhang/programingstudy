@@ -213,7 +213,6 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Module\IWorks.cs" />
     <Compile Include="Module\Vision2D.cs" />
     <Compile Include="Module\Recipe_UI.xaml.cs">
       <DependentUpon>Recipe_UI.xaml</DependentUpon>

@@ -4,7 +4,7 @@ using RootTools.Trees;
 
 namespace Root_Pine2_Vision.Module
 {
-    public class Works3D : IWorks //forget
+    public class Works3D
     {
         public string p_id { get; set; }
 

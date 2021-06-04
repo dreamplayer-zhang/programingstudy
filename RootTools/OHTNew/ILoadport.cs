@@ -28,7 +28,6 @@ namespace RootTools.OHTNew
 
         OHT m_OHTNew { get; set; }
 
-
         OHT_Semi m_OHTsemi
         { get; set; }
     }

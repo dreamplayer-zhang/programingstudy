@@ -908,6 +908,8 @@ namespace Root_AOP01_Inspection.Module
             }
         }
         public InfoCarrier p_infoCarrier { get; set; }
+        public OHT_Semi m_OHTsemi { get; set; }
+
         public StopWatch m_swLotTime;
 
         GemCarrierBase.eAssociated m_eAssociated = GemCarrierBase.eAssociated.NotAssociated;
