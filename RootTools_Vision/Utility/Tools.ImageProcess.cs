@@ -13,6 +13,21 @@ namespace RootTools_Vision
 {
     public partial class Tools
     {
+        public static List<CPoint> CircleFitting(List<CPoint> circle_points, int centerX, int centerY, int threshold)
+        {
+            int points_count = circle_points.Count;
+            List<CPoint> newList = new List<CPoint>();
+            foreach (CPoint pt in circle_points)
+            {
+                double radius = Math.Sqrt(Math.Pow(pt.X - centerX, 2) + Math.Pow(pt.Y - centerY, 2));
+                if (radius < threshold)
+                    newList.Add(pt);
+            }
+
+
+            return newList;
+        }
+
         public static Point FindCircleCenterByPoints(List<Point> circle_points, int centerX, int centerY, int searchLength)
         {
             int points_count = circle_points.Count;

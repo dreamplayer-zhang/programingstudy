@@ -86,8 +86,14 @@ namespace Root_WIND2.UI_User
 
         public List<string> GrabModeList
         {
-            get;
-            set;     
+            get
+            {
+                return ((WIND2_Handler)GlobalObjects.Instance.Get<WIND2_Engineer>().ClassHandler()).p_Vision.p_asGrabMode;
+            }
+            set
+            {
+
+            }
         }
 
         private double camResolutionX;

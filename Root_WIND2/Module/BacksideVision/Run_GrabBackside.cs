@@ -175,6 +175,16 @@ namespace Root_WIND2.Module
 
                     axisXY.p_axisY.SetTrigger(dTriggerStartPosY, dTriggerEndPosY, m_grabMode.m_dTrigger, true);
 
+                    if (m_grabMode.m_bUseLADS)
+                    {
+                        int nLADSMaxScanNum = Convert.ToInt32((m_LADSgrabMode.m_nWaferSize_mm * nMMPerUM / m_LADSgrabMode.m_dTargetResY_um) / m_LADSgrabMode.m_camera.GetRoiSize().X);
+                        int nMainMaxScanNum = nWaferSizeY_px / m_grabMode.m_camera.GetRoiSize().X;
+
+                        int ladsinfonum = nLADSMaxScanNum * (nScanLine + m_grabMode.m_ScanStartLine) / nMainMaxScanNum;
+                        SetFocusMap(((AjinAxis)axisXY.p_axisY).m_nAxis, ((AjinAxis)axisZ).m_nAxis, SetScanAxisPos(ladsinfonum, dTriggerStartPosY, dTriggerEndPosY),
+                            new List<double>(m_module.LadsInfos[ladsinfonum]), m_grabMode.m_bUseBiDirectionScan && (nScanLine % 2 != 0), nScanSpeed);
+                    }
+
                     MemoryData mem = m_module.m_engineer.GetMemory(strPool, strGroup, strMemory);
 
                     GrabData gd = m_grabMode.m_GD;

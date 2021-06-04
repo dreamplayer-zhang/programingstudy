@@ -740,7 +740,7 @@ namespace RootTools_Vision
                     if (byteDst == null)
                         return;
 
-                    Marshal.Copy((IntPtr)((long)ptrSrc + (long)(i * srcStride + left)), byteDst, width * (i - top), width);
+                    Marshal.Copy((IntPtr)((long)ptrSrc + (long)((long)i * srcStride + (long)left)), byteDst, width * (i - top), width);
 
                 });
 

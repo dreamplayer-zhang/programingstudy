@@ -114,7 +114,7 @@ namespace Root_WIND2.UI_User
 
 
         #region [Command]
-        public RelayCommand LoadedCommand
+        public System.Windows.Input.ICommand LoadedCommand
         {
             get => new RelayCommand(() =>
             {

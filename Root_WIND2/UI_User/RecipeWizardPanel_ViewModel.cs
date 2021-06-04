@@ -146,16 +146,6 @@ namespace Root_WIND2.UI_User
             get => frontsideInspectVM;
         }
 
-        #region [Camera ViewModes]
-        private UI_User.CameraVRS_ViewModel cameraVrsVM = new UI_User.CameraVRS_ViewModel();
-        public UI_User.CameraVRS_ViewModel CameraVrsVM
-        {
-            get => cameraVrsVM;
-        }
-
-        #endregion
-
-
         #endregion
 
         #region [Back ViewModels]
@@ -216,6 +206,12 @@ namespace Root_WIND2.UI_User
         public UI_User.CameraAlign_ViewModel CameraAlignVM
         {
             get => cameraAlignVM;
+        }
+
+        private UI_User.CameraVRS_ViewModel cameraVrsVM = new UI_User.CameraVRS_ViewModel();
+        public UI_User.CameraVRS_ViewModel CameraVrsVM
+        {
+            get => cameraVrsVM;
         }
 
         #endregion

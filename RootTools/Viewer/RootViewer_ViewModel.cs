@@ -696,7 +696,7 @@ namespace RootTools
 
             double contrastLevel = Math.Pow((100.0 + p_nContrast) / 100.0, 2);
 
-            double newColor = ((((color / 255.0) - 0.5) * contrastLevel) + 0.5) * 255.0;
+            double newColor = (((((double)color / 255.0) - 0.5) * contrastLevel) + 0.5) * 255.0;
             newColor += p_nBrightness;
 
             return (byte)Clamp((int)Math.Round(newColor), 0, 255);

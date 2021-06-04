@@ -359,7 +359,6 @@ namespace RootTools_Vision
         /// <param name="sharedBufferByteCnt">버퍼 채널 수</param>
         /// <param name="sharedBufferG">G채널 버퍼 포인터(없을 경우 IntPtr.Zero로 셋팅)</param>
         /// <param name="sharedBufferB">B채널 버퍼 포인터(없을 경우 IntPtr.Zero로 셋팅)</param>
-        
         public void SetSharedBuffer(IntPtr sharedBufferR_GRAY, int sharedBufferWidth, int sharedBufferHeight, int sharedBufferByteCnt, IntPtr sharedBufferG, IntPtr sharedBufferB)
         {
             this.sharedBufferInfo.PtrR_GRAY = sharedBufferR_GRAY;

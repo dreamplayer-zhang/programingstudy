@@ -67,7 +67,6 @@
             <Button Content="Stop" Command="{Binding btnStop}" Style="{StaticResource inspection_menu_button}"/>
             <Button Content="Clear" Command="{Binding btnClear}" Style="{StaticResource inspection_menu_button}"/>
             <Button Content="Save Klarf" Command="{Binding btnSaveKlarf}" Style="{StaticResource inspection_menu_button}"/>
-            <Button Content="Remote" Command="{Binding btnRemoteStart}" Style="{StaticResource inspection_menu_button}"/>
         </StackPanel>
         <Grid Grid.Row="1" Background="{StaticResource main_view_background}">
             <Grid.ColumnDefinitions>
