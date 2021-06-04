@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Net.Sockets;
+using System.Text;
 using System.Threading;
 
 namespace Root_Pine2_Vision.Module
@@ -19,11 +20,11 @@ namespace Root_Pine2_Vision.Module
         public void GetTools(ToolBox toolBox, bool bInit)
         {
             toolBox.Get(ref m_memoryPool, m_vision, "Memory" + p_id, 1);
-            toolBox.GetComm(ref m_tcpip, m_vision, "TCPIP" + p_id);
+            toolBox.GetComm(ref m_tcpip, m_vision, "Works" + p_id);
             if (bInit)
             {
                 InitMemory();
-                m_tcpip.EventReciveData += M_tcpip_EventReciveData;
+                m_tcpip.EventReceiveData += M_tcpip_EventReceiveData;
             }
         }
 
@@ -79,9 +80,116 @@ namespace Root_Pine2_Vision.Module
         }
         #endregion
 
-        #region TCPIP
-        private void M_tcpip_EventReciveData(byte[] aBuf, int nSize, Socket socket)
+        #region Protocol
+        public enum eProtocol
         {
+            Snap,
+            Recipe,
+            SnapDone,
+        }
+
+        public class Protocol
+        {
+            public eProtocol m_eProtocol;
+            public string m_sRecipe = "";
+            public int m_iSnap = 0;
+            public string m_sSend = "";
+            public string m_sInfo = "";
+
+            bool m_bWait = true; 
+            public void ReceiveData(string sSend)
+            {
+                m_sInfo = Receive(sSend); 
+                m_bWait = false; 
+            }
+
+            string Receive(string sSend)
+            {
+                int l = m_sSend.Length;
+                if (sSend.Length < l) return "Message Length Error";
+                if (m_sSend.Substring(0, l - 1) != sSend.Substring(0, l - 1)) return "Message not Correct";
+                return sSend.Substring(l, sSend.Length - l - 1); 
+            }
+
+            public string WaitReply()
+            {
+                while (m_bWait)
+                {
+                    Thread.Sleep(10);
+                    if (EQ.IsStop()) return "EQ Stop"; 
+                }
+                return m_sInfo;
+            }
+
+            public Protocol(int nID, eProtocol eProtocol, string sRecipe)
+            {
+                m_eProtocol = eProtocol;
+                m_sRecipe = sRecipe;
+                m_sSend = "<" + nID.ToString("000,") + eProtocol.ToString() + "," + sRecipe + ">"; 
+            }
+
+            public Protocol(int nID, eProtocol eProtocol, string sRecipe, int iSnap)
+            {
+                m_eProtocol = eProtocol;
+                m_sRecipe = sRecipe;
+                m_iSnap = iSnap;
+                m_sSend = "<" + nID.ToString("000,") + eProtocol.ToString() + "," + sRecipe + "," + iSnap.ToString() + ">";
+            }
+        }
+        Queue<Protocol> m_qProtocol = new Queue<Protocol>();
+        Protocol m_protocolSend = null;
+        #endregion
+
+        #region TCPIP
+        int m_iProtocol = 0; 
+        public string SendRecipe(string sRecipe)
+        {
+            Protocol protocol = new Protocol(m_iProtocol, eProtocol.Recipe, sRecipe);
+            m_qProtocol.Enqueue(protocol);
+            return protocol.WaitReply(); 
+        }
+
+        public string SendSnapDone(string sRecipe, int iSnap)
+        {
+            Protocol protocol = new Protocol(m_iProtocol, eProtocol.Recipe, sRecipe, iSnap);
+            m_qProtocol.Enqueue(protocol);
+            return protocol.WaitReply();
+        }
+
+        void ThreadSend()
+        {
+            if (m_protocolSend != null) return;
+            if (m_qProtocol.Count == 0) return;
+            m_protocolSend = m_qProtocol.Dequeue();
+            m_tcpip.Send(m_protocolSend.m_sSend); 
+        }
+
+        private void M_tcpip_EventReceiveData(byte[] aBuf, int nSize, Socket socket)
+        {
+            string sSend = Encoding.Default.GetString(aBuf, 0, nSize);
+            if (aBuf[0] == '[')
+            {
+                Reply(sSend);
+                return; 
+            }
+            if (m_protocolSend == null) return; 
+            m_protocolSend.ReceiveData(sSend);
+            m_protocolSend = null; 
+        }
+
+        void Reply(string sSend)
+        {
+            try
+            {
+                string[] asSend = sSend.Split(',');
+                if (asSend[1] == eProtocol.Snap.ToString())
+                {
+                    string sRecipe = asSend[2];
+                    string sInfo = m_vision.ReqSnap(p_eWorks, sRecipe);
+                    m_tcpip.Send(sSend.Substring(0, sSend.Length - 1) + "," + sInfo + "]"); 
+                }
+            }
+            catch (Exception) { }
         }
         #endregion
 
@@ -99,13 +207,16 @@ namespace Root_Pine2_Vision.Module
         int m_nProcessID = -1;
         void RunThreadProcess()
         {
+            int nProcess = 0; 
             m_bThreadProcess = true;
-            Thread.Sleep(10000);
+            Thread.Sleep(7000);
             while (m_bThreadProcess)
             {
-                Thread.Sleep(100);
-                if (m_bStartProcess)
+                Thread.Sleep(10);
+                ThreadSend(); 
+                if (m_bStartProcess && (nProcess > 100))
                 {
+                    nProcess = 0; 
                     try
                     {
                         if (IsProcessRun() == false)
@@ -131,6 +242,12 @@ namespace Root_Pine2_Vision.Module
             return false;
         }
         #endregion
+
+        public void Reset()
+        {
+            m_protocolSend = null;
+            m_qProtocol.Clear(); 
+        }
 
         public void RunTree(Tree tree)
         {

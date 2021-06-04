@@ -16,6 +16,12 @@ namespace Root_Pine2_Vision.Module
 
         MemoryData[] p_memSnap { get; }
 
+        string SendRecipe(string sRecipe);
+
+        string SendSnapDone(string sRecipe, int iSnap);
+
+        void Reset();
+
         void RunTree(Tree tree);
     }
 }
