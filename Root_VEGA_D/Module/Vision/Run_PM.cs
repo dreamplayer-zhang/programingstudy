@@ -57,6 +57,7 @@ namespace Root_VEGA_D.Module
         {
             Run_PM run = new Run_PM(m_module);
 
+            run.m_bIsRun = m_bIsRun;
             run.p_sGrabMode = p_sGrabMode;
             run.m_dScanDistance = m_dScanDistance;
             run.m_dLengthFromScanCenterY = m_dLengthFromScanCenterY;

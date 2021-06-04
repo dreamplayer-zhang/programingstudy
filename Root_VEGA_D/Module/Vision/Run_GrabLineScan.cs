@@ -32,7 +32,18 @@ namespace Root_VEGA_D.Module
         string m_sGrabMode = "";
         public bool m_bIPUCompleted = true;
         public int m_nCurScanLine = 0;
-        public bool m_bWaitRun = false;
+        bool m_bWaitRun = false;
+        public bool p_bWaitRun
+        {
+            get { return m_bWaitRun; }
+            set
+            {
+                if (m_bWaitRun == value) return;
+
+                m_log.Info(string.Format("{0}.p_bWaitRun {1} -> {2}", p_id, m_bWaitRun, !m_bWaitRun));
+                m_bWaitRun = value;
+            }
+        }
         public object m_lockWaitRun = new object();
         public string p_sGrabMode
         {
@@ -522,7 +533,7 @@ namespace Root_VEGA_D.Module
                     return p_sInfo;
 
                 // IPU 접속 대기
-                while (m_bWaitRun && !EQ.IsStop())
+                while (p_bWaitRun && !EQ.IsStop())
                 {
                     Thread.Sleep(10);
                 }
@@ -549,7 +560,7 @@ namespace Root_VEGA_D.Module
 
                     lock (m_lockWaitRun)
                     {
-                        if (m_bWaitRun)
+                        if (p_bWaitRun)
                         {
                             Thread.Sleep(10);
                             continue;

@@ -446,7 +446,7 @@ namespace RootTools.Control.ACS
                 bool bMove = ((nMotor & p_channel.ACSC_MST_MOVE) != 0);
                 bool bInPos = ((nMotor & p_channel.ACSC_MST_INPOS) != 0);
                 p_sensorInPos = !bMove && bInPos;
-                int nLimit = (int)aLimit.GetValue(m_nAxis);
+                int nLimit = p_channel.GetFault(m_nAxis);
                 p_sensorMinusLimit = (nLimit & p_channel.ACSC_SAFETY_LL) != 0;
                 p_sensorPlusLimit = (nLimit & p_channel.ACSC_SAFETY_RL) != 0;
             }

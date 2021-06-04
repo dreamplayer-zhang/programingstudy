@@ -788,7 +788,7 @@ namespace Root_VEGA_D.Module
                 if (runGrabLineScan.p_eRunState == ModuleRunBase.eRunState.Run)
                 {
                     // EQ Stop 상태로 변경하고 이미지그랩 중에 중단되었다는 상태값 설정
-                    runGrabLineScan.m_bWaitRun = false;
+                    runGrabLineScan.p_bWaitRun = false;
                 }
             }
         }
@@ -804,7 +804,7 @@ namespace Root_VEGA_D.Module
                     m_bDisconnectedGrabLineScanning = true;
 
                     // 재연결 시까지 RunGrabLineScan은 대기
-                    runGrabLineScan.m_bWaitRun = false;
+                    runGrabLineScan.p_bWaitRun = false;
                 }
             }
         }
@@ -826,7 +826,7 @@ namespace Root_VEGA_D.Module
                         m_bDisconnectedGrabLineScanning = true;
 
                         // 재연결 시까지 RunGrabLineScan은 대기
-                        runGrabLineScan.m_bWaitRun = true;
+                        runGrabLineScan.p_bWaitRun = true;
 
                         // IPU와 소켓통신 재 연결 될때까지의 상태 리셋 타이머 실행
                         DispatcherTimer timer = new DispatcherTimer();
@@ -865,7 +865,7 @@ namespace Root_VEGA_D.Module
 
                                         lock (runGrabLineScan.m_lockWaitRun)
                                         {
-                                            runGrabLineScan.m_bWaitRun = false;
+                                            runGrabLineScan.p_bWaitRun = false;
                                         }   
                                     }
                                 }
