@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Windows.Controls;
 using RootTools.Trees;
@@ -752,6 +753,15 @@ namespace RootTools.Control.Ajin
 
             bool bIOVisible = m_aDIO_I.Count > 0;
             RunTreeIOLock(m_treeRoot.GetTree("I/O Lock", true, bIOVisible), m_sUnit);
+        }
+
+        public override void RunTreePos(Tree tree, string sUnit)
+        {
+            base.RunTreePos(tree, sUnit);
+
+            bool useLimit = m_bSWBoardLimit;
+            uint use = Convert.ToUInt32(useLimit); 
+            CAXM.AxmSignalSetSoftLimit(m_nAxis, use, 0, 1, m_aPos[p_asPos[2]], m_aPos[p_asPos[3]]);
         }
 
         public override void RunTreeSetting(Tree.eMode mode)

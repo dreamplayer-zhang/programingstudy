@@ -245,10 +245,10 @@ namespace Root_WIND2.UI_User
 			int positionOffset = mode.m_nCameraPositionOffset;				// 카메라 위치 Offset
 
 			int startPosition = mode.m_nCameraHeight + (heightPerDegree * positionOffset);	// 검사 시작 위치
-			int endPosition = startPosition + (heightPerDegree * 360);						// 검사 종료 위치
+			int endPosition = startPosition + (heightPerDegree * 360);                      // 검사 종료 위치
 
 			Parameter.StartPosition = startPosition;
-			Parameter.EndPosition = endPosition;
+			Parameter.EndPosition = endPosition;			
 		}
 
 		public void SetRecipeParameter(EdgeSurfaceRecipeBase recipe, EdgeSurfaceParameterBase param)

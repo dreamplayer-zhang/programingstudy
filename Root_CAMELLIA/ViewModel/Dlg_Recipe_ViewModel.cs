@@ -361,6 +361,7 @@ namespace Root_CAMELLIA
         {
             if(m_currentMode == RecipeMode.Measure)
             {
+                if (p_recipePath == "") return;
                 string fileName = Path.GetFileName(p_recipePath);
                 string path = p_recipePath.Replace(Path.GetExtension(p_recipePath), "");
                 fileName = fileName.Replace(Path.GetExtension(fileName), ".aco");

@@ -164,6 +164,8 @@ namespace RootTools.Control
         {
             SWLimit_Minus,
             SWLimit_Plus,
+            SWBoardLimit_Minus,
+            SWBoardLimit_Plus,
             Position_0,
             Position_1,
             Position_2,
@@ -177,7 +179,7 @@ namespace RootTools.Control
             }
             RunTree(Tree.eMode.RegRead);
         }
-        public void RunTreePos(Tree tree, string sUnit)
+        public virtual void RunTreePos(Tree tree, string sUnit)
         {
             RunTreePosLimit(tree.GetTree("SW Limit", false));
             RunTreePosition(tree.GetTree("Position"), sUnit);
@@ -188,15 +190,21 @@ namespace RootTools.Control
             string sDesc = "Axis Position (" + sUnit + ")";
             m_aPos[p_asPos[0]] = tree.Set(m_aPos[p_asPos[0]], 0.0, p_asPos[0], sDesc, m_bSWLimit[0]);
             m_aPos[p_asPos[1]] = tree.Set(m_aPos[p_asPos[1]], 0.0, p_asPos[1], sDesc, m_bSWLimit[1]);
-            for (int n = 2; n < p_asPos.Count; n++)
+
+            m_aPos[p_asPos[2]] = tree.Set(m_aPos[p_asPos[2]], 0.0, p_asPos[2], sDesc, m_bSWBoardLimit);
+            m_aPos[p_asPos[3]] = tree.Set(m_aPos[p_asPos[3]], 0.0, p_asPos[3], sDesc, m_bSWBoardLimit);
+
+            for (int n = 4; n < p_asPos.Count; n++)
             {
                 m_aPos[p_asPos[n]] = tree.Set(m_aPos[p_asPos[n]], 0.0, p_asPos[n], sDesc);
             }
+
         }
         #endregion
 
         #region SW Limit
         bool[] m_bSWLimit = new bool[2] { false, false };
+        protected bool m_bSWBoardLimit = false;
 
         protected string CheckSWLimit(ref double fPosDst)
         {
@@ -225,11 +233,7 @@ namespace RootTools.Control
         {
             if (vJog == 0) return "OK";
             double fPosNow = p_posCommand;
-            if (m_bSWLimit[0] && (vJog < 0) && (fPosNow <= m_aPos[p_asPos[0]]))
-            {
-                StopAxis();
-                return "SW Minus Limit Error";
-            }
+            if (m_bSWLimit[0] && (vJog < 0) && (fPosNow <= m_aPos[p_asPos[0]])) return "SW Minus Limit Error";
             if (m_bSWLimit[1] && (vJog > 0) && (fPosNow >= m_aPos[p_asPos[1]])) return "SW Plus Limit Error";
             return "OK";
         }
@@ -248,6 +252,7 @@ namespace RootTools.Control
         {
             m_bSWLimit[0] = tree.Set(m_bSWLimit[0], m_bSWLimit[0], "Minus", "Use SW Minus Limit");
             m_bSWLimit[1] = tree.Set(m_bSWLimit[1], m_bSWLimit[1], "Plus", "Use SW Plus Limit");
+            m_bSWBoardLimit = tree.Set(m_bSWBoardLimit, m_bSWBoardLimit, "Board SW Limit", "Use Board SW Limit");
         }
         #endregion
 
