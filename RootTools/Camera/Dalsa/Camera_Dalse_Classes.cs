@@ -429,14 +429,14 @@ namespace RootTools.Camera.Dalsa
         {
             if (m_sapCam == null) return false;
 
-            return m_sapCam.SetFeatureValue("UserSetDefault", userset.ToString());
+            return m_sapCam.SetFeatureValue("UserSetDefaultSelector", userset.ToString());
         }
         bool GetPowerupUserset(ref eUserSet userset)
         {
             if (m_sapCam == null) return false;
 
             string sReturn;
-            bool bOk = m_sapCam.GetFeatureValue("UserSetDefault", out sReturn);
+            bool bOk = m_sapCam.GetFeatureValue("UserSetDefaultSelector", out sReturn);
             if(bOk)
                 userset = (eUserSet)Enum.Parse(typeof(eUserSet), sReturn);
 
