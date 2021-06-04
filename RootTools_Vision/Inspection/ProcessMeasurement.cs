@@ -73,12 +73,16 @@ namespace RootTools_Vision
 				KlarfData_Lot klarfData = new KlarfData_Lot();
 				Directory.CreateDirectory(settings_ebr.KlarfSavePath);
 
-				//klarfData.AddSlot(recipe.WaferMap, measureList, this.recipe.GetItem<OriginRecipe>());
 				klarfData.AddSlot(recipe.WaferMap, realKlarfData, this.recipe.GetItem<OriginRecipe>());
 				klarfData.WaferStart(recipe.WaferMap, DateTime.Now);
 				klarfData.SetResultTimeStamp();
 				klarfData.SaveKlarf(settings_ebr.KlarfSavePath, false);
 			}
+
+			// EBR 원형 이미지 저장
+			EBRRecipe recipeParam = this.recipe.GetItem<EBRRecipe>();
+			Tools.SaveCircleImage(@"D:\EBR Circle Image.bmp", settings_ebr.OutputImageSizeWidth, settings_ebr.OutputImageSizeHeight
+								  , this.currentWorkplace.SharedBufferInfo, recipeParam.FirstNotch, recipeParam.LastNotch);
 
 			#endregion
             WorkEventManager.OnProcessMeasurementDone(this.currentWorkplace, new ProcessMeasurementDoneEventArgs());
