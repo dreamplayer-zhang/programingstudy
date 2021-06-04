@@ -244,6 +244,7 @@ namespace RootTools.Control
         {
             m_bSWLimit[0] = tree.Set(m_bSWLimit[0], m_bSWLimit[0], "Minus", "Use SW Minus Limit");
             m_bSWLimit[1] = tree.Set(m_bSWLimit[1], m_bSWLimit[1], "Plus", "Use SW Plus Limit");
+
         }
         #endregion
 
