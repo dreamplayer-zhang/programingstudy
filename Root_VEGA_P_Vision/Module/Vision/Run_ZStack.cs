@@ -103,10 +103,12 @@ namespace Root_VEGA_P_Vision.Module
 
                 double dstep = Math.Abs(nendPos - nstartPos) / nstep;
 
+
+                ZStackGrabMode.m_nScanRate = 100;
                 FocusStacking_new fs = new FocusStacking_new(mem);
                 double dCamHeighttoPulse = nCamHeight * ZStackGrabMode.m_dResY_um;
                 double dCamWidthtoPulse = nCamWidth * ZStackGrabMode.m_dResX_um;
-                int nScanSpeed = Convert.ToInt32(ZStackGrabMode.m_nMaxFrame *  (dTriggerEndPosZ-dTriggerStartPosZ)/10 * ZStackGrabMode.m_nScanRate / 100);
+                int nScanSpeed = Convert.ToInt32(ZStackGrabMode.m_nMaxFrame *  (dTriggerEndPosZ-dTriggerStartPosZ)/nstep * ZStackGrabMode.m_nScanRate / 100);
 
                 int cntX = nPodSizeX_px / nCamWidth;
                 int cntY = nPodSizeY_px / nCamHeight;
@@ -119,7 +121,7 @@ namespace Root_VEGA_P_Vision.Module
 
                     for (int j = 0; j < cntY; j++)
                     {
-                        if (m_module.Run(axisZ.StartMove(dTriggerStartPosZ-40000)))
+                        if (m_module.Run(axisZ.StartMove(dTriggerStartPosZ)))
                             return p_sInfo;
                         if (m_module.Run(axisZ.WaitReady()))
                             return p_sInfo;
@@ -129,17 +131,17 @@ namespace Root_VEGA_P_Vision.Module
                         if (m_module.Run(axisXY.WaitReady()))
                             return p_sInfo;
 
-                        axisZ.SetTrigger(dTriggerStartPosZ, dTriggerEndPosZ, dstep, true);
+                        axisZ.SetTrigger(dTriggerStartPosZ, dTriggerEndPosZ, dstep,5, true);
                         //if (m_module.Run(m_module.Move(mainOpt.m_axisZ, dPosZ)))
                         //    return p_sInfo;
                         ZStackGrabMode.StartZGrab(mem, nstep, new CPoint(nCamWidth * i, nCamHeight * j)); //여기선 진자 찍는것만
 
-                        if (m_module.Run(axisZ.StartMove(dTriggerEndPosZ+40000, 500000)))
+                        if (m_module.Run(axisZ.StartMove(dTriggerEndPosZ, nScanSpeed)))
                             return p_sInfo;
                         if (m_module.Run(axisZ.WaitReady()))
                             return p_sInfo;
 
-                        axisXY.p_axisY.RunTrigger(false);
+                        axisZ.RunTrigger(false);
 
 
                     }
