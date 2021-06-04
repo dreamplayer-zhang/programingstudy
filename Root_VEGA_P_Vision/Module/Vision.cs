@@ -104,7 +104,8 @@ namespace Root_VEGA_P_Vision.Module
 
             public string Rotate(double degree, bool bWait = true)
             {
-                string sRun = m_axisR.StartMove(degree * p_pulsePerRound / 360);
+                double rotate = m_axisR.p_posActual + degree * p_pulsePerRound / 360;
+                string sRun = m_axisR.StartMove(rotate);
                 if (sRun != "OK") return sRun;
                 return bWait ? m_axisR.WaitReady() : "OK";
             }
@@ -395,8 +396,8 @@ namespace Root_VEGA_P_Vision.Module
                 m_sideOptic.CameraInit();
 
                 p_sInfo = m_sideOptic.axisZ.StartHome();
-                m_sideOptic.axisZ.WaitReady();
                 p_sInfo = m_mainOptic.m_axisZ.StartHome();
+                m_sideOptic.axisZ.WaitReady();
                 m_mainOptic.m_axisZ.WaitReady();
 
                 p_sInfo = base.StateHome();

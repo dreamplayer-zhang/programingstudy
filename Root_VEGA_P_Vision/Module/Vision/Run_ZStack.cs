@@ -15,7 +15,7 @@ using System.Threading;
 
 namespace Root_VEGA_P_Vision.Module
 {
-    class Run_ZStack:ModuleRunBase
+    class Run_ZStack : ModuleRunBase
     {
         Vision m_module;
         Vision.MainOptic mainOpt;
@@ -61,8 +61,8 @@ namespace Root_VEGA_P_Vision.Module
         public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
         {
             p_sZStackGrabMode = tree.Set(p_sZStackGrabMode, p_sZStackGrabMode, m_module.p_asGrabMode, "Grab Mode : ZStack Grab", "Select GrabMode", bVisible);
-            nstartPos = tree.Set(nstartPos, nstartPos, "Stacking Start Z", "Stacking Start Z Position",bVisible);
-            nendPos = tree.Set(nendPos, nendPos, "Stacking End Z", "Stacking End Z Position",bVisible);
+            nstartPos = tree.Set(nstartPos, nstartPos, "Stacking Start Z", "Stacking Start Z Position", bVisible);
+            nendPos = tree.Set(nendPos, nendPos, "Stacking End Z", "Stacking End Z Position", bVisible);
             nstep = tree.Set(nstep, nstep, "Step Count", "Snap Step Count", bVisible);
 
         }
@@ -77,15 +77,15 @@ namespace Root_VEGA_P_Vision.Module
                 AxisXY axisXY = m_module.m_stage.m_axisXY;
                 Axis axisZ = mainOpt.m_axisZ;
 
-                double dTriggerStartPosZ = nstartPos;
-                double dTriggerEndPosZ = nendPos;
+                double dTriggerStartPosZ = nstartPos-40000;
+                double dTriggerEndPosZ = nendPos+40000;
                 int nMMPerUM = 1000;
                 int nCamWidth = ZStackGrabMode.m_camera.GetRoiSize().X;
                 int nCamHeight = ZStackGrabMode.m_camera.GetRoiSize().Y;
                 int nPodSizeY_px = Convert.ToInt32(ZStackGrabMode.m_nPodYSize_mm * nMMPerUM / ZStackGrabMode.m_dResY_um);  //파드 영역의 Y픽셀 갯수
                 int nPodSizeX_px = Convert.ToInt32(ZStackGrabMode.m_nPodXSize_mm * nMMPerUM / ZStackGrabMode.m_dResX_um);
-                double dStartPosX = ZStackGrabMode.m_rpAxisCenter.X - (nPodSizeX_px * ZStackGrabMode.m_dResX_um * 1000)/ 2;
-                double dStartPosY = ZStackGrabMode.m_rpAxisCenter.Y - (nPodSizeY_px * ZStackGrabMode.m_dResY_um * 1000)/ 2;
+                double dStartPosX = ZStackGrabMode.m_rpAxisCenter.X; /*- (nPodSizeX_px * ZStackGrabMode.m_dResX_um * 1000)/ 2;*/
+                double dStartPosY = ZStackGrabMode.m_rpAxisCenter.Y; /*- (nPodSizeY_px * ZStackGrabMode.m_dResY_um * 1000)/ 2;*/
 
                 if (m_module.Run(axisXY.StartMove(new RPoint(dStartPosX, dStartPosY))))
                     return p_sInfo;
@@ -106,24 +106,25 @@ namespace Root_VEGA_P_Vision.Module
                 FocusStacking_new fs = new FocusStacking_new(mem);
                 double dCamHeighttoPulse = nCamHeight * ZStackGrabMode.m_dResY_um;
                 double dCamWidthtoPulse = nCamWidth * ZStackGrabMode.m_dResX_um;
+                int nScanSpeed = Convert.ToInt32(ZStackGrabMode.m_nMaxFrame *  (dTriggerEndPosZ-dTriggerStartPosZ)/10 * ZStackGrabMode.m_nScanRate / 100);
 
                 int cntX = nPodSizeX_px / nCamWidth;
                 int cntY = nPodSizeY_px / nCamHeight;
-                for (int i=0;i< cntX; i++)
+                for (int i = 0; i < cntX; i++)
                 {
                     if (m_module.Run(axisXY.p_axisX.StartMove(dStartPosX + i * dCamWidthtoPulse)))
                         return p_sInfo;
                     if (m_module.Run(axisXY.WaitReady()))
                         return p_sInfo;
 
-                    for (int j=0;j< cntY; j++)
+                    for (int j = 0; j < cntY; j++)
                     {
-                        if (m_module.Run(axisZ.StartMove(dTriggerStartPosZ)))
+                        if (m_module.Run(axisZ.StartMove(dTriggerStartPosZ-40000)))
                             return p_sInfo;
                         if (m_module.Run(axisZ.WaitReady()))
                             return p_sInfo;
 
-                        if (m_module.Run(axisXY.p_axisY.StartMove(dStartPosY + i * dCamHeighttoPulse)))
+                        if (m_module.Run(axisXY.p_axisY.StartMove(dStartPosY + j * dCamHeighttoPulse)))
                             return p_sInfo;
                         if (m_module.Run(axisXY.WaitReady()))
                             return p_sInfo;
@@ -131,23 +132,26 @@ namespace Root_VEGA_P_Vision.Module
                         axisZ.SetTrigger(dTriggerStartPosZ, dTriggerEndPosZ, dstep, true);
                         //if (m_module.Run(m_module.Move(mainOpt.m_axisZ, dPosZ)))
                         //    return p_sInfo;
-                        if (m_module.Run(axisZ.StartMove(dTriggerEndPosZ)))
+                        ZStackGrabMode.StartZGrab(mem, nstep, new CPoint(nCamWidth * i, nCamHeight * j)); //여기선 진자 찍는것만
+
+                        if (m_module.Run(axisZ.StartMove(dTriggerEndPosZ+40000, 500000)))
                             return p_sInfo;
                         if (m_module.Run(axisZ.WaitReady()))
                             return p_sInfo;
 
-                        
-                        ZStackGrabMode.StartZGrab(mem, nstep, new CPoint(nCamWidth*i,nCamHeight*j)); //여기선 진자 찍는것만
+                        axisXY.p_axisY.RunTrigger(false);
+
+
                     }
                 }
-
-                fs.Run(nCamWidth* cntX, nCamHeight* cntY);
+                ZStackGrabMode.m_camera.StopGrab();
+                return "OK";
+                //fs.Run(nCamWidth* cntX, nCamHeight* cntY);
             }
             finally
             {
                 ZStackGrabMode.SetLight(false);
             }
-            return "OK";
         }
     }
 }

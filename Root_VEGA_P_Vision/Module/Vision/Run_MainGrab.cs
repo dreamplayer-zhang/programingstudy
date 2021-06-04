@@ -66,7 +66,7 @@ namespace Root_VEGA_P_Vision.Module
         }
         public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
         {
-            p_sMainGrabMode = tree.Set(p_sMainGrabMode, p_sMainGrabMode, m_module.p_asGrabMode, "Grab Mode : Main Grab", "Select GrabMode", bVisible);
+            p_sMainGrabMode = tree.Set(p_sMainGrabMode, p_sMainGrabMode, m_module.p_asGrabMode, "Grab Mode : MainGrab", "Select GrabMode", bVisible);
             if (MainGrabMode != null)
             {
                 MainGrabMode.RunTreeLinescanOption(tree, bVisible);

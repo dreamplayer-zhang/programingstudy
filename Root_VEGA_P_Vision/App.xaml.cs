@@ -16,10 +16,10 @@ namespace Root_VEGA_P_Vision
         public const string mPool = "Vision.Memory";
         public const string mGroup = "Vision";
         public const string mMaskLayer = "MaskLayer";
-        public const string mMainGrab = "Main Grab";
-        public const string mSideGrab = "Side Grab";
-        public const string mStainGrab = "Stain Grab";
-        public const string mZStack = "Z Stack Grab";
+        public const string mMainGrab = "MainGrab";
+        public const string mSideGrab = "SideGrab";
+        public const string mStainGrab = "StainGrab";
+        public const string mZStack = "ZStackGrab";
         public const string mRotate = "Rotate";
 
     }

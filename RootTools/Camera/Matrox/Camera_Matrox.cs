@@ -545,6 +545,7 @@ namespace RootTools.Camera.Matrox
 
             int iBlock = 0;
             MemoryData m = param.mem;
+            Debug.WriteLine("memoffset X : " + param.memoffset.X);
             while (iBlock<m_nGrabCount)
             {
                 if (iBlock >= m_nGrabTrigger) continue;
@@ -556,7 +557,7 @@ namespace RootTools.Camera.Matrox
                     fixed (byte* p = srcarr)
                     {
                         IntPtr srcPtr = (IntPtr)p + p_nWidth * y;
-                        IntPtr dstPtr = (IntPtr)((long)m_MemPtr + param.memoffset.X + param.memoffset.Y * m_Memory.W);
+                        IntPtr dstPtr = (IntPtr)((long)m_MemPtr + param.memoffset.X + (param.memoffset.Y+ y) * m_Memory.W);
                         Buffer.MemoryCopy((void*)srcPtr, (void*)dstPtr, p_nWidth, p_nWidth);
                     }
                 });

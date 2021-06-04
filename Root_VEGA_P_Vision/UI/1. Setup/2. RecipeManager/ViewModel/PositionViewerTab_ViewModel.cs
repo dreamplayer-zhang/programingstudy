@@ -142,6 +142,9 @@ namespace Root_VEGA_P_Vision
                 MessageBox.Show("Vision Home이 완료 되지 않았습니다.");
                 return;
             }
+
+            vision.StartRun((Run_MainGrab)vision.CloneModuleRun(App.mMainGrab));
+
         }
         #endregion
     }
