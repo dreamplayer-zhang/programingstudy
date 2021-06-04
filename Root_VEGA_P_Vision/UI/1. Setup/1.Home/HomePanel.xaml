@@ -21,9 +21,9 @@
                         Visibility="Collapsed"
                         Command="{Binding btnInspection}"
                         Style="{StaticResource PanelBtn}"/>-->
-                <!--<Button Content="Recipe Wizard"
+                <Button Content="Recipe Wizard"
                         Command="{Binding btnRecipeWizard}"
-                        Style="{StaticResource PanelBtn}"/>-->
+                        Style="{StaticResource PanelBtn}"/>
                 <Button Content="Maintenance"
                         Command="{Binding btnMaintenance}"
                         Style="{StaticResource PanelBtn}"/>
@@ -34,10 +34,5 @@
         </Border>
 
         <Grid Grid.Column="1" x:Name="SubPanel"/>
-
-
-
-
-
     </Grid>
 </UserControl>

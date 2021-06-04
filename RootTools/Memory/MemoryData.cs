@@ -589,6 +589,31 @@ namespace RootTools.Memory
             Worker_MemorySave.DoWork += new DoWorkEventHandler(Worker_MemorySave_DoWork);
             Worker_MemorySave.RunWorkerAsync(arguments);
         }
+        private void Worker_MemorySave_DoWork(object sender, DoWorkEventArgs e)
+        {
+            List<object> arguments = (List<object>)(e.Argument);
+
+            string sFile = arguments[0].ToString();
+            int nMemIndex = Convert.ToInt32(arguments[1]);
+            int nByte = Convert.ToInt32(arguments[2]);
+
+            switch (GetUpperExt(sFile))
+            {
+                case "BMP": p_sInfo = FileSaveBMP(sFile, nMemIndex, nByte); break;
+                case "JPG": p_sInfo = FileSaveJPG(sFile, nMemIndex); break;
+            }
+        }
+        public void FileSave(string sFile, int nMemoryIndex, int nByte)
+        {
+            List<object> arguments = new List<object>();
+            arguments.Add(sFile);
+            arguments.Add(nMemoryIndex);
+            arguments.Add(nByte);
+
+            BackgroundWorker Worker_MemorySave = new BackgroundWorker();
+            Worker_MemorySave.DoWork += new DoWorkEventHandler(Worker_MemorySave_DoWork);
+            Worker_MemorySave.RunWorkerAsync(arguments);
+        }
         bool WriteBitmapFileHeader(BinaryWriter bw, int nByte, int width, int height)
         {
             if (bw == null)

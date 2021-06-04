@@ -165,6 +165,12 @@ namespace Root_WIND2.UI_User
                     workManager.IntegratedProcessDefectDone += ProcessDefectWaferDone_Callback;
                     workManager.WorkplaceStateChanged += WorkplaceStateChanged_Callback;
                 }
+
+                if(this.ImageViewerVM != null)
+                {
+                    this.ImageViewerVM.ReadCenterPoint();
+                    this.ImageViewerVM.ReadExclusivePolygon();
+                }
             });
         }
         public RelayCommand UnloadedCommand
@@ -225,14 +231,25 @@ namespace Root_WIND2.UI_User
             });
         }
 
-        public RelayCommand btnRemote
+
+        public RelayCommand btnSaveKlarf
         {
             get => new RelayCommand(() =>
             {
 
+                Settings settings = new Settings();
+                SettingItem_SetupBackside settings_backside = settings.GetItem<SettingItem_SetupBackside>();
+
+                WorkManager workManager = GlobalObjects.Instance.GetNamed<WorkManager>("backInspection");
+
+                Tools.SaveImageJpg(workManager.SharedBuffer,
+                    new Rect(settings_backside.WholeWaferImageStartX, settings_backside.WholeWaferImageStartY, settings_backside.WholeWaferImageEndX, settings_backside.WholeWaferImageEndY),
+                    settings_backside.KlarfSavePath + "\\" + DateTime.Now.ToString("yyyyMMddhhmmss") + "_backside.jpg",
+                    (long)(settings_backside.WholeWaferImageCompressionRate * 100),
+                    settings_backside.OutputImageSizeX,
+                    settings_backside.OutputImageSizeY);
             });
         }
-
         #endregion
 
 
@@ -297,6 +314,19 @@ namespace Root_WIND2.UI_User
 
         private void ProcessDefectWaferDone_Callback(object obj, IntegratedProcessDefectDoneEventArgs args)
         {
+            Workplace workplace = obj as Workplace;
+            List<String> textList = new List<String>();
+            List<CRect> rectList = new List<CRect>();
+
+
+            foreach (RootTools.Database.Defect defectInfo in workplace.DefectList)
+            {
+                String text = "";
+
+                rectList.Add(new CRect((int)defectInfo.p_rtDefectBox.Left, (int)defectInfo.p_rtDefectBox.Top, (int)defectInfo.p_rtDefectBox.Right, (int)defectInfo.p_rtDefectBox.Bottom));
+                textList.Add(text);
+            }
+
             Application.Current.Dispatcher.Invoke(DispatcherPriority.Normal, new Action(delegate
             {
                 DatabaseManager.Instance.SelectData();

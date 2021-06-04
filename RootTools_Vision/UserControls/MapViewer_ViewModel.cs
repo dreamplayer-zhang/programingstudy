@@ -16,18 +16,23 @@ namespace RootTools_Vision
 {
     public class MapViewer_ViewModel : ObservableObject
     {
-        public MapViewer_ViewModel()
+        private class MapViewerColorDefines
         {
-            ChipItems = new ObservableCollection<Rectangle>();
+            public static SolidColorBrush NoChip = Brushes.LightGray;
+            public static SolidColorBrush Normal = Brushes.DimGray;
+            public static SolidColorBrush Snap = Brushes.LightSkyBlue;
+            public static SolidColorBrush Position = Brushes.LightYellow;
+            public static SolidColorBrush Inspection = Brushes.Gold;
+            public static SolidColorBrush ProcessDefect = Brushes.YellowGreen;
+            public static SolidColorBrush ProcessDefectWafer = Brushes.Green;
         }
 
-
-        public void CreateMap(int _sizeX, int _sizeY)
+        public void CreateMap(int _sizeX, int _sizeY, int[] mapData = null)
         {
             this.MapSizeX = _sizeX;
             this.MapSizeY = _sizeY;
 
-            CreateMap();
+            CreateMap(mapData);
         }
 
         #region [Properties]
@@ -92,9 +97,11 @@ namespace RootTools_Vision
         #endregion
 
         #region [Draw Method]
-        private void CreateMap()
+        private void CreateMap(int[] mapData = null)
         {
             if (this.mapSizeX == 0 || this.mapSizeY == 0) return;
+
+            if (ChipItems == null) ChipItems = new ObservableCollection<Rectangle>();
 
             ChipItems.Clear();
 
@@ -121,8 +128,23 @@ namespace RootTools_Vision
                     rect.Stroke = Brushes.Transparent;
                     rect.Opacity = 0.7;
                     rect.StrokeThickness = 2;
-                    rect.Fill = Brushes.DimGray;
 
+                    if(mapData != null)
+                    {
+                        if(mapData[y * sizeY + x] == 0)
+                        {
+                            rect.Fill = Brushes.DimGray;
+                        }
+                        else
+                        {
+                            rect.Fill = Brushes.YellowGreen;
+                        }
+                    }
+                    else
+                    {
+                        rect.Fill = Brushes.DimGray;
+                    }
+                    
                     Canvas.SetZIndex(rect, 99);
                     //rect.MouseLeftButtonDown += ChipMouseLeftButtonDown;
 

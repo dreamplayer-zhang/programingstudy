@@ -14,7 +14,7 @@ using System.Windows.Media;
 
 namespace Root_WindII.Engineer
 {
-    public class WindII_Handler : IHandler
+    public class WindII_Handler : ObservableObject, IHandler
     {
         #region UI Binding
         public Brush p_brushHandler
@@ -33,13 +33,43 @@ namespace Root_WindII.Engineer
         #region Module
         public ModuleList p_moduleList { get; set; }
         public EFEM_Recipe m_recipe;
-        public EFEM_Process m_process; 
+        public EFEM_Process m_process;
+        WIND2 m_WIND2;
+        public WIND2 p_WIND2
+        {
+            get
+            {
+                return m_WIND2;
+            }
+            set
+            {
+                SetProperty(ref m_WIND2, value);
+            }
+        }
+        private Vision_Frontside m_visionFront;
+        public Vision_Frontside p_VisionFront
+		{
+            get => m_visionFront;
+            set => SetProperty(ref m_visionFront, value);
+        }
+
         void InitModule()
         {
             p_moduleList = new ModuleList(m_engineer);
             InitWTR();
             InitLoadport();
-            InitBackside(ModuleBase.eRemote.Client);
+            InitAligner();
+            m_visionFront = new Vision_Frontside("Vision", m_engineer, ModuleBase.eRemote.Server);
+            InitModule(m_visionFront);
+            ((IWTR)m_wtr).AddChild((IWTRChild)m_visionFront);
+
+            
+
+            InitVision();
+            //InitBackside(ModuleBase.eRemote.Client);
+            p_WIND2 = new WIND2("WIND2", m_engineer);
+            InitModule(p_WIND2);
+
 
             m_wtr.RunTree(Tree.eMode.RegRead);
             m_wtr.RunTree(Tree.eMode.Init);
@@ -170,16 +200,119 @@ namespace Root_WindII.Engineer
         }
         #endregion
 
-        #region Backside
-        bool m_bBackside = true;
-        public Backside m_backside;
-        void InitBackside(ModuleBase.eRemote eRemote)
+        #region Module Aligner
+        enum eAligner
         {
-            if (m_bBackside == false) return;
-            m_backside = new Backside("Backside", m_engineer, eRemote);
-            InitModule(m_backside);
+            None,
+            ATI,
+            RND
+        }
+        eAligner m_eAligner = eAligner.ATI;
+        void InitAligner()
+        {
+            ModuleBase module = null;
+            switch (m_eAligner)
+            {
+                case eAligner.ATI: module = new Aligner_ATI("Aligner", m_engineer); break;
+                case eAligner.RND: module = new Aligner_RND("Aligner", m_engineer); break;
+            }
+            if (module != null)
+            {
+                InitModule(module);
+                ((IWTR)m_wtr).AddChild((IWTRChild)module);
+            }
+        }
+
+        public void RunTreeAligner(Tree tree)
+        {
+            m_eAligner = (eAligner)tree.Set(m_eAligner, m_eAligner, "Type", "Aligner Type");
         }
         #endregion
+
+        #region Module Vision
+        enum eVision
+        {
+            Backside,
+            EBR,
+            AOP,
+            EdgeSide
+        }
+        List<eVision> m_aVisionType = new List<eVision>();
+        int m_lVision = 1;
+        void InitVision()
+        {
+            ModuleBase module;
+            for (int n = 0; n < m_lVision; n++)
+            {
+                string sN = n.ToString("00");
+                string sID = "Vision" + sN;
+                switch (m_aVisionType[n])
+                {
+                    case eVision.Backside:
+                        module = new Vision_Backside(GetVisionID(n), m_engineer, ModuleBase.eRemote.Client);
+                        break;
+                    case eVision.EBR:
+                        module = new Vision_EBR(GetVisionID(n), m_engineer);
+                        break;
+                    case eVision.AOP:
+                        module = new Vision_AOP(GetVisionID(n), m_engineer);
+                        break;
+                    case eVision.EdgeSide:
+                        module = new Vision_Edgeside(GetVisionID(n), m_engineer, ModuleBase.eRemote.Client);
+                        break;
+                    default:
+                        module = new Vision_AOP(GetVisionID(n), m_engineer);
+                        break;
+                }
+                InitModule(module);
+                ((IWTR)m_wtr).AddChild((IWTRChild)module);
+            }
+        }
+
+        string GetVisionID(int n)
+        {
+            eVision eVision = m_aVisionType[n];
+            int nCount = 0;
+            foreach (eVision vision in m_aVisionType)
+            {
+                if (vision == eVision)
+                    nCount++;
+            }
+            if (nCount == 1)
+                return eVision.ToString();
+            nCount = 0;
+            for (int i = 0; i < n; i++)
+            {
+                if (m_aVisionType[i] == eVision)
+                    nCount++;
+            }
+            return eVision.ToString() + nCount.ToString();
+        }
+
+        public void RunTreeVision(Tree tree)
+        {
+            m_lVision = tree.Set(m_lVision, m_lVision, "Count", "Vision Count");
+            while (m_aVisionType.Count < m_lVision)
+                m_aVisionType.Add(eVision.AOP);
+            Tree treeType = tree.GetTree("Type");
+            for (int n = 0; n < m_lVision; n++)
+            {
+                m_aVisionType[n] = (eVision)treeType.Set(m_aVisionType[n], m_aVisionType[n], n.ToString("00"), "Vision Type");
+            }
+        }
+        #endregion
+
+
+        //#region Backside
+        //bool m_bBackside = true;
+        //public Backside m_backside;
+        //void InitBackside(ModuleBase.eRemote eRemote)
+        //{
+        //    if (m_bBackside == false) return;
+        //    m_backside = new Backside("Backside", m_engineer, eRemote);
+        //    InitModule(m_backside);
+        //}
+        //#endregion
 
         #region StateHome
         public string StateHome()
@@ -377,7 +510,9 @@ namespace Root_WindII.Engineer
         {
             RunTreeWTR(tree.GetTree("WTR"));
             RunTreeLoadport(tree.GetTree("Loadport"));
-            m_bBackside = tree.Set(m_bBackside, m_bBackside, "Backside", "Use Backside");
+            RunTreeAligner(tree.GetTree("Aligner"));
+            RunTreeVision(tree.GetTree("Vision"));
+            //m_bBackside = tree.Set(m_bBackside, m_bBackside, "Backside", "Use Backside");
         }
         #endregion
 
@@ -405,8 +540,12 @@ namespace Root_WindII.Engineer
                 EQ.p_bStop = true;
                 m_thread.Join();
             }
-            p_moduleList.ThreadStop();
-            foreach (ModuleBase module in p_moduleList.m_aModule.Keys) module.ThreadStop();
+
+            if (p_moduleList != null)
+            {
+                p_moduleList.ThreadStop();
+                foreach (ModuleBase module in p_moduleList.m_aModule.Keys) module.ThreadStop();
+            }
         }
     }
 }

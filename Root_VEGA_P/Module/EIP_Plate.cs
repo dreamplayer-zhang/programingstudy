@@ -1,6 +1,7 @@
 ﻿using Root_VEGA_P.Engineer;
 using Root_VEGA_P_Vision.Module;
 using RootTools;
+using RootTools.Camera.CognexOCR;
 using RootTools.Control;
 using RootTools.Module;
 using RootTools.Trees;
@@ -12,13 +13,16 @@ namespace Root_VEGA_P.Module
     public class EIP_Plate : ModuleBase, IRTRChild
     {
         #region ToolBox
+        Camera_CognexOCR camBarcode;
         DIO_Os m_doCover;
         DIO_Is[] m_diCover = new DIO_Is[2] { null, null };
         public override void GetTools(bool bInit)
         {
+            p_sInfo = m_toolBox.GetCamera(ref camBarcode, this, p_id + ".Cam Barcode");
             p_sInfo = m_toolBox.GetDIO(ref m_doCover, this, p_id + ".Cover", Enum.GetNames(typeof(eCover)));
             p_sInfo = m_toolBox.GetDIO(ref m_diCover[0], this, p_id + ".Cover Open", new string[] { "0", "1" });
             p_sInfo = m_toolBox.GetDIO(ref m_diCover[1], this, p_id + ".Cover Close", new string[] { "0", "1" });
+            m_particleCounterSet.GetTools(m_toolBox, bInit);
             if (bInit) { }
         }
         #endregion
@@ -81,6 +85,7 @@ namespace Root_VEGA_P.Module
         {
             m_reg = new Registry("InfoPod");
             int nPod = m_reg.Read(p_id, -1);
+            if (nPod < 0) return;
             p_infoPod = new InfoPod((InfoPod.ePod)nPod);
             p_infoPod.ReadReg();
         }
@@ -163,16 +168,6 @@ namespace Root_VEGA_P.Module
         }
         #endregion
 
-        #region RunParticleCounter
-        public string RunParticleCounter(bool bCheckPod)
-        {
-            if (bCheckPod && (p_infoPod == null)) return "EIP Plate Check Error";
-            if (Run(RunCover(true))) return p_sInfo;
-            // Particle Count
-            return "OK";
-        }
-        #endregion
-
         #region State Home
         public override string StateHome()
         {
@@ -193,11 +188,12 @@ namespace Root_VEGA_P.Module
         }
         #endregion
 
-        ParticleCounterSet m_particleCounterSet;
+        public ParticleCounterSet m_particleCounterSet;
         public EIP_Plate(string id, IEngineer engineer)
         {
+            p_id = id; 
             VEGA_P vegaP = ((VEGA_P_Handler)engineer.ClassHandler()).m_VEGA;
-            m_particleCounterSet = new ParticleCounterSet(this, vegaP.m_flowSensor, vegaP.m_sample);
+            m_particleCounterSet = new ParticleCounterSet(this, vegaP);
             InitBase(id, engineer); 
         }
 
@@ -210,10 +206,9 @@ namespace Root_VEGA_P.Module
         #region ModuleRun
         protected override void InitModuleRuns()
         {
-            AddModuleRunList(new Run_Delay(this), true, "Time Delay");
-            AddModuleRunList(new Run_Run(this), true, "Run Particle Counter");
+            AddModuleRunList(new Run_Delay(this), false, "Time Delay");
             AddModuleRunList(new Run_RunCover(this), false, "Run Cover Sol Test");
-            m_particleCounterSet.InitModuleRuns();
+            m_particleCounterSet.InitModuleRuns(true);
         }
 
         public class Run_Delay : ModuleRunBase
@@ -242,34 +237,6 @@ namespace Root_VEGA_P.Module
             {
                 Thread.Sleep((int)(1000 * m_secDelay / 2));
                 return "OK";
-            }
-        }
-
-        public class Run_Run : ModuleRunBase
-        {
-            EIP_Plate m_module;
-            public Run_Run(EIP_Plate module)
-            {
-                m_module = module;
-                InitModuleRun(module);
-            }
-
-            bool m_bCheckPod = true;
-            public override ModuleRunBase Clone()
-            {
-                Run_Run run = new Run_Run(m_module);
-                run.m_bCheckPod = m_bCheckPod;
-                return run;
-            }
-
-            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
-            {
-                m_bCheckPod = tree.Set(m_bCheckPod, m_bCheckPod, "Check Pod", "Check Pod State", bVisible);
-            }
-
-            public override string Run()
-            {
-                return m_module.RunParticleCounter(m_bCheckPod);
             }
         }
 

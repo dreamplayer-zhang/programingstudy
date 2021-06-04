@@ -1,0 +1,28 @@
+﻿<UserControl x:Class="Root_VEGA_P_Vision.ImageViewerBase_Panel"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Root_VEGA_P_Vision"
+             mc:Ignorable="d" 
+                          d:DesignHeight="818"
+             d:DesignWidth="1912"
+             Background="{StaticResource PanelBackGround}">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="0.7*"/>
+            <RowDefinition Height="9*"/>
+        </Grid.RowDefinitions>
+        <StackPanel Grid.Row="0" Orientation="Horizontal">
+            <TextBlock Text="Image" Style="{StaticResource ImageText}"/>
+            <Button Content="Open" Style="{StaticResource ImageBaseBtn}" Command="{Binding p_SubViewer.DataContext.ImageOpen}"/>
+            <Button Content="Save" Style="{StaticResource ImageBaseBtn}" Command="{Binding p_SubViewer.DataContext.ImageSave}"/>
+            <Button Content="Clear" Style="{StaticResource ImageBaseBtn}" Command="{Binding p_SubViewer.DataContext.ImageClear}"/>
+            <Button Content="Snap" Style="{StaticResource ImageBaseBtn}" Command="{Binding p_SubViewer.DataContext.btnSnap}"/>
+            <Button Content="Insp" Visibility="{Binding InspBtnVisibility}" Style="{StaticResource ImageBaseBtn}" Command="{Binding p_SubViewer.DataContext.btnInsp}"/>
+        </StackPanel>
+        <Grid Grid.Row="1">
+            <ContentControl Content="{Binding p_SubViewer}"/>
+        </Grid>
+    </Grid>
+</UserControl>

@@ -165,5 +165,18 @@ namespace RootTools.Module
             m_treeRoot.UpdateTree += M_treeRoot_UpdateTree;
             RunTree(Tree.eMode.RegRead);
         }
+
+        public ModuleRunList Copy()
+        {
+            ModuleRunList temp = new ModuleRunList(m_id, m_engineer);
+
+            temp.p_aModuleRun = new ObservableCollection<ModuleRunBase>(p_aModuleRun);
+            return temp;
+        }
+
+        public ObservableCollection<ModuleRunBase> CopyModuleRun()
+        {
+            return new ObservableCollection<ModuleRunBase>(m_aModuleRun);
+        }
     }
 }

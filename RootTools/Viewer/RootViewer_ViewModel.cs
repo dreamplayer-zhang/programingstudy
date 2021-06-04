@@ -607,6 +607,12 @@ namespace RootTools
                 SetProperty(ref m_VisibleMenu, value);
             }
         }
+        private Visibility m_VisibleSlider = Visibility.Visible;
+        public Visibility p_VisibleSlider
+        {
+            get => m_VisibleSlider;
+            set => SetProperty(ref m_VisibleSlider, value);
+        }
 
         #endregion
 
@@ -690,7 +696,7 @@ namespace RootTools
 
             double contrastLevel = Math.Pow((100.0 + p_nContrast) / 100.0, 2);
 
-            double newColor = (((((double)color / 255.0) - 0.5) * contrastLevel) + 0.5) * 255.0;
+            double newColor = ((((color / 255.0) - 0.5) * contrastLevel) + 0.5) * 255.0;
             newColor += p_nBrightness;
 
             return (byte)Clamp((int)Math.Round(newColor), 0, 255);
@@ -718,6 +724,7 @@ namespace RootTools
             SetRoiRect();
         }
 
+        bool isUpdate = false;
         public unsafe void SetImageSource()
         {
             try
@@ -779,7 +786,7 @@ namespace RootTools
                     else
                     {
                         object o = new object();
-                        if (p_ImageData.GetBytePerPixel() == 1)
+                        if (p_ImageData.GetBytePerPixel() == 1 && p_ImageData.p_nByte==1)
                         {
                             Image<Gray, byte> view = new Image<Gray, byte>(p_CanvasWidth, p_CanvasHeight);
 
@@ -806,7 +813,7 @@ namespace RootTools
                                     {
                                         long pix_x = rectX + xx * rectWidth / p_CanvasWidth;
                                         /*byte pixel = ((byte*)ptrMem)[pix_x + (long)pix_y * sizeX];*/
-                                        byte* arrByte = (byte * )ptrMem.ToPointer();
+                                        byte* arrByte = (byte*)ptrMem.ToPointer();
                                         long idx = pix_x + (long)pix_y * sizeX;
                                         byte pixel = arrByte[idx];
                                         viewptr[yy, xx, 0] = ApplyContrastAndBrightness(pixel);
@@ -922,9 +929,16 @@ namespace RootTools
                                     });
 
                                     p_ImgSource = ImageHelper.ToBitmapSource(view);
+
+                                    p_TumbnailImgMargin = new Thickness(Convert.ToInt32((double)p_View_Rect.X * p_ThumbWidth / p_ImageData.p_Size.X), Convert.ToInt32((double)p_View_Rect.Y * p_ThumbHeight / p_ImageData.p_Size.Y), 0, 0);
+                                    if (Convert.ToInt32((double)p_View_Rect.Height * p_ThumbHeight / p_ImageData.p_Size.Y) == 0)
+                                        p_TumbnailImg_Rect = new System.Drawing.Rectangle(0, 0, Convert.ToInt32((double)p_View_Rect.Width * p_ThumbWidth / p_ImageData.p_Size.X), 2);
+                                    else
+                                        p_TumbnailImg_Rect = new System.Drawing.Rectangle(0, 0, Convert.ToInt32((double)p_View_Rect.Width * p_ThumbWidth / p_ImageData.p_Size.X), Convert.ToInt32((double)p_View_Rect.Height * p_ThumbHeight / p_ImageData.p_Size.Y));
                                 }
-                                else if (p_ImageData.m_eMode == ImageData.eMode.ImageBuffer)
+                                else if (!isUpdate && p_ImageData.m_eMode == ImageData.eMode.ImageBuffer)
                                 {
+                                    isUpdate = true;
                                     int canvasWidth = p_CanvasWidth; // 여기 잠시 수정
                                     int canvasHeight = p_CanvasHeight;
                                     Image<Rgb, byte> view = new Image<Rgb, byte>(canvasWidth, canvasHeight);
@@ -948,15 +962,25 @@ namespace RootTools
                                             for (int xx = 0; xx < canvasWidth; xx++)
                                             {
                                                 long pix_x = viewrectX + xx * viewrectWidth / canvasWidth;
-
-                                                viewPtr[yy, xx, 0] = ApplyContrastAndBrightness(imageptr[(pix_x * this.p_ImageData.GetBytePerPixel() + 2) + (long)pix_y * (sizeX * 3)]);
-                                                viewPtr[yy, xx, 1] = ApplyContrastAndBrightness(imageptr[(pix_x * this.p_ImageData.GetBytePerPixel() + 1) + (long)pix_y * (sizeX * 3)]);
-                                                viewPtr[yy, xx, 2] = ApplyContrastAndBrightness(imageptr[(pix_x * this.p_ImageData.GetBytePerPixel() + 0) + (long)pix_y * (sizeX * 3)]);
+                                                if (p_ImageData.m_aBuf.Length <= (pix_x * this.p_ImageData.GetBytePerPixel() + 2) + (long)pix_y * (sizeX * 3))
+                                                {
+                                                    viewPtr[yy, xx, 0] = 0;
+                                                    viewPtr[yy, xx, 1] = 0;
+                                                    viewPtr[yy, xx, 2] = 0;
+                                                }
+                                                else
+                                                {
+                                                    viewPtr[yy, xx, 0] = ApplyContrastAndBrightness(imageptr[(pix_x * this.p_ImageData.GetBytePerPixel() + 2) + (long)pix_y * (sizeX * 3)]);
+                                                    viewPtr[yy, xx, 1] = ApplyContrastAndBrightness(imageptr[(pix_x * this.p_ImageData.GetBytePerPixel() + 1) + (long)pix_y * (sizeX * 3)]);
+                                                    viewPtr[yy, xx, 2] = ApplyContrastAndBrightness(imageptr[(pix_x * this.p_ImageData.GetBytePerPixel() + 0) + (long)pix_y * (sizeX * 3)]);
+                                                }
+                                               
                                             }
                                         }
                                     });
 
                                     p_ImgSource = ImageHelper.ToBitmapSource(view);
+                                    isUpdate = false;
                                 }
                             }
                             else
@@ -1133,6 +1157,93 @@ namespace RootTools
             }
         }
 
+        public virtual unsafe void SetMaskLayerSource()
+        {
+            try
+            {
+                if (p_ROILayer != null)
+                {
+                    object o = new object();
+                    {
+                        int CanvasWidth = p_LayerCanvasWidth;
+                        int CanvasHeight = p_LayerCanvasHeight;
+
+                        ImageData view = new ImageData((int)CanvasWidth, (int)CanvasHeight, 4);
+                        byte* viewPtr = (byte*)view.GetPtr();
+
+                        IntPtr ptrMem = p_ROILayer.GetPtr();
+
+                        if (ptrMem == IntPtr.Zero)
+                            return;
+
+                        byte* imageptr = (byte*)ptrMem.ToPointer();
+
+                        CPoint memOffset = new CPoint(p_LayerMemoryOffsetX, p_LayerMemoryOffsetY);
+                        int viewrectX = ((p_View_Rect.X - memOffset.X) <= 0) ? 0 : (p_View_Rect.X - memOffset.X);
+                        int viewrectY = ((p_View_Rect.Y - memOffset.Y) <= 0) ? 0 : (p_View_Rect.Y - memOffset.Y);
+
+                        int layerMemWidth = p_ROILayer.p_Size.X;
+                        int layerMemHeight = p_ROILayer.p_Size.Y;
+
+                        int viewrectWidth = p_View_Rect.Width;
+                        int viewrectHeight = p_View_Rect.Height;
+
+                        int nstride = view.p_Size.X;
+
+                        Parallel.For(0, CanvasHeight, (yy) =>
+                        {
+                            long pix_y = viewrectY + yy * viewrectHeight / CanvasHeight;
+                            long pix_rect = pix_y * layerMemWidth;
+                            long dd = viewrectX + pix_rect;
+                            if (pix_y < layerMemHeight)
+                            {
+                                for (int xx = 0; xx < CanvasWidth; xx++)
+                                {
+                                    //long pix_x = viewrectX + xx * viewrectWidth / p_CanvasWidth;
+                                    long xpos = 4 * (dd + xx * viewrectWidth / p_CanvasWidth);
+                                    long ptrpos = (yy * nstride + xx)*4;
+
+                                    viewPtr[ptrpos + 3] = imageptr[3 + xpos]; //0;
+                                    viewPtr[ptrpos + 2] = imageptr[2 + xpos]; //0;//imageptr[0 + 3 * (pix_x + pix_rect)];
+                                    viewPtr[ptrpos + 1] = imageptr[1 + xpos]; //0;//imageptr[1 + 3 * (pix_x + pix_rect)];
+                                    viewPtr[ptrpos + 0] = imageptr[0 + xpos]; //0;//imageptr[2 + 3 * (pix_x + pix_rect)];
+                                }
+                            }
+                        });
+
+                        byte[] pixels1d = new byte[(long)CanvasHeight * CanvasWidth * 4];
+                        WriteableBitmap wbitmap = new WriteableBitmap((int)CanvasWidth, (int)CanvasHeight, 96, 96, PixelFormats.Bgra32, null);
+
+                        Parallel.For(0, CanvasHeight, (row) =>
+                        {
+                            for (int col = 0; col < CanvasWidth; col++)
+                            {
+                                long index = (col + row * CanvasWidth) * 4;
+                                long oi = (row * nstride + col)*4;
+
+
+                                pixels1d[index] = viewPtr[oi+ 0];
+                                pixels1d[index + 1] = viewPtr[oi + 1];
+                                pixels1d[index + 2] = viewPtr[oi + 2];
+                                pixels1d[index + 3] = viewPtr[oi + 3];
+                            }
+                        });
+
+                        Int32Rect rect = new Int32Rect(0, 0, (int)CanvasWidth, (int)CanvasHeight);
+                        int stride = (int)(4 * CanvasWidth);
+                        wbitmap.WritePixels(rect, pixels1d, stride, 0);
+                        p_LayerSource = wbitmap;
+                    }
+
+                }
+            }
+            catch (Exception ee)
+            {
+                TempLogger.Write("RootViewer", ee);
+                //System.Windows.MessageBox.Show(ee.ToString());
+            }
+        }
+
         public void ClearViewElement()
         {
             this.p_ViewElement.Clear();
@@ -1261,6 +1372,7 @@ namespace RootTools
                 int pix_x = 0;
                 int pix_y = 0;
 
+                
                 for (int yy = 0; yy < p_ThumbHeight; yy++)
                 {
                     pix_y = yy * p_ImageData.p_Size.Y / p_ThumbHeight;
@@ -1340,6 +1452,13 @@ namespace RootTools
                 return;
             byte* imagePtr = (byte*)ptrMem.ToPointer();
 
+            imagePtr[(memPt.Y * p_ROILayer.p_Size.X + memPt.X) * 4 + 0] = b; // b
+            imagePtr[(memPt.Y * p_ROILayer.p_Size.X + memPt.X) * 4 + 1] = g; // g
+            imagePtr[(memPt.Y * p_ROILayer.p_Size.X + memPt.X) * 4 + 2] = r; // r
+            imagePtr[(memPt.Y * p_ROILayer.p_Size.X + memPt.X) * 4 + 3] = a; // a
+        }
+        public virtual unsafe void DrawPixelBitmap(byte* imagePtr, CPoint memPt, byte r, byte g, byte b, byte a)
+        {
             imagePtr[(memPt.Y * p_ROILayer.p_Size.X + memPt.X) * 4 + 0] = b; // b
             imagePtr[(memPt.Y * p_ROILayer.p_Size.X + memPt.X) * 4 + 1] = g; // g
             imagePtr[(memPt.Y * p_ROILayer.p_Size.X + memPt.X) * 4 + 2] = r; // r
@@ -1822,6 +1941,17 @@ namespace RootTools
             {
                 int nX = (memPt.X - p_View_Rect.X) * p_CanvasWidth / p_View_Rect.Width + (p_CanvasWidth / p_View_Rect.Width) / 2;
                 int nY = (memPt.Y - p_View_Rect.Y) * p_CanvasHeight / p_View_Rect.Height + (p_CanvasHeight / p_View_Rect.Height) / 2;
+                return new CPoint(nX, nY);
+            }
+            return new CPoint(0, 0);
+        }
+
+        public CPoint GetCanvasPoint(Point memPt)
+        {
+            if (p_View_Rect.Width > 0 && p_View_Rect.Height > 0)
+            {
+                int nX = ((int)memPt.X - p_View_Rect.X) * p_CanvasWidth / p_View_Rect.Width + (p_CanvasWidth / p_View_Rect.Width) / 2;
+                int nY = ((int)memPt.Y - p_View_Rect.Y) * p_CanvasHeight / p_View_Rect.Height + (p_CanvasHeight / p_View_Rect.Height) / 2;
                 return new CPoint(nX, nY);
             }
             return new CPoint(0, 0);

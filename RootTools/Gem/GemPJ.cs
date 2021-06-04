@@ -28,7 +28,7 @@ namespace RootTools.Gem
             Stopped,
             Aborted,
             JobCanceled,
-            JobComplete,
+            JobComplete = 17
         }
         eState _eState = eState.Stopped;
         public eState p_eState
@@ -42,6 +42,7 @@ namespace RootTools.Gem
             }
         }
 
+     
         public enum eError
         {
             NO_ERROR,
@@ -134,12 +135,12 @@ namespace RootTools.Gem
         public string m_sPJobID = "";
         public string m_sRecipeID = "";
 
-        public GemPJ(string sPJobID, eAutoStart autoStart, string sRcpID, Log log)
+        public GemPJ(string sPJobID, eAutoStart autoStart, string sRcpID, Log log, string sRcpExt)
         {
             m_log = log;
             m_sPJobID = sPJobID;
             m_eAutoStart = autoStart;
-            sRcpID = string.Format("C:\\Recipe\\{0}.Camellia", sRcpID);
+            sRcpID = string.Format("C:\\Recipe\\{0}.{1}", sRcpID, sRcpExt);
             m_sRecipeID = sRcpID;
         }
     }

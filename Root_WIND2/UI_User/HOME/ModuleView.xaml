@@ -1,34 +1,42 @@
 ﻿<UserControl x:Class="Root_WIND2.UI_User.ModuleView"
-             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:Root_WIND2"
-             mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:Converter="clr-namespace:ViewConverter;assembly=RootTools"
+        xmlns:tree="clr-namespace:RootTools.Trees;assembly=RootTools"
+        xmlns:local="clr-namespace:Root_WIND2"
+        xmlns:ui="clr-namespace:Root_WIND2.UI_User"
+        mc:Ignorable="d" d:DesignHeight="150"
+        d:DesignWidth="600">
     <UserControl.Resources>
+        <Converter:VisibleToBoolConverter x:Key="VisibleToBoolConverters" />
+        <Converter:InverseVisibleToBoolConverter x:Key="InverseVisibleToBoolConverters" />
         <Style x:Key="use_checkbox_button" TargetType="CheckBox">
-            <Setter Property="FontSize" Value="24"/>
-            <Setter Property="FontWeight" Value="Bold"/>
-            <Setter Property="Foreground" Value="White"/>
-            <Setter Property="IsChecked" Value="{Binding IsChecked}"/>
+            <Setter Property="FontSize" Value="24" />
+            <Setter Property="FontWeight" Value="Bold" />
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="IsChecked" Value="{Binding IsChecked}" />
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="{x:Type CheckBox}">
                         <Border x:Name="bd" CornerRadius="10">
-                            <TextBlock x:Name="tb" Text="USE" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                            <TextBlock x:Name="tb" Text="USE" VerticalAlignment="Center"
+                                    HorizontalAlignment="Center" />
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsChecked" Value="True">
-                                <Setter TargetName="bd" Property="Background" Value="{StaticResource groupbox_button_normal}"/>
-                                <Setter TargetName="tb" Property="Text" Value="On"/>
+                                <Setter TargetName="bd" Property="Background"
+                                        Value="{StaticResource groupbox_button_normal}" />
+                                <Setter TargetName="tb" Property="Text" Value="On" />
                             </Trigger>
                             <Trigger Property="IsChecked" Value="False">
-                                <Setter TargetName="bd" Property="Background" Value="#222222"/>
-                                <Setter TargetName="tb" Property="Text" Value="Off"/>
+                                <Setter TargetName="bd" Property="Background" Value="#222222" />
+                                <Setter TargetName="tb" Property="Text" Value="Off" />
                             </Trigger>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="bd" Property="Background" Value="{StaticResource groupbox_button_mouseover}"/>
+                                <Setter TargetName="bd" Property="Background"
+                                        Value="{StaticResource groupbox_button_mouseover}" />
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -40,24 +48,76 @@
         <Border CornerRadius="4" Background="{StaticResource main_view_groupbox_background}">
             <Grid>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="200" />
-                    <ColumnDefinition />
+                    <ColumnDefinition Width="170" />
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="0.5*" />
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="100"/>
-                    <RowDefinition MinHeight="50"/>
+                    <RowDefinition Height="100" />
+                    <RowDefinition MinHeight="50" />
                 </Grid.RowDefinitions>
-                <TextBlock Text="{Binding ModuleName}" Foreground="White" FontSize="36" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                <CheckBox Style="{StaticResource use_checkbox_button}" Grid.Row="1" Margin="4"/>
-
-                <Border Grid.Column="1" Grid.RowSpan="2" Margin="4">
-                    <StackPanel Orientation="Vertical" Margin="4">
-                        <CheckBox Margin="4"  Content="Inspection" FontSize="12" Foreground="White"/>
-                        <CheckBox Margin="4" Content="Only Snap" FontSize="12" Foreground="White"/>
-                        <CheckBox Margin="4" Content="Alignment" FontSize="12" Foreground="White"/>
-                        <CheckBox Margin="4" Content="Save Wafer Image" FontSize="12" Foreground="White"/>
-                    </StackPanel>
+                <TextBlock Text="{Binding ModuleName}" Foreground="White" FontSize="25" TextWrapping="WrapWithOverflow"
+                        FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center"  TextAlignment="Center"/>
+                <CheckBox Style="{StaticResource use_checkbox_button}"
+                        IsChecked="{Binding IsUseChecked}" Grid.Row="1" Margin="4" />
+                <Border Grid.Column="1" Grid.RowSpan="2" Margin="4"
+                        Visibility="{Binding p_bSetting, Converter={StaticResource InverseVisibleToBoolConverters}}">
+                    <ListBox ItemsSource="{Binding ModeList}">
+                        <ListBox.Template>
+                            <ControlTemplate>
+                                <ItemsPresenter />
+                            </ControlTemplate>
+                        </ListBox.Template>
+                        <ListBox.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <StackPanel Background="Transparent" VerticalAlignment="Top"></StackPanel>
+                            </ItemsPanelTemplate>
+                        </ListBox.ItemsPanel>
+                        <ListBox.ItemContainerStyle>
+                            <Style TargetType="ListBoxItem">
+                                <Setter Property="Padding" Value="3" />
+                            </Style>
+                        </ListBox.ItemContainerStyle>
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="50"></ColumnDefinition>
+                                        <ColumnDefinition></ColumnDefinition>
+                                    </Grid.ColumnDefinitions>
+                                    <RadioButton IsChecked="{Binding bChecked}"
+                                            GroupName="{Binding sGroupName}" Margin="5"
+                                            FontSize="15"></RadioButton>
+                                    <TextBlock Grid.Column="2" Text="{Binding sName}"
+                                            Foreground="White" TextAlignment="Center"
+                                            VerticalAlignment="Center" Margin="10,0,0,0"></TextBlock>
+                                </Grid>
+                                <!--<DataTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="true">
+                                <Setter TargetName="ItemBorder" Property="Background" Value="Black"></Setter>
+                            </Trigger>
+                            <DataTrigger
+                                    Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ListBoxItem}}, Path=IsSelected}"
+                                    Value="True">
+                                <Setter TargetName="ItemBorder" Property="Background" Value="Black"></Setter>
+                            </DataTrigger>
+                        </DataTemplate.Triggers>-->
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
                 </Border>
+                <Border  Grid.Column="1" Width="auto" Grid.RowSpan="2" Margin="4" Visibility="{Binding p_bSetting, Converter={StaticResource VisibleToBoolConverters}}">
+                    <tree:TreeUI MaxWidth="500" DataContext="{Binding p_moduleTempList.p_treeRoot}" Background="White"/>
+                </Border>
+                
+                    <!--<ui:SequenceRecipe/>-->
+                    <!--<TabControl Background="Red">
+                        
+                    </TabControl>-->
+          
+                <Button Grid.Column="2" Grid.RowSpan="2" Background="Transparent" Content="Setting"
+                        Command="{Binding CommandSettingClick}" Foreground="White">
+                </Button>
             </Grid>
         </Border>
     </Grid>

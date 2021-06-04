@@ -359,6 +359,7 @@ namespace RootTools_Vision
         /// <param name="sharedBufferByteCnt">버퍼 채널 수</param>
         /// <param name="sharedBufferG">G채널 버퍼 포인터(없을 경우 IntPtr.Zero로 셋팅)</param>
         /// <param name="sharedBufferB">B채널 버퍼 포인터(없을 경우 IntPtr.Zero로 셋팅)</param>
+        
         public void SetSharedBuffer(IntPtr sharedBufferR_GRAY, int sharedBufferWidth, int sharedBufferHeight, int sharedBufferByteCnt, IntPtr sharedBufferG, IntPtr sharedBufferB)
         {
             this.sharedBufferInfo.PtrR_GRAY = sharedBufferR_GRAY;
@@ -460,6 +461,10 @@ namespace RootTools_Vision
             return sharedBufferInfo.PtrR_GRAY;
         }
 
+        public IntPtr GetSharedBufferInfo(int memnum)
+        {
+            return sharedBufferInfo.PtrList[memnum];
+        }
         public void SetOffset(int _offsetX, int _offsetY)
         {
             this.offsetX = _offsetX;
@@ -521,22 +526,27 @@ namespace RootTools_Vision
             defectList.Add(defect);
         }
 
+
+        private object lockObj = new object();
         public void AddDefect(string sInspectionID, int defectCode, float defectSz, float defectVal, float defectRelX, float defectRelY, float defectAbsLeft, float defectAbsTop, float defectW, float defectH, int chipIdxX, int chipIdxY) // SurfaceDefectParam
         {
-            Defect defect = new Defect(sInspectionID,
-                defectCode,
-                defectSz,
-                defectVal,
-                defectW,
-                defectH,
-                defectRelX,
-                defectRelY,
-                defectAbsLeft,
-                defectAbsTop,
-                chipIdxX,
-                chipIdxY);
+            lock (lockObj)
+            {
+                Defect defect = new Defect(sInspectionID,
+                    defectCode,
+                    defectSz,
+                    defectVal,
+                    defectW,
+                    defectH,
+                    defectRelX,
+                    defectRelY,
+                    defectAbsLeft,
+                    defectAbsTop,
+                    chipIdxX,
+                    chipIdxY);
 
-            defectList.Add(defect);
+                defectList.Add(defect);
+            }
         }
 
         public void AddMeasurement(string strInspectionID, string strSide, Measurement.MeasureType type, Measurement.EBRMeasureItem measureItem, float fData, float fDefectW, float fDefectH, float fAngle, float fDefectAbsLeft, float fDefectAbsTop, int nChipIdxX, int nChipIdxY)

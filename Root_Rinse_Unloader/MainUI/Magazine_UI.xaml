@@ -9,8 +9,9 @@
     <GroupBox x:Name="groupBoxMagazine" Header="Magazine" Margin="5,10" Style="{StaticResource group}" BorderThickness="0">
         <Grid>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="3*"/>
+                <ColumnDefinition Width="3*"/>
+                <ColumnDefinition Width="2*"/>
             </Grid.ColumnDefinitions>
             <Grid>
                 <Grid.RowDefinitions>
@@ -35,6 +36,18 @@
                 </GroupBox>
             </Grid>
             <Grid Grid.Column="1" x:Name="gridMagazineLevels"/>
+            <Grid Grid.Column="2">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <GroupBox Grid.Row="0" Header="" Style="{StaticResource group}" Margin="5,10" BorderThickness="0">
+                    <Button x:Name="buttonLoadUp" Content="Load Up" Margin="5,0" FontSize="30" FontWeight="Bold" FontFamily="Arial" BorderBrush="{x:Null}" Click="buttonLoadUp_Click"/>
+                </GroupBox>
+                <GroupBox Grid.Row="1" Header="" Style="{StaticResource group}" Margin="5,10" BorderThickness="0">
+                    <Button x:Name="buttonLoadDown" Content="Load Down" Margin="5,0" FontSize="30" FontWeight="Bold" FontFamily="Arial" BorderBrush="{x:Null}" Click="buttonLoadDown_Click"/>
+                </GroupBox>
+            </Grid>
         </Grid>
     </GroupBox>
 </UserControl>

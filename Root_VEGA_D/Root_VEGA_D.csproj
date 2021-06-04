@@ -67,7 +67,7 @@
       <HintPath>..\..\..\..\..\..\..\Program Files\Basler\pylon 6\Development\Assemblies\Basler.Pylon\x64\Basler.Pylon.dll</HintPath>
     </Reference>
     <Reference Include="EasyModbus">
-      <HintPath>bin\x64\EasyModbus.dll</HintPath>
+      <HintPath>..\Lib\EasyModbus.dll</HintPath>
     </Reference>
     <Reference Include="Emgu.CV.UI, Version=4.1.1.3497, Culture=neutral, PublicKeyToken=7281126722ab4438, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>

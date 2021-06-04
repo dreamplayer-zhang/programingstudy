@@ -28,6 +28,7 @@
                     <RadioButton Content="Alignment" IsEnabled = "{Binding IsEnabledAlignment}" Command="{Binding btnFrontAlignment}" Style="{StaticResource sidetap_child_radiobutton}"/>
                     <RadioButton Content="Mask" IsEnabled = "{Binding IsEnabledMask}" Command="{Binding btnFrontMask}" Style="{StaticResource sidetap_child_radiobutton}"/>
                     <RadioButton Content="Spec" IsEnabled ="{Binding IsEnabledSpec}" Command="{Binding btnFrontSpec}" Style="{StaticResource sidetap_child_radiobutton}"/>
+                    <RadioButton Content="Measurement" IsEnabled="{Binding IsEnabledMeasurement}" Command="{Binding btnFrontMeasurement}" Style="{StaticResource sidetap_child_radiobutton}"/>
                     <RadioButton Content="Inspect" Command="{Binding btnFrontInspect}" Style="{StaticResource sidetap_child_radiobutton}"/>
                     <RadioButton Content="Remote" Command="{Binding btnFrontRemote}" Style="{StaticResource sidetap_child_radiobutton}"/>
                     <Button Content="NEW" Command="{Binding btnNewRecipeFront}" Style="{StaticResource sidetap_child_button}"/>

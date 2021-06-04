@@ -98,9 +98,14 @@ namespace Root_VEGA_D
             RecipeWizard_UI.init(m_engineer);
             InitTimer();
             InitFFU();
-            //TextBlockRetID.DataContext = m_handler.m_aLoadport[0].p_infoCarrier.m_aGemSlot[0];
+            TextBlockRetID.DataContext = m_handler.m_aLoadport[0].p_infoCarrier.m_aGemSlot[0];
         }
+
         //bool m_blogin = false;
+
+
+
+
 
         void ThreadStop()
         {

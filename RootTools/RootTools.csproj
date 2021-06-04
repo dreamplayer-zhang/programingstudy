@@ -207,6 +207,9 @@
     <Reference Include="QRCoder, Version=1.3.6.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\QRCoder.1.3.6\lib\net40\QRCoder.dll</HintPath>
     </Reference>
+    <Reference Include="SSLNet">
+      <HintPath>..\Lib\MarsLog\SSLNet.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Data" />
@@ -270,6 +273,7 @@
     <Compile Include="Comm\TCPSyncServer_UI.xaml.cs">
       <DependentUpon>TCPSyncServer_UI.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Control\Axis3D.cs" />
     <Compile Include="Control\Xenax\Xenax.cs" />
     <Compile Include="Control\Xenax\XenaxAxis.cs" />
     <Compile Include="Control\Xenax\XenaxAxis_UI.xaml.cs">
@@ -345,6 +349,10 @@
       <DependentUpon>FFU_Group_UI.xaml</DependentUpon>
     </Compile>
     <Compile Include="Database\TempLogger.cs" />
+    <Compile Include="Gem\XGem\XGem_New.cs" />
+    <Compile Include="Gem\XGem\XGem_New_UI.xaml.cs">
+      <DependentUpon>XGem_New_UI.xaml</DependentUpon>
+    </Compile>
     <Compile Include="GeneralFunction.cs" />
     <Compile Include="GrabMode\GrabModeBase.cs" />
     <Compile Include="GrabMode\GrabModeBack.cs" />
@@ -411,6 +419,7 @@
       <DependentUpon>MiniViewer.xaml</DependentUpon>
     </Compile>
     <Compile Include="Image\MiniViewer_ViewModel.cs" />
+    <Compile Include="Image\R3Point.cs" />
     <Compile Include="InfoCarrier.cs" />
     <Compile Include="InfoCarrier_UI.xaml.cs">
       <DependentUpon>InfoCarrier_UI.xaml</DependentUpon>
@@ -430,6 +439,10 @@
       <DependentUpon>ToolSetLens_UI.xaml</DependentUpon>
     </Compile>
     <Compile Include="Light\LightTool_DAWOO.cs" />
+    <Compile Include="Light\LightTool_DAWOO_RGB.cs" />
+    <Compile Include="Light\LightTool_DAWOO_RGB_UI.xaml.cs">
+      <DependentUpon>LightTool_DAWOO_RGB_UI.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Light\LightTool_DAWOO_UI.xaml.cs">
       <DependentUpon>LightTool_DAWOO_UI.xaml</DependentUpon>
     </Compile>
@@ -440,6 +453,7 @@
     <Compile Include="Memory\MemoryViewerOption.xaml.cs">
       <DependentUpon>MemoryViewerOption.xaml</DependentUpon>
     </Compile>
+    <Compile Include="MarsLog\MarsLogManager.cs" />
     <Compile Include="OHTNew\ILoadport.cs" />
     <Compile Include="OHTNew\OHT.cs" />
     <Compile Include="OHTNew\OHT_ButtonUI.xaml.cs">
@@ -958,6 +972,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Gem\XGem\XGem_New_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Gem\XGem\XGem_UI.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -1011,6 +1029,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Light\LightTool_4ch_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Light\LightTool_DAWOO_RGB_UI.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

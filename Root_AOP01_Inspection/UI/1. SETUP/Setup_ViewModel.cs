@@ -40,6 +40,7 @@ namespace Root_AOP01_Inspection
         private SetupHome_ViewModel m_Home;
         public Maintenance_ViewModel m_Maintenance;
         private GEM_ViewModel m_GEM;
+        private Other_ViewModel m_Other;
 
         private RecipeWizard_ViewModel m_RecipeWizard;
         public RecipeWizard_ViewModel p_RecipeWizard
@@ -68,6 +69,7 @@ namespace Root_AOP01_Inspection
             m_RecipeWizard = new RecipeWizard_ViewModel(this);
             m_Maintenance = new Maintenance_ViewModel(this);
             m_GEM = new GEM_ViewModel(this);
+            m_Other = new Other_ViewModel(this);
 
             m_Recipe45D = new Recipe45D_ViewModel(this);
             m_Recipe45DGlass = new Recipe45DGlass_ViewModel(this);
@@ -232,6 +234,16 @@ namespace Root_AOP01_Inspection
 
             CurrentPanel = m_GEM.GEM;
             CurrentPanel.DataContext = m_GEM;
+        }
+
+        public void Set_GEMOtherPanel()
+        {
+            NaviButtons.Clear();
+            NaviButtons.Add(Navi_Setup);
+            NaviButtons.Add(Navi_GEM);
+
+            CurrentPanel = m_Other.Other;
+            CurrentPanel.DataContext = m_Other;
         }
         public void Set_Recipe45DPanel()
         {

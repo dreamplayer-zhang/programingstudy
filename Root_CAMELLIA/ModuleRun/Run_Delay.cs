@@ -45,6 +45,7 @@ namespace Root_CAMELLIA.Module
         public override string Run()
         {
             Thread.Sleep((int)(1000 * m_secDelay));
+            
             //if (m_module.LifterDown() != "OK")
             //{
             //    return p_sInfo;

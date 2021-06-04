@@ -256,7 +256,7 @@ namespace RootTools_Vision
             }
 
             this.inspectionSharedBuffer = this.currentWorkplace.GetSharedBufferInfo(this.parameterD2D.IndexChannel);
-            this.inspectionWorkBuffer = this.GetWorkplaceBuffer(this.parameterD2D.IndexChannel);
+            this.inspectionWorkBuffer = this.GetWorkplaceBufferByColorChannel(this.parameterD2D.IndexChannel);
 
             int memH = this.currentWorkplace.SharedBufferInfo.Height;
             int memW = this.currentWorkplace.SharedBufferInfo.Width;
@@ -370,7 +370,7 @@ namespace RootTools_Vision
                     this.currentWorkplace.SetSubState(WORKPLACE_SUB_STATE.BAD_CHIP, true);
 
                     this.currentWorkplace.AddDefect(sInspectionID,
-                        10010,
+                        2000 + (int)this.parameterD2D.IndexChannel * 100 + this.parameterD2D.MaskIndex + 1,
                         Label[i].area,
                         Label[i].value,
                         this.currentWorkplace.PositionX + Label[i].boundLeft,

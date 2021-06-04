@@ -7,15 +7,15 @@ using System.Threading.Tasks;
 
 namespace RootTools_Vision
 {
-    public class BacksideSurfaceParameter : ParameterBase, IMaskInspection, IColorInspection, IBacksideInspection
+    public class BacksideSurfaceParameter : ParameterBase, IMaskInspection, IColorInspection, IDisplaySpecSummary, IBackInspection
     {
         public BacksideSurfaceParameter() : base(typeof(BacksideSurface))
         {
 
         }
         #region [Parameter]
-        private int intensity = 0;
-        private int size = 0;
+        private int intensity = 30;
+        private int size = 10;
         private bool isBright = false;
         private DiffFilterMethod diffFilter = DiffFilterMethod.Average;
         #endregion
@@ -28,6 +28,7 @@ namespace RootTools_Vision
             set
             {
                 SetProperty<int>(ref this.intensity, value);
+                RaisePropertyChanged("Value");
             }
         }
         [Category("Parameter")]
@@ -72,6 +73,19 @@ namespace RootTools_Vision
         {
             get;
             set;
+        }
+
+        [Browsable(false)]
+        public int Value 
+        { 
+            get
+            {
+                return this.intensity;
+            }
+            set
+            {
+                RaisePropertyChanged("Value");
+            }   
         }
         #endregion
 

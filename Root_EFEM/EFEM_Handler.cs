@@ -203,7 +203,8 @@ namespace Root_EFEM
         {
             Backside,
             EBR,
-            AOP
+            AOP,
+            EdgeSide
         }
         List<eVision> m_aVisionType = new List<eVision>();
         int m_lVision = 1; 
@@ -216,9 +217,11 @@ namespace Root_EFEM
                 string sID = "Vision" + sN; 
                 switch (m_aVisionType[n])
                 {
-                    case eVision.Backside: module = new Vision_Backside(GetVisionID(n), m_engineer); break;
+                    case eVision.Backside: module = new Vision_Backside(GetVisionID(n), m_engineer, ModuleBase.eRemote.Client); break;
                     case eVision.EBR: module = new Vision_EBR(GetVisionID(n), m_engineer); break;
                     case eVision.AOP: module = new Vision_AOP(GetVisionID(n), m_engineer); break;
+                    case eVision.EdgeSide: module = new Vision_Edgeside(GetVisionID(n), m_engineer, ModuleBase.eRemote.Client);
+                        break;
                     default: module = new Vision_AOP(GetVisionID(n), m_engineer); break; 
                 }
                 InitModule(module);

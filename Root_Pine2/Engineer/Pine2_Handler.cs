@@ -1,5 +1,5 @@
-﻿using Root_ASIS.Module;
-using Root_Pine2.Module;
+﻿using Root_Pine2.Module;
+using Root_Pine2_Vision.Module;
 using RootTools;
 using RootTools.GAFs;
 using RootTools.Gem;
@@ -29,36 +29,75 @@ namespace Root_Pine2.Engineer
         #endregion
 
         #region Module
+        StopWatch m_swInit = new StopWatch(); 
         public ModuleList p_moduleList { get; set; }
         public Pine2 m_pine2;
-        public LoadEV m_loadEV; 
-        //public Storage m_storage;
-        //public Rail m_rail;
-        //public Roller m_roller;
-        //public Loader m_loader;
-
+        public LoadEV m_loadEV;
+        public MagazineEVSet m_magazineEV = new MagazineEVSet();
+        public Transfer m_transfer;
+        public Dictionary<Vision.eVision, Vision> m_aVision = new Dictionary<Vision.eVision, Vision>();
+        public Dictionary<Vision.eVision, Boats> m_aBoats = new Dictionary<Vision.eVision, Boats>(); 
+        public Loader0 m_loader0;
+        public Loader1 m_loader1;
+        public Loader2 m_loader2;
+        public Loader3 m_loader3;
         void InitModule()
         {
+            m_swInit.Start(); 
             p_moduleList = new ModuleList(m_engineer);
-            m_pine2 = new Pine2("Pine2", m_engineer);
-            InitModule(m_pine2);
-            m_loadEV = new LoadEV("LoadEV", m_engineer);
-            InitModule(m_loadEV);
-            //m_rail = new Rail("Rail", m_engineer, m_rinse);
-            //InitModule(m_rail);
-            //m_roller = new Roller("Roller", m_engineer, m_rinse);
-            //InitModule(m_roller);
-            //m_storage = new Storage("Storage", m_engineer, m_rinse, m_rail, m_roller);
-            //InitModule(m_storage);
-            //m_loader = new Loader("Loader", m_engineer, m_rinse, m_storage, m_roller);
-            //InitModule(m_loader);
+            InitModule(m_pine2 = new Pine2("Pine2", m_engineer));
+            InitModule(m_loadEV = new LoadEV("LoadEV", m_engineer));
+            InitMagazineEV();
+            InitVision(Vision.eVision.Top3D);
+            InitVision(Vision.eVision.Top2D);
+            InitVision(Vision.eVision.Bottom);
+            InitBoats(Vision.eVision.Top3D);
+            InitBoats(Vision.eVision.Top2D);
+            InitBoats(Vision.eVision.Bottom);
+            InitModule(m_transfer = new Transfer("Transter", m_engineer, m_pine2, m_magazineEV));
+            InitModule(m_loader0 = new Loader0("Loader0", m_engineer, this));
+            InitModule(m_loader1 = new Loader1("Loader1", m_engineer, this));
+            InitModule(m_loader2 = new Loader2("Loader2", m_engineer, this));
+            InitModule(m_loader3 = new Loader3("Loader3", m_engineer, this));
         }
 
+        long m_msInit = 0; 
         void InitModule(ModuleBase module)
         {
             ModuleBase_UI ui = new ModuleBase_UI();
             ui.Init(module);
             p_moduleList.AddModule(module, ui);
+            long ms = m_swInit.ElapsedMilliseconds; 
+            m_pine2.m_log.Info("InitModule " + module.p_id + " = " + (ms - m_msInit).ToString() + ", " + ms.ToString());
+            m_msInit = ms; 
+        }
+
+        void InitVision(Vision.eVision eVision)
+        {
+            Vision vision = new Vision(eVision, m_engineer, ModuleBase.eRemote.Client); 
+            ModuleBase_UI ui = new ModuleBase_UI();
+            ui.Init(vision);
+            p_moduleList.AddModule(vision, ui);
+            m_aVision.Add(eVision, vision);
+        }
+
+        void InitBoats(Vision.eVision eVision)
+        {
+            Boats boats = new Boats(m_aVision[eVision], m_engineer, m_pine2);
+            ModuleBase_UI ui = new ModuleBase_UI();
+            ui.Init(boats);
+            p_moduleList.AddModule(boats, ui);
+            m_aBoats.Add(eVision, boats); 
+        }
+
+        void InitMagazineEV()
+        {
+            foreach (InfoStrip.eMagazine eMagazine in Enum.GetValues(typeof(InfoStrip.eMagazine)))
+            {
+                MagazineEV magazineEV = new MagazineEV(eMagazine, m_engineer, m_pine2);
+                m_magazineEV.m_aEV.Add(eMagazine, magazineEV);
+                InitModule(magazineEV); 
+            }
         }
         #endregion
 
@@ -201,27 +240,6 @@ namespace Root_Pine2.Engineer
         }
         #endregion
 
-        #region PickerSet
-        public string StartPickerSet()
-        {
-            if (EQ.p_bPickerSet)
-            {
-                EQ.p_eState = EQ.eState.Ready;
-                p_moduleList.m_qModuleRun.Clear();
-                EQ.p_bPickerSet = false;
-                return "OK";
-            }
-            else
-            {
-                //if (m_loader.m_sFilePickerSet == "") return "PickerSet ModuleRun File ot Exist"; //forget
-                //EQ.p_bPickerSet = true;
-                //p_moduleList.m_moduleRunList.OpenJob(m_loader.m_sFilePickerSet);
-                //p_moduleList.StartModuleRuns();
-                return "OK";
-            }
-        }
-        #endregion
-
         string m_id;
         public Pine2_Engineer m_engineer;
         public GAF m_gaf;
@@ -240,6 +258,7 @@ namespace Root_Pine2.Engineer
 
         public void ThreadStop()
         {
+            m_magazineEV.ThreadStop(); 
             if (m_bThread)
             {
                 m_bThread = false;

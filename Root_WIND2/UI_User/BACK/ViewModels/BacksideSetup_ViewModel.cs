@@ -207,7 +207,8 @@ namespace Root_WIND2.UI_User
 
         public void LoadRecipe()
         {
-
+            RecipeType_WaferMap waferMap = GlobalObjects.Instance.Get<RecipeBack>().WaferMap;
+            this.MapViewerVM.CreateMap(waferMap.MapSizeX, waferMap.MapSizeY, waferMap.Data);
         }
 
         private void ROIDone_Callback(CPoint centerPt, int radius)
@@ -223,6 +224,12 @@ namespace Root_WIND2.UI_User
             get => new RelayCommand(() =>
             {
                 this.LoadRecipe();
+
+                if(this.ImageViewerVM != null)
+                {
+                    this.ImageViewerVM.ReadExclusivePolygon();
+                    this.ImageViewerVM.ReadCenterPoint();
+                }
             });
         }
 
@@ -236,7 +243,7 @@ namespace Root_WIND2.UI_User
                     return;
                 }
 
-                CreateROI();
+                //CreateROI();
             });
         }
         #endregion
@@ -245,6 +252,8 @@ namespace Root_WIND2.UI_User
         #region [Method]
         private void CreateROI()
         {
+            return;
+
             ImageData imageData = GlobalObjects.Instance.GetNamed<ImageData>("BackImage");
 
             int memH = imageData.p_Size.Y;
@@ -254,15 +263,13 @@ namespace Root_WIND2.UI_User
             float centerY = this.ImageViewerVM.CircleCenterMemY;
 
             int outMapX = this.MapSizeX, outMapY = this.MapSizeY;
-            float outOriginX, outOriginY;
-            float outChipSzX, outChipSzY;
             float outRadius = this.CircleRadius;
 
             IntPtr mainImage = new IntPtr();
 
             mainImage = imageData.GetPtr(0);
 
-            Cpp_Point[] WaferEdge = null;
+            Cpp_Point[] circlePoints = null;
             unsafe
             {
                 int DownSample = this.DownSamplingRatio;
@@ -276,51 +283,55 @@ namespace Root_WIND2.UI_User
                     outRadius /= DownSample;
                     memW /= DownSample; memH /= DownSample;
 
-                    WaferEdge = CLR_IP.Cpp_FindWaferEdge(pImg,
+                    circlePoints = CLR_IP.Cpp_FindWaferEdge(pImg,
                         &centerX, &centerY,
                         &outRadius,
                         memW, memH,
                         1
                         );
-
-                    mapData = CLR_IP.Cpp_GenerateMapData(
-                        WaferEdge,
-                        &outOriginX,
-                        &outOriginY,
-                        &outChipSzX,
-                        &outChipSzY,
-                        &outMapX,
-                        &outMapY,
-                        memW, memH,
-                        1,
-                        (this.SearchROIOptions == SEARCH_ROI_OPTIONS.IncludeWaferEdge)
-                        );
                 }
 
+                
                 // Param Up Scale
                 centerX *= DownSample; centerY *= DownSample;
                 outRadius *= DownSample;
-                outOriginX *= DownSample; outOriginY *= DownSample;
-                outChipSzX *= DownSample; outChipSzY *= DownSample;
 
+
+                PathGeometry geometry = PolygonController.CreatePolygonGeometry(this.ImageViewerVM.ExclusivePolyMemPointsList);
+                
                 List<CPoint> points = new List<CPoint>();
 
-                for (int i = 0; i < WaferEdge.Length; i++)
-                    points.Add(new CPoint(WaferEdge[i].x * DownSample, WaferEdge[i].y * DownSample));
+                for (int i = 0; i < circlePoints.Length; i++)
+                {
+                    CPoint pt = new CPoint(circlePoints[i].x * DownSample, circlePoints[i].y * DownSample);
+                    if (!PolygonController.HitTest(geometry, new Point(pt.X, pt.Y)))
+                    {
+                        points.Add(pt);
+                    }
+                }
 
-                this.mapSizeX = outMapX;
-                this.mapSizeY = outMapY;
-                this.OriginPointX = (int)outOriginX;
-                this.OriginPointY = (int)outOriginY;
-                this.SearchedCenterPointX = (int)centerX;
-                this.SearchedCenterPointY = (int)centerY;
+                Point centerPt = Tools.FindCircleCenterByPoints(DataConverter.CPointListToPointList(points), (int)centerX, (int)centerY, 100);
+
+                //this.mapSizeX = outMapX;
+                //this.mapSizeY = outMapY;
+                //this.OriginPointX = (int)outOriginX;
+                //this.OriginPointY = (int)outOriginY;
+                this.SearchedCenterPointX = (int)centerPt.X;
+                this.SearchedCenterPointY = (int)centerPt.Y;
                 this.SearchedCircleRadius = (int)outRadius;
-                this.MapUnitWidth = (int)outChipSzX;
-                this.MapUnitHeight = (int)outChipSzY;
+                //this.MapUnitWidth = (int)outChipSzX;
+                //this.MapUnitHeight = (int)outChipSzY;
 
-                this.ImageViewerVM.SetSearchedCenter(new CPoint((int)centerX, (int)centerY));
+                this.ImageViewerVM.SetSearchedCenter(new CPoint((int)centerPt.X, (int)centerPt.Y));
                 this.ImageViewerVM.SetSearchedCirclePoints(points);
 
+
+
+                // New
+                //DrawMapRectNew(SearchedCenterPointX, SearchedCenterPointY);
+
+                // Old
+                return;
                 this.MapViewerVM.CreateMap(this.mapSizeX, this.mapSizeY);
 
                 for(int i = 0; i < this.mapSizeY; i++)
@@ -365,9 +376,61 @@ namespace Root_WIND2.UI_User
             backsideRecipe.IsEdgeIncluded = (this.SearchROIOptions == SEARCH_ROI_OPTIONS.IncludeWaferEdge) ? true : false;
 
 
-            GlobalObjects.Instance.Get<RecipeBack>().WaferMap = new RecipeType_WaferMap(this.MapSizeX, this.MapSizeY, this.MapData);
+            //GlobalObjects.Instance.Get<RecipeBack>().WaferMap = new RecipeType_WaferMap(this.MapSizeX, this.MapSizeY, this.MapData);
         }
 
+        public void DrawMapRectNew(int centerX, int centerY)
+        {
+            
+            CameraInfo camInfo = DataConverter.GrabModeToCameraInfo(GlobalObjects.Instance.Get<WIND2_Engineer>().m_handler.p_BackSideVision.GetGrabMode(GlobalObjects.Instance.Get<RecipeBack>().CameraInfoIndex));
+
+
+            RecipeType_WaferMap waferMap = GlobalObjects.Instance.Get<RecipeBack>().WaferMap;
+            OriginRecipe originRecipe = GlobalObjects.Instance.Get<RecipeBack>().GetItem<OriginRecipe>();
+            mapData = waferMap.Data;
+
+            int MasterDieX = waferMap.MasterDieX;
+            int MasterDieY = waferMap.MasterDieY;
+
+            int originDieX = waferMap.OriginDieX;
+            int originDieY = waferMap.OriginDieY;
+
+            int mapSizeX = waferMap.MapSizeX;
+            int mapSizeY = waferMap.MapSizeY;
+            double diePitchX = waferMap.DiePitchX / camInfo.RealResX;
+            double diePitchY = waferMap.DiePitchY / camInfo.RealResY;
+            double sampleCenterX = waferMap.SampleCenterLocationX;
+            double sampleCenterY = waferMap.SampleCenterLocationY;
+
+            List<CRect> rectList = new List<CRect>();
+ 
+            int originX = (int)(centerX + sampleCenterX);
+            int originY = (int)(centerY - sampleCenterY);
+
+            for (int x = 0; x < mapSizeX; x++)
+            {
+                for (int y = 0; y < mapSizeY; y++)
+                {
+                    if (mapData[y * mapSizeX + x] == 1)
+                    {
+                        int left = (int)(originX - (originDieX - x) * diePitchX);
+                        int right = (int)(originX - (originDieX - x - 1) * diePitchX);
+                        int top = (int)(originY - (originDieY - y) * diePitchY);
+                        int bottom = (int)(originY - (originDieY - y - 1) * diePitchY);
+
+                        rectList.Add(new CRect(left, top, right, bottom));
+
+                        if (x == MasterDieX && y == MasterDieY)
+                        {
+                            originRecipe.OriginX = left;
+                            originRecipe.OriginY = bottom;
+                        }
+                    }
+                }
+            }
+
+            this.ImageViewerVM.SetMapRectList(rectList);
+        }
 
         public void DrawMapRect(int[] mapData, int mapX, int mapY, int orgX, int orgY, int chipW, int chipH)
         {

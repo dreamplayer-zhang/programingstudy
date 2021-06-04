@@ -15,12 +15,78 @@ namespace Root_EFEM.Module
     public class Loadport_RND : ModuleBase, IWTRChild, ILoadport
     {
         #region ToolBox
-        public DIO_I m_diPlaced;
-        public DIO_I m_diPresent;
-        public DIO_I m_diLoad;
-        public DIO_I m_diUnload;
-        public DIO_I m_diDoorOpen;
-        public DIO_I m_diDocked;
+        DIO_I m_diPlaced;
+        public DIO_I p_diPlaced
+        {
+            get
+            {
+                return m_diPlaced;
+            }
+            set
+            {
+                m_diPlaced = value;   
+            }
+        }
+        DIO_I m_diPresent;
+        public DIO_I p_diPresent
+        {
+            get
+            {
+                return m_diPresent;
+            }
+            set
+            {
+                m_diPresent = value;
+            }
+        }
+        DIO_I m_diLoad;
+        public DIO_I p_diLoad
+        {
+            get
+            {
+                return m_diLoad;
+            }
+            set
+            {
+                m_diLoad = value;
+            }
+        }
+        DIO_I m_diUnload;
+        public DIO_I p_diUnload
+        {
+            get
+            {
+                return m_diUnload;
+            }
+            set
+            {
+                m_diUnload = value;
+            }
+        }
+        DIO_I m_diDoorOpen;
+        public DIO_I p_diDoorOpen
+        {
+            get
+            {
+                return m_diDoorOpen;
+            }
+            set
+            {
+                m_diDoorOpen = value;
+            }
+        }
+        DIO_I m_diDocked;
+        public DIO_I p_diDocked
+        {
+            get
+            {
+                return m_diDocked;
+            }
+            set
+            {
+                m_diDocked = value;
+            }
+        }
         RS232 m_rs232;
         OHT _OHT;
         public OHT m_OHTNew
@@ -128,6 +194,8 @@ namespace Root_EFEM.Module
         {
             if (p_eState != eState.Ready)
                 return p_id + " eState not Ready";
+            if (!m_diDoorOpen.p_bIn)
+                return p_id + "Door Close Error";
             return p_infoCarrier.IsGetOK(nID);
         }
 
@@ -135,6 +203,8 @@ namespace Root_EFEM.Module
         {
             if (p_eState != eState.Ready)
                 return p_id + " eState not Ready";
+            if (!m_diDoorOpen.p_bIn)
+                return p_id + "Door Close Error";
             return p_infoCarrier.IsPutOK(nID);
         }
 
@@ -154,11 +224,13 @@ namespace Root_EFEM.Module
 
         public string AfterGet(int nID)
         {
+            p_infoCarrier.m_aGemSlot[nID].p_eState = GemSlotBase.eState.Run;
             return IsRunOK();
         }
 
         public string AfterPut(int nID)
         {
+            p_infoCarrier.m_aGemSlot[nID].p_eState = GemSlotBase.eState.Done;
             return IsRunOK();
         }
 
@@ -519,6 +591,11 @@ namespace Root_EFEM.Module
                 p_infoCarrier.m_bReqLoad = false;
                 StartRun(m_runDocking);
             }
+            if (p_infoCarrier.m_bReqGem)
+            {
+                p_infoCarrier.m_bReqGem = false;
+                StartRun(m_runGem);
+            }    
             if (p_infoCarrier.m_bReqUnload && p_infoCarrier.p_eState == InfoCarrier.eState.Dock)
             {
                 p_infoCarrier.m_bReqUnload = false;
@@ -578,6 +655,7 @@ namespace Root_EFEM.Module
         {
             get
             {
+                //return true;
                 return m_diPlaced.p_bIn;
             }
         }
@@ -585,6 +663,7 @@ namespace Root_EFEM.Module
         {
             get
             {
+                //return true;
                 return m_diPresent.p_bIn;
             }
         }
@@ -632,6 +711,7 @@ namespace Root_EFEM.Module
 
         #region ModuleRun
         ModuleRunBase m_runDocking;
+        ModuleRunBase m_runGem;
         ModuleRunBase m_runUndocking;
 
         public ModuleRunBase GetModuleRunUndocking()
@@ -642,11 +722,15 @@ namespace Root_EFEM.Module
         {
             return m_runDocking;
         }
+        public ModuleRunBase GetModuleRunGem()
+        {
+            return m_runGem;
+        }
 
         protected override void InitModuleRuns()
         {
             m_runDocking = AddModuleRunList(new Run_Docking(this), false, "Docking Carrier to Work Position");
-            AddModuleRunList(new Run_GemProcess(this), false, "Gem Slot Process Start");
+            m_runGem = AddModuleRunList(new Run_GemProcess(this), false, "Gem Slot Process Start");
             m_runUndocking = AddModuleRunList(new Run_Undocking(this), false, "Undocking Carrier from Work Position");
         }
 
@@ -831,6 +915,7 @@ namespace Root_EFEM.Module
                         return p_sInfo;
                 }
                 m_infoCarrier.p_eState = InfoCarrier.eState.Placed;
+                m_infoCarrier.p_eReqTransfer = GemCarrierBase.eTransfer.ReadyToUnload;
                 //m_module.m_ceidUnDocking.Send();
                 return sResult;
             }

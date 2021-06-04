@@ -44,6 +44,8 @@ namespace RootTools_Vision
         protected byte[] workplaceBufferG;
         protected byte[] workplaceBufferB;
 
+        protected List<byte[]> copiedBufferList = new List<byte[]>();
+
 
         protected string m_sName;
         public string p_sName
@@ -100,6 +102,23 @@ namespace RootTools_Vision
             this.workplaceBufferR_GRAY = bufferR_GRAY;
             this.workplaceBufferG = bufferG;
             this.workplaceBufferB = bufferB;
+
+            this.copiedBufferList.Clear();
+            this.copiedBufferList.Add(this.workplaceBufferR_GRAY);
+            this.copiedBufferList.Add(this.workplaceBufferG);
+            this.copiedBufferList.Add(this.workplaceBufferB);
+        }
+
+        public void SetWorkplaceBuffer(List<byte[]> bufferList)
+        {
+            this.copiedBufferList.Clear();
+            for(int i= 0; i < bufferList.Count; i++)
+            {
+                this.copiedBufferList.Add(bufferList[i]);
+                if (i == 0) this.workplaceBufferR_GRAY = this.copiedBufferList[i];
+                if (i == 1) this.workplaceBufferG = this.copiedBufferList[i];
+                if (i == 2) this.workplaceBufferB = this.copiedBufferList[i];
+            }
         }
 
         public void SetGrabMode(GrabModeBase grabMode)
@@ -107,7 +126,7 @@ namespace RootTools_Vision
             this.grabMode = grabMode;
 		}
 
-        public byte[] GetWorkplaceBuffer(IMAGE_CHANNEL channel)
+        public byte[] GetWorkplaceBufferByColorChannel(IMAGE_CHANNEL channel)
         {
             switch (channel)
             {
@@ -120,6 +139,14 @@ namespace RootTools_Vision
 
             }
             return this.workplaceBufferR_GRAY;
+        }
+
+        public byte[] GetWorkplaceBufferByIndex(int index)
+        {
+            if (this.copiedBufferList.Count > index)
+                return this.copiedBufferList[index];
+            else
+                return null;
         }
 
 

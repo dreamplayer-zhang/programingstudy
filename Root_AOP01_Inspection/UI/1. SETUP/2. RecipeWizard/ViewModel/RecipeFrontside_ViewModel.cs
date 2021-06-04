@@ -170,11 +170,73 @@ namespace Root_AOP01_Inspection
                     m_ImageViewer_VM.EdgeDrawMode = value;
                     if (value)
                     {
-                        m_ImageViewer_VM.Clear();
+                        EdgeDrawModeLeft = false;
+                        EdgeDrawModeRight = false;
+                        m_ImageViewer_VM.Clear();//어케할지 생각중
                         //tempList.Clear();
                     }
                 }
                 SetProperty(ref _EdgeDrawMode, value);
+            }
+        }
+
+        #endregion
+
+        #region EdgeDrawModeLeft
+        private bool _EdgeDrawModeLeft;
+        public bool EdgeDrawModeLeft
+        {
+            get
+            {
+                return _EdgeDrawModeLeft;
+            }
+            set
+            {
+                if (_EdgeDrawModeLeft == value)
+                    return;
+
+                if (m_ImageViewer_VM != null)
+                {
+                    m_ImageViewer_VM.EdgeDrawModeLeft = value;
+                    if (value)
+                    {
+                        EdgeDrawMode = false;
+                        EdgeDrawModeRight = false;
+                        m_ImageViewer_VM.Clear();//어케할지 생각중
+                        //tempList.Clear();
+                    }
+                }
+                SetProperty(ref _EdgeDrawModeLeft, value);
+            }
+        }
+
+        #endregion
+
+        #region EdgeDrawModeRight
+        private bool _EdgeDrawModeRight;
+        public bool EdgeDrawModeRight
+        {
+            get
+            {
+                return _EdgeDrawModeRight;
+            }
+            set
+            {
+                if (_EdgeDrawModeRight == value)
+                    return;
+
+                if (m_ImageViewer_VM != null)
+                {
+                    m_ImageViewer_VM.EdgeDrawModeRight = value;
+                    if (value)
+                    {
+                        EdgeDrawMode = false;
+                        EdgeDrawModeLeft = false;
+                        m_ImageViewer_VM.Clear();
+                        //tempList.Clear();
+                    }
+                }
+                SetProperty(ref _EdgeDrawModeRight, value);
             }
         }
 
@@ -447,29 +509,44 @@ namespace Root_AOP01_Inspection
 		private void saveCurrentEdge()
 		{
 			//현재 ViewModel에 있는 edgebox를 저장한다.
+            //선택된 상태를 보고 어디에 저장할지 판단
 			if (m_ImageViewer_VM.TRectList.Count == 6)
             {
-                MainVision mainVision = ((AOP01_Handler)m_Engineer.ClassHandler()).m_mainVision;
-                mainVision.SetRectInfo(m_ImageViewer_VM.TRectList,App.MainModuleName);
+                //일단 6개면 pass
+                if(EdgeDrawMode)
+                {
+                    MainVision mainVision = ((AOP01_Handler)m_Engineer.ClassHandler()).m_mainVision;
+                    mainVision.SetRectInfo(m_ImageViewer_VM.TRectList, App.MainModuleName);
+                }
+                else if(EdgeDrawModeLeft)
+                {
+                    MainVision mainVision = ((AOP01_Handler)m_Engineer.ClassHandler()).m_mainVision;
+                    mainVision.SetRectInfo(m_ImageViewer_VM.TRectList, App.MainLeftModuleName);
+                }
+                else if(EdgeDrawModeRight)
+                {
+                    MainVision mainVision = ((AOP01_Handler)m_Engineer.ClassHandler()).m_mainVision;
+                    mainVision.SetRectInfo(m_ImageViewer_VM.TRectList, App.MainRightModuleName);
+                }
             }
 		}
         private void DrawDone_Callback(CPoint leftTop, CPoint rightBottom)
         {
-            if (!EdgeDrawMode)
-            {
-                p_ImageViewer_VM.Clear();
-                this.m_ImageViewer_VM.DrawRect(leftTop, rightBottom, RecipeFrontside_Viewer_ViewModel.ColorType.Defect);
-            }
-            else
+            if(EdgeDrawMode || EdgeDrawModeLeft || EdgeDrawModeRight)
             {
                 //edge box draw mode. 최대개수는 6개로 고정한다
                 this.m_ImageViewer_VM.DrawRect(leftTop, rightBottom, RecipeFrontside_Viewer_ViewModel.ColorType.FeatureMatching);
 
-                if (this.m_ImageViewer_VM.Shapes.Count > 7)
+                if (this.m_ImageViewer_VM.Shapes.Count >= 7)
                 {
                     m_ImageViewer_VM.Shapes.RemoveAt(0);
                     m_ImageViewer_VM.p_DrawElement.RemoveAt(0);
                 }
+            }
+            else
+            {
+                p_ImageViewer_VM.Clear();
+                this.m_ImageViewer_VM.DrawRect(leftTop, rightBottom, RecipeFrontside_Viewer_ViewModel.ColorType.Defect);
             }
             GlobalObjects.Instance.GetNamed<InspectionManager_AOP>(App.MainInspMgRegName).RefreshDefect();
         }

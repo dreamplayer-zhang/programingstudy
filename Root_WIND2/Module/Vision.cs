@@ -37,16 +37,16 @@ namespace Root_WIND2.Module
 
         Camera_Dalsa m_CamMain;
         Camera_Basler m_CamAlign;
-        Camera_Basler m_CamAutoFocus;
-        public Camera_Basler p_CamAutoFocus
+        Camera_Basler m_CamVRS;
+        public Camera_Basler p_CamVRS
         {
             get
             {
-                return m_CamAutoFocus;
+                return m_CamVRS;
             }
             set
             {
-                m_CamAutoFocus = value;
+                m_CamVRS = value;
             }
         }
 
@@ -77,7 +77,7 @@ namespace Root_WIND2.Module
         public LightSet LightSet { get => m_lightSet; private set => m_lightSet = value; }
         public Camera_Dalsa CamMain { get => m_CamMain; private set => m_CamMain = value; }
         public Camera_Basler CamAlign { get => m_CamAlign; private set => m_CamAlign = value; }
-        public Camera_Basler CamAutoFocus { get => m_CamAutoFocus; private set => m_CamAutoFocus = value; }
+        public Camera_Basler CamAutoFocus { get => m_CamVRS; private set => m_CamVRS = value; }
 
         public KlarfData_Lot KlarfData_Lot { get => m_KlarfData_Lot; private set => m_KlarfData_Lot = value; }
         #endregion
@@ -94,7 +94,7 @@ namespace Root_WIND2.Module
                 p_sInfo = m_toolBox.Get(ref m_lightSet, this);
                 p_sInfo = m_toolBox.GetCamera(ref m_CamMain, this, "MainCam");
                 p_sInfo = m_toolBox.GetCamera(ref m_CamAlign, this, "AlignCam");
-                p_sInfo = m_toolBox.GetCamera(ref m_CamAutoFocus, this, "AutoFocusCam");
+                p_sInfo = m_toolBox.GetCamera(ref m_CamVRS, this, "AutoFocusCam");
                 p_sInfo = m_toolBox.Get(ref m_LensLinearTurret, this, "LensTurret");
             }
             p_sInfo = m_toolBox.Get(ref m_memoryPool, this, "Memory", 1);
@@ -121,6 +121,15 @@ namespace Root_WIND2.Module
             foreach (GrabModeFront grabMode in m_aGrabMode)
             {
                 if (sGrabMode == grabMode.p_sName) return grabMode;
+            }
+            return null;
+        }
+
+        public GrabModeFront GetGrabMode(int  index)
+        {
+            if(m_aGrabMode?.Count > 0)
+            {
+                return m_aGrabMode[index];
             }
             return null;
         }
@@ -200,7 +209,7 @@ namespace Root_WIND2.Module
         {
             m_memoryGroup = m_memoryPool.GetGroup(p_id);
             m_memoryMain = m_memoryGroup.CreateMemory("Main", 3, 1, 40000, 40000);
-            m_memoryMain = m_memoryGroup.CreateMemory("Layer", 1, 4, 30000, 30000); // Chip 크기 최대 30,000 * 30,000 고정 Origin ROI 메모리 할당 20.11.02 JTL 
+            m_memoryLayer = m_memoryGroup.CreateMemory("Layer", 1, 4, 30000, 30000); // Chip 크기 최대 30,000 * 30,000 고정 Origin ROI 메모리 할당 20.11.02 JTL 
         }
         #endregion
 
@@ -548,6 +557,9 @@ namespace Root_WIND2.Module
             AddModuleRunList(new Run_VisionAlign(this), true, "Run VisionAlign");
             AddModuleRunList(new Run_AutoFocus(this), false, "Run AutoFocus");
         }
+
+        
+
         #endregion
     }
 }

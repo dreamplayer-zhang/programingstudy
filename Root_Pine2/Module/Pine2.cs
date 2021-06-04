@@ -1,15 +1,13 @@
 ﻿using RootTools;
+using RootTools.Comm;
 using RootTools.Control;
-using RootTools.GAFs;
 using RootTools.Module;
 using RootTools.ToolBoxs;
 using RootTools.Trees;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
+using System.Windows.Threading;
 
 namespace Root_Pine2.Module
 {
@@ -19,7 +17,8 @@ namespace Root_Pine2.Module
         public override void GetTools(bool bInit)
         {
             m_lamp.GetTools(m_toolBox, this);
-            m_buzzer.GetTools(m_toolBox, this); 
+            m_buzzer.GetTools(m_toolBox, this);
+            m_display.GetTools(m_toolBox, this, bInit); 
             if (bInit)
             {
                 InitALID();
@@ -151,6 +150,68 @@ namespace Root_Pine2.Module
         }
         #endregion
 
+        #region LED Display
+        public class Display
+        {
+            Modbus m_modbus;
+            public void GetTools(ToolBox toolBox, ModuleBase module, bool bInit)
+            {
+                toolBox.GetComm(ref m_modbus, module, "Display");
+                if (bInit) m_modbus.Connect(); 
+            }
+
+            public string Write(int nUnit, string sMsg)
+            {
+                Data data = new Data(nUnit, sMsg);
+                m_qSend.Enqueue(data); 
+                return "OK";
+            }
+
+            #region Data
+            class Data
+            {
+                public int m_nUnit = 1;
+                public List<int> m_aSend = new List<int>(); 
+                public Data(int nUnit, string sMsg)
+                {
+                    m_nUnit = nUnit; 
+                    while (sMsg.Length < 4) sMsg += " ";
+                    m_aSend.Add(256 * (byte)sMsg[0] + (byte)sMsg[1]); //forget
+                    m_aSend.Add(256 * (byte)sMsg[2] + (byte)sMsg[3]);
+                }
+            }
+            Queue<Data> m_qSend = new Queue<Data>(); 
+
+            string Send(Data data)
+            {
+                return m_modbus.WriteHoldingRegister((byte)data.m_nUnit, 1, data.m_aSend); 
+            }
+            #endregion
+
+            #region Timer
+            public DispatcherTimer m_timer = new DispatcherTimer();
+            void InitTimer()
+            {
+                m_timer.Interval = TimeSpan.FromSeconds(0.1);
+                m_timer.Tick += M_timer_Tick; 
+                m_timer.Start();
+            }
+
+            private void M_timer_Tick(object sender, EventArgs e)
+            {
+                if (m_qSend.Count == 0) return;
+                Send(m_qSend.Dequeue()); 
+            }
+            #endregion
+
+            public Display()
+            {
+                InitTimer(); 
+            }
+        }
+        public Display m_display = new Display(); 
+        #endregion
+
         #region eRunMode
         public enum eRunMode
         {
@@ -180,6 +241,29 @@ namespace Root_Pine2.Module
                 if (_widthStrip == value) return;
                 _widthStrip = value;
                 OnPropertyChanged();
+            }
+        }
+
+        int _lStack = 50; 
+        public int p_lStack
+        {
+            get { return _lStack; }
+            set
+            {
+                _lStack = value;
+                OnPropertyChanged(); 
+            }
+        }
+
+        bool _b3D = true; 
+        public bool p_b3D
+        {
+            get { return _b3D; }
+            set
+            {
+                if (_b3D == value) return;
+                _b3D = value;
+                OnPropertyChanged(); 
             }
         }
         #endregion
@@ -248,6 +332,7 @@ namespace Root_Pine2.Module
 
         public override void ThreadStop()
         {
+            m_display.m_timer.Stop(); 
             ThreadDIOStop(); 
             base.ThreadStop();
         }

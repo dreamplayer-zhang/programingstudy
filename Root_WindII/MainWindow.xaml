@@ -8,52 +8,198 @@
         mc:Ignorable="d"
         Loaded="Window_Loaded"
         Closing="Window_Closing"
-        Title="MainWindow" Height="450" Width="800" WindowState="Maximized">
+        Title="MainWindow" Height="450" Width="800">
 
     <Window.Resources>
         <!-- SelectMode -->
         <ControlTemplate x:Key="selectmode">
-            <local:SelectMode DataContext="{Binding SelectModeVM}"/>
+            <local:SelectMode />
         </ControlTemplate>
         <!-- Setup -->
         <ControlTemplate x:Key="setup">
             <local:Setup DataContext="{Binding SetupVM}"/>
         </ControlTemplate>
+        <!-- Engineer -->
+        <!--<ControlTemplate x:Key="engineer">
+            <local:MaintenancePanel DataContext="{Binding MaintVM}"/>
+        </ControlTemplate>-->
     </Window.Resources>
+    
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="8*"/>
+            <RowDefinition Height="28"/>
+            <RowDefinition Height="85*"/>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="2*"/>
+            <RowDefinition Height="15*"/>
         </Grid.RowDefinitions>
-        
-        <!--<engineer:WindII_Engineer_UI x:Name="engineerUI"/>-->
+        <Border Grid.Row="0"
+                Grid.Column="1"
+                Background="{StaticResource main_background}">
+            <StackPanel Orientation="Horizontal">
+                <Menu Foreground="White"
+                      Background="{StaticResource main_background}">
+                    <MenuItem >
+                        <MenuItem.Header>
+                            <Grid Width="70"
+                                  Height="25">
+                                <TextBlock Text="File"
+                                           FontSize="13"
+                                           FontWeight="Bold"
+                                           VerticalAlignment="Center"
+                                           HorizontalAlignment="Center" />
+                            </Grid>
+                        </MenuItem.Header>
+                        <MenuItem Header="New" Foreground="Black"/>
+                        <MenuItem Header="Load" Foreground="Black"/>
+                        <MenuItem Header="Save"  Foreground="Black"/>
+                        <MenuItem Header="Save As"  Foreground="Black"/>
+                    </MenuItem>
+                    <MenuItem>
+                        <MenuItem.Header>
+                            <Grid Width="70"
+                                  Height="25">
+                                <TextBlock Text="View"
+                                           FontSize="13"
+                                           FontWeight="Bold"
+                                           VerticalAlignment="Center"
+                                           HorizontalAlignment="Center" />
+                            </Grid>
+                        </MenuItem.Header>
+                        <MenuItem Header="Log"  Foreground="Black">
 
-        <Grid Grid.Row="0">
-            <ContentControl>
+                        </MenuItem>
+                        <MenuItem Header="Alarm"  Foreground="Black">
+
+                        </MenuItem>
+                        <MenuItem Header="FDC"  Foreground="Black">
+
+                        </MenuItem>
+                    </MenuItem>
+                    <MenuItem>
+                        <MenuItem.Header>
+                            <Grid Width="70"
+                                  Height="25">
+                                <TextBlock Text="Tool"
+                                           FontSize="13"
+                                           FontWeight="Bold"
+                                           VerticalAlignment="Center"
+                                           HorizontalAlignment="Center" />
+                            </Grid>
+                        </MenuItem.Header>
+                        <MenuItem Header="Login"  Foreground="Black">
+
+                        </MenuItem>
+                        <MenuItem Header="RTR"  Foreground="Black">
+
+                        </MenuItem>
+                        <MenuItem Header="Loadport"  Foreground="Black">
+
+                        </MenuItem>
+                    </MenuItem>
+                    <MenuItem>
+                        <MenuItem.Header>
+                            <Grid Width="100"
+                                  Height="25">
+                                <TextBlock Text="Network"
+                                           FontSize="13"
+                                           FontWeight="Bold"
+                                           VerticalAlignment="Center"
+                                           HorizontalAlignment="Center" />
+                            </Grid>
+                        </MenuItem.Header>
+                        <MenuItem Header="Online"  Foreground="Black">
+
+                        </MenuItem>
+                        <MenuItem Header="Offline"  Foreground="Black">
+
+                        </MenuItem>
+                        <MenuItem Header="GEM"  Foreground="Black">
+                            <MenuItem Header="Online" HorizontalAlignment="Left" x:Name="GemOnline" Click="GemOnline_Click"/>
+                            <MenuItem Header="Local" HorizontalAlignment="Left" x:Name="GemLocal" Click="GemLocal_Click"/>
+                            <MenuItem Header="Offline" HorizontalAlignment="Left" x:Name="GemOffline" Click="GemOffline_Click"/>
+
+                        </MenuItem>
+
+
+                    </MenuItem>
+                    <MenuItem>
+                        <MenuItem.Header>
+                            <Grid Width="100"
+                                  Height="25">
+                                <TextBlock Text="Mode Select"
+                                           FontSize="13"
+                                           FontWeight="Bold"
+                                           VerticalAlignment="Center"
+                                           HorizontalAlignment="Center" />
+                            </Grid>
+                        </MenuItem.Header>
+                        <MenuItem Header="Main" x:Name="mode_main" IsCheckable="True" IsChecked="{Binding IsCheckModeMain, Mode=TwoWay}"  Foreground="Black"/>
+                        <MenuItem Header="Setup" x:Name="mode_setup" IsCheckable="True" IsChecked="{Binding IsCheckModeSetup, Mode=TwoWay}" Foreground="Black"/>
+                        <MenuItem Header="Review" x:Name="mode_review" IsCheckable="True" IsChecked="{Binding IsCheckModeReview}" Foreground="Black"/>
+                        <MenuItem Header="Operation" x:Name="mode_operation" IsCheckable="True" IsChecked="{Binding IsCheckModeOperation}" Foreground="Black"/>
+                        <MenuItem Header="Engineer" x:Name="mode_engineer" IsCheckable="True" IsChecked="{Binding IsCheckModeEngineer}" Foreground="Black"/>
+                    </MenuItem>
+                    <MenuItem Command="{Binding btnPopUpSetting}">
+                        <MenuItem.Header>
+                            <Grid Width="100"
+                                  Height="25">
+                                <TextBlock Text="Setting"
+                                           FontSize="13"
+                                           FontWeight="Bold"
+                                           VerticalAlignment="Center"
+                                           HorizontalAlignment="Center" />
+                            </Grid>
+                        </MenuItem.Header>
+                    </MenuItem>
+                </Menu>
+            </StackPanel>
+
+        </Border>
+        <Grid Grid.Row="1">
+            <ContentControl Content="{Binding p_CurrentPanel}">
                 <ContentControl.Style>
                     <Style TargetType="ContentControl">
                         <Style.Triggers>
-                             <!--SelectMode--> 
-                            <DataTrigger Binding="{Binding SelectedModeIndex}"
-                                         Value="0">
-                                <Setter Property="Template" Value="{StaticResource selectmode}"/>
+                            <!--Main-->
+                            <DataTrigger Binding="{Binding ElementName=mode_main, Path=IsChecked}"
+                                    Value="true">
+                                <Setter Property="Template" Value="{StaticResource selectmode}" />
                             </DataTrigger>
-                             <!--Setup--> 
-                            <DataTrigger Binding="{Binding SelectedModeIndex}"
-                                         Value="1">
-                                <Setter Property="Template" Value="{StaticResource setup}"/>
+                            <!--Setup-->
+                            <DataTrigger Binding="{Binding ElementName=mode_setup, Path=IsChecked}"
+                                    Value="true">
+                                <Setter Property="Template" Value="{StaticResource setup}" />
                             </DataTrigger>
+                            <!--Setup-->
+                            <!--<DataTrigger Binding="{Binding ElementName=mode_review, Path=IsChecked}"
+                                         Value="true">
+                                <Setter Property="Template" Value="{StaticResource review}"/>
+                            </DataTrigger>-->
+                            <!-- Engineer -->
+                            <!--<DataTrigger Binding="{Binding ElementName=mode_engineer, Path=IsChecked}"
+                                         Value="true">
+                                <Setter Property="Template" Value="{StaticResource engineer}"/>
+                            </DataTrigger>-->
                         </Style.Triggers>
                     </Style>
                 </ContentControl.Style>
             </ContentControl>
         </Grid>
-
-        <GridSplitter Grid.Row="1" 
-                      Height="5"
-                      HorizontalAlignment="Stretch"
-                      VerticalAlignment="Stretch"
-                      ShowsPreview="True"/>
+        <GridSplitter Grid.Row="2" Height="5" HorizontalAlignment="Stretch"
+                VerticalAlignment="Stretch" ShowsPreview="True" />
+        <Border Grid.Row="3" Grid.ColumnSpan="2" Panel.ZIndex="99" Margin="3">
+            <TabControl Grid.Row="2">
+                <TabItem Header="Log" FontSize="10">
+                </TabItem>
+                <TabItem Header="Warning" FontSize="10">
+                    <ContentControl Content="{Binding p_CurrentSubPanel}">
+                    </ContentControl>
+                </TabItem>
+                <TabItem Header="Inspection" FontSize="10" />
+                <TabItem Header="I/O" FontSize="10" />
+                <TabItem Header="Network" FontSize="10" />
+                <TabItem Header="Result" FontSize="10" />
+            </TabControl>
+        </Border>
     </Grid>
 </Window>

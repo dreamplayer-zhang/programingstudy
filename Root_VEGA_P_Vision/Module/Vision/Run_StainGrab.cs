@@ -64,7 +64,7 @@ namespace Root_VEGA_P_Vision.Module
                 AxisXY axisXY = m_module.m_stage.m_axisXY;
                 Axis axisZ = mainOpt.m_axisZ;
 
-                StainGrabMode.m_dTrigger = Convert.ToInt32(10 * StainGrabMode.m_dResY_um);  // 1pulse = 0.5um -> 20pulse = 1um
+                StainGrabMode.m_dTrigger = Convert.ToInt32(10 * StainGrabMode.m_dResY_um);  // 1pulse = 0.1um -> 20pulse = 1um
                 int nCamWidth = StainGrabMode.m_camera.GetRoiSize().X;
                 int nCamHeight = StainGrabMode.m_camera.GetRoiSize().Y;
                 int nPodSizeY_px = Convert.ToInt32(StainGrabMode.m_nPodSize_mm * 1000 / StainGrabMode.m_dResY_um);  // 웨이퍼 영역의 Y픽셀 갯수
@@ -81,14 +81,15 @@ namespace Root_VEGA_P_Vision.Module
 
                 //가로 총 Pixel 갯수 : PodWidth * 1000 / camera res X
                 //가로 횟수 : 총 Pixel 갯수 / CamWidth
-                int nXCount = (int)Math.Ceiling((double)(nPodSizeY_px / nCamWidth)) + 1;
-                int nYCount = nPodSizeY_px / nCamHeight;
+                //int nXCount = (int)Math.Ceiling((double)(nPodSizeY_px / nCamWidth)) + 1;
+                //int nYCount = nPodSizeY_px / nCamHeight;
+                int nXCount = 3;
+                int nYCount = 3;
                 #endregion
 
                 List<int> illumList = new List<int>();
                 for (int i = 0; i < StainGrabMode.m_lightSet.m_aLight.Count; i++)
-                    if (StainGrabMode.GetLight(i) != 0) illumList.Add(i);
-
+                    if (StainGrabMode.GetLight(i) > 0) illumList.Add(i);
                 if (m_module.Run(m_module.Move(axisZ, StainGrabMode.m_nFocusPosZ)))
                     return p_sInfo;
 
@@ -100,7 +101,7 @@ namespace Root_VEGA_P_Vision.Module
                         if (EQ.IsStop())
                             return "OK";
 
-                        double dPosX = StainGrabMode.m_rpAxisCenter.X + nPodSizeY_px * 1000 - nPulsePerWidth * (x);
+                        double dPosX = StainGrabMode.m_rpAxisCenter.X /*+ nPodSizeY_px * 1000*/ - nPulsePerWidth * (x-1);
 
                         //if (m_module.Run(m_module.Move(axisXY.p_axisX, dPosX)))
                         if (m_module.Run(axisXY.StartMove(new RPoint(dPosX, StainGrabMode.m_rpAxisCenter.Y + nPodSizeY_px * 500))))
@@ -111,7 +112,7 @@ namespace Root_VEGA_P_Vision.Module
                         for (int y = 0; y < nYCount; y++)
                         {
                             double tmp = (double)nYCount / 2 + y;
-                            double dPosY = StainGrabMode.m_rpAxisCenter.Y + nPodSizeY_px * 500 - nPulsePerHeight * y;
+                            double dPosY = StainGrabMode.m_rpAxisCenter.Y /*+ nPodSizeY_px * 500*/ - nPulsePerHeight * (y-1);
 
                             if (m_module.Run(axisXY.p_axisY.StartMove(dPosY)))
                                 return p_sInfo;

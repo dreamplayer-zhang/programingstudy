@@ -390,7 +390,7 @@ namespace RootTools.Control
             return StartMove(fPos, sSpeed);
         }
 
-        double m_posDst = 0;
+        public double m_posDst = 0;
         int m_msMoveTime = 0;
         public virtual string StartMove(double fPos, string sSpeed = null)
         {
@@ -645,6 +645,11 @@ namespace RootTools.Control
                 m_dPos = dPos;
                 m_bCmd = bCmd;
                 m_dUpTime = dUpTime; 
+            }
+
+            public int GetLine()
+            {
+                return (int)Math.Round((m_aPos[1] - m_aPos[0]) / m_dPos);
             }
 
             public void RunTree(Tree tree, string sUnit, bool bVisible = true)

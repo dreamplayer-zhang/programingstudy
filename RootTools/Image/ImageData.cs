@@ -315,7 +315,7 @@ namespace RootTools
 
         public unsafe void SetData(ImageData imgData, CRect rect, int stride, int nByte = 1)
         {
-            if (nByte == 1 && nByte == 2)
+            if (nByte == 1 || nByte == 2)
             {
                 IntPtr ptr = imgData.GetPtr();
                 for (int i = rect.Height - 1; i >= 0; i--)
@@ -2492,6 +2492,5 @@ namespace RootTools
         {
             CLR_IP.Cpp_SaveBMP(sFilePath, rawdata, nW, nH, nByteCnt);
         }
-
     }
 }

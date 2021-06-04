@@ -29,35 +29,6 @@
             <Setter Property="HorizontalAlignment"
                     Value="Left" />
         </Style>
-        <Style TargetType="{x:Type ToggleButton}" x:Key="IO_indicator">
-            <Setter Property="BorderThickness" Value="0"></Setter>
-            <Setter Property="Background" Value="{PriorityBinding}"></Setter>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="ToggleButton">
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="Auto" />
-                            </Grid.ColumnDefinitions>
-                            <Grid Background="Transparent" Name="grd" Grid.Column="1"
-                                    Margin="{TemplateBinding Padding}" VerticalAlignment="Center"
-                                  Height="20"
-                                    Width="20">
-                                <Ellipse x:Name="ellipse" Stroke="{TemplateBinding BorderBrush}"
-                                        StrokeThickness="2" Stretch="Uniform"
-                                        Fill="{TemplateBinding  Background}"></Ellipse>
-                            </Grid>
-                        </Grid>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsChecked" Value="False">
-                                <Setter TargetName="ellipse" Property="Fill" Value="#FFBBBBBB" />
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
     </Window.Resources>
 
     <Grid>
@@ -866,13 +837,12 @@
                                             <RowDefinition Height="30" />
                                             <RowDefinition Height="100" />
                                             <RowDefinition Height="100" />
-                                            <RowDefinition Height="150" />
-                                            <RowDefinition Height="150" />
-                                            <RowDefinition Height="150" />
-                                            <RowDefinition Height="80" />
+                                            <RowDefinition Height="400" />
+                                            <RowDefinition Height="100" />
+                                            <RowDefinition Height="100" />
 
                                         </Grid.RowDefinitions>
-                                        <!--<GroupBox Header="Product Info"
+                                        <GroupBox Header="Product Info"
                                                   Grid.Column="0"
                                                   Grid.Row="1" DataContext="">
                                             <UniformGrid Margin="5,2">
@@ -886,9 +856,9 @@
                                                 <TextBlock Text="EUV"
                                                            HorizontalAlignment="Left" />
                                             </UniformGrid>
-                                        </GroupBox>-->
+                                        </GroupBox>
                                         <GroupBox Header="Reticle Location"
-                                                  Grid.Column="0"
+                                                  Grid.Column="1"
                                                   Grid.Row="1">
                                             <Grid>
                                                 <Grid.ColumnDefinitions>
@@ -943,71 +913,9 @@
                                                            HorizontalAlignment="Left" />-->
                                             </Grid>
                                         </GroupBox>
-                                        <GroupBox Header="Isolator IO"
-                                                  Grid.Column="0"
-                                                  Grid.Row="6" Grid.ColumnSpan="2">
-                                            <Grid>
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition/>
-                                                    <ColumnDefinition/>
-                                                    <ColumnDefinition/>
-                                                    <ColumnDefinition/>
-                                                    <ColumnDefinition/>
-                                                    <ColumnDefinition/>
-                                                    <ColumnDefinition/>
-                                                    <ColumnDefinition/>
-                                                    <ColumnDefinition/>
-                                                    <ColumnDefinition/>
-                                                </Grid.ColumnDefinitions>
-                                                <Grid.RowDefinitions>
-                                                    <RowDefinition Height="1*"/>
-                                                    <RowDefinition Height="2*"/>
-                                                </Grid.RowDefinitions>
-                                                <TextBlock Text="FP Isolator" Grid.Column="0" Grid.Row="0" 
-                                                           HorizontalAlignment="Center" FontSize="12"/>
-                                                <ToggleButton  x:Name="btnFP_Isolator" Width ="{PriorityBinding}" Background="Green" Grid.Column="0" Grid.Row="1"
-                    Style="{StaticResource IO_indicator}" IsChecked="{Binding p_bIn}" HorizontalAlignment="Center" Margin="2"/>
-                                                <TextBlock Text="Isolator V" Grid.Column="1" Grid.Row="0"
-                                                           HorizontalAlignment="Center" FontSize="12"/>
-                                                <ToggleButton x:Name="btnIsolator_V" Width ="{PriorityBinding}" Background="Green" Grid.Column="1" Grid.Row="1"
-                    Style="{StaticResource IO_indicator}" IsChecked="{Binding p_bIn}" HorizontalAlignment="Center" Margin="2"/>
-                                                <TextBlock Text="Factory Air Pad" Grid.Column="2" Grid.Row="0"
-                                                           HorizontalAlignment="Center" FontSize="12"/>
-                                                <ToggleButton x:Name="btn_Factory_Air_Pad" Width ="{PriorityBinding}" Background="Green" Grid.Column="2" Grid.Row="1"
-                    Style="{StaticResource IO_indicator}" IsChecked="{Binding p_bIn}" HorizontalAlignment="Center" Margin="2"/>
-                                                <TextBlock Text="Air Tank" Grid.Column="3" Grid.Row="0"
-                                                           HorizontalAlignment="Center" FontSize="12"/>
-                                                <ToggleButton x:Name="btn_Air_Tank" Width ="{PriorityBinding}" Background="Green" Grid.Column="3" Grid.Row="1"
-                    Style="{StaticResource IO_indicator}" IsChecked="{Binding p_bIn}" HorizontalAlignment="Center" Margin="2"/>
-                                                <TextBlock Text="X Bottom" Grid.Column="4" Grid.Row="0"
-                                                           HorizontalAlignment="Center" FontSize="12"/>
-                                                <ToggleButton x:Name="btn_X_Bottom" Width ="{PriorityBinding}" Background="Green" Grid.Column="4" Grid.Row="1"
-                    Style="{StaticResource IO_indicator}" IsChecked="{Binding p_bIn}" HorizontalAlignment="Center" Margin="2"/>
-                                                <TextBlock Text="X Side Master" Grid.Column="5" Grid.Row="0"
-                                                           HorizontalAlignment="Center" FontSize="12"/>
-                                                <ToggleButton x:Name="btn_X_Side_Master" Width ="{PriorityBinding}" Background="Green" Grid.Column="5" Grid.Row="1"
-                    Style="{StaticResource IO_indicator}" IsChecked="{Binding p_bIn}" HorizontalAlignment="Center" Margin="2"/>
-                                                <TextBlock Text="X Side Slave" Grid.Column="6" Grid.Row="0"
-                                                           HorizontalAlignment="Center" FontSize="12"/>
-                                                <ToggleButton x:Name="btn_X_Side_Slave" Width ="{PriorityBinding}" Background="Green" Grid.Column="6" Grid.Row="1"
-                    Style="{StaticResource IO_indicator}" IsChecked="{Binding p_bIn}" HorizontalAlignment="Center" Margin="2"/>
-                                                <TextBlock Text="Y Bottom" Grid.Column="7" Grid.Row="0"
-                                                           HorizontalAlignment="Center" FontSize="12"/>
-                                                <ToggleButton x:Name="btn_Y_Bottom" Width ="{PriorityBinding}" Background="Green" Grid.Column="7" Grid.Row="1"
-                    Style="{StaticResource IO_indicator}" IsChecked="{Binding p_bIn}" HorizontalAlignment="Center" Margin="2"/>
-                                                <TextBlock Text="Y Side Master" Grid.Column="8" Grid.Row="0"
-                                                           HorizontalAlignment="Center" FontSize="12"/>
-                                                <ToggleButton x:Name="btn_Y_Side_Master" Width ="{PriorityBinding}" Background="Green" Grid.Column="8" Grid.Row="1"
-                    Style="{StaticResource IO_indicator}" IsChecked="{Binding p_bIn}" HorizontalAlignment="Center" Margin="2"/>
-                                                <TextBlock Text="Y Side Slave" Grid.Column="9" Grid.Row="0"
-                                                           HorizontalAlignment="Center" FontSize="12"/>
-                                                <ToggleButton x:Name="btn_Y_Side_Slave" Width ="{PriorityBinding}" Background="Green" Grid.Column="9" Grid.Row="1"
-                    Style="{StaticResource IO_indicator}" IsChecked="{Binding p_bIn}" HorizontalAlignment="Center" Margin="2"/>
-                                            </Grid>
-                                        </GroupBox>
                                         <GroupBox Header="Illumination Info"
                                                   Grid.Column="0"
-                                                  Grid.Row="5">
+                                                  Grid.Row="2">
                                             <UniformGrid Margin="5,2"
                                                          Columns="2">
                                                 <TextBlock Text="Red"
@@ -1026,7 +934,7 @@
                                         </GroupBox>
                                         <GroupBox Header="Coordinate Info"
                                                   Grid.Column="0"
-                                                  Grid.Row="3" Grid.RowSpan="2">
+                                                  Grid.Row="3">
                                             <Grid Margin="5,2">
                                                 <Grid.RowDefinitions>
                                                     <RowDefinition />
@@ -1086,8 +994,8 @@
 
                                         </GroupBox>
                                         <GroupBox Header="FFU"
-                                                  Grid.Row="1"
-                                                  Grid.Column="1">
+                                                  Grid.Row="4"
+                                                  Grid.Column="0">
                                             <Grid Margin="5,2">
                                                 <Grid.ColumnDefinitions>
                                                     <ColumnDefinition/>
@@ -1102,8 +1010,8 @@
                                             </Grid>
                                         </GroupBox>
                                         <GroupBox Header="FDC"
-                                                  Grid.Row="2"
-                                                  Grid.Column="1">
+                                                  Grid.Row="5"
+                                                  Grid.Column="0">
                                             <Grid Margin="5,2">
                                                 <Grid.ColumnDefinitions>
                                                     <ColumnDefinition/>
@@ -1111,21 +1019,21 @@
                                                     <ColumnDefinition/>
                                                     <ColumnDefinition/>
                                                 </Grid.ColumnDefinitions>
-                                                <TextBlock Grid.Column="0" Text="EFEM CDA"
-                                                           HorizontalAlignment="Center"/>
+                                                <TextBlock Grid.Column="0" Text="CDA 1"
+                                                           HorizontalAlignment="Left"/>
                                                 <TextBlock Grid.Column="1"
                                                            HorizontalAlignment="Left"
                                                            x:Name="FDC_CDA1"
                                                            Text="{Binding p_CDA1_Value}"/>
-                                                <TextBlock Grid.Column="2" Text="INSPECT CDA"
-                                                           HorizontalAlignment="Center"/>
+                                                <TextBlock Grid.Column="2" Text="CDA 2"
+                                                           HorizontalAlignment="Left"/>
                                                 <TextBlock Grid.Column="3"
                                                            x:Name="FDC_CDA2"
                                                            Text="{Binding p_CDA2_Value}"
                                                            HorizontalAlignment="Left" />
                                             </Grid>
                                         </GroupBox>
-                                        <Grid Grid.Column="0"
+                                        <Grid Grid.Column="1"
                                               Grid.Row="2">
                                             <GroupBox  Header="Inspection Info"
                                                        Grid.Row="0">

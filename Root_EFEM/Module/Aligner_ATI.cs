@@ -145,11 +145,11 @@ namespace Root_EFEM.Module
             public enum ePosZ
             {
                 PutReady, // -180636
-                PutDown, //-145930
+                PutDown, //-126000
                 GetReady, // 0
-                GetUp, // -121992 -15000 : added -15000 offset 210426
+                GetUp, // -126992
                 InversePutReady, // -180636
-                InversePutDown, // -180636
+                InversePutDown, // -165636
                 InverseGetReady, //-262386
                 InverseGetDown // -155636
             }
@@ -168,8 +168,8 @@ namespace Root_EFEM.Module
             #region AxisRotate
             public enum ePosRotate
             {
-                UpSide, // 0 -230 : added -230 offset 210426
-                DownSide // 100000
+                UpSide, // 0 -230
+                DownSide // 100000 -230
             }
             void InitPosRotate()
             {
@@ -239,7 +239,7 @@ namespace Root_EFEM.Module
 
             // Start Get
             if (Run(m_flipper.RunMoveX(Flipper.ePosX.Forward, m_flipper.m_xOffset))) return p_sInfo;
-            if (Run(m_flipper.RunMoveZ(Flipper.ePosZ.GetUp))) return p_sInfo; // added -15000 offset 210426
+            if (Run(m_flipper.RunMoveZ(Flipper.ePosZ.GetUp))) return p_sInfo;
             if (Run(RunVacuum(false))) return p_sInfo;
             if (Run(m_flipper.RunGuide(true))) return p_sInfo;
             if (Run(m_flipper.RunMoveZ(Flipper.ePosZ.InversePutReady))) return p_sInfo;
@@ -263,12 +263,12 @@ namespace Root_EFEM.Module
 
             // Start InversePut
             if (Run(m_flipper.RunMoveX(Flipper.ePosX.Forward, 0))) return p_sInfo;
+            if (Run(m_flipper.RunMoveZ(Flipper.ePosZ.InversePutDown))) return p_sInfo;
             if (Run(m_flipper.RunVacuum(false))) return p_sInfo;
             if (Run(m_flipper.RunGuide(false))) return p_sInfo;
-            if (Run(m_flipper.RunMoveZ(Flipper.ePosZ.InversePutDown))) return p_sInfo;
-            if (Run(RunVacuum(true))) return p_sInfo;
             if (Run(m_flipper.RunMoveX(Flipper.ePosX.Forward, m_flipper.m_xOffset))) return p_sInfo;
             if (Run(m_flipper.RunMoveZ(Flipper.ePosZ.InverseGetReady))) return p_sInfo;
+            if (Run(RunVacuum(true))) return p_sInfo;
             if (Run(m_flipper.RunMoveX(Flipper.ePosX.Backward, 0))) return p_sInfo;
             // End InversePut
 
@@ -292,11 +292,12 @@ namespace Root_EFEM.Module
             if (Run(m_flipper.RunMoveX(Flipper.ePosX.Forward, 0))) return p_sInfo;
             if (Run(RunVacuum(false))) return p_sInfo;
             if (Run(m_flipper.RunGuide(true))) return p_sInfo;
-            if (Run(m_flipper.RunMoveZ(Flipper.ePosZ.InverseGetDown))) return p_sInfo;
+            Thread.Sleep(10);
             if (Run(m_flipper.RunGuide(false))) return p_sInfo; // JEONG
+            if (Run(m_flipper.RunMoveZ(Flipper.ePosZ.InverseGetDown))) return p_sInfo;
             if (Run(m_flipper.RunVacuum(true))) return p_sInfo;
             if (Run(m_flipper.RunGuide(true))) return p_sInfo; // JEONG
-            if (Run(m_flipper.RunVacuum(true))) return p_sInfo; // JEONG : Vacuum ON 확인 위해서
+            //if (Run(m_flipper.RunVacuum(true))) return p_sInfo; // JEONG : Vacuum ON 확인 위해서
             if (Run(m_flipper.RunMoveZ(Flipper.ePosZ.PutReady))) return p_sInfo;
             if (Run(m_flipper.RunMoveX(Flipper.ePosX.Backward, 0))) return p_sInfo;
             // End RunInverseGet
@@ -310,29 +311,30 @@ namespace Root_EFEM.Module
 
             while (true)
             {
-                if (EQ.IsStop()) return p_id + " EQ Stop";
+                if (EQ.IsStop())
+                {
+                    return p_id + " EQ Stop (RNR: " + count.ToString() + "counts)";
+                }
 
                 if (RunPut() != "OK")
                 {
-                    return "RNR RunPut failed at " + count.ToString() + " count";
+                    return "RNR RunPut failed at " + count.ToString() + " counts";
                 }
                 if (RunGet() != "OK")
                 {
-                    return "RNR RunGet failed at " + count.ToString() + " count";
+                    return "RNR RunGet failed at " + count.ToString() + " counts";
                 }
                 if (RunInversePut() != "OK")
                 {
-                    return "RNR RunInversePut failed at " + count.ToString() + " count";
+                    return "RNR RunInversePut failed at " + count.ToString() + " counts";
                 }
                 if (RunInverseGet() != "OK")
                 {
-                    return "RNR RunInverseGet failed at " + count.ToString() + " count";
+                    return "RNR RunInverseGet failed at " + count.ToString() + " counts";
                 }
 
                 count = count + 1;
             }
-
-            //return "OK";
         }
 
         public string RunRecovery()

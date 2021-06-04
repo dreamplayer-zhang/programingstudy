@@ -93,6 +93,15 @@ namespace Root_WIND2.Module
             return null;
         }
 
+        public GrabModeBack GetGrabMode(int index)
+        {
+            if (m_aGrabMode?.Count > 0)
+            {
+                return m_aGrabMode[index];
+            }
+            return null;
+        }
+
         void RunTreeGrabMode(Tree tree)
         {
             m_lGrabMode = tree.Set(m_lGrabMode, m_lGrabMode, "Count", "Grab Mode Count");
@@ -311,6 +320,7 @@ namespace Root_WIND2.Module
                 return "OK";
             //            p_bStageBlow = false;
             //            p_bStageVac = true;
+
             Thread.Sleep(200);
 
             if (camMain != null && camMain.p_CamInfo.p_eState == eCamState.Init)
@@ -323,7 +333,6 @@ namespace Root_WIND2.Module
 
             if (diWaferExist.p_bIn == false)
                 p_bStageVac = false;
-
             return p_sInfo;
         }
         #endregion

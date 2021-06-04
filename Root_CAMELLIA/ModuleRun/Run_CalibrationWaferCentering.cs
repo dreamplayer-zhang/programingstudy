@@ -52,6 +52,14 @@ namespace Root_CAMELLIA.Module
             m_DataManager = module.m_DataManager;
             
             InitModuleRun(module);
+
+            DataManager.Instance.m_calibration.CalDoneEvent += CalDoneEvent;
+        }
+
+        void CalDoneEvent()
+        {
+            MarsLogManager logManager = MarsLogManager.Instance;
+            logManager.WriteFNC(EQ.p_nRunLP, m_module.p_id, "Calibration", SSLNet.STATUS.END);
         }
 
         public override ModuleRunBase Clone()
@@ -132,23 +140,41 @@ namespace Root_CAMELLIA.Module
             Axis axisZ = m_module.p_axisZ;
             string strVRSImageDir = "D:\\";
             string strVRSImageFullPath = "";
-           
+
+            MarsLogManager logManager = MarsLogManager.Instance;
+
+            logManager.WriteFNC(EQ.p_nRunLP, m_module.p_id, "Lifter Down", SSLNet.STATUS.START);
             if (m_module.LifterDown() != "OK")
             {
                 return p_sInfo;
             }
+            logManager.WriteFNC(EQ.p_nRunLP, m_module.p_id, "Lifter Down", SSLNet.STATUS.END);
 
-            if (m_module.Run(axisZ.StartMove(491453)))
-            {
-                return p_sInfo;
-            }
-            if (m_module.Run(axisZ.WaitReady()))
-                return p_sInfo;
+            int sequence = 0;
+
+            logManager.WritePRC(EQ.p_nRnR, m_module.p_id, SSLNet.PRC_EVENTID.Process, SSLNet.STATUS.START, this.p_id, sequence++, m_module.p_infoWafer.p_id);
+
+            logManager.AddData("Z Axis", m_dFocusZ, "Pulse");
+            logManager.WriteFNC(EQ.p_nRunLP, m_module.p_id, "Start Move", SSLNet.STATUS.START);
+            logManager.ClearData();
+            //if (m_module.Run(axisZ.StartMove(m_dFocusZ)))
+            //{
+            //    return p_sInfo;
+            //}
+            //if (m_module.Run(axisZ.WaitReady())) 
+            //    return p_sInfo;
+            logManager.WriteFNC(EQ.p_nRunLP, m_module.p_id, "Start Move", SSLNet.STATUS.END);
+
+
 
             if (m_useCal)
             {
                 if (m_useCentering)
                 {
+                    logManager.AddData(nameof(m_InitialCal), m_InitialCal);
+                    logManager.AddData(nameof(m_nCalibrationCnt), m_nCalibrationCnt);
+                    logManager.WriteFNC(EQ.p_nRunLP, m_module.p_id, "Calibration", SSLNet.STATUS.START);
+                    logManager.ClearData();
                     if (m_DataManager.m_calibration.Run(m_InitialCal, m_isPM, retryCount:m_nCalibrationCnt) != "OK")
                     {
                         return "Calibration fail";
@@ -167,7 +193,7 @@ namespace Root_CAMELLIA.Module
                             break;
                         }
                     }
-
+                    logManager.WriteFNC(EQ.p_nRunLP, m_module.p_id, "Calibration", SSLNet.STATUS.END);
                 }
             }
 

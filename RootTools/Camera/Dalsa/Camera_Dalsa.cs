@@ -330,7 +330,7 @@ namespace RootTools.Camera.Dalsa
 
                 SapFormat bufformat = m_sapAcq.XferParams.Format;
 
-                if (bufformat == SapFormat.RGB8888 || bufformat == SapFormat.RGBP8 || bufformat == SapFormat.Mono16)
+                if (bufformat == SapFormat.RGB8888 || bufformat == SapFormat.RGBP8 || bufformat == SapFormat.Mono16 || bufformat == SapFormat.RGB888)
                     m_sapBuf = new SapBuffer(p_nBuf, m_sapAcq.XferParams.Width, m_sapAcq.XferParams.Height, bufformat, SapBuffer.MemoryType.ScatterGather);
                 else if (bufformat == SapFormat.Mono8)
                     m_sapBuf = new SapBuffer(p_nBuf, m_sapAcq, SapBuffer.MemoryType.ScatterGather);
@@ -1052,7 +1052,7 @@ namespace RootTools.Camera.Dalsa
                         IntPtr BluePtr = (IntPtr)((long)m_BlueMemPtr + nB);
                         int nThreadIdx = GetReadyThread();
 
-                        if (m_sapBuf.Format == SapFormat.RGB8888)
+                        if (m_sapBuf.Format == SapFormat.RGB8888  || m_sapBuf.Format == SapFormat.RGB888)
                         {
                             byte* pRed = (byte*)RedPtr.ToPointer();
                             byte* pGreen = (byte*)GreenPtr.ToPointer();

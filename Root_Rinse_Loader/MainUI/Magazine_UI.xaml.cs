@@ -64,12 +64,19 @@ namespace Root_Rinse_Loader.MainUI
             m_bBlink = !m_bBlink;
             foreach (MagazineClamp_UI ui in m_aMagazine) ui.OnTimer(m_bBlink);
             groupBoxMagazine.IsEnabled = (EQ.p_eState == EQ.eState.Ready);
+            buttonLoadUp.IsEnabled = EQ.p_eState == EQ.eState.Ready;
+            buttonLoadDown.IsEnabled = EQ.p_eState == EQ.eState.Ready; 
         }
 
         private void buttonNew_Click(object sender, RoutedEventArgs e)
         {
             m_rinse.p_eMagazine = Storage.eMagazine.Magazine4; 
             m_rinse.p_iMagazine = 0; 
+        }
+
+        private void buttonNewUnloader_Click(object sender, RoutedEventArgs e)
+        {
+            m_rinse.SendNewMagazine();
         }
 
         private void TextBox_PreviewKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
@@ -84,5 +91,20 @@ namespace Root_Rinse_Loader.MainUI
         {
             m_storage.MoveMagazine(m_rinse.p_eMagazine, m_rinse.p_iMagazine, false); 
         }
+
+        private void buttonLoadUp_Click(object sender, RoutedEventArgs e)
+        {
+            buttonLoadUp.IsEnabled = false;
+            buttonLoadDown.IsEnabled = false; 
+            m_storage.RunLoadUp(); 
+        }
+
+        private void buttonLoadDown_Click(object sender, RoutedEventArgs e)
+        {
+            buttonLoadUp.IsEnabled = false;
+            buttonLoadDown.IsEnabled = false;
+            m_storage.RunLoadDown();
+        }
+
     }
 }

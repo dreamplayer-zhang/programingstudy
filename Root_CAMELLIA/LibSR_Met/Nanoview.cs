@@ -10,6 +10,7 @@ using NanoView;
 using System.Runtime.InteropServices;
 using System.Diagnostics;
 using System.IO.Ports;
+using MathNet.Numerics.Interpolation;
 using static Root_CAMELLIA.Module.Module_Camellia;
 using Root_CAMELLIA;
 
@@ -42,12 +43,15 @@ namespace Root_CAMELLIA.LibSR_Met
 
         public ARCNIR m_SR = null;
         Model m_Model = null;
+        Model m_ModelSave = null;
         DataManager m_DM = DataManager.GetInstance();
         Calculation m_Calculation = new Calculation();
         public PMDatas m_PMDatas = new PMDatas();
 
         public MaterialList m_MaterialList;
         public LayerList m_LayerList;
+        public MaterialList m_MaterialListSave;
+        public LayerList m_LayerListSave;
         string m_sConfigPath = string.Empty;
 
         public bool isExceptNIR = false;
@@ -61,8 +65,11 @@ namespace Root_CAMELLIA.LibSR_Met
         {
             m_SR = new ARCNIR();
             m_Model = new Model();
+            m_ModelSave = new Model();
             m_MaterialList = m_Model.m_MaterialList;
             m_LayerList = m_Model.m_LayerList;
+            m_MaterialListSave = m_ModelSave.m_MaterialList;
+            m_LayerListSave = m_ModelSave.m_LayerList;
 
             InitLamp();
         }
@@ -156,8 +163,7 @@ namespace Root_CAMELLIA.LibSR_Met
         //}
 
 
-
-        public ERRORCODE_NANOVIEW LoadModel(string sRecipeFilePath)
+        public ERRORCODE_NANOVIEW LoadModel(string sRecipeFilePath, bool bFileOpen = false)
         {
             try
             {
@@ -169,10 +175,23 @@ namespace Root_CAMELLIA.LibSR_Met
                     MessageBox.Show("올바른 파일 형식이 아닙니다. - " + sExt);
                     return ERRORCODE_NANOVIEW.ATI_PARAMETER_ERROR;
                 }
+                ERRORCODE_NANOVIEW rst;
 
-                ERRORCODE_NANOVIEW rst = (ERRORCODE_NANOVIEW)m_Model.FillFromFile(sRecipeFilePath);
+                if (bFileOpen)
+                {
+                    //rst = (ERRORCODE_NANOVIEW)m_Model.FillFromFile(sRecipeFilePath);
+                    //m_DM.m_LayerData = m_LayerList.ToLayerData();
 
-                m_DM.m_LayerData = m_LayerList.ToLayerData();
+                    rst = (ERRORCODE_NANOVIEW)m_ModelSave.FillFromFile(sRecipeFilePath);
+                }
+                else
+                {
+                    // 레시피 파일 로드 시, DM 에 Nano-View dll 데이터 저장
+                    rst = (ERRORCODE_NANOVIEW)m_Model.FillFromFile(sRecipeFilePath);
+                    m_DM.m_LayerData = m_LayerList.ToLayerData();
+                    
+                }
+
                 if (rst == ERRORCODE_NANOVIEW.SR_NO_ERROR)
                 {
                     m_DM.m_Log.WriteLog(LogType.Operating, "Modelling Done");
@@ -180,17 +199,32 @@ namespace Root_CAMELLIA.LibSR_Met
                 }
                 else
                 {
-                    foreach (Material m in m_Model.m_MaterialList)
+                    if (bFileOpen)
                     {
-                        m_Model.m_MaterialList.Remove(m);
+                        foreach (Material m in m_ModelSave.m_MaterialList)
+                        {
+                            m_ModelSave.m_MaterialList.Remove(m);
+                        }
                     }
-
+                    else
+                    {
+                        foreach (Material m in m_Model.m_MaterialList)
+                        {
+                            m_Model.m_MaterialList.Remove(m);
+                        }
+                    }
                     string sErr = Enum.GetName(typeof(ERRORCODE_NANOVIEW), rst);
                     m_DM.m_Log.WriteLog(LogType.Error, sErr);
                     MessageBox.Show(sErr); //추후 제거
                 }
-
-                m_DM.m_ThicknessData = new List<ThicknessScaleOffset>();
+                if (bFileOpen)
+                {
+                    m_DM.m_ThicknessDataSave = new List<ThicknessScaleOffset>();
+                }
+                else
+                {
+                    m_DM.m_ThicknessData = new List<ThicknessScaleOffset>();
+                }
                 path_sclfile = Path.GetDirectoryName(sRecipeFilePath) + "\\" + Path.GetFileNameWithoutExtension(sRecipeFilePath) + ".scl";
                 if (File.Exists(path_sclfile))
                 {
@@ -200,17 +234,35 @@ namespace Root_CAMELLIA.LibSR_Met
                     {
                         string str = SR.ReadLine();
                         string[] res = str.Split(',');
-
-                        m_DM.m_ThicknessData.Add(new ThicknessScaleOffset(Convert.ToDouble(res[0]), Convert.ToDouble(res[1])));
+                        if (bFileOpen)
+                        {
+                            m_DM.m_ThicknessDataSave.Add(new ThicknessScaleOffset(Convert.ToDouble(res[0]), Convert.ToDouble(res[1])));
+                        }
+                        else
+                        {
+                            m_DM.m_ThicknessData.Add(new ThicknessScaleOffset(Convert.ToDouble(res[0]), Convert.ToDouble(res[1])));
+                        }
                     }
 
                     SR.Close();
                 }
                 else
                 {
-                    for(int i = 0; i < m_DM.m_LayerData.Count; i++)
+
+                    if (bFileOpen)
                     {
-                        m_DM.m_ThicknessData.Add(new ThicknessScaleOffset());
+                        for (int i = 0; i < m_LayerListSave.Count; i++)
+                        {
+                            m_DM.m_ThicknessDataSave.Add(new ThicknessScaleOffset());
+                        }
+                    }
+                    else
+                    {
+                        for (int i = 0; i < m_LayerList.Count; i++)
+                        {
+                            m_DM.m_ThicknessData.Add(new ThicknessScaleOffset());
+                        }
+                    
                     }
                 }
                 
@@ -249,6 +301,108 @@ namespace Root_CAMELLIA.LibSR_Met
             }
         }
 
+        //public ERRORCODE_NANOVIEW LoadModel(string sRecipeFilePath, bool bFileOpen)
+        //{
+        //    try
+        //    {
+        //        string path_sclfile = "";
+        //        string sExt = Path.GetExtension(sRecipeFilePath);
+        //        if (sExt != ".rcp" && sExt != ".erm")
+        //        {
+        //            m_DM.m_Log.WriteLog(LogType.Error, "올바른 파일 형식이 아닙니다. - " + sExt);
+        //            MessageBox.Show("올바른 파일 형식이 아닙니다. - " + sExt);
+        //            return ERRORCODE_NANOVIEW.ATI_PARAMETER_ERROR;
+        //        }
+        //        ERRORCODE_NANOVIEW rst;
+
+        //        if (bFileOpen)
+        //        {
+        //            // 레시피 파일 로드 시, DM 에 Nano-View dll 데이터 저장
+        //            rst = (ERRORCODE_NANOVIEW)m_Model.FillFromFile(sRecipeFilePath);
+        //            m_DM.m_LayerData = m_LayerList.ToLayerData();
+        //        }
+        //        else
+        //        {
+        //            rst = (ERRORCODE_NANOVIEW)m_ModelSave.FillFromFile(sRecipeFilePath);
+        //        }
+
+        //        m_DM.m_LayerData = m_LayerList.ToLayerData();
+        //        if (rst == ERRORCODE_NANOVIEW.SR_NO_ERROR)
+        //        {
+        //            m_DM.m_Log.WriteLog(LogType.Operating, "Modelling Done");
+        //            //MessageBox.Show("Modelling Done"); //추후 제거
+        //        }
+        //        else
+        //        {
+        //            foreach (Material m in m_Model.m_MaterialList)
+        //            {
+        //                m_Model.m_MaterialList.Remove(m);
+        //            }
+
+        //            string sErr = Enum.GetName(typeof(ERRORCODE_NANOVIEW), rst);
+        //            m_DM.m_Log.WriteLog(LogType.Error, sErr);
+        //            MessageBox.Show(sErr); //추후 제거
+        //        }
+
+        //        m_DM.m_ThicknessData = new List<ThicknessScaleOffset>();
+        //        path_sclfile = Path.GetDirectoryName(sRecipeFilePath) + "\\" + Path.GetFileNameWithoutExtension(sRecipeFilePath) + ".scl";
+        //        if (File.Exists(path_sclfile))
+        //        {
+        //            StreamReader SR = new StreamReader(path_sclfile);
+
+        //            while (!SR.EndOfStream)
+        //            {
+        //                string str = SR.ReadLine();
+        //                string[] res = str.Split(',');
+
+        //                m_DM.m_ThicknessData.Add(new ThicknessScaleOffset(Convert.ToDouble(res[0]), Convert.ToDouble(res[1])));
+        //            }
+
+        //            SR.Close();
+        //        }
+        //        else
+        //        {
+        //            for (int i = 0; i < m_DM.m_LayerData.Count; i++)
+        //            {
+        //                m_DM.m_ThicknessData.Add(new ThicknessScaleOffset());
+        //            }
+        //        }
+
+
+        //        //string[] line = new string[20];
+
+        //        //int linecnt = 0;
+
+        //        //while ((line[linecnt] = SR.ReadLine()) != null)
+        //        //{
+        //        //    linecnt++;
+        //        //}
+
+        //        ////m_thk_scl_linecnt = linecnt;
+
+        //        //for (int j = 0; j < linecnt; j++)
+        //        //{
+        //        //    string[] result = line[j].Split(new char[] { ',' });
+
+
+        //        //    m_thk_scale[j] = Convert.ToDouble(result[0]);
+        //        //    m_thk_offset[j] = Convert.ToDouble(result[1]);
+
+
+        //        //}
+
+
+
+        //        return rst;
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        m_DM.m_Log.WriteLog(LogType.Error, ex.Message);
+        //        MessageBox.Show(ex.Message);
+        //        return ERRORCODE_NANOVIEW.NANOVIEW_ERROR;
+        //    }
+        //}
+
         public bool SaveModel(string sRecipeFilePath) //저장하거나 불러올때 NanoView따위의 추가 string이 필요함
         {
             try
@@ -256,7 +410,7 @@ namespace Root_CAMELLIA.LibSR_Met
                 //_layer[] layers = m_DM.m_LayerData.To_layer();
 
                 //m_SR.Model(layers, layers.Length);
-                if (UpdateModel() == false)
+                if (UpdateModel(true) == false)
                 {
                     MessageBox.Show("Save Modeling Fail! Please check the log.");
                     return false;
@@ -265,7 +419,7 @@ namespace Root_CAMELLIA.LibSR_Met
                 if (Path.GetExtension(sRecipeFilePath) != ".rcp")
                     sRecipeFilePath += ".rcp";
 
-                File.WriteAllLines(sRecipeFilePath, m_Model.m_LayerList.ToString());
+                File.WriteAllLines(sRecipeFilePath, m_ModelSave.m_LayerList.ToString());
 
                 string path_sclfile = Path.GetDirectoryName(sRecipeFilePath) + "\\" + Path.GetFileNameWithoutExtension(sRecipeFilePath) + ".scl";
 
@@ -273,11 +427,11 @@ namespace Root_CAMELLIA.LibSR_Met
                 {
                     StreamWriter SW = new StreamWriter(path_sclfile);
 
-                    for (int j = 0; j < m_DM.m_ThicknessData.Count; j++)
+                    for (int j = 0; j < m_DM.m_ThicknessDataSave.Count; j++)
                     {
                         string strline;
 
-                        strline = string.Format("{0},{1}", m_DM.m_ThicknessData[j].m_dThicknessScale, m_DM.m_ThicknessData[j].m_dThicknessOffset);
+                        strline = string.Format("{0},{1}", m_DM.m_ThicknessDataSave[j].m_dThicknessScale, m_DM.m_ThicknessDataSave[j].m_dThicknessOffset);
 
                         SW.WriteLine(strline);
                     }
@@ -310,7 +464,7 @@ namespace Root_CAMELLIA.LibSR_Met
         {
             try
             {
-                Material material = m_Model.GetMaterialFromName(sMaterialName);
+                Material material = m_ModelSave.GetMaterialFromName(sMaterialName);
 
                 return material;
             }
@@ -719,14 +873,14 @@ namespace Root_CAMELLIA.LibSR_Met
                     if (m_bSRInitialized == true)
                     {
                         //fitting할때 들어가야함
-                        if (nPointIndex == 0)
-                        {
-                            if (UpdateModel() == false)
+                        //if (nPointIndex == 0)
+                        //{
+                            if (UpdateModel(false) == false)
                             {
                                 MessageBox.Show("Modeling Fail! Please check the log.");
                                 return ERRORCODE_NANOVIEW.SR_MODELING_FAIL;
                             }
-                        }
+                        //}
                         RawData data = m_DM.m_RawData[nPointIndex];
                         //m_SR.bDispersionFit = false;
                         //m_SR.WavelengthForNK = 633;
@@ -800,7 +954,6 @@ namespace Root_CAMELLIA.LibSR_Met
 
                                 return ERRORCODE_NANOVIEW.MEASURED_DATA_NOT_FOUND;
                             }
-
                         }
 
 
@@ -830,12 +983,21 @@ namespace Root_CAMELLIA.LibSR_Met
             }
         }
 
-        public bool UpdateModel()
+        public bool UpdateModel(bool bFileSave)
         {
+            bool isSave = false;
             int i, count;
             string str = string.Empty;
-
-            count = m_Model.m_LayerList.Count;
+            Model LayerData;
+            if (bFileSave)
+            {
+                LayerData = m_ModelSave;
+            }
+            else
+            {
+                LayerData = m_Model;
+            }
+            count = LayerData.m_LayerList.Count;
             _layer[] layer = new _layer[count];
 
             for (i = 0; i < count; i++)
@@ -850,7 +1012,7 @@ namespace Root_CAMELLIA.LibSR_Met
 
             i = 0;
 
-            foreach (Layer l in m_Model.m_LayerList)
+            foreach (Layer l in LayerData.m_LayerList)
             {
                 if (l.m_Host == null)
                 {
@@ -894,27 +1056,40 @@ namespace Root_CAMELLIA.LibSR_Met
 
                 i++;
             }
-
-            int nRst = m_SR.Model(layer, count);
-            if (nRst == 0)
+            if (!bFileSave)
             {
-                m_DM.m_Log.WriteLog(LogType.Operating, "Modelling done");
-                return true;
+                ERRORCODE_NANOVIEW rst = (ERRORCODE_NANOVIEW)m_SR.Model(layer, count);
+                if (rst == 0)
+                {
+                    m_DM.m_Log.WriteLog(LogType.Operating, "Modelling done");
+                    isSave = true;
+                }
+                else
+                {
+                    m_DM.m_Log.WriteLog(LogType.Operating, "Modelling failed : " + m_SR.ErrorString);
+                    isSave = false;
+                }
             }
             else
             {
-                m_DM.m_Log.WriteLog(LogType.Operating, "Modelling failed : " + m_SR.ErrorString);
-                return false;
+                isSave = true;
             }
+
+
+            return isSave;
         }
 
-        public ERRORCODE_NANOVIEW LoadMaterial(string sMaterialFilePath)
+        public ERRORCODE_NANOVIEW LoadMaterial(string sMaterialFilePath, bool isSave = false)
         {
             try
             {
                 string sFileName = Path.GetFileName(sMaterialFilePath);
 
-                int nRst = m_Model.LoadMaterialFile(sMaterialFilePath);
+                int nRst = -1;
+                if (isSave)
+                    nRst = m_ModelSave.LoadMaterialFile(sMaterialFilePath);
+                else
+                    nRst = m_Model.LoadMaterialFile(sMaterialFilePath);
                 if (nRst == 0)
                 {
                     m_DM.m_Log.WriteLog(LogType.Operating, "Material(" + sFileName + ") file load done.");
@@ -994,15 +1169,19 @@ namespace Root_CAMELLIA.LibSR_Met
         {
             try
             {
+                Stopwatch sw = new Stopwatch();
                 if (nPointIndex == 0)
                 {
+                    sw.Start();
                     if (LoadNKDatas() == false)
                     {
-                        m_DM.m_Log.WriteLog(LogType.Operating, "NK Data is not find");
+                        m_DM.m_Log.WriteLog(LogType.Operating, "NK Data Cal Error");
                         MessageBox.Show("NK Data is not Found");
 
                         return false;
                     }
+                    sw.Stop();
+                    Debug.WriteLine("Cal nk >> " + sw.ElapsedMilliseconds.ToString());
                 }
                 int nDNum = m_DM.m_LayerData.Count - 2;
                 double[] dThickness = new double[m_DM.m_LayerData.Count - 2];
@@ -1012,9 +1191,10 @@ namespace Root_CAMELLIA.LibSR_Met
                     int nCalLayer = m_SR.Thickness.Count() - (i + 2);
                     dThickness[i] = m_SR.Thickness[nCalLayer];
                 }
-
+                sw.Start();
                 m_Calculation.CalcTransmittance_OptimizingSi(nPointIndex, ConstValue.SI_AVG_OFFSET_RANGE, ConstValue.SI_AVG_OFFSET_STEP, nDNum, dThickness);
-
+                sw.Stop();
+                Debug.WriteLine("Cal t >> " + sw.ElapsedMilliseconds.ToString());
                 return true;
             }
             catch (Exception ex)
@@ -1028,87 +1208,148 @@ namespace Root_CAMELLIA.LibSR_Met
 
         public bool LoadNKDatas()
         {
-            bool bLoadNKData = true;
-
-            m_DM.m_LayerData = m_Model.m_LayerList.ToLayerData();
-
-            for (int n = 0; n < m_Model.m_LayerList.Count; n++)
+            try
             {
-                m_DM.m_LayerData[n].wavelength.Clear();
-                m_DM.m_LayerData[n].n.Clear();
-                m_DM.m_LayerData[n].k.Clear();
-            }
-            string strTempPath = string.Empty;
-            string strNKFilePath = string.Empty;
-            string strNKFileFormat = string.Empty;
-            int nWLStart = Convert.ToInt32(m_DM.nStartWavelegth);
-            int nWLStop;
+                bool bLoadNKData = true;
+                int nWLStart = Convert.ToInt32(m_DM.nStartWavelegth);
+                int nWLStop, nNKDataNum;
+                m_DM.m_LayerData = m_Model.m_LayerList.ToLayerData();
 
-            if (m_DM.bExcept_NIR)
-            {
-                nWLStop = nWLStart + m_DM.nThicknessDataNum;
-            }
-            else
-            {
-                nWLStop = nWLStart + m_DM.m_RawData[0].nNIRDataNum;
-            }
-
-            for (int n = 0; n < m_Model.m_LayerList.Count - 1; n++)
-            {
-                strTempPath = m_Model.m_LayerList[n].m_Host.m_Path;
-                strNKFileFormat = Path.GetExtension(strTempPath);
-                bool bNKFileFormat = strNKFileFormat.Contains(".ref");
-                if (bNKFileFormat)
+                for (int n = 0; n < m_Model.m_LayerList.Count; n++)
                 {
-                    strNKFilePath = strTempPath.Replace(".ref", ".csv");
+                    m_DM.m_LayerData[n].wavelength.Clear();
+                    m_DM.m_LayerData[n].n.Clear();
+                    m_DM.m_LayerData[n].k.Clear();
+                }
+
+                m_Model.YType = Model.DataType.RPRS;
+                m_Model.m_Angle = m_Model.m_AngleAfter = 0.0;
+                if (m_DM.bExcept_NIR)
+                {
+                    nWLStop = nWLStart + m_DM.nThicknessDataNum;
+                    nNKDataNum = ConstValue.NUM_OF_MATERIAL_DATANUM;
+                    m_Model.m_eVMax = 4.0;
+                    m_Model.m_eVMin = 1.3;
                 }
                 else
                 {
-                    strNKFilePath = strTempPath.Replace(".dis", ".csv");
+                    nWLStop = nWLStart + m_DM.m_RawData[0].nNIRDataNum-1;
+                    nNKDataNum = 2 * ConstValue.NUM_OF_MATERIAL_DATANUM;
+                    m_Model.m_eVMax = 4.0;
+                    m_Model.m_eVMin = 0.8;
                 }
+                m_Model.m_NumOfData = nNKDataNum;
+                m_Model.AllocateMemory();
+                m_Model.MakeModelData(Model.CalculateType.INIT);
 
-                if (ReadNKDatas(n, strNKFilePath, nWLStart, nWLStop))
+                for (int n = 0; n < m_Model.m_LayerList.Count - 1; n++)
                 {
-                    bLoadNKData = true;
-                }
-                else
-                {
-                    bLoadNKData = false;
-                }
-            }
-
-            return bLoadNKData;
-        }
-
-        public bool ReadNKDatas(int nLayerIdx, string NKFilePath, int WLStart, int WLStop)
-        {
-            FileInfo FileCheck = new FileInfo(NKFilePath);
-
-            if (FileCheck.Exists)
-            {
-                StreamReader NKData = new StreamReader(NKFilePath);
-
-                while (!NKData.EndOfStream)
-                {
-                    string strTempNK = NKData.ReadLine();
-                    string[] strSplitNK = strTempNK.Split(',');
-                    // 이부분 수정 할것 NIR 사용할 것인지 아닌지에 따라서 nCalDataNUm 과 nDataNum_NIR 로 바꿔서 데이터 수집 할것
-                    if (Convert.ToInt32(strSplitNK[0]) >= WLStart && Convert.ToInt32(strSplitNK[0]) < WLStop)
+                    string sMaterialName = m_Model.m_LayerList[n].m_Host.m_Name;
+                    foreach (Material m in m_Model.m_MaterialList)
                     {
-                        m_DM.m_LayerData[nLayerIdx].wavelength.Add(Convert.ToDouble(strSplitNK[0]));
-                        m_DM.m_LayerData[nLayerIdx].n.Add(Convert.ToDouble(strSplitNK[1]));
-                        m_DM.m_LayerData[nLayerIdx].k.Add(Convert.ToDouble(strSplitNK[2]));
+                        if (m.m_Name == sMaterialName)
+                        {
+                            if (CalNKDatas(n, nWLStart, nWLStop, m.m_e, m.m_eV))
+                            {
+                                bLoadNKData = true;
+                            }
+                            else
+                            {
+                                bLoadNKData = false;
+                            }
+                        }
+
                     }
                 }
-                return true;
+                return bLoadNKData;
             }
-            else
+            catch (Exception ex)
             {
-                m_DM.m_Log.WriteLog(LogType.Operating, "NK 파장 범위가 맞지 않습니다.");
-                System.Windows.Forms.MessageBox.Show("NK 파장 범위가 맞지 않습니다.");
+                m_DM.m_Log.WriteLog(LogType.Error, ex.Message);
                 return false;
             }
         }
+        public bool CalNKDatas(int nLayerIdx, int WLStart, int WLStop, Complex[] Epsilon, double[] eV)
+        {
+            try
+            {
+                List<double> wavelength = new List<double>();
+                List<double> CalnData = new List<double>();
+                List<double> CalkData = new List<double>();
+                List<double> TempWavelength = new List<double>();
+                List<double> Tempn = new List<double>();
+                List<double> Tempk = new List<double>();
+
+                // 엡실론 데이터 nk 데이터로 변환
+                double dCaln = 0.0;
+                double dCalk = 0.0;
+                double temp_n = 0.0;
+                double temp_k = 0.0;
+
+                for (int n = 0; n < eV.Length; n++)
+                {
+                    wavelength.Add(1239.8116 / eV[n]);
+
+                    temp_n = Math.Pow((Math.Pow(Epsilon[n].real, 2) + Math.Pow(Epsilon[n].imag, 2)), 0.5) + Epsilon[n].real;
+                    dCaln = Math.Pow(0.5 * temp_n, 0.5);
+                    CalnData.Add(dCaln);
+
+                    temp_k = Math.Pow((Math.Pow(Epsilon[n].real, 2) + Math.Pow(Epsilon[n].imag, 2)), 0.5) - Epsilon[n].real;
+                    dCalk = Math.Pow(0.5 * temp_k, 0.5);
+                    CalkData.Add(dCalk);
+                }
+
+                //1nm 파장 간격에 맞추어 nk data spline 후 DataManager에 저장
+                int nSplineScale = 0;
+                double dInit_WL = Math.Truncate(wavelength[0]);
+                bool bSplineCal = true;
+                CubicSpline CSpline_nData = CubicSpline.InterpolateNatural(wavelength, CalnData);
+                CubicSpline CSpline_kData = CubicSpline.InterpolateNatural(wavelength, CalkData);
+                while (bSplineCal)
+                {
+                    TempWavelength.Add((-1 * nSplineScale) + dInit_WL);
+                    Tempn.Add(CSpline_nData.Interpolate(TempWavelength.Last()));
+                    Tempk.Add(CSpline_kData.Interpolate(TempWavelength.Last()));
+                    nSplineScale++;
+                    if (TempWavelength.Last() <= WLStart)
+                    {
+                        bSplineCal = false;
+                    }
+                }
+
+                //DataManager에 데이터 세이브
+                int nDataCount = Tempn.Count;
+                double[] array_Wavelength = new double[nDataCount];
+                double[] array_n = new double[nDataCount];
+                double[] array_k = new double[nDataCount];
+
+                TempWavelength.CopyTo(array_Wavelength);
+                Tempn.CopyTo(array_n);
+                Tempk.CopyTo(array_k);
+
+                Array.Reverse(array_Wavelength);
+                Array.Reverse(array_n);
+                Array.Reverse(array_k);
+
+                for (int n = 0; n < nDataCount; n++)
+                {
+                    if (array_Wavelength[n] >= WLStart && array_Wavelength[n] <= WLStop)
+                    {
+                        m_DM.m_LayerData[nLayerIdx].wavelength.Add(array_Wavelength[n]);
+                        m_DM.m_LayerData[nLayerIdx].n.Add(array_n[n]);
+                        m_DM.m_LayerData[nLayerIdx].k.Add(array_k[n]);
+                    }
+                }
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                m_DM.m_Log.WriteLog(LogType.Error, ex.Message);
+                return false;
+            }
+        }
+       
         public bool SaveRawData(int NumofData, double[] expx, double[] expy)
         {
             try
@@ -1531,85 +1772,103 @@ namespace Root_CAMELLIA.LibSR_Met
         }
         void InitLamp()
         {
-            sp.PortName = "COM2";
-            sp.BaudRate = 9600;
-            sp.DataBits = 8;
-            sp.StopBits = StopBits.One;
-            sp.Parity = Parity.None;
-            //sp.DataReceived += new SerialDataReceivedEventHandler(serialPort1_DataReceived);
-            sp.Open();
-
-            sp.Write("t");
-            string OutputData = sp.ReadLine();
-            string[] strtext = new string[7] { "H0:", "T0:", "L0:", "H1:", "T1:", "L1:", "Time:" };
-            string[] arr = OutputData.Split(':');
-            //string[] strarr = arr[1].Split(',');
-            double LampUseTime = 0.0;
-            double value = 0.0;
-            int Hr, Min, Sec;
-            int m_Hr_Org, m_Min_Org, m_Sec_Org;
-            int m_Hr, m_Min, m_Sec;
-            string filepath, timedata, strtime;
-            foreach (string str in strtext)
+            try
             {
-                if (OutputData.Contains(str))
+                sp.PortName = "COM6";
+                sp.BaudRate = 9600;
+                sp.DataBits = 8;
+                sp.StopBits = StopBits.One;
+                sp.Parity = Parity.None;
+                //sp.DataReceived += new SerialDataReceivedEventHandler(serialPort1_DataReceived);
+                sp.Open();
+
+                sp.Write("t");
+                string OutputData = sp.ReadLine();
+                string[] strtext = new string[7] { "H0:", "T0:", "L0:", "H1:", "T1:", "L1:", "Time:" };
+                string[] arr = OutputData.Split(':');
+                //string[] strarr = arr[1].Split(',');
+                double LampUseTime = 0.0;
+                double value = 0.0;
+                int Hr, Min, Sec;
+                int m_Hr_Org, m_Min_Org, m_Sec_Org;
+                int m_Hr, m_Min, m_Sec;
+                string filepath, timedata, strtime;
+                foreach (string str in strtext)
                 {
-                    if (OutputData.Contains("Time:"))
+                    if (OutputData.Contains(str))
                     {
-                        filepath = Application.StartupPath + "\\Timedata.txt";
-
-                        FileInfo fi = new FileInfo(filepath);
-
-                        m_Hr_Org = m_Min_Org = m_Sec_Org = 0;
-                        m_Hr = m_Min = m_Sec = 0;
-
-                        if (fi.Exists)
+                        if (OutputData.Contains("Time:"))
                         {
+                            filepath = Application.StartupPath + "\\Timedata.txt";
+
+                            FileInfo fi = new FileInfo(filepath);
+
+                            m_Hr_Org = m_Min_Org = m_Sec_Org = 0;
+                            m_Hr = m_Min = m_Sec = 0;
+
+                            if (!fi.Exists)
+                            {
+                                fi.Create();
+                                using (StreamWriter SW = new StreamWriter(filepath))
+                                {
+                                    SW.WriteLine("00:00:00");
+                                    SW.Close();
+                                }
+                                return;
+                            }
+
                             timedata = File.ReadAllText(@filepath);
-                            char sp = ':';
-                            string[] spstring = timedata.Split(sp);
+
+                            char split = ':';
+                            string[] spstring = timedata.Split(split);
 
                             m_Hr_Org = Convert.ToInt32(spstring[0]);
                             m_Min_Org = Convert.ToInt32(spstring[1]);
                             m_Sec_Org = Convert.ToInt32(spstring[2]);
 
-                        }
-                        Sec = Convert.ToInt32(arr[1]);
 
-                        m_Sec = Sec + m_Sec_Org;
+                            Sec = Convert.ToInt32(arr[1]);
 
-                        if (m_Sec >= 60)
-                        {
-                            m_Min = (m_Sec / 60) + m_Min_Org;
+                            m_Sec = Sec + m_Sec_Org;
 
-                            m_Sec = m_Sec % 60;
-                        }
-                        else
-                        {
-                            m_Min = m_Min_Org;
+                            if (m_Sec >= 60)
+                            {
+                                m_Min = (m_Sec / 60) + m_Min_Org;
+
+                                m_Sec = m_Sec % 60;
+                            }
+                            else
+                            {
+                                m_Min = m_Min_Org;
+                            }
+
+                            if (m_Min >= 60)
+                            {
+                                m_Hr = (m_Min / 60) + m_Hr_Org;
+
+                                m_Min = m_Min % 60;
+                            }
+                            else
+                            {
+                                m_Hr = m_Hr_Org;
+                            }
+                            value = m_Hr;
+                            strtime = string.Format("{0}:{1}:{2}", m_Hr, m_Min, m_Sec);
+                            using (StreamWriter SW = new StreamWriter(filepath))
+                            {
+                                SW.WriteLine(strtime);
+                            }
                         }
 
-                        if (m_Min >= 60)
-                        {
-                            m_Hr = (m_Min / 60) + m_Hr_Org;
-
-                            m_Min = m_Min % 60;
-                        }
-                        else
-                        {
-                            m_Hr = m_Hr_Org;
-                        }
-                        value = m_Hr;
-                        strtime = string.Format("{0}:{1}:{2}", m_Hr, m_Min, m_Sec);
-                        using (StreamWriter SW = new StreamWriter(filepath))
-                        {
-                            SW.WriteLine(strtime);
-                        }
                     }
-
                 }
+                sp.Write("c");
             }
-            sp.Write("c");
+            catch
+            {
+                
+            }
+          
         }
 
         public double UpdateLampData(string CheckWord)
@@ -1637,18 +1896,26 @@ namespace Root_CAMELLIA.LibSR_Met
 
                         m_Hr_Org = m_Min_Org = m_Sec_Org = 0;
                         m_Hr = m_Min = m_Sec = 0;
-
-                        if (fi.Exists)
+                        
+                        if (!fi.Exists)
                         {
-                            timedata = File.ReadAllText(@filepath);
-                            char sp = ':';
-                            string[] spstring = timedata.Split(sp);
-
-                            m_Hr_Org = Convert.ToInt32(spstring[0]);
-                            m_Min_Org = Convert.ToInt32(spstring[1]);
-                            m_Sec_Org = Convert.ToInt32(spstring[2]);
-
+                            fi.Create();
+                            using (StreamWriter SW = new StreamWriter(filepath))
+                            {
+                                SW.WriteLine("00:00:00");
+                                SW.Close();
+                            }
+                            return value;
                         }
+
+                        timedata = File.ReadAllText(@filepath);
+                        char split = ':';
+                        string[] spstring = timedata.Split(split);
+
+                        m_Hr_Org = Convert.ToInt32(spstring[0]);
+                        m_Min_Org = Convert.ToInt32(spstring[1]);
+                        m_Sec_Org = Convert.ToInt32(spstring[2]);
+
                         Sec = Convert.ToInt32(arr[1]);
 
                         m_Sec = Sec + m_Sec_Org;
