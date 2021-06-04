@@ -21,20 +21,33 @@ namespace RootTools_Vision.WorkManager3
 
         CancellationTokenSource cts;
 
-        public WorkPipeLine(int inspectionThreadNum = 4)
+        private int inspectionThreadNum = 1;
+        private bool bCopyBuffer = false;
+
+        public WorkPipeLine(int inspectionThreadNum = 4, bool bCopyBuffer = false)
         {
-            CreatePIpeLines(inspectionThreadNum);
+            this.inspectionThreadNum = inspectionThreadNum;
+            this.bCopyBuffer = bCopyBuffer;
+
+            CreatePipeLines(inspectionThreadNum, bCopyBuffer);
         }
 
-        private void CreatePIpeLines(int inspectionThreadNum)
+
+        public void Reset()
+        {
+            CreatePipeLines(this.inspectionThreadNum, this.bCopyBuffer);
+        }
+
+        private void CreatePipeLines(int inspectionThreadNum, bool bCopyBuffer)
         {
             pipes = new List<WorkPipe>();
 
             // PipeLine 생성
-            pipeSnap = new WorkPipe(WORK_TYPE.SNAP);
-            pipeAlignment = new WorkPipe(WORK_TYPE.ALIGNMENT);
-            pipeInspection = new WorkPipe(WORK_TYPE.INSPECTION, inspectionThreadNum);
-            pipeDefectProcess = new WorkPipe(WORK_TYPE.DEFECTPROCESS, inspectionThreadNum);
+            
+            pipeSnap = new WorkPipe(WORK_TYPE.SNAP, 1, false, false);
+            pipeAlignment = new WorkPipe(WORK_TYPE.ALIGNMENT, 1, false, false);
+            pipeInspection = new WorkPipe(WORK_TYPE.INSPECTION, inspectionThreadNum, false, bCopyBuffer);
+            pipeDefectProcess = new WorkPipe(WORK_TYPE.DEFECTPROCESS, inspectionThreadNum, false, false);
             pipeDefectProcessAll = new WorkPipe(WORK_TYPE.DEFECTPROCESS_ALL, 1, true);
 
             pipeSnap.SetNextPipe(pipeAlignment);

@@ -18,6 +18,13 @@ namespace RootTools_Vision
         }
         private bool useKlarf = true;
 
+        public bool UseTDIReview
+        {
+            get => this.useTDIReview;
+            set => this.useTDIReview = value;
+        }
+        private bool useTDIReview = true;
+
         [Category("Klarf")]
         [DisplayName("Klarf Save Path")]
         public string KlarfSavePath
@@ -122,6 +129,39 @@ namespace RootTools_Vision
             }
         }
         private int wholeWaferImageEndY = 1000;
+
+
+
+        [Category("Klarf")]
+        [DisplayName("Output Image Size Y")]
+        public int OutputImageSizeY
+        {
+            get
+            {
+                return outputImageSizeY;
+            }
+            set
+            {
+                outputImageSizeY = value;
+            }
+        }
+        private int outputImageSizeY = 3000;
+
+
+        [Category("Klarf")]
+        [DisplayName("Output Image Size X")]
+        public int OutputImageSizeX
+        {
+            get
+            {
+                return outputImageSizeX;
+            }
+            set
+            {
+                outputImageSizeX = value;
+            }
+        }
+        private int outputImageSizeX = 3000;
 
         [Category("Common")]
         [DisplayName("Defect Image Path")]

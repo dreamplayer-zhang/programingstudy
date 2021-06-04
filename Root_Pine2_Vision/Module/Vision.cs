@@ -1,6 +1,8 @@
 ﻿using RootTools;
+using RootTools.Camera;
 using RootTools.Camera.Dalsa;
 using RootTools.Light;
+using RootTools.Memory;
 using RootTools.Module;
 using RootTools.Trees;
 using System.Collections.Generic;
@@ -77,10 +79,14 @@ namespace Root_Pine2_Vision.Module
 
         public void RunLight(LightPower lightPower)
         {
-            for (int n = 0; n < p_lLight; n++)
+            if (p_eRemote == eRemote.Client) RemoteRun(eRemoteRun.RunLight, eRemote.Client, lightPower);
+            else
             {
-                Light light = m_lightSet.m_aLight[n];
-                if (light.m_light != null) light.m_light.p_fSetPower = lightPower.m_aPower[n];
+                for (int n = 0; n < p_lLight; n++)
+                {
+                    Light light = m_lightSet.m_aLight[n];
+                    if (light.m_light != null) light.m_light.p_fSetPower = lightPower.m_aPower[n];
+                }
             }
         }
 
@@ -113,6 +119,7 @@ namespace Root_Pine2_Vision.Module
             }
             public eEXT m_eEXT = eEXT.EXT1;
             public CPoint m_cpMemory = new CPoint();
+            public int m_nLine = 30000; 
             public int m_nOverlap = 0;
             public LightPower m_lightPower;
 
@@ -124,16 +131,34 @@ namespace Root_Pine2_Vision.Module
                 scanData.m_eDirection = m_eDirection;
                 scanData.m_eEXT = m_eEXT;
                 scanData.m_cpMemory = new CPoint(m_cpMemory);
+                scanData.m_nLine = m_nLine; 
                 scanData.m_nOverlap = m_nOverlap;
                 scanData.m_lightPower = m_lightPower.Clone();
                 return scanData; 
             }
 
+            public GrabData GetGrabData()
+            {
+                GrabData data = new GrabData();
+                data.bInvY = (m_eDirection == eDirection.Backward);
+                data.m_nOverlap = m_nOverlap;
+                data.nScanOffsetY = m_cpMemory.Y;
+                data.ReverseOffsetY = m_cpMemory.Y + m_nLine; 
+                return data; 
+            }
+
+            public CPoint GetMemoryOffset()
+            {
+                CPoint cp = new CPoint(m_cpMemory);
+                if (m_eDirection == eDirection.Backward) cp.Y += m_nLine;
+                return cp; 
+            }
+
             public void RunTree(Tree tree, bool bVisible)
             {
-                RunTreeStage(tree.GetTree("Stage", bVisible), bVisible);
-                RunTreeMemory(tree.GetTree("Memory", bVisible), bVisible); 
-                m_lightPower.RunTree(tree.GetTree("Light", bVisible), bVisible); 
+                RunTreeStage(tree.GetTree("Stage", true, bVisible), bVisible);
+                RunTreeMemory(tree.GetTree("Memory", true, bVisible), bVisible); 
+                m_lightPower.RunTree(tree.GetTree("Light", true, bVisible), bVisible); 
             }
 
             void RunTreeStage(Tree tree, bool bVisible)
@@ -147,6 +172,7 @@ namespace Root_Pine2_Vision.Module
             {
                 m_eEXT = (eEXT)tree.Set(m_eEXT, m_eEXT, "EXT", "Select EXT", bVisible);
                 m_cpMemory = tree.Set(m_cpMemory, m_cpMemory, "Offset", "Memory Offset Address (pixel)", bVisible);
+                m_nLine = tree.Set(m_nLine, m_nLine, "Line", "Memory Snap Lines", bVisible); 
                 m_nOverlap = tree.Set(m_nOverlap, m_nOverlap, "Overlap", "Memory Overlap Size (pixel)", bVisible);
             }
 
@@ -189,6 +215,38 @@ namespace Root_Pine2_Vision.Module
                 if (vision.p_id == sVisionWorks) return vision; 
             }
             return null; 
+        }
+        #endregion
+
+        #region RunSnap
+        public string StartSnap(SnapData snapData)
+        {
+            Run_Snap run = (Run_Snap)m_runSnap.Clone();
+            run.m_snapData = snapData;
+            return StartRun(run); 
+        }
+
+        public string RunSnap(SnapData snapData)
+        {
+            MemoryData memory = m_aWorks[snapData.m_eWorks].p_memSnap[(int)snapData.m_eEXT];
+            CPoint cpOffset = snapData.GetMemoryOffset();
+            GrabData grabData = snapData.GetGrabData();
+            try
+            {
+                m_camera.GrabLineScan(memory, cpOffset, snapData.m_nLine, grabData);
+                Thread.Sleep(200);
+                while (m_camera.p_CamInfo.p_eState != eCamState.Ready)
+                {
+                    Thread.Sleep(10);
+                    if (EQ.IsStop()) return "EQ Stop";
+                }
+            }
+            finally 
+            {
+                m_camera.StopGrab(); 
+                RunLightOff(); 
+            }
+            return "OK";
         }
         #endregion
 
@@ -238,7 +296,7 @@ namespace Root_Pine2_Vision.Module
         }
         #endregion
 
-        public eVision m_eVision = eVision.Top3D; 
+        public eVision m_eVision = eVision.Top2D; 
         public Vision(eVision eVision, IEngineer engineer, eRemote eRemote)
         {
             m_eVision = eVision;
@@ -264,7 +322,7 @@ namespace Root_Pine2_Vision.Module
         {
             StateHome,
             Reset,
-            LightCount
+            RunLight
         }
 
         Run_Remote GetRemoteRun(eRemoteRun eRemoteRun, eRemote eRemote, dynamic value)
@@ -276,6 +334,7 @@ namespace Root_Pine2_Vision.Module
             {
                 case eRemoteRun.StateHome: break;
                 case eRemoteRun.Reset: break;
+                case eRemoteRun.RunLight: run.m_lightPower = value; break; 
             }
             return run;
         }
@@ -317,6 +376,7 @@ namespace Root_Pine2_Vision.Module
                 m_eRemote = (eRemote)tree.Set(m_eRemote, m_eRemote, "Remote", "Remote", false);
                 switch (m_eRemoteRun)
                 {
+                    case eRemoteRun.RunLight: m_lightPower.RunTree(tree.GetTree("Light Power", bVisible), bVisible); break;
                     default: break; 
                 }
             }
@@ -327,6 +387,7 @@ namespace Root_Pine2_Vision.Module
                 {
                     case eRemoteRun.StateHome: return m_module.StateHome();
                     case eRemoteRun.Reset: m_module.Reset(); break;
+                    case eRemoteRun.RunLight: m_module.RunLight(m_lightPower); break; 
                 }
                 return "OK";
             }
@@ -334,10 +395,12 @@ namespace Root_Pine2_Vision.Module
         #endregion
 
         #region ModuleRun
+        ModuleRunBase m_runSnap; 
         protected override void InitModuleRuns()
         {
             AddModuleRunList(new Run_Remote(this), true, "Remote Run");
             AddModuleRunList(new Run_Delay(this), true, "Time Delay");
+            m_runSnap = AddModuleRunList(new Run_Snap(this), true, "Snap");
         }
 
         public class Run_Delay : ModuleRunBase
@@ -366,6 +429,35 @@ namespace Root_Pine2_Vision.Module
             {
                 Thread.Sleep((int)(1000 * m_secDelay / 2));
                 return "OK";
+            }
+        }
+
+        public class Run_Snap : ModuleRunBase
+        {
+            Vision m_module;
+            public Run_Snap(Vision module)
+            {
+                m_module = module;
+                m_snapData = new SnapData(module); 
+                InitModuleRun(module);
+            }
+
+            public SnapData m_snapData; 
+            public override ModuleRunBase Clone()
+            {
+                Run_Snap run = new Run_Snap(m_module);
+                run.m_snapData = m_snapData.Clone(); 
+                return run;
+            }
+
+            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
+            {
+                m_snapData.RunTree(tree, bVisible); 
+            }
+
+            public override string Run()
+            {
+                return m_module.RunSnap(m_snapData);
             }
         }
         #endregion

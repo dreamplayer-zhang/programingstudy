@@ -456,27 +456,6 @@ namespace RootTools.Gem.XGem
 
         private void M_xGem_OnGEMTerminalMessage(long nTid, string sMsg)
         {
-            //TODO : Terminal Message Parsing해서 Job Reserved 처리하기.
-            //Terminal Message 예시
-            /*
-            -----------TKIN PASS------------------
-            JOBID = PJ001
-            CSTID = tstatd
-            RECIPE = asdfasdf
-            SLOT = 111110000000000
-            -------------------------------------- =
-
-            ----------JOB RESERVED------------ -
-
-            ---------------------------------------
-            // if (Job Reserved가 있으면) m_ceidJobReserved.Send();
-
-            */
-            if (sMsg.Contains("Reserved") == true)
-            {
-                SetCEID(8211);
-            }
-
             LogRcv("OnGEMTerminalMessage", nTid, sMsg);
         }
 
@@ -762,11 +741,9 @@ namespace RootTools.Gem.XGem
 
         private void M_xGem_OnCMSCarrierDeleted(string sCarrierID)
         {
-            
             LogRcv("OnCMSCarrierDeleted", sCarrierID);
             foreach (GemCarrierBase carrier in m_aCarrier)
             {
-                if (carrier.p_ePresentSensor == GemCarrierBase.ePresent.Exist) return;
                 if (carrier.p_sCarrierID == sCarrierID)
                 {
                     p_sInfo = "eReqTransfer : " + carrier.p_eReqTransfer.ToString() + " -> " + GemCarrierBase.eTransfer.ReadyToLoad.ToString();
@@ -1199,7 +1176,10 @@ namespace RootTools.Gem.XGem
                 LogSend(nError, "Initialize", m_sPathConfig);
                 if (nError == 0) m_bStart = true;
             }
-            catch { p_sInfo = "Initialize File Open Error : " + m_sPathConfig; }
+            catch (Exception e)
+            {
+                p_sInfo = "XGem Config File Open Error : " + e.Message + "Path : " + m_sPathConfig;
+            }
         }
 
         public void DeleteAllJobInfo()

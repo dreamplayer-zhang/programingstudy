@@ -39,10 +39,10 @@ namespace Root_VEGA_P.Module
             //m_toolBox.Get(ref m_FFU, this, "FFU", ((AOP01_Engineer)m_engineer).m_dialogService);
 
             
-            //p_sInfo = m_toolBox.GetDIO(ref di_door_Machine, this, "Door Machine");
-            //p_sInfo = m_toolBox.GetDIO(ref di_door_AirTop, this, "Door Air Top");
-            //p_sInfo = m_toolBox.GetDIO(ref di_door_IO, this, "Door I/O");
-            //p_sInfo = m_toolBox.GetDIO(ref di_door_Elec, this, "Door Elec");
+            p_sInfo = m_toolBox.GetDIO(ref di_door_Machine, this, "Door Machine");
+            p_sInfo = m_toolBox.GetDIO(ref di_door_AirTop, this, "Door Air Top");
+            p_sInfo = m_toolBox.GetDIO(ref di_door_IO, this, "Door I/O");
+            p_sInfo = m_toolBox.GetDIO(ref di_door_Elec, this, "Door Elec");
 
             p_sInfo = m_flowSensor.GetTools(this);
 

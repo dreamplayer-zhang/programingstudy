@@ -367,33 +367,39 @@ namespace Root_Rinse_Unloader.Module
         public string MoveMagazine(bool bNext)
         {
             if (bNext) m_rinse.p_iMagazine++;
-            if (IsMagazineExist(m_rinse.p_eMagazine) == false)
-            {
-                if (Run(SetNextMagazine(m_rinse.p_eMagazine))) return p_sInfo;
-            }
+            if (Run(SetEnableMagazine())) return p_sInfo; 
+            return MoveMagazine(m_rinse.p_eMagazine, m_rinse.p_iMagazine, true);
+        }
+
+        string SetEnableMagazine()
+        {
             if (m_rinse.p_iMagazine >= 20)
             {
                 m_rinse.p_iMagazine = 0;
                 if (Run(SetNextMagazine(m_rinse.p_eMagazine))) return p_sInfo;
             }
-            return MoveMagazine(m_rinse.p_eMagazine, m_rinse.p_iMagazine, true);
+            if (IsMagazineExist(m_rinse.p_eMagazine)) return "OK";
+            {
+                SetNextMagazine(m_rinse.p_eMagazine);
+                return SetEnableMagazine();
+            }
         }
 
         string SetNextMagazine(eMagazine eMagazine)
         {
+            m_rinse.p_iMagazine = 0;
             switch (eMagazine)
             {
                 case eMagazine.Magazine1:
-                    m_alidMagazineFull.p_bSet = true; 
+                    m_alidMagazineFull.p_bSet = true;
                     m_rinse.RunBuzzer(RinseU.eBuzzer.Finish);
-                    EQ.p_eState = EQ.eState.Ready; 
+                    EQ.p_eState = EQ.eState.Ready;
                     return "Magazine Full";
                 case eMagazine.Magazine2: m_rinse.p_eMagazine = eMagazine.Magazine1; break;
                 case eMagazine.Magazine3: m_rinse.p_eMagazine = eMagazine.Magazine2; break;
                 case eMagazine.Magazine4: m_rinse.p_eMagazine = eMagazine.Magazine3; break;
             }
-            if (IsMagazineExist(m_rinse.p_eMagazine)) return "OK"; 
-            return SetNextMagazine(m_rinse.p_eMagazine); 
+            return "OK";
         }
 
         bool IsMagazineExist(eMagazine eMagazine)
