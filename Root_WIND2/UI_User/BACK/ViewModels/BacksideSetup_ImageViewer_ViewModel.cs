@@ -590,7 +590,6 @@ namespace Root_WIND2.UI_User
                     if (p_DrawElement.Contains(rt.UIElement) == true)
                     {
                         Rectangle rectangle = rt.UIElement as Rectangle;
-
                         CPoint canvasLeftTop = GetCanvasPoint(new CPoint(rt.MemoryRect.Left, rt.MemoryRect.Top));
                         CPoint canvasRightBottom = GetCanvasPoint(new CPoint(rt.MemoryRect.Right, rt.MemoryRect.Bottom));
 
@@ -981,21 +980,30 @@ namespace Root_WIND2.UI_User
 
                 List<CPoint> points = new List<CPoint>();
 
+                centerX = 300000 / 4 / 2;
+                centerY = 300000 / 4 / 2 + 2000;
+
+                int threshold = (int)centerX  + 2000;
+
                 for (int i = 0; i < circlePoints.Length; i++)
                 {
                     CPoint pt = new CPoint(circlePoints[i].x * DownSample, circlePoints[i].y * DownSample);
                     if (!PolygonController.HitTest(geometry, new Point(pt.X, pt.Y)))
                     {
+                        double radius = Math.Sqrt(Math.Pow(pt.X - centerX, 2) + Math.Pow(pt.Y - centerY, 2));
+                        if( radius < threshold)
                         points.Add(pt);
                     }
                 }
+
+
 
                 Point centerPt = Tools.FindCircleCenterByPoints(DataConverter.CPointListToPointList(points), (int)centerX, (int)centerY, 100);
 
                 this.SetSearchedCenter(new CPoint((int)centerPt.X, (int)centerPt.Y));
                 this.SetSearchedCirclePoints(points);
 
-                List<CRect> rectList = this.CalcDiePosition((int)centerPt.X, (int)centerPt.Y, true);
+                List<CRect> rectList = this.CalcDiePosition((int)centerPt.X, (int)centerPt.Y, false);
 
                 this.SetMapRectList(rectList);
             }

@@ -230,8 +230,8 @@ namespace Root_WIND2.UI_User
 
 			Application.Current.Dispatcher.Invoke(DispatcherPriority.Normal, new Action(delegate
 			{
-				DatabaseManager.Instance.SelectData();
-				dataViewerVM.pDataTable = DatabaseManager.Instance.pDefectTable;
+				//DatabaseManager.Instance.SelectData();
+				dataViewerVM.pDataTable = DatabaseManager.Instance.SelectCurrentInspectionDefect();
 
 				DrawRectDefect(ImageViewerTopVM, rectListTop, textListTop);
 				DrawRectDefect(imageViewerSideVM, rectListSide, textListSide);

@@ -214,7 +214,7 @@ namespace RootTools.Module
         {
             if (m_qModuleRemote.Count == 0) return false;
             ModuleRunBase moduleRun = m_qModuleRemote.Peek();
-            if (p_eRemote != eRemote.Client) return false;
+            if (moduleRun.m_eRemote == eRemote.Local && p_eRemote == eRemote.Local) return false;
             try
             {
                 m_swRun.Restart();
@@ -257,8 +257,10 @@ namespace RootTools.Module
                     p_bEnableHome = false;
                     p_sRun = "Stop";
                     string sStateHome = StateHome();
-                    if (sStateHome == "OK") p_eState = eState.Ready;
-                    else StopHome();
+                    if (sStateHome == "OK")
+                        p_eState = eState.Ready;
+                    else
+                        StopHome();
                     break;
                 case eState.Ready:
                     p_bEnableHome = true;
@@ -368,7 +370,7 @@ namespace RootTools.Module
         public List<string> m_asRecipe = new List<string>();
         /// <summary> m_aModuleRun : ModuleBase가 등록된 ModuleRun들의 List (for Clone) </summary>
         protected List<ModuleRunBase> m_aModuleRun = new List<ModuleRunBase>();
-        public ModuleRunBase AddModuleRunList(ModuleRunBase moduleRun, bool bRecipe, string sDesc)
+        protected ModuleRunBase AddModuleRunList(ModuleRunBase moduleRun, bool bRecipe, string sDesc)
         {
             m_aModuleRun.Add(moduleRun);
             m_asModuleRun.Add(moduleRun.m_sModuleRun);
@@ -409,8 +411,10 @@ namespace RootTools.Module
         public string StartRun(ModuleRunBase moduleRun)
         {
             if (EQ.IsStop()) return "EQ Stop";
-            if (((moduleRun.m_eRemote != eRemote.Local) && (moduleRun.m_eRemote == p_eRemote)) || p_eRemote == eRemote.Client) m_qModuleRemote.Enqueue(moduleRun); 
-            else m_qModuleRun.Enqueue(moduleRun);
+            if ((moduleRun.m_eRemote != eRemote.Local) && (moduleRun.m_eRemote == p_eRemote) || p_eRemote == eRemote.Client)
+                m_qModuleRemote.Enqueue(moduleRun);
+            else
+                m_qModuleRun.Enqueue(moduleRun);
             p_sInfo = "StartRun : " + moduleRun.m_sModuleRun;
             return "OK";
         }
@@ -432,6 +436,21 @@ namespace RootTools.Module
             m_log.Info("RemoteServer : " + moduleRun.p_id + " Done : " + (m_swRun.ElapsedMilliseconds / 1000.0).ToString("0.00 sec"));
             if (m_qModuleRun.Count > 0) m_qModuleRun.Dequeue();
             return true;
+        }
+
+        public virtual bool IsExistCarrier()
+        {
+            return false;
+        }
+
+        public virtual bool IsPlacement()
+        {
+            return false;
+        }
+
+        public virtual bool IsPresent()
+        {
+            return false;
         }
 
         StopWatch m_swRun = new StopWatch(); 
@@ -805,7 +824,6 @@ namespace RootTools.Module
             foreach (ModuleRunBase run in aModuleRun) run.RunTree(tree.GetTree(n++, run.p_id), true);
         }
         #endregion
-
         string _id = "";
         public string p_id
         {
