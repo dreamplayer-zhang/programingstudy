@@ -244,6 +244,7 @@ namespace RootTools.Camera.Dalsa
         {
             RunSetTree(treeRoot.GetTree("Connect Set"));
             RunImageRoiTree(treeRoot.GetTree("Buffer Image ROI", true, m_sapXfer != null));
+            RunCameraConfig(treeRoot.GetTree("Camera Config", true, m_sapXfer != null), m_sapXfer != null);
         }
 
         void RunSetTree(Tree tree)
@@ -269,6 +270,14 @@ namespace RootTools.Camera.Dalsa
             p_CamParam.p_Height = tree.Set(p_CamParam.p_Height, 100, "Image Height", "Buffer Image Height");
             p_CamParam.p_eDeviceScanType = (DalsaParameterSet.eDeviceScanType)tree.Set(p_CamParam.p_eDeviceScanType, p_CamParam.p_eDeviceScanType, "Device Scan Type", "Device Scan Type");
             p_CamParam.p_eTriggerMode = (DalsaParameterSet.eTriggerMode)tree.Set(p_CamParam.p_eTriggerMode, p_CamParam.p_eTriggerMode, "Trigger Mode", "Trigger Mode");
+        }
+
+        void RunCameraConfig(Tree tree, bool bVisible)
+        {
+            p_CamParam.p_eUserSetPowerup = (DalsaParameterSet.eUserSet)tree.Set(p_CamParam.p_eUserSetPowerup, p_CamParam.p_eUserSetPowerup, "Power-up UserSet", "Selects the UserSet Configuration Set on camera power-up or reset", bVisible);
+            p_CamParam.p_eUserSetCurrent = (DalsaParameterSet.eUserSet)tree.Set(p_CamParam.p_eUserSetCurrent, p_CamParam.p_eUserSetCurrent, "Current UserSet", "Selects and Current UserSet", bVisible);
+            p_CamParam.p_nRotaryEncoderMultiplier = tree.Set(p_CamParam.p_nRotaryEncoderMultiplier, p_CamParam.p_nRotaryEncoderMultiplier, "RotaryEncoderMultiplier", "Specifies a multiplication factor for the rotary encoder output pulse generator", bVisible);
+            p_CamParam.p_nRotaryEncoderDivider = tree.Set(p_CamParam.p_nRotaryEncoderDivider, p_CamParam.p_nRotaryEncoderDivider, "RotaryEncoderDivider", "Specifies a division factor for the rotary encoder output pulse generator", bVisible);
         }
 
         #endregion 
