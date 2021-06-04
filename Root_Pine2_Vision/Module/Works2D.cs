@@ -40,8 +40,8 @@ namespace Root_Pine2_Vision.Module
         void InitMemory()
         {
             m_memoryGroup = m_memoryPool.GetGroup("Pine2");
-            m_aMemory.Add(m_memoryExt[0] = m_memoryGroup.CreateMemory("EXT0", 1, 3, new CPoint(50000, 90000)));
-            m_aMemory.Add(m_memoryExt[1] = m_memoryGroup.CreateMemory("EXT1", 1, 3, new CPoint(50000, 90000)));
+            m_aMemory.Add(m_memoryExt[0] = m_memoryGroup.CreateMemory("EXT1", 1, 3, new CPoint(50000, 90000)));
+            m_aMemory.Add(m_memoryExt[1] = m_memoryGroup.CreateMemory("EXT2", 1, 3, new CPoint(50000, 90000)));
             m_aMemory.Add(m_memoryColor = m_memoryGroup.CreateMemory("Color", 1, 3, new CPoint(50000, 90000)));
             m_aMemory.Add(m_memoryRGB[0] = m_memoryGroup.CreateMemory("Red", 1, 1, new CPoint(50000, 90000)));
             m_aMemory.Add(m_memoryRGB[1] = m_memoryGroup.CreateMemory("Green", 1, 1, new CPoint(50000, 90000)));
@@ -224,6 +224,7 @@ namespace Root_Pine2_Vision.Module
                             Process process = Process.Start(m_sFileVisionWorks, p_id);
                             m_nProcessID = process.Id;
                         }
+                        else if(m_tcpip.p_bConnect == false) m_tcpip.Connect();
                     }
                     catch (Exception e) { m_vision.p_sInfo = p_id + " StartProcess Error : " + e.Message; }
                 }

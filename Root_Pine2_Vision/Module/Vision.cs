@@ -175,8 +175,8 @@ namespace Root_Pine2_Vision.Module
         }
         #endregion
 
-        #region SnapData
-        public class SnapData
+        #region Recipe
+        public class Recipe
         {
             public class Snap
             {
@@ -269,23 +269,23 @@ namespace Root_Pine2_Vision.Module
             }
             public eWorks m_eWorks = eWorks.A;
 
-            public SnapData Clone()
+            public Recipe Clone()
             {
-                SnapData snapData = new SnapData(m_vision);
-                snapData.m_eWorks = m_eWorks;
-                foreach (Snap snap in m_aSnap) snapData.m_aSnap.Add(snap.Clone());
-                return snapData; 
+                Recipe recipe = new Recipe(m_vision);
+                recipe.m_eWorks = m_eWorks;
+                foreach (Snap snap in m_aSnap) recipe.m_aSnap.Add(snap.Clone());
+                return recipe; 
             }
 
             public void RunTree(Tree tree, bool bVisible)
             {
                 m_eWorks = (eWorks)tree.Set(m_eWorks, m_eWorks, "Works", "Vision eWorks", bVisible);
-                p_lSnap = tree.Set(p_lSnap, p_lSnap, "Count", "SnapData Count");
+                p_lSnap = tree.Set(p_lSnap, p_lSnap, "Count", "Snap Count");
                 for (int n = 0; n < m_aSnap.Count; n++) m_aSnap[n].RunTree(tree.GetTree("Snap" + n.ToString("00"), true, bVisible), bVisible);
             }
 
             Vision m_vision; 
-            public SnapData(Vision vision)
+            public Recipe(Vision vision)
             {
                 m_vision = vision; 
             }
@@ -326,21 +326,21 @@ namespace Root_Pine2_Vision.Module
         #endregion
 
         #region RunSnap
-        public string StartSnap(SnapData.Snap snapData, eWorks eWorks, string sRecipe, int iSnap)
+        public string StartSnap(Recipe.Snap recipe, eWorks eWorks, string sRecipe, int iSnap)
         {
             Run_Snap run = (Run_Snap)m_runSnap.Clone();
             run.m_eWorks = eWorks; 
-            run.m_snapData = snapData;
+            run.m_recipe = recipe;
             run.m_sRecipe = sRecipe;
             run.m_iSnap = iSnap; 
             return StartRun(run); 
         }
 
-        public string RunSnap(SnapData.Snap snapData, eWorks eWorks, string sRecipe, int iSnap)
+        public string RunSnap(Recipe.Snap recipe, eWorks eWorks, string sRecipe, int iSnap)
         {
-            MemoryData memory = m_aWorks[eWorks].p_memSnap[(int)snapData.m_eEXT];
-            CPoint cpOffset = snapData.GetMemoryOffset();
-            GrabData grabData = snapData.GetGrabData(eWorks);
+            MemoryData memory = m_aWorks[eWorks].p_memSnap[(int)recipe.m_eEXT];
+            CPoint cpOffset = recipe.GetMemoryOffset();
+            GrabData grabData = recipe.GetGrabData(eWorks);
             try
             {
                 m_camera.GrabLineScan(memory, cpOffset, m_nLine, grabData);
@@ -410,10 +410,10 @@ namespace Root_Pine2_Vision.Module
         #endregion
 
         #region Vision_Snap_UI
-        Vision_Snap_UI m_ui;
+        Recipe_UI m_ui;
         void InitVision_Snap_UI()
         {
-            m_ui = new Vision_Snap_UI();
+            m_ui = new Recipe_UI();
             m_ui.Init(this);
             m_aTool.Add(m_ui);
         }
@@ -569,19 +569,19 @@ namespace Root_Pine2_Vision.Module
             public Run_Snap(Vision module)
             {
                 m_module = module;
-                m_snapData = new SnapData.Snap(module); 
+                m_recipe = new Recipe.Snap(module); 
                 InitModuleRun(module);
             }
 
             public eWorks m_eWorks = eWorks.A;
             public string m_sRecipe = "";
             public int m_iSnap = 0; 
-            public SnapData.Snap m_snapData; 
+            public Recipe.Snap m_recipe; 
             public override ModuleRunBase Clone()
             {
                 Run_Snap run = new Run_Snap(m_module);
                 run.m_eWorks = m_eWorks; 
-                run.m_snapData = m_snapData.Clone();
+                run.m_recipe = m_recipe.Clone();
                 run.m_sRecipe = m_sRecipe;
                 run.m_iSnap = m_iSnap; 
                 return run;
@@ -592,12 +592,12 @@ namespace Root_Pine2_Vision.Module
                 m_eWorks = (eWorks)tree.Set(m_eWorks, m_eWorks, "Works", "Vision eWorks", bVisible);
                 m_sRecipe = tree.Set(m_sRecipe, m_sRecipe, "Recipe", "Recipe", bVisible);
                 m_iSnap = tree.Set(m_iSnap, m_iSnap, "Snap Index", "Snap Index", bVisible); 
-                m_snapData.RunTree(tree, bVisible); 
+                m_recipe.RunTree(tree, bVisible); 
             }
 
             public override string Run()
             {
-                return m_module.RunSnap(m_snapData, m_eWorks, m_sRecipe, m_iSnap);
+                return m_module.RunSnap(m_recipe, m_eWorks, m_sRecipe, m_iSnap);
             }
         }
         #endregion

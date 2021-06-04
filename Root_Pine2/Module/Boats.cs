@@ -35,7 +35,7 @@ namespace Root_Pine2.Module
             return bWait ? m_axisCam.p_axisX.WaitReady() : "OK";
         }
 
-        public string RunMoveSnapStart(Vision.eWorks eWorks, Vision.SnapData.Snap snapData, bool bWait = true)
+        public string RunMoveSnapStart(Vision.eWorks eWorks, Vision.Recipe.Snap snapData, bool bWait = true)
         {
             m_axisCam.StartMove(eWorks, new RPoint(m_xCamScale * snapData.m_dpAxis.X, 0));
             if (Run(m_aBoat[eWorks].RunMoveSnapStart(snapData, bWait))) return p_sInfo;
@@ -123,20 +123,20 @@ namespace Root_Pine2.Module
         #endregion
 
         #region Snap
-        public string StartSnap(Vision.SnapData snapData)
+        public string StartSnap(Vision.Recipe snapData)
         {
             Run_Snap run = (Run_Snap)m_runSnap.Clone();
-            run.m_snapData = snapData;
+            run.m_recipe = snapData;
             return StartRun(run);
         }
 
-        public string RunSnap(Vision.SnapData snapData)
+        public string RunSnap(Vision.Recipe snapData)
         {
             StopWatch sw = new StopWatch();
             try
             {
                 int iSnap = 0; 
-                foreach (Vision.SnapData.Snap snap in snapData.m_aSnap)
+                foreach (Vision.Recipe.Snap snap in snapData.m_aSnap)
                 {
                     m_vision.RunLight(snap.m_lightPower);
                     if (Run(RunMoveSnapStart(snapData.m_eWorks, snap))) return p_sInfo;
@@ -209,26 +209,26 @@ namespace Root_Pine2.Module
             public Run_Snap(Boats module)
             {
                 m_module = module;
-                m_snapData = new Vision.SnapData(module.m_vision); 
+                m_recipe = new Vision.Recipe(module.m_vision); 
                 InitModuleRun(module);
             }
 
-            public Vision.SnapData m_snapData; 
+            public Vision.Recipe m_recipe; 
             public override ModuleRunBase Clone()
             {
                 Run_Snap run = new Run_Snap(m_module);
-                run.m_snapData = m_snapData.Clone();
+                run.m_recipe = m_recipe.Clone();
                 return run;
             }
 
             public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
             {
-                m_snapData.RunTree(tree, bVisible); 
+                m_recipe.RunTree(tree, bVisible); 
             }
 
             public override string Run()
             {
-                return m_module.RunSnap(m_snapData); 
+                return m_module.RunSnap(m_recipe); 
             }
         }
         #endregion
