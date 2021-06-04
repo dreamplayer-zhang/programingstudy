@@ -130,6 +130,7 @@ namespace RootTools.Module
                         {
                             ModuleRunBase moduleRun = m_qModuleRun.Peek();
                             p_iRun = p_maxRun - m_qModuleRun.Count;
+
                             moduleRun.StartRun();
                             Thread.Sleep(100);
                             while (moduleRun.m_moduleBase.m_qModuleRun.Count > 0) Thread.Sleep(10);
@@ -147,6 +148,9 @@ namespace RootTools.Module
                                 p_visibleRnR = Visibility.Visible;
                                 EQ.p_eState = EQ.eState.Ready;
                             }
+
+                          
+
                             if (m_qModuleRun.Count > 0)
                             {
                                 m_qModuleRun.Dequeue();
@@ -154,6 +158,13 @@ namespace RootTools.Module
                         }
                         if (m_qModuleRun.Count == 0)
                             p_iRun = p_maxRun - m_qModuleRun.Count;
+
+                        if (m_qModuleRun.Count != m_moduleRunList.p_aModuleRun.Count && m_qModuleRun.Count % m_moduleRunList.p_aModuleRun.Count == 0)
+                        {
+                            p_nTotalRnR++;
+                        }
+
+
 
                         break;
                     case EQ.eState.Error:
@@ -215,6 +226,8 @@ namespace RootTools.Module
             }
 
             p_maxRun = m_qModuleRun.Count;
+            p_nTotalRnR = 0;
+            p_nRnR = 1;
             EQ.p_eState = EQ.eState.Run;
         }
 
@@ -275,6 +288,18 @@ namespace RootTools.Module
             }
         }
 
+        int _nTotalRnR = 0;
+        public int p_nTotalRnR
+        {
+            get { return _nTotalRnR; }
+            set
+            {
+                if (_nTotalRnR == value) return;
+                _nTotalRnR = value;
+                p_Percent = ((double)_nTotalRnR / (double)p_nRnR * 100).ToString("F2");
+                OnPropertyChanged();
+            }
+        }
 
         int _maxRun = 1;
         public int p_maxRun
@@ -297,7 +322,7 @@ namespace RootTools.Module
             set 
             {
                 _iRun = value;
-                p_Percent = ((double)_iRun / (double)p_maxRun *100).ToString("F2");
+                //p_Percent = ((double)_iRun / (double)p_maxRun *100).ToString("F2");
                 if(p_sNowProgress != "STOP" && value == p_maxRun)
                     p_sNowProgress = "DONE";
                 
@@ -358,6 +383,7 @@ namespace RootTools.Module
                 foreach (ModuleRunBase moduleRun in m_moduleRunList.p_aModuleRun) m_qModuleRun.Enqueue(moduleRun);
             }
             p_maxRun = m_qModuleRun.Count;
+            p_nTotalRnR = 0;
             EQ.p_eState = EQ.eState.Run;
             return "OK"; 
         }

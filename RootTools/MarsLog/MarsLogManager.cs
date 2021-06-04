@@ -19,7 +19,7 @@ namespace RootTools
                     instance = new MarsLogManager();
                 }
                 return instance;
-            }
+            }   
             private set
             {
                 instance = value;
