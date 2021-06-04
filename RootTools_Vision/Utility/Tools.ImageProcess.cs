@@ -113,6 +113,8 @@ namespace RootTools_Vision
 				tempBitmap.Dispose();
 				tempBitmap = null;
 
+				filepath += ".jpg";
+
 				SaveImageJpg(saveBitmap, filepath, 30);
 				return true;
 			}
@@ -212,7 +214,9 @@ namespace RootTools_Vision
 				System.Drawing.Bitmap saveBitmap = new System.Drawing.Bitmap(tempBitmap);
 				tempBitmap.Dispose();
 				tempBitmap = null;
-				
+
+				filepath += ".jpg";
+
 				SaveImageJpg(saveBitmap, filepath, 30);
 				return true;
 			}

@@ -12,7 +12,6 @@ namespace Root_WIND2.UI_User
 	public class EdgesideSetupModule_ViewModel : ObservableObject
 	{
 		#region [Getter / Setter]
-
 		private OriginRecipe originRecipe;
 		public OriginRecipe OriginRecipe
 		{
@@ -52,43 +51,6 @@ namespace Root_WIND2.UI_User
 				SetProperty(ref processDefectParameter, value);
 			}
 		}
-
-		#region Scan Infomation
-
-		//private int cameraWidth;
-		//public int CameraWidth
-		//{
-		//	get => cameraWidth;
-		//	set => SetProperty(ref cameraWidth, value);
-		//}
-
-		//private int cameraHeight;
-		//public int CameraHeight
-		//{
-		//	get => cameraHeight;
-		//	set => SetProperty(ref cameraHeight, value);
-		//}
-
-		//private int imageHeight;
-		//public int ImageHeight
-		//{
-		//	get => imageHeight;
-		//	set => SetProperty(ref imageHeight, value);
-		//}
-
-		//private double resolution;
-		//public double Resolution
-		//{
-		//	get => resolution;
-		//	set => SetProperty(ref resolution, value);
-		//}
-
-		//private int positionOffset;
-		//public int PositionOffset
-		//{
-		//	get => positionOffset;
-		//	set => SetProperty(ref positionOffset, value);
-		//}
 
 		#region [Grab Mode]
 		public List<string> GrabModeList
@@ -140,7 +102,6 @@ namespace Root_WIND2.UI_User
 		}
 
 		private DataListView_ViewModel camInfoDataListVM;
-
 		public DataListView_ViewModel CamInfoDataListVM
 		{
 			get => this.camInfoDataListVM;
@@ -151,10 +112,7 @@ namespace Root_WIND2.UI_User
 		}
 		#endregion
 
-		#endregion
-
-		#region Origin Information
-
+		#region [Origin Information]
 		private int originX;
 		public int OriginX
 		{
@@ -200,9 +158,7 @@ namespace Root_WIND2.UI_User
 				SetProperty(ref originHeight, value);
 			}
 		}
-
 		#endregion
-
 		#endregion
 
 		public EdgesideSetupModule_ViewModel()
@@ -248,7 +204,7 @@ namespace Root_WIND2.UI_User
 			int endPosition = startPosition + (heightPerDegree * 360);                      // 검사 종료 위치
 
 			Parameter.StartPosition = startPosition;
-			Parameter.EndPosition = endPosition;			
+			Parameter.EndPosition = endPosition;
 		}
 
 		public void SetRecipeParameter(EdgeSurfaceRecipeBase recipe, EdgeSurfaceParameterBase param)
