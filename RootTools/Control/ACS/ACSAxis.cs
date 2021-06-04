@@ -142,24 +142,6 @@ namespace RootTools.Control.ACS
             if (p_bConnect == false) return "ACS not Connected";
             try
             {
-                int nMask = 0;
-                switch(m_nAxis)
-                {
-                    case 0: nMask = p_channel.ACSC_AXIS_0; break;
-                    case 2: nMask = p_channel.ACSC_AXIS_2; break;
-                    case 3: nMask = p_channel.ACSC_AXIS_3; break;
-                    case 4: nMask = p_channel.ACSC_AXIS_4; break;
-                    case 5: nMask = p_channel.ACSC_AXIS_5; break;
-                    default: return "Cannot find axis enum";
-                }
-
-                int nTemp = p_channel.ACSC_AXIS_2;
-
-                // 이벤트 설정
-                p_channel.SetInterruptMask(p_channel.ACSC_INTR_LOGICAL_MOTION_END, nMask);
-                p_channel.EnableEvent(p_channel.ACSC_INTR_LOGICAL_MOTION_END);
-                p_channel.LOGICALMOTIONEND += P_channel_MOVEEND;
-
                 p_channel.SetAccelerationImm(m_nAxis, m_speedNow.m_v / m_speedNow.m_acc);
                 p_channel.SetDecelerationImm(m_nAxis, m_speedNow.m_v / m_speedNow.m_dec);
                 p_channel.SetVelocityImm(m_nAxis, m_speedNow.m_v); 
@@ -187,24 +169,6 @@ namespace RootTools.Control.ACS
             if (p_bConnect == false) return "ACS not Connected";
             try
             {
-                int nMask = 0;
-                switch (m_nAxis)
-                {
-                    case 0: nMask = p_channel.ACSC_AXIS_0; break;
-                    case 2: nMask = p_channel.ACSC_AXIS_2; break;
-                    case 3: nMask = p_channel.ACSC_AXIS_3; break;
-                    case 4: nMask = p_channel.ACSC_AXIS_4; break;
-                    case 5: nMask = p_channel.ACSC_AXIS_5; break;
-                    default: return "Cannot find axis enum";
-                }
-
-                int nTemp = p_channel.ACSC_AXIS_2;
-
-                // 이벤트 설정
-                p_channel.SetInterruptMask(p_channel.ACSC_INTR_LOGICAL_MOTION_END, nMask);
-                p_channel.EnableEvent(p_channel.ACSC_INTR_LOGICAL_MOTION_END);
-                p_channel.LOGICALMOTIONEND += P_channel_MOVEEND;
-
                 p_channel.SetAccelerationImm(m_nAxis, v / acc);
                 p_channel.SetDecelerationImm(m_nAxis, v / dec);
                 p_channel.SetVelocityImm(m_nAxis, v);
@@ -222,14 +186,6 @@ namespace RootTools.Control.ACS
             return "OK";
         }
         #endregion
-        public override string WaitReady(double dInPos = -1)
-        {
-            p_channel.WaitMotionEnd(m_nAxis, -1);
-
-            p_eState = eState.Ready;
-
-            return base.WaitReady(dInPos);
-        }
 
         #region Shift
         public override string StartShift(double dfPos, string sSpeed = null)
@@ -241,11 +197,6 @@ namespace RootTools.Control.ACS
             if (p_bConnect == false) return "ACS not Connected";
             try
             {
-                // 이벤트 설정
-                p_channel.SetInterruptMask(p_channel.ACSC_INTR_LOGICAL_MOTION_END, m_nAxis);
-                p_channel.EnableEvent(p_channel.ACSC_INTR_LOGICAL_MOTION_END);
-                p_channel.LOGICALMOTIONEND += P_channel_MOVEEND;
-
                 p_channel.SetAccelerationImm(m_nAxis, m_speedNow.m_v / m_speedNow.m_acc);
                 p_channel.SetDecelerationImm(m_nAxis, m_speedNow.m_v / m_speedNow.m_dec);
                 p_channel.SetVelocityImm(m_nAxis, m_speedNow.m_v);
@@ -274,11 +225,6 @@ namespace RootTools.Control.ACS
             if (p_bConnect == false) return "ACS not Connected";
             try
             {
-                // 이벤트 설정
-                p_channel.SetInterruptMask(p_channel.ACSC_INTR_LOGICAL_MOTION_END, m_nAxis);
-                p_channel.EnableEvent(p_channel.ACSC_INTR_LOGICAL_MOTION_END);
-                p_channel.LOGICALMOTIONEND += P_channel_MOVEEND;
-
                 p_channel.SetAccelerationImm(m_nAxis, v / acc);
                 p_channel.SetDecelerationImm(m_nAxis, v / dec);
                 p_channel.SetVelocityImm(m_nAxis, v);
@@ -377,19 +323,6 @@ namespace RootTools.Control.ACS
                 // 로그
                 p_log.Info("Trigger Off");
             }
-        }
-        private void P_channel_MOVEEND(int Param)
-        {
-            //p_channel.SetInterruptMask(p_channel.ACSC_INTR_LOGICAL_MOTION_END, m_nAxis);
-            //p_channel.DisableEvent(p_channel.ACSC_INTR_LOGICAL_MOTION_END);
-            //p_channel.LOGICALMOTIONEND -= P_channel_MOVEEND;
-
-            // 로그
-            p_log.Info("Logical Move Off");
-
-            // Axis 상태 변경
-            p_eState = eState.Ready;
-            Thread.Sleep(100);
         }
         public void RunTreeSettingTrigger(Tree tree)
         {
@@ -513,7 +446,7 @@ namespace RootTools.Control.ACS
                 bool bMove = ((nMotor & p_channel.ACSC_MST_MOVE) != 0);
                 bool bInPos = ((nMotor & p_channel.ACSC_MST_INPOS) != 0);
                 p_sensorInPos = !bMove && bInPos;
-                int nLimit = (int)aLimit.GetValue(m_nAxis);
+                int nLimit = p_channel.GetFault(m_nAxis);
                 p_sensorMinusLimit = (nLimit & p_channel.ACSC_SAFETY_LL) != 0;
                 p_sensorPlusLimit = (nLimit & p_channel.ACSC_SAFETY_RL) != 0;
             }
