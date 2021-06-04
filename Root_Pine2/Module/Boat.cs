@@ -86,21 +86,21 @@ namespace Root_Pine2.Module
                 MemoryStream memoryStream = new MemoryStream(Encoding.ASCII.GetBytes(sSend));
                 m_treeRoot.m_job = new Job(memoryStream, false, m_boats.m_log);
                 m_treeRoot.p_eMode = Tree.eMode.JobOpen;
-                m_snapData.RunTree(m_treeRoot, true);
+                m_recipe.RunTree(m_treeRoot, true);
                 m_treeRoot.m_job.Close();
-                m_boats.StartSnap(m_snapData); 
+                m_boats.StartSnap(m_recipe); 
             }
 
             string p_id { get; set; }
             Boats m_boats;
             TreeRoot m_treeRoot;
-            Vision.SnapData m_snapData; 
+            Vision2D.Recipe m_recipe; 
             public RemoteSnap(string id, Boats boats)
             {
                 p_id = id; 
                 m_boats = boats;
                 m_treeRoot = new TreeRoot(id, boats.m_log);
-                m_snapData = new Vision.SnapData(boats.m_vision); 
+                m_recipe = new Vision2D.Recipe(boats.m_vision); 
             }
         }
         public RemoteSnap m_remoteSnap; 
@@ -132,7 +132,7 @@ namespace Root_Pine2.Module
         }
 
         double[] m_pSnap = new double[2] { 0, 0 }; 
-        void CalcSnapPos(Vision.SnapData.Snap snapData)
+        void CalcSnapPos(Vision2D.Recipe.Snap snapData)
         {
             double pStart = m_axis.GetPosValue(ePos.SnapStart) + m_yScale * snapData.m_dpAxis.Y;
             double pEnd = m_pSnap[0] + m_yScale * m_mmSnap;
@@ -141,11 +141,11 @@ namespace Root_Pine2.Module
             double dpAcc = m_yScale * m_mmAcc; 
             switch (snapData.m_eDirection)
             {
-                case Vision.SnapData.Snap.eDirection.Forward:
+                case Vision2D.Recipe.Snap.eDirection.Forward:
                     m_pSnap[0] = pStart - dpAcc;
                     m_pSnap[1] = pEnd + dpAcc;
                     break;
-                case Vision.SnapData.Snap.eDirection.Backward:
+                case Vision2D.Recipe.Snap.eDirection.Backward:
                     m_pSnap[0] = pEnd + dpAcc;
                     m_pSnap[1] = pStart - dpAcc;
                     break;
@@ -155,7 +155,7 @@ namespace Root_Pine2.Module
         double m_yScale = 10000;
         double m_mmSnap = 300;
         double m_mmAcc = 20;
-        public string RunMoveSnapStart(Vision.SnapData.Snap snapData, bool bWait = true)
+        public string RunMoveSnapStart(Vision2D.Recipe.Snap snapData, bool bWait = true)
         {
             CalcSnapPos(snapData);
             m_axis.StartMove(m_pSnap[0]);
@@ -225,14 +225,12 @@ namespace Root_Pine2.Module
         public InfoStrip p_infoStrip { get; set; }
         public string p_id { get; set; }
         Boats m_boats;
-        IWorks m_works;
-        public Boat(string id, Boats boats, IWorks works)
+        public Boat(string id, Boats boats)
         {
             m_bgwRunReady.DoWork += M_bgwRunReady_DoWork;
-            p_id = id + works.p_eWorks.ToString();
+            p_id = id;
             m_remoteSnap = new RemoteSnap(p_id, boats); 
             m_boats = boats;
-            m_works = works;
         }
     }
 }

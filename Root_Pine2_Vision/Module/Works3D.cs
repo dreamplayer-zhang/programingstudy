@@ -4,7 +4,7 @@ using RootTools.Trees;
 
 namespace Root_Pine2_Vision.Module
 {
-    public class Works3D : IWorks //forget
+    public class Works3D
     {
         public string p_id { get; set; }
 
@@ -36,8 +36,8 @@ namespace Root_Pine2_Vision.Module
         {
         }
 
-        public Vision.eWorks p_eWorks { get; set; }
-        public Works3D(Vision.eWorks eWorks, Vision vision)
+        public Vision2D.eWorks p_eWorks { get; set; }
+        public Works3D(Vision2D.eWorks eWorks, Vision2D vision)
         {
             p_eWorks = eWorks; 
         }

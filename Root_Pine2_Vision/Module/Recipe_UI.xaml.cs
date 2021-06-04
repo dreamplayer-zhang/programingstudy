@@ -9,19 +9,19 @@ namespace Root_Pine2_Vision.Module
     /// <summary>
     /// Vision_Snap_UI.xaml에 대한 상호 작용 논리
     /// </summary>
-    public partial class Vision_Snap_UI : UserControl, ITool
+    public partial class Recipe_UI : UserControl, ITool
     {
-        public Vision_Snap_UI()
+        public Recipe_UI()
         {
             InitializeComponent();
         }
 
-        Vision m_vision;
-        Vision.SnapData m_snapData;
-        public void Init(Vision vision)
+        Vision2D m_vision;
+        Vision2D.Recipe m_recipe;
+        public void Init(Vision2D vision)
         {
             m_vision = vision;
-            m_snapData = new Vision.SnapData(vision); 
+            m_recipe = new Vision2D.Recipe(vision); 
             DataContext = vision;
             InitTree();
         }
@@ -38,16 +38,16 @@ namespace Root_Pine2_Vision.Module
 
         private void M_treeRoot_UpdateTree()
         {
-            int lSnap = m_snapData.p_lSnap; 
+            int lSnap = m_recipe.p_lSnap; 
             RunTree(Tree.eMode.Update);
-            if (lSnap == m_snapData.p_lSnap) return; 
+            if (lSnap == m_recipe.p_lSnap) return; 
             RunTree(Tree.eMode.Init);
         }
 
         public void RunTree(Tree.eMode eMode)
         {
             m_treeRoot.p_eMode = eMode;
-            m_snapData.RunTree(m_treeRoot, true); 
+            m_recipe.RunTree(m_treeRoot, true); 
         }
         #endregion
 
@@ -63,7 +63,7 @@ namespace Root_Pine2_Vision.Module
             Job job = new Job(dlg.FileName, false, m_vision.m_log);
             m_treeRoot.m_job = job;
             m_treeRoot.p_eMode = Tree.eMode.JobOpen;
-            m_snapData.RunTree(m_treeRoot, true); 
+            m_recipe.RunTree(m_treeRoot, true); 
             job.Close();
             RunTree(Tree.eMode.Init); 
         }
@@ -79,7 +79,7 @@ namespace Root_Pine2_Vision.Module
             Job job = new Job(dlg.FileName, true, m_vision.m_log);
             m_treeRoot.m_job = job;
             m_treeRoot.p_eMode = Tree.eMode.JobSave;
-            m_snapData.RunTree(m_treeRoot, true);
+            m_recipe.RunTree(m_treeRoot, true);
             job.Close();
         }
 

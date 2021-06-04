@@ -81,7 +81,7 @@ namespace RootTools_Vision
 
 			// EBR 원형 이미지 저장
 			EBRRecipe recipeParam = this.recipe.GetItem<EBRRecipe>();
-			Tools.SaveCircleImage(@"D:\EBR Circle Image.bmp", settings_ebr.OutputImageSizeWidth, settings_ebr.OutputImageSizeHeight
+			Tools.SaveCircleImage(Path.Combine(settings_ebr.MeasureImagePath, sInspectionID, (realKlarfData.Count + 1).ToString()), settings_ebr.OutputImageSizeWidth, settings_ebr.OutputImageSizeHeight
 								  , this.currentWorkplace.SharedBufferInfo, recipeParam.FirstNotch, recipeParam.LastNotch);
 
 			#endregion
