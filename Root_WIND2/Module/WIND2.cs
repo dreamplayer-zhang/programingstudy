@@ -310,12 +310,13 @@ namespace Root_WIND2
                     str = di_Door_ElecBtm.m_id;
                 else if (!di_Door_ElecOptic.p_bIn)
                     str = di_Door_ElecOptic.m_id;
-                if (str != "")
+
+                if (str != "" && m_bThreadCheck)
                     GlobalObjects.Instance.Get<WIND2_Warning>().AddWarning(str + " Open Detect");
 
                 if (!di_ProtectionBar.p_bIn)
                     str = di_ProtectionBar.m_id;
-                if (str != "")
+                if (str != "" && m_bThreadCheck)
                     GlobalObjects.Instance.Get<WIND2_Warning>().AddWarning(str + " Up Dectect");
             }
         }
@@ -345,7 +346,8 @@ namespace Root_WIND2
                     str = di_Fan_4CH1.m_id;
                 else if (!di_Fan_4CH2.p_bIn)
                     str = di_Fan_4CH2.m_id;
-                if (str != "")
+
+                if (str != "" && m_bThreadCheck)
                     GlobalObjects.Instance.Get<WIND2_Warning>().AddWarning(str + " Fan Off Detect");
             }
         }
