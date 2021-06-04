@@ -225,14 +225,12 @@ namespace Root_Pine2.Module
         public InfoStrip p_infoStrip { get; set; }
         public string p_id { get; set; }
         Boats m_boats;
-        IWorks m_works;
-        public Boat(string id, Boats boats, IWorks works)
+        public Boat(string id, Boats boats)
         {
             m_bgwRunReady.DoWork += M_bgwRunReady_DoWork;
-            p_id = id + works.p_eWorks.ToString();
+            p_id = id;
             m_remoteSnap = new RemoteSnap(p_id, boats); 
             m_boats = boats;
-            m_works = works;
         }
     }
 }

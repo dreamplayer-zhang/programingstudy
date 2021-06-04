@@ -84,8 +84,8 @@ namespace Root_Pine2.Module
         public Dictionary<Vision2D.eWorks, Boat> m_aBoat = new Dictionary<Vision2D.eWorks, Boat>(); 
         void InitBoat()
         {
-            m_aBoat.Add(Vision2D.eWorks.A, new Boat(p_id, this, m_vision.m_aWorks[Vision2D.eWorks.A]));
-            m_aBoat.Add(Vision2D.eWorks.B, new Boat(p_id, this, m_vision.m_aWorks[Vision2D.eWorks.B]));
+            m_aBoat.Add(Vision2D.eWorks.A, new Boat(p_id + ".A", this));
+            m_aBoat.Add(Vision2D.eWorks.B, new Boat(p_id + ".B", this));
         }
         #endregion
 
