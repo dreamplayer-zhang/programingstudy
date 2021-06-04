@@ -134,6 +134,15 @@ namespace RootTools_Vision.Utility
         {
 			this.klarfData.Clear();
 
+			if (infoWafer == null)
+			{
+				this.cassetteID = "cassetteID";
+				this.lotID = "lotID";
+				this.recipeName = "recipeName";
+				this.waferID = "00";
+			}
+			else
+			{
 			this.cassetteID = infoWafer.p_sCarrierID;
 			this.lotID = infoWafer.p_sLotID;
 			this.recipeName = infoWafer.p_sRecipe;
@@ -151,6 +160,7 @@ namespace RootTools_Vision.Utility
 				this.deviceID = idArr[0];
 				this.partID = idArr[0];
 				this.stepID = idArr[1];
+			}
 			}
 
 			this.resX = grabMode.m_dRealResX_um;
@@ -204,11 +214,18 @@ namespace RootTools_Vision.Utility
 
 		public bool WaferStart(RecipeType_WaferMap mapdata, InfoWafer infoWafer)
         {
+
 			this.timeResult = DateTime.Now; 
 			this.timeRecipe = DateTime.Now;
 
+
+			if (infoWafer == null)
+				this.slotID = 0;
+			else
 			this.slotID = infoWafer.m_nSlot;
 
+
+			this.klarfFileName = this.klarfPath + "\\" + recipeName + "_" + waferID + "_" + lotID + "_" + cassetteID;
 			return true;
 		}
 
@@ -423,6 +440,8 @@ namespace RootTools_Vision.Utility
 
 			if (strFilePath == "") strFilePath = this.klarfPath;
 
+			SetResultTimeStamp();
+
 			timeFile = DateTime.Now;
 
 			if (!Directory.Exists(strFilePath))
@@ -470,16 +489,20 @@ namespace RootTools_Vision.Utility
 			if (strFilePath == "")
 				strFilePath = this.klarfPath;
 
-			timeFile = DateTime.Now;
-
-			FileStream fs = new FileStream(strFilePath, FileMode.Append, FileAccess.Write);
-			StreamWriter sw = new StreamWriter(fs, System.Text.Encoding.UTF8);
-
-			//m_sTemp = strFilePath + "\\LotEnd_" + m_sRecipeName + "_" + m_sWaferID;	// 기존
 			tempString = string.Format(strFilePath + "\\LotEnd_" + recipeName + "_" + cassetteID + "_" + "00-" + waferID);
 
 			tempString.Replace(".rcp", "");
 			tempString += ".trf";
+
+			SetResultTimeStamp();
+
+			timeFile = DateTime.Now;
+
+			FileStream fs = new FileStream(tempString, FileMode.Create, FileAccess.Write);
+			StreamWriter sw = new StreamWriter(fs, System.Text.Encoding.UTF8);
+
+			//m_sTemp = strFilePath + "\\LotEnd_" + m_sRecipeName + "_" + m_sWaferID;	// 기존
+
 
 			if (sw != null)
 			{

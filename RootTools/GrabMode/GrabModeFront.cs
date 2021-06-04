@@ -25,6 +25,7 @@ namespace RootTools
 
 		public double m_dTDIToVRSOffsetX = 0;
 		public double m_dTDIToVRSOffsetY = 0;
+		public double m_dTDIToVRSOffsetZ = 0;
 		public double m_dVRSFocusPos = 0;
 		
 		public bool m_bUseLADS = false;
@@ -59,6 +60,7 @@ namespace RootTools
 
 			dst.m_dTDIToVRSOffsetX = src.m_dTDIToVRSOffsetX;
 			dst.m_dTDIToVRSOffsetY = src.m_dTDIToVRSOffsetY;
+			dst.m_dTDIToVRSOffsetZ = src.m_dTDIToVRSOffsetZ;
 			dst.m_dVRSFocusPos = src.m_dVRSFocusPos;
 
 			dst.m_bUseLADS = src.m_bUseLADS;
@@ -85,6 +87,7 @@ namespace RootTools
 			m_ScanLineNum = tree.Set(m_ScanLineNum, m_ScanLineNum, "Scan Line Number", "Scan Line Number");
 			m_ScanStartLine = tree.Set(m_ScanStartLine, m_ScanStartLine, "Scan Start Line", "Scan Start Line");
 
+			m_GD.nUserSet = tree.Set(m_GD.nUserSet, m_GD.nUserSet, "UserSet", "UserSet 1~10", bVisible);
 			m_bUseBiDirectionScan = tree.Set(m_bUseBiDirectionScan, false, "Use BiDirectionScan", "Bi Direction Scan Use");
 			m_nReverseOffsetY = tree.Set(m_nReverseOffsetY, 800, "ReverseOffsetY", "Reverse Scan 동작시 Y 이미지 Offset 설정");
 
@@ -95,6 +98,7 @@ namespace RootTools
 		{
 			m_dTDIToVRSOffsetX = tree.Set(m_dTDIToVRSOffsetX, m_dTDIToVRSOffsetX, "TDI To VRS Offset X", "TDI To VRS Offset X");
 			m_dTDIToVRSOffsetY = tree.Set(m_dTDIToVRSOffsetY, m_dTDIToVRSOffsetY, "TDI To VRS Offset Y", "TDI To VRS Offset Y");
+			m_dTDIToVRSOffsetZ = tree.Set(m_dTDIToVRSOffsetZ, m_dTDIToVRSOffsetZ, "TDI To VRS Offset Z", "TDI To VRS Offset Z");
 			m_dVRSFocusPos = tree.Set(m_dVRSFocusPos, m_dVRSFocusPos, "VRS Focus Z", "VRS Focus Z", bVisible, true);
 		}
 
@@ -105,13 +109,18 @@ namespace RootTools
 
 		private void RunTreeLens(Tree tree, bool bVisible, bool bReadOnly)
 		{
-			//m_sLens = tree.Set(m_sLens, m_sLens, m_lens.p_asPos, "Lens Turret", "Turret", bVisible);
+			if (m_lens == null)
+				return;
+			m_sLens = tree.Set(m_sLens, m_sLens, m_lens.p_asPos, "Lens Turret", "Turret", bVisible);
 		}
 
 		public void SetLens()
 		{
 			if (m_lens != null)
 			{
+				m_lens.StartHome();
+				m_lens.WaitReady();
+				System.Threading.Thread.Sleep(2000);
 				m_lens.ChangePos(m_sLens);
 				m_lens.WaitReady();
 			}

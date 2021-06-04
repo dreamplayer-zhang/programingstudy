@@ -224,6 +224,7 @@ namespace Root_Pine2_Vision.Module
                             Process process = Process.Start(m_sFileVisionWorks, p_id);
                             m_nProcessID = process.Id;
                         }
+                        else if(m_tcpip.p_bConnect == false) m_tcpip.Connect();
                     }
                     catch (Exception e) { m_vision.p_sInfo = p_id + " StartProcess Error : " + e.Message; }
                 }

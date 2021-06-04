@@ -43,11 +43,8 @@ namespace Root_EFEM
             {
                 if (p_infoWafer == null) return;
                 if (IsWaferExist() == false)
-                {
-                    m_child.SetAlarm();
                     p_infoWafer = null;
                 }
-            }
 
             bool IsWaferExist()
             {
@@ -181,6 +178,43 @@ namespace Root_EFEM
         List<InfoWafer> m_aCalcWafer = new List<InfoWafer>();
         /// <summary> RunThread에서 실행 될 ModuleRun List (from Handler when EQ.p_eState == Run) </summary>
         public Queue<Sequence> m_qSequence = new Queue<Sequence>();
+        public Queue<Sequence> m_qRNRSequence = new Queue<Sequence>();
+
+        public void MakeRnRSeq()
+        {
+            Queue<Sequence> aSequence = new Queue<Sequence>();
+            ModuleRunBase runUndocking = m_aLoadport[0].GetModuleRunDocking().Clone();
+            EFEM_Process.Sequence sequenceUndock = new EFEM_Process.Sequence(runUndocking, null);
+            m_qRNRSequence.Enqueue(sequenceUndock);
+            //    m_qRNRSequence.Enqueue();
+            while (m_qSequence.Count > 0)
+            {
+                Sequence seq = m_qSequence.Dequeue();
+                aSequence.Enqueue(seq);
+                m_qRNRSequence.Enqueue(seq);
+            }
+            while (aSequence.Count>0)
+            {
+                m_qSequence.Enqueue(aSequence.Dequeue());
+            }
+        }
+
+        public void CopyRNRSeq()
+        {
+            Queue<Sequence> aSequence = new Queue<Sequence>();
+
+            while (m_qRNRSequence.Count > 0)
+            {
+                Sequence seq = m_qRNRSequence.Dequeue();
+                aSequence.Enqueue(seq);
+                m_qSequence.Enqueue(seq);
+            }
+            while (aSequence.Count > 0)
+            {
+                m_qRNRSequence.Enqueue(aSequence.Dequeue());
+            }
+        }
+    
 
         public string ReCalcSequence()
         {
@@ -407,7 +441,7 @@ namespace Root_EFEM
                 Thread.Sleep(100);
                 foreach(ILoadport loadport in m_aLoadport)
                 {
-                    if (loadport.p_id == sequence.m_infoWafer.m_sModule)
+                    if (sequence.m_infoWafer == null || loadport.p_id == sequence.m_infoWafer.m_sModule )
                     {
                         ModuleBase lp = (ModuleBase)loadport;
                         while (lp.p_eState != ModuleBase.eState.Ready && (EQ.IsStop() == false)) Thread.Sleep(10);
@@ -424,7 +458,8 @@ namespace Root_EFEM
             else sequence.m_moduleRun.StartRun();
             m_qSequence.Dequeue();
             InfoWafer infoWafer = sequence.m_infoWafer;
-            if (infoWafer.m_qProcess.Count > 0) infoWafer.m_qProcess.Dequeue();
+            if (infoWafer != null && infoWafer.m_qProcess.Count > 0) 
+                infoWafer.m_qProcess.Dequeue();
             if (m_qSequence.Count == 0) ClearInfoWafer();
             RunTree(Tree.eMode.Init);
             return "OK";
@@ -500,6 +535,8 @@ namespace Root_EFEM
                 ModuleRunBase moduleRun = aSequence[n].m_moduleRun;
                 ModuleBase module = moduleRun.m_moduleBase;
                 InfoWafer infoWafer = aSequence[n].m_infoWafer;
+                if (infoWafer != null)
+                {
                 string sTree = "(" + infoWafer.p_id.Replace("Loadport", "") + ")." + moduleRun.p_id;
                 switch (moduleRun.m_sModuleRun)
                 {
@@ -508,6 +545,7 @@ namespace Root_EFEM
                 }
                 moduleRun.RunTree(tree.GetTree(n, sTree, false), true);
             }
+        }
         }
         #endregion
 

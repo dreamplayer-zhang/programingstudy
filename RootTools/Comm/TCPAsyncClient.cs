@@ -93,6 +93,7 @@ namespace RootTools.Comm
         {
             try
             {
+                if (p_bUse == false) return; 
                 if (m_socket == null) return; 
                 m_socket.Connect(p_sIP, p_nPort);
                 Async async = new Async(m_lMaxBuffer);

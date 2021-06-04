@@ -329,8 +329,8 @@ namespace Root_WIND2.UI_User
 
             Application.Current.Dispatcher.Invoke(DispatcherPriority.Normal, new Action(delegate
             {
-                DatabaseManager.Instance.SelectData();
-                m_DataViewer_VM.pDataTable = DatabaseManager.Instance.pDefectTable;
+                //DatabaseManager.Instance.SelectData();
+                m_DataViewer_VM.pDataTable = DatabaseManager.Instance.SelectCurrentInspectionDefect();
             }));
         }
 
