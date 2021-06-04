@@ -94,13 +94,13 @@ namespace Root_Pine2.Module
             string p_id { get; set; }
             Boats m_boats;
             TreeRoot m_treeRoot;
-            Vision.Recipe m_recipe; 
+            Vision2D.Recipe m_recipe; 
             public RemoteSnap(string id, Boats boats)
             {
                 p_id = id; 
                 m_boats = boats;
                 m_treeRoot = new TreeRoot(id, boats.m_log);
-                m_recipe = new Vision.Recipe(boats.m_vision); 
+                m_recipe = new Vision2D.Recipe(boats.m_vision); 
             }
         }
         public RemoteSnap m_remoteSnap; 
@@ -132,7 +132,7 @@ namespace Root_Pine2.Module
         }
 
         double[] m_pSnap = new double[2] { 0, 0 }; 
-        void CalcSnapPos(Vision.Recipe.Snap snapData)
+        void CalcSnapPos(Vision2D.Recipe.Snap snapData)
         {
             double pStart = m_axis.GetPosValue(ePos.SnapStart) + m_yScale * snapData.m_dpAxis.Y;
             double pEnd = m_pSnap[0] + m_yScale * m_mmSnap;
@@ -141,11 +141,11 @@ namespace Root_Pine2.Module
             double dpAcc = m_yScale * m_mmAcc; 
             switch (snapData.m_eDirection)
             {
-                case Vision.Recipe.Snap.eDirection.Forward:
+                case Vision2D.Recipe.Snap.eDirection.Forward:
                     m_pSnap[0] = pStart - dpAcc;
                     m_pSnap[1] = pEnd + dpAcc;
                     break;
-                case Vision.Recipe.Snap.eDirection.Backward:
+                case Vision2D.Recipe.Snap.eDirection.Backward:
                     m_pSnap[0] = pEnd + dpAcc;
                     m_pSnap[1] = pStart - dpAcc;
                     break;
@@ -155,7 +155,7 @@ namespace Root_Pine2.Module
         double m_yScale = 10000;
         double m_mmSnap = 300;
         double m_mmAcc = 20;
-        public string RunMoveSnapStart(Vision.Recipe.Snap snapData, bool bWait = true)
+        public string RunMoveSnapStart(Vision2D.Recipe.Snap snapData, bool bWait = true)
         {
             CalcSnapPos(snapData);
             m_axis.StartMove(m_pSnap[0]);

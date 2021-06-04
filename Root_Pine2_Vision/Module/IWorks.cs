@@ -8,7 +8,7 @@ namespace Root_Pine2_Vision.Module
     {
         string p_id { get; set; }
 
-        Vision.eWorks p_eWorks { get; set; }
+        Vision2D.eWorks p_eWorks { get; set; }
 
         void ThreadStop(); 
 

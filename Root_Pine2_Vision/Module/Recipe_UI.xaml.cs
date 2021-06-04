@@ -16,12 +16,12 @@ namespace Root_Pine2_Vision.Module
             InitializeComponent();
         }
 
-        Vision m_vision;
-        Vision.Recipe m_recipe;
-        public void Init(Vision vision)
+        Vision2D m_vision;
+        Vision2D.Recipe m_recipe;
+        public void Init(Vision2D vision)
         {
             m_vision = vision;
-            m_recipe = new Vision.Recipe(vision); 
+            m_recipe = new Vision2D.Recipe(vision); 
             DataContext = vision;
             InitTree();
         }

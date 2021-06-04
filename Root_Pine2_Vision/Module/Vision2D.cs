@@ -10,7 +10,7 @@ using System.Threading;
 
 namespace Root_Pine2_Vision.Module
 {
-    public class Vision : ModuleBase
+    public class Vision2D : ModuleBase
     {
         public enum eVision
         {
@@ -56,8 +56,8 @@ namespace Root_Pine2_Vision.Module
                 }
             }
 
-            Vision m_vision;
-            public LightPower(Vision vision)
+            Vision2D m_vision;
+            public LightPower(Vision2D vision)
             {
                 m_vision = vision;
             }
@@ -248,8 +248,8 @@ namespace Root_Pine2_Vision.Module
                     m_nOverlap = tree.Set(m_nOverlap, m_nOverlap, "Overlap", "Memory Overlap Size (pixel)", bVisible);
                 }
 
-                Vision m_vision;
-                public Snap(Vision vision)
+                Vision2D m_vision;
+                public Snap(Vision2D vision)
                 {
                     m_vision = vision;
                     m_lightPower = new LightPower(vision);
@@ -284,8 +284,8 @@ namespace Root_Pine2_Vision.Module
                 for (int n = 0; n < m_aSnap.Count; n++) m_aSnap[n].RunTree(tree.GetTree("Snap" + n.ToString("00"), true, bVisible), bVisible);
             }
 
-            Vision m_vision; 
-            public Recipe(Vision vision)
+            Vision2D m_vision; 
+            public Recipe(Vision2D vision)
             {
                 m_vision = vision; 
             }
@@ -420,14 +420,14 @@ namespace Root_Pine2_Vision.Module
         #endregion
 
         public eVision m_eVision = eVision.Top2D; 
-        public Vision(eVision eVision, IEngineer engineer, eRemote eRemote)
+        public Vision2D(eVision eVision, IEngineer engineer, eRemote eRemote)
         {
             m_eVision = eVision;
             InitVisionWorks();
             InitBase("Vision " + eVision.ToString(), engineer, eRemote);
         }
 
-        public Vision(string id, IEngineer engineer, eRemote eRemote)
+        public Vision2D(string id, IEngineer engineer, eRemote eRemote)
         {
             InitGrabData();
             InitVisionWorks();
@@ -479,8 +479,8 @@ namespace Root_Pine2_Vision.Module
 
         public class Run_Remote : ModuleRunBase
         {
-            Vision m_module;
-            public Run_Remote(Vision module)
+            Vision2D m_module;
+            public Run_Remote(Vision2D module)
             {
                 m_module = module;
                 m_lightPower = new LightPower(m_module); 
@@ -536,8 +536,8 @@ namespace Root_Pine2_Vision.Module
 
         public class Run_Delay : ModuleRunBase
         {
-            Vision m_module;
-            public Run_Delay(Vision module)
+            Vision2D m_module;
+            public Run_Delay(Vision2D module)
             {
                 m_module = module;
                 InitModuleRun(module);
@@ -565,8 +565,8 @@ namespace Root_Pine2_Vision.Module
 
         public class Run_Snap : ModuleRunBase
         {
-            Vision m_module;
-            public Run_Snap(Vision module)
+            Vision2D m_module;
+            public Run_Snap(Vision2D module)
             {
                 m_module = module;
                 m_recipe = new Recipe.Snap(module); 
