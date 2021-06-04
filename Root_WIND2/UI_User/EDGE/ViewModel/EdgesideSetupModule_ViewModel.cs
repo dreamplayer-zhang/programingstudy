@@ -2,6 +2,7 @@
 using RootTools_Vision;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -224,10 +225,11 @@ namespace Root_WIND2.UI_User
 		/// </summary>
 		private void SetOriginInfo()
 		{
-			GrabModeEdge mode = ((WIND2_Handler)GlobalObjects.Instance.Get<WIND2_Engineer>().ClassHandler()).p_EdgeSideVision.m_aGrabMode[Recipe.GrabModeIndex];
-
-			if (mode == null)
+			ObservableCollection<GrabModeEdge> modeList = ((WIND2_Handler)GlobalObjects.Instance.Get<WIND2_Engineer>().ClassHandler()).p_EdgeSideVision.m_aGrabMode;
+			if (modeList.Count == 0)
 				return;
+
+			GrabModeEdge mode = modeList[Recipe.GrabModeIndex];
 
 			int imageHeight = mode.m_nImageHeight;  // 전체 이미지 Height
 			OriginRecipe.OriginX = 0;

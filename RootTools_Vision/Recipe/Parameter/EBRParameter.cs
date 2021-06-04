@@ -15,29 +15,29 @@ namespace RootTools_Vision
 		}
 
 		#region [Parameter]
-		private int roiWidth;
-		private int roiHeight;
+		// roi
+		private int roiHeight = 500;
+		//private double stepDegree = 10;
 		private int notchY;
-		private double stepDegree;
-		private int xRange;
+
+		// option
+		private int measureCount = 30;
+		private double notchOffsetDegree = 5;
+		private int xRange = 20;
+
+		// diff GV
 		private int diffEdge;
 		private int diffBevel;
 		private int diffEBR;
+
+		// 
 		private int offsetBevel;
 		private int offsetEBR;
 		#endregion
 
 		#region [Getter/Setter]
-		[Category("Parameter")]
-		public int ROIWidth
-		{
-			get => this.roiWidth;
-			set
-			{
-				SetProperty(ref this.roiWidth, value);
-			}
-		}
-		[Category("Parameter")]
+		[Category("ROI")]
+		[DisplayName("Height")]
 		public int ROIHeight
 		{
 			get => this.roiHeight;
@@ -46,7 +46,19 @@ namespace RootTools_Vision
 				SetProperty(ref this.roiHeight, value);
 			}
 		}
-		[Category("Parameter")]
+		//[Category("ROI")]
+		//[DisplayName("Step Degree")]
+		//public double StepDegree
+		//{
+		//	get => this.stepDegree;
+		//	set
+		//	{
+		//		SetProperty(ref this.stepDegree, value);
+		//	}
+		//}
+		[Browsable(false)]
+		[Category("ROI")]
+		[DisplayName("Notch")]
 		public int NotchY
 		{
 			get => this.notchY;
@@ -55,16 +67,29 @@ namespace RootTools_Vision
 				SetProperty(ref this.notchY, value);
 			}
 		}
-		[Category("Parameter")]
-		public double StepDegree
+
+		[Category("Option")]
+		[DisplayName("Measurement Count")]
+		public int MeasureCount
 		{
-			get => this.stepDegree;
+			get => this.measureCount;
 			set
 			{
-				SetProperty(ref this.stepDegree, value);
+				SetProperty(ref this.measureCount, value);
 			}
 		}
-		[Category("Parameter")]
+		[Category("Option")]
+		[DisplayName("Notch Offset Degree")]
+		public double NotchOffsetDegree
+		{
+			get => this.notchOffsetDegree;
+			set
+			{
+				SetProperty(ref this.notchOffsetDegree, value);
+			}
+		}
+		[Category("Option")]
+		[DisplayName("X Range")]
 		public int XRange
 		{
 			get => this.xRange;
@@ -73,7 +98,9 @@ namespace RootTools_Vision
 				SetProperty(ref this.xRange, value);
 			}
 		}
-		[Category("Parameter")]
+
+		[Category("Difference GV")]
+		[DisplayName("1. Wafer Edge")]
 		public int DiffEdge
 		{
 			get => this.diffEdge;
@@ -82,7 +109,8 @@ namespace RootTools_Vision
 				SetProperty(ref this.diffEdge, value);
 			}
 		}
-		[Category("Parameter")]
+		[Category("Difference GV")]
+		[DisplayName("2. Edge-Bevel")]
 		public int DiffBevel
 		{
 			get => this.diffBevel;
@@ -91,7 +119,8 @@ namespace RootTools_Vision
 				SetProperty(ref this.diffBevel, value);
 			}
 		}
-		[Category("Parameter")]
+		[Category("Difference GV")]
+		[DisplayName("3. Bevel-EBR")]
 		public int DiffEBR
 		{
 			get => this.diffEBR;
@@ -100,7 +129,9 @@ namespace RootTools_Vision
 				SetProperty(ref this.diffEBR, value);
 			}
 		}
-		[Category("Parameter")]
+
+		[Category("Offset")]
+		[DisplayName("1. Edge-Bevel")]
 		public int OffsetBevel
 		{
 			get => this.offsetBevel;
@@ -109,7 +140,8 @@ namespace RootTools_Vision
 				SetProperty(ref this.offsetBevel, value);
 			}
 		}
-		[Category("Parameter")]
+		[Category("Offset")]
+		[DisplayName("2. Bevel-EBR")]
 		public int OffsetEBR
 		{
 			get => this.offsetEBR;

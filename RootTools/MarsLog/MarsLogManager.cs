@@ -26,24 +26,15 @@ namespace RootTools
             }
         }
 
-
-        int m_dataCnt = 0;
-        int m_materialDataCnt = 0;
-
         public bool m_useLog = false;
         SSLoggerNet m_sSLoggerNet { get; set; } = null;
-        DataFormatter m_dataFormatter { get; set; } = null;
-        MaterialFormatter m_materialFormatter { get; set; } = null;
+
         MarsLogManager()
         {
             m_sSLoggerNet = new SSLoggerNet();
-            m_dataFormatter = new DataFormatter();
-            m_materialFormatter = new MaterialFormatter();
-            //m_sSLoggerNet.WritePRCLog(,);
-            //m_dataFormatter.AddData(,);
         }
 
-        public void WritePRC(int port, string device, PRC_EVENTID eventID, STATUS status, string stepName, int stepNum, string materialID = null)
+        public void WritePRC(int port, string device, PRC_EVENTID eventID, STATUS status, string stepName, int stepNum, DataFormatter dataFormatter = null, string materialID = null)
         {
             if (!m_useLog)
                 return;
@@ -52,17 +43,19 @@ namespace RootTools
             if (materialID != null)
                 isExist = true;
 
-            if (m_dataCnt > 0 && isExist)
-                m_sSLoggerNet.WritePRCLog(port, device, eventID, status, stepName, stepNum, m_dataFormatter);
-            else if (m_dataCnt > 0 && !isExist)
-                m_sSLoggerNet.WritePRCLog(port, device, eventID, status, stepName, stepNum, m_dataFormatter, materialID);
-            else if (m_dataCnt == 0 && isExist)
+            bool isDataExist = CheckDataExist(dataFormatter);
+
+            if (isDataExist && isExist)
+                m_sSLoggerNet.WritePRCLog(port, device, eventID, status, stepName, stepNum, dataFormatter);
+            else if (isDataExist && !isExist)
+                m_sSLoggerNet.WritePRCLog(port, device, eventID, status, stepName, stepNum, dataFormatter, materialID);
+            else if (isDataExist && isExist)
                 m_sSLoggerNet.WritePRCLog(port, device, eventID, status, stepName, stepNum, materialID);
             else
                 m_sSLoggerNet.WritePRCLog(port, device, eventID, status, stepName, stepNum);
         }
 
-        public void WriteFNC(int port, string device, string eventID, STATUS status, MATERIAL_TYPE? type = null)
+        public void WriteFNC(int port, string device, string eventID, STATUS status, DataFormatter dataFormatter = null, MATERIAL_TYPE? type = null)
         {
             if (!m_useLog)
                 return;
@@ -70,126 +63,201 @@ namespace RootTools
             bool isExist = false;
             if (type != null)
                 isExist = true;
-            if (m_dataCnt > 0 && isExist)
-                m_sSLoggerNet.WriteFNCLog(port, device, eventID, status, m_dataFormatter, (MATERIAL_TYPE)type);
-            else if (m_dataCnt > 0 && !isExist)
-                m_sSLoggerNet.WriteFNCLog(port, device, eventID, status, m_dataFormatter);
-            else if (m_dataCnt == 0 && isExist)
+
+            bool isDataExist = CheckDataExist(dataFormatter);
+
+            if (isDataExist && isExist)
+                m_sSLoggerNet.WriteFNCLog(port, device, eventID, status, dataFormatter, (MATERIAL_TYPE)type);
+            else if (isDataExist && !isExist)
+                m_sSLoggerNet.WriteFNCLog(port, device, eventID, status, dataFormatter);
+            else if (isDataExist && isExist)
                 m_sSLoggerNet.WriteFNCLog(port, device, eventID, status, (MATERIAL_TYPE)type);
             else
                 m_sSLoggerNet.WriteFNCLog(port, device, eventID, status);
         }
 
-        public void WriteXFR(string device, XFR_EVENTID eventID, STATUS stauts)
+        public void WriteXFR(string device, XFR_EVENTID eventID, STATUS stauts, FlowData fromDevice, FlowData fromSlot, FlowData toDevice, FlowData toSlot, DataFormatter dataFormatter = null, MaterialFormatter materialFormatter = null)
         {
             if (!m_useLog)
                 return;
-            //m_sSLoggerNet.WriteXFRLog(,);
-        }
 
-        public void WriteLEH()
-        {
-            if (!m_useLog)
-                return;
-        }
+            bool isDataExist = CheckDataExist(dataFormatter);
 
-        public void WriteCFG()
-        {
-            if (!m_useLog)
-                return;
-        }
+            bool isMaterialDataExist = CheckMaterialDataExist(materialFormatter);
 
-        public void ClearData()
-        {
-            if (!m_useLog)
-                return;
-            m_dataFormatter.ClearData();
-            m_dataCnt = 0;
-        }
-
-        public void ClearMaterialData()
-        {
-            if (!m_useLog)
-                return;
-            m_materialFormatter.ClearData();
-            m_materialDataCnt = 0;
-        }
-
-        //object GetTypeValue<T>(T value)
-        //{
-        //    var type = value.GetType();
-
-        //    if (type == typeof(int))
-        //    {
-        //        return 
-        //    }
-        //    else if (type == typeof(double) || type == typeof(long))
-        //    {
-
-        //    }
-        //    else if (type == typeof(string))
-        //    { 
-
-        //    }
-        //}
-
-        public void AddData(string key, dynamic value, string unit = null)
-        {
-            if(value.GetType() == typeof(bool))
-            {
-                value = value.ToString();
-            }
-            if (unit != null)
-                m_dataFormatter.AddData(key, value, unit);
+            if (isDataExist && isMaterialDataExist)
+                m_sSLoggerNet.WriteXFRLog(device, eventID, stauts, fromDevice, fromSlot, toDevice, toSlot, dataFormatter, materialFormatter);
+            else if (isDataExist && !isMaterialDataExist)
+                m_sSLoggerNet.WriteXFRLog(device, eventID, stauts, fromDevice, fromSlot, toDevice, toSlot, dataFormatter);
+            else if (!isDataExist && isMaterialDataExist)
+                m_sSLoggerNet.WriteXFRLog(device, eventID, stauts, fromDevice, fromSlot, toDevice, toSlot, materialFormatter);
             else
-                m_dataFormatter.AddData(key, value);
-
-            m_dataCnt++;
+                m_sSLoggerNet.WriteXFRLog(device, eventID, stauts, fromDevice, fromSlot, toDevice, toSlot);
         }
 
-        //public void AddData(string key, int value, string unit = null)
-        //{
-        //    if (unit != null)
-        //        m_dataFormatter.AddData(key, value, unit);
-        //    else
-        //        m_dataFormatter.AddData(key, value);
-
-        //    m_dataCnt++;
-        //}
-
-        //public void AddData(string key, double value, string unit = null)
-        //{
-        //    if (unit != null)
-        //        m_dataFormatter.AddData(key, value, unit);
-        //    else
-        //        m_dataFormatter.AddData(key, value);
-
-        //    m_dataCnt++;
-        //}
-
-        //public void AddData(string key, string value, string unit = null)
-        //{
-        //    if (unit != null)
-        //        m_dataFormatter.AddData(key, value, unit);
-        //    else
-        //        m_dataFormatter.AddData(key, value);
-
-        //    m_dataCnt++;
-        //}
-
-        public void AddMaterialData(string lot, int slot)
+        public void WriteLEH(int port, string device, LEH_EVENTID eventID, FlowData flowInfo, DataFormatter dataFormatter = null)
         {
-            m_materialFormatter.AddMaterial(lot, slot);
+            if (!m_useLog)
+                return;
 
-            m_materialDataCnt++;
+            bool isDataExist = CheckDataExist(dataFormatter);
+
+            if (isDataExist)
+                m_sSLoggerNet.WriteLEHLog(port, device, eventID, flowInfo, dataFormatter);
+            else
+                m_sSLoggerNet.WriteLEHLog(port, device, eventID, flowInfo);
         }
 
-        public void AddTwoMaterialData(string firstLot, int firstSlot, string secondLot, int secondSlot)
+        bool CheckDataExist(DataFormatter data)
         {
-            m_materialFormatter.AddTwoMaterial(firstLot, firstSlot, secondLot, secondSlot);
-
-            m_materialDataCnt++;
+            return data == null ? false : true;
         }
+
+        bool CheckMaterialDataExist(MaterialFormatter materialData)
+        {
+            return materialData == null ? false : true;
+        }
+
+        public void WriteCFG(string device, string eventID, DataFormatter dataFormatter = null)
+        {
+            if (!m_useLog)
+                return;
+
+            bool isDataExist = CheckDataExist(dataFormatter);
+
+            if (isDataExist)
+                m_sSLoggerNet.WriteCFGLog(device, eventID, dataFormatter);
+            else
+                m_sSLoggerNet.WriteCFGLog(device, eventID);
+        }
+
+        //public DataFormatter GetDataFormatter()
+        //{
+        //    return new DataFormatter();
+        //}
+
+        //public MaterialFormatter GetMaterialFormatter()
+        //{
+        //    return new MaterialFormatter();
+        //}
+
+        //public FlowData GetFlowData()
+        //{
+        //    return new FlowData();
+        //}
+
+        //public void AddData(string key, dynamic value, string unit = null)
+        //{
+        //    if(value.GetType() == typeof(bool))
+        //    {
+        //        value = value.ToString();
+        //    }
+        //    if (unit != null)
+        //        m_dataFormatter.AddData(key, value, unit);
+        //    else
+        //        m_dataFormatter.AddData(key, value);
+
+        //    m_dataCnt++;
+        //}
+
+        ////public void AddData(string key, int value, string unit = null)
+        ////{
+        ////    if (unit != null)
+        ////        m_dataFormatter.AddData(key, value, unit);
+        ////    else
+        ////        m_dataFormatter.AddData(key, value);
+
+        ////    m_dataCnt++;
+        ////}
+
+        ////public void AddData(string key, double value, string unit = null)
+        ////{
+        ////    if (unit != null)
+        ////        m_dataFormatter.AddData(key, value, unit);
+        ////    else
+        ////        m_dataFormatter.AddData(key, value);
+
+        ////    m_dataCnt++;
+        ////}
+
+        ////public void AddData(string key, string value, string unit = null)
+        ////{
+        ////    if (unit != null)
+        ////        m_dataFormatter.AddData(key, value, unit);
+        ////    else
+        ////        m_dataFormatter.AddData(key, value);
+
+        ////    m_dataCnt++;
+        ////}
+        //public void AddFlowData(FlowDataInfo flowData, dynamic value)
+        //{
+        //    switch (flowData)
+        //    {
+        //        case FlowDataInfo.FromDevice:
+        //            m_fromDevice.AddData(value);
+        //            break;
+        //        case FlowDataInfo.FromSlot:
+        //            m_fromSlot.AddData(value);
+        //            break;
+        //        case FlowDataInfo.ToDevice:
+        //            m_toDevice.AddData(value);
+        //            break;
+        //        case FlowDataInfo.ToSlot:
+        //            m_toSlot.AddData(value);
+        //            break;
+        //        case FlowDataInfo.FlowInfo:
+        //            m_flowInfo.AddData(value);
+        //            break;
+        //    }
+        //}
+
+        //public void ClearFlowData(FlowDataInfo flowData = FlowDataInfo.All)
+        //{
+        //    switch (flowData)
+        //    {
+        //        case FlowDataInfo.FromDevice:
+        //            m_fromDevice.ClearData();
+        //            break;
+        //        case FlowDataInfo.FromSlot:
+        //            m_fromSlot.ClearData();
+        //            break;
+        //        case FlowDataInfo.ToDevice:
+        //            m_toDevice.ClearData();
+        //            break;
+        //        case FlowDataInfo.ToSlot:
+        //            m_toSlot.ClearData();
+        //            break;
+        //        case FlowDataInfo.FlowInfo:
+        //            m_flowInfo.ClearData();
+        //            break;
+        //        case FlowDataInfo.All:
+        //            ClearAllFlowData();
+        //            break;
+        //    }
+        //}
+
+        //void ClearAllFlowData()
+        //{
+        //    m_fromDevice.ClearData();
+        //    m_fromSlot.ClearData();
+        //    m_toDevice.ClearData();
+        //    m_toSlot.ClearData();
+        //    m_flowInfo.ClearData();
+        //}
+
+        //public void AddMaterialData(string lot, int slot)
+        //{
+        //    m_materialFormatter.AddMaterial(lot, slot);
+
+        //    m_materialDataCnt++;
+        //}
+
+        //public void AddTwoMaterialData(string firstLot, int firstSlot, string secondLot, int secondSlot)
+        //{
+        //    m_materialFormatter.AddTwoMaterial(firstLot, firstSlot, secondLot, secondSlot);
+
+        //    m_materialDataCnt++;
+        //}
 
     }
 }
