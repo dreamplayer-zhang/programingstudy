@@ -259,7 +259,7 @@ namespace Root_Pine2_Vision.Module
             if (m_vision.p_eRemote == ModuleBase.eRemote.Server)
             {
                 m_idProcess = tree.Set(m_idProcess, m_idProcess, "ID", "VisionWorks Process ID");
-                m_sFileVisionWorks = tree.SetFile(m_sFileVisionWorks, m_sFileVisionWorks, ".exe", "File", "VisionWorks File Name");
+                m_sFileVisionWorks = tree.SetFile(m_sFileVisionWorks, m_sFileVisionWorks, "exe", "File", "VisionWorks File Name");
                 m_bStartProcess = tree.Set(m_bStartProcess, m_bStartProcess, "Start", "Start Memory Process");
             }
         }
