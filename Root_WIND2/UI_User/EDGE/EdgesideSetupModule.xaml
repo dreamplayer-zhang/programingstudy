@@ -102,16 +102,16 @@
                     </Grid>
                 </StackPanel>
             </GroupBox>
-
-            <GroupBox Header="Process Defect" 
-                      Grid.Row="1"
+            
+            <GroupBox Header="Inspect Spec" 
+                      Grid.Row="1" 
                       Background="{StaticResource GroupBoxBackground}"
                       Style="{StaticResource main_view_groupbox}"
                       Margin="4">
                 <GroupBox.Resources>
                     <local:PropertyConverter x:Key="PropertyConverter" />
                 </GroupBox.Resources>
-                <wpg:WpfPropertyGrid SelectedObject="{Binding ProcessDefectParameter, FallbackValue=null,               
+                <wpg:WpfPropertyGrid SelectedObject="{Binding Parameter, FallbackValue=null,               
                                      Converter={StaticResource ResourceKey=PropertyConverter}}"
                                      Margin="4"
                                      HorizontalAlignment="Stretch"
@@ -120,16 +120,16 @@
                                      ToolbarVisible="False"
                                      PropertySort="Categorized"/>
             </GroupBox>
-            
-            <GroupBox Header="Inspect Spec" 
-                      Grid.Row="2" 
+
+            <GroupBox Header="Process Defect" 
+                      Grid.Row="2"
                       Background="{StaticResource GroupBoxBackground}"
                       Style="{StaticResource main_view_groupbox}"
                       Margin="4">
                 <GroupBox.Resources>
                     <local:PropertyConverter x:Key="PropertyConverter" />
                 </GroupBox.Resources>
-                <wpg:WpfPropertyGrid SelectedObject="{Binding Parameter, FallbackValue=null,               
+                <wpg:WpfPropertyGrid SelectedObject="{Binding ProcessDefectParameter, FallbackValue=null,               
                                      Converter={StaticResource ResourceKey=PropertyConverter}}"
                                      Margin="4"
                                      HorizontalAlignment="Stretch"

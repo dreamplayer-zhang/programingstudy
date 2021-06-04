@@ -312,17 +312,13 @@
     </Compile>
     <Compile Include="UI_User\CAMERA\ViewModels\CameraAlign_ImageViewer_ViewModel.cs" />
     <Compile Include="UI_User\CAMERA\ViewModels\CameraAlign_ViewModel.cs" />
-    <Compile Include="UI_User\EBR\EBRSetup.xaml.cs">
-      <DependentUpon>EBRSetup.xaml</DependentUpon>
-    </Compile>
     <Compile Include="UI_User\EBR\EBRInspect.xaml.cs">
       <DependentUpon>EBRInspect.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI_User\EBR\EBRSetup_New.xaml.cs">
-      <DependentUpon>EBRSetup_New.xaml</DependentUpon>
+    <Compile Include="UI_User\EBR\EBRSetup.xaml.cs">
+      <DependentUpon>EBRSetup.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI_User\EBR\ViewModel\EBRInspect_ViewModel.cs" />
-    <Compile Include="UI_User\EBR\ViewModel\EBRSetup_New_ViewModel.cs" />
     <Compile Include="UI_User\EBR\ViewModel\EBRSetup_ViewModel.cs" />
     <Compile Include="UI_User\EBR\ViewModel\EBR_ImageViewer_ViewModel.cs" />
     <Compile Include="UI_User\EDGE\EdgesideSetupModule.xaml.cs">
@@ -381,6 +377,10 @@
       <DependentUpon>RecipeWizardPanel.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI_User\RecipeWizardPanel_ViewModel.cs" />
+    <Compile Include="UI_User\HOME\SequenceRecipe.xaml.cs">
+      <DependentUpon>SequenceRecipe.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI_User\HOME\SequenceRecipe_ViewModel.cs" />
     <Compile Include="UI_User\Setup.xaml.cs">
       <DependentUpon>Setup.xaml</DependentUpon>
     </Compile>
@@ -769,15 +769,11 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UI_User\EBR\EBRSetup.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
     <Page Include="UI_User\EBR\EBRInspect.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UI_User\EBR\EBRSetup_New.xaml">
+    <Page Include="UI_User\EBR\EBRSetup.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -828,6 +824,10 @@
     <Page Include="UI_User\RecipeWizardPanel.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI_User\HOME\SequenceRecipe.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UI_User\Setup.xaml">
       <SubType>Designer</SubType>

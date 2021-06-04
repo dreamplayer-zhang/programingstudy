@@ -55,9 +55,9 @@ namespace Root_WIND2
 			int bufferHeight = lastNotch - firstNotch;
 			int bufferHeightPerDegree = bufferHeight / 360;
 
-			int width = recipe.GetItem<EBRParameter>().ROIWidth;
+			int width = 5300;// recipe.GetItem<EBRParameter>().ROIWidth;
 			int height = recipe.GetItem<EBRParameter>().ROIHeight;
-			double stepDegree = recipe.GetItem<EBRParameter>().StepDegree;
+			double stepDegree = 10; //recipe.GetItem<EBRParameter>().StepDegree;
 			int workplaceCnt = (int)(360 / stepDegree);
 
 			workplaceBundle = new WorkplaceBundle();

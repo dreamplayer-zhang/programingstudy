@@ -260,19 +260,15 @@ namespace Root_Pine2.Module
             if (EQ.p_eState != EQ.eState.Run) return "OK";
             if (m_picker.p_infoStrip != null)
             {
-                if (m_picker.p_infoStrip.m_bPaper) return StartRun(m_runUnloadPaper);
+                if (m_picker.p_infoStrip.m_bPaper) return StartRun(m_runUnloadPaper); //forget
                 return StartUnloadBoat();
             }
             else
             {
                 switch (m_pine2.p_eMode)
                 {
-                    case Pine2.eRunMode.Stack:
-                        if (m_loadEV.p_bDone) return StartRun(m_runLoadEV);
-                        return "OK";
-                    case Pine2.eRunMode.Magazine:
-                        if (m_transfer.m_gripper.p_bEnable) return StartLoadTransfer();
-                        return "OK";
+                    case Pine2.eRunMode.Stack: return m_loadEV.p_bDone ? StartRun(m_runLoadEV) : "OK";
+                    case Pine2.eRunMode.Magazine: return m_transfer.m_gripper.p_bEnable ? StartLoadTransfer() : "OK";
                 }
             }
             return "OK";

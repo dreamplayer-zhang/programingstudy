@@ -1,0 +1,27 @@
+﻿<UserControl x:Class="Root_WIND2.UI_User.SequenceRecipe"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:tree="clr-namespace:RootTools.Trees;assembly=RootTools"
+             xmlns:local="clr-namespace:Root_WIND2.UI_User"
+             mc:Ignorable="d" 
+             d:DesignHeight="700" d:DesignWidth="600">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="2*"/>
+        </Grid.ColumnDefinitions>
+        <Grid>
+            <StackPanel>
+                <ComboBox Margin="3" ItemsSource="{Binding p_moduleList}" SelectedValue="{Binding p_selectModule}" Height="25"/>
+                <ComboBox Margin="3" ItemsSource="{Binding p_aModuleRun}" SelectedValue="{Binding p_selectModuleRun}" Height="25"/>
+                <Button Content="Add" Style="{StaticResource groupbox_griditem_button}" Margin="3" Height="25" Visibility="{Binding p_addVisibility}" Command="{Binding CmdAddModuleRun}"/>
+                <Button Content="Clear" Style="{StaticResource groupbox_griditem_button}" Margin="3" Height="25" Command="{Binding CmdClearModuleRun}"/>
+            </StackPanel>
+        </Grid>
+        <Grid Grid.Column="1">
+            <tree:TreeUI DataContext="{Binding p_moduleTempList.p_treeRoot}" Background="White"/>
+        </Grid>
+    </Grid>
+</UserControl>

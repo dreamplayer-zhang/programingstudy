@@ -929,6 +929,12 @@ namespace RootTools
                                     });
 
                                     p_ImgSource = ImageHelper.ToBitmapSource(view);
+
+                                    p_TumbnailImgMargin = new Thickness(Convert.ToInt32((double)p_View_Rect.X * p_ThumbWidth / p_ImageData.p_Size.X), Convert.ToInt32((double)p_View_Rect.Y * p_ThumbHeight / p_ImageData.p_Size.Y), 0, 0);
+                                    if (Convert.ToInt32((double)p_View_Rect.Height * p_ThumbHeight / p_ImageData.p_Size.Y) == 0)
+                                        p_TumbnailImg_Rect = new System.Drawing.Rectangle(0, 0, Convert.ToInt32((double)p_View_Rect.Width * p_ThumbWidth / p_ImageData.p_Size.X), 2);
+                                    else
+                                        p_TumbnailImg_Rect = new System.Drawing.Rectangle(0, 0, Convert.ToInt32((double)p_View_Rect.Width * p_ThumbWidth / p_ImageData.p_Size.X), Convert.ToInt32((double)p_View_Rect.Height * p_ThumbHeight / p_ImageData.p_Size.Y));
                                 }
                                 else if (!isUpdate && p_ImageData.m_eMode == ImageData.eMode.ImageBuffer)
                                 {
@@ -1366,6 +1372,7 @@ namespace RootTools
                 int pix_x = 0;
                 int pix_y = 0;
 
+                
                 for (int yy = 0; yy < p_ThumbHeight; yy++)
                 {
                     pix_y = yy * p_ImageData.p_Size.Y / p_ThumbHeight;
