@@ -672,7 +672,7 @@ namespace RootTools.Gem.XGem
             switch (nVerifyType)
             {
                 case 0:
-                    //carrier.m_bReqLoad = true; //Docking 시퀀스 내에 CarrierID Read 포함되어 있어 SetCarrierOn으로 이동.
+                    //carrier.m_bReqLoad = true; //Docking 시퀀스 내에 CarrierID Read 포함되어 있어 OHT 종료 후로 이동.
                     break;
                 case 1:
                     if (sSlotMap.Length < nCount) return;
@@ -729,7 +729,8 @@ namespace RootTools.Gem.XGem
 
         public string SendCarrierPresentSensor(GemCarrierBase carrier, bool bPresent)
         {
-            if (carrier.p_eAccessLP != GemCarrierBase.eAccessLP.Manual) return "Invalid Carrier PresentSensor when AccessLP = Auto";
+            //AccessLP Auto/Manual 모두 PresentSensor 사용
+            //if (carrier.p_eAccessLP != GemCarrierBase.eAccessLP.Manual) return "Invalid Carrier PresentSensor when AccessLP = Auto";
             long nPresent = bPresent ? 1 : 0;
             //long nError = m_xGem.CMSSetPresenceSensor(carrier.p_sLocID, nPresent);
             long nError = m_xGem.CMSSetCarrierOnOff(carrier.p_sLocID, nPresent);
@@ -744,11 +745,6 @@ namespace RootTools.Gem.XGem
             
             long nError = m_xGem.CMSSetPresenceSensor(carrier.p_sLocID, nOn);
             LogSend(nError, "CMSSetPresenceSensor", carrier.p_sLocID, nOn);
-            
-            if (nOn == 1)
-            {
-                carrier.m_bReqLoad = true;
-            }
         }
 
         public string CMSSetReadyToLoad(GemCarrierBase carrier)
