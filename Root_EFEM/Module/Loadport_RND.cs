@@ -18,12 +18,6 @@ namespace Root_EFEM.Module
     {
         #region ToolBox
         public DIO_I m_diPlaced;
-        public DIO_I m_diPresent;
-        public DIO_I m_diLoad;
-        public DIO_I m_diUnload;
-        public DIO_I m_diDoorOpen;
-        public DIO_I m_diDocked;
-        RS232 m_rs232;
         //OHT _OHT;
         //public OHT m_OHTNew
         //{
@@ -45,6 +39,89 @@ namespace Root_EFEM.Module
             set
             {
                 m_OHT = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public DIO_I p_diPlaced
+        {
+            get
+            {
+                return m_diPlaced;
+            }
+            set
+            {
+                m_diPlaced = value;
+            }
+        }
+        DIO_I m_diPresent;
+        public DIO_I p_diPresent
+        {
+            get
+            {
+                return m_diPresent;
+            }
+            set
+            {
+                m_diPresent = value;
+            }
+        }
+        DIO_I m_diLoad;
+        public DIO_I p_diLoad
+        {
+            get
+            {
+                return m_diLoad;
+            }
+            set
+            {
+                m_diLoad = value;
+            }
+        }
+        DIO_I m_diUnload;
+        public DIO_I p_diUnload
+        {
+            get
+            {
+                return m_diUnload;
+            }
+            set
+            {
+                m_diUnload = value;
+            }
+        }
+        DIO_I m_diDoorOpen;
+        public DIO_I p_diDoorOpen
+        {
+            get
+            {
+                return m_diDoorOpen;
+            }
+            set
+            {
+                m_diDoorOpen = value;
+            }
+        }
+        DIO_I m_diDocked;
+        public DIO_I p_diDocked
+        {
+            get
+            {
+                return m_diDocked;
+            }
+            set
+            {
+                m_diDocked = value;
+            }
+        }
+        RS232 m_rs232;
+        OHT _OHT;
+        public OHT m_OHTNew
+        {
+            get { return _OHT; }
+            set
+            {
+                _OHT = value;
                 OnPropertyChanged();
             }
         }
@@ -639,8 +716,6 @@ namespace Root_EFEM.Module
                 _rfid = value;
             }
         }
-
-        public OHT m_OHTNew { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
         public Loadport_RND(string id, IEngineer engineer, bool bEnableWaferSize, bool bEnableWaferCount)
         {
