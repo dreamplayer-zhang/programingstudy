@@ -224,16 +224,23 @@ namespace Root_WIND2.UI_User
 		/// </summary>
 		private void SetOriginInfo()
 		{
-			GrabModeEdge mode = ((WIND2_Handler)GlobalObjects.Instance.Get<WIND2_Engineer>().ClassHandler()).p_EdgeSideVision.m_aGrabMode[Recipe.GrabModeIndex];
+			try
+			{
+				GrabModeEdge mode = ((WIND2_Handler)GlobalObjects.Instance.Get<WIND2_Engineer>().ClassHandler()).p_EdgeSideVision.m_aGrabMode[Recipe.GrabModeIndex];
 
-			if (mode == null)
-				return;
+				if (mode == null)
+					return;
 
-			int imageHeight = mode.m_nImageHeight;  // 전체 이미지 Height
-			OriginRecipe.OriginX = 0;
-			OriginRecipe.OriginY = imageHeight;
-			OriginRecipe.OriginHeight = imageHeight;
-			OriginRecipe.DiePitchY = imageHeight;
+				int imageHeight = mode.m_nImageHeight;  // 전체 이미지 Height
+				OriginRecipe.OriginX = 0;
+				OriginRecipe.OriginY = imageHeight;
+				OriginRecipe.OriginHeight = imageHeight;
+				OriginRecipe.DiePitchY = imageHeight;
+            }
+            catch
+            {
+
+            }
 		}
 
 		private void CalculateInspectionROI()
