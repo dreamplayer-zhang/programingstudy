@@ -38,6 +38,37 @@ namespace RootTools_Vision
 		}
 		private string klarfSavePath = "D:\\Klarf";
 
+		[Category("Klarf")]
+		[DisplayName("Circle Image Size Width")]
+		public int OutputImageSizeWidth
+		{
+			get
+			{
+				return outputImageSizeWidth;
+			}
+			set
+			{
+				outputImageSizeWidth = value;
+			}
+		}
+		private int outputImageSizeWidth = 1000;
+
+
+		[Category("Klarf")]
+		[DisplayName("Circle Image Size Height")]
+		public int OutputImageSizeHeight
+		{
+			get
+			{
+				return outputImageSizeHeight;
+			}
+			set
+			{
+				outputImageSizeHeight = value;
+			}
+		}
+		private int outputImageSizeHeight = 1000;
+
 		[Category("Common")]
 		[DisplayName("Measurement Image Path")]
 		public string MeasureImagePath
