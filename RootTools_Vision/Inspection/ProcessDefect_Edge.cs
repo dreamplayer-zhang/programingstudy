@@ -32,11 +32,6 @@ namespace RootTools_Vision
 
 		protected override bool Preparation()
 		{
-			//if (this.parameterEdge == null || this.recipeEdge == null)
-			//{
-			//	this.parameterEdge = this.parameter as EdgeSurfaceParameter;
-			//	this.recipeEdge = recipe.GetItem<EdgeSurfaceRecipe>();
-			//}
 			return true;
 		}
 
@@ -54,7 +49,7 @@ namespace RootTools_Vision
 			if (this.currentWorkplace.Index != 0)
 				return;
 
-			ProcessDefectEdgeParameter param = this.recipe.GetItem<ProcessDefectEdgeParameter>();
+			ProcessDefectEdgeParameter processDefectParam = this.recipe.GetItem<ProcessDefectEdgeParameter>();
 
 			List<Defect> topDefectList = CollectDefectData(0, 2);
 			List<Defect> btmDefectList = CollectDefectData(3, 5);
@@ -64,12 +59,12 @@ namespace RootTools_Vision
 			List<Defect> btmMergeDefectList;
 			List<Defect> sideMergeDefectList;
 
-			if (param.UseMergeDefect)
+			if (processDefectParam.UseMergeDefect)
 			{
 				// merge할 때 각도 (RelY) 값 바뀜
-				topMergeDefectList = Tools.MergeDefect(topDefectList, param.MergeDefectDistnace);
-				btmMergeDefectList = Tools.MergeDefect(btmDefectList, param.MergeDefectDistnace);
-				sideMergeDefectList = Tools.MergeDefect(sideDefectList, param.MergeDefectDistnace);
+				topMergeDefectList = Tools.MergeDefect(topDefectList, processDefectParam.MergeDefectDistnace);
+				btmMergeDefectList = Tools.MergeDefect(btmDefectList, processDefectParam.MergeDefectDistnace);
+				sideMergeDefectList = Tools.MergeDefect(sideDefectList, processDefectParam.MergeDefectDistnace);
 			}
 			else
 			{
@@ -140,6 +135,13 @@ namespace RootTools_Vision
 			}
 			#endregion
 
+			// EDGE 전체 원형 이미지 저장
+			EdgeSurfaceParameter surfaceParam = this.recipe.GetItem<EdgeSurfaceParameter>();
+			Tools.SaveEdgeCircleImage(@"D:\Edge Circle Image.bmp", settings_edgeside.OutputImageSizeWidth, settings_edgeside.OutputImageSizeHeight 
+								  , topSharedBufferInfo, surfaceParam.EdgeParamBaseTop.StartPosition, surfaceParam.EdgeParamBaseTop.EndPosition
+								  , sideSharedBufferInfo, surfaceParam.EdgeParamBaseSide.StartPosition, surfaceParam.EdgeParamBaseSide.EndPosition
+								  , btmSharedBufferInfo, surfaceParam.EdgeParamBaseBtm.StartPosition, surfaceParam.EdgeParamBaseBtm.EndPosition);
+
 			//WorkEventManager.OnInspectionDone(this.currentWorkplace, new InspectionDoneEventArgs(new List<CRect>(), true));
 			WorkEventManager.OnIntegratedProcessDefectDone(this.currentWorkplace, new IntegratedProcessDefectDoneEventArgs());
 		}
@@ -166,9 +168,9 @@ namespace RootTools_Vision
 
 		//public System.Drawing.Bitmap MergeEdgesideImages(Defect defect)
 		//{
-		//	SharedBufferInfo sharedBufferInfo_Top = GetBufferInfoByChipX((int)EdgeSurface.EdgeMapPositionX.Top);
-		//	SharedBufferInfo sharedBufferInfo_Side = GetBufferInfoByChipX((int)EdgeSurface.EdgeMapPositionX.Side);
-		//	SharedBufferInfo sharedBufferInfo_Btm = GetBufferInfoByChipX((int)EdgeSurface.EdgeMapPositionX.Btm);
+		//	SharedBufferInfo sharedBufferInfo_Top = GetSharedBufferInfo(0);
+		//	SharedBufferInfo sharedBufferInfo_Side = GetSharedBufferInfo(6);
+		//	SharedBufferInfo sharedBufferInfo_Btm = GetSharedBufferInfo(3);
 
 		//	// TOP DEFECT 일 경우
 		//	if (defect.m_nChipIndexX == (int)EdgeSurface.EdgeMapPositionX.Top)

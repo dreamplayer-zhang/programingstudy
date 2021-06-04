@@ -318,6 +318,13 @@ namespace RootTools_Vision
             }
         }
 
+        public static void WriteTextToBitmap(System.Drawing.Bitmap sourceBitmap, System.Drawing.Font font, System.Drawing.Brush brush, System.Drawing.Point location, string text)
+        {
+            System.Drawing.Graphics bitmapGraphics = System.Drawing.Graphics.FromImage(sourceBitmap);
+            bitmapGraphics.DrawString(text, font, brush, location);
+            bitmapGraphics.Dispose();
+        }
+
 
         public static object lockTiffObj = new object();
         public static void SaveTiffImage(string Path, string fileName, List<Defect> defectList, SharedBufferInfo sharedBuffer, Size imageSize = default(Size))
@@ -348,6 +355,7 @@ namespace RootTools_Vision
 
                 MemoryStream image = new MemoryStream();
                 System.Drawing.Bitmap bitmap = Tools.CovertBufferToBitmap(sharedBuffer, defectRect);
+                WriteTextToBitmap(bitmap, new System.Drawing.Font("돋움체", 72f, System.Drawing.FontStyle.Bold), System.Drawing.Brushes.White, new System.Drawing.Point(20, 20), "테스트");
                 //System.Drawing.Bitmap NewImg = new System.Drawing.Bitmap(bitmap);
                 bitmap.Save(image, ImageFormat.Tiff);
                 inputImage.Add(image);

@@ -408,7 +408,7 @@ namespace Root_Pine2.Module
                 case Pine2.eRunMode.Stack: m_stack?.PutInfoStrip(); break;
                 case Pine2.eRunMode.Magazine: m_aMagazine[infoStrip.p_eMagazinePos]?.PutInfoStrip(infoStrip); break;
             }
-            m_infoStripUnload = null; 
+            m_infoStripUnload = null;
         }
 
         public void CheckMagazineDone()
@@ -426,12 +426,8 @@ namespace Root_Pine2.Module
         {
             switch (m_pine2.p_eMode)
             {
-                case Pine2.eRunMode.Stack:
-                    if (m_stack == null) return StartLoad();
-                    break;
-                case Pine2.eRunMode.Magazine:
-                    if (m_aMagazine[InfoStrip.eMagazinePos.Up] == null) return StartLoad();
-                    break;
+                case Pine2.eRunMode.Stack: return (m_stack == null) ? StartLoad() : "OK";
+                case Pine2.eRunMode.Magazine: return (m_aMagazine[InfoStrip.eMagazinePos.Up] == null) ? StartLoad() : "OK";
             }
             if ((EQ.p_eState != EQ.eState.Run) && (m_pine2.p_eMode == Pine2.eRunMode.Magazine))
             {
@@ -464,8 +460,6 @@ namespace Root_Pine2.Module
         #region Load
         string StartLoad()
         {
-            if (m_elevator.IsProduct(InfoStrip.eMagazinePos.Up)) return "Magazine Up Sensor Checked";
-            if (m_elevator.IsProduct(InfoStrip.eMagazinePos.Down)) return "Magazine Down Sensor Checked";
             p_sLED = "LOAD";
             return StartRun(m_runLoad);
         }
@@ -512,6 +506,7 @@ namespace Root_Pine2.Module
 
         string RunLoad(InfoStrip.eMagazinePos eMagazinePos)
         {
+            if (m_elevator.IsProduct(eMagazinePos)) return "Magazine Product Sensor Checked";
             if (Run(m_elevator.MoveToConveyor(eMagazinePos))) return p_sInfo;
             if (m_conveyor.CheckExist() == false) return "OK"; 
             if (Run(m_elevator.RunAlign(false))) return p_sInfo;

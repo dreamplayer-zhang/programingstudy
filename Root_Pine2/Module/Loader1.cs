@@ -85,7 +85,7 @@ namespace Root_Pine2.Module
             if (m_picker.p_infoStrip != null) return "Picker has InfoStrip";
             try
             {
-                boat.p_infoStrip.m_eVision = eVision;
+                boat.p_infoStrip.m_eVisionLoad = eVision;
                 boat.p_infoStrip.m_eWorks = eWorks; 
                 if (Run(RunMoveUp())) return p_sInfo;
                 if (Run(RunMoveX(eVision, eWorks))) return p_sInfo;
@@ -163,7 +163,7 @@ namespace Root_Pine2.Module
             if (EQ.p_eState != EQ.eState.Run) return "OK";
             if (m_picker.p_infoStrip != null)
             {
-                switch (m_picker.p_infoStrip.m_eVision)
+                switch (m_picker.p_infoStrip.m_eVisionLoad)
                 {
                     case Vision.eVision.Top3D: return StartUnloadBoat();
                     case Vision.eVision.Top2D: return StartUnloadTurnover(); 
@@ -178,12 +178,9 @@ namespace Root_Pine2.Module
                     switch (boat.p_eStep)
                     {
                         case Boat.eStep.Done: return StartLoad(Vision.eVision.Top2D, eWorks);
-                        case Boat.eStep.Ready:
-                            if (boats3D.m_aBoat[eWorks].p_eStep == Boat.eStep.Done) return StartLoad(Vision.eVision.Top3D, eWorks);
-                            break; 
+                        case Boat.eStep.Ready: return (boats3D.m_aBoat[eWorks].p_eStep == Boat.eStep.Done) ? StartLoad(Vision.eVision.Top3D, eWorks) : "OK";
                     }
                 }
-                return "OK"; 
             }
             return "OK";
         }
