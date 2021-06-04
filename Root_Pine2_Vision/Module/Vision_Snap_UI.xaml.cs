@@ -38,7 +38,10 @@ namespace Root_Pine2_Vision.Module
 
         private void M_treeRoot_UpdateTree()
         {
+            int lSnap = m_snapData.p_lSnap; 
             RunTree(Tree.eMode.Update);
+            if (lSnap == m_snapData.p_lSnap) return; 
+            RunTree(Tree.eMode.Init);
         }
 
         public void RunTree(Tree.eMode eMode)
@@ -48,13 +51,13 @@ namespace Root_Pine2_Vision.Module
         }
         #endregion
 
-        const string c_sExt = "snap"; 
+        const string c_sExt = "pine2"; 
         private void buttonOpen_Click(object sender, RoutedEventArgs e)
         {
             OpenFileDialog dlg = new OpenFileDialog();
             string sExt = "." + c_sExt;
             dlg.DefaultExt = sExt;
-            dlg.Filter = "Snap Data File (*" + sExt + ")|*" + sExt;
+            dlg.Filter = "Recipe File (*" + sExt + ")|*" + sExt;
             dlg.InitialDirectory = EQ.c_sPathRecipe;
             if (dlg.ShowDialog() == false) return;
             Job job = new Job(dlg.FileName, false, m_vision.m_log);
@@ -70,7 +73,7 @@ namespace Root_Pine2_Vision.Module
             SaveFileDialog dlg = new SaveFileDialog();
             string sExt = "." + c_sExt;
             dlg.DefaultExt = sExt;
-            dlg.Filter = "Snap Data File (*" + sExt + ")|*" + sExt;
+            dlg.Filter = "Pine2 Recipe File (*" + sExt + ")|*" + sExt;
             dlg.InitialDirectory = EQ.c_sPathRecipe;
             if (dlg.ShowDialog() == false) return;
             Job job = new Job(dlg.FileName, true, m_vision.m_log);
@@ -83,7 +86,7 @@ namespace Root_Pine2_Vision.Module
         #region ITool
         public string p_id
         {
-            get { return m_vision.p_id + ".SnapData"; }
+            get { return m_vision.p_id + ".Recipe"; }
             set { }
         }
 

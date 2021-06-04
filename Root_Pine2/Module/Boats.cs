@@ -35,10 +35,10 @@ namespace Root_Pine2.Module
             return bWait ? m_axisCam.p_axisX.WaitReady() : "OK";
         }
 
-        public string RunMoveSnapStart(Vision.SnapData snapData, bool bWait = true)
+        public string RunMoveSnapStart(Vision.eWorks eWorks, Vision.SnapData.Snap snapData, bool bWait = true)
         {
-            m_axisCam.StartMove(snapData.m_eWorks, new RPoint(m_xCamScale * snapData.m_dpAxis.X, 0));
-            if (Run(m_aBoat[snapData.m_eWorks].RunMoveSnapStart(snapData, bWait))) return p_sInfo;
+            m_axisCam.StartMove(eWorks, new RPoint(m_xCamScale * snapData.m_dpAxis.X, 0));
+            if (Run(m_aBoat[eWorks].RunMoveSnapStart(snapData, bWait))) return p_sInfo;
             return bWait ? m_axisCam.p_axisX.WaitReady() : "OK";
         }
 
@@ -135,11 +135,16 @@ namespace Root_Pine2.Module
             StopWatch sw = new StopWatch();
             try
             {
-                m_vision.RunLight(snapData.m_lightPower);
-                if (Run(RunMoveSnapStart(snapData))) return p_sInfo;
-                m_vision.StartSnap(snapData);
-                if (Run(m_aBoat[snapData.m_eWorks].RunSnap())) return p_sInfo;
-                if (m_vision.IsBusy()) EQ.p_bStop = true;
+                int iSnap = 0; 
+                foreach (Vision.SnapData.Snap snap in snapData.m_aSnap)
+                {
+                    m_vision.RunLight(snap.m_lightPower);
+                    if (Run(RunMoveSnapStart(snapData.m_eWorks, snap))) return p_sInfo;
+                    m_vision.StartSnap(snap, snapData.m_eWorks, p_sRecipe, iSnap);
+                    if (Run(m_aBoat[snapData.m_eWorks].RunSnap())) return p_sInfo;
+                    if (m_vision.IsBusy()) EQ.p_bStop = true;
+                    iSnap++; 
+                }
             }
             catch (Exception e) { p_sInfo = e.Message; }
             finally
@@ -150,6 +155,20 @@ namespace Root_Pine2.Module
 
             m_log.Info("Run Snap End : " + (sw.ElapsedMilliseconds / 1000.0).ToString("0.00") + " sec");
             return "OK";
+        }
+        #endregion
+
+        #region Recipe
+        string _sRecipe = ""; 
+        public string p_sRecipe
+        {
+            get { return _sRecipe; }
+            set
+            {
+                if (_sRecipe == value) return;
+                _sRecipe = value;
+                m_vision.SetRecipe(value); 
+            }
         }
         #endregion
 

@@ -17,6 +17,21 @@ namespace Root_Pine2_Vision.Module
             get { return null; }
         }
 
+        public string SendRecipe(string sRecipe)
+        {
+            return "OK";
+        }
+
+        public string SendSnapDone(string sRecipe, int iSnap)
+        {
+            return "OK";
+        }
+
+        public void Reset()
+        {
+            throw new System.NotImplementedException();
+        }
+
         public void RunTree(Tree tree)
         {
         }
