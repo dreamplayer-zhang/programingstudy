@@ -219,9 +219,9 @@ namespace Root_Pine2_Vision.Module
                     nProcess = 0; 
                     try
                     {
-                        if (IsProcessRun() == false)
+                        if (IsMemoryPool() && (IsProcessRun() == false))
                         {
-                            Process process = Process.Start(m_sFileVisionWorks, p_id);
+                            Process process = Process.Start(m_sFileVisionWorks, p_id + "." + m_tcpip.p_nPort.ToString());
                             m_nProcessID = process.Id;
                             Thread.Sleep(2000); 
                         }
@@ -232,6 +232,7 @@ namespace Root_Pine2_Vision.Module
                     }
                     catch (Exception e) { m_vision.p_sInfo = p_id + " StartProcess Error : " + e.Message; }
                 }
+                nProcess++; 
             }
         }
 
@@ -245,6 +246,12 @@ namespace Root_Pine2_Vision.Module
                 if (process.Id == m_nProcessID) return true;
             }
             return false;
+        }
+
+        bool IsMemoryPool()
+        {
+            MemoryPool pool = new MemoryPool(m_memoryPool.p_id);
+            return pool.m_MMF != null; 
         }
         #endregion
 
