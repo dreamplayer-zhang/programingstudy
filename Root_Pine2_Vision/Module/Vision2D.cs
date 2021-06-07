@@ -1,12 +1,15 @@
 ﻿using RootTools;
 using RootTools.Camera;
 using RootTools.Camera.Dalsa;
+using RootTools.Comm;
 using RootTools.Light;
 using RootTools.Memory;
 using RootTools.Module;
 using RootTools.Trees;
 using System.Collections.Generic;
 using System.IO;
+using System.Net.Sockets;
+using System.Text;
 using System.Threading;
 
 namespace Root_Pine2_Vision.Module
@@ -31,6 +34,8 @@ namespace Root_Pine2_Vision.Module
                 p_sInfo = m_toolBox.Get(ref m_lightSet, this);
                 m_aWorks[eWorks.A].GetTools(m_toolBox, bInit);
                 m_aWorks[eWorks.B].GetTools(m_toolBox, bInit);
+                p_sInfo = m_toolBox.GetComm(ref m_tcpRequest, this, "Request"); 
+                if (bInit) m_tcpRequest.EventReceiveData += M_tcpRequest_EventReceiveData;
             }
             m_remote.GetTools(bInit);
         }
@@ -318,10 +323,16 @@ namespace Root_Pine2_Vision.Module
 
             public void RunTreeRecipe(Tree.eMode eMode)
             {
-                m_treeRecipe.p_eMode = eMode; 
-                m_treeRecipe.Set(m_eWorks, m_eWorks, "Works", "Vision eWorks", true, true);
-                p_lSnap = m_treeRecipe.Set(p_lSnap, p_lSnap, "Count", "Snap Count");
-                for (int n = 0; n < m_aSnap.Count; n++) m_aSnap[n].RunTree(m_treeRecipe.GetTree("Snap" + n.ToString("00")), true);
+                m_treeRecipe.p_eMode = eMode;
+                RunTreeRecipe(m_treeRecipe, true, true); 
+            }
+
+            public void RunTreeRecipe(Tree tree, bool bVisible, bool bReadOnly = false)
+            {
+                tree.Set(m_eWorks, m_eWorks, "Works", "Vision eWorks", bVisible, bReadOnly);
+                p_lSnap = tree.Set(p_lSnap, p_lSnap, "Count", "Snap Count", bVisible);
+                for (int n = 0; n < m_aSnap.Count; n++) m_aSnap[n].RunTree(tree.GetTree("Snap" + n.ToString("00"), true, bVisible), bVisible);
+
             }
             #endregion
 
@@ -392,9 +403,24 @@ namespace Root_Pine2_Vision.Module
         #endregion
 
         #region Request
+        int m_nReq = 0;
+        string m_sReceive = ""; 
+        TCPAsyncClient m_tcpRequest;
+        private void M_tcpRequest_EventReceiveData(byte[] aBuf, int nSize, Socket socket)
+        {
+            m_sReceive = Encoding.Default.GetString(aBuf, 0, nSize);
+        }
+
         public string ReqSnap(string sRecipe, eWorks eWorks)
         {
-
+            string sSend = m_nReq.ToString("000,") + Works2D.eProtocol.Snap.ToString() + "," + sRecipe + "," + eWorks.ToString();
+            m_sReceive = "";
+            m_tcpRequest.Send(sSend); 
+            while (sSend != m_sReceive)
+            {
+                Thread.Sleep(10);
+                if (EQ.IsStop()) return "EQ Stop";
+            }
             return "OK"; 
         }
         #endregion

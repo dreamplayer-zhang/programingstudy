@@ -1,10 +1,13 @@
 ﻿using Root_Pine2_Vision.Module;
 using RootTools;
+using RootTools.Comm;
 using RootTools.Control;
 using RootTools.Module;
 using RootTools.Trees;
 using System;
 using System.Collections.Generic;
+using System.Net.Sockets;
+using System.Text;
 
 namespace Root_Pine2.Module
 {
@@ -16,7 +19,12 @@ namespace Root_Pine2.Module
             m_toolBox.GetAxis(ref m_axisCam, this, "Camera"); 
             m_aBoat[Vision2D.eWorks.A].GetTools(m_toolBox, this, bInit);
             m_aBoat[Vision2D.eWorks.B].GetTools(m_toolBox, this, bInit);
-            if (bInit) InitPosition(); 
+            m_toolBox.GetComm(ref m_tcpRequest, this, p_id + ".Request");
+            if (bInit)
+            {
+                InitPosition();
+                m_tcpRequest.EventReciveData += M_tcpRequest_EventReciveData;
+            }
         }
         #endregion
 
@@ -123,25 +131,25 @@ namespace Root_Pine2.Module
         #endregion
 
         #region Snap
-        public string StartSnap(Vision2D.Recipe snapData)
+        public string StartSnap(Vision2D.Recipe recipe)
         {
             Run_Snap run = (Run_Snap)m_runSnap.Clone();
-            run.m_recipe = snapData;
+            run.m_recipe = recipe;
             return StartRun(run);
         }
 
-        public string RunSnap(Vision2D.Recipe snapData)
+        public string RunSnap(Vision2D.Recipe recipe)
         {
             StopWatch sw = new StopWatch();
             try
             {
                 int iSnap = 0; 
-                foreach (Vision2D.Recipe.Snap snap in snapData.m_aSnap)
+                foreach (Vision2D.Recipe.Snap snap in recipe.m_aSnap)
                 {
                     m_vision.RunLight(snap.m_lightPower);
-                    if (Run(RunMoveSnapStart(snapData.m_eWorks, snap))) return p_sInfo;
-                    m_vision.StartSnap(snap, snapData.m_eWorks, p_sRecipe, iSnap);
-                    if (Run(m_aBoat[snapData.m_eWorks].RunSnap())) return p_sInfo;
+                    if (Run(RunMoveSnapStart(recipe.m_eWorks, snap))) return p_sInfo;
+                    m_vision.StartSnap(snap, recipe.m_eWorks, p_sRecipe, iSnap);
+                    if (Run(m_aBoat[recipe.m_eWorks].RunSnap())) return p_sInfo;
                     if (m_vision.IsBusy()) EQ.p_bStop = true;
                     iSnap++; 
                 }
@@ -149,8 +157,8 @@ namespace Root_Pine2.Module
             catch (Exception e) { p_sInfo = e.Message; }
             finally
             {
-                m_axisCam.StartMove((Vision2D.eWorks)(1 - (int)snapData.m_eWorks));
-                m_aBoat[snapData.m_eWorks].RunMove(p_ePosUnload);
+                m_axisCam.StartMove((Vision2D.eWorks)(1 - (int)recipe.m_eWorks));
+                m_aBoat[recipe.m_eWorks].RunMove(p_ePosUnload);
             }
 
             m_log.Info("Run Snap End : " + (sw.ElapsedMilliseconds / 1000.0).ToString("0.00") + " sec");
@@ -168,6 +176,32 @@ namespace Root_Pine2.Module
                 if (_sRecipe == value) return;
                 _sRecipe = value;
                 m_vision.SetRecipe(value); 
+            }
+        }
+        #endregion
+
+        #region Request
+        TCPAsyncServer m_tcpRequest;
+
+        private void M_tcpRequest_EventReciveData(byte[] aBuf, int nSize, Socket socket)
+        {
+            string sRead = Encoding.Default.GetString(aBuf, 0, nSize);
+            if (sRead.Length <= 0) return;
+            ReadRequest(sRead); 
+            m_tcpRequest.Send(sRead); 
+        }
+
+        void ReadRequest(string sRead)
+        {
+            string[] asRead = sRead.Split(',');
+            if (asRead.Length < 2) return;
+            if (asRead[1] == Works2D.eProtocol.Snap.ToString())
+            {
+                if (asRead.Length < 3) return;
+                string sRecipe = asRead[2];
+                Vision2D.eWorks eWorks = (asRead[3] == "A") ? Vision2D.eWorks.A : Vision2D.eWorks.B;
+                m_vision.m_recipe[eWorks].RecipeOpen(sRecipe);
+                StartSnap(m_vision.m_recipe[eWorks]); 
             }
         }
         #endregion
@@ -209,7 +243,7 @@ namespace Root_Pine2.Module
             public Run_Snap(Boats module)
             {
                 m_module = module;
-                //m_recipe = new Vision2D.Recipe(module.m_vision); 
+                m_recipe = new Vision2D.Recipe(module.m_vision, Vision2D.eWorks.A); 
                 InitModuleRun(module);
             }
 
@@ -223,7 +257,7 @@ namespace Root_Pine2.Module
 
             public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
             {
-                //m_recipe.RunTree(tree, bVisible); 
+                m_recipe.RunTreeRecipe(tree, bVisible); 
             }
 
             public override string Run()
