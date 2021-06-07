@@ -1,4 +1,6 @@
-﻿using RootTools.Module;
+﻿using Root_EFEM.Module;
+using Root_WIND2.Module;
+using RootTools.Module;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -103,12 +105,30 @@ namespace Root_WIND2
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             ModuleRunBase module = (ModuleRunBase)value;
-
-            if (module.m_moduleBase.GetType() == typeof(BacksideInspection))
-                return App.Img_Test;
+            var type = module.m_moduleBase.GetType();
+            if (type == typeof(WTR_RND))
+            {
+                return App.Img_WTR;
+            }
+            else if (type == typeof(Loadport_RND))
+            {
+                return App.Img_LP;
+            }
+            else if (type == typeof(Aligner_ATI))
+            {
+                return App.Img_Aligner;
+            }
+            else if (type == typeof(BackSideVision))
+            {
+                return App.Img_BacksideVision;
+            }
+            else if (type == typeof(EdgeSideVision))
+            {
+                return App.Img_EdgeSideVision;
+            }
             else
             {
-                return App.Img_Test;
+                return App.Img_Vision;
             }
         }
 

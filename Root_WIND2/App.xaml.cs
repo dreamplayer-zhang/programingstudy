@@ -14,6 +14,11 @@ namespace Root_WIND2
     /// </summary>
     public partial class App : Application
     {
-        public static BitmapImage Img_Test = new BitmapImage(new Uri("/Resource/VEGAImage.png", UriKind.RelativeOrAbsolute));
+        public static BitmapImage Img_Vision = new BitmapImage(new Uri("/Resources/VISION.JPG", UriKind.RelativeOrAbsolute));
+        public static BitmapImage Img_WTR = new BitmapImage(new Uri("/Resources/WTR.JPG", UriKind.RelativeOrAbsolute));
+        public static BitmapImage Img_LP = new BitmapImage(new Uri("/Resources/LOADPORT.JPG", UriKind.RelativeOrAbsolute));
+        public static BitmapImage Img_Aligner = new BitmapImage(new Uri("/Resources/ALIGNER.JPG", UriKind.RelativeOrAbsolute));
+        public static BitmapImage Img_BacksideVision = new BitmapImage(new Uri("/Resources/BACKSIDE ISO VIEW.JPG", UriKind.RelativeOrAbsolute));
+        public static BitmapImage Img_EdgeSideVision = new BitmapImage(new Uri("/Resources/EDGESIDE.JPG", UriKind.RelativeOrAbsolute));
     }
 }
