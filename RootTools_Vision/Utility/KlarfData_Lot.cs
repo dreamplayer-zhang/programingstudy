@@ -782,6 +782,7 @@ namespace RootTools_Vision.Utility
 
 				MemoryStream image = new MemoryStream();
 				System.Drawing.Bitmap bitmap = Tools.CovertBufferToBitmap(sharedBuffer, defectRect, 3000, 3000);
+				Tools.DrawRuler(ref bitmap, 10, 10, (float)resX);
 				//System.Drawing.Bitmap NewImg = new System.Drawing.Bitmap(bitmap);
 				bitmap.Save(image, ImageFormat.Tiff);
 				inputImage.Add(image);
