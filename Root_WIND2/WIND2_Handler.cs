@@ -58,7 +58,15 @@ namespace Root_WIND2
 
         #region Module
         public WIND2_Recipe m_recipe;
-        public EFEM_Process m_process;
+        EFEM_Process m_process;
+        public EFEM_Process p_process
+        {
+            get { return m_process; }
+            set
+            {
+                SetProperty(ref m_process, value);
+            }
+        }
         Vision m_vision;
         WIND2 m_WIND2;
         public WIND2 p_WIND2
@@ -122,7 +130,7 @@ namespace Root_WIND2
 
             m_recipe = new WIND2_Recipe("Recipe", m_engineer);
             foreach (ModuleBase module in p_moduleList.m_aModule.Keys) m_recipe.AddModule(module);
-            m_process = new EFEM_Process("Process", m_engineer, iWTR, m_ILoadport);
+            p_process = new EFEM_Process("Process", m_engineer, iWTR, m_ILoadport);
         }
 
         void InitEFEMModule()
@@ -156,7 +164,7 @@ namespace Root_WIND2
 
             m_recipe = new WIND2_Recipe("Recipe", m_engineer);
             foreach (ModuleBase module in p_moduleList.m_aModule.Keys) m_recipe.AddModule(module);
-            m_process = new EFEM_Process("Process", m_engineer, iWTR, m_ILoadport);
+            p_process = new EFEM_Process("Process", m_engineer, iWTR, m_ILoadport);
         }
 
         void InitModule(ModuleBase module)
@@ -403,14 +411,14 @@ namespace Root_WIND2
 
         public void CalcRecover()
         {
-            m_process.CalcRecover();
+            p_process.CalcRecover();
             CalcDockingUndocking();
         }
 
         void CalcUndocking()
         {
             List<EFEM_Process.Sequence> aSequence = new List<EFEM_Process.Sequence>();
-            while (m_process.m_qSequence.Count > 0) aSequence.Add(m_process.m_qSequence.Dequeue());
+            while (p_process.p_qSequence.Count > 0) aSequence.Add(p_process.p_qSequence.Dequeue());
             List<ILoadport> aDock = new List<ILoadport>();
 
 
@@ -451,7 +459,7 @@ namespace Root_WIND2
             while (aSequence.Count > 0)
             {
                 EFEM_Process.Sequence sequence = aSequence[0];
-                m_process.m_qSequence.Enqueue(sequence);
+                p_process.p_qSequence.Enqueue(sequence);
                 aSequence.RemoveAt(0);
                 for (int n = aDock.Count - 1; n >= 0; n--)
                 {
@@ -459,12 +467,12 @@ namespace Root_WIND2
                     {
                         ModuleRunBase runUndocking = aDock[n].GetModuleRunUndocking().Clone();
                         EFEM_Process.Sequence sequenceUndock = new EFEM_Process.Sequence(runUndocking, sequence.m_infoWafer);
-                        m_process.m_qSequence.Enqueue(sequenceUndock);
+                        p_process.p_qSequence.Enqueue(sequenceUndock);
                         aDock.RemoveAt(n);
                     }
                 }
             }
-            m_process.RunTree(Tree.eMode.Init);
+            p_process.RunTree(Tree.eMode.Init);
         }
 
         bool CalcDocking(ILoadport loadport, List<EFEM_Process.Sequence> aSequence)
@@ -503,7 +511,7 @@ namespace Root_WIND2
         {
             if (m_gem.p_cjRun == null)
                 return;
-            if (m_process.m_qSequence.Count > 0)
+            if (p_process.p_qSequence.Count > 0)
                 return;
             foreach (GemPJ pj in m_gem.p_cjRun.m_aPJ)
             {
@@ -567,11 +575,11 @@ namespace Root_WIND2
                     case EQ.eState.Run:
                         if (p_moduleList.m_qModuleRun.Count == 0)
                         {   
-                            m_process.p_sInfo = m_process.RunNextSequence();
+                            p_process.p_sInfo = p_process.RunNextSequence();
 
-                            if (m_process.m_qSequence.Count == 0)
+                            if (p_process.p_qSequence.Count == 0)
                                 //CheckUnload();
-                            if ((EQ.p_nRnR > 1) && (m_process.m_qSequence.Count == 0))
+                            if ((EQ.p_nRnR > 1) && (p_process.p_qSequence.Count == 0))
                             {
                                 m_process.CopyRNRSeq();
                                 //m_process.p_sInfo = m_process.AddInfoWafer(m_infoRnRSlot);
@@ -594,7 +602,7 @@ namespace Root_WIND2
                 if(loadport.p_infoCarrier.p_eState ==InfoCarrier.eState.Dock)
                 {
                     //Queue<EFEM_Process.Sequence> sequence = m_process.m_qSequence;
-                    if (m_process.m_qSequence.Count != 0) return;
+                    if (p_process.p_qSequence.Count != 0) return;
                     InfoCarrier infoCarrier = loadport.p_infoCarrier;
                     Application.Current.Dispatcher.Invoke((Action)delegate
                     {
