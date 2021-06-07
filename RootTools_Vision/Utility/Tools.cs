@@ -220,7 +220,7 @@ namespace RootTools_Vision
             return null;
         }
 
-        enum PenColor
+        public enum PenColor
         {
             WHITE,
             RED,
@@ -230,7 +230,7 @@ namespace RootTools_Vision
             ORANGE
         }
 
-        Pen GetPen(PenColor penColor)
+        static Pen GetPen(PenColor penColor)
         {
             Pen pen;
             switch (penColor)
@@ -258,7 +258,7 @@ namespace RootTools_Vision
             return pen;
         }
 
-        Brush GetBrush(PenColor penColor)
+        static Brush GetBrush(PenColor penColor)
         {
             Brush brush;
             switch (penColor)
@@ -294,11 +294,11 @@ namespace RootTools_Vision
             graphics.DrawString(text, myFont, brush, x, y);
 
         }
-        void DrawBitmapRect(ref Bitmap bit, float x, float y, float width, float height, PenColor penColor = PenColor.ORANGE)
+        public static void DrawBitmapRect(ref Bitmap bit, float x, float y, float width, float height, PenColor penColor = PenColor.ORANGE)
         {
             Graphics graphics = Graphics.FromImage(bit);
             Pen pen = GetPen(penColor);
-
+            pen.Width = 1;
            
             graphics.DrawRectangle(pen, x, y, width, height);
         }
@@ -309,14 +309,54 @@ namespace RootTools_Vision
             float f10um = (float)(10.0f / r);
             float f1um = f10um / 10;
 
+            CRect rt = new CRect(0, 0, x ,y);
+            double ratioY = y / 10;
+            double ratioX = x / 10;
+            CPoint ptStart = new CPoint(x / 2, (int)(y - ratioY));
+
             Graphics graphics = Graphics.FromImage(bit);
 
-            //graphics.DrawLine
+            int nDum = 10;
 
-            for (int i = 0; i <= 10; i++)
+            Pen pen = GetPen(PenColor.ORANGE);
+            pen.Width = 1;
+            int totalSize = (int)((rt.Width - ratioX - rt.X) / f10um);
+            
+            if(totalSize > 5)
             {
-
+                totalSize -= (totalSize % 5);
             }
+            if (totalSize > 10)
+                totalSize = 10;
+            int last = (int)(ptStart.X + f1um * totalSize * nDum);
+
+            for (int i = 0; i <= totalSize; i++)
+            {
+                graphics.DrawLine(pen, (ptStart.X + f1um * i * nDum), (ptStart.Y - 5), (ptStart.X + f1um * i * nDum), (ptStart.Y));
+
+                if (i % 5 == 0)
+                {
+                    graphics.DrawLine(pen, (float)(ptStart.X + f1um * i * nDum), (float)(ptStart.Y - 10), (float)(ptStart.X + f1um * i * nDum), (float)(ptStart.Y));
+                }
+
+                if (i % 10 == 0)
+                {
+                    graphics.DrawLine(pen, (float)(ptStart.X + f1um * i * nDum), (float)(ptStart.Y - 15), (float)(ptStart.X + f1um * i * nDum), (float)(ptStart.Y));
+                }
+                //totalSize++;
+            }
+
+            graphics.DrawLine(pen, last, (ptStart.Y - 15), last, (ptStart.Y));
+            graphics.DrawLine(pen, ptStart.X, ptStart.Y, last, ptStart.Y);
+
+            string str;
+            str = string.Format("{0}um", nDum * totalSize);
+            Brush brush = GetBrush(PenColor.ORANGE);
+            System.Drawing.Font myFont = new System.Drawing.Font("굴림", 8);
+            graphics.TextRenderingHint = System.Drawing.Text.TextRenderingHint.ClearTypeGridFit;
+            graphics.DrawString(str, myFont, brush, last - 20, ptStart.Y + 1);
+            //graphics.DrawString(str, );
+            //pDC->TextOut_Mem((int)(ptStart.x + f1um * 10 * nDum - 40), (int)(ptStart.y + 3), str);
         }
 
         public static Bitmap CovertArrayToBitmap(byte[] rawdata, int _width, int _height, int _byteCount)
