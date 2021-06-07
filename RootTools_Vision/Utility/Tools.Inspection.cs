@@ -189,7 +189,7 @@ namespace RootTools_Vision
             });
         }
 
-        public static void SaveDefectImageParallel(String path, List<Measurement> measurementList, SharedBufferInfo sharedBuffer, int nByteCnt)
+        public static void SaveDefectImageParallel(String path, List<Measurement> measurementList, SharedBufferInfo sharedBuffer, int nByteCnt, Size size = new Size())
         {
             path += "\\";
             DirectoryInfo di = new DirectoryInfo(path);
@@ -203,19 +203,33 @@ namespace RootTools_Vision
             {
                 double cx = (measure.p_rtDefectBox.Left + measure.p_rtDefectBox.Right) / 2;
                 double cy = (measure.p_rtDefectBox.Top + measure.p_rtDefectBox.Bottom) / 2;
+
                 int startX = (int)cx - 320;
                 int startY = (int)cy - 240;
+                int width = 640;
+                int height = 480;
                 //int endX = startX + 640;
                 //int endY = startY + 480;
 
+                System.Windows.Rect imageRect = new System.Windows.Rect(startX, startY, width, height);
 
-                System.Drawing.Bitmap bitmap = CovertBufferToBitmap(sharedBuffer, new System.Windows.Rect(startX, startY, 640, 480));
+                if (size != Size.Empty)
+                {
+                    startX = (int)(cx - (size.Width / 2));
+                    if (startX < 0)
+                        startX = 0;
+                   
+                    startY = (int)(cy - (size.Height / 2));
+                    width = (int)size.Width;
+                    height = (int)size.Height;
+                }
+
+                System.Drawing.Bitmap bitmap = CovertBufferToBitmap(sharedBuffer, new System.Windows.Rect(startX, startY, width, height));
 
                 lock(lockObj)
 				{
                     if (System.IO.File.Exists(path + measure.m_nMeasurementIndex + ".bmp"))
                         System.IO.File.Delete(path + measure.m_nMeasurementIndex + ".bmp");
-
 
                     bitmap.Save(path + measure.m_nMeasurementIndex + ".bmp");
                 }
