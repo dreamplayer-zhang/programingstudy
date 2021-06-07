@@ -325,6 +325,85 @@ namespace RootTools_Vision
             bitmapGraphics.Dispose();
         }
 
+        private static int CompareByNumericName(FileInfo firstFile, FileInfo secondFile)
+        {
+            int firstFileNumericName = Int32.Parse(Path.GetFileNameWithoutExtension(firstFile.Name));
+            int secondFileNumericName = Int32.Parse(Path.GetFileNameWithoutExtension(secondFile.Name));
+
+            return firstFileNumericName.CompareTo(secondFileNumericName);
+        }
+
+        public static void SaveTiffImageFromFile(string savePath, string saveFileName, string defectImagePath)
+		{
+            savePath += "\\";
+            DirectoryInfo di = new DirectoryInfo(savePath);
+            if (!di.Exists)
+                di.Create();
+
+            DirectoryInfo di2 = new DirectoryInfo(defectImagePath);
+            if (!di2.Exists)
+                return;
+
+            savePath += saveFileName + ".tiff";
+
+            ImageCodecInfo info = null;
+            info = (from ie in ImageCodecInfo.GetImageEncoders()
+                    where ie.MimeType == "image/tiff"
+                    select ie).FirstOrDefault();
+
+
+            EncoderParameters ep = new EncoderParameters(2);
+            bool firstPage = true;
+
+            //var test = di2.GetFiles().OrderBy(f => f.Name);
+            FileInfo[] files = di2.GetFiles();
+            Array.Sort<FileInfo>(files, CompareByNumericName);
+
+            ArrayList inputImage = new ArrayList();
+            foreach (FileInfo file in files)
+			{
+                System.Drawing.Image imgFromFile = System.Drawing.Bitmap.FromFile(file.FullName);
+                inputImage.Add(imgFromFile);
+            }
+
+            System.Drawing.Image img = null;
+            for (int i = 0; i < inputImage.Count; i++)
+            {
+                System.Drawing.Image img_src = (System.Drawing.Image)inputImage[i];
+                Guid guid = img_src.FrameDimensionsList[0];
+                System.Drawing.Imaging.FrameDimension dimension = new System.Drawing.Imaging.FrameDimension(guid);
+
+                for (int nLoopFrame = 0; nLoopFrame < img_src.GetFrameCount(dimension); nLoopFrame++)
+                {
+                    img_src.SelectActiveFrame(dimension, nLoopFrame);
+
+                    ep.Param[0] = new EncoderParameter(System.Drawing.Imaging.Encoder.Compression, Convert.ToInt32(EncoderValue.CompressionLZW));
+
+                    if (firstPage)
+                    {
+                        img = img_src;
+
+                        ep.Param[1] = new EncoderParameter(System.Drawing.Imaging.Encoder.SaveFlag, Convert.ToInt32(EncoderValue.MultiFrame));
+                        lock (lockTiffObj) img.Save(savePath, info, ep);
+
+                        firstPage = false;
+                        continue;
+                    }
+
+                    ep.Param[1] = new EncoderParameter(System.Drawing.Imaging.Encoder.SaveFlag, Convert.ToInt32(EncoderValue.FrameDimensionPage));
+                    lock (lockTiffObj) img.SaveAdd(img_src, ep);
+                }
+            }
+            if (inputImage.Count == 0)
+            {
+                lock (lockTiffObj) File.Create(savePath);
+                return;
+            }
+
+            ep.Param[1] = new EncoderParameter(System.Drawing.Imaging.Encoder.SaveFlag, Convert.ToInt32(EncoderValue.Flush));
+            lock (lockTiffObj) img.SaveAdd(ep);
+        }
+
 
         public static object lockTiffObj = new object();
         public static void SaveTiffImage(string Path, string fileName, List<Defect> defectList, SharedBufferInfo sharedBuffer, Size imageSize = default(Size))

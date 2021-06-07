@@ -51,9 +51,9 @@ namespace RootTools_Vision
 
 			ProcessDefectEdgeParameter processDefectParam = this.recipe.GetItem<ProcessDefectEdgeParameter>();
 
-			List<Defect> topDefectList = CollectDefectData(0, 2);
-			List<Defect> btmDefectList = CollectDefectData(3, 5);
-			List<Defect> sideDefectList = CollectDefectData(6, 8);
+			List<Defect> topDefectList = CollectDefectData(EdgeSurface.EdgeDefectCode.Top);
+			List<Defect> btmDefectList = CollectDefectData(EdgeSurface.EdgeDefectCode.Btm);
+			List<Defect> sideDefectList = CollectDefectData(EdgeSurface.EdgeDefectCode.Side);
 
 			List<Defect> topMergeDefectList;
 			List<Defect> btmMergeDefectList;
@@ -131,21 +131,29 @@ namespace RootTools_Vision
 				btmMergeDefectList.Clear();
 				sideMergeDefectList.Clear();
 				foreach (Defect defect in mergeDefectList)
+				//Parallel.ForEach(mergeDefectList, defect =>
 				{
-					int index = (defect.m_nDefectCode - 10000) / 100;
-					if (index >= 0 && index < 3)
+					if (defect.m_nDefectCode == (int)EdgeSurface.EdgeDefectCode.Top)
 						topMergeDefectList.Add(defect);
-					if (index >= 3 && index < 6)
+					else if (defect.m_nDefectCode == (int)EdgeSurface.EdgeDefectCode.Btm)
 						btmMergeDefectList.Add(defect);
-					if (index >= 6 && index < 10)
+					else if (defect.m_nDefectCode == (int)EdgeSurface.EdgeDefectCode.Side)
 						sideMergeDefectList.Add(defect);
-				}
 
-				Tools.SaveTiffImage(settings_edgeside.KlarfSavePath, "edgetop" + sInspectionID, topMergeDefectList, topSharedBufferInfo);
-				Tools.SaveTiffImage(settings_edgeside.KlarfSavePath, "edgeBttom" + sInspectionID, btmMergeDefectList, btmSharedBufferInfo);
-				Tools.SaveTiffImage(settings_edgeside.KlarfSavePath, "edgeSide" + sInspectionID, sideMergeDefectList, sideSharedBufferInfo);
+					//int index = (defect.m_nDefectCode - 10000) / 100;
+					//if (index >= 0 && index < 3)
+					//	topMergeDefectList.Add(defect);
+					//if (index >= 3 && index < 6)
+					//	btmMergeDefectList.Add(defect);
+					//if (index >= 6 && index < 10)
+					//	sideMergeDefectList.Add(defect);
+				}
+				//);
+
+				//Tools.SaveTiffImage(settings_edgeside.KlarfSavePath, "edgetop" + sInspectionID, topMergeDefectList, topSharedBufferInfo);
+				//Tools.SaveTiffImage(settings_edgeside.KlarfSavePath, "edgeBttom" + sInspectionID, btmMergeDefectList, btmSharedBufferInfo);
+				//Tools.SaveTiffImage(settings_edgeside.KlarfSavePath, "edgeSide" + sInspectionID, sideMergeDefectList, sideSharedBufferInfo);
 			}
-			#endregion
 
 			// EDGE 전체 원형 이미지 저장
 			EdgeSurfaceParameter surfaceParam = this.recipe.GetItem<EdgeSurfaceParameter>();
@@ -153,6 +161,10 @@ namespace RootTools_Vision
 								  , topSharedBufferInfo, surfaceParam.EdgeParamBaseTop.StartPosition, surfaceParam.EdgeParamBaseTop.EndPosition
 								  , sideSharedBufferInfo, surfaceParam.EdgeParamBaseSide.StartPosition, surfaceParam.EdgeParamBaseSide.EndPosition
 								  , btmSharedBufferInfo, surfaceParam.EdgeParamBaseBtm.StartPosition, surfaceParam.EdgeParamBaseBtm.EndPosition);
+						
+			Tools.SaveTiffImageFromFile(settings_edgeside.KlarfSavePath, sInspectionID, path);
+
+			#endregion
 
 			//WorkEventManager.OnInspectionDone(this.currentWorkplace, new InspectionDoneEventArgs(new List<CRect>(), true));
 			WorkEventManager.OnIntegratedProcessDefectDone(this.currentWorkplace, new IntegratedProcessDefectDoneEventArgs());
@@ -176,6 +188,20 @@ namespace RootTools_Vision
 																	 sharedBufferG,
 																	 sharedBufferB);
 			return sharedBufferInfo;
+		}
+
+		private List<Defect> CollectDefectData(EdgeSurface.EdgeDefectCode defectCode)
+		{
+			List<Defect> DefectList = new List<Defect>();
+			foreach (Workplace workplace in workplaceBundle)
+			{
+				foreach (Defect defect in workplace.DefectList)
+				{
+					if (defect.m_nDefectCode == (int)defectCode)
+						DefectList.Add(defect);
+				}
+			}
+			return DefectList;
 		}
 
 		/// <summary>
@@ -218,20 +244,20 @@ namespace RootTools_Vision
 
 		private Bitmap MergeEdgesideImages(Defect defect)
 		{
-			EdgeSurfaceParameter surfaceParam = this.recipe.GetItem<EdgeSurfaceParameter>();
-			int gap90 = surfaceParam.EdgeParamBaseTop.StartPosition - surfaceParam.EdgeParamBaseBtm.StartPosition;
-			int gap45 = surfaceParam.EdgeParamBaseSide.StartPosition - surfaceParam.EdgeParamBaseBtm.StartPosition;
-
 			SharedBufferInfo topSharedBufferInfo, btmSharedBufferInfo, sideSharedBufferInfo;
 			topSharedBufferInfo = GetSharedBufferInfo(0);
 			btmSharedBufferInfo = GetSharedBufferInfo(3);
 			sideSharedBufferInfo = GetSharedBufferInfo(6);
 
+			EdgeSurfaceParameter surfaceParam = this.recipe.GetItem<EdgeSurfaceParameter>();
+			int gap90 = surfaceParam.EdgeParamBaseTop.StartPosition - surfaceParam.EdgeParamBaseBtm.StartPosition;
+			int gap45 = surfaceParam.EdgeParamBaseSide.StartPosition - surfaceParam.EdgeParamBaseBtm.StartPosition;
+
 			Rect defectRect = defect.GetRect();
 			int imageWidth = this.currentWorkplace.SharedBufferInfo.Width; //this.recipe.GetItem<OriginRecipe>().OriginWidth;
 			int imageHeight = 500; //this.recipe.GetItem<EdgeSurfaceParameter>().EdgeParamBaseTop.ROIHeight;			
-			int imageTopPt = (int)(defectRect.Top + (defectRect.Height / 2) - (imageHeight / 2)); //141520;// defect 중심으로 둔 이미지의 Top
 			int imageLeftPt = 0;
+			int imageTopPt = (int)(defectRect.Top + (defectRect.Height / 2) - (imageHeight / 2)); //141520;// defect 중심으로 둔 이미지의 Top
 
 			Bitmap topImage, sideImage, btmImage;
 			if (defect.m_nDefectCode == (int)EdgeSurface.EdgeDefectCode.Top)
