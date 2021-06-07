@@ -108,7 +108,7 @@ namespace Root_WIND2
             blockTransferState.Text = m_carrier.p_eTransfer.ToString();
             SetBrush(buttonStateLoading, m_OHT.m_doLoadReq.p_bOn && p_bBlink);
             SetBrush(buttonStateUnloading, m_OHT.m_doUnloadReq.p_bOn && p_bBlink);
-            textBlockPlaced.Foreground = !m_loadport.m_diPlaced.p_bIn ? Brushes.White : Brushes.Gray;
+            textBlockPlaced.Foreground = !m_loadport.p_diPlaced.p_bIn ? Brushes.White : Brushes.Gray;
             textBlockPresent.Foreground = !m_loadport.p_diPresent.p_bIn ? Brushes.White : Brushes.Gray;
 
             if (m_OHT.p_eState == OHT_Semi.eState.All_Off && !m_OHT.m_bOHTErr && (!m_loadport.m_diPlaced.p_bIn || !m_loadport.p_diPresent.p_bIn))
