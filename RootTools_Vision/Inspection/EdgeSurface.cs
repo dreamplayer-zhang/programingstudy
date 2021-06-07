@@ -65,27 +65,27 @@ namespace RootTools_Vision
 			WorkEventManager.OnInspectionStart(this.currentWorkplace, new InspectionStartArgs());
 
 			if (paramTop.ChR)
-				DoColorInspection(paramTop, 0);
+				DoColorInspection(paramTop, EdgeDefectCode.Top, 0);
 			if (paramTop.ChG)
-				DoColorInspection(paramTop, 1);
+				DoColorInspection(paramTop, EdgeDefectCode.Top, 1);
 			if (paramTop.ChB)
-				DoColorInspection(paramTop, 2);
+				DoColorInspection(paramTop, EdgeDefectCode.Top, 2);
 			WorkEventManager.OnInspectionDone(this.currentWorkplace, new InspectionDoneEventArgs(new List<CRect>())); // 나중에 ProcessDefect쪽 EVENT로...
 
 			if (paramBottom.ChR)
-				DoColorInspection(paramBottom, 3);
+				DoColorInspection(paramBottom, EdgeDefectCode.Btm, 3);
 			if (paramBottom.ChG)
-				DoColorInspection(paramBottom, 4);
+				DoColorInspection(paramBottom, EdgeDefectCode.Btm, 4);
 			if (paramBottom.ChB)
-				DoColorInspection(paramBottom, 5);
+				DoColorInspection(paramBottom, EdgeDefectCode.Btm, 5);
 			WorkEventManager.OnInspectionDone(this.currentWorkplace, new InspectionDoneEventArgs(new List<CRect>())); // 나중에 ProcessDefect쪽 EVENT로...
 
 			if (paramSide.ChR)
-				DoColorInspection(paramSide, 6);
+				DoColorInspection(paramSide, EdgeDefectCode.Side, 6);
 			if (paramSide.ChG)
-				DoColorInspection(paramSide, 7);
+				DoColorInspection(paramSide, EdgeDefectCode.Side, 7);
 			if (paramSide.ChB)
-				DoColorInspection(paramSide, 8);
+				DoColorInspection(paramSide, EdgeDefectCode.Side, 8);
 			WorkEventManager.OnInspectionDone(this.currentWorkplace, new InspectionDoneEventArgs(new List<CRect>())); // 나중에 ProcessDefect쪽 EVENT로...
 		}
 
@@ -96,7 +96,7 @@ namespace RootTools_Vision
 			Btm = 10200,
 		}
 
-		private void DoColorInspection(EdgeSurfaceParameterBase param, int channelIndex)
+		private void DoColorInspection(EdgeSurfaceParameterBase param, EdgeDefectCode defectCode, int channelIndex)
 		{
 			//if (this.GetWorkplaceBufferByIndex(channelIndex) == null)
 			//	return;
@@ -112,8 +112,8 @@ namespace RootTools_Vision
 				endPtY = originRecipe.OriginHeight;
 
 			int count = (int)((endPtY - startPtY) / param.ROIHeight);
-			//for (int i = 1; i < 3; i++)
-			Parallel.For(1, count, i =>
+			for (int i = 1; i < 3; i++)
+			//Parallel.For(1, count, i =>
 			{
 				int ptLeft = 0;
 				int ptTop = startPtY + (i * height);
@@ -203,7 +203,7 @@ namespace RootTools_Vision
 						double degree = (double)360 / (param.EndPosition - param.StartPosition) * (defectTop + defectHeight / 2 - ptTop);
 
 						this.currentWorkplace.AddDefect(sInspectionID,
-							(int)EdgeDefectCode.Top/*10000 + (channelIndex * 100)*/,
+							(int)defectCode/*10000 + (channelIndex * 100)*/,
 							(float)(label[l].area * resolution),
 							label[l].value,
 							0,
@@ -219,7 +219,7 @@ namespace RootTools_Vision
 				}
 				#endregion
 			}
-			);
+			//);
 
 			// old
 			/*

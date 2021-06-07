@@ -154,8 +154,8 @@ namespace RootTools_Vision
 
 			float waferEdgeX, bevelX, ebrX;
 			waferEdgeX = FindEdge(arrDiff, arrDiff.Length - (2 * xRange), diffEdge);
-			bevelX = FindEdge(arrDiffReverse, (int)Math.Round(waferEdgeX), diffBevel + this.parameterEBR.OffsetBevel);
-			ebrX = FindEdge(arrDiff, (int)Math.Round(bevelX), diffEBR + this.parameterEBR.OffsetEBR);
+			bevelX = FindEdge(arrDiffReverse, (int)Math.Round(waferEdgeX) - this.parameterEBR.OffsetBevel, diffBevel);
+			ebrX = FindEdge(arrDiff, (int)Math.Round(bevelX) - this.parameterEBR.OffsetEBR, diffEBR);
 
 			// Add measurement
 			string sInspectionID = DatabaseManager.Instance.GetInspectionID();
@@ -259,7 +259,7 @@ namespace RootTools_Vision
 				searchStartX--;
 			}
 
-			if (searchStartX == 0) 
+			if (searchStartX < 0) 
 				return 0;
 
 			return FindEqualizeEdge(diff, peakX);
