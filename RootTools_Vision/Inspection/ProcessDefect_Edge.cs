@@ -118,7 +118,6 @@ namespace RootTools_Vision
 								  , sideSharedBufferInfo, surfaceParam.EdgeParamBaseSide.StartPosition, surfaceParam.EdgeParamBaseSide.EndPosition
 								  , btmSharedBufferInfo, surfaceParam.EdgeParamBaseBtm.StartPosition, surfaceParam.EdgeParamBaseBtm.EndPosition);
 
-
 			//if (settings_edgeside.UseKlarf)
 			//{
 			//	KlarfData_Lot klarfData = new KlarfData_Lot();

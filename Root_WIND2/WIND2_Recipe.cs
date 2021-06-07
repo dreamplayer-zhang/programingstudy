@@ -21,7 +21,16 @@ namespace Root_WIND2
         }
         #endregion
 
-        public ModuleRunList m_moduleRunList;
+        ModuleRunList m_moduleRunList;
+        public ModuleRunList p_moduleRunList
+        {
+            get { return m_moduleRunList; }
+            set
+            {
+                m_moduleRunList = value;
+                OnPropertyChanged("m_moduleRunList");
+            }
+        }
 
         public string m_id;
         IEngineer m_engineer;
@@ -31,7 +40,7 @@ namespace Root_WIND2
             m_id = id;
             m_engineer = engineer;
             m_log = LogView.GetLog(id);
-            m_moduleRunList = new ModuleRunList(id, engineer);
+            p_moduleRunList = new ModuleRunList(id, engineer);
         }
     }
 }

@@ -75,7 +75,7 @@ namespace Root_WIND2.UI_User
         public HomeRecipe_ViewModel()
         {
             m_recipe = ((WIND2_Handler)GlobalObjects.Instance.Get<WIND2_Engineer>().ClassHandler()).m_recipe;
-            m_moduleRunList = m_recipe.m_moduleRunList;
+            m_moduleRunList = m_recipe.p_moduleRunList;
             m_moduleRunList.Add(vision.p_id, "GrabLineScan");
             m_moduleRunList.RunTree(Tree.eMode.Init);
 

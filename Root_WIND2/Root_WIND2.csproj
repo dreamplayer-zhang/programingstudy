@@ -947,6 +947,14 @@
   <ItemGroup>
     <Resource Include="Resources\VEGAImage.png" />
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\ALIGNER.JPG" />
+    <Resource Include="Resources\BACKSIDE ISO VIEW.JPG" />
+    <Resource Include="Resources\EDGESIDE.JPG" />
+    <Resource Include="Resources\LOADPORT.JPG" />
+    <Resource Include="Resources\VISION.JPG" />
+    <Resource Include="Resources\WTR.JPG" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>copy /Y "$(SolutionDir)Lib\CRT_Runtime\10.0.18362.0\x64_bin\ucrt\ucrtbased.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\ucrtbased.dll"
