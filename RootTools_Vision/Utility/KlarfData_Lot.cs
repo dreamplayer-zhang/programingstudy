@@ -804,7 +804,7 @@ namespace RootTools_Vision.Utility
 					tiffHeight);
 
 				MemoryStream image = new MemoryStream();
-				System.Drawing.Bitmap bitmap = Tools.CovertBufferToBitmap(sharedBuffer, defectRect, 3000, 3000);
+				System.Drawing.Bitmap bitmap = Tools.CovertBufferToBitmap(sharedBuffer, defectRect, tiffWidth, tiffHeight);
 				//System.Drawing.Bitmap NewImg = new System.Drawing.Bitmap(bitmap);
 				bitmap.Save(image, ImageFormat.Tiff);
 				inputImage.Add(image);
