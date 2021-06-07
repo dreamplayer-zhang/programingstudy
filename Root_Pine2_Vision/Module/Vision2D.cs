@@ -392,8 +392,9 @@ namespace Root_Pine2_Vision.Module
         #endregion
 
         #region Request
-        public string ReqSnap(eWorks eWorks, string sRecipe)
+        public string ReqSnap(string sRecipe, eWorks eWorks)
         {
+
             return "OK"; 
         }
         #endregion
