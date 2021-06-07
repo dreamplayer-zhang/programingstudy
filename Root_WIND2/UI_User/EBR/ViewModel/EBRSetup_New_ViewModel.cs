@@ -134,7 +134,7 @@ namespace Root_WIND2.UI_User
             set
             {
                 RecipeEBR recipeEBR = GlobalObjects.Instance.Get<RecipeEBR>();
-                recipeEBR.GetItem<EBRParameter>().ROIWidth = value;
+                //recipeEBR.GetItem<EBRParameter>().ROIWidth = value;
                 
                 SetProperty(ref this.roiWidth, value);
             }
@@ -173,7 +173,7 @@ namespace Root_WIND2.UI_User
             set
             {
                 RecipeEBR recipeEBR = GlobalObjects.Instance.Get<RecipeEBR>();
-                recipeEBR.GetItem<EBRParameter>().StepDegree = value;
+                //recipeEBR.GetItem<EBRParameter>().StepDegree = value;
 
                 SetProperty(ref this.stepDegree, value);
             }
@@ -263,7 +263,15 @@ namespace Root_WIND2.UI_User
         {
             get
             {
-                return ((WIND2_Handler)GlobalObjects.Instance.Get<WIND2_Engineer>().ClassHandler()).p_EdgeSideVision.p_asGrabMode;
+                try
+                {
+                    return ((WIND2_Handler)GlobalObjects.Instance.Get<WIND2_Engineer>().ClassHandler()).p_EdgeSideVision.p_asGrabMode;
+                }
+                catch(Exception ex)
+                {
+                    MessageBox.Show(ex.Message);
+                }
+                return null;
             }
             set
             {
@@ -356,10 +364,10 @@ namespace Root_WIND2.UI_User
             this.FirstNotch = recipe.FirstNotch;
             this.LastNotch = recipe.LastNotch;
 
-			this.ROIWidth = parameter.ROIWidth;
+			//this.ROIWidth = parameter.ROIWidth;
             this.ROIHeight = parameter.ROIHeight;
             this.NotchY = parameter.NotchY;
-            this.StepDegree = parameter.StepDegree;
+            //this.StepDegree = parameter.StepDegree;
             this.XRange = parameter.XRange;
             this.DiffEdge = parameter.DiffEdge;
             this.DiffBevel = parameter.DiffBevel;
@@ -397,7 +405,7 @@ namespace Root_WIND2.UI_User
             int bufferHeight = lastNotch - firstNotch;
             //int bufferHeightPerDegree = bufferHeight / 360;
 
-            double stepDegree = parameter.StepDegree;
+            //double stepDegree = parameter.StepDegree;
             int mapSizeY = (int)(360 / stepDegree);
 
             RecipeType_WaferMap waferMap = recipeEBR.WaferMap;

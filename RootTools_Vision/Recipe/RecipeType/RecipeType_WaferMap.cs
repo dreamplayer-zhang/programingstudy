@@ -12,6 +12,7 @@ namespace RootTools_Vision
     {
         NO_CHIP = 0,
         NORMAL = 1,
+        FLAT_ZONE = 4
     }
 
     public class RecipeType_WaferMap

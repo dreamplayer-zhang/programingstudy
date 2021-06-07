@@ -49,11 +49,11 @@ namespace RootTools_Vision
 			int bufferHeight = lastNotch - firstNotch;
 			int bufferHeightPerDegree = bufferHeight / 360;
 
-			double stepDegree = parameterEBR.StepDegree;
+			double stepDegree = 10;// parameterEBR.StepDegree;
 			int cnt = (int)(360 / stepDegree);
 
 			int height = parameterEBR.ROIHeight;
-			int width = parameterEBR.ROIWidth;
+			int width = 5300;//parameterEBR.ROIWidth;
 
 			//Parallel.For(0, cnt, i =>
 			for (int i = 0; i < cnt; i++)

@@ -841,7 +841,7 @@ namespace RootTools_Vision
                     if (byteDst == null)
                         return;
 
-                    Marshal.Copy((IntPtr)((long)ptrSrc + (long)(i * srcStride + left)), byteDst, width * (i - top), width);
+                    Marshal.Copy((IntPtr)((long)ptrSrc + (long)((long)i * srcStride + (long)left)), byteDst, width * (i - top), width);
 
                 });
 
@@ -852,10 +852,10 @@ namespace RootTools_Vision
             }
         }
 
-        public static Bitmap FlipYImage(System.Drawing.Bitmap source)
+        public static Bitmap FlipXImage(System.Drawing.Bitmap source)
         {
             Bitmap dest = new Bitmap(source);
-            dest.RotateFlip(RotateFlipType.RotateNoneFlipY);
+            dest.RotateFlip(RotateFlipType.RotateNoneFlipX);
             return dest;
         }
 

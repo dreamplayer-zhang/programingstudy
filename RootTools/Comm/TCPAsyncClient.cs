@@ -9,7 +9,7 @@ namespace RootTools.Comm
     public class TCPAsyncClient : NotifyProperty, ITool, IComm
     {
         public delegate void OnReciveData(byte[] aBuf, int nSize, Socket socket);
-        public event OnReciveData EventReciveData;
+        public event OnReciveData EventReceiveData;
 
         #region ITool
         public UserControl p_ui
@@ -117,7 +117,7 @@ namespace RootTools.Comm
             try
             {
                 int lReceive = async.m_socket.EndReceive(ar);
-                if ((lReceive > 0) && (EventReciveData != null)) EventReciveData(async.m_aBuf, lReceive, async.m_socket);
+                if ((lReceive > 0) && (EventReceiveData != null)) EventReceiveData(async.m_aBuf, lReceive, async.m_socket);
                 if (m_bCommLog) m_commLog.Add(CommLog.eType.Receive, (lReceive < 64) ? Encoding.Default.GetString(async.m_aBuf, 0, lReceive) : "Large Data");
                 async.m_socket.BeginReceive(async.m_aBuf, 0, m_lMaxBuffer, SocketFlags.None, m_cbReceive, async);
             }

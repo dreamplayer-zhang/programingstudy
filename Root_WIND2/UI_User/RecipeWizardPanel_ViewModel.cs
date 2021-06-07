@@ -84,10 +84,9 @@ namespace Root_WIND2.UI_User
         public readonly UI_User.EdgesideSetup edgesideSetup = new UI_User.EdgesideSetup();
 		public readonly UI_User.EdgesideInspect edgesideInspect = new UI_User.EdgesideInspect();
 
-        // EBR
-        //public readonly UI_User.EBRSetup ebrSetup = new UI_User.EBRSetup();
-        public readonly UI_User.EBRSetup_New ebrSetup = new UI_User.EBRSetup_New();
-        public readonly UI_User.EBRInspect ebrInspect = new UI_User.EBRInspect();
+		// EBR
+		public readonly UI_User.EBRSetup ebrSetup = new UI_User.EBRSetup();
+		public readonly UI_User.EBRInspect ebrInspect = new UI_User.EBRInspect();
 
         // Camera
         public readonly UI_User.CameraVRS cameraVrs = new UI_User.CameraVRS();
@@ -147,16 +146,6 @@ namespace Root_WIND2.UI_User
             get => frontsideInspectVM;
         }
 
-        #region [Camera ViewModes]
-        private UI_User.CameraVRS_ViewModel cameraVrsVM = new UI_User.CameraVRS_ViewModel();
-        public UI_User.CameraVRS_ViewModel CameraVrsVM
-        {
-            get => cameraVrsVM;
-        }
-
-        #endregion
-
-
         #endregion
 
         #region [Back ViewModels]
@@ -199,8 +188,8 @@ namespace Root_WIND2.UI_User
 		#endregion
 
 		#region [EBR ViewModels]
-        private UI_User.EBRSetup_New_ViewModel ebrSetupVM = new UI_User.EBRSetup_New_ViewModel();
-        public UI_User.EBRSetup_New_ViewModel EBRSetupVM
+        private UI_User.EBRSetup_ViewModel ebrSetupVM = new UI_User.EBRSetup_ViewModel();
+        public UI_User.EBRSetup_ViewModel EBRSetupVM
         {
             get => ebrSetupVM;
         }
@@ -217,6 +206,12 @@ namespace Root_WIND2.UI_User
         public UI_User.CameraAlign_ViewModel CameraAlignVM
         {
             get => cameraAlignVM;
+        }
+
+        private UI_User.CameraVRS_ViewModel cameraVrsVM = new UI_User.CameraVRS_ViewModel();
+        public UI_User.CameraVRS_ViewModel CameraVrsVM
+        {
+            get => cameraVrsVM;
         }
 
         #endregion

@@ -138,6 +138,7 @@ namespace Root_WIND2.UI_User
         private void SelectedCellsChanged_Callback(object obj)
         {
             DataRowView row = (DataRowView)obj;
+            if (row == null) return;
 
             System.Drawing.Rectangle m_View_Rect = new System.Drawing.Rectangle((int)(double)row["m_fAbsX"] - ImageViewerVM.p_View_Rect.Width / 2, (int)(double)row["m_fAbsY"] - this.imageViewerVM.p_View_Rect.Height / 2, this.imageViewerVM.p_View_Rect.Width, this.imageViewerVM.p_View_Rect.Height);
             ImageViewerVM.p_View_Rect = m_View_Rect;

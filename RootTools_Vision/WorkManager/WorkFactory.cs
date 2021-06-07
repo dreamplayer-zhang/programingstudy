@@ -87,7 +87,7 @@ namespace RootTools_Vision
 
             WorkEventManager.PositionDone += PositionDone_Callback;
 
-            WorkEventManager.InspectionStart += InspectionStart_Callback;
+            //WorkEventManager.InspectionStart += InspectionStart_Callback;
             WorkEventManager.InspectionDone += InspectionDone_Callback;
 
             WorkEventManager.ProcessDefectDone += ProcessDefectDone_Callback;

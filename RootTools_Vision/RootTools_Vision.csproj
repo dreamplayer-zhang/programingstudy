@@ -180,6 +180,7 @@
     <Compile Include="Recipe\Recipe\EBRRecipe.cs" />
     <Compile Include="Recipe\Recipe\EdgeSurfaceRecipe.cs" />
     <Compile Include="Recipe\Recipe\EUVPodSurfaceRecipe.cs" />
+    <Compile Include="Recipe\Recipe\FrontAlignRecipe.cs" />
     <Compile Include="Recipe\Recipe\OriginRecipe.cs" />
     <Compile Include="Recipe\Recipe\VerticalWireRecipe.cs" />
     <Compile Include="Recipe\Recipe\PositionRecipe.cs" />

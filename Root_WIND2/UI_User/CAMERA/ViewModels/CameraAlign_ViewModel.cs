@@ -183,6 +183,8 @@ namespace Root_WIND2.UI_User
             {
                 return new RelayCommand(() =>
                 {
+                    if (VisionModule == null) return;
+
                     if (!VisionModule.p_CamAlign.m_ConnectDone)
                     {
                         VisionModule.p_CamAlign.FunctionConnect();

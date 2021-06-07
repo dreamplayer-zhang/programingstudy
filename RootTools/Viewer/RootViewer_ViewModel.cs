@@ -696,7 +696,7 @@ namespace RootTools
 
             double contrastLevel = Math.Pow((100.0 + p_nContrast) / 100.0, 2);
 
-            double newColor = ((((color / 255.0) - 0.5) * contrastLevel) + 0.5) * 255.0;
+            double newColor = (((((double)color / 255.0) - 0.5) * contrastLevel) + 0.5) * 255.0;
             newColor += p_nBrightness;
 
             return (byte)Clamp((int)Math.Round(newColor), 0, 255);
@@ -929,6 +929,12 @@ namespace RootTools
                                     });
 
                                     p_ImgSource = ImageHelper.ToBitmapSource(view);
+
+                                    p_TumbnailImgMargin = new Thickness(Convert.ToInt32((double)p_View_Rect.X * p_ThumbWidth / p_ImageData.p_Size.X), Convert.ToInt32((double)p_View_Rect.Y * p_ThumbHeight / p_ImageData.p_Size.Y), 0, 0);
+                                    if (Convert.ToInt32((double)p_View_Rect.Height * p_ThumbHeight / p_ImageData.p_Size.Y) == 0)
+                                        p_TumbnailImg_Rect = new System.Drawing.Rectangle(0, 0, Convert.ToInt32((double)p_View_Rect.Width * p_ThumbWidth / p_ImageData.p_Size.X), 2);
+                                    else
+                                        p_TumbnailImg_Rect = new System.Drawing.Rectangle(0, 0, Convert.ToInt32((double)p_View_Rect.Width * p_ThumbWidth / p_ImageData.p_Size.X), Convert.ToInt32((double)p_View_Rect.Height * p_ThumbHeight / p_ImageData.p_Size.Y));
                                 }
                                 else if (!isUpdate && p_ImageData.m_eMode == ImageData.eMode.ImageBuffer)
                                 {

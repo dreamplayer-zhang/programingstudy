@@ -90,13 +90,14 @@ namespace Root_WIND2
             EFEM
         }
         public eMode m_eMode = eMode.Vision;
-
         public bool m_bVisionEnable = false;
+        public bool m_bEngineerMode = false;
 
         void RunTreeMode(Tree tree)
         {
             m_eMode = (eMode)tree.Set(m_eMode, m_eMode, "Mode", "Run Mode");
             m_bVisionEnable = tree.Set(m_bVisionEnable, m_bVisionEnable, "VisionEnable", "VisionEnable");
+            m_bEngineerMode = tree.Set(m_bEngineerMode, m_bEngineerMode, "m_bEngineerMode", "Door Open & Pressure 감지 On/Off");
         }
         #endregion
 

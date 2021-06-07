@@ -42,19 +42,19 @@ namespace Root_Pine2.Module
         }
         void InitPosition()
         {
-            m_axis.AddPos(GetPosString(Vision.eWorks.A));
-            m_axis.AddPos(GetPosString(Vision.eWorks.B));
+            m_axis.AddPos(GetPosString(Vision2D.eWorks.A));
+            m_axis.AddPos(GetPosString(Vision2D.eWorks.B));
             m_axis.AddPos(Enum.GetNames(typeof(ePosTransfer)));
             m_axis.AddPos(Enum.GetNames(typeof(ePosTray)));
         }
-        string GetPosString(Vision.eWorks eWorks)
+        string GetPosString(Vision2D.eWorks eWorks)
         {
-            return Vision.eVision.Bottom.ToString() + eWorks.ToString();
+            return Vision2D.eVision.Bottom.ToString() + eWorks.ToString();
         }
         #endregion
 
         #region AxisXY
-        public string RunMoveBoat(Vision.eWorks eWorks, bool bWait = true)
+        public string RunMoveBoat(Vision2D.eWorks eWorks, bool bWait = true)
         {
             string sPos = GetPosString(eWorks);
             m_axis.p_axisX.StartMove(sPos);
@@ -78,7 +78,7 @@ namespace Root_Pine2.Module
         #endregion
 
         #region AxisZ
-        public string RunMoveZ(Vision.eWorks eWorks, bool bWait = true)
+        public string RunMoveZ(Vision2D.eWorks eWorks, bool bWait = true)
         {
             m_axis.p_axisZ.StartMove(GetPosString(eWorks));
             return bWait ? m_axis.WaitReady() : "OK";
@@ -104,9 +104,9 @@ namespace Root_Pine2.Module
         #endregion
 
         #region RunLoad
-        public string RunLoad(Vision.eWorks eWorks)
+        public string RunLoad(Vision2D.eWorks eWorks)
         {
-            Boat boat = m_handler.m_aBoats[Vision.eVision.Bottom].m_aBoat[eWorks]; 
+            Boat boat = m_handler.m_aBoats[Vision2D.eVision.Bottom].m_aBoat[eWorks]; 
             if (m_picker.p_infoStrip != null) return "InfoStrip != null";
             if (boat.p_eStep != Boat.eStep.Done) return "Boat not Done";
             try
@@ -186,7 +186,7 @@ namespace Root_Pine2.Module
                 switch (m_pine2.p_eMode)
                 {
                     case Pine2.eRunMode.Stack: return StartUnloadTray();
-                    case Pine2.eRunMode.Magazine: return StartUnloadTransfer();
+                    case Pine2.eRunMode.Magazine: return m_transfer.m_pusher.p_bEnable ? StartUnloadTransfer() : "OK";
                 }
             }
             else return StartLoadBoat();
@@ -224,13 +224,13 @@ namespace Root_Pine2.Module
 
         string StartLoadBoat()
         {
-            Boats boats = m_handler.m_aBoats[Vision.eVision.Bottom];
-            if (boats.m_aBoat[Vision.eWorks.A].p_eStep == Boat.eStep.Done) return StartLoadBoat(Vision.eWorks.A);
-            if (boats.m_aBoat[Vision.eWorks.B].p_eStep == Boat.eStep.Done) return StartLoadBoat(Vision.eWorks.B);
+            Boats boats = m_handler.m_aBoats[Vision2D.eVision.Bottom];
+            if (boats.m_aBoat[Vision2D.eWorks.A].p_eStep == Boat.eStep.Done) return StartLoadBoat(Vision2D.eWorks.A);
+            if (boats.m_aBoat[Vision2D.eWorks.B].p_eStep == Boat.eStep.Done) return StartLoadBoat(Vision2D.eWorks.B);
             return "OK";
         }
 
-        string StartLoadBoat(Vision.eWorks eWorks)
+        string StartLoadBoat(Vision2D.eWorks eWorks)
         {
             Run_LoadBoat run = (Run_LoadBoat)m_runLoadBoat.Clone();
             run.m_eWorks = eWorks;
@@ -292,7 +292,7 @@ namespace Root_Pine2.Module
                 InitModuleRun(module);
             }
 
-            public Vision.eWorks m_eWorks = Vision.eWorks.A;
+            public Vision2D.eWorks m_eWorks = Vision2D.eWorks.A;
             public override ModuleRunBase Clone()
             {
                 Run_LoadBoat run = new Run_LoadBoat(m_module);
@@ -302,7 +302,7 @@ namespace Root_Pine2.Module
 
             public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
             {
-                m_eWorks = (Vision.eWorks)tree.Set(m_eWorks, m_eWorks, "Boat", "Select Boat", bVisible);
+                m_eWorks = (Vision2D.eWorks)tree.Set(m_eWorks, m_eWorks, "Boat", "Select Boat", bVisible);
             }
 
             public override string Run()

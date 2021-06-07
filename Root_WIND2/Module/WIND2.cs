@@ -4,10 +4,14 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Threading;
+using Root_EFEM.Module;
 using RootTools;
 using RootTools.Control;
 using RootTools.GAFs;
 using RootTools.Module;
+using RootTools.OHT.Semi;
+using RootTools.OHTNew;
 using RootTools_Vision;
 
 namespace Root_WIND2
@@ -54,8 +58,12 @@ namespace Root_WIND2
         ALID alid_VAC1;
         ALID alid_VAC2;
         ALID alid_MCRESET;
+        ALID alid_Door;
+        ALID alid_Pressure;
+        ALID alid_FanAlarm;
         public DIO_Os m_doLamp;
         string[] asLamp = Enum.GetNames(typeof(eLamp));
+
 
         public override void GetTools(bool bInit)
         {
@@ -100,10 +108,15 @@ namespace Root_WIND2
             alid_VAC1 = m_gaf.GetALID(this, "VAC 1", "VAC 1 Error");
             alid_VAC2 = m_gaf.GetALID(this, "VAC 2", "VAC 2 Error");
             alid_MCRESET = m_gaf.GetALID(this, "MCReset", "MC Reset Error");
+            alid_Door = m_gaf.GetALID(this, "Door Open", "Door Open Detected");
+            alid_Pressure = m_gaf.GetALID(this, "EQ Pressure Limit", "EQ Pressure Limit");
+            alid_FanAlarm = m_gaf.GetALID(this, "Fan Stop Detected", "Fan Stop Detected");
+
         }
 
         Thread m_threadCheck;
         bool m_bThreadCheck = true;
+
 
         public WIND2(string id, IEngineer engineer)
         {
@@ -112,21 +125,54 @@ namespace Root_WIND2
             m_FFUGourp.OnDetectLimit += M_FFUGourp_OnDetectLimit;
             m_threadCheck = new Thread(new ThreadStart(RunThreadCheck));
             m_threadCheck.Start();
+            InitTimer();
+            ShowOHT();
         }
 
         
+        #region OHT
+        List<OHT_Semi> p_aOHT
+        {
+            get
+            {
+                List<OHT_Semi> aOHT = new List<OHT_Semi>();
+                WIND2_Handler handler = (WIND2_Handler)m_engineer.ClassHandler();
+                foreach (ILoadport loadport in handler.m_aLoadport)
+                {
+                    aOHT.Add(((Loadport_RND)loadport).m_OHTsemi);
+                }
+                return aOHT;
+            }
+        }
+        #endregion
+
 
         void RunThreadCheck()
         {
             m_bThreadCheck = true;
-            Thread.Sleep(1000);
+            Thread.Sleep(10000);
             while (m_bThreadCheck)
             {
+                try
+                {
                 Thread.Sleep(1000);
                 LampProcess();
                 DoorCheck();
                 FanCheck();
                 AlarmCheck();
+
+                    foreach (OHT_Semi OHT in p_aOHT)
+                    {
+                        OHT.p_bLightCurtain = !di_ProtectionBar.p_bIn;
+                        OHT.P_bProtectionBar = !di_ProtectionBar.p_bIn;
+                        OHT.P_MCReset = di_MCReset.p_bIn;
+                    }
+                }
+                catch (Exception e)
+                {
+                    
+                }
+
                 //if (_diEMS.p_bIn)
                 //{
                 //    this.p_eState = eState.Error;
@@ -310,14 +356,22 @@ namespace Root_WIND2
                     str = di_Door_ElecBtm.m_id;
                 else if (!di_Door_ElecOptic.p_bIn)
                     str = di_Door_ElecOptic.m_id;
-                if (str != "")
+
+                if (((WIND2_Engineer)m_engineer).m_bEngineerMode && str != "")
+                {
+                    alid_Door.Run(true, str);
+                }
+                else
+                {
+                    if (str != "")
                     GlobalObjects.Instance.Get<WIND2_Warning>().AddWarning(str + " Open Detect");
 
                 if (!di_ProtectionBar.p_bIn)
                     str = di_ProtectionBar.m_id;
-                if (str != "")
+                    if (str != "")
                     GlobalObjects.Instance.Get<WIND2_Warning>().AddWarning(str + " Up Dectect");
             }
+        }
         }
 
         private void FanCheck()
@@ -345,9 +399,17 @@ namespace Root_WIND2
                     str = di_Fan_4CH1.m_id;
                 else if (!di_Fan_4CH2.p_bIn)
                     str = di_Fan_4CH2.m_id;
-                if (str != "")
+
+                if (((WIND2_Engineer)m_engineer).m_bEngineerMode && str != "")
+                {
+                    alid_FanAlarm.Run(true, str);
+                }
+                else
+                {
+                    if (str != "")
                     GlobalObjects.Instance.Get<WIND2_Warning>().AddWarning(str + " Fan Off Detect");
             }
+        }
         }
 
         public override void ThreadStop()
@@ -355,6 +417,7 @@ namespace Root_WIND2
             if (m_bThreadCheck)
             {
                 m_bThreadCheck = false;
+                Thread.Sleep(2000);
                 m_threadCheck.Join();
             }
             base.ThreadStop();
@@ -367,7 +430,33 @@ namespace Root_WIND2
 
         private void M_FFUGourp_OnDetectLimit(string str)
         {
+            if (((WIND2_Engineer)m_engineer).m_bEngineerMode && str != "")
+            {
+                if(str.IndexOf("Pressure") >=0 )
+                    alid_Pressure.Run(true, str);
+            }
+            else
             GlobalObjects.Instance.Get<WIND2_Warning>().AddWarning(str);
+        }
+
+        public void ShowOHT()
+        {
+            m_timer.Start();
+        }
+
+        DispatcherTimer m_timer = new DispatcherTimer();
+        void InitTimer()
+        {
+            m_timer.Interval = TimeSpan.FromMilliseconds(10);
+            m_timer.Tick += M_timer_Tick;
+        }
+        OHTs_UI m_uiOHT;
+        private void M_timer_Tick(object sender, EventArgs e)
+        {
+            m_timer.Stop();
+            m_uiOHT = new OHTs_UI();
+            m_uiOHT.Init((WIND2_Handler)m_engineer.ClassHandler());
+            m_uiOHT.Show();
         }
     }
 }

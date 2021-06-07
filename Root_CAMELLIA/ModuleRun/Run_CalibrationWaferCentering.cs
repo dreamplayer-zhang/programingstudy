@@ -13,6 +13,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using static Root_CAMELLIA.Module.Module_Camellia;
+using SSLNet;
 
 namespace Root_CAMELLIA.Module
 {
@@ -52,6 +53,14 @@ namespace Root_CAMELLIA.Module
             m_DataManager = module.m_DataManager;
             
             InitModuleRun(module);
+
+            DataManager.Instance.m_calibration.CalDoneEvent += CalDoneEvent;
+        }
+
+        void CalDoneEvent()
+        {
+            MarsLogManager logManager = MarsLogManager.Instance;
+            logManager.WriteFNC(EQ.p_nRunLP, m_module.p_id, "Calibration", SSLNet.STATUS.END);
         }
 
         public override ModuleRunBase Clone()
@@ -132,23 +141,40 @@ namespace Root_CAMELLIA.Module
             Axis axisZ = m_module.p_axisZ;
             string strVRSImageDir = "D:\\";
             string strVRSImageFullPath = "";
-           
+
+            MarsLogManager logManager = MarsLogManager.Instance;
+
+            logManager.WriteFNC(EQ.p_nRunLP, m_module.p_id, "Lifter Down", SSLNet.STATUS.START);
             if (m_module.LifterDown() != "OK")
             {
                 return p_sInfo;
             }
+            logManager.WriteFNC(EQ.p_nRunLP, m_module.p_id, "Lifter Down", SSLNet.STATUS.END);
 
-            if (m_module.Run(axisZ.StartMove(m_dFocusZ)))
-            {
-                return p_sInfo;
-            }
-            if (m_module.Run(axisZ.WaitReady()))
-                return p_sInfo;
+            int sequence = 0;
+
+            logManager.WritePRC(EQ.p_nRnR, m_module.p_id, SSLNet.PRC_EVENTID.Process, SSLNet.STATUS.START, this.p_id, sequence++, materialID:m_module.p_infoWafer.p_id);
+
+            DataFormatter dataFormatter = new DataFormatter();
+            //logManager.MakeDataFormatter();
+            //logManager.AddData("Z Axis", m_dFocusZ, "Pulse");
+            dataFormatter.AddData("Z Axis", m_dFocusZ, "Pulse");
+            logManager.WriteFNC(EQ.p_nRunLP, m_module.p_id, "Start Move", SSLNet.STATUS.START, dataFormatter);
+            dataFormatter.ClearData();
+
+
+            logManager.WriteFNC(EQ.p_nRunLP, m_module.p_id, "Start Move", SSLNet.STATUS.END);
+
+
 
             if (m_useCal)
             {
                 if (m_useCentering)
                 {
+                    dataFormatter.AddData(nameof(m_InitialCal), m_InitialCal.ToString());
+                    dataFormatter.AddData(nameof(m_nCalibrationCnt), m_nCalibrationCnt);
+                    logManager.WriteFNC(EQ.p_nRunLP, m_module.p_id, "Calibration", SSLNet.STATUS.START, dataFormatter);
+                    dataFormatter.ClearData();
                     if (m_DataManager.m_calibration.Run(m_InitialCal, m_isPM, retryCount:m_nCalibrationCnt) != "OK")
                     {
                         return "Calibration fail";
@@ -156,18 +182,23 @@ namespace Root_CAMELLIA.Module
                 }
                 else
                 {
+                    bool success = false;
                     for(int i = 0; i < m_nCalibrationCnt; i++)
                     {
                         if (m_DataManager.m_calibration.Run(m_InitialCal, m_isPM, false) != "OK")
                         {
-                            return "Calibration fail";
+                            success = false;
+                            //return "Calibration fail";
                         }
                         else
                         {
+                            success = true;
                             break;
                         }
+                        if (!success)
+                            return "Calibration Fail";
                     }
-
+                    logManager.WriteFNC(EQ.p_nRunLP, m_module.p_id, "Calibration", SSLNet.STATUS.END);
                 }
             }
 
