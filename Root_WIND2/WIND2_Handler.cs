@@ -320,7 +320,7 @@ namespace Root_WIND2
         #region StateHome
         public string StateHome()
         {
-            m_process.m_qSequence.Clear();
+            m_process.p_qSequence.Clear();
             if (m_wtr != null)
             {
                 m_wtr.StateHome();
@@ -429,7 +429,7 @@ namespace Root_WIND2
             while (aSequence.Count > 0)
             {
                 EFEM_Process.Sequence sequence = aSequence[0];
-                m_process.m_qSequence.Enqueue(sequence);
+                m_process.p_qSequence.Enqueue(sequence);
                 aSequence.RemoveAt(0);
                 for (int n = aDock.Count - 1; n >= 0; n--)
                 {
@@ -437,7 +437,7 @@ namespace Root_WIND2
                     {
                         ModuleRunBase runUndocking = aDock[n].GetModuleRunUndocking().Clone();
                         EFEM_Process.Sequence sequenceUndock = new EFEM_Process.Sequence(runUndocking, sequence.m_infoWafer);
-                        m_process.m_qSequence.Enqueue(sequenceUndock);
+                        m_process.p_qSequence.Enqueue(sequenceUndock);
                         aDock.RemoveAt(n);
                     }
                 }
@@ -448,8 +448,8 @@ namespace Root_WIND2
         void CalcDockingUndocking()
         {
             List<EFEM_Process.Sequence> aSequence = new List<EFEM_Process.Sequence>();
-            while (m_process.m_qSequence.Count > 0)
-                aSequence.Add(m_process.m_qSequence.Dequeue());
+            while (m_process.p_qSequence.Count > 0)
+                aSequence.Add(m_process.p_qSequence.Dequeue());
             List<ILoadport> aDock = new List<ILoadport>();
             foreach (ILoadport loadport in m_aLoadport)
             {
@@ -489,7 +489,7 @@ namespace Root_WIND2
                 {
                     ModuleRunBase runDocking = loadport.GetModuleRunDocking().Clone();
                     EFEM_Process.Sequence sequenceDock = new EFEM_Process.Sequence(runDocking, sequence.m_infoWafer);
-                    m_process.m_qSequence.Enqueue(sequenceDock);
+                    m_process.p_qSequence.Enqueue(sequenceDock);
                     return true;
                 }
             }
