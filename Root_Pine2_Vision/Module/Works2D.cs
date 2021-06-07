@@ -219,15 +219,20 @@ namespace Root_Pine2_Vision.Module
                     nProcess = 0; 
                     try
                     {
-                        if (IsProcessRun() == false)
+                        if (IsMemoryPool() && (IsProcessRun() == false))
                         {
-                            Process process = Process.Start(m_sFileVisionWorks, p_id);
+                            Process process = Process.Start(m_sFileVisionWorks, p_id + "." + m_tcpip.p_nPort.ToString());
                             m_nProcessID = process.Id;
+                            Thread.Sleep(2000); 
                         }
-                        else if(m_tcpip.p_bConnect == false) m_tcpip.Connect();
+                        else if (m_tcpip.p_bConnect == false)
+                        {
+                            if (m_tcpip.p_bUse) m_tcpip.Connect();
+                        }
                     }
                     catch (Exception e) { m_vision.p_sInfo = p_id + " StartProcess Error : " + e.Message; }
                 }
+                nProcess++; 
             }
         }
 
@@ -242,6 +247,12 @@ namespace Root_Pine2_Vision.Module
             }
             return false;
         }
+
+        bool IsMemoryPool()
+        {
+            MemoryPool pool = new MemoryPool(m_memoryPool.p_id);
+            return pool.m_MMF != null; 
+        }
         #endregion
 
         public void Reset()
@@ -255,7 +266,7 @@ namespace Root_Pine2_Vision.Module
             if (m_vision.p_eRemote == ModuleBase.eRemote.Server)
             {
                 m_idProcess = tree.Set(m_idProcess, m_idProcess, "ID", "VisionWorks Process ID");
-                m_sFileVisionWorks = tree.SetFile(m_sFileVisionWorks, m_sFileVisionWorks, ".exe", "File", "VisionWorks File Name");
+                m_sFileVisionWorks = tree.SetFile(m_sFileVisionWorks, m_sFileVisionWorks, "exe", "File", "VisionWorks File Name");
                 m_bStartProcess = tree.Set(m_bStartProcess, m_bStartProcess, "Start", "Start Memory Process");
             }
         }
