@@ -99,7 +99,6 @@ namespace RootTools_Vision
 			btmSharedBufferInfo = GetSharedBufferInfo(3);
 			sideSharedBufferInfo = GetSharedBufferInfo(6);
 
-			// new - Defect Image Merge and Save
 			string path = Path.Combine(settings_edgeside.DefectImagePath, sInspectionID);
 			DirectoryInfo di = new DirectoryInfo(path);
 			if (!di.Exists)
@@ -112,57 +111,24 @@ namespace RootTools_Vision
 					mergeImage.Save(Path.Combine(path, mergeDefectList[i].m_nDefectIndex.ToString() + ".bmp"));
 			});
 
-			// old - Defect Image Save
-			//Tools.SaveDefectImageParallel(Path.Combine(settings_edgeside.DefectImagePath, sInspectionID), topMergeDefectList, topSharedBufferInfo, topSharedBufferInfo.ByteCnt);
-			//Tools.SaveDefectImageParallel(Path.Combine(settings_edgeside.DefectImagePath, sInspectionID), btmMergeDefectList, btmSharedBufferInfo, btmSharedBufferInfo.ByteCnt);
-			//Tools.SaveDefectImageParallel(Path.Combine(settings_edgeside.DefectImagePath, sInspectionID), sideMergeDefectList, sideSharedBufferInfo, sideSharedBufferInfo.ByteCnt);
-
-			if (settings_edgeside.UseKlarf)
-			{
-				KlarfData_Lot klarfData = new KlarfData_Lot();
-				Directory.CreateDirectory(settings_edgeside.KlarfSavePath);
-
-				klarfData.AddSlot(recipe.WaferMap, mergeDefectList, this.recipe.GetItem<OriginRecipe>());
-				klarfData.WaferStart(recipe.WaferMap, DateTime.Now);
-				klarfData.SetResultTimeStamp();
-				klarfData.SaveKlarf(settings_edgeside.KlarfSavePath, false);
-
-				topMergeDefectList.Clear();
-				btmMergeDefectList.Clear();
-				sideMergeDefectList.Clear();
-				foreach (Defect defect in mergeDefectList)
-				//Parallel.ForEach(mergeDefectList, defect =>
-				{
-					if (defect.m_nDefectCode == (int)EdgeSurface.EdgeDefectCode.Top)
-						topMergeDefectList.Add(defect);
-					else if (defect.m_nDefectCode == (int)EdgeSurface.EdgeDefectCode.Btm)
-						btmMergeDefectList.Add(defect);
-					else if (defect.m_nDefectCode == (int)EdgeSurface.EdgeDefectCode.Side)
-						sideMergeDefectList.Add(defect);
-
-					//int index = (defect.m_nDefectCode - 10000) / 100;
-					//if (index >= 0 && index < 3)
-					//	topMergeDefectList.Add(defect);
-					//if (index >= 3 && index < 6)
-					//	btmMergeDefectList.Add(defect);
-					//if (index >= 6 && index < 10)
-					//	sideMergeDefectList.Add(defect);
-				}
-				//);
-
-				//Tools.SaveTiffImage(settings_edgeside.KlarfSavePath, "edgetop" + sInspectionID, topMergeDefectList, topSharedBufferInfo);
-				//Tools.SaveTiffImage(settings_edgeside.KlarfSavePath, "edgeBttom" + sInspectionID, btmMergeDefectList, btmSharedBufferInfo);
-				//Tools.SaveTiffImage(settings_edgeside.KlarfSavePath, "edgeSide" + sInspectionID, sideMergeDefectList, sideSharedBufferInfo);
-			}
-
 			// EDGE 전체 원형 이미지 저장
 			EdgeSurfaceParameter surfaceParam = this.recipe.GetItem<EdgeSurfaceParameter>();
 			Tools.SaveEdgeCircleImage(Path.Combine(settings_edgeside.DefectImagePath, sInspectionID, (mergeDefectList.Count + 1).ToString()), settings_edgeside.OutputImageSizeWidth, settings_edgeside.OutputImageSizeHeight 
 								  , topSharedBufferInfo, surfaceParam.EdgeParamBaseTop.StartPosition, surfaceParam.EdgeParamBaseTop.EndPosition
 								  , sideSharedBufferInfo, surfaceParam.EdgeParamBaseSide.StartPosition, surfaceParam.EdgeParamBaseSide.EndPosition
 								  , btmSharedBufferInfo, surfaceParam.EdgeParamBaseBtm.StartPosition, surfaceParam.EdgeParamBaseBtm.EndPosition);
-						
-			Tools.SaveTiffImageFromFile(settings_edgeside.KlarfSavePath, sInspectionID, path);
+
+
+			//if (settings_edgeside.UseKlarf)
+			//{
+			//	KlarfData_Lot klarfData = new KlarfData_Lot();
+			//	Directory.CreateDirectory(settings_edgeside.KlarfSavePath);
+
+			//	klarfData.AddSlot(recipe.WaferMap, mergeDefectList, this.recipe.GetItem<OriginRecipe>());
+			//	klarfData.WaferStart(recipe.WaferMap, DateTime.Now);
+			//	klarfData.SetResultTimeStamp();
+			//	klarfData.SaveKlarf(settings_edgeside.KlarfSavePath, false);
+			//}
 
 			#endregion
 

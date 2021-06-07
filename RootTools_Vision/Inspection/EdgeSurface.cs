@@ -193,7 +193,7 @@ namespace RootTools_Vision
 				{
 					if ((label[l].area * resolution) > defectSizeMin
 						&& (label[l].area * resolution) < defectSizeMax
-						&& label[l].width > 0)
+						/*&& label[l].width > 10*/)
 					{
 						int defectLeft = ptLeft + label[l].boundLeft;
 						int defectTop = ptTop + label[l].boundTop;
@@ -203,7 +203,7 @@ namespace RootTools_Vision
 						double degree = (double)360 / (param.EndPosition - param.StartPosition) * (defectTop + defectHeight / 2 - ptTop);
 
 						this.currentWorkplace.AddDefect(sInspectionID,
-							(int)defectCode/*10000 + (channelIndex * 100)*/,
+							(int)defectCode /*10000 + (channelIndex * 100)*/,
 							(float)(label[l].area * resolution),
 							label[l].value,
 							0,
