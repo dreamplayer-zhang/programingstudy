@@ -80,14 +80,14 @@ namespace Root_VEGA_D.Module
             //if (m_grabMode != null) m_grabMode.RunTree(tree.GetTree("Grab Mode", false), bVisible, true);
         }
 
-
+        double m_dGrabLineScanPosZ;
         double m_dAFBestFocusPosY;
         int m_nAFBestGVSum;
         string RunAutoFocus()
         {
+            m_dGrabLineScanPosZ = m_grabMode.m_dFocusPosZ;
             if (!m_grabMode.m_bUseAF)
             {
-                m_dAFBestFocusPosY = m_grabMode.m_dFocusPosZ;
                 return "OK";
             }
 
@@ -151,13 +151,11 @@ namespace Root_VEGA_D.Module
                 }
 
                 // Offset 적용
-                if (m_nAFBestGVSum <= 0)
-                    m_dAFBestFocusPosY = m_grabMode.m_dFocusPosZ;
-                else
-                    m_dAFBestFocusPosY += m_grabMode.m_dAFOffset;
+                if (m_nAFBestGVSum > 0)
+                    m_dGrabLineScanPosZ += m_grabMode.m_dAFOffset;
 
                 // 포커스 위치로 이동
-                if (m_module.Run(axisZ.StartMove(m_dAFBestFocusPosY)))
+                if (m_module.Run(axisZ.StartMove(m_dGrabLineScanPosZ)))
                     return p_sInfo;
                 if (m_module.Run(axisZ.WaitReady()))
                     return p_sInfo;
@@ -171,9 +169,9 @@ namespace Root_VEGA_D.Module
                 m_grabMode.SetLight(false);
 
                 if(m_nAFBestGVSum <= 0)
-                    m_log.Info(string.Format("AutoFocus is failed, Z Pos is set to {0}", m_dAFBestFocusPosY));
+                    m_log.Info(string.Format("AutoFocus is failed, Z Pos is set to {0}", m_dGrabLineScanPosZ));
                 else
-                    m_log.Info(string.Format("AutoFocus is successful, Z Pos is set to {0}", m_dAFBestFocusPosY));
+                    m_log.Info(string.Format("AutoFocus is successful, Z Pos is set to {0}", m_dGrabLineScanPosZ));
             }
 
             return "OK";
@@ -183,6 +181,13 @@ namespace Root_VEGA_D.Module
         {
             Camera_Basler camRADS = m_module.CamRADS;
             IntPtr intPtr = camRADS.p_ImageData.GetPtr();  // R 채널 데이터
+
+            Axis axisZ = m_module.AxisZ;
+            ACSAxis acsAxisZ = axisZ as ACSAxis;
+            if (axisZ == null)
+                return;
+
+            double curPosZ = acsAxisZ.GetActualPosition();
 
             unsafe
             {
@@ -217,22 +222,17 @@ namespace Root_VEGA_D.Module
 
                     // 이전 RADS laser 정보와 비교하여 중심에 가까울 때의 Z축 위치 찾기
                     int nCenterOnImg = size.Y / 2;
-                    Axis axisZ = m_module.AxisZ;
-                    ACSAxis acsAxisZ = axisZ as ACSAxis;
-                    if (acsAxisZ != null)
+                    if (nSum > m_grabMode.m_nAFLaserThreshold)
                     {
-                        if (nSum > m_grabMode.m_nAFLaserThreshold)
-                        {
-                            double curPosZ = acsAxisZ.GetActualPosition();
-                            double diffPast = Math.Abs(nCenterOnImg - m_dAFBestFocusPosY);
-                            double diffNew = Math.Abs(nCenterOnImg - curPosZ);
+                        double diffPast = Math.Abs(nCenterOnImg - m_dAFBestFocusPosY);
+                        double diffNew = Math.Abs(nCenterOnImg - laserY);
 
-                            // 새로 발견한 위치가 중심에 더 가까울 경우
-                            if (diffPast > diffNew && nSum > m_nAFBestGVSum)
-                            {
-                                m_dAFBestFocusPosY = curPosZ;
-                                m_nAFBestGVSum = nSum;
-                            }
+                        // 새로 발견한 위치가 중심에 더 가까울 경우
+                        if (diffPast > diffNew && nSum > m_nAFBestGVSum)
+                        {
+                            m_dGrabLineScanPosZ = curPosZ;
+                            m_dAFBestFocusPosY = laserY;
+                            m_nAFBestGVSum = nSum;
                         }
                     }
                 }
@@ -509,7 +509,7 @@ namespace Root_VEGA_D.Module
 
                 double dfov_mm = grabData.m_nFovSize * m_grabMode.m_dResX_um * 0.001;
                 double dOverlap_mm = grabData.m_nOverlap * m_grabMode.m_dResX_um * 0.001;
-                double dPosZ = m_dAFBestFocusPosY;//m_grabMode.m_dFocusPosZ;
+                double dPosZ = m_dGrabLineScanPosZ;//m_grabMode.m_dFocusPosZ;
 
                 double dTriggerStartPosY = m_grabMode.m_rpAxisCenter.Y + m_grabMode.m_ptXYAlignData.Y - m_grabMode.m_nWaferSize_mm * 0.5;
                 double dTriggerEndPosY = m_grabMode.m_rpAxisCenter.Y + m_grabMode.m_ptXYAlignData.Y + m_grabMode.m_nWaferSize_mm * 0.5;
