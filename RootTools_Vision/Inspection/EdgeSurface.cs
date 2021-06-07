@@ -17,9 +17,6 @@ namespace RootTools_Vision
 	{
 		public override WORK_TYPE Type => WORK_TYPE.INSPECTION;
 
-		private EdgeSurfaceParameter parameterEdge;
-		private EdgeSurfaceRecipe recipeEdge;
-
 		public enum EdgeMapPositionX
 		{
 			Top = 0,
@@ -39,11 +36,6 @@ namespace RootTools_Vision
 
 		protected override bool Preparation()
 		{
-			if (this.parameterEdge == null || this.recipeEdge == null)
-			{
-				this.parameterEdge = this.parameter as EdgeSurfaceParameter;
-				this.recipeEdge = recipe.GetItem<EdgeSurfaceRecipe>();
-			}
 			return true;
 		}
 
@@ -58,9 +50,10 @@ namespace RootTools_Vision
 			if (this.currentWorkplace.Index == 0)
 				return;
 
-			EdgeSurfaceParameterBase paramTop = parameterEdge.EdgeParamBaseTop;
-			EdgeSurfaceParameterBase paramBottom = parameterEdge.EdgeParamBaseBtm;
-			EdgeSurfaceParameterBase paramSide = parameterEdge.EdgeParamBaseSide;
+			EdgeSurfaceParameter param = recipe.GetItem<EdgeSurfaceParameter>();
+			EdgeSurfaceParameterBase paramTop = param.EdgeParamBaseTop;
+			EdgeSurfaceParameterBase paramBottom = param.EdgeParamBaseBtm;
+			EdgeSurfaceParameterBase paramSide = param.EdgeParamBaseSide;
 
 			WorkEventManager.OnInspectionStart(this.currentWorkplace, new InspectionStartArgs());
 
