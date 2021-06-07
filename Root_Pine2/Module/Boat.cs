@@ -83,12 +83,14 @@ namespace Root_Pine2.Module
             {
                 string sSend = Encoding.Default.GetString(aBuf, 0, nSize);
                 if (sSend.Length <= 0) return;
+                /*
                 MemoryStream memoryStream = new MemoryStream(Encoding.ASCII.GetBytes(sSend));
                 m_treeRoot.m_job = new Job(memoryStream, false, m_boats.m_log);
                 m_treeRoot.p_eMode = Tree.eMode.JobOpen;
                 m_recipe.RunTree(m_treeRoot, true);
                 m_treeRoot.m_job.Close();
                 m_boats.StartSnap(m_recipe); 
+                */
             }
 
             string p_id { get; set; }
@@ -100,7 +102,7 @@ namespace Root_Pine2.Module
                 p_id = id; 
                 m_boats = boats;
                 m_treeRoot = new TreeRoot(id, boats.m_log);
-                m_recipe = new Vision2D.Recipe(boats.m_vision); 
+                //m_recipe = new Vision2D.Recipe(boats.m_vision); 
             }
         }
         public RemoteSnap m_remoteSnap; 

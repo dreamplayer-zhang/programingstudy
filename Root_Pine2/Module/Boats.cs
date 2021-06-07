@@ -209,7 +209,7 @@ namespace Root_Pine2.Module
             public Run_Snap(Boats module)
             {
                 m_module = module;
-                m_recipe = new Vision2D.Recipe(module.m_vision); 
+                //m_recipe = new Vision2D.Recipe(module.m_vision); 
                 InitModuleRun(module);
             }
 
@@ -223,7 +223,7 @@ namespace Root_Pine2.Module
 
             public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
             {
-                m_recipe.RunTree(tree, bVisible); 
+                //m_recipe.RunTree(tree, bVisible); 
             }
 
             public override string Run()
