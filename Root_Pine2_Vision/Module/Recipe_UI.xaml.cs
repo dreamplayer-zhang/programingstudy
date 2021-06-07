@@ -1,8 +1,5 @@
-﻿using Microsoft.Win32;
-using RootTools;
+﻿using RootTools;
 using RootTools.Trees;
-using System.Collections.Generic;
-using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -23,19 +20,11 @@ namespace Root_Pine2_Vision.Module
         {
             m_vision = vision;
             DataContext = vision;
-            SetRecipeList();
+            comboBoxOpen.ItemsSource = vision.GetRecipeList();
             treeRootAUI.Init(vision.m_recipe[Vision2D.eWorks.A].m_treeRecipe);
             treeRootBUI.Init(vision.m_recipe[Vision2D.eWorks.B].m_treeRecipe);
             vision.m_recipe[Vision2D.eWorks.A].RunTreeRecipe(Tree.eMode.Init);
             vision.m_recipe[Vision2D.eWorks.B].RunTreeRecipe(Tree.eMode.Init);
-        }
-
-        void SetRecipeList()
-        {
-            List<string> asRecipe = new List<string>(); 
-            DirectoryInfo info = new DirectoryInfo(EQ.c_sPathRecipe);
-            foreach (DirectoryInfo dir in info.GetDirectories()) asRecipe.Add(dir.Name);
-            comboBoxOpen.ItemsSource = asRecipe; 
         }
 
         private void comboBoxOpen_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -54,38 +43,11 @@ namespace Root_Pine2_Vision.Module
             if (textBoxRecipe.Text == "") return; 
             m_vision.m_recipe[Vision2D.eWorks.A].RecipeSave(textBoxRecipe.Text);
             m_vision.m_recipe[Vision2D.eWorks.B].RecipeSave(textBoxRecipe.Text);
-            SetRecipeList();
+            comboBoxOpen.ItemsSource = m_vision.GetRecipeList();
             comboBoxOpen.SelectedItem = textBoxRecipe.Text;
             labelInfo.Content = "Recipe Save Done : " + textBoxRecipe.Text; 
         }
 
-        /*
-                private void buttonOpen_Click(object sender, RoutedEventArgs e)
-                {
-                    OpenFileDialog dlg = new OpenFileDialog();
-                    string sExt = "." + c_sExt;
-                    dlg.DefaultExt = sExt;
-                    dlg.Filter = "Recipe File (*" + sExt + ")|*" + sExt;
-                    dlg.InitialDirectory = EQ.c_sPathRecipe;
-                    if (dlg.ShowDialog() == false) return;
-                    Job job = new Job(dlg.FileName, false, m_vision.m_log);
-                    m_treeRoot.m_job = job;
-                    m_treeRoot.p_eMode = Tree.eMode.JobOpen;
-                    m_recipe.RunTree(m_treeRoot, true); 
-                    job.Close();
-                    RunTree(Tree.eMode.Init); 
-                }
-
-                private void buttonSave_Click(object sender, RoutedEventArgs e)
-                {
-                    SaveFileDialog dlg = new SaveFileDialog();
-                    string sExt = "." + c_sExt;
-                    dlg.DefaultExt = sExt;
-                    dlg.Filter = "Pine2 Recipe File (*" + sExt + ")|*" + sExt;
-                    dlg.InitialDirectory = EQ.c_sPathRecipe;
-                    if (dlg.ShowDialog() == false) return;
-                }
-        */
         #region ITool
         public string p_id
         {

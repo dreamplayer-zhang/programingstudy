@@ -350,6 +350,15 @@ namespace Root_Pine2_Vision.Module
             m_recipe.Add(eWorks.A, new Recipe(this, eWorks.A));
             m_recipe.Add(eWorks.B, new Recipe(this, eWorks.B));
         }
+
+        public List<string> GetRecipeList()
+        {
+            List<string> asRecipe = new List<string>();
+            DirectoryInfo info = new DirectoryInfo(EQ.c_sPathRecipe);
+            foreach (DirectoryInfo dir in info.GetDirectories()) asRecipe.Add(dir.Name);
+            return asRecipe;
+        }
+
         #endregion
 
         #region Works
@@ -591,6 +600,7 @@ namespace Root_Pine2_Vision.Module
             AddModuleRunList(new Run_Remote(this), true, "Remote Run");
             AddModuleRunList(new Run_Delay(this), true, "Time Delay");
             m_runSnap = AddModuleRunList(new Run_Snap(this), true, "Snap");
+            AddModuleRunList(new Run_ReqSnap(this), true, "Snap Request");
         }
 
         public class Run_Delay : ModuleRunBase
@@ -657,6 +667,37 @@ namespace Root_Pine2_Vision.Module
             public override string Run()
             {
                 return m_module.RunSnap(m_recipe, m_eWorks, m_sRecipe, m_iSnap);
+            }
+        }
+
+        public class Run_ReqSnap : ModuleRunBase
+        {
+            Vision2D m_module;
+            public Run_ReqSnap(Vision2D module)
+            {
+                m_module = module;
+                InitModuleRun(module);
+            }
+
+            public eWorks m_eWorks = eWorks.A;
+            public string m_sRecipe = "";
+            public override ModuleRunBase Clone()
+            {
+                Run_ReqSnap run = new Run_ReqSnap(m_module);
+                run.m_eWorks = m_eWorks;
+                run.m_sRecipe = m_sRecipe;
+                return run;
+            }
+
+            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
+            {
+                m_eWorks = (eWorks)tree.Set(m_eWorks, m_eWorks, "Works", "Vision eWorks", bVisible);
+                m_sRecipe = tree.Set(m_sRecipe, m_sRecipe, m_module.GetRecipeList(), "Recipe", "Recipe", bVisible);
+            }
+
+            public override string Run()
+            {
+                return m_module.ReqSnap(m_sRecipe, m_eWorks);
             }
         }
         #endregion
