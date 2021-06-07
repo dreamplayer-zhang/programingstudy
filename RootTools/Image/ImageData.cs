@@ -780,15 +780,19 @@ namespace RootTools
             bw.Close();
             fs.Close();
         }
-        bool WriteBitmapFileHeader(BinaryWriter bw, int nByte)
+        bool WriteBitmapFileHeader(BinaryWriter bw, int nByte, int width, int height)
         {
             if (bw == null)
                 return false;
 
+            int rowSize = (width * nByte + 3) & ~3;
+            int paletteSize = (nByte == 1 ? (256 * 4) : 0);
+
+            int size = 14 + 40 + paletteSize + rowSize * height;
             int offbit = 14 + 40 + (nByte == 1 ? (256 * 4) : 0);
 
             bw.Write(Convert.ToUInt16(0x4d42));                     // bfType;
-            bw.Write(Convert.ToUInt32(14));                         // bfSize
+            bw.Write(Convert.ToUInt32(14/*(uint)size)*/));                 // bfSize
             bw.Write(Convert.ToUInt16(0));                          // bfReserved1
             bw.Write(Convert.ToUInt16(0));                          // bfReserved2
             bw.Write(Convert.ToUInt32(offbit));                     // bfOffbits
@@ -800,12 +804,13 @@ namespace RootTools
             if (bw == null)
                 return false;
 
+            int biBitCount = (isGrayScale ? 1 : p_nPlane) * nByte * 8;
+
             bw.Write(Convert.ToUInt32(40));                         // biSize
             bw.Write(Convert.ToInt32(width));                       // biWidth
             bw.Write(Convert.ToInt32(height));                      // biHeight
             bw.Write(Convert.ToUInt16(1));                          // biPlanes
-            bw.Write(Convert.ToUInt16(((isGrayScale == true) ? nByte : p_nByte * p_nPlane) * 8));     // biBitCount
-            //bw.Write(Convert.ToUInt16(8 * p_nByte * p_nPlane));     // biBitCount
+            bw.Write(Convert.ToUInt16(biBitCount));                 // biBitCount
             bw.Write(Convert.ToUInt32(0));                          // biCompression
             bw.Write(Convert.ToUInt32(0));                          // biSizeImage
             bw.Write(Convert.ToInt32(0));                           // biXPelsPerMeter
@@ -859,7 +864,7 @@ namespace RootTools
             try
             {
                 // Bitmap File Header
-                if (WriteBitmapFileHeader(bw, nByte) == false)
+                if (WriteBitmapFileHeader(bw, nByte, rect.Width, rect.Height) == false)
                     return;
 
                 // Bitmap Info Header
@@ -975,7 +980,7 @@ namespace RootTools
             try
             {
                 /// Bitmap File Header
-                if (WriteBitmapFileHeader(bw, 3) == false)
+                if (WriteBitmapFileHeader(bw, 3, rect.Width, rect.Height) == false)
                     return;
 
                 /// Bitmap Info Header
