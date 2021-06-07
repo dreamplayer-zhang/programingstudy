@@ -325,7 +325,6 @@ namespace RootTools_Vision
             bitmapGraphics.Dispose();
         }
 
-
         public static object lockTiffObj = new object();
         public static void SaveTiffImage(string Path, string fileName, List<Defect> defectList, SharedBufferInfo sharedBuffer, Size imageSize = default(Size))
         {

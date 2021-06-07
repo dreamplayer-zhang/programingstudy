@@ -466,9 +466,7 @@ namespace RootTools_Vision.Utility
 				builder.Append(0 + " ");
 				builder.Append(0 + " ");
 				builder.Append(0 + " ");
-				builder.Append(0 + " ");
-				builder.Append(1 + " ");
-				builder.Append(1 + "\n");
+				builder.Append(0 + "\n");
 			}
 
 			builder.AppendLine("SummarySpec 5" + " TESTNO NDEFECT DEFDENSITY NDIE NDEFDIE;");

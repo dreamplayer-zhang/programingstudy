@@ -899,6 +899,26 @@ namespace RootTools_Vision
             return dest;
         }
 
+        public static List<Measurement> DataTableToMeasurementList(DataTable table)
+        {
+            List<Measurement> defects = new List<Measurement>();
+            FieldInfo[] fields = typeof(Measurement).GetFields();
+
+            foreach (DataRow row in table.Rows)
+            {
+                Measurement defect = new Measurement();
+                foreach (FieldInfo info in fields)
+                {
+                    info.SetValue(defect, Convert.ChangeType(row[info.Name], info.FieldType));
+                }
+                
+                if (defect.m_strMeasureItem == Measurement.EBRMeasureItem.EBR.ToString())
+                    defects.Add(defect);
+            }
+
+            return defects;
+        }
+
         public static List<Defect> DataTableToDefectList(DataTable table)
         {
             List<Defect> defects = new List<Defect>();

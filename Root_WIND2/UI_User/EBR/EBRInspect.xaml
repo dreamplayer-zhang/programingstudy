@@ -59,6 +59,7 @@
             <Button Content="Snap" Command="{Binding btnSnap}" Style="{StaticResource inspection_menu_button}"/>
             <Button Content="Stop" Command="{Binding btnStop}" Style="{StaticResource inspection_menu_button}"/>
             <Button Content="Clear" Command="{Binding btnClear}" Style="{StaticResource inspection_menu_button}"/>
+            <Button Content="Save Klarf" Command="{Binding btnSaveKlarf}" Style="{StaticResource inspection_menu_button}"/>
         </StackPanel>
 
         <Grid Grid.Row="1" Background="{StaticResource main_view_background}">

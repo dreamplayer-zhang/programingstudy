@@ -1,5 +1,4 @@
-﻿using Microsoft.Win32;
-using RootTools;
+﻿using RootTools;
 using RootTools.Trees;
 using System.Windows;
 using System.Windows.Controls;
@@ -17,70 +16,36 @@ namespace Root_Pine2_Vision.Module
         }
 
         Vision2D m_vision;
-        Vision2D.Recipe m_recipe;
         public void Init(Vision2D vision)
         {
             m_vision = vision;
-            m_recipe = new Vision2D.Recipe(vision); 
             DataContext = vision;
-            InitTree();
+            comboBoxOpen.ItemsSource = vision.GetRecipeList();
+            treeRootAUI.Init(vision.m_recipe[Vision2D.eWorks.A].m_treeRecipe);
+            treeRootBUI.Init(vision.m_recipe[Vision2D.eWorks.B].m_treeRecipe);
+            vision.m_recipe[Vision2D.eWorks.A].RunTreeRecipe(Tree.eMode.Init);
+            vision.m_recipe[Vision2D.eWorks.B].RunTreeRecipe(Tree.eMode.Init);
         }
 
-        #region Tree
-        public TreeRoot m_treeRoot;
-        void InitTree()
+        private void comboBoxOpen_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            m_treeRoot = new TreeRoot(m_vision.p_id, null);
-            m_treeRoot.UpdateTree += M_treeRoot_UpdateTree;
-            treeRootUI.Init(m_treeRoot);
-            RunTree(Tree.eMode.Init);
-        }
-
-        private void M_treeRoot_UpdateTree()
-        {
-            int lSnap = m_recipe.p_lSnap; 
-            RunTree(Tree.eMode.Update);
-            if (lSnap == m_recipe.p_lSnap) return; 
-            RunTree(Tree.eMode.Init);
-        }
-
-        public void RunTree(Tree.eMode eMode)
-        {
-            m_treeRoot.p_eMode = eMode;
-            m_recipe.RunTree(m_treeRoot, true); 
-        }
-        #endregion
-
-        const string c_sExt = "pine2"; 
-        private void buttonOpen_Click(object sender, RoutedEventArgs e)
-        {
-            OpenFileDialog dlg = new OpenFileDialog();
-            string sExt = "." + c_sExt;
-            dlg.DefaultExt = sExt;
-            dlg.Filter = "Recipe File (*" + sExt + ")|*" + sExt;
-            dlg.InitialDirectory = EQ.c_sPathRecipe;
-            if (dlg.ShowDialog() == false) return;
-            Job job = new Job(dlg.FileName, false, m_vision.m_log);
-            m_treeRoot.m_job = job;
-            m_treeRoot.p_eMode = Tree.eMode.JobOpen;
-            m_recipe.RunTree(m_treeRoot, true); 
-            job.Close();
-            RunTree(Tree.eMode.Init); 
+            string sRecipe = (string)comboBoxOpen.SelectedItem;
+            textBoxRecipe.Text = sRecipe; 
+            m_vision.m_recipe[Vision2D.eWorks.A].RecipeOpen(sRecipe);
+            m_vision.m_recipe[Vision2D.eWorks.B].RecipeOpen(sRecipe);
+            labelInfo.Content = "Recipe Open Done : " + sRecipe;
+            m_vision.m_recipe[Vision2D.eWorks.A].RunTreeRecipe(Tree.eMode.Init);
+            m_vision.m_recipe[Vision2D.eWorks.B].RunTreeRecipe(Tree.eMode.Init);
         }
 
         private void buttonSave_Click(object sender, RoutedEventArgs e)
         {
-            SaveFileDialog dlg = new SaveFileDialog();
-            string sExt = "." + c_sExt;
-            dlg.DefaultExt = sExt;
-            dlg.Filter = "Pine2 Recipe File (*" + sExt + ")|*" + sExt;
-            dlg.InitialDirectory = EQ.c_sPathRecipe;
-            if (dlg.ShowDialog() == false) return;
-            Job job = new Job(dlg.FileName, true, m_vision.m_log);
-            m_treeRoot.m_job = job;
-            m_treeRoot.p_eMode = Tree.eMode.JobSave;
-            m_recipe.RunTree(m_treeRoot, true);
-            job.Close();
+            if (textBoxRecipe.Text == "") return; 
+            m_vision.m_recipe[Vision2D.eWorks.A].RecipeSave(textBoxRecipe.Text);
+            m_vision.m_recipe[Vision2D.eWorks.B].RecipeSave(textBoxRecipe.Text);
+            comboBoxOpen.ItemsSource = m_vision.GetRecipeList();
+            comboBoxOpen.SelectedItem = textBoxRecipe.Text;
+            labelInfo.Content = "Recipe Save Done : " + textBoxRecipe.Text; 
         }
 
         #region ITool
@@ -94,6 +59,5 @@ namespace Root_Pine2_Vision.Module
 
         public void ThreadStop() { }
         #endregion
-
     }
 }

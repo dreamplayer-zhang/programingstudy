@@ -324,11 +324,7 @@
     <Compile Include="UI_User\EBR\EBRInspect.xaml.cs">
       <DependentUpon>EBRInspect.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI_User\EBR\EBRSetup_New.xaml.cs">
-      <DependentUpon>EBRSetup_New.xaml</DependentUpon>
-    </Compile>
     <Compile Include="UI_User\EBR\ViewModel\EBRInspect_ViewModel.cs" />
-    <Compile Include="UI_User\EBR\ViewModel\EBRSetup_New_ViewModel.cs" />
     <Compile Include="UI_User\EBR\ViewModel\EBRSetup_ViewModel.cs" />
     <Compile Include="UI_User\EBR\ViewModel\EBR_ImageViewer_ViewModel.cs" />
     <Compile Include="UI_User\EDGE\EdgesideSetupModule.xaml.cs">
@@ -799,10 +795,6 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UI_User\EBR\EBRSetup_New.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="UI_User\EDGE\EdgesideSetupModule.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -954,6 +946,14 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\VEGAImage.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\ALIGNER.JPG" />
+    <Resource Include="Resources\BACKSIDE ISO VIEW.JPG" />
+    <Resource Include="Resources\EDGESIDE.JPG" />
+    <Resource Include="Resources\LOADPORT.JPG" />
+    <Resource Include="Resources\VISION.JPG" />
+    <Resource Include="Resources\WTR.JPG" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

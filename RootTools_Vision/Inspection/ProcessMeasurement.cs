@@ -45,7 +45,7 @@ namespace RootTools_Vision
 
             int measureItem = Enum.GetValues(typeof(Measurement.EBRMeasureItem)).Length;
 
-            for (int i = 0, index = 0; i < measureList.Count; i += measureItem, index++)
+            for (int i = 0, index = 1; i < measureList.Count; i += measureItem, index++)
                 for (int j = 0; j < measureItem; j++)
                     measureList[i + j].SetMeasureIndex(index);
 
@@ -68,21 +68,21 @@ namespace RootTools_Vision
 
 			Tools.SaveDefectImageParallel(Path.Combine(settings_ebr.MeasureImagePath, sInspectionID), measureList, this.currentWorkplace.SharedBufferInfo, this.currentWorkplace.SharedBufferInfo.ByteCnt);
 
-			if (settings_ebr.UseKlarf)
-			{
-				KlarfData_Lot klarfData = new KlarfData_Lot();
-				Directory.CreateDirectory(settings_ebr.KlarfSavePath);
-
-				klarfData.AddSlot(recipe.WaferMap, realKlarfData, this.recipe.GetItem<OriginRecipe>());
-				klarfData.WaferStart(recipe.WaferMap, DateTime.Now);
-				klarfData.SetResultTimeStamp();
-				klarfData.SaveKlarf(settings_ebr.KlarfSavePath, false);
-			}
-
 			// EBR 원형 이미지 저장
 			EBRRecipe recipeParam = this.recipe.GetItem<EBRRecipe>();
 			Tools.SaveCircleImage(Path.Combine(settings_ebr.MeasureImagePath, sInspectionID, (realKlarfData.Count + 1).ToString()), settings_ebr.OutputImageSizeWidth, settings_ebr.OutputImageSizeHeight
 								  , this.currentWorkplace.SharedBufferInfo, recipeParam.FirstNotch, recipeParam.LastNotch);
+
+			//if (settings_ebr.UseKlarf)
+			//{
+			//	KlarfData_Lot klarfData = new KlarfData_Lot();
+			//	Directory.CreateDirectory(settings_ebr.KlarfSavePath);
+
+			//	klarfData.AddSlot(recipe.WaferMap, realKlarfData, this.recipe.GetItem<OriginRecipe>());
+			//	klarfData.WaferStart(recipe.WaferMap, DateTime.Now);
+			//	klarfData.SetResultTimeStamp();
+			//	klarfData.SaveKlarf(settings_ebr.KlarfSavePath, false);
+			//}
 
 			#endregion
             WorkEventManager.OnProcessMeasurementDone(this.currentWorkplace, new ProcessMeasurementDoneEventArgs());
