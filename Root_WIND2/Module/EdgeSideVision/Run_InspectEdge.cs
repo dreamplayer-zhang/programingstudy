@@ -1,9 +1,12 @@
 ﻿using RootTools;
+using RootTools.Database;
 using RootTools.Module;
 using RootTools.Trees;
 using RootTools_Vision;
+using RootTools_Vision.Utility;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -21,6 +24,38 @@ namespace Root_WIND2.Module
 		{
 			get => recipeName;
 			set => recipeName = value;
+		}
+		#endregion
+
+
+		#region [Klarf]
+		private static KlarfData_Lot klarfData = new KlarfData_Lot();
+
+
+		private static void LotStart(string klarfPath, RecipeBase recipe, InfoWafer infoWafer, GrabModeBase grabMode)
+		{
+			if (klarfData == null) klarfData = new KlarfData_Lot();
+
+			if (Directory.Exists(klarfPath)) Directory.CreateDirectory(klarfPath);
+
+
+			klarfData.LotStart(klarfPath, infoWafer, recipe.WaferMap, grabMode);
+		}
+
+		private void CreateKlarf(RecipeBase recipe, InfoWafer infoWafer, List<Defect> defectList, bool useTDIReview = false, bool useVrsReview = false)
+		{
+			//klarfData.SetResolution((float)camInfo.RealResX, (float)camInfo.RealResY);
+			// Product 정보 셋팅
+
+			klarfData.WaferStart(recipe.WaferMap, infoWafer);
+			klarfData.AddSlot(recipe.WaferMap, defectList, recipe.GetItem<OriginRecipe>(), useTDIReview, useVrsReview);
+			klarfData.SaveKlarf();
+
+		}
+
+		private void LotEnd(InfoWafer infoWafer)
+		{
+			klarfData.CreateLotEnd();
 		}
 		#endregion
 

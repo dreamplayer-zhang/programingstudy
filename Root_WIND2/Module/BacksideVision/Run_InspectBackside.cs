@@ -109,8 +109,8 @@ namespace Root_WIND2.Module
             GrabModeBack m_grabMode = m_module.GetGrabMode(p_sGrabMode[recipe.CameraInfoIndex]);
 
             // Check Lot Start
-            //if(infoWafer.IsLotStart ??)
-            LotStart(settings_backside.KlarfSavePath, recipe, infoWafer, m_grabMode);
+            if (infoWafer._eWaferOrder == InfoWafer.eWaferOrder.FirstWafer)
+                LotStart(settings_backside.KlarfSavePath, recipe, infoWafer, m_grabMode);
 
 
 
@@ -179,6 +179,7 @@ namespace Root_WIND2.Module
 
                 #endregion
             }
+
 
             inspectionTimeWatcher.Stop();
             RootTools_Vision.TempLogger.Write("Inspection", string.Format("{0:F3}", (double)inspectionTimeWatcher.ElapsedMilliseconds / (double)1000));
