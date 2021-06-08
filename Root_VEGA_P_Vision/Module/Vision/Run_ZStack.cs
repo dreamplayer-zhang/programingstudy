@@ -70,15 +70,16 @@ namespace Root_VEGA_P_Vision.Module
         public override string Run()
         {
             if (p_sZStackGrabMode == null) return "Grab Mode : ZStack Grab == Null";
+            AxisXY axisXY = m_module.m_stage.m_axisXY;
+            Axis axisZ = mainOpt.m_axisZ;
             try
             {
                 ZStackGrabMode.SetLight(true);
 
-                AxisXY axisXY = m_module.m_stage.m_axisXY;
-                Axis axisZ = mainOpt.m_axisZ;
-
-                double dTriggerStartPosZ = nstartPos-40000;
-                double dTriggerEndPosZ = nendPos+40000;
+                double dAxisStartPosZ = nstartPos - 10000;
+                double dAxisEndPosZ = nendPos + 10000;
+                double dTriggerStartPosZ = nstartPos;
+                double dTriggerEndPosZ = nendPos;
                 int nMMPerUM = 1000;
                 int nCamWidth = ZStackGrabMode.m_camera.GetRoiSize().X;
                 int nCamHeight = ZStackGrabMode.m_camera.GetRoiSize().Y;
@@ -101,58 +102,88 @@ namespace Root_VEGA_P_Vision.Module
                 if (nstep > mem.p_nCount)
                     return "nstep is over the mem count";
 
-                double dstep = Math.Abs(nendPos - nstartPos) / nstep;
+                double dstep = Math.Abs(dTriggerEndPosZ - dTriggerStartPosZ) / nstep;
 
 
-                ZStackGrabMode.m_nScanRate = 100;
+                ZStackGrabMode.m_nScanRate = 10;
                 FocusStacking_new fs = new FocusStacking_new(mem);
-                double dCamHeighttoPulse = nCamHeight * ZStackGrabMode.m_dResY_um;
-                double dCamWidthtoPulse = nCamWidth * ZStackGrabMode.m_dResX_um;
-                int nScanSpeed = Convert.ToInt32(ZStackGrabMode.m_nMaxFrame *  (dTriggerEndPosZ-dTriggerStartPosZ)/nstep * ZStackGrabMode.m_nScanRate / 100);
+                double dCamHeighttoPulse = nCamHeight * ZStackGrabMode.m_dResY_um*10;
+                double dCamWidthtoPulse = nCamWidth * ZStackGrabMode.m_dResX_um*10;
+                int nScanSpeed = Convert.ToInt32(ZStackGrabMode.m_nMaxFrame * (dTriggerEndPosZ - dTriggerStartPosZ) / nstep * ZStackGrabMode.m_nScanRate / 100);
 
                 int cntX = nPodSizeX_px / nCamWidth;
                 int cntY = nPodSizeY_px / nCamHeight;
                 for (int i = 0; i < cntX; i++)
                 {
-                    if (m_module.Run(axisXY.p_axisX.StartMove(dStartPosX + i * dCamWidthtoPulse)))
+                    if (m_module.Run(axisZ.StartMove(dAxisStartPosZ)))
+                        return p_sInfo;
+                    if (m_module.Run(axisZ.WaitReady()))
+                        return p_sInfo;
+
+                    if (m_module.Run(axisXY.p_axisX.StartMove(dStartPosX - i * dCamWidthtoPulse)))
                         return p_sInfo;
                     if (m_module.Run(axisXY.WaitReady()))
                         return p_sInfo;
 
                     for (int j = 0; j < cntY; j++)
                     {
-                        if (m_module.Run(axisZ.StartMove(dTriggerStartPosZ)))
+                        if (m_module.Run(axisZ.StartMove(dAxisStartPosZ)))
                             return p_sInfo;
                         if (m_module.Run(axisZ.WaitReady()))
                             return p_sInfo;
 
-                        if (m_module.Run(axisXY.p_axisY.StartMove(dStartPosY + j * dCamHeighttoPulse)))
+                        if (m_module.Run(axisXY.p_axisY.StartMove(dStartPosY - j * dCamHeighttoPulse)))
                             return p_sInfo;
                         if (m_module.Run(axisXY.WaitReady()))
                             return p_sInfo;
 
-                        axisZ.SetTrigger(dTriggerStartPosZ, dTriggerEndPosZ, dstep,5, true);
+
+                        //for (int step = 0; step < 1; step++)
+                        //{
+                        //    double dPosZ = nstartPos + step * dstep;
+                        //    //if (m_module.Run(m_module.Move(mainOpt.m_axisZ, dPosZ)))
+                        //    //    return p_sInfo;
+                        //    if (m_module.Run(axisZ.StartMove(dPosZ)))
+                        //        return p_sInfo;
+                        //    if (m_module.Run(axisZ.WaitReady()))
+                        //        return p_sInfo;
+
+                        //    IntPtr ptr = mem.GetPtr(step);
+
+                        //    camZStack.LiveGrab();
+                        //    camZStack.StopGrab();
+                        //    Parallel.For(0, nCamHeight, (k) =>
+                        //    {
+                        //        Marshal.Copy(camZStack.m_ImageLive.m_aBuf, k * nCamWidth, (IntPtr)((long)ptr + ((k + j * nCamHeight) * mem.W)+nCamWidth*i), nCamWidth);
+                        //    });
+
+                        //    Thread.Sleep(100);
+                        //} //여기가 속주석으 끝
+
+
+                       axisZ.SetTrigger(dTriggerStartPosZ, dTriggerEndPosZ, Convert.ToInt32(dstep), 20, true);
                         //if (m_module.Run(m_module.Move(mainOpt.m_axisZ, dPosZ)))
                         //    return p_sInfo;
                         ZStackGrabMode.StartZGrab(mem, nstep, new CPoint(nCamWidth * i, nCamHeight * j)); //여기선 진자 찍는것만
 
-                        if (m_module.Run(axisZ.StartMove(dTriggerEndPosZ, nScanSpeed)))
+                        if (m_module.Run(axisZ.StartMove(dAxisEndPosZ, nScanSpeed)))
                             return p_sInfo;
                         if (m_module.Run(axisZ.WaitReady()))
                             return p_sInfo;
 
                         axisZ.RunTrigger(false);
-
-
+                        ZStackGrabMode.m_camera.StopGrab();
                     }
                 }
-                ZStackGrabMode.m_camera.StopGrab();
+
                 return "OK";
                 //fs.Run(nCamWidth* cntX, nCamHeight* cntY);
             }
             finally
             {
                 ZStackGrabMode.SetLight(false);
+                axisZ.RunTrigger(false);
+                ZStackGrabMode.m_camera.StopGrab();
             }
         }
     }

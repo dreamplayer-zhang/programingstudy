@@ -181,7 +181,7 @@ namespace Root_VEGA_P_Vision.Module
                 if (resAngle == double.MinValue)
                     return "Angle계산이 잘못됐습니다.";
                 else
-                    m_module.m_stage.Rotate((m_module.m_stage.m_axisR.p_posActual/1000) + (resAngle- AlignAngle));
+                    m_module.m_stage.Rotate(resAngle- AlignAngle);
 
                 return "OK";
             }
