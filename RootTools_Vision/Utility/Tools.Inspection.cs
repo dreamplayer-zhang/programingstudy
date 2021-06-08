@@ -325,6 +325,13 @@ namespace RootTools_Vision
             bitmapGraphics.Dispose();
         }
 
+        public static void WriteRectToBitmap(System.Drawing.Bitmap sourceBitmap, System.Drawing.Pen pen,System.Drawing.Rectangle rect)
+        {
+            System.Drawing.Graphics bitmapGraphics = System.Drawing.Graphics.FromImage(sourceBitmap);
+            //bitmapGraphics.DrawString(text, font, brush, location);
+            bitmapGraphics.DrawRectangle(pen, rect);
+            bitmapGraphics.Dispose();
+        }
 
         public static object lockTiffObj = new object();
         public static void SaveTiffImage(string Path, string fileName, List<Defect> defectList, SharedBufferInfo sharedBuffer, Size imageSize = default(Size))
