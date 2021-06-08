@@ -51,48 +51,6 @@ namespace RootTools_Vision
             Tools.ParallelImageCopy(info.PtrR_GRAY, info.Width, info.Height, cRect, dst);
             return dst;
         }
-
-        public static Bitmap ConvertArrayToBitmapRect(byte[] rawData, int _width, int _height, int _byteCount, CRect _rect)
-        {
-            try
-            {
-                System.Drawing.Imaging.PixelFormat format = System.Drawing.Imaging.PixelFormat.Format8bppIndexed;
-                if (_byteCount == 1)
-                {
-                    format = System.Drawing.Imaging.PixelFormat.Format8bppIndexed;
-                }
-                else if (_byteCount == 3)
-                {
-                    format = System.Drawing.Imaging.PixelFormat.Format24bppRgb;
-                }
-                else
-                {
-                    System.Windows.MessageBox.Show("지원하지 않는 PixelFormat입니다.");
-                    return null;
-                }
-
-                int stride = (int)Math.Ceiling((double)_width / 4) * 4;
-                Bitmap bmp = new Bitmap(_width, _height, format);
-                ColorPalette palette = bmp.Palette;
-                if (_byteCount == 1)
-                {
-                    for (int i = 0; i < 256; i++)
-                        palette.Entries[i] = Color.FromArgb(i, i, i);
-
-                    bmp.Palette = palette;
-                }
-                else
-                {
-                    //Color Palette 만들줄 아는사람 넣어줘
-                }
-
-                return bmp;
-            }
-            catch
-            {
-                return null;
-            }
-        }
               
         public unsafe static Bitmap CovertBufferToBitmap(SharedBufferInfo info, Rect rect, int outSizeX = 0, int outSizeY = 0)
         {
