@@ -185,7 +185,8 @@ namespace RootTools_Vision
 								left,
 								top,
 								this.currentWorkplace.MapIndexX,
-								this.currentWorkplace.MapIndexY);
+								this.currentWorkplace.MapIndexY,
+								waferEdgeX);
 
 			this.currentWorkplace.AddMeasurement(sInspectionID,
 								"EDGE",
@@ -198,7 +199,8 @@ namespace RootTools_Vision
 								left,
 								top,
 								this.currentWorkplace.MapIndexX,
-								this.currentWorkplace.MapIndexY);
+								this.currentWorkplace.MapIndexY,
+								bevelX);
 		}
 
 		private void FindEdge(int[] arrDiff)
