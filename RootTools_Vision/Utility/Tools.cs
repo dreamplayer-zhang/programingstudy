@@ -206,6 +206,9 @@ namespace RootTools_Vision
                         }
                     }
                 }
+
+
+
                 bmp.UnlockBits(bmpData);
 
                 return bmp;
@@ -217,6 +220,144 @@ namespace RootTools_Vision
             return null;
         }
 
+        public enum PenColor
+        {
+            WHITE,
+            RED,
+            BLUE,
+            GREEN,
+            YELLOW,
+            ORANGE
+        }
+
+        static Pen GetPen(PenColor penColor)
+        {
+            Pen pen;
+            switch (penColor)
+            {
+                case PenColor.WHITE:
+                    pen = new Pen(Color.White, 3);
+                    break;
+                case PenColor.RED:
+                    pen = new Pen(Color.Red, 3);
+                    break;
+                case PenColor.BLUE:
+                    pen = new Pen(Color.Blue, 3);
+                    break;
+                case PenColor.GREEN:
+                    pen = new Pen(Color.Green, 3);
+                    break;
+                case PenColor.YELLOW:
+                    pen = new Pen(Color.Yellow, 3);
+                    break;
+                case PenColor.ORANGE:
+                default:
+                    pen = new Pen(Color.Orange, 3);
+                    break;
+            }
+            return pen;
+        }
+
+        static Brush GetBrush(PenColor penColor)
+        {
+            Brush brush;
+            switch (penColor)
+            {
+                case PenColor.WHITE:
+                    brush = new SolidBrush(Color.White);
+                    break;
+                case PenColor.RED:
+                    brush = new SolidBrush(Color.Red);
+                    break;
+                case PenColor.BLUE:
+                    brush = new SolidBrush(Color.Black);
+                    break;
+                case PenColor.GREEN:
+                    brush = new SolidBrush(Color.Green);
+                    break;
+                case PenColor.YELLOW:
+                    brush = new SolidBrush(Color.Yellow);
+                    break;
+                case PenColor.ORANGE:
+                default:
+                    brush = new SolidBrush(Color.Orange);
+                    break;
+            }
+            return brush;
+        }
+        void DrawBitmapText(ref Bitmap bit, string text, float x, float y, PenColor penColor = PenColor.ORANGE)
+        {
+            Graphics graphics = Graphics.FromImage(bit);
+            Brush brush = GetBrush(penColor);
+
+            System.Drawing.Font myFont = new System.Drawing.Font(FontFamily.GenericSansSerif, 20, System.Drawing.FontStyle.Regular, GraphicsUnit.Pixel);
+            graphics.DrawString(text, myFont, brush, x, y);
+
+        }
+        public static void DrawBitmapRect(ref Bitmap bit, float x, float y, float width, float height, PenColor penColor = PenColor.ORANGE)
+        {
+            Graphics graphics = Graphics.FromImage(bit);
+            Pen pen = GetPen(penColor);
+            pen.Width = 1;
+           
+            graphics.DrawRectangle(pen, x, y, width, height);
+        }
+
+        public static void DrawRuler(ref Bitmap bit, int x, int y, float resolution)
+        {
+            double r = resolution;
+            float f10um = (float)(10.0f / r);
+            float f1um = f10um / 10;
+
+            CRect rt = new CRect(0, 0, x ,y);
+            double ratioY = y / 10;
+            double ratioX = x / 10;
+            CPoint ptStart = new CPoint(x / 2, (int)(y - ratioY));
+
+            Graphics graphics = Graphics.FromImage(bit);
+
+            int nDum = 10;
+
+            Pen pen = GetPen(PenColor.ORANGE);
+            pen.Width = 1;
+            int totalSize = (int)((rt.Width - ratioX - rt.X) / f10um);
+            
+            if(totalSize > 5)
+            {
+                totalSize -= (totalSize % 5);
+            }
+            if (totalSize > 10)
+                totalSize = 10;
+            int last = (int)(ptStart.X + f1um * totalSize * nDum);
+
+            for (int i = 0; i <= totalSize; i++)
+            {
+                graphics.DrawLine(pen, (ptStart.X + f1um * i * nDum), (ptStart.Y - 5), (ptStart.X + f1um * i * nDum), (ptStart.Y));
+
+                if (i % 5 == 0)
+                {
+                    graphics.DrawLine(pen, (float)(ptStart.X + f1um * i * nDum), (float)(ptStart.Y - 10), (float)(ptStart.X + f1um * i * nDum), (float)(ptStart.Y));
+                }
+
+                if (i % 10 == 0)
+                {
+                    graphics.DrawLine(pen, (float)(ptStart.X + f1um * i * nDum), (float)(ptStart.Y - 15), (float)(ptStart.X + f1um * i * nDum), (float)(ptStart.Y));
+                }
+                //totalSize++;
+            }
+
+            graphics.DrawLine(pen, last, (ptStart.Y - 15), last, (ptStart.Y));
+            graphics.DrawLine(pen, ptStart.X, ptStart.Y, last, ptStart.Y);
+
+            string str;
+            str = string.Format("{0}um", nDum * totalSize);
+            Brush brush = GetBrush(PenColor.ORANGE);
+            System.Drawing.Font myFont = new System.Drawing.Font("굴림", 8);
+            graphics.TextRenderingHint = System.Drawing.Text.TextRenderingHint.ClearTypeGridFit;
+            graphics.DrawString(str, myFont, brush, last - 20, ptStart.Y + 1);
+            //graphics.DrawString(str, );
+            //pDC->TextOut_Mem((int)(ptStart.x + f1um * 10 * nDum - 40), (int)(ptStart.y + 3), str);
+        }
 
         public static Bitmap CovertArrayToBitmap(byte[] rawdata, int _width, int _height, int _byteCount)
         {
@@ -740,7 +881,7 @@ namespace RootTools_Vision
                     if (byteDst == null)
                         return;
 
-                    Marshal.Copy((IntPtr)((long)ptrSrc + (long)(i * srcStride + left)), byteDst, width * (i - top), width);
+                    Marshal.Copy((IntPtr)((long)ptrSrc + (long)((long)i * srcStride + (long)left)), byteDst, width * (i - top), width);
 
                 });
 
@@ -751,11 +892,31 @@ namespace RootTools_Vision
             }
         }
 
-        public static Bitmap FlipYImage(System.Drawing.Bitmap source)
+        public static Bitmap FlipXImage(System.Drawing.Bitmap source)
         {
             Bitmap dest = new Bitmap(source);
-            dest.RotateFlip(RotateFlipType.RotateNoneFlipY);
+            dest.RotateFlip(RotateFlipType.RotateNoneFlipX);
             return dest;
+        }
+
+        public static List<Measurement> DataTableToMeasurementList(DataTable table)
+        {
+            List<Measurement> defects = new List<Measurement>();
+            FieldInfo[] fields = typeof(Measurement).GetFields();
+
+            foreach (DataRow row in table.Rows)
+            {
+                Measurement defect = new Measurement();
+                foreach (FieldInfo info in fields)
+                {
+                    info.SetValue(defect, Convert.ChangeType(row[info.Name], info.FieldType));
+                }
+                
+                if (defect.m_strMeasureItem == Measurement.EBRMeasureItem.EBR.ToString())
+                    defects.Add(defect);
+            }
+
+            return defects;
         }
 
         public static List<Defect> DataTableToDefectList(DataTable table)

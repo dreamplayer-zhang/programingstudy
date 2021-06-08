@@ -254,7 +254,10 @@ namespace Root_WIND2
                 RecipeEdge recipeEdge = GlobalObjects.Instance.Register<RecipeEdge>();
                 RecipeEBR recipeEBR = GlobalObjects.Instance.Register<RecipeEBR>();
 
+                //Align
+                RecipeAlign recipeAlign = GlobalObjects.Instance.Register<RecipeAlign>();
 
+                
                 if (frontImage.GetPtr() != IntPtr.Zero)
                 {
                     RootTools_Vision.WorkManager3.WorkManager frontInspection = GlobalObjects.Instance.RegisterNamed<RootTools_Vision.WorkManager3.WorkManager>("frontInspection", 4, true);

@@ -17,9 +17,6 @@ namespace RootTools_Vision
 	{
 		public override WORK_TYPE Type => WORK_TYPE.INSPECTION;
 
-		private EdgeSurfaceParameter parameterEdge;
-		private EdgeSurfaceRecipe recipeEdge;
-
 		public enum EdgeMapPositionX
 		{
 			Top = 0,
@@ -39,11 +36,6 @@ namespace RootTools_Vision
 
 		protected override bool Preparation()
 		{
-			if (this.parameterEdge == null || this.recipeEdge == null)
-			{
-				this.parameterEdge = this.parameter as EdgeSurfaceParameter;
-				this.recipeEdge = recipe.GetItem<EdgeSurfaceRecipe>();
-			}
 			return true;
 		}
 
@@ -58,34 +50,35 @@ namespace RootTools_Vision
 			if (this.currentWorkplace.Index == 0)
 				return;
 
-			EdgeSurfaceParameterBase paramTop = parameterEdge.EdgeParamBaseTop;
-			EdgeSurfaceParameterBase paramBottom = parameterEdge.EdgeParamBaseBtm;
-			EdgeSurfaceParameterBase paramSide = parameterEdge.EdgeParamBaseSide;
+			EdgeSurfaceParameter param = recipe.GetItem<EdgeSurfaceParameter>();
+			EdgeSurfaceParameterBase paramTop = param.EdgeParamBaseTop;
+			EdgeSurfaceParameterBase paramBottom = param.EdgeParamBaseBtm;
+			EdgeSurfaceParameterBase paramSide = param.EdgeParamBaseSide;
 
 			WorkEventManager.OnInspectionStart(this.currentWorkplace, new InspectionStartArgs());
 
 			if (paramTop.ChR)
-				DoColorInspection(paramTop, 0);
+				DoColorInspection(paramTop, EdgeDefectCode.Top, 0);
 			if (paramTop.ChG)
-				DoColorInspection(paramTop, 1);
+				DoColorInspection(paramTop, EdgeDefectCode.Top, 1);
 			if (paramTop.ChB)
-				DoColorInspection(paramTop, 2);
+				DoColorInspection(paramTop, EdgeDefectCode.Top, 2);
 			WorkEventManager.OnInspectionDone(this.currentWorkplace, new InspectionDoneEventArgs(new List<CRect>())); // 나중에 ProcessDefect쪽 EVENT로...
 
 			if (paramBottom.ChR)
-				DoColorInspection(paramBottom, 3);
+				DoColorInspection(paramBottom, EdgeDefectCode.Btm, 3);
 			if (paramBottom.ChG)
-				DoColorInspection(paramBottom, 4);
+				DoColorInspection(paramBottom, EdgeDefectCode.Btm, 4);
 			if (paramBottom.ChB)
-				DoColorInspection(paramBottom, 5);
+				DoColorInspection(paramBottom, EdgeDefectCode.Btm, 5);
 			WorkEventManager.OnInspectionDone(this.currentWorkplace, new InspectionDoneEventArgs(new List<CRect>())); // 나중에 ProcessDefect쪽 EVENT로...
 
 			if (paramSide.ChR)
-				DoColorInspection(paramSide, 6);
+				DoColorInspection(paramSide, EdgeDefectCode.Side, 6);
 			if (paramSide.ChG)
-				DoColorInspection(paramSide, 7);
+				DoColorInspection(paramSide, EdgeDefectCode.Side, 7);
 			if (paramSide.ChB)
-				DoColorInspection(paramSide, 8);
+				DoColorInspection(paramSide, EdgeDefectCode.Side, 8);
 			WorkEventManager.OnInspectionDone(this.currentWorkplace, new InspectionDoneEventArgs(new List<CRect>())); // 나중에 ProcessDefect쪽 EVENT로...
 		}
 
@@ -96,10 +89,10 @@ namespace RootTools_Vision
 			Btm = 10200,
 		}
 
-		private void DoColorInspection(EdgeSurfaceParameterBase param, int channelIndex)
+		private void DoColorInspection(EdgeSurfaceParameterBase param, EdgeDefectCode defectCode, int channelIndex)
 		{
-			if (this.GetWorkplaceBufferByIndex(channelIndex) == null)
-				return;
+			//if (this.GetWorkplaceBufferByIndex(channelIndex) == null)
+			//	return;
 
 			OriginRecipe originRecipe = recipe.GetItem<OriginRecipe>();
 			int width = originRecipe.OriginWidth;
@@ -112,8 +105,8 @@ namespace RootTools_Vision
 				endPtY = originRecipe.OriginHeight;
 
 			int count = (int)((endPtY - startPtY) / param.ROIHeight);
-			for (int i = 0; i < 2; i++)
-			//Parallel.For(0, count, i =>
+			for (int i = 1; i < 3; i++)
+			//Parallel.For(1, count, i =>
 			{
 				int ptLeft = 0;
 				int ptTop = startPtY + (i * height);
@@ -136,6 +129,10 @@ namespace RootTools_Vision
 					Marshal.Copy(this.currentWorkplace.SharedBufferInfo.PtrList[channelIndex] + startIdx, inspectionROI, dstIdx, width);
 				}
 
+				// bitmap save 
+				//System.Drawing.Bitmap bmp = Tools.CovertArrayToBitmap(inspectionROI, width, height, 1);
+				//bmp.Save("D:\\edge " + i + ".bmp");
+				
 				#region [Inspection]
 
 				int startPtX = 0;
@@ -189,7 +186,7 @@ namespace RootTools_Vision
 				{
 					if ((label[l].area * resolution) > defectSizeMin
 						&& (label[l].area * resolution) < defectSizeMax
-						&& label[l].width > 50)
+						/*&& label[l].width > 10*/)
 					{
 						int defectLeft = ptLeft + label[l].boundLeft;
 						int defectTop = ptTop + label[l].boundTop;
@@ -199,7 +196,7 @@ namespace RootTools_Vision
 						double degree = (double)360 / (param.EndPosition - param.StartPosition) * (defectTop + defectHeight / 2 - ptTop);
 
 						this.currentWorkplace.AddDefect(sInspectionID,
-							10000 + (channelIndex * 100),
+							(int)defectCode /*10000 + (channelIndex * 100)*/,
 							(float)(label[l].area * resolution),
 							label[l].value,
 							0,

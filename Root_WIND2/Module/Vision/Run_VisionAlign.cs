@@ -46,6 +46,19 @@ namespace Root_WIND2.Module
         public GrabModeFront m_grabMode = null;
         string m_sGrabMode = "";
 
+
+
+        // New
+        #region [Properties]
+        private string m_sRecipeName = "";
+        public string RecipeName
+        {
+            get => this.m_sRecipeName;
+            set => this.m_sRecipeName = value;
+        }
+        #endregion
+
+
         public string p_sGrabMode
         {
             get { return m_sGrabMode; }
@@ -77,6 +90,9 @@ namespace Root_WIND2.Module
             run.m_AlignCount = m_AlignCount;
             run.p_sGrabMode = p_sGrabMode;
             run.m_dVRSToAlignOffsetZ = m_dVRSToAlignOffsetZ;
+
+            // New
+            run.m_sRecipeName = this.m_sRecipeName;
             return run;
         }
 
@@ -91,13 +107,19 @@ namespace Root_WIND2.Module
             m_AlignCount = tree.Set(m_AlignCount, m_AlignCount, "Align count", "Align Count", bVisible);
             p_sGrabMode = tree.Set(p_sGrabMode, p_sGrabMode, m_module.p_asGrabMode, "Grab Mode", "Select GrabMode", bVisible);
             m_dVRSToAlignOffsetZ = tree.Set(m_dVRSToAlignOffsetZ, m_dVRSToAlignOffsetZ, "VRS To Align Offset Z Pos", "VRS To Align Offset Z Pos", bVisible);
+
+            // New
+            m_sRecipeName = tree.Set(m_sRecipeName, m_sRecipeName, "Recipe Name", "Recipe Name", bVisible);
         }
 
         public override string Run()
         {
-            StopWatch sw = new StopWatch();
+            // 210603 New
+            StopWatch timer = new StopWatch();
+            timer.Start();
 
-            sw.Start();
+
+            // Camera Connection
             if (m_CamAlign == null) return "Cam == null";
 
             m_CamAlign.Connect();
@@ -106,7 +128,7 @@ namespace Root_WIND2.Module
                 if (EQ.IsStop()) return "OK";
             }
 
-
+            // Init
             m_module.p_bStageVac = true;
             AxisXY axisXY = m_module.AxisXY;
             Axis axisZ = m_module.AxisZ;
@@ -115,8 +137,17 @@ namespace Root_WIND2.Module
 
             m_grabMode.SetLight(true);
 
+            //Recipe Open
+            RecipeAlign recipe = GlobalObjects.Instance.Get<RecipeAlign>();
+            FrontAlignRecipe alignRecipe = recipe.GetItem<FrontAlignRecipe>();
+            if (!recipe.Read(m_sRecipeName))
+            {
+                return "Recipe Open Fail";
+            }
+
+            // Move Z
             double dPos = m_focusPosZ;
-            if(m_grabMode.m_dVRSFocusPos != 0)
+            if (m_grabMode.m_dVRSFocusPos != 0)
             {
                 dPos = m_grabMode.m_dVRSFocusPos + m_dVRSToAlignOffsetZ;
             }
@@ -128,8 +159,6 @@ namespace Root_WIND2.Module
 
             if (m_module.Run(axisZ.StartMove(dPos)))
                 return p_sInfo;
-            if (m_module.Run(axisXY.StartMove(m_firstPointPulse)))
-                return p_sInfo;
 
             if (m_module.Run(axisZ.WaitReady()))
                 return p_sInfo;
@@ -137,191 +166,296 @@ namespace Root_WIND2.Module
                 return p_sInfo;
 
 
-            string strVRSImageDir = @"C:\Users\ATI\Desktop\image\";
-            int camWidth = m_CamAlign.GetRoiSize().X;
-            int camHeight = m_CamAlign.GetRoiSize().Y;
 
-            // 이미지 회득
-            ImageData img = m_CamAlign.p_ImageViewer.p_ImageData;
-            string strVRSImageFullPath;
-            if (m_CamAlign.Grab() == "OK")
-            {
-                strVRSImageFullPath = string.Format(strVRSImageDir + "test_{0}.bmp", 0);
-                img.SaveImageSync(strVRSImageFullPath);
-            }
-            IntPtr src = img.GetPtr();
-            byte[] rawdata;
+            RPoint firstPoint = new RPoint(alignRecipe.FirstSearchPointX, alignRecipe.FirstSearchPointY);
+            RPoint secondPoint = new RPoint(alignRecipe.SecondSearchPointX, alignRecipe.SecondSearchPointY);
 
-            int firstPosX = 0, firstPosY = 0, secondPosX = 0, secondPosY = 0;
-            int width = 0, height = 0;
-            int posX = 0, posY = 0;
+            // First Point
+            if (m_module.Run(axisXY.StartMove(firstPoint)))
+                return p_sInfo;
+            if (m_module.Run(axisXY.WaitReady()))
+                return p_sInfo;
 
-            // Feature 이미지들 저장한곳 찿
-            DirectoryInfo di = new DirectoryInfo(m_saveAlignFailImagePath);
-
-            int resPosX = 0;
-            int resPosY = 0;
-            float maxScore = 0;
-            string matchingFeaturePath = "";
-            byte[] findRawData = null;
-            int findWidth = 0, findHeight = 0;
-            float result;
-            foreach (FileInfo file in di.GetFiles())
-            {
-                string fullname = file.FullName;
-                unsafe
-                {
-
-                    rawdata = Tools.LoadBitmapToRawdata(fullname, &width, &height);
-
-                    result = CLR_IP.Cpp_TemplateMatching((byte*)(src.ToPointer()), rawdata, &posX, &posY, img.GetBitMapSource().PixelWidth, img.GetBitMapSource().PixelHeight, width, height, 0, 0, img.GetBitMapSource().PixelWidth, img.GetBitMapSource().PixelHeight, 5, 3, 0);
-                }
-                if (maxScore < result)
-                {
-                    maxScore = result;
-                    resPosX = posX;
-                    resPosY = posY;
-                    findRawData = rawdata;
-                    findWidth = width;
-                    findHeight = height;
-                    matchingFeaturePath = fullname;
-                }
-            }
-            if (maxScore < m_score)
-                return "First Point Align Fail [Score : " + maxScore.ToString() + "]";
+            long outX, outY;
+            double score = TemplateMatching(alignRecipe, out outX, out outY);
 
 
-
-            if (m_module.Run(axisXY.StartMove(m_secondPointPulse)))
+            // Second Point
+            if (m_module.Run(axisXY.StartMove(secondPoint)))
                 return p_sInfo;
             if (m_module.Run(axisXY.WaitReady()))
                 return p_sInfo;
 
 
-            if (m_CamAlign.Grab() == "OK")
+
+
+            // Old
+            //StopWatch sw = new StopWatch();
+
+            //sw.Start();
+            //if (m_CamAlign == null) return "Cam == null";
+
+            //m_CamAlign.Connect();
+            //while (!m_CamAlign.m_ConnectDone)
+            //{
+            //    if (EQ.IsStop()) return "OK";
+            //}
+
+
+            //m_module.p_bStageVac = true;
+            //AxisXY axisXY = m_module.AxisXY;
+            //Axis axisZ = m_module.AxisZ;
+
+            //if (m_grabMode == null) return "Grab Mode == null";
+
+            //m_grabMode.SetLight(true);
+
+            //double dPos = m_focusPosZ;
+            //if(m_grabMode.m_dVRSFocusPos != 0)
+            //{
+            //    dPos = m_grabMode.m_dVRSFocusPos + m_dVRSToAlignOffsetZ;
+            //}
+
+            //if (m_module.Run(axisZ.WaitReady()))
+            //    return p_sInfo;
+            //if (m_module.Run(axisXY.WaitReady()))
+            //    return p_sInfo;
+
+            //if (m_module.Run(axisZ.StartMove(dPos)))
+            //    return p_sInfo;
+            //if (m_module.Run(axisXY.StartMove(m_firstPointPulse)))
+            //    return p_sInfo;
+
+            //if (m_module.Run(axisZ.WaitReady()))
+            //    return p_sInfo;
+            //if (m_module.Run(axisXY.WaitReady()))
+            //    return p_sInfo;
+
+
+            //string strVRSImageDir = @"C:\Users\ATI\Desktop\image\";
+            //int camWidth = m_CamAlign.GetRoiSize().X;
+            //int camHeight = m_CamAlign.GetRoiSize().Y;
+
+            //// 이미지 회득
+            //ImageData img = m_CamAlign.p_ImageViewer.p_ImageData;
+            //string strVRSImageFullPath;
+            //if (m_CamAlign.Grab() == "OK")
+            //{
+            //    strVRSImageFullPath = string.Format(strVRSImageDir + "test_{0}.bmp", 0);
+            //    img.SaveImageSync(strVRSImageFullPath);
+            //}
+            //IntPtr src = img.GetPtr();
+            //byte[] rawdata;
+
+            //int firstPosX = 0, firstPosY = 0, secondPosX = 0, secondPosY = 0;
+            //int width = 0, height = 0;
+            //int posX = 0, posY = 0;
+
+            //// Feature 이미지들 저장한곳 찿
+            //DirectoryInfo di = new DirectoryInfo(m_saveAlignFailImagePath);
+
+            //int resPosX = 0;
+            //int resPosY = 0;
+            //float maxScore = 0;
+            //string matchingFeaturePath = "";
+            //byte[] findRawData = null;
+            //int findWidth = 0, findHeight = 0;
+            //float result;
+            //foreach (FileInfo file in di.GetFiles())
+            //{
+            //    string fullname = file.FullName;
+            //    unsafe
+            //    {
+
+            //        rawdata = Tools.LoadBitmapToRawdata(fullname, &width, &height);
+
+            //        result = CLR_IP.Cpp_TemplateMatching((byte*)(src.ToPointer()), rawdata, &posX, &posY, img.GetBitMapSource().PixelWidth, img.GetBitMapSource().PixelHeight, width, height, 0, 0, img.GetBitMapSource().PixelWidth, img.GetBitMapSource().PixelHeight, 5, 3, 0);
+            //    }
+            //    if (maxScore < result)
+            //    {
+            //        maxScore = result;
+            //        resPosX = posX;
+            //        resPosY = posY;
+            //        findRawData = rawdata;
+            //        findWidth = width;
+            //        findHeight = height;
+            //        matchingFeaturePath = fullname;
+            //    }
+            //}
+            //if (maxScore < m_score)
+            //    return "First Point Align Fail [Score : " + maxScore.ToString() + "]";
+
+
+
+            //if (m_module.Run(axisXY.StartMove(m_secondPointPulse)))
+            //    return p_sInfo;
+            //if (m_module.Run(axisXY.WaitReady()))
+            //    return p_sInfo;
+
+
+            //if (m_CamAlign.Grab() == "OK")
+            //{
+            //    strVRSImageFullPath = string.Format(strVRSImageDir + "test_{0}.bmp", 1);
+            //    img.SaveImageSync(strVRSImageFullPath);
+            //}
+
+            //IntPtr src2 = img.GetPtr();
+
+            //int resPosX2 = 0;
+            //int resPosY2 = 0;
+
+            //unsafe
+            //{
+            //    result = CLR_IP.Cpp_TemplateMatching((byte*)(src2.ToPointer()), findRawData, &resPosX2, &resPosY2, img.GetBitMapSource().PixelWidth, img.GetBitMapSource().PixelHeight, findWidth, findHeight, 0, 0, img.GetBitMapSource().PixelWidth, img.GetBitMapSource().PixelHeight, 5, 3, 0);
+            //}
+
+            //if (result < m_score)
+            //    return "Second Point Align Fail [Score : " + result.ToString() + "]";
+
+            //double resAngle = CalcAngle(resPosX, resPosY, resPosX2, resPosY2);
+
+            //Axis axisRotate = m_module.AxisRotate;
+            //axisRotate.StartMove((axisRotate.p_posActual - resAngle * 1000));
+            //axisRotate.WaitReady();
+
+
+
+            //if (m_AlignCount > 1)
+            //{
+            //    for (int cnt = 1; cnt < m_AlignCount; cnt++)
+            //    {
+
+            //        for (int i = 0; i < 2; i++)
+            //        {
+
+
+            //            bool IsFirst;
+            //            if (Math.Abs(axisXY.p_posActual.X - m_firstPointPulse.X) < 10)
+            //            {
+            //                IsFirst = true;
+            //            }
+            //            else
+            //            {
+            //                IsFirst = false;
+            //            }
+
+            //            if (m_CamAlign.Grab() == "OK")
+            //            {
+            //                strVRSImageFullPath = string.Format(strVRSImageDir + "Repeat Img{0}.bmp", cnt + (i + 1));
+            //                img.SaveImageSync(strVRSImageFullPath);
+            //            }
+            //            src = img.GetPtr();
+            //            int PosX = 0, PosY = 0;
+            //            unsafe
+            //            {
+            //                result = CLR_IP.Cpp_TemplateMatching((byte*)(src.ToPointer()), findRawData, &PosX, &PosY, img.GetBitMapSource().PixelWidth, img.GetBitMapSource().PixelHeight, findWidth, findHeight, 0, 0, img.GetBitMapSource().PixelWidth, img.GetBitMapSource().PixelHeight, 5, 3, 0);
+            //            }
+            //            if (IsFirst)
+            //            {
+            //                if (result < m_score)
+            //                    return "Align Count :" + cnt.ToString() + "First Point Align Fail [Score : " + result.ToString() + "]";
+
+            //                firstPosX = PosX;
+            //                firstPosY = PosY;
+            //                if (i != 1)
+            //                {
+            //                    if (m_module.Run(axisXY.StartMove(m_secondPointPulse)))
+            //                        return p_sInfo;
+            //                    if (m_module.Run(axisXY.WaitReady()))
+            //                        return p_sInfo;
+            //                }
+
+            //            }
+            //            else
+            //            {
+            //                if (result < m_score)
+            //                    return "Align Count :" + cnt.ToString() + "Second Point Align Fail [Score : " + result.ToString() + "]";
+
+            //                secondPosX = PosX;
+            //                secondPosY = PosY;
+
+            //                if (i != 1)
+            //                {
+            //                    if (m_module.Run(axisXY.StartMove(m_firstPointPulse)))
+            //                        return p_sInfo;
+            //                    if (m_module.Run(axisXY.WaitReady()))
+            //                        return p_sInfo;
+            //                }
+            //            }
+
+            //        }
+            //        resAngle = CalcAngle(firstPosX, firstPosY, secondPosX, secondPosY);
+
+            //        axisRotate.StartMove((axisRotate.p_posActual - resAngle * 1000));
+            //        axisRotate.WaitReady();
+            //    }
+
+            //}
+
+            //if (m_CamAlign.Grab() != "OK") return "Grab Error";
+            //RPoint pulse;
+            //if (Math.Abs(axisXY.p_posActual.X - m_firstPointPulse.X) < 10)
+            //{
+            //    pulse = m_firstPointPulse;
+            //}
+            //else
+            //{
+            //    pulse = m_secondPointPulse;
+            //}
+            //src = img.GetPtr();
+            //unsafe
+            //{
+            //    CLR_IP.Cpp_TemplateMatching((byte*)(src.ToPointer()), findRawData, &posX, &posY, img.GetBitMapSource().PixelWidth, img.GetBitMapSource().PixelHeight, findWidth, findHeight, 0, 0, img.GetBitMapSource().PixelWidth, img.GetBitMapSource().PixelHeight, 5, 3, 0);
+            //}
+
+            //m_grabMode.m_ptXYAlignData = new RPoint(-(posX + (width / 2) - camWidth / 2) * m_AlignCamResolution * 10, (posY + (height / 2) - camHeight / 2) * m_AlignCamResolution * 10);
+            //m_module.RunTree(Tree.eMode.RegWrite);
+            //m_module.RunTree(Tree.eMode.Init);
+
+            //m_grabMode.SetLight(false);
+
+            //sw.Stop();
+            //System.Diagnostics.Debug.WriteLine(sw.ElapsedMilliseconds);
+            return "OK";
+        }
+
+        private double TemplateMatching(FrontAlignRecipe alignRecipe, out long maxOutX, out long maxOutY)
+        {
+            ImageData camImage = m_CamAlign.p_ImageViewer.p_ImageData;
+            IntPtr camImagePtr = camImage.GetPtr();
+            double maxScore = double.MinValue;
+            maxOutX = 0;
+            maxOutY = 0;
+            foreach (RecipeType_ImageData feature in alignRecipe.AlignFeatureList)
             {
-                strVRSImageFullPath = string.Format(strVRSImageDir + "test_{0}.bmp", 1);
-                img.SaveImageSync(strVRSImageFullPath);
-            }
-
-            IntPtr src2 = img.GetPtr();
-
-            int resPosX2 = 0;
-            int resPosY2 = 0;
-
-            unsafe
-            {
-                result = CLR_IP.Cpp_TemplateMatching((byte*)(src2.ToPointer()), findRawData, &resPosX2, &resPosY2, img.GetBitMapSource().PixelWidth, img.GetBitMapSource().PixelHeight, findWidth, findHeight, 0, 0, img.GetBitMapSource().PixelWidth, img.GetBitMapSource().PixelHeight, 5, 3, 0);
-            }
-
-            if (result < m_score)
-                return "Second Point Align Fail [Score : " + result.ToString() + "]";
-
-            double resAngle = CalcAngle(resPosX, resPosY, resPosX2, resPosY2);
-
-            Axis axisRotate = m_module.AxisRotate;
-            axisRotate.StartMove((axisRotate.p_posActual - resAngle * 1000));
-            axisRotate.WaitReady();
-
-
-
-            if (m_AlignCount > 1)
-            {
-                for (int cnt = 1; cnt < m_AlignCount; cnt++)
+                byte[] rawdata = feature.RawData;
+                double result;
+                int outX = 0, outY = 0;
+                unsafe
                 {
-
-                    for (int i = 0; i < 2; i++)
-                    {
-
-
-                        bool IsFirst;
-                        if (Math.Abs(axisXY.p_posActual.X - m_firstPointPulse.X) < 10)
-                        {
-                            IsFirst = true;
-                        }
-                        else
-                        {
-                            IsFirst = false;
-                        }
-
-                        if (m_CamAlign.Grab() == "OK")
-                        {
-                            strVRSImageFullPath = string.Format(strVRSImageDir + "Repeat Img{0}.bmp", cnt + (i + 1));
-                            img.SaveImageSync(strVRSImageFullPath);
-                        }
-                        src = img.GetPtr();
-                        int PosX = 0, PosY = 0;
-                        unsafe
-                        {
-                            result = CLR_IP.Cpp_TemplateMatching((byte*)(src.ToPointer()), findRawData, &PosX, &PosY, img.GetBitMapSource().PixelWidth, img.GetBitMapSource().PixelHeight, findWidth, findHeight, 0, 0, img.GetBitMapSource().PixelWidth, img.GetBitMapSource().PixelHeight, 5, 3, 0);
-                        }
-                        if (IsFirst)
-                        {
-                            if (result < m_score)
-                                return "Align Count :" + cnt.ToString() + "First Point Align Fail [Score : " + result.ToString() + "]";
-
-                            firstPosX = PosX;
-                            firstPosY = PosY;
-                            if (i != 1)
-                            {
-                                if (m_module.Run(axisXY.StartMove(m_secondPointPulse)))
-                                    return p_sInfo;
-                                if (m_module.Run(axisXY.WaitReady()))
-                                    return p_sInfo;
-                            }
-
-                        }
-                        else
-                        {
-                            if (result < m_score)
-                                return "Align Count :" + cnt.ToString() + "Second Point Align Fail [Score : " + result.ToString() + "]";
-
-                            secondPosX = PosX;
-                            secondPosY = PosY;
-
-                            if (i != 1)
-                            {
-                                if (m_module.Run(axisXY.StartMove(m_firstPointPulse)))
-                                    return p_sInfo;
-                                if (m_module.Run(axisXY.WaitReady()))
-                                    return p_sInfo;
-                            }
-                        }
-
-                    }
-                    resAngle = CalcAngle(firstPosX, firstPosY, secondPosX, secondPosY);
-
-                    axisRotate.StartMove((axisRotate.p_posActual - resAngle * 1000));
-                    axisRotate.WaitReady();
+                    result = CLR_IP.Cpp_TemplateMatching(
+                        (byte*)(camImagePtr.ToPointer()),
+                        rawdata,
+                        &outX,
+                        &outY,
+                        camImage.GetBitMapSource().PixelWidth, camImage.GetBitMapSource().PixelHeight,
+                        feature.Width, feature.Height,
+                        0,
+                        0,
+                        camImage.GetBitMapSource().PixelWidth, camImage.GetBitMapSource().PixelHeight,
+                        5, 3, 0);
                 }
 
+                if (maxScore < result)
+                {
+                    maxScore = result;
+                    maxOutX = outX;
+                    maxOutY = outY;
+                }
+                    
             }
 
-            if (m_CamAlign.Grab() != "OK") return "Grab Error";
-            RPoint pulse;
-            if (Math.Abs(axisXY.p_posActual.X - m_firstPointPulse.X) < 10)
-            {
-                pulse = m_firstPointPulse;
-            }
-            else
-            {
-                pulse = m_secondPointPulse;
-            }
-            src = img.GetPtr();
-            unsafe
-            {
-                CLR_IP.Cpp_TemplateMatching((byte*)(src.ToPointer()), findRawData, &posX, &posY, img.GetBitMapSource().PixelWidth, img.GetBitMapSource().PixelHeight, findWidth, findHeight, 0, 0, img.GetBitMapSource().PixelWidth, img.GetBitMapSource().PixelHeight, 5, 3, 0);
-            }
-
-            m_grabMode.m_ptXYAlignData = new RPoint(-(posX + (width / 2) - camWidth / 2) * m_AlignCamResolution * 10, (posY + (height / 2) - camHeight / 2) * m_AlignCamResolution * 10);
-            m_module.RunTree(Tree.eMode.RegWrite);
-            m_module.RunTree(Tree.eMode.Init);
-
-            m_grabMode.SetLight(false);
-
-            sw.Stop();
-            System.Diagnostics.Debug.WriteLine(sw.ElapsedMilliseconds);
-            return "OK";
+            return maxScore;
         }
 
         private double CalcAngle(int resPosX, int resPosY, int resPosX2, int resPosY2)

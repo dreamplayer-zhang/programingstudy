@@ -75,6 +75,10 @@ namespace RootTools.Lens.LinearTurret
         {
             return m_axis.WaitReady();
         }
+        public  string StartHome()
+        {
+            return m_axis.StartHome();
+        }
         #endregion
 
         #region Tree

@@ -213,6 +213,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Recipe\RecipeAlign.cs" />
     <Compile Include="Tools\Constants.cs" />
     <Compile Include="Controls\UserControl\ColorPicker.xaml.cs">
       <DependentUpon>ColorPicker.xaml</DependentUpon>
@@ -262,6 +263,12 @@
     <Compile Include="MVVM\SizeObserver.cs" />
     <Compile Include="Tools\KlarfFileTransfer.cs" />
     <Compile Include="Tools\PositionConverter.cs" />
+    <Compile Include="OHT_UI.xaml.cs">
+      <DependentUpon>OHT_UI.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="OHT_UIs.xaml.cs">
+      <DependentUpon>OHT_UIs.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Recipe\RecipeBack.cs" />
     <Compile Include="Recipe\RecipeEBR.cs" />
     <Compile Include="Recipe\RecipeEdge.cs" />
@@ -311,11 +318,11 @@
     </Compile>
     <Compile Include="UI_User\CAMERA\ViewModels\CameraAlign_ImageViewer_ViewModel.cs" />
     <Compile Include="UI_User\CAMERA\ViewModels\CameraAlign_ViewModel.cs" />
-    <Compile Include="UI_User\EBR\EBRInspect.xaml.cs">
-      <DependentUpon>EBRInspect.xaml</DependentUpon>
-    </Compile>
     <Compile Include="UI_User\EBR\EBRSetup.xaml.cs">
       <DependentUpon>EBRSetup.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI_User\EBR\EBRInspect.xaml.cs">
+      <DependentUpon>EBRInspect.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI_User\EBR\ViewModel\EBRInspect_ViewModel.cs" />
     <Compile Include="UI_User\EBR\ViewModel\EBRSetup_ViewModel.cs" />
@@ -560,6 +567,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Dialog\Dialog_PortSelect.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="Dialog\Dialog_Scan.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -575,6 +586,14 @@
     <Page Include="ManualJob\ManualJobSchedule_UI.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="OHT_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="OHT_UIs.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UI\1. Setup\3. RecipeWizard\1. FrontSide\FrontsideInspection.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -768,11 +787,11 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UI_User\EBR\EBRInspect.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="UI_User\EBR\EBRSetup.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI_User\EBR\EBRInspect.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -927,6 +946,14 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\VEGAImage.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\ALIGNER.JPG" />
+    <Resource Include="Resources\BACKSIDE ISO VIEW.JPG" />
+    <Resource Include="Resources\EDGESIDE.JPG" />
+    <Resource Include="Resources\LOADPORT.JPG" />
+    <Resource Include="Resources\VISION.JPG" />
+    <Resource Include="Resources\WTR.JPG" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

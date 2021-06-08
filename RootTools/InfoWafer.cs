@@ -23,6 +23,24 @@ namespace RootTools
             }
         }
 
+        string _sInspectionID = "";
+        public string p_sInspectionID
+        {
+            get
+            {
+                return _sInspectionID;
+            }
+            set
+            {
+                if (_sInspectionID == value)
+                    return;
+                m_log.Info(p_id + "Inspection ID : " + _sInspectionID + " -> " + value);
+                _sInspectionID = value;
+                OnPropertyChanged();
+                RegWrite();
+            }
+        }
+
         string _sFrameID = "";
         public string p_sFrameID
         {
@@ -60,6 +78,15 @@ namespace RootTools
             e8inch,
             eError
         }
+        public enum eWaferOrder
+        {
+            FirstWafer,
+            MiddleWafer,
+            LastWafer,
+            FirstLastWafer,
+        }
+        public eWaferOrder _eWaferOrder = eWaferOrder.MiddleWafer;
+
         eWaferSize _eSize = eWaferSize.e300mm;
         public eWaferSize p_eSize
         {
@@ -267,8 +294,8 @@ namespace RootTools
         public void InitCalcProcess()
         {
             m_qCalcProcess.Clear(); 
-            if (EQ.p_nRnR > 1) foreach (ModuleRunBase run in m_moduleRunList.p_aModuleRun) m_qCalcProcess.Enqueue(run);
-            else
+        //    if (EQ.p_nRnR > 1) foreach (ModuleRunBase run in m_moduleRunList.p_aModuleRun) m_qCalcProcess.Enqueue(run);
+        //    else
             {
                 ModuleRunBase[] aProcess = m_qProcess.ToArray();
                 foreach (ModuleRunBase run in aProcess) m_qCalcProcess.Enqueue(run); 

@@ -12,6 +12,7 @@ namespace RootTools.Camera
     }
     public class GrabData
     {
+        public int nUserSet = 1;
         public int nScanOffsetY = 0;
         public bool bInvY = false;
         public int ReverseOffsetY = 0;

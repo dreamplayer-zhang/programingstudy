@@ -229,17 +229,20 @@ namespace RootTools_Vision.WorkManager3
 
             if(pipeLine.Stop() == false)
             {
-                //this.pipeLine = new WorkPipeLine(this.threadNum);
-
+                this.pipeLine.Reset();
                 TempLogger.Write("Worker", "PipeLine Initialize");
             }
+            else
+            {
 
-            this.pipeLine.Reset();
+            }
 
             if (lotInfo == null)
                 DatabaseManager.Instance.SetLotinfo(DateTime.Now, DateTime.Now, Path.GetFileName(this.recipe.RecipePath));
             else
                 DatabaseManager.Instance.SetLotinfo(lotInfo);
+
+            currentWorkplaceBundle = this.currentWorkplaceQueue.First().ParentBundle;
 
             pipeLine.Start(
                 this.currentWorkplaceQueue,
@@ -254,11 +257,13 @@ namespace RootTools_Vision.WorkManager3
         }
 
 
+
+        WorkplaceBundle currentWorkplaceBundle;
         public void CheckSnapDone(Rect snapArea)
         {
-            if (this.currentWorkplaceQueue == null || this.currentWorkplaceQueue.Count == 0) return;
+            if (this.currentWorkplaceBundle == null || this.currentWorkplaceBundle.Count == 0) return;
 
-            foreach (Workplace wp in this.currentWorkplaceQueue)
+            foreach (Workplace wp in this.currentWorkplaceBundle)
             {
                 if (wp.WorkState >= WORK_TYPE.SNAP) continue;
 

@@ -1,10 +1,13 @@
 ﻿using Root_Pine2_Vision.Module;
 using RootTools;
+using RootTools.Comm;
 using RootTools.Control;
 using RootTools.Module;
 using RootTools.Trees;
 using System;
 using System.Collections.Generic;
+using System.Net.Sockets;
+using System.Text;
 
 namespace Root_Pine2.Module
 {
@@ -14,9 +17,14 @@ namespace Root_Pine2.Module
         public override void GetTools(bool bInit)
         {
             m_toolBox.GetAxis(ref m_axisCam, this, "Camera"); 
-            m_aBoat[Vision.eWorks.A].GetTools(m_toolBox, this, bInit);
-            m_aBoat[Vision.eWorks.B].GetTools(m_toolBox, this, bInit);
-            if (bInit) InitPosition(); 
+            m_aBoat[Vision2D.eWorks.A].GetTools(m_toolBox, this, bInit);
+            m_aBoat[Vision2D.eWorks.B].GetTools(m_toolBox, this, bInit);
+            m_toolBox.GetComm(ref m_tcpRequest, this, p_id + ".Request");
+            if (bInit)
+            {
+                InitPosition();
+                m_tcpRequest.EventReciveData += M_tcpRequest_EventReciveData;
+            }
         }
         #endregion
 
@@ -26,19 +34,19 @@ namespace Root_Pine2.Module
         void InitPosition()
         {
             m_axisCam.AddPos(c_sPosReady);
-            m_axisCam.AddPos(Enum.GetNames(typeof(Vision.eWorks))); 
+            m_axisCam.AddPos(Enum.GetNames(typeof(Vision2D.eWorks))); 
         }
 
-        public string RunMoveCamera(Vision.eWorks ePos, bool bWait = true)
+        public string RunMoveCamera(Vision2D.eWorks ePos, bool bWait = true)
         {
             m_axisCam.StartMove(ePos);
             return bWait ? m_axisCam.p_axisX.WaitReady() : "OK";
         }
 
-        public string RunMoveSnapStart(Vision.SnapData snapData, bool bWait = true)
+        public string RunMoveSnapStart(Vision2D.eWorks eWorks, Vision2D.Recipe.Snap snapData, bool bWait = true)
         {
-            m_axisCam.StartMove(snapData.m_eWorks, new RPoint(m_xCamScale * snapData.m_dpAxis.X, 0));
-            if (Run(m_aBoat[snapData.m_eWorks].RunMoveSnapStart(snapData, bWait))) return p_sInfo;
+            m_axisCam.StartMove(eWorks, new RPoint(m_xCamScale * snapData.m_dpAxis.X, 0));
+            if (Run(m_aBoat[eWorks].RunMoveSnapStart(snapData, bWait))) return p_sInfo;
             return bWait ? m_axisCam.p_axisX.WaitReady() : "OK";
         }
 
@@ -56,9 +64,9 @@ namespace Root_Pine2.Module
             {
                 switch (m_vision.m_eVision)
                 {
-                    case Vision.eVision.Top3D: return Boat.ePos.Handler;
-                    case Vision.eVision.Top2D: return m_pine2.p_b3D ? Boat.ePos.Vision : Boat.ePos.Handler;
-                    case Vision.eVision.Bottom: return Boat.ePos.Vision; 
+                    case Vision2D.eVision.Top3D: return Boat.ePos.Handler;
+                    case Vision2D.eVision.Top2D: return m_pine2.p_b3D ? Boat.ePos.Vision : Boat.ePos.Handler;
+                    case Vision2D.eVision.Bottom: return Boat.ePos.Vision; 
                 }
                 return Boat.ePos.Handler; 
             }
@@ -70,9 +78,9 @@ namespace Root_Pine2.Module
             {
                 switch(m_vision.m_eVision)
                 {
-                    case Vision.eVision.Top3D: return Boat.ePos.Vision;
-                    case Vision.eVision.Top2D: return Boat.ePos.Vision;
-                    case Vision.eVision.Bottom: return Boat.ePos.Handler;
+                    case Vision2D.eVision.Top3D: return Boat.ePos.Vision;
+                    case Vision2D.eVision.Top2D: return Boat.ePos.Vision;
+                    case Vision2D.eVision.Bottom: return Boat.ePos.Handler;
                 }
                 return Boat.ePos.Vision;
             } 
@@ -81,11 +89,11 @@ namespace Root_Pine2.Module
         #endregion
 
         #region Boat
-        public Dictionary<Vision.eWorks, Boat> m_aBoat = new Dictionary<Vision.eWorks, Boat>(); 
+        public Dictionary<Vision2D.eWorks, Boat> m_aBoat = new Dictionary<Vision2D.eWorks, Boat>(); 
         void InitBoat()
         {
-            m_aBoat.Add(Vision.eWorks.A, new Boat(p_id, this, m_vision.m_aWorks[Vision.eWorks.A]));
-            m_aBoat.Add(Vision.eWorks.B, new Boat(p_id, this, m_vision.m_aWorks[Vision.eWorks.B]));
+            m_aBoat.Add(Vision2D.eWorks.A, new Boat(p_id + ".A", this));
+            m_aBoat.Add(Vision2D.eWorks.B, new Boat(p_id + ".B", this));
         }
         #endregion
 
@@ -101,14 +109,14 @@ namespace Root_Pine2.Module
             if (p_sInfo == "OK")
             {
                 p_eState = eState.Ready;
-                m_aBoat[Vision.eWorks.A].p_eStep = Boat.eStep.RunReady;
-                m_aBoat[Vision.eWorks.B].p_eStep = Boat.eStep.RunReady;
+                m_aBoat[Vision2D.eWorks.A].p_eStep = Boat.eStep.RunReady;
+                m_aBoat[Vision2D.eWorks.B].p_eStep = Boat.eStep.RunReady;
             }
             else
             {
                 p_eState = eState.Error;
-                m_aBoat[Vision.eWorks.A].p_eStep = Boat.eStep.Init;
-                m_aBoat[Vision.eWorks.B].p_eStep = Boat.eStep.Init;
+                m_aBoat[Vision2D.eWorks.A].p_eStep = Boat.eStep.Init;
+                m_aBoat[Vision2D.eWorks.B].p_eStep = Boat.eStep.Init;
             }
             return p_sInfo;
         }
@@ -116,40 +124,85 @@ namespace Root_Pine2.Module
         public override void Reset()
         {
             m_axisCam.StartMove(c_sPosReady); 
-            m_aBoat[Vision.eWorks.A].Reset(p_eState);
-            m_aBoat[Vision.eWorks.B].Reset(p_eState);
+            m_aBoat[Vision2D.eWorks.A].Reset(p_eState);
+            m_aBoat[Vision2D.eWorks.B].Reset(p_eState);
             base.Reset();
         }
         #endregion
 
         #region Snap
-        public string StartSnap(Vision.SnapData snapData)
+        public string StartSnap(Vision2D.Recipe recipe)
         {
             Run_Snap run = (Run_Snap)m_runSnap.Clone();
-            run.m_snapData = snapData;
+            run.m_recipe = recipe;
             return StartRun(run);
         }
 
-        public string RunSnap(Vision.SnapData snapData)
+        public string RunSnap(Vision2D.Recipe recipe)
         {
             StopWatch sw = new StopWatch();
             try
             {
-                m_vision.RunLight(snapData.m_lightPower);
-                if (Run(RunMoveSnapStart(snapData))) return p_sInfo;
-                m_vision.StartSnap(snapData);
-                if (Run(m_aBoat[snapData.m_eWorks].RunSnap())) return p_sInfo;
-                if (m_vision.IsBusy()) EQ.p_bStop = true;
+                int iSnap = 0; 
+                foreach (Vision2D.Recipe.Snap snap in recipe.m_aSnap)
+                {
+                    m_vision.RunLight(snap.m_lightPower);
+                    if (Run(RunMoveSnapStart(recipe.m_eWorks, snap))) return p_sInfo;
+                    m_vision.StartSnap(snap, recipe.m_eWorks, p_sRecipe, iSnap);
+                    if (Run(m_aBoat[recipe.m_eWorks].RunSnap())) return p_sInfo;
+                    if (m_vision.IsBusy()) EQ.p_bStop = true;
+                    iSnap++; 
+                }
             }
             catch (Exception e) { p_sInfo = e.Message; }
             finally
             {
-                m_axisCam.StartMove((Vision.eWorks)(1 - (int)snapData.m_eWorks));
-                m_aBoat[snapData.m_eWorks].RunMove(p_ePosUnload);
+                m_axisCam.StartMove((Vision2D.eWorks)(1 - (int)recipe.m_eWorks));
+                m_aBoat[recipe.m_eWorks].RunMove(p_ePosUnload);
             }
 
             m_log.Info("Run Snap End : " + (sw.ElapsedMilliseconds / 1000.0).ToString("0.00") + " sec");
             return "OK";
+        }
+        #endregion
+
+        #region Recipe
+        string _sRecipe = ""; 
+        public string p_sRecipe
+        {
+            get { return _sRecipe; }
+            set
+            {
+                if (_sRecipe == value) return;
+                _sRecipe = value;
+                m_vision.SetRecipe(value); 
+            }
+        }
+        #endregion
+
+        #region Request
+        TCPAsyncServer m_tcpRequest;
+
+        private void M_tcpRequest_EventReciveData(byte[] aBuf, int nSize, Socket socket)
+        {
+            string sRead = Encoding.Default.GetString(aBuf, 0, nSize);
+            if (sRead.Length <= 0) return;
+            ReadRequest(sRead); 
+            m_tcpRequest.Send(sRead); 
+        }
+
+        void ReadRequest(string sRead)
+        {
+            string[] asRead = sRead.Split(',');
+            if (asRead.Length < 2) return;
+            if (asRead[1] == Works2D.eProtocol.Snap.ToString())
+            {
+                if (asRead.Length < 3) return;
+                string sRecipe = asRead[2];
+                Vision2D.eWorks eWorks = (asRead[3] == "A") ? Vision2D.eWorks.A : Vision2D.eWorks.B;
+                m_vision.m_recipe[eWorks].RecipeOpen(sRecipe);
+                StartSnap(m_vision.m_recipe[eWorks]); 
+            }
         }
         #endregion
 
@@ -162,8 +215,8 @@ namespace Root_Pine2.Module
         #endregion
 
         Pine2 m_pine2;
-        public Vision m_vision; 
-        public Boats(Vision vision, IEngineer engineer, Pine2 pine2)
+        public Vision2D m_vision; 
+        public Boats(Vision2D vision, IEngineer engineer, Pine2 pine2)
         {
             m_vision = vision;
             p_id = "Boats " + vision.m_eVision.ToString();
@@ -190,26 +243,26 @@ namespace Root_Pine2.Module
             public Run_Snap(Boats module)
             {
                 m_module = module;
-                m_snapData = new Vision.SnapData(module.m_vision); 
+                m_recipe = new Vision2D.Recipe(module.m_vision, Vision2D.eWorks.A); 
                 InitModuleRun(module);
             }
 
-            public Vision.SnapData m_snapData; 
+            public Vision2D.Recipe m_recipe; 
             public override ModuleRunBase Clone()
             {
                 Run_Snap run = new Run_Snap(m_module);
-                run.m_snapData = m_snapData.Clone();
+                run.m_recipe = m_recipe.Clone();
                 return run;
             }
 
             public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
             {
-                m_snapData.RunTree(tree, bVisible); 
+                m_recipe.RunTreeRecipe(tree, bVisible); 
             }
 
             public override string Run()
             {
-                return m_module.RunSnap(m_snapData); 
+                return m_module.RunSnap(m_recipe); 
             }
         }
         #endregion

@@ -187,13 +187,23 @@ namespace Root_WIND2
 
                 p_Viewer.SetImageData(p_BackSideVision.GetMemoryData(BackSideVision.ScanMemory.BackSide));
                 p_ModuleList = engineer.ClassModuleList();
+                p_handler = (WIND2_Handler)engineer.ClassHandler();
                 p_aTK4S = ((WIND2_Handler)(engineer.ClassHandler())).p_WIND2.m_tk4s.p_aTK4S;
                 p_aFFU = ((WIND2_Handler)(engineer.ClassHandler())).p_WIND2.m_FFUGourp.p_aFFU;
+            }
+            else // engineer.m_eMode 가 무슨용도인지 모르겠다.. Vision 모드일 경우 p_ModuleList를 engineer로부터 못받아 오기 때문에 임시로 받아오도록 수정
+            {
+                p_ModuleList = engineer.ClassModuleList();
             }
         }
 
         public void EQHome()
         {
+            WIND2_Engineer engineer = GlobalObjects.Instance.Get<WIND2_Engineer>();
+            p_handler.p_process.p_qSequence.Enqueue(new Root_EFEM.EFEM_Process.Sequence(new Run_GrabBackside(p_handler.m_backSideVision), new InfoWafer("test", 0, engineer)));
+            p_handler.CalcSequence();
+            return;
+
             EQ.p_bStop = false;
             EQ.p_eState = EQ.eState.Home;
 
@@ -211,6 +221,16 @@ namespace Root_WIND2
             set
             {
                 SetProperty(ref m_ModuleList, value);
+            }
+        }
+
+        WIND2_Handler m_handler;
+        public WIND2_Handler p_handler
+        {
+            get { return m_handler; }
+            set
+            {
+                SetProperty(ref m_handler, value);
             }
         }
 

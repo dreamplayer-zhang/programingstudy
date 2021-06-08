@@ -4,8 +4,10 @@ using RootTools.Control;
 using RootTools.GAFs;
 using RootTools.Gem;
 using RootTools.Module;
+using RootTools.OHT.Semi;
 using RootTools.OHTNew;
 using RootTools.Trees;
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using static RootTools.Gem.XGem.XGem;
@@ -15,7 +17,32 @@ namespace Root_EFEM.Module
     public class Loadport_RND : ModuleBase, IWTRChild, ILoadport
     {
         #region ToolBox
-        DIO_I m_diPlaced;
+        public DIO_I m_diPlaced;
+        //OHT _OHT;
+        //public OHT m_OHTNew
+        //{
+        //    get { return _OHT; }
+        //    set
+        //    {
+        //        _OHT = value;
+        //        OnPropertyChanged();
+        //    }
+        //}
+        private OHT_Semi m_OHT;
+        //OHT _OHT;
+        public OHT_Semi m_OHTsemi
+        {
+            get
+            {
+                return m_OHT;
+            }
+            set
+            {
+                m_OHT = value;
+                OnPropertyChanged();
+            }
+        }
+
         public DIO_I p_diPlaced
         {
             get
@@ -24,7 +51,7 @@ namespace Root_EFEM.Module
             }
             set
             {
-                m_diPlaced = value;   
+                m_diPlaced = value;
             }
         }
         DIO_I m_diPresent;
@@ -98,6 +125,7 @@ namespace Root_EFEM.Module
                 OnPropertyChanged();
             }
         }
+
         //OHT m_OHT;
         ALID m_alid_WaferExist;
         public void SetAlarm()
@@ -113,7 +141,7 @@ namespace Root_EFEM.Module
             p_sInfo = m_toolBox.GetDIO(ref m_diDoorOpen, this, "DoorOpen");
             p_sInfo = m_toolBox.GetDIO(ref m_diDocked, this, "Docked");
             p_sInfo = m_toolBox.GetComm(ref m_rs232, this, "RS232");
-            p_sInfo = m_toolBox.GetOHT(ref _OHT, this, p_infoCarrier, "OHT");
+            p_sInfo = m_toolBox.GetOHT(ref m_OHT, this, p_infoCarrier, "OHT");
             if (bInit)
             {
                 m_rs232.OnReceive += M_rs232_OnReceive;
@@ -212,6 +240,8 @@ namespace Root_EFEM.Module
         {
             if (GetInfoWafer(nID) == null)
                 return p_id + nID.ToString("00") + " BeforeGet : InfoWafer = null";
+            if (!m_diDoorOpen.p_bIn)
+                return "Door Not Opened";
             return IsRunOK();
         }
 
@@ -219,18 +249,20 @@ namespace Root_EFEM.Module
         {
             if (GetInfoWafer(nID) != null)
                 return p_id + nID.ToString("00") + " BeforePut : InfoWafer != null";
+            if (!m_diDoorOpen.p_bIn)
+                return "Door Not Opened";
             return IsRunOK();
         }
 
         public string AfterGet(int nID)
         {
-            p_infoCarrier.m_aGemSlot[nID].p_eState = GemSlotBase.eState.Run;
+            InfoWafer wafer = GetInfoWafer(nID);
+            wafer.p_sInspectionID = wafer.p_sLotID + wafer.p_sWaferID +DateTime.Now.ToString("yyyyMMddhhmmss");
             return IsRunOK();
         }
 
         public string AfterPut(int nID)
         {
-            p_infoCarrier.m_aGemSlot[nID].p_eState = GemSlotBase.eState.Done;
             return IsRunOK();
         }
 
@@ -684,6 +716,7 @@ namespace Root_EFEM.Module
                 _rfid = value;
             }
         }
+
         public Loadport_RND(string id, IEngineer engineer, bool bEnableWaferSize, bool bEnableWaferCount)
         {
             p_bLock = false;
@@ -708,6 +741,24 @@ namespace Root_EFEM.Module
 
         private void M_gem_OnRemoteCommand(string sCmd, Dictionary<string, string> dicParam, long[] pnResult)
         {
+        }
+
+        public override bool IsExistCarrier()
+        {
+            if (m_diPlaced.p_bIn && m_diPresent.p_bIn)
+                return true;
+            else
+                return false;
+        }
+
+        public override bool IsPlacement()
+        {
+            return m_diPlaced.p_bIn;
+        }
+
+        public override bool IsPresent()
+        {
+            return m_diPresent.p_bIn;
         }
 
         #region ModuleRun
