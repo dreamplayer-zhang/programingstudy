@@ -57,12 +57,16 @@ namespace RootTools_Vision.Utility
 			slotID = 1;
 
 			klarfType = 0;
+
+			moduleName = "";
 		}
 		
 		#region [Variables]
 		private List<KlarfData> klarfData = null;
 
 		private int fileVer1, fileVer2;               // Klarf Ver : 사실 우린 의미가 없음.. 1 1 넣음됨.
+
+		private string moduleName;
 
 		private String inspectionStationVender;       // 설비 제작 업체.
 		private String inspectionStationModel;        // 설비 종류.
@@ -130,6 +134,11 @@ namespace RootTools_Vision.Utility
 
 
 
+
+		public void SetModuleName(string name)
+        {
+			this.moduleName = name;
+        }
 		// 210531 New
 		public bool LotStart(string klarfPath, InfoWafer infoWafer , RecipeType_WaferMap mapData, GrabModeBase grabMode)
         {
@@ -199,8 +208,9 @@ namespace RootTools_Vision.Utility
 
 			CalcSampleCenterLoc(_mapdata);
 
-			klarf_FileName = this.recipeName;
-			klarf_FileName = klarf_FileName + "_" + this.lotID + this.waferID + ".001";
+            SetResultTimeStamp();
+
+			klarf_FileName = this.recipeName + "_" + this.lotID + this.waferID + "_" + this.moduleName + ".001";
 			MEMMAP_FileName = this.lotID + "-" + this.cassetteID;
 
 			return true;
@@ -225,8 +235,9 @@ namespace RootTools_Vision.Utility
 			else
 			this.slotID = infoWafer.m_nSlot;
 
+			
 
-			this.klarfFileName = this.klarfPath + "\\" + recipeName + "_" + waferID + "_" + lotID + "_" + cassetteID;
+			this.klarfFileName = this.klarfPath + "\\" + recipeName + "_" + waferID + "_" + lotID + "_" + cassetteID +  "_" + moduleName;
 			return true;
 		}
 
@@ -495,7 +506,7 @@ namespace RootTools_Vision.Utility
 			tempString.Replace(".rcp", "");
 			tempString += ".trf";
 
-			SetResultTimeStamp();
+			//SetResultTimeStamp();
 
 			timeFile = DateTime.Now;
 

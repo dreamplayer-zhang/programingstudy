@@ -29,9 +29,14 @@ namespace Root_WIND2.Module
 
         private static void LotStart(string klarfPath, RecipeBase recipe, InfoWafer infoWafer, GrabModeBase grabMode)
         {
-            if (klarfData == null) klarfData = new KlarfData_Lot();
+            if (klarfData == null)
+            {
+                klarfData = new KlarfData_Lot();
+            }
 
-            if(Directory.Exists(klarfPath)) Directory.CreateDirectory(klarfPath);
+            klarfData.SetModuleName("Front");
+
+            if (Directory.Exists(klarfPath)) Directory.CreateDirectory(klarfPath);
 
 
             klarfData.LotStart(klarfPath, infoWafer, recipe.WaferMap, grabMode);
@@ -120,11 +125,11 @@ namespace Root_WIND2.Module
 
 
             // Check Lot Start
-            //if (infoWafer != null && (
-            //    infoWafer._eWaferOrder == InfoWafer.eWaferOrder.FirstLastWafer ||
-            //    infoWafer._eWaferOrder == InfoWafer.eWaferOrder.FirstWafer))
+            if (infoWafer != null && (
+                infoWafer._eWaferOrder == InfoWafer.eWaferOrder.FirstLastWafer ||
+                infoWafer._eWaferOrder == InfoWafer.eWaferOrder.FirstWafer))
             {
-            LotStart(settings_frontside.KlarfSavePath, recipe, infoWafer, m_grabMode);
+                LotStart(settings_frontside.KlarfSavePath, recipe, infoWafer, m_grabMode);
             }
                 
 
@@ -448,11 +453,11 @@ namespace Root_WIND2.Module
 
 
                 // LotEnd Check
-                //if (infoWafer != null && (
-                //    infoWafer._eWaferOrder == InfoWafer.eWaferOrder.FirstLastWafer ||
-                //    infoWafer._eWaferOrder == InfoWafer.eWaferOrder.LastWafer))
+                if (infoWafer != null && (
+                    infoWafer._eWaferOrder == InfoWafer.eWaferOrder.FirstLastWafer ||
+                    infoWafer._eWaferOrder == InfoWafer.eWaferOrder.LastWafer))
                 {
-                LotEnd(infoWafer);
+                    LotEnd(infoWafer);
                 }
                     
 
