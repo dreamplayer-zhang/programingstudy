@@ -236,7 +236,7 @@ namespace Root_Pine2_Vision.Module
             }
         }
 
-        public string m_idProcess = "VisionWorks";
+        public string m_idProcess = "VisionWorks2";
         bool IsProcessRun()
         {
             Process[] aProcess = Process.GetProcessesByName(m_idProcess);
