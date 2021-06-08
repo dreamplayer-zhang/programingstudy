@@ -786,8 +786,8 @@ namespace RootTools_Vision.Utility
 
 			ArrayList inputImage = new ArrayList();
 
-			int tiffWidth = 160;
-			int tiffHeight = 120;
+			int tiffWidth = 640;
+			int tiffHeight = 480;
 			if (imageSize != default(System.Windows.Size))
 			{
 				tiffWidth = (int)imageSize.Width;
@@ -805,6 +805,8 @@ namespace RootTools_Vision.Utility
 
 				MemoryStream image = new MemoryStream();
 				System.Drawing.Bitmap bitmap = Tools.CovertBufferToBitmap(sharedBuffer, defectRect, tiffWidth, tiffHeight);
+				Tools.DrawBitmapRect(ref bitmap, (tiffWidth / 2) -  (defect.m_fWidth / 2), (tiffHeight / 2) - (defect.m_fHeight / 2), defect.m_fWidth, defect.m_fHeight, Tools.PenColor.RED);
+				Tools.DrawRuler(ref bitmap, tiffWidth, tiffHeight, (float)resX);
 				//System.Drawing.Bitmap NewImg = new System.Drawing.Bitmap(bitmap);
 				bitmap.Save(image, ImageFormat.Tiff);
 				inputImage.Add(image);

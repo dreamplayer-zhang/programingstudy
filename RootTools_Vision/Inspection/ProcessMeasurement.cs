@@ -66,7 +66,11 @@ namespace RootTools_Vision
 			Settings settings = new Settings();
 			SettingItem_SetupEBR settings_ebr = settings.GetItem<SettingItem_SetupEBR>();
 
-			Tools.SaveDefectImageParallel(Path.Combine(settings_ebr.MeasureImagePath, sInspectionID), measureList, this.currentWorkplace.SharedBufferInfo, this.currentWorkplace.SharedBufferInfo.ByteCnt);
+			Tools.SaveDefectImageParallel(Path.Combine(settings_ebr.MeasureImagePath, sInspectionID)
+										, measureList
+										, this.currentWorkplace.SharedBufferInfo
+										, this.currentWorkplace.SharedBufferInfo.ByteCnt
+										, new System.Windows.Size(this.currentWorkplace.SharedBufferWidth, recipe.GetItem<EBRParameter>().ROIHeight));
 
 			// EBR 원형 이미지 저장
 			EBRRecipe recipeParam = this.recipe.GetItem<EBRRecipe>();
