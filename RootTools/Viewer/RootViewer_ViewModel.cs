@@ -1427,6 +1427,28 @@ namespace RootTools
             }
 
         }
+
+        public virtual unsafe void DrawLineBitmap(CPoint startPt, CPoint endPt, int thickness, byte r, byte g, byte b, byte a, CPoint offset = null)
+        {
+            if (offset == null) offset = new CPoint(0, 0);
+
+            startPt.X = startPt.X - offset.X - 1;
+            startPt.Y = startPt.Y - offset.Y - 1;
+            endPt.X = endPt.X - offset.X - 1;
+            endPt.Y = endPt.Y - offset.Y - 1;
+
+            List<CPoint> ListMemoryPoint = new List<CPoint>();
+
+            double angle = Math.Atan2(endPt.Y - startPt.Y, endPt.X - startPt.X);
+
+            ListMemoryPoint.Add(new CPoint((int)(startPt.X + thickness * Math.Cos(angle + Math.PI / 2)), (int)(startPt.Y + thickness * Math.Sin(angle + Math.PI / 2))));
+            ListMemoryPoint.Add(new CPoint((int)(startPt.X + thickness * Math.Cos(angle - Math.PI / 2)), (int)(startPt.Y + thickness * Math.Sin(angle - Math.PI / 2))));
+            ListMemoryPoint.Add(new CPoint((int)(endPt.X + thickness * Math.Cos(angle - Math.PI / 2)), (int)(endPt.Y + thickness * Math.Sin(angle - Math.PI / 2))));
+            ListMemoryPoint.Add(new CPoint((int)(endPt.X + thickness * Math.Cos(angle + Math.PI / 2)), (int)(endPt.Y + thickness * Math.Sin(angle + Math.PI / 2))));
+
+            DrawPolygonBitmap(ListMemoryPoint, r, g, b, a);
+        }
+
         public virtual unsafe void DrawRectBitmap(CRect rect, byte r, byte g, byte b, byte a, CPoint offset = null)
         {
             if (offset == null) offset = new CPoint(0, 0);

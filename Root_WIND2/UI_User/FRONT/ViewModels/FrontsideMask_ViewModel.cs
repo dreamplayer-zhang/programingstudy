@@ -539,11 +539,24 @@ namespace Root_WIND2.UI_User
             line.MemoryEndPoint = currentMemPt;
             line.SetData();
             CreateModifyTool_Line(line);
-            foreach (CPoint pt in line.Data)
-            {
-                base.DrawPixelBitmap(pt - OriginOffset, 255, 0, 0, 255);
-            }
-            base.SetLayerSource();
+
+            ContextMenu cMenu = new ContextMenu();
+            MenuItem menuAdd = new MenuItem();
+            menuAdd.Header = "Add";
+            menuAdd.Click += MenuAdd_Click_Line;
+            MenuItem menuDelete = new MenuItem();
+            menuDelete.Header = "Delete";
+            menuDelete.Click += MenuDelete_Click_Line;
+            MenuItem menuCancel = new MenuItem();
+            menuCancel.Header = "Cancel";
+            menuCancel.Click += MenuCancel_Click_Line;
+
+            cMenu.Items.Add(menuAdd);
+            cMenu.Items.Add(menuDelete);
+            cMenu.Items.Add(menuCancel);
+
+            line.CanvasLine.ContextMenu = cMenu;
+            line.CanvasLine.ContextMenu.IsOpen = true;
         }
         #endregion
 
@@ -766,6 +779,33 @@ namespace Root_WIND2.UI_User
             crop.CropImage = CropImage;
             crop.CropImageData = rectImageData;
             p_UIElement.Add(CropImage);
+        }
+        #endregion
+
+        #region Menu Click Line
+        private void MenuAdd_Click_Line(object sender, RoutedEventArgs e)
+        {
+            byte r = p_SelectedROI.p_Color.R;
+            byte g = p_SelectedROI.p_Color.G;
+            byte b = p_SelectedROI.p_Color.B;
+            DrawLineBitmap((CurrentShape as TLine).MemoryStartPoint, (CurrentShape as TLine).MemoryEndPoint, 2, r, g, b, 255, OriginOffset);
+
+            BufferInspROI.Clear();
+
+            SetLayerSource();
+            _SaveROI();
+        }
+        private void MenuDelete_Click_Line(object sender, RoutedEventArgs e)
+        {
+            DrawLineBitmap((CurrentShape as TLine).MemoryStartPoint, (CurrentShape as TLine).MemoryEndPoint, 0, 0, 0, 0, 0, OriginOffset);
+
+            BufferInspROI.Clear();
+            SetLayerSource();
+        }
+
+        private void MenuCancel_Click_Line(object sender, RoutedEventArgs e)
+        {
+            BufferInspROI.Clear();
         }
         #endregion
 
