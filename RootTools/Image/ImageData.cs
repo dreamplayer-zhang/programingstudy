@@ -792,7 +792,7 @@ namespace RootTools
             int offbit = 14 + 40 + (nByte == 1 ? (256 * 4) : 0);
 
             bw.Write(Convert.ToUInt16(0x4d42));                     // bfType;
-            bw.Write(Convert.ToUInt32(14/*(uint)size)*/));                 // bfSize
+            bw.Write(Convert.ToUInt32((uint)size));                // bfSize
             bw.Write(Convert.ToUInt16(0));                          // bfReserved1
             bw.Write(Convert.ToUInt16(0));                          // bfReserved2
             bw.Write(Convert.ToUInt32(offbit));                     // bfOffbits
