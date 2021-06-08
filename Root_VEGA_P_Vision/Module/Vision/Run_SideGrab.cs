@@ -69,15 +69,16 @@ namespace Root_VEGA_P_Vision.Module
         {
             if (p_sSideGrabMode == null) return "Grab Mode : Side Grab == Null";
 
+            AxisXY axisXY = m_module.m_stage.m_axisXY;
+            Axis axisZ = sideOpt.axisZ;
+            Axis axisR = m_module.m_stage.m_axisR;
+
             try
             {
                 if (!camSide.IsConnected())
                     camSide.Connect();
 
                 #region [Local Variable]
-                AxisXY axisXY = m_module.m_stage.m_axisXY;
-                Axis axisZ = sideOpt.axisZ;
-                Axis axisR = m_module.m_stage.m_axisR;
 
                 CPoint cpMemoryOffset = new CPoint(SidegrabMode.m_cpMemoryOffset);
 
@@ -187,6 +188,9 @@ namespace Root_VEGA_P_Vision.Module
             }
             finally
             {
+                m_module.Run(axisR.StartHome());
+                m_module.Run(axisR.WaitReady());
+
                 SidegrabMode.SetLight(false);
             }
 
