@@ -113,7 +113,7 @@ namespace Root_VEGA_P_Vision.Module
 
                 int cntX = nPodSizeX_px / nCamWidth;
                 int cntY = nPodSizeY_px / nCamHeight;
-                for (int i = 1; i < 3/*cntX*/; i++)
+                for (int i = 0; i < cntX; i++)
                 {
                     if (m_module.Run(axisZ.StartMove(dAxisStartPosZ)))
                         return p_sInfo;
@@ -125,7 +125,7 @@ namespace Root_VEGA_P_Vision.Module
                     if (m_module.Run(axisXY.WaitReady()))
                         return p_sInfo;
 
-                    for (int j = 1; j < 3/*cntY*/; j++)
+                    for (int j = 0; j < cntY; j++)
                     {
                         if (m_module.Run(axisZ.StartMove(dAxisStartPosZ)))
                             return p_sInfo;
