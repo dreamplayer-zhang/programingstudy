@@ -604,13 +604,13 @@ namespace Root_WIND2.UI_User
             ContextMenu cMenu = new ContextMenu();
             MenuItem menuAdd = new MenuItem();
             menuAdd.Header = "Add";
-            menuAdd.Click += MenuAdd_Click;
+            menuAdd.Click += MenuAdd_Click_Rect;
             MenuItem menuDelete = new MenuItem();
             menuDelete.Header = "Delete";
-            menuDelete.Click += MenuDelete_Click;
+            menuDelete.Click += MenuDelete_Click_Rect;
             MenuItem menuCancel = new MenuItem();
             menuCancel.Header = "Cancel";
-            menuCancel.Click += MenuCancel_Click;
+            menuCancel.Click += MenuCancel_Click_Rect;
 
             cMenu.Items.Add(menuAdd);
             cMenu.Items.Add(menuDelete);
@@ -664,6 +664,24 @@ namespace Root_WIND2.UI_User
             p_UIElement.Remove(polygon.CanvasPolyLine);
 
             CreateModifyTool_Polygon(polygon);
+
+            ContextMenu cMenu = new ContextMenu();
+            MenuItem menuAdd = new MenuItem();
+            menuAdd.Header = "Add";
+            menuAdd.Click += MenuAdd_Click_Polygon;
+            MenuItem menuDelete = new MenuItem();
+            menuDelete.Header = "Delete";
+            menuDelete.Click += MenuDelete_Click_Polygon;
+            MenuItem menuCancel = new MenuItem();
+            menuCancel.Header = "Cancel";
+            menuCancel.Click += MenuCancel_Click_Polygon;
+
+            cMenu.Items.Add(menuAdd);
+            cMenu.Items.Add(menuDelete);
+            cMenu.Items.Add(menuCancel);
+
+            polygon.CanvasPolygon.ContextMenu = cMenu;
+            polygon.CanvasPolygon.ContextMenu.IsOpen = true;
         }
         #endregion
 
@@ -751,7 +769,8 @@ namespace Root_WIND2.UI_User
         }
         #endregion
 
-        private void MenuAdd_Click(object sender, RoutedEventArgs e)
+        #region Menu Click Rect
+        private void MenuAdd_Click_Rect(object sender, RoutedEventArgs e)
         {
             byte r = p_SelectedROI.p_Color.R;
             byte g = p_SelectedROI.p_Color.G;
@@ -762,7 +781,8 @@ namespace Root_WIND2.UI_User
             SetLayerSource();
             _SaveROI();
         }
-        private void MenuDelete_Click(object sender, RoutedEventArgs e)
+
+        private void MenuDelete_Click_Rect(object sender, RoutedEventArgs e)
         {
             DrawRectBitmap((CurrentShape as TRect).MemoryRect, 0, 0, 0, 0, OriginOffset);
 
@@ -770,10 +790,38 @@ namespace Root_WIND2.UI_User
             SetLayerSource();
         }
 
-        private void MenuCancel_Click(object sender, RoutedEventArgs e)
+        private void MenuCancel_Click_Rect(object sender, RoutedEventArgs e)
         {
             BufferInspROI.Clear();
         }
+        #endregion
+
+        #region Menu Click Polygon
+        private void MenuAdd_Click_Polygon(object sender, RoutedEventArgs e)
+        {
+            byte r = p_SelectedROI.p_Color.R;
+            byte g = p_SelectedROI.p_Color.G;
+            byte b = p_SelectedROI.p_Color.B;
+            DrawPolygonBitmap((CurrentShape as TPolygon).ListMemoryPoint, r, g, b, 255, OriginOffset);
+            BufferInspROI.Clear();
+
+            SetLayerSource();
+            _SaveROI();
+        }
+        private void MenuDelete_Click_Polygon(object sender, RoutedEventArgs e)
+        {
+            DrawPolygonBitmap((CurrentShape as TPolygon).ListMemoryPoint, 0, 0, 0, 0, OriginOffset);
+
+            BufferInspROI.Clear();
+            SetLayerSource();
+        }
+
+        private void MenuCancel_Click_Polygon(object sender, RoutedEventArgs e)
+        {
+            BufferInspROI.Clear();
+        }
+        #endregion
+
         #endregion
 
         #region Modify Method
