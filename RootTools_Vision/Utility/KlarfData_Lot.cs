@@ -5,6 +5,7 @@ using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
@@ -1164,7 +1165,7 @@ namespace RootTools_Vision.Utility
 			return firstFileNumericName.CompareTo(secondFileNumericName);
 		}
 
-		public bool SaveImageJpgInterpolation(SharedBufferInfo info, Rect rect, long compressRatio, int outSizeX, int outSizeY, List<List<System.Windows.Point>> polygon,double minRadius, int thickness, int centerX, int centerY)
+		public bool SaveImageJpgInterpolation(SharedBufferInfo info, Rect rect, long compressRatio, int outSizeX, int outSizeY, List<List<System.Windows.Point>> polygon, int cuttingSize, double minRadius, int thickness, int centerX, int centerY)
         {
 
 			Bitmap bmp = Tools.CovertBufferToBitmap(info, rect, outSizeX, outSizeY);
@@ -1184,9 +1185,17 @@ namespace RootTools_Vision.Utility
 				gp.FillPolygon(brush, poly.ToArray());
 		
 			}
-
 			Tools.CirclarInterpolation(bmp, polygon, minRadius, thickness, centerX, centerY, outSizeX, outSizeY);
+
+            GraphicsPath path = new GraphicsPath();
+			int cutSize = cuttingSize * 10;
+			path.AddEllipse(centerX - cutSize, centerY - cutSize, cutSize * 2, cutSize * 2);
+            Region region = new Region(path);
+            gp.ExcludeClip(region);
+            gp.FillRectangle(new SolidBrush(Color.Black), 0, 0, outSizeX, outSizeY);
+
             //Tools.InterpolationImage(bmp, polygon);
+
 
 
             Tools.SaveImageJpg(bmp,"D:\\backside.jpg", compressRatio);

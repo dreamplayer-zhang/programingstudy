@@ -236,7 +236,7 @@ namespace RootTools_Vision
                 double preR = 0;
                 double preB = 0;
                 double preG = 0;
-                int thickness = 600;
+                int thickness = thickenss;
                 for (double t = 0; t < thickness; t+= 1)
                 {
                     for (double angle = 360; angle >= 0; angle -= 0.01)

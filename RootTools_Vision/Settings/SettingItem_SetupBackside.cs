@@ -176,7 +176,7 @@ namespace RootTools_Vision
                 minRadius = value;
             }
         }
-        private double minRadius = 3000;
+        private double minRadius = 1000;
 
         [Category("Klarf")]
         [DisplayName("Save Min Thickness")]
@@ -192,6 +192,21 @@ namespace RootTools_Vision
             }
         }
         private int minThickness = 400;
+
+        [Category("Klarf")]
+        [DisplayName("Cutting Image Size (mm)")]
+        public int CuttingSize
+        {
+            get
+            {
+                return cuttingSize;
+            }
+            set
+            {
+                cuttingSize = value;
+            }
+        }
+        private int cuttingSize = 130;
 
         [Category("Common")]
         [DisplayName("Defect Image Path")]
