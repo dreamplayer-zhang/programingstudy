@@ -1161,6 +1161,37 @@ namespace RootTools_Vision.Utility
 			return firstFileNumericName.CompareTo(secondFileNumericName);
 		}
 
+		public bool SaveImageJpgInterpolation(SharedBufferInfo info, Rect rect, long compressRatio, int outSizeX, int outSizeY, List<List<System.Windows.Point>> polygon,double minRadius, int thickness, int centerX, int centerY)
+        {
+
+			Bitmap bmp = Tools.CovertBufferToBitmap(info, rect, outSizeX, outSizeY);
+			Graphics gp =  Graphics.FromImage(bmp);
+			Brush brush = new SolidBrush(Color.Black);
+
+			
+			for (int i = 0; i < polygon.Count; i++)
+            {
+				List<PointF> poly = new List<PointF>();
+				
+				for (int j = 0; j < polygon[i].Count; j++)
+                {
+					
+					poly.Add(new PointF((float)polygon[i][j].X,  (float)polygon[i][j].Y));
+				}
+				gp.FillPolygon(brush, poly.ToArray());
+		
+			}
+
+			Tools.CirclarInterpolation(bmp, polygon, minRadius, thickness, centerX, centerY, outSizeX, outSizeY);
+            //Tools.InterpolationImage(bmp, polygon);
+
+
+            Tools.SaveImageJpg(bmp,"D:\\backside.jpg", compressRatio);
+            //Tools.SaveImageJpg(bmp, this.klarfFileName + ".jpg", compressRatio);
+
+            return true;
+        }
+
 		public bool SaveImageJpg(SharedBufferInfo info, Rect rect, long compressRatio, int outSizeX, int outSizeY)
 		{
 			Bitmap bmp = Tools.CovertBufferToBitmap(info, rect, outSizeX, outSizeY);

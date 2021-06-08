@@ -25,7 +25,8 @@ namespace Root_WIND2.Module
         //bool m_bInvDir = false;
         public GrabModeBack m_grabMode = null;
         string m_sGrabMode = "";
-
+        double m_dMinRadius = 1000;
+        int m_nThickness = 400;
         #region [Klarf]
         private static KlarfData_Lot klarfData = new KlarfData_Lot();
 
@@ -87,6 +88,8 @@ namespace Root_WIND2.Module
             Run_InspectBackside run = new Run_InspectBackside(m_module);
             run.p_sGrabMode = p_sGrabMode;
             run.RecipeName = this.RecipeName;
+            run.m_dMinRadius = m_dMinRadius;
+            run.m_nThickness = m_nThickness;
             return run;
         }
 
@@ -95,6 +98,8 @@ namespace Root_WIND2.Module
             m_sRecipeName = tree.SetFile(m_sRecipeName, m_sRecipeName, "rcp", "Recipe", "Recipe Name", bVisible);
             // 이거 다 셋팅 되어 있는거 가져와야함
             p_sGrabMode = tree.Set(p_sGrabMode, p_sGrabMode, m_module.p_asGrabMode, "Grab Mode", "Select GrabMode", bVisible);
+            m_dMinRadius = tree.Set(m_dMinRadius, m_dMinRadius, "Save Min Radius", "Min Radius", true, false);
+            m_nThickness = tree.Set(m_nThickness, m_nThickness, "Save Thickness", "Save Thicness", true, false);
         }
 
         public override string Run()
@@ -104,10 +109,10 @@ namespace Root_WIND2.Module
             SettingItem_SetupBackside settings_backside = settings.GetItem<SettingItem_SetupBackside>();
 
             InfoWafer infoWafer = m_module.GetInfoWafer(0);
-            RecipeFront recipe = GlobalObjects.Instance.Get<RecipeFront>();
+            RecipeBack recipe = GlobalObjects.Instance.Get<RecipeBack>();
 
-            GrabModeBack m_grabMode = m_module.GetGrabMode(p_sGrabMode[recipe.CameraInfoIndex]);
-
+            GrabModeBack m_grabMode = m_module.GetGrabMode(recipe.CameraInfoIndex);
+            
             // Check Lot Start
             if (infoWafer._eWaferOrder == InfoWafer.eWaferOrder.FirstWafer)
                 LotStart(settings_backside.KlarfSavePath, recipe, infoWafer, m_grabMode);
@@ -166,15 +171,32 @@ namespace Root_WIND2.Module
                         klarfData.SaveTiffImageOnlyTDI(defects, workManager.SharedBuffer, new Size(160, 120));
                     }
 
-                    klarfData.SaveImageJpg(workManager.SharedBuffer,
-                        new Rect(
-                            settings_backside.WholeWaferImageStartX,
-                            settings_backside.WholeWaferImageStartY,
-                            settings_backside.WholeWaferImageEndX,
-                            settings_backside.WholeWaferImageEndY),
-                        (long)(settings_backside.WholeWaferImageCompressionRate * 100),
-                        settings_backside.OutputImageSizeX,
-                        settings_backside.OutputImageSizeY);
+                    List<List<Point>> polygon = PolygonController.ReadPolygonFile(recipe.ExclusiveRegionFilePath);
+
+                    BacksideRecipe backRecipe = recipe.GetItem<BacksideRecipe>();
+
+                    klarfData.SaveImageJpgInterpolation(workManager.SharedBuffer,
+                       new Rect(
+                           settings_backside.WholeWaferImageStartX,
+                           settings_backside.WholeWaferImageStartY,
+                           settings_backside.WholeWaferImageEndX,
+                           settings_backside.WholeWaferImageEndY),
+                       (long)(settings_backside.WholeWaferImageCompressionRate * 100),
+                       settings_backside.OutputImageSizeX,
+                       settings_backside.OutputImageSizeY, polygon, m_dMinRadius, m_nThickness,
+                       backRecipe.CenterX,
+                       backRecipe.CenterY);
+
+                    //요거 대신
+                    //klarfData.SaveImageJpg(workManager.SharedBuffer,
+                    //    new Rect(
+                    //        settings_backside.WholeWaferImageStartX,
+                    //        settings_backside.WholeWaferImageStartY,
+                    //        settings_backside.WholeWaferImageEndX,
+                    //        settings_backside.WholeWaferImageEndY),
+                    //    (long)(settings_backside.WholeWaferImageCompressionRate * 100),
+                    //    settings_backside.OutputImageSizeX,
+                    //    settings_backside.OutputImageSizeY);
                 }
 
                 #endregion
