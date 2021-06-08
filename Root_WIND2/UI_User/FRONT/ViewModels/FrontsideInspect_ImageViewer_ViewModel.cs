@@ -328,9 +328,13 @@ namespace Root_WIND2.UI_User
 
                 Canvas.SetLeft(rt, canvasLeftTop.X < canvasRightBottom.X ? canvasLeftTop.X : canvasRightBottom.X);
                 Canvas.SetTop(rt, canvasLeftTop.Y < canvasRightBottom.Y ? canvasLeftTop.Y : canvasRightBottom.Y);
-            }
 
-            RedrawShapes();
+
+                
+            }
+            //if(m_KeyEvent.Key == Key.LeftShift && m_KeyEvent.IsDown)
+                RedrawShapes();
+
         }
         public override void PreviewMouseUp(object sender, MouseEventArgs e)
         {
@@ -474,14 +478,28 @@ namespace Root_WIND2.UI_User
                 p_DrawElement.Add(grid);
         }
 
+        bool InViewRect(TRect rt)
+        {
+            if(p_View_Rect.Contains(rt.MemoryRect.Left, rt.MemoryRect.Top))
+            {
+                return true;
+            }
+            return false;
+        }
+
+        bool isRedrawing = false;
         private void RedrawShapes()
         {
-            if(this.IsDefectChecked)
+            if (isRedrawing)
+                return;
+            isRedrawing = true;
+            if (this.IsDefectChecked)
             {
                 foreach (TRect rt in rectList)
                 {
-                    if (p_DrawElement.Contains(rt.UIElement) == true)
+                    if (InViewRect(rt) && p_DrawElement.Contains(rt.UIElement) == true)
                     {
+                        rt.UIElement.Visibility = Visibility.Visible;
                         Rectangle rectangle = rt.UIElement as Rectangle;
                         CPoint canvasLeftTop = GetCanvasPoint(new CPoint(rt.MemoryRect.Left, rt.MemoryRect.Top));
                         CPoint canvasRightBottom = GetCanvasPoint(new CPoint(rt.MemoryRect.Right, rt.MemoryRect.Bottom));
@@ -492,12 +510,15 @@ namespace Root_WIND2.UI_User
                         Canvas.SetLeft(rectangle, canvasLeftTop.X);
                         Canvas.SetTop(rectangle, canvasLeftTop.Y);
                     }
+                    else
+                    {
+                        rt.UIElement.Visibility = Visibility.Hidden;
+                    }
                 }
             }
-
             foreach (TRect rt in boxList)
             {
-                if (p_UIElement.Contains(rt.UIElement) == true)
+                if (InViewRect(rt) && p_UIElement.Contains(rt.UIElement) == true)
                 {
                     Rectangle rectangle = rt.UIElement as Rectangle;
                     CPoint canvasLeftTop = GetCanvasPoint(new CPoint(rt.MemoryRect.Left, rt.MemoryRect.Top));
@@ -510,6 +531,7 @@ namespace Root_WIND2.UI_User
                     Canvas.SetTop(rectangle, canvasLeftTop.Y);
                 }
             }
+            isRedrawing = false;
         }
         public void UpdateImageViewer()
         {

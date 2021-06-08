@@ -121,15 +121,15 @@ namespace Root_Pine2.Module
 
             #region Axis
             double m_dPulse = 0;
-            public InfoStrip.eMagazine m_ePosDst = InfoStrip.eMagazine.Magazine0; 
-            public string RunMove(InfoStrip.eMagazine ePos, bool bGripPos, bool bWait = true)
+            public InfoStrip.eMagazine m_ePosDst = InfoStrip.eMagazine.Magazine0;
+            public string RunMove(InfoStrip.eMagazine ePos, bool bPushPos, bool bWait = true)
             {
                 if (m_transfer.m_pusher.p_bLock) return "Lock by Sorter Picker";
                 if (m_transfer.m_gripper.p_bLock) return "Lock by Loader Picker";
                 m_transfer.m_pusher.p_bEnable = false;
                 m_transfer.m_gripper.p_bEnable = false; 
-                m_ePosDst = ePos; 
-                m_axis.StartMove(ePos, bGripPos ? 0 : m_dPulse); 
+                m_ePosDst = ePos;
+                m_axis.StartMove(ePos, bPushPos ? 0 : m_dPulse); 
                 return bWait ? m_axis.WaitReady() : "OK";
             }
             #endregion
@@ -374,13 +374,24 @@ namespace Root_Pine2.Module
 
 
         #region RunLoad
+        public string StartLoad()
+        {
+            return StartRun(m_runLoad.Clone()); 
+        }
+
         public string RunLoad()
         {
             InfoStrip infoStrip = m_magazineEV.GetInfoStrip(true);
-            if (infoStrip == null) return "";
-            if (Run(m_buffer.RunMove(infoStrip.p_eMagazine, true, false))) return p_sInfo;
+            if (infoStrip == null)
+            {
+                if (Run(m_buffer.RunMove(m_magazineEV.m_eMagazineGet, false, true))) return p_sInfo;
+                m_pusher.p_bEnable = true;
+                Thread.Sleep(1000);
+                return m_pusher.WaitUnlock();
+            }
+            if (Run(m_buffer.RunMove(infoStrip.p_eMagazine, false, false))) return p_sInfo;
             if (Run(m_magazineEV.RunMove(infoStrip))) return p_sInfo;
-            if (Run(m_buffer.RunMove(infoStrip.p_eMagazine, true, true))) return p_sInfo;
+            if (Run(m_buffer.RunMove(infoStrip.p_eMagazine, false, true))) return p_sInfo;
             m_pusher.p_bEnable = true; 
             try
             {
@@ -400,10 +411,15 @@ namespace Root_Pine2.Module
         #endregion
 
         #region RunUnload
+        public string StartUnload()
+        {
+            return StartRun(m_runUnload.Clone()); 
+        }
+
         public string RunUnload()
         {
             InfoStrip infoStrip = m_pusher.p_infoStrip; 
-            if (infoStrip == null) return "";
+            if (infoStrip == null) return "OK";
             if (Run(m_buffer.RunMove(infoStrip.p_eMagazine, true, false))) return p_sInfo;
             if (Run(m_magazineEV.RunMove(infoStrip))) return p_sInfo;
             if (Run(m_buffer.RunMove(infoStrip.p_eMagazine, true, true))) return p_sInfo;
@@ -415,7 +431,16 @@ namespace Root_Pine2.Module
         }
         #endregion
 
-        #region State Home
+        #region override
+        public override string StateReady()
+        {
+            if (EQ.p_eState != EQ.eState.Run) return "OK";
+            if (m_pine2.p_eMode != Pine2.eRunMode.Magazine) return "OK";
+            if (m_pusher.p_infoStrip != null) StartUnload();
+            if (m_gripper.p_infoStrip == null) StartLoad(); 
+            return "OK"; 
+        }
+
         public override string StateHome()
         {
             if (EQ.p_bSimulate)
@@ -453,7 +478,7 @@ namespace Root_Pine2.Module
             m_pine2 = pine2;
             m_magazineEV = magazineEV;
             m_buffer = new Buffer(this); 
-            base.InitBase(id, engineer); 
+            InitBase(id, engineer); 
         }
 
         public override void ThreadStop()
@@ -463,14 +488,16 @@ namespace Root_Pine2.Module
         }
 
         #region ModuleRun
+        ModuleRunBase m_runLoad;
+        ModuleRunBase m_runUnload;
         protected override void InitModuleRuns()
         {
             AddModuleRunList(new Run_ChangeWidth(this), false, "Run Change Width");
             AddModuleRunList(new Run_LoaderPusher(this), false, "Run Load Pusher");
             AddModuleRunList(new Run_Grip(this), false, "Run Grip Strip");
             AddModuleRunList(new Run_Pusher(this), false, "Run Push Strip");
-            AddModuleRunList(new Run_RunLoad(this), false, "Run Load to Transfer");
-            AddModuleRunList(new Run_RunUnload(this), false, "Run Unload to Magazine");
+            m_runLoad = AddModuleRunList(new Run_RunLoad(this), false, "Run Load to Transfer");
+            m_runUnload = AddModuleRunList(new Run_RunUnload(this), false, "Run Unload to Magazine");
         }
 
         public class Run_ChangeWidth : ModuleRunBase

@@ -124,7 +124,7 @@
                               Height="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=ActualHeight}">
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
-                            <Canvas ClipToBounds="True" />
+                            <Canvas ClipToBounds="True"/>
                         </ItemsPanelTemplate>
                     </ItemsControl.ItemsPanel>
                 </ItemsControl>

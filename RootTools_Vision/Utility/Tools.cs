@@ -164,6 +164,9 @@ namespace RootTools_Vision
                         }
                     }
                 }
+
+
+
                 bmp.UnlockBits(bmpData);
 
                 return bmp;
@@ -175,6 +178,534 @@ namespace RootTools_Vision
             return null;
         }
 
+        public unsafe static Bitmap CirclarInterpolation(Bitmap bmp, List<List<System.Windows.Point>> polygon, double minRadius, int thickenss,int centerX, int centerY, int outSizeX, int outSizeY)
+        {
+            BitmapData bmpData = bmp.LockBits(new Rectangle(0, 0, bmp.Width, bmp.Height), ImageLockMode.ReadWrite, bmp.PixelFormat);
+            IntPtr pointer = bmpData.Scan0;
+
+            int byteCount = 3;
+
+            double radius = minRadius;
+
+            unsafe
+            {
+                byte* pDst = (byte*)pointer.ToPointer();
+
+                double preR = 0;
+                double preB = 0;
+                double preG = 0;
+                int thickness = thickenss;
+                for (double t = 0; t < thickness; t+= 1)
+                {
+                    for (double angle = 360; angle >= 0; angle -= 0.01)
+                {
+
+
+                        double y = (double)centerX + ((radius + t) * Math.Cos((double)angle * Math.PI / 180F));
+                        double x = (double)centerY + ((radius + t) * Math.Sin((double)angle * Math.PI / 180F));
+
+                        if (x >= outSizeX || y >= outSizeY)
+                            break;
+                        double curR = pDst[(long)((long)(y) * (bmpData.Stride) + (long)(x) * byteCount + 0)];
+                        double curG = pDst[(long)((long)(y) * (bmpData.Stride) + (long)(x) * byteCount + 1)];
+                        double curB = pDst[(long)((long)(y) * (bmpData.Stride) + (long)(x) * byteCount + 2)];
+
+                        if (curR == 0 && curG == 0 && curB == 0)
+                        {
+
+                            int cnt1 = 0;
+                            int cnt2 = 0;
+                            int cnt3 = 0;
+                            double val1 = 0;
+                            double val2 = 0;
+                            double val3 = 0;
+                            for (int a = -1; a < 2; a++)
+                            {
+                                for (int b = -1; b < 2; b++)
+                                {
+                                    if(y + a >= outSizeX || x + b >= outSizeY)
+                                    {
+                                        break;
+                                    }
+                                    if (pDst[(long)((long)(y + a)) * (bmpData.Stride) + (long)(x + b) * byteCount + 0] != 0)
+                                    {
+                                        val1 += pDst[(long)((long)(y + a)) * (bmpData.Stride) + (long)(x + b) * byteCount + 0];
+                                        cnt1++;
+                                    }
+                                    if (pDst[(long)((long)(y + a)) * (bmpData.Stride) + (long)(x + b) * byteCount + 1] != 0)
+                                    {
+                                        val2 += pDst[(long)((long)(y + a)) * (bmpData.Stride) + (long)(x + b) * byteCount + 1];
+                                        cnt2++;
+                                    }
+                                    if (pDst[(long)((long)(y + a)) * (bmpData.Stride) + (long)(x + b) * byteCount + 2] != 0)
+                                    {
+                                        val3 += pDst[(long)((long)(y + a)) * (bmpData.Stride) + (long)(x + b) * byteCount + 2];
+                                        cnt3++;
+                                    }
+                                    //if (bmp.Height <= rect[k].Top + (i + a))
+                                    //    break; ;
+                                    //if (pDst[(long)((long)(rect[k].Top + (i + a)) * (bmpData.Stride) + (long)(rect[k].Left + (j + b)) * byteCount + 0)] != 0)
+                                    //{
+                                    //    val1 += pDst[(long)((long)(rect[k].Top + (i + a)) * (bmpData.Stride) + (long)(rect[k].Left + (j + b)) * byteCount + 0)];
+                                    //    cnt1++;
+                                    //}
+                                    //if (pDst[(long)((long)(rect[k].Top + (i + a)) * (bmpData.Stride) + (long)(rect[k].Left + (j + b)) * byteCount + 1)] != 0)
+                                    //{
+                                    //    val2 += pDst[(long)((long)(rect[k].Top + (i + a)) * (bmpData.Stride) + (long)(rect[k].Left + (j + b)) * byteCount + 1)];
+                                    //    cnt2++;
+                                    //}
+                                    //if (pDst[(long)((long)(rect[k].Top + (i + a)) * (bmpData.Stride) + (long)(rect[k].Left + (j + b)) * byteCount + 2)] != 0)
+                                    //{
+                                    //    val3 += pDst[(long)((long)(rect[k].Top + (i + a)) * (bmpData.Stride) + (long)(rect[k].Left + (j + b)) * byteCount + 2)];
+                                    //    cnt3++;
+                                    //}
+                                }
+                            }
+                                //if(t == 5)
+                                //{
+                                //    pDst[(long)((long)(y) * (bmpData.Stride) + (long)(x) * byteCount + 0)] = (byte)0;
+                                //    pDst[(long)((long)(y) * (bmpData.Stride) + (long)(x) * byteCount + 1)] = (byte)0;
+                                //    pDst[(long)((long)(y) * (bmpData.Stride) + (long)(x) * byteCount + 2)] = (byte)255;
+                                //}
+                                //else
+                                {
+                                if(!double.IsNaN(val1 / cnt1))
+                                {
+                                    pDst[(long)((long)(y) * (bmpData.Stride) + (long)(x) * byteCount + 0)] = Convert.ToByte(val1 / cnt1);
+                                    pDst[(long)((long)(y) * (bmpData.Stride) + (long)(x) * byteCount + 1)] = Convert.ToByte(val2 / cnt2);
+                                    pDst[(long)((long)(y) * (bmpData.Stride) + (long)(x) * byteCount + 2)] = Convert.ToByte(val3 / cnt3);
+                                }
+                                
+                            }
+                            
+
+                            //curR = preR;
+                            //curG = preG;
+                            //curB = preB;
+                        }
+                        else
+                        {
+                            preR = curR;
+                            preG = curG;
+                            preB = curB;
+                        }
+
+                        
+                    }
+                }
+            }
+
+            bmp.UnlockBits(bmpData);
+            return bmp;
+        }
+        public unsafe static Bitmap InterpolationImage(Bitmap bmp, List<List<System.Windows.Point>> polygon)
+        {
+
+            BitmapData bmpData = bmp.LockBits(new Rectangle(0, 0, bmp.Width, bmp.Height), ImageLockMode.ReadWrite, bmp.PixelFormat);
+            IntPtr pointer = bmpData.Scan0;
+
+            int byteCount;
+            if (bmp.PixelFormat == PixelFormat.Format8bppIndexed)
+            {
+                byteCount = 1;
+            }
+            else
+            {
+                byteCount = 3;
+            }
+
+            List<Rect> rect = new List<Rect>();
+
+            for(int i = 0; i < polygon.Count; i++)
+            {
+                int minX = int.MaxValue, maxX = 0, minY = int.MaxValue, maxY = 0;
+                for(int j = 0; j < polygon[i].Count; j++)
+                {
+                    if(minX > polygon[i][j].X)
+                    {
+                        minX = (int)polygon[i][j].X;
+                    }
+                    if(maxX < polygon[i][j].X)
+                    {
+                        maxX = (int)polygon[i][j].X;
+                    }
+                    if (minY > polygon[i][j].Y)
+                    {
+                        minY = (int)polygon[i][j].Y;
+                    }
+                    if (maxY < polygon[i][j].Y)
+                    {
+                        maxY = (int)polygon[i][j].Y;
+                    }
+                }
+                rect.Add(new Rect(new System.Windows.Point(minX, minY), new System.Windows.Point(maxX, maxY)));
+            }
+
+            unsafe
+            {
+                byte* pDst = (byte*)pointer.ToPointer();
+                //byte* pR = (byte*)info.PtrR_GRAY.ToPointer();
+                //byte* pG = (byte*)info.PtrG.ToPointer();
+                //byte* pB = (byte*)info.PtrB.ToPointer();
+
+               for(int k = 0; k < rect.Count; k++)
+                {
+                    for (long i = 0; i < rect[k].Height; i++)
+                    {
+                        for (long j = 0; j < rect[k].Width; j++)
+                        {
+                            if (bmp.Height <= rect[k].Top + i)
+                                break; ;
+                            if (pDst[(long)((long)(rect[k].Top + i) * (bmpData.Stride) + (long)(rect[k].Left + j) * byteCount + 0)] == 0)
+                            {
+                                //int asdfh = 10;
+                                int cnt1 = 0;
+                                int cnt2 = 0;
+                                int cnt3 = 0;
+                                int val1 = 0;
+                                int val2 = 0;
+                                int val3 = 0;
+                                for (int a = - 1; a < 2; a++)
+                                {
+                                    for(int b = -1; b < 2; b++)
+                                    {
+                                        if (bmp.Height <= rect[k].Top + (i + a))
+                                            break; ;
+                                        if (pDst[(long)((long)(rect[k].Top + (i + a)) * (bmpData.Stride) + (long)(rect[k].Left + (j + b)) * byteCount + 0)] != 0)
+                                        {
+                                            val1 += pDst[(long)((long)(rect[k].Top + (i + a)) * (bmpData.Stride) + (long)(rect[k].Left + (j + b)) * byteCount + 0)];
+                                            cnt1++;
+                                        }
+                                        if (pDst[(long)((long)(rect[k].Top + (i + a)) * (bmpData.Stride) + (long)(rect[k].Left + (j + b)) * byteCount + 1)] != 0)
+                                        {
+                                            val2 += pDst[(long)((long)(rect[k].Top + (i + a)) * (bmpData.Stride) + (long)(rect[k].Left + (j + b)) * byteCount + 1)];
+                                            cnt2++;
+                                        }
+                                        if (pDst[(long)((long)(rect[k].Top + (i + a)) * (bmpData.Stride) + (long)(rect[k].Left + (j + b)) * byteCount + 2)] != 0)
+                                        {
+                                            val3 += pDst[(long)((long)(rect[k].Top + (i + a)) * (bmpData.Stride) + (long)(rect[k].Left + (j + b)) * byteCount + 2)];
+                                            cnt3++;
+                                        }
+                                    }
+                                }
+                                pDst[(long)((long)(rect[k].Y + i) * (bmpData.Stride) + (long)(rect[k].X + j) * byteCount + 0)] = Convert.ToByte(val1 / cnt1);
+                                pDst[(long)((long)(rect[k].Y + i) * (bmpData.Stride) + (long)(rect[k].X + j) * byteCount + 1)] = Convert.ToByte(val2 / cnt2);
+                                pDst[(long)((long)(rect[k].Y + i) * (bmpData.Stride) + (long)(rect[k].X + j) * byteCount + 2)] = Convert.ToByte(val3 / cnt3);
+                                //pDst[(long)((long)(rect[k].Y + i) * (bmpData.Stride) + (long)(rect[k].X + j) * byteCount + 0)];
+                            }
+                            //pDst[(long)((long)rect[k].X + i * (bmpData.Stride) + (long)j * byteCount + 0)];
+                            //pDst[(long)((long)i * (bmpData.Stride) + (long)j * byteCount + 0)] = *(pB + (long)(j * samplingX));
+                            //pDst[(long)((long)i * (bmpData.Stride) + (long)j * byteCount + 0)] = pDst[(long)((long)i * (bmpData.Stride) + (long)j * byteCount + 0)];
+                            //if (PolygonController.HitTest(geometry, new System.Windows.Point(j, i)))
+                            //{
+                            //    pDst[(long)((long)i * (bmpData.Stride) + (long)j * _byteCount + 0)] = 0;
+                            //    pDst[(long)((long)i * (bmpData.Stride) + (long)j * _byteCount + 1)] = 0;
+                            //    pDst[(long)((long)i * (bmpData.Stride) + (long)j * _byteCount + 2)] = 0;
+                            //}
+                            //else
+                            //{
+                            //pDst[(long)((long)i * (bmpData.Stride) + (long)j * _byteCount + 0)] = *(pB + (long)(j * samplingX));
+                            //pDst[(long)((long)i * (bmpData.Stride) + (long)j * _byteCount + 1)] = *(pG + (long)(j * samplingX));
+                            //pDst[(long)((long)i * (bmpData.Stride) + (long)j * _byteCount + 2)] = *(pR + (long)(j * samplingX));
+                            //}
+                        }
+
+                        //pR += (long)(info.Width * samplingY);
+                        //pG += (long)(info.Width * samplingY);
+                        //pB += (long)(info.Width * samplingY);
+                    }
+                }
+               
+            }
+            bmp.UnlockBits(bmpData);
+            return bmp;
+        }
+
+        public unsafe static Bitmap CovertBufferToBitmapPolygon(SharedBufferInfo info, Rect rect, List<List<System.Windows.Point>> polygon ,int outSizeX = 0, int outSizeY = 0)
+        {
+            try
+            {
+                int _byteCount = info.ByteCnt;
+                int _width = info.Width;
+                int _height = info.Height;
+
+                int roiWidth = (int)rect.Width;
+                int roiHeight = (int)rect.Height;
+
+                double samplingX = 1;
+                double samplingY = 1;
+                if (outSizeX != 0 && outSizeY != 0)
+                {
+                    if (outSizeX > roiWidth) outSizeX = roiWidth;
+                    if (outSizeY > roiHeight) outSizeY = roiHeight;
+
+                    roiWidth = outSizeX;
+                    roiHeight = outSizeY;
+
+                    samplingX = Math.Floor((double)(int)rect.Width / outSizeX);
+                    samplingY = Math.Floor((double)(int)rect.Height / outSizeY);
+                }
+
+
+                System.Drawing.Imaging.PixelFormat format = System.Drawing.Imaging.PixelFormat.Format8bppIndexed;
+                if (_byteCount == 1)
+                {
+                    format = System.Drawing.Imaging.PixelFormat.Format8bppIndexed;
+                }
+                else if (_byteCount == 3)
+                {
+                    format = System.Drawing.Imaging.PixelFormat.Format24bppRgb;
+                }
+                else
+                {
+                    System.Windows.MessageBox.Show("지원하지 않는 PixelFormat입니다.");
+                    return null;
+                }
+
+                int stride = (int)Math.Ceiling((double)_width / 4) * 4;
+                Bitmap bmp = new Bitmap((int)roiWidth, roiHeight, format);
+
+                ColorPalette palette = bmp.Palette;
+
+                if (_byteCount == 1)
+                {
+                    for (int i = 0; i < 256; i++)
+                        palette.Entries[i] = Color.FromArgb(i, i, i);
+
+                    bmp.Palette = palette;
+                }
+
+
+                BitmapData bmpData = bmp.LockBits(new Rectangle(0, 0, (int)roiWidth, (int)roiHeight), ImageLockMode.WriteOnly, format);
+
+                IntPtr pointer = bmpData.Scan0;
+                if (_byteCount == 1)
+                {
+                    int h = (int)rect.Height;
+
+                    byte* ptr = (byte*)pointer.ToPointer();
+
+                    for (int i = 0; i < h; i++)
+                    {
+                        //Marshal.Copy(info.PtrR_GRAY + (int)((i + rect.Top) * info.Width + rect.Left), ptr, (int)(i * _width),(int)rect.Width );                        
+                        CopyMemory(pointer + (i * bmpData.Stride), info.PtrR_GRAY + +(int)((i + rect.Top) * info.Width + rect.Left), (uint)rect.Width);
+                    }
+
+
+                    //for (int i = 0; i < _height; i++)
+                    //{
+                    //    Buffer.MemoryCopy(info.PtrList[0].ToPointer()[i * _width], pointer.ToPointer()[i * bmpData.Stride], bmpData.Stride, bmpData.Stride);
+                    //    //CopyMemory(info.PtrR_GRAY + i * _width, pointer + i * bmpData.Stride, (uint)_width);
+                    //}
+                }
+                else if (_byteCount == 3)
+                {
+                    unsafe
+                    {
+                        byte* pDst = (byte*)pointer.ToPointer();
+                        byte* pR = (byte*)info.PtrR_GRAY.ToPointer();
+                        byte* pG = (byte*)info.PtrG.ToPointer();
+                        byte* pB = (byte*)info.PtrB.ToPointer();
+
+                        for (int i = 0; i < rect.Y; i++)
+                        {
+                            pR += info.Width;
+                            pG += info.Width;
+                            pB += info.Width;
+                        }
+
+                        pR += (int)rect.Left;
+                        pG += (int)rect.Left;
+                        pB += (int)rect.Left;
+
+                        for(int i = 0; i < polygon.Count; i++)
+                        {
+                            //for(long j = 0; j )
+                        }
+                        //for(long i = 0; i <)
+
+                        for (long i = 0; i < roiHeight; i++)
+                        {
+                            for (long j = 0; j < roiWidth; j++)
+                            {
+                                //if (PolygonController.HitTest(geometry, new System.Windows.Point(j, i)))
+                                //{
+                                //    pDst[(long)((long)i * (bmpData.Stride) + (long)j * _byteCount + 0)] = 0;
+                                //    pDst[(long)((long)i * (bmpData.Stride) + (long)j * _byteCount + 1)] = 0;
+                                //    pDst[(long)((long)i * (bmpData.Stride) + (long)j * _byteCount + 2)] = 0;
+                                //}
+                                //else
+                                {
+                                    pDst[(long)((long)i * (bmpData.Stride) + (long)j * _byteCount + 0)] = *(pB + (long)(j * samplingX));
+                                    pDst[(long)((long)i * (bmpData.Stride) + (long)j * _byteCount + 1)] = *(pG + (long)(j * samplingX));
+                                    pDst[(long)((long)i * (bmpData.Stride) + (long)j * _byteCount + 2)] = *(pR + (long)(j * samplingX));
+                                }
+                            }
+
+                            pR += (long)(info.Width * samplingY);
+                            pG += (long)(info.Width * samplingY);
+                            pB += (long)(info.Width * samplingY);
+                        }
+                    }
+                }
+
+
+
+                bmp.UnlockBits(bmpData);
+
+                return bmp;
+            }
+            catch (Exception)
+            {
+
+            }
+            return null;
+        }
+
+        unsafe void GetInterpolationValue(byte* p, int i, int j, double sampling)
+        {
+            //for(int i = 0; i < 9; i++)
+            //*(p + (long)(j * sampling))
+        }
+
+        public enum PenColor
+        {
+            WHITE,
+            RED,
+            BLUE,
+            GREEN,
+            YELLOW,
+            ORANGE
+        }
+
+        static Pen GetPen(PenColor penColor)
+        {
+            Pen pen;
+            switch (penColor)
+            {
+                case PenColor.WHITE:
+                    pen = new Pen(Color.White, 3);
+                    break;
+                case PenColor.RED:
+                    pen = new Pen(Color.Red, 3);
+                    break;
+                case PenColor.BLUE:
+                    pen = new Pen(Color.Blue, 3);
+                    break;
+                case PenColor.GREEN:
+                    pen = new Pen(Color.Green, 3);
+                    break;
+                case PenColor.YELLOW:
+                    pen = new Pen(Color.Yellow, 3);
+                    break;
+                case PenColor.ORANGE:
+                default:
+                    pen = new Pen(Color.Orange, 3);
+                    break;
+            }
+            return pen;
+        }
+
+        static Brush GetBrush(PenColor penColor)
+        {
+            Brush brush;
+            switch (penColor)
+            {
+                case PenColor.WHITE:
+                    brush = new SolidBrush(Color.White);
+                    break;
+                case PenColor.RED:
+                    brush = new SolidBrush(Color.Red);
+                    break;
+                case PenColor.BLUE:
+                    brush = new SolidBrush(Color.Black);
+                    break;
+                case PenColor.GREEN:
+                    brush = new SolidBrush(Color.Green);
+                    break;
+                case PenColor.YELLOW:
+                    brush = new SolidBrush(Color.Yellow);
+                    break;
+                case PenColor.ORANGE:
+                default:
+                    brush = new SolidBrush(Color.Orange);
+                    break;
+            }
+            return brush;
+        }
+        void DrawBitmapText(ref Bitmap bit, string text, float x, float y, PenColor penColor = PenColor.ORANGE)
+        {
+            Graphics graphics = Graphics.FromImage(bit);
+            Brush brush = GetBrush(penColor);
+
+            System.Drawing.Font myFont = new System.Drawing.Font(FontFamily.GenericSansSerif, 20, System.Drawing.FontStyle.Regular, GraphicsUnit.Pixel);
+            graphics.DrawString(text, myFont, brush, x, y);
+
+        }
+        public static void DrawBitmapRect(ref Bitmap bit, float x, float y, float width, float height, PenColor penColor = PenColor.ORANGE)
+        {
+            Graphics graphics = Graphics.FromImage(bit);
+            Pen pen = GetPen(penColor);
+            pen.Width = 1;
+           
+            graphics.DrawRectangle(pen, x, y, width, height);
+        }
+
+        public static void DrawRuler(ref Bitmap bit, int x, int y, float resolution)
+        {
+            double r = resolution;
+            float f10um = (float)(10.0f / r);
+            float f1um = f10um / 10;
+
+            CRect rt = new CRect(0, 0, x ,y);
+            double ratioY = y / 10;
+            double ratioX = x / 10;
+            CPoint ptStart = new CPoint(x / 2, (int)(y - ratioY));
+
+            Graphics graphics = Graphics.FromImage(bit);
+
+            int nDum = 10;
+
+            Pen pen = GetPen(PenColor.ORANGE);
+            pen.Width = 1;
+            int totalSize = (int)((rt.Width - ratioX - rt.X) / f10um);
+            
+            if(totalSize > 5)
+            {
+                totalSize -= (totalSize % 5);
+            }
+            if (totalSize > 10)
+                totalSize = 10;
+            int last = (int)(ptStart.X + f1um * totalSize * nDum);
+
+            for (int i = 0; i <= totalSize; i++)
+            {
+                graphics.DrawLine(pen, (ptStart.X + f1um * i * nDum), (ptStart.Y - 5), (ptStart.X + f1um * i * nDum), (ptStart.Y));
+
+                if (i % 5 == 0)
+                {
+                    graphics.DrawLine(pen, (float)(ptStart.X + f1um * i * nDum), (float)(ptStart.Y - 10), (float)(ptStart.X + f1um * i * nDum), (float)(ptStart.Y));
+                }
+
+                if (i % 10 == 0)
+                {
+                    graphics.DrawLine(pen, (float)(ptStart.X + f1um * i * nDum), (float)(ptStart.Y - 15), (float)(ptStart.X + f1um * i * nDum), (float)(ptStart.Y));
+                }
+                //totalSize++;
+            }
+
+            graphics.DrawLine(pen, last, (ptStart.Y - 15), last, (ptStart.Y));
+            graphics.DrawLine(pen, ptStart.X, ptStart.Y, last, ptStart.Y);
+
+            string str;
+            str = string.Format("{0}um", nDum * totalSize);
+            Brush brush = GetBrush(PenColor.ORANGE);
+            System.Drawing.Font myFont = new System.Drawing.Font("굴림", 8);
+            graphics.TextRenderingHint = System.Drawing.Text.TextRenderingHint.ClearTypeGridFit;
+            graphics.DrawString(str, myFont, brush, last - 20, ptStart.Y + 1);
+            //graphics.DrawString(str, );
+            //pDC->TextOut_Mem((int)(ptStart.x + f1um * 10 * nDum - 40), (int)(ptStart.y + 3), str);
+        }
 
         public static Bitmap CovertArrayToBitmap(byte[] rawdata, int _width, int _height, int _byteCount)
         {
@@ -714,6 +1245,26 @@ namespace RootTools_Vision
             Bitmap dest = new Bitmap(source);
             dest.RotateFlip(RotateFlipType.RotateNoneFlipX);
             return dest;
+        }
+
+        public static List<Measurement> DataTableToMeasurementList(DataTable table)
+        {
+            List<Measurement> defects = new List<Measurement>();
+            FieldInfo[] fields = typeof(Measurement).GetFields();
+
+            foreach (DataRow row in table.Rows)
+            {
+                Measurement defect = new Measurement();
+                foreach (FieldInfo info in fields)
+                {
+                    info.SetValue(defect, Convert.ChangeType(row[info.Name], info.FieldType));
+                }
+                
+                if (defect.m_strMeasureItem == Measurement.EBRMeasureItem.EBR.ToString())
+                    defects.Add(defect);
+            }
+
+            return defects;
         }
 
         public static List<Defect> DataTableToDefectList(DataTable table)

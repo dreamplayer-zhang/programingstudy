@@ -880,7 +880,7 @@ namespace Root_WIND2.UI_User
                     if (!dir.Exists)
                         dir.Create();
 
-                    RecipeFront recipe = GlobalObjects.Instance.Get<RecipeFront>();
+                    RecipeBack recipe = GlobalObjects.Instance.Get<RecipeBack>();
                     recipe.Clear();
 
                     recipe.Name = sFileNameNoExt;
