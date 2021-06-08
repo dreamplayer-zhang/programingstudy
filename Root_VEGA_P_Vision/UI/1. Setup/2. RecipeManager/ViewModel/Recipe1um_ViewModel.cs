@@ -82,6 +82,7 @@ namespace Root_VEGA_P_Vision
 
             EIPcoverBottom_Step = new ScrewUI_ViewModel("EIP_Cover.Stack.Front");
             EIPbaseplate_step = new ScrewUI_ViewModel("EIP_Plate.Stack.Front");
+            SelectedViewer = EIPCoverBottom;
         }
 
         public ICommand ImageOpen

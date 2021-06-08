@@ -21,8 +21,25 @@ namespace Root_VEGA_P_Vision
         public PositionFeature curTab;
         PositionImageViewer_ViewModel mEIPCoverTop, mEIPCoverBtm, mEIPBaseTop, mEIPBaseBtm;
         EUVPositionRecipe positionRecipe;
+        int selectedIdx;
+        List<int> numList;
 
         #region Property
+        public int SelectedIdx
+        {
+            get => selectedIdx;
+            set
+            {
+                SetProperty(ref selectedIdx, value);
+                selectedViewer.SelectedIdx = value;
+            }
+        }
+        public List<int> MemNumList
+        {
+            get => numList;
+            set => SetProperty(ref numList, value);
+        }
+
         public PositionImageViewer_ViewModel p_EIPCoverTop
         {
             get => mEIPCoverTop;
@@ -55,6 +72,10 @@ namespace Root_VEGA_P_Vision
             mEIPBaseBtm = new PositionImageViewer_ViewModel("EIP_Plate.Main.Back");
 
             positionRecipe = GlobalObjects.Instance.Get<RecipeVision>().GetItem<EUVPositionRecipe>();
+            numList = new List<int>();
+            for (int i = 0; i < mEIPCoverTop.p_ImageData.p_nPlane; i++)
+                MemNumList.Add(i + 1);
+
             selectedViewer = mEIPCoverTop;
             curTab = PositionFeature.COVERTOP;
         }
@@ -97,7 +118,7 @@ namespace Root_VEGA_P_Vision
         }
         public ICommand ImageOpen
         {
-            get => new RelayCommand(() => selectedViewer._openImage());
+            get => new RelayCommand(() => selectedViewer._openImage(SelectedIdx));
         }
         public ICommand ImageSave
         {

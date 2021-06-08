@@ -29,8 +29,22 @@ namespace Root_VEGA_P_Vision
         EUVOriginRecipe originRecipe;
 
         int selectedIdx, sideselectedIdx;
-
+        List<int> numList;
         #region Property
+        public int SelectedIdx
+        {
+            get => selectedIdx;
+            set
+            {
+                SetProperty(ref selectedIdx, value);
+                selectedViewer.SelectedIdx = value;
+            }
+        }
+        public List<int> MemNumList
+        {
+            get => numList;
+            set => SetProperty(ref numList, value);
+        }
         public OriginImageViewer_ViewModel p_2DOriginViewer
         {
             get => m2DTDIViewer;
@@ -71,6 +85,9 @@ namespace Root_VEGA_P_Vision
             selectedIdx = 0;
             sideselectedIdx = 0;
             selectedViewer = p_2DOriginViewer;
+            numList = new List<int>();
+            for (int i = 0; i < m2DTDIViewer.p_ImageData.p_nPlane; i++)
+                MemNumList.Add(i + 1);
         }
 
         void InitOriginViewer(OriginImageViewer_ViewModel viewer)
@@ -196,7 +213,7 @@ namespace Root_VEGA_P_Vision
 
         public ICommand ImageOpen
         {
-            get => new RelayCommand(() => selectedViewer._openImage());
+            get => new RelayCommand(() => selectedViewer._openImage(SelectedIdx));
         }
         public ICommand ImageSave
         {

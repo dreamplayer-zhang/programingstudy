@@ -1,5 +1,6 @@
 ﻿using Root_VEGA_P.Engineer;
 using RootTools;
+using RootTools_Vision;
 using System.ComponentModel;
 using System.IO;
 using System.Windows;
@@ -15,15 +16,20 @@ namespace Root_VEGA_P
         public MainWindow()
         {
             InitializeComponent();
-        }
 
-        VEGA_P_Engineer m_engineer = new VEGA_P_Engineer();
+			if (!Directory.Exists(@"C:\Recipe\VEGA_P")) Directory.CreateDirectory(@"C:\Recipe\VEGA_P");
+
+			m_engineer = new VEGA_P_Engineer();
+			m_engineer = GlobalObjects.Instance.Register<VEGA_P_Engineer>();
+			m_engineer.Init("VEGA_P");
+
+			logView.Init(LogView._logView);
+			DataContext = new MainVM(this);
+		}
+
+		VEGA_P_Engineer m_engineer;
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            if (!Directory.Exists(@"C:\Recipe\VEGA_P")) Directory.CreateDirectory(@"C:\Recipe\VEGA_P");
-            m_engineer.Init("VEGA_P");
-            engineerUI.Init(m_engineer);
-			logView.Init(LogView._logView);
 			InitMemory();
         }
         private void Window_Closing(object sender, CancelEventArgs e)
