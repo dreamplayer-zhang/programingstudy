@@ -25,8 +25,6 @@ namespace Root_WIND2.Module
         //bool m_bInvDir = false;
         public GrabModeBack m_grabMode = null;
         string m_sGrabMode = "";
-        double m_dMinRadius = 1000;
-        int m_nThickness = 400;
         #region [Klarf]
         private static KlarfData_Lot klarfData = new KlarfData_Lot();
 
@@ -88,8 +86,6 @@ namespace Root_WIND2.Module
             Run_InspectBackside run = new Run_InspectBackside(m_module);
             run.p_sGrabMode = p_sGrabMode;
             run.RecipeName = this.RecipeName;
-            run.m_dMinRadius = m_dMinRadius;
-            run.m_nThickness = m_nThickness;
             return run;
         }
 
@@ -98,8 +94,6 @@ namespace Root_WIND2.Module
             m_sRecipeName = tree.SetFile(m_sRecipeName, m_sRecipeName, "rcp", "Recipe", "Recipe Name", bVisible);
             // 이거 다 셋팅 되어 있는거 가져와야함
             p_sGrabMode = tree.Set(p_sGrabMode, p_sGrabMode, m_module.p_asGrabMode, "Grab Mode", "Select GrabMode", bVisible);
-            m_dMinRadius = tree.Set(m_dMinRadius, m_dMinRadius, "Save Min Radius", "Min Radius", true, false);
-            m_nThickness = tree.Set(m_nThickness, m_nThickness, "Save Thickness", "Save Thicness", true, false);
         }
 
         public override string Run()
@@ -183,7 +177,7 @@ namespace Root_WIND2.Module
                            settings_backside.WholeWaferImageEndY),
                        (long)(settings_backside.WholeWaferImageCompressionRate * 100),
                        settings_backside.OutputImageSizeX,
-                       settings_backside.OutputImageSizeY, polygon, m_dMinRadius, m_nThickness,
+                       settings_backside.OutputImageSizeY, polygon, settings_backside.MinRadius, settings_backside.Thickness,
                        backRecipe.CenterX,
                        backRecipe.CenterY);
 
