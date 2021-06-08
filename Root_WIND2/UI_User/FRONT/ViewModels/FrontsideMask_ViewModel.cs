@@ -315,7 +315,7 @@ namespace Root_WIND2.UI_User
             CPoint memPt = new CPoint(p_MouseMemX, p_MouseMemY);
             memPt = CheckOriginBox(memPt);
 
-            CPoint canvasPt = GetCanvasPoint(memPt - OriginOffset);
+            CPoint canvasPt = GetCanvasPoint(memPt);
             switch (eToolProcess)
             {
                 case ToolProcess.None:
