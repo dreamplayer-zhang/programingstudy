@@ -1111,7 +1111,10 @@ namespace RootTools_Vision.Utility
 			ArrayList inputImage = new ArrayList();
 			foreach (FileInfo file in files)
 			{
-				System.Drawing.Image imgFromFile = System.Drawing.Bitmap.FromFile(file.FullName);
+				if (file.Extension != ".bmp" && file.Extension != ".jpg")
+					continue;
+
+				System.Drawing.Image imgFromFile = System.Drawing.Bitmap.FromFile(file.FullName);		
 				inputImage.Add(imgFromFile);
 			}
 

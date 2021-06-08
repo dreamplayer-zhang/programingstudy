@@ -10,6 +10,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Shapes;
 
 namespace RootTools_Vision
 {
@@ -189,38 +190,50 @@ namespace RootTools_Vision
             });
         }
 
-        public static void SaveDefectImageParallel(String path, List<Measurement> measurementList, SharedBufferInfo sharedBuffer, int nByteCnt)
+        public static void SaveDefectImageParallel(String path, List<Measurement> measurementList, SharedBufferInfo sharedBuffer, int nByteCnt, Size size = new Size())
         {
-            path += "\\";
-            DirectoryInfo di = new DirectoryInfo(path);
-            if (!di.Exists)
-                di.Create();
+			path += "\\";
+			DirectoryInfo di = new DirectoryInfo(path);
+			if (!di.Exists)
+				di.Create();
 
-            if (measurementList.Count < 1)
-                return;
+			if (measurementList.Count < 1)
+				return;
 
-            Parallel.ForEach(measurementList, measure =>
-            {
-                double cx = (measure.p_rtDefectBox.Left + measure.p_rtDefectBox.Right) / 2;
-                double cy = (measure.p_rtDefectBox.Top + measure.p_rtDefectBox.Bottom) / 2;
-                int startX = (int)cx - 320;
-                int startY = (int)cy - 240;
-                //int endX = startX + 640;
-                //int endY = startY + 480;
+			Parallel.ForEach(measurementList, measure =>
+			{
+				double cx = (measure.p_rtDefectBox.Left + measure.p_rtDefectBox.Right) / 2;
+				double cy = (measure.p_rtDefectBox.Top + measure.p_rtDefectBox.Bottom) / 2;
 
+				int startX = (int)cx - 320;
+				int startY = (int)cy - 240;
+				int width = 640;
+				int height = 480;
 
-                System.Drawing.Bitmap bitmap = CovertBufferToBitmap(sharedBuffer, new System.Windows.Rect(startX, startY, 640, 480));
+				System.Windows.Rect imageRect = new System.Windows.Rect(startX, startY, width, height);
 
-                lock(lockObj)
+				if (size != Size.Empty)
 				{
-                    if (System.IO.File.Exists(path + measure.m_nMeasurementIndex + ".bmp"))
-                        System.IO.File.Delete(path + measure.m_nMeasurementIndex + ".bmp");
+					startX = (int)(cx - (size.Width / 2));
+					if (startX < 0)
+						startX = 0;
 
+					startY = (int)(cy - (size.Height / 2));
+					width = (int)size.Width;
+					height = (int)size.Height;
+				}
 
-                    bitmap.Save(path + measure.m_nMeasurementIndex + ".bmp");
-                }
-            });
-        }
+				System.Drawing.Bitmap bitmap = CovertBufferToBitmap(sharedBuffer, new System.Windows.Rect(startX, startY, width, height));
+
+				lock (lockObj)
+				{
+					if (System.IO.File.Exists(path + measure.m_nMeasurementIndex + ".bmp"))
+						System.IO.File.Delete(path + measure.m_nMeasurementIndex + ".bmp");
+
+					bitmap.Save(path + measure.m_nMeasurementIndex + ".bmp");
+				}
+			});
+		}
 
         private static object lockObj = new object();
 
@@ -322,6 +335,14 @@ namespace RootTools_Vision
         {
             System.Drawing.Graphics bitmapGraphics = System.Drawing.Graphics.FromImage(sourceBitmap);
             bitmapGraphics.DrawString(text, font, brush, location);
+            bitmapGraphics.Dispose();
+        }
+
+        public static void WriteRectToBitmap(System.Drawing.Bitmap sourceBitmap, System.Drawing.Pen pen,System.Drawing.Rectangle rect)
+        {
+            System.Drawing.Graphics bitmapGraphics = System.Drawing.Graphics.FromImage(sourceBitmap);
+            //bitmapGraphics.DrawString(text, font, brush, location);
+            bitmapGraphics.DrawRectangle(pen, rect);
             bitmapGraphics.Dispose();
         }
 

@@ -160,6 +160,7 @@ namespace RootTools_Vision
 			set => SetProperty(ref roiHeight, value);
 		}
 
+		[Browsable(false)]
 		[Category("Search Edge Line")]
 		[DisplayName("Use")]
 		public bool UseEdgeSearch

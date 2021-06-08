@@ -435,6 +435,7 @@ namespace Root_Pine2.Module
         public override string StateReady()
         {
             if (EQ.p_eState != EQ.eState.Run) return "OK";
+            if (m_pine2.p_eMode != Pine2.eRunMode.Magazine) return "OK";
             if (m_pusher.p_infoStrip != null) StartUnload();
             if (m_gripper.p_infoStrip == null) StartLoad(); 
             return "OK"; 
