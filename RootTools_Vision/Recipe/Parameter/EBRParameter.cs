@@ -17,7 +17,6 @@ namespace RootTools_Vision
 		#region [Parameter]
 		// roi
 		private int roiHeight = 500;
-		//private double stepDegree = 10;
 		private int notchY;
 
 		// option
@@ -46,16 +45,6 @@ namespace RootTools_Vision
 				SetProperty(ref this.roiHeight, value);
 			}
 		}
-		//[Category("ROI")]
-		//[DisplayName("Step Degree")]
-		//public double StepDegree
-		//{
-		//	get => this.stepDegree;
-		//	set
-		//	{
-		//		SetProperty(ref this.stepDegree, value);
-		//	}
-		//}
 		[Browsable(false)]
 		[Category("ROI")]
 		[DisplayName("Notch")]
