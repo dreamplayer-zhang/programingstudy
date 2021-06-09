@@ -10,6 +10,10 @@
         d:DesignWidth="1912" Background="{StaticResource main_view_background}">
     <UserControl.Resources>
         <local:ModuleStateToColorConverter x:Key="ModuleStateToColorConverters"></local:ModuleStateToColorConverter>
+        <local:ModuleRunStateBrushconverter x:Key="ModuleRunStateBrushConverters"></local:ModuleRunStateBrushconverter>
+        <local:ModuleRunStepConverter x:Key="ModuleRunStepConverter"></local:ModuleRunStepConverter>
+        <local:ModuleRunImageConverter x:Key="ModuleRunImageConverter"></local:ModuleRunImageConverter>
+        <local:ModuleRunStateVisibleConverter x:Key="ModuleRunStateVisibleConverter"></local:ModuleRunStateVisibleConverter>
         <Style TargetType="{x:Type TabItem}">
             <Setter Property="Template">
                 <Setter.Value>
@@ -613,8 +617,58 @@
                                                 </Border>
                                             </Grid>
                                         </GroupBox>
-                                        <Image Margin="40" Grid.Row="3"
-                                                Source="/Root_WIND2;component/Resources/VEGAImage.PNG"></Image>
+                                        <GroupBox Header="Process"
+                                                  FontSize="15"
+                                                  Grid.Row="3">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition/>
+                                                    <ColumnDefinition Width="3*" />
+                                                </Grid.ColumnDefinitions>
+                                                <Grid Grid.Column="0"
+                                                      Margin="5">
+                                                    <ItemsControl ItemsSource="{Binding p_handler.p_process.p_qSequence}"
+                                                                  Margin="0,5">
+                                                        <ItemsControl.ItemTemplate>
+                                                            <DataTemplate>
+                                                                <Grid DataContext="{Binding p_moduleRun}"
+                                                                      Height="40"
+                                                                      Background="{Binding p_eRunState, Converter={StaticResource ModuleRunStateBrushConverters}}">
+                                                                    <TextBlock Text="{Binding Converter={StaticResource ModuleRunStepConverter}}"
+                                                                               VerticalAlignment="Center"
+                                                                               Margin="3,0"/>
+                                                                </Grid>
+                                                            </DataTemplate>
+                                                        </ItemsControl.ItemTemplate>
+                                                    </ItemsControl>
+                                                </Grid>
+                                                <ScrollViewer Grid.Column="1"
+                                                              Margin="5">
+                                                    <Grid>
+                                                        <ItemsControl ItemsSource="{Binding p_handler.p_process.p_qSequence}">
+                                                            <ItemsControl.ItemsPanel>
+                                                                <ItemsPanelTemplate>
+                                                                    <StackPanel />
+                                                                </ItemsPanelTemplate>
+                                                            </ItemsControl.ItemsPanel>
+
+                                                            <ItemsControl.ItemTemplate>
+                                                                <DataTemplate>
+                                                                    <GroupBox DataContext="{Binding p_moduleRun}"
+                                                                              Header="{Binding Converter={StaticResource ModuleRunStepConverter}}"
+                                                                              Height="200">
+                                                                        <Grid>
+                                                                            <Image Source="{Binding Converter={StaticResource ModuleRunImageConverter}}" 
+                                                                                   Opacity="{Binding p_eRunState, Converter={StaticResource ModuleRunStateVisibleConverter}, ConverterParameter=Opacity}" />
+                                                                        </Grid>
+                                                                    </GroupBox>
+                                                                </DataTemplate>
+                                                            </ItemsControl.ItemTemplate>
+                                                        </ItemsControl>
+                                                    </Grid>
+                                                </ScrollViewer>
+                                            </Grid>
+                                        </GroupBox>
                                     </Grid>
                                 </Grid>
                             </TabItem>

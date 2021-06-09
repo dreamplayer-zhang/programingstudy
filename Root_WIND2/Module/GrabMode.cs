@@ -31,6 +31,7 @@ namespace Root_WIND2.Module
         public RPoint m_ptXYAlignData = new RPoint(0, 0);
         public double m_dTDIToVRSOffsetX = 0;
         public double m_dTDIToVRSOffsetY = 0;
+        public double m_dTDIToVRSOffsetZ = 0;
         public double m_dVRSFocusPos = 0;
         public RPoint m_rpAxisCenter = new RPoint();    // Wafer Center Position
         public CPoint m_cpMemoryOffset = new CPoint();  // Memory Offset
@@ -38,10 +39,10 @@ namespace Root_WIND2.Module
         public double m_dResY_um = 1;                   // Camera Resolution Y
         public int m_nFocusPosZ = 0;                    // Focus Position Z
         public int m_nWaferSize_mm = 1000;              // Wafer Size (mm)
-        public int m_nMaxFrame = 100;                   // Camera max Frame 스펙
-        public int m_nScanRate = 100;                   // Camera Frame Spec 사용률 ? 1~100 %
+        public int m_nMaxFrame = 100;                   // Camera max Frame ?�펙
+        public int m_nScanRate = 100;                   // Camera Frame Spec ?�용�?? 1~100 %
         public int m_nYOffset = 0;
-        public double m_dCamTriggerRatio = 1;              // Camera 분주비
+        public double m_dCamTriggerRatio = 1;              // Camera 분주�?
 
         public GrabData m_GD = new GrabData();
         LensLinearTurret m_lens = null;
@@ -52,6 +53,7 @@ namespace Root_WIND2.Module
             m_cpMemoryOffset = tree.Set(m_cpMemoryOffset, m_cpMemoryOffset, "Memory Offset", "Grab Start Memory Position (px)", bVisible);
             m_dCamTriggerRatio = tree.Set(m_dCamTriggerRatio, m_dCamTriggerRatio, "Trigger Ratio", "Trigger Ratio", bVisible);
 
+            
             m_GD.m_nFovStart = tree.Set(m_GD.m_nFovStart, m_GD.m_nFovStart, "Cam Fov Star Pxl", "Pixel", bVisible);
             m_GD.m_nFovSize = tree.Set(m_GD.m_nFovSize, m_GD.m_nFovSize, "Cam Fov Size Pxl", "Pixel", bVisible);
             m_GD.m_nOverlap = tree.Set(m_GD.m_nOverlap, m_GD.m_nOverlap, "Cam Overlap Size Pxl", "Pixel", bVisible);
@@ -76,13 +78,13 @@ namespace Root_WIND2.Module
             m_nFocusPosZ = tree.Set(m_nFocusPosZ, m_nFocusPosZ, "Focus Z Position", "Focus Z Position", bVisible);
             m_nWaferSize_mm = tree.Set(m_nWaferSize_mm, m_nWaferSize_mm, "Wafer Size Y", "Wafer Size Y", bVisible);
             m_nMaxFrame = (tree.GetTree("Scan Velocity", false, bVisible)).Set(m_nMaxFrame, m_nMaxFrame, "Max Frame", "Camera Max Frame Spec", bVisible);
-            m_nScanRate = (tree.GetTree("Scan Velocity", false, bVisible)).Set(m_nScanRate, m_nScanRate, "Scan Rate", "카메라 Frame 사용률 1~ 100 %", bVisible);
+            m_nScanRate = (tree.GetTree("Scan Velocity", false, bVisible)).Set(m_nScanRate, m_nScanRate, "Scan Rate", "카메??Frame ?�용�?1~ 100 %", bVisible);
         }
 
         void RunTreeCamera(Tree tree, bool bVisible, bool bReadOnly)
         {
             m_bUseBiDirectionScan = tree.Set(m_bUseBiDirectionScan, false, "Use BiDirectionScan", "Bi Direction Scan Use");
-            m_nReverseOffsetY = tree.Set(m_nReverseOffsetY, 800, "ReverseOffsetY", "Reverse Scan 동작시 Y 이미지 Offset 설정");
+            m_nReverseOffsetY = tree.Set(m_nReverseOffsetY, 800, "ReverseOffsetY", "Reverse Scan ?�작??Y ?��?지 Offset ?�정");
             if(m_cameraSet != null)
             {
                 m_sCamera = tree.Set(m_sCamera, m_sCamera, m_cameraSet.p_asCamera, "Camera", "Select Camera", bVisible, bReadOnly);
@@ -93,6 +95,7 @@ namespace Root_WIND2.Module
             m_ptXYAlignData = tree.Set(m_ptXYAlignData, m_ptXYAlignData, "XY Align Data", "XY Align Data", bVisible, true);
             m_dTDIToVRSOffsetX = tree.Set(m_dTDIToVRSOffsetX, m_dTDIToVRSOffsetX, "TDI To VRS Offset X", "TDI To VRS Offset X");
             m_dTDIToVRSOffsetY = tree.Set(m_dTDIToVRSOffsetY, m_dTDIToVRSOffsetY, "TDI To VRS Offset Y", "TDI To VRS Offset Y");
+            m_dTDIToVRSOffsetZ = tree.Set(m_dTDIToVRSOffsetZ, m_dTDIToVRSOffsetZ, "TDI To VRS Offset Z", "TDI To VRS Offset Z");
             m_dVRSFocusPos = tree.Set(m_dVRSFocusPos, m_dVRSFocusPos, "VRS Focus Z", "VRS Focus Z", bVisible, true);
         }
 
@@ -101,11 +104,11 @@ namespace Root_WIND2.Module
             m_camera.GrabLineScan(memory, cpScanOffset, nLine, m_GrabData, bTest);
             m_camera.Grabed += m_camera_Grabed;
         }
-        public void StartGrabColor(MemoryData memory, CPoint cpScanOffset, int nLine, GrabData m_GrabData = null)
-        {
-            m_camera.GrabLineScanColor(memory, cpScanOffset, nLine, m_GrabData);
-            m_camera.Grabed += m_camera_Grabed;
-        }
+        //public void StartGrabColor(MemoryData memory, CPoint cpScanOffset, int nLine, GrabData m_GrabData = null)
+        //{
+        //    m_camera.GrabLineScanColor(memory, cpScanOffset, nLine, m_GrabData);
+        //    m_camera.Grabed += m_camera_Grabed;
+        //}
         void m_camera_Grabed(object sender, System.EventArgs e)
         {
             if (Grabed != null)
@@ -193,7 +196,7 @@ namespace Root_WIND2.Module
 
         #region Axis
         public int m_dTrigger = 10;
-        public int m_intervalAcc = 100000;        // 가속 구간 point,  단위 0.1um
+        public int m_intervalAcc = 100000;        // 가??구간 point,  ?�위 0.1um
         public int m_ScanLineNum = 1;
         public int m_ScanStartLine = 0;
         #endregion
@@ -207,7 +210,7 @@ namespace Root_WIND2.Module
         }
         void RunTreeScanPos(Tree tree, bool bVisible, bool bReadOnly)
         {
-            m_eScanPos = (eScanPos)tree.Set(m_eScanPos, m_eScanPos, "Scan 위치", "Scan 위치, 0 Position 이 Bottom", bVisible, bReadOnly);
+            m_eScanPos = (eScanPos)tree.Set(m_eScanPos, m_eScanPos, "Scan ?�치", "Scan ?�치, 0 Position ??Bottom", bVisible, bReadOnly);
         }
 
         public string p_sName { get; set; }
@@ -273,7 +276,7 @@ namespace Root_WIND2.Module
 
         public void RunTreeLADS(Tree tree)
         {
-            m_bUseLADS = tree.Set(m_bUseLADS, m_bUseLADS, "Use LADS", "LADS 사용 여부");
+            m_bUseLADS = tree.Set(m_bUseLADS, m_bUseLADS, "Use LADS", "LADS ?�용 ?��?");
         }
         public virtual void RunTree(Tree.eMode mode) { }
     }

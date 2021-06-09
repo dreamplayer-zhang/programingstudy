@@ -30,8 +30,8 @@ namespace Root_Pine2.Module
         #endregion
 
         #region Boat Flow
-        public Vision.eVision m_eVisionLoad = Vision.eVision.Top3D; 
-        public Vision.eWorks m_eWorks = Vision.eWorks.A;
+        public Vision2D.eVision m_eVisionLoad = Vision2D.eVision.Top3D; 
+        public Vision2D.eWorks m_eWorks = Vision2D.eWorks.A;
         #endregion
 
         string _id = ""; 

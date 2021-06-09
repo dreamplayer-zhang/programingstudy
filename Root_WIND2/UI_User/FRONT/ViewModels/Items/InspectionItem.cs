@@ -180,7 +180,7 @@ namespace Root_WIND2
             {
                 return new RelayCommand(() =>
                 {
-                    if (ComboBoxItemChanged_Mask != null)
+                    if (ComboBoxItemChanged_Method != null)
                         ComboBoxItemChanged_Method(p_InspMethod, new EventArgs());
                 });
             }

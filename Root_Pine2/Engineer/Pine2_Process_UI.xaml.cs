@@ -69,7 +69,7 @@ namespace Root_Pine2.Engineer
         List<Boats_UI> m_aBoatsUI = new List<Boats_UI>(); 
         void InitBoatsUI()
         {
-            foreach (Vision.eVision eVision in Enum.GetValues(typeof(Vision.eVision)))
+            foreach (Vision2D.eVision eVision in Enum.GetValues(typeof(Vision2D.eVision)))
             {
                 Boats_UI ui = new Boats_UI();
                 ui.Init(m_handler.m_aBoats[eVision]);

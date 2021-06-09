@@ -158,8 +158,6 @@ namespace Root_CAMELLIA.Module
             logManager.WritePRC(EQ.p_nRnR, m_module.p_id, SSLNet.PRC_EVENTID.Process, SSLNet.STATUS.START, this.p_id, sequence++, materialID:m_module.p_infoWafer.p_id);
 
             DataFormatter dataFormatter = new DataFormatter();
-            //logManager.MakeDataFormatter();
-            //logManager.AddData("Z Axis", m_dFocusZ, "Pulse");
             dataFormatter.AddData("Z Axis", m_dFocusZ, "Pulse");
             logManager.WriteFNC(EQ.p_nRunLP, m_module.p_id, "Start Move", SSLNet.STATUS.START, dataFormatter);
             dataFormatter.ClearData();

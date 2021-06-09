@@ -353,8 +353,10 @@ namespace Root_WIND2.UI_User
             RecipeFront recipeFront = GlobalObjects.Instance.Get<RecipeFront>();
 
             CameraInfo camInfo = DataConverter.GrabModeToCameraInfo(engineer.m_handler.p_Vision.GetGrabMode(recipeFront.CameraInfoIndex));
-
+            
             this.CamInfoDataListVM.Init(camInfo);
+
+            this.SelectedGrabModeIndex = recipeFront.CameraInfoIndex;
         }
 
         #region [Properties]

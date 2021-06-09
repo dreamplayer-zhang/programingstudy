@@ -201,7 +201,11 @@ namespace RootTools_Vision
                     RecipeBase temp = this;
                     temp = (RecipeBase)xml.Deserialize(reader);
 
+                    this.Name = temp.Name;
                     this.WaferMap = temp.WaferMap;
+                    this.CameraInfoIndex = temp.CameraInfoIndex;
+                    this.UseExclusiveRegion = temp.UseExclusiveRegion;
+                    this.ExclusiveRegionFilePath = temp.ExclusiveRegionFilePath;
                 }
 
                 // Parameter
@@ -315,6 +319,9 @@ namespace RootTools_Vision
             recipeBase.RecipeFolderPath = this.RecipeFolderPath;
             recipeBase.RecipePath = this.RecipePath;
             recipeBase.WaferMap = this.WaferMap;
+            recipeBase.CameraInfoIndex = this.CameraInfoIndex;
+            recipeBase.UseExclusiveRegion = this.UseExclusiveRegion;
+            recipeBase.ExclusiveRegionFilePath = this.ExclusiveRegionFilePath;
 
             return recipeBase;
         }

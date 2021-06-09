@@ -35,8 +35,8 @@ namespace Root_Pine2.Engineer
         public LoadEV m_loadEV;
         public MagazineEVSet m_magazineEV = new MagazineEVSet();
         public Transfer m_transfer;
-        public Dictionary<Vision.eVision, Vision> m_aVision = new Dictionary<Vision.eVision, Vision>();
-        public Dictionary<Vision.eVision, Boats> m_aBoats = new Dictionary<Vision.eVision, Boats>(); 
+        public Dictionary<Vision2D.eVision, Vision2D> m_aVision = new Dictionary<Vision2D.eVision, Vision2D>();
+        public Dictionary<Vision2D.eVision, Boats> m_aBoats = new Dictionary<Vision2D.eVision, Boats>(); 
         public Loader0 m_loader0;
         public Loader1 m_loader1;
         public Loader2 m_loader2;
@@ -48,12 +48,12 @@ namespace Root_Pine2.Engineer
             InitModule(m_pine2 = new Pine2("Pine2", m_engineer));
             InitModule(m_loadEV = new LoadEV("LoadEV", m_engineer));
             InitMagazineEV();
-            InitVision(Vision.eVision.Top3D);
-            InitVision(Vision.eVision.Top2D);
-            InitVision(Vision.eVision.Bottom);
-            InitBoats(Vision.eVision.Top3D);
-            InitBoats(Vision.eVision.Top2D);
-            InitBoats(Vision.eVision.Bottom);
+            InitVision(Vision2D.eVision.Top3D);
+            InitVision(Vision2D.eVision.Top2D);
+            InitVision(Vision2D.eVision.Bottom);
+            InitBoats(Vision2D.eVision.Top3D);
+            InitBoats(Vision2D.eVision.Top2D);
+            InitBoats(Vision2D.eVision.Bottom);
             InitModule(m_transfer = new Transfer("Transter", m_engineer, m_pine2, m_magazineEV));
             InitModule(m_loader0 = new Loader0("Loader0", m_engineer, this));
             InitModule(m_loader1 = new Loader1("Loader1", m_engineer, this));
@@ -72,16 +72,16 @@ namespace Root_Pine2.Engineer
             m_msInit = ms; 
         }
 
-        void InitVision(Vision.eVision eVision)
+        void InitVision(Vision2D.eVision eVision)
         {
-            Vision vision = new Vision(eVision, m_engineer, ModuleBase.eRemote.Client); 
+            Vision2D vision = new Vision2D(eVision, m_engineer, ModuleBase.eRemote.Client); 
             ModuleBase_UI ui = new ModuleBase_UI();
             ui.Init(vision);
             p_moduleList.AddModule(vision, ui);
             m_aVision.Add(eVision, vision);
         }
 
-        void InitBoats(Vision.eVision eVision)
+        void InitBoats(Vision2D.eVision eVision)
         {
             Boats boats = new Boats(m_aVision[eVision], m_engineer, m_pine2);
             ModuleBase_UI ui = new ModuleBase_UI();
