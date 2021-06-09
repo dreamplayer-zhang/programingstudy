@@ -20,6 +20,7 @@ namespace Root_Pine2.Module
         #endregion
 
         #region LED Display
+        int m_nComm = 0; 
         int m_nUnitLED = 0; 
         string _sLED = "LED";
         public string p_sLED
@@ -30,12 +31,13 @@ namespace Root_Pine2.Module
                 if (_sLED == value) return;
                 _sLED = value;
                 OnPropertyChanged(); 
-                m_pine2.m_display.Write(m_nUnitLED, value); 
+                m_pine2.m_display.Write(m_nComm, m_nUnitLED, value); 
             }
         }
 
         void RunTreeLED(Tree tree)
         {
+            m_nComm = tree.Set(m_nComm, m_nComm, "Comm", "Communication ID (0, 1)"); 
             m_nUnitLED = tree.Set(m_nUnitLED, m_nUnitLED, "Unit", "LED Display Modbus Unit ID");
         }
         #endregion
@@ -424,6 +426,7 @@ namespace Root_Pine2.Module
         #region override
         public override string StateReady()
         {
+            return "OK";  //forget
             switch (m_pine2.p_eMode)
             {
                 case Pine2.eRunMode.Stack: return (m_stack == null) ? StartLoad() : "OK";
@@ -611,6 +614,7 @@ namespace Root_Pine2.Module
         {
             m_runLoad = AddModuleRunList(new Run_Load(this), false, "Load Magazine or Stack");
             m_runUnload = AddModuleRunList(new Run_Unload(this), false, "Unload Magazine or Stack");
+            AddModuleRunList(new Run_DisplayLED(this), false, "Run Disply LED");
             AddModuleRunList(new Run_Align(this), false, "Run Align");
             AddModuleRunList(new Run_MoveStack(this), false, "Move Stack Position");
             m_runMoveTransfer = AddModuleRunList(new Run_MoveTransfer(this), false, "Move Transfer Position");
@@ -663,6 +667,35 @@ namespace Root_Pine2.Module
             public override string Run()
             {
                 return m_module.RunUnload();
+            }
+        }
+
+        public class Run_DisplayLED : ModuleRunBase
+        {
+            MagazineEV m_module;
+            public Run_DisplayLED(MagazineEV module)
+            {
+                m_module = module;
+                InitModuleRun(module);
+            }
+
+            string m_sLED = "Test";
+            public override ModuleRunBase Clone()
+            {
+                Run_DisplayLED run = new Run_DisplayLED(m_module);
+                run.m_sLED = m_sLED;
+                return run;
+            }
+
+            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
+            {
+                m_sLED = tree.Set(m_sLED, m_sLED, "LED", "Display LED", bVisible);
+            }
+
+            public override string Run()
+            {
+                m_module.p_sLED = m_sLED;
+                return "OK";
             }
         }
 

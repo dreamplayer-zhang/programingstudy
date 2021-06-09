@@ -17,7 +17,7 @@ namespace Root_Pine2.Module
         public override void GetTools(bool bInit)
         {
             m_toolBox.GetAxis(ref m_axisXZ, this, "Loader2");
-            m_toolBox.GetDIO(ref m_dioTurn, this, "Turn", "Up", "Down");
+            m_toolBox.GetDIO(ref m_dioTurn, this, "Turn", "Down", "Up");
             m_toolBox.GetDIO(ref m_doVacuum, this, "Vacuum");
             if (bInit) InitPosition();
         }
