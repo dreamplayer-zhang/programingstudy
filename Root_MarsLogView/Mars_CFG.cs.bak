@@ -16,7 +16,7 @@ namespace Root_MarsLogView
 
         #region Property
         public string p_sModule { get; set; }
-   
+
         public string p_sCategory { get; set; }
 
         public string p_sCfgID { get; set; }
@@ -41,7 +41,6 @@ namespace Root_MarsLogView
             if (GetString(6) != p_sValue) return false;
             return true;
         }
-
         string GetString(int nIndex)
         {
             if (m_asLog.Length <= nIndex) return "";
