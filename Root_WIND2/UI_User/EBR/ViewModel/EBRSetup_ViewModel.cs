@@ -212,8 +212,12 @@ namespace Root_WIND2.UI_User
         public void LoadParameter()
 		{
             RecipeEBR recipe = GlobalObjects.Instance.Get<RecipeEBR>();
-
             OriginRecipe originRecipe = recipe.GetItem<OriginRecipe>();
+            EBRRecipe ebrRecipe = recipe.GetItem<EBRRecipe>();
+
+            if (originRecipe == null || ebrRecipe == null)
+                return;
+
 			this.OriginX = originRecipe.OriginX;
 			this.OriginY = originRecipe.OriginY;
 			this.OriginWidth = originRecipe.OriginWidth;
@@ -221,7 +225,6 @@ namespace Root_WIND2.UI_User
 			this.DiePitchX = originRecipe.DiePitchX;
 			this.DiePitchY = originRecipe.DiePitchY;
 
-            EBRRecipe ebrRecipe = recipe.GetItem<EBRRecipe>();
             this.FirstNotch = ebrRecipe.FirstNotch;
             this.LastNotch = ebrRecipe.LastNotch;
 

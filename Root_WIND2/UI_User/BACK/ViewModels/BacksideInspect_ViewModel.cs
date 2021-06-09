@@ -199,7 +199,9 @@ namespace Root_WIND2.UI_User
                 this.ImageViewerVM.ClearObjects();
                 if (GlobalObjects.Instance.GetNamed<WorkManager>("backInspection") != null)
                 {
-                    GlobalObjects.Instance.GetNamed<WorkManager>("backInspection").Start();
+
+                   RecipeBack recipe = GlobalObjects.Instance.Get<RecipeBack>();
+                   GlobalObjects.Instance.GetNamed<WorkManager>("backInspection").Start();
                 }
             });
         }

@@ -13,7 +13,7 @@ using System.Windows;
 
 namespace Root_WIND2.Module
 {
-    class Run_GrabBackside : ModuleRunBase
+    public class Run_GrabBackside : ModuleRunBase
     {
         // Member
         BackSideVision m_module;

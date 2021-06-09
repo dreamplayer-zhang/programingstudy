@@ -85,7 +85,7 @@ namespace Root_Pine2_Vision.Module
         public enum eProtocol
         {
             Snap,
-            Recipe,
+            RecipeOpen,
             SnapDone,
         }
 
@@ -145,14 +145,14 @@ namespace Root_Pine2_Vision.Module
         int m_iProtocol = 0; 
         public string SendRecipe(string sRecipe)
         {
-            Protocol protocol = new Protocol(m_iProtocol, eProtocol.Recipe, sRecipe);
+            Protocol protocol = new Protocol(m_iProtocol, eProtocol.RecipeOpen, sRecipe);
             m_qProtocol.Enqueue(protocol);
             return protocol.WaitReply(); 
         }
 
         public string SendSnapDone(string sRecipe, int iSnap)
         {
-            Protocol protocol = new Protocol(m_iProtocol, eProtocol.Recipe, sRecipe, iSnap);
+            Protocol protocol = new Protocol(m_iProtocol, eProtocol.SnapDone, sRecipe, iSnap);
             m_qProtocol.Enqueue(protocol);
             return protocol.WaitReply();
         }
@@ -186,7 +186,7 @@ namespace Root_Pine2_Vision.Module
                 if (asSend[1] == eProtocol.Snap.ToString())
                 {
                     string sRecipe = asSend[2];
-                    string sInfo = m_vision.ReqSnap(p_eWorks, sRecipe);
+                    string sInfo = m_vision.ReqSnap(sRecipe, p_eWorks);
                     m_tcpip.Send(sSend.Substring(0, sSend.Length - 1) + "," + sInfo + "]"); 
                 }
             }

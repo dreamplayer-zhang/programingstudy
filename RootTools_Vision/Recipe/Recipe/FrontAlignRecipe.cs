@@ -39,7 +39,12 @@ namespace RootTools_Vision
 
         public FrontAlignRecipe()
         {
+            this.FirstSearchPointX = 0;
+            this.FirstSearchPointY = 0;
+            this.SecondSearchPointX = 0;
+            this.SecondSearchPointY = 0;
 
+            this.alignFeatureList = new List<RecipeType_ImageData>();
         }
 
         public void AddAlignFeature(int positionX, int positionY, int featureWidth, int featureHeight, int byteCnt, byte[] rawData)

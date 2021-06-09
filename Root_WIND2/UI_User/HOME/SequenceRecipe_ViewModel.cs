@@ -148,7 +148,7 @@ namespace Root_WIND2.UI_User
         public SequenceRecipe_ViewModel()
         {
             p_recipe = ((WIND2_Handler)GlobalObjects.Instance.Get<WIND2_Engineer>().ClassHandler()).m_recipe;
-            p_moduleRunList = p_recipe.m_moduleRunList;
+            p_moduleRunList = p_recipe.p_moduleRunList;
             p_moduleTempList = p_moduleRunList.Copy();
 
             p_tree.Init(p_moduleTempList.p_treeRoot);

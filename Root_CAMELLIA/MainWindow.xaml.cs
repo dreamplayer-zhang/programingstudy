@@ -175,7 +175,7 @@ namespace Root_CAMELLIA
         bool IsEnable_Resume()
         {
             if (EQ.p_eState != EQ.eState.Ready) return false;
-            if (m_handler.m_process.m_qSequence.Count <= 0) return false;
+            if (m_handler.m_process.p_qSequence.Count <= 0) return false;
             return true;
         }
 

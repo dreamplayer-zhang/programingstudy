@@ -53,8 +53,6 @@ namespace Root_CAMELLIA.Module
             m_DataManager = module.m_DataManager;
             
             InitModuleRun(module);
-
-            DataManager.Instance.m_calibration.CalDoneEvent += CalDoneEvent;
         }
 
         void CalDoneEvent()
@@ -134,6 +132,7 @@ namespace Root_CAMELLIA.Module
 
         public override string Run()
         {
+            DataManager.Instance.m_calibration.CalDoneEvent += CalDoneEvent;
             StopWatch test = new StopWatch();
             test.Start();
             m_log.Warn("Measure Start");
@@ -143,7 +142,7 @@ namespace Root_CAMELLIA.Module
             string strVRSImageFullPath = "";
 
             MarsLogManager logManager = MarsLogManager.Instance;
-
+            
             logManager.WriteFNC(EQ.p_nRunLP, m_module.p_id, "Lifter Down", SSLNet.STATUS.START);
             if (m_module.LifterDown() != "OK")
             {
@@ -156,8 +155,6 @@ namespace Root_CAMELLIA.Module
             logManager.WritePRC(EQ.p_nRnR, m_module.p_id, SSLNet.PRC_EVENTID.Process, SSLNet.STATUS.START, this.p_id, sequence++, materialID:m_module.p_infoWafer.p_id);
 
             DataFormatter dataFormatter = new DataFormatter();
-            //logManager.MakeDataFormatter();
-            //logManager.AddData("Z Axis", m_dFocusZ, "Pulse");
             dataFormatter.AddData("Z Axis", m_dFocusZ, "Pulse");
             logManager.WriteFNC(EQ.p_nRunLP, m_module.p_id, "Start Move", SSLNet.STATUS.START, dataFormatter);
             dataFormatter.ClearData();
@@ -408,7 +405,7 @@ namespace Root_CAMELLIA.Module
 
             test.Stop();
             m_log.Warn("Calibration End >> " + test.ElapsedMilliseconds);
-
+            DataManager.Instance.m_calibration.CalDoneEvent -= CalDoneEvent;
             return "OK";
         }
     }

@@ -1,11 +1,15 @@
 ﻿using RootTools;
 using RootTools.Camera;
 using RootTools.Camera.Dalsa;
+using RootTools.Comm;
 using RootTools.Light;
 using RootTools.Memory;
 using RootTools.Module;
 using RootTools.Trees;
 using System.Collections.Generic;
+using System.IO;
+using System.Net.Sockets;
+using System.Text;
 using System.Threading;
 
 namespace Root_Pine2_Vision.Module
@@ -30,6 +34,8 @@ namespace Root_Pine2_Vision.Module
                 p_sInfo = m_toolBox.Get(ref m_lightSet, this);
                 m_aWorks[eWorks.A].GetTools(m_toolBox, bInit);
                 m_aWorks[eWorks.B].GetTools(m_toolBox, bInit);
+                p_sInfo = m_toolBox.GetComm(ref m_tcpRequest, this, "Request"); 
+                if (bInit) m_tcpRequest.EventReceiveData += M_tcpRequest_EventReceiveData;
             }
             m_remote.GetTools(bInit);
         }
@@ -271,25 +277,88 @@ namespace Root_Pine2_Vision.Module
 
             public Recipe Clone()
             {
-                Recipe recipe = new Recipe(m_vision);
+                Recipe recipe = new Recipe(m_vision, m_eWorks);
                 recipe.m_eWorks = m_eWorks;
                 foreach (Snap snap in m_aSnap) recipe.m_aSnap.Add(snap.Clone());
                 return recipe; 
             }
 
-            public void RunTree(Tree tree, bool bVisible)
+            const string c_sExt = ".pine2";
+            public void RecipeSave(string sRecipe)
             {
-                m_eWorks = (eWorks)tree.Set(m_eWorks, m_eWorks, "Works", "Vision eWorks", bVisible);
-                p_lSnap = tree.Set(p_lSnap, p_lSnap, "Count", "Snap Count");
-                for (int n = 0; n < m_aSnap.Count; n++) m_aSnap[n].RunTree(tree.GetTree("Snap" + n.ToString("00"), true, bVisible), bVisible);
+                string sPath = EQ.c_sPathRecipe + "\\" + sRecipe;
+                Directory.CreateDirectory(sPath); 
+                string sFile = sPath + "\\" + m_vision.m_eVision.ToString() + m_eWorks.ToString() + c_sExt;
+                m_treeRecipe.m_job = new Job(sFile, true, m_vision.m_log);
+                RunTreeRecipe(Tree.eMode.JobSave);
+                m_treeRecipe.m_job.Close();
             }
 
-            Vision2D m_vision; 
-            public Recipe(Vision2D vision)
+            public void RecipeOpen(string sRecipe)
             {
-                m_vision = vision; 
+                string sPath = EQ.c_sPathRecipe + "\\" + sRecipe;
+                Directory.CreateDirectory(sPath);
+                string sFile = sPath + "\\" + m_vision.m_eVision.ToString() + m_eWorks.ToString() + c_sExt;
+                m_treeRecipe.m_job = new Job(sFile, false, m_vision.m_log);
+                RunTreeRecipe(Tree.eMode.JobOpen);
+                m_treeRecipe.m_job.Close();
+            }
+
+
+            #region TreeRecipe
+            public TreeRoot m_treeRecipe;
+            void InitTreeRecipe()
+            {
+                m_treeRecipe = new TreeRoot(m_vision.p_id, m_vision.m_log);
+                m_treeRecipe.UpdateTree += M_treeRecipe_UpdateTree;
+            }
+
+            private void M_treeRecipe_UpdateTree()
+            {
+                int lSnap = p_lSnap;
+                RunTreeRecipe(Tree.eMode.Update);
+                if (lSnap != p_lSnap) RunTreeRecipe(Tree.eMode.Init);
+            }
+
+
+            public void RunTreeRecipe(Tree.eMode eMode)
+            {
+                m_treeRecipe.p_eMode = eMode;
+                RunTreeRecipe(m_treeRecipe, true, true); 
+            }
+
+            public void RunTreeRecipe(Tree tree, bool bVisible, bool bReadOnly = false)
+            {
+                tree.Set(m_eWorks, m_eWorks, "Works", "Vision eWorks", bVisible, bReadOnly);
+                p_lSnap = tree.Set(p_lSnap, p_lSnap, "Count", "Snap Count", bVisible);
+                for (int n = 0; n < m_aSnap.Count; n++) m_aSnap[n].RunTree(tree.GetTree("Snap" + n.ToString("00"), true, bVisible), bVisible);
+
+            }
+            #endregion
+
+            Vision2D m_vision; 
+            public Recipe(Vision2D vision, eWorks eWorks)
+            {
+                m_vision = vision;
+                m_eWorks = eWorks;
+                InitTreeRecipe(); 
             }
         }
+        public Dictionary<eWorks, Recipe> m_recipe = new Dictionary<eWorks, Recipe>();
+        void InitRecipe()
+        {
+            m_recipe.Add(eWorks.A, new Recipe(this, eWorks.A));
+            m_recipe.Add(eWorks.B, new Recipe(this, eWorks.B));
+        }
+
+        public List<string> GetRecipeList()
+        {
+            List<string> asRecipe = new List<string>();
+            DirectoryInfo info = new DirectoryInfo(EQ.c_sPathRecipe);
+            foreach (DirectoryInfo dir in info.GetDirectories()) asRecipe.Add(dir.Name);
+            return asRecipe;
+        }
+
         #endregion
 
         #region Works
@@ -324,27 +393,43 @@ namespace Root_Pine2_Vision.Module
             GrabData grabData = recipe.GetGrabData(eWorks);
             try
             {
-                m_camera.GrabLineScan(memory, cpOffset, m_nLine, grabData);
+                //m_camera.GrabLineScan(memory, cpOffset, m_nLine, grabData);
                 Thread.Sleep(200);
-                while (m_camera.p_CamInfo.p_eState != eCamState.Ready)
-                {
-                    Thread.Sleep(10);
-                    if (EQ.IsStop()) return "EQ Stop";
-                }
-                m_aWorks[eWorks].SendSnapDone(sRecipe, iSnap); 
+                //while (m_camera.p_CamInfo.p_eState != eCamState.Ready)
+                //{
+                    //Thread.Sleep(10);
+                    //if (EQ.IsStop()) return "EQ Stop";
+                //}
+                //m_aWorks[eWorks].SendSnapDone(sRecipe, iSnap); 
             }
             finally 
             {
-                m_camera.StopGrab(); 
-                RunLightOff(); 
+                //m_camera.StopGrab(); 
+                //RunLightOff(); 
             }
             return "OK";
         }
         #endregion
 
         #region Request
-        public string ReqSnap(eWorks eWorks, string sRecipe)
+        int m_nReq = 0;
+        string m_sReceive = ""; 
+        TCPAsyncClient m_tcpRequest;
+        private void M_tcpRequest_EventReceiveData(byte[] aBuf, int nSize, Socket socket)
         {
+            m_sReceive = Encoding.Default.GetString(aBuf, 0, nSize);
+        }
+
+        public string ReqSnap(string sRecipe, eWorks eWorks)
+        {
+            string sSend = m_nReq.ToString("000,") + Works2D.eProtocol.Snap.ToString() + "," + sRecipe + "," + eWorks.ToString();
+            m_sReceive = "";
+            m_tcpRequest.Send(sSend); 
+            while (sSend != m_sReceive)
+            {
+                Thread.Sleep(10);
+                if (EQ.IsStop()) return "EQ Stop";
+            }
             return "OK"; 
         }
         #endregion
@@ -381,6 +466,7 @@ namespace Root_Pine2_Vision.Module
             }
             else
             {
+                m_eVision = (eVision)tree.GetTree("Vision").Set(m_eVision, m_eVision, "Type", "Vision Type"); 
                 m_nLine = tree.GetTree("Camera").Set(m_nLine, m_nLine, "Line", "Memory Snap Lines (pixel)");
                 m_aWorks[eWorks.A].RunTree(tree.GetTree("Works " + m_aWorks[eWorks.A].p_id));
                 m_aWorks[eWorks.B].RunTree(tree.GetTree("Works " + m_aWorks[eWorks.B].p_id));
@@ -412,6 +498,7 @@ namespace Root_Pine2_Vision.Module
         {
             InitGrabData();
             InitVisionWorks();
+            InitRecipe();
             InitBase(id, engineer, eRemote);
             InitVision_Snap_UI();
         }
@@ -513,6 +600,7 @@ namespace Root_Pine2_Vision.Module
             AddModuleRunList(new Run_Remote(this), true, "Remote Run");
             AddModuleRunList(new Run_Delay(this), true, "Time Delay");
             m_runSnap = AddModuleRunList(new Run_Snap(this), true, "Snap");
+            AddModuleRunList(new Run_ReqSnap(this), true, "Snap Request");
         }
 
         public class Run_Delay : ModuleRunBase
@@ -579,6 +667,37 @@ namespace Root_Pine2_Vision.Module
             public override string Run()
             {
                 return m_module.RunSnap(m_recipe, m_eWorks, m_sRecipe, m_iSnap);
+            }
+        }
+
+        public class Run_ReqSnap : ModuleRunBase
+        {
+            Vision2D m_module;
+            public Run_ReqSnap(Vision2D module)
+            {
+                m_module = module;
+                InitModuleRun(module);
+            }
+
+            public eWorks m_eWorks = eWorks.A;
+            public string m_sRecipe = "";
+            public override ModuleRunBase Clone()
+            {
+                Run_ReqSnap run = new Run_ReqSnap(m_module);
+                run.m_eWorks = m_eWorks;
+                run.m_sRecipe = m_sRecipe;
+                return run;
+            }
+
+            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
+            {
+                m_eWorks = (eWorks)tree.Set(m_eWorks, m_eWorks, "Works", "Vision eWorks", bVisible);
+                m_sRecipe = tree.Set(m_sRecipe, m_sRecipe, m_module.GetRecipeList(), "Recipe", "Recipe", bVisible);
+            }
+
+            public override string Run()
+            {
+                return m_module.ReqSnap(m_sRecipe, m_eWorks);
             }
         }
         #endregion
