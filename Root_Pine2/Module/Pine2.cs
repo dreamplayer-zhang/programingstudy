@@ -153,16 +153,21 @@ namespace Root_Pine2.Module
         #region LED Display
         public class Display
         {
-            Modbus m_modbus;
+            Modbus[] m_modbus = new Modbus[2] { null, null };
             public void GetTools(ToolBox toolBox, ModuleBase module, bool bInit)
             {
-                toolBox.GetComm(ref m_modbus, module, "Display");
-                if (bInit) m_modbus.Connect(); 
+                toolBox.GetComm(ref m_modbus[0], module, "Display0");
+                toolBox.GetComm(ref m_modbus[1], module, "Display1");
+                if (bInit)
+                {
+                    m_modbus[0].Connect();
+                    m_modbus[1].Connect();
+                }
             }
 
-            public string Write(int nUnit, string sMsg)
+            public string Write(int nComm, int nUnit, string sMsg)
             {
-                Data data = new Data(nUnit, sMsg);
+                Data data = new Data(nComm, nUnit, sMsg);
                 m_qSend.Enqueue(data); 
                 return "OK";
             }
@@ -170,10 +175,12 @@ namespace Root_Pine2.Module
             #region Data
             class Data
             {
+                public int m_nComm = 0; 
                 public int m_nUnit = 1;
                 public List<int> m_aSend = new List<int>(); 
-                public Data(int nUnit, string sMsg)
+                public Data(int nCumm, int nUnit, string sMsg)
                 {
+                    m_nComm = nCumm; 
                     m_nUnit = nUnit; 
                     while (sMsg.Length < 4) sMsg += " ";
                     m_aSend.Add(256 * (byte)sMsg[0] + (byte)sMsg[1]); //forget
@@ -184,7 +191,7 @@ namespace Root_Pine2.Module
 
             string Send(Data data)
             {
-                return m_modbus.WriteHoldingRegister((byte)data.m_nUnit, 1, data.m_aSend); 
+                return m_modbus[data.m_nComm].WriteHoldingRegister((byte)data.m_nUnit, 1, data.m_aSend); 
             }
             #endregion
 
