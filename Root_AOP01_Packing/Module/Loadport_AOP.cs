@@ -4,6 +4,7 @@ using RootTools.Control;
 using RootTools.GAFs;
 using RootTools.Gem;
 using RootTools.Module;
+using RootTools.OHT.Semi;
 using RootTools.OHTNew;
 using RootTools.Trees;
 using System;
@@ -498,6 +499,8 @@ namespace Root_AOP01_Packing.Module
             }
         }
         public InfoCarrier p_infoCarrier { get; set; }
+        public OHT_Semi m_OHTsemi { get; set; }
+
         public Loadport_AOP(string id, IEngineer engineer, bool bEnableWaferSize, bool bEnableWaferCount)
         {
             p_secHome = 40; 

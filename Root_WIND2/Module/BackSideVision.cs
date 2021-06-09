@@ -260,8 +260,8 @@ namespace Root_WIND2.Module
 
         public string AfterPut(int nID)
         {
-            if (!diWaferExist.p_bIn || !diWaferExistVac.p_bIn)
-                alid_WaferExist.Run(true, "Wafer Check Error");
+            //if (!diWaferExist.p_bIn || !diWaferExistVac.p_bIn)
+            //    alid_WaferExist.Run(true, "Wafer Check Error");
             return "OK";
         }
 
@@ -320,7 +320,6 @@ namespace Root_WIND2.Module
                 return "OK";
             //            p_bStageBlow = false;
             //            p_bStageVac = true;
-
             Thread.Sleep(200);
 
             if (camMain != null && camMain.p_CamInfo.p_eState == eCamState.Init)
@@ -333,6 +332,7 @@ namespace Root_WIND2.Module
 
             if (diWaferExist.p_bIn == false)
                 p_bStageVac = false;
+
             return p_sInfo;
         }
         #endregion

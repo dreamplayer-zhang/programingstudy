@@ -64,46 +64,8 @@ namespace Root_Pine2.Module
             toolBox.GetDIO(ref m_doRollerPusher, boats, p_id + ".Roller Pusher");
             toolBox.GetDIO(ref m_doCleanerBlow, boats, p_id + ".Cleaner Blow");
             toolBox.GetDIO(ref m_doCleanerSuction, boats, p_id + ".Cleaner Suction");
-            m_remoteSnap.GetTools(toolBox, bInit); 
             if (bInit) InitPosition();
         }
-        #endregion
-
-        #region Remote Snap
-        public class RemoteSnap
-        {
-            TCPAsyncServer m_tcpip;
-            public void GetTools(ToolBox toolBox, bool bInit)
-            {
-                toolBox.GetComm(ref m_tcpip, m_boats, p_id + ".RemoteSnap"); 
-                if (bInit) m_tcpip.EventReciveData += M_tcpip_EventReciveData;
-            }
-
-            private void M_tcpip_EventReciveData(byte[] aBuf, int nSize, Socket socket)
-            {
-                string sSend = Encoding.Default.GetString(aBuf, 0, nSize);
-                if (sSend.Length <= 0) return;
-                MemoryStream memoryStream = new MemoryStream(Encoding.ASCII.GetBytes(sSend));
-                m_treeRoot.m_job = new Job(memoryStream, false, m_boats.m_log);
-                m_treeRoot.p_eMode = Tree.eMode.JobOpen;
-                m_snapData.RunTree(m_treeRoot, true);
-                m_treeRoot.m_job.Close();
-                m_boats.StartSnap(m_snapData); 
-            }
-
-            string p_id { get; set; }
-            Boats m_boats;
-            TreeRoot m_treeRoot;
-            Vision.SnapData m_snapData; 
-            public RemoteSnap(string id, Boats boats)
-            {
-                p_id = id; 
-                m_boats = boats;
-                m_treeRoot = new TreeRoot(id, boats.m_log);
-                m_snapData = new Vision.SnapData(boats.m_vision); 
-            }
-        }
-        public RemoteSnap m_remoteSnap; 
         #endregion
 
         #region Axis
@@ -132,7 +94,7 @@ namespace Root_Pine2.Module
         }
 
         double[] m_pSnap = new double[2] { 0, 0 }; 
-        void CalcSnapPos(Vision.SnapData snapData)
+        void CalcSnapPos(Vision2D.Recipe.Snap snapData)
         {
             double pStart = m_axis.GetPosValue(ePos.SnapStart) + m_yScale * snapData.m_dpAxis.Y;
             double pEnd = m_pSnap[0] + m_yScale * m_mmSnap;
@@ -141,11 +103,11 @@ namespace Root_Pine2.Module
             double dpAcc = m_yScale * m_mmAcc; 
             switch (snapData.m_eDirection)
             {
-                case Vision.SnapData.eDirection.Forward:
+                case Vision2D.Recipe.Snap.eDirection.Forward:
                     m_pSnap[0] = pStart - dpAcc;
                     m_pSnap[1] = pEnd + dpAcc;
                     break;
-                case Vision.SnapData.eDirection.Backward:
+                case Vision2D.Recipe.Snap.eDirection.Backward:
                     m_pSnap[0] = pEnd + dpAcc;
                     m_pSnap[1] = pStart - dpAcc;
                     break;
@@ -155,7 +117,7 @@ namespace Root_Pine2.Module
         double m_yScale = 10000;
         double m_mmSnap = 300;
         double m_mmAcc = 20;
-        public string RunMoveSnapStart(Vision.SnapData snapData, bool bWait = true)
+        public string RunMoveSnapStart(Vision2D.Recipe.Snap snapData, bool bWait = true)
         {
             CalcSnapPos(snapData);
             m_axis.StartMove(m_pSnap[0]);
@@ -225,14 +187,11 @@ namespace Root_Pine2.Module
         public InfoStrip p_infoStrip { get; set; }
         public string p_id { get; set; }
         Boats m_boats;
-        IWorks m_works;
-        public Boat(string id, Boats boats, IWorks works)
+        public Boat(string id, Boats boats)
         {
             m_bgwRunReady.DoWork += M_bgwRunReady_DoWork;
-            p_id = id + works.p_eWorks.ToString();
-            m_remoteSnap = new RemoteSnap(p_id, boats); 
+            p_id = id;
             m_boats = boats;
-            m_works = works;
         }
     }
 }

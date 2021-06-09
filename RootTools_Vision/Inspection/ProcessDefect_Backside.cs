@@ -105,7 +105,7 @@ namespace RootTools_Vision
             //// Add Defect to DB
             if (MergeDefectList.Count > 0)
             {
-                DatabaseManager.Instance.AddDefectDataList(MergeDefectList, "defect");
+                DatabaseManager.Instance.AddDefectDataListNoAutoCount(MergeDefectList, "defect");
             }
 
             Settings settings = new Settings();

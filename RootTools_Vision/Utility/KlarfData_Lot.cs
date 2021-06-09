@@ -5,6 +5,7 @@ using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
@@ -56,12 +57,16 @@ namespace RootTools_Vision.Utility
 			slotID = 1;
 
 			klarfType = 0;
+
+			moduleName = "";
 		}
 		
 		#region [Variables]
 		private List<KlarfData> klarfData = null;
 
 		private int fileVer1, fileVer2;               // Klarf Ver : 사실 우린 의미가 없음.. 1 1 넣음됨.
+
+		private string moduleName;
 
 		private String inspectionStationVender;       // 설비 제작 업체.
 		private String inspectionStationModel;        // 설비 종류.
@@ -129,11 +134,25 @@ namespace RootTools_Vision.Utility
 
 
 
+
+		public void SetModuleName(string name)
+        {
+			this.moduleName = name;
+        }
 		// 210531 New
 		public bool LotStart(string klarfPath, InfoWafer infoWafer , RecipeType_WaferMap mapData, GrabModeBase grabMode)
         {
 			this.klarfData.Clear();
 
+			if (infoWafer == null)
+			{
+				this.cassetteID = "cassetteID";
+				this.lotID = "lotID";
+				this.recipeName = "recipeName";
+				this.waferID = "00";
+			}
+			else
+			{
 			this.cassetteID = infoWafer.p_sCarrierID;
 			this.lotID = infoWafer.p_sLotID;
 			this.recipeName = infoWafer.p_sRecipe;
@@ -151,6 +170,7 @@ namespace RootTools_Vision.Utility
 				this.deviceID = idArr[0];
 				this.partID = idArr[0];
 				this.stepID = idArr[1];
+			}
 			}
 
 			this.resX = grabMode.m_dRealResX_um;
@@ -188,8 +208,9 @@ namespace RootTools_Vision.Utility
 
 			CalcSampleCenterLoc(_mapdata);
 
-			klarf_FileName = this.recipeName;
-			klarf_FileName = klarf_FileName + "_" + this.lotID + this.waferID + ".001";
+            SetResultTimeStamp();
+
+			klarf_FileName = this.recipeName + "_" + this.lotID + this.waferID + "_" + this.moduleName + ".001";
 			MEMMAP_FileName = this.lotID + "-" + this.cassetteID;
 
 			return true;
@@ -204,11 +225,19 @@ namespace RootTools_Vision.Utility
 
 		public bool WaferStart(RecipeType_WaferMap mapdata, InfoWafer infoWafer)
         {
+
 			this.timeResult = DateTime.Now; 
 			this.timeRecipe = DateTime.Now;
 
+
+			if (infoWafer == null)
+				this.slotID = 0;
+			else
 			this.slotID = infoWafer.m_nSlot;
 
+			
+
+			this.klarfFileName = this.klarfPath + "\\" + recipeName + "_" + waferID + "_" + lotID + "_" + cassetteID +  "_" + moduleName;
 			return true;
 		}
 
@@ -423,6 +452,8 @@ namespace RootTools_Vision.Utility
 
 			if (strFilePath == "") strFilePath = this.klarfPath;
 
+			SetResultTimeStamp();
+
 			timeFile = DateTime.Now;
 
 			if (!Directory.Exists(strFilePath))
@@ -470,16 +501,20 @@ namespace RootTools_Vision.Utility
 			if (strFilePath == "")
 				strFilePath = this.klarfPath;
 
-			timeFile = DateTime.Now;
-
-			FileStream fs = new FileStream(strFilePath, FileMode.Append, FileAccess.Write);
-			StreamWriter sw = new StreamWriter(fs, System.Text.Encoding.UTF8);
-
-			//m_sTemp = strFilePath + "\\LotEnd_" + m_sRecipeName + "_" + m_sWaferID;	// 기존
 			tempString = string.Format(strFilePath + "\\LotEnd_" + recipeName + "_" + cassetteID + "_" + "00-" + waferID);
 
 			tempString.Replace(".rcp", "");
 			tempString += ".trf";
+
+			//SetResultTimeStamp();
+
+			timeFile = DateTime.Now;
+
+			FileStream fs = new FileStream(tempString, FileMode.Create, FileAccess.Write);
+			StreamWriter sw = new StreamWriter(fs, System.Text.Encoding.UTF8);
+
+			//m_sTemp = strFilePath + "\\LotEnd_" + m_sRecipeName + "_" + m_sWaferID;	// 기존
+
 
 			if (sw != null)
 			{
@@ -763,8 +798,8 @@ namespace RootTools_Vision.Utility
 
 			ArrayList inputImage = new ArrayList();
 
-			int tiffWidth = 160;
-			int tiffHeight = 120;
+			int tiffWidth = 640;
+			int tiffHeight = 480;
 			if (imageSize != default(System.Windows.Size))
 			{
 				tiffWidth = (int)imageSize.Width;
@@ -781,7 +816,9 @@ namespace RootTools_Vision.Utility
 					tiffHeight);
 
 				MemoryStream image = new MemoryStream();
-				System.Drawing.Bitmap bitmap = Tools.CovertBufferToBitmap(sharedBuffer, defectRect, 3000, 3000);
+				System.Drawing.Bitmap bitmap = Tools.CovertBufferToBitmap(sharedBuffer, defectRect, tiffWidth, tiffHeight);
+				Tools.DrawBitmapRect(ref bitmap, (tiffWidth / 2) -  (defect.m_fWidth / 2), (tiffHeight / 2) - (defect.m_fHeight / 2), defect.m_fWidth, defect.m_fHeight, Tools.PenColor.RED);
+				Tools.DrawRuler(ref bitmap, tiffWidth, tiffHeight, (float)resX);
 				//System.Drawing.Bitmap NewImg = new System.Drawing.Bitmap(bitmap);
 				bitmap.Save(image, ImageFormat.Tiff);
 				inputImage.Add(image);
@@ -1055,6 +1092,128 @@ namespace RootTools_Vision.Utility
 			}
 
 		}
+
+		public void SaveTiffImageFromFiles(string defectImagePath)
+		{
+			string savePath = (string)this.klarfPath.Clone();
+			savePath = Path.Combine(savePath, this.klarfFileName + ".tif");
+
+			//savePath += "\\";
+			//DirectoryInfo di = new DirectoryInfo(savePath);
+			//if (!di.Exists)
+			//	di.Create();
+
+			DirectoryInfo di2 = new DirectoryInfo(defectImagePath);
+			if (!di2.Exists)
+				return;
+
+			ImageCodecInfo info = null;
+			info = (from ie in ImageCodecInfo.GetImageEncoders()
+					where ie.MimeType == "image/tiff"
+					select ie).FirstOrDefault();
+
+
+			EncoderParameters ep = new EncoderParameters(2);
+			bool firstPage = true;
+
+			//var test = di2.GetFiles().OrderBy(f => f.Name);
+			FileInfo[] files = di2.GetFiles();
+			Array.Sort<FileInfo>(files, CompareByNumericName);
+
+			ArrayList inputImage = new ArrayList();
+			foreach (FileInfo file in files)
+			{
+				if (file.Extension != ".bmp" && file.Extension != ".jpg")
+					continue;
+
+				System.Drawing.Image imgFromFile = System.Drawing.Bitmap.FromFile(file.FullName);		
+				inputImage.Add(imgFromFile);
+			}
+
+			System.Drawing.Image img = null;
+			for (int i = 0; i < inputImage.Count; i++)
+			{
+				System.Drawing.Image img_src = (System.Drawing.Image)inputImage[i];
+				Guid guid = img_src.FrameDimensionsList[0];
+				System.Drawing.Imaging.FrameDimension dimension = new System.Drawing.Imaging.FrameDimension(guid);
+
+				for (int nLoopFrame = 0; nLoopFrame < img_src.GetFrameCount(dimension); nLoopFrame++)
+				{
+					img_src.SelectActiveFrame(dimension, nLoopFrame);
+
+					ep.Param[0] = new EncoderParameter(System.Drawing.Imaging.Encoder.Compression, Convert.ToInt32(EncoderValue.CompressionLZW));
+
+					if (firstPage)
+					{
+						img = img_src;
+
+						ep.Param[1] = new EncoderParameter(System.Drawing.Imaging.Encoder.SaveFlag, Convert.ToInt32(EncoderValue.MultiFrame));
+						lock (lockTiffObj) img.Save(savePath, info, ep);
+
+						firstPage = false;
+						continue;
+					}
+
+					ep.Param[1] = new EncoderParameter(System.Drawing.Imaging.Encoder.SaveFlag, Convert.ToInt32(EncoderValue.FrameDimensionPage));
+					lock (lockTiffObj) img.SaveAdd(img_src, ep);
+				}
+			}
+			if (inputImage.Count == 0)
+			{
+				lock (lockTiffObj) File.Create(savePath);
+				return;
+			}
+
+			ep.Param[1] = new EncoderParameter(System.Drawing.Imaging.Encoder.SaveFlag, Convert.ToInt32(EncoderValue.Flush));
+			lock (lockTiffObj) img.SaveAdd(ep);
+		}
+
+		private int CompareByNumericName(FileInfo firstFile, FileInfo secondFile)
+		{
+			int firstFileNumericName = Int32.Parse(Path.GetFileNameWithoutExtension(firstFile.Name));
+			int secondFileNumericName = Int32.Parse(Path.GetFileNameWithoutExtension(secondFile.Name));
+
+			return firstFileNumericName.CompareTo(secondFileNumericName);
+		}
+
+		public bool SaveImageJpgInterpolation(SharedBufferInfo info, Rect rect, long compressRatio, int outSizeX, int outSizeY, List<List<System.Windows.Point>> polygon, int cuttingSize, double minRadius, int thickness, int centerX, int centerY)
+        {
+
+			Bitmap bmp = Tools.CovertBufferToBitmap(info, rect, outSizeX, outSizeY);
+			Graphics gp =  Graphics.FromImage(bmp);
+			Brush brush = new SolidBrush(Color.Black);
+
+			
+			for (int i = 0; i < polygon.Count; i++)
+            {
+				List<PointF> poly = new List<PointF>();
+				
+				for (int j = 0; j < polygon[i].Count; j++)
+                {
+					
+					poly.Add(new PointF((float)polygon[i][j].X,  (float)polygon[i][j].Y));
+				}
+				gp.FillPolygon(brush, poly.ToArray());
+		
+			}
+			Tools.CirclarInterpolation(bmp, polygon, minRadius, thickness, centerX, centerY, outSizeX, outSizeY);
+
+            GraphicsPath path = new GraphicsPath();
+			int cutSize = cuttingSize * 10;
+			path.AddEllipse(centerX - cutSize, centerY - cutSize, cutSize * 2, cutSize * 2);
+            Region region = new Region(path);
+            gp.ExcludeClip(region);
+            gp.FillRectangle(new SolidBrush(Color.Black), 0, 0, outSizeX, outSizeY);
+
+            //Tools.InterpolationImage(bmp, polygon);
+
+
+
+            Tools.SaveImageJpg(bmp,"D:\\backside.jpg", compressRatio);
+            //Tools.SaveImageJpg(bmp, this.klarfFileName + ".jpg", compressRatio);
+
+            return true;
+        }
 
 		public bool SaveImageJpg(SharedBufferInfo info, Rect rect, long compressRatio, int outSizeX, int outSizeY)
 		{

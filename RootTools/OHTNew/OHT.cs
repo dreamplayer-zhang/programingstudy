@@ -533,6 +533,9 @@ namespace RootTools.OHTNew
                         m_doLoadReq.p_bWait = false;
                         m_doUnloadReq.p_bWait = false;
                         m_doReady.p_bWait = false;
+
+                        m_carrier.m_bReqLoad = true;
+
                         break;
                 }
             }
