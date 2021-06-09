@@ -222,7 +222,12 @@ namespace Root_Pine2_Vision.Module
                     {
                         if (IsMemoryPool() && (IsProcessRun() == false))
                         {
-                            Process process = Process.Start(m_sFileVisionWorks, p_id + "." + m_tcpip.p_nPort.ToString());
+                            ProcessStartInfo startInfo = new ProcessStartInfo(m_sFileVisionWorks);
+                            startInfo.Arguments = p_id + "." + m_tcpip.p_nPort.ToString();
+                            startInfo.WorkingDirectory = "C://WisVision//";
+                            Process process = Process.Start(startInfo);
+
+                            //Process process = Process.Start(m_sFileVisionWorks, p_id + "." + m_tcpip.p_nPort.ToString());
                             m_nProcessID = process.Id;
                             Thread.Sleep(2000); 
                         }
