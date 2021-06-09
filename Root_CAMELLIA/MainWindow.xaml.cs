@@ -88,7 +88,7 @@ namespace Root_CAMELLIA
             m_handler = m_engineer.m_handler;
             //loadportA.Init(m_handler.m_aLoadport[0], m_handler, m_handler.m_aRFID[0]);
             //loadportB.Init(m_handler.m_aLoadport[1], m_handler, m_handler.m_aRFID[1]);
-
+            marsLogManager = MarsLogManager.Instance;
             int nLPNum = m_handler.m_aLoadport.Count;
             for (int i = 0; i < nLPNum; i++) dlgOHT.Init(m_handler.m_aLoadport[i].m_OHTNew);
             SplashScreenHelper.ShowText("Handler Initialize Done");
@@ -115,6 +115,7 @@ namespace Root_CAMELLIA
         }
 
         DispatcherTimer m_timer = new DispatcherTimer();
+        MarsLogManager marsLogManager;
         void InitTimer()
         {
             m_timer.Interval = TimeSpan.FromMilliseconds(20);
@@ -122,10 +123,23 @@ namespace Root_CAMELLIA
             m_timer.Start();
         }
         // EQ.eState oldstate = EQ.eState.Init;
+        bool isCFGWrite = false;
         private void M_timer_Tick(object sender, EventArgs e)
         {
             tbTime.Text = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
-            TimerUI();
+            if(DateTime.Now.Minute == 0 && DateTime.Now.Second == 0 && !isCFGWrite)
+            {
+                DataFormatter data = new DataFormatter();
+                data.AddData("Version", BaseDefine.Configuration.Version3);
+                marsLogManager.WriteCFG("Vision", "Version", data);
+                data.ClearData();
+                isCFGWrite = true;
+            }
+
+            if (DateTime.Now.Second == 1)
+                isCFGWrite = false;
+
+                TimerUI();
             TimerLamp();
 
             buttonResume.IsEnabled = IsEnable_Resume();
