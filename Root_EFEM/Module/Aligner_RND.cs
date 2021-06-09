@@ -718,7 +718,7 @@ namespace Root_EFEM.Module
 
         public override void Reset()
         {
-            SendCmd(eCmd.EmgStop);
+            SendCmd(eCmd.SlowStop);
             SendCmd(eCmd.ClearError);
             SendCmd(eCmd.ResetPos);
             base.Reset();

@@ -31,7 +31,7 @@ namespace Root_Pine2_Vision.Module
         #region Memory
         public MemoryGroup m_memoryGroup;
         MemoryData[] m_memoryExt = new MemoryData[2] { null, null };
-        MemoryData m_memoryColor;
+        MemoryData[] m_memoryColor = new MemoryData[2] { null, null };
         MemoryData[] m_memoryRGB = new MemoryData[3] { null, null, null };
         MemoryData[] m_memoryConv = new MemoryData[3] { null, null, null };
         MemoryData[] m_memoryHSI = new MemoryData[3] { null, null, null };
@@ -42,7 +42,8 @@ namespace Root_Pine2_Vision.Module
             m_memoryGroup = m_memoryPool.GetGroup("Pine2");
             m_aMemory.Add(m_memoryExt[0] = m_memoryGroup.CreateMemory("EXT1", 1, 3, new CPoint(50000, 90000)));
             m_aMemory.Add(m_memoryExt[1] = m_memoryGroup.CreateMemory("EXT2", 1, 3, new CPoint(50000, 90000)));
-            m_aMemory.Add(m_memoryColor = m_memoryGroup.CreateMemory("Color", 1, 3, new CPoint(50000, 90000)));
+            m_aMemory.Add(m_memoryColor[0] = m_memoryGroup.CreateMemory("Color1", 1, 3, new CPoint(50000, 90000)));
+            m_aMemory.Add(m_memoryColor[1] = m_memoryGroup.CreateMemory("Color2", 1, 3, new CPoint(50000, 90000)));
             m_aMemory.Add(m_memoryRGB[0] = m_memoryGroup.CreateMemory("Red", 1, 1, new CPoint(50000, 90000)));
             m_aMemory.Add(m_memoryRGB[1] = m_memoryGroup.CreateMemory("Green", 1, 1, new CPoint(50000, 90000)));
             m_aMemory.Add(m_memoryRGB[2] = m_memoryGroup.CreateMemory("Blue", 1, 1, new CPoint(50000, 90000)));
@@ -52,7 +53,7 @@ namespace Root_Pine2_Vision.Module
             m_aMemory.Add(m_memoryHSI[0] = m_memoryGroup.CreateMemory("Hue", 1, 1, new CPoint(50000, 90000)));
             m_aMemory.Add(m_memoryHSI[1] = m_memoryGroup.CreateMemory("Saturation", 1, 1, new CPoint(50000, 90000)));
             m_aMemory.Add(m_memoryHSI[2] = m_memoryGroup.CreateMemory("Intensity", 1, 1, new CPoint(50000, 90000)));
-            m_aMemory.Add(m_memoryGerbber = m_memoryGroup.CreateMemory("Gerbber", 1, 3, new CPoint(50000, 90000)));
+            m_aMemory.Add(m_memoryGerbber = m_memoryGroup.CreateMemory("Gerbber", 1, 1, new CPoint(50000, 90000)));
 
             string regGroup = "MMF Data " + p_id;   // MMF Data A, MMF Data B
             Registry reg = new Registry(false, regGroup, "MemoryOffset");
@@ -221,7 +222,12 @@ namespace Root_Pine2_Vision.Module
                     {
                         if (IsMemoryPool() && (IsProcessRun() == false))
                         {
-                            Process process = Process.Start(m_sFileVisionWorks, p_id + "." + m_tcpip.p_nPort.ToString());
+                            ProcessStartInfo startInfo = new ProcessStartInfo(m_sFileVisionWorks);
+                            startInfo.Arguments = p_id + "." + m_tcpip.p_nPort.ToString();
+                            startInfo.WorkingDirectory = "C://WisVision//";
+                            Process process = Process.Start(startInfo);
+
+                            //Process process = Process.Start(m_sFileVisionWorks, p_id + "." + m_tcpip.p_nPort.ToString());
                             m_nProcessID = process.Id;
                             Thread.Sleep(2000); 
                         }
