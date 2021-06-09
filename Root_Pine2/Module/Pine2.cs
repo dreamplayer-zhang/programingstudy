@@ -6,6 +6,7 @@ using RootTools.ToolBoxs;
 using RootTools.Trees;
 using System;
 using System.Collections.Generic;
+using System.Text;
 using System.Threading;
 using System.Windows.Threading;
 
@@ -181,10 +182,11 @@ namespace Root_Pine2.Module
                 public Data(int nCumm, int nUnit, string sMsg)
                 {
                     m_nComm = nCumm; 
-                    m_nUnit = nUnit; 
+                    m_nUnit = nUnit;
                     while (sMsg.Length < 4) sMsg += " ";
-                    m_aSend.Add(256 * (byte)sMsg[0] + (byte)sMsg[1]); //forget
-                    m_aSend.Add(256 * (byte)sMsg[2] + (byte)sMsg[3]);
+                    byte[] aMsg = Encoding.ASCII.GetBytes(sMsg); 
+                    m_aSend.Add(256 * aMsg[0] + aMsg[1]); 
+                    m_aSend.Add(256 * aMsg[2] + aMsg[3]);
                 }
             }
             Queue<Data> m_qSend = new Queue<Data>(); 
