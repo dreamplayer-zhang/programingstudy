@@ -458,6 +458,7 @@ namespace Root_EFEM
             bool bLoadport = sequence.p_moduleRun.m_moduleBase is ILoadport;
             if (bLoadport)
             {
+                
                 sequence.p_moduleRun.StartRun();
                 Thread.Sleep(100);
                 foreach(ILoadport loadport in m_aLoadport)
@@ -471,11 +472,25 @@ namespace Root_EFEM
             }
             else if ((sequence.p_moduleRun.m_moduleBase == wtr) || bLoadport) 
             {
+                string curChild = ((IWTRRun)sequence.p_moduleRun).p_sChild;
+                Sequence[] sequences = p_qSequence.ToArray();
+                if (sequences.Length > 2)
+                {
+                    if(sequences[1].p_moduleRun.m_moduleBase == wtr)
+                    {
+                        if(!curChild.Contains("Loadport") && curChild == ((IWTRRun)sequences[1].p_moduleRun).p_sChild)
+                        {
+                            ((IWTRRun)sequence.p_moduleRun).p_isExchange = true;
+                            ((IWTRRun)sequence.p_moduleRun).p_nExchangeSlot = sequences[1].m_infoWafer.m_nSlot;
+                            ((IWTRRun)sequences[1].p_moduleRun).p_isExchange = true;
+                            ((IWTRRun)sequences[1].p_moduleRun).p_nExchangeSlot = sequence.m_infoWafer.m_nSlot;
+                        }
+                    }
+                }
                 sequence.p_moduleRun.StartRun();
                 Thread.Sleep(100);
                 while (wtr.IsBusy() && (EQ.IsStop() == false)) Thread.Sleep(10);
             }
-
             else sequence.p_moduleRun.StartRun();
             p_qSequence.Dequeue();
             InfoWafer infoWafer = sequence.m_infoWafer;

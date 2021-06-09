@@ -33,6 +33,15 @@ namespace RootTools
         {
             m_sSLoggerNet = new SSLoggerNet();
         }
+        public void ChangeMaterial(int port, int slot, string lot, string foup, string recipe)
+        {
+            m_sSLoggerNet.ChangeMaterial(port, slot, lot, foup, recipe);
+        }
+
+        public void ChangeMaterialSlot(int port, int slot)
+        {
+            m_sSLoggerNet.ChangeMaterialSlot(port, slot);
+        }
 
         public void WritePRC(int port, string device, PRC_EVENTID eventID, STATUS status, string stepName, int stepNum, DataFormatter dataFormatter = null, string materialID = null)
         {
