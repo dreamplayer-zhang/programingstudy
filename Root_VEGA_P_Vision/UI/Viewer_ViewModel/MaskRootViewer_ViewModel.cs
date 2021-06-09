@@ -21,6 +21,12 @@ using RootTools_Vision.WorkManager3;
 
 namespace Root_VEGA_P_Vision
 {
+    public enum ViewerMode
+    {
+        Mask,CaptureROI,None
+    }
+    public delegate void CapturedAreaDoneEvent(object e,string parts);
+
     public class MaskRootViewer_ViewModel : BaseViewer_ViewModel
     {
         #region [ColorDefines]
@@ -32,6 +38,7 @@ namespace Root_VEGA_P_Vision
             public static SolidColorBrush ChipPositionMove = Brushes.Yellow;
             public static SolidColorBrush PostionFail = Brushes.Red;
             public static SolidColorBrush Defect = Brushes.Red;
+            public static SolidColorBrush CapturedArea = new SolidColorBrush(Color.FromRgb(255,45,85));
         }
 
         private class MapViewerColorDefines
@@ -67,10 +74,10 @@ namespace Root_VEGA_P_Vision
         }
         #endregion
 
-
         ToolProcess m_eToolProcess;
         public ToolType m_eToolType;
         ThresholdMode m_eThresholdMode;
+        public ViewerMode m_eCurMode = ViewerMode.None;
         System.Windows.Media.Color m_Color = Colors.Navy;
         Color m_EraseColor = Color.FromArgb(0,0,0,0);
 
@@ -94,9 +101,10 @@ namespace Root_VEGA_P_Vision
             m_cInspROI = new ItemMask();
             m_History = new Stack<Work>();
 
+            InitializeUIElements();
             Init_PenCursor();
             InitInspMgr();
-        }
+        } 
 
         #region Override
 
@@ -109,210 +117,206 @@ namespace Root_VEGA_P_Vision
 
             CPoint memPt = new CPoint(p_MouseMemX, p_MouseMemY);
 
-
-            if (m_eToolType != ToolType.None)
+            switch(m_eCurMode)
             {
-                m_CurrentWork = new Work(m_eToolType);
-            }
-
-            bool IsDraw = recipeSetting.IsDraw;
-
-            switch (m_eToolProcess)
-            {
-
-                case ToolProcess.None:
-
-                    switch (m_eToolType)
+                case ViewerMode.CaptureROI:
+                    ProcessCaptureROI(e);
+                    break;
+                case ViewerMode.Mask:
+                    if (m_eToolType != ToolType.None)
                     {
-                        case ToolType.None:
-                            break;
-                        case ToolType.Pen:
-                            m_CurrentWork.Points.Add(memPt);
-                            //if (m_timer.IsBusy == false) 
-                            //    m_timer.RunWorkerAsync();
-                            if(IsDraw)
-                                Pen(memPt, _nThickness);
-                            else
-                                Eraser(memPt, _nThickness);
+                        m_CurrentWork = new Work(m_eToolType);
+                    }
 
-                            m_eToolProcess = ToolProcess.Drawing;
-                            break;
-                        case ToolType.Eraser:
-                            m_CurrentWork.Points.Add(memPt);
-                            Eraser(memPt, _nThickness);
-                            m_eToolProcess = ToolProcess.Drawing;
-                            break;
-                        case ToolType.Rect:
-                            if (IsDraw)
-                                Start_Rect(memPt);
-                            else
-                                Erase_Rect(memPt);
+                    bool IsDraw = recipeSetting.IsDraw;
+                    switch (m_eToolProcess)
+                    {
 
-                            m_eToolProcess = ToolProcess.Drawing;
+                        case ToolProcess.None:
+
+                            switch (m_eToolType)
+                            {
+                                case ToolType.None:
+                                    break;
+                                case ToolType.Pen:
+                                    m_CurrentWork.Points.Add(memPt);
+                                    //if (m_timer.IsBusy == false) 
+                                    //    m_timer.RunWorkerAsync();
+                                    if (IsDraw)
+                                        Pen(memPt, _nThickness);
+                                    else
+                                        Eraser(memPt, _nThickness);
+
+                                    m_eToolProcess = ToolProcess.Drawing;
+                                    break;
+                                case ToolType.Eraser:
+                                    m_CurrentWork.Points.Add(memPt);
+                                    Eraser(memPt, _nThickness);
+                                    m_eToolProcess = ToolProcess.Drawing;
+                                    break;
+                                case ToolType.Rect:
+                                    if (IsDraw)
+                                        Start_Rect(memPt);
+                                    else
+                                        Erase_Rect(memPt);
+
+                                    m_eToolProcess = ToolProcess.Drawing;
+                                    break;
+                                case ToolType.Circle:
+                                    break;
+                                case ToolType.Crop:
+                                    break;
+                                case ToolType.Threshold:
+                                    Start_Rect(memPt);
+                                    m_eToolProcess = ToolProcess.Drawing;
+                                    break;
+                            }
                             break;
-                        case ToolType.Circle:
+                        case ToolProcess.Drawing:
+                            switch (m_eToolType)
+                            {
+                                case ToolType.None:
+                                    break;
+                                case ToolType.Pen:
+                                    m_CurrentWork.Points.Add(memPt);
+                                    Pen(memPt, _nThickness);
+                                    break;
+                                case ToolType.Eraser:
+                                    m_CurrentWork.Points.Add(memPt);
+                                    Eraser(memPt, _nThickness);
+                                    break;
+                                case ToolType.Rect:
+                                    break;
+                                case ToolType.Circle:
+                                    break;
+                                case ToolType.Crop:
+                                    break;
+                                case ToolType.Threshold:
+                                    break;
+                            }
                             break;
-                        case ToolType.Crop:
+                        case ToolProcess.Modifying:
                             break;
-                        case ToolType.Threshold:
-                            Start_Rect(memPt);
-                            m_eToolProcess = ToolProcess.Drawing;
+                        default:
                             break;
                     }
-                    break;
-                case ToolProcess.Drawing:
-                    switch (m_eToolType)
-                    {
-                        case ToolType.None:
-                            break;
-                        case ToolType.Pen:
-                            m_CurrentWork.Points.Add(memPt);
-                            Pen(memPt, _nThickness);
-                            break;
-                        case ToolType.Eraser:
-                            m_CurrentWork.Points.Add(memPt);
-                            Eraser(memPt, _nThickness);
-                            break;
-                        case ToolType.Rect:
-                            break;
-                        case ToolType.Circle:
-                            break;
-                        case ToolType.Crop:
-                            break;
-                        case ToolType.Threshold:
-                            break;
-                    }
-                    break;
-                case ToolProcess.Modifying:
-                    break;
-                default:
                     break;
             }
         }
         public override void MouseMove(object sender, MouseEventArgs e)
         {
             base.MouseMove(sender, e);
-            if (m_KeyEvent != null)
-                if (m_KeyEvent.Key == Key.LeftShift && m_KeyEvent.IsDown)
-                {
-                    PenCursor.Visibility = Visibility.Collapsed;
-                    return;
-                }
 
-            CPoint memPt = new CPoint(p_MouseMemX, p_MouseMemY);
-
-            m_eToolType = recipeSetting.m_eToolType;
-            p_nThickness = recipeSetting.p_nThickness;
-            PenCursor.Visibility = Visibility.Collapsed;
-
-            bool IsDraw = recipeSetting.IsDraw;
-
-            switch (m_eToolProcess)
+            switch (m_eCurMode)
             {
-                case ToolProcess.None:
-                    if (m_eToolType == ToolType.Pen || m_eToolType == ToolType.Eraser)
+                case ViewerMode.CaptureROI:
+                    CPoint CanvasPt = new CPoint(p_MouseX, p_MouseY);
+                    CPoint MemPt = GetMemPoint(CanvasPt);
+                    switch (boxState)
                     {
-                        PenCursor.Visibility = Visibility.Visible;
-                        Draw_PenCursor();
+                        case BoxProcess.None:
+                            break;
+                        case BoxProcess.Drawing:
+                            BOX = Drawing(BOX, MemPt);
+                            break;
+                        case BoxProcess.Modifying:
+                            break;
                     }
-                    break;
-                case ToolProcess.Drawing:
-                    switch (m_eToolType)
-                    {
-                        case ToolType.None:
-                            break;
-                        case ToolType.Pen:
-                            PenCursor.Visibility = Visibility.Visible;
-                            Draw_PenCursor();
-                            if (e.LeftButton == MouseButtonState.Pressed)
-                            {
-                                m_CurrentWork.Points.Add(memPt);
-                                if (IsDraw)
-                                    Pen(memPt, _nThickness);
-                                else
-                                    Eraser(memPt, _nThickness);
-                            }
-                            break;
-                        case ToolType.Eraser:
-                            PenCursor.Visibility = Visibility.Visible;
 
-                            Draw_PenCursor();
-                            if (e.LeftButton == MouseButtonState.Pressed)
+                    break;
+                case ViewerMode.Mask:
+                    if (m_KeyEvent != null)
+                        if (m_KeyEvent.Key == Key.LeftShift && m_KeyEvent.IsDown)
+                        {
+                            PenCursor.Visibility = Visibility.Collapsed;
+                            return;
+                        }
+
+                    CPoint memPt = new CPoint(p_MouseMemX, p_MouseMemY);
+
+                    m_eToolType = recipeSetting.m_eToolType;
+                    p_nThickness = recipeSetting.p_nThickness;
+                    PenCursor.Visibility = Visibility.Collapsed;
+
+                    bool IsDraw = recipeSetting.IsDraw;
+
+                    switch (m_eToolProcess)
+                    {
+                        case ToolProcess.None:
+                            if (m_eToolType == ToolType.Pen || m_eToolType == ToolType.Eraser)
                             {
-                                m_CurrentWork.Points.Add(memPt);
-                                Eraser(memPt, _nThickness);
+                                PenCursor.Visibility = Visibility.Visible;
+                                Draw_PenCursor();
                             }
                             break;
-                        case ToolType.Rect:
-                            if (e.LeftButton == MouseButtonState.Pressed)
+                        case ToolProcess.Drawing:
+                            switch (m_eToolType)
                             {
-                                Drawing_Rect(memPt);
+                                case ToolType.None:
+                                    break;
+                                case ToolType.Pen:
+                                    PenCursor.Visibility = Visibility.Visible;
+                                    Draw_PenCursor();
+                                    if (e.LeftButton == MouseButtonState.Pressed)
+                                    {
+                                        m_CurrentWork.Points.Add(memPt);
+                                        if (IsDraw)
+                                            Pen(memPt, _nThickness);
+                                        else
+                                            Eraser(memPt, _nThickness);
+                                    }
+                                    break;
+                                case ToolType.Eraser:
+                                    PenCursor.Visibility = Visibility.Visible;
+
+                                    Draw_PenCursor();
+                                    if (e.LeftButton == MouseButtonState.Pressed)
+                                    {
+                                        m_CurrentWork.Points.Add(memPt);
+                                        Eraser(memPt, _nThickness);
+                                    }
+                                    break;
+                                case ToolType.Rect:
+                                    if (e.LeftButton == MouseButtonState.Pressed)
+                                    {
+                                        Drawing_Rect(memPt);
+                                    }
+                                    break;
+                                case ToolType.Circle:
+                                    break;
+                                case ToolType.Crop:
+                                    break;
+                                case ToolType.Threshold:
+                                    if (e.LeftButton == MouseButtonState.Pressed)
+                                    {
+                                        Drawing_Rect(memPt);
+                                    }
+                                    break;
                             }
                             break;
-                        case ToolType.Circle:
+                        case ToolProcess.Modifying:
                             break;
-                        case ToolType.Crop:
-                            break;
-                        case ToolType.Threshold:
-                            if (e.LeftButton == MouseButtonState.Pressed)
-                            {
-                                Drawing_Rect(memPt);
-                            }
+                        default:
                             break;
                     }
-                    break;
-                case ToolProcess.Modifying:
-                    break;
-                default:
                     break;
             }
 
         }
         public override void PreviewMouseUp(object sender, MouseEventArgs e)
         {
-            switch (m_eToolProcess)
-
+            switch(m_eCurMode)
             {
-                case ToolProcess.None:
+                case ViewerMode.CaptureROI:
+                    CPoint CanvasPt = new CPoint(p_MouseX, p_MouseY);
+                    CPoint MemPt = GetMemPoint(CanvasPt);
+                    //ProcessCaptureROI(e);
                     break;
-                case ToolProcess.Drawing:
-                    switch (m_eToolType)
-                    {
-                        case ToolType.None:
-                            break;
-                        case ToolType.Pen:
-                            m_eToolProcess = ToolProcess.None;
-                            break;
-                        case ToolType.Eraser:
-                            m_eToolProcess = ToolProcess.None;
-                            break;
-                        case ToolType.Rect:
-                            if (recipeSetting.IsDraw)
-                                Done_Rect();
-                            else
-                                Done_EraseRect();
-                            m_eToolProcess = ToolProcess.None;
-                            break;
-                        case ToolType.Circle:
-                            break;
-                        case ToolType.Crop:
-                            break;
-                        case ToolType.Threshold:
-                            m_eThresholdMode = (ThresholdMode)recipeSetting.p_nselectedUpdown;
-                            p_nThreshold = recipeSetting.p_nThreshold;
-                            Done_Threshold();
-                            m_eToolProcess = ToolProcess.None;
-                            break;
-                        default:
-                            break;
-                    }
-                    m_History.Push(m_CurrentWork);
-                    break;
-                case ToolProcess.Modifying:
-                    break;
-                default:
+                case ViewerMode.Mask:
+                    ProcessMask();
                     break;
             }
+            
         }
         public override void MouseWheel(object sender, MouseWheelEventArgs e)
         {
@@ -899,6 +903,30 @@ namespace Root_VEGA_P_Vision
                 Canvas.SetRight(rect.CanvasRect, canvasRB.X);
                 Canvas.SetBottom(rect.CanvasRect, canvasRB.Y);
             }
+
+
+            if (BOX == null) return;
+            if (p_UIElement.Contains(BOX.UIElement))
+            {
+                TRect rect = BOX as TRect;
+                CPoint LT = new CPoint(rect.MemoryRect.Left, rect.MemoryRect.Top);
+                CPoint RB = new CPoint(rect.MemoryRect.Right, rect.MemoryRect.Bottom);
+
+                CPoint canvasLT = new CPoint(GetCanvasPoint(LT));
+                CPoint canvasRB = new CPoint(GetCanvasPoint(RB));
+                int width = Math.Abs(canvasRB.X - canvasLT.X);
+                int height = Math.Abs(canvasRB.Y - canvasLT.Y);
+                rect.CanvasRect.Width = width;
+                rect.CanvasRect.Height = height;
+                Canvas.SetLeft(rect.CanvasRect, canvasLT.X);
+                Canvas.SetTop(rect.CanvasRect, canvasLT.Y);
+                Canvas.SetRight(rect.CanvasRect, canvasRB.X);
+                Canvas.SetBottom(rect.CanvasRect, canvasRB.Y);
+
+                if (BOX.isSelected)
+                    BOX.ModifyTool.Visibility = Visibility.Visible;
+            }
+
         }
 
         private void Texts_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
@@ -1079,6 +1107,136 @@ namespace Root_VEGA_P_Vision
         }
         #endregion
 
+        #region Mask
+        void ProcessMask()
+        {
+            switch (m_eToolProcess)
+            {
+                case ToolProcess.None:
+                    break;
+                case ToolProcess.Drawing:
+                    switch (m_eToolType)
+                    {
+                        case ToolType.None:
+                            break;
+                        case ToolType.Pen:
+                            m_eToolProcess = ToolProcess.None;
+                            break;
+                        case ToolType.Eraser:
+                            m_eToolProcess = ToolProcess.None;
+                            break;
+                        case ToolType.Rect:
+                            if (recipeSetting.IsDraw)
+                                Done_Rect();
+                            else
+                                Done_EraseRect();
+                            m_eToolProcess = ToolProcess.None;
+                            break;
+                        case ToolType.Circle:
+                            break;
+                        case ToolType.Crop:
+                            break;
+                        case ToolType.Threshold:
+                            m_eThresholdMode = (ThresholdMode)recipeSetting.p_nselectedUpdown;
+                            p_nThreshold = recipeSetting.p_nThreshold;
+                            Done_Threshold();
+                            m_eToolProcess = ToolProcess.None;
+                            break;
+                        default:
+                            break;
+                    }
+                    m_History.Push(m_CurrentWork);
+                    break;
+                case ToolProcess.Modifying:
+                    break;
+                default:
+                    break;
+            }
+        }
+        #endregion
+
+        #region CaptureArea
+        public event CapturedAreaDoneEvent CapturedAreaDone;
+
+        private enum BoxProcess
+        {
+            None,
+            Drawing,
+            Modifying,
+        }
+        CPoint mousePointBuffer;
+        TShape BOX;
+
+        BoxProcess boxState = BoxProcess.None;
+        private TShape StartDraw(TShape shape, CPoint memPt)
+        {
+            shape = new TRect(ImageViewerColorDefines.CapturedArea, 2, 0.4);
+            TRect rect = shape as TRect;
+            rect.MemPointBuffer = memPt;
+            rect.MemoryRect.Left = memPt.X;
+            rect.MemoryRect.Top = memPt.Y;
+
+            return shape;
+        }
+        private TShape DrawDone(TShape shape)
+        {
+            TRect rect = shape as TRect;
+            rect.CanvasRect.Fill = rect.FillBrush;
+            rect.CanvasRect.Tag = rect;
+
+            //m_eCurMode = ViewerMode.None;
+            return shape;
+        }
+        void ProcessCaptureROI(MouseEventArgs e)
+        {
+            CPoint CanvasPt = new CPoint(p_MouseX, p_MouseY);
+            CPoint MemPt = GetMemPoint(CanvasPt);
+            switch (boxState)
+            {
+                case BoxProcess.None:
+                    if (p_Cursor != Cursors.Arrow)
+                    {
+                        mousePointBuffer = MemPt;
+                        boxState = BoxProcess.Modifying;
+                        break;
+                    }
+                    else
+                    {
+                        if (p_UIElement.Contains(BOX.UIElement))
+                        {
+                            p_UIElement.Remove(BOX.UIElement);
+                            p_UIElement.Remove(BOX.ModifyTool);
+                        }
+
+                        BOX = StartDraw(BOX, MemPt);
+                        p_UIElement.Add(BOX.UIElement);
+                        boxState = BoxProcess.Drawing;
+                    }
+                    break;
+                case BoxProcess.Drawing:
+                    BOX = DrawDone(BOX);
+                    if (CapturedAreaDone != null)
+                        CapturedAreaDone(BOX,TabName.Split('.')[0]);
+
+                    boxState = BoxProcess.None;
+                    break;
+                case BoxProcess.Modifying:
+                    break;
+            }
+        }
+
+        public void CaptureArea()
+        {
+            m_eCurMode = ViewerMode.CaptureROI;
+        }
+
+        private void InitializeUIElements()
+        {
+            BOX = new TShape();
+        }
+
+
+        #endregion
 
         #region ICommand
         public ICommand btnIllum1

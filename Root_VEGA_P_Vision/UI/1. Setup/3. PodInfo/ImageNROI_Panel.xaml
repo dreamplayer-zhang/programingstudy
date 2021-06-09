@@ -61,9 +61,9 @@
                     <RadioButton Content="ROI" Style="{StaticResource SelecteRadioBtn}"/>
                 </UniformGrid>
                 <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Center">
-                    <Button Content="Pen" Style="{StaticResource MaskButton}" Command="{Binding btnDot}"/>
-                    <Button Content="Rect" Style="{StaticResource MaskButton}" Command="{Binding btnRect}" Margin="4,5,4,8"/>
-                    <Button Content="Select" Style="{StaticResource MaskButton}" Command="{Binding btnSelect}"/>
+                    <Button Content="Pen" Style="{StaticResource MaskButton}" Command="{Binding SelectedViewer.btnDot}"/>
+                    <Button Content="Rect" Style="{StaticResource MaskButton}" Command="{Binding SelectedViewer.btnRect}" Margin="4,5,4,8"/>
+                    <Button Content="Select" Style="{StaticResource MaskButton}" Command="{Binding SelectedViewer.btnSelect}"/>
                 </StackPanel>
             </Grid>
             <Grid Grid.Row="3" Margin="10,0,10,0">

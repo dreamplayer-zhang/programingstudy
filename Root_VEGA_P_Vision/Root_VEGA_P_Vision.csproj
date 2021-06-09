@@ -293,6 +293,9 @@
       <DependentUpon>OriginInfo_UI.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\1. Setup\UserControl\OriginInfo_ViewModel.cs" />
+    <Compile Include="UI\1. Setup\UserControl\ROIListItem.xaml.cs">
+      <DependentUpon>ROIListItem.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI\1. Setup\UserControl\SurfaceParam_Tree.xaml.cs">
       <DependentUpon>SurfaceParam_Tree.xaml</DependentUpon>
     </Compile>
@@ -495,6 +498,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UI\1. Setup\UserControl\OriginInfo_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\1. Setup\UserControl\ROIListItem.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

@@ -214,6 +214,7 @@
         <SolidColorBrush x:Key="BorderSplitColor" Color="#FFCCCCCC"/>
         <SolidColorBrush x:Key="MainBackGroundColor" Color="#FFEDECEA"/>
         <SolidColorBrush x:Key="ButtonBackGroundColor" Color="#FF8FDAD6"/>
+        <SolidColorBrush x:Key="ButtonMouseoverBGColor" Color="#FF59c8c2"/>
 
         <!--#region [Color Definition] -->
         <SolidColorBrush x:Key="main_background" Color="#080820"/>
@@ -315,10 +316,15 @@
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
-                        <Border CornerRadius="5" Background="{StaticResource MainThema}" BorderBrush="#ccc" BorderThickness="0,1,1,0" >
+                        <Border x:Name="btnBorder" CornerRadius="5" Background="{StaticResource MainThema}" BorderBrush="#ccc" BorderThickness="0,1,1,0" >
                             <ContentPresenter x:Name="contentPresenter" ContentTemplate="{TemplateBinding ContentTemplate}" Content="{TemplateBinding Content}" 
                                               HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" Margin="{TemplateBinding Padding}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
                         </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="btnBorder" Property="Background" Value="{StaticResource DisableMainThem}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
@@ -327,8 +333,17 @@
             <Setter Property="Padding" Value="15,1,15,1"/>
             <Setter Property="Foreground" Value="{StaticResource MainThema}"/>
             <Setter Property="VerticalAlignment" Value="Center"/>
-            
-            
+        </Style>
+        <Style x:Key="ROIListItem" TargetType="TextBlock">
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+            <Setter Property="Padding" Value="10,0,10,0"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+        <Style x:Key="ROIListHeader" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="FontWeight" Value="ExtraBold"/>
         </Style>
         <Style x:Key="main_view_groupbox" TargetType="GroupBox">
             <Setter Property="BorderBrush" Value="Gray"/>
@@ -1072,7 +1087,7 @@
                 </Setter.Value>
             </Setter>
         </Style>
-        <Style TargetType="ComboBox" x:Key="ComboBoxStyle">
+        <Style TargetType="ComboBox" x:Key="ComboBoxStyle"> 
             <Setter Property="VerticalContentAlignment" Value="Center"/>
             <Setter Property="HorizontalContentAlignment" Value="Center"/>
             <Setter Property="Background" Value="{StaticResource MainThema}"/>
@@ -1085,12 +1100,20 @@
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="{x:Type Button}">
-                        <Border CornerRadius="10" BorderThickness="2" Width="{TemplateBinding Width}"
+                        <Border  x:Name="btnBorder" CornerRadius="10" BorderThickness="2" Width="{TemplateBinding Width}"
                                 Height="{TemplateBinding Height}" Background="{StaticResource ButtonBackGroundColor}">
                             
                         <ContentPresenter VerticalAlignment="Center"
                                                HorizontalAlignment="Center"/>
                         </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger  Property="IsMouseOver" Value="True">
+                                <Setter TargetName="btnBorder" Property="BorderBrush" Value="{StaticResource ButtonMouseoverBGColor}"/>
+                                <Setter TargetName="btnBorder" Property="Background" Value="{StaticResource ButtonMouseoverBGColor}"/>
+                                <Setter Property="Foreground" Value="White"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                        
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>

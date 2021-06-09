@@ -14,7 +14,7 @@
                 <RowDefinition Height="0.3*"/>
                 <RowDefinition Height="1*"/>
             </Grid.RowDefinitions>-->
-            <Button  Grid.Row="0" Background="{StaticResource MainBackGroundColor}" Command="{Binding BrightBtn}" 
+            <Button  Grid.Row="0" Background="{StaticResource MainBackGroundColor}" Command="{Binding BrightBtn}" Height="35" 
                  HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" BorderThickness="0">
                 <Grid>
                     <Grid.ColumnDefinitions>
@@ -27,7 +27,7 @@
 
             </Button>
             <local:SurfaceParam_Panel DataContext="{Binding BrightParam}" Visibility="{Binding RelativeSource={RelativeSource AncestorType={x:Type StackPanel}},Path=DataContext.BrightVisibility,Converter={StaticResource BooleanToVisiblity}}" Grid.Row="1"/>
-            <Button Grid.Row="2" Background="{StaticResource MainBackGroundColor}" Command="{Binding DarkBtn}"
+            <Button Grid.Row="2" Background="{StaticResource MainBackGroundColor}" Command="{Binding DarkBtn}"  Height="35" 
                 HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" BorderThickness="0">
                 <Grid>
                     <Grid.ColumnDefinitions>

@@ -21,18 +21,17 @@
                 <Grid.RowDefinitions>
                     <RowDefinition Height="2.5*" />
                     <RowDefinition Height="3*" />
-                    <RowDefinition Height="2*" />
-                    <RowDefinition Height="2.5*" />
-                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="4*" />
+                    <RowDefinition Height="0.2*" />
                 </Grid.RowDefinitions>
                 <local:MaskTools_Panel Grid.Row="0" DataContext="{Binding MaskTools}"/>
                 <local:SurfaceParam_Tree DataContext="{Binding SurfaceParamTree}" Grid.Row="1"/>
                 <Grid Visibility="{Binding IsHighRes,Converter={StaticResource BooleanToVisiblity}}" Grid.Row="2" Margin="10,10,10,0">
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="0.3*"/>
-                        <RowDefinition Height="0.1*"/>
-                        <RowDefinition Height="0.6*"/>
-                        <RowDefinition Height="0.6*"/>
+                        <RowDefinition Height="0.4*"/>
+                        <RowDefinition Height="1"/>
+                        <RowDefinition Height="1*"/>
+                        <RowDefinition Height="5*"/>
                     </Grid.RowDefinitions>
                     <TextBlock Grid.Row="0" Text="ROI" Style="{StaticResource HeaderTextBlock}"/>
                     <Line Height="1" Grid.Row="1"
@@ -42,20 +41,44 @@
                       VerticalAlignment="Top"
                       X2="1"/>
                     <UniformGrid Grid.Row="2" Rows="1" HorizontalAlignment="Stretch">
-                        <RadioButton Content="Capture Area" IsChecked="True" Style="{StaticResource SelecteRadioBtn}"/>
-                        <RadioButton Content="ROI" Style="{StaticResource SelecteRadioBtn}"/>
+                        <RadioButton x:Name="btnDraw" Content="Draw" Style="{StaticResource SelecteRadioBtn}" Command="{Binding p_BaseViewer.p_SubViewer.DataContext.btnDraw}"/>
+                        <RadioButton x:Name="btnAdd" Content="Add"  Style="{StaticResource SelecteRadioBtn}" Command="{Binding p_BaseViewer.p_SubViewer.DataContext.btnAdd}"/>
+                        <RadioButton x:Name="btnDelete" Content="Delete" Style="{StaticResource SelecteRadioBtn}" Command="{Binding p_BaseViewer.p_SubViewer.DataContext.btnDelete}"/>
                     </UniformGrid>
-                    <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Center">
-                        <Button Content="Pen" Style="{StaticResource MaskButton}" Command="{Binding btnDot}"/>
-                        <Button Content="Rect" Style="{StaticResource MaskButton}" Command="{Binding btnRect}"/>
-                        <Button Content="Select" Style="{StaticResource MaskButton}" Command="{Binding btnSelect}"/>
-                    </StackPanel>
+                    <Grid Grid.Row="3">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="0.2*"/>
+                            <RowDefinition Height="2*"/>
+                        </Grid.RowDefinitions>
+                        <Grid Background="{StaticResource MainThema}">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Style="{StaticResource ROIListHeader}" Text="Parts"/>
+                            <TextBlock Grid.Column="1" Style="{StaticResource ROIListHeader}" Text="X"/>
+                            <TextBlock Grid.Column="2" Style="{StaticResource ROIListHeader}" Text="Y"/>
+                        </Grid>
+                        <ListBox Grid.Row="1" Background="Transparent" ItemsSource="{Binding p_BaseViewer.p_SubViewer.DataContext.ROIList}" SelectedIndex="{Binding p_BaseViewer.p_SubViewer.DataContext.ROIListIdx}">
+                            <ListBox.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <StackPanel Orientation="Vertical" />
+                                </ItemsPanelTemplate>
+                            </ListBox.ItemsPanel>
+                        </ListBox>
+                    </Grid>
+                    <!--<StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Center">
+                        <Button Content="Pen" Style="{StaticResource MaskButton}" Command="{Binding p_BaseViewer.p_SubViewer.btnDot}"/>
+                        <Button Content="Rect" Style="{StaticResource MaskButton}" Command="{Binding p_BaseViewer.p_SubViewer.btnRect}"/>
+                        <Button Content="Select" Style="{StaticResource MaskButton}" Command="{Binding p_BaseViewer.p_SubViewer.btnSelect}"/>
+                    </StackPanel>-->
                 </Grid>
 
-                
-                <Grid Visibility="{Binding IsSide, Converter={StaticResource BooleanToVisiblity}}" Grid.Row="2" Margin="10,0,10,0">
+                <!--"{Binding IsSide, Converter={StaticResource BooleanToVisiblity}}"-->
+                <!--<Grid Visibility="{Binding IsSide, Converter={StaticResource BooleanToVisiblity}}" Grid.Row="2" Margin="10,0,10,0">
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="0.2*"/>
+                        <RowDefinition Height="0.1*"/>
                         <RowDefinition Height="0.1*"/>
                         <RowDefinition Height="0.5*"/>
                         <RowDefinition Height="0.5*"/>
@@ -101,7 +124,7 @@
                             <ColumnDefinition/>
                             <ColumnDefinition/>
                         </Grid.ColumnDefinitions>
-                    <TextBlock Grid.Column="0" Text="Vertical" Style="{StaticResource HeaderTextBlock}" HorizontalAlignment="Center"/>
+                        <TextBlock Grid.Column="0" Text="Vertical" Style="{StaticResource HeaderTextBlock}" HorizontalAlignment="Center"/>
                         <Grid Margin="10,0,10,0" Grid.Column="1">
                             <Grid.RowDefinitions>
                                 <RowDefinition/>
@@ -123,14 +146,7 @@
                             </Border>
                         </Grid>
                     </Grid>
-                </Grid>
-                <Grid Grid.Row="3">
-                    <Button Content="Clear"
-                                            Command="{Binding p_MaskPanel.DataContext.Clear}"
-                                            VerticalAlignment="Bottom"
-                                            Height="35"
-                                            Margin="5" />
-                </Grid>
+                </Grid>-->
             </Grid>
         </Grid>
     </Grid>
