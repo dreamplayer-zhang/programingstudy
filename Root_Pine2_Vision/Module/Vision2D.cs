@@ -393,19 +393,19 @@ namespace Root_Pine2_Vision.Module
             GrabData grabData = recipe.GetGrabData(eWorks);
             try
             {
-                m_camera.GrabLineScan(memory, cpOffset, m_nLine, grabData);
+                //m_camera.GrabLineScan(memory, cpOffset, m_nLine, grabData);
                 Thread.Sleep(200);
-                while (m_camera.p_CamInfo.p_eState != eCamState.Ready)
-                {
-                    Thread.Sleep(10);
-                    if (EQ.IsStop()) return "EQ Stop";
-                }
-                m_aWorks[eWorks].SendSnapDone(sRecipe, iSnap); 
+                //while (m_camera.p_CamInfo.p_eState != eCamState.Ready)
+                //{
+                    //Thread.Sleep(10);
+                    //if (EQ.IsStop()) return "EQ Stop";
+                //}
+                //m_aWorks[eWorks].SendSnapDone(sRecipe, iSnap); 
             }
             finally 
             {
-                m_camera.StopGrab(); 
-                RunLightOff(); 
+                //m_camera.StopGrab(); 
+                //RunLightOff(); 
             }
             return "OK";
         }
