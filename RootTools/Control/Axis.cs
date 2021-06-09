@@ -238,14 +238,37 @@ namespace RootTools.Control
             return "OK";
         }
 
-        public void ThreadCheck_SWLimit()
+        bool bLimitPlusCheck = false;
+        bool bLimitMinusCheck = false;
+        public void ThreadCheck_SWLimit(bool isPlus)
         {
+            bool isError = false;
             double fPos = p_posActual;
             bool bSWLimit0 = m_bSWLimit[0] && (fPos < m_aPos[p_asPos[0]]);
-            if (bSWLimit0) p_log.Info(p_id + ": Servo SW limit(-) !!");
+            if (bSWLimit0 && !isPlus && !bLimitMinusCheck)
+            {
+                isError = true;
+                p_log.Info(p_id + ": Servo SW limit(-) !!");
+                bLimitMinusCheck = true;
+            }
             bool bSWLimit1 = m_bSWLimit[1] && (fPos > m_aPos[p_asPos[1]]);
-            if (bSWLimit1) p_log.Info(p_id + ": Servo SW limit(+) !!");
-            if (bSWLimit0 || bSWLimit1) StopAxis();
+            if (bSWLimit1 && isPlus && !bLimitPlusCheck)
+            {
+                isError = true;
+                p_log.Info(p_id + ": Servo SW limit(+) !!");
+                bLimitPlusCheck = true;
+            }
+
+            if (fPos > m_aPos[p_asPos[0]])
+                bLimitMinusCheck = false;
+
+            if (fPos < m_aPos[p_asPos[1]])
+                bLimitPlusCheck = false;
+
+            if (isError)
+            {
+                StopAxis();
+            }
         }
 
         void RunTreePosLimit(Tree tree)

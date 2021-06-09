@@ -161,7 +161,8 @@ namespace RootTools.Module
 
                         if (m_qModuleRun.Count != m_moduleRunList.p_aModuleRun.Count && m_qModuleRun.Count % m_moduleRunList.p_aModuleRun.Count == 0)
                         {
-                            p_nTotalRnR++;
+                            if(p_nRnR > p_nTotalRnR)
+                                p_nTotalRnR++;
                         }
 
 

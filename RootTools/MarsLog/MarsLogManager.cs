@@ -49,7 +49,7 @@ namespace RootTools
                 m_sSLoggerNet.WritePRCLog(port, device, eventID, status, stepName, stepNum, dataFormatter);
             else if (isDataExist && !isExist)
                 m_sSLoggerNet.WritePRCLog(port, device, eventID, status, stepName, stepNum, dataFormatter, materialID);
-            else if (isDataExist && isExist)
+            else if (!isDataExist && isExist)
                 m_sSLoggerNet.WritePRCLog(port, device, eventID, status, stepName, stepNum, materialID);
             else
                 m_sSLoggerNet.WritePRCLog(port, device, eventID, status, stepName, stepNum);
