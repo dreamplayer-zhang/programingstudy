@@ -1553,7 +1553,6 @@ namespace RootTools
             circle.MemoryRect.Top = circle.MemoryRect.Top - offset.Y - 1;
             circle.MemoryRect.Bottom = circle.MemoryRect.Bottom - offset.Y - 1;
 
-            int k = 0;
             int temp = 0;
             int[] ptX = new int[2];
 
