@@ -14,10 +14,6 @@ namespace RootTools_Vision
 	{
 		public override WORK_TYPE Type => WORK_TYPE.INSPECTION;
 
-		private EBRParameter parameterEBR;
-		private EBRRecipe recipeEBR;
-		private GrabModeEdge grabModeEdge;
-
 		public EBR() : base()
 		{
 			m_sName = this.GetType().Name;
@@ -25,9 +21,6 @@ namespace RootTools_Vision
 
 		protected override bool Preparation()
 		{
-			this.parameterEBR = this.parameter as EBRParameter;
-			this.recipeEBR = this.recipe.GetItem<EBRRecipe>();
-			this.grabModeEdge = this.grabMode as GrabModeEdge;
 			return true;
 		}
 
@@ -43,27 +36,46 @@ namespace RootTools_Vision
 			if (this.currentWorkplace.Index == 0)
 				return;
 
+			OriginRecipe originRecipe = recipe.GetItem<OriginRecipe>();
+			EBRRecipe recipeEBR = recipe.GetItem<EBRRecipe>();
+			EBRParameter param = recipe.GetItem<EBRParameter>();
+
 			int firstNotch = recipeEBR.FirstNotch;
 			int lastNotch = recipeEBR.LastNotch;
-
 			int bufferHeight = lastNotch - firstNotch;
 			int bufferHeightPerDegree = bufferHeight / 360;
 
-			double stepDegree = parameterEBR.StepDegree;
-			int cnt = (int)(360 / stepDegree);
+			// new
+			int width = originRecipe.OriginWidth;
+			int height = param.ROIHeight;
 
-			int height = parameterEBR.ROIHeight;
-			int width = parameterEBR.ROIWidth;
+			int stepDegree = (int)((360 - param.NotchOffsetDegree) / param.MeasureCount);
+			int stepDegreeHeight = stepDegree * bufferHeightPerDegree;
+			int notchOffsetHeight = (int)(param.NotchOffsetDegree * bufferHeightPerDegree);
 
-			//Parallel.For(0, cnt, i =>
-			for (int i = 0; i < cnt; i++)
+			for (int i = 0; i < param.MeasureCount; i++)
 			{
-				int posY = firstNotch + (int)((bufferHeightPerDegree * stepDegree * (i + 1)) - (height / 2));
+				int posY = firstNotch + notchOffsetHeight + (stepDegreeHeight * (i + 1)) - (height / 2);
 				int[] arrDiff;
 				arrDiff = GetDiffArr(this.currentWorkplace.SharedBufferInfo.PtrR_GRAY, 0, posY, width, height);
 				FindEdge(arrDiff, 0, posY, width, height);
 			}
-			//);
+
+			// old
+			//double stepDegree = 10;// parameterEBR.StepDegree;
+			//int cnt = (int)(360 / stepDegree);
+
+			//int width = 5300;//parameterEBR.ROIWidth;
+			//int height = parameterEBR.ROIHeight;
+
+			//for (int i = 0; i < cnt; i++)
+			//{
+			//	int posY = firstNotch + (int)((bufferHeightPerDegree * stepDegree * (i + 1)) - (height / 2));
+			//	int[] arrDiff;
+			//	arrDiff = GetDiffArr(this.currentWorkplace.SharedBufferInfo.PtrR_GRAY, 0, posY, width, height);
+			//	FindEdge(arrDiff, 0, posY, width, height);
+			//}
+
 			WorkEventManager.OnInspectionDone(this.currentWorkplace, new InspectionDoneEventArgs(new List<CRect>())); // 나중에 ProcessDefect쪽 EVENT로...
 		}
 
@@ -87,6 +99,8 @@ namespace RootTools_Vision
 
 		private unsafe int[] GetDiffArr(IntPtr memory, int left, int top, int width, int height)
 		{
+			EBRParameter param = recipe.GetItem<EBRParameter>();
+
 			int[] arrAvg = new int[width];
 			int[] arrEqual = new int[arrAvg.Length];
 			int[] arrDiff = new int[arrEqual.Length];
@@ -94,7 +108,7 @@ namespace RootTools_Vision
 			int right = left + width;
 			int btm = top + height;
 
-			int xRange = this.parameterEBR.XRange;
+			int xRange = param.XRange;
 
 			// average
 			for (int x = left; x < right; x++)
@@ -128,10 +142,8 @@ namespace RootTools_Vision
 
 			// Raw data 저장
 			string sInspectionID = DatabaseManager.Instance.GetInspectionID();
-			string folderPath = @"D:\EBRRawData\";
+			string folderPath = @"D:\EBR RawData\";
 			Directory.CreateDirectory(folderPath);
-
-			//StreamWriter swResult = new StreamWriter(folderPath + "_" + this.currentWorkplace.Index.ToString() + "_Result.csv");
 			StreamWriter swResult = new StreamWriter(folderPath + sInspectionID.ToString() + "_" + top.ToString() + "_Result.csv");
 			for (int i = 0; i < arrDiff.Length; i++)
 				swResult.WriteLine(arrAvg[i] + "," + arrEqual[i] + "," + arrDiff[i]);
@@ -142,11 +154,13 @@ namespace RootTools_Vision
 
 		private void FindEdge(int[] arrDiff, int left, int top, int width, int height)
 		{
-			int xRange = this.parameterEBR.XRange;
-			int diffEdge = this.parameterEBR.DiffEdge;
-			int diffBevel = this.parameterEBR.DiffBevel;
-			int diffEBR = this.parameterEBR.DiffEBR;
-			double resolution = 1;//this.grabModeEdge.m_dTargetResX_um;
+			EBRParameter param = recipe.GetItem<EBRParameter>();
+
+			int xRange = param.XRange;
+			int diffEdge = param.DiffEdge;
+			int diffBevel = param.DiffBevel;
+			int diffEBR = param.DiffEBR;
+			double resolution = this.currentWorkplace.CameraInfo.TargetResX;
 
 			int[] arrDiffReverse = new int[arrDiff.Length];
 			for (int i = 0; i < arrDiff.Length; i++)
@@ -154,8 +168,8 @@ namespace RootTools_Vision
 
 			float waferEdgeX, bevelX, ebrX;
 			waferEdgeX = FindEdge(arrDiff, arrDiff.Length - (2 * xRange), diffEdge);
-			bevelX = FindEdge(arrDiffReverse, (int)Math.Round(waferEdgeX), diffBevel + this.parameterEBR.OffsetBevel);
-			ebrX = FindEdge(arrDiff, (int)Math.Round(bevelX), diffEBR + this.parameterEBR.OffsetEBR);
+			bevelX = FindEdge(arrDiffReverse, (int)Math.Round(waferEdgeX) - param.OffsetBevel, diffBevel);
+			ebrX = FindEdge(arrDiff, (int)Math.Round(bevelX) - param.OffsetEBR, diffEBR);
 
 			// Add measurement
 			string sInspectionID = DatabaseManager.Instance.GetInspectionID();
@@ -171,7 +185,8 @@ namespace RootTools_Vision
 								left,
 								top,
 								this.currentWorkplace.MapIndexX,
-								this.currentWorkplace.MapIndexY);
+								this.currentWorkplace.MapIndexY,
+								waferEdgeX);
 
 			this.currentWorkplace.AddMeasurement(sInspectionID,
 								"EDGE",
@@ -184,16 +199,19 @@ namespace RootTools_Vision
 								left,
 								top,
 								this.currentWorkplace.MapIndexX,
-								this.currentWorkplace.MapIndexY);
+								this.currentWorkplace.MapIndexY,
+								bevelX);
 		}
 
 		private void FindEdge(int[] arrDiff)
 		{
-			int xRange = this.parameterEBR.XRange;
-			int diffEdge = this.parameterEBR.DiffEdge;
-			int diffBevel = this.parameterEBR.DiffBevel;
-			int diffEBR = this.parameterEBR.DiffEBR;
-			double resolution = 1;//this.grabModeEdge.m_dTargetResX_um;
+			EBRParameter param = recipe.GetItem<EBRParameter>();
+
+			int xRange = param.XRange;
+			int diffEdge = param.DiffEdge;
+			int diffBevel = param.DiffBevel;
+			int diffEBR = param.DiffEBR;
+			double resolution = this.currentWorkplace.CameraInfo.TargetResX;
 
 			int[] arrDiffReverse = new int[arrDiff.Length];
 			for (int i = 0; i < arrDiff.Length; i++)
@@ -201,8 +219,8 @@ namespace RootTools_Vision
 
 			float waferEdgeX, bevelX, ebrX;
 			waferEdgeX = FindEdge(arrDiff, arrDiff.Length - (2 * xRange), diffEdge);
-			bevelX = FindEdge(arrDiffReverse, (int)Math.Round(waferEdgeX), diffBevel + this.parameterEBR.OffsetBevel);
-			ebrX = FindEdge(arrDiff, (int)Math.Round(bevelX), diffEBR + this.parameterEBR.OffsetEBR);
+			bevelX = FindEdge(arrDiffReverse, (int)Math.Round(waferEdgeX) - param.OffsetBevel, diffBevel);
+			ebrX = FindEdge(arrDiff, (int)Math.Round(bevelX) - param.OffsetEBR, diffEBR);
 
 			// Add measurement
 			string sInspectionID = DatabaseManager.Instance.GetInspectionID();
@@ -259,7 +277,7 @@ namespace RootTools_Vision
 				searchStartX--;
 			}
 
-			if (searchStartX == 0) 
+			if (searchStartX < 0) 
 				return 0;
 
 			return FindEqualizeEdge(diff, peakX);
@@ -267,7 +285,9 @@ namespace RootTools_Vision
 
 		private float FindEqualizeEdge(int[] diff, int peakX)
 		{
-			int xRange = this.parameterEBR.XRange;
+			EBRParameter param = recipe.GetItem<EBRParameter>();
+
+			int xRange = param.XRange;
 			double[] arrDiffSum = null;
 
 			if (peakX < xRange)
@@ -304,7 +324,9 @@ namespace RootTools_Vision
 
 		private double FindEdgeSum(int[] diff, int pointX)
 		{
-			int xRange = this.parameterEBR.XRange;
+			EBRParameter param = recipe.GetItem<EBRParameter>();
+
+			int xRange = param.XRange;
 			double sum = 0;
 
 			for (int x = pointX - xRange; x < pointX; x++)

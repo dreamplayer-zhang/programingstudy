@@ -285,6 +285,13 @@ namespace Root_WIND2.Module
                     CvInvoke.HConcat(ResultMat, Vmat, ResultMat);
             }
 
+            GeneralFunction.WriteINIFile("LADS", "Count", m_module.LadsInfos.Count.ToString(), @"C:\WIND2\Init\LADSInfo.ini");
+
+            for (int i = 0; i < m_module.LadsInfos.Count; i++)
+            {
+                GeneralFunction.WriteINIFile("LADS", "Info"+i.ToString("00"), m_module.LadsInfos[i].ToString(), @"C:\WIND2\Init\LADSInfo.ini");
+            }
+
             CvInvoke.ApplyColorMap(ResultMat, ResultMat, ColorMapType.Ocean);
             CvInvoke.Imwrite(@"D:\FocusMap.bmp", ResultMat);
         }

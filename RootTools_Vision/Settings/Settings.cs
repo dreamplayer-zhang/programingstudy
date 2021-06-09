@@ -20,6 +20,7 @@ namespace RootTools_Vision
 
         private void CreateSettingItems()
         {
+            SettingItems.Add(new SettingItem_Setup(new string[] { "Setup" }));
             SettingItems.Add(new SettingItem_SetupFrontside(new string[] { "Setup", "Frontside" }));
             SettingItems.Add(new SettingItem_SetupBackside(new string[] { "Setup", "Backside" }));
             SettingItems.Add(new SettingItem_SetupEdgeside(new string[] { "Setup", "Edgeside" }));

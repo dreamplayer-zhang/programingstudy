@@ -2,6 +2,7 @@
 using RootTools_Vision;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,7 +13,6 @@ namespace Root_WIND2.UI_User
 	public class EdgesideSetupModule_ViewModel : ObservableObject
 	{
 		#region [Getter / Setter]
-
 		private OriginRecipe originRecipe;
 		public OriginRecipe OriginRecipe
 		{
@@ -52,43 +52,6 @@ namespace Root_WIND2.UI_User
 				SetProperty(ref processDefectParameter, value);
 			}
 		}
-
-		#region Scan Infomation
-
-		//private int cameraWidth;
-		//public int CameraWidth
-		//{
-		//	get => cameraWidth;
-		//	set => SetProperty(ref cameraWidth, value);
-		//}
-
-		//private int cameraHeight;
-		//public int CameraHeight
-		//{
-		//	get => cameraHeight;
-		//	set => SetProperty(ref cameraHeight, value);
-		//}
-
-		//private int imageHeight;
-		//public int ImageHeight
-		//{
-		//	get => imageHeight;
-		//	set => SetProperty(ref imageHeight, value);
-		//}
-
-		//private double resolution;
-		//public double Resolution
-		//{
-		//	get => resolution;
-		//	set => SetProperty(ref resolution, value);
-		//}
-
-		//private int positionOffset;
-		//public int PositionOffset
-		//{
-		//	get => positionOffset;
-		//	set => SetProperty(ref positionOffset, value);
-		//}
 
 		#region [Grab Mode]
 		public List<string> GrabModeList
@@ -140,7 +103,6 @@ namespace Root_WIND2.UI_User
 		}
 
 		private DataListView_ViewModel camInfoDataListVM;
-
 		public DataListView_ViewModel CamInfoDataListVM
 		{
 			get => this.camInfoDataListVM;
@@ -151,10 +113,7 @@ namespace Root_WIND2.UI_User
 		}
 		#endregion
 
-		#endregion
-
-		#region Origin Information
-
+		#region [Origin Information]
 		private int originX;
 		public int OriginX
 		{
@@ -200,9 +159,7 @@ namespace Root_WIND2.UI_User
 				SetProperty(ref originHeight, value);
 			}
 		}
-
 		#endregion
-
 		#endregion
 
 		public EdgesideSetupModule_ViewModel()
@@ -224,10 +181,11 @@ namespace Root_WIND2.UI_User
 		/// </summary>
 		private void SetOriginInfo()
 		{
-			GrabModeEdge mode = ((WIND2_Handler)GlobalObjects.Instance.Get<WIND2_Engineer>().ClassHandler()).p_EdgeSideVision.m_aGrabMode[Recipe.GrabModeIndex];
-
-			if (mode == null)
+			ObservableCollection<GrabModeEdge> modeList = ((WIND2_Handler)GlobalObjects.Instance.Get<WIND2_Engineer>().ClassHandler()).p_EdgeSideVision.m_aGrabMode;
+			if (modeList.Count == 0)
 				return;
+
+			GrabModeEdge mode = modeList[Recipe.GrabModeIndex];
 
 			int imageHeight = mode.m_nImageHeight;  // 전체 이미지 Height
 			OriginRecipe.OriginX = 0;
@@ -245,7 +203,7 @@ namespace Root_WIND2.UI_User
 			int positionOffset = mode.m_nCameraPositionOffset;				// 카메라 위치 Offset
 
 			int startPosition = mode.m_nCameraHeight + (heightPerDegree * positionOffset);	// 검사 시작 위치
-			int endPosition = startPosition + (heightPerDegree * 360);						// 검사 종료 위치
+			int endPosition = startPosition + (heightPerDegree * 360);                      // 검사 종료 위치
 
 			Parameter.StartPosition = startPosition;
 			Parameter.EndPosition = endPosition;

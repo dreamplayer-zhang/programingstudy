@@ -182,6 +182,7 @@
     <Compile Include="Recipe\Recipe\EUVOriginRecipe.cs" />
     <Compile Include="Recipe\Recipe\EUVPodSurfaceRecipe.cs" />
     <Compile Include="Recipe\Recipe\EUVPositionRecipe.cs" />
+    <Compile Include="Recipe\Recipe\FrontAlignRecipe.cs" />
     <Compile Include="Recipe\Recipe\OriginRecipe.cs" />
     <Compile Include="Recipe\Recipe\VerticalWireRecipe.cs" />
     <Compile Include="Recipe\Recipe\PositionRecipe.cs" />
@@ -207,6 +208,7 @@
     <Compile Include="Settings\SettingDialog_ViewModel.cs" />
     <Compile Include="Settings\SettingItem.cs" />
     <Compile Include="Settings\SettingItem_Database.cs" />
+    <Compile Include="Settings\SettingItem_Setup.cs" />
     <Compile Include="Settings\SettingItem_SetupBackside.cs" />
     <Compile Include="Settings\SettingItem_SetupCamera.cs" />
     <Compile Include="Settings\SettingItem_SetupEBR.cs" />

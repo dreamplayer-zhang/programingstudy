@@ -35,8 +35,8 @@ namespace Root_Pine2.Module
                 case ModuleBase.eState.Run: Background = Brushes.Yellow; break;
                 case ModuleBase.eState.Error: Background = Brushes.OrangeRed; break;
             }
-            textBlockA.Text = (m_boats.m_aBoat[Vision.eWorks.A].p_infoStrip != null) ? m_boats.m_aBoat[Vision.eWorks.A].p_id : "";
-            textBlockB.Text = (m_boats.m_aBoat[Vision.eWorks.B].p_infoStrip != null) ? m_boats.m_aBoat[Vision.eWorks.B].p_id : "";
+            textBlockA.Text = (m_boats.m_aBoat[Vision2D.eWorks.A].p_infoStrip != null) ? m_boats.m_aBoat[Vision2D.eWorks.A].p_id : "";
+            textBlockB.Text = (m_boats.m_aBoat[Vision2D.eWorks.B].p_infoStrip != null) ? m_boats.m_aBoat[Vision2D.eWorks.B].p_id : "";
             OnRunTree();
         }
 

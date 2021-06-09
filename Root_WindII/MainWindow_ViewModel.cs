@@ -14,6 +14,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using RootTools.Database;
+using RootTools.Gem.XGem;
 
 namespace Root_WindII
 {
@@ -181,10 +182,32 @@ namespace Root_WindII
                 SetProperty(ref this.isCheckModeEngineer, value);
             }
         }
-
+                
         #endregion
         #region [Command]
+        public ICommand GemOnlineClickCommand
+        {
+            get => new RelayCommand(() =>
+            {
+                GlobalObjects.Instance.Get<WindII_Engineer>().ClassGem().p_eReqControl = XGem.eControl.ONLINEREMOTE;
+            });
+        }
 
+        public ICommand GemLocalClickCommand
+        {
+            get => new RelayCommand(() =>
+            {
+                GlobalObjects.Instance.Get<WindII_Engineer>().ClassGem().p_eReqControl = XGem.eControl.LOCAL;
+            });
+        }
+
+        public ICommand GemOfflineClickCommand
+        {
+            get => new RelayCommand(() =>
+            {
+                GlobalObjects.Instance.Get<WindII_Engineer>().ClassGem().p_eReqControl = XGem.eControl.OFFLINE;
+            });
+        }
         #endregion
         #endregion
 

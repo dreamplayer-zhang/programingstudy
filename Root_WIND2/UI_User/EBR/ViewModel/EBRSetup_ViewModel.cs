@@ -1,414 +1,237 @@
-﻿using LiveCharts;
-using LiveCharts.Wpf;
-using Root_WIND2.Module;
-using RootTools;
-using RootTools.Database;
-using RootTools.Module;
+﻿using RootTools;
 using RootTools_Vision;
 using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Media;
-using System.Windows.Threading;
+using System.Windows.Forms;
 
 namespace Root_WIND2.UI_User
 {
-	class EBRSetup_ViewModel : ObservableObject
+	public class EBRSetup_ViewModel : ObservableObject
 	{
-		private EBR_ImageViewer_ViewModel imageViewerVM;
-		private EBRRecipe recipe;
+        #region [Properties]
+        private EBR_ImageViewer_ViewModel imageViewerVM;
+        public EBR_ImageViewer_ViewModel ImageViewerVM
+        {
+            get { return imageViewerVM; }
+            set { SetProperty(ref imageViewerVM, value); }
+        }
+
+        #region [Origin Recipe]
+        private int originX = 0;
+        public int OriginX
+        {
+            get => this.originX;
+            set
+            {
+                RecipeEBR recipeEBR = GlobalObjects.Instance.Get<RecipeEBR>();
+                recipeEBR.GetItem<OriginRecipe>().OriginX = value;
+
+                SetProperty<int>(ref this.originX, value);
+            }
+        }
+
+        private int originY = 0;
+        public int OriginY
+        {
+            get => this.originY;
+            set
+            {
+                RecipeEBR recipeEBR = GlobalObjects.Instance.Get<RecipeEBR>();
+                recipeEBR.GetItem<OriginRecipe>().OriginY = value;
+
+                SetProperty<int>(ref this.originY, value);
+            }
+        }
+
+        private int originWidth = 0;
+        public int OriginWidth
+        {
+            get => this.originWidth;
+            set
+            {
+                RecipeEBR recipeEBR = GlobalObjects.Instance.Get<RecipeEBR>();
+                recipeEBR.GetItem<OriginRecipe>().OriginWidth = value;
+                recipeEBR.GetItem<OriginRecipe>().DiePitchX = value;
+
+                DiePitchX = value;
+                SetProperty<int>(ref this.originWidth, value);
+            }
+        }
+
+        private int originHeight = 0;
+        public int OriginHeight
+        {
+            get => this.originHeight;
+            set
+            {
+                RecipeEBR recipeEBR = GlobalObjects.Instance.Get<RecipeEBR>();
+                recipeEBR.GetItem<OriginRecipe>().OriginHeight = value;
+                recipeEBR.GetItem<OriginRecipe>().DiePitchY = value;
+
+                DiePitchY = value;
+                SetProperty<int>(ref this.originHeight, value);
+            }
+        }
+
+        private int diePitchX = 0;
+        public int DiePitchX
+        {
+            get => this.diePitchX;
+            set
+            {
+                SetProperty<int>(ref this.diePitchX, value);
+            }
+        }
+
+        private int diePitchY = 0;
+        public int DiePitchY
+        {
+            get => this.diePitchY;
+            set
+            {
+                SetProperty<int>(ref this.diePitchY, value);
+            }
+        }
+        #endregion
+
+        #region [Recipe]
+        private int firstNotch = 0;
+        public int FirstNotch
+        {
+            get => this.firstNotch;
+            set
+            {
+                RecipeEBR recipeEBR = GlobalObjects.Instance.Get<RecipeEBR>();
+                recipeEBR.GetItem<EBRRecipe>().FirstNotch = value;
+
+                SetProperty<int>(ref this.firstNotch, value);
+            }
+        }
+
+        private int lastNotch = 0;
+        public int LastNotch
+        {
+            get => this.lastNotch;
+            set
+            {
+                RecipeEBR recipeEBR = GlobalObjects.Instance.Get<RecipeEBR>();
+                recipeEBR.GetItem<EBRRecipe>().LastNotch = value;
+
+                SetProperty<int>(ref this.lastNotch, value);
+            }
+        }
+		#endregion
+
+		#region [Parameter]
 		private EBRParameter parameter;
+        public EBRParameter Parameter
+        {
+            get
+            {
+                return parameter;
+            }
+            set
+            {
+                SetProperty(ref parameter, value);
+            }
+        }
 
-		private int selectedGrabModeIndex = 0;
-		// grab mode data
-		private int cameraWidth;
-		private int cameraHeight;
-		private double resolution;
+        private ProcessMeasurementParameter processParameter;
+        public ProcessMeasurementParameter ProcessParameter
+        {
+            get
+            {
+                return processParameter;
+            }
+            set
+            {
+                SetProperty(ref processParameter, value);
+            }
+        }
+        #endregion
 
-		#region Data Viewer Parameter
-		private DataTable measurementDataTable;
-		private SeriesCollection measurementGraph;
-		private string[] xLabels;
+        #region [Grab Mode]
+        public List<string> GrabModeList
+        {
+            get
+            {
+                return ((WIND2_Handler)GlobalObjects.Instance.Get<WIND2_Engineer>().ClassHandler()).p_EdgeSideVision.p_asGrabMode;
+            }
+        }
 
-		private int progress = 0;
-		private int maxProgress = 100;
-		private string percentage = "0";
+        private int selectedGrabModeIndex = 0;
+        public int SelectedGrabModeIndex
+        {
+            get => this.selectedGrabModeIndex;
+            set
+            {
+                WIND2_Engineer engineer = GlobalObjects.Instance.Get<WIND2_Engineer>();
+                RecipeEBR recipeEBR = GlobalObjects.Instance.Get<RecipeEBR>();
 
-		private int sizeYMinVal = 0;
-		private int sizeYMaxVal = 1000; 
-		private double sizeFrom = 0;
-		private double sizeTo = 50;
-		#endregion
+                recipeEBR.CameraInfoIndex = value;
 
-		#region [Getter / Setter]
-		public EBR_ImageViewer_ViewModel ImageViewerVM
+                CameraInfo camInfo = DataConverter.GrabModeToCameraInfo(engineer.m_handler.p_EdgeSideVision.GetGrabMode(recipeEBR.CameraInfoIndex));
+                this.CamInfoDataListVM.Init(camInfo);
+
+                SetProperty<int>(ref this.selectedGrabModeIndex, value);
+            }
+        }
+
+        private DataListView_ViewModel camInfoDataListVM;
+
+        public DataListView_ViewModel CamInfoDataListVM
+        {
+            get => this.camInfoDataListVM;
+            set
+            {
+                SetProperty(ref this.camInfoDataListVM, value);
+            }
+        }
+        #endregion
+        
+        #endregion
+
+        public EBRSetup_ViewModel()
 		{
-			get { return imageViewerVM; }
-			set { SetProperty(ref imageViewerVM, value); }
-		}
+			if (GlobalObjects.Instance.GetNamed<ImageData>("EBRImage").GetPtr() == IntPtr.Zero)
+				return;
 
-		public EBRRecipe Recipe
-		{
-			get => recipe;
-			set => SetProperty(ref recipe, value);
-		}
-
-		public EBRParameter Parameter
-		{
-			get => parameter;
-			set
-			{
-				SetProperty(ref parameter, value);
-			}
-		}
-
-		public List<string> GrabModeList
-		{
-			get
-			{
-				return ((WIND2_Handler)GlobalObjects.Instance.Get<WIND2_Engineer>().ClassHandler()).p_EdgeSideVision.p_asGrabMode;
-			}
-		}
-		public int CameraWidth
-		{
-			get => cameraWidth;
-			set => SetProperty(ref cameraWidth, value);
-		}
-
-		public int CameraHeight
-		{
-			get => cameraHeight;
-			set => SetProperty(ref cameraHeight, value);
-		}
-
-		public double Resolution
-		{
-			get => resolution;
-			set => SetProperty(ref resolution, value);
-		}
-		public int SelectedGrabModeIndex
-		{
-			get => this.selectedGrabModeIndex;
-			set
-			{
-				GrabModeEdge mode = ((WIND2_Handler)GlobalObjects.Instance.Get<WIND2_Engineer>().ClassHandler()).p_EdgeSideVision.m_aGrabMode[value];
-
-				if (mode.m_camera != null)
-				{
-					CameraWidth = mode.m_camera.GetRoiSize().X;
-					CameraHeight = mode.m_camera.GetRoiSize().Y;
-				}
-				else
-				{
-					CameraWidth = 0;
-					CameraHeight = mode.m_nCameraHeight;
-				}
-				Resolution = mode.m_dTargetResX_um;
-
-				Recipe.GrabModeIndex = value;
-				SetProperty<int>(ref this.selectedGrabModeIndex, value);
-			}
-		}
-
-		public int Progress
-		{
-			get => progress;
-			set => SetProperty(ref progress, value);
-		}
-		public int MaxProgress
-		{
-			get => maxProgress;
-			set => SetProperty(ref maxProgress, value);
-		}
-		public string Percentage
-		{
-			get => percentage;
-			set => SetProperty(ref percentage, value);
-		}
-
-		public DataTable MeasurementDataTable
-		{
-			get => measurementDataTable;
-			set => SetProperty(ref measurementDataTable, value);
-		}
-
-		public SeriesCollection MeasurementGraph
-		{
-			get => measurementGraph;
-			set
-			{
-				measurementGraph = value;
-				RaisePropertyChanged("MeasurementGraph");
-			}
-		}
-
-		public string[] XLabels
-		{
-			get => xLabels;
-			set
-			{
-				xLabels = value;
-				RaisePropertyChanged("XLabels");
-			}
-		}
-
-		public int SizeYMinVal
-		{
-			get => sizeYMinVal;
-			set
-			{
-				sizeYMinVal = value;
-				RaisePropertyChanged("sizeYMinVal");
-			}
-		}
-
-		public int SizeYMaxVal
-		{
-			get => sizeYMaxVal;
-			set
-			{
-				sizeYMaxVal = value;
-				RaisePropertyChanged("SizeYMaxVal");
-			}
-		}
-
-		public double SizeFrom
-		{
-			get => sizeFrom;
-			set
-			{
-				sizeFrom = value;
-				RaisePropertyChanged("SizeFrom");
-			}
-		}
-
-		public double SizeTo
-		{
-			get => sizeTo;
-			set
-			{
-				sizeTo = value;
-				RaisePropertyChanged("SizeTo");
-			}
-		}
-
-		public Func<float, string> YLabel { get; set; }
-		public string XTitle { get; set; }
-		public string YTitle { get; set; }
-		#endregion
-
-		#region [Command]
-		public RelayCommand btnStart
-		{
-			get => new RelayCommand(() =>
-			{
-				this.ImageViewerVM.ClearObjects();
-				Progress = 0;
-				Inspect();
-			});
-		}
-
-		public RelayCommand btnSnap
-		{
-			get => new RelayCommand(() =>
-			{
-				Scan();
-			});
-		}
-
-		public RelayCommand btnStop
-		{
-			get => new RelayCommand(() =>
-			{
-
-			});
-		}
-
-		public RelayCommand btnClear
-		{
-			get => new RelayCommand(() =>
-			{
-				this.ImageViewerVM.ClearObjects();
-			});
-		}
-		#endregion
-
-		public EBRSetup_ViewModel()
-		{
 			ImageViewerVM = new EBR_ImageViewer_ViewModel();
 			ImageViewerVM.init(GlobalObjects.Instance.GetNamed<ImageData>("EBRImage"), GlobalObjects.Instance.Get<DialogService>());
 
-			RecipeEBR recipe = GlobalObjects.Instance.Get<RecipeEBR>();
-			Recipe = recipe.GetItem<EBRRecipe>();
-			Parameter = recipe.GetItem<EBRParameter>();
+            RecipeEBR recipe = GlobalObjects.Instance.Get<RecipeEBR>();
+            Parameter = recipe.GetItem<EBRParameter>();
+            ProcessParameter = recipe.GetItem<ProcessMeasurementParameter>();
 
-			if (GlobalObjects.Instance.Get<InspectionManagerEBR>() != null)
-            {
-				GlobalObjects.Instance.Get<InspectionManagerEBR>().InspectionDone += WorkEventManager_InspectionDone;
-				GlobalObjects.Instance.Get<InspectionManagerEBR>().ProcessMeasurementDone += WorkEventManager_ProcessMeasurementDone;
-			}
-		}
+            this.camInfoDataListVM = new DataListView_ViewModel();
+        }
 
-		private void WorkEventManager_InspectionDone(object sender, InspectionDoneEventArgs e)
+        public void LoadParameter()
 		{
-			Workplace workplace = sender as Workplace;
+            RecipeEBR recipe = GlobalObjects.Instance.Get<RecipeEBR>();
+            OriginRecipe originRecipe = recipe.GetItem<OriginRecipe>();
+            EBRRecipe ebrRecipe = recipe.GetItem<EBRRecipe>();
 
-			Application.Current.Dispatcher.Invoke(DispatcherPriority.Normal, new Action(delegate
-			{
-				UpdateProgress();
-			}));
-		}
+            if (originRecipe == null || ebrRecipe == null)
+                return;
 
-		private void WorkEventManager_ProcessMeasurementDone(object sender, ProcessMeasurementDoneEventArgs e)
-		{
-			Workplace workplace = sender as Workplace;
-			List<CRect> rectList = new List<CRect>();
-			List<string> textList = new List<string>();
+			this.OriginX = originRecipe.OriginX;
+			this.OriginY = originRecipe.OriginY;
+			this.OriginWidth = originRecipe.OriginWidth;
+			this.OriginHeight = originRecipe.OriginHeight;
+			this.DiePitchX = originRecipe.DiePitchX;
+			this.DiePitchY = originRecipe.DiePitchY;
 
-			foreach (RootTools.Database.Measurement measure in workplace.MeasureList)
-			{
-				String text = "";
+            this.FirstNotch = ebrRecipe.FirstNotch;
+            this.LastNotch = ebrRecipe.LastNotch;
 
-				rectList.Add(new CRect((int)measure.p_rtDefectBox.Left, (int)measure.p_rtDefectBox.Top, (int)measure.p_rtDefectBox.Right, (int)measure.p_rtDefectBox.Bottom));
-				textList.Add(text);
-			}
+            Parameter = recipe.GetItem<EBRParameter>();
+            ProcessParameter = recipe.GetItem<ProcessMeasurementParameter>();
 
-			Application.Current.Dispatcher.Invoke(DispatcherPriority.Normal, new Action(delegate
-			{
-				UpdateDataGrid();
-				DrawGraph();
-				DrawRectMeasurementROI(rectList, textList);
-			}));
-		}
-
-		public void Scan()
-		{
-			EQ.p_bStop = false;
-			EdgeSideVision edgeSideVision = ((WIND2_Handler)GlobalObjects.Instance.Get<WIND2_Engineer>().ClassHandler()).p_EdgeSideVision;
-			if (edgeSideVision.p_eState != ModuleBase.eState.Ready)
-			{
-				MessageBox.Show("Vision Home이 완료 되지 않았습니다.");
-				return;
-			}
-
-			Run_GrabEBR grab = (Run_GrabEBR)edgeSideVision.CloneModuleRun("GrabEBR");
-			edgeSideVision.StartRun(grab);
-		}
-
-		public void Inspect()
-		{
-			if (GlobalObjects.Instance.Get<InspectionManagerEBR>() != null)
-				GlobalObjects.Instance.Get<InspectionManagerEBR>().Start();			
-		}
-
-		public void LoadParameter()
-		{
-			RecipeEBR recipe = GlobalObjects.Instance.Get<RecipeEBR>();
-
-			if (recipe.GetItem<EBRParameter>() == null)
-				return;
-
-			Recipe = recipe.GetItem<EBRRecipe>();
-			Parameter = recipe.GetItem<EBRParameter>();
-		}
-
-		public void CreateRecipeWaferMap()
-		{
-			//RecipeType_WaferMap waferMap = GlobalObjects.Instance.Get<RecipeEBR>().WaferMap;
-
-		}
-
-		private void UpdateProgress()
-		{
-			if (GlobalObjects.Instance.Get<InspectionManagerEBR>() != null)
-			{
-				int workplaceCount = GlobalObjects.Instance.Get<InspectionManagerEBR>().GetWorkplaceCount();
-				MaxProgress = workplaceCount - 1;
-				Progress++;
-
-				int proc = (int)(((double)Progress / MaxProgress) * 100);
-				Percentage = proc.ToString();
-			}
-		}
-
-		private void UpdateDataGrid()
-		{
-			RecipeEBR recipe = GlobalObjects.Instance.Get<RecipeEBR>();
-
-			string sInspectionID = DatabaseManager.Instance.GetInspectionID();
-			string sRecipeID = recipe.Name;
-			string sReicpeFileName = sRecipeID + ".rcp";
-
-			string sDefect = "measurement";
-			MeasurementDataTable = DatabaseManager.Instance.SelectTablewithInspectionID(sDefect, sInspectionID);
-		}
-
-		private void DrawGraph()
-		{
-			MeasurementGraph = null;
-			if (MeasurementGraph == null)
-			{
-				MeasurementGraph = new SeriesCollection
-				{
-					new LineSeries
-					{
-						Title = "Bevel",
-						Fill = Brushes.Transparent,
-						
-					},
-					new LineSeries
-					{
-						Title = "EBR",
-						Fill = Brushes.Transparent,
-					},
-				};
-			}
-
-			int binCount = measurementDataTable.Rows.Count;
-			XLabels = new string[binCount];
-			for (int i = 1; i <= binCount; i++)
-			{
-				XLabels[i - 1] = (parameter.StepDegree * i).ToString();
-			}
-			YLabel = value => value.ToString("N");
-
-			DataRow[] datas;
-			datas = measurementDataTable.Select();
-			ChartValues<float> bevels = new ChartValues<float>();
-			foreach (DataRow table in datas)
-			{
-				if (table[5].ToString() == Measurement.EBRMeasureItem.Bevel.ToString())
-				{
-					string data = table[6].ToString();
-					bevels.Add(float.Parse(data));
-				}
-			}
-			MeasurementGraph[0].Values = bevels;
-
-			ChartValues<float> ebrs = new ChartValues<float>();
-			foreach (DataRow table in datas)
-			{
-				if (table[5].ToString() == Measurement.EBRMeasureItem.EBR.ToString())
-				{
-					string data = table[6].ToString();
-					ebrs.Add(float.Parse(data));
-				}
-			}
-			MeasurementGraph[1].Values = ebrs;
-
-			//if (bevels != null)
-			//	SizeYMinVal = (int)bevels.Min();
-			if (ebrs != null)
-				SizeYMaxVal = (int)ebrs.Max();
-		}
-		private void DrawRectMeasurementROI(List<CRect> rectList, List<String> textList, bool reDraw = false)
-		{
-			imageViewerVM.AddDrawRectList(rectList, System.Windows.Media.Brushes.Red);
-		}
-		
-	}
+            this.SelectedGrabModeIndex = recipe.CameraInfoIndex;
+        }
+    }
 }
