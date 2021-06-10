@@ -127,26 +127,26 @@ namespace Root_VEGA_D
 
         private void M_bgwLoad_DoWork(object sender, DoWorkEventArgs e)
         {
-            while ((EQ.IsStop() != true) && m_loadport.IsBusy()) Thread.Sleep(10);
-            Thread.Sleep(100);
-        }
-
-        public void PMComplete()
-		{
+            while (!bPMComplete && (EQ.IsStop() == false)) Thread.Sleep(10);
             m_loadport.p_open = false;
             ModuleRunBase Docking = m_loadport.m_runDocking.Clone();
             m_loadport.StartRun(Docking);
-            //m_loadport.RunDocking();
+
+            while (m_loadport.IsBusy() && (EQ.IsStop() == false)) Thread.Sleep(10);
             if (m_loadport.p_infoCarrier.m_aInfoWafer[0] == null)
             {
                 m_loadport.m_alidInforeticle.Run(true, "Reticle Info Error, Check Reticle in Loadport");
                 ModuleRunBase UnDocking = m_loadport.m_runUndocking.Clone();
                 m_loadport.StartRun(UnDocking);
-                //m_loadport.RunUndocking();
                 return;
             }
             if (m_manualjob.ShowPopup(m_handler) == false) return;
-            m_bgwLoad.RunWorkerAsync();
+        }
+
+        bool bPMComplete = false;
+        public void PMComplete()
+		{
+            bPMComplete = true;
         }
         #region Button Click Event
         private void buttonLoad_Click(object sender, RoutedEventArgs e)
@@ -156,9 +156,12 @@ namespace Root_VEGA_D
             else if (m_loadport.p_id == "LoadportB") EQ.p_nRunLP = 1;
             ModuleRunBase moduleRun = m_handler.m_vision.m_runPM.Clone();
             m_handler.m_vision.StartRun(moduleRun);
+
             //ModuleRunBase moduleRun = m_rfid.m_runReadID.Clone();
             //m_rfid.StartRun(moduleRun);
             //while ((EQ.IsStop() != true) && m_rfid.IsBusy()) Thread.Sleep(10);
+
+            m_bgwLoad.RunWorkerAsync();
         }
 
         private void buttonUnloadReq_Click(object sender, RoutedEventArgs e)
