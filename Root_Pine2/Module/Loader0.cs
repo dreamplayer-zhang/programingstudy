@@ -22,7 +22,6 @@ namespace Root_Pine2.Module
 
         public enum ePosTransfer
         {
-            Transfer0,
             Transfer1,
             Transfer2,
             Transfer3,
@@ -30,6 +29,18 @@ namespace Root_Pine2.Module
             Transfer5,
             Transfer6,
             Transfer7,
+            Transfer8
+        }
+        public enum ePosTray
+        {
+            Tray1,
+            Tray2,
+            Tray3,
+            Tray4,
+            Tray5,
+            Tray6,
+            Tray7,
+            Tray8,
         }
         public enum eUnloadVision
         {
@@ -37,7 +48,6 @@ namespace Root_Pine2.Module
             Top2D,
         }
         const string c_sPosLoadEV = "LoadEV";
-        const string c_sPosPaper = "PaperTray"; 
         void InitPosition()
         {
             m_axis.AddPos(c_sPosLoadEV);
@@ -46,7 +56,7 @@ namespace Root_Pine2.Module
             m_axis.AddPos(GetPosString(eUnloadVision.Top3D, Vision2D.eWorks.B));
             m_axis.AddPos(GetPosString(eUnloadVision.Top2D, Vision2D.eWorks.A));
             m_axis.AddPos(GetPosString(eUnloadVision.Top2D, Vision2D.eWorks.B));
-            m_axis.AddPos(c_sPosPaper); 
+            m_axis.AddPos(Enum.GetNames(typeof(ePosTray)));
         }
         string GetPosString(eUnloadVision eVision, Vision2D.eWorks eWorks)
         {
@@ -104,10 +114,10 @@ namespace Root_Pine2.Module
             return bWait ? m_axis.WaitReady() : "OK";
         }
 
-        public string RunMovePaperTray(bool bWait = true)
+        public string RunMoveTray(ePosTray eTray, bool bWait = true)
         {
-            if (Run(StartMoveX(c_sPosPaper, 0))) return p_sInfo;
-            m_axis.p_axisY.StartMove(c_sPosPaper);
+            if (Run(StartMoveX(eTray.ToString(), 0))) return p_sInfo;
+            m_axis.p_axisY.StartMove(eTray.ToString());
             return bWait ? m_axis.WaitReady() : "OK";
         }
 
@@ -145,9 +155,9 @@ namespace Root_Pine2.Module
             return bWait ? m_axis.WaitReady() : "OK";
         }
 
-        public string RunMoveZPaper(bool bWait = true)
+        public string RunMoveZPaper(ePosTray eTray, bool bWait = true)
         {
-            m_axis.p_axisZ.StartMove(c_sPosPaper);
+            m_axis.p_axisZ.StartMove(eTray);
             return bWait ? m_axis.WaitReady() : "OK";
         }
 
@@ -239,10 +249,14 @@ namespace Root_Pine2.Module
             try
             {
                 if (Run(RunMoveUp())) return p_sInfo;
-                if (Run(RunMovePaperTray())) return p_sInfo;
-                if (Run(RunMoveZPaper())) return p_sInfo;
+                ePosTray ePosTray = ePosTray.Tray8;
+                if (Run(GetPaperTray(ref ePosTray))) return p_sInfo; 
+                if (Run(RunMoveTray(ePosTray))) return p_sInfo;
+                if (Run(RunMoveZPaper(ePosTray))) return p_sInfo;
                 if (Run(m_picker.RunVacuum(false))) return p_sInfo;
                 m_picker.p_infoStrip = null;
+                MagazineEV magazine = m_handler.m_magazineEV.m_aEV[(InfoStrip.eMagazine)ePosTray];
+                magazine.PutInfoStrip(null); 
                 if (Run(RunMoveUp())) return p_sInfo;
                 if (Run(RunMoveLoadEV())) return p_sInfo;
             }
@@ -251,6 +265,28 @@ namespace Root_Pine2.Module
                 RunMoveUp();
             }
             return "OK";
+        }
+
+        string GetPaperTray(ref ePosTray ePosTray)
+        {
+            MagazineEVSet magazine = m_handler.m_magazineEV;
+            foreach (InfoStrip.eMagazine eMagazine in Enum.GetValues(typeof(InfoStrip.eMagazine)))
+            {
+                if (magazine.IsEnableStack(eMagazine, InfoStrip.eResult.Paper, true))
+                {
+                    ePosTray = (ePosTray)eMagazine; 
+                    return "OK";
+                }
+            }
+            foreach (InfoStrip.eMagazine eMagazine in Enum.GetValues(typeof(InfoStrip.eMagazine)))
+            {
+                if (magazine.IsEnableStack(eMagazine, InfoStrip.eResult.Paper, false)) 
+                {
+                    ePosTray = (ePosTray)eMagazine;
+                    return "OK";
+                }
+            }
+            return "Paper Tray not Ready"; 
         }
 
         public string RunUnloadBoat(eUnloadVision eVision, Vision2D.eWorks eWorks)
@@ -380,7 +416,7 @@ namespace Root_Pine2.Module
         {
             m_runLoadEV = AddModuleRunList(new Run_LoadEV(this), true, "Load Strip from LoadEV");
             m_runLoadTransfer = AddModuleRunList(new Run_LoadTransfer(this), true, "Load Strip from Transfer");
-            m_runUnloadPaper = AddModuleRunList(new Run_UnloadPaper(this), true, "Unload Paper to Paper Tray");
+            m_runUnloadPaper = AddModuleRunList(new Run_UnloadPaper(this), true, "Unload Paper to Tray");
             m_runUnloadBoat = AddModuleRunList(new Run_UnloadBoat(this), true, "Unload Paper to Boat");
             m_runAvoidX = AddModuleRunList(new Run_AvoidX(this), true, "Avoid Axis X");
         }
@@ -425,7 +461,7 @@ namespace Root_Pine2.Module
                 InitModuleRun(module);
             }
 
-            public ePosTransfer m_ePos = ePosTransfer.Transfer0;
+            public ePosTransfer m_ePos = ePosTransfer.Transfer1;
             public override ModuleRunBase Clone()
             {
                 Run_LoadTransfer run = new Run_LoadTransfer(m_module);

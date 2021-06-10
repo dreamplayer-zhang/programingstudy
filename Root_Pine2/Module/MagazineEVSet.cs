@@ -8,7 +8,7 @@ namespace Root_Pine2.Module
     {
         public Dictionary<InfoStrip.eMagazine, MagazineEV> m_aEV = new Dictionary<InfoStrip.eMagazine, MagazineEV>();
 
-        public InfoStrip.eMagazine m_eMagazineGet = InfoStrip.eMagazine.Magazine0; 
+        public InfoStrip.eMagazine m_eMagazineGet = InfoStrip.eMagazine.Magazine1; 
         public InfoStrip GetInfoStrip(bool bPeek)
         {
             int iMagazine = (int)m_eMagazineGet; 

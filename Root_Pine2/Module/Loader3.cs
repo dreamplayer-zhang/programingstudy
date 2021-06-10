@@ -24,7 +24,6 @@ namespace Root_Pine2.Module
 
         public enum ePosTransfer
         {
-            Transfer0,
             Transfer1,
             Transfer2,
             Transfer3,
@@ -32,16 +31,18 @@ namespace Root_Pine2.Module
             Transfer5,
             Transfer6,
             Transfer7,
+            Transfer8,
         }
         public enum ePosTray
         {
-            Tray0,
             Tray1,
             Tray2,
             Tray3,
             Tray4,
             Tray5,
             Tray6,
+            Tray7,
+            Tray8,
         }
         void InitPosition()
         {
@@ -228,8 +229,10 @@ namespace Root_Pine2.Module
                 if (Run(RunMoveTray(ePos))) return p_sInfo;
                 if (Run(RunMoveZ(ePos))) return p_sInfo;
                 if (Run(m_picker.RunVacuum(false))) return p_sInfo;
-                if (Run(RunMoveUp())) return p_sInfo;
                 m_picker.p_infoStrip = null;
+                MagazineEV magazine = m_handler.m_magazineEV.m_aEV[(InfoStrip.eMagazine)ePos];
+                magazine.PutInfoStrip(m_picker.p_infoStrip);
+                if (Run(RunMoveUp())) return p_sInfo;
             }
             finally
             {
@@ -390,7 +393,7 @@ namespace Root_Pine2.Module
                 InitModuleRun(module);
             }
 
-            public ePosTransfer m_ePos = ePosTransfer.Transfer0;
+            public ePosTransfer m_ePos = ePosTransfer.Transfer1;
             public override ModuleRunBase Clone()
             {
                 Run_UnloadTransfer run = new Run_UnloadTransfer(m_module);
@@ -418,7 +421,7 @@ namespace Root_Pine2.Module
                 InitModuleRun(module);
             }
 
-            public ePosTray m_ePos = ePosTray.Tray0; 
+            public ePosTray m_ePos = ePosTray.Tray1; 
             public override ModuleRunBase Clone()
             {
                 Run_UnloadTray run = new Run_UnloadTray(m_module);
