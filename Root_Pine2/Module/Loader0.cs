@@ -325,6 +325,13 @@ namespace Root_Pine2.Module
         }
         #endregion
 
+        #region PickerSet
+        public string RunPickerSet()
+        {
+            return "OK"; 
+        }
+        #endregion
+
         #region override
         public override string StateReady()
         {
@@ -418,7 +425,8 @@ namespace Root_Pine2.Module
             m_runLoadTransfer = AddModuleRunList(new Run_LoadTransfer(this), true, "Load Strip from Transfer");
             m_runUnloadPaper = AddModuleRunList(new Run_UnloadPaper(this), true, "Unload Paper to Tray");
             m_runUnloadBoat = AddModuleRunList(new Run_UnloadBoat(this), true, "Unload Paper to Boat");
-            m_runAvoidX = AddModuleRunList(new Run_AvoidX(this), true, "Avoid Axis X");
+            m_runAvoidX = AddModuleRunList(new Run_AvoidX(this), false, "Avoid Axis X");
+            AddModuleRunList(new Run_PickerSet(this), false, "Avoid Axis X");
         }
 
         public class Run_LoadEV : ModuleRunBase
@@ -561,6 +569,31 @@ namespace Root_Pine2.Module
             public override string Run()
             {
                 return m_module.RunAvoidX(m_fPos);
+            }
+        }
+
+        public class Run_PickerSet : ModuleRunBase
+        {
+            Loader0 m_module;
+            public Run_PickerSet(Loader0 module)
+            {
+                m_module = module;
+                InitModuleRun(module);
+            }
+
+            public override ModuleRunBase Clone()
+            {
+                Run_PickerSet run = new Run_PickerSet(m_module);
+                return run;
+            }
+
+            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
+            {
+            }
+
+            public override string Run()
+            {
+                return m_module.RunPickerSet();
             }
         }
         #endregion

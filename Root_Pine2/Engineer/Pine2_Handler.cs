@@ -220,22 +220,6 @@ namespace Root_Pine2.Engineer
             {
                 if (_bRun == value) return;
                 _bRun = value;
-                StartRun(value);
-            }
-        }
-
-        void StartRun(bool bRun)
-        {
-            if (bRun)
-            {
-                //m_rail.StartRun(); //forget
-                //m_roller.StartRun();
-                //m_storage.StartRun();
-                //m_loader.StartRun();
-            }
-            else
-            {
-
             }
         }
 
@@ -250,6 +234,9 @@ namespace Root_Pine2.Engineer
                 {
                     case EQ.eState.Home: StateHome(); break;
                     case EQ.eState.Run: break;
+                    case EQ.eState.ModuleRunList: 
+
+                        break;
                 }
                 p_bRun = (EQ.p_eState == EQ.eState.Run) && (EQ.p_bPickerSet == false);
             }
