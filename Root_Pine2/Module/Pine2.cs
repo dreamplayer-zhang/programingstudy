@@ -1,4 +1,5 @@
-﻿using RootTools;
+﻿using Root_Pine2.Engineer;
+using RootTools;
 using RootTools.Comm;
 using RootTools.Control;
 using RootTools.Module;
@@ -275,6 +276,18 @@ namespace Root_Pine2.Module
                 OnPropertyChanged(); 
             }
         }
+
+        string _sRecipe = "";
+        public string p_sRecipe
+        {
+            get { return _sRecipe; }
+            set
+            {
+                if (_sRecipe == value) return;
+                _sRecipe = value;
+                m_handler.p_sRecipe = value; 
+            }
+        }
         #endregion
 
         #region Thread DIO
@@ -328,12 +341,15 @@ namespace Root_Pine2.Module
             m_buzzer.RunTree(tree.GetTree("Buzzer")); 
             p_eMode = (eRunMode)tree.Set(p_eMode, p_eMode, "Mode", "RunMode");
             p_widthStrip = tree.Set(p_widthStrip, p_widthStrip, "Width", "Strip Width (mm)");
+            p_sRecipe = tree.Set(p_sRecipe, p_sRecipe, "Recipe", "Recipe"); 
         }
         #endregion
 
+        Pine2_Handler m_handler; 
         public Pine2(string id, IEngineer engineer)
         {
             p_id = id;
+            m_handler = (Pine2_Handler)engineer.ClassHandler(); 
             InitBase(id, engineer);
 
             InitThread();

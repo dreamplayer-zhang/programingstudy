@@ -28,6 +28,22 @@ namespace Root_Pine2.Engineer
         }
         #endregion
 
+        #region Recipe
+        string _sRecipe = ""; 
+        public string p_sRecipe
+        {
+            get { return _sRecipe; }
+            set
+            {
+                if (_sRecipe == value) return;
+                _sRecipe = value;
+                m_aBoats[Vision2D.eVision.Top3D].p_sRecipe = value;
+                m_aBoats[Vision2D.eVision.Top2D].p_sRecipe = value;
+                m_aBoats[Vision2D.eVision.Bottom].p_sRecipe = value;
+            }
+        }
+        #endregion
+
         #region Module
         StopWatch m_swInit = new StopWatch(); 
         public ModuleList p_moduleList { get; set; }
