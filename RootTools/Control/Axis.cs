@@ -237,20 +237,38 @@ namespace RootTools.Control
             if (m_bSWLimit[1] && (vJog > 0) && (fPosNow >= m_aPos[p_asPos[1]])) return "SW Plus Limit Error";
             return "OK";
         }
-        bool tt = false;
-        void ThreadCheck_SWLimit()
+
+        bool bLimitPlusCheck = false;
+        bool bLimitMinusCheck = false;
+        public void ThreadCheck_SWLimit(bool isPlus)
         {
+            bool isError = false;
             double fPos = p_posActual;
-            bool bSWLimit0 = m_bSWLimit[0] && (fPos > m_aPos[p_asPos[0]]);
-            if (bSWLimit0) p_log.Info(p_id + ": Servo SW limit(-) !!");
-            bool bSWLimit1 = m_bSWLimit[1] && (fPos > m_aPos[p_asPos[1]]);
-            if (tt == true)
-            if (bSWLimit1)
+            bool bSWLimit0 = m_bSWLimit[0] && (fPos < m_aPos[p_asPos[0]]);
+            if (bSWLimit0 && !isPlus && !bLimitMinusCheck)
             {
-                p_log.Info(p_id + ": Servo SW limit(+) !!");
-                tt = false;
+                isError = true;
+                p_log.Info(p_id + ": Servo SW limit(-) !!");
+                bLimitMinusCheck = true;
             }
-            if (bSWLimit0 || bSWLimit1) StopAxis();
+            bool bSWLimit1 = m_bSWLimit[1] && (fPos > m_aPos[p_asPos[1]]);
+            if (bSWLimit1 && isPlus && !bLimitPlusCheck)
+            {
+                isError = true;
+                p_log.Info(p_id + ": Servo SW limit(+) !!");
+                bLimitPlusCheck = true;
+            }
+
+            if (fPos > m_aPos[p_asPos[0]])
+                bLimitMinusCheck = false;
+
+            if (fPos < m_aPos[p_asPos[1]])
+                bLimitPlusCheck = false;
+
+            if (isError)
+            {
+                StopAxis();
+            }
         }
 
         void RunTreePosLimit(Tree tree)
@@ -385,7 +403,7 @@ namespace RootTools.Control
             if (EQ.IsStop()) return p_id + " EQ Stop";
             if (EQ.p_bSimulate) return "OK";
             //if (p_eState != eState.Ready) return p_id + " Axis State not Ready : " + p_eState.ToString();
-            return CheckSWLimit(fScale * m_speedNow.m_v);
+            return CheckSWLimit (fScale * m_speedNow.m_v);
         }
 
         public virtual void StopAxis(bool bSlowStop = true) { }

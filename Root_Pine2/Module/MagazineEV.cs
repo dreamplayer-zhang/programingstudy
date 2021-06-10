@@ -410,7 +410,6 @@ namespace Root_Pine2.Module
                 case Pine2.eRunMode.Stack: m_stack?.PutInfoStrip(); break;
                 case Pine2.eRunMode.Magazine: m_aMagazine[infoStrip.p_eMagazinePos]?.PutInfoStrip(infoStrip); break;
             }
-            m_infoStripUnload = null;
         }
 
         public void CheckMagazineDone()
@@ -426,18 +425,31 @@ namespace Root_Pine2.Module
         #region override
         public override string StateReady()
         {
-            return "OK";  //forget
             switch (m_pine2.p_eMode)
             {
-                case Pine2.eRunMode.Stack: return (m_stack == null) ? StartLoad() : "OK";
-                case Pine2.eRunMode.Magazine: return (m_aMagazine[InfoStrip.eMagazinePos.Up] == null) ? StartLoad() : "OK";
-            }
-            if ((EQ.p_eState != EQ.eState.Run) && (m_pine2.p_eMode == Pine2.eRunMode.Magazine))
-            {
-                if (m_infoStripUnload != null) return StartMoveTransfer(m_infoStripUnload);
-                return StartMoveTransfer(GetInfoStrip(true)); 
+                case Pine2.eRunMode.Stack: 
+                    if (m_stack == null)
+                    {
+                        return CheckStartLoad() ? StartLoad() : "OK"; 
+                    }
+                    return "OK"; 
+                case Pine2.eRunMode.Magazine: 
+                    if (m_aMagazine[InfoStrip.eMagazinePos.Up] == null)
+                    {
+                        return CheckStartLoad() ? StartLoad() : "OK";
+                    }
+                    if (m_aMagazine[InfoStrip.eMagazinePos.Down] == null)
+                    {
+                        return CheckStartLoad() ? StartLoad() : "OK";
+                    }
+                    return "OK"; 
             }
             return "OK";
+        }
+
+        bool CheckStartLoad()
+        {
+            return m_conveyor.CheckExist() && m_conveyor.CheckSwitch(); 
         }
 
         public override void Reset()
@@ -472,37 +484,26 @@ namespace Root_Pine2.Module
             switch (m_pine2.p_eMode)
             {
                 case Pine2.eRunMode.Magazine:
-                    if (Run(WaitSwitch())) return p_sInfo;
-                    if (m_conveyor.CheckExist() == false) return "Check Magazine";
-                    if (Run(RunLoad(InfoStrip.eMagazinePos.Up))) return p_sInfo;
-                    m_aMagazine[InfoStrip.eMagazinePos.Up] = new Magazine(this, InfoStrip.eMagazinePos.Up);
-                    if (Run(WaitSwitch())) return p_sInfo;
-                    if (m_conveyor.CheckExist() == false)
+                    InfoStrip.eMagazinePos pos = InfoStrip.eMagazinePos.Up;
+                    if (m_aMagazine[pos] == null)
                     {
-                        if (Run(WaitSwitch())) return p_sInfo;
-                        if (m_conveyor.CheckExist() == false) return "OK";
+                        if (Run(RunLoad(pos))) return p_sInfo;
+                        m_aMagazine[pos] = new Magazine(this, pos);
+                        return "OK";
                     }
-                    if (Run(RunLoad(InfoStrip.eMagazinePos.Down))) return p_sInfo;
-                    m_aMagazine[InfoStrip.eMagazinePos.Down] = new Magazine(this, InfoStrip.eMagazinePos.Down);
-                    StartMoveTransfer(GetInfoStrip(true));
-                    break;
+                    pos = InfoStrip.eMagazinePos.Down;
+                    if (m_aMagazine[pos] == null)
+                    {
+                        if (Run(RunLoad(pos))) return p_sInfo;
+                        m_aMagazine[pos] = new Magazine(this, pos);
+                        return "OK";
+                    }
+                    break; 
                 case Pine2.eRunMode.Stack:
-                    if (Run(WaitSwitch())) return p_sInfo;
-                    if (m_conveyor.CheckExist() == false) return "Check Tray";
                     if (Run(RunLoad(InfoStrip.eMagazinePos.Up))) return p_sInfo;
                     if (Run(m_elevator.MoveStack())) return p_sInfo;
                     m_stack = new Stack(this);
                     break;
-            }
-            return "OK";
-        }
-
-        string WaitSwitch()
-        {
-            while (m_conveyor.CheckSwitch() == false)
-            {
-                Thread.Sleep(10);
-                if (EQ.IsStop()) return "EQ Stop"; 
             }
             return "OK";
         }
@@ -562,7 +563,6 @@ namespace Root_Pine2.Module
         #endregion
 
         #region Move Transfer
-        public InfoStrip m_infoStripUnload = null;
         public string StartMoveTransfer(InfoStrip infoStrip)
         {
             if (m_elevator.IsSamePos(infoStrip)) return "OK";

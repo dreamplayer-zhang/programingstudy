@@ -13,12 +13,14 @@ namespace Root_Pine2.Module
         #region ToolBox
         AxisXY m_axisXZ;
         DIO_I2O m_dioTurn;
-        DIO_O m_doVacuum; 
+        DIO_O m_doVacuum;
+        public DIO_I m_diCrash;
         public override void GetTools(bool bInit)
         {
             m_toolBox.GetAxis(ref m_axisXZ, this, "Loader2");
             m_toolBox.GetDIO(ref m_dioTurn, this, "Turn", "Down", "Up");
             m_toolBox.GetDIO(ref m_doVacuum, this, "Vacuum");
+            m_toolBox.GetDIO(ref m_diCrash, this, "Crash");
             if (bInit) InitPosition();
         }
 
@@ -75,6 +77,32 @@ namespace Root_Pine2.Module
         void RunTreeVacuum(Tree tree)
         {
             m_secVacuum = tree.Set(m_secVacuum, m_secVacuum, "Delay", "Vacuum On & Off Delay (sec)"); 
+        }
+        #endregion
+
+        #region Crash
+        Loader1 p_loader1 { get { return m_handler.m_loader1; } }
+        bool m_bThreadCrash = false;
+        Thread m_threadCrash;
+        void InitThreadCrash()
+        {
+            m_threadCrash = new Thread(new ThreadStart(RunThreadCrash));
+            m_threadCrash.Start();
+        }
+
+        void RunThreadCrash()
+        {
+            m_bThreadCrash = true;
+            Thread.Sleep(5000);
+            while (m_bThreadCrash)
+            {
+                Thread.Sleep(10);
+                if (m_diCrash.p_bIn)
+                {
+                    m_axisXZ.p_axisX.ServoOn(false);
+                    p_loader1.m_axisXZ.p_axisX.ServoOn(false);
+                }
+            }
         }
         #endregion
 
@@ -135,17 +163,25 @@ namespace Root_Pine2.Module
 
         public InfoStrip p_infoStrip { get; set; }
         Pine2 m_pine2 = null;
+        Pine2_Handler m_handler; 
         Boats m_boats; 
         public Loader2(string id, IEngineer engineer, Pine2_Handler handler)
         {
-            p_infoStrip = null; 
+            p_infoStrip = null;
+            m_handler = handler; 
             m_pine2 = handler.m_pine2;
             m_boats = handler.m_aBoats[Vision2D.eVision.Bottom];
             base.InitBase(id, engineer);
+            InitThreadCrash();
         }
 
         public override void ThreadStop()
         {
+            if (m_bThreadCrash)
+            {
+                m_bThreadCrash = false;
+                m_threadCrash.Join();
+            }
             base.ThreadStop();
         }
 

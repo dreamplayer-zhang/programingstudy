@@ -88,5 +88,16 @@ namespace Root_CAMELLIA
                 return "Version " + _Version2;
             }
         }
+
+        private string _Version3 = "1.0.0.0";
+        public string Version3
+        {
+            get
+            {
+                string fileVersion = FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location).FileVersion;
+                _Version3 = fileVersion;
+                return _Version3;
+            }
+        }
     }
 }

@@ -1,4 +1,5 @@
-﻿using RootTools;
+﻿using Root_Pine2.Engineer;
+using RootTools;
 using RootTools.Comm;
 using RootTools.Control;
 using RootTools.Module;
@@ -6,6 +7,7 @@ using RootTools.ToolBoxs;
 using RootTools.Trees;
 using System;
 using System.Collections.Generic;
+using System.Text;
 using System.Threading;
 using System.Windows.Threading;
 
@@ -181,10 +183,11 @@ namespace Root_Pine2.Module
                 public Data(int nCumm, int nUnit, string sMsg)
                 {
                     m_nComm = nCumm; 
-                    m_nUnit = nUnit; 
+                    m_nUnit = nUnit;
                     while (sMsg.Length < 4) sMsg += " ";
-                    m_aSend.Add(256 * (byte)sMsg[0] + (byte)sMsg[1]); //forget
-                    m_aSend.Add(256 * (byte)sMsg[2] + (byte)sMsg[3]);
+                    byte[] aMsg = Encoding.ASCII.GetBytes(sMsg); 
+                    m_aSend.Add(256 * aMsg[0] + aMsg[1]); 
+                    m_aSend.Add(256 * aMsg[2] + aMsg[3]);
                 }
             }
             Queue<Data> m_qSend = new Queue<Data>(); 
@@ -273,6 +276,18 @@ namespace Root_Pine2.Module
                 OnPropertyChanged(); 
             }
         }
+
+        string _sRecipe = "";
+        public string p_sRecipe
+        {
+            get { return _sRecipe; }
+            set
+            {
+                if (_sRecipe == value) return;
+                _sRecipe = value;
+                m_handler.p_sRecipe = value; 
+            }
+        }
         #endregion
 
         #region Thread DIO
@@ -326,12 +341,15 @@ namespace Root_Pine2.Module
             m_buzzer.RunTree(tree.GetTree("Buzzer")); 
             p_eMode = (eRunMode)tree.Set(p_eMode, p_eMode, "Mode", "RunMode");
             p_widthStrip = tree.Set(p_widthStrip, p_widthStrip, "Width", "Strip Width (mm)");
+            p_sRecipe = tree.Set(p_sRecipe, p_sRecipe, "Recipe", "Recipe"); 
         }
         #endregion
 
+        Pine2_Handler m_handler; 
         public Pine2(string id, IEngineer engineer)
         {
             p_id = id;
+            m_handler = (Pine2_Handler)engineer.ClassHandler(); 
             InitBase(id, engineer);
 
             InitThread();
