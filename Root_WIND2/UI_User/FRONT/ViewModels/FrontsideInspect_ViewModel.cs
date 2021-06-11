@@ -336,6 +336,7 @@ namespace Root_WIND2.UI_User
                 klarfData.SetResultTimeStamp();
                 klarfData.SaveKlarf();
                 klarfData.SaveTiffImageOnlyTDI(defects, workManager.SharedBuffer, new Size(160, 120));
+
             });
         }
 

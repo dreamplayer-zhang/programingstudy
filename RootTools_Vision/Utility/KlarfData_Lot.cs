@@ -468,9 +468,6 @@ namespace RootTools_Vision.Utility
 				tempString = string.Format(strFilePath + "\\" + recipeName + "_" + waferID + "_" + lotID + "_" + cassetteID);
 			}
 
-			tempString.Replace("\\\\", "\\");
-			tempString.Replace(".rcp", "");
-			klarfFileName = tempString;
 			string klarfFileFullPath = klarfFileName + ".001";
 
 			FileStream fs = new FileStream(klarfFileFullPath, FileMode.Create, FileAccess.Write);
@@ -1196,7 +1193,8 @@ namespace RootTools_Vision.Utility
 				gp.FillPolygon(brush, poly.ToArray());
 		
 			}
-			Tools.CirclarInterpolation(bmp, polygon, minRadius, thickness, centerX, centerY, outSizeX, outSizeY);
+
+			Tools.CirclarInterpolation(bmp, minRadius, thickness, centerX, centerY, outSizeX, outSizeY);
 
             GraphicsPath path = new GraphicsPath();
 			int cutSize = cuttingSize * 10;

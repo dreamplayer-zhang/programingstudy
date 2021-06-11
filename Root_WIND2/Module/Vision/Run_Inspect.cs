@@ -77,15 +77,15 @@ namespace Root_WIND2.Module
             set => m_sRecipeName = value;
         }
 
-        public string p_sGrabMode
-        {
-            get { return m_sGrabMode; }
-            set
-            {
-                m_sGrabMode = value;
-                m_grabMode = m_module.GetGrabMode(value);
-            }
-        }
+        //public string p_sGrabMode
+        //{
+        //    get { return m_sGrabMode; }
+        //    set
+        //    {
+        //        m_sGrabMode = value;
+        //        m_grabMode = m_module.GetGrabMode(value);
+        //    }
+        //}
         #endregion
 
         public Run_Inspect(Vision module)
@@ -97,7 +97,7 @@ namespace Root_WIND2.Module
         public override ModuleRunBase Clone()
         {
             Run_Inspect run = new Run_Inspect(m_module);
-            run.p_sGrabMode = p_sGrabMode;
+            //run.p_sGrabMode = p_sGrabMode;
             run.RecipeName = this.RecipeName;
             run.m_dTDIToVRSOffsetZ = m_dTDIToVRSOffsetZ;
 
@@ -108,7 +108,7 @@ namespace Root_WIND2.Module
         {
             m_sRecipeName = tree.SetFile(m_sRecipeName, m_sRecipeName, "rcp", "Recipe", "Recipe Name", bVisible);
             // 이거 다 셋팅 되어 있는거 가져와야함
-            p_sGrabMode = tree.Set(p_sGrabMode, p_sGrabMode, m_module.p_asGrabMode, "Grab Mode", "Select GrabMode", bVisible);
+            //p_sGrabMode = tree.Set(p_sGrabMode, p_sGrabMode, m_module.p_asGrabMode, "Grab Mode", "Select GrabMode", bVisible);
             m_dTDIToVRSOffsetZ = tree.Set(m_dTDIToVRSOffsetZ, m_dTDIToVRSOffsetZ, "TDI To VRS Offset Z", "TDI To VRS Offset Z", bVisible);
         }
 
@@ -117,17 +117,21 @@ namespace Root_WIND2.Module
             Settings settings = new Settings();
             SettingItem_SetupFrontside settings_frontside = settings.GetItem<SettingItem_SetupFrontside>();
 
+
+            // 여기 현장버전으로 수정되야함
             InfoWafer infoWafer = m_module.GetInfoWafer(0);
 
             RecipeFront recipe = GlobalObjects.Instance.Get<RecipeFront>();
 
+            if (recipe.Read(this.m_sRecipeName) == false)
+                return "Recipe Read Fail";
+
             m_grabMode = m_module.GetGrabMode(recipe.CameraInfoIndex);
 
-
             // Check Lot Start
-            if (infoWafer != null && (
-                infoWafer._eWaferOrder == InfoWafer.eWaferOrder.FirstLastWafer ||
-                infoWafer._eWaferOrder == InfoWafer.eWaferOrder.FirstWafer))
+            if ((infoWafer != null) && (
+                (infoWafer._eWaferOrder == InfoWafer.eWaferOrder.FirstLastWafer) ||
+                (infoWafer._eWaferOrder == InfoWafer.eWaferOrder.FirstWafer)))
             {
                 LotStart(settings_frontside.KlarfSavePath, recipe, infoWafer, m_grabMode);
             }
@@ -177,8 +181,6 @@ namespace Root_WIND2.Module
                 #region [Snap sequence] 
 
                 // 210525 추가
-             
-
                 m_grabMode.SetLens();
                 m_grabMode.SetLight(true);
                 m_module.p_bStageVac = true;
@@ -366,7 +368,7 @@ namespace Root_WIND2.Module
                 else
 				{
                     #region [Klarf]
-                    if(settings_frontside.UseKlarf)
+                    if(settings_frontside.UseKlarf && (infoWafer != null))
                     {
                         DataTable table = DatabaseManager.Instance.SelectCurrentInspectionDefect();
                         List<Defect> defects = Tools.DataTableToDefectList(table);
@@ -453,9 +455,9 @@ namespace Root_WIND2.Module
 
 
                 // LotEnd Check
-                if (infoWafer != null && (
-                    infoWafer._eWaferOrder == InfoWafer.eWaferOrder.FirstLastWafer ||
-                    infoWafer._eWaferOrder == InfoWafer.eWaferOrder.LastWafer))
+                if ((infoWafer != null) && (
+                    (infoWafer._eWaferOrder == InfoWafer.eWaferOrder.FirstLastWafer) ||
+                    (infoWafer._eWaferOrder == InfoWafer.eWaferOrder.LastWafer)))
                 {
                     LotEnd(infoWafer);
                 }

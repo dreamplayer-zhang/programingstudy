@@ -33,6 +33,8 @@ namespace Root_WIND2.Module
         {
             if (klarfData == null) klarfData = new KlarfData_Lot();
 
+            klarfData.SetModuleName("Backside");
+
             if (Directory.Exists(klarfPath)) Directory.CreateDirectory(klarfPath);
 
 
@@ -106,9 +108,11 @@ namespace Root_WIND2.Module
             RecipeBack recipe = GlobalObjects.Instance.Get<RecipeBack>();
 
             GrabModeBack m_grabMode = m_module.GetGrabMode(recipe.CameraInfoIndex);
-            
+
             // Check Lot Start
-            if (infoWafer._eWaferOrder == InfoWafer.eWaferOrder.FirstWafer)
+            if ((infoWafer != null) && (
+                (infoWafer._eWaferOrder == InfoWafer.eWaferOrder.FirstLastWafer) ||
+                (infoWafer._eWaferOrder == InfoWafer.eWaferOrder.FirstWafer)))
                 LotStart(settings_backside.KlarfSavePath, recipe, infoWafer, m_grabMode);
 
             
@@ -180,24 +184,18 @@ namespace Root_WIND2.Module
                        settings_backside.OutputImageSizeY, polygon, settings_backside.CuttingSize, settings_backside.MinRadius, settings_backside.Thickness,
                        backRecipe.CenterX,
                        backRecipe.CenterY);
-
-                    //요거 대신
-                    //klarfData.SaveImageJpg(workManager.SharedBuffer,
-                    //    new Rect(
-                    //        settings_backside.WholeWaferImageStartX,
-                    //        settings_backside.WholeWaferImageStartY,
-                    //        settings_backside.WholeWaferImageEndX,
-                    //        settings_backside.WholeWaferImageEndY),
-                    //    (long)(settings_backside.WholeWaferImageCompressionRate * 100),
-                    //    settings_backside.OutputImageSizeX,
-                    //    settings_backside.OutputImageSizeY);
                 }
 
                 #endregion
             }
 
+            if ((infoWafer != null) && (
+                (infoWafer._eWaferOrder == InfoWafer.eWaferOrder.FirstLastWafer) ||
+                (infoWafer._eWaferOrder == InfoWafer.eWaferOrder.LastWafer)))
+                LotEnd(infoWafer);
 
-            inspectionTimeWatcher.Stop();
+
+                inspectionTimeWatcher.Stop();
             RootTools_Vision.TempLogger.Write("Inspection", string.Format("{0:F3}", (double)inspectionTimeWatcher.ElapsedMilliseconds / (double)1000));
 
             return "OK";
