@@ -73,8 +73,8 @@ namespace RootTools_Vision
                     roiWidth = outSizeX;
                     roiHeight = outSizeY;
 
-                    samplingX = Math.Floor((double)(int)rect.Width / outSizeX);
-                    samplingY = Math.Floor((double)(int)rect.Height / outSizeY);
+                    samplingX = (double)rect.Width / outSizeX;
+                    samplingY = (double)rect.Height / outSizeY;
                 }
 
 
@@ -178,7 +178,7 @@ namespace RootTools_Vision
             return null;
         }
 
-        public unsafe static Bitmap CirclarInterpolation(Bitmap bmp, List<List<System.Windows.Point>> polygon, double minRadius, int thickenss,int centerX, int centerY, int outSizeX, int outSizeY)
+        public unsafe static Bitmap CirclarInterpolation(Bitmap bmp, double minRadius, int thickenss,int centerX, int centerY, int outSizeX, int outSizeY)
         {
             BitmapData bmpData = bmp.LockBits(new Rectangle(0, 0, bmp.Width, bmp.Height), ImageLockMode.ReadWrite, bmp.PixelFormat);
             IntPtr pointer = bmpData.Scan0;

@@ -12,7 +12,6 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using System.Windows.Threading;
 
 namespace Root_WIND2
 {
@@ -26,21 +25,9 @@ namespace Root_WIND2
         {
             InitializeComponent();
         }
-
-        DispatcherTimer m_timer = new DispatcherTimer();
-
         public void Init()
         {
-            m_timer.Tick += M_timer_Tick;
-            m_timer.Interval = TimeSpan.FromMilliseconds(500);
-            m_timer.Start();
         }
-
-        private void M_timer_Tick(object sender, EventArgs e)
-        {   
-            tbClock.Text = DateTime.Now.ToString("yyyy - MM - dd  hh:mm:ss");
-        }
-
         private void GroupBox_MouseEnter(object sender, MouseEventArgs e)
         {
             ((GroupBox)sender).Background = Brushes.AliceBlue;

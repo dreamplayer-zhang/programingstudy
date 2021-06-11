@@ -801,7 +801,7 @@ namespace Root_EFEM.Module
                     if (Run(CmdUnload())) return p_sInfo;
                 }
             }
-            if (m_diPlaced.p_bIn && m_diPresent.p_bIn)
+            if (m_diPlaced.p_bIn && p_diPresent.p_bIn)
             {
                 p_infoCarrier.p_eState = InfoCarrier.eState.Placed;
                 m_bPlaced = true;
@@ -896,7 +896,7 @@ namespace Root_EFEM.Module
         }
 
         public bool p_bPlaced { get { return m_diPlaced.p_bIn; } }
-        public bool p_bPresent { get { return m_diPresent.p_bIn; } }
+        public bool p_bPresent { get { return p_diPresent.p_bIn; } }
         #endregion
 
         public InfoCarrier p_infoCarrier { get; set; }

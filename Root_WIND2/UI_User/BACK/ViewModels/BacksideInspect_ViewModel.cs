@@ -1,9 +1,12 @@
 ﻿using RootTools;
 using RootTools.Database;
 using RootTools_Vision;
+using RootTools_Vision.Utility;
 using RootTools_Vision.WorkManager3;
 using System;
 using System.Collections.Generic;
+using System.Data;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -239,17 +242,56 @@ namespace Root_WIND2.UI_User
             get => new RelayCommand(() =>
             {
 
+                WorkManager workManager = GlobalObjects.Instance.GetNamed<WorkManager>("backInspection");
+                RecipeBack recipe = GlobalObjects.Instance.Get<RecipeBack>();
+
+                WIND2_Engineer engineer = GlobalObjects.Instance.Get<WIND2_Engineer>();
+                GrabModeBack grabMode = engineer.m_handler.p_BackSideVision.GetGrabMode(recipe.CameraInfoIndex);
+                InfoWafer infoWafer = engineer.m_handler.p_BackSideVision.p_infoWafer;
+                if (infoWafer == null)
+                {
+                    infoWafer = new InfoWafer("null", 0, engineer);
+                }
+
                 Settings settings = new Settings();
                 SettingItem_SetupBackside settings_backside = settings.GetItem<SettingItem_SetupBackside>();
 
-                WorkManager workManager = GlobalObjects.Instance.GetNamed<WorkManager>("backInspection");
+                DataTable table = DatabaseManager.Instance.SelectCurrentInspectionDefect();
+                List<Defect> defects = Tools.DataTableToDefectList(table);
 
-                Tools.SaveImageJpg(workManager.SharedBuffer,
-                    new Rect(settings_backside.WholeWaferImageStartX, settings_backside.WholeWaferImageStartY, settings_backside.WholeWaferImageEndX, settings_backside.WholeWaferImageEndY),
-                    settings_backside.KlarfSavePath + "\\" + DateTime.Now.ToString("yyyyMMddhhmmss") + "_backside.jpg",
-                    (long)(settings_backside.WholeWaferImageCompressionRate * 100),
-                    settings_backside.OutputImageSizeX,
-                    settings_backside.OutputImageSizeY);
+                KlarfData_Lot klarfData = new KlarfData_Lot();
+                Directory.CreateDirectory(settings_backside.KlarfSavePath);
+
+                klarfData.LotStart(settings_backside.KlarfSavePath, infoWafer, recipe.WaferMap, grabMode);
+                klarfData.WaferStart(recipe.WaferMap, infoWafer);
+                klarfData.AddSlot(recipe.WaferMap, defects, recipe.GetItem<OriginRecipe>(), settings_backside.UseTDIReview);
+                klarfData.SetResultTimeStamp();
+                klarfData.SaveKlarf();
+                klarfData.SaveTiffImageOnlyTDI(defects, workManager.SharedBuffer, new Size(160, 120));
+
+
+                //Tools.SaveImageJpg(workManager.SharedBuffer,
+                //    new Rect(settings_backside.WholeWaferImageStartX, settings_backside.WholeWaferImageStartY, settings_backside.WholeWaferImageEndX, settings_backside.WholeWaferImageEndY),
+                //    settings_backside.KlarfSavePath + "\\" + DateTime.Now.ToString("yyyyMMddhhmmss") + "_backside.jpg",
+                //    (long)(settings_backside.WholeWaferImageCompressionRate * 100),
+                //    settings_backside.OutputImageSizeX,
+                //    settings_backside.OutputImageSizeY);
+
+                List<List<Point>> polygon = PolygonController.ReadPolygonFile(recipe.ExclusiveRegionFilePath);
+
+                BacksideRecipe backRecipe = recipe.GetItem<BacksideRecipe>();
+
+                klarfData.SaveImageJpgInterpolation(workManager.SharedBuffer,
+                       new Rect(
+                           settings_backside.WholeWaferImageStartX,
+                           settings_backside.WholeWaferImageStartY,
+                           settings_backside.WholeWaferImageEndX,
+                           settings_backside.WholeWaferImageEndY),
+                       (long)(settings_backside.WholeWaferImageCompressionRate * 100),
+                       settings_backside.OutputImageSizeX,
+                       settings_backside.OutputImageSizeY, polygon, settings_backside.CuttingSize, settings_backside.MinRadius, settings_backside.Thickness,
+                       backRecipe.CenterX,
+                       backRecipe.CenterY);
             });
         }
         #endregion

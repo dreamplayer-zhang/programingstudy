@@ -209,7 +209,7 @@ namespace Root_WIND2.Module
                 base.Reset();
             }
         }
-
+            
         public override void InitMemorys()
         {
             m_memoryGroup = m_memoryPool.GetGroup(p_id);
@@ -327,7 +327,7 @@ namespace Root_WIND2.Module
                 if (!m_diReadyX.p_bIn || !m_diReadyY.p_bIn)
                     return "Ready Fail";
                 else
-                    return "OK";
+                return "OK";
             }
         }
 
@@ -358,8 +358,8 @@ namespace Root_WIND2.Module
                 return RemoteRun(eRemoteRun.AfterGet, eRemote.Client, nID);
             else
             {
-                return "OK";
-            }
+            return "OK";
+        }
         }
 
         public string AfterPut(int nID)
@@ -369,8 +369,8 @@ namespace Root_WIND2.Module
             else
             {
                 m_doVac.Write(true);
-                return "OK";
-            }
+            return "OK";
+        }
         }
 
         enum eCheckWafer
