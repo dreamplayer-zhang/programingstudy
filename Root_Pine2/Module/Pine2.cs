@@ -185,7 +185,8 @@ namespace Root_Pine2.Module
                     m_nComm = nCumm; 
                     m_nUnit = nUnit;
                     while (sMsg.Length < 4) sMsg += " ";
-                    byte[] aMsg = Encoding.ASCII.GetBytes(sMsg); 
+                    byte[] aMsg = Encoding.ASCII.GetBytes(sMsg);
+                    for (int n = 0; n < 4; n++) aMsg[n] -= (byte)'0'; 
                     m_aSend.Add(256 * aMsg[0] + aMsg[1]); 
                     m_aSend.Add(256 * aMsg[2] + aMsg[3]);
                 }
@@ -194,6 +195,7 @@ namespace Root_Pine2.Module
 
             string Send(Data data)
             {
+                m_modbus[data.m_nComm].Connect(); 
                 return m_modbus[data.m_nComm].WriteHoldingRegister((byte)data.m_nUnit, 1, data.m_aSend); 
             }
             #endregion

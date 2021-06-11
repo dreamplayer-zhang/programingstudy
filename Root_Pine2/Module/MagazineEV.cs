@@ -595,7 +595,8 @@ namespace Root_Pine2.Module
             m_conveyor = new Conveyor(this); 
             InitMagazine(); 
             p_eMagazine = eMagazine;
-            p_id = eMagazine.ToString(); 
+            string sID = eMagazine.ToString();
+            p_id = sID.Substring(0, sID.Length - 1) + (char)(eMagazine + '0'); 
             m_nUnitLED = (int)eMagazine + 1; 
             m_pine2 = pine2; 
             base.InitBase(p_id, engineer);
