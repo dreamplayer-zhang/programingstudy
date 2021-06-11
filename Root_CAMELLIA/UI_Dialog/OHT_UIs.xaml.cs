@@ -1,8 +1,4 @@
-﻿using Root_EFEM.Module;
-using RootTools;
-using RootTools.OHT.Semi;
-using RootTools.OHTNew;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -16,26 +12,24 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
-namespace Root_CAMELLIA.UI_Dialog
+using Root_EFEM.Module;
+
+namespace Root_CAMELLIA
 {
     /// <summary>
-    /// Dlg_OHT.xaml에 대한 상호 작용 논리
+    /// OHTs_UI.xaml에 대한 상호 작용 논리
     /// </summary>
-    public partial class Dlg_OHT : Window
+    public partial class OHTs_UI : Window
     {
-        public Dlg_OHT()
+        public OHTs_UI()
         {
             InitializeComponent();
         }
 
-        public void Init(OHT_Semi oht)
+        public void Init(CAMELLIA_Handler handler)
         {
-            //if (oht.p_id == "LoadportA.OHT") OHTA.Init(oht);
-            //else OHTB.Init(oht);
-        }
-
-        private void Window_Loaded(object sender, RoutedEventArgs e)
-        {
+            manualOHTA.Init((Loadport_RND)handler.m_aLoadport[0]);
+            manualOHTB.Init((Loadport_RND)handler.m_aLoadport[1]);
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
@@ -43,5 +37,15 @@ namespace Root_CAMELLIA.UI_Dialog
             e.Cancel = true;
             this.Hide();
         }
+
+        private void Window_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            e.Handled = true;
+            if (e.Key == Key.Escape)
+            {
+                this.Hide();
+            }
+        }
     }
 }
+
