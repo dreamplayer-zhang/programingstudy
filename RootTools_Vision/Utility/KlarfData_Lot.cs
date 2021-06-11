@@ -468,9 +468,6 @@ namespace RootTools_Vision.Utility
 				tempString = string.Format(strFilePath + "\\" + recipeName + "_" + waferID + "_" + lotID + "_" + cassetteID);
 			}
 
-			tempString.Replace("\\\\", "\\");
-			tempString.Replace(".rcp", "");
-			klarfFileName = tempString;
 			string klarfFileFullPath = klarfFileName + ".001";
 
 			FileStream fs = new FileStream(klarfFileFullPath, FileMode.Create, FileAccess.Write);

@@ -178,7 +178,7 @@ namespace RootTools_Vision
             return null;
         }
 
-        public unsafe static Bitmap CirclarInterpolation(Bitmap bmp, List<List<System.Windows.Point>> polygon, double minRadius, int thickenss,int centerX, int centerY, int outSizeX, int outSizeY)
+        public unsafe static Bitmap CirclarInterpolation(Bitmap bmp, double minRadius, int thickenss,int centerX, int centerY, int outSizeX, int outSizeY)
         {
             BitmapData bmpData = bmp.LockBits(new Rectangle(0, 0, bmp.Width, bmp.Height), ImageLockMode.ReadWrite, bmp.PixelFormat);
             IntPtr pointer = bmpData.Scan0;
