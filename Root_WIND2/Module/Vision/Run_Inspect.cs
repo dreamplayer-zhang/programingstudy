@@ -444,6 +444,15 @@ namespace Root_WIND2.Module
                         {
                             klarfData.SaveTiffImageOnlyVRS(defects, vrsImageQueue, new Size(vrsRect.Width, vrsRect.Height));
                         }
+
+                        if(settings_frontside.UseKlarfWholeWaferImage)
+                        {
+                            klarfData.SaveImageJpg(workManager.SharedBuffer,
+                            new Rect(settings_frontside.WholeWaferImageStartX, settings_frontside.WholeWaferImageStartY, settings_frontside.WholeWaferImageEndX, settings_frontside.WholeWaferImageEndY),
+                            (long)(settings_frontside.WholeWaferImageCompressionRate * 100),
+                            settings_frontside.OutputImageSizeX,
+                            settings_frontside.OutputImageSizeY);
+                        }
                     }
 
                     #endregion

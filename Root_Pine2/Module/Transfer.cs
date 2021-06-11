@@ -137,14 +137,14 @@ namespace Root_Pine2.Module
             #region Width
             public enum eWidth
             {
-                mm70,
-                mm90,
+                mm75,
+                mm95,
             }
             public string RunWidth(double fWidth, bool bWait = true)
             {
-                double f70 = m_axisWidth.GetPosValue(eWidth.mm70);
-                double f90 = m_axisWidth.GetPosValue(eWidth.mm90);
-                double dPos = (f90 - f70) * (fWidth - 70) / 10 + f70;
+                double f75 = m_axisWidth.GetPosValue(eWidth.mm75);
+                double f95 = m_axisWidth.GetPosValue(eWidth.mm95);
+                double dPos = (f95 - f75) * (fWidth - 75) / 20 + f75;
                 m_axisWidth.StartMove(dPos);
                 return bWait ? m_axisWidth.WaitReady() : "OK";
             }
@@ -371,7 +371,6 @@ namespace Root_Pine2.Module
         }
         public Pusher m_pusher = new Pusher();
         #endregion
-
 
         #region RunLoad
         public string StartLoad()

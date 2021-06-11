@@ -64,6 +64,7 @@ namespace Root_Pine2.Module
                 toolBox.GetDIO(ref m_dioSwitch, module, "Switch", false);
                 toolBox.GetDIO(ref m_doMove, module, "Move", Enum.GetNames(typeof(eMove)));
                 toolBox.GetDIO(ref m_diCheck, module, "Check", Enum.GetNames(typeof(eCheck)));
+                if (bInit) m_doMove.AllOff();
             }
 
             public void RunSwitch(int nBlink)
@@ -169,10 +170,11 @@ namespace Root_Pine2.Module
                 m_axis.AddPos(Enum.GetNames(typeof(ePos)));
             }
 
-            public string MoveToConveyor(InfoStrip.eMagazinePos eMagazinePos, bool bWait = true)
+            double m_dConveyerUp = 7;
+            public string MoveToConveyor(InfoStrip.eMagazinePos eMagazinePos, bool bUp, bool bWait = true)
             {
                 m_infoStripPos = null;
-                m_axis.StartMove((eMagazinePos == InfoStrip.eMagazinePos.Up) ? ePos.ConveyorUp : ePos.ConveyorDown);
+                m_axis.StartMove((eMagazinePos == InfoStrip.eMagazinePos.Up) ? ePos.ConveyorUp : ePos.ConveyorDown, bUp ? (1000 * m_dConveyerUp) : 0);
                 if (bWait == false) return "OK";
                 return m_axis.WaitReady();
             }
@@ -240,17 +242,14 @@ namespace Root_Pine2.Module
             #endregion
 
             #region Product & Protrude
-            double m_secProduct = 10; 
             public string WaitProduct(InfoStrip.eMagazinePos eMagazinePos)
             {
-                StopWatch sw = new StopWatch();
-                int msWait = (int)(1000 * m_secProduct); 
-                while (sw.ElapsedMilliseconds < msWait)
+                while (true)
                 {
                     Thread.Sleep(10);
+                    if (EQ.IsStop()) return "EQ Stop"; 
                     if (m_diProduct.ReadDI(eMagazinePos)) return "OK";
                 }
-                return "Wait Product Timeout"; 
             }
 
             public bool IsProduct(InfoStrip.eMagazinePos eMagazinePos)
@@ -267,8 +266,8 @@ namespace Root_Pine2.Module
             public void RunTree(Tree tree)
             {
                 m_dSlot = tree.Set(m_dSlot, m_dSlot, "Slot Interval", "Magazine Slot Interval (pulse)");
+                m_dConveyerUp = tree.Set(m_dConveyerUp, m_dConveyerUp, "Conveyer Up", "Conveyer Up (pulse)");
                 m_secAlign = tree.Set(m_secAlign, m_secAlign, "Align Timeout", "Align Timeout (sec)");
-                m_secProduct = tree.Set(m_secProduct, m_secProduct, "Wait Product", "Wait Product (sec)"); 
             }
         }
         Elevator m_elevator = new Elevator();
@@ -466,6 +465,8 @@ namespace Root_Pine2.Module
                 p_eState = eState.Ready;
                 return "OK";
             }
+            if (m_elevator.IsProduct(InfoStrip.eMagazinePos.Up)) return "Remove Porduct";
+            if (m_elevator.IsProduct(InfoStrip.eMagazinePos.Down)) return "Remove Porduct";
             p_sInfo = base.StateHome();
             p_eState = (p_sInfo == "OK") ? eState.Ready : eState.Error;
             return p_sInfo;
@@ -511,12 +512,13 @@ namespace Root_Pine2.Module
         string RunLoad(InfoStrip.eMagazinePos eMagazinePos)
         {
             if (m_elevator.IsProduct(eMagazinePos)) return "Magazine Product Sensor Checked";
-            if (Run(m_elevator.MoveToConveyor(eMagazinePos))) return p_sInfo;
+            if (Run(m_elevator.MoveToConveyor(eMagazinePos, false))) return p_sInfo;
             if (m_conveyor.CheckExist() == false) return "OK"; 
             if (Run(m_elevator.RunAlign(false))) return p_sInfo;
             m_conveyor.RunMove(Conveyor.eMove.Forward);
             if (Run(m_elevator.WaitProduct(eMagazinePos))) return p_sInfo;
             m_conveyor.RunMoveStop();
+            if (Run(m_elevator.MoveToConveyor(eMagazinePos, true))) return p_sInfo;
             if (Run(m_elevator.RunAlign(true))) return p_sInfo;
             return "OK";
         }
@@ -552,8 +554,9 @@ namespace Root_Pine2.Module
         {
             if (m_elevator.IsProduct(eMagazinePos) == false) return "OK"; 
             if (Run(m_elevator.RunAlign(true))) return p_sInfo;
-            if (Run(m_elevator.MoveToConveyor(eMagazinePos))) return p_sInfo;
+            if (Run(m_elevator.MoveToConveyor(eMagazinePos, true))) return p_sInfo;
             if (Run(m_elevator.RunAlign(false))) return p_sInfo;
+            if (Run(m_elevator.MoveToConveyor(eMagazinePos, false))) return p_sInfo;
             m_conveyor.RunMove(Conveyor.eMove.Backward);
             Thread.Sleep(1000);
             if (Run(m_conveyor.WaitUnload())) return p_sInfo;

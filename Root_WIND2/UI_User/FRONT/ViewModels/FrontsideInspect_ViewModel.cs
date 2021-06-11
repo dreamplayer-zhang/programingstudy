@@ -337,6 +337,14 @@ namespace Root_WIND2.UI_User
                 klarfData.SaveKlarf();
                 klarfData.SaveTiffImageOnlyTDI(defects, workManager.SharedBuffer, new Size(160, 120));
 
+
+                klarfData.SaveImageJpg(workManager.SharedBuffer,
+                    new Rect(settings_frontside.WholeWaferImageStartX, settings_frontside.WholeWaferImageStartY, settings_frontside.WholeWaferImageEndX, settings_frontside.WholeWaferImageEndY),
+                    (long)(settings_frontside.WholeWaferImageCompressionRate * 100),
+                    settings_frontside.OutputImageSizeX,
+                    settings_frontside.OutputImageSizeY);
+
+
             });
         }
 

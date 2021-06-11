@@ -157,9 +157,9 @@ namespace RootTools_Vision
                         {
                             for (long j = 0; j < roiWidth; j++)
                             {
-                                pDst[(long)((long)i * (bmpData.Stride) + (long)j * _byteCount + 0)] = *(pBB + (long)(j * samplingX));
+                                pDst[(long)((long)i * (bmpData.Stride) + (long)j * _byteCount + 0)] = *(pRR + (long)(j * samplingX));
                                 pDst[(long)((long)i * (bmpData.Stride) + (long)j * _byteCount + 1)] = *(pGG + (long)(j * samplingX));
-                                pDst[(long)((long)i * (bmpData.Stride) + (long)j * _byteCount + 2)] = *(pRR + (long)(j * samplingX));
+                                pDst[(long)((long)i * (bmpData.Stride) + (long)j * _byteCount + 2)] = *(pBB + (long)(j * samplingX));
                             }
 
                             pRR = pR + (long)((info.Width * (long)(samplingY * i)));
