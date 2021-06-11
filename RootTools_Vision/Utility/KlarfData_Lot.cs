@@ -1173,41 +1173,56 @@ namespace RootTools_Vision.Utility
 			return firstFileNumericName.CompareTo(secondFileNumericName);
 		}
 
-		public bool SaveImageJpgInterpolation(SharedBufferInfo info, Rect rect, long compressRatio, int outSizeX, int outSizeY, List<List<System.Windows.Point>> polygon, int cuttingSize, double minRadius, int thickness, int centerX, int centerY)
+		public bool SaveImageJpgInterpolation(SharedBufferInfo info, Rect rect, long compressRatio, int outSizeX, int outSizeY, List<List<System.Windows.Point>> polygon, int waferSizeX, int waferSizeY, int centerX, int centerY)
         {
 
 			Bitmap bmp = Tools.CovertBufferToBitmap(info, rect, outSizeX, outSizeY);
-			//Graphics gp =  Graphics.FromImage(bmp);
-			//Brush brush = new SolidBrush(Color.Black);
-
-			
-			//for (int i = 0; i < polygon.Count; i++)
-   //         {
-			//	List<PointF> poly = new List<PointF>();
-				
-			//	for (int j = 0; j < polygon[i].Count; j++)
-   //             {
-					
-			//		poly.Add(new PointF((float)polygon[i][j].X,  (float)polygon[i][j].Y));
-			//	}
-			//	gp.FillPolygon(brush, poly.ToArray());
-		
-			//}
-			//double resizeRatioX = (outSizeX / rect.Width);
-			//double resizeRatioY = (outSizeY / rect.Height);
-			//float cutSizeX = (float)(cuttingSize * resizeRatioX);
-			//float cutSizeY = (float)(cuttingSize * resizeRatioY);
-
-			//Tools.CirclarInterpolation(bmp, polygon, (minRadius * resizeRatioX), (int)(minRadius * thickness), (int)(centerX * resizeRatioX), (int)(centerY * resizeRatioY), outSizeX, outSizeY);
+            Graphics gp = Graphics.FromImage(bmp);
+            Brush brush = new SolidBrush(Color.Black);
 
 
-   //         GraphicsPath path = new GraphicsPath();
-			//path.AddEllipse((float)((centerX * resizeRatioX) - cutSizeX), (float)((centerY * resizeRatioY) - cutSizeY), (float)(cutSizeX * 2), (float)(cutSizeY * 2));
-			//Region region = new Region(path);
-   //         gp.ExcludeClip(region);
-   //         gp.FillRectangle(new SolidBrush(Color.Black), 0, 0, outSizeX, outSizeY);
+            double resizeRatioX = (outSizeX / rect.Width);
+            double resizeRatioY = (outSizeY / rect.Height);
 
-            //Tools.InterpolationImage(bmp, polygon);
+			//float ratioX = (float)(centerX % 1000);
+			//float ratioY = (float)(centerY % 1000);
+			double resizeWaferSizeX = waferSizeX * resizeRatioX;
+			double resizeWaferSizeY = waferSizeY * resizeRatioY;
+
+			double reSizeCenterX = centerX * resizeRatioX;
+            double reSizeCenterY = centerY * resizeRatioY;
+            double shortLength = double.MaxValue;
+            double longLength = double.MinValue;
+            for (int i = 0; i < polygon.Count; i++)
+            {
+                List<PointF> poly = new List<PointF>();
+
+                for (int j = 0; j < polygon[i].Count; j++)
+                {
+
+                    poly.Add(new PointF((float)(polygon[i][j].X * resizeRatioX), (float)(polygon[i][j].Y * resizeRatioY)));
+                    double calcShort = Math.Sqrt(Math.Pow(reSizeCenterX - poly[j].X, 2) + Math.Pow(reSizeCenterY - poly[j].Y, 2));
+                    if (shortLength > calcShort)
+                        shortLength = calcShort;
+                    if (longLength < calcShort)
+                        longLength = calcShort;
+
+                }
+                gp.FillPolygon(brush, poly.ToArray());
+
+            }
+
+
+            Tools.CirclarInterpolation(bmp, shortLength, longLength, (int)reSizeCenterX, (int)reSizeCenterY, outSizeX, outSizeY);
+
+
+            GraphicsPath path = new GraphicsPath();
+            path.AddEllipse((float)(reSizeCenterX - (resizeWaferSizeX / 2)), (float)(reSizeCenterY - (resizeWaferSizeY / 2)), (float)resizeWaferSizeX, (float)resizeWaferSizeY);
+            Region region = new Region(path);
+            gp.ExcludeClip(region);
+            gp.FillRectangle(new SolidBrush(Color.Black), 0, 0, outSizeX, outSizeY);
+
+            // Tools.InterpolationImage(bmp, polygon);
 
 
 

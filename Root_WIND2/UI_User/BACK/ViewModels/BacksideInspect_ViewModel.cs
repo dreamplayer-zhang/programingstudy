@@ -280,7 +280,7 @@ namespace Root_WIND2.UI_User
                 List<List<Point>> polygon = PolygonController.ReadPolygonFile(recipe.ExclusiveRegionFilePath);
 
                 BacksideRecipe backRecipe = recipe.GetItem<BacksideRecipe>();
-
+               
                 klarfData.SaveImageJpgInterpolation(workManager.SharedBuffer,
                        new Rect(
                            settings_backside.WholeWaferImageStartX,
@@ -289,7 +289,7 @@ namespace Root_WIND2.UI_User
                            settings_backside.WholeWaferImageEndY),
                        (long)(settings_backside.WholeWaferImageCompressionRate * 100),
                        settings_backside.OutputImageSizeX,
-                       settings_backside.OutputImageSizeY, polygon, settings_backside.CuttingSize, settings_backside.MinRadius, settings_backside.Thickness,
+                       settings_backside.OutputImageSizeY, polygon, (int)(settings_backside.SaveWaferSize * 1000 / grabMode.m_dRealResX_um), (int)(settings_backside.SaveWaferSize * 1000 / grabMode.m_dRealResY_um),
                        backRecipe.CenterX,
                        backRecipe.CenterY);
             });

@@ -163,50 +163,21 @@ namespace RootTools_Vision
         }
         private int outputImageSizeX = 3000;
 
-        [Category("Klarf")]
-        [DisplayName("Save Min Radius")]
-        public double MinRadius
-        {
-            get
-            {
-                return minRadius;
-            }
-            set
-            {
-                minRadius = value;
-            }
-        }
-        private double minRadius = 1000;
 
         [Category("Klarf")]
-        [DisplayName("Save Min Thickness")]
-        public int Thickness
+        [DisplayName("Save Image Wafer Size (mm)")]
+        public int SaveWaferSize
         {
             get
             {
-                return minThickness;
+                return saveWaferSize;
             }
             set
             {
-                minThickness = value;
+                saveWaferSize = value;
             }
         }
-        private int minThickness = 400;
-
-        [Category("Klarf")]
-        [DisplayName("Cutting Image Size (mm)")]
-        public int CuttingSize
-        {
-            get
-            {
-                return cuttingSize;
-            }
-            set
-            {
-                cuttingSize = value;
-            }
-        }
-        private int cuttingSize = 130;
+        private int saveWaferSize = 280;
 
         [Category("Common")]
         [DisplayName("Defect Image Path")]
