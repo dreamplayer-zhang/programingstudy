@@ -4,7 +4,7 @@ namespace RootTools.Control
 {
     public class DIO_I : NotifyPropertyChanged, IDIO
     {
-        public BitDI m_bitDI = new BitDI();
+        public BitDI m_bitDI { get; private set; } = new BitDI();
 
         bool m_bReverse = false; 
 

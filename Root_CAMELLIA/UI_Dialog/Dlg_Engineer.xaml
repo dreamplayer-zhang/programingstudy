@@ -12,8 +12,8 @@
         xmlns:met="clr-namespace:Root_CAMELLIA.LibSR_Met"
         xmlns:stage="clr-namespace:Camellia2Stage"
         xmlns:System="clr-namespace:System;assembly=mscorlib"
-        WindowStyle="None"
-        ResizeMode="CanResize"
+        WindowStyle="None" ShowInTaskbar="False"
+        ResizeMode="NoResize"
         WindowStartupLocation="CenterScreen"
         WindowState="Normal"
         Width="1820"
@@ -29,6 +29,11 @@
         <i:EventTrigger EventName="Unloaded">
             <i:InvokeCommandAction Command="{Binding UnloadedCommand}" />
         </i:EventTrigger>
+        <i:EventTrigger EventName="PreviewKeyDown">
+            <i:CallMethodAction MethodName="OnKeyDown" TargetObject="{Binding}"/>
+
+
+        </i:EventTrigger>
     </i:Interaction.Triggers>
     <Window.Resources>
         <local:AxisToStageUIConverter x:Key="AxisToStageConverter"/>
@@ -37,10 +42,7 @@
         <local:AxisStateToEnableConverter x:Key="AxisStateToEnable" />
         <local:AxisStateToOpacityConverter x:Key="AxisStateToOpacity" />
         <local:AxisStateToLoadingOpacityConverter x:Key="AxisStateToLoadingOpacity" />
-        <local:AxisXToMotionUIConverter x:Key="AxisXToMotionUI"/>
-        <local:AxisYToMotionUIConverter x:Key="AxisYToMotionUI"/>
-        <local:AxisZToMotionUIConverter x:Key="AxisZToMotionUI"/>
-        <local:AxisLifterToMotionUIConverter x:Key="AxisLifterToMotionUI"/>
+        <local:AxisToMotionUIMultiConverter x:Key="AxisToMotionUIMultiConverter"/>
         <local:ModuleStateToLoadingOpacityConverter x:Key="ModuleStateConverter"/>
         <local:ModuleStateToLoadingEnableConverter x:Key="ModuleStateToEnableConverter"/>
         <viewConverter:ConnectStringToBoolConverter x:Key="ConnectStringToBoolConverters" />
@@ -100,7 +102,7 @@
         <TabControl Grid.Row="1" SelectedIndex="{Binding TabIndex, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
             <TabItem Header="Manual"
                      Margin="-1,0,0,0"
-                     Width="100">
+                     Width="100" Style="{StaticResource customTabitem}">
                 <Grid>
                     <StackPanel>
                         <Grid Height="10"/>
@@ -112,7 +114,7 @@
                             </Grid.ColumnDefinitions>
                             <GroupBox Header="PM">
                                 <TabControl>
-                                    <TabItem Header="PM Manual">
+                                    <TabItem Header="PM Manual" Style="{StaticResource customTabitem}">
                                         <Grid Grid.Column="0">
                                             <Grid.ColumnDefinitions>
                                                 <ColumnDefinition Width="1.2*"/>
@@ -250,7 +252,7 @@
                                                         </Grid>
                                                         <Button
                                                     Margin="5"
-                                                    Grid.Row="0"
+                                                    Grid.Row="0" Style="{StaticResource customButton}"
                                                     Command="{Binding CmdCentering}" IsEnabled="{Binding ModuleCamellia.p_eState, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource ModuleStateToEnableConverter} }" >
                                                             <TextBlock TextWrapping="Wrap" TextAlignment="Center">
                                                     Wafer Centering
@@ -258,7 +260,7 @@
                                                         </Button>
                                                         <Button
                                                     Margin="5"
-                                                    Grid.Column="1" Grid.Row="0"
+                                                    Grid.Column="1" Grid.Row="0" Style="{StaticResource customButton}" 
                                                     Command="{Binding CmdInitCal}" IsEnabled="{Binding ModuleCamellia.p_eState, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource ModuleStateToEnableConverter} }">
                                                             <TextBlock TextWrapping="Wrap" TextAlignment="Center">
                                                     Init Calibration
@@ -266,18 +268,18 @@
                                                         </Button>
                                                         <Button 
                                                     Margin="5"
-                                                    Grid.Row="1"
+                                                    Grid.Row="1" Style="{StaticResource customButton}"
                                                     Command="{Binding CmdMeasureBack}" IsEnabled="{Binding ModuleCamellia.p_eState, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource ModuleStateToEnableConverter} }">
                                                             <TextBlock TextWrapping="Wrap" TextAlignment="Center">
                                                     Background Calibration
                                                             </TextBlock>
                                                         </Button>
-                                                        <Button Grid.Column="2" Grid.Row="0" Margin="5" Command="{Binding CmdInit}" Content="Initialize" IsEnabled="{Binding ModuleCamellia.p_eState, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource ModuleStateToEnableConverter} }"/>
+                                                        <Button Style="{StaticResource customButton}" Grid.Column="2" Grid.Row="0" Margin="5" Command="{Binding CmdInit}" Content="Initialize" IsEnabled="{Binding ModuleCamellia.p_eState, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource ModuleStateToEnableConverter} }"/>
 
                                                         <CheckBox Content="EQ Stop" Grid.Column="3" HorizontalAlignment="Center" VerticalAlignment="Center" IsChecked="{Binding Path=p_bStop, Source={x:Static tools:EQ.m_EQ} , UpdateSourceTrigger=PropertyChanged}"/>
 
                                                         <Button
-                                                    Margin="5"
+                                                    Margin="5" Style="{StaticResource customButton}"
                                                     Grid.Column="1" Grid.Row="1"
                                                     Command="{Binding CmdMeasureSample}" IsEnabled="{Binding ModuleCamellia.p_eState, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource ModuleStateToEnableConverter} }" >
                                                             <TextBlock TextWrapping="Wrap" TextAlignment="Center">
@@ -286,13 +288,13 @@
                                                         </Button>
                                                         <Button
                                                     Margin="5"
-                                                    Grid.Column="2" Grid.Row="1"
+                                                    Grid.Column="2" Grid.Row="1" Style="{StaticResource customButton}"
                                                     Command="{Binding CmdPointMeasure}" IsEnabled="{Binding ModuleCamellia.p_eState, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource ModuleStateToEnableConverter} }">
                                                             <TextBlock TextWrapping="Wrap" TextAlignment="Center">
                                                     Point Measure
                                                             </TextBlock>
                                                         </Button>
-                                                        <Button Grid.Column="3" Grid.Row="1" Margin="5" Command="{Binding}" IsEnabled="{Binding ModuleCamellia.p_eState, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource ModuleStateToEnableConverter} }">Repeat</Button>
+                                                        <Button Style="{StaticResource customButton}" Grid.Column="3" Grid.Row="1" Margin="5" Command="{Binding}" IsEnabled="{Binding ModuleCamellia.p_eState, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource ModuleStateToEnableConverter} }">Repeat</Button>
                                                     </Grid>
                                                     <Grid Grid.Row="3">
                                                         <Viewbox>
@@ -371,7 +373,7 @@
                                             </Grid>
                                         </Grid>
                                     </TabItem>
-                                    <TabItem Header="PM Setting">
+                                    <TabItem Header="PM Setting" Style="{StaticResource customTabitem}">
                                         <local:PMCheckReview DataContext="{Binding p_PMCheckReview_ViewModel}" />
                                     </TabItem>
                                 </TabControl>
@@ -657,8 +659,6 @@
                                                                     Width="10000" Height="10000">
                                                             <Border Width="3000"
                                                                         Height="3000"
-                                                                        Canvas.Left="{Binding AxisX.p_posActual, Converter={StaticResource AxisXToMotionUI}}"
-                                                                        Canvas.Top="{Binding AxisY.p_posActual, Converter={StaticResource AxisYToMotionUI}}"
                                                                         Background="Gray"
                                                                         Margin="5">
 
@@ -671,6 +671,28 @@
                                                                                    VerticalAlignment="Center"
                                                                                    HorizontalAlignment="Center" />
                                                                 </Grid>
+                                                                <Border.Style>
+                                                                    <Style TargetType="Border">
+                                                                        <Setter Property="Canvas.Left">
+                                                                            <Setter.Value>
+                                                                                <MultiBinding Converter="{StaticResource AxisToMotionUIMultiConverter}">
+                                                                                    <Binding Path="AxisX.p_posActual"/>
+                                                                                    <Binding Path="AxisX"/>
+                                                                                    <MultiBinding.ConverterParameter>AxisX</MultiBinding.ConverterParameter>
+                                                                                </MultiBinding>
+                                                                            </Setter.Value>
+                                                                        </Setter>
+                                                                        <Setter Property="Canvas.Top">
+                                                                            <Setter.Value>
+                                                                                <MultiBinding Converter="{StaticResource AxisToMotionUIMultiConverter}">
+                                                                                    <Binding Path="AxisY.p_posActual"/>
+                                                                                    <Binding Path="AxisY"/>
+                                                                                    <MultiBinding.ConverterParameter>AxisY</MultiBinding.ConverterParameter>
+                                                                                </MultiBinding>
+                                                                            </Setter.Value>
+                                                                        </Setter>
+                                                                    </Style>
+                                                                </Border.Style>
                                                             </Border>
                                                         </Canvas>
                                                     </Viewbox>
@@ -682,9 +704,22 @@
                                                                     Width="2000" Height="10000">
                                                             <Border Width="2000"
                                                                         Height="500"
-                                                                        Canvas.Top="{Binding AxisZ.p_posActual, Converter={StaticResource AxisZToMotionUI}}"
                                                                         Background="Gray"
-                                                                        Margin="5" />
+                                                                        Margin="5" >
+                                                                <Border.Style>
+                                                                    <Style TargetType="Border">
+                                                                        <Setter Property="Canvas.Top">
+                                                                            <Setter.Value>
+                                                                                <MultiBinding Converter="{StaticResource AxisToMotionUIMultiConverter}">
+                                                                                    <Binding Path="AxisZ.p_posActual"/>
+                                                                                    <Binding Path="AxisZ"/>
+                                                                                    <MultiBinding.ConverterParameter>AxisZ</MultiBinding.ConverterParameter>
+                                                                                </MultiBinding>
+                                                                            </Setter.Value>
+                                                                        </Setter>
+                                                                    </Style>
+                                                                </Border.Style>
+                                                            </Border>
                                                         </Canvas>
                                                     </Viewbox>
                                                 </GroupBox>
@@ -696,9 +731,22 @@
                                                                     Height="10000">
                                                             <Border Width="2000"
                                                                         Height="500"
-                                                                        Canvas.Top="{Binding AxisLifter.p_posActual, Converter={StaticResource AxisLifterToMotionUI}}"
                                                                         Background="Gray"
-                                                                        Margin="5" />
+                                                                        Margin="5" >
+                                                                <Border.Style>
+                                                                    <Style TargetType="Border">
+                                                                        <Setter Property="Canvas.Top">
+                                                                            <Setter.Value>
+                                                                                <MultiBinding Converter="{StaticResource AxisToMotionUIMultiConverter}">
+                                                                                    <Binding Path="AxisLifter.p_posActual"/>
+                                                                                    <Binding Path="AxisLifter"/>
+                                                                                    <MultiBinding.ConverterParameter>AxisLifter</MultiBinding.ConverterParameter>
+                                                                                </MultiBinding>
+                                                                            </Setter.Value>
+                                                                        </Setter>
+                                                                    </Style>
+                                                                </Border.Style>
+                                                            </Border>
                                                         </Canvas>
                                                     </Viewbox>
                                                 </GroupBox>
@@ -730,8 +778,8 @@
                                                     <ColumnDefinition/>
                                                 </Grid.ColumnDefinitions>
                                                 <TabControl SelectedIndex="{Binding MotionTabIndex, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
-                                                    <TabItem Width="0"/>
-                                                    <TabItem Header="X"
+                                                    <TabItem Width="0" Style="{StaticResource customTabitem}"/>
+                                                    <TabItem Header="X" Style="{StaticResource customTabitem}"
                                                              Width="30"
                                                              Margin="-3,0,0,0">
                                                         <DataGrid ItemsSource="{Binding CurrentAxisWorkPoints, Mode=TwoWay}"
@@ -757,7 +805,7 @@
                                                             </DataGrid.Columns>
                                                         </DataGrid>
                                                     </TabItem>
-                                                    <TabItem Header="Y"
+                                                    <TabItem Header="Y" Style="{StaticResource customTabitem}"
                                                               Width="30"
                                                              Margin="-3,0,0,0">
                                                         <DataGrid ItemsSource="{Binding CurrentAxisWorkPoints, Mode=TwoWay}"
@@ -783,7 +831,7 @@
                                                             </DataGrid.Columns>
                                                         </DataGrid>
                                                     </TabItem>
-                                                    <TabItem Header="Z"
+                                                    <TabItem Header="Z" Style="{StaticResource customTabitem}"
                                                               Width="30"
                                                              Margin="-3,0,0,0">
                                                         <DataGrid ItemsSource="{Binding CurrentAxisWorkPoints, Mode=TwoWay}"
@@ -809,7 +857,7 @@
                                                             </DataGrid.Columns>
                                                         </DataGrid>
                                                     </TabItem>
-                                                    <TabItem Header="Lifter"
+                                                    <TabItem Header="Lifter" Style="{StaticResource customTabitem}"
                                                              Width="60"
                                                              Margin="-3,0,0,0">
                                                         <DataGrid ItemsSource="{Binding CurrentAxisWorkPoints, Mode=TwoWay}"
@@ -835,7 +883,7 @@
                                                             </DataGrid.Columns>
                                                         </DataGrid>
                                                     </TabItem>
-                                                    <TabItem Header="Tilt X"
+                                                    <TabItem Header="Tilt X" Style="{StaticResource customTabitem}"
                                                              Width="60"
                                                              Margin="-3,0,0,0">
                                                         <DataGrid ItemsSource="{Binding CurrentAxisWorkPoints, Mode=TwoWay}"
@@ -861,7 +909,7 @@
                                                             </DataGrid.Columns>
                                                         </DataGrid>
                                                     </TabItem>
-                                                    <TabItem Header="Tilt Y"
+                                                    <TabItem Header="Tilt Y" Style="{StaticResource customTabitem}"
                                                              Width="60"
                                                              Margin="-3,0,0,0">
                                                         <DataGrid ItemsSource="{Binding CurrentAxisWorkPoints, Mode=TwoWay}"
@@ -887,7 +935,7 @@
                                                             </DataGrid.Columns>
                                                         </DataGrid>
                                                     </TabItem>
-                                                    <TabItem Header="Stage Z"
+                                                    <TabItem Header="Stage Z" Style="{StaticResource customTabitem}"
                                                              Width="60"
                                                              Margin="-3,0,0,0">
                                                         <DataGrid ItemsSource="{Binding CurrentAxisWorkPoints, Mode=TwoWay}"
@@ -987,13 +1035,13 @@
                     </StackPanel>
                 </Grid>
             </TabItem>
-            <TabItem Header="Handler"
+            <TabItem Header="Handler" Style="{StaticResource customTabitem}"
                      Width="100">
                 <Grid>
                     <local:Camellia_Hander_UI x:Name="HandlerUI" />
                 </Grid>
             </TabItem>
-            <TabItem Header="ToolBox"
+            <TabItem Header="ToolBox" Style="{StaticResource customTabitem}"
                      Width="100">
                 <local:Camellia_ToolBox x:Name="ToolBoxUI"/>
             </TabItem>

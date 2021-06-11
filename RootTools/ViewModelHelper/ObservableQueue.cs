@@ -19,10 +19,10 @@ namespace RootTools
             {
                 queue.Enqueue(item);
             }
-            //if (CollectionChanged != null)
-            //    CollectionChanged(this,
-            //        new NotifyCollectionChangedEventArgs(
-            //            NotifyCollectionChangedAction.Add, item));
+            if (CollectionChanged != null)
+                CollectionChanged(this,
+                    new NotifyCollectionChangedEventArgs(
+                        NotifyCollectionChangedAction.Add, item));
         }
 
         public T Dequeue()
@@ -32,12 +32,29 @@ namespace RootTools
                 var item = queue.Dequeue();
                 return item;
             }
-
             //error남
             //if (CollectionChanged != null)
             //    CollectionChanged(this,
             //        new NotifyCollectionChangedEventArgs(
             //            NotifyCollectionChangedAction.Remove, item));
+        }
+
+        public T Peek()
+        {
+            lock(queue)
+            {
+                var item = queue.Peek();
+                return item;
+            }
+        }
+
+        public T[] ToArray()
+        {
+            lock(queue)
+            {
+                var array = queue.ToArray();
+                return array;
+            }
         }
 
         public IEnumerator<T> GetEnumerator()

@@ -421,7 +421,7 @@ namespace Root_CAMELLIA
         void CalcDockingUndocking()
         {
             List<EFEM_Process.Sequence> aSequence = new List<EFEM_Process.Sequence>();
-            while (m_process.m_qSequence.Count > 0) aSequence.Add(m_process.m_qSequence.Dequeue());
+            while (m_process.p_qSequence.Count > 0) aSequence.Add(m_process.p_qSequence.Dequeue());
             List<ILoadport> aDock = new List<ILoadport>();
             foreach (ILoadport loadport in m_aLoadport)
             {
@@ -430,7 +430,7 @@ namespace Root_CAMELLIA
             while (aSequence.Count > 0)
             {
                 EFEM_Process.Sequence sequence = aSequence[0];
-                m_process.m_qSequence.Enqueue(sequence);
+                m_process.p_qSequence.Enqueue(sequence);
                 aSequence.RemoveAt(0);
                 for (int n = aDock.Count - 1; n >= 0; n--)
                 //for (int n = m_process.m_qSequence.Count - 1; n >= 0; n--)
@@ -439,7 +439,7 @@ namespace Root_CAMELLIA
                     {
                         ModuleRunBase runUndocking = aDock[n].GetModuleRunUndocking().Clone();
                         EFEM_Process.Sequence sequenceUndock = new EFEM_Process.Sequence(runUndocking, sequence.m_infoWafer);
-                        m_process.m_qSequence.Enqueue(sequenceUndock);
+                        m_process.p_qSequence.Enqueue(sequenceUndock);
                         aDock.RemoveAt(n);
                     }
                 }
@@ -457,7 +457,7 @@ namespace Root_CAMELLIA
                     if (loadport.p_infoCarrier.p_eState == InfoCarrier.eState.Dock) return true;
                     ModuleRunBase runDocking = loadport.GetModuleRunDocking().Clone();
                     EFEM_Process.Sequence sequenceDock = new EFEM_Process.Sequence(runDocking, sequence.m_infoWafer);
-                    m_process.m_qSequence.Enqueue(sequenceDock);
+                    m_process.p_qSequence.Enqueue(sequenceDock);
                     return true;
                 }
             }
@@ -479,7 +479,7 @@ namespace Root_CAMELLIA
         {
             if (m_gem.p_cjRun == null)
                 return;
-            if (m_process.m_qSequence.Count > 0)
+            if (m_process.p_qSequence.Count > 0)
                 return;
             foreach (GemPJ pj in m_gem.p_cjRun.m_aPJ)
             {
@@ -541,7 +541,7 @@ namespace Root_CAMELLIA
                             m_process.p_sInfo = m_process.RunNextSequence();
                             //CheckUnload();
                             //if((m_nRnR > 1) && (m_process.m_qSequence.Count == 0))
-                            if ((EQ.p_nRnR > 1) && (m_process.m_qSequence.Count == 0))
+                            if ((EQ.p_nRnR > 1) && (m_process.p_qSequence.Count == 0))
                             {
                                 while (m_aLoadport[EQ.p_nRunLP].p_infoCarrier.p_eState != InfoCarrier.eState.Placed) Thread.Sleep(10);
                                 Thread.Sleep(1000);
@@ -614,11 +614,12 @@ namespace Root_CAMELLIA
 
         public void ThreadStop()
         {
+
             if (p_bThread)
             {
                 p_bThread = false;
                 EQ.p_bStop = true;
-                m_thread.Join();
+                //m_thread.Join(); // 여기서 멈춰 프로그램 종료되지 않는 현상 있음.
             }
             if (m_moduleList != null)
             {
@@ -626,6 +627,7 @@ namespace Root_CAMELLIA
                 foreach (ModuleBase module in m_moduleList.m_aModule.Keys)
                     module.ThreadStop();
             }
+           
         }
     }
 }

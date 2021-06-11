@@ -59,7 +59,35 @@ namespace Root_MarsLogView
 
         string GetVisionString(string sVision)
         {
-            string[] asMars = new string[14] { "", "", "", "'PRC'", "", "", "", "'Wafer'", "", "", "", "$", "0", "$" };
+            string[] asMars = new string[sVision.Length + 1];//vision으로 받을때는 시간 한개만 받는데 asmars에는 시간 날짜 따로 기입하여 +1
+            int index = sVision.IndexOf("LogType:");
+            string logtype = "";
+            if (index == -1) logtype = "PRC";
+            else sVision.Substring(index+8,3);//check 필요
+			string[] asVision = sVision.Split(',');
+			GetDateTime(asMars);
+
+            switch (logtype)
+            {
+                case "PRC": PRC_stringArrange(sVision,ref asMars);
+                    break;
+                case "LEH": 
+                    break;
+                case "FNC": 
+                    break;
+                case "XFR": 
+                    break;
+                case "CFG": CFG_stringArrange(asVision, ref asMars);
+					break;
+            }
+            string sLog = asMars[0];
+            for (int n = 1; n < 14; n++) sLog += '\t' + asMars[n];
+            return sLog;
+        }
+
+        void PRC_stringArrange(string sVision, ref string[] aasMars)
+		{
+            string[] asMars = new string[14] { "", "", "", "'PRC'", "", "", "", "'Wafer'", "1", "", "", "$", "0", "$" };
             string[] asVision = sVision.Split(',');
             GetDateTime(asMars);
             foreach (string sCmd in asVision)

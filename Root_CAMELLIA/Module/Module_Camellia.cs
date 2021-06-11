@@ -188,7 +188,9 @@ namespace Root_CAMELLIA.Module
         DIO_I m_homeExistWafer;
         DIO_I m_loadExistWafer;
         DIO_O m_vacuumOnOff;
-
+        DIO_I m_axisLifterHome1;
+        DIO_I m_axisLifterHome2;
+        DIO_I m_axisLifterHome3;
 
         private Camera_Basler m_CamVRS;
         public Camera_Basler p_CamVRS
@@ -252,6 +254,14 @@ namespace Root_CAMELLIA.Module
             m_axisLifter.AddPos(Enum.GetNames(typeof(eAxisPos)));
             m_axisLifter.AddIO(m_axisXReady);
             m_axisLifter.AddIO(m_axisYReady);
+
+            m_axisXY.p_axisX.AddIO(m_axisLifterHome1);
+            m_axisXY.p_axisX.AddIO(m_axisLifterHome2);
+            m_axisXY.p_axisX.AddIO(m_axisLifterHome3);
+
+            m_axisXY.p_axisY.AddIO(m_axisLifterHome1);
+            m_axisXY.p_axisY.AddIO(m_axisLifterHome2);
+            m_axisXY.p_axisY.AddIO(m_axisLifterHome3);
             //m_axisLifter.AddIO(m_vaccum);
             m_axisLifter.p_vaccumDIO_I = m_vacuum;
         }
@@ -285,7 +295,10 @@ namespace Root_CAMELLIA.Module
             p_sInfo = m_toolBox.GetCamera(ref m_CamVRS, this, "VRS");
             p_sInfo = m_toolBox.Get(ref m_lightSet, this);
             p_sInfo = m_toolBox.GetDIO(ref m_axisXReady, this, "Stage X Ready");
-            p_sInfo = m_toolBox.GetDIO(ref m_axisYReady, this, "Stage Y Ready");   
+            p_sInfo = m_toolBox.GetDIO(ref m_axisYReady, this, "Stage Y Ready");
+            p_sInfo = m_toolBox.GetDIO(ref m_axisLifterHome1, this, "Lifter 1 Home");
+            p_sInfo = m_toolBox.GetDIO(ref m_axisLifterHome2, this, "Lifter 2 Home");
+            p_sInfo = m_toolBox.GetDIO(ref m_axisLifterHome3, this, "Lifter 3 Home");
             p_sInfo = m_toolBox.GetDIO(ref m_vacuum, this, "Vaccum On");
             p_sInfo = m_toolBox.GetDIO(ref m_vacuumOnOff, this, "Vaccum OnOff");
             p_sInfo = m_toolBox.GetDIO(ref m_homeExistWafer, this, "Home Wafer Exist");
@@ -335,92 +348,80 @@ namespace Root_CAMELLIA.Module
             AddModuleRunList(new Run_PMSensorCameraTilt (this), true, "PM Sensor_Camera Tilt");
         }
 
-
-        bool m_isHomeRun = false;
-
         public bool p_isClearInfoWafer { get; set; } = false;
         public override string StateHome()
         {
             p_isClearInfoWafer = true;
-            m_isHomeRun = true;
-            try
+            p_sInfo = "OK";
+            if (EQ.p_bSimulate)
+                return "OK";
+
+            m_tiltAxisXY.p_axisX.p_eState = Axis.eState.Ready;
+            m_tiltAxisXY.p_axisY.p_eState = Axis.eState.Ready;
+            m_stageAxisZ.p_eState = Axis.eState.Ready;
+
+            Thread.Sleep(200);
+            if (m_listAxis.Count == 0) return "OK";
+            if (p_eState == eState.Run) return "Invalid State : Run";
+            if (EQ.IsStop()) return "Home Stop";
+
+            foreach (Axis axis in m_listAxis)
             {
-                p_sInfo = "OK";
-                if (EQ.p_bSimulate)
-                    return "OK";
+                if (axis != null) axis.ServoOn(true);
+            }
+            Thread.Sleep(200);
+            if (EQ.IsStop()) return "Home Stop";
 
-                m_tiltAxisXY.p_axisX.p_eState = Axis.eState.Ready;
-                m_tiltAxisXY.p_axisY.p_eState = Axis.eState.Ready;
-                m_stageAxisZ.p_eState = Axis.eState.Ready;
-
-                Thread.Sleep(200);
-                if (m_listAxis.Count == 0) return "OK";
-                if (p_eState == eState.Run) return "Invalid State : Run";
-                if (EQ.IsStop()) return "Home Stop";
-
-                foreach (Axis axis in m_listAxis)
-                {
-                    if (axis != null) axis.ServoOn(true);
-                }
-                Thread.Sleep(200);
-                if (EQ.IsStop()) return "Home Stop";
-
-                for (int i = 0; i < p_axisLifter.m_bDIO_I.Count; i++)
-                {
-                    p_axisLifter.m_bDIO_I[i] = false;
-                }
-                if (!LifterMoveVacuumCheck())
-                {
-                    p_eState = eState.Error;
-                    p_sInfo = "Vacuum is not turn off";
-                    MessageBox.Show(p_sInfo);
-                    return p_sInfo;
-                }
-                p_axisLifter.StartHome();
-                if (p_axisLifter.WaitReady() != "OK")
-                {
-                    p_eState = eState.Error;
-                    p_sInfo = "Lifter Home Error";
-                    MessageBox.Show(p_sInfo);
-                    return p_sInfo;
-                }
-
-                for (int i = 0; i < p_axisLifter.m_bDIO_I.Count; i++)
-                {
-                    p_axisLifter.m_bDIO_I[i] = true;
-                }
-
-
-                p_axisXY.p_axisX.StartHome();
-                p_axisXY.p_axisY.StartHome();
-                p_axisZ.StartHome();
-
-                if (p_axisXY.p_axisX.WaitReady() != "OK")
-                {
-                    p_eState = eState.Error;
-                    return "AxisX Home Error";
-                }
-
-                if (p_axisXY.p_axisY.WaitReady() != "OK")
-                {
-                    p_eState = eState.Error;
-                    return "AxisY Home Error";
-                }
-
-                if (p_axisZ.WaitReady() != "OK")
-                {
-                    p_eState = eState.Error;
-                    return "AxisZ Home Error";
-                }
-                p_eState = (p_sInfo == "OK") ? eState.Ready : eState.Error;
-
+            for (int i = 0; i < p_axisLifter.m_bDIO_I.Count; i++)
+            {
+                p_axisLifter.m_bDIO_I[i] = false;
+            }
+            if (!LifterMoveVacuumCheck())
+            {
+                p_eState = eState.Error;
+                p_sInfo = "Vacuum is not turn off";
+                MessageBox.Show(p_sInfo);
                 return p_sInfo;
             }
-            finally
+            p_axisLifter.StartHome();
+            if (p_axisLifter.WaitReady() != "OK")
             {
-                m_isHomeRun = false;
-            }  
-            
+                p_eState = eState.Error;
+                p_sInfo = "Lifter Home Error";
+                MessageBox.Show(p_sInfo);
+                return p_sInfo;
+            }
+
+            for (int i = 0; i < p_axisLifter.m_bDIO_I.Count; i++)
+            {
+                p_axisLifter.m_bDIO_I[i] = true;
+            }
+
+
+            p_axisXY.p_axisX.StartHome();
+            p_axisXY.p_axisY.StartHome();
+            p_axisZ.StartHome();
+
+            if (p_axisXY.p_axisX.WaitReady() != "OK")
+            {
+                p_eState = eState.Error;
+                return "AxisX Home Error";
+            }
+
+            if (p_axisXY.p_axisY.WaitReady() != "OK")
+            {
+                p_eState = eState.Error;
+                return "AxisY Home Error";
+            }
+
+            if (p_axisZ.WaitReady() != "OK")
+            {
+                p_eState = eState.Error;
+                return "AxisZ Home Error";
+            }
+            p_eState = (p_sInfo == "OK") ? eState.Ready : eState.Error;
+
+            return p_sInfo;
         }
 
 
@@ -556,12 +557,12 @@ namespace Root_CAMELLIA.Module
             {
                 if (!m_vacuum.p_bIn)
                 {
-                    if (p_axisLifter.IsInPos(ePosition.Position_0))
+                    if (p_axisLifter.IsInPos(eAxisPos.Ready))
                     {
                         return "OK";
                     }
 
-                    if (Run(p_axisLifter.StartMove(ePosition.Position_0)))
+                    if (Run(p_axisLifter.StartMove(eAxisPos.Ready)))
                     {
                         return p_sInfo;
                     }
@@ -670,6 +671,7 @@ namespace Root_CAMELLIA.Module
 
         public string BeforeGet(int nID)
         {
+            //App.m_SSLoggerNet.WriteXFRLog(nID, SSLNet.XFR_EVENTID.GET, SSLNet.STATUS.START,);
             //m_CamVRS.FunctionConnect();
             string info = MoveReadyPos();
             if (info != "OK")
@@ -706,7 +708,7 @@ namespace Root_CAMELLIA.Module
         public string AfterGet(int nID)
         {
             // Make Directory
-           
+            //App.m_SSLoggerNet.WriteXFRLog(nID, SSLNet.XFR_EVENTID.GET, SSLNet.STATUS.END,);
             return "OK";
         }
 

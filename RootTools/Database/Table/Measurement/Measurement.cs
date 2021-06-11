@@ -7,6 +7,7 @@ using System.Windows;
 
 namespace RootTools.Database
 {
+    // EBR
     [Serializable]
     public class Measurement : Data
     {
@@ -49,7 +50,7 @@ namespace RootTools.Database
 
         }
 
-        public Measurement(string strInspectionID, string strSide, string strType, string strMeasureName, float fData, float fDefectW, float fDefectH, float fAngle, float fDefectAbsLeft, float fDefectAbsTop, int nChipIdxX, int nChipIdxY)
+        public Measurement(string strInspectionID, string strSide, string strType, string strMeasureName, float fData, float fDefectW, float fDefectH, float fAngle, float fDefectAbsLeft, float fDefectAbsTop, int nChipIdxX, int nChipIdxY, float fRelX = 0, float fRelY = 0)
         {
             m_strInspectionID = strInspectionID;
             m_strSide = strSide;
@@ -66,6 +67,9 @@ namespace RootTools.Database
 
             m_nChipIndexX = nChipIdxX;
             m_nChipIndexY = nChipIdxY;
+
+            m_fRelX = fRelX;
+            m_fRelY = fRelY;
 
 			m_rtDefectBox = new Rect(fDefectAbsLeft, fDefectAbsTop, fDefectW, fDefectH);
         }

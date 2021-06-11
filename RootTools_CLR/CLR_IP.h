@@ -103,5 +103,10 @@ namespace RootTools_CLR
 		void Cpp_CreatInterpolationData(int i,double dXScale, double dXShift, int nWidth);
 		void Cpp_ProcessInterpolation(int i,int thid, BYTE* pSrc, int nSrcHeight, int nSrcWidth, int nFovWidth, LPBYTE* ppTarget, int nXOffset, int nYOffset, int nDir, int nSy, int nEy);
 		void Cpp_ProcessInterpolation(int i,int  thid, BYTE* pSrcImg, int nSrcHeight, int nSrcWidth, int nFovWidth, LPBYTE pTarget);
+
+		static int Cpp_FindEdge(array<byte>^ pSrcImg, int  nMemW, int  nMemH, int nROIL, int nROIT, int nROIR, int nROIB, int nDir, int nSearchLevel);
+		static int Cpp_FindEdge(byte* pSrcImg, int  nMemW, int  nMemH, int nROIL, int nROIT, int nROIR, int nROIB, int nDir, int nSearchLevel);
+		static int Cpp_FindEdge16bit(array<byte>^ pSrcImg, int  nMemW, int  nMemH, int nROIL, int nROIT, int nROIR, int nROIB, int nDir, int nSearchLevel);
+		static int Cpp_FindEdge16bit(byte* pSrcImg, int  nMemW, int  nMemH, int nROIL, int nROIT, int nROIR, int nROIB, int nDir, int nSearchLevel);
 	};
 }

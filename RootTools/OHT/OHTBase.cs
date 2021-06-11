@@ -17,6 +17,8 @@ namespace RootTools.OHT
             get { return _sInfo; }
             set
             {
+                if (value == null)
+                    return;
                 if (value == _sInfo) return;
                 _sInfo = value;
                 //if (value != "OK")  //KHD 201222 del /test

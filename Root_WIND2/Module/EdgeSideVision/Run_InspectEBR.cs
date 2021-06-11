@@ -1,9 +1,13 @@
 ﻿using RootTools;
+using RootTools.Database;
 using RootTools.Module;
 using RootTools.Trees;
 using RootTools_Vision;
+using RootTools_Vision.Utility;
 using System;
 using System.Collections.Generic;
+using System.Data;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -15,12 +19,42 @@ namespace Root_WIND2.Module
 		EdgeSideVision module;
 
 		string recipeName = string.Empty;
+
 		#region [Getter/Setter]
 
 		public string RecipeName
 		{
 			get => recipeName;
 			set => recipeName = value;
+		}
+		#endregion
+
+		#region [Klarf]
+		private static KlarfData_Lot klarfData = new KlarfData_Lot();
+
+		private static void LotStart(string klarfPath, RecipeBase recipe, InfoWafer infoWafer, GrabModeBase grabMode)
+		{
+			if (klarfData == null) klarfData = new KlarfData_Lot();
+
+			if (Directory.Exists(klarfPath)) Directory.CreateDirectory(klarfPath);
+
+
+			klarfData.LotStart(klarfPath, infoWafer, recipe.WaferMap, grabMode);
+		}
+
+		private void CreateKlarf(RecipeBase recipe, InfoWafer infoWafer, List<Measurement> defectList, bool useTDIReview = false, bool useVrsReview = false)
+		{
+			//klarfData.SetResolution((float)camInfo.RealResX, (float)camInfo.RealResY);
+			// Product 정보 셋팅
+
+			klarfData.WaferStart(recipe.WaferMap, infoWafer);
+			klarfData.AddSlot(recipe.WaferMap, defectList, recipe.GetItem<OriginRecipe>());
+			klarfData.SaveKlarf();
+		}
+
+		private void LotEnd(InfoWafer infoWafer)
+		{
+			klarfData.CreateLotEnd();
 		}
 		#endregion
 
@@ -44,30 +78,77 @@ namespace Root_WIND2.Module
 
 		public override string Run()
 		{
-			try
+			Settings settings = new Settings();
+			SettingItem_SetupEBR settings_ebr = settings.GetItem<SettingItem_SetupEBR>();
+
+			InfoWafer infoWafer = module.GetInfoWafer(0);
+			RecipeEBR recipe = GlobalObjects.Instance.Get<RecipeEBR>();
+			GrabModeEdge grabMode = module.GetGrabMode(recipe.CameraInfoIndex);
+
+			// Check Lot Start
+			//if (infoWafer != null && (
+			//    infoWafer._eWaferOrder == InfoWafer.eWaferOrder.FirstLastWafer ||
+			//    infoWafer._eWaferOrder == InfoWafer.eWaferOrder.FirstWafer))
 			{
-				if (EQ.IsStop())
-					return "OK";
+				//LotStart(settings_edgeside.KlarfSavePath, recipe, infoWafer, grabMode);
+			}
 
-				InspectionManagerEBR inspectionEBR = GlobalObjects.Instance.Get<InspectionManagerEBR>();
+			if (EQ.IsStop())
+				return "OK";
 
-				if (inspectionEBR.Recipe.Read(recipeName) == false)
+			RootTools_Vision.WorkManager3.WorkManager workManager = GlobalObjects.Instance.GetNamed<RootTools_Vision.WorkManager3.WorkManager>("ebrInspection");
+			if (workManager == null)
+			{
+				throw new ArgumentException("WorkManager가 초기화되지 않았습니다(null)");
+			}
+			workManager.Stop();
+
+			if (EQ.IsStop() == false)
+			{
+				if (workManager.OpenRecipe(recipeName) == false)
 					return "Recipe Open Fail";
 
-				inspectionEBR.Start();
-				
-				while (inspectionEBR.CheckAllWorkDone() == false)
-				{
-					if (EQ.IsStop())
-						return "OK";
+				workManager.Start();
+			}
+			else
+			{
+				workManager.Stop();
+			}
 
-					Task.Delay(1000);
+			try
+			{
+				if (workManager.WaitWorkDone(ref EQ.m_EQ.StopToken(), 60 * 3 /*3 minutes*/) == false)
+				{
+					// Time out!!
+					return "OK";
+				}
+				else
+				{
+					#region [Klarf]
+					if (settings_ebr.UseKlarf)
+					{
+						DataTable table = DatabaseManager.Instance.SelectCurrentInspectionDefect("measurement");
+						List<Measurement> defects = Tools.DataTableToMeasurementList(table);
+
+						CreateKlarf(recipe, infoWafer, defects);
+						klarfData.SaveTiffImageFromFiles(Path.Combine(settings_ebr.MeasureImagePath, DatabaseManager.Instance.GetInspectionID()));
+					}
+					#endregion
+				}
+
+				// LotEnd Check
+				//if (infoWafer != null && (
+				//    infoWafer._eWaferOrder == InfoWafer.eWaferOrder.FirstLastWafer ||
+				//    infoWafer._eWaferOrder == InfoWafer.eWaferOrder.LastWafer))
+				{
+					//LotEnd(infoWafer);
 				}
 
 				return "OK";
 			}
 			finally
 			{
+
 			}
 		}
 	}

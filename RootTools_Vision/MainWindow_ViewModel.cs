@@ -11,8 +11,19 @@ using System.Windows.Input;
 
 namespace RootTools_Vision
 {
-    public class MainWindow_ViewModel
+    public class MainWindow_ViewModel : ObservableObject
     {
+
+        private DataListView_ViewModel dataListViewVM;
+        public DataListView_ViewModel DataListViewVM
+        {
+            get => this.dataListViewVM;
+            set
+            {
+                SetProperty(ref this.dataListViewVM, value);
+            }
+        }
+
 
         #region [ViewModels]
         CloneImageViewer_ViewModel imageViewerVM = new CloneImageViewer_ViewModel();
@@ -33,6 +44,12 @@ namespace RootTools_Vision
 
         public MainWindow_ViewModel()
         {
+            CameraInfo camInfo = new CameraInfo();
+            this.DataListViewVM = new DataListView_ViewModel();
+            this.dataListViewVM.Init(camInfo);
+
+
+            ///
             Settings setting = new Settings();
             SettingItem_Database frontSettings = setting.GetItem<SettingItem_Database>();
 

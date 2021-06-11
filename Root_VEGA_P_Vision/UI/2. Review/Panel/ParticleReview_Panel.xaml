@@ -1,0 +1,208 @@
+﻿<UserControl x:Class="Root_VEGA_P_Vision.ParticleReview_Panel"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Root_VEGA_P_Vision"
+             mc:Ignorable="d" 
+             xmlns:Tools="clr-namespace:RootTools;assembly=RootTools"
+             d:DesignHeight="866" d:DesignWidth="1912" Background="{StaticResource PanelBackGround}">
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="1*"/>
+            <ColumnDefinition Width="2*"/>
+        </Grid.ColumnDefinitions>
+        <GroupBox Grid.Column="0" Header="Outer Pod Image">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+                <GroupBox Grid.Row="0" Header="Dome">
+                    <Tools:RootViewer DataContext="{Binding DomeViewer}"/>
+                </GroupBox>
+                <GroupBox Grid.Row="1" Header="Door">
+                    <Tools:RootViewer DataContext="{Binding DoorViewer}"/>
+                </GroupBox>
+            </Grid>
+        </GroupBox>
+        <Grid Grid.Column="1" Background="White">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+                <GroupBox Grid.Column="0" Header="Outer Pod">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="0.3*"/>
+                            <RowDefinition Height="0.7*"/>
+                        </Grid.RowDefinitions>
+                        <Grid Grid.Row="0">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                </Grid.ColumnDefinitions>
+                                <Grid Grid.Column="0">
+                                    <Image Source="../../../Resources/dome.jpg" VerticalAlignment="Center" HorizontalAlignment="Center" RenderTransformOrigin="0.5,0.5">
+                                        <Image.RenderTransform>
+                                            <ScaleTransform ScaleY="-1"/>
+                                        </Image.RenderTransform>
+                                    </Image>
+                                
+                                </Grid>
+                                <Grid Grid.Column="1">
+                                    <Image Source="../../../Resources/door.jpg" VerticalAlignment="Center" HorizontalAlignment="Center" RenderTransformOrigin="0.5,0.5">
+                                        <Image.RenderTransform>
+                                            <ScaleTransform ScaleX="-1" ScaleY="-1"/>
+                                        </Image.RenderTransform>
+                                    </Image>
+                                </Grid>
+                            </Grid>
+                        </Grid>
+                        <Grid Grid.Row="1" >
+                            <Border BorderThickness="0">
+                                <DataGrid IsReadOnly="True" HeadersVisibility="Column" Style="{StaticResource DatagridStyle}" RowStyle="{StaticResource DataGridRowStyle}">
+                                    <DataGrid.Columns>
+                                        <DataGridTextColumn Header="Nozzle No." Binding="{Binding Path=a}" HeaderStyle="{StaticResource DataGridHeaderStyle}" Width="1*"/>
+                                        <DataGridTextColumn Header="Count" Binding="{Binding Path=b}" HeaderStyle="{StaticResource DataGridHeaderStyle}" Width="1*"/>
+                                        <DataGridTextColumn Header="Cycle" Binding="{Binding Path=c}" HeaderStyle="{StaticResource DataGridHeaderStyle}" Width="1*"/>
+                                    </DataGrid.Columns>
+                                    <local:Dummy a="01" b="0" c="8"/>
+                                    <local:Dummy a="02" b="0" c="8"/>
+                                    <local:Dummy a="03" b="0" c="8"/>
+                                    <local:Dummy a="04" b="0" c="8"/>
+                                    <local:Dummy a="05" b="0" c="8"/>
+                                    <local:Dummy a="06" b="0" c="8"/>
+                                    <local:Dummy a="07" b="0" c="8"/>
+                                    <local:Dummy a="08" b="0" c="8"/>
+                                    <local:Dummy a="09" b="0" c="8"/>
+                                    <local:Dummy a="10" b="0" c="8"/>
+                                    <local:Dummy a="11" b="0" c="8"/>
+                                    <local:Dummy a="12" b="0" c="8"/>
+                                    <local:Dummy a="13" b="0" c="8"/>
+                                    <local:Dummy a="14" b="0" c="8"/>
+                                    <local:Dummy a="15" b="0" c="8"/>
+                                    <local:Dummy a="16" b="0" c="8"/>
+                                    <local:Dummy a="17" b="0" c="8"/>
+                                </DataGrid>
+
+                            </Border>
+                        </Grid>
+                    </Grid>
+                </GroupBox>
+                <GroupBox Grid.Column="1" Header="Inner Pod Cover">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="0.3*"/>
+                            <RowDefinition Height="0.7*"/>
+                        </Grid.RowDefinitions>
+                        <Grid Grid.Row="0">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                </Grid.ColumnDefinitions>
+                                <Grid Grid.Column="0">
+                                    <Image Source="../../../Resources/EIPBasePlateTop.jpg" VerticalAlignment="Center" HorizontalAlignment="Center" RenderTransformOrigin="0.5,0.5">
+                                        <Image.RenderTransform>
+                                            <ScaleTransform ScaleX="-1" ScaleY="-1"/>
+                                        </Image.RenderTransform>
+                                    </Image>
+                                </Grid>
+                                <Grid Grid.Column="1">
+                                    <Image Source="../../../Resources/EIPBasePlateBottom.jpg" VerticalAlignment="Center" HorizontalAlignment="Center" RenderTransformOrigin="0.5,0.5">
+                                        <Image.RenderTransform>
+                                            <ScaleTransform ScaleX="-1" ScaleY="-1"/>
+                                        </Image.RenderTransform>
+                                    </Image>
+                                </Grid>
+                            </Grid>
+                        </Grid>
+                        <Grid Grid.Row="1" >
+                            <DataGrid IsReadOnly="True" HeadersVisibility="Column" Style="{StaticResource DatagridStyle}" RowStyle="{StaticResource DataGridRowStyle}">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="Nozzle No." Binding="{Binding Path=a}" HeaderStyle="{StaticResource DataGridHeaderStyle}" Width="1*"/>
+                                    <DataGridTextColumn Header="Count" Binding="{Binding Path=b}" HeaderStyle="{StaticResource DataGridHeaderStyle}" Width="1*"/>
+                                    <DataGridTextColumn Header="Cycle" Binding="{Binding Path=c}" HeaderStyle="{StaticResource DataGridHeaderStyle}" Width="1*"/>
+                                </DataGrid.Columns>
+                                <local:Dummy a="01" b="0" c="8"/>
+                                <local:Dummy a="02" b="0" c="8"/>
+                                <local:Dummy a="03" b="0" c="8"/>
+                                <local:Dummy a="04" b="0" c="8"/>
+                                <local:Dummy a="05" b="0" c="8"/>
+                                <local:Dummy a="06" b="0" c="8"/>
+                                <local:Dummy a="07" b="0" c="8"/>
+                                <local:Dummy a="08" b="0" c="8"/>
+                                <local:Dummy a="09" b="0" c="8"/>
+                                <local:Dummy a="10" b="0" c="8"/>
+                                <local:Dummy a="11" b="0" c="8"/>
+                                <local:Dummy a="12" b="0" c="8"/>
+                                <local:Dummy a="13" b="0" c="8"/>
+                                <local:Dummy a="14" b="0" c="8"/>
+                                <local:Dummy a="15" b="0" c="8"/>
+                                <local:Dummy a="16" b="0" c="8"/>
+                                <local:Dummy a="17" b="0" c="8"/>
+                            </DataGrid>
+                        </Grid>
+                    </Grid>
+                </GroupBox>
+                <GroupBox Grid.Column="2" Header="Inner Base Plate">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="0.3*"/>
+                            <RowDefinition Height="0.7*"/>
+                        </Grid.RowDefinitions>
+                        <Grid Grid.Row="0">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                </Grid.ColumnDefinitions>
+                                <Grid Grid.Column="0">
+                                    <Image Source="../../../Resources/EIPCoverTop.jpg" VerticalAlignment="Center" HorizontalAlignment="Center" RenderTransformOrigin="0.5,0.5">
+                                        <Image.RenderTransform>
+                                            <ScaleTransform ScaleX="-1" ScaleY="-1"/>
+                                        </Image.RenderTransform>
+                                    </Image>
+                                </Grid>
+                                <Grid Grid.Column="1">
+                                    <Image Source="../../../Resources/EIPCoverBottom.jpg" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                </Grid>
+                            </Grid>
+                        </Grid>
+                        <Grid Grid.Row="1" >
+                            <DataGrid IsReadOnly="True" HeadersVisibility="Column" Style="{StaticResource DatagridStyle}" RowStyle="{StaticResource DataGridRowStyle}">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="Nozzle No." Binding="{Binding Path=a}" HeaderStyle="{StaticResource DataGridHeaderStyle}" Width="1*"/>
+                                    <DataGridTextColumn Header="Count" Binding="{Binding Path=b}" HeaderStyle="{StaticResource DataGridHeaderStyle}" Width="1*"/>
+                                    <DataGridTextColumn Header="Cycle" Binding="{Binding Path=c}" HeaderStyle="{StaticResource DataGridHeaderStyle}" Width="1*"/>
+                                </DataGrid.Columns>
+                                <local:Dummy a="01" b="0" c="8"/>
+                                <local:Dummy a="02" b="0" c="8"/>
+                                <local:Dummy a="03" b="0" c="8"/>
+                                <local:Dummy a="04" b="0" c="8"/>
+                                <local:Dummy a="05" b="0" c="8"/>
+                                <local:Dummy a="06" b="0" c="8"/>
+                                <local:Dummy a="07" b="0" c="8"/>
+                                <local:Dummy a="08" b="0" c="8"/>
+                                <local:Dummy a="09" b="0" c="8"/>
+                                <local:Dummy a="10" b="0" c="8"/>
+                                <local:Dummy a="11" b="0" c="8"/>
+                                <local:Dummy a="12" b="0" c="8"/>
+                                <local:Dummy a="13" b="0" c="8"/>
+                                <local:Dummy a="14" b="0" c="8"/>
+                                <local:Dummy a="15" b="0" c="8"/>
+                                <local:Dummy a="16" b="0" c="8"/>
+                            </DataGrid>
+                        </Grid>
+                    </Grid>
+                </GroupBox>
+
+            </Grid>
+        </Grid>
+    </Grid>
+</UserControl>

@@ -30,35 +30,6 @@
             <Setter Property="HorizontalAlignment"
                     Value="Left" />
         </Style>
-        <Style TargetType="{x:Type ToggleButton}" x:Key="IO_indicator">
-            <Setter Property="BorderThickness" Value="0"></Setter>
-            <Setter Property="Background" Value="{PriorityBinding}"></Setter>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="ToggleButton">
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="Auto" />
-                            </Grid.ColumnDefinitions>
-                            <Grid Background="Transparent" Name="grd" Grid.Column="1"
-                                    Margin="{TemplateBinding Padding}" VerticalAlignment="Center"
-                                  Height="20"
-                                    Width="20">
-                                <Ellipse x:Name="ellipse" Stroke="{TemplateBinding BorderBrush}"
-                                        StrokeThickness="2" Stretch="Uniform"
-                                        Fill="{TemplateBinding  Background}"></Ellipse>
-                            </Grid>
-                        </Grid>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsChecked" Value="False">
-                                <Setter TargetName="ellipse" Property="Fill" Value="#FFBBBBBB" />
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
     </Window.Resources>
 
     <Grid>
@@ -471,7 +442,7 @@
                                             <RowDefinition Height="8*" />
 
                                         </Grid.RowDefinitions>
-                                        <!--<GroupBox Header="Product Info"
+                                        <GroupBox Header="Product Info"
                                                   Grid.Column="0"
                                                   Grid.Row="1" DataContext="">
                                             <UniformGrid Margin="5,2">
@@ -485,9 +456,9 @@
                                                 <TextBlock Text="EUV"
                                                            HorizontalAlignment="Left" />
                                             </UniformGrid>
-                                        </GroupBox>-->
+                                        </GroupBox>
                                         <GroupBox Header="Reticle Location"
-                                                  Grid.Column="0"
+                                                  Grid.Column="1"
                                                   Grid.Row="1">
                                             <Grid>
                                                 <Grid.ColumnDefinitions>
@@ -606,7 +577,7 @@
                                         </GroupBox>
                                         <GroupBox Header="Illumination Info"
                                                   Grid.Column="0"
-                                                  Grid.Row="5">
+                                                  Grid.Row="2">
                                             <UniformGrid Margin="5,2"
                                                          Columns="2">
                                                 <TextBlock Text="Red"
@@ -625,7 +596,7 @@
                                         </GroupBox>
                                         <GroupBox Header="Coordinate Info"
                                                   Grid.Column="0"
-                                                  Grid.Row="3" Grid.RowSpan="2">
+                                                  Grid.Row="3">
                                             <Grid Margin="5,2">
                                                 <Grid.RowDefinitions>
                                                     <RowDefinition />
@@ -685,8 +656,8 @@
 
                                         </GroupBox>
                                         <GroupBox Header="FFU"
-                                                  Grid.Row="1"
-                                                  Grid.Column="1">
+                                                  Grid.Row="4"
+                                                  Grid.Column="0">
                                             <Grid Margin="5,2">
                                                 <Grid.ColumnDefinitions>
                                                     <ColumnDefinition/>
@@ -701,8 +672,8 @@
                                             </Grid>
                                         </GroupBox>
                                         <GroupBox Header="FDC"
-                                                  Grid.Row="2"
-                                                  Grid.Column="1">
+                                                  Grid.Row="5"
+                                                  Grid.Column="0">
                                             <Grid Margin="5,2">
                                                 <Grid.ColumnDefinitions>
                                                     <ColumnDefinition Width="2*"/>
@@ -712,8 +683,8 @@
                                                     <ColumnDefinition Width="0.65*"/>
                                                     <ColumnDefinition Width="1*"/>
                                                 </Grid.ColumnDefinitions>
-                                                <TextBlock Grid.Column="0" Text="EFEM CDA"
-                                                           HorizontalAlignment="Center"/>
+                                                <TextBlock Grid.Column="0" Text="CDA 1"
+                                                           HorizontalAlignment="Left"/>
                                                 <TextBlock Grid.Column="1"
                                                            HorizontalAlignment="Left"
                                                            x:Name="FDC_CDA1"
@@ -730,7 +701,7 @@
                                                            HorizontalAlignment="Left"/>
                                             </Grid>
                                         </GroupBox>
-                                        <Grid Grid.Column="0"
+                                        <Grid Grid.Column="1"
                                               Grid.Row="2">
                                             <GroupBox  Header="Inspection Info"
                                                        Grid.Row="0">

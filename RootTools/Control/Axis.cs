@@ -165,6 +165,8 @@ namespace RootTools.Control
         {
             SWLimit_Minus,
             SWLimit_Plus,
+            SWBoardLimit_Minus,
+            SWBoardLimit_Plus,
             Position_0,
             Position_1,
             Position_2,
@@ -178,7 +180,7 @@ namespace RootTools.Control
             }
             RunTree(Tree.eMode.RegRead);
         }
-        public void RunTreePos(Tree tree, string sUnit)
+        public virtual void RunTreePos(Tree tree, string sUnit)
         {
             RunTreePosLimit(tree.GetTree("SW Limit", false));
             RunTreePosition(tree.GetTree("Position"), sUnit);
@@ -189,15 +191,21 @@ namespace RootTools.Control
             string sDesc = "Axis Position (" + sUnit + ")";
             m_aPos[p_asPos[0]] = tree.Set(m_aPos[p_asPos[0]], 0.0, p_asPos[0], sDesc, m_bSWLimit[0]);
             m_aPos[p_asPos[1]] = tree.Set(m_aPos[p_asPos[1]], 0.0, p_asPos[1], sDesc, m_bSWLimit[1]);
-            for (int n = 2; n < p_asPos.Count; n++)
+
+            m_aPos[p_asPos[2]] = tree.Set(m_aPos[p_asPos[2]], 0.0, p_asPos[2], sDesc, m_bSWBoardLimit);
+            m_aPos[p_asPos[3]] = tree.Set(m_aPos[p_asPos[3]], 0.0, p_asPos[3], sDesc, m_bSWBoardLimit);
+
+            for (int n = 4; n < p_asPos.Count; n++)
             {
                 m_aPos[p_asPos[n]] = tree.Set(m_aPos[p_asPos[n]], 0.0, p_asPos[n], sDesc);
             }
+
         }
         #endregion
 
         #region SW Limit
         bool[] m_bSWLimit = new bool[2] { false, false };
+        protected bool m_bSWBoardLimit = false;
 
         protected string CheckSWLimit(ref double fPosDst)
         {
@@ -231,20 +239,44 @@ namespace RootTools.Control
             return "OK";
         }
 
-        void ThreadCheck_SWLimit()
+        bool bLimitPlusCheck = false;
+        bool bLimitMinusCheck = false;
+        public void ThreadCheck_SWLimit(bool isPlus)
         {
+            bool isError = false;
             double fPos = p_posActual;
-            bool bSWLimit0 = m_bSWLimit[0] && (fPos > m_aPos[p_asPos[0]]);
-            if (bSWLimit0) p_log.Info(p_id + ": Servo SW limit(-) !!");
+            bool bSWLimit0 = m_bSWLimit[0] && (fPos < m_aPos[p_asPos[0]]);
+            if (bSWLimit0 && !isPlus && !bLimitMinusCheck)
+            {
+                isError = true;
+                p_log.Info(p_id + ": Servo SW limit(-) !!");
+                bLimitMinusCheck = true;
+            }
             bool bSWLimit1 = m_bSWLimit[1] && (fPos > m_aPos[p_asPos[1]]);
-            if (bSWLimit1) p_log.Info(p_id + ": Servo SW limit(+) !!");
-            if (bSWLimit0 || bSWLimit1) StopAxis();
+            if (bSWLimit1 && isPlus && !bLimitPlusCheck)
+            {
+                isError = true;
+                p_log.Info(p_id + ": Servo SW limit(+) !!");
+                bLimitPlusCheck = true;
+            }
+
+            if (fPos > m_aPos[p_asPos[0]])
+                bLimitMinusCheck = false;
+
+            if (fPos < m_aPos[p_asPos[1]])
+                bLimitPlusCheck = false;
+
+            if (isError)
+            {
+                StopAxis();
+            }
         }
 
         void RunTreePosLimit(Tree tree)
         {
             m_bSWLimit[0] = tree.Set(m_bSWLimit[0], m_bSWLimit[0], "Minus", "Use SW Minus Limit");
             m_bSWLimit[1] = tree.Set(m_bSWLimit[1], m_bSWLimit[1], "Plus", "Use SW Plus Limit");
+            m_bSWBoardLimit = tree.Set(m_bSWBoardLimit, m_bSWBoardLimit, "Board SW Limit", "Use Board SW Limit");
         }
         #endregion
 
@@ -372,7 +404,7 @@ namespace RootTools.Control
             if (EQ.IsStop()) return p_id + " EQ Stop";
             if (EQ.p_bSimulate) return "OK";
             //if (p_eState != eState.Ready) return p_id + " Axis State not Ready : " + p_eState.ToString();
-            return CheckSWLimit(fScale * m_speedNow.m_v);
+            return CheckSWLimit (fScale * m_speedNow.m_v);
         }
 
         public virtual void StopAxis(bool bSlowStop = true) { }
@@ -390,7 +422,7 @@ namespace RootTools.Control
             return StartMove(fPos, sSpeed);
         }
 
-        double m_posDst = 0;
+        public double m_posDst = 0;
         int m_msMoveTime = 0;
         public virtual string StartMove(double fPos, string sSpeed = null)
         {
@@ -645,6 +677,11 @@ namespace RootTools.Control
                 m_dPos = dPos;
                 m_bCmd = bCmd;
                 m_dUpTime = dUpTime; 
+            }
+
+            public int GetLine()
+            {
+                return (int)Math.Round((m_aPos[1] - m_aPos[0]) / m_dPos);
             }
 
             public void RunTree(Tree tree, string sUnit, bool bVisible = true)

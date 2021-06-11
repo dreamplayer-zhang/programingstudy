@@ -23,6 +23,9 @@ namespace Root_CAMELLIA
         public const string RegNanoViewExceptNIR = "ExceptNIR";
         public const string RegNanoViewUseThickness = "Use Thickness"; 
         public const string RegLightSourcePath = "LightSourcePath";
+        public const string Dir_SequenceInitialPath = @"C:\Recipe\";
+        public const string Dir_InitialPath = @"C:\Recipe\CAMELLIA2";
+        public const string Dir_InitialLayerPath = @"C:\Recipe\LAYER\";
         public const string Dir_Preset = @"C:\Camellia\Preset\";
         public const string Dir_StageMap = @"C:\Camellia\StageMap\";
         public const string Dir_Recipe = @"C:\Camellia\Recipe\PRD\15Line\"; // 변경해야함
@@ -72,6 +75,28 @@ namespace Root_CAMELLIA
             {
                 //_loginSuccess = value;
                 SetProperty(ref _loginSuccess, value);
+            }
+        }
+
+        private string _Version2 = "1.0.0.0";
+        public string Version2
+        {
+            get
+            {
+                string fileVersion = FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location).FileVersion;
+                _Version2 = fileVersion;
+                return "Version " + _Version2;
+            }
+        }
+
+        private string _Version3 = "1.0.0.0";
+        public string Version3
+        {
+            get
+            {
+                string fileVersion = FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location).FileVersion;
+                _Version3 = fileVersion;
+                return _Version3;
             }
         }
     }

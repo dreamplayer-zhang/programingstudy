@@ -358,6 +358,32 @@ namespace RootTools.Database
 #endif
 		}
 
+		public void SelectData(string tableName)
+		{
+			if (m_MainConnectSession.IsConnected == false)
+				return;
+#if !DEBUG
+			try
+			{
+
+#endif
+			DataSet data = new DataSet();
+			string sSelectQuery = "SELECT * FROM wind2." + tableName; // Temp
+			MySqlDataAdapter ap = new MySqlDataAdapter();
+
+
+			ap.SelectCommand = new MySqlCommand(sSelectQuery, m_MainConnectSession.GetConnection());
+			ap.Fill(data); // DataSet으로 전체 데이터 복사.
+			m_DefectTable = data.Tables[0].Copy();
+#if !DEBUG
+			}
+			catch (Exception ex)
+			{
+				string sMsg = ex.Message;
+			}
+#endif
+		}
+
 
 		public DataTable SelectTable(string sTable)
 		{
@@ -454,6 +480,33 @@ namespace RootTools.Database
 		}
 
 		#endregion
+
+
+		public DataTable SelectCurrentInspectionDefect(string tableName = "defect")
+		{
+			DataSet data = new DataSet();
+			DataTable table;
+#if !DEBUG
+			try
+			{
+#endif
+			string sSelectQuery = string.Format("SELECT * FROM wind2.{0} where m_strInspectionID = '{1}';", tableName, m_sInspectionID);
+			MySqlDataAdapter ap = new MySqlDataAdapter();
+			ap.SelectCommand = new MySqlCommand(sSelectQuery, m_MainConnectSession.GetConnection());
+			ap.Fill(data);
+			table = data.Tables[0].Copy();
+			return table;
+#if !DEBUG
+			}
+			catch (Exception ex)
+			{
+				TempLogger.Write("Database", ex);
+				table = data.Tables[0].Copy();
+				return table;
+			}
+
+#endif
+		}
 
 
 
@@ -622,6 +675,70 @@ namespace RootTools.Database
 #endif
 		}
 
+
+		public void AddDefectDataListNoAutoCount(List<Defect> _defectlist, string tableName)
+		{
+#if !DEBUG
+			try
+			{
+#endif
+			if (tableName == "null" && !CheckExistTable(tableName))
+			{
+				//var tableQuery = string.Format("CREATE TABLE '{0}' ('m_nDefectIndex' int(11) NOT NULL AUTO_INCREMENT,'m_strInspectionID' varchar(45) DEFAULT NULL,'m_nDefectCode' int(11) DEFAULT NULL,'m_fSize' double DEFAULT NULL,'m_fWidth' double DEFAULT NULL,'m_fHeight' double DEFAULT NULL,'m_fRelX' double DEFAULT NULL,'m_fRelY' double DEFAULT NULL,'m_fAbsX' double DEFAULT NULL,'m_fAbsY' double DEFAULT NULL,'m_fGV' double DEFAULT NULL,'m_nChipIndexX' int(11) DEFAULT NULL,'m_nChipIndexY' int(11) DEFAULT NULL,PRIMARY KEY ('m_nDefectIndex')) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8;", tableName);
+				//CreateTable(tableName, typeof(Defect),nameof(Defect.m_nDefectIndex));
+				return;
+			}
+			StringBuilder temp = new StringBuilder();
+			StringBuilder sbQuery = new StringBuilder();
+			StringBuilder sbColumList = new StringBuilder();
+			StringBuilder sValueList = new StringBuilder();
+			List<string> sbValueList = new List<string>();
+			Type type = typeof(Defect);
+			FieldInfo[] fld = type.GetFields(BindingFlags.Instance | BindingFlags.Public).ToArray();
+
+			for (int defectListNum = 0; defectListNum < _defectlist.Count; defectListNum++)
+			{
+				temp.Clear();
+				sbColumList.Clear();
+				for (int i = 0; i < fld.Length; i++)
+				{
+					var f = fld[i];
+					object obj = f.GetValue(_defectlist[defectListNum]);
+					sbColumList.Append(f.Name);
+					if (i == 0)
+						temp.Append("(");
+
+					temp.AppendFormat("'{0}'", obj);
+
+					if (i != fld.Length - 1)
+					{
+						sbColumList.Append(",");
+						temp.Append(",");
+					}
+					else
+						temp.Append(")");
+				}
+				sbValueList.Add(temp.ToString());
+			}
+
+			sbQuery.AppendFormat("INSERT INTO {0}({1}) values", tableName, sbColumList.ToString());
+			for (int i = 0; i < sbValueList.Count; i++)
+			{
+				sbQuery.Append(sbValueList[i]);
+				if (i != sbValueList.Count - 1)
+					sbQuery.Append(",");
+			}
+			SendQuery(sbQuery.ToString());
+#if !DEBUG
+			}
+			catch (Exception ex)
+			{
+				TempLogger.Write("Database", ex);
+			}
+
+#endif
+		}
+
 		public void AddMeasurementDataList(List<Measurement> _measurelist)
 		{
 #if !DEBUG
@@ -699,6 +816,48 @@ namespace RootTools.Database
 				);
 			SendQuery(sLotinfoQuery);
 		}
+
+		public void SetLotinfo(DateTime inspectionstart, DateTime inspectionend, string recipeid)
+		{
+			//Inspection ID 생성(KEY)
+			m_Loftinfo.SetLotinfo(inspectionstart, inspectionend, "LotID", "CSTID", "SetupID", "CSID", "WaferID", recipeid);
+			m_sInspectionID = MakeInspectionID(m_Loftinfo);
+			string sLotinfoQuery;
+
+			sLotinfoQuery = string.Format("INSERT INTO lotinfo(InspectionStart, InspectionEnd, sInspectionID, sLotID, sCSTID, sWaferID, sRecipeID)" +
+				" values('{0}','{1}','{2}','{3}','{4}','{5}','{6}')"
+				, inspectionstart.ToString("yyyyMMddHHmmss")
+				, inspectionend.ToString("yyyyMMddHHmmss")
+				, m_sInspectionID
+				, "null"
+				, "null"
+				, "null"
+				, "null"
+				);
+			SendQuery(sLotinfoQuery);
+		}
+
+		public void SetLotinfo(Lotinfo lotInfo)
+		{
+			//Inspection ID 생성(KEY)
+			m_Loftinfo.SetLotinfo(lotInfo);
+			m_sInspectionID = MakeInspectionID(m_Loftinfo);
+			string sLotinfoQuery;
+
+			sLotinfoQuery = string.Format("INSERT INTO lotinfo(InspectionStart, InspectionEnd, sInspectionID, sLotID, sCSTID, sWaferID, sRecipeID)" +
+				" values('{0}','{1}','{2}','{3}','{4}','{5}','{6}')"
+				, m_Loftinfo.InspectionStart.ToString("yyyyMMddHHmmss")
+				, m_Loftinfo.InspectionEnd.ToString("yyyyMMddHHmmss")
+				, m_sInspectionID
+				, m_Loftinfo.GetLotID()
+				, m_Loftinfo.GetCSTID()
+				, m_Loftinfo.GetWaferID()
+				, m_Loftinfo.GetRecipeID()
+				);
+			SendQuery(sLotinfoQuery);
+		}
+
+
 		public string MakeInspectionID(Lotinfo _Lotinfo)
 		{
 			string sResult = "";

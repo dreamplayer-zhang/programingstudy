@@ -49,27 +49,15 @@ namespace Root_EFEM.Module
                 m_diPresent = value;
             }
         }
-        //public bool m_bOpen = false;
-        //public DIO_I p_diOpen
-        //{
-        //    get
-        //    {
-        //        return m_diOpen;
-        //    }
-        //    set
-        //    {
-        //        m_diOpen = value;
-        //        m_bOpen = m_diOpen.p_bIn;
-        //        OnPropertyChanged();
-        //    }
-        //}
-        bool _bopen = false;
-        public bool p_open
+        public DIO_I p_diOpen
         {
-            get { return _bopen; }
-            set {
-                _bopen = value;
-                OnPropertyChanged();
+            get
+            {
+                return m_diOpen;
+            }
+            set
+            {
+                m_diOpen = value;
             }
         }
         public DIO_I p_diClose
@@ -538,7 +526,7 @@ namespace Root_EFEM.Module
                     m_loadport.m_alidCMD.Run(true, "RS232 Connection Lost !!");
                     return "RS232 Connection Lost !!";
                 }
-                int nWait = 1000 * secWait;
+                int nWait = 100 * secWait;
                 while (nWait > 0)
                 {
                     if (EQ.IsStop()) 
@@ -914,7 +902,7 @@ namespace Root_EFEM.Module
                     if (Run(CmdUnload())) return p_sInfo;
                 }
             }
-            if (m_diPlaced.p_bIn && m_diPresent.p_bIn)
+            if (m_diPlaced.p_bIn && p_diPresent.p_bIn)
             {
                 p_infoCarrier.p_eState = InfoCarrier.eState.Placed;
                 m_bPlaced = true;
@@ -1037,7 +1025,7 @@ namespace Root_EFEM.Module
         }
 
         public bool p_bPlaced { get { return m_diPlaced.p_bIn; } }
-        public bool p_bPresent { get { return m_diPresent.p_bIn; } }
+        public bool p_bPresent { get { return p_diPresent.p_bIn; } }
         #endregion
 
         public InfoCarrier p_infoCarrier { get; set; }
@@ -1183,7 +1171,6 @@ namespace Root_EFEM.Module
                     m_module.m_alidLoad.Run(true, p_sInfo);
                     return p_sInfo;
                 }
-
                 m_infoCarrier.SendSlotMap();
                 while (m_infoCarrier.p_eStateSlotMap != GemCarrierBase.eGemState.VerificationOK)
                 {
@@ -1259,7 +1246,7 @@ namespace Root_EFEM.Module
                 }
                 if (!EQ.p_bSimulate)
                 {
-                    //if (m_module.Run(m_module.CmdGetMap())) return p_sInfo;
+                    if (m_module.Run(m_module.CmdGetMap())) return p_sInfo;
                     if (m_module.Run(m_module.CmdUnload()))
                     {
                         m_module.m_alidUnLoad.Run(true, p_sInfo);

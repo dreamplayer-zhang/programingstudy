@@ -37,7 +37,7 @@ namespace RootTools.Gem.XGem
                 OnPropertyChanged(); 
             }
         }
-
+        
         void InitEventCommunicate()
         {
             m_xGem.OnGEMCommStateChanged += M_xGem_OnGEMCommStateChanged;
@@ -67,6 +67,7 @@ namespace RootTools.Gem.XGem
         }
 
         eControl _eReqControl = eControl.OFFLINE;
+
         public eControl p_eReqControl
         {
             get { return _eReqControl; }
@@ -269,7 +270,7 @@ namespace RootTools.Gem.XGem
                 m_qLog.Enqueue(new LogData(eType.Info, _sInfo));
             }
         }
-        
+
         string _sLastError = "OK";
         public string p_sLastError
         {
@@ -417,6 +418,7 @@ namespace RootTools.Gem.XGem
             long nError = p_bEnable ? m_xGem.GEMSetEvent(ecv.p_nID) : 0;
             LogSend(nError, "GEMSetEvent", ecv.p_nID);
             p_sInfo = "SetCEID " + ecv.p_sModule + "." + ecv.p_id;
+            
             return nError; 
         }
 
@@ -426,6 +428,7 @@ namespace RootTools.Gem.XGem
             long nError = p_bEnable ? m_xGem.GEMSetEvent(nCEID) : 0;
             LogSend(nError, "GEMSetEvent", nCEID);
             p_sInfo = "SetCEID " + nCEID;
+            
             return nError;
         }
 
@@ -578,8 +581,8 @@ namespace RootTools.Gem.XGem
 
         public void SendLPInfo(GemCarrierBase carrier)
         {
-            long nError = m_xGem.CMSSetLPInfo(carrier.p_sLocID, (long)carrier.p_eReqTransfer, (long)carrier.p_eReqAccessLP, 0, 0, carrier.p_sCarrierID);
-            LogSend(nError, "CMSSetLPInfo", carrier.p_sLocID, carrier.p_eTransfer, carrier.p_eAccessLP, 0, 0, carrier.p_sCarrierID);
+            long nError = m_xGem.CMSSetLPInfo(carrier.p_sLocID, (long)carrier.p_eReqTransfer, (long)carrier.p_eReqAccessLP, 0, (long)carrier.p_eReqAssociated, carrier.p_sCarrierID);
+            LogSend(nError, "CMSSetLPInfo", carrier.p_sLocID, carrier.p_eTransfer, carrier.p_eAccessLP, 0, carrier.p_eReqAssociated, carrier.p_sCarrierID);
         }
 
         void InitEventGemCarrier()
@@ -645,7 +648,7 @@ namespace RootTools.Gem.XGem
             switch (nVerifyType)
             {
                 case 0:
-                    carrier.m_bReqLoad = true; 
+                    carrier.m_bReqLoad = true;
                     break;
                 case 1:
                     if (sSlotMap.Length < nCount) return; 
@@ -705,6 +708,7 @@ namespace RootTools.Gem.XGem
             if (carrier.p_eAccessLP != GemCarrierBase.eAccessLP.Manual) return "Invalid Carrier PresentSensor when AccessLP = Auto"; 
             long nPresent = bPresent ? 1 : 0;
             long nError = m_xGem.CMSSetPresenceSensor(carrier.p_sLocID, nPresent);
+            
             return LogSend(nError, "CMSSetPresenceSensor", carrier.p_sLocID, nPresent);
         }
 
@@ -751,6 +755,10 @@ namespace RootTools.Gem.XGem
         private void M_xGem_OnCMSAssociationStateChanged(string sLocID, long nState)
         {
             LogRcv("OnCMSAssociationStateChanged", sLocID, nState);
+            GemCarrierBase carrier = GetGemCarrier(sLocID);
+            if (carrier == null) return;
+            p_sInfo = "eAssociated : " + carrier.p_eAssociated.ToString() + " -> " + ((GemCarrierBase.eAssociated)nState).ToString();
+            carrier.p_eAssociated = (GemCarrierBase.eAssociated)nState;
         }
 
         public void RemoveCarrierInfo(string sLocID)
@@ -825,6 +833,7 @@ namespace RootTools.Gem.XGem
                         p_sLastError = "MatrialID not Found : " + psMtrlID[iMtrl] + " in Recipe : " + psRcpID[n]; 
                         asErrorMsg.Add(p_sLastError);
                     }
+                    /* //PJReqVerifySlot 함수 내부에선 PJCreate 된 후 Slot의 상태를 확인하여, 순서 상 맞지 않아 주석 처리함.
                     else 
                     {
                         string sVerify = carrier.PJReqVerifySlot(psSlotInfo[iMtrl]); 
@@ -835,6 +844,7 @@ namespace RootTools.Gem.XGem
                             asErrorMsg.Add(p_sLastError);
                         }
                     }
+                    */
                 }
             }
             long nResult = 1; 
@@ -852,8 +862,9 @@ namespace RootTools.Gem.XGem
         {
             LogRcv("OnPJCreated", sPJobID, psMtrlID[0], nAutoStart, sRcpID);
             PJDelete(sPJobID);
-            GemPJ pj = new GemPJ(sPJobID, (GemPJ.eAutoStart)nAutoStart, sRcpID, m_log);
+            GemPJ pj = new GemPJ(sPJobID, (GemPJ.eAutoStart)nAutoStart, sRcpID, m_log, m_sRecipeExt);
             m_aPJ.Add(pj);
+            
             for (int n = 0; n < nMtrlCount; n++)
             {
                 GemCarrierBase carrier = GetGemCarrier(GetGemLocID(psMtrlID[n]));
@@ -865,12 +876,18 @@ namespace RootTools.Gem.XGem
                     }
                 }
             }
+
+            long nError = m_xGem.PJSetState(sPJobID, (long)GemPJ.eState.Queued);
+            LogSend(nError, "PJSetState", sPJobID, GemPJ.eState.Queued);
         }
 
         private void M_xGem_OnPJDeleted(string sPJobID)
         {
-            LogRcv("OnPJDeleted", sPJobID);
-            PJDelete(sPJobID); 
+            LogRcv("OnPJDeleted", sPJobID); 
+            PJDelete(sPJobID);
+
+            long nError = m_xGem.PJSetState(sPJobID, (long)GemPJ.eState.JobComplete);
+            LogSend(nError, "PJSetState", sPJobID, GemPJ.eState.JobComplete);
         }
 
         void PJDelete(string sPJobID)
@@ -893,6 +910,7 @@ namespace RootTools.Gem.XGem
                     pj.SettingUp();
                     long nError = m_xGem.PJSettingUpCompt(sPJobID);
                     LogSend(nError, "PJSettingUpCompt", sPJobID);
+
                     break;
             }
         }
@@ -901,6 +919,8 @@ namespace RootTools.Gem.XGem
         {
             LogRcv("OnPJSettingUpStart", sPJobID);
             LogSend(m_xGem.PJSettingUpStart(sPJobID), "OnPJSettingUpStart", sPJobID);
+            long nError = m_xGem.PJSetState(sPJobID, (long)GemPJ.eState.SettingUp);
+            LogSend(nError, "PJSetState", sPJobID, GemPJ.eState.SettingUp);
         }
 
         private void M_xGem_OnPJReqCommand(long nMsgID, string sPJobID, long nCommand)
@@ -910,8 +930,6 @@ namespace RootTools.Gem.XGem
             GetPJ(sPJobID).p_eCommand = cmd; 
             PJRspCommand(nMsgID, cmd, sPJobID, 1, 0, 0, "");
             Thread.Sleep(20);
-            long nError = m_xGem.PJSetState(sPJobID, (long)GemPJ.eState.Processing);
-            LogSend(nError, "PJSetState", sPJobID, GemPJ.eState.Processing);
         }
 
         void PJRspCommand(long nMsgId, GemPJ.eCommand cmd, string sPJobID, long nAck, long nErrorCount, long nErrorCode, string sError)
@@ -920,6 +938,9 @@ namespace RootTools.Gem.XGem
             string[] asError = new string[1] { sError };
             long nError = m_xGem.PJRspCommand(nMsgId, (long)cmd, sPJobID, nAck, nErrorCount, aErrorCode, asError);
             LogSend(nError, "PJRspCommand", nMsgId, cmd, sPJobID, nAck, nErrorCount, aErrorCode[0], asError[0]);
+
+            nError = m_xGem.PJSetState(sPJobID, (long)GemPJ.eState.Processing);
+            LogSend(nError, "PJSetState", sPJobID, GemPJ.eState.Processing);
         }
 
         public void SendPJComplete(string sPJobID)
@@ -1021,7 +1042,7 @@ namespace RootTools.Gem.XGem
         }
 
         void SendCJReqSelect(GemCJ cj)
-        {
+        {            
             LogSend(m_xGem.CJReqSelect(cj.m_sCJobID), "CJReqSelect", cj.m_sCJobID); 
         }
         
@@ -1148,13 +1169,17 @@ namespace RootTools.Gem.XGem
         string m_sPathConfig = "C:\\Init\\GEM300.cfg";
         void XGemConfigFile()
         {
+            long nError;
             try
             {
-                long nError = m_xGem.Initialize(m_sPathConfig);
+                nError = m_xGem.Initialize(m_sPathConfig);
                 LogSend(nError, "Initialize", m_sPathConfig);
                 if (nError == 0) m_bStart = true;
             }
-            catch { p_sInfo = "Initialize File Open Error : " + m_sPathConfig; }
+            catch (Exception e)
+            {
+                p_sInfo = "XGem Config File Open Error : " + e.Message + "Path : " + m_sPathConfig;
+            }
         }
 
         public void DeleteAllJobInfo()

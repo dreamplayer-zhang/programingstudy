@@ -21,11 +21,35 @@ namespace RootTools_Vision
 
         private List<RecipeItemBase> recipeItemList;
         private List<ParameterBase> parameterItemList;
+
+        private int cameraInfoIndex = 0;
+
+        private bool useExclusiveRegion = false;
+        private string exclusiveRegionFilePath = "";
         #endregion
 
         #region [Getter Setter]
         public string Name { get => name; set => name = value; }
         public RecipeType_WaferMap WaferMap { get => waferMap; set => waferMap = value; }
+
+        public int CameraInfoIndex
+        {
+            get => this.cameraInfoIndex;
+            set => this.cameraInfoIndex = value;
+        }
+
+        public bool UseExclusiveRegion
+        {
+            get => this.useExclusiveRegion;
+            set => this.useExclusiveRegion = value;
+        }
+
+        public string ExclusiveRegionFilePath
+        {
+            get => this.exclusiveRegionFilePath;
+            set => this.exclusiveRegionFilePath = value;
+        }
+
 
         [XmlIgnore]
         public List<RecipeItemBase> RecipeItemList { get => recipeItemList; set => recipeItemList = value; }
@@ -177,7 +201,11 @@ namespace RootTools_Vision
                     RecipeBase temp = this;
                     temp = (RecipeBase)xml.Deserialize(reader);
 
+                    this.Name = temp.Name;
                     this.WaferMap = temp.WaferMap;
+                    this.CameraInfoIndex = temp.CameraInfoIndex;
+                    this.UseExclusiveRegion = temp.UseExclusiveRegion;
+                    this.ExclusiveRegionFilePath = temp.ExclusiveRegionFilePath;
                 }
 
                 // Parameter
@@ -213,7 +241,9 @@ namespace RootTools_Vision
                 MessageBox.Show("Recipe Open Error\nDetail : " + ex.Message);
                 rst = false;
             }
+
             
+
             return rst;
         }
 
@@ -270,6 +300,8 @@ namespace RootTools_Vision
                     XmlSerializer xml = new XmlSerializer(this.RecipeItemList.GetType());
                     xml.Serialize(tw, this.RecipeItemList);
                 }
+
+               
             }
             catch(Exception ex)
             {
@@ -287,6 +319,9 @@ namespace RootTools_Vision
             recipeBase.RecipeFolderPath = this.RecipeFolderPath;
             recipeBase.RecipePath = this.RecipePath;
             recipeBase.WaferMap = this.WaferMap;
+            recipeBase.CameraInfoIndex = this.CameraInfoIndex;
+            recipeBase.UseExclusiveRegion = this.UseExclusiveRegion;
+            recipeBase.ExclusiveRegionFilePath = this.ExclusiveRegionFilePath;
 
             return recipeBase;
         }

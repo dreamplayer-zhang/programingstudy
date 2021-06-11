@@ -50,7 +50,7 @@ namespace RootTools_Vision
 
 
 			this.inspectionSharedBuffer = this.currentWorkplace.GetSharedBufferInfo(this.parameterBackside.IndexChannel);
-			byte[] workplaceBuffer = GetWorkplaceBuffer(this.parameterBackside.IndexChannel);
+			byte[] workplaceBuffer = GetWorkplaceBufferByColorChannel(this.parameterBackside.IndexChannel);
 
 			//bool isBackside = false;
 

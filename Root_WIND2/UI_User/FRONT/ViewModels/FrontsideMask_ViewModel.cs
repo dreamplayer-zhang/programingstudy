@@ -315,7 +315,7 @@ namespace Root_WIND2.UI_User
             CPoint memPt = new CPoint(p_MouseMemX, p_MouseMemY);
             memPt = CheckOriginBox(memPt);
 
-            CPoint canvasPt = GetCanvasPoint(memPt - OriginOffset);
+            CPoint canvasPt = GetCanvasPoint(memPt);
             switch (eToolProcess)
             {
                 case ToolProcess.None:
@@ -439,6 +439,7 @@ namespace Root_WIND2.UI_User
                     StartDrawRect(color, thickness, opacity, startMemPt, startCanvasPt);
                     break;
                 case ToolType.Circle:
+                    StartDrawCircle(color, thickness, opacity, startMemPt, startCanvasPt);
                     break;
                 case ToolType.Polygon:
                     StartDrawPolygon(color, thickness, opacity, startMemPt, startCanvasPt);
@@ -484,6 +485,7 @@ namespace Root_WIND2.UI_User
                     DrawingRect(startMemPt, startCanvasPt);
                     break;
                 case ToolType.Circle:
+                    DrawingCircle(startMemPt, startCanvasPt);
                     break;
                 case ToolType.Polygon:
                     DrawingPolygon(startMemPt, startCanvasPt);
@@ -506,6 +508,7 @@ namespace Root_WIND2.UI_User
                     DrawDoneRect(startMemPt, startCanvasPt);
                     break;
                 case ToolType.Circle:
+                    DrawDoneCircle(startMemPt, startCanvasPt);
                     break;
                 case ToolType.Polygon:
                     DrawDonePolygon(startMemPt, startCanvasPt);
@@ -539,11 +542,24 @@ namespace Root_WIND2.UI_User
             line.MemoryEndPoint = currentMemPt;
             line.SetData();
             CreateModifyTool_Line(line);
-            foreach (CPoint pt in line.Data)
-            {
-                base.DrawPixelBitmap(pt - OriginOffset, 255, 0, 0, 255);
-            }
-            base.SetLayerSource();
+
+            ContextMenu cMenu = new ContextMenu();
+            MenuItem menuAdd = new MenuItem();
+            menuAdd.Header = "Add";
+            menuAdd.Click += MenuAdd_Click_Line;
+            MenuItem menuDelete = new MenuItem();
+            menuDelete.Header = "Delete";
+            menuDelete.Click += MenuDelete_Click_Line;
+            MenuItem menuCancel = new MenuItem();
+            menuCancel.Header = "Cancel";
+            menuCancel.Click += MenuCancel_Click_Line;
+
+            cMenu.Items.Add(menuAdd);
+            cMenu.Items.Add(menuDelete);
+            cMenu.Items.Add(menuCancel);
+
+            line.CanvasLine.ContextMenu = cMenu;
+            line.CanvasLine.ContextMenu.IsOpen = true;
         }
         #endregion
 
@@ -604,13 +620,13 @@ namespace Root_WIND2.UI_User
             ContextMenu cMenu = new ContextMenu();
             MenuItem menuAdd = new MenuItem();
             menuAdd.Header = "Add";
-            menuAdd.Click += MenuAdd_Click;
+            menuAdd.Click += MenuAdd_Click_Rect;
             MenuItem menuDelete = new MenuItem();
             menuDelete.Header = "Delete";
-            menuDelete.Click += MenuDelete_Click;
+            menuDelete.Click += MenuDelete_Click_Rect;
             MenuItem menuCancel = new MenuItem();
             menuCancel.Header = "Cancel";
-            menuCancel.Click += MenuCancel_Click;
+            menuCancel.Click += MenuCancel_Click_Rect;
 
             cMenu.Items.Add(menuAdd);
             cMenu.Items.Add(menuDelete);
@@ -618,6 +634,84 @@ namespace Root_WIND2.UI_User
 
             rect.CanvasRect.ContextMenu = cMenu;
             rect.CanvasRect.ContextMenu.IsOpen = true;
+        }
+        #endregion
+
+        #region Circle
+        private void StartDrawCircle(Brush color, double thickness, double opacity, CPoint startMemPt, CPoint startCanvasPt)
+        {
+            CurrentShape = new TEllipse(color, thickness, opacity);
+            TEllipse circle = CurrentShape as TEllipse;
+            circle.MemPointBuffer = startMemPt;
+            circle.MemoryRect.Left = startMemPt.X;
+            circle.MemoryRect.Top = startMemPt.Y;
+            circle.CanvasEllipse.Width = 0;
+            circle.CanvasEllipse.Height = 0;
+        }
+
+        private void DrawingCircle(CPoint currentMemPt, CPoint currentCanvasPt)
+        {
+            TEllipse circle = CurrentShape as TEllipse;
+
+            if (circle.MemPointBuffer.X > currentMemPt.X)
+            {
+                circle.MemoryRect.Left = currentMemPt.X;
+                circle.MemoryRect.Right = circle.MemPointBuffer.X;
+            }
+            else
+            {
+                circle.MemoryRect.Left = circle.MemPointBuffer.X;
+                circle.MemoryRect.Right = currentMemPt.X;
+            }
+            if (circle.MemPointBuffer.Y > currentMemPt.Y)
+            {
+                circle.MemoryRect.Top = currentMemPt.Y;
+                circle.MemoryRect.Bottom = circle.MemPointBuffer.Y;
+            }
+            else
+            {
+                circle.MemoryRect.Top = circle.MemPointBuffer.Y;
+                circle.MemoryRect.Bottom = currentMemPt.Y;
+            }
+
+            double pixSizeX = (double)p_CanvasWidth / (double)p_View_Rect.Width;
+            double pixSizeY = (double)p_CanvasHeight / (double)p_View_Rect.Height;
+
+            CPoint LT = new CPoint(circle.MemoryRect.Left, circle.MemoryRect.Top);
+            CPoint RB = new CPoint(circle.MemoryRect.Right, circle.MemoryRect.Bottom);
+            Point canvasLT = new Point(GetCanvasDoublePoint(LT).X, GetCanvasDoublePoint(LT).Y);
+            Point canvasRB = new Point(GetCanvasDoublePoint(RB).X, GetCanvasDoublePoint(RB).Y);
+
+            Canvas.SetLeft(circle.CanvasEllipse, canvasLT.X - pixSizeX / 2);
+            Canvas.SetTop(circle.CanvasEllipse, canvasLT.Y - pixSizeY / 2);
+
+            circle.CanvasEllipse.Width = Math.Abs(canvasRB.X - canvasLT.X + pixSizeX);
+            circle.CanvasEllipse.Height = Math.Abs(canvasRB.Y - canvasLT.Y + pixSizeY);
+        }
+
+        private void DrawDoneCircle(CPoint currentMemPt, CPoint currentCanvasPt)
+        {
+            TEllipse circle = CurrentShape as TEllipse;
+            //circle.CanvasEllipse.Fill = circle.FillBrush;
+            //CreateModifyTool_Ellipse(circle);
+
+            ContextMenu cMenu = new ContextMenu();
+            MenuItem menuAdd = new MenuItem();
+            menuAdd.Header = "Add";
+            menuAdd.Click += MenuAdd_Click_Circle;
+            MenuItem menuDelete = new MenuItem();
+            menuDelete.Header = "Delete";
+            menuDelete.Click += MenuDelete_Click_Circle;
+            MenuItem menuCancel = new MenuItem();
+            menuCancel.Header = "Cancel";
+            menuCancel.Click += MenuCancel_Click_Circle;
+
+            cMenu.Items.Add(menuAdd);
+            cMenu.Items.Add(menuDelete);
+            cMenu.Items.Add(menuCancel);
+
+            circle.CanvasEllipse.ContextMenu = cMenu;
+            circle.CanvasEllipse.ContextMenu.IsOpen = true;
         }
         #endregion
 
@@ -664,6 +758,24 @@ namespace Root_WIND2.UI_User
             p_UIElement.Remove(polygon.CanvasPolyLine);
 
             CreateModifyTool_Polygon(polygon);
+
+            ContextMenu cMenu = new ContextMenu();
+            MenuItem menuAdd = new MenuItem();
+            menuAdd.Header = "Add";
+            menuAdd.Click += MenuAdd_Click_Polygon;
+            MenuItem menuDelete = new MenuItem();
+            menuDelete.Header = "Delete";
+            menuDelete.Click += MenuDelete_Click_Polygon;
+            MenuItem menuCancel = new MenuItem();
+            menuCancel.Header = "Cancel";
+            menuCancel.Click += MenuCancel_Click_Polygon;
+
+            cMenu.Items.Add(menuAdd);
+            cMenu.Items.Add(menuDelete);
+            cMenu.Items.Add(menuCancel);
+
+            polygon.CanvasPolygon.ContextMenu = cMenu;
+            polygon.CanvasPolygon.ContextMenu.IsOpen = true;
         }
         #endregion
 
@@ -751,7 +863,35 @@ namespace Root_WIND2.UI_User
         }
         #endregion
 
-        private void MenuAdd_Click(object sender, RoutedEventArgs e)
+        #region Menu Click Line
+        private void MenuAdd_Click_Line(object sender, RoutedEventArgs e)
+        {
+            byte r = p_SelectedROI.p_Color.R;
+            byte g = p_SelectedROI.p_Color.G;
+            byte b = p_SelectedROI.p_Color.B;
+            DrawLineBitmap((CurrentShape as TLine).MemoryStartPoint, (CurrentShape as TLine).MemoryEndPoint, 2, r, g, b, 255, OriginOffset);
+
+            BufferInspROI.Clear();
+
+            SetLayerSource();
+            _SaveROI();
+        }
+        private void MenuDelete_Click_Line(object sender, RoutedEventArgs e)
+        {
+            DrawLineBitmap((CurrentShape as TLine).MemoryStartPoint, (CurrentShape as TLine).MemoryEndPoint, 0, 0, 0, 0, 0, OriginOffset);
+
+            BufferInspROI.Clear();
+            SetLayerSource();
+        }
+
+        private void MenuCancel_Click_Line(object sender, RoutedEventArgs e)
+        {
+            BufferInspROI.Clear();
+        }
+        #endregion
+
+        #region Menu Click Rect
+        private void MenuAdd_Click_Rect(object sender, RoutedEventArgs e)
         {
             byte r = p_SelectedROI.p_Color.R;
             byte g = p_SelectedROI.p_Color.G;
@@ -762,7 +902,8 @@ namespace Root_WIND2.UI_User
             SetLayerSource();
             _SaveROI();
         }
-        private void MenuDelete_Click(object sender, RoutedEventArgs e)
+
+        private void MenuDelete_Click_Rect(object sender, RoutedEventArgs e)
         {
             DrawRectBitmap((CurrentShape as TRect).MemoryRect, 0, 0, 0, 0, OriginOffset);
 
@@ -770,10 +911,64 @@ namespace Root_WIND2.UI_User
             SetLayerSource();
         }
 
-        private void MenuCancel_Click(object sender, RoutedEventArgs e)
+        private void MenuCancel_Click_Rect(object sender, RoutedEventArgs e)
         {
             BufferInspROI.Clear();
         }
+        #endregion
+
+        #region Menu Click Polygon
+        private void MenuAdd_Click_Polygon(object sender, RoutedEventArgs e)
+        {
+            byte r = p_SelectedROI.p_Color.R;
+            byte g = p_SelectedROI.p_Color.G;
+            byte b = p_SelectedROI.p_Color.B;
+            DrawPolygonBitmap((CurrentShape as TPolygon).ListMemoryPoint, r, g, b, 255, OriginOffset);
+            BufferInspROI.Clear();
+
+            SetLayerSource();
+            _SaveROI();
+        }
+        private void MenuDelete_Click_Polygon(object sender, RoutedEventArgs e)
+        {
+            DrawPolygonBitmap((CurrentShape as TPolygon).ListMemoryPoint, 0, 0, 0, 0, OriginOffset);
+
+            BufferInspROI.Clear();
+            SetLayerSource();
+        }
+
+        private void MenuCancel_Click_Polygon(object sender, RoutedEventArgs e)
+        {
+            BufferInspROI.Clear();
+        }
+        #endregion
+
+        #region Menu Click Circle
+        private void MenuAdd_Click_Circle(object sender, RoutedEventArgs e)
+        {
+            byte r = p_SelectedROI.p_Color.R;
+            byte g = p_SelectedROI.p_Color.G;
+            byte b = p_SelectedROI.p_Color.B;
+            DrawCircleBitmap(CurrentShape as TEllipse, r, g, b, 255, OriginOffset);
+            BufferInspROI.Clear();
+
+            SetLayerSource();
+            _SaveROI();
+        }
+        private void MenuDelete_Click_Circle(object sender, RoutedEventArgs e)
+        {
+            DrawCircleBitmap(CurrentShape as TEllipse, 0, 0, 0, 0, OriginOffset);
+
+            BufferInspROI.Clear();
+            SetLayerSource();
+        }
+
+        private void MenuCancel_Click_Circle(object sender, RoutedEventArgs e)
+        {
+            BufferInspROI.Clear();
+        }
+        #endregion
+
         #endregion
 
         #region Modify Method

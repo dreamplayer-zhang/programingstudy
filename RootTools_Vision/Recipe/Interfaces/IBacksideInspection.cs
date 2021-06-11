@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace RootTools_Vision
 {
+    //Reticle 용
     public interface IBacksideInspection
     {
     }

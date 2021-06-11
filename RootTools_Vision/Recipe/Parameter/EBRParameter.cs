@@ -15,107 +15,128 @@ namespace RootTools_Vision
 		}
 
 		#region [Parameter]
-		private int roiWidth;
-		private int roiHeight;
+		// roi
+		private int roiHeight = 500;
 		private int notchY;
-		private int stepDegree;
-		private int xRange;
+
+		// option
+		private int measureCount = 30;
+		private double notchOffsetDegree = 5;
+		private int xRange = 20;
+
+		// diff GV
 		private int diffEdge;
 		private int diffBevel;
 		private int diffEBR;
+
+		// 
 		private int offsetBevel;
 		private int offsetEBR;
 		#endregion
 
 		#region [Getter/Setter]
-		[Category("Parameter")]
-		public int ROIWidth
-		{
-			get => this.roiWidth;
-			set
-			{
-				SetProperty<int>(ref this.roiWidth, value);
-			}
-		}
-		[Category("Parameter")]
+		[Category("ROI")]
+		[DisplayName("Height")]
 		public int ROIHeight
 		{
 			get => this.roiHeight;
 			set
 			{
-				SetProperty<int>(ref this.roiHeight, value);
+				SetProperty(ref this.roiHeight, value);
 			}
 		}
-		[Category("Parameter")]
+		[Browsable(false)]
+		[Category("ROI")]
+		[DisplayName("Notch")]
 		public int NotchY
 		{
 			get => this.notchY;
 			set
 			{
-				SetProperty<int>(ref this.notchY, value);
+				SetProperty(ref this.notchY, value);
 			}
 		}
-		[Category("Parameter")]
-		public int StepDegree
+
+		[Category("Option")]
+		[DisplayName("Measurement Count")]
+		public int MeasureCount
 		{
-			get => this.stepDegree;
+			get => this.measureCount;
 			set
 			{
-				SetProperty<int>(ref this.stepDegree, value);
+				SetProperty(ref this.measureCount, value);
 			}
 		}
-		[Category("Parameter")]
+		[Category("Option")]
+		[DisplayName("Notch Offset Degree")]
+		public double NotchOffsetDegree
+		{
+			get => this.notchOffsetDegree;
+			set
+			{
+				SetProperty(ref this.notchOffsetDegree, value);
+			}
+		}
+		[Category("Option")]
+		[DisplayName("X Range")]
 		public int XRange
 		{
 			get => this.xRange;
 			set
 			{
-				SetProperty<int>(ref this.xRange, value);
+				SetProperty(ref this.xRange, value);
 			}
 		}
-		[Category("Parameter")]
+
+		[Category("Difference GV")]
+		[DisplayName("1. Wafer Edge")]
 		public int DiffEdge
 		{
 			get => this.diffEdge;
 			set
 			{
-				SetProperty<int>(ref this.diffEdge, value);
+				SetProperty(ref this.diffEdge, value);
 			}
 		}
-		[Category("Parameter")]
+		[Category("Difference GV")]
+		[DisplayName("2. Edge-Bevel")]
 		public int DiffBevel
 		{
 			get => this.diffBevel;
 			set
 			{
-				SetProperty<int>(ref this.diffBevel, value);
+				SetProperty(ref this.diffBevel, value);
 			}
 		}
-		[Category("Parameter")]
+		[Category("Difference GV")]
+		[DisplayName("3. Bevel-EBR")]
 		public int DiffEBR
 		{
 			get => this.diffEBR;
 			set
 			{
-				SetProperty<int>(ref this.diffEBR, value);
+				SetProperty(ref this.diffEBR, value);
 			}
 		}
-		[Category("Parameter")]
+
+		[Category("Offset")]
+		[DisplayName("1. Edge-Bevel")]
 		public int OffsetBevel
 		{
 			get => this.offsetBevel;
 			set
 			{
-				SetProperty<int>(ref this.offsetBevel, value);
+				SetProperty(ref this.offsetBevel, value);
 			}
 		}
-		[Category("Parameter")]
+		[Category("Offset")]
+		[DisplayName("2. Bevel-EBR")]
 		public int OffsetEBR
 		{
 			get => this.offsetEBR;
 			set
 			{
-				SetProperty<int>(ref this.offsetEBR, value);
+				SetProperty(ref this.offsetEBR, value);
 			}
 		}
 

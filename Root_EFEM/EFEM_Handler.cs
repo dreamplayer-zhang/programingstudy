@@ -203,7 +203,8 @@ namespace Root_EFEM
         {
             Backside,
             EBR,
-            AOP
+            AOP,
+            EdgeSide
         }
         List<eVision> m_aVisionType = new List<eVision>();
         int m_lVision = 1; 
@@ -216,9 +217,11 @@ namespace Root_EFEM
                 string sID = "Vision" + sN; 
                 switch (m_aVisionType[n])
                 {
-                    case eVision.Backside: module = new Vision_Backside(GetVisionID(n), m_engineer); break;
+                    case eVision.Backside: module = new Vision_Backside(GetVisionID(n), m_engineer, ModuleBase.eRemote.Client); break;
                     case eVision.EBR: module = new Vision_EBR(GetVisionID(n), m_engineer); break;
                     case eVision.AOP: module = new Vision_AOP(GetVisionID(n), m_engineer); break;
+                    case eVision.EdgeSide: module = new Vision_Edgeside(GetVisionID(n), m_engineer, ModuleBase.eRemote.Client);
+                        break;
                     default: module = new Vision_AOP(GetVisionID(n), m_engineer); break; 
                 }
                 InitModule(module);
@@ -341,7 +344,7 @@ namespace Root_EFEM
         void CalcDockingUndocking()
         {
             List<EFEM_Process.Sequence> aSequence = new List<EFEM_Process.Sequence>();
-            while (m_process.m_qSequence.Count > 0) aSequence.Add(m_process.m_qSequence.Dequeue());
+            while (m_process.p_qSequence.Count > 0) aSequence.Add(m_process.p_qSequence.Dequeue());
             List<ILoadport> aDock = new List<ILoadport>();
             foreach (ILoadport loadport in m_aLoadport)
             {
@@ -350,7 +353,7 @@ namespace Root_EFEM
             while (aSequence.Count > 0)
             {
                 EFEM_Process.Sequence sequence = aSequence[0];
-                m_process.m_qSequence.Enqueue(sequence);
+                m_process.p_qSequence.Enqueue(sequence);
                 aSequence.RemoveAt(0);
                 for (int n = aDock.Count - 1; n >= 0; n--)
                 {
@@ -358,7 +361,7 @@ namespace Root_EFEM
                     {
                         ModuleRunBase runUndocking = aDock[n].GetModuleRunUndocking().Clone();
                         EFEM_Process.Sequence sequenceUndock = new EFEM_Process.Sequence(runUndocking, sequence.m_infoWafer);
-                        m_process.m_qSequence.Enqueue(sequenceUndock);
+                        m_process.p_qSequence.Enqueue(sequenceUndock);
                         aDock.RemoveAt(n);
                     }
                 }
@@ -389,7 +392,7 @@ namespace Root_EFEM
         public void CheckFinish()
         {
             if (m_gem.p_cjRun == null) return;
-            if (m_process.m_qSequence.Count > 0) return;
+            if (m_process.p_qSequence.Count > 0) return;
             foreach (GemPJ pj in m_gem.p_cjRun.m_aPJ)
             {
                 m_gem?.SendPJComplete(pj.m_sPJobID);
@@ -434,7 +437,7 @@ namespace Root_EFEM
                         if (p_moduleList.m_qModuleRun.Count == 0)
                         {
                             m_process.p_sInfo = m_process.RunNextSequence();
-                            if ((EQ.p_nRnR > 1) && (m_process.m_qSequence.Count == 0))
+                            if ((EQ.p_nRnR > 1) && (m_process.p_qSequence.Count == 0))
                             {
                                 m_process.p_sInfo = m_process.AddInfoWafer(m_infoRnRSlot);
                                 CalcSequence();

@@ -59,12 +59,15 @@ namespace Root_CAMELLIA.Data
             }
         }
 
-        public int GetLayerCount()
+        public int GetLayerCount(bool isSave = true)
         {
-            return App.m_nanoView.m_LayerList.Count;
+            if (isSave)
+                return App.m_nanoView.m_LayerListSave.Count;
+            else
+                return App.m_nanoView.m_LayerList.Count;
         }
 
-        public void AddLayer(int index = -1)
+        public void AddLayer(int index = -1, bool isSave = true)
         {
             Layer layerData = new Layer();
             //App.m_nanoView.ThicknessScaleOffset thickData = new App.m_nanoView.ThicknessScaleOffset();
@@ -72,21 +75,39 @@ namespace Root_CAMELLIA.Data
             if (index == -1)
             {
                 //MetDataManager.m_LayerData.Add(layerData);
-                App.m_nanoView.m_LayerList.Add(layerData);
-                Met.DataManager.GetInstance().m_ThicknessData.Add(thicknessData);
+                if (isSave)
+                {
+                    App.m_nanoView.m_LayerListSave.Add(layerData);
+                    Met.DataManager.GetInstance().m_ThicknessDataSave.Add(thicknessData);
+                }
+                else
+                {
+                    App.m_nanoView.m_LayerList.Add(layerData);
+                    Met.DataManager.GetInstance().m_ThicknessData.Add(thicknessData);
+                }
+                
             }
             else
             {
-               // MetDataManager.m_LayerData.Insert(index, layerData);
-                App.m_nanoView.m_LayerList.Insert(index, layerData);
-                Met.DataManager.GetInstance().m_ThicknessData.Insert(index,thicknessData);
+                // MetDataManager.m_LayerData.Insert(index, layerData);
+                if (isSave)
+                {
+                    App.m_nanoView.m_LayerListSave.Insert(index, layerData);
+                    Met.DataManager.GetInstance().m_ThicknessDataSave.Insert(index, thicknessData);
+                }
+                else
+                {
+                    App.m_nanoView.m_LayerList.Insert(index, layerData);
+                    Met.DataManager.GetInstance().m_ThicknessData.Insert(index, thicknessData);
+                }
+
             }
         }
 
         public void DeleteLayer(int index = -1)
         {
-            App.m_nanoView.m_LayerList.RemoveAt(index);
-            Met.DataManager.GetInstance().m_ThicknessData.RemoveAt(index);
+            App.m_nanoView.m_LayerListSave.RemoveAt(index);
+            Met.DataManager.GetInstance().m_ThicknessDataSave.RemoveAt(index);
         }
 
         public class LayerData : ObservableObject
@@ -377,13 +398,20 @@ namespace Root_CAMELLIA.Data
             #endregion
 
             #region Function
-            public void UpdateGridLayer(int currentLayer)
+            public void UpdateGridLayer(int currentLayer, bool isSave = true)
             {
                 Layer layerData;
-                layerData = App.m_nanoView.m_LayerList.ElementAt(currentLayer);
-
                 ThicknessScaleOffset thicknessData;
-                thicknessData = Met.DataManager.GetInstance().m_ThicknessData.ElementAt(currentLayer);
+                if (isSave)
+                {
+                    layerData = App.m_nanoView.m_LayerListSave.ElementAt(currentLayer);
+                    thicknessData = Met.DataManager.GetInstance().m_ThicknessDataSave.ElementAt(currentLayer);
+                }
+                else
+                {
+                    layerData = App.m_nanoView.m_LayerList.ElementAt(currentLayer);
+                    thicknessData = Met.DataManager.GetInstance().m_ThicknessData.ElementAt(currentLayer);
+                }
 
                 if(layerData.m_Host == null)
                 {
@@ -460,7 +488,7 @@ namespace Root_CAMELLIA.Data
             public bool CheckLayerHost(int currentLayer)
             {
                 Layer layerData;
-                layerData = App.m_nanoView.m_LayerList.ElementAt(currentLayer);
+                layerData = App.m_nanoView.m_LayerListSave.ElementAt(currentLayer);
 
                 if(layerData.m_Host == null)
                 {
@@ -472,9 +500,9 @@ namespace Root_CAMELLIA.Data
             public void UpdateModelLayer(int currentLayer)
             {
                 Layer layerData;
-                layerData = App.m_nanoView.m_LayerList.ElementAt(currentLayer);
+                layerData = App.m_nanoView.m_LayerListSave.ElementAt(currentLayer);
                 ThicknessScaleOffset thicknessData;
-                thicknessData = Met.DataManager.GetInstance().m_ThicknessData.ElementAt(currentLayer);
+                thicknessData = Met.DataManager.GetInstance().m_ThicknessDataSave.ElementAt(currentLayer);
 
                 layerData.m_Host = App.m_nanoView.GetMaterialFromName(Path.GetFileNameWithoutExtension(SelectedHost1));
                 layerData.m_Guest1 = App.m_nanoView.GetMaterialFromName(Path.GetFileNameWithoutExtension(SelectedGuest1));

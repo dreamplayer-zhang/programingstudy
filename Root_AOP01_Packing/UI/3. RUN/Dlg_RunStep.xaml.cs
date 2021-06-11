@@ -1,4 +1,5 @@
-﻿using System;
+﻿using RootTools;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -17,7 +18,7 @@ namespace Root_AOP01_Packing
     /// <summary>
     /// Dlg_RunStep.xaml에 대한 상호 작용 논리
     /// </summary>
-    public partial class Dlg_RunStep : Window
+    public partial class Dlg_RunStep : Window, IDialog
     {
         public Dlg_RunStep()
         {
@@ -45,11 +46,6 @@ namespace Root_AOP01_Packing
             {
                 this.DragMove();
             }
-        }
-
-        private void CloseButton_Click(object sender, RoutedEventArgs e)
-        {
-            this.Close();
         }
 
         private void MinimizeButton_Click(object sender, RoutedEventArgs e)

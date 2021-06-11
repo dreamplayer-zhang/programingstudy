@@ -18,6 +18,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Threading;
+using static RootTools.Control.Axis;
 
 namespace Root_CAMELLIA
 {
@@ -530,6 +531,14 @@ namespace Root_CAMELLIA
         //    }
         //}
 
+        public void OnKeyDown(object sender, KeyEventArgs e)
+        {
+            if(e.Key == Key.Escape)
+            {
+                CloseWindow();
+            }
+        }
+
         public void OnMouseLeave(object sender, MouseEventArgs e)
         {
             foreach (ShapeEllipse se in listCandidatePoint)
@@ -654,6 +663,12 @@ namespace Root_CAMELLIA
             return Math.Round(dResult, 3);
         }
 
+        public void GrabStop()
+        {
+            if (ModuleCamellia.p_CamVRS.p_CamInfo._IsGrabbing)
+                ModuleCamellia.p_CamVRS.GrabStop();
+        }
+
         #region Cameara Command
         public ICommand ConnectCommand
         {
@@ -699,9 +714,7 @@ namespace Root_CAMELLIA
             {
                 return new RelayCommand(() =>
                 {
-
-                    ModuleCamellia.p_CamVRS.GrabStop();
-
+                    GrabStop();
                 });
             }
         }
@@ -1105,16 +1118,24 @@ namespace Root_CAMELLIA
             }
         }
 
+        public ICommand UnloadedCommand
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    GrabStop();
+                });
+            }
+        }
+
         public ICommand CmdClose
         {
             get
             {
                 return new RelayCommand(() =>
                 {
-                    Run_Measure measure = (Run_Measure)ModuleCamellia.CloneModuleRun("Measure");
-                    ModuleCamellia.mwvm.p_StageCenterPulse = measure.m_StageCenterPos_pulse;
-
-                    CloseRequested(this, new DialogCloseRequestedEventArgs(true));
+                    CloseWindow();
                 });
             }
         }
@@ -1143,6 +1164,15 @@ namespace Root_CAMELLIA
         #endregion
 
         #region Function
+
+        void CloseWindow()
+        {
+            Run_Measure measure = (Run_Measure)ModuleCamellia.CloneModuleRun("Measure");
+            ModuleCamellia.mwvm.p_StageCenterPulse = measure.m_StageCenterPos_pulse;
+
+            CloseRequested(this, new DialogCloseRequestedEventArgs(true));
+        }
+
         public void UpdateParameter()
         {
             LibSR_Met.DataManager dataManager = LibSR_Met.DataManager.GetInstance();

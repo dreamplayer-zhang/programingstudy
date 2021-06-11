@@ -18,6 +18,9 @@ namespace Root_WIND2
             // Regiseter Parameter Items
             //RegisterParameterItem<PositionParameter>();
             RegisterParameterItem<BacksideSurfaceParameter>();
+
+            this.UseExclusiveRegion = true;
+            this.ExclusiveRegionFilePath = Constants.FilePath.BacksideExclusiveRegionFilePath;
         }
     }
 }

@@ -177,6 +177,20 @@ namespace RootTools
                 }
             }
         }
+
+        public bool CheckLogin(string sUserName, string sPassword)
+        {
+            foreach (User user in m_aAllUser)
+            {
+                if (user.CheckLogin(sPassword, sUserName))
+                {
+                    p_user = user;
+                    if (OnChangeUser != null) OnChangeUser();
+                    return true;
+                }
+            }
+            return false;
+        }
         #endregion
 
         #region KeepUser

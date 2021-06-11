@@ -1,6 +1,9 @@
 ﻿using RootTools;
+using RootTools_CLR;
+using RootTools_Vision;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -9,6 +12,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shapes;
+using System.Xml.Serialization;
 
 namespace Root_WIND2.UI_User
 {
@@ -21,10 +25,13 @@ namespace Root_WIND2.UI_User
         public class ColorDefines
         {
             public static SolidColorBrush Circle  = Brushes.Blue;
-            public static SolidColorBrush SearchCenterPoint = Brushes.Yellow;
+            public static SolidColorBrush SearchCenterPoint = Brushes.Magenta;
             public static SolidColorBrush SearchCircle = Brushes.Yellow;
             public static SolidColorBrush Map = Brushes.YellowGreen;
             public static SolidColorBrush MapFill = Brushes.Transparent;
+
+            public static SolidColorBrush ExclusivePolyStroke = Brushes.Red;
+            public static SolidColorBrush ExclusivePolyFill = Brushes.Red;
         }
 
         #endregion
@@ -46,33 +53,81 @@ namespace Root_WIND2.UI_User
             get => this.isROIChecked;
             set
             {
+                if(value == true)
+                {
+                    this.IsPolyChecked = false;
+                }
                 SetProperty<bool>(ref this.isROIChecked, value);
             }
         }
+
+        private bool isPolyChecked = false;
+        public bool IsPolyChecked
+        {
+            get => this.isPolyChecked;
+            set
+            {
+                if (value == true)
+                {
+                    this.IsROIChecked = false;
+
+                    AddExclusivePolygon();
+                }
+                else
+                {
+                    int lastIndex = this.exclusivePolyMemPointsList.Count - 1;
+                    if (lastIndex >= 0)
+                    {
+                        Polygon lastPoly = this.ExclusivePolyList[lastIndex];
+                        if (lastPoly.Points.Count == 0)
+                        {
+                            this.p_UIElement.Remove(lastPoly);
+                            this.ExclusivePolyList.Remove(lastPoly);
+                            this.exclusivePolyMemPointsList.Remove(this.exclusivePolyMemPointsList[lastIndex]);
+                        }
+                    }
+                }
+
+                SetProperty<bool>(ref this.isPolyChecked, value);
+            }
+        }
+
+        private int circleCenterMemX;
 
         public int CircleCenterMemX
         {
             get
             {
-                int width = this.circleEndMemoryPoint.X - this.circleStartMemoryPoint.X;
-                int height = this.circleEndMemoryPoint.Y - this.circleStartMemoryPoint.Y;
-                int radius = width > height ? width : height;
-                radius = (int)((double)radius * 0.5);
+                //int width = this.circleEndMemoryPoint.X - this.circleStartMemoryPoint.X;
+                //int height = this.circleEndMemoryPoint.Y - this.circleStartMemoryPoint.Y;
+                //int radius = width > height ? width : height;
+                //radius = (int)((double)radius * 0.5);
 
-                return this.circleStartMemoryPoint.X + radius;
+                return this.circleCenterMemX;
+            }
+
+            set
+            {
+                SetProperty(ref this.circleCenterMemX, value);
             }
         }
 
+
+        private int circleCenterMemY;
         public int CircleCenterMemY
         {
             get
             {
-                int width = this.circleEndMemoryPoint.X - this.circleStartMemoryPoint.X;
-                int height = this.circleEndMemoryPoint.Y - this.circleStartMemoryPoint.Y;
-                int radius = width > height ? width : height;
-                radius = (int)((double)radius * 0.5);
+                //int width = this.circleEndMemoryPoint.X - this.circleStartMemoryPoint.X;
+                //int height = this.circleEndMemoryPoint.Y - this.circleStartMemoryPoint.Y;
+                //int radius = width > height ? width : height;
+                //radius = (int)((double)radius * 0.5);
 
-                return this.circleStartMemoryPoint.Y + radius;
+                return this.circleCenterMemY;
+            }
+            set
+            {
+                SetProperty(ref this.circleCenterMemY, value);
             }
         }
 
@@ -82,6 +137,41 @@ namespace Root_WIND2.UI_User
             get => this.p_UIElement.Contains(this.CircleUI);
         }
         #endregion
+
+
+        public bool HitTest(Point hitPt)
+        {
+            //PathGeometry geometry = new PathGeometry();
+            //PathFigure path = new PathFigure();
+            //path.Segments.Add(new PolyLineSegment(this.exclusivePolyMemPointsList[0].ToList(), true));
+            //geometry.Figures.Add(path);
+
+            PathGeometry pathGeometry = new PathGeometry();
+
+            foreach (List<Point> points in this.exclusivePolyMemPointsList)
+            {
+                PathFigure figure = new PathFigure();
+                figure.StartPoint = points[0];
+
+                PathSegmentCollection segments = new PathSegmentCollection();
+
+                foreach (Point pt in points)
+                {
+                    if (points[0] == pt) continue;
+
+                    LineSegment lineSegment = new LineSegment();
+                    lineSegment.Point = pt;
+
+                    segments.Add(lineSegment);
+                }
+
+                figure.Segments = segments;
+
+                pathGeometry.Figures.Add(figure);
+            }
+
+            return pathGeometry.FillContains(hitPt);
+        }
 
         #region [Draw Method]
         private enum CIRCLE_DRAW_STATE
@@ -122,6 +212,15 @@ namespace Root_WIND2.UI_User
 
         private List<TRect> mapRectList = new List<TRect>();
 
+        // Exclusive Region
+        private List<Polygon> ExclusivePolyList;
+        private List<List<Point>> exclusivePolyMemPointsList = new List<List<Point>>();
+
+
+        public List<List<Point>> ExclusivePolyMemPointsList
+        {
+            get => this.exclusivePolyMemPointsList;
+        }
 
         #region [Initilize UIElements]
         private void InitializeUIElements()
@@ -195,6 +294,12 @@ namespace Root_WIND2.UI_User
             BottomPoint.HorizontalAlignment = System.Windows.HorizontalAlignment.Center;
             BottomPoint.VerticalAlignment = System.Windows.VerticalAlignment.Bottom;
 
+            Canvas.SetZIndex(CenterPoint, 99);
+            Canvas.SetZIndex(LeftPoint, 99);
+            Canvas.SetZIndex(TopPoint, 99);
+            Canvas.SetZIndex(RightPoint, 99);
+            Canvas.SetZIndex(BottomPoint, 99);
+
             CircleEditUI.Children.Add(CenterPoint);
             CircleEditUI.Children.Add(LeftPoint);
             CircleEditUI.Children.Add(TopPoint);
@@ -205,24 +310,27 @@ namespace Root_WIND2.UI_User
 
             #region [SearchedCircle]
             SearchedCenterPointUI = new Grid();
-            SearchedCenterPointUI.Width = 15;
-            SearchedCenterPointUI.Height = 15;
+            SearchedCenterPointUI.Width = 30;
+            SearchedCenterPointUI.Height = 30;
 
             Line line1 = new Line(); // H
-            line1.X1 = -15;
+            line1.X1 = 0;
             line1.Y1 = 0;
-            line1.X2 = 15;
-            line1.Y2 = 0;
+            line1.X2 = 30;
+            line1.Y2 = 30;
             line1.Stroke = ColorDefines.SearchCenterPoint;
-            line1.StrokeThickness = 2;
+            line1.StrokeThickness = 3;
 
             Line line2 = new Line(); // H
             line2.X1 = 0;
-            line2.Y1 = -15;
-            line2.X2 = 0;
-            line2.Y2 = 15;
+            line2.Y1 = 30;
+            line2.X2 = 30;
+            line2.Y2 = 0;
             line2.Stroke = ColorDefines.SearchCenterPoint;
-            line2.StrokeThickness = 2;
+            line2.StrokeThickness = 3;
+
+            Canvas.SetZIndex(line1, 98);
+            Canvas.SetZIndex(line2, 98);
 
             SearchedCenterPointUI.Children.Add(line1);
             SearchedCenterPointUI.Children.Add(line2);
@@ -231,6 +339,12 @@ namespace Root_WIND2.UI_User
             SearchedCircleUI.Stroke = ColorDefines.SearchCircle;
             SearchedCircleUI.StrokeThickness = 2;
             #endregion
+
+
+            #region [Exclusive Polygon]
+            ExclusivePolyList = new List<Polygon>();
+            #endregion
+
         }
 
         private void MouseLeftButtonDown_CircleEditUI_Center(object sender, MouseEventArgs e)
@@ -288,6 +402,9 @@ namespace Root_WIND2.UI_User
         {
             if(this.p_UIElement.Contains(CircleUI))
             {
+                //this.p_UIElement.Remove(CircleUI);
+                //return;
+
                 CPoint canvasStartPt = GetCanvasPoint(this.circleStartMemoryPoint);
                 CPoint canvasEndPt = GetCanvasPoint(this.circleEndMemoryPoint);
 
@@ -300,6 +417,7 @@ namespace Root_WIND2.UI_User
 
                 Canvas.SetLeft(CircleUI, canvasStartPt.X);
                 Canvas.SetTop(CircleUI, canvasStartPt.Y);
+                //Canvas.SetZIndex(CircleUI, 99);
 
                 DrawCircleEdit();
             }
@@ -322,7 +440,8 @@ namespace Root_WIND2.UI_User
                 Canvas.SetLeft(CircleEditUI, canvasStartPt.X - EditPointSize / 2);
                 Canvas.SetTop(CircleEditUI, canvasStartPt.Y - EditPointSize / 2);
 
-                if(ROIDone != null)
+
+                if (ROIDone != null)
                 {
 
                     int memW = this.circleEndMemoryPoint.X - this.circleStartMemoryPoint.X;
@@ -337,12 +456,12 @@ namespace Root_WIND2.UI_User
 
         public void DrawSearchedCircle()
         {
-            if(this.p_UIElement.Contains(SearchedCircleUI))
+            if(this.p_UIElement.Contains(SearchedCenterPointUI))
             {
                 CPoint canvasPt = GetCanvasPoint(this.searchedCenterMemoryPoint);
 
-                Canvas.SetLeft(SearchedCenterPointUI, canvasPt.X);
-                Canvas.SetTop(SearchedCenterPointUI, canvasPt.Y);
+                Canvas.SetLeft(SearchedCenterPointUI, canvasPt.X - 15);
+                Canvas.SetTop(SearchedCenterPointUI, canvasPt.Y - 15);
             }
 
             if(this.p_UIElement.Contains(SearchedCircleUI))
@@ -356,12 +475,83 @@ namespace Root_WIND2.UI_User
             }
         }
 
+
+        public void AddExclusivePolygonPoint(CPoint memPt)
+        {
+            CPoint canvasPt = GetCanvasPoint(new CPoint((int)memPt.X, (int)memPt.Y));
+
+            int lastIndex = this.exclusivePolyMemPointsList.Count - 1;
+
+            this.exclusivePolyMemPointsList[lastIndex].Add(new Point(memPt.X, memPt.Y));
+            this.ExclusivePolyList[lastIndex].Points.Add(new Point(canvasPt.X, canvasPt.Y));
+
+            if (this.p_UIElement.Contains(this.ExclusivePolyList[lastIndex]) == false)
+                this.p_UIElement.Add(this.ExclusivePolyList[lastIndex]);
+        }
+
+
+        public void AddExclusivePolygonPoint(Point memPt)
+        {
+            CPoint canvasPt = GetCanvasPoint(new CPoint((int)memPt.X, (int)memPt.Y));
+
+            int lastIndex = this.exclusivePolyMemPointsList.Count - 1;
+
+            this.exclusivePolyMemPointsList[lastIndex].Add(memPt);
+            this.ExclusivePolyList[lastIndex].Points.Add(new Point(canvasPt.X, canvasPt.Y));
+
+            if(this.p_UIElement.Contains(this.ExclusivePolyList[lastIndex]) == false)
+                this.p_UIElement.Add(this.ExclusivePolyList[lastIndex]);
+        }
+
+        public void AddExclusivePolygon()
+        {
+            Polygon polygon = new Polygon();
+            polygon.Stroke = ColorDefines.ExclusivePolyStroke;
+            polygon.StrokeThickness = 2;
+            polygon.Fill = ColorDefines.ExclusivePolyFill;
+            polygon.Opacity = 0.3;
+
+            this.ExclusivePolyList.Add(polygon);
+            this.exclusivePolyMemPointsList.Add(new List<Point>());
+        }
+
+        public void ClearExclusivePolygon()
+        {
+            if(this.IsPolyChecked == true)
+                this.IsPolyChecked = false;
+
+            foreach(Polygon polygon in this.ExclusivePolyList)
+            {
+                if(this.p_UIElement.Contains(polygon))
+                {
+                    this.p_UIElement.Remove(polygon);
+                }
+            }
+            this.ExclusivePolyList.Clear();
+            this.exclusivePolyMemPointsList.Clear();
+        }
+
+        public void DrawExclusivePolygon()
+        {
+            int i = 0;
+            foreach (Polygon polygon in this.ExclusivePolyList)
+            {
+                polygon.Points.Clear();
+                foreach (Point pt in this.exclusivePolyMemPointsList[i])
+                {
+                    CPoint canvasPt = GetCanvasPoint(pt);
+                    polygon.Points.Add(new Point(canvasPt.X, canvasPt.Y));
+                }
+                i++;
+            }
+        }
+
         public void SetMapRectList(List<CRect> rectList)
         {
             this.mapRectList.Clear();
             this.p_DrawElement.Clear();
 
-            foreach(CRect rt in rectList)
+            foreach (CRect rt in rectList)
             {
                 CPoint canvasLeftTop = GetCanvasPoint(new CPoint(rt.Left, rt.Top));
                 CPoint canvasRightBottom = GetCanvasPoint(new CPoint(rt.Right, rt.Bottom));
@@ -393,7 +583,7 @@ namespace Root_WIND2.UI_User
 
         public void DrawMapRectList()
         {
-            if(this.mapRectList.Count > 0)
+            if (this.mapRectList.Count > 0)
             {
                 foreach (TRect rt in mapRectList)
                 {
@@ -419,7 +609,10 @@ namespace Root_WIND2.UI_User
             if (this.p_UIElement.Contains(SearchedCenterPointUI))
                 this.p_UIElement.Remove(SearchedCenterPointUI);
 
+            //Canvas.SetZIndex(this.SearchedCenterPointUI, 99);
             this.p_UIElement.Add(SearchedCenterPointUI);
+
+
 
             DrawSearchedCircle();
         }
@@ -437,10 +630,16 @@ namespace Root_WIND2.UI_User
 
         private void RedrawShapes()
         {
+            DrawMapRectList();
+
             DrawCircle();
             DrawCircleEdit();
             DrawSearchedCircle();
-            DrawMapRectList();
+
+            // Polygon
+            DrawExclusivePolygon();
+
+            //Canvas.SetZIndex(CircleEditUI, 99);
         }
 
         #endregion
@@ -456,6 +655,15 @@ namespace Root_WIND2.UI_User
 
             CPoint canvasPt = new CPoint(p_MouseX, p_MouseY);
             CPoint memPt = GetMemPoint(canvasPt);
+
+
+            //if (HitTest(new Point(memPt.X, memPt.Y)) == true)
+            //    MessageBox.Show("Hit!!");
+
+            if (this.IsPolyChecked == true)
+            {
+                AddExclusivePolygonPoint(memPt);
+            }
 
             if(this.circleEditState == CIRCLE_EDIT_STATE.None)
             {
@@ -505,6 +713,9 @@ namespace Root_WIND2.UI_User
             CPoint canvasPt = new CPoint(p_MouseX, p_MouseY);
             CPoint memPt = GetMemPoint(canvasPt);
 
+
+            Line line = new Line();
+            
             if (isDrawing == true)
             {
                 circleEndMemoryPoint.X = memPt.X;
@@ -665,6 +876,553 @@ namespace Root_WIND2.UI_User
                 });
             }
         }
+
+        public RelayCommand btnCircleDetectCommand
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    if(this.p_UIElement.Contains(this.CircleUI))
+                    {
+                        try
+                        {
+                            SearchCircleCenter();
+                        }
+                        catch(Exception ex)
+                        {
+                            MessageBox.Show(ex.Message);
+                        }
+                    }
+                    else
+                    {
+                        MessageBox.Show("ROI가 존재하지 않습니다.");
+                    }
+                });
+            }
+        }
+
+        public RelayCommand btnCircleClearCommand
+        {
+            get => new RelayCommand(() =>
+            {
+                if (this.p_UIElement.Contains(this.CircleUI))
+                {
+                    this.p_UIElement.Remove(this.CircleUI);
+                }
+
+                if(this.p_UIElement.Contains(this.CircleEditUI))
+                {
+                    this.p_UIElement.Remove(this.CircleEditUI);
+                }
+
+                if(this.p_UIElement.Contains(this.SearchedCircleUI))
+                {
+                    this.p_UIElement.Remove(this.SearchedCircleUI);
+                }
+            });
+        }
+
+
+        public void SearchCircleCenter()
+        {
+            int roiW = this.circleEndMemoryPoint.X - this.circleStartMemoryPoint.X;
+            int roiH = this.circleEndMemoryPoint.Y - this.circleStartMemoryPoint.Y;
+            float roiR = roiW > roiH ? roiW : roiH;
+
+            int roiCenterX = this.circleStartMemoryPoint.X + (int)roiR / 2;
+            int roiCenterY = this.circleStartMemoryPoint.Y + (int)roiR / 2;
+
+
+            ImageData imageData = this.p_ImageData;
+
+            int memH = imageData.p_Size.Y;
+            int memW = imageData.p_Size.X;
+
+            float centerX = roiCenterX; // 레시피 티칭 값 가지고오기
+            float centerY = roiCenterY;
+
+            IntPtr mainImage = new IntPtr();
+
+            mainImage = imageData.GetPtr(0);
+
+            Cpp_Point[] circlePoints = null;
+            unsafe
+            {
+                int DownSample = 20;
+
+                fixed (byte* pImg = new byte[(long)(memW / DownSample) * (long)(memH / DownSample)]) // 원본 이미지 너무 커서 안열림
+                {
+                    CLR_IP.Cpp_SubSampling((byte*)mainImage, pImg, memW, memH, 0, 0, memW, memH, DownSample);
+
+                    // Param Down Scale
+                    centerX /= DownSample; centerY /= DownSample;
+                    roiR /= DownSample;
+                    memW /= DownSample; memH /= DownSample;
+
+                    circlePoints = CLR_IP.Cpp_FindWaferEdge(pImg,
+                        &centerX, &centerY,
+                        &roiR,
+                        memW, memH,
+                        1
+                        );
+                }
+
+
+                // Param Up Scale
+               centerX *= DownSample;
+               centerY *= DownSample;
+
+                double outRadius = roiR * DownSample;
+
+
+                PathGeometry geometry = PolygonController.CreatePolygonGeometry(this.ExclusivePolyMemPointsList);
+
+                List<CPoint> points = new List<CPoint>();
+
+                //centerX = 300000 / 4 / 2;
+                //centerY = 300000 / 4 / 2 + 2000;
+
+                int threshold = (int)centerX  + 2000;
+
+                for (int i = 0; i < circlePoints.Length; i++)
+                {
+                    CPoint pt = new CPoint(circlePoints[i].x * DownSample, circlePoints[i].y * DownSample);
+                    if (!PolygonController.HitTest(geometry, new Point(pt.X, pt.Y)))
+                    {
+                        double radius = Math.Sqrt(Math.Pow(pt.X - centerX, 2) + Math.Pow(pt.Y - centerY, 2));
+                        if( radius < threshold)
+                        points.Add(pt);
+                    }
+                }
+
+
+
+                Point centerPt = Tools.FindCircleCenterByPoints(DataConverter.CPointListToPointList(points), (int)centerX, (int)centerY, 100);
+
+                this.SetSearchedCenter(new CPoint((int)centerPt.X, (int)centerPt.Y));
+                this.SetSearchedCirclePoints(points);
+
+                List<CRect> rectList = this.CalcDiePosition((int)centerPt.X, (int)centerPt.Y, false);
+
+                this.SetMapRectList(rectList);
+            }
+        }
+
+        public List<CRect> CalcDiePosition(int centerX, int centerY)
+        {
+            CameraInfo camInfo = DataConverter.GrabModeToCameraInfo(GlobalObjects.Instance.Get<WIND2_Engineer>().m_handler.p_BackSideVision.GetGrabMode(GlobalObjects.Instance.Get<RecipeBack>().CameraInfoIndex));
+
+            RecipeType_WaferMap waferMap = GlobalObjects.Instance.Get<RecipeBack>().WaferMap;
+            OriginRecipe originRecipe = GlobalObjects.Instance.Get<RecipeBack>().GetItem<OriginRecipe>();
+            int[] mapData = waferMap.Data;
+
+            int MasterDieX = waferMap.MasterDieX;
+            int MasterDieY = waferMap.MasterDieY;
+
+            int originDieX = waferMap.OriginDieX;
+            int originDieY = waferMap.OriginDieY;
+
+            int mapSizeX = waferMap.MapSizeX;
+            int mapSizeY = waferMap.MapSizeY;
+            double diePitchX = waferMap.DiePitchX / camInfo.RealResX;
+            double diePitchY = waferMap.DiePitchY / camInfo.RealResY;
+            double sampleCenterX = waferMap.SampleCenterLocationX;
+            double sampleCenterY = waferMap.SampleCenterLocationY;
+
+            List<CRect> rectList = new List<CRect>();
+
+            int originX = (int)(centerX + sampleCenterX);
+            int originY = (int)(centerY - sampleCenterY);
+
+            for (int x = 0; x < mapSizeX; x++)
+            {
+                for (int y = 0; y < mapSizeY; y++)
+                {
+                    if (mapData[y * mapSizeX + x] == 1)
+                    {
+                        int left = (int)(originX - (originDieX - x) * diePitchX);
+                        int right = (int)(originX - (originDieX - x - 1) * diePitchX);
+                        int top = (int)(originY - (originDieY - y) * diePitchY);
+                        int bottom = (int)(originY - (originDieY - y - 1) * diePitchY);
+
+                        rectList.Add(new CRect(left, top, right, bottom));
+
+                        if (x == MasterDieX && y == MasterDieY)
+                        {
+                            originRecipe.OriginX = left;
+                            originRecipe.OriginY = bottom;
+                        }
+                    }
+                }
+            }
+
+
+            BacksideRecipe backsideRecipe = GlobalObjects.Instance.Get<RecipeBack>().GetItem<BacksideRecipe>();
+
+            backsideRecipe.CenterX = centerX;
+            backsideRecipe.CenterY = centerY;
+
+            return rectList;
+        }
+
+        public List<CRect> CalcDiePosition(int centerX, int centerY, bool isPartialDie)
+        {
+            CameraInfo camInfo = DataConverter.GrabModeToCameraInfo(GlobalObjects.Instance.Get<WIND2_Engineer>().m_handler.p_BackSideVision.GetGrabMode(GlobalObjects.Instance.Get<RecipeBack>().CameraInfoIndex));
+
+            RecipeType_WaferMap waferMap = GlobalObjects.Instance.Get<RecipeBack>().WaferMap;
+            OriginRecipe originRecipe = GlobalObjects.Instance.Get<RecipeBack>().GetItem<OriginRecipe>();
+            int[] mapData = waferMap.Data;
+
+            int MasterDieX = waferMap.MasterDieX;
+            int MasterDieY = waferMap.MasterDieY;
+
+            int originDieX = waferMap.OriginDieX;
+            int originDieY = waferMap.OriginDieY;
+
+            double diePitchX = waferMap.DiePitchX / camInfo.RealResX;
+            double diePitchY = waferMap.DiePitchY / camInfo.RealResY;
+            double sampleCenterX = waferMap.SampleCenterLocationX;
+            double sampleCenterY = waferMap.SampleCenterLocationY;
+
+            int mapSizeX = waferMap.MapSizeX;
+            int mapSizeY = waferMap.MapSizeY;
+
+            double radius = 150000 / camInfo.RealResX;
+            double radius_2 = radius * radius;
+
+
+            List<CRect> rectList = new List<CRect>();
+
+            int originX = (int)(centerX + sampleCenterX);
+            int originY = (int)(centerY - sampleCenterY);
+
+            if(isPartialDie)
+            {
+                double left_remain_X = (centerX - sampleCenterX) - (originDieX * diePitchX);
+                double top_remain_y = (centerY - sampleCenterY) - (originDieY * diePitchY);
+
+                double right_remain_X = (centerX - sampleCenterX) - ((mapSizeX - originDieX + 1) * diePitchX);
+                double bottom_remain_y = (centerY - sampleCenterY) - ((mapSizeY - originDieY + 1) * diePitchY);
+
+
+                int dieLeftCount = 0, dieRightCount = 0, dieTopCount = 0, dieBottomCount = 0;
+                if (left_remain_X > 0)
+                {
+                    dieLeftCount = (int)Math.Ceiling(left_remain_X / diePitchX);
+                }
+
+                if (top_remain_y > 0)
+                {
+                    dieTopCount = (int)Math.Ceiling(top_remain_y / diePitchY);
+                }
+
+                if (right_remain_X > 0)
+                {
+                    dieRightCount = (int)Math.Ceiling(right_remain_X / diePitchX);
+                }
+
+                if (bottom_remain_y > 0)
+                {
+                    dieBottomCount = (int)Math.Ceiling(bottom_remain_y / diePitchY);
+                }
+
+
+                int originMapSizeX = mapSizeX;
+                int originMapSizeY = mapSizeY;
+                mapSizeX += (dieLeftCount + dieRightCount);
+                mapSizeY += (dieTopCount + dieBottomCount);
+
+                originDieX += dieLeftCount;
+                originDieY += dieTopCount;
+
+                for (int x = 0; x < mapSizeX; x++)
+                {
+                    for (int y = 0; y < mapSizeY; y++)
+                    {
+                        int rel_x = (x - originDieX); // 원점 중심좌표로 Right/Top방향이 +
+                        int rel_y = (originDieY - y);
+
+                        int left = (int)(originX + rel_x * diePitchX);
+                        int right = (int)(originX + (rel_x + 1) * diePitchX);
+                        int top = (int)(originY - (rel_y) * diePitchY);
+                        int bottom = (int)(originY - (rel_y - 1) * diePitchY);
+
+
+                        int map_x = x - dieLeftCount;
+                        int map_y = y - dieTopCount;
+                        if(map_x >= 0 && map_y >= 0 && 
+                            map_x < originMapSizeX && map_y < originMapSizeY)
+                        {
+                            if (mapData[map_y * originMapSizeX + map_x] == 1)
+                                continue;
+                        }
+
+                        if (rel_x >= 0 && rel_y >= 0) // 제 1사분면
+                        {
+                            // 다이의 좌하단이 포함
+                            if( Math.Pow(left - centerX, 2) + Math.Pow(bottom - centerY, 2) < radius_2)
+                            {
+                                rectList.Add(new CRect(left, top, right, bottom));
+                            }
+
+                        }
+                        else if(rel_x < 0 && rel_y >= 0) // 제 2사분면
+                        {
+                            // 다이의 우하단이 포함
+                            if (Math.Pow(right - centerX, 2) + Math.Pow(bottom - centerY, 2) < radius_2)
+                            {
+                                rectList.Add(new CRect(left, top, right, bottom));
+                            }
+                        }
+                        else if(rel_x < 0 && rel_y < 0) // 제 3사분면
+                        {
+                            // 다이의 우상단이 포함
+                            if (Math.Pow(right - centerX, 2) + Math.Pow(top - centerY, 2) < radius_2)
+                            {
+                                rectList.Add(new CRect(left, top, right, bottom));
+                            }
+                        }
+                        else //제 4사분면
+                        {
+                            // 다이의 좌상단이 포함
+                            if (Math.Pow(left - centerX, 2) + Math.Pow(top - centerY, 2) < radius_2)
+                            {
+                                rectList.Add(new CRect(left, top, right, bottom));
+                            }
+                        }
+
+
+                        //int map_x = x - dieLeftCount;
+                        //int map_y = y - dieTopCount;
+
+
+                        //if (mapData[y * mapSizeX + x] == 1)
+                        //{
+
+
+                        //    rectList.Add(new CRect(left, top, right, bottom));
+
+                        //    if (x == MasterDieX && y == MasterDieY)
+                        //    {
+                        //        originRecipe.OriginX = left;
+                        //        originRecipe.OriginY = bottom;
+                        //    }
+                        //}
+                    }
+                }
+
+            }
+            else
+            {
+                for (int x = 0; x < mapSizeX; x++)
+                {
+                    for (int y = 0; y < mapSizeY; y++)
+                    {
+                        if (mapData[y * mapSizeX + x] == 1)
+                        {
+                            int left = (int)(originX - (originDieX - x) * diePitchX);
+                            int right = (int)(originX - (originDieX - x - 1) * diePitchX);
+                            int top = (int)(originY - (originDieY - y) * diePitchY);
+                            int bottom = (int)(originY - (originDieY - y - 1) * diePitchY);
+
+                            rectList.Add(new CRect(left, top, right, bottom));
+
+                            if (x == MasterDieX && y == MasterDieY)
+                            {
+                                originRecipe.OriginX = left;
+                                originRecipe.OriginY = bottom;
+                            }
+                        }
+                    }
+                }
+            }
+
+
+            BacksideRecipe backsideRecipe = GlobalObjects.Instance.Get<RecipeBack>().GetItem<BacksideRecipe>();
+
+            backsideRecipe.CenterX = centerX;
+            backsideRecipe.CenterY = centerY;
+
+            return rectList;
+        }
+
+
+
+        public RelayCommand btnSavePolyCommand
+        {
+            get => new RelayCommand(() =>
+             {
+                 this.IsPolyChecked = false;
+
+                 SaveExclusivePolygon();
+             });
+        }
+
+        public RelayCommand btnCancelPolyCommand
+        {
+            get => new RelayCommand(() =>
+            {
+                if(this.IsPolyChecked == true)
+                {
+                    this.IsPolyChecked = false;
+
+                    if (this.exclusivePolyMemPointsList.Count != 0)
+                    {
+                        int lastIndex = this.exclusivePolyMemPointsList.Count - 1;
+                        Polygon lastPoly = this.ExclusivePolyList[lastIndex];
+
+                        if (lastPoly.Points.Count > 0)
+                        {
+                            this.p_UIElement.Remove(lastPoly);
+                            this.ExclusivePolyList.Remove(lastPoly);
+                            this.exclusivePolyMemPointsList.Remove(this.exclusivePolyMemPointsList[lastIndex]);
+                        }
+                    }
+                }
+            });
+        }
+
+        public RelayCommand btnClearPolyCommand
+        {
+            get => new RelayCommand(() =>
+            {
+                ClearExclusivePolygon();
+            });
+        }
+
+        public RelayCommand btnCircleSaveCommand
+        {
+            get => new RelayCommand(() =>
+             {
+                 SaveCenterPoint();
+             });
+        }
+
+
+
+        public void SaveCenterPoint()
+        {
+            try
+            {
+                lock (lockObj)
+                {
+                    if (File.Exists(Constants.FilePath.BacksideCenterPointFilePath))
+                    {
+                        string strTime = DateTime.Now.ToString("yyyyMMddhhmmss");
+                        if (!File.Exists(Constants.RootPath.RootSetupPath + strTime + "_" + Constants.FileName.BacksideCenterPointFileName))
+                        {
+                            File.Move(Constants.FilePath.BacksideCenterPointFilePath, Constants.RootPath.RootSetupPath + strTime + "_" + Constants.FileName.BacksideCenterPointFileName);
+                        }
+                    }
+
+                    using (StreamWriter wr = new StreamWriter(Constants.FilePath.BacksideCenterPointFilePath))
+                    {
+                       
+                        XmlSerializer xs = new XmlSerializer(typeof(CPoint));
+                        xs.Serialize(wr, this.searchedCenterMemoryPoint);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+
+        public void ReadCenterPoint()
+        {
+            try
+            {
+                if (File.Exists(Constants.FilePath.BacksideCenterPointFilePath))
+                {        
+                    using (var sr = new StreamReader(Constants.FilePath.BacksideCenterPointFilePath))
+                    {
+                        XmlSerializer xs = new XmlSerializer(typeof(CPoint));
+                        CPoint centerPt = (CPoint)xs.Deserialize(sr);
+
+                        SetSearchedCenter(centerPt);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+
+
+        private readonly string ExclusivePolygonListFilePath = "Backside_ExclusivePolygonList.xml";
+
+        private object lockObj = new object();
+        public void SaveExclusivePolygon()
+        {
+            try
+            {
+                lock (lockObj)
+                {
+                    if (File.Exists(Constants.RootPath.RootSetupPath + ExclusivePolygonListFilePath))
+                    {
+                        string strTime = DateTime.Now.ToString("yyyyMMddhhmmss");
+                        if (!File.Exists(Constants.RootPath.RootSetupPath + strTime + "_" + ExclusivePolygonListFilePath))
+                        {
+                            File.Move(Constants.RootPath.RootSetupPath + ExclusivePolygonListFilePath, Constants.RootPath.RootSetupPath + strTime + "_" + ExclusivePolygonListFilePath);
+                        }
+                    }
+
+                    using (StreamWriter wr = new StreamWriter(Constants.RootPath.RootSetupPath + ExclusivePolygonListFilePath))
+                    {
+                        XmlSerializer xs = new XmlSerializer(typeof(List<List<Point>>));
+                        xs.Serialize(wr, this.exclusivePolyMemPointsList);
+                    }
+                }
+            }
+            catch(Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+
+        public void ReadExclusivePolygon()
+        {
+            try
+            {
+                if (File.Exists(Constants.RootPath.RootSetupPath + ExclusivePolygonListFilePath))
+                {
+                    ClearExclusivePolygon();
+
+                    using (var sr = new StreamReader(Constants.RootPath.RootSetupPath + ExclusivePolygonListFilePath))
+                    {
+                        XmlSerializer xs = new XmlSerializer(typeof(List<List<Point>>));
+                        this.exclusivePolyMemPointsList = (List<List<Point>>)xs.Deserialize(sr);
+
+                        foreach (List<Point> pointList in this.exclusivePolyMemPointsList)
+                        {
+                            Polygon polygon = new Polygon();
+
+                            polygon.Stroke = ColorDefines.ExclusivePolyStroke;
+                            polygon.StrokeThickness = 2;
+                            polygon.Fill = ColorDefines.ExclusivePolyFill;
+                            polygon.Opacity = 0.3;
+                            this.ExclusivePolyList.Add(polygon);
+
+                            foreach (Point pt in pointList)
+                            {
+                                CPoint canvasPt = GetCanvasPoint(pt);
+                                polygon.Points.Add(new Point(canvasPt.X, canvasPt.Y));
+                            }
+
+                            this.p_UIElement.Add(polygon);
+                        }
+                    }
+                }
+            }
+            catch(Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
+
         #endregion
     }
 }

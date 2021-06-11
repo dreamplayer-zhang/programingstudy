@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Windows.Controls;
 using RootTools.Trees;
@@ -39,6 +40,8 @@ namespace RootTools.Control.Ajin
             m_bAbsoluteEncoder = tree.Set(m_bAbsoluteEncoder, m_bAbsoluteEncoder, "Absolute Encoder", "Absolute Encoder");
             if (nAxis != m_nAxis) m_listAxis.m_qSetAxis.Enqueue(this);
         }
+
+        bool m_isPlus = false;
         #endregion
 
         #region Position & Velocity
@@ -81,6 +84,11 @@ namespace RootTools.Control.Ajin
         {
             p_log.Info(p_id + " Jog Start : " + fScale.ToString());
             if (IsInterlock()) return p_id + m_sCheckInterlock;
+
+            if (fScale > 0)
+                m_isPlus = true;
+            else
+                m_isPlus = false;
 
             p_sInfo = base.Jog(fScale, sSpeed);
             if (p_sInfo != "OK") return p_sInfo;
@@ -585,6 +593,7 @@ namespace RootTools.Control.Ajin
                         break;
                     default: break;
                 }
+                ThreadCheck_SWLimit(m_isPlus);
             }
         }
 
@@ -759,6 +768,15 @@ namespace RootTools.Control.Ajin
 
             bool bIOVisible = m_aDIO_I.Count > 0;
             RunTreeIOLock(m_treeRoot.GetTree("I/O Lock", true, bIOVisible), m_sUnit);
+        }
+
+        public override void RunTreePos(Tree tree, string sUnit)
+        {
+            base.RunTreePos(tree, sUnit);
+
+            bool useLimit = m_bSWBoardLimit;
+            uint use = Convert.ToUInt32(useLimit); 
+            CAXM.AxmSignalSetSoftLimit(m_nAxis, use, 0, 1, m_aPos[p_asPos[3]], m_aPos[p_asPos[2]]);
         }
 
         public override void RunTreeSetting(Tree.eMode mode)

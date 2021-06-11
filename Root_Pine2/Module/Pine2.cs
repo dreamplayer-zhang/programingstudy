@@ -1,15 +1,15 @@
-﻿using RootTools;
+﻿using Root_Pine2.Engineer;
+using RootTools;
+using RootTools.Comm;
 using RootTools.Control;
-using RootTools.GAFs;
 using RootTools.Module;
 using RootTools.ToolBoxs;
 using RootTools.Trees;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
+using System.Windows.Threading;
 
 namespace Root_Pine2.Module
 {
@@ -19,7 +19,8 @@ namespace Root_Pine2.Module
         public override void GetTools(bool bInit)
         {
             m_lamp.GetTools(m_toolBox, this);
-            m_buzzer.GetTools(m_toolBox, this); 
+            m_buzzer.GetTools(m_toolBox, this);
+            m_display.GetTools(m_toolBox, this, bInit); 
             if (bInit)
             {
                 InitALID();
@@ -151,6 +152,85 @@ namespace Root_Pine2.Module
         }
         #endregion
 
+        #region LED Display
+        public class Display
+        {
+            Modbus[] m_modbus = new Modbus[2] { null, null };
+            public void GetTools(ToolBox toolBox, ModuleBase module, bool bInit)
+            {
+                toolBox.GetComm(ref m_modbus[0], module, "Display0");
+                toolBox.GetComm(ref m_modbus[1], module, "Display1");
+                if (bInit)
+                {
+                    m_modbus[0].Connect();
+                    m_modbus[1].Connect();
+                }
+            }
+
+            public string Write(int nComm, int nUnit, string sMsg)
+            {
+                Data data = new Data(nComm, nUnit, sMsg);
+                m_qSend.Enqueue(data); 
+                return "OK";
+            }
+
+            #region Data
+            class Data
+            {
+                public int m_nComm = 0; 
+                public int m_nUnit = 1;
+                public List<int> m_aSend = new List<int>(); 
+                public Data(int nCumm, int nUnit, string sMsg)
+                {
+                    m_nComm = nCumm; 
+                    m_nUnit = nUnit;
+                    while (sMsg.Length < 4) sMsg += " ";
+                    byte[] aMsg = Encoding.ASCII.GetBytes(sMsg);
+                    for (int n = 0; n < 4; n++) aMsg[n] = GetCode(aMsg[n]); 
+                    m_aSend.Add(256 * aMsg[0] + aMsg[1]); 
+                    m_aSend.Add(256 * aMsg[2] + aMsg[3]);
+                }
+
+                byte GetCode(byte ch)
+                {
+                    if ((ch >= '0') && (ch <= '9')) return (byte)(ch - '0');
+                    if ((ch >= 'A') && (ch <= 'Z')) return (byte)(ch - 'A' + 10);
+                    return 0x3f;
+                }
+            }
+            Queue<Data> m_qSend = new Queue<Data>(); 
+
+            string Send(Data data)
+            {
+                m_modbus[data.m_nComm].Connect(); 
+                return m_modbus[data.m_nComm].WriteHoldingRegister((byte)data.m_nUnit, 1, data.m_aSend); 
+            }
+            #endregion
+
+            #region Timer
+            public DispatcherTimer m_timer = new DispatcherTimer();
+            void InitTimer()
+            {
+                m_timer.Interval = TimeSpan.FromSeconds(0.1);
+                m_timer.Tick += M_timer_Tick; 
+                m_timer.Start();
+            }
+
+            private void M_timer_Tick(object sender, EventArgs e)
+            {
+                if (m_qSend.Count == 0) return;
+                Send(m_qSend.Dequeue()); 
+            }
+            #endregion
+
+            public Display()
+            {
+                InitTimer(); 
+            }
+        }
+        public Display m_display = new Display(); 
+        #endregion
+
         #region eRunMode
         public enum eRunMode
         {
@@ -180,6 +260,41 @@ namespace Root_Pine2.Module
                 if (_widthStrip == value) return;
                 _widthStrip = value;
                 OnPropertyChanged();
+            }
+        }
+
+        int _lStack = 50; 
+        public int p_lStack
+        {
+            get { return _lStack; }
+            set
+            {
+                _lStack = value;
+                OnPropertyChanged(); 
+            }
+        }
+
+        bool _b3D = true; 
+        public bool p_b3D
+        {
+            get { return _b3D; }
+            set
+            {
+                if (_b3D == value) return;
+                _b3D = value;
+                OnPropertyChanged(); 
+            }
+        }
+
+        string _sRecipe = "";
+        public string p_sRecipe
+        {
+            get { return _sRecipe; }
+            set
+            {
+                if (_sRecipe == value) return;
+                _sRecipe = value;
+                m_handler.p_sRecipe = value; 
             }
         }
         #endregion
@@ -235,12 +350,15 @@ namespace Root_Pine2.Module
             m_buzzer.RunTree(tree.GetTree("Buzzer")); 
             p_eMode = (eRunMode)tree.Set(p_eMode, p_eMode, "Mode", "RunMode");
             p_widthStrip = tree.Set(p_widthStrip, p_widthStrip, "Width", "Strip Width (mm)");
+            p_sRecipe = tree.Set(p_sRecipe, p_sRecipe, "Recipe", "Recipe"); 
         }
         #endregion
 
+        Pine2_Handler m_handler; 
         public Pine2(string id, IEngineer engineer)
         {
             p_id = id;
+            m_handler = (Pine2_Handler)engineer.ClassHandler(); 
             InitBase(id, engineer);
 
             InitThread();
@@ -248,6 +366,7 @@ namespace Root_Pine2.Module
 
         public override void ThreadStop()
         {
+            m_display.m_timer.Stop(); 
             ThreadDIOStop(); 
             base.ThreadStop();
         }

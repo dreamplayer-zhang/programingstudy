@@ -245,6 +245,36 @@ namespace RootTools.Light
         }
         #endregion
 
+        #region Light DAWOO RGB
+        const string c_sDAWOO_RGB = "DAWOO RGB";
+        int m_nDAWOO_RGB = 0;
+        ObservableCollection<LightTool_DAWOO_RGB> m_aLightToolDAWOO_RGB = new ObservableCollection<LightTool_DAWOO_RGB>();
+        public ObservableCollection<LightTool_DAWOO_RGB> p_aLightToolDAWOO_RGB
+        {
+            get
+            {
+                return m_aLightToolDAWOO_RGB;
+            }
+            set
+            {
+                SetProperty(ref m_aLightToolDAWOO_RGB, value);
+            }
+        }
+
+        bool RunTreeDAWOO_RGB(Tree tree)
+        {
+            m_nDAWOO_RGB = tree.Set(m_nDAWOO_RGB, m_nDAWOO_RGB, "Count", "Light DAWOO RGB Count");
+            while (p_aLightToolDAWOO_RGB.Count > m_nDAWOO_RGB)
+                p_aLightToolDAWOO_RGB.RemoveAt(p_aLightToolDAWOO_RGB.Count - 1);
+            while (p_aLightToolDAWOO_RGB.Count < m_nDAWOO_RGB)
+            {
+                LightTool_DAWOO_RGB lightTool = new LightTool_DAWOO_RGB(c_sDAWOO_RGB + "." + (char)('A' + p_aLightToolDAWOO_RGB.Count), m_engineer);
+                p_aLightToolDAWOO_RGB.Add(lightTool);
+            }
+            return true;
+        }
+        #endregion
+
         #region Tree
         private void M_treeRoot_UpdateTree()
         {
@@ -264,6 +294,7 @@ namespace RootTools.Light
             bChange |= RunLVSTree(m_treeRoot.GetTree(c_sLVS));
             bChange |= RunLVSnewTree(m_treeRoot.GetTree(c_sLVSnew));
             bChange |= RunTreeDAWOO(m_treeRoot.GetTree(c_sDAWOO));
+            bChange |= RunTreeDAWOO_RGB(m_treeRoot.GetTree(c_sDAWOO_RGB));
             if (bChange)
             {
                 p_asLightTool.Clear();
@@ -279,6 +310,8 @@ namespace RootTools.Light
                 foreach (LightTool_LVS_new lightTool in p_aLightToolLVSnew)
                     AddTool(lightTool);
                 foreach (LightTool_DAWOO lightTool in p_aLightToolDAWOO)
+                    AddTool(lightTool);
+                foreach (LightTool_DAWOO_RGB lightTool in p_aLightToolDAWOO_RGB)
                     AddTool(lightTool);
                 if (OnToolChanged != null)
                     OnToolChanged();
@@ -334,6 +367,7 @@ namespace RootTools.Light
             else if (type == typeof(LightTool_LVS)) m_nLVS++;
             else if (type == typeof(LightTool_LVS_new)) m_nLVSnew++;
             else if (type == typeof(LightTool_DAWOO)) m_nDAWOO++;
+            else if (type == typeof(LightTool_DAWOO_RGB)) m_nDAWOO_RGB ++;
             RunTree(Tree.eMode.Init);
         }
 
@@ -374,6 +408,12 @@ namespace RootTools.Light
                 if (m_nDAWOO == 0)
                     return;
                 m_nDAWOO--;
+            }
+            else if (type == typeof(LightTool_DAWOO_RGB))
+            {
+                if (m_nDAWOO_RGB == 0)
+                    return;
+                m_nDAWOO_RGB--;
             }
             RunTree(Tree.eMode.Init);
         }

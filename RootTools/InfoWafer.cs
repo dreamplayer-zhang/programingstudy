@@ -23,6 +23,24 @@ namespace RootTools
             }
         }
 
+        string _sInspectionID = "";
+        public string p_sInspectionID
+        {
+            get
+            {
+                return _sInspectionID;
+            }
+            set
+            {
+                if (_sInspectionID == value)
+                    return;
+                m_log.Info(p_id + "Inspection ID : " + _sInspectionID + " -> " + value);
+                _sInspectionID = value;
+                OnPropertyChanged();
+                RegWrite();
+            }
+        }
+
         string _sFrameID = "";
         public string p_sFrameID
         {
@@ -60,6 +78,15 @@ namespace RootTools
             e8inch,
             eError
         }
+        public enum eWaferOrder
+        {
+            FirstWafer,
+            MiddleWafer,
+            LastWafer,
+            FirstLastWafer,
+        }
+        public eWaferOrder _eWaferOrder = eWaferOrder.MiddleWafer;
+
         eWaferSize _eSize = eWaferSize.e300mm;
         public eWaferSize p_eSize
         {
@@ -231,7 +258,8 @@ namespace RootTools
         {
             m_sManualRecipe = sRecipe;
             p_sRecipe = sRecipe;
-            m_moduleRunList.OpenJob(sRecipe, true);
+            if(m_moduleRunList != null)
+                m_moduleRunList.OpenJob(sRecipe, true);
             m_qProcess.Clear();
         }
 
@@ -266,8 +294,8 @@ namespace RootTools
         public void InitCalcProcess()
         {
             m_qCalcProcess.Clear(); 
-            if (EQ.p_nRnR > 1) foreach (ModuleRunBase run in m_moduleRunList.p_aModuleRun) m_qCalcProcess.Enqueue(run);
-            else
+        //    if (EQ.p_nRnR > 1) foreach (ModuleRunBase run in m_moduleRunList.p_aModuleRun) m_qCalcProcess.Enqueue(run);
+        //    else
             {
                 ModuleRunBase[] aProcess = m_qProcess.ToArray();
                 foreach (ModuleRunBase run in aProcess) m_qCalcProcess.Enqueue(run); 
@@ -301,6 +329,16 @@ namespace RootTools
             string id = sModule + "." + ((nSlot >= 0) ? (nSlot + 1).ToString("00") : "Recover"); 
             InitBase(id, engineer);
             m_moduleRunList = new ModuleRunList(id, engineer);
+            m_moduleRunList.Clear();
+        }
+
+        public InfoWafer(InfoWafer info)
+        {
+            m_sModule = info.m_sModule;
+            m_nSlot = info.m_nSlot;
+            string id = m_sModule + "." + ((m_nSlot >= 0) ? (m_nSlot + 1).ToString("00") : "Recover");
+            InitBase(id, info.m_engineer);
+            m_moduleRunList = new ModuleRunList(id, m_engineer);
             m_moduleRunList.Clear();
         }
     }

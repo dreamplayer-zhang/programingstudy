@@ -884,12 +884,8 @@ namespace Root_VEGA_D.Module
             Run_GrabLineScan runGrabLineScan = PeekModuleRun() as Run_GrabLineScan;
             if (runGrabLineScan != null)
             {
-                // 현재 GrabLineScan 진행중이었다면
-                if (runGrabLineScan.p_eRunState == ModuleRunBase.eRunState.Run)
-                {
-                    // EQ Stop 상태로 변경하고 이미지그랩 중에 중단되었다는 상태값 설정
-                    runGrabLineScan.m_bWaitRun = false;
-                }
+                // EQ Stop 상태로 변경하고 이미지그랩 중에 중단되었다는 상태값 설정
+                runGrabLineScan.p_bWaitRun = false;
             }
         }
         private void EventAccept(Socket socket)
@@ -897,14 +893,14 @@ namespace Root_VEGA_D.Module
             Run_GrabLineScan runGrabLineScan = PeekModuleRun() as Run_GrabLineScan;
             if (runGrabLineScan != null)
             {
-                // 현재 GrabLineScan 진행중이었다면
-                if (runGrabLineScan.p_eRunState == ModuleRunBase.eRunState.Run)
+                if(m_bDisconnectedGrabLineScanning)
                 {
-                    // EQ Stop 상태로 변경하고 이미지그랩 중에 중단되었다는 상태값 설정
-                    m_bDisconnectedGrabLineScanning = true;
+                    // 이미지 스캔 중 연결이 끊겼다는 상태값을 리셋
+                    m_bDisconnectedGrabLineScanning = false;
 
-                    // 재연결 시까지 RunGrabLineScan은 대기
-                    runGrabLineScan.m_bWaitRun = false;
+                    // 대기중인 RunGrabLineScan 재개
+                    runGrabLineScan.p_bWaitRun = false;
+
                 }
             }
         }
@@ -926,7 +922,7 @@ namespace Root_VEGA_D.Module
                         m_bDisconnectedGrabLineScanning = true;
 
                         // 재연결 시까지 RunGrabLineScan은 대기
-                        runGrabLineScan.m_bWaitRun = true;
+                        runGrabLineScan.p_bWaitRun = true;
 
                         // IPU와 소켓통신 재 연결 될때까지의 상태 리셋 타이머 실행
                         DispatcherTimer timer = new DispatcherTimer();
@@ -959,13 +955,13 @@ namespace Root_VEGA_D.Module
                                     Run_GrabLineScan runGrabLineScan = PeekModuleRun() as Run_GrabLineScan;
                                     if (runGrabLineScan != null)
                                     {
-                                        runGrabLineScan.m_nCurScanLine = curScanLine;
-                                        runGrabLineScan.m_grabMode.m_ScanLineNum = totalScanLine;
-                                        runGrabLineScan.m_grabMode.m_ScanStartLine = startScanLine;
-
                                         lock (runGrabLineScan.m_lockWaitRun)
                                         {
-                                            runGrabLineScan.m_bWaitRun = false;
+                                            runGrabLineScan.m_nCurScanLine = curScanLine;
+                                            runGrabLineScan.m_grabMode.m_ScanLineNum = totalScanLine;
+                                            runGrabLineScan.m_grabMode.m_ScanStartLine = startScanLine;
+
+                                            runGrabLineScan.p_bWaitRun = false;
                                         }   
                                     }
                                 }

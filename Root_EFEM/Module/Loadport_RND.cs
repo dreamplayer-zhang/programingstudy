@@ -4,8 +4,10 @@ using RootTools.Control;
 using RootTools.GAFs;
 using RootTools.Gem;
 using RootTools.Module;
+using RootTools.OHT.Semi;
 using RootTools.OHTNew;
 using RootTools.Trees;
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using static RootTools.Gem.XGem.XGem;
@@ -16,11 +18,102 @@ namespace Root_EFEM.Module
     {
         #region ToolBox
         public DIO_I m_diPlaced;
-        public DIO_I m_diPresent;
-        public DIO_I m_diLoad;
-        public DIO_I m_diUnload;
-        public DIO_I m_diDoorOpen;
-        public DIO_I m_diDocked;
+        //OHT _OHT;
+        //public OHT m_OHTNew
+        //{
+        //    get { return _OHT; }
+        //    set
+        //    {
+        //        _OHT = value;
+        //        OnPropertyChanged();
+        //    }
+        //}
+        private OHT_Semi m_OHT;
+        //OHT _OHT;
+        public OHT_Semi m_OHTsemi
+        {
+            get
+            {
+                return m_OHT;
+            }
+            set
+            {
+                m_OHT = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public DIO_I p_diPlaced
+        {
+            get
+            {
+                return m_diPlaced;
+            }
+            set
+            {
+                m_diPlaced = value;
+            }
+        }
+        DIO_I m_diPresent;
+        public DIO_I p_diPresent
+        {
+            get
+            {
+                return m_diPresent;
+            }
+            set
+            {
+                m_diPresent = value;
+            }
+        }
+        DIO_I m_diLoad;
+        public DIO_I p_diLoad
+        {
+            get
+            {
+                return m_diLoad;
+            }
+            set
+            {
+                m_diLoad = value;
+            }
+        }
+        DIO_I m_diUnload;
+        public DIO_I p_diUnload
+        {
+            get
+            {
+                return m_diUnload;
+            }
+            set
+            {
+                m_diUnload = value;
+            }
+        }
+        DIO_I m_diDoorOpen;
+        public DIO_I p_diDoorOpen
+        {
+            get
+            {
+                return m_diDoorOpen;
+            }
+            set
+            {
+                m_diDoorOpen = value;
+            }
+        }
+        DIO_I m_diDocked;
+        public DIO_I p_diDocked
+        {
+            get
+            {
+                return m_diDocked;
+            }
+            set
+            {
+                m_diDocked = value;
+            }
+        }
         RS232 m_rs232;
         OHT _OHT;
         public OHT m_OHTNew
@@ -32,6 +125,7 @@ namespace Root_EFEM.Module
                 OnPropertyChanged();
             }
         }
+
         //OHT m_OHT;
         ALID m_alid_WaferExist;
         public void SetAlarm()
@@ -47,7 +141,7 @@ namespace Root_EFEM.Module
             p_sInfo = m_toolBox.GetDIO(ref m_diDoorOpen, this, "DoorOpen");
             p_sInfo = m_toolBox.GetDIO(ref m_diDocked, this, "Docked");
             p_sInfo = m_toolBox.GetComm(ref m_rs232, this, "RS232");
-            p_sInfo = m_toolBox.GetOHT(ref _OHT, this, p_infoCarrier, "OHT");
+            p_sInfo = m_toolBox.GetOHT(ref m_OHT, this, p_infoCarrier, "OHT");
             if (bInit)
             {
                 m_rs232.OnReceive += M_rs232_OnReceive;
@@ -60,7 +154,7 @@ namespace Root_EFEM.Module
         public bool CheckPlaced()
         {
             GemCarrierBase.ePresent present;
-            if (m_diPlaced.p_bIn != m_diPresent.p_bIn)
+            if (m_diPlaced.p_bIn != p_diPresent.p_bIn)
                 present = GemCarrierBase.ePresent.Unknown;
             else
                 present = m_diPlaced.p_bIn ? GemCarrierBase.ePresent.Exist : GemCarrierBase.ePresent.Empty;
@@ -128,6 +222,8 @@ namespace Root_EFEM.Module
         {
             if (p_eState != eState.Ready)
                 return p_id + " eState not Ready";
+            if (!m_diDoorOpen.p_bIn)
+                return p_id + "Door Close Error";
             return p_infoCarrier.IsGetOK(nID);
         }
 
@@ -135,6 +231,8 @@ namespace Root_EFEM.Module
         {
             if (p_eState != eState.Ready)
                 return p_id + " eState not Ready";
+            if (!m_diDoorOpen.p_bIn)
+                return p_id + "Door Close Error";
             return p_infoCarrier.IsPutOK(nID);
         }
 
@@ -142,6 +240,8 @@ namespace Root_EFEM.Module
         {
             if (GetInfoWafer(nID) == null)
                 return p_id + nID.ToString("00") + " BeforeGet : InfoWafer = null";
+            if (!m_diDoorOpen.p_bIn)
+                return "Door Not Opened";
             return IsRunOK();
         }
 
@@ -149,11 +249,15 @@ namespace Root_EFEM.Module
         {
             if (GetInfoWafer(nID) != null)
                 return p_id + nID.ToString("00") + " BeforePut : InfoWafer != null";
+            if (!m_diDoorOpen.p_bIn)
+                return "Door Not Opened";
             return IsRunOK();
         }
 
         public string AfterGet(int nID)
         {
+            InfoWafer wafer = GetInfoWafer(nID);
+            wafer.p_sInspectionID = wafer.p_sLotID + wafer.p_sWaferID +DateTime.Now.ToString("yyyyMMddhhmmss");
             return IsRunOK();
         }
 
@@ -514,11 +618,17 @@ namespace Root_EFEM.Module
                             m_infoCarrier.m_bReqReadCarrierID = false;
                             StartRun(m_runReadPodID);
                         } */
+            bool bUseXGem = m_engineer.p_bUseXGem;
             if (p_infoCarrier.m_bReqLoad)
             {
                 p_infoCarrier.m_bReqLoad = false;
-                StartRun(m_runDocking);
+                if (bUseXGem) StartRun(m_runDocking);
             }
+            if (p_infoCarrier.m_bReqGem)
+            {
+                p_infoCarrier.m_bReqGem = false;
+                StartRun(m_runGem);
+            }    
             if (p_infoCarrier.m_bReqUnload && p_infoCarrier.p_eState == InfoCarrier.eState.Dock)
             {
                 p_infoCarrier.m_bReqUnload = false;
@@ -578,6 +688,7 @@ namespace Root_EFEM.Module
         {
             get
             {
+                //return true;
                 return m_diPlaced.p_bIn;
             }
         }
@@ -585,7 +696,8 @@ namespace Root_EFEM.Module
         {
             get
             {
-                return m_diPresent.p_bIn;
+                //return true;
+                return p_diPresent.p_bIn;
             }
         }
         #endregion
@@ -604,6 +716,7 @@ namespace Root_EFEM.Module
                 _rfid = value;
             }
         }
+
         public Loadport_RND(string id, IEngineer engineer, bool bEnableWaferSize, bool bEnableWaferCount)
         {
             p_bLock = false;
@@ -630,8 +743,27 @@ namespace Root_EFEM.Module
         {
         }
 
+        public override bool IsExistCarrier()
+        {
+            if (m_diPlaced.p_bIn && p_diPresent.p_bIn)
+                return true;
+            else
+                return false;
+        }
+
+        public override bool IsPlacement()
+        {
+            return m_diPlaced.p_bIn;
+        }
+
+        public override bool IsPresent()
+        {
+            return p_diPresent.p_bIn;
+        }
+
         #region ModuleRun
         ModuleRunBase m_runDocking;
+        ModuleRunBase m_runGem;
         ModuleRunBase m_runUndocking;
 
         public ModuleRunBase GetModuleRunUndocking()
@@ -642,11 +774,15 @@ namespace Root_EFEM.Module
         {
             return m_runDocking;
         }
+        public ModuleRunBase GetModuleRunGem()
+        {
+            return m_runGem;
+        }
 
         protected override void InitModuleRuns()
         {
             m_runDocking = AddModuleRunList(new Run_Docking(this), false, "Docking Carrier to Work Position");
-            AddModuleRunList(new Run_GemProcess(this), false, "Gem Slot Process Start");
+            m_runGem = AddModuleRunList(new Run_GemProcess(this), false, "Gem Slot Process Start");
             m_runUndocking = AddModuleRunList(new Run_Undocking(this), false, "Undocking Carrier from Work Position");
         }
 
@@ -831,6 +967,7 @@ namespace Root_EFEM.Module
                         return p_sInfo;
                 }
                 m_infoCarrier.p_eState = InfoCarrier.eState.Placed;
+                m_infoCarrier.p_eReqTransfer = GemCarrierBase.eTransfer.ReadyToUnload;
                 //m_module.m_ceidUnDocking.Send();
                 return sResult;
             }

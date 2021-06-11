@@ -18,6 +18,13 @@ namespace RootTools_Vision
         }
         private bool useKlarf = true;
 
+        public bool UseTDIReview
+        {
+            get => this.useTDIReview;
+            set => this.useTDIReview = value;
+        }
+        private bool useTDIReview = true;
+
         [Category("Klarf")]
         [DisplayName("Klarf Save Path")]
         public string KlarfSavePath
@@ -62,6 +69,144 @@ namespace RootTools_Vision
             }
         }
         private double wholeWaferImageCompressionRate = 1;
+
+        [Category("Klarf")]
+        [DisplayName("Whole Wafer Image Start X")]
+        public int WholeWaferImageStartX
+        {
+            get
+            {
+                return wholeWaferImageStartX;
+            }
+            set
+            {
+                wholeWaferImageStartX = value;
+            }
+        }
+        private int wholeWaferImageStartX = 0;
+
+        [Category("Klarf")]
+        [DisplayName("Whole Wafer Image Start Y")]
+        public int WholeWaferImageStartY
+        {
+            get
+            {
+                return wholeWaferImageStartY;
+            }
+            set
+            {
+                wholeWaferImageStartY = value;
+            }
+        }
+        private int wholeWaferImageStartY = 0;
+
+        [Category("Klarf")]
+        [DisplayName("Whole Wafer Image End X")]
+        public int WholeWaferImageEndX
+        {
+            get
+            {
+                return wholeWaferImageEndX;
+            }
+            set
+            {
+                wholeWaferImageEndX = value;
+            }
+        }
+        private int wholeWaferImageEndX = 1000;
+
+        [Category("Klarf")]
+        [DisplayName("Whole Wafer Image End Y")]
+        public int WholeWaferImageEndY
+        {
+            get
+            {
+                return wholeWaferImageEndY;
+            }
+            set
+            {
+                wholeWaferImageEndY = value;
+            }
+        }
+        private int wholeWaferImageEndY = 1000;
+
+
+
+        [Category("Klarf")]
+        [DisplayName("Output Image Size Y")]
+        public int OutputImageSizeY
+        {
+            get
+            {
+                return outputImageSizeY;
+            }
+            set
+            {
+                outputImageSizeY = value;
+            }
+        }
+        private int outputImageSizeY = 3000;
+
+
+        [Category("Klarf")]
+        [DisplayName("Output Image Size X")]
+        public int OutputImageSizeX
+        {
+            get
+            {
+                return outputImageSizeX;
+            }
+            set
+            {
+                outputImageSizeX = value;
+            }
+        }
+        private int outputImageSizeX = 3000;
+
+        [Category("Klarf")]
+        [DisplayName("Save Min Radius")]
+        public double MinRadius
+        {
+            get
+            {
+                return minRadius;
+            }
+            set
+            {
+                minRadius = value;
+            }
+        }
+        private double minRadius = 1000;
+
+        [Category("Klarf")]
+        [DisplayName("Save Min Thickness")]
+        public int Thickness
+        {
+            get
+            {
+                return minThickness;
+            }
+            set
+            {
+                minThickness = value;
+            }
+        }
+        private int minThickness = 400;
+
+        [Category("Klarf")]
+        [DisplayName("Cutting Image Size (mm)")]
+        public int CuttingSize
+        {
+            get
+            {
+                return cuttingSize;
+            }
+            set
+            {
+                cuttingSize = value;
+            }
+        }
+        private int cuttingSize = 130;
 
         [Category("Common")]
         [DisplayName("Defect Image Path")]

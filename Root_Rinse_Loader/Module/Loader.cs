@@ -173,7 +173,6 @@ namespace Root_Rinse_Loader.Module
 
         #region Axis Move
         Axis m_axis; 
-
         public enum ePos
         {
             Stotage,
@@ -187,9 +186,22 @@ namespace Root_Rinse_Loader.Module
 
         public string MoveLoader(ePos ePos, bool bWait = true)
         {
+            if ((ePos == ePos.Stotage) && m_storage.IsHighPos()) return "Check Storage Position"; 
             m_axis.StartMove(ePos);
             if (bWait == false) return "OK"; 
             return m_axis.WaitReady(); 
+        }
+
+        public bool IsLoaderDanger()
+        {
+            if (IsLoaderDanger(m_axis.p_posCommand)) return true;
+            return IsLoaderDanger(m_axis.m_posDst); 
+        }
+
+        bool IsLoaderDanger(double fPos)
+        {
+            double dPos = Math.Abs(fPos - m_axis.GetPosValue(ePos.Stotage));
+            return (dPos < Math.Abs(fPos - m_axis.GetPosValue(ePos.Rail))); 
         }
         #endregion
 

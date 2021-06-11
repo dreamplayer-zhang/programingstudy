@@ -24,11 +24,43 @@ namespace Root_WIND2
 
         public InspectionItem()
         {
-            if(this.m_cInspROI != null) this.m_InspROI = this.m_cInspROI[0];
-            
+            m_cInspMethod = new ObservableCollection<ParameterBase>();
+            m_cInspROI = new ObservableCollection<ItemMask>();
+
+            // Old
+            //if(this.m_cInspROI != null) this.m_InspROI = this.m_cInspROI[0];
+
+            //// Method
+            //m_cInspMethod = new ObservableCollection<ParameterBase>();
+            //p_cInspMethod = ParameterBase.GetFrontSideClass();
+
+            //this.p_InspMethod = this.m_cInspMethod[0]; // Position
+            //this.p_InspChannel = IMAGE_CHANNEL.R_GRAY;
+
+            //// Mask
+            //m_cInspROI = new ObservableCollection<ItemMask>();
+            //MaskRecipe maskRecipe = GlobalObjects.Instance.Get<RecipeFront>().GetItem<MaskRecipe>();
+            //for (int i = 0; i < maskRecipe.MaskList.Count; i++)
+            //{
+            //    ItemMask roi = new ItemMask();
+            //    roi.p_Index = i;
+            //    roi.p_Size = maskRecipe.MaskList[i].Area;
+            //    roi.p_Data = maskRecipe.MaskList[i].ToPointLineList();
+            //    roi.p_Color = maskRecipe.MaskList[i].ColorIndex;
+            //    this.p_cInspROI.Add(roi);
+            //}
+
+            //if (this.p_cInspROI.Count > 0)
+            //    this.p_InspROI = this.p_cInspROI[0];
+        }
+
+        public InspectionItem(string inspection)
+        {
+            if (this.m_cInspROI != null) this.m_InspROI = this.m_cInspROI[0];
+
             // Method
             m_cInspMethod = new ObservableCollection<ParameterBase>();
-            p_cInspMethod = ParameterBase.GetFrontSideClass();
+            p_cInspMethod = ParameterBase.GetParameters(inspection);
 
             this.p_InspMethod = this.m_cInspMethod[0]; // Position
             this.p_InspChannel = IMAGE_CHANNEL.R_GRAY;
@@ -148,7 +180,7 @@ namespace Root_WIND2
             {
                 return new RelayCommand(() =>
                 {
-                    if (ComboBoxItemChanged_Mask != null)
+                    if (ComboBoxItemChanged_Method != null)
                         ComboBoxItemChanged_Method(p_InspMethod, new EventArgs());
                 });
             }

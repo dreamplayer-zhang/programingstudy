@@ -48,7 +48,7 @@ namespace RootTools_Vision
                 return;
 
             this.inspectionSharedBuffer = this.currentWorkplace.GetSharedBufferInfo(this.parameterSurface.IndexChannel);
-            byte[] workplaceBuffer = GetWorkplaceBuffer(this.parameterSurface.IndexChannel);
+            byte[] workplaceBuffer = GetWorkplaceBufferByColorChannel(this.parameterSurface.IndexChannel);
 
             // Inspection Param
             bool isDarkInsp = !parameterSurface.IsBright; // Option
@@ -117,7 +117,7 @@ namespace RootTools_Vision
                     if (Label[i].area > nDefectSz)
                     {
                         this.currentWorkplace.AddDefect(sInspectionID,
-                            10001,
+                            1000 + (int)this.parameterSurface.IndexChannel * 100 + this.parameterSurface.MaskIndex,
                             Label[i].area,
                             Label[i].value,
                             this.currentWorkplace.PositionX + Label[i].boundLeft,

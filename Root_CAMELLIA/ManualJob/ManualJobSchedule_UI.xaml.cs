@@ -158,7 +158,7 @@ namespace Root_CAMELLIA.ManualJob
 
         void InitSlotRecipeList()
         {
-            DirectoryInfo info = new DirectoryInfo("C:\\Recipe\\");
+            DirectoryInfo info = new DirectoryInfo(BaseDefine.Dir_InitialPath);
             FileInfo[] files = info.GetFiles("*.Camellia");
             List<string> asRecipeFile = new List<string>();
             foreach (FileInfo fileInfo in files)
@@ -186,27 +186,37 @@ namespace Root_CAMELLIA.ManualJob
 
         void InitInfo()
         {
-            textboxLocID.Text = m_infoCarrier.p_sLocID;
+            //textboxLocID.Text = m_infoCarrier.p_sLocID;
             textboxLotID.Text = m_infoCarrier.p_sLotID;
             textboxCstID.Text = m_infoCarrier.p_sCarrierID;
         }
 
         void InitRecipeList()
         {
-            DirectoryInfo info = new DirectoryInfo("C:\\Recipe\\");
-            FileInfo[] files = info.GetFiles("*.Camellia");
+            DirectoryInfo info = new DirectoryInfo(BaseDefine.Dir_InitialPath);
             List<string> asRecipeFile = new List<string>();
-            foreach(FileInfo fileInfo in files)
+            foreach (var dir in info.GetDirectories())
             {
-                asRecipeFile.Add(fileInfo.Name);
+                FileInfo[] fileInfos = dir.GetFiles("*." + EQ.m_sModel);
+
+                foreach (FileInfo fileinfo in fileInfos)
+                {
+                    asRecipeFile.Add(fileinfo.Name);
+                }
             }
+            //FileInfo[] files = info.GetFiles("*.Camellia");
+         
+            //foreach(FileInfo fileInfo in files)
+            //{
+            //    asRecipeFile.Add(fileInfo.Name);
+            //}
             comboRecipeID.ItemsSource = asRecipeFile;
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             m_JobSchedule.p_ManualJobBlink = false;
-            e.Cancel = true;
+            //e.Cancel = true;
             this.Hide();
         }
 
@@ -230,18 +240,21 @@ namespace Root_CAMELLIA.ManualJob
             }
         }
 
+        //? 여기 수정해야함 -> Recipe 오픈하고 이것저것...
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             if (m_infoCarrier == null) return;
-            m_infoCarrier.p_sLocID = textboxLocID.Text;
+            //m_infoCarrier.p_sLocID = textboxLocID.Text;
             m_infoCarrier.p_sLotID = textboxLotID.Text;
             m_infoCarrier.p_sCarrierID = textboxCstID.Text;
             for(int i=0; i<nSlot; i++)
             {
                 InfoWafer infoWafer = m_infoCarrier.GetInfoWafer(i); 
+
                 if (infoWafer != null)
                 {
-                    infoWafer.p_eState = (m_tblockState[i].Text == "Select") ? GemSlotBase.eState.Select : GemSlotBase.eState.Empty;
+                    infoWafer.p_eState = (m_tblockState[i].Text == "Select") ? GemSlotBase.eState.Select : GemSlotBase.eState.Exist;
+                    m_infoCarrier.m_aGemSlot[i].p_eState = infoWafer.p_eState;
                     infoWafer.p_sWaferID = m_tboxWaferID[i].Text;
                     if (infoWafer.p_eState == GemSlotBase.eState.Select)
                     {

@@ -257,17 +257,16 @@
                         <Grid.RowDefinitions>
                             <RowDefinition/>
                             <RowDefinition/>
-                            <RowDefinition/>
                         </Grid.RowDefinitions>
-                        <StackPanel Grid.Row="0" Orientation="Horizontal">
+                        <!--<StackPanel Grid.Row="0" Orientation="Horizontal">
                             <TextBlock Text="Location ID = " VerticalAlignment="Center"/>
                             <TextBox x:Name="textboxLocID" VerticalAlignment="Center" TextAlignment="Left" MinWidth="100"/>
-                        </StackPanel>
-                        <StackPanel Grid.Row="1" Orientation="Horizontal">
+                        </StackPanel>-->
+                        <StackPanel Grid.Row="0" Orientation="Horizontal">
                             <TextBlock Text="Lot ID = " VerticalAlignment="Center"/>
                             <TextBox x:Name="textboxLotID" VerticalAlignment="Center" TextAlignment="Left" MinWidth="100"/>
                         </StackPanel>
-                        <StackPanel Grid.Row="2" Orientation="Horizontal">
+                        <StackPanel Grid.Row="1" Orientation="Horizontal">
                             <TextBlock Text="Carrier ID = " VerticalAlignment="Center"/>
                             <TextBox x:Name="textboxCstID" VerticalAlignment="Center" TextAlignment="Left" MinWidth="100"/>
                         </StackPanel>
@@ -360,7 +359,7 @@
                         <TextBlock Text="Wafer ID" Margin="4" FontSize="20" VerticalAlignment="Center" TextAlignment="Center" Foreground="Black" Background="White"/>
                     </Grid>
                 </Grid>
-                <Grid Grid.Row="1" x:Name="gridSlot" ShowGridLines="True">
+                <Grid Grid.Row="1" x:Name="gridSlot" ShowGridLines="False">
                 </Grid>
             </Grid>
             <Grid Grid.Row="1">
