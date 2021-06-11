@@ -13,6 +13,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using System.ComponentModel;
 
 namespace Root_WIND2
 {
@@ -176,20 +177,21 @@ namespace Root_WIND2
                 {
 
                 }
-                
+
                 p_WTR = (WTR_RND)((WIND2_Handler)(engineer.ClassHandler())).p_WTR;
                 p_EdgeVision = (EdgeSideVision)((WIND2_Handler)(engineer.ClassHandler())).p_EdgeSideVision;
-                p_BackSideVision  = (BackSideVision)((WIND2_Handler)(engineer.ClassHandler())).p_BackSideVision;
+                p_BackSideVision = (BackSideVision)((WIND2_Handler)(engineer.ClassHandler())).p_BackSideVision;
                 p_Vision = (Vision)((WIND2_Handler)(engineer.ClassHandler())).p_Vision;
-            
+
                 m_Viewer.init(null, GlobalObjects.Instance.Get<DialogService>());
                 m_ToolMemory = engineer.ClassMemoryTool();
 
                 p_Viewer.SetImageData(p_BackSideVision.GetMemoryData(BackSideVision.ScanMemory.BackSide));
                 p_ModuleList = engineer.ClassModuleList();
-                p_handler = (WIND2_Handler)engineer.ClassHandler();
                 p_aTK4S = ((WIND2_Handler)(engineer.ClassHandler())).p_WIND2.m_tk4s.p_aTK4S;
                 p_aFFU = ((WIND2_Handler)(engineer.ClassHandler())).p_WIND2.m_FFUGourp.p_aFFU;
+				bgwLoad.DoWork += BgwLoad_DoWork;
+            	bgwLoad.RunWorkerCompleted += BgwLoad_RunWorkerCompleted;
             }
             else // engineer.m_eMode 가 무슨용도인지 모르겠다.. Vision 모드일 경우 p_ModuleList를 engineer로부터 못받아 오기 때문에 임시로 받아오도록 수정
             {
@@ -199,11 +201,6 @@ namespace Root_WIND2
 
         public void EQHome()
         {
-            WIND2_Engineer engineer = GlobalObjects.Instance.Get<WIND2_Engineer>();
-            p_handler.p_process.p_qSequence.Enqueue(new Root_EFEM.EFEM_Process.Sequence(new Run_GrabBackside(p_handler.m_backSideVision), new InfoWafer("test", 0, engineer)));
-            p_handler.CalcSequence();
-            return;
-
             EQ.p_bStop = false;
             EQ.p_eState = EQ.eState.Home;
 
@@ -234,12 +231,74 @@ namespace Root_WIND2
             }
         }
 
+BackgroundWorker bgwLoad = new BackgroundWorker();
+
         public void LoadLoadport1CST()
         {
+
+            bgwLoad.RunWorkerAsync();
+            //WIND2_Engineer engineer = GlobalObjects.Instance.Get<WIND2_Engineer>();
+            ////m_SetupVM.maintVM.HandlerUI.GetModuleList_UI().ModuleListRunOpen();
+            ////m_SetupVM.maintVM.HandlerUI.GetModuleList_UI().ModuleListRun();
+            //((WIND2_Handler)(engineer.ClassHandler())).p_aLoadport[0].RunDocking();
+            ////m_moduleRunList.OpenJob("C:\\Recipe\\RNR_ALL.RunWIND2");
+        }
+        //bool IsEnable_Recovery(WIND2_Handler handler)
+        //{
+        //    if (IsRunModule())
+        //        return false;
+        //    if (EQ.p_eState != EQ.eState.Ready)
+        //        return false;
+        //    if (EQ.p_bStop == true)
+        //        return false;
+        //    return m_handler.IsEnableRecovery();
+        //}
+
+        //bool IsRunModule()
+        //{
+        //    if (IsRunModule((Loadport_RND)m_handler.m_aLoadport[0]))
+        //        return true;
+        //    if (IsRunModule((Loadport_RND)m_handler.m_aLoadport[1]))
+        //        return true;
+        //    if (IsRunModule(m_handler.m_wtr))
+        //        return true;
+        //    if (IsRunModule(m_handler.m_Aligner))
+        //        return true;
+        //    if (IsRunModule(m_handler.m_camellia))
+        //        return true;
+        //    return false;
+        //}
+
+        //bool IsRunModule(ModuleBase module)
+        //{
+        //    if (module.p_eState == ModuleBase.eState.Run)
+        //        return true;
+        //    if (module.p_eState == ModuleBase.eState.Home)
+        //        return true;
+        //    return (module.m_qModuleRun.Count > 0);
+        //}
+
+        public void RecoveryCommand()
+        {
+            WIND2_Handler handler = ((WIND2_Handler)GlobalObjects.Instance.Get<WIND2_Engineer>().ClassHandler());
+            //if (IsEnable_Recovery(handler) == false)
+            //    return;
+            handler.CalcRecover();
+            EQ.p_bStop = false;
+            EQ.p_eState = EQ.eState.Run;
+            EQ.p_bRecovery = true;
+        }
+        private void BgwLoad_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+        }
+
+        private void BgwLoad_DoWork(object sender, DoWorkEventArgs e)
+        {
             WIND2_Engineer engineer = GlobalObjects.Instance.Get<WIND2_Engineer>();
+            ((WIND2_Handler)engineer.ClassHandler()).bLoad = true;
             //m_SetupVM.maintVM.HandlerUI.GetModuleList_UI().ModuleListRunOpen();
             //m_SetupVM.maintVM.HandlerUI.GetModuleList_UI().ModuleListRun();
-            ((WIND2_Handler)(engineer.ClassHandler())).p_aLoadport[0].RunDocking();
+            ((WIND2_Handler)(engineer.ClassHandler())).p_aLoadport[0].RunDocking();//kkkk
             //m_moduleRunList.OpenJob("C:\\Recipe\\RNR_ALL.RunWIND2");
         }
 
@@ -253,7 +312,7 @@ namespace Root_WIND2
 
         public void FuncEdgeTopImageView()
         {
-            m_imagedata =  p_EdgeVision.GetMemoryData(EdgeSideVision.EDGE_TYPE.EdgeTop);
+            m_imagedata = p_EdgeVision.GetMemoryData(EdgeSideVision.EDGE_TYPE.EdgeTop);
             m_imagedata.p_nByte = 1;
             m_imagedata.p_nPlane = 3;
             p_Viewer.SetImageData(m_imagedata);
@@ -295,7 +354,7 @@ namespace Root_WIND2
         {
             get
             {
-                  return new RelayCommand(EQHome); 
+                return new RelayCommand(EQHome);
             }
         }
 
@@ -339,6 +398,15 @@ namespace Root_WIND2
                 return new RelayCommand(FuncEBRImageView);
             }
         }
+
+        public RelayCommand CommandRecovery
+        {
+            get
+            {
+                return new RelayCommand(RecoveryCommand);
+            }
+        }
+
 
         private Database_DataView_VM m_DataViewer_VM = new Database_DataView_VM();
         public Database_DataView_VM p_DataViewer_VM

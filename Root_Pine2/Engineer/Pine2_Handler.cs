@@ -28,6 +28,22 @@ namespace Root_Pine2.Engineer
         }
         #endregion
 
+        #region Recipe
+        string _sRecipe = ""; 
+        public string p_sRecipe
+        {
+            get { return _sRecipe; }
+            set
+            {
+                if (_sRecipe == value) return;
+                _sRecipe = value;
+                m_aBoats[Vision2D.eVision.Top3D].p_sRecipe = value;
+                m_aBoats[Vision2D.eVision.Top2D].p_sRecipe = value;
+                m_aBoats[Vision2D.eVision.Bottom].p_sRecipe = value;
+            }
+        }
+        #endregion
+
         #region Module
         StopWatch m_swInit = new StopWatch(); 
         public ModuleList p_moduleList { get; set; }
@@ -204,22 +220,6 @@ namespace Root_Pine2.Engineer
             {
                 if (_bRun == value) return;
                 _bRun = value;
-                StartRun(value);
-            }
-        }
-
-        void StartRun(bool bRun)
-        {
-            if (bRun)
-            {
-                //m_rail.StartRun(); //forget
-                //m_roller.StartRun();
-                //m_storage.StartRun();
-                //m_loader.StartRun();
-            }
-            else
-            {
-
             }
         }
 
@@ -234,6 +234,9 @@ namespace Root_Pine2.Engineer
                 {
                     case EQ.eState.Home: StateHome(); break;
                     case EQ.eState.Run: break;
+                    case EQ.eState.ModuleRunList: 
+
+                        break;
                 }
                 p_bRun = (EQ.p_eState == EQ.eState.Run) && (EQ.p_bPickerSet == false);
             }

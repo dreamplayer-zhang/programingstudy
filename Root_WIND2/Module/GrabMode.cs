@@ -39,10 +39,10 @@ namespace Root_WIND2.Module
         public double m_dResY_um = 1;                   // Camera Resolution Y
         public int m_nFocusPosZ = 0;                    // Focus Position Z
         public int m_nWaferSize_mm = 1000;              // Wafer Size (mm)
-        public int m_nMaxFrame = 100;                   // Camera max Frame ?¤íŽ™
-        public int m_nScanRate = 100;                   // Camera Frame Spec ?¬ìš©ë¥?? 1~100 %
+        public int m_nMaxFrame = 100;                   // Camera max Frame ½ºÆå
+        public int m_nScanRate = 100;                   // Camera Frame Spec »ç¿ë·ü ? 1~100 %
         public int m_nYOffset = 0;
-        public double m_dCamTriggerRatio = 1;              // Camera ë¶„ì£¼ë¹?
+        public double m_dCamTriggerRatio = 1;              // Camera ºÐÁÖºñ
 
         public GrabData m_GD = new GrabData();
         LensLinearTurret m_lens = null;
@@ -78,13 +78,13 @@ namespace Root_WIND2.Module
             m_nFocusPosZ = tree.Set(m_nFocusPosZ, m_nFocusPosZ, "Focus Z Position", "Focus Z Position", bVisible);
             m_nWaferSize_mm = tree.Set(m_nWaferSize_mm, m_nWaferSize_mm, "Wafer Size Y", "Wafer Size Y", bVisible);
             m_nMaxFrame = (tree.GetTree("Scan Velocity", false, bVisible)).Set(m_nMaxFrame, m_nMaxFrame, "Max Frame", "Camera Max Frame Spec", bVisible);
-            m_nScanRate = (tree.GetTree("Scan Velocity", false, bVisible)).Set(m_nScanRate, m_nScanRate, "Scan Rate", "ì¹´ë©”??Frame ?¬ìš©ë¥?1~ 100 %", bVisible);
+            m_nScanRate = (tree.GetTree("Scan Velocity", false, bVisible)).Set(m_nScanRate, m_nScanRate, "Scan Rate", "Ä«¸Þ¶ó Frame »ç¿ë·ü 1~ 100 %", bVisible);
         }
 
         void RunTreeCamera(Tree tree, bool bVisible, bool bReadOnly)
         {
             m_bUseBiDirectionScan = tree.Set(m_bUseBiDirectionScan, false, "Use BiDirectionScan", "Bi Direction Scan Use");
-            m_nReverseOffsetY = tree.Set(m_nReverseOffsetY, 800, "ReverseOffsetY", "Reverse Scan ?™ìž‘??Y ?´ë?ì§€ Offset ?¤ì •");
+            m_nReverseOffsetY = tree.Set(m_nReverseOffsetY, 800, "ReverseOffsetY", "Reverse Scan µ¿ÀÛ½Ã Y ÀÌ¹ÌÁö Offset ¼³Á¤");
             if(m_cameraSet != null)
             {
                 m_sCamera = tree.Set(m_sCamera, m_sCamera, m_cameraSet.p_asCamera, "Camera", "Select Camera", bVisible, bReadOnly);
@@ -196,7 +196,7 @@ namespace Root_WIND2.Module
 
         #region Axis
         public int m_dTrigger = 10;
-        public int m_intervalAcc = 100000;        // ê°€??êµ¬ê°„ point,  ?¨ìœ„ 0.1um
+        public int m_intervalAcc = 100000;        // °¡¼Ó ±¸°£ point,  ´ÜÀ§ 0.1um
         public int m_ScanLineNum = 1;
         public int m_ScanStartLine = 0;
         #endregion
@@ -210,7 +210,7 @@ namespace Root_WIND2.Module
         }
         void RunTreeScanPos(Tree tree, bool bVisible, bool bReadOnly)
         {
-            m_eScanPos = (eScanPos)tree.Set(m_eScanPos, m_eScanPos, "Scan ?„ì¹˜", "Scan ?„ì¹˜, 0 Position ??Bottom", bVisible, bReadOnly);
+            m_eScanPos = (eScanPos)tree.Set(m_eScanPos, m_eScanPos, "Scan À§Ä¡", "Scan À§Ä¡, 0 Position ÀÌ Bottom", bVisible, bReadOnly);
         }
 
         public string p_sName { get; set; }
@@ -276,7 +276,7 @@ namespace Root_WIND2.Module
 
         public void RunTreeLADS(Tree tree)
         {
-            m_bUseLADS = tree.Set(m_bUseLADS, m_bUseLADS, "Use LADS", "LADS ?¬ìš© ?¬ë?");
+            m_bUseLADS = tree.Set(m_bUseLADS, m_bUseLADS, "Use LADS", "LADS »ç¿ë ¿©ºÎ");
         }
         public virtual void RunTree(Tree.eMode mode) { }
     }

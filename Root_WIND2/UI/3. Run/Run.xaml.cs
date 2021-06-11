@@ -1,5 +1,6 @@
 ﻿using Root_EFEM.Module;
 using Root_WIND2.Module;
+using RootTools;
 using RootTools.Module;
 using System;
 using System.Collections.Generic;
@@ -42,8 +43,52 @@ namespace Root_WIND2
                 //case RootTools.Module.ModuleBase.eState.Ready: return Brushes.LightYellow;
                 case RootTools.Module.ModuleBase.eState.Run:
                     return Brushes.PaleGreen;
-                case RootTools.Module.ModuleBase.eState.Error: return Brushes.Red;
-                default: return SystemColors.ControlColorKey;
+                case RootTools.Module.ModuleBase.eState.Error:
+                    return Brushes.Red;
+                default:
+                    return SystemColors.ControlColorKey;
+            }
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotSupportedException();
+        }
+    }
+
+
+    public class PressureConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            double result = (int)value / 10.0;
+            return result;
+
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotSupportedException();
+        }
+    }
+
+
+        public class EQStateToColorConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            EQ.eState eState = (EQ.eState)value;
+            switch (eState)
+            {
+                //case RootTools.Module.ModuleBase.eState.Init: return Brushes.DimGray;
+                //case RootTools.Module.ModuleBase.eState.Home: return Brushes.DimGray;
+                //case RootTools.Module.ModuleBase.eState.Ready: return Brushes.LightYellow;
+                case EQ.eState.Run:
+                    return Brushes.PaleGreen;
+                case EQ.eState.Error:
+                    return Brushes.Red;
+                default:
+                    return SystemColors.ControlColorKey;
             }
         }
 

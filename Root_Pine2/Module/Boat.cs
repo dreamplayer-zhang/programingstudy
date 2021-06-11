@@ -1,15 +1,11 @@
 ﻿using Root_Pine2_Vision.Module;
 using RootTools;
-using RootTools.Comm;
 using RootTools.Control;
 using RootTools.Module;
 using RootTools.ToolBoxs;
 using RootTools.Trees;
 using System;
 using System.ComponentModel;
-using System.IO;
-using System.Net.Sockets;
-using System.Text;
 
 namespace Root_Pine2.Module
 {
@@ -178,6 +174,21 @@ namespace Root_Pine2.Module
         }
         #endregion
 
+        #region Recipe
+        string _sRecipe = "";
+        public string p_sRecipe
+        {
+            get { return _sRecipe; }
+            set
+            {
+                if (_sRecipe == value) return;
+                _sRecipe = value;
+                m_recipe.RecipeOpen(value); 
+            }
+        }
+        public Vision2D.Recipe m_recipe; 
+        #endregion
+
         public void Reset(ModuleBase.eState eState)
         {
             p_infoStrip = null;
@@ -187,11 +198,12 @@ namespace Root_Pine2.Module
         public InfoStrip p_infoStrip { get; set; }
         public string p_id { get; set; }
         Boats m_boats;
-        public Boat(string id, Boats boats)
+        public Boat(string id, Boats boats, Vision2D.eWorks eWorks)
         {
             m_bgwRunReady.DoWork += M_bgwRunReady_DoWork;
             p_id = id;
             m_boats = boats;
+            m_recipe = new Vision2D.Recipe(boats.m_vision, eWorks);
         }
     }
 }

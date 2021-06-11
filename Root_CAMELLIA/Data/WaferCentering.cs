@@ -16,6 +16,8 @@ namespace Root_CAMELLIA.Data
 {
     public class WaferCentering
     {
+        public delegate void FindEdgeDone(object dir);
+        public event FindEdgeDone FindEdgeDoneEvent;
         public enum eDir
         {
             LT = 0,

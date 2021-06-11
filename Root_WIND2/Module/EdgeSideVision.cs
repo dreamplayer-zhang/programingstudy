@@ -475,7 +475,6 @@ namespace Root_WIND2.Module
 		}
 
 		public EdgeSideVision(string id, IEngineer engineer)
-
 		{ 
 			base.InitBase(id, engineer);
 			InitPosAxis();

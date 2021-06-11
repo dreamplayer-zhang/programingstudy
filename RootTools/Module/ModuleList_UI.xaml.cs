@@ -39,6 +39,7 @@ namespace RootTools.Module
             foreach (ModuleRunBase moduleRun in m_moduleList.p_moduleList)
             {
                 m_moduleList.p_Percent = "0";
+                m_moduleList.p_nTotalRnR = 0;
                 moduleRun.p_nProgress = 0;
                 moduleRun.p_eRunState = ModuleRunBase.eRunState.Ready;
             }
