@@ -149,18 +149,22 @@ namespace RootTools_Vision
                         pG += (int)rect.Left;
                         pB += (int)rect.Left;
 
+                        byte* pRR = pR;
+                        byte* pGG = pG;
+                        byte* pBB = pB;
+
                         for (long i = 0; i <roiHeight ; i++)
                         {
                             for (long j = 0; j < roiWidth; j++)
                             {
-                                pDst[(long)((long)i * (bmpData.Stride) + (long)j * _byteCount + 0)] = *(pB + (long)(j * samplingX));
-                                pDst[(long)((long)i * (bmpData.Stride) + (long)j * _byteCount + 1)] = *(pG + (long)(j * samplingX));
-                                pDst[(long)((long)i * (bmpData.Stride) + (long)j * _byteCount + 2)] = *(pR + (long)(j * samplingX));
+                                pDst[(long)((long)i * (bmpData.Stride) + (long)j * _byteCount + 0)] = *(pRR + (long)(j * samplingX));
+                                pDst[(long)((long)i * (bmpData.Stride) + (long)j * _byteCount + 1)] = *(pGG + (long)(j * samplingX));
+                                pDst[(long)((long)i * (bmpData.Stride) + (long)j * _byteCount + 2)] = *(pBB + (long)(j * samplingX));
                             }
 
-                            pR += (long)(info.Width * samplingY);
-                            pG += (long)(info.Width * samplingY);
-                            pB += (long)(info.Width * samplingY);
+                            pRR = pR + (long)((info.Width * (long)(samplingY * i)));
+                            pGG = pG + (long)((info.Width * (long)(samplingY * i)));
+                            pBB = pB + (long)((info.Width * (long)(samplingY * i)));
                         }
                     }
                 }
