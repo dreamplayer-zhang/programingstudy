@@ -16,8 +16,10 @@ namespace Root_Pine2.Module
     public class Pine2 : ModuleBase
     {
         #region ToolBox
+        DIO_IO m_dioPickerSet;
         public override void GetTools(bool bInit)
         {
+            m_toolBox.GetDIO(ref m_dioPickerSet, this, "PickerSet"); 
             m_lamp.GetTools(m_toolBox, this);
             m_buzzer.GetTools(m_toolBox, this);
             m_display.GetTools(m_toolBox, this, bInit); 
@@ -36,6 +38,52 @@ namespace Root_Pine2.Module
         private void M_EQ_OnChanged(_EQ.eEQ eEQ, dynamic value)
         {
             m_buzzer.OnEQChanged(eEQ, value); 
+        }
+        #endregion
+
+        #region PickerSet
+        bool _bPickerSet = false; 
+        public bool p_bPickerSet
+        {
+            get { return _bPickerSet; }
+            set
+            {
+                if (_bPickerSet == value) return;
+                _bPickerSet = value;
+                OnPropertyChanged(); 
+                //forget
+            }
+        }
+
+        bool _diPickerSet = false; 
+        public bool p_diPickerSet
+        {
+            get { return _diPickerSet; }
+            set
+            {
+                if (_diPickerSet == value) return;
+                _diPickerSet = value;
+                OnPropertyChanged(); 
+            }
+        }
+
+        void RunThreadPickerSet(bool bBlink)
+        {
+            m_dioPickerSet.Write(bBlink && p_bPickerSet);
+            if (m_dioPickerSet.p_bIn) p_diPickerSet = true; 
+        }
+
+        public string WaitPickerSet(ref double sec)
+        {
+            p_diPickerSet = false; 
+            StopWatch sw = new StopWatch(); 
+            while (p_diPickerSet == false)
+            {
+                Thread.Sleep(10);
+                if (EQ.IsStop()) return "EQ Stop"; 
+            }
+            sec = sw.ElapsedMilliseconds / 1000.0;
+            return "OK"; 
         }
         #endregion
 
@@ -322,6 +370,7 @@ namespace Root_Pine2.Module
                     sw.Start();
                     bBlink = !bBlink; 
                 }
+                RunThreadPickerSet(bBlink); 
                 m_lamp.RunLamp(bBlink);
                 m_buzzer.CheckBuzzerOff(); 
             }
