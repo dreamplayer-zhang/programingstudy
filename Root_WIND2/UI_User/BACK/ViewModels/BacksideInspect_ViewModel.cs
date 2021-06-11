@@ -242,12 +242,12 @@ namespace Root_WIND2.UI_User
             get => new RelayCommand(() =>
             {
 
-                WorkManager workManager = GlobalObjects.Instance.GetNamed<WorkManager>("frontInspection");
-                RecipeFront recipe = GlobalObjects.Instance.Get<RecipeFront>();
+                WorkManager workManager = GlobalObjects.Instance.GetNamed<WorkManager>("backInspection");
+                RecipeBack recipe = GlobalObjects.Instance.Get<RecipeBack>();
 
                 WIND2_Engineer engineer = GlobalObjects.Instance.Get<WIND2_Engineer>();
-                GrabModeFront grabMode = engineer.m_handler.p_Vision.GetGrabMode(recipe.CameraInfoIndex);
-                InfoWafer infoWafer = engineer.m_handler.p_Vision.p_infoWafer;
+                GrabModeBack grabMode = engineer.m_handler.p_BackSideVision.GetGrabMode(recipe.CameraInfoIndex);
+                InfoWafer infoWafer = engineer.m_handler.p_BackSideVision.p_infoWafer;
                 if (infoWafer == null)
                 {
                     infoWafer = new InfoWafer("null", 0, engineer);
