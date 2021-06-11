@@ -11,7 +11,7 @@ namespace Root_Pine2.Module
     public class Loader1 : ModuleBase
     {
         #region ToolBox
-        AxisXY m_axisXZ;
+        public AxisXY m_axisXZ;
         public override void GetTools(bool bInit)
         {
             m_toolBox.GetAxis(ref m_axisXZ, this, "Loader1");

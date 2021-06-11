@@ -1,6 +1,5 @@
 ﻿using Root_EFEM.Module;
 using Root_WIND2.Module;
-using RootTools;
 using RootTools.Module;
 using System;
 using System.Collections.Generic;
@@ -72,8 +71,7 @@ namespace Root_WIND2
         }
     }
 
-
-        public class EQStateToColorConverter : IValueConverter
+public class EQStateToColorConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {

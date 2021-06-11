@@ -123,8 +123,9 @@ namespace RootTools.Module
                     case EQ.eState.Init: p_sRun = "Home"; break;
                     case EQ.eState.Home: p_sRun = "Stop"; break;
                     case EQ.eState.Ready: p_sRun = "Run"; break;
-                    case EQ.eState.Run:
-                    case EQ.eState.Recovery:
+                    case EQ.eState.Run: p_sRun = "No Touch"; break;
+                    case EQ.eState.Recovery: p_sRun = "No Touch"; break;
+                    case EQ.eState.ModuleRunList:
                         p_sRun = "Stop";
                         if (m_qModuleRun.Count > 0)
                         {
@@ -148,25 +149,15 @@ namespace RootTools.Module
                                 p_visibleRnR = Visibility.Visible;
                                 EQ.p_eState = EQ.eState.Ready;
                             }
-
-                          
-
-                            if (m_qModuleRun.Count > 0)
-                            {
-                                m_qModuleRun.Dequeue();
-                            }
+                            if (m_qModuleRun.Count > 0) m_qModuleRun.Dequeue();
                         }
-                        if (m_qModuleRun.Count == 0)
-                            p_iRun = p_maxRun - m_qModuleRun.Count;
+                        if (m_qModuleRun.Count == 0) p_iRun = p_maxRun - m_qModuleRun.Count;
 
                         if (m_qModuleRun.Count != m_moduleRunList.p_aModuleRun.Count && m_qModuleRun.Count % m_moduleRunList.p_aModuleRun.Count == 0)
                         {
-                            if(p_nRnR > p_nTotalRnR)
+                            if (p_nRnR > p_nTotalRnR)
                                 p_nTotalRnR++;
                         }
-
-
-
                         break;
                     case EQ.eState.Error:
                         p_Percent = "ERROR";
@@ -204,8 +195,7 @@ namespace RootTools.Module
                         EQ.p_bStop = true;
                     }
                     break;
-                case EQ.eState.Run:
-                case EQ.eState.Recovery:
+                case EQ.eState.ModuleRunList:
                     m_qModuleRun.Clear();
                     p_moduleList.Clear();
                     EQ.p_bStop = true;
@@ -229,7 +219,7 @@ namespace RootTools.Module
             p_maxRun = m_qModuleRun.Count;
             p_nTotalRnR = 0;
             p_nRnR = 1;
-            EQ.p_eState = EQ.eState.Run;
+            EQ.p_eState = EQ.eState.ModuleRunList;
         }
 
         public string ClickRunStep()
@@ -246,7 +236,7 @@ namespace RootTools.Module
                 }
             }
             p_maxRun = m_qModuleRun.Count;
-            EQ.p_eState = EQ.eState.Run;
+            EQ.p_eState = EQ.eState.ModuleRunList;
             return "OK";
         }
         #endregion
@@ -385,7 +375,7 @@ namespace RootTools.Module
             }
             p_maxRun = m_qModuleRun.Count;
             p_nTotalRnR = 0;
-            EQ.p_eState = EQ.eState.Run;
+            EQ.p_eState = EQ.eState.ModuleRunList;
             return "OK"; 
         }
         #endregion

@@ -63,7 +63,7 @@ namespace Root_WIND2
         ALID alid_FanAlarm;
         public DIO_Os m_doLamp;
         string[] asLamp = Enum.GetNames(typeof(eLamp));
-        
+
 
         public override void GetTools(bool bInit)
         {
@@ -116,7 +116,7 @@ namespace Root_WIND2
 
         Thread m_threadCheck;
         bool m_bThreadCheck = true;
-        
+
 
         public WIND2(string id, IEngineer engineer)
         {
@@ -129,7 +129,7 @@ namespace Root_WIND2
             ShowOHT();
         }
 
-
+        
         #region OHT
         List<OHT_Semi> p_aOHT
         {
@@ -155,11 +155,11 @@ namespace Root_WIND2
             {
                 try
                 {
-                    Thread.Sleep(1000);
-                    LampProcess();
-                    DoorCheck();
-                    FanCheck();
-                    AlarmCheck();
+                Thread.Sleep(1000);
+                LampProcess();
+                DoorCheck();
+                FanCheck();
+                AlarmCheck();
 
                     foreach (OHT_Semi OHT in p_aOHT)
                     {
@@ -364,14 +364,14 @@ namespace Root_WIND2
                 else
                 {
                     if (str != "")
-                        GlobalObjects.Instance.Get<WIND2_Warning>().AddWarning(str + " Open Detect");
+                    GlobalObjects.Instance.Get<WIND2_Warning>().AddWarning(str + " Open Detect");
 
-                    if (!di_ProtectionBar.p_bIn)
-                        str = di_ProtectionBar.m_id;
+                if (!di_ProtectionBar.p_bIn)
+                    str = di_ProtectionBar.m_id;
                     if (str != "")
-                        GlobalObjects.Instance.Get<WIND2_Warning>().AddWarning(str + " Up Dectect");
-                }
+                    GlobalObjects.Instance.Get<WIND2_Warning>().AddWarning(str + " Up Dectect");
             }
+        }
         }
 
         private void FanCheck()
@@ -407,9 +407,9 @@ namespace Root_WIND2
                 else
                 {
                     if (str != "")
-                        GlobalObjects.Instance.Get<WIND2_Warning>().AddWarning(str + " Fan Off Detect");
-                }
+                    GlobalObjects.Instance.Get<WIND2_Warning>().AddWarning(str + " Fan Off Detect");
             }
+        }
         }
 
         public override void ThreadStop()
@@ -424,7 +424,7 @@ namespace Root_WIND2
         }
 
         private void M_tk4s_OnDetectLimit(string str)
-        {   
+        {
             GlobalObjects.Instance.Get<WIND2_Warning>().AddWarning(str);
         }
 
@@ -436,7 +436,7 @@ namespace Root_WIND2
                     alid_Pressure.Run(true, str);
             }
             else
-                GlobalObjects.Instance.Get<WIND2_Warning>().AddWarning(str);
+            GlobalObjects.Instance.Get<WIND2_Warning>().AddWarning(str);
         }
 
         public void ShowOHT()

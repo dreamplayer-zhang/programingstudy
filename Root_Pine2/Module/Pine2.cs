@@ -1,4 +1,5 @@
-﻿using RootTools;
+﻿using Root_Pine2.Engineer;
+using RootTools;
 using RootTools.Comm;
 using RootTools.Control;
 using RootTools.Module;
@@ -6,6 +7,7 @@ using RootTools.ToolBoxs;
 using RootTools.Trees;
 using System;
 using System.Collections.Generic;
+using System.Text;
 using System.Threading;
 using System.Windows.Threading;
 
@@ -181,16 +183,26 @@ namespace Root_Pine2.Module
                 public Data(int nCumm, int nUnit, string sMsg)
                 {
                     m_nComm = nCumm; 
-                    m_nUnit = nUnit; 
+                    m_nUnit = nUnit;
                     while (sMsg.Length < 4) sMsg += " ";
-                    m_aSend.Add(256 * (byte)sMsg[0] + (byte)sMsg[1]); //forget
-                    m_aSend.Add(256 * (byte)sMsg[2] + (byte)sMsg[3]);
+                    byte[] aMsg = Encoding.ASCII.GetBytes(sMsg);
+                    for (int n = 0; n < 4; n++) aMsg[n] = GetCode(aMsg[n]); 
+                    m_aSend.Add(256 * aMsg[0] + aMsg[1]); 
+                    m_aSend.Add(256 * aMsg[2] + aMsg[3]);
+                }
+
+                byte GetCode(byte ch)
+                {
+                    if ((ch >= '0') && (ch <= '9')) return (byte)(ch - '0');
+                    if ((ch >= 'A') && (ch <= 'Z')) return (byte)(ch - 'A' + 10);
+                    return 0x3f;
                 }
             }
             Queue<Data> m_qSend = new Queue<Data>(); 
 
             string Send(Data data)
             {
+                m_modbus[data.m_nComm].Connect(); 
                 return m_modbus[data.m_nComm].WriteHoldingRegister((byte)data.m_nUnit, 1, data.m_aSend); 
             }
             #endregion
@@ -273,6 +285,18 @@ namespace Root_Pine2.Module
                 OnPropertyChanged(); 
             }
         }
+
+        string _sRecipe = "";
+        public string p_sRecipe
+        {
+            get { return _sRecipe; }
+            set
+            {
+                if (_sRecipe == value) return;
+                _sRecipe = value;
+                m_handler.p_sRecipe = value; 
+            }
+        }
         #endregion
 
         #region Thread DIO
@@ -326,12 +350,15 @@ namespace Root_Pine2.Module
             m_buzzer.RunTree(tree.GetTree("Buzzer")); 
             p_eMode = (eRunMode)tree.Set(p_eMode, p_eMode, "Mode", "RunMode");
             p_widthStrip = tree.Set(p_widthStrip, p_widthStrip, "Width", "Strip Width (mm)");
+            p_sRecipe = tree.Set(p_sRecipe, p_sRecipe, "Recipe", "Recipe"); 
         }
         #endregion
 
+        Pine2_Handler m_handler; 
         public Pine2(string id, IEngineer engineer)
         {
             p_id = id;
+            m_handler = (Pine2_Handler)engineer.ClassHandler(); 
             InitBase(id, engineer);
 
             InitThread();

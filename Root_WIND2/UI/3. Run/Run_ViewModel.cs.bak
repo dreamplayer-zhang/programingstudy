@@ -190,8 +190,8 @@ namespace Root_WIND2
                 p_ModuleList = engineer.ClassModuleList();
                 p_aTK4S = ((WIND2_Handler)(engineer.ClassHandler())).p_WIND2.m_tk4s.p_aTK4S;
                 p_aFFU = ((WIND2_Handler)(engineer.ClassHandler())).p_WIND2.m_FFUGourp.p_aFFU;
-				bgwLoad.DoWork += BgwLoad_DoWork;
-            	bgwLoad.RunWorkerCompleted += BgwLoad_RunWorkerCompleted;
+bgwLoad.DoWork += BgwLoad_DoWork;
+            bgwLoad.RunWorkerCompleted += BgwLoad_RunWorkerCompleted;
             }
             else // engineer.m_eMode 가 무슨용도인지 모르겠다.. Vision 모드일 경우 p_ModuleList를 engineer로부터 못받아 오기 때문에 임시로 받아오도록 수정
             {
