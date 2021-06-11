@@ -488,9 +488,29 @@ namespace RootTools.Memory
                 {
                     if (aX[x] != -1)
                     {
-                        for (int i = 0; i < nByte; i++)
+                        if (nOffsetFromUpperBit == 0)
                         {
-                            aBuf[ix + iy + i] = *(pSrc + aX[x] + i);
+                            for (int i = 0; i < nByte; i++)
+                            {
+                                aBuf[ix + iy + i] = *(pSrc + aX[x] + i);
+                            }
+                        }
+                        else
+                        {
+                            byte[] arr = new byte[sizeof(long)];
+                            for (int i = 0; i < nByte; i++)
+                            {
+                                arr[i] = *(pSrc + aX[x] + i);
+                            }
+
+                            ulong nVal = BitConverter.ToUInt64(arr, 0);
+                            nVal = nVal << nOffsetFromUpperBit;
+
+                            for (int i = 0; i < nByte; i++)
+                            {
+                                byte b = (byte)((nVal >> (i * 8)) & 0xFF);
+                                aBuf[ix + iy + i] = (byte)((nVal >> (i * 8)) & 0xFF);
+                            }
                         }
                     }
                     else
@@ -500,7 +520,6 @@ namespace RootTools.Memory
                             aBuf[ix + iy + i] = 0;
                         }
                     }
-                    
                 }
             }
 
