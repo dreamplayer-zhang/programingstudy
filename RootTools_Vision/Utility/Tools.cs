@@ -73,8 +73,8 @@ namespace RootTools_Vision
                     roiWidth = outSizeX;
                     roiHeight = outSizeY;
 
-                    samplingX = Math.Floor((double)(int)rect.Width / outSizeX);
-                    samplingY = Math.Floor((double)(int)rect.Height / outSizeY);
+                    samplingX = (double)rect.Width / outSizeX;
+                    samplingY = (double)rect.Height / outSizeY;
                 }
 
 
