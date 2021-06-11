@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:RootTools.Memory"
         mc:Ignorable="d"
-        Title="MemoryViewerOption" Height="278" Width="330" WindowStartupLocation="CenterOwner" ResizeMode="NoResize">
+        Title="MemoryViewerOption" Height="278" Width="330" WindowStartupLocation="CenterOwner" ResizeMode="NoResize" ShowInTaskbar="False">
     <Grid>
         <GroupBox Header="Overlap" HorizontalAlignment="Left" Height="101" Margin="10,10,0,0" VerticalAlignment="Top" Width="302">
             <Grid HorizontalAlignment="Left" VerticalAlignment="Top">

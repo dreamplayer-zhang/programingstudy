@@ -187,19 +187,19 @@ namespace RootTools.Camera.Dalsa
         //    }
         //}
 
-        int _nUserSetNum = 0;
-        public int p_nUserSetNum
-        {
-            get => _nUserSetNum;
-            set
-            {
-                if (value < 17 && value > 0) 
-                {
-                    _nUserSetNum = value;
-                    SetUserset(value);
-                }
-            }
-        }
+        //int _nUserSetNum = 0;
+        //public int p_nUserSetNum
+        //{
+        //    get => _nUserSetNum;
+        //    set
+        //    {
+        //        if (value < 17 && value > 0) 
+        //        {
+        //            _nUserSetNum = value;
+        //            SetUserset(value);
+        //        }
+        //    }
+        //}
         eUserSet m_eUserSetPowerup = eUserSet.Default;
         public eUserSet p_eUserSetPowerup
         {
@@ -364,15 +364,6 @@ namespace RootTools.Camera.Dalsa
                 m_sapCam.SetFeatureValue("sensorScanDirection", dir.ToString());
         }
 
-        public void SetUserSet(int i)
-        {
-            
-            if (m_sapCam != null)
-                m_sapCam.SetFeatureValue("UserSetSelector", "UserSet"+i.ToString());
-
-            m_sapCam.GetFeatureValue("UserSetSelector", out string str);
-        }
-
         public DalsaParameterSet(Log log)
         {
             m_log = log;
@@ -426,13 +417,6 @@ namespace RootTools.Camera.Dalsa
             if (!res.Equals("Internal"))
                 m_sapCam.SetFeatureValue("TriggerMode", "Internal");
             p_eTriggerMode = eTriggerMode.Internal;
-        }
-        void SetUserset(int num)
-        {
-            string str;
-            m_sapCam.GetFeatureValue("UserSetSelector", out str);
-            if (!str.Contains(num.ToString()))
-                m_sapCam.SetFeatureValue("UserSetSelector", "UserSet" + num.ToString());
         }
         bool SetPowerupUserset(eUserSet userset)
         {
