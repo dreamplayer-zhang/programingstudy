@@ -90,7 +90,7 @@ namespace Root_CAMELLIA
             //loadportB.Init(m_handler.m_aLoadport[1], m_handler, m_handler.m_aRFID[1]);
             marsLogManager = MarsLogManager.Instance;
             int nLPNum = m_handler.m_aLoadport.Count;
-            for (int i = 0; i < nLPNum; i++) dlgOHT.Init(m_handler.m_aLoadport[i].m_OHTNew);
+            for (int i = 0; i < nLPNum; i++) dlgOHT.Init(m_handler.m_aLoadport[i].m_OHTsemi);
             SplashScreenHelper.ShowText("Handler Initialize Done");
 
             SplashScreenHelper.ShowText("Log View Initialize");

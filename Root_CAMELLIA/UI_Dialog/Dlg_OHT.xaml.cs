@@ -1,5 +1,6 @@
 ﻿using Root_EFEM.Module;
 using RootTools;
+using RootTools.OHT.Semi;
 using RootTools.OHTNew;
 using System;
 using System.Collections.Generic;
@@ -27,7 +28,7 @@ namespace Root_CAMELLIA.UI_Dialog
             InitializeComponent();
         }
 
-        public void Init(OHT oht)
+        public void Init(OHT_Semi oht)
         {
             if (oht.p_id == "LoadportA.OHT") OHTA.Init(oht);
             else OHTB.Init(oht);
