@@ -183,6 +183,7 @@ namespace RootTools.Memory
             if (p_memoryData == null) return;
             p_memoryData.UpdateOpenProgress += P_memoryData_UpdateOpenProgress1;
             p_memoryData.FileSave(sFile, p_nMemoryIndex, nByte);
+            //p_memoryData.FileSaveBMP(sFile, nByte);
             //switch (GetUpperExt(sFile))
             //{
             //    case "BMP": p_memoryData.p_sInfo = p_memoryData.FileSaveBMP(sFile, p_nMemoryIndex, nByte); break;
@@ -311,6 +312,32 @@ namespace RootTools.Memory
                 switch (p_memoryData.p_nByte)
                 {
                     case 1: p_sGV = m_aBufDisplay[nAdd].ToString(); break;
+                    case 2:
+                        unsafe
+                        {
+                            CPoint pt = new CPoint(p_cpImage);
+                            if (m_bRemoveOverlapArea)
+                            {
+                                int nDisplayLen = (m_nFov - m_nOverlap);
+                                int quotient = pt.X / nDisplayLen;
+                                pt.X = pt.X + m_nOverlap * quotient;
+                                if (pt.X >= p_memoryData.p_sz.X * p_memoryData.p_nByte)
+                                    pt.X = -1;
+                            }
+
+                            IntPtr intPtr = p_memoryData.GetPtr(p_nMemoryIndex, pt.X, pt.Y);
+                            if(intPtr != null)
+                            {
+                                byte* ptr = (byte*)intPtr.ToPointer();
+                                if (ptr != null)
+                                {
+                                    int gv = *ptr + (*(ptr + 1) << 8);
+
+                                    p_sGV = gv.ToString();
+                                }
+                            }
+                        }
+                        break;
                     case 3:
                     case 4:
                         p_sGV = m_aBufDisplay[nAdd + 2].ToString() + ", " + m_aBufDisplay[nAdd + 1].ToString() + ", " + m_aBufDisplay[nAdd].ToString();
@@ -391,13 +418,34 @@ namespace RootTools.Memory
 
         CPoint m_szImage = new CPoint(); 
         CPoint m_szBitmapSource = new CPoint();
-        byte[] m_aBufDisplay = null; 
-        unsafe void UpdateBitmapSource()
+        byte[] m_aBufDisplay = null;
+
+        int m_nOffsetFromUpperBit = 0;
+        public int p_nOffsetFromUpperBit
         {
-            Parallel.For(0, 4, new ParallelOptions { MaxDegreeOfParallelism = 12 }, (i) =>
-            {
-                Debug.WriteLine(i.ToString());
-            });
+            get { return m_nOffsetFromUpperBit; }
+            set { m_nOffsetFromUpperBit = value; }
+        }
+        bool m_bRemoveOverlapArea = false;
+        public bool p_bRemoveOverlapArea
+        {
+            get { return m_bRemoveOverlapArea; }
+            set { m_bRemoveOverlapArea = value; }
+        }
+        int m_nFov = 8000;
+        public int p_nFov
+        {
+            get { return m_nFov; }
+            set { m_nFov = value; }
+        }
+        int m_nOverlap = 0;
+        public int p_nOverlap
+        {
+            get { return m_nOverlap; }
+            set { m_nOverlap = value; }
+        }
+        public unsafe void UpdateBitmapSource()
+        {
             if (p_memoryData == null) return;
             if (p_memoryData.GetPtr(p_nMemoryIndex) == null) return;
             if (p_szWindow.X * p_szWindow.Y == 0) return;
@@ -406,7 +454,6 @@ namespace RootTools.Memory
             m_szImage = new CPoint((int)(p_memoryData.p_sz.X * p_fZoom), (int)(p_memoryData.p_sz.Y * p_fZoom));
 
             int nByte = p_memoryData.p_nByte;
-            int nBytePerPixel = p_memoryData.p_nByte * p_memoryData.p_nCount;
             CPoint sz = m_szBitmapSource = new CPoint(Math.Min(p_szWindow.X, m_szImage.X), Math.Min(p_szWindow.Y, m_szImage.Y));
             byte[] aBuf = m_aBufDisplay = new byte[(long)nByte * sz.Y * sz.X];
 
@@ -416,19 +463,44 @@ namespace RootTools.Memory
             for (int x = 0; x < sz.X; x++)
             {
                 aX[x] = nByte * (m_cpOffset.X + (int)Math.Round(x / p_fZoom));
+                if(m_bRemoveOverlapArea)
+                {
+                    int nDisplayLen = (m_nFov - m_nOverlap);
+                    int quotient = aX[x] / (nDisplayLen * nByte);
+                    aX[x] = aX[x] + m_nOverlap * quotient * nByte;
+                    if (aX[x] >= p_memoryData.p_sz.X * nByte)
+                        aX[x] = -1;
+                }
             }
 
             for (int y = 0, iy = 0; y < sz.Y; y++, iy += nByte * sz.X)
             {
                 int pY = m_cpOffset.Y + (int)Math.Round(y / p_fZoom);
                 byte* pSrc = (byte*)p_memoryData.GetPtr(p_nMemoryIndex, 0, pY).ToPointer();
+                if (pSrc == null)
+                    return;
+
+                int nOffsetFromUpperBit = m_nOffsetFromUpperBit;
+                if (nOffsetFromUpperBit > (p_memoryData.p_nByte - 1) * 8)
+                    nOffsetFromUpperBit = 0;
 
                 for (int x = 0, ix = 0; x < sz.X; x++, ix += nByte)
                 {
-                    for (int i = 0; i < nByte; i++)
+                    if (aX[x] != -1)
                     {
-                        aBuf[ix + iy + i] = *(pSrc + aX[x] + i);
+                        for (int i = 0; i < nByte; i++)
+                        {
+                            aBuf[ix + iy + i] = *(pSrc + aX[x] + i);
+                        }
                     }
+                    else
+                    {
+                        for (int i = 0; i < nByte; i++)
+                        {
+                            aBuf[ix + iy + i] = 0;
+                        }
+                    }
+                    
                 }
             }
 
