@@ -189,6 +189,13 @@ namespace Root_Pine2.Module
                     m_aSend.Add(256 * aMsg[0] + aMsg[1]); 
                     m_aSend.Add(256 * aMsg[2] + aMsg[3]);
                 }
+
+                byte GetCode(byte ch)
+                {
+                    if ((ch >= '0') && (ch <= '9')) return (byte)(ch - '0');
+                    if ((ch >= 'A') && (ch <= 'Z')) return (byte)(ch - 'A' + 10);
+                    return 0x3f;
+                }
             }
             Queue<Data> m_qSend = new Queue<Data>(); 
 
