@@ -10,6 +10,7 @@ using RootTools.Control.ACS;
 using RootTools.Memory;
 using RootTools.Module;
 using RootTools.Trees;
+using RootTools_CLR;
 using RootTools_Vision;
 using System;
 using System.Collections.Generic;
@@ -143,7 +144,7 @@ namespace Root_VEGA_D.Module
                     // 중앙에 RADS 레이저가 맞춰진적이 없다면
                     if (m_nAFBestGVSum <= 0)
                     {
-                        m_log.Info(string.Format("AutoFocus Try ({0}/{1}) - Cannot find best Y position by auto focusing", nTryCount, m_grabMode.m_nRetryCount));
+                        m_log.Info(string.Format("AutoFocus Try ({0}/{1}) - Cannot find best Y position by auto focusing", nTryCount + 1, m_grabMode.m_nRetryCount));
                         nTryCount++;
                     }
                     else
@@ -385,7 +386,38 @@ namespace Root_VEGA_D.Module
                             rectBotMarker.Right = rectBotMarker.Left + imgBot.Width;
                             rectBotMarker.Bottom = rectBotMarker.Top + imgBot.Height;
 
-                            m_log.Info(string.Format("LeftBottom Align Marker is found - {0}, {1}", botMarkerX, botMarkerY));
+                            // FindEdge 함수 사용하여 정확한 위치 보정
+                            int nEdgeCheckMargin = 10;
+
+                            CRect rectROI = new CRect(
+                                rectBotMarker.Left - nEdgeCheckMargin - (int)(m_grabMode.m_nCenterX - m_grabMode.m_GD.m_nFovSize * 0.5),
+                                rectBotMarker.Top - nEdgeCheckMargin,
+                                rectBotMarker.Right + nEdgeCheckMargin - (int)(m_grabMode.m_nCenterX - m_grabMode.m_GD.m_nFovSize * 0.5),
+                                rectBotMarker.Bottom + nEdgeCheckMargin);
+
+                            unsafe
+                            {
+                                IntPtr intPtr = mem.GetPtr();
+                                byte* ptrImg = (byte*)intPtr.ToPointer();
+
+                                int centerX = (rectROI.Left + rectROI.Right) / 2;
+                                int centerY = (rectROI.Top + rectROI.Bottom) / 2;
+                                int width = rectROI.Width;
+                                int height = rectROI.Height;
+
+                                int nOffsetX_LtoR = CLR_IP.Cpp_FindEdge16bit(ptrImg, mem.p_sz.X, mem.p_sz.Y, rectROI.Left, (int)(centerY - height * 0.1 * 0.5), (int)(rectROI.Left + width * 0.1), (int)(centerY + height * 0.1 * 0.5), 0, 100);
+                                int nOffsetY_BtoT = CLR_IP.Cpp_FindEdge16bit(ptrImg, mem.p_sz.X, mem.p_sz.Y, (int)(centerX - width * 0.1 * 0.5), (int)(rectROI.Bottom - height * 0.1), (int)(centerX + width * 0.1 * 0.5), rectROI.Bottom, 3, 100);
+
+                                botMarkerX += nOffsetX_LtoR - nEdgeCheckMargin - rectROI.Left;
+                                botMarkerY += nOffsetY_BtoT + nEdgeCheckMargin - rectROI.Bottom;
+                            }
+
+                            rectBotMarker.Left = botMarkerX;
+                            rectBotMarker.Top = botMarkerY;
+                            rectBotMarker.Right = rectBotMarker.Left + imgBot.Width;
+                            rectBotMarker.Bottom = rectBotMarker.Top + imgBot.Height;
+
+                            m_log.Info(string.Format("LeftBottom Align Marker is found - {0}, {1}", rectBotMarker.Left, rectBotMarker.Bottom));
                         }
 
                         m_log.Info(string.Format("Align Success, theta difference = {0}", dThetaDegree * -1));
@@ -407,6 +439,7 @@ namespace Root_VEGA_D.Module
 
             return "Align Failed";
         }
+
         bool TemplateMatch(Image<Gray, byte> imgTargetArea, Image<Gray, byte> imgTemplate, double dMatchScore, out CPoint ptResult)
         {
             int nWidthDiff = 0;
@@ -497,10 +530,6 @@ namespace Root_VEGA_D.Module
                 // 스캔 라인 초기화
                 m_nCurScanLine = 0;
 
-                // 메모리 오프셋
-                CPoint cpMemoryOffset = new CPoint(m_grabMode.m_cpMemoryOffset);
-                cpMemoryOffset.X += m_grabMode.m_ScanStartLine * grabData.m_nFovSize;
-
                 // 변수 계산
                 m_grabMode.m_dTrigger = Math.Round(m_grabMode.m_dResY_um * m_grabMode.m_dCamTriggerRatio, 1);     // 트리거 (1 pulse = 3.0 mm)
 
@@ -553,6 +582,13 @@ namespace Root_VEGA_D.Module
                 //m_grabMode.SetLens();
                 m_grabMode.SetLight(true);
 
+                // 라인 스캔 전 정보 로그 작성
+                m_log.Info(string.Format("GrabLineScan Info : AxisX_Speed({0:F3}), AxisY_Speed({1:F3}), AxisZ_Pos({2:F3})", axisXY.p_axisX.GetSpeedValue(Axis.eSpeed.Move).m_v, axisXY.p_axisY.GetSpeedValue(Axis.eSpeed.Move).m_v, dPosZ));
+                for (int i = 0; i < m_grabMode.m_lightSet.m_aLight.Count; i++)
+                {
+                    m_log.Info(string.Format("GrabLineScan Light {0} : {1}({2}))", i + 1, m_grabMode.m_lightSet.m_aLight[i].m_sName, m_grabMode.m_aLightPower[i]));
+                }
+
                 while (m_grabMode.m_ScanLineNum > m_nCurScanLine)
                 {
                     if (EQ.IsStop())
@@ -574,6 +610,10 @@ namespace Root_VEGA_D.Module
 
                         double dPosX = m_grabMode.m_rpAxisCenter.X + m_grabMode.m_nWaferSize_mm * 0.5 - nLineIndex * (dfov_mm - dOverlap_mm);
                         double dNextPosX = dPosX - (dfov_mm - dOverlap_mm);
+
+                        // 메모리 오프셋
+                        CPoint cpMemoryOffset = new CPoint(m_grabMode.m_cpMemoryOffset);
+                        cpMemoryOffset.X += m_grabMode.m_ScanStartLine * grabData.m_nFovSize;
 
                         // Grab 방향 및 시작, 종료 위치 설정
                         m_grabMode.m_eGrabDirection = eGrabDirection.Forward;
@@ -650,7 +690,6 @@ namespace Root_VEGA_D.Module
 
                         // 다음 이미지 획득을 위해 변수 값 변경
                         m_nCurScanLine++;
-                        cpMemoryOffset.X += grabData.m_nFovSize;
                     }
                 }
                 m_grabMode.m_camera.StopGrab();

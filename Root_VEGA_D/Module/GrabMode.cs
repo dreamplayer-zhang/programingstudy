@@ -117,8 +117,8 @@ namespace Root_VEGA_D.Module
         #endregion
 
         #region Light
-        LightSet m_lightSet;
-        List<double> m_aLightPower = new List<double>();
+        public LightSet m_lightSet;
+        public List<double> m_aLightPower = new List<double>();
         void RunTreeLight(Tree tree, bool bVisible, bool bReadOnly)
         {
             if (m_lightSet == null) return;
