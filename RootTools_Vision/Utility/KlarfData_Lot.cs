@@ -1180,30 +1180,35 @@ namespace RootTools_Vision.Utility
         {
 
 			Bitmap bmp = Tools.CovertBufferToBitmap(info, rect, outSizeX, outSizeY);
-			Graphics gp =  Graphics.FromImage(bmp);
-			Brush brush = new SolidBrush(Color.Black);
+			//Graphics gp =  Graphics.FromImage(bmp);
+			//Brush brush = new SolidBrush(Color.Black);
 
 			
-			for (int i = 0; i < polygon.Count; i++)
-            {
-				List<PointF> poly = new List<PointF>();
+			//for (int i = 0; i < polygon.Count; i++)
+   //         {
+			//	List<PointF> poly = new List<PointF>();
 				
-				for (int j = 0; j < polygon[i].Count; j++)
-                {
+			//	for (int j = 0; j < polygon[i].Count; j++)
+   //             {
 					
-					poly.Add(new PointF((float)polygon[i][j].X,  (float)polygon[i][j].Y));
-				}
-				gp.FillPolygon(brush, poly.ToArray());
+			//		poly.Add(new PointF((float)polygon[i][j].X,  (float)polygon[i][j].Y));
+			//	}
+			//	gp.FillPolygon(brush, poly.ToArray());
 		
-			}
-			Tools.CirclarInterpolation(bmp, polygon, minRadius, thickness, centerX, centerY, outSizeX, outSizeY);
+			//}
+			//double resizeRatioX = (outSizeX / rect.Width);
+			//double resizeRatioY = (outSizeY / rect.Height);
+			//float cutSizeX = (float)(cuttingSize * resizeRatioX);
+			//float cutSizeY = (float)(cuttingSize * resizeRatioY);
 
-            GraphicsPath path = new GraphicsPath();
-			int cutSize = cuttingSize * 10;
-			path.AddEllipse(centerX - cutSize, centerY - cutSize, cutSize * 2, cutSize * 2);
-            Region region = new Region(path);
-            gp.ExcludeClip(region);
-            gp.FillRectangle(new SolidBrush(Color.Black), 0, 0, outSizeX, outSizeY);
+			//Tools.CirclarInterpolation(bmp, polygon, (minRadius * resizeRatioX), (int)(minRadius * thickness), (int)(centerX * resizeRatioX), (int)(centerY * resizeRatioY), outSizeX, outSizeY);
+
+
+   //         GraphicsPath path = new GraphicsPath();
+			//path.AddEllipse((float)((centerX * resizeRatioX) - cutSizeX), (float)((centerY * resizeRatioY) - cutSizeY), (float)(cutSizeX * 2), (float)(cutSizeY * 2));
+			//Region region = new Region(path);
+   //         gp.ExcludeClip(region);
+   //         gp.FillRectangle(new SolidBrush(Color.Black), 0, 0, outSizeX, outSizeY);
 
             //Tools.InterpolationImage(bmp, polygon);
 

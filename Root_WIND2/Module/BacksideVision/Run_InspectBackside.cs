@@ -177,7 +177,7 @@ namespace Root_WIND2.Module
                            settings_backside.WholeWaferImageEndY),
                        (long)(settings_backside.WholeWaferImageCompressionRate * 100),
                        settings_backside.OutputImageSizeX,
-                       settings_backside.OutputImageSizeY, polygon, settings_backside.CuttingSize, settings_backside.MinRadius, settings_backside.Thickness,
+                       settings_backside.OutputImageSizeY, polygon, (int)(settings_backside.CuttingSize * 1000 / m_grabMode.m_dRealResX_um), settings_backside.MinRadius, settings_backside.Thickness,
                        backRecipe.CenterX,
                        backRecipe.CenterY);
 
