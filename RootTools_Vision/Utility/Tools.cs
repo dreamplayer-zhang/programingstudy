@@ -158,9 +158,9 @@ namespace RootTools_Vision
                                 pDst[(long)((long)i * (bmpData.Stride) + (long)j * _byteCount + 2)] = *(pR + (long)(j * samplingX));
                             }
 
-                            pR += (long)(info.Width * samplingY);
-                            pG += (long)(info.Width * samplingY);
-                            pB += (long)(info.Width * samplingY);
+                            pR += (long)(info.Width * (long)samplingY);
+                            pG += (long)(info.Width * (long)samplingY);
+                            pB += (long)(info.Width * (long)samplingY);
                         }
                     }
                 }
