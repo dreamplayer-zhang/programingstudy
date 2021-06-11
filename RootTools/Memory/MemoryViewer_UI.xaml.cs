@@ -115,7 +115,6 @@ namespace RootTools.Memory
         private void gridBitmapSource_KeyDown(object sender, KeyEventArgs e)
         {
             if (m_viewer == null) return;
-            
         }
         #endregion
 

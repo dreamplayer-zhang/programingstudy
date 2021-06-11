@@ -254,7 +254,10 @@ namespace Root_WIND2
                 RecipeEdge recipeEdge = GlobalObjects.Instance.Register<RecipeEdge>();
                 RecipeEBR recipeEBR = GlobalObjects.Instance.Register<RecipeEBR>();
 
+                //Align
+                RecipeAlign recipeAlign = GlobalObjects.Instance.Register<RecipeAlign>();
 
+                
                 if (frontImage.GetPtr() != IntPtr.Zero)
                 {
                     RootTools_Vision.WorkManager3.WorkManager frontInspection = GlobalObjects.Instance.RegisterNamed<RootTools_Vision.WorkManager3.WorkManager>("frontInspection", 4, true);
@@ -423,6 +426,7 @@ namespace Root_WIND2
                 dialogService.Register<SettingDialog_ViewModel, SettingDialog>();
                 dialogService.Register<TK4S, TK4SModuleUI>();
                 dialogService.Register<FFUModule, FFUModuleUI>();
+                //dialogService.Register<Dialog_PortSelect_ViewModel, Dialog_PortSelect>();
 
 
 

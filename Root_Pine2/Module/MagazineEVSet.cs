@@ -8,7 +8,7 @@ namespace Root_Pine2.Module
     {
         public Dictionary<InfoStrip.eMagazine, MagazineEV> m_aEV = new Dictionary<InfoStrip.eMagazine, MagazineEV>();
 
-        InfoStrip.eMagazine m_eMagazineGet = InfoStrip.eMagazine.Magazine0; 
+        public InfoStrip.eMagazine m_eMagazineGet = InfoStrip.eMagazine.Magazine1; 
         public InfoStrip GetInfoStrip(bool bPeek)
         {
             int iMagazine = (int)m_eMagazineGet; 
@@ -20,13 +20,6 @@ namespace Root_Pine2.Module
                 if (infoStrip != null) return infoStrip;
             }
             return null; 
-        }
-
-        public string PutRequest(InfoStrip infoStrip)
-        {
-            if (infoStrip == null) return "InfoStrip == null";
-            m_aEV[infoStrip.p_eMagazine].m_infoStripUnload = infoStrip;
-            return "OK"; 
         }
 
         public string PutInfoStrip(InfoStrip infoStrip)
@@ -78,15 +71,15 @@ namespace Root_Pine2.Module
 
         void RunThread()
         {
-            int nBlink = 0; 
+            int nBlink = 0;
             m_bThread = true;
-            Thread.Sleep(5000); 
+            Thread.Sleep(5000);
             while (m_bThread)
             {
                 Thread.Sleep(200);
                 foreach (MagazineEV magazine in m_aEV.Values)
                 {
-                    magazine.m_conveyor.RunSwitch(nBlink); 
+                    magazine.m_conveyor.RunSwitch(nBlink);
                 }
                 nBlink = (nBlink + 1) % 8;
             }

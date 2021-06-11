@@ -28,12 +28,12 @@ namespace Root_Pine2_Vision.Engineer
 
         #region Module
         public ModuleList p_moduleList { get; set; }
-        public Vision m_vision; 
+        public Vision2D m_vision; 
 
         void InitModule()
         {
             p_moduleList = new ModuleList(m_engineer);
-            m_vision = new Vision("Vision", m_engineer, ModuleBase.eRemote.Server);
+            m_vision = new Vision2D("Vision", m_engineer, ModuleBase.eRemote.Server);
             InitModule(m_vision);
         }
 

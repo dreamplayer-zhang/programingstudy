@@ -5,6 +5,7 @@ using RootTools;
 using RootTools.Database;
 using RootTools.Module;
 using RootTools_Vision;
+using RootTools_Vision.Utility;
 using RootTools_Vision.WorkManager3;
 using System;
 using System.Collections.Generic;
@@ -150,7 +151,14 @@ namespace Root_WIND2.UI_User
 				this.ImageViewerVM.ClearObjects();
 
 				if (GlobalObjects.Instance.GetNamed<WorkManager>("ebrInspection") != null)
+				{
+					WIND2_Engineer engineer = GlobalObjects.Instance.Get<WIND2_Engineer>();
+					RecipeEBR recipeEBR = GlobalObjects.Instance.Get<RecipeEBR>();
+					CameraInfo camInfo = DataConverter.GrabModeToCameraInfo(engineer.m_handler.p_EdgeSideVision.GetGrabMode(recipeEBR.CameraInfoIndex));
+
+					GlobalObjects.Instance.GetNamed<WorkManager>("ebrInspection").SetCameraInfo(camInfo);
 					GlobalObjects.Instance.GetNamed<WorkManager>("ebrInspection").Start();
+				}
 			});
 		}
 
@@ -185,6 +193,39 @@ namespace Root_WIND2.UI_User
 			get => new RelayCommand(() =>
 			{
 				this.ImageViewerVM.ClearObjects();
+			});
+		}
+
+		public RelayCommand btnSaveKlarf
+		{
+			get => new RelayCommand(() =>
+			{
+				WorkManager workManager = GlobalObjects.Instance.GetNamed<WorkManager>("ebrInspection");
+				RecipeEBR recipe = GlobalObjects.Instance.Get<RecipeEBR>();
+
+				WIND2_Engineer engineer = GlobalObjects.Instance.Get<WIND2_Engineer>();
+				GrabModeEdge grabMode = engineer.m_handler.p_EdgeSideVision.GetGrabMode(recipe.CameraInfoIndex);
+				InfoWafer infoWafer = engineer.m_handler.p_EdgeSideVision.p_infoWafer;
+				if (infoWafer == null)
+				{
+					infoWafer = new InfoWafer("null", 0, engineer);
+				}
+
+				Settings settings = new Settings();
+				SettingItem_SetupEBR settings_ebr = settings.GetItem<SettingItem_SetupEBR>();
+
+				DataTable table = DatabaseManager.Instance.SelectCurrentInspectionDefect("measurement");
+				List<Measurement> defects = Tools.DataTableToMeasurementList(table);
+
+				KlarfData_Lot klarfData = new KlarfData_Lot();
+				Directory.CreateDirectory(settings_ebr.KlarfSavePath);
+
+				klarfData.LotStart(settings_ebr.KlarfSavePath, infoWafer, recipe.WaferMap, grabMode);
+				klarfData.WaferStart(recipe.WaferMap, infoWafer);
+				klarfData.AddSlot(recipe.WaferMap, defects, recipe.GetItem<OriginRecipe>());
+				klarfData.SetResultTimeStamp();
+				klarfData.SaveKlarf();
+				klarfData.SaveTiffImageFromFiles(Path.Combine(settings_ebr.MeasureImagePath, DatabaseManager.Instance.GetInspectionID()));
 			});
 		}
 		#endregion
@@ -261,7 +302,7 @@ namespace Root_WIND2.UI_User
 			XLabels = new string[binCount];
 			for (int i = 1; i <= binCount; i++)
 			{
-				XLabels[i - 1] = (parameter.StepDegree * i).ToString();
+				XLabels[i - 1] = (/*parameter.StepDegree*/10 * i).ToString();
 			}
 			YLabel = value => value.ToString("N");
 
@@ -306,7 +347,7 @@ namespace Root_WIND2.UI_User
 			XLabels = new string[binCount];
 			for (int i = 1; i <= binCount; i++)
 			{
-				XLabels[i - 1] = (parameter.StepDegree * i).ToString();
+				XLabels[i - 1] = (/*parameter.StepDegree*/10 * i).ToString();
 			}
 			YLabel = value => value.ToString("N");
 

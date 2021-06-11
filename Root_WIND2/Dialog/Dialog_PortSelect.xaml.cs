@@ -1,4 +1,5 @@
-﻿using System;
+﻿using RootTools;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,19 +11,18 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace Root_WIND2.UI_User
+namespace Root_WIND2
 {
-	/// <summary>
-	/// EBRSetup_New.xaml에 대한 상호 작용 논리
-	/// </summary>
-	public partial class EBRSetup_New : UserControl
-	{
-		public EBRSetup_New()
-		{
-			InitializeComponent();
-		}
-	}
+    /// <summary>
+    /// Dialog_Scan.xaml에 대한 상호 작용 논리
+    /// </summary>
+    public partial class Dialog_PortSelect : Window, IDialog
+    {
+        public Dialog_PortSelect()
+        {
+            InitializeComponent();
+        }
+    }
 }

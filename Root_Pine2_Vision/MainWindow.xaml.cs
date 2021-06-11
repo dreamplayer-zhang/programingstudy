@@ -20,7 +20,6 @@ namespace Root_Pine2_Vision
         Pine2_Vision_Handler m_handler;
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            if (!Directory.Exists(@"C:\Recipe\Pine2")) Directory.CreateDirectory(@"C:\Recipe\Pine2");
             m_engineer.Init("Pine2");
             engineerUI.Init(m_engineer);
             m_handler = (Pine2_Vision_Handler)m_engineer.ClassHandler();

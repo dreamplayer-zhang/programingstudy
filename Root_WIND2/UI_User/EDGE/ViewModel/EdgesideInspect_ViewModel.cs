@@ -13,6 +13,8 @@ using System.Windows.Input;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using RootTools_Vision.WorkManager3;
+using RootTools_Vision.Utility;
+
 namespace Root_WIND2.UI_User
 {
 	public class EdgesideInspect_ViewModel : ObservableObject
@@ -132,6 +134,39 @@ namespace Root_WIND2.UI_User
 				this.ImageViewerBtmVM.ClearObjects();
 			});
 		}
+
+		public RelayCommand btnSaveKlarf
+		{
+			get => new RelayCommand(() =>
+			{
+				WorkManager workManager = GlobalObjects.Instance.GetNamed<WorkManager>("edgeInspection");
+				RecipeEdge recipe = GlobalObjects.Instance.Get<RecipeEdge>();
+
+				WIND2_Engineer engineer = GlobalObjects.Instance.Get<WIND2_Engineer>();
+				GrabModeEdge grabMode = engineer.m_handler.p_EdgeSideVision.GetGrabMode(recipe.CameraInfoIndex);
+				InfoWafer infoWafer = engineer.m_handler.p_EdgeSideVision.p_infoWafer;
+				if (infoWafer == null)
+				{
+					infoWafer = new InfoWafer("null", 0, engineer);
+				}
+
+				Settings settings = new Settings(); 
+				SettingItem_SetupEdgeside settings_edgeside = settings.GetItem<SettingItem_SetupEdgeside>();
+
+				DataTable table = DatabaseManager.Instance.SelectCurrentInspectionDefect();
+				List<Defect> defects = Tools.DataTableToDefectList(table);
+
+				KlarfData_Lot klarfData = new KlarfData_Lot();
+				Directory.CreateDirectory(settings_edgeside.KlarfSavePath);
+
+				klarfData.LotStart(settings_edgeside.KlarfSavePath, infoWafer, recipe.WaferMap, grabMode);
+				klarfData.WaferStart(recipe.WaferMap, infoWafer);
+				klarfData.AddSlot(recipe.WaferMap, defects, recipe.GetItem<OriginRecipe>());
+				klarfData.SetResultTimeStamp();
+				klarfData.SaveKlarf();
+				klarfData.SaveTiffImageFromFiles(Path.Combine(settings_edgeside.DefectImagePath, DatabaseManager.Instance.GetInspectionID()));
+			});
+		}
 		#endregion
 
 		public EdgesideInspect_ViewModel()
@@ -230,8 +265,8 @@ namespace Root_WIND2.UI_User
 
 			Application.Current.Dispatcher.Invoke(DispatcherPriority.Normal, new Action(delegate
 			{
-				DatabaseManager.Instance.SelectData();
-				dataViewerVM.pDataTable = DatabaseManager.Instance.pDefectTable;
+				//DatabaseManager.Instance.SelectData();
+				dataViewerVM.pDataTable = DatabaseManager.Instance.SelectCurrentInspectionDefect();
 
 				DrawRectDefect(ImageViewerTopVM, rectListTop, textListTop);
 				DrawRectDefect(imageViewerSideVM, rectListSide, textListSide);

@@ -29,9 +29,14 @@ namespace Root_WIND2.Module
 
         private static void LotStart(string klarfPath, RecipeBase recipe, InfoWafer infoWafer, GrabModeBase grabMode)
         {
-            if (klarfData == null) klarfData = new KlarfData_Lot();
+            if (klarfData == null)
+            {
+                klarfData = new KlarfData_Lot();
+            }
 
-            if(Directory.Exists(klarfPath)) Directory.CreateDirectory(klarfPath);
+            klarfData.SetModuleName("Front");
+
+            if (Directory.Exists(klarfPath)) Directory.CreateDirectory(klarfPath);
 
 
             klarfData.LotStart(klarfPath, infoWafer, recipe.WaferMap, grabMode);
@@ -72,15 +77,15 @@ namespace Root_WIND2.Module
             set => m_sRecipeName = value;
         }
 
-        public string p_sGrabMode
-        {
-            get { return m_sGrabMode; }
-            set
-            {
-                m_sGrabMode = value;
-                m_grabMode = m_module.GetGrabMode(value);
-            }
-        }
+        //public string p_sGrabMode
+        //{
+        //    get { return m_sGrabMode; }
+        //    set
+        //    {
+        //        m_sGrabMode = value;
+        //        m_grabMode = m_module.GetGrabMode(value);
+        //    }
+        //}
         #endregion
 
         public Run_Inspect(Vision module)
@@ -92,7 +97,7 @@ namespace Root_WIND2.Module
         public override ModuleRunBase Clone()
         {
             Run_Inspect run = new Run_Inspect(m_module);
-            run.p_sGrabMode = p_sGrabMode;
+            //run.p_sGrabMode = p_sGrabMode;
             run.RecipeName = this.RecipeName;
             run.m_dTDIToVRSOffsetZ = m_dTDIToVRSOffsetZ;
 
@@ -103,7 +108,7 @@ namespace Root_WIND2.Module
         {
             m_sRecipeName = tree.SetFile(m_sRecipeName, m_sRecipeName, "rcp", "Recipe", "Recipe Name", bVisible);
             // 이거 다 셋팅 되어 있는거 가져와야함
-            p_sGrabMode = tree.Set(p_sGrabMode, p_sGrabMode, m_module.p_asGrabMode, "Grab Mode", "Select GrabMode", bVisible);
+            //p_sGrabMode = tree.Set(p_sGrabMode, p_sGrabMode, m_module.p_asGrabMode, "Grab Mode", "Select GrabMode", bVisible);
             m_dTDIToVRSOffsetZ = tree.Set(m_dTDIToVRSOffsetZ, m_dTDIToVRSOffsetZ, "TDI To VRS Offset Z", "TDI To VRS Offset Z", bVisible);
         }
 
@@ -112,14 +117,25 @@ namespace Root_WIND2.Module
             Settings settings = new Settings();
             SettingItem_SetupFrontside settings_frontside = settings.GetItem<SettingItem_SetupFrontside>();
 
+
+            // 여기 현장버전으로 수정되야함
             InfoWafer infoWafer = m_module.GetInfoWafer(0);
+
             RecipeFront recipe = GlobalObjects.Instance.Get<RecipeFront>();
 
-            m_grabMode = m_module.GetGrabMode(p_sGrabMode[recipe.CameraInfoIndex]);
+            if (recipe.Read(this.m_sRecipeName) == false)
+                return "Recipe Read Fail";
+
+            m_grabMode = m_module.GetGrabMode(recipe.CameraInfoIndex);
 
             // Check Lot Start
-            //if(infoWafer.IsLotStart ??)
-            LotStart(settings_frontside.KlarfSavePath, recipe, infoWafer, m_grabMode);
+            if ((infoWafer != null) && (
+                (infoWafer._eWaferOrder == InfoWafer.eWaferOrder.FirstLastWafer) ||
+                (infoWafer._eWaferOrder == InfoWafer.eWaferOrder.FirstWafer)))
+            {
+                LotStart(settings_frontside.KlarfSavePath, recipe, infoWafer, m_grabMode);
+            }
+                
 
 
             StopWatch inspectionTimeWatcher = new StopWatch();
@@ -165,11 +181,9 @@ namespace Root_WIND2.Module
                 #region [Snap sequence] 
 
                 // 210525 추가
-             
-
                 m_grabMode.SetLens();
                 m_grabMode.SetLight(true);
-
+                m_module.p_bStageVac = true;
                 AxisXY axisXY = m_module.AxisXY;
                 Axis axisZ = m_module.AxisZ;
                 Axis axisRotate = m_module.AxisRotate;
@@ -178,8 +192,8 @@ namespace Root_WIND2.Module
                 int nScanLine = 0;
                 int nMMPerUM = 1000;
 
-                double dXScale = m_grabMode.m_dTargetResX_um * 10;
-                cpMemoryOffset.X += (nScanLine + m_grabMode.m_ScanStartLine) * m_grabMode.m_GD.m_nFovSize;
+                double dXScale = m_grabMode.m_dRealResX_um * 10;
+                cpMemoryOffset.X += (nScanLine /*+ m_grabMode.m_ScanStartLine*/) * m_grabMode.m_GD.m_nFovSize;
                 m_grabMode.m_dTrigger = Convert.ToInt32(10 * m_grabMode.m_dTargetResY_um);  // 1pulse = 0.1um -> 10pulse = 1um
                 int nWaferSizeY_px = Convert.ToInt32(m_grabMode.m_nWaferSize_mm * nMMPerUM / m_grabMode.m_dTargetResY_um);  // 웨이퍼 영역의 Y픽셀 갯수
                 int nTotalTriggerCount = Convert.ToInt32(m_grabMode.m_dTrigger * nWaferSizeY_px);   // 스캔영역 중 웨이퍼 스캔 구간에서 발생할 Trigger 갯수
@@ -200,7 +214,7 @@ namespace Root_WIND2.Module
                 while (nWholeWaferScanLineNumber > nScanLine)
                 {
                     if (EQ.IsStop())
-                        return "OK";
+                        return "EQ Stop";
 
                     bool bNormal = true;
                     // 위에서 아래로 찍는것을 정방향으로 함, 즉 Y축 값이 큰쪽에서 작은쪽으로 찍는것이 정방향
@@ -220,15 +234,16 @@ namespace Root_WIND2.Module
                         m_grabMode.m_eGrabDirection = eGrabDirection.BackWard;
                     }
                     double dfovum = m_grabMode.m_GD.m_nFovSize * dXScale;
-                    double dPosX = m_grabMode.m_rpAxisCenter.X + m_grabMode.m_ptXYAlignData.X + nWaferSizeY_px * (double)m_grabMode.m_dTrigger / 2 - (nScanLine + m_grabMode.m_ScanStartLine) * m_grabMode.m_GD.m_nFovSize * dXScale;
-                    double dNextPosX = m_grabMode.m_rpAxisCenter.X + m_grabMode.m_ptXYAlignData.X + nWaferSizeY_px * (double)m_grabMode.m_dTrigger / 2 - (nScanLine + 1 + m_grabMode.m_ScanStartLine) * m_grabMode.m_GD.m_nFovSize * dXScale;
+                    double dPosX = m_grabMode.m_rpAxisCenter.X + m_grabMode.m_ptXYAlignData.X + nWaferSizeY_px * (double)m_grabMode.m_dTrigger / 2 - (nScanLine /*+ m_grabMode.m_ScanStartLine*/) * m_grabMode.m_GD.m_nFovSize * dXScale;
+                    double dNextPosX = m_grabMode.m_rpAxisCenter.X + m_grabMode.m_ptXYAlignData.X + nWaferSizeY_px * (double)m_grabMode.m_dTrigger / 2 - (nScanLine + 1 /*+ m_grabMode.m_ScanStartLine*/) * m_grabMode.m_GD.m_nFovSize * dXScale;
 
-                    if (m_grabMode.m_dVRSFocusPos != 0)
-                    {
-                        dFocusPosZ = m_grabMode.m_dVRSFocusPos + m_dTDIToVRSOffsetZ;
-                    }
+                    double dPosZ = m_grabMode.m_nFocusPosZ;
+                    //if (m_grabMode.m_dVRSFocusPos != 0)
+                    //{
+                    //    dPosZ = m_grabMode.m_dVRSFocusPos + m_dTDIToVRSOffsetZ;
+                    //}
                     //포커스 높이로 이동
-                    if (m_module.Run(axisZ.StartMove(dFocusPosZ)))
+                    if (m_module.Run(axisZ.StartMove(dPosZ)))
                         return p_sInfo;
 
                     // XY 찍는 위치로 이동
@@ -256,7 +271,7 @@ namespace Root_WIND2.Module
 
                     GrabData gd = m_grabMode.m_GD;
                     gd.bInvY = m_grabMode.m_eGrabDirection == eGrabDirection.BackWard;
-                    gd.nScanOffsetY = (nScanLine + m_grabMode.m_ScanStartLine) * m_grabMode.m_nYOffset;
+                    gd.nScanOffsetY = (nScanLine /*+ m_grabMode.m_ScanStartLine*/) * m_grabMode.m_nYOffset;
                     gd.ReverseOffsetY = m_grabMode.m_nReverseOffsetY;
                     //카메라 그랩 시작
                     m_grabMode.StartGrab(mem, cpMemoryOffset, nWaferSizeY_px, m_grabMode.m_GD);
@@ -313,7 +328,7 @@ namespace Root_WIND2.Module
                     if (bNormal == true)
                     {
                         //WIND2EventManager.OnSnapDone(this, new SnapDoneArgs(new CPoint(startOffsetX, startOffsetY), cpMemoryOffset + new CPoint(m_grabMode.m_GD.m_nFovSize, nWaferSizeY_px)));
-                        //workManager.CheckSnapDone(new Rect(new Point(startOffsetX, startOffsetY), new Point(cpMemoryOffset.X + m_grabMode.m_GD.m_nFovSize, cpMemoryOffset.Y + nWaferSizeY_px)));
+                        workManager.CheckSnapDone(new Rect(new Point(startOffsetX, startOffsetY), new Point(cpMemoryOffset.X + m_grabMode.m_GD.m_nFovSize, cpMemoryOffset.Y + nWaferSizeY_px)));
                         nScanLine++;
                         cpMemoryOffset.X += m_grabMode.m_GD.m_nFovSize;
                     }
@@ -353,7 +368,7 @@ namespace Root_WIND2.Module
                 else
 				{
                     #region [Klarf]
-                    if(settings_frontside.UseKlarf)
+                    if(settings_frontside.UseKlarf && (infoWafer != null))
                     {
                         DataTable table = DatabaseManager.Instance.SelectCurrentInspectionDefect();
                         List<Defect> defects = Tools.DataTableToDefectList(table);
@@ -440,8 +455,13 @@ namespace Root_WIND2.Module
 
 
                 // LotEnd Check
-                //if(infoWafer.IsLotEnd)
-                LotEnd(infoWafer);
+                if ((infoWafer != null) && (
+                    (infoWafer._eWaferOrder == InfoWafer.eWaferOrder.FirstLastWafer) ||
+                    (infoWafer._eWaferOrder == InfoWafer.eWaferOrder.LastWafer)))
+                {
+                    LotEnd(infoWafer);
+                }
+                    
 
                 return "OK";
             }

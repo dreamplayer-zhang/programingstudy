@@ -418,13 +418,6 @@ namespace RootTools.Camera.Dalsa
                 m_sapCam.SetFeatureValue("TriggerMode", "Internal");
             p_eTriggerMode = eTriggerMode.Internal;
         }
-        //void SetUserset(int num)
-        //{
-        //    string str;
-        //    m_sapCam.GetFeatureValue("UserSetSelector", out str);
-        //    if (!str.Contains(num.ToString()))
-        //        m_sapCam.SetFeatureValue("UserSetSelector", "UserSet" + num.ToString());
-        //}
         bool SetPowerupUserset(eUserSet userset)
         {
             if (m_sapCam == null) return false;

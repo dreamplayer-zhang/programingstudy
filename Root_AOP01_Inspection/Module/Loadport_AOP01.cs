@@ -26,7 +26,7 @@ namespace Root_AOP01_Inspection.Module
         #region ToolBox
         RS232 m_rs232;
         public DIO_I m_diPlaced;
-        public DIO_I m_diPresent;
+        public DIO_I p_diPresent;
         public DIO_I m_diOpen;
         public DIO_I m_diClose;
         public DIO_I m_diReady;
@@ -46,7 +46,7 @@ namespace Root_AOP01_Inspection.Module
         public override void GetTools(bool bInit)
         {
             p_sInfo = m_toolBox.GetDIO(ref m_diPlaced, this, "Place");
-            p_sInfo = m_toolBox.GetDIO(ref m_diPresent, this, "Present");
+            p_sInfo = m_toolBox.GetDIO(ref p_diPresent, this, "Present");
             p_sInfo = m_toolBox.GetDIO(ref m_diOpen, this, "Open");
             p_sInfo = m_toolBox.GetDIO(ref m_diClose, this, "Close");
             p_sInfo = m_toolBox.GetDIO(ref m_diReady, this, "Ready");
@@ -470,7 +470,7 @@ namespace Root_AOP01_Inspection.Module
             m_svidLPOpen.p_value = m_diOpen.p_bIn;
             m_svidLPClose.p_value = m_diClose.p_bIn;
             m_svidLPPlacement.p_value = m_diPlaced.p_bIn;
-            m_svidLPPresence.p_value = m_diPresent.p_bIn;
+            m_svidLPPresence.p_value = p_diPresent.p_bIn;
         }
 
         public void CheckCEID()
@@ -749,7 +749,7 @@ namespace Root_AOP01_Inspection.Module
                         return p_sInfo;
                     }
                 }
-                if (!m_diPlaced.p_bIn && !m_diPresent.p_bIn)
+                if (!m_diPlaced.p_bIn && !p_diPresent.p_bIn)
                 {
                     p_infoCarrier.p_eState = InfoCarrier.eState.Placed;
                     m_bPlaced = true;
@@ -787,10 +787,11 @@ namespace Root_AOP01_Inspection.Module
             //    p_infoCarrier.m_bReqReadCarrierID = false;
             //    StartRun(m_runReadPodID);
             //}
+            bool bUseXGem = m_engineer.p_bUseXGem;
             if (p_infoCarrier.m_bReqLoad)
             {
                 p_infoCarrier.m_bReqLoad = false;
-                StartRun(m_runDocking);
+                if (bUseXGem) StartRun(m_runDocking);
             }
 
             if (p_infoCarrier.m_bReqGem)
@@ -799,7 +800,7 @@ namespace Root_AOP01_Inspection.Module
                 StartRun(m_runGem);
             }
             
-            if (p_infoCarrier.m_bReqUnload)
+            if (p_infoCarrier.m_bReqUnload && p_infoCarrier.p_eState == InfoCarrier.eState.Dock)
             {
                 p_infoCarrier.m_bReqUnload = false;
                 StartRun(m_runUndocking);
@@ -894,7 +895,7 @@ namespace Root_AOP01_Inspection.Module
         }
 
         public bool p_bPlaced { get { return m_diPlaced.p_bIn; } }
-        public bool p_bPresent { get { return m_diPresent.p_bIn; } }
+        public bool p_bPresent { get { return p_diPresent.p_bIn; } }
         #endregion
 
         IRFID _rfid;
@@ -907,6 +908,8 @@ namespace Root_AOP01_Inspection.Module
             }
         }
         public InfoCarrier p_infoCarrier { get; set; }
+        public OHT_Semi m_OHTsemi { get; set; }
+
         public StopWatch m_swLotTime;
 
         GemCarrierBase.eAssociated m_eAssociated = GemCarrierBase.eAssociated.NotAssociated;

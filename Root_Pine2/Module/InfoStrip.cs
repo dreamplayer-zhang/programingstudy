@@ -30,8 +30,8 @@ namespace Root_Pine2.Module
         #endregion
 
         #region Boat Flow
-        public Vision.eVision m_eVisionLoad = Vision.eVision.Top3D; 
-        public Vision.eWorks m_eWorks = Vision.eWorks.A;
+        public Vision2D.eVision m_eVisionLoad = Vision2D.eVision.Top3D; 
+        public Vision2D.eWorks m_eWorks = Vision2D.eWorks.A;
         #endregion
 
         string _id = ""; 
@@ -47,7 +47,7 @@ namespace Root_Pine2.Module
         public int p_nStrip { get; set; }
         public InfoStrip(int nStrip)
         {
-            p_eMagazine = eMagazine.Magazine0; 
+            p_eMagazine = eMagazine.Magazine1; 
             p_nStrip = nStrip;
             p_id = "Strip" + nStrip.ToString("000"); 
         }
@@ -60,7 +60,6 @@ namespace Root_Pine2.Module
 
         public enum eMagazine
         {
-            Magazine0,
             Magazine1,
             Magazine2,
             Magazine3,
@@ -68,6 +67,7 @@ namespace Root_Pine2.Module
             Magazine5,
             Magazine6,
             Magazine7,
+            Magazine8,
         }
         public eMagazine p_eMagazine { get; set; }
         public enum eMagazinePos

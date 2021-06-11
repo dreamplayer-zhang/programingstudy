@@ -1,4 +1,5 @@
 ﻿using RootTools.Module;
+using RootTools.OHT.Semi;
 using System;
 
 namespace RootTools.OHTNew
@@ -26,5 +27,8 @@ namespace RootTools.OHTNew
         IRFID m_rfid { get; set; }
 
         OHT m_OHTNew { get; set; }
+
+        OHT_Semi m_OHTsemi
+        { get; set; }
     }
 }

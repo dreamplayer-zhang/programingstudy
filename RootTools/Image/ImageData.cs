@@ -327,6 +327,12 @@ namespace RootTools
 
             else if (nByte == 3)
             {
+                if (imgData.m_MemData == null)
+                {
+                    System.Windows.MessageBox.Show("ImageData SetData() 실패\nMemoryData == null");
+                    return;
+                }
+                    
                 byte* Rptr = (byte*)imgData.m_MemData.GetPtr(0).ToPointer();
                 byte* Gptr = (byte*)imgData.m_MemData.GetPtr(1).ToPointer();
                 byte* Bptr = (byte*)imgData.m_MemData.GetPtr(2).ToPointer();
@@ -1007,18 +1013,22 @@ namespace RootTools
 
                 if (ptrR != IntPtr.Zero && ptrG != IntPtr.Zero && ptrB != IntPtr.Zero)
                 {
-                    for (int j = rect.Top + rect.Height - 1; j >= rect.Top; j--)
+                    for (long j = rect.Top + rect.Height - 1; j >= rect.Top; j--)
                     {
                         Array.Clear(aBuf, 0, rowSize);
 
                         Parallel.For(0, rect.Width, new ParallelOptions { MaxDegreeOfParallelism = 12 }, (i) =>
                         {
-                            int idx = (j * p_Size.X + i + rect.Left) * p_nByte;
+
+                            if (Worker_MemoryCopy.CancellationPending)
+                                return;
+
+                            long idx = (long) (j * p_Size.X + i + rect.Left) * p_nByte;
                             if (p_nByte == 1)
                             {
-                                aBuf[i * 3 + 0] = (byte)(blue ? ((byte*)ptrB.ToPointer())[idx] : 0);
-                                aBuf[i * 3 + 1] = (byte)(green ? ((byte*)ptrG.ToPointer())[idx] : 0);
-                                aBuf[i * 3 + 2] = (byte)(red ? ((byte*)ptrR.ToPointer())[idx] : 0);
+                                aBuf[(long)i * 3 + 0] = (byte)(blue ? ((byte*)ptrB.ToPointer())[idx] : 0);
+                                aBuf[(long)i * 3 + 1] = (byte)(green ? ((byte*)ptrG.ToPointer())[idx] : 0);
+                                aBuf[(long)i * 3 + 2] = (byte)(red ? ((byte*)ptrR.ToPointer())[idx] : 0);
                             }
                             else if (p_nByte == 2)
                             {
@@ -1026,9 +1036,9 @@ namespace RootTools
                                 int g = (int)((int*)ptrG.ToPointer())[idx];
                                 int r = (int)((int*)ptrR.ToPointer())[idx];
 
-                                aBuf[i * 3 + 0] = (byte)(b / 0xffff);
-                                aBuf[i * 3 + 1] = (byte)(g / 0xffff);
-                                aBuf[i * 3 + 2] = (byte)(r / 0xffff);
+                                aBuf[(long)i * 3 + 0] = (byte)(b / 0xffff);
+                                aBuf[(long)i * 3 + 1] = (byte)(g / 0xffff);
+                                aBuf[(long)i * 3 + 2] = (byte)(r / 0xffff);
                             };
                         });
 
@@ -1942,6 +1952,29 @@ namespace RootTools
             _nByte = 0;
             p_Size.X = 0;
             p_Size.Y = 0;
+        }
+
+
+        public void CopyToBuffer(out byte[] buffer, Rect rect = default(Rect))
+        {
+            int startX = (int)rect.Left;
+            int startY = (int)rect.Top;
+            int width = (int)rect.Width;
+            int height = (int)rect.Height;
+            int byteCount = GetBytePerPixel();
+
+            if (rect == default(Rect))
+            {
+                buffer = new byte[m_aBuf.Length];
+                Buffer.BlockCopy(m_aBuf, 0, buffer, 0, m_aBuf.Length);
+            }
+            else
+            {
+                buffer = new byte[(int)(rect.Width * rect.Height * byteCount)];
+
+                for (int i = 0; i < height; i++)
+                    Array.Copy(m_aBuf, (i + startY) * p_Stride + startX, buffer, i * width * byteCount, width * byteCount);
+            }    
         }
 
         #region 주석

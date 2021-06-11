@@ -25,7 +25,6 @@ namespace Root_WIND2.Module
         //bool m_bInvDir = false;
         public GrabModeBack m_grabMode = null;
         string m_sGrabMode = "";
-
         #region [Klarf]
         private static KlarfData_Lot klarfData = new KlarfData_Lot();
 
@@ -33,6 +32,8 @@ namespace Root_WIND2.Module
         private static void LotStart(string klarfPath, RecipeBase recipe, InfoWafer infoWafer, GrabModeBase grabMode)
         {
             if (klarfData == null) klarfData = new KlarfData_Lot();
+
+            klarfData.SetModuleName("Backside");
 
             if (Directory.Exists(klarfPath)) Directory.CreateDirectory(klarfPath);
 
@@ -104,15 +105,17 @@ namespace Root_WIND2.Module
             SettingItem_SetupBackside settings_backside = settings.GetItem<SettingItem_SetupBackside>();
 
             InfoWafer infoWafer = m_module.GetInfoWafer(0);
-            RecipeFront recipe = GlobalObjects.Instance.Get<RecipeFront>();
+            RecipeBack recipe = GlobalObjects.Instance.Get<RecipeBack>();
 
-            GrabModeBack m_grabMode = m_module.GetGrabMode(p_sGrabMode[recipe.CameraInfoIndex]);
+            GrabModeBack m_grabMode = m_module.GetGrabMode(recipe.CameraInfoIndex);
 
             // Check Lot Start
-            //if(infoWafer.IsLotStart ??)
-            LotStart(settings_backside.KlarfSavePath, recipe, infoWafer, m_grabMode);
+            if ((infoWafer != null) && (
+                (infoWafer._eWaferOrder == InfoWafer.eWaferOrder.FirstLastWafer) ||
+                (infoWafer._eWaferOrder == InfoWafer.eWaferOrder.FirstWafer)))
+                LotStart(settings_backside.KlarfSavePath, recipe, infoWafer, m_grabMode);
 
-
+            
 
             StopWatch inspectionTimeWatcher = new StopWatch();
             inspectionTimeWatcher.Start();
@@ -166,21 +169,33 @@ namespace Root_WIND2.Module
                         klarfData.SaveTiffImageOnlyTDI(defects, workManager.SharedBuffer, new Size(160, 120));
                     }
 
-                    klarfData.SaveImageJpg(workManager.SharedBuffer,
-                        new Rect(
-                            settings_backside.WholeWaferImageStartX,
-                            settings_backside.WholeWaferImageStartY,
-                            settings_backside.WholeWaferImageEndX,
-                            settings_backside.WholeWaferImageEndY),
-                        (long)(settings_backside.WholeWaferImageCompressionRate * 100),
-                        settings_backside.OutputImageSizeX,
-                        settings_backside.OutputImageSizeY);
+                    List<List<Point>> polygon = PolygonController.ReadPolygonFile(recipe.ExclusiveRegionFilePath);
+
+                    BacksideRecipe backRecipe = recipe.GetItem<BacksideRecipe>();
+
+                    klarfData.SaveImageJpgInterpolation(workManager.SharedBuffer,
+                       new Rect(
+                           settings_backside.WholeWaferImageStartX,
+                           settings_backside.WholeWaferImageStartY,
+                           settings_backside.WholeWaferImageEndX,
+                           settings_backside.WholeWaferImageEndY),
+                       (long)(settings_backside.WholeWaferImageCompressionRate * 100),
+                       settings_backside.OutputImageSizeX,
+                       settings_backside.OutputImageSizeY, polygon, settings_backside.CuttingSize, settings_backside.MinRadius, settings_backside.Thickness,
+                       backRecipe.CenterX,
+                       backRecipe.CenterY);
                 }
 
                 #endregion
             }
 
-            inspectionTimeWatcher.Stop();
+            if ((infoWafer != null) && (
+                (infoWafer._eWaferOrder == InfoWafer.eWaferOrder.FirstLastWafer) ||
+                (infoWafer._eWaferOrder == InfoWafer.eWaferOrder.LastWafer)))
+                LotEnd(infoWafer);
+
+
+                inspectionTimeWatcher.Stop();
             RootTools_Vision.TempLogger.Write("Inspection", string.Format("{0:F3}", (double)inspectionTimeWatcher.ElapsedMilliseconds / (double)1000));
 
             return "OK";
