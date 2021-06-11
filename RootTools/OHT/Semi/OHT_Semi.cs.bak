@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Windows.Controls;
+using RootTools.GAFs;
 
 namespace RootTools.OHT.Semi
 {
@@ -41,7 +42,7 @@ namespace RootTools.OHT.Semi
         }
         #endregion
 
-        bool _bLightCurtain = false;
+        bool _bLightCurtain = false; 
         public bool p_bLightCurtain
         {
             get
@@ -53,7 +54,7 @@ namespace RootTools.OHT.Semi
                 if (_bLightCurtain == value)
                     return;
                 _bLightCurtain = value;
-                OnPropertyChanged();
+                OnPropertyChanged(); 
             }
         }
 
@@ -90,14 +91,14 @@ namespace RootTools.OHT.Semi
         }
 
         #region ITool
-        List<OHT_Semi_UI> m_aUI = new List<OHT_Semi_UI>();
+        List<OHT_Semi_UI> m_aUI = new List<OHT_Semi_UI>(); 
         public UserControl p_ui
         {
             get
             {
                 OHT_Semi_UI ui = new OHT_Semi_UI();
                 ui.Init(this);
-                m_aUI.Add(ui);
+                m_aUI.Add(ui); 
                 return ui;
             }
         }
@@ -111,7 +112,7 @@ namespace RootTools.OHT.Semi
                 history.m_aData.Add(new History.Data(dio));
             foreach (OHT_Semi_UI ui in m_aUI)
                 ui.m_qHistory.Enqueue(history);
-            m_lastHistory = history;
+            m_lastHistory = history; 
         }
 
         History m_lastHistory = new History();
@@ -124,7 +125,7 @@ namespace RootTools.OHT.Semi
                 if (m_aDIO[n].p_bOn != m_lastHistory.m_aData[n].p_bOn)
                     return true;
             }
-            return false;
+            return false; 
         }
 
         public bool IsActiveInputOff()
@@ -157,7 +158,7 @@ namespace RootTools.OHT.Semi
             }
         }
 
-        bool _bHoAvailable = true;
+        bool _bHoAvailable = true; 
         bool p_bHoAvailable
         {
             get
@@ -172,13 +173,13 @@ namespace RootTools.OHT.Semi
                     return;
                 if (_bHoAvailable != value)
                     m_log.Info("p_bHoAvailable = " + value.ToString());
-                _bHoAvailable = value;
+                _bHoAvailable = value; 
                 OnPropertyChanged();
                 m_doHoAvailable.p_bOn = value;
             }
         }
 
-        bool _bES = true;
+        bool _bES = true; 
         bool p_bES
         {
             get
@@ -193,7 +194,7 @@ namespace RootTools.OHT.Semi
                     return;
                 if (_bES != value)
                     m_log.Info("p_bES = " + value.ToString());
-                _bES = value;
+                _bES = value; 
                 OnPropertyChanged();
                 m_doES.p_bOn = value;
                 p_eState = eState.All_Off;
@@ -225,11 +226,11 @@ namespace RootTools.OHT.Semi
         }
 
         StopWatch m_swTP = new StopWatch();
-        eTP m_eCheckTP = eTP.TP1;
-        int m_msTP = 0;
+        eTP m_eCheckTP = eTP.TP1; 
+        int m_msTP = 0; 
         void StartTP(eTP tp)
         {
-            m_eCheckTP = tp;
+            m_eCheckTP = tp; 
             m_msTP = 1000 * m_dicTP[tp];
             m_swTP.Start();
             m_log.Info(tp.ToString() + " Start StopWatch");
@@ -279,7 +280,7 @@ namespace RootTools.OHT.Semi
             if (m_bOHTErr == true)
             {
                 return "OK";
-            }
+            }          
             m_msTP = 0;
             switch (m_eCheckTP)
             {
@@ -305,7 +306,7 @@ namespace RootTools.OHT.Semi
                     return "TP5 Timeout (CS_0 signal did not\n turn OFF within specified time.)";
                 case eTP.TD3:
                     return "TP3 Timeout";
-
+                    
             }
             return "OK";
         }
@@ -314,7 +315,7 @@ namespace RootTools.OHT.Semi
         {
             foreach (eTP tp in Enum.GetValues(typeof(eTP)))
             {
-                m_dicTP[tp] = tree.Set(m_dicTP[tp], m_dicTP[tp], tp.ToString(), "OHT TP Value (sec)");
+                m_dicTP[tp] = tree.Set(m_dicTP[tp], m_dicTP[tp], tp.ToString(), "OHT TP Value (sec)"); 
             }
         }
         #endregion
@@ -329,7 +330,7 @@ namespace RootTools.OHT.Semi
             LU_Req_Off,
             Ready_Off
         }
-        eState _eState = eState.All_Off;
+        eState _eState = eState.All_Off; 
         public eState p_eState
         {
             get
@@ -342,7 +343,7 @@ namespace RootTools.OHT.Semi
                     return;
                 m_log.Info(p_id + " State : " + _eState.ToString() + " -> " + value.ToString());
                 _eState = value;
-                p_sState = value.ToString();
+                p_sState = value.ToString(); 
                 OnPropertyChanged();
                 switch (value)
                 {
@@ -398,13 +399,13 @@ namespace RootTools.OHT.Semi
             Thread.Sleep(10);
             while (m_bThread)
             {
-                if (IsOHTStateChange() && EQ.p_eState == EQ.eState.Error)
+                if(IsOHTStateChange() && EQ.p_eState == EQ.eState.Error)
                 {
                     p_sInfo = "System Error";
                     m_bOHTErr = true;
                     //return;
                 }
-                Thread.Sleep(20);
+                    Thread.Sleep(20);
                 if (m_bAuto && m_bAuto != m_bAuto_p)
                 {
                     m_carrier.p_eAccessLP = GemCarrierBase.eAccessLP.Auto;
@@ -440,168 +441,168 @@ namespace RootTools.OHT.Semi
                 }
 
 
-                m_bAuto_p = m_bAuto;
-                p_eAccessLP = m_carrier.p_eAccessLP;
-                //p_bModuyleReady = (m_module.p_eState == ModuleBase.eState.Ready);
-                //p_eAccessLP = GemCarrierBase.eAccessLP.Manual;
-                p_bModuyleReady = true;
+                    m_bAuto_p = m_bAuto;
+                    p_eAccessLP = m_carrier.p_eAccessLP;
+                    //p_bModuyleReady = (m_module.p_eState == ModuleBase.eState.Ready);
+                    //p_eAccessLP = GemCarrierBase.eAccessLP.Manual;
+                    p_bModuyleReady = true;
 
-                //p_bES = m_diLightCurtain.p_bOn || (m_carrier.p_eAccessLP == GemCarrierBase.eAccessLP.Manual);
-                if (m_bOHTErr != true || m_bProtectError == true)
-                {
-                    if (IsCS(true))
+                    //p_bES = m_diLightCurtain.p_bOn || (m_carrier.p_eAccessLP == GemCarrierBase.eAccessLP.Manual);
+                    if (m_bOHTErr != true || m_bProtectError == true)
                     {
-                        if (P_bProtectionBar || p_bLightCurtain)
+                        if (IsCS(true))
                         {
-                            m_bOHTErr = true;
-                            if (P_bProtectionBar)
+                            if (P_bProtectionBar || p_bLightCurtain)
                             {
-                                p_sInfo = "ProtectionBar detect Error";
-                            }
-                            else
-                            {
-                                p_sInfo = "LightCurtain detect Error";
-                            }
-                        }
-                    }
-                    else
-                    {
-                        if (P_bProtectionBar || p_bLightCurtain)
-                        {
-                            m_bProtectError = true;
-                            m_bOHTErr = true;
-                            if (P_bProtectionBar)
-                            {
-                                p_sInfo = "ProtectionBar detect Error";
-                            }
-                            else
-                            {
-                                p_sInfo = "LightCurtain detect Error";
+                                m_bOHTErr = true;
+                                if (P_bProtectionBar)
+                                {
+                                    p_sInfo = "ProtectionBar detect Error";
+                                }
+                                else
+                                {
+                                    p_sInfo = "LightCurtain detect Error";
+                                }
                             }
                         }
                         else
                         {
-                            m_bProtectError = false;
-                            m_bOHTErr = false;
-                            p_sInfo = "OK";
+                            if (P_bProtectionBar || p_bLightCurtain)
+                            {
+                                m_bProtectError = true;
+                                m_bOHTErr = true;
+                                if (P_bProtectionBar)
+                                {
+                                    p_sInfo = "ProtectionBar detect Error";
+                                }
+                                else
+                                {
+                                    p_sInfo = "LightCurtain detect Error";
+                                }
+                            }
+                            else
+                            {
+                                m_bProtectError = false;
+                                m_bOHTErr = false;
+                                p_sInfo = "OK";
+                            }
                         }
                     }
-                }
 
 
                 //p_bES = m_bOHTErr || m_carrier.p_eAccessLP == GemCarrierBase.eAccessLP.Manual;
                 p_bES = P_MCReset && (!m_bOHTErr || m_bProtectError);
                 p_bHoAvailable = p_bES && m_carrier.p_eAccessLP == GemCarrierBase.eAccessLP.Auto && !m_bOHTErr;
 
-                //p_bES = m_diLightCurtain.p_bOn 
-                //p_bHoAvailable = p_bES
-                string sTP = CheckTP();
-                if (sTP != "OK")
-                {
-                    p_sInfo = sTP;
-                    m_bOHTErr = true; //KHd 201130 add
-                    p_eState = eState.All_Off;
-                }
-                if (!m_bOHTErr && m_bAuto)
-                {
-                    switch (p_eState)
+                    //p_bES = m_diLightCurtain.p_bOn 
+                    //p_bHoAvailable = p_bES
+                    string sTP = CheckTP();
+                    if (sTP != "OK")
                     {
-                        case eState.All_Off:
-                            CheckPresent(false);
-                            bool bCS = IsCS(true);
-                            if (bCS && m_diValid.p_bOn)
-                            {
-                                p_doLU_Req.p_bOn = true;
-                                p_eState = eState.LU_Req_On;
-                            }
-                            CheckDI(m_diTrReq, false);
-                            CheckDI(m_diBusy, false);
-                            CheckDI(m_diComplete, false);
-                            m_doLoadReq.p_bWait = false;
-                            m_doUnloadReq.p_bWait = false;
-                            m_doReady.p_bWait = false;
-                            break;
-                        case eState.LU_Req_On:
-                            CheckPresent(false);
-                            CheckCS(true);
-                            CheckDI(m_diValid, true);
-                            if (m_diTrReq.p_bOn)
-                            {
-                                m_doReady.p_bOn = true;
-                                p_eState = eState.Ready_On;
-                            }
-                            CheckDI(m_diBusy, false);
-                            CheckDI(m_diComplete, false);
-                            m_doLoadReq.p_bWait = (m_carrier.p_eTransfer == GemCarrierBase.eTransfer.ReadyToLoad);
-                            m_doUnloadReq.p_bWait = (m_carrier.p_eTransfer == GemCarrierBase.eTransfer.ReadyToUnload);
-                            m_doReady.p_bWait = false;
-                            break;
-                        case eState.Ready_On:
-                            CheckPresent(false);
-                            CheckCS(true);
-                            CheckDI(m_diValid, true);
-                            CheckDI(m_diTrReq, true);
+                        p_sInfo = sTP;
+                        m_bOHTErr = true; //KHd 201130 add
+                        p_eState = eState.All_Off;
+                    }
+                    if (!m_bOHTErr && m_bAuto)
+                    {
+                        switch (p_eState)
+                        {
+                            case eState.All_Off:
+                                CheckPresent(false);
+                                bool bCS = IsCS(true);
+                                if (bCS && m_diValid.p_bOn)
+                                {
+                                    p_doLU_Req.p_bOn = true;
+                                    p_eState = eState.LU_Req_On;
+                                }
+                                CheckDI(m_diTrReq, false);
+                                CheckDI(m_diBusy, false);
+                                CheckDI(m_diComplete, false);
+                                m_doLoadReq.p_bWait = false;
+                                m_doUnloadReq.p_bWait = false;
+                                m_doReady.p_bWait = false;
+                                break;
+                            case eState.LU_Req_On:
+                                CheckPresent(false);
+                                CheckCS(true);
+                                CheckDI(m_diValid, true);
+                                if (m_diTrReq.p_bOn)
+                                {
+                                    m_doReady.p_bOn = true;
+                                    p_eState = eState.Ready_On;
+                                }
+                                CheckDI(m_diBusy, false);
+                                CheckDI(m_diComplete, false);
+                                m_doLoadReq.p_bWait = (m_carrier.p_eTransfer == GemCarrierBase.eTransfer.ReadyToLoad);
+                                m_doUnloadReq.p_bWait = (m_carrier.p_eTransfer == GemCarrierBase.eTransfer.ReadyToUnload);
+                                m_doReady.p_bWait = false;
+                                break;
+                            case eState.Ready_On:
+                                CheckPresent(false);
+                                CheckCS(true);
+                                CheckDI(m_diValid, true);
+                                CheckDI(m_diTrReq, true);
                             if (m_diBusy.p_bOn)
                                 p_eState = eState.Busy_On;
-                            CheckDI(m_diComplete, false);
-                            m_doLoadReq.p_bWait = (m_carrier.p_eTransfer == GemCarrierBase.eTransfer.ReadyToLoad);
-                            m_doUnloadReq.p_bWait = (m_carrier.p_eTransfer == GemCarrierBase.eTransfer.ReadyToUnload);
-                            m_doReady.p_bWait = true;
-                            break;
-                        case eState.Busy_On:
-                            CheckCS(true);
-                            CheckDI(m_diValid, true);
-                            CheckDI(m_diTrReq, true);
-                            CheckDI(m_diBusy, true);
+                                CheckDI(m_diComplete, false);
+                                m_doLoadReq.p_bWait = (m_carrier.p_eTransfer == GemCarrierBase.eTransfer.ReadyToLoad);
+                                m_doUnloadReq.p_bWait = (m_carrier.p_eTransfer == GemCarrierBase.eTransfer.ReadyToUnload);
+                                m_doReady.p_bWait = true;
+                                break;
+                            case eState.Busy_On:
+                                CheckCS(true);
+                                CheckDI(m_diValid, true);
+                                CheckDI(m_diTrReq, true);
+                                CheckDI(m_diBusy, true);
                             CheckTP3SensorLogic();
-                            if (IsLUReqDone())
-                            {
-                                p_doLU_Req.p_bOn = false;
-                                p_eState = eState.LU_Req_Off;
-                                ResetTD3();
-                            }
-                            CheckDI(m_diComplete, false);
-                            m_doLoadReq.p_bWait = (m_carrier.p_eTransfer == GemCarrierBase.eTransfer.ReadyToLoad);
-                            m_doUnloadReq.p_bWait = (m_carrier.p_eTransfer == GemCarrierBase.eTransfer.ReadyToUnload);
-                            m_doReady.p_bWait = true;
-                            break;
-                        case eState.LU_Req_Off:
-                            CheckPresent(true);
-                            CheckCS(true);
-                            CheckDI(m_diValid, true);
-                            if ((m_diTrReq.p_bOn == false) && (m_diBusy.p_bOn == false) && m_diComplete.p_bOn)
-                            {
-                                m_doReady.p_bOn = false;
-                                p_eState = eState.Ready_Off;
-                            }
-                            m_doLoadReq.p_bWait = false;
-                            m_doUnloadReq.p_bWait = false;
-                            m_doReady.p_bWait = true;
-                            break;
-                        case eState.Ready_Off:
-                            CheckPresent(true);
-                            if ((IsCS(false) == false) && (m_diValid.p_bOn == false) && (m_diComplete.p_bOn == false))
-                            {
-                                switch (m_carrier.p_eTransfer)
+                                if (IsLUReqDone())
                                 {
-                                    case GemCarrierBase.eTransfer.ReadyToLoad:
-                                        m_carrier.p_eTransfer = GemCarrierBase.eTransfer.TransferBlocked;
-                                        break;
-                                    case GemCarrierBase.eTransfer.ReadyToUnload:
-                                        m_carrier.p_eTransfer = GemCarrierBase.eTransfer.ReadyToLoad;
-                                        break;
+                                    p_doLU_Req.p_bOn = false;
+                                    p_eState = eState.LU_Req_Off;
+                                    ResetTD3();
                                 }
+                                CheckDI(m_diComplete, false);
+                                m_doLoadReq.p_bWait = (m_carrier.p_eTransfer == GemCarrierBase.eTransfer.ReadyToLoad);
+                                m_doUnloadReq.p_bWait = (m_carrier.p_eTransfer == GemCarrierBase.eTransfer.ReadyToUnload);
+                                m_doReady.p_bWait = true;
+                                break;
+                            case eState.LU_Req_Off:
+                                CheckPresent(true);
+                                CheckCS(true);
+                                CheckDI(m_diValid, true);
+                                if ((m_diTrReq.p_bOn == false) && (m_diBusy.p_bOn == false) && m_diComplete.p_bOn)
+                                {
+                                    m_doReady.p_bOn = false;
+                                    p_eState = eState.Ready_Off;
+                                }
+                                m_doLoadReq.p_bWait = false;
+                                m_doUnloadReq.p_bWait = false;
+                                m_doReady.p_bWait = true;
+                                break;
+                            case eState.Ready_Off:
+                                CheckPresent(true);
+                                if ((IsCS(false) == false) && (m_diValid.p_bOn == false) && (m_diComplete.p_bOn == false))
+                                {
+                                    switch (m_carrier.p_eTransfer)
+                                    {
+                                        case GemCarrierBase.eTransfer.ReadyToLoad:
+                                            m_carrier.p_eTransfer = GemCarrierBase.eTransfer.TransferBlocked;
+                                            break;
+                                        case GemCarrierBase.eTransfer.ReadyToUnload:
+                                            m_carrier.p_eTransfer = GemCarrierBase.eTransfer.ReadyToLoad;
+                                            break;
+                                    }
                                 if (!m_diCS[0].p_bOn && !m_diValid.p_bOn)
-                                    p_eState = eState.All_Off;
-                            }
-                            CheckDI(m_diTrReq, false);
-                            CheckDI(m_diBusy, false);
-                            m_doLoadReq.p_bWait = false;
-                            m_doUnloadReq.p_bWait = false;
-                            m_doReady.p_bWait = false;
-                            break;
-                    }
-                    CheckChangeDIO();
+                                    p_eState = eState.All_Off;   
+                                }
+                                CheckDI(m_diTrReq, false);
+                                CheckDI(m_diBusy, false);
+                                m_doLoadReq.p_bWait = false;
+                                m_doUnloadReq.p_bWait = false;
+                                m_doReady.p_bWait = false;
+                                break;
+                        }
+                        CheckChangeDIO();
                 }
             }
         }
@@ -686,7 +687,7 @@ namespace RootTools.OHT.Semi
         void CheckPresent(bool bDone)
         {
             bool bDoneOld = bDone;
-            bool bpresent = false;
+            bool bpresent= false;
             if (m_module.p_eState == ModuleBase.eState.Error)
                 return;
             GemCarrierBase.ePresent present;
@@ -712,7 +713,7 @@ namespace RootTools.OHT.Semi
                     }
 
                     break;
-
+                    
                 case GemCarrierBase.eTransfer.ReadyToUnload:
                     //present = bDone ? GemCarrierBase.ePresent.Empty : GemCarrierBase.ePresent.Exist;   //KHD 210318 del
                     //if (m_carrier.p_ePresentSensor == GemCarrierBase.ePresent.Empty)
@@ -742,7 +743,7 @@ namespace RootTools.OHT.Semi
             if (p_eState == eState.All_Off)
                 p_sInfo = p_id + m_eCheckTP.ToString() + " Access Violation\n(Carrier Sensor Illegal Check In Auto Mode.)";//" Illegal Present Sensor";
             else
-                p_sInfo = p_id + m_eCheckTP.ToString() + " Sensor Logic \n(Carrier is placed incorrectly. \nRemove this or load stable.)";//" Illegal Present Sensor";
+            p_sInfo = p_id + m_eCheckTP.ToString()+" Sensor Logic \n(Carrier is placed incorrectly. \nRemove this or load stable.)";//" Illegal Present Sensor";
             m_bOHTErr = true;
         }
 
@@ -753,7 +754,7 @@ namespace RootTools.OHT.Semi
             bool bCSOn = false;
             for (int n = 0; n < 2; n++)
                 bCSOn |= m_diCS[n].p_bOn;
-            return bCSOn;
+            return bCSOn; 
         }
 
         void CheckCS(bool bOn)
@@ -761,9 +762,9 @@ namespace RootTools.OHT.Semi
             bool bCSOn = IsCS(bOn);
             if (bCSOn == bOn)
                 return;
-            CheckDI(m_diCS[0], bOn);
+            CheckDI(m_diCS[0], bOn); 
         }
-
+        
         void CheckDI(DI di, bool bOn)
         {
             //if (m_module.p_eState == ModuleBase.eState.Error) return; 
@@ -788,12 +789,12 @@ namespace RootTools.OHT.Semi
             switch (m_carrier.p_eTransfer)
             {
                 case GemCarrierBase.eTransfer.ReadyToLoad:
-                    return (m_carrier.p_ePresentSensor == GemCarrierBase.ePresent.Exist);
+                    return (m_carrier.p_ePresentSensor == GemCarrierBase.ePresent.Exist); 
 
                 case GemCarrierBase.eTransfer.ReadyToUnload:
                     return (m_carrier.p_ePresentSensor == GemCarrierBase.ePresent.Empty);
             }
-            return true;
+            return true; 
         }
         #endregion
 
@@ -806,9 +807,9 @@ namespace RootTools.OHT.Semi
         public override void RunTree(Tree.eMode mode)
         {
             m_treeRoot.p_eMode = mode;
-            RunTreeInfo(m_treeRoot.GetTree("Info"));
+            RunTreeInfo(m_treeRoot.GetTree("Info")); 
             RunTreeDIO(m_treeRoot.GetTree("Digital Input"));
-            RunTreeTP(m_treeRoot.GetTree("TP"));
+            RunTreeTP(m_treeRoot.GetTree("TP")); 
         }
         #endregion
 
@@ -819,7 +820,7 @@ namespace RootTools.OHT.Semi
             InitDIO();
             InitBase(module, carrier, toolDIO);
             InitThread();
-            CheckChangeDIO();
+            CheckChangeDIO(); 
         }
 
         public void ThreadStop()
@@ -827,19 +828,19 @@ namespace RootTools.OHT.Semi
             if (m_bThread)
             {
                 m_bThread = false;
-                m_thread.Join();
+                m_thread.Join(); 
             }
         }
         eState temp = (eState)EQ.eState.Init;
         bool IsOHTStateChange()
         {
-            if (temp != (eState)EQ.p_eState)
-            {
-                temp = (eState)EQ.p_eState;
-                return true;
-            }
-            else
-                return false;
+                if (temp != (eState)EQ.p_eState)
+                {
+                    temp = (eState)EQ.p_eState;
+                    return true;
+                }
+                else
+                    return false;
         }
     }
 }

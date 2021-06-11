@@ -11,15 +11,6 @@
         
         <BorderGapMaskConverter x:Key="BorderGapMaskConverter"/>
 
-        <SolidColorBrush x:Key="Yellow"
-                         Color="#FFF3CD6E" />
-        <SolidColorBrush x:Key="Green"
-                         Color="SeaGreen" />
-        <SolidColorBrush x:Key="DarkGray"
-                         Color="DimGray" />
-        <SolidColorBrush x:Key="LightGray"
-                         Color="#FFEAEAEA" />
-        
         <!--#region [New Design] -->
         
         <!--#region [Color Definition] -->

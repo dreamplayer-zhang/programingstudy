@@ -20,7 +20,7 @@ namespace RootTools.Camera.Dalsa
 
         enum ResourceIdx
         {
-            Gray=0,
+            Gray = 0,
             Color,
         }
         #region Property

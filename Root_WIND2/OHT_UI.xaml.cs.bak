@@ -19,7 +19,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Threading;
 
-namespace Root_AOP01_Inspection.Module
+namespace Root_WIND2
 {
     /// <summary>
     /// OHT_UI.xaml에 대한 상호 작용 논리
@@ -41,17 +41,18 @@ namespace Root_AOP01_Inspection.Module
 
         void ChangeLPState(GemCarrierBase.eAccessLP State)
         {
-/*            if (State == GemCarrierBase.eAccessLP.Auto)
-            {
-                m_loadport.m_doAuto.Write(true);
-                m_loadport.m_doManual.Write(false);
-            }
-            else if (State == GemCarrierBase.eAccessLP.Manual)
-            {
-                m_loadport.m_doAuto.Write(false);
-                m_loadport.m_doManual.Write(true);
-            }
-*/        }
+            /*            if (State == GemCarrierBase.eAccessLP.Auto)
+                        {
+                            m_loadport.m_doAuto.Write(true);
+                            m_loadport.m_doManual.Write(false);
+                        }
+                        else if (State == GemCarrierBase.eAccessLP.Manual)
+                        {
+                            m_loadport.m_doAuto.Write(false);
+                            m_loadport.m_doManual.Write(true);
+                        }
+            */
+        }
 
         private void buttonAccessManual_Click(object sender, RoutedEventArgs e)
         {
@@ -78,9 +79,9 @@ namespace Root_AOP01_Inspection.Module
             }
             else
             {
-                m_loadport.p_infoCarrier.p_eReqAccessLP = GemCarrierBase.eAccessLP.Auto; //KHD 210317
+                m_loadport.p_infoCarrier.p_eReqAccessLP = GemCarrierBase.eAccessLP.Auto;
                 //changeLPState(GemCarrierBase.eAccessLP.Auto);
-                if (!m_loadport.m_diPlaced.p_bIn || !m_loadport.p_diPresent.p_bIn)
+                if (m_loadport.m_diPlaced.p_bIn && m_loadport.p_diPresent.p_bIn)
                 {
                     m_OHT.m_bPODExist = true;
                 }
@@ -93,10 +94,10 @@ namespace Root_AOP01_Inspection.Module
                 m_OHT.m_doReady.p_bOn = false;
                 m_OHT.m_doES.p_bOn = true;
                 m_OHT.m_bAuto = true;
-                //if((m_loadport.m_diPlaced.p_bIn || !m_loadport.p_diPresent.p_bIn) && m_OHT.p_eState == OHT_Semi.eState.All_Off) //KHD 210317
-                //{
-                //    m_carrier.p_eTransfer = GemCarrierBase.eTransfer.ReadyToUnload;
-                //}
+                if ((m_loadport.m_diPlaced.p_bIn || !m_loadport.p_diPresent.p_bIn) && m_OHT.p_eState == OHT_Semi.eState.All_Off)
+                {
+                    m_carrier.p_eTransfer = GemCarrierBase.eTransfer.ReadyToUnload;
+                }
             }
         }
         #endregion
@@ -107,18 +108,16 @@ namespace Root_AOP01_Inspection.Module
             blockTransferState.Text = m_carrier.p_eTransfer.ToString();
             SetBrush(buttonStateLoading, m_OHT.m_doLoadReq.p_bOn && p_bBlink);
             SetBrush(buttonStateUnloading, m_OHT.m_doUnloadReq.p_bOn && p_bBlink);
-            textBlockPlaced.Foreground = !m_loadport.m_diPlaced.p_bIn ? Brushes.White : Brushes.Gray;
+            textBlockPlaced.Foreground = !m_loadport.p_diPlaced.p_bIn ? Brushes.White : Brushes.Gray;
             textBlockPresent.Foreground = !m_loadport.p_diPresent.p_bIn ? Brushes.White : Brushes.Gray;
-            
-            if (m_OHT.p_eState == OHT_Semi.eState.All_Off && !m_OHT.m_bOHTErr && (!m_loadport.m_diPlaced.p_bIn|| !m_loadport.p_diPresent.p_bIn))
+
+            if (m_OHT.p_eState == OHT_Semi.eState.All_Off && !m_OHT.m_bOHTErr && (!m_loadport.m_diPlaced.p_bIn || !m_loadport.p_diPresent.p_bIn))
             {
-                //m_carrier.p_ePresentSensor = GemCarrierBase.ePresent.Exist;
-                m_OHT.m_bPODExist = true;
+                m_carrier.p_ePresentSensor = GemCarrierBase.ePresent.Exist;
             }
             else if (m_loadport.m_diPlaced.p_bIn && m_loadport.p_diPresent.p_bIn)
             {
-                //m_carrier.p_ePresentSensor = GemCarrierBase.ePresent.Empty;
-                m_OHT.m_bPODExist = false;
+                m_carrier.p_ePresentSensor = GemCarrierBase.ePresent.Exist;
                 bStartTD3 = false;
             }
             if (m_OHT.p_eState == OHT_Semi.eState.Busy_On)
@@ -133,7 +132,6 @@ namespace Root_AOP01_Inspection.Module
                     if (!m_loadport.m_diPlaced.p_bIn && !m_loadport.p_diPresent.p_bIn && m_carrier.p_eTransfer == GemCarrierBase.eTransfer.ReadyToLoad)
                     {
                         m_carrier.p_ePresentSensor = GemCarrierBase.ePresent.Exist;
-                        m_OHT.m_bPODExist = true;
                         bStartTD3 = false;
                     }
                 }
@@ -144,10 +142,9 @@ namespace Root_AOP01_Inspection.Module
                         m_OHT.StartTD3();
                         bStartTD3 = true;
                     }
-                    else if (m_loadport.m_diPlaced.p_bIn && m_loadport.p_diPresent.p_bIn && m_carrier.p_eTransfer == GemCarrierBase.eTransfer.ReadyToUnload)
+                    else if (m_loadport.m_diPlaced.p_bIn && m_loadport.p_diPresent.p_bIn && m_carrier.p_eTransfer == GemCarrierBase.eTransfer.ReadyToLoad)
                     {
                         m_carrier.p_ePresentSensor = GemCarrierBase.ePresent.Empty;
-                        m_OHT.m_bPODExist = false;
                         bStartTD3 = false;
                     }
                 }
@@ -160,82 +157,66 @@ namespace Root_AOP01_Inspection.Module
                         m_OHT.m_bOHTErr = true;
                     }
                 }
-            }
-            else if (m_OHT.p_eState == OHT_Semi.eState.LU_Req_Off || m_OHT.p_eState == OHT_Semi.eState.Ready_Off/*|| m_OHT.p_eState == OHT_Semi.eState.Ready_Off*/)
-            {
-                if (m_carrier.p_eTransfer == GemCarrierBase.eTransfer.ReadyToLoad)
-                {
-                    if (m_loadport.m_diPlaced.p_bIn || m_loadport.p_diPresent.p_bIn)
-                    {
-                        //m_carrier.p_ePresentSensor = GemCarrierBase.ePresent.Empty;
-                        m_OHT.m_bPODExist = false;
-                    }
-                    else
-                    {
-                        //m_carrier.p_ePresentSensor = GemCarrierBase.ePresent.Exist;
-                        m_OHT.m_bPODExist = true;
-                    }
-                }
-                else if (m_carrier.p_eTransfer == GemCarrierBase.eTransfer.ReadyToUnload)
-                {
-                    if (!m_loadport.m_diPlaced.p_bIn || !m_loadport.p_diPresent.p_bIn)
-                    {
-                        //m_carrier.p_ePresentSensor = GemCarrierBase.ePresent.Exist;
-                        m_OHT.m_bPODExist = true;
-                    }
-                    else
-                    {
-                        //m_carrier.p_ePresentSensor = GemCarrierBase.ePresent.Empty;
-                        m_OHT.m_bPODExist = false;
-                    }
-                }
-            }
-            /*else if(m_OHT.p_eState == OHT_Semi.eState.Ready_Off)
-            {
-                if (m_carrier.p_eTransfer == GemCarrierBase.eTransfer.ReadyToLoad)
-                {
-                    if (m_loadport.m_diPlaced.p_bIn || m_loadport.p_diPresent.p_bIn)
-                    {
-                        //m_carrier.p_ePresentSensor = GemCarrierBase.ePresent.Empty;
-                        m_OHT.m_bPODExist = false;
-                    }
-                    else
-                    {
-                        //m_carrier.p_ePresentSensor = GemCarrierBase.ePresent.Exist;
-                        m_OHT.m_bPODExist = true;
-                    }
-                }
-                else if (m_carrier.p_eTransfer == GemCarrierBase.eTransfer.ReadyToUnload)
-                {
-                    if (!m_loadport.m_diPlaced.p_bIn || !m_loadport.p_diPresent.p_bIn)
-                    {
-                        //m_carrier.p_ePresentSensor = GemCarrierBase.ePresent.Exist;
-                        m_OHT.m_bPODExist = true;
-                    }
-                    else
-                    {
-                        //m_carrier.p_ePresentSensor = GemCarrierBase.ePresent.Empty;
-                        m_OHT.m_bPODExist = false;
-                    }
-                }
-            }*/
 
-            if(m_loadport.p_infoCarrier.p_eReqAccessLP == GemCarrierBase.eAccessLP.Manual)
+            }
+            else if (m_OHT.p_eState == OHT_Semi.eState.LU_Req_Off || m_OHT.p_eState == OHT_Semi.eState.Ready_Off)
+            {
+                if (m_carrier.p_eTransfer == GemCarrierBase.eTransfer.ReadyToLoad)
+                {
+                    if (m_loadport.m_diPlaced.p_bIn || m_loadport.p_diPresent.p_bIn)
+                    {
+                        m_carrier.p_ePresentSensor = GemCarrierBase.ePresent.Empty;
+                    }
+                    else
+                    {
+                        m_carrier.p_ePresentSensor = GemCarrierBase.ePresent.Exist;
+                    }
+                }
+                else if (m_carrier.p_eTransfer == GemCarrierBase.eTransfer.ReadyToUnload)
+                {
+                    if (!m_loadport.m_diPlaced.p_bIn || !m_loadport.p_diPresent.p_bIn)
+                    {
+                        m_carrier.p_ePresentSensor = GemCarrierBase.ePresent.Exist;
+                    }
+                    else
+                    {
+                        m_carrier.p_ePresentSensor = GemCarrierBase.ePresent.Empty;
+                    }
+                }
+            }
+            else
+            {
+                if (m_carrier.p_eTransfer == GemCarrierBase.eTransfer.ReadyToLoad)
+                {
+                    if (!m_loadport.m_diPlaced.p_bIn || !m_loadport.p_diPresent.p_bIn)
+                    {
+                        m_carrier.p_ePresentSensor = GemCarrierBase.ePresent.Exist;
+                    }
+                }
+                else if (m_carrier.p_eTransfer == GemCarrierBase.eTransfer.ReadyToUnload)
+                {
+                    if (m_loadport.m_diPlaced.p_bIn || m_loadport.p_diPresent.p_bIn)
+                    {
+                        m_carrier.p_ePresentSensor = GemCarrierBase.ePresent.Empty;
+                    }
+                }
+            }
+
+            if (m_loadport.p_infoCarrier.p_eReqAccessLP == GemCarrierBase.eAccessLP.Manual)
             {
                 //if (m_carrier.p_eTransfer != GemCarrierBase.eTransfer.TransferBlocked)
                 //{
                 //    m_carrier.p_eTransfer = GemCarrierBase.eTransfer.TransferBlocked;
                 //}   
-                //if(!m_loadport.m_diPlaced.p_bIn || !m_loadport.p_diPresent.p_bIn)
+                //if(!m_loadport.m_diPlaced.p_bIn || !m_loadport.m_diPresent.p_bIn)
                 //{
                 //    m_carrier.p_ePresentSensor = GemCarrierBase.ePresent.Exist;
                 //}
-                //blockTransferState.Text = "TransferBlocked";
-                m_carrier.p_eTransfer = GemCarrierBase.eTransfer.TransferBlocked; //KHD 210317
+                blockTransferState.Text = "TransferBlocked";
             }
             bool bPodIn = p_bBlink ? !m_loadport.m_diPlaced.p_bIn : !m_loadport.p_diPresent.p_bIn;
-            imageInPod.Visibility = bPodIn ? Visibility.Visible : Visibility.Hidden;
-            imageOutPod.Visibility = bPodIn ? Visibility.Hidden : Visibility.Visible;
+            //imageInPod.Visibility = bPodIn ? Visibility.Visible : Visibility.Hidden;
+            //imageOutPod.Visibility = bPodIn ? Visibility.Hidden : Visibility.Visible;
             //if (m_carrier.p_eTransfer == GemCarrierBase.eTransfer.ReadyToLoad)
             //{
             //    m_loadport.m_bLoadCheck = true;
@@ -272,7 +253,8 @@ namespace Root_AOP01_Inspection.Module
         {
             bool bOn = di.p_bOn;
             button.Foreground = bOn ? Brushes.Red : Brushes.Black;
-            if (di.p_bWait) bOn = p_bBlink ? bOn : !bOn;
+            if (di.p_bWait)
+                bOn = p_bBlink ? bOn : !bOn;
             button.Background = bOn ? Brushes.Yellow : Brushes.DimGray;
         }
         #endregion
@@ -286,13 +268,13 @@ namespace Root_AOP01_Inspection.Module
             {
                 if (!m_OHT.m_bOHTErr)
                 {
-                    if(bProtectError)
+                    if (bProtectError)
                     {
-                        if ((m_loadport.m_diPlaced.p_bIn || m_loadport.p_diPresent.p_bIn) && m_OHT.p_eState == OHT_Semi.eState.All_Off)
+                        if ((!m_loadport.m_diPlaced.p_bIn || !m_loadport.p_diPresent.p_bIn) && m_OHT.p_eState == OHT_Semi.eState.All_Off)
                         {
                             m_carrier.p_eTransfer = GemCarrierBase.eTransfer.ReadyToLoad;
                         }
-                        else if((!m_loadport.m_diPlaced.p_bIn && !m_loadport.p_diPresent.p_bIn) && m_OHT.p_eState == OHT_Semi.eState.All_Off)
+                        else if ((m_loadport.m_diPlaced.p_bIn && m_loadport.p_diPresent.p_bIn) && m_OHT.p_eState == OHT_Semi.eState.All_Off)
                         {
                             m_carrier.p_eTransfer = GemCarrierBase.eTransfer.ReadyToUnload;
                         }
@@ -306,7 +288,7 @@ namespace Root_AOP01_Inspection.Module
                         buttonRetry.IsEnabled = false;
                         grPioState.Background = null;
                         grErrState.Background = null;
-                    }     
+                    }
                 }
                 else
                 {
@@ -339,7 +321,8 @@ namespace Root_AOP01_Inspection.Module
         {
             bool bOn = dio.p_bOn;
             button.Foreground = bOn ? Brushes.Red : Brushes.Black;
-            if (dio.p_bWait) bOn = p_bBlink ? bOn : !bOn;
+            if (dio.p_bWait)
+                bOn = p_bBlink ? bOn : !bOn;
             button.Background = bOn ? Brushes.Yellow : Brushes.DimGray;
         }
 
@@ -372,8 +355,14 @@ namespace Root_AOP01_Inspection.Module
         #region OHT p_sInfo
         private void buttonRetry_Click(object sender, RoutedEventArgs e)
         {
-            if(EQ.p_bStop == true ||EQ.p_eState == EQ.eState.Error)
+            if (EQ.p_bStop == true || EQ.p_eState == EQ.eState.Error)
             {
+                return;
+            }
+
+            if (! m_OHT.IsActiveInputOff())
+            {
+                MessageBox.Show("OHT Input을 모두 해제후 시도 하여 주세요.");
                 return;
             }
             m_OHT.m_doLoadReq.p_bOn = false;
@@ -381,12 +370,13 @@ namespace Root_AOP01_Inspection.Module
             m_OHT.m_doReady.p_bOn = false;
             m_OHT.p_sInfo = "";
             m_OHT.m_bOHTErr = false;
-            m_OHT.p_eState = OHT_Semi.eState.All_Off;
-            if (!m_OHT.m_bPODExist && m_OHT.p_eState == OHT_Semi.eState.All_Off)
+            grPioState.Background = null;
+            grErrState.Background = null;
+            if (!m_loadport.m_diPlaced.p_bIn && m_OHT.p_eState == OHT_Semi.eState.All_Off)
             {
                 m_carrier.p_eTransfer = GemCarrierBase.eTransfer.ReadyToLoad;
             }
-            else if (m_OHT.m_bPODExist && m_OHT.p_eState == OHT_Semi.eState.All_Off)
+            else if (m_loadport.m_diPlaced.p_bIn && m_OHT.p_eState == OHT_Semi.eState.All_Off)
             {
                 m_carrier.p_eTransfer = GemCarrierBase.eTransfer.ReadyToUnload;
             }
@@ -416,7 +406,13 @@ namespace Root_AOP01_Inspection.Module
 
         #region Timer
         int _nBlink = 0;
-        bool p_bBlink { get { return _nBlink < 5; } }
+        bool p_bBlink
+        {
+            get
+            {
+                return _nBlink < 5;
+            }
+        }
 
         DispatcherTimer m_timer = new DispatcherTimer();
         private void M_timer_Tick(object sender, EventArgs e)
@@ -431,16 +427,16 @@ namespace Root_AOP01_Inspection.Module
         #endregion
 
 
-        Loadport_AOP01 m_loadport;
+        Loadport_RND m_loadport;
         OHT_Semi m_OHT;
         GemCarrierBase m_carrier = null;
-        public void Init(Loadport_AOP01 loadport)
+        public void Init(Loadport_RND loadport)
         {
             m_loadport = loadport;
-            m_OHT = loadport.m_OHT;
+            m_OHT = loadport.m_OHTsemi;
             m_carrier = loadport.p_infoCarrier;
-            this.DataContext = loadport.m_OHT;
-            GemCarrierBase.eTransfer tt1 = loadport.m_OHT.m_carrier.p_eTransfer;
+            this.DataContext = loadport.m_OHTsemi;
+            GemCarrierBase.eTransfer tt1 = loadport.m_OHTsemi.m_carrier.p_eTransfer;
             m_timer.Interval = TimeSpan.FromSeconds(0.1);
             m_timer.Tick += M_timer_Tick;
             m_timer.Start();

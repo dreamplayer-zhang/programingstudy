@@ -1,43 +1,62 @@
 ﻿<UserControl x:Class="Root_WIND2.Run"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:local="clr-namespace:Root_WIND2"
-        xmlns:tools="clr-namespace:RootTools;assembly=RootTools"
-        xmlns:packicon="http://metro.mahapps.com/winfx/xaml/iconpacks"
-        xmlns:converter="clr-namespace:ViewConverter;assembly=RootTools" mc:Ignorable="d" d:DesignHeight="888"
-        d:DesignWidth="1912" Background="{StaticResource main_view_background}">
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:local="clr-namespace:Root_WIND2"
+             xmlns:tools="clr-namespace:RootTools;assembly=RootTools"
+             xmlns:packicon="http://metro.mahapps.com/winfx/xaml/iconpacks"
+             xmlns:converter="clr-namespace:ViewConverter;assembly=RootTools"
+             mc:Ignorable="d"
+             d:DesignHeight="888"
+             d:DesignWidth="1912"
+             Background="{StaticResource main_view_background}">
     <UserControl.Resources>
         <local:ModuleStateToColorConverter x:Key="ModuleStateToColorConverters"></local:ModuleStateToColorConverter>
-        <local:ModuleRunStateBrushconverter x:Key="ModuleRunStateBrushConverters"></local:ModuleRunStateBrushconverter>
-        <local:ModuleRunStepConverter x:Key="ModuleRunStepConverter"></local:ModuleRunStepConverter>
-        <local:ModuleRunImageConverter x:Key="ModuleRunImageConverter"></local:ModuleRunImageConverter>
-        <local:ModuleRunStateVisibleConverter x:Key="ModuleRunStateVisibleConverter"></local:ModuleRunStateVisibleConverter>
+        <local:PressureConverter x:Key="PressureConverters">
+        </local:PressureConverter>
+            <local:EQStateToColorConverter x:Key="EQStateToColorConverters"></local:EQStateToColorConverter>
         <Style TargetType="{x:Type TabItem}">
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="TabItem">
-                        <Border Name="Panel" BorderBrush="#FFACACAC" Width="100" Height="18"
+                        <Border Name="Panel"
+                                BorderBrush="#FFACACAC"
+                                Width="100"
+                                Height="18"
                                 VerticalAlignment="Bottom">
-                            <TextBlock Name="Text" FontFamily="Arial" TextAlignment="Center"
-                                    VerticalAlignment="Center">
+                            <TextBlock Name="Text"
+                                       FontFamily="Arial"
+                                       TextAlignment="Center"
+                                       VerticalAlignment="Center">
                                 <ContentPresenter VerticalAlignment="Center"
-                                        HorizontalAlignment="Center" ContentSource="Header" />
+                                                  HorizontalAlignment="Center"
+                                                  ContentSource="Header" />
                             </TextBlock>
                         </Border>
                         <ControlTemplate.Triggers>
-                            <Trigger Property="IsSelected" Value="False">
-                                <Setter TargetName="Panel" Property="Background" Value="White" />
+                            <Trigger Property="IsSelected"
+                                     Value="False">
+                                <Setter TargetName="Panel"
+                                        Property="Background"
+                                        Value="White" />
                             </Trigger>
-                            <Trigger Property="IsSelected" Value="True">
-                                <Setter TargetName="Panel" Property="Background"
+                            <Trigger Property="IsSelected"
+                                     Value="True">
+                                <Setter TargetName="Panel"
+                                        Property="Background"
                                         Value="{StaticResource ControlBackGround}" />
-                                <Setter TargetName="Panel" Property="Height" Value="22" />
-                                <Setter TargetName="Text" Property="FontWeight" Value="Bold" />
+                                <Setter TargetName="Panel"
+                                        Property="Height"
+                                        Value="22" />
+                                <Setter TargetName="Text"
+                                        Property="FontWeight"
+                                        Value="Bold" />
                             </Trigger>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="Panel" Property="Background"
+                            <Trigger Property="IsMouseOver"
+                                     Value="True">
+                                <Setter TargetName="Panel"
+                                        Property="Background"
                                         Value="{DynamicResource {x:Static SystemColors.GradientInactiveCaptionBrushKey}}" />
                             </Trigger>
 
@@ -46,20 +65,27 @@
                 </Setter.Value>
             </Setter>
         </Style>
-        <Style x:Key="btnImage" TargetType="Button">
-            <Setter Property="Margin" Value="1"></Setter>
+        <Style x:Key="btnImage"
+               TargetType="Button">
+            <Setter Property="Margin"
+                    Value="1"></Setter>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="{x:Type Button}">
-                        <Border x:Name="border" BorderBrush="Black"
+                        <Border x:Name="border"
+                                BorderBrush="Black"
                                 Background="WhiteSmoke"
-                                BorderThickness="1" CornerRadius="5">
-                            <ContentPresenter HorizontalAlignment="Center" x:Name="contentPresenter"
-                                    VerticalAlignment="Center" />
+                                BorderThickness="1"
+                                CornerRadius="5">
+                            <ContentPresenter HorizontalAlignment="Center"
+                                              x:Name="contentPresenter"
+                                              VerticalAlignment="Center" />
                         </Border>
                         <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="true">
-                                <Setter Property="Background" TargetName="border"
+                            <Trigger Property="IsMouseOver"
+                                     Value="true">
+                                <Setter Property="Background"
+                                        TargetName="border"
                                         Value="SkyBlue" />
                             </Trigger>
                         </ControlTemplate.Triggers>
@@ -67,41 +93,62 @@
                 </Setter.Value>
             </Setter>
         </Style>
-        <Style x:Key="tbFDCName" TargetType="TextBlock">
-            <Setter Property="TextAlignment" Value="Center"></Setter>
-            <Setter Property="FontWeight" Value="Bold"></Setter>
-            <Setter Property="FontSize" Value="20"></Setter>
+        <Style x:Key="tbFDCName"
+               TargetType="TextBlock">
+            <Setter Property="TextAlignment"
+                    Value="Center"></Setter>
+            <Setter Property="FontWeight"
+                    Value="Bold"></Setter>
+            <Setter Property="FontSize"
+                    Value="20"></Setter>
             <Setter Property="Width"
                     Value="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ItemsControl}}, Path=Foreground}"></Setter>
         </Style>
-        <Style x:Key="tbFDCValue" TargetType="TextBlock">
-            <Setter Property="TextAlignment" Value="Center"></Setter>
-            <Setter Property="FontWeight" Value="Bold"></Setter>
-            <Setter Property="FontSize" Value="30"></Setter>
+        <Style x:Key="tbFDCValue"
+               TargetType="TextBlock">
+            <Setter Property="TextAlignment"
+                    Value="Center"></Setter>
+            <Setter Property="FontWeight"
+                    Value="Bold"></Setter>
+            <Setter Property="FontSize"
+                    Value="30"></Setter>
             <Setter Property="Width"
                     Value="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ItemsControl}}, Path=Foreground}"></Setter>
         </Style>
-        <Style x:Key="tbFDCUnit" TargetType="TextBlock">
-            <Setter Property="Margin" Value="0,-18,20,0"></Setter>
-            <Setter Property="FontSize" Value="12"></Setter>
-            <Setter Property="HorizontalAlignment" Value="Right"></Setter>
+        <Style x:Key="tbFDCUnit"
+               TargetType="TextBlock">
+            <Setter Property="Margin"
+                    Value="0,-18,20,0"></Setter>
+            <Setter Property="FontSize"
+                    Value="12"></Setter>
+            <Setter Property="HorizontalAlignment"
+                    Value="Right"></Setter>
             <Setter Property="Width"
                     Value="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ItemsControl}}, Path=Foreground}"></Setter>
         </Style>
-        <Style x:Key="eq_menu_button" TargetType="Button">
-            <Setter Property="Background" Value="{StaticResource groupbox_button_normal}"/>
-            <Setter Property="Foreground" Value="{StaticResource groupbox_button_text}"/>
-            <Setter Property="Margin" Value="4,4,0,4"/>
-            <Setter Property="FontSize" Value="14"/>
+        <Style x:Key="eq_menu_button"
+               TargetType="Button">
+            <Setter Property="Background"
+                    Value="{StaticResource groupbox_button_normal}" />
+            <Setter Property="Foreground"
+                    Value="{StaticResource groupbox_button_text}" />
+            <Setter Property="Margin"
+                    Value="4,4,0,4" />
+            <Setter Property="FontSize"
+                    Value="14" />
             <!--<Setter Property="FontWeight" Value="Bold"/>-->
-            <Setter Property="Width" Value="120"/>
-            <Setter Property="VerticalAlignment" Value="Stretch"/>
-            <Setter Property="VerticalContentAlignment" Value="Center"/>
-            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="Width"
+                    Value="120" />
+            <Setter Property="VerticalAlignment"
+                    Value="Stretch" />
+            <Setter Property="VerticalContentAlignment"
+                    Value="Center" />
+            <Setter Property="HorizontalContentAlignment"
+                    Value="Center" />
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="{x:Type Button}">
-                        <Border BorderThickness="0" 
+                        <Border BorderThickness="0"
                                 Width="{TemplateBinding Width}"
                                 Height="{TemplateBinding Height}"
                                 CornerRadius="6"
@@ -109,16 +156,67 @@
                                 BorderBrush="{StaticResource sidetap_parent_menu_text}"
                                 HorizontalAlignment="{TemplateBinding HorizontalAlignment}">
                             <ContentPresenter  VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
-                                               HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"/>
+                                               HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" />
                         </Border>
 
                         <ControlTemplate.Triggers>
-                            <Trigger  Property="IsMouseOver" Value="True">
-                                <Setter Property="Background" Value="{StaticResource groupbox_button_mouseover}"/>
+                            <Trigger  Property="IsMouseOver"
+                                      Value="True">
+                                <Setter Property="Background"
+                                        Value="{StaticResource groupbox_button_mouseover}" />
                             </Trigger>
-                            <Trigger  Property="IsPressed" Value="True">
-                                <Setter Property="Background" Value="{StaticResource groupbox_button_press}"/>
-                                <Setter Property="Foreground" Value="{StaticResource groupbox_button_press_text}"/>
+                            <Trigger  Property="IsPressed"
+                                      Value="True">
+                                <Setter Property="Background"
+                                        Value="{StaticResource groupbox_button_press}" />
+                                <Setter Property="Foreground"
+                                        Value="{StaticResource groupbox_button_press_text}" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="button_selectmode"
+               TargetType="Button">
+            <Setter Property="Background"
+                    Value="#333366" />
+            <Setter Property="Foreground"
+                    Value="{StaticResource groupbox_button_text}" />
+            <Setter Property="FontSize"
+                    Value="10" />
+            <Setter Property="FontWeight"
+                    Value="Bold" />
+            <Setter Property="HorizontalAlignment"
+                    Value="Stretch" />
+            <Setter Property="VerticalAlignment"
+                    Value="Stretch" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Border BorderThickness="0"
+                                Width="{TemplateBinding Width}"
+                                Height="{TemplateBinding Height}"
+                                CornerRadius="12"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{StaticResource sidetap_parent_menu_text}"
+                                HorizontalAlignment="{TemplateBinding HorizontalAlignment}">
+                            <ContentPresenter  VerticalAlignment="Center"
+                                               HorizontalAlignment="Center" />
+                        </Border>
+
+                        <ControlTemplate.Triggers>
+                            <Trigger  Property="IsMouseOver"
+                                      Value="True">
+                                <Setter Property="Background"
+                                        Value="{StaticResource groupbox_button_mouseover}" />
+                            </Trigger>
+                            <Trigger  Property="IsPressed"
+                                      Value="True">
+                                <Setter Property="Background"
+                                        Value="{StaticResource groupbox_button_press}" />
+                                <Setter Property="Foreground"
+                                        Value="{StaticResource groupbox_button_press_text}" />
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -133,36 +231,53 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
         <!--Menu-->
-        <Border Grid.Row="0" Background="{StaticResource ControlBackGround}" BorderBrush="DimGray"
+        <Border Grid.Row="0"
+                Background="{StaticResource ControlBackGround}"
+                BorderBrush="DimGray"
                 BorderThickness="0,0,0,0">
             <StackPanel Orientation="Horizontal">
                 <Menu>
                     <MenuItem Background="{StaticResource ControlBackGround}"
-                            BorderBrush="#FF707070" Command="{Binding btnMode}"
-                            BorderThickness="0,0,0,0">
+                              BorderBrush="#FF707070"
+                              Command="{Binding btnMode}"
+                              BorderThickness="0,0,0,0">
                         <MenuItem.Header>
-                            <Grid Width="70" Height="25">
-                                <TextBlock Text="Mode" FontSize="13" FontWeight="Bold"
-                                        VerticalAlignment="Center" HorizontalAlignment="Center" />
+                            <Grid Width="70"
+                                  Height="25">
+                                <TextBlock Text="Mode"
+                                           FontSize="13"
+                                           FontWeight="Bold"
+                                           VerticalAlignment="Center"
+                                           HorizontalAlignment="Center" />
                             </Grid>
                         </MenuItem.Header>
                     </MenuItem>
                     <MenuItem Background="{StaticResource ControlBackGround}"
-                            BorderBrush="#FF707070" BorderThickness="0,0,0,0">
+                              BorderBrush="#FF707070"
+                              BorderThickness="0,0,0,0">
                         <MenuItem.Header>
-                            <Grid Width="70" Height="25">
-                                <TextBlock Text="Tuning" FontSize="13" FontWeight="Bold"
-                                        VerticalAlignment="Center" HorizontalAlignment="Center" />
+                            <Grid Width="70"
+                                  Height="25">
+                                <TextBlock Text="Tuning"
+                                           FontSize="13"
+                                           FontWeight="Bold"
+                                           VerticalAlignment="Center"
+                                           HorizontalAlignment="Center" />
                             </Grid>
                         </MenuItem.Header>
                     </MenuItem>
                     <MenuItem Background="{StaticResource ControlBackGround}"
-                            BorderBrush="#FF707070" Command="{Binding btnDetail}"
-                            BorderThickness="0,0,0,0">
+                              BorderBrush="#FF707070"
+                              Command="{Binding btnDetail}"
+                              BorderThickness="0,0,0,0">
                         <MenuItem.Header>
-                            <Grid Width="70" Height="25">
-                                <TextBlock Text="Detail" FontSize="13" FontWeight="Bold"
-                                        VerticalAlignment="Center" HorizontalAlignment="Center" />
+                            <Grid Width="70"
+                                  Height="25">
+                                <TextBlock Text="Detail"
+                                           FontSize="13"
+                                           FontWeight="Bold"
+                                           VerticalAlignment="Center"
+                                           HorizontalAlignment="Center" />
                             </Grid>
                         </MenuItem.Header>
                     </MenuItem>
@@ -172,11 +287,14 @@
         <!--End Menu-->
 
         <!--Toolbar-->
-        <Border Grid.Row="1" Background="{StaticResource ControlBackGround}" BorderBrush="DimGray"
+        <Border Grid.Row="1"
+                Background="{StaticResource ControlBackGround}"
+                BorderBrush="DimGray"
                 BorderThickness="0,0,0,0">
         </Border>
         <!--End Toolbar-->
-        <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Visible">
+        <ScrollViewer Grid.Row="2"
+                      VerticalScrollBarVisibility="Visible">
             <StackPanel>
                 <Grid Height="838">
                     <Grid.ColumnDefinitions>
@@ -188,26 +306,35 @@
                         <Grid.RowDefinitions>
                             <RowDefinition Height="2.5*" />
                             <RowDefinition Height="1.5*" />
+                            <RowDefinition Height="1.5*" />
                             <RowDefinition Height="6*" />
                         </Grid.RowDefinitions>
-                        <GroupBox Grid.Row="0" Header="Progress" Margin="4" Style="{StaticResource main_view_groupbox}">
+                        <GroupBox Grid.Row="0"
+                                  Header="Progress"
+                                  Margin="4"
+                                  Style="{StaticResource main_view_groupbox}">
                             <Grid>
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="1.5*" />
-                                    <RowDefinition Height="1*" />
+
                                     <RowDefinition Height="1*" />
                                 </Grid.RowDefinitions>
-                                <StackPanel Grid.Row="0" Margin="10,5" VerticalAlignment="Center">
-                                    <TextBlock Text="Total Progress" FontSize="16" FontWeight="Bold" />
+                                <StackPanel Grid.Row="0"
+                                            Margin="10,5"
+                                            VerticalAlignment="Center">
+                                    <TextBlock Text="Total Progress"
+                                               FontSize="16"
+                                               FontWeight="Bold" />
                                     <Grid DataContext="{Binding p_ModuleList}">
-                                        <ProgressBar Height="40" Margin="0,5"
-                                                Value="{Binding p_iRun}"
-                                                Maximum="{Binding p_maxRun}" />
+                                        <ProgressBar Height="40"
+                                                     Margin="0,5"
+                                                     Value="{Binding p_iRun}"
+                                                     Maximum="{Binding p_maxRun}" />
                                         <!--<TextBlock Text="{Binding p_iRun}" HorizontalAlignment="Center" VerticalAlignment="Center"
                                                    FontWeight="Bold" FontSize="13"/>-->
                                     </Grid>
                                 </StackPanel>
-                                <StackPanel Grid.Row="1" Margin="10,2" VerticalAlignment="Center">
+                                <!--<StackPanel Grid.Row="1" Margin="10,2" VerticalAlignment="Center">
                                     <TextBlock Text="Sub Progress" FontSize="13" FontWeight="Bold" />
                                     <Grid>
                                         <ProgressBar Height="25" Value="80" />
@@ -215,34 +342,142 @@
                                                 VerticalAlignment="Center"
                                                 HorizontalAlignment="Center" />
                                     </Grid>
-                                </StackPanel>
-                                <UniformGrid Grid.Row="2" Columns="2" Margin="20,5">
-                                    <TextBlock Text="Need" VerticalAlignment="Center" />
-                                    <TextBlock Text="00:00:00" VerticalAlignment="Center"
-                                            HorizontalAlignment="Center" />
-                                    <TextBlock Text="Run" VerticalAlignment="Center" />
-                                    <TextBlock Text="00:00:00" VerticalAlignment="Center"
-                                            HorizontalAlignment="Center" />
+                                </StackPanel>-->
+                                <UniformGrid Grid.Row="2"
+                                             Columns="2"
+                                             Margin="20,5">
+                                    <TextBlock Text="Need"
+                                               VerticalAlignment="Center" />
+                                    <TextBlock Text="00:00:00"
+                                               VerticalAlignment="Center"
+                                               HorizontalAlignment="Center" />
+                                    <TextBlock Text="Run"
+                                               VerticalAlignment="Center" />
+                                    <TextBlock Text="00:00:00"
+                                               VerticalAlignment="Center"
+                                               HorizontalAlignment="Center" />
                                 </UniformGrid>
                             </Grid>
                         </GroupBox>
-                        <GroupBox Grid.Row="1" Header="Product" Margin="4" Style="{StaticResource main_view_groupbox}">
-                            <UniformGrid Margin="20,5" Columns="2">
-                                <TextBlock Text="Cst ID" VerticalAlignment="Center" />
-                                <TextBlock Text="-" VerticalAlignment="Center"
-                                        HorizontalAlignment="Center" />
-                                <TextBlock Text="Lot ID" VerticalAlignment="Center" />
-                                <TextBlock Text="-" VerticalAlignment="Center"
-                                        HorizontalAlignment="Center" />
-                                <TextBlock Text="Wafer ID" VerticalAlignment="Center" />
-                                <TextBlock Text="DummyWafer001" VerticalAlignment="Center"
-                                        HorizontalAlignment="Center" />
-                                <TextBlock Text="Recipe" VerticalAlignment="Center" />
-                                <TextBlock Text="test200804.rcp" VerticalAlignment="Center"
-                                        HorizontalAlignment="Center" />
+                        <GroupBox Grid.Row="1"
+                                  Header="Product"
+                                  Margin="4"
+                                  Style="{StaticResource main_view_groupbox}">
+                            <UniformGrid Margin="20,5"
+                                         Columns="2">
+                                <TextBlock Text="Cst ID"
+                                           VerticalAlignment="Center" />
+                                <TextBlock Text="-"
+                                           VerticalAlignment="Center"
+                                           HorizontalAlignment="Center" />
+                                <TextBlock Text="Lot ID"
+                                           VerticalAlignment="Center" />
+                                <TextBlock Text="-"
+                                           VerticalAlignment="Center"
+                                           HorizontalAlignment="Center" />
+                                <TextBlock Text="Wafer ID"
+                                           VerticalAlignment="Center" />
+                                <TextBlock Text="DummyWafer001"
+                                           VerticalAlignment="Center"
+                                           HorizontalAlignment="Center" />
+                                <TextBlock Text="Recipe"
+                                           VerticalAlignment="Center" />
+                                <TextBlock Text="test200804.rcp"
+                                           VerticalAlignment="Center"
+                                           HorizontalAlignment="Center" />
                             </UniformGrid>
                         </GroupBox>
-                        <GroupBox Grid.Row="2" Header="Module State" Margin="4" Style="{StaticResource main_view_groupbox}">
+                        <GroupBox Grid.Row="2"
+                                  Header="Button"
+                                  Margin="4"
+                                  Style="{StaticResource main_view_groupbox}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition></ColumnDefinition>
+                                    <ColumnDefinition></ColumnDefinition>
+                                    <ColumnDefinition></ColumnDefinition>
+                                    <ColumnDefinition></ColumnDefinition>
+                                </Grid.ColumnDefinitions>
+
+                                <!--<Button FontWeight="Bold" FontSize="13" 
+                                    BorderThickness="0,0,0,0"
+                                    Background="{StaticResource groupbox_button_mouseover}">
+                                    <StackPanel Orientation="Vertical">
+                                        -->
+                                <!--<TextBlock Text="Load"/>-->
+                                <!--<material:PackIcon Kind="FolderOpen"/>-->
+                                <!--
+                                        <packicon:PackIconMaterial Kind="Home" Height="20" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                        <TextBlock Text="Home "></TextBlock>
+                                    </StackPanel>
+                                </Button>-->
+                                <Button Style="{StaticResource button_selectmode}"
+                                        Margin="5"
+                                        Command="{Binding CommandHome}"
+                                        Grid.RowSpan="2">
+                                    <Button.Content>
+                                        <StackPanel Orientation="Vertical"
+                                                    Width="60"
+                                                    Height="60">
+                                            <packicon:PackIconMaterial Kind="Home"
+                                                                       Height="40"
+                                                                       Margin="0,5,0,0"
+                                                                       HorizontalAlignment="Center"
+                                                                       VerticalAlignment="Center"
+                                                                       Width="40" />
+                                            <TextBlock Text="Home"
+                                                       HorizontalAlignment="Center"
+                                                       FontSize="13"
+                                                       FontWeight="Bold" />
+                                        </StackPanel>
+                                    </Button.Content>
+                                </Button>
+                                <Button Style="{StaticResource button_selectmode}"
+                                        Margin="5"
+                                        Command="{Binding CommandLoadCST}"
+                                        Grid.Column="1"
+                                        Grid.RowSpan="2">
+                                    <Button.Content>
+                                        <StackPanel Orientation="Vertical">
+                                            <packicon:PackIconMaterial Kind="ProgressDownload"
+                                                                       Height="40"
+                                                                       Margin="0,5,0,0"
+                                                                       HorizontalAlignment="Center"
+                                                                       VerticalAlignment="Center"
+                                                                       Width="40" />
+                                            <TextBlock Text="Load"
+                                                       HorizontalAlignment="Center"
+                                                       FontSize="13"
+                                                       FontWeight="Bold" />
+                                        </StackPanel>
+                                    </Button.Content>
+                                </Button>
+                                <Button Style="{StaticResource button_selectmode}"
+                                        Margin="5"
+                                        Command="{Binding CommandRecovery}"
+                                        Grid.Column="2"
+                                        Grid.RowSpan="2">
+                                    <Button.Content>
+                                        <StackPanel Orientation="Vertical">
+                                            <packicon:PackIconMaterial Kind="Redo"
+                                                                       Height="40"
+                                                                       Margin="0,5,0,0"
+                                                                       HorizontalAlignment="Center"
+                                                                       VerticalAlignment="Center"
+                                                                       Width="40" />
+                                            <TextBlock Text="Recovery"
+                                                       HorizontalAlignment="Center"
+                                                       FontSize="13"
+                                                       FontWeight="Bold" />
+                                        </StackPanel>
+                                    </Button.Content>
+                                </Button>
+                            </Grid>
+                        </GroupBox>
+                        <GroupBox Grid.Row="3"
+                                  Header="Module State"
+                                  Margin="4"
+                                  Style="{StaticResource main_view_groupbox}">
                             <Grid>
                                 <Grid.RowDefinitions>
                                     <RowDefinition />
@@ -253,34 +488,34 @@
                                     <RowDefinition />
                                     <RowDefinition />
                                 </Grid.RowDefinitions>
-                                <Grid Margin="10,5" Grid.Row="0">
+                                <Grid Margin="10,5"
+                                      Grid.Row="0">
                                     <Grid.RowDefinitions>
                                         <RowDefinition Height="20" />
                                         <RowDefinition />
                                     </Grid.RowDefinitions>
-                                    <TextBlock Text="EQ" VerticalAlignment="Bottom" FontSize="13"
-                                            FontWeight="Bold" />
-                                    <Border Grid.Row="1" CornerRadius="5" BorderBrush="DimGray"
-                                            BorderThickness="1"
-                                            Background="{StaticResource PanelBackGround}">
-                                        <Grid>
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition></ColumnDefinition>
-                                                <ColumnDefinition></ColumnDefinition>
-                                            </Grid.ColumnDefinitions>
-                                            <TextBlock
+                                    <TextBlock Text="EQ"
+                                               VerticalAlignment="Bottom"
+                                               FontSize="13"
+                                               FontWeight="Bold" />
+                                    <Border Grid.Row="1"
+                                            CornerRadius="5"
+                                            BorderBrush="DimGray"
+                                            BorderThickness="1">
+                                        <TextBlock DataContext="{Binding Source={x:Static tools:EQ.m_EQ}}"
+                                                   Text="{Binding p_eState}"
+                                                   Grid.Row="1"
+                                                   VerticalAlignment="Center"
+                                                   HorizontalAlignment="Center" />
+                                        <!--<TextBlock
                                                     DataContext="{Binding Source={x:Static tools:EQ.m_EQ}}"
                                                     Text="{Binding p_eState}"
                                                     VerticalAlignment="Center"
-                                                    HorizontalAlignment="Center" />
-                                            <Button Grid.Column="1" Margin="5" Content="Initial"
-                                                    Command="{Binding CommandHome}" 
-                                                    Style="{StaticResource eq_menu_button}"></Button>
-                                        </Grid>
-
+                                                    HorizontalAlignment="Center" />-->
                                     </Border>
                                 </Grid>
-                                <Grid Margin="10,5" Grid.Row="1">
+                                <Grid Margin="10,5"
+                                      Grid.Row="1">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition />
                                         <ColumnDefinition />
@@ -290,117 +525,176 @@
                                             <RowDefinition Height="20" />
                                             <RowDefinition />
                                         </Grid.RowDefinitions>
-                                        <TextBlock Text="LoadPort1" VerticalAlignment="Bottom"
-                                                FontSize="13" FontWeight="Bold" />
-                                        <Border Grid.Row="1" CornerRadius="5" Margin="0,0,4,0"
-                                                BorderBrush="DimGray" BorderThickness="1"
-                                                Background="{StaticResource PanelBackGround}">
-                                            <Button Content="{Binding p_LoadPort1.p_eState}"
-                                                    Margin="5" BorderThickness="0"
-                                                    Background="{StaticResource PanelBackGround}"
-                                                    Command="{Binding CommandLoadCST}"></Button>
-                                            <!--<TextBlock Text="{Binding p_LoadPort1.p_eState}"
+                                        <TextBlock Text="LoadPort1"
+                                                   VerticalAlignment="Bottom"
+                                                   FontSize="13"
+                                                   FontWeight="Bold" />
+                                        <Border Grid.Row="1"
+                                                CornerRadius="5"
+                                                BorderBrush="DimGray"
+                                                BorderThickness="1"
+                                                Background="{Binding p_LoadPort1.p_eState, Converter={StaticResource ModuleStateToColorConverters} }">
+                                            <TextBlock Text="{Binding p_LoadPort1.p_eState}"
+                                                       Grid.Row="1"
                                                        VerticalAlignment="Center"
-                                                       HorizontalAlignment="Center"/>-->
+                                                       HorizontalAlignment="Center" />
                                         </Border>
                                     </Grid>
-                                    <Grid Grid.Column="1" Margin="4,0,0,0">
+                                    <Grid Grid.Column="1"
+                                          Margin="4,0,0,0">
                                         <Grid.RowDefinitions>
                                             <RowDefinition Height="20" />
                                             <RowDefinition />
                                         </Grid.RowDefinitions>
-                                        <TextBlock Text="LoadPort2" VerticalAlignment="Bottom"
-                                                FontSize="13" FontWeight="Bold" />
-                                        <Border Grid.Row="1" CornerRadius="5" BorderBrush="DimGray"
+                                        <TextBlock Text="LoadPort2"
+                                                   VerticalAlignment="Bottom"
+                                                   FontSize="13"
+                                                   FontWeight="Bold" />
+                                        <Border Grid.Row="1"
+                                                CornerRadius="5"
+                                                BorderBrush="DimGray"
                                                 BorderThickness="1"
-                                                Background="{StaticResource PanelBackGround}">
+                                                Background="{Binding p_LoadPort2.p_eState, Converter={StaticResource ModuleStateToColorConverters} }">
                                             <TextBlock Text="{Binding p_LoadPort2.p_eState}"
-                                                    VerticalAlignment="Center"
-                                                    HorizontalAlignment="Center" />
+                                                       Grid.Row="1"
+                                                       VerticalAlignment="Center"
+                                                       HorizontalAlignment="Center" />
                                         </Border>
                                     </Grid>
                                 </Grid>
-                                <Grid Margin="10,5" Grid.Row="2">
+                                <Grid Margin="10,5"
+                                      Grid.Row="2">
                                     <Grid.RowDefinitions>
                                         <RowDefinition Height="20" />
                                         <RowDefinition />
                                     </Grid.RowDefinitions>
-                                    <TextBlock Text="WTR" VerticalAlignment="Bottom" FontSize="13"
-                                            FontWeight="Bold" />
-                                    <Border Grid.Row="1" CornerRadius="5" BorderBrush="DimGray"
+                                    <TextBlock Text="WTR"
+                                               VerticalAlignment="Bottom"
+                                               FontSize="13"
+                                               FontWeight="Bold" />
+                                    <Border Grid.Row="1"
+                                            CornerRadius="5"
+                                            BorderBrush="DimGray"
                                             BorderThickness="1"
                                             Background="{Binding p_WTR.p_eState, Converter={StaticResource ModuleStateToColorConverters} }">
-                                        <TextBlock Text="{Binding p_WTR.p_eState}" Grid.Row="1"
-                                                VerticalAlignment="Center"
-                                                HorizontalAlignment="Center" />
+                                        <TextBlock Text="{Binding p_WTR.p_eState}"
+                                                   Grid.Row="1"
+                                                   VerticalAlignment="Center"
+                                                   HorizontalAlignment="Center" />
                                     </Border>
                                 </Grid>
-                                <Grid Margin="10,5" Grid.Row="3">
+                                <Grid Margin="10,5"
+                                      Grid.Row="3">
                                     <Grid.RowDefinitions>
                                         <RowDefinition Height="20" />
                                         <RowDefinition />
                                     </Grid.RowDefinitions>
-                                    <TextBlock Text="Aligner" VerticalAlignment="Bottom"
-                                            FontSize="13" FontWeight="Bold" />
-                                    <Border Grid.Row="1" CornerRadius="5" BorderBrush="DimGray"
+                                    <TextBlock Text="Aligner"
+                                               VerticalAlignment="Bottom"
+                                               FontSize="13"
+                                               FontWeight="Bold" />
+                                    <Border Grid.Row="1"
+                                            CornerRadius="5"
+                                            BorderBrush="DimGray"
                                             BorderThickness="1"
                                             Background="{Binding p_Aligner.p_eState, Converter={StaticResource ModuleStateToColorConverters} }">
                                         <TextBlock Text="{Binding p_Aligner.p_eState}"
-                                                FontWeight="Bold" VerticalAlignment="Center"
-                                                HorizontalAlignment="Center" />
+                                                   FontWeight="Bold"
+                                                   VerticalAlignment="Center"
+                                                   HorizontalAlignment="Center" />
                                     </Border>
                                 </Grid>
-                                <Grid Margin="10,5" Grid.Row="4">
+                                <Grid Margin="10,5"
+                                      Grid.Row="4">
                                     <Grid.RowDefinitions>
                                         <RowDefinition Height="20" />
                                         <RowDefinition />
                                     </Grid.RowDefinitions>
-                                    <TextBlock Text="EBR(Edge)" VerticalAlignment="Bottom"
-                                            FontSize="13" FontWeight="Bold" />
-                                    <Border Grid.Row="1" CornerRadius="5" BorderBrush="DimGray"
+                                    <TextBlock Text="EBR(Edge)"
+                                               VerticalAlignment="Bottom"
+                                               FontSize="13"
+                                               FontWeight="Bold" />
+
+                                    <Border Grid.Row="1"
+                                            CornerRadius="5"
+                                            BorderBrush="DimGray"
+                                            BorderThickness="1"
+                                            Background="{Binding p_EdgeVision.p_eState, Converter={StaticResource ModuleStateToColorConverters} }">
+                                        <TextBlock Text="{Binding p_EdgeVision.p_eState}"
+                                                   FontWeight="Bold"
+                                                   VerticalAlignment="Center"
+                                                   HorizontalAlignment="Center" />
+                                    </Border>
+                                    <!--<Border Grid.Row="1"
+                                            CornerRadius="5"
+                                            BorderBrush="DimGray"
                                             BorderThickness="1"
                                             Background="{StaticResource PanelBackGround}">
                                         <Grid>
-                                            <ProgressBar Height="{PriorityBinding}" Margin="5,5"
-                                                    Value="{Binding p_EdgeVision.p_nProgress}" />
+                                            <ProgressBar Height="{PriorityBinding}"
+                                                         Margin="5,5"
+                                                         Visibility="Hidden"
+                                                         Value="{Binding p_EdgeVision.p_nProgress}" />
                                             <TextBlock Text="{Binding p_EdgeVision.p_eState}"
-                                                    VerticalAlignment="Center"
-                                                    HorizontalAlignment="Center" />
+                                                       VerticalAlignment="Center"
+                                                       HorizontalAlignment="Center" />
                                         </Grid>
-                                    </Border>
+                                    </Border>-->
                                 </Grid>
-                                <Grid Margin="10,5" Grid.Row="5">
+                                <Grid Margin="10,5"
+                                      Grid.Row="5">
                                     <Grid.RowDefinitions>
                                         <RowDefinition Height="20" />
                                         <RowDefinition />
                                     </Grid.RowDefinitions>
-                                    <TextBlock Text="BackSide" VerticalAlignment="Bottom"
-                                            FontSize="13" FontWeight="Bold" />
-                                    <Border Grid.Row="1" CornerRadius="5" BorderBrush="DimGray"
+                                    <TextBlock Text="BackSide"
+                                               VerticalAlignment="Bottom"
+                                               FontSize="13"
+                                               FontWeight="Bold" />
+                                    <Border Grid.Row="1"
+                                            CornerRadius="5"
+                                            BorderBrush="DimGray"
+                                            BorderThickness="1"
+                                            Background="{Binding p_BackSideVision.p_eState, Converter={StaticResource ModuleStateToColorConverters} }">
+                                        <TextBlock Text="{Binding p_BackSideVision.p_eState}"
+                                                   FontWeight="Bold"
+                                                   VerticalAlignment="Center"
+                                                   HorizontalAlignment="Center" />
+                                    </Border>
+                                    <!--<Border Grid.Row="1"
+                                            CornerRadius="5"
+                                            BorderBrush="DimGray"
                                             BorderThickness="1"
                                             Background="{StaticResource PanelBackGround}">
                                         <Grid>
-                                            <ProgressBar Height="{PriorityBinding}" Margin="5,5"
-                                                    Value="{Binding p_BackSideVision.p_nProgress}" />
+                                            <ProgressBar Height="{PriorityBinding}"
+                                                         Margin="5,5"
+                                                         Visibility="Hidden"
+                                                         Value="{Binding p_BackSideVision.p_nProgress}" />
                                             <TextBlock Text="{Binding p_BackSideVision.p_eState}"
-                                                    VerticalAlignment="Center"
-                                                    HorizontalAlignment="Center" />
+                                                       VerticalAlignment="Center"
+                                                       HorizontalAlignment="Center" />
                                         </Grid>
-                                    </Border>
+                                    </Border>-->
                                 </Grid>
-                                <Grid Margin="10,5" Grid.Row="6">
+                                <Grid Margin="10,5"
+                                      Grid.Row="6">
                                     <Grid.RowDefinitions>
                                         <RowDefinition Height="20" />
                                         <RowDefinition />
                                     </Grid.RowDefinitions>
-                                    <TextBlock Text="FrontSide" VerticalAlignment="Bottom"
-                                            FontSize="13" FontWeight="Bold" />
-                                    <Border Grid.Row="1" CornerRadius="5" BorderBrush="DimGray"
+                                    <TextBlock Text="FrontSide"
+                                               VerticalAlignment="Bottom"
+                                               FontSize="13"
+                                               FontWeight="Bold" />
+                                    <Border Grid.Row="1"
+                                            CornerRadius="5"
+                                            BorderBrush="DimGray"
                                             BorderThickness="1"
                                             Background="{Binding p_Vision.p_eState, Converter={StaticResource ModuleStateToColorConverters} }">
                                         <TextBlock Text="{Binding p_Vision.p_eState}"
-                                                VerticalAlignment="Center"
-                                                HorizontalAlignment="Center" />
+                                                   VerticalAlignment="Center"
+                                                   HorizontalAlignment="Center" />
                                     </Border>
                                 </Grid>
                             </Grid>
@@ -410,7 +704,7 @@
 
                     <Grid Grid.Column="1">
                         <TabControl Background="{StaticResource PanelBackGround}"
-                                BorderThickness="1">
+                                    BorderThickness="1">
                             <TabItem Header="Inspection">
                                 <local:View />
                             </TabItem>
@@ -434,34 +728,43 @@
                                                 <ColumnDefinition></ColumnDefinition>
                                                 <ColumnDefinition></ColumnDefinition>
                                             </Grid.ColumnDefinitions>
-                                            <Button Grid.Column="0" Content="BackSide Image"
+                                            <Button Grid.Column="0"
+                                                    Content="BackSide Image"
                                                     Style="{StaticResource eq_menu_button}"
                                                     Command="{Binding CommandBackSideImageView}"></Button>
-                                            <Button Grid.Column="1" Content="Edge Top Image"
+                                            <Button Grid.Column="1"
+                                                    Content="Edge Top Image"
                                                     Style="{StaticResource eq_menu_button}"
                                                     Command="{Binding CommandEdgeTopImageView}"></Button>
-                                            <Button Grid.Column="2" Content="Edge Side Image"
+                                            <Button Grid.Column="2"
+                                                    Content="Edge Side Image"
                                                     Style="{StaticResource eq_menu_button}"
                                                     Command="{Binding CommandEdgeSideImageView}"></Button>
-                                            <Button Grid.Column="3" Content="Edge Btm Image"
+                                            <Button Grid.Column="3"
+                                                    Content="Edge Btm Image"
                                                     Style="{StaticResource eq_menu_button}"
                                                     Command="{Binding CommandEdgeBtmImageView}"></Button>
-                                            <Button Grid.Column="4" Content="EBR Image"
+                                            <Button Grid.Column="4"
+                                                    Content="EBR Image"
                                                     Style="{StaticResource eq_menu_button}"
                                                     Command="{Binding CommandEBRImageView}"></Button>
-                                            <Button Grid.Column="5" Content="Front Image"
+                                            <Button Grid.Column="5"
+                                                    Content="Front Image"
                                                     Style="{StaticResource eq_menu_button}"></Button>
                                         </Grid>
                                         <tools:RootViewer Grid.Row="2"
-                                                DataContext="{Binding p_Viewer}"></tools:RootViewer>
+                                                          DataContext="{Binding p_Viewer}"></tools:RootViewer>
                                     </Grid>
                                     <Grid Grid.Column="1">
                                         <Grid.RowDefinitions>
                                             <RowDefinition Height="1*"></RowDefinition>
-                                            <RowDefinition Height="1*"></RowDefinition>
+                                            <RowDefinition Height="190"></RowDefinition>
                                             <RowDefinition Height="4*"></RowDefinition>
                                         </Grid.RowDefinitions>
-                                        <GroupBox Grid.Row="0" Header="FDC" Margin="4" Style="{StaticResource main_view_groupbox}">
+                                        <GroupBox Grid.Row="0"
+                                                  Header="FDC"
+                                                  Margin="4"
+                                                  Style="{StaticResource main_view_groupbox}">
                                             <Grid>
                                                 <Grid.ColumnDefinitions>
                                                     <ColumnDefinition></ColumnDefinition>
@@ -469,73 +772,84 @@
                                                     <ColumnDefinition></ColumnDefinition>
                                                     <ColumnDefinition></ColumnDefinition>
                                                 </Grid.ColumnDefinitions>
-                                                <Border Grid.Column="0" BorderThickness="0"
-                                                        BorderBrush="Black" CornerRadius="5">
+                                                <Border Grid.Column="0"
+                                                        BorderThickness="0"
+                                                        BorderBrush="Black"
+                                                        CornerRadius="5">
                                                     <ItemsControl>
                                                         <packicon:PackIconIonicons
                                                                 HorizontalAlignment="Center"
-                                                                Kind="CloudOutlineiOS"
-                                                                Width="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ItemsControl}}, Path=Foreground}"
-                                                                Height="40"></packicon:PackIconIonicons>
+                                                                                   Kind="CloudOutlineiOS"
+                                                                                   Width="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ItemsControl}}, Path=Foreground}"
+                                                                                   Height="40"></packicon:PackIconIonicons>
                                                         <TextBlock Text="CDA"
-                                                                Style="{StaticResource tbFDCName}"></TextBlock>
+                                                                   Style="{StaticResource tbFDCName}"></TextBlock>
                                                         <TextBlock Text="{Binding p_aTK4S[2].p_dValue}"
-                                                                Style="{StaticResource tbFDCValue}"></TextBlock>
+                                                                   Style="{StaticResource tbFDCValue}"></TextBlock>
                                                         <TextBlock Text="MPa"
-                                                                Style="{StaticResource tbFDCUnit}" />
+                                                                   Style="{StaticResource tbFDCUnit}" />
                                                     </ItemsControl>
                                                 </Border>
-                                                <Border Grid.Column="1" BorderThickness="0"
-                                                        BorderBrush="Black" CornerRadius="5">
+                                                <Border Grid.Column="1"
+                                                        BorderThickness="0"
+                                                        BorderBrush="Black"
+                                                        CornerRadius="5">
                                                     <ItemsControl>
                                                         <packicon:PackIconIonicons
                                                                 HorizontalAlignment="Center"
-                                                                Kind="RainyiOS"
-                                                                Width="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ItemsControl}}, Path=Foreground}"
-                                                                Height="40"></packicon:PackIconIonicons>
+                                                                                   Kind="RainyiOS"
+                                                                                   Width="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ItemsControl}}, Path=Foreground}"
+                                                                                   Height="40"></packicon:PackIconIonicons>
                                                         <TextBlock Text="VAC"
-                                                                Style="{StaticResource tbFDCName}"></TextBlock>
+                                                                   Style="{StaticResource tbFDCName}"></TextBlock>
                                                         <TextBlock Text="{Binding p_aTK4S[0].p_dValue}"
-                                                                Style="{StaticResource tbFDCValue}"></TextBlock>
-                                                        <TextBlock Text="kPa"
-                                                                Style="{StaticResource tbFDCUnit}" />
+                                                                   Style="{StaticResource tbFDCValue}"></TextBlock>
+                                                        <TextBlock Text="Pa"
+                                                                   Style="{StaticResource tbFDCUnit}" />
                                                     </ItemsControl>
                                                 </Border>
-                                                <Border Grid.Column="2" BorderThickness="0"
-                                                        BorderBrush="Black" CornerRadius="5">
+                                                <Border Grid.Column="2"
+                                                        BorderThickness="0"
+                                                        BorderBrush="Black"
+                                                        CornerRadius="5">
                                                     <ItemsControl>
                                                         <packicon:PackIconIonicons
                                                                 HorizontalAlignment="Center"
-                                                                Kind="ColorWandiOS"
-                                                                Width="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ItemsControl}}, Path=Foreground}"
-                                                                Height="40"></packicon:PackIconIonicons>
+                                                                                   Kind="ColorWandiOS"
+                                                                                   Width="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ItemsControl}}, Path=Foreground}"
+                                                                                   Height="40"></packicon:PackIconIonicons>
                                                         <TextBlock Text="Static"
-                                                                Style="{StaticResource tbFDCName}"></TextBlock>
+                                                                   Style="{StaticResource tbFDCName}"></TextBlock>
                                                         <TextBlock Text="{Binding p_aTK4S[3].p_dValue}"
-                                                                Style="{StaticResource tbFDCValue}"></TextBlock>
+                                                                   Style="{StaticResource tbFDCValue}"></TextBlock>
                                                         <TextBlock Text="V"
-                                                                Style="{StaticResource tbFDCUnit}" />
+                                                                   Style="{StaticResource tbFDCUnit}" />
                                                     </ItemsControl>
                                                 </Border>
-                                                <Border Grid.Column="3" BorderThickness="0"
-                                                        BorderBrush="Black" CornerRadius="5">
+                                                <Border Grid.Column="3"
+                                                        BorderThickness="0"
+                                                        BorderBrush="Black"
+                                                        CornerRadius="5">
                                                     <ItemsControl>
                                                         <packicon:PackIconBootstrapIcons
                                                                 HorizontalAlignment="Center"
-                                                                Kind="Thermometer"
-                                                                Width="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ItemsControl}}, Path=Foreground}"
-                                                                Height="40"></packicon:PackIconBootstrapIcons>
+                                                                                         Kind="Thermometer"
+                                                                                         Width="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ItemsControl}}, Path=Foreground}"
+                                                                                         Height="40"></packicon:PackIconBootstrapIcons>
                                                         <TextBlock Text="Temp"
-                                                                Style="{StaticResource tbFDCName}"></TextBlock>
+                                                                   Style="{StaticResource tbFDCName}"></TextBlock>
                                                         <TextBlock Text="{Binding p_aTK4S[4].p_dValue}"
-                                                                Style="{StaticResource tbFDCValue}"></TextBlock>
+                                                                   Style="{StaticResource tbFDCValue}"></TextBlock>
                                                         <TextBlock Text="'C"
-                                                                Style="{StaticResource tbFDCUnit}" />
+                                                                   Style="{StaticResource tbFDCUnit}" />
                                                     </ItemsControl>
                                                 </Border>
                                             </Grid>
                                         </GroupBox>
-                                        <GroupBox Grid.Row="1" Header="FFU" Margin="4" Style="{StaticResource main_view_groupbox}">
+                                        <GroupBox Grid.Row="1"
+                                                  Header="FFU"
+                                                  Margin="4"
+                                                  Style="{StaticResource main_view_groupbox}">
                                             <Grid>
                                                 <Grid.ColumnDefinitions>
                                                     <ColumnDefinition></ColumnDefinition>
@@ -543,132 +857,111 @@
                                                     <ColumnDefinition></ColumnDefinition>
                                                     <ColumnDefinition></ColumnDefinition>
                                                 </Grid.ColumnDefinitions>
-                                                <Border Grid.Column="0" BorderThickness="0"
-                                                        BorderBrush="Black" CornerRadius="5">
+                                                <Border Grid.Column="0"
+                                                        BorderThickness="0"
+                                                        BorderBrush="Black"
+                                                        CornerRadius="5">
                                                     <ItemsControl>
                                                         <packicon:PackIconMaterial Grid.Row="0"
-                                                                Kind="Fan" Foreground="Black"
-                                                                HorizontalAlignment="Center"
-                                                                VerticalAlignment="Center"
-                                                                Width="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ItemsControl}}, Path=Foreground}"
-                                                                Height="40">
+                                                                                   Kind="Fan"
+                                                                                   Foreground="Black"
+                                                                                   HorizontalAlignment="Center"
+                                                                                   VerticalAlignment="Center"
+                                                                                   Width="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ItemsControl}}, Path=Foreground}"
+                                                                                   Height="40">
                                                         </packicon:PackIconMaterial>
                                                         <TextBlock Text="EFEM 1"
-                                                                Style="{StaticResource tbFDCName}"></TextBlock>
+                                                                   Style="{StaticResource tbFDCName}"></TextBlock>
                                                         <TextBlock Text="{Binding p_aFFU[0].p_nRPM}"
-                                                                Style="{StaticResource tbFDCValue}"></TextBlock>
+                                                                   Style="{StaticResource tbFDCValue}"></TextBlock>
                                                         <TextBlock Text="RPM"
-                                                                Style="{StaticResource tbFDCUnit}" />
+                                                                   Style="{StaticResource tbFDCUnit}" />
+                                                        <TextBlock Text="{Binding p_aFFU[0].p_nPressure, Converter={StaticResource PressureConverters}}"
+                                                                   Style="{StaticResource tbFDCValue}"></TextBlock>
+                                                        <TextBlock Text="Pa"
+                                                                   Style="{StaticResource tbFDCUnit}" />
                                                     </ItemsControl>
                                                 </Border>
-                                                <Border Grid.Column="1" BorderThickness="0"
-                                                        BorderBrush="Black" CornerRadius="5">
+                                                <Border Grid.Column="1"
+                                                        BorderThickness="0"
+                                                        BorderBrush="Black"
+                                                        CornerRadius="5">
                                                     <ItemsControl>
                                                         <packicon:PackIconMaterial Grid.Row="0"
-                                                                Kind="Fan" Foreground="Black"
-                                                                HorizontalAlignment="Center"
-                                                                VerticalAlignment="Center"
-                                                                Width="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ItemsControl}}, Path=Foreground}"
-                                                                Height="40">
+                                                                                   Kind="Fan"
+                                                                                   Foreground="Black"
+                                                                                   HorizontalAlignment="Center"
+                                                                                   VerticalAlignment="Center"
+                                                                                   Width="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ItemsControl}}, Path=Foreground}"
+                                                                                   Height="40">
                                                         </packicon:PackIconMaterial>
                                                         <TextBlock Text="EFEM 2"
-                                                                Style="{StaticResource tbFDCName}"></TextBlock>
-                                                        <TextBlock Text="{Binding p_aFFU[1].p_nRPM}"
-                                                                Style="{StaticResource tbFDCValue}"></TextBlock>
-                                                        <TextBlock Text="RPM"
-                                                                Style="{StaticResource tbFDCUnit}" />
-                                                    </ItemsControl>
-                                                </Border>
-                                                <Border Grid.Column="2" BorderThickness="0"
-                                                        BorderBrush="Black" CornerRadius="5">
-                                                    <ItemsControl>
-                                                        <packicon:PackIconMaterial Grid.Row="0"
-                                                                Kind="Fan" Foreground="Black"
-                                                                HorizontalAlignment="Center"
-                                                                VerticalAlignment="Center"
-                                                                Width="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ItemsControl}}, Path=Foreground}"
-                                                                Height="40">
-                                                        </packicon:PackIconMaterial>
-                                                        <TextBlock Text="Stage 1"
-                                                                Style="{StaticResource tbFDCName}"></TextBlock>
+                                                                   Style="{StaticResource tbFDCName}"></TextBlock>
                                                         <TextBlock Text="{Binding p_aFFU[2].p_nRPM}"
-                                                                Style="{StaticResource tbFDCValue}"></TextBlock>
+                                                                   Style="{StaticResource tbFDCValue}"></TextBlock>
                                                         <TextBlock Text="RPM"
-                                                                Style="{StaticResource tbFDCUnit}" />
+                                                                   Style="{StaticResource tbFDCUnit}" />
+                                                        <TextBlock Text="{Binding p_aFFU[2].p_nPressure, Converter={StaticResource PressureConverters}}"
+                                                                   Style="{StaticResource tbFDCValue}"></TextBlock>
+                                                        <TextBlock Text="Pa"
+                                                                   Style="{StaticResource tbFDCUnit}" />
                                                     </ItemsControl>
                                                 </Border>
-                                                <Border Grid.Column="3" BorderThickness="0"
-                                                        BorderBrush="Black" CornerRadius="5">
+                                                <Border Grid.Column="2"
+                                                        BorderThickness="0"
+                                                        BorderBrush="Black"
+                                                        CornerRadius="5">
                                                     <ItemsControl>
                                                         <packicon:PackIconMaterial Grid.Row="0"
-                                                                Kind="Fan" Foreground="Black"
-                                                                HorizontalAlignment="Center"
-                                                                VerticalAlignment="Center"
-                                                                Width="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ItemsControl}}, Path=Foreground}"
-                                                                Height="40">
+                                                                                   Kind="Fan"
+                                                                                   Foreground="Black"
+                                                                                   HorizontalAlignment="Center"
+                                                                                   VerticalAlignment="Center"
+                                                                                   Width="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ItemsControl}}, Path=Foreground}"
+                                                                                   Height="40">
                                                         </packicon:PackIconMaterial>
-                                                        <TextBlock Text="Stage 2"
-                                                                Style="{StaticResource tbFDCName}"></TextBlock>
-                                                        <TextBlock Text="{Binding p_aFFU[3].p_nRPM}"
-                                                                Style="{StaticResource tbFDCValue}"></TextBlock>
+                                                        <TextBlock Text="Vision 1"
+                                                                   Style="{StaticResource tbFDCName}"></TextBlock>
+                                                        <TextBlock Text="{Binding p_aFFU[4].p_nRPM}"
+                                                                   Style="{StaticResource tbFDCValue}"></TextBlock>
                                                         <TextBlock Text="RPM"
-                                                                Style="{StaticResource tbFDCUnit}" />
+                                                                   Style="{StaticResource tbFDCUnit}" />
+                                                        <TextBlock Text="{Binding p_aFFU[4].p_nPressure, Converter={StaticResource PressureConverters}}"
+                                                                   Style="{StaticResource tbFDCValue}"></TextBlock>
+                                                        <TextBlock Text="Pa"
+                                                                   Style="{StaticResource tbFDCUnit}" />
+                                                    </ItemsControl>
+                                                </Border>
+                                                <Border Grid.Column="3"
+                                                        BorderThickness="0"
+                                                        BorderBrush="Black"
+                                                        CornerRadius="5">
+                                                    <ItemsControl>
+                                                        <packicon:PackIconMaterial Grid.Row="0"
+                                                                                   Kind="Fan"
+                                                                                   Foreground="Black"
+                                                                                   HorizontalAlignment="Center"
+                                                                                   VerticalAlignment="Center"
+                                                                                   Width="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ItemsControl}}, Path=Foreground}"
+                                                                                   Height="40">
+                                                        </packicon:PackIconMaterial>
+                                                        <TextBlock Text="Vision 2"
+                                                                   Style="{StaticResource tbFDCName}"></TextBlock>
+                                                        <TextBlock Text="{Binding p_aFFU[5].p_nRPM}"
+                                                                   Style="{StaticResource tbFDCValue}"></TextBlock>
+                                                        <TextBlock Text="RPM"
+                                                                   Style="{StaticResource tbFDCUnit}" />
+                                                        <TextBlock Text="{Binding p_aFFU[5].p_nPressure, Converter={StaticResource PressureConverters}}"
+                                                                   Style="{StaticResource tbFDCValue}"></TextBlock>
+                                                        <TextBlock Text="Pa"
+                                                                   Style="{StaticResource tbFDCUnit}" />
                                                     </ItemsControl>
                                                 </Border>
                                             </Grid>
                                         </GroupBox>
-                                        <GroupBox Header="Process"
-                                                  FontSize="15"
-                                                  Grid.Row="3">
-                                            <Grid>
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition/>
-                                                    <ColumnDefinition Width="3*" />
-                                                </Grid.ColumnDefinitions>
-                                                <Grid Grid.Column="0"
-                                                      Margin="5">
-                                                    <ItemsControl ItemsSource="{Binding p_handler.p_process.p_qSequence}"
-                                                                  Margin="0,5">
-                                                        <ItemsControl.ItemTemplate>
-                                                            <DataTemplate>
-                                                                <Grid DataContext="{Binding p_moduleRun}"
-                                                                      Height="40"
-                                                                      Background="{Binding p_eRunState, Converter={StaticResource ModuleRunStateBrushConverters}}">
-                                                                    <TextBlock Text="{Binding Converter={StaticResource ModuleRunStepConverter}}"
-                                                                               VerticalAlignment="Center"
-                                                                               Margin="3,0"/>
-                                                                </Grid>
-                                                            </DataTemplate>
-                                                        </ItemsControl.ItemTemplate>
-                                                    </ItemsControl>
-                                                </Grid>
-                                                <ScrollViewer Grid.Column="1"
-                                                              Margin="5">
-                                                    <Grid>
-                                                        <ItemsControl ItemsSource="{Binding p_handler.p_process.p_qSequence}">
-                                                            <ItemsControl.ItemsPanel>
-                                                                <ItemsPanelTemplate>
-                                                                    <StackPanel />
-                                                                </ItemsPanelTemplate>
-                                                            </ItemsControl.ItemsPanel>
-
-                                                            <ItemsControl.ItemTemplate>
-                                                                <DataTemplate>
-                                                                    <GroupBox DataContext="{Binding p_moduleRun}"
-                                                                              Header="{Binding Converter={StaticResource ModuleRunStepConverter}}"
-                                                                              Height="200">
-                                                                        <Grid>
-                                                                            <Image Source="{Binding Converter={StaticResource ModuleRunImageConverter}}" 
-                                                                                   Opacity="{Binding p_eRunState, Converter={StaticResource ModuleRunStateVisibleConverter}, ConverterParameter=Opacity}" />
-                                                                        </Grid>
-                                                                    </GroupBox>
-                                                                </DataTemplate>
-                                                            </ItemsControl.ItemTemplate>
-                                                        </ItemsControl>
-                                                    </Grid>
-                                                </ScrollViewer>
-                                            </Grid>
-                                        </GroupBox>
+                                        <Image Margin="40"
+                                               Grid.Row="3"
+                                               Source="/Root_WIND2;component/Resources/VEGAImage.PNG"></Image>
                                     </Grid>
                                 </Grid>
                             </TabItem>
