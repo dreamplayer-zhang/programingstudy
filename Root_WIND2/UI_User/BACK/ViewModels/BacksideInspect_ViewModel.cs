@@ -270,12 +270,12 @@ namespace Root_WIND2.UI_User
                 klarfData.SaveTiffImageOnlyTDI(defects, workManager.SharedBuffer, new Size(160, 120));
 
 
-                Tools.SaveImageJpg(workManager.SharedBuffer,
-                    new Rect(settings_backside.WholeWaferImageStartX, settings_backside.WholeWaferImageStartY, settings_backside.WholeWaferImageEndX, settings_backside.WholeWaferImageEndY),
-                    settings_backside.KlarfSavePath + "\\" + DateTime.Now.ToString("yyyyMMddhhmmss") + "_backside.jpg",
-                    (long)(settings_backside.WholeWaferImageCompressionRate * 100),
-                    settings_backside.OutputImageSizeX,
-                    settings_backside.OutputImageSizeY);
+                //Tools.SaveImageJpg(workManager.SharedBuffer,
+                //    new Rect(settings_backside.WholeWaferImageStartX, settings_backside.WholeWaferImageStartY, settings_backside.WholeWaferImageEndX, settings_backside.WholeWaferImageEndY),
+                //    settings_backside.KlarfSavePath + "\\" + DateTime.Now.ToString("yyyyMMddhhmmss") + "_backside.jpg",
+                //    (long)(settings_backside.WholeWaferImageCompressionRate * 100),
+                //    settings_backside.OutputImageSizeX,
+                //    settings_backside.OutputImageSizeY);
 
                 List<List<Point>> polygon = PolygonController.ReadPolygonFile(recipe.ExclusiveRegionFilePath);
 
