@@ -23,20 +23,20 @@ namespace Root_WIND2.Module
     public class Run_VisionAlign : ModuleRunBase
     {
         Vision m_module;
-        public RPoint m_firstPointPulse = new RPoint();
-        public RPoint m_secondPointPulse = new RPoint();
+        //public RPoint m_firstPointPulse = new RPoint();
+        //public RPoint m_secondPointPulse = new RPoint();
         public int m_focusPosZ = 0;
         public Camera_Basler m_CamAlign;
 
-        public bool m_saveAlignFailImage = false;
-        public string m_saveAlignFailImagePath = "D:\\";
+        //public bool m_saveAlignFailImage = false;
+        //public string m_saveAlignFailImagePath = "D:\\";
 
         public int m_score = 80;
 
         public int m_repeatCnt = 1;
         public int m_failMovePulse = 10000; // 1mm
 
-        public double m_AlignCamResolution = 5.5f;
+        //public double m_AlignCamResolution = 5.5f;
         public int m_AlignCount = 1;
 
         const int PULSE_TO_UM = 10;
@@ -80,13 +80,13 @@ namespace Root_WIND2.Module
         public override ModuleRunBase Clone()
         {
             Run_VisionAlign run = new Run_VisionAlign(m_module);
-            run.m_firstPointPulse = m_firstPointPulse;
-            run.m_secondPointPulse = m_secondPointPulse;
+            //run.m_firstPointPulse = m_firstPointPulse;
+            //run.m_secondPointPulse = m_secondPointPulse;
             run.m_focusPosZ = m_focusPosZ;
             run.m_score = m_score;
-            run.m_saveAlignFailImage = m_saveAlignFailImage;
-            run.m_saveAlignFailImagePath = m_saveAlignFailImagePath;
-            run.m_AlignCamResolution = m_AlignCamResolution;
+            //run.m_saveAlignFailImage = m_saveAlignFailImage;
+            //run.m_saveAlignFailImagePath = m_saveAlignFailImagePath;
+            //run.m_AlignCamResolution = m_AlignCamResolution;
             run.m_AlignCount = m_AlignCount;
             run.p_sGrabMode = p_sGrabMode;
             run.m_dVRSToAlignOffsetZ = m_dVRSToAlignOffsetZ;
@@ -98,12 +98,12 @@ namespace Root_WIND2.Module
 
         public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
         {
-            m_firstPointPulse = tree.Set(m_firstPointPulse, m_firstPointPulse, "First Align Point", "First Align Point (pulse)", bVisible);
-            m_secondPointPulse = tree.Set(m_secondPointPulse, m_secondPointPulse, "Second Align Point", "Second Align Point (pulse)", bVisible);
+            //m_firstPointPulse = tree.Set(m_firstPointPulse, m_firstPointPulse, "First Align Point", "First Align Point (pulse)", bVisible);
+            //m_secondPointPulse = tree.Set(m_secondPointPulse, m_secondPointPulse, "Second Align Point", "Second Align Point (pulse)", bVisible);
             m_focusPosZ = tree.Set(m_focusPosZ, m_focusPosZ, "Focus Position Z", "Focus Position Z", bVisible);
             m_score = tree.Set(m_score, m_score, "Matching Score", "Matching Score", bVisible);
-            m_saveAlignFailImagePath = tree.SetFolder(m_saveAlignFailImagePath, m_saveAlignFailImagePath, "Align Feature Path", "Align Feature Path", bVisible);
-            m_AlignCamResolution = tree.Set(m_AlignCamResolution, m_AlignCamResolution, "Align Cam Resolution", "Align Cam Resolution", bVisible);
+            //m_saveAlignFailImagePath = tree.SetFolder(m_saveAlignFailImagePath, m_saveAlignFailImagePath, "Align Feature Path", "Align Feature Path", bVisible);
+            //m_AlignCamResolution = tree.Set(m_AlignCamResolution, m_AlignCamResolution, "Align Cam Resolution", "Align Cam Resolution", bVisible);
             m_AlignCount = tree.Set(m_AlignCount, m_AlignCount, "Align count", "Align Count", bVisible);
             p_sGrabMode = tree.Set(p_sGrabMode, p_sGrabMode, m_module.p_asGrabMode, "Grab Mode", "Select GrabMode", bVisible);
             m_dVRSToAlignOffsetZ = tree.Set(m_dVRSToAlignOffsetZ, m_dVRSToAlignOffsetZ, "VRS To Align Offset Z Pos", "VRS To Align Offset Z Pos", bVisible);
@@ -140,10 +140,19 @@ namespace Root_WIND2.Module
             //Recipe Open
             RecipeAlign recipe = GlobalObjects.Instance.Get<RecipeAlign>();
             FrontAlignRecipe alignRecipe = recipe.GetItem<FrontAlignRecipe>();
+
+            if(alignRecipe == null)
+            {
+                return "FrontAlignRecipe == null";
+            }
+
             if (!recipe.Read(m_sRecipeName))
             {
                 return "Recipe Open Fail";
             }
+
+            if (alignRecipe.AlignFeatureList.Count == 0)
+                return "Align Featur Count == 0";
 
             // Move Z
             double dPos = m_focusPosZ;
@@ -177,8 +186,13 @@ namespace Root_WIND2.Module
                 return p_sInfo;
 
             long outX, outY;
-            double score = TemplateMatching(alignRecipe, out outX, out outY);
+            int featureIndex;
 
+            double score = TemplateMatching(alignRecipe, out outX, out outY, out featureIndex);
+            if (score < m_score)
+            {
+                return "First Point Align Fail [Score : " + score.ToString() + "]";
+            }
 
             // Second Point
             if (m_module.Run(axisXY.StartMove(secondPoint)))
@@ -187,7 +201,73 @@ namespace Root_WIND2.Module
                 return p_sInfo;
 
 
+            // 두번째는 첫번째에서 Score가 가장 높은 feature로 함
+            long outX2, outY2;
+            double score2 = TemplateMatchingWithSelectedFeature(alignRecipe, featureIndex, out outX2, out outY2);
 
+
+            if (score2 < m_score)
+                return "Second Point Align Fail [Score : " + score2.ToString() + "]";
+
+
+            double dAngle = CalcAngle(outX, outY, outX2, outY2);
+
+            Axis axisRotate = m_module.AxisRotate;
+            axisRotate.StartMove(axisRotate.p_posActual - dAngle * 1000);
+            axisRotate.WaitReady();
+
+
+            // 정확도를 위해 반복성 수행
+            for (int cnt = 1; cnt < m_AlignCount; cnt++)
+            {
+                // First Point
+                if (m_module.Run(axisXY.StartMove(firstPoint)))
+                    return p_sInfo;
+                if (m_module.Run(axisXY.WaitReady()))
+                    return p_sInfo;
+
+                score = TemplateMatching(alignRecipe, out outX, out outY, out featureIndex);
+                if (score < m_score)
+                {
+                    return "First Point Align Fail [Score : " + score.ToString() + "]";
+                }
+
+                // Second Point
+                if (m_module.Run(axisXY.StartMove(secondPoint)))
+                    return p_sInfo;
+                if (m_module.Run(axisXY.WaitReady()))
+                    return p_sInfo;
+
+                score2 = TemplateMatchingWithSelectedFeature(alignRecipe, featureIndex, out outX2, out outY2);
+
+
+                if (score2 < m_score)
+                    return "Second Point Align Fail [Score : " + score2.ToString() + "]";
+
+
+                dAngle = CalcAngle(outX, outY, outX2, outY2);
+
+                axisRotate.StartMove(axisRotate.p_posActual - dAngle * 1000);
+                axisRotate.WaitReady();
+            }
+
+
+            RecipeType_ImageData feature = alignRecipe.AlignFeatureList[featureIndex];
+            int featureWidth = feature.Width;
+            int featureHeight = feature.Height;
+            int camWidth = m_CamAlign.GetRoiSize().X;
+            int camHeight = m_CamAlign.GetRoiSize().Y;
+
+
+            m_grabMode.m_ptXYAlignData = new RPoint(-(outX + (featureWidth / 2) - camWidth / 2) * m_grabMode.m_dRealResX_um * 10, (outY + (featureHeight / 2) - camHeight / 2) * m_grabMode.m_dRealResX_um * 10);
+
+            m_module.RunTree(Tree.eMode.RegWrite);
+            m_module.RunTree(Tree.eMode.Init);
+
+            m_grabMode.SetLight(false);
+
+            timer.Stop();
+            System.Diagnostics.Debug.WriteLine(timer.ElapsedMilliseconds);
 
             // Old
             //StopWatch sw = new StopWatch();
@@ -419,13 +499,15 @@ namespace Root_WIND2.Module
             return "OK";
         }
 
-        private double TemplateMatching(FrontAlignRecipe alignRecipe, out long maxOutX, out long maxOutY)
+        private double TemplateMatching(FrontAlignRecipe alignRecipe, out long maxOutX, out long maxOutY, out int featureIndex)
         {
             ImageData camImage = m_CamAlign.p_ImageViewer.p_ImageData;
             IntPtr camImagePtr = camImage.GetPtr();
             double maxScore = double.MinValue;
             maxOutX = 0;
             maxOutY = 0;
+            int index = 0;
+            featureIndex = 0;
             foreach (RecipeType_ImageData feature in alignRecipe.AlignFeatureList)
             {
                 byte[] rawdata = feature.RawData;
@@ -451,22 +533,67 @@ namespace Root_WIND2.Module
                     maxScore = result;
                     maxOutX = outX;
                     maxOutY = outY;
+                    featureIndex = index;
                 }
-                    
+                index++;
             }
 
             return maxScore;
         }
 
-        private double CalcAngle(int resPosX, int resPosY, int resPosX2, int resPosY2)
+
+
+        private double TemplateMatchingWithSelectedFeature(FrontAlignRecipe alignRecipe, int featureIndex, out long maxOutX, out long maxOutY)
         {
+            ImageData camImage = m_CamAlign.p_ImageViewer.p_ImageData;
+            IntPtr camImagePtr = camImage.GetPtr();
+            double maxScore = double.MinValue;
+            maxOutX = 0;
+            maxOutY = 0;
+            int index = 0;
+            RecipeType_ImageData feature = alignRecipe.AlignFeatureList[featureIndex];
+
+            byte[] rawdata = feature.RawData;
+            double result;
+            int outX = 0, outY = 0;
+            unsafe
+            {
+                result = CLR_IP.Cpp_TemplateMatching(
+                    (byte*)(camImagePtr.ToPointer()),
+                    rawdata,
+                    &outX,
+                    &outY,
+                    camImage.GetBitMapSource().PixelWidth, camImage.GetBitMapSource().PixelHeight,
+                    feature.Width, feature.Height,
+                    0,
+                    0,
+                    camImage.GetBitMapSource().PixelWidth, camImage.GetBitMapSource().PixelHeight,
+                    5, 3, 0);
+            }
+
+            if (maxScore < result)
+            {
+                maxScore = result;
+                maxOutX = outX;
+                maxOutY = outY;
+            }
+
+            index++;
+
+            return maxScore;
+        }
+
+        private double CalcAngle(long posX, long posY, long posX2, long posY2)
+        {            
+            FrontAlignRecipe alignRecipe = GlobalObjects.Instance.Get<RecipeAlign>().GetItem<FrontAlignRecipe>();
+
             int camWidth = m_CamAlign.GetRoiSize().X;
             int camHeight = m_CamAlign.GetRoiSize().Y;
-            double cx = m_firstPointPulse.X / PULSE_TO_UM - ((camWidth / 2) + resPosX) * m_AlignCamResolution;
-            double cy = m_firstPointPulse.Y / PULSE_TO_UM - ((camHeight / 2) + resPosY) * m_AlignCamResolution;
+            double cx = alignRecipe.FirstSearchPointX / PULSE_TO_UM - ((camWidth / 2) + posX) * m_grabMode.m_dRealResX_um;
+            double cy = alignRecipe.FirstSearchPointY / PULSE_TO_UM - ((camHeight / 2) + posY) * m_grabMode.m_dRealResX_um;
 
-            double cx2 = m_secondPointPulse.X / PULSE_TO_UM - ((camWidth / 2) + resPosX2) * m_AlignCamResolution;
-            double cy2 = m_secondPointPulse.Y / PULSE_TO_UM - ((camHeight / 2) + resPosY2) * m_AlignCamResolution;
+            double cx2 = alignRecipe.SecondSearchPointX / PULSE_TO_UM - ((camWidth / 2) + posX2) * m_grabMode.m_dRealResX_um;
+            double cy2 = alignRecipe.SecondSearchPointY / PULSE_TO_UM - ((camHeight / 2) + posY2) * m_grabMode.m_dRealResX_um;
 
 
             double radian = Math.Atan2(cy2 - cy, cx2 - cx);

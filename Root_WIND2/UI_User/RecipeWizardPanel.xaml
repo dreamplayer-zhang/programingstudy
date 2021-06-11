@@ -86,6 +86,9 @@
                 <StackPanel Margin="0, 4, 0, 0" HorizontalAlignment="Stretch">
                     <RadioButton Content="VRS Camera " Command="{Binding btnCameraVRS}" IsChecked="True" Style="{StaticResource sidetap_child_radiobutton}"/>
                     <RadioButton Content="Align Camera " Command="{Binding btnCameraAlign}" Style="{StaticResource sidetap_child_radiobutton}"/>
+                    <Button Content="NEW" Command="{Binding btnNewRecipeAlign}" Style="{StaticResource sidetap_child_button}"/>
+                    <Button Content="SAVE" Command="{Binding btnSaveRecipeAlign}" Style="{StaticResource sidetap_child_button}"/>
+                    <Button Content="LOAD" Command="{Binding btnLoadRecipeAlign}" Style="{StaticResource sidetap_child_button}"/>
                 </StackPanel>
             </Border>
         </ControlTemplate>

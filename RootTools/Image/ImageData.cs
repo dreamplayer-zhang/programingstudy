@@ -303,6 +303,12 @@ namespace RootTools
 
             else if (nByte == 3)
             {
+                if (imgData.m_MemData == null)
+                {
+                    System.Windows.MessageBox.Show("ImageData SetData() 실패\nMemoryData == null");
+                    return;
+                }
+                    
                 byte* Rptr = (byte*)imgData.m_MemData.GetPtr(0).ToPointer();
                 byte* Gptr = (byte*)imgData.m_MemData.GetPtr(1).ToPointer();
                 byte* Bptr = (byte*)imgData.m_MemData.GetPtr(2).ToPointer();

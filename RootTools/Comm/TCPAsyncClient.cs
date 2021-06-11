@@ -74,7 +74,7 @@ namespace RootTools.Comm
 
         #region Client Socket
         Socket m_socket = null;
-        void InitClient()
+        public void InitClient()
         {
             m_socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             m_commLog.Add(CommLog.eType.Info, "Init Client Socket");
@@ -117,8 +117,11 @@ namespace RootTools.Comm
             try
             {
                 int lReceive = async.m_socket.EndReceive(ar);
-                if ((lReceive > 0) && (EventReceiveData != null)) EventReceiveData(async.m_aBuf, lReceive, async.m_socket);
-                if (m_bCommLog) m_commLog.Add(CommLog.eType.Receive, (lReceive < 64) ? Encoding.Default.GetString(async.m_aBuf, 0, lReceive) : "Large Data");
+                if (lReceive > 0)
+                {
+                    if (EventReceiveData != null) EventReceiveData(async.m_aBuf, lReceive, async.m_socket);
+                    if (m_bCommLog) m_commLog.Add(CommLog.eType.Receive, (lReceive < 64) ? Encoding.Default.GetString(async.m_aBuf, 0, lReceive) : "Large Data");
+                }
                 async.m_socket.BeginReceive(async.m_aBuf, 0, m_lMaxBuffer, SocketFlags.None, m_cbReceive, async);
             }
             catch (Exception e)
@@ -215,6 +218,7 @@ namespace RootTools.Comm
         {
             if (m_socket != null) m_socket.Close();
             m_socket = null;
+            m_commLog.Add(CommLog.eType.Info, "Socket Closed");
         }
 
     }

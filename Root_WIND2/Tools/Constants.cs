@@ -21,6 +21,7 @@ namespace Root_WIND2
             public const string RecipeBackRootPath = @"C:\Root\Recipe\Back\";
             public const string RecipeEdgeRootPath = @"C:\Root\Recipe\Edge\";
             public const string RecipeEBRRootPath = @"C:\Root\Recipe\EBR\";
+            public const string RecipeAlignRootPath = @"C:\Root\Recipe\Align\";
 
             public const string ImageRootPath = @"D:\Images\";
 

@@ -980,8 +980,8 @@ namespace Root_WIND2.UI_User
 
                 List<CPoint> points = new List<CPoint>();
 
-                centerX = 300000 / 4 / 2;
-                centerY = 300000 / 4 / 2 + 2000;
+                //centerX = 300000 / 4 / 2;
+                //centerY = 300000 / 4 / 2 + 2000;
 
                 int threshold = (int)centerX  + 2000;
 
@@ -1056,6 +1056,12 @@ namespace Root_WIND2.UI_User
                     }
                 }
             }
+
+
+            BacksideRecipe backsideRecipe = GlobalObjects.Instance.Get<RecipeBack>().GetItem<BacksideRecipe>();
+
+            backsideRecipe.CenterX = centerX;
+            backsideRecipe.CenterY = centerY;
 
             return rectList;
         }
@@ -1231,6 +1237,12 @@ namespace Root_WIND2.UI_User
                     }
                 }
             }
+
+
+            BacksideRecipe backsideRecipe = GlobalObjects.Instance.Get<RecipeBack>().GetItem<BacksideRecipe>();
+
+            backsideRecipe.CenterX = centerX;
+            backsideRecipe.CenterY = centerY;
 
             return rectList;
         }

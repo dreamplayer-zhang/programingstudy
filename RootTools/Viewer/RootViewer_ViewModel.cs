@@ -4,6 +4,7 @@ using RootTools.Database;
 using System;
 using System.CodeDom;
 using System.Collections.ObjectModel;
+using System.Collections.Generic;
 using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
 using System.Threading;
@@ -1426,6 +1427,28 @@ namespace RootTools
             }
 
         }
+
+        public virtual unsafe void DrawLineBitmap(CPoint startPt, CPoint endPt, int thickness, byte r, byte g, byte b, byte a, CPoint offset = null)
+        {
+            if (offset == null) offset = new CPoint(0, 0);
+
+            startPt.X = startPt.X - offset.X - 1;
+            startPt.Y = startPt.Y - offset.Y - 1;
+            endPt.X = endPt.X - offset.X - 1;
+            endPt.Y = endPt.Y - offset.Y - 1;
+
+            List<CPoint> ListMemoryPoint = new List<CPoint>();
+
+            double angle = Math.Atan2(endPt.Y - startPt.Y, endPt.X - startPt.X);
+
+            ListMemoryPoint.Add(new CPoint((int)(startPt.X + thickness * Math.Cos(angle + Math.PI / 2)), (int)(startPt.Y + thickness * Math.Sin(angle + Math.PI / 2))));
+            ListMemoryPoint.Add(new CPoint((int)(startPt.X + thickness * Math.Cos(angle - Math.PI / 2)), (int)(startPt.Y + thickness * Math.Sin(angle - Math.PI / 2))));
+            ListMemoryPoint.Add(new CPoint((int)(endPt.X + thickness * Math.Cos(angle - Math.PI / 2)), (int)(endPt.Y + thickness * Math.Sin(angle - Math.PI / 2))));
+            ListMemoryPoint.Add(new CPoint((int)(endPt.X + thickness * Math.Cos(angle + Math.PI / 2)), (int)(endPt.Y + thickness * Math.Sin(angle + Math.PI / 2))));
+
+            DrawPolygonBitmap(ListMemoryPoint, r, g, b, a);
+        }
+
         public virtual unsafe void DrawRectBitmap(CRect rect, byte r, byte g, byte b, byte a, CPoint offset = null)
         {
             if (offset == null) offset = new CPoint(0, 0);
@@ -1445,6 +1468,117 @@ namespace RootTools
             });
         }
 
+        public virtual unsafe void DrawPolygonBitmap(List<CPoint> ListMemoryPoint, byte r, byte g, byte b, byte a, CPoint offset = null)
+        {
+            if (offset == null) offset = new CPoint(0, 0);
+
+            for (int i = 0; i < ListMemoryPoint.Count; i++)
+            {
+                ListMemoryPoint[i].X = ListMemoryPoint[i].X - offset.X - 1;
+                ListMemoryPoint[i].Y = ListMemoryPoint[i].Y - offset.Y - 1;
+            }
+
+            int maxY = 0;
+            int minY = 0;
+            int k = 0;
+            int temp = 0;
+            int[] ptX = new int[p_CanvasWidth];
+            List<ScanLine> ListScanLines = new List<ScanLine>();
+
+            for (int i = 0; i < ListMemoryPoint.Count; i++)
+            {
+                if (i == ListMemoryPoint.Count - 1)
+                {
+                    if (ListMemoryPoint[i].Y == ListMemoryPoint[0].Y)
+                    {
+                        continue;
+                    }
+
+                    ListScanLines.Add(new ScanLine(ListMemoryPoint[i], ListMemoryPoint[0]));
+                    maxY = Math.Max(maxY, Math.Max(ListMemoryPoint[i].Y, ListMemoryPoint[0].Y));
+                    minY = Math.Min(minY, Math.Min(ListMemoryPoint[i].Y, ListMemoryPoint[0].Y));
+                }
+                else
+                {
+                    if (ListMemoryPoint[i].Y == ListMemoryPoint[i + 1].Y)
+                    {
+                        continue;
+                    }
+
+                    ListScanLines.Add(new ScanLine(ListMemoryPoint[i], ListMemoryPoint[i + 1]));
+                    maxY = Math.Max(maxY, Math.Max(ListMemoryPoint[i].Y, ListMemoryPoint[0].Y));
+                    minY = Math.Min(minY, Math.Min(ListMemoryPoint[i].Y, ListMemoryPoint[0].Y));
+                }
+            }
+
+            for (int y = minY; y < maxY; y++)
+            {
+                k = 0;
+                for (int i = 0; i < ListScanLines.Count; i++)
+                {
+                    if ((ListScanLines[i].StartPt.Y <= y && ListScanLines[i].EndPt.Y > y) || (ListScanLines[i].StartPt.Y > y && ListScanLines[i].EndPt.Y <= y))
+                    {
+                        ptX[k] = (int)(ListScanLines[i].StartPt.X + ListScanLines[i].slope * (y - ListScanLines[i].StartPt.Y));
+                        k = k + 1;
+                    }
+                }
+
+                for (int i = 0; i < k - 1; i++)
+                {
+                    if (ptX[i] > ptX[i + 1])
+                    {
+                        temp = ptX[i];
+                        ptX[i] = ptX[i + 1];
+                        ptX[i + 1] = temp;
+                    }
+                }
+
+                for (int i = 0; i < k; i += 2)
+                {
+                    for (int x = ptX[i]; x <= ptX[i + 1]; x++)
+                    {
+                        CPoint pixelPt = new CPoint(x, y);
+                        DrawPixelBitmap(pixelPt, r, g, b, a);
+                    }
+                }
+            }
+        }
+
+        public virtual unsafe void DrawCircleBitmap(TEllipse circle, byte r, byte g, byte b, byte a, CPoint offset = null)
+        {
+            if (offset == null) offset = new CPoint(0, 0);
+
+            circle.MemoryRect.Left = circle.MemoryRect.Left - offset.X - 1;
+            circle.MemoryRect.Right = circle.MemoryRect.Right - offset.X - 1;
+            circle.MemoryRect.Top = circle.MemoryRect.Top - offset.Y - 1;
+            circle.MemoryRect.Bottom = circle.MemoryRect.Bottom - offset.Y - 1;
+
+            int temp = 0;
+            int[] ptX = new int[2];
+
+            int x0 = circle.MemoryRect.Left + circle.MemoryRect.Width / 2;
+            int y0 = circle.MemoryRect.Top + circle.MemoryRect.Height / 2;
+
+            for (int y = circle.MemoryRect.Top; y < circle.MemoryRect.Bottom + 1; y++)
+            {
+                ptX[0] = (int)Math.Sqrt(Math.Pow(circle.MemoryRect.Width / 2, 2) * (1 - Math.Pow(y - y0, 2) / Math.Pow(circle.MemoryRect.Height / 2, 2))) + x0;
+                ptX[1] = 2 * x0 - ptX[0];
+
+                if (ptX[0] > ptX[1])
+                {
+                    temp = ptX[0];
+                    ptX[0] = ptX[1];
+                    ptX[1] = temp;
+                }
+
+                for (int x = ptX[0]; x <= ptX[1]; x++)
+                {
+                    CPoint pixelPt = new CPoint(x, y);
+                    DrawPixelBitmap(pixelPt, r, g, b, a);
+                }
+            }
+        }
+
         public virtual unsafe void DrawPixelBitmap(CPoint memPt, byte r, byte g, byte b, byte a)
         {
             IntPtr ptrMem = p_ROILayer.GetPtr();
@@ -1457,6 +1591,7 @@ namespace RootTools
             imagePtr[(memPt.Y * p_ROILayer.p_Size.X + memPt.X) * 4 + 2] = r; // r
             imagePtr[(memPt.Y * p_ROILayer.p_Size.X + memPt.X) * 4 + 3] = a; // a
         }
+
         public virtual unsafe void DrawPixelBitmap(byte* imagePtr, CPoint memPt, byte r, byte g, byte b, byte a)
         {
             imagePtr[(memPt.Y * p_ROILayer.p_Size.X + memPt.X) * 4 + 0] = b; // b
@@ -1464,6 +1599,7 @@ namespace RootTools
             imagePtr[(memPt.Y * p_ROILayer.p_Size.X + memPt.X) * 4 + 2] = r; // r
             imagePtr[(memPt.Y * p_ROILayer.p_Size.X + memPt.X) * 4 + 3] = a; // a
         }
+
         public virtual unsafe void DrawPixelBitmap(CPoint memPt, byte value, CPoint offset = null)
         {
             if (offset == null) offset = new CPoint(0, 0);

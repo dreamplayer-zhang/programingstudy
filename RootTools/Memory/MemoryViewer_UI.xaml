@@ -24,10 +24,12 @@
             <ComboBox x:Name="comboBoxIndex" SelectedValue="{Binding p_nMemoryIndex}" Margin="2"
                     MinWidth="40" />
             <Menu VerticalAlignment="Center">
-                <MenuItem Header="File">
+                <MenuItem Header="Menu">
                     <MenuItem x:Name="menuOpen" Header="Open" Click="menuOpen_Click" />
                     <MenuItem x:Name="memuSave" Header="Save" Click="memuSave_Click" />
                     <MenuItem x:Name="memuClear" Header="Clear" Click="memuClear_Click" />
+                    <Separator/>
+                    <MenuItem x:Name="memuOption" Header="Option" Click="memuOption_Click" />
                 </MenuItem>
             </Menu>
             <Label Content="{Binding p_sZoom}" ToolTip="Zoom" VerticalAlignment="Center" />
@@ -53,7 +55,8 @@
                 PreviewMouseWheel="gridBitmapSource_PreviewMouseWheel"
                 PreviewMouseLeftButtonDown="gridBitmapSource_PreviewMouseLeftButtonDown"
                 PreviewMouseLeftButtonUp="gridBitmapSource_PreviewMouseLeftButtonUp"
-                MouseLeave="gridBitmapSource_MouseLeave">
+                MouseLeave="gridBitmapSource_MouseLeave"
+                KeyDown="gridBitmapSource_KeyDown">
             <Image x:Name="imageBitmapSource" Source="{Binding p_bitmapSrc}" />
             <Grid x:Name="gridDrawing" />
         </Canvas>

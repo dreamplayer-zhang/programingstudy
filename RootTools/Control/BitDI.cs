@@ -34,7 +34,7 @@ namespace RootTools.Control
             {
                 if (_sID == value) return;
                 _sID = value;
-                _sLongID = _sID + m_nID.ToString("000");
+                _sLongID = m_nID.ToString("000 ") + _sID;
                 string[] sIDs = _sID.Split('.');
                 _sShortID = m_nID.ToString("000 ") + _sID.Replace(sIDs[0] + ".", ""); 
                 OnPropertyChanged();

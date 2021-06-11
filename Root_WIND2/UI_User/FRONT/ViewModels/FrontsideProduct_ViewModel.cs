@@ -253,8 +253,6 @@ namespace Root_WIND2.UI_User
                     dlg.Filter = "ASC file (*.ASC)|*.ASC|MCTxt file (*.txt)|*.txt|CTMap (*.FAB)|*.FAB|ALPSMap (*.Alpsdata)|*.Alpsdata|Text file (*.txt)|*.txt|xml file (*.xml)|*.xml|dat file (*.dat)|*.dat|G85 Map (*.*)|*.*|TSK Map (*.*)|*.*|Klarf file (*.001,*.smf)|*.001;*.smf||";
                     if (dlg.ShowDialog() == System.Windows.Forms.DialogResult.OK)
                     {
-                        int count = 0;
-                        string line;
                         int[] mapdata = new int[0];
 
                         string sFolderPath = System.IO.Path.GetDirectoryName(dlg.FileName);
@@ -353,8 +351,10 @@ namespace Root_WIND2.UI_User
             RecipeFront recipeFront = GlobalObjects.Instance.Get<RecipeFront>();
 
             CameraInfo camInfo = DataConverter.GrabModeToCameraInfo(engineer.m_handler.p_Vision.GetGrabMode(recipeFront.CameraInfoIndex));
-
+            
             this.CamInfoDataListVM.Init(camInfo);
+
+            this.SelectedGrabModeIndex = recipeFront.CameraInfoIndex;
         }
 
         #region [Properties]

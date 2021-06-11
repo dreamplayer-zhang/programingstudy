@@ -920,7 +920,7 @@ namespace Root_CAMELLIA.LibSR_Met
 
                         data.dGoF = m_Calculation.CalcGoF(data.VIS_Reflectance, data.CalcReflectance, 0, nWLCount, 0, nWLCount - 1, dAvgR);
 
-                        if (data.dGoF > 0.99999)
+                        if (data.dGoF > 0.9999)
                         {
                             data.dGoF = 0.9999;
                         }
@@ -1169,6 +1169,13 @@ namespace Root_CAMELLIA.LibSR_Met
         {
             try
             {
+                // 선택 파장 투과율 배열 생성하기
+                double[] CalTWavelenghList = new double[m_DM.m_ContourMapDataT.Count];
+                for (int i=0; i < m_DM.m_ContourMapDataT.Count; i++ )
+                {
+                    CalTWavelenghList[i] = m_DM.m_ContourMapDataT[i].Wavelength;
+                }
+
                 Stopwatch sw = new Stopwatch();
                 if (nPointIndex == 0)
                 {
@@ -1191,10 +1198,16 @@ namespace Root_CAMELLIA.LibSR_Met
                     int nCalLayer = m_SR.Thickness.Count() - (i + 2);
                     dThickness[i] = m_SR.Thickness[nCalLayer];
                 }
-                sw.Start();
+                Stopwatch sw1 = new Stopwatch();
+                sw1.Start();
                 m_Calculation.CalcTransmittance_OptimizingSi(nPointIndex, ConstValue.SI_AVG_OFFSET_RANGE, ConstValue.SI_AVG_OFFSET_STEP, nDNum, dThickness);
-                sw.Stop();
-                Debug.WriteLine("Cal t >> " + sw.ElapsedMilliseconds.ToString());
+                sw1.Stop();
+                Debug.WriteLine("Cal t >> " + sw1.ElapsedMilliseconds.ToString());
+                Stopwatch sw2 = new Stopwatch();
+                sw2.Start();
+                m_Calculation.PointCalcTransmittance_OptimizingSi(nPointIndex, ConstValue.SI_AVG_OFFSET_RANGE, ConstValue.SI_AVG_OFFSET_STEP, nDNum, dThickness, CalTWavelenghList);
+                sw2.Stop();
+                Debug.WriteLine("CalPoint t >> " + sw2.ElapsedMilliseconds.ToString());
                 return true;
             }
             catch (Exception ex)
