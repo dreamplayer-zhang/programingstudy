@@ -367,7 +367,6 @@ namespace Root_Pine2.Module
         {
             m_mmPickerSetUp = tree.Set(m_mmPickerSetUp, m_mmPickerSetUp, "Picker Up", "Picker Up (mm)");
             m_secPickerSet = tree.Set(m_secPickerSet, m_secPickerSet, "Done", "PickerSet Done Time (sec)");
-
         }
         #endregion
 
@@ -466,7 +465,7 @@ namespace Root_Pine2.Module
             m_runUnloadPaper = AddModuleRunList(new Run_UnloadPaper(this), true, "Unload Paper to Tray");
             m_runUnloadBoat = AddModuleRunList(new Run_UnloadBoat(this), true, "Unload Paper to Boat");
             m_runAvoidX = AddModuleRunList(new Run_AvoidX(this), false, "Avoid Axis X");
-            AddModuleRunList(new Run_PickerSet(this), false, "Avoid Axis X");
+            AddModuleRunList(new Run_PickerSet(this), false, "Picker Set");
         }
 
         public class Run_LoadEV : ModuleRunBase
