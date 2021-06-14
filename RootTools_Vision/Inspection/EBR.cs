@@ -200,7 +200,7 @@ namespace RootTools_Vision
 								top,
 								this.currentWorkplace.MapIndexX,
 								this.currentWorkplace.MapIndexY,
-								bevelX);
+								waferEdgeX);
 		}
 
 		private void FindEdge(int[] arrDiff)
