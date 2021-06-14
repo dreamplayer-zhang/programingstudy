@@ -140,8 +140,12 @@ namespace RootTools_Vision
 
                 // Rect
                 System.Drawing.Pen pen;
+                int offset = 0;
                 if (measure.m_strMeasureItem == Measurement.EBRMeasureItem.EBR.ToString())
+                {
                     pen = new System.Drawing.Pen(System.Drawing.Color.Red, 3);
+                    offset = 10;
+                }
                 else
                     pen = new System.Drawing.Pen(System.Drawing.Color.Green, 3);
 
@@ -153,7 +157,7 @@ namespace RootTools_Vision
 				int rectStartY = (height / 2);
 
 				//graphics.DrawRectangle(pen, rectStartX, rectStartY, rectWidth, rectHeight);
-				graphics.DrawLine(pen, rectStartX, rectStartY, rectStartX + rectWidth, rectStartY);
+				graphics.DrawLine(pen, rectStartX, rectStartY + offset, rectStartX + rectWidth, rectStartY + offset);
 
                 if (System.IO.File.Exists(path + measure.m_nMeasurementIndex + ".bmp"))
                     System.IO.File.Delete(path + measure.m_nMeasurementIndex + ".bmp");
