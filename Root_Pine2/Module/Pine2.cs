@@ -322,6 +322,17 @@ namespace Root_Pine2.Module
             }
         }
 
+        int _lStackPaper = 100;
+        public int p_lStackPaper
+        {
+            get { return _lStackPaper; }
+            set
+            {
+                _lStackPaper = value;
+                OnPropertyChanged();
+            }
+        }
+
         bool _b3D = true; 
         public bool p_b3D
         {

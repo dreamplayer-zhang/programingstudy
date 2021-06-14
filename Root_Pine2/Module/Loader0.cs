@@ -270,17 +270,17 @@ namespace Root_Pine2.Module
         string GetPaperTray(ref ePosTray ePosTray)
         {
             MagazineEVSet magazine = m_handler.m_magazineEV;
-            foreach (InfoStrip.eMagazine eMagazine in Enum.GetValues(typeof(InfoStrip.eMagazine)))
+            for (InfoStrip.eMagazine eMagazine = InfoStrip.eMagazine.Magazine7; eMagazine >= InfoStrip.eMagazine.Magazine0; eMagazine--)
             {
                 if (magazine.IsEnableStack(eMagazine, InfoStrip.eResult.Paper, true))
                 {
-                    ePosTray = (ePosTray)eMagazine; 
+                    ePosTray = (ePosTray)eMagazine;
                     return "OK";
                 }
             }
-            foreach (InfoStrip.eMagazine eMagazine in Enum.GetValues(typeof(InfoStrip.eMagazine)))
+            for (InfoStrip.eMagazine eMagazine = InfoStrip.eMagazine.Magazine7; eMagazine >= InfoStrip.eMagazine.Magazine0; eMagazine--)
             {
-                if (magazine.IsEnableStack(eMagazine, InfoStrip.eResult.Paper, false)) 
+                if (magazine.IsEnableStack(eMagazine, InfoStrip.eResult.Paper, false))
                 {
                     ePosTray = (ePosTray)eMagazine;
                     return "OK";

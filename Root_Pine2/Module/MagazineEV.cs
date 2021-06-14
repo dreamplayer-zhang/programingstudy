@@ -313,7 +313,14 @@ namespace Root_Pine2.Module
                 }
             }
 
-            int p_lStack { get { return m_magazineEV.m_pine2.p_lStack; } }
+            int p_lStack 
+            { 
+                get 
+                {
+                    if (p_eResult == InfoStrip.eResult.Paper) return m_magazineEV.m_pine2.p_lStackPaper; 
+                    return m_magazineEV.m_pine2.p_lStack; 
+                } 
+            }
 
             public void PutInfoStrip()
             {
@@ -333,36 +340,36 @@ namespace Root_Pine2.Module
         #region Magazine
         public class Magazine
         {
-            List<InfoStrip> m_aInfoStrip = new List<InfoStrip>();
+            public List<InfoStrip> m_aStripRun = new List<InfoStrip>();
             private void InfoStrip_OnDispose(InfoStrip infoStrip)
             {
-                m_aInfoStrip.Remove(infoStrip); 
+                m_aStripRun.Remove(infoStrip); 
             }
 
             public InfoStrip GetInfoStrip(bool bPeek)
             {
-                if (m_qInfoStrip.Count == 0) return null;
-                if (bPeek) return m_qInfoStrip.Peek(); 
-                InfoStrip infoStrip = m_qInfoStrip.Dequeue();
-                m_aInfoStrip.Add(infoStrip);
+                if (m_qStripReady.Count == 0) return null;
+                if (bPeek) return m_qStripReady.Peek(); 
+                InfoStrip infoStrip = m_qStripReady.Dequeue();
+                m_aStripRun.Add(infoStrip);
                 return infoStrip; 
             }
 
             public void PutInfoStrip(InfoStrip infoStrip)
             {
-                m_aInfoStrip.Remove(infoStrip);
+                m_aStripRun.Remove(infoStrip);
                 m_magazineEV.CheckMagazineDone(); 
             }
 
             public bool IsDone()
             {
-                if (m_qInfoStrip.Count > 0) return false;
-                if (m_aInfoStrip.Count > 0) return false;
+                if (m_qStripReady.Count > 0) return false;
+                if (m_aStripRun.Count > 0) return false;
                 return true; 
             }
 
             MagazineEV m_magazineEV; 
-            Queue<InfoStrip> m_qInfoStrip = new Queue<InfoStrip>(); 
+            public Queue<InfoStrip> m_qStripReady = new Queue<InfoStrip>(); 
             public Magazine(MagazineEV magazineEV, InfoStrip.eMagazinePos eMagazinePos)
             {
                 m_magazineEV = magazineEV; 
@@ -370,7 +377,7 @@ namespace Root_Pine2.Module
                 {
                     InfoStrip infoStrip = new InfoStrip(magazineEV.p_eMagazine, eMagazinePos, n);
                     infoStrip.OnDispose += InfoStrip_OnDispose;
-                    m_qInfoStrip.Enqueue(infoStrip); 
+                    m_qStripReady.Enqueue(infoStrip); 
                 }
             }
         }
@@ -413,11 +420,8 @@ namespace Root_Pine2.Module
 
         public void CheckMagazineDone()
         {
-            foreach (Magazine magazine in m_aMagazine.Values)
-            {
-                if ((magazine != null) && (magazine.IsDone() == false)) return; 
-            }
-            StartUnload();
+            if ((m_aMagazine[InfoStrip.eMagazinePos.Down] != null) && m_aMagazine[InfoStrip.eMagazinePos.Down].IsDone()) StartUnload();
+            if ((m_aMagazine[InfoStrip.eMagazinePos.Up] != null) && m_aMagazine[InfoStrip.eMagazinePos.Up].IsDone()) StartUnload();
         }
         #endregion
 
@@ -528,7 +532,7 @@ namespace Root_Pine2.Module
         #region Unload
         public string StartUnload()
         {
-            p_sLED = "UNLD"; 
+            p_sLED = "DONE"; 
             return StartRun(m_runUnload);
         }
 
@@ -545,6 +549,7 @@ namespace Root_Pine2.Module
                     break;
                 case Pine2.eRunMode.Stack:
                     if (Run(RunUnload(InfoStrip.eMagazinePos.Up))) return p_sInfo;
+                    m_stack.WriteResultLED();
                     m_stack = null; 
                     break;
             }
@@ -561,7 +566,6 @@ namespace Root_Pine2.Module
             m_conveyor.RunMove(Conveyor.eMove.Backward);
             Thread.Sleep(1000);
             if (Run(m_conveyor.WaitUnload())) return p_sInfo;
-            m_stack?.WriteResultLED(); 
             return "OK";
         }
         #endregion
