@@ -22,6 +22,7 @@ namespace Root_Pine2.Module
 
         public enum ePosTransfer
         {
+            Transfer0,
             Transfer1,
             Transfer2,
             Transfer3,
@@ -29,10 +30,10 @@ namespace Root_Pine2.Module
             Transfer5,
             Transfer6,
             Transfer7,
-            Transfer8
         }
         public enum ePosTray
         {
+            Tray0,
             Tray1,
             Tray2,
             Tray3,
@@ -40,7 +41,6 @@ namespace Root_Pine2.Module
             Tray5,
             Tray6,
             Tray7,
-            Tray8,
         }
         public enum eUnloadVision
         {
@@ -249,7 +249,7 @@ namespace Root_Pine2.Module
             try
             {
                 if (Run(RunMoveUp())) return p_sInfo;
-                ePosTray ePosTray = ePosTray.Tray8;
+                ePosTray ePosTray = ePosTray.Tray7;
                 if (Run(GetPaperTray(ref ePosTray))) return p_sInfo; 
                 if (Run(RunMoveTray(ePosTray))) return p_sInfo;
                 if (Run(RunMoveZPaper(ePosTray))) return p_sInfo;
@@ -334,7 +334,13 @@ namespace Root_Pine2.Module
             long msPickerSet = (long)(1000 * m_secPickerSet); 
             try
             {
-                string sPick = (m_pine2.p_eMode == Pine2.eRunMode.Stack) ? c_sPosLoadEV : ePosTransfer.Transfer8.ToString();
+                if (Run(RunMoveUp())) return p_sInfo; 
+                string sPick = (m_pine2.p_eMode == Pine2.eRunMode.Stack) ? c_sPosLoadEV : ePosTransfer.Transfer7.ToString();
+                switch (m_pine2.p_eMode)
+                {
+                    case Pine2.eRunMode.Stack: if (Run(RunMoveLoadEV())) return p_sInfo; break;
+                    case Pine2.eRunMode.Magazine: if (Run(RunMoveTransfer(ePosTransfer.Transfer7))) return p_sInfo; break; 
+                }
                 while (true)
                 {
                     if (Run(RunMoveZ(sPick, 0))) return p_sInfo;
@@ -508,7 +514,7 @@ namespace Root_Pine2.Module
                 InitModuleRun(module);
             }
 
-            public ePosTransfer m_ePos = ePosTransfer.Transfer1;
+            public ePosTransfer m_ePos = ePosTransfer.Transfer0;
             public override ModuleRunBase Clone()
             {
                 Run_LoadTransfer run = new Run_LoadTransfer(m_module);

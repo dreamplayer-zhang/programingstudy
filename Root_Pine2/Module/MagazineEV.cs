@@ -15,7 +15,7 @@ namespace Root_Pine2.Module
         public override void GetTools(bool bInit)
         {
             m_conveyor.GetTools(m_toolBox, this, bInit);
-            m_elevator.GetTools(m_toolBox, this, bInit); 
+            m_elevator.GetTools(m_toolBox, this, bInit);
         }
         #endregion
 
@@ -469,6 +469,7 @@ namespace Root_Pine2.Module
             if (m_elevator.IsProduct(InfoStrip.eMagazinePos.Down)) return "Remove Porduct";
             p_sInfo = base.StateHome();
             p_eState = (p_sInfo == "OK") ? eState.Ready : eState.Error;
+            p_sLED = "MGZ" + ((int)p_eMagazine).ToString();
             return p_sInfo;
         }
         #endregion

@@ -254,6 +254,7 @@ namespace Root_Pine2.Module
         protected override void InitModuleRuns()
         {
             m_runSnap = AddModuleRunList(new Run_Snap(this), false, "Run Snap");
+            m_runSnap = AddModuleRunList(new Run_MoveBoat(this), false, "Move Boat");
         }
 
         public class Run_Snap : ModuleRunBase
@@ -281,6 +282,37 @@ namespace Root_Pine2.Module
             public override string Run()
             {
                 return m_module.RunSnap(m_eWorks); 
+            }
+        }
+
+        public class Run_MoveBoat : ModuleRunBase
+        {
+            Boats m_module;
+            public Run_MoveBoat(Boats module)
+            {
+                m_module = module;
+                InitModuleRun(module);
+            }
+
+            public Boat.ePos m_ePos = Boat.ePos.Handler; 
+            public Vision2D.eWorks m_eWorks;
+            public override ModuleRunBase Clone()
+            {
+                Run_MoveBoat run = new Run_MoveBoat(m_module);
+                run.m_eWorks = m_eWorks;
+                run.m_ePos = m_ePos; 
+                return run;
+            }
+
+            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
+            {
+                m_eWorks = (Vision2D.eWorks)tree.Set(m_eWorks, m_eWorks, "eWorks", "Select Boat", bVisible);
+                m_ePos = (Boat.ePos)tree.Set(m_ePos, m_ePos, "Position", "Boat Position", bVisible); 
+            }
+
+            public override string Run()
+            {
+                return m_module.m_aBoat[m_eWorks].RunMove(m_ePos);
             }
         }
         #endregion

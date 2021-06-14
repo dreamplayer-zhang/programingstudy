@@ -48,7 +48,7 @@ namespace Root_Pine2.Module
                 }
             }
 
-            InfoStrip.eMagazine m_ePosLeft = InfoStrip.eMagazine.Magazine4;
+            InfoStrip.eMagazine m_ePosLeft = InfoStrip.eMagazine.Magazine3;
             int GetAxisID(InfoStrip.eMagazine ePos)
             {
                 return (ePos <= m_ePosLeft) ? 0 : 1; 
@@ -121,7 +121,7 @@ namespace Root_Pine2.Module
 
             #region Axis
             double m_dPulse = 0;
-            public InfoStrip.eMagazine m_ePosDst = InfoStrip.eMagazine.Magazine1;
+            public InfoStrip.eMagazine m_ePosDst = InfoStrip.eMagazine.Magazine0;
             public string RunMove(InfoStrip.eMagazine ePos, bool bPushPos, bool bWait = true)
             {
                 if (m_transfer.m_pusher.p_bLock) return "Lock by Sorter Picker";
@@ -129,7 +129,8 @@ namespace Root_Pine2.Module
                 m_transfer.m_pusher.p_bEnable = false;
                 m_transfer.m_gripper.p_bEnable = false; 
                 m_ePosDst = ePos;
-                m_axis.StartMove(ePos, bPushPos ? 0 : m_dPulse); 
+                double dPos = 1000 * (95 - m_transfer.m_pine2.p_widthStrip);
+                m_axis.StartMove(ePos, (bPushPos ? 0 : m_dPulse) + dPos); 
                 return bWait ? m_axis.WaitReady() : "OK";
             }
             #endregion
@@ -555,7 +556,7 @@ namespace Root_Pine2.Module
                 InitModuleRun(module);
             }
 
-            InfoStrip.eMagazine m_eMagazine = InfoStrip.eMagazine.Magazine1;
+            InfoStrip.eMagazine m_eMagazine = InfoStrip.eMagazine.Magazine0;
             bool m_bPush = false; 
             public override ModuleRunBase Clone()
             {
