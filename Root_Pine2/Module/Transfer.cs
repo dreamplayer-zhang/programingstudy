@@ -384,7 +384,6 @@ namespace Root_Pine2.Module
             InfoStrip infoStrip = m_magazineEV.GetInfoStrip(true);
             if (infoStrip == null)
             {
-                if (Run(m_buffer.RunMove(m_magazineEV.m_eMagazineGet, false, true))) return p_sInfo;
                 m_pusher.p_bEnable = (m_pusher.p_infoStrip == null);
                 Thread.Sleep(2000);
                 return m_pusher.WaitUnlock();

@@ -299,7 +299,7 @@ namespace Root_Pine2.Module
             }
         }
 
-        double _widthStrip = 77;
+        double _widthStrip = 95;
         public double p_widthStrip
         {
             get { return _widthStrip; }
@@ -410,6 +410,8 @@ namespace Root_Pine2.Module
             m_buzzer.RunTree(tree.GetTree("Buzzer")); 
             p_eMode = (eRunMode)tree.Set(p_eMode, p_eMode, "Mode", "RunMode");
             p_widthStrip = tree.Set(p_widthStrip, p_widthStrip, "Width", "Strip Width (mm)");
+            p_lStack = tree.Set(p_lStack, p_lStack, "Stack Count", "Strip Max Stack Count");
+            p_lStackPaper = tree.Set(p_lStackPaper, p_lStackPaper, "Paper Count", "Paper Max Stack Count");
             p_sRecipe = tree.Set(p_sRecipe, p_sRecipe, "Recipe", "Recipe"); 
         }
         #endregion
