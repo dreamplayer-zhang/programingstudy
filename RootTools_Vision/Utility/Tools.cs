@@ -73,8 +73,8 @@ namespace RootTools_Vision
                     roiWidth = outSizeX;
                     roiHeight = outSizeY;
 
-                    samplingX = Math.Floor((double)(int)rect.Width / outSizeX);
-                    samplingY = Math.Floor((double)(int)rect.Height / outSizeY);
+                    samplingX = (double)rect.Width / outSizeX;
+                    samplingY = (double)rect.Height / outSizeY;
                 }
 
 
@@ -149,18 +149,22 @@ namespace RootTools_Vision
                         pG += (int)rect.Left;
                         pB += (int)rect.Left;
 
+                        byte* pRR = pR;
+                        byte* pGG = pG;
+                        byte* pBB = pB;
+
                         for (long i = 0; i <roiHeight ; i++)
                         {
                             for (long j = 0; j < roiWidth; j++)
                             {
-                                pDst[(long)((long)i * (bmpData.Stride) + (long)j * _byteCount + 0)] = *(pB + (long)(j * samplingX));
-                                pDst[(long)((long)i * (bmpData.Stride) + (long)j * _byteCount + 1)] = *(pG + (long)(j * samplingX));
-                                pDst[(long)((long)i * (bmpData.Stride) + (long)j * _byteCount + 2)] = *(pR + (long)(j * samplingX));
+                                pDst[(long)((long)i * (bmpData.Stride) + (long)j * _byteCount + 0)] = *(pRR + (long)(j * samplingX));
+                                pDst[(long)((long)i * (bmpData.Stride) + (long)j * _byteCount + 1)] = *(pGG + (long)(j * samplingX));
+                                pDst[(long)((long)i * (bmpData.Stride) + (long)j * _byteCount + 2)] = *(pBB + (long)(j * samplingX));
                             }
 
-                            pR += (long)(info.Width * samplingY);
-                            pG += (long)(info.Width * samplingY);
-                            pB += (long)(info.Width * samplingY);
+                            pRR = pR + (long)((info.Width * (long)(samplingY * i)));
+                            pGG = pG + (long)((info.Width * (long)(samplingY * i)));
+                            pBB = pB + (long)((info.Width * (long)(samplingY * i)));
                         }
                     }
                 }
@@ -178,7 +182,7 @@ namespace RootTools_Vision
             return null;
         }
 
-        public unsafe static Bitmap CirclarInterpolation(Bitmap bmp, List<List<System.Windows.Point>> polygon, double minRadius, int thickenss,int centerX, int centerY, int outSizeX, int outSizeY)
+        public unsafe static Bitmap CirclarInterpolation(Bitmap bmp, double minRadius, double thickness,int centerX, int centerY, int outSizeX, int outSizeY)
         {
             BitmapData bmpData = bmp.LockBits(new Rectangle(0, 0, bmp.Width, bmp.Height), ImageLockMode.ReadWrite, bmp.PixelFormat);
             IntPtr pointer = bmpData.Scan0;
@@ -194,7 +198,6 @@ namespace RootTools_Vision
                 double preR = 0;
                 double preB = 0;
                 double preG = 0;
-                int thickness = thickenss;
                 for (double t = 0; t < thickness; t+= 1)
                 {
                     for (double angle = 360; angle >= 0; angle -= 0.01)
@@ -204,8 +207,8 @@ namespace RootTools_Vision
                         double y = (double)centerX + ((radius + t) * Math.Cos((double)angle * Math.PI / 180F));
                         double x = (double)centerY + ((radius + t) * Math.Sin((double)angle * Math.PI / 180F));
 
-                        if (x >= outSizeX || y >= outSizeY)
-                            break;
+                        if (x >= outSizeX || y >= outSizeY || y < 0 || x < 0)
+                            continue;
                         double curR = pDst[(long)((long)(y) * (bmpData.Stride) + (long)(x) * byteCount + 0)];
                         double curG = pDst[(long)((long)(y) * (bmpData.Stride) + (long)(x) * byteCount + 1)];
                         double curB = pDst[(long)((long)(y) * (bmpData.Stride) + (long)(x) * byteCount + 2)];
@@ -388,9 +391,13 @@ namespace RootTools_Vision
                                         }
                                     }
                                 }
-                                pDst[(long)((long)(rect[k].Y + i) * (bmpData.Stride) + (long)(rect[k].X + j) * byteCount + 0)] = Convert.ToByte(val1 / cnt1);
-                                pDst[(long)((long)(rect[k].Y + i) * (bmpData.Stride) + (long)(rect[k].X + j) * byteCount + 1)] = Convert.ToByte(val2 / cnt2);
-                                pDst[(long)((long)(rect[k].Y + i) * (bmpData.Stride) + (long)(rect[k].X + j) * byteCount + 2)] = Convert.ToByte(val3 / cnt3);
+                                if(cnt1 != 0)
+                                {
+                                    pDst[(long)((long)(rect[k].Y + i) * (bmpData.Stride) + (long)(rect[k].X + j) * byteCount + 0)] = Convert.ToByte(val1 / cnt1);
+                                    pDst[(long)((long)(rect[k].Y + i) * (bmpData.Stride) + (long)(rect[k].X + j) * byteCount + 1)] = Convert.ToByte(val2 / cnt2);
+                                    pDst[(long)((long)(rect[k].Y + i) * (bmpData.Stride) + (long)(rect[k].X + j) * byteCount + 2)] = Convert.ToByte(val3 / cnt3);
+                                }
+                                
                                 //pDst[(long)((long)(rect[k].Y + i) * (bmpData.Stride) + (long)(rect[k].X + j) * byteCount + 0)];
                             }
                             //pDst[(long)((long)rect[k].X + i * (bmpData.Stride) + (long)j * byteCount + 0)];

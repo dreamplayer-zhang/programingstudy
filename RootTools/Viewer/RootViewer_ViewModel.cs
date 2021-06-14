@@ -1544,6 +1544,41 @@ namespace RootTools
             }
         }
 
+        public virtual unsafe void DrawCircleBitmap(TEllipse circle, byte r, byte g, byte b, byte a, CPoint offset = null)
+        {
+            if (offset == null) offset = new CPoint(0, 0);
+
+            circle.MemoryRect.Left = circle.MemoryRect.Left - offset.X - 1;
+            circle.MemoryRect.Right = circle.MemoryRect.Right - offset.X - 1;
+            circle.MemoryRect.Top = circle.MemoryRect.Top - offset.Y - 1;
+            circle.MemoryRect.Bottom = circle.MemoryRect.Bottom - offset.Y - 1;
+
+            int temp = 0;
+            int[] ptX = new int[2];
+
+            int x0 = circle.MemoryRect.Left + circle.MemoryRect.Width / 2;
+            int y0 = circle.MemoryRect.Top + circle.MemoryRect.Height / 2;
+
+            for (int y = circle.MemoryRect.Top; y < circle.MemoryRect.Bottom + 1; y++)
+            {
+                ptX[0] = (int)Math.Sqrt(Math.Pow(circle.MemoryRect.Width / 2, 2) * (1 - Math.Pow(y - y0, 2) / Math.Pow(circle.MemoryRect.Height / 2, 2))) + x0;
+                ptX[1] = 2 * x0 - ptX[0];
+
+                if (ptX[0] > ptX[1])
+                {
+                    temp = ptX[0];
+                    ptX[0] = ptX[1];
+                    ptX[1] = temp;
+                }
+
+                for (int x = ptX[0]; x <= ptX[1]; x++)
+                {
+                    CPoint pixelPt = new CPoint(x, y);
+                    DrawPixelBitmap(pixelPt, r, g, b, a);
+                }
+            }
+        }
+
         public virtual unsafe void DrawPixelBitmap(CPoint memPt, byte r, byte g, byte b, byte a)
         {
             IntPtr ptrMem = p_ROILayer.GetPtr();
@@ -1556,6 +1591,7 @@ namespace RootTools
             imagePtr[(memPt.Y * p_ROILayer.p_Size.X + memPt.X) * 4 + 2] = r; // r
             imagePtr[(memPt.Y * p_ROILayer.p_Size.X + memPt.X) * 4 + 3] = a; // a
         }
+
         public virtual unsafe void DrawPixelBitmap(byte* imagePtr, CPoint memPt, byte r, byte g, byte b, byte a)
         {
             imagePtr[(memPt.Y * p_ROILayer.p_Size.X + memPt.X) * 4 + 0] = b; // b
@@ -1563,6 +1599,7 @@ namespace RootTools
             imagePtr[(memPt.Y * p_ROILayer.p_Size.X + memPt.X) * 4 + 2] = r; // r
             imagePtr[(memPt.Y * p_ROILayer.p_Size.X + memPt.X) * 4 + 3] = a; // a
         }
+
         public virtual unsafe void DrawPixelBitmap(CPoint memPt, byte value, CPoint offset = null)
         {
             if (offset == null) offset = new CPoint(0, 0);

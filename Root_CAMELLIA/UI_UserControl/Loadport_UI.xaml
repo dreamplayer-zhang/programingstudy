@@ -204,10 +204,10 @@
                                     <Border.Style>
                                         <Style TargetType="Border">
                                             <Style.Triggers>
-                                                <DataTrigger Binding="{Binding p_loadport.m_OHTNew.p_eAccessLP, UpdateSourceTrigger=PropertyChanged}" Value="Auto">
+                                                <DataTrigger Binding="{Binding p_loadport.m_OHTsemi.p_eAccessLP, UpdateSourceTrigger=PropertyChanged}" Value="Auto">
                                                     <Setter Property="Background" Value="Transparent"/>
                                                 </DataTrigger>
-                                                <DataTrigger Binding="{Binding p_loadport.m_OHTNew.p_eAccessLP, UpdateSourceTrigger=PropertyChanged}" Value="Manual">
+                                                <DataTrigger Binding="{Binding p_loadport.m_OHTsemi.p_eAccessLP, UpdateSourceTrigger=PropertyChanged}" Value="Manual">
                                                     <Setter Property="Background" Value="#86ff11"/>
                                                 </DataTrigger>
                                             </Style.Triggers>
@@ -219,10 +219,10 @@
                                     <Border.Style>
                                         <Style TargetType="Border">
                                             <Style.Triggers>
-                                                <DataTrigger Binding="{Binding p_loadport.m_OHTNew.p_eAccessLP, UpdateSourceTrigger=PropertyChanged}" Value="Auto">
+                                                <DataTrigger Binding="{Binding p_loadport.m_OHTsemi.p_eAccessLP, UpdateSourceTrigger=PropertyChanged}" Value="Auto">
                                                     <Setter Property="Background" Value="#86ff11"/>
                                                 </DataTrigger>
-                                                <DataTrigger Binding="{Binding p_loadport.m_OHTNew.p_eAccessLP, UpdateSourceTrigger=PropertyChanged}" Value="Manual">
+                                                <DataTrigger Binding="{Binding p_loadport.m_OHTsemi.p_eAccessLP, UpdateSourceTrigger=PropertyChanged}" Value="Manual">
                                                     <Setter Property="Background" Value="Transparent"/>
                                                 </DataTrigger>
                                             </Style.Triggers>
@@ -306,7 +306,7 @@
                         <Border Margin="5" VerticalAlignment="Center">
                             <StackPanel Orientation="Horizontal">
                                 <TextBlock Text="Loadport State : " TextAlignment="Center"/>
-                                <TextBlock Text="{Binding p_loadport.m_OHTNew.m_carrier.p_eTransfer}" TextAlignment="Center"/>
+                                <TextBlock Text="{Binding p_loadport.m_OHTsemi.m_carrier.p_eTransfer}" TextAlignment="Center"/>
                             </StackPanel>
                         </Border>
                     </Grid>

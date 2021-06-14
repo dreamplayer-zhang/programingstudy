@@ -431,6 +431,12 @@
     <Compile Include="ManualJob\ManualJobSchedule_UI.xaml.cs">
       <DependentUpon>ManualJobSchedule_UI.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UI_Dialog\OHT_UI.xaml.cs">
+      <DependentUpon>OHT_UI.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI_Dialog\OHT_UIs.xaml.cs">
+      <DependentUpon>OHT_UIs.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI_Engineer\Camellia_Recipe_UI.xaml.cs">
       <DependentUpon>Camellia_Recipe_UI.xaml</DependentUpon>
     </Compile>
@@ -620,6 +626,14 @@
     <Page Include="ManualJob\ManualJobSchedule_UI.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI_Dialog\OHT_UI.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI_Dialog\OHT_UIs.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="UI_Engineer\Camellia_Recipe_UI.xaml">
       <SubType>Designer</SubType>

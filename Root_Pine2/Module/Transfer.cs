@@ -129,7 +129,8 @@ namespace Root_Pine2.Module
                 m_transfer.m_pusher.p_bEnable = false;
                 m_transfer.m_gripper.p_bEnable = false; 
                 m_ePosDst = ePos;
-                m_axis.StartMove(ePos, bPushPos ? 0 : m_dPulse); 
+                double dPos = 1000 * (95 - m_transfer.m_pine2.p_widthStrip);
+                m_axis.StartMove(ePos, (bPushPos ? 0 : m_dPulse) + dPos); 
                 return bWait ? m_axis.WaitReady() : "OK";
             }
             #endregion
@@ -137,14 +138,14 @@ namespace Root_Pine2.Module
             #region Width
             public enum eWidth
             {
-                mm70,
-                mm90,
+                mm75,
+                mm95,
             }
             public string RunWidth(double fWidth, bool bWait = true)
             {
-                double f70 = m_axisWidth.GetPosValue(eWidth.mm70);
-                double f90 = m_axisWidth.GetPosValue(eWidth.mm90);
-                double dPos = (f90 - f70) * (fWidth - 70) / 10 + f70;
+                double f75 = m_axisWidth.GetPosValue(eWidth.mm75);
+                double f95 = m_axisWidth.GetPosValue(eWidth.mm95);
+                double dPos = (f95 - f75) * (fWidth - 75) / 20 + f75;
                 m_axisWidth.StartMove(dPos);
                 return bWait ? m_axisWidth.WaitReady() : "OK";
             }
@@ -372,7 +373,6 @@ namespace Root_Pine2.Module
         public Pusher m_pusher = new Pusher();
         #endregion
 
-
         #region RunLoad
         public string StartLoad()
         {
@@ -385,14 +385,14 @@ namespace Root_Pine2.Module
             if (infoStrip == null)
             {
                 if (Run(m_buffer.RunMove(m_magazineEV.m_eMagazineGet, false, true))) return p_sInfo;
-                m_pusher.p_bEnable = true;
-                Thread.Sleep(1000);
+                m_pusher.p_bEnable = (m_pusher.p_infoStrip == null);
+                Thread.Sleep(2000);
                 return m_pusher.WaitUnlock();
             }
             if (Run(m_buffer.RunMove(infoStrip.p_eMagazine, false, false))) return p_sInfo;
             if (Run(m_magazineEV.RunMove(infoStrip))) return p_sInfo;
             if (Run(m_buffer.RunMove(infoStrip.p_eMagazine, false, true))) return p_sInfo;
-            m_pusher.p_bEnable = true; 
+            m_pusher.p_bEnable = (m_pusher.p_infoStrip == null);
             try
             {
                 if (Run(m_gripper.RunGripperReady(Gripper.eGripper.Grip))) return p_sInfo;
@@ -410,6 +410,23 @@ namespace Root_Pine2.Module
         }
         #endregion
 
+        #region RunWaitLoader
+        public string StartWaitLoader()
+        {
+            return StartRun(m_runWaitLoader.Clone());
+        }
+
+        public string RunWaitLoader()
+        {
+            m_gripper.p_bEnable = (m_gripper.p_infoStrip != null);
+            m_pusher.p_bEnable = (m_pusher.p_infoStrip == null); 
+            Thread.Sleep(2000);
+            if (Run(m_gripper.WaitUnlock())) return p_sInfo;
+            if (Run(m_pusher.WaitUnlock())) return p_sInfo;
+            return "OK";
+        }
+        #endregion
+
         #region RunUnload
         public string StartUnload()
         {
@@ -423,7 +440,7 @@ namespace Root_Pine2.Module
             if (Run(m_buffer.RunMove(infoStrip.p_eMagazine, true, false))) return p_sInfo;
             if (Run(m_magazineEV.RunMove(infoStrip))) return p_sInfo;
             if (Run(m_buffer.RunMove(infoStrip.p_eMagazine, true, true))) return p_sInfo;
-            m_gripper.p_bEnable = true;
+            m_gripper.p_bEnable = (m_gripper.p_infoStrip != null);
             if (Run(m_pusher.RunPusher())) return p_sInfo;
             m_magazineEV.PutInfoStrip(infoStrip);
             m_pusher.p_infoStrip = null; 
@@ -436,9 +453,9 @@ namespace Root_Pine2.Module
         {
             if (EQ.p_eState != EQ.eState.Run) return "OK";
             if (m_pine2.p_eMode != Pine2.eRunMode.Magazine) return "OK";
-            if (m_pusher.p_infoStrip != null) StartUnload();
-            if (m_gripper.p_infoStrip == null) StartLoad(); 
-            return "OK"; 
+            if (m_pusher.p_infoStrip != null) return StartUnload();
+            if (m_gripper.p_infoStrip == null) return StartLoad();
+            return StartWaitLoader(); 
         }
 
         public override string StateHome()
@@ -490,6 +507,7 @@ namespace Root_Pine2.Module
         #region ModuleRun
         ModuleRunBase m_runLoad;
         ModuleRunBase m_runUnload;
+        ModuleRunBase m_runWaitLoader; 
         protected override void InitModuleRuns()
         {
             AddModuleRunList(new Run_ChangeWidth(this), false, "Run Change Width");
@@ -498,6 +516,7 @@ namespace Root_Pine2.Module
             AddModuleRunList(new Run_Pusher(this), false, "Run Push Strip");
             m_runLoad = AddModuleRunList(new Run_RunLoad(this), false, "Run Load to Transfer");
             m_runUnload = AddModuleRunList(new Run_RunUnload(this), false, "Run Unload to Magazine");
+            m_runWaitLoader = AddModuleRunList(new Run_WaitLoader(this), false, "Wait Loader");
         }
 
         public class Run_ChangeWidth : ModuleRunBase
@@ -657,6 +676,31 @@ namespace Root_Pine2.Module
             public override string Run()
             {
                 return m_module.RunUnload();
+            }
+        }
+
+        public class Run_WaitLoader : ModuleRunBase
+        {
+            Transfer m_module;
+            public Run_WaitLoader(Transfer module)
+            {
+                m_module = module;
+                InitModuleRun(module);
+            }
+
+            public override ModuleRunBase Clone()
+            {
+                Run_WaitLoader run = new Run_WaitLoader(m_module);
+                return run;
+            }
+
+            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
+            {
+            }
+
+            public override string Run()
+            {
+                return m_module.RunWaitLoader();
             }
         }
         #endregion
