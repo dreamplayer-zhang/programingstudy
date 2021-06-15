@@ -1,8 +1,11 @@
 ﻿using Emgu.CV;
 using Emgu.CV.Structure;
+using LiveCharts;
+using LiveCharts.Wpf;
 using RootTools;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -240,6 +243,80 @@ namespace RootTools_Vision
 				//System.Windows.MessageBox.Show(ee.ToString());
 				return false;
 			}
+		}
+
+		public static ChartValues<float> DataToChartValues(List<float> datas)
+		{
+			ChartValues<float> values = new ChartValues<float>();
+			foreach (float data in datas)
+			{
+				values.Add(data);
+			}
+
+			return values;
+		}
+
+		public static void SaveEBRChartToImage(string filepath, List<float> ebrData, List<float> bevelData)
+		{
+			ChartValues<float> ebr = DataToChartValues(ebrData);
+			ChartValues<float> bevel = DataToChartValues(bevelData);
+
+			Application.Current.Dispatcher.Invoke(delegate
+			{
+				var chart = new LiveCharts.Wpf.CartesianChart
+				{
+					DisableAnimations = true,
+					Width = 800,
+					Height = 400,
+					//AxisY = new AxesCollection
+					//{
+					//	new Axis
+					//	{
+					//		AxisLine = false,
+					//		//MinValue = 0,
+					//	}
+					//}
+				};
+
+				chart.Series.Add(new LineSeries 
+								{ 
+									Values = ebr,
+									Fill = System.Windows.Media.Brushes.Transparent,
+									
+								});
+				chart.Series.Add(new LineSeries 
+								{ 
+									Values = bevel,
+									Fill = System.Windows.Media.Brushes.Transparent,
+								});
+
+				var viewbox = new System.Windows.Controls.Viewbox();
+				viewbox.Child = chart;
+				viewbox.Measure(chart.RenderSize);
+				viewbox.Arrange(new Rect(new System.Windows.Point(0, 0), chart.RenderSize));
+				chart.Update(true, true); //force chart redraw
+				viewbox.UpdateLayout();
+
+				filepath += ".jpg";
+
+				var encoder = new JpegBitmapEncoder();
+				EncodeVisual(chart, filepath, encoder);
+			});
+
+			//chart = null;
+			//viewbox = null;
+			//encoder = null;
+			//bitmap = null;
+			//frame = null;
+		}
+
+		static void EncodeVisual(FrameworkElement visual, string fileName, BitmapEncoder encoder)
+		{
+			var bitmap = new RenderTargetBitmap((int)visual.ActualWidth, (int)visual.ActualHeight, 96, 96, System.Windows.Media.PixelFormats.Pbgra32);
+			bitmap.Render(visual);
+			var frame = BitmapFrame.Create(bitmap);
+			encoder.Frames.Add(frame);
+			using (var stream = File.Create(fileName)) encoder.Save(stream);
 		}
 	}
 }

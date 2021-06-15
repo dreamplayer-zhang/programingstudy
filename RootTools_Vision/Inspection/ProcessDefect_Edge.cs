@@ -62,7 +62,6 @@ namespace RootTools_Vision
 
 			if (processDefectParam.UseMergeDefect)
 			{
-				// merge할 때 각도 (RelY) 값 바뀜
 				topMergeDefectList = Tools.MergeDefect(topDefectList, processDefectParam.MergeDefectDistnace);
 				btmMergeDefectList = Tools.MergeDefect(btmDefectList, processDefectParam.MergeDefectDistnace);
 				sideMergeDefectList = Tools.MergeDefect(sideDefectList, processDefectParam.MergeDefectDistnace);
@@ -84,6 +83,9 @@ namespace RootTools_Vision
 
 			// Top/Side/Btm 별 Defect Merge 후 Index 재정렬
 			mergeDefectList = RearrangeDefectIndex(mergeDefectList);
+			// 각도 계산
+			mergeDefectList = CalculateAngle(mergeDefectList);
+
 			foreach (Defect defect in mergeDefectList)
 				this.currentWorkplace.DefectList.Add(defect);
 
@@ -120,17 +122,6 @@ namespace RootTools_Vision
 								  , topSharedBufferInfo, surfaceParam.EdgeParamBaseTop.StartPosition, surfaceParam.EdgeParamBaseTop.EndPosition
 								  , sideSharedBufferInfo, surfaceParam.EdgeParamBaseSide.StartPosition, surfaceParam.EdgeParamBaseSide.EndPosition
 								  , btmSharedBufferInfo, surfaceParam.EdgeParamBaseBtm.StartPosition, surfaceParam.EdgeParamBaseBtm.EndPosition);
-
-			//if (settings_edgeside.UseKlarf)
-			//{
-			//	KlarfData_Lot klarfData = new KlarfData_Lot();
-			//	Directory.CreateDirectory(settings_edgeside.KlarfSavePath);
-
-			//	klarfData.AddSlot(recipe.WaferMap, mergeDefectList, this.recipe.GetItem<OriginRecipe>());
-			//	klarfData.WaferStart(recipe.WaferMap, DateTime.Now);
-			//	klarfData.SetResultTimeStamp();
-			//	klarfData.SaveKlarf(settings_edgeside.KlarfSavePath, false);
-			//}
 
 			#endregion
 
@@ -210,6 +201,43 @@ namespace RootTools_Vision
 			return MergeDefectList;
 		}
 
+		private List<Defect> CalculateAngle(List<Defect> defectList)
+		{
+			List<Defect> calAngleDefect = new List<Defect>();
+
+			foreach (Defect defect in defectList)
+			{
+				EdgeSurfaceParameterBase param = this.recipe.GetItem<EdgeSurfaceParameter>().EdgeParamBaseTop;
+				int startPosition = param.StartPosition;
+				int endPosition = param.EndPosition;
+
+				if (defect.m_nDefectCode == (int)EdgeSurface.EdgeDefectCode.Top)
+				{
+					param = this.recipe.GetItem<EdgeSurfaceParameter>().EdgeParamBaseTop;
+					startPosition = param.StartPosition;
+					endPosition = param.EndPosition;
+				}
+				else if (defect.m_nDefectCode == (int)EdgeSurface.EdgeDefectCode.Side)
+				{
+					param = this.recipe.GetItem<EdgeSurfaceParameter>().EdgeParamBaseSide;
+					startPosition = param.StartPosition;
+					endPosition = param.EndPosition;
+				}
+				else if (defect.m_nDefectCode == (int)EdgeSurface.EdgeDefectCode.Btm)
+				{
+					param = this.recipe.GetItem<EdgeSurfaceParameter>().EdgeParamBaseBtm;
+					startPosition = param.StartPosition;
+					endPosition = param.EndPosition;
+				}
+
+				double degree = (double)360 / (endPosition - startPosition) * (defect.m_fAbsY + (defect.m_fHeight / 2) - startPosition);
+				defect.m_fRelY = (float)degree;
+				calAngleDefect.Add(defect);
+			}
+
+			return calAngleDefect;
+		}
+
 		private Bitmap MergeEdgesideImages(Defect defect)
 		{
 			SharedBufferInfo topSharedBufferInfo, btmSharedBufferInfo, sideSharedBufferInfo;
@@ -224,7 +252,7 @@ namespace RootTools_Vision
 			// Defect 중심 원본 Image
 			Rect defectRect = defect.GetRect();
 			int imageWidth = this.recipe.GetItem<OriginRecipe>().OriginWidth;
-			int imageHeight = this.recipe.GetItem<EdgeSurfaceParameter>().EdgeParamBaseTop.ROIHeight;			
+			int imageHeight = 500; //this.recipe.GetItem<EdgeSurfaceParameter>().EdgeParamBaseTop.ROIHeight;			
 			int defectImageLeftPt = 0;
 			int defectImageTopPt = (int)(defectRect.Top + (defectRect.Height / 2) - (imageHeight / 2)); //141520;
 			
@@ -330,6 +358,8 @@ namespace RootTools_Vision
 			g.DrawImage(filpTop, 0, 0);
 			g.DrawImage(filpSide, filpTop.Width, 0);
 			g.DrawImage(btmImage, filpTop.Width + filpSide.Width, 0);
+
+			Tools.DrawBitmapText(ref bitmap, "Angle : " + defect.m_fRelY.ToString("F3"), 50, 50, 30, PenColor.RED);
 
 			return bitmap;
 		}
