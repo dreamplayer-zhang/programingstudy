@@ -183,9 +183,9 @@ namespace RootTools_Vision
 							if (pix_y < 500)
 								pix_y = 500;
 
-							view.Data[yy, xx, 0] = ((byte*)ptrMemTop.PtrR_GRAY)[(long)pix_x + (long)pix_y * ptrMemTop.Width];
-							view.Data[yy, xx, 1] = ((byte*)ptrMemTop.PtrG)[(long)pix_x + (long)pix_y * ptrMemTop.Width];
-							view.Data[yy, xx, 2] = ((byte*)ptrMemTop.PtrB)[(long)pix_x + (long)pix_y * ptrMemTop.Width];
+                            view.Data[yy, xx, 0] = ((byte*)ptrMemTop.PtrR_GRAY)[(long)pix_x + (long)pix_y * ptrMemTop.Width];
+                            view.Data[yy, xx, 1] = ((byte*)ptrMemTop.PtrG)[(long)pix_x + (long)pix_y * ptrMemTop.Width];
+                            view.Data[yy, xx, 2] = ((byte*)ptrMemTop.PtrB)[(long)pix_x + (long)pix_y * ptrMemTop.Width];
 						}
 
 						else if (dist < max2 && dist > min2)
@@ -199,10 +199,10 @@ namespace RootTools_Vision
 							if (pix_y < 500)
 								pix_y = 500;
 
-							view.Data[yy, xx, 0] = ((byte*)ptrMemSide.PtrR_GRAY)[(long)pix_x + (long)pix_y * ptrMemSide.Width];
-							view.Data[yy, xx, 1] = ((byte*)ptrMemSide.PtrG)[(long)pix_x + (long)pix_y * ptrMemSide.Width];
-							view.Data[yy, xx, 2] = ((byte*)ptrMemSide.PtrB)[(long)pix_x + (long)pix_y * ptrMemSide.Width];
-						}
+                            view.Data[yy, xx, 0] = ((byte*)ptrMemSide.PtrR_GRAY)[(long)pix_x + (long)pix_y * ptrMemSide.Width];
+                            view.Data[yy, xx, 1] = ((byte*)ptrMemSide.PtrG)[(long)pix_x + (long)pix_y * ptrMemSide.Width];
+                            view.Data[yy, xx, 2] = ((byte*)ptrMemSide.PtrB)[(long)pix_x + (long)pix_y * ptrMemSide.Width];
+                        }
 
 						else if (dist < max3 && dist > min3)
 						{
@@ -215,10 +215,10 @@ namespace RootTools_Vision
 							if (pix_y < 500)
 								pix_y = 500;
 
-							view.Data[yy, xx, 0] = ((byte*)ptrMemBtm.PtrR_GRAY)[(long)pix_x + (long)pix_y * ptrMemBtm.Width];
-							view.Data[yy, xx, 1] = ((byte*)ptrMemBtm.PtrG)[(long)pix_x + (long)pix_y * ptrMemBtm.Width];
-							view.Data[yy, xx, 2] = ((byte*)ptrMemBtm.PtrB)[(long)pix_x + (long)pix_y * ptrMemBtm.Width];
-						}
+                            view.Data[yy, xx, 0] = ((byte*)ptrMemBtm.PtrR_GRAY)[(long)pix_x + (long)pix_y * ptrMemBtm.Width];
+                            view.Data[yy, xx, 1] = ((byte*)ptrMemBtm.PtrG)[(long)pix_x + (long)pix_y * ptrMemBtm.Width];
+                            view.Data[yy, xx, 2] = ((byte*)ptrMemBtm.PtrB)[(long)pix_x + (long)pix_y * ptrMemBtm.Width];
+                        }
 					}
 				}
 

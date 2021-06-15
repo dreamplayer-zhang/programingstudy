@@ -77,7 +77,7 @@ namespace Root_WIND2.UI_User
 				CameraInfo camInfo = DataConverter.GrabModeToCameraInfo(engineer.m_handler.p_EdgeSideVision.GetGrabMode(Recipe.GrabModeIndex));
 				this.CamInfoDataListVM.Init(camInfo);
 
-				CalculateInspectionROI();
+				//CalculateInspectionROI();
 				SetProperty<int>(ref this.selectedGrabModeIndex, value);
 
 				// old - GrabMode

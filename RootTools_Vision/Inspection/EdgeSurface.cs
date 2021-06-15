@@ -105,8 +105,8 @@ namespace RootTools_Vision
 				endPtY = originRecipe.OriginHeight;
 
 			int count = (int)((endPtY - startPtY) / param.ROIHeight);
-			//for (int i = 1; i < 3; i++)
-			Parallel.For(1, count, i =>
+            for (int i = 1; i < 3; i++)
+                //Parallel.For(1, count, i =>
 			{
 				int ptLeft = 0;
 				int ptTop = startPtY + (i * height);
@@ -176,7 +176,7 @@ namespace RootTools_Vision
 				CLR_IP.Cpp_Threshold(diff, thresh, width, height, false, param.Threshold);
 				var label = CLR_IP.Cpp_Labeling(diff, thresh, width, height, true);
 
-				double resolution = this.currentWorkplace.CameraInfo.TargetResX;
+				double resolution = 1; //this.currentWorkplace.CameraInfo.TargetResX;
 				int defectSizeMin = param.DefectSizeMin;
 				int defectSizeMax = param.DefectSizeMax;
 
@@ -212,7 +212,7 @@ namespace RootTools_Vision
 				}
 				#endregion
 			}
-			);
+			//);
 
 			// old
 			/*
