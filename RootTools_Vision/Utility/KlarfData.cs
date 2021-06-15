@@ -457,10 +457,10 @@ namespace RootTools_Vision.Utility
 				builder.Append(_defectdata[i].m_fRelY + " ");
 				builder.Append(_defectdata[i].m_nChipIndexX + " ");
 				builder.Append(_defectdata[i].m_nChipIndexY + " ");
-				builder.Append(_defectdata[i].m_fData + " ");
+				builder.Append(_defectdata[i].m_fData * resolutionX + " ");
 				builder.Append(0 + " ");
-				builder.Append(_defectdata[i].m_fData + " ");
-				builder.Append(_defectdata[i].m_fData + " ");
+				builder.Append(_defectdata[i].m_fData * resolutionX + " ");
+				builder.Append(_defectdata[i].m_fData * resolutionX + " ");
 				builder.Append(0 + " ");
 				builder.Append(0 + " ");
 				builder.Append(0 + " ");
