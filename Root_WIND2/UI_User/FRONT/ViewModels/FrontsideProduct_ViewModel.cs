@@ -241,7 +241,7 @@ namespace Root_WIND2.UI_User
             }
         }
 
-        public ICommand btnToolASCImportCommand
+        public ICommand btnToolFileImportCommand
         {
             get
             {
@@ -249,8 +249,8 @@ namespace Root_WIND2.UI_User
                 {
                     System.Windows.Forms.OpenFileDialog dlg = new System.Windows.Forms.OpenFileDialog();
                     dlg.InitialDirectory = Constants.RootPath.RecipeFrontRootPath;
-                    dlg.Title = "Load ASC File";
-                    dlg.Filter = "ASC file (*.ASC)|*.ASC|MCTxt file (*.txt)|*.txt|CTMap (*.FAB)|*.FAB|ALPSMap (*.Alpsdata)|*.Alpsdata|Text file (*.txt)|*.txt|xml file (*.xml)|*.xml|dat file (*.dat)|*.dat|G85 Map (*.*)|*.*|TSK Map (*.*)|*.*|Klarf file (*.001,*.smf)|*.001;*.smf||";
+                    dlg.Title = "Load File";
+                    dlg.Filter = "ASC file (*.ASC)|*.ASC|MCTxt file (*.txt)|*.txt|CTMap (*.FAB)|*.FAB|ALPSMap (*.Alpsdata)|*.Alpsdata|Text file (*.txt)|*.txt|xml file (*.xml)|*.xml|dat file (*.dat)|*.dat|G85 Map (*.*)|*.*|TSK Map (*.*)|*.*|Klarf file (*.001,*.smf)|*.001;*.smf";
                     if (dlg.ShowDialog() == System.Windows.Forms.DialogResult.OK)
                     {
                         int[] mapdata = new int[0];
@@ -264,7 +264,7 @@ namespace Root_WIND2.UI_User
                         {
                             RecipeType_WaferMap waferMap = GlobalObjects.Instance.Get<RecipeFront>().WaferMap;
                             StreamReader sr = new StreamReader(sFullPath, Encoding.Default);
-                            OpenMapDataMap(sr);
+                            OpenMapDataMap(sr, dlg.FilterIndex);
                         }
                         catch (Exception ex)
                         {
@@ -443,10 +443,17 @@ namespace Root_WIND2.UI_User
             DrawMap();
         }
 
-        public void OpenMapDataMap(StreamReader stdFile)
+        public void OpenMapDataMap(StreamReader stdFile, int filterIndex)
         {
-            OpenMapDataWaferMap(stdFile);
-            ConvertACSMapDataToWaferMap();
+            if (filterIndex == 1) // Read ASC file
+            {
+                OpenASCMapDataWaferMap(stdFile);
+                ConvertACSMapDataToWaferMap();
+            }
+            else if (filterIndex == 10) // Read Klaf file
+            {
+                OpenKlafMapDataWaferMap(stdFile);
+            }
             DrawMap();
         }
 
@@ -626,16 +633,22 @@ namespace Root_WIND2.UI_User
             waferMap.VerticalFlip();
         }
 
-        private void OpenMapDataWaferMap(StreamReader stdFile)
+        private void OpenASCMapDataWaferMap(StreamReader stdFile)
         {
             RecipeType_WaferMap waferMap = GlobalObjects.Instance.Get<RecipeFront>().WaferMap;
-            waferMap.OpenMapData(stdFile);
+            waferMap.OpenASCMapData(stdFile);
         }
 
         private void ConvertACSMapDataToWaferMap()
         {
             RecipeType_WaferMap waferMap = GlobalObjects.Instance.Get<RecipeFront>().WaferMap;
             waferMap.ConvertACSMapDataToWaferMap();
+        }
+
+        private void OpenKlafMapDataWaferMap(StreamReader stdFile)
+        {
+            RecipeType_WaferMap waferMap = GlobalObjects.Instance.Get<RecipeFront>().WaferMap;
+            waferMap.OpenKlafMapData(stdFile);
         }
 
         private CHIP_TYPE GetRecipeChipType(int x, int y)
