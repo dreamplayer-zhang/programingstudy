@@ -3,11 +3,13 @@ using RootTools_CLR;
 using RootTools_Vision.Utility;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Media;
+using static RootTools_Vision.Tools;
 
 namespace RootTools_Vision
 {
@@ -55,7 +57,7 @@ namespace RootTools_Vision
 
 			#region Klarf / Defect Image 저장
 
-			// Klarf에만 표시되는 Data
+			// Klarf에만 표시되는 Data - 이거 이제 필요없는데
 			List<Measurement> realKlarfData = new List<Measurement>();
 			for (int i = 0; i < measureList.Count; i++)
 			{
@@ -67,7 +69,8 @@ namespace RootTools_Vision
 			Settings settings = new Settings();
 			SettingItem_SetupEBR settings_ebr = settings.GetItem<SettingItem_SetupEBR>();
 
-			/*Tools.*/SaveDefectImageParallel(Path.Combine(settings_ebr.MeasureImagePath, sInspectionID)
+            // EBR 측정 이미지 저장
+			SaveDefectImageParallel(Path.Combine(settings_ebr.MeasureImagePath, sInspectionID)
 										, measureList
 										, this.currentWorkplace.SharedBufferInfo
 										, this.currentWorkplace.SharedBufferInfo.ByteCnt
@@ -75,19 +78,20 @@ namespace RootTools_Vision
 
 			// EBR 원형 이미지 저장
 			EBRRecipe recipeParam = this.recipe.GetItem<EBRRecipe>();
-			Tools.SaveCircleImage(Path.Combine(settings_ebr.MeasureImagePath, sInspectionID, (realKlarfData.Count + 1).ToString()), settings_ebr.OutputImageSizeWidth, settings_ebr.OutputImageSizeHeight
-								  , this.currentWorkplace.SharedBufferInfo, recipeParam.FirstNotch, recipeParam.LastNotch);
+			Tools.SaveCircleImage(Path.Combine(settings_ebr.MeasureImagePath, sInspectionID, (realKlarfData.Count + 1).ToString()), settings_ebr.OutputImageSizeWidth, settings_ebr.OutputImageSizeHeight, settings_ebr.Thickness
+                                  , this.currentWorkplace.SharedBufferInfo, recipeParam.FirstNotch, recipeParam.LastNotch);
 
-			//if (settings_ebr.UseKlarf)
-			//{
-			//	KlarfData_Lot klarfData = new KlarfData_Lot();
-			//	Directory.CreateDirectory(settings_ebr.KlarfSavePath);
-
-			//	klarfData.AddSlot(recipe.WaferMap, realKlarfData, this.recipe.GetItem<OriginRecipe>());
-			//	klarfData.WaferStart(recipe.WaferMap, DateTime.Now);
-			//	klarfData.SetResultTimeStamp();
-			//	klarfData.SaveKlarf(settings_ebr.KlarfSavePath, false);
-			//}
+            // Graph 이미지 저장
+            List<float> ebrData = new List<float>();
+            List<float> bevelData = new List<float>();
+            for (int i = 0; i < measureList.Count; i++)
+            {
+                if (measureList[i].m_strMeasureItem == Measurement.EBRMeasureItem.EBR.ToString())
+                    ebrData.Add(measureList[i].m_fData);
+                if (measureList[i].m_strMeasureItem == Measurement.EBRMeasureItem.Bevel.ToString())
+                    bevelData.Add(measureList[i].m_fData);
+            }
+            Tools.SaveEBRChartToImage(Path.Combine(settings_ebr.MeasureImagePath, sInspectionID, (realKlarfData.Count + 2).ToString()), ebrData, bevelData);
 
 			#endregion
             WorkEventManager.OnProcessMeasurementDone(this.currentWorkplace, new ProcessMeasurementDoneEventArgs());
@@ -138,22 +142,24 @@ namespace RootTools_Vision
                 graphics.DrawImage(bitmap, 0, 0);
                 bitmap.Dispose();
 
-                // Rect
                 System.Drawing.Pen pen;
+                int offset = 0;
                 if (measure.m_strMeasureItem == Measurement.EBRMeasureItem.EBR.ToString())
+                {
                     pen = new System.Drawing.Pen(System.Drawing.Color.Red, 3);
+                    offset = 10;
+                }
                 else
                     pen = new System.Drawing.Pen(System.Drawing.Color.Green, 3);
 
-                double resolution = this.currentWorkplace.CameraInfo.TargetResX;
-                int rectStartX = (int)(measure.m_fRelX - (measure.m_fData / resolution));
+                //double resolution = this.currentWorkplace.CameraInfo.TargetResX;
+                int rectStartX = (int)(measure.m_fRelX - (measure.m_fData /*/ resolution*/));
                 int rectWidth = (int)measure.m_fRelX - rectStartX;
-                //int rectHeight = 100;
-				//int rectStartY = (height / 2) - rectHeight;
 				int rectStartY = (height / 2);
+				graphics.DrawLine(pen, rectStartX, rectStartY + offset, rectStartX + rectWidth, rectStartY + offset);
 
-				//graphics.DrawRectangle(pen, rectStartX, rectStartY, rectWidth, rectHeight);
-				graphics.DrawLine(pen, rectStartX, rectStartY, rectStartX + rectWidth, rectStartY);
+                System.Drawing.Font myFont = new System.Drawing.Font(System.Drawing.FontFamily.GenericSansSerif, 100, System.Drawing.FontStyle.Regular, GraphicsUnit.Pixel);
+                graphics.DrawString("Angle : " + measure.m_fAngle.ToString("F3"), myFont, new System.Drawing.SolidBrush(System.Drawing.Color.Red), 100, 100);
 
                 if (System.IO.File.Exists(path + measure.m_nMeasurementIndex + ".bmp"))
                     System.IO.File.Delete(path + measure.m_nMeasurementIndex + ".bmp");
@@ -163,5 +169,5 @@ namespace RootTools_Vision
             //);
         }
         private static object lockObj = new object();
-    }
+	}
 }

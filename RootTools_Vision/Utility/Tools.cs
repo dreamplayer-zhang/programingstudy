@@ -643,12 +643,12 @@ namespace RootTools_Vision
             }
             return brush;
         }
-        void DrawBitmapText(ref Bitmap bit, string text, float x, float y, PenColor penColor = PenColor.ORANGE)
+        public static void DrawBitmapText(ref Bitmap bit, string text, float x, float y, int fontSize = 20, PenColor penColor = PenColor.ORANGE)
         {
             Graphics graphics = Graphics.FromImage(bit);
             Brush brush = GetBrush(penColor);
 
-            System.Drawing.Font myFont = new System.Drawing.Font(FontFamily.GenericSansSerif, 20, System.Drawing.FontStyle.Regular, GraphicsUnit.Pixel);
+            System.Drawing.Font myFont = new System.Drawing.Font(FontFamily.GenericSansSerif, fontSize, System.Drawing.FontStyle.Regular, GraphicsUnit.Pixel);
             graphics.DrawString(text, myFont, brush, x, y);
 
         }

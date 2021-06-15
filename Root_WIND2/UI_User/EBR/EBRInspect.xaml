@@ -117,7 +117,7 @@
                     <TabControl>
                         <TabItem Header="EBR">
                             <Grid Background="White">
-                                <lvc:CartesianChart Series="{Binding EBRGraph}"
+                                <lvc:CartesianChart Series="{Binding EBRGraph.Series}"
                                                             LegendLocation="Top"
                                                             DisableAnimations="true">
 
@@ -127,7 +127,7 @@
 
                         <TabItem Header="Bevel">
                             <Grid Background="White">
-                                <lvc:CartesianChart Series="{Binding BevelGraph}"
+                                <lvc:CartesianChart Series="{Binding BevelGraph.Series}"
                                                             LegendLocation="Top"
                                                             DisableAnimations="true">
                                 </lvc:CartesianChart>

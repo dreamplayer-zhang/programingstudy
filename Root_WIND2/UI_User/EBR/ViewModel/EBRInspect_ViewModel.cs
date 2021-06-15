@@ -18,6 +18,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
+using Point = System.Drawing.Point;
 
 namespace Root_WIND2.UI_User
 {
@@ -32,8 +33,8 @@ namespace Root_WIND2.UI_User
 		}
 
 		#region Measurement Graph
-		private SeriesCollection ebrGraph;
-		public SeriesCollection EBRGraph
+		private CartesianChart ebrGraph;
+		public CartesianChart EBRGraph
 		{
 			get => ebrGraph;
 			set
@@ -102,8 +103,8 @@ namespace Root_WIND2.UI_User
 		public string XTitle { get; set; }
 		public string YTitle { get; set; }
 
-		private SeriesCollection bevelGraph;
-		public SeriesCollection BevelGraph
+		private CartesianChart bevelGraph;
+		public CartesianChart BevelGraph
 		{
 			get => bevelGraph;
 			set
@@ -285,13 +286,54 @@ namespace Root_WIND2.UI_User
 			EBRGraph = null;
 			if (EBRGraph == null)
 			{
+				EBRGraph = new CartesianChart
+				{
+					Series = new SeriesCollection
+					{
+						new LineSeries
+						{
+							Title = "EBR",
+							Fill = System.Windows.Media.Brushes.Transparent,
+						}
+					}
+				};
+			}
+
+			RecipeEBR recipeEBR = GlobalObjects.Instance.Get<RecipeEBR>();
+			EBRParameter parameter = recipeEBR.GetItem<EBRParameter>();
+
+			//int binCount = dataViewerVM.pDataTable.Rows.Count;
+			//XLabels = new string[binCount];
+			//for (int i = 1; i <= binCount; i++)
+			//{
+			//	XLabels[i - 1] = (/*parameter.StepDegree*/10 * i).ToString();
+			//}
+			//YLabel = value => value.ToString("N");
+
+			DataRow[] datas = (DataRow[])dataViewerVM.pDataTable.Select();
+			ChartValues<float> values = new ChartValues<float>();
+			foreach (DataRow table in datas)
+			{
+				if (table[5].ToString() == Measurement.EBRMeasureItem.EBR.ToString())
+				{
+					string data = table[6].ToString();
+					values.Add(float.Parse(data));
+				}
+			}
+			EBRGraph.Series[0].Values = values;
+
+			// old
+			/*
+			EBRGraph = null;
+			if (EBRGraph == null)
+			{
 				EBRGraph = new SeriesCollection
 				{
 					new LineSeries
 					{
-						//Title = "EBR",
+						Title = "EBR",
 						Fill = System.Windows.Media.Brushes.Transparent,
-					},
+					}
 				};
 			}
 
@@ -302,7 +344,7 @@ namespace Root_WIND2.UI_User
 			XLabels = new string[binCount];
 			for (int i = 1; i <= binCount; i++)
 			{
-				XLabels[i - 1] = (/*parameter.StepDegree*/10 * i).ToString();
+				XLabels[i - 1] = (10 * i).ToString();
 			}
 			YLabel = value => value.ToString("N");
 
@@ -317,6 +359,7 @@ namespace Root_WIND2.UI_User
 				}
 			}
 			EBRGraph[0].Values = values;
+			*/
 
 			//if (values != null)
 			//{
@@ -330,12 +373,15 @@ namespace Root_WIND2.UI_User
 			BevelGraph = null;
 			if (BevelGraph == null)
 			{
-				BevelGraph = new SeriesCollection
+				BevelGraph = new CartesianChart
 				{
-					new LineSeries
+					Series = new SeriesCollection
 					{
-						//Title = "EBR",
-						Fill = System.Windows.Media.Brushes.Transparent,
+						new LineSeries
+						{
+							Title = "BEVEL",
+							Fill = System.Windows.Media.Brushes.Transparent,
+						}
 					},
 				};
 			}
@@ -343,13 +389,13 @@ namespace Root_WIND2.UI_User
 			RecipeEBR recipeEBR = GlobalObjects.Instance.Get<RecipeEBR>();
 			EBRParameter parameter = recipeEBR.GetItem<EBRParameter>();
 
-			int binCount = dataViewerVM.pDataTable.Rows.Count;
-			XLabels = new string[binCount];
-			for (int i = 1; i <= binCount; i++)
-			{
-				XLabels[i - 1] = (/*parameter.StepDegree*/10 * i).ToString();
-			}
-			YLabel = value => value.ToString("N");
+			//int binCount = dataViewerVM.pDataTable.Rows.Count;
+			//XLabels = new string[binCount];
+			//for (int i = 1; i <= binCount; i++)
+			//{
+			//	XLabels[i - 1] = (/*parameter.StepDegree*/10 * i).ToString();
+			//}
+			//YLabel = value => value.ToString("N");
 
 			DataRow[] datas = (DataRow[])dataViewerVM.pDataTable.Select();
 			ChartValues<float> values = new ChartValues<float>();
@@ -361,7 +407,7 @@ namespace Root_WIND2.UI_User
 					values.Add(float.Parse(data));
 				}
 			}
-			BevelGraph[0].Values = values;
+			BevelGraph.Series[0].Values = values;
 
 			if (values != null)
 			{

@@ -5,6 +5,7 @@ using RootTools.Control;
 using RootTools.Module;
 using RootTools.Trees;
 using System;
+using System.Threading;
 
 namespace Root_Pine2.Module
 {
@@ -52,9 +53,9 @@ namespace Root_Pine2.Module
             return bWait ? m_axisXZ.p_axisY.WaitReady() : "OK";
         }
 
-        public string RunMoveZ(Vision2D.eVision eVision, Vision2D.eWorks ePos, bool bWait = true)
+        public string RunMoveZ(Vision2D.eVision eVision, Vision2D.eWorks ePos, double dPos, bool bWait = true)
         {
-            m_axisXZ.p_axisY.StartMove(GetPosString(eVision, ePos));
+            m_axisXZ.p_axisY.StartMove(GetPosString(eVision, ePos), -dPos);
             return bWait ? m_axisXZ.p_axisY.WaitReady() : "OK";
         }
 
@@ -89,7 +90,7 @@ namespace Root_Pine2.Module
                 boat.p_infoStrip.m_eWorks = eWorks; 
                 if (Run(RunMoveUp())) return p_sInfo;
                 if (Run(RunMoveX(eVision, eWorks))) return p_sInfo;
-                if (Run(RunMoveZ(eVision, eWorks))) return p_sInfo;
+                if (Run(RunMoveZ(eVision, eWorks, 0))) return p_sInfo;
                 boat.RunVacuum(false);
                 boat.RunBlow(true); 
                 if (Run(m_picker.RunVacuum(true))) return p_sInfo;
@@ -119,7 +120,7 @@ namespace Root_Pine2.Module
             {
                 if (Run(RunMoveUp())) return p_sInfo;
                 if (Run(RunMoveX(Vision2D.eVision.Top2D, eVisionWorks))) return p_sInfo;
-                if (Run(RunMoveZ(Vision2D.eVision.Top2D, eVisionWorks))) return p_sInfo;
+                if (Run(RunMoveZ(Vision2D.eVision.Top2D, eVisionWorks, 0))) return p_sInfo;
                 boat.RunVacuum(true);
                 m_picker.RunVacuum(false);
                 boat.p_infoStrip = m_picker.p_infoStrip;
@@ -157,6 +158,52 @@ namespace Root_Pine2.Module
         }
         #endregion
 
+        #region PickerSet
+        double m_mmPickerSetUp = 10;
+        double m_secPickerSet = 7;
+        public string RunPickerSet()
+        {
+            StopWatch sw = new StopWatch();
+            long msPickerSet = (long)(1000 * m_secPickerSet);
+            try
+            {
+                if (Run(RunMoveUp())) return p_sInfo;
+                if (Run(RunMoveX(Vision2D.eVision.Top3D, Vision2D.eWorks.A))) return p_sInfo; 
+                while (true)
+                {
+                    if (Run(RunMoveZ(Vision2D.eVision.Top3D, Vision2D.eWorks.A, 0))) return p_sInfo;
+                    if (Run(m_picker.RunVacuum(false))) return p_sInfo;
+                    double sec = 0;
+                    if (Run(m_pine2.WaitPickerSet(ref sec))) return p_sInfo;
+                    if (Run(m_picker.RunVacuum(true))) return p_sInfo;
+                    if (Run(RunMoveZ(Vision2D.eVision.Top3D, Vision2D.eWorks.A, 1000 * m_mmPickerSetUp))) return p_sInfo;
+                    Thread.Sleep(200);
+                    m_pine2.p_diPickerSet = false;
+                    if (m_picker.IsVacuum())
+                    {
+                        sw.Start();
+                        while (sw.ElapsedMilliseconds < msPickerSet)
+                        {
+                            Thread.Sleep(10);
+                            if (EQ.IsStop()) return "EQ Stop";
+                            if (m_pine2.p_diPickerSet) return "OK";
+                        }
+                    }
+                }
+            }
+            finally
+            {
+                RunMoveUp();
+            }
+        }
+
+        void RunTreePickerSet(Tree tree)
+        {
+            m_mmPickerSetUp = tree.Set(m_mmPickerSetUp, m_mmPickerSetUp, "Picker Up", "Picker Up (mm)");
+            m_secPickerSet = tree.Set(m_secPickerSet, m_secPickerSet, "Done", "PickerSet Done Time (sec)");
+        }
+        #endregion
+        
         #region override
         public override string StateReady()
         {
@@ -224,6 +271,7 @@ namespace Root_Pine2.Module
         {
             base.RunTree(tree);
             m_picker.RunTreeVacuum(tree.GetTree("Vacuum"));
+            RunTreePickerSet(tree.GetTree("PickerSet"));
         }
         #endregion
 
@@ -254,6 +302,7 @@ namespace Root_Pine2.Module
             m_runLoad = AddModuleRunList(new Run_Load(this), true, "Load Strip from Boat");
             m_runUnload = AddModuleRunList(new Run_Unload(this), true, "Unload Strip to Boat");
             m_runUnloadTurnover = AddModuleRunList(new Run_UnloadTurnover(this), true, "Unload Strip to Turnover");
+            AddModuleRunList(new Run_PickerSet(this), false, "Picker Set");
         }
 
         public class Run_Load : ModuleRunBase
@@ -337,6 +386,31 @@ namespace Root_Pine2.Module
             public override string Run()
             {
                 return m_module.RunUnloadTurnover(); 
+            }
+        }
+
+        public class Run_PickerSet : ModuleRunBase
+        {
+            Loader1 m_module;
+            public Run_PickerSet(Loader1 module)
+            {
+                m_module = module;
+                InitModuleRun(module);
+            }
+
+            public override ModuleRunBase Clone()
+            {
+                Run_PickerSet run = new Run_PickerSet(m_module);
+                return run;
+            }
+
+            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
+            {
+            }
+
+            public override string Run()
+            {
+                return m_module.RunPickerSet();
             }
         }
         #endregion
