@@ -63,8 +63,7 @@ namespace RootTools_Vision
                 int roiWidth = (int)rect.Width;
                 int roiHeight = (int)rect.Height;
 
-                int centerOffsetX = centerX - (outSizeX / 2);
-                int centerOffsetY = centerY - (outSizeY / 2);
+                
 
                 double samplingX = 1;
                 double samplingY = 1;
@@ -79,6 +78,8 @@ namespace RootTools_Vision
                     samplingX = (double)rect.Width / outSizeX;
                     samplingY = (double)rect.Height / outSizeY;
                 }
+                int centerOffsetX = (int)(centerX / samplingX) - (outSizeX / 2);
+                int centerOffsetY = (int)(centerY / samplingY) - (outSizeY / 2);
 
 
                 System.Drawing.Imaging.PixelFormat format = System.Drawing.Imaging.PixelFormat.Format8bppIndexed;
@@ -121,16 +122,9 @@ namespace RootTools_Vision
 
                     for (int i = 0; i < h; i++)
                     {
-                        //Marshal.Copy(info.PtrR_GRAY + (int)((i + rect.Top) * info.Width + rect.Left), ptr, (int)(i * _width),(int)rect.Width );                        
                         CopyMemory(pointer + (i * bmpData.Stride), info.PtrR_GRAY + +(int)((i + rect.Top) * info.Width + rect.Left), (uint)rect.Width);
                     }
 
-                    
-                    //for (int i = 0; i < _height; i++)
-                    //{
-                    //    Buffer.MemoryCopy(info.PtrList[0].ToPointer()[i * _width], pointer.ToPointer()[i * bmpData.Stride], bmpData.Stride, bmpData.Stride);
-                    //    //CopyMemory(info.PtrR_GRAY + i * _width, pointer + i * bmpData.Stride, (uint)_width);
-                    //}
                 }
                 else if (_byteCount == 3)
                 {
@@ -148,9 +142,9 @@ namespace RootTools_Vision
                             pB += info.Width;
                         }
 
-                        pR += (int)rect.Left + centerOffsetX;
-                        pG += (int)rect.Left + centerOffsetX;
-                        pB += (int)rect.Left + centerOffsetX;
+                        pR += (int)rect.Left;
+                        pG += (int)rect.Left;
+                        pB += (int)rect.Left;
 
                         byte* pRR = pR;
                         byte* pGG = pG;
@@ -160,14 +154,14 @@ namespace RootTools_Vision
                         {
                             for (long j = 0; j < roiWidth; j++)
                             {
-                                pDst[(long)((long)i * (bmpData.Stride) + (long)j * _byteCount + 2)] = *(pRR + (long)(j * samplingX));
-                                pDst[(long)((long)i * (bmpData.Stride) + (long)j * _byteCount + 1)] = *(pGG + (long)(j * samplingX));
-                                pDst[(long)((long)i * (bmpData.Stride) + (long)j * _byteCount + 0)] = *(pBB + (long)(j * samplingX));
+                                pDst[(long)((long)i * (bmpData.Stride) + (long)j * _byteCount + 2)] = *(pRR + (long)((j + centerOffsetX) * samplingX));
+                                pDst[(long)((long)i * (bmpData.Stride) + (long)j * _byteCount + 1)] = *(pGG + (long)((j + centerOffsetX) * samplingX));
+                                pDst[(long)((long)i * (bmpData.Stride) + (long)j * _byteCount + 0)] = *(pBB + (long)((j + centerOffsetX) * samplingX));
                             }
 
-                            pRR = pR + (long)((info.Width * (long)((samplingY * i) + centerOffsetY)));
-                            pGG = pG + (long)((info.Width * (long)((samplingY * i) + centerOffsetY)));
-                            pBB = pB + (long)((info.Width * (long)((samplingY * i) + centerOffsetY)));
+                            pRR = pR + (long)(info.Width * (long)(samplingY * (i + centerOffsetY)));
+                            pGG = pG + (long)(info.Width * (long)(samplingY * (i + centerOffsetY)));
+                            pBB = pB + (long)(info.Width * (long)(samplingY * (i + centerOffsetY)));
                         }
                     }
                 }

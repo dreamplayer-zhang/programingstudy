@@ -1191,6 +1191,7 @@ namespace RootTools_Vision.Utility
 			edge.MakeTransparent(Color.Black);
 
 			Bitmap back = new Bitmap(Image.FromFile(klarfFileName + ".jpg"));
+			//Bitmap back = new Bitmap(Image.FromFile(@"D:\backside" + ".jpg"));
 			back.MakeTransparent(Color.Black);
 			
 			Bitmap outputImage = new Bitmap(edge.Width, edge.Height);
@@ -1215,13 +1216,9 @@ namespace RootTools_Vision.Utility
             Graphics gp = Graphics.FromImage(bmp);
             Brush brush = new SolidBrush(Color.Black);
 
-			
-
 			double resizeRatioX = (outSizeX / rect.Width);
             double resizeRatioY = (outSizeY / rect.Height);
 
-            //float ratioX = (float)(centerX % 1000);
-            //float ratioY = (float)(centerY % 1000);
             double resizeWaferSizeX = waferSizeX * resizeRatioX;
             double resizeWaferSizeY = waferSizeY * resizeRatioY;
 
@@ -1253,7 +1250,7 @@ namespace RootTools_Vision.Utility
 
 
             GraphicsPath path = new GraphicsPath();
-            path.AddEllipse((float)(1500 - (resizeWaferSizeX / 2)), (float)(1500 - (resizeWaferSizeY / 2)), (float)resizeWaferSizeX, (float)resizeWaferSizeY);
+            path.AddEllipse((float)((outSizeX / 2) - (resizeWaferSizeX / 2)), (float)((outSizeY / 2) - (resizeWaferSizeY / 2)), (float)resizeWaferSizeX, (float)resizeWaferSizeY);
             Region region = new Region(path);
             gp.ExcludeClip(region);
             gp.FillRectangle(new SolidBrush(Color.Black), 0, 0, outSizeX, outSizeY);
@@ -1266,14 +1263,9 @@ namespace RootTools_Vision.Utility
 			Bitmap outputImage = new Bitmap(bmp.Width, bmp.Height);
 			Graphics gpOutput = Graphics.FromImage(outputImage);
 			gpOutput.DrawImage(bmp, -((sizeX * ratioX) / 2), -((sizeY * ratioY) / 2), outSizeX + (sizeX * ratioX), outSizeY + (sizeY * ratioY));
-			//gpOutput.DrawImage(bmp, (float)-(sizeX * ratioX), (float)-(sizeY * ratioY), (float)(outSizeX - (-(sizeX * ratioX) * 2)), (float)(outSizeY - (-(sizeY * ratioY) * 2)));
 
-			Tools.SaveImageJpg(outputImage, "D:\\backside.jpg", compressRatio); 
+			Tools.SaveImageJpg(outputImage, klarfFileName + ".jpg", compressRatio); 
 
-
-
-			//Tools.SaveImageJpg(bmp,"D:\\backside.jpg", compressRatio);
-            //Tools.SaveImageJpg(bmp, this.klarfFileName + ".jpg", compressRatio);
 
              return true;
         }
