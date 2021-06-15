@@ -118,7 +118,7 @@ namespace RootTools_Vision
 
 			// EDGE 전체 원형 이미지 저장
 			EdgeSurfaceParameter surfaceParam = this.recipe.GetItem<EdgeSurfaceParameter>();
-			Tools.SaveEdgeCircleImage(Path.Combine(settings_edgeside.DefectImagePath, sInspectionID, (mergeDefectList.Count + 1).ToString()), settings_edgeside.OutputImageSizeWidth, settings_edgeside.OutputImageSizeHeight 
+			Tools.SaveEdgeCircleImage(Path.Combine(settings_edgeside.DefectImagePath, sInspectionID, (mergeDefectList.Count + 1).ToString()), settings_edgeside.OutputImageSizeWidth, settings_edgeside.OutputImageSizeHeight, settings_edgeside.Thickness
 								  , topSharedBufferInfo, surfaceParam.EdgeParamBaseTop.StartPosition, surfaceParam.EdgeParamBaseTop.EndPosition
 								  , sideSharedBufferInfo, surfaceParam.EdgeParamBaseSide.StartPosition, surfaceParam.EdgeParamBaseSide.EndPosition
 								  , btmSharedBufferInfo, surfaceParam.EdgeParamBaseBtm.StartPosition, surfaceParam.EdgeParamBaseBtm.EndPosition);
