@@ -190,6 +190,8 @@ namespace Root_WIND2.Module
                        settings_backside.OutputImageSizeY, polygon, (int)(settings_backside.SaveWaferSize * 1000 / m_grabMode.m_dRealResX_um), (int)(settings_backside.SaveWaferSize * 1000 / m_grabMode.m_dRealResY_um),
                        backRecipe.CenterX,
                        backRecipe.CenterY);
+
+                    klarfData.SaveImageJpgMerge(settings_backside.SaveWaferSize);
                 }
 
                 #endregion
@@ -200,8 +202,8 @@ namespace Root_WIND2.Module
                 (infoWafer._eWaferOrder == InfoWafer.eWaferOrder.LastWafer)))
                 LotEnd(infoWafer);
 
-
-                inspectionTimeWatcher.Stop();
+           
+            inspectionTimeWatcher.Stop();
             RootTools_Vision.TempLogger.Write("Inspection", string.Format("{0:F3}", (double)inspectionTimeWatcher.ElapsedMilliseconds / (double)1000));
 
             return "OK";

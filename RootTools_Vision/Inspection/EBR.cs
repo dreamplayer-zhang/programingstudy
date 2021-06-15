@@ -49,8 +49,8 @@ namespace RootTools_Vision
 			int width = originRecipe.OriginWidth;
 			int height = param.ROIHeight;
 
-			int stepDegree = (int)((360 - param.NotchOffsetDegree) / param.MeasureCount);
-			int stepDegreeHeight = stepDegree * bufferHeightPerDegree;
+			double stepDegree = (360 - param.NotchOffsetDegree) / param.MeasureCount;
+			int stepDegreeHeight = (int)stepDegree * bufferHeightPerDegree;
 			int notchOffsetHeight = (int)(param.NotchOffsetDegree * bufferHeightPerDegree);
 
 			for (int i = 0; i < param.MeasureCount; i++)
@@ -58,7 +58,9 @@ namespace RootTools_Vision
 				int posY = firstNotch + notchOffsetHeight + (stepDegreeHeight * (i + 1)) - (height / 2);
 				int[] arrDiff;
 				arrDiff = GetDiffArr(this.currentWorkplace.SharedBufferInfo.PtrR_GRAY, 0, posY, width, height);
-				FindEdge(arrDiff, 0, posY, width, height);
+
+				double angle = stepDegree * (i + 1);
+				FindEdge(arrDiff, 0, posY, width, height, angle);
 			}
 
 			// old
@@ -152,7 +154,7 @@ namespace RootTools_Vision
 			return arrDiff;
 		}
 
-		private void FindEdge(int[] arrDiff, int left, int top, int width, int height)
+		private void FindEdge(int[] arrDiff, int left, int top, int width, int height, double angle)
 		{
 			EBRParameter param = recipe.GetItem<EBRParameter>();
 
@@ -178,10 +180,10 @@ namespace RootTools_Vision
 								"EDGE",
 								Measurement.MeasureType.EBR,
 								Measurement.EBRMeasureItem.Bevel,
-								(float)((waferEdgeX - bevelX) * resolution),
+								(float)((waferEdgeX - bevelX)),
 								width,
 								height,
-								CalculateAngle(this.currentWorkplace.Index),
+								(float)angle,
 								left,
 								top,
 								this.currentWorkplace.MapIndexX,
@@ -192,15 +194,15 @@ namespace RootTools_Vision
 								"EDGE",
 								Measurement.MeasureType.EBR,
 								Measurement.EBRMeasureItem.EBR,
-								(float)((waferEdgeX - ebrX) * resolution),
+								(float)((waferEdgeX - ebrX)),
 								width,
 								height,
-								CalculateAngle(this.currentWorkplace.Index),
+								(float)angle,
 								left,
 								top,
 								this.currentWorkplace.MapIndexX,
 								this.currentWorkplace.MapIndexY,
-								bevelX);
+								waferEdgeX);
 		}
 
 		private void FindEdge(int[] arrDiff)

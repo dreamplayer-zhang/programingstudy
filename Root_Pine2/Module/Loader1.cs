@@ -168,6 +168,7 @@ namespace Root_Pine2.Module
             try
             {
                 if (Run(RunMoveUp())) return p_sInfo;
+                if (Run(RunMoveX(Vision2D.eVision.Top3D, Vision2D.eWorks.A))) return p_sInfo; 
                 while (true)
                 {
                     if (Run(RunMoveZ(Vision2D.eVision.Top3D, Vision2D.eWorks.A, 0))) return p_sInfo;
@@ -202,6 +203,7 @@ namespace Root_Pine2.Module
             m_secPickerSet = tree.Set(m_secPickerSet, m_secPickerSet, "Done", "PickerSet Done Time (sec)");
         }
         #endregion
+        
         #region override
         public override string StateReady()
         {

@@ -213,6 +213,11 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Dialog\Dialog_MapCreator.xaml.cs">
+      <DependentUpon>Dialog_MapCreator.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Dialog\Dialog_MapCreator_ImageViewer_ViewModel.cs" />
+    <Compile Include="Dialog\Dialog_MapCreator_ViewModel.cs" />
     <Compile Include="Recipe\RecipeAlign.cs" />
     <Compile Include="Tools\Constants.cs" />
     <Compile Include="Controls\UserControl\ColorPicker.xaml.cs">
@@ -583,6 +588,10 @@
     <Page Include="Controls\UserControl\LoadingBlock.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialog\Dialog_MapCreator.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="ManualJob\ManualJobSchedule_UI.xaml">
       <Generator>MSBuild:Compile</Generator>

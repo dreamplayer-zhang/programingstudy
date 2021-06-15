@@ -105,8 +105,8 @@ namespace RootTools_Vision
 				endPtY = originRecipe.OriginHeight;
 
 			int count = (int)((endPtY - startPtY) / param.ROIHeight);
-			//for (int i = 1; i < 3; i++)
-			Parallel.For(1, count, i =>
+            for (int i = 1; i < 3; i++)
+                //Parallel.For(1, count, i =>
 			{
 				int ptLeft = 0;
 				int ptTop = startPtY + (i * height);
@@ -176,7 +176,7 @@ namespace RootTools_Vision
 				CLR_IP.Cpp_Threshold(diff, thresh, width, height, false, param.Threshold);
 				var label = CLR_IP.Cpp_Labeling(diff, thresh, width, height, true);
 
-				double resolution = this.currentWorkplace.CameraInfo.TargetResX;
+				double resolution = 1; //this.currentWorkplace.CameraInfo.TargetResX;
 				int defectSizeMin = param.DefectSizeMin;
 				int defectSizeMax = param.DefectSizeMax;
 
@@ -190,21 +190,20 @@ namespace RootTools_Vision
 					{
 						int defectLeft = ptLeft + label[l].boundLeft;
 						int defectTop = ptTop + label[l].boundTop;
-						int defectWidth = Math.Abs(label[l].boundRight - label[l].boundLeft);
-						int defectHeight = Math.Abs(label[l].boundBottom - label[l].boundTop);
-
-						double degree = (double)360 / (param.EndPosition - param.StartPosition) * (defectTop + defectHeight / 2 - ptTop);
+						//int defectWidth = Math.Abs(label[l].boundRight - label[l].boundLeft);
+						//int defectHeight = Math.Abs(label[l].boundBottom - label[l].boundTop);
+						//double degree = (double)360 / (param.EndPosition - param.StartPosition) * (defectTop + defectHeight / 2 - ptTop);
 
 						this.currentWorkplace.AddDefect(sInspectionID,
 							(int)defectCode /*10000 + (channelIndex * 100)*/,
 							(float)(label[l].area * resolution),
 							label[l].value,
 							0,
-							(float)degree,
+							0,
 							defectLeft,
 							defectTop,
-							(float)(defectWidth * resolution),
-							(float)(defectHeight * resolution),
+							(float)label[l].width,
+							(float)label[l].height,
 							this.currentWorkplace.MapIndexX,
 							this.currentWorkplace.MapIndexY
 							);
@@ -212,7 +211,7 @@ namespace RootTools_Vision
 				}
 				#endregion
 			}
-			);
+			//);
 
 			// old
 			/*

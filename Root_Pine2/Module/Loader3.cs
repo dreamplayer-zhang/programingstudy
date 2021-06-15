@@ -24,6 +24,7 @@ namespace Root_Pine2.Module
 
         public enum ePosTransfer
         {
+            Transfer0,
             Transfer1,
             Transfer2,
             Transfer3,
@@ -31,10 +32,10 @@ namespace Root_Pine2.Module
             Transfer5,
             Transfer6,
             Transfer7,
-            Transfer8,
         }
         public enum ePosTray
         {
+            Tray0,
             Tray1,
             Tray2,
             Tray3,
@@ -42,7 +43,6 @@ namespace Root_Pine2.Module
             Tray5,
             Tray6,
             Tray7,
-            Tray8,
         }
         void InitPosition()
         {
@@ -439,7 +439,7 @@ namespace Root_Pine2.Module
                 InitModuleRun(module);
             }
 
-            public ePosTransfer m_ePos = ePosTransfer.Transfer1;
+            public ePosTransfer m_ePos = ePosTransfer.Transfer0;
             public override ModuleRunBase Clone()
             {
                 Run_UnloadTransfer run = new Run_UnloadTransfer(m_module);
@@ -467,7 +467,7 @@ namespace Root_Pine2.Module
                 InitModuleRun(module);
             }
 
-            public ePosTray m_ePos = ePosTray.Tray1; 
+            public ePosTray m_ePos = ePosTray.Tray0; 
             public override ModuleRunBase Clone()
             {
                 Run_UnloadTray run = new Run_UnloadTray(m_module);

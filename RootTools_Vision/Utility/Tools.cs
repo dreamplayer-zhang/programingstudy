@@ -53,7 +53,7 @@ namespace RootTools_Vision
             return dst;
         }
               
-        public unsafe static Bitmap CovertBufferToBitmap(SharedBufferInfo info, Rect rect, int outSizeX = 0, int outSizeY = 0)
+        public unsafe static Bitmap CovertBufferToBitmap(SharedBufferInfo info, Rect rect, int outSizeX = 0, int outSizeY = 0, int centerX = 0, int centerY = 0)
         {
             try
             {
@@ -63,6 +63,9 @@ namespace RootTools_Vision
 
                 int roiWidth = (int)rect.Width;
                 int roiHeight = (int)rect.Height;
+
+                int centerOffsetX = centerX - (outSizeX / 2);
+                int centerOffsetY = centerY - (outSizeY / 2);
 
                 double samplingX = 1;
                 double samplingY = 1;
@@ -146,9 +149,9 @@ namespace RootTools_Vision
                             pB += info.Width;
                         }
 
-                        pR += (int)rect.Left;
-                        pG += (int)rect.Left;
-                        pB += (int)rect.Left;
+                        pR += (int)rect.Left + centerOffsetX;
+                        pG += (int)rect.Left + centerOffsetX;
+                        pB += (int)rect.Left + centerOffsetX;
 
                         byte* pRR = pR;
                         byte* pGG = pG;
@@ -163,14 +166,14 @@ namespace RootTools_Vision
                                 pDst[(long)((long)i * (bmpData.Stride) + (long)j * _byteCount + 0)] = *(pBB + (long)(j * samplingX));
                             }
 
-                            pRR = pR + (long)((info.Width * (long)(samplingY * i)));
-                            pGG = pG + (long)((info.Width * (long)(samplingY * i)));
-                            pBB = pB + (long)((info.Width * (long)(samplingY * i)));
+                            pRR = pR + (long)((info.Width * (long)((samplingY * i) + centerOffsetY)));
+                            pGG = pG + (long)((info.Width * (long)((samplingY * i) + centerOffsetY)));
+                            pBB = pB + (long)((info.Width * (long)((samplingY * i) + centerOffsetY)));
                         }
                     }
                 }
 
-
+                
 
                 bmp.UnlockBits(bmpData);
 
@@ -779,12 +782,12 @@ namespace RootTools_Vision
             }
             return brush;
         }
-        void DrawBitmapText(ref Bitmap bit, string text, float x, float y, PenColor penColor = PenColor.ORANGE)
+        public static void DrawBitmapText(ref Bitmap bit, string text, float x, float y, int fontSize = 20, PenColor penColor = PenColor.ORANGE)
         {
             Graphics graphics = Graphics.FromImage(bit);
             Brush brush = GetBrush(penColor);
 
-            System.Drawing.Font myFont = new System.Drawing.Font(FontFamily.GenericSansSerif, 20, System.Drawing.FontStyle.Regular, GraphicsUnit.Pixel);
+            System.Drawing.Font myFont = new System.Drawing.Font(FontFamily.GenericSansSerif, fontSize, System.Drawing.FontStyle.Regular, GraphicsUnit.Pixel);
             graphics.DrawString(text, myFont, brush, x, y);
 
         }
