@@ -336,7 +336,7 @@ namespace Root_WIND2.UI_User
 
         public FrontsideProduct_ViewModel()
         {
-            chipItems = new ObservableCollection<Rectangle>();
+            chipItems = new ObservableCollection<UIElement>();
 
             this.camInfoDataListVM = new DataListView_ViewModel();
         }
@@ -358,14 +358,14 @@ namespace Root_WIND2.UI_User
         }
 
         #region [Properties]
-        private ObservableCollection<Rectangle> chipItems;
+        private ObservableCollection<UIElement> chipItems;
 
-        public ObservableCollection<Rectangle> ChipItems
+        public ObservableCollection<UIElement> ChipItems
         {
             get => this.chipItems;
             set
             {
-                SetProperty<ObservableCollection<Rectangle>>(ref this.chipItems, value);
+                SetProperty<ObservableCollection<UIElement>>(ref this.chipItems, value);
             }
         }
 
@@ -473,8 +473,20 @@ namespace Root_WIND2.UI_User
                         Rectangle rect = new Rectangle();
                         rect.Width = chipWidth;
                         rect.Height = chipHeight;
+
+                        TextBlock tb = new TextBlock();
+                        tb.FontSize = (int)(0.7 * Math.Min(chipWidth, chipHeight));
+                        tb.FontWeight = FontWeights.UltraBold;
+                        tb.Width = chipWidth;
+                        tb.Height = chipHeight;
+                        tb.TextAlignment = TextAlignment.Center;
+                        tb.Padding = new Thickness(0, (int)((chipHeight - tb.FontSize) / 2), 0, 0);
+
                         Canvas.SetLeft(rect, originPt.X + (chipWidth * (x + 1)));
                         Canvas.SetTop(rect, originPt.Y + (chipHeight * (y + 1)));
+
+                        Canvas.SetLeft(tb, originPt.X + (chipWidth * (x + 1)));
+                        Canvas.SetTop(tb, originPt.Y + (chipHeight * (y + 1)));
 
                         rect.Tag = new CPoint(x + 1, y + 1);
                         rect.Stroke = Brushes.Transparent;
@@ -487,11 +499,11 @@ namespace Root_WIND2.UI_User
 
                             if (x == -1 && y != -1)
                             {
-                                rect.ToolTip = string.Format("{0}", y + 1); // row index
+                                tb.Text = string.Format("{0}", y + 1); // row index
                             }
                             else if (x != -1 && y == -1)
                             {
-                                rect.ToolTip = string.Format("{0}", x + 1); // column index
+                                tb.Text = string.Format("{0}", x + 1); // column index
                             }
                         }
                         else
@@ -508,8 +520,11 @@ namespace Root_WIND2.UI_User
                             rect.MouseLeftButtonDown += ChipMouseLeftButtonDown;
                             rect.MouseMove += ChipMouseMove;
                         }
-                        Canvas.SetZIndex(rect, 99);
+                        Canvas.SetZIndex(rect, 98);
+                        Canvas.SetZIndex(tb, 99);
                         ChipItems.Add(rect);
+                        if (tb.Text != "")
+                            ChipItems.Add(tb);
                     }
                 }
             }
