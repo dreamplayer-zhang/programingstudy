@@ -155,9 +155,8 @@
                     <Button Content="Create Map" Command="{Binding CreateMapCommand}" Width ="378" Style="{StaticResource groupbox_button}"/>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                    <Button Content="Chip Finder" Command="{Binding OpenChipFinderCommand}" Width ="184" Style="{StaticResource groupbox_button}"/>
-                    <Button Content="Chip Editor" Command="{Binding OpenChipEditorCommand}" Width ="184" Style="{StaticResource groupbox_button}"/>
-                </StackPanel>
+                    <Button Content="Map Creator" Command="{Binding OpenMapCreatorCommand}" Width ="378" Style="{StaticResource groupbox_button}"/>
+                    </StackPanel>
                 </StackPanel>
         </GroupBox>
         <GroupBox Grid.Row="1"
