@@ -1248,10 +1248,13 @@ namespace RootTools_Vision.Utility
 
             }
 
-            Tools.CirclarInterpolation(bmp, shortLength - 100, longLength, (int)reSizeCenterX, (int)reSizeCenterY, outSizeX, outSizeY);
+			int outImageCenterX = outSizeX / 2;
+			int outImageCenterY = outSizeY / 2;
+
+			Tools.CirclarInterpolation(bmp, shortLength - 100, longLength, (int)reSizeCenterX, (int)reSizeCenterY, outSizeX, outSizeY);
 
             GraphicsPath path = new GraphicsPath();
-            path.AddEllipse((float)(1500 - (resizeWaferSizeX / 2)), (float)(1500 - (resizeWaferSizeY / 2)), (float)resizeWaferSizeX, (float)resizeWaferSizeY);
+            path.AddEllipse((float)(outImageCenterX - (resizeWaferSizeX / 2)), (float)(outImageCenterY - (resizeWaferSizeY / 2)), (float)resizeWaferSizeX, (float)resizeWaferSizeY);
             Region region = new Region(path);
             gp.ExcludeClip(region);
             gp.FillRectangle(new SolidBrush(Color.Black), 0, 0, outSizeX, outSizeY);
@@ -1264,16 +1267,14 @@ namespace RootTools_Vision.Utility
 			Bitmap outputImage = new Bitmap(bmp.Width, bmp.Height);
 			Graphics gpOutput = Graphics.FromImage(outputImage);
 			gpOutput.DrawImage(bmp, -((sizeX * ratioX) / 2), -((sizeY * ratioY) / 2), outSizeX + (sizeX * ratioX), outSizeY + (sizeY * ratioY));
-			//gpOutput.DrawImage(bmp, (float)-(sizeX * ratioX), (float)-(sizeY * ratioY), (float)(outSizeX - (-(sizeX * ratioX) * 2)), (float)(outSizeY - (-(sizeY * ratioY) * 2)));
+            //gpOutput.DrawImage(bmp, (float)-(sizeX * ratioX), (float)-(sizeY * ratioY), (float)(outSizeX - (-(sizeX * ratioX) * 2)), (float)(outSizeY - (-(sizeY * ratioY) * 2)));
 
-			Tools.SaveImageJpg(outputImage, "D:\\backside.jpg", compressRatio); 
+            //Tools.SaveImageJpg(outputImage, "D:\\backside.jpg", compressRatio); 
+            //Tools.SaveImageJpg(bmp,"D:\\backside.jpg", compressRatio);
 
+            Tools.SaveImageJpg(outputImage, this.klarfFileName + ".jpg", compressRatio);
 
-
-			//Tools.SaveImageJpg(bmp,"D:\\backside.jpg", compressRatio);
-            //Tools.SaveImageJpg(bmp, this.klarfFileName + ".jpg", compressRatio);
-
-             return true;
+            return true;
         }
 
 		public bool SaveImageJpg(SharedBufferInfo info, Rect rect, long compressRatio, int outSizeX, int outSizeY)
