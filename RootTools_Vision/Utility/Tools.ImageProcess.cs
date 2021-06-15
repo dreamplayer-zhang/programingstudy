@@ -77,7 +77,7 @@ namespace RootTools_Vision
             return Math.Sqrt(sdSum / (dataArr.Length - 1));
         }
 
-		public static unsafe bool SaveCircleImage(string filepath, int saveImageWidth, int saveImageHeight,
+		public static unsafe bool SaveCircleImage(string filepath, int saveImageWidth, int saveImageHeight, int thickness,
 												  SharedBufferInfo ptrMem, int startPos, int endPos)
 		{
 			try
@@ -87,7 +87,7 @@ namespace RootTools_Vision
 				int pix_y = 0;
 
 				CPoint center = new CPoint(saveImageWidth / 2, saveImageHeight / 2);
-				int nLen = 300;
+				int nLen = thickness; //300;
 				int nRadius = saveImageWidth < saveImageHeight ? saveImageWidth : saveImageHeight;
 				int nRadius2 = nRadius - nLen;
 				int nRadius3 = nRadius - nLen * 2;
@@ -143,7 +143,7 @@ namespace RootTools_Vision
 			}
 		}
 
-		public static unsafe bool SaveEdgeCircleImage(string filepath, int saveImageWidth, int saveImageHeight,
+		public static unsafe bool SaveEdgeCircleImage(string filepath, int saveImageWidth, int saveImageHeight, int thickness,
 												  SharedBufferInfo ptrMemTop, int startPosTop, int endPosTop,
 												  SharedBufferInfo ptrMemSide, int startPosSide, int endPosSide,
 												  SharedBufferInfo ptrMemBtm, int startPosBtm, int endPosBtm)
@@ -155,7 +155,7 @@ namespace RootTools_Vision
 				int pix_y = 0;
 
 				CPoint center = new CPoint(saveImageWidth / 2, saveImageHeight / 2);
-				int nLen = 50;
+				int nLen = thickness; //50;
 				int nRadius = saveImageWidth < saveImageHeight ? saveImageWidth : saveImageHeight;
 				int nRadius2 = nRadius - nLen;
 				int nRadius3 = nRadius - nLen * 2;

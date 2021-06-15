@@ -69,6 +69,21 @@ namespace RootTools_Vision
         }
         private int outputImageSizeHeight = 1000;
 
+        [Category("Klarf")]
+        [DisplayName("Circle Thickness")]
+        public int Thickness
+        {
+            get
+            {
+                return thickness;
+            }
+            set
+            {
+                thickness = value;
+            }
+        }
+        private int thickness = 50;
+
         [Category("Common")]
         [DisplayName("Defect Image Path")]
         public string DefectImagePath

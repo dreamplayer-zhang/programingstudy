@@ -46,7 +46,7 @@
                     <Button Content="Invert" Command="{Binding btnToolInvertCommand}" Style="{StaticResource imageViewer_toolbar_button}"/>
                     <Button Content="H-Flip" Command="{Binding btnToolHorizontalFlipCommand}" Style="{StaticResource imageViewer_toolbar_button}"/>
                     <Button Content="V-Flip" Command="{Binding btnToolVerticalFlipCommand}" Style="{StaticResource imageViewer_toolbar_button}"/>
-                    <Button Content=" ASC&#xa;Import" Command="{Binding btnToolASCImportCommand}" Style="{StaticResource imageViewer_toolbar_button}"/>
+                    <Button Content="  File&#xa;Import" Command="{Binding btnToolFileImportCommand}" Style="{StaticResource imageViewer_toolbar_button}"/>
                 </StackPanel>
                 <StackPanel Grid.Column="2"  Orientation="Horizontal">
                     <TextBlock Text="Mode" Margin="290,0,4,0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
@@ -154,7 +154,11 @@
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                     <Button Content="Create Map" Command="{Binding CreateMapCommand}" Width ="378" Style="{StaticResource groupbox_button}"/>
                 </StackPanel>
-            </StackPanel>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                    <Button Content="Chip Finder" Command="{Binding OpenChipFinderCommand}" Width ="184" Style="{StaticResource groupbox_button}"/>
+                    <Button Content="Chip Editor" Command="{Binding OpenChipEditorCommand}" Width ="184" Style="{StaticResource groupbox_button}"/>
+                </StackPanel>
+                </StackPanel>
         </GroupBox>
         <GroupBox Grid.Row="1"
                   Grid.Column="1"
