@@ -1191,6 +1191,7 @@ namespace RootTools_Vision.Utility
 			edge.MakeTransparent(Color.Black);
 
 			Bitmap back = new Bitmap(Image.FromFile(klarfFileName + ".jpg"));
+			//Bitmap back = new Bitmap(Image.FromFile(@"D:\backside" + ".jpg"));
 			back.MakeTransparent(Color.Black);
 			
 			Bitmap outputImage = new Bitmap(edge.Width, edge.Height);
@@ -1215,13 +1216,9 @@ namespace RootTools_Vision.Utility
             Graphics gp = Graphics.FromImage(bmp);
             Brush brush = new SolidBrush(Color.Black);
 
-			
-
 			double resizeRatioX = (outSizeX / rect.Width);
             double resizeRatioY = (outSizeY / rect.Height);
 
-            //float ratioX = (float)(centerX % 1000);
-            //float ratioY = (float)(centerY % 1000);
             double resizeWaferSizeX = waferSizeX * resizeRatioX;
             double resizeWaferSizeY = waferSizeY * resizeRatioY;
 
