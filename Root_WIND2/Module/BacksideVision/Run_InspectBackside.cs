@@ -169,6 +169,12 @@ namespace Root_WIND2.Module
                         klarfData.SaveTiffImageOnlyTDI(defects, workManager.SharedBuffer, new Size(160, 120));
                     }
 
+                    if(recipe.ExclusiveRegionFilePath == "")
+                    {
+                        recipe.ExclusiveRegionFilePath = Constants.FilePath.BacksideExclusiveRegionFilePath;
+                        recipe.Save();
+                    }
+
                     List<List<Point>> polygon = PolygonController.ReadPolygonFile(recipe.ExclusiveRegionFilePath);
 
                     BacksideRecipe backRecipe = recipe.GetItem<BacksideRecipe>();

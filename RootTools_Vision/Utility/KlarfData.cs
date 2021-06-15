@@ -310,7 +310,7 @@ namespace RootTools_Vision.Utility
 
 
 			tempString = string.Format("SampleTestPlan {0:d}\n", sampleTestCnt);
-			sampleTestPlan = sampleTestPlan.Substring(0, sampleTestPlan.Length - 1);
+			sampleTestPlan = sampleTestPlan.Substring(0, sampleTestPlan.Length > 0 ? sampleTestPlan.Length - 1:0);
 			sampleTestPlan = tempString + sampleTestPlan + ";\n";
 
 			float nAreaPerTest = (float)(diePitchX * diePitchY * sampleTestCnt);
