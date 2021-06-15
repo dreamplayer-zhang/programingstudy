@@ -117,6 +117,9 @@ namespace Root_WIND2.Module
 
 		public GrabModeEdge GetGrabMode(int index)
 		{
+			if (m_aGrabMode?.Count <= index)
+				return null;
+
 			if (m_aGrabMode?.Count > 0)
 			{
 				return m_aGrabMode[index];

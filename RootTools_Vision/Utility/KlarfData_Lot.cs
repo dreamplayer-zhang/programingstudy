@@ -1192,7 +1192,7 @@ namespace RootTools_Vision.Utility
 			double reSizeCenterX = centerX * resizeRatioX;
             double reSizeCenterY = centerY * resizeRatioY;
             double shortLength = double.MaxValue;
-            double longLength = double.MinValue;
+            double longLength = resizeWaferSizeY/2;
             for (int i = 0; i < polygon.Count; i++)
             {
                 List<PointF> poly = new List<PointF>();
@@ -1204,17 +1204,15 @@ namespace RootTools_Vision.Utility
                     double calcShort = Math.Sqrt(Math.Pow(reSizeCenterX - poly[j].X, 2) + Math.Pow(reSizeCenterY - poly[j].Y, 2));
                     if (shortLength > calcShort)
                         shortLength = calcShort;
-                    if (longLength < calcShort)
-                        longLength = calcShort;
+                    //if (longLength < calcShort)
+                    //    longLength = calcShort;
 
                 }
                 gp.FillPolygon(brush, poly.ToArray());
 
             }
 
-
-            Tools.CirclarInterpolation(bmp, shortLength, longLength, (int)reSizeCenterX, (int)reSizeCenterY, outSizeX, outSizeY);
-
+            Tools.CirclarInterpolation(bmp, shortLength - 100, longLength, (int)reSizeCenterX, (int)reSizeCenterY, outSizeX, outSizeY);
 
             GraphicsPath path = new GraphicsPath();
             path.AddEllipse((float)(reSizeCenterX - (resizeWaferSizeX / 2)), (float)(reSizeCenterY - (resizeWaferSizeY / 2)), (float)resizeWaferSizeX, (float)resizeWaferSizeY);
@@ -1224,10 +1222,7 @@ namespace RootTools_Vision.Utility
 
             // Tools.InterpolationImage(bmp, polygon);
 
-
-
-            Tools.SaveImageJpg(bmp,"D:\\backside.jpg", compressRatio);
-            //Tools.SaveImageJpg(bmp, this.klarfFileName + ".jpg", compressRatio);
+            Tools.SaveImageJpg(bmp, this.klarfFileName + ".jpg", compressRatio);
 
             return true;
         }
