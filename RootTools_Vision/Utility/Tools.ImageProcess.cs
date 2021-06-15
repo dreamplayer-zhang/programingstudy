@@ -265,29 +265,53 @@ namespace RootTools_Vision
 			{
 				var chart = new LiveCharts.Wpf.CartesianChart
 				{
+					Background = System.Windows.Media.Brushes.White,
+					LegendLocation = LegendLocation.Top,
 					DisableAnimations = true,
 					Width = 800,
 					Height = 400,
-					//AxisY = new AxesCollection
-					//{
-					//	new Axis
-					//	{
-					//		AxisLine = false,
-					//		//MinValue = 0,
-					//	}
-					//}
+
+					AxisY = new AxesCollection
+					{
+						new LiveCharts.Wpf.Axis()
+						{
+							Title= "EBR",
+							Position = AxisPosition.LeftBottom,
+							Separator = new Separator()
+							{
+								Step = 100,
+								IsEnabled = true
+							}
+						},
+
+						new LiveCharts.Wpf.Axis()
+						{
+							Title= "Bevel",
+							Position = AxisPosition.RightTop,
+							Separator = new Separator()
+							{
+								Step = 100,
+								IsEnabled = true
+							},
+							MinValue = 0
+						},
+					}
 				};
 
 				chart.Series.Add(new LineSeries 
-								{ 
-									Values = ebr,
+								{
+									Title = "EBR",
 									Fill = System.Windows.Media.Brushes.Transparent,
-									
+									ScalesYAt = 0,
+									Values = ebr,
 								});
+
 				chart.Series.Add(new LineSeries 
 								{ 
-									Values = bevel,
+									Title = "Bevel",
 									Fill = System.Windows.Media.Brushes.Transparent,
+									ScalesYAt = 1,
+									Values = bevel,
 								});
 
 				var viewbox = new System.Windows.Controls.Viewbox();
