@@ -14,16 +14,21 @@
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
-            <Grid Grid.Row="0" Background="Beige" Margin="3">
-                <TextBlock x:Name="textBlockA" HorizontalAlignment="Center"/>
+            <Grid Grid.Row="0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Grid Grid.Column="0" Margin="3" Background="Beige">
+                    <TextBlock x:Name="textBlockA" HorizontalAlignment="Center"/>
+                </Grid>
+                <Grid Grid.Column="1" Margin="3" Background="Beige">
+                    <TextBlock x:Name="textBlockB" HorizontalAlignment="Center"/>
+                </Grid>
             </Grid>
-            <Grid Grid.Row="1" Background="Beige" Margin="3">
-                <TextBlock x:Name="textBlockB" HorizontalAlignment="Center"/>
-            </Grid>
-            <tree:TreeUI Grid.Row="2" x:Name="treeRootUI" IsEnabled="False"/>
+            <tree:TreeUI Grid.Row="1" x:Name="treeRootUI" IsEnabled="False"/>
         </Grid>
     </GroupBox>
 </UserControl>
