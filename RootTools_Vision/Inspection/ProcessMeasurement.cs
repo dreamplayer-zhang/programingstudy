@@ -159,7 +159,7 @@ namespace RootTools_Vision
 				graphics.DrawLine(pen, rectStartX, rectStartY + offset, rectStartX + rectWidth, rectStartY + offset);
 
                 System.Drawing.Font myFont = new System.Drawing.Font(System.Drawing.FontFamily.GenericSansSerif, 100, System.Drawing.FontStyle.Regular, GraphicsUnit.Pixel);
-                graphics.DrawString("Angle : " + measure.m_fAngle.ToString(), myFont, new System.Drawing.SolidBrush(System.Drawing.Color.Red), 100, 100);
+                graphics.DrawString("Angle : " + measure.m_fAngle.ToString("F3"), myFont, new System.Drawing.SolidBrush(System.Drawing.Color.Red), 100, 100);
 
                 if (System.IO.File.Exists(path + measure.m_nMeasurementIndex + ".bmp"))
                     System.IO.File.Delete(path + measure.m_nMeasurementIndex + ".bmp");
