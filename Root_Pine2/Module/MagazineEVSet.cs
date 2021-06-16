@@ -95,7 +95,7 @@ namespace Root_Pine2.Module
             Thread.Sleep(5000);
             while (m_bThread)
             {
-                Thread.Sleep(200);
+                Thread.Sleep(150);
                 foreach (MagazineEV magazine in m_aEV.Values)
                 {
                     magazine.m_conveyor.RunSwitch(nBlink);
