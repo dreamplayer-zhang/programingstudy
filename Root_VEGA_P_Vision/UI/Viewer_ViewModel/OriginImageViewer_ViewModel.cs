@@ -1,10 +1,7 @@
 ﻿using RootTools;
 using RootTools_Vision;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -59,12 +56,23 @@ namespace Root_VEGA_P_Vision
         #endregion
         #region [ViewerState]
         EUVOriginRecipe originRecipe;
-
+        OriginInfo originInfo;
+        RecipeBase recipe;
         public OriginImageViewer_ViewModel(string imageData):base(imageData)
         {
             p_VisibleMenu = Visibility.Collapsed;
-            RecipeVision recipe = GlobalObjects.Instance.Get<RecipeVision>();
+            recipe = GlobalObjects.Instance.Get<RecipeCoverFront>();
             originRecipe = recipe.GetItem<EUVOriginRecipe>();
+
+            if (imageData.Contains("Main"))
+                originInfo = originRecipe.TDIOriginInfo;
+            else if (imageData.Contains("Stain"))
+                originInfo = originRecipe.StainOriginInfo;
+            else if (imageData.Contains("Top"))
+                originInfo = originRecipe.SideTBOriginInfo;
+            else if (imageData.Contains("Left"))
+                originInfo = originRecipe.SideLROriginInfo;
+
             InitializeUIElement();
         }
 
@@ -291,14 +299,7 @@ namespace Root_VEGA_P_Vision
                     originLeftTop = memPt;
                     DrawOriginLeftTopPoint(originLeftTop);
 
-                    if (memid.Contains("Main"))
-                        originRecipe.TDIOrigin.Origin = memPt;
-                    else if (memid.Contains("Stain"))
-                        originRecipe.StainOrigin.Origin = memPt;
-                    else if (memid.Contains("Top"))
-                        originRecipe.SideTBOrigin.Origin = memPt;
-                    else if (memid.Contains("Left"))
-                        originRecipe.SideLROrigin.Origin = memPt;
+                    originInfo.Origin = memPt;
 
                     if (OriginPointDone != null)
                         OriginPointDone();
@@ -319,14 +320,7 @@ namespace Root_VEGA_P_Vision
                     int w = originBox.Right - originBox.Left;
                     int h = originBox.Bottom - originBox.Top;
 
-                    if (memid.Contains("Main"))
-                        originRecipe.TDIOrigin.OriginSize = new CPoint(w,h);
-                    else if (memid.Contains("Stain"))
-                        originRecipe.StainOrigin.OriginSize = new CPoint(w,h);
-                    else if (memid.Contains("Top"))
-                        originRecipe.SideTBOrigin.OriginSize = new CPoint(w,h);
-                    else if (memid.Contains("Left"))
-                        originRecipe.SideLROrigin.OriginSize = new CPoint(w,h);
+                    originInfo.OriginSize = new CPoint(w, h);
 
                     DrawOriginRightBottomPoint(originRightBottom);
                     DrawOriginBox();
@@ -438,6 +432,44 @@ namespace Root_VEGA_P_Vision
             RedrawShapes();
         }
 
+        #endregion
+
+        #region MasterImage
+        public CPoint Offset = new CPoint();
+        public void _saveMasterImage()
+        {
+            int posX = Offset.X;
+            int posY = Offset.Y;
+            int width = p_ImageData.p_Size.X;
+            int height = p_ImageData.p_Size.Y;
+            int byteCount = 1;
+            byte[] rawdata = p_ImageData.GetByteArray();
+
+            string memid = p_ImageData.m_MemData.p_id;
+
+            originRecipe.SaveMasterImage(/*recipe.RecipeFolderPath*/@"C:\Recipe\",memid.Split('.')[1] + "_MasterImage.bmp", 
+                posX, posY, width, height, byteCount, rawdata,originInfo);
+        }
+        public void _loadMasterImage()
+        {
+            string memid = p_ImageData.m_MemData.p_id;
+            RecipeType_ImageData imgData = originRecipe.TDIOriginInfo.MasterImage;
+
+            originRecipe.LoadMasterImage(recipe.RecipeFolderPath, memid.Split('.')[1] + "_MasterImage.bmp", originInfo);
+            imgData = originInfo.MasterImage;
+
+            ImageData BoxImageData = new ImageData(imgData.Width, imgData.Height, imgData.ByteCnt);
+
+            BoxImageData.m_eMode = ImageData.eMode.ImageBuffer;
+            BoxImageData.SetData(Marshal.UnsafeAddrOfPinnedArrayElement(imgData.RawData, 0)
+                , new CRect(0, 0, imgData.Width, imgData.Height)
+                , imgData.Width, imgData.ByteCnt);
+
+            Offset = new CPoint(imgData.PositionX, imgData.PositionY);
+            p_ImageData = BoxImageData;
+
+            SetRoiRect();
+        }
         #endregion
     }
 }

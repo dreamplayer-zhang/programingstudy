@@ -56,10 +56,21 @@ namespace Root_VEGA_P_Vision
             this.recipeSetting = recipeSetting;
             Main = new Recipe6um_Panel();
             Main.DataContext = this;
-            coverTop_ImageViewer = new MaskRootViewer_ViewModel("EIP_Cover.Main.Front",recipeSetting.MaskTools);
-            coverBottom_ImageViewer = new MaskRootViewer_ViewModel("EIP_Cover.Main.Back", recipeSetting.MaskTools);
-            baseTop_ImageViewer = new MaskRootViewer_ViewModel("EIP_Plate.Main.Front", recipeSetting.MaskTools);
-            baseBottom_ImageViewer = new MaskRootViewer_ViewModel("EIP_Plate.Main.Back", recipeSetting.MaskTools);
+            RecipeCoverFront recipeCoverFront = GlobalObjects.Instance.Get<RecipeCoverFront>();
+            coverTop_ImageViewer = new MaskRootViewer_ViewModel("EIP_Cover.Main.Front",recipeSetting.MaskTools,
+                recipeCoverFront,recipeCoverFront.GetItem<EUVOriginRecipe>().TDIOriginInfo,recipeCoverFront.GetItem<EUVPodSurfaceParameter>().PodTDI.MaskIndex);
+            
+            RecipeCoverBack recipeCoverBack = GlobalObjects.Instance.Get<RecipeCoverBack>();
+            coverBottom_ImageViewer = new MaskRootViewer_ViewModel("EIP_Cover.Main.Back", recipeSetting.MaskTools,
+                recipeCoverBack,recipeCoverBack.GetItem<EUVOriginRecipe>().TDIOriginInfo,recipeCoverBack.GetItem<EUVPodSurfaceParameter>().PodTDI.MaskIndex);
+
+            RecipePlateFront recipePlateFront = GlobalObjects.Instance.Get<RecipePlateFront>();
+            baseTop_ImageViewer = new MaskRootViewer_ViewModel("EIP_Plate.Main.Front", recipeSetting.MaskTools,
+                recipePlateFront,recipePlateFront.GetItem<EUVOriginRecipe>().TDIOriginInfo,recipePlateFront.GetItem<EUVPodSurfaceParameter>().PodTDI.MaskIndex);
+
+            RecipePlateBack recipePlateBack = GlobalObjects.Instance.Get<RecipePlateBack>();
+            baseBottom_ImageViewer = new MaskRootViewer_ViewModel("EIP_Plate.Main.Back", recipeSetting.MaskTools,
+                recipePlateBack, recipePlateBack.GetItem<EUVOriginRecipe>().TDIOriginInfo, recipePlateBack.GetItem<EUVPodSurfaceParameter>().PodTDI.MaskIndex);
 
             numList = new List<int>();
             for(int i=0;i<coverTop_ImageViewer.p_ImageData.p_nPlane;i++)

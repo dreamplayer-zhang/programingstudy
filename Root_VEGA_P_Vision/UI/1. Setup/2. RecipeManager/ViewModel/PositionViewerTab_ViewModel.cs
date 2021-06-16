@@ -20,7 +20,6 @@ namespace Root_VEGA_P_Vision
         public PositionViewerTab_Panel Main;
         public PositionFeature curTab;
         PositionImageViewer_ViewModel mEIPCoverTop, mEIPCoverBtm, mEIPBaseTop, mEIPBaseBtm;
-        EUVPositionRecipe positionRecipe;
         int selectedIdx;
         List<int> numList;
 
@@ -66,12 +65,15 @@ namespace Root_VEGA_P_Vision
         { 
             Main = new PositionViewerTab_Panel();
             Main.DataContext = this;
-            mEIPCoverTop = new PositionImageViewer_ViewModel("EIP_Cover.Main.Front");
-            mEIPCoverBtm = new PositionImageViewer_ViewModel("EIP_Cover.Main.Back");
-            mEIPBaseTop = new PositionImageViewer_ViewModel("EIP_Plate.Main.Front");
-            mEIPBaseBtm = new PositionImageViewer_ViewModel("EIP_Plate.Main.Back");
+            mEIPCoverTop = new PositionImageViewer_ViewModel("EIP_Cover.Main.Front",
+                GlobalObjects.Instance.Get<RecipeCoverFront>());
+            mEIPCoverBtm = new PositionImageViewer_ViewModel("EIP_Cover.Main.Back",
+                GlobalObjects.Instance.Get<RecipeCoverBack>());
+            mEIPBaseTop = new PositionImageViewer_ViewModel("EIP_Plate.Main.Front",
+                GlobalObjects.Instance.Get<RecipePlateFront>());
+            mEIPBaseBtm = new PositionImageViewer_ViewModel("EIP_Plate.Main.Back",
+                GlobalObjects.Instance.Get<RecipeCoverBack>());
 
-            positionRecipe = GlobalObjects.Instance.Get<RecipeVision>().GetItem<EUVPositionRecipe>();
             numList = new List<int>();
             for (int i = 0; i < mEIPCoverTop.p_ImageData.p_nPlane; i++)
                 MemNumList.Add(i + 1);
@@ -89,7 +91,8 @@ namespace Root_VEGA_P_Vision
         }
 
         #region ICommand
-        public PositionImageViewer_ViewModel selectedViewer { get; set; } = new PositionImageViewer_ViewModel("EIP_Cover.Main.Front");
+        public PositionImageViewer_ViewModel selectedViewer { get; set; } = new PositionImageViewer_ViewModel("EIP_Cover.Main.Front",
+            GlobalObjects.Instance.Get<RecipeCoverFront>());
         public FeatureLists selectedLists { get; set; } = new FeatureLists();
         public ICommand TabChanged
         {
@@ -99,19 +102,19 @@ namespace Root_VEGA_P_Vision
                 {
                     case PositionFeature.COVERTOP:
                         selectedViewer = p_EIPCoverTop;
-                        selectedLists = positionRecipe.EIPCoverTopFeature;
+                        selectedLists = GlobalObjects.Instance.Get<RecipeCoverFront>().GetItem<EUVPositionRecipe>().PartsFeatureList;
                         break;
                     case PositionFeature.COVERBTM:
                         selectedViewer = p_EIPCoverBtm;
-                        selectedLists = positionRecipe.EIPCoverBtmFeature;
+                        selectedLists = GlobalObjects.Instance.Get<RecipeCoverBack>().GetItem<EUVPositionRecipe>().PartsFeatureList;
                         break;
                     case PositionFeature.BASETOP:
                         selectedViewer = p_EIPBaseTop;
-                        selectedLists = positionRecipe.EIPBaseTopFeature;
+                        selectedLists = GlobalObjects.Instance.Get<RecipePlateFront>().GetItem<EUVPositionRecipe>().PartsFeatureList;
                         break;
                     case PositionFeature.BASEBTM:
                         selectedViewer = p_EIPBaseBtm;
-                        selectedLists = positionRecipe.EIPBaseBtmFeature;
+                        selectedLists = GlobalObjects.Instance.Get<RecipePlateBack>().GetItem<EUVPositionRecipe>().PartsFeatureList;
                         break;
                 }
             });
@@ -165,7 +168,6 @@ namespace Root_VEGA_P_Vision
             }
 
             vision.StartRun((Run_MainGrab)vision.CloneModuleRun(App.mMainGrab));
-
         }
         #endregion
     }

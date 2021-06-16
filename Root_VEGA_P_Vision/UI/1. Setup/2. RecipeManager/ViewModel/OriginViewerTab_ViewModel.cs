@@ -26,10 +26,30 @@ namespace Root_VEGA_P_Vision
         public OriginViewerTab_Panel Main;
         OriginImageViewer_ViewModel m2DTDIViewer, mStainViewer, mSideTopBtmViewer,mSideLeftRightViewer;
         OriginImageViewer_ViewModel selectedViewer;
-        EUVOriginRecipe originRecipe;
+        OriginInfo TDIorigin,stainOrigin,sideLROrigin,sideTBOrigin;
 
         int selectedIdx, sideselectedIdx;
         List<int> numList;
+        OriginInfo TDIOrigin
+        {
+            get => TDIorigin;
+            set => SetProperty(ref TDIorigin, value);
+        }
+        OriginInfo StainOrigin
+        {
+            get => stainOrigin;
+            set => SetProperty(ref stainOrigin, value);
+        }
+        OriginInfo SideLROrigin
+        {
+            get => sideLROrigin;
+            set => SetProperty(ref sideLROrigin, value);
+        }
+        OriginInfo SideTBOrigin
+        {
+            get => sideTBOrigin;
+            set => SetProperty(ref sideTBOrigin, value);
+        }
         #region Property
         public int SelectedIdx
         {
@@ -80,7 +100,12 @@ namespace Root_VEGA_P_Vision
             InitOriginViewer(p_SideOriginTopBtmViewer);
             InitOriginViewer(p_SideOriginLeftRightViewer);
 
-            originRecipe = GlobalObjects.Instance.Get<RecipeVision>().GetItem<EUVOriginRecipe>();
+            EUVOriginRecipe originRecipe = GlobalObjects.Instance.Get<RecipeCoverFront>().GetItem<EUVOriginRecipe>();
+
+            //TDIOrigin = originRecipe.TDIOriginInfo;
+            //StainOrigin = originRecipe.StainOriginInfo;
+            //SideLROrigin = originRecipe.SideLROriginInfo;
+            //SideTBOrigin = originRecipe.SideTBOriginInfo;
 
             selectedIdx = 0;
             sideselectedIdx = 0;
@@ -99,11 +124,6 @@ namespace Root_VEGA_P_Vision
 
         public void LoadRecipe()
         {
-            TDIOrigin = originRecipe.TDIOrigin;
-            StainOrigin = originRecipe.StainOrigin;
-            SideLROrigin = originRecipe.SideLROrigin;
-            SideTBOrigin = originRecipe.SideTBOrigin;
-
             p_2DOriginViewer.SetOriginBox(TDIOrigin.Origin, TDIOrigin.OriginSize);
             p_StainOriginViewer.SetOriginBox(StainOrigin.Origin, StainOrigin.OriginSize);
             p_SideOriginTopBtmViewer.SetOriginBox(SideTBOrigin.Origin, SideTBOrigin.OriginSize);
@@ -119,18 +139,10 @@ namespace Root_VEGA_P_Vision
 
         public void OriginPointDone_Callback()
         {
-            TDIOrigin = originRecipe.TDIOrigin;
-            StainOrigin = originRecipe.StainOrigin;
-            SideLROrigin = originRecipe.SideLROrigin;
-            SideTBOrigin = originRecipe.SideTBOrigin;
         }
 
         public void OriginBoxDone_Callback()
         {
-            TDIOrigin = originRecipe.TDIOrigin;
-            StainOrigin = originRecipe.StainOrigin;
-            SideLROrigin = originRecipe.SideLROrigin;
-            SideTBOrigin = originRecipe.SideTBOrigin;
             VegaPEventManager.OnRecipeUpdated(this, new RecipeEventArgs());
         }
 
@@ -141,48 +153,13 @@ namespace Root_VEGA_P_Vision
             //originRecipe.Clear();
             VegaPEventManager.OnRecipeUpdated(this, new RecipeEventArgs());
         }
-        #endregion
-        #region [Properties]
-        private OriginInfo tdiOrigin = new OriginInfo(new CPoint(0, 0), new CPoint(0, 0));
-        public OriginInfo TDIOrigin
-        {
-            get => tdiOrigin;
-            set
-            {
-                SetProperty(ref tdiOrigin, value);
-            }
-        }
 
-        private OriginInfo stainOrigin = new OriginInfo(new CPoint(0, 0), new CPoint(0, 0));
-        public OriginInfo StainOrigin
+        void SetOriginRecipe()
         {
-            get => stainOrigin;
-            set
-            {
-                SetProperty(ref stainOrigin, value);
-            }
-        }
 
-        private OriginInfo sideTBOrigin = new OriginInfo(new CPoint(0, 0), new CPoint(0, 0));
-        public OriginInfo SideTBOrigin
-        {
-            get => sideTBOrigin;
-            set
-            {
-                SetProperty(ref sideTBOrigin, value);
-            }
-        }
-
-        private OriginInfo sideLROrigin = new OriginInfo(new CPoint(0, 0), new CPoint(0, 0));
-        public OriginInfo SideLROrigin
-        {
-            get => sideLROrigin;
-            set
-            {
-                SetProperty(ref sideLROrigin, value);
-            }
         }
         #endregion
+
         #region RelayCommand
         public ICommand TabChanged
         {
@@ -213,7 +190,8 @@ namespace Root_VEGA_P_Vision
 
         public ICommand ImageOpen
         {
-            get => new RelayCommand(() => selectedViewer._openImage(SelectedIdx));
+            get => new RelayCommand(() => 
+            selectedViewer._openImage(SelectedIdx-1));
         }
         public ICommand ImageSave
         {
@@ -236,6 +214,18 @@ namespace Root_VEGA_P_Vision
                 MessageBox.Show("Vision Home이 완료 되지 않았습니다.");
                 return;
             }
+        }
+        public ICommand btnSaveMasterImage
+        {
+            get => new RelayCommand(() => {
+                selectedViewer._saveMasterImage();
+            });
+        }
+        public ICommand btnLoadMasterImage
+        {
+            get => new RelayCommand(() => {
+                selectedViewer._saveMasterImage();
+            });
         }
         #endregion
     }

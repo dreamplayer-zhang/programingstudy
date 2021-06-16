@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -45,6 +46,12 @@ namespace Root_VEGA_P_Vision
         private Home_ViewModel homeVM;
 
         public Setup Main;
+
+        RecipeCoverFront recipeCoverFront;
+        RecipeCoverBack recipeCoverBack;
+        RecipePlateFront recipePlateFront;
+        RecipePlateBack recipePlateBack;
+
         public Setup_ViewModel()
         {
             Main = new Setup();
@@ -53,6 +60,11 @@ namespace Root_VEGA_P_Vision
 
         public void init()
         {
+            recipeCoverFront = GlobalObjects.Instance.Get<RecipeCoverFront>();
+            recipeCoverBack  = GlobalObjects.Instance.Get<RecipeCoverBack>();
+            recipePlateFront = GlobalObjects.Instance.Get<RecipePlateFront>();
+            recipePlateBack  = GlobalObjects.Instance.Get<RecipePlateBack>();
+
             InitAllPanel();
             InitAllNaviBtn();
             SetHome();
@@ -113,10 +125,6 @@ namespace Root_VEGA_P_Vision
         {
             SetMaintenance();
         }
-        void Navi_GEMClick(object sender, RoutedEventArgs e)
-        {
-            SetGEM();
-        }
         void Navi_PodInfoClick(object sender, RoutedEventArgs e)
         {
             SetPodInfo();
@@ -148,7 +156,7 @@ namespace Root_VEGA_P_Vision
             {
                 return new RelayCommand(() =>
                 {
-                    MessageBox.Show("WIND2 전체 레시피 저장하는거 구현해줘요");
+                    CreateRecipe();
                 });
             }
 
@@ -160,27 +168,118 @@ namespace Root_VEGA_P_Vision
             {
                 return new RelayCommand(() =>
                 {
-                    // 각패널 별로있어야함
-                    //if (this.Recipe.RecipePath == "")
-                    //{
-                    //    ProgramManager.Instance.ShowDialogSaveRecipe();
-                    //}
-                    //else
-                    //{
-                    //    ProgramManager.Instance.SaveRecipe(this.Recipe.RecipePath);
-                    //}
+                    SaveRecipe();
                 });
             }
         }
 
+        void SaveRecipe()
+        {
+            if (!recipeCoverFront.RecipePath.Equals(""))
+            {
+                recipeCoverFront.Save(recipeCoverFront.RecipePath);
+                return;
+            }
+
+            if (!recipeCoverBack.RecipePath.Equals(""))
+            {
+                recipeCoverBack.Save(recipeCoverBack.RecipePath);
+                return;
+            }
+
+            if (!recipePlateFront.RecipePath.Equals(""))
+            {
+                recipePlateFront.Save(recipePlateFront.RecipePath);
+                return;
+            }
+
+            if (!recipePlateBack.RecipePath.Equals(""))
+            {
+                recipePlateBack.Save(recipePlateBack.RecipePath);
+                return;
+            }
+
+
+            //System.Windows.Forms.OpenFileDialog dlg = new System.Windows.Forms.OpenFileDialog();
+            //dlg.InitialDirectory = App.RecipeRootPath;
+            //dlg.Title = "Save Recipe";
+            //dlg.Filter = "ATI files (*.rcp)|*.rcp|All files (*.*)|*.*";
+            //if (dlg.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            //{
+            //    string sFolderPath = Path.GetDirectoryName(dlg.FileName); // 디렉토리명
+            //    string sFileName = Path.GetFileName(dlg.FileName); // 파일이름 + 확장자
+
+            //    DirectoryInfo dir = new DirectoryInfo(sFolderPath);
+            //    if (!dir.Exists)
+            //        dir.Create();
+
+            //    recipeCoverFront.Save(Path.Combine(sFolderPath, "RecipeCoverFront_" + sFileName));
+            //    recipeCoverBack.Save(Path.Combine(sFolderPath, "RecipeCoverBack_" + sFileName));
+            //    recipePlateFront.Save(Path.Combine(sFolderPath, "RecipePlateFront_" + sFileName));
+            //    recipePlateBack.Save(Path.Combine(sFolderPath, "RecipePlateBack_" + sFileName));
+            //}
+            CreateRecipe();
+        }
+        void LoadRecipe()
+        {
+            System.Windows.Forms.OpenFileDialog dlg = new System.Windows.Forms.OpenFileDialog();
+            dlg.InitialDirectory = App.RecipeRootPath;
+            dlg.Title = "Load Recipe";
+            dlg.Filter = "ATI files (*.rcp)|*.rcp|All files (*.*)|*.*";
+            if (dlg.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            {
+                string sFolderPath = Path.GetDirectoryName(dlg.FileName); // 디렉토리명
+                string sFileName = Path.GetFileName(dlg.FileName); // 파일이름 + 확장자
+
+                DirectoryInfo dir = new DirectoryInfo(sFolderPath);
+                if (!dir.Exists)
+                    dir.Create();
+
+                recipeCoverFront.Read(Path.Combine(sFolderPath,"RecipeCoverFront_"+sFileName));
+                recipeCoverBack.Read(Path.Combine(sFolderPath, "RecipeCoverBack_" + sFileName));
+                recipePlateFront.Read(Path.Combine(sFolderPath, "RecipePlateFront_" + sFileName));
+                recipePlateBack.Read(Path.Combine(sFolderPath, "RecipePlateBack_" + sFileName));
+            }
+        }
+        
         public ICommand btnLoadRecipe
         {
             get
             {
                 return new RelayCommand(() =>
                 {
-                    MessageBox.Show("WIND2 전체 레시피 로드하는거 구현해줘요");
+                    LoadRecipe();
                 });
+            }
+        }
+
+        void CreateRecipe()
+        {
+            System.Windows.Forms.SaveFileDialog dlg = new System.Windows.Forms.SaveFileDialog();
+            dlg.InitialDirectory = Constants.RootPath.RecipeEBRRootPath;
+            dlg.Title = "Save Recipe";
+            dlg.Filter = "ATI files (*.rcp)|*.rcp|All files (*.*)|*.*";
+            if (dlg.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            {
+                string sFolderPath = Path.GetDirectoryName(dlg.FileName); // 디렉토리명
+                string sFileNameNoExt = Path.GetFileNameWithoutExtension(dlg.FileName); // Only 파일이름
+                string sFileName = Path.GetFileName(dlg.FileName); // 파일이름 + 확장자
+                string sRecipeFolderPath = Path.Combine(sFolderPath, sFileNameNoExt); // 디렉토리명
+                string sFullPath = Path.Combine(sRecipeFolderPath, sFileName); // 레시피 이름으 된 폴더안의 rcp 파일 경로
+
+                DirectoryInfo dir = new DirectoryInfo(sRecipeFolderPath);
+                if (!dir.Exists)
+                    dir.Create();
+
+                recipeCoverFront.Clear();
+                recipeCoverBack.Clear();
+                recipePlateFront.Clear();
+                recipePlateBack.Clear();
+
+                recipeCoverFront.Save(Path.Combine(sFolderPath, "RecipeCoverFront_" + sFileName));
+                recipeCoverBack.Save(Path.Combine(sFolderPath, "RecipeCoverBack_" + sFileName));
+                recipePlateFront.Save(Path.Combine(sFolderPath, "RecipePlateFront_" + sFileName));
+                recipePlateBack.Save(Path.Combine(sFolderPath, "RecipePlateBack_" + sFileName));
             }
         }
 
@@ -203,16 +302,12 @@ namespace Root_VEGA_P_Vision
         {
             p_NaviButtons.Clear();
             p_NaviButtons.Add(m_btnNaviRecipeWizard);
-            //p_CurrentPanel = recipeManagerVM.Main;
-            //recipeManagerVM.Main.radiobtnOrigin.IsChecked = true;
-            //recipeManagerVM.SetOrigin();
         }
         public void SetRecipeMask() 
         {
             p_NaviButtons.Clear();
             p_NaviButtons.Add(m_btnNaviRecipeWizard);
             p_NaviButtons.Add(m_btnNaviRecipeMask);
-
         }
         public void SetPodInfo()
         {
@@ -224,17 +319,11 @@ namespace Root_VEGA_P_Vision
         {
             p_NaviButtons.Clear();
             p_NaviButtons.Add(m_btnNaviMaintenance);
-
-            //p_CurrentPanel = maintVM.Main;
-            //p_CurrentPanel.DataContext = maintVM;
         }
         public void SetGEM()
         {
             p_NaviButtons.Clear();
             p_NaviButtons.Add(m_btnNaviGEM);
-
-            //p_CurrentPanel = gemVM.Main;
-            //p_CurrentPanel.DataContext = gemVM;
         }
         public void Dispose()
         {

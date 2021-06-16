@@ -82,11 +82,23 @@ namespace Root_VEGA_P_Vision
             this.recipeSetting = recipeSetting;
             Main = new Recipe1um_Panel();
             Main.DataContext = this;
-            EIPcoverBottom_TDI = new MaskRootViewer_ViewModel("EIP_Cover.Main.Front", recipeSetting.MaskTools);
-            EIPbasePlateTop_TDI = new MaskRootViewer_ViewModel("EIP_Cover.Stack.Back", recipeSetting.MaskTools);
-            EIPcoverBottom_Stacking = new MaskRootViewer_ViewModel("EIP_Plate.Main.Front", recipeSetting.MaskTools);
-            basePlateROI1 = new MaskRootViewer_ViewModel("EIP_Cover.Stack.Back", recipeSetting.MaskTools);
-            basePlateROI2 = new MaskRootViewer_ViewModel("EIP_Cover.Stack.Back", recipeSetting.MaskTools);
+            RecipeCoverBack recipeCoverBack = GlobalObjects.Instance.Get<RecipeCoverBack>();
+            EIPcoverBottom_TDI = new MaskRootViewer_ViewModel("EIP_Cover.Main.Back", recipeSetting.MaskTools,
+                recipeCoverBack, recipeCoverBack.GetItem<EUVOriginRecipe>().TDIOriginInfo,recipeCoverBack.GetItem<EUVPodSurfaceParameter>().PodTDI.MaskIndex);
+
+            RecipePlateFront recipePlateFront = GlobalObjects.Instance.Get<RecipePlateFront>();
+            EIPbasePlateTop_TDI = new MaskRootViewer_ViewModel("EIP_Plate.Main.Front", recipeSetting.MaskTools,
+                recipePlateFront, recipePlateFront.GetItem<EUVOriginRecipe>().TDIOriginInfo,recipePlateFront.GetItem<EUVPodSurfaceParameter>().PodTDI.MaskIndex);
+
+            EIPcoverBottom_Stacking = new MaskRootViewer_ViewModel("EIP_Cover.Stack.Back", recipeSetting.MaskTools,
+                recipeCoverBack,recipeCoverBack.GetItem<EUVOriginRecipe>().TDIOriginInfo,recipeCoverBack.GetItem<EUVPodSurfaceParameter>().PodStacking.MaskIndex);
+
+            basePlateROI1 = new MaskRootViewer_ViewModel("EIP_Cover.Stack.Back", recipeSetting.MaskTools,
+                recipeCoverBack, recipeCoverBack.GetItem<EUVOriginRecipe>().TDIOriginInfo, recipeCoverBack.GetItem<EUVPodSurfaceParameter>().PodStacking.MaskIndex);
+
+            basePlateROI2 = new MaskRootViewer_ViewModel("EIP_Plate.Stack.Front", recipeSetting.MaskTools,
+                recipePlateFront, recipePlateFront.GetItem<EUVOriginRecipe>().TDIOriginInfo, recipePlateFront.GetItem<EUVPodSurfaceParameter>().PodTDI.MaskIndex);
+
             SelectedViewer = EIPCoverBottom_TDI;
             curROIListItem = new ROIListItem();
 

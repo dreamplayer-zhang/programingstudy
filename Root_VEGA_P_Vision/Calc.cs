@@ -25,12 +25,12 @@ namespace Root_VEGA_P_Vision
     {
         public static unsafe double GetAlignAngle(ImageData imageData,int nScore,int trigger)
         {
-            EUVPositionRecipe positionRecipe = GlobalObjects.Instance.Get<RecipeVision>().GetItem<EUVPositionRecipe>();
+            EUVPositionRecipe positionRecipe = GlobalObjects.Instance.Get<RecipeCoverFront>().GetItem<EUVPositionRecipe>();
             
             byte* srcPtr = (byte*)imageData.GetPtr().ToPointer();
 
             List<Result> resli = new List<Result>();
-            foreach (RecipeType_ImageData template in positionRecipe.EIPCoverTopFeature.ListAlignFeature)
+            foreach (RecipeType_ImageData template in positionRecipe.PartsFeatureList.ListAlignFeature)
             {
                 int posX = 0, posY = 0; //results
                 int left = template.PositionX - trigger;

@@ -11,9 +11,14 @@ namespace Root_VEGA_P_Vision
     public class SurfaceParam_Tree_ViewModel:ObservableObject
     {
         public SurfaceParam_Tree Main;
-        EUVPodSurfaceParameter surfaceParameter;
+        EUVPodSurfaceParameterBase surfaceParameter;
         SurfaceParam_ViewModel darkParam, brightParam;
         bool darkVisibility, brightVisibility;
+        public EUVPodSurfaceParameterBase SurfaceParameter
+        {
+            get => surfaceParameter;
+            set => SetProperty(ref surfaceParameter, value);
+        }
         public bool DarkVisibility
         {
             get => darkVisibility;
@@ -34,14 +39,14 @@ namespace Root_VEGA_P_Vision
             get => brightParam;
             set => SetProperty(ref brightParam, value);
         }
-        public SurfaceParam_Tree_ViewModel()
+        public SurfaceParam_Tree_ViewModel(EUVPodSurfaceParameterBase surfaceParam)
         {
             Main = new SurfaceParam_Tree();
             Main.DataContext = this;
 
-            surfaceParameter = GlobalObjects.Instance.Get<RecipeVision>().GetItem<EUVPodSurfaceParameter>();
-            darkParam = new SurfaceParam_ViewModel(surfaceParameter.PodStain.DarkParam);
-            brightParam = new SurfaceParam_ViewModel(surfaceParameter.PodStain.BrightParam);
+            surfaceParameter = surfaceParam;
+            darkParam = new SurfaceParam_ViewModel(surfaceParameter.DarkParam);
+            brightParam = new SurfaceParam_ViewModel(surfaceParameter.BrightParam);
             darkVisibility = brightVisibility = false;
         }
         public ICommand BrightBtn

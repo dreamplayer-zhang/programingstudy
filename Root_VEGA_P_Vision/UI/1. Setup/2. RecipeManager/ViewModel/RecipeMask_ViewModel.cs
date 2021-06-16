@@ -23,7 +23,6 @@ namespace Root_VEGA_P_Vision
         RecipeManager_ViewModel recipeManager;
         MaskTools_ViewModel maskTools;
 
-        EUVPodSurfaceRecipe surfaceRecipe;
         EUVPodSurfaceParameter surfaceParameter;
         EUVPodSurfaceParameterBase curBaseParam;
         SurfaceParam_Tree_ViewModel surfaceParamTree;
@@ -55,8 +54,6 @@ namespace Root_VEGA_P_Vision
             get => surfaceParamTree;
             set => SetProperty(ref surfaceParamTree, value);
         }
-
-        
         public UserControl p_MaskPanel
         {
             get => m_CurrentPanel;
@@ -68,18 +65,17 @@ namespace Root_VEGA_P_Vision
             this.recipeManager = recipeManager;
             Main = new RecipeMask_Panel();
             Main.DataContext = this;
-            surfaceRecipe = GlobalObjects.Instance.Get<RecipeVision>().GetItem<EUVPodSurfaceRecipe>();
-            surfaceParameter = GlobalObjects.Instance.Get<RecipeVision>().GetItem<EUVPodSurfaceParameter>();
+            surfaceParameter = GlobalObjects.Instance.Get<RecipeCoverFront>().GetItem<EUVPodSurfaceParameter>();
             maskTools = new MaskTools_ViewModel();
 
             recipeStainVM = new RecipeStain_ViewModel(this);
             recipeTDIVM = new Recipe6um_ViewModel(this);
             recipeSideVM = new RecipeSide_ViewModel(this);
             recipeStackingVM = new Recipe1um_ViewModel(this);
-            surfaceParamTree = new SurfaceParam_Tree_ViewModel();
+            surfaceParamTree = new SurfaceParam_Tree_ViewModel(GlobalObjects.Instance.Get<RecipeCoverFront>().GetItem<EUVPodSurfaceParameter>().PodStain);
             mBase = new ImageViewerBase_ViewModel();
 
-            CurBaseParam = SurfaceParameter.PodStain;
+            //CurBaseParam = SurfaceParameter.PodStain;
             IsSide = false;
             SetStain();
         }
@@ -89,11 +85,6 @@ namespace Root_VEGA_P_Vision
         {
             get => curBaseParam;
             set => SetProperty(ref curBaseParam, value);
-        }
-        public EUVPodSurfaceRecipe SurfaceRecipe
-        {
-            get => surfaceRecipe;
-            set => SetProperty(ref surfaceRecipe, value);
         }
         public EUVPodSurfaceParameter SurfaceParameter
         {
@@ -138,7 +129,7 @@ namespace Root_VEGA_P_Vision
         {
             p_BaseViewer.p_SubViewer = recipeSideVM.Main;
             p_BaseViewer.p_SubViewer.DataContext = recipeSideVM;
-            CurBaseParam = surfaceParameter.PodSide;
+            //CurBaseParam = surfaceParameter.PodSide;
             IsSide = true;
             IsHighRes = false;
         }
@@ -176,153 +167,6 @@ namespace Root_VEGA_P_Vision
         }
         private ObservableCollection<UIElement> m_UIElements;
 
-        public int p_nThickness
-        {
-            get
-            {
-                return _nThickness;
-            }
-            set
-            {
-                SetProperty(ref _nThickness, value);
-            }
-        }
-        private int _nThickness = 5;
-
-        public int p_nThreshold
-        {
-            get
-            {
-                return _nThreshold;
-            }
-            set
-            {
-                SetProperty(ref _nThreshold, value);
-            }
-        }
-        private int _nThreshold = 50;
-
-        public int p_nThresholdMode
-        {
-            get
-            {
-                return _nThresholdMode;
-            }
-            set
-            {
-                m_eThresholdMode = (ThresholdMode)value;
-                SetProperty(ref _nThresholdMode, value);
-            }
-        }
-        private int _nThresholdMode = 0;
-
-        public bool bPenCheck
-        {
-            get
-            {
-                return _bPenCheck;
-            }
-            set
-            {
-                if (value)
-                {
-                    m_eToolType = ToolType.Pen;
-                    UncheckTool(m_eToolType);
-                }
-                SetProperty(ref _bPenCheck, value);
-            }
-        }
-        private bool _bPenCheck;
-
-        public bool bEraserCheck
-        {
-            get
-            {
-                return _bEraserCheck;
-            }
-            set
-            {
-                if (value)
-                {
-                    m_eToolType = ToolType.Eraser;
-                    UncheckTool(m_eToolType);
-                }
-                SetProperty(ref _bEraserCheck, value);
-            }
-        }
-        private bool _bEraserCheck;
-
-        public bool bRectCheck
-        {
-            get
-            {
-                return _bRectCheck;
-            }
-            set
-            {
-                if (value)
-                {
-                    m_eToolType = ToolType.Rect;
-                    UncheckTool(m_eToolType);
-                }
-                SetProperty(ref _bRectCheck, value);
-            }
-        }
-        private bool _bRectCheck;
-
-        public bool bCircleCheck
-        {
-            get
-            {
-                return _bCircleCheck;
-            }
-            set
-            {
-                if (value)
-                {
-                    m_eToolType = ToolType.Circle;
-                    UncheckTool(m_eToolType);
-                }
-                SetProperty(ref _bCircleCheck, value);
-            }
-        }
-        private bool _bCircleCheck;
-
-        public bool bCropCheck
-        {
-            get
-            {
-                return _bCropCheck;
-            }
-            set
-            {
-                if (value)
-                {
-                    m_eToolType = ToolType.Crop;
-                    UncheckTool(m_eToolType);
-                }
-                SetProperty(ref _bCropCheck, value);
-            }
-        }
-        private bool _bCropCheck;
-
-        public bool bThresholdCheck
-        {
-            get
-            {
-                return _bThresholdCheck;
-            }
-            set
-            {
-                if (value)
-                {
-                    m_eToolType = ToolType.Threshold;
-                    UncheckTool(m_eToolType);
-                }
-                SetProperty(ref _bThresholdCheck, value);
-            }
-        }
-        private bool _bThresholdCheck;
 
         public bool bPenVisibility;
 
@@ -332,56 +176,6 @@ namespace Root_VEGA_P_Vision
             get => _bGBsimilar;
             set => SetProperty(ref _bGBsimilar, value);
         }
-        void UncheckTool(ToolType type)
-        {
-            switch (type)
-            {
-                case ToolType.Pen:
-                    bEraserCheck = false;
-                    bRectCheck = false;
-                    bCircleCheck = false;
-                    bCropCheck = false;
-                    bThresholdCheck = false;
-                    break;
-                case ToolType.Eraser:
-                    bPenCheck = false;
-                    bRectCheck = false;
-                    bCircleCheck = false;
-                    bCropCheck = false;
-                    bThresholdCheck = false;
-                    break;
-                case ToolType.Rect:
-                    bPenCheck = false;
-                    bEraserCheck = false;
-                    bCircleCheck = false;
-                    bCropCheck = false;
-                    bThresholdCheck = false;
-                    break;
-                case ToolType.Circle:
-                    bPenCheck = false;
-                    bEraserCheck = false;
-                    bRectCheck = false;
-                    bCropCheck = false;
-                    bThresholdCheck = false;
-                    break;
-                case ToolType.Crop:
-                    bPenCheck = false;
-                    bEraserCheck = false;
-                    bRectCheck = false;
-                    bCircleCheck = false;
-                    bThresholdCheck = false;
-                    break;
-                case ToolType.Threshold:
-                    bPenCheck = false;
-                    bEraserCheck = false;
-                    bRectCheck = false;
-                    bCircleCheck = false;
-                    bCropCheck = false;
-                    break;
-            }
-        }
-
-
         #endregion
     }
 }

@@ -27,8 +27,10 @@ namespace Root_VEGA_P_Vision
         public event FeatureBoxDoneEvent FeatureBoxDone;
         public event ManualAlignDoneEvent ManualAlignDone;
 
-        public PositionImageViewer_ViewModel(string imageData):base(imageData)
+        RecipeBase recipe;
+        public PositionImageViewer_ViewModel(string imageData,RecipeBase recipe):base(imageData)
         {
+            this.recipe = recipe;
             p_VisibleMenu = Visibility.Collapsed;
             InitializeUIElements();
         }
@@ -671,18 +673,28 @@ namespace Root_VEGA_P_Vision
         }
         public void RedrawOriginBox()
         {
-            EUVOriginRecipe originRecipe = GlobalObjects.Instance.Get<RecipeVision>().GetItem<EUVOriginRecipe>();
+            EUVOriginRecipe originRecipe = recipe.GetItem<EUVOriginRecipe>();
+            OriginInfo originInfo = originRecipe.TDIOriginInfo;
 
-            int originWidth = originRecipe.TDIOrigin.OriginSize.X;
-            int originHeight = originRecipe.TDIOrigin.OriginSize.Y;
+            if (TabName.Contains("Stain"))
+                originInfo = originRecipe.StainOriginInfo;
+            else if (TabName.Contains("Main"))
+                originInfo = originRecipe.TDIOriginInfo;
+            else if (TabName.Contains("Top"))
+                originInfo = originRecipe.SideTBOriginInfo;
+            else if (TabName.Contains("Left"))
+                originInfo = originRecipe.SideLROriginInfo;
+
+            int originWidth = originInfo.OriginSize.X;
+            int originHeight = originInfo.OriginSize.Y;
 
             if (originWidth == 0 || originHeight == 0) return;
 
-            int left = originRecipe.TDIOrigin.Origin.X;
-            int top = originRecipe.TDIOrigin.Origin.Y;
+            int left = originInfo.Origin.X;
+            int top = originInfo.Origin.Y;
 
-            int right = originRecipe.TDIOrigin.Origin.X + originWidth;
-            int bottom = originRecipe.TDIOrigin.Origin.Y+originHeight;
+            int right = originInfo.Origin.X + originWidth;
+            int bottom = originInfo.Origin.Y+originHeight;
 
             CPoint canvasLeftTop = GetCanvasPoint(new CPoint(left, top));
             CPoint canvasLeftBottom = GetCanvasPoint(new CPoint(left, bottom));

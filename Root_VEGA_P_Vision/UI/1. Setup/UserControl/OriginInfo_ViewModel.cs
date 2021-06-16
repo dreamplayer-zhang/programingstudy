@@ -10,17 +10,17 @@ namespace Root_VEGA_P_Vision
     public class OriginInfo_ViewModel:ObservableObject
     {
         public OriginInfo_UI Main;
-        OriginInfo origininfo;
         string header;
-        public OriginInfo OriginInfo
-        {
-            get => origininfo;
-            set => SetProperty(ref origininfo, value);
-        }
+        OriginInfo originInfo;
         public string Header
         {
             get => header;
             set => SetProperty(ref header, value);
+        }
+        public OriginInfo OriginInfo
+        {
+            get => originInfo;
+            set => SetProperty(ref originInfo, value);
         }
         public OriginInfo_ViewModel(OriginInfo OriginInfo, string header)
         {

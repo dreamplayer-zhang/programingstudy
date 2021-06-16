@@ -11,12 +11,18 @@ namespace Root_VEGA_P_Vision
     {
         public MaskTools_Panel Main;
         ToolType eToolType;
+        ViewerMode eviewerMode;
         bool isDraw;
         int nThickness, nThreshold, IsUp;
         public ToolType m_eToolType
         {
             get => eToolType;
             set => SetProperty(ref eToolType, value);
+        }
+        public ViewerMode eViewerMode
+        {
+            get => eviewerMode;
+            set => SetProperty(ref eviewerMode, value);
         }
         public int p_nThickness
         {
@@ -56,23 +62,35 @@ namespace Root_VEGA_P_Vision
         }
         public ICommand btnDraw
         {
-            get => new RelayCommand(()=> { IsDraw = true; });
+            get => new RelayCommand(()=> { 
+                eViewerMode = ViewerMode.Mask; 
+                IsDraw = true; 
+            });
         }
         public ICommand btnErase
         {
-            get => new RelayCommand(() => { IsDraw = false; });
+            get => new RelayCommand(() => { 
+                eViewerMode = ViewerMode.Mask;
+                IsDraw = false; 
+            });
         }
         public ICommand btnPen
         {
-            get => new RelayCommand(()=> { eToolType = ToolType.Pen; });
+            get => new RelayCommand(()=> {
+                eToolType = ToolType.Pen; 
+            });
         }
         public ICommand btnRect
         {
-            get => new RelayCommand(() => { eToolType = ToolType.Rect; });
+            get => new RelayCommand(() => {
+                eToolType = ToolType.Rect; 
+            });
         }
         public ICommand btnThreshold
         {
-            get => new RelayCommand(() => { eToolType = ToolType.Threshold; });
+            get => new RelayCommand(() => {
+                eToolType = ToolType.Threshold; 
+            });
         }
     }
 }

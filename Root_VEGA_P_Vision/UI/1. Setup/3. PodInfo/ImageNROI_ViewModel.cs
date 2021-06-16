@@ -38,8 +38,11 @@ namespace Root_VEGA_P_Vision
             Main = new ImageNROI_Panel();
             Main.DataContext = this;
             maskTools = new MaskTools_ViewModel();
-            SelectedViewer = new MaskRootViewer_ViewModel("EIP_Cover.Main.Front", maskTools);
-            surfaceParamTree = new SurfaceParam_Tree_ViewModel();
+            RecipeBase recipe = GlobalObjects.Instance.Get<RecipeCoverFront>();
+            SelectedViewer = new MaskRootViewer_ViewModel("EIP_Cover.Main.Front", maskTools,
+                recipe,recipe.GetItem<EUVOriginRecipe>().TDIOriginInfo,recipe.GetItem<EUVPodSurfaceParameter>().PodTDI.MaskIndex);
+
+            surfaceParamTree = new SurfaceParam_Tree_ViewModel(GlobalObjects.Instance.Get<RecipeCoverFront>().GetItem<EUVPodSurfaceParameter>().PodStain);
             VegaPEventManager.ImageROIBtn += VegaPEventManager_ImageROIBtn;
         }
 
@@ -50,7 +53,10 @@ namespace Root_VEGA_P_Vision
 
         public ICommand btnSaveMasterImage
         {
-            get => new RelayCommand(() => { });
+            get => new RelayCommand(() => {
+                //RecipeVision recipe = GlobalObjects.Instance.Get<RecipeVision>();
+                //recipe.SaveMasterImage()
+            });
         }
         public ICommand btnLoadMasterImage
         {

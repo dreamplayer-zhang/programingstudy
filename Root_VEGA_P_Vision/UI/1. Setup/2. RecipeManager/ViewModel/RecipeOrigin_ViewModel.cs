@@ -25,8 +25,6 @@ namespace Root_VEGA_P_Vision
         ImageViewerBase_ViewModel mBase;
         OriginViewerTab_ViewModel originviewerTab;
         PositionViewerTab_ViewModel positionviewerTab;
-        EUVOriginRecipe originRecipe;
-        EUVPositionRecipe positionRecipe;
 
         AlignFeatureInfo_ViewModel selectedFeatureInfo;
         OriginInfo_ViewModel tdiOrigin, stainOrigin,sideTBOrigin,sideLROrigin;
@@ -91,13 +89,6 @@ namespace Root_VEGA_P_Vision
             set => SetProperty(ref m_panel, value);
         }
 
-        public EUVOriginRecipe p_OriginRecipe
-        {
-            get => originRecipe;
-            set => SetProperty(ref originRecipe, value);
-        }
-
-
         #endregion
         public RecipeOrigin_ViewModel(RecipeManager_ViewModel recipeManager)
         {
@@ -107,15 +98,13 @@ namespace Root_VEGA_P_Vision
             mBase = new ImageViewerBase_ViewModel();
             originviewerTab = new OriginViewerTab_ViewModel();
             positionviewerTab = new PositionViewerTab_ViewModel();
-            originRecipe = GlobalObjects.Instance.Get<RecipeVision>().GetItem<EUVOriginRecipe>();
-            positionRecipe = GlobalObjects.Instance.Get<RecipeVision>().GetItem<EUVPositionRecipe>();
 
             SelectedFeatureInfo = new AlignFeatureInfo_ViewModel(this, positionviewerTab.selectedLists);
-
-            tdiOrigin = new OriginInfo_ViewModel(originRecipe.TDIOrigin, "2D TDI Origin");
-            stainOrigin = new OriginInfo_ViewModel(originRecipe.StainOrigin, "Stain Origin");
-            sideTBOrigin = new OriginInfo_ViewModel(originRecipe.SideTBOrigin, "Side Top -Bottom Origin");
-            sideLROrigin = new OriginInfo_ViewModel(originRecipe.SideLROrigin,"Side Left - Right Origin");
+            EUVOriginRecipe originRecipe = GlobalObjects.Instance.Get<RecipeCoverFront>().GetItem<EUVOriginRecipe>();
+            tdiOrigin = new OriginInfo_ViewModel(originRecipe.TDIOriginInfo, "2D TDI Origin");
+            stainOrigin = new OriginInfo_ViewModel(originRecipe.StainOriginInfo, "Stain Origin");
+            sideTBOrigin = new OriginInfo_ViewModel(originRecipe.SideTBOriginInfo, "Side Top -Bottom Origin");
+            sideLROrigin = new OriginInfo_ViewModel(originRecipe.SideLROriginInfo,"Side Left - Right Origin");;
 
             positionviewerTab.p_EIPBaseBtm.FeatureBoxDone += FeatureBoxDoneUpdate;
             positionviewerTab.p_EIPBaseTop.FeatureBoxDone += FeatureBoxDoneUpdate;

@@ -41,13 +41,24 @@ namespace Root_VEGA_P_Vision
         {
             Main = new RecipeSideImageViewers_Panel();
             Main.DataContext = this;
-            top_ViewerVM = new MaskRootViewer_ViewModel(parts + ".Top", recipeSide.recipeSetting.MaskTools);
+            RecipeBase recipe = GlobalObjects.Instance.Get<RecipeCoverFront>();
 
-            bottom_ViewerVM = new MaskRootViewer_ViewModel(parts+".Bottom", recipeSide.recipeSetting.MaskTools);
+            if (parts.Contains("Cover"))
+                recipe = GlobalObjects.Instance.Get<RecipeCoverFront>();
+            else if (parts.Contains("Plate"))
+                recipe = GlobalObjects.Instance.Get<RecipePlateFront>();
 
-            left_ViewerVM = new MaskRootViewer_ViewModel(parts+".Left", recipeSide.recipeSetting.MaskTools);
+            top_ViewerVM = new MaskRootViewer_ViewModel(parts + ".Top", recipeSide.recipeSetting.MaskTools,recipe,
+                recipe.GetItem<EUVOriginRecipe>().SideTBOriginInfo,recipe.GetItem<EUVPodSurfaceParameter>().PodSideTB.MaskIndex);
 
-            right_ViewerVM = new MaskRootViewer_ViewModel(parts+".Right", recipeSide.recipeSetting.MaskTools);
+            bottom_ViewerVM = new MaskRootViewer_ViewModel(parts+".Bottom", recipeSide.recipeSetting.MaskTools, recipe,
+                recipe.GetItem<EUVOriginRecipe>().SideTBOriginInfo,recipe.GetItem<EUVPodSurfaceParameter>().PodSideTB.MaskIndex);
+
+            left_ViewerVM = new MaskRootViewer_ViewModel(parts+".Left", recipeSide.recipeSetting.MaskTools, recipe,
+                recipe.GetItem<EUVOriginRecipe>().SideLROriginInfo,recipe.GetItem<EUVPodSurfaceParameter>().PodSideLR.MaskIndex);
+
+            right_ViewerVM = new MaskRootViewer_ViewModel(parts+".Right", recipeSide.recipeSetting.MaskTools, recipe,
+                recipe.GetItem<EUVOriginRecipe>().SideLROriginInfo, recipe.GetItem<EUVPodSurfaceParameter>().PodSideLR.MaskIndex);
         }
     }
 }

@@ -20,17 +20,37 @@
         <Grid Grid.Column="1">
             <Grid Visibility="{Binding OriginInfoVisible,Converter={StaticResource BooleanToVisiblity}}">
                 <Grid.RowDefinitions>
+                    <RowDefinition Height="1.1*"/>
                     <RowDefinition Height="2*"/>
                     <RowDefinition Height="2*"/>
                     <RowDefinition Height="2*"/>
                     <RowDefinition Height="2*"/>
-                    <RowDefinition Height="4*"/>
+                    <RowDefinition Height="3*"/>
 
                 </Grid.RowDefinitions>
-                <local:OriginInfo_UI Grid.Row="0" DataContext="{Binding TDIOrigin}"/>
-                <local:OriginInfo_UI Grid.Row="1" DataContext="{Binding StainOrigin}"/>
-                <local:OriginInfo_UI Grid.Row="2" DataContext="{Binding SideTBOrigin}"/>
-                <local:OriginInfo_UI Grid.Row="3" DataContext="{Binding SideLROrigin}"/>
+                <local:OriginInfo_UI Grid.Row="1" DataContext="{Binding TDIOrigin}"/>
+                <local:OriginInfo_UI Grid.Row="2" DataContext="{Binding StainOrigin}"/>
+                <local:OriginInfo_UI Grid.Row="3" DataContext="{Binding SideTBOrigin}"/>
+                <local:OriginInfo_UI Grid.Row="4" DataContext="{Binding SideLROrigin}"/>
+                <Grid Grid.Row="0" Margin="10,0,10,0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="0.8*"/>
+                        <RowDefinition Height="0.2*"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <TextBlock Grid.Row="0" Text="Master Image" Style="{StaticResource HeaderTextBlock}"/>
+                    <Line Height="1" Grid.Row="1"
+                      Stretch="Fill"
+                      Stroke="{StaticResource BorderBrush}"
+                      StrokeThickness="0.7"
+                      VerticalAlignment="Top"
+                      X2="1"/>
+
+                    <UniformGrid Rows="1" Grid.Row="2" HorizontalAlignment="Center">
+                        <Button Content="Save MasterImage"  Command="{Binding p_BaseViewer.p_SubViewer.DataContext.btnSaveMasterImage}" Style="{StaticResource ImageBaseBtn}"/>
+                        <Button Content="Load MasterImage"  Command="{Binding p_BaseViewer.p_SubViewer.DataContext.btnLoadMasterImage}" Style="{StaticResource ImageBaseBtn}"/>
+                    </UniformGrid>
+                </Grid>
             </Grid>
 
             <local:AlignFeatureInfo Visibility="{Binding RelativeSource

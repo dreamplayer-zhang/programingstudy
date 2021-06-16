@@ -19,11 +19,6 @@ namespace Root_VEGA_P_Vision
     public class AlignFeatureInfo_ViewModel:ObservableObject
     {
         #region Property
-        public EUVPositionRecipe PositionRecipe
-        {
-            get => positionRecipe;
-            set => SetProperty(ref positionRecipe, value);
-        }
         private ObservableCollection<UIElement> alignFeatureList = new ObservableCollection<UIElement>();
         public ObservableCollection<UIElement> AlignFeatureList
         {
@@ -98,7 +93,6 @@ namespace Root_VEGA_P_Vision
         #endregion
 
         public AlignFeatureInfo Main;
-        EUVPositionRecipe positionRecipe;
         RecipeOrigin_ViewModel recipeOrigin;
         PositionFeature curTabIdx;
         public AlignBtnState btnState;
@@ -109,7 +103,6 @@ namespace Root_VEGA_P_Vision
             this.recipeOrigin = recipeOrigin;
             curTabIdx = recipeOrigin.PositionViewerTab.curTab;
             Main.DataContext = this;
-            positionRecipe = GlobalObjects.Instance.Get<RecipeVision>().GetItem<EUVPositionRecipe>();
             this.list = list;
             CurPosData = new RecipeType_ImageData();
             CurAlignData = new RecipeType_ImageData();

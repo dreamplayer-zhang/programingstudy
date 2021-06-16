@@ -1158,7 +1158,7 @@ namespace RootTools
             }
         }
 
-        public virtual unsafe void SetMaskLayerSource()
+        public virtual unsafe void SetMaskLayerSource(int MaskIdx)
         {
             try
             {
@@ -1172,7 +1172,7 @@ namespace RootTools
                         ImageData view = new ImageData((int)CanvasWidth, (int)CanvasHeight, 4);
                         byte* viewPtr = (byte*)view.GetPtr();
 
-                        IntPtr ptrMem = p_ROILayer.GetPtr();
+                        IntPtr ptrMem = p_ROILayer.GetPtr(MaskIdx);
 
                         if (ptrMem == IntPtr.Zero)
                             return;

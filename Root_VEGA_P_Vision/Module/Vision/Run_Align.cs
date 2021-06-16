@@ -175,7 +175,7 @@ namespace Root_VEGA_P_Vision.Module
 
                 AlignGrabMode.m_camera.StopGrab();
 
-                double AlignAngle = GlobalObjects.Instance.Get<RecipeVision>().GetItem<EUVPositionRecipe>().EIPCoverTopFeature.AlignAngle;
+                double AlignAngle = GlobalObjects.Instance.Get<RecipeVision>().GetItem<EUVPositionRecipe>().PartsFeatureList.AlignAngle;
                 double resAngle = Calc.GetAlignAngle(GlobalObjects.Instance.GetNamed<ImageData>("EIP_Cover.Main.Front"), 50,300);
 
                 if (resAngle == double.MinValue)
@@ -191,11 +191,11 @@ namespace Root_VEGA_P_Vision.Module
             }
         }
 
-        public CPoint ConvertRelToAbs(CPoint ptRel)
+        public CPoint ConvertRelToAbs(CPoint ptRel,RecipeBase recipe)
         {
-            EUVOriginRecipe originRecipe = GlobalObjects.Instance.Get<RecipeVision>().GetItem<EUVOriginRecipe>();
+            EUVOriginRecipe originRecipe = recipe.GetItem<EUVOriginRecipe>();
 
-            return new CPoint(originRecipe.TDIOrigin.Origin.X + ptRel.X, originRecipe.TDIOrigin.Origin.Y - originRecipe.TDIOrigin.OriginSize.Y + ptRel.Y);
+            return new CPoint(originRecipe.TDIOriginInfo.Origin.X + ptRel.X, originRecipe.TDIOriginInfo.Origin.Y - originRecipe.TDIOriginInfo.Origin.Y + ptRel.Y);
         }
         private void GrabMode_Grabed(object sender, EventArgs e)
         {

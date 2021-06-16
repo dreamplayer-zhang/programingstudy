@@ -32,45 +32,13 @@ namespace Root_VEGA_P_Vision
         #region [ColorDefines]
         private class ImageViewerColorDefines
         {
-            public static SolidColorBrush MasterPosition = Brushes.Magenta;
-            public static SolidColorBrush MasterPostionMove = Brushes.Yellow;
-            public static SolidColorBrush ChipPosition = Brushes.Blue;
-            public static SolidColorBrush ChipPositionMove = Brushes.Yellow;
-            public static SolidColorBrush PostionFail = Brushes.Red;
-            public static SolidColorBrush Defect = Brushes.Red;
-            public static SolidColorBrush CapturedArea = new SolidColorBrush(Color.FromRgb(255,45,85));
-        }
-
-        private class MapViewerColorDefines
-        {
-            public static SolidColorBrush NoChip = Brushes.LightGray;
-            public static SolidColorBrush Normal = Brushes.DimGray;
-            public static SolidColorBrush Snap = Brushes.LightSkyBlue;
-            public static SolidColorBrush Position = Brushes.LightYellow;
-            public static SolidColorBrush Inspection = Brushes.Gold;
-            public static SolidColorBrush ProcessDefect = Brushes.YellowGreen;
-            public static SolidColorBrush ProcessDefectWafer = Brushes.Green;
-
-            public static SolidColorBrush GetWorkplaceStateColor(WORK_TYPE state)
-            {
-                switch (state)
-                {
-                    case WORK_TYPE.NONE:
-                        return Normal;
-                    case WORK_TYPE.SNAP:
-                        return Snap;
-                    case WORK_TYPE.ALIGNMENT:
-                        return Position;
-                    case WORK_TYPE.INSPECTION:
-                        return Inspection;
-                    case WORK_TYPE.DEFECTPROCESS:
-                        return ProcessDefect;
-                    case WORK_TYPE.DEFECTPROCESS_ALL:
-                        return ProcessDefectWafer;
-                    default:
-                        return Normal;
-                }
-            }
+            public static SolidColorBrush MasterPosition = new SolidColorBrush(Color.FromRgb(255, 45, 85));
+            public static SolidColorBrush MasterPostionMove = new SolidColorBrush(Color.FromRgb(255, 204, 0));
+            public static SolidColorBrush ChipPosition = new SolidColorBrush(Color.FromRgb(0,122,255));
+            public static SolidColorBrush ChipPositionMove = new SolidColorBrush(Color.FromRgb(255,204,0));
+            public static SolidColorBrush PostionFail = new SolidColorBrush(Color.FromRgb(255, 59, 48));
+            public static SolidColorBrush Defect = new SolidColorBrush(Color.FromRgb(255, 59, 48));
+            public static SolidColorBrush CapturedArea = new SolidColorBrush(Color.FromRgb(255,59,48));
         }
         #endregion
 
@@ -78,13 +46,13 @@ namespace Root_VEGA_P_Vision
         public ToolType m_eToolType;
         ThresholdMode m_eThresholdMode;
         public ViewerMode m_eCurMode = ViewerMode.None;
-        System.Windows.Media.Color m_Color = Colors.Navy;
+        Color m_Color = Colors.Navy;
         Color m_EraseColor = Color.FromArgb(0,0,0,0);
 
         Stack<Work> m_History;
         Work m_CurrentWork;
         TShape m_CurrentShape;
-        MaskTools_ViewModel recipeSetting;
+        MaskTools_ViewModel maskTool;
         ItemMask m_cInspROI;
 
         public ItemMask p_cInspROI
@@ -93,13 +61,36 @@ namespace Root_VEGA_P_Vision
             set => SetProperty(ref m_cInspROI, value);
         }
 
-        public MaskRootViewer_ViewModel(string imagedata, MaskTools_ViewModel recipeSetting) : base(imagedata)
+        RecipeBase recipe;
+        public RecipeBase Recipe
+        {
+            get => recipe;
+            set => SetProperty(ref recipe, value);
+        }
+        OriginInfo originInfo;
+        public MaskRootViewer_ViewModel(string imagedata, MaskTools_ViewModel maskTool,RecipeBase recipe,OriginInfo originInfo,int ROIMaskIdx) : base(imagedata)
         {
             p_VisibleMenu = Visibility.Collapsed;
-            this.recipeSetting = recipeSetting;
-
+            this.maskTool = maskTool;
             m_cInspROI = new ItemMask();
             m_History = new Stack<Work>();
+            this.recipe = recipe;
+
+            //CoverFront = 0, CoverBack = 10, PlateFront = 20, PlateBack = 30
+            if(imagedata.Contains("Cover"))
+            {
+                if (imagedata.Contains("Front"))
+                    this.ROIMaskIdx = ROIMaskIdx;
+                else if (imagedata.Contains("Back"))
+                    this.ROIMaskIdx = ROIMaskIdx + 10;
+            }else if(imagedata.Contains("Plate"))
+            {
+                if (imagedata.Contains("Front"))
+                    this.ROIMaskIdx = ROIMaskIdx+20;
+                else if (imagedata.Contains("Back"))
+                    this.ROIMaskIdx = ROIMaskIdx+30;
+            }
+            this.originInfo = originInfo;
 
             InitializeUIElements();
             Init_PenCursor();
@@ -128,10 +119,9 @@ namespace Root_VEGA_P_Vision
                         m_CurrentWork = new Work(m_eToolType);
                     }
 
-                    bool IsDraw = recipeSetting.IsDraw;
+                    bool IsDraw = maskTool.IsDraw;
                     switch (m_eToolProcess)
                     {
-
                         case ToolProcess.None:
 
                             switch (m_eToolType)
@@ -207,6 +197,9 @@ namespace Root_VEGA_P_Vision
         {
             base.MouseMove(sender, e);
 
+            if (m_eCurMode.Equals(ViewerMode.None))
+                m_eCurMode = maskTool.eViewerMode;
+
             switch (m_eCurMode)
             {
                 case ViewerMode.CaptureROI:
@@ -234,11 +227,11 @@ namespace Root_VEGA_P_Vision
 
                     CPoint memPt = new CPoint(p_MouseMemX, p_MouseMemY);
 
-                    m_eToolType = recipeSetting.m_eToolType;
-                    p_nThickness = recipeSetting.p_nThickness;
+                    m_eToolType = maskTool.m_eToolType;
+                    p_nThickness = maskTool.p_nThickness;
                     PenCursor.Visibility = Visibility.Collapsed;
 
-                    bool IsDraw = recipeSetting.IsDraw;
+                    bool IsDraw = maskTool.IsDraw;
 
                     switch (m_eToolProcess)
                     {
@@ -310,7 +303,6 @@ namespace Root_VEGA_P_Vision
                 case ViewerMode.CaptureROI:
                     CPoint CanvasPt = new CPoint(p_MouseX, p_MouseY);
                     CPoint MemPt = GetMemPoint(CanvasPt);
-                    //ProcessCaptureROI(e);
                     break;
                 case ViewerMode.Mask:
                     ProcessMask();
@@ -331,7 +323,7 @@ namespace Root_VEGA_P_Vision
         #region Tool
         private unsafe void Pen(CPoint cPt, int size)
         {
-            IntPtr ptrMem = p_ROILayer.GetPtr();
+            IntPtr ptrMem = p_ROILayer.GetPtr(ROIMaskIdx+SelectedIdx);
             if (ptrMem == IntPtr.Zero)
                 return;
             byte* imagePtr = (byte*)ptrMem.ToPointer();
@@ -356,8 +348,7 @@ namespace Root_VEGA_P_Vision
                     fPtr[pos] = clr;
                 }
             });
-            //SetLayerSource();
-            SetMaskLayerSource();
+            SetMaskLayerSource(ROIMaskIdx + SelectedIdx);
         }
         private void Eraser(CPoint cPt, int size)
         {
@@ -443,6 +434,7 @@ namespace Root_VEGA_P_Vision
             rect.MemoryRect.Top = rect.MemoryRect.Top;
             rect.MemoryRect.Bottom = rect.MemoryRect.Bottom;
 
+            m_eCurMode = ViewerMode.None;
             Parallel.For(rect.MemoryRect.Top, rect.MemoryRect.Bottom + 1, y =>
             {
                 for (int x = rect.MemoryRect.Left; x <= rect.MemoryRect.Right; x++)
@@ -452,8 +444,7 @@ namespace Root_VEGA_P_Vision
                     DrawPixelBitmap(pixelPt, m_Color.R, m_Color.G, m_Color.B, m_Color.A);
                 }
             });
-            SetMaskLayerSource();
-            //SetLayerSource();
+            SetMaskLayerSource(ROIMaskIdx + SelectedIdx);
             m_History.Push(m_CurrentWork);
             p_UIElement.Remove(rect.CanvasRect);
         }
@@ -464,7 +455,7 @@ namespace Root_VEGA_P_Vision
             rect.MemoryRect.Right = rect.MemoryRect.Right;
             rect.MemoryRect.Top = rect.MemoryRect.Top;
             rect.MemoryRect.Bottom = rect.MemoryRect.Bottom;
-
+            m_eCurMode = ViewerMode.None;
             Parallel.For(rect.MemoryRect.Top, rect.MemoryRect.Bottom + 1, y =>
             {
                 for (int x = rect.MemoryRect.Left; x <= rect.MemoryRect.Right; x++)
@@ -474,9 +465,8 @@ namespace Root_VEGA_P_Vision
                     DrawPixelBitmap(pixelPt, m_EraseColor.R, m_EraseColor.G, m_EraseColor.B, m_EraseColor.A);
                 }
             });
-            SetMaskLayerSource();
+            SetMaskLayerSource(ROIMaskIdx + SelectedIdx);
 
-            //SetLayerSource();
             m_History.Push(m_CurrentWork);
             p_UIElement.Remove(rect.CanvasRect);
         }
@@ -486,6 +476,7 @@ namespace Root_VEGA_P_Vision
 
             CRect ThresholdRect = new CRect(rect.MemoryRect.Left, rect.MemoryRect.Top, rect.MemoryRect.Right + 1, rect.MemoryRect.Bottom + 1);
             IntPtr ptr = p_ImageData.GetPtr();
+            m_eCurMode = ViewerMode.None;
             for (int i = ThresholdRect.Height - 1; i >= 0; i--)
             {
                 byte* gv = (byte*)((IntPtr)((long)ptr + ThresholdRect.Left * p_ImageData.p_nByte + ((long)i + ThresholdRect.Top) * p_ImageData.p_Stride));
@@ -512,11 +503,7 @@ namespace Root_VEGA_P_Vision
                     }
                 }
             }
-            //SetLayerSource();
-            SetMaskLayerSource();
-
-
-
+            SetMaskLayerSource(ROIMaskIdx + SelectedIdx);
             p_UIElement.Remove(rect.CanvasRect);
         }
 
@@ -593,8 +580,6 @@ namespace Root_VEGA_P_Vision
             GlobalObjects.Instance.GetNamed<WorkManager>(TabName).InspectionDone += InspectionDone_Callback;
             GlobalObjects.Instance.GetNamed<WorkManager>(TabName).ProcessDefectWaferStart += ProcessDefectWaferStart_Callback;
             GlobalObjects.Instance.GetNamed<WorkManager>(TabName).IntegratedProcessDefectDone += ProcessDefectWaferDone_Callback;
-
-
         }
 
         private void ProcessDefectWaferDone_Callback(object sender, IntegratedProcessDefectDoneEventArgs e)
@@ -690,8 +675,8 @@ namespace Root_VEGA_P_Vision
         }
         public void LoadRecipe()
         {
-            if (currentRecipe != GlobalObjects.Instance.Get<RecipeVision>().Name)
-                currentRecipe = GlobalObjects.Instance.Get<RecipeVision>().Name;
+            if (currentRecipe != recipe.Name)
+                currentRecipe = recipe.Name;
         }
 
         public void DrawRectDefect(List<CRect> rectList, List<string> text)
@@ -704,12 +689,17 @@ namespace Root_VEGA_P_Vision
             if (GlobalObjects.Instance.GetNamed<WorkManager>(TabName) != null)
             {
                 p_ImageData.GetPtr(SelectedIdx);
-                EUVOriginRecipe originRecipe = GlobalObjects.Instance.Get<RecipeVision>().GetItem<EUVOriginRecipe>();
-                OriginRecipe insporigin = GlobalObjects.Instance.Get<RecipeVision>().GetItem<OriginRecipe>();
-                insporigin.OriginX = originRecipe.StainOrigin.Origin.X;
-                insporigin.OriginY = originRecipe.StainOrigin.Origin.Y;
-                insporigin.OriginWidth = originRecipe.StainOrigin.OriginSize.X;
-                insporigin.OriginHeight = originRecipe.StainOrigin.OriginSize.Y;
+                OriginRecipe insporigin = recipe.GetItem<OriginRecipe>();
+                insporigin.OriginX = originInfo.Origin.X;
+                insporigin.OriginY = originInfo.Origin.Y;
+                insporigin.OriginWidth = originInfo.OriginSize.X;
+                insporigin.OriginHeight = originInfo.OriginSize.Y;
+
+                if (originInfo == null)
+                {
+                    MessageBox.Show("Origin이 없습니다");
+                    return;
+                }
 
                 SetMaskInspROI();
 
@@ -718,11 +708,10 @@ namespace Root_VEGA_P_Vision
         }
         unsafe void SetMaskInspROI()
         {
-            EUVOriginRecipe originRecipe = GlobalObjects.Instance.Get<RecipeVision>().GetItem<EUVOriginRecipe>();
-            int originWidth = originRecipe.StainOrigin.OriginSize.X;
-            int originHeight = originRecipe.StainOrigin.OriginSize.Y;
+            int originWidth = originInfo.OriginSize.X;
+            int originHeight = originInfo.OriginSize.Y;
 
-            IntPtr ptrMem = p_ROILayer.GetPtr(SelectedIdx);
+            IntPtr ptrMem = p_ROILayer.GetPtr(ROIMaskIdx+SelectedIdx);
             if (ptrMem == IntPtr.Zero)
                 return;
             byte* bitmapPtr = (byte*)ptrMem.ToPointer();
@@ -761,11 +750,7 @@ namespace Root_VEGA_P_Vision
         }
         public void SetRecipeData()
         {
-            //Stain은 Origin Recipe 영역을 전부다 쓸꺼임
-            RecipeVision recipe = GlobalObjects.Instance.Get<RecipeVision>();
-            EUVOriginRecipe originRecipe = GlobalObjects.Instance.Get<RecipeVision>().GetItem<EUVOriginRecipe>();
-
-            recipe.GetItem<MaskRecipe>().OriginPoint = new CPoint(originRecipe.StainOrigin.OriginSize.X, originRecipe.StainOrigin.OriginSize.Y);
+            recipe.GetItem<MaskRecipe>().OriginPoint = new CPoint(originInfo.OriginSize.X, originInfo.OriginSize.Y);
             if (recipe.GetItem<MaskRecipe>().MaskList.Count > 0)
                 recipe.GetItem<MaskRecipe>().MaskList.Clear();
 
@@ -852,27 +837,6 @@ namespace Root_VEGA_P_Vision
 
         private void RedrawShapes()
         {
-            // 개선중..
-            //watch.p_secTimeout = 1;
-            //if (watch.IsRunning == true)
-            //{
-            //    time += watch.ElapsedMilliseconds;
-            //    watch.Restart();
-            //}
-            //else
-            //{
-            //    watch.Start();
-            //}
-
-            //if (time < 1000 / 20)
-            //{
-            //    return;
-            //}
-            //else
-            //{
-            //    time = 0;
-            //}
-
             foreach (TShape shape in Shapes)
             {
                 TRect rect = shape as TRect;
@@ -891,8 +855,6 @@ namespace Root_VEGA_P_Vision
 
                 CPoint canvasLT = new CPoint(GetCanvasPoint(LT));
                 CPoint canvasRB = new CPoint(GetCanvasPoint(RB));
-
-
 
                 int width = Math.Abs(canvasRB.X - canvasLT.X);
                 int height = Math.Abs(canvasRB.Y - canvasLT.Y);
@@ -1126,7 +1088,7 @@ namespace Root_VEGA_P_Vision
                             m_eToolProcess = ToolProcess.None;
                             break;
                         case ToolType.Rect:
-                            if (recipeSetting.IsDraw)
+                            if (maskTool.IsDraw)
                                 Done_Rect();
                             else
                                 Done_EraseRect();
@@ -1137,8 +1099,8 @@ namespace Root_VEGA_P_Vision
                         case ToolType.Crop:
                             break;
                         case ToolType.Threshold:
-                            m_eThresholdMode = (ThresholdMode)recipeSetting.p_nselectedUpdown;
-                            p_nThreshold = recipeSetting.p_nThreshold;
+                            m_eThresholdMode = (ThresholdMode)maskTool.p_nselectedUpdown;
+                            p_nThreshold = maskTool.p_nThreshold;
                             Done_Threshold();
                             m_eToolProcess = ToolProcess.None;
                             break;
@@ -1225,11 +1187,6 @@ namespace Root_VEGA_P_Vision
             }
         }
 
-        public void CaptureArea()
-        {
-            m_eCurMode = ViewerMode.CaptureROI;
-        }
-
         private void InitializeUIElements()
         {
             BOX = new TShape();
@@ -1261,7 +1218,7 @@ namespace Root_VEGA_P_Vision
             {
                 return new RelayCommand(() =>
                 {
-                    IntPtr ptrMem = p_ROILayer.GetPtr();
+                    IntPtr ptrMem = p_ROILayer.GetPtr(ROIMaskIdx+SelectedIdx);
                     if (ptrMem == IntPtr.Zero)
                         return;
 
@@ -1270,7 +1227,7 @@ namespace Root_VEGA_P_Vision
                     {
                         Marshal.Copy(buf, 0, (IntPtr)((long)ptrMem + (long)p_ROILayer.p_Size.X * p_ROILayer.GetBytePerPixel() * i), buf.Length);
                     }
-                    SetLayerSource();
+                    SetMaskLayerSource(ROIMaskIdx + SelectedIdx);
                 });
             }
         }

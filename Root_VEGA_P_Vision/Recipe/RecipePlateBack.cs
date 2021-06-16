@@ -1,13 +1,21 @@
 ﻿using RootTools_Vision;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace Root_VEGA_P_Vision
 {
-    public class RecipeVision:RecipeBase
+    public class RecipePlateBack:RecipeBase
     {
         public override void Initilize()
         {
             RegisterRecipeItem<EUVOriginRecipe>();
+            RegisterRecipeItem<OriginRecipe>();//Recipe에서 필요함
             RegisterRecipeItem<EUVPositionRecipe>();
+            RegisterRecipeItem<StainRecipe>();
+            RegisterRecipeItem<LowResRecipe>();
             RegisterRecipeItem<MaskRecipe>();
             RegisterRecipeItem<EUVPodSurfaceRecipe>();
             RegisterParameterItem<EUVPodSurfaceParameter>();

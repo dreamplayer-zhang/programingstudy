@@ -21,7 +21,12 @@ namespace Root_VEGA_P_Vision
     {
         int selectedIdx;
         string tabName;
-
+        int ROImaskIdx;
+        public int ROIMaskIdx
+        {
+            get => ROImaskIdx;
+            set => SetProperty(ref ROImaskIdx, value);
+        }
         public int SelectedIdx
         {
             get => selectedIdx;
@@ -158,7 +163,7 @@ namespace Root_VEGA_P_Vision
                     p_ImgSource = Tools.ConvertBitmapToSource(bmp);
                 }
                 if (p_ROILayer != null)
-                    SetMaskLayerSource();
+                    SetMaskLayerSource(ROIMaskIdx+selectedIdx);
             }
             catch (Exception ee)
             {

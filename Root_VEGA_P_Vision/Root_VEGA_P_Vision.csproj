@@ -96,6 +96,7 @@
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Emgu.CV.World, Version=4.1.1.3497, Culture=neutral, PublicKeyToken=7281126722ab4438" />
     <Reference Include="MahApps.Metro.IconPacks, Version=4.0.0.0, Culture=neutral, PublicKeyToken=0c0d510f9915137a, processorArchitecture=MSIL">
       <HintPath>..\packages\MahApps.Metro.IconPacks.4.8.0\lib\net47\MahApps.Metro.IconPacks.dll</HintPath>
     </Reference>
@@ -237,10 +238,15 @@
     <Compile Include="MainVM.cs" />
     <Compile Include="Module\InspectionManagerVegaP.cs" />
     <Compile Include="Module\Vision\Run_Align.cs" />
+    <Compile Include="Module\Vision\Run_Inspection.cs" />
     <Compile Include="MVVM\Helper.cs" />
     <Compile Include="MVVM\ObservableObject.cs" />
     <Compile Include="MVVM\PropertySupport.cs" />
     <Compile Include="MVVM\RelayCommand.cs" />
+    <Compile Include="Recipe\RecipeCoverBack.cs" />
+    <Compile Include="Recipe\RecipeCoverFront.cs" />
+    <Compile Include="Recipe\RecipePlateBack.cs" />
+    <Compile Include="Recipe\RecipePlateFront.cs" />
     <Compile Include="Recipe\VisionSurfaceRecipe.cs" />
     <Compile Include="UI\1. Setup\2. RecipeManager\Panel\ImageViewerBase_Panel.xaml.cs">
       <DependentUpon>ImageViewerBase_Panel.xaml</DependentUpon>
