@@ -34,7 +34,9 @@ namespace Root_Pine2.Module
                 case ModuleBase.eState.Run: Background = Brushes.Yellow; break;
                 case ModuleBase.eState.Error: Background = Brushes.OrangeRed; break;
             }
-            OnRunTree(); 
+            OnRunTree();
+            textBlockUp.Text = (m_magazineEV.m_stack != null) ? "Stack" : ((m_magazineEV.m_aMagazine[InfoStrip.eMagazinePos.Up] != null) ? "Magazine" : "");
+            textBlockDown.Text = (m_magazineEV.m_aMagazine[InfoStrip.eMagazinePos.Down] != null) ? "Magazine" : "";
         }
 
         int[] m_nQueue = new int[2] { 0, 0 };

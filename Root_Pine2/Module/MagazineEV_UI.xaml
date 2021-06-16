@@ -14,12 +14,20 @@
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
-            <Grid Grid.Row="0" Background="Beige" Margin="3">
+            <Grid Grid.Row="0" Background="AliceBlue" Margin="3">
                 <TextBlock Text="{Binding p_sLED}" HorizontalAlignment="Center"/>
             </Grid>
-            <tree:TreeUI Grid.Row="1" x:Name="treeRootUI" IsEnabled="False"/>
+            <Grid Grid.Row="1" Background="Beige" Margin="3">
+                <TextBlock x:Name="textBlockUp" HorizontalAlignment="Center"/>
+            </Grid>
+            <Grid Grid.Row="2" Background="Beige" Margin="3">
+                <TextBlock x:Name="textBlockDown" HorizontalAlignment="Center"/>
+            </Grid>
+            <tree:TreeUI Grid.Row="3" x:Name="treeRootUI" IsEnabled="False"/>
         </Grid>
     </GroupBox>
 </UserControl>

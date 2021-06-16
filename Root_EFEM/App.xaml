@@ -4,8 +4,6 @@
              xmlns:local="clr-namespace:Root_EFEM"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
-        
-        
         <!--<SolidColorBrush x:Key="BdrBackGround" Color="White"/>
         <SolidColorBrush x:Key="BdrTitleBackGround" Color="#FF43437A"/>
         <SolidColorBrush x:Key="TbForeGround" Color="White"/>

@@ -241,7 +241,7 @@ namespace Root_WIND2.UI_User
             }
         }
 
-        public ICommand btnToolASCImportCommand
+        public ICommand btnToolFileImportCommand
         {
             get
             {
@@ -249,8 +249,8 @@ namespace Root_WIND2.UI_User
                 {
                     System.Windows.Forms.OpenFileDialog dlg = new System.Windows.Forms.OpenFileDialog();
                     dlg.InitialDirectory = Constants.RootPath.RecipeFrontRootPath;
-                    dlg.Title = "Load ASC File";
-                    dlg.Filter = "ASC file (*.ASC)|*.ASC|MCTxt file (*.txt)|*.txt|CTMap (*.FAB)|*.FAB|ALPSMap (*.Alpsdata)|*.Alpsdata|Text file (*.txt)|*.txt|xml file (*.xml)|*.xml|dat file (*.dat)|*.dat|G85 Map (*.*)|*.*|TSK Map (*.*)|*.*|Klarf file (*.001,*.smf)|*.001;*.smf||";
+                    dlg.Title = "Load File";
+                    dlg.Filter = "ASC file (*.ASC)|*.ASC|MCTxt file (*.txt)|*.txt|CTMap (*.FAB)|*.FAB|ALPSMap (*.Alpsdata)|*.Alpsdata|Text file (*.txt)|*.txt|xml file (*.xml)|*.xml|dat file (*.dat)|*.dat|G85 Map (*.*)|*.*|TSK Map (*.*)|*.*|Klarf file (*.001,*.smf)|*.001;*.smf";
                     if (dlg.ShowDialog() == System.Windows.Forms.DialogResult.OK)
                     {
                         int[] mapdata = new int[0];
@@ -264,7 +264,7 @@ namespace Root_WIND2.UI_User
                         {
                             RecipeType_WaferMap waferMap = GlobalObjects.Instance.Get<RecipeFront>().WaferMap;
                             StreamReader sr = new StreamReader(sFullPath, Encoding.Default);
-                            OpenMapDataMap(sr);
+                            OpenMapDataMap(sr, dlg.FilterIndex);
                         }
                         catch (Exception ex)
                         {
@@ -336,7 +336,7 @@ namespace Root_WIND2.UI_User
 
         public FrontsideProduct_ViewModel()
         {
-            chipItems = new ObservableCollection<Rectangle>();
+            chipItems = new ObservableCollection<UIElement>();
 
             this.camInfoDataListVM = new DataListView_ViewModel();
         }
@@ -358,14 +358,14 @@ namespace Root_WIND2.UI_User
         }
 
         #region [Properties]
-        private ObservableCollection<Rectangle> chipItems;
+        private ObservableCollection<UIElement> chipItems;
 
-        public ObservableCollection<Rectangle> ChipItems
+        public ObservableCollection<UIElement> ChipItems
         {
             get => this.chipItems;
             set
             {
-                SetProperty<ObservableCollection<Rectangle>>(ref this.chipItems, value);
+                SetProperty<ObservableCollection<UIElement>>(ref this.chipItems, value);
             }
         }
 
@@ -443,10 +443,17 @@ namespace Root_WIND2.UI_User
             DrawMap();
         }
 
-        public void OpenMapDataMap(StreamReader stdFile)
+        public void OpenMapDataMap(StreamReader stdFile, int filterIndex)
         {
-            OpenMapDataWaferMap(stdFile);
-            ConvertACSMapDataToWaferMap();
+            if (filterIndex == 1) // Read ASC file
+            {
+                OpenASCMapDataWaferMap(stdFile);
+                ConvertACSMapDataToWaferMap();
+            }
+            else if (filterIndex == 10) // Read Klaf file
+            {
+                OpenKlafMapDataWaferMap(stdFile);
+            }
             DrawMap();
         }
 
@@ -473,8 +480,20 @@ namespace Root_WIND2.UI_User
                         Rectangle rect = new Rectangle();
                         rect.Width = chipWidth;
                         rect.Height = chipHeight;
+
+                        TextBlock tb = new TextBlock();
+                        tb.FontSize = (int)(0.7 * Math.Min(chipWidth, chipHeight));
+                        tb.FontWeight = FontWeights.UltraBold;
+                        tb.Width = chipWidth;
+                        tb.Height = chipHeight;
+                        tb.TextAlignment = TextAlignment.Center;
+                        tb.Padding = new Thickness(0, (int)((chipHeight - tb.FontSize) / 2), 0, 0);
+
                         Canvas.SetLeft(rect, originPt.X + (chipWidth * (x + 1)));
                         Canvas.SetTop(rect, originPt.Y + (chipHeight * (y + 1)));
+
+                        Canvas.SetLeft(tb, originPt.X + (chipWidth * (x + 1)));
+                        Canvas.SetTop(tb, originPt.Y + (chipHeight * (y + 1)));
 
                         rect.Tag = new CPoint(x + 1, y + 1);
                         rect.Stroke = Brushes.Transparent;
@@ -487,11 +506,11 @@ namespace Root_WIND2.UI_User
 
                             if (x == -1 && y != -1)
                             {
-                                rect.ToolTip = string.Format("{0}", y + 1); // row index
+                                tb.Text = string.Format("{0}", y + 1); // row index
                             }
                             else if (x != -1 && y == -1)
                             {
-                                rect.ToolTip = string.Format("{0}", x + 1); // column index
+                                tb.Text = string.Format("{0}", x + 1); // column index
                             }
                         }
                         else
@@ -508,8 +527,11 @@ namespace Root_WIND2.UI_User
                             rect.MouseLeftButtonDown += ChipMouseLeftButtonDown;
                             rect.MouseMove += ChipMouseMove;
                         }
-                        Canvas.SetZIndex(rect, 99);
+                        Canvas.SetZIndex(rect, 98);
+                        Canvas.SetZIndex(tb, 99);
                         ChipItems.Add(rect);
+                        if (tb.Text != "")
+                            ChipItems.Add(tb);
                     }
                 }
             }
@@ -611,16 +633,22 @@ namespace Root_WIND2.UI_User
             waferMap.VerticalFlip();
         }
 
-        private void OpenMapDataWaferMap(StreamReader stdFile)
+        private void OpenASCMapDataWaferMap(StreamReader stdFile)
         {
             RecipeType_WaferMap waferMap = GlobalObjects.Instance.Get<RecipeFront>().WaferMap;
-            waferMap.OpenMapData(stdFile);
+            waferMap.OpenASCMapData(stdFile);
         }
 
         private void ConvertACSMapDataToWaferMap()
         {
             RecipeType_WaferMap waferMap = GlobalObjects.Instance.Get<RecipeFront>().WaferMap;
             waferMap.ConvertACSMapDataToWaferMap();
+        }
+
+        private void OpenKlafMapDataWaferMap(StreamReader stdFile)
+        {
+            RecipeType_WaferMap waferMap = GlobalObjects.Instance.Get<RecipeFront>().WaferMap;
+            waferMap.OpenKlafMapData(stdFile);
         }
 
         private CHIP_TYPE GetRecipeChipType(int x, int y)

@@ -106,5 +106,7 @@ namespace RootTools_CLR
 
 		static int Cpp_FindEdge(array<byte>^ pSrcImg, int  nMemW, int  nMemH, int nROIL, int nROIT, int nROIR, int nROIB, int nDir, int nSearchLevel);
 		static int Cpp_FindEdge(byte* pSrcImg, int  nMemW, int  nMemH, int nROIL, int nROIT, int nROIR, int nROIB, int nDir, int nSearchLevel);
+		static int Cpp_FindEdge16bit(array<byte>^ pSrcImg, int  nMemW, int  nMemH, int nROIL, int nROIT, int nROIR, int nROIB, int nDir, int nSearchLevel);
+		static int Cpp_FindEdge16bit(byte* pSrcImg, int  nMemW, int  nMemH, int nROIL, int nROIT, int nROIR, int nROIB, int nDir, int nSearchLevel);
 	};
 }

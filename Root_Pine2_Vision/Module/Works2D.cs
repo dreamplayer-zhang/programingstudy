@@ -222,6 +222,8 @@ namespace Root_Pine2_Vision.Module
                     {
                         if (IsMemoryPool() && (IsProcessRun() == false))
                         {
+                            m_tcpip.ThreadStop();
+                            m_tcpip.InitClient();
                             ProcessStartInfo startInfo = new ProcessStartInfo(m_sFileVisionWorks);
                             startInfo.Arguments = p_id + "." + m_tcpip.p_nPort.ToString();
                             startInfo.WorkingDirectory = "C://WisVision//";
@@ -256,8 +258,9 @@ namespace Root_Pine2_Vision.Module
 
         bool IsMemoryPool()
         {
-            MemoryPool pool = new MemoryPool(m_memoryPool.p_id);
-            return pool.m_MMF != null; 
+            return true;
+            //MemoryPool pool = new MemoryPool(m_memoryPool.p_id);
+            //return pool.m_MMF != null; 
         }
         #endregion
 

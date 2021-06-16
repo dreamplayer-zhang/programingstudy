@@ -1,4 +1,5 @@
-﻿using RootTools;
+﻿using Root_Pine2.Engineer;
+using RootTools;
 using RootTools.Comm;
 using RootTools.Control;
 using RootTools.Module;
@@ -6,6 +7,7 @@ using RootTools.ToolBoxs;
 using RootTools.Trees;
 using System;
 using System.Collections.Generic;
+using System.Text;
 using System.Threading;
 using System.Windows.Threading;
 
@@ -14,8 +16,10 @@ namespace Root_Pine2.Module
     public class Pine2 : ModuleBase
     {
         #region ToolBox
+        DIO_IO m_dioPickerSet;
         public override void GetTools(bool bInit)
         {
+            m_toolBox.GetDIO(ref m_dioPickerSet, this, "PickerSet"); 
             m_lamp.GetTools(m_toolBox, this);
             m_buzzer.GetTools(m_toolBox, this);
             m_display.GetTools(m_toolBox, this, bInit); 
@@ -34,6 +38,52 @@ namespace Root_Pine2.Module
         private void M_EQ_OnChanged(_EQ.eEQ eEQ, dynamic value)
         {
             m_buzzer.OnEQChanged(eEQ, value); 
+        }
+        #endregion
+
+        #region PickerSet
+        bool _bPickerSet = false; 
+        public bool p_bPickerSet
+        {
+            get { return _bPickerSet; }
+            set
+            {
+                if (_bPickerSet == value) return;
+                _bPickerSet = value;
+                OnPropertyChanged(); 
+                //forget
+            }
+        }
+
+        bool _diPickerSet = false; 
+        public bool p_diPickerSet
+        {
+            get { return _diPickerSet; }
+            set
+            {
+                if (_diPickerSet == value) return;
+                _diPickerSet = value;
+                OnPropertyChanged(); 
+            }
+        }
+
+        void RunThreadPickerSet(bool bBlink)
+        {
+            m_dioPickerSet.Write(bBlink && p_bPickerSet);
+            if (m_dioPickerSet.p_bIn) p_diPickerSet = true; 
+        }
+
+        public string WaitPickerSet(ref double sec)
+        {
+            p_diPickerSet = false; 
+            StopWatch sw = new StopWatch(); 
+            while (p_diPickerSet == false)
+            {
+                Thread.Sleep(10);
+                if (EQ.IsStop()) return "EQ Stop"; 
+            }
+            sec = sw.ElapsedMilliseconds / 1000.0;
+            return "OK"; 
         }
         #endregion
 
@@ -181,16 +231,26 @@ namespace Root_Pine2.Module
                 public Data(int nCumm, int nUnit, string sMsg)
                 {
                     m_nComm = nCumm; 
-                    m_nUnit = nUnit; 
+                    m_nUnit = nUnit;
                     while (sMsg.Length < 4) sMsg += " ";
-                    m_aSend.Add(256 * (byte)sMsg[0] + (byte)sMsg[1]); //forget
-                    m_aSend.Add(256 * (byte)sMsg[2] + (byte)sMsg[3]);
+                    byte[] aMsg = Encoding.ASCII.GetBytes(sMsg);
+                    for (int n = 0; n < 4; n++) aMsg[n] = GetCode(aMsg[n]); 
+                    m_aSend.Add(256 * aMsg[0] + aMsg[1]); 
+                    m_aSend.Add(256 * aMsg[2] + aMsg[3]);
+                }
+
+                byte GetCode(byte ch)
+                {
+                    if ((ch >= '0') && (ch <= '9')) return (byte)(ch - '0');
+                    if ((ch >= 'A') && (ch <= 'Z')) return (byte)(ch - 'A' + 10);
+                    return 0x3f;
                 }
             }
             Queue<Data> m_qSend = new Queue<Data>(); 
 
             string Send(Data data)
             {
+                m_modbus[data.m_nComm].Connect(); 
                 return m_modbus[data.m_nComm].WriteHoldingRegister((byte)data.m_nUnit, 1, data.m_aSend); 
             }
             #endregion
@@ -239,7 +299,7 @@ namespace Root_Pine2.Module
             }
         }
 
-        double _widthStrip = 77;
+        double _widthStrip = 95;
         public double p_widthStrip
         {
             get { return _widthStrip; }
@@ -262,6 +322,17 @@ namespace Root_Pine2.Module
             }
         }
 
+        int _lStackPaper = 100;
+        public int p_lStackPaper
+        {
+            get { return _lStackPaper; }
+            set
+            {
+                _lStackPaper = value;
+                OnPropertyChanged();
+            }
+        }
+
         bool _b3D = true; 
         public bool p_b3D
         {
@@ -271,6 +342,18 @@ namespace Root_Pine2.Module
                 if (_b3D == value) return;
                 _b3D = value;
                 OnPropertyChanged(); 
+            }
+        }
+
+        string _sRecipe = "";
+        public string p_sRecipe
+        {
+            get { return _sRecipe; }
+            set
+            {
+                if (_sRecipe == value) return;
+                _sRecipe = value;
+                m_handler.p_sRecipe = value; 
             }
         }
         #endregion
@@ -298,6 +381,7 @@ namespace Root_Pine2.Module
                     sw.Start();
                     bBlink = !bBlink; 
                 }
+                RunThreadPickerSet(bBlink); 
                 m_lamp.RunLamp(bBlink);
                 m_buzzer.CheckBuzzerOff(); 
             }
@@ -326,12 +410,17 @@ namespace Root_Pine2.Module
             m_buzzer.RunTree(tree.GetTree("Buzzer")); 
             p_eMode = (eRunMode)tree.Set(p_eMode, p_eMode, "Mode", "RunMode");
             p_widthStrip = tree.Set(p_widthStrip, p_widthStrip, "Width", "Strip Width (mm)");
+            p_lStack = tree.Set(p_lStack, p_lStack, "Stack Count", "Strip Max Stack Count");
+            p_lStackPaper = tree.Set(p_lStackPaper, p_lStackPaper, "Paper Count", "Paper Max Stack Count");
+            p_sRecipe = tree.Set(p_sRecipe, p_sRecipe, "Recipe", "Recipe"); 
         }
         #endregion
 
+        Pine2_Handler m_handler; 
         public Pine2(string id, IEngineer engineer)
         {
             p_id = id;
+            m_handler = (Pine2_Handler)engineer.ClassHandler(); 
             InitBase(id, engineer);
 
             InitThread();

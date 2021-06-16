@@ -1,8 +1,11 @@
 ﻿using Emgu.CV;
 using Emgu.CV.Structure;
+using LiveCharts;
+using LiveCharts.Wpf;
 using RootTools;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -74,7 +77,7 @@ namespace RootTools_Vision
             return Math.Sqrt(sdSum / (dataArr.Length - 1));
         }
 
-		public static unsafe bool SaveCircleImage(string filepath, int saveImageWidth, int saveImageHeight,
+		public static unsafe bool SaveCircleImage(string filepath, int saveImageWidth, int saveImageHeight, int thickness,
 												  SharedBufferInfo ptrMem, int startPos, int endPos)
 		{
 			try
@@ -84,7 +87,7 @@ namespace RootTools_Vision
 				int pix_y = 0;
 
 				CPoint center = new CPoint(saveImageWidth / 2, saveImageHeight / 2);
-				int nLen = 300;
+				int nLen = thickness; //300;
 				int nRadius = saveImageWidth < saveImageHeight ? saveImageWidth : saveImageHeight;
 				int nRadius2 = nRadius - nLen;
 				int nRadius3 = nRadius - nLen * 2;
@@ -140,7 +143,7 @@ namespace RootTools_Vision
 			}
 		}
 
-		public static unsafe bool SaveEdgeCircleImage(string filepath, int saveImageWidth, int saveImageHeight,
+		public static unsafe bool SaveEdgeCircleImage(string filepath, int saveImageWidth, int saveImageHeight, int thickness,
 												  SharedBufferInfo ptrMemTop, int startPosTop, int endPosTop,
 												  SharedBufferInfo ptrMemSide, int startPosSide, int endPosSide,
 												  SharedBufferInfo ptrMemBtm, int startPosBtm, int endPosBtm)
@@ -152,7 +155,7 @@ namespace RootTools_Vision
 				int pix_y = 0;
 
 				CPoint center = new CPoint(saveImageWidth / 2, saveImageHeight / 2);
-				int nLen = 50;
+				int nLen = thickness; //50;
 				int nRadius = saveImageWidth < saveImageHeight ? saveImageWidth : saveImageHeight;
 				int nRadius2 = nRadius - nLen;
 				int nRadius3 = nRadius - nLen * 2;
@@ -183,9 +186,9 @@ namespace RootTools_Vision
 							if (pix_y < 500)
 								pix_y = 500;
 
-							view.Data[yy, xx, 0] = ((byte*)ptrMemTop.PtrR_GRAY)[(long)pix_x + (long)pix_y * ptrMemTop.Width];
-							view.Data[yy, xx, 1] = ((byte*)ptrMemTop.PtrG)[(long)pix_x + (long)pix_y * ptrMemTop.Width];
-							view.Data[yy, xx, 2] = ((byte*)ptrMemTop.PtrB)[(long)pix_x + (long)pix_y * ptrMemTop.Width];
+                            view.Data[yy, xx, 0] = ((byte*)ptrMemTop.PtrR_GRAY)[(long)pix_x + (long)pix_y * ptrMemTop.Width];
+                            view.Data[yy, xx, 1] = ((byte*)ptrMemTop.PtrG)[(long)pix_x + (long)pix_y * ptrMemTop.Width];
+                            view.Data[yy, xx, 2] = ((byte*)ptrMemTop.PtrB)[(long)pix_x + (long)pix_y * ptrMemTop.Width];
 						}
 
 						else if (dist < max2 && dist > min2)
@@ -199,10 +202,10 @@ namespace RootTools_Vision
 							if (pix_y < 500)
 								pix_y = 500;
 
-							view.Data[yy, xx, 0] = ((byte*)ptrMemSide.PtrR_GRAY)[(long)pix_x + (long)pix_y * ptrMemSide.Width];
-							view.Data[yy, xx, 1] = ((byte*)ptrMemSide.PtrG)[(long)pix_x + (long)pix_y * ptrMemSide.Width];
-							view.Data[yy, xx, 2] = ((byte*)ptrMemSide.PtrB)[(long)pix_x + (long)pix_y * ptrMemSide.Width];
-						}
+                            view.Data[yy, xx, 0] = ((byte*)ptrMemSide.PtrR_GRAY)[(long)pix_x + (long)pix_y * ptrMemSide.Width];
+                            view.Data[yy, xx, 1] = ((byte*)ptrMemSide.PtrG)[(long)pix_x + (long)pix_y * ptrMemSide.Width];
+                            view.Data[yy, xx, 2] = ((byte*)ptrMemSide.PtrB)[(long)pix_x + (long)pix_y * ptrMemSide.Width];
+                        }
 
 						else if (dist < max3 && dist > min3)
 						{
@@ -215,10 +218,10 @@ namespace RootTools_Vision
 							if (pix_y < 500)
 								pix_y = 500;
 
-							view.Data[yy, xx, 0] = ((byte*)ptrMemBtm.PtrR_GRAY)[(long)pix_x + (long)pix_y * ptrMemBtm.Width];
-							view.Data[yy, xx, 1] = ((byte*)ptrMemBtm.PtrG)[(long)pix_x + (long)pix_y * ptrMemBtm.Width];
-							view.Data[yy, xx, 2] = ((byte*)ptrMemBtm.PtrB)[(long)pix_x + (long)pix_y * ptrMemBtm.Width];
-						}
+                            view.Data[yy, xx, 0] = ((byte*)ptrMemBtm.PtrR_GRAY)[(long)pix_x + (long)pix_y * ptrMemBtm.Width];
+                            view.Data[yy, xx, 1] = ((byte*)ptrMemBtm.PtrG)[(long)pix_x + (long)pix_y * ptrMemBtm.Width];
+                            view.Data[yy, xx, 2] = ((byte*)ptrMemBtm.PtrB)[(long)pix_x + (long)pix_y * ptrMemBtm.Width];
+                        }
 					}
 				}
 
@@ -240,6 +243,104 @@ namespace RootTools_Vision
 				//System.Windows.MessageBox.Show(ee.ToString());
 				return false;
 			}
+		}
+
+		public static ChartValues<float> DataToChartValues(List<float> datas)
+		{
+			ChartValues<float> values = new ChartValues<float>();
+			foreach (float data in datas)
+			{
+				values.Add(data);
+			}
+
+			return values;
+		}
+
+		public static void SaveEBRChartToImage(string filepath, List<float> ebrData, List<float> bevelData)
+		{
+			ChartValues<float> ebr = DataToChartValues(ebrData);
+			ChartValues<float> bevel = DataToChartValues(bevelData);
+
+			Application.Current.Dispatcher.Invoke(delegate
+			{
+				var chart = new LiveCharts.Wpf.CartesianChart
+				{
+					Background = System.Windows.Media.Brushes.White,
+					LegendLocation = LegendLocation.Top,
+					DisableAnimations = true,
+					Width = 800,
+					Height = 400,
+
+					AxisY = new AxesCollection
+					{
+						new LiveCharts.Wpf.Axis()
+						{
+							Title= "EBR",
+							Position = AxisPosition.LeftBottom,
+							Separator = new Separator()
+							{
+								Step = 100,
+								IsEnabled = true
+							}
+						},
+
+						new LiveCharts.Wpf.Axis()
+						{
+							Title= "Bevel",
+							Position = AxisPosition.RightTop,
+							Separator = new Separator()
+							{
+								Step = 100,
+								IsEnabled = true
+							},
+							MinValue = 0
+						},
+					}
+				};
+
+				chart.Series.Add(new LineSeries 
+								{
+									Title = "EBR",
+									Fill = System.Windows.Media.Brushes.Transparent,
+									ScalesYAt = 0,
+									Values = ebr,
+								});
+
+				chart.Series.Add(new LineSeries 
+								{ 
+									Title = "Bevel",
+									Fill = System.Windows.Media.Brushes.Transparent,
+									ScalesYAt = 1,
+									Values = bevel,
+								});
+
+				var viewbox = new System.Windows.Controls.Viewbox();
+				viewbox.Child = chart;
+				viewbox.Measure(chart.RenderSize);
+				viewbox.Arrange(new Rect(new System.Windows.Point(0, 0), chart.RenderSize));
+				chart.Update(true, true); //force chart redraw
+				viewbox.UpdateLayout();
+
+				filepath += ".jpg";
+
+				var encoder = new JpegBitmapEncoder();
+				EncodeVisual(chart, filepath, encoder);
+			});
+
+			//chart = null;
+			//viewbox = null;
+			//encoder = null;
+			//bitmap = null;
+			//frame = null;
+		}
+
+		static void EncodeVisual(FrameworkElement visual, string fileName, BitmapEncoder encoder)
+		{
+			var bitmap = new RenderTargetBitmap((int)visual.ActualWidth, (int)visual.ActualHeight, 96, 96, System.Windows.Media.PixelFormats.Pbgra32);
+			bitmap.Render(visual);
+			var frame = BitmapFrame.Create(bitmap);
+			encoder.Frames.Add(frame);
+			using (var stream = File.Create(fileName)) encoder.Save(stream);
 		}
 	}
 }

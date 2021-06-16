@@ -321,6 +321,7 @@ namespace Root_CAMELLIA.Module
                 CanInitCal[i] = false;
                 CheckDocking[i] = false;
             }
+
            // try
             //{
             //    if (p_CamVRS != null && !p_CamVRS.p_CamInfo._OpenStatus)
@@ -330,6 +331,8 @@ namespace Root_CAMELLIA.Module
             //}
 
         }
+
+
 
         public override void ThreadStop()
         {

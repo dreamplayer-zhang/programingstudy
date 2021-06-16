@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
@@ -52,7 +53,7 @@ namespace RootTools_Vision
             return dst;
         }
               
-        public unsafe static Bitmap CovertBufferToBitmap(SharedBufferInfo info, Rect rect, int outSizeX = 0, int outSizeY = 0)
+        public unsafe static Bitmap CovertBufferToBitmap(SharedBufferInfo info, Rect rect, int outSizeX = 0, int outSizeY = 0, int centerX = 0, int centerY = 0)
         {
             try
             {
@@ -62,6 +63,8 @@ namespace RootTools_Vision
 
                 int roiWidth = (int)rect.Width;
                 int roiHeight = (int)rect.Height;
+
+                
 
                 double samplingX = 1;
                 double samplingY = 1;
@@ -73,9 +76,11 @@ namespace RootTools_Vision
                     roiWidth = outSizeX;
                     roiHeight = outSizeY;
 
-                    samplingX = Math.Floor((double)(int)rect.Width / outSizeX);
-                    samplingY = Math.Floor((double)(int)rect.Height / outSizeY);
+                    samplingX = (double)rect.Width / outSizeX;
+                    samplingY = (double)rect.Height / outSizeY;
                 }
+                int centerOffsetX = (int)(centerX / samplingX) - (outSizeX / 2);
+                int centerOffsetY = (int)(centerY / samplingY) - (outSizeY / 2);
 
 
                 System.Drawing.Imaging.PixelFormat format = System.Drawing.Imaging.PixelFormat.Format8bppIndexed;
@@ -118,16 +123,9 @@ namespace RootTools_Vision
 
                     for (int i = 0; i < h; i++)
                     {
-                        //Marshal.Copy(info.PtrR_GRAY + (int)((i + rect.Top) * info.Width + rect.Left), ptr, (int)(i * _width),(int)rect.Width );                        
                         CopyMemory(pointer + (i * bmpData.Stride), info.PtrR_GRAY + +(int)((i + rect.Top) * info.Width + rect.Left), (uint)rect.Width);
                     }
 
-                    
-                    //for (int i = 0; i < _height; i++)
-                    //{
-                    //    Buffer.MemoryCopy(info.PtrList[0].ToPointer()[i * _width], pointer.ToPointer()[i * bmpData.Stride], bmpData.Stride, bmpData.Stride);
-                    //    //CopyMemory(info.PtrR_GRAY + i * _width, pointer + i * bmpData.Stride, (uint)_width);
-                    //}
                 }
                 else if (_byteCount == 3)
                 {
@@ -149,23 +147,27 @@ namespace RootTools_Vision
                         pG += (int)rect.Left;
                         pB += (int)rect.Left;
 
+                        byte* pRR = pR;
+                        byte* pGG = pG;
+                        byte* pBB = pB;
+
                         for (long i = 0; i <roiHeight ; i++)
                         {
                             for (long j = 0; j < roiWidth; j++)
                             {
-                                pDst[(long)((long)i * (bmpData.Stride) + (long)j * _byteCount + 0)] = *(pB + (long)(j * samplingX));
-                                pDst[(long)((long)i * (bmpData.Stride) + (long)j * _byteCount + 1)] = *(pG + (long)(j * samplingX));
-                                pDst[(long)((long)i * (bmpData.Stride) + (long)j * _byteCount + 2)] = *(pR + (long)(j * samplingX));
+                                pDst[(long)((long)i * (bmpData.Stride) + (long)j * _byteCount + 2)] = *(pRR + (long)((j + centerOffsetX) * samplingX));
+                                pDst[(long)((long)i * (bmpData.Stride) + (long)j * _byteCount + 1)] = *(pGG + (long)((j + centerOffsetX) * samplingX));
+                                pDst[(long)((long)i * (bmpData.Stride) + (long)j * _byteCount + 0)] = *(pBB + (long)((j + centerOffsetX) * samplingX));
                             }
 
-                            pR += (long)(info.Width * samplingY);
-                            pG += (long)(info.Width * samplingY);
-                            pB += (long)(info.Width * samplingY);
+                            pRR = pR + (long)(info.Width * (long)(samplingY * (i + centerOffsetY)));
+                            pGG = pG + (long)(info.Width * (long)(samplingY * (i + centerOffsetY)));
+                            pBB = pB + (long)(info.Width * (long)(samplingY * (i + centerOffsetY)));
                         }
                     }
                 }
 
-
+                
 
                 bmp.UnlockBits(bmpData);
 
@@ -178,110 +180,210 @@ namespace RootTools_Vision
             return null;
         }
 
-        public unsafe static Bitmap CirclarInterpolation(Bitmap bmp, List<List<System.Windows.Point>> polygon, double minRadius, int thickenss,int centerX, int centerY, int outSizeX, int outSizeY)
+        public unsafe static Bitmap CirclarInterpolation(Bitmap bmp, double minRadius, double thickness,int centerX, int centerY, int outSizeX, int outSizeY)
         {
             BitmapData bmpData = bmp.LockBits(new Rectangle(0, 0, bmp.Width, bmp.Height), ImageLockMode.ReadWrite, bmp.PixelFormat);
             IntPtr pointer = bmpData.Scan0;
 
             int byteCount = 3;
-
             double radius = minRadius;
+
+            int thickness_interval = 1;
+            double angle_interval = 0.01;
+
+            Queue<long> queIndex = new Queue<long>();
+            Queue<byte> queValueR = new Queue<byte>();
+            Queue<byte> queValueG = new Queue<byte>();
+            Queue<byte> queValueB = new Queue<byte>();
 
             unsafe
             {
                 byte* pDst = (byte*)pointer.ToPointer();
 
-                double preR = 0;
-                double preB = 0;
-                double preG = 0;
-                int thickness = thickenss;
-                for (double t = 0; t < thickness; t+= 1)
+                for (double t = 0; t < thickness; t += thickness_interval)
                 {
-                    for (double angle = 360; angle >= 0; angle -= 0.01)
-                {
+                    double preR = 0;
+                    double preB = 0;
+                    double preG = 0;
 
+                    for (double angle = 360; angle >= 0; angle -= angle_interval)
+                    {
+                        double x = (double)centerX + ((radius + t) * Math.Cos((double)angle * Math.PI / 180F));
+                        double y = (double)centerY + ((radius + t) * Math.Sin((double)angle * Math.PI / 180F));
 
-                        double y = (double)centerX + ((radius + t) * Math.Cos((double)angle * Math.PI / 180F));
-                        double x = (double)centerY + ((radius + t) * Math.Sin((double)angle * Math.PI / 180F));
+                        if (x >= outSizeX || y >= outSizeY || y < 0 || x < 0)
+                            continue;
 
-                        if (x >= outSizeX || y >= outSizeY)
-                            break;
                         double curR = pDst[(long)((long)(y) * (bmpData.Stride) + (long)(x) * byteCount + 0)];
                         double curG = pDst[(long)((long)(y) * (bmpData.Stride) + (long)(x) * byteCount + 1)];
                         double curB = pDst[(long)((long)(y) * (bmpData.Stride) + (long)(x) * byteCount + 2)];
 
                         if (curR == 0 && curG == 0 && curB == 0)
                         {
-
-                            int cnt1 = 0;
-                            int cnt2 = 0;
-                            int cnt3 = 0;
-                            double val1 = 0;
-                            double val2 = 0;
-                            double val3 = 0;
-                            for (int a = -1; a < 2; a++)
+                            // 1. Find next non-zero color
+                            // - 진행방향으로 10도만큼 탐색
+                            // - 0근처에서는 예외가 있지만 지지대 위치가 0도에 위치하지 않기 때문에 예외처리 안함
+                            int nextCount = 1;
+                            byte nextR = 0;
+                            byte nextG = 0;
+                            byte nextB = 0;
+                            for (double da = angle - angle_interval; da >= angle - 90; da -= angle_interval)
                             {
-                                for (int b = -1; b < 2; b++)
-                                {
-                                    if(y + a >= outSizeX || x + b >= outSizeY)
-                                    {
-                                        break;
-                                    }
-                                    if (pDst[(long)((long)(y + a)) * (bmpData.Stride) + (long)(x + b) * byteCount + 0] != 0)
-                                    {
-                                        val1 += pDst[(long)((long)(y + a)) * (bmpData.Stride) + (long)(x + b) * byteCount + 0];
-                                        cnt1++;
-                                    }
-                                    if (pDst[(long)((long)(y + a)) * (bmpData.Stride) + (long)(x + b) * byteCount + 1] != 0)
-                                    {
-                                        val2 += pDst[(long)((long)(y + a)) * (bmpData.Stride) + (long)(x + b) * byteCount + 1];
-                                        cnt2++;
-                                    }
-                                    if (pDst[(long)((long)(y + a)) * (bmpData.Stride) + (long)(x + b) * byteCount + 2] != 0)
-                                    {
-                                        val3 += pDst[(long)((long)(y + a)) * (bmpData.Stride) + (long)(x + b) * byteCount + 2];
-                                        cnt3++;
-                                    }
-                                    //if (bmp.Height <= rect[k].Top + (i + a))
-                                    //    break; ;
-                                    //if (pDst[(long)((long)(rect[k].Top + (i + a)) * (bmpData.Stride) + (long)(rect[k].Left + (j + b)) * byteCount + 0)] != 0)
-                                    //{
-                                    //    val1 += pDst[(long)((long)(rect[k].Top + (i + a)) * (bmpData.Stride) + (long)(rect[k].Left + (j + b)) * byteCount + 0)];
-                                    //    cnt1++;
-                                    //}
-                                    //if (pDst[(long)((long)(rect[k].Top + (i + a)) * (bmpData.Stride) + (long)(rect[k].Left + (j + b)) * byteCount + 1)] != 0)
-                                    //{
-                                    //    val2 += pDst[(long)((long)(rect[k].Top + (i + a)) * (bmpData.Stride) + (long)(rect[k].Left + (j + b)) * byteCount + 1)];
-                                    //    cnt2++;
-                                    //}
-                                    //if (pDst[(long)((long)(rect[k].Top + (i + a)) * (bmpData.Stride) + (long)(rect[k].Left + (j + b)) * byteCount + 2)] != 0)
-                                    //{
-                                    //    val3 += pDst[(long)((long)(rect[k].Top + (i + a)) * (bmpData.Stride) + (long)(rect[k].Left + (j + b)) * byteCount + 2)];
-                                    //    cnt3++;
-                                    //}
-                                }
-                            }
-                                //if(t == 5)
-                                //{
-                                //    pDst[(long)((long)(y) * (bmpData.Stride) + (long)(x) * byteCount + 0)] = (byte)0;
-                                //    pDst[(long)((long)(y) * (bmpData.Stride) + (long)(x) * byteCount + 1)] = (byte)0;
-                                //    pDst[(long)((long)(y) * (bmpData.Stride) + (long)(x) * byteCount + 2)] = (byte)255;
-                                //}
-                                //else
-                                {
-                                if(!double.IsNaN(val1 / cnt1))
-                                {
-                                    pDst[(long)((long)(y) * (bmpData.Stride) + (long)(x) * byteCount + 0)] = Convert.ToByte(val1 / cnt1);
-                                    pDst[(long)((long)(y) * (bmpData.Stride) + (long)(x) * byteCount + 1)] = Convert.ToByte(val2 / cnt2);
-                                    pDst[(long)((long)(y) * (bmpData.Stride) + (long)(x) * byteCount + 2)] = Convert.ToByte(val3 / cnt3);
-                                }
-                                
-                            }
-                            
+                                nextCount++;
 
-                            //curR = preR;
-                            //curG = preG;
-                            //curB = preB;
+                                double dx = (double)centerX + ((radius + t) * Math.Cos((double)da * Math.PI / 180F));
+                                double dy = (double)centerY + ((radius + t) * Math.Sin((double)da * Math.PI / 180F));
+
+                                if ((dx >= outSizeX || dy >= outSizeY) ||
+                                    (dx < 0 || dy < 0))
+                                {
+                                    continue;
+                                }
+
+                                long index = (long)((long)(dy) * (bmpData.Stride) + (long)(dx) * byteCount);
+                                byte tempR = pDst[(long)(index + 0)];
+                                byte tempG = pDst[(long)(index + 1)];
+                                byte tempB = pDst[(long)(index + 2)];
+
+                                if (tempR != 0 || tempG != 0 || tempB != 0)
+                                {
+                                    nextR = tempR;
+                                    nextG = tempG;
+                                    nextB = tempB;
+                                    break;
+                                }
+                            }
+
+                            // 2, Interpolation으로 채우기
+
+                            double diffR = (nextR - preR);
+                            double diffG = (nextG - preG);
+                            double diffB = (nextB - preB);
+
+                            double ratioR = (double)diffR / nextCount;
+                            double ratioG = (double)diffG / nextCount;
+                            double ratioB = (double)diffB / nextCount;
+                            
+                            double range_angle = angle - angle_interval * nextCount;
+
+                            int count = 0;
+                            for (double da = angle - angle_interval; da > range_angle; da -= angle_interval)
+                            {
+                                count++;
+                                double dx = (double)centerX + ((radius + t) * Math.Cos((double)da * Math.PI / 180F));
+                                double dy = (double)centerY + ((radius + t) * Math.Sin((double)da * Math.PI / 180F));
+
+                                if ((dx >= outSizeX || dy >= outSizeY) ||
+                                    (dx < 0 || dy < 0))
+                                {
+                                    continue;
+                                }
+
+                                int valR = (int)(preR + (int)(ratioR * count));
+                                int valG = (int)(preG + (int)(ratioG * count));
+                                int valB = (int)(preB + (int)(ratioB * count));
+
+                                if (valR > 255) valR = 255;
+                                if (valG > 255) valG = 255;
+                                if (valB > 255) valB = 255;
+
+                                long dIndex = (long)(dy) * (bmpData.Stride) + (long)(dx) * byteCount;
+
+                                queIndex.Enqueue(dIndex);
+                                queValueR.Enqueue((byte)valR);
+                                queValueG.Enqueue((byte)valG);
+                                queValueB.Enqueue((byte)valB);
+                                //pDst[(long)(dIndex + 0)] = (byte)valR;
+                                //pDst[(long)(dIndex + 1)] = (byte)valG;
+                                //pDst[(long)(dIndex + 2)] = (byte)valB;
+                            }
+
+                            angle = range_angle;
+
+                            if (angle < 0) break;
+
+
+
+                            //
+                            //int cnt1 = 0;
+                            //int cnt2 = 0;
+                            //int cnt3 = 0;
+                            //double val1 = 0;
+                            //double val2 = 0;
+                            //double val3 = 0;
+
+
+                            //for (int dt = -thickness_interval; dt <= thickness_interval; dt++)
+                            //{
+                            //    for (double da = -angle_interval; da <= angle_interval; da++)
+                            //    {
+                            //        double dx = (double)centerX + ((radius + t + dt) * Math.Cos((double)(angle + da) * Math.PI / 180F));
+                            //        double dy = (double)centerY + ((radius + t + dt) * Math.Sin((double)(angle + da) * Math.PI / 180F));
+
+                            //        if ((dx >= outSizeX || dy >= outSizeY) ||
+                            //            (dx < 0 || dy < 0))
+                            //        {
+                            //            continue;
+                            //        }
+
+                            //        if (pDst[(long)((long)(dy)) * (bmpData.Stride) + (long)(dx) * byteCount + 0] != 0)
+                            //        {
+                            //            val1 += pDst[(long)((long)(dy)) * (bmpData.Stride) + (long)(dx) * byteCount + 0];
+                            //            cnt1++;
+                            //        }
+                            //        if (pDst[(long)((long)(dy)) * (bmpData.Stride) + (long)(dx) * byteCount + 1] != 0)
+                            //        {
+                            //            val2 += pDst[(long)((long)(dy)) * (bmpData.Stride) + (long)(dx) * byteCount + 1];
+                            //            cnt2++;
+                            //        }
+                            //        if (pDst[(long)((long)(dy)) * (bmpData.Stride) + (long)(dx) * byteCount + 2] != 0)
+                            //        {
+                            //            val3 += pDst[(long)((long)(dy)) * (bmpData.Stride) + (long)(dx) * byteCount + 2];
+                            //            cnt3++;
+                            //        }
+                            //    }
+                            //}
+
+                            // Old
+                            //for (int a = -1; a < 2; a++)
+                            //{
+                            //    for (int b = -1; b < 2; b++)
+                            //    {
+                            //        if (y + a >= outSizeX || x + b >= outSizeY)
+                            //        {
+                            //            break;
+                            //        }
+                            //        if (pDst[(long)((long)(y + a)) * (bmpData.Stride) + (long)(x + b) * byteCount + 0] != 0)
+                            //        {
+                            //            val1 += pDst[(long)((long)(y + a)) * (bmpData.Stride) + (long)(x + b) * byteCount + 0];
+                            //            cnt1++;
+                            //        }
+                            //        if (pDst[(long)((long)(y + a)) * (bmpData.Stride) + (long)(x + b) * byteCount + 1] != 0)
+                            //        {
+                            //            val2 += pDst[(long)((long)(y + a)) * (bmpData.Stride) + (long)(x + b) * byteCount + 1];
+                            //            cnt2++;
+                            //        }
+                            //        if (pDst[(long)((long)(y + a)) * (bmpData.Stride) + (long)(x + b) * byteCount + 2] != 0)
+                            //        {
+                            //            val3 += pDst[(long)((long)(y + a)) * (bmpData.Stride) + (long)(x + b) * byteCount + 2];
+                            //            cnt3++;
+                            //        }
+                            //    }
+                            //}
+
+                            //if (!double.IsNaN(val1 / cnt1))
+                            //{
+                            //    curR = Convert.ToByte(val1 / cnt1);
+                            //    curG = Convert.ToByte(val2 / cnt2);
+                            //    curB = Convert.ToByte(val3 / cnt3);
+                            //    pDst[(long)((long)(y) * (bmpData.Stride) + (long)(x) * byteCount + 0)] = (byte)curR;
+                            //    pDst[(long)((long)(y) * (bmpData.Stride) + (long)(x) * byteCount + 1)] = (byte)curG;
+                            //    pDst[(long)((long)(y) * (bmpData.Stride) + (long)(x) * byteCount + 2)] = (byte)curB;
+                            //}
+
+                            //preR = curR;
+                            //preG = curG;
+                            //preB = curB;
                         }
                         else
                         {
@@ -289,9 +391,46 @@ namespace RootTools_Vision
                             preG = curG;
                             preB = curB;
                         }
-
-                        
                     }
+                }
+
+                foreach(var index in queIndex)
+                {
+                    pDst[(long)(index + 0)] = (byte)queValueR.Dequeue();
+                    pDst[(long)(index + 1)] = (byte)queValueG.Dequeue();
+                    pDst[(long)(index + 2)] = (byte)queValueB.Dequeue();
+                }
+
+                while(queIndex.Count != 0)
+                {
+                    long index = queIndex.Dequeue();
+
+                    int valR = 0;
+                    int valG = 0;
+                    int valB = 0;
+                    int cnt = 0;
+                    for (int i= -1; i <=1; i++)
+                    {
+                        for(int j = -1; j <= 1; j++)
+                        {
+                            long dIndex = ((long)i * bmpData.Stride + (long)(j * byteCount));
+                            int tempR = pDst[(long)(index + dIndex + 0)];
+                            int tempG = pDst[(long)(index + dIndex + 1)];
+                            int tempB = pDst[(long)(index + dIndex + 2)];
+
+                            if (tempR == 0 && tempG == 0 && tempB == 0)
+                                continue;
+
+                            cnt++;
+                            valR += tempR;
+                            valG += tempG;
+                            valB += tempB;
+                        }
+                    }
+
+                    pDst[(long)(index + 0)] = (byte)(valR / cnt);
+                    pDst[(long)(index + 1)] = (byte)(valG / cnt);
+                    pDst[(long)(index + 2)] = (byte)(valB / cnt);
                 }
             }
 
@@ -388,9 +527,13 @@ namespace RootTools_Vision
                                         }
                                     }
                                 }
-                                pDst[(long)((long)(rect[k].Y + i) * (bmpData.Stride) + (long)(rect[k].X + j) * byteCount + 0)] = Convert.ToByte(val1 / cnt1);
-                                pDst[(long)((long)(rect[k].Y + i) * (bmpData.Stride) + (long)(rect[k].X + j) * byteCount + 1)] = Convert.ToByte(val2 / cnt2);
-                                pDst[(long)((long)(rect[k].Y + i) * (bmpData.Stride) + (long)(rect[k].X + j) * byteCount + 2)] = Convert.ToByte(val3 / cnt3);
+                                if(cnt1 != 0)
+                                {
+                                    pDst[(long)((long)(rect[k].Y + i) * (bmpData.Stride) + (long)(rect[k].X + j) * byteCount + 0)] = Convert.ToByte(val1 / cnt1);
+                                    pDst[(long)((long)(rect[k].Y + i) * (bmpData.Stride) + (long)(rect[k].X + j) * byteCount + 1)] = Convert.ToByte(val2 / cnt2);
+                                    pDst[(long)((long)(rect[k].Y + i) * (bmpData.Stride) + (long)(rect[k].X + j) * byteCount + 2)] = Convert.ToByte(val3 / cnt3);
+                                }
+                                
                                 //pDst[(long)((long)(rect[k].Y + i) * (bmpData.Stride) + (long)(rect[k].X + j) * byteCount + 0)];
                             }
                             //pDst[(long)((long)rect[k].X + i * (bmpData.Stride) + (long)j * byteCount + 0)];
@@ -633,12 +776,12 @@ namespace RootTools_Vision
             }
             return brush;
         }
-        void DrawBitmapText(ref Bitmap bit, string text, float x, float y, PenColor penColor = PenColor.ORANGE)
+        public static void DrawBitmapText(ref Bitmap bit, string text, float x, float y, int fontSize = 20, PenColor penColor = PenColor.ORANGE)
         {
             Graphics graphics = Graphics.FromImage(bit);
             Brush brush = GetBrush(penColor);
 
-            System.Drawing.Font myFont = new System.Drawing.Font(FontFamily.GenericSansSerif, 20, System.Drawing.FontStyle.Regular, GraphicsUnit.Pixel);
+            System.Drawing.Font myFont = new System.Drawing.Font(FontFamily.GenericSansSerif, fontSize, System.Drawing.FontStyle.Regular, GraphicsUnit.Pixel);
             graphics.DrawString(text, myFont, brush, x, y);
 
         }

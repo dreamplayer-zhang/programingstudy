@@ -247,25 +247,33 @@ namespace RootTools_Vision
             return rst;
         }
 
-        public bool Save(string recipePath)
+        public bool Save(string recipePath = "")
         {
             string time = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
-
-            using (StreamWriter writer = new StreamWriter(recipePath, true))
-            {
-                writer.WriteLine(time + " - SaveRecipe()");
-            }
-
             bool rst = true;
-            this.RecipePath = (string)recipePath.Clone();
 
-            recipePath = recipePath.Replace(".rcp", "");
-            string recipeName = recipePath.Substring(recipePath.LastIndexOf("\\") + 1);
-            string recipeFolderPath = recipePath.Substring(0 ,recipePath.LastIndexOf("\\") + 1);
+            if (recipePath != "")
+            {
+                using (StreamWriter writer = new StreamWriter(recipePath, true))
+                {
+                    writer.WriteLine(time + " - SaveRecipe()");
+                }
 
-            this.RecipeFolderPath = (string)recipeFolderPath.Clone();
+                this.RecipePath = (string)recipePath.Clone();
 
+                recipePath = recipePath.Replace(".rcp", "");
+                string recipeName = recipePath.Substring(recipePath.LastIndexOf("\\") + 1);
+                string recipeFolderPath = recipePath.Substring(0, recipePath.LastIndexOf("\\") + 1);
 
+                this.RecipeFolderPath = (string)recipeFolderPath.Clone();
+            }
+            else
+            {
+                using (StreamWriter writer = new StreamWriter(this.RecipePath, true))
+                {
+                    writer.WriteLine(time + " - SaveRecipe()");
+                }
+            }
 
             // Xml 파일을 읽은 뒤 이미지나 ROI 등을 불러오기 위해서 각 class에 대한 Save 함수를 호출한다.
             foreach (ParameterBase param in this.ParameterItemList)

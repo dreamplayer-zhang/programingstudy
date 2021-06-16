@@ -154,7 +154,7 @@ namespace Root_EFEM.Module
         public bool CheckPlaced()
         {
             GemCarrierBase.ePresent present;
-            if (m_diPlaced.p_bIn != m_diPresent.p_bIn)
+            if (m_diPlaced.p_bIn != p_diPresent.p_bIn)
                 present = GemCarrierBase.ePresent.Unknown;
             else
                 present = m_diPlaced.p_bIn ? GemCarrierBase.ePresent.Exist : GemCarrierBase.ePresent.Empty;
@@ -697,7 +697,7 @@ namespace Root_EFEM.Module
             get
             {
                 //return true;
-                return m_diPresent.p_bIn;
+                return p_diPresent.p_bIn;
             }
         }
         #endregion
@@ -745,7 +745,7 @@ namespace Root_EFEM.Module
 
         public override bool IsExistCarrier()
         {
-            if (m_diPlaced.p_bIn && m_diPresent.p_bIn)
+            if (m_diPlaced.p_bIn && p_diPresent.p_bIn)
                 return true;
             else
                 return false;
@@ -758,7 +758,7 @@ namespace Root_EFEM.Module
 
         public override bool IsPresent()
         {
-            return m_diPresent.p_bIn;
+            return p_diPresent.p_bIn;
         }
 
         #region ModuleRun
