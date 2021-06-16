@@ -277,6 +277,14 @@ namespace Root_WIND2.UI_User
                 //    settings_backside.OutputImageSizeX,
                 //    settings_backside.OutputImageSizeY);
 
+                if (recipe.UseExclusiveRegion == false)
+                    recipe.UseExclusiveRegion = true;
+
+                if (recipe.ExclusiveRegionFilePath == "")
+                    recipe.ExclusiveRegionFilePath = Constants.FilePath.BacksideExclusiveRegionFilePath;
+
+                recipe.Save();
+
                 List<List<Point>> polygon = PolygonController.ReadPolygonFile(recipe.ExclusiveRegionFilePath);
 
                 BacksideRecipe backRecipe = recipe.GetItem<BacksideRecipe>();

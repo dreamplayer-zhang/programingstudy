@@ -302,7 +302,7 @@ namespace RootTools_Vision
             this.mapdata = flipmapdata;
         }
 
-        public void OpenMapData(StreamReader stdFile)
+        public void OpenASCMapData(StreamReader stdFile)
         {
             // [ 2021-06-01 ] : Imported by jhan from VisionWorks2
 
@@ -488,6 +488,105 @@ namespace RootTools_Vision
                         }
                 }
             }
+        }
+
+        public void OpenKlafMapData(StreamReader stdFile)
+        {
+            // [ 2021-06-15 ] : Imported by jhan from VisionWorks2
+
+            string strNumber = "";
+            string buffX;
+            string buffY;
+            string tmp;
+
+            int[] SampleX = new int[10000];
+            int[] SampleY = new int[10000];
+            int Min_x = 99, Max_x = 0, Min_y = 99, Max_y = 0;
+            int num = 0;
+
+            tmp = stdFile.ReadLine();
+            tmp.Trim();
+            while (tmp.IndexOf("SampleTestPlan ") == -1)
+            {
+                tmp = stdFile.ReadLine();
+            }
+            for (int i = 13; i < tmp.Length; i++)
+            {
+                char ch = tmp[i];
+                if (ch >= '0' && ch <= '9')
+                {
+                    strNumber += ch;
+                }
+            }
+
+            int n = Int32.Parse(strNumber);
+            while (tmp.IndexOf(";") == -1)
+            {
+                tmp = stdFile.ReadLine();
+                tmp.Trim();
+
+                buffX = tmp.Substring(0, tmp.IndexOf(' '));
+                buffY = tmp.Substring(tmp.IndexOf(' ') + 1, tmp.Length - tmp.IndexOf(' ') - 1);
+
+                SampleX[num] = Int32.Parse(buffX);
+                if (buffY.IndexOf(";") != -1)
+                {
+                    buffY = buffY.Substring(0, buffY.Length - 1);
+                }
+                SampleY[num] = Int32.Parse(buffY);
+                num = num + 1;
+                buffY = "";
+                buffX = "";
+            }
+
+            for (int i = 0; i < n; i++)
+            {
+                if (SampleX[i] > Max_x)
+                {
+                    Max_x = SampleX[i];
+                }
+                if (SampleX[i] < Min_x)
+                {
+                    Min_x = SampleX[i];
+                }
+                if (SampleY[i] > Max_y)
+                {
+                    Max_y = SampleY[i];
+                }
+                if (SampleY[i] < Min_y)
+                {
+                    Min_y = SampleY[i];
+                }
+            }
+
+            mapSizeX = (Max_x - Min_x + 1);
+            mapSizeY = (Max_y - Min_y + 1);
+
+            mapdata = new int[mapSizeX * mapSizeY];
+            int[] p = mapdata;
+
+            int cnt = 0;
+            int t = 0;
+            for (int i = 0; i < n; i++)
+            {
+                t = (SampleX[cnt] - Min_x) + (mapSizeX * (Max_y - SampleY[cnt]));
+                p[t] = 1;
+                cnt++;
+            }
+
+            /*//SampleInspection
+            if (m_pSampleInspMapData != NULL) delete[] m_pSampleInspMapData;
+            m_pSampleInspMapData = new BYTE[mapSizeX * mapSizeY];
+            memset(m_pSampleInspMapData, 0, sizeof(BYTE) * mapSizeX * mapSizeY);
+            p = m_pSampleInspMapData;
+
+            cnt = 0;
+            for (int i = 0; i < n; i++)
+            {
+                int t = (SampleX[cnt] - Min_x) + (m_nUnitXNum * (Max_y - SampleY[cnt]));
+                *(p + t) = 1;
+                cnt++;
+            }*/
         }
 
         int CountChar(string str, char c)

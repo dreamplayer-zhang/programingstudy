@@ -108,6 +108,7 @@ namespace RootTools_Vision
                 DatabaseManager.Instance.AddDefectDataListNoAutoCount(MergeDefectList, "defect");
             }
 
+
             Settings settings = new Settings();
             SettingItem_SetupBackside settings_backside = settings.GetItem<SettingItem_SetupBackside>();
 

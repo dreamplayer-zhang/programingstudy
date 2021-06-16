@@ -310,7 +310,7 @@ namespace RootTools_Vision.Utility
 
 
 			tempString = string.Format("SampleTestPlan {0:d}\n", sampleTestCnt);
-			sampleTestPlan = sampleTestPlan.Substring(0, sampleTestPlan.Length - 1);
+			sampleTestPlan = sampleTestPlan.Substring(0, sampleTestPlan.Length > 0 ? sampleTestPlan.Length - 1:0);
 			sampleTestPlan = tempString + sampleTestPlan + ";\n";
 
 			float nAreaPerTest = (float)(diePitchX * diePitchY * sampleTestCnt);
@@ -457,10 +457,10 @@ namespace RootTools_Vision.Utility
 				builder.Append(_defectdata[i].m_fRelY + " ");
 				builder.Append(_defectdata[i].m_nChipIndexX + " ");
 				builder.Append(_defectdata[i].m_nChipIndexY + " ");
-				builder.Append(_defectdata[i].m_fData + " ");
+				builder.Append(_defectdata[i].m_fData * resolutionX + " ");
 				builder.Append(0 + " ");
-				builder.Append(_defectdata[i].m_fData + " ");
-				builder.Append(_defectdata[i].m_fData + " ");
+				builder.Append(_defectdata[i].m_fData * resolutionX + " ");
+				builder.Append(_defectdata[i].m_fData * resolutionX + " ");
 				builder.Append(0 + " ");
 				builder.Append(0 + " ");
 				builder.Append(0 + " ");
