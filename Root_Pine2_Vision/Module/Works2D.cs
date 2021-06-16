@@ -40,8 +40,16 @@ namespace Root_Pine2_Vision.Module
         void InitMemory()
         {
             m_memoryGroup = m_memoryPool.GetGroup("Pine2");
-            m_aMemory.Add(m_memoryExt[0] = m_memoryGroup.CreateMemory("EXT1", 1, 3, new CPoint(50000, 90000)));
-            m_aMemory.Add(m_memoryExt[1] = m_memoryGroup.CreateMemory("EXT2", 1, 3, new CPoint(50000, 90000)));
+            m_aMemory.Add(m_memoryExt[0] = m_memoryGroup.CreateMemory("EXT1", 1, 3, new CPoint(50000, 90000))); // Red Green Blue
+            m_aMemory.Add(m_memoryExt[1] = m_memoryGroup.CreateMemory("EXT2", 1, 3, new CPoint(50000, 90000))); // Axial Pad Side
+
+            m_aMemory.Add(m_memoryExt[0] = m_memoryGroup.CreateMemory("EXT1_R", 1, 1, new CPoint(50000, 90000)));
+            m_aMemory.Add(m_memoryExt[0] = m_memoryGroup.CreateMemory("EXT1_G", 1, 1, new CPoint(50000, 90000)));
+            m_aMemory.Add(m_memoryExt[0] = m_memoryGroup.CreateMemory("EXT1_B", 1, 1, new CPoint(50000, 90000)));
+            m_aMemory.Add(m_memoryExt[1] = m_memoryGroup.CreateMemory("EXT2_A", 1, 1, new CPoint(50000, 90000)));
+            m_aMemory.Add(m_memoryExt[1] = m_memoryGroup.CreateMemory("EXT2_P", 1, 1, new CPoint(50000, 90000)));
+            m_aMemory.Add(m_memoryExt[1] = m_memoryGroup.CreateMemory("EXT2_S", 1, 1, new CPoint(50000, 90000)));
+
             m_aMemory.Add(m_memoryColor[0] = m_memoryGroup.CreateMemory("Color1", 1, 3, new CPoint(50000, 90000)));
             m_aMemory.Add(m_memoryColor[1] = m_memoryGroup.CreateMemory("Color2", 1, 3, new CPoint(50000, 90000)));
             m_aMemory.Add(m_memoryRGB[0] = m_memoryGroup.CreateMemory("Red", 1, 1, new CPoint(50000, 90000)));
