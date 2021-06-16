@@ -12,6 +12,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Media.Imaging;
 
 namespace RootTools_Vision.Utility
 {
@@ -137,7 +138,8 @@ namespace RootTools_Vision.Utility
 
 		public void SetModuleName(string name)
         {
-			this.moduleName = name;
+			string lower = name.ToLower();
+			this.moduleName = lower;
         }
 		// 210531 New
 		public bool LotStart(string klarfPath, InfoWafer infoWafer , RecipeType_WaferMap mapData, GrabModeBase grabMode)
@@ -468,9 +470,6 @@ namespace RootTools_Vision.Utility
 				tempString = string.Format(strFilePath + "\\" + recipeName + "_" + waferID + "_" + lotID + "_" + cassetteID);
 			}
 
-			tempString.Replace("\\\\", "\\");
-			tempString.Replace(".rcp", "");
-			klarfFileName = tempString;
 			string klarfFileFullPath = klarfFileName + ".001";
 
 			FileStream fs = new FileStream(klarfFileFullPath, FileMode.Create, FileAccess.Write);
@@ -1176,41 +1175,101 @@ namespace RootTools_Vision.Utility
 			return firstFileNumericName.CompareTo(secondFileNumericName);
 		}
 
-		public bool SaveImageJpgInterpolation(SharedBufferInfo info, Rect rect, long compressRatio, int outSizeX, int outSizeY, List<List<System.Windows.Point>> polygon, int cuttingSize, double minRadius, int thickness, int centerX, int centerY)
+		public bool SaveImageJpgMerge(int waferSize)
+        {
+			int pages;
+			string edgeFileName = klarfFileName.Substring(0, klarfFileName.LastIndexOf("backside")) + "edge.tif";
+
+			if (!File.Exists(edgeFileName))
+				return false;
+
+			Image image = Image.FromFile(edgeFileName);
+			pages = image.GetFrameCount(FrameDimension.Page);
+			image.SelectActiveFrame(FrameDimension.Page, pages - 1);
+
+			Bitmap edge = new Bitmap(image);
+			edge.MakeTransparent(Color.Black);
+
+			Bitmap back = new Bitmap(Image.FromFile(klarfFileName + ".jpg"));
+			//Bitmap back = new Bitmap(Image.FromFile(@"D:\backside" + ".jpg"));
+			back.MakeTransparent(Color.Black);
+			
+			Bitmap outputImage = new Bitmap(edge.Width, edge.Height);
+			 
+			Graphics gp = Graphics.FromImage(outputImage);
+
+			gp.DrawImage(edge, 0, 0, edge.Width, edge.Height);
+			gp.DrawImage(back, 0, 0, back.Width, back.Height);
+
+			Tools.SaveImageJpg(outputImage, klarfFileName + ".jpg", 100);
+			edge.Dispose();
+			back.Dispose();
+			gp.Dispose();
+
+			return true;
+        }
+
+		public bool SaveImageJpgInterpolation(SharedBufferInfo info, Rect rect, long compressRatio, int outSizeX, int outSizeY, List<List<System.Windows.Point>> polygon, int waferSizeX, int waferSizeY, int centerX, int centerY)
         {
 
-			Bitmap bmp = Tools.CovertBufferToBitmap(info, rect, outSizeX, outSizeY);
-			Graphics gp =  Graphics.FromImage(bmp);
-			Brush brush = new SolidBrush(Color.Black);
+			Bitmap bmp = Tools.CovertBufferToBitmap(info, rect, outSizeX, outSizeY, centerX, centerY);
+            Graphics gp = Graphics.FromImage(bmp);
+            Brush brush = new SolidBrush(Color.Black);
 
-			
-			for (int i = 0; i < polygon.Count; i++)
+			double resizeRatioX = (outSizeX / rect.Width);
+            double resizeRatioY = (outSizeY / rect.Height);
+
+            double resizeWaferSizeX = waferSizeX * resizeRatioX;
+            double resizeWaferSizeY = waferSizeY * resizeRatioY;
+
+            double reSizeCenterX = centerX * resizeRatioX;
+            double reSizeCenterY = centerY * resizeRatioY;
+            double shortLength = double.MaxValue;
+            double longLength = resizeWaferSizeY/2;
+            for (int i = 0; i < polygon.Count; i++)
             {
-				List<PointF> poly = new List<PointF>();
-				
-				for (int j = 0; j < polygon[i].Count; j++)
+                List<PointF> poly = new List<PointF>();
+
+                for (int j = 0; j < polygon[i].Count; j++)
                 {
-					
-					poly.Add(new PointF((float)polygon[i][j].X,  (float)polygon[i][j].Y));
-				}
-				gp.FillPolygon(brush, poly.ToArray());
-		
-			}
-			Tools.CirclarInterpolation(bmp, polygon, minRadius, thickness, centerX, centerY, outSizeX, outSizeY);
+
+                    poly.Add(new PointF((float)(polygon[i][j].X * resizeRatioX), (float)(polygon[i][j].Y * resizeRatioY)));
+                    double calcShort = Math.Sqrt(Math.Pow(reSizeCenterX - poly[j].X, 2) + Math.Pow(reSizeCenterY - poly[j].Y, 2));
+                    if (shortLength > calcShort)
+                        shortLength = calcShort;
+                    //if (longLength < calcShort)
+                    //    longLength = calcShort;
+
+                }
+                gp.FillPolygon(brush, poly.ToArray());
+
+            }
+
+			int outImageCenterX = outSizeX / 2;
+			int outImageCenterY = outSizeY / 2;
+
+			Tools.CirclarInterpolation(bmp, shortLength - 100, longLength, (int)reSizeCenterX, (int)reSizeCenterY, outSizeX, outSizeY);
 
             GraphicsPath path = new GraphicsPath();
-			int cutSize = cuttingSize * 10;
-			path.AddEllipse(centerX - cutSize, centerY - cutSize, cutSize * 2, cutSize * 2);
+            path.AddEllipse((float)(outImageCenterX - (resizeWaferSizeX / 2)), (float)(outImageCenterY - (resizeWaferSizeY / 2)), (float)resizeWaferSizeX, (float)resizeWaferSizeY);
             Region region = new Region(path);
             gp.ExcludeClip(region);
             gp.FillRectangle(new SolidBrush(Color.Black), 0, 0, outSizeX, outSizeY);
 
-            //Tools.InterpolationImage(bmp, polygon);
 
+			float ratioX = (float)(outSizeX / resizeWaferSizeX);
+			float ratioY = (float)(outSizeY /resizeWaferSizeY);
+			int sizeX = outSizeX - (int)resizeWaferSizeX - 150;
+			int sizeY = outSizeY - (int)resizeWaferSizeY - 150;
+			Bitmap outputImage = new Bitmap(bmp.Width, bmp.Height);
+			Graphics gpOutput = Graphics.FromImage(outputImage);
+			gpOutput.DrawImage(bmp, -((sizeX * ratioX) / 2), -((sizeY * ratioY) / 2), outSizeX + (sizeX * ratioX), outSizeY + (sizeY * ratioY));
+            //gpOutput.DrawImage(bmp, (float)-(sizeX * ratioX), (float)-(sizeY * ratioY), (float)(outSizeX - (-(sizeX * ratioX) * 2)), (float)(outSizeY - (-(sizeY * ratioY) * 2)));
 
+            //Tools.SaveImageJpg(outputImage, "D:\\backside.jpg", compressRatio); 
+            //Tools.SaveImageJpg(bmp,"D:\\backside.jpg", compressRatio);
 
-            Tools.SaveImageJpg(bmp,"D:\\backside.jpg", compressRatio);
-            //Tools.SaveImageJpg(bmp, this.klarfFileName + ".jpg", compressRatio);
+            Tools.SaveImageJpg(outputImage, this.klarfFileName + ".jpg", compressRatio);
 
             return true;
         }

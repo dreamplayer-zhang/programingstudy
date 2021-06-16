@@ -8,25 +8,37 @@ namespace Root_Pine2.Module
     {
         public Dictionary<InfoStrip.eMagazine, MagazineEV> m_aEV = new Dictionary<InfoStrip.eMagazine, MagazineEV>();
 
-        public InfoStrip.eMagazine m_eMagazineGet = InfoStrip.eMagazine.Magazine0; 
         public InfoStrip GetInfoStrip(bool bPeek)
         {
-            int iMagazine = (int)m_eMagazineGet; 
-            for (int n = 0; n < m_aEV.Count; n++)
+            MagazineEV.Magazine magazineGet = null;
+            int nStripMin = 100; 
+            foreach (MagazineEV magazineEV in m_aEV.Values)
             {
-                m_eMagazineGet = (InfoStrip.eMagazine)((n + iMagazine) % m_aEV.Count); 
-                MagazineEV magazineEV = m_aEV[m_eMagazineGet];
-                InfoStrip infoStrip = magazineEV.GetInfoStrip(bPeek);
-                if (infoStrip != null) return infoStrip;
+                MagazineEV.Magazine magazine = magazineEV.m_aMagazine[InfoStrip.eMagazinePos.Down]; 
+                if ((magazine != null) && (magazine.m_qStripReady.Count > 0))
+                {
+                    if (nStripMin > magazine.m_qStripReady.Count)
+                    {
+                        magazineGet = magazine;
+                        nStripMin = magazine.m_qStripReady.Count;
+                    }
+                }
             }
+            if (magazineGet != null) return magazineGet.GetInfoStrip(bPeek);
+            foreach (MagazineEV magazineEV in m_aEV.Values)
+            {
+                MagazineEV.Magazine magazine = magazineEV.m_aMagazine[InfoStrip.eMagazinePos.Up];
+                if ((magazine != null) && (magazine.m_qStripReady.Count > 0) && (magazineEV.m_aMagazine[InfoStrip.eMagazinePos.Down] == null))
+                {
+                    if (nStripMin > magazine.m_qStripReady.Count)
+                    {
+                        magazineGet = magazine;
+                        nStripMin = magazine.m_qStripReady.Count;
+                    }
+                }
+            }
+            if (magazineGet != null) return magazineGet.GetInfoStrip(bPeek);
             return null; 
-        }
-
-        public string PutRequest(InfoStrip infoStrip)
-        {
-            if (infoStrip == null) return "InfoStrip == null";
-            m_aEV[infoStrip.p_eMagazine].m_infoStripUnload = infoStrip;
-            return "OK"; 
         }
 
         public string PutInfoStrip(InfoStrip infoStrip)
@@ -78,15 +90,15 @@ namespace Root_Pine2.Module
 
         void RunThread()
         {
-            int nBlink = 0; 
+            int nBlink = 0;
             m_bThread = true;
-            Thread.Sleep(5000); 
+            Thread.Sleep(5000);
             while (m_bThread)
             {
                 Thread.Sleep(200);
                 foreach (MagazineEV magazine in m_aEV.Values)
                 {
-                    magazine.m_conveyor.RunSwitch(nBlink); 
+                    magazine.m_conveyor.RunSwitch(nBlink);
                 }
                 nBlink = (nBlink + 1) % 8;
             }

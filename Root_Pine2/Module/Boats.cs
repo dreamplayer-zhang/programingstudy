@@ -92,8 +92,8 @@ namespace Root_Pine2.Module
         public Dictionary<Vision2D.eWorks, Boat> m_aBoat = new Dictionary<Vision2D.eWorks, Boat>(); 
         void InitBoat()
         {
-            m_aBoat.Add(Vision2D.eWorks.A, new Boat(p_id + ".A", this));
-            m_aBoat.Add(Vision2D.eWorks.B, new Boat(p_id + ".B", this));
+            m_aBoat.Add(Vision2D.eWorks.A, new Boat(p_id + ".A", this, Vision2D.eWorks.A));
+            m_aBoat.Add(Vision2D.eWorks.B, new Boat(p_id + ".B", this, Vision2D.eWorks.B));
         }
         #endregion
 
@@ -111,6 +111,8 @@ namespace Root_Pine2.Module
                 p_eState = eState.Ready;
                 m_aBoat[Vision2D.eWorks.A].p_eStep = Boat.eStep.RunReady;
                 m_aBoat[Vision2D.eWorks.B].p_eStep = Boat.eStep.RunReady;
+                m_aBoat[Vision2D.eWorks.A].m_doTriggerSwitch.Write(false);
+                m_aBoat[Vision2D.eWorks.B].m_doTriggerSwitch.Write(false);
             }
             else
             {
@@ -128,28 +130,44 @@ namespace Root_Pine2.Module
             m_aBoat[Vision2D.eWorks.B].Reset(p_eState);
             base.Reset();
         }
+
+        public override string StateReady()
+        {
+            if (EQ.p_eState != EQ.eState.Run) return "OK"; 
+            if (IsReady(m_aBoat[Vision2D.eWorks.A])) return StartSnap(Vision2D.eWorks.A);
+            if (IsReady(m_aBoat[Vision2D.eWorks.B])) return StartSnap(Vision2D.eWorks.B);
+            return "OK"; 
+        }
+
+        bool IsReady(Boat boat)
+        {
+            if (boat.p_eStep != Boat.eStep.Ready) return false;
+            return (boat.p_infoStrip != null); 
+        }
         #endregion
 
         #region Snap
-        public string StartSnap(Vision2D.Recipe recipe)
+        public string StartSnap(Vision2D.eWorks eWorks)
         {
             Run_Snap run = (Run_Snap)m_runSnap.Clone();
-            run.m_recipe = recipe;
+            run.m_eWorks = eWorks;
             return StartRun(run);
         }
 
-        public string RunSnap(Vision2D.Recipe recipe)
+        public string RunSnap(Vision2D.eWorks eWorks)
         {
             StopWatch sw = new StopWatch();
             try
             {
+                m_aBoat[eWorks].p_eStep = Boat.eStep.Run;
+                m_aBoat[eWorks].m_doTriggerSwitch.Write(true); 
                 int iSnap = 0; 
-                foreach (Vision2D.Recipe.Snap snap in recipe.m_aSnap)
+                foreach (Vision2D.Recipe.Snap snap in m_aBoat[eWorks].m_recipe.m_aSnap)
                 {
                     //m_vision.RunLight(snap.m_lightPower);
-                    //if (Run(RunMoveSnapStart(recipe.m_eWorks, snap))) return p_sInfo;
-                    m_vision.StartSnap(snap, recipe.m_eWorks, p_sRecipe, iSnap);
-                    //if (Run(m_aBoat[recipe.m_eWorks].RunSnap())) return p_sInfo;
+                    //if (Run(RunMoveSnapStart(eWorks, snap))) return p_sInfo;
+                    m_vision.StartSnap(snap, eWorks, p_sRecipe, iSnap);
+                    //if (Run(m_aBoat[eWorks].RunSnap())) return p_sInfo;
                     if (m_vision.IsBusy()) EQ.p_bStop = true;
                     iSnap++; 
                 }
@@ -157,10 +175,11 @@ namespace Root_Pine2.Module
             catch (Exception e) { p_sInfo = e.Message; }
             finally
             {
-                m_axisCam.StartMove((Vision2D.eWorks)(1 - (int)recipe.m_eWorks));
-                m_aBoat[recipe.m_eWorks].RunMove(p_ePosUnload);
+                m_axisCam.StartMove((Vision2D.eWorks)(1 - (int)eWorks));
+                m_aBoat[eWorks].RunMove(p_ePosUnload);
+                m_aBoat[eWorks].p_eStep = Boat.eStep.Run;
+                m_aBoat[eWorks].m_doTriggerSwitch.Write(false);
             }
-
             m_log.Info("Run Snap End : " + (sw.ElapsedMilliseconds / 1000.0).ToString("0.00") + " sec");
             return "OK";
         }
@@ -175,6 +194,8 @@ namespace Root_Pine2.Module
             {
                 if (_sRecipe == value) return;
                 _sRecipe = value;
+                m_aBoat[Vision2D.eWorks.A].p_sRecipe = value;
+                m_aBoat[Vision2D.eWorks.B].p_sRecipe = value;
                 m_vision.SetRecipe(value); 
             }
         }
@@ -200,8 +221,9 @@ namespace Root_Pine2.Module
                 if (asRead.Length < 3) return;
                 string sRecipe = asRead[2];
                 Vision2D.eWorks eWorks = (asRead[3] == "A") ? Vision2D.eWorks.A : Vision2D.eWorks.B;
-                m_vision.m_recipe[eWorks].RecipeOpen(sRecipe);
-                StartSnap(m_vision.m_recipe[eWorks]); 
+                //m_vision.m_recipe[eWorks].RecipeOpen(sRecipe);
+                m_aBoat[eWorks].m_recipe.RecipeOpen(sRecipe); 
+                StartSnap(eWorks); 
             }
         }
         #endregion
@@ -235,6 +257,7 @@ namespace Root_Pine2.Module
         protected override void InitModuleRuns()
         {
             m_runSnap = AddModuleRunList(new Run_Snap(this), false, "Run Snap");
+            m_runSnap = AddModuleRunList(new Run_MoveBoat(this), false, "Move Boat");
         }
 
         public class Run_Snap : ModuleRunBase
@@ -243,26 +266,56 @@ namespace Root_Pine2.Module
             public Run_Snap(Boats module)
             {
                 m_module = module;
-                m_recipe = new Vision2D.Recipe(module.m_vision, Vision2D.eWorks.A); 
                 InitModuleRun(module);
             }
 
-            public Vision2D.Recipe m_recipe; 
+            public Vision2D.eWorks m_eWorks; 
             public override ModuleRunBase Clone()
             {
                 Run_Snap run = new Run_Snap(m_module);
-                run.m_recipe = m_recipe.Clone();
+                run.m_eWorks = m_eWorks;
                 return run;
             }
 
             public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
             {
-                m_recipe.RunTreeRecipe(tree, bVisible); 
+                m_eWorks = (Vision2D.eWorks)tree.Set(m_eWorks, m_eWorks, "eWorks", "Select Boat", bVisible); 
             }
 
             public override string Run()
             {
-                return m_module.RunSnap(m_recipe); 
+                return m_module.RunSnap(m_eWorks); 
+            }
+        }
+
+        public class Run_MoveBoat : ModuleRunBase
+        {
+            Boats m_module;
+            public Run_MoveBoat(Boats module)
+            {
+                m_module = module;
+                InitModuleRun(module);
+            }
+
+            public Boat.ePos m_ePos = Boat.ePos.Handler; 
+            public Vision2D.eWorks m_eWorks;
+            public override ModuleRunBase Clone()
+            {
+                Run_MoveBoat run = new Run_MoveBoat(m_module);
+                run.m_eWorks = m_eWorks;
+                run.m_ePos = m_ePos; 
+                return run;
+            }
+
+            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
+            {
+                m_eWorks = (Vision2D.eWorks)tree.Set(m_eWorks, m_eWorks, "eWorks", "Select Boat", bVisible);
+                m_ePos = (Boat.ePos)tree.Set(m_ePos, m_ePos, "Position", "Boat Position", bVisible); 
+            }
+
+            public override string Run()
+            {
+                return m_module.m_aBoat[m_eWorks].RunMove(m_ePos);
             }
         }
         #endregion

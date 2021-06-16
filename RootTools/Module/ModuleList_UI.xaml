@@ -39,9 +39,9 @@
                     <!--<Run Text="0"/>
                     <Run Text="/"/>
                     <Run Text="20"/>-->
-                     <Run Text="{Binding p_iRun}"/>
+                     <Run Text="{Binding p_nTotalRnR}"/>
                     <Run Text="/"/>
-                    <Run Text="{Binding p_maxRun}"/>
+                    <Run Text="{Binding p_nRnR}"/>
                 </TextBlock>
             </Grid>
         </StackPanel>

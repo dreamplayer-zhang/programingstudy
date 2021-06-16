@@ -1,15 +1,11 @@
 ﻿using Root_Pine2_Vision.Module;
 using RootTools;
-using RootTools.Comm;
 using RootTools.Control;
 using RootTools.Module;
 using RootTools.ToolBoxs;
 using RootTools.Trees;
 using System;
 using System.ComponentModel;
-using System.IO;
-using System.Net.Sockets;
-using System.Text;
 
 namespace Root_Pine2.Module
 {
@@ -54,6 +50,7 @@ namespace Root_Pine2.Module
         DIO_O m_doRollerPusher;
         DIO_O m_doCleanerBlow;
         DIO_O m_doCleanerSuction;
+        public DIO_O m_doTriggerSwitch; 
         public void GetTools(ToolBox toolBox, Boats boats, bool bInit)
         {
             toolBox.GetAxis(ref m_axis, boats, p_id + ".Snap");
@@ -64,6 +61,7 @@ namespace Root_Pine2.Module
             toolBox.GetDIO(ref m_doRollerPusher, boats, p_id + ".Roller Pusher");
             toolBox.GetDIO(ref m_doCleanerBlow, boats, p_id + ".Cleaner Blow");
             toolBox.GetDIO(ref m_doCleanerSuction, boats, p_id + ".Cleaner Suction");
+            toolBox.GetDIO(ref m_doTriggerSwitch, boats, p_id + ".Trigger Switch");
             if (bInit) InitPosition();
         }
         #endregion
@@ -178,20 +176,37 @@ namespace Root_Pine2.Module
         }
         #endregion
 
+        #region Recipe
+        string _sRecipe = "";
+        public string p_sRecipe
+        {
+            get { return _sRecipe; }
+            set
+            {
+                if (_sRecipe == value) return;
+                _sRecipe = value;
+                m_recipe.RecipeOpen(value); 
+            }
+        }
+        public Vision2D.Recipe m_recipe; 
+        #endregion
+
         public void Reset(ModuleBase.eState eState)
         {
             p_infoStrip = null;
+            m_doTriggerSwitch.Write(false); 
             if (eState == ModuleBase.eState.Ready) p_eStep = eStep.RunReady;
         }
 
         public InfoStrip p_infoStrip { get; set; }
         public string p_id { get; set; }
         Boats m_boats;
-        public Boat(string id, Boats boats)
+        public Boat(string id, Boats boats, Vision2D.eWorks eWorks)
         {
             m_bgwRunReady.DoWork += M_bgwRunReady_DoWork;
             p_id = id;
             m_boats = boats;
+            m_recipe = new Vision2D.Recipe(boats.m_vision, eWorks);
         }
     }
 }

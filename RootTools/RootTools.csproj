@@ -453,6 +453,9 @@
       <DependentUpon>LightTool_LVS_new_UI.xaml</DependentUpon>
     </Compile>
     <Compile Include="MarsLog\MarsLogManager.cs" />
+    <Compile Include="Memory\MemoryViewerOption.xaml.cs">
+      <DependentUpon>MemoryViewerOption.xaml</DependentUpon>
+    </Compile>
     <Compile Include="OHTNew\ILoadport.cs" />
     <Compile Include="OHTNew\OHT.cs" />
     <Compile Include="OHTNew\OHT_ButtonUI.xaml.cs">
@@ -1096,6 +1099,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Comm\TCPIPServer_UI.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Memory\MemoryViewerOption.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

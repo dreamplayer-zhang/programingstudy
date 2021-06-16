@@ -297,8 +297,8 @@ namespace Root_CAMELLIA
                 return new RelayCommand(() =>
                 {
                     if (EQ.p_bSimulate)
-                        p_loadport.m_OHTNew.m_carrier.p_eAccessLP = GemCarrierBase.eAccessLP.Manual;
-                    p_loadport.m_OHTNew.m_carrier.p_eReqAccessLP = GemCarrierBase.eAccessLP.Manual;
+                        p_loadport.m_OHTsemi.m_carrier.p_eAccessLP = GemCarrierBase.eAccessLP.Manual;
+                    p_loadport.m_OHTsemi.m_carrier.p_eReqAccessLP = GemCarrierBase.eAccessLP.Manual;
                 });
             }
         }
@@ -310,8 +310,8 @@ namespace Root_CAMELLIA
                 return new RelayCommand(() =>
                 {
                     if (EQ.p_bSimulate)
-                        p_loadport.m_OHTNew.m_carrier.p_eAccessLP = GemCarrierBase.eAccessLP.Auto;
-                    p_loadport.m_OHTNew.m_carrier.p_eReqAccessLP = GemCarrierBase.eAccessLP.Auto;
+                        p_loadport.m_OHTsemi.m_carrier.p_eAccessLP = GemCarrierBase.eAccessLP.Auto;
+                    p_loadport.m_OHTsemi.m_carrier.p_eReqAccessLP = GemCarrierBase.eAccessLP.Auto;
                 });
             }
         }

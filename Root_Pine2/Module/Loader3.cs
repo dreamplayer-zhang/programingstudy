@@ -5,16 +5,19 @@ using RootTools.Control;
 using RootTools.Module;
 using RootTools.Trees;
 using System;
+using System.Threading;
 
 namespace Root_Pine2.Module
 {
     public class Loader3 : ModuleBase
     {
         #region ToolBox
-        Axis3D m_axis;
+        public Axis3D m_axis;
+        public DIO_I m_diCrash; 
         public override void GetTools(bool bInit)
         {
             m_toolBox.GetAxis(ref m_axis, this, "Loader3");
+            m_toolBox.GetDIO(ref m_diCrash, this, "Crash"); 
             m_picker.GetTools(m_toolBox, this, bInit);
             if (bInit) InitPosition();
         }
@@ -39,6 +42,7 @@ namespace Root_Pine2.Module
             Tray4,
             Tray5,
             Tray6,
+            Tray7,
         }
         void InitPosition()
         {
@@ -53,34 +57,92 @@ namespace Root_Pine2.Module
         }
         #endregion
 
+        #region Crash
+        bool m_bThreadCrash = false;
+        Thread m_threadCrash; 
+        void InitThreadCrash()
+        {
+            m_threadCrash = new Thread(new ThreadStart(RunThreadCrash));
+            m_threadCrash.Start();
+        }
+
+        void RunThreadCrash()
+        {
+            m_bThreadCrash = true;
+            Thread.Sleep(5000);
+            while (m_bThreadCrash)
+            {
+                Thread.Sleep(10);
+                if (m_diCrash.p_bIn)
+                {
+                    m_axis.p_axisX.ServoOn(false);
+                    p_loader0.m_axis.p_axisX.ServoOn(false); 
+                }
+            }
+        }
+        #endregion
+
+        #region AvoidX
+        Loader0 p_loader0 { get { return m_handler.m_loader0; } }
+        string StartMoveX(string sPos)
+        {
+            Axis axisX = p_loader0.m_axis.p_axisX;
+            double fPos = m_axis.p_axisX.GetPosValue(sPos);
+            while ((fPos + axisX.m_posDst) > Loader0.c_lAxisX)
+            {
+                Thread.Sleep(10);
+                if (EQ.IsStop()) return "EQ Stop";
+                if (p_loader0.IsBusy() == false)
+                {
+                    p_loader0.StartAvoidX(fPos);
+                    Thread.Sleep(10);
+                }
+            }
+            return m_axis.p_axisX.StartMove(fPos);
+        }
+
+        public string StartAvoidX(double fPos)
+        {
+            Run_AvoidX run = (Run_AvoidX)m_runAvoidX.Clone();
+            run.m_fPos = Loader0.c_lAxisX - fPos;
+            return StartRun(run); 
+        }
+
+        public string RunAvoidX(double fPos)
+        {
+            m_axis.p_axisX.StartMove(fPos);
+            return m_axis.p_axisX.WaitReady(); 
+        }
+        #endregion
+
         #region AxisXY
         public string RunMoveBoat(Vision2D.eWorks eWorks, bool bWait = true)
         {
             string sPos = GetPosString(eWorks);
-            m_axis.p_axisX.StartMove(sPos);
+            if (Run(StartMoveX(sPos))) return p_sInfo;
             m_axis.p_axisY.StartMove(sPos);
             return bWait ? m_axis.WaitReady() : "OK";
         }
 
         public string RunMoveTransfer(ePosTransfer ePos, bool bWait = true)
         {
-            m_axis.p_axisX.StartMove(ePos);
+            if (Run(StartMoveX(ePos.ToString()))) return p_sInfo;
             m_axis.p_axisY.StartMove(ePos);
             return bWait ? m_axis.WaitReady() : "OK";
         }
 
         public string RunMoveTray(ePosTray ePos, bool bWait = true)
         {
-            m_axis.p_axisX.StartMove(ePos);
+            if (Run(StartMoveX(ePos.ToString()))) return p_sInfo;
             m_axis.p_axisY.StartMove(ePos);
             return bWait ? m_axis.WaitReady() : "OK";
         }
         #endregion
 
         #region AxisZ
-        public string RunMoveZ(Vision2D.eWorks eWorks, bool bWait = true)
+        public string RunMoveZ(Vision2D.eWorks eWorks, double dPos, bool bWait = true)
         {
-            m_axis.p_axisZ.StartMove(GetPosString(eWorks));
+            m_axis.p_axisZ.StartMove(GetPosString(eWorks), -dPos);
             return bWait ? m_axis.WaitReady() : "OK";
         }
 
@@ -113,7 +175,7 @@ namespace Root_Pine2.Module
             {
                 if (Run(RunMoveUp())) return p_sInfo;
                 if (Run(RunMoveBoat(eWorks))) return p_sInfo;
-                if (Run(RunMoveZ(eWorks))) return p_sInfo;
+                if (Run(RunMoveZ(eWorks, 0))) return p_sInfo;
                 boat.RunVacuum(false);
                 boat.RunBlow(true);
                 if (Run(m_picker.RunVacuum(true))) return p_sInfo;
@@ -166,8 +228,10 @@ namespace Root_Pine2.Module
                 if (Run(RunMoveTray(ePos))) return p_sInfo;
                 if (Run(RunMoveZ(ePos))) return p_sInfo;
                 if (Run(m_picker.RunVacuum(false))) return p_sInfo;
-                if (Run(RunMoveUp())) return p_sInfo;
                 m_picker.p_infoStrip = null;
+                MagazineEV magazine = m_handler.m_magazineEV.m_aEV[(InfoStrip.eMagazine)ePos];
+                magazine.PutInfoStrip(m_picker.p_infoStrip);
+                if (Run(RunMoveUp())) return p_sInfo;
             }
             finally
             {
@@ -177,6 +241,51 @@ namespace Root_Pine2.Module
         }
         #endregion
 
+
+        #region PickerSet
+        double m_mmPickerSetUp = 10;
+        double m_secPickerSet = 7;
+        public string RunPickerSet()
+        {
+            StopWatch sw = new StopWatch();
+            long msPickerSet = (long)(1000 * m_secPickerSet);
+            try
+            {
+                Vision2D.eWorks eWorks = Vision2D.eWorks.A; 
+                while (true)
+                {
+                    if (Run(RunMoveZ(eWorks, 0))) return p_sInfo;
+                    if (Run(m_picker.RunVacuum(false))) return p_sInfo;
+                    double sec = 0;
+                    if (Run(m_pine2.WaitPickerSet(ref sec))) return p_sInfo;
+                    if (Run(m_picker.RunVacuum(true))) return p_sInfo;
+                    if (Run(RunMoveZ(eWorks, 1000 * m_mmPickerSetUp))) return p_sInfo;
+                    Thread.Sleep(200);
+                    m_pine2.p_diPickerSet = false;
+                    if (m_picker.IsVacuum())
+                    {
+                        sw.Start();
+                        while (sw.ElapsedMilliseconds < msPickerSet)
+                        {
+                            Thread.Sleep(10);
+                            if (EQ.IsStop()) return "EQ Stop";
+                            if (m_pine2.p_diPickerSet) return "OK";
+                        }
+                    }
+                }
+            }
+            finally
+            {
+                RunMoveUp();
+            }
+        }
+
+        void RunTreePickerSet(Tree tree)
+        {
+            m_mmPickerSetUp = tree.Set(m_mmPickerSetUp, m_mmPickerSetUp, "Picker Up", "Picker Up (mm)");
+            m_secPickerSet = tree.Set(m_secPickerSet, m_secPickerSet, "Done", "PickerSet Done Time (sec)");
+        }
+        #endregion
         #region override
         public override string StateReady()
         {
@@ -249,6 +358,7 @@ namespace Root_Pine2.Module
         {
             base.RunTree(tree);
             m_picker.RunTreeVacuum(tree.GetTree("Vacuum"));
+            RunTreePickerSet(tree.GetTree("PickerSet"));
         }
         #endregion
 
@@ -264,10 +374,16 @@ namespace Root_Pine2.Module
             m_transfer = handler.m_transfer;
             m_handler = handler;
             base.InitBase(id, engineer);
+            InitThreadCrash(); 
         }
 
         public override void ThreadStop()
         {
+            if (m_bThreadCrash)
+            {
+                m_bThreadCrash = false;
+                m_threadCrash.Join(); 
+            }
             m_picker.ThreadStop();
             base.ThreadStop();
         }
@@ -276,11 +392,14 @@ namespace Root_Pine2.Module
         ModuleRunBase m_runLoadBoat;
         ModuleRunBase m_runUnloadTransfer;
         ModuleRunBase m_runUnloadTray;
+        ModuleRunBase m_runAvoidX;
         protected override void InitModuleRuns()
         {
             m_runLoadBoat = AddModuleRunList(new Run_LoadBoat(this), true, "Load Strip from Boat");
             m_runUnloadTransfer = AddModuleRunList(new Run_UnloadTransfer(this), true, "Unload Strip from Transfer");
             m_runUnloadTray = AddModuleRunList(new Run_UnloadTray(this), true, "Unload Strip to Paper Tray");
+            m_runAvoidX = AddModuleRunList(new Run_AvoidX(this), true, "Avoid Axis X");
+            AddModuleRunList(new Run_PickerSet(this), false, "Picker Set");
         }
 
         public class Run_LoadBoat : ModuleRunBase
@@ -364,6 +483,59 @@ namespace Root_Pine2.Module
             public override string Run()
             {
                 return m_module.RunUnloadTray(m_ePos);
+            }
+        }
+
+        public class Run_AvoidX : ModuleRunBase
+        {
+            Loader3 m_module;
+            public Run_AvoidX(Loader3 module)
+            {
+                m_module = module;
+                InitModuleRun(module);
+            }
+
+            public double m_fPos = 0;
+            public override ModuleRunBase Clone()
+            {
+                Run_AvoidX run = new Run_AvoidX(m_module);
+                run.m_fPos = m_fPos;
+                return run;
+            }
+
+            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
+            {
+                m_fPos = tree.Set(m_fPos, m_fPos, "Position", "Axis X Avoid Position", bVisible);
+            }
+
+            public override string Run()
+            {
+                return m_module.RunAvoidX(m_fPos); 
+            }
+        }
+
+        public class Run_PickerSet : ModuleRunBase
+        {
+            Loader3 m_module;
+            public Run_PickerSet(Loader3 module)
+            {
+                m_module = module;
+                InitModuleRun(module);
+            }
+
+            public override ModuleRunBase Clone()
+            {
+                Run_PickerSet run = new Run_PickerSet(m_module);
+                return run;
+            }
+
+            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
+            {
+            }
+
+            public override string Run()
+            {
+                return m_module.RunPickerSet();
             }
         }
         #endregion

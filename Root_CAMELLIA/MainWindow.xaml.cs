@@ -80,7 +80,7 @@ namespace Root_CAMELLIA
 
         CAMELLIA_Engineer m_engineer;
         CAMELLIA_Handler m_handler;
-       
+        OHTs_UI dlgOHT;
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             SplashScreenHelper.ShowText("Handler Initialize");
@@ -88,9 +88,13 @@ namespace Root_CAMELLIA
             m_handler = m_engineer.m_handler;
             //loadportA.Init(m_handler.m_aLoadport[0], m_handler, m_handler.m_aRFID[0]);
             //loadportB.Init(m_handler.m_aLoadport[1], m_handler, m_handler.m_aRFID[1]);
-
+            marsLogManager = MarsLogManager.Instance;
             int nLPNum = m_handler.m_aLoadport.Count;
-            for (int i = 0; i < nLPNum; i++) dlgOHT.Init(m_handler.m_aLoadport[i].m_OHTNew);
+            //for (int i = 0; i < nLPNum; i++) dlgOHT.Init(m_handler.m_aLoadport[i].m_OHTsemi);
+            dlgOHT = new OHTs_UI();
+            dlgOHT.Init((CAMELLIA_Handler)m_engineer.ClassHandler());
+
+
             SplashScreenHelper.ShowText("Handler Initialize Done");
 
             SplashScreenHelper.ShowText("Log View Initialize");
@@ -115,6 +119,7 @@ namespace Root_CAMELLIA
         }
 
         DispatcherTimer m_timer = new DispatcherTimer();
+        MarsLogManager marsLogManager;
         void InitTimer()
         {
             m_timer.Interval = TimeSpan.FromMilliseconds(20);
@@ -122,10 +127,23 @@ namespace Root_CAMELLIA
             m_timer.Start();
         }
         // EQ.eState oldstate = EQ.eState.Init;
+        bool isCFGWrite = false;
         private void M_timer_Tick(object sender, EventArgs e)
         {
             tbTime.Text = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
-            TimerUI();
+            if(DateTime.Now.Minute == 0 && DateTime.Now.Second == 0 && !isCFGWrite)
+            {
+                DataFormatter data = new DataFormatter();
+                data.AddData("Version", BaseDefine.Configuration.Version3);
+                marsLogManager.WriteCFG("Vision", "Version", data);
+                data.ClearData();
+                isCFGWrite = true;
+            }
+
+            if (DateTime.Now.Second == 1)
+                isCFGWrite = false;
+
+                TimerUI();
             TimerLamp();
 
             buttonResume.IsEnabled = IsEnable_Resume();
@@ -274,7 +292,29 @@ namespace Root_CAMELLIA
             m_engineer.BuzzerOff();
         }
 
-        Dlg_OHT dlgOHT = new Dlg_OHT();
+        
+
+        //public void ShowOHT()
+        //{
+        //    m_timer.Start();
+        //}
+
+        //DispatcherTimer m_timer = new DispatcherTimer();
+        //void InitTimer()
+        //{
+        //    m_timer.Interval = TimeSpan.FromMilliseconds(10);
+        //    m_timer.Tick += M_timer_Tick;
+        //}
+        //OHTs_UI m_uiOHT;
+        //private void M_timer_Tick(object sender, EventArgs e)
+        //{
+        //    m_timer.Stop();
+        //    m_uiOHT = new OHTs_UI();
+        //    m_uiOHT.Init((CAMELLIA_Handler)m_engineer.ClassHandler());
+        //    m_uiOHT.Show();
+        //}
+
+        //Dlg_OHT dlgOHT = new Dlg_OHT();
         private void buttonOHT_Click(object sender, RoutedEventArgs e)
         {
             dlgOHT.Show();

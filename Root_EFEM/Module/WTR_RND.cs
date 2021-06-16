@@ -5,6 +5,7 @@ using RootTools.GAFs;
 using RootTools.Module;
 using RootTools.ToolBoxs;
 using RootTools.Trees;
+using SSLNet;
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -813,6 +814,8 @@ namespace Root_EFEM.Module
             }
 
             public string p_sChild { get; set; }
+            public bool p_isExchange { get; set; } = false;
+            public int p_nExchangeSlot { get; set; } = -1;
             public eArm m_eArm = eArm.Upper;
             public int m_nChildID = 0;
             public override ModuleRunBase Clone()
@@ -847,6 +850,8 @@ namespace Root_EFEM.Module
 
             public override string Run()
             {
+                MarsLogManager marsLogManager = MarsLogManager.Instance;
+
                 IWTRChild child = m_module.GetChild(p_sChild);
                 if (child == null) return "WTR Child not Found : " + p_sChild;
                 if (EQ.p_bSimulate)
@@ -866,9 +871,54 @@ namespace Root_EFEM.Module
                     if (EQ.IsStop()) return "Stop";
                     Thread.Sleep(100);
                 }
+                
+
                 if (m_module.Run(child.BeforeGet(m_nChildID))) return p_sInfo;
                 if (m_module.Run(child.IsGetOK(m_nChildID))) return p_sInfo;
                 m_module.m_dicArm[m_eArm].p_infoWafer = child.GetInfoWafer(m_nChildID);
+                
+                marsLogManager.ChangeMaterial(EQ.p_nRunLP, m_module.m_dicArm[m_eArm].p_infoWafer.m_nSlot, m_module.m_dicArm[m_eArm].p_infoWafer.p_sLotID, m_module.m_dicArm[m_eArm].p_infoWafer.p_sCarrierID, m_module.m_dicArm[m_eArm].p_infoWafer.p_sRecipe);
+                //MaterialFormatter materialFormatter = new MaterialFormatter();
+                FlowData fromSlot = new FlowData();
+                FlowData from = new FlowData();
+                FlowData to = new FlowData();
+                FlowData toSlot = new FlowData();
+                string id = child.p_id;
+                if (!(id.Contains("Loadport") || id.Contains("Aligner")))
+                {
+                    id = "Vision";
+                }
+                if (!p_isExchange)
+                {
+                    from.AddData(id);
+                    if (id.Contains("Loadport"))
+                    {
+                        fromSlot.AddData(m_module.m_dicArm[m_eArm].p_infoWafer.m_nSlot + 1);
+                    }
+                    else
+                    {
+                        fromSlot.AddData(1);
+                    }
+
+
+                    to.AddData("WTR");
+                    toSlot.AddData(1);
+                    marsLogManager.WriteXFR("WTR", SSLNet.XFR_EVENTID.GET, SSLNet.STATUS.START, from, fromSlot, to, toSlot);
+                }
+                else
+                {
+                    from.AddData(id);
+                    from.AddData("WTR");
+                    fromSlot.AddData(1);
+                    fromSlot.AddData(1);
+                    to.AddData("WTR");
+                    to.AddData(id);
+                    toSlot.AddData(2);
+                    toSlot.AddData(1);
+                    marsLogManager.WriteXFR("WTR", XFR_EVENTID.EXCHANGE, STATUS.START, from, fromSlot, to, toSlot);
+                }
+
+
                 try
                 {
                     child.p_bLock = true;
@@ -884,6 +934,12 @@ namespace Root_EFEM.Module
                         child.SetInfoWafer(m_nChildID, null);
                     else m_module.m_dicArm[m_eArm].p_infoWafer = null;
                 }
+                if (!p_isExchange)
+                {
+                    marsLogManager.WriteXFR("WTR", SSLNet.XFR_EVENTID.GET, SSLNet.STATUS.END, from, fromSlot, to, toSlot);
+                    p_isExchange = false;
+                }
+                
                 //return "OK"; //0202 
                 if (m_module.m_dicArm[m_eArm].IsWaferExist()) 
                     return "OK"; // IsWaferExist 디버그 찍어봐야지머
@@ -902,6 +958,9 @@ namespace Root_EFEM.Module
             }
 
             public string p_sChild { get; set; }
+            public bool p_isExchange { get; set; } = false;
+            public int p_nExchangeSlot { get; set; } = -1;
+
             public eArm m_eArm = eArm.Upper;
             public int m_nChildID = 0;
             public override ModuleRunBase Clone()
@@ -935,6 +994,8 @@ namespace Root_EFEM.Module
 
             public override string Run()
             {
+                MarsLogManager marsLogManager = MarsLogManager.Instance;
+
                 IWTRChild child = m_module.GetChild(p_sChild);
                 if (child == null) return "WTR Child not Found : " + p_sChild;
                 if (EQ.p_bSimulate)
@@ -954,8 +1015,42 @@ namespace Root_EFEM.Module
                 if (m_module.Run(child.BeforePut(m_nChildID))) return p_sInfo;
                 if (m_module.Run(child.IsPutOK(m_module.m_dicArm[m_eArm].p_infoWafer, m_nChildID))) return p_sInfo;
                 child.SetInfoWafer(m_nChildID, m_module.m_dicArm[m_eArm].p_infoWafer);
+
+
+                FlowData from = new FlowData();
+                FlowData fromSlot = new FlowData();
+                FlowData to = new FlowData();
+                FlowData toSlot = new FlowData();
+                string id = child.p_id;
+
+                if (!(id.Contains("Loadport") || id.Contains("Aligner")))
+                {
+                    id = "Vision";
+                }
+                if (!p_isExchange)
+                {
+                    
+                    from.AddData("WTR");
+
+                    fromSlot.AddData(1);
+                    to.AddData(id);
+                    if (id.Contains("Loadport"))
+                    {
+                        toSlot.AddData(m_module.m_dicArm[m_eArm].p_infoWafer.m_nSlot + 1);
+                    }
+                    else
+                    {
+                        toSlot.AddData(1);
+                    }
+
+
+
+                    marsLogManager.WriteXFR("WTR", SSLNet.XFR_EVENTID.PUT, SSLNet.STATUS.START, from, fromSlot, to, toSlot);
+                }
+              
                 try
                 {
+                    
                     child.p_bLock = true;
                     if (m_module.Run(m_module.WriteCmd(eCmd.Put, posWTR, m_nChildID + 1, (int)m_eArm + 1))) return p_sInfo;
                     if (m_module.Run(m_module.WaitReply(m_module.m_secMotion))) return p_sInfo;
@@ -967,6 +1062,23 @@ namespace Root_EFEM.Module
                     //0203 여기 왜 거꾸로..? // 0204 I/O 잘못 됨
                     if (m_module.m_dicArm[m_eArm].IsWaferExist()) child.SetInfoWafer(m_nChildID, null);
                     else m_module.m_dicArm[m_eArm].p_infoWafer = null;
+                }
+                if (!p_isExchange)
+                {
+                    marsLogManager.WriteXFR("WTR", SSLNet.XFR_EVENTID.PUT, SSLNet.STATUS.END, from, fromSlot, to, toSlot);
+                }
+                else
+                {
+                    from.AddData(id);
+                    from.AddData("WTR");
+                    fromSlot.AddData(1);
+                    fromSlot.AddData(1);
+                    to.AddData("WTR");
+                    to.AddData(id);
+                    toSlot.AddData(2);
+                    toSlot.AddData(1);
+                    marsLogManager.WriteXFR("WTR", SSLNet.XFR_EVENTID.EXCHANGE, SSLNet.STATUS.END, from, fromSlot, to, toSlot);
+                    p_isExchange = false;
                 }
                 if (m_module.m_dicArm[m_eArm].IsWaferExist() == false) 
                     return "OK";
