@@ -28,6 +28,7 @@ namespace Root_Pine2.Module
             m_axisXZ.AddPos(GetPosString(Vision2D.eVision.Top3D, Vision2D.eWorks.B));
             m_axisXZ.AddPos(GetPosString(Vision2D.eVision.Top2D, Vision2D.eWorks.A));
             m_axisXZ.AddPos(GetPosString(Vision2D.eVision.Top2D, Vision2D.eWorks.B));
+            m_axisXZ.p_axisY.AddPos("Up");
         }
 
         string GetPosString(Vision2D.eVision eVision, Vision2D.eWorks eVisionWorks)
@@ -61,7 +62,7 @@ namespace Root_Pine2.Module
 
         public string RunMoveUp(bool bWait = true)
         {
-            m_axisXZ.p_axisY.StartMove(0);
+            m_axisXZ.p_axisY.StartMove(m_axisXZ.p_axisY.GetPosValue("Up"));
             return bWait ? m_axisXZ.WaitReady() : "OK";
         }
         #endregion
