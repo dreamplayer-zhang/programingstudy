@@ -59,7 +59,7 @@ namespace Root_CAMELLIA.Module
         void CalDoneEvent()
         {
             MarsLogManager logManager = MarsLogManager.Instance;
-            logManager.WriteFNC(EQ.p_nRunLP, m_module.p_id, "Calibration", SSLNet.STATUS.END);
+            logManager.WriteFNC(EQ.p_nRunLP, BaseDefine.LOG_DEVICE_ID, "Calibration", SSLNet.STATUS.END);
         }
 
         public override ModuleRunBase Clone()
@@ -135,6 +135,7 @@ namespace Root_CAMELLIA.Module
         public override string Run()
         {
             DataManager.Instance.m_calibration.CalDoneEvent += CalDoneEvent;
+            string deviceID = BaseDefine.LOG_DEVICE_ID;
 
             StopWatch test = new StopWatch();
             test.Start();
@@ -146,37 +147,38 @@ namespace Root_CAMELLIA.Module
 
             MarsLogManager logManager = MarsLogManager.Instance;
             DataFormatter dataformatter = new DataFormatter();
-            logManager.WriteFNC(EQ.p_nRunLP, m_module.p_id, "Lifter Down", SSLNet.STATUS.START);
+            logManager.WriteFNC(EQ.p_nRunLP, deviceID, "Lifter Down", SSLNet.STATUS.START);
             if (m_module.LifterDown() != "OK")
             {
                 return p_sInfo;
             }
-            logManager.WriteFNC(EQ.p_nRunLP, m_module.p_id, "Lifter Down", SSLNet.STATUS.END);
+            logManager.WriteFNC(EQ.p_nRunLP, deviceID, "Lifter Down", SSLNet.STATUS.END);
 
             int sequence = 0;
 
-            logManager.WritePRC(EQ.p_nRnR, m_module.p_id, SSLNet.PRC_EVENTID.Process, SSLNet.STATUS.START, this.p_id, sequence++, materialID:m_module.p_infoWafer.p_id);
+            logManager.WritePRC(EQ.p_nRnR, deviceID, SSLNet.PRC_EVENTID.Process, SSLNet.STATUS.START, this.p_id, sequence++);
 
             DataFormatter dataFormatter = new DataFormatter();
             dataFormatter.AddData("Z Axis", m_dFocusZ, "Pulse");
-            logManager.WriteFNC(EQ.p_nRunLP, m_module.p_id, "Start Move", SSLNet.STATUS.START, dataFormatter);
+            logManager.WriteFNC(EQ.p_nRunLP, deviceID, "Start Move", SSLNet.STATUS.START, dataFormatter);
             dataFormatter.ClearData();
             if (m_module.Run(axisZ.StartMove(m_dFocusZ)))
                 return p_sInfo;
             if (m_module.Run(axisZ.WaitReady()))
                 return p_sInfo;
 
-            logManager.WriteFNC(EQ.p_nRunLP, m_module.p_id, "Start Move", SSLNet.STATUS.END);
+            logManager.WriteFNC(EQ.p_nRunLP, deviceID, "Start Move", SSLNet.STATUS.END);
 
 
 
             if (m_useCal)
             {
+                logManager.WriteFNC(EQ.p_nRunLP, deviceID, "Calibration", SSLNet.STATUS.START, dataFormatter);
                 if (m_useCentering)
                 {
                     dataFormatter.AddData(nameof(m_InitialCal), m_InitialCal.ToString());
                     dataFormatter.AddData(nameof(m_nCalibrationCnt), m_nCalibrationCnt);
-                    logManager.WriteFNC(EQ.p_nRunLP, m_module.p_id, "Calibration", SSLNet.STATUS.START, dataFormatter);
+                    
                     dataFormatter.ClearData();
                     if (m_DataManager.m_calibration.Run(m_InitialCal, m_isPM, retryCount:m_nCalibrationCnt) != "OK")
                     {
@@ -201,21 +203,22 @@ namespace Root_CAMELLIA.Module
                         if (!success)
                             return "Calibration Fail";
                     }
-                    logManager.WriteFNC(EQ.p_nRunLP, m_module.p_id, "Calibration", SSLNet.STATUS.END);
+                    logManager.WriteFNC(EQ.p_nRunLP, deviceID, "Calibration", SSLNet.STATUS.END);
                 }
             }
 
             if (!m_useCentering)
             {
-                dataformatter.AddData("Z Axis", 0, "Pulse");
-                logManager.WriteFNC(EQ.p_nRunLP, m_module.p_id, "Start Move", SSLNet.STATUS.START, dataFormatter);
+                dataFormatter.AddData("Z Axis", axisZ.GetPosValue(eAxisPos.Home), "Pulse");
+                logManager.WriteFNC(EQ.p_nRunLP, deviceID, "Start Move", SSLNet.STATUS.START, dataFormatter);
                 dataformatter.ClearData();
                 if (m_module.Run(axisZ.StartMove(eAxisPos.Home)))
                     return p_sInfo;
                 if (m_module.Run(axisZ.WaitReady()))
                     return p_sInfo;
+                logManager.WriteFNC(EQ.p_nRunLP, deviceID, "Start Move", SSLNet.STATUS.END);
 
-                logManager.WriteFNC(EQ.p_nRunLP, m_module.p_id, "Start Move", SSLNet.STATUS.END);
+                logManager.WritePRC(EQ.p_nRunLP, deviceID, SSLNet.PRC_EVENTID.Process, SSLNet.STATUS.END, this.p_id, sequence++, materialID: m_module.p_infoWafer.p_id);
                 return "OK";
             }
 
@@ -228,7 +231,7 @@ namespace Root_CAMELLIA.Module
 
             StopWatch sw = new StopWatch();
 
-            logManager.WriteFNC(EQ.p_nRunLP, m_module.p_id, "VRS Connect", SSLNet.STATUS.START);
+            logManager.WriteFNC(EQ.p_nRunLP, deviceID, "VRS Connect", SSLNet.STATUS.START);
             if (VRS.p_CamInfo._OpenStatus == false) VRS.Connect();
             while (VRS.p_CamInfo._OpenStatus == false)
             {
@@ -240,7 +243,7 @@ namespace Root_CAMELLIA.Module
                 }
             }   
             sw.Stop();
-            logManager.WriteFNC(EQ.p_nRunLP, m_module.p_id, "VRS Connect", SSLNet.STATUS.END);
+            logManager.WriteFNC(EQ.p_nRunLP, deviceID, "VRS Connect", SSLNet.STATUS.END);
 
             dataformatter.AddData(nameof(m_bUseCustomSpeed), m_bUseCustomSpeed.ToString());
             if (m_bUseCustomSpeed && CheckVaildParameter())
@@ -254,7 +257,7 @@ namespace Root_CAMELLIA.Module
                 dataformatter.AddData(nameof(m_dMoveSpeedY), m_dMoveSpeedY);
                 dataformatter.AddData(nameof(m_dMoveAccY), m_dMoveAccY);
                 dataformatter.AddData(nameof(m_dMoveDecY), m_dMoveDecY);
-                logManager.WriteFNC(EQ.p_nRunLP, m_module.p_id, "Start Move", SSLNet.STATUS.START, dataFormatter);
+                logManager.WriteFNC(EQ.p_nRunLP, deviceID, "Start Move", SSLNet.STATUS.START, dataFormatter);
                 dataformatter.ClearData();
                 if (m_module.Run(axisXY.p_axisX.StartMove(m_WaferLT_pulse.X, m_dMoveSpeedX, m_dMoveAccX, m_dMoveDecX)))
                 {
@@ -271,14 +274,14 @@ namespace Root_CAMELLIA.Module
             {
                 dataformatter.AddData("X Axis", m_WaferLT_pulse.X, "Pulse");
                 dataformatter.AddData("Y Axis", m_WaferLT_pulse.Y, "Pulse");
-                logManager.WriteFNC(EQ.p_nRunLP, m_module.p_id, "Start Move", SSLNet.STATUS.START);
+                logManager.WriteFNC(EQ.p_nRunLP, deviceID, "Start Move", SSLNet.STATUS.START);
                 dataformatter.ClearData();
                 if (m_module.Run(axisXY.StartMove(m_WaferLT_pulse)))
                     return p_sInfo;
                 if (m_module.Run(axisXY.WaitReady()))
                     return p_sInfo;
             }
-            logManager.WriteFNC(EQ.p_nRunLP, m_module.p_id, "Start Move", SSLNet.STATUS.END);
+            logManager.WriteFNC(EQ.p_nRunLP, deviceID, "Start Move", SSLNet.STATUS.END);
             //Thread.Sleep(1000);
 
             //ImageData asdv = new ImageData(VRS.p_ImageViewer.p_ImageData.m_MemData);
@@ -294,14 +297,14 @@ namespace Root_CAMELLIA.Module
             //{
             //    return "Grab Error";
             //}
-            logManager.WriteFNC(EQ.p_nRunLP, m_module.p_id, "GrabOneShot", SSLNet.STATUS.START);
+            logManager.WriteFNC(EQ.p_nRunLP, deviceID, "GrabOneShot", SSLNet.STATUS.START);
             VRS.GrabOneShot();
-            logManager.WriteFNC(EQ.p_nRunLP, m_module.p_id, "GrabOneShot", SSLNet.STATUS.END);
+            logManager.WriteFNC(EQ.p_nRunLP, deviceID, "GrabOneShot", SSLNet.STATUS.END);
 
 
             CenteringParam param = new CenteringParam(img, VRS.GetRoiSize(), m_EdgeSearchRange, m_EdgeSearchLevel, WaferCentering.eDir.LT);
             //logManager.WritePRC(EQ.p_nRnR, m_module.p_id, SSLNet.PRC_EVENTID.Process, SSLNet.STATUS.START, this.p_id, sequence++, m_module.p_infoWafer.p_id);
-            logManager.WritePRC(EQ.p_nRunLP, m_module.p_id, SSLNet.PRC_EVENTID.StepProcess, SSLNet.STATUS.START, "Find Edge", sequence++, materialID:m_module.p_infoWafer.p_id);
+            logManager.WritePRC(EQ.p_nRunLP, deviceID, SSLNet.PRC_EVENTID.StepProcess, SSLNet.STATUS.START, "Find Edge", sequence++, materialID:m_module.p_infoWafer.p_id);
             ThreadPool.QueueUserWorkItem(m_DataManager.m_waferCentering.FindEdge, param);
 
 
@@ -331,14 +334,14 @@ namespace Root_CAMELLIA.Module
             {
                 dataformatter.AddData("X Axis", m_WaferRT_pulse.X, "Pulse");
                 dataformatter.AddData("Y Axis", m_WaferRT_pulse.Y, "Pulse");
-                logManager.WriteFNC(EQ.p_nRunLP, m_module.p_id, "Start Move", SSLNet.STATUS.START);
+                logManager.WriteFNC(EQ.p_nRunLP, deviceID, "Start Move", SSLNet.STATUS.START);
                 dataformatter.ClearData();
                 if (m_module.Run(axisXY.StartMove(m_WaferRT_pulse)))
                     return p_sInfo;
                 if (m_module.Run(axisXY.WaitReady()))
                     return p_sInfo;
             }
-            logManager.WriteFNC(EQ.p_nRunLP, m_module.p_id, "Start Move", SSLNet.STATUS.END);
+            logManager.WriteFNC(EQ.p_nRunLP, deviceID, "Start Move", SSLNet.STATUS.END);
             // return "OK";
             //m_DataManager.m_waferCentering.FindEdge(param);
             //Thread.Sleep(1000);
@@ -358,9 +361,9 @@ namespace Root_CAMELLIA.Module
             //    return "Grab Error";
             //}
 
-            logManager.WriteFNC(EQ.p_nRunLP, m_module.p_id, "GrabOneShot", SSLNet.STATUS.START);
+            logManager.WriteFNC(EQ.p_nRunLP, deviceID, "GrabOneShot", SSLNet.STATUS.START);
             VRS.GrabOneShot();
-            logManager.WriteFNC(EQ.p_nRunLP, m_module.p_id, "GrabOneShot", SSLNet.STATUS.END);
+            logManager.WriteFNC(EQ.p_nRunLP, deviceID, "GrabOneShot", SSLNet.STATUS.END);
 
             param = new CenteringParam(img, VRS.GetRoiSize(), m_EdgeSearchRange, m_EdgeSearchLevel, WaferCentering.eDir.RT);
             ThreadPool.QueueUserWorkItem(m_DataManager.m_waferCentering.FindEdge, param);
@@ -394,14 +397,14 @@ namespace Root_CAMELLIA.Module
             {
                 dataformatter.AddData("X Axis", m_WaferRT_pulse.X, "Pulse");
                 dataformatter.AddData("Y Axis", m_WaferRT_pulse.Y, "Pulse");
-                logManager.WriteFNC(EQ.p_nRunLP, m_module.p_id, "Start Move", SSLNet.STATUS.START);
+                logManager.WriteFNC(EQ.p_nRunLP, deviceID, "Start Move", SSLNet.STATUS.START);
                 dataformatter.ClearData();
                 if (m_module.Run(axisXY.StartMove(m_WaferRB_pulse)))
                     return p_sInfo;
                 if (m_module.Run(axisXY.WaitReady()))
                     return p_sInfo;
             }
-            logManager.WriteFNC(EQ.p_nRunLP, m_module.p_id, "Start Move", SSLNet.STATUS.END);
+            logManager.WriteFNC(EQ.p_nRunLP, deviceID, "Start Move", SSLNet.STATUS.END);
             //if (VRS.Grab() == "OK")
             //{
             //    //strVRSImageFullPath = string.Format(strVRSImageDir + "VRSImage_{0}.bmp", 2);
@@ -412,9 +415,9 @@ namespace Root_CAMELLIA.Module
             //{
             //    return "Grab Error";
             //}
-            logManager.WriteFNC(EQ.p_nRunLP, m_module.p_id, "GrabOneShot", SSLNet.STATUS.START);
+            logManager.WriteFNC(EQ.p_nRunLP, deviceID, "GrabOneShot", SSLNet.STATUS.START);
             VRS.GrabOneShot();
-            logManager.WriteFNC(EQ.p_nRunLP, m_module.p_id, "GrabOneShot", SSLNet.STATUS.END);
+            logManager.WriteFNC(EQ.p_nRunLP, deviceID, "GrabOneShot", SSLNet.STATUS.END);
 
 
             param = new CenteringParam(img, VRS.GetRoiSize(), m_EdgeSearchRange, m_EdgeSearchLevel, WaferCentering.eDir.RB);
@@ -431,11 +434,11 @@ namespace Root_CAMELLIA.Module
                     return "EQ Stop";
                 }
             }
-            logManager.WritePRC(EQ.p_nRunLP, m_module.p_id, SSLNet.PRC_EVENTID.StepProcess, SSLNet.STATUS.END, "Find Edge", sequence++, materialID:m_module.p_infoWafer.p_id);
+            logManager.WritePRC(EQ.p_nRunLP, deviceID, SSLNet.PRC_EVENTID.StepProcess, SSLNet.STATUS.END, "Find Edge", sequence++, materialID:m_module.p_infoWafer.p_id);
 
-            logManager.WritePRC(EQ.p_nRunLP, m_module.p_id, SSLNet.PRC_EVENTID.StepProcess, SSLNet.STATUS.START, "CalCenterPoint", sequence++, materialID:m_module.p_infoWafer.p_id);
+            logManager.WritePRC(EQ.p_nRunLP, deviceID, SSLNet.PRC_EVENTID.StepProcess, SSLNet.STATUS.START, "CalCenterPoint", sequence++, materialID:m_module.p_infoWafer.p_id);
             m_DataManager.m_waferCentering.CalCenterPoint(VRS.GetRoiSize(), m_dResX_um, m_dResY_um, m_WaferLT_pulse, m_WaferRT_pulse, m_WaferRB_pulse);
-            logManager.WritePRC(EQ.p_nRunLP, m_module.p_id, SSLNet.PRC_EVENTID.StepProcess, SSLNet.STATUS.END, "CalCenterPoint", sequence++, materialID:m_module.p_infoWafer.p_id);
+            logManager.WritePRC(EQ.p_nRunLP, deviceID, SSLNet.PRC_EVENTID.StepProcess, SSLNet.STATUS.END, "CalCenterPoint", sequence++, materialID:m_module.p_infoWafer.p_id);
             if (m_InitialCal)
             {
                 while (!m_DataManager.m_calibration.InItCalDone && m_useCal)
@@ -463,11 +466,14 @@ namespace Root_CAMELLIA.Module
             }
 
 
-
-            if (m_module.Run(axisZ.StartMove(0)))
+            dataFormatter.AddData("Z Axis", axisZ.GetPosValue(eAxisPos.Home), "Pulse");
+            logManager.WriteFNC(EQ.p_nRunLP, deviceID, "Start Move", SSLNet.STATUS.START, dataFormatter);
+            dataformatter.ClearData();
+            if (m_module.Run(axisZ.StartMove(eAxisPos.Home)))
                 return p_sInfo;
             if (m_module.Run(axisZ.WaitReady()))
                 return p_sInfo;
+            logManager.WriteFNC(EQ.p_nRunLP, deviceID, "Start Move", SSLNet.STATUS.END);
 
             m_module.SetLight(false);
 
@@ -476,7 +482,7 @@ namespace Root_CAMELLIA.Module
             test.Stop();
             m_log.Warn("Calibration End >> " + test.ElapsedMilliseconds);
 
-            logManager.WritePRC(EQ.p_nRunLP, m_module.p_id, SSLNet.PRC_EVENTID.Process, SSLNet.STATUS.END, this.p_id, sequence++, materialID:m_module.p_infoWafer.p_id);
+            logManager.WritePRC(EQ.p_nRunLP, deviceID, SSLNet.PRC_EVENTID.Process, SSLNet.STATUS.END, this.p_id, sequence++, materialID:m_module.p_infoWafer.p_id);
 
             return "OK";
         }

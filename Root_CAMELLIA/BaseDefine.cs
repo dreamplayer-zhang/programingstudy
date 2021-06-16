@@ -38,7 +38,7 @@ namespace Root_CAMELLIA
 
         public const string USERNAME = "0a50ffc00ab87ec51cd41269a8820b1ba28c04fbbf51208803e073824b612fa3";
         public const string PASSWORD = "e664ff11431cd8eaf28ec5c5a43a4633e8c338306522d73efc9882bea7ee2640";
-
+        public const string LOG_DEVICE_ID = "Vision";
 
 
         private static ConfigModel _configModel = new ConfigModel();
