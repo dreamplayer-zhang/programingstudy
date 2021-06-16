@@ -16,10 +16,24 @@ namespace Root_Pine2.Module
     public class Pine2 : ModuleBase
     {
         #region ToolBox
+        DIO_IO m_dioStart;
+        DIO_IO m_dioStop;
+        DIO_IO m_dioReset;
+        DIO_IO m_dioHome;
         DIO_IO m_dioPickerSet;
+        DIO_I m_diEmergency;
+        DIO_I m_diDoorOpen; 
+        DIO_I m_diCDA;
         public override void GetTools(bool bInit)
         {
-            m_toolBox.GetDIO(ref m_dioPickerSet, this, "PickerSet"); 
+            m_toolBox.GetDIO(ref m_dioStart, this, "Start");
+            m_toolBox.GetDIO(ref m_dioStop, this, "Stop");
+            m_toolBox.GetDIO(ref m_dioReset, this, "Reset");
+            m_toolBox.GetDIO(ref m_dioHome, this, "Home");
+            m_toolBox.GetDIO(ref m_dioPickerSet, this, "PickerSet");
+            m_toolBox.GetDIO(ref m_diEmergency, this, "Emergency");
+            m_toolBox.GetDIO(ref m_diDoorOpen, this, "Door Open");
+            m_toolBox.GetDIO(ref m_diCDA, this, "CDA");
             m_lamp.GetTools(m_toolBox, this);
             m_buzzer.GetTools(m_toolBox, this);
             m_display.GetTools(m_toolBox, this, bInit); 
@@ -30,31 +44,49 @@ namespace Root_Pine2.Module
             }
         }
 
-        public override string StateHome()
-        {
-            return p_sInfo;
-        }
-
         private void M_EQ_OnChanged(_EQ.eEQ eEQ, dynamic value)
         {
             m_buzzer.OnEQChanged(eEQ, value); 
         }
         #endregion
 
-        #region PickerSet
-        bool _bPickerSet = false; 
-        public bool p_bPickerSet
+        #region DIO
+        EQ.eState m_eEQState = EQ.eState.Idle; 
+        void RunThreadDIO(bool bBlink)
         {
-            get { return _bPickerSet; }
-            set
+            if (m_eEQState != EQ.p_eState)
             {
-                if (_bPickerSet == value) return;
-                _bPickerSet = value;
-                OnPropertyChanged(); 
-                //forget
+                m_eEQState = EQ.p_eState;
+                m_dioStart.Write(false);
+                m_dioStop.Write(false);
+                m_dioReset.Write(false);
+                m_dioHome.Write(false); 
+            }
+            switch (EQ.p_eState)
+            {
+                case EQ.eState.Init:
+                    m_dioHome.Write(bBlink);
+                    if (m_dioHome.p_bIn) EQ.p_eState = EQ.eState.Home; 
+                    break;
+                case EQ.eState.Ready:
+                    m_dioStart.Write(bBlink);
+                    if (m_dioStart.p_bIn) EQ.p_eState = EQ.eState.Run;
+                    m_dioReset.Write(bBlink);
+                    if (m_dioReset.p_bIn) m_handler.Reset(); 
+                    break;
+                case EQ.eState.Run:
+                    m_dioStop.Write(bBlink);
+                    if (m_dioStop.p_bIn) EQ.p_eState = EQ.eState.Ready; 
+                    break;
+                case EQ.eState.Error:
+                    m_dioReset.Write(bBlink);
+                    if (m_dioReset.p_bIn) m_handler.Reset();
+                    break;
             }
         }
+        #endregion
 
+        #region PickerSet 
         bool _diPickerSet = false; 
         public bool p_diPickerSet
         {
@@ -69,7 +101,7 @@ namespace Root_Pine2.Module
 
         void RunThreadPickerSet(bool bBlink)
         {
-            m_dioPickerSet.Write(bBlink && p_bPickerSet);
+            m_dioPickerSet.Write(bBlink && EQ.p_bPickerSet);
             if (m_dioPickerSet.p_bIn) p_diPickerSet = true; 
         }
 
@@ -84,6 +116,50 @@ namespace Root_Pine2.Module
             }
             sec = sw.ElapsedMilliseconds / 1000.0;
             return "OK"; 
+        }
+        #endregion
+
+        #region Emergency
+        bool _bEmergency = false; 
+        public bool p_bEmergency
+        {
+            get { return _bEmergency; }
+            set
+            {
+                if (_bEmergency == value) return;
+                _bEmergency = value;
+                if (value)
+                {
+                    EQ.p_bStop = true;
+                    EQ.p_eState = EQ.eState.Error;
+                    ((Pine2_Engineer)m_engineer).m_ajin.m_listAxis.RunEmergency();
+                }
+                OnPropertyChanged(); 
+            }
+        }
+
+        bool _bCDA = false; 
+        public bool p_bCDA
+        {
+            get { return _bCDA; }
+            set
+            {
+                if (_bCDA == value) return;
+                _bCDA = value; 
+                if (value)
+                {
+                    EQ.p_eState = EQ.eState.Error;
+                    EQ.p_bStop = true; 
+                }
+                OnPropertyChanged();
+            }
+        }
+
+        void RunThreadEMG()
+        {
+            p_bEmergency = m_diEmergency.p_bIn;
+            EQ.p_bDoorOpen = m_diDoorOpen.p_bIn;
+            p_bCDA = m_diCDA.p_bIn;
         }
         #endregion
 
@@ -381,6 +457,8 @@ namespace Root_Pine2.Module
                     sw.Start();
                     bBlink = !bBlink; 
                 }
+                RunThreadEMG(); 
+                RunThreadDIO(bBlink); 
                 RunThreadPickerSet(bBlink); 
                 m_lamp.RunLamp(bBlink);
                 m_buzzer.CheckBuzzerOff(); 
@@ -392,6 +470,13 @@ namespace Root_Pine2.Module
             if (m_bRunDIO == false) return;
             m_bRunDIO = false;
             m_threadDIO.Join(); 
+        }
+        #endregion
+
+        #region StateHome
+        public override string StateHome()
+        {
+            return "OK";
         }
         #endregion
 
