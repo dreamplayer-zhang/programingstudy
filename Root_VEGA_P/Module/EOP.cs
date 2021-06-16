@@ -5,25 +5,28 @@ using RootTools.Camera.BaslerPylon;
 using RootTools.Camera.CognexOCR;
 using RootTools.Control;
 using RootTools.Light;
+using RootTools.Memory;
 using RootTools.Module;
 using RootTools.ToolBoxs;
 using RootTools.Trees;
 using System;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace Root_VEGA_P.Module
 {
     public class EOP : ModuleBase
     {
         #region ToolBox
-        LightSet lightSet;
+        MemoryPool memoryPool;
         Axis m_axis;
         DIO_Os m_doCoverDown;
         DIO_Os m_doCoverDownX;
         public override void GetTools(bool bInit)
         {
-            p_sInfo = m_toolBox.Get(ref lightSet, this);
+            p_sInfo = m_toolBox.Get(ref memoryPool, this, "Memory", 1);
             p_sInfo = m_toolBox.GetAxis(ref m_axis, this, "Y");
             p_sInfo = m_toolBox.GetDIO(ref m_doCoverDown, this, "Cover", Enum.GetNames(typeof(eCover)));
             p_sInfo = m_toolBox.GetDIO(ref m_doCoverDownX, this, "Cover X", Enum.GetNames(typeof(eCover)));
@@ -77,22 +80,46 @@ namespace Root_VEGA_P.Module
         {
             m_secCoverDown = tree.Set(m_secCoverDown, m_secCoverDown, "Timeout", "Run Cover UpDown Timeout (sec)"); 
         }
-        #endregion 
+        #endregion
 
+        #region Snap
+        public enum Parts
+        {
+            Dome,Door,
+        }
+        public string RunEOPSnap(Parts parts)
+        {
+            switch(parts)
+            {
+                case Parts.Dome:
+                    if (Run(m_dome.RunDomeSnap()))
+                        return p_sInfo;
+                    break;
+                case Parts.Door:
+                    if (Run(m_door.RunDoorSnap()))
+                        return p_sInfo;
+                    break;
+            }
+            return "OK";
+        }
+        #endregion
         #region Dome
         public class Dome : NotifyProperty, IRTRChild
         {
             #region ToolBox
-            CameraBasler camDome;
+            Camera_Basler camDome;
             public Axis m_axisRotate;
             DIO_Is m_diCheckRotate;
             DIO_Is m_diCheckDome;
             DIO_Os m_doClamp;
             DIO_Is[] m_diClamp = new DIO_Is[2] { null, null };
             DIO_Is[] m_diCoverDown = new DIO_Is[2] { null, null };
+            LightSet lightSet;
+
             public void GetTools(ToolBox toolBox, bool bInit)
             {
                 toolBox.GetCamera(ref camDome, m_EOP, p_id + ".Cam Dome");
+                toolBox.Get(ref lightSet, m_EOP);
                 toolBox.GetAxis(ref m_axisRotate, m_EOP, p_id + ".Rotate");
                 toolBox.GetDIO(ref m_diCheckRotate, m_EOP, p_id + ".Rotate", new string[] { "0", "1" });
                 toolBox.GetDIO(ref m_diCheckDome, m_EOP, p_id + ".Check", new string[] { "0", "1" });
@@ -121,6 +148,70 @@ namespace Root_VEGA_P.Module
             {
                 m_axisRotate.StartMove(ePos);
                 return m_axisRotate.WaitReady();
+            }
+            #endregion
+
+            #region LightSet
+            protected List<double> m_aLightPower = new List<double>();
+            protected void RunTreeLight(Tree tree)
+            {
+                if (lightSet == null) return;
+
+                while (m_aLightPower.Count < lightSet.m_aLight.Count)
+                    m_aLightPower.Add(0);
+                for (int n = 0; n < m_aLightPower.Count; n++)
+                {
+                    m_aLightPower[n] = tree.Set(m_aLightPower[n], m_aLightPower[n], lightSet.m_aLight[n].m_sName, "Light Power (0 ~ 100 %%)");
+                }
+            }
+
+            public void SetLight(bool bOn)
+            {
+                for (int n = 0; n < m_aLightPower.Count; n++)
+                {
+                    if (lightSet.m_aLight[n].m_light != null)
+                        lightSet.m_aLight[n].m_light.p_fSetPower = bOn ? m_aLightPower[n] : 0;
+                }
+            }
+            #endregion
+
+            #region Snap
+
+            public string RunDomeSnap()
+            {
+                try
+                {
+                    if (camDome == null)
+                        camDome.Connect();
+
+                    MemoryData mem = m_EOP.memoryPool.GetMemory(m_EOP.p_id, "Dome");
+
+                    SetLight(true);
+
+                    camDome.Grab();
+                    IntPtr ptr = mem.GetPtr();
+                    byte[] arr = camDome.p_ImageData.m_aBuf;
+                    int byteperpxl = camDome.p_ImageData.GetBytePerPixel();
+                    int nCamHeight = camDome.p_sz.Y;
+                    int nCamWidth = camDome.p_sz.X;
+                    Parallel.For(0, nCamHeight, (j) =>
+                    {
+                        Marshal.Copy(arr, j * nCamWidth, (IntPtr)((long)ptr + (j * mem.W)), nCamWidth);
+                    });
+
+                }
+                finally
+                {
+                    if (camDome == null)
+                        camDome.StopGrab();
+
+                    SetLight(false);
+                }
+                return "OK";
+            }
+            void RunTreeDomeSnap(Tree tree)
+            {
+
             }
             #endregion
 
@@ -296,6 +387,35 @@ namespace Root_VEGA_P.Module
             {
                 m_particleCounterSet.ThreadStop();
             }
+
+            #region ModuleRun
+            public void InitModuleRuns(bool bRecipe)
+            {
+                m_EOP.AddModuleRunList(new Run_DomeSnap(m_EOP), bRecipe, "Run Dome Snap");
+            }
+            public class Run_DomeSnap : ModuleRunBase
+            {
+                EOP m_module;
+                public Run_DomeSnap(EOP module)
+                {
+                    m_module = module;
+                    InitModuleRun(module);
+                }
+                public override ModuleRunBase Clone()
+                {
+                    Run_DomeSnap run = new Run_DomeSnap(m_module);
+                    return run;
+                }
+                public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
+                {
+
+                }
+                public override string Run()
+                {
+                    return m_module.m_dome.RunDomeSnap();
+                }
+            }
+            #endregion
         }
         public Dome m_dome; 
         void InitDome()
@@ -303,17 +423,19 @@ namespace Root_VEGA_P.Module
             m_dome = new Dome("Dome", this); 
         }
         #endregion
-
+     
         #region Door
         public class Door : NotifyProperty, IRTRChild
         {
             #region ToolBox
-            CameraBasler camDoor;
+            LightSet lightSet;
+            Camera_Basler camDoor;
             DIO_Is m_diCheckDoor;
             DIO_Os m_doCylinder;
             DIO_Is[] m_diCylinder = new DIO_Is[2] { null, null };
             public void GetTools(ToolBox toolBox, bool bInit)
             {
+                toolBox.Get(ref lightSet, m_EOP);
                 toolBox.GetCamera(ref camDoor, m_EOP, p_id + ".Cam Door");
                 toolBox.GetDIO(ref m_diCheckDoor, m_EOP, p_id + ".Check", new string[] { "0", "1" });
                 toolBox.GetDIO(ref m_doCylinder, m_EOP, p_id + ".Cylinder", Enum.GetNames(typeof(eCylinder)));
@@ -475,6 +597,64 @@ namespace Root_VEGA_P.Module
             }
             #endregion
 
+            #region LightSet
+            protected List<double> m_aLightPower = new List<double>();
+            protected void RunTreeLight(Tree tree)
+            {
+                if (lightSet == null) return;
+
+                while (m_aLightPower.Count < lightSet.m_aLight.Count)
+                    m_aLightPower.Add(0);
+                for (int n = 0; n < m_aLightPower.Count; n++)
+                {
+                    m_aLightPower[n] = tree.Set(m_aLightPower[n], m_aLightPower[n], lightSet.m_aLight[n].m_sName, "Light Power (0 ~ 100 %%)");
+                }
+            }
+
+            public void SetLight(bool bOn)
+            {
+                for (int n = 0; n < m_aLightPower.Count; n++)
+                {
+                    if (lightSet.m_aLight[n].m_light != null)
+                        lightSet.m_aLight[n].m_light.p_fSetPower = bOn ? m_aLightPower[n] : 0;
+                }
+            }
+            #endregion
+
+            #region Snap
+
+            public string RunDoorSnap()
+            {
+                try
+                {
+                    if (camDoor == null)
+                        camDoor.Connect();
+
+                    MemoryData mem = m_EOP.memoryPool.GetMemory(m_EOP.p_id, "Dome");
+
+                    camDoor.Grab();
+                    IntPtr ptr = mem.GetPtr();
+                    byte[] arr = camDoor.p_ImageData.m_aBuf;
+                    int byteperpxl = camDoor.p_ImageData.GetBytePerPixel();
+                    int nCamHeight = camDoor.p_sz.Y;
+                    int nCamWidth = camDoor.p_sz.X;
+                    Parallel.For(0, nCamHeight, (j) =>
+                    {
+                        Marshal.Copy(arr, (int)(j * nCamWidth), (IntPtr)((long)ptr + (j * mem.W)), nCamWidth);
+                    });
+
+                    camDoor.StopGrab();
+                }
+                finally
+                {
+                }
+                return "";
+            }
+            void RunTreeDomeSnap(Tree tree)
+            {
+
+            }
+            #endregion
             public string p_id { get; set; }
             EOP m_EOP;
             public ParticleCounterSet m_particleCounterSet;
@@ -490,6 +670,34 @@ namespace Root_VEGA_P.Module
             {
                 m_particleCounterSet.ThreadStop();
             }
+            #region ModuleRun
+            public void InitModuleRuns(bool bRecipe)
+            {
+                m_EOP.AddModuleRunList(new Run_DoorSnap(m_EOP), bRecipe, "Run DoorSnap");
+            }
+            public class Run_DoorSnap : ModuleRunBase
+            {
+                EOP m_module;
+                public Run_DoorSnap(EOP module)
+                {
+                    m_module = module;
+                    InitModuleRun(module);
+                }
+                public override ModuleRunBase Clone()
+                {
+                    Run_DoorSnap run = new Run_DoorSnap(m_module);
+                    return run;
+                }
+                public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
+                {
+                    base.RunTree(tree, bVisible, bRecipe);
+                }
+                public override string Run()
+                {
+                    return m_module.m_dome.RunDomeSnap();
+                }
+            }
+            #endregion
         }
         public Door m_door;
         void InitDoor()
@@ -514,8 +722,8 @@ namespace Root_VEGA_P.Module
                 if (Run(m_door.RunCylinderUp(false))) return p_sInfo;
                 if (Run(RunMove(ePos.Forward))) return p_sInfo;
                 if (Run(RunCoverDown(true))) return p_sInfo;
-                if (Run(m_dome.m_particleCounterSet.RunParticleCounter(runCount.m_dataDome.m_asNozzle))) return p_sInfo;
-                if (Run(m_door.m_particleCounterSet.RunParticleCounter(runCount.m_dataDoor.m_asNozzle))) return p_sInfo;
+                //if (Run(m_dome.m_particleCounterSet.RunParticleCounter(runCount.m_dataDome.m_asNozzle))) return p_sInfo;
+                //if (Run(m_door.m_particleCounterSet.RunParticleCounter(runCount.m_dataDoor.m_asNozzle))) return p_sInfo;
                 if (Run(RunCoverDown(false))) return p_sInfo;
                 if (Run(RunMove(ePos.Backward))) return p_sInfo;
                 if (Run(m_door.RunCylinderUp(true))) return p_sInfo;
@@ -594,10 +802,13 @@ namespace Root_VEGA_P.Module
             AddModuleRunList(new Run_Delay(this), false, "Time Delay");
             AddModuleRunList(new Run_ParticleCount(this), true, "Run Particle Counter");
             AddModuleRunList(new Run_RunSol(this), false, "Run Sol Test");
-            m_dome.m_particleCounterSet.InitModuleRuns(false); 
+            m_dome.m_particleCounterSet.InitModuleRuns(false);
+            m_dome.InitModuleRuns(false);
             m_door.m_particleCounterSet.InitModuleRuns(false);
+            m_door.InitModuleRuns(false);
         }
 
+        
         public class Run_Delay : ModuleRunBase
         {
             EOP m_module;
