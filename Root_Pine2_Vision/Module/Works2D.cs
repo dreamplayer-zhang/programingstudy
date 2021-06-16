@@ -30,10 +30,8 @@ namespace Root_Pine2_Vision.Module
 
         #region Memory
         public MemoryGroup m_memoryGroup;
-        MemoryData[] m_memoryExt = new MemoryData[2] { null, null };    // 지울 버퍼
-        MemoryData[] m_memoryExtRGB = new MemoryData[3] { null, null, null };   // 남겨놓을 버퍼
-        MemoryData[] m_memoryExtAPS = new MemoryData[3] { null, null, null };   // 남겨놓을 버퍼
-        MemoryData[] m_memoryColor = new MemoryData[2] { null, null };
+        MemoryData[] m_memoryExt = new MemoryData[2] { null, null };
+        MemoryData[] m_memoryColor = new MemoryData[3] { null, null, null };
         MemoryData[] m_memoryRGB = new MemoryData[3] { null, null, null };
         MemoryData[] m_memoryAPS = new MemoryData[3] { null, null, null };
         MemoryData[] m_memoryHSI = new MemoryData[3] { null, null, null };
@@ -42,18 +40,12 @@ namespace Root_Pine2_Vision.Module
         void InitMemory()
         {
             m_memoryGroup = m_memoryPool.GetGroup("Pine2");
-            m_aMemory.Add(m_memoryExt[0] = m_memoryGroup.CreateMemory("EXT1", 1, 3, new CPoint(50000, 90000))); // Red Green Blue
-            m_aMemory.Add(m_memoryExt[1] = m_memoryGroup.CreateMemory("EXT2", 1, 3, new CPoint(50000, 90000))); // Axial Pad Side
+            m_aMemory.Add(m_memoryExt[0] = m_memoryGroup.CreateMemory("EXT1", 3, 1, new CPoint(50000, 90000))); // Red Green Blue      -> VisionWorks2 Gerbber/RGBtoG/CtoG
+            m_aMemory.Add(m_memoryExt[1] = m_memoryGroup.CreateMemory("EXT2", 3, 1, new CPoint(50000, 90000))); // Axial Pad Side      -> VisionWorks2 Ext1/Ext2/SideTemp
 
-            m_aMemory.Add(m_memoryExtRGB[0] = m_memoryGroup.CreateMemory("EXT1_R", 1, 1, new CPoint(50000, 90000)));   // Gerbber
-            m_aMemory.Add(m_memoryExtRGB[1] = m_memoryGroup.CreateMemory("EXT1_G", 1, 1, new CPoint(50000, 90000)));   // RGBtoG
-            m_aMemory.Add(m_memoryExtRGB[2] = m_memoryGroup.CreateMemory("EXT1_B", 1, 1, new CPoint(50000, 90000)));   // CtoG
-            m_aMemory.Add(m_memoryExtAPS[0] = m_memoryGroup.CreateMemory("EXT2_A", 1, 1, new CPoint(50000, 90000)));   // Ext1
-            m_aMemory.Add(m_memoryExtAPS[1] = m_memoryGroup.CreateMemory("EXT2_P", 1, 1, new CPoint(50000, 90000)));   // Ext2
-            m_aMemory.Add(m_memoryExtAPS[2] = m_memoryGroup.CreateMemory("EXT2_S", 1, 1, new CPoint(50000, 90000)));   // SideTemp
-
-            m_aMemory.Add(m_memoryColor[0] = m_memoryGroup.CreateMemory("Color1", 1, 3, new CPoint(50000, 90000))); // 0
-            m_aMemory.Add(m_memoryColor[1] = m_memoryGroup.CreateMemory("Color2", 1, 3, new CPoint(50000, 90000))); // 1
+            m_aMemory.Add(m_memoryColor[0] = m_memoryGroup.CreateMemory("Color1", 1, 3, new CPoint(50000, 90000))); // RGB 합성 이미지 버퍼
+            m_aMemory.Add(m_memoryColor[1] = m_memoryGroup.CreateMemory("Color2", 1, 3, new CPoint(50000, 90000))); // APS 합성 이미지 버퍼
+            m_aMemory.Add(m_memoryColor[2] = m_memoryGroup.CreateMemory("Color3", 1, 3, new CPoint(50000, 90000))); // HSI 합성 이미지 버퍼
             m_aMemory.Add(m_memoryRGB[0] = m_memoryGroup.CreateMemory("Red", 1, 1, new CPoint(50000, 90000)));
             m_aMemory.Add(m_memoryRGB[1] = m_memoryGroup.CreateMemory("Green", 1, 1, new CPoint(50000, 90000)));
             m_aMemory.Add(m_memoryRGB[2] = m_memoryGroup.CreateMemory("Blue", 1, 1, new CPoint(50000, 90000)));
@@ -64,13 +56,6 @@ namespace Root_Pine2_Vision.Module
             m_aMemory.Add(m_memoryHSI[1] = m_memoryGroup.CreateMemory("Saturation", 1, 1, new CPoint(50000, 90000)));
             m_aMemory.Add(m_memoryHSI[2] = m_memoryGroup.CreateMemory("Intensity", 1, 1, new CPoint(50000, 90000)));
 
-            //m_aMemory.Add(m_memoryGerbber = m_memoryGroup.CreateMemory("Gerbber", 1, 1, new CPoint(50000, 90000)));
-            //m_aMemory.Add(m_memoryGerbber = m_memoryGroup.CreateMemory("RGBtoG", 1, 1, new CPoint(50000, 90000)));
-            //m_aMemory.Add(m_memoryGerbber = m_memoryGroup.CreateMemory("CtoG", 1, 1, new CPoint(50000, 90000)));
-            //m_aMemory.Add(m_memoryGerbber = m_memoryGroup.CreateMemory("Ext1", 1, 1, new CPoint(50000, 90000)));
-            //m_aMemory.Add(m_memoryGerbber = m_memoryGroup.CreateMemory("Ext2", 1, 1, new CPoint(50000, 90000)));
-            //m_aMemory.Add(m_memoryGerbber = m_memoryGroup.CreateMemory("SideTemp", 1, 1, new CPoint(50000, 90000)));
-
             string regGroup = "MMF Data " + p_id;   // MMF Data A, MMF Data B
             Registry reg = new Registry(false, regGroup, "MemoryOffset");
             foreach (MemoryData mem in m_aMemory) reg.Write(mem.p_id, mem.p_mbOffset);
@@ -80,15 +65,6 @@ namespace Root_Pine2_Vision.Module
             foreach (MemoryData mem in m_aMemory) reg.Write(mem.p_id, mem.p_sz.X);
             reg = new Registry(false, regGroup, "MemorySizeY");
             foreach (MemoryData mem in m_aMemory) reg.Write(mem.p_id, mem.p_sz.Y);
-
-            //Registry reg = new Registry("MemoryOffset");
-            //foreach (MemoryData mem in m_aMemory) reg.Write(mem.p_id, mem.p_mbOffset);
-            //reg = new Registry("MemoryDepth");
-            //foreach (MemoryData mem in m_aMemory) reg.Write(mem.p_id, mem.p_nByte);
-            //reg = new Registry("MemorySizeX");
-            //foreach (MemoryData mem in m_aMemory) reg.Write(mem.p_id, mem.p_sz.X);
-            //reg = new Registry("MemorySizeY");
-            //foreach (MemoryData mem in m_aMemory) reg.Write(mem.p_id, mem.p_sz.Y);
         }
 
         public MemoryData[] p_memSnap
