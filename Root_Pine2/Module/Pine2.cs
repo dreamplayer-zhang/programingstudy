@@ -24,6 +24,9 @@ namespace Root_Pine2.Module
         DIO_I m_diEmergency;
         DIO_I m_diDoorOpen; 
         DIO_I m_diCDA;
+        DIO_O m_doFFU_Handler;
+        DIO_O m_doFFU_Vision;
+        DIO_O m_doIonizer; 
         public override void GetTools(bool bInit)
         {
             m_toolBox.GetDIO(ref m_dioStart, this, "Start");
@@ -34,6 +37,9 @@ namespace Root_Pine2.Module
             m_toolBox.GetDIO(ref m_diEmergency, this, "Emergency");
             m_toolBox.GetDIO(ref m_diDoorOpen, this, "Door Open");
             m_toolBox.GetDIO(ref m_diCDA, this, "CDA");
+            m_toolBox.GetDIO(ref m_doFFU_Handler, this, "FFU Handler");
+            m_toolBox.GetDIO(ref m_doFFU_Vision, this, "FFU Vision");
+            m_toolBox.GetDIO(ref m_doIonizer, this, "Ionizer");
             m_lamp.GetTools(m_toolBox, this);
             m_buzzer.GetTools(m_toolBox, this);
             m_display.GetTools(m_toolBox, this, bInit); 

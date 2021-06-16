@@ -111,6 +111,8 @@ namespace Root_Pine2.Module
                 p_eState = eState.Ready;
                 m_aBoat[Vision2D.eWorks.A].p_eStep = Boat.eStep.RunReady;
                 m_aBoat[Vision2D.eWorks.B].p_eStep = Boat.eStep.RunReady;
+                m_aBoat[Vision2D.eWorks.A].m_doTriggerSwitch.Write(false);
+                m_aBoat[Vision2D.eWorks.B].m_doTriggerSwitch.Write(false);
             }
             else
             {
@@ -157,7 +159,8 @@ namespace Root_Pine2.Module
             StopWatch sw = new StopWatch();
             try
             {
-                m_aBoat[eWorks].p_eStep = Boat.eStep.Run; 
+                m_aBoat[eWorks].p_eStep = Boat.eStep.Run;
+                m_aBoat[eWorks].m_doTriggerSwitch.Write(true); 
                 int iSnap = 0; 
                 foreach (Vision2D.Recipe.Snap snap in m_aBoat[eWorks].m_recipe.m_aSnap)
                 {
@@ -175,8 +178,8 @@ namespace Root_Pine2.Module
                 m_axisCam.StartMove((Vision2D.eWorks)(1 - (int)eWorks));
                 m_aBoat[eWorks].RunMove(p_ePosUnload);
                 m_aBoat[eWorks].p_eStep = Boat.eStep.Run;
+                m_aBoat[eWorks].m_doTriggerSwitch.Write(false);
             }
-
             m_log.Info("Run Snap End : " + (sw.ElapsedMilliseconds / 1000.0).ToString("0.00") + " sec");
             return "OK";
         }

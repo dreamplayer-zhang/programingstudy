@@ -50,6 +50,7 @@ namespace Root_Pine2.Module
         DIO_O m_doRollerPusher;
         DIO_O m_doCleanerBlow;
         DIO_O m_doCleanerSuction;
+        public DIO_O m_doTriggerSwitch; 
         public void GetTools(ToolBox toolBox, Boats boats, bool bInit)
         {
             toolBox.GetAxis(ref m_axis, boats, p_id + ".Snap");
@@ -60,6 +61,7 @@ namespace Root_Pine2.Module
             toolBox.GetDIO(ref m_doRollerPusher, boats, p_id + ".Roller Pusher");
             toolBox.GetDIO(ref m_doCleanerBlow, boats, p_id + ".Cleaner Blow");
             toolBox.GetDIO(ref m_doCleanerSuction, boats, p_id + ".Cleaner Suction");
+            toolBox.GetDIO(ref m_doTriggerSwitch, boats, p_id + ".Trigger Switch");
             if (bInit) InitPosition();
         }
         #endregion
@@ -192,6 +194,7 @@ namespace Root_Pine2.Module
         public void Reset(ModuleBase.eState eState)
         {
             p_infoStrip = null;
+            m_doTriggerSwitch.Write(false); 
             if (eState == ModuleBase.eState.Ready) p_eStep = eStep.RunReady;
         }
 
