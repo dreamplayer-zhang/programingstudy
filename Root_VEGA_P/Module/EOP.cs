@@ -103,6 +103,7 @@ namespace Root_VEGA_P.Module
             return "OK";
         }
         #endregion
+
         #region Dome
         public class Dome : NotifyProperty, IRTRChild
         {
@@ -408,7 +409,7 @@ namespace Root_VEGA_P.Module
                 }
                 public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
                 {
-
+                    m_module.m_dome.RunTreeLight(tree);
                 }
                 public override string Run()
                 {
@@ -630,6 +631,8 @@ namespace Root_VEGA_P.Module
                     if (camDoor == null)
                         camDoor.Connect();
 
+                    SetLight(true);
+
                     MemoryData mem = m_EOP.memoryPool.GetMemory(m_EOP.p_id, "Dome");
 
                     camDoor.Grab();
@@ -643,10 +646,11 @@ namespace Root_VEGA_P.Module
                         Marshal.Copy(arr, (int)(j * nCamWidth), (IntPtr)((long)ptr + (j * mem.W)), nCamWidth);
                     });
 
-                    camDoor.StopGrab();
                 }
                 finally
                 {
+                    camDoor.StopGrab();
+                    SetLight(false);
                 }
                 return "";
             }
@@ -690,11 +694,11 @@ namespace Root_VEGA_P.Module
                 }
                 public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
                 {
-                    base.RunTree(tree, bVisible, bRecipe);
+                    m_module.m_door.RunTreeLight(tree);
                 }
                 public override string Run()
                 {
-                    return m_module.m_dome.RunDomeSnap();
+                    return m_module.m_door.RunDoorSnap();
                 }
             }
             #endregion
