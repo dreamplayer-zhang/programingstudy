@@ -60,6 +60,7 @@ namespace Root_CAMELLIA.Module
         {
             MarsLogManager logManager = MarsLogManager.Instance;
             logManager.WriteFNC(EQ.p_nRunLP, m_module.p_id, "Calibration", SSLNet.STATUS.END);
+            logManager.WritePRC(EQ.p_nRunLP, m_module.p_id, PRC_EVENTID.StepProcess, STATUS.END, "Background Calibration",5);
         }
 
         public override ModuleRunBase Clone()
@@ -176,6 +177,7 @@ namespace Root_CAMELLIA.Module
                 {
                     dataFormatter.AddData(nameof(m_InitialCal), m_InitialCal.ToString());
                     dataFormatter.AddData(nameof(m_nCalibrationCnt), m_nCalibrationCnt);
+                    logManager.WritePRC(EQ.p_nRunLP, m_module.p_id, PRC_EVENTID.StepProcess, STATUS.START, "Background Calibration", sequence++);
                     logManager.WriteFNC(EQ.p_nRunLP, m_module.p_id, "Calibration", SSLNet.STATUS.START, dataFormatter);
                     dataFormatter.ClearData();
                     if (m_DataManager.m_calibration.Run(m_InitialCal, m_isPM, retryCount:m_nCalibrationCnt) != "OK")
@@ -202,6 +204,7 @@ namespace Root_CAMELLIA.Module
                             return "Calibration Fail";
                     }
                     logManager.WriteFNC(EQ.p_nRunLP, m_module.p_id, "Calibration", SSLNet.STATUS.END);
+                    logManager.WritePRC(EQ.p_nRunLP, m_module.p_id, PRC_EVENTID.StepProcess, STATUS.END, "Background Calibration", 5);
                 }
             }
 
