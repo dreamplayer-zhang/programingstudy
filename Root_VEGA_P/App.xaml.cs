@@ -13,5 +13,9 @@ namespace Root_VEGA_P
     /// </summary>
     public partial class App : Application
     {
+        public const string mDome = "Dome";
+        public const string mDoor = "Door";
+        public const string mPool = "EOP.Memory";
+        public const string mGroup = "Memory";
     }
 }

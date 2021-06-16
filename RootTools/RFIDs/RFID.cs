@@ -53,7 +53,8 @@ namespace RootTools.RFIDs
         public string Read(out string sRFID)
         {
             p_sRFID = "";
-            if (m_RFID == null) InitIRFID();
+            if (m_RFID == null) 
+                InitIRFID();
             string sRun = m_RFID.Read(out sRFID);
             p_sRFID = sRFID; 
             return sRun;

@@ -135,12 +135,13 @@ namespace Root_VEGA_P.Module
             public string RunVacuum(bool bOn)
             {
                 m_doVacuum.Write(bOn);
-                if (bOn) Thread.Sleep((int)(1000 * m_secVac)); 
+                if (bOn) 
+                    Thread.Sleep((int)(1000 * m_secVac)); 
                 else
                 {
                     m_doBlow.Write(true);
-                    Thread.Sleep((int)(500 * m_secBlow));
-                    m_doBlow.Write(false);
+                    //Thread.Sleep((int)(500 * m_secBlow));
+                    //m_doBlow.Write(false);
                 }
                 return "OK";
             }
@@ -495,12 +496,12 @@ namespace Root_VEGA_P.Module
                 switch (m_infoPods.p_eState)
                 {
                     case InfoPods.eState.Dock: return "OK";
-                    case InfoPods.eState.Empty: return "Pod not Exist";
+                    //case InfoPods.eState.Empty: return "Pod not Exist";
                 }
                 string sRFID = "";
                 m_RFID.Read(out sRFID);
                 m_infoPods.p_sCarrierID = sRFID;
-                m_infoPods.SendCarrierID(m_infoPods.p_sCarrierID);
+                //m_infoPods.SendCarrierID(m_infoPods.p_sCarrierID);
                 m_bDocking = true;
                 if (m_stage.p_bPlaced == false) return "Not Placed";
                 if (m_stage.p_bPresent == false) return "Not Present";

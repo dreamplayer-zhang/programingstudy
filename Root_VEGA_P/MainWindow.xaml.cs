@@ -1,5 +1,6 @@
 ﻿using Root_VEGA_P.Engineer;
 using RootTools;
+using RootTools.Memory;
 using RootTools_Vision;
 using System.ComponentModel;
 using System.IO;
@@ -39,8 +40,27 @@ namespace Root_VEGA_P
 
 		void InitMemory()
 		{
-			m_engineer.ClassMemoryTool().CreatePool("VEGA-P", 1).GetGroup("Mask").CreateMemory("Image", 1, 1, new RootTools.CPoint(20000, 20000));
-			m_engineer.ClassMemoryTool().GetPool("VEGA-P").GetGroup("Mask").CreateMemory("Layer", 1, 1, new RootTools.CPoint(20000, 20000));
+			MemoryTool memoryTool = m_engineer.ClassMemoryTool();
+			MemoryGroup memoryGroup = memoryTool.GetPool(App.mPool).GetGroup(App.mGroup);
+			memoryGroup.CreateMemory(App.mDome, 1, 1, 1000, 1000);
+			memoryGroup.CreateMemory(App.mDoor, 1, 1, 1000, 1000);
+
+			ImageData img = GlobalObjects.Instance.RegisterNamed<ImageData>(App.mDome, memoryTool.GetMemory(App.mPool, App.mGroup, App.mDome));
+			MemoryData memoryData =memoryTool.GetMemory(App.mPool, App.mGroup, App.mDoor);
+			if(img.m_MemData!=null)
+            {
+				img.p_nByte = memoryData.p_nByte;
+				img.p_nPlane = memoryData.p_nCount;
+            }
+
+			img = GlobalObjects.Instance.RegisterNamed<ImageData>(App.mDoor, memoryTool.GetMemory(App.mPool, App.mGroup, App.mDoor));
+			memoryData = memoryTool.GetMemory(App.mPool, App.mGroup, App.mDoor);
+
+			if (img.m_MemData != null)
+			{
+				img.p_nByte = memoryData.p_nByte;
+				img.p_nPlane = memoryData.p_nCount;
+			}
 		}
 		#region Title Bar
 		private void MinimizeButton_Click(object sender, RoutedEventArgs e)
