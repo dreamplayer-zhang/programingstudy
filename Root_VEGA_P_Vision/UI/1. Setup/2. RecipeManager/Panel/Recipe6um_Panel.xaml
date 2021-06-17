@@ -11,7 +11,7 @@
     <Grid>
         <TabControl Grid.Column="1" Style="{StaticResource ImageViewerTabControlStyle}">
             <i:Interaction.Triggers>
-                <i:EventTrigger EventName="SelectedIndexChanged">
+                <i:EventTrigger EventName="SelectionChanged">
                     <i:InvokeCommandAction Command="{Binding TabChanged}"/>
                 </i:EventTrigger>
             </i:Interaction.Triggers>

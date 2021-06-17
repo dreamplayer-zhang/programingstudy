@@ -163,7 +163,7 @@ namespace Root_VEGA_P_Vision
                     p_ImgSource = Tools.ConvertBitmapToSource(bmp);
                 }
                 if (p_ROILayer != null)
-                    SetMaskLayerSource(ROIMaskIdx+selectedIdx);
+                    SetMaskLayerSource();
             }
             catch (Exception ee)
             {

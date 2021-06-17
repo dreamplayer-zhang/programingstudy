@@ -184,8 +184,7 @@ namespace Root_VEGA_P_Vision
 					foreach(var v2 in Enum.GetValues(SideType))
                     {
 						string memstr = v.ToString() + "." + v2.ToString();
-						//string maskstr = memstr + ".MaskImage";
-
+	
 						MemoryData memData = engineer.ClassMemoryTool().GetMemory(App.mPool, App.mGroup, memstr);
                         ImageData Data = GlobalObjects.Instance.RegisterNamed<ImageData>(memstr, memoryTool.GetMemory(App.mPool, App.mGroup, memstr));
                         List<IntPtr> li = new List<IntPtr>();

@@ -136,21 +136,19 @@ namespace Root_VEGA_P_Vision
                 {
                     case 0:
                         selectedViewer = EIPCoverTop_ImageViewerVM;
-                        recipeSetting.SurfaceParameter = selectedViewer.Recipe.GetItem<EUVPodSurfaceParameter>();
                         break;
                     case 1:
                         selectedViewer = EIPCoverBottom_ImaageViewerVM;
-                        recipeSetting.SurfaceParameter = selectedViewer.Recipe.GetItem<EUVPodSurfaceParameter>();
                         break;
                     case 2:
                         selectedViewer = EIPBaseTop_ImageViewerVM;
-                        recipeSetting.SurfaceParameter = selectedViewer.Recipe.GetItem<EUVPodSurfaceParameter>();
                         break;
                     case 3:
                         selectedViewer = EIPBaseBottom_ImageViewerVM;
-                        recipeSetting.SurfaceParameter = selectedViewer.Recipe.GetItem<EUVPodSurfaceParameter>();
                         break;
                 }
+                recipeSetting.SurfaceParameter = selectedViewer.Recipe.GetItem<EUVPodSurfaceParameter>();
+                selectedViewer.SetMask();
             });
         }
 
