@@ -100,7 +100,8 @@ namespace RootTools.GAFs
             lableModule.DataContext = alid;
             lableDesc.DataContext = alid;
             lableMsg.DataContext = alid;
-            alidImage.Source = alid.p_image;
+            if(alid != null)
+                alidImage.Source = alid.p_image;
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)

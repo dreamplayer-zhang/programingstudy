@@ -572,7 +572,7 @@ namespace Root_Pine2.Module
                     break;
                 case Pine2.eRunMode.Stack:
                     sRun = RunUnload(InfoStrip.eMagazinePos.Up); 
-                    m_stack.WriteResultLED();
+                    m_stack?.WriteResultLED();
                     m_stack = null;
                     return sRun;
             }
