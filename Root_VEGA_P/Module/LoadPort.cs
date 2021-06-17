@@ -202,12 +202,14 @@ namespace Root_VEGA_P.Module
                 {
                     string sSeal = RunSeal(eDoorSeal.Unseal);
                     if (sSeal != "OK") return sSeal;
+                    Thread.Sleep(500);
                     return RunOpen(bOpen); 
                 }
                 else
                 {
                     string sOpen = RunOpen(bOpen);
                     if (sOpen != "OK") return sOpen;
+                    Thread.Sleep(500);
                     return RunSeal(eDoorSeal.Seal); 
                 }
             }
