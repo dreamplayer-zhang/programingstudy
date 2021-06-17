@@ -258,11 +258,14 @@ namespace Root_EFEM.Module
         {
             InfoWafer wafer = GetInfoWafer(nID);
             wafer.p_sInspectionID = wafer.p_sLotID + wafer.p_sWaferID +DateTime.Now.ToString("yyyyMMddhhmmss");
+
+            p_infoCarrier.m_aGemSlot[nID].p_eState = GemSlotBase.eState.Run;
             return IsRunOK();
         }
 
         public string AfterPut(int nID)
         {
+            p_infoCarrier.m_aGemSlot[nID].p_eState = GemSlotBase.eState.Done;
             return IsRunOK();
         }
 
@@ -957,7 +960,7 @@ namespace Root_EFEM.Module
 
                 marsLogManager.WriteFNC(EQ.p_nRunLP, m_module.p_id, "Carrier Unload", SSLNet.STATUS.START, type: SSLNet.MATERIAL_TYPE.FOUP);
 
-                if (bUseXGem)
+                if (bUseXGem && !m_gem.p_bOffline)
                 {
                     while (m_infoCarrier.p_eAccess != GemCarrierBase.eAccess.InAccessed)
                     {
