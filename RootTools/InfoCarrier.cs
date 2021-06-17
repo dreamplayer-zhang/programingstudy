@@ -285,6 +285,40 @@ namespace RootTools
             return "OK";
         }
 
+        public string GetMapData()
+        {
+            string map = "";
+            foreach(GemSlotBase slot in m_aGemSlot)
+            {
+                switch (slot.p_eState)
+                {
+                    case GemSlotBase.eState.Empty:
+                        map += "0";
+                        break;
+                    case GemSlotBase.eState.Exist:
+                        map += "1";
+                        break;
+                    case GemSlotBase.eState.Double:
+                        map += "D";
+                        break;
+                    case GemSlotBase.eState.Cross:
+                        map += "C";
+                        break;
+                    default:
+                        map += "-";
+                        break;
+                }
+            }
+            //if (p_lWafer > aSlotState.Count) return "SetMapData Lendth Error";
+            //for (int n = 0; n < p_lWafer; n++)
+            //{
+            //    m_aGemSlot[n].p_eState = aSlotState[n];
+            //    if (aSlotState[n] == GemSlotBase.eState.Exist) SetInfoWafer(n);
+            //    else SetInfoWafer(n, null);
+            //}
+            return map;
+        }
+
         public string SetSelectMapData(InfoCarrier infoCarrier)
         {
             //if (p_lWafer > aSlotState.Count) return "SetMapData Lendth Error";

@@ -21,6 +21,13 @@ using RootTools_Vision.WorkManager3;
 
 namespace Root_VEGA_P_Vision
 {
+    /*
+ * BufferInspROI에 그리고 나서 InspROI에 넣어주는 것
+ * Viewer는 ItemMask ROI를 가지고 있는것
+ * recipe 안에 Mask RecipeList 안에 Viewer의 Recipe 정보를 갖고 있음
+ * Viewer에는 Recipe 정보가 존재 -> MaskRecipe 안의 Index == ROIMaskIdx, SelectedIdx 갯수만큼 갖고있어야됨
+ */
+
     public enum ViewerMode
     {
         Mask,CaptureROI,None
@@ -75,22 +82,12 @@ namespace Root_VEGA_P_Vision
             m_cInspROI = new ItemMask();
             m_History = new Stack<Work>();
             this.recipe = recipe;
-
-            //CoverFront = 0, CoverBack = 10, PlateFront = 20, PlateBack = 30
-            if(imagedata.Contains("Cover"))
-            {
-                if (imagedata.Contains("Front"))
-                    this.ROIMaskIdx = ROIMaskIdx;
-                else if (imagedata.Contains("Back"))
-                    this.ROIMaskIdx = ROIMaskIdx + 10;
-            }else if(imagedata.Contains("Plate"))
-            {
-                if (imagedata.Contains("Front"))
-                    this.ROIMaskIdx = ROIMaskIdx+20;
-                else if (imagedata.Contains("Back"))
-                    this.ROIMaskIdx = ROIMaskIdx+30;
-            }
+            this.ROIMaskIdx = ROIMaskIdx; //현재 검사영역이 뭐냐
             this.originInfo = originInfo;
+
+            int cnt = p_ImageData.p_nPlane;
+            for(int i=0;i<cnt;i++)
+                recipe.GetItem<MaskRecipe>().MaskList.Add(new RecipeType_Mask(m_cInspROI.p_Data, m_cInspROI.p_Color));
 
             InitializeUIElements();
             Init_PenCursor();
@@ -323,7 +320,7 @@ namespace Root_VEGA_P_Vision
         #region Tool
         private unsafe void Pen(CPoint cPt, int size)
         {
-            IntPtr ptrMem = p_ROILayer.GetPtr(ROIMaskIdx+SelectedIdx);
+            IntPtr ptrMem = p_ROILayer.GetPtr();
             if (ptrMem == IntPtr.Zero)
                 return;
             byte* imagePtr = (byte*)ptrMem.ToPointer();
@@ -348,7 +345,7 @@ namespace Root_VEGA_P_Vision
                     fPtr[pos] = clr;
                 }
             });
-            SetMaskLayerSource(ROIMaskIdx + SelectedIdx);
+            SetMaskLayerSource();
         }
         private void Eraser(CPoint cPt, int size)
         {
@@ -444,7 +441,8 @@ namespace Root_VEGA_P_Vision
                     DrawPixelBitmap(pixelPt, m_Color.R, m_Color.G, m_Color.B, m_Color.A);
                 }
             });
-            SetMaskLayerSource(ROIMaskIdx + SelectedIdx);
+            SetMaskInspROI();
+            SetMaskLayerSource();
             m_History.Push(m_CurrentWork);
             p_UIElement.Remove(rect.CanvasRect);
         }
@@ -465,7 +463,8 @@ namespace Root_VEGA_P_Vision
                     DrawPixelBitmap(pixelPt, m_EraseColor.R, m_EraseColor.G, m_EraseColor.B, m_EraseColor.A);
                 }
             });
-            SetMaskLayerSource(ROIMaskIdx + SelectedIdx);
+            SetMaskInspROI();
+            SetMaskLayerSource();
 
             m_History.Push(m_CurrentWork);
             p_UIElement.Remove(rect.CanvasRect);
@@ -503,12 +502,38 @@ namespace Root_VEGA_P_Vision
                     }
                 }
             }
-            SetMaskLayerSource(ROIMaskIdx + SelectedIdx);
+            SetMaskInspROI();
+            SetMaskLayerSource();
             p_UIElement.Remove(rect.CanvasRect);
         }
 
         #endregion
 
+        public unsafe void SetMask()
+        {
+            m_eCurMode = ViewerMode.None;
+            MaskRecipe maskRecipe = recipe.GetItem<MaskRecipe>();
+
+            ClearMaskLayer();
+
+            p_cInspROI.p_Data = recipe.GetItem<MaskRecipe>().MaskList[ROIMaskIdx].ToPointLineList();
+
+            //for(int i=0;i<p_ROILayer.p_Size.Y;i++)
+            //{
+            //    for(int j=0;j<p_ROILayer.p_Size.X;j++)
+            //    {
+            //        DrawPixelBitmap
+            //    }
+            //}
+            foreach(PointLine pointLine in p_cInspROI.p_Data)
+            {
+                for(int i=0;i<pointLine.Width;i++)
+                {
+                    DrawPixelBitmap(new CPoint(pointLine.StartPt.X+i,pointLine.StartPt.Y), m_Color.R, m_Color.G, m_Color.B, m_Color.A);
+                }
+            }
+            SetMaskLayerSource();
+        }
         #region Property
 
         public int p_nThickness
@@ -711,7 +736,7 @@ namespace Root_VEGA_P_Vision
             int originWidth = originInfo.OriginSize.X;
             int originHeight = originInfo.OriginSize.Y;
 
-            IntPtr ptrMem = p_ROILayer.GetPtr(ROIMaskIdx+SelectedIdx);
+            IntPtr ptrMem = p_ROILayer.GetPtr();
             if (ptrMem == IntPtr.Zero)
                 return;
             byte* bitmapPtr = (byte*)ptrMem.ToPointer();
@@ -750,11 +775,10 @@ namespace Root_VEGA_P_Vision
         }
         public void SetRecipeData()
         {
+            MaskRecipe maskRecipe = recipe.GetItem<MaskRecipe>();
             recipe.GetItem<MaskRecipe>().OriginPoint = new CPoint(originInfo.OriginSize.X, originInfo.OriginSize.Y);
-            if (recipe.GetItem<MaskRecipe>().MaskList.Count > 0)
-                recipe.GetItem<MaskRecipe>().MaskList.Clear();
-
-            recipe.GetItem<MaskRecipe>().MaskList.Add(new RecipeType_Mask(p_cInspROI.p_Data, Color.FromArgb(255, 255, 0, 0)));
+            maskRecipe.MaskList[ROIMaskIdx] = new RecipeType_Mask(p_cInspROI.p_Data, Color.FromArgb(255, 255, 0, 0));
+            //recipe.GetItem<MaskRecipe>().MaskList.Add(new RecipeType_Mask(p_cInspROI.p_Data, Color.FromArgb(255, 255, 0, 0)));
         }
 
         public override void SetRoiRect()
@@ -1218,7 +1242,7 @@ namespace Root_VEGA_P_Vision
             {
                 return new RelayCommand(() =>
                 {
-                    IntPtr ptrMem = p_ROILayer.GetPtr(ROIMaskIdx+SelectedIdx);
+                    IntPtr ptrMem = p_ROILayer.GetPtr();
                     if (ptrMem == IntPtr.Zero)
                         return;
 
@@ -1227,9 +1251,22 @@ namespace Root_VEGA_P_Vision
                     {
                         Marshal.Copy(buf, 0, (IntPtr)((long)ptrMem + (long)p_ROILayer.p_Size.X * p_ROILayer.GetBytePerPixel() * i), buf.Length);
                     }
-                    SetMaskLayerSource(ROIMaskIdx + SelectedIdx);
+                    SetMaskLayerSource();
                 });
             }
+        }
+        public void ClearMaskLayer()
+        {
+            IntPtr ptrMem = p_ROILayer.GetPtr();
+            if (ptrMem == IntPtr.Zero)
+                return;
+
+            byte[] buf = new byte[p_ROILayer.p_Size.X * p_ROILayer.GetBytePerPixel()];
+            for (int i = 0; i < p_ROILayer.p_Size.Y; i++)
+            {
+                Marshal.Copy(buf, 0, (IntPtr)((long)ptrMem + (long)p_ROILayer.p_Size.X * p_ROILayer.GetBytePerPixel() * i), buf.Length);
+            }
+            SetMaskLayerSource();
         }
         #endregion
     }

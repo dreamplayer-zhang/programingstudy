@@ -63,6 +63,15 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Lib\Basler.Pylon.dll</HintPath>
     </Reference>
+    <Reference Include="Cognex.DataMan.SDK.Discovery.PC">
+      <HintPath>Camera\CognexDM150\DLL\Cognex.DataMan.SDK.Discovery.PC.dll</HintPath>
+    </Reference>
+    <Reference Include="Cognex.DataMan.SDK.PC">
+      <HintPath>Camera\CognexDM150\DLL\Cognex.DataMan.SDK.PC.dll</HintPath>
+    </Reference>
+    <Reference Include="Cognex.DataMan.SDK.Utils.PC">
+      <HintPath>Camera\CognexDM150\DLL\Cognex.DataMan.SDK.Utils.PC.dll</HintPath>
+    </Reference>
     <Reference Include="CyUSB">
       <HintPath>CyUSB\CyUSB.dll</HintPath>
     </Reference>
@@ -251,6 +260,10 @@
     </Compile>
     <Compile Include="Camera\BaslerPylon\GraphWindowTest.xaml.cs">
       <DependentUpon>GraphWindowTest.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Camera\CognexDM150\Camera_CognexDM150.cs" />
+    <Compile Include="Camera\CognexDM150\Camera_CognexDM150_UI.xaml.cs">
+      <DependentUpon>Camera_CognexDM150_UI.xaml</DependentUpon>
     </Compile>
     <Compile Include="Comm\Modbus.cs" />
     <Compile Include="Comm\Modbus_UI.xaml.cs">
@@ -841,6 +854,10 @@
     <Page Include="Camera\CameraSet_UI.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Camera\CognexDM150\Camera_CognexDM150_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Camera\Dalsa\CameraDalsa_UI.xaml">
       <SubType>Designer</SubType>

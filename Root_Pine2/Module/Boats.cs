@@ -249,6 +249,8 @@ namespace Root_Pine2.Module
 
         public override void ThreadStop()
         {
+            m_aBoat[Vision2D.eWorks.A].ThreadStop();
+            m_aBoat[Vision2D.eWorks.B].ThreadStop();
             base.ThreadStop();
         }
 

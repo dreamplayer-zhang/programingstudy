@@ -12,25 +12,25 @@ namespace Root_VEGA_P_Vision
 {
     public class RecipeSideImageViewers_ViewModel:ObservableObject
     {
-        RootViewer_ViewModel top_ViewerVM, bottom_ViewerVM, left_ViewerVM, right_ViewerVM;
+        MaskRootViewer_ViewModel top_ViewerVM, bottom_ViewerVM, left_ViewerVM, right_ViewerVM;
 
         #region Property
-        public RootViewer_ViewModel Top_ViewerVM
+        public MaskRootViewer_ViewModel Top_ViewerVM
         {
             get => top_ViewerVM;
             set => SetProperty(ref top_ViewerVM, value);
         }
-        public RootViewer_ViewModel Bottom_ViewerVM
+        public MaskRootViewer_ViewModel Bottom_ViewerVM
         {
             get => bottom_ViewerVM;
             set => SetProperty(ref bottom_ViewerVM, value);
         }
-        public RootViewer_ViewModel Left_ViewerVM
+        public MaskRootViewer_ViewModel Left_ViewerVM
         {
             get => left_ViewerVM;
             set => SetProperty(ref left_ViewerVM, value);
         }
-        public RootViewer_ViewModel Right_ViewerVM
+        public MaskRootViewer_ViewModel Right_ViewerVM
         {
             get => right_ViewerVM;
             set => SetProperty(ref right_ViewerVM, value);
@@ -59,6 +59,13 @@ namespace Root_VEGA_P_Vision
 
             right_ViewerVM = new MaskRootViewer_ViewModel(parts+".Right", recipeSide.recipeSetting.MaskTools, recipe,
                 recipe.GetItem<EUVOriginRecipe>().SideLROriginInfo, recipe.GetItem<EUVPodSurfaceParameter>().PodSideLR.MaskIndex);
+        }
+        public void TabChanged()
+        {
+            top_ViewerVM.SetMask();
+            bottom_ViewerVM.SetMask();
+            left_ViewerVM.SetMask();
+            right_ViewerVM.SetMask();
         }
     }
 }

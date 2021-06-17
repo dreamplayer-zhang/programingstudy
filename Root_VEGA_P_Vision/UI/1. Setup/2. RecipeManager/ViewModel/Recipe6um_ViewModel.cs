@@ -87,6 +87,10 @@ namespace Root_VEGA_P_Vision
         public ICommand TabChanged
         {
             get => new RelayCommand(() => {
+                coverTop_ImageViewer.SetMask();
+                coverBottom_ImageViewer.SetMask();
+                baseTop_ImageViewer.SetMask();
+                baseBottom_ImageViewer.SetMask();
             });
         }
 

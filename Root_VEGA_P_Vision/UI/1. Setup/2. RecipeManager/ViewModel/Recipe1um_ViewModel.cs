@@ -21,6 +21,13 @@ namespace Root_VEGA_P_Vision
 
         MaskRootViewer_ViewModel EIPcoverBottom_TDI, EIPbasePlateTop_TDI, EIPcoverBottom_Stacking, basePlateROI1, basePlateROI2, selectedViewer;
         int selectedTab;
+        List<int> numList;
+        public List<int> MemNumList
+        {
+            get => numList;
+            set => SetProperty(ref numList, value);
+        }
+
         #region Property
         private ObservableCollection<UIElement> ROIlist = new ObservableCollection<UIElement>();
         public ObservableCollection<UIElement> ROIList
@@ -44,6 +51,8 @@ namespace Root_VEGA_P_Vision
                     selectedViewer = EIPCoverBottom_TDI;
                 else
                     selectedViewer = EIPBasePlateTop_TDI;
+
+                selectedViewer.SetMask();
             }
         }
         public MaskRootViewer_ViewModel SelectedViewer
@@ -101,6 +110,10 @@ namespace Root_VEGA_P_Vision
 
             SelectedViewer = EIPCoverBottom_TDI;
             curROIListItem = new ROIListItem();
+
+            numList = new List<int>();
+            for (int i = 0; i < EIPcoverBottom_TDI.p_ImageData.p_nPlane; i++)
+                MemNumList.Add(i + 1);
 
             selectedViewer.CapturedAreaDone += SelectedViewer_CapturedAreaDone;
         }

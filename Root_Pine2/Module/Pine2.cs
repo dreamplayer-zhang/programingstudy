@@ -85,6 +85,8 @@ namespace Root_Pine2.Module
                     if (m_dioStop.p_bIn) EQ.p_eState = EQ.eState.Ready; 
                     break;
                 case EQ.eState.Error:
+                    m_dioHome.Write(bBlink);
+                    if (m_dioHome.p_bIn) EQ.p_eState = EQ.eState.Home;
                     m_dioReset.Write(bBlink);
                     if (m_dioReset.p_bIn) m_handler.Reset();
                     break;
@@ -452,13 +454,13 @@ namespace Root_Pine2.Module
         void RunThreadDIO()
         {
             m_bRunDIO = true;
-            Thread.Sleep(2000);
+            Thread.Sleep(5000);
             StopWatch sw = new StopWatch();
             bool bBlink = false; 
             while (m_bRunDIO)
             {
                 Thread.Sleep(10);
-                if (sw.ElapsedMilliseconds > 500)
+                if (sw.ElapsedMilliseconds > 400)
                 {
                     sw.Start();
                     bBlink = !bBlink; 

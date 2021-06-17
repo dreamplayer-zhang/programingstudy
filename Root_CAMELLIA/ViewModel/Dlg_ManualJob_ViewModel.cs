@@ -314,6 +314,8 @@ namespace Root_CAMELLIA
                     infoWafer.p_eState = (p_data[nSlot - 1 - i].p_state == "Select") ? GemSlotBase.eState.Select : GemSlotBase.eState.Exist;
                     m_infoCarrier.m_aGemSlot[i].p_eState = infoWafer.p_eState;
                     infoWafer.p_sWaferID = p_data[nSlot - 1 - i].p_waferID;
+                    infoWafer.p_sLotID = p_lotID;
+                    infoWafer.p_sCarrierID = p_carrierID;
                     if (infoWafer.p_eState == GemSlotBase.eState.Select)
                     {
                         infoWafer.RecipeOpen(sequenceRecipePath);
