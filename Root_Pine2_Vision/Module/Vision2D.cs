@@ -26,6 +26,7 @@ namespace Root_Pine2_Vision.Module
         #region ToolBox
         Camera_Dalsa m_camera;
         public LightSet m_lightSet;
+        RS232 m_rs232RGBW; 
         public override void GetTools(bool bInit)
         {
             if (p_eRemote == eRemote.Server)
@@ -34,6 +35,7 @@ namespace Root_Pine2_Vision.Module
                 p_sInfo = m_toolBox.Get(ref m_lightSet, this);
                 m_aWorks[eWorks.A].GetTools(m_toolBox, bInit);
                 m_aWorks[eWorks.B].GetTools(m_toolBox, bInit);
+                p_sInfo = m_toolBox.GetComm(ref m_rs232RGBW, this, "RGBW"); 
                 p_sInfo = m_toolBox.GetComm(ref m_tcpRequest, this, "Request"); 
                 if (bInit) m_tcpRequest.EventReceiveData += M_tcpRequest_EventReceiveData;
             }
@@ -44,17 +46,20 @@ namespace Root_Pine2_Vision.Module
         #region Light
         public class LightPower
         {
+            public eRGBW m_eRGBW = eRGBW.White; 
             public List<double> m_aPower = new List<double>();
 
             public LightPower Clone()
             {
                 LightPower power = new LightPower(m_vision);
+                power.m_eRGBW = m_eRGBW; 
                 for (int n = 0; n < m_vision.p_lLight; n++) power.m_aPower[n] = m_aPower[n];
                 return power;
             }
 
             public void RunTree(Tree tree, bool bVisible)
             {
+                m_eRGBW = (eRGBW)tree.Set(m_eRGBW, m_eRGBW, "RGBW", "Set RGBW", bVisible); 
                 while (m_aPower.Count < m_vision.p_lLight) m_aPower.Add(0);
                 for (int n = 0; n < m_aPower.Count; n++)
                 {
@@ -74,12 +79,14 @@ namespace Root_Pine2_Vision.Module
         {
             get
             {
-                if (p_eRemote == eRemote.Client) return _lLight;
-                return m_lightSet.m_aLight.Count;
+                return _lLight;
+                //if (p_eRemote == eRemote.Client) return _lLight;
+                //return m_lightSet.m_aLight.Count;
             }
             set
             {
-                if (p_eRemote == eRemote.Client) _lLight = value;
+                _lLight = value;
+                //if (p_eRemote == eRemote.Client) _lLight = value;
             }
         }
 
@@ -88,6 +95,7 @@ namespace Root_Pine2_Vision.Module
             if (p_eRemote == eRemote.Client) RemoteRun(eRemoteRun.RunLight, eRemote.Client, lightPower);
             else
             {
+                SetRGBW(lightPower.m_eRGBW); 
                 for (int n = 0; n < p_lLight; n++)
                 {
                     Light light = m_lightSet.m_aLight[n];
@@ -106,7 +114,28 @@ namespace Root_Pine2_Vision.Module
         }
         #endregion
 
-        #region Recipe
+        #region RGBW
+        public enum eRGBW
+        {
+            Red,
+            Green,
+            Blue,
+            White
+        }
+        string SetRGBW(eRGBW eRGBW)
+        {
+            switch (eRGBW)
+            {
+                case eRGBW.Red: m_rs232RGBW.Send("r"); break;
+                case eRGBW.Green: m_rs232RGBW.Send("g"); break;
+                case eRGBW.Blue: m_rs232RGBW.Send("b"); break;
+                case eRGBW.White: m_rs232RGBW.Send("w"); break;
+            }
+            return "OK";
+        }
+        #endregion
+
+        #region p_sRecipe
         string _sRecipe = ""; 
         public string p_sRecipe
         {
@@ -466,6 +495,7 @@ namespace Root_Pine2_Vision.Module
             }
             else
             {
+                p_lLight = tree.GetTree("Light").Set(p_lLight, p_lLight, "Channel", "Light Channel Count");
                 m_eVision = (eVision)tree.GetTree("Vision").Set(m_eVision, m_eVision, "Type", "Vision Type"); 
                 m_nLine = tree.GetTree("Camera").Set(m_nLine, m_nLine, "Line", "Memory Snap Lines (pixel)");
                 m_aWorks[eWorks.A].RunTree(tree.GetTree("Works " + m_aWorks[eWorks.A].p_id));
