@@ -163,14 +163,14 @@ namespace Root_CAMELLIA.Module
 
             DataFormatter dataFormatter = new DataFormatter();
             dataFormatter.AddData("Z Axis", m_dFocusZ, "Pulse");
-            logManager.WriteFNC(EQ.p_nRunLP, deviceID, "Start Move", SSLNet.STATUS.START, dataFormatter);
+            logManager.WriteFNC(EQ.p_nRunLP, deviceID, "Stage Move", SSLNet.STATUS.START, dataFormatter);
             dataFormatter.ClearData();
             if (m_module.Run(axisZ.StartMove(m_dFocusZ)))
                 return p_sInfo;
             if (m_module.Run(axisZ.WaitReady()))
                 return p_sInfo;
 
-            logManager.WriteFNC(EQ.p_nRunLP, deviceID, "Start Move", SSLNet.STATUS.END);
+            logManager.WriteFNC(EQ.p_nRunLP, deviceID, "Stage Move", SSLNet.STATUS.END);
 
 
 
@@ -214,13 +214,13 @@ namespace Root_CAMELLIA.Module
             if (!m_useCentering)
             {
                 dataFormatter.AddData("Z Axis", axisZ.GetPosValue(eAxisPos.Home), "Pulse");
-                logManager.WriteFNC(EQ.p_nRunLP, deviceID, "Start Move", SSLNet.STATUS.START, dataFormatter);
+                logManager.WriteFNC(EQ.p_nRunLP, deviceID, "Stage Move", SSLNet.STATUS.START, dataFormatter);
                 dataformatter.ClearData();
                 if (m_module.Run(axisZ.StartMove(eAxisPos.Home)))
                     return p_sInfo;
                 if (m_module.Run(axisZ.WaitReady()))
                     return p_sInfo;
-                logManager.WriteFNC(EQ.p_nRunLP, deviceID, "Start Move", SSLNet.STATUS.END);
+                logManager.WriteFNC(EQ.p_nRunLP, deviceID, "Stage Move", SSLNet.STATUS.END);
 
                 string materialID = "";
                 if (m_module.p_infoWafer == null)
@@ -264,7 +264,7 @@ namespace Root_CAMELLIA.Module
                 dataformatter.AddData(nameof(m_dMoveSpeedY), m_dMoveSpeedY);
                 dataformatter.AddData(nameof(m_dMoveAccY), m_dMoveAccY);
                 dataformatter.AddData(nameof(m_dMoveDecY), m_dMoveDecY);
-                logManager.WriteFNC(EQ.p_nRunLP, deviceID, "Start Move", SSLNet.STATUS.START, dataFormatter);
+                logManager.WriteFNC(EQ.p_nRunLP, deviceID, "Stage Move", SSLNet.STATUS.START, dataFormatter);
                 dataformatter.ClearData();
                 if (m_module.Run(axisXY.p_axisX.StartMove(m_WaferLT_pulse.X, m_dMoveSpeedX, m_dMoveAccX, m_dMoveDecX)))
                 {
@@ -281,14 +281,14 @@ namespace Root_CAMELLIA.Module
             {
                 dataformatter.AddData("X Axis", m_WaferLT_pulse.X, "Pulse");
                 dataformatter.AddData("Y Axis", m_WaferLT_pulse.Y, "Pulse");
-                logManager.WriteFNC(EQ.p_nRunLP, deviceID, "Start Move", SSLNet.STATUS.START);
+                logManager.WriteFNC(EQ.p_nRunLP, deviceID, "Stage Move", SSLNet.STATUS.START);
                 dataformatter.ClearData();
                 if (m_module.Run(axisXY.StartMove(m_WaferLT_pulse)))
                     return p_sInfo;
                 if (m_module.Run(axisXY.WaitReady()))
                     return p_sInfo;
             }
-            logManager.WriteFNC(EQ.p_nRunLP, deviceID, "Start Move", SSLNet.STATUS.END);
+            logManager.WriteFNC(EQ.p_nRunLP, deviceID, "Stage Move", SSLNet.STATUS.END);
             //Thread.Sleep(1000);
 
             //ImageData asdv = new ImageData(VRS.p_ImageViewer.p_ImageData.m_MemData);
@@ -341,14 +341,14 @@ namespace Root_CAMELLIA.Module
             {
                 dataformatter.AddData("X Axis", m_WaferRT_pulse.X, "Pulse");
                 dataformatter.AddData("Y Axis", m_WaferRT_pulse.Y, "Pulse");
-                logManager.WriteFNC(EQ.p_nRunLP, deviceID, "Start Move", SSLNet.STATUS.START);
+                logManager.WriteFNC(EQ.p_nRunLP, deviceID, "Stage Move", SSLNet.STATUS.START);
                 dataformatter.ClearData();
                 if (m_module.Run(axisXY.StartMove(m_WaferRT_pulse)))
                     return p_sInfo;
                 if (m_module.Run(axisXY.WaitReady()))
                     return p_sInfo;
             }
-            logManager.WriteFNC(EQ.p_nRunLP, deviceID, "Start Move", SSLNet.STATUS.END);
+            logManager.WriteFNC(EQ.p_nRunLP, deviceID, "Stage Move", SSLNet.STATUS.END);
             // return "OK";
             //m_DataManager.m_waferCentering.FindEdge(param);
             //Thread.Sleep(1000);
@@ -404,14 +404,14 @@ namespace Root_CAMELLIA.Module
             {
                 dataformatter.AddData("X Axis", m_WaferRT_pulse.X, "Pulse");
                 dataformatter.AddData("Y Axis", m_WaferRT_pulse.Y, "Pulse");
-                logManager.WriteFNC(EQ.p_nRunLP, deviceID, "Start Move", SSLNet.STATUS.START);
+                logManager.WriteFNC(EQ.p_nRunLP, deviceID, "Stage Move", SSLNet.STATUS.START);
                 dataformatter.ClearData();
                 if (m_module.Run(axisXY.StartMove(m_WaferRB_pulse)))
                     return p_sInfo;
                 if (m_module.Run(axisXY.WaitReady()))
                     return p_sInfo;
             }
-            logManager.WriteFNC(EQ.p_nRunLP, deviceID, "Start Move", SSLNet.STATUS.END);
+            logManager.WriteFNC(EQ.p_nRunLP, deviceID, "Stage Move", SSLNet.STATUS.END);
             //if (VRS.Grab() == "OK")
             //{
             //    //strVRSImageFullPath = string.Format(strVRSImageDir + "VRSImage_{0}.bmp", 2);
@@ -474,13 +474,13 @@ namespace Root_CAMELLIA.Module
 
 
             dataFormatter.AddData("Z Axis", axisZ.GetPosValue(eAxisPos.Home), "Pulse");
-            logManager.WriteFNC(EQ.p_nRunLP, deviceID, "Start Move", SSLNet.STATUS.START, dataFormatter);
+            logManager.WriteFNC(EQ.p_nRunLP, deviceID, "Stage Move", SSLNet.STATUS.START, dataFormatter);
             dataformatter.ClearData();
             if (m_module.Run(axisZ.StartMove(eAxisPos.Home)))
                 return p_sInfo;
             if (m_module.Run(axisZ.WaitReady()))
                 return p_sInfo;
-            logManager.WriteFNC(EQ.p_nRunLP, deviceID, "Start Move", SSLNet.STATUS.END);
+            logManager.WriteFNC(EQ.p_nRunLP, deviceID, "Stage Move", SSLNet.STATUS.END);
 
             m_module.SetLight(false);
 

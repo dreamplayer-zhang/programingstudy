@@ -321,13 +321,13 @@ namespace Root_CAMELLIA.Module
                         MeasurePoint = new RPoint(dX, dY);
                         dataFormatter.AddData("X Axis", dX, "Pulse");
                         dataFormatter.AddData("Y Axis", dY, "Pulse");
-                        marsLogManager.WriteFNC(EQ.p_nRunLP, deviceID, "Start Move", SSLNet.STATUS.START, type:MATERIAL_TYPE.WAFER);
+                        marsLogManager.WriteFNC(EQ.p_nRunLP, deviceID, "Stage Move", SSLNet.STATUS.START, type:MATERIAL_TYPE.WAFER);
                         dataFormatter.ClearData();
                         if (m_module.Run(axisXY.StartMove(MeasurePoint)))
                             return p_sInfo;
                         if (m_module.Run(axisXY.WaitReady()))
                             return p_sInfo;
-                        marsLogManager.WriteFNC(EQ.p_nRunLP, deviceID, "Start Move", SSLNet.STATUS.END);
+                        marsLogManager.WriteFNC(EQ.p_nRunLP, deviceID, "Stage Move", SSLNet.STATUS.END);
 
                         m_mwvm.p_ArrowX1 = x * RatioX;
                         m_mwvm.p_ArrowY1 = -y * RatioY;
@@ -376,7 +376,7 @@ namespace Root_CAMELLIA.Module
 
                         dataFormatter.AddData("X Axis", dX, "Pulse");
                         dataFormatter.AddData("Y Axis", dY, "Pulse");
-                        marsLogManager.WriteFNC(EQ.p_nRunLP, deviceID, "Start Move", SSLNet.STATUS.START, type: MATERIAL_TYPE.WAFER);
+                        marsLogManager.WriteFNC(EQ.p_nRunLP, deviceID, "Stage Move", SSLNet.STATUS.START, type: MATERIAL_TYPE.WAFER);
                         dataFormatter.ClearData();
                         isMove = true;
                         if (m_module.Run(axisXY.StartMove(MeasurePoint)))
@@ -400,7 +400,7 @@ namespace Root_CAMELLIA.Module
                         if (m_module.Run(axisXY.WaitReady()))
                             return p_sInfo;
 
-                        marsLogManager.WriteFNC(EQ.p_nRunLP, deviceID, "Start Move", SSLNet.STATUS.END, type: MATERIAL_TYPE.WAFER);
+                        marsLogManager.WriteFNC(EQ.p_nRunLP, deviceID, "Stage Move", SSLNet.STATUS.END, type: MATERIAL_TYPE.WAFER);
                         isMove = false;
                     }
 
