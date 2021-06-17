@@ -79,12 +79,14 @@ namespace Root_Pine2_Vision.Module
         {
             get
             {
-                if (p_eRemote == eRemote.Client) return _lLight;
-                return m_lightSet.m_aLight.Count;
+                return _lLight;
+                //if (p_eRemote == eRemote.Client) return _lLight;
+                //return m_lightSet.m_aLight.Count;
             }
             set
             {
-                if (p_eRemote == eRemote.Client) _lLight = value;
+                _lLight = value;
+                //if (p_eRemote == eRemote.Client) _lLight = value;
             }
         }
 
@@ -124,10 +126,10 @@ namespace Root_Pine2_Vision.Module
         {
             switch (eRGBW)
             {
-                case eRGBW.Red: m_rs232RGBW.Send("R"); break;
-                case eRGBW.Green: m_rs232RGBW.Send("G"); break;
-                case eRGBW.Blue: m_rs232RGBW.Send("B"); break;
-                case eRGBW.White: m_rs232RGBW.Send("W"); break;
+                case eRGBW.Red: m_rs232RGBW.Send("r"); break;
+                case eRGBW.Green: m_rs232RGBW.Send("g"); break;
+                case eRGBW.Blue: m_rs232RGBW.Send("b"); break;
+                case eRGBW.White: m_rs232RGBW.Send("w"); break;
             }
             return "OK";
         }
@@ -493,6 +495,7 @@ namespace Root_Pine2_Vision.Module
             }
             else
             {
+                p_lLight = tree.GetTree("Light").Set(p_lLight, p_lLight, "Channel", "Light Channel Count");
                 m_eVision = (eVision)tree.GetTree("Vision").Set(m_eVision, m_eVision, "Type", "Vision Type"); 
                 m_nLine = tree.GetTree("Camera").Set(m_nLine, m_nLine, "Line", "Memory Snap Lines (pixel)");
                 m_aWorks[eWorks.A].RunTree(tree.GetTree("Works " + m_aWorks[eWorks.A].p_id));

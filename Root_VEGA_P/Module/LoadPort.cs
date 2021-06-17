@@ -1,5 +1,6 @@
 ﻿using Root_VEGA_P_Vision.Module;
 using RootTools;
+using RootTools.Camera.CognexDM150;
 using RootTools.Camera.CognexOCR;
 using RootTools.Comm;
 using RootTools.Control;
@@ -18,11 +19,13 @@ namespace Root_VEGA_P.Module
     {
         #region ToolBox
         Camera_CognexOCR camBarcode;
+        Camera_CognexDM150 m_camBCD; 
         OHT m_OHT;
         RFID m_RFID; 
         public override void GetTools(bool bInit)
         {
             p_sInfo = m_toolBox.GetCamera(ref camBarcode, this, "Barcode Cam");
+            p_sInfo = m_toolBox.GetCamera(ref m_camBCD, this, "Barcode Camera");
             p_sInfo = m_toolBox.GetOHT(ref m_OHT, this, m_infoPods, "OHT");
             p_sInfo = m_toolBox.Get(ref m_RFID, this, "RFID");
             m_stage.GetTools(m_toolBox, this, bInit);

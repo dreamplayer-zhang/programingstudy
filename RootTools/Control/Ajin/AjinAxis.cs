@@ -825,29 +825,32 @@ namespace RootTools.Control.Ajin
             }
         }
 
+        static readonly object m_csLock = new object();
         List<string> m_aAXM = new List<string>(); 
         uint AXM(string sFunc, uint uResult)
         {
-            if (uResult == 0)
+            lock (m_csLock)
             {
-                for (int n = 0; n < m_aAXM.Count; n++)
+                if (uResult == 0)
                 {
-                    if (sFunc == m_aAXM[n])
+                    for (int n = 0; n < m_aAXM.Count; n++)
                     {
-                        m_aAXM.RemoveAt(n);
-                        return uResult; 
+                        if (sFunc == m_aAXM[n])
+                        {
+                            m_aAXM.RemoveAt(n);
+                            return uResult;
+                        }
                     }
+                    return uResult;
                 }
+                foreach (string sAXM in m_aAXM)
+                {
+                    if (sAXM == sFunc) return uResult;
+                }
+                m_aAXM.Add(sFunc);
+                p_sInfo = sFunc + ", Error # = " + uResult.ToString();
                 return uResult;
             }
-            foreach (string sAXM in m_aAXM)
-            {
-                if (sAXM == sFunc) return uResult; 
-            }
-            m_aAXM.Add(sFunc); 
-            p_sInfo = sFunc + ", Error # = " + uResult.ToString();
-            return uResult;
         }
-
     }
 }
