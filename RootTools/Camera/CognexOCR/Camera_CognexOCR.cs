@@ -74,7 +74,6 @@ namespace RootTools.Camera.CognexOCR
         }
         #endregion
 
-
         #region Read OCR
         public string ReadOCR(ref string sID, ref double dSocre)
         {
