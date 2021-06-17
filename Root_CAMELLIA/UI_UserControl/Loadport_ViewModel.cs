@@ -258,7 +258,7 @@ namespace Root_CAMELLIA
                 {
                     p_totalDone++;
 
-                    p_progressValue = (p_totalDone / p_totalSelect) * 100;
+                    p_progressValue = (double)p_totalDone / p_totalSelect * 100;
                 }
                 p_dataSelectIndex = 24 - ((InfoWafer)sender).m_nSlot;
             }));
@@ -326,7 +326,7 @@ namespace Root_CAMELLIA
                     {
                         return;
                     }
-                        if (EQ.p_eState != EQ.eState.Ready || p_loadport.p_diPlaced.p_bIn)
+                    if (EQ.p_eState != EQ.eState.Ready || p_loadport.p_diPlaced.p_bIn)
                     {
                         p_loadport.p_infoCarrier.p_eReqTransfer = GemCarrierBase.eTransfer.TransferBlocked;
                     }
@@ -474,9 +474,9 @@ namespace Root_CAMELLIA
             }
             bool bReadyLoadport = (p_loadport.p_eState == ModuleBase.eState.Ready);
             bool bReadyToLoad = true;
-            if (App.m_engineer.p_bUseXGem)
+            if (App.m_engineer.p_bUseXGem && !p_loadport.p_infoCarrier.m_gem.p_bOffline)
                 bReadyToLoad = (p_loadport.p_infoCarrier.p_eTransfer == GemCarrierBase.eTransfer.ReadyToLoad);
-
+            
             bool bReadyState = (p_loadport.m_qModuleRun.Count == 0);
             bool bEQReadyState = (EQ.p_eState == EQ.eState.Ready);
             //if (m_loadport.p_infoCarrier.p_eState != InfoCarrier.eState.Placed) return false;
@@ -489,7 +489,7 @@ namespace Root_CAMELLIA
         {
             bool bReadyLoadport = (p_loadport.p_eState == ModuleBase.eState.Ready);
             bool bReadyToUnload = true;
-            if(App.m_engineer.p_bUseXGem)
+            if (App.m_engineer.p_bUseXGem && !p_loadport.p_infoCarrier.m_gem.p_bOffline)
                 bReadyToUnload = (p_loadport.p_infoCarrier.p_eTransfer == GemCarrierBase.eTransfer.ReadyToUnload);
             bool bAccess = (p_loadport.p_infoCarrier.p_eAccessLP == GemCarrierBase.eAccessLP.Auto);
             bool bPlaced = p_loadport.CheckPlaced();
