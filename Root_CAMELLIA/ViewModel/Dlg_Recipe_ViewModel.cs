@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Input;
 
 namespace Root_CAMELLIA
@@ -14,14 +15,41 @@ namespace Root_CAMELLIA
     public class Dlg_Recipe_ViewModel : ObservableObject, IDialogRequestClose
     {
         MainWindow_ViewModel main;
-        Dlg_RecipeManager_ViewModel recipeManager_ViewModel;
-        SequenceRecipe_ViewModel sequenceRecipe_ViewModel;
+        public Dlg_RecipeManager_ViewModel recipeManager_ViewModel { get; set; }
+        public SequenceRecipe_ViewModel sequenceRecipe_ViewModel { get; set; }
         public Dlg_Recipe_ViewModel(MainWindow_ViewModel main)
         {
             this.main = main;
             this.sequenceRecipe_ViewModel = main.SequenceViewModel;
             this.recipeManager_ViewModel = main.RecipeViewModel;
             p_DataContext = sequenceRecipe_ViewModel;
+        }
+
+        
+        Visibility m_SequenceRecipeVisible = Visibility.Visible;
+        public Visibility p_SequenceRecipeVisible
+        {
+            get
+            {
+                return m_SequenceRecipeVisible;
+            }
+            set
+            {
+                SetProperty(ref m_SequenceRecipeVisible, value);
+            }
+        }
+
+        Visibility m_RecipeVisible = Visibility.Collapsed;
+        public Visibility p_RecipeVisible
+        {
+            get
+            {
+                return m_RecipeVisible;
+            }
+            set
+            {
+                SetProperty(ref m_RecipeVisible, value);
+            }
         }
 
         public enum RecipeMode
@@ -134,15 +162,16 @@ namespace Root_CAMELLIA
                     p_opacity = 1.0;
                     if (p_isSequenceRecipe && m_currentMode != RecipeMode.Sequence)
                     {
-                        p_DataContext = sequenceRecipe_ViewModel;
+                        //p_DataContext = sequenceRecipe_ViewModel;
+                        p_RecipeVisible = Visibility.Collapsed;
+                        p_SequenceRecipeVisible = Visibility.Visible;
                         m_currentMode = RecipeMode.Sequence;
                     }
                     else if(p_isMeasureRecipe && m_currentMode != RecipeMode.Measure)
                     {
-
-                        p_DataContext = recipeManager_ViewModel;
                         m_currentMode = RecipeMode.Measure;
-                        //StopWatch sw = new StopWatch();
+                        p_RecipeVisible = Visibility.Visible;
+                        p_SequenceRecipeVisible = Visibility.Collapsed;
 
                         //sw.Start();
                         //bool open = main.RecipeOpen;
@@ -187,7 +216,7 @@ namespace Root_CAMELLIA
                         return;
                     }
                     else
-                    {
+                    {                        
                         CloseRequested(this, new DialogCloseRequestedEventArgs(false));
                     }
                 });
