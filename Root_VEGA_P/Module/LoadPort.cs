@@ -18,13 +18,11 @@ namespace Root_VEGA_P.Module
     public class Loadport : ModuleBase, IRTRChild
     {
         #region ToolBox
-        Camera_CognexOCR camBarcode;
         Camera_CognexDM150 m_camBCD; 
         OHT m_OHT;
         RFID m_RFID; 
         public override void GetTools(bool bInit)
         {
-            p_sInfo = m_toolBox.GetCamera(ref camBarcode, this, "Barcode Cam");
             p_sInfo = m_toolBox.GetCamera(ref m_camBCD, this, "Barcode Camera");
             p_sInfo = m_toolBox.GetOHT(ref m_OHT, this, m_infoPods, "OHT");
             p_sInfo = m_toolBox.Get(ref m_RFID, this, "RFID");
@@ -513,6 +511,7 @@ namespace Root_VEGA_P.Module
                 if (Run(m_stage.RunVacuum(true))) return p_sInfo;
                 if (Run(m_door.RunDoor(true))) return p_sInfo;
                 if (Run(m_stage.RunMove(Stage.ePos.Barcode))) return p_sInfo;
+                if (Run(m_camBCD.ReadBCD())) return p_sInfo;
                 //forget
                 if (Run(m_stage.RunMove(Stage.ePos.Inside))) return p_sInfo;
                 if (Run(m_door.RunDoor(false))) return p_sInfo;
@@ -626,7 +625,11 @@ namespace Root_VEGA_P.Module
             if (EQ.p_bSimulate) return "OK";
             if (Run(m_door.RunDoor(true))) return p_sInfo;
             if (Run(base.StateHome())) return p_sInfo;
-            if (Run(m_stage.RunMove(Stage.ePos.Outside))) return p_sInfo; 
+            if (Run(m_stage.RunMove(Stage.ePos.Outside))) return p_sInfo;
+
+            //if(m_camBCD!=null)
+            //    m_camBCD.Connect();
+
             return m_door.RunDoor(false);
         }
         #endregion
