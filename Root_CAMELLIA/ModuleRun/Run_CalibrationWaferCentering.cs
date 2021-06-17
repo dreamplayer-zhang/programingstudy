@@ -146,6 +146,8 @@ namespace Root_CAMELLIA.Module
             string strVRSImageDir = "D:\\";
             string strVRSImageFullPath = "";
 
+            m_DataManager.m_waferCentering.FindEdgeInit();
+
             MarsLogManager logManager = MarsLogManager.Instance;
             DataFormatter dataformatter = new DataFormatter();
             logManager.WriteFNC(EQ.p_nRunLP, deviceID, "Lifter Down", SSLNet.STATUS.START);
@@ -220,11 +222,14 @@ namespace Root_CAMELLIA.Module
                     return p_sInfo;
                 logManager.WriteFNC(EQ.p_nRunLP, deviceID, "Start Move", SSLNet.STATUS.END);
 
-                logManager.WritePRC(EQ.p_nRunLP, deviceID, SSLNet.PRC_EVENTID.Process, SSLNet.STATUS.END, this.p_id, sequence++, materialID: m_module.p_infoWafer.p_id);
+                string materialID = "";
+                if (m_module.p_infoWafer == null)
+                    materialID = "test";
+                logManager.WritePRC(EQ.p_nRunLP, deviceID, SSLNet.PRC_EVENTID.Process, SSLNet.STATUS.END, this.p_id, sequence++, materialID: materialID);
                 return "OK";
             }
 
-            m_DataManager.m_waferCentering.FindEdgeInit();
+       
 
             m_module.SetLight(true);
 
