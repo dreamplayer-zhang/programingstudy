@@ -275,7 +275,8 @@ namespace RootTools_Vision
 					{
 						new LiveCharts.Wpf.Axis()
 						{
-							Title= "EBR",
+							Title = "EBR(pxl)",
+							Foreground = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Colors.LightSkyBlue),
 							Position = AxisPosition.LeftBottom,
 							Separator = new Separator()
 							{
@@ -286,7 +287,8 @@ namespace RootTools_Vision
 
 						new LiveCharts.Wpf.Axis()
 						{
-							Title= "Bevel",
+							Title = "Bevel(pxl)",
+							Foreground = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Colors.IndianRed),
 							Position = AxisPosition.RightTop,
 							Separator = new Separator()
 							{
