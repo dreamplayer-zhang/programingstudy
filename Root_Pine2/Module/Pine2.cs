@@ -29,11 +29,11 @@ namespace Root_Pine2.Module
         DIO_O m_doIonizer; 
         public override void GetTools(bool bInit)
         {
-            m_toolBox.GetDIO(ref m_dioStart, this, "Start");
-            m_toolBox.GetDIO(ref m_dioStop, this, "Stop");
-            m_toolBox.GetDIO(ref m_dioReset, this, "Reset");
-            m_toolBox.GetDIO(ref m_dioHome, this, "Home");
-            m_toolBox.GetDIO(ref m_dioPickerSet, this, "PickerSet");
+            m_toolBox.GetDIO(ref m_dioStart, this, "Start", false);
+            m_toolBox.GetDIO(ref m_dioStop, this, "Stop", false);
+            m_toolBox.GetDIO(ref m_dioReset, this, "Reset", false);
+            m_toolBox.GetDIO(ref m_dioHome, this, "Home", false);
+            m_toolBox.GetDIO(ref m_dioPickerSet, this, "PickerSet", false);
             m_toolBox.GetDIO(ref m_diEmergency, this, "Emergency");
             m_toolBox.GetDIO(ref m_diDoorOpen, this, "Door Open");
             m_toolBox.GetDIO(ref m_diCDA, this, "CDA");
