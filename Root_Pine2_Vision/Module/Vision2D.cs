@@ -36,8 +36,12 @@ namespace Root_Pine2_Vision.Module
                 m_aWorks[eWorks.A].GetTools(m_toolBox, bInit);
                 m_aWorks[eWorks.B].GetTools(m_toolBox, bInit);
                 p_sInfo = m_toolBox.GetComm(ref m_rs232RGBW, this, "RGBW"); 
-                p_sInfo = m_toolBox.GetComm(ref m_tcpRequest, this, "Request"); 
-                if (bInit) m_tcpRequest.EventReceiveData += M_tcpRequest_EventReceiveData;
+                p_sInfo = m_toolBox.GetComm(ref m_tcpRequest, this, "Request");
+                if (bInit)
+                {
+                    m_tcpRequest.EventReceiveData += M_tcpRequest_EventReceiveData;
+                    m_rs232RGBW.p_bConnect = true;
+                }
             }
             m_remote.GetTools(bInit);
         }
