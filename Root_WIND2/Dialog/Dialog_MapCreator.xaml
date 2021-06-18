@@ -22,7 +22,7 @@
         <GroupBox Margin="4"
                   Header="Image VIewer" Style="{StaticResource main_view_groupbox}" DataContext="{Binding ImageViewerVM}">
             <Grid>
-                <!--<Grid.RowDefinitions>
+                <Grid.RowDefinitions>
                     <RowDefinition Height="40"/>
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
@@ -35,14 +35,14 @@
                     <Button IsEnabled="False" Content="RGB" Style="{StaticResource imageViewer_toolbar_button}"/>
 
                     <TextBlock Text="Tool" Margin="12,0,4,0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                    <CheckBox Content="Orgin" IsChecked="{Binding IsOriginChecked, Mode=TwoWay}" Command="{Binding btnOriginCommand}" Style="{StaticResource imageViewer_toolbar_checkbox}"/>
-                    <CheckBox Content="Pitch" IsChecked="{Binding IsPitchChecked, Mode=TwoWay}" IsEnabled="{Binding IsPitchEnable}" Command="{Binding btnPitchCommand}" Style="{StaticResource imageViewer_toolbar_checkbox}"/>
-                    <CheckBox IsEnabled="False" Content="Rular" IsChecked="{Binding IsRularChecked, Mode=TwoWay}" Command="{Binding btnRularCommand}" Style="{StaticResource imageViewer_toolbar_checkbox}"/>
+                    <CheckBox Content="Select&#xa; Chip" IsChecked="{Binding IsSelectChipChecked, Mode=TwoWay}" Command="{Binding btnModeSelectChipCommand}" Style="{StaticResource imageViewer_toolbar_checkbox}"/>
+                    <CheckBox Content="Select&#xa; ROI" IsChecked="{Binding IsSelectRoiChecked, Mode=TwoWay}" Command="{Binding btnModeSelectRoiCommand}" Style="{StaticResource imageViewer_toolbar_checkbox}"/>
+                    <CheckBox Content="Wafer&#xa;Mode" IsChecked="{Binding IsWaferModeChecked, Mode=TwoWay}" Command="{Binding btnWaferModeCommand}" Style="{StaticResource imageViewer_toolbar_checkbox}"/>
 
                     <TextBlock Text="View" Margin="12,0,4,0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
                     <Button Content="FULL" Command="{Binding btnViewFullCommand}" Style="{StaticResource imageViewer_toolbar_button}"/>
                     <Button Content="BOX" Command="{Binding btnViewBoxCommand}" Style="{StaticResource imageViewer_toolbar_button}"/>
-                </StackPanel>-->
+                </StackPanel>
                 <Grid Grid.Row="1" >
                     <tools:RootViewer />
                 </Grid>
@@ -57,15 +57,12 @@
                     <Grid HorizontalAlignment="Stretch" Style="{StaticResource group_box_grid_item}">
                         <Grid.ColumnDefinitions >
                             <ColumnDefinition Width="120"/>
-                            <ColumnDefinition Width="50"/>
+                            <ColumnDefinition Width="30"/>
                             <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="50"/>
+                            <ColumnDefinition Width="30"/>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
-                        <CheckBox IsChecked="{Binding IsSelectChipChecked, Mode=TwoWay}" Command="{Binding btnModeSelectChipCommand}">
-                            <TextBlock Text="Select Chip" Style="{StaticResource group_box_item_name_text}"/>
-                        </CheckBox>
-                        <TextBlock Text="Size: " Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        <TextBlock Text="Selected Chip Size: " Style="{StaticResource group_box_item_name_text}"/>
                         <TextBox Grid.Column="2" Text="{Binding ChipOriginWidth}" IsEnabled="False" HorizontalContentAlignment="Center"/>
                         <TextBlock Text="x" Grid.Column="3"  HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         <TextBox Grid.Column="4" Text="{Binding ChipOriginHeight}" IsEnabled="False" HorizontalContentAlignment="Center"/>
@@ -75,35 +72,23 @@
                     <Grid HorizontalAlignment="Stretch" Style="{StaticResource group_box_grid_item}">
                         <Grid.ColumnDefinitions >
                             <ColumnDefinition Width="120"/>
-                            <ColumnDefinition Width="50"/>
+                            <ColumnDefinition Width="30"/>
                             <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="50"/>
+                            <ColumnDefinition Width="30"/>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
-                        <CheckBox IsChecked="{Binding IsSelectRoiChecked, Mode=TwoWay}" Command="{Binding btnModeSelectRoiCommand}">
-                            <TextBlock Text="Select ROI" Style="{StaticResource group_box_item_name_text}"/>
-                        </CheckBox>
-                        <TextBlock Text="Size: " Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        <TextBlock Text="Selected ROI Size: " Style="{StaticResource group_box_item_name_text}"/>
                         <TextBox Grid.Column="2" IsEnabled="False" Text="{Binding RoiOriginWidth}" HorizontalContentAlignment="Center"/>
                         <TextBlock Text="x" Grid.Column="3"  HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         <TextBox Grid.Column="4" IsEnabled="False" Text="{Binding RoiOriginHeight}" HorizontalContentAlignment="Center"/>
                     </Grid>
 
-                    <!-- Pitch Row Right Top -->
-                    <Grid HorizontalAlignment="Stretch" Style="{StaticResource group_box_grid_item}">
-                        <Grid.ColumnDefinitions >
-                            <ColumnDefinition Width="120"/>
-                        </Grid.ColumnDefinitions>
-                        <CheckBox IsChecked="{Binding IsWaferModeChecked, Mode=TwoWay}" Command="{Binding btnOriginCommand}">
-                            <TextBlock Text="Wafer Mode" Style="{StaticResource group_box_item_name_text}"/>
-                        </CheckBox>
-                    </Grid>
-
                     <!-- Image Offset -->
                     <Grid HorizontalAlignment="Stretch" Style="{StaticResource group_box_grid_item}">
                         <Grid.ColumnDefinitions >
-                            <ColumnDefinition Width="80"/>
-                            <ColumnDefinition Width="50"/>
+                            <ColumnDefinition Width="120"/>
+                            <ColumnDefinition Width="30"/>
+                            <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
                         <TextBlock Text="Similarity: " Style="{StaticResource group_box_item_name_text}"/>
                         <TextBox Grid.Column="2" IsEnabled="True" Text="{Binding CamResolutionX}" HorizontalContentAlignment="Center"/>
