@@ -327,13 +327,13 @@ namespace Root_WIND2
         Grid SelectRoiRightBottom_UI = null;
         Grid SelectRoiBox_UI = null;
 
-        CPoint selectChipLeftTop = new CPoint();
-        CPoint selectChipRightBottom = new CPoint();
-        CRect selectChipBox = new CRect();
+        public CPoint selectChipLeftTop = new CPoint();
+        public CPoint selectChipRightBottom = new CPoint();
+        public CRect selectChipBox = new CRect();
 
-        CPoint selectRoiLeftTop = new CPoint();
-        CPoint selectRoiRightBottom = new CPoint();
-        CRect selectRoiBox = new CRect();
+        public CPoint selectRoiLeftTop = new CPoint();
+        public CPoint selectRoiRightBottom = new CPoint();
+        public CRect selectRoiBox = new CRect();
 
         public void InitializeUIElement()
         {

@@ -304,7 +304,7 @@ namespace RootTools_Vision.Utility
             data.sampleCenterLocationX = this.sampleCenterLocationX;
             data.sampleCenterLocationY = this.sampleCenterLocationY;
             data.resolutionX = this.resX;
-            data.resolutionX = this.resY;
+            data.resolutionY = this.resY;
 
             data.SetSampleTestPlan(_mapdata);
             data.SetDefectInfor_SRLine(_mapdata, _defectlist, _origin, useTDIReview, useVrsReview);
