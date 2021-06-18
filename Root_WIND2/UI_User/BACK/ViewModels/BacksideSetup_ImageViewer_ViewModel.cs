@@ -1051,9 +1051,9 @@ namespace Root_WIND2.UI_User
                 this.SetSearchedCenter(new CPoint((int)centerPt.X, (int)centerPt.Y));
                 this.SetSearchedCirclePoints(points);
 
-                List<CRect> rectList = this.CalcDiePosition((int)centerPt.X, (int)centerPt.Y, false);
-
                 List<CRect> rectOutterList = this.CalcDiePosition((int)centerPt.X, (int)centerPt.Y, true);
+
+                List<CRect> rectList = this.CalcDiePosition((int)centerPt.X, (int)centerPt.Y, false);
 
                 this.SetMapRectList(rectList, rectOutterList);
             }
