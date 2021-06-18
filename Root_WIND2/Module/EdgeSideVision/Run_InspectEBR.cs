@@ -38,6 +38,7 @@ namespace Root_WIND2.Module
 
 			if (Directory.Exists(klarfPath)) Directory.CreateDirectory(klarfPath);
 
+			klarfData.SetModuleName("EBR");
 
 			klarfData.LotStart(klarfPath, infoWafer, recipe.WaferMap, grabMode);
 		}
