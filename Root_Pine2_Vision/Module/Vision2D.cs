@@ -426,6 +426,7 @@ namespace Root_Pine2_Vision.Module
             GrabData grabData = recipe.GetGrabData(eWorks);
             try
             {
+
                 //m_camera.GrabLineScan(memory, cpOffset, m_nLine, grabData);
                 Thread.Sleep(200);
                 //while (m_camera.p_CamInfo.p_eState != eCamState.Ready)
@@ -471,12 +472,9 @@ namespace Root_Pine2_Vision.Module
         public override void Reset()
         {
             if (p_eRemote == eRemote.Client) RemoteRun(eRemoteRun.Reset, eRemote.Client, null);
-            else
-            {
-                m_aWorks[eWorks.A].Reset();
-                m_aWorks[eWorks.B].Reset();
-                base.Reset();
-            }
+            m_aWorks[eWorks.A].Reset();
+            m_aWorks[eWorks.B].Reset();
+            base.Reset();
         }
         #endregion
 

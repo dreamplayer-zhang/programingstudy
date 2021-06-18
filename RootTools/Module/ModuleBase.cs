@@ -666,6 +666,7 @@ namespace RootTools.Module
 
             void ServerModuleRun(Protocol protocol)
             {
+                EQ.p_bStop = false; 
                 ModuleRunBase run = m_module.CloneModuleRun(protocol.m_sCmd);
                 if (run == null)
                 {
