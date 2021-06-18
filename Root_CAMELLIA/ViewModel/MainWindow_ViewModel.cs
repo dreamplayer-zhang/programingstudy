@@ -1233,16 +1233,25 @@ namespace Root_CAMELLIA
                     //    return;
                     //}
 
-                    bool isRecipeLoad = false;
-                    if (DataManager.Instance.recipeDM.LoadRecipeName != "")
-                    {
-                        isRecipeLoad = true;
-                    }
-                    RecipeViewModel.UpdateListView(isRecipeLoad);
-                    RecipeViewModel.UpdateView(isRecipeLoad, true);
+                    //bool isRecipeLoad = false;
+                    //if (DataManager.Instance.recipeDM.LoadRecipeName != "")
+                    //{
+                    //    isRecipeLoad = true;
+                    //}
+                    StopWatch sw = new StopWatch();
+                    sw.Start();
+                    //RecipeViewModel.UpdateListView(isRecipeLoad);
+                    //RecipeViewModel.UpdateView(isRecipeLoad, true);
                     var viewModel = RecipeCreatorViewModel;
+                    sw.Stop();
+                    System.Diagnostics.Debug.WriteLine(sw.ElapsedMilliseconds);
+
                     var dialog = dialogService.GetDialog(viewModel) as Dlg_Recipe;
                     Nullable<bool> result = dialog.ShowDialog();
+                    //dialog.Visibility = Visibility.Visible;
+                    //dialog.Visibility = Visibility.Visible;
+                    //var dialog = dialogService.GetDialog(viewModel) as Dlg_Recipe;
+                    //dialog.Visibility = Visibility.Visible;
 
 
                     // MeasurementRD 꺼 가져와서 그려야함.

@@ -29,26 +29,6 @@ namespace Root_WIND2
         }
 
         #region [Properties]
-        private bool isSelectChipChecked = true;
-        public bool IsSelectChipChecked
-        {
-            get => this.isSelectChipChecked;
-            set
-            {
-                SetProperty<bool>(ref this.isSelectChipChecked, value);
-            }
-        }
-
-        private bool isSelectRoiChecked = false;
-        public bool IsSelectRoiChecked
-        {
-            get => this.isSelectRoiChecked;
-            set
-            {
-                SetProperty<bool>(ref this.isSelectRoiChecked, value);
-            }
-        }
-
         private int chipOriginX = 0;
         public int ChipOriginX
         {
@@ -148,45 +128,6 @@ namespace Root_WIND2
             {
                 return new RelayCommand(() =>
                 {
-
-                });
-            }
-        }
-
-        public ICommand btnModeSelectChipCommand
-        {
-            get
-            {
-                return new RelayCommand(() =>
-                {
-                    if (this.IsSelectChipChecked == true)
-                    {
-                        this.IsSelectRoiChecked = false;
-                    }
-                    else
-                    {
-                        this.IsSelectRoiChecked = true;
-
-                    }
-                });
-            }
-        }
-
-        public ICommand btnModeSelectRoiCommand
-        {
-            get
-            {
-                return new RelayCommand(() =>
-                {
-                    if (this.IsSelectRoiChecked == true)
-                    {
-                        this.IsSelectChipChecked = false;
-                    }
-                    else
-                    {
-                        this.IsSelectChipChecked = true;
-
-                    }
                 });
             }
         }

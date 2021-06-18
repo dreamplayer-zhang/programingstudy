@@ -291,7 +291,7 @@ namespace Root_Pine2.Module
 
         public string RunUnloadBoat(eUnloadVision eVision, Vision2D.eWorks eWorks)
         {
-            if (m_picker.p_infoStrip != null) return "InfoStrip != null";
+            if (m_picker.p_infoStrip == null) return "InfoStrip == null";
             Boats boats = GetBoats(eVision);
             Boat boat = boats.m_aBoat[eWorks];
             if (boat.p_eStep != Boat.eStep.Ready) return "Boat not Ready";

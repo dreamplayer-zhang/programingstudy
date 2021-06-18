@@ -149,17 +149,17 @@
                         </TextBlock>
                     </Border>
                     <Border Grid.Column="1" Grid.Row="1" BorderBrush="White" BorderThickness="1,1,2,0" Margin="0,0,10,0" >
-                        <TextBlock  FontWeight="Bold" FontSize="18" Text="{Binding Path=p_XGem.p_eReqControl, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource EnumConverter}}" FontFamily="consolas" TextAlignment="Center" VerticalAlignment="Center">
+                        <TextBlock  FontWeight="Bold" FontSize="18" Text="{Binding Path=p_XGem.p_eControl, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource EnumConverter}}" FontFamily="consolas" TextAlignment="Center" VerticalAlignment="Center">
                             <TextBlock.Style>
                                 <Style TargetType="TextBlock">
                                     <Style.Triggers>
-                                        <DataTrigger Binding="{Binding Path=p_XGem.p_eReqControl, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource EnumConverter}}" Value="Offline">
+                                        <DataTrigger Binding="{Binding Path=p_XGem.p_eControl, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource EnumConverter}}" Value="Offline">
                                             <Setter Property="Foreground" Value="Red"/>
                                         </DataTrigger>
-                                        <DataTrigger Binding="{Binding Path=p_XGem.p_eReqControl, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource EnumConverter}}" Value="Online Local">
+                                        <DataTrigger Binding="{Binding Path=p_XGem.p_eControl, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource EnumConverter}}" Value="Online Local">
                                             <Setter Property="Foreground" Value="#22b14c"/>
                                         </DataTrigger>
-                                        <DataTrigger Binding="{Binding Path=p_XGem.p_eReqControl, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource EnumConverter}}" Value="Online Remote">
+                                        <DataTrigger Binding="{Binding Path=p_XGem.p_eControl, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource EnumConverter}}" Value="Online Remote">
                                             <Setter Property="Foreground" Value="#22b14c"/>
                                         </DataTrigger>
                                     </Style.Triggers>

@@ -26,6 +26,7 @@ namespace Root_Pine2_Vision.Module
         #region ToolBox
         Camera_Dalsa m_camera;
         public LightSet m_lightSet;
+        RS232 m_rs232RGBW; 
         public override void GetTools(bool bInit)
         {
             if (p_eRemote == eRemote.Server)
@@ -34,8 +35,13 @@ namespace Root_Pine2_Vision.Module
                 p_sInfo = m_toolBox.Get(ref m_lightSet, this);
                 m_aWorks[eWorks.A].GetTools(m_toolBox, bInit);
                 m_aWorks[eWorks.B].GetTools(m_toolBox, bInit);
-                p_sInfo = m_toolBox.GetComm(ref m_tcpRequest, this, "Request"); 
-                if (bInit) m_tcpRequest.EventReceiveData += M_tcpRequest_EventReceiveData;
+                p_sInfo = m_toolBox.GetComm(ref m_rs232RGBW, this, "RGBW"); 
+                p_sInfo = m_toolBox.GetComm(ref m_tcpRequest, this, "Request");
+                if (bInit)
+                {
+                    m_tcpRequest.EventReceiveData += M_tcpRequest_EventReceiveData;
+                    m_rs232RGBW.p_bConnect = true;
+                }
             }
             m_remote.GetTools(bInit);
         }
@@ -44,18 +50,20 @@ namespace Root_Pine2_Vision.Module
         #region Light
         public class LightPower
         {
+            public eRGBW m_eRGBW = eRGBW.White; 
             public List<double> m_aPower = new List<double>();
 
             public LightPower Clone()
             {
                 LightPower power = new LightPower(m_vision);
+                power.m_eRGBW = m_eRGBW; 
                 for (int n = 0; n < m_vision.p_lLight; n++) power.m_aPower[n] = m_aPower[n];
                 return power;
             }
 
             public void RunTree(Tree tree, bool bVisible)
             {
-                while (m_aPower.Count < m_vision.p_lLight) m_aPower.Add(0);
+                m_eRGBW = (eRGBW)tree.Set(m_eRGBW, m_eRGBW, "RGBW", "Set RGBW", bVisible); 
                 for (int n = 0; n < m_aPower.Count; n++)
                 {
                     m_aPower[n] = tree.Set(m_aPower[n], m_aPower[n], n.ToString("00"), "Light Power (0 ~ 100)", bVisible);
@@ -66,6 +74,7 @@ namespace Root_Pine2_Vision.Module
             public LightPower(Vision2D vision)
             {
                 m_vision = vision;
+                while (m_aPower.Count < m_vision.p_lLight) m_aPower.Add(0);
             }
         }
 
@@ -74,12 +83,14 @@ namespace Root_Pine2_Vision.Module
         {
             get
             {
-                if (p_eRemote == eRemote.Client) return _lLight;
-                return m_lightSet.m_aLight.Count;
+                return _lLight;
+                //if (p_eRemote == eRemote.Client) return _lLight;
+                //return m_lightSet.m_aLight.Count;
             }
             set
             {
-                if (p_eRemote == eRemote.Client) _lLight = value;
+                _lLight = value;
+                //if (p_eRemote == eRemote.Client) _lLight = value;
             }
         }
 
@@ -88,6 +99,7 @@ namespace Root_Pine2_Vision.Module
             if (p_eRemote == eRemote.Client) RemoteRun(eRemoteRun.RunLight, eRemote.Client, lightPower);
             else
             {
+                SetRGBW(lightPower.m_eRGBW); 
                 for (int n = 0; n < p_lLight; n++)
                 {
                     Light light = m_lightSet.m_aLight[n];
@@ -106,7 +118,28 @@ namespace Root_Pine2_Vision.Module
         }
         #endregion
 
-        #region Recipe
+        #region RGBW
+        public enum eRGBW
+        {
+            Red,
+            Green,
+            Blue,
+            White
+        }
+        string SetRGBW(eRGBW eRGBW)
+        {
+            switch (eRGBW)
+            {
+                case eRGBW.Red: m_rs232RGBW.Send("r"); break;
+                case eRGBW.Green: m_rs232RGBW.Send("g"); break;
+                case eRGBW.Blue: m_rs232RGBW.Send("b"); break;
+                case eRGBW.White: m_rs232RGBW.Send("w"); break;
+            }
+            return "OK";
+        }
+        #endregion
+
+        #region p_sRecipe
         string _sRecipe = ""; 
         public string p_sRecipe
         {
@@ -123,7 +156,7 @@ namespace Root_Pine2_Vision.Module
         public void SetRecipe(string sRecipe)
         {
             if (p_eRemote == eRemote.Client) RemoteRun(eRemoteRun.Recipe, eRemote.Client, sRecipe);
-            p_sRecipe = sRecipe; 
+            else p_sRecipe = sRecipe; 
         }
         #endregion
 
@@ -376,18 +409,18 @@ namespace Root_Pine2_Vision.Module
         #endregion
 
         #region RunSnap
-        public string StartSnap(Recipe.Snap recipe, eWorks eWorks, string sRecipe, int iSnap)
+        public string StartSnap(Recipe.Snap recipe, eWorks eWorks, int iSnap)
         {
             Run_Snap run = (Run_Snap)m_runSnap.Clone();
             run.m_eWorks = eWorks; 
             run.m_recipe = recipe;
-            run.m_sRecipe = sRecipe;
             run.m_iSnap = iSnap; 
             return StartRun(run); 
         }
 
-        public string RunSnap(Recipe.Snap recipe, eWorks eWorks, string sRecipe, int iSnap)
+        public string RunSnap(Recipe.Snap recipe, eWorks eWorks, int iSnap)
         {
+            EQ.p_bStop = false; 
             MemoryData memory = m_aWorks[eWorks].p_memSnap[(int)recipe.m_eEXT];
             CPoint cpOffset = recipe.GetMemoryOffset();
             GrabData grabData = recipe.GetGrabData(eWorks);
@@ -400,7 +433,7 @@ namespace Root_Pine2_Vision.Module
                     //Thread.Sleep(10);
                     //if (EQ.IsStop()) return "EQ Stop";
                 //}
-                //m_aWorks[eWorks].SendSnapDone(sRecipe, iSnap); 
+                //m_aWorks[eWorks].SendSnapDone(iSnap); 
             }
             finally 
             {
@@ -422,7 +455,7 @@ namespace Root_Pine2_Vision.Module
 
         public string ReqSnap(string sRecipe, eWorks eWorks)
         {
-            string sSend = m_nReq.ToString("000,") + Works2D.eProtocol.Snap.ToString() + "," + sRecipe + "," + eWorks.ToString();
+            string sSend = m_nReq.ToString("000") + "," + Works2D.eProtocol.Snap.ToString() + "," + sRecipe + "," + eWorks.ToString();
             m_sReceive = "";
             m_tcpRequest.Send(sSend); 
             while (sSend != m_sReceive)
@@ -466,6 +499,7 @@ namespace Root_Pine2_Vision.Module
             }
             else
             {
+                p_lLight = tree.GetTree("Light").Set(p_lLight, p_lLight, "Channel", "Light Channel Count");
                 m_eVision = (eVision)tree.GetTree("Vision").Set(m_eVision, m_eVision, "Type", "Vision Type"); 
                 m_nLine = tree.GetTree("Camera").Set(m_nLine, m_nLine, "Line", "Memory Snap Lines (pixel)");
                 m_aWorks[eWorks.A].RunTree(tree.GetTree("Works " + m_aWorks[eWorks.A].p_id));
@@ -581,6 +615,7 @@ namespace Root_Pine2_Vision.Module
 
             public override string Run()
             {
+                EQ.p_bStop = false; 
                 switch (m_eRemoteRun)
                 {
                     case eRemoteRun.StateHome: return m_module.StateHome();
@@ -643,7 +678,6 @@ namespace Root_Pine2_Vision.Module
             }
 
             public eWorks m_eWorks = eWorks.A;
-            public string m_sRecipe = "";
             public int m_iSnap = 0; 
             public Recipe.Snap m_recipe; 
             public override ModuleRunBase Clone()
@@ -651,7 +685,6 @@ namespace Root_Pine2_Vision.Module
                 Run_Snap run = new Run_Snap(m_module);
                 run.m_eWorks = m_eWorks; 
                 run.m_recipe = m_recipe.Clone();
-                run.m_sRecipe = m_sRecipe;
                 run.m_iSnap = m_iSnap; 
                 return run;
             }
@@ -659,14 +692,13 @@ namespace Root_Pine2_Vision.Module
             public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
             {
                 m_eWorks = (eWorks)tree.Set(m_eWorks, m_eWorks, "Works", "Vision eWorks", bVisible);
-                m_sRecipe = tree.Set(m_sRecipe, m_sRecipe, "Recipe", "Recipe", bVisible);
                 m_iSnap = tree.Set(m_iSnap, m_iSnap, "Snap Index", "Snap Index", bVisible); 
                 m_recipe.RunTree(tree, bVisible); 
             }
 
             public override string Run()
             {
-                return m_module.RunSnap(m_recipe, m_eWorks, m_sRecipe, m_iSnap);
+                return m_module.RunSnap(m_recipe, m_eWorks, m_iSnap);
             }
         }
 

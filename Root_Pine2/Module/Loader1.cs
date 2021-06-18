@@ -20,7 +20,8 @@ namespace Root_Pine2.Module
             if (bInit) InitPosition();
         }
 
-        const string c_sTurnover = "Turnover"; 
+        const string c_sTurnover = "Turnover";
+        const string c_sUp = "Up";
         void InitPosition()
         {
             m_axisXZ.AddPos(c_sTurnover);
@@ -28,6 +29,7 @@ namespace Root_Pine2.Module
             m_axisXZ.AddPos(GetPosString(Vision2D.eVision.Top3D, Vision2D.eWorks.B));
             m_axisXZ.AddPos(GetPosString(Vision2D.eVision.Top2D, Vision2D.eWorks.A));
             m_axisXZ.AddPos(GetPosString(Vision2D.eVision.Top2D, Vision2D.eWorks.B));
+            m_axisXZ.p_axisY.AddPos(c_sUp);
         }
 
         string GetPosString(Vision2D.eVision eVision, Vision2D.eWorks eVisionWorks)
@@ -61,7 +63,7 @@ namespace Root_Pine2.Module
 
         public string RunMoveUp(bool bWait = true)
         {
-            m_axisXZ.p_axisY.StartMove(0);
+            m_axisXZ.p_axisY.StartMove(c_sUp);
             return bWait ? m_axisXZ.WaitReady() : "OK";
         }
         #endregion

@@ -249,55 +249,55 @@ namespace Root_CAMELLIA.Module
         #endregion
 
         #region Check Thread
-        //bool m_bThread = false;
+        bool m_bFDCThread = false;
         Thread m_thread;
         void InitThreadFan()
         {
-            //if (m_bThread) return;
-           // m_thread = new Thread(new ThreadStart(RunThreadFDC));
-            //m_thread.Start();
+            if (m_bFDCThread) return;
+            m_thread = new Thread(new ThreadStart(RunThreadFDC));
+            m_thread.Start();
         }
-        protected override void RunThread()
-        {
-            base.RunThread();
-            Thread.Sleep(m_msInterval);
-            if (!m_modbus.m_client.Connected)
-            {
-                Thread.Sleep(1000);
-                p_sInfo = m_modbus.Connect();
-            }
-            else
-            {
-                if (m_aData.Count > m_iData)
-                {
-                    m_aData[m_iData].ReadInputRegister(m_modbus);
-                    m_iData = (m_iData + 1) % m_aData.Count;
-                    UpdateEvent();
-                }
-            }
-        }
-        //void RunThreadFDC()
+        //protected override void RunThread()
         //{
-        //    m_bThread = true;
-        //    while (m_bThread)
+        //    base.RunThread();
+        //    Thread.Sleep(m_msInterval);
+        //    if (!m_modbus.m_client.Connected)
         //    {
-        //        Thread.Sleep(m_msInterval);
-        //        if (!m_modbus.m_client.Connected)
+        //        Thread.Sleep(1000);
+        //        p_sInfo = m_modbus.Connect();
+        //    }
+        //    else
+        //    {
+        //        if (m_aData.Count > m_iData)
         //        {
-        //            Thread.Sleep(1000);
-        //            p_sInfo = m_modbus.Connect();
-        //        }
-        //        else
-        //        {
-        //            if (m_aData.Count > m_iData)
-        //            {
-        //                m_aData[m_iData].ReadInputRegister(m_modbus);
-        //                m_iData = (m_iData + 1) % m_aData.Count;
-        //                UpdateEvent();
-        //            }
+        //            m_aData[m_iData].ReadInputRegister(m_modbus);
+        //            m_iData = (m_iData + 1) % m_aData.Count;
+        //            UpdateEvent();
         //        }
         //    }
         //}
+        void RunThreadFDC()
+        {
+            m_bFDCThread = true;
+            while (m_bFDCThread)
+            {
+                Thread.Sleep(m_msInterval);
+                if (!m_modbus.m_client.Connected)
+                {
+                    Thread.Sleep(1000);
+                    p_sInfo = m_modbus.Connect();
+                }
+                else
+                {
+                    if (m_aData.Count > m_iData)
+                    {
+                        m_aData[m_iData].ReadInputRegister(m_modbus);
+                        m_iData = (m_iData + 1) % m_aData.Count;
+                        UpdateEvent();
+                    }
+                }
+            }
+        }
 
         public int m_iData = 0;
         //protected override void RunThread()
@@ -325,11 +325,15 @@ namespace Root_CAMELLIA.Module
         {
             p_id = id;
             base.InitBase(id, engineer);
-            //InitThreadFan();
+            InitThreadFan();
         }
 
         public override void ThreadStop()
         {
+            if (m_bFDCThread)
+            {
+                m_bFDCThread = false;
+            }
             base.ThreadStop();
         }
     }
