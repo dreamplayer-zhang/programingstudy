@@ -64,7 +64,6 @@ namespace Root_Pine2_Vision.Module
             public void RunTree(Tree tree, bool bVisible)
             {
                 m_eRGBW = (eRGBW)tree.Set(m_eRGBW, m_eRGBW, "RGBW", "Set RGBW", bVisible); 
-                while (m_aPower.Count < m_vision.p_lLight) m_aPower.Add(0);
                 for (int n = 0; n < m_aPower.Count; n++)
                 {
                     m_aPower[n] = tree.Set(m_aPower[n], m_aPower[n], n.ToString("00"), "Light Power (0 ~ 100)", bVisible);
@@ -75,6 +74,7 @@ namespace Root_Pine2_Vision.Module
             public LightPower(Vision2D vision)
             {
                 m_vision = vision;
+                while (m_aPower.Count < m_vision.p_lLight) m_aPower.Add(0);
             }
         }
 
