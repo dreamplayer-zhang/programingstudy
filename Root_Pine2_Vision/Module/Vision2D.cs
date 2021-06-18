@@ -156,7 +156,7 @@ namespace Root_Pine2_Vision.Module
         public void SetRecipe(string sRecipe)
         {
             if (p_eRemote == eRemote.Client) RemoteRun(eRemoteRun.Recipe, eRemote.Client, sRecipe);
-            p_sRecipe = sRecipe; 
+            else p_sRecipe = sRecipe; 
         }
         #endregion
 

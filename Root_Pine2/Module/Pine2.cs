@@ -505,7 +505,10 @@ namespace Root_Pine2.Module
             p_widthStrip = tree.Set(p_widthStrip, p_widthStrip, "Width", "Strip Width (mm)");
             p_lStack = tree.Set(p_lStack, p_lStack, "Stack Count", "Strip Max Stack Count");
             p_lStackPaper = tree.Set(p_lStackPaper, p_lStackPaper, "Paper Count", "Paper Max Stack Count");
-            p_sRecipe = tree.Set(p_sRecipe, p_sRecipe, "Recipe", "Recipe"); 
+            if (tree.p_treeRoot.p_eMode != Tree.eMode.RegRead)
+            {
+                p_sRecipe = tree.Set(p_sRecipe, p_sRecipe, "Recipe", "Recipe");
+            }
         }
         #endregion
 

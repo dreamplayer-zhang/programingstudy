@@ -164,10 +164,10 @@ namespace Root_Pine2.Module
                 int iSnap = 0; 
                 foreach (Vision2D.Recipe.Snap snap in m_aBoat[eWorks].m_recipe.m_aSnap)
                 {
-                    //m_vision.RunLight(snap.m_lightPower);
-                    //if (Run(RunMoveSnapStart(eWorks, snap))) return p_sInfo;
+                    m_vision.RunLight(snap.m_lightPower);
+                    if (Run(RunMoveSnapStart(eWorks, snap))) return p_sInfo;
                     m_vision.StartSnap(snap, eWorks, p_sRecipe, iSnap);
-                    //if (Run(m_aBoat[eWorks].RunSnap())) return p_sInfo;
+                    if (Run(m_aBoat[eWorks].RunSnap())) return p_sInfo;
                     if (m_vision.IsBusy()) EQ.p_bStop = true;
                     iSnap++; 
                 }
