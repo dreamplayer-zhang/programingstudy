@@ -170,6 +170,7 @@ namespace RootTools.OHT.Semi
             {
                 if (m_doHoAvailable.p_bOn == value)
                     return;
+                if (m_doHoAvailable.m_do == null) return;
                 if (m_doHoAvailable.m_do.m_bitDO.m_nID < 0)
                     return;
                 if (_bHoAvailable != value)
@@ -191,6 +192,7 @@ namespace RootTools.OHT.Semi
             {
                 if (m_doES.p_bOn == value)
                     return;
+                if (m_doES.m_do == null) return;
                 if (m_doES.m_do.m_bitDO.m_nID < 0)
                     return;
                 if (_bES != value)
