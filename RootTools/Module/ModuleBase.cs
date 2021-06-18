@@ -242,7 +242,10 @@ namespace RootTools.Module
                 Thread.Sleep(10);
                 RunThread();
             }
+            RunThreadStop(); 
         }
+
+        protected virtual void RunThreadStop() { }
 
         protected virtual void RunThread()
         {

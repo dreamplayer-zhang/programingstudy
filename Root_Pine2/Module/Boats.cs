@@ -259,10 +259,16 @@ namespace Root_Pine2.Module
             InitBase(p_id, engineer); 
         }
 
+        protected override void RunThreadStop()
+        {
+            m_aBoat[Vision2D.eWorks.A].RunMove(Boat.ePos.Handler, false);
+            m_aBoat[Vision2D.eWorks.B].RunMove(Boat.ePos.Handler);
+            m_aBoat[Vision2D.eWorks.A].RunMove(Boat.ePos.Handler);
+            base.RunThreadStop();
+        }
+
         public override void ThreadStop()
         {
-            m_aBoat[Vision2D.eWorks.A].ThreadStop();
-            m_aBoat[Vision2D.eWorks.B].ThreadStop();
             base.ThreadStop();
         }
 
