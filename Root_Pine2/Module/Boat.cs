@@ -209,9 +209,8 @@ namespace Root_Pine2.Module
             m_recipe = new Vision2D.Recipe(boats.m_vision, eWorks);
         }
 
-        public void RunThreadStop()
+        public void ThreadStop()
         {
-            RunMove(ePos.Handler); 
         }
     }
 }
