@@ -37,9 +37,12 @@ namespace Root_Pine2.Engineer
             {
                 if (_sRecipe == value) return;
                 _sRecipe = value;
-                m_aBoats[Vision2D.eVision.Top3D].p_sRecipe = value;
-                m_aBoats[Vision2D.eVision.Top2D].p_sRecipe = value;
-                m_aBoats[Vision2D.eVision.Bottom].p_sRecipe = value;
+                if (m_aBoats.Count > 0)
+                {
+                    //m_aBoats[Vision2D.eVision.Top3D].p_sRecipe = value;
+                    //m_aBoats[Vision2D.eVision.Top2D].p_sRecipe = value;
+                    m_aBoats[Vision2D.eVision.Bottom].p_sRecipe = value;
+                }
             }
         }
         #endregion
@@ -178,7 +181,17 @@ namespace Root_Pine2.Engineer
             gaf?.ClearALID();
             foreach (ModuleBase module in moduleList.m_aModule.Keys) module.Reset();
             Thread.Sleep(100);
+            if (IsModuleReady(moduleList)) EQ.p_eState = EQ.eState.Ready; 
             EQ.p_bStop = false;
+        }
+
+        bool IsModuleReady(ModuleList moduleList)
+        {
+            foreach (ModuleBase module in moduleList.m_aModule.Keys)
+            {
+                if (module.p_eState != ModuleBase.eState.Ready) return false; 
+            }
+            return true; 
         }
         #endregion
 

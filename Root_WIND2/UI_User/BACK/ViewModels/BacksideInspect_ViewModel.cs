@@ -242,12 +242,12 @@ namespace Root_WIND2.UI_User
             get => new RelayCommand(() =>
             {
 
-                WorkManager workManager = GlobalObjects.Instance.GetNamed<WorkManager>("frontInspection");
-                RecipeFront recipe = GlobalObjects.Instance.Get<RecipeFront>();
+                WorkManager workManager = GlobalObjects.Instance.GetNamed<WorkManager>("backInspection");
+                RecipeBack recipe = GlobalObjects.Instance.Get<RecipeBack>();
 
                 WIND2_Engineer engineer = GlobalObjects.Instance.Get<WIND2_Engineer>();
-                GrabModeFront grabMode = engineer.m_handler.p_Vision.GetGrabMode(recipe.CameraInfoIndex);
-                InfoWafer infoWafer = engineer.m_handler.p_Vision.p_infoWafer;
+                GrabModeBack grabMode = engineer.m_handler.p_BackSideVision.GetGrabMode(recipe.CameraInfoIndex);
+                InfoWafer infoWafer = engineer.m_handler.p_BackSideVision.p_infoWafer;
                 if (infoWafer == null)
                 {
                     infoWafer = new InfoWafer("null", 0, engineer);
@@ -270,17 +270,25 @@ namespace Root_WIND2.UI_User
                 klarfData.SaveTiffImageOnlyTDI(defects, workManager.SharedBuffer, new Size(160, 120));
 
 
-                Tools.SaveImageJpg(workManager.SharedBuffer,
-                    new Rect(settings_backside.WholeWaferImageStartX, settings_backside.WholeWaferImageStartY, settings_backside.WholeWaferImageEndX, settings_backside.WholeWaferImageEndY),
-                    settings_backside.KlarfSavePath + "\\" + DateTime.Now.ToString("yyyyMMddhhmmss") + "_backside.jpg",
-                    (long)(settings_backside.WholeWaferImageCompressionRate * 100),
-                    settings_backside.OutputImageSizeX,
-                    settings_backside.OutputImageSizeY);
+                //Tools.SaveImageJpg(workManager.SharedBuffer,
+                //    new Rect(settings_backside.WholeWaferImageStartX, settings_backside.WholeWaferImageStartY, settings_backside.WholeWaferImageEndX, settings_backside.WholeWaferImageEndY),
+                //    settings_backside.KlarfSavePath + "\\" + DateTime.Now.ToString("yyyyMMddhhmmss") + "_backside.jpg",
+                //    (long)(settings_backside.WholeWaferImageCompressionRate * 100),
+                //    settings_backside.OutputImageSizeX,
+                //    settings_backside.OutputImageSizeY);
+
+                if (recipe.UseExclusiveRegion == false)
+                    recipe.UseExclusiveRegion = true;
+
+                if (recipe.ExclusiveRegionFilePath == "")
+                    recipe.ExclusiveRegionFilePath = Constants.FilePath.BacksideExclusiveRegionFilePath;
+
+                recipe.Save();
 
                 List<List<Point>> polygon = PolygonController.ReadPolygonFile(recipe.ExclusiveRegionFilePath);
 
                 BacksideRecipe backRecipe = recipe.GetItem<BacksideRecipe>();
-
+               
                 klarfData.SaveImageJpgInterpolation(workManager.SharedBuffer,
                        new Rect(
                            settings_backside.WholeWaferImageStartX,
@@ -289,7 +297,7 @@ namespace Root_WIND2.UI_User
                            settings_backside.WholeWaferImageEndY),
                        (long)(settings_backside.WholeWaferImageCompressionRate * 100),
                        settings_backside.OutputImageSizeX,
-                       settings_backside.OutputImageSizeY, polygon, settings_backside.CuttingSize, settings_backside.MinRadius, settings_backside.Thickness,
+                       settings_backside.OutputImageSizeY, polygon, (int)(settings_backside.SaveWaferSize * 1000 / grabMode.m_dRealResX_um), (int)(settings_backside.SaveWaferSize * 1000 / grabMode.m_dRealResY_um),
                        backRecipe.CenterX,
                        backRecipe.CenterY);
             });

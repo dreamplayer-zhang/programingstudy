@@ -47,7 +47,7 @@ namespace Root_Pine2.Module
         public int p_nStrip { get; set; }
         public InfoStrip(int nStrip)
         {
-            p_eMagazine = eMagazine.Magazine1; 
+            p_eMagazine = eMagazine.Magazine0; 
             p_nStrip = nStrip;
             p_id = "Strip" + nStrip.ToString("000"); 
         }
@@ -60,6 +60,7 @@ namespace Root_Pine2.Module
 
         public enum eMagazine
         {
+            Magazine0,
             Magazine1,
             Magazine2,
             Magazine3,
@@ -67,7 +68,6 @@ namespace Root_Pine2.Module
             Magazine5,
             Magazine6,
             Magazine7,
-            Magazine8,
         }
         public eMagazine p_eMagazine { get; set; }
         public enum eMagazinePos

@@ -258,11 +258,14 @@ namespace Root_EFEM.Module
         {
             InfoWafer wafer = GetInfoWafer(nID);
             wafer.p_sInspectionID = wafer.p_sLotID + wafer.p_sWaferID +DateTime.Now.ToString("yyyyMMddhhmmss");
+
+            p_infoCarrier.m_aGemSlot[nID].p_eState = GemSlotBase.eState.Run;
             return IsRunOK();
         }
 
         public string AfterPut(int nID)
         {
+            p_infoCarrier.m_aGemSlot[nID].p_eState = GemSlotBase.eState.Done;
             return IsRunOK();
         }
 
@@ -823,7 +826,9 @@ namespace Root_EFEM.Module
 
             public override string Run()
             {
+                MarsLogManager marsLogManager = MarsLogManager.Instance;
                 string sResult = "OK";
+               
                 if (EQ.p_bSimulate)
                 {
                     m_infoCarrier.p_ePresentSensor = GemCarrierBase.ePresent.Exist;
@@ -848,6 +853,9 @@ namespace Root_EFEM.Module
                     m_infoCarrier.SendCarrierID(m_infoCarrier.p_sCarrierID);
                 else
                     return p_sInfo + " SendCarrierID : " + m_infoCarrier.p_sCarrierID;
+
+
+                marsLogManager.WriteFNC(EQ.p_nRunLP, m_module.p_id, "Carrier Load", SSLNet.STATUS.START, type:SSLNet.MATERIAL_TYPE.FOUP);
 
                 while (m_infoCarrier.p_eStateCarrierID != GemCarrierBase.eGemState.VerificationOK)
                 {
@@ -889,6 +897,7 @@ namespace Root_EFEM.Module
                 }
                 else
                 {
+                   
                     if (m_module.Run(m_module.CmdLoad(m_bMapping)))
                         return p_sInfo;
                     if (m_module.Run(m_module.CmdGetMapData()))
@@ -903,6 +912,11 @@ namespace Root_EFEM.Module
                     if (m_infoCarrier.p_eStateSlotMap == GemCarrierBase.eGemState.VerificationFailed)
                         return p_sInfo + " infoCarrier.p_eStateSlotMap = " + m_infoCarrier.p_eStateSlotMap.ToString();
                 }
+
+                
+                SSLNet.DataFormatter dataformatter = new SSLNet.DataFormatter();
+                dataformatter.AddData("MapID", m_infoCarrier.GetMapData());
+                marsLogManager.WriteFNC(EQ.p_nRunLP, m_module.p_id, "Carrier Load", SSLNet.STATUS.END, dataformatter, SSLNet.MATERIAL_TYPE.FOUP);
                 //m_module.m_ceidDocking.Send();
                 return "OK";
             }
@@ -934,6 +948,7 @@ namespace Root_EFEM.Module
 
             public override string Run()
             {
+                MarsLogManager marsLogManager = MarsLogManager.Instance;
                 string sResult = "OK";
                 bool bUseXGem = m_module.m_engineer.p_bUseXGem;
                 IGem m_gem = m_module.m_gem;
@@ -942,7 +957,10 @@ namespace Root_EFEM.Module
                     if (m_infoCarrier.p_eState != InfoCarrier.eState.Dock)
                         return p_id + " RunUnload, InfoCarrier.p_eState = " + m_infoCarrier.p_eState.ToString();
                 }
-                if(bUseXGem)
+
+                marsLogManager.WriteFNC(EQ.p_nRunLP, m_module.p_id, "Carrier Unload", SSLNet.STATUS.START, type: SSLNet.MATERIAL_TYPE.FOUP);
+
+                if (bUseXGem && !m_gem.p_bOffline)
                 {
                     while (m_infoCarrier.p_eAccess != GemCarrierBase.eAccess.InAccessed)
                     {
@@ -968,6 +986,7 @@ namespace Root_EFEM.Module
                 }
                 m_infoCarrier.p_eState = InfoCarrier.eState.Placed;
                 m_infoCarrier.p_eReqTransfer = GemCarrierBase.eTransfer.ReadyToUnload;
+                marsLogManager.WriteFNC(EQ.p_nRunLP, m_module.p_id, "Carrier Unload", SSLNet.STATUS.END, type: SSLNet.MATERIAL_TYPE.FOUP);
                 //m_module.m_ceidUnDocking.Send();
                 return sResult;
             }

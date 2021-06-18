@@ -18,15 +18,21 @@ namespace Root_Pine2.Engineer
             InitializeComponent();
         }
 
+        Pine2 m_pine2; 
         Pine2_Handler m_handler; 
         public void Init(Pine2_Handler handler)
         {
             m_handler = handler;
+            m_pine2 = handler.m_pine2; 
 
             labelEQState.DataContext = EQ.m_EQ;
             checkBoxStop.DataContext = EQ.m_EQ;
             checkBoxPause.DataContext = EQ.m_EQ;
             checkBoxSimulate.DataContext = EQ.m_EQ;
+
+            textBlockMode.DataContext = m_pine2;
+            textBoxWidth.DataContext = m_pine2;
+            textBlock3D.DataContext = m_pine2; 
 
             InitMagazineEV_UI();
             InitLoaderUI(handler.m_loader0, gridLoader, 6);
@@ -107,6 +113,16 @@ namespace Root_Pine2.Engineer
             foreach (Boats_UI ui in m_aBoatsUI) ui.OnTimer();
             m_transferUI.OnTimer();
             m_loadEVUI.OnTimer(); 
+        }
+
+        private void textBlockMode_PreviewMouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            m_pine2.p_eMode = 1 - m_pine2.p_eMode;
+        }
+
+        private void textBlock3D_PreviewMouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            m_pine2.p_b3D = !m_pine2.p_b3D; 
         }
     }
 }

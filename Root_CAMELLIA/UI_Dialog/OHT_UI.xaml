@@ -1,0 +1,296 @@
+﻿<UserControl x:Class="Root_CAMELLIA.OHT_UI"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:local="clr-namespace:Root_CAMELLIA"
+             mc:Ignorable="d"
+             d:DesignHeight="700"
+             d:DesignWidth="350"
+             Background="#FF2D2D30">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="1*" />
+            <RowDefinition Height="1*" />
+            <RowDefinition Height="1*" />
+            <RowDefinition Height="3.3*" />
+            <RowDefinition Height="1.2*" />
+        </Grid.RowDefinitions>
+        <Grid Grid.Row="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="1*" />
+                <RowDefinition Height="2.5*" />
+            </Grid.RowDefinitions>
+            <TextBlock Grid.Row="0"
+                       Text="Access Mode"
+                       FontSize="15"
+                       FontWeight="Bold"
+                       Foreground="White"
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Center" />
+            <Grid Grid.Row="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition />
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+                <Button Grid.Column="0"
+                        x:Name="buttonAccessManual"
+                        Content="Manual"
+                        Margin="5"
+                        Click="buttonAccessManual_Click" />
+                <Button Grid.Column="1"
+                        x:Name="buttonAccessAuto"
+                        Content="Auto"
+                        Margin="5"
+                        Click="buttonAccessAuto_Click" />
+            </Grid>
+        </Grid>
+
+        <Grid Grid.Row="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="1*" />
+                <RowDefinition Height="2.5*" />
+            </Grid.RowDefinitions>
+            <TextBlock Grid.Row="0"
+                       Text="Loadport State"
+                       FontSize="15"
+                       FontWeight="Bold"
+                       Foreground="White"
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Center" />
+            <Grid Grid.Row="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition />
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+                <Grid Grid.Column="0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition />
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+                    <!--<Image Grid.Column="0" x:Name="imageOutPod" Source="/Resources/OutPod.png" Margin="1"/>
+                    <Image Grid.Column="0" x:Name="imageInPod" Source="/Resources/InPod.png" Margin="1" Visibility="Hidden"/>-->
+                    <Grid Grid.Column="1">
+                        <Grid.RowDefinitions>
+                            <RowDefinition />
+                            <RowDefinition />
+                        </Grid.RowDefinitions>
+                        <TextBlock Grid.Row="0"
+                                   x:Name="textBlockPlaced"
+                                   Text="Placed"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center"
+                                   FontSize="15"
+                                   Foreground="White"
+                                   Margin="0,10,22,0" />
+                        <TextBlock Grid.Row="1"
+                                   x:Name="textBlockPresent"
+                                   Text="Present"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center"
+                                   FontSize="15"
+                                   Foreground="White"
+                                   Margin="0,0,16,10" />
+                    </Grid>
+                </Grid>
+                <Grid Grid.Column="1">
+                    <Grid.RowDefinitions>
+                        <RowDefinition />
+                        <RowDefinition />
+                    </Grid.RowDefinitions>
+                    <Button Grid.Row="0"
+                            x:Name="buttonStateLoading"
+                            Content="Loading"
+                            Margin="4" />
+                    <Button Grid.Row="1"
+                            x:Name="buttonStateUnloading"
+                            Content="Unloading"
+                            Margin="4" />
+                </Grid>
+            </Grid>
+        </Grid>
+        <Grid Grid.Row="2">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="1*" />
+                <RowDefinition Height="2.5*" />
+            </Grid.RowDefinitions>
+            <TextBlock Grid.Row="0"
+                       Text="Transfer State"
+                       FontSize="15"
+                       FontWeight="Bold"
+                       Foreground="White"
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Center"
+                       Height="18"
+                       Width="100" />
+            <Grid Grid.Row="1">
+                <TextBlock x:Name="blockTransferState"
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Center"
+                           FontSize="30"
+                           Foreground="White" />
+            </Grid>
+        </Grid>
+        <Grid x:Name="grPioState"
+              Grid.Row="3">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="23*" />
+                <RowDefinition Height="282*" />
+            </Grid.RowDefinitions>
+            <TextBlock Grid.Row="0"
+                       Text="PIO State"
+                       FontSize="15"
+                       FontWeight="Bold"
+                       Foreground="White"
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Center" />
+            <Grid Grid.Row="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition />
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+                <Grid Grid.Column="0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition />
+                        <RowDefinition />
+                        <RowDefinition />
+                        <RowDefinition />
+                        <RowDefinition />
+                        <RowDefinition />
+                        <RowDefinition />
+                        <RowDefinition />
+                    </Grid.RowDefinitions>
+                    <Button Grid.Row="0"
+                            x:Name="buttonDIValid"
+                            Content="1.Valid"
+                            Margin="5"
+                            Background="{DynamicResource Yellow}"
+                            Foreground="White" />
+                    <Button Grid.Row="1"
+                            x:Name="buttonDICS0"
+                            Content="2.CS-0"
+                            Margin="5"
+                            Background="{DynamicResource DarkGray}"
+                            Foreground="White" />
+                    <Button Grid.Row="2"
+                            x:Name="buttonDICS1"
+                            Content="3.CS-1"
+                            Margin="5"
+                            Background="{DynamicResource DarkGray}"
+                            Foreground="White" />
+                    <Button Grid.Row="3"
+                            Content="4.N/C"
+                            Margin="5"
+                            Background="{DynamicResource DarkGray}"
+                            Foreground="White" />
+                    <Button Grid.Row="4"
+                            x:Name="buttonDITrReq"
+                            Content="5.TR-REQ"
+                            Margin="5"
+                            Background="{DynamicResource DarkGray}"
+                            Foreground="White" />
+                    <Button Grid.Row="5"
+                            x:Name="buttonDIBusy"
+                            Content="6.BUSY"
+                            Margin="5"
+                            Background="{DynamicResource DarkGray}"
+                            Foreground="White" />
+                    <Button Grid.Row="6"
+                            x:Name="buttonDICompt"
+                            Content="7.COMPT"
+                            Margin="5"
+                            Background="{DynamicResource DarkGray}"
+                            Foreground="White" />
+                    <Button Grid.Row="7"
+                            x:Name="buttonDICont"
+                            Content="8.CONT"
+                            Margin="5"
+                            Background="{DynamicResource DarkGray}"
+                            Foreground="White" />
+                </Grid>
+                <Grid Grid.Column="1">
+                    <Grid.RowDefinitions>
+                        <RowDefinition />
+                        <RowDefinition />
+                        <RowDefinition />
+                        <RowDefinition />
+                        <RowDefinition />
+                        <RowDefinition />
+                        <RowDefinition />
+                        <RowDefinition />
+                    </Grid.RowDefinitions>
+                    <Button Grid.Row="0"
+                            x:Name="buttonDOLReq"
+                            Content="1.L-REQ"
+                            Margin="5"
+                            Click="buttonDOLReq_Click" />
+                    <Button Grid.Row="1"
+                            x:Name="buttonDOUReq"
+                            Content="2.U-REQ"
+                            Margin="5"
+                            Click="buttonDOUReq_Click" />
+                    <Button Grid.Row="2"
+                            Content="3.N/C"
+                            Margin="5"
+                            Background="{DynamicResource DarkGray}"
+                            Foreground="White" />
+                    <Button Grid.Row="3"
+                            x:Name="buttonDOReady"
+                            Content="4.READY"
+                            Margin="5"
+                            Click="buttonDOReady_Click" />
+                    <Button Grid.Row="4"
+                            Content="5.N/C"
+                            Margin="5"
+                            Background="{DynamicResource DarkGray}"
+                            Foreground="White" />
+                    <Button Grid.Row="5"
+                            Content="6.N/C"
+                            Margin="5"
+                            Background="{DynamicResource DarkGray}"
+                            Foreground="White" />
+                    <Button Grid.Row="6"
+                            x:Name="buttonDOHoAvbl"
+                            Content="7.HO-AVBL"
+                            Margin="5"
+                            Click="buttonDOHoAvbl_Click" />
+                    <Button Grid.Row="7"
+                            x:Name="buttonDOES"
+                            Content="8.ES"
+                            Margin="5"
+                            Click="buttonDOES_Click" />
+                </Grid>
+            </Grid>
+        </Grid>
+
+        <Grid x:Name="grErrState"
+              Grid.Row="4"
+              Margin="0,0,0,-56">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="28*" />
+                <RowDefinition Height="97*" />
+                <RowDefinition Height="42*" />
+            </Grid.RowDefinitions>
+            <TextBlock Grid.Row="0"
+                       Text="Error State"
+                       FontSize="15"
+                       FontWeight="Bold"
+                       Foreground="White"
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Center"
+                       Height="18" />
+            <TextBox Grid.Row="1"
+                     Background="White"
+                     Text="{Binding p_sInfo}"
+                     FontSize="16"
+                     Margin="1"
+                     IsEnabled="False" />
+            <Button Grid.Row="2"
+                    x:Name="buttonRetry"
+                    Content="Retry Key"
+                    Margin="3"
+                    FontWeight="Bold"
+                    Click="buttonRetry_Click" />
+        </Grid>
+    </Grid>
+</UserControl>

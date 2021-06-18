@@ -12,24 +12,26 @@ namespace Root_Pine2.Module
     {
         #region ToolBox
         AxisXY m_axisXZ;
-        DIO_I2O m_dioTurn;
+        DIO_I2O m_dioTurnUp;
         DIO_O m_doVacuum;
         public DIO_I m_diCrash;
         public override void GetTools(bool bInit)
         {
             m_toolBox.GetAxis(ref m_axisXZ, this, "Loader2");
-            m_toolBox.GetDIO(ref m_dioTurn, this, "Turn", "Down", "Up");
+            m_toolBox.GetDIO(ref m_dioTurnUp, this, "Turn", "Down", "Up");
             m_toolBox.GetDIO(ref m_doVacuum, this, "Vacuum");
             m_toolBox.GetDIO(ref m_diCrash, this, "Crash");
             if (bInit) InitPosition();
         }
 
-        const string c_sReady = "Ready"; 
+        const string c_sReady = "Ready";
+        const string c_sUp = "Up";
         void InitPosition()
         {
             m_axisXZ.AddPos(c_sReady);
             m_axisXZ.AddPos(GetPosString(Vision2D.eWorks.A));
             m_axisXZ.AddPos(GetPosString(Vision2D.eWorks.B));
+            m_axisXZ.p_axisY.AddPos(c_sUp);
         }
 
         string GetPosString(Vision2D.eWorks eVisionWorks)
@@ -61,10 +63,16 @@ namespace Root_Pine2.Module
             return bWait ? m_axisXZ.p_axisY.WaitReady() : "OK";
         }
 
-        public string RunTurn(bool bTurn)
+        public string RunMove(string sPos, bool bWait = true)
         {
-            m_dioTurn.Write(bTurn); 
-            return m_dioTurn.WaitDone();
+            m_axisXZ.StartMove(sPos);
+            return bWait ? m_axisXZ.WaitReady() : "OK"; 
+        }
+
+        public string RunTurnUp(bool bUp)
+        {
+            m_dioTurnUp.Write(bUp); 
+            return m_dioTurnUp.WaitDone();
         }
 
         public string RunVacuum(bool bOn)
@@ -114,23 +122,24 @@ namespace Root_Pine2.Module
             try
             {
                 m_doVacuum.Write(true);
-                if (Run(RunTurn(true))) return p_sInfo;
                 if (Run(RunMoveX(eVisionWorks))) return p_sInfo;
+                if (Run(RunMoveZ(c_sUp))) return p_sInfo;
+                if (Run(RunTurnUp(false))) return p_sInfo;
                 if (Run(RunMoveZ(eVisionWorks))) return p_sInfo;
                 m_doVacuum.Write(false);
                 boat.RunVacuum(true);
                 Thread.Sleep((int)(1000 * m_secVacuum));
                 boat.p_infoStrip = p_infoStrip;
                 p_infoStrip = null;
-                if (Run(RunMoveZ(c_sReady))) return p_sInfo;
-                if (Run(RunMoveX(c_sReady))) return p_sInfo;
-                if (Run(RunTurn(false))) return p_sInfo;
+                if (Run(RunMoveZ(c_sUp))) return p_sInfo;
+                if (Run(RunTurnUp(true))) return p_sInfo;
+                m_axisXZ.p_axisY.StartMove(c_sReady); 
+                if (Run(RunMove(c_sReady))) return p_sInfo;
             }
             finally
             {
-                RunMoveZ(c_sReady);
-                RunMoveX(c_sReady);
-                RunTurn(false);
+                RunMove(c_sReady);
+                RunTurnUp(true);
             }
             return "OK";
         }
@@ -150,9 +159,8 @@ namespace Root_Pine2.Module
         {
             base.Reset();
             p_infoStrip = null;
-            RunMoveZ(c_sReady);
-            RunMoveX(c_sReady);
-            RunTurn(false); 
+            RunMove(c_sReady);
+            RunTurnUp(true); 
         }
         public override void RunTree(Tree tree)
         {

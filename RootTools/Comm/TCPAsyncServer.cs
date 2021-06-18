@@ -80,6 +80,7 @@ namespace RootTools.Comm
         Socket m_socketComm = null; 
         void CallBackAccept(IAsyncResult ar)
         {
+            if (m_socket == null) return; 
             m_socketComm = m_socket.EndAccept(ar);
             Async async = new Async(m_lMaxBuffer);
             async.m_socket = m_socketComm;

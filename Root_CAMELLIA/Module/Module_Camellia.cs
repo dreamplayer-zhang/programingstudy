@@ -321,6 +321,7 @@ namespace Root_CAMELLIA.Module
                 CanInitCal[i] = false;
                 CheckDocking[i] = false;
             }
+
            // try
             //{
             //    if (p_CamVRS != null && !p_CamVRS.p_CamInfo._OpenStatus)
@@ -330,6 +331,8 @@ namespace Root_CAMELLIA.Module
             //}
 
         }
+
+
 
         public override void ThreadStop()
         {
@@ -716,6 +719,8 @@ namespace Root_CAMELLIA.Module
         {
             p_dataSavePath = BaseDefine.Dir_MeasureSaveRootPath + p_infoWafer.p_sRecipe;// + @"\" + DateTime.Now.ToString("yyyy-MM-dd") + "T" + DateTime.Now.ToString("HH-mm-ss");
             GeneralTools.MakeDirectory(p_dataSavePath);
+
+            MarsLogManager.Instance.ChangeMaterial(EQ.p_nRunLP, p_infoWafer.m_nSlot + 1, p_infoWafer.p_sLotID, p_infoWafer.p_sCarrierID, p_infoWafer.p_sRecipe);
             return "OK";
         }
 

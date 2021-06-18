@@ -19,7 +19,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Threading;
 
-namespace Root_WIND2
+namespace Root_CAMELLIA
 {
     /// <summary>
     /// OHT_UI.xaml에 대한 상호 작용 논리
@@ -94,7 +94,7 @@ namespace Root_WIND2
                 m_OHT.m_doReady.p_bOn = false;
                 m_OHT.m_doES.p_bOn = true;
                 m_OHT.m_bAuto = true;
-                if ((m_loadport.m_diPlaced.p_bIn || !m_loadport.p_diPresent.p_bIn) && m_OHT.p_eState == OHT_Semi.eState.All_Off)
+                if ((m_loadport.p_diPlaced.p_bIn || !m_loadport.p_diPresent.p_bIn) && m_OHT.p_eState == OHT_Semi.eState.All_Off)
                 {
                     m_carrier.p_eTransfer = GemCarrierBase.eTransfer.ReadyToUnload;
                 }
@@ -111,11 +111,11 @@ namespace Root_WIND2
             textBlockPlaced.Foreground = !m_loadport.p_diPlaced.p_bIn ? Brushes.White : Brushes.Gray;
             textBlockPresent.Foreground = !m_loadport.p_diPresent.p_bIn ? Brushes.White : Brushes.Gray;
 
-            if (m_OHT.p_eState == OHT_Semi.eState.All_Off && !m_OHT.m_bOHTErr && (!m_loadport.m_diPlaced.p_bIn || !m_loadport.p_diPresent.p_bIn))
+            if (m_OHT.p_eState == OHT_Semi.eState.All_Off && !m_OHT.m_bOHTErr && (!m_loadport.p_diPlaced.p_bIn || !m_loadport.p_diPresent.p_bIn))
             {
                 m_carrier.p_ePresentSensor = GemCarrierBase.ePresent.Exist;
             }
-            else if (m_loadport.m_diPlaced.p_bIn && m_loadport.p_diPresent.p_bIn)
+            else if (m_loadport.p_diPlaced.p_bIn && m_loadport.p_diPresent.p_bIn)
             {
                 m_carrier.p_ePresentSensor = GemCarrierBase.ePresent.Exist;
                 bStartTD3 = false;
@@ -124,12 +124,12 @@ namespace Root_WIND2
             {
                 if (m_carrier.p_eTransfer == GemCarrierBase.eTransfer.ReadyToLoad)
                 {
-                    if ((!m_loadport.m_diPlaced.p_bIn || !m_loadport.p_diPresent.p_bIn) && !bStartTD3)
+                    if ((!m_loadport.p_diPlaced.p_bIn || !m_loadport.p_diPresent.p_bIn) && !bStartTD3)
                     {
                         m_OHT.StartTD3();
                         bStartTD3 = true;
                     }
-                    if (!m_loadport.m_diPlaced.p_bIn && !m_loadport.p_diPresent.p_bIn && m_carrier.p_eTransfer == GemCarrierBase.eTransfer.ReadyToLoad)
+                    if (!m_loadport.p_diPlaced.p_bIn && !m_loadport.p_diPresent.p_bIn && m_carrier.p_eTransfer == GemCarrierBase.eTransfer.ReadyToLoad)
                     {
                         m_carrier.p_ePresentSensor = GemCarrierBase.ePresent.Exist;
                         bStartTD3 = false;
@@ -137,12 +137,12 @@ namespace Root_WIND2
                 }
                 if (m_carrier.p_eTransfer == GemCarrierBase.eTransfer.ReadyToUnload)
                 {
-                    if ((m_loadport.m_diPlaced.p_bIn || m_loadport.p_diPresent.p_bIn) && !bStartTD3)
+                    if ((m_loadport.p_diPlaced.p_bIn || m_loadport.p_diPresent.p_bIn) && !bStartTD3)
                     {
                         m_OHT.StartTD3();
                         bStartTD3 = true;
                     }
-                    else if (m_loadport.m_diPlaced.p_bIn && m_loadport.p_diPresent.p_bIn && m_carrier.p_eTransfer == GemCarrierBase.eTransfer.ReadyToLoad)
+                    else if (m_loadport.p_diPlaced.p_bIn && m_loadport.p_diPresent.p_bIn && m_carrier.p_eTransfer == GemCarrierBase.eTransfer.ReadyToLoad)
                     {
                         m_carrier.p_ePresentSensor = GemCarrierBase.ePresent.Empty;
                         bStartTD3 = false;
@@ -188,14 +188,14 @@ namespace Root_WIND2
             {
                 if (m_carrier.p_eTransfer == GemCarrierBase.eTransfer.ReadyToLoad)
                 {
-                    if (!m_loadport.m_diPlaced.p_bIn || !m_loadport.p_diPresent.p_bIn)
+                    if (m_loadport.m_diPlaced.p_bIn && m_loadport.p_diPresent.p_bIn)
                     {
                         m_carrier.p_ePresentSensor = GemCarrierBase.ePresent.Exist;
                     }
                 }
                 else if (m_carrier.p_eTransfer == GemCarrierBase.eTransfer.ReadyToUnload)
                 {
-                    if (m_loadport.m_diPlaced.p_bIn || m_loadport.p_diPresent.p_bIn)
+                    if (!m_loadport.m_diPlaced.p_bIn && !m_loadport.p_diPresent.p_bIn)
                     {
                         m_carrier.p_ePresentSensor = GemCarrierBase.ePresent.Empty;
                     }
@@ -208,7 +208,7 @@ namespace Root_WIND2
                 //{
                 //    m_carrier.p_eTransfer = GemCarrierBase.eTransfer.TransferBlocked;
                 //}   
-                //if(!m_loadport.m_diPlaced.p_bIn || !m_loadport.m_diPresent.p_bIn)
+                //if(!m_loadport.m_diPlaced.p_bIn || !m_loadport.p_diPresent.p_bIn)
                 //{
                 //    m_carrier.p_ePresentSensor = GemCarrierBase.ePresent.Exist;
                 //}
