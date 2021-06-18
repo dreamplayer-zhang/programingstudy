@@ -1200,9 +1200,10 @@ namespace Root_CAMELLIA.LibSR_Met
                 }
                 Stopwatch sw1 = new Stopwatch();
                 sw1.Start();
-                m_Calculation.CalcTransmittance_OptimizingSi(nPointIndex, ConstValue.SI_AVG_OFFSET_RANGE, ConstValue.SI_AVG_OFFSET_STEP, nDNum, dThickness);
+                m_Calculation.CalcTransmittance_OptimizingSi(nPointIndex, ConstValue.SI_AVG_OFFSET_RANGE, ConstValue.SI_AVG_OFFSET_STEP, nDNum, dThickness, CalTWavelenghList);
                 sw1.Stop();
                 Debug.WriteLine("Cal t >> " + sw1.ElapsedMilliseconds.ToString());
+               
                 Stopwatch sw2 = new Stopwatch();
                 sw2.Start();
                 m_Calculation.PointCalcTransmittance_OptimizingSi(nPointIndex, ConstValue.SI_AVG_OFFSET_RANGE, ConstValue.SI_AVG_OFFSET_STEP, nDNum, dThickness, CalTWavelenghList);
