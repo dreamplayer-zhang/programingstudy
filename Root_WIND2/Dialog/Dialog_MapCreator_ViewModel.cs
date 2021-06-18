@@ -149,6 +149,16 @@ namespace Root_WIND2
                 SetProperty<int>(ref this.roiHeight, value);
             }
         }
+
+        private int chipSimilarity = 70;
+        public int ChipSimilarity
+        {
+            get => this.chipSimilarity;
+            set
+            {
+                SetProperty<int>(ref this.chipSimilarity, value);
+            }
+        }
         #endregion
 
         #region [Command]

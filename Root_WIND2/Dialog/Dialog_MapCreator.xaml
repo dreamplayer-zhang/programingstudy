@@ -91,7 +91,7 @@
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
                         <TextBlock Text="Similarity: " Style="{StaticResource group_box_item_name_text}"/>
-                        <TextBox Grid.Column="2" IsEnabled="True" Text="{Binding CamResolutionX}" HorizontalContentAlignment="Center"/>
+                        <TextBox Grid.Column="2" IsEnabled="True" Text="{Binding ChipSimilarity}" HorizontalContentAlignment="Center"/>
                     </Grid>
 
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
