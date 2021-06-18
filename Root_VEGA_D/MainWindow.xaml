@@ -30,6 +30,35 @@
             <Setter Property="HorizontalAlignment"
                     Value="Left" />
         </Style>
+        <Style TargetType="{x:Type ToggleButton}" x:Key="IO_indicator">
+            <Setter Property="BorderThickness" Value="0"></Setter>
+            <Setter Property="Background" Value="{PriorityBinding}"></Setter>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ToggleButton">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <Grid Background="Transparent" Name="grd" Grid.Column="1"
+                                    Margin="{TemplateBinding Padding}" VerticalAlignment="Center"
+                                  Height="20"
+                                    Width="20">
+                                <Ellipse x:Name="ellipse" Stroke="{TemplateBinding BorderBrush}"
+                                        StrokeThickness="2" Stretch="Uniform"
+                                        Fill="{TemplateBinding  Background}"></Ellipse>
+                            </Grid>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsChecked" Value="False">
+                                <Setter TargetName="ellipse" Property="Fill" Value="#FFBBBBBB" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
     </Window.Resources>
 
     <Grid>

@@ -23,10 +23,22 @@ namespace Root_EFEM.Module
         {
             m_alid_WaferExist.Run(true, "Aligner Wafer Exist Error");
         }
-        
-        #region ToolBox
 
+        #region ToolBox
         RS232 m_rs232;
+        bool _open = false;
+        public bool p_open
+		{
+            get 
+            {
+                return _open;
+            }
+            set
+			{
+                _open = value;
+                OnPropertyChanged();
+			}
+		}
         public DIO_I p_diPlaced
         {
             get
@@ -114,6 +126,8 @@ namespace Root_EFEM.Module
         private DIO_I m_diRun;
 
         public OHT_Semi m_OHT;
+        public OHT_Semi m_OHTsemi { get; set; }
+
         OHT _OHT;
         public OHT m_OHTNew
         {
