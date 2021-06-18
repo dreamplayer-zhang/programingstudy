@@ -409,18 +409,18 @@ namespace Root_Pine2_Vision.Module
         #endregion
 
         #region RunSnap
-        public string StartSnap(Recipe.Snap recipe, eWorks eWorks, string sRecipe, int iSnap)
+        public string StartSnap(Recipe.Snap recipe, eWorks eWorks, int iSnap)
         {
             Run_Snap run = (Run_Snap)m_runSnap.Clone();
             run.m_eWorks = eWorks; 
             run.m_recipe = recipe;
-            run.m_sRecipe = sRecipe;
             run.m_iSnap = iSnap; 
             return StartRun(run); 
         }
 
-        public string RunSnap(Recipe.Snap recipe, eWorks eWorks, string sRecipe, int iSnap)
+        public string RunSnap(Recipe.Snap recipe, eWorks eWorks, int iSnap)
         {
+            EQ.p_bStop = false; 
             MemoryData memory = m_aWorks[eWorks].p_memSnap[(int)recipe.m_eEXT];
             CPoint cpOffset = recipe.GetMemoryOffset();
             GrabData grabData = recipe.GetGrabData(eWorks);
@@ -433,7 +433,7 @@ namespace Root_Pine2_Vision.Module
                     //Thread.Sleep(10);
                     //if (EQ.IsStop()) return "EQ Stop";
                 //}
-                //m_aWorks[eWorks].SendSnapDone(sRecipe, iSnap); 
+                //m_aWorks[eWorks].SendSnapDone(iSnap); 
             }
             finally 
             {
@@ -615,6 +615,7 @@ namespace Root_Pine2_Vision.Module
 
             public override string Run()
             {
+                EQ.p_bStop = false; 
                 switch (m_eRemoteRun)
                 {
                     case eRemoteRun.StateHome: return m_module.StateHome();
@@ -677,7 +678,6 @@ namespace Root_Pine2_Vision.Module
             }
 
             public eWorks m_eWorks = eWorks.A;
-            public string m_sRecipe = "";
             public int m_iSnap = 0; 
             public Recipe.Snap m_recipe; 
             public override ModuleRunBase Clone()
@@ -685,7 +685,6 @@ namespace Root_Pine2_Vision.Module
                 Run_Snap run = new Run_Snap(m_module);
                 run.m_eWorks = m_eWorks; 
                 run.m_recipe = m_recipe.Clone();
-                run.m_sRecipe = m_sRecipe;
                 run.m_iSnap = m_iSnap; 
                 return run;
             }
@@ -693,14 +692,13 @@ namespace Root_Pine2_Vision.Module
             public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
             {
                 m_eWorks = (eWorks)tree.Set(m_eWorks, m_eWorks, "Works", "Vision eWorks", bVisible);
-                m_sRecipe = tree.Set(m_sRecipe, m_sRecipe, "Recipe", "Recipe", bVisible);
                 m_iSnap = tree.Set(m_iSnap, m_iSnap, "Snap Index", "Snap Index", bVisible); 
                 m_recipe.RunTree(tree, bVisible); 
             }
 
             public override string Run()
             {
-                return m_module.RunSnap(m_recipe, m_eWorks, m_sRecipe, m_iSnap);
+                return m_module.RunSnap(m_recipe, m_eWorks, m_iSnap);
             }
         }
 

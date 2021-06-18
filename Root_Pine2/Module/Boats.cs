@@ -166,7 +166,7 @@ namespace Root_Pine2.Module
                 {
                     m_vision.RunLight(snap.m_lightPower);
                     if (Run(RunMoveSnapStart(eWorks, snap))) return p_sInfo;
-                    m_vision.StartSnap(snap, eWorks, p_sRecipe, iSnap);
+                    m_vision.StartSnap(snap, eWorks, iSnap);
                     if (Run(m_aBoat[eWorks].RunSnap())) return p_sInfo;
                     if (m_vision.IsBusy()) EQ.p_bStop = true;
                     iSnap++; 
@@ -198,6 +198,18 @@ namespace Root_Pine2.Module
                 m_aBoat[Vision2D.eWorks.B].p_sRecipe = value;
                 m_vision.SetRecipe(value); 
             }
+        }
+
+        public void RecipeOpen(string sRecipe)
+        {
+            if (p_sRecipe != sRecipe)
+            {
+                p_sRecipe = sRecipe;
+                return;
+            }
+            m_aBoat[Vision2D.eWorks.A].m_recipe.RecipeOpen(sRecipe);
+            m_aBoat[Vision2D.eWorks.B].m_recipe.RecipeOpen(sRecipe);
+            m_vision.SetRecipe(sRecipe); 
         }
         #endregion
 
@@ -271,21 +283,25 @@ namespace Root_Pine2.Module
                 InitModuleRun(module);
             }
 
+            public string m_sRecipe = "";
             public Vision2D.eWorks m_eWorks; 
             public override ModuleRunBase Clone()
             {
                 Run_Snap run = new Run_Snap(m_module);
+                run.m_sRecipe = m_sRecipe;
                 run.m_eWorks = m_eWorks;
                 return run;
             }
 
             public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
             {
+                m_sRecipe = tree.Set(m_sRecipe, m_sRecipe, m_module.m_vision.GetRecipeList(), "Recipe", "Recipe", bVisible);
                 m_eWorks = (Vision2D.eWorks)tree.Set(m_eWorks, m_eWorks, "eWorks", "Select Boat", bVisible); 
             }
 
             public override string Run()
             {
+                m_module.RecipeOpen(m_sRecipe); 
                 return m_module.RunSnap(m_eWorks); 
             }
         }
