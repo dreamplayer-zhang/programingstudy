@@ -455,7 +455,7 @@ namespace Root_Pine2_Vision.Module
 
         public string ReqSnap(string sRecipe, eWorks eWorks)
         {
-            string sSend = m_nReq.ToString("000,") + Works2D.eProtocol.Snap.ToString() + "," + sRecipe + "," + eWorks.ToString();
+            string sSend = m_nReq.ToString("000") + "," + Works2D.eProtocol.Snap.ToString() + "," + sRecipe + "," + eWorks.ToString();
             m_sReceive = "";
             m_tcpRequest.Send(sSend); 
             while (sSend != m_sReceive)
