@@ -1797,6 +1797,7 @@ namespace Root_CAMELLIA.LibSR_Met
                 sp.Open();
 
                 sp.Write("t");
+                sp.ReadTimeout = 1000;
                 string OutputData = sp.ReadLine();
                 string[] strtext = new string[7] { "H0:", "T0:", "L0:", "H1:", "T1:", "L1:", "Time:" };
                 string[] arr = OutputData.Split(':');
@@ -1878,7 +1879,7 @@ namespace Root_CAMELLIA.LibSR_Met
                 }
                 sp.Write("c");
             }
-            catch
+            catch(Exception e)
             {
                 
             }

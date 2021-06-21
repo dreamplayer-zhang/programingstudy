@@ -38,6 +38,7 @@ namespace Root_CAMELLIA.Module
     {
         public DataManager m_DataManager;
         public MainWindow_ViewModel mwvm;
+        
         InfoCarrier[] infoCarrier = new InfoCarrier[2];
         Log m_camelliaLog;
         #region ToolBox
@@ -646,7 +647,7 @@ namespace Root_CAMELLIA.Module
 
         private string MoveReadyPos()
         {
-            if (p_axisLifter.IsInPos(ePosition.Position_0)) return "OK";
+            if (p_axisLifter.IsInPos(eAxisPos.Ready)) return "OK";
 
             /* XY Ready 위치 이동 */
             if (Run(p_axisXY.p_axisX.StartMove(eAxisPos.Ready)))
@@ -712,6 +713,7 @@ namespace Root_CAMELLIA.Module
         {
             // Make Directory
             //App.m_SSLoggerNet.WriteXFRLog(nID, SSLNet.XFR_EVENTID.GET, SSLNet.STATUS.END,);
+            MarsLogManager.Instance.WritePRC(EQ.p_nRunLP, BaseDefine.LOG_DEVICE_ID, SSLNet.PRC_EVENTID.Process, SSLNet.STATUS.END, this.p_id, 0);
             return "OK";
         }
 
@@ -721,6 +723,7 @@ namespace Root_CAMELLIA.Module
             GeneralTools.MakeDirectory(p_dataSavePath);
 
             MarsLogManager.Instance.ChangeMaterial(EQ.p_nRunLP, p_infoWafer.m_nSlot + 1, p_infoWafer.p_sLotID, p_infoWafer.p_sCarrierID, p_infoWafer.p_sRecipe);
+            MarsLogManager.Instance.WritePRC(EQ.p_nRunLP, BaseDefine.LOG_DEVICE_ID, SSLNet.PRC_EVENTID.Process, SSLNet.STATUS.START, this.p_id, 0);
             return "OK";
         }
 
