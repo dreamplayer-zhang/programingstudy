@@ -358,6 +358,30 @@ namespace RootTools.Camera.BaslerPylon
             }
         }
 
+        public void SetMulticast()
+        {
+            if (p_CamInfo._DeviceUserID == "") return;
+            List<ICameraInfo> allCameras = CameraFinder.Enumerate();    //SEHException 에러 나는경우 Lib/BaslerRuntime 내 파일들을 실행위치로 복사 요망
+            ICameraInfo ConnectCamInfo = null;
+            foreach (ICameraInfo cameraInfo in allCameras)
+            {
+                if (p_CamInfo._DeviceUserID == cameraInfo[CameraInfoKey.UserDefinedName])
+                {
+                    ConnectCamInfo = cameraInfo;
+                    UpdateCamInfo(ConnectCamInfo, m_cam);
+                    break;
+                }
+            }
+
+            m_cam.Parameters[PLStream.TransmissionType].TrySetValue(PLStream.TransmissionType.Multicast);
+            string strTemp = m_cam.Parameters[PLStream.TransmissionType].GetValue();
+            UpdateCamInfo(ConnectCamInfo, m_cam);
+
+            m_cam.Parameters[PLCamera.GevSCPSPacketSize].SetValue(576);
+            m_cam.Parameters[PLCamera.GevSCBWRA].SetValue(10);
+         
+        }
+
         void bgw_Connect_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             RunTree(Tree.eMode.Init);
@@ -898,7 +922,7 @@ namespace RootTools.Camera.BaslerPylon
             }
             catch (Exception exception)
             {
-                MessageBox.Show(exception.ToString());
+                m_log.Info(exception.Message);
             }
             finally
             {
