@@ -1,7 +1,6 @@
 ﻿using Root_EFEM;
 using Root_EFEM.Module;
 using Root_VEGA_D.Module;
-using Root_VEGA_D_IPU.Module;
 using RootTools;
 using RootTools.GAFs;
 using RootTools.Gem;
@@ -36,7 +35,6 @@ namespace Root_VEGA_D.Engineer
         public VEGA_D_Recipe m_recipe;
         public VEGA_D_Process m_process;
         public Vision m_vision;
-        public Vision_IPU m_visionIPU;
         public HomeProgress_UI m_HomeProgress = new HomeProgress_UI();
         public Interlock m_interlock;
         public TowerLamp m_towerlamp;
@@ -53,8 +51,6 @@ namespace Root_VEGA_D.Engineer
             m_vision = new Vision("Vision", m_engineer);
             InitModule(m_vision);
             iWTR.AddChild(m_vision);
-            m_visionIPU = new Vision_IPU("Vision_IPU", m_engineer);
-            InitModule(m_visionIPU);
             m_FFU = new FFU("FFU", m_engineer);
             InitModule(m_FFU);
             m_interlock = new Interlock("Interlock", m_engineer,m_engineer.m_ACS);
@@ -199,6 +195,7 @@ namespace Root_VEGA_D.Engineer
         #endregion
 
         #region StateHome
+        public bool m_bIsPossible_Recovery = false;
         public string StateHome()
         {
             m_HomeProgress.HomeProgressShow();
@@ -211,10 +208,10 @@ namespace Root_VEGA_D.Engineer
                 EQ.p_eState = EQ.eState.Init;
                 return sInfo;
             }
-            sInfo = StateHome(m_interlock, (ModuleBase)m_aLoadport[0], (ModuleBase)m_aLoadport[1], m_vision, m_visionIPU, m_towerlamp, (RFID_Brooks)m_aRFID[0], (RFID_Brooks)m_aRFID[1], m_FFU);
+            if(!m_wtr.m_diArmClose.p_bIn) m_wtr.m_alidRTRArmError.Run(true, "RTR Arm is not close in home motion");
+            sInfo = StateHome(m_interlock, (ModuleBase)m_aLoadport[0], (ModuleBase)m_aLoadport[1], m_vision, m_towerlamp, (RFID_Brooks)m_aRFID[0], (RFID_Brooks)m_aRFID[1], m_FFU);
             if (sInfo == "OK") EQ.p_eState = EQ.eState.Ready;
-            //if (sInfo == "OK") m_bIsPossible_Recovery = true;
-            if (sInfo == "OK") EQ.p_eState = EQ.eState.Ready;
+            if (sInfo == "OK") m_bIsPossible_Recovery = true;
             return sInfo;
         }
 
@@ -393,15 +390,18 @@ namespace Root_VEGA_D.Engineer
                 {
                     case EQ.eState.Home: StateHome(); break;
                     case EQ.eState.Run:
+                        m_engineer.m_handler.m_bIsPossible_Recovery = false;
+                        if (!m_wtr.m_diArmClose.p_bIn)
+                        {
+                            m_wtr.m_alidRTRArmError.Run(true, "RTR Arm is open in Cycle");
+                            break;
+                        }
                         if (p_moduleList.m_qModuleRun.Count == 0)
                         {
                             m_process.p_sInfo = m_process.RunNextSequence();
                             if ((EQ.p_nRnR > 1) && (m_process.m_qSequence.Count == 0))
                             {
                                 while (m_aLoadport[EQ.p_nRunLP].p_infoCarrier.p_eState != InfoCarrier.eState.Placed) Thread.Sleep(10);
-                                //m_process.p_sInfo = m_process.AddInfoWafer(m_infoRnRSlot);
-                                m_infoRnRSlot.RecipeOpen("C:\\Recipe\\VEGA_D\\" + "OnlyOne.Vega_D");
-                                AddSequence(m_infoRnRSlot);
                                 m_process.p_sInfo = m_process.AddInfoWafer(m_infoRnRSlot);
                                 CalcSequence();
                                 //m_nRnR--;

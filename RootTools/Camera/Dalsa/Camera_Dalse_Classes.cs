@@ -418,13 +418,13 @@ namespace RootTools.Camera.Dalsa
                 m_sapCam.SetFeatureValue("TriggerMode", "Internal");
             p_eTriggerMode = eTriggerMode.Internal;
         }
-        bool SetPowerupUserset(eUserSet userset)
+        public bool SetPowerupUserset(eUserSet userset)
         {
             if (m_sapCam == null) return false;
 
             return m_sapCam.SetFeatureValue("UserSetDefaultSelector", userset.ToString());
         }
-        bool GetPowerupUserset(ref eUserSet userset)
+        public bool GetPowerupUserset(ref eUserSet userset)
         {
             if (m_sapCam == null) return false;
 
@@ -435,13 +435,13 @@ namespace RootTools.Camera.Dalsa
 
             return bOk;
         }
-        bool SetCurrentUserset(eUserSet userset)
+        public bool SetCurrentUserset(eUserSet userset)
         {
             if (m_sapCam == null) return false;
 
             return m_sapCam.SetFeatureValue("UserSetSelector", userset.ToString());
         }
-        bool GetCurrentUserset(ref eUserSet userset)
+        public bool GetCurrentUserset(ref eUserSet userset)
         {
             if (m_sapCam == null) return false;
 
@@ -452,19 +452,19 @@ namespace RootTools.Camera.Dalsa
 
             return bOk;
         }
-        bool LoadUserset()
+        public bool LoadUserset()
         {
             if (m_sapCam == null) return false;
 
             return m_sapCam.SetFeatureValue("UserSetLoad", "");
         }
-        bool SetRotaryEncoderMultiplier(int mul)
+        public bool SetRotaryEncoderMultiplier(int mul)
         {
             if (m_sapCam == null) return false;
 
             return m_sapCam.SetFeatureValue("rotaryEncoderMultiplier", mul);
         }
-        bool GetRotaryEncoderMultiplier(ref int mul)
+        public bool GetRotaryEncoderMultiplier(ref int mul)
         {
             if (m_sapCam == null) return false;
 
@@ -475,13 +475,13 @@ namespace RootTools.Camera.Dalsa
 
             return bOk;
         }
-        bool SetRotaryEncoderDivider(int div)
+        public bool SetRotaryEncoderDivider(int div)
         {
             if (m_sapCam == null) return false;
 
             return m_sapCam.SetFeatureValue("rotaryEncoderDivider", div);
         }
-        bool GetRotaryEncoderDivider(ref int div)
+        public bool GetRotaryEncoderDivider(ref int div)
         {
             if (m_sapCam == null) return false;
 

@@ -16,6 +16,7 @@ namespace Root_EFEM.Module
         RS232 m_rs232;
         public IHandler m_handle;
         ILoadport m_loadport;
+        public string m_sResult;
 
         public RFID_Brooks(string sID, IEngineer engineer, ILoadport loadport)
         {
@@ -331,21 +332,26 @@ namespace Root_EFEM.Module
 
             public override string Run()
             {
-                string sResult = "OK";
-                //if (EQ.p_bSimulate) m_module.m_sReadID = m_sSimulCarrierID;
-                //else
-                //{
-                //    if (m_bRFID)
-                //    {
-                //        sResult = m_module.ReadRFID();
-                //    }
-                //}
-                sResult = m_module.ReadRFID();
-                if (sResult == "OK")
+				m_module.m_sResult = "";
+				//if (EQ.p_bSimulate) m_module.m_sReadID = m_sSimulCarrierID;
+				//else
+				//{
+				//    if (m_bRFID)
+				//    {
+				//        sResult = m_module.ReadRFID();
+				//    }
+				//}
+				string sResult = m_module.ReadRFID();
+				if (sResult == "OK")
+                {
                     m_log.Info(m_module.m_sReadID);
-                if(m_module.m_loadport != null)
-                    m_module.m_loadport.p_infoCarrier.p_sCarrierID = m_module.m_sReadID;
-                return sResult;
+                    if (m_module.m_loadport != null)
+                        m_module.m_loadport.p_infoCarrier.p_sCarrierID = m_module.m_sReadID;
+                }
+                m_module.m_sResult = sResult;
+
+                //return sResult;
+                return "OK";
             }
         }
         #endregion

@@ -490,7 +490,13 @@ namespace RootTools_Vision
             }
         }
 
-        public void OpenKlafMapData(StreamReader stdFile)
+        public void OpenXmlMapData(StreamReader stdFile)
+        {
+            // [ 2021-06-21 ] : Developed by jhan
+
+        }
+
+        public void OpenKlarfMapData(StreamReader stdFile)
         {
             // [ 2021-06-15 ] : Imported by jhan from VisionWorks2
 

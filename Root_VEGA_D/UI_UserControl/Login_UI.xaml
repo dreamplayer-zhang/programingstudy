@@ -1,0 +1,51 @@
+﻿<Window x:Class="Root_VEGA_D.Login_UI"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Root_VEGA_D"
+        mc:Ignorable="d"
+        Title="Login Window" Height="300" Width="600" Background="{StaticResource PanelBackGround}" FontFamily="Arial">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition></RowDefinition>
+            <RowDefinition></RowDefinition>
+            <RowDefinition></RowDefinition>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="0.5*"></ColumnDefinition>
+            <ColumnDefinition Width="2*"></ColumnDefinition>
+        </Grid.ColumnDefinitions>
+        <Border Grid.Row="0" Grid.Column="0" BorderBrush="Black" Margin="5,5,0,5" BorderThickness="1,1,0,1">
+            <TextBlock Text="ID" FontSize="60" HorizontalAlignment="Left" VerticalAlignment="Center" Padding="5,0,5,0"></TextBlock>
+        </Border>
+
+        <Border Grid.Row="0" Grid.Column="1" BorderBrush="Black" Margin="0,5,5,5" BorderThickness="0,1,1,1">
+            <TextBox  Background="White" HorizontalContentAlignment="Center"  VerticalContentAlignment="Center" FontSize="40" Margin="5" x:Name="textBoxID" Padding="5,0,5,0" ></TextBox>
+        </Border>
+
+        <Border Grid.Row="1" Grid.Column="0"  BorderBrush="Black" Margin="5,5,0,5" BorderThickness="1,1,0,1">
+            <TextBlock Text="PW" FontSize="60" HorizontalAlignment="Left" VerticalAlignment="Center" Padding="5,0,5,0"></TextBlock>
+        </Border>
+
+        <Border Grid.Row="1" Grid.Column="1" BorderBrush="Black" Margin="0,5,5,5" BorderThickness="0,1,1,1">
+            <TextBox Background="White" HorizontalContentAlignment="Center"  VerticalContentAlignment="Center" FontSize="40" Margin="5" x:Name="textBoxPW" Padding="5,0,5,0"></TextBox>
+        </Border>
+        <Border Grid.Row="2" Grid.ColumnSpan="2">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1*"></ColumnDefinition>
+                    <ColumnDefinition Width="0.5*"></ColumnDefinition>
+                </Grid.ColumnDefinitions>
+                <Border Grid.Column="0" BorderBrush="Black" BorderThickness="1" Margin="5">
+                    <TextBlock x:Name="textBlockLoginLevel" FontSize="40" Text="{Binding p_eLevel}" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center"></TextBlock>
+                </Border>
+                <Border Grid.Column="1" BorderBrush="Black" BorderThickness="1" Margin="5">
+                    <Button x:Name="btnLogin" Content="Login" FontSize="40" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold" Click="Login_Click"/>
+                    <!--<Button x:Name="login" Content="login" FontSize="40" HorizontalContentAlignment="center" VerticalContentAlignment="center" FontWeight="bold" Click="">
+                    </Button>-->
+                </Border>
+            </Grid>
+        </Border>
+    </Grid>
+</Window>

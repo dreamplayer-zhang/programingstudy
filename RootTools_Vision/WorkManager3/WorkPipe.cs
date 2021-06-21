@@ -927,9 +927,9 @@ namespace RootTools_Vision.WorkManager3
                 new CRect
                 (
                     workplace.PositionX,
-                    workplace.PositionY + workplace.Height,
+                    workplace.PositionY,
                     workplace.PositionX + workplace.Width,
-                    workplace.PositionY),
+                    workplace.PositionY + workplace.Height),
                     buffer.BufferList[i]);
             }
 

@@ -1,6 +1,13 @@
-﻿using Root_EFEM.Module;
+﻿using Emgu.CV;
+using Emgu.CV.Cvb;
+using Emgu.CV.CvEnum;
+using Emgu.CV.Structure;
+using Emgu.CV.Util;
+using Root_EFEM.Module;
 using Root_VEGA_D_IPU.Module;
+using Root_VEGA_D.Engineer;
 using RootTools;
+using RootTools.Camera;
 using RootTools.Camera.BaslerPylon;
 using RootTools.Camera.Dalsa;
 using RootTools.Comm;
@@ -13,12 +20,16 @@ using RootTools.Memory;
 using RootTools.Module;
 using RootTools.RADS;
 using RootTools.Trees;
+using RootTools_Vision;
 using RootTools_Vision.Utility;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Net.Sockets;
 using System.Threading;
+using System.Windows;
+using System.Windows.Threading;
 
 namespace Root_VEGA_D.Module
 {
@@ -27,15 +38,24 @@ namespace Root_VEGA_D.Module
         #region GAF
         public ALID m_visionHomeError;
         public ALID m_visionInspectError;
+        public ALID m_alidShutterSensor;
+        public ALID m_alidReticleLocateInfoError;
         public ALID m_alidShutterDownError;
         public ALID m_alidShutterUpError;
         ALID m_alid_WaferExist;
+        public ALID m_alidPMCoaxialError;
+        public ALID m_alidPMTransmittedError;
+        public ALID m_alidPMFail;
+
         void InitGAF()
         {
             m_visionHomeError = m_gaf.GetALID(this, "Vision Home Error", "Vision Home Error");
             m_visionInspectError = m_gaf.GetALID(this, "Vision Inspect Error", "Vision Inspect Error");
             m_alidShutterDownError = m_gaf.GetALID(this, "VS Shutter Error", "Shutter is not down");
             m_alidShutterUpError = m_gaf.GetALID(this, "VS Shutter Error", "Shutter is not up");
+            m_alidPMCoaxialError = m_gaf.GetALID(this, "PM Error", "Coaxial Light PM Test is failed");
+            m_alidPMTransmittedError = m_gaf.GetALID(this, "PM Error", "Transmitted Light PM Test is failed");
+            m_alidPMFail = m_gaf.GetALID(this, "PM Fail", "PM is Fail, Pod is not load");
         }
         public void SetAlarm()
         {
@@ -49,10 +69,17 @@ namespace Root_VEGA_D.Module
         AxisXY m_axisXY;
         DIO_O m_doVac;
         DIO_O m_doBlow;
+        DIO_I m_diMaskProtrude1;//docking shutter에 존재하는 센서
+        DIO_I m_diMaskProtrude2;//docking shutter에 존재하는 센서
+        DIO_I m_diRobotHandProtrude;//docking shutter에 존재하는 센서
         DIO_O m_doShutterDown;
         DIO_O m_doShutterUp;
         DIO_I m_diShutterDownCheck;
         DIO_I m_diShutterUpCheck;
+        DIO_I m_diStageReticleCheck;
+        DIO_I m_diStageReticleTilt1;
+        DIO_I m_diStageReticleTilt2;
+
         MemoryPool m_memoryPool;
         MemoryGroup m_memoryGroup;
         MemoryData m_memoryMain;
@@ -61,7 +88,6 @@ namespace Root_VEGA_D.Module
 
         Camera_Dalsa m_CamMain;
         Camera_Basler m_CamAlign;
-        Camera_Basler m_CamAutoFocus;
         Camera_Basler m_CamRADS;
 
         KlarfData_Lot m_KlarfData_Lot;
@@ -69,6 +95,7 @@ namespace Root_VEGA_D.Module
 
         TCPIPComm_VEGA_D m_tcpipCommServer;
         RADSControl m_RADSControl;
+
 
         #region [Getter Setter]
         public Axis AxisRotate { get => m_axisRotate; private set => m_axisRotate = value; }
@@ -83,9 +110,10 @@ namespace Root_VEGA_D.Module
         public LightSet LightSet { get => m_lightSet; private set => m_lightSet = value; }
         public Camera_Dalsa CamMain { get => m_CamMain; private set => m_CamMain = value; }
         public Camera_Basler CamAlign { get => m_CamAlign; private set => m_CamAlign = value; }
-        public Camera_Basler CamAutoFocus { get => m_CamAutoFocus; private set => m_CamAutoFocus = value; }
+        public Camera_Basler CamRADS { get => m_CamRADS; private set => m_CamRADS = value; }
         public KlarfData_Lot KlarfData_Lot { get => m_KlarfData_Lot; private set => m_KlarfData_Lot = value; }
         public TCPIPComm_VEGA_D TcpipCommServer { get => m_tcpipCommServer; private set => m_tcpipCommServer = value; }
+        public RADSControl RADSControl { get => m_RADSControl; private set => m_RADSControl = value; }
         #endregion
 
         public override void GetTools(bool bInit)
@@ -95,27 +123,41 @@ namespace Root_VEGA_D.Module
             p_sInfo = m_toolBox.GetAxis(ref m_axisXY, this, "Axis XY");
             p_sInfo = m_toolBox.GetDIO(ref m_doVac, this, "Stage Vacuum");
             p_sInfo = m_toolBox.GetDIO(ref m_doBlow, this, "Stage Blow");
+            p_sInfo = m_toolBox.GetDIO(ref m_diMaskProtrude1, this, "Shutter Mask Protrude 1");
+            p_sInfo = m_toolBox.GetDIO(ref m_diMaskProtrude2, this, "Shutter Mask Protrude 2");
+            p_sInfo = m_toolBox.GetDIO(ref m_diRobotHandProtrude, this, "Shutter Robot Hand Protrude");
             p_sInfo = m_toolBox.GetDIO(ref m_doShutterUp, this, "Shutter Up");
             p_sInfo = m_toolBox.GetDIO(ref m_doShutterDown, this, "Shutter Down");
             p_sInfo = m_toolBox.GetDIO(ref m_diShutterUpCheck, this, "Shutter Up Check");
             p_sInfo = m_toolBox.GetDIO(ref m_diShutterDownCheck, this, "Shutter Down Check");
+            p_sInfo = m_toolBox.GetDIO(ref m_diStageReticleCheck, this, "Stage Reticle Check");
+            p_sInfo = m_toolBox.GetDIO(ref m_diStageReticleTilt1, this, "Stage Reticle Tilt Check 1");
+            p_sInfo = m_toolBox.GetDIO(ref m_diStageReticleTilt2, this, "Stage Reticle Tilt Check 2");
             p_sInfo = m_toolBox.Get(ref m_lightSet, this);
             p_sInfo = m_toolBox.GetCamera(ref m_CamMain, this, "MainCam");
             p_sInfo = m_toolBox.GetCamera(ref m_CamAlign, this, "AlignCam");
-            p_sInfo = m_toolBox.GetCamera(ref m_CamAutoFocus, this, "AutoFocusCam");
             p_sInfo = m_toolBox.GetCamera(ref m_CamRADS, this, "RADS");
             p_sInfo = m_toolBox.Get(ref m_LensLinearTurret, this, "LensTurret");
 
             p_sInfo = m_toolBox.Get(ref m_memoryPool, this, "Memory", 1);
-            m_alid_WaferExist = m_gaf.GetALID(this, "Vision Wafer Exist", "Vision Wafer Exist");
             //m_remote.GetTools(bInit);
 
-            bool bUseRADS = false;
-            //if (m_CamRADS.p_CamInfo != null) bUseRADS = true;
-            //p_sInfo = m_toolBox.Get(ref m_RADSControl, this, "RADSControl", bUseRADS);
+            InitALID();
+
+            p_sInfo = m_toolBox.Get(ref m_RADSControl, this, "RADSControl", true);
+        }
+        void InitALID()
+        {
+            m_visionHomeError = m_gaf.GetALID(this, "Vision Home Error", "Vision Home Error");
+            m_visionInspectError = m_gaf.GetALID(this, "Vision Inspect Error", "Vision Inspect Error");
+            m_alidShutterSensor = m_gaf.GetALID(this, "Shutter Sensor Error", "Shutter Sensor is detected");
+            m_alidShutterDownError = m_gaf.GetALID(this, "VS Shutter Error", "Shutter is not down");
+            m_alidShutterUpError = m_gaf.GetALID(this, "VS Shutter Error", "Shutter is not up");
+            m_alidReticleLocateInfoError = m_gaf.GetALID(this, "Reticle Locate Info is not Correct", "Reticle Locate Info is not Correct");
+            m_alidPMCoaxialError = m_gaf.GetALID(this, "PM Coaxial Check Error", "Coaxial Light PM Test is failed");
+            m_alidPMTransmittedError = m_gaf.GetALID(this, "PM Transmitted Check Error", "Transmitted Light PM Test is failed");
         }
         #endregion
-
 
         #region Grab Mode
         int m_lGrabMode = 0;
@@ -144,7 +186,7 @@ namespace Root_VEGA_D.Module
             foreach (GrabMode grabMode in m_aGrabMode)
             {
                 grabMode.m_ptXYAlignData = new RPoint(0, 0);
-                grabMode.m_dVRSFocusPos = 0;
+                //grabMode.m_dVRSFocusPos = 0;
             }
             this.RunTree(Tree.eMode.RegWrite);
             this.RunTree(Tree.eMode.Init);
@@ -162,6 +204,30 @@ namespace Root_VEGA_D.Module
             while (m_aGrabMode.Count > m_lGrabMode) m_aGrabMode.RemoveAt(m_aGrabMode.Count - 1);
             foreach (GrabMode grabMode in m_aGrabMode) grabMode.RunTreeName(tree.GetTree("Name", false));
             foreach (GrabMode grabMode in m_aGrabMode) grabMode.RunTree(tree.GetTree(grabMode.p_sName, false), true, false);
+        }
+        void RunTreeSetup(Tree tree)
+        {
+            m_eCheckWafer = (eCheckWafer)tree.Set(m_eCheckWafer, m_eCheckWafer, "CheckWafer", "CheckWafer");
+        }
+        #endregion
+
+        #region Light
+        public List<string> p_asLightSet
+        {
+            get
+            {
+                List<string> asLight = new List<string>();
+                foreach (Light light in m_lightSet.m_aLight) asLight.Add(light.m_sName);
+                return asLight;
+            }
+        }
+        public Light GetLight(string sLight)
+        {
+            foreach (Light light in m_lightSet.m_aLight)
+            {
+                if (sLight == light.m_sName) return light;
+            }
+            return null;
         }
         #endregion
 
@@ -310,30 +376,63 @@ namespace Root_VEGA_D.Module
             return m_waferSize.GetData(infoWafer.p_eSize).m_teachWTR;
         }
 
+        public string ShutterSafety()
+		{
+            if (!m_diMaskProtrude1.p_bIn) return "Mask Protrude 1 = "+ m_diMaskProtrude1.p_bIn;
+            if (!m_diMaskProtrude2.p_bIn) return "Mask Protrude 2 = "+ m_diMaskProtrude2.p_bIn;
+            if (!m_diRobotHandProtrude.p_bIn) return "Mask Protrude 1 = "+ m_diRobotHandProtrude.p_bIn;
+            Thread.Sleep(1000);
+            return "OK";
+        }
+        public string StageReticleCheck(bool bOn)
+        {
+            if (m_diStageReticleCheck.p_bIn == bOn) return "Reticle Check = " + m_diStageReticleCheck.p_bIn;
+            if (m_diStageReticleTilt1.p_bIn == bOn) return "Reticle Tilt 1 = " + m_diStageReticleTilt1.p_bIn;
+            if (m_diStageReticleTilt2.p_bIn == bOn) return "Reticle Tilt 2 = " + m_diStageReticleTilt2.p_bIn;
+            return "OK";
+        }
+
         public string BeforeGet(int nID)
         {
-            ////shutter
-            //m_doShutterUp.Write(false);
-            //Thread.Sleep(100);
-            //m_doShutterDown.Write(true);
-            //StopWatch sw = new StopWatch();
-            //sw.Start();
-            //while (!m_diShutterDownCheck.p_bIn || m_diShutterUpCheck.p_bIn)
-            //{
-            //    if (sw.ElapsedMilliseconds > 5000)
-            //    {
-            //        m_alidShutterDownError.Run(true, "Shutter error in Beforeget");
-            //    }
-            //}
-            ////
+            //shutter 
+            p_sInfo = ShutterSafety();
+            if (p_sInfo != "OK")
+            {
+                m_alidShutterSensor.Run(true, p_sInfo);
+                return p_sInfo;
+            }
+            m_doShutterUp.Write(false);
+            Thread.Sleep(100);
+            m_doShutterDown.Write(true);
+            StopWatch sw = new StopWatch();
+            sw.Start();
+            while (!m_diShutterDownCheck.p_bIn || m_diShutterUpCheck.p_bIn)
+            {
+                if (sw.ElapsedMilliseconds > 5000)
+                {
+                    m_alidShutterDownError.Run(true, "Shutter error in Beforeget");
+                }
+            }
+            //
+
+            // 레티클 유무 체크
+            p_sInfo = StageReticleCheck(false);//shutter Sensor check
+            if (p_sInfo != "OK")
+            {
+                m_alidReticleLocateInfoError.Run(true, p_sInfo);
+                return p_sInfo;
+            }
+
             if (p_eRemote == eRemote.Client) return RemoteRun(eRemoteRun.BeforeGet, eRemote.Client, nID);
             else
             {
                 if (Run(m_axisZ.StartMove(eAxisPosZ.Ready))) return p_sInfo;
                 if (Run(m_axisRotate.StartMove(eAxisPosRotate.Ready))) return p_sInfo;
-                if (Run(m_axisXY.StartMove(eAxisPosX.Ready))) return p_sInfo;
-
-                if (Run(m_axisXY.WaitReady()))
+                if (Run(m_axisXY.p_axisX.StartMove(eAxisPosX.Ready))) return p_sInfo;
+                if (Run(m_axisXY.p_axisY.StartMove(eAxisPosY.Ready))) return p_sInfo;
+                if (Run(m_axisXY.p_axisX.WaitReady()))
+                    return p_sInfo;
+                if (Run(m_axisXY.p_axisY.WaitReady()))
                     return p_sInfo;
                 if (Run(m_axisRotate.WaitReady()))
                     return p_sInfo;
@@ -355,28 +454,44 @@ namespace Root_VEGA_D.Module
 
         public string BeforePut(int nID)
         {
-            ////shutter
-            //m_doShutterUp.Write(false);
-            //Thread.Sleep(100);
-            //m_doShutterDown.Write(true);
-            //StopWatch sw = new StopWatch();
-            //sw.Start();
-            //while (!m_diShutterDownCheck.p_bIn || m_diShutterUpCheck.p_bIn)
-            //{
-            //    if (sw.ElapsedMilliseconds > 5000)
-            //    {
-            //        m_alidShutterDownError.Run(true, "Shutter error in Beforeput");
-            //    }
-            //}
-            ////
+            //shutter
+            p_sInfo = ShutterSafety();
+            if (p_sInfo != "OK")
+            {
+                m_alidShutterSensor.Run(true, p_sInfo);
+                return p_sInfo;
+            }
+            m_doShutterUp.Write(false);
+            Thread.Sleep(100);
+            m_doShutterDown.Write(true);
+            StopWatch sw = new StopWatch();
+            sw.Start();
+            while (!m_diShutterDownCheck.p_bIn || m_diShutterUpCheck.p_bIn)
+            {
+                if (sw.ElapsedMilliseconds > 5000)
+                {
+                    m_alidShutterDownError.Run(true, "Shutter error in Beforeput");
+                }
+            }
+            // 레티클 유무 체크
+            p_sInfo = StageReticleCheck(true);//shutter Sensor check
+            if (p_sInfo != "OK")
+            {
+                m_alidReticleLocateInfoError.Run(true, p_sInfo);
+                return p_sInfo;
+            }
+
             if (p_eRemote == eRemote.Client) return RemoteRun(eRemoteRun.BeforePut, eRemote.Client, nID);
             else
             {
                 if (Run(m_axisZ.StartMove(eAxisPosZ.Ready))) return p_sInfo;
                 if (Run(m_axisRotate.StartMove(eAxisPosRotate.Ready))) return p_sInfo;
-                if (Run(m_axisXY.StartMove(eAxisPosX.Ready))) return p_sInfo;
+                if (Run(m_axisXY.p_axisX.StartMove(eAxisPosX.Ready))) return p_sInfo;
+                if (Run(m_axisXY.p_axisY.StartMove(eAxisPosY.Ready))) return p_sInfo;
 
-                if (Run(m_axisXY.WaitReady()))
+                if (Run(m_axisXY.p_axisX.WaitReady()))
+                    return p_sInfo;
+                if (Run(m_axisXY.p_axisY.WaitReady()))
                     return p_sInfo;
                 if (Run(m_axisRotate.WaitReady()))
                     return p_sInfo;
@@ -396,39 +511,61 @@ namespace Root_VEGA_D.Module
 
         public string AfterGet(int nID)
         {
+            p_sInfo = StageReticleCheck(true);
+            if (p_sInfo != "OK")
+            {
+                m_alidReticleLocateInfoError.Run(true, p_sInfo);
+                return p_sInfo;
+            }
             ////shutter
-            //m_doShutterDown.Write(false);
-            //Thread.Sleep(100);
-            //m_doShutterUp.Write(true);
-            //StopWatch sw = new StopWatch();
-            //sw.Start();
-            //while (m_diShutterDownCheck.p_bIn || !m_diShutterUpCheck.p_bIn)
-            //{
-            //    if (sw.ElapsedMilliseconds > 5000)
-            //    {
-            //        m_alidShutterDownError.Run(true, "Shutter error in Afterget");
-            //    }
-            //}
-            ////
+            p_sInfo = ShutterSafety();
+            if (p_sInfo != "OK")
+            {
+                m_alidShutterSensor.Run(true, p_sInfo);
+                return p_sInfo;
+            }
+            m_doShutterDown.Write(false);
+            Thread.Sleep(100);
+            m_doShutterUp.Write(true);
+            StopWatch sw = new StopWatch();
+            sw.Start();
+            while (m_diShutterDownCheck.p_bIn || !m_diShutterUpCheck.p_bIn)
+            {
+                if (sw.ElapsedMilliseconds > 5000)
+                {
+                    m_alidShutterDownError.Run(true, "Shutter error in Afterget");
+                }
+            }
             return "OK";
         }
 
         public string AfterPut(int nID)
         {
+            p_sInfo = StageReticleCheck(false);
+            if (p_sInfo != "OK")
+            {
+                m_alidReticleLocateInfoError.Run(true, p_sInfo);
+                return p_sInfo;
+            }
             ////shutter
-            //m_doShutterDown.Write(false);
-            //Thread.Sleep(100);
-            //m_doShutterUp.Write(true);
-            //StopWatch sw = new StopWatch();
-            //sw.Start();
-            //while (m_diShutterDownCheck.p_bIn || !m_diShutterUpCheck.p_bIn)
-            //{
-            //    if (sw.ElapsedMilliseconds > 5000)
-            //    {
-            //        m_alidShutterDownError.Run(true, "Shutter error in Afterput");
-            //    }
-            //}
-            ////
+            p_sInfo = ShutterSafety();
+            if (p_sInfo != "OK")
+            {
+                m_alidShutterSensor.Run(true, p_sInfo);
+                return p_sInfo;
+            }
+            m_doShutterDown.Write(false);
+            Thread.Sleep(100);
+            m_doShutterUp.Write(true);
+            StopWatch sw = new StopWatch();
+            sw.Start();
+            while (m_diShutterDownCheck.p_bIn || !m_diShutterUpCheck.p_bIn)
+            {
+                if (sw.ElapsedMilliseconds > 5000)
+                {
+                    m_alidShutterDownError.Run(true, "Shutter error in Afterput");
+                }
+            }
             return "OK";
         }
 
@@ -442,7 +579,12 @@ namespace Root_VEGA_D.Module
         {
             switch (m_eCheckWafer)
             {
-                case eCheckWafer.Sensor: return false; // m_diWaferExist.p_bIn;
+                case eCheckWafer.Sensor:
+                    if (!(m_diStageReticleCheck.p_bIn == m_diStageReticleCheck.p_bIn && m_diStageReticleCheck.p_bIn == m_diStageReticleCheck.p_bIn))
+                    {
+                        m_alidReticleLocateInfoError.Run(true, "Reticle Sensor value is not same.");
+                    }
+                    return m_diStageReticleCheck.p_bIn || m_diStageReticleCheck.p_bIn || m_diStageReticleCheck.p_bIn;//jws tilt체크필요
                 default: return (p_infoWafer != null);
             }
         }
@@ -510,6 +652,186 @@ namespace Root_VEGA_D.Module
             base.RunTree(tree);
             RunTreeAxis(tree.GetTree("Axis", false));
             RunTreeGrabMode(tree.GetTree("Grab Mode", false));
+            RunTreeSetup(tree.GetTree("Setup", false));
+        }
+        #endregion
+
+        #region Vision Algorithm
+        Image<Gray, byte> GetGrayByteImageFromMemory(MemoryData mem, CRect crtROI)
+        {
+            if (crtROI.Width < 1 || crtROI.Height < 1) return null;
+            if (crtROI.Left < 0 || crtROI.Top < 0) return null;
+            if (crtROI.Width % 4 != 0)
+            {
+                int nSpare = 0;
+                while (((crtROI.Width + nSpare) % 4) != 0) nSpare++;
+                crtROI = new CRect(crtROI.Left, crtROI.Top, crtROI.Right + nSpare, crtROI.Bottom);
+            }
+            ImageData img = new ImageData(crtROI.Width, crtROI.Height, 1);
+            IntPtr p = mem.GetPtr();
+            img.SetData(p, crtROI, (int)mem.W);
+
+            byte[] barr = img.GetByteArray();
+            System.Drawing.Bitmap bmp = img.GetBitmapToArray(crtROI.Width, crtROI.Height, barr);
+            Image<Gray, byte> imgReturn = new Image<Gray, byte>(bmp);
+
+            return imgReturn;
+        }
+
+        public Image<Gray, byte> GetGrayByteImageFromMemory_12bit(MemoryData mem, CRect crtROI)
+        {
+            if (crtROI.Width < 1 || crtROI.Height < 1) return null;
+            if (crtROI.Left < 0 || crtROI.Top < 0) return null;
+            if (crtROI.Width % 4 != 0)
+            {
+                int nSpare = 0;
+                while (((crtROI.Width + nSpare) % 4) != 0) nSpare++;
+                crtROI = new CRect(crtROI.Left, crtROI.Top, crtROI.Right + nSpare, crtROI.Bottom);
+            }
+            string strTempFile = "D:\\AlignMarkTemplateImage\\TempAreaImage.bmp";
+            ImageData tempImgData = new ImageData(mem);
+            tempImgData.FileSaveGrayBMP(strTempFile, crtROI, 1);
+
+            return new Image<Gray, byte>(strTempFile);
+            //ImageData img = new ImageData(crtROI.Width, crtROI.Height, 1);
+            //IntPtr p = mem.GetPtr();
+            //img.SetData_12bit(p, crtROI, (int)(mem.W / mem.p_nByte));
+
+            //byte[] barr = img.GetByteArray();
+            //System.Drawing.Bitmap bmp = img.GetBitmapToArray(crtROI.Width, crtROI.Height, barr);
+            //Image<Gray, byte> imgReturn = new Image<Gray, byte>(bmp);
+
+            //return imgReturn;
+        }
+
+        public bool TemplateMatching(MemoryData mem, CRect crtSearchArea, Image<Gray, byte> imgSrc, Image<Gray, byte> imgTemplate, out CPoint cptCenter, double dMatchScore)
+        {
+            // variable
+            int nWidthDiff = 0;
+            int nHeightDiff = 0;
+            Point ptMaxRelative = new Point();
+            float fMaxScore = float.MinValue;
+            bool bFoundTemplate = false;
+
+            // implement
+            if (imgTemplate.Width > imgSrc.Width || imgTemplate.Height > imgSrc.Height)
+            {
+                cptCenter = new CPoint();
+                cptCenter.X = 0;
+                cptCenter.Y = 0;
+                return false;
+            }
+            Image<Gray, float> imgResult = imgSrc.MatchTemplate(imgTemplate, TemplateMatchingType.CcorrNormed);
+            nWidthDiff = imgSrc.Width - imgResult.Width;
+            nHeightDiff = imgSrc.Height - imgResult.Height;
+            float[,,] matches = imgResult.Data;
+
+            for (int x = 0; x < matches.GetLength(1); x++)
+            {
+                for (int y = 0; y < matches.GetLength(0); y++)
+                {
+                    if (fMaxScore < matches[y, x, 0] && dMatchScore <= matches[y, x, 0])
+                    {
+                        fMaxScore = matches[y, x, 0];
+                        ptMaxRelative.X = x;
+                        ptMaxRelative.Y = y;
+                        bFoundTemplate = true;
+                    }
+                }
+            }
+            cptCenter = new CPoint();
+            cptCenter.X = (int)(crtSearchArea.Left + ptMaxRelative.X) + (int)(nWidthDiff / 2);
+            cptCenter.Y = (int)(crtSearchArea.Top + ptMaxRelative.Y) + (int)(nHeightDiff / 2);
+
+            return bFoundTemplate;
+        }
+        public string RunLineScan(GrabMode grabmode, MemoryData mem, CPoint memOffset, int nSnapCount, double posX, double startPosY, double endPosY, double startTriggerY, double endTriggerY)
+        {
+            if (grabmode == null) return "Grabmode of RunLineScan is null.";
+
+            Camera_Dalsa camMain = grabmode.m_camera as Camera_Dalsa;
+            if (camMain == null)
+                return "Main Camara is null";
+
+            // 시작위치로 이동
+            if (Run(AxisXY.StartMove(posX, startPosY)))
+                return p_sInfo;
+            if (Run(AxisXY.WaitReady()))
+                return p_sInfo;
+
+            // 분주비 재설정
+            int nEncoderMul = 1;
+            int nEncoderDiv = 1;
+
+            camMain.p_CamParam.GetRotaryEncoderMultiplier(ref nEncoderMul);
+            camMain.p_CamParam.GetRotaryEncoderDivider(ref nEncoderDiv);
+
+            camMain.p_CamParam.SetRotaryEncoderMultiplier(1);
+            camMain.p_CamParam.SetRotaryEncoderDivider(1);
+            camMain.p_CamParam.SetRotaryEncoderMultiplier(nEncoderMul);
+            camMain.p_CamParam.SetRotaryEncoderDivider(nEncoderDiv);
+
+            // 트리거 설정
+            AxisXY.p_axisY.SetTrigger(startTriggerY, endTriggerY, grabmode.m_dTrigger, 0.001, true);
+
+            // 카메라 스냅 시작
+            grabmode.StartGrab(mem, memOffset, (int)(nSnapCount * 0.98), grabmode.m_GD);
+
+            // 이동하면서 그랩
+            if (Run(AxisXY.p_axisY.StartMove(endPosY)))
+                return p_sInfo;
+
+            // 라인스캔 완료 대기
+            if (Run(AxisXY.p_axisY.WaitReady()))
+                return p_sInfo;
+
+            // 이미지 스냅 스레드 동작중이라면 중지
+            while (camMain.p_CamInfo.p_eState != eCamState.Ready && !EQ.IsStop())
+            {
+                Thread.Sleep(10);
+            }
+            return "OK";
+        }
+        public string StartRADS(int nOffset = 0)
+        {
+            if (CamRADS == null) return "RADS Cam is null";
+
+            RADSControl.m_timer.Start();
+            RADSControl.p_IsRun = true;
+            RADSControl.StartRADS();
+
+            StopWatch sw = new StopWatch();
+            if (CamRADS.p_CamInfo._OpenStatus == false) CamRADS.Connect();
+            while (CamRADS.p_CamInfo._OpenStatus == false)
+            {
+                if (sw.ElapsedMilliseconds > 15000)
+                {
+                    sw.Stop();
+                    return "RADS Camera Not Connected";
+                }
+            }
+            sw.Stop();
+
+            // Offset 설정
+            RADSControl.p_connect.SetADSOffset(nOffset);
+
+            // RADS 카메라 설정
+            CamRADS.SetMulticast();
+            CamRADS.GrabContinuousShot();
+
+            return "OK";
+        }
+
+        public string StopRADS()
+        {
+            if (CamRADS == null) return "RADS Cam is null";
+
+            RADSControl.m_timer.Stop();
+            RADSControl.p_IsRun = false;
+            RADSControl.StopRADS();
+            if (CamRADS.p_CamInfo._IsGrabbing == true) CamRADS.StopGrab();
+
+            return "OK";
         }
         #endregion
 
@@ -525,8 +847,8 @@ namespace Root_VEGA_D.Module
             m_toolBox.GetComm(ref server, this, "TCPIP");
 
             m_tcpipCommServer = new TCPIPComm_VEGA_D(server);
-            m_tcpipCommServer.EventReciveData += EventReceiveData;
-            InitGAF();
+            m_tcpipCommServer.EventReceiveData += EventReceiveData;
+            m_tcpipCommServer.EventAccept += EventAccept;
         }
 
         private void Vision_OnChangeState(eState eState)
@@ -539,33 +861,139 @@ namespace Root_VEGA_D.Module
                     break;
             }
         }
+        ModuleRunBase PeekModuleRun()
+        {
+            if (m_qModuleRun.Count > 0)
+            {
+                return m_qModuleRun.Peek();
+            }
+            else
+                return null;
+        }
 
+        bool m_bDisconnectedGrabLineScanning = false;    // 이미지 스캔 도중 소켓통신 연결이 끊어졌을 때의 상태값
+        int m_nDisconnectedStateResetTime = 300 * 1000;              // IPU와 연결이 끊어지고 재개될때까지 대기하는 시간
+        private void ResetDisconnectedStateTimerTick(object sender, EventArgs e)
+        {
+            // 소켓 연결 해제 이후 m_nDisconnectedStateResetTime (ms) 만큼 시간 뒤 호출되는 콜백함수
+            DispatcherTimer timer = sender as DispatcherTimer;
+            if (timer != null)
+                timer.Stop();
+
+            // 이미지 스캔을 재개하지 않을 것이므로
+            // 이미지 스캔 중 연결이 끊겼다는 상태값을 다시 리셋
+            m_bDisconnectedGrabLineScanning = false;
+
+            // 재 연결까지 Run_GrabLineScan이 대기 중이라면 상태 변경
+            Run_GrabLineScan runGrabLineScan = PeekModuleRun() as Run_GrabLineScan;
+            if (runGrabLineScan != null)
+            {
+                // EQ Stop 상태로 변경하고 이미지그랩 중에 중단되었다는 상태값 설정
+                runGrabLineScan.p_bWaitRun = false;
+            }
+        }
+        private void EventAccept(Socket socket)
+        {
+            Run_GrabLineScan runGrabLineScan = PeekModuleRun() as Run_GrabLineScan;
+            if (runGrabLineScan != null)
+            {
+                if(m_bDisconnectedGrabLineScanning)
+                {
+                    // 이미지 스캔 중 연결이 끊겼다는 상태값을 리셋
+                    m_bDisconnectedGrabLineScanning = false;
+
+                    // 대기중인 RunGrabLineScan 재개
+                    runGrabLineScan.p_bWaitRun = false;
+
+                }
+            }
+        }
         private void EventReceiveData(byte[] aBuf, int nSize, Socket socket)
         {
             if (nSize <= 0)
-                return;
-
-            int nStartIdx = 0;
-            TCPIPComm_VEGA_D.Command cmd = TCPIPComm_VEGA_D.Command.none;
-            Dictionary<string, string> mapParam = new Dictionary<string, string>();
-
-            while (m_tcpipCommServer.ParseMessage(aBuf, nSize, ref nStartIdx, ref cmd, mapParam))
             {
-                switch (cmd)
+                // 연결이 종료되었을 때
+                if (socket.Connected)
+                    return;
+
+                Run_GrabLineScan runGrabLineScan = PeekModuleRun() as Run_GrabLineScan;
+                if (runGrabLineScan != null)
                 {
-                    case TCPIPComm_VEGA_D.Command.result:
-                        {
-                            ModuleRunBase moduleRunBase = m_aModuleRun.Find(x => (x.GetType() == typeof(Run_GrabLineScan)));
-                            if (moduleRunBase != null)
-                                moduleRunBase.Run();
-                        }
-                        break;
-                    case TCPIPComm_VEGA_D.Command.alive:
-                        break;
-                    case TCPIPComm_VEGA_D.Command.ready:
-                        break;
-                    default:
-                        break;
+                    // 현재 GrabLineScan 진행중이었다면
+                    if (runGrabLineScan.p_eRunState == ModuleRunBase.eRunState.Run)
+                    {
+                        // EQ Stop 상태로 변경하고 이미지그랩 중에 중단되었다는 상태값 설정
+                        m_bDisconnectedGrabLineScanning = true;
+
+                        // 재연결 시까지 RunGrabLineScan은 대기
+                        runGrabLineScan.p_bWaitRun = true;
+
+                        // IPU와 소켓통신 재 연결 될때까지의 상태 리셋 타이머 실행
+                        DispatcherTimer timer = new DispatcherTimer();
+                        timer.Interval = TimeSpan.FromMilliseconds(m_nDisconnectedStateResetTime);
+                        timer.Tick += new EventHandler(ResetDisconnectedStateTimerTick);
+                        timer.Start();
+                    }
+                }
+            }
+            else
+            {
+                int nStartIdx = 0;
+                TCPIPComm_VEGA_D.Command cmd = TCPIPComm_VEGA_D.Command.None;
+                Dictionary<string, string> mapParam = new Dictionary<string, string>();
+
+                // 도착한 메세지를 파싱하여 메세지 단위마다 처리
+                while (m_tcpipCommServer.ParseMessage(aBuf, nSize, ref nStartIdx, ref cmd, mapParam))
+                {
+                    switch (cmd)
+                    {
+                        case TCPIPComm_VEGA_D.Command.resume:
+                            {
+                                if (m_bDisconnectedGrabLineScanning)
+                                {
+                                    // 이전에 이미지 그랩 작업을 이어서 할 수 있도록 처리
+                                    int totalScanLine = int.Parse(mapParam[TCPIPComm_VEGA_D.PARAM_NAME_TOTALSCANLINECOUNT]);
+                                    int curScanLine = int.Parse(mapParam[TCPIPComm_VEGA_D.PARAM_NAME_CURRENTSCANLINE]);
+                                    int startScanLine = int.Parse(mapParam[TCPIPComm_VEGA_D.PARAM_NAME_STARTSCANLINE]);
+
+                                    Run_GrabLineScan runGrabLineScan = PeekModuleRun() as Run_GrabLineScan;
+                                    if (runGrabLineScan != null)
+                                    {
+                                        lock (runGrabLineScan.m_lockWaitRun)
+                                        {
+                                            runGrabLineScan.m_nCurScanLine = curScanLine;
+                                            runGrabLineScan.m_grabMode.m_ScanLineNum = totalScanLine;
+                                            runGrabLineScan.m_grabMode.m_ScanStartLine = startScanLine;
+
+                                            runGrabLineScan.p_bWaitRun = false;
+                                        }   
+                                    }
+                                }
+                                else
+                                {
+                                    // EQ Stop 상태를 변경하여 이미지 스캔을 재개하지 않을 것이므로
+                                    // 이미지 스캔 중 연결이 끊겼다는 상태값을 다시 리셋
+                                    m_bDisconnectedGrabLineScanning = false;
+                                }
+                            }
+                            break;
+                        case TCPIPComm_VEGA_D.Command.Result:
+                            {
+                                Run_GrabLineScan runGrabLineScan = PeekModuleRun() as Run_GrabLineScan;
+                                if (runGrabLineScan != null)
+                                {
+                                    // 현재 GrabLineScan 진행중이었다면
+                                    if (runGrabLineScan.p_eRunState == ModuleRunBase.eRunState.Run)
+                                    {
+                                        // IPU에서 이미지 검사 완료되었기 때문에 해당 상태변수 true로 변경
+                                        runGrabLineScan.m_bIPUCompleted = true;
+                                    }
+                                }
+                            }
+                            break;
+                        default:
+                            break;
+                    }
                 }
             }
         }
@@ -710,7 +1138,9 @@ namespace Root_VEGA_D.Module
             }
         }
         #endregion
+
         #region ModuleRun
+        public ModuleRunBase m_runPM;
         protected override void InitModuleRuns()
         {
             AddModuleRunList(new Run_Test(this), true, "Test");
@@ -721,6 +1151,9 @@ namespace Root_VEGA_D.Module
             //AddModuleRunList(new Run_Inspect(this), true, "Run Inspect");
             //AddModuleRunList(new Run_VisionAlign(this), true, "Run VisionAlign");
             //AddModuleRunList(new Run_AutoFocus(this), false, "Run AutoFocus");
+            AddModuleRunList(new Run_MakeTemplateImage(this), true, "Run Make TemplateImage");
+            AddModuleRunList(new Run_PatternAlign(this), true, "Run Pattern Align");
+            m_runPM = AddModuleRunList(new Run_PM(this,(VEGA_D_Handler)m_engineer.ClassHandler()), true, "Run PM");
         }
         #endregion
     }
