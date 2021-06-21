@@ -760,12 +760,16 @@ namespace Root_VEGA_D.Module
                 return p_sInfo;
 
             // 분주비 재설정
-            int nEncoderMul = camMain.GetEncoderMultiplier();
-            int nEncoderDiv = camMain.GetEncoderDivider();
-            camMain.SetEncoderMultiplier(1);
-            camMain.SetEncoderDivider(1);
-            camMain.SetEncoderMultiplier(nEncoderMul);
-            camMain.SetEncoderDivider(nEncoderDiv);
+            int nEncoderMul = 1;
+            int nEncoderDiv = 1;
+
+            camMain.p_CamParam.GetRotaryEncoderMultiplier(ref nEncoderMul);
+            camMain.p_CamParam.GetRotaryEncoderDivider(ref nEncoderDiv);
+
+            camMain.p_CamParam.SetRotaryEncoderMultiplier(1);
+            camMain.p_CamParam.SetRotaryEncoderDivider(1);
+            camMain.p_CamParam.SetRotaryEncoderMultiplier(nEncoderMul);
+            camMain.p_CamParam.SetRotaryEncoderDivider(nEncoderDiv);
 
             // 트리거 설정
             AxisXY.p_axisY.SetTrigger(startTriggerY, endTriggerY, grabmode.m_dTrigger, 0.001, true);
