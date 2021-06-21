@@ -166,6 +166,22 @@ namespace Root_Pine2.Module
             return StartRun(run);
         }
 
+        public override string StateHome()
+        {
+            if (EQ.p_bSimulate)
+            {
+                p_eState = eState.Ready;
+                return "OK";
+            }
+            p_sInfo = base.StateHome();
+            if (p_sInfo == "OK")
+            {
+                RunTurnUp(true);
+                RunMove(c_sReady); 
+            }
+            return p_sInfo;
+        }
+
         public override void Reset()
         {
             base.Reset();
