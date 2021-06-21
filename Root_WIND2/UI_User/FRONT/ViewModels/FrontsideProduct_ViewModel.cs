@@ -450,9 +450,13 @@ namespace Root_WIND2.UI_User
                 OpenASCMapDataWaferMap(stdFile);
                 ConvertACSMapDataToWaferMap();
             }
-            else if (filterIndex == 10) // Read Klaf file
+            else if (filterIndex == 6) // Read XML file
             {
-                OpenKlafMapDataWaferMap(stdFile);
+                OpenXmlMapDataWaferMap(stdFile);
+            }
+            else if (filterIndex == 10) // Read Klarf file
+            {
+                OpenKlarfMapDataWaferMap(stdFile);
             }
             DrawMap();
         }
@@ -645,10 +649,16 @@ namespace Root_WIND2.UI_User
             waferMap.ConvertACSMapDataToWaferMap();
         }
 
-        private void OpenKlafMapDataWaferMap(StreamReader stdFile)
+        private void OpenXmlMapDataWaferMap(StreamReader stdFile)
         {
             RecipeType_WaferMap waferMap = GlobalObjects.Instance.Get<RecipeFront>().WaferMap;
-            waferMap.OpenKlafMapData(stdFile);
+            waferMap.OpenXmlMapData(stdFile);
+        }
+
+        private void OpenKlarfMapDataWaferMap(StreamReader stdFile)
+        {
+            RecipeType_WaferMap waferMap = GlobalObjects.Instance.Get<RecipeFront>().WaferMap;
+            waferMap.OpenKlarfMapData(stdFile);
         }
 
         private CHIP_TYPE GetRecipeChipType(int x, int y)
