@@ -148,7 +148,7 @@ namespace Root_CAMELLIA.LibSR_Met
             }
         }
 
-        public void CalcTransmittance_OptimizingSi(int nPointIdx, int nSiAvgOffsetRange, int nSiAvgOffsetStep, int nDNum, double[] mPn)
+        public void CalcTransmittance_OptimizingSi(int nPointIdx, int nSiAvgOffsetRange, int nSiAvgOffsetStep, int nDNum, double[] mPn, double[] CalWL)
         {
             int nDataMin = 9999;
             int nDataMinLayerIdx = 0;
@@ -266,6 +266,21 @@ namespace Root_CAMELLIA.LibSR_Met
             //});
             //task2.Start();
             //task2.Wait();
+            PointTransmittanceData(CalWL, nPointIdx);
+        }
+        private void PointTransmittanceData(double[] CalWL, int nPointidx)
+        {
+            int nDCOLTransDataNum = 0;
+            for (int n=0; n < m_DM.m_RawData[0].nNIRDataNum; n++)
+            {
+                //int nDCOLTransDataNum = 0;//CalWL.Length;
+                if (nDCOLTransDataNum < CalWL.Length && m_DM.m_RawData[nPointidx].Wavelength [n] == m_DM.m_ContourMapDataT[nDCOLTransDataNum].Wavelength)
+                {
+                    double DCOLTransData = m_DM.m_RawData[nPointidx].Transmittance[n];
+                    m_DM.m_RawData[nPointidx].DCOLTransmittance.Add(DCOLTransData);
+                    nDCOLTransDataNum++;
+                }
+            }
         }
         public void PointCalcTransmittance_OptimizingSi(int nPointIdx, int nSiAvgOffsetRange, int nSiAvgOffsetStep, int nDNum, double[] mPn, double [] CalWL)
         {
@@ -378,7 +393,7 @@ namespace Root_CAMELLIA.LibSR_Met
                     dTAvg = 0.0;
                 }
 
-                m_DM.m_ContourMapDataT[i].RawData = dTAvg;
+                m_DM.m_RawData[nPointIdx].DCOLTransmittance.Add(dTAvg);
             }
            // });
             sw.Stop();
@@ -517,7 +532,7 @@ namespace Root_CAMELLIA.LibSR_Met
                 if (m_DM.m_bCalcTransmittance)
                 {
                     // 투과율 계산 안함
-                    CalcTransmittance_OptimizingSi(nPointIndex, ConstValue.SI_AVG_OFFSET_RANGE, ConstValue.SI_AVG_OFFSET_STEP, nDNum, mPn);
+                    //CalcTransmittance_OptimizingSi(nPointIndex, ConstValue.SI_AVG_OFFSET_RANGE, ConstValue.SI_AVG_OFFSET_STEP, nDNum, mPn);
                 }
                 else
                 {
@@ -698,7 +713,7 @@ namespace Root_CAMELLIA.LibSR_Met
 
             if (m_DM.m_bCalcTransmittance)
             {
-                CalcTransmittance_OptimizingSi(nPointIndex, ConstValue.SI_AVG_OFFSET_RANGE, ConstValue.SI_AVG_OFFSET_STEP, nDNum, mPn);
+                //CalcTransmittance_OptimizingSi(nPointIndex, ConstValue.SI_AVG_OFFSET_RANGE, ConstValue.SI_AVG_OFFSET_STEP, nDNum, mPn);
             }
             else
             {

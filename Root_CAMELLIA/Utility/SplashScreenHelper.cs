@@ -4,12 +4,18 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Media;
 using System.Windows.Threading;
 
 namespace Root_CAMELLIA
 {
     internal class SplashScreenHelper
     {
+        public enum CurrentState
+        {
+            OK,
+            Error,
+        }
         public static Dlg_SplashScreen SplashScreen { get; set; }
 
         public static void Show()
@@ -45,8 +51,12 @@ namespace Root_CAMELLIA
                 SplashScreen.Hide();
         }
 
-        public static void ShowText(string text)
+        public static void ShowText(string text, CurrentState state = CurrentState.OK)
         {
+            Brush brush = Brushes.AliceBlue;
+            if (state == CurrentState.Error)
+                brush = Brushes.Red;
+
             if (SplashScreen == null) return;
 
             if (!SplashScreen.Dispatcher.CheckAccess())
@@ -61,6 +71,7 @@ namespace Root_CAMELLIA
                                 new Action(delegate ()
                                 {
                                     ((Dlg_SplashScreen_ViewModel)SplashScreen.DataContext).SplashScreenText = text;
+                                    ((Dlg_SplashScreen_ViewModel)SplashScreen.DataContext).SplashScreenBrush = brush;
                                 }
                             ));
                             SplashScreen.Dispatcher.Invoke(DispatcherPriority.ApplicationIdle, new Action(() => { }));
