@@ -124,6 +124,18 @@ namespace Root_CAMELLIA
         }
         private ObservableCollection<UIElement> m_DrawElement = new ObservableCollection<UIElement>();
 
+        public ObservableCollection<UIElement> p_DrawGuideElement
+        {
+            get
+            {
+                return m_DrawGuideElement;
+            }
+            set
+            {
+                SetProperty(ref m_DrawGuideElement, value);
+            }
+        }
+        private ObservableCollection<UIElement> m_DrawGuideElement = new ObservableCollection<UIElement>();
         /// <summary>
         /// Preview Stage Canvas
         /// </summary>
@@ -212,6 +224,7 @@ namespace Root_CAMELLIA
         public List<ShapeManager> Shapes = new List<ShapeManager>();
         public List<ShapeManager> ShapesCandidatePoint = new List<ShapeManager>();
         public List<GeometryManager> Geometry = new List<GeometryManager>();
+        public List<GeometryManager> GuideGeometry = new List<GeometryManager>();
         public List<GeometryManager> ViewRectGeometry = new List<GeometryManager>();
         public List<GeometryManager> SelectGeometry = new List<GeometryManager>();
         public List<TextManager> TextBlocks = new List<TextManager>();
@@ -1038,6 +1051,13 @@ namespace Root_CAMELLIA
 
         public Arc[] viewStageTopHoleArc = new Arc[2];
         public Arc[] viewStageBotHoleArc = new Arc[2];
+
+        public Circle viewStageGuideField = new Circle();
+        public ShapeDraw.Line viewStageGuideLineHole = new ShapeDraw.Line();
+        public Arc[] viewStageGuideEdgeHoleArc = new Arc[8];
+        public Arc[] viewStageGuideDoubleHoleArc = new Arc[8];
+        public Arc[] viewStageGuideTopHoleArc = new Arc[2];
+        public Arc[] viewStageGuideBotHoleArc = new Arc[2];
         #endregion
 
         #region Geometry, Shape
@@ -1053,7 +1073,9 @@ namespace Root_CAMELLIA
 
         #region CircleHole
         private Circle viewStageCircleHole = new Circle();
+        private Circle viewStageGuideCircleHole = new Circle();
         public List<Circle> dataStageCircleHole = new List<Circle>();
+        public List<Circle> dataStageGuideCircleHole = new List<Circle>();
         #endregion
 
         #region ViewRect
@@ -2050,14 +2072,13 @@ namespace Root_CAMELLIA
             OpenStageCircleHole();
         }
 
+
+
         bool CheckActiveTest(System.Windows.Point pt)
         {
-            for (int i = 0; i < Geometry.Count; i++)
+            for (int i = 0; i < GuideGeometry.Count; i++)
             {
-                //Geometry g = new Geometry();
-
-                //Geometry[i].path.fillcon
-                if (Geometry[i].path.Data.FillContains(pt) && Geometry[i].path.Fill == GeneralTools.ActiveBrush)
+                if (GuideGeometry[i].path.Data.FillContains(pt))
                 {
                     return true;
                 }
@@ -2070,6 +2091,7 @@ namespace Root_CAMELLIA
             if (dataStageCircleHole.Count != 0)
             {
                 dataStageCircleHole.Clear();
+                dataStageGuideCircleHole.Clear();
             }
 
             string fileName = BaseDefine.Dir_StageHole; //Todo 수정해야함
@@ -2092,6 +2114,9 @@ namespace Root_CAMELLIA
 
                         Circle circle = new Circle(double.Parse(str[0]), double.Parse(str[1]), double.Parse(str[2]), double.Parse(str[2]));
                         dataStageCircleHole.Add(circle);
+
+                        circle = new Circle(double.Parse(str[0]), double.Parse(str[1]), double.Parse(str[2]) - 2, double.Parse(str[2]) - 2);
+                        dataStageGuideCircleHole.Add(circle);
                     }
                 }
             }
@@ -2124,6 +2149,8 @@ namespace Root_CAMELLIA
         private void RedrawStage()
         {
             int index = 0;
+
+            
             //stage.
             CustomEllipseGeometry stageField = Geometry[index] as CustomEllipseGeometry;
             viewStageField.Set(GeneralTools.DataStageField);
@@ -2151,6 +2178,8 @@ namespace Root_CAMELLIA
                 index++;
             }
 
+          
+
             // 엣지부분 흰색 영역
             for (int i = 0; i < 2 * GeneralTools.EdgeNum; i++)
             {
@@ -2169,7 +2198,6 @@ namespace Root_CAMELLIA
                 index++;
                 drawGeometryManager.ClearSegments();
             }
-
 
             // 긴 타원형 홀
             for (int i = 0; i < 2 * GeneralTools.DoubleHoleNum; i++)
@@ -2190,6 +2218,7 @@ namespace Root_CAMELLIA
 
                 drawGeometryManager.ClearSegments();
             }
+
 
             // 윗부분 및 아랫부분 타원홀
             for (int i = 0; i < 2; i++)
@@ -2240,7 +2269,6 @@ namespace Root_CAMELLIA
                 idx++;
             }
 
-
             // 스테이지 엣지
 
             CustomEllipseGeometry stageEdge = Geometry[index] as CustomEllipseGeometry;
@@ -2271,6 +2299,38 @@ namespace Root_CAMELLIA
 
             if (p_isCustomize)
             {
+
+                int tempIndex = 0;
+
+                CustomRectangleGeometry rectGuideLine = GuideGeometry[tempIndex] as CustomRectangleGeometry;
+                viewStageGuideLineHole.Set(GeneralTools.DataStageGuideLineHole);
+                viewStageGuideLineHole.Transform(RatioX, RatioY);
+                viewStageGuideLineHole.ScaleOffset(ZoomScale, OffsetX, OffsetY);
+                rectGuideLine.SetData(drawGeometryManager.GetRect(viewStageGuideLineHole, CenterX, CenterY), thickness: 1 * ZoomScale);
+                GuideGeometry[tempIndex] = rectGuideLine;
+                tempIndex++;
+
+                for (int i = 0; i < 2 * GeneralTools.EdgeNum; i++)
+                {
+                    viewStageGuideEdgeHoleArc[i].Set(GeneralTools.DataStageGuideEdgeHoleArc[i]);
+                    viewStageGuideEdgeHoleArc[i].Transform(RatioX, RatioY);
+                    viewStageGuideEdgeHoleArc[i].ScaleOffset(ZoomScale, OffsetX, OffsetY);
+                }
+
+                for (int n = 0; n < GeneralTools.EdgeNum; n++)
+                {
+                    CustomPathGeometry edgePath = GuideGeometry[tempIndex] as CustomPathGeometry;
+
+                    PathFigure path = drawGeometryManager.AddDoubleHole(viewStageGuideEdgeHoleArc[2 * n + 0], viewStageGuideEdgeHoleArc[2 * n + 1], CenterX, CenterY);
+
+                    edgePath.SetData(path, 1 * ZoomScale);
+                    GuideGeometry[tempIndex] = edgePath;
+                    tempIndex++;
+                    drawGeometryManager.ClearSegments();
+                }
+
+
+
                 for (int i = 0; i < m_customizeRD.DataCandidatePoint.Count; i++)
                 {
                     ShapeEllipse dataCandidatePoint = ShapesCandidatePoint[i] as ShapeEllipse;
@@ -2283,6 +2343,72 @@ namespace Root_CAMELLIA
                     Circle c = drawGeometryManager.GetRect(circle, CenterX, CenterY);
                     dataCandidatePoint.SetData(c, (int)(circle.width), (int)(circle.height), 95);
                     ShapesCandidatePoint[i] = dataCandidatePoint;
+                }
+
+                for (int i = 0; i < 2 * GeneralTools.DoubleHoleNum; i++)
+                {
+                    viewStageGuideDoubleHoleArc[i].Set(GeneralTools.DataStageGuideDoubleHoleArc[i]);
+                    viewStageGuideDoubleHoleArc[i].Transform(RatioX, RatioY);
+                    viewStageGuideDoubleHoleArc[i].ScaleOffset(ZoomScale, OffsetX, OffsetY);
+                }
+
+                for (int i = 0; i < GeneralTools.DoubleHoleNum; i++)
+                {
+                    CustomPathGeometry doubleHole = GuideGeometry[tempIndex] as CustomPathGeometry;
+                    PathFigure path = drawGeometryManager.AddDoubleHole(viewStageGuideDoubleHoleArc[2 * i + 0], viewStageGuideDoubleHoleArc[2 * i + 1], CenterX, CenterY);
+
+                    doubleHole.SetData(path, 1 * ZoomScale);
+                    GuideGeometry[tempIndex] = doubleHole;
+
+                    drawGeometryManager.ClearSegments();
+                    tempIndex++;
+                }
+
+                for (int i = 0; i < 2; i++)
+                {
+                    //Top
+                    viewStageGuideTopHoleArc[i].Set(GeneralTools.DataStageGuideTopHoleArc[i]);
+                    viewStageGuideTopHoleArc[i].Transform(RatioX, RatioY);
+                    viewStageGuideTopHoleArc[i].ScaleOffset(ZoomScale, OffsetX, OffsetY);
+
+                    //Bot
+                    viewStageGuideBotHoleArc[i].Set(GeneralTools.DataStageGuideBotHoleArc[i]);
+                    viewStageGuideBotHoleArc[i].Transform(RatioX, RatioY);
+                    viewStageGuideBotHoleArc[i].ScaleOffset(ZoomScale, OffsetX, OffsetY);
+                }
+
+                for (int i = 0; i < 2; i++)
+                {
+                    CustomPathGeometry topBotDoubleHole = GuideGeometry[tempIndex] as CustomPathGeometry;
+                    if (i == 0)
+                    {
+                        arc = viewStageGuideTopHoleArc;
+                    }
+                    else
+                    {
+                        arc = viewStageGuideBotHoleArc;
+                    }
+
+                    PathFigure path = drawGeometryManager.AddDoubleHole(arc[0], arc[1], CenterX, CenterY);
+
+                    topBotDoubleHole.SetData(path, 1 * ZoomScale);
+                    GuideGeometry[tempIndex] = topBotDoubleHole;
+                    tempIndex++;
+                    drawGeometryManager.ClearSegments();
+                }
+
+                foreach (Circle circle in dataStageGuideCircleHole)
+                {
+                    CustomEllipseGeometry circleHole = GuideGeometry[tempIndex] as CustomEllipseGeometry;
+                    viewStageGuideCircleHole.Set(circle);
+                    viewStageGuideCircleHole.Transform(RatioX, RatioY);
+                    viewStageGuideCircleHole.ScaleOffset(ZoomScale, OffsetX, OffsetY);
+                    drawGeometryManager.GetRect(ref viewStageGuideCircleHole, CenterX, CenterY);
+                    circleHole.SetData(viewStageGuideCircleHole, (int)(viewStageGuideCircleHole.Width / 2),
+                        (int)(viewStageGuideCircleHole.Y + (viewStageGuideCircleHole.Height / 2) + viewStageGuideCircleHole.Y), 1 * ZoomScale);
+                    GuideGeometry[tempIndex] = circleHole;
+
+                    tempIndex++;
                 }
 
             }
@@ -3141,6 +3267,173 @@ namespace Root_CAMELLIA
                     }
                 }
             }));
+        }
+
+        public void SetGuideStage()
+        {
+            p_DrawGuideElement.Clear();
+            ObservableCollection<UIElement> temp = new ObservableCollection<UIElement>();
+            GeneralTools.GbHole.GradientOrigin = new System.Windows.Point(0.3, 0.3);
+            // 스테이지
+
+            //stage = new CustomEllipseGeometry(System.Windows.Media.Brushes.Red, System.Windows.Media.Brushes.Red);
+            //CustomEllipseGeometry stageField = stage as CustomEllipseGeometry;
+
+            //Circle newCircle = new Circle();
+            //newCircle.X = GeneralTools.DataStageField.X;
+            //newCircle.Y = GeneralTools.DataStageField.Y;
+            //newCircle.Width = GeneralTools.DataStageField.Width - 2;
+            //newCircle.Height = GeneralTools.DataStageField.Height - 2;
+            //viewStageGuideField.Set(newCircle);
+            //viewStageGuideField.Transform(RatioX, RatioY);
+            //viewStageGuideField.ScaleOffset(ZoomScale, OffsetX, OffsetY);
+            //stageField.SetData(viewStageGuideField, CenterX, CenterY);
+
+            //GuideGeometry.Add(stageField);
+            // temp.Add(stageField.path);
+
+            // Stage 중간 흰색 라인
+            stage = new CustomRectangleGeometry(GeneralTools.GuideCustomLineBrush, "3,1", 1, 0.5d);
+            CustomRectangleGeometry rectLine = stage as CustomRectangleGeometry;
+            viewStageGuideLineHole.Set(GeneralTools.DataStageGuideLineHole);
+            viewStageGuideLineHole.Transform(RatioX, RatioY);
+            viewStageGuideLineHole.ScaleOffset(ZoomScale, OffsetX, OffsetY);
+            rectLine.SetData(drawGeometryManager.GetRect(viewStageGuideLineHole, CenterX, CenterY));
+            GuideGeometry.Add(rectLine);
+            temp.Add(rectLine.path);
+            //stage = new CustomRectangleGeometry(GeneralTools.ActiveBrush, GeneralTools.ActiveBrush);
+            //CustomRectangleGeometry rectLine = stage as CustomRectangleGeometry;
+            //viewStageGuideLineHole.Set(GeneralTools.DataStageGuideLineHole);
+            //viewStageGuideLineHole.Transform(RatioX, RatioY);
+            //viewStageGuideLineHole.ScaleOffset(ZoomScale, OffsetX, OffsetY);
+            //rectLine.SetData(drawGeometryManager.GetRect(viewStageGuideLineHole, CenterX, CenterY));
+            //GuideGeometryGeometry.Add(rectLine);
+            //temp.Add(rectLine.path);
+
+            //// Stage 점선 가이드라인
+            //for (int i = 0; i < GeneralTools.GuideLineNum; i++)
+            //{
+
+            //    stage = new CustomEllipseGeometry(GeneralTools.GuideLineBrush, "3,1", 5, 0.1d);
+
+            //    CustomEllipseGeometry guideLine = stage as CustomEllipseGeometry;
+            //    ViewStageGuideLine[i] = new Circle();
+            //    ViewStageGuideLine[i].Set(GeneralTools.DataStageGuideLine[i]);
+            //    ViewStageGuideLine[i].Transform(RatioX, RatioY);
+
+            //    ViewStageGuideLine[i].ScaleOffset(ZoomScale, OffsetX, OffsetY);
+            //    guideLine.SetData(ViewStageGuideLine[i], CenterX, CenterY, 5 * ZoomScale);
+            //    Geometry.Add(guideLine);
+            //    temp.Add(guideLine.path);
+
+            //}
+
+            // 엣지부분 흰색 영역
+            for (int i = 0; i < 2 * GeneralTools.EdgeNum; i++)
+            {
+                viewStageGuideEdgeHoleArc[i] = new Arc();
+                viewStageGuideEdgeHoleArc[i].Set(GeneralTools.DataStageGuideEdgeHoleArc[i]);
+                viewStageGuideEdgeHoleArc[i].Transform(RatioX, RatioY);
+                viewStageGuideEdgeHoleArc[i].ScaleOffset(ZoomScale, OffsetX, OffsetY);
+            }
+
+            for (int n = 0; n < GeneralTools.EdgeNum; n++)
+            {
+                stage = new CustomPathGeometry(GeneralTools.GuideCustomLineBrush, "3,1", 1, 0.5d);
+                CustomPathGeometry edgePath = stage as CustomPathGeometry;
+
+                PathFigure path = drawGeometryManager.AddDoubleHole(viewStageGuideEdgeHoleArc[2 * n + 0], viewStageGuideEdgeHoleArc[2 * n + 1], CenterX, CenterY);
+
+                edgePath.SetData(path);
+                GuideGeometry.Add(edgePath);
+                temp.Add(edgePath.path);
+                drawGeometryManager.ClearSegments();
+            }
+
+
+            // 긴 타원형 홀
+            for (int i = 0; i < 2 * GeneralTools.DoubleHoleNum; i++)
+            {
+
+                viewStageGuideDoubleHoleArc[i] = new Arc();
+                viewStageGuideDoubleHoleArc[i].Set(GeneralTools.DataStageGuideDoubleHoleArc[i]);
+                viewStageGuideDoubleHoleArc[i].Transform(RatioX, RatioY);
+                viewStageGuideDoubleHoleArc[i].ScaleOffset(ZoomScale, OffsetX, OffsetY);
+            }
+
+            for (int i = 0; i < GeneralTools.DoubleHoleNum; i++)
+            {
+                stage = new CustomPathGeometry(GeneralTools.GuideCustomLineBrush, "3,1", 1, 0.5d);
+                CustomPathGeometry doubleHole = stage as CustomPathGeometry;
+
+                PathFigure path = drawGeometryManager.AddDoubleHole(viewStageGuideDoubleHoleArc[2 * i + 0], viewStageGuideDoubleHoleArc[2 * i + 1], CenterX, CenterY);
+
+                doubleHole.SetData(path);
+                GuideGeometry.Add(doubleHole);
+                temp.Add(doubleHole.path);
+                drawGeometryManager.ClearSegments();
+            }
+
+            // 윗부분 및 아랫부분 타원홀
+            for (int i = 0; i < 2; i++)
+            {
+                //Top
+                viewStageGuideTopHoleArc[i] = new Arc();
+                viewStageGuideTopHoleArc[i].Set(GeneralTools.DataStageGuideTopHoleArc[i]);
+                viewStageGuideTopHoleArc[i].Transform(RatioX, RatioY);
+                viewStageGuideTopHoleArc[i].ScaleOffset(ZoomScale, OffsetX, OffsetY);
+
+                //Bot
+                viewStageGuideBotHoleArc[i] = new Arc();
+                viewStageGuideBotHoleArc[i].Set(GeneralTools.DataStageGuideBotHoleArc[i]);
+                viewStageGuideBotHoleArc[i].Transform(RatioX, RatioY);
+                viewStageGuideBotHoleArc[i].ScaleOffset(ZoomScale, OffsetX, OffsetY);
+            }
+
+            Arc[] arc;
+            for (int i = 0; i < 2; i++)
+            {
+                stage = new CustomPathGeometry(GeneralTools.GuideCustomLineBrush, "3,1", 1, 0.5d);
+                CustomPathGeometry topBotDoubleHole = stage as CustomPathGeometry;
+                if (i == 0)
+                {
+                    arc = viewStageGuideTopHoleArc;
+                }
+                else
+                {
+                    arc = viewStageGuideBotHoleArc;
+                }
+
+                PathFigure path = drawGeometryManager.AddDoubleHole(arc[0], arc[1], CenterX, CenterY);
+
+                topBotDoubleHole.SetData(path);
+                GuideGeometry.Add(topBotDoubleHole);
+                temp.Add(topBotDoubleHole.path);
+                drawGeometryManager.ClearSegments();
+            }
+
+
+            // 스테이지 홀
+            foreach (Circle circle in dataStageCircleHole)
+            {
+                stage = new CustomEllipseGeometry(GeneralTools.GuideCustomLineBrush, "3,1", 1, 0.5d);
+                CustomEllipseGeometry circleHole = stage as CustomEllipseGeometry;
+                Circle guideCircle = new Circle();
+                guideCircle.X = circle.X;
+                guideCircle.Y = circle.Y;
+                guideCircle.Width = circle.Width - 2;
+                guideCircle.Height = circle.Height - 2;
+                viewStageGuideCircleHole.Set(guideCircle);
+                viewStageGuideCircleHole.Transform(RatioX, RatioY);
+                viewStageGuideCircleHole.ScaleOffset(ZoomScale, OffsetX, OffsetY);
+                drawGeometryManager.GetRect(ref viewStageGuideCircleHole, CenterX, CenterY);
+                circleHole.SetData(viewStageGuideCircleHole, (int)(viewStageGuideCircleHole.Width / 2),
+                    (int)(viewStageGuideCircleHole.Y + (viewStageGuideCircleHole.Height / 2) + viewStageGuideCircleHole.Y));
+                GuideGeometry.Add(circleHole);
+                temp.Add(circleHole.path);
+            }
+
+            p_DrawGuideElement = temp;
         }
 
         public void SetStage()
@@ -4254,6 +4547,135 @@ namespace Root_CAMELLIA
             }
         }
 
+        double m_SettingRRangeMin = 150;
+        public double p_SettingRRangeMin
+        {
+            get
+            {
+                return m_SettingRRangeMin;
+            }
+            set
+            {
+                SetProperty(ref m_SettingRRangeMin, value);
+            }
+        }
+
+        double m_SettingRRangeMax = 200;
+        public double p_SettingRRangeMax
+        {
+            get
+            {
+                return m_SettingRRangeMax;
+            }
+            set
+            {
+                SetProperty(ref m_SettingRRangeMax, value);
+            }
+        }
+
+        double m_SettingRStep = 5;
+        public double p_SettingRStep
+        {
+            get
+            {
+                return m_SettingRStep;
+            }
+            set
+            {
+                SetProperty(ref m_SettingRStep, value);
+            }
+        }
+        double m_SettingAngle = 5;
+        public double p_SettingAngle
+        {
+            get
+            {
+                return m_SettingAngle;
+            }
+            set
+            {
+                SetProperty(ref m_SettingAngle, value);
+            }
+        }
+        void SetCandidateCircle()
+        {
+            double dStartR = p_SettingRRangeMin;
+            double dEndR = p_SettingRRangeMax;
+            double dStepR = p_SettingRStep;
+            double dStepAngle = p_SettingAngle;
+            double dSize;
+            if(!double.TryParse(p_circleSize, out dSize))
+            {
+                return;
+            }
+            List<CCircle> temp = new List<CCircle>();
+            foreach (var item in m_customizeRD.DataCandidatePoint)
+            {
+                temp.Add(item);
+            }
+            m_customizeRD.DataCandidatePoint.Clear();
+            //foreach (var item in temp)
+            //{
+            //    if (item.type != CamelliaState.CamelliaCenterEdge.Edge)
+            //    {
+            //        m_DM.m_RDM.TeachingRD.DataCandidatePoint.Add(item);
+            //    }
+            //}
+
+            double dDeg = 0;
+            double dR = 0;
+            double dX = 0;
+            double dY = 0;
+
+            //dRatioX = (double)pictureBoxMain.Width / General.ViewSize;
+            //dRatioY = (double)pictureBoxMain.Height / General.ViewSize;
+            m_customizeRD.DataCandidateSelectedPoint.Clear();
+
+            for (dDeg = -180; dDeg < 180; dDeg += dStepAngle)
+            {
+                for (dR = dStartR; dR <= dEndR; dR += dStepR)
+                {
+                    dX = Math.Round((dR * Math.Cos(dDeg / 180 * Math.PI)), 2);
+                    dY = Math.Round((dR * Math.Sin(dDeg / 180 * Math.PI)), 2);
+
+
+                    CCircle circle = new CCircle(dX, dY, dSize, dSize, 0, 0);
+
+                    CCircle c = new CCircle(dX, dY, dSize, dSize, 0, 0);
+                    c.Transform(RatioX, RatioY);
+                    c.ScaleOffset(ZoomScale, OffsetX, OffsetY);
+                    System.Windows.Point pointF = new System.Windows.Point((float)(c.x + CenterX), (float)(-c.y + CenterY));
+
+                    if (CheckActiveTest(pointF))
+                    {
+                        int nIndex = -1;
+                        if (ContainsData(m_customizeRD.DataCandidatePoint, circle, out nIndex))
+                        {
+                            DeletePoint(nIndex, 1);
+                        }
+
+                        m_customizeRD.DataCandidatePoint.Add(circle);
+                      
+                        m_customizeRD.DataCandidateSelectedPoint.Add(circle);
+                    }
+                }
+            }
+            InitCandidatePoint(m_customizeRD);
+            UpdateListView();
+            UpdateView();
+        }
+
+        public ICommand CmdSetCandidateCircle
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    SetCandidateCircle();
+                });
+            }
+        }
+
         public ICommand CmdPresetLoad
         {
             get
@@ -4847,6 +5269,7 @@ namespace Root_CAMELLIA
                         dataManager.recipeDM.TeachingRD.Clone(m_customizeRD);
                         p_TabIndex = 1;
                         InitCandidatePoint(m_customizeRD);
+                        SetGuideStage();
                     }
                     else
                     {
@@ -4855,6 +5278,8 @@ namespace Root_CAMELLIA
                         m_customizeRD.Clone(dataManager.recipeDM.TeachingRD);
                         p_TabIndex = 0;
                         InitCandidatePoint(dataManager.recipeDM.TeachingRD);
+                        m_DrawGuideElement.Clear();
+                        GuideGeometry.Clear();
                     }
                     UpdateListView();
                     UpdateView();
