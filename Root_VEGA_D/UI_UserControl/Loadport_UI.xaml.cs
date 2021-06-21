@@ -58,24 +58,31 @@ namespace Root_VEGA_D
         bool IsEnableLoad()
         {
             bool bReadyLoadport = (m_loadport.p_eState == ModuleBase.eState.Ready);
-            bool bReadyToLoad = (m_loadport.p_infoCarrier.p_eTransfer == GemCarrierBase.eTransfer.ReadyToLoad);
-            bReadyToLoad = true;
+            bool bReadyToUnload = (m_loadport.p_infoCarrier.p_eTransfer == GemCarrierBase.eTransfer.ReadyToUnload);  //LYJ 210525 add
+            //bReadyToLoad = true;
             bool bReadyState = (m_loadport.m_qModuleRun.Count == 0);
+            bool bCheckInterlock = !m_loadport.m_OHT.p_bLightCurtain && !m_loadport.m_OHT.P_bProtectionBar;
             bool bEQReadyState = (EQ.p_eState == EQ.eState.Ready);
             //if (m_loadport.p_infoCarrier.p_eState != InfoCarrier.eState.Placed) return false;
-            bool bPlaced = m_loadport.CheckPlaced();
+            bool bPodExist = (!m_loadport.m_diPlaced.p_bIn && !m_loadport.m_diPresent.p_bIn);  //LYJ 210525 add
+            //bool bCheckClose = m_loadport.m_diClose.p_bIn; //LYJ 210525 add
+            bool bCheckClose = !m_loadport.m_diOpen.p_bIn; //LYJ 210525 add
+            //bool bPlaced = m_loadport.CheckPlaced();
 
             if (m_handler.IsEnableRecovery() == true) return false;
-            return bReadyLoadport && bReadyToLoad && bReadyState && bEQReadyState && bPlaced;
+            return bReadyLoadport && !bReadyToUnload && bReadyState && bEQReadyState && bPodExist && bCheckInterlock && bCheckClose;
         }
 
         bool IsEnableUnloadReq()
         {
             bool bReadyLoadport = (m_loadport.p_eState == ModuleBase.eState.Ready);
-            bool bReadyToUnload = (m_loadport.p_infoCarrier.p_eTransfer == GemCarrierBase.eTransfer.ReadyToUnload);
-            bool bAccess = (m_loadport.p_infoCarrier.p_eAccessLP == GemCarrierBase.eAccessLP.Auto);
-            bool bPlaced = m_loadport.CheckPlaced();
-            return bReadyLoadport && bReadyToUnload && bAccess & bPlaced;
+            bool bTransferBlock = (m_loadport.p_infoCarrier.p_eTransfer == GemCarrierBase.eTransfer.TransferBlocked);
+            bool bPodExist = (!m_loadport.m_diPlaced.p_bIn && !m_loadport.m_diPresent.p_bIn);
+            bool bCheckInterlock = !m_loadport.m_OHT.p_bLightCurtain && !m_loadport.m_OHT.P_bProtectionBar;
+            //bool bCheckClose = m_loadport.m_diClose.p_bIn; //LYJ 210525 add
+            bool bCheckClose = !m_loadport.m_diOpen.p_bIn; //LYJ 210525 add
+
+            return bReadyLoadport && bTransferBlock && bPodExist && bCheckInterlock && bCheckClose;
         }
         #endregion
         public void Init(ILoadport loadport, VEGA_D_Handler handler, IRFID rfid)
@@ -85,9 +92,12 @@ namespace Root_VEGA_D
             m_rfid = (RFID_Brooks)rfid;
             this.DataContext = m_loadport;
 
+            if(m_rfid.m_sResult != "OK")
             textBoxPodID.DataContext = loadport.p_infoCarrier;
-            textBoxLotID.DataContext = loadport.p_infoCarrier.m_aGemSlot[0];
-            textBoxRecipeID.DataContext = loadport.p_infoCarrier.m_aGemSlot[0];
+            else
+            { textBoxPodID.IsEnabled = false; }
+            textBoxLotID.DataContext = loadport.p_infoCarrier;
+            //textBoxRecipeID.DataContext = loadport.p_infoCarrier.m_aGemSlot[0];
 
             InitTimer();
             m_bgwLoad.DoWork += M_bgwLoad_DoWork;
@@ -96,6 +106,8 @@ namespace Root_VEGA_D
             infoCarrier.m_aInfoWafer[0] = (InfoWafer)infoCarrier.m_aGemSlot[0];
             infoCarrier.m_aInfoWafer[0].p_eState = GemSlotBase.eState.Exist;
             m_manualjob = new ManualJobSchedule(m_handler.m_engineer,m_loadport,infoCarrier);
+
+            m_loadport.m_CommonFunction = PMComplete;
         }
 
         private void M_bgwLoad_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
@@ -115,37 +127,65 @@ namespace Root_VEGA_D
 
         private void M_bgwLoad_DoWork(object sender, DoWorkEventArgs e)
         {
-            while ((EQ.IsStop() != true) && m_loadport.IsBusy()) Thread.Sleep(10);
-            Thread.Sleep(100);
+            while (!bPMComplete && (EQ.IsStop() == false)) Thread.Sleep(10);
+            m_loadport.p_open = false;
+            ModuleRunBase Docking = m_loadport.m_runDocking.Clone();
+            m_loadport.StartRun(Docking);
+
+            while (m_loadport.IsBusy() && (EQ.IsStop() == false)) Thread.Sleep(10);
+            if (m_loadport.p_infoCarrier.m_aInfoWafer[0] == null)
+            {
+                m_loadport.m_alidInforeticle.Run(true, "Reticle Info Error, Check Reticle in Loadport");
+                ModuleRunBase UnDocking = m_loadport.m_runUndocking.Clone();
+                m_loadport.StartRun(UnDocking);
+                return;
+            }
+            if (m_manualjob.ShowPopup(m_handler) == false) return;
         }
 
+        bool bPMComplete = false;
+        public void PMComplete()
+		{
+            bPMComplete = true;
+        }
         #region Button Click Event
         private void buttonLoad_Click(object sender, RoutedEventArgs e)
         {
             if (IsEnableLoad() == false) return;
             if (m_loadport.p_id == "LoadportA") EQ.p_nRunLP = 0;
             else if (m_loadport.p_id == "LoadportB") EQ.p_nRunLP = 1;
+            ModuleRunBase moduleRun = m_handler.m_vision.m_runPM.Clone();
+            m_handler.m_vision.StartRun(moduleRun);
+
             //ModuleRunBase moduleRun = m_rfid.m_runReadID.Clone();
             //m_rfid.StartRun(moduleRun);
             //while ((EQ.IsStop() != true) && m_rfid.IsBusy()) Thread.Sleep(10);
-            ModuleRunBase Docking = m_loadport.m_runDocking.Clone();
-            m_loadport.StartRun(Docking);
-            //m_loadport.RunDocking();
-            if (m_loadport.p_infoCarrier.m_aInfoWafer[0] == null)
-            {
-                m_loadport.m_alidInforeticle.Run(true, "Reticle Info Error");
-                ModuleRunBase UnDocking = m_loadport.m_runUndocking.Clone();
-                m_loadport.StartRun(UnDocking);
-                //m_loadport.RunUndocking();
-                return;
-            }
-            if (m_manualjob.ShowPopup(m_handler) == false) return;
+
             m_bgwLoad.RunWorkerAsync();
         }
 
         private void buttonUnloadReq_Click(object sender, RoutedEventArgs e)
         {
-
+            if (IsEnableUnloadReq() == false) return;
+            m_loadport.m_ceidUnloadReq.Send();
+            if (m_loadport.m_OHT.m_bAuto && m_loadport.m_OHT.p_eState == RootTools.OHT.Semi.OHT_Semi.eState.All_Off)
+            {
+                if (!m_loadport.m_diPlaced.p_bIn && !m_loadport.m_diPresent.p_bIn && !m_loadport.m_OHT.m_bOHTErr)
+                {
+                    m_loadport.m_OHT.m_carrier.p_eTransfer = RootTools.Gem.GemCarrierBase.eTransfer.ReadyToUnload;
+                    m_loadport.m_OHT.p_bHoAvailable = false;
+                    m_loadport.m_OHT.p_bES = false;
+                    m_loadport.m_OHT.m_bRFIDRead = true;
+                }
+            }
+            else if (!m_loadport.m_OHT.m_bAuto)
+            {
+                if (!m_loadport.m_diPlaced.p_bIn && !m_loadport.m_diPresent.p_bIn && !m_loadport.m_OHT.m_bOHTErr)
+                {
+                    m_loadport.m_OHT.m_carrier.p_eTransfer = RootTools.Gem.GemCarrierBase.eTransfer.ReadyToUnload;
+                    m_loadport.m_OHT.m_bRFIDRead = true;
+                }
+            }
         }
         #endregion
     }

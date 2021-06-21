@@ -97,7 +97,7 @@
               Background="#FFDDDDDD"
               MouseLeftButtonDown="Grid_MouseLeftButtonDown">
             <StackPanel Orientation="Horizontal">
-                <TextBlock Text="VEGA D Home Progress"
+                <TextBlock Text="VEGA-D Home Progress"
                            VerticalAlignment="Center"
                            FontSize="12"
                            Margin="5,0,0,0"
