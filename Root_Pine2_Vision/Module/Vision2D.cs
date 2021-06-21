@@ -412,7 +412,6 @@ namespace Root_Pine2_Vision.Module
         public bool m_bIsGrabThreadStarted = false;
         public string StartSnap(Recipe.Snap recipe, eWorks eWorks, int iSnap)
         {
-            m_bIsGrabThreadStarted = false;
             Run_Snap run = (Run_Snap)m_runSnap.Clone();
             run.m_eWorks = eWorks; 
             run.m_recipe = recipe;
@@ -436,7 +435,6 @@ namespace Root_Pine2_Vision.Module
                     Thread.Sleep(10);
                     if (EQ.IsStop()) return "EQ Stop";
                 }
-                m_bIsGrabThreadStarted = true;
                 //m_aWorks[eWorks].SendSnapDone(iSnap); 
             }
             catch 
@@ -445,23 +443,6 @@ namespace Root_Pine2_Vision.Module
                 //RunLightOff(); 
             }
             return "OK";
-        }
-
-        public bool CheckGrabThreadStarted()
-        {
-            int nTimeGap = 10;
-            int nCount = nTimeGap * 1000;   // ms
-
-            while(nCount > 0)
-            {
-                if (m_bIsGrabThreadStarted)
-                    return true;
-
-                Thread.Sleep(nTimeGap);
-                nCount -= nTimeGap;
-            }
-
-            return false;
         }
         #endregion
 
