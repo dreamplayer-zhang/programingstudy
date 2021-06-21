@@ -175,12 +175,16 @@ namespace Root_Pine2.Module
             {
                 m_aBoat[eWorks].p_eStep = Boat.eStep.Run;
                 m_aBoat[eWorks].m_doTriggerSwitch.Write(true); 
-                int iSnap = 0; 
+                int iSnap = 0;
+                int nCount = 10 * 1000; // ms
                 foreach (Vision2D.Recipe.Snap snap in m_aBoat[eWorks].m_recipe.m_aSnap)
                 {
                     m_vision.RunLight(snap.m_lightPower);
                     if (Run(RunMoveSnapStart(eWorks, snap))) return p_sInfo;
                     m_vision.StartSnap(snap, eWorks, iSnap);
+
+                    if (m_vision.CheckGrabThreadStarted() == false) return "NotGrabThreadStarted";
+
                     if (Run(m_aBoat[eWorks].RunSnap())) return p_sInfo;
                     if (m_vision.IsBusy()) EQ.p_bStop = true;
                     iSnap++; 
