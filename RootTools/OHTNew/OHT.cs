@@ -533,6 +533,9 @@ namespace RootTools.OHTNew
                         m_doLoadReq.p_bWait = false;
                         m_doUnloadReq.p_bWait = false;
                         m_doReady.p_bWait = false;
+
+                        m_carrier.m_bReqLoad = true;
+
                         break;
                 }
             }
@@ -685,7 +688,7 @@ namespace RootTools.OHTNew
         public ModuleBase m_module;
         dynamic m_loadport; 
         public Log m_log;
-        public GemCarrierBase m_carrier = null;
+        public GemCarrierBase m_carrier { get; set; } = null;
         IToolDIO m_toolDIO;
 
         public OHT(string id, ModuleBase module, GemCarrierBase carrier, IToolDIO toolDIO)

@@ -13,16 +13,16 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace Root_WIND2.UI_User
-{
-	/// <summary>
-	/// EBRSetup_New.xaml에 대한 상호 작용 논리
-	/// </summary>
-	public partial class EBRSetup_New : UserControl
-	{
-		public EBRSetup_New()
-		{
-			InitializeComponent();
-		}
-	}
+namespace Root_WIND2
+{ 
+    /// <summary>
+    /// MotionViewer.xaml에 대한 상호 작용 논리
+    /// </summary>
+    public partial class MotionViewer : UserControl
+    {
+        public MotionViewer()
+        {
+            InitializeComponent();
+        }
+    }
 }

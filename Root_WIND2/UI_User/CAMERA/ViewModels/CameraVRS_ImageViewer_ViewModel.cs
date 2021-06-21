@@ -14,7 +14,7 @@ namespace Root_WIND2.UI_User
     {
         public CameraVRS_ImageViewer_ViewModel()
         {
-
+            this.p_VisibleMenu = Visibility.Collapsed;
         }
 
         public void OnUpdateImage(Object sender, EventArgs args)

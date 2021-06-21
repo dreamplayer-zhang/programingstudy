@@ -120,8 +120,30 @@ namespace RootTools_Vision.WorkManager3
         }
 
         public WorkManager(int inspectionThreadNum)
+        { 
+            bool bCopyBuffer = false;
+            pipeLine = new WorkPipeLine(inspectionThreadNum, bCopyBuffer);
+
+            this.threadNum = inspectionThreadNum;
+
+            WorkEventManager.PositionDone += PositionDone_Callback;
+
+            WorkEventManager.InspectionStart += InspectionStart_Callback;
+            WorkEventManager.InspectionDone += InspectionDone_Callback;
+
+            WorkEventManager.ProcessDefectDone += ProcessDefectDone_Callback;
+
+            WorkEventManager.ProcessDefectWaferStart += ProcessDefectWaferStart_Callback;
+            WorkEventManager.IntegratedProcessDefectDone += IntegratedProcessDefectDone_Callback;
+
+            WorkEventManager.ProcessMeasurementDone += ProcessMeasurementDone_Callback;
+
+            WorkEventManager.WorkplaceStateChanged += WorkplaceStateChanged_Callback;
+        }
+
+        public WorkManager(int inspectionThreadNum, bool bCopyBuffer)
         {
-            pipeLine = new WorkPipeLine(inspectionThreadNum);
+            pipeLine = new WorkPipeLine(inspectionThreadNum, bCopyBuffer);
 
             this.threadNum = inspectionThreadNum;
 
@@ -207,17 +229,20 @@ namespace RootTools_Vision.WorkManager3
 
             if(pipeLine.Stop() == false)
             {
-                //this.pipeLine = new WorkPipeLine(this.threadNum);
-
+                this.pipeLine.Reset();
                 TempLogger.Write("Worker", "PipeLine Initialize");
             }
+            else
+            {
 
-            this.pipeLine = new WorkPipeLine(this.threadNum);
+            }
 
             if (lotInfo == null)
                 DatabaseManager.Instance.SetLotinfo(DateTime.Now, DateTime.Now, Path.GetFileName(this.recipe.RecipePath));
             else
                 DatabaseManager.Instance.SetLotinfo(lotInfo);
+
+            currentWorkplaceBundle = this.currentWorkplaceQueue.First().ParentBundle;
 
             pipeLine.Start(
                 this.currentWorkplaceQueue,
@@ -232,11 +257,13 @@ namespace RootTools_Vision.WorkManager3
         }
 
 
+
+        WorkplaceBundle currentWorkplaceBundle;
         public void CheckSnapDone(Rect snapArea)
         {
-            if (this.currentWorkplaceQueue == null || this.currentWorkplaceQueue.Count == 0) return;
+            if (this.currentWorkplaceBundle == null || this.currentWorkplaceBundle.Count == 0) return;
 
-            foreach (Workplace wp in this.currentWorkplaceQueue)
+            foreach (Workplace wp in this.currentWorkplaceBundle)
             {
                 if (wp.WorkState >= WORK_TYPE.SNAP) continue;
 

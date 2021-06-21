@@ -241,8 +241,45 @@ namespace Root_CAMELLIA
             p_Module_Camellia.p_CamVRS.Captured += GetImage;
             DataManager.Instance.recipeDM.RecipeLoaded += RecipeLoadDone;
 
+
+            App.m_engineer.m_login.OnChangeUser += ChangeUser;
+
             //((XGem)p_XGem).p_eComm;
             p_XGem = (XGem)App.m_engineer.ClassGem();
+
+            MarsLogManager instance = MarsLogManager.Instance;
+            instance.m_useLog = true;
+        }
+
+        string m_curUser = "Offline";
+        public string p_curUser
+        {
+            get
+            {
+                return m_curUser;
+            }
+            set
+            {
+                SetProperty(ref m_curUser, value);
+            }
+        }
+
+        Login.eLevel m_curUserLevel = RootTools.Login.eLevel.Logout;
+        public Login.eLevel p_curUserLevel
+        {
+            get
+            {
+                return m_curUserLevel;
+            }
+            set
+            {
+                SetProperty(ref m_curUserLevel ,value);
+            }
+        }
+        public void ChangeUser()
+        {
+            p_curUser = App.m_engineer.m_login.p_sUserName;
+            p_curUserLevel = App.m_engineer.m_login.p_eLevel;
         }
 
         XGem m_XGem;
@@ -1196,16 +1233,25 @@ namespace Root_CAMELLIA
                     //    return;
                     //}
 
-                    bool isRecipeLoad = false;
-                    if (DataManager.Instance.recipeDM.LoadRecipeName != "")
-                    {
-                        isRecipeLoad = true;
-                    }
-                    RecipeViewModel.UpdateListView(isRecipeLoad);
-                    RecipeViewModel.UpdateView(isRecipeLoad, true);
+                    //bool isRecipeLoad = false;
+                    //if (DataManager.Instance.recipeDM.LoadRecipeName != "")
+                    //{
+                    //    isRecipeLoad = true;
+                    //}
+                    StopWatch sw = new StopWatch();
+                    sw.Start();
+                    //RecipeViewModel.UpdateListView(isRecipeLoad);
+                    //RecipeViewModel.UpdateView(isRecipeLoad, true);
                     var viewModel = RecipeCreatorViewModel;
+                    sw.Stop();
+                    System.Diagnostics.Debug.WriteLine(sw.ElapsedMilliseconds);
+
                     var dialog = dialogService.GetDialog(viewModel) as Dlg_Recipe;
                     Nullable<bool> result = dialog.ShowDialog();
+                    //dialog.Visibility = Visibility.Visible;
+                    //dialog.Visibility = Visibility.Visible;
+                    //var dialog = dialogService.GetDialog(viewModel) as Dlg_Recipe;
+                    //dialog.Visibility = Visibility.Visible;
 
 
                     // MeasurementRD 꺼 가져와서 그려야함.
@@ -1282,6 +1328,7 @@ namespace Root_CAMELLIA
                 return new RelayCommand(() =>
                 {
                     BaseDefine.Configuration.LoginSuccess = false;
+                    App.m_engineer.m_login.Logout();
                 });
             }
         }

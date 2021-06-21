@@ -20,7 +20,7 @@ namespace RootTools.Camera.Dalsa
 
         enum ResourceIdx
         {
-            Gray = 0,
+            Gray=0,
             Color,
         }
         #region Property
@@ -244,6 +244,7 @@ namespace RootTools.Camera.Dalsa
         {
             RunSetTree(treeRoot.GetTree("Connect Set"));
             RunImageRoiTree(treeRoot.GetTree("Buffer Image ROI", true, m_sapXfer != null));
+            RunCameraConfig(treeRoot.GetTree("Camera Config", true, m_sapXfer != null), m_sapXfer != null);
         }
 
         void RunSetTree(Tree tree)
@@ -252,7 +253,6 @@ namespace RootTools.Camera.Dalsa
             p_CamInfo.p_sFile = tree.SetFile(p_CamInfo.p_sFile, p_CamInfo.p_sFile, "ccf", "CamFile", "Cam File");
             p_CamInfo.p_sAreaCamFile = tree.SetFile(p_CamInfo.p_sAreaCamFile, p_CamInfo.p_sAreaCamFile, "ccf", "Area Cam file", "Area Cam File");
             p_CamInfo.p_nResourceIdx = tree.Set(p_CamInfo.p_nResourceIdx, p_CamInfo.p_nResourceIdx, "Resource Count", "Resource Count");
-            p_CamParam.p_nUserSetNum = tree.Set(p_CamParam.p_nUserSetNum, p_CamParam.p_nUserSetNum, "UserSet Number", "UserSet Number");
         }
 
         void RunImageRoiTree(Tree tree)
@@ -267,6 +267,14 @@ namespace RootTools.Camera.Dalsa
             p_CamParam.p_Height = tree.Set(p_CamParam.p_Height, 100, "Image Height", "Buffer Image Height");
             p_CamParam.p_eDeviceScanType = (DalsaParameterSet.eDeviceScanType)tree.Set(p_CamParam.p_eDeviceScanType, p_CamParam.p_eDeviceScanType, "Device Scan Type", "Device Scan Type");
             p_CamParam.p_eTriggerMode = (DalsaParameterSet.eTriggerMode)tree.Set(p_CamParam.p_eTriggerMode, p_CamParam.p_eTriggerMode, "Trigger Mode", "Trigger Mode");
+        }
+
+        void RunCameraConfig(Tree tree, bool bVisible)
+        {
+            p_CamParam.p_eUserSetPowerup = (DalsaParameterSet.eUserSet)tree.Set(p_CamParam.p_eUserSetPowerup, p_CamParam.p_eUserSetPowerup, "Power-up UserSet", "Selects the UserSet Configuration Set on camera power-up or reset", bVisible);
+            p_CamParam.p_eUserSetCurrent = (DalsaParameterSet.eUserSet)tree.Set(p_CamParam.p_eUserSetCurrent, p_CamParam.p_eUserSetCurrent, "Current UserSet", "Selects and Current UserSet", bVisible);
+            p_CamParam.p_nRotaryEncoderMultiplier = tree.Set(p_CamParam.p_nRotaryEncoderMultiplier, p_CamParam.p_nRotaryEncoderMultiplier, "RotaryEncoderMultiplier", "Specifies a multiplication factor for the rotary encoder output pulse generator", bVisible);
+            p_CamParam.p_nRotaryEncoderDivider = tree.Set(p_CamParam.p_nRotaryEncoderDivider, p_CamParam.p_nRotaryEncoderDivider, "RotaryEncoderDivider", "Specifies a division factor for the rotary encoder output pulse generator", bVisible);
         }
 
         #endregion 

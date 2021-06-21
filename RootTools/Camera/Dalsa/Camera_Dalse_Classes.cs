@@ -114,6 +114,28 @@ namespace RootTools.Camera.Dalsa
             External,
         }
 
+        public enum eUserSet
+        {
+            Default=0,
+            UserSet1,
+            UserSet2,
+            UserSet3,
+            UserSet4,
+            UserSet5,
+            UserSet6,
+            UserSet7,
+            UserSet8,
+            UserSet9,
+            UserSet10,
+            UserSet11,
+            UserSet12,
+            UserSet13,
+            UserSet14,
+            UserSet15,
+            UserSet16,
+        }
+
+
         public Log m_log;
         SapAcqDevice m_sapCam;
         SapAcquisition m_SapGrabber;
@@ -165,17 +187,60 @@ namespace RootTools.Camera.Dalsa
         //    }
         //}
 
-        int _nUserSetNum = 0;
-        public int p_nUserSetNum
+        //int _nUserSetNum = 0;
+        //public int p_nUserSetNum
+        //{
+        //    get => _nUserSetNum;
+        //    set
+        //    {
+        //        if (value < 17 && value > 0) 
+        //        {
+        //            _nUserSetNum = value;
+        //            SetUserset(value);
+        //        }
+        //    }
+        //}
+        eUserSet m_eUserSetPowerup = eUserSet.Default;
+        public eUserSet p_eUserSetPowerup
         {
-            get => _nUserSetNum;
+            get { return m_eUserSetPowerup; }
             set
             {
-                if (value < 17 && value > 0) 
+                if(SetPowerupUserset(value))
+                    m_eUserSetPowerup = value;
+            }
+        }
+        eUserSet m_eUserSetCurrent = eUserSet.Default;
+        public eUserSet p_eUserSetCurrent
+        {
+            get { return m_eUserSetCurrent; }
+            set
+            {
+                if(SetCurrentUserset(value))
                 {
-                    _nUserSetNum = value;
-                    SetUserset(value);
+                    if(LoadUserset())
+                        m_eUserSetCurrent = value;
                 }
+            }
+        }
+        int m_nRotaryEncoderMultiplier = 1;
+        public int p_nRotaryEncoderMultiplier
+        {
+            get { return m_nRotaryEncoderMultiplier; }
+            set
+            {
+                if (SetRotaryEncoderMultiplier(value))
+                    m_nRotaryEncoderMultiplier = value;
+            }
+        }
+        int m_nRotaryEncoderDivider = 1;
+        public int p_nRotaryEncoderDivider
+        {
+            get { return m_nRotaryEncoderDivider; }
+            set
+            {
+                if (SetRotaryEncoderDivider(value))
+                    m_nRotaryEncoderDivider = value;
             }
         }
         eDir m_eDir = eDir.Forward;
@@ -326,6 +391,16 @@ namespace RootTools.Camera.Dalsa
             }
             p_eTriggerMode = eTriggerMode.External;
 
+            // Get default UserSet data from device
+            eUserSet userset = eUserSet.Default;
+            if (GetPowerupUserset(ref userset)) m_eUserSetPowerup = userset;
+            if (GetCurrentUserset(ref userset)) m_eUserSetCurrent = userset;
+
+            // Get default Encoder Multiplier, Divider
+            int nEncoderVal = 1;
+            if (GetRotaryEncoderMultiplier(ref nEncoderVal)) m_nRotaryEncoderMultiplier = nEncoderVal;
+            if (GetRotaryEncoderDivider(ref nEncoderVal)) m_nRotaryEncoderDivider = nEncoderVal;
+
         }
         public void SetAreaParams()
         {
@@ -343,12 +418,79 @@ namespace RootTools.Camera.Dalsa
                 m_sapCam.SetFeatureValue("TriggerMode", "Internal");
             p_eTriggerMode = eTriggerMode.Internal;
         }
-        void SetUserset(int num)
+        bool SetPowerupUserset(eUserSet userset)
         {
-            string str;
-            m_sapCam.GetFeatureValue("UserSetSelector", out str);
-            if (!str.Contains(num.ToString()))
-                m_sapCam.SetFeatureValue("UserSetSelector", "UserSet" + num.ToString());
+            if (m_sapCam == null) return false;
+
+            return m_sapCam.SetFeatureValue("UserSetDefaultSelector", userset.ToString());
+        }
+        bool GetPowerupUserset(ref eUserSet userset)
+        {
+            if (m_sapCam == null) return false;
+
+            string sReturn;
+            bool bOk = m_sapCam.GetFeatureValue("UserSetDefaultSelector", out sReturn);
+            if(bOk)
+                userset = (eUserSet)Enum.Parse(typeof(eUserSet), sReturn);
+
+            return bOk;
+        }
+        bool SetCurrentUserset(eUserSet userset)
+        {
+            if (m_sapCam == null) return false;
+
+            return m_sapCam.SetFeatureValue("UserSetSelector", userset.ToString());
+        }
+        bool GetCurrentUserset(ref eUserSet userset)
+        {
+            if (m_sapCam == null) return false;
+
+            string sReturn;
+            bool bOk = m_sapCam.GetFeatureValue("UserSetSelector", out sReturn);
+            if(bOk)
+                userset = (eUserSet)Enum.Parse(typeof(eUserSet), sReturn);
+
+            return bOk;
+        }
+        bool LoadUserset()
+        {
+            if (m_sapCam == null) return false;
+
+            return m_sapCam.SetFeatureValue("UserSetLoad", "");
+        }
+        bool SetRotaryEncoderMultiplier(int mul)
+        {
+            if (m_sapCam == null) return false;
+
+            return m_sapCam.SetFeatureValue("rotaryEncoderMultiplier", mul);
+        }
+        bool GetRotaryEncoderMultiplier(ref int mul)
+        {
+            if (m_sapCam == null) return false;
+
+            int tempMul;
+            bool bOk = m_sapCam.GetFeatureValue("rotaryEncoderMultiplier", out tempMul);
+            if (bOk)
+                mul = tempMul;
+
+            return bOk;
+        }
+        bool SetRotaryEncoderDivider(int div)
+        {
+            if (m_sapCam == null) return false;
+
+            return m_sapCam.SetFeatureValue("rotaryEncoderDivider", div);
+        }
+        bool GetRotaryEncoderDivider(ref int div)
+        {
+            if (m_sapCam == null) return false;
+
+            int tempDiv;
+            bool bOk = m_sapCam.GetFeatureValue("rotaryEncoderDivider", out tempDiv);
+            if (bOk)
+                div = tempDiv;
+
+            return bOk;
         }
         public void SetCamHandle(SapAcqDevice device, SapAcquisition acquisition)
         {

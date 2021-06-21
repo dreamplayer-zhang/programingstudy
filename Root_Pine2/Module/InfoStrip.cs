@@ -30,11 +30,20 @@ namespace Root_Pine2.Module
         #endregion
 
         #region Boat Flow
-        public Vision.eVision m_eVision = Vision.eVision.Top3D; 
-        public Vision.eWorks m_eWorks = Vision.eWorks.A;
+        public Vision2D.eVision m_eVisionLoad = Vision2D.eVision.Top3D; 
+        public Vision2D.eWorks m_eWorks = Vision2D.eWorks.A;
         #endregion
 
-        public string p_id { get; set; }
+        string _id = ""; 
+        public string p_id 
+        { 
+            get { return _id; }
+            set
+            {
+                _id = value;
+                OnPropertyChanged(); 
+            }
+        }
         public int p_nStrip { get; set; }
         public InfoStrip(int nStrip)
         {

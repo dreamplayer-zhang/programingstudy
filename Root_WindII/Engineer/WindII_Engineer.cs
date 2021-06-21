@@ -30,7 +30,7 @@ namespace Root_WindII.Engineer
         public GAF m_gaf = new GAF();
         public GAF ClassGAF() { return m_gaf; }
 
-        public IGem ClassGem() { return null; }
+        public IGem ClassGem() { return m_xGem; }
 
         public IHandler ClassHandler() { return m_handler; }
 
@@ -106,12 +106,12 @@ namespace Root_WindII.Engineer
                 OnPropertyChanged();
             }
         }
-        XGem m_xGem = null;
-        XGem_UI m_xGemUI = new XGem_UI();
+        XGem_New m_xGem = null;
+        XGem_New_UI m_xGemUI = new XGem_New_UI();
         void InitXGem()
         {
             if (p_bUseXGem == false) return;
-            m_xGem = new XGem();
+            m_xGem = new XGem_New();
             m_xGem.Init("XGem", this);
             m_xGemUI.Init(m_xGem);
             m_toolBox.AddToolSet(m_xGem, m_xGemUI);

@@ -32,6 +32,8 @@ namespace RootTools_Vision.WorkManager3
 
         private CopyBufferData[] copyBufferList;
 
+        private bool bCopyBuffer = false;
+
         #region [Properties]
 
         public bool IsReady
@@ -173,7 +175,7 @@ namespace RootTools_Vision.WorkManager3
         }
         #endregion
 
-        public WorkPipe(WORK_TYPE type, int threadNum = 1, bool isWaitAll = false)
+        public WorkPipe(WORK_TYPE type, int threadNum = 1, bool isWaitAll = false, bool bCopyBuffer = false)
         {
             this.workList = new List<WorkBase>();
             this.queue = new ConcurrentQueue<Workplace>();
@@ -181,6 +183,8 @@ namespace RootTools_Vision.WorkManager3
             this.type = type;
             this.maxThreadNum = threadNum;
             this.isWaitAll = isWaitAll;
+
+            this.bCopyBuffer = bCopyBuffer;
 
             this.taskManager = new TaskManager<Workplace>(threadNum);
 
@@ -289,7 +293,7 @@ namespace RootTools_Vision.WorkManager3
                 if (queue.TryDequeue(out workplace) && !token.IsCancellationRequested && !this.IsStopRequest)
                 {
                     CopyBufferData copyBuffer = null;
-                    if(this.type == WORK_TYPE.INSPECTION)
+                    if(this.type == WORK_TYPE.INSPECTION && this.bCopyBuffer == true)
                     {
                         while ((copyBuffer = GetAvailableCopyBuffer()) == null && !token.IsCancellationRequested)
                         {
@@ -297,7 +301,7 @@ namespace RootTools_Vision.WorkManager3
                         };
                     }
 
-                    while(!this.taskManager.Invoke(DoJob(workplace, this.workList, token, copyBuffer)) && !token.IsCancellationRequested)
+                    while(!this.taskManager.Invoke(DoJob(workplace, this.workList, token, copyBuffer, this.bCopyBuffer)) && !token.IsCancellationRequested)
                     {
                         Thread.Sleep(100);
                     }
@@ -352,14 +356,14 @@ namespace RootTools_Vision.WorkManager3
         }
 
 
-        private static Task<Workplace> DoJob(Workplace workplace, List<WorkBase> works, CancellationToken token, CopyBufferData copyBuffer = null)
+        private static Task<Workplace> DoJob(Workplace workplace, List<WorkBase> works, CancellationToken token, CopyBufferData copyBuffer = null, bool bCopyBuffer = false)
         {
             return new Task<Workplace>(() =>
             {
                 try
                 {
                     //CopyBuffer buffer = null;
-                    if (works.Count > 0 && works[0].Type == WORK_TYPE.INSPECTION)
+                    if (works.Count > 0 && works[0].Type == WORK_TYPE.INSPECTION && bCopyBuffer == true)
                     {
                         //buffer.Realloc(workplace.Width, workplace.Height);
 

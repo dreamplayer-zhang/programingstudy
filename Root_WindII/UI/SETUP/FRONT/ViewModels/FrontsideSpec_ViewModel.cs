@@ -88,7 +88,7 @@ namespace Root_WindII
 
             foreach (ParameterBase parameterBase in recipe.ParameterItemList)
             {
-                if (parameterBase.GetType().GetInterface(nameof(IFrontsideInspection)) == null)
+                if (parameterBase.GetType().GetInterface(nameof(IFrontsideInspection)) == null && parameterBase.GetType().GetInterface(nameof(IFrontsideMeasurement)) == null)
                     continue;
 
                 InspectionItem item = new InspectionItem();

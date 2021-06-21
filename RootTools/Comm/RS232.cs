@@ -53,7 +53,10 @@ namespace RootTools.Comm
             set
             {
                 if ((m_sp != null) == value) return;
-                m_log.Info(p_id + " Connect -> " + value.ToString());
+
+                if(m_log != null)
+                    m_log.Info(p_id + " Connect -> " + value.ToString());
+                
                 if (value)
                 {
                     _sInfo = Connect();
@@ -177,7 +180,7 @@ namespace RootTools.Comm
         public string m_sRead = "";
         private void M_sp_DataReceived(object sender, SerialDataReceivedEventArgs e)
         {
-            if (OnReceive == null) return;
+            //if (OnReceive == null) return;
             SerialPort sp = (SerialPort)sender;
             string sRead = sp.ReadExisting();
             m_commLog.Add(CommLog.eType.Receive, sRead.Trim());
@@ -215,7 +218,7 @@ namespace RootTools.Comm
             {
                 if (p_eEndBit == eEndBit.None)
                 {
-                    OnReceive(sRead);
+                    if (OnReceive != null) OnReceive(sRead);
                     return "";
                 }
                 else if (p_eEndBit == eEndBit.LFCR_4CH)
@@ -238,12 +241,12 @@ namespace RootTools.Comm
                             }
                         }
                     }
-                    OnReceive(sRead.Substring(0, nIndex));
+                    if (OnReceive != null) OnReceive(sRead.Substring(0, nIndex));
                     return "";
                 }
                 nIndex = sRead.IndexOf(m_sEnd);
                 if (nIndex < 0) return sRead;
-                OnReceive(sRead.Substring(0, nIndex));
+                if (OnReceive != null) OnReceive(sRead.Substring(0, nIndex));
                 nIndex += m_sEnd.Length;
                 if (sRead.Length < nIndex) return "";
                 else return sRead.Substring(nIndex, sRead.Length - nIndex);

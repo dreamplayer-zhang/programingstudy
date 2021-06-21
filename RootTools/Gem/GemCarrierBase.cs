@@ -1,6 +1,5 @@
 ﻿using RootTools.Module;
 using RootTools.Trees;
-using RootTools.GAFs;
 using System;
 using System.Collections.Generic;
 using System.Windows.Media;
@@ -50,7 +49,7 @@ namespace RootTools.Gem
             Unknown
         }
         ePresent _ePresentSensor = ePresent.Empty;
-        public ePresent p_ePresentSensor
+        public ePresent p_ePresentSensor 
         {
             get { return _ePresentSensor; }
             set
@@ -62,21 +61,11 @@ namespace RootTools.Gem
                 {
                     switch (value)
                     {
-                        case ePresent.Empty:
-                            {
-                                p_bCarrierOn = false;
-                                //m_module.p_sInfo = m_gem.SendCarrierPresentSensor(this, false); 
-                                
-                            }
-                            break; 
-                        case ePresent.Exist:
-                            {
-                                p_bCarrierOn = true;
-                                //m_module.p_sInfo = m_gem.SendCarrierPresentSensor(this, true);
-                            }
-                            break; 
+                        case ePresent.Empty: m_module.p_sInfo = m_gem.SendCarrierPresentSensor(this, false); break;
+                        case ePresent.Exist: m_module.p_sInfo = m_gem.SendCarrierPresentSensor(this, true); break;
                     }
-                    //SendCarrierOn();
+                    
+                    SendCarrierOn();
                 }
                 
             }
@@ -109,24 +98,7 @@ namespace RootTools.Gem
             {
                 if (_eReqAssociated == value) return;
                 m_log.Info("p_eAssociated State " + _eReqAssociated.ToString() + " -> " + value.ToString());
-                _eReqAssociated = value;
-                /*  
-                switch (_eReqAssociated)
-                {
-                    case eAssociated.Associated:
-                        {
-                            p_eReqTransfer = eTransfer.TransferBlocked;
-                            m_gem.SendLPInfo(p_sLocID, (long)p_eTransfer, (long)p_eAccess, 0, (long)p_eReqAssociated, p_sCarrierID);
-                            break;
-                        }
-                    case eAssociated.NotAssociated:
-                        {
-                            m_gem.SendLPInfo(p_sLocID, (long)p_eTransfer, (long)p_eAccess, 0, (long)p_eReqAssociated, p_sCarrierID);
-                            break;
-                        }
-                }
-                */
-                
+                _eReqAssociated = value;                
             }
         }
 
@@ -134,7 +106,6 @@ namespace RootTools.Gem
         {
             p_eReqAssociated = value;
             m_gem.SendLPInfo(this);
-            //m_gem.SendLPInfo(p_sLocID, (long)p_eTransfer, (long)p_eAccess, 0, (long)p_eReqAssociated, p_sCarrierID);
         }
 
         public void RunTreeAssociated(Tree tree)
@@ -164,16 +135,17 @@ namespace RootTools.Gem
             switch (p_eTransfer)
             {
                 case eTransfer.TransferBlocked:
-                    if (p_ePresentSensor == ePresent.Exist)
-                    {
-                        if (m_gem != null) p_bCarrierOn = true;
-                        //m_bReqReadCarrierID = true;//jws 210414 check 필요 여기서 rfid 리드 요청함
-                    }
-                    if (p_ePresentSensor == ePresent.Empty) 
-                    {
-                        if (m_gem != null) p_bCarrierOn = false;
-                    }
-                    break;
+                if (p_ePresentSensor == ePresent.Exist)
+                {
+                    if (m_gem != null) p_bCarrierOn = true;
+                    //m_bReqReadCarrierID = true;//jws 210414 check 필요 여기서 rfid 리드 요청함
+                }
+            
+                if (p_ePresentSensor == ePresent.Empty) 
+                {
+                    if (m_gem != null) p_bCarrierOn = false;
+                }
+                break;
             }
         }
 
@@ -198,7 +170,7 @@ namespace RootTools.Gem
             ReadyToLoad,
             ReadyToUnload
         }
-        eTransfer _eReqTransfer = eTransfer.OutOfService;
+        eTransfer _eReqTransfer = eTransfer.ReadyToLoad;
         public eTransfer p_eReqTransfer
         {
             get { return _eReqTransfer; }
@@ -217,9 +189,8 @@ namespace RootTools.Gem
                     case eTransfer.ReadyToUnload:
                         if (m_gem != null) m_module.p_sInfo = m_gem.CMSSetReadyToUnload(this);
                         break;
-                    case eTransfer.TransferBlocked:
-                        m_gem.SendCarrierPresentSensor(this, (p_ePresentSensor == ePresent.Empty) ? false : true);
-                        //m_gem.SendLPInfo(this);
+                    default:
+                        m_gem.SendLPInfo(this);
                         break;
                 }
                 RunTree(Tree.eMode.Init);
@@ -288,8 +259,8 @@ namespace RootTools.Gem
                 _eReqAccess = value; 
                 switch (_eAccess)
                 {
-                    case eAccess.CarrierCompleted: 
 
+                    case eAccess.CarrierCompleted: 
                         m_bReqUnload = true; 
                         break; 
                 }
@@ -358,13 +329,6 @@ namespace RootTools.Gem
 
             m_gem.SendCarrierID(this, sCarrierID);
 
-             /*
-            if (m_gem != null && m_gem.p_eControl == eControl.ONLINEREMOTE)
-            {
-                p_eStateCarrierID = eGemState.WaitForHost;
-            }
-            */
-
             p_sCarrierID = sCarrierID;
             m_log.Info("Send CarrierID : " + sCarrierID);
         }
@@ -426,7 +390,6 @@ namespace RootTools.Gem
 
         public void SetPJ(GemPJ pj, List<GemSlotBase.eState> aSlotState)
         {
-            m_bReqGem = true;
             int l = Math.Min(aSlotState.Count, m_aGemSlot.Count); 
             for (int n = 0; n < l; n++)
             {
@@ -478,7 +441,6 @@ namespace RootTools.Gem
         protected ModuleBase m_module; 
         protected Log m_log;
         public IGem m_gem;
-        public GAF m_gaf;
         public void InitBase()
         {
             m_gem?.AddGemCarrier(this);

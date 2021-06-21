@@ -29,7 +29,7 @@ namespace Root_CAMELLIA.Data
             {
                 instance = value;
             }
-}
+        }
         public DataManager(MainWindow_ViewModel main = null)
         {
             Main = main;

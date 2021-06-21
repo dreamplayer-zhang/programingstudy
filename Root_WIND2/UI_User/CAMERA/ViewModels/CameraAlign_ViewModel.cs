@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -16,7 +17,7 @@ using System.Windows.Input;
 
 namespace Root_WIND2.UI_User
 {
-    public class CameraAlign_ViewModel : ObservableObject
+    public class CameraAlign_ViewModel : ObservableObject, IPage
     {
         #region [Properties]
         private CameraAlign_ImageViewer_ViewModel imageViewerVM;
@@ -36,6 +37,16 @@ namespace Root_WIND2.UI_User
             set
             {
                 SetProperty(ref this.motionControllerVM, value);
+            }
+        }
+
+        private MotionViewer_ViewModel motionViewerVM;
+        public MotionViewer_ViewModel MotionViewerVM
+        {
+            get => this.motionViewerVM;
+            set
+            {
+                SetProperty(ref this.motionViewerVM, value);
             }
         }
 
@@ -64,6 +75,46 @@ namespace Root_WIND2.UI_User
                 SetProperty<Image>(ref this.selectedFeatureItem, value);
             }
         }
+
+        private long firstAxisPositionX = 0;
+        public long FirstAxisPositionX
+        {
+            get => this.firstAxisPositionX;
+            set
+            {
+                SetProperty(ref this.firstAxisPositionX, value);
+            }
+        }
+
+        private long firstAxisPositionY = 0;
+        public long FirstAxisPositionY
+        {
+            get => this.firstAxisPositionY;
+            set
+            {
+                SetProperty(ref this.firstAxisPositionY, value);
+            }
+        }
+
+        private long secondAxisPositionX = 0;
+        public long SecondAxisPositionX
+        {
+            get => this.secondAxisPositionX;
+            set
+            {
+                SetProperty(ref this.secondAxisPositionX, value);
+            }
+        }
+
+        private long secondAxisPositionY = 0;
+        public long SecondAxisPositionY
+        {
+            get => this.secondAxisPositionY;
+            set
+            {
+                SetProperty(ref this.secondAxisPositionY, value);
+            }
+        }
         #endregion
 
 
@@ -76,37 +127,15 @@ namespace Root_WIND2.UI_User
             {
                 this.visionModule = GlobalObjects.Instance.Get<WIND2_Engineer>().m_handler.p_Vision;
 
-                motionControllerVM = new MotionController_ViewModel(VisionModule.AxisXY.p_axisX, VisionModule.AxisXY.p_axisY, VisionModule.AxisRotate, VisionModule.AxisZ);
+                this.motionControllerVM = new MotionController_ViewModel(VisionModule.AxisXY.p_axisX, VisionModule.AxisXY.p_axisY, VisionModule.AxisRotate, VisionModule.AxisZ);
+                this.motionViewerVM = new MotionViewer_ViewModel(VisionModule.AxisXY.p_axisX, VisionModule.AxisXY.p_axisY, VisionModule.AxisRotate, VisionModule.AxisZ);
 
-                this.ImageViewerVM.SetImageData(visionModule.p_CamAlign.p_ImageViewer.p_ImageData);
-
-                this.visionModule.p_CamAlign.Grabed += this.ImageViewerVM.OnUpdateImage;
+                if(visionModule.p_CamAlign != null)
+                {
+                    this.ImageViewerVM.SetImageData(visionModule.p_CamAlign.p_ImageViewer.p_ImageData);
+                    this.visionModule.p_CamAlign.Grabed += this.ImageViewerVM.OnUpdateImage;
+                }
             }
-
-            //EQ.p_bStop = false;
-            //Vision vision = ((WIND2_Handler)GlobalObjects.Instance.Get<WIND2_Engineer>().ClassHandler()).p_Vision;
-            //if (vision.p_eState != ModuleBase.eState.Ready)
-            //{
-            //    MessageBox.Show("Vision Home이 완료 되지 않았습니다.");
-            //    return;
-            //}
-
-
-            // 이거머냐
-            //Run_GrabLineScan Grab = (Run_GrabLineScan)visionModule.CloneModuleRun("GrabLineScan");
-            //var viewModel = new Dialog_Scan_ViewModel(visionModule, Grab);
-            //Nullable<bool> result = GlobalObjects.Instance.Get<DialogService>().ShowDialog(viewModel);
-            //if (result.HasValue)
-            //{
-            //    if (result.Value)
-            //    {
-            //        visionModule.StartRun(Grab);
-            //    }
-            //    else
-            //    {
-
-            //    }
-            //}
         }
 
         #region [Properties]
@@ -183,6 +212,18 @@ namespace Root_WIND2.UI_User
             {
                 return new RelayCommand(() =>
                 {
+
+                    //if (GlobalObjects.Instance.Get<WIND2_Engineer>().m_eMode == WIND2_Engineer.eMode.Vision)
+                    //{
+                    //    if(this.ImageViewerVM.p_ImageData != null)
+                    //    {
+                    //        this.ImageViewerVM.SetImageData(visionModule.p_CamAlign.p_ImageViewer.p_ImageData);
+                    //        this.visionModule.p_CamAlign.Grabed += this.ImageViewerVM.OnUpdateImage;
+                    //    }
+                    //}
+
+                    if (VisionModule == null) return;
+
                     if (!VisionModule.p_CamAlign.m_ConnectDone)
                     {
                         VisionModule.p_CamAlign.FunctionConnect();
@@ -195,7 +236,7 @@ namespace Root_WIND2.UI_User
                         }
                     }
 
-                    RefreshFeatureItemList();
+                    LoadRecipe();
                 });
             }
         }
@@ -212,7 +253,13 @@ namespace Root_WIND2.UI_User
         {
             get => new RelayCommand(() =>
             {
+                this.FirstAxisPositionX = (long)VisionModule.AxisXY.p_axisX.p_posActual;
+                this.FirstAxisPositionY = (long)VisionModule.AxisXY.p_axisY.p_posActual;
 
+                FrontAlignRecipe alignRecipe = GlobalObjects.Instance.Get<RecipeAlign>().GetItem<FrontAlignRecipe>();
+
+                alignRecipe.FirstSearchPointX = this.FirstAxisPositionX;
+                alignRecipe.FirstSearchPointY = this.FirstAxisPositionY;
 
             });
         }
@@ -221,7 +268,13 @@ namespace Root_WIND2.UI_User
         {
             get => new RelayCommand(() =>
             {
+                this.SecondAxisPositionX = (long)VisionModule.AxisXY.p_axisX.p_posActual;
+                this.SecondAxisPositionY = (long)VisionModule.AxisXY.p_axisY.p_posActual;
 
+                FrontAlignRecipe alignRecipe = GlobalObjects.Instance.Get<RecipeAlign>().GetItem<FrontAlignRecipe>();
+
+                alignRecipe.SecondSearchPointX = this.SecondAxisPositionX;
+                alignRecipe.SecondSearchPointY = this.SecondAxisPositionY;
             });
         }
 
@@ -229,37 +282,69 @@ namespace Root_WIND2.UI_User
         {
             get => new RelayCommand(() =>
             {
-                string imagePath = GlobalObjects.Instance.Get<Settings>().GetItem<SettingItem_SetupCamera>().FeatureImagePath;
-                DirectoryInfo di = new DirectoryInfo(imagePath);
-                di.Create();
+                FrontAlignRecipe alignRecipe = GlobalObjects.Instance.Get<RecipeAlign>().GetItem<FrontAlignRecipe>();
 
-                string fileName = "feature_" + di.GetFiles().Length + ".bmp";
+                ImageData featureImageData = this.ImageViewerVM.BoxImage;
 
-                this.ImageViewerVM.BoxImage.SaveImageSync(imagePath + "\\" + fileName);
+                byte[] srcBuf = featureImageData.m_aBuf;
+                byte[] rawData = new byte[featureImageData.p_Size.X * featureImageData.p_Size.Y];
+                Array.Copy(srcBuf, rawData, srcBuf.Length);
+
+                alignRecipe.AddAlignFeature(0, 0, featureImageData.p_Size.X, featureImageData.p_Size.Y, 1, rawData);
 
                 RefreshFeatureItemList();
             });
         }
 
+        public ICommand btnFeatureDeleteCommand
+        {
+            get => new RelayCommand(() =>
+            {
+                if (SelectedFeatureItem == null) return;
 
-       
+                FrontAlignRecipe alignRecipe = GlobalObjects.Instance.Get<RecipeAlign>().GetItem<FrontAlignRecipe>();
+
+                int index = FeatureItemList.IndexOf(SelectedFeatureItem);
+                alignRecipe.AlignFeatureList.RemoveAt(index);
+
+                this.FeatureItemList.Remove(SelectedFeatureItem);
+                SelectedFeatureItem = null;
+            });
+        }
+
+        public ICommand btnFeatureClearCommand
+        {
+            get => new RelayCommand(() =>
+            {
+                ClearFeatureList();
+            });
+        }
+
+
         #endregion
 
         #region [Method]
+
+        private void ClearFeatureList()
+        {
+            this.featureItemList.Clear();
+
+            FrontAlignRecipe alignRecipe = GlobalObjects.Instance.Get<RecipeAlign>().GetItem<FrontAlignRecipe>();
+            alignRecipe.AlignFeatureList.Clear();
+        }
+
         private void RefreshFeatureItemList()
         {
             this.FeatureItemList.Clear();
 
-            string imagePath = GlobalObjects.Instance.Get<Settings>().GetItem<SettingItem_SetupCamera>().FeatureImagePath;
+            FrontAlignRecipe alignRecipe = GlobalObjects.Instance.Get<RecipeAlign>().GetItem<FrontAlignRecipe>();
 
-            DirectoryInfo di = new DirectoryInfo(imagePath);
-            di.Create();
-
-            foreach (FileInfo file in di.GetFiles()) 
+            foreach (RecipeType_ImageData feature in alignRecipe.AlignFeatureList) 
             {
                 Image image = new Image();
-                string fullname = file.FullName;
-                image.Source = Tools.ConvertBitmapToSource(((System.Drawing.Bitmap)System.Drawing.Image.FromFile(fullname)));
+
+                System.Drawing.Bitmap bmp = Tools.CovertArrayToBitmap(feature.RawData, feature.Width, feature.Height, feature.ByteCnt);
+                image.Source = Tools.ConvertBitmapToSource(bmp);
                 image.Width = 200;
                 image.Height = 200;
                 Application.Current.Dispatcher.Invoke((Action)delegate
@@ -267,6 +352,18 @@ namespace Root_WIND2.UI_User
                     this.FeatureItemList.Add(image);
                 });
             }
+        }
+
+        public void LoadRecipe()
+        {
+            FrontAlignRecipe alignRecipe = GlobalObjects.Instance.Get<RecipeAlign>().GetItem<FrontAlignRecipe>();
+
+            this.FirstAxisPositionX = alignRecipe.FirstSearchPointX;
+            this.FirstAxisPositionY = alignRecipe.FirstSearchPointY;
+            this.SecondAxisPositionX = alignRecipe.SecondSearchPointX;
+            this.SecondAxisPositionY = alignRecipe.SecondSearchPointY;
+
+            RefreshFeatureItemList();
         }
 
         #endregion

@@ -105,32 +105,33 @@ namespace RootTools_Vision
             //// Add Defect to DB
             if (MergeDefectList.Count > 0)
             {
-                DatabaseManager.Instance.AddDefectDataList(MergeDefectList, "defect");
+                DatabaseManager.Instance.AddDefectDataListNoAutoCount(MergeDefectList, "defect");
             }
+
 
             Settings settings = new Settings();
             SettingItem_SetupBackside settings_backside = settings.GetItem<SettingItem_SetupBackside>();
 
             Tools.SaveDefectImage(Path.Combine(settings_backside.DefectImagePath, sInspectionID), MergeDefectList, this.currentWorkplace.SharedBufferInfo, this.currentWorkplace.SharedBufferByteCnt);
 
-            if (settings_backside.UseKlarf)
-            {
-                KlarfData_Lot klarfData = new KlarfData_Lot();
-                Directory.CreateDirectory(settings_backside.KlarfSavePath);
+            //if (settings_backside.UseKlarf)
+            //{
+            //    KlarfData_Lot klarfData = new KlarfData_Lot();
+            //    Directory.CreateDirectory(settings_backside.KlarfSavePath);
 
-                klarfData.AddSlot(recipe.WaferMap, MergeDefectList, this.recipe.GetItem<OriginRecipe>());
-                klarfData.WaferStart(recipe.WaferMap, DateTime.Now);
-                klarfData.SetResultTimeStamp();
+            //    klarfData.AddSlot(recipe.WaferMap, MergeDefectList, this.recipe.GetItem<OriginRecipe>());
+            //    klarfData.WaferStart(recipe.WaferMap, DateTime.Now);
+            //    klarfData.SetResultTimeStamp();
 
-                klarfData.SaveKlarf(settings_backside.KlarfSavePath, false);
+            //    klarfData.SaveKlarf(settings_backside.KlarfSavePath, false);
 
-                Tools.SaveTiffImage(settings_backside.KlarfSavePath, klarfData.GetKlarfFileName(), MergeDefectList, this.currentWorkplace.SharedBufferInfo);
+            //    Tools.SaveTiffImage(settings_backside.KlarfSavePath, klarfData.GetKlarfFileName(), MergeDefectList, this.currentWorkplace.SharedBufferInfo);
 
-                Tools.SaveImageJpg(this.currentWorkplace.SharedBufferInfo, 
-                    new Rect(settings_backside.WholeWaferImageStartX, settings_backside.WholeWaferImageStartY, settings_backside.WholeWaferImageEndX, settings_backside.WholeWaferImageEndY),
-                    settings_backside.KlarfSavePath + "\\" + DateTime.Now.ToString("yyyyMMddhhmmss") + "_backside.jpg", 
-                    (long)(settings_backside.WholeWaferImageCompressionRate * 100));
-            }
+            //    Tools.SaveImageJpg(this.currentWorkplace.SharedBufferInfo, 
+            //        new Rect(settings_backside.WholeWaferImageStartX, settings_backside.WholeWaferImageStartY, settings_backside.WholeWaferImageEndX, settings_backside.WholeWaferImageEndY),
+            //        settings_backside.KlarfSavePath + "\\" + DateTime.Now.ToString("yyyyMMddhhmmss") + "_backside.jpg", 
+            //        (long)(settings_backside.WholeWaferImageCompressionRate * 100));
+            //}
 
 
 

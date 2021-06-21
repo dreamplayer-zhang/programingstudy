@@ -22,7 +22,7 @@ namespace Root_WIND2
         public void Init(WIND2_Recipe recipe)
         {
             m_recipe = recipe;
-            m_moduleRunList = recipe.m_moduleRunList;
+            m_moduleRunList = recipe.p_moduleRunList;
             this.DataContext = recipe;
             comboBoxModule.ItemsSource = recipe.m_asModule;
             treeRootUI.Init(m_moduleRunList.m_treeRoot);
@@ -39,7 +39,7 @@ namespace Root_WIND2
             dlg.DefaultExt = "." + sModel;
             dlg.Filter = sModel + " Recipe (." + sModel + ")|*." + sModel;
             if (dlg.ShowDialog() == true) m_moduleRunList.OpenJob(dlg.FileName);
-            m_recipe.m_moduleRunList.RunTree(Tree.eMode.Init);
+            m_recipe.p_moduleRunList.RunTree(Tree.eMode.Init);
         }
 
         private void buttonSave_Click(object sender, RoutedEventArgs e)
@@ -49,13 +49,13 @@ namespace Root_WIND2
             dlg.InitialDirectory = m_sPath;
             dlg.Filter = sModel + " Recipe (." + sModel + ")|*." + sModel;
             if (dlg.ShowDialog() == true) m_moduleRunList.SaveJob(dlg.FileName);
-            m_recipe.m_moduleRunList.RunTree(Tree.eMode.Init);
+            m_recipe.p_moduleRunList.RunTree(Tree.eMode.Init);
         }
 
         private void buttonClear_Click(object sender, RoutedEventArgs e)
         {
             m_moduleRunList.Clear();
-            m_recipe.m_moduleRunList.RunTree(Tree.eMode.Init);
+            m_recipe.p_moduleRunList.RunTree(Tree.eMode.Init);
         }
         #endregion
 
@@ -81,7 +81,7 @@ namespace Root_WIND2
         private void buttonAdd_Click(object sender, RoutedEventArgs e)
         {
             m_moduleRunList.Add(m_sModule, m_sModuleRun);
-            m_recipe.m_moduleRunList.RunTree(Tree.eMode.Init);
+            m_recipe.p_moduleRunList.RunTree(Tree.eMode.Init);
         }
         #endregion
     }

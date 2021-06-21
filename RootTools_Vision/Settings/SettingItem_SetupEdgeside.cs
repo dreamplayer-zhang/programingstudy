@@ -38,6 +38,52 @@ namespace RootTools_Vision
         }
         private string klarfSavePath = "D:\\Klarf";
 
+        [Category("Klarf")]
+        [DisplayName("Whole Circle Image Size Width")]
+        public int OutputImageSizeWidth
+        {
+            get
+            {
+                return outputImageSizeWidth;
+            }
+            set
+            {
+                outputImageSizeWidth = value;
+            }
+        }
+        private int outputImageSizeWidth = 1000;
+
+
+        [Category("Klarf")]
+        [DisplayName("Whole Circle Image Size Height")]
+        public int OutputImageSizeHeight
+        {
+            get
+            {
+                return outputImageSizeHeight;
+            }
+            set
+            {
+                outputImageSizeHeight = value;
+            }
+        }
+        private int outputImageSizeHeight = 1000;
+
+        [Category("Klarf")]
+        [DisplayName("Circle Thickness")]
+        public int Thickness
+        {
+            get
+            {
+                return thickness;
+            }
+            set
+            {
+                thickness = value;
+            }
+        }
+        private int thickness = 50;
+
         [Category("Common")]
         [DisplayName("Defect Image Path")]
         public string DefectImagePath
