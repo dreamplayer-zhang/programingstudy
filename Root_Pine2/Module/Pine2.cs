@@ -29,11 +29,11 @@ namespace Root_Pine2.Module
         DIO_O m_doIonizer; 
         public override void GetTools(bool bInit)
         {
-            m_toolBox.GetDIO(ref m_dioStart, this, "Start");
-            m_toolBox.GetDIO(ref m_dioStop, this, "Stop");
-            m_toolBox.GetDIO(ref m_dioReset, this, "Reset");
-            m_toolBox.GetDIO(ref m_dioHome, this, "Home");
-            m_toolBox.GetDIO(ref m_dioPickerSet, this, "PickerSet");
+            m_toolBox.GetDIO(ref m_dioStart, this, "Start", false);
+            m_toolBox.GetDIO(ref m_dioStop, this, "Stop", false);
+            m_toolBox.GetDIO(ref m_dioReset, this, "Reset", false);
+            m_toolBox.GetDIO(ref m_dioHome, this, "Home", false);
+            m_toolBox.GetDIO(ref m_dioPickerSet, this, "PickerSet", false);
             m_toolBox.GetDIO(ref m_diEmergency, this, "Emergency");
             m_toolBox.GetDIO(ref m_diDoorOpen, this, "Door Open");
             m_toolBox.GetDIO(ref m_diCDA, this, "CDA");
@@ -383,6 +383,7 @@ namespace Root_Pine2.Module
             }
         }
 
+        public double m_widthDefaultStrip = 95; 
         double _widthStrip = 95;
         public double p_widthStrip
         {
@@ -392,6 +393,19 @@ namespace Root_Pine2.Module
                 if (_widthStrip == value) return;
                 _widthStrip = value;
                 OnPropertyChanged();
+            }
+        }
+
+        public double m_thicknessDefault = 0;
+        double _thickness = 0;
+        public double p_thickness
+        {
+            get { return _thickness; }
+            set
+            {
+                if (_thickness == value) return;
+                _thickness = value;
+                OnPropertyChanged(); 
             }
         }
 
@@ -501,11 +515,18 @@ namespace Root_Pine2.Module
         {
             base.RunTree(tree);
             m_buzzer.RunTree(tree.GetTree("Buzzer")); 
-            p_eMode = (eRunMode)tree.Set(p_eMode, p_eMode, "Mode", "RunMode");
-            p_widthStrip = tree.Set(p_widthStrip, p_widthStrip, "Width", "Strip Width (mm)");
-            p_lStack = tree.Set(p_lStack, p_lStack, "Stack Count", "Strip Max Stack Count");
-            p_lStackPaper = tree.Set(p_lStackPaper, p_lStackPaper, "Paper Count", "Paper Max Stack Count");
-            p_sRecipe = tree.Set(p_sRecipe, p_sRecipe, "Recipe", "Recipe"); 
+            p_eMode = (eRunMode)tree.GetTree("Mode").Set(p_eMode, p_eMode, "Mode", "RunMode");
+            p_b3D = tree.GetTree("Mode").Set(p_b3D, p_b3D, "3D", "RunMode");
+            p_widthStrip = tree.GetTree("Strip").Set(p_widthStrip, p_widthStrip, "Width", "Strip Width (mm)");
+            p_thickness = tree.GetTree("Strip").Set(p_thickness, p_thickness, "Thickness", "Strip Thickness (um)");
+            m_widthDefaultStrip = tree.GetTree("Default Strip").Set(m_widthDefaultStrip, m_widthDefaultStrip, "Width", "Strip Width (mm)");
+            m_thicknessDefault = tree.GetTree("Default Strip").Set(m_thicknessDefault, m_thicknessDefault, "Thickness", "Strip Thickness (um)");
+            p_lStack = tree.GetTree("Stack").Set(p_lStack, p_lStack, "Stack Count", "Strip Max Stack Count");
+            p_lStackPaper = tree.GetTree("Stack").Set(p_lStackPaper, p_lStackPaper, "Paper Count", "Paper Max Stack Count");
+            if (tree.p_treeRoot.p_eMode != Tree.eMode.RegRead)
+            {
+                p_sRecipe = tree.GetTree("Mode").Set(p_sRecipe, p_sRecipe, "Recipe", "Recipe");
+            }
         }
         #endregion
 

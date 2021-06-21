@@ -98,9 +98,9 @@
                         </Grid.ColumnDefinitions>
                         <TextBlock Text="Pitch" Style="{StaticResource group_box_item_name_text}"/>
                         <TextBlock Text="X" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                        <TextBox Grid.Column="2" IsEnabled="False" Text="{Binding PitchX}" HorizontalContentAlignment="Center"/>
+                        <TextBox Grid.Column="2" IsEnabled="True" Text="{Binding PitchX}" HorizontalContentAlignment="Center"/>
                         <TextBlock Text="Y" Grid.Column="3"  HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                        <TextBox Grid.Column="4" IsEnabled="False" Text="{Binding PitchY}" HorizontalContentAlignment="Center"/>
+                        <TextBox Grid.Column="4" IsEnabled="True" Text="{Binding PitchY}" HorizontalContentAlignment="Center"/>
                     </Grid>
 
                     <!-- Image Offset -->
@@ -120,8 +120,7 @@
                     </Grid>
 
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                        <Button Content="Save" Width ="120" Style="{StaticResource groupbox_button}"/>
-                        <Button Content="Reload" Width ="120" Style="{StaticResource groupbox_button}"/>
+                        <Button Content="Save" Width ="120" Style="{StaticResource groupbox_button}" Command="{Binding btnOriginSaveCommand}"/>
                         <Button Content="Clear" Command="{Binding btnOriginClearCommand}" Width ="120" Style="{StaticResource groupbox_button}"/>
                     </StackPanel>
                 </StackPanel>

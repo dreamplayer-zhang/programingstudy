@@ -9,7 +9,7 @@
     <DataGrid x:Name="dataGrid" IsReadOnly="True" AutoGenerateColumns="False">
         <DataGrid.Columns>
             <DataGridTextColumn Header="Module ID" Binding="{Binding p_sModule}"/>
-            <DataGridTextColumn Header="Event" Binding="{Binding p_sCategory}"/>
+            <DataGridTextColumn Header="Event" Binding="{Binding p_sEvent}"/>
             <DataGridTextColumn Header="Time" Binding="{Binding p_sTime}"/>
             <DataGridTextColumn Header="Cfg ID" Binding="{Binding p_sCfgID}"/>
             <DataGridTextColumn Header="Value" Binding="{Binding p_sValue}"/>

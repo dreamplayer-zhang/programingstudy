@@ -26,6 +26,7 @@ namespace Root_VEGA_D
     /// </summary>
     public partial class ManualJobSchedule_UI : Window
     {
+        static public bool bParallel = false;
         static public bool m_bShow = false;
         InfoCarrier m_infoCarrier = null;
         InfoWafer m_infoWafer = null;
@@ -53,6 +54,7 @@ namespace Root_VEGA_D
             btnRun.DataContext = loadport;
             m_loadport = loadport;
             //InitInfo();
+            textboxLocID.Content = m_infoCarrier.p_sLocID;
             InitRecipe();
         }
 
@@ -86,6 +88,7 @@ namespace Root_VEGA_D
         private void checkRnR_Checked(object sender, RoutedEventArgs e)
         {
             m_Manualjob.p_bRnR = true;
+            bParallel = true;
             textblockRnR.Visibility = Visibility.Visible;
             textboxRnR.Visibility = Visibility.Visible;
         }
@@ -93,6 +96,7 @@ namespace Root_VEGA_D
         private void checkRnR_Unchecked(object sender, RoutedEventArgs e)
         {
             m_Manualjob.p_bRnR = false;
+            bParallel = false;
             textblockRnR.Visibility = Visibility.Hidden;
             textboxRnR.Visibility = Visibility.Hidden;
         }
@@ -128,7 +132,7 @@ namespace Root_VEGA_D
 
         private void Button_Click_1(object sender, RoutedEventArgs e)
         {
-            m_infoCarrier.SetInfoWafer(0, null);
+            //m_infoCarrier.SetInfoWafer(0, null);
             ModuleRunBase UnDocking = m_loadport.m_runUndocking.Clone();
             m_loadport.StartRun(UnDocking);
             this.Close();

@@ -79,8 +79,8 @@ namespace RootTools_Vision
                     samplingX = (double)rect.Width / outSizeX;
                     samplingY = (double)rect.Height / outSizeY;
                 }
-                int centerOffsetX = (int)(centerX / samplingX) - (outSizeX / 2);
-                int centerOffsetY = (int)(centerY / samplingY) - (outSizeY / 2);
+                int centerOffsetX = 0; //(int)(centerX / samplingX) - (outSizeX / 2);
+                int centerOffsetY = 0;  //(int)(centerY / samplingY) - (outSizeY / 2);
 
 
                 System.Drawing.Imaging.PixelFormat format = System.Drawing.Imaging.PixelFormat.Format8bppIndexed;
@@ -414,6 +414,9 @@ namespace RootTools_Vision
                         for(int j = -1; j <= 1; j++)
                         {
                             long dIndex = ((long)i * bmpData.Stride + (long)(j * byteCount));
+
+                            if ((index + dIndex) < 0 || (index + dIndex) > (bmpData.Stride * bmpData.Height)) continue;
+
                             int tempR = pDst[(long)(index + dIndex + 0)];
                             int tempG = pDst[(long)(index + dIndex + 1)];
                             int tempB = pDst[(long)(index + dIndex + 2)];

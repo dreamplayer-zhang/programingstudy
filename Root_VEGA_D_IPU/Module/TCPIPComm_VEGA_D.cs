@@ -11,7 +11,9 @@ namespace Root_VEGA_D_IPU.Module
 {
     public class TCPIPComm_VEGA_D
     {
-        public event TCPIPServer.OnReciveData EventReciveData;
+        public event TCPIPServer.OnReciveData EventReceiveData;
+        public event TCPIPServer.OnAccept EventAccept;
+        public event TCPIPServer.OnConnect EventConnect;
 
         TCPIPServer m_server;
         TCPIPClient m_client;
@@ -31,14 +33,18 @@ namespace Root_VEGA_D_IPU.Module
         public TCPIPComm_VEGA_D(TCPIPServer server)
         {
             m_server = server;
-            server.EventReciveData += EventReceiveData;
+            server.EventReciveData += EventReceiveDataFunc;
+            server.EventAccept += EventAcceptFunc;
+
             m_bIsServer = true;
         }
 
         public TCPIPComm_VEGA_D(TCPIPClient client)
         {
             m_client = client;
-            client.EventReciveData += EventReceiveData;
+            client.EventReciveData += EventReceiveDataFunc;
+            client.EventConnect += EventConnectFunc;
+
             m_bIsServer = false;
         }
 
@@ -46,14 +52,25 @@ namespace Root_VEGA_D_IPU.Module
 
         public enum Command
         {
-            none,
-            start,
-            end,
-            rcpname,
-            result,
-            alive,
-            ready,
+            None,
+            LineStart,
+            LineEnd,
+            RcpName,
+            Result,
+            resume,
         }
+
+        // start command
+        public const string PARAM_NAME_OFFSETX = "OFFSETX";
+        public const string PARAM_NAME_OFFSETY = "OFFSETY";
+        public const string PARAM_NAME_SCANDIR = "DIR";
+        public const string PARAM_NAME_FOV = "FOV";
+        public const string PARAM_NAME_OVERLAP = "OVERLAP";
+        public const string PARAM_NAME_RCPNAME = "RCPNAME";
+        public const string PARAM_NAME_LINE = "LINE";
+        public const string PARAM_NAME_TOTALSCANLINECOUNT = "TOTALSCANLINECOUNT";
+        public const string PARAM_NAME_CURRENTSCANLINE = "CURRENTSCANLINE";
+        public const string PARAM_NAME_STARTSCANLINE = "STARTSCANLINE";
 
         const string COMMAND_NAME = "CMD";
 
@@ -65,6 +82,9 @@ namespace Root_VEGA_D_IPU.Module
 
             // ';'으로 메세지 단위 구분
             int msgSeperatorIdx = sRecv.IndexOf(';');
+            if (msgSeperatorIdx == -1)
+                msgSeperatorIdx = sRecv.Length; // ';' 문자가 없을 경우
+
             string strFullMsg = sRecv.Substring(0, msgSeperatorIdx);
             nStartIdx = msgSeperatorIdx + 1;
 
@@ -108,9 +128,22 @@ namespace Root_VEGA_D_IPU.Module
             return true;
         }
 
-        private void EventReceiveData(byte[] aBuf, int nSize, Socket socket)
+        private void EventReceiveDataFunc(byte[] aBuf, int nSize, Socket socket)
         {
-            EventReciveData(aBuf, nSize, socket);
+            if(EventReceiveData != null)
+                EventReceiveData(aBuf, nSize, socket);
+        }
+
+        private void EventAcceptFunc(Socket socket)
+        {
+            if (EventAccept != null)
+                EventAccept(socket);
+        }
+
+        private void EventConnectFunc(Socket socket)
+        {
+            if (EventConnect != null)
+                EventConnect(socket);
         }
 
         public void SendMessage(Command cmd)
