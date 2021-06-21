@@ -162,7 +162,7 @@ namespace RootTools_Vision
 			int diffEdge = param.DiffEdge;
 			int diffBevel = param.DiffBevel;
 			int diffEBR = param.DiffEBR;
-			double resolution = this.currentWorkplace.CameraInfo.TargetResX;
+			//double resolution = this.currentWorkplace.CameraInfo.TargetResX;
 
 			int[] arrDiffReverse = new int[arrDiff.Length];
 			for (int i = 0; i < arrDiff.Length; i++)
@@ -213,7 +213,7 @@ namespace RootTools_Vision
 			int diffEdge = param.DiffEdge;
 			int diffBevel = param.DiffBevel;
 			int diffEBR = param.DiffEBR;
-			double resolution = this.currentWorkplace.CameraInfo.TargetResX;
+			//double resolution = this.currentWorkplace.CameraInfo.TargetResX;
 
 			int[] arrDiffReverse = new int[arrDiff.Length];
 			for (int i = 0; i < arrDiff.Length; i++)
@@ -231,7 +231,7 @@ namespace RootTools_Vision
 								"EDGE",
 								Measurement.MeasureType.EBR,
 								Measurement.EBRMeasureItem.Bevel,
-								(float)((waferEdgeX - bevelX) * resolution),
+								(float)((waferEdgeX - bevelX) /** resolution*/),
 								this.currentWorkplace.Width,
 								this.currentWorkplace.Height,
 								CalculateAngle(this.currentWorkplace.Index),
@@ -244,7 +244,7 @@ namespace RootTools_Vision
 								"EDGE",
 								Measurement.MeasureType.EBR,
 								Measurement.EBRMeasureItem.EBR,
-								(float)((waferEdgeX - ebrX) * resolution),
+								(float)((waferEdgeX - ebrX) /** resolution*/),
 								this.currentWorkplace.Width,
 								this.currentWorkplace.Height,
 								CalculateAngle(this.currentWorkplace.Index),

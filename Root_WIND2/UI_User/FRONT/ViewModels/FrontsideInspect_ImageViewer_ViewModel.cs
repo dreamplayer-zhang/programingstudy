@@ -480,7 +480,9 @@ namespace Root_WIND2.UI_User
 
         bool InViewRect(TRect rt)
         {
-            if(p_View_Rect.Contains(rt.MemoryRect.Left, rt.MemoryRect.Top))
+            return true;
+
+            if (p_View_Rect.Contains(rt.MemoryRect.Left, rt.MemoryRect.Top))
             {
                 return true;
             }

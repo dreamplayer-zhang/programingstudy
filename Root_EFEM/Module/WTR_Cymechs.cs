@@ -41,12 +41,14 @@ namespace Root_EFEM.Module
 
         #region ToolBox
         public DIO_I m_diReticleCheck;
+        public DIO_I m_diArmClose;
         TCPIPClient m_tcpip; 
         RS232 m_rs232;
         public override void GetTools(bool bInit)
         {
             InitALID();
             p_sInfo = m_toolBox.GetDIO(ref m_diReticleCheck, this, "Reticle Check Sensor");
+            p_sInfo = m_toolBox.GetDIO(ref m_diArmClose, this, "ArmClose");
             switch (p_eComm)
             {
                 case eComm.TCPIP:
@@ -514,6 +516,7 @@ namespace Root_EFEM.Module
             {
                 bool bDone = m_protocolSend.OnReceive(sRead);
                 string[] sreads = sRead.Split(' ');
+                if(sreads.Length>=2)
                 m_alidRTRCmdError.Run(sreads[0] == "_ERR", "Cymechs Robot Error, Error Code : " + sreads[1]);
                 if (bDone) m_protocolSend = null;
             }
@@ -534,10 +537,13 @@ namespace Root_EFEM.Module
 
         #region GAF
         public ALID m_alidRTRCmdError;
+        public ALID m_alidRTRArmError;
         void InitALID()
 		{
             m_alidRTRCmdError = m_gaf.GetALID(this, "Cymechs", "RTR CMD ERROR");
-		}
+            m_alidRTRArmError = m_gaf.GetALID(this, "Cymechs", "RTR Arm ERROR");
+
+        }
         #endregion
 
         #region Protocol
@@ -1027,10 +1033,10 @@ namespace Root_EFEM.Module
                 }
                 int posWTR = child.GetTeachWTR(child.GetInfoWafer(m_nChildID));
                 if (posWTR < 0) return "WTR Teach Position Not Defined";
-                if (child.p_eState != eState.Ready)
-                {
-                    if (m_module.Run(m_module.CmdGoto(posWTR, m_nChildID + 1, m_eArm, false, false))) return p_sInfo;
-                }
+                //if (child.p_eState != eState.Ready)
+                //{
+                //    if (m_module.Run(m_module.CmdGoto(posWTR, m_nChildID + 1, m_eArm, false, false))) return p_sInfo;
+                //}
                 while (child.p_eState != eState.Ready)
                 {
                     if (EQ.IsStop()) return "Stop";

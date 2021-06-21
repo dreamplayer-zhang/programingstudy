@@ -226,7 +226,7 @@ namespace RootTools
             }
             catch (Exception e)
             {
-                m_log.Error(e.ToString(), "Job Save Error");
+                m_log.Error(e.ToString(), "Job Open or Save Error");
             }
         }
 

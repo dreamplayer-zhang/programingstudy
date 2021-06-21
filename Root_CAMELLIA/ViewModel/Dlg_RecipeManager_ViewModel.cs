@@ -5484,7 +5484,7 @@ namespace Root_CAMELLIA
                         dataManager.recipeDM.TeachingRD.WaveLengthReflectance.Add(item);
                         ReflectanceListItem.Add(item);
                         ReflectanceListItem = new ObservableCollection<WavelengthItem>(ReflectanceListItem.OrderBy(x => x.p_waveLength));
-
+                        dataManager.recipeDM.TeachingRD.WaveLengthReflectance.Sort((x1, x2) => x1.p_waveLength.CompareTo(x2.p_waveLength));
                         //ReflectanceListItem.Add(value);
                         //ReflectanceListItem = new ObservableCollection<double>(ReflectanceListItem.OrderBy(x=>x));
                     }
@@ -5493,6 +5493,7 @@ namespace Root_CAMELLIA
                         dataManager.recipeDM.TeachingRD.WaveLengthTransmittance.Add(item);
                         TransmittanceListItem.Add(item);
                         TransmittanceListItem = new ObservableCollection<WavelengthItem>(TransmittanceListItem.OrderBy(x => x.p_waveLength));
+                        dataManager.recipeDM.TeachingRD.WaveLengthTransmittance.Sort((x1, x2) => x1.p_waveLength.CompareTo(x2.p_waveLength));
                     }
                     //WaveLengthValue = "0";
                     MyIsFocused = true;
@@ -5518,7 +5519,7 @@ namespace Root_CAMELLIA
                     }
                     nRWLCount++;
                 }
-            }
+            }   
             else
             {
                 int nTWLCount = 0;

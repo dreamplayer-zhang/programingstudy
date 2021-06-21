@@ -37,6 +37,7 @@ namespace Root_WIND2.Module
 
 			if (Directory.Exists(klarfPath)) Directory.CreateDirectory(klarfPath);
 
+			klarfData.SetModuleName("Edgeside");
 
 			klarfData.LotStart(klarfPath, infoWafer, recipe.WaferMap, grabMode);
 		}
@@ -85,11 +86,11 @@ namespace Root_WIND2.Module
 			GrabModeEdge grabMode = module.GetGrabMode(recipe.CameraInfoIndex);
 
 			// Check Lot Start
-			//if (infoWafer != null && (
-			//    infoWafer._eWaferOrder == InfoWafer.eWaferOrder.FirstLastWafer ||
-			//    infoWafer._eWaferOrder == InfoWafer.eWaferOrder.FirstWafer))
+			if ((infoWafer != null) && (
+				(infoWafer._eWaferOrder == InfoWafer.eWaferOrder.FirstLastWafer) ||
+				(infoWafer._eWaferOrder == InfoWafer.eWaferOrder.FirstWafer)))
 			{
-				//LotStart(settings_edgeside.KlarfSavePath, recipe, infoWafer, grabMode);
+				LotStart(settings_edgeside.KlarfSavePath, recipe, infoWafer, grabMode);
 			}
 
 			if (EQ.IsStop())
@@ -107,7 +108,7 @@ namespace Root_WIND2.Module
 				if (workManager.OpenRecipe(recipeName) == false)
 					return "Recipe Open Fail";
 
-				workManager.Start(false);
+				workManager.Start();
 			}
 			else
 			{
@@ -134,13 +135,13 @@ namespace Root_WIND2.Module
 					}
 					#endregion
 				}
-				
-				// LotEnd Check
-				//if (infoWafer != null && (
-				//    infoWafer._eWaferOrder == InfoWafer.eWaferOrder.FirstLastWafer ||
-				//    infoWafer._eWaferOrder == InfoWafer.eWaferOrder.LastWafer))
+
+				//LotEnd Check
+				if ((infoWafer != null) && (
+					(infoWafer._eWaferOrder == InfoWafer.eWaferOrder.FirstLastWafer) ||
+					(infoWafer._eWaferOrder == InfoWafer.eWaferOrder.LastWafer)))
 				{
-					//LotEnd(infoWafer);
+					LotEnd(infoWafer);
 				}
 
 				return "OK";

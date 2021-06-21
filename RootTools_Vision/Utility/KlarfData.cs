@@ -241,7 +241,8 @@ namespace RootTools_Vision.Utility
 
 		private void PutTiffFileName(StreamWriter sw)
 		{
-			tempString = string.Format("TiffFilename " + klarfFileName +".tif" + ";\n");
+			string tiffName = klarfFileName.Substring(klarfFileName.LastIndexOf("\\") + 1);
+			tempString = string.Format("TiffFilename " + tiffName + ".tif" + ";\n");
 			sw.Write(tempString);
 		}
 

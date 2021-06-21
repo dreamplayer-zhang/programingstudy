@@ -1051,11 +1051,11 @@ namespace Root_WIND2.UI_User
                 this.SetSearchedCenter(new CPoint((int)centerPt.X, (int)centerPt.Y));
                 this.SetSearchedCirclePoints(points);
 
+                //List<CRect> rectOutterList = this.CalcDiePosition((int)centerPt.X, (int)centerPt.Y, true);
+
                 List<CRect> rectList = this.CalcDiePosition((int)centerPt.X, (int)centerPt.Y, false);
 
-                List<CRect> rectOutterList = this.CalcDiePosition((int)centerPt.X, (int)centerPt.Y, true);
-
-                this.SetMapRectList(rectList, rectOutterList);
+                this.SetMapRectList(rectList, new List<CRect>());
             }
         }
 
@@ -1132,6 +1132,10 @@ namespace Root_WIND2.UI_User
 
             double diePitchX = waferMap.DiePitchX / camInfo.RealResX;
             double diePitchY = waferMap.DiePitchY / camInfo.RealResY;
+
+            originRecipe.DiePitchX = (int)diePitchX;
+            originRecipe.DiePitchY = (int)diePitchY;
+
             double sampleCenterX = waferMap.SampleCenterLocationX;
             double sampleCenterY = waferMap.SampleCenterLocationY;
 

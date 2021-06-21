@@ -371,8 +371,7 @@ namespace RootTools.RADS
 			int ADSCP_address = (int)uint.Parse(results[8].ToString("X2") + results[9].ToString("X2"), System.Globalization.NumberStyles.HexNumber);
 			int ADSCP_value = (int)uint.Parse(results[10].ToString("X2") + results[11].ToString("X2"), System.Globalization.NumberStyles.HexNumber);
 
-			Console.WriteLine("Echo Data Received : {0} {1} {2} {3} {4} {5}",
-				ADSCP_Type, ADSCP_Opcode, ADSCP_Length, ADSCP_seqNumber, ADSCP_address, ADSCP_value);
+			//Console.WriteLine("Echo Data Received : {0} {1} {2} {3} {4} {5}", ADSCP_Type, ADSCP_Opcode, ADSCP_Length, ADSCP_seqNumber, ADSCP_address, ADSCP_value);
 
 			if (ADSCP_Type == "3202" && ADSCP_Opcode == RADSControlInfo.ADSCP_OPCODE_READ_RSP)
 			{
@@ -451,8 +450,7 @@ namespace RootTools.RADS
 					int ADSCP_value = (int)uint.Parse(results[10].ToString("X2") + results[11].ToString("X2"), System.Globalization.NumberStyles.HexNumber);
 
 					Console.WriteLine("Response IP Address : {0}", remoteEP);
-					Console.WriteLine("Echo Data Received : {0} {1} {2} {3} {4} {5}",
-						ADSCP_Type, ADSCP_Opcode, ADSCP_Length, ADSCP_seqNumber, ADSCP_address, ADSCP_value);
+					//Console.WriteLine("Echo Data Received : {0} {1} {2} {3} {4} {5}", ADSCP_Type, ADSCP_Opcode, ADSCP_Length, ADSCP_seqNumber, ADSCP_address, ADSCP_value);
 
 					if (ADSCP_Type == "3202" && ADSCP_Opcode == RADSControlInfo.ADSCP_OPCODE_RESET_RSP)
 					{
@@ -718,8 +716,7 @@ namespace RootTools.RADS
 					int ADSCP_value = (int)uint.Parse(results[10].ToString("X2") + results[11].ToString("X2"), System.Globalization.NumberStyles.HexNumber);
 
 
-					Console.WriteLine("Echo Data Received : {0} {1} {2} {3} {4} {5}",
-						ADSCP_Type, ADSCP_Opcode, ADSCP_Length, ADSCP_seqNumber, ADSCP_address, ADSCP_value);
+					//Console.WriteLine("Echo Data Received : {0} {1} {2} {3} {4} {5}", ADSCP_Type, ADSCP_Opcode, ADSCP_Length, ADSCP_seqNumber, ADSCP_address, ADSCP_value);
 
 					if (ADSCP_Type == "3202" && ADSCP_Opcode == RADSControlInfo.ADSCP_OPCODE_WRITE_RSP)
 					{

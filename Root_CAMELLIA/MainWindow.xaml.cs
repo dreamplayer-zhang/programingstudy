@@ -149,7 +149,7 @@ namespace Root_CAMELLIA
             if (DateTime.Now.Second == 1)
                 isCFGWrite = false;
 
-                TimerUI();
+            TimerUI();
             TimerLamp();
 
             buttonResume.IsEnabled = IsEnable_Resume();

@@ -663,6 +663,7 @@ namespace RootTools.Module
 
             void ServerModuleRun(Protocol protocol)
             {
+                EQ.p_bStop = false; 
                 ModuleRunBase run = m_module.CloneModuleRun(protocol.m_sCmd);
                 if (run == null)
                 {
@@ -824,6 +825,7 @@ namespace RootTools.Module
             foreach (ModuleRunBase run in aModuleRun) run.RunTree(tree.GetTree(n++, run.p_id), true);
         }
         #endregion
+
         string _id = "";
         public string p_id
         {

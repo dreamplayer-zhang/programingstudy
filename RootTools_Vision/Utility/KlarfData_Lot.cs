@@ -155,10 +155,10 @@ namespace RootTools_Vision.Utility
 			}
 			else
 			{
-			this.cassetteID = infoWafer.p_sCarrierID;
-			this.lotID = infoWafer.p_sLotID;
-			this.recipeName = infoWafer.p_sRecipe;
-			this.waferID = infoWafer.p_sWaferID;
+			this.cassetteID = infoWafer.p_sCarrierID == "" ? "CassetteID": infoWafer.p_sCarrierID;
+			this.lotID = infoWafer.p_sLotID == "" ? "LotID" : infoWafer.p_sLotID;
+			this.recipeName = infoWafer.p_sRecipe == "" ? "Recipe" : infoWafer.p_sRecipe;
+			this.waferID = infoWafer.p_sWaferID == "" ? "WaferID" : infoWafer.p_sWaferID;
 
 			string[] idArr = infoWafer.p_sRecipe.Split('.');
 			if(idArr.Length == 1)
@@ -189,34 +189,42 @@ namespace RootTools_Vision.Utility
 
 
 		// 이건 쓰지말자...
-		public bool LotStart(string _recipeName/*, CRecipeData_ProductSetting* _productInfor*/, RecipeType_WaferMap _mapdata, string _lotID, DateTime _lotStart)
-		{
-			this.klarfData.Clear();
-			SetProductInfo(/*_productInfor*/);
+		//public bool LotStart(string _recipeName/*, CRecipeData_ProductSetting* _productInfor*/, RecipeType_WaferMap _mapdata, string _lotID, DateTime _lotStart)
+		//{
+		//	this.klarfData.Clear();
+		//	SetProductInfo(/*_productInfor*/);
 
-			this.recipeName = _recipeName;
-			this.lotID = _lotID;	
-			this.deviceID = "deviceID"; //_mapdata.GetDeviceID();
+		//	this.recipeName = _recipeName;
+		//	this.lotID = _lotID;	
+		//	this.deviceID = "deviceID"; //_mapdata.GetDeviceID();
 
-            switch (/*_mapdata.GetFlatZone()*/4)
-            {
-                //case 1: this.orientationMarkLocation = "LEFT"; break;
-                //case 2: this.orientationMarkLocation = "RIGHT"; break;
-                //case 3: this.orientationMarkLocation = "UP"; break;
-                case 4: this.orientationMarkLocation = "DOWN"; break;
-            }
+		  //          switch (/*_mapdata.GetFlatZone()*/4)
+		  //          {
+		  //              //case 1: this.orientationMarkLocation = "LEFT"; break;
+		  //              //case 2: this.orientationMarkLocation = "RIGHT"; break;
+		  //              //case 3: this.orientationMarkLocation = "UP"; break;
+		  //              case 4: this.orientationMarkLocation = "DOWN"; break;
+		  //          }
 
-			this.timeResult = _lotStart;
+		//	this.timeResult = _lotStart;
 
-			CalcSampleCenterLoc(_mapdata);
+		//	CalcSampleCenterLoc(_mapdata);
 
-            SetResultTimeStamp();
+		 //          SetResultTimeStamp();
 
-			klarf_FileName = this.recipeName + "_" + this.lotID + this.waferID + "_" + this.moduleName + ".001";
-			MEMMAP_FileName = this.lotID + "-" + this.cassetteID;
+		//	if(this.moduleName == "")
+		//          {
+		//		klarf_FileName = this.recipeName + "_" + this.lotID + this.waferID + ".001";
+		//	}
+		//	else
+		//          {
+		//		klarf_FileName = this.recipeName + "_" + this.lotID + this.waferID + "_" + this.moduleName + ".001";
+		//	}
+			
+		//	MEMMAP_FileName = this.lotID + "-" + this.cassetteID;
 
-			return true;
-		}
+		//	return true;
+		//}
 
 		public void SetResultTimeStamp()
 		{
@@ -238,8 +246,11 @@ namespace RootTools_Vision.Utility
 			this.slotID = infoWafer.m_nSlot;
 
 			
+			if(this.moduleName == "")
+				this.klarfFileName = this.klarfPath + "\\" + recipeName + "_" + waferID + "_" + lotID + "_" + cassetteID;
+			else
+				this.klarfFileName = this.klarfPath + "\\" + recipeName + "_" + waferID + "_" + lotID + "_" + cassetteID + "_" + moduleName;
 
-			this.klarfFileName = this.klarfPath + "\\" + recipeName + "_" + waferID + "_" + lotID + "_" + cassetteID +  "_" + moduleName;
 			return true;
 		}
 
@@ -304,7 +315,7 @@ namespace RootTools_Vision.Utility
             data.sampleCenterLocationX = this.sampleCenterLocationX;
             data.sampleCenterLocationY = this.sampleCenterLocationY;
             data.resolutionX = this.resX;
-            data.resolutionX = this.resY;
+            data.resolutionY = this.resY;
 
             data.SetSampleTestPlan(_mapdata);
             data.SetDefectInfor_SRLine(_mapdata, _defectlist, _origin, useTDIReview, useVrsReview);
@@ -734,7 +745,8 @@ namespace RootTools_Vision.Utility
 
 		private void PutLotID(StreamWriter sw)
 		{
-			tempString = string.Format("LotID {0}{1}-{2}{3};\n", 34, lotID, cassetteID, 34);
+			tempString = string.Format("LotID \"{0}-{1}\";\n", lotID, cassetteID);
+
 			sw.Write(tempString);
 		}
 
