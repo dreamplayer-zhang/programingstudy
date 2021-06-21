@@ -48,13 +48,13 @@ namespace Root_Pine2.Module
             return "OK"; 
         }
 
-        public string RunMove(InfoStrip infoStrip)
+        public string RunMove(InfoStrip infoStrip, double dZ)
         {
             if (infoStrip == null) return "InfoStrip == null"; 
             MagazineEV magazineEV = m_aEV[infoStrip.p_eMagazine];
             if (magazineEV.IsBusy()) return "Magazine Elevator is Busy"; 
             if (magazineEV.p_eState != ModuleBase.eState.Ready) return "Magazine Elevator is not Ready";
-            if (Run(magazineEV.StartMoveTransfer(infoStrip))) return m_sInfo;
+            if (Run(magazineEV.StartMoveTransfer(infoStrip, dZ))) return m_sInfo;
             Thread.Sleep(100);
             while (magazineEV.IsBusy()) Thread.Sleep(10);
             return magazineEV.p_sInfo;

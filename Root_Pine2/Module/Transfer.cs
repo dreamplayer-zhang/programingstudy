@@ -40,8 +40,11 @@ namespace Root_Pine2.Module
             #endregion
 
             #region Axis
+            string c_sReady = "Ready";
             void InitPosition()
             {
+                m_axis[0].AddPos(c_sReady);
+                m_axis[1].AddPos(c_sReady);
                 foreach (InfoStrip.eMagazine ePos in Enum.GetValues(typeof(InfoStrip.eMagazine)))
                 {
                     m_axis[GetAxisID(ePos)].AddPos(ePos.ToString()); 
@@ -54,6 +57,16 @@ namespace Root_Pine2.Module
                 return (ePos <= m_ePosLeft) ? 0 : 1; 
             }
 
+            public string RunMoveReady(bool bWait = true)
+            {
+                m_axis[0].StartMove(c_sReady);
+                m_axis[1].StartMove(c_sReady);
+                if (bWait == false) return "OK";
+                if (m_axis[0].WaitReady() != "OK") return "Move Ready Error";
+                if (m_axis[1].WaitReady() != "OK") return "Move Ready Error";
+                return "OK";
+            }
+
             public string RunMove(InfoStrip.eMagazine ePos, bool bWait = true)
             {
                 Axis axis = m_axis[GetAxisID(ePos)]; 
@@ -63,8 +76,7 @@ namespace Root_Pine2.Module
 
             public void Reset()
             {
-                m_axis[0].StartMove(0);
-                m_axis[1].StartMove(0);
+                RunMoveReady(false); 
             }
             #endregion
 
@@ -120,7 +132,8 @@ namespace Root_Pine2.Module
             #endregion
 
             #region Axis
-            double m_dPulse = 0;
+            double m_dxPulse = 0;
+            public double m_dZ = 0;
             public InfoStrip.eMagazine m_ePosDst = InfoStrip.eMagazine.Magazine0;
             public string RunMove(InfoStrip.eMagazine ePos, bool bPushPos, bool bWait = true)
             {
@@ -129,8 +142,8 @@ namespace Root_Pine2.Module
                 m_transfer.m_pusher.p_bEnable = false;
                 m_transfer.m_gripper.p_bEnable = false; 
                 m_ePosDst = ePos;
-                double dPos = 1000 * (95 - m_transfer.m_pine2.p_widthStrip);
-                m_axis.StartMove(ePos, (bPushPos ? 0 : m_dPulse) + dPos); 
+                double dPos = 1000 * (95 - m_transfer.m_pine2.p_widthStrip) / 2;
+                m_axis.StartMove(ePos, (bPushPos ? 0 : m_dxPulse) + dPos); 
                 return bWait ? m_axis.WaitReady() : "OK";
             }
             #endregion
@@ -158,7 +171,8 @@ namespace Root_Pine2.Module
 
             public void RunTree(Tree tree)
             {
-                m_dPulse = tree.Set(m_dPulse, m_dPulse, "dPulse", "Distance between Buffer (pulse)"); 
+                m_dxPulse = tree.Set(m_dxPulse, m_dxPulse, "dPulse", "Distance between Buffer (pulse)");
+                m_dZ = tree.Set(m_dZ, m_dZ, "dZ", "Distance between Buffer (pulse)");
             }
 
             Transfer m_transfer; 
@@ -389,7 +403,7 @@ namespace Root_Pine2.Module
                 return m_pusher.WaitUnlock();
             }
             if (Run(m_buffer.RunMove(infoStrip.p_eMagazine, false, false))) return p_sInfo;
-            if (Run(m_magazineEV.RunMove(infoStrip))) return p_sInfo;
+            if (Run(m_magazineEV.RunMove(infoStrip, 0))) return p_sInfo;
             if (Run(m_buffer.RunMove(infoStrip.p_eMagazine, false, true))) return p_sInfo;
             m_pusher.p_bEnable = (m_pusher.p_infoStrip == null);
             try
@@ -437,7 +451,7 @@ namespace Root_Pine2.Module
             InfoStrip infoStrip = m_pusher.p_infoStrip; 
             if (infoStrip == null) return "OK";
             if (Run(m_buffer.RunMove(infoStrip.p_eMagazine, true, false))) return p_sInfo;
-            if (Run(m_magazineEV.RunMove(infoStrip))) return p_sInfo;
+            if (Run(m_magazineEV.RunMove(infoStrip, m_buffer.m_dZ))) return p_sInfo;
             if (Run(m_buffer.RunMove(infoStrip.p_eMagazine, true, true))) return p_sInfo;
             m_gripper.p_bEnable = (m_gripper.p_infoStrip != null);
             if (Run(m_pusher.RunPusher())) return p_sInfo;
@@ -451,10 +465,17 @@ namespace Root_Pine2.Module
         public override string StateReady()
         {
             if (EQ.p_eState != EQ.eState.Run) return "OK";
-            if (m_pine2.p_eMode != Pine2.eRunMode.Magazine) return "OK";
-            if (m_pusher.p_infoStrip != null) return StartUnload();
-            if (m_gripper.p_infoStrip == null) return StartLoad();
-            return StartWaitLoader(); 
+            switch (m_pine2.p_eMode)
+            {
+                case Pine2.eRunMode.Stack:
+                    m_loaderPusher.RunMoveReady(); 
+                    break;
+                case Pine2.eRunMode.Magazine:
+                    if (m_pusher.p_infoStrip != null) return StartUnload();
+                    if (m_gripper.p_infoStrip == null) return StartLoad();
+                    return StartWaitLoader();
+            }
+            return "OK"; 
         }
 
         public override string StateHome()
