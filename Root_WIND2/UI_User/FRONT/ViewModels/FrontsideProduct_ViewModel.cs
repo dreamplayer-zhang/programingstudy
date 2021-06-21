@@ -312,6 +312,18 @@ namespace Root_WIND2.UI_User
                 });
             }
         }
+
+        public ICommand OpenMapCreatorCommand
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    var viewModel = new Dialog_MapCreator_ViewModel();
+                    Nullable<bool> result = GlobalObjects.Instance.Get<DialogService>().ShowDialog(viewModel);
+                });
+            }
+        }
         #endregion
 
         private int defaultMapSizeX = 14;
