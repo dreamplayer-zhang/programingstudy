@@ -409,7 +409,6 @@ namespace Root_Pine2_Vision.Module
         #endregion
 
         #region RunSnap
-        public bool m_bIsGrabThreadStarted = false;
         public string StartSnap(Recipe.Snap recipe, eWorks eWorks, int iSnap)
         {
             Run_Snap run = (Run_Snap)m_runSnap.Clone();
@@ -437,7 +436,7 @@ namespace Root_Pine2_Vision.Module
                 }
                 //m_aWorks[eWorks].SendSnapDone(iSnap); 
             }
-            catch 
+            finally 
             {
                 m_camera.StopGrab(); 
                 //RunLightOff(); 
