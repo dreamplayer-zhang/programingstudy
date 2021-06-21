@@ -26,86 +26,137 @@ namespace Root_WIND2
 
             this.imageViewerVM = new Dialog_MapCreator_ImageViewer_ViewModel();
             this.imageViewerVM.init(GlobalObjects.Instance.GetNamed<ImageData>("FrontImage"), GlobalObjects.Instance.Get<DialogService>());
+
+            this.imageViewerVM.SelectChipPointDone += SelectChipPointDone_Callback;
+            this.imageViewerVM.SelectRoiPointDone += SelectRoiPointDone_Callback;
+            this.imageViewerVM.SelectChipBoxDone += SelectChipBoxDone_Callback;
+            this.imageViewerVM.SelectChipBoxReset += SelectChipBoxReset_Callback;
+            this.imageViewerVM.SelectRoiBoxDone += SelectRoiBoxDone_Callback;
+            this.imageViewerVM.SelectRoiBoxReset += SelectRoiBoxReset_Callback;
+        }
+
+        public void SelectChipPointDone_Callback()
+        {
+            this.ChipX = this.imageViewerVM.selectChipBox.Left;
+            this.ChipY = this.imageViewerVM.selectChipBox.Bottom;
+        }
+
+        public void SelectRoiPointDone_Callback()
+        {
+            this.RoiX = this.imageViewerVM.selectRoiBox.Left;
+            this.RoiY = this.imageViewerVM.selectRoiBox.Bottom;
+        }
+
+        public void SelectChipBoxDone_Callback()
+        {
+            this.ChipWidth = this.imageViewerVM.selectChipBox.Width;
+            this.ChipHeight = this.imageViewerVM.selectChipBox.Height;
+        }
+
+        public void SelectChipBoxReset_Callback()
+        {
+
+        }
+
+        public void SelectRoiBoxDone_Callback()
+        {
+            this.RoiWidth = this.imageViewerVM.selectRoiBox.Width;
+            this.RoiHeight = this.imageViewerVM.selectRoiBox.Height;
+        }
+
+        public void SelectRoiBoxReset_Callback()
+        {
+
         }
 
         #region [Properties]
-        private int chipOriginX = 0;
-        public int ChipOriginX
+        private int chipX = 0;
+        public int ChipX
         {
-            get => this.chipOriginX;
+            get => this.chipX;
             set
             {
-                SetProperty<int>(ref this.chipOriginX, value);
+                SetProperty<int>(ref this.chipX, value);
             }
         }
 
-        private int chipOriginY = 0;
-        public int ChipOriginY
+        private int chipY = 0;
+        public int ChipY
         {
-            get => this.chipOriginY;
+            get => this.chipY;
             set
             {
-                SetProperty<int>(ref this.chipOriginY, value);
+                SetProperty<int>(ref this.chipY, value);
             }
         }
 
-        private int chipOriginWidth = 0;
-        public int ChipOriginWidth
+        private int chipWidth = 0;
+        public int ChipWidth
         {
-            get => this.chipOriginWidth;
+            get => this.chipWidth;
             set
             {
-                SetProperty<int>(ref this.chipOriginWidth, value);
+                SetProperty<int>(ref this.chipWidth, value);
             }
         }
 
-        private int chipOriginHeight = 0;
-        public int ChipOriginHeight
+        private int chipHeight = 0;
+        public int ChipHeight
         {
-            get => this.chipOriginHeight;
+            get => this.chipHeight;
             set
             {
-                SetProperty<int>(ref this.chipOriginHeight, value);
+                SetProperty<int>(ref this.chipHeight, value);
             }
         }
 
-        private int roiOriginX = 0;
-        public int RoiOriginX
+        private int roiX = 0;
+        public int RoiX
         {
-            get => this.roiOriginX;
+            get => this.roiX;
             set
             {
-                SetProperty<int>(ref this.roiOriginX, value);
+                SetProperty<int>(ref this.roiX, value);
             }
         }
 
-        private int roiOriginY = 0;
-        public int RoiOriginY
+        private int roiY = 0;
+        public int RoiY
         {
-            get => this.roiOriginY;
+            get => this.roiY;
             set
             {
-                SetProperty<int>(ref this.roiOriginY, value);
+                SetProperty<int>(ref this.roiY, value);
             }
         }
 
-        private int roiOriginWidth = 0;
-        public int RoiOriginWidth
+        private int roiWidth = 0;
+        public int RoiWidth
         {
-            get => this.roiOriginWidth;
+            get => this.roiWidth;
             set
             {
-                SetProperty<int>(ref this.roiOriginWidth, value);
+                SetProperty<int>(ref this.roiWidth, value);
             }
         }
 
-        private int roiOriginHeight = 0;
-        public int RoiOriginHeight
+        private int roiHeight = 0;
+        public int RoiHeight
         {
-            get => this.roiOriginHeight;
+            get => this.roiHeight;
             set
             {
-                SetProperty<int>(ref this.roiOriginHeight, value);
+                SetProperty<int>(ref this.roiHeight, value);
+            }
+        }
+
+        private int chipSimilarity = 70;
+        public int ChipSimilarity
+        {
+            get => this.chipSimilarity;
+            set
+            {
+                SetProperty<int>(ref this.chipSimilarity, value);
             }
         }
         #endregion

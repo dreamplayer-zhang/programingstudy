@@ -63,9 +63,9 @@
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
                         <TextBlock Text="Selected Chip Size: " Style="{StaticResource group_box_item_name_text}"/>
-                        <TextBox Grid.Column="2" Text="{Binding ChipOriginWidth}" IsEnabled="False" HorizontalContentAlignment="Center"/>
+                        <TextBox Grid.Column="2" Text="{Binding ChipWidth}" IsEnabled="False" HorizontalContentAlignment="Center"/>
                         <TextBlock Text="x" Grid.Column="3"  HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                        <TextBox Grid.Column="4" Text="{Binding ChipOriginHeight}" IsEnabled="False" HorizontalContentAlignment="Center"/>
+                        <TextBox Grid.Column="4" Text="{Binding ChipHeight}" IsEnabled="False" HorizontalContentAlignment="Center"/>
                     </Grid>
                 
                     <!-- Origin Row Right Top -->
@@ -78,9 +78,9 @@
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
                         <TextBlock Text="Selected ROI Size: " Style="{StaticResource group_box_item_name_text}"/>
-                        <TextBox Grid.Column="2" IsEnabled="False" Text="{Binding RoiOriginWidth}" HorizontalContentAlignment="Center"/>
+                        <TextBox Grid.Column="2" IsEnabled="False" Text="{Binding RoiWidth}" HorizontalContentAlignment="Center"/>
                         <TextBlock Text="x" Grid.Column="3"  HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                        <TextBox Grid.Column="4" IsEnabled="False" Text="{Binding RoiOriginHeight}" HorizontalContentAlignment="Center"/>
+                        <TextBox Grid.Column="4" IsEnabled="False" Text="{Binding RoiHeight}" HorizontalContentAlignment="Center"/>
                     </Grid>
 
                     <!-- Image Offset -->
@@ -91,7 +91,7 @@
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
                         <TextBlock Text="Similarity: " Style="{StaticResource group_box_item_name_text}"/>
-                        <TextBox Grid.Column="2" IsEnabled="True" Text="{Binding CamResolutionX}" HorizontalContentAlignment="Center"/>
+                        <TextBox Grid.Column="2" IsEnabled="True" Text="{Binding ChipSimilarity}" HorizontalContentAlignment="Center"/>
                     </Grid>
 
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">

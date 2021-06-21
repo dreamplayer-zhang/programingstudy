@@ -211,7 +211,6 @@ namespace Root_Pine2.Module
 
         public void ThreadStop()
         {
-            m_axis.StartMove(ePos.Handler); 
         }
     }
 }

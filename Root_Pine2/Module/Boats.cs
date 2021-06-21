@@ -86,6 +86,20 @@ namespace Root_Pine2.Module
             } 
             set { }
         }
+
+        public string RunMoveReady(Vision2D.eWorks eWorks)
+        {
+            if (Run(m_aBoat[eWorks].RunMove(p_ePosLoad))) return p_sInfo;
+            m_aBoat[eWorks].p_eStep = Boat.eStep.Ready;
+            return "OK";
+        }
+
+        public string RunMoveDone(Vision2D.eWorks eWorks)
+        {
+            if (Run(m_aBoat[eWorks].RunMove(p_ePosUnload))) return p_sInfo;
+            m_aBoat[eWorks].p_eStep = Boat.eStep.Done;
+            return "OK";
+        }
         #endregion
 
         #region Boat
@@ -271,7 +285,8 @@ namespace Root_Pine2.Module
         protected override void InitModuleRuns()
         {
             m_runSnap = AddModuleRunList(new Run_Snap(this), false, "Run Snap");
-            m_runSnap = AddModuleRunList(new Run_MoveBoat(this), false, "Move Boat");
+            AddModuleRunList(new Run_MoveBoat(this), false, "Move Boat");
+            AddModuleRunList(new Run_RunBoat(this), false, "Run Boat");
         }
 
         public class Run_Snap : ModuleRunBase
@@ -334,6 +349,47 @@ namespace Root_Pine2.Module
             public override string Run()
             {
                 return m_module.m_aBoat[m_eWorks].RunMove(m_ePos);
+            }
+        }
+
+        public class Run_RunBoat : ModuleRunBase
+        {
+            Boats m_module;
+            public Run_RunBoat(Boats module)
+            {
+                m_module = module;
+                InitModuleRun(module);
+            }
+
+            enum eRun
+            {
+                Ready,
+                Done,
+            }
+            eRun m_eRun = eRun.Ready; 
+            public Vision2D.eWorks m_eWorks;
+            public override ModuleRunBase Clone()
+            {
+                Run_RunBoat run = new Run_RunBoat(m_module);
+                run.m_eWorks = m_eWorks;
+                run.m_eRun = m_eRun;
+                return run;
+            }
+
+            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
+            {
+                m_eWorks = (Vision2D.eWorks)tree.Set(m_eWorks, m_eWorks, "eWorks", "Select Boat", bVisible);
+                m_eRun = (eRun)tree.Set(m_eRun, m_eRun, "Run", "Boat Run", bVisible);
+            }
+
+            public override string Run()
+            {
+                switch (m_eRun)
+                {
+                    case eRun.Ready: return m_module.RunMoveReady(m_eWorks);
+                    case eRun.Done: return m_module.RunMoveDone(m_eWorks); 
+                }
+                return "OK";
             }
         }
         #endregion
