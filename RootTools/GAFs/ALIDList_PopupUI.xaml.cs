@@ -1,7 +1,6 @@
 ﻿using System.ComponentModel;
 using System.Windows;
 using System.Windows.Input;
-using System.Windows.Media.Imaging;
 
 namespace RootTools.GAFs
 {
@@ -101,7 +100,8 @@ namespace RootTools.GAFs
             lableModule.DataContext = alid;
             lableDesc.DataContext = alid;
             lableMsg.DataContext = alid;
-            alidImage.Source = alid.p_image;
+            if(alid != null)
+                alidImage.Source = alid.p_image;
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)

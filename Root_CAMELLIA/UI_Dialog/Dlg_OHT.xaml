@@ -3,8 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:oht="clr-namespace:RootTools.OHTNew;assembly=RootTools"
-        xmlns:local="clr-namespace:Root_CAMELLIA.UI_Dialog"
+        xmlns:local="clr-namespace:Root_CAMELLIA"
         mc:Ignorable="d"
         Loaded="Window_Loaded"
         Closing="Window_Closing"
@@ -19,7 +18,7 @@
                 <GroupBox.Header>
                     <TextBlock Text="LoadportA"/>
                 </GroupBox.Header>
-                <oht:OHT_UI x:Name="OHTA"/>
+                <local:OHT_UI x:Name="OHTA"/>
             </GroupBox>
         </Grid>
         <Grid Grid.Column="1">
@@ -27,7 +26,7 @@
                 <GroupBox.Header>
                     <TextBlock Text="LoadportB"/>
                 </GroupBox.Header>
-                <oht:OHT_UI x:Name="OHTB"/>
+                <local:OHT_UI x:Name="OHTB"/>
             </GroupBox>
         </Grid>
     </Grid>

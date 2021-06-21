@@ -618,7 +618,6 @@ namespace RootTools.Camera.BaslerPylon
                     m_cam.StreamGrabber.ImageGrabbed -= OnImageGrabbed;
                     if (isImageUpdate)
                     {
-                       
                         m_cam.StreamGrabber.ImageGrabbed += OnImageGrabbed;
                     }
                     else
@@ -694,7 +693,7 @@ namespace RootTools.Camera.BaslerPylon
                 // Check if the image can be displayed.
                 if (grabResult.IsValid)
                 {
-                    //if (!stopWatch.IsRunning)
+                    if (!stopWatch.IsRunning)
                     {
                         if (m_bLive)
                         {
@@ -714,7 +713,7 @@ namespace RootTools.Camera.BaslerPylon
                             }
                             GrabEvent();
 
-                            //if(stopWatch.ElapsedMilliseconds > 33)
+                            if (stopWatch.ElapsedMilliseconds > 33)
                             {
                                 int imgSize = m_ImageGrab.p_Size.X * m_ImageGrab.p_Size.Y;
                                 m_threadBuf = new ImageData(m_ImageGrab.p_Size.X, m_ImageGrab.p_Size.Y, m_ImageGrab.GetBytePerPixel());
@@ -794,10 +793,15 @@ namespace RootTools.Camera.BaslerPylon
             }
         }
 
+
+        private bool grabLock = false;
         private void OnImageGrabbed(Object sender, ImageGrabbedEventArgs e)
         {
             try
             {
+                if (grabLock == true) return; 
+
+                grabLock = true;
                 IGrabResult grabResult = e.GrabResult;
                 
                 // Check if the image can be displayed.
@@ -888,6 +892,9 @@ namespace RootTools.Camera.BaslerPylon
                         }
                     }
                 }
+
+
+                grabLock = false;
             }
             catch (Exception exception)
             {

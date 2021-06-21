@@ -16,6 +16,9 @@ namespace RootTools_Vision
     {
         public static List<List<Point>> ReadPolygonFile(string filePath)
         {
+            if (File.Exists(filePath) == false)
+                return new List<List<Point>>();
+
             using (var sr = new StreamReader(filePath))
             {
                 XmlSerializer xs = new XmlSerializer(typeof(List<List<Point>>));

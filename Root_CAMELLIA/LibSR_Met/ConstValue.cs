@@ -29,6 +29,7 @@ namespace Root_CAMELLIA.LibSR_Met
        
         public const int OUT_OF_RANGE = -1111;
         //Transmittance
+        public const int NUM_OF_MATERIAL_DATANUM = 400;
         public const int MULTI_THREAD_COUNT = 7;
         public const double DELTA = 0.0000000001;//미분 극소변화량
         public const double SI_INIT_THICKNESS = 7750000;

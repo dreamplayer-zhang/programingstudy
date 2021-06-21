@@ -142,9 +142,10 @@ namespace Root_WIND2.Module
             {
                 if (EQ.IsStop()) return "OK";
             }
-            m_grabMode.SetLight(true);
 
             if (m_grabMode == null) return "Grab Mode == null";
+
+            m_grabMode.SetLight(true);
 
             try
             {

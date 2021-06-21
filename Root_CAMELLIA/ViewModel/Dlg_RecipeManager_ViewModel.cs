@@ -3858,6 +3858,17 @@ namespace Root_CAMELLIA
                     return false;
             }
 
+            if (isModelPathChange)
+            {
+                if (CustomMessageBox.Show("Caution!", "Model Path has been Changed! Not Saved Yet. Continue?", MessageBoxButton.OKCancel, CustomMessageBox.MessageBoxImage.Warning) == MessageBoxResult.OK)
+                {
+                    isModelPathChange = false;
+                    return true;
+                }
+                else
+                    return false;
+            }
+
             return true;
         }
 
@@ -4904,6 +4915,7 @@ namespace Root_CAMELLIA
                 {
                     p_UseThickness = false;
                 }
+                ClearData();
                 UpdateListView(false);
                 UpdateLayerGridView();
                 UpdateParameter();
@@ -4941,6 +4953,7 @@ namespace Root_CAMELLIA
                     return;
                 }
             }
+            isModelPathChange = false;
             isLayerDataChange = false;
             if (p_SettingViewModel.p_ExceptNIR)
             {
@@ -5036,7 +5049,7 @@ namespace Root_CAMELLIA
                     }
                     WavelengthItem item = new WavelengthItem(value, WaveLengthScale, WaveLengthOffset);
 
-                    if (!CheckVaildValue(value))
+                    if (!CheckVaildValue(value, WaveLengthScale, WaveLengthOffset))
                     {
                         return;
                     }
@@ -5046,6 +5059,7 @@ namespace Root_CAMELLIA
                         dataManager.recipeDM.TeachingRD.WaveLengthReflectance.Add(item);
                         ReflectanceListItem.Add(item);
                         ReflectanceListItem = new ObservableCollection<WavelengthItem>(ReflectanceListItem.OrderBy(x => x.p_waveLength));
+
                         //ReflectanceListItem.Add(value);
                         //ReflectanceListItem = new ObservableCollection<double>(ReflectanceListItem.OrderBy(x=>x));
                     }
@@ -5061,26 +5075,40 @@ namespace Root_CAMELLIA
             }
         }
 
-        private bool CheckVaildValue(double wave)
+        private bool CheckVaildValue(double wave, double Scale, double Offset)
         {
             if (IsReflectanceCheck)
             {
+                int nRWLCount = 0;
                 foreach(WavelengthItem item in dataManager.recipeDM.TeachingRD.WaveLengthReflectance)
                 {
-                    if(item.p_waveLength == wave)
+                    if(item.p_waveLength == wave && item.p_scale == Scale && item.p_offset == Offset)
                     {
                         return false;
                     }
+                    else if (item.p_waveLength == wave)
+                    {
+                        dataManager.recipeDM.TeachingRD.WaveLengthReflectance.RemoveAt(nRWLCount);
+                        ReflectanceListItem.RemoveAt(nRWLCount);
+                    }
+                    nRWLCount++;
                 }
             }
             else
             {
+                int nTWLCount = 0;
                 foreach (WavelengthItem item in dataManager.recipeDM.TeachingRD.WaveLengthTransmittance)
                 {
-                    if (item.p_waveLength == wave)
+                    if (item.p_waveLength == wave && item.p_scale == Scale && item.p_offset == Offset)
                     {
                         return false;
                     }
+                    else if (item.p_waveLength == wave)
+                    {
+                        dataManager.recipeDM.TeachingRD.WaveLengthReflectance.RemoveAt(nTWLCount);
+                        ReflectanceListItem.RemoveAt(nTWLCount);
+                    }
+                    nTWLCount++;
                 }
             }
             return true;
@@ -5176,6 +5204,7 @@ namespace Root_CAMELLIA
             }
         }
 
+        public bool isModelPathChange = false;
         public ICommand CmdSaveModel
         {
             get
@@ -5190,7 +5219,14 @@ namespace Root_CAMELLIA
                     }
                     if (dataManager.recipeDM.SaveModel())
                     {
-                        ModelPath = dataManager.recipeDM.TeachingRD.ModelRecipePath;
+                        if(dataManager.recipeDM.SaveRecipeRD.ModelRecipePath != dataManager.recipeDM.TeachingRD.ModelRecipePath)
+                        {
+                            if(CustomMessageBox.Show("Caution!", "Model Path has been Changed! Change the Model Path?", MessageBoxButton.OKCancel, CustomMessageBox.MessageBoxImage.Warning) == MessageBoxResult.OK)
+                            {
+                                ModelPath = dataManager.recipeDM.TeachingRD.ModelRecipePath;
+                                isModelPathChange = true;
+                            }
+                        }
                         isLayerDataChange = false;
                     }
                 });

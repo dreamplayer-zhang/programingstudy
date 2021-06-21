@@ -581,7 +581,7 @@
                     </DataTemplate>
                 </GridViewColumn.CellTemplate>
             </GridViewColumn>
-            <GridViewColumn Header="Value" x:Name="Column2" Width="120"
+            <GridViewColumn Header="Value" x:Name="Column2" Width="240"
                         HeaderContainerStyle="{StaticResource GridHeaderRight}">
                 <GridViewColumn.CellTemplate>
                     <DataTemplate>
@@ -737,7 +737,7 @@
                             <DataTemplate DataType="{x:Type local:TreeItem_stringList}">
                                 <ComboBox SelectedValue="{Binding p_value}"
                                           IsEnabled="{Binding p_bEnable}"
-                                          ItemsSource="{Binding p_list}" 
+                                          ItemsSource="{Binding p_list}" Foreground="Black"
                                           GotFocus="TextBox_GotFocus" LostFocus="TextBox_LostFocus"
                                           SelectionChanged="ComboBox_SelectionChanged"/>
                             </DataTemplate>

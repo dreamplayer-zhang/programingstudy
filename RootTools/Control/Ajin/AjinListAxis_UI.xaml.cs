@@ -32,22 +32,32 @@ namespace RootTools.Control.Ajin
 
         void InitTabControl()
         {
-            tabControlAxis.Items.Clear();
             comboAxis.ItemsSource = null;
-            m_asAxis.Clear(); 
             foreach (AjinAxis axis in m_listAxis.m_aAxis)
             {
-                TabItem tabItem = new TabItem();
-                tabItem.Header = axis.p_id; 
-                tabItem.Content = axis.p_ui;
-                m_asAxis.Add(axis.p_id); 
-                tabItem.Height = 0;
-                tabControlAxis.Items.Add(tabItem);
-                axis.RunTree(Tree.eMode.Init);
-                axis.RunTreeSetting(Tree.eMode.Init);
-                axis.RunTreeInterlock(Tree.eMode.Init);
+                if (IsNewAxis(axis))
+                {
+                    TabItem tabItem = new TabItem();
+                    tabItem.Header = axis.p_id;
+                    tabItem.Content = axis.p_ui;
+                    m_asAxis.Add(axis.p_id);
+                    tabItem.Height = 0;
+                    tabControlAxis.Items.Add(tabItem);
+                    axis.RunTree(Tree.eMode.Init);
+                    axis.RunTreeSetting(Tree.eMode.Init);
+                    axis.RunTreeInterlock(Tree.eMode.Init);
+                }
             }
             comboAxis.ItemsSource = m_asAxis; 
+        }
+
+        bool IsNewAxis(AjinAxis axis)
+        {
+            foreach (TabItem tabItem in tabControlAxis.Items)
+            {
+                if ((string)tabItem.Header == axis.p_id) return false;
+            }
+            return true;
         }
 
         private void ButtonOpenMot_Click(object sender, RoutedEventArgs e)

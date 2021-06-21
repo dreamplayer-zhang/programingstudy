@@ -25,7 +25,7 @@ namespace Root_VEGA_P.Module
             m_armEIP.GetTools(m_toolBox, this);
             if (bInit)
             {
-                m_tcpip.EventReciveData += M_tcpip_EventReciveData;
+                m_tcpip.EventReceiveData += M_tcpip_EventReciveData;
                 InitALID();
             }
         }

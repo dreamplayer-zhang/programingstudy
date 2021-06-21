@@ -4,8 +4,10 @@ using RootTools.Control;
 using RootTools.GAFs;
 using RootTools.Gem;
 using RootTools.Module;
+using RootTools.OHT.Semi;
 using RootTools.OHTNew;
 using RootTools.Trees;
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using static RootTools.Gem.XGem.XGem;
@@ -15,7 +17,32 @@ namespace Root_EFEM.Module
     public class Loadport_RND : ModuleBase, IWTRChild, ILoadport
     {
         #region ToolBox
-        DIO_I m_diPlaced;
+        public DIO_I m_diPlaced;
+        //OHT _OHT;
+        //public OHT m_OHTNew
+        //{
+        //    get { return _OHT; }
+        //    set
+        //    {
+        //        _OHT = value;
+        //        OnPropertyChanged();
+        //    }
+        //}
+        private OHT_Semi m_OHT;
+        //OHT _OHT;
+        public OHT_Semi m_OHTsemi
+        {
+            get
+            {
+                return m_OHT;
+            }
+            set
+            {
+                m_OHT = value;
+                OnPropertyChanged();
+            }
+        }
+
         public DIO_I p_diPlaced
         {
             get
@@ -24,7 +51,7 @@ namespace Root_EFEM.Module
             }
             set
             {
-                m_diPlaced = value;   
+                m_diPlaced = value;
             }
         }
         DIO_I m_diPresent;
@@ -98,6 +125,7 @@ namespace Root_EFEM.Module
                 OnPropertyChanged();
             }
         }
+
         //OHT m_OHT;
         ALID m_alid_WaferExist;
         public void SetAlarm()
@@ -113,7 +141,7 @@ namespace Root_EFEM.Module
             p_sInfo = m_toolBox.GetDIO(ref m_diDoorOpen, this, "DoorOpen");
             p_sInfo = m_toolBox.GetDIO(ref m_diDocked, this, "Docked");
             p_sInfo = m_toolBox.GetComm(ref m_rs232, this, "RS232");
-            p_sInfo = m_toolBox.GetOHT(ref _OHT, this, p_infoCarrier, "OHT");
+            p_sInfo = m_toolBox.GetOHT(ref m_OHT, this, p_infoCarrier, "OHT");
             if (bInit)
             {
                 m_rs232.OnReceive += M_rs232_OnReceive;
@@ -126,7 +154,7 @@ namespace Root_EFEM.Module
         public bool CheckPlaced()
         {
             GemCarrierBase.ePresent present;
-            if (m_diPlaced.p_bIn != m_diPresent.p_bIn)
+            if (m_diPlaced.p_bIn != p_diPresent.p_bIn)
                 present = GemCarrierBase.ePresent.Unknown;
             else
                 present = m_diPlaced.p_bIn ? GemCarrierBase.ePresent.Exist : GemCarrierBase.ePresent.Empty;
@@ -212,6 +240,8 @@ namespace Root_EFEM.Module
         {
             if (GetInfoWafer(nID) == null)
                 return p_id + nID.ToString("00") + " BeforeGet : InfoWafer = null";
+            if (!m_diDoorOpen.p_bIn)
+                return "Door Not Opened";
             return IsRunOK();
         }
 
@@ -219,11 +249,16 @@ namespace Root_EFEM.Module
         {
             if (GetInfoWafer(nID) != null)
                 return p_id + nID.ToString("00") + " BeforePut : InfoWafer != null";
+            if (!m_diDoorOpen.p_bIn)
+                return "Door Not Opened";
             return IsRunOK();
         }
 
         public string AfterGet(int nID)
         {
+            InfoWafer wafer = GetInfoWafer(nID);
+            wafer.p_sInspectionID = wafer.p_sLotID + wafer.p_sWaferID +DateTime.Now.ToString("yyyyMMddhhmmss");
+
             p_infoCarrier.m_aGemSlot[nID].p_eState = GemSlotBase.eState.Run;
             return IsRunOK();
         }
@@ -586,11 +621,17 @@ namespace Root_EFEM.Module
                             m_infoCarrier.m_bReqReadCarrierID = false;
                             StartRun(m_runReadPodID);
                         } */
+            bool bUseXGem = m_engineer.p_bUseXGem;
             if (p_infoCarrier.m_bReqLoad)
             {
                 p_infoCarrier.m_bReqLoad = false;
-                StartRun(m_runDocking);
+                if (bUseXGem) StartRun(m_runDocking);
             }
+            if (p_infoCarrier.m_bReqGem)
+            {
+                p_infoCarrier.m_bReqGem = false;
+                StartRun(m_runGem);
+            }    
             if (p_infoCarrier.m_bReqUnload && p_infoCarrier.p_eState == InfoCarrier.eState.Dock)
             {
                 p_infoCarrier.m_bReqUnload = false;
@@ -659,7 +700,7 @@ namespace Root_EFEM.Module
             get
             {
                 //return true;
-                return m_diPresent.p_bIn;
+                return p_diPresent.p_bIn;
             }
         }
         #endregion
@@ -678,6 +719,7 @@ namespace Root_EFEM.Module
                 _rfid = value;
             }
         }
+
         public Loadport_RND(string id, IEngineer engineer, bool bEnableWaferSize, bool bEnableWaferCount)
         {
             p_bLock = false;
@@ -704,8 +746,27 @@ namespace Root_EFEM.Module
         {
         }
 
+        public override bool IsExistCarrier()
+        {
+            if (m_diPlaced.p_bIn && p_diPresent.p_bIn)
+                return true;
+            else
+                return false;
+        }
+
+        public override bool IsPlacement()
+        {
+            return m_diPlaced.p_bIn;
+        }
+
+        public override bool IsPresent()
+        {
+            return p_diPresent.p_bIn;
+        }
+
         #region ModuleRun
         ModuleRunBase m_runDocking;
+        ModuleRunBase m_runGem;
         ModuleRunBase m_runUndocking;
 
         public ModuleRunBase GetModuleRunUndocking()
@@ -716,11 +777,15 @@ namespace Root_EFEM.Module
         {
             return m_runDocking;
         }
+        public ModuleRunBase GetModuleRunGem()
+        {
+            return m_runGem;
+        }
 
         protected override void InitModuleRuns()
         {
             m_runDocking = AddModuleRunList(new Run_Docking(this), false, "Docking Carrier to Work Position");
-            AddModuleRunList(new Run_GemProcess(this), false, "Gem Slot Process Start");
+            m_runGem = AddModuleRunList(new Run_GemProcess(this), false, "Gem Slot Process Start");
             m_runUndocking = AddModuleRunList(new Run_Undocking(this), false, "Undocking Carrier from Work Position");
         }
 
@@ -761,7 +826,9 @@ namespace Root_EFEM.Module
 
             public override string Run()
             {
+                MarsLogManager marsLogManager = MarsLogManager.Instance;
                 string sResult = "OK";
+               
                 if (EQ.p_bSimulate)
                 {
                     m_infoCarrier.p_ePresentSensor = GemCarrierBase.ePresent.Exist;
@@ -786,6 +853,9 @@ namespace Root_EFEM.Module
                     m_infoCarrier.SendCarrierID(m_infoCarrier.p_sCarrierID);
                 else
                     return p_sInfo + " SendCarrierID : " + m_infoCarrier.p_sCarrierID;
+
+
+                marsLogManager.WriteFNC(EQ.p_nRunLP, m_module.p_id, "Carrier Load", SSLNet.STATUS.START, type:SSLNet.MATERIAL_TYPE.FOUP);
 
                 while (m_infoCarrier.p_eStateCarrierID != GemCarrierBase.eGemState.VerificationOK)
                 {
@@ -827,6 +897,7 @@ namespace Root_EFEM.Module
                 }
                 else
                 {
+                   
                     if (m_module.Run(m_module.CmdLoad(m_bMapping)))
                         return p_sInfo;
                     if (m_module.Run(m_module.CmdGetMapData()))
@@ -841,6 +912,11 @@ namespace Root_EFEM.Module
                     if (m_infoCarrier.p_eStateSlotMap == GemCarrierBase.eGemState.VerificationFailed)
                         return p_sInfo + " infoCarrier.p_eStateSlotMap = " + m_infoCarrier.p_eStateSlotMap.ToString();
                 }
+
+                
+                SSLNet.DataFormatter dataformatter = new SSLNet.DataFormatter();
+                dataformatter.AddData("MapID", m_infoCarrier.GetMapData());
+                marsLogManager.WriteFNC(EQ.p_nRunLP, m_module.p_id, "Carrier Load", SSLNet.STATUS.END, dataformatter, SSLNet.MATERIAL_TYPE.FOUP);
                 //m_module.m_ceidDocking.Send();
                 return "OK";
             }
@@ -872,6 +948,7 @@ namespace Root_EFEM.Module
 
             public override string Run()
             {
+                MarsLogManager marsLogManager = MarsLogManager.Instance;
                 string sResult = "OK";
                 bool bUseXGem = m_module.m_engineer.p_bUseXGem;
                 IGem m_gem = m_module.m_gem;
@@ -880,7 +957,10 @@ namespace Root_EFEM.Module
                     if (m_infoCarrier.p_eState != InfoCarrier.eState.Dock)
                         return p_id + " RunUnload, InfoCarrier.p_eState = " + m_infoCarrier.p_eState.ToString();
                 }
-                if(bUseXGem)
+
+                marsLogManager.WriteFNC(EQ.p_nRunLP, m_module.p_id, "Carrier Unload", SSLNet.STATUS.START, type: SSLNet.MATERIAL_TYPE.FOUP);
+
+                if (bUseXGem && !m_gem.p_bOffline)
                 {
                     while (m_infoCarrier.p_eAccess != GemCarrierBase.eAccess.InAccessed)
                     {
@@ -905,6 +985,8 @@ namespace Root_EFEM.Module
                         return p_sInfo;
                 }
                 m_infoCarrier.p_eState = InfoCarrier.eState.Placed;
+                m_infoCarrier.p_eReqTransfer = GemCarrierBase.eTransfer.ReadyToUnload;
+                marsLogManager.WriteFNC(EQ.p_nRunLP, m_module.p_id, "Carrier Unload", SSLNet.STATUS.END, type: SSLNet.MATERIAL_TYPE.FOUP);
                 //m_module.m_ceidUnDocking.Send();
                 return sResult;
             }

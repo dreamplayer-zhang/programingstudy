@@ -138,7 +138,6 @@
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="290*"></ColumnDefinition>
                 <ColumnDefinition Width="Auto"></ColumnDefinition>
-                <ColumnDefinition Width="0*"></ColumnDefinition>
                 <ColumnDefinition Width="507*"/>
             </Grid.ColumnDefinitions>
             <tree:TreeUI x:Name="tree"/>

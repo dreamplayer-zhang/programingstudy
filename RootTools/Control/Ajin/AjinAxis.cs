@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Windows.Controls;
 using RootTools.Trees;
@@ -39,6 +40,8 @@ namespace RootTools.Control.Ajin
             m_bAbsoluteEncoder = tree.Set(m_bAbsoluteEncoder, m_bAbsoluteEncoder, "Absolute Encoder", "Absolute Encoder");
             if (nAxis != m_nAxis) m_listAxis.m_qSetAxis.Enqueue(this);
         }
+
+        bool m_isPlus = false;
         #endregion
 
         #region Position & Velocity
@@ -74,6 +77,11 @@ namespace RootTools.Control.Ajin
         {
             p_log.Info(p_id + " Jog Start : " + fScale.ToString());
             if (IsInterlock()) return p_id + m_sCheckInterlock;
+
+            if (fScale > 0)
+                m_isPlus = true;
+            else
+                m_isPlus = false;
 
             p_sInfo = base.Jog(fScale, sSpeed);
             if (p_sInfo != "OK") return p_sInfo;
@@ -206,8 +214,6 @@ namespace RootTools.Control.Ajin
                 return "OK";
             }
             p_sInfo = base.StartHome();
-            if (m_nAxis == 3)
-                m_eHomeDir = eMoveDir.DIR_CW;
             if (p_sInfo != "OK") return p_sInfo;
             if (AXM("AxmHomeSetMethod", CAXM.AxmHomeSetMethod(m_nAxis, (int)m_eHomeDir, (uint)m_eHomeSignal, (uint)m_eHomeZPhase, 1000, 0)) != 0) return p_sInfo;
             Speed[] speed = new Speed[2] { GetSpeedValue(eSpeed.Home_First), GetSpeedValue(eSpeed.Home_Last) };
@@ -580,6 +586,7 @@ namespace RootTools.Control.Ajin
                         break;
                     default: break;
                 }
+                ThreadCheck_SWLimit(m_isPlus);
             }
         }
 
@@ -756,6 +763,15 @@ namespace RootTools.Control.Ajin
             RunTreeIOLock(m_treeRoot.GetTree("I/O Lock", true, bIOVisible), m_sUnit);
         }
 
+        public override void RunTreePos(Tree tree, string sUnit)
+        {
+            base.RunTreePos(tree, sUnit);
+
+            bool useLimit = m_bSWBoardLimit;
+            uint use = Convert.ToUInt32(useLimit); 
+            CAXM.AxmSignalSetSoftLimit(m_nAxis, use, 0, 1, m_aPos[p_asPos[3]], m_aPos[p_asPos[2]]);
+        }
+
         public override void RunTreeSetting(Tree.eMode mode)
         {
             m_treeRootSetting.p_eMode = mode;
@@ -809,29 +825,32 @@ namespace RootTools.Control.Ajin
             }
         }
 
+        static readonly object m_csLock = new object();
         List<string> m_aAXM = new List<string>(); 
         uint AXM(string sFunc, uint uResult)
         {
-            if (uResult == 0)
+            lock (m_csLock)
             {
-                for (int n = 0; n < m_aAXM.Count; n++)
+                if (uResult == 0)
                 {
-                    if (sFunc == m_aAXM[n])
+                    for (int n = 0; n < m_aAXM.Count; n++)
                     {
-                        m_aAXM.RemoveAt(n);
-                        return uResult; 
+                        if (sFunc == m_aAXM[n])
+                        {
+                            m_aAXM.RemoveAt(n);
+                            return uResult;
+                        }
                     }
+                    return uResult;
                 }
+                foreach (string sAXM in m_aAXM)
+                {
+                    if (sAXM == sFunc) return uResult;
+                }
+                m_aAXM.Add(sFunc);
+                p_sInfo = sFunc + ", Error # = " + uResult.ToString();
                 return uResult;
             }
-            foreach (string sAXM in m_aAXM)
-            {
-                if (sAXM == sFunc) return uResult; 
-            }
-            m_aAXM.Add(sFunc); 
-            p_sInfo = sFunc + ", Error # = " + uResult.ToString();
-            return uResult;
         }
-
     }
 }

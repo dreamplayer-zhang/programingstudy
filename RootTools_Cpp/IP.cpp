@@ -2116,7 +2116,7 @@ void IP::FitEllipse(BYTE* pSrc, BYTE* pDst, int nW, int nH)
 }
 
 // Edge Box
-int IP::FindEdge(BYTE* pSrc, int nMemW, int nMemH, Point ptLT, Point ptRB, int nDir, int nSearchLevel)
+int IP::FindEdge(BYTE* pSrc, int nMemW, int nMemH, Point ptLT, Point ptRB, int nDir, int nSearchLevel, int nByte /*= 1*/)
 {
     // nDir : 0 (To Right), 1 (To Left), 2 (To Bottom), 3 (To Top)
 
@@ -2135,9 +2135,9 @@ int IP::FindEdge(BYTE* pSrc, int nMemW, int nMemH, Point ptLT, Point ptRB, int n
     long nX2 = ptRB.x;
     long nY1 = ptLT.y;
     long nY2 = ptRB.y;
-    int nMin = 255;
-    int nMax = 0;
-    int nEdge = 0;
+    long nMin = pow(2, nByte * 8) - 1;
+    long nMax = 0;
+    long nEdge = 0;
 
     switch (nDir)
     {
@@ -2153,7 +2153,11 @@ int IP::FindEdge(BYTE* pSrc, int nMemW, int nMemH, Point ptLT, Point ptRB, int n
 
             for (long r = nY1; r <= nY2; r++)
             {
-                nAverage += pSrc[r * nMemW + c];
+                LONGLONG idx = ((LONGLONG)r * nMemW + c) * nByte;
+                for (long i = 0; i < nByte; i++)
+                {
+                    nAverage += (pSrc[idx + i] << (i * 8));
+                }
             }
 
             nAverage /= nCount;
@@ -2199,7 +2203,11 @@ int IP::FindEdge(BYTE* pSrc, int nMemW, int nMemH, Point ptLT, Point ptRB, int n
 
             for (long r = nY1; r <= nY2; r++)
             {
-                nAverage += pSrc[r * nMemW + c];
+                LONGLONG idx = ((LONGLONG)r * nMemW + c) * nByte;
+                for (long i = 0; i < nByte; i++)
+                {
+                    nAverage += (pSrc[idx + i] << (i * 8));
+                }
             }
 
             nAverage /= nCount;
@@ -2245,7 +2253,11 @@ int IP::FindEdge(BYTE* pSrc, int nMemW, int nMemH, Point ptLT, Point ptRB, int n
 
             for (long c = nX1; c <= nX2; c++)
             {
-                nAverage += pSrc[r * nMemW + c];
+                LONGLONG idx = ((LONGLONG)r * nMemW + c) * nByte;
+                for (long i = 0; i < nByte; i++)
+                {
+                    nAverage += (pSrc[idx + i] << (i * 8));
+                }
             }
 
             nAverage /= nCount;
@@ -2291,7 +2303,11 @@ int IP::FindEdge(BYTE* pSrc, int nMemW, int nMemH, Point ptLT, Point ptRB, int n
 
             for (long c = nX1; c <= nX2; c++)
             {
-                nAverage += pSrc[r * nMemW + c];
+                LONGLONG idx = ((LONGLONG)r * nMemW + c) * nByte;
+                for (long i = 0; i < nByte; i++)
+                {
+                    nAverage += (pSrc[idx + i] << (i * 8));
+                }
             }
 
             nAverage /= nCount;

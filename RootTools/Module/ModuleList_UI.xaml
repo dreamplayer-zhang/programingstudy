@@ -33,7 +33,17 @@
             <Button x:Name="buttonAdd" Content="Add" Margin="2" Visibility="Hidden" Click="ButtonAdd_Click"/>
             <Button x:Name="buttonRnR" Content="RnR" Margin="2,12,2,2" Visibility="{Binding p_visibleRnR}" Click="buttonRnR_Click"/>
             <TextBox x:Name="textBoxRnR" Text="{Binding p_nRnR}" Margin="2" Visibility="{Binding p_visibleRnR}" TextAlignment="Center"/>
-            <ProgressBar Margin="2,12,2,2" Orientation="Horizontal" Height="10" Value="{Binding p_iRun}" Maximum="{Binding p_maxRun}" Minimum="0"/>
+            <Grid>
+                <ProgressBar Margin="2,10,2,2" Orientation="Horizontal" Height="12" Value="{Binding p_iRun}" Maximum="{Binding p_maxRun}" Minimum="0"/>
+                <TextBlock Margin="2,10,2,2" TextAlignment="Center">
+                    <!--<Run Text="0"/>
+                    <Run Text="/"/>
+                    <Run Text="20"/>-->
+                     <Run Text="{Binding p_nTotalRnR}"/>
+                    <Run Text="/"/>
+                    <Run Text="{Binding p_nRnR}"/>
+                </TextBlock>
+            </Grid>
         </StackPanel>
         <GridSplitter Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="AliceBlue" ShowsPreview="True" Width="3"/>
         <Grid Grid.Column="2">

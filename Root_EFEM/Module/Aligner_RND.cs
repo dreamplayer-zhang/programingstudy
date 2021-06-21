@@ -471,6 +471,7 @@ namespace Root_EFEM.Module
 
         public string RunAlign(double fDeg)
         {
+            MarsLogManager marsLogManager = MarsLogManager.Instance;
             if (!m_diWaferExist.p_bIn)
             {
                 m_alid_WaferExist.Run(true, "Aligner Wafer Exist Error");
@@ -485,6 +486,7 @@ namespace Root_EFEM.Module
                
                 return p_sInfo;
             }
+            marsLogManager.WriteFNC(EQ.p_nRunLP, this.p_id, "Align", SSLNet.STATUS.END, type:SSLNet.MATERIAL_TYPE.WAFER);
             return "OK";
         }
 
@@ -718,7 +720,7 @@ namespace Root_EFEM.Module
 
         public override void Reset()
         {
-            SendCmd(eCmd.EmgStop);
+            SendCmd(eCmd.SlowStop);
             SendCmd(eCmd.ClearError);
             SendCmd(eCmd.ResetPos);
             base.Reset();
@@ -868,6 +870,9 @@ namespace Root_EFEM.Module
 
             public override string Run()
             {
+                MarsLogManager marsLogManager = MarsLogManager.Instance;
+
+                marsLogManager.WriteFNC(EQ.p_nRunLP, m_module.p_id, "Align", SSLNet.STATUS.START, type:SSLNet.MATERIAL_TYPE.WAFER);
                 if (m_bOCR)
                 {
                     if (m_module.Run(m_module.RunAlign(m_fDegOCR))) return p_sInfo;

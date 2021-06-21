@@ -28,6 +28,7 @@ namespace Root_WIND2.UI_User
             public static SolidColorBrush SearchCenterPoint = Brushes.Magenta;
             public static SolidColorBrush SearchCircle = Brushes.Yellow;
             public static SolidColorBrush Map = Brushes.YellowGreen;
+            public static SolidColorBrush OutterMap = Brushes.Yellow;
             public static SolidColorBrush MapFill = Brushes.Transparent;
 
             public static SolidColorBrush ExclusivePolyStroke = Brushes.Red;
@@ -210,6 +211,7 @@ namespace Root_WIND2.UI_User
         private CPoint searchedCenterMemoryPoint = new CPoint();
         private List<CPoint> searchedCirclePoints = new List<CPoint>();
 
+        private List<TRect> mapOutterRectList = new List<TRect>();
         private List<TRect> mapRectList = new List<TRect>();
 
         // Exclusive Region
@@ -546,9 +548,10 @@ namespace Root_WIND2.UI_User
             }
         }
 
-        public void SetMapRectList(List<CRect> rectList)
+        public void SetMapRectList(List<CRect> rectList, List<CRect> outterRectList)
         {
             this.mapRectList.Clear();
+            this.mapOutterRectList.Clear();
             this.p_DrawElement.Clear();
 
             foreach (CRect rt in rectList)
@@ -579,6 +582,35 @@ namespace Root_WIND2.UI_User
                 mapRectList.Add(tRect);
                 p_DrawElement.Add(rtUI);
             }
+
+            foreach (CRect rt in outterRectList)
+            {
+                CPoint canvasLeftTop = GetCanvasPoint(new CPoint(rt.Left, rt.Top));
+                CPoint canvasRightBottom = GetCanvasPoint(new CPoint(rt.Right, rt.Bottom));
+
+                Rectangle rtUI = new Rectangle();
+                rtUI.Width = canvasRightBottom.X - canvasLeftTop.X;
+                rtUI.Height = canvasRightBottom.Y - canvasLeftTop.Y;
+
+                rtUI.Stroke = ColorDefines.OutterMap;
+                rtUI.StrokeThickness = 2;
+                rtUI.Opacity = 1;
+                rtUI.Tag = "OutterMap";
+                rtUI.Fill = ColorDefines.MapFill;
+
+                Canvas.SetLeft(rtUI, canvasLeftTop.X);
+                Canvas.SetTop(rtUI, canvasLeftTop.Y);
+
+                TRect tRect = new TRect();
+                tRect.UIElement = rtUI;
+                tRect.MemoryRect.Left = rt.Left;
+                tRect.MemoryRect.Top = rt.Top;
+                tRect.MemoryRect.Right = rt.Right;
+                tRect.MemoryRect.Bottom = rt.Bottom;
+
+                mapOutterRectList.Add(tRect);
+                p_DrawElement.Add(rtUI);
+            }
         }
 
         public void DrawMapRectList()
@@ -590,7 +622,22 @@ namespace Root_WIND2.UI_User
                     if (p_DrawElement.Contains(rt.UIElement) == true)
                     {
                         Rectangle rectangle = rt.UIElement as Rectangle;
+                        CPoint canvasLeftTop = GetCanvasPoint(new CPoint(rt.MemoryRect.Left, rt.MemoryRect.Top));
+                        CPoint canvasRightBottom = GetCanvasPoint(new CPoint(rt.MemoryRect.Right, rt.MemoryRect.Bottom));
 
+                        rectangle.Width = canvasRightBottom.X - canvasLeftTop.X;
+                        rectangle.Height = canvasRightBottom.Y - canvasLeftTop.Y;
+
+                        Canvas.SetLeft(rectangle, canvasLeftTop.X);
+                        Canvas.SetTop(rectangle, canvasLeftTop.Y);
+                    }
+                }
+
+                foreach (TRect rt in mapOutterRectList)
+                {
+                    if (p_DrawElement.Contains(rt.UIElement) == true)
+                    {
+                        Rectangle rectangle = rt.UIElement as Rectangle;
                         CPoint canvasLeftTop = GetCanvasPoint(new CPoint(rt.MemoryRect.Left, rt.MemoryRect.Top));
                         CPoint canvasRightBottom = GetCanvasPoint(new CPoint(rt.MemoryRect.Right, rt.MemoryRect.Bottom));
 
@@ -981,23 +1028,34 @@ namespace Root_WIND2.UI_User
 
                 List<CPoint> points = new List<CPoint>();
 
+                //centerX = 300000 / 4 / 2;
+                //centerY = 300000 / 4 / 2 + 2000;
+
+                int threshold = (int)centerX  + 2000;
+
                 for (int i = 0; i < circlePoints.Length; i++)
                 {
                     CPoint pt = new CPoint(circlePoints[i].x * DownSample, circlePoints[i].y * DownSample);
                     if (!PolygonController.HitTest(geometry, new Point(pt.X, pt.Y)))
                     {
+                        double radius = Math.Sqrt(Math.Pow(pt.X - centerX, 2) + Math.Pow(pt.Y - centerY, 2));
+                        if( radius < threshold)
                         points.Add(pt);
                     }
                 }
+
+
 
                 Point centerPt = Tools.FindCircleCenterByPoints(DataConverter.CPointListToPointList(points), (int)centerX, (int)centerY, 100);
 
                 this.SetSearchedCenter(new CPoint((int)centerPt.X, (int)centerPt.Y));
                 this.SetSearchedCirclePoints(points);
 
-                List<CRect> rectList = this.CalcDiePosition((int)centerPt.X, (int)centerPt.Y, true);
+                List<CRect> rectOutterList = this.CalcDiePosition((int)centerPt.X, (int)centerPt.Y, true);
 
-                this.SetMapRectList(rectList);
+                List<CRect> rectList = this.CalcDiePosition((int)centerPt.X, (int)centerPt.Y, false);
+
+                this.SetMapRectList(rectList, rectOutterList);
             }
         }
 
@@ -1049,6 +1107,12 @@ namespace Root_WIND2.UI_User
                 }
             }
 
+
+            BacksideRecipe backsideRecipe = GlobalObjects.Instance.Get<RecipeBack>().GetItem<BacksideRecipe>();
+
+            backsideRecipe.CenterX = centerX;
+            backsideRecipe.CenterY = centerY;
+
             return rectList;
         }
 
@@ -1088,8 +1152,8 @@ namespace Root_WIND2.UI_User
                 double left_remain_X = (centerX - sampleCenterX) - (originDieX * diePitchX);
                 double top_remain_y = (centerY - sampleCenterY) - (originDieY * diePitchY);
 
-                double right_remain_X = (centerX - sampleCenterX) - ((mapSizeX - originDieX + 1) * diePitchX);
-                double bottom_remain_y = (centerY - sampleCenterY) - ((mapSizeY - originDieY + 1) * diePitchY);
+                double right_remain_X = (centerX - sampleCenterX) - ((mapSizeX - originDieX) * diePitchX);
+                double bottom_remain_y = (centerY - sampleCenterY) - ((mapSizeY - originDieY) * diePitchY);
 
 
                 int dieLeftCount = 0, dieRightCount = 0, dieTopCount = 0, dieBottomCount = 0;
@@ -1201,6 +1265,7 @@ namespace Root_WIND2.UI_User
             }
             else
             {
+                // Normal
                 for (int x = 0; x < mapSizeX; x++)
                 {
                     for (int y = 0; y < mapSizeY; y++)
@@ -1223,6 +1288,11 @@ namespace Root_WIND2.UI_User
                     }
                 }
             }
+
+            BacksideRecipe backsideRecipe = GlobalObjects.Instance.Get<RecipeBack>().GetItem<BacksideRecipe>();
+
+            backsideRecipe.CenterX = centerX;
+            backsideRecipe.CenterY = centerY;
 
             return rectList;
         }

@@ -16,6 +16,8 @@ namespace Root_CAMELLIA.Data
 {
     public class WaferCentering
     {
+        public delegate void FindEdgeDone(object dir);
+        public event FindEdgeDone FindEdgeDoneEvent;
         public enum eDir
         {
             LT = 0,
@@ -64,14 +66,14 @@ namespace Root_CAMELLIA.Data
             }
             ptAvgRB = new Point(sumX / m_ptRB.Count, sumY / m_ptRB.Count);
 
-            double LTX = ptLTPulse.X - (((ptROI.X / 2) + ptAvgLT.X) * resolutionX * 10);
-            double LTY = ptLTPulse.Y + (((ptROI.Y / 2) - ptAvgLT.Y) * resolutionY * 10);
+            double LTX = ptLTPulse.X + ((ptAvgLT.X - (ptROI.X / 2)) * resolutionX * 10);
+            double LTY = ptLTPulse.Y - ((ptAvgLT.Y - (ptROI.Y / 2)) * resolutionX * 10);
 
-            double RTX = ptRTPulse.X - (((ptROI.X / 2) + ptAvgRT.X) * resolutionX * 10);
-            double RTY = ptRTPulse.Y + (((ptROI.Y / 2) - ptAvgRT.Y) * resolutionY * 10);
+            double RTX = ptRTPulse.X + ((ptAvgRT.X - (ptROI.X / 2)) * resolutionX * 10);
+            double RTY = ptRTPulse.Y - ((ptAvgRT.Y - (ptROI.Y / 2)) * resolutionX * 10);
 
-            double RBX = ptRBPulse.X - (((ptROI.X / 2) + ptAvgRB.X) * resolutionX * 10);
-            double RBY = ptRBPulse.Y + (((ptROI.Y / 2) - ptAvgRB.Y) * resolutionY * 10);
+            double RBX = ptRBPulse.X + ((ptAvgRB.X - (ptROI.X / 2)) * resolutionX * 10);
+            double RBY = ptRBPulse.Y - ((ptAvgRB.Y - (ptROI.Y / 2)) * resolutionX * 10);
 
             PointF ptLT = new PointF((float)LTX, (float)LTY);
             PointF ptRT = new PointF((float)RTX, (float)RTY);
@@ -247,6 +249,7 @@ namespace Root_CAMELLIA.Data
             FindRTEdgeDone = false;
             FindRBEdgeDone = false;
             ErrorString = "OK";
+            m_ptCenter = new RPoint();
         }
 
         public void FindEdge(ImageData ImgData, CPoint ptROI, int nSearchRange, int nSearchLength, int nSearchLevel, eDir dir)

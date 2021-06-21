@@ -28,7 +28,7 @@ namespace RootTools_Vision.Utility
 		public String waferID_name;
 		public String sampleOrientationMarkType;       // FLAT or NOTCH
 		public String orientationMarkLocation;         // Flat zone 방향 // UP, DOWN, LEFT, RIGHT
-		public String tiffFileName;                    // Tiff file 명
+		public String klarfFileName;                    // Tiff file 명
 
 		public double diePitchX, diePitchY;          // Die Pitch
 		public double dieOriginX, dieOriginY;        // 센터 기준. 무조건 0, 0 으로 보고 셋팅
@@ -241,7 +241,7 @@ namespace RootTools_Vision.Utility
 
 		private void PutTiffFileName(StreamWriter sw)
 		{
-			tempString = string.Format("TiffFilename " + tiffFileName + ";\n");
+			tempString = string.Format("TiffFilename " + klarfFileName +".tif" + ";\n");
 			sw.Write(tempString);
 		}
 
@@ -310,7 +310,7 @@ namespace RootTools_Vision.Utility
 
 
 			tempString = string.Format("SampleTestPlan {0:d}\n", sampleTestCnt);
-			sampleTestPlan = sampleTestPlan.Substring(0, sampleTestPlan.Length - 1);
+			sampleTestPlan = sampleTestPlan.Substring(0, sampleTestPlan.Length > 0 ? sampleTestPlan.Length - 1:0);
 			sampleTestPlan = tempString + sampleTestPlan + ";\n";
 
 			float nAreaPerTest = (float)(diePitchX * diePitchY * sampleTestCnt);
@@ -457,18 +457,16 @@ namespace RootTools_Vision.Utility
 				builder.Append(_defectdata[i].m_fRelY + " ");
 				builder.Append(_defectdata[i].m_nChipIndexX + " ");
 				builder.Append(_defectdata[i].m_nChipIndexY + " ");
-				builder.Append(_defectdata[i].m_fData + " ");
+				builder.Append(_defectdata[i].m_fData * resolutionX + " ");
 				builder.Append(0 + " ");
-				builder.Append(_defectdata[i].m_fData + " ");
-				builder.Append(_defectdata[i].m_fData + " ");
-				builder.Append(0 + " ");
-				builder.Append(0 + " ");
+				builder.Append(_defectdata[i].m_fData * resolutionX + " ");
+				builder.Append(_defectdata[i].m_fData * resolutionX + " ");
 				builder.Append(0 + " ");
 				builder.Append(0 + " ");
 				builder.Append(0 + " ");
 				builder.Append(0 + " ");
-				builder.Append(1 + " ");
-				builder.Append(1 + "\n");
+				builder.Append(0 + " ");
+				builder.Append(0 + "\n");
 			}
 
 			builder.AppendLine("SummarySpec 5" + " TESTNO NDEFECT DEFDENSITY NDIE NDEFDIE;");
