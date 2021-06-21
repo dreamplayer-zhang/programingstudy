@@ -165,7 +165,7 @@ namespace Root_Pine2_Vision.Module
         public class Grab
         {
             public int m_nFovStart = 0;
-            public int m_nFovSize = 12000;
+            public int m_nFovSize = 8000;
             public double[] m_dScale = new double[3] { 1, 1, 1 };
             public double[] m_dShift = new double[3] { 0, 0, 0 };
             public int[] m_yShift = new int[3] { 0, 0, 0 };
@@ -427,18 +427,18 @@ namespace Root_Pine2_Vision.Module
             try
             {
 
-                m_camera.GrabLineScan(memory, cpOffset, m_nLine, grabData);
+                //m_camera.GrabLineScan(memory, cpOffset, m_nLine, grabData);
                 Thread.Sleep(200);
-                while (m_camera.p_CamInfo.p_eState != eCamState.Ready)
-                {
-                    Thread.Sleep(10);
-                    if (EQ.IsStop()) return "EQ Stop";
-                }
+                //while (m_camera.p_CamInfo.p_eState != eCamState.Ready)
+                //{
+                    //Thread.Sleep(10);
+                    //if (EQ.IsStop()) return "EQ Stop";
+                //}
                 //m_aWorks[eWorks].SendSnapDone(iSnap); 
             }
             finally 
             {
-                m_camera.StopGrab(); 
+                //m_camera.StopGrab(); 
                 //RunLightOff(); 
             }
             return "OK";
