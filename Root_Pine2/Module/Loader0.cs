@@ -124,7 +124,7 @@ namespace Root_Pine2.Module
         int m_pulsemm = 1000; 
         public string RunMoveLoadEV(bool bWait = true)
         {
-            double dPos = m_pulsemm * (95 - m_pine2.p_widthStrip);
+            double dPos = m_pulsemm * (m_pine2.m_widthDefaultStrip - m_pine2.p_widthStrip);
             if (Run(StartMoveX(c_sPosLoadEV, dPos))) return p_sInfo;
             m_axis.p_axisY.StartMove(c_sPosLoadEV);
             return bWait ? m_axis.WaitReady() : "OK"; 

@@ -142,7 +142,7 @@ namespace Root_Pine2.Module
                 m_transfer.m_pusher.p_bEnable = false;
                 m_transfer.m_gripper.p_bEnable = false; 
                 m_ePosDst = ePos;
-                double dPos = 1000 * (95 - m_transfer.m_pine2.p_widthStrip) / 2;
+                double dPos = 1000 * (m_transfer.m_pine2.m_widthDefaultStrip - m_transfer.m_pine2.p_widthStrip) / 2;
                 m_axis.StartMove(ePos, (bPushPos ? 0 : m_dxPulse) + dPos); 
                 return bWait ? m_axis.WaitReady() : "OK";
             }
