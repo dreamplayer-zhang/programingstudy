@@ -112,8 +112,8 @@ namespace Root_Pine2.Module
         {
             string sPos = GetPosString(eVision, eWorks);
             m_axis.p_axisY.StartMove(sPos);
-            while (m_axis.p_axisY.p_posCommand > m_axis.p_axisY.GetPosValue(ePosTransfer.Transfer0)) Thread.Sleep(10); 
-            m_axis.p_axisY.StartMove(sPos);
+            while (m_axis.p_axisY.p_posCommand > m_axis.p_axisY.GetPosValue(ePosTransfer.Transfer0)) Thread.Sleep(10);
+            if (Run(StartMoveX(sPos, 0))) return p_sInfo;
             return bWait ? m_axis.WaitReady() : "OK";
         }
 
