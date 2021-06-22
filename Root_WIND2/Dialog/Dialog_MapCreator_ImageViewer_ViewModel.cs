@@ -520,12 +520,13 @@ namespace Root_WIND2
                     //ClearObjects();
                     this.p_UIElement.Remove(SelectChipBox_UI);
 
+                    if (this.SelectChipPointDone != null)
+                        this.SelectChipPointDone();
+
                     p_Cursor = Cursors.Arrow;
                     selectChipLeftTop = memPt;
                     DrawSelectChipLeftTopPoint(selectChipLeftTop);
-
-                    if (this.SelectChipPointDone != null)
-                        this.SelectChipPointDone();
+                    SetSelectChipPoint();
 
                     selectChipState = PROCESS_SELECT_CHIP_STATE.SelectChipRightBottom;
                     break;
@@ -582,12 +583,13 @@ namespace Root_WIND2
                     //ClearObjects();
                     this.p_UIElement.Remove(SelectRoiBox_UI);
 
+                    if (this.SelectRoiPointDone != null)
+                        this.SelectRoiPointDone();
+
                     p_Cursor = Cursors.Arrow;
                     selectRoiLeftTop = memPt;
                     DrawSelectRoiLeftTopPoint(selectRoiLeftTop);
-
-                    if (this.SelectRoiPointDone != null)
-                        this.SelectRoiPointDone();
+                    SetSelectRoiPoint();
 
                     selectRoiState = PROCESS_SELECT_ROI_STATE.SelectRoiRightBottom;
                     break;
@@ -1024,10 +1026,22 @@ namespace Root_WIND2
                 this.SelectRoiBoxReset();
         }
 
+        public void SetSelectChipPoint()
+        {
+            if (this.SelectChipPointDone != null)
+                this.SelectChipPointDone();
+        }
+
         public void SetSelectChip()
         {
             if (this.SelectChipBoxDone != null)
                 this.SelectChipBoxDone();
+        }
+
+        public void SetSelectRoiPoint()
+        {
+            if (this.SelectRoiPointDone != null)
+                this.SelectRoiPointDone();
         }
 
         public void SetSelectRoi()
