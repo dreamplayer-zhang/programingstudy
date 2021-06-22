@@ -44,12 +44,14 @@ namespace Root_Pine2.Module
             Tray6,
             Tray7,
         }
+        const string c_sPosUp = "Up";
         void InitPosition()
         {
             m_axis.AddPos(GetPosString(Vision2D.eWorks.A));
             m_axis.AddPos(GetPosString(Vision2D.eWorks.B));
             m_axis.AddPos(Enum.GetNames(typeof(ePosTransfer)));
             m_axis.AddPos(Enum.GetNames(typeof(ePosTray)));
+            m_axis.p_axisZ.AddPos(c_sPosUp);
         }
         string GetPosString(Vision2D.eWorks eWorks)
         {
@@ -160,7 +162,7 @@ namespace Root_Pine2.Module
 
         public string RunMoveUp(bool bWait = true)
         {
-            m_axis.p_axisZ.StartMove(0);
+            m_axis.p_axisZ.StartMove(c_sPosUp);
             return bWait ? m_axis.WaitReady() : "OK";
         }
         #endregion
@@ -241,7 +243,6 @@ namespace Root_Pine2.Module
         }
         #endregion
 
-
         #region PickerSet
         double m_mmPickerSetUp = 10;
         double m_secPickerSet = 7;
@@ -286,7 +287,22 @@ namespace Root_Pine2.Module
             m_secPickerSet = tree.Set(m_secPickerSet, m_secPickerSet, "Done", "PickerSet Done Time (sec)");
         }
         #endregion
+
         #region override
+        public override string StateHome()
+        {
+            if (EQ.p_bSimulate)
+            {
+                p_eState = eState.Ready;
+                return "OK";
+            }
+            p_sInfo = base.StateHome(m_axis.p_axisZ);
+            if (p_sInfo != "OK") return p_sInfo;
+            p_sInfo = base.StateHome(m_axis.p_axisX, m_axis.p_axisY);
+            p_eState = (p_sInfo == "OK") ? eState.Ready : eState.Error;
+            return p_sInfo;
+        }
+
         public override string StateReady()
         {
             if (EQ.p_eState != EQ.eState.Run) return "OK";
@@ -302,13 +318,29 @@ namespace Root_Pine2.Module
             return "OK";
         }
 
+        public override void Reset()
+        {
+            m_picker.m_dioVacuum.Write(false);
+            m_picker.p_infoStrip = null;
+            base.Reset();
+        }
+
+        public override void RunTree(Tree tree)
+        {
+            base.RunTree(tree);
+            m_picker.RunTreeVacuum(tree.GetTree("Vacuum"));
+            RunTreePickerSet(tree.GetTree("PickerSet"));
+        }
+        #endregion
+
+        #region Start Run
         string StartUnloadTray()
         {
             MagazineEVSet magazine = m_handler.m_magazineEV;
-            InfoStrip.eResult eResult = m_picker.p_infoStrip.p_eResult; 
+            InfoStrip.eResult eResult = m_picker.p_infoStrip.p_eResult;
             foreach (ePosTray ePosTray in Enum.GetValues(typeof(ePosTray)))
             {
-                if (magazine.IsEnableStack((InfoStrip.eMagazine)ePosTray, eResult, true)) return StartUnloadTray(ePosTray); 
+                if (magazine.IsEnableStack((InfoStrip.eMagazine)ePosTray, eResult, true)) return StartUnloadTray(ePosTray);
             }
             foreach (ePosTray ePosTray in Enum.GetValues(typeof(ePosTray)))
             {
@@ -321,14 +353,14 @@ namespace Root_Pine2.Module
         {
             Run_UnloadTray run = (Run_UnloadTray)m_runUnloadTray.Clone();
             run.m_ePos = ePosTray;
-            return StartRun(run); 
+            return StartRun(run);
         }
 
         string StartUnloadTransfer()
         {
             Run_UnloadTransfer run = (Run_UnloadTransfer)m_runUnloadTransfer.Clone();
             run.m_ePos = (ePosTransfer)m_transfer.m_buffer.m_ePosDst;
-            return StartRun(run); 
+            return StartRun(run);
         }
 
         string StartLoadBoat()
@@ -343,22 +375,7 @@ namespace Root_Pine2.Module
         {
             Run_LoadBoat run = (Run_LoadBoat)m_runLoadBoat.Clone();
             run.m_eWorks = eWorks;
-            return StartRun(run); 
-        }
-
-
-        public override void Reset()
-        {
-            m_picker.m_dioVacuum.Write(false);
-            m_picker.p_infoStrip = null;
-            base.Reset();
-        }
-
-        public override void RunTree(Tree tree)
-        {
-            base.RunTree(tree);
-            m_picker.RunTreeVacuum(tree.GetTree("Vacuum"));
-            RunTreePickerSet(tree.GetTree("PickerSet"));
+            return StartRun(run);
         }
         #endregion
 

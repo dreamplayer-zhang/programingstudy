@@ -22,10 +22,10 @@
                 <TextBlock Text="{Binding p_sLED}" HorizontalAlignment="Center"/>
             </Grid>
             <Grid Grid.Row="1" Background="Beige" Margin="3">
-                <TextBlock x:Name="textBlockUp" HorizontalAlignment="Center"/>
+                <TextBlock x:Name="textBlockUp" HorizontalAlignment="Center" PreviewMouseLeftButtonDown="textBlockUp_PreviewMouseLeftButtonDown"/>
             </Grid>
             <Grid Grid.Row="2" Background="Beige" Margin="3">
-                <TextBlock x:Name="textBlockDown" HorizontalAlignment="Center"/>
+                <TextBlock x:Name="textBlockDown" HorizontalAlignment="Center" PreviewMouseLeftButtonDown="textBlockDown_PreviewMouseLeftButtonDown"/>
             </Grid>
             <tree:TreeUI Grid.Row="3" x:Name="treeRootUI" IsEnabled="False"/>
         </Grid>

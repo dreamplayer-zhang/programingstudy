@@ -39,6 +39,8 @@ namespace Root_Pine2.Module
             textBlockVision.Foreground = m_boats.m_vision.m_remote.p_bEnable ? Brushes.Red : Brushes.LightGray; 
             textBlockA.Text = (m_boats.m_aBoat[Vision2D.eWorks.A].p_infoStrip != null) ? m_boats.m_aBoat[Vision2D.eWorks.A].p_id : "";
             textBlockB.Text = (m_boats.m_aBoat[Vision2D.eWorks.B].p_infoStrip != null) ? m_boats.m_aBoat[Vision2D.eWorks.B].p_id : "";
+            textBlockStepA.Text = m_boats.m_aBoat[Vision2D.eWorks.A].p_eStep.ToString();
+            textBlockStepB.Text = m_boats.m_aBoat[Vision2D.eWorks.B].p_eStep.ToString();
             OnRunTree();
         }
 

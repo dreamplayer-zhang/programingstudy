@@ -15,9 +15,10 @@
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
-            <Grid Grid.Row="0" Margin="3" Background="Beige">
+            <Grid Grid.Row="0" Margin="3" Background="AntiqueWhite">
                 <TextBlock x:Name="textBlockVision" Text="Vision" HorizontalAlignment="Center" PreviewMouseLeftButtonDown="textBlockVision_PreviewMouseLeftButtonDown"/>
             </Grid>
             <Grid Grid.Row="1">
@@ -32,7 +33,19 @@
                     <TextBlock x:Name="textBlockB" HorizontalAlignment="Center"/>
                 </Grid>
             </Grid>
-            <tree:TreeUI Grid.Row="2" x:Name="treeRootUI" IsEnabled="False"/>
+            <Grid Grid.Row="2">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Grid Grid.Column="0" Margin="3" Background="AliceBlue">
+                    <TextBlock x:Name="textBlockStepA" HorizontalAlignment="Center"/>
+                </Grid>
+                <Grid Grid.Column="1" Margin="3" Background="AliceBlue">
+                    <TextBlock x:Name="textBlockStepB" HorizontalAlignment="Center"/>
+                </Grid>
+            </Grid>
+            <tree:TreeUI Grid.Row="3" x:Name="treeRootUI" IsEnabled="False"/>
         </Grid>
     </GroupBox>
 </UserControl>
