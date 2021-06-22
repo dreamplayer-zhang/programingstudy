@@ -11,6 +11,13 @@ namespace Root_CAMELLIA
 {
     public static class BaseDefine
     {
+        public enum Process
+        {
+            CalbrationWaferCentering = 1,
+            Measure
+        }
+
+
         public const int ViewSize = 310;
         public const int WFRadius = 300;
         public const int MaxPoint = 50000;

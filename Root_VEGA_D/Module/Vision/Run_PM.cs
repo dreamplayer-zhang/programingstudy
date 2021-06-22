@@ -34,8 +34,6 @@ namespace Root_VEGA_D.Module
         string m_sMemoryData = "";
         VEGA_D_Handler m_handler;
 
-        public bool m_bIsPMCheckOK = false;
-
         List<LightData> m_lCoaxialLightData = new List<LightData>();
         List<LightData> m_lTransmittedLightData = new List<LightData>();
 
@@ -177,69 +175,70 @@ namespace Root_VEGA_D.Module
 
         public override string Run()
         {
-            if (!m_bIsRun)
-            {
-                m_bIsPMCheckOK = true;
-                return "OK";
-            }
-            else
-                m_bIsPMCheckOK = false;
-
-            if (m_grabMode == null) return "Grab Mode == null";
-
-            // Memory
-            MemoryData mem = m_module.MemoryPool.GetMemory(m_sMemoryGroup, m_sMemoryData);
-            if (mem == null) return "Set Memory Setting";
-
-            // USL & LSL Check
-            if (m_nLSL > m_nUSL) return "Check USL & LSL setting";
-
-            // Position
-            AxisXY axisXY = m_module.AxisXY;
-            Axis.Speed speedY = axisXY.p_axisY.GetSpeedValue(Axis.eSpeed.Move);
-
-            double dPosX = m_grabMode.m_rpAxisCenter.X + m_grabMode.m_GD.m_nFovSize * m_grabMode.m_dResX_um * 0.001 * 0.5;
-
-            double accDistance = speedY.m_acc * speedY.m_v * 0.5 * 2.0;
-            double decDistance = speedY.m_dec * speedY.m_v * 0.5 * 2.0;
-
-            double dStartTriggerY = m_grabMode.m_rpAxisCenter.Y - m_dScanDistance * 0.5;
-            double dEndTriggerY = m_grabMode.m_rpAxisCenter.Y + m_dScanDistance * 0.5;
-
-            double dStartPosY = dStartTriggerY - accDistance;
-            double dEndPosY = dEndTriggerY + decDistance;
-
-            int centerY_px = (int)(m_dScanDistance * 1000 * 0.5 / m_grabMode.m_dResY_um);
-
-            int nScanLen_px = (int)Math.Round(m_dScanDistance * 1000 / m_grabMode.m_dResY_um);
-
-            m_grabMode.m_dTrigger = Math.Round(m_grabMode.m_dResY_um * m_grabMode.m_dCamTriggerRatio, 1);
-
-            // Make PM Data List
-            int nCheckPointLenFromCenter_px = (int)(m_dLengthFromScanCenterY * 1000 / m_grabMode.m_dResY_um);
-            int nCoaxialCheckPosY_px = centerY_px - nCheckPointLenFromCenter_px;
-            int nTransmittedCheckPosY_px = centerY_px + nCheckPointLenFromCenter_px;
-
-            CRect rectCoaxial = new CRect((int)(m_grabMode.m_GD.m_nFovSize * 0.5), nCoaxialCheckPosY_px, m_nCheckArea);
-            CRect rectTransmitted = new CRect((int)(m_grabMode.m_GD.m_nFovSize * 0.5), nTransmittedCheckPosY_px, m_nCheckArea);
-
-            List<PMData> listPMData = new List<PMData>();
-            listPMData.Add(new PMData(m_lCoaxialLightData, rectCoaxial, m_dCoaxialZPos));
-            listPMData.Add(new PMData(m_lTransmittedLightData, rectTransmitted, m_dTransmittedZPos));
-
             // Prepare Log
             PreparePMLog();
-
             WritePMLog(ePMLogType.PM_Start, "");
+
+            // 동축, 투과조명 시료 PM 기능 결과
             bool bCoaxialResult = true;
             bool bTransmittedResult = true;
-            // Collect GV Value
+
             try
-            {
+            { 
+                if (!m_bIsRun)
+                {
+                    ((Loadport_Cymechs)m_handler.m_loadport[EQ.p_nRunLP]).m_CommonFunction();
+
+                    return "OK";
+                }
+
+                if (m_grabMode == null) return "Grab Mode == null";
+
+                // Memory
+                MemoryData mem = m_module.MemoryPool.GetMemory(m_sMemoryGroup, m_sMemoryData);
+                if (mem == null) return "Set Memory Setting";
+
+                // USL & LSL Check
+                if (m_nLSL > m_nUSL) return "Check USL & LSL setting";
+
+                // Position
+                AxisXY axisXY = m_module.AxisXY;
+                Axis.Speed speedY = axisXY.p_axisY.GetSpeedValue(Axis.eSpeed.Move);
+
+                double dPosX = m_grabMode.m_rpAxisCenter.X + m_grabMode.m_GD.m_nFovSize * m_grabMode.m_dResX_um * 0.001 * 0.5;
+
+                double accDistance = speedY.m_acc * speedY.m_v * 0.5 * 2.0;
+                double decDistance = speedY.m_dec * speedY.m_v * 0.5 * 2.0;
+
+                double dStartTriggerY = m_grabMode.m_rpAxisCenter.Y - m_dScanDistance * 0.5;
+                double dEndTriggerY = m_grabMode.m_rpAxisCenter.Y + m_dScanDistance * 0.5;
+
+                double dStartPosY = dStartTriggerY - accDistance;
+                double dEndPosY = dEndTriggerY + decDistance;
+
+                int centerY_px = (int)(m_dScanDistance * 1000 * 0.5 / m_grabMode.m_dResY_um);
+
+                int nScanLen_px = (int)Math.Round(m_dScanDistance * 1000 / m_grabMode.m_dResY_um);
+
+                m_grabMode.m_dTrigger = Math.Round(m_grabMode.m_dResY_um * m_grabMode.m_dCamTriggerRatio, 1);
+
+                // Make PM Data List
+                int nCheckPointLenFromCenter_px = (int)(m_dLengthFromScanCenterY * 1000 / m_grabMode.m_dResY_um);
+                int nCoaxialCheckPosY_px = centerY_px - nCheckPointLenFromCenter_px;
+                int nTransmittedCheckPosY_px = centerY_px + nCheckPointLenFromCenter_px;
+
+                CRect rectCoaxial = new CRect((int)(m_grabMode.m_GD.m_nFovSize * 0.5), nCoaxialCheckPosY_px, m_nCheckArea);
+                CRect rectTransmitted = new CRect((int)(m_grabMode.m_GD.m_nFovSize * 0.5), nTransmittedCheckPosY_px, m_nCheckArea);
+
+                List<PMData> listPMData = new List<PMData>();
+                listPMData.Add(new PMData(m_lCoaxialLightData, rectCoaxial, m_dCoaxialZPos));
+                listPMData.Add(new PMData(m_lTransmittedLightData, rectTransmitted, m_dTransmittedZPos));
+
                 // RADS 연결
                 if (m_module.Run(m_module.StartRADS()))
                     return p_sInfo;
 
+                // Collect GV Value
                 foreach (PMData pmData in listPMData)
                 {
                     // Turn off lights
@@ -313,11 +312,10 @@ namespace Root_VEGA_D.Module
                 // Alarm
                 m_module.m_alidPMCoaxialError.Run(!bCoaxialResult, m_module.m_alidPMCoaxialError.p_sDesc);
                 m_module.m_alidPMTransmittedError.Run(!bTransmittedResult, m_module.m_alidPMTransmittedError.p_sDesc);
-
-                if (bCoaxialResult && bTransmittedResult) m_bIsPMCheckOK = true;
             }
             catch (Exception e)
             {
+                m_log.Info(e.Message);
             }
             finally
             {
@@ -330,9 +328,18 @@ namespace Root_VEGA_D.Module
 
                 // RADS 기능 off
                 m_module.StopRADS();
+
+                // PM 기능 이후 loadport 제어
+                if (!bCoaxialResult && !bTransmittedResult)
+                {
+                    ((Loadport_Cymechs)m_handler.m_loadport[EQ.p_nRunLP]).m_CommonFunction();
+                }
+                else
+                {
+                    m_module.m_alidPMFail.Run(true, "PM is Fail");
+                }
             }
-            if (!bCoaxialResult && !bTransmittedResult) ((Loadport_Cymechs)m_handler.m_loadport[EQ.p_nRunLP]).m_CommonFunction();
-            else m_module.m_alidPMFail.Run(true, "PM is Fail");
+            
             return "OK";
         }
     }
