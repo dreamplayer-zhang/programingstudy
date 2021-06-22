@@ -34,6 +34,7 @@ namespace Root_CAMELLIA.LibSR_Met
         public double[] VIS_Wavelength;
         public double[] Transmittance;
         public double[] CalcReflectance;
+        public List<double> DCOLTransmittance;
 
         public RawData()
         {
@@ -45,6 +46,7 @@ namespace Root_CAMELLIA.LibSR_Met
             VIS_Wavelength = new double[ConstValue.SPECTROMETER_MAX_PIXELSIZE];
             Transmittance = new double[ConstValue.SPECTROMETER_MAX_PIXELSIZE];
             CalcReflectance = new double[ConstValue.SPECTROMETER_MAX_PIXELSIZE];
+            DCOLTransmittance= new List<double>();
         }
     }
 
@@ -1628,35 +1630,38 @@ namespace Root_CAMELLIA.LibSR_Met
             for (int i = 0; i < m_ScalesListT.Count; i++)
             {
                 ContourMapData mapdata = new ContourMapData();
-                dWavelengthMAxR = m_ScalesListT[i].p_waveLength;
-                if (i == 0)
-                {
-                    mapdata.Wavelength = m_ScalesListT[i].p_waveLength;
-                    mapdata.dOffset = m_ScalesListT[i].p_offset;
-                    mapdata.dScale = m_ScalesListT[i].p_scale;
-                    m_ContourMapDataT.Add(mapdata);
-                }
-                else
-                {
-                    if (dWavelengthMAxR > m_ContourMapDataT[i - 1].Wavelength)
-                    {
-                        mapdata.Wavelength = m_ScalesListT[i].p_waveLength;
-                        mapdata.dOffset = m_ScalesListT[i].p_offset;
-                        mapdata.dScale = m_ScalesListT[i].p_scale;
-                        m_ContourMapDataT.Add(mapdata);
-                    }
-                    else
-                    {
-                        mapdata.Wavelength = m_ContourMapDataT[i - 1].Wavelength;
-                        mapdata.dOffset = m_ScalesListT[i - 1].p_offset;
-                        mapdata.dScale = m_ScalesListT[i - 1].p_scale;
-                        m_ContourMapDataT.Add(mapdata);
-                        mapdata.Wavelength = m_ScalesListT[i].p_waveLength;
-                        mapdata.dOffset = m_ScalesListT[i].p_offset;
-                        mapdata.dScale = m_ScalesListT[i].p_scale;
-                        m_ContourMapDataT[i - 1] = mapdata;
-                    }
-                }
+                mapdata.Wavelength = m_ScalesListT[i].p_waveLength;
+                m_ContourMapDataT.Add(mapdata);
+                //ContourMapData mapdata = new ContourMapData();
+                //dWavelengthMAxR = m_ScalesListT[i].p_waveLength;
+                //if (i == 0)
+                //{
+                //    mapdata.Wavelength = m_ScalesListT[i].p_waveLength;
+                //    mapdata.dOffset = m_ScalesListT[i].p_offset;
+                //    mapdata.dScale = m_ScalesListT[i].p_scale;
+                //    m_ContourMapDataT.Add(mapdata);
+                //}
+                //else
+                //{
+                //    if (dWavelengthMAxR > m_ContourMapDataT[i - 1].Wavelength)
+                //    {
+                //        mapdata.Wavelength = m_ScalesListT[i].p_waveLength;
+                //        mapdata.dOffset = m_ScalesListT[i].p_offset;
+                //        mapdata.dScale = m_ScalesListT[i].p_scale;
+                //        m_ContourMapDataT.Add(mapdata);
+                //    }
+                //    else
+                //    {
+                //        mapdata.Wavelength = m_ContourMapDataT[i - 1].Wavelength;
+                //        mapdata.dOffset = m_ScalesListT[i - 1].p_offset;
+                //        mapdata.dScale = m_ScalesListT[i - 1].p_scale;
+                //        m_ContourMapDataT.Add(mapdata);
+                //        mapdata.Wavelength = m_ScalesListT[i].p_waveLength;
+                //        mapdata.dOffset = m_ScalesListT[i].p_offset;
+                //        mapdata.dScale = m_ScalesListT[i].p_scale;
+                //        m_ContourMapDataT[i - 1] = mapdata;
+                //    }
+                //}
 
             }
         }

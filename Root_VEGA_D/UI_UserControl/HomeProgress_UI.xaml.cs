@@ -48,7 +48,7 @@ namespace Root_VEGA_D
         DispatcherTimer m_timer = new DispatcherTimer();
         void InitTimer()
         {
-            m_timer.Interval = TimeSpan.FromMilliseconds(20);
+            m_timer.Interval = TimeSpan.FromMilliseconds(50);
             m_timer.Tick += M_timer_Tick;
             m_timer.Start();
         }

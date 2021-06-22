@@ -242,7 +242,10 @@ namespace RootTools.Module
                 Thread.Sleep(10);
                 RunThread();
             }
+            RunThreadStop(); 
         }
+
+        protected virtual void RunThreadStop() { }
 
         protected virtual void RunThread()
         {
@@ -663,6 +666,7 @@ namespace RootTools.Module
 
             void ServerModuleRun(Protocol protocol)
             {
+                EQ.p_bStop = false; 
                 ModuleRunBase run = m_module.CloneModuleRun(protocol.m_sCmd);
                 if (run == null)
                 {

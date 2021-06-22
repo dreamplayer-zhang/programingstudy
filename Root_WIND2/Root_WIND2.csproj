@@ -218,6 +218,7 @@
     </Compile>
     <Compile Include="Dialog\Dialog_MapCreator_ImageViewer_ViewModel.cs" />
     <Compile Include="Dialog\Dialog_MapCreator_ViewModel.cs" />
+    <Compile Include="Module\Vision\Run_InspectOnly.cs" />
     <Compile Include="Recipe\RecipeAlign.cs" />
     <Compile Include="Tools\Constants.cs" />
     <Compile Include="Controls\UserControl\ColorPicker.xaml.cs">

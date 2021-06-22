@@ -32,6 +32,7 @@ namespace Root_Pine2.Engineer
 
             textBlockMode.DataContext = m_pine2;
             textBoxWidth.DataContext = m_pine2;
+            textBoxThickness.DataContext = m_pine2; 
             textBlock3D.DataContext = m_pine2; 
 
             InitMagazineEV_UI();

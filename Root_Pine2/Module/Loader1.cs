@@ -149,6 +149,7 @@ namespace Root_Pine2.Module
                 loader2.RunVacuum(true);
                 m_picker.RunVacuum(false);
                 if (Run(RunMoveUp())) return p_sInfo;
+                if (Run(RunMoveX(Vision2D.eVision.Top2D, Vision2D.eWorks.B))) return p_sInfo; 
                 loader2.p_infoStrip = m_picker.p_infoStrip;
                 m_picker.p_infoStrip = null;
             }

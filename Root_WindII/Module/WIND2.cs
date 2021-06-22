@@ -16,26 +16,25 @@ namespace Root_WindII
     {
         public TK4SGroup m_tk4s;
         public FFU_Group m_FFUGourp;
-        DIO_I di_Door_VSPC;
+        DIO_I di_Door_VSMainPanel;
+        DIO_I di_Door_VSAxisPanel;
+        DIO_I di_Door_VSRearTop;
         DIO_I di_Door_VSTop;
-        DIO_I di_Door_VSBTM;
-        DIO_I di_Door_VSLoof;
+        DIO_I di_Door_VSBottom;
+        DIO_I di_Door_EFEMElecPanel;
         DIO_I di_Door_EFEMTop;
-        DIO_I di_Door_EFEMBtm;
-        DIO_I di_Door_EFEMAir;
-        DIO_I di_Door_ElecTop;
-        DIO_I di_Door_ElecBtm;
-        DIO_I di_Door_ElecOptic;
-        DIO_I di_Fan_VSPCDoor;
-        DIO_I di_Fan_VSTop;
-        DIO_I di_Fan_VSBTM;
-        DIO_I di_Fan_EFEMPC;
-        DIO_I di_Fan_12CH1;
-        DIO_I di_Fan_12CH2;
-        DIO_I di_Fan_12CH3;
-        DIO_I di_Fan_VSPC;
-        DIO_I di_Fan_4CH1;
-        DIO_I di_Fan_4CH2;
+
+        
+        //DIO_I di_Fan_VSPCDoor;
+        //DIO_I di_Fan_VSTop;
+        //DIO_I di_Fan_VSBTM;
+        //DIO_I di_Fan_EFEMPC;
+        //DIO_I di_Fan_12CH1;
+        //DIO_I di_Fan_12CH2;
+        //DIO_I di_Fan_12CH3;
+        //DIO_I di_Fan_VSPC;
+        //DIO_I di_Fan_4CH1;
+        //DIO_I di_Fan_4CH2;
         DIO_I di_EMO;
         DIO_I di_CDA;
         DIO_I di_VAC1;
@@ -62,26 +61,24 @@ namespace Root_WindII
             p_sInfo = m_toolBox.GetDIO(ref m_doLamp, this, "Tower Lamp", asLamp);
             m_toolBox.Get(ref m_tk4s, this, "FDC", GlobalObjects.Instance.Get<DialogService>());
             m_toolBox.Get(ref m_FFUGourp, this, "FFU", GlobalObjects.Instance.Get<DialogService>());
-            p_sInfo = m_toolBox.GetDIO(ref di_Door_VSPC, this, "Vision PC Door");
+            p_sInfo = m_toolBox.GetDIO(ref di_Door_VSMainPanel, this, "Vision Main Panel Door");
+            p_sInfo = m_toolBox.GetDIO(ref di_Door_VSAxisPanel, this, "Vision Axis Panel Door");
+            p_sInfo = m_toolBox.GetDIO(ref di_Door_VSRearTop, this, "Vision Rear Top Door");
             p_sInfo = m_toolBox.GetDIO(ref di_Door_VSTop, this, "Vision Top Door");
-            p_sInfo = m_toolBox.GetDIO(ref di_Door_VSBTM, this, "Vision Bottom Door");
-            p_sInfo = m_toolBox.GetDIO(ref di_Door_VSLoof, this, "Vision LoofDoor");
+            p_sInfo = m_toolBox.GetDIO(ref di_Door_VSBottom, this, "Vision Bottom Door");
+            p_sInfo = m_toolBox.GetDIO(ref di_Door_EFEMElecPanel, this, "EFEM Elec PanelDoor");
             p_sInfo = m_toolBox.GetDIO(ref di_Door_EFEMTop, this, "EFEM Top Door");
-            p_sInfo = m_toolBox.GetDIO(ref di_Door_EFEMBtm, this, "EFEM Bottom Door");
-            p_sInfo = m_toolBox.GetDIO(ref di_Door_EFEMAir, this, "EFEM Air Door");
-            p_sInfo = m_toolBox.GetDIO(ref di_Door_ElecTop, this, "Elec Top Door");
-            p_sInfo = m_toolBox.GetDIO(ref di_Door_ElecBtm, this, "Elec Bottom Door");
-            p_sInfo = m_toolBox.GetDIO(ref di_Door_ElecOptic, this, "Elec Optic Door");
-            p_sInfo = m_toolBox.GetDIO(ref di_Fan_VSPCDoor, this, "Vision PC Door Fan");
-            p_sInfo = m_toolBox.GetDIO(ref di_Fan_VSTop, this, "Vision Top Fan");
-            p_sInfo = m_toolBox.GetDIO(ref di_Fan_VSBTM, this, "Vision Bottom Fan");
-            p_sInfo = m_toolBox.GetDIO(ref di_Fan_EFEMPC, this, "EFEM PC Fan");
-            p_sInfo = m_toolBox.GetDIO(ref di_Fan_12CH1, this, "12CH 1 Fan");
-            p_sInfo = m_toolBox.GetDIO(ref di_Fan_12CH2, this, "12CH 2 Fan");
-            p_sInfo = m_toolBox.GetDIO(ref di_Fan_12CH3, this, "12CH 3 Fan");
-            p_sInfo = m_toolBox.GetDIO(ref di_Fan_VSPC, this, "Vision PC Fan");
-            p_sInfo = m_toolBox.GetDIO(ref di_Fan_4CH1, this, "4CH 1 Fan");
-            p_sInfo = m_toolBox.GetDIO(ref di_Fan_4CH2, this, "4CH 2 Fan");
+            
+            //p_sInfo = m_toolBox.GetDIO(ref di_Fan_VSPCDoor, this, "Vision PC Door Fan");
+            //p_sInfo = m_toolBox.GetDIO(ref di_Fan_VSTop, this, "Vision Top Fan");
+            //p_sInfo = m_toolBox.GetDIO(ref di_Fan_VSBTM, this, "Vision Bottom Fan");
+            //p_sInfo = m_toolBox.GetDIO(ref di_Fan_EFEMPC, this, "EFEM PC Fan");
+            //p_sInfo = m_toolBox.GetDIO(ref di_Fan_12CH1, this, "12CH 1 Fan");
+            //p_sInfo = m_toolBox.GetDIO(ref di_Fan_12CH2, this, "12CH 2 Fan");
+            //p_sInfo = m_toolBox.GetDIO(ref di_Fan_12CH3, this, "12CH 3 Fan");
+            //p_sInfo = m_toolBox.GetDIO(ref di_Fan_VSPC, this, "Vision PC Fan");
+            //p_sInfo = m_toolBox.GetDIO(ref di_Fan_4CH1, this, "4CH 1 Fan");
+            //p_sInfo = m_toolBox.GetDIO(ref di_Fan_4CH2, this, "4CH 2 Fan");
             p_sInfo = m_toolBox.GetDIO(ref di_EMO, this, "Emergency");
             p_sInfo = m_toolBox.GetDIO(ref di_CDA, this, "CDA");
             p_sInfo = m_toolBox.GetDIO(ref di_VAC1, this, "VAC1");
@@ -288,29 +285,34 @@ namespace Root_WindII
         {
             if (true)
             {
+                if (EQ.p_eState == EQ.eState.Run)
+                    do_door_Lock.Write(true);
+
                 string str = "";
-                if (!di_Door_VSPC.p_bIn)
-                    str = di_Door_VSPC.m_id;
+
+               
+                if (!di_Door_VSMainPanel.p_bIn)
+                    str = di_Door_VSMainPanel.m_id;
+                else if (!di_Door_VSAxisPanel.p_bIn)
+                    str = di_Door_VSAxisPanel.m_id;
+                else if (!di_Door_VSRearTop.p_bIn)
+                    str = di_Door_VSRearTop.m_id;
                 else if (!di_Door_VSTop.p_bIn)
                     str = di_Door_VSTop.m_id;
-                else if (!di_Door_VSBTM.p_bIn)
-                    str = di_Door_VSBTM.m_id;
-                else if (!di_Door_VSLoof.p_bIn)
-                    str = di_Door_VSLoof.m_id;
+                else if (!di_Door_VSBottom.p_bIn)
+                    str = di_Door_VSBottom.m_id;
+                else if (!di_Door_EFEMElecPanel.p_bIn)
+                    str = di_Door_EFEMElecPanel.m_id;
                 else if (!di_Door_EFEMTop.p_bIn)
                     str = di_Door_EFEMTop.m_id;
-                else if (!di_Door_EFEMBtm.p_bIn)
-                    str = di_Door_EFEMBtm.m_id;
-                else if (!di_Door_EFEMAir.p_bIn)
-                    str = di_Door_EFEMAir.m_id;
-                else if (!di_Door_ElecTop.p_bIn)
-                    str = di_Door_ElecTop.m_id;
-                else if (!di_Door_ElecBtm.p_bIn)
-                    str = di_Door_ElecBtm.m_id;
-                else if (!di_Door_ElecOptic.p_bIn)
-                    str = di_Door_ElecOptic.m_id;
+                else
+                {
+                    str = GeneralFunction.ReadINIFile("1", "2", @"Z:\1.ini");
+                }
                 if (str != "")
                     GlobalObjects.Instance.Get<WindII_Warning>().AddWarning(str + " Open Detect");
+
+                str = "";
 
                 if (!di_ProtectionBar.p_bIn)
                     str = di_ProtectionBar.m_id;
@@ -324,26 +326,26 @@ namespace Root_WindII
             if (true)
             {
                 string str = "";
-                if (!di_Fan_VSPCDoor.p_bIn)
-                    str = di_Fan_VSPCDoor.m_id;
-                else if (!di_Fan_VSTop.p_bIn)
-                    str = di_Fan_VSTop.m_id;
-                else if (!di_Fan_VSBTM.p_bIn)
-                    str = di_Fan_VSBTM.m_id;
-                else if (!di_Fan_EFEMPC.p_bIn)
-                    str = di_Fan_EFEMPC.m_id;
-                else if (!di_Fan_12CH1.p_bIn)
-                    str = di_Fan_12CH1.m_id;
-                else if (!di_Fan_12CH2.p_bIn)
-                    str = di_Fan_12CH2.m_id;
-                else if (!di_Fan_12CH3.p_bIn)
-                    str = di_Fan_12CH3.m_id;
-                else if (!di_Fan_VSPC.p_bIn)
-                    str = di_Fan_VSPC.m_id;
-                else if (!di_Fan_4CH1.p_bIn)
-                    str = di_Fan_4CH1.m_id;
-                else if (!di_Fan_4CH2.p_bIn)
-                    str = di_Fan_4CH2.m_id;
+                //if (!di_Fan_VSPCDoor.p_bIn)
+                //    str = di_Fan_VSPCDoor.m_id;
+                //else if (!di_Fan_VSTop.p_bIn)
+                //    str = di_Fan_VSTop.m_id;
+                //else if (!di_Fan_VSBTM.p_bIn)
+                //    str = di_Fan_VSBTM.m_id;
+                //else if (!di_Fan_EFEMPC.p_bIn)
+                //    str = di_Fan_EFEMPC.m_id;
+                //else if (!di_Fan_12CH1.p_bIn)
+                //    str = di_Fan_12CH1.m_id;
+                //else if (!di_Fan_12CH2.p_bIn)
+                //    str = di_Fan_12CH2.m_id;
+                //else if (!di_Fan_12CH3.p_bIn)
+                //    str = di_Fan_12CH3.m_id;
+                //else if (!di_Fan_VSPC.p_bIn)
+                //    str = di_Fan_VSPC.m_id;
+                //else if (!di_Fan_4CH1.p_bIn)
+                //    str = di_Fan_4CH1.m_id;
+                //else if (!di_Fan_4CH2.p_bIn)
+                //    str = di_Fan_4CH2.m_id;
                 if (str != "")
                     GlobalObjects.Instance.Get<WindII_Warning>().AddWarning(str + " Fan Off Detect");
             }
