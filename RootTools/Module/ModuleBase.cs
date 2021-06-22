@@ -499,7 +499,7 @@ namespace RootTools.Module
             }
         }
 
-        public class Remote
+        public class Remote : NotifyProperty
         {
             MemoryStream m_memoryStream = new MemoryStream();
 
@@ -608,6 +608,18 @@ namespace RootTools.Module
             #endregion
 
             #region Client
+            bool _bEnable = true;
+            public bool p_bEnable
+            {
+                get { return _bEnable; }
+                set
+                {
+                    if (_bEnable == value) return;
+                    _bEnable = value;
+                    OnPropertyChanged();
+                }
+            }
+
             TCPIPClient m_client;
             void InitClient(bool bInit)
             {
@@ -617,6 +629,7 @@ namespace RootTools.Module
 
             public string RemoteSend(ModuleRunBase run)
             {
+                if (p_bEnable == false) return "OK";
                 m_memoryStream = new MemoryStream();
                 m_treeRoot.m_job = new Job(m_memoryStream, true, m_log);
                 m_treeRoot.p_eMode = Tree.eMode.JobSave;
@@ -828,6 +841,7 @@ namespace RootTools.Module
             foreach (ModuleRunBase run in aModuleRun) run.RunTree(tree.GetTree(n++, run.p_id), true);
         }
         #endregion
+        
         string _id = "";
         public string p_id
         {
