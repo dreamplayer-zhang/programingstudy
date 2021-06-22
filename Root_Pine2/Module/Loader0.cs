@@ -48,6 +48,7 @@ namespace Root_Pine2.Module
             Top2D,
         }
         const string c_sPosLoadEV = "LoadEV";
+        const string c_sPosUp = "Up";
         void InitPosition()
         {
             m_axis.AddPos(c_sPosLoadEV);
@@ -57,6 +58,7 @@ namespace Root_Pine2.Module
             m_axis.AddPos(GetPosString(eUnloadVision.Top2D, Vision2D.eWorks.A));
             m_axis.AddPos(GetPosString(eUnloadVision.Top2D, Vision2D.eWorks.B));
             m_axis.AddPos(Enum.GetNames(typeof(ePosTray)));
+            m_axis.p_axisZ.AddPos(c_sPosUp);
         }
         string GetPosString(eUnloadVision eVision, Vision2D.eWorks eWorks)
         {
@@ -109,8 +111,9 @@ namespace Root_Pine2.Module
         public string RunMoveBoat(eUnloadVision eVision, Vision2D.eWorks eWorks, bool bWait = true)
         {
             string sPos = GetPosString(eVision, eWorks);
-            if (Run(StartMoveX(sPos, 0))) return p_sInfo;
             m_axis.p_axisY.StartMove(sPos);
+            while (m_axis.p_axisY.p_posCommand > m_axis.p_axisY.GetPosValue(ePosTransfer.Transfer0)) Thread.Sleep(10);
+            if (Run(StartMoveX(sPos, 0))) return p_sInfo;
             return bWait ? m_axis.WaitReady() : "OK";
         }
 
@@ -124,7 +127,7 @@ namespace Root_Pine2.Module
         int m_pulsemm = 1000; 
         public string RunMoveLoadEV(bool bWait = true)
         {
-            double dPos = m_pulsemm * (95 - m_pine2.p_widthStrip);
+            double dPos = m_pulsemm * (m_pine2.m_widthDefaultStrip - m_pine2.p_widthStrip);
             if (Run(StartMoveX(c_sPosLoadEV, dPos))) return p_sInfo;
             m_axis.p_axisY.StartMove(c_sPosLoadEV);
             return bWait ? m_axis.WaitReady() : "OK"; 
@@ -163,7 +166,7 @@ namespace Root_Pine2.Module
 
         public string RunMoveUp(bool bWait = true)
         {
-            m_axis.p_axisZ.StartMove(0);
+            m_axis.p_axisZ.StartMove(c_sPosUp);
             return bWait ? m_axis.WaitReady() : "OK";
         }
 

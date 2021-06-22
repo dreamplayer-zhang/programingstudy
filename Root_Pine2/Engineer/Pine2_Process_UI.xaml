@@ -52,6 +52,10 @@
                         <TextBox x:Name="textBoxWidth" Text="{Binding p_widthStrip}" Margin="3" MinWidth="40" VerticalAlignment="Center" TextAlignment="Center"/>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal">
+                        <Label Content="Thickness :" Margin="3" VerticalAlignment="Center"/>
+                        <TextBox x:Name="textBoxThickness" Text="{Binding p_thickness}" Margin="3" MinWidth="40" VerticalAlignment="Center" TextAlignment="Center"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
                         <Label Content=" 3D  :" Margin="3" VerticalAlignment="Center"/>
                         <TextBlock x:Name="textBlock3D" Text="{Binding p_b3D}" Margin="3" VerticalAlignment="Center" PreviewMouseDown="textBlock3D_PreviewMouseDown"/>
                     </StackPanel>

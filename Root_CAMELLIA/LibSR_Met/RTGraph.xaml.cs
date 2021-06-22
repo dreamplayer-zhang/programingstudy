@@ -376,7 +376,7 @@ namespace Root_CAMELLIA.LibSR_Met
                 {
                     if (m_DM.m_RawData[n].bDataExist)
                     {
-                        comboBoxDataIndex.Items.Add(n);
+                        comboBoxDataIndex.Items.Add(n+1);
                     }
                 }
             }

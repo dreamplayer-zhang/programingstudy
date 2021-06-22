@@ -197,13 +197,15 @@ namespace RootTools.Gem
             }
         }
 
-        eTransfer _eTransfer = eTransfer.ReadyToLoad;
+        eTransfer _eTransfer = eTransfer.OutOfService;
+        public eTransfer eBeforTransfer= eTransfer.OutOfService;
         public eTransfer p_eTransfer
         {
             get { return _eTransfer; }
             set
             {
                 if (_eTransfer == value) return;
+                eBeforTransfer = value;
                 m_log.Info("p_eTransfer " + _eTransfer.ToString() + " -> " + value.ToString());
                 _eTransfer = value;
                 OnPropertyChanged();
