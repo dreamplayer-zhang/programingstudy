@@ -61,17 +61,39 @@ namespace Root_VEGA_P_Vision
         public OriginImageViewer_ViewModel(string imageData):base(imageData)
         {
             p_VisibleMenu = Visibility.Collapsed;
+            p_ROILayer = null;
             recipe = GlobalObjects.Instance.Get<RecipeCoverFront>();
             originRecipe = recipe.GetItem<EUVOriginRecipe>();
+            p_ROILayer = null;
 
             if (imageData.Contains("Main"))
+            {
                 originInfo = originRecipe.TDIOriginInfo;
+                GlobalObjects.Instance.Get<RecipeCoverBack>().GetItem<EUVOriginRecipe>().TDIOriginInfo = originInfo;
+                GlobalObjects.Instance.Get<RecipePlateFront>().GetItem<EUVOriginRecipe>().TDIOriginInfo = originInfo;
+                GlobalObjects.Instance.Get<RecipePlateBack>().GetItem<EUVOriginRecipe>().TDIOriginInfo = originInfo;
+            }
             else if (imageData.Contains("Stain"))
+            {
                 originInfo = originRecipe.StainOriginInfo;
+                GlobalObjects.Instance.Get<RecipeCoverBack>().GetItem<EUVOriginRecipe>().StainOriginInfo = originInfo;
+                GlobalObjects.Instance.Get<RecipePlateFront>().GetItem<EUVOriginRecipe>().StainOriginInfo = originInfo;
+                GlobalObjects.Instance.Get<RecipePlateBack>().GetItem<EUVOriginRecipe>().StainOriginInfo = originInfo;
+            }
             else if (imageData.Contains("Top"))
+            {
                 originInfo = originRecipe.SideTBOriginInfo;
+                GlobalObjects.Instance.Get<RecipeCoverBack>().GetItem<EUVOriginRecipe>().SideTBOriginInfo = originInfo;
+                GlobalObjects.Instance.Get<RecipePlateFront>().GetItem<EUVOriginRecipe>().SideTBOriginInfo = originInfo;
+                GlobalObjects.Instance.Get<RecipePlateBack>().GetItem<EUVOriginRecipe>().SideTBOriginInfo = originInfo;
+            }
             else if (imageData.Contains("Left"))
+            {
                 originInfo = originRecipe.SideLROriginInfo;
+                GlobalObjects.Instance.Get<RecipeCoverBack>().GetItem<EUVOriginRecipe>().SideLROriginInfo = originInfo;
+                GlobalObjects.Instance.Get<RecipePlateFront>().GetItem<EUVOriginRecipe>().SideLROriginInfo = originInfo;
+                GlobalObjects.Instance.Get<RecipePlateBack>().GetItem<EUVOriginRecipe>().SideLROriginInfo = originInfo;
+            }
 
             InitializeUIElement();
         }

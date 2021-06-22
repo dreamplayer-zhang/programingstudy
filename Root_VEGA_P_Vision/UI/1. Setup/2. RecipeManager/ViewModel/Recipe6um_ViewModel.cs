@@ -15,15 +15,56 @@ namespace Root_VEGA_P_Vision
 {
     public class Recipe6um_ViewModel:ObservableObject
     {
-        RecipeMask_ViewModel recipeSetting;
+        RecipeMask_ViewModel recipeMask;
         MaskRootViewer_ViewModel coverTop_ImageViewer, coverBottom_ImageViewer, baseTop_ImageViewer, baseBottom_ImageViewer;
-        RootViewer_ViewModel selectedViewer;
-
+        MaskRootViewer_ViewModel selectedViewer;
+        public MaskRootViewer_ViewModel SelectedViewer
+        {
+            get => selectedViewer;
+            set => SetProperty(ref selectedViewer, value);
+        }
         List<int> numList;
         public List<int> MemNumList
         {
             get => numList;
             set => SetProperty(ref numList, value);
+        }
+        int selectedIdx;
+        public int SelectedIdx
+        {
+            get => selectedIdx;
+            set
+            {
+                SetProperty(ref selectedIdx, value);
+                selectedViewer.SelectedIdx = value;
+                selectedViewer.SetMask();
+            }
+        }
+        int selectedTab;
+        public int SelectedTab
+        {
+            get => selectedTab;
+            set
+            {
+                switch(value)
+                {
+                    case 0:
+                        SelectedViewer = CoverTop_ImageViewer;
+                        break;
+                    case 1:
+                        SelectedViewer = CoverBottom_ImageViewer;
+                        break;
+                    case 2:
+                        SelectedViewer = BaseTop_ImageViewer;
+                        break;
+                    case 3:
+                        SelectedViewer = BaseBottom_ImageViewer;
+                        break;
+                }
+                recipeMask.SurfaceParameterBase = selectedViewer.Recipe.GetItem<EUVPodSurfaceParameter>().PodTDI;
+                SelectedViewer.SetMask();
+                SetProperty(ref selectedTab, value);
+            } 
         }
         #region Property
         public MaskRootViewer_ViewModel CoverTop_ImageViewer
@@ -51,27 +92,28 @@ namespace Root_VEGA_P_Vision
         public Recipe6um_Panel Main;
 
         
-        public Recipe6um_ViewModel(RecipeMask_ViewModel recipeSetting)
+        public Recipe6um_ViewModel(RecipeMask_ViewModel recipeMask)
         {
-            this.recipeSetting = recipeSetting;
+            this.recipeMask = recipeMask;
             Main = new Recipe6um_Panel();
             Main.DataContext = this;
             RecipeCoverFront recipeCoverFront = GlobalObjects.Instance.Get<RecipeCoverFront>();
-            coverTop_ImageViewer = new MaskRootViewer_ViewModel("EIP_Cover.Main.Front",recipeSetting.MaskTools,
+            coverTop_ImageViewer = new MaskRootViewer_ViewModel("EIP_Cover.Main.Front",recipeMask.MaskTools,
                 recipeCoverFront,recipeCoverFront.GetItem<EUVOriginRecipe>().TDIOriginInfo,recipeCoverFront.GetItem<EUVPodSurfaceParameter>().PodTDI.MaskIndex);
             
             RecipeCoverBack recipeCoverBack = GlobalObjects.Instance.Get<RecipeCoverBack>();
-            coverBottom_ImageViewer = new MaskRootViewer_ViewModel("EIP_Cover.Main.Back", recipeSetting.MaskTools,
+            coverBottom_ImageViewer = new MaskRootViewer_ViewModel("EIP_Cover.Main.Back", recipeMask.MaskTools,
                 recipeCoverBack,recipeCoverBack.GetItem<EUVOriginRecipe>().TDIOriginInfo,recipeCoverBack.GetItem<EUVPodSurfaceParameter>().PodTDI.MaskIndex);
 
             RecipePlateFront recipePlateFront = GlobalObjects.Instance.Get<RecipePlateFront>();
-            baseTop_ImageViewer = new MaskRootViewer_ViewModel("EIP_Plate.Main.Front", recipeSetting.MaskTools,
+            baseTop_ImageViewer = new MaskRootViewer_ViewModel("EIP_Plate.Main.Front", recipeMask.MaskTools,
                 recipePlateFront,recipePlateFront.GetItem<EUVOriginRecipe>().TDIOriginInfo,recipePlateFront.GetItem<EUVPodSurfaceParameter>().PodTDI.MaskIndex);
 
             RecipePlateBack recipePlateBack = GlobalObjects.Instance.Get<RecipePlateBack>();
-            baseBottom_ImageViewer = new MaskRootViewer_ViewModel("EIP_Plate.Main.Back", recipeSetting.MaskTools,
+            baseBottom_ImageViewer = new MaskRootViewer_ViewModel("EIP_Plate.Main.Back", recipeMask.MaskTools,
                 recipePlateBack, recipePlateBack.GetItem<EUVOriginRecipe>().TDIOriginInfo, recipePlateBack.GetItem<EUVPodSurfaceParameter>().PodTDI.MaskIndex);
 
+            selectedViewer = coverTop_ImageViewer;
             numList = new List<int>();
             for(int i=0;i<coverTop_ImageViewer.p_ImageData.p_nPlane;i++)
                 MemNumList.Add(i+1);
@@ -84,16 +126,6 @@ namespace Root_VEGA_P_Vision
         {
             get => new RelayCommand(() => { });
         }
-        public ICommand TabChanged
-        {
-            get => new RelayCommand(() => {
-                coverTop_ImageViewer.SetMask();
-                coverBottom_ImageViewer.SetMask();
-                baseTop_ImageViewer.SetMask();
-                baseBottom_ImageViewer.SetMask();
-            });
-        }
-
         void Snap()
         {
             EQ.p_bStop = false;

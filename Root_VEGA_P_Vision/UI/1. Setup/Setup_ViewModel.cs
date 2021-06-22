@@ -256,7 +256,7 @@ namespace Root_VEGA_P_Vision
         void CreateRecipe()
         {
             System.Windows.Forms.SaveFileDialog dlg = new System.Windows.Forms.SaveFileDialog();
-            dlg.InitialDirectory = Constants.RootPath.RecipeEBRRootPath;
+            dlg.InitialDirectory = App.RecipeRootPath;
             dlg.Title = "Save Recipe";
             dlg.Filter = "ATI files (*.rcp)|*.rcp|All files (*.*)|*.*";
             if (dlg.ShowDialog() == System.Windows.Forms.DialogResult.OK)
@@ -267,19 +267,30 @@ namespace Root_VEGA_P_Vision
                 string sRecipeFolderPath = Path.Combine(sFolderPath, sFileNameNoExt); // 디렉토리명
                 string sFullPath = Path.Combine(sRecipeFolderPath, sFileName); // 레시피 이름으 된 폴더안의 rcp 파일 경로
 
-                DirectoryInfo dir = new DirectoryInfo(sRecipeFolderPath);
-                if (!dir.Exists)
-                    dir.Create();
+                string[] RecipeFilePaths = { sRecipeFolderPath + @"\\RecipeCoverFront", sRecipeFolderPath + @"\\RecipeCoverBack",
+                sRecipeFolderPath + @"\\RecipePlateFront", sRecipeFolderPath + @"\\RecipePlateBack"};
 
-                recipeCoverFront.Clear();
-                recipeCoverBack.Clear();
-                recipePlateFront.Clear();
-                recipePlateBack.Clear();
+                foreach (string path in RecipeFilePaths)
+                {
+                    DirectoryInfo dir = new DirectoryInfo(path);
+                    if (!dir.Exists)
+                        dir.Create();
+                }
 
-                recipeCoverFront.Save(Path.Combine(sFolderPath, "RecipeCoverFront_" + sFileName));
-                recipeCoverBack.Save(Path.Combine(sFolderPath, "RecipeCoverBack_" + sFileName));
-                recipePlateFront.Save(Path.Combine(sFolderPath, "RecipePlateFront_" + sFileName));
-                recipePlateBack.Save(Path.Combine(sFolderPath, "RecipePlateBack_" + sFileName));
+                //recipeCoverFront.Clear();
+                //recipeCoverBack.Clear();
+                //recipePlateFront.Clear();
+                //recipePlateBack.Clear();
+
+                bool saveRes = false;
+                saveRes = recipeCoverFront.Save(Path.Combine(RecipeFilePaths[0], "RecipeCoverFront_" + sFileName));
+                saveRes = recipeCoverBack.Save(Path.Combine(RecipeFilePaths[1], "RecipeCoverBack_" + sFileName));
+                saveRes = recipePlateFront.Save(Path.Combine(RecipeFilePaths[2], "RecipePlateFront_" + sFileName));
+                saveRes = recipePlateBack.Save(Path.Combine(RecipeFilePaths[3], "RecipePlateBack_" + sFileName));
+                if(saveRes)
+                {
+                    MessageBox.Show("Recipe Saved!");
+                }
             }
         }
 

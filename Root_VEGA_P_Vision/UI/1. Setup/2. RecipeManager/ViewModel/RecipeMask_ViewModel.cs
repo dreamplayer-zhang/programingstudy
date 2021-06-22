@@ -23,8 +23,7 @@ namespace Root_VEGA_P_Vision
         RecipeManager_ViewModel recipeManager;
         MaskTools_ViewModel maskTools;
 
-        EUVPodSurfaceParameter surfaceParameter;
-        EUVPodSurfaceParameterBase curBaseParam;
+        EUVPodSurfaceParameterBase surfaceParameterBase;
         SurfaceParam_Tree_ViewModel surfaceParamTree;
         ImageViewerBase_ViewModel mBase;
         bool isSide, isHighRes;
@@ -65,31 +64,34 @@ namespace Root_VEGA_P_Vision
             this.recipeManager = recipeManager;
             Main = new RecipeMask_Panel();
             Main.DataContext = this;
-            surfaceParameter = GlobalObjects.Instance.Get<RecipeCoverFront>().GetItem<EUVPodSurfaceParameter>();
             maskTools = new MaskTools_ViewModel();
 
             recipeStainVM = new RecipeStain_ViewModel(this);
             recipeTDIVM = new Recipe6um_ViewModel(this);
             recipeSideVM = new RecipeSide_ViewModel(this);
             recipeStackingVM = new Recipe1um_ViewModel(this);
-            surfaceParamTree = new SurfaceParam_Tree_ViewModel(GlobalObjects.Instance.Get<RecipeCoverFront>().GetItem<EUVPodSurfaceParameter>().PodStain);
+            SurfaceParameterBase = GlobalObjects.Instance.Get<RecipeCoverFront>().GetItem<EUVPodSurfaceParameter>().PodStain;
+            surfaceParamTree = new SurfaceParam_Tree_ViewModel(SurfaceParameterBase);
             mBase = new ImageViewerBase_ViewModel();
-
-            //CurBaseParam = SurfaceParameter.PodStain;
+            surfaceParamTree.BrightParam.Param = SurfaceParameterBase.BrightParam;
+            surfaceParamTree.DarkParam.Param = SurfaceParameterBase.DarkParam;
             IsSide = false;
             SetStain();
         }
 
         #region Property
-        public EUVPodSurfaceParameterBase CurBaseParam
+        public EUVPodSurfaceParameterBase SurfaceParameterBase
         {
-            get => curBaseParam;
-            set => SetProperty(ref curBaseParam, value);
-        }
-        public EUVPodSurfaceParameter SurfaceParameter
-        {
-            get => surfaceParameter;
-            set => SetProperty(ref surfaceParameter, value);
+            get => surfaceParameterBase;
+            set 
+            {
+                SetProperty(ref surfaceParameterBase, value);
+                if(surfaceParamTree!=null)
+                {
+                    surfaceParamTree.BrightParam.Param = SurfaceParameterBase.BrightParam;
+                    surfaceParamTree.DarkParam.Param = SurfaceParameterBase.DarkParam;
+                }
+            } 
         }
         public MaskTools_ViewModel MaskTools
         {
@@ -103,7 +105,7 @@ namespace Root_VEGA_P_Vision
         {
             p_BaseViewer.p_SubViewer = recipeStainVM.Main;
             p_BaseViewer.p_SubViewer.DataContext = recipeStainVM;
-            CurBaseParam = SurfaceParameter.PodStain;
+            SurfaceParameterBase = recipeStainVM.SelectedViewer.Recipe.GetItem<EUVPodSurfaceParameter>().PodStain;
             IsSide = false;
             IsHighRes = false;
         }
@@ -111,7 +113,7 @@ namespace Root_VEGA_P_Vision
         {
             p_BaseViewer.p_SubViewer = recipeTDIVM.Main;
             p_BaseViewer.p_SubViewer.DataContext = recipeTDIVM;
-            CurBaseParam = SurfaceParameter.PodTDI;
+            SurfaceParameterBase = recipeTDIVM.SelectedViewer.Recipe.GetItem<EUVPodSurfaceParameter>().PodTDI;
             IsSide = false;
             IsHighRes = false;
 
@@ -120,7 +122,7 @@ namespace Root_VEGA_P_Vision
         {
             p_BaseViewer.p_SubViewer = recipeStackingVM.Main;
             p_BaseViewer.p_SubViewer.DataContext = recipeStackingVM;
-            CurBaseParam = SurfaceParameter.PodStacking;
+            SurfaceParameterBase = recipeStackingVM.SelectedViewer.Recipe.GetItem<EUVPodSurfaceParameter>().PodStacking;
             IsSide = false;
             IsHighRes = true;
 
@@ -129,7 +131,7 @@ namespace Root_VEGA_P_Vision
         {
             p_BaseViewer.p_SubViewer = recipeSideVM.Main;
             p_BaseViewer.p_SubViewer.DataContext = recipeSideVM;
-            //CurBaseParam = surfaceParameter.PodSide;
+            surfaceParameterBase = recipeSideVM.SelectedSideTab.SelectedParamBase;
             IsSide = true;
             IsHighRes = false;
         }

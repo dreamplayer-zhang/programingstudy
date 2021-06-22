@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 
 namespace RootTools_Vision
 {
+    
     public class EUVPodSurfaceParameter:ParameterBase
     {
         EUVPodSurfaceParameterBase podStain;
@@ -68,6 +69,7 @@ namespace RootTools_Vision
 
     }
 
+    [Serializable]
     public class SurfaceParam : ObservableObject
     {
         #region [Parameter]
@@ -78,6 +80,8 @@ namespace RootTools_Vision
 
         #endregion
 
+        public SurfaceParam()
+        { }
         #region [Getter/Setter]
  
         public string DefectName
@@ -136,6 +140,8 @@ namespace RootTools_Vision
 
         #endregion
     }
+
+    [Serializable]
     public class EUVPodSurfaceParameterBase : ObservableObject, IMaskInspection //InspectionParameter
     {
         SurfaceParam brightParam, darkParam;
@@ -168,6 +174,16 @@ namespace RootTools_Vision
             DarkParam = new SurfaceParam();
             BrightParam = new SurfaceParam();
             this.MaskIndex = MaskIndex;
+        }
+        public EUVPodSurfaceParameterBase()
+        { }
+        public EUVPodSurfaceParameterBase(EUVPodSurfaceParameterBase param)
+        {
+            isEnablebrignt = param.isEnablebrignt;
+            isEnabledark = param.isEnabledark;
+            brightParam = param.brightParam;
+            darkParam = param.darkParam;
+            MaskIndex = param.MaskIndex;
         }
         public int MaskIndex { get; set; }
 

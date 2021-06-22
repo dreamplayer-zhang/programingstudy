@@ -9,7 +9,7 @@
              d:DesignHeight="818"
              d:DesignWidth="1912">
 
-    <TabControl Style="{StaticResource ImageViewerTabControlStyle}">
+    <TabControl Style="{StaticResource ImageViewerTabControlStyle}" SelectedIndex="{Binding SelectedTab}">
         <TabItem Header="EIP Cover" Style="{StaticResource ImageViewerTabItemStyle}">
             <local:RecipeSideImageViewers_Panel DataContext="{Binding EIPCoverViewers}"/>
         </TabItem>

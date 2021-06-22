@@ -27,7 +27,6 @@ namespace Root_VEGA_P_Vision
  * recipe 안에 Mask RecipeList 안에 Viewer의 Recipe 정보를 갖고 있음
  * Viewer에는 Recipe 정보가 존재 -> MaskRecipe 안의 Index == ROIMaskIdx, SelectedIdx 갯수만큼 갖고있어야됨
  */
-
     public enum ViewerMode
     {
         Mask,CaptureROI,None
@@ -516,15 +515,8 @@ namespace Root_VEGA_P_Vision
 
             ClearMaskLayer();
 
-            p_cInspROI.p_Data = recipe.GetItem<MaskRecipe>().MaskList[ROIMaskIdx].ToPointLineList();
+            p_cInspROI.p_Data = recipe.GetItem<MaskRecipe>().MaskList[ROIMaskIdx+SelectedIdx].ToPointLineList();
 
-            //for(int i=0;i<p_ROILayer.p_Size.Y;i++)
-            //{
-            //    for(int j=0;j<p_ROILayer.p_Size.X;j++)
-            //    {
-            //        DrawPixelBitmap
-            //    }
-            //}
             foreach(PointLine pointLine in p_cInspROI.p_Data)
             {
                 for(int i=0;i<pointLine.Width;i++)
@@ -599,7 +591,6 @@ namespace Root_VEGA_P_Vision
         #region Inspection
         void InitInspMgr()
         {
-
             GlobalObjects.Instance.GetNamed<WorkManager>(TabName).InspectionStart += InspectionStart_Callback;
             GlobalObjects.Instance.GetNamed<WorkManager>(TabName).PositionDone += PositionDone_Callback;
             GlobalObjects.Instance.GetNamed<WorkManager>(TabName).InspectionDone += InspectionDone_Callback;
@@ -736,6 +727,12 @@ namespace Root_VEGA_P_Vision
             int originWidth = originInfo.OriginSize.X;
             int originHeight = originInfo.OriginSize.Y;
 
+            if (originWidth == 0 && originHeight == 0)
+            {
+                ClearMaskLayer();
+                return;
+            }    
+
             IntPtr ptrMem = p_ROILayer.GetPtr();
             if (ptrMem == IntPtr.Zero)
                 return;
@@ -777,7 +774,7 @@ namespace Root_VEGA_P_Vision
         {
             MaskRecipe maskRecipe = recipe.GetItem<MaskRecipe>();
             recipe.GetItem<MaskRecipe>().OriginPoint = new CPoint(originInfo.OriginSize.X, originInfo.OriginSize.Y);
-            maskRecipe.MaskList[ROIMaskIdx] = new RecipeType_Mask(p_cInspROI.p_Data, Color.FromArgb(255, 255, 0, 0));
+            maskRecipe.MaskList[ROIMaskIdx+SelectedIdx] = new RecipeType_Mask(p_cInspROI.p_Data, Color.FromArgb(255, 255, 0, 0));
             //recipe.GetItem<MaskRecipe>().MaskList.Add(new RecipeType_Mask(p_cInspROI.p_Data, Color.FromArgb(255, 255, 0, 0)));
         }
 
@@ -1063,19 +1060,19 @@ namespace Root_VEGA_P_Vision
             switch (color)
             {
                 case ColorType.MasterFeature:
-                    rectInfo = new TRect(Brushes.DarkMagenta, 4, 1);
+                    rectInfo = new TRect(ImageViewerColorDefines.MasterPosition, 4, 1);
                     break;
                 case ColorType.ChipFeature:
-                    rectInfo = new TRect(Brushes.DarkBlue, 4, 1);
+                    rectInfo = new TRect(ImageViewerColorDefines.ChipPosition, 4, 1);
                     break;
                 case ColorType.FeatureMatching:
-                    rectInfo = new TRect(Brushes.Gold, 4, 1);
+                    rectInfo = new TRect(ImageViewerColorDefines.ChipPositionMove, 4, 1);
                     break;
                 case ColorType.FeatureMatchingFail:
-                    rectInfo = new TRect(Brushes.Red, 4, 1);
+                    rectInfo = new TRect(ImageViewerColorDefines.PostionFail, 4, 1);
                     break;
                 case ColorType.Defect:
-                    rectInfo = new TRect(Brushes.Red, 4, 1);
+                    rectInfo = new TRect(ImageViewerColorDefines.Defect, 4, 1);
                     break;
                 default:
                     rectInfo = new TRect(Brushes.Black, 4, 1);

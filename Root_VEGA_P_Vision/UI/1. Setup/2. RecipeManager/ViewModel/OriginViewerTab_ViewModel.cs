@@ -102,7 +102,8 @@ namespace Root_VEGA_P_Vision
 
             EUVOriginRecipe originRecipe = GlobalObjects.Instance.Get<RecipeCoverFront>().GetItem<EUVOriginRecipe>();
 
-            //TDIOrigin = originRecipe.TDIOriginInfo;
+            //TDIOrigin = originRecipe.TDI
+            ;
             //StainOrigin = originRecipe.StainOriginInfo;
             //SideLROrigin = originRecipe.SideLROriginInfo;
             //SideTBOrigin = originRecipe.SideTBOriginInfo;

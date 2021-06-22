@@ -32,6 +32,7 @@ namespace Root_VEGA_P_Vision
         {
             this.recipe = recipe;
             p_VisibleMenu = Visibility.Collapsed;
+            p_ROILayer = null;
             InitializeUIElements();
         }
         private enum BoxProcess

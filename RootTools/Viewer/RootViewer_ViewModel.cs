@@ -303,7 +303,7 @@ namespace RootTools
                 SetProperty(ref m_View_Rect, value);
             }
         }
-        private int m_CanvasWidth = 100;
+        protected int m_CanvasWidth = 100;
         public int p_CanvasWidth
         {
             get

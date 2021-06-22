@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 
 namespace RootTools_Vision
 {
+    [Serializable]
     public class FeatureLists // Align Info
     {
         public FeatureLists()
