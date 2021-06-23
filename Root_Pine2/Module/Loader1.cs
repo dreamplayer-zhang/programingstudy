@@ -206,8 +206,22 @@ namespace Root_Pine2.Module
             m_secPickerSet = tree.Set(m_secPickerSet, m_secPickerSet, "Done", "PickerSet Done Time (sec)");
         }
         #endregion
-        
+
         #region override
+        public override string StateHome()
+        {
+            if (EQ.p_bSimulate)
+            {
+                p_eState = eState.Ready;
+                return "OK";
+            }
+            p_sInfo = base.StateHome(m_axisXZ.p_axisY);
+            if (p_sInfo != "OK") return p_sInfo;
+            p_sInfo = base.StateHome(m_axisXZ.p_axisX);
+            p_eState = (p_sInfo == "OK") ? eState.Ready : eState.Error;
+            return p_sInfo;
+        }
+
         public override string StateReady()
         {
             if (EQ.p_eState != EQ.eState.Run) return "OK";
@@ -235,6 +249,21 @@ namespace Root_Pine2.Module
             return "OK";
         }
 
+        public override void Reset()
+        {
+            base.Reset();
+            m_picker.p_infoStrip = null;
+        }
+
+        public override void RunTree(Tree tree)
+        {
+            base.RunTree(tree);
+            m_picker.RunTreeVacuum(tree.GetTree("Vacuum"));
+            RunTreePickerSet(tree.GetTree("PickerSet"));
+        }
+        #endregion
+
+        #region Start Run
         string StartUnloadBoat()
         {
             Boats boats = m_handler.m_aBoats[Vision2D.eVision.Top2D];
@@ -253,7 +282,7 @@ namespace Root_Pine2.Module
         string StartUnloadTurnover()
         {
             if (m_handler.m_loader2.p_eState != eState.Ready) return "OK";
-            return StartRun(m_runUnloadTurnover); 
+            return StartRun(m_runUnloadTurnover);
         }
 
         string StartLoad(Vision2D.eVision eVision, Vision2D.eWorks eWorks)
@@ -261,21 +290,9 @@ namespace Root_Pine2.Module
             Run_Load run = (Run_Load)m_runLoad.Clone();
             run.m_eLoad = (eVision == Vision2D.eVision.Top3D) ? eLoad.Top3D : eLoad.Top2D;
             run.m_eWorks = eWorks;
-            return StartRun(run); 
+            return StartRun(run);
         }
 
-        public override void Reset()
-        {
-            base.Reset();
-            m_picker.p_infoStrip = null;
-        }
-
-        public override void RunTree(Tree tree)
-        {
-            base.RunTree(tree);
-            m_picker.RunTreeVacuum(tree.GetTree("Vacuum"));
-            RunTreePickerSet(tree.GetTree("PickerSet"));
-        }
         #endregion
 
         public InfoStrip p_infoStrip { get { return m_picker.p_infoStrip; } }

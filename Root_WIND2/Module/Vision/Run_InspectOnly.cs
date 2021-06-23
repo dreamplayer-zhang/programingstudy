@@ -105,6 +105,7 @@ namespace Root_WIND2.Module
 
         public override string Run()
         {
+
             Settings settings = new Settings();
             SettingItem_SetupFrontside settings_frontside = settings.GetItem<SettingItem_SetupFrontside>();
 

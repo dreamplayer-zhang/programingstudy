@@ -16,12 +16,14 @@ namespace Root_Pine2_Vision.Module
 {
     public class Vision2D : ModuleBase
     {
+        #region Property
         public enum eVision
         {
             Top3D,
             Top2D,
             Bottom
         }
+        #endregion
 
         #region ToolBox
         Camera_Dalsa m_camera;
@@ -41,6 +43,7 @@ namespace Root_Pine2_Vision.Module
                 {
                     m_tcpRequest.EventReceiveData += M_tcpRequest_EventReceiveData;
                     m_rs232RGBW.p_bConnect = true;
+                    m_camera.Connect();
                 }
             }
             m_remote.GetTools(bInit);
@@ -81,16 +84,11 @@ namespace Root_Pine2_Vision.Module
         int _lLight = 6;
         public int p_lLight
         {
-            get
-            {
-                return _lLight;
-                //if (p_eRemote == eRemote.Client) return _lLight;
-                //return m_lightSet.m_aLight.Count;
-            }
+            get { return _lLight; }
             set
             {
                 _lLight = value;
-                //if (p_eRemote == eRemote.Client) _lLight = value;
+                OnPropertyChanged(); 
             }
         }
 
@@ -161,7 +159,7 @@ namespace Root_Pine2_Vision.Module
         #endregion
 
         #region GrabData
-        public int m_nLine = 30000;
+        public int m_nLine = 78800;
         public class Grab
         {
             public int m_nFovStart = 0;
@@ -252,10 +250,10 @@ namespace Root_Pine2_Vision.Module
                 public GrabData GetGrabData(eWorks eWorks)
                 {
                     GrabData data = new GrabData();
-                    data.bInvY = (m_eDirection == eDirection.Backward);
+                    data.bInvY = (m_eDirection == eDirection.Forward);
                     data.m_nOverlap = m_nOverlap;
                     data.nScanOffsetY = m_cpMemory.Y;
-                    data.ReverseOffsetY = m_cpMemory.Y + m_vision.m_nLine;
+                    data.ReverseOffsetY = m_cpMemory.Y; /* + m_vision.m_nLine */
                     m_vision.m_aGrabData[eWorks].SetData(data); 
                     return data;
                 }
@@ -428,17 +426,19 @@ namespace Root_Pine2_Vision.Module
             {
 
                 m_camera.GrabLineScan(memory, cpOffset, m_nLine, grabData);
-                Thread.Sleep(200);
                 while (m_camera.p_CamInfo.p_eState != eCamState.Ready)
                 {
                     Thread.Sleep(10);
                     if (EQ.IsStop()) return "EQ Stop";
                 }
-                //m_aWorks[eWorks].SendSnapDone(iSnap); 
+
+                // Root Vision -> VisionWorks2
+                if (m_aWorks[eWorks].IsProcessRun())
+                    m_aWorks[eWorks].SendSnapDone(iSnap);
             }
-            finally 
+            catch
             {
-                m_camera.StopGrab(); 
+                m_camera.StopGrab();
                 //RunLightOff(); 
             }
             return "OK";
@@ -471,7 +471,6 @@ namespace Root_Pine2_Vision.Module
         #region override
         public override void Reset()
         {
-            if (p_eRemote == eRemote.Client) RemoteRun(eRemoteRun.Reset, eRemote.Client, null);
             m_aWorks[eWorks.A].Reset();
             m_aWorks[eWorks.B].Reset();
             base.Reset();
@@ -481,8 +480,7 @@ namespace Root_Pine2_Vision.Module
         #region State Home
         public override string StateHome()
         {
-            if (p_eRemote == eRemote.Client) return RemoteRun(eRemoteRun.StateHome, eRemote.Client, null);
-            else p_eState = eState.Ready;
+            p_eState = eState.Ready;
             return "OK";
         }
         #endregion
@@ -545,7 +543,6 @@ namespace Root_Pine2_Vision.Module
         public enum eRemoteRun
         {
             StateHome,
-            Reset,
             RunLight,
             Recipe
         }
@@ -558,7 +555,6 @@ namespace Root_Pine2_Vision.Module
             switch (eRemoteRun)
             {
                 case eRemoteRun.StateHome: break;
-                case eRemoteRun.Reset: break;
                 case eRemoteRun.RunLight: run.m_lightPower = value; break;
                 case eRemoteRun.Recipe: run.m_sRecipe = value; break; 
             }
@@ -567,6 +563,7 @@ namespace Root_Pine2_Vision.Module
 
         string RemoteRun(eRemoteRun eRemoteRun, eRemote eRemote, dynamic value)
         {
+            if (m_remote.p_bEnable == false) return "OK";
             Run_Remote run = GetRemoteRun(eRemoteRun, eRemote, value);
             StartRun(run);
             while (run.p_eRunState != ModuleRunBase.eRunState.Done)
@@ -617,7 +614,6 @@ namespace Root_Pine2_Vision.Module
                 switch (m_eRemoteRun)
                 {
                     case eRemoteRun.StateHome: return m_module.StateHome();
-                    case eRemoteRun.Reset: m_module.Reset(); break;
                     case eRemoteRun.RunLight: m_module.RunLight(m_lightPower); break;
                     case eRemoteRun.Recipe: m_module.SetRecipe(m_sRecipe); break; 
                 }
@@ -727,6 +723,11 @@ namespace Root_Pine2_Vision.Module
 
             public override string Run()
             {
+                // Root Vision -> VisionWorks2
+                if (m_module.m_aWorks[m_eWorks].IsProcessRun())
+                {
+                    m_module.m_aWorks[m_eWorks].SendSnapInfo(m_sRecipe, 0, 1);
+                }
                 return m_module.ReqSnap(m_sRecipe, m_eWorks);
             }
         }

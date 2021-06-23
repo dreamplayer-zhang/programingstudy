@@ -21,7 +21,7 @@ namespace Root_WIND2
 
         public Dialog_MapCreator_ViewModel()
         {
-            if (GlobalObjects.Instance.GetNamed<ImageData>("FrontImage").GetPtr() == IntPtr.Zero && GlobalObjects.Instance.GetNamed<ImageData>("FrontImage").m_eMode !=  ImageData.eMode.OtherPCMem)
+            if (GlobalObjects.Instance.GetNamed<ImageData>("FrontImage").GetPtr() == IntPtr.Zero && GlobalObjects.Instance.GetNamed<ImageData>("FrontImage").m_eMode != ImageData.eMode.OtherPCMem)
                 return;
 
             this.imageViewerVM = new Dialog_MapCreator_ImageViewer_ViewModel();
@@ -37,14 +37,14 @@ namespace Root_WIND2
 
         public void SelectChipPointDone_Callback()
         {
-            this.ChipX = this.imageViewerVM.selectChipBox.Left;
-            this.ChipY = this.imageViewerVM.selectChipBox.Bottom;
+            this.ChipX = this.imageViewerVM.selectChipLeftTop.X;
+            this.ChipY = this.imageViewerVM.selectChipLeftTop.Y;
         }
 
         public void SelectRoiPointDone_Callback()
         {
-            this.RoiX = this.imageViewerVM.selectRoiBox.Left;
-            this.RoiY = this.imageViewerVM.selectRoiBox.Bottom;
+            this.RoiX = this.imageViewerVM.selectRoiLeftTop.X;
+            this.RoiY = this.imageViewerVM.selectRoiLeftTop.Y;
         }
 
         public void SelectChipBoxDone_Callback()

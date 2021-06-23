@@ -32,6 +32,7 @@ namespace Root_Pine2.Engineer
 
             textBlockMode.DataContext = m_pine2;
             textBoxWidth.DataContext = m_pine2;
+            textBoxThickness.DataContext = m_pine2; 
             textBlock3D.DataContext = m_pine2; 
 
             InitMagazineEV_UI();
@@ -112,7 +113,8 @@ namespace Root_Pine2.Engineer
             foreach (Loader_UI ui in m_aLoaderUI) ui.OnTimer();
             foreach (Boats_UI ui in m_aBoatsUI) ui.OnTimer();
             m_transferUI.OnTimer();
-            m_loadEVUI.OnTimer(); 
+            m_loadEVUI.OnTimer();
+            OnTimerRun(); 
         }
 
         private void textBlockMode_PreviewMouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
@@ -124,5 +126,48 @@ namespace Root_Pine2.Engineer
         {
             m_pine2.p_b3D = !m_pine2.p_b3D; 
         }
+
+        #region Run Button
+        void OnTimerRun()
+        {
+            buttonStart.IsEnabled = (EQ.p_eState == EQ.eState.Ready);
+            buttonStop.IsEnabled = (EQ.p_eState == EQ.eState.Run); 
+            buttonReset.IsEnabled = (EQ.p_eState == EQ.eState.Ready) || (EQ.p_eState == EQ.eState.Error);
+            buttonHome.IsEnabled = (EQ.p_eState == EQ.eState.Ready) || (EQ.p_eState == EQ.eState.Init) || (EQ.p_eState == EQ.eState.Error);
+        }
+
+        private void buttonHome_Click(object sender, System.Windows.RoutedEventArgs e)
+        {
+            switch (EQ.p_eState)
+            {
+                case EQ.eState.Init:
+                case EQ.eState.Error:
+                case EQ.eState.Ready:
+                    EQ.p_eState = EQ.eState.Home;
+                    break; 
+            }
+        }
+
+        private void buttonStart_Click(object sender, System.Windows.RoutedEventArgs e)
+        {
+            if (EQ.p_eState == EQ.eState.Ready) EQ.p_eState = EQ.eState.Run;
+        }
+
+        private void buttonStop_Click(object sender, System.Windows.RoutedEventArgs e)
+        {
+            if (EQ.p_eState == EQ.eState.Run) EQ.p_eState = EQ.eState.Ready; 
+        }
+
+        private void buttonReset_Click(object sender, System.Windows.RoutedEventArgs e)
+        {
+            switch (EQ.p_eState)
+            {
+                case EQ.eState.Ready:
+                case EQ.eState.Error:
+                    m_handler.Reset();
+                    break; 
+            }
+        }
+        #endregion
     }
 }

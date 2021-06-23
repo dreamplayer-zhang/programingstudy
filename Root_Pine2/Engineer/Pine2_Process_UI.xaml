@@ -40,6 +40,17 @@
             </GroupBox>
             <GroupBox Grid.Column="1" BorderBrush="Black" BorderThickness="1" Margin="3">
                 <GroupBox.Header>
+                    <TextBlock Text="Run" Foreground="Black" FontWeight="Bold" />
+                </GroupBox.Header>
+                <StackPanel Orientation="Vertical">
+                    <Button x:Name="buttonStart" Content="Start" Margin="3" Click="buttonStart_Click"/>
+                    <Button x:Name="buttonStop" Content="Stop" Margin="3" Click="buttonStop_Click"/>
+                    <Button x:Name="buttonReset" Content="Reset" Margin="3" Click="buttonReset_Click"/>
+                    <Button x:Name="buttonHome" Content="Home" Margin="3" Click="buttonHome_Click"/>
+                </StackPanel>
+            </GroupBox>
+            <GroupBox Grid.Column="2" BorderBrush="Black" BorderThickness="1" Margin="3">
+                <GroupBox.Header>
                     <TextBlock Text="Pine2" Foreground="Black" FontWeight="Bold" />
                 </GroupBox.Header>
                 <StackPanel Orientation="Vertical">
@@ -50,6 +61,10 @@
                     <StackPanel Orientation="Horizontal">
                         <Label Content="Width :" Margin="3" VerticalAlignment="Center"/>
                         <TextBox x:Name="textBoxWidth" Text="{Binding p_widthStrip}" Margin="3" MinWidth="40" VerticalAlignment="Center" TextAlignment="Center"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <Label Content="Thickness :" Margin="3" VerticalAlignment="Center"/>
+                        <TextBox x:Name="textBoxThickness" Text="{Binding p_thickness}" Margin="3" MinWidth="40" VerticalAlignment="Center" TextAlignment="Center"/>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal">
                         <Label Content=" 3D  :" Margin="3" VerticalAlignment="Center"/>

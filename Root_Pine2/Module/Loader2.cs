@@ -75,7 +75,7 @@ namespace Root_Pine2.Module
 
         public string RunTurnUp(bool bUp)
         {
-            if (m_axisXZ.p_axisX.p_posCommand == m_axisXZ.p_axisY.GetPosValue(c_sReady))
+            if (m_axisXZ.p_axisX.p_posCommand == m_axisXZ.p_axisX.GetPosValue(c_sReady))
             {
                 m_dioTurnUp.Write(bUp);
                 return m_dioTurnUp.WaitDone();
@@ -127,7 +127,7 @@ namespace Root_Pine2.Module
         }
         #endregion
 
-        #region RunUnload
+        #region Run
         public string RunUnload(Vision2D.eWorks eVisionWorks)
         {
             Boat boat = m_boats.m_aBoat[eVisionWorks];
@@ -154,6 +154,13 @@ namespace Root_Pine2.Module
             }
             return "OK";
         }
+
+        public string RunMoveReady()
+        {
+            RunTurnUp(true);
+            RunMove(c_sReady);
+            return "OK";
+        }
         #endregion
 
         #region override
@@ -173,12 +180,11 @@ namespace Root_Pine2.Module
                 p_eState = eState.Ready;
                 return "OK";
             }
-            p_sInfo = base.StateHome();
-            if (p_sInfo == "OK")
-            {
-                RunTurnUp(true);
-                RunMove(c_sReady); 
-            }
+            p_sInfo = base.StateHome(m_axisXZ.p_axisY);
+            if (p_sInfo != "OK") return p_sInfo;
+            p_sInfo = base.StateHome(m_axisXZ.p_axisX);
+            p_eState = (p_sInfo == "OK") ? eState.Ready : eState.Error;
+            if (p_sInfo == "OK") RunMoveReady();
             return p_sInfo;
         }
 
@@ -225,6 +231,7 @@ namespace Root_Pine2.Module
         protected override void InitModuleRuns()
         {
             m_runUnload = AddModuleRunList(new Run_Unload(this), true, "Unload Strip to Boat");
+            AddModuleRunList(new Run_MoveReady(this), true, "Loader2 Move to Ready Position");
         }
 
         public class Run_Unload : ModuleRunBase
@@ -252,6 +259,31 @@ namespace Root_Pine2.Module
             public override string Run()
             {
                 return m_module.RunUnload(m_eWorks);
+            }
+        }
+
+        public class Run_MoveReady : ModuleRunBase
+        {
+            Loader2 m_module;
+            public Run_MoveReady(Loader2 module)
+            {
+                m_module = module;
+                InitModuleRun(module);
+            }
+
+            public override ModuleRunBase Clone()
+            {
+                Run_MoveReady run = new Run_MoveReady(m_module);
+                return run;
+            }
+
+            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
+            {
+            }
+
+            public override string Run()
+            {
+                return m_module.RunMoveReady();
             }
         }
         #endregion

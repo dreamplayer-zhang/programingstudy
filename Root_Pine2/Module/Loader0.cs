@@ -48,6 +48,7 @@ namespace Root_Pine2.Module
             Top2D,
         }
         const string c_sPosLoadEV = "LoadEV";
+        const string c_sPosUp = "Up";
         void InitPosition()
         {
             m_axis.AddPos(c_sPosLoadEV);
@@ -57,6 +58,7 @@ namespace Root_Pine2.Module
             m_axis.AddPos(GetPosString(eUnloadVision.Top2D, Vision2D.eWorks.A));
             m_axis.AddPos(GetPosString(eUnloadVision.Top2D, Vision2D.eWorks.B));
             m_axis.AddPos(Enum.GetNames(typeof(ePosTray)));
+            m_axis.p_axisZ.AddPos(c_sPosUp);
         }
         string GetPosString(eUnloadVision eVision, Vision2D.eWorks eWorks)
         {
@@ -163,7 +165,7 @@ namespace Root_Pine2.Module
 
         public string RunMoveUp(bool bWait = true)
         {
-            m_axis.p_axisZ.StartMove(0);
+            m_axis.p_axisZ.StartMove(c_sPosUp);
             return bWait ? m_axis.WaitReady() : "OK";
         }
 
@@ -377,6 +379,20 @@ namespace Root_Pine2.Module
         #endregion
 
         #region override
+        public override string StateHome()
+        {
+            if (EQ.p_bSimulate)
+            {
+                p_eState = eState.Ready;
+                return "OK";
+            }
+            p_sInfo = base.StateHome(m_axis.p_axisZ);
+            if (p_sInfo != "OK") return p_sInfo;
+            p_sInfo = base.StateHome(m_axis.p_axisX, m_axis.p_axisY);
+            p_eState = (p_sInfo == "OK") ? eState.Ready : eState.Error;
+            return p_sInfo;
+        }
+
         public override string StateReady()
         {
             if (EQ.p_eState != EQ.eState.Run) return "OK";
@@ -396,30 +412,6 @@ namespace Root_Pine2.Module
             return "OK";
         }
 
-        string StartUnloadBoat()
-        {
-            Vision2D.eVision eVision = m_pine2.p_b3D ? Vision2D.eVision.Top3D : Vision2D.eVision.Top2D;
-            Boats boats = m_handler.m_aBoats[eVision];
-            if (boats.m_aBoat[Vision2D.eWorks.A].p_eStep == Boat.eStep.Ready) return StartUnloadBoat(eVision, Vision2D.eWorks.A);
-            if (boats.m_aBoat[Vision2D.eWorks.B].p_eStep == Boat.eStep.Ready) return StartUnloadBoat(eVision, Vision2D.eWorks.B);
-            return "OK"; 
-        }
-
-        string StartUnloadBoat(Vision2D.eVision eVision, Vision2D.eWorks eWorks)
-        {
-            Run_UnloadBoat run = (Run_UnloadBoat)m_runUnloadBoat.Clone();
-            run.m_eVision = (eVision == Vision2D.eVision.Top3D) ? eUnloadVision.Top3D : eUnloadVision.Top2D;
-            run.m_eWorks = eWorks;
-            return StartRun(run); 
-        }
-
-        string StartLoadTransfer()
-        {
-            Run_LoadTransfer run = (Run_LoadTransfer)m_runLoadTransfer.Clone();
-            run.m_ePos = (ePosTransfer)m_transfer.m_buffer.m_ePosDst;
-            return StartRun(run); 
-        }
-
         public override void Reset()
         {
             m_picker.m_dioVacuum.Write(false);
@@ -433,6 +425,32 @@ namespace Root_Pine2.Module
             m_picker.RunTreeVacuum(tree.GetTree("Vacuum"));
             RunTreeAxis(tree.GetTree("Axis"));
             RunTreePickerSet(tree.GetTree("PickerSet")); 
+        }
+        #endregion
+
+        #region Start Run
+        string StartUnloadBoat()
+        {
+            Vision2D.eVision eVision = m_pine2.p_b3D ? Vision2D.eVision.Top3D : Vision2D.eVision.Top2D;
+            Boats boats = m_handler.m_aBoats[eVision];
+            if (boats.m_aBoat[Vision2D.eWorks.A].p_eStep == Boat.eStep.Ready) return StartUnloadBoat(eVision, Vision2D.eWorks.A);
+            if (boats.m_aBoat[Vision2D.eWorks.B].p_eStep == Boat.eStep.Ready) return StartUnloadBoat(eVision, Vision2D.eWorks.B);
+            return "OK";
+        }
+
+        string StartUnloadBoat(Vision2D.eVision eVision, Vision2D.eWorks eWorks)
+        {
+            Run_UnloadBoat run = (Run_UnloadBoat)m_runUnloadBoat.Clone();
+            run.m_eVision = (eVision == Vision2D.eVision.Top3D) ? eUnloadVision.Top3D : eUnloadVision.Top2D;
+            run.m_eWorks = eWorks;
+            return StartRun(run);
+        }
+
+        string StartLoadTransfer()
+        {
+            Run_LoadTransfer run = (Run_LoadTransfer)m_runLoadTransfer.Clone();
+            run.m_ePos = (ePosTransfer)m_transfer.m_buffer.m_ePosDst;
+            return StartRun(run);
         }
         #endregion
 
