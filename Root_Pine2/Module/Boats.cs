@@ -99,6 +99,7 @@ namespace Root_Pine2.Module
         {
             if (Run(m_aBoat[eWorks].RunMove(p_ePosUnload))) return p_sInfo;
             m_aBoat[eWorks].p_eStep = Boat.eStep.Done;
+            if (m_aBoat[eWorks].p_infoStrip != null) m_aBoat[eWorks].p_infoStrip.p_eResult = InfoStrip.eResult.Rework; 
             return "OK";
         }
         #endregion
