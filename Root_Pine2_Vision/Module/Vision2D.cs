@@ -163,7 +163,7 @@ namespace Root_Pine2_Vision.Module
         public class Grab
         {
             public int m_nFovStart = 0;
-            public int m_nFovSize = 8000;
+            public int m_nFovSize = 12000;
             public double[] m_dScale = new double[3] { 1, 1, 1 };
             public double[] m_dShift = new double[3] { 0, 0, 0 };
             public int[] m_yShift = new int[3] { 0, 0, 0 };
@@ -425,18 +425,20 @@ namespace Root_Pine2_Vision.Module
             try
             {
 
-                //m_camera.GrabLineScan(memory, cpOffset, m_nLine, grabData);
-                Thread.Sleep(200);
-                //while (m_camera.p_CamInfo.p_eState != eCamState.Ready)
-                //{
-                    //Thread.Sleep(10);
-                    //if (EQ.IsStop()) return "EQ Stop";
-                //}
-                //m_aWorks[eWorks].SendSnapDone(iSnap); 
+                m_camera.GrabLineScan(memory, cpOffset, m_nLine, grabData);
+                while (m_camera.p_CamInfo.p_eState != eCamState.Ready)
+                {
+                    Thread.Sleep(10);
+                    if (EQ.IsStop()) return "EQ Stop";
+                }
+
+                // Root Vision -> VisionWorks2
+                if (m_aWorks[eWorks].IsProcessRun())
+                    m_aWorks[eWorks].SendSnapDone(iSnap);
             }
             catch
             {
-                //m_camera.StopGrab(); 
+                m_camera.StopGrab();
                 //RunLightOff(); 
             }
             return "OK";
@@ -721,6 +723,11 @@ namespace Root_Pine2_Vision.Module
 
             public override string Run()
             {
+                // Root Vision -> VisionWorks2
+                if (m_module.m_aWorks[m_eWorks].IsProcessRun())
+                {
+                    m_module.m_aWorks[m_eWorks].SendSnapInfo(m_sRecipe, 0, 1);
+                }
                 return m_module.ReqSnap(m_sRecipe, m_eWorks);
             }
         }
