@@ -250,7 +250,8 @@ namespace Root_Pine2.Module
                 string sRecipe = asRead[2];
                 Vision2D.eWorks eWorks = (asRead[3] == "A") ? Vision2D.eWorks.A : Vision2D.eWorks.B;
                 //m_vision.m_recipe[eWorks].RecipeOpen(sRecipe);
-                m_aBoat[eWorks].m_recipe.RecipeOpen(sRecipe); 
+                //m_aBoat[eWorks].m_recipe.RecipeOpen(sRecipe);
+                RecipeOpen(sRecipe);
                 StartSnap(eWorks); 
             }
         }
