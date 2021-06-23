@@ -34,6 +34,7 @@ namespace RootTools.Module
         {
             ModuleListRun();
         }
+
         public void ModuleListRun()
         {
             foreach (ModuleRunBase moduleRun in m_moduleList.p_moduleList)
@@ -138,6 +139,13 @@ namespace RootTools.Module
         {
             m_moduleList.p_visibleRnR = Visibility.Hidden;
             m_moduleRunList.Clear();
+            InitModuleRunNames();
+        }
+
+        private void buttonUndo_Click(object sender, RoutedEventArgs e)
+        {
+            m_moduleList.p_visibleRnR = Visibility.Hidden;
+            m_moduleRunList.Undo();
             InitModuleRunNames();
         }
 
