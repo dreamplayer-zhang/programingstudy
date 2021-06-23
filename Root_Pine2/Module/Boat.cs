@@ -153,6 +153,7 @@ namespace Root_Pine2.Module
         public void RunVacuum(bool bOn)
         {
             m_doVacuumPump.Write(bOn);
+            for (int n = 0; n < 4; n++) m_doVacuum.Write(n, bOn); 
         }
 
         public void RunBlow(bool bBlow)

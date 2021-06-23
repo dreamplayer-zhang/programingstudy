@@ -67,12 +67,12 @@ namespace Root_Pine2.Engineer
             InitModule(m_pine2 = new Pine2("Pine2", m_engineer));
             InitModule(m_loadEV = new LoadEV("LoadEV", m_engineer));
             InitMagazineEV();
-            InitVision(Vision2D.eVision.Top3D);
-            InitVision(Vision2D.eVision.Top2D);
             InitVision(Vision2D.eVision.Bottom);
-            InitBoats(Vision2D.eVision.Top3D);
-            InitBoats(Vision2D.eVision.Top2D);
+            InitVision(Vision2D.eVision.Top2D);
+            InitVision(Vision2D.eVision.Top3D);
             InitBoats(Vision2D.eVision.Bottom);
+            InitBoats(Vision2D.eVision.Top2D);
+            InitBoats(Vision2D.eVision.Top3D);
             InitModule(m_transfer = new Transfer("Transter", m_engineer, m_pine2, m_magazineEV));
             InitModule(m_loader0 = new Loader0("Loader0", m_engineer, this));
             InitModule(m_loader1 = new Loader1("Loader1", m_engineer, this));

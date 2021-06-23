@@ -181,6 +181,7 @@ namespace Root_Pine2.Module
                 boat.RunVacuum(false);
                 boat.RunBlow(true);
                 if (Run(m_picker.RunVacuum(true))) return p_sInfo;
+                Thread.Sleep(500);
                 boat.RunBlow(false);
                 if (Run(RunMoveUp())) return p_sInfo;
                 if (m_picker.IsVacuum() == false) return p_sInfo;

@@ -487,6 +487,8 @@ namespace Root_Pine2.Module
             }
             p_sInfo = base.StateHome();
             p_eState = (p_sInfo == "OK") ? eState.Ready : eState.Error;
+            m_loaderPusher.Reset();
+            m_buffer.Reset(m_pine2);
             return p_sInfo;
         }
 
