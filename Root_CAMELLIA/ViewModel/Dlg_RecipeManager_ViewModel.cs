@@ -4066,6 +4066,26 @@ namespace Root_CAMELLIA
             }
         }
 
+        public void DeleteCandidatePointCumstomize(int nIndex, int nRange)
+        {
+            for (int i = nIndex; i < nIndex + nRange; i++)
+            {
+                double dPointX = m_customizeRD.DataCandidatePoint[nIndex].x;
+                double dPointY = m_customizeRD.DataCandidatePoint[nIndex].y;
+
+                m_customizeRD.DataCandidatePoint.RemoveAt(nIndex);
+                //int nDeleteIndex = dataManager.recipeDM.TeachingRD.DataMeasurementRoute.FindIndex(s => s.Equals(nIndex));
+                //dataManager.recipeDM.TeachingRD.DataMeasurementRoute.RemoveAt(nDeleteIndex);
+                //for (int j = 0; j < dataManager.recipeDM.TeachingRD.DataMeasurementRoute.Count; j++)
+                //{
+                //    if (dataManager.recipeDM.TeachingRD.DataMeasurementRoute[j] > nIndex)
+                //    {
+                //        dataManager.recipeDM.TeachingRD.DataMeasurementRoute[j] = dataManager.recipeDM.TeachingRD.DataMeasurementRoute[j] - 1;
+                //    }
+                //}
+            }
+        }
+
         public void DeletePoint(int nIndex, int nRange)
         {
             for (int i = nIndex; i < nIndex + nRange; i++)
@@ -4203,13 +4223,19 @@ namespace Root_CAMELLIA
                 PointAddMode = "Normal";
             }
 
-            p_isCustomize = false;
-            CheckSelectPoint();
-            m_customizeRD.Clone(dataManager.recipeDM.TeachingRD);
-            //dataManager.recipeDM.TeachingRD.test(
-            p_TabIndex = 0;
-            InitCandidatePoint(dataManager.recipeDM.TeachingRD);
-            UpdateView();
+
+            if (p_isCustomize)
+            {
+                m_customizeRD.Clone(dataManager.recipeDM.TeachingRD);
+                //dataManager.recipeDM.TeachingRD.test(
+                p_TabIndex = 0;
+                InitCandidatePoint(dataManager.recipeDM.TeachingRD);
+                UpdateView();
+                CheckSelectPoint();
+                p_isCustomize = false;
+            }
+          
+
         }
 
         public void UpdateGridCombo(bool isSave = true)
@@ -4547,8 +4573,8 @@ namespace Root_CAMELLIA
             }
         }
 
-        double m_SettingRRangeMin = 150;
-        public double p_SettingRRangeMin
+        string m_SettingRRangeMin = "150";
+        public string p_SettingRRangeMin
         {
             get
             {
@@ -4560,8 +4586,8 @@ namespace Root_CAMELLIA
             }
         }
 
-        double m_SettingRRangeMax = 200;
-        public double p_SettingRRangeMax
+        string m_SettingRRangeMax = "200";
+        public string p_SettingRRangeMax
         {
             get
             {
@@ -4573,8 +4599,8 @@ namespace Root_CAMELLIA
             }
         }
 
-        double m_SettingRStep = 5;
-        public double p_SettingRStep
+        string m_SettingRStep = "5";
+        public string p_SettingRStep
         {
             get
             {
@@ -4585,8 +4611,8 @@ namespace Root_CAMELLIA
                 SetProperty(ref m_SettingRStep, value);
             }
         }
-        double m_SettingAngle = 5;
-        public double p_SettingAngle
+        string m_SettingAngle = "5";
+        public string p_SettingAngle
         {
             get
             {
@@ -4599,12 +4625,10 @@ namespace Root_CAMELLIA
         }
         void SetCandidateCircle()
         {
-            double dStartR = p_SettingRRangeMin;
-            double dEndR = p_SettingRRangeMax;
-            double dStepR = p_SettingRStep;
-            double dStepAngle = p_SettingAngle;
-            double dSize;
-            if(!double.TryParse(p_circleSize, out dSize))
+            double dStartR, dEndR, dStepR, dStepAngle, dSize;
+
+            if(!double.TryParse(p_circleSize, out dSize) || !double.TryParse(p_SettingRRangeMin, out dStartR) || !double.TryParse(p_SettingRRangeMax, out dEndR) || !double.TryParse(p_SettingRStep, out dStepR)
+                || !double.TryParse(p_SettingAngle, out dStepAngle))
             {
                 return;
             }
@@ -4614,13 +4638,10 @@ namespace Root_CAMELLIA
                 temp.Add(item);
             }
             m_customizeRD.DataCandidatePoint.Clear();
-            //foreach (var item in temp)
-            //{
-            //    if (item.type != CamelliaState.CamelliaCenterEdge.Edge)
-            //    {
-            //        m_DM.m_RDM.TeachingRD.DataCandidatePoint.Add(item);
-            //    }
-            //}
+            foreach (var item in temp)
+            {
+                m_customizeRD.DataCandidatePoint.Add(item);
+            }
 
             double dDeg = 0;
             double dR = 0;
@@ -4629,14 +4650,14 @@ namespace Root_CAMELLIA
 
             //dRatioX = (double)pictureBoxMain.Width / General.ViewSize;
             //dRatioY = (double)pictureBoxMain.Height / General.ViewSize;
-            m_customizeRD.DataCandidateSelectedPoint.Clear();
+            //m_customizeRD.DataCandidateSelectedPoint.Clear();
 
             for (dDeg = -180; dDeg < 180; dDeg += dStepAngle)
             {
                 for (dR = dStartR; dR <= dEndR; dR += dStepR)
                 {
-                    dX = Math.Round((dR * Math.Cos(dDeg / 180 * Math.PI)), 2);
-                    dY = Math.Round((dR * Math.Sin(dDeg / 180 * Math.PI)), 2);
+                    dX = Math.Round(dR * Math.Cos(dDeg / 180 * Math.PI), 2);
+                    dY = Math.Round(dR * Math.Sin(dDeg / 180 * Math.PI), 2);
 
 
                     CCircle circle = new CCircle(dX, dY, dSize, dSize, 0, 0);
@@ -4651,12 +4672,12 @@ namespace Root_CAMELLIA
                         int nIndex = -1;
                         if (ContainsData(m_customizeRD.DataCandidatePoint, circle, out nIndex))
                         {
-                            DeletePoint(nIndex, 1);
+                            DeleteCandidatePointCumstomize(nIndex, 1);
                         }
 
                         m_customizeRD.DataCandidatePoint.Add(circle);
                       
-                        m_customizeRD.DataCandidateSelectedPoint.Add(circle);
+                        //m_customizeRD.DataCandidateSelectedPoint.Add(circle);
                     }
                 }
             }

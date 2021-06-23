@@ -136,11 +136,33 @@ namespace Root_CAMELLIA.Module
         {
             DataManager.Instance.m_calibration.CalDoneEvent += CalDoneEvent;
             string deviceID = BaseDefine.LOG_DEVICE_ID;
+            MarsLogManager logManager = MarsLogManager.Instance;
 
             StopWatch test = new StopWatch();
             test.Start();
             m_log.Warn("Calibration Start");
-         
+
+            m_module.SetLight(true);
+
+            Camera_Basler VRS = m_module.p_CamVRS;
+            ImageData img = VRS.p_ImageViewer.p_ImageData;
+
+            StopWatch sw = new StopWatch();
+
+            logManager.WriteFNC(EQ.p_nRunLP, deviceID, "VRS Connect", SSLNet.STATUS.START);
+            if (VRS.p_CamInfo._OpenStatus == false) VRS.Connect();
+            while (VRS.p_CamInfo._OpenStatus == false)
+            {
+                if (sw.ElapsedMilliseconds > 15000)
+                {
+                    sw.Stop();
+
+                    return "Navigation Camera Not Connected";
+                }
+            }
+            sw.Stop();
+            logManager.WriteFNC(EQ.p_nRunLP, deviceID, "VRS Connect", SSLNet.STATUS.END);
+
 
             AxisXY axisXY = m_module.p_axisXY;
             Axis axisZ = m_module.p_axisZ;
@@ -151,7 +173,7 @@ namespace Root_CAMELLIA.Module
             if (m_module.p_infoWafer == null)
                 materialID = "test";
 
-            MarsLogManager logManager = MarsLogManager.Instance;
+           
             logManager.WritePRC(EQ.p_nRunLP, deviceID, SSLNet.PRC_EVENTID.StepProcess, SSLNet.STATUS.START, "Calibration WaferCentering", (int)BaseDefine.Process.CalbrationWaferCentering);
 
             m_DataManager.m_waferCentering.FindEdgeInit();
@@ -232,29 +254,6 @@ namespace Root_CAMELLIA.Module
                 //logManager.WritePRC(EQ.p_nRunLP, deviceID, SSLNet.PRC_EVENTID.Process, SSLNet.STATUS.END, this.p_id, 0);
                 return "OK";
             }
-
-       
-
-            m_module.SetLight(true);
-
-            Camera_Basler VRS = m_module.p_CamVRS;
-            ImageData img = VRS.p_ImageViewer.p_ImageData;
-
-            StopWatch sw = new StopWatch();
-
-            logManager.WriteFNC(EQ.p_nRunLP, deviceID, "VRS Connect", SSLNet.STATUS.START);
-            if (VRS.p_CamInfo._OpenStatus == false) VRS.Connect();
-            while (VRS.p_CamInfo._OpenStatus == false)
-            {
-                if (sw.ElapsedMilliseconds > 15000)
-                {
-                    sw.Stop();
-
-                    return "Navigation Camera Not Connected";
-                }
-            }   
-            sw.Stop();
-            logManager.WriteFNC(EQ.p_nRunLP, deviceID, "VRS Connect", SSLNet.STATUS.END);
 
             dataformatter.AddData(nameof(m_bUseCustomSpeed), m_bUseCustomSpeed.ToString());
 
