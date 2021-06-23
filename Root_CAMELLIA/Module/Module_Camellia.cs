@@ -255,14 +255,17 @@ namespace Root_CAMELLIA.Module
             m_axisLifter.AddPos(Enum.GetNames(typeof(eAxisPos)));
             m_axisLifter.AddIO(m_axisXReady);
             m_axisLifter.AddIO(m_axisYReady);
+            m_stageAxisZ.AddPos(Enum.GetNames(typeof(eAxisPos)));
+            m_tiltAxisXY.p_axisX.AddPos(Enum.GetNames(typeof(eAxisPos)));
+            m_tiltAxisXY.p_axisY.AddPos(Enum.GetNames(typeof(eAxisPos)));
 
-            m_axisXY.p_axisX.AddIO(m_axisLifterHome1);
-            m_axisXY.p_axisX.AddIO(m_axisLifterHome2);
-            m_axisXY.p_axisX.AddIO(m_axisLifterHome3);
+            //m_axisXY.p_axisX.AddIO(m_axisLifterHome1);
+            //m_axisXY.p_axisX.AddIO(m_axisLifterHome2);
+            //m_axisXY.p_axisX.AddIO(m_axisLifterHome3);
 
-            m_axisXY.p_axisY.AddIO(m_axisLifterHome1);
-            m_axisXY.p_axisY.AddIO(m_axisLifterHome2);
-            m_axisXY.p_axisY.AddIO(m_axisLifterHome3);
+            //m_axisXY.p_axisY.AddIO(m_axisLifterHome1);
+            //m_axisXY.p_axisY.AddIO(m_axisLifterHome2);
+            //m_axisXY.p_axisY.AddIO(m_axisLifterHome3);
             //m_axisLifter.AddIO(m_vaccum);
             m_axisLifter.p_vaccumDIO_I = m_vacuum;
         }
@@ -423,6 +426,23 @@ namespace Root_CAMELLIA.Module
                 p_eState = eState.Error;
                 return "AxisZ Home Error";
             }
+
+            p_stageAxisZ.StartHome();
+
+            if(p_stageAxisZ.WaitReady() != "OK")
+            {
+                p_eState = eState.Error;
+                return "Axis StageZ Home Error";
+            }
+
+            p_stageAxisZ.StartMove(eAxisPos.Ready);
+
+            if(p_stageAxisZ.WaitReady() != "OK")
+            {
+                p_eState = eState.Error;
+                return "Axis StageZ Move Ready Error";
+            }
+
             p_eState = (p_sInfo == "OK") ? eState.Ready : eState.Error;
 
             return p_sInfo;
