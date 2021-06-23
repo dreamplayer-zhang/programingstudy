@@ -261,7 +261,7 @@ namespace Root_Pine2_Vision.Module
                 public CPoint GetMemoryOffset()
                 {
                     CPoint cp = new CPoint(m_cpMemory);
-                    if (m_eDirection == eDirection.Backward) cp.Y += m_vision.m_nLine;
+                    //if (m_eDirection == eDirection.Backward) cp.Y += m_vision.m_nLine;
                     return cp;
                 }
 
