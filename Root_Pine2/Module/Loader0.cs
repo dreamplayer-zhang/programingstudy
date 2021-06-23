@@ -48,10 +48,12 @@ namespace Root_Pine2.Module
             Top2D,
         }
         const string c_sPosLoadEV = "LoadEV";
+        const string c_sPosPaper = "Paper";
         const string c_sPosUp = "Up";
         void InitPosition()
         {
             m_axis.AddPos(c_sPosLoadEV);
+            m_axis.AddPos(c_sPosPaper);
             m_axis.AddPos(Enum.GetNames(typeof(ePosTransfer)));
             m_axis.AddPos(GetPosString(eUnloadVision.Top3D, Vision2D.eWorks.A));
             m_axis.AddPos(GetPosString(eUnloadVision.Top3D, Vision2D.eWorks.B));
@@ -132,6 +134,14 @@ namespace Root_Pine2.Module
             return bWait ? m_axis.WaitReady() : "OK"; 
         }
 
+        public string RunMovePaper()
+        {
+            double dPos = m_pulsemm * (m_pine2.m_widthDefaultStrip - m_pine2.p_widthStrip);
+            if (Run(StartMoveX(c_sPosPaper, dPos))) return p_sInfo;
+            m_axis.p_axisY.StartMove(c_sPosLoadEV);
+            return m_axis.WaitReady();
+        }
+
         void RunTreeAxis(Tree tree)
         {
             m_pulsemm = tree.Set(m_pulsemm, m_pulsemm, "Pulse / mm", "Axis X (Pulse / mm)");
@@ -204,6 +214,9 @@ namespace Root_Pine2.Module
                 if (Run(RunShakeUp(nShake, dzShakeUp))) return p_sInfo;
                 m_loadEV.p_eMove = LoadEV.eMove.Stop;
                 m_loadEV.p_bBlow = false;
+                if (Run(RunMoveZ(c_sPosPaper, 0))) return p_sInfo;
+                if (Run(RunMovePaper())) return p_sInfo;
+                m_loadEV.CheckPaper(); 
                 if (Run(RunMoveUp())) return p_sInfo;
                 if (m_picker.IsVacuum() == false) return p_sInfo;
                 m_picker.p_infoStrip = m_loadEV.GetNewInfoStrip();

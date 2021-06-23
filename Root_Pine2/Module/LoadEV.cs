@@ -135,6 +135,11 @@ namespace Root_Pine2.Module
         {
             p_iStrip = 0; 
         }
+
+        public void CheckPaper()
+        {
+            p_bPaper = m_diPaper.p_bIn && p_bUsePaper;
+        }
         #endregion
 
         #region MoveEV
@@ -213,7 +218,6 @@ namespace Root_Pine2.Module
                         if (sw.ElapsedMilliseconds > msTimeout) return "RunLoad Timeout : Top Sensor Up";
                     }
                     p_eMove = eMove.Stop;
-                    p_bPaper = m_diPaper.p_bIn && p_bUsePaper;
                     p_bDone = p_bCheck;
                     return "OK";
                 }
