@@ -39,6 +39,16 @@ namespace Root_Pine2.Module
             OnRunTree();
             textBlockUp.Text = (m_magazineEV.m_stack != null) ? "Stack" : ((m_magazineEV.m_aMagazine[InfoStrip.eMagazinePos.Up] != null) ? "Magazine" : "");
             textBlockDown.Text = (m_magazineEV.m_aMagazine[InfoStrip.eMagazinePos.Down] != null) ? "Magazine" : "";
+            if (m_magazineEV.m_elevator.m_bProtrude)
+            {
+                gridUp.Background = Brushes.Pink; 
+                gridDown.Background = Brushes.Pink;
+            }
+            else
+            {
+                gridUp.Background = m_magazineEV.m_elevator.m_bProduct[InfoStrip.eMagazinePos.Up] ? Brushes.AliceBlue : Brushes.Beige;
+                gridDown.Background = m_magazineEV.m_elevator.m_bProduct[InfoStrip.eMagazinePos.Down] ? Brushes.AliceBlue : Brushes.Beige;
+            }
         }
 
         int[] m_nQueue = new int[2] { 0, 0 };
@@ -53,15 +63,15 @@ namespace Root_Pine2.Module
         private void gridUp_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             if (EQ.p_eState == EQ.eState.Run) return;
-            if (m_magazineEV.m_aMagazine[InfoStrip.eMagazinePos.Down] != null) return;
-            if ((m_magazineEV.m_aMagazine[InfoStrip.eMagazinePos.Up] == null) && (m_magazineEV.m_stack == null)) return;
+            if (m_magazineEV.m_elevator.m_bProduct[InfoStrip.eMagazinePos.Down]) return;
+            if (m_magazineEV.m_elevator.m_bProduct[InfoStrip.eMagazinePos.Up] == false) return;
             m_magazineEV.StartUnload();
         }
 
         private void gridDown_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             if (EQ.p_eState == EQ.eState.Run) return;
-            if (m_magazineEV.m_aMagazine[InfoStrip.eMagazinePos.Down] == null) return;
+            if (m_magazineEV.m_elevator.m_bProduct[InfoStrip.eMagazinePos.Down] == false) return;
             m_magazineEV.StartUnload();
         }
     }

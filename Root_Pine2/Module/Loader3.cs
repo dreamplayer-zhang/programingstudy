@@ -335,25 +335,32 @@ namespace Root_Pine2.Module
         #endregion
 
         #region Start Run
-        string StartUnloadTray()
+        public string CalcTrayPos(ref ePosTray eTray)
         {
             MagazineEVSet magazine = m_handler.m_magazineEV;
             InfoStrip.eResult eResult = m_picker.p_infoStrip.p_eResult;
             foreach (ePosTray ePosTray in Enum.GetValues(typeof(ePosTray)))
             {
-                if (magazine.IsEnableStack((InfoStrip.eMagazine)ePosTray, eResult, true)) return StartUnloadTray(ePosTray);
+                if (magazine.IsEnableStack((InfoStrip.eMagazine)ePosTray, eResult, true))
+                {
+                    eTray = ePosTray; 
+                    return "OK";
+                }
             }
             foreach (ePosTray ePosTray in Enum.GetValues(typeof(ePosTray)))
             {
-                if (magazine.IsEnableStack((InfoStrip.eMagazine)ePosTray, eResult, false)) return StartUnloadTray(ePosTray);
+                if (magazine.IsEnableStack((InfoStrip.eMagazine)ePosTray, eResult, false))
+                {
+                    eTray = ePosTray;
+                    return "OK";
+                }
             }
-            return "OK";
+            return "Error";
         }
 
-        string StartUnloadTray(ePosTray ePosTray)
+        string StartUnloadTray()
         {
             Run_UnloadTray run = (Run_UnloadTray)m_runUnloadTray.Clone();
-            run.m_ePos = ePosTray;
             return StartRun(run);
         }
 
@@ -485,22 +492,22 @@ namespace Root_Pine2.Module
                 InitModuleRun(module);
             }
 
-            public ePosTray m_ePos = ePosTray.Tray0; 
             public override ModuleRunBase Clone()
             {
                 Run_UnloadTray run = new Run_UnloadTray(m_module);
-                run.m_ePos = m_ePos;
                 return run;
             }
 
             public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
             {
-                m_ePos = (ePosTray)tree.Set(m_ePos, m_ePos, "Tray", "Select Tray", bVisible);
             }
 
             public override string Run()
             {
-                return m_module.RunUnloadTray(m_ePos);
+                ePosTray ePosTray = ePosTray.Tray0;
+                string sRun = m_module.CalcTrayPos(ref ePosTray);
+                if (sRun != "OK") return sRun; 
+                return m_module.RunUnloadTray(ePosTray);
             }
         }
 
