@@ -130,10 +130,10 @@ namespace Root_Pine2.Engineer
         #region Run Button
         void OnTimerRun()
         {
-            buttonHome.IsEnabled = (EQ.p_eState == EQ.eState.Init) || (EQ.p_eState == EQ.eState.Error);
             buttonStart.IsEnabled = (EQ.p_eState == EQ.eState.Ready);
             buttonStop.IsEnabled = (EQ.p_eState == EQ.eState.Run); 
             buttonReset.IsEnabled = (EQ.p_eState == EQ.eState.Ready) || (EQ.p_eState == EQ.eState.Error);
+            buttonHome.IsEnabled = (EQ.p_eState == EQ.eState.Ready) || (EQ.p_eState == EQ.eState.Init) || (EQ.p_eState == EQ.eState.Error);
         }
 
         private void buttonHome_Click(object sender, System.Windows.RoutedEventArgs e)
@@ -142,6 +142,7 @@ namespace Root_Pine2.Engineer
             {
                 case EQ.eState.Init:
                 case EQ.eState.Error:
+                case EQ.eState.Ready:
                     EQ.p_eState = EQ.eState.Home;
                     break; 
             }

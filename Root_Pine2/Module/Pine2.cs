@@ -75,6 +75,8 @@ namespace Root_Pine2.Module
                     if (m_dioHome.p_bIn) EQ.p_eState = EQ.eState.Home; 
                     break;
                 case EQ.eState.Ready:
+                    m_dioHome.Write(bBlink);
+                    if (m_dioHome.p_bIn) EQ.p_eState = EQ.eState.Home;
                     m_dioStart.Write(bBlink);
                     if (m_dioStart.p_bIn) EQ.p_eState = EQ.eState.Run;
                     m_dioReset.Write(bBlink);
@@ -196,21 +198,9 @@ namespace Root_Pine2.Module
 
             public void RunLamp(bool bBlink)
             {
-                switch (EQ.p_eState)
-                {
-                    case EQ.eState.Init:
-                        m_doLamp.AllOff();
-                        m_doLamp.Write(eLamp.Yellow, bBlink);
-                        break;
-                    case EQ.eState.Home:
-                        m_doLamp.Write(eLamp.Yellow, true);
-                        m_doLamp.Write(eLamp.Green, true);
-                        m_doLamp.Write(eLamp.Red, true);
-                        break;
-                    case EQ.eState.Ready: m_doLamp.Write(eLamp.Yellow); break;
-                    case EQ.eState.Run: m_doLamp.Write(eLamp.Green); break;
-                    case EQ.eState.Error: m_doLamp.Write(eLamp.Red); break;
-                }
+                m_doLamp.Write(eLamp.Yellow, bBlink && ((EQ.p_eState == EQ.eState.Ready) || (EQ.p_eState == EQ.eState.Home)));
+                m_doLamp.Write(eLamp.Green, bBlink && ((EQ.p_eState == EQ.eState.Run) || (EQ.p_eState == EQ.eState.Home)));
+                m_doLamp.Write(eLamp.Red, bBlink && ((EQ.p_eState == EQ.eState.Error) || (EQ.p_eState == EQ.eState.Home)));
             }
         }
         Lamp m_lamp = new Lamp();
@@ -334,6 +324,7 @@ namespace Root_Pine2.Module
 
             string Send(Data data)
             {
+                if (data == null) return "OK"; 
                 m_modbus[data.m_nComm].Connect(); 
                 return m_modbus[data.m_nComm].WriteHoldingRegister((byte)data.m_nUnit, 1, data.m_aSend); 
             }

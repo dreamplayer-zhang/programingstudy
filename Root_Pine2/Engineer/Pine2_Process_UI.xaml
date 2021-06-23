@@ -43,10 +43,10 @@
                     <TextBlock Text="Run" Foreground="Black" FontWeight="Bold" />
                 </GroupBox.Header>
                 <StackPanel Orientation="Vertical">
-                    <Button x:Name="buttonHome" Content="Home" Margin="3" Click="buttonHome_Click"/>
                     <Button x:Name="buttonStart" Content="Start" Margin="3" Click="buttonStart_Click"/>
                     <Button x:Name="buttonStop" Content="Stop" Margin="3" Click="buttonStop_Click"/>
                     <Button x:Name="buttonReset" Content="Reset" Margin="3" Click="buttonReset_Click"/>
+                    <Button x:Name="buttonHome" Content="Home" Margin="3" Click="buttonHome_Click"/>
                 </StackPanel>
             </GroupBox>
             <GroupBox Grid.Column="2" BorderBrush="Black" BorderThickness="1" Margin="3">

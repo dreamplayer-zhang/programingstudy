@@ -27,10 +27,10 @@
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
                 <Grid Grid.Column="0" Margin="3" Background="Beige">
-                    <TextBlock x:Name="textBlockA" HorizontalAlignment="Center"/>
+                    <TextBlock x:Name="textBlockB" HorizontalAlignment="Center"/>
                 </Grid>
                 <Grid Grid.Column="1" Margin="3" Background="Beige">
-                    <TextBlock x:Name="textBlockB" HorizontalAlignment="Center"/>
+                    <TextBlock x:Name="textBlockA" HorizontalAlignment="Center"/>
                 </Grid>
             </Grid>
             <Grid Grid.Row="2">
@@ -39,10 +39,10 @@
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
                 <Grid Grid.Column="0" Margin="3" Background="AliceBlue">
-                    <TextBlock x:Name="textBlockStepA" HorizontalAlignment="Center"/>
+                    <TextBlock x:Name="textBlockStepB" HorizontalAlignment="Center"/>
                 </Grid>
                 <Grid Grid.Column="1" Margin="3" Background="AliceBlue">
-                    <TextBlock x:Name="textBlockStepB" HorizontalAlignment="Center"/>
+                    <TextBlock x:Name="textBlockStepA" HorizontalAlignment="Center"/>
                 </Grid>
             </Grid>
             <tree:TreeUI Grid.Row="3" x:Name="treeRootUI" IsEnabled="False"/>

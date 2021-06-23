@@ -78,15 +78,12 @@ namespace Root_Pine2.Module
             if (m_axisXZ.p_axisX.p_posCommand == m_axisXZ.p_axisX.GetPosValue(c_sReady))
             {
                 m_dioTurnUp.Write(bUp);
-                Thread.Sleep(4000);
-                return "OK";
-                //return m_dioTurnUp.WaitDone();
+                return m_dioTurnUp.WaitDone();
             }
             double zPos = m_axisXZ.p_axisY.p_posCommand;
             RunMoveZ((double)0);
             m_dioTurnUp.Write(bUp);
-            Thread.Sleep(4000);
-            //if (Run(m_dioTurnUp.WaitDone())) return p_sInfo;
+            if (Run(m_dioTurnUp.WaitDone())) return p_sInfo;
             RunMoveZ(zPos);
             return "OK";
         }

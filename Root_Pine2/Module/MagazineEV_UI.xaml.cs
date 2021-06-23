@@ -50,19 +50,19 @@ namespace Root_Pine2.Module
             m_magazineEV.RunTreeQueue(Tree.eMode.Init);
         }
 
-        private void textBlockUp_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        private void gridUp_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            if (EQ.p_eState != EQ.eState.Run) return;
+            if (EQ.p_eState == EQ.eState.Run) return;
             if (m_magazineEV.m_aMagazine[InfoStrip.eMagazinePos.Down] != null) return;
             if ((m_magazineEV.m_aMagazine[InfoStrip.eMagazinePos.Up] == null) && (m_magazineEV.m_stack == null)) return;
             m_magazineEV.StartUnload();
         }
 
-        private void textBlockDown_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        private void gridDown_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            if (EQ.p_eState != EQ.eState.Run) return;
+            if (EQ.p_eState == EQ.eState.Run) return;
             if (m_magazineEV.m_aMagazine[InfoStrip.eMagazinePos.Down] == null) return;
-            m_magazineEV.StartUnload(); 
+            m_magazineEV.StartUnload();
         }
     }
 }
