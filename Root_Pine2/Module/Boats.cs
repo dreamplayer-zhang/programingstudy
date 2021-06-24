@@ -95,6 +95,14 @@ namespace Root_Pine2.Module
             return "OK";
         }
 
+        public string StartBoatDone(Vision2D.eWorks eWorks)
+        {
+            Run_RunBoat run = (Run_RunBoat)m_runBoat.Clone();
+            run.m_eWorks = eWorks;
+            run.m_eRun = Run_RunBoat.eRun.Done; 
+            return StartRun(run);
+        }
+
         public string RunMoveDone(Vision2D.eWorks eWorks)
         {
             if (Run(m_aBoat[eWorks].RunMove(p_ePosUnload))) return p_sInfo;
@@ -150,8 +158,16 @@ namespace Root_Pine2.Module
         public override string StateReady()
         {
             if (EQ.p_eState != EQ.eState.Run) return "OK"; 
-            if (IsReady(m_aBoat[Vision2D.eWorks.A])) return StartSnap(Vision2D.eWorks.A);
-            if (IsReady(m_aBoat[Vision2D.eWorks.B])) return StartSnap(Vision2D.eWorks.B);
+            if (m_vision.m_remote.p_bEnable)
+            {
+                if (IsReady(m_aBoat[Vision2D.eWorks.A])) return StartSnap(Vision2D.eWorks.A);
+                if (IsReady(m_aBoat[Vision2D.eWorks.B])) return StartSnap(Vision2D.eWorks.B);
+            }
+            else
+            {
+                if (IsReady(m_aBoat[Vision2D.eWorks.A])) return StartBoatDone(Vision2D.eWorks.A);
+                if (IsReady(m_aBoat[Vision2D.eWorks.B])) return StartBoatDone(Vision2D.eWorks.B);
+            }
             return "OK"; 
         }
 
@@ -292,11 +308,12 @@ namespace Root_Pine2.Module
 
         #region ModuleRun
         ModuleRunBase m_runSnap;
+        ModuleRunBase m_runBoat;
         protected override void InitModuleRuns()
         {
             m_runSnap = AddModuleRunList(new Run_Snap(this), false, "Run Snap");
             AddModuleRunList(new Run_MoveBoat(this), false, "Move Boat");
-            AddModuleRunList(new Run_RunBoat(this), false, "Run Boat");
+            m_runBoat = AddModuleRunList(new Run_RunBoat(this), false, "Run Boat");
         }
 
         public class Run_Snap : ModuleRunBase
@@ -371,12 +388,12 @@ namespace Root_Pine2.Module
                 InitModuleRun(module);
             }
 
-            enum eRun
+            public enum eRun
             {
                 Ready,
                 Done,
             }
-            eRun m_eRun = eRun.Ready; 
+            public eRun m_eRun = eRun.Ready; 
             public Vision2D.eWorks m_eWorks;
             public override ModuleRunBase Clone()
             {
