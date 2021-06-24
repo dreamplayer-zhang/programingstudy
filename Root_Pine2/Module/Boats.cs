@@ -199,6 +199,7 @@ namespace Root_Pine2.Module
                     m_vision.RunLight(snap.m_lightPower);
                     if (Run(RunMoveSnapStart(eWorks, snap))) return p_sInfo;
                     m_vision.StartSnap(snap, eWorks, iSnap);
+                    Thread.Sleep(200);
                     if (Run(m_aBoat[eWorks].RunSnap())) return p_sInfo;
                     if (m_vision.IsBusy()) EQ.p_bStop = true;
                     iSnap++; 
