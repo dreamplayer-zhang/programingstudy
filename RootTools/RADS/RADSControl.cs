@@ -6,6 +6,7 @@ using System.Net;
 using System.Text;
 using System.Timers;
 using System.Windows.Controls;
+using System.Windows.Forms.DataVisualization.Charting;
 
 namespace RootTools.RADS
 {
@@ -27,6 +28,7 @@ namespace RootTools.RADS
 			//	p_treeRoot = p_connect.p_CurrentController.p_TreeRoot;
 			m_timer = new Timer(100);
 			m_timer.Elapsed += Timer_Elapsed;
+			m_timer.Start();
 			//}
 		}
 
@@ -46,9 +48,16 @@ namespace RootTools.RADS
 			{
 				RADSControl_UI ui = new RADSControl_UI();
 				ui.Init(this);
+				
+				if(ui.m_voltPoints != null)
+					m_voltPoints = ui.m_voltPoints;
+
 				return (UserControl)ui;
 			}
 		}
+
+		DataPointCollection m_voltPoints = null;
+
 		#endregion
 
 		#region EventHandler
@@ -171,6 +180,13 @@ namespace RootTools.RADS
 				if (p_connect.p_CurrentController.p_ADS_run == 0)
 				{
 					p_IsRun = false;//"Ready";
+
+					System.Windows.Application.Current.Dispatcher.Invoke(delegate
+					{
+						if(m_voltPoints != null)
+							m_voltPoints.Clear();
+					});
+					
 				}
 				else if (p_connect.p_CurrentController.p_ADS_up > 0)
 				{
@@ -182,9 +198,22 @@ namespace RootTools.RADS
 				{
 					p_IsRun = true;
                     p_nAdsData = p_connect.p_CurrentController.p_ADS_data;
-                    //Console.WriteLine("AdsData : {0}", p_nAdsData);
-				}
+					//Console.WriteLine("AdsData : {0}", p_nAdsData);
 
+					// Update Voltage Graph Points
+					System.Windows.Application.Current.Dispatcher.Invoke(delegate
+					{
+						if (m_voltPoints != null)
+                        {
+							m_voltPoints.InsertY(0, p_nAdsData);
+
+							while (m_voltPoints.Count > 1000)
+							{
+								m_voltPoints.RemoveAt(m_voltPoints.Count - 1);
+							}
+						}	
+					});
+				}
 			}
 			else
 			{
