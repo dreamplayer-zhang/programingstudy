@@ -403,7 +403,15 @@ namespace Root_Rinse_Loader.Module
                 p_eState = eState.Ready;
                 return "OK";
             }
-            foreach (Magazine magazine in m_aMagazine) magazine.RunClamp(magazine.p_bCheck);
+            foreach (Magazine magazine in m_aMagazine)
+            {
+                if (magazine.IsProtrusion())
+                {
+                    p_sInfo = "Magazine Protrusion Sensor Checked";
+                    return p_sInfo; 
+                }
+                magazine.RunClamp(magazine.p_bCheck);
+            }
             p_sInfo = base.StateHome();
             p_eState = (p_sInfo == "OK") ? eState.Ready : eState.Error;
             return p_sInfo;
