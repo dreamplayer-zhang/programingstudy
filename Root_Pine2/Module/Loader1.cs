@@ -217,6 +217,7 @@ namespace Root_Pine2.Module
             }
             p_sInfo = base.StateHome(m_axisXZ.p_axisY);
             if (p_sInfo != "OK") return p_sInfo;
+            RunMoveUp(); 
             p_sInfo = base.StateHome(m_axisXZ.p_axisX);
             p_eState = (p_sInfo == "OK") ? eState.Ready : eState.Error;
             return p_sInfo;

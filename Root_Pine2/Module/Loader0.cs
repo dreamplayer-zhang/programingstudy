@@ -315,7 +315,7 @@ namespace Root_Pine2.Module
         {
             Vision2D.eVision eVision = m_pine2.p_b3D ? Vision2D.eVision.Top3D : Vision2D.eVision.Top2D;
             Boats boats = m_handler.m_aBoats[eVision];
-            if (boats.m_aBoat[Vision2D.eWorks.A].p_eStep == Boat.eStep.Ready) return StartUnloadBoat(eVision, Vision2D.eWorks.A);
+            //if (boats.m_aBoat[Vision2D.eWorks.A].p_eStep == Boat.eStep.Ready) return StartUnloadBoat(eVision, Vision2D.eWorks.A);
             if (boats.m_aBoat[Vision2D.eWorks.B].p_eStep == Boat.eStep.Ready) return StartUnloadBoat(eVision, Vision2D.eWorks.B);
             return "OK";
         }
@@ -425,6 +425,7 @@ namespace Root_Pine2.Module
             }
             p_sInfo = base.StateHome(m_axis.p_axisZ);
             if (p_sInfo != "OK") return p_sInfo;
+            RunMoveUp(); 
             p_sInfo = base.StateHome(m_axis.p_axisX, m_axis.p_axisY);
             p_eState = (p_sInfo == "OK") ? eState.Ready : eState.Error;
             return p_sInfo;

@@ -175,8 +175,16 @@ namespace Root_Pine2.Module
         #region StateReady
         public override string StateReady()
         {
-            if (m_diTop.p_bIn && p_eMove == eMove.Stop) p_eMove = eMove.Down;
-            if (!m_diTop.p_bIn && p_eMove == eMove.Down) p_eMove = eMove.Stop;
+            switch (EQ.p_eState)
+            {
+                case EQ.eState.Run:
+                    if (m_diCheck.p_bIn && (p_bDone == false)) StartLoad();
+                    break;
+                default:
+                    if (m_diTop.p_bIn && p_eMove == eMove.Stop) p_eMove = eMove.Down;
+                    if (!m_diTop.p_bIn && p_eMove == eMove.Down) p_eMove = eMove.Stop;
+                    break; 
+            }
             return "OK";
         }
         #endregion

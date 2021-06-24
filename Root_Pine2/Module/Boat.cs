@@ -197,7 +197,7 @@ namespace Root_Pine2.Module
         public void Reset(ModuleBase.eState eState)
         {
             p_infoStrip = null;
-            m_doTriggerSwitch.Write(false); 
+            m_doTriggerSwitch.Write(false);
             if (eState == ModuleBase.eState.Ready) p_eStep = eStep.RunReady;
         }
 
