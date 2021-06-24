@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace RootTools_Vision
 {
-    public class PBIParameter : ParameterBase
+    public class PBIParameter : ParameterBase, IFrontsideMeasurement
     {
         public PBIParameter() : base(typeof(PBI))
         {

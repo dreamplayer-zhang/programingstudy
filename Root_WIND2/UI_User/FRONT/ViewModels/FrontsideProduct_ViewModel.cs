@@ -12,6 +12,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shapes;
+using System.IO;
 
 namespace Root_WIND2.UI_User
 {
@@ -35,6 +36,10 @@ namespace Root_WIND2.UI_User
         //int nShotMatrixY = 1;
         //int nShotSizeX = 1;
         //int nShotSizeY = 1;
+
+        public bool dragAction = false;
+        CPoint startPos = new CPoint(-1, -1);
+        CPoint prevPos = new CPoint(-1, -1);
         #endregion
 
         #region [Get/Set]
@@ -180,7 +185,7 @@ namespace Root_WIND2.UI_User
             }
         }
 
-        public ICommand ClearMapCommand
+        public ICommand btnToolClearMapCommand
         {
             get
             {
@@ -204,11 +209,119 @@ namespace Root_WIND2.UI_User
         }
 
 
-        public ICommand CreateDefaultMapCommand
+        public ICommand btnToolCreateDefaultMapCommand
         {
             get
             {
                 return new RelayCommand(CreateDefaultMap);
+            }
+        }
+
+        public ICommand btnToolInvertCommand
+        {
+            get
+            {
+                return new RelayCommand(InvertMap);
+            }
+        }
+
+        public ICommand btnToolHorizontalFlipCommand
+        {
+            get
+            {
+                return new RelayCommand(HorizontalFlipMap);
+            }
+        }
+
+        public ICommand btnToolVerticalFlipCommand
+        {
+            get
+            {
+                return new RelayCommand(VerticalFlipMap);
+            }
+        }
+
+        public ICommand btnToolFileImportCommand
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    System.Windows.Forms.OpenFileDialog dlg = new System.Windows.Forms.OpenFileDialog();
+                    dlg.InitialDirectory = Constants.RootPath.RecipeFrontRootPath;
+                    dlg.Title = "Load File";
+                    dlg.Filter = "ASC file (*.ASC)|*.ASC|MCTxt file (*.txt)|*.txt|CTMap (*.FAB)|*.FAB|ALPSMap (*.Alpsdata)|*.Alpsdata|Text file (*.txt)|*.txt|xml file (*.xml)|*.xml|dat file (*.dat)|*.dat|G85 Map (*.*)|*.*|TSK Map (*.*)|*.*|Klarf file (*.001,*.smf)|*.001;*.smf";
+                    if (dlg.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                    {
+                        int[] mapdata = new int[0];
+
+                        string sFolderPath = System.IO.Path.GetDirectoryName(dlg.FileName);
+                        string sFileNameNoExt = System.IO.Path.GetFileNameWithoutExtension(dlg.FileName);
+                        string sFileName = System.IO.Path.GetFileName(dlg.FileName);
+                        string sFullPath = System.IO.Path.Combine(sFolderPath, sFileName);
+
+                        try
+                        {
+                            RecipeType_WaferMap waferMap = GlobalObjects.Instance.Get<RecipeFront>().WaferMap;
+                            StreamReader sr = new StreamReader(sFullPath, Encoding.Default);
+                            OpenMapDataMap(sr, dlg.FilterIndex);
+                        }
+                        catch (Exception ex)
+                        {
+                            MessageBox.Show(ex.Message);
+                        }
+                    }
+                });
+            }
+        }
+
+        public ICommand btnModeDrawCommand
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    if (this.IsDrawChecked == true)
+                    {
+                        this.IsEraseChecked = false;
+                    }
+                    else
+                    {
+                        this.IsEraseChecked = true;
+
+                    }
+                });
+            }
+        }
+
+        public ICommand btnModeEraseCommand
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    if (this.IsEraseChecked == true)
+                    {
+                        this.IsDrawChecked = false;
+                    }
+                    else
+                    {
+                        this.IsDrawChecked = true;
+
+                    }
+                });
+            }
+        }
+
+        public ICommand OpenMapCreatorCommand
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    var viewModel = new Dialog_MapCreator_ViewModel();
+                    Nullable<bool> result = GlobalObjects.Instance.Get<DialogService>().ShowDialog(viewModel);
+                });
             }
         }
         #endregion
@@ -235,7 +348,7 @@ namespace Root_WIND2.UI_User
 
         public FrontsideProduct_ViewModel()
         {
-            chipItems = new ObservableCollection<Rectangle>();
+            chipItems = new ObservableCollection<UIElement>();
 
             this.camInfoDataListVM = new DataListView_ViewModel();
         }
@@ -250,19 +363,21 @@ namespace Root_WIND2.UI_User
             RecipeFront recipeFront = GlobalObjects.Instance.Get<RecipeFront>();
 
             CameraInfo camInfo = DataConverter.GrabModeToCameraInfo(engineer.m_handler.p_Vision.GetGrabMode(recipeFront.CameraInfoIndex));
-
+            
             this.CamInfoDataListVM.Init(camInfo);
+
+            this.SelectedGrabModeIndex = recipeFront.CameraInfoIndex;
         }
 
         #region [Properties]
-        private ObservableCollection<Rectangle> chipItems;
+        private ObservableCollection<UIElement> chipItems;
 
-        public ObservableCollection<Rectangle> ChipItems
+        public ObservableCollection<UIElement> ChipItems
         {
             get => this.chipItems;
             set
             {
-                SetProperty<ObservableCollection<Rectangle>>(ref this.chipItems, value);
+                SetProperty<ObservableCollection<UIElement>>(ref this.chipItems, value);
             }
         }
 
@@ -282,6 +397,25 @@ namespace Root_WIND2.UI_User
             public double Height { get; set; }
         }
 
+        private bool isDrawChecked = true;
+        public bool IsDrawChecked
+        {
+            get => this.isDrawChecked;
+            set
+            {
+                SetProperty<bool>(ref this.isDrawChecked, value);
+            }
+        }
+
+        private bool isEraseChecked = false;
+        public bool IsEraseChecked
+        {
+            get => this.isEraseChecked;
+            set
+            {
+                SetProperty<bool>(ref this.isEraseChecked, value);
+            }
+        }
         #endregion
 
 
@@ -304,6 +438,41 @@ namespace Root_WIND2.UI_User
             DrawMap();
         }
 
+        public void InvertMap()
+        {
+            InvertWaferMap();
+            DrawMap();
+        }
+        public void HorizontalFlipMap()
+        {
+            HorizontalFlipWaferMap();
+            DrawMap();
+        }
+
+        public void VerticalFlipMap()
+        {
+            VerticalFlipWaferMap();
+            DrawMap();
+        }
+
+        public void OpenMapDataMap(StreamReader stdFile, int filterIndex)
+        {
+            if (filterIndex == 1) // Read ASC file
+            {
+                OpenASCMapDataWaferMap(stdFile);
+                ConvertACSMapDataToWaferMap();
+            }
+            else if (filterIndex == 6) // Read XML file
+            {
+                OpenXmlMapDataWaferMap(stdFile);
+            }
+            else if (filterIndex == 10) // Read Klarf file
+            {
+                OpenKlarfMapDataWaferMap(stdFile);
+            }
+            DrawMap();
+        }
+
         public void DrawMap()
         {
             ChipItems.Clear();
@@ -313,60 +482,128 @@ namespace Root_WIND2.UI_User
             int sizeX = waferMap.MapSizeX;
             int sizeY = waferMap.MapSizeY;
 
-            double chipWidth = (double)CanvasWidth / (double)sizeX;
-            double chipHeight = (double)CanvasHeight/ (double)sizeY;
+            double chipWidth = (double)CanvasWidth / (double)(sizeX + 1); // add 1 for row index line
+            double chipHeight = (double)CanvasHeight/ (double)(sizeY + 1); // add 1 for column index line
 
             Point originPt = new Point(0, 0);
 
-            for (int y = 0; y < sizeY; y++)
+            if (sizeX > 0 && sizeY > 0)
             {
-                for (int x = 0; x < sizeX; x++)
+                for (int y = -1; y < sizeY; y++) // start from -1 for column index line
                 {
-                    Rectangle rect = new Rectangle();
-                    rect.Width = chipWidth;
-                    rect.Height = chipHeight;
-                    Canvas.SetLeft(rect, originPt.X + (chipWidth * x));
-                    Canvas.SetTop(rect, originPt.Y + (chipHeight * y));
- 
-                    rect.Tag = new CPoint(x, y);
-                    rect.ToolTip = string.Format("({0}, {1})", x, y); // chip index
-                    rect.Stroke = Brushes.Transparent;
-                    rect.Fill = Brushes.Green;
-                    rect.Opacity = 0.7;
-                    rect.StrokeThickness = 2;
+                    for (int x = -1; x < sizeX; x++) // start from -1 for row index line
+                    {
+                        Rectangle rect = new Rectangle();
+                        rect.Width = chipWidth;
+                        rect.Height = chipHeight;
 
-                    if (waferMap.Data[y * sizeX + x] == 0) // No Chip
-                        rect.Fill = Brushes.DimGray;
-                    else
-                        rect.Fill = Brushes.Green;
+                        TextBlock tb = new TextBlock();
+                        tb.FontSize = (int)(0.7 * Math.Min(chipWidth, chipHeight));
+                        tb.FontWeight = FontWeights.UltraBold;
+                        tb.Width = chipWidth;
+                        tb.Height = chipHeight;
+                        tb.TextAlignment = TextAlignment.Center;
+                        tb.Padding = new Thickness(0, (int)((chipHeight - tb.FontSize) / 2), 0, 0);
 
-                    Canvas.SetZIndex(rect, 99);
-                    rect.MouseLeftButtonDown += ChipMouseLeftButtonDown;
+                        Canvas.SetLeft(rect, originPt.X + (chipWidth * (x + 1)));
+                        Canvas.SetTop(rect, originPt.Y + (chipHeight * (y + 1)));
 
-                    ChipItems.Add(rect);
+                        Canvas.SetLeft(tb, originPt.X + (chipWidth * (x + 1)));
+                        Canvas.SetTop(tb, originPt.Y + (chipHeight * (y + 1)));
+
+                        rect.Tag = new CPoint(x + 1, y + 1);
+                        rect.Stroke = Brushes.Transparent;
+                        rect.Opacity = 0.7;
+                        rect.StrokeThickness = 2;
+
+                        if (x == -1 || y == -1)
+                        {
+                            rect.Fill = Brushes.Blue;
+
+                            if (x == -1 && y != -1)
+                            {
+                                tb.Text = string.Format("{0}", y + 1); // row index
+                            }
+                            else if (x != -1 && y == -1)
+                            {
+                                tb.Text = string.Format("{0}", x + 1); // column index
+                            }
+                        }
+                        else
+                        {
+                            rect.ToolTip = string.Format("({0}, {1})", x, y); // chip index
+
+                            if (waferMap.Data[y * sizeX + x] == (int)CHIP_TYPE.NO_CHIP)
+                                rect.Fill = Brushes.DimGray;
+                            else if (waferMap.Data[y * sizeX + x] == (int)CHIP_TYPE.NORMAL)
+                                rect.Fill = Brushes.Green;
+                            else if (waferMap.Data[y * sizeX + x] == (int)CHIP_TYPE.FLAT_ZONE)
+                                rect.Fill = Brushes.Maroon;
+
+                            rect.MouseLeftButtonDown += ChipMouseLeftButtonDown;
+                            rect.MouseMove += ChipMouseMove;
+                        }
+                        Canvas.SetZIndex(rect, 98);
+                        Canvas.SetZIndex(tb, 99);
+                        ChipItems.Add(rect);
+                        if (tb.Text != "")
+                            ChipItems.Add(tb);
+                    }
                 }
             }
         }
 
-
         private void ChipMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             Rectangle selected = (Rectangle)sender;
-            CPoint pos = (CPoint)selected.Tag;
+            startPos = (CPoint)selected.Tag;
+            prevPos = startPos;
             //int stride = (int)m_MapData.PartialMapSize.Height;
 
-            CHIP_TYPE type = GetRecipeChipType(pos.X, pos.Y);
-            switch (type)
+            CHIP_TYPE type = GetRecipeChipType(startPos.X - 1, startPos.Y - 1);
+            if (this.IsDrawChecked && type == CHIP_TYPE.NO_CHIP)
             {
-                case CHIP_TYPE.NO_CHIP:
-                    UpdateRecipeWaferMap(pos.X, pos.Y, CHIP_TYPE.NORMAL);
-                    break;
-                case CHIP_TYPE.NORMAL:
-                    UpdateRecipeWaferMap(pos.X, pos.Y, CHIP_TYPE.NO_CHIP);
-                    break;
+                UpdateRecipeWaferMap(startPos.X - 1, startPos.Y - 1, CHIP_TYPE.NORMAL);
+            }
+            else if (this.IsEraseChecked && type != CHIP_TYPE.NO_CHIP)
+            {
+                UpdateRecipeWaferMap(startPos.X - 1, startPos.Y - 1, CHIP_TYPE.NO_CHIP);
             }
 
-            selected.Fill = ChipTypeToBrush(GetRecipeChipType(pos.X, pos.Y));
+            selected.Fill = ChipTypeToBrush(GetRecipeChipType(startPos.X - 1, startPos.Y - 1));
+        }
+
+        private void ChipMouseMove(object sender, MouseEventArgs e)
+        {
+            if (e.LeftButton == MouseButtonState.Pressed)
+            {
+                Rectangle selected = (Rectangle)sender;
+                CPoint movingPos = (CPoint)selected.Tag;
+                //int stride = (int)m_MapData.PartialMapSize.Height;
+
+                if ((prevPos.X != -1 && prevPos.Y != -1) && (prevPos.X != movingPos.X || prevPos.Y != movingPos.Y))
+                {
+                    prevPos.X = movingPos.X;
+                    prevPos.Y = movingPos.Y;
+
+                    CHIP_TYPE type = GetRecipeChipType(movingPos.X - 1, movingPos.Y - 1);
+                    if (this.IsDrawChecked && type == CHIP_TYPE.NO_CHIP)
+                    {
+                        UpdateRecipeWaferMap(startPos.X - 1, startPos.Y - 1, CHIP_TYPE.NORMAL);
+                    }
+                    else if (this.IsEraseChecked && type != CHIP_TYPE.NO_CHIP)
+                    {
+                        UpdateRecipeWaferMap(startPos.X - 1, startPos.Y - 1, CHIP_TYPE.NO_CHIP);
+                    }
+
+                    selected.Fill = ChipTypeToBrush(GetRecipeChipType(movingPos.X - 1, movingPos.Y - 1));
+                }
+            }
+        }
+
+        private void ChipMouseLeftButtonUp(object sender, MouseEventArgs e)
+        {
+            dragAction = false;
         }
 
         private void CreateRecipeWaferMap(int mapSizeX, int mapSizeY, CHIP_TYPE type)
@@ -394,6 +631,48 @@ namespace Root_WIND2.UI_User
             waferMap.Data[y * waferMap.MapSizeX + x] = (int)type;
         }
 
+        private void InvertWaferMap()
+        {
+            RecipeType_WaferMap waferMap = GlobalObjects.Instance.Get<RecipeFront>().WaferMap;
+            waferMap.Invert();
+        }
+
+        private void HorizontalFlipWaferMap()
+        {
+            RecipeType_WaferMap waferMap = GlobalObjects.Instance.Get<RecipeFront>().WaferMap;
+            waferMap.HorizontalFlip();
+        }
+
+        private void VerticalFlipWaferMap()
+        {
+            RecipeType_WaferMap waferMap = GlobalObjects.Instance.Get<RecipeFront>().WaferMap;
+            waferMap.VerticalFlip();
+        }
+
+        private void OpenASCMapDataWaferMap(StreamReader stdFile)
+        {
+            RecipeType_WaferMap waferMap = GlobalObjects.Instance.Get<RecipeFront>().WaferMap;
+            waferMap.OpenASCMapData(stdFile);
+        }
+
+        private void ConvertACSMapDataToWaferMap()
+        {
+            RecipeType_WaferMap waferMap = GlobalObjects.Instance.Get<RecipeFront>().WaferMap;
+            waferMap.ConvertACSMapDataToWaferMap();
+        }
+
+        private void OpenXmlMapDataWaferMap(StreamReader stdFile)
+        {
+            RecipeType_WaferMap waferMap = GlobalObjects.Instance.Get<RecipeFront>().WaferMap;
+            waferMap.OpenXmlMapData(stdFile);
+        }
+
+        private void OpenKlarfMapDataWaferMap(StreamReader stdFile)
+        {
+            RecipeType_WaferMap waferMap = GlobalObjects.Instance.Get<RecipeFront>().WaferMap;
+            waferMap.OpenKlarfMapData(stdFile);
+        }
+
         private CHIP_TYPE GetRecipeChipType(int x, int y)
         {
             RecipeType_WaferMap waferMap = GlobalObjects.Instance.Get<RecipeFront>().WaferMap;
@@ -409,6 +688,8 @@ namespace Root_WIND2.UI_User
                     return Brushes.DimGray;
                 case CHIP_TYPE.NORMAL:
                     return Brushes.Green;
+                case CHIP_TYPE.FLAT_ZONE:
+                    return Brushes.Maroon;
             }
             return Brushes.DimGray;
             #endregion

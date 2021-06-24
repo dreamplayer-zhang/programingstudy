@@ -358,6 +358,30 @@ namespace RootTools.Camera.BaslerPylon
             }
         }
 
+        public void SetMulticast()
+        {
+            if (p_CamInfo._DeviceUserID == "") return;
+            List<ICameraInfo> allCameras = CameraFinder.Enumerate();    //SEHException 에러 나는경우 Lib/BaslerRuntime 내 파일들을 실행위치로 복사 요망
+            ICameraInfo ConnectCamInfo = null;
+            foreach (ICameraInfo cameraInfo in allCameras)
+            {
+                if (p_CamInfo._DeviceUserID == cameraInfo[CameraInfoKey.UserDefinedName])
+                {
+                    ConnectCamInfo = cameraInfo;
+                    UpdateCamInfo(ConnectCamInfo, m_cam);
+                    break;
+                }
+            }
+
+            m_cam.Parameters[PLStream.TransmissionType].TrySetValue(PLStream.TransmissionType.Multicast);
+            string strTemp = m_cam.Parameters[PLStream.TransmissionType].GetValue();
+            UpdateCamInfo(ConnectCamInfo, m_cam);
+
+            m_cam.Parameters[PLCamera.GevSCPSPacketSize].SetValue(576);
+            m_cam.Parameters[PLCamera.GevSCBWRA].SetValue(10);
+         
+        }
+
         void bgw_Connect_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             RunTree(Tree.eMode.Init);
@@ -618,7 +642,6 @@ namespace RootTools.Camera.BaslerPylon
                     m_cam.StreamGrabber.ImageGrabbed -= OnImageGrabbed;
                     if (isImageUpdate)
                     {
-                       
                         m_cam.StreamGrabber.ImageGrabbed += OnImageGrabbed;
                     }
                     else
@@ -694,7 +717,7 @@ namespace RootTools.Camera.BaslerPylon
                 // Check if the image can be displayed.
                 if (grabResult.IsValid)
                 {
-                    //if (!stopWatch.IsRunning)
+                    if (!stopWatch.IsRunning)
                     {
                         if (m_bLive)
                         {
@@ -714,7 +737,7 @@ namespace RootTools.Camera.BaslerPylon
                             }
                             GrabEvent();
 
-                            //if(stopWatch.ElapsedMilliseconds > 33)
+                            if (stopWatch.ElapsedMilliseconds > 33)
                             {
                                 int imgSize = m_ImageGrab.p_Size.X * m_ImageGrab.p_Size.Y;
                                 m_threadBuf = new ImageData(m_ImageGrab.p_Size.X, m_ImageGrab.p_Size.Y, m_ImageGrab.GetBytePerPixel());
@@ -794,10 +817,15 @@ namespace RootTools.Camera.BaslerPylon
             }
         }
 
+
+        private bool grabLock = false;
         private void OnImageGrabbed(Object sender, ImageGrabbedEventArgs e)
         {
             try
             {
+                if (grabLock == true) return; 
+
+                grabLock = true;
                 IGrabResult grabResult = e.GrabResult;
                 
                 // Check if the image can be displayed.
@@ -888,10 +916,13 @@ namespace RootTools.Camera.BaslerPylon
                         }
                     }
                 }
+
+
+                grabLock = false;
             }
             catch (Exception exception)
             {
-                MessageBox.Show(exception.ToString());
+                m_log.Info(exception.Message);
             }
             finally
             {

@@ -1,5 +1,6 @@
 ﻿using RootTools.Camera;
 using RootTools.Camera.BaslerPylon;
+using RootTools.Camera.CognexDM150;
 using RootTools.Camera.CognexOCR;
 using RootTools.Camera.Dalsa;
 using RootTools.Camera.Matrox;
@@ -334,6 +335,17 @@ namespace RootTools.ToolBoxs
             {
                 InitCameraSet(module);
                 value = new Camera_CognexOCR(module.p_id + "." + id, module.m_log);
+                module.m_cameraSet.Add(value);
+            }
+            return "OK";
+        }
+
+        public string GetCamera(ref Camera_CognexDM150 value, ModuleBase module, string id)
+        {
+            if (value == null)
+            {
+                InitCameraSet(module);
+                value = new Camera_CognexDM150(module.p_id + "." + id, module.m_log);
                 module.m_cameraSet.Add(value);
             }
             return "OK";

@@ -47,8 +47,8 @@ namespace RootTools.Light
         Log m_log;
         public LightSet(LightToolSet lightToolSet, string sModule, Log log)
         {
-            m_sModule = sModule; 
-           p_id = sModule + ".Light";
+            m_sModule = sModule;
+            p_id = sModule + ".Light";
             m_lightToolSet = lightToolSet;
             m_log = log;
         }

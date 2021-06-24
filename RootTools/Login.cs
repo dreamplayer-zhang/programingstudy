@@ -43,7 +43,7 @@ namespace RootTools
             public bool CheckLogin(string sPassword, string sUserName)
             {
                 if (sPassword != m_sPassword) return false;
-                if (sUserName == "") return true;
+                if (sUserName == "") return false;
                 return (sUserName == m_id); 
             }
         }
@@ -176,6 +176,20 @@ namespace RootTools
                     return; 
                 }
             }
+        }
+
+        public bool CheckLogin(string sUserName, string sPassword)
+        {
+            foreach (User user in m_aAllUser)
+            {
+                if (user.CheckLogin(sPassword, sUserName))
+                {
+                    p_user = user;
+                    if (OnChangeUser != null) OnChangeUser();
+                    return true;
+                }
+            }
+            return false;
         }
         #endregion
 

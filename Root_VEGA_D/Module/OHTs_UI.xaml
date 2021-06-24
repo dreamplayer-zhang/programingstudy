@@ -1,0 +1,27 @@
+﻿<Window x:Class="Root_VEGA_D.Module.OHTs_UI"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Root_VEGA_D.Module"
+        mc:Ignorable="d"
+        Title="OHTs_UI" Height="900" Width="700" WindowStyle="ToolWindow" Background="#FF2D2D30" Topmost="True" Closing="Window_Closing">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="29*"/>
+            <RowDefinition Height="98*"/>
+            <RowDefinition Height="743*"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="17*"/>
+            <ColumnDefinition Width="330*"/>
+            <ColumnDefinition Width="346*"/>
+        </Grid.ColumnDefinitions>
+        <GroupBox x:Name="gbOHTLoadport" Grid.Column="0" Header="Loadport A" Foreground="White" FontSize="15" Margin="8" Grid.ColumnSpan="2" Grid.RowSpan="3">
+            <local:OHT_UI x:Name="manualOHTA" Margin="0,0,0,55"/>
+        </GroupBox>
+        <GroupBox Grid.Column="2" Header="Loadport B" Foreground="White" FontSize="15" Margin="8" Grid.RowSpan="3">
+            <local:OHT_UI x:Name="manualOHTB" Margin="0,0,0,55"/>
+        </GroupBox>
+    </Grid>
+</Window>

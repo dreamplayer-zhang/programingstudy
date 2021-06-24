@@ -80,7 +80,7 @@ namespace Root_AOP01_Inspection.Module
             {
                 m_loadport.p_infoCarrier.p_eReqAccessLP = GemCarrierBase.eAccessLP.Auto; //KHD 210317
                 //changeLPState(GemCarrierBase.eAccessLP.Auto);
-                if (!m_loadport.m_diPlaced.p_bIn || !m_loadport.m_diPresent.p_bIn)
+                if (!m_loadport.m_diPlaced.p_bIn || !m_loadport.p_diPresent.p_bIn)
                 {
                     m_OHT.m_bPODExist = true;
                 }
@@ -93,7 +93,7 @@ namespace Root_AOP01_Inspection.Module
                 m_OHT.m_doReady.p_bOn = false;
                 m_OHT.m_doES.p_bOn = true;
                 m_OHT.m_bAuto = true;
-                //if((m_loadport.m_diPlaced.p_bIn || !m_loadport.m_diPresent.p_bIn) && m_OHT.p_eState == OHT_Semi.eState.All_Off) //KHD 210317
+                //if((m_loadport.m_diPlaced.p_bIn || !m_loadport.p_diPresent.p_bIn) && m_OHT.p_eState == OHT_Semi.eState.All_Off) //KHD 210317
                 //{
                 //    m_carrier.p_eTransfer = GemCarrierBase.eTransfer.ReadyToUnload;
                 //}
@@ -108,14 +108,14 @@ namespace Root_AOP01_Inspection.Module
             SetBrush(buttonStateLoading, m_OHT.m_doLoadReq.p_bOn && p_bBlink);
             SetBrush(buttonStateUnloading, m_OHT.m_doUnloadReq.p_bOn && p_bBlink);
             textBlockPlaced.Foreground = !m_loadport.m_diPlaced.p_bIn ? Brushes.White : Brushes.Gray;
-            textBlockPresent.Foreground = !m_loadport.m_diPresent.p_bIn ? Brushes.White : Brushes.Gray;
+            textBlockPresent.Foreground = !m_loadport.p_diPresent.p_bIn ? Brushes.White : Brushes.Gray;
             
-            if (m_OHT.p_eState == OHT_Semi.eState.All_Off && !m_OHT.m_bOHTErr && (!m_loadport.m_diPlaced.p_bIn|| !m_loadport.m_diPresent.p_bIn))
+            if (m_OHT.p_eState == OHT_Semi.eState.All_Off && !m_OHT.m_bOHTErr && (!m_loadport.m_diPlaced.p_bIn|| !m_loadport.p_diPresent.p_bIn))
             {
                 //m_carrier.p_ePresentSensor = GemCarrierBase.ePresent.Exist;
                 m_OHT.m_bPODExist = true;
             }
-            else if (m_loadport.m_diPlaced.p_bIn && m_loadport.m_diPresent.p_bIn)
+            else if (m_loadport.m_diPlaced.p_bIn && m_loadport.p_diPresent.p_bIn)
             {
                 //m_carrier.p_ePresentSensor = GemCarrierBase.ePresent.Empty;
                 m_OHT.m_bPODExist = false;
@@ -125,12 +125,12 @@ namespace Root_AOP01_Inspection.Module
             {
                 if (m_carrier.p_eTransfer == GemCarrierBase.eTransfer.ReadyToLoad)
                 {
-                    if ((!m_loadport.m_diPlaced.p_bIn || !m_loadport.m_diPresent.p_bIn) && !bStartTD3)
+                    if ((!m_loadport.m_diPlaced.p_bIn || !m_loadport.p_diPresent.p_bIn) && !bStartTD3)
                     {
                         m_OHT.StartTD3();
                         bStartTD3 = true;
                     }
-                    if (!m_loadport.m_diPlaced.p_bIn && !m_loadport.m_diPresent.p_bIn && m_carrier.p_eTransfer == GemCarrierBase.eTransfer.ReadyToLoad)
+                    if (!m_loadport.m_diPlaced.p_bIn && !m_loadport.p_diPresent.p_bIn && m_carrier.p_eTransfer == GemCarrierBase.eTransfer.ReadyToLoad)
                     {
                         m_carrier.p_ePresentSensor = GemCarrierBase.ePresent.Exist;
                         m_OHT.m_bPODExist = true;
@@ -139,12 +139,12 @@ namespace Root_AOP01_Inspection.Module
                 }
                 if (m_carrier.p_eTransfer == GemCarrierBase.eTransfer.ReadyToUnload)
                 {
-                    if ((m_loadport.m_diPlaced.p_bIn || m_loadport.m_diPresent.p_bIn) && !bStartTD3)
+                    if ((m_loadport.m_diPlaced.p_bIn || m_loadport.p_diPresent.p_bIn) && !bStartTD3)
                     {
                         m_OHT.StartTD3();
                         bStartTD3 = true;
                     }
-                    else if (m_loadport.m_diPlaced.p_bIn && m_loadport.m_diPresent.p_bIn && m_carrier.p_eTransfer == GemCarrierBase.eTransfer.ReadyToUnload)
+                    else if (m_loadport.m_diPlaced.p_bIn && m_loadport.p_diPresent.p_bIn && m_carrier.p_eTransfer == GemCarrierBase.eTransfer.ReadyToUnload)
                     {
                         m_carrier.p_ePresentSensor = GemCarrierBase.ePresent.Empty;
                         m_OHT.m_bPODExist = false;
@@ -165,7 +165,7 @@ namespace Root_AOP01_Inspection.Module
             {
                 if (m_carrier.p_eTransfer == GemCarrierBase.eTransfer.ReadyToLoad)
                 {
-                    if (m_loadport.m_diPlaced.p_bIn || m_loadport.m_diPresent.p_bIn)
+                    if (m_loadport.m_diPlaced.p_bIn || m_loadport.p_diPresent.p_bIn)
                     {
                         //m_carrier.p_ePresentSensor = GemCarrierBase.ePresent.Empty;
                         m_OHT.m_bPODExist = false;
@@ -178,7 +178,7 @@ namespace Root_AOP01_Inspection.Module
                 }
                 else if (m_carrier.p_eTransfer == GemCarrierBase.eTransfer.ReadyToUnload)
                 {
-                    if (!m_loadport.m_diPlaced.p_bIn || !m_loadport.m_diPresent.p_bIn)
+                    if (!m_loadport.m_diPlaced.p_bIn || !m_loadport.p_diPresent.p_bIn)
                     {
                         //m_carrier.p_ePresentSensor = GemCarrierBase.ePresent.Exist;
                         m_OHT.m_bPODExist = true;
@@ -194,7 +194,7 @@ namespace Root_AOP01_Inspection.Module
             {
                 if (m_carrier.p_eTransfer == GemCarrierBase.eTransfer.ReadyToLoad)
                 {
-                    if (m_loadport.m_diPlaced.p_bIn || m_loadport.m_diPresent.p_bIn)
+                    if (m_loadport.m_diPlaced.p_bIn || m_loadport.p_diPresent.p_bIn)
                     {
                         //m_carrier.p_ePresentSensor = GemCarrierBase.ePresent.Empty;
                         m_OHT.m_bPODExist = false;
@@ -207,7 +207,7 @@ namespace Root_AOP01_Inspection.Module
                 }
                 else if (m_carrier.p_eTransfer == GemCarrierBase.eTransfer.ReadyToUnload)
                 {
-                    if (!m_loadport.m_diPlaced.p_bIn || !m_loadport.m_diPresent.p_bIn)
+                    if (!m_loadport.m_diPlaced.p_bIn || !m_loadport.p_diPresent.p_bIn)
                     {
                         //m_carrier.p_ePresentSensor = GemCarrierBase.ePresent.Exist;
                         m_OHT.m_bPODExist = true;
@@ -226,14 +226,14 @@ namespace Root_AOP01_Inspection.Module
                 //{
                 //    m_carrier.p_eTransfer = GemCarrierBase.eTransfer.TransferBlocked;
                 //}   
-                //if(!m_loadport.m_diPlaced.p_bIn || !m_loadport.m_diPresent.p_bIn)
+                //if(!m_loadport.m_diPlaced.p_bIn || !m_loadport.p_diPresent.p_bIn)
                 //{
                 //    m_carrier.p_ePresentSensor = GemCarrierBase.ePresent.Exist;
                 //}
                 //blockTransferState.Text = "TransferBlocked";
                 m_carrier.p_eTransfer = GemCarrierBase.eTransfer.TransferBlocked; //KHD 210317
             }
-            bool bPodIn = p_bBlink ? !m_loadport.m_diPlaced.p_bIn : !m_loadport.m_diPresent.p_bIn;
+            bool bPodIn = p_bBlink ? !m_loadport.m_diPlaced.p_bIn : !m_loadport.p_diPresent.p_bIn;
             imageInPod.Visibility = bPodIn ? Visibility.Visible : Visibility.Hidden;
             imageOutPod.Visibility = bPodIn ? Visibility.Hidden : Visibility.Visible;
             //if (m_carrier.p_eTransfer == GemCarrierBase.eTransfer.ReadyToLoad)
@@ -288,11 +288,11 @@ namespace Root_AOP01_Inspection.Module
                 {
                     if(bProtectError)
                     {
-                        if ((m_loadport.m_diPlaced.p_bIn || m_loadport.m_diPresent.p_bIn) && m_OHT.p_eState == OHT_Semi.eState.All_Off)
+                        if ((m_loadport.m_diPlaced.p_bIn || m_loadport.p_diPresent.p_bIn) && m_OHT.p_eState == OHT_Semi.eState.All_Off)
                         {
                             m_carrier.p_eTransfer = GemCarrierBase.eTransfer.ReadyToLoad;
                         }
-                        else if((!m_loadport.m_diPlaced.p_bIn && !m_loadport.m_diPresent.p_bIn) && m_OHT.p_eState == OHT_Semi.eState.All_Off)
+                        else if((!m_loadport.m_diPlaced.p_bIn && !m_loadport.p_diPresent.p_bIn) && m_OHT.p_eState == OHT_Semi.eState.All_Off)
                         {
                             m_carrier.p_eTransfer = GemCarrierBase.eTransfer.ReadyToUnload;
                         }

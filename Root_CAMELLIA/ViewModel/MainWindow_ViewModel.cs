@@ -241,8 +241,45 @@ namespace Root_CAMELLIA
             p_Module_Camellia.p_CamVRS.Captured += GetImage;
             DataManager.Instance.recipeDM.RecipeLoaded += RecipeLoadDone;
 
+
+            App.m_engineer.m_login.OnChangeUser += ChangeUser;
+
             //((XGem)p_XGem).p_eComm;
             p_XGem = (XGem)App.m_engineer.ClassGem();
+
+            MarsLogManager instance = MarsLogManager.Instance;
+            instance.m_useLog = true;
+        }
+
+        string m_curUser = "Offline";
+        public string p_curUser
+        {
+            get
+            {
+                return m_curUser;
+            }
+            set
+            {
+                SetProperty(ref m_curUser, value);
+            }
+        }
+
+        Login.eLevel m_curUserLevel = RootTools.Login.eLevel.Logout;
+        public Login.eLevel p_curUserLevel
+        {
+            get
+            {
+                return m_curUserLevel;
+            }
+            set
+            {
+                SetProperty(ref m_curUserLevel ,value);
+            }
+        }
+        public void ChangeUser()
+        {
+            p_curUser = App.m_engineer.m_login.p_sUserName;
+            p_curUserLevel = App.m_engineer.m_login.p_eLevel;
         }
 
         XGem m_XGem;
@@ -614,7 +651,8 @@ namespace Root_CAMELLIA
                 }
                 else
                 {
-                    SplashScreenHelper.ShowText("NanoView Initialize Error");
+                    SplashScreenHelper.ShowText("NanoView Initialize Error", SplashScreenHelper.CurrentState.Error);
+                    Thread.Sleep(1500);
                 }
             }
             SettingViewModel.LoadSettingData();
@@ -933,16 +971,16 @@ namespace Root_CAMELLIA
         public void InitTimer()
         {
             //m_timer.Interval = TimeSpan.FromMinutes(60);
-          //  p_lampUsetime = App.m_nanoView.UpdateLampData("t");
-          //  p_lampStatus = App.m_nanoView.LampState();
+            p_lampUsetime = App.m_nanoView.UpdateLampData("t");
+            p_lampStatus = App.m_nanoView.LampState();
 
             m_timer.Interval = TimeSpan.FromMinutes(60);
             m_timer.Tick += M_timer_Tick;
             m_timer.Start();
 
-            //m_statusTimer.Interval = TimeSpan.FromMinutes(5);
-            //m_statusTimer.Tick += M_timer_StatusTick;
-            //m_statusTimer.Start();
+            m_statusTimer.Interval = TimeSpan.FromMinutes(5);
+            m_statusTimer.Tick += M_timer_StatusTick;
+            m_statusTimer.Start();
 
             ////m_timer.Interval = TimeSpan.FromMilliseconds(100);
             ////m_timer.Tick += M_timer_Tick;
@@ -988,7 +1026,7 @@ namespace Root_CAMELLIA
         }
         private void M_timer_Tick(object sender, EventArgs e)
         {
-            //p_lampUsetime = App.m_nanoView.UpdateLampData("t");
+            p_lampUsetime = App.m_nanoView.UpdateLampData("t");
             //p_LampStatus = App.m_nanoView.GetLightSourceStatus();
             //tbTime.Text = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
         }
@@ -1196,16 +1234,25 @@ namespace Root_CAMELLIA
                     //    return;
                     //}
 
-                    bool isRecipeLoad = false;
-                    if (DataManager.Instance.recipeDM.LoadRecipeName != "")
-                    {
-                        isRecipeLoad = true;
-                    }
-                    RecipeViewModel.UpdateListView(isRecipeLoad);
-                    RecipeViewModel.UpdateView(isRecipeLoad, true);
+                    //bool isRecipeLoad = false;
+                    //if (DataManager.Instance.recipeDM.LoadRecipeName != "")
+                    //{
+                    //    isRecipeLoad = true;
+                    //}
+                    StopWatch sw = new StopWatch();
+                    sw.Start();
+                    //RecipeViewModel.UpdateListView(isRecipeLoad);
+                    //RecipeViewModel.UpdateView(isRecipeLoad, true);
                     var viewModel = RecipeCreatorViewModel;
+                    sw.Stop();
+                    System.Diagnostics.Debug.WriteLine(sw.ElapsedMilliseconds);
+
                     var dialog = dialogService.GetDialog(viewModel) as Dlg_Recipe;
                     Nullable<bool> result = dialog.ShowDialog();
+                    //dialog.Visibility = Visibility.Visible;
+                    //dialog.Visibility = Visibility.Visible;
+                    //var dialog = dialogService.GetDialog(viewModel) as Dlg_Recipe;
+                    //dialog.Visibility = Visibility.Visible;
 
 
                     // MeasurementRD 꺼 가져와서 그려야함.
@@ -1282,6 +1329,7 @@ namespace Root_CAMELLIA
                 return new RelayCommand(() =>
                 {
                     BaseDefine.Configuration.LoginSuccess = false;
+                    App.m_engineer.m_login.Logout();
                 });
             }
         }

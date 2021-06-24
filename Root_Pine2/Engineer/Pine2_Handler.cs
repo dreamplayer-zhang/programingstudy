@@ -28,30 +28,51 @@ namespace Root_Pine2.Engineer
         }
         #endregion
 
+        #region Recipe
+        string _sRecipe = ""; 
+        public string p_sRecipe
+        {
+            get { return _sRecipe; }
+            set
+            {
+                if (_sRecipe == value) return;
+                _sRecipe = value;
+                if (m_aBoats.Count > 0)
+                {
+                    m_aBoats[Vision2D.eVision.Top3D].p_sRecipe = value;
+                    m_aBoats[Vision2D.eVision.Top2D].p_sRecipe = value;
+                    m_aBoats[Vision2D.eVision.Bottom].p_sRecipe = value;
+                }
+            }
+        }
+        #endregion
+
         #region Module
+        StopWatch m_swInit = new StopWatch(); 
         public ModuleList p_moduleList { get; set; }
         public Pine2 m_pine2;
         public LoadEV m_loadEV;
         public MagazineEVSet m_magazineEV = new MagazineEVSet();
         public Transfer m_transfer;
-        public Dictionary<Vision.eVision, Vision> m_aVision = new Dictionary<Vision.eVision, Vision>();
-        public Dictionary<Vision.eVision, Boats> m_aBoats = new Dictionary<Vision.eVision, Boats>(); 
+        public Dictionary<Vision2D.eVision, Vision2D> m_aVision = new Dictionary<Vision2D.eVision, Vision2D>();
+        public Dictionary<Vision2D.eVision, Boats> m_aBoats = new Dictionary<Vision2D.eVision, Boats>(); 
         public Loader0 m_loader0;
         public Loader1 m_loader1;
         public Loader2 m_loader2;
         public Loader3 m_loader3;
         void InitModule()
         {
+            m_swInit.Start(); 
             p_moduleList = new ModuleList(m_engineer);
             InitModule(m_pine2 = new Pine2("Pine2", m_engineer));
             InitModule(m_loadEV = new LoadEV("LoadEV", m_engineer));
             InitMagazineEV();
-            InitVision(Vision.eVision.Top3D);
-            InitVision(Vision.eVision.Top2D);
-            InitVision(Vision.eVision.Bottom);
-            InitBoats(Vision.eVision.Top3D);
-            InitBoats(Vision.eVision.Top2D);
-            InitBoats(Vision.eVision.Bottom);
+            InitVision(Vision2D.eVision.Bottom);
+            InitVision(Vision2D.eVision.Top2D);
+            InitVision(Vision2D.eVision.Top3D);
+            InitBoats(Vision2D.eVision.Bottom);
+            InitBoats(Vision2D.eVision.Top2D);
+            InitBoats(Vision2D.eVision.Top3D);
             InitModule(m_transfer = new Transfer("Transter", m_engineer, m_pine2, m_magazineEV));
             InitModule(m_loader0 = new Loader0("Loader0", m_engineer, this));
             InitModule(m_loader1 = new Loader1("Loader1", m_engineer, this));
@@ -59,23 +80,27 @@ namespace Root_Pine2.Engineer
             InitModule(m_loader3 = new Loader3("Loader3", m_engineer, this));
         }
 
+        long m_msInit = 0; 
         void InitModule(ModuleBase module)
         {
             ModuleBase_UI ui = new ModuleBase_UI();
             ui.Init(module);
             p_moduleList.AddModule(module, ui);
+            long ms = m_swInit.ElapsedMilliseconds; 
+            m_pine2.m_log.Info("InitModule " + module.p_id + " = " + (ms - m_msInit).ToString() + ", " + ms.ToString());
+            m_msInit = ms; 
         }
 
-        void InitVision(Vision.eVision eVision)
+        void InitVision(Vision2D.eVision eVision)
         {
-            Vision vision = new Vision(eVision, m_engineer, ModuleBase.eRemote.Client); 
+            Vision2D vision = new Vision2D(eVision, m_engineer, ModuleBase.eRemote.Client); 
             ModuleBase_UI ui = new ModuleBase_UI();
             ui.Init(vision);
             p_moduleList.AddModule(vision, ui);
             m_aVision.Add(eVision, vision);
         }
 
-        void InitBoats(Vision.eVision eVision)
+        void InitBoats(Vision2D.eVision eVision)
         {
             Boats boats = new Boats(m_aVision[eVision], m_engineer, m_pine2);
             ModuleBase_UI ui = new ModuleBase_UI();
@@ -156,7 +181,17 @@ namespace Root_Pine2.Engineer
             gaf?.ClearALID();
             foreach (ModuleBase module in moduleList.m_aModule.Keys) module.Reset();
             Thread.Sleep(100);
+            if (IsModuleReady(moduleList)) EQ.p_eState = EQ.eState.Ready; 
             EQ.p_bStop = false;
+        }
+
+        bool IsModuleReady(ModuleList moduleList)
+        {
+            foreach (ModuleBase module in moduleList.m_aModule.Keys)
+            {
+                if (module.p_eState != ModuleBase.eState.Ready) return false; 
+            }
+            return true; 
         }
         #endregion
 
@@ -198,22 +233,6 @@ namespace Root_Pine2.Engineer
             {
                 if (_bRun == value) return;
                 _bRun = value;
-                StartRun(value);
-            }
-        }
-
-        void StartRun(bool bRun)
-        {
-            if (bRun)
-            {
-                //m_rail.StartRun(); //forget
-                //m_roller.StartRun();
-                //m_storage.StartRun();
-                //m_loader.StartRun();
-            }
-            else
-            {
-
             }
         }
 
@@ -228,6 +247,9 @@ namespace Root_Pine2.Engineer
                 {
                     case EQ.eState.Home: StateHome(); break;
                     case EQ.eState.Run: break;
+                    case EQ.eState.ModuleRunList: 
+
+                        break;
                 }
                 p_bRun = (EQ.p_eState == EQ.eState.Run) && (EQ.p_bPickerSet == false);
             }

@@ -260,8 +260,8 @@ namespace Root_WIND2.Module
 
         public string AfterPut(int nID)
         {
-            if (!diWaferExist.p_bIn || !diWaferExistVac.p_bIn)
-                alid_WaferExist.Run(true, "Wafer Check Error");
+            //if (!diWaferExist.p_bIn || !diWaferExistVac.p_bIn)
+            //    alid_WaferExist.Run(true, "Wafer Check Error");
             return "OK";
         }
 

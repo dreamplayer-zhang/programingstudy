@@ -59,6 +59,7 @@
             <Button Content="Snap" Command="{Binding btnSnap}" Style="{StaticResource inspection_menu_button}"/>
             <Button Content="Stop" Command="{Binding btnStop}" Style="{StaticResource inspection_menu_button}"/>
             <Button Content="Clear" Command="{Binding btnClear}" Style="{StaticResource inspection_menu_button}"/>
+            <Button Content="Save Klarf" Command="{Binding btnSaveKlarf}" Style="{StaticResource inspection_menu_button}"/>
         </StackPanel>
 
         <Grid Grid.Row="1" Background="{StaticResource main_view_background}">
@@ -116,7 +117,7 @@
                     <TabControl>
                         <TabItem Header="EBR">
                             <Grid Background="White">
-                                <lvc:CartesianChart Series="{Binding EBRGraph}"
+                                <lvc:CartesianChart Series="{Binding EBRGraph.Series}"
                                                             LegendLocation="Top"
                                                             DisableAnimations="true">
 
@@ -126,7 +127,7 @@
 
                         <TabItem Header="Bevel">
                             <Grid Background="White">
-                                <lvc:CartesianChart Series="{Binding BevelGraph}"
+                                <lvc:CartesianChart Series="{Binding BevelGraph.Series}"
                                                             LegendLocation="Top"
                                                             DisableAnimations="true">
                                 </lvc:CartesianChart>
@@ -144,117 +145,6 @@
                 <tools:Database_DataView DataContext="{Binding DataViewerVM}" Margin="4">
                 </tools:Database_DataView>
             </GroupBox>
-            <!-- new -->
-
-            <!-- old -->
-            <!--<Grid Grid.Column="1" Background="{StaticResource main_view_background}">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="1*"/>
-                    <RowDefinition Height="1*"/>
-                    <RowDefinition Height="1*"/>
-                </Grid.RowDefinitions>
-
-                <GroupBox Grid.Row="0" 
-                      Header="Inspection state"
-                      Margin="4"
-                      Style="{StaticResource main_view_groupbox}">
-                    <vision:MapViewer DataContext="{Binding MapViewerVM}"  Margin="4"/>
-                </GroupBox>
-
-                <GroupBox Grid.Row="1" Header="Graph" Margin="4"
-                                  Style="{StaticResource main_view_groupbox}"
-                                  Background="{StaticResource GroupBoxBackground}">
-                    <TabControl>
-                        <TabItem Header="EBR">
-                            <Grid Background="White">
-                                <lvc:CartesianChart Series="{Binding EBRGraph}"
-                                                            LegendLocation="Top"
-                                                            DisableAnimations="true">
-                                    --><!--<lvc:CartesianChart.AxisX>
-                                        <lvc:Axis Title="{Binding XTitle}"
-                                                          Labels="{Binding XLabels}"
-                                                          Separator="{x:Static lvc:DefaultAxes.CleanSeparator}">
-                                        </lvc:Axis>
-                                    </lvc:CartesianChart.AxisX>
-                                    <lvc:CartesianChart.AxisY>
-                                        <lvc:Axis Title="{Binding YTitle}"
-                                                          MinValue="{Binding SizeYMinVal}"
-                                                          MaxValue="{Binding SizeYMaxVal}"
-                                                          LabelFormatter="{Binding SizeYLabel}">
-                                        </lvc:Axis>
-                                    </lvc:CartesianChart.AxisY>--><!--
-                                </lvc:CartesianChart>
-                            </Grid>
-                        </TabItem>
-
-                        <TabItem Header="Bevel">
-                            <Grid Background="White">
-                                <lvc:CartesianChart Series="{Binding BevelGraph}"
-                                                            LegendLocation="Top"
-                                                            DisableAnimations="true">
-                                </lvc:CartesianChart>
-                            </Grid>
-                        </TabItem>
-                        
-                    </TabControl>
-                    
-                </GroupBox>
-
-                <GroupBox Grid.Row="2" Grid.Column="1" Header="Raw Data" Margin="4"
-                                  Style="{StaticResource main_view_groupbox}"
-                                  Background="{StaticResource GroupBoxBackground}">
-                    <Grid Background="White">
-                        <lvc:CartesianChart Series="{Binding RawGraph}"
-                                                    LegendLocation="Top"
-                                                    DisableAnimations="true">
-                            --><!--<lvc:CartesianChart.AxisX>
-                                <lvc:Axis Title="{Binding XTitle}"
-                                                  Labels="{Binding XLabels}"
-                                                  Separator="{x:Static lvc:DefaultAxes.CleanSeparator}">
-                                </lvc:Axis>
-                            </lvc:CartesianChart.AxisX>
-                            <lvc:CartesianChart.AxisY>
-                                <lvc:Axis Title="{Binding YTitle}"
-                                                  MinValue="{Binding SizeYMinVal}"
-                                                  MaxValue="{Binding SizeYMaxVal}"
-                                                  LabelFormatter="{Binding SizeYLabel}">
-                                </lvc:Axis>
-                            </lvc:CartesianChart.AxisY>--><!--
-                        </lvc:CartesianChart>
-                    </Grid>
-                </GroupBox>
-
-            </Grid>
-            
-            <Grid Grid.Column="2" Background="{StaticResource main_view_background}">
-                <Grid.RowDefinitions>
-                    <RowDefinition/>
-                    <RowDefinition Height="2*"/>
-                </Grid.RowDefinitions>
-
-                <GroupBox Grid.Row="0" Margin="4"
-                                  Style="{StaticResource main_view_groupbox}"
-                                  Header="Measurement Image">
-                    <Grid Background="Black">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="43*"/>
-                            <ColumnDefinition Width="482*"/>
-                        </Grid.ColumnDefinitions>
-                        <Image Source="{Binding MeasurementImage}" Grid.ColumnSpan="2">
-                        </Image>
-                    </Grid>
-                </GroupBox>
-
-                <GroupBox Grid.Row="1" 
-                      Header="Measurement List"
-                      Margin="4,0,4,4"
-                      Style="{StaticResource main_view_groupbox}" >
-                    <tools:Database_DataView DataContext="{Binding DataViewerVM}" Margin="4">
-                    </tools:Database_DataView>
-                </GroupBox>
-
-            </Grid>-->
-            <!-- old -->
         </Grid>
     </Grid>
 </UserControl>

@@ -59,6 +59,64 @@ namespace RootTools
         }
 
     }
+
+    public class ScanLine : TShape
+    {
+        public CPoint StartPt;
+        public CPoint EndPt;
+        public int MaxY;
+        public int MinY;
+        public int XofMinY;
+        public int dx;
+        public int dy;
+        public double slope; // dx/dy (inverse of dy/dx)
+
+        public ScanLine()
+        {
+            this.StartPt = new CPoint();
+            this.EndPt = new CPoint();
+        }
+
+        public ScanLine(CPoint startPt, CPoint endPt)
+        {
+            this.StartPt = new CPoint();
+            this.EndPt = new CPoint();
+
+            StartPt.X = startPt.X;
+            StartPt.Y = startPt.Y;
+            EndPt.X = endPt.X;
+            EndPt.Y = endPt.Y;
+
+            MaxY = Math.Max(StartPt.Y, EndPt.Y);
+            MinY = Math.Min(StartPt.Y, EndPt.Y);
+
+            if (MinY == StartPt.Y)
+            {
+                XofMinY = StartPt.X;
+            }
+            else
+            {
+                XofMinY = EndPt.X;
+            }
+
+            dy = EndPt.Y - StartPt.Y;
+            dx = EndPt.X - StartPt.X;
+            
+            if (dy == 0)
+            {
+                slope = 1.0;
+            }
+            if (dx == 0)
+            {
+                slope = 0.0;
+            }
+            if (dy != 0 && dx != 0)
+            {
+                slope = (double)dx / (double)dy;
+            }
+        }
+    }
+
     public class TPoint : TShape
     {
         public TPoint()
@@ -190,10 +248,8 @@ namespace RootTools
             CanvasRect.Opacity = opacity;
 
         }
-
-
-
     }
+
     public class TRect : TShape
     {
         public Rectangle _CanvasRect;
@@ -262,6 +318,7 @@ namespace RootTools
 
 
     }
+
     public class TEllipse : TShape
     {
         public Grid _grid;
@@ -281,20 +338,24 @@ namespace RootTools
             }
         }
 
-
-        
+        public CRect MemoryRect;
         public CPoint MemPointBuffer;
         public List<PointLine> Data;
 
         public TEllipse()
         {
+            _grid = new Grid();
             CanvasEllipse = new Ellipse();
+            MemoryRect = new CRect();
             MemPointBuffer = new CPoint();
             Data = new List<PointLine>();
         }
         public TEllipse(Brush brush, double thickness, double opacity)
         {
+            _grid = new Grid();
             CanvasEllipse = new Ellipse();
+            MemoryRect = new CRect();
+            MemPointBuffer = new CPoint();
             Data = new List<PointLine>();
 
             _grid.Children.Add(CanvasEllipse);
@@ -304,8 +365,8 @@ namespace RootTools
             CanvasEllipse.StrokeThickness = thickness;
             CanvasEllipse.Opacity = opacity;
         }
-
     }
+
     public class TPolygon : TShape
     {
         public Polygon _CanvasPolygon;
@@ -324,7 +385,6 @@ namespace RootTools
         }
 
         public Polyline CanvasPolyLine;
-
         public List<CPoint> ListMemoryPoint;
         public List<PointLine> Data;
         public TPolygon(Brush brush, double thickness, double opacity)
@@ -345,6 +405,5 @@ namespace RootTools
             ListMemoryPoint = new List<CPoint>();
             Data = new List<PointLine>();
         }
-
     }
 }

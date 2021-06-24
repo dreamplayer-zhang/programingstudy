@@ -10,6 +10,7 @@ using NanoView;
 using System.Runtime.InteropServices;
 using System.Diagnostics;
 using System.IO.Ports;
+using MathNet.Numerics.Interpolation;
 using static Root_CAMELLIA.Module.Module_Camellia;
 using Root_CAMELLIA;
 
@@ -872,14 +873,14 @@ namespace Root_CAMELLIA.LibSR_Met
                     if (m_bSRInitialized == true)
                     {
                         //fitting할때 들어가야함
-                        if (nPointIndex == 0)
-                        {
+                        //if (nPointIndex == 0)
+                        //{
                             if (UpdateModel(false) == false)
                             {
                                 MessageBox.Show("Modeling Fail! Please check the log.");
                                 return ERRORCODE_NANOVIEW.SR_MODELING_FAIL;
                             }
-                        }
+                        //}
                         RawData data = m_DM.m_RawData[nPointIndex];
                         //m_SR.bDispersionFit = false;
                         //m_SR.WavelengthForNK = 633;
@@ -919,7 +920,7 @@ namespace Root_CAMELLIA.LibSR_Met
 
                         data.dGoF = m_Calculation.CalcGoF(data.VIS_Reflectance, data.CalcReflectance, 0, nWLCount, 0, nWLCount - 1, dAvgR);
 
-                        if (data.dGoF > 0.99999)
+                        if (data.dGoF > 0.9999)
                         {
                             data.dGoF = 0.9999;
                         }
@@ -953,7 +954,6 @@ namespace Root_CAMELLIA.LibSR_Met
 
                                 return ERRORCODE_NANOVIEW.MEASURED_DATA_NOT_FOUND;
                             }
-
                         }
 
 
@@ -1169,15 +1169,26 @@ namespace Root_CAMELLIA.LibSR_Met
         {
             try
             {
+                // 선택 파장 투과율 배열 생성하기
+                double[] CalTWavelenghList = new double[m_DM.m_ContourMapDataT.Count];
+                for (int i=0; i < m_DM.m_ContourMapDataT.Count; i++ )
+                {
+                    CalTWavelenghList[i] = m_DM.m_ContourMapDataT[i].Wavelength;
+                }
+
+                Stopwatch sw = new Stopwatch();
                 if (nPointIndex == 0)
                 {
+                    sw.Start();
                     if (LoadNKDatas() == false)
                     {
-                        m_DM.m_Log.WriteLog(LogType.Operating, "NK Data is not find");
+                        m_DM.m_Log.WriteLog(LogType.Operating, "NK Data Cal Error");
                         MessageBox.Show("NK Data is not Found");
 
                         return false;
                     }
+                    sw.Stop();
+                    Debug.WriteLine("Cal nk >> " + sw.ElapsedMilliseconds.ToString());
                 }
                 int nDNum = m_DM.m_LayerData.Count - 2;
                 double[] dThickness = new double[m_DM.m_LayerData.Count - 2];
@@ -1187,9 +1198,17 @@ namespace Root_CAMELLIA.LibSR_Met
                     int nCalLayer = m_SR.Thickness.Count() - (i + 2);
                     dThickness[i] = m_SR.Thickness[nCalLayer];
                 }
-
-                m_Calculation.CalcTransmittance_OptimizingSi(nPointIndex, ConstValue.SI_AVG_OFFSET_RANGE, ConstValue.SI_AVG_OFFSET_STEP, nDNum, dThickness);
-
+                Stopwatch sw1 = new Stopwatch();
+                sw1.Start();
+                m_Calculation.CalcTransmittance_OptimizingSi(nPointIndex, ConstValue.SI_AVG_OFFSET_RANGE, ConstValue.SI_AVG_OFFSET_STEP, nDNum, dThickness, CalTWavelenghList);
+                sw1.Stop();
+                Debug.WriteLine("Cal t >> " + sw1.ElapsedMilliseconds.ToString());
+               
+                Stopwatch sw2 = new Stopwatch();
+                sw2.Start();
+                m_Calculation.PointCalcTransmittance_OptimizingSi(nPointIndex, ConstValue.SI_AVG_OFFSET_RANGE, ConstValue.SI_AVG_OFFSET_STEP, nDNum, dThickness, CalTWavelenghList);
+                sw2.Stop();
+                Debug.WriteLine("CalPoint t >> " + sw2.ElapsedMilliseconds.ToString());
                 return true;
             }
             catch (Exception ex)
@@ -1203,87 +1222,148 @@ namespace Root_CAMELLIA.LibSR_Met
 
         public bool LoadNKDatas()
         {
-            bool bLoadNKData = true;
-
-            m_DM.m_LayerData = m_Model.m_LayerList.ToLayerData();
-
-            for (int n = 0; n < m_Model.m_LayerList.Count; n++)
+            try
             {
-                m_DM.m_LayerData[n].wavelength.Clear();
-                m_DM.m_LayerData[n].n.Clear();
-                m_DM.m_LayerData[n].k.Clear();
-            }
-            string strTempPath = string.Empty;
-            string strNKFilePath = string.Empty;
-            string strNKFileFormat = string.Empty;
-            int nWLStart = Convert.ToInt32(m_DM.nStartWavelegth);
-            int nWLStop;
+                bool bLoadNKData = true;
+                int nWLStart = Convert.ToInt32(m_DM.nStartWavelegth);
+                int nWLStop, nNKDataNum;
+                m_DM.m_LayerData = m_Model.m_LayerList.ToLayerData();
 
-            if (m_DM.bExcept_NIR)
-            {
-                nWLStop = nWLStart + m_DM.nThicknessDataNum;
-            }
-            else
-            {
-                nWLStop = nWLStart + m_DM.m_RawData[0].nNIRDataNum;
-            }
-
-            for (int n = 0; n < m_Model.m_LayerList.Count - 1; n++)
-            {
-                strTempPath = m_Model.m_LayerList[n].m_Host.m_Path;
-                strNKFileFormat = Path.GetExtension(strTempPath);
-                bool bNKFileFormat = strNKFileFormat.Contains(".ref");
-                if (bNKFileFormat)
+                for (int n = 0; n < m_Model.m_LayerList.Count; n++)
                 {
-                    strNKFilePath = strTempPath.Replace(".ref", ".csv");
+                    m_DM.m_LayerData[n].wavelength.Clear();
+                    m_DM.m_LayerData[n].n.Clear();
+                    m_DM.m_LayerData[n].k.Clear();
+                }
+
+                m_Model.YType = Model.DataType.RPRS;
+                m_Model.m_Angle = m_Model.m_AngleAfter = 0.0;
+                if (m_DM.bExcept_NIR)
+                {
+                    nWLStop = nWLStart + m_DM.nThicknessDataNum;
+                    nNKDataNum = ConstValue.NUM_OF_MATERIAL_DATANUM;
+                    m_Model.m_eVMax = 4.0;
+                    m_Model.m_eVMin = 1.3;
                 }
                 else
                 {
-                    strNKFilePath = strTempPath.Replace(".dis", ".csv");
+                    nWLStop = nWLStart + m_DM.m_RawData[0].nNIRDataNum-1;
+                    nNKDataNum = 2 * ConstValue.NUM_OF_MATERIAL_DATANUM;
+                    m_Model.m_eVMax = 4.0;
+                    m_Model.m_eVMin = 0.8;
                 }
+                m_Model.m_NumOfData = nNKDataNum;
+                m_Model.AllocateMemory();
+                m_Model.MakeModelData(Model.CalculateType.INIT);
 
-                if (ReadNKDatas(n, strNKFilePath, nWLStart, nWLStop))
+                for (int n = 0; n < m_Model.m_LayerList.Count - 1; n++)
                 {
-                    bLoadNKData = true;
-                }
-                else
-                {
-                    bLoadNKData = false;
-                }
-            }
-
-            return bLoadNKData;
-        }
-
-        public bool ReadNKDatas(int nLayerIdx, string NKFilePath, int WLStart, int WLStop)
-        {
-            FileInfo FileCheck = new FileInfo(NKFilePath);
-
-            if (FileCheck.Exists)
-            {
-                StreamReader NKData = new StreamReader(NKFilePath);
-
-                while (!NKData.EndOfStream)
-                {
-                    string strTempNK = NKData.ReadLine();
-                    string[] strSplitNK = strTempNK.Split(',');
-                    // 이부분 수정 할것 NIR 사용할 것인지 아닌지에 따라서 nCalDataNUm 과 nDataNum_NIR 로 바꿔서 데이터 수집 할것
-                    if (Convert.ToInt32(strSplitNK[0]) >= WLStart && Convert.ToInt32(strSplitNK[0]) < WLStop)
+                    string sMaterialName = m_Model.m_LayerList[n].m_Host.m_Name;
+                    foreach (Material m in m_Model.m_MaterialList)
                     {
-                        m_DM.m_LayerData[nLayerIdx].wavelength.Add(Convert.ToDouble(strSplitNK[0]));
-                        m_DM.m_LayerData[nLayerIdx].n.Add(Convert.ToDouble(strSplitNK[1]));
-                        m_DM.m_LayerData[nLayerIdx].k.Add(Convert.ToDouble(strSplitNK[2]));
+                        if (m.m_Name == sMaterialName)
+                        {
+                            if (CalNKDatas(n, nWLStart, nWLStop, m.m_e, m.m_eV))
+                            {
+                                bLoadNKData = true;
+                            }
+                            else
+                            {
+                                bLoadNKData = false;
+                            }
+                        }
+
                     }
                 }
-                return true;
+                return bLoadNKData;
             }
-            else
+            catch (Exception ex)
             {
-                m_DM.m_Log.WriteLog(LogType.Operating, "NK 파장 범위가 맞지 않습니다.");
-                System.Windows.Forms.MessageBox.Show("NK 파장 범위가 맞지 않습니다.");
+                m_DM.m_Log.WriteLog(LogType.Error, ex.Message);
                 return false;
             }
         }
+        public bool CalNKDatas(int nLayerIdx, int WLStart, int WLStop, Complex[] Epsilon, double[] eV)
+        {
+            try
+            {
+                List<double> wavelength = new List<double>();
+                List<double> CalnData = new List<double>();
+                List<double> CalkData = new List<double>();
+                List<double> TempWavelength = new List<double>();
+                List<double> Tempn = new List<double>();
+                List<double> Tempk = new List<double>();
+
+                // 엡실론 데이터 nk 데이터로 변환
+                double dCaln = 0.0;
+                double dCalk = 0.0;
+                double temp_n = 0.0;
+                double temp_k = 0.0;
+
+                for (int n = 0; n < eV.Length; n++)
+                {
+                    wavelength.Add(1239.8116 / eV[n]);
+
+                    temp_n = Math.Pow((Math.Pow(Epsilon[n].real, 2) + Math.Pow(Epsilon[n].imag, 2)), 0.5) + Epsilon[n].real;
+                    dCaln = Math.Pow(0.5 * temp_n, 0.5);
+                    CalnData.Add(dCaln);
+
+                    temp_k = Math.Pow((Math.Pow(Epsilon[n].real, 2) + Math.Pow(Epsilon[n].imag, 2)), 0.5) - Epsilon[n].real;
+                    dCalk = Math.Pow(0.5 * temp_k, 0.5);
+                    CalkData.Add(dCalk);
+                }
+
+                //1nm 파장 간격에 맞추어 nk data spline 후 DataManager에 저장
+                int nSplineScale = 0;
+                double dInit_WL = Math.Truncate(wavelength[0]);
+                bool bSplineCal = true;
+                CubicSpline CSpline_nData = CubicSpline.InterpolateNatural(wavelength, CalnData);
+                CubicSpline CSpline_kData = CubicSpline.InterpolateNatural(wavelength, CalkData);
+                while (bSplineCal)
+                {
+                    TempWavelength.Add((-1 * nSplineScale) + dInit_WL);
+                    Tempn.Add(CSpline_nData.Interpolate(TempWavelength.Last()));
+                    Tempk.Add(CSpline_kData.Interpolate(TempWavelength.Last()));
+                    nSplineScale++;
+                    if (TempWavelength.Last() <= WLStart)
+                    {
+                        bSplineCal = false;
+                    }
+                }
+
+                //DataManager에 데이터 세이브
+                int nDataCount = Tempn.Count;
+                double[] array_Wavelength = new double[nDataCount];
+                double[] array_n = new double[nDataCount];
+                double[] array_k = new double[nDataCount];
+
+                TempWavelength.CopyTo(array_Wavelength);
+                Tempn.CopyTo(array_n);
+                Tempk.CopyTo(array_k);
+
+                Array.Reverse(array_Wavelength);
+                Array.Reverse(array_n);
+                Array.Reverse(array_k);
+
+                for (int n = 0; n < nDataCount; n++)
+                {
+                    if (array_Wavelength[n] >= WLStart && array_Wavelength[n] <= WLStop)
+                    {
+                        m_DM.m_LayerData[nLayerIdx].wavelength.Add(array_Wavelength[n]);
+                        m_DM.m_LayerData[nLayerIdx].n.Add(array_n[n]);
+                        m_DM.m_LayerData[nLayerIdx].k.Add(array_k[n]);
+                    }
+                }
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                m_DM.m_Log.WriteLog(LogType.Error, ex.Message);
+                return false;
+            }
+        }
+       
         public bool SaveRawData(int NumofData, double[] expx, double[] expy)
         {
             try
@@ -1717,6 +1797,7 @@ namespace Root_CAMELLIA.LibSR_Met
                 sp.Open();
 
                 sp.Write("t");
+                sp.ReadTimeout = 1000;
                 string OutputData = sp.ReadLine();
                 string[] strtext = new string[7] { "H0:", "T0:", "L0:", "H1:", "T1:", "L1:", "Time:" };
                 string[] arr = OutputData.Split(':');
@@ -1798,7 +1879,7 @@ namespace Root_CAMELLIA.LibSR_Met
                 }
                 sp.Write("c");
             }
-            catch
+            catch(Exception e)
             {
                 
             }

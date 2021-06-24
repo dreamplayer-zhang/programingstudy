@@ -13,9 +13,9 @@ namespace Root_CAMELLIA.Data
         public List<CCircle> DataSelectedPoint { get; set; } = new List<CCircle>();
         public List<int> DataMeasurementRoute { get; set; } = new List<int>();
         public float LowerWaveLength { get; set; } = 350;
-        public float UpperWaveLength { get; set; }
-        public int LMIteration { get; set; }
-        public float DampingFactor { get; set; }
+        public float UpperWaveLength { get; set; } = 950;
+        public int LMIteration { get; set; } = 10;
+        public float DampingFactor { get; set; } = 0.01f;
         public List<WavelengthItem> WaveLengthReflectance { get; set; } = new List<WavelengthItem>();
         public List<WavelengthItem> WaveLengthTransmittance { get; set; } = new List<WavelengthItem>();
         public int VISIntegrationTime { get; set; } = 20;
@@ -27,6 +27,7 @@ namespace Root_CAMELLIA.Data
         public void ClearPoint()
         {
             DataCandidatePoint.Clear();
+            DataCandidateSelectedPoint.Clear();
             DataSelectedPoint.Clear();
             DataMeasurementRoute.Clear();
         }

@@ -34,6 +34,7 @@ namespace RootTools.Comm
         public Parity m_eParity = Parity.None;
         public StopBits m_eStopbits = StopBits.None;
         public bool m_bUseCallback = true;
+        public Handshake m_eHandshake = Handshake.XOnXOff;
 
         void RunConnectTree(Tree tree)
         {
@@ -71,7 +72,7 @@ namespace RootTools.Comm
             try
             {
                 m_sp = new SerialPort(m_sPort, m_nBaudrate, m_eParity, m_nDataBit, m_eStopbits);
-                m_sp.Handshake = Handshake.XOnXOff;
+                m_sp.Handshake = m_eHandshake;
 
                 //m_sp.RtsEnable = true;
                 m_sp.Encoding = Encoding.ASCII;

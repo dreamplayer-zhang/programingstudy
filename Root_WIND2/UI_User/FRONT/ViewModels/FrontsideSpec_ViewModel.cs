@@ -82,7 +82,13 @@ namespace Root_WIND2.UI_User
 
 
 
-
+            foreach(InspectionItem item in p_cInspItem)
+            {
+                item.ComboBoxItemChanged_Channel -= ComboBoxItemChanged_Channel_Callback;
+                item.ComboBoxItemChanged_Mask -= ComboBoxItemChanged_Mask_Callback;
+                item.ComboBoxItemChanged_Method -= ComboBoxItemChanged_Method_Callback;
+                item.ButtonClicked_Delete -= ButtonClicked_Delete_Callback;
+            }
             // Inspection Item
             p_cInspItem.Clear();
 
@@ -112,7 +118,8 @@ namespace Root_WIND2.UI_User
 
                 if (info.ImplementedInterfaces.Contains(typeof(IMaskInspection)) == true)
                 {
-                    item.p_InspROI = item.p_cInspROI[((IMaskInspection)parameterBase).MaskIndex];
+                    if (item.p_cInspROI.Count != 0) 
+                        item.p_InspROI = item.p_cInspROI[((IMaskInspection)parameterBase).MaskIndex];
                 }
 
 

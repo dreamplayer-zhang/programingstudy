@@ -513,7 +513,7 @@ namespace RootTools.Memory
                     }
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 return "Occured error opening BMP file";
             }
@@ -562,7 +562,7 @@ namespace RootTools.Memory
             //}
             //br.Close();
             //fs.Close();
-            return "OK"; 
+            return "OK";
         }
         private void Worker_MemorySave_DoWork(object sender, DoWorkEventArgs e)
         {
@@ -751,7 +751,7 @@ namespace RootTools.Memory
                 else
                     return "Cannot read addresss in MemoryData";
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 return "Occured error writing BMP file";
             }

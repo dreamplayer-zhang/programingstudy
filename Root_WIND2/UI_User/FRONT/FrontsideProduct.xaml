@@ -34,17 +34,37 @@
                   Header="Map View"
                   Margin="4"
                   Style="{StaticResource main_view_groupbox}">
-            <ItemsControl ItemsSource="{Binding ChipItems}"
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="40"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <StackPanel Grid.Column="1"  Orientation="Horizontal">
+                    <TextBlock Text="Tool" Margin="12,0,4,0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                    <Button Content="Default" Command="{Binding  btnToolCreateDefaultMapCommand}" Style="{StaticResource imageViewer_toolbar_button}"/>
+                    <Button Content="Clear" Command="{Binding  btnToolClearMapCommand}" Style="{StaticResource imageViewer_toolbar_button}"/>
+                    <Button Content="Invert" Command="{Binding btnToolInvertCommand}" Style="{StaticResource imageViewer_toolbar_button}"/>
+                    <Button Content="H-Flip" Command="{Binding btnToolHorizontalFlipCommand}" Style="{StaticResource imageViewer_toolbar_button}"/>
+                    <Button Content="V-Flip" Command="{Binding btnToolVerticalFlipCommand}" Style="{StaticResource imageViewer_toolbar_button}"/>
+                    <Button Content="  File&#xa;Import" Command="{Binding btnToolFileImportCommand}" Style="{StaticResource imageViewer_toolbar_button}"/>
+                </StackPanel>
+                <StackPanel Grid.Column="2"  Orientation="Horizontal">
+                    <TextBlock Text="Mode" Margin="290,0,4,0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                    <CheckBox Content="Draw" IsChecked="{Binding IsDrawChecked , Mode=TwoWay}" Command="{Binding  btnModeDrawCommand}" Style="{StaticResource imageViewer_toolbar_checkbox}"/>
+                    <CheckBox Content="Erase" IsChecked="{Binding IsEraseChecked, Mode=TwoWay}" Command="{Binding  btnModeEraseCommand}" Style="{StaticResource imageViewer_toolbar_checkbox}"/>
+                </StackPanel>
+                <Grid Grid.Row="1" >
+                    <ItemsControl ItemsSource="{Binding ChipItems}"
                           WIND2:SizeObserver.Observe="True"
                           WIND2:SizeObserver.ObservedWidth="{Binding CanvasWidth, Mode=OneWayToSource}"
                           WIND2:SizeObserver.ObservedHeight="{Binding CanvasHeight, Mode=OneWayToSource}"
                           Background="White">
-                <ItemsControl.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <Canvas/>
-                    </ItemsPanelTemplate>
-                </ItemsControl.ItemsPanel>
-                <!--<ItemsControl.ItemTemplate>
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <Canvas/>
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <!--<ItemsControl.ItemTemplate>
                     <DataTemplate>
                         <Rectangle Width="{Binding Width}" Height="{Binding Height}" Fill="Green">
                             <Rectangle.RenderTransform>
@@ -53,15 +73,21 @@
                         </Rectangle>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>-->
-                <i:Interaction.Triggers>
-                    <i:EventTrigger EventName="SizeChanged">
-                        <i:InvokeCommandAction Command="{Binding SizeChangedCommand}"/>
-                    </i:EventTrigger>
-                    <i:EventTrigger EventName="MouseLeftButtonDown">
-                        <i:InvokeCommandAction Command="{Binding MouseLeftButtonDownCommand}"/>
-                    </i:EventTrigger>
-                </i:Interaction.Triggers>
-            </ItemsControl>
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger EventName="SizeChanged">
+                                <i:InvokeCommandAction Command="{Binding SizeChangedCommand}"/>
+                            </i:EventTrigger>
+                            <i:EventTrigger EventName="MouseLeftButtonDown">
+                                <i:InvokeCommandAction Command="{Binding MouseLeftButtonDownCommand}"/>
+                            </i:EventTrigger>
+                            <i:EventTrigger EventName="MouseMove">
+                                <i:InvokeCommandAction Command="{Binding MouseMoveCommand}"/>
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+                    </ItemsControl>
+                </Grid>
+            </Grid>
+            
         </GroupBox>
 
         <StackPanel Grid.Column="1" Orientation="Vertical">
@@ -126,11 +152,12 @@
                     <TextBox IsEnabled="False" Grid.Row="4" Grid.Column="4" Height="20"/>
                 </Grid>
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                    <Button Content="Create Map" Command="{Binding CreateMapCommand}" Width ="120" Style="{StaticResource groupbox_button}"/>
-                    <Button Content="Clear" Command="{Binding ClearMapCommand}" Width ="120" Style="{StaticResource groupbox_button}"/>
-                    <Button Content="Default" Command="{Binding CreateDefaultMapCommand}" Width ="120" Style="{StaticResource groupbox_button}"/>
+                    <Button Content="Create Map" Command="{Binding CreateMapCommand}" Width ="378" Style="{StaticResource groupbox_button}"/>
                 </StackPanel>
-            </StackPanel>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                    <Button Content="Map Creator" Command="{Binding OpenMapCreatorCommand}" Width ="378" Style="{StaticResource groupbox_button}"/>
+                    </StackPanel>
+                </StackPanel>
         </GroupBox>
         <GroupBox Grid.Row="1"
                   Grid.Column="1"

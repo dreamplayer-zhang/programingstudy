@@ -4,7 +4,10 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:Converter="clr-namespace:ViewConverter;assembly=RootTools"
-        xmlns:local="clr-namespace:Root_WIND2" mc:Ignorable="d" d:DesignHeight="150"
+        xmlns:tree="clr-namespace:RootTools.Trees;assembly=RootTools"
+        xmlns:local="clr-namespace:Root_WIND2"
+        xmlns:ui="clr-namespace:Root_WIND2.UI_User"
+        mc:Ignorable="d" d:DesignHeight="150"
         d:DesignWidth="600">
     <UserControl.Resources>
         <Converter:VisibleToBoolConverter x:Key="VisibleToBoolConverters" />
@@ -45,16 +48,16 @@
         <Border CornerRadius="4" Background="{StaticResource main_view_groupbox_background}">
             <Grid>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="200" />
-                    <ColumnDefinition />
-                    <ColumnDefinition Width="50" />
+                    <ColumnDefinition Width="170" />
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="0.5*" />
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="100" />
                     <RowDefinition MinHeight="50" />
                 </Grid.RowDefinitions>
-                <TextBlock Text="{Binding ModuleName}" Foreground="White" FontSize="20"
-                        FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                <TextBlock Text="{Binding ModuleName}" Foreground="White" FontSize="25" TextWrapping="WrapWithOverflow"
+                        FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center"  TextAlignment="Center"/>
                 <CheckBox Style="{StaticResource use_checkbox_button}"
                         IsChecked="{Binding IsUseChecked}" Grid.Row="1" Margin="4" />
                 <Border Grid.Column="1" Grid.RowSpan="2" Margin="4"
@@ -82,9 +85,9 @@
                                         <ColumnDefinition Width="50"></ColumnDefinition>
                                         <ColumnDefinition></ColumnDefinition>
                                     </Grid.ColumnDefinitions>
-                                    <CheckBox IsChecked="{Binding bChecked}"
-                                            Style="{StaticResource use_checkbox_button}" Margin="5"
-                                            FontSize="15"></CheckBox>
+                                    <RadioButton IsChecked="{Binding bChecked}"
+                                            GroupName="{Binding sGroupName}" Margin="5"
+                                            FontSize="15"></RadioButton>
                                     <TextBlock Grid.Column="2" Text="{Binding sName}"
                                             Foreground="White" TextAlignment="Center"
                                             VerticalAlignment="Center" Margin="10,0,0,0"></TextBlock>
@@ -103,12 +106,15 @@
                         </ListBox.ItemTemplate>
                     </ListBox>
                 </Border>
-                <Border Grid.Column="1" Grid.RowSpan="2" Margin="4"
-                        Visibility="{Binding p_bSetting, Converter={StaticResource VisibleToBoolConverters}}">
-                    <TabControl>
-                        
-                    </TabControl>
+                <Border  Grid.Column="1" Width="auto" Grid.RowSpan="2" Margin="4" Visibility="{Binding p_bSetting, Converter={StaticResource VisibleToBoolConverters}}">
+                    <tree:TreeUI MaxWidth="500" DataContext="{Binding p_moduleTempList.p_treeRoot}" Background="White"/>
                 </Border>
+                
+                    <!--<ui:SequenceRecipe/>-->
+                    <!--<TabControl Background="Red">
+                        
+                    </TabControl>-->
+          
                 <Button Grid.Column="2" Grid.RowSpan="2" Background="Transparent" Content="Setting"
                         Command="{Binding CommandSettingClick}" Foreground="White">
                 </Button>

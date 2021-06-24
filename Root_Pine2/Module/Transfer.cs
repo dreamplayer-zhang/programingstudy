@@ -15,6 +15,8 @@ namespace Root_Pine2.Module
         {
             m_loaderPusher.GetTools(m_toolBox, this, bInit);
             m_buffer.GetTools(m_toolBox, this, bInit);
+            m_gripper.GetTools(m_toolBox, this, bInit);
+            m_pusher.GetTools(m_toolBox, this, bInit);
         }
         #endregion
 
@@ -38,8 +40,11 @@ namespace Root_Pine2.Module
             #endregion
 
             #region Axis
+            string c_sReady = "Ready";
             void InitPosition()
             {
+                m_axis[0].AddPos(c_sReady);
+                m_axis[1].AddPos(c_sReady);
                 foreach (InfoStrip.eMagazine ePos in Enum.GetValues(typeof(InfoStrip.eMagazine)))
                 {
                     m_axis[GetAxisID(ePos)].AddPos(ePos.ToString()); 
@@ -52,6 +57,16 @@ namespace Root_Pine2.Module
                 return (ePos <= m_ePosLeft) ? 0 : 1; 
             }
 
+            public string RunMoveReady(bool bWait = true)
+            {
+                m_axis[0].StartMove(c_sReady);
+                m_axis[1].StartMove(c_sReady);
+                if (bWait == false) return "OK";
+                if (m_axis[0].WaitReady() != "OK") return "Move Ready Error";
+                if (m_axis[1].WaitReady() != "OK") return "Move Ready Error";
+                return "OK";
+            }
+
             public string RunMove(InfoStrip.eMagazine ePos, bool bWait = true)
             {
                 Axis axis = m_axis[GetAxisID(ePos)]; 
@@ -61,8 +76,7 @@ namespace Root_Pine2.Module
 
             public void Reset()
             {
-                m_axis[0].StartMove(0);
-                m_axis[1].StartMove(0);
+                RunMoveReady(false); 
             }
             #endregion
 
@@ -106,8 +120,6 @@ namespace Root_Pine2.Module
             {
                 toolBox.GetAxis(ref m_axis, module, "Buffer");
                 toolBox.GetAxis(ref m_axisWidth, module, "Width");
-                m_gripper.GetTools(toolBox, module, bInit);
-                m_pusher.GetTools(toolBox, module, bInit);
                 if (bInit) InitPosition();
             }
 
@@ -120,14 +132,18 @@ namespace Root_Pine2.Module
             #endregion
 
             #region Axis
-            double m_dPulse = 0;
-            public InfoStrip.eMagazine m_ePosDst = InfoStrip.eMagazine.Magazine0; 
-            public string RunMove(InfoStrip.eMagazine ePos, bool bGripPos, bool bWait = true)
+            double m_dxPulse = 0;
+            public double m_dZ = 0;
+            public InfoStrip.eMagazine m_ePosDst = InfoStrip.eMagazine.Magazine0;
+            public string RunMove(InfoStrip.eMagazine ePos, bool bPushPos, bool bWait = true)
             {
-                if (m_pusher.p_bLock) return "Lock by Sorter Picker";
-                if (m_gripper.p_bLock) return "Lock by Loader Picker";
-                m_ePosDst = ePos; 
-                m_axis.StartMove(ePos, bGripPos ? 0 : m_dPulse); 
+                if (m_transfer.m_pusher.p_bLock) return "Lock by Sorter Picker";
+                if (m_transfer.m_gripper.p_bLock) return "Lock by Loader Picker";
+                m_transfer.m_pusher.p_bEnable = false;
+                m_transfer.m_gripper.p_bEnable = false; 
+                m_ePosDst = ePos;
+                double dPos = 1000 * (m_transfer.m_pine2.m_widthDefaultStrip - m_transfer.m_pine2.p_widthStrip) / 2;
+                m_axis.StartMove(ePos, (bPushPos ? 0 : m_dxPulse) + dPos); 
                 return bWait ? m_axis.WaitReady() : "OK";
             }
             #endregion
@@ -135,14 +151,14 @@ namespace Root_Pine2.Module
             #region Width
             public enum eWidth
             {
-                mm70,
-                mm90,
+                mm75,
+                mm95,
             }
             public string RunWidth(double fWidth, bool bWait = true)
             {
-                double f70 = m_axisWidth.GetPosValue(eWidth.mm70);
-                double f90 = m_axisWidth.GetPosValue(eWidth.mm90);
-                double dPos = (f90 - f70) * (fWidth - 70) / 10 + f70;
+                double f75 = m_axisWidth.GetPosValue(eWidth.mm75);
+                double f95 = m_axisWidth.GetPosValue(eWidth.mm95);
+                double dPos = (f95 - f75) * (fWidth - 75) / 20 + f75;
                 m_axisWidth.StartMove(dPos);
                 return bWait ? m_axisWidth.WaitReady() : "OK";
             }
@@ -150,265 +166,318 @@ namespace Root_Pine2.Module
 
             public void Reset(Pine2 pine)
             {
-                m_gripper.Reset();
-                m_pusher.Reset();
                 RunWidth(pine.p_widthStrip);
             }
 
             public void RunTree(Tree tree)
             {
-                m_dPulse = tree.Set(m_dPulse, m_dPulse, "dPulse", "Distance between Buffer (pulse)"); 
+                m_dxPulse = tree.Set(m_dxPulse, m_dxPulse, "dPulse", "Distance between Buffer (pulse)");
+                m_dZ = tree.Set(m_dZ, m_dZ, "dZ", "Distance between Buffer (pulse)");
             }
 
-            #region Gripper
-            public class Gripper : NotifyProperty
+            Transfer m_transfer; 
+            public Buffer(Transfer transfer)
             {
-                Axis m_axis;
-                DIO_I2O m_dioGripper;
-                DIO_Is m_diCheck;
-                public void GetTools(ToolBox toolBox, Transfer module, bool bInit)
-                {
-                    toolBox.GetAxis(ref m_axis, module, "Gripper");
-                    toolBox.GetDIO(ref m_dioGripper, module, "Gripper", "Ungrip", "Grip");
-                    toolBox.GetDIO(ref m_diCheck, module, "Gripper Check", new string[] { "1", "2" });
-                    if (bInit) m_axis.AddPos(Enum.GetNames(typeof(eGripper)));
-                }
-
-                public enum eGripper
-                {
-                    Ready,
-                    Ungrip,
-                    Grip
-                }
-                public string RunMoveGripper(eGripper eGripper, bool bWait = true)
-                {
-                    m_axis.StartMove(eGripper);
-                    return bWait ? m_axis.WaitReady() : "OK";
-                }
-
-                public string RunGripperReady(eGripper eGripper)
-                {
-                    m_dioGripper.Write(false);
-                    return RunMoveGripper(eGripper, false); 
-                }
-                
-                public string RunGripper()
-                {
-                    if (Run(RunGripper(false))) return m_sRun;
-                    if (Run(RunMoveGripper(eGripper.Grip))) return m_sRun;
-                    if (Run(RunGripper(true))) return m_sRun;
-                    if (Run(RunMoveGripper(eGripper.Ungrip))) return m_sRun;
-                    if (Run(RunGripper(false))) return m_sRun;
-                    if (Run(RunMoveGripper(eGripper.Ready))) return m_sRun;
-                    return "OK";
-                }
-
-                string RunGripper(bool bGrip, bool bWait = true)
-                {
-                    m_dioGripper.Write(bGrip);
-                    return bWait ? m_dioGripper.WaitDone() : "OK";
-                }
-
-                string m_sRun = "OK";
-                bool Run(string sRun)
-                {
-                    m_sRun = sRun;
-                    return sRun != "OK";
-                }
-
-                public bool IsExist()
-                {
-                    return m_diCheck.ReadDI(0) || m_diCheck.ReadDI(1);
-                }
-
-                public InfoStrip p_infoStrip { get; set; }
-                public void Reset()
-                {
-                    p_bEnable = false;
-                    p_bLock = false;
-                    if (p_infoStrip == null) return;
-                    if (IsExist() == false) p_infoStrip = null;
-                }
-
-                bool _bEnable = false;
-                public bool p_bEnable
-                {
-                    get { return _bEnable; }
-                    set
-                    {
-                        if (_bEnable == value) return;
-                        _bEnable = value;
-                        OnPropertyChanged();
-                    }
-                }
-
-                bool _bLock = false;
-                public bool p_bLock
-                {
-                    get { return _bLock; }
-                    set
-                    {
-                        if (_bLock == value) return;
-                        _bLock = value;
-                        OnPropertyChanged();
-                    }
-                }
-
-                public string WaitUnlock()
-                {
-                    while (p_bLock)
-                    {
-                        Thread.Sleep(10);
-                        if (EQ.IsStop()) return "EQ Stop";
-                    }
-                    return "OK";
-                }
-
-                public Gripper()
-                {
-                    p_infoStrip = null; 
-                }
+                m_transfer = transfer; 
             }
-            public Gripper m_gripper = new Gripper();
-            #endregion
-
-            #region Pusher
-            public class Pusher : NotifyProperty
-            {
-                DIO_I2O m_dioPusher;
-                DIO_I m_diOverload;
-                DIO_Is m_diCheck;
-                public void GetTools(ToolBox toolBox, Transfer module, bool bInit)
-                {
-                    toolBox.GetDIO(ref m_dioPusher, module, "Pusher", "Backward", "Forward");
-                    toolBox.GetDIO(ref m_diOverload, module, "Pusher Overload");
-                    toolBox.GetDIO(ref m_diCheck, module, "Pusher Check", new string[] { "1", "2" });
-                }
-
-                public string RunPusher()
-                {
-                    try
-                    {
-                        m_dioPusher.Write(true);
-                        StopWatch sw = new StopWatch();
-                        int msTimeout = (int)(1000 * m_dioPusher.m_secTimeout);
-                        Thread.Sleep(100);
-                        while (!m_dioPusher.p_bDone)
-                        {
-                            Thread.Sleep(10);
-                            if (m_diOverload.p_bIn) return "Pusher Overload Sensor Error";
-                            if (sw.ElapsedMilliseconds > msTimeout) return "Run Pusher Forward Timeout";
-                        }
-                        Thread.Sleep(100);
-                        m_dioPusher.Write(false);
-                        return m_dioPusher.WaitDone();
-                    }
-                    finally { m_dioPusher.Write(false); }
-                }
-
-                public bool IsExist()
-                {
-                    return m_diCheck.ReadDI(0) || m_diCheck.ReadDI(1);
-                }
-
-                public InfoStrip p_infoStrip { get; set; }
-                
-                public void Reset()
-                {
-                    p_bEnable = false;
-                    p_bLock = false;
-                    if (p_infoStrip == null) return;
-                    if (IsExist() == false) p_infoStrip = null;
-                }
-
-                bool _bEnable = false;
-                public bool p_bEnable
-                {
-                    get { return _bEnable; }
-                    set
-                    {
-                        if (_bEnable == value) return;
-                        _bEnable = value;
-                        OnPropertyChanged();
-                    }
-                }
-
-                bool _bLock = false;
-                public bool p_bLock
-                {
-                    get { return _bLock; }
-                    set
-                    {
-                        if (_bLock == value) return;
-                        _bLock = value;
-                        OnPropertyChanged();
-                    }
-                }
-
-                public string WaitUnlock()
-                {
-                    while (p_bLock)
-                    {
-                        Thread.Sleep(10);
-                        if (EQ.IsStop()) return "EQ Stop";
-                    }
-                    return "OK"; 
-                }
-
-                public Pusher()
-                {
-                    p_infoStrip = null; 
-                }
-            }
-            public Pusher m_pusher = new Pusher();
-            #endregion
         }
-        public Buffer m_buffer = new Buffer();
+        public Buffer m_buffer;
+        #endregion
+
+        #region Gripper
+        public class Gripper : NotifyProperty
+        {
+            Axis m_axis;
+            DIO_I2O m_dioGripper;
+            DIO_Is m_diCheck;
+            public void GetTools(ToolBox toolBox, Transfer module, bool bInit)
+            {
+                toolBox.GetAxis(ref m_axis, module, "Gripper");
+                toolBox.GetDIO(ref m_dioGripper, module, "Gripper", "Ungrip", "Grip");
+                toolBox.GetDIO(ref m_diCheck, module, "Gripper Check", new string[] { "1", "2" });
+                if (bInit) m_axis.AddPos(Enum.GetNames(typeof(eGripper)));
+            }
+
+            public enum eGripper
+            {
+                Ready,
+                Ungrip,
+                Grip
+            }
+            public string RunMoveGripper(eGripper eGripper, bool bWait = true)
+            {
+                m_axis.StartMove(eGripper);
+                return bWait ? m_axis.WaitReady() : "OK";
+            }
+
+            public string RunGripperReady(eGripper eGripper)
+            {
+                m_dioGripper.Write(false);
+                return RunMoveGripper(eGripper, false);
+            }
+
+            public string RunGripper()
+            {
+                if (Run(RunGripper(false))) return m_sRun;
+                if (Run(RunMoveGripper(eGripper.Grip))) return m_sRun;
+                if (Run(RunGripper(true))) return m_sRun;
+                if (Run(RunMoveGripper(eGripper.Ungrip))) return m_sRun;
+                if (Run(RunGripper(false))) return m_sRun;
+                if (Run(RunMoveGripper(eGripper.Ready))) return m_sRun;
+                return "OK";
+            }
+
+            string RunGripper(bool bGrip, bool bWait = true)
+            {
+                m_dioGripper.Write(bGrip);
+                return bWait ? m_dioGripper.WaitDone() : "OK";
+            }
+
+            string m_sRun = "OK";
+            bool Run(string sRun)
+            {
+                m_sRun = sRun;
+                return sRun != "OK";
+            }
+
+            public bool IsExist()
+            {
+                return m_diCheck.ReadDI(0) || m_diCheck.ReadDI(1);
+            }
+
+            public InfoStrip p_infoStrip { get; set; }
+            public void Reset()
+            {
+                p_bEnable = false;
+                p_bLock = false;
+                if (p_infoStrip == null) return;
+                if (IsExist() == false) p_infoStrip = null;
+            }
+
+            bool _bEnable = false;
+            public bool p_bEnable
+            {
+                get { return _bEnable; }
+                set
+                {
+                    if (_bEnable == value) return;
+                    _bEnable = value;
+                    OnPropertyChanged();
+                }
+            }
+
+            bool _bLock = false;
+            public bool p_bLock
+            {
+                get { return _bLock; }
+                set
+                {
+                    if (_bLock == value) return;
+                    _bLock = value;
+                    OnPropertyChanged();
+                }
+            }
+
+            public string WaitUnlock()
+            {
+                while (p_bLock)
+                {
+                    Thread.Sleep(10);
+                    if (EQ.IsStop()) return "EQ Stop";
+                }
+                return "OK";
+            }
+
+            public Gripper()
+            {
+                p_infoStrip = null;
+            }
+        }
+        public Gripper m_gripper = new Gripper();
+        #endregion
+
+        #region Pusher
+        public class Pusher : NotifyProperty
+        {
+            DIO_I2O m_dioPusher;
+            DIO_I m_diOverload;
+            DIO_Is m_diCheck;
+            public void GetTools(ToolBox toolBox, Transfer module, bool bInit)
+            {
+                toolBox.GetDIO(ref m_dioPusher, module, "Pusher", "Backward", "Forward");
+                toolBox.GetDIO(ref m_diOverload, module, "Pusher Overload");
+                toolBox.GetDIO(ref m_diCheck, module, "Pusher Check", new string[] { "1", "2" });
+            }
+
+            public string RunPusher()
+            {
+                try
+                {
+                    m_dioPusher.Write(true);
+                    StopWatch sw = new StopWatch();
+                    int msTimeout = (int)(1000 * m_dioPusher.m_secTimeout);
+                    Thread.Sleep(100);
+                    while (!m_dioPusher.p_bDone)
+                    {
+                        Thread.Sleep(10);
+                        if (m_diOverload.p_bIn) return "Pusher Overload Sensor Error";
+                        if (sw.ElapsedMilliseconds > msTimeout) return "Run Pusher Forward Timeout";
+                    }
+                    Thread.Sleep(100);
+                    m_dioPusher.Write(false);
+                    return m_dioPusher.WaitDone();
+                }
+                finally { m_dioPusher.Write(false); }
+            }
+
+            public bool IsExist()
+            {
+                return m_diCheck.ReadDI(0) || m_diCheck.ReadDI(1);
+            }
+
+            public InfoStrip p_infoStrip { get; set; }
+
+            public void Reset()
+            {
+                p_bEnable = false;
+                p_bLock = false;
+                if (p_infoStrip == null) return;
+                if (IsExist() == false) p_infoStrip = null;
+            }
+
+            bool _bEnable = false;
+            public bool p_bEnable
+            {
+                get { return _bEnable; }
+                set
+                {
+                    if (_bEnable == value) return;
+                    _bEnable = value;
+                    OnPropertyChanged();
+                }
+            }
+
+            bool _bLock = false;
+            public bool p_bLock
+            {
+                get { return _bLock; }
+                set
+                {
+                    if (_bLock == value) return;
+                    _bLock = value;
+                    OnPropertyChanged();
+                }
+            }
+
+            public string WaitUnlock()
+            {
+                while (p_bLock)
+                {
+                    Thread.Sleep(10);
+                    if (EQ.IsStop()) return "EQ Stop";
+                }
+                return "OK";
+            }
+
+            public Pusher()
+            {
+                p_infoStrip = null;
+            }
+        }
+        public Pusher m_pusher = new Pusher();
         #endregion
 
         #region RunLoad
+        public string StartLoad()
+        {
+            return StartRun(m_runLoad.Clone()); 
+        }
+
         public string RunLoad()
         {
             InfoStrip infoStrip = m_magazineEV.GetInfoStrip(true);
-            if (infoStrip == null) return "";
-            if (Run(m_buffer.RunMove(infoStrip.p_eMagazine, true, false))) return p_sInfo;
-            if (Run(m_magazineEV.RunMove(infoStrip))) return p_sInfo;
-            if (Run(m_buffer.RunMove(infoStrip.p_eMagazine, true, true))) return p_sInfo;
-            m_buffer.m_pusher.p_bEnable = true; 
+            if (infoStrip == null)
+            {
+                m_pusher.p_bEnable = (m_pusher.p_infoStrip == null);
+                Thread.Sleep(2000);
+                return m_pusher.WaitUnlock();
+            }
+            if (Run(m_buffer.RunMove(infoStrip.p_eMagazine, false, false))) return p_sInfo;
+            if (Run(m_magazineEV.RunMove(infoStrip, 0))) return p_sInfo;
+            if (Run(m_buffer.RunMove(infoStrip.p_eMagazine, false, true))) return p_sInfo;
+            m_pusher.p_bEnable = (m_pusher.p_infoStrip == null);
             try
             {
-                if (Run(m_buffer.m_gripper.RunGripperReady(Buffer.Gripper.eGripper.Grip))) return p_sInfo;
+                if (Run(m_gripper.RunGripperReady(Gripper.eGripper.Grip))) return p_sInfo;
                 if (Run(m_loaderPusher.RunPusher(infoStrip.p_eMagazine))) return p_sInfo;
-                if (Run(m_buffer.m_gripper.RunGripper())) return p_sInfo;
+                if (Run(m_gripper.RunGripper())) return p_sInfo;
                 infoStrip = m_magazineEV.GetInfoStrip(false);
-                if (m_buffer.m_gripper.IsExist()) m_buffer.m_gripper.p_infoStrip = infoStrip;
-                else infoStrip.Dispose(); 
-                return m_buffer.m_pusher.WaitUnlock();
+                if (m_gripper.IsExist()) m_gripper.p_infoStrip = infoStrip;
+                else infoStrip.Dispose();
+                return m_pusher.WaitUnlock();
             }
             finally
             {
-                m_buffer.m_gripper.RunGripperReady(Buffer.Gripper.eGripper.Ready); 
+                m_gripper.RunGripperReady(Gripper.eGripper.Ready); 
             }
+        }
+        #endregion
+
+        #region RunWaitLoader
+        public string StartWaitLoader()
+        {
+            return StartRun(m_runWaitLoader.Clone());
+        }
+
+        public string RunWaitLoader()
+        {
+            m_gripper.p_bEnable = (m_gripper.p_infoStrip != null);
+            m_pusher.p_bEnable = (m_pusher.p_infoStrip == null); 
+            Thread.Sleep(2000);
+            if (Run(m_gripper.WaitUnlock())) return p_sInfo;
+            if (Run(m_pusher.WaitUnlock())) return p_sInfo;
+            return "OK";
         }
         #endregion
 
         #region RunUnload
+        public string StartUnload()
+        {
+            return StartRun(m_runUnload.Clone()); 
+        }
+
         public string RunUnload()
         {
-            InfoStrip infoStrip = m_buffer.m_pusher.p_infoStrip; 
-            if (infoStrip == null) return "";
+            InfoStrip infoStrip = m_pusher.p_infoStrip; 
+            if (infoStrip == null) return "OK";
             if (Run(m_buffer.RunMove(infoStrip.p_eMagazine, true, false))) return p_sInfo;
-            if (Run(m_magazineEV.RunMove(infoStrip))) return p_sInfo;
+            if (Run(m_magazineEV.RunMove(infoStrip, m_buffer.m_dZ))) return p_sInfo;
             if (Run(m_buffer.RunMove(infoStrip.p_eMagazine, true, true))) return p_sInfo;
-            m_buffer.m_gripper.p_bEnable = true;
-            if (Run(m_buffer.m_pusher.RunPusher())) return p_sInfo;
+            m_gripper.p_bEnable = (m_gripper.p_infoStrip != null);
+            if (Run(m_pusher.RunPusher())) return p_sInfo;
             m_magazineEV.PutInfoStrip(infoStrip);
-            m_buffer.m_pusher.p_infoStrip = null; 
-            return m_buffer.m_gripper.WaitUnlock(); 
+            m_pusher.p_infoStrip = null; 
+            return m_gripper.WaitUnlock(); 
         }
         #endregion
 
-        #region State Home
+        #region override
+        public override string StateReady()
+        {
+            if (EQ.p_eState != EQ.eState.Run) return "OK";
+            switch (m_pine2.p_eMode)
+            {
+                case Pine2.eRunMode.Stack:
+                    m_loaderPusher.RunMoveReady(); 
+                    break;
+                case Pine2.eRunMode.Magazine:
+                    if (m_pusher.p_infoStrip != null) return StartUnload();
+                    if (m_gripper.p_infoStrip == null) return StartLoad();
+                    return StartWaitLoader();
+            }
+            return "OK"; 
+        }
+
         public override string StateHome()
         {
             if (EQ.p_bSimulate)
@@ -418,13 +487,17 @@ namespace Root_Pine2.Module
             }
             p_sInfo = base.StateHome();
             p_eState = (p_sInfo == "OK") ? eState.Ready : eState.Error;
+            m_loaderPusher.Reset();
+            m_buffer.Reset(m_pine2);
             return p_sInfo;
         }
 
         public override void Reset()
         {
             m_loaderPusher.Reset();
-            m_buffer.Reset(m_pine2); 
+            m_buffer.Reset(m_pine2);
+            m_gripper.Reset();
+            m_pusher.Reset();
             base.Reset();
         }
         #endregion
@@ -442,8 +515,9 @@ namespace Root_Pine2.Module
         public Transfer(string id, IEngineer engineer, Pine2 pine2, MagazineEVSet magazineEV)
         {
             m_pine2 = pine2;
-            m_magazineEV = magazineEV; 
-            base.InitBase(id, engineer); 
+            m_magazineEV = magazineEV;
+            m_buffer = new Buffer(this); 
+            InitBase(id, engineer); 
         }
 
         public override void ThreadStop()
@@ -453,14 +527,18 @@ namespace Root_Pine2.Module
         }
 
         #region ModuleRun
+        ModuleRunBase m_runLoad;
+        ModuleRunBase m_runUnload;
+        ModuleRunBase m_runWaitLoader; 
         protected override void InitModuleRuns()
         {
             AddModuleRunList(new Run_ChangeWidth(this), false, "Run Change Width");
             AddModuleRunList(new Run_LoaderPusher(this), false, "Run Load Pusher");
             AddModuleRunList(new Run_Grip(this), false, "Run Grip Strip");
             AddModuleRunList(new Run_Pusher(this), false, "Run Push Strip");
-            AddModuleRunList(new Run_RunLoad(this), false, "Run Load to Transfer");
-            AddModuleRunList(new Run_RunUnload(this), false, "Run Unload to Magazine");
+            m_runLoad = AddModuleRunList(new Run_RunLoad(this), false, "Run Load to Transfer");
+            m_runUnload = AddModuleRunList(new Run_RunUnload(this), false, "Run Unload to Magazine");
+            m_runWaitLoader = AddModuleRunList(new Run_WaitLoader(this), false, "Wait Loader");
         }
 
         public class Run_ChangeWidth : ModuleRunBase
@@ -544,7 +622,7 @@ namespace Root_Pine2.Module
 
             public override string Run()
             {
-                return m_module.m_buffer.m_gripper.RunGripper(); 
+                return m_module.m_gripper.RunGripper(); 
             }
         }
 
@@ -569,7 +647,7 @@ namespace Root_Pine2.Module
 
             public override string Run()
             {
-                return m_module.m_buffer.m_pusher.RunPusher(); 
+                return m_module.m_pusher.RunPusher(); 
             }
         }
 
@@ -620,6 +698,31 @@ namespace Root_Pine2.Module
             public override string Run()
             {
                 return m_module.RunUnload();
+            }
+        }
+
+        public class Run_WaitLoader : ModuleRunBase
+        {
+            Transfer m_module;
+            public Run_WaitLoader(Transfer module)
+            {
+                m_module = module;
+                InitModuleRun(module);
+            }
+
+            public override ModuleRunBase Clone()
+            {
+                Run_WaitLoader run = new Run_WaitLoader(m_module);
+                return run;
+            }
+
+            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
+            {
+            }
+
+            public override string Run()
+            {
+                return m_module.RunWaitLoader();
             }
         }
         #endregion

@@ -214,7 +214,7 @@ namespace RootTools.Module
         {
             if (m_qModuleRemote.Count == 0) return false;
             ModuleRunBase moduleRun = m_qModuleRemote.Peek();
-            if (moduleRun.m_eRemote == eRemote.Local) return false;
+            if (moduleRun.m_eRemote == eRemote.Local && p_eRemote == eRemote.Local) return false;
             try
             {
                 m_swRun.Restart();
@@ -242,7 +242,10 @@ namespace RootTools.Module
                 Thread.Sleep(10);
                 RunThread();
             }
+            RunThreadStop(); 
         }
+
+        protected virtual void RunThreadStop() { }
 
         protected virtual void RunThread()
         {
@@ -257,8 +260,10 @@ namespace RootTools.Module
                     p_bEnableHome = false;
                     p_sRun = "Stop";
                     string sStateHome = StateHome();
-                    if (sStateHome == "OK") p_eState = eState.Ready;
-                    else StopHome();
+                    if (sStateHome == "OK")
+                        p_eState = eState.Ready;
+                    else
+                        StopHome();
                     break;
                 case eState.Ready:
                     p_bEnableHome = true;
@@ -409,8 +414,10 @@ namespace RootTools.Module
         public string StartRun(ModuleRunBase moduleRun)
         {
             if (EQ.IsStop()) return "EQ Stop";
-            if ((moduleRun.m_eRemote != eRemote.Local) && (moduleRun.m_eRemote == p_eRemote)) m_qModuleRemote.Enqueue(moduleRun); 
-            else m_qModuleRun.Enqueue(moduleRun);
+            if ((moduleRun.m_eRemote != eRemote.Local) && (moduleRun.m_eRemote == p_eRemote) || p_eRemote == eRemote.Client)
+                m_qModuleRemote.Enqueue(moduleRun);
+            else
+                m_qModuleRun.Enqueue(moduleRun);
             p_sInfo = "StartRun : " + moduleRun.m_sModuleRun;
             return "OK";
         }
@@ -432,6 +439,21 @@ namespace RootTools.Module
             m_log.Info("RemoteServer : " + moduleRun.p_id + " Done : " + (m_swRun.ElapsedMilliseconds / 1000.0).ToString("0.00 sec"));
             if (m_qModuleRun.Count > 0) m_qModuleRun.Dequeue();
             return true;
+        }
+
+        public virtual bool IsExistCarrier()
+        {
+            return false;
+        }
+
+        public virtual bool IsPlacement()
+        {
+            return false;
+        }
+
+        public virtual bool IsPresent()
+        {
+            return false;
         }
 
         StopWatch m_swRun = new StopWatch(); 
@@ -477,7 +499,7 @@ namespace RootTools.Module
             }
         }
 
-        public class Remote
+        public class Remote : NotifyProperty
         {
             MemoryStream m_memoryStream = new MemoryStream();
 
@@ -586,6 +608,18 @@ namespace RootTools.Module
             #endregion
 
             #region Client
+            bool _bEnable = true;
+            public bool p_bEnable
+            {
+                get { return _bEnable; }
+                set
+                {
+                    if (_bEnable == value) return;
+                    _bEnable = value;
+                    OnPropertyChanged();
+                }
+            }
+
             TCPIPClient m_client;
             void InitClient(bool bInit)
             {
@@ -595,6 +629,7 @@ namespace RootTools.Module
 
             public string RemoteSend(ModuleRunBase run)
             {
+                if (p_bEnable == false) return "OK";
                 m_memoryStream = new MemoryStream();
                 m_treeRoot.m_job = new Job(m_memoryStream, true, m_log);
                 m_treeRoot.p_eMode = Tree.eMode.JobSave;
@@ -644,6 +679,7 @@ namespace RootTools.Module
 
             void ServerModuleRun(Protocol protocol)
             {
+                EQ.p_bStop = false; 
                 ModuleRunBase run = m_module.CloneModuleRun(protocol.m_sCmd);
                 if (run == null)
                 {
@@ -805,7 +841,7 @@ namespace RootTools.Module
             foreach (ModuleRunBase run in aModuleRun) run.RunTree(tree.GetTree(n++, run.p_id), true);
         }
         #endregion
-
+        
         string _id = "";
         public string p_id
         {

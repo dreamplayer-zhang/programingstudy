@@ -49,7 +49,7 @@ namespace RootTools.Gem
             Unknown
         }
         ePresent _ePresentSensor = ePresent.Empty;
-        public ePresent p_ePresentSensor
+        public ePresent p_ePresentSensor 
         {
             get { return _ePresentSensor; }
             set
@@ -64,9 +64,54 @@ namespace RootTools.Gem
                         case ePresent.Empty: m_module.p_sInfo = m_gem.SendCarrierPresentSensor(this, false); break;
                         case ePresent.Exist: m_module.p_sInfo = m_gem.SendCarrierPresentSensor(this, true); break;
                     }
+                    
+                    SendCarrierOn();
                 }
-                SendCarrierOn();
+                
             }
+        }
+
+        public enum eAssociated
+        {
+            NotAssociated,
+            Associated
+        }
+        eAssociated _eAssociated = eAssociated.NotAssociated;
+
+        public eAssociated p_eAssociated
+        {
+            get { return _eAssociated; }
+            set 
+            {
+                if (_eAssociated == value) return;
+                m_log.Info("p_eAssociated State " + _eAssociated.ToString() + " -> " + value.ToString());
+                _eAssociated = value;
+            }
+        }
+
+        eAssociated _eReqAssociated = eAssociated.NotAssociated;
+
+        public eAssociated p_eReqAssociated
+        {
+            get { return _eReqAssociated; }
+            set 
+            {
+                if (_eReqAssociated == value) return;
+                m_log.Info("p_eAssociated State " + _eReqAssociated.ToString() + " -> " + value.ToString());
+                _eReqAssociated = value;                
+            }
+        }
+
+        public void SetReqAssociated(eAssociated value)
+        {
+            p_eReqAssociated = value;
+            m_gem.SendLPInfo(this);
+        }
+
+        public void RunTreeAssociated(Tree tree)
+        {
+            p_eReqAssociated = (eAssociated)tree.Set(p_eReqAssociated, p_eReqAssociated, "Request", "Request Asocciated State");
+            tree.Set(p_eAssociated, p_eAssociated, "State", "Associated State", true, true);
         }
         #endregion
 
@@ -90,18 +135,17 @@ namespace RootTools.Gem
             switch (p_eTransfer)
             {
                 case eTransfer.TransferBlocked:
-                    if (p_ePresentSensor == ePresent.Exist)
-                    {
-                        if (m_gem != null) p_bCarrierOn = true; 
-                        //m_bReqReadCarrierID = true;//jws 210414 check 필요 여기서 rfid 리드 요청함
-                    }
-                    break;
-                case eTransfer.ReadyToUnload:
-                    if (p_ePresentSensor == ePresent.Empty)
-                    {
-                        if (m_gem != null) p_bCarrierOn = false; 
-                    }
-                    break;
+                if (p_ePresentSensor == ePresent.Exist)
+                {
+                    if (m_gem != null) p_bCarrierOn = true;
+                    //m_bReqReadCarrierID = true;//jws 210414 check 필요 여기서 rfid 리드 요청함
+                }
+            
+                if (p_ePresentSensor == ePresent.Empty) 
+                {
+                    if (m_gem != null) p_bCarrierOn = false;
+                }
+                break;
             }
         }
 
@@ -117,7 +161,7 @@ namespace RootTools.Gem
             tree.SetButton(new RelayCommand(CMSDelCarrierInfo), "Delete", "Delete", "Delete Carrier Info");
         }
         #endregion
-
+          
         #region Carrier Tranfer
         public enum eTransfer
         {
@@ -126,12 +170,12 @@ namespace RootTools.Gem
             ReadyToLoad,
             ReadyToUnload
         }
-        eTransfer _eReqTransfer = eTransfer.OutOfService;
+        eTransfer _eReqTransfer = eTransfer.ReadyToLoad;
         public eTransfer p_eReqTransfer
         {
             get { return _eReqTransfer; }
             set
-            {
+            { 
                 if (_eReqTransfer == value) return;
                 if ((m_gem == null) || m_gem.p_bOffline) return;
                 m_log.Info("p_eTransfer " + _eReqTransfer.ToString() + " -> " + value.ToString());
@@ -154,12 +198,14 @@ namespace RootTools.Gem
         }
 
         eTransfer _eTransfer = eTransfer.OutOfService;
+        public eTransfer eBeforTransfer= eTransfer.OutOfService;
         public eTransfer p_eTransfer
         {
             get { return _eTransfer; }
             set
             {
                 if (_eTransfer == value) return;
+                eBeforTransfer = value;
                 m_log.Info("p_eTransfer " + _eTransfer.ToString() + " -> " + value.ToString());
                 _eTransfer = value;
                 OnPropertyChanged();
@@ -180,6 +226,7 @@ namespace RootTools.Gem
         public bool m_bReqReadCarrierID = false;
         public bool m_bReqLoad = false;
         public bool m_bReqUnload = false;
+        public bool m_bReqGem = false;
         #endregion
 
         #region Carrier Access
@@ -214,8 +261,8 @@ namespace RootTools.Gem
                 _eReqAccess = value; 
                 switch (_eAccess)
                 {
-                    case eAccess.CarrierCompleted: 
 
+                    case eAccess.CarrierCompleted: 
                         m_bReqUnload = true; 
                         break; 
                 }
@@ -254,6 +301,7 @@ namespace RootTools.Gem
                 _eAccessLP = value;
                 RunTree(Tree.eMode.Init);
                 OnPropertyChanged();
+                OnPropertyChanged("p_eAccessLP");
                 OnPropertyChanged("p_bAccessLP_Auto");
                 OnPropertyChanged("p_bAccessLP_Manual");
             }
@@ -281,8 +329,10 @@ namespace RootTools.Gem
                 p_eTransfer = eTransfer.TransferBlocked;
                 return;
             }
+
             m_gem.SendCarrierID(this, sCarrierID);
-            p_sCarrierID = sCarrierID; 
+
+            p_sCarrierID = sCarrierID;
             m_log.Info("Send CarrierID : " + sCarrierID);
         }
 
@@ -313,6 +363,7 @@ namespace RootTools.Gem
             }
             List<GemSlotBase.eState> aMap = new List<GemSlotBase.eState>();
             foreach (GemSlotBase slot in m_aGemSlot) aMap.Add(slot.p_eState);
+            p_eStateSlotMap = eGemState.WaitForHost;
             m_gem.SendSlotMap(this, aMap);
             m_log.Info("Send Carrier Slotmap : " + aMap);
         }
@@ -384,6 +435,7 @@ namespace RootTools.Gem
         {
             RunTreeTransfer(tree.GetTree("Transfer"));
             RunTreeAccessLP(tree.GetTree("AccessLP"));
+            RunTreeAssociated(tree.GetTree("Associated"));
             RunTreeCarrier(tree.GetTree("Carrier"));
         }
         #endregion
@@ -397,7 +449,7 @@ namespace RootTools.Gem
             m_gem?.AddGemCarrier(this);
             m_treeRoot = new TreeRoot(p_sLocID + ".Gem", m_log);
             m_treeRoot.UpdateTree += M_treeRoot_UpdateTree;
-
+            
             OnPropertyChanged("p_bAccessLP_Auto");
             OnPropertyChanged("p_bAccessLP_Manual");
         }

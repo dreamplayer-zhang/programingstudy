@@ -13,7 +13,11 @@ namespace RootTools.Comm
     public class TCPIPServer : ITool, IComm
     {
         public delegate void OnReciveData(byte[] aBuf, int nSize, Socket socket);
+        public delegate void OnAccept(Socket socket);
+        public delegate void OnConnect(Socket socket);
         public event OnReciveData EventReciveData;
+        public event OnAccept EventAccept;
+        public event OnConnect EventConnect;
 
         #region ITool
         public UserControl p_ui
@@ -48,6 +52,7 @@ namespace RootTools.Comm
         public class TCPSocket
         {
             public event OnReciveData EventReciveData;
+            public event OnAccept EventAccept;
 
             public Socket m_socket;
             public CommLog m_commLog;
@@ -102,21 +107,39 @@ namespace RootTools.Comm
                 {
                     if (ar == null || !socket.Connected)
                     {
+                        // 연결에 문제 있음을 확인
                         m_commLog.Add(CommLog.eType.Info, "Disconnect !!");
+
+                        if (EventReciveData != null) EventReciveData(m_aReadBuff, 0, socket);
                         socket.Close();
+
                         return;
                     }
+
                     int nReadLength = socket.EndReceive(ar);
                     if (nReadLength > 0)
                     {
                         m_commLog.Add(CommLog.eType.Receive, (nReadLength < 1024) ? Encoding.ASCII.GetString(m_aReadBuff, 0, nReadLength) : "...");
+
                         socket.BeginReceive(m_aReadBuff, 0, m_aReadBuff.Length, SocketFlags.None, new AsyncCallback(CallBack_Receive), socket);
                         if (EventReciveData != null) EventReciveData(m_aReadBuff, nReadLength, socket);
                     }
                     else m_commLog.Add(CommLog.eType.Info, "CallBack_Receive Close");
                 }
+                catch (SocketException ex)
+                {
+                    // SocketException 발생
+                    m_commLog.Add(CommLog.eType.Info, "Receive SocketException : " + ex.Message);
+
+                    if (ex.SocketErrorCode == SocketError.ConnectionReset)
+                    {
+                        if (EventReciveData != null) EventReciveData(m_aReadBuff, 0, socket);
+                        socket.Close();
+                    }
+                }
                 catch (Exception eX)
                 {
+                    // Exception 발생
                     m_commLog.Add(CommLog.eType.Info, "Receive Exception : " + eX.Message);
                 }
             }
@@ -164,6 +187,8 @@ namespace RootTools.Comm
                 m_tcpSocket = tcpSocket;
                 m_tcpSocket.EventReciveData += M_tcpSocket_EventReciveData;
                 m_commLog.Add(CommLog.eType.Info, tcpSocket.p_id + " is Connect !!");
+
+                if (EventAccept != null) EventAccept(socket);
             }
             catch (SocketException eX)
             {

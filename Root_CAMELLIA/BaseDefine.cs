@@ -11,6 +11,13 @@ namespace Root_CAMELLIA
 {
     public static class BaseDefine
     {
+        public enum Process
+        {
+            CalbrationWaferCentering = 1,
+            Measure
+        }
+
+
         public const int ViewSize = 310;
         public const int WFRadius = 300;
         public const int MaxPoint = 50000;
@@ -38,7 +45,7 @@ namespace Root_CAMELLIA
 
         public const string USERNAME = "0a50ffc00ab87ec51cd41269a8820b1ba28c04fbbf51208803e073824b612fa3";
         public const string PASSWORD = "e664ff11431cd8eaf28ec5c5a43a4633e8c338306522d73efc9882bea7ee2640";
-
+        public const string LOG_DEVICE_ID = "Vision";
 
 
         private static ConfigModel _configModel = new ConfigModel();
@@ -86,6 +93,17 @@ namespace Root_CAMELLIA
                 string fileVersion = FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location).FileVersion;
                 _Version2 = fileVersion;
                 return "Version " + _Version2;
+            }
+        }
+
+        private string _Version3 = "1.0.0.0";
+        public string Version3
+        {
+            get
+            {
+                string fileVersion = FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location).FileVersion;
+                _Version3 = fileVersion;
+                return _Version3;
             }
         }
     }

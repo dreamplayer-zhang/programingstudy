@@ -4,6 +4,7 @@ using RootTools.Database;
 using System;
 using System.CodeDom;
 using System.Collections.ObjectModel;
+using System.Collections.Generic;
 using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
 using System.Threading;
@@ -696,7 +697,7 @@ namespace RootTools
 
             double contrastLevel = Math.Pow((100.0 + p_nContrast) / 100.0, 2);
 
-            double newColor = ((((color / 255.0) - 0.5) * contrastLevel) + 0.5) * 255.0;
+            double newColor = (((((double)color / 255.0) - 0.5) * contrastLevel) + 0.5) * 255.0;
             newColor += p_nBrightness;
 
             return (byte)Clamp((int)Math.Round(newColor), 0, 255);
@@ -724,304 +725,322 @@ namespace RootTools
             SetRoiRect();
         }
 
+        bool isUpdate = false;
         public unsafe void SetImageSource()
         {
-            try
-            {
-                if (p_ImageData != null)
-                {
+			try
+			{
+				if (p_ImageData != null)
+				{
 
-                    if (p_ImageData.m_eMode == ImageData.eMode.OtherPCMem)
-                    {
-                        if (p_ImageData.GetBytePerPixel() == 1)
-                        {
-                            if (p_View_Rect != new System.Drawing.Rectangle(0, 0, 0, 0))
-                            {
-                                Image<Gray, byte> view = new Image<Gray, byte>(p_CanvasWidth, p_CanvasHeight);
-                                byte[,,] viewptr = view.Data;
-                                byte[] image = p_ImageData.GetData(p_View_Rect, p_CanvasWidth, p_CanvasHeight);
-                                //for (int yy = 0; yy < p_CanvasHeight; yy++)
-                                Parallel.For(0, p_CanvasHeight, (yy) =>
-                                {
-                                    for (int xx = 0; xx < p_CanvasWidth; xx++)
-                                    {
-                                        viewptr[yy, xx, 0] = ApplyContrastAndBrightness(image[p_CanvasWidth * yy + xx]);
-                                    }
-                                });
-                                p_ImgSource = ImageHelper.ToBitmapSource(view);
-                            }
-                        }
-                        else if (p_ImageData.GetBytePerPixel() == 3)
-                        {
-                            if (p_View_Rect != new System.Drawing.Rectangle(0, 0, 0, 0))
-                            {
-                                Image<Rgb, byte> view = new Image<Rgb, byte>(p_CanvasWidth, p_CanvasHeight);
-                                byte[,,] viewptr = view.Data;
-                                byte[] image = p_ImageData.GetData(p_View_Rect, p_CanvasWidth, p_CanvasHeight);
-                                int nTerm = p_CanvasWidth * p_CanvasHeight;
-                                if(image !=null)                              
-                                Parallel.For(0, p_CanvasHeight, (yy) =>
-                                {
-                                    for (int xx = 0; xx < p_CanvasWidth; xx++)
-                                    {
-                                        viewptr[yy, xx, 0] = ApplyContrastAndBrightness(image[p_CanvasWidth * yy + xx]);
-                                        viewptr[yy, xx, 1] = ApplyContrastAndBrightness(image[p_CanvasWidth * yy + xx + nTerm]);
-                                        viewptr[yy, xx, 2] = ApplyContrastAndBrightness(image[p_CanvasWidth * yy + xx + nTerm * 2]);
-                                    }
-                                });
-                                p_ImgSource = ImageHelper.ToBitmapSource(view);
-                            }
-                        }
-                        //        p_ImgSource = p_ImageData.GetData(p_View_Rect, p_CanvasWidth, p_CanvasHeight);
-                        //Image<Gray, byte> view = new Image<Gray, byte>(p_CanvasWidth, p_CanvasHeight);
-                        //byte[,,] viewptr = view.Data;
-                        //byte[] image = p_ImageData.GetData(p_View_Rect,p_CanvasWidth, p_CanvasHeight);
-                        //for (int xx = 0; xx < p_CanvasWidth; xx++)
-                        //{   
-                        //    viewptr[xx, xx, 0] = image[p_View_Rect.Width * xx];
-                        //}
-                        //p_ImgSource = ImageHelper.ToBitmapSource(view);
-                    }
-                    else
-                    {
-                        object o = new object();
-                        if (p_ImageData.GetBytePerPixel() == 1 && p_ImageData.p_nByte==1)
-                        {
-                            Image<Gray, byte> view = new Image<Gray, byte>(p_CanvasWidth, p_CanvasHeight);
+					if (p_ImageData.m_eMode == ImageData.eMode.OtherPCMem)
+					{
+						if (p_ImageData.GetBytePerPixel() == 1)
+						{
+							if (p_View_Rect != new System.Drawing.Rectangle(0, 0, 0, 0))
+							{
+								Image<Gray, byte> view = new Image<Gray, byte>(p_CanvasWidth, p_CanvasHeight);
+								byte[,,] viewptr = view.Data;
+								byte[] image = p_ImageData.GetData(p_View_Rect, p_CanvasWidth, p_CanvasHeight);
+								//for (int yy = 0; yy < p_CanvasHeight; yy++)
+								Parallel.For(0, p_CanvasHeight, (yy) =>
+								{
+									for (int xx = 0; xx < p_CanvasWidth; xx++)
+									{
+										viewptr[yy, xx, 0] = ApplyContrastAndBrightness(image[p_CanvasWidth * yy + xx]);
+									}
+								});
+								p_ImgSource = ImageHelper.ToBitmapSource(view);
+							}
+						}
+						else if (p_ImageData.GetBytePerPixel() == 3)
+						{
+							if (p_View_Rect != new System.Drawing.Rectangle(0, 0, 0, 0))
+							{
+								Image<Rgb, byte> view = new Image<Rgb, byte>(p_CanvasWidth, p_CanvasHeight);
+								byte[,,] viewptr = view.Data;
+								byte[] image = p_ImageData.GetData(p_View_Rect, p_CanvasWidth, p_CanvasHeight);
+								int nTerm = p_CanvasWidth * p_CanvasHeight;
+								if (image != null)
+									Parallel.For(0, p_CanvasHeight, (yy) =>
+									{
+										for (int xx = 0; xx < p_CanvasWidth; xx++)
+										{
+											viewptr[yy, xx, 0] = ApplyContrastAndBrightness(image[p_CanvasWidth * yy + xx]);
+											viewptr[yy, xx, 1] = ApplyContrastAndBrightness(image[p_CanvasWidth * yy + xx + nTerm]);
+											viewptr[yy, xx, 2] = ApplyContrastAndBrightness(image[p_CanvasWidth * yy + xx + nTerm * 2]);
+										}
+									});
+								p_ImgSource = ImageHelper.ToBitmapSource(view);
+							}
+						}
+						//        p_ImgSource = p_ImageData.GetData(p_View_Rect, p_CanvasWidth, p_CanvasHeight);
+						//Image<Gray, byte> view = new Image<Gray, byte>(p_CanvasWidth, p_CanvasHeight);
+						//byte[,,] viewptr = view.Data;
+						//byte[] image = p_ImageData.GetData(p_View_Rect,p_CanvasWidth, p_CanvasHeight);
+						//for (int xx = 0; xx < p_CanvasWidth; xx++)
+						//{   
+						//    viewptr[xx, xx, 0] = image[p_View_Rect.Width * xx];
+						//}
+						//p_ImgSource = ImageHelper.ToBitmapSource(view);
+					}
+					else
+					{
+						object o = new object();
+						if (p_ImageData.GetBytePerPixel() == 1 && p_ImageData.p_nByte == 1)
+						{
+							Image<Gray, byte> view = new Image<Gray, byte>(p_CanvasWidth, p_CanvasHeight);
 
-                            IntPtr ptrMem = p_ImageData.GetPtr();
-                            if (ptrMem == IntPtr.Zero)
-                                return;
+							IntPtr ptrMem = p_ImageData.GetPtr();
+							if (ptrMem == IntPtr.Zero)
+								return;
 
-                            int rectX, rectY, rectWidth, rectHeight, sizeX;
-                            byte[,,] viewptr = view.Data;
+							int rectX, rectY, rectWidth, rectHeight, sizeX;
+							byte[,,] viewptr = view.Data;
 
-                            rectX = p_View_Rect.X;
-                            rectY = p_View_Rect.Y;
-                            rectWidth = p_View_Rect.Width;
-                            rectHeight = p_View_Rect.Height;
+							rectX = p_View_Rect.X;
+							rectY = p_View_Rect.Y;
+							rectWidth = p_View_Rect.Width;
+							rectHeight = p_View_Rect.Height;
 
-                            sizeX = p_ImageData.p_Size.X;
+							sizeX = p_ImageData.p_Size.X;
 
-                            Parallel.For(0, p_CanvasHeight, (yy) =>
-                            {
-                                {
-                                    long pix_y = rectY + yy * rectHeight / p_CanvasHeight;
+							Parallel.For(0, p_CanvasHeight, (yy) =>
+							{
+								{
+									long pix_y = rectY + yy * rectHeight / p_CanvasHeight;
 
-                                    for (int xx = 0; xx < p_CanvasWidth; xx++)
-                                    {
-                                        long pix_x = rectX + xx * rectWidth / p_CanvasWidth;
-                                        /*byte pixel = ((byte*)ptrMem)[pix_x + (long)pix_y * sizeX];*/
-                                        byte* arrByte = (byte*)ptrMem.ToPointer();
-                                        long idx = pix_x + (long)pix_y * sizeX;
-                                        byte pixel = arrByte[idx];
-                                        viewptr[yy, xx, 0] = ApplyContrastAndBrightness(pixel);
-                                    }
-                                }
-                            });
+									for (int xx = 0; xx < p_CanvasWidth; xx++)
+									{
+										long pix_x = rectX + xx * rectWidth / p_CanvasWidth;
+										/*byte pixel = ((byte*)ptrMem)[pix_x + (long)pix_y * sizeX];*/
+										byte* arrByte = (byte*)ptrMem.ToPointer();
+										long idx = pix_x + (long)pix_y * sizeX;
+										byte pixel = arrByte[idx];
+										viewptr[yy, xx, 0] = ApplyContrastAndBrightness(pixel);
+									}
+								}
+							});
 
-                            p_ImgSource = ImageHelper.ToBitmapSource(view);
+							p_ImgSource = ImageHelper.ToBitmapSource(view);
 
-                            p_TumbnailImgMargin = new Thickness(Convert.ToInt32((double)p_View_Rect.X * p_ThumbWidth / p_ImageData.p_Size.X), Convert.ToInt32((double)p_View_Rect.Y * p_ThumbHeight / p_ImageData.p_Size.Y), 0, 0);
+							p_TumbnailImgMargin = new Thickness(Convert.ToInt32((double)p_View_Rect.X * p_ThumbWidth / p_ImageData.p_Size.X), Convert.ToInt32((double)p_View_Rect.Y * p_ThumbHeight / p_ImageData.p_Size.Y), 0, 0);
 
-                            if (Convert.ToInt32((double)p_View_Rect.Height * p_ThumbHeight / p_ImageData.p_Size.Y) == 0)
-                                p_TumbnailImg_Rect = new System.Drawing.Rectangle(0, 0, Convert.ToInt32((double)p_View_Rect.Width * p_ThumbWidth / p_ImageData.p_Size.X), 2);
-                            else
-                                p_TumbnailImg_Rect = new System.Drawing.Rectangle(0, 0, Convert.ToInt32((double)p_View_Rect.Width * p_ThumbWidth / p_ImageData.p_Size.X), Convert.ToInt32((double)p_View_Rect.Height * p_ThumbHeight / p_ImageData.p_Size.Y));
+							if (Convert.ToInt32((double)p_View_Rect.Height * p_ThumbHeight / p_ImageData.p_Size.Y) == 0)
+								p_TumbnailImg_Rect = new System.Drawing.Rectangle(0, 0, Convert.ToInt32((double)p_View_Rect.Width * p_ThumbWidth / p_ImageData.p_Size.X), 2);
+							else
+								p_TumbnailImg_Rect = new System.Drawing.Rectangle(0, 0, Convert.ToInt32((double)p_View_Rect.Width * p_ThumbWidth / p_ImageData.p_Size.X), Convert.ToInt32((double)p_View_Rect.Height * p_ThumbHeight / p_ImageData.p_Size.Y));
 
-                        }
-                        else if (p_ImageData.GetBytePerPixel() == 2)
-                        {
-                            Image<Gray, byte> view = new Image<Gray, byte>(p_CanvasWidth, p_CanvasHeight);
+						}
+						else if (p_ImageData.GetBytePerPixel() == 2)
+						{
+							Image<Gray, byte> view = new Image<Gray, byte>(p_CanvasWidth, p_CanvasHeight);
 
-                            IntPtr ptrMem = p_ImageData.GetPtr();
-                            if (ptrMem == IntPtr.Zero)
-                                return;
+							IntPtr ptrMem = p_ImageData.GetPtr();
+							if (ptrMem == IntPtr.Zero)
+								return;
 
-                            int rectX, rectY, rectWidth, rectHeight, sizeX;
-                            byte[,,] viewptr = view.Data;
+							int rectX, rectY, rectWidth, rectHeight, sizeX;
+							byte[,,] viewptr = view.Data;
 
-                            rectX = p_View_Rect.X;
-                            rectY = p_View_Rect.Y;
-                            rectWidth = p_View_Rect.Width;
-                            rectHeight = p_View_Rect.Height;
+							rectX = p_View_Rect.X;
+							rectY = p_View_Rect.Y;
+							rectWidth = p_View_Rect.Width;
+							rectHeight = p_View_Rect.Height;
 
-                            sizeX = p_ImageData.p_Size.X;
+							sizeX = p_ImageData.p_Size.X;
 
-                            byte* arrByte = (byte*)ptrMem.ToPointer();
+							byte* arrByte = (byte*)ptrMem.ToPointer();
 
-                            Parallel.For(0, p_CanvasHeight, (yy) =>
-                            {
-                                {
-                                    long pix_y = rectY + yy * rectHeight / p_CanvasHeight;
+							Parallel.For(0, p_CanvasHeight, (yy) =>
+							{
+								{
+									long pix_y = rectY + yy * rectHeight / p_CanvasHeight;
 
-                                    for (int xx = 0; xx < p_CanvasWidth; xx++)
-                                    {
-                                        long pix_x = rectX + xx * rectWidth / p_CanvasWidth;
-                                        byte b1 = arrByte[(pix_y * sizeX + pix_x) * 2 + 0];
-                                        byte b2 = arrByte[(pix_y * sizeX + pix_x) * 2 + 1];
-                                        ushort us = BitConverter.ToUInt16(new byte[] { b1, b2 }, 0);
-                                        byte b = (byte)(((double)us / (Math.Pow(2, 16) - 1)) * (Math.Pow(2, 8) - 1));
+									for (int xx = 0; xx < p_CanvasWidth; xx++)
+									{
+										long pix_x = rectX + xx * rectWidth / p_CanvasWidth;
+										byte b1 = arrByte[(pix_y * sizeX + pix_x) * 2 + 0];
+										byte b2 = arrByte[(pix_y * sizeX + pix_x) * 2 + 1];
+										ushort us = BitConverter.ToUInt16(new byte[] { b1, b2 }, 0);
+										byte b = (byte)(((double)us / (Math.Pow(2, 16) - 1)) * (Math.Pow(2, 8) - 1));
 
-                                        viewptr[yy, xx, 0] = ApplyContrastAndBrightness(b);
-                                    }
-                                }
-                            });
+										viewptr[yy, xx, 0] = ApplyContrastAndBrightness(b);
+									}
+								}
+							});
 
-                            p_ImgSource = ImageHelper.ToBitmapSource(view);
+							p_ImgSource = ImageHelper.ToBitmapSource(view);
 
-                            p_TumbnailImgMargin = new Thickness(Convert.ToInt32((double)p_View_Rect.X * p_ThumbWidth / p_ImageData.p_Size.X), Convert.ToInt32((double)p_View_Rect.Y * p_ThumbHeight / p_ImageData.p_Size.Y), 0, 0);
+							p_TumbnailImgMargin = new Thickness(Convert.ToInt32((double)p_View_Rect.X * p_ThumbWidth / p_ImageData.p_Size.X), Convert.ToInt32((double)p_View_Rect.Y * p_ThumbHeight / p_ImageData.p_Size.Y), 0, 0);
 
-                            if (Convert.ToInt32((double)p_View_Rect.Height * p_ThumbHeight / p_ImageData.p_Size.Y) == 0)
-                                p_TumbnailImg_Rect = new System.Drawing.Rectangle(0, 0, Convert.ToInt32((double)p_View_Rect.Width * p_ThumbWidth / p_ImageData.p_Size.X), 2);
-                            else
-                                p_TumbnailImg_Rect = new System.Drawing.Rectangle(0, 0, Convert.ToInt32((double)p_View_Rect.Width * p_ThumbWidth / p_ImageData.p_Size.X), Convert.ToInt32((double)p_View_Rect.Height * p_ThumbHeight / p_ImageData.p_Size.Y));
-                        }
-                        else if (p_ImageData.GetBytePerPixel() == 3)
-                        {
-                            if (p_eColorViewMode == eColorViewMode.All)
-                            {
-                                if (p_ImageData.m_eMode == ImageData.eMode.MemoryRead)
-                                {
-                                    Image<Rgb, byte> view = new Image<Rgb, byte>(p_CanvasWidth, p_CanvasHeight);
-                                    IntPtr ptrMemR = p_ImageData.GetPtr(0);
-                                    IntPtr ptrMemG = p_ImageData.GetPtr(1);
-                                    IntPtr ptrMemB = p_ImageData.GetPtr(2);
+							if (Convert.ToInt32((double)p_View_Rect.Height * p_ThumbHeight / p_ImageData.p_Size.Y) == 0)
+								p_TumbnailImg_Rect = new System.Drawing.Rectangle(0, 0, Convert.ToInt32((double)p_View_Rect.Width * p_ThumbWidth / p_ImageData.p_Size.X), 2);
+							else
+								p_TumbnailImg_Rect = new System.Drawing.Rectangle(0, 0, Convert.ToInt32((double)p_View_Rect.Width * p_ThumbWidth / p_ImageData.p_Size.X), Convert.ToInt32((double)p_View_Rect.Height * p_ThumbHeight / p_ImageData.p_Size.Y));
+						}
+						else if (p_ImageData.GetBytePerPixel() == 3)
+						{
+							if (p_eColorViewMode == eColorViewMode.All)
+							{
+								if (p_ImageData.m_eMode == ImageData.eMode.MemoryRead)
+								{
+									Image<Rgb, byte> view = new Image<Rgb, byte>(p_CanvasWidth, p_CanvasHeight);
+									IntPtr ptrMemR = p_ImageData.GetPtr(0);
+									IntPtr ptrMemG = p_ImageData.GetPtr(1);
+									IntPtr ptrMemB = p_ImageData.GetPtr(2);
 
 
-                                    if (ptrMemR == IntPtr.Zero)
-                                        return;
+									if (ptrMemR == IntPtr.Zero)
+										return;
 
-                                    byte[,,] viewPtr = view.Data;
-                                    byte* imageptrR = (byte*)ptrMemR.ToPointer();
-                                    byte* imageptrG = (byte*)ptrMemG.ToPointer();
-                                    byte* imageptrB = (byte*)ptrMemB.ToPointer();
+									byte[,,] viewPtr = view.Data;
+									byte* imageptrR = (byte*)ptrMemR.ToPointer();
+									byte* imageptrG = (byte*)ptrMemG.ToPointer();
+									byte* imageptrB = (byte*)ptrMemB.ToPointer();
 
-                                    int viewrectY = p_View_Rect.Y;
-                                    int viewrectX = p_View_Rect.X;
-                                    int viewrectHeight = p_View_Rect.Height;
-                                    int viewrectWidth = p_View_Rect.Width;
-                                    int sizeX = p_ImageData.p_Size.X;
+									int viewrectY = p_View_Rect.Y;
+									int viewrectX = p_View_Rect.X;
+									int viewrectHeight = p_View_Rect.Height;
+									int viewrectWidth = p_View_Rect.Width;
+									int sizeX = p_ImageData.p_Size.X;
 
-                                    if (imageptrR == null)
-                                        return;
-                                    if (imageptrG == null)
-                                        return;
-                                    if (imageptrB == null)
-                                        return;
-                                    Parallel.For(0, p_CanvasHeight, (yy) =>
-                                    {
-                                        {
-                                            long pix_y = viewrectY + yy * viewrectHeight / p_CanvasHeight;
-                                            for (int xx = 0; xx < p_CanvasWidth; xx++)
-                                            {
-                                                long pix_x = viewrectX + xx * viewrectWidth / p_CanvasWidth;
+									if (imageptrR == null)
+										return;
+									if (imageptrG == null)
+										return;
+									if (imageptrB == null)
+										return;
+									Parallel.For(0, p_CanvasHeight, (yy) =>
+									{
+										{
+											long pix_y = viewrectY + yy * viewrectHeight / p_CanvasHeight;
+											for (int xx = 0; xx < p_CanvasWidth; xx++)
+											{
+												long pix_x = viewrectX + xx * viewrectWidth / p_CanvasWidth;
 
-                                                if (pix_x + (long)pix_y * sizeX >= 0)
-                                                {
-                                                    viewPtr[yy, xx, 0] = ApplyContrastAndBrightness(imageptrR[pix_x + (long)pix_y * sizeX]);
-                                                    viewPtr[yy, xx, 1] = ApplyContrastAndBrightness(imageptrG[pix_x + (long)pix_y * sizeX]);
-                                                    viewPtr[yy, xx, 2] = ApplyContrastAndBrightness(imageptrB[pix_x + (long)pix_y * sizeX]);
-                                                }
-                                            }
-                                        }
-                                    });
+												if (pix_x + (long)pix_y * sizeX >= 0)
+												{
+													viewPtr[yy, xx, 0] = ApplyContrastAndBrightness(imageptrR[(long)pix_x + (long)pix_y * sizeX]);
+													viewPtr[yy, xx, 1] = ApplyContrastAndBrightness(imageptrG[(long)pix_x + (long)pix_y * sizeX]);
+													viewPtr[yy, xx, 2] = ApplyContrastAndBrightness(imageptrB[(long)pix_x + (long)pix_y * sizeX]);
+												}
+											}
+										}
+									});
 
-                                    p_ImgSource = ImageHelper.ToBitmapSource(view);
-                                }
-                                else if (p_ImageData.m_eMode == ImageData.eMode.ImageBuffer)
-                                {
-                                    int canvasWidth = p_CanvasWidth; // 여기 잠시 수정
-                                    int canvasHeight = p_CanvasHeight;
-                                    Image<Rgb, byte> view = new Image<Rgb, byte>(canvasWidth, canvasHeight);
+									p_ImgSource = ImageHelper.ToBitmapSource(view);
 
-                                    if (this.p_ImageData == null)
-                                        return;
+									p_TumbnailImgMargin = new Thickness(Convert.ToInt32((double)p_View_Rect.X * p_ThumbWidth / p_ImageData.p_Size.X), Convert.ToInt32((double)p_View_Rect.Y * p_ThumbHeight / p_ImageData.p_Size.Y), 0, 0);
+									if (Convert.ToInt32((double)p_View_Rect.Height * p_ThumbHeight / p_ImageData.p_Size.Y) == 0)
+										p_TumbnailImg_Rect = new System.Drawing.Rectangle(0, 0, Convert.ToInt32((double)p_View_Rect.Width * p_ThumbWidth / p_ImageData.p_Size.X), 2);
+									else
+										p_TumbnailImg_Rect = new System.Drawing.Rectangle(0, 0, Convert.ToInt32((double)p_View_Rect.Width * p_ThumbWidth / p_ImageData.p_Size.X), Convert.ToInt32((double)p_View_Rect.Height * p_ThumbHeight / p_ImageData.p_Size.Y));
+								}
+								else if (!isUpdate && p_ImageData.m_eMode == ImageData.eMode.ImageBuffer)
+								{
+									isUpdate = true;
+									int canvasWidth = p_CanvasWidth; // 여기 잠시 수정
+									int canvasHeight = p_CanvasHeight;
+									Image<Rgb, byte> view = new Image<Rgb, byte>(canvasWidth, canvasHeight);
 
-                                    byte[,,] viewPtr = view.Data;
-                                    byte* imageptr = (byte*)p_ImageData.GetPtr();
+									if (this.p_ImageData == null)
+										return;
 
-                                    int viewrectY = p_View_Rect.Y;
-                                    int viewrectX = p_View_Rect.X;
-                                    int viewrectHeight = p_View_Rect.Height;
-                                    int viewrectWidth = p_View_Rect.Width;
-                                    int sizeX = p_ImageData.p_Size.X;
+									byte[,,] viewPtr = view.Data;
+									byte* imageptr = (byte*)p_ImageData.GetPtr();
 
-                                    Parallel.For(0, canvasHeight, (yy) =>
-                                    {
-                                        {
-                                            long pix_y = viewrectY + yy * viewrectHeight / canvasHeight;
-                                            for (int xx = 0; xx < canvasWidth; xx++)
-                                            {
-                                                long pix_x = viewrectX + xx * viewrectWidth / canvasWidth;
+									int viewrectY = p_View_Rect.Y;
+									int viewrectX = p_View_Rect.X;
+									int viewrectHeight = p_View_Rect.Height;
+									int viewrectWidth = p_View_Rect.Width;
+									int sizeX = p_ImageData.p_Size.X;
 
-                                                viewPtr[yy, xx, 0] = ApplyContrastAndBrightness(imageptr[(pix_x * this.p_ImageData.GetBytePerPixel() + 2) + (long)pix_y * (sizeX * 3)]);
-                                                viewPtr[yy, xx, 1] = ApplyContrastAndBrightness(imageptr[(pix_x * this.p_ImageData.GetBytePerPixel() + 1) + (long)pix_y * (sizeX * 3)]);
-                                                viewPtr[yy, xx, 2] = ApplyContrastAndBrightness(imageptr[(pix_x * this.p_ImageData.GetBytePerPixel() + 0) + (long)pix_y * (sizeX * 3)]);
-                                            }
-                                        }
-                                    });
+									Parallel.For(0, canvasHeight, (yy) =>
+									{
+										{
+											long pix_y = viewrectY + yy * viewrectHeight / canvasHeight;
+											for (int xx = 0; xx < canvasWidth; xx++)
+											{
+												long pix_x = viewrectX + xx * viewrectWidth / canvasWidth;
+												if (p_ImageData.m_aBuf.Length <= (pix_x * this.p_ImageData.GetBytePerPixel() + 2) + (long)pix_y * (sizeX * 3))
+												{
+													viewPtr[yy, xx, 0] = 0;
+													viewPtr[yy, xx, 1] = 0;
+													viewPtr[yy, xx, 2] = 0;
+												}
+												else
+												{
+													viewPtr[yy, xx, 0] = ApplyContrastAndBrightness(imageptr[(pix_x * this.p_ImageData.GetBytePerPixel() + 2) + (long)pix_y * (sizeX * 3)]);
+													viewPtr[yy, xx, 1] = ApplyContrastAndBrightness(imageptr[(pix_x * this.p_ImageData.GetBytePerPixel() + 1) + (long)pix_y * (sizeX * 3)]);
+													viewPtr[yy, xx, 2] = ApplyContrastAndBrightness(imageptr[(pix_x * this.p_ImageData.GetBytePerPixel() + 0) + (long)pix_y * (sizeX * 3)]);
+												}
 
-                                    p_ImgSource = ImageHelper.ToBitmapSource(view);
-                                }
-                            }
-                            else
-                            {
-                                Image<Gray, byte> view = new Image<Gray, byte>(p_CanvasWidth, p_CanvasHeight);
-                                IntPtr ptrMem = IntPtr.Zero;
-                                switch (p_eColorViewMode)
-                                {
-                                    case eColorViewMode.R:
-                                        ptrMem = p_ImageData.GetPtr(0);
-                                        break;
-                                    case eColorViewMode.G:
-                                        ptrMem = p_ImageData.GetPtr(1);
-                                        break;
-                                    case eColorViewMode.B:
-                                        ptrMem = p_ImageData.GetPtr(2);
-                                        break;
-                                }
+											}
+										}
+									});
 
-                                if (ptrMem == IntPtr.Zero)
-                                    return;
+									p_ImgSource = ImageHelper.ToBitmapSource(view);
+									isUpdate = false;
+								}
+							}
+							else
+							{
+								Image<Gray, byte> view = new Image<Gray, byte>(p_CanvasWidth, p_CanvasHeight);
+								IntPtr ptrMem = IntPtr.Zero;
+								switch (p_eColorViewMode)
+								{
+									case eColorViewMode.R:
+										ptrMem = p_ImageData.GetPtr(0);
+										break;
+									case eColorViewMode.G:
+										ptrMem = p_ImageData.GetPtr(1);
+										break;
+									case eColorViewMode.B:
+										ptrMem = p_ImageData.GetPtr(2);
+										break;
+								}
 
-                                byte[,,] viewPtr = view.Data;
-                                byte* imageptr = (byte*)ptrMem.ToPointer();
+								if (ptrMem == IntPtr.Zero)
+									return;
 
-                                int viewrectY = p_View_Rect.Y;
-                                int viewrectX = p_View_Rect.X;
-                                int viewrectHeight = p_View_Rect.Height;
-                                int viewrectWidth = p_View_Rect.Width;
-                                int sizeX = p_ImageData.p_Size.X;
+								byte[,,] viewPtr = view.Data;
+								byte* imageptr = (byte*)ptrMem.ToPointer();
 
-                                Parallel.For(0, p_CanvasHeight, (yy) =>
-                                {
-                                    //lock (o)
-                                    {
-                                        long pix_y = viewrectY + yy * viewrectHeight / p_CanvasHeight;
-                                        for (int xx = 0; xx < p_CanvasWidth; xx++)
-                                        {
-                                            long pix_x = viewrectX + xx * viewrectWidth / p_CanvasWidth;
-                                            viewPtr[yy, xx, 0] = ApplyContrastAndBrightness(imageptr[pix_x + (long)pix_y * sizeX]);
-                                        }
-                                    }
-                                });
+								int viewrectY = p_View_Rect.Y;
+								int viewrectX = p_View_Rect.X;
+								int viewrectHeight = p_View_Rect.Height;
+								int viewrectWidth = p_View_Rect.Width;
+								int sizeX = p_ImageData.p_Size.X;
 
-                                p_ImgSource = ImageHelper.ToBitmapSource(view);
-                            }
-                        }
-                    }
-                }
-                if (p_ROILayer != null)
-                    SetLayerSource();
-            }
-            catch (Exception ee)
-            {
-                TempLogger.Write("RootViewer", ee);
-                //System.Windows.MessageBox.Show(ee.ToString());
-            }
+								Parallel.For(0, p_CanvasHeight, (yy) =>
+								{
+									//lock (o)
+									{
+										long pix_y = viewrectY + yy * viewrectHeight / p_CanvasHeight;
+										for (int xx = 0; xx < p_CanvasWidth; xx++)
+										{
+											long pix_x = viewrectX + xx * viewrectWidth / p_CanvasWidth;
+											viewPtr[yy, xx, 0] = ApplyContrastAndBrightness(imageptr[pix_x + (long)pix_y * sizeX]);
+										}
+									}
+								});
 
-        }
+								p_ImgSource = ImageHelper.ToBitmapSource(view);
+							}
+						}
+					}
+				}
+				if (p_ROILayer != null)
+					SetLayerSource();
+			}
+			catch (Exception ee)
+			{
+				TempLogger.Write("RootViewer", ee);
+				//System.Windows.MessageBox.Show(ee.ToString());
+			}
+
+		}
         public virtual unsafe void SetLayerSource()
         {
             try
@@ -1084,59 +1103,59 @@ namespace RootTools
                         int layerMemWidth = p_ROILayer.p_Size.X;
                         int layerMemHeight = p_ROILayer.p_Size.Y;
                         
-                        int viewrectWidth = p_View_Rect.Width;
-                        int viewrectHeight = p_View_Rect.Height;
+                       int viewrectWidth = p_View_Rect.Width;
+                       int viewrectHeight = p_View_Rect.Height;
 
 
 
-                        Parallel.For(0, CanvasHeight, (yy) =>
-                        {
-                            long pix_y = viewrectY + yy * viewrectHeight / CanvasHeight;
-                            long pix_rect = pix_y * layerMemWidth;
+                       Parallel.For(0, CanvasHeight, (yy) =>
+                       {
+                           long pix_y = viewrectY + yy * viewrectHeight / CanvasHeight;
+                           long pix_rect = pix_y * layerMemWidth;
 
-                            if(pix_y < layerMemHeight)
-                            {
-                                for (int xx = 0; xx < CanvasWidth; xx++)
-                                {
-                                    long pix_x = viewrectX + xx * viewrectWidth / p_CanvasWidth;
+                           if(pix_y < layerMemHeight)
+                           {
+                               for (int xx = 0; xx < CanvasWidth; xx++)
+                               {
+                                   long pix_x = viewrectX + xx * viewrectWidth / p_CanvasWidth;
 
-                                    viewPtr[yy, xx, 3] = ApplyContrastAndBrightness(imageptr[3 + 4 * (pix_x + pix_rect)]); //0;
-                                    viewPtr[yy, xx, 2] = ApplyContrastAndBrightness(imageptr[2 + 4 * (pix_x + pix_rect)]); //0;//imageptr[0 + 3 * (pix_x + pix_rect)];
-                                    viewPtr[yy, xx, 1] = ApplyContrastAndBrightness(imageptr[1 + 4 * (pix_x + pix_rect)]); //0;//imageptr[1 + 3 * (pix_x + pix_rect)];
-                                    viewPtr[yy, xx, 0] = ApplyContrastAndBrightness(imageptr[0 + 4 * (pix_x + pix_rect)]); //0;//imageptr[2 + 3 * (pix_x + pix_rect)];
-                                }
-                            }
-                        });
+                                   viewPtr[yy, xx, 3] = ApplyContrastAndBrightness(imageptr[3 + 4 * (pix_x + pix_rect)]); //0;
+                                   viewPtr[yy, xx, 2] = ApplyContrastAndBrightness(imageptr[2 + 4 * (pix_x + pix_rect)]); //0;//imageptr[0 + 3 * (pix_x + pix_rect)];
+                                   viewPtr[yy, xx, 1] = ApplyContrastAndBrightness(imageptr[1 + 4 * (pix_x + pix_rect)]); //0;//imageptr[1 + 3 * (pix_x + pix_rect)];
+                                   viewPtr[yy, xx, 0] = ApplyContrastAndBrightness(imageptr[0 + 4 * (pix_x + pix_rect)]); //0;//imageptr[2 + 3 * (pix_x + pix_rect)];
+                               }
+                           }
+                       });
 
-                        byte[] pixels1d = new byte[(long)CanvasHeight * CanvasWidth * 4];
-                        WriteableBitmap wbitmap = new WriteableBitmap(CanvasWidth, CanvasHeight, 96, 96, PixelFormats.Bgra32, null);
+                       byte[] pixels1d = new byte[(long)CanvasHeight * CanvasWidth * 4];
+                       WriteableBitmap wbitmap = new WriteableBitmap(CanvasWidth, CanvasHeight, 96, 96, PixelFormats.Bgra32, null);
 
-                        Parallel.For(0, CanvasHeight, (row) =>
-                        {
-                            for (int col = 0; col < CanvasWidth; col++)
-                            {
-                                int index = col * 4 + row * CanvasWidth * 4;
-                                pixels1d[index] = ApplyContrastAndBrightness(viewPtr[row, col, 0]);
-                                pixels1d[index + 1] = ApplyContrastAndBrightness(viewPtr[row, col, 1]);
-                                pixels1d[index + 2] = ApplyContrastAndBrightness(viewPtr[row, col, 2]);
-                                pixels1d[index + 3] = ApplyContrastAndBrightness(viewPtr[row, col, 3]);
-                            }
-                        });
+                       Parallel.For(0, CanvasHeight, (row) =>
+                       {
+                           for (int col = 0; col < CanvasWidth; col++)
+                           {
+                               int index = col * 4 + row * CanvasWidth * 4;
+                               pixels1d[index] = ApplyContrastAndBrightness(viewPtr[row, col, 0]);
+                               pixels1d[index + 1] = ApplyContrastAndBrightness(viewPtr[row, col, 1]);
+                               pixels1d[index + 2] = ApplyContrastAndBrightness(viewPtr[row, col, 2]);
+                               pixels1d[index + 3] = ApplyContrastAndBrightness(viewPtr[row, col, 3]);
+                           }
+                       });
 
-                        Int32Rect rect = new Int32Rect(0, 0, CanvasWidth, CanvasHeight);
-                        int stride = 4 * CanvasWidth;
-                        wbitmap.WritePixels(rect, pixels1d, stride, 0);
-                        p_LayerSource = wbitmap;
-                        //p_LayerSource = ImageHelper.ToBitmapSource(view);
-                    }
+                       Int32Rect rect = new Int32Rect(0, 0, CanvasWidth, CanvasHeight);
+                       int stride = 4 * CanvasWidth;
+                       wbitmap.WritePixels(rect, pixels1d, stride, 0);
+                       p_LayerSource = wbitmap;
+                       //p_LayerSource = ImageHelper.ToBitmapSource(view);
+                   }
 
-                }
-            }
-            catch (Exception ee)
-            {
-                TempLogger.Write("RootViewer", ee);
-                //System.Windows.MessageBox.Show(ee.ToString());
-            }
+               }
+           }
+           catch (Exception ee)
+           {
+               TempLogger.Write("RootViewer", ee);
+               //System.Windows.MessageBox.Show(ee.ToString());
+           }
         }
 
         public virtual unsafe void SetMaskLayerSource()
@@ -1312,64 +1331,65 @@ namespace RootTools
         }
         public unsafe void SetThumNailIamgeSource()
         {
-            if (p_ImageData.GetBytePerPixel() == 1)
-            {
-                Image<Gray, byte> view = new Image<Gray, byte>(p_ThumbWidth, p_ThumbHeight);
-                IntPtr ptrMem = p_ImageData.GetPtr();
-                if (ptrMem == IntPtr.Zero)
-                    return;
-                int pix_x = 0;
-                int pix_y = 0;
+			if (p_ImageData.GetBytePerPixel() == 1)
+			{
+				Image<Gray, byte> view = new Image<Gray, byte>(p_ThumbWidth, p_ThumbHeight);
+				IntPtr ptrMem = p_ImageData.GetPtr();
+				if (ptrMem == IntPtr.Zero)
+					return;
+				int pix_x = 0;
+				int pix_y = 0;
 
-                for (int yy = 0; yy < p_ThumbHeight; yy++)
-                {
-                    for (int xx = 0; xx < p_ThumbWidth; xx++)
-                    {
-                        pix_x = xx * p_ImageData.p_Size.X / p_ThumbWidth;
-                        pix_y = yy * p_ImageData.p_Size.Y / p_ThumbHeight;
-                        view.Data[yy, xx, 0] = ApplyContrastAndBrightness(((byte*)ptrMem)[pix_x + (long)pix_y * p_ImageData.p_Size.X]);
-                    }
-                }
-                if (view.Width != 0 && view.Height != 0)
-                    p_ThumNailImgSource = ImageHelper.ToBitmapSource(view);
-            }
-            else if (p_ImageData.GetBytePerPixel() == 3)
-            {
-                Image<Rgb, byte> view = new Image<Rgb, byte>(p_ThumbWidth, p_ThumbHeight);
-                IntPtr ptrMemR = p_ImageData.GetPtr(2);
-                IntPtr ptrMemG = p_ImageData.GetPtr(1);
-                IntPtr ptrMemB = p_ImageData.GetPtr(0);
+				for (int yy = 0; yy < p_ThumbHeight; yy++)
+				{
+					for (int xx = 0; xx < p_ThumbWidth; xx++)
+					{
+						pix_x = xx * p_ImageData.p_Size.X / p_ThumbWidth;
+						pix_y = yy * p_ImageData.p_Size.Y / p_ThumbHeight;
+						view.Data[yy, xx, 0] = ApplyContrastAndBrightness(((byte*)ptrMem)[pix_x + (long)pix_y * p_ImageData.p_Size.X]);
+					}
+				}
+				if (view.Width != 0 && view.Height != 0)
+					p_ThumNailImgSource = ImageHelper.ToBitmapSource(view);
+			}
+			else if (p_ImageData.GetBytePerPixel() == 3)
+			{
+				Image<Rgb, byte> view = new Image<Rgb, byte>(p_ThumbWidth, p_ThumbHeight);
+				IntPtr ptrMemR = p_ImageData.GetPtr(2);
+				IntPtr ptrMemG = p_ImageData.GetPtr(1);
+				IntPtr ptrMemB = p_ImageData.GetPtr(0);
 
 
-                if (ptrMemR == IntPtr.Zero)
-                    return;
+				if (ptrMemR == IntPtr.Zero)
+					return;
 
-                byte[,,] viewPtr = view.Data;
-                byte* imageptrR = (byte*)ptrMemR.ToPointer();
-                byte* imageptrG = (byte*)ptrMemG.ToPointer();
-                byte* imageptrB = (byte*)ptrMemB.ToPointer();
+				byte[,,] viewPtr = view.Data;
+				byte* imageptrR = (byte*)ptrMemR.ToPointer();
+				byte* imageptrG = (byte*)ptrMemG.ToPointer();
+				byte* imageptrB = (byte*)ptrMemB.ToPointer();
 
-                if (ptrMemR == IntPtr.Zero)
-                    return;
-                int pix_x = 0;
-                int pix_y = 0;
+				if (ptrMemR == IntPtr.Zero)
+					return;
+				int pix_x = 0;
+				int pix_y = 0;
 
-                for (int yy = 0; yy < p_ThumbHeight; yy++)
-                {
-                    pix_y = yy * p_ImageData.p_Size.Y / p_ThumbHeight;
-                    for (int xx = 0; xx < p_ThumbWidth; xx++)
-                    {
-                        pix_x = xx * p_ImageData.p_Size.X / p_ThumbWidth;
-                        view.Data[yy, xx, 2] = ApplyContrastAndBrightness(((byte*)imageptrR)[0 + (pix_x + (long)pix_y * p_ImageData.p_Size.X)]);
-                        view.Data[yy, xx, 1] = ApplyContrastAndBrightness(((byte*)imageptrG)[1 + (pix_x + (long)pix_y * p_ImageData.p_Size.X)]);
-                        view.Data[yy, xx, 0] = ApplyContrastAndBrightness(((byte*)imageptrB)[2 + (pix_x + (long)pix_y * p_ImageData.p_Size.X)]);
-                    }
-                }
-                if (view.Width != 0 && view.Height != 0)
-                    p_ThumNailImgSource = ImageHelper.ToBitmapSource(view);
-            }
 
-        }
+				for (int yy = 0; yy < p_ThumbHeight; yy++)
+				{
+					pix_y = yy * p_ImageData.p_Size.Y / p_ThumbHeight;
+					for (int xx = 0; xx < p_ThumbWidth; xx++)
+					{
+						pix_x = xx * p_ImageData.p_Size.X / p_ThumbWidth;
+						view.Data[yy, xx, 2] = ApplyContrastAndBrightness(((byte*)imageptrR)[0 + (pix_x + (long)pix_y * p_ImageData.p_Size.X)]);
+						view.Data[yy, xx, 1] = ApplyContrastAndBrightness(((byte*)imageptrG)[1 + (pix_x + (long)pix_y * p_ImageData.p_Size.X)]);
+						view.Data[yy, xx, 0] = ApplyContrastAndBrightness(((byte*)imageptrB)[2 + (pix_x + (long)pix_y * p_ImageData.p_Size.X)]);
+					}
+				}
+				if (view.Width != 0 && view.Height != 0)
+					p_ThumNailImgSource = ImageHelper.ToBitmapSource(view);
+			}
+
+		}
         public System.Windows.Media.Color GetPixelColor(BitmapSource source, int x, int y)
         {
             System.Windows.Media.Color c = System.Windows.Media.Colors.White;
@@ -1407,6 +1427,28 @@ namespace RootTools
             }
 
         }
+
+        public virtual unsafe void DrawLineBitmap(CPoint startPt, CPoint endPt, int thickness, byte r, byte g, byte b, byte a, CPoint offset = null)
+        {
+            if (offset == null) offset = new CPoint(0, 0);
+
+            startPt.X = startPt.X - offset.X - 1;
+            startPt.Y = startPt.Y - offset.Y - 1;
+            endPt.X = endPt.X - offset.X - 1;
+            endPt.Y = endPt.Y - offset.Y - 1;
+
+            List<CPoint> ListMemoryPoint = new List<CPoint>();
+
+            double angle = Math.Atan2(endPt.Y - startPt.Y, endPt.X - startPt.X);
+
+            ListMemoryPoint.Add(new CPoint((int)(startPt.X + thickness * Math.Cos(angle + Math.PI / 2)), (int)(startPt.Y + thickness * Math.Sin(angle + Math.PI / 2))));
+            ListMemoryPoint.Add(new CPoint((int)(startPt.X + thickness * Math.Cos(angle - Math.PI / 2)), (int)(startPt.Y + thickness * Math.Sin(angle - Math.PI / 2))));
+            ListMemoryPoint.Add(new CPoint((int)(endPt.X + thickness * Math.Cos(angle - Math.PI / 2)), (int)(endPt.Y + thickness * Math.Sin(angle - Math.PI / 2))));
+            ListMemoryPoint.Add(new CPoint((int)(endPt.X + thickness * Math.Cos(angle + Math.PI / 2)), (int)(endPt.Y + thickness * Math.Sin(angle + Math.PI / 2))));
+
+            DrawPolygonBitmap(ListMemoryPoint, r, g, b, a);
+        }
+
         public virtual unsafe void DrawRectBitmap(CRect rect, byte r, byte g, byte b, byte a, CPoint offset = null)
         {
             if (offset == null) offset = new CPoint(0, 0);
@@ -1426,6 +1468,117 @@ namespace RootTools
             });
         }
 
+        public virtual unsafe void DrawPolygonBitmap(List<CPoint> ListMemoryPoint, byte r, byte g, byte b, byte a, CPoint offset = null)
+        {
+            if (offset == null) offset = new CPoint(0, 0);
+
+            for (int i = 0; i < ListMemoryPoint.Count; i++)
+            {
+                ListMemoryPoint[i].X = ListMemoryPoint[i].X - offset.X - 1;
+                ListMemoryPoint[i].Y = ListMemoryPoint[i].Y - offset.Y - 1;
+            }
+
+            int maxY = 0;
+            int minY = 0;
+            int k = 0;
+            int temp = 0;
+            int[] ptX = new int[p_CanvasWidth];
+            List<ScanLine> ListScanLines = new List<ScanLine>();
+
+            for (int i = 0; i < ListMemoryPoint.Count; i++)
+            {
+                if (i == ListMemoryPoint.Count - 1)
+                {
+                    if (ListMemoryPoint[i].Y == ListMemoryPoint[0].Y)
+                    {
+                        continue;
+                    }
+
+                    ListScanLines.Add(new ScanLine(ListMemoryPoint[i], ListMemoryPoint[0]));
+                    maxY = Math.Max(maxY, Math.Max(ListMemoryPoint[i].Y, ListMemoryPoint[0].Y));
+                    minY = Math.Min(minY, Math.Min(ListMemoryPoint[i].Y, ListMemoryPoint[0].Y));
+                }
+                else
+                {
+                    if (ListMemoryPoint[i].Y == ListMemoryPoint[i + 1].Y)
+                    {
+                        continue;
+                    }
+
+                    ListScanLines.Add(new ScanLine(ListMemoryPoint[i], ListMemoryPoint[i + 1]));
+                    maxY = Math.Max(maxY, Math.Max(ListMemoryPoint[i].Y, ListMemoryPoint[0].Y));
+                    minY = Math.Min(minY, Math.Min(ListMemoryPoint[i].Y, ListMemoryPoint[0].Y));
+                }
+            }
+
+            for (int y = minY; y < maxY; y++)
+            {
+                k = 0;
+                for (int i = 0; i < ListScanLines.Count; i++)
+                {
+                    if ((ListScanLines[i].StartPt.Y <= y && ListScanLines[i].EndPt.Y > y) || (ListScanLines[i].StartPt.Y > y && ListScanLines[i].EndPt.Y <= y))
+                    {
+                        ptX[k] = (int)(ListScanLines[i].StartPt.X + ListScanLines[i].slope * (y - ListScanLines[i].StartPt.Y));
+                        k = k + 1;
+                    }
+                }
+
+                for (int i = 0; i < k - 1; i++)
+                {
+                    if (ptX[i] > ptX[i + 1])
+                    {
+                        temp = ptX[i];
+                        ptX[i] = ptX[i + 1];
+                        ptX[i + 1] = temp;
+                    }
+                }
+
+                for (int i = 0; i < k; i += 2)
+                {
+                    for (int x = ptX[i]; x <= ptX[i + 1]; x++)
+                    {
+                        CPoint pixelPt = new CPoint(x, y);
+                        DrawPixelBitmap(pixelPt, r, g, b, a);
+                    }
+                }
+            }
+        }
+
+        public virtual unsafe void DrawCircleBitmap(TEllipse circle, byte r, byte g, byte b, byte a, CPoint offset = null)
+        {
+            if (offset == null) offset = new CPoint(0, 0);
+
+            circle.MemoryRect.Left = circle.MemoryRect.Left - offset.X - 1;
+            circle.MemoryRect.Right = circle.MemoryRect.Right - offset.X - 1;
+            circle.MemoryRect.Top = circle.MemoryRect.Top - offset.Y - 1;
+            circle.MemoryRect.Bottom = circle.MemoryRect.Bottom - offset.Y - 1;
+
+            int temp = 0;
+            int[] ptX = new int[2];
+
+            int x0 = circle.MemoryRect.Left + circle.MemoryRect.Width / 2;
+            int y0 = circle.MemoryRect.Top + circle.MemoryRect.Height / 2;
+
+            for (int y = circle.MemoryRect.Top; y < circle.MemoryRect.Bottom + 1; y++)
+            {
+                ptX[0] = (int)Math.Sqrt(Math.Pow(circle.MemoryRect.Width / 2, 2) * (1 - Math.Pow(y - y0, 2) / Math.Pow(circle.MemoryRect.Height / 2, 2))) + x0;
+                ptX[1] = 2 * x0 - ptX[0];
+
+                if (ptX[0] > ptX[1])
+                {
+                    temp = ptX[0];
+                    ptX[0] = ptX[1];
+                    ptX[1] = temp;
+                }
+
+                for (int x = ptX[0]; x <= ptX[1]; x++)
+                {
+                    CPoint pixelPt = new CPoint(x, y);
+                    DrawPixelBitmap(pixelPt, r, g, b, a);
+                }
+            }
+        }
+
         public virtual unsafe void DrawPixelBitmap(CPoint memPt, byte r, byte g, byte b, byte a)
         {
             IntPtr ptrMem = p_ROILayer.GetPtr();
@@ -1438,6 +1591,7 @@ namespace RootTools
             imagePtr[(memPt.Y * p_ROILayer.p_Size.X + memPt.X) * 4 + 2] = r; // r
             imagePtr[(memPt.Y * p_ROILayer.p_Size.X + memPt.X) * 4 + 3] = a; // a
         }
+
         public virtual unsafe void DrawPixelBitmap(byte* imagePtr, CPoint memPt, byte r, byte g, byte b, byte a)
         {
             imagePtr[(memPt.Y * p_ROILayer.p_Size.X + memPt.X) * 4 + 0] = b; // b
@@ -1445,6 +1599,7 @@ namespace RootTools
             imagePtr[(memPt.Y * p_ROILayer.p_Size.X + memPt.X) * 4 + 2] = r; // r
             imagePtr[(memPt.Y * p_ROILayer.p_Size.X + memPt.X) * 4 + 3] = a; // a
         }
+
         public virtual unsafe void DrawPixelBitmap(CPoint memPt, byte value, CPoint offset = null)
         {
             if (offset == null) offset = new CPoint(0, 0);

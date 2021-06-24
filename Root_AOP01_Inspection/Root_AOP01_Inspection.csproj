@@ -181,6 +181,7 @@
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Windows.Interactivity">
       <HintPath>..\packages\System.Windows.Interactivity.WPF.2.0.20525\lib\net40\System.Windows.Interactivity.dll</HintPath>
     </Reference>
@@ -227,6 +228,10 @@
     <Compile Include="Module\Loadport_AOP01.cs" />
     <Compile Include="Module\RTR_RND.cs" />
     <Compile Include="Module\FFU.cs" />
+    <Compile Include="UI\1. SETUP\4. GEM\Other_Panel.xaml.cs">
+      <DependentUpon>Other_Panel.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\1. SETUP\4. GEM\Other_ViewModel.cs" />
     <Compile Include="UI\3. RUN\ManualJobSchedule.cs" />
     <Compile Include="UI\3. RUN\Dlg_Start.xaml.cs">
       <DependentUpon>Dlg_Start.xaml</DependentUpon>
@@ -330,6 +335,10 @@
     <Page Include="UI\1. SETUP\2. RecipeWizard\Panel\Recipe45DGlass_Panel.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\1. SETUP\4. GEM\Other_Panel.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UI\3. RUN\Dlg_Start.xaml">
       <SubType>Designer</SubType>

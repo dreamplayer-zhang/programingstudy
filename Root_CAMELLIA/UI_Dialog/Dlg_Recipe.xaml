@@ -7,44 +7,20 @@
         xmlns:local="clr-namespace:Root_CAMELLIA" WindowStyle="None"
         xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
         ResizeMode="NoResize"
-        WindowStartupLocation="Manual" Left="300" Top="20"
+        WindowStartupLocation="Manual" Left="60" Top="60"
         WindowState="Normal"
         Width="1940" Height="1030"
         BorderBrush="Black" BorderThickness="1"
         Background="White"
         mc:Ignorable="d" SizeToContent="WidthAndHeight"
-        Title="Dlg_">
+        Title="Recipe Creator">
     <i:Interaction.Triggers>
-        <i:EventTrigger EventName="Loaded">
-            <i:InvokeCommandAction Command="{Binding LoadedCommand}" />
-        </i:EventTrigger>
         <i:EventTrigger EventName="Unloaded">
             <i:InvokeCommandAction Command="{Binding UnloadedCommand}" />
         </i:EventTrigger>
     </i:Interaction.Triggers>
     <Window.Resources>
         <local:MapModeToBoolConverter x:Key="ModeConverter"/>
-        <DataTemplate DataType="{x:Type local:Dlg_RecipeManager_ViewModel}" >
-            <local:Dlg_RecipeManager DataContext="{Binding}"/>
-        </DataTemplate>
-
-        <DataTemplate DataType="{x:Type local:SequenceRecipe_ViewModel}" >
-            <local:SequenceRecipe DataContext="{Binding}"/>
-        </DataTemplate>
-
-        <!--<DataTemplate x:Name="pmThicknessView" DataType="{x:Type local:PM_Thickness_ViewModel}" >
-            <local:PM_Thickness DataContext="{Binding}"/>
-        </DataTemplate>
-
-        <DataTemplate x:Name="pmSensorHoleOffsetView" DataType="{x:Type local:PM_SensorHoleOffset_ViewModel}" >
-            <local:PM_SensorHoleOffset DataContext="{Binding}"/>
-        </DataTemplate>
-
-        <DataTemplate x:Name="pmSensorCameraTiltView" DataType="{x:Type local:PM_SensorCameraTilt_ViewModel}" >
-            <local:PM_SensorCameraTilt DataContext="{Binding}"/>
-        </DataTemplate>-->
-        
-        
     </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
@@ -132,7 +108,16 @@
                 </Grid>
             </Border>
             <Grid Grid.Column="1" Width="auto" Height="auto">
-                <ContentControl DataContext="{Binding p_DataContext}" Content="{Binding}"/>
+                <StackPanel>
+                    <Grid Visibility="{Binding p_SequenceRecipeVisible, UpdateSourceTrigger=PropertyChanged}">
+                        <local:SequenceRecipe DataContext="{Binding sequenceRecipe_ViewModel}"/>
+                    </Grid>
+                    <Grid Visibility="{Binding p_RecipeVisible, UpdateSourceTrigger=PropertyChanged}">
+                        <local:Dlg_RecipeManager DataContext="{Binding recipeManager_ViewModel}"/>
+                    </Grid>
+                </StackPanel>
+                
+               <!--<ContentControl DataContext="{Binding p_DataContext}" Content="{Binding}"/>-->
             </Grid>
         </Grid>
     </Grid>

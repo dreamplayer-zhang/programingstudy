@@ -140,6 +140,8 @@ void IP::Threshold(BYTE* pSrc, BYTE* pDst, int nMemW, int nMemH, Point ptLT, Poi
         cv::threshold(imgSrc, imgDst, thresh, 255, CV_THRESH_BINARY_INV);
     else
         cv::threshold(imgSrc, imgDst, thresh, 255, CV_THRESH_BINARY);
+
+    delete[] imgROI;
 }
 
 float IP::Average(BYTE* pSrc, int nW, int nH)
@@ -161,6 +163,8 @@ float IP::Average(BYTE* pSrc, int nMemW, int nMemH, Point ptLT, Point ptRB)
     }
 
     Mat imgSrc = Mat(roiH, roiW, CV_8UC1, imgROI);
+
+    delete[] imgROI;
 
     return (cv::sum(cv::sum(imgSrc)))[0] / (roiW * roiH); // mean 함수의 return Type = Scalar
 
@@ -338,6 +342,7 @@ float IP::TemplateMatching(BYTE* pSrc, BYTE* pTemp, Point& outMatchPoint, int nM
         minMaxLoc(result, NULL, &chMax, NULL, &outMatchPoint); // 완벽하게 매칭될 경우 1
     }
 
+    delete[] imgROI;
 
     return (chMax * 100 > 1) ? chMax * 100 : 1; // Matching Score
 }
@@ -585,6 +590,9 @@ void IP::SelectMinDiffinArea(BYTE* pSrc, BYTE* pDst, int imgNum, int nMemW, int 
     }
     
     Mat imgDst = Mat(nChipH, nChipW, CV_8UC1, pDst); // Golden Image Debug
+
+    delete[] pRefChipLT;
+    delete[] pRefIdx;
 }
 Point IP::FindMinDiffLoc(BYTE* pSrc, BYTE* pInOutTarget, int nTargetW, int nTargetH, int nTrigger)
 {
@@ -871,6 +879,8 @@ void IP::CreateGoldenImage_Median(BYTE* pSrc, BYTE* pDst, int imgNum, int nMemW,
 
         pResult += nChipW;
     }
+
+    delete[] pChipLT;
     //Mat imgDst = Mat(nChipH, nChipW, CV_8UC1, pDst); // Golden Image Debug
 }
 void IP::CreateGoldenImage_MedianAvg(BYTE* pSrc, BYTE* pDst, int imgNum, int nMemW, int nMemH, std::vector<Point> vtROILT, int nChipW, int nChipH)
@@ -1098,6 +1108,8 @@ void IP::CreateGoldenImage_MedianAvg(BYTE* pSrc, BYTE* pDst, int imgNum, int nMe
 
         pResult += nChipW;
     }
+
+    delete[] pChipLT;
     //Mat imgDst = Mat(nChipH, nChipW, CV_8UC1, pDst); // Golden Image Debug
 }
 // OpenCV로 개발... 느려서 안씀
@@ -1256,6 +1268,9 @@ void IP::MergeImage_Average(BYTE* pSrc, BYTE* pDst, int imgNum, int nMemW, int n
         for (int k = 0; k < imgNum; k++)
             pChipLT[k] += nMemW;
     }
+
+    delete[] p;
+    delete[] pChipLT;
 }
 
 // D2D 3.0
@@ -1767,6 +1782,8 @@ void IP::SaveDefectListBMP(String sFilePath, BYTE* pSrc, int nW, int nH, Rect De
 		resize(saveROI, saveROI, Size(640, 480));
 
 	imwrite(Path, saveROI);
+
+    delete[] defectROI;
 }
 void IP::SaveDefectListBMP(String sFilePath, BYTE* pSrc, int nW, int nH, std::vector<Rect> DefectRect)
 {
@@ -1891,6 +1908,8 @@ void IP::SaveDefectListBMP_Color(String sFilePath, BYTE* pR, BYTE* pG, BYTE* pB,
 			resize(saveROI, saveROI, Size(640, 480));
 
 		BGR[2 - ch] = saveROI;
+
+        delete[] defectROI;
 	}
 	Mat colorImg;
 	cv::merge(BGR, 3, colorImg);
@@ -1960,6 +1979,8 @@ void IP::SaveDefectListBMP_Color(String sFilePath, BYTE* pR, BYTE* pG, BYTE* pB,
                 resize(saveROI, saveROI, Size(640, 480));
 
             BGR[2 - ch] = saveROI;
+
+            delete[] defectROI;
         }
         Mat colorImg;
         cv::merge(BGR, 3, colorImg);
@@ -2116,7 +2137,7 @@ void IP::FitEllipse(BYTE* pSrc, BYTE* pDst, int nW, int nH)
 }
 
 // Edge Box
-int IP::FindEdge(BYTE* pSrc, int nMemW, int nMemH, Point ptLT, Point ptRB, int nDir, int nSearchLevel)
+int IP::FindEdge(BYTE* pSrc, int nMemW, int nMemH, Point ptLT, Point ptRB, int nDir, int nSearchLevel, int nByte /*= 1*/)
 {
     // nDir : 0 (To Right), 1 (To Left), 2 (To Bottom), 3 (To Top)
 
@@ -2135,9 +2156,9 @@ int IP::FindEdge(BYTE* pSrc, int nMemW, int nMemH, Point ptLT, Point ptRB, int n
     long nX2 = ptRB.x;
     long nY1 = ptLT.y;
     long nY2 = ptRB.y;
-    int nMin = 255;
-    int nMax = 0;
-    int nEdge = 0;
+    long nMin = pow(2, nByte * 8) - 1;
+    long nMax = 0;
+    long nEdge = 0;
 
     switch (nDir)
     {
@@ -2153,7 +2174,11 @@ int IP::FindEdge(BYTE* pSrc, int nMemW, int nMemH, Point ptLT, Point ptRB, int n
 
             for (long r = nY1; r <= nY2; r++)
             {
-                nAverage += pSrc[r * nMemW + c];
+                LONGLONG idx = ((LONGLONG)r * nMemW + c) * nByte;
+                for (long i = 0; i < nByte; i++)
+                {
+                    nAverage += (pSrc[idx + i] << (i * 8));
+                }
             }
 
             nAverage /= nCount;
@@ -2199,7 +2224,11 @@ int IP::FindEdge(BYTE* pSrc, int nMemW, int nMemH, Point ptLT, Point ptRB, int n
 
             for (long r = nY1; r <= nY2; r++)
             {
-                nAverage += pSrc[r * nMemW + c];
+                LONGLONG idx = ((LONGLONG)r * nMemW + c) * nByte;
+                for (long i = 0; i < nByte; i++)
+                {
+                    nAverage += (pSrc[idx + i] << (i * 8));
+                }
             }
 
             nAverage /= nCount;
@@ -2245,7 +2274,11 @@ int IP::FindEdge(BYTE* pSrc, int nMemW, int nMemH, Point ptLT, Point ptRB, int n
 
             for (long c = nX1; c <= nX2; c++)
             {
-                nAverage += pSrc[r * nMemW + c];
+                LONGLONG idx = ((LONGLONG)r * nMemW + c) * nByte;
+                for (long i = 0; i < nByte; i++)
+                {
+                    nAverage += (pSrc[idx + i] << (i * 8));
+                }
             }
 
             nAverage /= nCount;
@@ -2291,7 +2324,11 @@ int IP::FindEdge(BYTE* pSrc, int nMemW, int nMemH, Point ptLT, Point ptRB, int n
 
             for (long c = nX1; c <= nX2; c++)
             {
-                nAverage += pSrc[r * nMemW + c];
+                LONGLONG idx = ((LONGLONG)r * nMemW + c) * nByte;
+                for (long i = 0; i < nByte; i++)
+                {
+                    nAverage += (pSrc[idx + i] << (i * 8));
+                }
             }
 
             nAverage /= nCount;

@@ -31,6 +31,107 @@ namespace Root_WIND2.UI_User
 
         #endregion
 
+        #region [Properties]
+        private bool isColorChecked = true;
+        public bool IsColorChecked
+        {
+            get => this.isColorChecked;
+            set
+            {
+                if (value == true)
+                {
+                    this.IsRChecked = false;
+                    this.IsGChecked = false;
+                    this.IsBChecked = false;
+                }
+                p_eColorViewMode = eColorViewMode.All;
+                SetProperty<bool>(ref this.isColorChecked, value);
+            }
+        }
+
+        private bool isRChecked = false;
+        public bool IsRChecked
+        {
+            get => this.isRChecked;
+            set
+            {
+                if (value == true)
+                {
+                    this.IsColorChecked = false;
+                    this.IsGChecked = false;
+                    this.IsBChecked = false;
+                }
+                p_eColorViewMode = eColorViewMode.R;
+                SetProperty<bool>(ref this.isRChecked, value);
+            }
+        }
+
+        private bool isGChecked = false;
+        public bool IsGChecked
+        {
+            get => this.isGChecked;
+            set
+            {
+                if (value == true)
+                {
+                    this.IsRChecked = false;
+                    this.IsColorChecked = false;
+                    this.IsBChecked = false;
+                }
+                p_eColorViewMode = eColorViewMode.G;
+                SetProperty<bool>(ref this.isGChecked, value);
+            }
+        }
+
+        private bool isBChecked = false;
+        public bool IsBChecked
+        {
+            get => this.isBChecked;
+            set
+            {
+                if (value == true)
+                {
+                    this.IsRChecked = false;
+                    this.IsGChecked = false;
+                    this.IsColorChecked = false;
+                }
+                p_eColorViewMode = eColorViewMode.B;
+                SetProperty<bool>(ref this.isBChecked, value);
+            }
+        }
+
+        private bool isDefectChecked = true;
+        public bool IsDefectChecked
+        {
+            get => this.isDefectChecked;
+            set
+            {
+                if (value)
+                {
+                    foreach (TRect rt in rectList)
+                    {
+                        if (p_DrawElement.Contains(rt.UIElement) == false)
+                        {
+                            p_DrawElement.Add(rt.UIElement);
+                        }
+                    }
+                }
+                else
+                {
+                    foreach (TRect rt in rectList)
+                    {
+                        if (p_DrawElement.Contains(rt.UIElement) == true)
+                        {
+                            p_DrawElement.Remove(rt.UIElement);
+                        }
+                    }
+                }
+
+                SetProperty(ref this.isDefectChecked, value);
+            }
+        }
+        #endregion
+
         public class DrawDefines
         {
             public static int RectTickness = 4;
@@ -306,7 +407,8 @@ namespace Root_WIND2.UI_User
 
             rectList.Add(tRect);
 
-            p_DrawElement.Add(rt);
+            if(this.IsDefectChecked == true)
+                p_DrawElement.Add(rt);
         }
 
 
@@ -354,11 +456,15 @@ namespace Root_WIND2.UI_User
             p_DrawElement.Add(grid);
         }
 
+        bool isRedrawing = false;
         private void RedrawShapes()
         {
-            foreach (TRect rt in rectList)
+            if (isRedrawing == true) return;
+            isRedrawing = true;
+
+            if(this.IsDefectChecked == true)
             {
-                if (p_DrawElement.Contains(rt.UIElement) == true)
+                foreach (TRect rt in rectList)
                 {
                     Rectangle rectangle = rt.UIElement as Rectangle;
                     CPoint canvasLeftTop = GetCanvasPoint(new CPoint(rt.MemoryRect.Left, rt.MemoryRect.Top));
@@ -369,11 +475,18 @@ namespace Root_WIND2.UI_User
 
                     Canvas.SetLeft(rectangle, canvasLeftTop.X);
                     Canvas.SetTop(rectangle, canvasLeftTop.Y);
+
+                    if (p_DrawElement.Contains(rt.UIElement) == false)
+                    {
+                        p_DrawElement.Add(rt.UIElement);
+                    }
                 }
             }
 
             DrawSearchedCircle();
             DrawExclusivePolygon();
+
+            isRedrawing = false;
         }
 
         public void RemoveObjectsByTag(string tag)

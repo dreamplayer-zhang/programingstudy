@@ -62,7 +62,7 @@ namespace Root_AOP01_Inspection.UI_UserControl
         private void M_timer_Tick(object sender, EventArgs e)
         {
             Placed.Background = m_loadport.m_diPlaced.p_bIn == false ? Brushes.SteelBlue : Brushes.LightGray;
-            Present.Background = m_loadport.m_diPresent.p_bIn == false ? Brushes.SteelBlue : Brushes.LightGray;
+            Present.Background = m_loadport.p_diPresent.p_bIn == false ? Brushes.SteelBlue : Brushes.LightGray;
             Load.Background = m_loadport.m_bLoadCheck == true ? Brushes.SteelBlue : Brushes.LightGray;
             UnLoad.Background = m_loadport.m_bUnLoadCheck == true ? Brushes.SteelBlue : Brushes.LightGray;
             Alarm.Background = m_loadport.p_eState == ModuleBase.eState.Error ? Brushes.Red : Brushes.LightGray;
@@ -137,7 +137,7 @@ namespace Root_AOP01_Inspection.UI_UserControl
         private void ButtonUnLoadReq_Click(object sender, RoutedEventArgs e)
         {
             if (IsEnableUnloadReq() == false) return;
-            m_loadport.m_ceidUnloadReq.Send();
+            //m_loadport.m_ceidUnloadReq.Send();
         }
     }
 }

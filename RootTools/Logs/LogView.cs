@@ -122,7 +122,7 @@ namespace RootTools
         {
             m_client = new TCPAsyncClient(EQ.m_sModel + ".Log", null);
             m_client.p_nPort = 7065;
-            m_client.EventReciveData += M_client_EventReciveData;
+            m_client.EventReceiveData += M_client_EventReciveData;
         }
 
         private void M_client_EventReciveData(byte[] aBuf, int nSize, Socket socket)

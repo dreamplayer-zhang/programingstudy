@@ -29,6 +29,9 @@ namespace Root_WIND2.Module
         AxisXY m_axisXY;
         DIO_O m_doVac;
         DIO_O m_doBlow;
+        DIO_I m_diReadyX;
+        DIO_I m_diReadyY;
+        
         MemoryPool m_memoryPool;
         MemoryGroup m_memoryGroup;
         MemoryData m_memoryMain;
@@ -91,6 +94,8 @@ namespace Root_WIND2.Module
                 p_sInfo = m_toolBox.GetAxis(ref m_axisXY, this, "Axis XY");
                 p_sInfo = m_toolBox.GetDIO(ref m_doVac, this, "Stage Vacuum");
                 p_sInfo = m_toolBox.GetDIO(ref m_doBlow, this, "Stage Blow");
+                p_sInfo = m_toolBox.GetDIO(ref m_diReadyX, this, "Stage Ready X");
+                p_sInfo = m_toolBox.GetDIO(ref m_diReadyY, this, "Stage Ready Y");
                 p_sInfo = m_toolBox.Get(ref m_lightSet, this);
                 p_sInfo = m_toolBox.GetCamera(ref m_CamMain, this, "MainCam");
                 p_sInfo = m_toolBox.GetCamera(ref m_CamAlign, this, "AlignCam");
@@ -204,12 +209,12 @@ namespace Root_WIND2.Module
                 base.Reset();
             }
         }
-            
+
         public override void InitMemorys()
         {
             m_memoryGroup = m_memoryPool.GetGroup(p_id);
             m_memoryMain = m_memoryGroup.CreateMemory("Main", 3, 1, 40000, 40000);
-            m_memoryLayer = m_memoryGroup.CreateMemory("Layer", 1, 4, 30000, 30000); // Chip 크기 최대 30,000 * 30,000 고정 Origin ROI 메모리 할당 20.11.02 JTL 
+            m_memoryLayer = m_memoryGroup.CreateMemory("Layer", 1, 4, 30000, 30000); // Chip ?�기 최�? 30,000 * 30,000 고정 Origin ROI 메모�??�당 20.11.02 JTL 
         }
         #endregion
 
@@ -316,8 +321,13 @@ namespace Root_WIND2.Module
                 m_axisRotate.WaitReady();
                 m_axisZ.WaitReady();
 
+                DoVac.Write(false);
                 ClearData();
-                return "OK";
+
+                if (!m_diReadyX.p_bIn || !m_diReadyY.p_bIn)
+                    return "Ready Fail";
+                else
+                    return "OK";
             }
         }
 
@@ -333,18 +343,34 @@ namespace Root_WIND2.Module
                 m_axisXY.WaitReady();
                 m_axisRotate.WaitReady();
                 m_axisZ.WaitReady();
+                DoVac.Write(false);
+                if (!m_diReadyX.p_bIn || !m_diReadyY.p_bIn)
+                    return "Ready Fail";
+                else
+                    return "OK";
                 return "OK";
             }
         }
 
         public string AfterGet(int nID)
         {
-            return "OK";
+            if (p_eRemote == eRemote.Client)
+                return RemoteRun(eRemoteRun.AfterGet, eRemote.Client, nID);
+            else
+            {
+                return "OK";
+            }
         }
 
         public string AfterPut(int nID)
         {
-            return "OK";
+            if (p_eRemote == eRemote.Client)
+                return RemoteRun(eRemoteRun.AfterPut, eRemote.Client, nID);
+            else
+            {
+                m_doVac.Write(true);
+                return "OK";
+            }
         }
 
         enum eCheckWafer
@@ -396,7 +422,8 @@ namespace Root_WIND2.Module
         public override string StateHome()
         {
             if (EQ.p_bSimulate) return "OK";
-            if (p_eRemote == eRemote.Client) return RemoteRun(eRemoteRun.StateHome, eRemote.Client, null);
+            if (p_eRemote == eRemote.Client) 
+                return RemoteRun(eRemoteRun.StateHome, eRemote.Client, null);
             else
             {
                 //            p_bStageBlow = false;
@@ -410,7 +437,7 @@ namespace Root_WIND2.Module
 
                 //if (m_CamAutoFocus != null)
                 //    m_CamAutoFocus.Connect();
-
+                p_bStageVac = true;
                 p_sInfo = base.StateHome();
                 p_eState = (p_sInfo == "OK") ? eState.Ready : eState.Error;
                 //p_bStageVac = false;
@@ -464,6 +491,8 @@ namespace Root_WIND2.Module
             Reset,
             BeforeGet,
             BeforePut,
+            AfterGet,
+            AfterPut,
         }
 
         Run_Remote GetRemoteRun(eRemoteRun eRemoteRun, eRemote eRemote, dynamic value)
@@ -478,6 +507,12 @@ namespace Root_WIND2.Module
                 case eRemoteRun.Reset: break;
                 case eRemoteRun.BeforeGet: run.m_nID = value; break;
                 case eRemoteRun.BeforePut: run.m_nID = value; break;
+                case eRemoteRun.AfterGet:
+                    run.m_nID = value;
+                    break;
+                case eRemoteRun.AfterPut:
+                    run.m_nID = value;
+                    break;
             }
             return run;
         }
@@ -489,7 +524,8 @@ namespace Root_WIND2.Module
             while (run.p_eRunState != ModuleRunBase.eRunState.Done)
             {
                 Thread.Sleep(10);
-                if (EQ.IsStop()) return "EQ Stop";
+                if (EQ.IsStop()) 
+                    return "EQ Stop";
             }
             return p_sInfo;
         }
@@ -540,6 +576,10 @@ namespace Root_WIND2.Module
                     case eRemoteRun.Reset: m_module.Reset(); break;
                     case eRemoteRun.BeforeGet: return m_module.BeforeGet(m_nID);
                     case eRemoteRun.BeforePut: return m_module.BeforePut(m_nID);
+                    case eRemoteRun.AfterGet:
+                        return m_module.AfterGet(m_nID);
+                    case eRemoteRun.AfterPut:
+                        return m_module.AfterPut(m_nID);
                 }
                 return "OK";
             }
@@ -554,12 +594,10 @@ namespace Root_WIND2.Module
             AddModuleRunList(new Run_Rotate(this), false, "Rotate Axis");
             AddModuleRunList(new Run_GrabLineScan(this), true, "Run Grab LineScan Camera");
             AddModuleRunList(new Run_Inspect(this), true, "Run Inspect");
+            AddModuleRunList(new Run_InspectOnly(this), true, "Run InspectOnly");
             AddModuleRunList(new Run_VisionAlign(this), true, "Run VisionAlign");
             AddModuleRunList(new Run_AutoFocus(this), false, "Run AutoFocus");
         }
-
-        
-
         #endregion
     }
 }

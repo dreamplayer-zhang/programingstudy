@@ -56,26 +56,29 @@ namespace Root_EFEM.Module
 
         public override void GetTools(bool bInit)
         {
-            p_sInfo = m_toolBox.GetAxis(ref axisZ, this, "Axis Z");
-            p_sInfo = m_toolBox.GetAxis(ref axisXY, this, "Axis XY");
-            p_sInfo = m_toolBox.GetDIO(ref doVac, this, "Stage Vacuum");
-            p_sInfo = m_toolBox.GetDIO(ref doBlow, this, "Stage Blow");
-            p_sInfo = m_toolBox.GetDIO(ref diWaferExist, this, "Wafer Exist");
-            p_sInfo = m_toolBox.GetDIO(ref diWaferExistVac, this, "Wafer Exist Vac Check");
-            p_sInfo = m_toolBox.GetDIO(ref di_test1, this, "ESide Elec Panel Top door");
-            p_sInfo = m_toolBox.GetDIO(ref di_test2, this, "ESide Elec Panel Bottom door");
-            p_sInfo = m_toolBox.GetDIO(ref di_test3, this, "Eside PC Door Sensor");
-            p_sInfo = m_toolBox.GetDIO(ref di_test4, this, "Eside Top Loof Door Sensor");
+            if (p_eRemote != eRemote.Client)
+            {
+                p_sInfo = m_toolBox.GetAxis(ref axisZ, this, "Axis Z");
+                p_sInfo = m_toolBox.GetAxis(ref axisXY, this, "Axis XY");
+                p_sInfo = m_toolBox.GetDIO(ref doVac, this, "Stage Vacuum");
+                p_sInfo = m_toolBox.GetDIO(ref doBlow, this, "Stage Blow");
+                p_sInfo = m_toolBox.GetDIO(ref diWaferExist, this, "Wafer Exist");
+                p_sInfo = m_toolBox.GetDIO(ref diWaferExistVac, this, "Wafer Exist Vac Check");
+                p_sInfo = m_toolBox.GetDIO(ref di_test1, this, "ESide Elec Panel Top door");
+                p_sInfo = m_toolBox.GetDIO(ref di_test2, this, "ESide Elec Panel Bottom door");
+                p_sInfo = m_toolBox.GetDIO(ref di_test3, this, "Eside PC Door Sensor");
+                p_sInfo = m_toolBox.GetDIO(ref di_test4, this, "Eside Top Loof Door Sensor");
 
+                p_sInfo = m_toolBox.Get(ref lightSet, this);
+                p_sInfo = m_toolBox.GetCamera(ref camMain, this, "MainCam");
+                p_sInfo = m_toolBox.GetCamera(ref camLADS, this, "LADSCam");
+                if (camLADS != null)
+                    camLADS.Connect();
+            }
             p_sInfo = m_toolBox.Get(ref memoryPool, this, "Memory", 1);
-            p_sInfo = m_toolBox.Get(ref lightSet, this);
-            p_sInfo = m_toolBox.GetCamera(ref camMain, this, "MainCam");
-            p_sInfo = m_toolBox.GetCamera(ref camLADS, this, "LADSCam");
             memoryGroup = memoryPool.GetGroup(p_id);
             alid_WaferExist = m_gaf.GetALID(this, "Wafer Exist", "Wafer Exist");
             m_remote.GetTools(bInit);
-            if (camLADS != null)
-                camLADS.Connect();
         }
         #endregion
 
@@ -213,6 +216,11 @@ namespace Root_EFEM.Module
 
         public string IsGetOK(int nID)
         {
+            if (p_eRemote == eRemote.Client)
+            {
+                return "OK";
+            }
+
             if (p_eState != eState.Ready)
                 return p_id + " eState not Ready";
             //if (p_infoWafer == null)
@@ -222,6 +230,11 @@ namespace Root_EFEM.Module
 
         public string IsPutOK(InfoWafer infoWafer, int nID)
         {
+            if (p_eRemote == eRemote.Client)
+            {
+                return "OK";
+            }
+
             if (p_eState != eState.Ready)
                 return p_id + " eState not Ready";
             //if (p_infoWafer != null)
@@ -327,22 +340,26 @@ namespace Root_EFEM.Module
         {
             if (EQ.p_bSimulate)
                 return "OK";
-            //            p_bStageBlow = false;
-            //            p_bStageVac = true;
-            Thread.Sleep(200);
+            if (p_eRemote == eRemote.Client) return RemoteRun(eRemoteRun.StateHome, eRemote.Client, null);
+            else
+            {
+                //            p_bStageBlow = false;
+                //            p_bStageVac = true;
+                Thread.Sleep(200);
 
-            if (camMain != null && camMain.p_CamInfo.p_eState == eCamState.Init)
-                camMain.Connect();
+                if (camMain != null && camMain.p_CamInfo.p_eState == eCamState.Init)
+                    camMain.Connect();
 
 
-            base.StateHome();
+                base.StateHome();
 
-            p_eState = (p_sInfo == "OK") ? eState.Ready : eState.Error;
+                p_eState = (p_sInfo == "OK") ? eState.Ready : eState.Error;
 
-            if (diWaferExist.p_bIn == false)
-                p_bStageVac = false;
+                if (diWaferExist.p_bIn == false)
+                    p_bStageVac = false;
 
-            return p_sInfo;
+                return p_sInfo;
+            }
         }
         #endregion
 

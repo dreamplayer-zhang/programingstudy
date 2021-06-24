@@ -21,5 +21,25 @@ namespace RootTools_Vision
                 SetProperty(ref useProcessDefectEdge, value);
             }
         }
+
+        private bool useMergeDefect = true;
+        public bool UseMergeDefect
+        {
+            get => this.useMergeDefect;
+            set
+            {
+                SetProperty(ref this.useMergeDefect, value);
+            }
+        }
+
+        private int mergeDefectDistance = 2;
+        public int MergeDefectDistnace
+        {
+            get => this.mergeDefectDistance;
+            set
+            {
+                SetProperty(ref this.mergeDefectDistance, value);
+            }
+        }
     }
 }

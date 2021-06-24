@@ -34,7 +34,18 @@ namespace Root_WindII.Engineer
         public ModuleList p_moduleList { get; set; }
         public EFEM_Recipe m_recipe;
         public EFEM_Process m_process;
-        
+        WIND2 m_WIND2;
+        public WIND2 p_WIND2
+        {
+            get
+            {
+                return m_WIND2;
+            }
+            set
+            {
+                SetProperty(ref m_WIND2, value);
+            }
+        }
         private Vision_Frontside m_visionFront;
         public Vision_Frontside p_VisionFront
 		{
@@ -47,13 +58,18 @@ namespace Root_WindII.Engineer
             p_moduleList = new ModuleList(m_engineer);
             InitWTR();
             InitLoadport();
-
+            InitAligner();
             m_visionFront = new Vision_Frontside("Vision", m_engineer, ModuleBase.eRemote.Server);
             InitModule(m_visionFront);
+            ((IWTR)m_wtr).AddChild((IWTRChild)m_visionFront);
 
+            
 
             InitVision();
             //InitBackside(ModuleBase.eRemote.Client);
+            p_WIND2 = new WIND2("WIND2", m_engineer);
+            InitModule(p_WIND2);
+
 
             m_wtr.RunTree(Tree.eMode.RegRead);
             m_wtr.RunTree(Tree.eMode.Init);
@@ -184,7 +200,34 @@ namespace Root_WindII.Engineer
         }
         #endregion
 
+        #region Module Aligner
+        enum eAligner
+        {
+            None,
+            ATI,
+            RND
+        }
+        eAligner m_eAligner = eAligner.ATI;
+        void InitAligner()
+        {
+            ModuleBase module = null;
+            switch (m_eAligner)
+            {
+                case eAligner.ATI: module = new Aligner_ATI("Aligner", m_engineer); break;
+                case eAligner.RND: module = new Aligner_RND("Aligner", m_engineer); break;
+            }
+            if (module != null)
+            {
+                InitModule(module);
+                ((IWTR)m_wtr).AddChild((IWTRChild)module);
+            }
+        }
 
+        public void RunTreeAligner(Tree tree)
+        {
+            m_eAligner = (eAligner)tree.Set(m_eAligner, m_eAligner, "Type", "Aligner Type");
+        }
+        #endregion
 
         #region Module Vision
         enum eVision
@@ -356,7 +399,7 @@ namespace Root_WindII.Engineer
         void CalcDockingUndocking()
         {
             List<EFEM_Process.Sequence> aSequence = new List<EFEM_Process.Sequence>();
-            while (m_process.m_qSequence.Count > 0) aSequence.Add(m_process.m_qSequence.Dequeue());
+            while (m_process.p_qSequence.Count > 0) aSequence.Add(m_process.p_qSequence.Dequeue());
             List<ILoadport> aDock = new List<ILoadport>();
             foreach (ILoadport loadport in m_aLoadport)
             {
@@ -365,7 +408,7 @@ namespace Root_WindII.Engineer
             while (aSequence.Count > 0)
             {
                 EFEM_Process.Sequence sequence = aSequence[0];
-                m_process.m_qSequence.Enqueue(sequence);
+                m_process.p_qSequence.Enqueue(sequence);
                 aSequence.RemoveAt(0);
                 for (int n = aDock.Count - 1; n >= 0; n--)
                 {
@@ -373,7 +416,7 @@ namespace Root_WindII.Engineer
                     {
                         ModuleRunBase runUndocking = aDock[n].GetModuleRunUndocking().Clone();
                         EFEM_Process.Sequence sequenceUndock = new EFEM_Process.Sequence(runUndocking, sequence.m_infoWafer);
-                        m_process.m_qSequence.Enqueue(sequenceUndock);
+                        m_process.p_qSequence.Enqueue(sequenceUndock);
                         aDock.RemoveAt(n);
                     }
                 }
@@ -404,7 +447,7 @@ namespace Root_WindII.Engineer
         public void CheckFinish()
         {
             if (m_gem.p_cjRun == null) return;
-            if (m_process.m_qSequence.Count > 0) return;
+            if (m_process.p_qSequence.Count > 0) return;
             foreach (GemPJ pj in m_gem.p_cjRun.m_aPJ)
             {
                 m_gem?.SendPJComplete(pj.m_sPJobID);
@@ -448,7 +491,7 @@ namespace Root_WindII.Engineer
                         if (p_moduleList.m_qModuleRun.Count == 0)
                         {
                             m_process.p_sInfo = m_process.RunNextSequence();
-                            if ((EQ.p_nRnR > 1) && (m_process.m_qSequence.Count == 0))
+                            if ((EQ.p_nRnR > 1) && (m_process.p_qSequence.Count == 0))
                             {
                                 m_process.p_sInfo = m_process.AddInfoWafer(m_infoRnRSlot);
                                 CalcSequence();
@@ -467,6 +510,7 @@ namespace Root_WindII.Engineer
         {
             RunTreeWTR(tree.GetTree("WTR"));
             RunTreeLoadport(tree.GetTree("Loadport"));
+            RunTreeAligner(tree.GetTree("Aligner"));
             RunTreeVision(tree.GetTree("Vision"));
             //m_bBackside = tree.Set(m_bBackside, m_bBackside, "Backside", "Use Backside");
         }

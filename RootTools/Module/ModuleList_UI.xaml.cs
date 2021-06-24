@@ -34,11 +34,13 @@ namespace RootTools.Module
         {
             ModuleListRun();
         }
+
         public void ModuleListRun()
         {
             foreach (ModuleRunBase moduleRun in m_moduleList.p_moduleList)
             {
                 m_moduleList.p_Percent = "0";
+                m_moduleList.p_nTotalRnR = 0;
                 moduleRun.p_nProgress = 0;
                 moduleRun.p_eRunState = ModuleRunBase.eRunState.Ready;
             }
@@ -137,6 +139,13 @@ namespace RootTools.Module
         {
             m_moduleList.p_visibleRnR = Visibility.Hidden;
             m_moduleRunList.Clear();
+            InitModuleRunNames();
+        }
+
+        private void buttonUndo_Click(object sender, RoutedEventArgs e)
+        {
+            m_moduleList.p_visibleRnR = Visibility.Hidden;
+            m_moduleRunList.Undo();
             InitModuleRunNames();
         }
 
