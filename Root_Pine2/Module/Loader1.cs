@@ -239,12 +239,15 @@ namespace Root_Pine2.Module
                 Boats boats2D = m_handler.m_aBoats[Vision2D.eVision.Top2D];
                 foreach (Vision2D.eWorks eWorks in Enum.GetValues(typeof(Vision2D.eWorks)))
                 {
-                    if (boats2D.m_aBoat[eWorks].p_eStep == Boat.eStep.Done) return StartLoad(Vision2D.eVision.Top2D, eWorks);
+                    if (boats2D.m_aBoat[eWorks].IsDone()) return StartLoad(Vision2D.eVision.Top2D, eWorks);
                 }
                 Boats boats3D = m_handler.m_aBoats[Vision2D.eVision.Top3D];
                 foreach (Vision2D.eWorks eWorks in Enum.GetValues(typeof(Vision2D.eWorks)))
                 {
-                    if ((boats3D.m_aBoat[eWorks].p_eStep == Boat.eStep.Done) && (boats2D.m_aBoat[eWorks].p_infoStrip == null)) return StartLoad(Vision2D.eVision.Top3D, eWorks);
+                    if (boats3D.m_aBoat[eWorks].IsDone())
+                    {
+                        if (boats2D.m_aBoat[eWorks].p_infoStrip == null) return StartLoad(Vision2D.eVision.Top3D, eWorks);
+                    }
                 }
             }
             return "OK";

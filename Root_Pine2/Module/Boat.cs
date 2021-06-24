@@ -33,6 +33,11 @@ namespace Root_Pine2.Module
             }
         }
 
+        public bool IsDone()
+        {
+            return p_eStep == eStep.Done; 
+        }
+
         BackgroundWorker m_bgwRunReady = new BackgroundWorker();
         private void M_bgwRunReady_DoWork(object sender, DoWorkEventArgs e)
         {
