@@ -26,6 +26,7 @@ namespace RootTools_Vision.WorkManager3
         private WorkPipeLine pipeLine;
 
         private int threadNum;
+        private bool useCopyBuffer;
 
         private ConcurrentQueue<Workplace> currentWorkplaceQueue;
         #endregion
@@ -146,6 +147,7 @@ namespace RootTools_Vision.WorkManager3
             pipeLine = new WorkPipeLine(inspectionThreadNum, bCopyBuffer);
 
             this.threadNum = inspectionThreadNum;
+            this.useCopyBuffer = bCopyBuffer;
 
             WorkEventManager.PositionDone += PositionDone_Callback;
 
@@ -227,8 +229,9 @@ namespace RootTools_Vision.WorkManager3
             this.currentWorkplaceQueue = 
                 RecipeToWorkplaceConverter.ConvertToQueue(this.recipe, this.sharedBuffer, this.cameraInfo);
 
-            if(pipeLine.Stop() == false)
+            if (pipeLine.Stop() == false)
             {
+                this.pipeLine = new WorkPipeLine(threadNum, useCopyBuffer);
                 this.pipeLine.Reset();
                 TempLogger.Write("Worker", "PipeLine Initialize");
             }
@@ -236,6 +239,8 @@ namespace RootTools_Vision.WorkManager3
             {
 
             }
+
+            //this.pipeLine = new WorkPipeLine(threadNum, useCopyBuffer);
 
             if (lotInfo == null)
                 DatabaseManager.Instance.SetLotinfo(DateTime.Now, DateTime.Now, Path.GetFileName(this.recipe.RecipePath));
@@ -274,7 +279,12 @@ namespace RootTools_Vision.WorkManager3
 
         public void Stop()
         {
-            pipeLine.Stop();
+            if(pipeLine != null)
+                pipeLine.Stop();
+
+            //pipeLine = null;
+
+            this.currentWorkplaceBundle = null;
 
             GC.Collect();
         }

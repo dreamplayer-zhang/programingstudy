@@ -75,6 +75,8 @@ namespace Root_Pine2.Module
                     if (m_dioHome.p_bIn) EQ.p_eState = EQ.eState.Home; 
                     break;
                 case EQ.eState.Ready:
+                    m_dioHome.Write(bBlink);
+                    if (m_dioHome.p_bIn) EQ.p_eState = EQ.eState.Home;
                     m_dioStart.Write(bBlink);
                     if (m_dioStart.p_bIn) EQ.p_eState = EQ.eState.Run;
                     m_dioReset.Write(bBlink);
@@ -196,21 +198,9 @@ namespace Root_Pine2.Module
 
             public void RunLamp(bool bBlink)
             {
-                switch (EQ.p_eState)
-                {
-                    case EQ.eState.Init:
-                        m_doLamp.AllOff();
-                        m_doLamp.Write(eLamp.Yellow, bBlink);
-                        break;
-                    case EQ.eState.Home:
-                        m_doLamp.Write(eLamp.Yellow, true);
-                        m_doLamp.Write(eLamp.Green, true);
-                        m_doLamp.Write(eLamp.Red, true);
-                        break;
-                    case EQ.eState.Ready: m_doLamp.Write(eLamp.Yellow); break;
-                    case EQ.eState.Run: m_doLamp.Write(eLamp.Green); break;
-                    case EQ.eState.Error: m_doLamp.Write(eLamp.Red); break;
-                }
+                m_doLamp.Write(eLamp.Yellow, bBlink && ((EQ.p_eState == EQ.eState.Ready) || (EQ.p_eState == EQ.eState.Home)));
+                m_doLamp.Write(eLamp.Green, bBlink && ((EQ.p_eState == EQ.eState.Run) || (EQ.p_eState == EQ.eState.Home)));
+                m_doLamp.Write(eLamp.Red, bBlink && ((EQ.p_eState == EQ.eState.Error) || (EQ.p_eState == EQ.eState.Home)));
             }
         }
         Lamp m_lamp = new Lamp();
@@ -334,6 +324,7 @@ namespace Root_Pine2.Module
 
             string Send(Data data)
             {
+                if (data == null) return "OK"; 
                 m_modbus[data.m_nComm].Connect(); 
                 return m_modbus[data.m_nComm].WriteHoldingRegister((byte)data.m_nUnit, 1, data.m_aSend); 
             }
@@ -383,6 +374,7 @@ namespace Root_Pine2.Module
             }
         }
 
+        public double m_widthDefaultStrip = 95; 
         double _widthStrip = 95;
         public double p_widthStrip
         {
@@ -392,6 +384,19 @@ namespace Root_Pine2.Module
                 if (_widthStrip == value) return;
                 _widthStrip = value;
                 OnPropertyChanged();
+            }
+        }
+
+        public double m_thicknessDefault = 0;
+        double _thickness = 0;
+        public double p_thickness
+        {
+            get { return _thickness; }
+            set
+            {
+                if (_thickness == value) return;
+                _thickness = value;
+                OnPropertyChanged(); 
             }
         }
 
@@ -501,13 +506,17 @@ namespace Root_Pine2.Module
         {
             base.RunTree(tree);
             m_buzzer.RunTree(tree.GetTree("Buzzer")); 
-            p_eMode = (eRunMode)tree.Set(p_eMode, p_eMode, "Mode", "RunMode");
-            p_widthStrip = tree.Set(p_widthStrip, p_widthStrip, "Width", "Strip Width (mm)");
-            p_lStack = tree.Set(p_lStack, p_lStack, "Stack Count", "Strip Max Stack Count");
-            p_lStackPaper = tree.Set(p_lStackPaper, p_lStackPaper, "Paper Count", "Paper Max Stack Count");
+            p_eMode = (eRunMode)tree.GetTree("Mode").Set(p_eMode, p_eMode, "Mode", "RunMode");
+            p_b3D = tree.GetTree("Mode").Set(p_b3D, p_b3D, "3D", "RunMode");
+            p_widthStrip = tree.GetTree("Strip").Set(p_widthStrip, p_widthStrip, "Width", "Strip Width (mm)");
+            p_thickness = tree.GetTree("Strip").Set(p_thickness, p_thickness, "Thickness", "Strip Thickness (um)");
+            m_widthDefaultStrip = tree.GetTree("Default Strip").Set(m_widthDefaultStrip, m_widthDefaultStrip, "Width", "Strip Width (mm)");
+            m_thicknessDefault = tree.GetTree("Default Strip").Set(m_thicknessDefault, m_thicknessDefault, "Thickness", "Strip Thickness (um)");
+            p_lStack = tree.GetTree("Stack").Set(p_lStack, p_lStack, "Stack Count", "Strip Max Stack Count");
+            p_lStackPaper = tree.GetTree("Stack").Set(p_lStackPaper, p_lStackPaper, "Paper Count", "Paper Max Stack Count");
             if (tree.p_treeRoot.p_eMode != Tree.eMode.RegRead)
             {
-                p_sRecipe = tree.Set(p_sRecipe, p_sRecipe, "Recipe", "Recipe");
+                p_sRecipe = tree.GetTree("Mode").Set(p_sRecipe, p_sRecipe, "Recipe", "Recipe");
             }
         }
         #endregion

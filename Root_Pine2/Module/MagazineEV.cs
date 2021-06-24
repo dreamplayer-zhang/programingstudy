@@ -188,12 +188,12 @@ namespace Root_Pine2.Module
             }
 
             double m_dSlot = 6000;
-            public string MoveToTransfer(InfoStrip infoStrip)
+            public string MoveToTransfer(InfoStrip infoStrip, double dZ)
             {
                 if (m_conveyor.IsCheck(Conveyor.eCheck.Inside)) return "Conveyer Inside Sensor Checked";
                 m_infoStripPos = null;
                 ePos ePos = (infoStrip.p_eMagazinePos == InfoStrip.eMagazinePos.Up) ? ePos.TransferUp : ePos.TransferDown;
-                m_axis.StartMove(ePos, -m_dSlot * infoStrip.p_nStrip);
+                m_axis.StartMove(ePos, dZ - m_dSlot * infoStrip.p_nStrip);
                 string sMove = m_axis.WaitReady();
                 if (sMove == "OK") m_infoStripPos = infoStrip;
                 return sMove;
@@ -249,18 +249,17 @@ namespace Root_Pine2.Module
                 {
                     Thread.Sleep(10);
                     if (EQ.IsStop()) return "EQ Stop"; 
-                    if (m_diProduct.ReadDI(eMagazinePos)) return "OK";
+                    if (m_bProduct[eMagazinePos]) return "OK";
                 }
             }
 
-            public bool IsProduct(InfoStrip.eMagazinePos eMagazinePos)
+            public Dictionary<InfoStrip.eMagazinePos, bool> m_bProduct = new Dictionary<InfoStrip.eMagazinePos, bool>();
+            public bool m_bProtrude = false; 
+            public void ThreadCheck()
             {
-                return m_diProduct.ReadDI(eMagazinePos); 
-            }
-
-            public bool IsProtrude()
-            {
-                return m_diProtrude.p_bIn; 
+                m_bProduct[InfoStrip.eMagazinePos.Up] = m_diProduct.ReadDI(InfoStrip.eMagazinePos.Up);
+                m_bProduct[InfoStrip.eMagazinePos.Down] = m_diProduct.ReadDI(InfoStrip.eMagazinePos.Down);
+                m_bProtrude = m_diProtrude.p_bIn;
             }
             #endregion
 
@@ -273,10 +272,12 @@ namespace Root_Pine2.Module
             Conveyor m_conveyor; 
             public Elevator(Conveyor conveyor)
             {
-                m_conveyor = conveyor; 
+                m_conveyor = conveyor;
+                m_bProduct.Add(InfoStrip.eMagazinePos.Up, false);
+                m_bProduct.Add(InfoStrip.eMagazinePos.Down, false);
             }
         }
-        Elevator m_elevator;
+        public Elevator m_elevator;
         #endregion
 
         #region Stack
@@ -475,7 +476,7 @@ namespace Root_Pine2.Module
                 p_eState = eState.Ready;
                 return "OK";
             }
-            if ((m_aMagazine[InfoStrip.eMagazinePos.Down] != null) || m_elevator.IsProduct(InfoStrip.eMagazinePos.Down)) return "Remove Down Magazine";
+            if ((m_aMagazine[InfoStrip.eMagazinePos.Down] != null) || m_elevator.m_bProduct[InfoStrip.eMagazinePos.Down]) return "Remove Down Magazine";
             p_sInfo = base.StateHome();
             p_eState = (p_sInfo == "OK") ? eState.Ready : eState.Error;
             p_sLED = "MGZ" + ((int)p_eMagazine).ToString();
@@ -523,7 +524,7 @@ namespace Root_Pine2.Module
         {
             try
             {
-                if (m_elevator.IsProduct(eMagazinePos)) return "Magazine Product Sensor Checked";
+                if (m_elevator.m_bProduct[eMagazinePos]) return "Magazine Product Sensor Checked";
                 if (Run(m_elevator.MoveToConveyor(eMagazinePos, (m_pine2.p_eMode == Pine2.eRunMode.Magazine) ? 0 : -7))) return p_sInfo;
                 if (m_conveyor.CheckExist() == false) return "Conveyer Sensor not Detected";
                 if (Run(m_elevator.RunAlign(false))) return p_sInfo;
@@ -556,14 +557,14 @@ namespace Root_Pine2.Module
             switch (m_pine2.p_eMode)
             {
                 case Pine2.eRunMode.Magazine:
-                    if ((m_aMagazine[InfoStrip.eMagazinePos.Down] != null) || m_elevator.IsProduct(InfoStrip.eMagazinePos.Down))
+                    if ((m_aMagazine[InfoStrip.eMagazinePos.Down] != null) || m_elevator.m_bProduct[InfoStrip.eMagazinePos.Down])
                     {
                         sRun = RunUnload(InfoStrip.eMagazinePos.Down); 
                         m_aMagazine[InfoStrip.eMagazinePos.Down] = null;
                         if (Run(m_elevator.RunAlign(true))) return p_sInfo;
                         return sRun;
                     }
-                    if ((m_aMagazine[InfoStrip.eMagazinePos.Up] != null) || m_elevator.IsProduct(InfoStrip.eMagazinePos.Up))
+                    if ((m_aMagazine[InfoStrip.eMagazinePos.Up] != null) || m_elevator.m_bProduct[InfoStrip.eMagazinePos.Up])
                     {
                         sRun = RunUnload(InfoStrip.eMagazinePos.Up); 
                         m_aMagazine[InfoStrip.eMagazinePos.Up] = null;
@@ -618,19 +619,41 @@ namespace Root_Pine2.Module
         #endregion
 
         #region Move Transfer
-        public string StartMoveTransfer(InfoStrip infoStrip)
+        public string StartMoveTransfer(InfoStrip infoStrip, double dZ)
         {
             if (m_elevator.IsSamePos(infoStrip)) return "OK";
             Run_MoveTransfer run = (Run_MoveTransfer)m_runMoveTransfer.Clone();
-            run.m_infoStrip = infoStrip; 
+            run.m_infoStrip = infoStrip;
+            run.m_dZ = dZ; 
             return StartRun(run); 
         }
 
-        public string RunMoveTransfer(InfoStrip infoStrip)
+        public string RunMoveTransfer(InfoStrip infoStrip, double dZ)
         {
             if (infoStrip == null) return "InfoStrip not Found";
             p_sLED = infoStrip.m_sLED; 
-            return m_elevator.MoveToTransfer(infoStrip);
+            return m_elevator.MoveToTransfer(infoStrip, dZ);
+        }
+        #endregion
+
+        #region Check Thread
+        Thread m_threadCheck;
+        bool m_bThreadCheck = false; 
+        void InitThread()
+        {
+            m_threadCheck = new Thread(new ThreadStart(RunThreadCheck));
+            m_threadCheck.Start();
+        }
+
+        void RunThreadCheck()
+        {
+            m_bThreadCheck = true;
+            Thread.Sleep(5000);
+            while (m_bThreadCheck)
+            {
+                Thread.Sleep(10);
+                m_elevator.ThreadCheck(); 
+            }
         }
         #endregion
 
@@ -657,10 +680,16 @@ namespace Root_Pine2.Module
             m_nUnitLED = (int)eMagazine + 1; 
             m_pine2 = pine2; 
             base.InitBase(p_id, engineer);
+            InitThread(); 
         }
 
         public override void ThreadStop()
         {
+            if (m_bThreadCheck)
+            {
+                m_bThreadCheck = false;
+                m_threadCheck.Join();
+            }
             base.ThreadStop();
         }
 
@@ -820,22 +849,25 @@ namespace Root_Pine2.Module
                 InitModuleRun(module);
             }
 
-            public InfoStrip m_infoStrip; 
+            public InfoStrip m_infoStrip;
+            public double m_dZ = 0; 
             public override ModuleRunBase Clone()
             {
                 Run_MoveTransfer run = new Run_MoveTransfer(m_module);
-                run.m_infoStrip = m_infoStrip.Clone(); 
+                run.m_infoStrip = m_infoStrip.Clone();
+                run.m_dZ = m_dZ; 
                 return run;
             }
 
             public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
             {
-                m_infoStrip.RunTreeMagazine(tree, bVisible); 
+                m_infoStrip.RunTreeMagazine(tree, bVisible);
+                m_dZ = tree.Set(m_dZ, m_dZ, "dZ", "Z Offset (pulse)", bVisible); 
             }
 
             public override string Run()
             {
-                return m_module.RunMoveTransfer(m_infoStrip);
+                return m_module.RunMoveTransfer(m_infoStrip, m_dZ);
             }
         }
         #endregion

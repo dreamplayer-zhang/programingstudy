@@ -95,7 +95,8 @@ namespace Root_Pine2.Module
         void CalcSnapPos(Vision2D.Recipe.Snap snapData)
         {
             double pStart = m_axis.GetPosValue(ePos.SnapStart) + m_yScale * snapData.m_dpAxis.Y;
-            double pEnd = m_pSnap[0] + m_yScale * m_mmSnap;
+            double pEnd = pStart + m_yScale * m_mmSnap;
+            //double pEnd = m_pSnap[0] + m_yScale * m_mmSnap;
             m_axis.m_trigger.m_aPos[0] = pStart;
             m_axis.m_trigger.m_aPos[1] = pEnd; 
             double dpAcc = m_yScale * m_mmAcc; 
@@ -126,7 +127,8 @@ namespace Root_Pine2.Module
         {
             try
             {
-                m_axis.RunTrigger(true);
+                m_axis.SetTrigger(m_axis.m_trigger.m_aPos[0], m_axis.m_trigger.m_aPos[1], m_axis.m_trigger.m_dPos, true);
+                //m_axis.RunTrigger(true);
                 m_axis.StartMove(m_pSnap[1], "Snap");
                 return m_axis.WaitReady();
 
@@ -151,6 +153,7 @@ namespace Root_Pine2.Module
         public void RunVacuum(bool bOn)
         {
             m_doVacuumPump.Write(bOn);
+            for (int n = 0; n < 4; n++) m_doVacuum.Write(n, bOn); 
         }
 
         public void RunBlow(bool bBlow)
@@ -209,8 +212,9 @@ namespace Root_Pine2.Module
             m_recipe = new Vision2D.Recipe(boats.m_vision, eWorks);
         }
 
-        public void ThreadStop()
+        public void RunThreadStop()
         {
+            RunMove(ePos.Handler); 
         }
     }
 }

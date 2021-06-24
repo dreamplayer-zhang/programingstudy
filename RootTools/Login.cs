@@ -43,7 +43,7 @@ namespace RootTools
             public bool CheckLogin(string sPassword, string sUserName)
             {
                 if (sPassword != m_sPassword) return false;
-                if (sUserName == "") return true;
+                if (sUserName == "") return false;
                 return (sUserName == m_id); 
             }
         }

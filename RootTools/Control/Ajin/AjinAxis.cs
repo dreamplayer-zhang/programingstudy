@@ -55,6 +55,13 @@ namespace RootTools.Control.Ajin
             AXM("AxmStatusSetActPos", CAXM.AxmStatusSetActPos(m_nAxis, fPos * p_pulsepUnit));
         }
 
+        public override double GetActualPosition()
+        {
+            double fPos = 0;
+            AXM("AxmStatusGetActPos", CAXM.AxmStatusGetActPos(m_nAxis, ref fPos));
+            return fPos / p_pulsepUnit;
+        }
+
         public override void OverrideVelocity(double v)
         {
             AXM("AxmOverrideVel", CAXM.AxmOverrideVel(m_nAxis, v * p_pulsepUnit));
@@ -213,6 +220,13 @@ namespace RootTools.Control.Ajin
                 p_eState = eState.Ready;
                 return "OK";
             }
+
+            bool useLimit = m_bSWBoardLimit;
+            if (useLimit)
+            {
+                CAXM.AxmSignalSetSoftLimit(m_nAxis, Convert.ToUInt32(!useLimit), 0, 1, m_aPos[p_asPos[3]], m_aPos[p_asPos[2]]);
+            }
+          
             p_sInfo = base.StartHome();
             if (p_sInfo != "OK") return p_sInfo;
             if (AXM("AxmHomeSetMethod", CAXM.AxmHomeSetMethod(m_nAxis, (int)m_eHomeDir, (uint)m_eHomeSignal, (uint)m_eHomeZPhase, 1000, 0)) != 0) return p_sInfo;
@@ -222,6 +236,14 @@ namespace RootTools.Control.Ajin
             if (AXM("AxmHomeSetStart", CAXM.AxmHomeSetStart(m_nAxis)) != 0) return p_sInfo;
             p_eState = eState.Home;
             Thread.Sleep(10);
+
+            uint use = Convert.ToUInt32(useLimit);
+            CAXM.AxmSignalSetSoftLimit(m_nAxis, use, 0, 1, m_aPos[p_asPos[3]], m_aPos[p_asPos[2]]);
+
+            if (useLimit)
+            {
+                CAXM.AxmSignalSetSoftLimit(m_nAxis, Convert.ToUInt32(useLimit), 0, 1, m_aPos[p_asPos[3]], m_aPos[p_asPos[2]]);
+            }
             return "OK";
         }
 
@@ -245,6 +267,7 @@ namespace RootTools.Control.Ajin
         public override void ServoOn(bool bOn)
         {
             if (EQ.p_bSimulate) return;
+            StopAxis(); 
             if (bOn && m_bAbsoluteEncoder) AXM("AxmM3ServoSensOn", CAXM.AxmM3ServoSensOn(m_nAxis));
             uint uOn = (uint)(bOn ? 1 : 0);
             if (AXM("AxmSignalServoOn", CAXM.AxmSignalServoOn(m_nAxis, uOn)) != 0) return;
@@ -766,10 +789,6 @@ namespace RootTools.Control.Ajin
         public override void RunTreePos(Tree tree, string sUnit)
         {
             base.RunTreePos(tree, sUnit);
-
-            bool useLimit = m_bSWBoardLimit;
-            uint use = Convert.ToUInt32(useLimit); 
-            CAXM.AxmSignalSetSoftLimit(m_nAxis, use, 0, 1, m_aPos[p_asPos[3]], m_aPos[p_asPos[2]]);
         }
 
         public override void RunTreeSetting(Tree.eMode mode)

@@ -2,6 +2,7 @@
 using RootTools.Module;
 using RootTools.Trees;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media;
 
 namespace Root_Pine2.Module
@@ -35,8 +36,11 @@ namespace Root_Pine2.Module
                 case ModuleBase.eState.Run: Background = Brushes.Yellow; break;
                 case ModuleBase.eState.Error: Background = Brushes.OrangeRed; break;
             }
-            textBlockA.Text = (m_boats.m_aBoat[Vision2D.eWorks.A].p_infoStrip != null) ? m_boats.m_aBoat[Vision2D.eWorks.A].p_id : "";
-            textBlockB.Text = (m_boats.m_aBoat[Vision2D.eWorks.B].p_infoStrip != null) ? m_boats.m_aBoat[Vision2D.eWorks.B].p_id : "";
+            textBlockVision.Foreground = m_boats.m_vision.m_remote.p_bEnable ? Brushes.Red : Brushes.LightGray; 
+            textBlockA.Text = (m_boats.m_aBoat[Vision2D.eWorks.A].p_infoStrip != null) ? m_boats.m_aBoat[Vision2D.eWorks.A].p_infoStrip.p_id : "";
+            textBlockB.Text = (m_boats.m_aBoat[Vision2D.eWorks.B].p_infoStrip != null) ? m_boats.m_aBoat[Vision2D.eWorks.B].p_infoStrip.p_id : "";
+            textBlockStepA.Text = m_boats.m_aBoat[Vision2D.eWorks.A].p_eStep.ToString();
+            textBlockStepB.Text = m_boats.m_aBoat[Vision2D.eWorks.B].p_eStep.ToString();
             OnRunTree();
         }
 
@@ -47,6 +51,11 @@ namespace Root_Pine2.Module
             m_nQueue[0] = m_boats.m_qModuleRun.Count;
             m_nQueue[1] = m_boats.m_qModuleRemote.Count;
             m_boats.RunTreeQueue(Tree.eMode.Init);
+        }
+
+        private void textBlockVision_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            m_boats.m_vision.m_remote.p_bEnable = !m_boats.m_vision.m_remote.p_bEnable; 
         }
     }
 }

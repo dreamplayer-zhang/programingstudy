@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading;
 
 namespace Root_Pine2.Module
 {
@@ -98,6 +99,7 @@ namespace Root_Pine2.Module
         {
             if (Run(m_aBoat[eWorks].RunMove(p_ePosUnload))) return p_sInfo;
             m_aBoat[eWorks].p_eStep = Boat.eStep.Done;
+            if (m_aBoat[eWorks].p_infoStrip != null) m_aBoat[eWorks].p_infoStrip.p_eResult = InfoStrip.eResult.Rework; 
             return "OK";
         }
         #endregion
@@ -175,12 +177,13 @@ namespace Root_Pine2.Module
             {
                 m_aBoat[eWorks].p_eStep = Boat.eStep.Run;
                 m_aBoat[eWorks].m_doTriggerSwitch.Write(true); 
-                int iSnap = 0; 
+                int iSnap = 0;
                 foreach (Vision2D.Recipe.Snap snap in m_aBoat[eWorks].m_recipe.m_aSnap)
                 {
                     m_vision.RunLight(snap.m_lightPower);
                     if (Run(RunMoveSnapStart(eWorks, snap))) return p_sInfo;
                     m_vision.StartSnap(snap, eWorks, iSnap);
+                    Thread.Sleep(200);
                     if (Run(m_aBoat[eWorks].RunSnap())) return p_sInfo;
                     if (m_vision.IsBusy()) EQ.p_bStop = true;
                     iSnap++; 
@@ -248,7 +251,8 @@ namespace Root_Pine2.Module
                 string sRecipe = asRead[2];
                 Vision2D.eWorks eWorks = (asRead[3] == "A") ? Vision2D.eWorks.A : Vision2D.eWorks.B;
                 //m_vision.m_recipe[eWorks].RecipeOpen(sRecipe);
-                m_aBoat[eWorks].m_recipe.RecipeOpen(sRecipe); 
+                //m_aBoat[eWorks].m_recipe.RecipeOpen(sRecipe);
+                RecipeOpen(sRecipe);
                 StartSnap(eWorks); 
             }
         }
@@ -273,10 +277,16 @@ namespace Root_Pine2.Module
             InitBase(p_id, engineer); 
         }
 
+        protected override void RunThreadStop()
+        {
+            m_aBoat[Vision2D.eWorks.A].RunMove(Boat.ePos.Handler, false);
+            m_aBoat[Vision2D.eWorks.B].RunMove(Boat.ePos.Handler);
+            m_aBoat[Vision2D.eWorks.A].RunMove(Boat.ePos.Handler);
+            base.RunThreadStop();
+        }
+
         public override void ThreadStop()
         {
-            m_aBoat[Vision2D.eWorks.A].ThreadStop();
-            m_aBoat[Vision2D.eWorks.B].ThreadStop();
             base.ThreadStop();
         }
 

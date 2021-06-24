@@ -3,10 +3,14 @@ using RootTools.Control;
 using RootTools.GAFs;
 using RootTools.Module;
 using RootTools.Trees;
+using Root_EFEM.Module;
 using Root_VEGA_D.Engineer;
+using RootTools.OHT.Semi;
 using RootTools.Control.ACS;
 using System.Threading;
+using System.Collections.Generic;
 using System;
+using RootTools.OHTNew;
 
 namespace Root_VEGA_D.Module
 {
@@ -22,6 +26,16 @@ namespace Root_VEGA_D.Module
         DIO_I m_diEFEMLeft_Door;
         DIO_I m_diEFEMRight_Door;
         DIO_I m_diActiveIsolator_Alarm;
+        public DIO_I m_diFP_Isolator;
+        public DIO_I m_diIsolator_VPre;
+        public DIO_I m_diFactory_Air_PadPre;
+        public DIO_I m_diAir_TankPre;
+        public DIO_I m_diX_BottomPre;
+        public DIO_I m_diX_SideMasterPre;
+        public DIO_I m_diX_SideSlavePre;
+        public DIO_I m_diY_BottomPre;
+        public DIO_I m_diY_SideMasterPre;
+        public DIO_I m_diY_SideSlavePre;
         DIO_I m_diVisionFFU_Door;
         DIO_I m_diVisionTop_Door;
         DIO_I m_diVisionBtm_Door;
@@ -47,6 +61,16 @@ namespace Root_VEGA_D.Module
             p_sInfo = m_toolBox.GetDIO(ref m_diEFEMLeft_Door, this, "EFEM Left Door");
             p_sInfo = m_toolBox.GetDIO(ref m_diEFEMRight_Door, this, "EFEM Right Door");
             p_sInfo = m_toolBox.GetDIO(ref m_diActiveIsolator_Alarm, this, "Active Isolator Alarm");
+            p_sInfo = m_toolBox.GetDIO(ref m_diFP_Isolator, this, "Factory Pressure Isolator Indicator");
+            p_sInfo = m_toolBox.GetDIO(ref m_diIsolator_VPre, this, "Isolator V Pressure Indicator");
+            p_sInfo = m_toolBox.GetDIO(ref m_diFactory_Air_PadPre, this, "Factory Air Pad Pressure Indicator");
+            p_sInfo = m_toolBox.GetDIO(ref m_diAir_TankPre, this, "Air Tank Pressure Indicator");
+            p_sInfo = m_toolBox.GetDIO(ref m_diX_BottomPre, this, "X Bottom Pressure Indicator");
+            p_sInfo = m_toolBox.GetDIO(ref m_diX_SideMasterPre, this, "X Side Master Pressure Indicator");
+            p_sInfo = m_toolBox.GetDIO(ref m_diX_SideSlavePre, this, "X Side Slave Pressure Indicator");
+            p_sInfo = m_toolBox.GetDIO(ref m_diY_BottomPre, this, "Y Bottom Pressure Indicator");
+            p_sInfo = m_toolBox.GetDIO(ref m_diY_SideMasterPre, this, "Y Side Master Pressure Indicator");
+            p_sInfo = m_toolBox.GetDIO(ref m_diY_SideSlavePre, this, "Y Side Slave Pressure Indicator");
             p_sInfo = m_toolBox.GetDIO(ref m_diVisionFFU_Door, this, "Vision FFU Door");
             p_sInfo = m_toolBox.GetDIO(ref m_diVisionTop_Door, this, "Vision Top Door");
             p_sInfo = m_toolBox.GetDIO(ref m_diVisionBtm_Door, this, "Vision Bottom Door");
@@ -82,6 +106,16 @@ namespace Root_VEGA_D.Module
         ALID m_alidEFEMLeft_Door;
         ALID m_alidEFEMRight_Door;
         ALID m_alidActiveIsolator_Alarm;
+        ALID m_alidFP_Isolator;
+        ALID m_alidIsolator_VPre;
+        ALID m_alidFactory_Air_PadPre;
+        ALID m_alidAir_TankPre;
+        ALID m_alidX_BottomPre;
+        ALID m_alidX_SideMasterPre;
+        ALID m_alidX_SideSlavePre;
+        ALID m_alidY_BottomPre;
+        ALID m_alidY_SideMasterPre;
+        ALID m_alidY_SideSlavePre;
         ALID m_alidVisionFFU_Door;
         ALID m_alidVisionTop_Door;
         ALID m_alidVisionBtm_Door;
@@ -100,7 +134,7 @@ namespace Root_VEGA_D.Module
             m_alidMCReset_EMS = m_gaf.GetALID(this, "MC Reset (EMS)", "MC Reset Error");
             m_alidMCReset_EMO = m_gaf.GetALID(this, "MC Reset (EMO)", "MC Reset Error");
             m_alidDoorLock = m_gaf.GetALID(this, "Door Lock", "Door Lock Error");
-            m_alidCDA1_digital = m_gaf.GetALID(this, "CDA2 Pressure Digital", "CDA1 Pressure Error(Digital)");
+            m_alidCDA1_digital = m_gaf.GetALID(this, "CDA1 Pressure Digital", "CDA1 Pressure Error(Digital)");
             m_alidCDA1_Low = m_gaf.GetALID(this, "CDA1 Pressure Low Alarm", "CDA1 Pressure Low Error");
             m_alidCDA1_High = m_gaf.GetALID(this, "CDA1 Pressure Low Alarm", "CDA1 Pressure Low Error");
             m_alidCDA2_digital = m_gaf.GetALID(this, "CDA2 Pressure Digital", "CDA2 Pressure Error(Digital)");
@@ -110,6 +144,16 @@ namespace Root_VEGA_D.Module
             m_alidEFEMRight_Door = m_gaf.GetALID(this, "EFEM Right Door", "EFEM Right Door Open");
             m_alidVisionFFU_Door = m_gaf.GetALID(this, "Vision FFU Door", "Vision FFU Door Open");
             m_alidVisionTop_Door = m_gaf.GetALID(this, "Vision Top Door", "Vision Top Door Open");
+            m_alidFP_Isolator = m_gaf.GetALID(this, "Factory Pressure Isolator Error", "Factory Pressure Isolator Error");
+            m_alidIsolator_VPre = m_gaf.GetALID(this, "Isolator V Pressure Error", "Isolator V Pressure Error");
+            m_alidFactory_Air_PadPre = m_gaf.GetALID(this, "Factory Air PAd Pressure Error", "Factory Air Pad Pressure Error");
+            m_alidAir_TankPre = m_gaf.GetALID(this, "Air Tank Pressure Error", "Air Tank Pressure Error");
+            m_alidX_BottomPre = m_gaf.GetALID(this, "X Bottom Pressure Error", "X Bottom Pressure Error");
+            m_alidX_SideMasterPre = m_gaf.GetALID(this, "X Side Master Pressure Error", "X Side Master Pressure Error");
+            m_alidX_SideSlavePre = m_gaf.GetALID(this, "X Side Slave Pressure Error", "X Side Slave Pressure Error");
+            m_alidY_BottomPre = m_gaf.GetALID(this, "Y Bottom Pressure Error", "Y Bottom Pressure Error");
+            m_alidY_SideMasterPre = m_gaf.GetALID(this, "Y Side Master Pressure Error", "Y Side Master Pressure Error");
+            m_alidY_SideSlavePre = m_gaf.GetALID(this, "Y Side Slave Pressure Error", "Y Side Slave Pressure Error");
             m_alidVisionBtm_Door = m_gaf.GetALID(this, "Vision Btm Door", "Vision Bottom Door Open");
             m_alidVisionSlide_Door = m_gaf.GetALID(this, "Vision Slide Door", "Vision Slide Door Open");
             m_alidActiveIsolator_Alarm = m_gaf.GetALID(this, "Active Isolator", "Active Isolator Alarm");
@@ -139,11 +183,12 @@ namespace Root_VEGA_D.Module
             }
             set
             {
-                if (Math.Abs(m_CDA1_Value - value) < 0.05) return;
+               // if (Math.Abs(m_CDA1_Value - value) < 0.05) return;
                 m_CDA1_Value = value;
                 OnPropertyChanged();
             }
         }
+        public double m_CDA2_Value;
         public double p_CDA2_Value
         {
             get
@@ -152,12 +197,11 @@ namespace Root_VEGA_D.Module
             }
             set
             {
-                if (Math.Abs(m_CDA2_Value - value) < 0.05) return;
+               // if (Math.Abs(m_CDA2_Value - value) < 0.05) return;
                 m_CDA2_Value = value;
                 OnPropertyChanged();
             }
         }
-        public double m_CDA2_Value;
         public void CheckFDC()
 		{
 			Thread.Sleep(10);
@@ -165,9 +209,9 @@ namespace Root_VEGA_D.Module
 			{
 				try
 				{
-					p_CDA1_Value = m_ACS.GetAnalogData((int)eAnalog_CDA.CDA1);
-					p_CDA2_Value = m_ACS.GetAnalogData((int)eAnalog_CDA.CDA2);
-				}
+                    p_CDA1_Value = Math.Truncate(m_ACS.GetAnalogData((int)eAnalog_CDA.CDA1) / 32768 * 1000) / 1000;
+                    p_CDA2_Value = Math.Truncate(m_ACS.GetAnalogData((int)eAnalog_CDA.CDA2) / 32768 * 1000) / 1000;
+                }
 				catch (Exception e) { m_log.Info("FDC Error " + e.Message); }
 				if (p_CDA1_Value < m_mmLimitCDA1.X)
 				{ m_alidCDA1_Low.Run(true, "CDA1_Value Pressure Lower than Limit"); }
@@ -200,15 +244,25 @@ namespace Root_VEGA_D.Module
             CheckFDC();
 
             m_alidCDA1_digital.Run(!m_diCDA1.p_bIn, "Please Check CDA1 Pressure Sensor");
-            m_alidCDA1_digital.Run(!m_diCDA2.p_bIn, "Please Check CDA2 Pressure Sensor");
+            m_alidCDA2_digital.Run(!m_diCDA2.p_bIn, "Please Check CDA2 Pressure Sensor");
 
             m_alidEFEMLeft_Door.Run(!m_diEFEMLeft_Door.p_bIn, "EFEM Left Door Open");
             m_alidEFEMRight_Door.Run(!m_diEFEMRight_Door.p_bIn, "EFEM Right Door Open");
             m_alidVisionFFU_Door.Run(!m_diVisionFFU_Door.p_bIn, "Vision FFU Door Open");
             m_alidVisionTop_Door.Run(!m_diVisionTop_Door.p_bIn, "Vision Top Door Open");
             m_alidVisionBtm_Door.Run(!m_diVisionBtm_Door.p_bIn, "Vision Bottom Door Open");
-            m_alidVisionSlide_Door.Run(!m_diVisionSlide_Door.p_bIn, "Vision Slide Door Open");
+            m_alidVisionSlide_Door.Run(m_diVisionSlide_Door.p_bIn, "Vision Slide Door Open");
 
+            m_alidFP_Isolator.Run(!m_diFP_Isolator.p_bIn, "Factory Pressure Isolator Alarm");
+            m_alidIsolator_VPre.Run(!m_diIsolator_VPre.p_bIn, "Isolator V Alarm");
+            m_alidFactory_Air_PadPre.Run(!m_diFactory_Air_PadPre.p_bIn, "Factory Air Pad Pressure Alarm");
+            m_alidAir_TankPre.Run(!m_diAir_TankPre.p_bIn, "Air Tank Alarm");
+            m_alidX_BottomPre.Run(!m_diX_BottomPre.p_bIn, "X Bottom Pressure Alarm");
+            m_alidX_SideMasterPre.Run(!m_diX_SideMasterPre.p_bIn, "X Side Master Pressure Alarm");
+            m_alidX_SideSlavePre.Run(!m_diX_SideSlavePre.p_bIn, "X Side Slave Pressure Alarm");
+            m_alidY_BottomPre.Run(!m_diY_BottomPre.p_bIn, "Y Bottom Pressure Alarm");
+            m_alidY_SideMasterPre.Run(!m_diY_SideMasterPre.p_bIn, "Y Side Master Pressure Alarm");
+            m_alidY_SideSlavePre.Run(!m_diY_SideSlavePre.p_bIn, "Y Side Slave Pressure Alarm");
             m_alidActiveIsolator_Alarm.Run(!m_diActiveIsolator_Alarm.p_bIn, "Active Isolator Alarm");
             m_alidPC1Fan_Alarm.Run(!m_diPC1Fan_Alarm.p_bIn, "PC1 Fan Alarm");
             m_alidPC2Fan_Alarm.Run(!m_diPC2Fan_Alarm.p_bIn, "PC2 Fan Alarm");
@@ -232,9 +286,29 @@ namespace Root_VEGA_D.Module
             {
                 m_alidProtectionbar.Run(!m_diProtectionbar.p_bIn, "Protectionbar Check Error");
             }
+            foreach (OHT_Semi OHT in p_aOHT)
+            {
+                OHT.p_bLightCurtain = !m_diLightCurtain.p_bIn;
+                OHT.P_bProtectionBar = !m_diProtectionbar.p_bIn;
+            }
         }
         #endregion
 
+        #region OHT
+        List<OHT_Semi> p_aOHT
+        {
+            get
+            {
+                List<OHT_Semi> aOHT = new List<OHT_Semi>();
+                VEGA_D_Handler handler = (VEGA_D_Handler)m_engineer.ClassHandler();
+                foreach (ILoadport loadport in handler.m_aLoadport)
+                {
+                    aOHT.Add(((Loadport_Cymechs)loadport).m_OHT);
+                }
+                return aOHT;
+            }
+        }
+        #endregion
         #region Tree
         bool m_bDoorlock_Use = false;
         bool m_bLightCurtain_Use = false;
@@ -258,8 +332,8 @@ namespace Root_VEGA_D.Module
             m_bProtectionbar_Use = tree.Set(m_bProtectionbar_Use, m_bProtectionbar_Use, "Protectionbar Use", "Protectionbar Use");
         }
         #endregion
-        public RPoint m_mmLimitCDA1 = new RPoint();
-        public RPoint m_mmLimitCDA2 = new RPoint();
+        public RPoint m_mmLimitCDA1 = new RPoint();//EFEM
+        public RPoint m_mmLimitCDA2 = new RPoint();//INSPECT
         ALID[] m_alid = new ALID[2] { null, null };
         ACS m_ACS;
         public Interlock(string id, IEngineer engineer,ACS acs)

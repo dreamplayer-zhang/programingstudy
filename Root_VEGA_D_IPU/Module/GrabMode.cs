@@ -9,13 +9,6 @@ using System.Collections.Generic;
 
 namespace Root_VEGA_D_IPU.Module
 {
-    public enum eScanPos
-    {
-        Bottom = 0,
-        Left,
-        Top,
-        Right,
-    }
     public class GrabMode
     {
         #region Camera
@@ -29,9 +22,9 @@ namespace Root_VEGA_D_IPU.Module
         public ICamera m_camera = null;
         CameraSet m_cameraSet;
         public RPoint m_ptXYAlignData = new RPoint(0, 0);
-        public double m_dTDIToVRSOffsetX = 0;
-        public double m_dTDIToVRSOffsetY = 0;
-        public double m_dVRSFocusPos = 0;
+        //public double m_dTDIToVRSOffsetX = 0;
+        //public double m_dTDIToVRSOffsetY = 0;
+        //public double m_dVRSFocusPos = 0;
         public RPoint m_rpAxisCenter = new RPoint();    // Wafer Center Position
         public CPoint m_cpMemoryOffset = new CPoint();  // Memory Offset
         public double m_dResX_um = 1;                   // Camera Resolution X
@@ -40,7 +33,7 @@ namespace Root_VEGA_D_IPU.Module
         public int m_nWaferSize_mm = 1000;              // Wafer Size (mm)
         public int m_nMaxFrame = 100;                   // Camera max Frame 스펙
         public int m_nScanRate = 100;                   // Camera Frame Spec 사용률 ? 1~100 %
-        public int m_nYOffset = 0;
+        //public int m_nYOffset = 0;
         public double m_dCamTriggerRatio = 1;              // Camera 분주비
 
         public GrabData m_GD = new GrabData();
@@ -58,7 +51,7 @@ namespace Root_VEGA_D_IPU.Module
             m_GD.m_nOverlap = tree.Set(m_GD.m_nOverlap, m_GD.m_nOverlap, "Cam Overlap Size Pxl", "Pixel", bVisible);
             m_dResX_um = tree.Set(m_dResX_um, m_dResX_um, "Cam X Resolution", "X Resolution (um)", bVisible);
             m_dResY_um = tree.Set(m_dResY_um, m_dResY_um, "Cam Y Resolution", "Y Resolution (um)", bVisible);
-            m_nYOffset = tree.Set(m_nYOffset, m_nYOffset, "Cam Y Offset", "Y Tilt(pxl)", bVisible);
+            //m_nYOffset = tree.Set(m_nYOffset, m_nYOffset, "Cam Y Offset", "Y Tilt(pxl)", bVisible);
 
             //m_sLens = tree.Set(m_sLens, m_sLens, m_lens.p_asPos, "Lens Turret", "Turret", bVisible);
             
@@ -88,9 +81,9 @@ namespace Root_VEGA_D_IPU.Module
             m_ScanLineNum = tree.Set(m_ScanLineNum, m_ScanLineNum, "Scan Line Number", "Scan Line Number");
             m_ScanStartLine = tree.Set(m_ScanStartLine, m_ScanStartLine, "Scan Start Line", "Scan Start Line");
             m_ptXYAlignData = tree.Set(m_ptXYAlignData, m_ptXYAlignData, "XY Align Data", "XY Align Data", bVisible, true);
-            m_dTDIToVRSOffsetX = tree.Set(m_dTDIToVRSOffsetX, m_dTDIToVRSOffsetX, "TDI To VRS Offset X", "TDI To VRS Offset X");
-            m_dTDIToVRSOffsetY = tree.Set(m_dTDIToVRSOffsetY, m_dTDIToVRSOffsetY, "TDI To VRS Offset Y", "TDI To VRS Offset Y");
-            m_dVRSFocusPos = tree.Set(m_dVRSFocusPos, m_dVRSFocusPos, "VRS Focus Z", "VRS Focus Z", bVisible, true);
+            //m_dTDIToVRSOffsetX = tree.Set(m_dTDIToVRSOffsetX, m_dTDIToVRSOffsetX, "TDI To VRS Offset X", "TDI To VRS Offset X");
+            //m_dTDIToVRSOffsetY = tree.Set(m_dTDIToVRSOffsetY, m_dTDIToVRSOffsetY, "TDI To VRS Offset Y", "TDI To VRS Offset Y");
+            //m_dVRSFocusPos = tree.Set(m_dVRSFocusPos, m_dVRSFocusPos, "VRS Focus Z", "VRS Focus Z", bVisible, true);
         }
 
         public void StartGrab(MemoryData memory, CPoint cpScanOffset, int nLine, GrabData m_GrabData = null, bool bTest = false)
@@ -195,16 +188,10 @@ namespace Root_VEGA_D_IPU.Module
         public int m_ScanStartLine = 0;
         #endregion
 
-        public eScanPos m_eScanPos = eScanPos.Bottom;
-
         public string p_id
         {
             get;
             set;
-        }
-        void RunTreeScanPos(Tree tree, bool bVisible, bool bReadOnly)
-        {
-            m_eScanPos = (eScanPos)tree.Set(m_eScanPos, m_eScanPos, "Scan 위치", "Scan 위치, 0 Position 이 Bottom", bVisible, bReadOnly);
         }
 
         public string p_sName { get; set; }
@@ -227,7 +214,6 @@ namespace Root_VEGA_D_IPU.Module
             dst.m_camera = src.m_camera;
             dst.m_dTrigger = src.m_dTrigger;
             dst.m_eGrabDirection = src.m_eGrabDirection;
-            dst.m_eScanPos = src.m_eScanPos;
             dst.m_intervalAcc = src.m_intervalAcc;
             dst.m_memoryData = src.m_memoryData;
             dst.m_memoryGroup = src.m_memoryGroup;
@@ -265,13 +251,8 @@ namespace Root_VEGA_D_IPU.Module
             RunTreeCamera(tree, bVisible, bReadOnly);
             RunTreeLight(tree.GetTree("LightPower", false), bVisible, bReadOnly);
             RunTreeMemory(tree.GetTree("Memory", false), bVisible, bReadOnly);
-            RunTreeScanPos(tree.GetTree("ScanPos", false), bVisible, bReadOnly);
         }
 
-        public void RunTreeLADS(Tree tree)
-        {
-            m_bUseLADS = tree.Set(m_bUseLADS, m_bUseLADS, "Use LADS", "LADS 사용 여부");
-        }
         public virtual void RunTree(Tree.eMode mode) { }
     }
 }

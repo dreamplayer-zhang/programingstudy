@@ -48,15 +48,19 @@ namespace Root_Pine2.Module
             Top2D,
         }
         const string c_sPosLoadEV = "LoadEV";
+        const string c_sPosPaper = "Paper";
+        const string c_sPosUp = "Up";
         void InitPosition()
         {
             m_axis.AddPos(c_sPosLoadEV);
+            m_axis.AddPos(c_sPosPaper);
             m_axis.AddPos(Enum.GetNames(typeof(ePosTransfer)));
             m_axis.AddPos(GetPosString(eUnloadVision.Top3D, Vision2D.eWorks.A));
             m_axis.AddPos(GetPosString(eUnloadVision.Top3D, Vision2D.eWorks.B));
             m_axis.AddPos(GetPosString(eUnloadVision.Top2D, Vision2D.eWorks.A));
             m_axis.AddPos(GetPosString(eUnloadVision.Top2D, Vision2D.eWorks.B));
             m_axis.AddPos(Enum.GetNames(typeof(ePosTray)));
+            m_axis.p_axisZ.AddPos(c_sPosUp);
         }
         string GetPosString(eUnloadVision eVision, Vision2D.eWorks eWorks)
         {
@@ -124,10 +128,18 @@ namespace Root_Pine2.Module
         int m_pulsemm = 1000; 
         public string RunMoveLoadEV(bool bWait = true)
         {
-            double dPos = m_pulsemm * (95 - m_pine2.p_widthStrip);
+            double dPos = m_pulsemm * (m_pine2.m_widthDefaultStrip - m_pine2.p_widthStrip);
             if (Run(StartMoveX(c_sPosLoadEV, dPos))) return p_sInfo;
             m_axis.p_axisY.StartMove(c_sPosLoadEV);
             return bWait ? m_axis.WaitReady() : "OK"; 
+        }
+
+        public string RunMovePaper()
+        {
+            double dPos = m_pulsemm * (m_pine2.m_widthDefaultStrip - m_pine2.p_widthStrip);
+            if (Run(StartMoveX(c_sPosPaper, dPos))) return p_sInfo;
+            m_axis.p_axisY.StartMove(c_sPosLoadEV);
+            return m_axis.WaitReady();
         }
 
         void RunTreeAxis(Tree tree)
@@ -163,7 +175,7 @@ namespace Root_Pine2.Module
 
         public string RunMoveUp(bool bWait = true)
         {
-            m_axis.p_axisZ.StartMove(0);
+            m_axis.p_axisZ.StartMove(c_sPosUp);
             return bWait ? m_axis.WaitReady() : "OK";
         }
 
@@ -202,6 +214,9 @@ namespace Root_Pine2.Module
                 if (Run(RunShakeUp(nShake, dzShakeUp))) return p_sInfo;
                 m_loadEV.p_eMove = LoadEV.eMove.Stop;
                 m_loadEV.p_bBlow = false;
+                if (Run(RunMoveZ(c_sPosPaper, 0))) return p_sInfo;
+                if (Run(RunMovePaper())) return p_sInfo;
+                m_loadEV.CheckPaper(); 
                 if (Run(RunMoveUp())) return p_sInfo;
                 if (m_picker.IsVacuum() == false) return p_sInfo;
                 m_picker.p_infoStrip = m_loadEV.GetNewInfoStrip();
@@ -377,6 +392,20 @@ namespace Root_Pine2.Module
         #endregion
 
         #region override
+        public override string StateHome()
+        {
+            if (EQ.p_bSimulate)
+            {
+                p_eState = eState.Ready;
+                return "OK";
+            }
+            p_sInfo = base.StateHome(m_axis.p_axisZ);
+            if (p_sInfo != "OK") return p_sInfo;
+            p_sInfo = base.StateHome(m_axis.p_axisX, m_axis.p_axisY);
+            p_eState = (p_sInfo == "OK") ? eState.Ready : eState.Error;
+            return p_sInfo;
+        }
+
         public override string StateReady()
         {
             if (EQ.p_eState != EQ.eState.Run) return "OK";
@@ -396,30 +425,6 @@ namespace Root_Pine2.Module
             return "OK";
         }
 
-        string StartUnloadBoat()
-        {
-            Vision2D.eVision eVision = m_pine2.p_b3D ? Vision2D.eVision.Top3D : Vision2D.eVision.Top2D;
-            Boats boats = m_handler.m_aBoats[eVision];
-            if (boats.m_aBoat[Vision2D.eWorks.A].p_eStep == Boat.eStep.Ready) return StartUnloadBoat(eVision, Vision2D.eWorks.A);
-            if (boats.m_aBoat[Vision2D.eWorks.B].p_eStep == Boat.eStep.Ready) return StartUnloadBoat(eVision, Vision2D.eWorks.B);
-            return "OK"; 
-        }
-
-        string StartUnloadBoat(Vision2D.eVision eVision, Vision2D.eWorks eWorks)
-        {
-            Run_UnloadBoat run = (Run_UnloadBoat)m_runUnloadBoat.Clone();
-            run.m_eVision = (eVision == Vision2D.eVision.Top3D) ? eUnloadVision.Top3D : eUnloadVision.Top2D;
-            run.m_eWorks = eWorks;
-            return StartRun(run); 
-        }
-
-        string StartLoadTransfer()
-        {
-            Run_LoadTransfer run = (Run_LoadTransfer)m_runLoadTransfer.Clone();
-            run.m_ePos = (ePosTransfer)m_transfer.m_buffer.m_ePosDst;
-            return StartRun(run); 
-        }
-
         public override void Reset()
         {
             m_picker.m_dioVacuum.Write(false);
@@ -433,6 +438,32 @@ namespace Root_Pine2.Module
             m_picker.RunTreeVacuum(tree.GetTree("Vacuum"));
             RunTreeAxis(tree.GetTree("Axis"));
             RunTreePickerSet(tree.GetTree("PickerSet")); 
+        }
+        #endregion
+
+        #region Start Run
+        string StartUnloadBoat()
+        {
+            Vision2D.eVision eVision = m_pine2.p_b3D ? Vision2D.eVision.Top3D : Vision2D.eVision.Top2D;
+            Boats boats = m_handler.m_aBoats[eVision];
+            if (boats.m_aBoat[Vision2D.eWorks.A].p_eStep == Boat.eStep.Ready) return StartUnloadBoat(eVision, Vision2D.eWorks.A);
+            if (boats.m_aBoat[Vision2D.eWorks.B].p_eStep == Boat.eStep.Ready) return StartUnloadBoat(eVision, Vision2D.eWorks.B);
+            return "OK";
+        }
+
+        string StartUnloadBoat(Vision2D.eVision eVision, Vision2D.eWorks eWorks)
+        {
+            Run_UnloadBoat run = (Run_UnloadBoat)m_runUnloadBoat.Clone();
+            run.m_eVision = (eVision == Vision2D.eVision.Top3D) ? eUnloadVision.Top3D : eUnloadVision.Top2D;
+            run.m_eWorks = eWorks;
+            return StartRun(run);
+        }
+
+        string StartLoadTransfer()
+        {
+            Run_LoadTransfer run = (Run_LoadTransfer)m_runLoadTransfer.Clone();
+            run.m_ePos = (ePosTransfer)m_transfer.m_buffer.m_ePosDst;
+            return StartRun(run);
         }
         #endregion
 

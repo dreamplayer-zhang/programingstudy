@@ -464,6 +464,9 @@
     <Compile Include="Light\LightTool_LVS_new_UI.xaml.cs">
       <DependentUpon>LightTool_LVS_new_UI.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Memory\MemoryViewerOption.xaml.cs">
+      <DependentUpon>MemoryViewerOption.xaml</DependentUpon>
+    </Compile>
     <Compile Include="MarsLog\MarsLogManager.cs" />
     <Compile Include="Memory\MemoryViewerOption.xaml.cs">
       <DependentUpon>MemoryViewerOption.xaml</DependentUpon>

@@ -141,7 +141,7 @@ namespace Root_CAMELLIA.Module
                         //m_mwvm.p_RTGraph.DrawTransmittanceGraph(index, "Wavelength(nm)", "Reflectance(%)");
 
                     }
-                    m_mwvm.p_Progress = (((double)(index + 1) / m_DataManager.recipeDM.MeasurementRD.DataSelectedPoint.Count) * 100);
+                    m_mwvm.p_Progress = (double)(index + 1) / m_DataManager.recipeDM.MeasurementRD.DataSelectedPoint.Count * 100;
                     SaveRawData(index);
                     //.DataManager MetData = LibSR_Met.DataManager.GetInstance();
                     // Spectrum data Thread 추가 두개두개두개
@@ -167,7 +167,7 @@ namespace Root_CAMELLIA.Module
                     nThicknessCnt++;
                 }
 
-                if (MeasureDone && nThicknessCnt == m_DataManager.recipeDM.MeasurementRD.DataSelectedPoint.Count)
+                if (MeasureDone && (nThicknessCnt == m_DataManager.recipeDM.MeasurementRD.DataSelectedPoint.Count || m_isPointMeasure))
                 {
                     m_CalcThicknessDone = true;
                     break;
@@ -221,7 +221,11 @@ namespace Root_CAMELLIA.Module
         {
             MarsLogManager marsLogManager = MarsLogManager.Instance;
             DataFormatter dataFormatter = new DataFormatter();
+
             string deviceID = BaseDefine.LOG_DEVICE_ID;
+            marsLogManager.WritePRC(EQ.p_nRunLP, deviceID, SSLNet.PRC_EVENTID.StepProcess, SSLNet.STATUS.START, "Measure", (int)BaseDefine.Process.Measure);
+
+
             if (!MakeSaveDirectory())
             {
                 return "Make Directory Error";
@@ -242,7 +246,7 @@ namespace Root_CAMELLIA.Module
             m_thread = new Task(RunThread);
             m_thread.Start();
 
-            marsLogManager.WritePRC(EQ.p_nRunLP, deviceID, SSLNet.PRC_EVENTID.Process, SSLNet.STATUS.START, this.p_id, 0, materialID:m_module.p_infoWafer.p_id);
+            //marsLogManager.WritePRC(EQ.p_nRunLP, deviceID, SSLNet.PRC_EVENTID.Process, SSLNet.STATUS.START, this.p_id, 0, materialID:m_module.p_infoWafer.p_id);
             InfoWafer info = m_module.p_infoWafer;
 
 
@@ -287,8 +291,6 @@ namespace Root_CAMELLIA.Module
                 {
                     centerX = m_DataManager.m_waferCentering.m_ptCenter.X;
                     centerY = m_DataManager.m_waferCentering.m_ptCenter.Y;
-                    //centerX = m_DataManager.m_waferCentering.m_ptCenter.X - (m_StageCenterPos_pulse.X - m_DataManager.m_waferCentering.m_ptCenter.X);
-                    //centerY = m_DataManager.m_waferCentering.m_ptCenter.Y - (m_StageCenterPos_pulse.Y- m_DataManager.m_waferCentering.m_ptCenter.Y);
                 }
 
                 double RatioX = (int)(BaseDefine.CanvasWidth / BaseDefine.ViewSize);
@@ -314,7 +316,6 @@ namespace Root_CAMELLIA.Module
                     }
                     if (i == 0)
                     {
-                        marsLogManager.WritePRC(EQ.p_nRunLP, deviceID, SSLNet.PRC_EVENTID.StepProcess, SSLNet.STATUS.START, "Measure", 1, materialID:m_module.p_infoWafer.p_id);
                         MeasurePoint = new RPoint(dX, dY);
                         dataFormatter.AddData("X Axis", dX, "Pulse");
                         dataFormatter.AddData("Y Axis", dY, "Pulse");
@@ -452,7 +453,6 @@ namespace Root_CAMELLIA.Module
             }
             m_log.Warn("Calc Thickness 끝 >> " + test.ElapsedMilliseconds);
             marsLogManager.WriteFNC(EQ.p_nRunLP, BaseDefine.LOG_DEVICE_ID, "GetThicness", SSLNet.STATUS.END, type: MATERIAL_TYPE.WAFER);
-            marsLogManager.WritePRC(EQ.p_nRunLP, deviceID, SSLNet.PRC_EVENTID.StepProcess, SSLNet.STATUS.END, "Measure", 1, materialID: m_module.p_infoWafer.p_id);
             //? 세이브?
 
             //if (m_module.Run(axisXY.StartMove(eAxisPos.Ready)))
@@ -499,7 +499,7 @@ namespace Root_CAMELLIA.Module
                
             }
 
-            marsLogManager.WritePRC(EQ.p_nRunLP, deviceID, SSLNet.PRC_EVENTID.Process, SSLNet.STATUS.END, this.p_id, 0, materialID:m_module.p_infoWafer.p_id);
+            marsLogManager.WritePRC(EQ.p_nRunLP, deviceID, SSLNet.PRC_EVENTID.StepProcess, SSLNet.STATUS.END, "Measure", (int)BaseDefine.Process.Measure);
 
             return "OK";
         }
