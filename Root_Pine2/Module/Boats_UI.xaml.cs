@@ -23,6 +23,7 @@ namespace Root_Pine2.Module
             m_boats = boats;
             DataContext = boats;
             treeRootUI.Init(boats.m_treeRootQueue);
+            treeVisionUI.Init(boats.m_vision.m_treeRootQueue); 
             boats.RunTreeQueue(Tree.eMode.Init);
         }
 

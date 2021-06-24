@@ -44,6 +44,7 @@ namespace RootTools.Comm
             m_nDataBit = tree.Set(m_nDataBit, m_nDataBit, "Data Bit", "Data Bit (7 ~ 8");
             m_eStopbits = (StopBits)tree.Set(m_eStopbits, m_eStopbits, "Stop Bit", "Stop Bit");
             m_bUseCallback = tree.Set(m_bUseCallback, true, "Callback", "Callback");
+            m_eHandshake = (Handshake)tree.Set(m_eHandshake, m_eHandshake, "Handshake", "Handshake");
         }
         #endregion
 
