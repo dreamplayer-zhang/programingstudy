@@ -37,8 +37,8 @@ namespace Root_Pine2.Engineer
 
             InitMagazineEV_UI();
             InitLoaderUI(handler.m_loader0, gridLoader, 6);
-            InitLoaderUI(handler.m_loader1, gridBoat, 6);
-            InitLoaderUI(handler.m_loader2, gridBoat, 0);
+            InitLoaderUI(handler.m_loader1, gridLoader1);
+            InitLoaderUI(handler.m_loader2, gridLoader2);
             InitLoaderUI(handler.m_loader3, gridLoader, 0);
             InitBoatsUI();
             InitTransferUI();
@@ -71,6 +71,15 @@ namespace Root_Pine2.Engineer
             Grid.SetColumn(ui, nColumn);
             grid.Children.Add(ui);
             m_aLoaderUI.Add(ui); 
+        }
+
+        void InitLoaderUI(dynamic loader, Grid grid)
+        {
+            Loader_UI ui = new Loader_UI();
+            ui.Init(loader);
+            Grid.SetRow(ui, 1);
+            grid.Children.Add(ui);
+            m_aLoaderUI.Add(ui);
         }
 
         List<Boats_UI> m_aBoatsUI = new List<Boats_UI>(); 
