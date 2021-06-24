@@ -232,18 +232,6 @@ namespace Root_Pine2.Module
                 m_vision.SetRecipe(value); 
             }
         }
-
-        public void RecipeOpen(string sRecipe)
-        {
-            if (p_sRecipe != sRecipe)
-            {
-                p_sRecipe = sRecipe;
-                return;
-            }
-            m_aBoat[Vision2D.eWorks.A].m_recipe.RecipeOpen(sRecipe);
-            m_aBoat[Vision2D.eWorks.B].m_recipe.RecipeOpen(sRecipe);
-            m_vision.SetRecipe(sRecipe); 
-        }
         #endregion
 
         #region Request
@@ -266,9 +254,7 @@ namespace Root_Pine2.Module
                 if (asRead.Length < 3) return;
                 string sRecipe = asRead[2];
                 Vision2D.eWorks eWorks = (asRead[3] == "A") ? Vision2D.eWorks.A : Vision2D.eWorks.B;
-                //m_vision.m_recipe[eWorks].RecipeOpen(sRecipe);
-                //m_aBoat[eWorks].m_recipe.RecipeOpen(sRecipe);
-                RecipeOpen(sRecipe);
+                m_aBoat[eWorks].p_sRecipe = sRecipe; 
                 StartSnap(eWorks); 
             }
         }
@@ -343,7 +329,7 @@ namespace Root_Pine2.Module
 
             public override string Run()
             {
-                m_module.RecipeOpen(m_sRecipe); 
+                m_module.p_sRecipe = m_sRecipe; 
                 return m_module.RunSnap(m_eWorks); 
             }
         }

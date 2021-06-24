@@ -389,7 +389,6 @@ namespace Root_Pine2_Vision.Module
             foreach (DirectoryInfo dir in info.GetDirectories()) asRecipe.Add(dir.Name);
             return asRecipe;
         }
-
         #endregion
 
         #region Works
@@ -456,6 +455,7 @@ namespace Root_Pine2_Vision.Module
 
         public string ReqSnap(string sRecipe, eWorks eWorks)
         {
+            m_aWorks[eWorks].SendRecipe(sRecipe);
             string sSend = m_nReq.ToString("000") + "," + Works2D.eProtocol.Snap.ToString() + "," + sRecipe + "," + eWorks.ToString();
             m_sReceive = "";
             m_tcpRequest.Send(sSend); 
