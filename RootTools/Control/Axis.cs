@@ -561,7 +561,7 @@ namespace RootTools.Control
             string sStartHome = ResetAlarm();
             ServoOn(true);
             Thread.Sleep(10); 
-            if (p_bServoOn == false) return p_id + " ServoOn Error";
+            //if (p_bServoOn == false) return p_id + " ServoOn Error";
             return "OK";
         }
 
@@ -735,7 +735,9 @@ namespace RootTools.Control
         {
             m_treeRootSetting = new TreeRoot(p_id + ".Setting", p_log);
             m_treeRootSetting.UpdateTree += M_treeRootSetting_UpdateTree;
+            
             RunTreeSetting(Tree.eMode.RegRead);
+            RunTreeSetting(Tree.eMode.Update);
         }
 
         private void M_treeRootSetting_UpdateTree()
