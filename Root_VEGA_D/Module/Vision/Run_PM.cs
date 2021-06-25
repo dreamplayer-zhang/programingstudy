@@ -1,5 +1,6 @@
-﻿using RootTools;
-using RootTools.Camera.BaslerPylon;
+﻿using Root_EFEM.Module;
+using Root_VEGA_D.Engineer;
+using RootTools;
 using RootTools.Control;
 using RootTools.Light;
 using RootTools.Memory;
@@ -8,11 +9,7 @@ using RootTools.Trees;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
-using Root_VEGA_D.Engineer;
-using Root_EFEM.Module;
 
 namespace Root_VEGA_D.Module
 {
@@ -142,65 +139,62 @@ namespace Root_VEGA_D.Module
             }
         }
 
-        enum ePMLogType
+        void WritePMLog(bool bCoaxialResult, bool bTransmittedResult, int nCoaxialAvg, int nTransmittedAvg)
         {
-            PM_Start,
-            PM_Error,
-            PM_End,
-            PM_CoaxialLight_Result,
-            PM_Transmitted_Result,
-        }
-        StreamWriter m_writerLog = null;
-        DateTime m_dtNow;
-        void PreparePMLog()
-        {
-            m_dtNow = DateTime.Now;
+            // Create Directory, Log File
+            DateTime dt = DateTime.Now;
             string sPath = LogView._logView.p_sPath;
 
             Directory.CreateDirectory(sPath + "\\PM");
 
-            StreamWriter writer = new StreamWriter(sPath + "\\PM" + "\\" + m_dtNow.ToShortDateString() + ".txt", true, Encoding.Default);
-            if(writer != null)
+            string strFile = sPath + "\\PM" + "\\" + dt.ToShortDateString() + ".txt";
+            bool bIsLogExist = File.Exists(strFile);
+            using (StreamWriter writer = new StreamWriter(strFile, true, Encoding.Default))
             {
-                m_writerLog = writer;
+                if(!bIsLogExist)
+                {
+                    // 파일 첫 줄 작성 시 헤더 작성
+                    writer.WriteLine("Time,PM_Success,Coaxial_Result,Transmitted_Result,Coaxial_Avg,Tranmitted_Avg,USL,LSL");
+                }
+
+                string strTime = dt.Hour.ToString("00") + '.' + dt.Minute.ToString("00") + '.' + dt.Second.ToString("00") + '.' + dt.Millisecond.ToString("000");
+                string strPMSuccess = (bCoaxialResult && bTransmittedResult).ToString();
+                string strCoaxialResult = bCoaxialResult.ToString();
+                string strTransmittedResult = bTransmittedResult.ToString();
+                string strCoaxialAvg = nCoaxialAvg.ToString();
+                string strTransmittedAvg = nTransmittedAvg.ToString();
+                string strUSL = m_nUSL.ToString();
+                string strLSL = m_nLSL.ToString();
+
+                writer.WriteLine("{0},{1},{2},{3},{4},{5},{6},{7}", strTime, strPMSuccess, strCoaxialResult, strTransmittedResult, strCoaxialAvg, strTransmittedAvg, strUSL, strLSL);
             }
-        }
-        void WritePMLog(ePMLogType type, string strLog)
-        {
-            string log = m_dtNow.Hour.ToString("00") + '.' + m_dtNow.Minute.ToString("00") + '.' + m_dtNow.Second.ToString("00") + '.' + m_dtNow.Millisecond.ToString("000");
-            log += "\t" + type.ToString() + "\t" + strLog;
-            if(m_writerLog != null)
-                m_writerLog.WriteLine(log);
         }
 
         public override string Run()
         {
-            // Prepare Log
-            PreparePMLog();
-            WritePMLog(ePMLogType.PM_Start, "");
-
             // 동축, 투과조명 시료 PM 기능 결과
-            bool bCoaxialResult = true;
-            bool bTransmittedResult = true;
+            bool bCoaxialResult = false;
+            bool bTransmittedResult = false;
+
+            if (!m_bIsRun)
+            {
+                ((Loadport_Cymechs)m_handler.m_loadport[EQ.p_nRunLP]).m_CommonFunction();
+
+                return "OK";
+            }
+
+            // Grabmode
+            if (m_grabMode == null) return "Grab Mode == null";
+
+            // Memory
+            MemoryData mem = m_module.MemoryPool.GetMemory(m_sMemoryGroup, m_sMemoryData);
+            if (mem == null) return "Set Memory Setting";
+
+            // USL & LSL Check
+            if (m_nLSL > m_nUSL) return "Check USL & LSL setting";
 
             try
-            { 
-                if (!m_bIsRun)
-                {
-                    ((Loadport_Cymechs)m_handler.m_loadport[EQ.p_nRunLP]).m_CommonFunction();
-
-                    return "OK";
-                }
-
-                if (m_grabMode == null) return "Grab Mode == null";
-
-                // Memory
-                MemoryData mem = m_module.MemoryPool.GetMemory(m_sMemoryGroup, m_sMemoryData);
-                if (mem == null) return "Set Memory Setting";
-
-                // USL & LSL Check
-                if (m_nLSL > m_nUSL) return "Check USL & LSL setting";
-
+            {
                 // Position
                 AxisXY axisXY = m_module.AxisXY;
                 Axis.Speed speedY = axisXY.p_axisY.GetSpeedValue(Axis.eSpeed.Move);
@@ -249,11 +243,7 @@ namespace Root_VEGA_D.Module
                     {
                         Light light = m_module.GetLight(data.m_sLight);
                         if (light == null)
-                        {
-                            string sMsg = "Check Light Setting";
-                            WritePMLog(ePMLogType.PM_Error, sMsg);
-                            return sMsg;
-                        }
+                            return "Check Light Setting";
 
                         light.p_fPower = data.m_nLightPower;
                     }
@@ -306,8 +296,7 @@ namespace Root_VEGA_D.Module
                 m_log.Info(string.Format("Coaxial Light PM result : {0} (Average = {1})", bCoaxialResult ? "OK" : "Fail", listPMData[0].m_average));
                 m_log.Info(string.Format("Transmitted Light PM result : {0} (Average = {1})", bTransmittedResult ? "OK" : "Fail", listPMData[1].m_average));
 
-                WritePMLog(ePMLogType.PM_CoaxialLight_Result, bCoaxialResult.ToString() + "\t" + listPMData[0].m_average.ToString());
-                WritePMLog(ePMLogType.PM_Transmitted_Result, bTransmittedResult.ToString() + "\t" + listPMData[1].m_average.ToString());
+                WritePMLog(bCoaxialResult, bTransmittedResult, listPMData[0].m_average, listPMData[1].m_average);
 
                 // Alarm
                 m_module.m_alidPMCoaxialError.Run(!bCoaxialResult, m_module.m_alidPMCoaxialError.p_sDesc);
@@ -319,10 +308,6 @@ namespace Root_VEGA_D.Module
             }
             finally
             {
-                // Log
-                WritePMLog(ePMLogType.PM_End, "");
-                m_writerLog.Close();
-
                 // Turn off light
                 m_grabMode.SetLight(false);
 
@@ -330,19 +315,21 @@ namespace Root_VEGA_D.Module
                 m_module.StopRADS();
 
                 // PM 기능 이후 loadport 제어
-                if (!bCoaxialResult && !bTransmittedResult)
+                if (bCoaxialResult && bTransmittedResult)
                 {
+                    m_log.Info("PM Success");
                     ((Loadport_Cymechs)m_handler.m_loadport[EQ.p_nRunLP]).m_CommonFunction();
                 }
                 else
                 {
-                    m_module.m_alidPMFail.Run(true, "PM is Fail");
+                    m_log.Info("PM Failed");
+                    m_module.m_alidPMFail.Run(true, "PM Failed");
                 }
             }
-            
-            return "OK";
+            if (bCoaxialResult && bTransmittedResult)
+                return "OK";
+            else
+                return "PM Failed";
         }
     }
-
-    
 }

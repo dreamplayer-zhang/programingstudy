@@ -6,11 +6,13 @@ using RootTools.Light;
 using RootTools.Memory;
 using RootTools.Module;
 using RootTools.Trees;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
+using System.Windows;
 
 namespace Root_Pine2_Vision.Module
 {
@@ -389,7 +391,6 @@ namespace Root_Pine2_Vision.Module
             foreach (DirectoryInfo dir in info.GetDirectories()) asRecipe.Add(dir.Name);
             return asRecipe;
         }
-
         #endregion
 
         #region Works
@@ -424,7 +425,6 @@ namespace Root_Pine2_Vision.Module
             GrabData grabData = recipe.GetGrabData(eWorks);
             try
             {
-
                 m_camera.GrabLineScan(memory, cpOffset, m_nLine, grabData);
                 while (m_camera.p_CamInfo.p_eState != eCamState.Ready)
                 {
@@ -436,10 +436,14 @@ namespace Root_Pine2_Vision.Module
                 if (m_aWorks[eWorks].IsProcessRun())
                     m_aWorks[eWorks].SendSnapDone(iSnap);
             }
-            catch
+            catch (Exception ex)
             {
+                MessageBox.Show(ex.ToString());
                 m_camera.StopGrab();
-                //RunLightOff(); 
+            }
+            finally
+            {
+                RunLightOff(); 
             }
             return "OK";
         }
@@ -456,6 +460,7 @@ namespace Root_Pine2_Vision.Module
 
         public string ReqSnap(string sRecipe, eWorks eWorks)
         {
+            m_aWorks[eWorks].SendRecipe(sRecipe);
             string sSend = m_nReq.ToString("000") + "," + Works2D.eProtocol.Snap.ToString() + "," + sRecipe + "," + eWorks.ToString();
             m_sReceive = "";
             m_tcpRequest.Send(sSend); 

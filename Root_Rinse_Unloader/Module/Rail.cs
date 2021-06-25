@@ -321,6 +321,15 @@ namespace Root_Rinse_Unloader.Module
             return true;
         }
 
+        public bool IsArriveOn()
+        {
+            foreach (Line line in m_aLine)
+            {
+                if (line.m_diCheck[2].p_bIn) return true; 
+            }
+            return false; 
+        }
+
         bool IsReadyPush()
         {
             foreach (Line line in m_aLine)

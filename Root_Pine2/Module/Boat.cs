@@ -33,6 +33,16 @@ namespace Root_Pine2.Module
             }
         }
 
+        public bool IsEnableRun()
+        {
+            return (p_eStep == eStep.Ready) && (p_infoStrip != null);
+        }
+
+        public bool IsDone()
+        {
+            return p_eStep == eStep.Done; 
+        }
+
         BackgroundWorker m_bgwRunReady = new BackgroundWorker();
         private void M_bgwRunReady_DoWork(object sender, DoWorkEventArgs e)
         {
@@ -186,7 +196,7 @@ namespace Root_Pine2.Module
             get { return _sRecipe; }
             set
             {
-                if (_sRecipe == value) return;
+                //if (_sRecipe == value) return;
                 _sRecipe = value;
                 m_recipe.RecipeOpen(value); 
             }
@@ -197,8 +207,9 @@ namespace Root_Pine2.Module
         public void Reset(ModuleBase.eState eState)
         {
             p_infoStrip = null;
-            m_doTriggerSwitch.Write(false); 
+            m_doTriggerSwitch.Write(false);
             if (eState == ModuleBase.eState.Ready) p_eStep = eStep.RunReady;
+            RunVacuum(false); 
         }
 
         public InfoStrip p_infoStrip { get; set; }

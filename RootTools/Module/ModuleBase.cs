@@ -836,9 +836,9 @@ namespace RootTools.Module
         {
             int n = 0; 
             ModuleRunBase[] aModuleRemote = m_qModuleRemote.ToArray();
-            foreach (ModuleRunBase run in aModuleRemote) run.RunTree(tree.GetTree(n++, run.p_id), true);
+            foreach (ModuleRunBase run in aModuleRemote) run.RunTree(tree.GetTree(n++, run.m_sModuleRun), true);
             ModuleRunBase[] aModuleRun = m_qModuleRun.ToArray();
-            foreach (ModuleRunBase run in aModuleRun) run.RunTree(tree.GetTree(n++, run.p_id), true);
+            foreach (ModuleRunBase run in aModuleRun) run.RunTree(tree.GetTree(n++, run.m_sModuleRun), true);
         }
         #endregion
         
