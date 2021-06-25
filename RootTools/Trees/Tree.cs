@@ -172,6 +172,11 @@ namespace RootTools.Trees
             return FindTreeItem(nIndex.ToString("000") + "." + sName); 
         }
 
+        Tree FindTreeItem(string sName, char cIndex)
+        {
+            return FindTreeItem((char)(cIndex + 'A') + "." + sName);
+        }
+
         void AddTreeItem(Tree treeItem)
         {
             if (p_treeRoot.p_eMode != eMode.Init) return;
