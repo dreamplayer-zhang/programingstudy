@@ -39,10 +39,10 @@
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
-                <Grid Grid.Column="0" Margin="3" Background="AliceBlue">
+                <Grid Grid.Column="0" Margin="3" Background="AliceBlue" PreviewMouseLeftButtonDown="GridB_PreviewMouseLeftButtonDown">
                     <TextBlock x:Name="textBlockStepB" HorizontalAlignment="Center"/>
                 </Grid>
-                <Grid Grid.Column="1" Margin="3" Background="AliceBlue">
+                <Grid Grid.Column="1" Margin="3" Background="AliceBlue" PreviewMouseLeftButtonDown="GridA_PreviewMouseLeftButtonDown">
                     <TextBlock x:Name="textBlockStepA" HorizontalAlignment="Center"/>
                 </Grid>
             </Grid>

@@ -186,12 +186,14 @@ namespace Root_Pine2.Module
         Vision2D.eWorks m_eWorksLoad = Vision2D.eWorks.A;
         public string RunLoad(Vision2D.eWorks eWorks)
         {
-            Boat boat = m_handler.m_aBoats[Vision2D.eVision.Bottom].m_aBoat[eWorks]; 
+            Boats boats = m_handler.m_aBoats[Vision2D.eVision.Bottom];
+            Boat boat = boats.m_aBoat[eWorks]; 
             if (m_picker.p_infoStrip != null) return "InfoStrip != null";
             if (boat.p_eStep != Boat.eStep.Done) return "Boat not Done";
             try
             {
                 if (Run(RunMoveUp())) return p_sInfo;
+                if (Run(boats.RunMoveReady(eWorks))) return p_sInfo;
                 if (Run(RunMoveBoat(eWorks))) return p_sInfo;
                 if (Run(RunMoveZ(eWorks, 0))) return p_sInfo;
                 boat.RunVacuum(false);
@@ -259,8 +261,13 @@ namespace Root_Pine2.Module
             try
             {
                 ePosTray ePosTray = ePosTray.Tray0;
-                string sRun = CalcTrayPos(ref ePosTray);
-                if (sRun != "OK") return sRun;
+                if (CalcTrayPos(ref ePosTray) != "OK")
+                {
+                    EQ.p_eState = EQ.eState.Ready;
+                    m_pine2.m_buzzer.RunBuzzer(Pine2.eBuzzer.Warning);
+                    Thread.Sleep(200); 
+                    return "OK";
+                }
                 if (Run(RunMoveUp())) return p_sInfo;
                 if (Run(RunMoveTray(ePosTray))) return p_sInfo;
                 if (Run(RunMoveZ(ePosTray))) return p_sInfo;
@@ -270,6 +277,7 @@ namespace Root_Pine2.Module
                 MagazineEV magazine = m_handler.m_magazineEV.m_aEV[(InfoStrip.eMagazine)ePosTray];
                 magazine.PutInfoStrip(m_picker.p_infoStrip);
                 if (Run(RunMoveBoat(1 - m_eWorksLoad))) return p_sInfo;
+                m_handler.CheckDone(); 
             }
             finally
             {

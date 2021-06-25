@@ -262,7 +262,10 @@ namespace Root_Rinse_Loader.Module
         {
             if ((iIndex < 0) || (iIndex >= 20)) return "Invalid Index";
             if (IsMagazineProtrusion()) return "Check Storage : Strip Protrusion";
-            if (IsLoaderDanger()) return "Check Loader Position"; 
+            if (IsLoaderDanger()) return "Check Loader Position";
+            double fPos = m_axis.GetPosValue(eMagazine) - iIndex * m_dZ;
+            if (fPos == m_axis.p_posCommand) return "OK";
+            if (m_rail.IsStartOn()) return "Check Rail Sensor";
             m_axis.StartMove(eMagazine, -iIndex * m_dZ);
             if (bWait) return m_axis.WaitReady();
             return "OK";
@@ -405,7 +408,7 @@ namespace Root_Rinse_Loader.Module
             }
             foreach (Magazine magazine in m_aMagazine)
             {
-                if (magazine.IsProtrusion())
+                if (magazine.IsProtrusion() || m_rail.IsStartOn())
                 {
                     p_sInfo = "Magazine Protrusion Sensor Checked";
                     return p_sInfo; 

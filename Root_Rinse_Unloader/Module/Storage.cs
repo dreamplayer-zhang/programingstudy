@@ -204,6 +204,9 @@ namespace Root_Rinse_Unloader.Module
             if ((iIndex < 0) || (iIndex >= 20)) return "Invalid Index";
             if (IsMagazineProtrusion()) return "Check Storage : Strip Protrusion";
             if (IsLoaderDanger()) return "Check Loader Position";
+            double fPos = m_axis.GetPosValue(eMagazine) - iIndex * m_dZ;
+            if (fPos == m_axis.p_posCommand) return "OK";
+            if (m_handler.m_rail.IsArriveOn()) return "Check Rail Sensor";
             m_axis.StartMove(eMagazine, -iIndex * m_dZ);
             if (bWait) return m_axis.WaitReady();
             return "OK"; 
@@ -294,7 +297,7 @@ namespace Root_Rinse_Unloader.Module
             }
             foreach (Magazine magazine in m_aMagazine)
             {
-                if (magazine.IsProtrusion())
+                if (magazine.IsProtrusion() || m_handler.m_rail.IsArriveOn())
                 {
                     p_sInfo = "Magazine Protrusion Sensor Checked";
                     return p_sInfo;
@@ -321,10 +324,12 @@ namespace Root_Rinse_Unloader.Module
         #endregion
 
         RinseU m_rinse;
+        RinseU_Handler m_handler;
         public Storage(string id, IEngineer engineer, RinseU rinse)
         {
             p_id = id;
             m_rinse = rinse;
+            m_handler = (RinseU_Handler)engineer.ClassHandler(); 
             InitMagazine();
             InitStack();
             InitBase(id, engineer);

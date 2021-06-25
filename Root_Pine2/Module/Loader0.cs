@@ -338,6 +338,7 @@ namespace Root_Pine2.Module
             try
             {
                 if (Run(RunMoveUp())) return p_sInfo;
+                if (Run(boats.RunMoveReady(eWorks))) return p_sInfo; 
                 if (Run(RunMoveBoat(eVision, eWorks))) return p_sInfo;
                 if (Run(RunMoveZ(eVision, eWorks))) return p_sInfo;
                 boat.RunVacuum(true);

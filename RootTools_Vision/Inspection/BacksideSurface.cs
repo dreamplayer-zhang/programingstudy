@@ -48,6 +48,7 @@ namespace RootTools_Vision
                 return;
 			}
 
+
             this.inspectionSharedBuffer = this.currentWorkplace.GetSharedBufferInfo(this.parameterBackside.IndexChannel);
             byte[] workplaceBuffer = GetWorkplaceBufferByColorChannel(this.parameterBackside.IndexChannel);
 
@@ -60,7 +61,10 @@ namespace RootTools_Vision
             int chipH = this.currentWorkplace.Height;
 
             byte[] arrBinImg = new byte[chipW * chipH]; // Threashold 결과 array
-            
+
+
+           
+
 
             // Dark
             CLR_IP.Cpp_Threshold(workplaceBuffer, arrBinImg, chipW, chipH, isDarkInsp, nGrayLevel);
@@ -83,6 +87,12 @@ namespace RootTools_Vision
                 default:
                     break;
             }
+
+
+
+            // Masking
+            OuterMasking(ref arrBinImg);
+
 
             // Labeling
             var Label = CLR_IP.Cpp_Labeling(workplaceBuffer, arrBinImg, chipW, chipH, isDarkInsp);
@@ -119,6 +129,61 @@ namespace RootTools_Vision
             WorkEventManager.OnInspectionDone(this.currentWorkplace, new InspectionDoneEventArgs(new List<CRect>())); // 나중에 ProcessDefect쪽 EVENT로...
         }
 
+
+        private void OuterMasking(ref byte[] imgArr)
+        {
+            // Outer Area Mask
+            double centerX = recipeBackside.CenterX;
+            double centerY = recipeBackside.CenterY;
+            double radius = recipeBackside.Radius;
+            double radius_2 = radius * radius;
+
+            double left = this.currentWorkplace.PositionX;
+            double top = this.currentWorkplace.PositionY;
+            double right = this.currentWorkplace.PositionX + this.currentWorkplace.Width;
+            double bottom = this.currentWorkplace.PositionY + this.currentWorkplace.Height;
+
+            int width = this.currentWorkplace.Width;
+            int height = this.currentWorkplace.Height;
+
+
+            // Mask 생성
+
+
+            // 포함이 안된 경우
+            long posX = (long)left, posY = (long)top;
+
+            if (((left - centerX) * (left - centerX) + (top - centerX) * (top - centerX) <= radius_2) &&
+                ((right - centerX) * (right - centerX) + (top - centerX) * (top - centerX) <= radius_2) &&
+                ((right - centerX) * (right - centerX) + (bottom - centerX) * (bottom - centerX) <= radius_2) &&
+                ((left - centerX) * (left - centerX) + (bottom - centerX) * (bottom - centerX) <= radius_2)
+                )
+            {
+                return;
+            }
+
+
+            // Masking
+            for (int y = 0; y < height; y++)
+            {
+                for (int x = 0; x < width; x++)
+                {
+                    long index = x + y * width;
+
+                    long absX = (long)left + x - (long)centerX;
+                    long absY = (long)centerY - (long)(top + y);
+
+                    long absX_2 = (absX * absX);
+                    long absY_2 = (absY * absY);
+
+                    if (absX_2 + absY_2 > radius_2)
+                    {
+                        imgArr[(long)index] = 0;
+                    }
+                }
+            }
+            
+        }
 
         public override WorkBase Clone()
         {

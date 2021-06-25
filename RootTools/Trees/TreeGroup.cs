@@ -27,12 +27,12 @@
             p_bExpand = bExpand;
         }
 
-        public TreeGroup(string sIndex, string sName, Tree treeParent, Log log, bool bExpand, bool bVisible, bool bReadOnly)
+        public TreeGroup(char cIndex, string sName, Tree treeParent, Log log, bool bExpand, bool bVisible, bool bReadOnly)
         {
-            p_sName = sIndex + "." + sName;
+            p_sName = (char)(cIndex + 'A') + "." + sName;
             p_treeParent = treeParent;
             p_treeRoot = treeParent.p_treeRoot;
-            p_id = treeParent.p_id + "." + sIndex + "." + sName;
+            p_id = treeParent.p_id + "." + (char)(cIndex + 'A') + "." + sName;
             p_bVisible = bVisible;
             p_bEnable = !bReadOnly && p_treeRoot.p_bEnable;
             m_log = log;

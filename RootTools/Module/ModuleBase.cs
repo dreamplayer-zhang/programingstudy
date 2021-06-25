@@ -834,11 +834,11 @@ namespace RootTools.Module
 
         void RunTreeQueue(Tree tree)
         {
-            int n = 0; 
+            char c = (char)0; 
             ModuleRunBase[] aModuleRemote = m_qModuleRemote.ToArray();
-            foreach (ModuleRunBase run in aModuleRemote) run.RunTree(tree.GetTree(n++, run.m_sModuleRun), true);
+            foreach (ModuleRunBase run in aModuleRemote) run.RunTree(tree.GetTree(c++, run.m_sModuleRun), true);
             ModuleRunBase[] aModuleRun = m_qModuleRun.ToArray();
-            foreach (ModuleRunBase run in aModuleRun) run.RunTree(tree.GetTree(n++, run.m_sModuleRun), true);
+            foreach (ModuleRunBase run in aModuleRun) run.RunTree(tree.GetTree(c++, run.m_sModuleRun), true);
         }
         #endregion
         

@@ -197,6 +197,11 @@ namespace Root_Pine2.Module
                 StopWatch sw = new StopWatch();
                 int msTimeout = (int)(1000 * secTimeout);
                 p_bCheck = m_diCheck.p_bIn;
+                if (p_bCheck == false)
+                {
+                    m_pine2.m_buzzer.RunBuzzer(Pine2.eBuzzer.Finish); 
+                    return "OK"; 
+                }
                 try
                 {
                     if (m_dioEV.m_aBitDI[1].p_bOn)
@@ -287,8 +292,10 @@ namespace Root_Pine2.Module
         #endregion
 
         readonly object m_csLock = new object();
-        public LoadEV(string id, IEngineer engineer)
+        Pine2 m_pine2; 
+        public LoadEV(string id, IEngineer engineer, Pine2 pine2)
         {
+            m_pine2 = pine2; 
             base.InitBase(id, engineer);
         }
 

@@ -65,7 +65,7 @@ namespace Root_Pine2.Engineer
             m_swInit.Start(); 
             p_moduleList = new ModuleList(m_engineer);
             InitModule(m_pine2 = new Pine2("Pine2", m_engineer));
-            InitModule(m_loadEV = new LoadEV("LoadEV", m_engineer));
+            InitModule(m_loadEV = new LoadEV("LoadEV", m_engineer, m_pine2));
             InitMagazineEV();
             InitVision(Vision2D.eVision.Bottom);
             InitVision(Vision2D.eVision.Top2D);
@@ -117,6 +117,41 @@ namespace Root_Pine2.Engineer
                 m_magazineEV.m_aEV.Add(eMagazine, magazineEV);
                 InitModule(magazineEV); 
             }
+        }
+        #endregion
+
+        #region CheckDone
+        public string CheckDone()
+        {
+            if (IsDone())
+            {
+                m_pine2.m_buzzer.RunBuzzer(Pine2.eBuzzer.Finish);
+                EQ.p_eState = EQ.eState.Ready; 
+            }
+            return "OK";
+        }
+
+        bool IsDone()
+        {
+            if (m_loader0.p_infoStrip != null) return false;
+            if (m_loader1.p_infoStrip != null) return false;
+            if (m_loader2.p_infoStrip != null) return false;
+            if (m_loader3.p_infoStrip != null) return false;
+            if (m_aBoats[Vision2D.eVision.Top3D].m_aBoat[Vision2D.eWorks.A].p_infoStrip != null) return false;
+            if (m_aBoats[Vision2D.eVision.Top3D].m_aBoat[Vision2D.eWorks.B].p_infoStrip != null) return false;
+            if (m_aBoats[Vision2D.eVision.Top2D].m_aBoat[Vision2D.eWorks.A].p_infoStrip != null) return false;
+            if (m_aBoats[Vision2D.eVision.Top2D].m_aBoat[Vision2D.eWorks.B].p_infoStrip != null) return false;
+            if (m_aBoats[Vision2D.eVision.Bottom].m_aBoat[Vision2D.eWorks.A].p_infoStrip != null) return false;
+            if (m_aBoats[Vision2D.eVision.Bottom].m_aBoat[Vision2D.eWorks.B].p_infoStrip != null) return false;
+            if (m_transfer.m_gripper.p_infoStrip != null) return false;
+            if (m_transfer.m_pusher.p_infoStrip != null) return false; 
+            switch (m_pine2.p_eMode)
+            {
+                case Pine2.eRunMode.Stack:
+                    if (m_loadEV.p_bCheck) return false; 
+                    break; 
+            }
+            return true;
         }
         #endregion
 

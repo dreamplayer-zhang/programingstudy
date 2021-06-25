@@ -91,6 +91,7 @@ namespace Root_Pine2.Module
                 boat.p_infoStrip.m_eVisionLoad = eVision;
                 boat.p_infoStrip.m_eWorks = eWorks; 
                 if (Run(RunMoveUp())) return p_sInfo;
+                if (Run(boats.RunMoveReady(eWorks))) return p_sInfo;
                 if (Run(RunMoveX(eVision, eWorks))) return p_sInfo;
                 if (Run(RunMoveZ(eVision, eWorks, 0))) return p_sInfo;
                 boat.RunVacuum(false);
@@ -116,14 +117,15 @@ namespace Root_Pine2.Module
         public string RunUnload()
         {
             Boats boats = m_handler.m_aBoats[Vision2D.eVision.Top2D];
-            Vision2D.eWorks eVisionWorks = p_infoStrip.m_eWorks; 
-            Boat boat = boats.m_aBoat[eVisionWorks];
+            Vision2D.eWorks eWorks = p_infoStrip.m_eWorks; 
+            Boat boat = boats.m_aBoat[eWorks];
             if (boat.p_eStep != Boat.eStep.Ready) return "Boat not Ready";
             try
             {
                 if (Run(RunMoveUp())) return p_sInfo;
-                if (Run(RunMoveX(Vision2D.eVision.Top2D, eVisionWorks))) return p_sInfo;
-                if (Run(RunMoveZ(Vision2D.eVision.Top2D, eVisionWorks, 0))) return p_sInfo;
+                if (Run(boats.RunMoveReady(eWorks))) return p_sInfo;
+                if (Run(RunMoveX(Vision2D.eVision.Top2D, eWorks))) return p_sInfo;
+                if (Run(RunMoveZ(Vision2D.eVision.Top2D, eWorks, 0))) return p_sInfo;
                 boat.RunVacuum(true);
                 m_picker.RunVacuum(false);
                 if (Run(RunMoveUp(false))) return p_sInfo;
@@ -240,10 +242,6 @@ namespace Root_Pine2.Module
             else
             {
                 Boats boats2D = m_handler.m_aBoats[Vision2D.eVision.Top2D];
-                foreach (Vision2D.eWorks eWorks in Enum.GetValues(typeof(Vision2D.eWorks)))
-                {
-                    if (boats2D.m_aBoat[eWorks].IsDone()) return StartLoad(Vision2D.eVision.Top2D, eWorks);
-                }
                 Boats boats3D = m_handler.m_aBoats[Vision2D.eVision.Top3D];
                 foreach (Vision2D.eWorks eWorks in Enum.GetValues(typeof(Vision2D.eWorks)))
                 {
@@ -251,6 +249,10 @@ namespace Root_Pine2.Module
                     {
                         if (boats2D.m_aBoat[eWorks].p_infoStrip == null) return StartLoad(Vision2D.eVision.Top3D, eWorks);
                     }
+                }
+                foreach (Vision2D.eWorks eWorks in Enum.GetValues(typeof(Vision2D.eWorks)))
+                {
+                    if (boats2D.m_aBoat[eWorks].IsDone()) return StartLoad(Vision2D.eVision.Top2D, eWorks);
                 }
             }
             return "OK";
