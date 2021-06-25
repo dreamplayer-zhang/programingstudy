@@ -33,6 +33,11 @@ namespace Root_Pine2.Module
             }
         }
 
+        public bool IsEnableRun()
+        {
+            return (p_eStep == eStep.Ready) && (p_infoStrip != null);
+        }
+
         public bool IsDone()
         {
             return p_eStep == eStep.Done; 
@@ -204,6 +209,7 @@ namespace Root_Pine2.Module
             p_infoStrip = null;
             m_doTriggerSwitch.Write(false);
             if (eState == ModuleBase.eState.Ready) p_eStep = eStep.RunReady;
+            RunVacuum(false); 
         }
 
         public InfoStrip p_infoStrip { get; set; }
