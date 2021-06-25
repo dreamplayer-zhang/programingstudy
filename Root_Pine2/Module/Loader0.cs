@@ -98,6 +98,7 @@ namespace Root_Pine2.Module
         public string RunAvoidX(double fPos)
         {
             m_axis.p_axisX.StartMove(fPos);
+            m_axis.p_axisY.StartMove(ePosTransfer.Transfer0);
             return m_axis.p_axisX.WaitReady();
         }
         #endregion
@@ -315,7 +316,7 @@ namespace Root_Pine2.Module
         {
             Vision2D.eVision eVision = m_pine2.p_b3D ? Vision2D.eVision.Top3D : Vision2D.eVision.Top2D;
             Boats boats = m_handler.m_aBoats[eVision];
-            //if (boats.m_aBoat[Vision2D.eWorks.A].p_eStep == Boat.eStep.Ready) return StartUnloadBoat(eVision, Vision2D.eWorks.A);
+            if (boats.m_aBoat[Vision2D.eWorks.A].p_eStep == Boat.eStep.Ready) return StartUnloadBoat(eVision, Vision2D.eWorks.A);
             if (boats.m_aBoat[Vision2D.eWorks.B].p_eStep == Boat.eStep.Ready) return StartUnloadBoat(eVision, Vision2D.eWorks.B);
             return "OK";
         }
@@ -341,10 +342,12 @@ namespace Root_Pine2.Module
                 if (Run(RunMoveZ(eVision, eWorks))) return p_sInfo;
                 boat.RunVacuum(true);
                 if (Run(m_picker.RunVacuum(false))) return p_sInfo;
+                if (Run(RunMoveUp(false))) return p_sInfo;
+                Thread.Sleep(200); 
                 boat.p_infoStrip = m_picker.p_infoStrip;
                 m_picker.p_infoStrip = null;
                 boat.p_infoStrip.m_eWorks = eWorks;
-                if (Run(RunMoveUp())) return p_sInfo;
+                if (Run(m_axis.WaitReady())) return p_sInfo;
             }
             finally
             {
@@ -436,7 +439,7 @@ namespace Root_Pine2.Module
             if (EQ.p_eState != EQ.eState.Run) return "OK";
             if (m_picker.p_infoStrip != null)
             {
-                if (m_picker.p_infoStrip.m_bPaper) return StartRun(m_runUnloadPaper); //forget
+                if (m_picker.p_infoStrip.m_bPaper) return StartRun(m_runUnloadPaper); 
                 return StartUnloadBoat();
             }
             else

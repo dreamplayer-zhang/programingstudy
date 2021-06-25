@@ -207,6 +207,19 @@ namespace RootTools.Trees
             AddTreeItem(newGroup);
             return newGroup;
         }
+
+        public Tree GetTree(char cIndex, string sName, bool bExpand = true, bool bVisible = true, bool bReadOnly = false) //forget
+        {
+            Tree item = FindTreeItem(sName, cIndex);
+            if (item != null)
+            {
+                item.p_bVisible = bVisible;
+                return item;
+            }
+            Tree newGroup = new TreeGroup(cIndex, sName, this, m_log, bExpand, bVisible, bReadOnly);
+            AddTreeItem(newGroup);
+            return newGroup;
+        }
         #endregion
 
         #region TreeItem

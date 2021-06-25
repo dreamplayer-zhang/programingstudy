@@ -54,9 +54,9 @@ namespace Root_Pine2.Module
             m_boats.RunTreeQueue(Tree.eMode.Init);
         }
 
-        private void textBlockVision_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        private void Grid_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            m_boats.m_vision.m_remote.p_bEnable = !m_boats.m_vision.m_remote.p_bEnable; 
+            m_boats.m_vision.m_remote.p_bEnable = !m_boats.m_vision.m_remote.p_bEnable;
         }
     }
 }

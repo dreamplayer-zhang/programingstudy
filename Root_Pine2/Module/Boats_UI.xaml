@@ -19,8 +19,8 @@
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
-            <Grid Grid.Row="0" Margin="3" Background="AntiqueWhite">
-                <TextBlock x:Name="textBlockVision" Text="Vision" HorizontalAlignment="Center" PreviewMouseLeftButtonDown="textBlockVision_PreviewMouseLeftButtonDown"/>
+            <Grid Grid.Row="0" Margin="3" Background="AntiqueWhite" PreviewMouseLeftButtonDown="Grid_PreviewMouseLeftButtonDown">
+                <TextBlock x:Name="textBlockVision" Text="Vision" HorizontalAlignment="Center"/>
             </Grid>
             <Grid Grid.Row="1">
                 <Grid.ColumnDefinitions>
