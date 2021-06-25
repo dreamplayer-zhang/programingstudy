@@ -295,7 +295,7 @@ namespace Root_Rinse_Unloader.Module
             }
             foreach (Magazine magazine in m_aMagazine)
             {
-                if (magazine.IsProtrusion())
+                if (magazine.IsProtrusion() || m_handler.m_rail.IsArriveOn())
                 {
                     p_sInfo = "Magazine Protrusion Sensor Checked";
                     return p_sInfo;
