@@ -460,7 +460,6 @@ namespace Root_Pine2_Vision.Module
 
         public string ReqSnap(string sRecipe, eWorks eWorks)
         {
-            m_aWorks[eWorks].SendRecipe(sRecipe);
             string sSend = m_nReq.ToString("000") + "," + Works2D.eProtocol.Snap.ToString() + "," + sRecipe + "," + eWorks.ToString();
             m_sReceive = "";
             m_tcpRequest.Send(sSend); 
@@ -731,7 +730,10 @@ namespace Root_Pine2_Vision.Module
                 // Root Vision -> VisionWorks2
                 if (m_module.m_aWorks[m_eWorks].IsProcessRun())
                 {
-                    m_module.m_aWorks[m_eWorks].SendSnapInfo(m_sRecipe, 0, 1);
+                    m_module.m_aWorks[m_eWorks].SendRecipe(m_sRecipe);                  // 1. VisionWorks2 Recipe Open 
+                    m_module.m_recipe[m_eWorks].RecipeOpen(m_sRecipe);                  // 2. Root Vision Recipe Open
+                    int nSnapCount = m_module.m_recipe[m_eWorks].m_aSnap.Count;
+                    m_module.m_aWorks[m_eWorks].SendSnapInfo(m_sRecipe, 0, nSnapCount); // 3. VisionWorks2 Receive SnapInfo
                 }
                 return m_module.ReqSnap(m_sRecipe, m_eWorks);
             }
