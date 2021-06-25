@@ -425,7 +425,6 @@ namespace Root_Pine2_Vision.Module
             GrabData grabData = recipe.GetGrabData(eWorks);
             try
             {
-
                 m_camera.GrabLineScan(memory, cpOffset, m_nLine, grabData);
                 while (m_camera.p_CamInfo.p_eState != eCamState.Ready)
                 {
@@ -436,12 +435,11 @@ namespace Root_Pine2_Vision.Module
                 // Root Vision -> VisionWorks2
                 if (m_aWorks[eWorks].IsProcessRun())
                     m_aWorks[eWorks].SendSnapDone(iSnap);
-
-                m_camera.StopGrab();
             }
             catch (Exception ex)
             {
                 MessageBox.Show(ex.ToString());
+                m_camera.StopGrab();
             }
             finally
             {
