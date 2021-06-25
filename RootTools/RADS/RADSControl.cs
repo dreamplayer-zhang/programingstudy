@@ -1,16 +1,14 @@
-﻿using RootTools.Trees;
+﻿using RootTools.Comm;
+using RootTools.Trees;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
-using System.Text;
 using System.Timers;
 using System.Windows.Controls;
 using System.Windows.Forms.DataVisualization.Charting;
 
 namespace RootTools.RADS
 {
-	public class RADSControl : ObservableObject, ITool
+    public class RADSControl : ObservableObject, ITool
 	{
 		public string p_id { get; set; }
 		Log m_log;
@@ -30,6 +28,8 @@ namespace RootTools.RADS
 			m_timer.Elapsed += Timer_Elapsed;
 			m_timer.Start();
 			//}
+
+			InitRS232();
 		}
 
 		#region Tree
@@ -131,6 +131,27 @@ namespace RootTools.RADS
 		}
 		#endregion
 
+		#region RS232
+		public RS232byte m_rs232;
+		void InitRS232()
+		{
+			m_rs232 = new RS232byte(p_id, m_log);
+			m_rs232.OnReceive += M_rs232_OnReceive;
+		}
+
+		private void M_rs232_OnReceive(byte[] aRead, int nRead)
+		{
+			if (nRead > 0)
+			{
+				if (aRead[0] == 165)
+				{
+					int nVoltage = (int)BitConverter.ToUInt16(aRead, 1);
+					p_nVoltage = nVoltage;
+				}
+			}
+		}
+		#endregion
+
 		public Timer m_timer { get; set; }
 
 		RADSConnectControl m_connect;
@@ -162,7 +183,17 @@ namespace RootTools.RADS
 				SetProperty(ref m_nAdsData, value);
             }
         }
-		
+
+		int m_nVoltage = 0;
+		public int p_nVoltage
+		{
+			get { return m_nVoltage; }
+			set
+			{
+				SetProperty(ref m_nVoltage, value);
+			}
+		}
+
 		private void OnSearchComplete()
 		{
 			if (this.SearchComplete != null)
@@ -205,7 +236,7 @@ namespace RootTools.RADS
 					{
 						if (m_voltPoints != null)
                         {
-							m_voltPoints.InsertY(0, p_nAdsData);
+							m_voltPoints.InsertY(0, p_nVoltage);
 
 							while (m_voltPoints.Count > 1000)
 							{

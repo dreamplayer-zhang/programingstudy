@@ -42,6 +42,9 @@ namespace RootTools.RADS
                 radsControl.p_connect.p_CurrentController.RunTree(Tree.eMode.Init);
             }
 
+            // Initialize rs232 for monitoring voltage
+            rs232UI.Init(radsControl.m_rs232);
+
             // voltage graph
             m_voltChart = MyWinformChart;
 
