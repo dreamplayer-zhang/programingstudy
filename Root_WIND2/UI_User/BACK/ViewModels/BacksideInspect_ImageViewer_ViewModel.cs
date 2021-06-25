@@ -227,8 +227,10 @@ namespace Root_WIND2.UI_User
                 {
                     using (var sr = new StreamReader(Constants.FilePath.BacksideCenterPointFilePath))
                     {
-                        XmlSerializer xs = new XmlSerializer(typeof(CPoint));
-                        CPoint centerPt = (CPoint)xs.Deserialize(sr);
+                        XmlSerializer xs = new XmlSerializer(typeof(BacksideCircleData));
+
+                        BacksideCircleData data = (BacksideCircleData)xs.Deserialize(sr);
+                        CPoint centerPt = data.CenterPoint;
 
                         SetSearchedCenter(centerPt);
                     }
