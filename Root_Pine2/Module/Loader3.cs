@@ -261,8 +261,13 @@ namespace Root_Pine2.Module
             try
             {
                 ePosTray ePosTray = ePosTray.Tray0;
-                string sRun = CalcTrayPos(ref ePosTray);
-                if (sRun != "OK") return sRun;
+                if (CalcTrayPos(ref ePosTray) != "OK")
+                {
+                    EQ.p_eState = EQ.eState.Ready;
+                    m_pine2.m_buzzer.RunBuzzer(Pine2.eBuzzer.Warning);
+                    Thread.Sleep(200); 
+                    return "OK";
+                }
                 if (Run(RunMoveUp())) return p_sInfo;
                 if (Run(RunMoveTray(ePosTray))) return p_sInfo;
                 if (Run(RunMoveZ(ePosTray))) return p_sInfo;

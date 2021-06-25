@@ -262,6 +262,7 @@ namespace Root_Rinse_Loader.Module
         {
             if ((iIndex < 0) || (iIndex >= 20)) return "Invalid Index";
             if (IsMagazineProtrusion()) return "Check Storage : Strip Protrusion";
+            if (m_rail.IsStartOn()) return "Check Rail Sensor"; 
             if (IsLoaderDanger()) return "Check Loader Position"; 
             m_axis.StartMove(eMagazine, -iIndex * m_dZ);
             if (bWait) return m_axis.WaitReady();

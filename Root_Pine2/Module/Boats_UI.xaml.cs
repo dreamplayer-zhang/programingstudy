@@ -1,4 +1,5 @@
 ﻿using Root_Pine2_Vision.Module;
+using RootTools;
 using RootTools.Module;
 using RootTools.Trees;
 using System.Windows.Controls;
@@ -57,6 +58,20 @@ namespace Root_Pine2.Module
         private void Grid_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             m_boats.m_vision.m_remote.p_bEnable = !m_boats.m_vision.m_remote.p_bEnable;
+        }
+
+        private void GridA_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            if (EQ.p_eState != EQ.eState.Ready) return;
+            if (m_boats.p_eState != ModuleBase.eState.Ready) return;
+            m_boats.m_aBoat[Vision2D.eWorks.A].RunMove(Boat.ePos.Vision, false);  
+        }
+
+        private void GridB_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            if (EQ.p_eState != EQ.eState.Ready) return;
+            if (m_boats.p_eState != ModuleBase.eState.Ready) return;
+            m_boats.m_aBoat[Vision2D.eWorks.B].RunMove(Boat.ePos.Vision, false);
         }
     }
 }
