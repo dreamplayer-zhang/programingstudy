@@ -203,8 +203,10 @@ namespace Root_Rinse_Unloader.Module
         {
             if ((iIndex < 0) || (iIndex >= 20)) return "Invalid Index";
             if (IsMagazineProtrusion()) return "Check Storage : Strip Protrusion";
-            if (m_handler.m_rail.IsArriveOn()) return "Check Rail Sensor"; 
             if (IsLoaderDanger()) return "Check Loader Position";
+            double fPos = m_axis.GetPosValue(eMagazine) - iIndex * m_dZ;
+            if (fPos == m_axis.p_posCommand) return "OK";
+            if (m_handler.m_rail.IsArriveOn()) return "Check Rail Sensor";
             m_axis.StartMove(eMagazine, -iIndex * m_dZ);
             if (bWait) return m_axis.WaitReady();
             return "OK"; 
