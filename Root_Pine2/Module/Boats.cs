@@ -50,7 +50,7 @@ namespace Root_Pine2.Module
             return bWait ? m_axisCam.p_axisX.WaitReady() : "OK";
         }
 
-        double m_xCamScale = 1000; 
+        double m_xCamScale = 10000; 
         void RunTreeCamAxis(Tree tree)
         {
             m_xCamScale = tree.Set(m_xCamScale, m_xCamScale, "X Scale", "Camera X Axis Scale (pulse / mm)"); 

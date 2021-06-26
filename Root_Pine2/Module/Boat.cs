@@ -104,6 +104,7 @@ namespace Root_Pine2.Module
         double[] m_pSnap = new double[2] { 0, 0 }; 
         void CalcSnapPos(Vision2D.Recipe.Snap snapData)
         {
+            CalcAccDist();
             double pStart = m_axis.GetPosValue(ePos.SnapStart) + m_yScale * snapData.m_dpAxis.Y;
             double pEnd = pStart + m_yScale * m_mmSnap;
             //double pEnd = m_pSnap[0] + m_yScale * m_mmSnap;
@@ -123,9 +124,20 @@ namespace Root_Pine2.Module
             }
         }
 
-        double m_yScale = 10000;
+        double m_yScale = 10000;    // upulse
         double m_mmSnap = 300;
         double m_mmAcc = 20;
+
+        public void CalcAccDist()
+        {
+            Axis.Speed SnapSpeed = m_axis.GetSpeedValue("Snap");
+            double dVel = SnapSpeed.m_v / m_yScale;    // 최종 속도 (등속도)       [mm/s]
+            double dSec = SnapSpeed.m_acc;             // 가속하는데 걸리는 시간   [s]
+
+            double dAcc = dVel / dSec;
+            m_mmAcc = 0.5 * dAcc * dSec * dSec;         // 가속하는 거리 [mm]
+        }
+
         public string RunMoveSnapStart(Vision2D.Recipe.Snap snapData, bool bWait = true)
         {
             CalcSnapPos(snapData);
