@@ -198,7 +198,8 @@ namespace Root_Pine2.Module
             {
                 if (_sRecipe == value) return; 
                 _sRecipe = value;
-                m_recipe.RecipeOpen(value); 
+                if(value != "")
+                    m_recipe.RecipeOpen(value); 
             }
         }
         public Vision2D.Recipe m_recipe; 
