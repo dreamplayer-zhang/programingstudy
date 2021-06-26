@@ -190,13 +190,13 @@ namespace Root_Pine2.Module
         #endregion
 
         #region Recipe
-        string _sRecipe = "";
+        public string _sRecipe = "";
         public string p_sRecipe
         {
             get { return _sRecipe; }
             set
             {
-                //if (_sRecipe == value) return;
+                if (_sRecipe == value) return; 
                 _sRecipe = value;
                 m_recipe.RecipeOpen(value); 
             }

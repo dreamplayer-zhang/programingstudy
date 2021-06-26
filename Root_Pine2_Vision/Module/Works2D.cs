@@ -146,9 +146,12 @@ namespace Root_Pine2_Vision.Module
         #endregion
 
         #region TCPIP
-        int m_iProtocol = 0; 
+        int m_iProtocol = 0;
+        string m_sRecipe = ""; 
         public string SendRecipe(string sRecipe)
         {
+            if (m_sRecipe == sRecipe) return "OK";
+            m_sRecipe = sRecipe; 
             if (m_bStartProcess == false) return "OK";
             Protocol protocol = new Protocol(m_iProtocol, eProtocol.RecipeOpen, sRecipe);
             m_qProtocol.Enqueue(protocol);
@@ -158,7 +161,7 @@ namespace Root_Pine2_Vision.Module
         public string SendSnapDone(int iSnap)
         {
             if (m_bStartProcess == false) return "OK";
-            Protocol protocol = new Protocol(m_iProtocol, eProtocol.SnapDone, m_vision.p_sRecipe, iSnap);
+            Protocol protocol = new Protocol(m_iProtocol, eProtocol.SnapDone, m_sRecipe, iSnap);
             m_qProtocol.Enqueue(protocol);
             return protocol.WaitReply();
         }

@@ -6,6 +6,7 @@ using RootTools.Gem;
 using RootTools.Module;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -44,6 +45,18 @@ namespace Root_Pine2.Engineer
                     m_aBoats[Vision2D.eVision.Bottom].p_sRecipe = value;
                 }
             }
+        }
+
+        public List<string> p_asRecipe
+        {
+            get
+            {
+                List<string> asRecipe = new List<string>();
+                DirectoryInfo info = new DirectoryInfo(EQ.c_sPathRecipe);
+                foreach (DirectoryInfo dir in info.GetDirectories()) asRecipe.Add(dir.Name);
+                return asRecipe;
+            }
+            set { }
         }
         #endregion
 

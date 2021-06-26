@@ -139,24 +139,15 @@ namespace Root_Pine2_Vision.Module
         }
         #endregion
 
-        #region p_sRecipe
-        string _sRecipe = ""; 
-        public string p_sRecipe
+        #region Send Recipe
+        public void SendRecipe(string sRecipe)
         {
-            get { return _sRecipe; }
-            set
+            if (p_eRemote == eRemote.Client) RemoteRun(eRemoteRun.SendRecipe, eRemote.Client, sRecipe);
+            else
             {
-                if (_sRecipe == value) return;
-                _sRecipe = value;
-                m_aWorks[eWorks.A].SendRecipe(value);
-                m_aWorks[eWorks.B].SendRecipe(value);
+                m_aWorks[eWorks.A].SendRecipe(sRecipe);
+                m_aWorks[eWorks.B].SendRecipe(sRecipe);
             }
-        }
-
-        public void SetRecipe(string sRecipe)
-        {
-            if (p_eRemote == eRemote.Client) RemoteRun(eRemoteRun.Recipe, eRemote.Client, sRecipe);
-            else p_sRecipe = sRecipe; 
         }
         #endregion
 
@@ -337,7 +328,6 @@ namespace Root_Pine2_Vision.Module
                 m_treeRecipe.m_job.Close();
             }
 
-
             #region TreeRecipe
             public TreeRoot m_treeRecipe;
             void InitTreeRecipe()
@@ -384,12 +374,16 @@ namespace Root_Pine2_Vision.Module
             m_recipe.Add(eWorks.B, new Recipe(this, eWorks.B));
         }
 
-        public List<string> GetRecipeList()
+        public List<string> p_asRecipe
         {
-            List<string> asRecipe = new List<string>();
-            DirectoryInfo info = new DirectoryInfo(EQ.c_sPathRecipe);
-            foreach (DirectoryInfo dir in info.GetDirectories()) asRecipe.Add(dir.Name);
-            return asRecipe;
+            get
+            {
+                List<string> asRecipe = new List<string>();
+                DirectoryInfo info = new DirectoryInfo(EQ.c_sPathRecipe);
+                foreach (DirectoryInfo dir in info.GetDirectories()) asRecipe.Add(dir.Name);
+                return asRecipe;
+            }
+            set { }
         }
         #endregion
 
@@ -548,7 +542,7 @@ namespace Root_Pine2_Vision.Module
         {
             StateHome,
             RunLight,
-            Recipe
+            SendRecipe
         }
 
         Run_Remote GetRemoteRun(eRemoteRun eRemoteRun, eRemote eRemote, dynamic value)
@@ -560,7 +554,7 @@ namespace Root_Pine2_Vision.Module
             {
                 case eRemoteRun.StateHome: break;
                 case eRemoteRun.RunLight: run.m_lightPower = value; break;
-                case eRemoteRun.Recipe: run.m_sRecipe = value; break; 
+                case eRemoteRun.SendRecipe: run.m_sRecipe = value; break; 
             }
             return run;
         }
@@ -607,7 +601,7 @@ namespace Root_Pine2_Vision.Module
                 switch (m_eRemoteRun)
                 {
                     case eRemoteRun.RunLight: m_lightPower.RunTree(tree.GetTree("Light Power", true, bVisible), bVisible); break;
-                    case eRemoteRun.Recipe: m_sRecipe = tree.Set(m_sRecipe, m_sRecipe, "Recipe", "Recipe", bVisible); break; 
+                    case eRemoteRun.SendRecipe: m_sRecipe = tree.Set(m_sRecipe, m_sRecipe, "Recipe", "Recipe", bVisible); break; 
                     default: break; 
                 }
             }
@@ -619,7 +613,7 @@ namespace Root_Pine2_Vision.Module
                 {
                     case eRemoteRun.StateHome: return m_module.StateHome();
                     case eRemoteRun.RunLight: m_module.RunLight(m_lightPower); break;
-                    case eRemoteRun.Recipe: m_module.SetRecipe(m_sRecipe); break; 
+                    case eRemoteRun.SendRecipe: m_module.SendRecipe(m_sRecipe); break; 
                 }
                 return "OK";
             }
@@ -722,7 +716,7 @@ namespace Root_Pine2_Vision.Module
             public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
             {
                 m_eWorks = (eWorks)tree.Set(m_eWorks, m_eWorks, "Works", "Vision eWorks", bVisible);
-                m_sRecipe = tree.Set(m_sRecipe, m_sRecipe, m_module.GetRecipeList(), "Recipe", "Recipe", bVisible);
+                m_sRecipe = tree.Set(m_sRecipe, m_sRecipe, m_module.p_asRecipe, "Recipe", "Recipe", bVisible);
             }
 
             public override string Run()

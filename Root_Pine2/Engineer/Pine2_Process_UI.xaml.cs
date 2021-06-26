@@ -30,6 +30,7 @@ namespace Root_Pine2.Engineer
             checkBoxPause.DataContext = EQ.m_EQ;
             checkBoxSimulate.DataContext = EQ.m_EQ;
 
+            comboRecipe.DataContext = handler; 
             textBlockMode.DataContext = m_pine2;
             textBoxWidth.DataContext = m_pine2;
             textBoxThickness.DataContext = m_pine2; 

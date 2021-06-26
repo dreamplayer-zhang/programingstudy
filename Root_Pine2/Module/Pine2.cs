@@ -433,18 +433,6 @@ namespace Root_Pine2.Module
                 OnPropertyChanged(); 
             }
         }
-
-        string _sRecipe = "";
-        public string p_sRecipe
-        {
-            get { return _sRecipe; }
-            set
-            {
-                if (_sRecipe == value) return;
-                _sRecipe = value;
-                m_handler.p_sRecipe = value; 
-            }
-        }
         #endregion
 
         #region Thread DIO
@@ -514,10 +502,6 @@ namespace Root_Pine2.Module
             m_thicknessDefault = tree.GetTree("Default Strip").Set(m_thicknessDefault, m_thicknessDefault, "Thickness", "Strip Thickness (um)");
             p_lStack = tree.GetTree("Stack").Set(p_lStack, p_lStack, "Stack Count", "Strip Max Stack Count");
             p_lStackPaper = tree.GetTree("Stack").Set(p_lStackPaper, p_lStackPaper, "Paper Count", "Paper Max Stack Count");
-            if (tree.p_treeRoot.p_eMode != Tree.eMode.RegRead)
-            {
-                p_sRecipe = tree.GetTree("Mode").Set(p_sRecipe, p_sRecipe, "Recipe", "Recipe");
-            }
         }
         #endregion
 
