@@ -38,6 +38,7 @@ namespace Root_Pine2.Engineer
             {
                 if (_sRecipe == value) return;
                 _sRecipe = value;
+                m_pine2.RecipeOpen(value); 
                 if (m_aBoats.Count > 0)
                 {
                     m_aBoats[Vision2D.eVision.Top3D].p_sRecipe = value;
