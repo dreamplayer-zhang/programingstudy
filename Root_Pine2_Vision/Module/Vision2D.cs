@@ -267,7 +267,7 @@ namespace Root_Pine2_Vision.Module
 
                 void RunTreeStage(Tree tree, bool bVisible)
                 {
-                    m_dpAxis = tree.Set(m_dpAxis, m_dpAxis, "Offset", "Axis Offset (pulse)", bVisible);
+                    m_dpAxis = tree.Set(m_dpAxis, m_dpAxis, "Offset", "Axis Offset (mm)", bVisible);
                     m_eDirection = (eDirection)tree.Set(m_eDirection, m_eDirection, "Direction", "Scan Direction", bVisible);
                 }
 
