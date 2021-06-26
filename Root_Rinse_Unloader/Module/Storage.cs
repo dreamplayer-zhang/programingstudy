@@ -29,9 +29,11 @@ namespace Root_Rinse_Unloader.Module
 
         #region GAF
         ALID m_alidMagazineFull;
+        ALID m_alidProtrusion;
         void InitALID()
         {
             m_alidMagazineFull = m_gaf.GetALID(this, "MagazineFull", "MagazineFull Error");
+            m_alidProtrusion = m_gaf.GetALID(this, "Protrusion", "Protrusion");
         }
         #endregion
 
@@ -125,11 +127,20 @@ namespace Root_Rinse_Unloader.Module
             return "OK";
         }
 
-        public bool IsMagazineProtrusion()
+        public bool IsProtrusion()
         {
             foreach (Magazine magazine in m_aMagazine)
             {
-                if (magazine.IsProtrusion()) return true;
+                if (magazine.IsProtrusion())
+                {
+                    m_alidProtrusion.Run(true, "Check Storage : Strip Protrusion");
+                    return true;
+                }
+            }
+            if (m_handler.m_rail.IsArriveOn())
+            {
+                m_alidProtrusion.Run(true, "Check Rail Sensor");
+                return true;
             }
             return false;
         }
@@ -198,24 +209,26 @@ namespace Root_Rinse_Unloader.Module
             m_axis.AddPos("Stack");
         }
 
+        string MoveElevator(double fPos, bool bWait = true)
+        {
+            if (fPos == m_axis.p_posCommand) return "OK";
+            if (IsProtrusion()) return "Protrusion Error";
+            m_axis.StartMove(fPos);
+            return bWait ? m_axis.WaitReady() : "OK";
+        }
+
         int m_dZ = 6000;
         public string MoveMagazine(eMagazine eMagazine, int iIndex, bool bWait)
         {
             if ((iIndex < 0) || (iIndex >= 20)) return "Invalid Index";
-            if (IsMagazineProtrusion()) return "Check Storage : Strip Protrusion";
             if (IsLoaderDanger()) return "Check Loader Position";
             double fPos = m_axis.GetPosValue(eMagazine) - iIndex * m_dZ;
-            if (fPos == m_axis.p_posCommand) return "OK";
-            if (m_handler.m_rail.IsArriveOn()) return "Check Rail Sensor";
-            m_axis.StartMove(eMagazine, -iIndex * m_dZ);
-            if (bWait) return m_axis.WaitReady();
-            return "OK"; 
+            return MoveElevator(fPos, bWait);
         }
 
         public string MoveStack()
         {
-            m_axis.StartMove("Stack");
-            return m_axis.WaitReady();
+            return MoveElevator(m_axis.GetPosValue("Stack"));
         }
 
         public bool IsHighPos()
@@ -295,15 +308,8 @@ namespace Root_Rinse_Unloader.Module
                 p_eState = eState.Ready;
                 return "OK";
             }
-            foreach (Magazine magazine in m_aMagazine)
-            {
-                if (magazine.IsProtrusion() || m_handler.m_rail.IsArriveOn())
-                {
-                    p_sInfo = "Magazine Protrusion Sensor Checked";
-                    return p_sInfo;
-                }
-                magazine.RunClamp(magazine.p_bCheck);
-            }
+            if (IsProtrusion()) return "Protrusion Error";
+            foreach (Magazine magazine in m_aMagazine) magazine.RunClamp(magazine.p_bCheck);
             p_sInfo = base.StateHome();
             p_eState = (p_sInfo == "OK") ? eState.Ready : eState.Error;
             return p_sInfo;

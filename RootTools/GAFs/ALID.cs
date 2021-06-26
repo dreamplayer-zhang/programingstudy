@@ -68,7 +68,7 @@ namespace RootTools.GAFs
 			}
 		}
 
-		bool _bEQError = false;
+		bool _bEQError = true;
         public bool p_bEQError
         {
             get { return _bEQError; }
