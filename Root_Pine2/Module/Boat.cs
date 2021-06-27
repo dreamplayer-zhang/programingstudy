@@ -149,7 +149,7 @@ namespace Root_Pine2.Module
         {
             try
             {
-                m_axis.SetTrigger(m_axis.m_trigger.m_aPos[0], m_axis.m_trigger.m_aPos[1], m_axis.m_trigger.m_dPos, true);
+                m_axis.SetTrigger(m_axis.m_trigger.m_aPos[0], m_axis.m_trigger.m_aPos[1], m_axis.m_trigger.m_dPos, 10, true);
                 //m_axis.RunTrigger(true);
                 m_axis.StartMove(m_pSnap[1], "Snap");
                 return m_axis.WaitReady();
