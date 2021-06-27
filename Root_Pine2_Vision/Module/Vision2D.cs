@@ -417,8 +417,11 @@ namespace Root_Pine2_Vision.Module
             MemoryData memory = m_aWorks[eWorks].p_memSnap[(int)recipe.m_eEXT];
             CPoint cpOffset = recipe.GetMemoryOffset();
             GrabData grabData = recipe.GetGrabData(eWorks);
+            DalsaParameterSet.eUserSet nUserset = (recipe.m_eEXT == Recipe.Snap.eEXT.EXT1) ? DalsaParameterSet.eUserSet.UserSet2 : DalsaParameterSet.eUserSet.UserSet3;  // RGB : Userset2 , APS : Userset3
             try
             {
+                if(m_camera.p_CamParam.p_eUserSetCurrent != nUserset)
+                    m_camera.p_CamParam.p_eUserSetCurrent = nUserset;
                 m_camera.GrabLineScan(memory, cpOffset, m_nLine, grabData);
                 while (m_camera.p_CamInfo.p_eState != eCamState.Ready)
                 {
