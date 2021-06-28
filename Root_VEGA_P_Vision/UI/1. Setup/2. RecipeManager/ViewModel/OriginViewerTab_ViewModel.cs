@@ -27,6 +27,7 @@ namespace Root_VEGA_P_Vision
         OriginImageViewer_ViewModel m2DTDIViewer, mStainViewer, mSideTopBtmViewer,mSideLeftRightViewer;
         OriginImageViewer_ViewModel selectedViewer;
         OriginInfo TDIorigin,stainOrigin,sideLROrigin,sideTBOrigin;
+        EUVOriginRecipe originRecipe;
 
         int selectedIdx, sideselectedIdx;
         List<int> numList;
@@ -100,13 +101,7 @@ namespace Root_VEGA_P_Vision
             InitOriginViewer(p_SideOriginTopBtmViewer);
             InitOriginViewer(p_SideOriginLeftRightViewer);
 
-            EUVOriginRecipe originRecipe = GlobalObjects.Instance.Get<RecipeCoverFront>().GetItem<EUVOriginRecipe>();
-
-            //TDIOrigin = originRecipe.TDI
-            ;
-            //StainOrigin = originRecipe.StainOriginInfo;
-            //SideLROrigin = originRecipe.SideLROriginInfo;
-            //SideTBOrigin = originRecipe.SideTBOriginInfo;
+            originRecipe = GlobalObjects.Instance.Get<RecipeCoverFront>().GetItem<EUVOriginRecipe>();
 
             selectedIdx = 0;
             sideselectedIdx = 0;
@@ -114,6 +109,18 @@ namespace Root_VEGA_P_Vision
             numList = new List<int>();
             for (int i = 0; i < m2DTDIViewer.p_ImageData.p_nPlane; i++)
                 MemNumList.Add(i + 1);
+
+            VegaPEventManager.RecipeUpdated += VegaPEventManager_RecipeUpdated;
+        }
+
+        private void VegaPEventManager_RecipeUpdated(object sender, RecipeEventArgs e)
+        {
+            RecipeBase recipe = e.recipe;
+            originRecipe = recipe.GetItem<EUVOriginRecipe>();
+            m2DTDIViewer.SetOriginBox(originRecipe.TDIOriginInfo.Origin, originRecipe.TDIOriginInfo.OriginSize);
+            mStainViewer.SetOriginBox(originRecipe.StainOriginInfo.Origin, originRecipe.StainOriginInfo.OriginSize);
+            mSideTopBtmViewer.SetOriginBox(originRecipe.SideTBOriginInfo.Origin, originRecipe.SideTBOriginInfo.OriginSize);
+            mSideLeftRightViewer.SetOriginBox(originRecipe.SideLROriginInfo.Origin, originRecipe.SideLROriginInfo.OriginSize);
         }
 
         void InitOriginViewer(OriginImageViewer_ViewModel viewer)
@@ -123,15 +130,6 @@ namespace Root_VEGA_P_Vision
             viewer.OriginBoxDone += OriginBoxDone_Callback;
         }
 
-        public void LoadRecipe()
-        {
-            p_2DOriginViewer.SetOriginBox(TDIOrigin.Origin, TDIOrigin.OriginSize);
-            p_StainOriginViewer.SetOriginBox(StainOrigin.Origin, StainOrigin.OriginSize);
-            p_SideOriginTopBtmViewer.SetOriginBox(SideTBOrigin.Origin, SideTBOrigin.OriginSize);
-            p_SideOriginLeftRightViewer.SetOriginBox(SideLROrigin.Origin, SideLROrigin.OriginSize);
-
-            VegaPEventManager.OnRecipeUpdated(this, new RecipeEventArgs());
-        }
         #region CallbackFunc
         public void OriginBoxReset_Callback()
         {
@@ -144,15 +142,12 @@ namespace Root_VEGA_P_Vision
 
         public void OriginBoxDone_Callback()
         {
-            VegaPEventManager.OnRecipeUpdated(this, new RecipeEventArgs());
+            //VegaPEventManager.OnRecipeUpdated(this, new RecipeEventArgs());
         }
 
         public void Clear()
         {
             selectedViewer.ClearObjects(true);
-
-            //originRecipe.Clear();
-            VegaPEventManager.OnRecipeUpdated(this, new RecipeEventArgs());
         }
 
         void SetOriginRecipe()

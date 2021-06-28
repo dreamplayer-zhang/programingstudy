@@ -14,7 +14,7 @@
     </i:Interaction.Triggers>
     <Grid Width="120" Height="140" Margin="10,0,0,0">
         <Grid Background="Transparent">
-            <Image x:Name="image"/>
+            <Image x:Name="image" HorizontalAlignment="Center" VerticalAlignment="Center"/>
         </Grid>
     </Grid>
 </UserControl>

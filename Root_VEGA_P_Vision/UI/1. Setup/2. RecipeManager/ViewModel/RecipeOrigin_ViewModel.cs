@@ -99,7 +99,7 @@ namespace Root_VEGA_P_Vision
             originviewerTab = new OriginViewerTab_ViewModel();
             positionviewerTab = new PositionViewerTab_ViewModel();
 
-            SelectedFeatureInfo = new AlignFeatureInfo_ViewModel(this, positionviewerTab.selectedLists);
+            SelectedFeatureInfo = new AlignFeatureInfo_ViewModel(this, positionviewerTab.selectedLists, positionviewerTab.selectedViewer.recipe);
             EUVOriginRecipe originRecipe = GlobalObjects.Instance.Get<RecipeCoverFront>().GetItem<EUVOriginRecipe>();
             tdiOrigin = new OriginInfo_ViewModel(originRecipe.TDIOriginInfo, "2D TDI Origin");
             stainOrigin = new OriginInfo_ViewModel(originRecipe.StainOriginInfo, "Stain Origin");
@@ -118,6 +118,16 @@ namespace Root_VEGA_P_Vision
 
             originInfoVisible = true;
             positionInfoVisible = false;
+            VegaPEventManager.RecipeUpdated += VegaPEventManager_RecipeUpdated;
+        }
+
+        private void VegaPEventManager_RecipeUpdated(object sender, RecipeEventArgs e)
+        {
+            EUVOriginRecipe originRecipe = e.recipe.GetItem<EUVOriginRecipe>();
+            tdiOrigin.OriginInfo = originRecipe.TDIOriginInfo;
+            stainOrigin.OriginInfo = originRecipe.StainOriginInfo;
+            sideTBOrigin.OriginInfo = originRecipe.SideTBOriginInfo;
+            sideLROrigin.OriginInfo = originRecipe.SideLROriginInfo;
         }
 
         public void ManualAlignDoneUpdate(CPoint Top, CPoint Btm)

@@ -107,7 +107,7 @@ namespace Root_VEGA_P_Vision
             Main = new RecipeSideImageViewers_Panel();
             Main.DataContext = this;
             RecipeBase recipe = GlobalObjects.Instance.Get<RecipeCoverFront>();
-
+            this.recipeSide = recipeSide;
             if (parts.Contains("Cover"))
                 recipe = GlobalObjects.Instance.Get<RecipeCoverFront>();
             else if (parts.Contains("Plate"))

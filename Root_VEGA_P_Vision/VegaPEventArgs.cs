@@ -1,4 +1,5 @@
 ﻿using RootTools;
+using RootTools_Vision;
 using System;
 
 namespace Root_VEGA_P_Vision
@@ -16,10 +17,11 @@ namespace Root_VEGA_P_Vision
     }
     public class RecipeEventArgs : EventArgs
     {
+        public readonly RecipeBase recipe;
 
-        public RecipeEventArgs()
+        public RecipeEventArgs(RecipeBase recipe)
         {
-
+            this.recipe = recipe;
         }
     }
     public class ImageROIEventArgs:EventArgs

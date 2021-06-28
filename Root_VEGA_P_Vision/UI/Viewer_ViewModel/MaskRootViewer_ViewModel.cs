@@ -91,7 +91,27 @@ namespace Root_VEGA_P_Vision
             InitializeUIElements();
             Init_PenCursor();
             InitInspMgr();
-        } 
+
+            VegaPEventManager.RecipeUpdated += VegaPEventManager_RecipeUpdated;
+        }
+
+        private void VegaPEventManager_RecipeUpdated(object sender, RecipeEventArgs e)
+        {
+            EUVOriginRecipe originRecipe = recipe.GetItem<EUVOriginRecipe>();
+
+            if (TabName.Contains("Main"))
+                originInfo = originRecipe.TDIOriginInfo;
+            else if (TabName.Contains("Stain"))
+                originInfo = originRecipe.StainOriginInfo;
+            else if (TabName.Contains("Top") || TabName.Contains("Bottom"))
+                originInfo = originRecipe.SideTBOriginInfo;
+            else if (TabName.Contains("Left") || TabName.Contains("Right"))
+                originInfo = originRecipe.SideLROriginInfo;
+
+            ClearMaskLayer();
+            Shapes.Clear();
+            p_DrawElement.Clear();
+        }
 
         #region Override
 
@@ -407,8 +427,8 @@ namespace Root_VEGA_P_Vision
                 rect.MemoryRect.Bottom = cPt.Y;
             }
 
-            double pixSizeX = (double)p_CanvasWidth / (double)p_View_Rect.Width;
-            double pixSizeY = (double)p_CanvasHeight / (double)p_View_Rect.Height;
+            double pixSizeX = p_CanvasWidth / (double)p_View_Rect.Width;
+            double pixSizeY = p_CanvasHeight / (double)p_View_Rect.Height;
 
             CPoint LT = new CPoint(rect.MemoryRect.Left, rect.MemoryRect.Top);
             CPoint RB = new CPoint(rect.MemoryRect.Right, rect.MemoryRect.Bottom);
@@ -477,7 +497,7 @@ namespace Root_VEGA_P_Vision
             m_eCurMode = ViewerMode.None;
             for (int i = ThresholdRect.Height - 1; i >= 0; i--)
             {
-                byte* gv = (byte*)((IntPtr)((long)ptr + ThresholdRect.Left * p_ImageData.p_nByte + ((long)i + ThresholdRect.Top) * p_ImageData.p_Stride));
+                byte* gv = (byte*)(IntPtr)((long)ptr + ThresholdRect.Left * p_ImageData.p_nByte + ((long)i + ThresholdRect.Top) * p_ImageData.p_Stride);
                 for (int j = 0; j < ThresholdRect.Width; j++)
                 {
 
@@ -510,18 +530,21 @@ namespace Root_VEGA_P_Vision
 
         public unsafe void SetMask()
         {
+            if (recipe.GetItem<MaskRecipe>().MaskList.Count < (ROIMaskIdx + SelectedIdx))
+                return;
+
             m_eCurMode = ViewerMode.None;
             MaskRecipe maskRecipe = recipe.GetItem<MaskRecipe>();
 
             ClearMaskLayer();
 
-            p_cInspROI.p_Data = recipe.GetItem<MaskRecipe>().MaskList[ROIMaskIdx+SelectedIdx].ToPointLineList();
+            p_cInspROI.p_Data = recipe.GetItem<MaskRecipe>().MaskList[ROIMaskIdx + SelectedIdx].ToPointLineList();
 
-            foreach(PointLine pointLine in p_cInspROI.p_Data)
+            foreach (PointLine pointLine in p_cInspROI.p_Data)
             {
-                for(int i=0;i<pointLine.Width;i++)
+                for (int i = 0; i < pointLine.Width; i++)
                 {
-                    DrawPixelBitmap(new CPoint(pointLine.StartPt.X+i,pointLine.StartPt.Y), m_Color.R, m_Color.G, m_Color.B, m_Color.A);
+                    DrawPixelBitmap(new CPoint(pointLine.StartPt.X + i, pointLine.StartPt.Y), m_Color.R, m_Color.G, m_Color.B, m_Color.A);
                 }
             }
             SetMaskLayerSource();
@@ -672,8 +695,6 @@ namespace Root_VEGA_P_Vision
             //ImageViewerVM.DrawText(ptNew)
         }
 
-
-        private string currentRecipe = "";
         private MapViewer_ViewModel mapViewerVM;
         public MapViewer_ViewModel MapViewerVM
         {
@@ -688,11 +709,6 @@ namespace Root_VEGA_P_Vision
         {
             get { return this.m_DataViewer_VM; }
             set { SetProperty(ref m_DataViewer_VM, value); }
-        }
-        public void LoadRecipe()
-        {
-            if (currentRecipe != recipe.Name)
-                currentRecipe = recipe.Name;
         }
 
         public void DrawRectDefect(List<CRect> rectList, List<string> text)
@@ -722,7 +738,7 @@ namespace Root_VEGA_P_Vision
                 GlobalObjects.Instance.GetNamed<WorkManager>(TabName).Start();
             }
         }
-        unsafe void SetMaskInspROI()
+        unsafe void SetMaskInspROI() //지금 마스크 위에 있는 그림들을 Data로 바꾸는것
         {
             int originWidth = originInfo.OriginSize.X;
             int originHeight = originInfo.OriginSize.Y;

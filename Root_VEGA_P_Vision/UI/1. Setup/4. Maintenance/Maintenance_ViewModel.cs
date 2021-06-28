@@ -10,6 +10,12 @@ namespace Root_VEGA_P_Vision
     public class Maintenance_ViewModel : ObservableObject
     {
         public MaintenancePanel Main;
+        UserControl subPanel;
+        public UserControl pSubPanel
+        {
+            get => subPanel;
+            set => SetProperty(ref subPanel, value);
+        }
         public VEGA_P_Vision_Handler_UI HandlerUI;
         VEGA_P_Vision_Engineer_UI EngineerUI;
         Setup_ViewModel m_Setup;
@@ -17,7 +23,7 @@ namespace Root_VEGA_P_Vision
         ToolBox_UI ToolBoxUI;
         ViewerTest ToolViewerTest;
         ViewerTest_ViewModel ToolViewerTest_VM;
-
+        PodInfoRecipe_ViewModel podInfoRecipe;
         public Maintenance_ViewModel(Home_ViewModel home)
         {
             this.home = home;
@@ -36,35 +42,43 @@ namespace Root_VEGA_P_Vision
             HandlerUI.Init(GlobalObjects.Instance.Get<VEGA_P_Vision_Engineer>().m_handler);
             ToolBoxUI.Init(GlobalObjects.Instance.Get<VEGA_P_Vision_Engineer>().ClassToolBox());
 
+            podInfoRecipe = new PodInfoRecipe_ViewModel();
             Init();
-            SetPage(EngineerUI);
+            pSubPanel = EngineerUI;
+            pSubPanel.DataContext = EngineerUI.DataContext;
         }
         public void Init()
         {
             Main = new MaintenancePanel();
-        }
-        public void SetPage(UserControl page)
-        {
-            Main.SubPanel.Children.Clear();
-            Main.SubPanel.Children.Add(page);
+            Main.DataContext = this;
         }
 
         #region [RelayCommand]
         public ICommand btnHandler
         {
-            get => new RelayCommand(() => SetPage(EngineerUI));
+            get => new RelayCommand(() => {
+                pSubPanel = EngineerUI;
+                pSubPanel.DataContext = EngineerUI.DataContext;
+            });
         }
         public ICommand btnBack
         {
             get => new RelayCommand(() => m_Setup.SetHome());
         }
-        public ICommand btnToolBox
+        //public ICommand btnToolBox
+        //{
+        //    //get => new RelayCommand(() => SetPage(ToolBoxUI));
+        //}
+        //public ICommand btnViewerTest
+        //{
+        //    get => new RelayCommand(() => SetPage(ToolViewerTest));
+        //}
+        public ICommand btnPodInfo
         {
-            get => new RelayCommand(() => SetPage(ToolBoxUI));
-        }
-        public ICommand btnViewerTest
-        {
-            get => new RelayCommand(() => SetPage(ToolViewerTest));
+            get => new RelayCommand(() => {
+                pSubPanel = podInfoRecipe.Main;
+                pSubPanel.DataContext = podInfoRecipe;
+            });
         }
         #endregion
     }

@@ -97,38 +97,46 @@ namespace Root_VEGA_P_Vision
         PositionFeature curTabIdx;
         public AlignBtnState btnState;
         FeatureLists list;
-        public AlignFeatureInfo_ViewModel(RecipeOrigin_ViewModel recipeOrigin,FeatureLists list)
+        RecipeBase recipe;
+        public AlignFeatureInfo_ViewModel(RecipeOrigin_ViewModel recipeOrigin,FeatureLists list,RecipeBase recipe)
         {
             Main = new AlignFeatureInfo();
             this.recipeOrigin = recipeOrigin;
             curTabIdx = recipeOrigin.PositionViewerTab.curTab;
+            this.recipe = recipe;
             Main.DataContext = this;
-            this.list = list;
+            this.list = recipe.GetItem<EUVPositionRecipe>().PartsFeatureList;
             CurPosData = new RecipeType_ImageData();
             CurAlignData = new RecipeType_ImageData();
+
+            VegaPEventManager.RecipeUpdated += VegaPEventManager_RecipeUpdated;
         }
 
-        public void LoadRecipe()
+        private void VegaPEventManager_RecipeUpdated(object sender, RecipeEventArgs e)
         {
-            //PositionFeatureList.Clear();
-            //AlignFeatureList.Clear();
+            PositionFeatureList.Clear();
+            AlignFeatureList.Clear();
 
-            //foreach (RecipeType_ImageData feature in positionRecipe.ListAlignFeature)
-            //{
-            //    FeatureControl fc = new FeatureControl();
-            //    fc.p_ImageSource = Tools.ConvertBitmapToSource(Tools.CovertArrayToBitmap(feature.RawData, feature.Width, feature.Height, feature.ByteCnt));
-            //    fc.DataContext = this;
+            EUVPositionRecipe positionRecipe = GlobalObjects.Instance.Get<RecipeCoverFront>().GetItem<EUVPositionRecipe>();
+            
+            foreach (RecipeType_ImageData feature in positionRecipe.PartsFeatureList.ListAlignFeature)
+            {
+                FeatureControl fc = new FeatureControl();
+                fc.p_ImageSource = Tools.ConvertBitmapToSource(Tools.CovertArrayToBitmap(feature.RawData, feature.Width, feature.Height, feature.ByteCnt));
+                fc.DataContext = this;
 
-            //    AlignFeatureList.Add(fc);
-            //}
-            //foreach (RecipeType_ImageData feature in positionRecipe.ListPositionFeature)
-            //{
-            //    FeatureControl fc = new FeatureControl();
-            //    fc.p_ImageSource = Tools.ConvertBitmapToSource(Tools.CovertArrayToBitmap(feature.RawData, feature.Width, feature.Height, feature.ByteCnt));
-            //    fc.DataContext = this;
+                AlignFeatureList.Add(fc);
+            }
+            foreach (RecipeType_ImageData feature in positionRecipe.PartsFeatureList.ListPositionFeature)
+            {
+                FeatureControl fc = new FeatureControl();
+                fc.p_ImageSource = Tools.ConvertBitmapToSource(Tools.CovertArrayToBitmap(feature.RawData, feature.Width, feature.Height, feature.ByteCnt));
+                fc.DataContext = this;
 
-            //    PositionFeatureList.Add(fc);
-            //}
+                PositionFeatureList.Add(fc);
+            }
+
+            list = e.recipe.GetItem<EUVPositionRecipe>().PartsFeatureList;
         }
         #region ICommand
         public ICommand btnAlign
@@ -210,6 +218,8 @@ namespace Root_VEGA_P_Vision
             fc.p_ImageSource = Tools.ConvertBitmapToSource(Tools.CovertArrayToBitmap(feature.RawData, feature.Width, feature.Height, feature.ByteCnt));
             fc.DataContext = this;
             AlignFeatureList.Add(fc);
+
+            recipe.GetItem<EUVPositionRecipe>().PartsFeatureList = list;
         }
         void PosAdd()
         {
@@ -228,6 +238,8 @@ namespace Root_VEGA_P_Vision
             fc.p_ImageSource = Tools.ConvertBitmapToSource(Tools.CovertArrayToBitmap(feature.RawData, feature.Width, feature.Height, feature.ByteCnt));
             fc.DataContext = this;
             PositionFeatureList.Add(fc);
+
+            recipe.GetItem<EUVPositionRecipe>().PartsFeatureList = list;
         }
         void AlignDelete()
         {
@@ -235,6 +247,9 @@ namespace Root_VEGA_P_Vision
             AlignFeatureList.RemoveAt(AlignFeatureIdx);
             if (AlignFeatureList.Count == 0)
                 AlignFeatureIdx = -1;
+
+            recipe.GetItem<EUVPositionRecipe>().PartsFeatureList = list;
+
         }
         void PosDelete()
         {
@@ -242,12 +257,17 @@ namespace Root_VEGA_P_Vision
             PositionFeatureList.RemoveAt(AlignFeatureIdx);
             if (PositionFeatureList.Count == 0)
                 PositionFeatureIdx = -1;
+
+            recipe.GetItem<EUVPositionRecipe>().PartsFeatureList = list;
+
         }
         void PosClear()
         {
             list.ClearPositionFeature();
             PositionFeatureList.Clear();
             PositionFeatureIdx = -1;
+            recipe.GetItem<EUVPositionRecipe>().PartsFeatureList = list;
+
         }
 
         void AlignClear()
@@ -255,6 +275,8 @@ namespace Root_VEGA_P_Vision
             list.ClearAlignFeature();
             AlignFeatureList.Clear();
             AlignFeatureIdx = -1;
+            recipe.GetItem<EUVPositionRecipe>().PartsFeatureList = list;
+
         }
         #endregion
     }

@@ -95,6 +95,7 @@ namespace Root_VEGA_P_Vision
                 GlobalObjects.Instance.Get<RecipePlateBack>().GetItem<EUVOriginRecipe>().SideLROriginInfo = originInfo;
             }
 
+
             InitializeUIElement();
         }
 

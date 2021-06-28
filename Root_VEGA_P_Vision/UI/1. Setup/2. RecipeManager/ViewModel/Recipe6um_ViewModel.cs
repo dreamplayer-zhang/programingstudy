@@ -126,6 +126,19 @@ namespace Root_VEGA_P_Vision
         {
             get => new RelayCommand(() => { });
         }
+        public ICommand ImageOpen
+        {
+            get => new RelayCommand(() => selectedViewer._openImage(SelectedIdx));
+        }
+        public ICommand ImageSave
+        {
+            get => new RelayCommand(() => selectedViewer._saveImage());
+        }
+        public ICommand ImageClear
+        {
+            get => new RelayCommand(() => selectedViewer._clearImage());
+        }
+
         void Snap()
         {
             EQ.p_bStop = false;

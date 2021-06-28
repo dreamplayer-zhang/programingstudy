@@ -27,7 +27,7 @@ namespace Root_VEGA_P_Vision
         public event FeatureBoxDoneEvent FeatureBoxDone;
         public event ManualAlignDoneEvent ManualAlignDone;
 
-        RecipeBase recipe;
+        public RecipeBase recipe;
         public PositionImageViewer_ViewModel(string imageData,RecipeBase recipe):base(imageData)
         {
             this.recipe = recipe;

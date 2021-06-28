@@ -28,19 +28,19 @@ namespace RootTools_Vision
         public List<RecipeType_ImageData> ListPositionFeature { get => listPositionFeature; set => listPositionFeature = value; }
         public void AddAlignFeature(int positionX, int positionY, int featureWidth, int featureHeight, int byteCnt, byte[] rawData)
         {
-            listAlignFeature.Add(new RecipeType_ImageData(positionX, positionY, featureWidth, featureHeight, byteCnt, rawData));
+            ListAlignFeature.Add(new RecipeType_ImageData(positionX, positionY, featureWidth, featureHeight, byteCnt, rawData));
         }
         public void AddPositionFeature(int positionX, int positionY, int featureWidth, int featureHeight, int byteCnt, byte[] rawData)
         {
-            listPositionFeature.Add(new RecipeType_ImageData(positionX, positionY, featureWidth, featureHeight, byteCnt, rawData));
+            ListPositionFeature.Add(new RecipeType_ImageData(positionX, positionY, featureWidth, featureHeight, byteCnt, rawData));
         }
         public void RemoveAlignFeature(int index)
         {
-            listAlignFeature.RemoveAt(index);
+            ListAlignFeature.RemoveAt(index);
         }
         public void RemovePositionFeature(int index)
         {
-            listPositionFeature.RemoveAt(index);
+            ListPositionFeature.RemoveAt(index);
         }
         public void ClearAlignFeature()
         {
@@ -48,7 +48,7 @@ namespace RootTools_Vision
         }
         public void ClearPositionFeature()
         {
-            listPositionFeature.Clear();
+            ListPositionFeature.Clear();
         }
         public void Clear()
         {
@@ -58,7 +58,7 @@ namespace RootTools_Vision
         public bool Read(string recipePath)
         {
             bool rst = true;
-            foreach (RecipeType_ImageData featureData in listAlignFeature)
+            foreach (RecipeType_ImageData featureData in ListAlignFeature)
             {
                 // Load
                 if (!featureData.Read(recipePath))
@@ -68,7 +68,7 @@ namespace RootTools_Vision
                 }
             }
 
-            foreach (RecipeType_ImageData featureData in listPositionFeature)
+            foreach (RecipeType_ImageData featureData in ListPositionFeature)
             {
                 // Load
                 if (!featureData.Read(recipePath))
@@ -84,7 +84,7 @@ namespace RootTools_Vision
         {
             bool rst = true;
 
-            foreach (RecipeType_ImageData featureData in listAlignFeature)
+            foreach (RecipeType_ImageData featureData in ListAlignFeature)
             {
                 // FileName Setting
                 if (featureData.FileName == "")
@@ -107,7 +107,7 @@ namespace RootTools_Vision
                 }
             }
 
-            foreach (RecipeType_ImageData featureData in listPositionFeature)
+            foreach (RecipeType_ImageData featureData in ListPositionFeature)
             {
                 // FileName Setting
                 if (featureData.FileName == "")

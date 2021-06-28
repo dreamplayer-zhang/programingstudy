@@ -100,8 +100,8 @@ namespace Root_VEGA_P_Vision
 			UIManager.Instance.MainPanel = MainPanel;
 			UIManager.Instance.ChangeUIMode();
 
-			logView.Init(LogView._logView);
-			InitTimer();
+            logView.Init(LogView._logView);
+            InitTimer();
         }
 		void CreateGlobalPaths()
 		{
@@ -136,7 +136,7 @@ namespace Root_VEGA_P_Vision
 				RecipePlateBack recipePlateBack = GlobalObjects.Instance.Register<RecipePlateBack>();
 
 				GlobalObjects.Instance.RegisterNamed<ImageData>(App.mMaskLayer, memoryTool.GetMemory(App.mPool, App.mGroup, App.mMaskLayer));
-
+				GlobalObjects.Instance.Register<PodIDInfo>();
 				foreach (var v in Enum.GetValues(partstype))
                     foreach (var v2 in Enum.GetValues(InspType))
                         foreach (var v3 in Enum.GetValues(UpdownType))

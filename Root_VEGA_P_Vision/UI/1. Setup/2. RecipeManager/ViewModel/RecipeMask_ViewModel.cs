@@ -77,7 +77,10 @@ namespace Root_VEGA_P_Vision
             surfaceParamTree.DarkParam.Param = SurfaceParameterBase.DarkParam;
             IsSide = false;
             SetStain();
+
+            VegaPEventManager.RecipeUpdated += VegaPEventManager_RecipeUpdated;
         }
+
 
         #region Property
         public EUVPodSurfaceParameterBase SurfaceParameterBase
@@ -100,12 +103,49 @@ namespace Root_VEGA_P_Vision
         }
         #endregion
 
+        private void VegaPEventManager_RecipeUpdated(object sender, RecipeEventArgs e)
+        {
+            /*
+ Mask Number Info
+Stain 0,1/2,3
+TDI 4,5,6
+SideLR 5,6
+SideTB 7,8
+Stacking 9(Cover),10(Bottom)
+ */
+            switch (surfaceParameterBase.MaskIndex)
+            {
+                case 0:
+                case 1:
+                    SurfaceParameterBase = e.recipe.GetItem<EUVPodSurfaceParameter>().PodStain;
+                    break;
+                case 2:
+                case 3:
+                case 4:
+                    SurfaceParameterBase = e.recipe.GetItem<EUVPodSurfaceParameter>().PodTDI;
+                    break;
+                case 5:
+                    case 6:
+                    SurfaceParameterBase = e.recipe.GetItem<EUVPodSurfaceParameter>().PodSideLR;
+                    break;
+                case 7:
+                case 8:
+                    SurfaceParameterBase = e.recipe.GetItem<EUVPodSurfaceParameter>().PodSideTB;
+                    break;
+                case 9:
+                case 10:
+                    SurfaceParameterBase = e.recipe.GetItem<EUVPodSurfaceParameter>().PodStacking;
+                    break;
+            }
+        }
+
         #region RelayCommand
         public void SetStain()
         {
             p_BaseViewer.p_SubViewer = recipeStainVM.Main;
             p_BaseViewer.p_SubViewer.DataContext = recipeStainVM;
             SurfaceParameterBase = recipeStainVM.SelectedViewer.Recipe.GetItem<EUVPodSurfaceParameter>().PodStain;
+            recipeStainVM.SelectedViewer.SetMask();
             IsSide = false;
             IsHighRes = false;
         }
@@ -114,6 +154,8 @@ namespace Root_VEGA_P_Vision
             p_BaseViewer.p_SubViewer = recipeTDIVM.Main;
             p_BaseViewer.p_SubViewer.DataContext = recipeTDIVM;
             SurfaceParameterBase = recipeTDIVM.SelectedViewer.Recipe.GetItem<EUVPodSurfaceParameter>().PodTDI;
+            recipeStainVM.SelectedViewer.SetMask();
+
             IsSide = false;
             IsHighRes = false;
 
@@ -123,6 +165,8 @@ namespace Root_VEGA_P_Vision
             p_BaseViewer.p_SubViewer = recipeStackingVM.Main;
             p_BaseViewer.p_SubViewer.DataContext = recipeStackingVM;
             SurfaceParameterBase = recipeStackingVM.SelectedViewer.Recipe.GetItem<EUVPodSurfaceParameter>().PodStacking;
+            recipeStainVM.SelectedViewer.SetMask();
+
             IsSide = false;
             IsHighRes = true;
 
@@ -132,6 +176,8 @@ namespace Root_VEGA_P_Vision
             p_BaseViewer.p_SubViewer = recipeSideVM.Main;
             p_BaseViewer.p_SubViewer.DataContext = recipeSideVM;
             surfaceParameterBase = recipeSideVM.SelectedSideTab.SelectedParamBase;
+            recipeStainVM.SelectedViewer.SetMask();
+
             IsSide = true;
             IsHighRes = false;
         }

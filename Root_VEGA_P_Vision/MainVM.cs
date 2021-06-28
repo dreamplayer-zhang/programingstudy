@@ -124,7 +124,7 @@ namespace Root_VEGA_P_Vision
                     recipe = GlobalObjects.Instance.Get<RecipePlateBack>();
                     recipe.Read(sFullPath);
 
-                    VegaPEventManager.OnRecipeUpdated(this, new RecipeEventArgs());
+                    VegaPEventManager.OnRecipeUpdated(this, new RecipeEventArgs(recipe));
                 }
             });
         }

@@ -185,7 +185,7 @@
             <Setter Property="BorderBrush" Value="#FF363C58"/>
             <Setter Property="Padding" Value="10"/>
             <Setter Property="Background" Value="#FF363C58"/>
-            <Setter Property="HorizontalContentAlignment" Value="Left"/>
+            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
         </Style>
         <ObjectDataProvider x:Key="dataFromEnum" MethodName="GetValues"
                             ObjectType="{x:Type System:Enum}">
@@ -196,6 +196,7 @@
 
         <local:InverseBooleanConverter x:Key="InverseBoolean"/>
         <local:BooleanToVisiblityConverter x:Key="BooleanToVisiblity"/>
+        <local:InverseBooleanToVisiblityConverter x:Key="InverseBooleanToVisibility"/>
         <BorderGapMaskConverter x:Key="BorderGapMaskConverter"/>
         <local:VisibilityToWindowStateConverter x:Key="VisibilityToWindowState"/>
         <local:ListToVisibilityConverter x:Key="ListToVisibility"/>

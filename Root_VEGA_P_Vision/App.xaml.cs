@@ -30,5 +30,8 @@ namespace Root_VEGA_P_Vision
         public const string ImageRootPath = @"D:\Images\";
         public const string SettingFilePath = @"C:\Root\Setting.ini";
         public const string RootSetupPath = RootPath + @"Setup\";
+
+        //RecipeName
+        public static readonly string[] RecipeNames = { "RecipeCoverFront", "RecipeCoverBack", "RecipePlateFront", "RecipePlateBack" };
     }
 }
