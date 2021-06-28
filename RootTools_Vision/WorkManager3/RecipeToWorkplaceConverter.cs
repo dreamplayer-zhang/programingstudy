@@ -55,8 +55,8 @@ namespace RootTools_Vision.WorkManager3
                     masterX = waferMap.ExtraMasterDieX;
                     masterY = waferMap.ExtraMasterDieY;
 
-                    originAbsX = originRecipe.OriginX + (waferMap.MasterDieX - waferMap.ExtraMasterDieX) * originWidth;
-                    originAbsY = originRecipe.OriginY + (waferMap.MasterDieY - waferMap.ExtraMasterDieY) * originHeight;
+                    originAbsX = originRecipe.OriginX - waferMap.ExtraDieOffsetX * originWidth;
+                    originAbsY = originRecipe.OriginY - waferMap.ExtraDieOffsetY * originHeight;
                 }
 
 

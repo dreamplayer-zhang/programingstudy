@@ -50,6 +50,8 @@ namespace RootTools_Vision
         private int extraMapSizeY = 0;
         private int extraMasterDieX = 0;
         private int extraMasterDieY = 0;
+        private int extraDieOffsetX = 0;
+        private int extraDieOffsetY = 0;
 
         #region [Getter Setter]
         public int MapSizeX
@@ -214,6 +216,8 @@ namespace RootTools_Vision
         public int ExtraMapSizeY { get => extraMapSizeY; set => extraMapSizeY = value; }
         public int ExtraMasterDieX { get => extraMasterDieX; set => extraMasterDieX = value; }
         public int ExtraMasterDieY { get => extraMasterDieY; set => extraMasterDieY = value; }
+        public int ExtraDieOffsetX { get => extraDieOffsetX; set => extraDieOffsetX = value; }
+        public int ExtraDieOffsetY { get => extraDieOffsetY; set => extraDieOffsetY = value; }
 
         #endregion
 
@@ -246,10 +250,13 @@ namespace RootTools_Vision
             }
         }
 
-        public void CreateExtraMap(int mapSizeX, int mapSizeY, int[] _mapdata)
+        public void CreateExtraMap(int mapSizeX, int mapSizeY, int[] _mapdata, int offsetX, int offsetY)
         {
             this.extraMapSizeX = mapSizeX;
             this.extraMapSizeY = mapSizeY;
+            this.extraDieOffsetX = offsetX;
+            this.extraDieOffsetY = offsetY;
+
             this.extraMapdata = new int[this.extraMapSizeX * this.extraMapSizeY];
             this.extraMapdata = (int[])_mapdata.Clone();
 

@@ -92,7 +92,7 @@ namespace RootTools_Vision.WorkManager3
             }
             catch(Exception)
             {
-
+                
             }
         }
 

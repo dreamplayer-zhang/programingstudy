@@ -148,8 +148,9 @@ namespace RootTools_Vision.WorkManager3
                 
                 foreach (WorkPipe pipe in pipes)
                 {
-                    //if(!pipe.TryStop()) result = false;
-                    pipe.Abort();
+                    if(!pipe.TryStop()) result = false;
+
+                    //pipe.Abort();
                 }
             }
 

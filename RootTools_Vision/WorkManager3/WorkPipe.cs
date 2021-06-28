@@ -289,7 +289,7 @@ namespace RootTools_Vision.WorkManager3
 
             try
             {
-                using (token.Register(Thread.CurrentThread.Abort, true))
+                using (token.Register(Thread.CurrentThread.Abort, false))
                 {
                     int count = 0;
                     Workplace workplace = new Workplace();
@@ -340,7 +340,9 @@ namespace RootTools_Vision.WorkManager3
         public void Abort()
         {
             if (this.cancelTokenSrc != null)
-                this.cancelTokenSrc.Cancel(false);
+                this.cancelTokenSrc.Cancel();
+
+            this.cancelTokenSrc = null;
         }
 
 
