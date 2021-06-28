@@ -328,6 +328,7 @@ namespace Root_Pine2_Vision.Module
 
                     if (m_treeRecipe.p_eMode == Tree.eMode.JobOpen)
                     {
+                        while (m_aSnap.Count > value) m_aSnap.RemoveAt(m_aSnap.Count - 1);
                         while (m_aSnap.Count < value) m_aSnap.Add(new Snap(m_vision));
                     }
 
