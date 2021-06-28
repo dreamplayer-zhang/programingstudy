@@ -243,20 +243,23 @@ namespace RootTools.RADS
 				//Console.WriteLine("You're not ready!");
 			}
 
-			// 분당 평균 Voltage 로그 작성
-			TimeSpan diffTime = e.SignalTime - m_tickTime;
-			m_dElapsedTime += diffTime.TotalMilliseconds;
-			m_dVoltageSum += p_nVoltage * diffTime.TotalMilliseconds;
+			if(m_rs232.p_bConnect)
+            {
+				// 분당 평균 Voltage 로그 작성
+				TimeSpan diffTime = e.SignalTime - m_tickTime;
+				m_dElapsedTime += diffTime.TotalMilliseconds;
+				m_dVoltageSum += p_nVoltage * diffTime.TotalMilliseconds;
 
-			if (m_dElapsedTime > 60 * 100)
-			{
-				m_log.Info(string.Format("Average Voltage: {0}", m_dVoltageSum / m_dElapsedTime));
+				if (m_dElapsedTime > 60 * 1000)
+				{
+					m_log.Info(string.Format("Average Voltage: {0}", m_dVoltageSum / m_dElapsedTime));
 
-				m_dVoltageSum = 0;
-				m_dElapsedTime = 0;
+					m_dVoltageSum = 0;
+					m_dElapsedTime = 0;
+				}
+
+				m_tickTime = e.SignalTime;
 			}
-
-			m_tickTime = e.SignalTime;
 		}
 
 		public void Dispose()
