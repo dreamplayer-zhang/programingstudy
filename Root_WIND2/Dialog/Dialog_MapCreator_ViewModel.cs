@@ -424,7 +424,7 @@ namespace Root_WIND2
 
         public C3Point GetDiffSum(byte[] byteChipBoxResized, byte[] byteRoiBoxResized, CPoint ptStart, double resizeFactor)
         {
-            UInt64 TotalSum = 18446744073709551615;
+            UInt64 TotalSum = 0;
             UInt64 PrevMinSum = 18446744073709551615;
             C3Point ptOriginChip = new C3Point();
             CPoint ptStartResized = new CPoint((int)((ptStart.X - this.RoiX) * resizeFactor), (int)((ptStart.Y - this.RoiY) * resizeFactor));
@@ -452,7 +452,7 @@ namespace Root_WIND2
                         ptOriginChip.X = (int)(x / resizeFactor) + this.RoiX;
                         ptOriginChip.Y = (int)(y / resizeFactor) + this.RoiY;
                     }
-                    TotalSum = 18446744073709551615;
+                    TotalSum = 0;
                 }
             }
 
