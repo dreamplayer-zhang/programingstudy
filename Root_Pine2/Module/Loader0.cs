@@ -1,10 +1,14 @@
 ﻿using Root_Pine2.Engineer;
 using Root_Pine2_Vision.Module;
 using RootTools;
+using RootTools.Comm;
 using RootTools.Control;
 using RootTools.Module;
+using RootTools.ToolBoxs;
 using RootTools.Trees;
 using System;
+using System.Net.Sockets;
+using System.Text;
 using System.Threading;
 
 namespace Root_Pine2.Module
@@ -16,7 +20,8 @@ namespace Root_Pine2.Module
         public override void GetTools(bool bInit)
         {
             m_toolBox.GetAxis(ref m_axis, this, "Loader0");
-            m_picker.GetTools(m_toolBox, this, bInit); 
+            m_picker.GetTools(m_toolBox, this, bInit);
+            m_keyence.GetTools(m_toolBox, this, bInit); 
             if (bInit) InitPosition();
         }
 
@@ -50,10 +55,12 @@ namespace Root_Pine2.Module
         const string c_sPosLoadEV = "LoadEV";
         const string c_sPosPaper = "Paper";
         const string c_sPosUp = "Up";
+        const string c_sPosKeyence = "Keyence";
         void InitPosition()
         {
             m_axis.AddPos(c_sPosLoadEV);
             m_axis.AddPos(c_sPosPaper);
+            m_axis.AddPos(c_sPosKeyence);
             m_axis.AddPos(Enum.GetNames(typeof(ePosTransfer)));
             m_axis.AddPos(GetPosString(eUnloadVision.Top3D, Vision2D.eWorks.A));
             m_axis.AddPos(GetPosString(eUnloadVision.Top3D, Vision2D.eWorks.B));
@@ -66,6 +73,58 @@ namespace Root_Pine2.Module
         {
             return eVision.ToString() + eWorks.ToString(); 
         }
+        #endregion
+
+        #region Keyence SR-1000
+        class Keyence
+        {
+            TCPAsyncClient m_tcpip;
+            public void GetTools(ToolBox toolBox, ModuleBase module, bool bInit)
+            {
+                toolBox.GetComm(ref m_tcpip, module, "Keyence");
+                if (bInit) m_tcpip.EventReceiveData += M_tcpip_EventReceiveData;
+            }
+
+            bool m_bRecieve = false; 
+            public string m_sCode = "";
+            private void M_tcpip_EventReceiveData(byte[] aBuf, int nSize, Socket socket)
+            {
+                string sMsg = Encoding.Default.GetString(aBuf, 0, nSize - 1);
+                if ((sMsg == "OK,LON") || (sMsg == "OK,LOFF")) m_sCode = "";
+                else m_sCode = sMsg;
+                m_bRecieve = true; 
+            }
+
+            public string ReadCode()
+            {
+                if (m_tcpip.p_bConnect == false)
+                {
+                    m_tcpip.Connect();
+                    Thread.Sleep(10);
+                    if (m_tcpip.p_bConnect == false) return "Not Connected";
+                }
+                Thread.Sleep(10);
+                m_bRecieve = false; 
+                m_tcpip.Send("LON\r");
+                StopWatch sw = new StopWatch();
+                while (sw.ElapsedMilliseconds < 1000)
+                {
+                    Thread.Sleep(10); 
+                    if (m_bRecieve)
+                    {
+                        if (m_sCode == "") m_tcpip.Send("LOFF\r"); 
+                        return m_sCode; 
+                    }
+                }
+                return m_sCode;
+            }
+
+            public void ThreadStop()
+            {
+                m_tcpip.ThreadStop(); 
+            }
+        }
+        Keyence m_keyence = new Keyence(); 
         #endregion
 
         #region AvoidX
@@ -143,6 +202,13 @@ namespace Root_Pine2.Module
             return m_axis.WaitReady();
         }
 
+        public string RunMove(string sPos, bool bWait = true)
+        {
+            if (Run(StartMoveX(sPos, 0))) return p_sInfo;
+            m_axis.p_axisY.StartMove(sPos);
+            return bWait ? m_axis.WaitReady() : "OK";
+        }
+
         void RunTreeAxis(Tree tree)
         {
             m_pulsemm = tree.Set(m_pulsemm, m_pulsemm, "Pulse / mm", "Axis X (Pulse / mm)");
@@ -207,6 +273,9 @@ namespace Root_Pine2.Module
             try
             {
                 if (Run(RunMoveUp())) return p_sInfo;
+                if (Run(RunMove(c_sPosKeyence))) return p_sInfo; 
+                if (Run(RunMoveZ(c_sPosKeyence, 0))) return p_sInfo;
+                m_keyence.ReadCode(); 
                 if (Run(RunMoveLoadEV())) return p_sInfo;
                 if (Run(RunMoveZ(c_sPosLoadEV, 0))) return p_sInfo;
                 m_loadEV.p_bBlow = true;
@@ -221,6 +290,7 @@ namespace Root_Pine2.Module
                 if (Run(RunMoveUp())) return p_sInfo;
                 if (m_picker.IsVacuum() == false) return p_sInfo;
                 m_picker.p_infoStrip = m_loadEV.GetNewInfoStrip();
+                if (m_keyence.m_sCode != "") m_picker.p_infoStrip.p_id = m_keyence.m_sCode; 
                 m_loadEV.StartLoad(); 
             }
             finally
@@ -489,7 +559,8 @@ namespace Root_Pine2.Module
 
         public override void ThreadStop()
         {
-            m_picker.ThreadStop(); 
+            m_picker.ThreadStop();
+            m_keyence.ThreadStop(); 
             base.ThreadStop();
         }
 

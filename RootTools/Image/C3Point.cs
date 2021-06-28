@@ -40,7 +40,7 @@ namespace RootTools
         {
             X = x;
             Y = y;
-            Z = Z;
+            Z = z;
         }
 
         public C3Point(C3Point p)
