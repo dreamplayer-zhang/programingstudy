@@ -67,6 +67,15 @@ namespace Root_Rinse_Loader.Module
             }
             foreach (Line line in m_aLine) line.m_bExist = false;
         }
+
+        public bool IsStartOn()
+        {
+            foreach (Line line in m_aLine)
+            {
+                if (line.m_diCheck[0].p_bIn) return true;
+            }
+            return false;
+        }
         #endregion
 
         #region Width

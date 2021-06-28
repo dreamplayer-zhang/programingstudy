@@ -156,6 +156,7 @@ namespace Root_VEGA_D.Module
             m_alidReticleLocateInfoError = m_gaf.GetALID(this, "Reticle Locate Info is not Correct", "Reticle Locate Info is not Correct");
             m_alidPMCoaxialError = m_gaf.GetALID(this, "PM Coaxial Check Error", "Coaxial Light PM Test is failed");
             m_alidPMTransmittedError = m_gaf.GetALID(this, "PM Transmitted Check Error", "Transmitted Light PM Test is failed");
+            m_alidPMFail = m_gaf.GetALID(this, "PM Fail", "PM is Fail, Pod is not load");
         }
         #endregion
 

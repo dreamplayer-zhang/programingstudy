@@ -106,7 +106,6 @@ namespace Root_CAMELLIA
 
             SplashScreenHelper.ShowText("Camellia2 Initialize Done");
 
-
             //SSLoggerNet sSLoggerNet = new SSLoggerNet();
             //DataFormatter data = new DataFormatter();
             //sSLoggerNet.WriteFNCLog(1, "1", "1", STATUS.START);
@@ -116,6 +115,12 @@ namespace Root_CAMELLIA
             instance.m_useLog = true;
             //instance.m_sSLoggerNet.WriteFNCLog(EQ.p_nRunLP, m_handler.m_loadport[0].p_id, "Test", STATUS.START);
             //instance.m_sSLoggerNet.WriteFNCLog(EQ.p_nRunLP, m_handler.m_loadport[0].p_id, "Test", STATUS.END,  MATERIAL_TYPE.FOUP);
+
+            //StreamWriter sw = new StreamWriter, true); // append
+
+            //sw.WriteLine("asdf");
+
+           
         }
 
         DispatcherTimer m_timer = new DispatcherTimer();
@@ -131,7 +136,8 @@ namespace Root_CAMELLIA
         private void M_timer_Tick(object sender, EventArgs e)
         {
             tbTime.Text = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
-            if(DateTime.Now.Minute == 0 && DateTime.Now.Second == 0 && !isCFGWrite)
+
+            if (DateTime.Now.Minute == 0 && DateTime.Now.Second == 0 && !isCFGWrite)
             {
                 DataFormatter data = new DataFormatter();
                 data.AddData("Version", BaseDefine.Configuration.Version3);

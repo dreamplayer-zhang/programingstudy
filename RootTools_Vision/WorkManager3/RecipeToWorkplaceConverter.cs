@@ -44,6 +44,22 @@ namespace RootTools_Vision.WorkManager3
                 int originWidth = originRecipe.OriginWidth;
                 int originHeight = originRecipe.OriginHeight;
 
+                if(waferMap.UseExtraMap == true)
+                {
+                    mapData = waferMap.ExtraMapdata;
+                    mapSizeX = waferMap.ExtraMapSizeX;
+                    mapSizeY = waferMap.ExtraMapSizeY;
+                    bundle.SizeX = mapSizeX;
+                    bundle.SizeY = mapSizeY;
+
+                    masterX = waferMap.ExtraMasterDieX;
+                    masterY = waferMap.ExtraMasterDieY;
+
+                    originAbsX = originRecipe.OriginX + (waferMap.MasterDieX - waferMap.ExtraMasterDieX) * originWidth;
+                    originAbsY = originRecipe.OriginY + (waferMap.MasterDieY - waferMap.ExtraMasterDieY) * originHeight;
+                }
+
+
                 Workplace wp = new Workplace(-1, -1, originAbsX, originAbsY, originWidth, originHeight, queue.Count);
 
                 bundle.Add(wp);
@@ -55,7 +71,8 @@ namespace RootTools_Vision.WorkManager3
                     // Top
                     for (int y = masterY; y >= 0; y--)
                     {
-                        if (mapData[x + y * mapSizeX] == 1)
+                        if ((mapData[x + y * mapSizeX] == (int)CHIP_TYPE.NORMAL) ||
+                            (mapData[x + y * mapSizeX] == (int)CHIP_TYPE.EXTRA))
                         {
                             int dx = x - masterX;
                             int dy = y - masterY;
@@ -86,7 +103,8 @@ namespace RootTools_Vision.WorkManager3
                     // Bottom
                     for (int y = masterY + 1; y < mapSizeY; y++)
                     {
-                        if (mapData[x + y * mapSizeX] == 1)
+                        if ((mapData[x + y * mapSizeX] == (int)CHIP_TYPE.NORMAL) ||
+                            (mapData[x + y * mapSizeX] == (int)CHIP_TYPE.EXTRA))
                         {
                             int dx = x - masterX;
                             int dy = y - masterY;
@@ -118,7 +136,8 @@ namespace RootTools_Vision.WorkManager3
                     // Top
                     for (int y = masterY; y >= 0; y--)
                     {
-                        if (mapData[x + y * mapSizeX] == 1)
+                        if ((mapData[x + y * mapSizeX] == (int)CHIP_TYPE.NORMAL) ||
+                             (mapData[x + y * mapSizeX] == (int)CHIP_TYPE.EXTRA))
                         {
                             int dx = x - masterX;
                             int dy = y - masterY;
@@ -150,7 +169,8 @@ namespace RootTools_Vision.WorkManager3
                     // Bottom
                     for (int y = masterY + 1; y < mapSizeY; y++)
                     {
-                        if (mapData[x + y * mapSizeX] == 1)
+                        if ((mapData[x + y * mapSizeX] == (int)CHIP_TYPE.NORMAL) ||
+                            (mapData[x + y * mapSizeX] == (int)CHIP_TYPE.EXTRA))
                         {
                             int dx = x - masterX;
                             int dy = y - masterY;

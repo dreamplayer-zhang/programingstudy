@@ -14,6 +14,7 @@ namespace Root_CAMELLIA
     {
         public static SolidColorBrush ActiveBrush { get; } = new SolidColorBrush(Color.FromArgb(255, 220, 220, 220));
         public static SolidColorBrush GuideLineBrush { get; } = new SolidColorBrush(Color.FromArgb(255, 255, 255, 255));
+        public static SolidColorBrush GuideCustomLineBrush { get; } = new SolidColorBrush(Color.FromArgb(255, 255, 0, 0));
         public static SolidColorBrush StageShadeBrush { get; } = new SolidColorBrush(Color.FromArgb(128, 0, 0, 0));
         public static SolidColorBrush SelectPointBrush { get; } = new SolidColorBrush(Color.FromArgb(128, 0, 0, 255));
         public static SolidColorBrush StageHoleBrush { get; } = new SolidColorBrush(Color.FromArgb(64, 128, 128, 128));
@@ -49,6 +50,14 @@ namespace Root_CAMELLIA
         public static Arc[] DataStageDoubleHoleArc { get; } = new Arc[8];
         public static Arc[] DataStageTopHoleArc { get; } = new Arc[2];
         public static Arc[] DataStageBotHoleArc { get; } = new Arc[2];
+
+        public static Circle DataStageGuideField { get; } = new Circle();
+        public static ShapeDraw.Line DataStageGuideLineHole { get; } = new ShapeDraw.Line();
+        public static System.Drawing.PointF[] DataStageGuideEdgeHolePoint { get; } = new System.Drawing.PointF[64];
+        public static Arc[] DataStageGuideEdgeHoleArc { get; } = new Arc[8];
+        public static Arc[] DataStageGuideDoubleHoleArc { get; } = new Arc[8];
+        public static Arc[] DataStageGuideTopHoleArc { get; } = new Arc[2];
+        public static Arc[] DataStageGuideBotHoleArc { get; } = new Arc[2];
 
         public static int ArcPointNum { get; } = 63;
         public static int EdgeNum { get; } = 4;
@@ -107,6 +116,7 @@ namespace Root_CAMELLIA
             DataStageDoubleHoleArc[6].InitArc(-dInLength, dInLength, dRadiusHole, (5 / (float)4) * Math.PI, (1 / (float)4) * Math.PI, ArcPointNum, true);
             DataStageDoubleHoleArc[7].InitArc(-dOutLength, dOutLength, dRadiusHole, (1 / (float)4) * Math.PI, (5 / (float)4) * Math.PI, ArcPointNum, true);
 
+
             DataStageTopHoleArc[0] = new Arc(0, 145, dRadiusHole, Math.PI, 0, ArcPointNum, true);
             DataStageTopHoleArc[1] = new Arc(0, 0, dRadiusOut, Math.Atan2(Math.Sqrt(23989), 6), Math.Atan2(Math.Sqrt(23989), -6), ArcPointNum, true);
             DataStageBotHoleArc[0] = new Arc(0, -145, dRadiusHole, 0, Math.PI, ArcPointNum, true);
@@ -122,6 +132,57 @@ namespace Root_CAMELLIA
             DataStageGuideLine[1].Set(0, 0, 98, 98);
             DataStageGuideLine[2].Set(0, 0, 150, 150);
             DataStageGuideLine[3].Set(0, 0, 196, 196);
+
+
+
+            DataStageGuideLineHole.Set(0, 0, BaseDefine.ViewSize - 2, 5);
+
+            dRadiusIn = 131;
+            dRadiusOut = 154;
+
+            DataStageGuideEdgeHolePoint[0] = new System.Drawing.PointF((float)16, (float)Math.Sqrt(16905));
+            DataStageGuideEdgeHolePoint[1] = new System.Drawing.PointF((float)Math.Sqrt(16560.75), (float)24.5);
+            DataStageGuideEdgeHolePoint[2] = new System.Drawing.PointF((float)Math.Sqrt(23115.75), (float)24.5);
+            DataStageGuideEdgeHolePoint[3] = new System.Drawing.PointF((float)16, (float)Math.Sqrt(23460));
+            DataStageGuideEdgeHolePoint[4] = new System.Drawing.PointF((float)Math.Sqrt(16560.75), (float)-24.5);
+            DataStageGuideEdgeHolePoint[5] = new System.Drawing.PointF((float)16, (float)-Math.Sqrt(16905));
+            DataStageGuideEdgeHolePoint[6] = new System.Drawing.PointF((float)16, (float)-Math.Sqrt(23460));
+            DataStageGuideEdgeHolePoint[7] = new System.Drawing.PointF((float)Math.Sqrt(23115.75), (float)-24.5);
+            DataStageGuideEdgeHolePoint[8] = new System.Drawing.PointF((float)-16, (float)-Math.Sqrt(16905));
+            DataStageGuideEdgeHolePoint[9] = new System.Drawing.PointF((float)-Math.Sqrt(16560.75), (float)-24.5);
+            DataStageGuideEdgeHolePoint[10] = new System.Drawing.PointF((float)-Math.Sqrt(23115.75), (float)-24.5);
+            DataStageGuideEdgeHolePoint[11] = new System.Drawing.PointF((float)-16, (float)-Math.Sqrt(23460));
+            DataStageGuideEdgeHolePoint[12] = new System.Drawing.PointF((float)-Math.Sqrt(16560.75), (float)24.5);
+            DataStageGuideEdgeHolePoint[13] = new System.Drawing.PointF((float)-16, (float)Math.Sqrt(16905));
+            DataStageGuideEdgeHolePoint[14] = new System.Drawing.PointF((float)-16, (float)Math.Sqrt(23460));
+            DataStageGuideEdgeHolePoint[15] = new System.Drawing.PointF((float)-Math.Sqrt(23115.75), (float)24.5);
+
+            for (int i = 0; i < EdgeNum; i++)
+            {
+                DataStageGuideEdgeHoleArc[2 * i + 0] = new Arc(0, 0, dRadiusIn, Math.Atan2(DataStageGuideEdgeHolePoint[4 * i + 0].Y, DataStageGuideEdgeHolePoint[4 * i + 0].X), Math.Atan2(DataStageGuideEdgeHolePoint[4 * i + 1].Y, DataStageGuideEdgeHolePoint[4 * i + 1].X), ArcPointNum, false);
+                DataStageGuideEdgeHoleArc[2 * i + 1] = new Arc(0, 0, dRadiusOut, Math.Atan2(DataStageGuideEdgeHolePoint[4 * i + 2].Y, DataStageGuideEdgeHolePoint[4 * i + 2].X), Math.Atan2(DataStageGuideEdgeHolePoint[4 * i + 3].Y, DataStageGuideEdgeHolePoint[4 * i + 3].X), ArcPointNum, false);
+            }
+
+
+            dRadiusHole = 5;
+
+            for (int i = 0; i < 2 * DoubleHoleNum; i++)
+            {
+                DataStageGuideDoubleHoleArc[i] = new Arc();
+            }
+            DataStageGuideDoubleHoleArc[0].InitArc(dInLength, dInLength, dRadiusHole, (3 / (float)4) * Math.PI, (7 / (float)4) * Math.PI, ArcPointNum, true);
+            DataStageGuideDoubleHoleArc[1].InitArc(dOutLength, dOutLength, dRadiusHole, (7 / (float)4) * Math.PI, (3 / (float)4) * Math.PI, ArcPointNum, true);
+            DataStageGuideDoubleHoleArc[2].InitArc(dInLength, -dInLength, dRadiusHole, (1 / (float)4) * Math.PI, (5 / (float)4) * Math.PI, ArcPointNum, true);
+            DataStageGuideDoubleHoleArc[3].InitArc(dOutLength, -dOutLength, dRadiusHole, (5 / (float)4) * Math.PI, (1 / (float)4) * Math.PI, ArcPointNum, true);
+            DataStageGuideDoubleHoleArc[4].InitArc(-dInLength, -dInLength, dRadiusHole, (7 / (float)4) * Math.PI, (3 / (float)4) * Math.PI, ArcPointNum, true);
+            DataStageGuideDoubleHoleArc[5].InitArc(-dOutLength, -dOutLength, dRadiusHole, (3 / (float)4) * Math.PI, (7 / (float)4) * Math.PI, ArcPointNum, true);
+            DataStageGuideDoubleHoleArc[6].InitArc(-dInLength, dInLength, dRadiusHole, (5 / (float)4) * Math.PI, (1 / (float)4) * Math.PI, ArcPointNum, true);
+            DataStageGuideDoubleHoleArc[7].InitArc(-dOutLength, dOutLength, dRadiusHole, (1 / (float)4) * Math.PI, (5 / (float)4) * Math.PI, ArcPointNum, true);
+
+            DataStageGuideTopHoleArc[0] = new Arc(0, 145, dRadiusHole, Math.PI, 0, ArcPointNum, true);
+            DataStageGuideTopHoleArc[1] = new Arc(0, 0, dRadiusOut, Math.Atan2(Math.Sqrt(23989), 5), Math.Atan2(Math.Sqrt(23989), -5), ArcPointNum, true);
+            DataStageGuideBotHoleArc[0] = new Arc(0, -145, dRadiusHole, 0, Math.PI, ArcPointNum, true);
+            DataStageGuideBotHoleArc[1] = new Arc(0, 0, dRadiusOut, Math.Atan2(-Math.Sqrt(23989), -5), Math.Atan2(-Math.Sqrt(23989), 5), ArcPointNum, true);
         }
 
         public static string SHA256Hash(string data)

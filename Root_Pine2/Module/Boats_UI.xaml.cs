@@ -1,4 +1,5 @@
 ﻿using Root_Pine2_Vision.Module;
+using RootTools;
 using RootTools.Module;
 using RootTools.Trees;
 using System.Windows.Controls;
@@ -23,6 +24,7 @@ namespace Root_Pine2.Module
             m_boats = boats;
             DataContext = boats;
             treeRootUI.Init(boats.m_treeRootQueue);
+            treeVisionUI.Init(boats.m_vision.m_treeRootQueue); 
             boats.RunTreeQueue(Tree.eMode.Init);
         }
 
@@ -37,8 +39,8 @@ namespace Root_Pine2.Module
                 case ModuleBase.eState.Error: Background = Brushes.OrangeRed; break;
             }
             textBlockVision.Foreground = m_boats.m_vision.m_remote.p_bEnable ? Brushes.Red : Brushes.LightGray; 
-            textBlockA.Text = (m_boats.m_aBoat[Vision2D.eWorks.A].p_infoStrip != null) ? m_boats.m_aBoat[Vision2D.eWorks.A].p_id : "";
-            textBlockB.Text = (m_boats.m_aBoat[Vision2D.eWorks.B].p_infoStrip != null) ? m_boats.m_aBoat[Vision2D.eWorks.B].p_id : "";
+            textBlockA.Text = (m_boats.m_aBoat[Vision2D.eWorks.A].p_infoStrip != null) ? m_boats.m_aBoat[Vision2D.eWorks.A].p_infoStrip.p_id : "";
+            textBlockB.Text = (m_boats.m_aBoat[Vision2D.eWorks.B].p_infoStrip != null) ? m_boats.m_aBoat[Vision2D.eWorks.B].p_infoStrip.p_id : "";
             textBlockStepA.Text = m_boats.m_aBoat[Vision2D.eWorks.A].p_eStep.ToString();
             textBlockStepB.Text = m_boats.m_aBoat[Vision2D.eWorks.B].p_eStep.ToString();
             OnRunTree();
@@ -53,9 +55,23 @@ namespace Root_Pine2.Module
             m_boats.RunTreeQueue(Tree.eMode.Init);
         }
 
-        private void textBlockVision_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        private void Grid_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            m_boats.m_vision.m_remote.p_bEnable = !m_boats.m_vision.m_remote.p_bEnable; 
+            m_boats.m_vision.m_remote.p_bEnable = !m_boats.m_vision.m_remote.p_bEnable;
+        }
+
+        private void GridA_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            if (EQ.p_eState != EQ.eState.Ready) return;
+            if (m_boats.p_eState != ModuleBase.eState.Ready) return;
+            m_boats.m_aBoat[Vision2D.eWorks.A].RunMove(Boat.ePos.Vision, false);  
+        }
+
+        private void GridB_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            if (EQ.p_eState != EQ.eState.Ready) return;
+            if (m_boats.p_eState != ModuleBase.eState.Ready) return;
+            m_boats.m_aBoat[Vision2D.eWorks.B].RunMove(Boat.ePos.Vision, false);
         }
     }
 }

@@ -6,11 +6,13 @@ using RootTools.Light;
 using RootTools.Memory;
 using RootTools.Module;
 using RootTools.Trees;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
+using System.Windows;
 
 namespace Root_Pine2_Vision.Module
 {
@@ -28,7 +30,7 @@ namespace Root_Pine2_Vision.Module
         #region ToolBox
         Camera_Dalsa m_camera;
         public LightSet m_lightSet;
-        RS232 m_rs232RGBW; 
+        RS232 m_rs232RGBW;
         public override void GetTools(bool bInit)
         {
             if (p_eRemote == eRemote.Server)
@@ -37,7 +39,7 @@ namespace Root_Pine2_Vision.Module
                 p_sInfo = m_toolBox.Get(ref m_lightSet, this);
                 m_aWorks[eWorks.A].GetTools(m_toolBox, bInit);
                 m_aWorks[eWorks.B].GetTools(m_toolBox, bInit);
-                p_sInfo = m_toolBox.GetComm(ref m_rs232RGBW, this, "RGBW"); 
+                p_sInfo = m_toolBox.GetComm(ref m_rs232RGBW, this, "RGBW");
                 p_sInfo = m_toolBox.GetComm(ref m_tcpRequest, this, "Request");
                 if (bInit)
                 {
@@ -53,20 +55,20 @@ namespace Root_Pine2_Vision.Module
         #region Light
         public class LightPower
         {
-            public eRGBW m_eRGBW = eRGBW.White; 
+            public eRGBW m_eRGBW = eRGBW.White;
             public List<double> m_aPower = new List<double>();
 
             public LightPower Clone()
             {
                 LightPower power = new LightPower(m_vision);
-                power.m_eRGBW = m_eRGBW; 
+                power.m_eRGBW = m_eRGBW;
                 for (int n = 0; n < m_vision.p_lLight; n++) power.m_aPower[n] = m_aPower[n];
                 return power;
             }
 
             public void RunTree(Tree tree, bool bVisible)
             {
-                m_eRGBW = (eRGBW)tree.Set(m_eRGBW, m_eRGBW, "RGBW", "Set RGBW", bVisible); 
+                m_eRGBW = (eRGBW)tree.Set(m_eRGBW, m_eRGBW, "RGBW", "Set RGBW", bVisible);
                 for (int n = 0; n < m_aPower.Count; n++)
                 {
                     m_aPower[n] = tree.Set(m_aPower[n], m_aPower[n], n.ToString("00"), "Light Power (0 ~ 100)", bVisible);
@@ -79,6 +81,19 @@ namespace Root_Pine2_Vision.Module
                 m_vision = vision;
                 while (m_aPower.Count < m_vision.p_lLight) m_aPower.Add(0);
             }
+
+            public static bool IsSameLight(LightPower lightPower1, LightPower lightPower2)
+            {
+                if (lightPower1.m_aPower.Count != lightPower2.m_aPower.Count) return false;
+                if (lightPower1.m_eRGBW != lightPower2.m_eRGBW) return false;
+
+                for(int i = 0; i < lightPower1.m_aPower.Count; i++)
+                {
+                    if (lightPower1.m_aPower[i] != lightPower2.m_aPower[i]) return false;
+                }
+
+                return true;
+            }
         }
 
         int _lLight = 6;
@@ -88,7 +103,7 @@ namespace Root_Pine2_Vision.Module
             set
             {
                 _lLight = value;
-                OnPropertyChanged(); 
+                OnPropertyChanged();
             }
         }
 
@@ -97,7 +112,7 @@ namespace Root_Pine2_Vision.Module
             if (p_eRemote == eRemote.Client) RemoteRun(eRemoteRun.RunLight, eRemote.Client, lightPower);
             else
             {
-                SetRGBW(lightPower.m_eRGBW); 
+                SetRGBW(lightPower.m_eRGBW);
                 for (int n = 0; n < p_lLight; n++)
                 {
                     Light light = m_lightSet.m_aLight[n];
@@ -137,24 +152,15 @@ namespace Root_Pine2_Vision.Module
         }
         #endregion
 
-        #region p_sRecipe
-        string _sRecipe = ""; 
-        public string p_sRecipe
+        #region Send Recipe
+        public void SendRecipe(string sRecipe)
         {
-            get { return _sRecipe; }
-            set
+            if (p_eRemote == eRemote.Client) RemoteRun(eRemoteRun.SendRecipe, eRemote.Client, sRecipe);
+            else
             {
-                if (_sRecipe == value) return;
-                _sRecipe = value;
-                m_aWorks[eWorks.A].SendRecipe(value);
-                m_aWorks[eWorks.B].SendRecipe(value);
+                m_aWorks[eWorks.A].SendRecipe(sRecipe);
+                m_aWorks[eWorks.B].SendRecipe(sRecipe);
             }
-        }
-
-        public void SetRecipe(string sRecipe)
-        {
-            if (p_eRemote == eRemote.Client) RemoteRun(eRemoteRun.Recipe, eRemote.Client, sRecipe);
-            else p_sRecipe = sRecipe; 
         }
         #endregion
 
@@ -164,6 +170,9 @@ namespace Root_Pine2_Vision.Module
         {
             public int m_nFovStart = 0;
             public int m_nFovSize = 12000;
+            public int m_nReverseOffset = 0;
+            public int m_nOverlap = 0;
+            public double m_dResolution = 3.8;
             public double[] m_dScale = new double[3] { 1, 1, 1 };
             public double[] m_dShift = new double[3] { 0, 0, 0 };
             public int[] m_yShift = new int[3] { 0, 0, 0 };
@@ -185,10 +194,18 @@ namespace Root_Pine2_Vision.Module
 
             public void RunTree(Tree tree)
             {
+                RunTreeImage(tree.GetTree("Image"));
                 RunTreeFOV(tree.GetTree("FOV"));
                 RunTreeColor(tree.GetTree("Red"), 0);
                 RunTreeColor(tree.GetTree("Green"), 1);
                 RunTreeColor(tree.GetTree("Blue"), 2);
+            }
+
+            void RunTreeImage(Tree tree)
+            {
+                m_dResolution = tree.Set(m_dResolution, m_dResolution, "Pixel Resolution", "Pixel Resolution (um/pixel)");
+                m_nReverseOffset = tree.Set(m_nReverseOffset, m_nReverseOffset, "Reverse Offset", "Reverse Offset (pixel)");
+                m_nOverlap = tree.Set(m_nOverlap, m_nOverlap, "Overlap", "Overlap (pixel)");
             }
 
             void RunTreeFOV(Tree tree)
@@ -215,6 +232,13 @@ namespace Root_Pine2_Vision.Module
         #region Recipe
         public class Recipe
         {
+            public enum eSnapMode
+            {
+                RGB,
+                APS,
+                ALL
+            }
+
             public class Snap
             {
                 public RPoint m_dpAxis = new RPoint();
@@ -247,21 +271,21 @@ namespace Root_Pine2_Vision.Module
                     return snap;
                 }
 
-                public GrabData GetGrabData(eWorks eWorks)
+                public GrabData GetGrabData(eWorks eWorks, CPoint cpOffset)
                 {
                     GrabData data = new GrabData();
                     data.bInvY = (m_eDirection == eDirection.Forward);
                     data.m_nOverlap = m_nOverlap;
-                    data.nScanOffsetY = m_cpMemory.Y;
-                    data.ReverseOffsetY = m_cpMemory.Y; /* + m_vision.m_nLine */
-                    m_vision.m_aGrabData[eWorks].SetData(data); 
+                    data.nScanOffsetY = cpOffset.Y;   /*m_cpMemory.Y;*/
+                    data.ReverseOffsetY = cpOffset.Y; /*m_cpMemory.Y;*/ /* + m_vision.m_nLine */
+                    m_vision.m_aGrabData[eWorks].SetData(data);
                     return data;
                 }
 
                 public CPoint GetMemoryOffset()
                 {
                     CPoint cp = new CPoint(m_cpMemory);
-                    if (m_eDirection == eDirection.Backward) cp.Y += m_vision.m_nLine;
+                    //if (m_eDirection == eDirection.Backward) cp.Y += m_vision.m_nLine;
                     return cp;
                 }
 
@@ -274,7 +298,7 @@ namespace Root_Pine2_Vision.Module
 
                 void RunTreeStage(Tree tree, bool bVisible)
                 {
-                    m_dpAxis = tree.Set(m_dpAxis, m_dpAxis, "Offset", "Axis Offset (pulse)", bVisible);
+                    m_dpAxis = tree.Set(m_dpAxis, m_dpAxis, "Offset", "Axis Offset (mm)", bVisible);
                     m_eDirection = (eDirection)tree.Set(m_eDirection, m_eDirection, "Direction", "Scan Direction", bVisible);
                 }
 
@@ -294,31 +318,127 @@ namespace Root_Pine2_Vision.Module
             }
             public List<Snap> m_aSnap = new List<Snap>();
 
+            public int _lSnap = 0;
             public int p_lSnap
             {
-                get { return m_aSnap.Count; }
+                get { return _lSnap; /*m_aSnap.Count;*/ }
                 set
                 {
-                    if (m_aSnap.Count == value) return;
-                    while (m_aSnap.Count > value) m_aSnap.RemoveAt(m_aSnap.Count - 1);
-                    while (m_aSnap.Count < value) m_aSnap.Add(new Snap(m_vision));
+                    _lSnap = value;
+
+                    if (m_treeRecipe.p_eMode == Tree.eMode.JobOpen)
+                    {
+                        while (m_aSnap.Count < value) m_aSnap.Add(new Snap(m_vision));
+                    }
+
+                    //if (m_aSnap.Count == value) return;
+                    //while (m_aSnap.Count > value) m_aSnap.RemoveAt(m_aSnap.Count - 1);
+                    //while (m_aSnap.Count < value) m_aSnap.Add(new Snap(m_vision));
+
+                    //double nAxisOffset = m_vision.m_aGrabData[m_eWorks].m_nFovSize * 3.8 / 1000;
+                    //for (int i = 0; i < m_aSnap.Count; i++)
+                    //{
+                    //    RPoint rp = new RPoint(i * nAxisOffset, 0);
+                    //    m_aSnap[i].m_dpAxis = rp;
+                    //}
                 }
             }
+
+            public eSnapMode _eSnapMode = 0;
+            public eSnapMode p_eSnapMode
+            {
+                get { return _eSnapMode; }
+                set
+                {
+                    _eSnapMode = value;
+                }
+            }
+
+            public double _dProductWidth = 0;
+            public double p_dProductWidth
+            {
+                get { return _dProductWidth; }
+                set
+                {
+                    _dProductWidth = value;
+                    if (m_treeRecipe.p_eMode == Tree.eMode.JobOpen) return;
+                    
+                    m_aSnap.Clear();
+                    int nFOVpx = m_vision.m_aGrabData[m_eWorks].m_nFovSize;
+                    int nOverlap = m_vision.m_aGrabData[m_eWorks].m_nOverlap;
+                    int nReverseOffset = m_vision.m_aGrabData[m_eWorks].m_nReverseOffset;
+                    double dResolution = m_vision.m_aGrabData[m_eWorks].m_dResolution;
+                    double dFOVmm = nFOVpx * dResolution / 1000;
+                    int nSnapCount = (int)Math.Ceiling(_dProductWidth / dFOVmm);    // 제품 전체를 찍기위한 스냅 횟수
+
+                    if (p_eSnapMode == eSnapMode.ALL)
+                        p_lSnap = nSnapCount * 2;   // ALL인 경우 총 Snap횟수. (RGB + APS)
+                    else
+                        p_lSnap = nSnapCount;       // RGB 또는 APS인 경우 총 Snap 횟수.
+
+                    int nSnapLineIndex = 0;
+                    for (int i = 0; i < p_lSnap; i++)
+                    {
+                        nSnapLineIndex = i % nSnapCount;    // nSnapCount = 3인경우, RGB(0,1,2), APS(0,1,2), ALL(0,1,2,0,1,2)
+                        m_aSnap.Add(new Snap(m_vision));
+                        m_aSnap[i].m_dpAxis = new RPoint(nSnapLineIndex * dFOVmm, 0);
+                        m_aSnap[i].m_nOverlap = nOverlap;
+
+                        if (nSnapLineIndex % 2 == 0)  // 정방향
+                        {
+                            m_aSnap[i].m_eDirection = Snap.eDirection.Forward;
+                            //m_aSnap[i].m_cpMemory = new CPoint(nSnapLineIndex * nFOVpx, 0);
+                        }
+                        else  // 역방향
+                        {
+                            m_aSnap[i].m_eDirection = Snap.eDirection.Backward;
+                            //m_aSnap[i].m_cpMemory = new CPoint(nSnapLineIndex * nFOVpx, nReverseOffset);
+                        }
+
+                        if (p_eSnapMode == eSnapMode.RGB)
+                        {
+                            m_aSnap[i].m_eEXT = Snap.eEXT.EXT1;
+                            m_aSnap[i].m_lightPower = m_lightPowerRGB.Clone();
+                        }
+                        else if (p_eSnapMode == eSnapMode.APS)
+                        {
+                            m_aSnap[i].m_eEXT = Snap.eEXT.EXT2;
+                            m_aSnap[i].m_lightPower = m_lightPowerAPS.Clone();
+                        }
+                        else if (p_eSnapMode == eSnapMode.ALL)
+                        {
+                            if (i / nSnapCount == 0)  // RGB
+                            {
+                                m_aSnap[i].m_eEXT = Snap.eEXT.EXT1;
+                                m_aSnap[i].m_lightPower = m_lightPowerRGB.Clone();
+                            }
+                            else  // APS
+                            {
+                                m_aSnap[i].m_eEXT = Snap.eEXT.EXT2;
+                                m_aSnap[i].m_lightPower = m_lightPowerAPS.Clone();
+                            }
+                        }
+                    }
+                }
+            }
+
             public eWorks m_eWorks = eWorks.A;
 
             public Recipe Clone()
             {
                 Recipe recipe = new Recipe(m_vision, m_eWorks);
                 recipe.m_eWorks = m_eWorks;
+                recipe.m_lightPowerRGB = m_lightPowerRGB.Clone();
+                recipe.m_lightPowerAPS = m_lightPowerAPS.Clone();
                 foreach (Snap snap in m_aSnap) recipe.m_aSnap.Add(snap.Clone());
-                return recipe; 
+                return recipe;
             }
 
             const string c_sExt = ".pine2";
             public void RecipeSave(string sRecipe)
             {
                 string sPath = EQ.c_sPathRecipe + "\\" + sRecipe;
-                Directory.CreateDirectory(sPath); 
+                Directory.CreateDirectory(sPath);
                 string sFile = sPath + "\\" + m_vision.m_eVision.ToString() + m_eWorks.ToString() + c_sExt;
                 m_treeRecipe.m_job = new Job(sFile, true, m_vision.m_log);
                 RunTreeRecipe(Tree.eMode.JobSave);
@@ -335,7 +455,6 @@ namespace Root_Pine2_Vision.Module
                 m_treeRecipe.m_job.Close();
             }
 
-
             #region TreeRecipe
             public TreeRoot m_treeRecipe;
             void InitTreeRecipe()
@@ -346,33 +465,57 @@ namespace Root_Pine2_Vision.Module
 
             private void M_treeRecipe_UpdateTree()
             {
-                int lSnap = p_lSnap;
+                //int lSnap = p_lSnap;
+                //RunTreeRecipe(Tree.eMode.Update);
+                //if (lSnap != p_lSnap) RunTreeRecipe(Tree.eMode.Init);
+
+                double dProductWidth = p_dProductWidth;
+                eSnapMode eSnapMode = p_eSnapMode;
+                LightPower lightPowerRGB = m_lightPowerRGB.Clone();
+                LightPower lightPowerAPS = m_lightPowerAPS.Clone();
+
                 RunTreeRecipe(Tree.eMode.Update);
-                if (lSnap != p_lSnap) RunTreeRecipe(Tree.eMode.Init);
+                if (dProductWidth != p_dProductWidth || eSnapMode != p_eSnapMode || !LightPower.IsSameLight(lightPowerRGB, m_lightPowerRGB) || !LightPower.IsSameLight(lightPowerAPS, m_lightPowerAPS))
+                    RunTreeRecipe(Tree.eMode.Init);
             }
 
 
             public void RunTreeRecipe(Tree.eMode eMode)
             {
                 m_treeRecipe.p_eMode = eMode;
-                RunTreeRecipe(m_treeRecipe, true, true); 
+                RunTreeRecipe(m_treeRecipe, true, true);
             }
 
+            public LightPower m_lightPowerRGB, m_lightPowerAPS;
             public void RunTreeRecipe(Tree tree, bool bVisible, bool bReadOnly = false)
             {
                 tree.Set(m_eWorks, m_eWorks, "Works", "Vision eWorks", bVisible, bReadOnly);
-                p_lSnap = tree.Set(p_lSnap, p_lSnap, "Count", "Snap Count", bVisible);
-                for (int n = 0; n < m_aSnap.Count; n++) m_aSnap[n].RunTree(tree.GetTree("Snap" + n.ToString("00"), true, bVisible), bVisible);
+                p_eSnapMode = (eSnapMode)tree.Set(p_eSnapMode, p_eSnapMode, "Snap Mode", "Select Snap Mode", bVisible);
+                p_dProductWidth = tree.Set(p_dProductWidth, p_dProductWidth, "Product Width", "Product Width(mm)", bVisible);
+                p_lSnap = tree.Set(p_lSnap, p_lSnap, "Count", "Snap Count", bVisible, true);
+
+                if (m_treeRecipe.p_eMode != Tree.eMode.JobOpen)
+                {
+                    if (p_eSnapMode == eSnapMode.RGB || p_eSnapMode == eSnapMode.ALL)
+                        m_lightPowerRGB.RunTree(tree.GetTree("Light").GetTree("RGB Light", true, bVisible), bVisible);
+                    if (p_eSnapMode == eSnapMode.APS || p_eSnapMode == eSnapMode.ALL)
+                        m_lightPowerAPS.RunTree(tree.GetTree("Light").GetTree("APS Light", true, bVisible), bVisible);
+                }
+
+                for (int n = 0; n < m_aSnap.Count; n++)
+                    m_aSnap[n].RunTree(tree.GetTree("Snap").GetTree("Snap" + n.ToString("00"), false, bVisible, true), bVisible);
 
             }
             #endregion
 
-            Vision2D m_vision; 
+            Vision2D m_vision;
             public Recipe(Vision2D vision, eWorks eWorks)
             {
                 m_vision = vision;
                 m_eWorks = eWorks;
-                InitTreeRecipe(); 
+                m_lightPowerRGB = new LightPower(vision);
+                m_lightPowerAPS = new LightPower(vision);
+                InitTreeRecipe();
             }
         }
         public Dictionary<eWorks, Recipe> m_recipe = new Dictionary<eWorks, Recipe>();
@@ -382,14 +525,17 @@ namespace Root_Pine2_Vision.Module
             m_recipe.Add(eWorks.B, new Recipe(this, eWorks.B));
         }
 
-        public List<string> GetRecipeList()
+        public List<string> p_asRecipe
         {
-            List<string> asRecipe = new List<string>();
-            DirectoryInfo info = new DirectoryInfo(EQ.c_sPathRecipe);
-            foreach (DirectoryInfo dir in info.GetDirectories()) asRecipe.Add(dir.Name);
-            return asRecipe;
+            get
+            {
+                List<string> asRecipe = new List<string>();
+                DirectoryInfo info = new DirectoryInfo(EQ.c_sPathRecipe);
+                foreach (DirectoryInfo dir in info.GetDirectories()) asRecipe.Add(dir.Name);
+                return asRecipe;
+            }
+            set { }
         }
-
         #endregion
 
         #region Works
@@ -398,7 +544,7 @@ namespace Root_Pine2_Vision.Module
             A,
             B,
         }
-        public Dictionary<eWorks, Works2D> m_aWorks = new Dictionary<eWorks, Works2D>(); 
+        public Dictionary<eWorks, Works2D> m_aWorks = new Dictionary<eWorks, Works2D>();
         void InitVisionWorks()
         {
             m_aWorks.Add(eWorks.A, new Works2D(eWorks.A, this));
@@ -410,21 +556,35 @@ namespace Root_Pine2_Vision.Module
         public string StartSnap(Recipe.Snap recipe, eWorks eWorks, int iSnap)
         {
             Run_Snap run = (Run_Snap)m_runSnap.Clone();
-            run.m_eWorks = eWorks; 
+            run.m_eWorks = eWorks;
             run.m_recipe = recipe;
-            run.m_iSnap = iSnap; 
-            return StartRun(run); 
+            run.m_iSnap = iSnap;
+            return StartRun(run);
         }
 
         public string RunSnap(Recipe.Snap recipe, eWorks eWorks, int iSnap)
         {
-            EQ.p_bStop = false; 
+            EQ.p_bStop = false;
+            int nFOVpx = m_aGrabData[eWorks].m_nFovSize;
+            int nReverseOffset = m_aGrabData[eWorks].m_nReverseOffset;
+            Recipe.eSnapMode nSnapMode = m_recipe[eWorks].p_eSnapMode;
+            int nTotalSnap = m_recipe[eWorks].p_lSnap;
+            int nSnapLineIndex = nSnapMode == Recipe.eSnapMode.ALL ? iSnap % (nTotalSnap / 2) : iSnap % (nTotalSnap);
+
+            CPoint cpOffset;    // 이미지 시작점
+            if (recipe.m_eDirection == Recipe.Snap.eDirection.Forward)
+                cpOffset = new CPoint(nSnapLineIndex * nFOVpx, 0);
+            else
+                cpOffset = new CPoint(nSnapLineIndex * nFOVpx, nReverseOffset);
+
             MemoryData memory = m_aWorks[eWorks].p_memSnap[(int)recipe.m_eEXT];
-            CPoint cpOffset = recipe.GetMemoryOffset();
-            GrabData grabData = recipe.GetGrabData(eWorks);
+            GrabData grabData = recipe.GetGrabData(eWorks, cpOffset);
+            DalsaParameterSet.eUserSet nUserset = (recipe.m_eEXT == Recipe.Snap.eEXT.EXT1) ? DalsaParameterSet.eUserSet.UserSet2 : DalsaParameterSet.eUserSet.UserSet3;  // RGB : Userset2 , APS : Userset3
+            
             try
             {
-
+                if (m_camera.p_CamParam.p_eUserSetCurrent != nUserset)
+                    m_camera.p_CamParam.p_eUserSetCurrent = nUserset;
                 m_camera.GrabLineScan(memory, cpOffset, m_nLine, grabData);
                 while (m_camera.p_CamInfo.p_eState != eCamState.Ready)
                 {
@@ -436,10 +596,14 @@ namespace Root_Pine2_Vision.Module
                 if (m_aWorks[eWorks].IsProcessRun())
                     m_aWorks[eWorks].SendSnapDone(iSnap);
             }
-            catch
+            catch (Exception ex)
             {
+                MessageBox.Show(ex.ToString());
                 m_camera.StopGrab();
-                //RunLightOff(); 
+            }
+            finally
+            {
+                RunLightOff();
             }
             return "OK";
         }
@@ -447,7 +611,7 @@ namespace Root_Pine2_Vision.Module
 
         #region Request
         int m_nReq = 0;
-        string m_sReceive = ""; 
+        string m_sReceive = "";
         TCPAsyncClient m_tcpRequest;
         private void M_tcpRequest_EventReceiveData(byte[] aBuf, int nSize, Socket socket)
         {
@@ -458,13 +622,13 @@ namespace Root_Pine2_Vision.Module
         {
             string sSend = m_nReq.ToString("000") + "," + Works2D.eProtocol.Snap.ToString() + "," + sRecipe + "," + eWorks.ToString();
             m_sReceive = "";
-            m_tcpRequest.Send(sSend); 
+            m_tcpRequest.Send(sSend);
             while (sSend != m_sReceive)
             {
                 Thread.Sleep(10);
                 if (EQ.IsStop()) return "EQ Stop";
             }
-            return "OK"; 
+            return "OK";
         }
         #endregion
 
@@ -496,7 +660,7 @@ namespace Root_Pine2_Vision.Module
             else
             {
                 p_lLight = tree.GetTree("Light").Set(p_lLight, p_lLight, "Channel", "Light Channel Count");
-                m_eVision = (eVision)tree.GetTree("Vision").Set(m_eVision, m_eVision, "Type", "Vision Type"); 
+                m_eVision = (eVision)tree.GetTree("Vision").Set(m_eVision, m_eVision, "Type", "Vision Type");
                 m_nLine = tree.GetTree("Camera").Set(m_nLine, m_nLine, "Line", "Memory Snap Lines (pixel)");
                 m_aWorks[eWorks.A].RunTree(tree.GetTree("Works " + m_aWorks[eWorks.A].p_id));
                 m_aWorks[eWorks.B].RunTree(tree.GetTree("Works " + m_aWorks[eWorks.B].p_id));
@@ -516,7 +680,7 @@ namespace Root_Pine2_Vision.Module
         }
         #endregion
 
-        public eVision m_eVision = eVision.Top2D; 
+        public eVision m_eVision = eVision.Top2D;
         public Vision2D(eVision eVision, IEngineer engineer, eRemote eRemote)
         {
             m_eVision = eVision;
@@ -535,7 +699,7 @@ namespace Root_Pine2_Vision.Module
 
         public override void ThreadStop()
         {
-            foreach (Works2D works in m_aWorks.Values) works.ThreadStop(); 
+            foreach (Works2D works in m_aWorks.Values) works.ThreadStop();
             base.ThreadStop();
         }
 
@@ -544,7 +708,7 @@ namespace Root_Pine2_Vision.Module
         {
             StateHome,
             RunLight,
-            Recipe
+            SendRecipe
         }
 
         Run_Remote GetRemoteRun(eRemoteRun eRemoteRun, eRemote eRemote, dynamic value)
@@ -556,7 +720,7 @@ namespace Root_Pine2_Vision.Module
             {
                 case eRemoteRun.StateHome: break;
                 case eRemoteRun.RunLight: run.m_lightPower = value; break;
-                case eRemoteRun.Recipe: run.m_sRecipe = value; break; 
+                case eRemoteRun.SendRecipe: run.m_sRecipe = value; break;
             }
             return run;
         }
@@ -580,19 +744,19 @@ namespace Root_Pine2_Vision.Module
             public Run_Remote(Vision2D module)
             {
                 m_module = module;
-                m_lightPower = new LightPower(m_module); 
+                m_lightPower = new LightPower(m_module);
                 InitModuleRun(module);
             }
 
             public eRemoteRun m_eRemoteRun = eRemoteRun.StateHome;
             public LightPower m_lightPower;
-            public string m_sRecipe = ""; 
+            public string m_sRecipe = "";
             public override ModuleRunBase Clone()
             {
                 Run_Remote run = new Run_Remote(m_module);
                 run.m_eRemoteRun = m_eRemoteRun;
                 run.m_lightPower = m_lightPower.Clone();
-                run.m_sRecipe = m_sRecipe; 
+                run.m_sRecipe = m_sRecipe;
                 return run;
             }
 
@@ -603,19 +767,19 @@ namespace Root_Pine2_Vision.Module
                 switch (m_eRemoteRun)
                 {
                     case eRemoteRun.RunLight: m_lightPower.RunTree(tree.GetTree("Light Power", true, bVisible), bVisible); break;
-                    case eRemoteRun.Recipe: m_sRecipe = tree.Set(m_sRecipe, m_sRecipe, "Recipe", "Recipe", bVisible); break; 
-                    default: break; 
+                    case eRemoteRun.SendRecipe: m_sRecipe = tree.Set(m_sRecipe, m_sRecipe, "Recipe", "Recipe", bVisible); break;
+                    default: break;
                 }
             }
 
             public override string Run()
             {
-                EQ.p_bStop = false; 
+                EQ.p_bStop = false;
                 switch (m_eRemoteRun)
                 {
                     case eRemoteRun.StateHome: return m_module.StateHome();
                     case eRemoteRun.RunLight: m_module.RunLight(m_lightPower); break;
-                    case eRemoteRun.Recipe: m_module.SetRecipe(m_sRecipe); break; 
+                    case eRemoteRun.SendRecipe: m_module.SendRecipe(m_sRecipe); break;
                 }
                 return "OK";
             }
@@ -623,7 +787,7 @@ namespace Root_Pine2_Vision.Module
         #endregion
 
         #region ModuleRun
-        ModuleRunBase m_runSnap; 
+        ModuleRunBase m_runSnap;
         protected override void InitModuleRuns()
         {
             AddModuleRunList(new Run_Remote(this), true, "Remote Run");
@@ -667,27 +831,27 @@ namespace Root_Pine2_Vision.Module
             public Run_Snap(Vision2D module)
             {
                 m_module = module;
-                m_recipe = new Recipe.Snap(module); 
+                m_recipe = new Recipe.Snap(module);
                 InitModuleRun(module);
             }
 
             public eWorks m_eWorks = eWorks.A;
-            public int m_iSnap = 0; 
-            public Recipe.Snap m_recipe; 
+            public int m_iSnap = 0;
+            public Recipe.Snap m_recipe;
             public override ModuleRunBase Clone()
             {
                 Run_Snap run = new Run_Snap(m_module);
-                run.m_eWorks = m_eWorks; 
+                run.m_eWorks = m_eWorks;
                 run.m_recipe = m_recipe.Clone();
-                run.m_iSnap = m_iSnap; 
+                run.m_iSnap = m_iSnap;
                 return run;
             }
 
             public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
             {
                 m_eWorks = (eWorks)tree.Set(m_eWorks, m_eWorks, "Works", "Vision eWorks", bVisible);
-                m_iSnap = tree.Set(m_iSnap, m_iSnap, "Snap Index", "Snap Index", bVisible); 
-                m_recipe.RunTree(tree, bVisible); 
+                m_iSnap = tree.Set(m_iSnap, m_iSnap, "Snap Index", "Snap Index", bVisible);
+                m_recipe.RunTree(tree, bVisible);
             }
 
             public override string Run()
@@ -718,7 +882,7 @@ namespace Root_Pine2_Vision.Module
             public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
             {
                 m_eWorks = (eWorks)tree.Set(m_eWorks, m_eWorks, "Works", "Vision eWorks", bVisible);
-                m_sRecipe = tree.Set(m_sRecipe, m_sRecipe, m_module.GetRecipeList(), "Recipe", "Recipe", bVisible);
+                m_sRecipe = tree.Set(m_sRecipe, m_sRecipe, m_module.p_asRecipe, "Recipe", "Recipe", bVisible);
             }
 
             public override string Run()
@@ -726,7 +890,11 @@ namespace Root_Pine2_Vision.Module
                 // Root Vision -> VisionWorks2
                 if (m_module.m_aWorks[m_eWorks].IsProcessRun())
                 {
-                    m_module.m_aWorks[m_eWorks].SendSnapInfo(m_sRecipe, 0, 1);
+                    m_module.m_aWorks[m_eWorks].SendRecipe(m_sRecipe);                  // 1. VisionWorks2 Recipe Open 
+                    m_module.m_recipe[m_eWorks].RecipeOpen(m_sRecipe);                  // 2. Root Vision Recipe Open
+                    int nSnapCount = m_module.m_recipe[m_eWorks].p_lSnap;               // 총 Snap 횟수
+                    int nSnapMode = (int)m_module.m_recipe[m_eWorks].p_eSnapMode;       // Snap Mode (RGB, APS, ALL)
+                    m_module.m_aWorks[m_eWorks].SendSnapInfo(m_sRecipe, nSnapMode, nSnapCount); // 3. VisionWorks2 Receive SnapInfo
                 }
                 return m_module.ReqSnap(m_sRecipe, m_eWorks);
             }

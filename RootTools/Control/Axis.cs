@@ -561,7 +561,7 @@ namespace RootTools.Control
             string sStartHome = ResetAlarm();
             ServoOn(true);
             Thread.Sleep(10); 
-            if (p_bServoOn == false) return p_id + " ServoOn Error";
+            //if (p_bServoOn == false) return p_id + " ServoOn Error";
             return "OK";
         }
 
@@ -699,12 +699,14 @@ namespace RootTools.Control
         {
             m_trigger.Set(fPos0, fPos1, dPos, bCmd, -1);
             RunTrigger(true, m_trigger);
+            p_log.Info("SetTrigger : " + dPos.ToString() + ", " + fPos0.ToString() + " ~ " + fPos1.ToString()); 
         }
 
         public void SetTrigger(double fPos0, double fPos1, double dPos, double dUptime, bool bCmd)
         {
             m_trigger.Set(fPos0, fPos1, dPos, bCmd, dUptime);
             RunTrigger(true, m_trigger);
+            p_log.Info("SetTrigger : " + dPos.ToString() + ", " + fPos0.ToString() + " ~ " + fPos1.ToString());
         }
 
         public virtual void RunTrigger(bool bOn, Trigger trigger = null) { }
@@ -735,7 +737,9 @@ namespace RootTools.Control
         {
             m_treeRootSetting = new TreeRoot(p_id + ".Setting", p_log);
             m_treeRootSetting.UpdateTree += M_treeRootSetting_UpdateTree;
+            
             RunTreeSetting(Tree.eMode.RegRead);
+            RunTreeSetting(Tree.eMode.Update);
         }
 
         private void M_treeRootSetting_UpdateTree()

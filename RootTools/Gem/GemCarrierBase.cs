@@ -301,6 +301,7 @@ namespace RootTools.Gem
                 _eAccessLP = value;
                 RunTree(Tree.eMode.Init);
                 OnPropertyChanged();
+                OnPropertyChanged("p_eAccessLP");
                 OnPropertyChanged("p_bAccessLP_Auto");
                 OnPropertyChanged("p_bAccessLP_Manual");
             }

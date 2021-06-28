@@ -78,15 +78,12 @@ namespace Root_Pine2.Module
             if (m_axisXZ.p_axisX.p_posCommand == m_axisXZ.p_axisX.GetPosValue(c_sReady))
             {
                 m_dioTurnUp.Write(bUp);
-                Thread.Sleep(4000);
-                return "OK";
-                //return m_dioTurnUp.WaitDone();
+                return m_dioTurnUp.WaitDone();
             }
             double zPos = m_axisXZ.p_axisY.p_posCommand;
             RunMoveZ((double)0);
             m_dioTurnUp.Write(bUp);
-            Thread.Sleep(4000);
-            //if (Run(m_dioTurnUp.WaitDone())) return p_sInfo;
+            if (Run(m_dioTurnUp.WaitDone())) return p_sInfo;
             RunMoveZ(zPos);
             return "OK";
         }
@@ -131,22 +128,23 @@ namespace Root_Pine2.Module
         #endregion
 
         #region Run
-        public string RunUnload(Vision2D.eWorks eVisionWorks)
+        public string RunUnload(Vision2D.eWorks eWorks)
         {
-            Boat boat = m_boats.m_aBoat[eVisionWorks];
+            Boat boat = m_boats.m_aBoat[eWorks];
             if (boat.p_eStep != Boat.eStep.Ready) return "Boat not Ready";
             try
             {
                 m_doVacuum.Write(true);
                 if (Run(RunTurnUp(false))) return p_sInfo;
-                if (Run(RunMoveX(eVisionWorks))) return p_sInfo;
-                if (Run(RunMoveZ(eVisionWorks))) return p_sInfo;
+                if (Run(m_boats.RunMoveReady(eWorks))) return p_sInfo;
+                if (Run(RunMoveX(eWorks))) return p_sInfo;
+                if (Run(RunMoveZ(eWorks))) return p_sInfo;
                 m_doVacuum.Write(false);
                 boat.RunVacuum(true);
                 Thread.Sleep((int)(1000 * m_secVacuum));
+                if (Run(RunMoveZ(c_sReady))) return p_sInfo;
                 boat.p_infoStrip = p_infoStrip;
                 p_infoStrip = null;
-                if (Run(RunMoveZ(c_sReady))) return p_sInfo;
                 if (Run(RunMoveX(c_sReady))) return p_sInfo;
                 if (Run(RunTurnUp(true))) return p_sInfo;
             }

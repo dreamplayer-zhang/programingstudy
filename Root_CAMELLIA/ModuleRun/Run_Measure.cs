@@ -141,7 +141,7 @@ namespace Root_CAMELLIA.Module
                         //m_mwvm.p_RTGraph.DrawTransmittanceGraph(index, "Wavelength(nm)", "Reflectance(%)");
 
                     }
-                    m_mwvm.p_Progress = (((double)(index + 1) / m_DataManager.recipeDM.MeasurementRD.DataSelectedPoint.Count) * 100);
+                    m_mwvm.p_Progress = (double)(index + 1) / m_DataManager.recipeDM.MeasurementRD.DataSelectedPoint.Count * 100;
                     SaveRawData(index);
                     //.DataManager MetData = LibSR_Met.DataManager.GetInstance();
                     // Spectrum data Thread 추가 두개두개두개
@@ -167,7 +167,7 @@ namespace Root_CAMELLIA.Module
                     nThicknessCnt++;
                 }
 
-                if (MeasureDone && nThicknessCnt == m_DataManager.recipeDM.MeasurementRD.DataSelectedPoint.Count)
+                if (MeasureDone && (nThicknessCnt == m_DataManager.recipeDM.MeasurementRD.DataSelectedPoint.Count || m_isPointMeasure))
                 {
                     m_CalcThicknessDone = true;
                     break;
@@ -291,8 +291,6 @@ namespace Root_CAMELLIA.Module
                 {
                     centerX = m_DataManager.m_waferCentering.m_ptCenter.X;
                     centerY = m_DataManager.m_waferCentering.m_ptCenter.Y;
-                    //centerX = m_DataManager.m_waferCentering.m_ptCenter.X - (m_StageCenterPos_pulse.X - m_DataManager.m_waferCentering.m_ptCenter.X);
-                    //centerY = m_DataManager.m_waferCentering.m_ptCenter.Y - (m_StageCenterPos_pulse.Y- m_DataManager.m_waferCentering.m_ptCenter.Y);
                 }
 
                 double RatioX = (int)(BaseDefine.CanvasWidth / BaseDefine.ViewSize);
