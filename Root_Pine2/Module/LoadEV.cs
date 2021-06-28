@@ -199,6 +199,7 @@ namespace Root_Pine2.Module
                 p_bCheck = m_diCheck.p_bIn;
                 if (p_bCheck == false)
                 {
+                    p_bDone = false; 
                     m_pine2.m_buzzer.RunBuzzer(Pine2.eBuzzer.Finish); 
                     return "OK"; 
                 }
@@ -231,7 +232,7 @@ namespace Root_Pine2.Module
                         if (sw.ElapsedMilliseconds > msTimeout) return "RunLoad Timeout : Top Sensor Up";
                     }
                     p_eMove = eMove.Stop;
-                    p_bDone = p_bCheck;
+                    p_bDone = m_diCheck.p_bIn;
                     return "OK";
                 }
                 finally
@@ -280,6 +281,7 @@ namespace Root_Pine2.Module
         public override void Reset()
         {
             base.Reset();
+            p_bDone = false; 
             StartLoad();
         }
         #endregion

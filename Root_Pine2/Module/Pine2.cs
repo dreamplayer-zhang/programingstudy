@@ -513,7 +513,7 @@ namespace Root_Pine2.Module
             if (m_handler.p_sRecipe == "") return; 
             string sPath = EQ.c_sPathRecipe + "\\" + m_handler.p_sRecipe;
             Directory.CreateDirectory(sPath);
-            string sFile = sPath + "\\Pine2." + c_sExt;
+            string sFile = sPath + "\\Pine2" + c_sExt;
             m_treeRootSetup.m_job = new Job(sFile, true, m_log);
             RunTree(Tree.eMode.JobSave);
             m_treeRootSetup.m_job.Close();
@@ -523,7 +523,7 @@ namespace Root_Pine2.Module
         {
             string sPath = EQ.c_sPathRecipe + "\\" + sRecipe;
             Directory.CreateDirectory(sPath);
-            string sFile = sPath + "\\Pine2." + c_sExt;
+            string sFile = sPath + "\\Pine2" + c_sExt;
             m_treeRootSetup.m_job = new Job(sFile, false, m_log);
             RunTree(Tree.eMode.JobOpen);
             m_treeRootSetup.m_job.Close();

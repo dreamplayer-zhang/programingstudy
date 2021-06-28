@@ -104,6 +104,7 @@ namespace Root_Pine2.Module
 
         public string RunMoveDone(Vision2D.eWorks eWorks)
         {
+            m_aBoat[eWorks].p_eStep = Boat.eStep.Run;
             if (Run(m_aBoat[eWorks].RunMove(p_ePosUnload))) return p_sInfo;
             m_aBoat[eWorks].p_eStep = Boat.eStep.Done;
             if (m_aBoat[eWorks].p_infoStrip != null) m_aBoat[eWorks].p_infoStrip.p_eResult = InfoStrip.eResult.Rework; 
@@ -198,13 +199,13 @@ namespace Root_Pine2.Module
                     if (m_vision.IsBusy()) EQ.p_bStop = true;
                     iSnap++; 
                 }
+                m_aBoat[eWorks].p_eStep = Boat.eStep.Done;
             }
             catch (Exception e) { p_sInfo = e.Message; }
             finally
             {
                 m_axisCam.StartMove((Vision2D.eWorks)(1 - (int)eWorks));
                 m_aBoat[eWorks].RunMove(p_ePosUnload);
-                m_aBoat[eWorks].p_eStep = Boat.eStep.Run;
                 m_aBoat[eWorks].m_doTriggerSwitch.Write(false);
             }
             m_log.Info("Run Snap End : " + (sw.ElapsedMilliseconds / 1000.0).ToString("0.00") + " sec");

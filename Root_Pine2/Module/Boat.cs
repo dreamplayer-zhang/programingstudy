@@ -95,12 +95,6 @@ namespace Root_Pine2.Module
             return bWait ? m_axis.WaitReady() : "OK";
         }
 
-        public string MoveSnap(double dPosAcc)
-        {
-            m_axis.StartMove(m_axis.m_trigger.m_aPos[0] + dPosAcc);
-            return m_axis.WaitReady();
-        }
-
         double[] m_pSnap = new double[2] { 0, 0 }; 
         void CalcSnapPos(Vision2D.Recipe.Snap snapData)
         {
