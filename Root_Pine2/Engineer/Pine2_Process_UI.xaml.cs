@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
 using System.Windows.Threading;
 
 namespace Root_Pine2.Engineer
@@ -121,6 +122,7 @@ namespace Root_Pine2.Engineer
         DispatcherTimer m_timer = new DispatcherTimer();
         private void M_timer_Tick(object sender, EventArgs e)
         {
+            grid.Background = (m_pine2.p_eMode == Pine2.eRunMode.Magazine) ? Brushes.Moccasin : Brushes.Silver; 
             foreach (MagazineEV_UI ui in m_aMagazineUI) ui.OnTimer(); 
             foreach (Loader_UI ui in m_aLoaderUI) ui.OnTimer();
             foreach (Boats_UI ui in m_aBoatsUI) ui.OnTimer();
