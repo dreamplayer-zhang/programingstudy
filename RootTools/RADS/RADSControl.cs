@@ -1,15 +1,14 @@
-﻿using RootTools.Trees;
+﻿using RootTools.Comm;
+using RootTools.Trees;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
-using System.Text;
 using System.Timers;
 using System.Windows.Controls;
+using System.Windows.Forms.DataVisualization.Charting;
 
 namespace RootTools.RADS
 {
-	public class RADSControl : ObservableObject, ITool
+    public class RADSControl : ObservableObject, ITool
 	{
 		public string p_id { get; set; }
 		Log m_log;
@@ -25,9 +24,16 @@ namespace RootTools.RADS
 			//if (bUseRADS == true)
 			//{
 			//	p_treeRoot = p_connect.p_CurrentController.p_TreeRoot;
+
+			m_tickTime = DateTime.Now;
+
 			m_timer = new Timer(100);
 			m_timer.Elapsed += Timer_Elapsed;
+			m_timer.Start();
 			//}
+
+			InitRS232();
+			m_rs232.p_bConnect = true;
 		}
 
 		#region Tree
@@ -46,9 +52,16 @@ namespace RootTools.RADS
 			{
 				RADSControl_UI ui = new RADSControl_UI();
 				ui.Init(this);
+				
+				if(ui.m_voltPoints != null)
+					m_voltPoints = ui.m_voltPoints;
+
 				return (UserControl)ui;
 			}
 		}
+
+		DataPointCollection m_voltPoints = null;
+
 		#endregion
 
 		#region EventHandler
@@ -122,6 +135,31 @@ namespace RootTools.RADS
 		}
 		#endregion
 
+		#region RS232
+		public RS232byte m_rs232;
+		void InitRS232()
+		{
+			m_rs232 = new RS232byte(p_id, m_log);
+			m_rs232.OnReceive += M_rs232_OnReceive;
+		}
+
+		private void M_rs232_OnReceive(byte[] aRead, int nRead)
+		{
+			if (nRead > 0)
+			{
+				if (aRead[0] == 165)
+				{
+					byte b1 = aRead[1];
+					byte b2 = aRead[2];
+					int nVal = b1 << 8 | b2;
+
+					int nVoltage = 150 * nVal / 0x7600;
+					p_nVoltage = nVoltage;
+				}
+			}
+		}
+		#endregion
+
 		public Timer m_timer { get; set; }
 
 		RADSConnectControl m_connect;
@@ -153,12 +191,27 @@ namespace RootTools.RADS
 				SetProperty(ref m_nAdsData, value);
             }
         }
-		
+
+		int m_nVoltage = 0;
+		public int p_nVoltage
+		{
+			get { return m_nVoltage; }
+			set
+			{
+				SetProperty(ref m_nVoltage, value);
+			}
+		}
+
 		private void OnSearchComplete()
 		{
 			if (this.SearchComplete != null)
 				this.SearchComplete();
 		}
+
+
+		DateTime m_tickTime;
+		double m_dVoltageSum = 0;
+		double m_dElapsedTime = 0;
 
 		private void Timer_Elapsed(object sender, ElapsedEventArgs e)
 		{
@@ -182,14 +235,28 @@ namespace RootTools.RADS
 				{
 					p_IsRun = true;
                     p_nAdsData = p_connect.p_CurrentController.p_ADS_data;
-                    //Console.WriteLine("AdsData : {0}", p_nAdsData);
+					//Console.WriteLine("AdsData : {0}", p_nAdsData);
 				}
-
 			}
 			else
 			{
 				//Console.WriteLine("You're not ready!");
 			}
+
+			// 분당 평균 Voltage 로그 작성
+			TimeSpan diffTime = e.SignalTime - m_tickTime;
+			m_dElapsedTime += diffTime.TotalMilliseconds;
+			m_dVoltageSum += p_nVoltage * diffTime.TotalMilliseconds;
+
+			if (m_dElapsedTime > 60 * 100)
+			{
+				m_log.Info(string.Format("Average Voltage: {0}", m_dVoltageSum / m_dElapsedTime));
+
+				m_dVoltageSum = 0;
+				m_dElapsedTime = 0;
+			}
+
+			m_tickTime = e.SignalTime;
 		}
 
 		public void Dispose()
