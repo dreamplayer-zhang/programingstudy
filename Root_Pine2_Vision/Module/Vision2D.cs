@@ -276,7 +276,7 @@ namespace Root_Pine2_Vision.Module
                     GrabData data = new GrabData();
                     data.bInvY = (m_eDirection == eDirection.Forward);
                     data.m_nOverlap = m_nOverlap;
-                    data.nScanOffsetY = cpOffset.Y;   /*m_cpMemory.Y;*/
+                    data.nScanOffsetY = 0;   /*m_cpMemory.Y;*/
                     data.ReverseOffsetY = cpOffset.Y; /*m_cpMemory.Y;*/ /* + m_vision.m_nLine */
                     m_vision.m_aGrabData[eWorks].SetData(data);
                     return data;
@@ -328,6 +328,7 @@ namespace Root_Pine2_Vision.Module
 
                     if (m_treeRecipe.p_eMode == Tree.eMode.JobOpen)
                     {
+                        while (m_aSnap.Count > value) m_aSnap.RemoveAt(m_aSnap.Count - 1);
                         while (m_aSnap.Count < value) m_aSnap.Add(new Snap(m_vision));
                     }
 
@@ -366,7 +367,6 @@ namespace Root_Pine2_Vision.Module
                     m_aSnap.Clear();
                     int nFOVpx = m_vision.m_aGrabData[m_eWorks].m_nFovSize;
                     int nOverlap = m_vision.m_aGrabData[m_eWorks].m_nOverlap;
-                    int nReverseOffset = m_vision.m_aGrabData[m_eWorks].m_nReverseOffset;
                     double dResolution = m_vision.m_aGrabData[m_eWorks].m_dResolution;
                     double dFOVmm = nFOVpx * dResolution / 1000;
                     int nSnapCount = (int)Math.Ceiling(_dProductWidth / dFOVmm);    // 제품 전체를 찍기위한 스냅 횟수
@@ -569,13 +569,13 @@ namespace Root_Pine2_Vision.Module
             int nReverseOffset = m_aGrabData[eWorks].m_nReverseOffset;
             Recipe.eSnapMode nSnapMode = m_recipe[eWorks].p_eSnapMode;
             int nTotalSnap = m_recipe[eWorks].p_lSnap;
-            int nSnapLineIndex = nSnapMode == Recipe.eSnapMode.ALL ? iSnap % (nTotalSnap / 2) : iSnap % (nTotalSnap);
+            int nSnapLineIndex = (nSnapMode == Recipe.eSnapMode.ALL) ? iSnap % (nTotalSnap / 2) : iSnap % (nTotalSnap);
 
             CPoint cpOffset;    // 이미지 시작점
             if (recipe.m_eDirection == Recipe.Snap.eDirection.Forward)
-                cpOffset = new CPoint(nSnapLineIndex * nFOVpx, 0);
-            else
                 cpOffset = new CPoint(nSnapLineIndex * nFOVpx, nReverseOffset);
+            else
+                cpOffset = new CPoint(nSnapLineIndex * nFOVpx, 0);
 
             MemoryData memory = m_aWorks[eWorks].p_memSnap[(int)recipe.m_eEXT];
             GrabData grabData = recipe.GetGrabData(eWorks, cpOffset);
