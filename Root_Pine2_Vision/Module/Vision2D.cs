@@ -325,6 +325,12 @@ namespace Root_Pine2_Vision.Module
                 set
                 {
                     _lSnap = value;
+
+                    if (m_treeRecipe.p_eMode == Tree.eMode.JobOpen)
+                    {
+                        while (m_aSnap.Count < value) m_aSnap.Add(new Snap(m_vision));
+                    }
+
                     //if (m_aSnap.Count == value) return;
                     //while (m_aSnap.Count > value) m_aSnap.RemoveAt(m_aSnap.Count - 1);
                     //while (m_aSnap.Count < value) m_aSnap.Add(new Snap(m_vision));
@@ -355,62 +361,61 @@ namespace Root_Pine2_Vision.Module
                 set
                 {
                     _dProductWidth = value;
-                    if (m_vision.m_aGrabData.Count > 0)
+                    if (m_treeRecipe.p_eMode == Tree.eMode.JobOpen) return;
+                    
+                    m_aSnap.Clear();
+                    int nFOVpx = m_vision.m_aGrabData[m_eWorks].m_nFovSize;
+                    int nOverlap = m_vision.m_aGrabData[m_eWorks].m_nOverlap;
+                    int nReverseOffset = m_vision.m_aGrabData[m_eWorks].m_nReverseOffset;
+                    double dResolution = m_vision.m_aGrabData[m_eWorks].m_dResolution;
+                    double dFOVmm = nFOVpx * dResolution / 1000;
+                    int nSnapCount = (int)Math.Ceiling(_dProductWidth / dFOVmm);    // 제품 전체를 찍기위한 스냅 횟수
+
+                    if (p_eSnapMode == eSnapMode.ALL)
+                        p_lSnap = nSnapCount * 2;   // ALL인 경우 총 Snap횟수. (RGB + APS)
+                    else
+                        p_lSnap = nSnapCount;       // RGB 또는 APS인 경우 총 Snap 횟수.
+
+                    int nSnapLineIndex = 0;
+                    for (int i = 0; i < p_lSnap; i++)
                     {
-                        m_aSnap.Clear();
-                        int nFOVpx = m_vision.m_aGrabData[m_eWorks].m_nFovSize;
-                        int nOverlap = m_vision.m_aGrabData[m_eWorks].m_nOverlap;
-                        int nReverseOffset = m_vision.m_aGrabData[m_eWorks].m_nReverseOffset;
-                        double dResolution = m_vision.m_aGrabData[m_eWorks].m_dResolution;
-                        double dFOVmm = nFOVpx * dResolution / 1000;
-                        int nSnapCount = (int)Math.Ceiling(_dProductWidth / dFOVmm);    // 제품 전체를 찍기위한 스냅 횟수
+                        nSnapLineIndex = i % nSnapCount;    // nSnapCount = 3인경우, RGB(0,1,2), APS(0,1,2), ALL(0,1,2,0,1,2)
+                        m_aSnap.Add(new Snap(m_vision));
+                        m_aSnap[i].m_dpAxis = new RPoint(nSnapLineIndex * dFOVmm, 0);
+                        m_aSnap[i].m_nOverlap = nOverlap;
 
-                        if (p_eSnapMode == eSnapMode.ALL)
-                            p_lSnap = nSnapCount * 2;   // ALL인 경우 총 Snap횟수. (RGB + APS)
-                        else
-                            p_lSnap = nSnapCount;       // RGB 또는 APS인 경우 총 Snap 횟수.
-
-                        int nSnapLineIndex = 0;
-                        for (int i = 0; i < p_lSnap; i++)
+                        if (nSnapLineIndex % 2 == 0)  // 정방향
                         {
-                            nSnapLineIndex = i % nSnapCount;    // nSnapCount = 3인경우, RGB(0,1,2), APS(0,1,2), ALL(0,1,2,0,1,2)
-                            m_aSnap.Add(new Snap(m_vision));
-                            m_aSnap[i].m_dpAxis = new RPoint(nSnapLineIndex * dFOVmm, 0);
-                            m_aSnap[i].m_nOverlap = nOverlap;
+                            m_aSnap[i].m_eDirection = Snap.eDirection.Forward;
+                            //m_aSnap[i].m_cpMemory = new CPoint(nSnapLineIndex * nFOVpx, 0);
+                        }
+                        else  // 역방향
+                        {
+                            m_aSnap[i].m_eDirection = Snap.eDirection.Backward;
+                            //m_aSnap[i].m_cpMemory = new CPoint(nSnapLineIndex * nFOVpx, nReverseOffset);
+                        }
 
-                            if (nSnapLineIndex % 2 == 0)  // 정방향
-                            {
-                                m_aSnap[i].m_eDirection = Snap.eDirection.Forward;
-                                //m_aSnap[i].m_cpMemory = new CPoint(nSnapLineIndex * nFOVpx, 0);
-                            }
-                            else  // 역방향
-                            {
-                                m_aSnap[i].m_eDirection = Snap.eDirection.Backward;
-                                //m_aSnap[i].m_cpMemory = new CPoint(nSnapLineIndex * nFOVpx, nReverseOffset);
-                            }
-
-                            if (p_eSnapMode == eSnapMode.RGB)
+                        if (p_eSnapMode == eSnapMode.RGB)
+                        {
+                            m_aSnap[i].m_eEXT = Snap.eEXT.EXT1;
+                            m_aSnap[i].m_lightPower = m_lightPowerRGB.Clone();
+                        }
+                        else if (p_eSnapMode == eSnapMode.APS)
+                        {
+                            m_aSnap[i].m_eEXT = Snap.eEXT.EXT2;
+                            m_aSnap[i].m_lightPower = m_lightPowerAPS.Clone();
+                        }
+                        else if (p_eSnapMode == eSnapMode.ALL)
+                        {
+                            if (i / nSnapCount == 0)  // RGB
                             {
                                 m_aSnap[i].m_eEXT = Snap.eEXT.EXT1;
                                 m_aSnap[i].m_lightPower = m_lightPowerRGB.Clone();
                             }
-                            else if (p_eSnapMode == eSnapMode.APS)
+                            else  // APS
                             {
                                 m_aSnap[i].m_eEXT = Snap.eEXT.EXT2;
                                 m_aSnap[i].m_lightPower = m_lightPowerAPS.Clone();
-                            }
-                            else if (p_eSnapMode == eSnapMode.ALL)
-                            {
-                                if (i / nSnapCount == 0)  // RGB
-                                {
-                                    m_aSnap[i].m_eEXT = Snap.eEXT.EXT1;
-                                    m_aSnap[i].m_lightPower = m_lightPowerRGB.Clone();
-                                }
-                                else  // APS
-                                {
-                                    m_aSnap[i].m_eEXT = Snap.eEXT.EXT2;
-                                    m_aSnap[i].m_lightPower = m_lightPowerAPS.Clone();
-                                }
                             }
                         }
                     }
@@ -488,10 +493,14 @@ namespace Root_Pine2_Vision.Module
                 p_eSnapMode = (eSnapMode)tree.Set(p_eSnapMode, p_eSnapMode, "Snap Mode", "Select Snap Mode", bVisible);
                 p_dProductWidth = tree.Set(p_dProductWidth, p_dProductWidth, "Product Width", "Product Width(mm)", bVisible);
                 p_lSnap = tree.Set(p_lSnap, p_lSnap, "Count", "Snap Count", bVisible, true);
-                if (p_eSnapMode == eSnapMode.RGB || p_eSnapMode == eSnapMode.ALL)
-                    m_lightPowerRGB.RunTree(tree.GetTree("Light").GetTree("RGB Light", true, bVisible), bVisible);
-                if (p_eSnapMode == eSnapMode.APS || p_eSnapMode == eSnapMode.ALL)
-                    m_lightPowerAPS.RunTree(tree.GetTree("Light").GetTree("APS Light", true, bVisible), bVisible);
+
+                if (m_treeRecipe.p_eMode != Tree.eMode.JobOpen)
+                {
+                    if (p_eSnapMode == eSnapMode.RGB || p_eSnapMode == eSnapMode.ALL)
+                        m_lightPowerRGB.RunTree(tree.GetTree("Light").GetTree("RGB Light", true, bVisible), bVisible);
+                    if (p_eSnapMode == eSnapMode.APS || p_eSnapMode == eSnapMode.ALL)
+                        m_lightPowerAPS.RunTree(tree.GetTree("Light").GetTree("APS Light", true, bVisible), bVisible);
+                }
 
                 for (int n = 0; n < m_aSnap.Count; n++)
                     m_aSnap[n].RunTree(tree.GetTree("Snap").GetTree("Snap" + n.ToString("00"), false, bVisible, true), bVisible);
