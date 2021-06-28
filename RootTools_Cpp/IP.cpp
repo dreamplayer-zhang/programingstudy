@@ -364,6 +364,53 @@ float IP::TemplateMatching(BYTE* pSrc, BYTE* pTemp, Point& outMatchPoint, int nM
 
     return (chMax * 100 > 1) ? chMax * 100 : 1; // Matching Score
 }
+// Trigger가 커질 경우 OpenCV 함수는 점점 느려짐... First Chip Trigger 등을 사용하려면 
+//static float TemplateMatching_IPP(BYTE* pSrc, BYTE* pTemp, Point& outMatchPoint, int nSrcW, int nSrcH, int nTempW, int nTempH, Point ptLT, Point ptRB, int method, int nByteCnt, int nChIdx);
+//{
+//    IppiSize SizeFeature = { rtRef.width, rtRef.height };
+//    IppiSize SizeSrc = { rtRef.width + nX2 - nX1, rtRef.height + nY2 - nY1 };
+//    int nFeatureStep = SizeFeature.width * sizeof(Ipp8u);
+//    int nFeatureSize = SizeFeature.width * SizeFeature.height;
+//    int nSrcStep = SizeSrc.width * sizeof(Ipp8u);
+//    int nSrcSize = SizeSrc.width * SizeSrc.height;
+//
+//    int dstStep = (SizeSrc.width) * sizeof(Ipp32f);
+//    Ipp8u* pFeature = new Ipp8u[nFeatureSize];
+//    Ipp8u* pSrc = new Ipp8u[nSrcSize];
+//    Ipp32f* pDst = NULL;
+//
+//    for (int i = 0; i < SizeFeature.height; i++)
+//        memcpy(&pFeature[i * SizeFeature.width], ppRefMem[i], SizeFeature.width);
+//
+//    for (int i = 0; i < SizeSrc.height; i++)
+//    {
+//        if (i + ptStart.y + nY1 < 0 || ptStart.x + nX1 < 0)
+//        {
+//            if (ptStart.y + nY1 < 0)	ptStart.y += 1;
+//            if (ptStart.x + nX1 < 0)	ptStart.x += 1;
+//        }
+//
+//        memcpy(&pSrc[i * SizeSrc.width], &ppMem[i + ptStart.y + nY1][ptStart.x + nX1], SizeSrc.width);
+//    }
+//    Ipp32f fMax;
+//    int nMaxX = 0;
+//    int nMaxY = 0;
+//    cv::Point ptResult;
+//
+//    pDst = new Ipp32f[nSrcSize];
+//
+//    ippiCrossCorrSame_NormLevel_8u32f_C1R(pSrc, nSrcStep, SizeSrc, pFeature, nFeatureStep, SizeFeature, pDst, dstStep);
+//    ippiMaxIndx_32f_C1R(pDst, dstStep, SizeSrc, &fMax, &nMaxX, &nMaxY);
+//    ptResult = cv::Point(nMaxX + nX1 - rtRef.x, nMaxY + nY1 - rtRef.y);
+//
+//    int nScore = (int)(fMax * 100);
+//    if (pDst != NULL)
+//        delete[] pDst;
+//    delete[] pFeature;
+//    delete[] pSrc;
+//
+//    return ptResult;
+//}
 
 // D2D 
 void IP::SubtractAbs(BYTE* pSrc1, BYTE* pSrc2, BYTE* pDst, int nW, int nH)
@@ -2386,50 +2433,3 @@ int IP::FindEdge(BYTE* pSrc, int nMemW, int nMemH, Point ptLT, Point ptRB, int n
 
     return nEdge;
 }
-
-//cv::Point IP::TemplateMatching_IPP(int nX1, int nX2, int nY1, int nY2, cv::Rect rtRef, BYTE** ppMem, cv::Point ptStart, byte** ppRefMem, bool bLaplace, int nThresholdMethod, int nDilationCount, bool bMergeRotation)
-//{
-//    IppiSize SizeFeature = { rtRef.width, rtRef.height };
-//    IppiSize SizeSrc = { rtRef.width + nX2 - nX1, rtRef.height + nY2 - nY1 };
-//    int nFeatureStep = SizeFeature.width * sizeof(Ipp8u);
-//    int nFeatureSize = SizeFeature.width * SizeFeature.height;
-//    int nSrcStep = SizeSrc.width * sizeof(Ipp8u);
-//    int nSrcSize = SizeSrc.width * SizeSrc.height;
-//
-//    int dstStep = (SizeSrc.width) * sizeof(Ipp32f);
-//    Ipp8u* pFeature = new Ipp8u[nFeatureSize];
-//    Ipp8u* pSrc = new Ipp8u[nSrcSize];
-//    Ipp32f* pDst = NULL;
-//
-//    for (int i = 0; i < SizeFeature.height; i++)
-//        memcpy(&pFeature[i * SizeFeature.width], ppRefMem[i], SizeFeature.width);
-//
-//    for (int i = 0; i < SizeSrc.height; i++)
-//    {
-//        if (i + ptStart.y + nY1 < 0 || ptStart.x + nX1 < 0)
-//        {
-//            if (ptStart.y + nY1 < 0)	ptStart.y += 1;
-//            if (ptStart.x + nX1 < 0)	ptStart.x += 1;
-//        }
-//
-//        memcpy(&pSrc[i * SizeSrc.width], &ppMem[i + ptStart.y + nY1][ptStart.x + nX1], SizeSrc.width);
-//    }
-//    Ipp32f fMax;
-//    int nMaxX = 0;
-//    int nMaxY = 0;
-//    cv::Point ptResult;
-//
-//	pDst = new Ipp32f[nSrcSize];
-//
-//	ippiCrossCorrSame_NormLevel_8u32f_C1R(pSrc, nSrcStep, SizeSrc, pFeature, nFeatureStep, SizeFeature, pDst, dstStep);
-//	ippiMaxIndx_32f_C1R(pDst, dstStep, SizeSrc, &fMax, &nMaxX, &nMaxY);
-//	ptResult = cv::Point(nMaxX + nX1 - rtRef.x, nMaxY + nY1 - rtRef.y);
-//
-//    int nScore = (int)(fMax * 100);
-//    if (pDst != NULL)
-//        delete[] pDst;
-//    delete[] pFeature;
-//    delete[] pSrc;
-//
-//    return ptResult;
-//}

@@ -73,6 +73,19 @@ namespace RootTools_Vision
                         }
                     }
                 }
+                // Chip_trigger mode에서는 golden image를 생성하지 않으므로 첫 chip에서 golden image를 임시로 생성 후 scale map을 만들어줍니다.
+                else if((parameterD2D.RefImageUpdate == RefImageUpdateFreq.Chip_Trigger) && (parameterD2D.ScaleMap == true))
+                {
+                    CreateGoldenImage();
+
+                    if (scaleMap == null)
+                        scaleMap = new float[this.currentWorkplace.Width * this.currentWorkplace.Height];
+
+                    CLR_IP.Cpp_CreateDiffScaleMap(GoldenImage, scaleMap, this.currentWorkplace.Width, this.currentWorkplace.Height, 10, 10);
+
+                    foreach (Workplace wp in this.workplaceBundle)
+                        wp.SetPreworkData(PREWORKDATA_KEY.D2D_SCALE_MAP, (object)(scaleMap));
+                }
                 else
                 {
                     return true;
@@ -89,6 +102,18 @@ namespace RootTools_Vision
                 if (this.currentWorkplace.GetPreworkData(PREWORKDATA_KEY.D2D_GOLDEN_IMAGE) != null)
                 {
                     this.GoldenImage = this.currentWorkplace.GetPreworkData(PREWORKDATA_KEY.D2D_GOLDEN_IMAGE) as byte[];
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            else if ((parameterD2D.RefImageUpdate == RefImageUpdateFreq.Chip_Trigger) && (parameterD2D.ScaleMap == true))
+            {
+                if (this.currentWorkplace.GetPreworkData(PREWORKDATA_KEY.D2D_SCALE_MAP) != null)
+                {
+                    this.scaleMap = this.currentWorkplace.GetPreworkData(PREWORKDATA_KEY.D2D_SCALE_MAP) as float[];
                     return true;
                 }
                 else
@@ -296,6 +321,11 @@ namespace RootTools_Vision
                                             this.currentWorkplace.SharedBufferInfo.Width, this.currentWorkplace.SharedBufferInfo.Height,
                                             wpROIData, new Cpp_Point(this.currentWorkplace.PositionX, this.currentWorkplace.PositionY)
                                             , 1, this.currentWorkplace.Width, this.currentWorkplace.Height);
+
+                        if (parameterD2D.ScaleMap) // ScaleMap Option
+                        { 
+                            CLR_IP.Cpp_Multiply(diffImg, scaleMap, diffImg, chipW, chipH);
+                        }
                     }
                 }
             }
@@ -363,7 +393,7 @@ namespace RootTools_Vision
             CLR_IP.Cpp_Threshold(diffImg, binImg, chipW, chipH, parameterD2D.Intensity);
             
             // Mask
-            MaskRecipe mask = this.recipe.GetItem<MaskRecipe>(); //요기다 추가해줘용
+            MaskRecipe mask = this.recipe.GetItem<MaskRecipe>();
 
             Cpp_Point[] maskStartPoint = new Cpp_Point[mask.MaskList[this.parameterD2D.MaskIndex].PointLines.Count];
             int[] maskLength = new int[mask.MaskList[this.parameterD2D.MaskIndex].PointLines.Count];
@@ -436,8 +466,8 @@ namespace RootTools_Vision
             else
             {
                 // 중심에 있는 4개의 칩으로만 Golden Image 생성
-                startY = mapYIdx[mapYIdx.Count() / 2 - 1 - 2];
-                endY = mapYIdx[mapYIdx.Count() / 2 - 1 + 2];
+                startY = mapYIdx[(mapYIdx.Count() + mapYIdx.Count() % 2) / 2 - 1 - 2];
+                endY = mapYIdx[(mapYIdx.Count() + mapYIdx.Count() % 2) / 2 - 1 + 2];
                 // 칩 전체 다 쓰기
                 //startY = mapYIdx[0];
                 //endY = mapYIdx[mapYIdx.Count() - 1];
