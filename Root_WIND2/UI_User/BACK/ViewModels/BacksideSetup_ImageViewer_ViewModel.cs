@@ -1286,9 +1286,14 @@ namespace Root_WIND2.UI_User
 
             extraMapData = new int[mapSizeX * mapSizeY];
 
-            for (int x = 0; x < mapSizeX; x++)
+            int startX = mapSizeX - 1;
+            int startY = mapSizeY - 1;
+            int endX = 0;
+            int endY = 0;
+
+            for (int y = 0; y < mapSizeY; y++)
             {
-                for (int y = 0; y < mapSizeY; y++)
+                for (int x = 0; x < mapSizeX; x++)
                 {
                     int rel_x = (x - originDieX); // 원점 중심좌표로 Right/Top방향이 +
                     int rel_y = (originDieY - y);
@@ -1306,7 +1311,7 @@ namespace Root_WIND2.UI_User
                     {
                         if (mapData[map_y * originMapSizeX + map_x] == 1)
                         {
-                            extraMapData[x * mapSizeX + y] = (int)CHIP_TYPE.NORMAL;
+                            extraMapData[y * mapSizeX + x] = (int)CHIP_TYPE.NORMAL;
                             continue;
                         }
                     }
@@ -1316,7 +1321,7 @@ namespace Root_WIND2.UI_User
                         // 다이의 좌하단이 포함
                         if (Math.Pow(left - centerX, 2) + Math.Pow(bottom - centerY, 2) < radius_2)
                         {
-                            extraMapData[x * mapSizeX + y] = (int)CHIP_TYPE.EXTRA;
+                            extraMapData[y * mapSizeX + x] = (int)CHIP_TYPE.EXTRA;
                             rectList.Add(new CRect(left, top, right, bottom));
                         }
 
@@ -1326,7 +1331,7 @@ namespace Root_WIND2.UI_User
                         // 다이의 우하단이 포함
                         if (Math.Pow(right - centerX, 2) + Math.Pow(bottom - centerY, 2) < radius_2)
                         {
-                            extraMapData[x * mapSizeX + y] = (int)CHIP_TYPE.EXTRA;
+                            extraMapData[y * mapSizeX + x] = (int)CHIP_TYPE.EXTRA;
                             rectList.Add(new CRect(left, top, right, bottom));
                         }
                     }
@@ -1335,7 +1340,7 @@ namespace Root_WIND2.UI_User
                         // 다이의 우상단이 포함
                         if (Math.Pow(right - centerX, 2) + Math.Pow(top - centerY, 2) < radius_2)
                         {
-                            extraMapData[x * mapSizeX + y] = (int)CHIP_TYPE.EXTRA;
+                            extraMapData[y * mapSizeX + x] = (int)CHIP_TYPE.EXTRA;
                             rectList.Add(new CRect(left, top, right, bottom));
                         }
                     }
@@ -1344,15 +1349,40 @@ namespace Root_WIND2.UI_User
                         // 다이의 좌상단이 포함
                         if (Math.Pow(left - centerX, 2) + Math.Pow(top - centerY, 2) < radius_2)
                         {
-                            extraMapData[x * mapSizeX + y] = (int)CHIP_TYPE.EXTRA;
+                            extraMapData[y * mapSizeX + x] = (int)CHIP_TYPE.EXTRA;
                             rectList.Add(new CRect(left, top, right, bottom));
                         }
+                    }
+
+                    if (extraMapData[y * mapSizeX + x] == (int)CHIP_TYPE.EXTRA ||
+                        extraMapData[y * mapSizeX + x] == (int)CHIP_TYPE.NORMAL)
+                    {
+                        if (startX > x) startX = x;
+                        if (startY > y) startY = y;
+
+                        if (endX < x) endX = x;
+                        if (endY < y) endY = y;
                     }
                 }
             }
 
+            // 비어 있는 행/열 삭제
+            int newSizeX = endX - startX + 1;
+            int newSizeY = endY - startY + 1;
+            int[] newExtraMapData = new int[newSizeX * newSizeY];
+            for(int y = startY; y <= endY; y++)
+            {
+                for(int x = startX; x <= endX; x++)
+                {
+                    int xx = x - startX;
+                    int yy = y - startY;
+                    newExtraMapData[xx + yy * newSizeX] = extraMapData[x + y * mapSizeX];
+                }
+            }
+
+
             waferMap.UseExtraMap = true;
-            waferMap.CreateExtraMap(mapSizeX, mapSizeY, extraMapData);
+            waferMap.CreateExtraMap(newSizeX, newSizeY, newExtraMapData, startX, startY);
 
             return rectList;
         }
