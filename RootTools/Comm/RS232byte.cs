@@ -35,6 +35,7 @@ namespace RootTools.Comm
         public StopBits m_eStopbits = StopBits.None;
         public bool m_bUseCallback = true;
         public Handshake m_eHandshake = Handshake.XOnXOff;
+        public bool m_bLog = true;
 
         void RunConnectTree(Tree tree)
         {
@@ -132,7 +133,7 @@ namespace RootTools.Comm
             SerialPort sp = (SerialPort)sender;
             int nRead = sp.Read(m_aRead, 0, p_lRead);
             string sRead = Encoding.ASCII.GetString(m_aRead, 0, nRead);
-            m_commLog.Add(CommLog.eType.Receive, sRead);
+            if(m_bLog) m_commLog.Add(CommLog.eType.Receive, sRead);
             if (OnReceive != null) OnReceive(m_aRead, nRead); 
         }
         #endregion
@@ -142,7 +143,7 @@ namespace RootTools.Comm
         {
             lock (m_csLock)
             {
-                m_commLog.Add(CommLog.eType.Send, sMsg);
+                if(m_bLog) m_commLog.Add(CommLog.eType.Send, sMsg);
                 m_sp.Write(sMsg);
                 return "OK"; 
             }
@@ -156,7 +157,7 @@ namespace RootTools.Comm
                 if (m_sp == null)
                     return "Fail";
                 string sWrite = Encoding.ASCII.GetString(aWrite, nOffset, nWrite);
-                m_commLog.Add(CommLog.eType.Send, sWrite);
+                if (m_bLog) m_commLog.Add(CommLog.eType.Send, sWrite);
                 m_sp.Write(aWrite, nOffset, nWrite);
                 return "OK";
             }
@@ -175,6 +176,7 @@ namespace RootTools.Comm
             m_treeRoot.p_eMode = mode;
             RunConnectTree(m_treeRoot.GetTree("Connect"));
             RunTimeoutTree(m_treeRoot.GetTree("Timeout"));
+            RunSettingTree(m_treeRoot.GetTree("Setting"));
         }
 
         int m_msWriteTimeout = 2000;
@@ -183,6 +185,11 @@ namespace RootTools.Comm
         {
             m_msReadTimeout = tree.Set(m_msReadTimeout, 2000, "Read", "Read Timeout (ms)");
             m_msWriteTimeout = tree.Set(m_msWriteTimeout, 2000, "Write", "Write Timeout (ms)");
+        }
+
+        void RunSettingTree(Tree tree)
+        {
+            m_bLog = tree.Set(m_bLog, m_bLog, "Log", "Write Send/Receive Log");
         }
         #endregion
 
