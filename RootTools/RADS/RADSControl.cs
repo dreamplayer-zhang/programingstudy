@@ -24,12 +24,16 @@ namespace RootTools.RADS
 			//if (bUseRADS == true)
 			//{
 			//	p_treeRoot = p_connect.p_CurrentController.p_TreeRoot;
+
+			m_tickTime = DateTime.Now;
+
 			m_timer = new Timer(100);
 			m_timer.Elapsed += Timer_Elapsed;
 			m_timer.Start();
 			//}
 
 			InitRS232();
+			m_rs232.p_bConnect = true;
 		}
 
 		#region Tree
@@ -145,7 +149,11 @@ namespace RootTools.RADS
 			{
 				if (aRead[0] == 165)
 				{
-					int nVoltage = (int)BitConverter.ToUInt16(aRead, 1);
+					byte b1 = aRead[1];
+					byte b2 = aRead[2];
+					int nVal = b1 << 8 | b2;
+
+					int nVoltage = 150 * nVal / 0x7600;
 					p_nVoltage = nVoltage;
 				}
 			}
@@ -200,6 +208,11 @@ namespace RootTools.RADS
 				this.SearchComplete();
 		}
 
+
+		DateTime m_tickTime;
+		double m_dVoltageSum = 0;
+		double m_dElapsedTime = 0;
+
 		private void Timer_Elapsed(object sender, ElapsedEventArgs e)
 		{
 			if (IsReady)
@@ -211,13 +224,6 @@ namespace RootTools.RADS
 				if (p_connect.p_CurrentController.p_ADS_run == 0)
 				{
 					p_IsRun = false;//"Ready";
-
-					System.Windows.Application.Current.Dispatcher.Invoke(delegate
-					{
-						if(m_voltPoints != null)
-							m_voltPoints.Clear();
-					});
-					
 				}
 				else if (p_connect.p_CurrentController.p_ADS_up > 0)
 				{
@@ -230,26 +236,27 @@ namespace RootTools.RADS
 					p_IsRun = true;
                     p_nAdsData = p_connect.p_CurrentController.p_ADS_data;
 					//Console.WriteLine("AdsData : {0}", p_nAdsData);
-
-					// Update Voltage Graph Points
-					System.Windows.Application.Current.Dispatcher.Invoke(delegate
-					{
-						if (m_voltPoints != null)
-                        {
-							m_voltPoints.InsertY(0, p_nVoltage);
-
-							while (m_voltPoints.Count > 1000)
-							{
-								m_voltPoints.RemoveAt(m_voltPoints.Count - 1);
-							}
-						}	
-					});
 				}
 			}
 			else
 			{
 				//Console.WriteLine("You're not ready!");
 			}
+
+			// 분당 평균 Voltage 로그 작성
+			TimeSpan diffTime = e.SignalTime - m_tickTime;
+			m_dElapsedTime += diffTime.TotalMilliseconds;
+			m_dVoltageSum += p_nVoltage * diffTime.TotalMilliseconds;
+
+			if (m_dElapsedTime > 60 * 100)
+			{
+				m_log.Info(string.Format("Average Voltage: {0}", m_dVoltageSum / m_dElapsedTime));
+
+				m_dVoltageSum = 0;
+				m_dElapsedTime = 0;
+			}
+
+			m_tickTime = e.SignalTime;
 		}
 
 		public void Dispose()

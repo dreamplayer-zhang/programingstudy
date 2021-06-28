@@ -32,6 +32,9 @@ namespace RootTools.RADS
         public Chart m_voltChart = null;
         public DataPointCollection m_voltPoints = null;
 
+        DispatcherTimer m_timerGraphUpdate = new DispatcherTimer();
+        System.Timers.Timer m_timerTest = new System.Timers.Timer(100);
+
         public void Init(RADSControl radsControl)
         {
             m_RADSControl = radsControl;
@@ -53,21 +56,36 @@ namespace RootTools.RADS
             m_voltPoints.Add(0);
 
             ChartArea chartArea = m_voltChart.ChartAreas["chartarea"];
-            //chartArea.AxisX.IsInterlaced = true;
             chartArea.AxisX.IsReversed = true;
-            //chartArea.AxisX.IsStartedFromZero = false;
-            chartArea.AxisX.Maximum = 1000;
+            chartArea.AxisX.Maximum = 200;
             chartArea.AxisX.IntervalAutoMode = IntervalAutoMode.VariableCount;
             chartArea.AxisX.IsMarginVisible = false;
             chartArea.AxisX.LabelStyle.Enabled = false;
             chartArea.AxisX.LabelStyle.IsEndLabelVisible = true;
 
-            //chartArea.AxisY.IsInterlaced = true;
             chartArea.AxisY.Minimum = 0;
-            chartArea.AxisY.Maximum = 1000;
+            chartArea.AxisY.Maximum = 150;
             chartArea.AxisY.IsMarginVisible = false;
             chartArea.AxisY.LabelStyle.Enabled = false;
             chartArea.AxisY.LabelStyle.IsEndLabelVisible = true;
+
+            m_timerGraphUpdate.Tick += M_timerGraphUpdate_Tick;
+            m_timerGraphUpdate.Interval = TimeSpan.FromMilliseconds(100);
+            m_timerGraphUpdate.Start();
+        }
+        private void M_timerGraphUpdate_Tick(object sender, EventArgs e)
+        {
+            m_voltPoints.InsertY(0, m_RADSControl.p_nVoltage);
+
+            while (m_voltPoints.Count > 1000)
+            {
+                m_voltPoints.RemoveAt(m_voltPoints.Count - 1);
+            }
+        }
+
+        public void Dispose()
+        {
+            m_timerGraphUpdate.Stop();
         }
     }
 }
