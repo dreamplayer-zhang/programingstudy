@@ -111,6 +111,18 @@ namespace Root_Rinse_Unloader.Module
         {
             for (int n = 0; n < 4; n++) m_aLine.Add(new Line("Line" + n.ToString(), this));
         }
+
+        public bool IsStripExist()
+        {
+            foreach (Line line in m_aLine)
+            {
+                for (int n = 0; n < 3; n++)
+                {
+                    if (line.m_diCheck[n].p_bIn) return true; 
+                }
+            }
+            return false; 
+        }
         #endregion
 
         #region Width

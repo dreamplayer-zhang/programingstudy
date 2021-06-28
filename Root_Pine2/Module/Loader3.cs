@@ -86,10 +86,10 @@ namespace Root_Pine2.Module
 
         #region AvoidX
         Loader0 p_loader0 { get { return m_handler.m_loader0; } }
-        string StartMoveX(string sPos)
+        string StartMoveX(string sPos, double xOffset)
         {
             Axis axisX = p_loader0.m_axis.p_axisX;
-            double fPos = m_axis.p_axisX.GetPosValue(sPos);
+            double fPos = m_axis.p_axisX.GetPosValue(sPos) + xOffset;
             while ((fPos + axisX.m_posDst) > Loader0.c_lAxisX)
             {
                 Thread.Sleep(10);
@@ -121,21 +121,21 @@ namespace Root_Pine2.Module
         public string RunMoveBoat(Vision2D.eWorks eWorks, bool bWait = true)
         {
             string sPos = GetPosString(eWorks);
-            if (Run(StartMoveX(sPos))) return p_sInfo;
+            if (Run(StartMoveX(sPos, 0))) return p_sInfo;
             m_axis.p_axisY.StartMove(sPos);
             return bWait ? m_axis.WaitReady() : "OK";
         }
 
-        public string RunMoveTransfer(ePosTransfer ePos, bool bWait = true)
+        public string RunMoveTransfer(ePosTransfer ePos, double xOffset, bool bWait = true)
         {
-            if (Run(StartMoveX(ePos.ToString()))) return p_sInfo;
+            if (Run(StartMoveX(ePos.ToString(), xOffset))) return p_sInfo;
             m_axis.p_axisY.StartMove(ePos);
             return bWait ? m_axis.WaitReady() : "OK";
         }
 
         public string RunMoveTray(ePosTray ePos, bool bWait = true)
         {
-            if (Run(StartMoveX(ePos.ToString()))) return p_sInfo;
+            if (Run(StartMoveX(ePos.ToString(), 0))) return p_sInfo;
             m_axis.p_axisY.StartMove(ePos);
             return bWait ? m_axis.WaitReady() : "OK";
         }
@@ -193,7 +193,7 @@ namespace Root_Pine2.Module
             try
             {
                 if (Run(RunMoveUp())) return p_sInfo;
-                if (Run(boats.RunMoveReady(eWorks))) return p_sInfo;
+                if (Run(boats.RunMoveDone(eWorks))) return p_sInfo;
                 if (Run(RunMoveBoat(eWorks))) return p_sInfo;
                 if (Run(RunMoveZ(eWorks, 0))) return p_sInfo;
                 boat.RunVacuum(false);
@@ -217,22 +217,23 @@ namespace Root_Pine2.Module
         #endregion
 
         #region RunUnload
-        string StartUnloadTransfer() //forget
+        string StartUnloadTransfer() 
         {
             Run_UnloadTransfer run = (Run_UnloadTransfer)m_runUnloadTransfer.Clone();
-            run.m_ePos = (ePosTransfer)m_transfer.m_buffer.m_ePosDst;
             return StartRun(run);
         }
 
-        public string RunUnloadTransfer(ePosTransfer ePos) //forget
+        public string RunUnloadTransfer() 
         {
             if (m_picker.p_infoStrip != null) return "InfoStrip != null";
             if (m_transfer.m_pusher.p_bEnable == false) return "Buffer Pusher not Enable";
             try
             {
+                ePosTransfer ePos = (ePosTransfer)m_transfer.m_buffer.m_ePosDst;
+                double xOffset = m_transfer.m_buffer.m_xOffset;
                 m_transfer.m_pusher.p_bLock = true;
                 if (Run(RunMoveUp())) return p_sInfo;
-                if (Run(RunMoveTransfer(ePos))) return p_sInfo;
+                if (Run(RunMoveTransfer(ePos, xOffset))) return p_sInfo;
                 if (Run(RunMoveZ(ePos))) return p_sInfo;
                 if (Run(m_picker.RunVacuum(false))) return p_sInfo;
                 if (Run(RunMoveUp())) return p_sInfo;
@@ -479,22 +480,19 @@ namespace Root_Pine2.Module
                 InitModuleRun(module);
             }
 
-            public ePosTransfer m_ePos = ePosTransfer.Transfer0;
             public override ModuleRunBase Clone()
             {
                 Run_UnloadTransfer run = new Run_UnloadTransfer(m_module);
-                run.m_ePos = m_ePos;
                 return run;
             }
 
             public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
             {
-                m_ePos = (ePosTransfer)tree.Set(m_ePos, m_ePos, "Transfer", "Select Transfer", bVisible);
             }
 
             public override string Run()
             {
-                return m_module.RunUnloadTransfer(m_ePos);
+                return m_module.RunUnloadTransfer();
             }
         }
 

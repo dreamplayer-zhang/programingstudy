@@ -3,7 +3,10 @@ using Root_Pine2_Vision.Module;
 using RootTools;
 using System;
 using System.Collections.Generic;
+using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
+using System.Windows.Media;
 using System.Windows.Threading;
 
 namespace Root_Pine2.Engineer
@@ -30,6 +33,7 @@ namespace Root_Pine2.Engineer
             checkBoxPause.DataContext = EQ.m_EQ;
             checkBoxSimulate.DataContext = EQ.m_EQ;
 
+            comboRecipe.DataContext = handler; 
             textBlockMode.DataContext = m_pine2;
             textBoxWidth.DataContext = m_pine2;
             textBoxThickness.DataContext = m_pine2; 
@@ -118,6 +122,7 @@ namespace Root_Pine2.Engineer
         DispatcherTimer m_timer = new DispatcherTimer();
         private void M_timer_Tick(object sender, EventArgs e)
         {
+            grid.Background = (m_pine2.p_eMode == Pine2.eRunMode.Magazine) ? Brushes.Moccasin : Brushes.Silver; 
             foreach (MagazineEV_UI ui in m_aMagazineUI) ui.OnTimer(); 
             foreach (Loader_UI ui in m_aLoaderUI) ui.OnTimer();
             foreach (Boats_UI ui in m_aBoatsUI) ui.OnTimer();
@@ -126,12 +131,12 @@ namespace Root_Pine2.Engineer
             OnTimerRun(); 
         }
 
-        private void textBlockMode_PreviewMouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        private void textBlockMode_PreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
             m_pine2.p_eMode = 1 - m_pine2.p_eMode;
         }
 
-        private void textBlock3D_PreviewMouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        private void textBlock3D_PreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
             m_pine2.p_b3D = !m_pine2.p_b3D; 
         }
@@ -145,7 +150,12 @@ namespace Root_Pine2.Engineer
             buttonHome.IsEnabled = (EQ.p_eState == EQ.eState.Ready) || (EQ.p_eState == EQ.eState.Init) || (EQ.p_eState == EQ.eState.Error);
         }
 
-        private void buttonHome_Click(object sender, System.Windows.RoutedEventArgs e)
+        private void buttonRecipeSave_Click(object sender, RoutedEventArgs e)
+        {
+            m_pine2.RecipeSave();
+        }
+
+        private void buttonHome_Click(object sender, RoutedEventArgs e)
         {
             switch (EQ.p_eState)
             {
@@ -157,17 +167,17 @@ namespace Root_Pine2.Engineer
             }
         }
 
-        private void buttonStart_Click(object sender, System.Windows.RoutedEventArgs e)
+        private void buttonStart_Click(object sender, RoutedEventArgs e)
         {
             if (EQ.p_eState == EQ.eState.Ready) EQ.p_eState = EQ.eState.Run;
         }
 
-        private void buttonStop_Click(object sender, System.Windows.RoutedEventArgs e)
+        private void buttonStop_Click(object sender, RoutedEventArgs e)
         {
             if (EQ.p_eState == EQ.eState.Run) EQ.p_eState = EQ.eState.Ready; 
         }
 
-        private void buttonReset_Click(object sender, System.Windows.RoutedEventArgs e)
+        private void buttonReset_Click(object sender, RoutedEventArgs e)
         {
             switch (EQ.p_eState)
             {
