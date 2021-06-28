@@ -104,9 +104,9 @@ namespace Root_Pine2.Module
         #endregion
 
         #region AxisXY
-        public string RunMoveTransfer(ePosTransfer ePos, bool bWait = true)
+        public string RunMoveTransfer(ePosTransfer ePos, double xOffset, bool bWait = true)
         {
-            if (Run(StartMoveX(ePos.ToString(), 0))) return p_sInfo; 
+            if (Run(StartMoveX(ePos.ToString(), xOffset))) return p_sInfo; 
             m_axis.p_axisY.StartMove(ePos);
             return bWait ? m_axis.WaitReady() : "OK";
         }
@@ -232,23 +232,24 @@ namespace Root_Pine2.Module
             return "OK";
         }
 
-        string StartLoadTransfer() //forget
+        string StartLoadTransfer() 
         {
             Run_LoadTransfer run = (Run_LoadTransfer)m_runLoadTransfer.Clone();
-            run.m_ePos = (ePosTransfer)m_transfer.m_buffer.m_ePosDst;
             return StartRun(run);
         }
 
-        public string RunLoadTransfer(ePosTransfer ePos) //forget
+        public string RunLoadTransfer()
         {
             Transfer.Gripper gripper = m_transfer.m_gripper;
             if (m_picker.p_infoStrip != null) return "InfoStrip != null";
             if (gripper.p_bEnable == false) return "Load from Transfer not Enable";
             try
             {
+                ePosTransfer ePos = (ePosTransfer)m_transfer.m_buffer.m_ePosDst;
+                double xOffset = m_transfer.m_buffer.m_xOffset; 
                 gripper.p_bLock = true;
                 if (Run(RunMoveUp())) return p_sInfo;
-                if (Run(RunMoveTransfer(ePos))) return p_sInfo;
+                if (Run(RunMoveTransfer(ePos, -xOffset))) return p_sInfo;
                 if (Run(RunMoveZ(ePos))) return p_sInfo;
                 if (Run(m_picker.RunVacuum(true))) return p_sInfo;
                 if (Run(RunMoveUp())) return p_sInfo;
@@ -382,7 +383,7 @@ namespace Root_Pine2.Module
                 switch (m_pine2.p_eMode)
                 {
                     case Pine2.eRunMode.Stack: if (Run(RunMoveLoadEV())) return p_sInfo; break;
-                    case Pine2.eRunMode.Magazine: if (Run(RunMoveTransfer(ePosTransfer.Transfer7))) return p_sInfo; break; 
+                    case Pine2.eRunMode.Magazine: if (Run(RunMoveTransfer(ePosTransfer.Transfer7, 0))) return p_sInfo; break; 
                 }
                 while (true)
                 {
@@ -548,22 +549,19 @@ namespace Root_Pine2.Module
                 InitModuleRun(module);
             }
 
-            public ePosTransfer m_ePos = ePosTransfer.Transfer0;
             public override ModuleRunBase Clone()
             {
                 Run_LoadTransfer run = new Run_LoadTransfer(m_module);
-                run.m_ePos = m_ePos;
                 return run;
             }
 
             public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
             {
-                m_ePos = (ePosTransfer)tree.Set(m_ePos, m_ePos, "Transfer", "Select Transfer", bVisible);
             }
 
             public override string Run()
             {
-                return m_module.RunLoadTransfer(m_ePos);
+                return m_module.RunLoadTransfer();
             }
         }
 

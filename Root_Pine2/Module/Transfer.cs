@@ -135,6 +135,7 @@ namespace Root_Pine2.Module
             double m_dxPulse = 0;
             public double m_dZ = 0;
             public InfoStrip.eMagazine m_ePosDst = InfoStrip.eMagazine.Magazine0;
+            public double m_xOffset = 0; 
             public string RunMove(InfoStrip.eMagazine ePos, bool bPushPos, bool bWait = true)
             {
                 if (m_transfer.m_pusher.p_bLock) return "Lock by Sorter Picker";
@@ -143,7 +144,8 @@ namespace Root_Pine2.Module
                 m_transfer.m_gripper.p_bEnable = false; 
                 m_ePosDst = ePos;
                 double dPos = 1000 * (m_transfer.m_pine2.m_widthDefaultStrip - m_transfer.m_pine2.p_widthStrip) / 2;
-                m_axis.StartMove(ePos, (bPushPos ? m_dxPulse : 0) + dPos); 
+                m_xOffset = (bPushPos ? m_dxPulse : 0) + dPos; 
+                m_axis.StartMove(ePos, m_xOffset); 
                 return bWait ? m_axis.WaitReady() : "OK";
             }
             #endregion
