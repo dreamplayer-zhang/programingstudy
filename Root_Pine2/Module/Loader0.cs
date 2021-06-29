@@ -528,7 +528,7 @@ namespace Root_Pine2.Module
         public override void Reset()
         {
             m_picker.m_dioVacuum.Write(false);
-            m_picker.p_infoStrip = null; 
+            m_picker.p_infoStrip = null;
             base.Reset();
         }
 

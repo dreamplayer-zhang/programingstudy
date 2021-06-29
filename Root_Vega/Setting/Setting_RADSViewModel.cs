@@ -119,8 +119,6 @@ namespace Root_Vega.Setting
 
         void StartADS()
         {
-            m_timerControl.m_timer.Start();
-            p_timerControl.p_IsRun = true;
             p_timerControl.StartRADS();
 
             return;
@@ -136,8 +134,6 @@ namespace Root_Vega.Setting
 
         void StopADS()
         {
-            p_timerControl.m_timer.Stop();
-            p_timerControl.p_IsRun = false;
             p_timerControl.StopRADS();
             return;
         }
