@@ -27,6 +27,8 @@ namespace Root_VEGA_D.Module
     {
         Vision m_module;
 
+        public delegate void OnGrabLineScanEvent(Run_GrabLineScan moduleRun);
+
         //bool m_bInvDir = false;
         public GrabMode m_grabMode = null;
         //double m_dTDIToVRSOffsetZ = 0;
@@ -264,6 +266,8 @@ namespace Root_VEGA_D.Module
 
             return "OK";
         }
+
+        public event OnGrabLineScanEvent AlignComleted;
         string RunAlign(MemoryData mem, int nSnapCount, double startPosY, double endPosY, double startTriggerY, double endTriggerY, out CRect rectBotMarker)
         {
             rectBotMarker = new CRect(0, 0, 0, 0);
@@ -420,6 +424,8 @@ namespace Root_VEGA_D.Module
             finally
             {
                 m_grabMode.SetLight(false);
+
+                if(AlignComleted != null) AlignComleted(this);
             }
 
             m_log.Info("Align Failed");
@@ -477,6 +483,8 @@ namespace Root_VEGA_D.Module
                 return false;
         }
 
+        public event OnGrabLineScanEvent LineScanStarting;
+        public event OnGrabLineScanEvent LineScanCompleted;
         public override string Run()
         {
             if (m_grabMode == null) return "Grab Mode == null";
@@ -559,8 +567,8 @@ namespace Root_VEGA_D.Module
                 {
                     // 'LineStart' 메세지 전달
                     Dictionary<string, string> mapParam = new Dictionary<string, string>();
-                    mapParam["BOT_ALIGN_MARKER_POS_X"] = rectBotMarker.Left.ToString();
-                    mapParam["BOT_ALIGN_MARKER_POS_Y"] = rectBotMarker.Bottom.ToString();
+                    mapParam[TCPIPComm_VEGA_D.PARAM_NAME_BOT_ALIGN_MARKER_POS_X] = rectBotMarker.Left.ToString();
+                    mapParam[TCPIPComm_VEGA_D.PARAM_NAME_BOT_ALIGN_MARKER_POS_Y] = rectBotMarker.Bottom.ToString();
 
                     m_module.TcpipCommServer.SendMessage(TCPIPComm_VEGA_D.Command.RcpName, mapParam);
                 }
@@ -588,6 +596,9 @@ namespace Root_VEGA_D.Module
                             Thread.Sleep(10);
                             continue;
                         }
+
+                        // 라인스캔 시작할 때 이벤트 함수 호출
+                        if (LineScanStarting != null) LineScanStarting(this);
 
                         // 이동 위치 계산
                         //int nScanSpeed = Convert.ToInt32((double)m_grabMode.m_nMaxFrame * m_grabMode.m_dTrigger * (double)m_grabMode.m_nScanRate / 100);
@@ -678,6 +689,9 @@ namespace Root_VEGA_D.Module
 
                         // 다음 이미지 획득을 위해 변수 값 변경
                         m_nCurScanLine++;
+
+                        // 라인스캔 끝났을 때 이벤트 함수 호출
+                        if (LineScanCompleted != null) LineScanCompleted(this);
                     }
                 }
                 m_grabMode.m_camera.StopGrab();

@@ -58,7 +58,7 @@ namespace RootTools.Comm
             p_bUse = bUse;
         }
         #endregion
-        
+
         #region Async
         public class Async
         {
@@ -79,7 +79,7 @@ namespace RootTools.Comm
             m_socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             m_commLog.Add(CommLog.eType.Info, "Init Client Socket");
             m_cbSend = new AsyncCallback(CallBackSend);
-            Connect(); 
+            Connect();
         }
         #endregion
 
@@ -93,17 +93,17 @@ namespace RootTools.Comm
         {
             try
             {
-                if (m_socket == null) return; 
+                if (m_socket == null) return;
                 m_socket.Connect(p_sIP, p_nPort);
                 Async async = new Async(m_lMaxBuffer);
                 async.m_socket = m_socket;
-                m_cbReceive = new AsyncCallback(CallBackReceive); 
+                m_cbReceive = new AsyncCallback(CallBackReceive);
                 m_socket.BeginReceive(async.m_aBuf, 0, m_lMaxBuffer, SocketFlags.None, m_cbReceive, async);
                 m_commLog.Add(CommLog.eType.Info, "Connected");
             }
             catch (Exception e)
             {
-                m_commLog.Add(CommLog.eType.Info, "Connect Error " + e.Message); 
+                m_commLog.Add(CommLog.eType.Info, "Connect Error " + e.Message);
             }
         }
         #endregion
@@ -126,7 +126,7 @@ namespace RootTools.Comm
             }
             catch (Exception e)
             {
-                if (m_socket != null) m_commLog.Add(CommLog.eType.Info, "CallBack Exception : " + e.Message); 
+                if (m_socket != null) m_commLog.Add(CommLog.eType.Info, "CallBack Exception : " + e.Message);
             }
         }
         #endregion
@@ -136,7 +136,7 @@ namespace RootTools.Comm
         static readonly object g_lock = new object();
         public string Send(string sMsg)
         {
-            if (m_socket == null) return "Not Connected";
+            if (m_socket == null || !m_socket.Connected) return "Not Connected";
             lock (g_lock)
             {
                 Async async = new Async(1);
@@ -205,6 +205,7 @@ namespace RootTools.Comm
         public string p_id { get; set; }
         int m_lMaxBuffer = 4096;
         Log m_log;
+        System.Threading.Thread th;
         public TCPAsyncClient(string id, Log log, int lMaxBuffer = 4096)
         {
             p_id = id;
@@ -212,6 +213,28 @@ namespace RootTools.Comm
             m_log = log;
             InitCommLog();
             InitTree();
+            th = new System.Threading.Thread(Try);
+            th.Start();
+        }
+        ~TCPAsyncClient()
+        {
+            th.Abort();
+        }
+        public void Try()
+        {
+            while (true)
+            {
+
+                System.Threading.Thread.Sleep(1000);
+                if (_bUse == true)
+                {
+                    if (m_socket != null)
+                        if (m_socket.Connected == false)
+                        {
+                            Connect();
+                        }
+                }
+            }
         }
 
         public void ThreadStop()
