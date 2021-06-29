@@ -20,7 +20,7 @@ namespace Root_Pine2_Vision.Module
         {
             m_vision = vision;
             DataContext = vision;
-            comboBoxOpen.ItemsSource = vision.GetRecipeList();
+            comboBoxOpen.ItemsSource = vision.p_asRecipe;
             treeRootAUI.Init(vision.m_recipe[Vision2D.eWorks.A].m_treeRecipe);
             treeRootBUI.Init(vision.m_recipe[Vision2D.eWorks.B].m_treeRecipe);
             vision.m_recipe[Vision2D.eWorks.A].RunTreeRecipe(Tree.eMode.Init);
@@ -43,7 +43,7 @@ namespace Root_Pine2_Vision.Module
             if (textBoxRecipe.Text == "") return; 
             m_vision.m_recipe[Vision2D.eWorks.A].RecipeSave(textBoxRecipe.Text);
             m_vision.m_recipe[Vision2D.eWorks.B].RecipeSave(textBoxRecipe.Text);
-            comboBoxOpen.ItemsSource = m_vision.GetRecipeList();
+            comboBoxOpen.ItemsSource = m_vision.p_asRecipe;
             comboBoxOpen.SelectedItem = textBoxRecipe.Text;
             labelInfo.Content = "Recipe Save Done : " + textBoxRecipe.Text; 
         }

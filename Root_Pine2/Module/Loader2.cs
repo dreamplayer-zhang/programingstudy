@@ -75,7 +75,7 @@ namespace Root_Pine2.Module
 
         public string RunTurnUp(bool bUp)
         {
-            if (m_axisXZ.p_axisX.p_posCommand == m_axisXZ.p_axisY.GetPosValue(c_sReady))
+            if (m_axisXZ.p_axisX.p_posCommand == m_axisXZ.p_axisX.GetPosValue(c_sReady))
             {
                 m_dioTurnUp.Write(bUp);
                 return m_dioTurnUp.WaitDone();
@@ -127,23 +127,24 @@ namespace Root_Pine2.Module
         }
         #endregion
 
-        #region RunUnload
-        public string RunUnload(Vision2D.eWorks eVisionWorks)
+        #region Run
+        public string RunUnload(Vision2D.eWorks eWorks)
         {
-            Boat boat = m_boats.m_aBoat[eVisionWorks];
+            Boat boat = m_boats.m_aBoat[eWorks];
             if (boat.p_eStep != Boat.eStep.Ready) return "Boat not Ready";
             try
             {
                 m_doVacuum.Write(true);
                 if (Run(RunTurnUp(false))) return p_sInfo;
-                if (Run(RunMoveX(eVisionWorks))) return p_sInfo;
-                if (Run(RunMoveZ(eVisionWorks))) return p_sInfo;
+                if (Run(m_boats.RunMoveReady(eWorks))) return p_sInfo;
+                if (Run(RunMoveX(eWorks))) return p_sInfo;
+                if (Run(RunMoveZ(eWorks))) return p_sInfo;
                 m_doVacuum.Write(false);
                 boat.RunVacuum(true);
                 Thread.Sleep((int)(1000 * m_secVacuum));
+                if (Run(RunMoveZ(c_sReady))) return p_sInfo;
                 boat.p_infoStrip = p_infoStrip;
                 p_infoStrip = null;
-                if (Run(RunMoveZ(c_sReady))) return p_sInfo;
                 if (Run(RunMoveX(c_sReady))) return p_sInfo;
                 if (Run(RunTurnUp(true))) return p_sInfo;
             }
@@ -152,6 +153,13 @@ namespace Root_Pine2.Module
                 RunMove(c_sReady);
                 RunTurnUp(true);
             }
+            return "OK";
+        }
+
+        public string RunMoveReady()
+        {
+            RunTurnUp(true);
+            RunMove(c_sReady);
             return "OK";
         }
         #endregion
@@ -173,12 +181,11 @@ namespace Root_Pine2.Module
                 p_eState = eState.Ready;
                 return "OK";
             }
-            p_sInfo = base.StateHome();
-            if (p_sInfo == "OK")
-            {
-                RunTurnUp(true);
-                RunMove(c_sReady); 
-            }
+            p_sInfo = base.StateHome(m_axisXZ.p_axisY);
+            if (p_sInfo != "OK") return p_sInfo;
+            p_sInfo = base.StateHome(m_axisXZ.p_axisX);
+            p_eState = (p_sInfo == "OK") ? eState.Ready : eState.Error;
+            if (p_sInfo == "OK") RunMoveReady();
             return p_sInfo;
         }
 
@@ -225,6 +232,7 @@ namespace Root_Pine2.Module
         protected override void InitModuleRuns()
         {
             m_runUnload = AddModuleRunList(new Run_Unload(this), true, "Unload Strip to Boat");
+            AddModuleRunList(new Run_MoveReady(this), true, "Loader2 Move to Ready Position");
         }
 
         public class Run_Unload : ModuleRunBase
@@ -252,6 +260,31 @@ namespace Root_Pine2.Module
             public override string Run()
             {
                 return m_module.RunUnload(m_eWorks);
+            }
+        }
+
+        public class Run_MoveReady : ModuleRunBase
+        {
+            Loader2 m_module;
+            public Run_MoveReady(Loader2 module)
+            {
+                m_module = module;
+                InitModuleRun(module);
+            }
+
+            public override ModuleRunBase Clone()
+            {
+                Run_MoveReady run = new Run_MoveReady(m_module);
+                return run;
+            }
+
+            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
+            {
+            }
+
+            public override string Run()
+            {
+                return m_module.RunMoveReady();
             }
         }
         #endregion

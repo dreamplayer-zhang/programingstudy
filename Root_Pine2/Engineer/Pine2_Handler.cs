@@ -6,6 +6,7 @@ using RootTools.Gem;
 using RootTools.Module;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -37,13 +38,26 @@ namespace Root_Pine2.Engineer
             {
                 if (_sRecipe == value) return;
                 _sRecipe = value;
+                m_pine2.RecipeOpen(value); 
                 if (m_aBoats.Count > 0)
                 {
-                    m_aBoats[Vision2D.eVision.Top3D].p_sRecipe = value;
+                    if (m_pine2.p_b3D) m_aBoats[Vision2D.eVision.Top3D].p_sRecipe = value;
                     m_aBoats[Vision2D.eVision.Top2D].p_sRecipe = value;
                     m_aBoats[Vision2D.eVision.Bottom].p_sRecipe = value;
                 }
             }
+        }
+
+        public List<string> p_asRecipe
+        {
+            get
+            {
+                List<string> asRecipe = new List<string>();
+                DirectoryInfo info = new DirectoryInfo(EQ.c_sPathRecipe);
+                foreach (DirectoryInfo dir in info.GetDirectories()) asRecipe.Add(dir.Name);
+                return asRecipe;
+            }
+            set { }
         }
         #endregion
 
@@ -65,14 +79,14 @@ namespace Root_Pine2.Engineer
             m_swInit.Start(); 
             p_moduleList = new ModuleList(m_engineer);
             InitModule(m_pine2 = new Pine2("Pine2", m_engineer));
-            InitModule(m_loadEV = new LoadEV("LoadEV", m_engineer));
+            InitModule(m_loadEV = new LoadEV("LoadEV", m_engineer, m_pine2));
             InitMagazineEV();
-            InitVision(Vision2D.eVision.Top3D);
-            InitVision(Vision2D.eVision.Top2D);
             InitVision(Vision2D.eVision.Bottom);
-            InitBoats(Vision2D.eVision.Top3D);
-            InitBoats(Vision2D.eVision.Top2D);
+            InitVision(Vision2D.eVision.Top2D);
+            InitVision(Vision2D.eVision.Top3D);
             InitBoats(Vision2D.eVision.Bottom);
+            InitBoats(Vision2D.eVision.Top2D);
+            InitBoats(Vision2D.eVision.Top3D);
             InitModule(m_transfer = new Transfer("Transter", m_engineer, m_pine2, m_magazineEV));
             InitModule(m_loader0 = new Loader0("Loader0", m_engineer, this));
             InitModule(m_loader1 = new Loader1("Loader1", m_engineer, this));
@@ -117,6 +131,41 @@ namespace Root_Pine2.Engineer
                 m_magazineEV.m_aEV.Add(eMagazine, magazineEV);
                 InitModule(magazineEV); 
             }
+        }
+        #endregion
+
+        #region CheckDone
+        public string CheckDone()
+        {
+            if (IsDone())
+            {
+                m_pine2.m_buzzer.RunBuzzer(Pine2.eBuzzer.Finish);
+                EQ.p_eState = EQ.eState.Ready; 
+            }
+            return "OK";
+        }
+
+        bool IsDone()
+        {
+            if (m_loader0.p_infoStrip != null) return false;
+            if (m_loader1.p_infoStrip != null) return false;
+            if (m_loader2.p_infoStrip != null) return false;
+            if (m_loader3.p_infoStrip != null) return false;
+            if (m_aBoats[Vision2D.eVision.Top3D].m_aBoat[Vision2D.eWorks.A].p_infoStrip != null) return false;
+            if (m_aBoats[Vision2D.eVision.Top3D].m_aBoat[Vision2D.eWorks.B].p_infoStrip != null) return false;
+            if (m_aBoats[Vision2D.eVision.Top2D].m_aBoat[Vision2D.eWorks.A].p_infoStrip != null) return false;
+            if (m_aBoats[Vision2D.eVision.Top2D].m_aBoat[Vision2D.eWorks.B].p_infoStrip != null) return false;
+            if (m_aBoats[Vision2D.eVision.Bottom].m_aBoat[Vision2D.eWorks.A].p_infoStrip != null) return false;
+            if (m_aBoats[Vision2D.eVision.Bottom].m_aBoat[Vision2D.eWorks.B].p_infoStrip != null) return false;
+            if (m_transfer.m_gripper.p_infoStrip != null) return false;
+            if (m_transfer.m_pusher.p_infoStrip != null) return false; 
+            switch (m_pine2.p_eMode)
+            {
+                case Pine2.eRunMode.Stack:
+                    if (m_loadEV.p_bCheck) return false; 
+                    break; 
+            }
+            return true;
         }
         #endregion
 

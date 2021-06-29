@@ -27,6 +27,7 @@ namespace Root_CAMELLIA.Data
         public void ClearPoint()
         {
             DataCandidatePoint.Clear();
+            DataCandidateSelectedPoint.Clear();
             DataSelectedPoint.Clear();
             DataMeasurementRoute.Clear();
         }
