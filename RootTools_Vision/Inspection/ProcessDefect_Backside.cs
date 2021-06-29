@@ -23,6 +23,12 @@ namespace RootTools_Vision
         
         string TableName;
 
+        public ProcessDefect_Backside()
+        {
+
+        }
+
+
         public ProcessDefect_Backside(string tableName)
         {
             TableName = tableName;
@@ -38,20 +44,27 @@ namespace RootTools_Vision
 
         protected override bool Execution()
         {
-            DoProcessDefect_Wafer();
+            ProcessDefectBacksideParameter param = this.parameter as ProcessDefectBacksideParameter;
+            if(param.Use == true)
+                DoProcessDefect_Backside();
+            else
+                return true;
 
             return true;
         }
 
-        public void DoProcessDefect_Wafer()
+        public void DoProcessDefect_Backside()
         {
             if (!(this.currentWorkplace.MapIndexX == -1 && this.currentWorkplace.MapIndexY == -1))
                 return;
 
+
+            ProcessDefectBacksideParameter param = this.parameter as ProcessDefectBacksideParameter;
+
             WorkEventManager.OnProcessDefectWaferStart(this, new ProcessDefectWaferStartEventArgs());
 
             // Option Param
-            int mergeDist = 3;
+            int mergeDist = param.MergeDefectDistnace;
             int backsideOffset = 0;
             // Recipe
 
@@ -69,7 +82,7 @@ namespace RootTools_Vision
 
             List<Defect> DefectList = CollectDefectData();
 
-            DeleteOutsideDefect(DefectList, waferCenterX, waferCenterY, radius, backsideOffset);
+            //DeleteOutsideDefect(DefectList, waferCenterX, waferCenterY, radius, backsideOffset);
 
             List<Defect> MergeDefectList = MergeDefect(DefectList, mergeDist);
 
@@ -92,29 +105,33 @@ namespace RootTools_Vision
             //// Add Defect to DB
             if (MergeDefectList.Count > 0)
             {
-                DatabaseManager.Instance.AddDefectDataList(MergeDefectList, TableName);
+                DatabaseManager.Instance.AddDefectDataListNoAutoCount(MergeDefectList, "defect");
             }
+
 
             Settings settings = new Settings();
             SettingItem_SetupBackside settings_backside = settings.GetItem<SettingItem_SetupBackside>();
 
             Tools.SaveDefectImage(Path.Combine(settings_backside.DefectImagePath, sInspectionID), MergeDefectList, this.currentWorkplace.SharedBufferInfo, this.currentWorkplace.SharedBufferByteCnt);
 
-            if (settings_backside.UseKlarf)
-            {
-                KlarfData_Lot klarfData = new KlarfData_Lot();
-                Directory.CreateDirectory(settings_backside.KlarfSavePath);
+            //if (settings_backside.UseKlarf)
+            //{
+            //    KlarfData_Lot klarfData = new KlarfData_Lot();
+            //    Directory.CreateDirectory(settings_backside.KlarfSavePath);
 
-                //klarfData.AddSlot(recipe.WaferMap, MergeDefectList, this.recipe.GetItem<BacksideRecipe>());
-                //klarfData.WaferStart(recipe.WaferMap, DateTime.Now);
-                //klarfData.SetResultTimeStamp();
+            //    klarfData.AddSlot(recipe.WaferMap, MergeDefectList, this.recipe.GetItem<OriginRecipe>());
+            //    klarfData.WaferStart(recipe.WaferMap, DateTime.Now);
+            //    klarfData.SetResultTimeStamp();
 
-                //klarfData.SaveKlarf(settings_backside.KlarfSavePath, false);
+            //    klarfData.SaveKlarf(settings_backside.KlarfSavePath, false);
 
-                //Tools.SaveTiffImage(settings_backside.KlarfSavePath, MergeDefectList, this.currentWorkplace.SharedBufferInfo);
-                
-                //Tools.SaveImageJpg(this.currentWorkplace.SharedBufferInfo, new Rect(0, 0, 3000, 3000), settings_backside.KlarfSavePath + "\\" + DateTime.Now.ToString("yyyyMMddhhmmss") + "_backside.jpg", (long)(settings_backside.WholeWaferImageCompressionRate * 100));
-            }
+            //    Tools.SaveTiffImage(settings_backside.KlarfSavePath, klarfData.GetKlarfFileName(), MergeDefectList, this.currentWorkplace.SharedBufferInfo);
+
+            //    Tools.SaveImageJpg(this.currentWorkplace.SharedBufferInfo, 
+            //        new Rect(settings_backside.WholeWaferImageStartX, settings_backside.WholeWaferImageStartY, settings_backside.WholeWaferImageEndX, settings_backside.WholeWaferImageEndY),
+            //        settings_backside.KlarfSavePath + "\\" + DateTime.Now.ToString("yyyyMMddhhmmss") + "_backside.jpg", 
+            //        (long)(settings_backside.WholeWaferImageCompressionRate * 100));
+            //}
 
 
 
@@ -214,15 +231,16 @@ namespace RootTools_Vision
                         DefectList[j].m_fSize = -123;
                         continue;
                     }
-                    else if (defectRect1.IntersectsWith(defectRect2))
-                    {
-                        Rect intersect = Rect.Intersect(defectRect1, defectRect2);
-                        if (intersect.Height == 0 || intersect.Width == 0)
-                        {
-                            DefectList[j].m_fSize = -123;
-                            continue;
-                        }
-                    }
+                    // 이거 버그 있어서 주석 밑에 조건이랑 같음
+                    //else if (defectRect1.IntersectsWith(defectRect2))
+                    //{
+                    //    Rect intersect = Rect.Intersect(defectRect1, defectRect2);
+                    //    if (intersect.Height == 0 || intersect.Width == 0)
+                    //    {
+                    //        DefectList[j].m_fSize = -123;
+                    //        continue;
+                    //    }
+                    //}
 
                     defectRect1.Inflate(new Size(mergeDist, mergeDist)); // Rect 가로/세로 mergeDist 만큼 확장
                     if (defectRect1.IntersectsWith(defectRect2) && (DefectList[i].m_nDefectCode == DefectList[j].m_nDefectCode))

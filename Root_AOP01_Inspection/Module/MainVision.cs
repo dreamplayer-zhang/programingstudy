@@ -17,6 +17,7 @@ using RootTools.Memory;
 using RootTools.Module;
 using RootTools.Trees;
 using RootTools_Vision;
+using RootTools.GAFs;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -35,7 +36,6 @@ using DPoint = System.Drawing.Point;
 using RootTools_CLR;
 using System.Linq;
 using RootTools.Inspects;
-using RootTools.GAFs;
 using System.Runtime.ExceptionServices;
 using System.Security;
 using RootTools.Comm;
@@ -44,11 +44,69 @@ namespace Root_AOP01_Inspection.Module
 {
     public class MainVision : ModuleBase, IWTRChild
     {
+        public enum PatternEdge
+		{
+            Center,
+            Left,
+            Right,
+		}
         public Dispatcher dispatcher;   // RecipeLADS_ViewModel 페이지에서 LADS Heatmap 바인딩을 하려면 Dispatcher 필요
         ALID m_alid_WaferExist;
         public void SetAlarm()
         {
             m_alid_WaferExist.Run(true, "Vision Wafer Exist Error");
+        }
+
+        public CEID m_ceidInspectionStart;
+        public CEID m_ceidInspectionEnd;
+
+        public CEID m_ceidResultData;
+
+        SVID m_svidStageXPos;
+        SVID m_svidStageYPos;
+
+        SVID m_svidBarcodeStratch;
+        SVID m_svidPatternShift;
+        SVID m_svidPatternRotation;
+        SVID m_svidPellicleShift;
+        SVID m_svidPellicleRotation;
+        SVID m_svidAlignKey;
+        SVID m_svidPatternSurface;
+        SVID m_svidPellicleSurface;
+        SVID m_svidSideCrack;
+        SVID m_svidPellicleScratch;
+        SVID m_svidPatternSide;
+        SVID m_svidGlassSurface;
+        SVID m_svidStageReticleTilt;
+        SVID m_svidStageReticleFrame;
+        SVID m_svidStageReticleCheck;
+
+        void InitGAF()
+        {
+            m_ceidInspectionStart = m_gaf.GetCEID(this, "Inspection Start");
+            m_ceidInspectionEnd = m_gaf.GetCEID(this, "Inspection End");
+
+            m_ceidResultData = m_gaf.GetCEID(this, "Result Data");
+
+            m_svidStageXPos = m_gaf.GetSVID(this, "Stage X Load/Unload Pos");
+            m_svidStageYPos = m_gaf.GetSVID(this, "Stage Y Load/Unload Pos");
+
+            m_svidBarcodeStratch = m_gaf.GetSVID(this, "Barcode Stratch");
+            m_svidPatternShift = m_gaf.GetSVID(this, "Pattern Shift");
+            m_svidPatternRotation = m_gaf.GetSVID(this, "Pattern Rotation");
+            m_svidPellicleShift = m_gaf.GetSVID(this, "Pellicle Shift");
+            m_svidPellicleRotation = m_gaf.GetSVID(this, "Pellicle Rotation");
+            m_svidAlignKey = m_gaf.GetSVID(this, "Align Key");
+            m_svidPatternSurface = m_gaf.GetSVID(this, "Pattern Surface");
+            m_svidPellicleSurface = m_gaf.GetSVID(this, "Pellicle Surface");
+            m_svidSideCrack = m_gaf.GetSVID(this, "Side Crack");
+            m_svidPellicleScratch = m_gaf.GetSVID(this, "Pellicle Scratch");
+            m_svidPatternSide = m_gaf.GetSVID(this, "Pattern Side");
+            m_svidGlassSurface = m_gaf.GetSVID(this, "Glass Surface");
+
+            m_svidStageReticleTilt = m_gaf.GetSVID(this, "Stage Reticle Tilt");
+            m_svidStageReticleFrame = m_gaf.GetSVID(this, "Stage Reticle Frame");
+            m_svidStageReticleCheck = m_gaf.GetSVID(this, "Stage Reticle Check");
         }
         #region ToolBox
         public Axis m_axisRotate;
@@ -114,6 +172,8 @@ namespace Root_AOP01_Inspection.Module
             p_sInfo = m_toolBox.GetCamera(ref m_CamLADS, this, "LADS");
             p_sInfo = m_toolBox.GetComm(ref m_rs232, this, "RS232");
             m_axisRotate.StartMove(1000);
+
+            if (bInit) InitGAF();
         }
         #endregion
 
@@ -493,11 +553,10 @@ namespace Root_AOP01_Inspection.Module
 			{
 				return;
 			}
-
-			for (int i = 0; i < ((Run_SurfaceInspection)m_aModuleRun[targetidx]).EdgeList.Length; i++)
-			{
-				((Run_SurfaceInspection)m_aModuleRun[targetidx]).EdgeList[i] = new TRect(rectList[i]);
-			}
+            for (int i = 0; i < ((Run_SurfaceInspection)m_aModuleRun[targetidx]).EdgeList.Length; i++)
+            {
+                ((Run_SurfaceInspection)m_aModuleRun[targetidx]).EdgeList[i] = new TRect(rectList[i]);
+            }
 			((Run_SurfaceInspection)m_aModuleRun[targetidx]).UpdeteTree();
 		}
 		internal void SetSurfaceParam(bool isBright, int GV, int size, string mainModuleName)
@@ -1367,8 +1426,16 @@ namespace Root_AOP01_Inspection.Module
             main.m_sModuleRun = App.MainModuleName;
             AddModuleRunList(main, true, "Run " + App.MainModuleName);
 
+            var mainLeft = new Run_MainLeftInspection(this, App.MainRecipeRegName, App.MainInspLeftMgRegName);
+            mainLeft.m_sModuleRun = App.MainLeftModuleName;
+            AddModuleRunList(mainLeft, true, "Run " + App.MainLeftModuleName);
 
-			var pell = new Run_PellSideInspection(this, App.PellRecipeRegName, App.PellInspMgRegName);
+            var mainRight = new Run_MainRightInspection(this, App.MainRecipeRegName, App.MainInspRightMgRegName);
+            mainRight.m_sModuleRun = App.MainRightModuleName;
+            AddModuleRunList(mainRight, true, "Run " + App.MainRightModuleName);
+
+
+            var pell = new Run_PellSideInspection(this, App.PellRecipeRegName, App.PellInspMgRegName);
 			pell.m_sModuleRun = App.PellicleModuleName;
 			AddModuleRunList(pell, true, "Run " + App.PellicleModuleName);
 
@@ -1395,6 +1462,27 @@ namespace Root_AOP01_Inspection.Module
 
 
             AddModuleRunList(new Run_TestPellicle(this), true, "Run Delay");
+        }
+        #endregion
+
+        #region InspResult
+        public string UpdateInspResult()
+        {
+            //검사 결과 파일 저장 경로 확인 후 업데이트 하도록 수정.
+            m_svidBarcodeStratch.p_value   = true;
+            m_svidPatternShift.p_value     = 0.0;
+            m_svidPatternRotation.p_value  = 0.0;
+            m_svidPellicleShift.p_value    = 0.0;
+            m_svidPellicleRotation.p_value = 0.0;
+            m_svidAlignKey.p_value         = true;
+            m_svidPatternSurface.p_value   = 5;
+            m_svidPellicleSurface.p_value  = 5;
+            m_svidSideCrack.p_value        = 5;
+            m_svidPellicleScratch.p_value  = 5;
+            m_svidPatternSide.p_value      = 5;
+            m_svidGlassSurface.p_value     = 5;
+
+            return "OK";
         }
         #endregion
 
@@ -1456,8 +1544,20 @@ namespace Root_AOP01_Inspection.Module
 			public Run_LeftSideInspection(MainVision module, string rcpName, string inspMgmName) : base(module, rcpName, inspMgmName)
 			{
 			}
-		}
-		public class Run_TopSideInspection : Run_SurfaceInspection
+        }
+        public class Run_MainLeftInspection : Run_SurfaceInspection
+        {
+            public Run_MainLeftInspection(MainVision module, string rcpName, string inspMgmName) : base(module, rcpName, inspMgmName)
+            {
+            }
+        }
+        public class Run_MainRightInspection : Run_SurfaceInspection
+        {
+            public Run_MainRightInspection(MainVision module, string rcpName, string inspMgmName) : base(module, rcpName, inspMgmName)
+            {
+            }
+        }
+        public class Run_TopSideInspection : Run_SurfaceInspection
 		{
 			public Run_TopSideInspection(MainVision module, string rcpName, string inspMgmName) : base(module, rcpName, inspMgmName)
 			{
@@ -1498,19 +1598,9 @@ namespace Root_AOP01_Inspection.Module
             public Run_SurfaceInspection(MainVision module, string rcpName, string inspMgmName)
 			{
                 EdgeList = new TRect[6];
-                EdgeListLeftSide = new TRect[6];
-                EdgeListRightSide = new TRect[6];
                 for (int j = 0; j < 6; j++)
 				{
 					EdgeList[j] = new TRect();
-                }
-                for (int j = 0; j < 6; j++)
-                {
-                    EdgeListLeftSide[j] = new TRect();
-                }
-                for (int j = 0; j < 6; j++)
-                {
-                    EdgeListRightSide[j] = new TRect();
                 }
                 currentRcpName = rcpName;
                 currentMgmName = inspMgmName;
@@ -1531,8 +1621,6 @@ namespace Root_AOP01_Inspection.Module
             public int BlockSizeHeight;
 
             public TRect[] EdgeList = new TRect[6];
-            public TRect[] EdgeListLeftSide = new TRect[6];
-            public TRect[] EdgeListRightSide = new TRect[6];
             //List<TRect> sideLeftEdgeList;
             //List<TRect> sideRightEdgeList;
             //List<TRect> sideTopEdgeList;
@@ -1544,8 +1632,6 @@ namespace Root_AOP01_Inspection.Module
 			{
 				Run_SurfaceInspection run = new Run_SurfaceInspection(m_module, this.currentRcpName, this.currentMgmName);
                 run.EdgeList = EdgeList;
-                run.EdgeListLeftSide = EdgeListLeftSide;
-                run.EdgeListRightSide = EdgeListRightSide;
                 run.BrightGV = BrightGV;
                 run.SurfaceGV = SurfaceGV;
                 run.SurfaceSize = SurfaceSize;
@@ -1573,34 +1659,34 @@ namespace Root_AOP01_Inspection.Module
 					defeaultName = currentMgmName + " EdgeBox #{0} Height";
 					EdgeList[i].MemoryRect.Height = ((tree.GetTree(edgeboxRootName, false, bVisible)).GetTree(string.Format(edgeboxName, i), false, bVisible)).Set(EdgeList[i].MemoryRect.Height, EdgeList[i].MemoryRect.Height, string.Format(defeaultName, i), "EdgeBox's Height (pixel. MemoryRect)", bVisible);
                 }
-                defeaultName = currentMgmName + " EdgeBox Left#{0}";
-                edgeboxName = "Left EdgeBox List #{0}";
-                edgeboxRootName = "Left EdgeBox List";
-                for (int i = 0; i < 6; i++)
-                {
-                    defeaultName = currentMgmName + " EdgeBox #{0} Left";
-                    EdgeListLeftSide[i].MemoryRect.Left = ((tree.GetTree(edgeboxRootName, false, bVisible)).GetTree(string.Format(edgeboxName, i), false, bVisible)).Set(EdgeListLeftSide[i].MemoryRect.Left, EdgeListLeftSide[i].MemoryRect.Left, string.Format(defeaultName, i), "EdgeBox's Left Position (pixel. MemoryRect)", bVisible);
-                    defeaultName = currentMgmName + " EdgeBox #{0} Top";
-                    EdgeListLeftSide[i].MemoryRect.Top = ((tree.GetTree(edgeboxRootName, false, bVisible)).GetTree(string.Format(edgeboxName, i), false, bVisible)).Set(EdgeListLeftSide[i].MemoryRect.Top, EdgeListLeftSide[i].MemoryRect.Top, string.Format(defeaultName, i), "EdgeBox's Top Position (pixel. MemoryRect)", bVisible);
-                    defeaultName = currentMgmName + " EdgeBox #{0} Width";
-                    EdgeListLeftSide[i].MemoryRect.Width = ((tree.GetTree(edgeboxRootName, false, bVisible)).GetTree(string.Format(edgeboxName, i), false, bVisible)).Set(EdgeListLeftSide[i].MemoryRect.Width, EdgeListLeftSide[i].MemoryRect.Width, string.Format(defeaultName, i), "EdgeBox's Width (pixel. MemoryRect)", bVisible);
-                    defeaultName = currentMgmName + " EdgeBox #{0} Height";
-                    EdgeListLeftSide[i].MemoryRect.Height = ((tree.GetTree(edgeboxRootName, false, bVisible)).GetTree(string.Format(edgeboxName, i), false, bVisible)).Set(EdgeListLeftSide[i].MemoryRect.Height, EdgeListLeftSide[i].MemoryRect.Height, string.Format(defeaultName, i), "EdgeBox's Height (pixel. MemoryRect)", bVisible);
-                }
-                defeaultName = currentMgmName + " EdgeBox Right#{0}";
-                edgeboxName = "Right EdgeBox List #{0}";
-                edgeboxRootName = "Right EdgeBox List";
-                for (int i = 0; i < 6; i++)
-                {
-                    defeaultName = currentMgmName + " EdgeBox #{0} Left";
-                    EdgeListRightSide[i].MemoryRect.Left = ((tree.GetTree(edgeboxRootName, false, bVisible)).GetTree(string.Format(edgeboxName, i), false, bVisible)).Set(EdgeListRightSide[i].MemoryRect.Left, EdgeListRightSide[i].MemoryRect.Left, string.Format(defeaultName, i), "EdgeBox's Left Position (pixel. MemoryRect)", bVisible);
-                    defeaultName = currentMgmName + " EdgeBox #{0} Top";
-                    EdgeListRightSide[i].MemoryRect.Top = ((tree.GetTree(edgeboxRootName, false, bVisible)).GetTree(string.Format(edgeboxName, i), false, bVisible)).Set(EdgeListRightSide[i].MemoryRect.Top, EdgeListRightSide[i].MemoryRect.Top, string.Format(defeaultName, i), "EdgeBox's Top Position (pixel. MemoryRect)", bVisible);
-                    defeaultName = currentMgmName + " EdgeBox #{0} Width";
-                    EdgeListRightSide[i].MemoryRect.Width = ((tree.GetTree(edgeboxRootName, false, bVisible)).GetTree(string.Format(edgeboxName, i), false, bVisible)).Set(EdgeListRightSide[i].MemoryRect.Width, EdgeListRightSide[i].MemoryRect.Width, string.Format(defeaultName, i), "EdgeBox's Width (pixel. MemoryRect)", bVisible);
-                    defeaultName = currentMgmName + " EdgeBox #{0} Height";
-                    EdgeListRightSide[i].MemoryRect.Height = ((tree.GetTree(edgeboxRootName, false, bVisible)).GetTree(string.Format(edgeboxName, i), false, bVisible)).Set(EdgeListRightSide[i].MemoryRect.Height, EdgeListRightSide[i].MemoryRect.Height, string.Format(defeaultName, i), "EdgeBox's Height (pixel. MemoryRect)", bVisible);
-                }
+                //defeaultName = currentMgmName + " EdgeBox Left#{0}";
+                //edgeboxName = "Left EdgeBox List #{0}";
+                //edgeboxRootName = "Left EdgeBox List";
+                //for (int i = 0; i < 6; i++)
+                //{
+                //    defeaultName = currentMgmName + " EdgeBox #{0} Left";
+                //    EdgeListLeftSide[i].MemoryRect.Left = ((tree.GetTree(edgeboxRootName, false, bVisible)).GetTree(string.Format(edgeboxName, i), false, bVisible)).Set(EdgeListLeftSide[i].MemoryRect.Left, EdgeListLeftSide[i].MemoryRect.Left, string.Format(defeaultName, i), "EdgeBox's Left Position (pixel. MemoryRect)", bVisible);
+                //    defeaultName = currentMgmName + " EdgeBox #{0} Top";
+                //    EdgeListLeftSide[i].MemoryRect.Top = ((tree.GetTree(edgeboxRootName, false, bVisible)).GetTree(string.Format(edgeboxName, i), false, bVisible)).Set(EdgeListLeftSide[i].MemoryRect.Top, EdgeListLeftSide[i].MemoryRect.Top, string.Format(defeaultName, i), "EdgeBox's Top Position (pixel. MemoryRect)", bVisible);
+                //    defeaultName = currentMgmName + " EdgeBox #{0} Width";
+                //    EdgeListLeftSide[i].MemoryRect.Width = ((tree.GetTree(edgeboxRootName, false, bVisible)).GetTree(string.Format(edgeboxName, i), false, bVisible)).Set(EdgeListLeftSide[i].MemoryRect.Width, EdgeListLeftSide[i].MemoryRect.Width, string.Format(defeaultName, i), "EdgeBox's Width (pixel. MemoryRect)", bVisible);
+                //    defeaultName = currentMgmName + " EdgeBox #{0} Height";
+                //    EdgeListLeftSide[i].MemoryRect.Height = ((tree.GetTree(edgeboxRootName, false, bVisible)).GetTree(string.Format(edgeboxName, i), false, bVisible)).Set(EdgeListLeftSide[i].MemoryRect.Height, EdgeListLeftSide[i].MemoryRect.Height, string.Format(defeaultName, i), "EdgeBox's Height (pixel. MemoryRect)", bVisible);
+                //}
+                //defeaultName = currentMgmName + " EdgeBox Right#{0}";
+                //edgeboxName = "Right EdgeBox List #{0}";
+                //edgeboxRootName = "Right EdgeBox List";
+                //for (int i = 0; i < 6; i++)
+                //{
+                //    defeaultName = currentMgmName + " EdgeBox #{0} Left";
+                //    EdgeListRightSide[i].MemoryRect.Left = ((tree.GetTree(edgeboxRootName, false, bVisible)).GetTree(string.Format(edgeboxName, i), false, bVisible)).Set(EdgeListRightSide[i].MemoryRect.Left, EdgeListRightSide[i].MemoryRect.Left, string.Format(defeaultName, i), "EdgeBox's Left Position (pixel. MemoryRect)", bVisible);
+                //    defeaultName = currentMgmName + " EdgeBox #{0} Top";
+                //    EdgeListRightSide[i].MemoryRect.Top = ((tree.GetTree(edgeboxRootName, false, bVisible)).GetTree(string.Format(edgeboxName, i), false, bVisible)).Set(EdgeListRightSide[i].MemoryRect.Top, EdgeListRightSide[i].MemoryRect.Top, string.Format(defeaultName, i), "EdgeBox's Top Position (pixel. MemoryRect)", bVisible);
+                //    defeaultName = currentMgmName + " EdgeBox #{0} Width";
+                //    EdgeListRightSide[i].MemoryRect.Width = ((tree.GetTree(edgeboxRootName, false, bVisible)).GetTree(string.Format(edgeboxName, i), false, bVisible)).Set(EdgeListRightSide[i].MemoryRect.Width, EdgeListRightSide[i].MemoryRect.Width, string.Format(defeaultName, i), "EdgeBox's Width (pixel. MemoryRect)", bVisible);
+                //    defeaultName = currentMgmName + " EdgeBox #{0} Height";
+                //    EdgeListRightSide[i].MemoryRect.Height = ((tree.GetTree(edgeboxRootName, false, bVisible)).GetTree(string.Format(edgeboxName, i), false, bVisible)).Set(EdgeListRightSide[i].MemoryRect.Height, EdgeListRightSide[i].MemoryRect.Height, string.Format(defeaultName, i), "EdgeBox's Height (pixel. MemoryRect)", bVisible);
+                //}
                 BrightGV = tree.Set(BrightGV, BrightGV, "Use Bright Inspection", "Use Bright Inspection", bVisible);
                 SurfaceGV = tree.Set(SurfaceGV, SurfaceGV, "Target Inspection GV", "Target Inspection GV", bVisible);
                 SurfaceSize = tree.Set(SurfaceSize, SurfaceSize, "Target Inspection Size", "Target Inspection Size", bVisible);
@@ -1720,7 +1806,7 @@ namespace Root_AOP01_Inspection.Module
                     outChipSzX *= DownSample; outChipSzY *= DownSample;
 
                     // Save Recipe
-                    SetRecipeMapData(mapData, (int)outmap_x, (int)outmap_y, (int)outOriginX, (int)outOriginY, (int)outChipSzX, (int)outChipSzY);
+                    SetRecipeMapData(mapData, (int)outmap_x, (int)outmap_y, (int)outOriginX, (int)outOriginY, (int)outChipSzX, (int)outChipSzY);//이부분때문에 Pattern Side검사가 안될 가능성이 있음
 
                     //GlobalObjects.Instance.Get<BacksideRecipe>().CenterX = (int)centX;
                     //GlobalObjects.Instance.Get<BacksideRecipe>().CenterY = (int)centY;
@@ -1971,6 +2057,8 @@ namespace Root_AOP01_Inspection.Module
                             defectCode = InspectionManager.MakeDefectCode(InspectionTarget.Glass, inspType, 0);
                             break;
 						case App.MainInspMgRegName:
+                        case App.MainInspLeftMgRegName:
+                        case App.MainInspRightMgRegName:
                         default:
                             targetViewModel = UIManager.Instance.SetupViewModel.m_RecipeFrontSide.p_ImageViewer_VM;
 							defectCode = InspectionManager.MakeDefectCode(InspectionTarget.Chrome, inspType, 0);
@@ -1978,11 +2066,6 @@ namespace Root_AOP01_Inspection.Module
                     }
 
                     _StartRecipeTeaching(EdgeList, targetViewModel);
-                    if(currentMgmName == App.MainInspMgRegName)
-                    {
-                        _StartRecipeTeaching(EdgeListRightSide, targetViewModel);
-                        _StartRecipeTeaching(EdgeListLeftSide, targetViewModel);
-                    }
 
                     ReticleSurfaceParameter surParam = GlobalObjects.Instance.GetNamed<AOP_RecipeSurface>(currentRcpName).GetItem<ReticleSurfaceParameter>();
                     surParam.IsBright = BrightGV;

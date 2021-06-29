@@ -185,10 +185,32 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Engineer\Process_InfoPod_UI.xaml.cs">
+      <DependentUpon>Process_InfoPod_UI.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Engineer\Process_Module_UI.xaml.cs">
+      <DependentUpon>Process_Module_UI.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Engineer\Recipe_InfoPod_UI.xaml.cs">
+      <DependentUpon>Recipe_InfoPod_UI.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Engineer\Recipe_Module_UI.xaml.cs">
+      <DependentUpon>Recipe_Module_UI.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Engineer\Recipe_Nozzle_UI.xaml.cs">
+      <DependentUpon>Recipe_Nozzle_UI.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Engineer\VEGA_P_Process.cs" />
+    <Compile Include="Engineer\VEGA_P_Process_UI.xaml.cs">
+      <DependentUpon>VEGA_P_Process_UI.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Module\EIP_Cover.cs" />
     <Compile Include="Module\EIP_Plate.cs" />
     <Compile Include="Module\EOP.cs" />
     <Compile Include="Module\FlowSensor.cs" />
+    <Compile Include="Module\NozzleSet_UI.xaml.cs">
+      <DependentUpon>NozzleSet_UI.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Module\ParticleCounterSet.cs" />
     <Compile Include="Module\VEGA_P.cs" />
     <Compile Include="UI\1. Setup\Panel_RecipeManger.xaml.cs">
@@ -200,11 +222,35 @@
     <Compile Include="UI\SelectMode.xaml.cs">
       <DependentUpon>SelectMode.xaml</DependentUpon>
     </Compile>
+    <Page Include="Engineer\Process_InfoPod_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Engineer\Process_Module_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Engineer\Recipe_Module_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Engineer\Recipe_Nozzle_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Engineer\VEGA_P_Engineer_UI.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Engineer\VEGA_P_Handler_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Engineer\Recipe_InfoPod_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Engineer\VEGA_P_Process_UI.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -250,6 +296,10 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="Module\NozzleSet_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="UI\1. Setup\Panel_RecipeManger.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -323,6 +373,7 @@
     <Resource Include="Icon\Resource\system_task_127px.png" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Recipe\" />
     <Folder Include="UI\2. Review\" />
     <Folder Include="UI\3. Operation\" />
     <Folder Include="ViewModel\" />
@@ -346,4 +397,54 @@
     <Resource Include="UI\1. Setup\basebot.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>copy /Y "$(SolutionDir)Lib\CRT_Runtime\10.0.18362.0\x64_bin\ucrt\ucrtbased.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\ucrtbased.dll"
+copy /Y "$(SolutionDir)SQLite\sqlite3.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\sqlite3.dll"
+copy /Y "$(SolutionDir)Lib\opencv_world347d.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\opencv_world347d.dll"
+copy /Y "$(SolutionDir)Lib\opencv_world347.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\opencv_world347.dll"
+IF NOT EXIST "$(SolutionDir)$(ProjectName)\$(OutDir)\x64" (mkdir "$(SolutionDir)$(ProjectName)\$(OutDir)\x64")
+copy /Y "$(SolutionDir)Lib\EMGU.CV\x64\concrt140.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\x64\concrt140.dll"
+copy /Y "$(SolutionDir)Lib\EMGU.CV\x64\cvextern.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\x64\cvextern.dll"
+copy /Y "$(SolutionDir)Lib\EMGU.CV\x64\msvcp140.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\x64\msvcp140.dll"
+copy /Y "$(SolutionDir)Lib\EMGU.CV\x64\opencv_videoio_ffmpeg411_64.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\x64\opencv_videoio_ffmpeg411_64.dll"
+copy /Y "$(SolutionDir)Lib\EMGU.CV\x64\vcruntime140.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\x64\vcruntime140.dll"
+copy /Y "$(SolutionDir)Lib\AXL\AXL.dll" $(SolutionDir)$(ProjectName)\$(OutDir)\AXL.dll"
+copy /Y "$(SolutionDir)Lib\AXL\AXL.lib" $(SolutionDir)$(ProjectName)\$(OutDir)\AXL.lib"
+copy /Y "$(SolutionDir)Lib\AXL\EzBasicAxl.dll" $(SolutionDir)$(ProjectName)\$(OutDir)\EzBasicAxl.dll"
+IF NOT EXIST "C:\vsdb\init" (mkdir "C:\vsdb\init")
+copy /Y "$(SolutionDir)Init\vsdb.txt" "C:\vsdb\init\vsdb.txt"
+IF NOT EXIST "$(SolutionDir)$(ProjectName)\$(OutDir)\plugin" (mkdir "$(SolutionDir)$(ProjectName)\$(OutDir)\plugin")
+copy /Y "$(SolutionDir)Lib\mariadb-connector-c\lib\mariadb\libmariadb.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\libmariadb.dll"
+copy /Y "$(SolutionDir)Lib\mariadb-connector-c\lib\mariadb\libmariadb.lib" "$(SolutionDir)$(ProjectName)\$(OutDir)\libmariadb.lib"
+copy /Y "$(SolutionDir)Lib\mariadb-connector-c\lib\mariadb\libmariadb.pdb" "$(SolutionDir)$(ProjectName)\$(OutDir)\libmariadb.pdb"
+copy /Y "$(SolutionDir)Lib\mariadb-connector-c\lib\mariadb\mariadbclient.lib" "$(SolutionDir)$(ProjectName)\$(OutDir)\mariadbclient.lib"
+copy /Y "$(SolutionDir)Lib\mariadb-connector-c\lib\mariadb\plugin\auth_gssapi_client.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\plugin\auth_gssapi_client.dll"
+copy /Y "$(SolutionDir)Lib\mariadb-connector-c\lib\mariadb\plugin\caching_sha2_password.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\plugin\caching_sha2_password.dll"
+copy /Y "$(SolutionDir)Lib\mariadb-connector-c\lib\mariadb\plugin\client_ed25519.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\plugin\client_ed25519.dll"
+copy /Y "$(SolutionDir)Lib\mariadb-connector-c\lib\mariadb\plugin\dialog.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\plugin\dialog.dll"
+copy /Y "$(SolutionDir)Lib\mariadb-connector-c\lib\mariadb\plugin\mysql_clear_password.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\plugin\mysql_clear_password.dll"
+copy /Y "$(SolutionDir)Lib\mariadb-connector-c\lib\mariadb\plugin\pvio_npipe.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\plugin\pvio_npipe.dll"
+copy /Y "$(SolutionDir)Lib\mariadb-connector-c\lib\mariadb\plugin\pvio_shmem.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\plugin\pvio_shmem.dll"
+copy /Y "$(SolutionDir)Lib\mariadb-connector-c\lib\mariadb\plugin\sha256_password.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\plugin\sha256_password.dll"
+copy /Y "$(SolutionDir)Lib\WibuCm64.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\WibuCm64.dll"
+IF NOT EXIST "$(SolutionDir)$(ProjectName)\$(OutDir)\Reference" (mkdir "$(SolutionDir)$(ProjectName)\$(OutDir)\Reference")
+copy /Y "$(SolutionDir)Lib\MetLib\Reference\configb.dat" $(SolutionDir)$(ProjectName)\$(OutDir)\Reference\configb.dat"
+copy /Y "$(SolutionDir)Lib\MetLib\Reference\configb_0.dat" $(SolutionDir)$(ProjectName)\$(OutDir)\Reference\configb_0.dat"
+copy /Y "$(SolutionDir)Lib\MetLib\Reference\configb_1.dat" $(SolutionDir)$(ProjectName)\$(OutDir)\Reference\configb_1.dat"
+copy /Y "$(SolutionDir)Lib\MetLib\Reference\configc.dat" $(SolutionDir)$(ProjectName)\$(OutDir)\Reference\configc.dat"
+copy /Y "$(SolutionDir)Lib\MetLib\Reference\configc_org.dat" $(SolutionDir)$(ProjectName)\$(OutDir)\Reference\configc_org.dat"
+copy /Y "$(SolutionDir)Lib\MetLib\Reference\configd.dat" $(SolutionDir)$(ProjectName)\$(OutDir)\Reference\configd.dat"
+copy /Y "$(SolutionDir)Lib\MetLib\Reference\configd_0.dat" $(SolutionDir)$(ProjectName)\$(OutDir)\Reference\configd_0.dat"
+copy /Y "$(SolutionDir)Lib\MetLib\Reference\Init_ATI_NIR.cfg" $(SolutionDir)$(ProjectName)\$(OutDir)\Reference\Init_ATI_NIR.cfg"
+copy /Y "$(SolutionDir)Lib\MetLib\Reference\Init_ATI_NIR.ini" $(SolutionDir)$(ProjectName)\$(OutDir)\Reference\Init_ATI_NIR.ini"
+copy /Y "$(SolutionDir)Lib\MetLib\Reference\ZedGraph.dll" $(SolutionDir)$(ProjectName)\$(OutDir)\Reference\ZedGraph.dll"
+copy /Y "$(SolutionDir)Lib\MetLib\NanoView.dll" $(SolutionDir)$(ProjectName)\$(OutDir)\NanoView.dll"
+copy /Y "$(SolutionDir)Lib\MetLib\NETOmniDriver-NET40.dll" $(SolutionDir)$(ProjectName)\$(OutDir)\NETOmniDriver-NET40.dll"
+copy /Y "$(SolutionDir)Lib\MetLib\OmniDriver64.dll" $(SolutionDir)$(ProjectName)\$(OutDir)\OmniDriver64.dll"
+copy /Y "$(SolutionDir)Lib\MetLib\r4nd_class.dll" $(SolutionDir)$(ProjectName)\$(OutDir)\r4nd_class.dll"</PostBuildEvent>
+  </PropertyGroup>
+  <PropertyGroup>
+    <PreBuildEvent>
+    </PreBuildEvent>
+  </PropertyGroup>
 </Project>

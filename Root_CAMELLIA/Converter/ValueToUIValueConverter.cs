@@ -1,4 +1,5 @@
-﻿using System;
+﻿using RootTools;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -29,6 +30,36 @@ namespace Root_CAMELLIA
             {
                 return string.Format("{0} °C", val / 10);
             }
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    class EnumToStringConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            Type type = value.GetType();
+            if(type == typeof(RootTools.Gem.XGem.XGem.eControl))
+            {
+                string val = Enum.GetName(type, value);
+                if (val == "ONLINEREMOTE")
+                {
+                    return "Online Remote";
+                }
+                else if (val == "LOCAL")
+                {
+                    return "Online Local";
+                }
+                else
+                {
+                    return "Offline";
+                }
+            }
+            return Enum.GetName(type, value);
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

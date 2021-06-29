@@ -21,11 +21,35 @@ namespace RootTools_Vision
 
         private List<RecipeItemBase> recipeItemList;
         private List<ParameterBase> parameterItemList;
+
+        private int cameraInfoIndex = 0;
+
+        private bool useExclusiveRegion = false;
+        private string exclusiveRegionFilePath = "";
         #endregion
 
         #region [Getter Setter]
         public string Name { get => name; set => name = value; }
         public RecipeType_WaferMap WaferMap { get => waferMap; set => waferMap = value; }
+
+        public int CameraInfoIndex
+        {
+            get => this.cameraInfoIndex;
+            set => this.cameraInfoIndex = value;
+        }
+
+        public bool UseExclusiveRegion
+        {
+            get => this.useExclusiveRegion;
+            set => this.useExclusiveRegion = value;
+        }
+
+        public string ExclusiveRegionFilePath
+        {
+            get => this.exclusiveRegionFilePath;
+            set => this.exclusiveRegionFilePath = value;
+        }
+
 
         [XmlIgnore]
         public List<RecipeItemBase> RecipeItemList { get => recipeItemList; set => recipeItemList = value; }
@@ -177,7 +201,11 @@ namespace RootTools_Vision
                     RecipeBase temp = this;
                     temp = (RecipeBase)xml.Deserialize(reader);
 
+                    this.Name = temp.Name;
                     this.WaferMap = temp.WaferMap;
+                    this.CameraInfoIndex = temp.CameraInfoIndex;
+                    this.UseExclusiveRegion = temp.UseExclusiveRegion;
+                    this.ExclusiveRegionFilePath = temp.ExclusiveRegionFilePath;
                 }
 
                 // Parameter
@@ -213,29 +241,39 @@ namespace RootTools_Vision
                 MessageBox.Show("Recipe Open Error\nDetail : " + ex.Message);
                 rst = false;
             }
+
             
+
             return rst;
         }
 
-        public bool Save(string recipePath)
+        public bool Save(string recipePath = "")
         {
             string time = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
-
-            using (StreamWriter writer = new StreamWriter(recipePath, true))
-            {
-                writer.WriteLine(time + " - SaveRecipe()");
-            }
-
             bool rst = true;
-            this.RecipePath = (string)recipePath.Clone();
 
-            recipePath = recipePath.Replace(".rcp", "");
-            string recipeName = recipePath.Substring(recipePath.LastIndexOf("\\") + 1);
-            string recipeFolderPath = recipePath.Substring(0 ,recipePath.LastIndexOf("\\") + 1);
+            if (recipePath != "")
+            {
+                using (StreamWriter writer = new StreamWriter(recipePath, true))
+                {
+                    writer.WriteLine(time + " - SaveRecipe()");
+                }
 
-            this.RecipeFolderPath = (string)recipeFolderPath.Clone();
+                this.RecipePath = (string)recipePath.Clone();
 
+                recipePath = recipePath.Replace(".rcp", "");
+                string recipeName = recipePath.Substring(recipePath.LastIndexOf("\\") + 1);
+                string recipeFolderPath = recipePath.Substring(0, recipePath.LastIndexOf("\\") + 1);
 
+                this.RecipeFolderPath = (string)recipeFolderPath.Clone();
+            }
+            else
+            {
+                using (StreamWriter writer = new StreamWriter(this.RecipePath, true))
+                {
+                    writer.WriteLine(time + " - SaveRecipe()");
+                }
+            }
 
             // Xml 파일을 읽은 뒤 이미지나 ROI 등을 불러오기 위해서 각 class에 대한 Save 함수를 호출한다.
             foreach (ParameterBase param in this.ParameterItemList)
@@ -270,6 +308,8 @@ namespace RootTools_Vision
                     XmlSerializer xml = new XmlSerializer(this.RecipeItemList.GetType());
                     xml.Serialize(tw, this.RecipeItemList);
                 }
+
+               
             }
             catch(Exception ex)
             {
@@ -287,6 +327,9 @@ namespace RootTools_Vision
             recipeBase.RecipeFolderPath = this.RecipeFolderPath;
             recipeBase.RecipePath = this.RecipePath;
             recipeBase.WaferMap = this.WaferMap;
+            recipeBase.CameraInfoIndex = this.CameraInfoIndex;
+            recipeBase.UseExclusiveRegion = this.UseExclusiveRegion;
+            recipeBase.ExclusiveRegionFilePath = this.ExclusiveRegionFilePath;
 
             return recipeBase;
         }

@@ -67,7 +67,7 @@
       <HintPath>..\..\..\..\..\..\..\Program Files\Basler\pylon 6\Development\Assemblies\Basler.Pylon\x64\Basler.Pylon.dll</HintPath>
     </Reference>
     <Reference Include="EasyModbus">
-      <HintPath>D:\Root_Cameliia2\Root\Lib\EasyModbus.dll</HintPath>
+      <HintPath>..\Lib\EasyModbus.dll</HintPath>
     </Reference>
     <Reference Include="Emgu.CV.UI, Version=4.1.1.3497, Culture=neutral, PublicKeyToken=7281126722ab4438, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -173,6 +173,10 @@
     </Reference>
     <Reference Include="MahApps.Metro.IconPacks.Zondicons, Version=4.0.0.0, Culture=neutral, PublicKeyToken=0c0d510f9915137a, processorArchitecture=MSIL">
       <HintPath>..\packages\MahApps.Metro.IconPacks.4.8.0\lib\net47\MahApps.Metro.IconPacks.Zondicons.dll</HintPath>
+    </Reference>
+    <Reference Include="RootTools_CLR, Version=1.0.0.0, Culture=neutral, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\bin\Debug\RootTools_CLR.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -331,6 +335,7 @@
     <Compile Include="Module\Vision\Run_GrabLineScan.cs" />
     <Compile Include="Module\Vision\Run_MakeTemplateImage.cs" />
     <Compile Include="Module\Vision\Run_PatternAlign.cs" />
+    <Compile Include="Module\Vision\Run_PM.cs" />
     <Compile Include="RecipeManager_UI.xaml.cs">
       <DependentUpon>RecipeManager_UI.xaml</DependentUpon>
     </Compile>

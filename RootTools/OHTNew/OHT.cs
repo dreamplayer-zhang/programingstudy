@@ -533,6 +533,9 @@ namespace RootTools.OHTNew
                         m_doLoadReq.p_bWait = false;
                         m_doUnloadReq.p_bWait = false;
                         m_doReady.p_bWait = false;
+
+                        m_carrier.m_bReqLoad = true;
+
                         break;
                 }
             }
@@ -563,6 +566,7 @@ namespace RootTools.OHTNew
                     InvalidAccess(m_diBusy.p_bOn, "BUSY");
                     InvalidAccess(m_diComplete.p_bOn, "COMPT");
                 }
+                OnPropertyChanged();
             }
         }
 
@@ -598,7 +602,7 @@ namespace RootTools.OHTNew
                 default: return;
             }
             if (m_carrier.p_ePresentSensor == present) return;
-            p_sInfo = p_id + " Illegal Prosent Sensor";
+            p_sInfo = p_id + " Illegal Present Sensor";
         }
 
         bool IsCS(bool bOn)
@@ -684,7 +688,7 @@ namespace RootTools.OHTNew
         public ModuleBase m_module;
         dynamic m_loadport; 
         public Log m_log;
-        public GemCarrierBase m_carrier = null;
+        public GemCarrierBase m_carrier { get; set; } = null;
         IToolDIO m_toolDIO;
 
         public OHT(string id, ModuleBase module, GemCarrierBase carrier, IToolDIO toolDIO)

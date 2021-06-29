@@ -175,9 +175,10 @@ namespace Root_Rinse_Unloader.Engineer
         {
             if (bRun)
             {
+                m_rail.RunPusherDown(true);
+                m_loader.StartRun();
                 m_rail.StartRun();
                 m_roller.StartRun();
-                m_loader.StartRun();
                 m_storage.StartRun(); 
             }
             else

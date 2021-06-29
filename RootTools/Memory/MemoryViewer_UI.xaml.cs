@@ -115,7 +115,6 @@ namespace RootTools.Memory
         private void gridBitmapSource_KeyDown(object sender, KeyEventArgs e)
         {
             if (m_viewer == null) return;
-            
         }
         #endregion
 
@@ -167,6 +166,9 @@ namespace RootTools.Memory
 
         private void memuOption_Click(object sender, RoutedEventArgs e)
         {
+            if (m_viewer.p_memoryData == null)
+                return;
+
             MemoryViewerOption optionWindow = new MemoryViewerOption();
             optionWindow.Owner = Window.GetWindow(this);
             optionWindow.SetOverlapOption(m_viewer.p_bRemoveOverlapArea, m_viewer.p_nFov, m_viewer.p_nOverlap);

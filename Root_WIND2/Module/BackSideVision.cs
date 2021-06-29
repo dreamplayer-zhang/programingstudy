@@ -93,6 +93,15 @@ namespace Root_WIND2.Module
             return null;
         }
 
+        public GrabModeBack GetGrabMode(int index)
+        {
+            if (m_aGrabMode?.Count > 0)
+            {
+                return m_aGrabMode[index];
+            }
+            return null;
+        }
+
         void RunTreeGrabMode(Tree tree)
         {
             m_lGrabMode = tree.Set(m_lGrabMode, m_lGrabMode, "Count", "Grab Mode Count");
@@ -251,8 +260,8 @@ namespace Root_WIND2.Module
 
         public string AfterPut(int nID)
         {
-            if (!diWaferExist.p_bIn || !diWaferExistVac.p_bIn)
-                alid_WaferExist.Run(true, "Wafer Check Error");
+            //if (!diWaferExist.p_bIn || !diWaferExistVac.p_bIn)
+            //    alid_WaferExist.Run(true, "Wafer Check Error");
             return "OK";
         }
 

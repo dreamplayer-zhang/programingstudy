@@ -90,7 +90,7 @@ namespace Root_VEGA_D_IPU.Module
             foreach (GrabMode grabMode in m_aGrabMode)
             {
                 grabMode.m_ptXYAlignData = new RPoint(0, 0);
-                grabMode.m_dVRSFocusPos = 0;
+                //grabMode.m_dVRSFocusPos = 0;
             }
             this.RunTree(Tree.eMode.RegWrite);
             this.RunTree(Tree.eMode.Init);
@@ -365,7 +365,7 @@ namespace Root_VEGA_D_IPU.Module
                             string strGroup = m_memoryGroup.p_id;
                             string strMemory = m_memoryMain.p_id;
                             MemoryData mem = m_engineer.GetMemory(strPool, strGroup, strMemory);
-                            m_CamMain.GrabLineScan(mem, ptOffset, nLine);
+                            m_CamMain.GrabLineScan(mem, ptOffset, (int)(nLine * 0.98));
 
 
                             // 작업 중인 이미지 그랩 데이터 저장

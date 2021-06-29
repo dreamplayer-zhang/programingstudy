@@ -12,6 +12,7 @@ using RootTools.Camera.Matrox;
 using Root_EFEM.Module;
 using Root_EFEM;
 using RootTools.GAFs;
+using System;
 
 namespace Root_WIND2.Module
 {
@@ -114,6 +115,15 @@ namespace Root_WIND2.Module
 			return null;
 		}
 
+		public GrabModeEdge GetGrabMode(int index)
+		{
+			if (m_aGrabMode?.Count > 0 && (m_aGrabMode.Count-1 > index))
+			{
+				return m_aGrabMode[index];
+			}
+			return null;
+		}
+
 		void RunTreeGrabMode(Tree tree)
 		{
 			m_lGrabMode = tree.Set(m_lGrabMode, m_lGrabMode, "Count", "Grab Mode Count");
@@ -195,6 +205,15 @@ namespace Root_WIND2.Module
 		void RunTreeAxis(Tree tree)
 		{
 			pulseRound = tree.Set(pulseRound, pulseRound, "Rotate Pulse / Round", "Rotate Axis Pulse / 1 Round (pulse)");
+		}
+
+		public enum eAxisPosEdge
+		{
+			Ready,
+		}
+		void InitPosAxis()
+		{
+			AxisRotate.AddPos(Enum.GetNames(typeof(eAxisPosEdge)));
 		}
 		#endregion
 
@@ -279,7 +298,14 @@ namespace Root_WIND2.Module
 			{
 				p_bStageVac = false;
 				p_eState = eState.Error;
-				return "OK";
+				return "Fail";
+			}
+			axisRotate.StartMove(eAxisPosEdge.Ready);
+			if (axisRotate.WaitReady() != "OK")
+			{
+				p_bStageVac = false;
+				p_eState = eState.Error;
+				return "Fail";
 			}
 			p_bStageVac = false;
 			return "OK";
@@ -296,6 +322,13 @@ namespace Root_WIND2.Module
 				p_eState = eState.Error;
 				return "OK";
 			}
+			axisRotate.StartMove(eAxisPosEdge.Ready);
+			if (axisRotate.WaitReady() != "OK")
+			{
+				p_bStageVac = false;
+				p_eState = eState.Error;
+				return "Fail";
+			}
 			p_bStageVac = false;
 			return "OK";
 		}
@@ -308,8 +341,8 @@ namespace Root_WIND2.Module
 		public string AfterPut(int nID)
 		{
 			doVac.Write(true);
-			if (!diWaferExist.p_bIn || !diWaferExistVac.p_bIn)
-				alid_WaferExist.Run(true, "Wafer Check Error");
+			//if (!diWaferExist.p_bIn || !diWaferExistVac.p_bIn)
+			//	alid_WaferExist.Run(true, "Wafer Check Error");
 			return "OK";
 		}
 
@@ -444,6 +477,7 @@ namespace Root_WIND2.Module
 		public EdgeSideVision(string id, IEngineer engineer)
 		{ 
 			base.InitBase(id, engineer);
+			InitPosAxis();
 			m_waferSize = new InfoWafer.WaferSize(id, false, false);
 		}
 				

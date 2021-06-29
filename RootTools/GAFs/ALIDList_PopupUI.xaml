@@ -9,12 +9,12 @@
         Visibility="Visible" 
         Background="AliceBlue"
         WindowStyle="None"
-        WindowChrome.IsHitTestVisibleInChrome="False"
+        WindowChrome.IsHitTestVisibleInChrome="False" ResizeMode="NoResize"
         WindowState="Normal"
-        WindowStartupLocation="CenterScreen" Topmost="True" Closing="Window_Closing">
+        WindowStartupLocation="CenterScreen" Topmost="True" Closing="Window_Closing" BorderBrush="Black" BorderThickness="3">
     <Window.Resources>
         <DataTemplate x:Key="header">
-            <TextBlock Text="{Binding}" Foreground="White" Margin="3,0,0,0"/>
+            <TextBlock Text="{Binding}" Foreground="Black" Margin="3,0,0,0"/>
         </DataTemplate>
     </Window.Resources>
     <Grid Background="Crimson">
@@ -95,7 +95,7 @@
         </Grid>
         <Grid Margin="10,10,10,0" Grid.Row="1">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="1.5*"/>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="2*"/>
             </Grid.ColumnDefinitions>
@@ -108,11 +108,11 @@
                 <ListView Grid.Row="1"
                           x:Name="listViewALID"
                           Margin="2,2,2,0"
-                          Foreground="Black">
+                          Foreground="Black" PreviewMouseUp="TextBlock_PreviewMouseUp">
                     <ListView.View>
                         <!--<GridView ColumnHeaderContainerStyle="{StaticResource ResourceKey=BasicGridViewColumn}" >-->
                         <GridView>
-                            <GridViewColumn Width="200"
+                            <GridViewColumn Width="130"
                                             Header="Time"
                                             HeaderTemplate="{StaticResource header}">
                                 <GridViewColumn.CellTemplate>
@@ -122,7 +122,7 @@
                                     </DataTemplate>
                                 </GridViewColumn.CellTemplate>
                             </GridViewColumn>
-                            <GridViewColumn Width="70"
+                            <GridViewColumn Width="50"
                                             Header="ALID"
                                             HeaderTemplate="{StaticResource header}">
                                 <GridViewColumn.CellTemplate>
@@ -132,8 +132,23 @@
                                     </DataTemplate>
                                 </GridViewColumn.CellTemplate>
                             </GridViewColumn>
+                            <GridViewColumn Width="180"
+                                            Header="Desc"
+                                            HeaderTemplate="{StaticResource header}">
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding p_sDesc}"
+                                                   PreviewMouseUp="TextBlock_PreviewMouseUp" />
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </GridViewColumn>
                         </GridView>
                     </ListView.View>
+                    <ListView.ItemContainerStyle>
+                        <Style TargetType="ListViewItem">
+                            <Setter Property="HorizontalContentAlignment" Value="Center" />
+                        </Style>
+                    </ListView.ItemContainerStyle>
                 </ListView>
             </Grid>
             <GridSplitter Grid.Column="1"
@@ -146,11 +161,12 @@
             <Grid Grid.Column="2" Grid.Row="1">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="20"/>
-                    <RowDefinition Height="4*"/>
-                    <RowDefinition Height="10"/>
+                    <RowDefinition Height="2*"/>
+                    <RowDefinition Height="5"/>
+                    <RowDefinition Height="2*"/>
                     <RowDefinition Height="6*"/>
                 </Grid.RowDefinitions>
-                <Border BorderBrush="Gray" BorderThickness="1" Grid.Row="1" Grid.RowSpan="3"/>
+                <Border BorderBrush="Gray" BorderThickness="1" Grid.Row="1" Grid.RowSpan="4"/>
                 <Grid Grid.Row="0" Background="{StaticResource ControlBackGround}">
                     <TextBlock Text="Alarm Description" VerticalAlignment="Center" HorizontalAlignment="Center"
                                FontSize="12"/>
@@ -158,7 +174,6 @@
                            VerticalAlignment="Center" FontSize="10"/>-->
                 </Grid>
                 <StackPanel Grid.Row="1" Orientation="Horizontal">
-                    <Label Content=" "/>
                     <Label x:Name="lableALID" Content="{Binding p_nID}" ToolTip="ALID" Foreground="Black" FontSize="20"/>
                     <Label x:Name="lableModule" Content="{Binding p_sModule}" ToolTip="Module" Foreground="Black" FontSize="20"/>
                     <Label x:Name="lableDesc" Content="{Binding p_sDesc}" ToolTip="Description" Foreground="Black" FontSize="20"/>
@@ -166,9 +181,14 @@
                 <Grid Grid.Row="2" Background="AliceBlue">
                 </Grid>
                 <Grid Grid.Row="3" >
-                    <StackPanel Grid.Row="1" Orientation="Horizontal">
-                        <Label x:Name="lableMsg" Content="{Binding p_sMsg}" ToolTip="Message" Foreground="Black" FontSize="20" />
-                    </StackPanel>
+                    <!--<StackPanel Grid.Row="1">-->
+                     <Label x:Name="lableMsg" Content="{Binding p_sMsg}" ToolTip="Message" Foreground="Black" FontSize="20" />
+                    <!--</StackPanel>-->
+                </Grid>
+                <Grid Grid.Row="4" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                    <Canvas ClipToBounds="True" x:Name="canvas" Margin="5">
+                        <Image x:Name="alidImage"  Width="{Binding Path=ActualWidth, ElementName=canvas}" Height="{Binding Path=ActualHeight, ElementName=canvas}"  Stretch="Fill"></Image>
+                    </Canvas>
                 </Grid>
             </Grid>
         </Grid>

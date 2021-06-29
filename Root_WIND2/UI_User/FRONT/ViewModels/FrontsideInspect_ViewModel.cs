@@ -11,6 +11,8 @@ using System.Windows.Media;
 using System.Windows.Threading;
 using System.Data;
 using RootTools_Vision.WorkManager3;
+using RootTools_Vision.Utility;
+using System.IO;
 
 namespace Root_WIND2.UI_User
 {
@@ -83,6 +85,16 @@ namespace Root_WIND2.UI_User
             get { return this.m_DataViewer_VM; }
             set { SetProperty(ref m_DataViewer_VM, value); }
         }
+
+        private string inspectionID;
+        public string InspectionID
+        {
+            get => this.inspectionID;
+            set
+            {
+                SetProperty(ref this.inspectionID, value);
+            }
+        }
         #endregion
 
 
@@ -104,6 +116,7 @@ namespace Root_WIND2.UI_User
                 GlobalObjects.Instance.GetNamed<WorkManager>("frontInspection").InspectionDone += InspectionDone_Callback;
                 GlobalObjects.Instance.GetNamed<WorkManager>("frontInspection").ProcessDefectWaferStart += ProcessDefectWaferStart_Callback;
                 GlobalObjects.Instance.GetNamed<WorkManager>("frontInspection").IntegratedProcessDefectDone += ProcessDefectWaferDone_Callback;
+                GlobalObjects.Instance.GetNamed<WorkManager>("frontInspection").ProcessDefectDone += ProcessDefectDone_Callback;
             }
 
 
@@ -125,6 +138,7 @@ namespace Root_WIND2.UI_User
         private void SelectedCellsChanged_Callback(object obj)
         {
             DataRowView row = (DataRowView)obj;
+            if (row == null) return;
 
             System.Drawing.Rectangle m_View_Rect = new System.Drawing.Rectangle((int)(double)row["m_fAbsX"] - ImageViewerVM.p_View_Rect.Width / 2, (int)(double)row["m_fAbsY"] - this.imageViewerVM.p_View_Rect.Height / 2, this.imageViewerVM.p_View_Rect.Width, this.imageViewerVM.p_View_Rect.Height);
             ImageViewerVM.p_View_Rect = m_View_Rect;
@@ -215,8 +229,6 @@ namespace Root_WIND2.UI_User
             });
         }
 
-        WorkManager workManager;
-
         public RelayCommand btnStart
         {
             get => new RelayCommand(() =>
@@ -224,7 +236,9 @@ namespace Root_WIND2.UI_User
 
                 if (GlobalObjects.Instance.GetNamed<WorkManager>("frontInspection") != null)
                 {
-                    GlobalObjects.Instance.GetNamed<WorkManager>("frontInspection").Start();
+                    GlobalObjects.Instance.GetNamed<WorkManager>("frontInspection").Start();                    
+
+                    this.InspectionID = DatabaseManager.Instance.GetInspectionID();
                 }
                 return;
 
@@ -291,6 +305,57 @@ namespace Root_WIND2.UI_User
             });
         }
 
+
+        public RelayCommand btnSaveKlarf
+        {
+            get => new RelayCommand(() =>
+            {
+                WorkManager workManager = GlobalObjects.Instance.GetNamed<WorkManager>("frontInspection");
+                RecipeFront recipe = GlobalObjects.Instance.Get<RecipeFront>();
+
+                WIND2_Engineer engineer = GlobalObjects.Instance.Get<WIND2_Engineer>();
+                GrabModeFront grabMode = engineer.m_handler.p_Vision.GetGrabMode(recipe.CameraInfoIndex);
+                InfoWafer infoWafer = engineer.m_handler.p_Vision.p_infoWafer;
+                if(infoWafer == null)
+                {
+                    infoWafer = new InfoWafer("null", 0, engineer);
+                }
+
+                Settings settings = new Settings();
+                SettingItem_SetupFrontside settings_frontside = settings.GetItem<SettingItem_SetupFrontside>();
+
+                DataTable table = DatabaseManager.Instance.SelectCurrentInspectionDefect();
+                List<Defect> defects = Tools.DataTableToDefectList(table);
+
+                KlarfData_Lot klarfData = new KlarfData_Lot();
+                Directory.CreateDirectory(settings_frontside.KlarfSavePath);
+
+                klarfData.LotStart(settings_frontside.KlarfSavePath, infoWafer, recipe.WaferMap, grabMode);
+                klarfData.WaferStart(recipe.WaferMap, infoWafer);
+                klarfData.AddSlot(recipe.WaferMap, defects, recipe.GetItem<OriginRecipe>(), settings_frontside.UseTDIReview);
+                klarfData.SetResultTimeStamp();
+                klarfData.SaveKlarf();
+                klarfData.SaveTiffImageOnlyTDI(defects, workManager.SharedBuffer, new Size(160, 120));
+
+
+                klarfData.SaveImageJpg(workManager.SharedBuffer,
+                    new Rect(settings_frontside.WholeWaferImageStartX, settings_frontside.WholeWaferImageStartY, settings_frontside.WholeWaferImageEndX, settings_frontside.WholeWaferImageEndY),
+                    (long)(settings_frontside.WholeWaferImageCompressionRate * 100),
+                    settings_frontside.OutputImageSizeX,
+                    settings_frontside.OutputImageSizeY);
+
+
+            });
+        }
+
+        public RelayCommand btnInspectionIDSearchCommand
+        {
+            get => new RelayCommand(() =>
+            {
+                m_DataViewer_VM.pDataTable = DatabaseManager.Instance.SelectTablewithInspectionID("defect", this.inspectionID);                
+            });
+        }
+
         public RelayCommand btnRemoteStart
         {
             get => new RelayCommand(() =>
@@ -331,6 +396,8 @@ namespace Root_WIND2.UI_User
 
         private void InspectionDone_Callback(object obj, InspectionDoneEventArgs args)
         {
+            return;
+
             Workplace workplace = args.workplace;
             if (workplace == null || workplace.DefectList == null) return;
             List<String> textList = new List<String>();
@@ -361,10 +428,54 @@ namespace Root_WIND2.UI_User
 
         private void ProcessDefectWaferDone_Callback(object obj, IntegratedProcessDefectDoneEventArgs args)
         {
+            Workplace workplace = obj as Workplace;
+
+            if (workplace == null || workplace.DefectList == null) return;
+            List<String> textList = new List<String>();
+            List<CRect> rectList = new List<CRect>();
+
+            foreach (RootTools.Database.Defect defectInfo in workplace.DefectList)
+            {
+                String text = "";
+
+                rectList.Add(new CRect((int)defectInfo.p_rtDefectBox.Left, (int)defectInfo.p_rtDefectBox.Top, (int)defectInfo.p_rtDefectBox.Right, (int)defectInfo.p_rtDefectBox.Bottom));
+                textList.Add(text);
+            }
+
             Application.Current.Dispatcher.Invoke(DispatcherPriority.Normal, new Action(delegate
             {
-                DatabaseManager.Instance.SelectData();
-                m_DataViewer_VM.pDataTable = DatabaseManager.Instance.pDefectTable;
+                DrawRectDefect(rectList, textList);
+            }));
+
+            Application.Current.Dispatcher.Invoke(DispatcherPriority.Normal, new Action(delegate
+            {
+                m_DataViewer_VM.pDataTable = DatabaseManager.Instance.SelectCurrentInspectionDefect();
+
+              
+            }));
+
+            //List<Defect> defects = Tools.DataTableToDefectList(m_DataViewer_VM.pDataTable);
+        }
+
+        private void ProcessDefectDone_Callback(object obj, ProcessDefectDoneEventArgs args)
+        {
+            Workplace workplace = obj as Workplace;
+            if (workplace == null || workplace.DefectList == null) return;
+            List<String> textList = new List<String>();
+            List<CRect> rectList = new List<CRect>();
+
+
+            foreach (RootTools.Database.Defect defectInfo in workplace.DefectList)
+            {
+                String text = "";
+
+                rectList.Add(new CRect((int)defectInfo.p_rtDefectBox.Left, (int)defectInfo.p_rtDefectBox.Top, (int)defectInfo.p_rtDefectBox.Right, (int)defectInfo.p_rtDefectBox.Bottom));
+                textList.Add(text);
+            }
+
+            Application.Current.Dispatcher.Invoke(DispatcherPriority.Normal, new Action(delegate
+            {
+                DrawRectDefect(rectList, textList);
             }));
         }
 

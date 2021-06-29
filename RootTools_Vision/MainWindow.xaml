@@ -20,12 +20,14 @@
             <ColumnDefinition Width="8*"/>
             <ColumnDefinition Width="2*"/>
         </Grid.ColumnDefinitions>
-        <local:LogViewer Grid.Row="0"
+        <local:DataListView DataContext="{Binding DataListViewVM}"/>
+        <!--<local:LogViewer Grid.Row="0"
                          Grid.Column="0"
-                         DataContext="{Binding LogViewerVM}"/>
+                         DataContext="{Binding LogViewerVM}"/>-->
 
 
         <StackPanel Grid.Row="0" Grid.Column="1">
+           
             <Button Content="Button" HorizontalAlignment="Stretch" Height="100" />
             <Button Content="TEST" HorizontalAlignment="Stretch" Height="100"/>
             <Button Content="Server" HorizontalAlignment="Stretch"  VerticalAlignment="Top" Height="100" />

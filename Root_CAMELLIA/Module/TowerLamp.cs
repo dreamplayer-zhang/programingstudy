@@ -117,5 +117,11 @@ namespace Root_CAMELLIA.Module
             p_id = id;
             base.InitBase(id, engineer);
         }
+
+        public override void ThreadStop()
+        {
+            base.ThreadStop();
+        }
     }
+
 }

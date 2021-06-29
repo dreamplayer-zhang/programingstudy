@@ -249,19 +249,37 @@ namespace Root_CAMELLIA.Module
         #endregion
 
         #region Check Thread
-        bool m_bThread = false;
+        bool m_bFDCThread = false;
         Thread m_thread;
         void InitThreadFan()
         {
-            if (m_bThread) return;
+            if (m_bFDCThread) return;
             m_thread = new Thread(new ThreadStart(RunThreadFDC));
             m_thread.Start();
         }
-
+        //protected override void RunThread()
+        //{
+        //    base.RunThread();
+        //    Thread.Sleep(m_msInterval);
+        //    if (!m_modbus.m_client.Connected)
+        //    {
+        //        Thread.Sleep(1000);
+        //        p_sInfo = m_modbus.Connect();
+        //    }
+        //    else
+        //    {
+        //        if (m_aData.Count > m_iData)
+        //        {
+        //            m_aData[m_iData].ReadInputRegister(m_modbus);
+        //            m_iData = (m_iData + 1) % m_aData.Count;
+        //            UpdateEvent();
+        //        }
+        //    }
+        //}
         void RunThreadFDC()
         {
-            m_bThread = true;
-            while (m_bThread)
+            m_bFDCThread = true;
+            while (m_bFDCThread)
             {
                 Thread.Sleep(m_msInterval);
                 if (!m_modbus.m_client.Connected)
@@ -282,10 +300,10 @@ namespace Root_CAMELLIA.Module
         }
 
         public int m_iData = 0;
-        protected override void RunThread()
-        {
-            base.RunThread();
-        }
+        //protected override void RunThread()
+        //{
+        //    base.RunThread();
+        //}
 
         int m_msInterval = 100; 
         void RunTreeThread(Tree tree)
@@ -312,7 +330,10 @@ namespace Root_CAMELLIA.Module
 
         public override void ThreadStop()
         {
-            m_bThread = false;
+            if (m_bFDCThread)
+            {
+                m_bFDCThread = false;
+            }
             base.ThreadStop();
         }
     }

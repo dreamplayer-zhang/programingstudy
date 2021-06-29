@@ -74,32 +74,49 @@ namespace RootTools_Vision
 	public class EdgeSurfaceParameterBase : ObservableObject
 	{
 		#region [Parameter]
+		// inspection ROI
 		private int startPosition = 0;
+		private int endPosition = 10000;
 		private int roiHeight = 1000;
+		
+		// parameter
 		private int threshold = 10;
 		private int defectSizeMin = 1;
-		private int defectSizeMax = 10000;
-		private int mergeDist = 1;
+		private int defectSizeMax = 100;
+		
+		// search edge
+		private bool useEdgeSearch = true;
 		private int edgeSearchLevel = 20;
 
+		// option
 		private bool chR = false;
 		private bool chG = false;
 		private bool chB = false;
 		#endregion
 
-		#region [Getter/Setter]
-		[Category("Parameter")]
-		public int StartPosition
+		#region [Property]
+		[Category("Option")]
+		[DisplayName("R-Channel")]
+		public bool ChR
 		{
-			get => this.startPosition;
-			set => SetProperty(ref startPosition, value);
+			get => this.chR;
+			set => SetProperty(ref chR, value);
 		}
-		[Category("Parameter")]
-		public int ROIHeight
+		[Category("Option")]
+		[DisplayName("G-Channel")]
+		public bool ChG
 		{
-			get => this.roiHeight;
-			set => SetProperty(ref roiHeight, value);
+			get => this.chG;
+			set => SetProperty(ref chG, value);
 		}
+		[Category("Option")]
+		[DisplayName("B-Channel")]
+		public bool ChB
+		{
+			get => this.chB;
+			set => SetProperty(ref chB, value);
+		}
+
 		[Category("Parameter")]
 		public int Threshold
 		{
@@ -107,46 +124,56 @@ namespace RootTools_Vision
 			set => SetProperty(ref threshold, value);
 		}
 		[Category("Parameter")]
+		[DisplayName("Size Min")]
 		public int DefectSizeMin
 		{
 			get => this.defectSizeMin;
 			set => SetProperty(ref defectSizeMin, value);
 		}
 		[Category("Parameter")]
+		[DisplayName("Size Max")]
 		public int DefectSizeMax
 		{
 			get => this.defectSizeMax;
 			set => SetProperty(ref defectSizeMax, value);
 		}
-		[Category("Parameter")]
-		public int MergeDist
+
+		[Category("ROI")]
+		[DisplayName("Start Y Position")]
+		public int StartPosition
 		{
-			get => this.mergeDist;
-			set => SetProperty(ref mergeDist, value);
+			get => this.startPosition;
+			set => SetProperty(ref startPosition, value);
 		}
-		[Category("Parameter")]
+		[Category("ROI")]
+		[DisplayName("End Y Position")]
+		public int EndPosition
+		{
+			get => this.endPosition;
+			set => SetProperty(ref endPosition, value);
+		}
+		[Category("ROI")]
+		[DisplayName("Step Height")]
+		public int ROIHeight
+		{
+			get => this.roiHeight;
+			set => SetProperty(ref roiHeight, value);
+		}
+
+		[Browsable(false)]
+		[Category("Search Edge Line")]
+		[DisplayName("Use")]
+		public bool UseEdgeSearch
+		{
+			get => this.useEdgeSearch;
+			set => SetProperty(ref useEdgeSearch, value);
+		}
+		[Category("Search Edge Line")]
+		[DisplayName("Level(%)")]
 		public int EdgeSearchLevel
 		{
 			get => this.edgeSearchLevel;
 			set => SetProperty(ref edgeSearchLevel, value);
-		}
-		[Category("Parameter")]
-		public bool ChR
-		{
-			get => this.chR;
-			set => SetProperty(ref chR, value);
-		}
-		[Category("Parameter")]
-		public bool ChG
-		{
-			get => this.chG;
-			set => SetProperty(ref chG, value);
-		}
-		[Category("Parameter")]
-		public bool ChB
-		{
-			get => this.chB;
-			set => SetProperty(ref chB, value);
 		}
 		#endregion
 	}

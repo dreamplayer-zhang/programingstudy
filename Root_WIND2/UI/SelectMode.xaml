@@ -115,6 +115,7 @@
             <Grid Height="883">
                 <!--<material:MaterialDateDisplay Margin="20,20" FontFamily="Arial"/>-->
                 <TextBlock Text="2021-01-11 09:15:46" Margin="30"
+                           x:Name="tbClock"
                        VerticalAlignment="Top"
                        HorizontalAlignment="Right"
                        FontSize="30"

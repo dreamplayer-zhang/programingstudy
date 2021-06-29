@@ -87,30 +87,6 @@ namespace Root_WIND2.UI_User
                 SetProperty<bool>(ref this.isBChecked, value);
             }
         }
-
-        private bool isOriginChecked = false;
-        public bool IsOriginChecked
-        {
-            get => this.isOriginChecked;
-            set
-            {
-                //if (value != true)
-                //{
-                //    if (!p_UIElement.Contains(OriginBox_UI))
-                //    {
-                //        ClearObjects();
-                //    }
-                //    else
-                //    {
-                //        this.originLeftBottom.X = this.originBox.Left;
-                //        this.originLeftBottom.Y = this.originBox.Bottom;
-                //        RedrawShapes();
-                //    }
-                //}
-
-                SetProperty<bool>(ref this.isOriginChecked, value);
-            }
-        }
         #endregion
 
         #region [Command]

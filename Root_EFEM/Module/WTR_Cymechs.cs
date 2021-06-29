@@ -516,6 +516,7 @@ namespace Root_EFEM.Module
             {
                 bool bDone = m_protocolSend.OnReceive(sRead);
                 string[] sreads = sRead.Split(' ');
+                if(sreads.Length>=2)
                 m_alidRTRCmdError.Run(sreads[0] == "_ERR", "Cymechs Robot Error, Error Code : " + sreads[1]);
                 if (bDone) m_protocolSend = null;
             }
@@ -987,6 +988,8 @@ namespace Root_EFEM.Module
             }
 
             public string p_sChild { get; set; }
+            public bool p_isExchange { get; set; } = false;
+            public int p_nExchangeSlot { get; set; } = -1;
             public eArm m_eArm = eArm.A;
             public int m_nChildID = 0;
             public override ModuleRunBase Clone()
@@ -1070,6 +1073,8 @@ namespace Root_EFEM.Module
             }
 
             public string p_sChild { get; set; }
+            public bool p_isExchange { get; set; } = false;
+            public int p_nExchangeSlot { get; set; } = -1;
             public eArm m_eArm = eArm.A;
             public int m_nChildID = 0;
             public override ModuleRunBase Clone()

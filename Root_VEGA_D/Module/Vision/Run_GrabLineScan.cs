@@ -10,6 +10,7 @@ using RootTools.Control.ACS;
 using RootTools.Memory;
 using RootTools.Module;
 using RootTools.Trees;
+using RootTools_CLR;
 using RootTools_Vision;
 using System;
 using System.Collections.Generic;
@@ -28,11 +29,22 @@ namespace Root_VEGA_D.Module
 
         //bool m_bInvDir = false;
         public GrabMode m_grabMode = null;
-        double m_dTDIToVRSOffsetZ = 0;
+        //double m_dTDIToVRSOffsetZ = 0;
         string m_sGrabMode = "";
         public bool m_bIPUCompleted = true;
         public int m_nCurScanLine = 0;
-        public bool m_bWaitRun = false;
+        bool m_bWaitRun = false;
+        public bool p_bWaitRun
+        {
+            get { return m_bWaitRun; }
+            set
+            {
+                if (m_bWaitRun == value) return;
+
+                m_log.Info(string.Format("{0}.p_bWaitRun {1} -> {2}", p_id, m_bWaitRun, !m_bWaitRun));
+                m_bWaitRun = value;
+            }
+        }
         public object m_lockWaitRun = new object();
         public string p_sGrabMode
         {
@@ -54,25 +66,29 @@ namespace Root_VEGA_D.Module
         {
             Run_GrabLineScan run = new Run_GrabLineScan(m_module);
             run.p_sGrabMode = p_sGrabMode;
-            run.m_dTDIToVRSOffsetZ = m_dTDIToVRSOffsetZ;
+            run.m_bIPUCompleted = m_bIPUCompleted;
+            run.m_nCurScanLine = m_nCurScanLine;
+            run.m_bWaitRun = m_bWaitRun;
+            //run.m_dTDIToVRSOffsetZ = m_dTDIToVRSOffsetZ;
+
             return run;
         }
 
         public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
         {
             p_sGrabMode = tree.Set(p_sGrabMode, p_sGrabMode, m_module.p_asGrabMode, "Grab Mode", "Select GrabMode", bVisible);
-            m_dTDIToVRSOffsetZ = tree.Set(m_dTDIToVRSOffsetZ, m_dTDIToVRSOffsetZ, "TDI To VRS Offset Z", "TDI To VRS Offset Z", bVisible);
+            //m_dTDIToVRSOffsetZ = tree.Set(m_dTDIToVRSOffsetZ, m_dTDIToVRSOffsetZ, "TDI To VRS Offset Z", "TDI To VRS Offset Z", bVisible);
             //if (m_grabMode != null) m_grabMode.RunTree(tree.GetTree("Grab Mode", false), bVisible, true);
         }
 
-
+        double m_dGrabLineScanPosZ;
         double m_dAFBestFocusPosY;
         int m_nAFBestGVSum;
         string RunAutoFocus()
         {
+            m_dGrabLineScanPosZ = m_grabMode.m_dFocusPosZ;
             if (!m_grabMode.m_bUseAF)
             {
-                m_dAFBestFocusPosY = m_grabMode.m_dFocusPosZ;
                 return "OK";
             }
 
@@ -90,7 +106,7 @@ namespace Root_VEGA_D.Module
                 if (camRADS.p_CamInfo._OpenStatus == false) camRADS.Connect();
 
                 int nTryCount = 0;
-                while(nTryCount < 3)
+                while(nTryCount < m_grabMode.m_nRetryCount)
                 {
                     // RADS Voltage Reset
                     m_module.RADSControl.ResetController();
@@ -128,7 +144,7 @@ namespace Root_VEGA_D.Module
                     // 중앙에 RADS 레이저가 맞춰진적이 없다면
                     if (m_nAFBestGVSum <= 0)
                     {
-                        m_log.Info(string.Format("AutoFocus Try {0} - Cannot find best Y position by auto focusing", nTryCount));
+                        m_log.Info(string.Format("AutoFocus Try ({0}/{1}) - Cannot find best Y position by auto focusing", nTryCount + 1, m_grabMode.m_nRetryCount));
                         nTryCount++;
                     }
                     else
@@ -136,13 +152,11 @@ namespace Root_VEGA_D.Module
                 }
 
                 // Offset 적용
-                if (m_nAFBestGVSum <= 0)
-                    m_dAFBestFocusPosY = m_grabMode.m_dFocusPosZ;
-                else
-                    m_dAFBestFocusPosY += m_grabMode.m_dAFOffset;
+                if (m_nAFBestGVSum > 0)
+                    m_dGrabLineScanPosZ += m_grabMode.m_dAFOffset;
 
                 // 포커스 위치로 이동
-                if (m_module.Run(axisZ.StartMove(m_dAFBestFocusPosY)))
+                if (m_module.Run(axisZ.StartMove(m_dGrabLineScanPosZ)))
                     return p_sInfo;
                 if (m_module.Run(axisZ.WaitReady()))
                     return p_sInfo;
@@ -156,9 +170,9 @@ namespace Root_VEGA_D.Module
                 m_grabMode.SetLight(false);
 
                 if(m_nAFBestGVSum <= 0)
-                    m_log.Info(string.Format("AutoFocus is failed, Z Pos is set to {0}", m_dAFBestFocusPosY));
+                    m_log.Info(string.Format("AutoFocus is failed, Z Pos is set to {0}", m_dGrabLineScanPosZ));
                 else
-                    m_log.Info(string.Format("AutoFocus is successful, Z Pos is set to {0}", m_dAFBestFocusPosY));
+                    m_log.Info(string.Format("AutoFocus is successful, Z Pos is set to {0}", m_dGrabLineScanPosZ));
             }
 
             return "OK";
@@ -168,6 +182,13 @@ namespace Root_VEGA_D.Module
         {
             Camera_Basler camRADS = m_module.CamRADS;
             IntPtr intPtr = camRADS.p_ImageData.GetPtr();  // R 채널 데이터
+
+            Axis axisZ = m_module.AxisZ;
+            ACSAxis acsAxisZ = axisZ as ACSAxis;
+            if (axisZ == null)
+                return;
+
+            double curPosZ = acsAxisZ.GetActualPosition();
 
             unsafe
             {
@@ -202,57 +223,35 @@ namespace Root_VEGA_D.Module
 
                     // 이전 RADS laser 정보와 비교하여 중심에 가까울 때의 Z축 위치 찾기
                     int nCenterOnImg = size.Y / 2;
-                    Axis axisZ = m_module.AxisZ;
-                    ACSAxis acsAxisZ = axisZ as ACSAxis;
-                    if (acsAxisZ != null)
+                    if (nSum > m_grabMode.m_nAFLaserThreshold)
                     {
-                        if (nSum > m_grabMode.m_nAFLaserThreshold)
-                        {
-                            double curPosZ = acsAxisZ.GetActualPosition();
-                            double diffPast = Math.Abs(nCenterOnImg - m_dAFBestFocusPosY);
-                            double diffNew = Math.Abs(nCenterOnImg - curPosZ);
+                        double diffPast = Math.Abs(nCenterOnImg - m_dAFBestFocusPosY);
+                        double diffNew = Math.Abs(nCenterOnImg - laserY);
 
-                            // 새로 발견한 위치가 중심에 더 가까울 경우
-                            if (diffPast > diffNew && nSum > m_nAFBestGVSum)
-                            {
-                                m_dAFBestFocusPosY = curPosZ;
-                                m_nAFBestGVSum = nSum;
-                            }
+                        // 새로 발견한 위치가 중심에 더 가까울 경우
+                        if (diffPast > diffNew && nSum > m_nAFBestGVSum)
+                        {
+                            m_dGrabLineScanPosZ = curPosZ;
+                            m_dAFBestFocusPosY = laserY;
+                            m_nAFBestGVSum = nSum;
                         }
                     }
                 }
             }
         }
 
-        string ConnectRADS()
+        string StartRADS()
         {
-            Camera_Basler camRADS = (Camera_Basler)m_module.CamRADS;
-
             if (m_grabMode.pUseRADS && m_module.RADSControl.p_IsRun == false)
-            {
-                m_module.RADSControl.m_timer.Start();
-                m_module.RADSControl.p_IsRun = true;
-                m_module.RADSControl.StartRADS();
+                return m_module.StartRADS(m_grabMode.pRADSOffset);
 
-                StopWatch sw = new StopWatch();
-                if (camRADS.p_CamInfo._OpenStatus == false) camRADS.Connect();
-                while (camRADS.p_CamInfo._OpenStatus == false)
-                {
-                    if (sw.ElapsedMilliseconds > 15000)
-                    {
-                        sw.Stop();
-                        return "RADS Camera Not Connected";
-                    }
-                }
-                sw.Stop();
+            return "OK";
+        }
 
-                // Offset 설정
-                m_module.RADSControl.p_connect.SetADSOffset(m_grabMode.pRADSOffset);
-
-                // RADS 카메라 설정
-                camRADS.SetMulticast();
-                camRADS.GrabContinuousShot();
-            }
+        string StopRADS()
+        {
+            if (m_grabMode.pUseRADS && m_module.RADSControl.p_IsRun == true)
+                return m_module.StopRADS();
 
             return "OK";
         }
@@ -278,19 +277,23 @@ namespace Root_VEGA_D.Module
 
             return "OK";
         }
-        string RunAlign(MemoryData mem, int nSnapCount, double startPosY, double endPosY, double startTriggerY, double endTriggerY)
+        string RunAlign(MemoryData mem, int nSnapCount, double startPosY, double endPosY, double startTriggerY, double endTriggerY, out CRect rectBotMarker)
         {
+            rectBotMarker = new CRect(0, 0, 0, 0);
+
             if (m_grabMode.m_bUseAlign == false)
                 return "OK";
 
             m_grabMode.SetLight(true);
 
+            m_log.Info("Align Start");
+
             try
             {
                 double dPosX = m_grabMode.m_rpAxisCenter.X + m_grabMode.m_nWaferSize_mm * 0.5 - (m_grabMode.m_nCenterX - m_grabMode.m_GD.m_nFovSize * 0.5) * m_grabMode.m_dResX_um * 0.001;
-                
+
                 CPoint memOffset = new CPoint(0, 0);
-                if (m_module.Run(RunLineScan(mem, memOffset, nSnapCount, dPosX, startPosY, endPosY, startTriggerY, endTriggerY)))
+                if (m_module.Run(m_module.RunLineScan(m_grabMode, mem, memOffset, nSnapCount, dPosX, startPosY, endPosY, startTriggerY, endTriggerY)))
                     return p_sInfo;
 
                 Image<Gray, byte> imgTop = new Image<Gray, byte>(m_grabMode.p_sTopTemplateFile);
@@ -311,7 +314,7 @@ namespace Root_VEGA_D.Module
                 CPoint ptCenterBot = new CPoint();
                 bool bTopResult = TemplateMatch(imgTopArea_div4, imgTop_div4, m_grabMode.m_dMatchScore, out ptCenterTop);
                 bool bBotResult = TemplateMatch(imgBotArea_div4, imgBot_div4, m_grabMode.m_dMatchScore, out ptCenterBot);
-                if(bTopResult && bBotResult)
+                if (bTopResult && bBotResult)
                 {
                     ptCenterTop.X *= 4;
                     ptCenterTop.Y *= 4;
@@ -320,7 +323,7 @@ namespace Root_VEGA_D.Module
 
                     searchTopArea = new CRect(new CPoint(searchTopArea.Left + ptCenterTop.X, searchTopArea.Top + ptCenterTop.Y), imgTop.Width + 8, imgTop.Height + 8);
                     searchBotArea = new CRect(new CPoint(searchBotArea.Left + ptCenterBot.X, searchBotArea.Top + ptCenterBot.Y), imgBot.Width + 8, imgBot.Height + 8);
-                    
+
                     imgTopArea = m_module.GetGrayByteImageFromMemory_12bit(mem, searchTopArea);
                     imgBotArea = m_module.GetGrayByteImageFromMemory_12bit(mem, searchBotArea);
 
@@ -339,18 +342,91 @@ namespace Root_VEGA_D.Module
 
                         // Rotate 축 Theta만큼 회전
                         Axis axisRotate = m_module.AxisRotate;
-                        if (m_module.Run(axisRotate.StartMove(axisRotate.p_posActual + dThetaDegree * -1)))
+                        if (m_module.Run(axisRotate.StartMove(axisRotate.p_posActual + dThetaDegree * -1, 0.05)))
                             return p_sInfo;
                         if (m_module.Run(axisRotate.WaitReady()))
                             return p_sInfo;
 
-                        m_log.Info("Align Success");
+                        // IPU 연결된 상태라면 좌하단 Align Marker 위치 전달을 위해 찾아야함
+                        if (m_module.TcpipCommServer.IsConnected())
+                        {
+                            if (m_module.Run(m_module.RunLineScan(m_grabMode, mem, memOffset, nSnapCount, dPosX, startPosY, endPosY, startTriggerY, endTriggerY)))
+                                return p_sInfo;
+
+                            searchBotArea = new CRect(0, (int)(m_grabMode.m_nBottomCenterY - m_grabMode.m_nSearchAreaSize * 0.5), m_grabMode.m_GD.m_nFovSize, (int)(m_grabMode.m_nBottomCenterY + m_grabMode.m_nSearchAreaSize * 0.5));
+                            imgBotArea = m_module.GetGrayByteImageFromMemory_12bit(mem, searchBotArea);
+                            imgBotArea_div4 = imgBotArea.Resize(0.25, Emgu.CV.CvEnum.Inter.Linear);
+
+                            ptCenterBot = new CPoint();
+                            bBotResult = TemplateMatch(imgBotArea_div4, imgBot_div4, m_grabMode.m_dMatchScore, out ptCenterBot);
+
+                            if (!bBotResult)
+                                return "Cannot get Bottom Align Marker Position";
+
+                            int botMarkerX = (int)(0 + m_grabMode.m_nCenterX - m_grabMode.m_GD.m_nFovSize * 0.5 + (ptCenterBot.X - imgBot_div4.Width * 0.5) * 4 - 4);
+                            int botMarkerY = (int)(m_grabMode.m_nBottomCenterY - m_grabMode.m_nSearchAreaSize * 0.5 + (ptCenterBot.Y - imgBot_div4.Height * 0.5) * 4 - 4);
+
+                            ptCenterBot.X *= 4;
+                            ptCenterBot.Y *= 4;
+
+                            searchBotArea = new CRect(new CPoint(searchBotArea.Left + ptCenterBot.X, searchBotArea.Top + ptCenterBot.Y), imgBot.Width + 8, imgBot.Height + 8);
+
+                            imgBotArea = m_module.GetGrayByteImageFromMemory_12bit(mem, searchBotArea);
+
+                            bBotResult = TemplateMatch(imgBotArea, imgBot, m_grabMode.m_dMatchScore, out ptCenterBot);
+
+                            if (!bBotResult)
+                                return "Cannot get Bottom Align Marker Position";
+
+                            botMarkerX += (int)(ptCenterBot.X - imgBot.Width * 0.5);
+                            botMarkerY += (int)(ptCenterBot.Y - imgBot.Height * 0.5);
+
+                            rectBotMarker.Left = botMarkerX;
+                            rectBotMarker.Top = botMarkerY;
+                            rectBotMarker.Right = rectBotMarker.Left + imgBot.Width;
+                            rectBotMarker.Bottom = rectBotMarker.Top + imgBot.Height;
+
+                            // FindEdge 함수 사용하여 정확한 위치 보정
+                            int nEdgeCheckMargin = 10;
+
+                            CRect rectROI = new CRect(
+                                rectBotMarker.Left - nEdgeCheckMargin - (int)(m_grabMode.m_nCenterX - m_grabMode.m_GD.m_nFovSize * 0.5),
+                                rectBotMarker.Top - nEdgeCheckMargin,
+                                rectBotMarker.Right + nEdgeCheckMargin - (int)(m_grabMode.m_nCenterX - m_grabMode.m_GD.m_nFovSize * 0.5),
+                                rectBotMarker.Bottom + nEdgeCheckMargin);
+
+                            unsafe
+                            {
+                                IntPtr intPtr = mem.GetPtr();
+                                byte* ptrImg = (byte*)intPtr.ToPointer();
+
+                                int centerX = (rectROI.Left + rectROI.Right) / 2;
+                                int centerY = (rectROI.Top + rectROI.Bottom) / 2;
+                                int width = rectROI.Width;
+                                int height = rectROI.Height;
+
+                                int nOffsetX_LtoR = CLR_IP.Cpp_FindEdge16bit(ptrImg, mem.p_sz.X, mem.p_sz.Y, rectROI.Left, (int)(centerY - height * 0.1 * 0.5), (int)(rectROI.Left + width * 0.1), (int)(centerY + height * 0.1 * 0.5), 0, 100);
+                                int nOffsetY_BtoT = CLR_IP.Cpp_FindEdge16bit(ptrImg, mem.p_sz.X, mem.p_sz.Y, (int)(centerX - width * 0.1 * 0.5), (int)(rectROI.Bottom - height * 0.1), (int)(centerX + width * 0.1 * 0.5), rectROI.Bottom, 3, 100);
+
+                                botMarkerX += nOffsetX_LtoR - nEdgeCheckMargin - rectROI.Left;
+                                botMarkerY += nOffsetY_BtoT + nEdgeCheckMargin - rectROI.Bottom;
+                            }
+
+                            rectBotMarker.Left = botMarkerX;
+                            rectBotMarker.Top = botMarkerY;
+                            rectBotMarker.Right = rectBotMarker.Left + imgBot.Width;
+                            rectBotMarker.Bottom = rectBotMarker.Top + imgBot.Height;
+
+                            m_log.Info(string.Format("LeftBottom Align Marker is found - {0}, {1}", rectBotMarker.Left, rectBotMarker.Bottom));
+                        }
+
+                        m_log.Info(string.Format("Align Success, theta difference = {0}", dThetaDegree * -1));
 
                         return "OK";
                     }
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 m_log.Info(ex.Message);
             }
@@ -363,6 +439,7 @@ namespace Root_VEGA_D.Module
 
             return "Align Failed";
         }
+
         bool TemplateMatch(Image<Gray, byte> imgTargetArea, Image<Gray, byte> imgTemplate, double dMatchScore, out CPoint ptResult)
         {
             int nWidthDiff = 0;
@@ -395,49 +472,22 @@ namespace Root_VEGA_D.Module
 
             return bFoundTemplate;
         }
-        public string RunLineScan(MemoryData mem, CPoint memOffset, int nSnapCount, double posX, double startPosY, double endPosY, double startTriggerY, double endTriggerY)
+
+        bool m_bContinuousConnectedIPU = false;
+        bool CheckIPUConnectStatus()
         {
-            AxisXY axisXY = m_module.AxisXY;
-            Axis axisZ = m_module.AxisZ;
-
-            Camera_Dalsa camMain = m_grabMode.m_camera as Camera_Dalsa;
-            if (camMain == null)
-                return "Main Camara is null";
-
-            // 시작위치로 이동
-            if (m_module.Run(axisXY.StartMove(posX, startPosY)))
-                return p_sInfo;
-            if (m_module.Run(axisXY.WaitReady()))
-                return p_sInfo;
-
-            // 분주비 재설정
-            int nEncoderMul = camMain.GetEncoderMultiplier();
-            int nEncoderDiv = camMain.GetEncoderDivider();
-            camMain.SetEncoderMultiplier(1);
-            camMain.SetEncoderDivider(1);
-            camMain.SetEncoderMultiplier(nEncoderMul);
-            camMain.SetEncoderDivider(nEncoderDiv);
-
-            // 트리거 설정
-            axisXY.p_axisY.SetTrigger(startTriggerY, endTriggerY, m_grabMode.m_dTrigger, 0.001, true);
-
-            // 카메라 스냅 시작
-            m_grabMode.StartGrab(mem, memOffset, (int)(nSnapCount * 0.98), m_grabMode.m_GD);
-
-            // 이동하면서 그랩
-            if (m_module.Run(axisXY.p_axisY.StartMove(endPosY)))
-                return p_sInfo;
-
-            // 라인스캔 완료 대기
-            if (m_module.Run(axisXY.p_axisY.WaitReady()))
-                return p_sInfo;
-
-            // 이미지 스냅 스레드 동작중이라면 중지
-            while (camMain.p_CamInfo.p_eState != eCamState.Ready && !EQ.IsStop())
+            if (m_bContinuousConnectedIPU)
             {
-                Thread.Sleep(10);
+                if(m_module.TcpipCommServer.IsConnected())
+                    return true;
+                else
+                {
+                    m_bContinuousConnectedIPU = false;
+                    return false;
+                }
             }
-            return "OK";
+            else
+                return false;
         }
 
         public override string Run()
@@ -470,7 +520,7 @@ namespace Root_VEGA_D.Module
                     return p_sInfo;
 
                 // RADS 연결
-                if (m_module.Run(ConnectRADS()))
+                if (m_module.Run(StartRADS()))
                     return p_sInfo;
 
                 // 카메라 연결 시도
@@ -480,14 +530,6 @@ namespace Root_VEGA_D.Module
                 // 스캔 라인 초기화
                 m_nCurScanLine = 0;
 
-                // 기계 장치 설정
-                //m_grabMode.SetLens();
-                m_grabMode.SetLight(true);
-
-                // 메모리 오프셋
-                CPoint cpMemoryOffset = new CPoint(m_grabMode.m_cpMemoryOffset);
-                cpMemoryOffset.X += m_grabMode.m_ScanStartLine * grabData.m_nFovSize;
-
                 // 변수 계산
                 m_grabMode.m_dTrigger = Math.Round(m_grabMode.m_dResY_um * m_grabMode.m_dCamTriggerRatio, 1);     // 트리거 (1 pulse = 3.0 mm)
 
@@ -496,11 +538,11 @@ namespace Root_VEGA_D.Module
 
                 double dfov_mm = grabData.m_nFovSize * m_grabMode.m_dResX_um * 0.001;
                 double dOverlap_mm = grabData.m_nOverlap * m_grabMode.m_dResX_um * 0.001;
-                double dPosZ = m_dAFBestFocusPosY;//m_grabMode.m_dFocusPosZ;
+                double dPosZ = m_dGrabLineScanPosZ;//m_grabMode.m_dFocusPosZ;
 
                 double dTriggerStartPosY = m_grabMode.m_rpAxisCenter.Y + m_grabMode.m_ptXYAlignData.Y - m_grabMode.m_nWaferSize_mm * 0.5;
                 double dTriggerEndPosY = m_grabMode.m_rpAxisCenter.Y + m_grabMode.m_ptXYAlignData.Y + m_grabMode.m_nWaferSize_mm * 0.5;
-                
+
                 Axis.Speed speedY = axisXY.p_axisY.GetSpeedValue(Axis.eSpeed.Move);
 
                 double accDistance = speedY.m_acc * speedY.m_v * 0.5 * 2.0;
@@ -515,8 +557,37 @@ namespace Root_VEGA_D.Module
                 MemoryData mem = m_module.m_engineer.GetMemory(strPool, strGroup, strMemory);
 
                 // 얼라인
-                if (m_module.Run(RunAlign(mem, nWaferSizeY_px, dStartPosY, dEndPosY, dTriggerStartPosY, dTriggerEndPosY)))
+                CRect rectBotMarker = new CRect(0, 0, 0, 0);
+                if (m_module.Run(RunAlign(mem, nWaferSizeY_px, dStartPosY, dEndPosY, dTriggerStartPosY, dTriggerEndPosY, out rectBotMarker)))
                     return p_sInfo;
+
+                // IPU 접속 대기
+                while (p_bWaitRun && !EQ.IsStop())
+                {
+                    Thread.Sleep(10);
+                }
+
+                // IPU에 Bottom Align Marker Position 전달
+                if (m_module.TcpipCommServer.IsConnected())
+                {
+                    // 'LineStart' 메세지 전달
+                    Dictionary<string, string> mapParam = new Dictionary<string, string>();
+                    mapParam["BOT_ALIGN_MARKER_POS_X"] = rectBotMarker.Left.ToString();
+                    mapParam["BOT_ALIGN_MARKER_POS_Y"] = rectBotMarker.Bottom.ToString();
+
+                    m_module.TcpipCommServer.SendMessage(TCPIPComm_VEGA_D.Command.RcpName, mapParam);
+                }
+
+                // 기계 장치 설정
+                //m_grabMode.SetLens();
+                m_grabMode.SetLight(true);
+
+                // 라인 스캔 전 정보 로그 작성
+                m_log.Info(string.Format("GrabLineScan Info : AxisX_Speed({0:F3}), AxisY_Speed({1:F3}), AxisZ_Pos({2:F3})", axisXY.p_axisX.GetSpeedValue(Axis.eSpeed.Move).m_v, axisXY.p_axisY.GetSpeedValue(Axis.eSpeed.Move).m_v, dPosZ));
+                for (int i = 0; i < m_grabMode.m_lightSet.m_aLight.Count; i++)
+                {
+                    m_log.Info(string.Format("GrabLineScan Light {0} : {1}({2}))", i + 1, m_grabMode.m_lightSet.m_aLight[i].m_sName, m_grabMode.m_aLightPower[i]));
+                }
 
                 while (m_grabMode.m_ScanLineNum > m_nCurScanLine)
                 {
@@ -525,7 +596,7 @@ namespace Root_VEGA_D.Module
 
                     lock (m_lockWaitRun)
                     {
-                        if (m_bWaitRun)
+                        if (p_bWaitRun)
                         {
                             Thread.Sleep(10);
                             continue;
@@ -539,6 +610,10 @@ namespace Root_VEGA_D.Module
 
                         double dPosX = m_grabMode.m_rpAxisCenter.X + m_grabMode.m_nWaferSize_mm * 0.5 - nLineIndex * (dfov_mm - dOverlap_mm);
                         double dNextPosX = dPosX - (dfov_mm - dOverlap_mm);
+
+                        // 메모리 오프셋
+                        CPoint cpMemoryOffset = new CPoint(m_grabMode.m_cpMemoryOffset);
+                        cpMemoryOffset.X += m_grabMode.m_ScanStartLine * grabData.m_nFovSize;
 
                         // Grab 방향 및 시작, 종료 위치 설정
                         m_grabMode.m_eGrabDirection = eGrabDirection.Forward;
@@ -559,8 +634,8 @@ namespace Root_VEGA_D.Module
                             dEndPosY = dTriggerEndPosY + decDistance;
                         }
 
-                        if (m_grabMode.m_dVRSFocusPos != 0)
-                            dPosZ = m_grabMode.m_dVRSFocusPos + m_dTDIToVRSOffsetZ;
+                        //if (m_grabMode.m_dVRSFocusPos != 0)
+                        //    dPosZ = m_grabMode.m_dVRSFocusPos + m_dTDIToVRSOffsetZ;
 
                         //포커스 높이로 Z축 이동
                         if (m_module.Run(axisZ.StartMove(dPosZ)))
@@ -576,7 +651,8 @@ namespace Root_VEGA_D.Module
                         CPoint tmpMemOffset = new CPoint(cpMemoryOffset);
 
                         // IPU PC와 연결된 상태라면
-                        if (m_module.TcpipCommServer.IsConnected())
+                        m_bContinuousConnectedIPU = m_module.TcpipCommServer.IsConnected();
+                        if (CheckIPUConnectStatus())
                         {
                             // 'LineStart' 메세지 전달
                             Dictionary<string, string> mapParam = new Dictionary<string, string>();
@@ -601,16 +677,20 @@ namespace Root_VEGA_D.Module
                         }
 
                         // 라인 스캔
-                        if (m_module.Run(RunLineScan(mem, tmpMemOffset, nWaferSizeY_px, dPosX, dStartPosY, dEndPosY, dTriggerStartPosY, dTriggerEndPosY)))
+                        if (m_module.Run(m_module.RunLineScan(m_grabMode, mem, tmpMemOffset, nWaferSizeY_px, dPosX, dStartPosY, dEndPosY, dTriggerStartPosY, dTriggerEndPosY)))
                             return p_sInfo;
 
+
                         // IPU PC와 연결된 상태라면 'LineEnd' 메세지 전달
-                        if (m_module.TcpipCommServer.IsConnected())
+                        if (CheckIPUConnectStatus())
+                        {
+                            Thread.Sleep(3000); // IPU에서 검사로 인한 이미지 그랩 지연을 감안하여 LineEnd 메세지를 3초 후에 전달
+
                             m_module.TcpipCommServer.SendMessage(TCPIPComm_VEGA_D.Command.LineEnd);
+                        }
 
                         // 다음 이미지 획득을 위해 변수 값 변경
                         m_nCurScanLine++;
-                        cpMemoryOffset.X += grabData.m_nFovSize;
                     }
                 }
                 m_grabMode.m_camera.StopGrab();
@@ -618,7 +698,7 @@ namespace Root_VEGA_D.Module
                 snapTimeWatcher.Stop();
 
                 // IPU와 연결상태에 이미지 검사가 끝나기까지 대기
-                while (m_module.TcpipCommServer.IsConnected() && !m_bIPUCompleted && !EQ.IsStop())
+                while (CheckIPUConnectStatus() && !m_bIPUCompleted && !EQ.IsStop())
                 {
                     Thread.Sleep(10);
                 }
@@ -639,13 +719,7 @@ namespace Root_VEGA_D.Module
                 m_grabMode.SetLight(false);
 
                 // RADS 기능 off
-                if (m_grabMode.pUseRADS && m_module.RADSControl.p_IsRun == true)
-                {
-                    m_module.RADSControl.m_timer.Stop();
-                    m_module.RADSControl.p_IsRun = false;
-                    m_module.RADSControl.StopRADS();
-                    if (camRADS.p_CamInfo._IsGrabbing == true) camRADS.StopGrab();
-                }
+                StopRADS();
             }
         }
     }

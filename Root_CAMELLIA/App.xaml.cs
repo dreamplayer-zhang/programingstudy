@@ -1,4 +1,5 @@
 ﻿using Root_CAMELLIA.LibSR_Met;
+using SSLNet;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -17,9 +18,42 @@ namespace Root_CAMELLIA
     {
         public static CAMELLIA_Engineer m_engineer = new CAMELLIA_Engineer();
         public static Nanoview m_nanoView = new Nanoview();
+        public static SSLoggerNet m_SSLoggerNet = new SSLoggerNet();
+
+
+        public App()
+
+        {
+
+            this.Dispatcher.UnhandledException += this.Dispatcher_UnhandledException;
+
+            this.Dispatcher.UnhandledExceptionFilter += this.Dispatcher_UnhandledExceptionFilter;
+
+        }
+
+
+
+        private void Dispatcher_UnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)
+
+        {
+
+            e.Handled = true;
+
+        }
+
+
+
+        private void Dispatcher_UnhandledExceptionFilter(object sender, System.Windows.Threading.DispatcherUnhandledExceptionFilterEventArgs e)
+
+        {
+
+            e.RequestCatch = true;
+
+        }
 
         private void Application_Startup(object sender, StartupEventArgs e)
         {
+
             //base.OnStartup(e);
             Thread thread = new Thread(
                 new System.Threading.ThreadStart(

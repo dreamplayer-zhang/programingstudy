@@ -18,7 +18,7 @@ namespace Root.Module
             p_sInfo = m_toolBox.GetComm(ref m_tcpip, this, "Client", 2000000);
             if (bInit)
             {
-                m_tcpip.EventReciveData += M_tcpip_EventReciveData;
+                m_tcpip.EventReceiveData += M_tcpip_EventReciveData;
             }
         }
         #endregion

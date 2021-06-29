@@ -9,6 +9,9 @@ using System.Windows.Forms;
 using NanoView;
 using System.Runtime.InteropServices;
 using System.Diagnostics;
+using System.IO.Ports;
+using static Root_CAMELLIA.Module.Module_Camellia;
+using Root_CAMELLIA;
 
 namespace Root_CAMELLIA.LibSR_Met
 {
@@ -29,6 +32,7 @@ namespace Root_CAMELLIA.LibSR_Met
             SR_MATERIAL_FILE_ERROR = 14,
             SR_MATERIAL_FILE_LOAD_ERROR = 15,
             SR_MODELING_FAIL = 16,
+            SR_SHUTTER_MOTION_ERROR = 17,
 
             MEASURED_DATA_NOT_FOUND = 100,
 
@@ -38,8 +42,11 @@ namespace Root_CAMELLIA.LibSR_Met
 
         public ARCNIR m_SR = null;
         Model m_Model = null;
+        Model m_ModelSave = null;
         DataManager m_DM = DataManager.GetInstance();
         Calculation m_Calculation = new Calculation();
+        public PMDatas m_PMDatas = new PMDatas();
+
         public MaterialList m_MaterialList;
         public LayerList m_LayerList;
         string m_sConfigPath = string.Empty;
@@ -55,9 +62,14 @@ namespace Root_CAMELLIA.LibSR_Met
         {
             m_SR = new ARCNIR();
             m_Model = new Model();
+            m_ModelSave = new Model();
             m_MaterialList = m_Model.m_MaterialList;
             m_LayerList = m_Model.m_LayerList;
+
+            InitLamp();
         }
+
+
 
         [DllImport("kernel32")]
 
@@ -84,7 +96,8 @@ namespace Root_CAMELLIA.LibSR_Met
                     m_sConfigPath = nConfigureFilePath;
                     m_bSRInitialized = true;
                     m_DM.m_Log.WriteLog(LogType.Operating, "SR Initialize Done");
-                    MessageBox.Show("Initialize Done"); //추후 제거
+                    SplashScreenHelper.ShowText("SR Initialize Done!");
+                    //MessageBox.Show("Initialize Done"); //추후 제거
 
                     //double Boxcar_VIS = m_SR.Boxcar_VIS;
                     //double Average_VIS = m_SR.Average_VIS;
@@ -101,7 +114,8 @@ namespace Root_CAMELLIA.LibSR_Met
                 {
                     string sErr = Enum.GetName(typeof(ERRORCODE_NANOVIEW), rst);
                     m_DM.m_Log.WriteLog(LogType.Error, sErr);
-                    MessageBox.Show(sErr); //추후 제거
+                    SplashScreenHelper.ShowText("SR Initialize Error!");
+                    //MessageBox.Show(sErr); //추후 제거
                 }
 
                 return rst;
@@ -109,7 +123,8 @@ namespace Root_CAMELLIA.LibSR_Met
             catch (Exception ex)
             {
                 m_DM.m_Log.WriteLog(LogType.Error, ex.Message);
-                MessageBox.Show(ex.Message);
+                //MessageBox.Show(ex.Message);
+                SplashScreenHelper.ShowText("SR Initialize Error!");
                 return ERRORCODE_NANOVIEW.NANOVIEW_ERROR;
             }
         }
@@ -148,6 +163,7 @@ namespace Root_CAMELLIA.LibSR_Met
         {
             try
             {
+                string path_sclfile = "";
                 string sExt = Path.GetExtension(sRecipeFilePath);
                 if (sExt != ".rcp" && sExt != ".erm")
                 {
@@ -159,7 +175,6 @@ namespace Root_CAMELLIA.LibSR_Met
                 ERRORCODE_NANOVIEW rst = (ERRORCODE_NANOVIEW)m_Model.FillFromFile(sRecipeFilePath);
 
                 m_DM.m_LayerData = m_LayerList.ToLayerData();
-
                 if (rst == ERRORCODE_NANOVIEW.SR_NO_ERROR)
                 {
                     m_DM.m_Log.WriteLog(LogType.Operating, "Modelling Done");
@@ -176,6 +191,55 @@ namespace Root_CAMELLIA.LibSR_Met
                     m_DM.m_Log.WriteLog(LogType.Error, sErr);
                     MessageBox.Show(sErr); //추후 제거
                 }
+
+                m_DM.m_ThicknessData = new List<ThicknessScaleOffset>();
+                path_sclfile = Path.GetDirectoryName(sRecipeFilePath) + "\\" + Path.GetFileNameWithoutExtension(sRecipeFilePath) + ".scl";
+                if (File.Exists(path_sclfile))
+                {
+                    StreamReader SR = new StreamReader(path_sclfile);
+
+                    while (!SR.EndOfStream)
+                    {
+                        string str = SR.ReadLine();
+                        string[] res = str.Split(',');
+
+                        m_DM.m_ThicknessData.Add(new ThicknessScaleOffset(Convert.ToDouble(res[0]), Convert.ToDouble(res[1])));
+                    }
+
+                    SR.Close();
+                }
+                else
+                {
+                    for(int i = 0; i < m_DM.m_LayerData.Count; i++)
+                    {
+                        m_DM.m_ThicknessData.Add(new ThicknessScaleOffset());
+                    }
+                }
+                
+
+                    //string[] line = new string[20];
+
+                    //int linecnt = 0;
+
+                    //while ((line[linecnt] = SR.ReadLine()) != null)
+                    //{
+                    //    linecnt++;
+                    //}
+
+                    ////m_thk_scl_linecnt = linecnt;
+
+                    //for (int j = 0; j < linecnt; j++)
+                    //{
+                    //    string[] result = line[j].Split(new char[] { ',' });
+
+
+                    //    m_thk_scale[j] = Convert.ToDouble(result[0]);
+                    //    m_thk_offset[j] = Convert.ToDouble(result[1]);
+
+
+                    //}
+
+                    
 
                 return rst;
             }
@@ -204,6 +268,32 @@ namespace Root_CAMELLIA.LibSR_Met
                     sRecipeFilePath += ".rcp";
 
                 File.WriteAllLines(sRecipeFilePath, m_Model.m_LayerList.ToString());
+
+                string path_sclfile = Path.GetDirectoryName(sRecipeFilePath) + "\\" + Path.GetFileNameWithoutExtension(sRecipeFilePath) + ".scl";
+
+                try
+                {
+                    StreamWriter SW = new StreamWriter(path_sclfile);
+
+                    for (int j = 0; j < m_DM.m_ThicknessData.Count; j++)
+                    {
+                        string strline;
+
+                        strline = string.Format("{0},{1}", m_DM.m_ThicknessData[j].m_dThicknessScale, m_DM.m_ThicknessData[j].m_dThicknessOffset);
+
+                        SW.WriteLine(strline);
+                    }
+
+                    SW.Close();
+
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message);
+
+                    return false;
+
+                }
 
                 m_DM.m_Log.WriteLog(LogType.Operating, "Recipe Save Done");
                 MessageBox.Show("Recipe Save Done"); //추후 제거
@@ -244,8 +334,10 @@ namespace Root_CAMELLIA.LibSR_Met
 
                     WritePrivateProfileString("ARC Detector Parameter", "Background Int. time", datas.nBGIntTime_VIS.ToString(), sPath);
                     WritePrivateProfileString("ARC Detector Parameter", "Average", datas.nAverage_VIS.ToString(), sPath);
+                    WritePrivateProfileString("ARC Detector Parameter", "Integration time", datas.nInitCalIntTime_VIS.ToString(), sPath);
                     WritePrivateProfileString("ARCNIR Detector Parameter", "Background Int. time", datas.nBGIntTime_NIR.ToString(), sPath);
                     WritePrivateProfileString("ARCNIR Detector Parameter", "Average", datas.nAverage_NIR.ToString(), sPath);
+                    WritePrivateProfileString("ARCNIR Detector Parameter", "Integration time", datas.nInitCalIntTime_NIR.ToString(), sPath);
 
                     m_DM.m_Log.WriteLog(LogType.Operating, "Save Done");
 
@@ -286,7 +378,7 @@ namespace Root_CAMELLIA.LibSR_Met
                     if (int.TryParse(key.ToString(), out nData)) datas.nAverage_VIS = nData;
 
                     GetPrivateProfileString("ARC Detector Parameter", "Boxcar", "No Info.", key, nBufSize, sPath);
-                    if (int.TryParse(key.ToString(), out nData)) datas.nBoxcar_VIS= nData;
+                    if (int.TryParse(key.ToString(), out nData)) datas.nBoxcar_VIS = nData;
 
                     GetPrivateProfileString("ARC Detector Parameter", "Integration time", "No Info.", key, nBufSize, sPath);
                     if (int.TryParse(key.ToString(), out nData)) datas.nInitCalIntTime_VIS = nData;
@@ -320,14 +412,22 @@ namespace Root_CAMELLIA.LibSR_Met
             }
         }
 
-       
+
 
         public ERRORCODE_NANOVIEW Calibration(bool bInitialCal)
         {
             //Init Calibration 아니고 Sample 측정 시 Measure Background
             try
             {
-                double[] spectrum = new double[ConstValue.SPECTROMETER_MAX_PIXELSIZE];
+                //bool bCheckShutter = CheckShutter();
+                //double[] spectrum = new double[ConstValue.SPECTROMETER_MAX_PIXELSIZE];
+                double[] VISBackCount = new double[ConstValue.SPECTROMETER_MAX_PIXELSIZE];
+                double[] NIRBackCount = new double[ConstValue.SPECTROMETER_MAX_PIXELSIZE];
+                double[] VISBackWavelength = new double[ConstValue.SPECTROMETER_MAX_PIXELSIZE];
+                double[] NIRBackWavelength = new double[ConstValue.SPECTROMETER_MAX_PIXELSIZE];
+                m_DM.BackGroundCalCountData = new double[ConstValue.SPECTROMETER_MAX_PIXELSIZE];
+                m_DM.BackGroundCalWavelength = new double[ConstValue.SPECTROMETER_MAX_PIXELSIZE];
+
                 if (isExceptNIR)
                 {
                     m_SR.BackIntTime_NIR = 15;
@@ -335,17 +435,28 @@ namespace Root_CAMELLIA.LibSR_Met
                 }
                 else
                 {
+
                     m_SR.BackIntTime_NIR = m_DM.m_SettngData.nBGIntTime_NIR;
                     m_SR.Average_NIR = m_DM.m_SettngData.nAverage_NIR;
+
                 }
-                m_SR.IntTime_VIS = m_DM.m_SettngData.nInitCalIntTime_VIS;
-                m_SR.IntTime_NIR = m_DM.m_SettngData.nInitCalIntTime_NIR;
+                if (bInitialCal == true)
+                {
+                    m_SR.IntTime_VIS = m_DM.m_SettngData.nInitCalIntTime_VIS;
+                    m_SR.IntTime_NIR = m_DM.m_SettngData.nInitCalIntTime_NIR;
+                }
+                else
+                {
+                    m_SR.IntTime_VIS = m_DM.m_SettngData.nMeasureIntTime_VIS;
+                    m_SR.IntTime_NIR = m_DM.m_SettngData.nMeasureIntTime_NIR;
+                }
                 m_SR.BackIntTime_VIS = m_DM.m_SettngData.nBGIntTime_VIS;
                 m_SR.Average_VIS = m_DM.m_SettngData.nAverage_VIS;
                 m_SR.bUpdateBeta = bInitialCal;
-              
 
-                ERRORCODE_NANOVIEW rst = (ERRORCODE_NANOVIEW)m_SR.MeasureBackground(spectrum);
+
+                //ERRORCODE_NANOVIEW rst = (ERRORCODE_NANOVIEW)m_SR.MeasureBackground(spectrum);
+                ERRORCODE_NANOVIEW rst = (ERRORCODE_NANOVIEW)m_SR.MeasureBackground(VISBackWavelength, VISBackCount, NIRBackWavelength, NIRBackCount);
                 Thread.Sleep(1000);
                 if (rst == ERRORCODE_NANOVIEW.SR_NO_ERROR)
                 {
@@ -355,11 +466,23 @@ namespace Root_CAMELLIA.LibSR_Met
 
                     m_DM.m_Log.WriteLog(LogType.Operating, sLogPlus + "Calibration Done");
                     //MessageBox.Show(sLogPlus + "Calibration Done");
-                    if(!bInitialCal)
+                    if (!bInitialCal)
                     {
                         bCheckSampleCal = true;
                     }
+                    //추가 Test Count Data 남기기
+                    if (!bInitialCal)
+                    {
+                        Array.Copy(VISBackWavelength, 0, m_DM.BackGroundCalWavelength, 0, 378);
+                        Array.Copy(NIRBackWavelength, 12, m_DM.BackGroundCalWavelength, 378, 48);
+                        Array.Copy(VISBackCount, 0, m_DM.BackGroundCalCountData, 0, 378);
+                        Array.Copy(NIRBackCount, 12, m_DM.BackGroundCalCountData, 378, 48);
+
+                        m_DM.CalibrationBackCountSave();
+                        //m_PMDatas.LampCheck();
+                    }
                 }
+
                 else
                 {
                     string sErr = Enum.GetName(typeof(ERRORCODE_NANOVIEW), rst);
@@ -387,7 +510,8 @@ namespace Root_CAMELLIA.LibSR_Met
                         MessageBox.Show(sErr); //추후 제거
                     }
                 }
-
+                // 임시
+                //return ERRORCODE_NANOVIEW.NANOVIEW_ERROR;
                 return rst;
                 //}
                 //else// measurebackground error code 제대로 나오면 없애버리기
@@ -406,114 +530,153 @@ namespace Root_CAMELLIA.LibSR_Met
             }
         }
 
-        public ERRORCODE_NANOVIEW SampleMeasure(int nPointIndex, double dXPos, double dYPos, bool bExcept_NIR, bool bTransmittance, bool bThickness, float nLowerWaveLength, float nUpperWavelength) 
+        public ERRORCODE_NANOVIEW SampleMeasure(int nPointIndex, double dXPos, double dYPos, bool bExcept_NIR, bool bTransmittance, bool bThickness, float nLowerWaveLength, float nUpperWavelength)
         {
             try
             {
-                if (m_bSRInitialized == true)
+                //Shutter 체크 기능 추가
+                bool bShutterOpen = true;
+                if (nPointIndex == 0)
                 {
-                    if(!bCheckSampleCal)
-                    {
-                        m_DM.m_Log.WriteLog(LogType.Operating, "Sample Calibration First");
-                        MessageBox.Show("Sample Calibration First"); 
-                    }
-                    //fitting할때 들어가야함
-                    //_layer[] layers = m_DM.m_LayerData.To_layer();
-                    //m_SR.Model(layers, layers.Length);
-                    m_DM.bExcept_NIR = bExcept_NIR;
-                    m_DM.bThickness = bThickness;
-                    m_DM.bTransmittance = bTransmittance;
-                    if (m_DM.bExcept_NIR)
-                    {
-                        m_SR.IntTime_NIR = 15;
-                    }
-                    else
-                    {
-                        m_SR.IntTime_NIR = m_DM.m_SettngData.nMeasureIntTime_NIR;
-                    }
-                    m_SR.IntTime_VIS = m_DM.m_SettngData.nMeasureIntTime_VIS;
-                    
-                   
-                    double[] rs = new double[ConstValue.SPECTROMETER_MAX_PIXELSIZE];
-                    double[] reflectance = new double[ConstValue.SPECTROMETER_MAX_PIXELSIZE];
-                    double[] eV = new double[ConstValue.SPECTROMETER_MAX_PIXELSIZE];
-                    int nNumOfData = 0;
+                    //ShutterMotion(true);
+                    bool bCheckShutter = CheckShutter();
+                    //bool bShutterOpen = false;
 
-                    ERRORCODE_NANOVIEW rst = (ERRORCODE_NANOVIEW)m_SR.Measure(reflectance, rs, eV, ref nNumOfData);
-
-                    if (rst == ERRORCODE_NANOVIEW.SR_NO_ERROR)
+                    if (!bCheckShutter)
                     {
-                        RawData data = m_DM.m_RawData[nPointIndex];
-                        data.bDataExist = true;
-                        data.nCalcDataNum = nNumOfData;
-                        m_DM.nStartWavelegth = nLowerWaveLength;
-                        m_DM.nThicknessDataNum= (int)(nUpperWavelength - nLowerWaveLength)+1;
-                        data.nNIRDataNum = m_SR.m_ExpNum;
-                        data.dX = dXPos;
-                        data.dY = dYPos;
-                        Array.Reverse(m_SR.m_ExpR);
-                        Array.Reverse(m_SR.m_Expnm);
-                        m_SR.m_ExpR.CopyTo(data.Reflectance, 0);
-                        
-                        m_SR.m_Expnm.CopyTo(data.Wavelength, 0);
-                        Array.Reverse(m_SR.m_ExpR);
-                        for (int i=0; i<nNumOfData;i++)
+                        ERRORCODE_NANOVIEW rst = Calibration(false);
+                        if (rst == ERRORCODE_NANOVIEW.SR_NO_ERROR)
                         {
-                            if( Math.Round(ConstValue.EV_TO_WAVELENGTH_VALUE/ eV[i])== nUpperWavelength)
-                            {
-                                Array.Copy(reflectance,i, data.VIS_Reflectance, 0,m_DM.nThicknessDataNum);
-                                Array.Copy(eV,i, data.eV,0, m_DM.nThicknessDataNum);
-                                break;
-                            }
-
+                            bShutterOpen = CheckShutter();
                         }
-                        //Array.Copy(reflectance, data.VIS_Reflectance, data.nThicknessDataNum);
-                        //Array.Copy(eV, data.eV, data.nThicknessDataNum);
-                       
-                        m_DM.m_Log.WriteLog(LogType.Operating, "Sample Measure Done");
-                        //MessageBox.Show("Sample Measure Done"); //추후 제거
+                        else
+                        {
+                            m_DM.m_Log.WriteLog(LogType.Error, "Sample Cal Error");
+                        }
+
                     }
                     else
                     {
-                        string sErr = Enum.GetName(typeof(ERRORCODE_NANOVIEW), rst);
+                        bShutterOpen = bCheckShutter;
+                    }
+
+                    bCheckShutter = CheckShutter();
+                }
+                if (bShutterOpen)
+                {
+                    Thread.Sleep(500);
+                    if (m_bSRInitialized == true)
+                    {
+                        if (!bCheckSampleCal)
+                        {
+                            m_DM.m_Log.WriteLog(LogType.Operating, "Sample Calibration First");
+                            MessageBox.Show("Sample Calibration First");
+                        }
+                        //fitting할때 들어가야함
+                        //_layer[] layers = m_DM.m_LayerData.To_layer();
+                        //m_SR.Model(layers, layers.Length);
+                        m_DM.bExcept_NIR = bExcept_NIR;
+                        m_DM.bThickness = bThickness;
+                        m_DM.bTransmittance = bTransmittance;
+                        if (m_DM.bExcept_NIR)
+                        {
+                            m_SR.IntTime_NIR = 15;
+                        }
+                        else
+                        {
+                            m_SR.IntTime_NIR = m_DM.m_SettngData.nMeasureIntTime_NIR;
+                        }
+                        m_SR.IntTime_VIS = m_DM.m_SettngData.nMeasureIntTime_VIS;
+
+
+                        double[] rs = new double[ConstValue.SPECTROMETER_MAX_PIXELSIZE];
+                        double[] reflectance = new double[ConstValue.SPECTROMETER_MAX_PIXELSIZE];
+                        double[] eV = new double[ConstValue.SPECTROMETER_MAX_PIXELSIZE];
+                        int nNumOfData = 0;
+
+                        ERRORCODE_NANOVIEW rst = (ERRORCODE_NANOVIEW)m_SR.Measure(reflectance, rs, eV, ref nNumOfData);
+
+                        if (rst == ERRORCODE_NANOVIEW.SR_NO_ERROR)
+                        {
+                            RawData data = m_DM.m_RawData[nPointIndex];
+                            data.bDataExist = true;
+                            data.nCalcDataNum = nNumOfData;
+                            m_DM.nStartWavelegth = nLowerWaveLength;
+                            m_DM.nThicknessDataNum = (int)(nUpperWavelength - nLowerWaveLength) + 1;
+                            data.nNIRDataNum = m_SR.m_ExpNum;
+                            data.dX = dXPos;
+                            data.dY = dYPos;
+                            Array.Reverse(m_SR.m_ExpR);
+                            Array.Reverse(m_SR.m_Expnm);
+                            m_SR.m_ExpR.CopyTo(data.Reflectance, 0);
+
+                            m_SR.m_Expnm.CopyTo(data.Wavelength, 0);
+                            Array.Reverse(m_SR.m_ExpR);
+                            for (int i = 0; i < nNumOfData; i++)
+                            {
+                                if (Math.Round(ConstValue.EV_TO_WAVELENGTH_VALUE / eV[i]) == nUpperWavelength)
+                                {
+                                    Array.Copy(reflectance, i, data.VIS_Reflectance, 0, m_DM.nThicknessDataNum);
+                                    Array.Copy(eV, i, data.eV, 0, m_DM.nThicknessDataNum);
+                                    break;
+                                }
+
+                            }
+                            //Array.Copy(reflectance, data.VIS_Reflectance, data.nThicknessDataNum);
+                            //Array.Copy(eV, data.eV, data.nThicknessDataNum);
+
+                            m_DM.m_Log.WriteLog(LogType.Operating, "Sample Measure Done");
+                            //MessageBox.Show("Sample Measure Done"); //추후 제거
+                        }
+                        else
+                        {
+                            string sErr = Enum.GetName(typeof(ERRORCODE_NANOVIEW), rst);
+                            m_DM.m_Log.WriteLog(LogType.Error, sErr);
+                            MessageBox.Show(sErr); //추후 제거
+                        }
+
+                        string strPath;
+                        strPath = Application.StartupPath + "\\" + "Measure Data";
+                        DirectoryInfo di = new DirectoryInfo(strPath);
+                        if (di.Exists == false) di.Create();
+
+                        string filename = String.Format("{0}\\{1}", strPath, "sample");
+
+                        string expfilename = filename + ".exp";
+                        string txtfilename = filename + ".txt";
+
+                        StreamWriter writer = new StreamWriter(expfilename);
+
+                        for (int i = 0; i < nNumOfData; i++)
+                        {
+                            writer.WriteLine("{0:f4} {1:f4} {2}", rs[i], reflectance[i], eV[i], Environment.NewLine);
+                        }
+                        writer.Close();
+
+                        StreamWriter writer1 = new StreamWriter(txtfilename);
+
+                        for (int i = 0; i < m_SR.m_ExpNum; i++)
+                        {
+                            writer1.WriteLine("{0:f0} {1:f4}", m_SR.m_Expnm[i], m_SR.m_ExpR[i], Environment.NewLine);
+                        }
+                        writer1.Close();
+
+                        return rst;
+                    }
+                    else
+                    {
+                        string sErr = Enum.GetName(typeof(ERRORCODE_NANOVIEW), -1);
                         m_DM.m_Log.WriteLog(LogType.Error, sErr);
                         MessageBox.Show(sErr); //추후 제거
+                        return ERRORCODE_NANOVIEW.SR_DO_HW_INITIALIZE_FIRST;
                     }
-
-                    string strPath;
-                    strPath = Application.StartupPath + "\\" + "Measure Data";
-                    DirectoryInfo di = new DirectoryInfo(strPath);
-                    if (di.Exists == false) di.Create();
-
-                    string filename = String.Format("{0}\\{1}", strPath, "sample");
-
-                    string expfilename = filename + ".exp";
-                    string txtfilename = filename + ".txt";
-
-                    StreamWriter writer = new StreamWriter(expfilename);
-
-                    for (int i = 0; i < nNumOfData; i++)
-                    {
-                        writer.WriteLine("{0:f4} {1:f4} {2}", rs[i], reflectance[i], eV[i], Environment.NewLine);
-                    }
-                    writer.Close();
-
-                    StreamWriter writer1 = new StreamWriter(txtfilename);
-
-                    for (int i = 0; i < m_SR.m_ExpNum; i++)
-                    {
-                        writer1.WriteLine("{0:f0} {1:f4}", m_SR.m_Expnm[i], m_SR.m_ExpR[i], Environment.NewLine);
-                    }
-                    writer1.Close();
-
-                    return rst;
                 }
                 else
                 {
                     string sErr = Enum.GetName(typeof(ERRORCODE_NANOVIEW), -1);
                     m_DM.m_Log.WriteLog(LogType.Error, sErr);
                     MessageBox.Show(sErr); //추후 제거
-                    return ERRORCODE_NANOVIEW.SR_DO_HW_INITIALIZE_FIRST;
+                    return ERRORCODE_NANOVIEW.SR_SHUTTER_MOTION_ERROR;
                 }
             }
             catch (Exception ex)
@@ -523,11 +686,12 @@ namespace Root_CAMELLIA.LibSR_Met
                 return ERRORCODE_NANOVIEW.NANOVIEW_ERROR;
             }
         }
-        
-       public double GetAlphaFit()
+
+        public double GetAlphaFit()
         {
             return m_SR.Alpha1;
         }
+
 
         public ERRORCODE_NANOVIEW GetThickness(int nPointIndex, int nIteration, double dDampingFactor, bool isAlphafit = true)
         {
@@ -536,7 +700,7 @@ namespace Root_CAMELLIA.LibSR_Met
                 if (m_DM.bThickness)
                 {
                     m_SR.m_iteration = nIteration;
-                    m_SR.m_divratio = Math.Round(dDampingFactor,3);
+                    m_SR.m_divratio = Math.Round(dDampingFactor, 3);
                     m_SR.bAlpha1Fit = isAlphafit;
                     m_SR.Alpha1 = 1.0;
 
@@ -577,7 +741,7 @@ namespace Root_CAMELLIA.LibSR_Met
                         sw.Stop();
                         Debug.WriteLine("Fit >> " + sw.ElapsedMilliseconds.ToString());
 
-                     
+
                         Array.Copy(m_SR.FitY, data.CalcReflectance, m_DM.nThicknessDataNum);
 
                         data.Thickness.Clear();
@@ -585,7 +749,7 @@ namespace Root_CAMELLIA.LibSR_Met
                         {
                             data.Thickness.Add(m_SR.Thickness[n]);
                         }
-                        
+
                         double dAvgR = 0.0;
                         int nWLCount = 0;
                         double[] VIS_Wavelength = new double[ConstValue.SPECTROMETER_MAX_PIXELSIZE];
@@ -604,6 +768,10 @@ namespace Root_CAMELLIA.LibSR_Met
 
                         data.dGoF = m_Calculation.CalcGoF(data.VIS_Reflectance, data.CalcReflectance, 0, nWLCount, 0, nWLCount - 1, dAvgR);
 
+                        if (data.dGoF > 0.99999)
+                        {
+                            data.dGoF = 0.9999;
+                        }
 
                         if (rst == ERRORCODE_NANOVIEW.SR_NO_ERROR)
                         {
@@ -620,7 +788,7 @@ namespace Root_CAMELLIA.LibSR_Met
                             m_DM.m_Log.WriteLog(LogType.Error, sErr);
                             MessageBox.Show(sErr); //추후 제거
                         }
-                       
+
                         if (m_DM.bTransmittance)
                         {
                             if (GetTransmittance(nPointIndex))
@@ -652,9 +820,9 @@ namespace Root_CAMELLIA.LibSR_Met
                 {
                     m_DM.m_Log.WriteLog(LogType.Others, "No Cal Thickenss");
                     ERRORCODE_NANOVIEW rst = 0;
-                    return rst ;
+                    return rst;
                 }
-                
+
             }
             catch (Exception ex)
             {
@@ -749,7 +917,7 @@ namespace Root_CAMELLIA.LibSR_Met
                 string sFileName = Path.GetFileName(sMaterialFilePath);
 
                 int nRst = m_Model.LoadMaterialFile(sMaterialFilePath);
-                if(nRst == 0)
+                if (nRst == 0)
                 {
                     m_DM.m_Log.WriteLog(LogType.Operating, "Material(" + sFileName + ") file load done.");
                     return ERRORCODE_NANOVIEW.SR_NO_ERROR;
@@ -780,6 +948,12 @@ namespace Root_CAMELLIA.LibSR_Met
         {
             try
             {
+                m_SR.BackIntTime_NIR = m_DM.m_SettngData.nBGIntTime_NIR;
+                m_SR.Average_NIR = m_DM.m_SettngData.nAverage_NIR;
+                m_SR.IntTime_VIS = m_DM.m_SettngData.nInitCalIntTime_VIS;
+                m_SR.IntTime_NIR = m_DM.m_SettngData.nInitCalIntTime_NIR;
+                m_SR.BackIntTime_VIS = m_DM.m_SettngData.nBGIntTime_VIS;
+                m_SR.Average_VIS = m_DM.m_SettngData.nAverage_VIS;
 
                 if (m_bSRInitialized == false)
                 {
@@ -868,8 +1042,8 @@ namespace Root_CAMELLIA.LibSR_Met
             }
             string strTempPath = string.Empty;
             string strNKFilePath = string.Empty;
-            string strNKFileFormat = string.Empty; 
-            int nWLStart = Convert .ToInt32(m_DM.nStartWavelegth);
+            string strNKFileFormat = string.Empty;
+            int nWLStart = Convert.ToInt32(m_DM.nStartWavelegth);
             int nWLStop;
 
             if (m_DM.bExcept_NIR)
@@ -1041,26 +1215,33 @@ namespace Root_CAMELLIA.LibSR_Met
         ///</summary>
         public ERRORCODE_NANOVIEW GetLightSourceStatus(ref bool bLampOperation, ref bool bControllerOperation, ref bool bLampOn, ref bool bLaserOn)
         {
+            //Lamp fault/controller  o:NG/1:OK
+            //Lamp On/ Laser ON 0:OFF/ 1:ON
             try
             {
                 int[] LightSignal = new int[4];
                 int pixelDepth = m_SR.PixelDepth;
-                ERRORCODE_NANOVIEW rst = (ERRORCODE_NANOVIEW)m_SR.CheckLight(LightSignal);
+                m_SR.CheckLight(LightSignal);
 
                 if (LightSignal[0] == 0)
-                    bLampOperation = true;
-                else
                 {
                     bLampOperation = false;
                     m_DM.m_Log.WriteLog(LogType.Error, "Lamp Fault!");
                 }
+                else
+                {
+                    bLampOperation = true;
+                }
 
                 if (LightSignal[1] == 0)
-                    bControllerOperation = true;
-                else
                 {
                     bControllerOperation = false;
                     m_DM.m_Log.WriteLog(LogType.Error, "Lamp Controller Fault!");
+                }
+                else
+                {
+                    bControllerOperation = true;
+
                 }
 
                 if (LightSignal[2] == 0)
@@ -1084,7 +1265,7 @@ namespace Root_CAMELLIA.LibSR_Met
                     m_DM.m_Log.WriteLog(LogType.Operating, "LaserOn: " + bLaserOn.ToString());
                     m_bPreLaserOn = bLaserOn;
                 }
-                return rst;
+                return ERRORCODE_NANOVIEW.SR_NO_ERROR;
             }
             catch (Exception ex)
             {
@@ -1094,134 +1275,554 @@ namespace Root_CAMELLIA.LibSR_Met
             }
         }
 
-        public void LightSourceLogging(string DirectoryPath)//input : Write Log 생성 및 작성 경로
+        //public void LightSourceLogging(string DirectoryPath)//input : Write Log 생성 및 작성 경로
+        //{
+        //    try
+        //    {
+        //        //로그상의 최신상태를 기록하는 불변수
+        //        bool bError = false;
+        //        bool bOn = false;
+        //        bool bOff = false;
+
+        //        string CurrentFilePath = DirectoryPath + "\\LightLog.txt";
+        //        if (!File.Exists(CurrentFilePath))//로그파일이 없으면 새로 생성
+        //        {
+        //            StreamWriter LightLog = File.CreateText(CurrentFilePath);
+        //            LightLog.Close();
+        //        }
+        //        else
+        //        {
+        //            StreamReader LogReader = new StreamReader(CurrentFilePath);
+
+        //            while (!LogReader.EndOfStream)//로그에서 가장 마지막 상태를 기록
+        //            {
+        //                string StatusCode = LogReader.ReadLine().Split(',')[0];
+
+        //                if (StatusCode == "켜짐")
+        //                {
+        //                    bOn = true;
+        //                    bOff = false;
+        //                    bError = false;
+        //                }
+        //                else if (StatusCode == "꺼짐")
+        //                {
+        //                    bOn = false;
+        //                    bOff = true;
+        //                    bError = false;
+        //                }
+        //                else if (StatusCode == "에러")
+        //                {
+        //                    bOn = false;
+        //                    bOff = false;
+        //                    bError = true;
+        //                }
+        //            }
+        //            LogReader.Close();
+        //        }
+
+        //        int[] LightSignal = new int[4];
+        //        string[] LightResult = new string[1];
+
+        //        ERRORCODE_NANOVIEW rst = (ERRORCODE_NANOVIEW)m_SR.CheckLight(LightSignal);
+
+        //        if ((LightSignal[0] != 1 || LightSignal[1] != 1) && !bError)//에러가 발생했고, 가장 최근 로그가 에러가 아니면
+        //        {
+        //            LightResult[0] = "에러," + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+        //            File.AppendAllLines(CurrentFilePath, LightResult);
+        //        }
+
+        //        if (LightSignal[2] == 1 && !bOff)
+        //        {
+        //            LightResult[0] = "꺼짐," + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+        //            File.AppendAllLines(CurrentFilePath, LightResult);
+        //        }
+        //        else if (LightSignal[2] != 1 && !bOn)
+        //        {
+        //            LightResult[0] = "켜짐," + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+        //            File.AppendAllLines(CurrentFilePath, LightResult);
+        //        }
+
+
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        m_DM.m_Log.WriteLog(LogType.Error, ex.Message);
+        //        MessageBox.Show(ex.Message);
+        //    }
+        //}
+
+        //public void ChangeLightSourceLog(string DirectoryPath)//input으로 로그생성 폴더까지만입력, 기존 조명로그파일의 이름을 변경하여 백업함
+        //{
+        //    string CurrentFilePath = DirectoryPath + "\\LightLog.txt";
+        //    if (File.Exists(CurrentFilePath))
+        //    {
+        //        string newFilePath = DirectoryPath + "\\LightLog.txt";
+        //        int i = 1;
+        //        while (File.Exists(newFilePath))
+        //        {
+        //            newFilePath = DirectoryPath.Replace(".txt", String.Format("({0:C}).txt", i));
+        //            File.Move(DirectoryPath, newFilePath);
+        //            i++;
+        //        }
+
+        //        File.Move(CurrentFilePath, newFilePath);
+        //    }
+        //}
+
+        //public double GetLightSourceUsedTime(string DirectoryPath)// 몇시간사용했는지 나옴 Round로 소수 자리수 끊어서 사용
+        //{
+        //    string CurrentFilePath = DirectoryPath + "\\LightLog.txt";
+        //    if (File.Exists(CurrentFilePath))
+        //    {
+        //        TimeSpan OnWorking = TimeSpan.Zero;
+        //        StreamReader LogReader = new StreamReader(CurrentFilePath);
+        //        string[] Line = LogReader.ReadLine().Split(',');
+        //        string PreStatus = Line[0];
+        //        string PreTime = Line[1];
+        //        while (!LogReader.EndOfStream)
+        //        {
+        //            Line = LogReader.ReadLine().Split(',');
+        //            string CurrentStatus = Line[0];
+        //            string CurrentTime = Line[1];
+        //            if (PreStatus == "켜짐" && (CurrentStatus != "켜짐")) // => 꺼짐 to 켜짐
+        //            {
+        //                OnWorking += DateTime.ParseExact(CurrentTime, "yyyy-MM-dd HH:mm:ss", System.Globalization.CultureInfo.InvariantCulture) - DateTime.ParseExact(PreTime, "yyyy-MM-dd HH:mm:ss", System.Globalization.CultureInfo.InvariantCulture);
+        //            }
+        //            PreStatus = CurrentStatus;
+        //            PreTime = CurrentTime;
+        //        }
+        //        if (Line[0] == "켜짐") //로그에서 켜짐으로 끝나는 경우 현재와 시간계산 한 값 추가
+        //        {
+        //            OnWorking += DateTime.Now - DateTime.ParseExact(Line[1], "yyyy-MM-dd HH:mm:ss", System.Globalization.CultureInfo.InvariantCulture);
+        //        }
+
+        //        return OnWorking.TotalHours;
+        //    }
+        //    else
+        //    {
+        //        return -1;//파일이 존재하지않을때
+        //    }
+        //}
+
+        #region Shutter 관련 기능
+        public bool ShutterMotion(bool bShutterOpen)
         {
-            try
+            bool bOpen = false;
+            if (bShutterOpen)
             {
-                //로그상의 최신상태를 기록하는 불변수
-                bool bError = false;
-                bool bOn = false;
-                bool bOff = false;
-
-                string CurrentFilePath = DirectoryPath + "\\LightLog.txt";
-                if (!File.Exists(CurrentFilePath))//로그파일이 없으면 새로 생성
-                {
-                    StreamWriter LightLog = File.CreateText(CurrentFilePath);
-                    LightLog.Close();
-                }
-                else
-                {
-                    StreamReader LogReader = new StreamReader(CurrentFilePath);
-
-                    while (!LogReader.EndOfStream)//로그에서 가장 마지막 상태를 기록
-                    {
-                        string StatusCode = LogReader.ReadLine().Split(',')[0];
-
-                        if (StatusCode == "켜짐")
-                        {
-                            bOn = true;
-                            bOff = false;
-                            bError = false;
-                        }
-                        else if (StatusCode == "꺼짐")
-                        {
-                            bOn = false;
-                            bOff = true;
-                            bError = false;
-                        }
-                        else if (StatusCode == "에러")
-                        {
-                            bOn = false;
-                            bOff = false;
-                            bError = true;
-                        }
-                    }
-                    LogReader.Close();
-                }
-
-                int[] LightSignal = new int[4];
-                string[] LightResult = new string[1];
-
-                ERRORCODE_NANOVIEW rst = (ERRORCODE_NANOVIEW)m_SR.CheckLight(LightSignal);
-
-                if ((LightSignal[0] != 1 || LightSignal[1] != 1) && !bError)//에러가 발생했고, 가장 최근 로그가 에러가 아니면
-                {
-                    LightResult[0] = "에러," + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
-                    File.AppendAllLines(CurrentFilePath, LightResult);
-                }
-
-                if (LightSignal[2] == 1 && !bOff)
-                {
-                    LightResult[0] = "꺼짐," + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
-                    File.AppendAllLines(CurrentFilePath, LightResult);
-                }
-                else if (LightSignal[2] != 1 && !bOn)
-                {
-                    LightResult[0] = "켜짐," + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
-                    File.AppendAllLines(CurrentFilePath, LightResult);
-                }
-
-
-            }
-            catch (Exception ex)
-            {
-                m_DM.m_Log.WriteLog(LogType.Error, ex.Message);
-                MessageBox.Show(ex.Message);
-            }
-        }
-
-        public void ChangeLightSourceLog(string DirectoryPath)//input으로 로그생성 폴더까지만입력, 기존 조명로그파일의 이름을 변경하여 백업함
-        {
-            string CurrentFilePath = DirectoryPath + "\\LightLog.txt";
-            if (File.Exists(CurrentFilePath))
-            {
-                string newFilePath = DirectoryPath + "\\LightLog.txt";
-                int i = 1;
-                while (File.Exists(newFilePath))
-                {
-                    newFilePath = DirectoryPath.Replace(".txt", String.Format("({0:C}).txt", i));
-                    File.Move(DirectoryPath, newFilePath);
-                    i++;
-                }
-
-                File.Move(CurrentFilePath, newFilePath);
-            }
-        }
-
-        public double GetLightSourceUsedTime(string DirectoryPath)// 몇시간사용했는지 나옴 Round로 소수 자리수 끊어서 사용
-        {
-            string CurrentFilePath = DirectoryPath + "\\LightLog.txt";
-            if (File.Exists(CurrentFilePath))
-            {
-                TimeSpan OnWorking = TimeSpan.Zero;
-                StreamReader LogReader = new StreamReader(CurrentFilePath);
-                string[] Line = LogReader.ReadLine().Split(',');
-                string PreStatus = Line[0];
-                string PreTime = Line[1];
-                while (!LogReader.EndOfStream)
-                {
-                    Line = LogReader.ReadLine().Split(',');
-                    string CurrentStatus = Line[0];
-                    string CurrentTime = Line[1];
-                    if (PreStatus == "켜짐" && (CurrentStatus != "켜짐")) // => 꺼짐 to 켜짐
-                    {
-                        OnWorking += DateTime.ParseExact(CurrentTime, "yyyy-MM-dd HH:mm:ss", System.Globalization.CultureInfo.InvariantCulture) - DateTime.ParseExact(PreTime, "yyyy-MM-dd HH:mm:ss", System.Globalization.CultureInfo.InvariantCulture);
-                    }
-                    PreStatus = CurrentStatus;
-                    PreTime = CurrentTime;
-                }
-                if (Line[0] == "켜짐") //로그에서 켜짐으로 끝나는 경우 현재와 시간계산 한 값 추가
-                {
-                    OnWorking += DateTime.Now - DateTime.ParseExact(Line[1], "yyyy-MM-dd HH:mm:ss", System.Globalization.CultureInfo.InvariantCulture);
-                }
-
-                return OnWorking.TotalHours;
+                m_SR.ShutterMotion(1);
+                bOpen = false;
+                return bOpen;
             }
             else
             {
-                return -1;//파일이 존재하지않을때
+                m_SR.ShutterMotion(2);
+                bOpen = true;
+                return bOpen;
+            }
+
+        }
+
+        public bool CheckShutter()
+        {
+            bool bOpen = false;
+
+            if (m_SR.m_bShutterOpen == true)
+            {
+                bOpen = true;
+                return bOpen;
+            }
+            else
+            {
+                bOpen = false;
+                return bOpen;
             }
         }
 
+        #endregion
+
+
+        #region Lamp Controller  Check
+
+        public enum CheckLampState
+        {
+            SignalError = -3,
+            Error_Controller_Power_OFF = -2,
+            Error_Lamp_Switch_OFF = -1,
+            Error_Lamp_Temperature_High = 0,
+            ON = 1,
+            WarmUP = 2,
+            OFF = 3
+        }
+
+
+        public SerialPort sp = new SerialPort();
+        public void CloseLampSignal()
+        {
+            sp.Write("t");
+            string OutputData = sp.ReadLine();
+            string[] strtext = new string[7] { "H0:", "T0:", "L0:", "H1:", "T1:", "L1:", "Time:" };
+            string[] arr = OutputData.Split(':');
+            //string[] strarr = arr[1].Split(',');
+            double LampUseTime = 0.0;
+            double value = 0.0;
+            int Hr, Min, Sec;
+            int m_Hr_Org, m_Min_Org, m_Sec_Org;
+            int m_Hr, m_Min, m_Sec;
+            string filepath, timedata, strtime;
+            foreach (string str in strtext)
+            {
+                if (OutputData.Contains(str))
+                {
+                    if (OutputData.Contains("Time:"))
+                    {
+                        filepath = Application.StartupPath + "\\Timedata.txt";
+
+                        FileInfo fi = new FileInfo(filepath);
+
+                        m_Hr_Org = m_Min_Org = m_Sec_Org = 0;
+                        m_Hr = m_Min = m_Sec = 0;
+
+                        if (fi.Exists)
+                        {
+                            timedata = File.ReadAllText(@filepath);
+                            char sp = ':';
+                            string[] spstring = timedata.Split(sp);
+
+                            m_Hr_Org = Convert.ToInt32(spstring[0]);
+                            m_Min_Org = Convert.ToInt32(spstring[1]);
+                            m_Sec_Org = Convert.ToInt32(spstring[2]);
+
+                        }
+                        Sec = Convert.ToInt32(arr[1]);
+
+                        m_Sec = Sec + m_Sec_Org;
+
+                        if (m_Sec >= 60)
+                        {
+                            m_Min = (m_Sec / 60) + m_Min_Org;
+
+                            m_Sec = m_Sec % 60;
+                        }
+                        else
+                        {
+                            m_Min = m_Min_Org;
+                        }
+
+                        if (m_Min >= 60)
+                        {
+                            m_Hr = (m_Min / 60) + m_Hr_Org;
+
+                            m_Min = m_Min % 60;
+                        }
+                        else
+                        {
+                            m_Hr = m_Hr_Org;
+                        }
+                        value = m_Hr;
+                        strtime = string.Format("{0}:{1}:{2}", m_Hr, m_Min, m_Sec);
+                        using (StreamWriter SW = new StreamWriter(filepath))
+                        {
+                            SW.WriteLine(strtime);
+                        }
+                    }
+
+                }
+            }
+            sp.Write("c");
+        }
+        void InitLamp()
+        {
+            try
+            {
+                sp.PortName = "COM6";
+                sp.BaudRate = 9600;
+                sp.DataBits = 8;
+                sp.StopBits = StopBits.One;
+                sp.Parity = Parity.None;
+                //sp.DataReceived += new SerialDataReceivedEventHandler(serialPort1_DataReceived);
+                sp.Open();
+
+                sp.Write("t");
+                string OutputData = sp.ReadLine();
+                string[] strtext = new string[7] { "H0:", "T0:", "L0:", "H1:", "T1:", "L1:", "Time:" };
+                string[] arr = OutputData.Split(':');
+                //string[] strarr = arr[1].Split(',');
+                double LampUseTime = 0.0;
+                double value = 0.0;
+                int Hr, Min, Sec;
+                int m_Hr_Org, m_Min_Org, m_Sec_Org;
+                int m_Hr, m_Min, m_Sec;
+                string filepath, timedata, strtime;
+                foreach (string str in strtext)
+                {
+                    if (OutputData.Contains(str))
+                    {
+                        if (OutputData.Contains("Time:"))
+                        {
+                            filepath = Application.StartupPath + "\\Timedata.txt";
+
+                            FileInfo fi = new FileInfo(filepath);
+
+                            m_Hr_Org = m_Min_Org = m_Sec_Org = 0;
+                            m_Hr = m_Min = m_Sec = 0;
+
+                            if (!fi.Exists)
+                            {
+                                fi.Create();
+                                using (StreamWriter SW = new StreamWriter(filepath))
+                                {
+                                    SW.WriteLine("00:00:00");
+                                    SW.Close();
+                                }
+                                return;
+                            }
+
+                            timedata = File.ReadAllText(@filepath);
+
+                            char split = ':';
+                            string[] spstring = timedata.Split(split);
+
+                            m_Hr_Org = Convert.ToInt32(spstring[0]);
+                            m_Min_Org = Convert.ToInt32(spstring[1]);
+                            m_Sec_Org = Convert.ToInt32(spstring[2]);
+
+
+                            Sec = Convert.ToInt32(arr[1]);
+
+                            m_Sec = Sec + m_Sec_Org;
+
+                            if (m_Sec >= 60)
+                            {
+                                m_Min = (m_Sec / 60) + m_Min_Org;
+
+                                m_Sec = m_Sec % 60;
+                            }
+                            else
+                            {
+                                m_Min = m_Min_Org;
+                            }
+
+                            if (m_Min >= 60)
+                            {
+                                m_Hr = (m_Min / 60) + m_Hr_Org;
+
+                                m_Min = m_Min % 60;
+                            }
+                            else
+                            {
+                                m_Hr = m_Hr_Org;
+                            }
+                            value = m_Hr;
+                            strtime = string.Format("{0}:{1}:{2}", m_Hr, m_Min, m_Sec);
+                            using (StreamWriter SW = new StreamWriter(filepath))
+                            {
+                                SW.WriteLine(strtime);
+                            }
+                        }
+
+                    }
+                }
+                sp.Write("c");
+            }
+            catch
+            {
+                
+            }
+          
+        }
+
+        public double UpdateLampData(string CheckWord)
+        {
+            sp.Write(CheckWord);
+            string OutputData = sp.ReadLine();
+            string[] strtext = new string[7] { "H0:", "T0:", "L0:", "H1:", "T1:", "L1:", "Time:" };
+            string[] arr = OutputData.Split(':');
+            //string[] strarr = arr[1].Split(',');
+            double LampUseTime = 0.0;
+            double value = 0.0;
+            int Hr, Min, Sec;
+            int m_Hr_Org, m_Min_Org, m_Sec_Org;
+            int m_Hr, m_Min, m_Sec;
+            string filepath, timedata, strtime;
+            foreach (string str in strtext)
+            {
+                if (OutputData.Contains(str))
+                {
+                    if (OutputData.Contains("Time:"))
+                    {
+                        filepath = Application.StartupPath + "\\Timedata.txt";
+
+                        FileInfo fi = new FileInfo(filepath);
+
+                        m_Hr_Org = m_Min_Org = m_Sec_Org = 0;
+                        m_Hr = m_Min = m_Sec = 0;
+                        
+                        if (!fi.Exists)
+                        {
+                            fi.Create();
+                            using (StreamWriter SW = new StreamWriter(filepath))
+                            {
+                                SW.WriteLine("00:00:00");
+                                SW.Close();
+                            }
+                            return value;
+                        }
+
+                        timedata = File.ReadAllText(@filepath);
+                        char split = ':';
+                        string[] spstring = timedata.Split(split);
+
+                        m_Hr_Org = Convert.ToInt32(spstring[0]);
+                        m_Min_Org = Convert.ToInt32(spstring[1]);
+                        m_Sec_Org = Convert.ToInt32(spstring[2]);
+
+                        Sec = Convert.ToInt32(arr[1]);
+
+                        m_Sec = Sec + m_Sec_Org;
+
+                        if (m_Sec >= 60)
+                        {
+                            m_Min = (m_Sec / 60) + m_Min_Org;
+
+                            m_Sec = m_Sec % 60;
+                        }
+                        else
+                        {
+                            m_Min = m_Min_Org;
+                        }
+
+                        if (m_Min >= 60)
+                        {
+                            m_Hr = (m_Min / 60) + m_Hr_Org;
+
+                            m_Min = m_Min % 60;
+                        }
+                        else
+                        {
+                            m_Hr = m_Hr_Org;
+                        }
+                        value = m_Hr;
+                        strtime = string.Format("{0}:{1}:{2}", m_Hr, m_Min, m_Sec);
+                        using (StreamWriter SW = new StreamWriter(filepath))
+                        {
+                            SW.WriteLine(strtime);
+                        }
+                        sp.Write("c");
+                    }
+                    else
+                    {
+                        decimal number1 = 0;
+                        bool canConvert = decimal.TryParse(arr[1], out number1);
+                        if (canConvert == true)
+                            value = Convert.ToDouble(number1);
+                    }
+
+
+                }
+
+            }
+            return value;
+        }
+        private void UpdateLampTime(bool Initialize)
+        {
+            double LampUseTime = UpdateLampData("t");
+
+            //p_LampTimeCount = LampUseTime;
+
+            if (LampUseTime > 9500)
+            {
+                LampPMCheck(10000 - LampUseTime);
+            }
+        }
+        private void LampPMCheck(double dLeftLampTime)
+        {
+            //if (dLeftLampTime >= 0)
+            //{
+            //    string sLeftLampTime = dLeftLampTime.ToString();
+            //    p_LampTimeError = sLeftLampTime + " Hours Left until PM !";
+
+            //}
+            //else
+            //{
+            //    p_LampTimeError = "Please, Do Lamp PM";
+            //}
+        }
+
+
+        #endregion
+
+        #region 램프 상태 체크
+        public CheckLampState LampState()
+        {
+            bool LampFault = false;
+            bool Controller = false;
+            bool LampON = false;
+            bool LaserON = false;
+            bool VISLightON = false;
+            bool NIRLightON = false;
+            //double rst = 0.0;
+            CheckLampState rst = CheckLampState.ON;
+            if (UpdateLampData("1") > 0)
+            {
+                VISLightON = true;
+            }
+            else
+            {
+                VISLightON = false;
+            }
+            if (UpdateLampData("2") > 0)
+            {
+                NIRLightON = true;
+            }
+            else
+            {
+                NIRLightON = false;
+            }
+
+            if (GetLightSourceStatus(ref LampFault, ref Controller, ref LampON, ref LaserON) != Nanoview.ERRORCODE_NANOVIEW.SR_NO_ERROR)
+            {
+                // 나머지 작업할 항목
+                if (LaserON == true && LampON == false)
+                {
+                    rst = CheckLampState.WarmUP;
+                }
+                else if (LaserON == true && LampON == true)
+                {
+                    rst = CheckLampState.ON;
+                }
+                else if (LampFault == false || Controller == false)
+                {
+                    if (!LampFault)
+                    {
+                        rst = CheckLampState.Error_Lamp_Switch_OFF;
+                    }
+                    if (!Controller)
+                    {
+                        rst = CheckLampState.Error_Lamp_Temperature_High;
+                    }
+                }
+
+                else if (LampFault == false && Controller == false && LampON == true)
+                {
+                    rst = CheckLampState.Error_Controller_Power_OFF;
+                }
+                else
+                {
+                    if (VISLightON == true && NIRLightON == true)
+                    {
+                        rst = CheckLampState.SignalError;
+                    }
+                    else if (VISLightON == false && NIRLightON == false)
+                    {
+                        rst = CheckLampState.OFF;
+                    }
+                }
+
+            }
+            return rst;
+        }
     }
+    #endregion
 }
+

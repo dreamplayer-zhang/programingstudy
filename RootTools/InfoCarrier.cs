@@ -235,7 +235,7 @@ namespace RootTools
         {
             if (nID < 0) return;
             if (nID >= p_lWafer) return;
-            m_aInfoWafer[nID] = (InfoWafer)m_aGemSlot[nID];
+            m_aInfoWafer[nID] = new InfoWafer((InfoWafer)m_aGemSlot[nID]);
             SaveInfoWafer(nID);
         }
         #endregion
@@ -283,6 +283,40 @@ namespace RootTools
                 else SetInfoWafer(n, null);
             }
             return "OK";
+        }
+
+        public string GetMapData()
+        {
+            string map = "";
+            foreach(GemSlotBase slot in m_aGemSlot)
+            {
+                switch (slot.p_eState)
+                {
+                    case GemSlotBase.eState.Empty:
+                        map += "0";
+                        break;
+                    case GemSlotBase.eState.Exist:
+                        map += "1";
+                        break;
+                    case GemSlotBase.eState.Double:
+                        map += "D";
+                        break;
+                    case GemSlotBase.eState.Cross:
+                        map += "C";
+                        break;
+                    default:
+                        map += "-";
+                        break;
+                }
+            }
+            //if (p_lWafer > aSlotState.Count) return "SetMapData Lendth Error";
+            //for (int n = 0; n < p_lWafer; n++)
+            //{
+            //    m_aGemSlot[n].p_eState = aSlotState[n];
+            //    if (aSlotState[n] == GemSlotBase.eState.Exist) SetInfoWafer(n);
+            //    else SetInfoWafer(n, null);
+            //}
+            return map;
         }
 
         public string SetSelectMapData(InfoCarrier infoCarrier)

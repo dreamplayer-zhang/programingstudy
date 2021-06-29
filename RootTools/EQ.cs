@@ -15,6 +15,7 @@ namespace RootTools
             Run,
             Recovery,  //LYJ 210128 add
             Error,
+            ModuleRunList,
             Null
         }
 

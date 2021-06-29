@@ -128,7 +128,12 @@ namespace Root_VEGA_D
             RecipeWizardTab.Visibility = (m_engineer.m_login.p_eLevel >= Login.eLevel.Operator) ? Visibility.Visible : Visibility.Collapsed;
             //TextBlockRetID.DataContext = m_handler.m_aLoadport[0].p_infoCarrier.m_aGemSlot[0];
         }
+
         //bool m_blogin = false;
+
+
+
+
 
         void ThreadStop()
         {

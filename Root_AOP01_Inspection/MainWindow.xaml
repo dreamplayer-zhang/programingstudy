@@ -54,11 +54,15 @@
                        HorizontalAlignment="Center"/>
             <StackPanel WindowChrome.IsHitTestVisibleInChrome="True"
                         HorizontalAlignment="Right"
-                        Orientation="Horizontal"
-                        Grid.Column="2">
-                <TextBlock Text="OFFLINE"
+                        Orientation="Horizontal" Width="183">
+                <Button HorizontalAlignment="Left" VerticalAlignment="Top" Width="97" Height="25" FontFamily="Arial" FontWeight="Bold" 
+                    Background="{DynamicResource MainThema}"
+                    BorderThickness="0,0,0,0"
+                    AutomationProperties.Name="btnControlState">
+                    <TextBlock Name="textControlState" Text="OFFLINE"
                        Foreground="White"
-                       VerticalAlignment="Center" Margin="20,0"/>
+                       VerticalAlignment="Center" RenderTransformOrigin="0.176,0.572" Width="95" FontSize="11" TextAlignment="Center"/>
+                </Button>
                 <Button Style="{StaticResource SystemButton}"
                         x:Name="MinimizeButton"
                         Width="30"
@@ -183,6 +187,7 @@
                         <MenuItem Background="{StaticResource ControlBackGround}"
                                   BorderBrush="#FF707070"
                                   Width="100"
+                                  x:Name="NetworkMenu"
                                   BorderThickness="0,0,0,0" Padding="0">
                             <MenuItem.Header>
                                 <Grid Width="100">
@@ -193,13 +198,13 @@
                                                HorizontalAlignment="Center"/>
                                 </Grid>
                             </MenuItem.Header>
-                            <MenuItem Header="Online">
+                            <MenuItem Header="Offline" x:Name="NetworkOffline" Click="GemOffline_Click">
 
                             </MenuItem>
-                            <MenuItem Header="Offline" IsEnabled="False">
+                            <MenuItem Header="Local" x:Name="NetworkLocal" Click="GemLocal_Click">
 
                             </MenuItem>
-                            <MenuItem Header="GEM" IsEnabled="False">
+                            <MenuItem Header="Online" x:Name="NetworkOnline" Click="GemOnline_Click">
 
                             </MenuItem>
 
@@ -248,20 +253,20 @@
                                                HorizontalAlignment="Center"/>
                                 </Grid>
                             </MenuItem.Header>
-						</MenuItem>
-						<MenuItem Background="{StaticResource ControlBackGround}"
+                        </MenuItem>
+                        <MenuItem Background="{StaticResource ControlBackGround}"
                                   BorderBrush="#FF707070"
                                   Width="110"
 								  Click="btnPopUpSetting">
-							<MenuItem.Header>
-								<TextBlock Text="Setting" 
+                            <MenuItem.Header>
+                                <TextBlock Text="Setting" 
                                                FontSize="13"
                                                FontWeight="Bold"
                                                VerticalAlignment="Center"
                                                HorizontalAlignment="Center"/>
-							</MenuItem.Header>
-						</MenuItem>
-					</Menu>
+                            </MenuItem.Header>
+                        </MenuItem>
+                    </Menu>
                 </StackPanel>
                 <Menu Background="{StaticResource ControlBackGround}" HorizontalAlignment="Right">
                     <MenuItem Background="{StaticResource ControlBackGround}"
@@ -307,7 +312,7 @@
                     </TabItem.Header>
                     <TabControl Visibility="{Binding ElementName=viewLog, Path=IsChecked, Converter={StaticResource BooleanToVisiblity}}">
                         <tools:LogView_UI x:Name="logViewUI" Margin="2"/>
-                    </TabControl> 
+                    </TabControl>
                 </TabItem>
                 <!--<TabItem Width="50" Visibility="{Binding ElementName=viewAlarm, Path=IsChecked, Converter={StaticResource BooleanToVisiblity}}">
                     <TabItem.Header>

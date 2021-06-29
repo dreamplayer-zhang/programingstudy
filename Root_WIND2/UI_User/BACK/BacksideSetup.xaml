@@ -40,17 +40,45 @@
                     <Button Content="Clear" Command="{Binding btnClearCommand}" Style="{StaticResource imageViewer_toolbar_button}"/>
                     <Button IsEnabled="False" Content="RGB" Style="{StaticResource imageViewer_toolbar_button}"/>
 
-                    <TextBlock Text="Tool" Margin="12,0,4,0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                    <CheckBox Content="ROI" IsChecked="{Binding IsROIChecked, Mode=TwoWay}" Command="{Binding btnROICommand}" Style="{StaticResource imageViewer_toolbar_checkbox}"/>
+                    <TextBlock Text="Center Point" Margin="12,0,4,0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                    <CheckBox Content="Circle" IsChecked="{Binding IsROIChecked, Mode=TwoWay}" Command="{Binding btnROICommand}" Style="{StaticResource imageViewer_toolbar_checkbox}"/>
+                    <Button Content="Detect" Command="{Binding btnCircleDetectCommand}" Style="{StaticResource imageViewer_toolbar_button}"/>
+                    <Button Content="Save" Command="{Binding btnCircleSaveCommand}" Style="{StaticResource imageViewer_toolbar_button}"/>
+                    <Button Content="Clear" Command="{Binding btnCircleClearCommand}" Style="{StaticResource imageViewer_toolbar_button}"/>
+
+                    <TextBlock Text="Exclusive Region" Margin="12,0,4,0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                    <CheckBox Content="Poly" IsChecked="{Binding IsPolyChecked, Mode=TwoWay}" Command="{Binding btnPolyCommand}" Style="{StaticResource imageViewer_toolbar_checkbox}"/>
+                    <Button Content="Save" Command="{Binding btnSavePolyCommand}" Style="{StaticResource imageViewer_toolbar_button}"/>
+                    <Button Content="Cancel" Command="{Binding btnCancelPolyCommand}" Style="{StaticResource imageViewer_toolbar_button}"/>
+                    <Button Content="Clear" Command="{Binding btnClearPolyCommand}" Style="{StaticResource imageViewer_toolbar_button}"/>
                 </StackPanel>
                 <Grid Grid.Row="1" >
-
                     <tools:RootViewer />
                 </Grid>
             </Grid>
         </GroupBox>
         <Grid  Grid.Column="1">
             <Grid.RowDefinitions>
+                <RowDefinition />
+                <RowDefinition />
+            </Grid.RowDefinitions>
+            <GroupBox Header="MapViewer" Margin="4" Style="{StaticResource main_view_groupbox}">
+                <vision:MapViewer DataContext="{Binding MapViewerVM}"  Margin="4"/>
+            </GroupBox>
+            <GroupBox Header="" 
+                      Grid.Row="1"
+                      Style="{StaticResource main_view_groupbox}">
+                <StackPanel Orientation="Vertical">
+                    <Button Content="Create ROI"
+                        Command="{Binding btnCreateROICommand}"
+                        Style="{StaticResource groupbox_button}"/>
+                </StackPanel>
+            </GroupBox>
+            
+                
+            
+            
+            <!--<Grid.RowDefinitions>
                 <RowDefinition Height="500" />
                 <RowDefinition Height="226"/>
                 <RowDefinition />
@@ -183,7 +211,7 @@
                     </Grid>
                     <Button Content="Create ROI" Command="{Binding btnCreateROICommand}" Style="{StaticResource groupbox_button}"/>
                 </StackPanel>
-            </GroupBox>
+            </GroupBox>-->
         </Grid>
     </Grid>
 </UserControl>

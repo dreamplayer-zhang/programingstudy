@@ -63,10 +63,10 @@ namespace RootTools_Vision
 
                 Tools.SpliteColor(this.rawData, this.rawDataR, this.rawDataG, this.rawDataB);
 
-                Tools.SaveRawdataToBitmap("D:\\Image.bmp", this.rawData, this.width, this.height, this.byteCnt);
-                Tools.SaveRawdataToBitmap("D:\\ImageR.bmp", this.rawDataR, this.width, this.height, 1);
-                Tools.SaveRawdataToBitmap("D:\\ImageG.bmp", this.rawDataG, this.width, this.height, 1);
-                Tools.SaveRawdataToBitmap("D:\\ImageB.bmp", this.rawDataB, this.width, this.height, 1);
+                //Tools.SaveRawdataToBitmap("D:\\Image.bmp", this.rawData, this.width, this.height, this.byteCnt);
+                //Tools.SaveRawdataToBitmap("D:\\ImageR.bmp", this.rawDataR, this.width, this.height, 1);
+                //Tools.SaveRawdataToBitmap("D:\\ImageG.bmp", this.rawDataG, this.width, this.height, 1);
+                //Tools.SaveRawdataToBitmap("D:\\ImageB.bmp", this.rawDataB, this.width, this.height, 1);
             }
         }
 

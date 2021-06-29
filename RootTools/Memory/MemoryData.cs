@@ -513,7 +513,7 @@ namespace RootTools.Memory
                     }
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 return "Occured error opening BMP file";
             }
@@ -751,7 +751,7 @@ namespace RootTools.Memory
                 else
                     return "Cannot read addresss in MemoryData";
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 return "Occured error writing BMP file";
             }

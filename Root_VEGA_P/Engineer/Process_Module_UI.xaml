@@ -1,0 +1,21 @@
+﻿<UserControl x:Class="Root_VEGA_P.Engineer.Process_Module_UI"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Root_VEGA_P.Engineer"
+             xmlns:tree="clr-namespace:RootTools.Trees;assembly=RootTools"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="180">
+    <StackPanel Orientation="Vertical" Width="180">
+        <GroupBox BorderBrush="Black" BorderThickness="1">
+            <GroupBox.Header>
+                <TextBlock x:Name="textBlockHeader" Foreground="Black" FontWeight="Bold"/>
+            </GroupBox.Header>
+            <StackPanel Orientation="Vertical">
+                <StackPanel x:Name="stackPanelInfoPod" Orientation="Vertical"/>
+                <tree:TreeUI x:Name="treeRootUI" Height="120" IsEnabled="False"/>
+            </StackPanel>
+        </GroupBox>
+    </StackPanel>
+</UserControl>

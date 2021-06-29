@@ -128,19 +128,16 @@ namespace Root_WIND2.UI_User
 			if (IsTopChecked)
 			{
 				ImageViewerVM.init(GlobalObjects.Instance.GetNamed<ImageData>("EdgeTopImage"), GlobalObjects.Instance.Get<DialogService>());
-				ModuleVM.SetName("TOP");
 				ModuleVM.SetRecipeParameter(recipe.GetItem<EdgeSurfaceRecipe>().EdgeRecipeBaseTop, recipe.GetItem<EdgeSurfaceParameter>().EdgeParamBaseTop);
 			}
 			else if (IsSideChecked)
 			{
 				ImageViewerVM.init(GlobalObjects.Instance.GetNamed<ImageData>("EdgeSideImage"), GlobalObjects.Instance.Get<DialogService>());
-				ModuleVM.SetName("Side");
 				ModuleVM.SetRecipeParameter(recipe.GetItem<EdgeSurfaceRecipe>().EdgeRecipeBaseSide, recipe.GetItem<EdgeSurfaceParameter>().EdgeParamBaseSide);
 			}
 			else if (IsBtmChecked)
 			{
 				ImageViewerVM.init(GlobalObjects.Instance.GetNamed<ImageData>("EdgeBottomImage"), GlobalObjects.Instance.Get<DialogService>());
-				ModuleVM.SetName("BOTTOM");
 				ModuleVM.SetRecipeParameter(recipe.GetItem<EdgeSurfaceRecipe>().EdgeRecipeBaseBtm, recipe.GetItem<EdgeSurfaceParameter>().EdgeParamBaseBtm);
 			}
 			else
@@ -151,10 +148,8 @@ namespace Root_WIND2.UI_User
 		{
 			RecipeEdge recipe = GlobalObjects.Instance.Get<RecipeEdge>();
 
-			if (recipe.GetItem<OriginRecipe>() == null)
-				return;
-			if (recipe.GetItem<EdgeSurfaceParameter>() == null)
-				return;
+			if (recipe.GetItem<OriginRecipe>() == null) return;
+			if (recipe.GetItem<EdgeSurfaceParameter>() == null) return;
 						
 			ModuleVM.OriginRecipe = recipe.GetItem<OriginRecipe>();
 			if (IsTopChecked)

@@ -21,7 +21,10 @@
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
-                        <Border>
+                        <Border x:Name="buttonBorder">
+                            <Border.Effect>
+                                <DropShadowEffect ShadowDepth="2" Opacity="0.5"/>
+                            </Border.Effect>
                             <Border.Style>
                                 <Style TargetType="{x:Type Border}">
                                     <Setter Property="CornerRadius" Value="10"></Setter>
@@ -40,6 +43,17 @@
                                 <ContentPresenter TextBlock.TextAlignment="Center" VerticalAlignment="Center" TextBlock.Foreground="White"/>
                             </Grid>
                         </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="buttonBorder" Property="Background" Value="Crimson"/>
+                                <Setter TargetName="buttonBorder" Property="Opacity" Value="0.45"/>
+                                <Setter TargetName="buttonBorder" Property="Effect">
+                                    <Setter.Value>
+                                        <DropShadowEffect ShadowDepth="2" Opacity="0"/>
+                                    </Setter.Value>
+                                </Setter>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>

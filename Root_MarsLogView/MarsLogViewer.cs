@@ -59,16 +59,44 @@ namespace Root_MarsLogView
 
         string GetVisionString(string sVision)
         {
-            string[] asMars = new string[14] { "", "", "", "'PRC'", "", "", "", "'Wafer'", "", "", "", "$", "0", "$" };
+            string[] asMars = new string[sVision.Length + 1];//vision으로 받을때는 시간 한개만 받는데 asmars에는 시간 날짜 따로 기입하여 +1
+            int index = sVision.IndexOf("LogType:");
+            string logtype = "";
+            if (index == -1) logtype = "PRC";
+            else sVision.Substring(index+8,3);//check 필요
+			string[] asVision = sVision.Split(',');
+			GetDateTime(asMars);
+
+            switch (logtype)
+            {
+                case "PRC": PRC_stringArrange(sVision,ref asMars);
+                    break;
+                case "LEH": 
+                    break;
+                case "FNC": 
+                    break;
+                case "XFR": 
+                    break;
+                case "CFG": CFG_stringArrange(asVision, ref asMars);
+					break;
+            }
+            string sLog = asMars[0];
+            for (int n = 1; n < 14; n++) sLog += '\t' + asMars[n];
+            return sLog;
+        }
+
+        void PRC_stringArrange(string sVision, ref string[] aasMars)
+		{
+            string[] asMars = new string[14] { "", "", "", "'PRC'", "", "", "", "'Wafer'", "1", "", "", "$", "0", "$" };
             string[] asVision = sVision.Split(',');
-            GetDateTime(asMars); 
+            GetDateTime(asMars);
             foreach (string sCmd in asVision)
             {
                 string[] asCmd = sCmd.Split(':');
-                if(asCmd[0] == "WaferID")
-				{
-					if (asCmd.Length == 3) asCmd[1] = asCmd[1] + ':' + asCmd[2];
-				}
+                if (asCmd[0] == "WaferID")
+                {
+                    if (asCmd.Length == 3) asCmd[1] = asCmd[1] + ':' + asCmd[2];
+                }
                 if (asCmd.Length >= 2)
                 {
                     switch (asCmd[0])
@@ -83,13 +111,17 @@ namespace Root_MarsLogView
                         case "RecipeName": asMars[10] = '\'' + asCmd[1] + '\''; break;
                         case "StepNumber": asMars[11] = asCmd[1]; break;
                         case "StepSeq": asMars[12] = asCmd[1]; break;
-                        case "StepName": asMars[13] = '\'' + asCmd[1] + '\''; break;
+                        case "StepName": 
+                            if (asCmd[1] == "$") asMars[13] = asCmd[1]; 
+                            else asMars[13] = '\'' + asCmd[1] + '\''; 
+                            break;
+
                     }
                 }
             }
             string sLog = asMars[0];
-            for (int n = 1; n < 14; n++) sLog += '\t' + asMars[n]; 
-            return sLog; 
+            for (int n = 1; n < 14; n++) sLog += '\t' + asMars[n];
+            return sLog;
         }
 
         void GetDateTime(string[] asMars)
@@ -126,7 +158,7 @@ namespace Root_MarsLogView
                         case "'XFR'": m_listXFR.Add(mars.m_iTCP, sLog, asLog); break;
                         case "'FNC'": m_listFNC.Add(mars.m_iTCP, sLog, asLog); break;
                         case "'LEH'": m_listLEH.Add(mars.m_iTCP, sLog, asLog); break;
-                        case "'CFG'": m_listCFG.Add(sLog, asLog); break;
+                        case "'CFG'": m_listCFG.Add(mars.m_iTCP, sLog, asLog); break; //210602 nscho
                         case "'Reset'":
                         case "Reset": Reset(mars.m_iTCP); break; 
                     }
@@ -143,13 +175,14 @@ namespace Root_MarsLogView
             m_listPRC.Reset(iTCP, sDate, sTime);
             m_listXFR.Reset(iTCP, sDate, sTime);
             m_listLEH.Reset(iTCP, sDate, sTime);
+            m_listCFG.Reset(iTCP, sDate, sTime); //210602 nscho
         }
         #endregion
 
         #region Write Event
         public void WriteEvent(string sLog)
         {
-            if (sLog[sLog.Length - 1] == '$') sLog = sLog.Substring(0, sLog.Length - 1);
+            if (sLog[sLog.Length - 1] == '$') sLog = sLog.Substring(0, sLog.Length);
             string sFile = GetFileName(sLog);
             bool bExist = File.Exists(sFile); 
             StreamWriter sw = new StreamWriter(new FileStream(sFile, FileMode.Append));
@@ -232,6 +265,7 @@ namespace Root_MarsLogView
             m_listXFR.ThreadStop(sDate, sTime);
             m_listFNC.ThreadStop(sDate, sTime);
             m_listLEH.ThreadStop(sDate, sTime);
+            m_listCFG.ThreadStop(sDate, sTime); //210602 nscho
             m_tcpServer[0].ThreadStop();
             m_tcpServer[1].ThreadStop();
         }

@@ -399,13 +399,22 @@ namespace Root_VEGA_D.Engineer
                 return EQ.IsStop() ? "EQ Stop" : "OK";
             }
             Sequence sequence = m_qSequence.Peek();
+            if (sequence.m_moduleRun.p_id.Contains(".Docking") && !EQ.p_bRecovery)
+            {
+                ModuleRunBase VisionPM = handler.m_vision.m_runPM.Clone();
+                handler.m_vision.StartRun(VisionPM);
+                while (handler.m_vision.IsBusy() && (EQ.IsStop() == false)) Thread.Sleep(10);
+                if (EQ.IsStop()) return "EQ Stop";
+            }
+            ModuleBase module = sequence.m_moduleRun.m_moduleBase;
             //bool bLoadport = sequence.m_moduleRun.m_moduleBase is ILoadport;
-            //if ((sequence.m_moduleRun.m_moduleBase == wtr) || bLoadport)
-            //{
-            //    sequence.m_moduleRun.StartRun();
-            //    while (wtr.IsBusy() && (EQ.IsStop() == false)) Thread.Sleep(10);
-            //}
-            sequence.m_moduleRun.StartRun();
+			//if ((sequence.m_moduleRun.m_moduleBase == wtr) || bLoadport)
+			//{
+			//	sequence.m_moduleRun.StartRun();
+			//	while (wtr.IsBusy() && (EQ.IsStop() == false)) Thread.Sleep(10);
+			//}
+			sequence.m_moduleRun.StartRun();
+            while (module.IsBusy() && (EQ.IsStop() == false)) Thread.Sleep(10);
             m_qSequence.Dequeue();
             m_dSequencePercent += m_dOneSequencePercent;
             InfoWafer infoWafer = sequence.m_infoWafer;
@@ -503,6 +512,7 @@ namespace Root_VEGA_D.Engineer
         public string m_id;
         IEngineer m_engineer;
         public IHandler m_handler;
+        VEGA_D_Handler handler;
         IWTR m_wtr;
         Log m_log;
         public VEGA_D_Process(string id, IEngineer engineer, IWTR wtr)
@@ -510,6 +520,7 @@ namespace Root_VEGA_D.Engineer
             m_id = id;
             m_engineer = engineer;
             m_handler = engineer.ClassHandler();
+            handler = (VEGA_D_Handler)m_engineer.ClassHandler();
             m_wtr = wtr;
             m_log = LogView.GetLog(id);
             InitTree(id);

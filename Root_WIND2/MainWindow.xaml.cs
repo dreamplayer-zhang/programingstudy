@@ -44,7 +44,7 @@ namespace Root_WIND2
         {
             Init();
 
-            MessageBox.Show("DDD");
+            //MessageBox.Show("DDD");
         }
 
         private void Window_Closing(object sender, CancelEventArgs e)
@@ -254,10 +254,13 @@ namespace Root_WIND2
                 RecipeEdge recipeEdge = GlobalObjects.Instance.Register<RecipeEdge>();
                 RecipeEBR recipeEBR = GlobalObjects.Instance.Register<RecipeEBR>();
 
+                //Align
+                RecipeAlign recipeAlign = GlobalObjects.Instance.Register<RecipeAlign>();
 
+                
                 if (frontImage.GetPtr() != IntPtr.Zero)
                 {
-                    RootTools_Vision.WorkManager3.WorkManager frontInspection = GlobalObjects.Instance.RegisterNamed<RootTools_Vision.WorkManager3.WorkManager>("frontInspection", 4);
+                    RootTools_Vision.WorkManager3.WorkManager frontInspection = GlobalObjects.Instance.RegisterNamed<RootTools_Vision.WorkManager3.WorkManager>("frontInspection", 4, true);
 
                     frontInspection.SetRecipe(recipeFront);
                     frontInspection.SetSharedBuffer(new SharedBufferInfo(
@@ -268,6 +271,10 @@ namespace Root_WIND2
                             frontImage.GetPtr(1), 
                             frontImage.GetPtr(2), 
                                 new MemoryID(memoryFrontPool, memoryFrontGroup, memoryFront)));
+
+
+                    CameraInfo camInfo = DataConverter.GrabModeToCameraInfo(engineer.m_handler.p_Vision.GetGrabMode(recipeFront.CameraInfoIndex));
+                    frontInspection.SetCameraInfo(camInfo);
                 }
 
                 //if (frontImage.GetPtr() == IntPtr.Zero)
@@ -300,7 +307,7 @@ namespace Root_WIND2
                 }
                 else
                 {
-                    RootTools_Vision.WorkManager3.WorkManager backInspection = GlobalObjects.Instance.RegisterNamed<RootTools_Vision.WorkManager3.WorkManager>("backInspection", 4);
+                    RootTools_Vision.WorkManager3.WorkManager backInspection = GlobalObjects.Instance.RegisterNamed<RootTools_Vision.WorkManager3.WorkManager>("backInspection", 4, true);
 
                     backInspection.SetRecipe(recipeBack);
                     backInspection.SetSharedBuffer(new SharedBufferInfo(
@@ -322,17 +329,42 @@ namespace Root_WIND2
 
                 if (edgeTopImage.GetPtr() != IntPtr.Zero)
                 {
-                    RootTools_Vision.WorkManager3.WorkManager edgeTopInspection = GlobalObjects.Instance.RegisterNamed<RootTools_Vision.WorkManager3.WorkManager>("edgeTopInspection", 5);
+                    //RootTools_Vision.WorkManager3.WorkManager edgeTopInspection = GlobalObjects.Instance.RegisterNamed<RootTools_Vision.WorkManager3.WorkManager>("edgeTopInspection", 5);
 
-                    edgeTopInspection.SetRecipe(recipeEdge);
-                    edgeTopInspection.SetSharedBuffer(new SharedBufferInfo(
-                                edgeTopImage.GetPtr(0),
+                    //edgeTopInspection.SetRecipe(recipeEdge);
+                    //edgeTopInspection.SetSharedBuffer(new SharedBufferInfo(
+                    //            edgeTopImage.GetPtr(0),
+                    //            edgeTopImage.p_Size.X,
+                    //            edgeTopImage.p_Size.Y,
+                    //            edgeTopImage.GetBytePerPixel(),
+                    //            edgeTopImage.GetPtr(1),
+                    //            edgeTopImage.GetPtr(2),
+                    //            new MemoryID(memoryEdgePool, memoryEdgeGroup, memoryEdgeTop)));
+
+                    // Ex) 다중 이미지 버퍼 할당
+                    RootTools_Vision.WorkManager3.WorkManager edgeInspection = GlobalObjects.Instance.RegisterNamed<RootTools_Vision.WorkManager3.WorkManager>("edgeInspection");
+
+                    edgeInspection.SetRecipe(recipeEdge);
+                    edgeInspection.SetSharedBuffer(new SharedBufferInfo(
                                 edgeTopImage.p_Size.X,
                                 edgeTopImage.p_Size.Y,
                                 edgeTopImage.GetBytePerPixel(),
-                                edgeTopImage.GetPtr(1),
-                                edgeTopImage.GetPtr(2),
-                                new MemoryID(memoryFrontPool, memoryFrontGroup, memoryFront)));
+                                new List<IntPtr>()
+                                {
+                                    edgeTopImage.GetPtr(0),
+                                    edgeTopImage.GetPtr(1),
+                                    edgeTopImage.GetPtr(2),
+                                    edgeBottomImage.GetPtr(0),
+                                    edgeBottomImage.GetPtr(1),
+                                    edgeBottomImage.GetPtr(2),
+                                    edgeSideImage.GetPtr(0),
+                                    edgeSideImage.GetPtr(1),
+                                    edgeSideImage.GetPtr(2),
+                                }
+                                ));
+
+                    CameraInfo camInfo = DataConverter.GrabModeToCameraInfo(engineer.m_handler.p_EdgeSideVision.GetGrabMode(recipeEdge.CameraInfoIndex));
+                    edgeInspection.SetCameraInfo(camInfo);
                 }
 
                 /*
@@ -356,28 +388,46 @@ namespace Root_WIND2
                 }
                 */
 
-                if (ebrImage.GetPtr() == IntPtr.Zero)
+                if (ebrImage.GetPtr() != IntPtr.Zero)
                 {
-                    //MessageBox.Show("EBR Inspection 생성 실패, 메모리 할당 없음");
+                    RootTools_Vision.WorkManager3.WorkManager ebrInspection = GlobalObjects.Instance.RegisterNamed<RootTools_Vision.WorkManager3.WorkManager>("ebrInspection");
+
+                    ebrInspection.SetRecipe(recipeEBR);
+                    ebrInspection.SetSharedBuffer(new SharedBufferInfo(
+                            ebrImage.GetPtr(0),
+                            ebrImage.p_Size.X,
+                            ebrImage.p_Size.Y,
+                            ebrImage.GetBytePerPixel()));
+
+                    CameraInfo camInfo = DataConverter.GrabModeToCameraInfo(engineer.m_handler.p_Vision.GetGrabMode(recipeEBR.CameraInfoIndex));
+                    ebrInspection.SetCameraInfo(camInfo);
                 }
-                else
-                {
-                    InspectionManagerEBR inspectionEBR = GlobalObjects.Instance.Register<InspectionManagerEBR>
-                    (
-                    recipeEBR,
-                    new SharedBufferInfo(ebrImage.GetPtr(0), ebrImage.p_Size.X, ebrImage.p_Size.Y, ebrImage.GetBytePerPixel(), ebrImage.GetPtr(1), ebrImage.GetPtr(2))
-                    );
-                }
+
+                /*
+				if (ebrImage.GetPtr() == IntPtr.Zero)
+				{
+					//MessageBox.Show("EBR Inspection 생성 실패, 메모리 할당 없음");
+				}
+				else
+				{
+					InspectionManagerEBR inspectionEBR = GlobalObjects.Instance.Register<InspectionManagerEBR>
+					(
+					recipeEBR,
+					new SharedBufferInfo(ebrImage.GetPtr(0), ebrImage.p_Size.X, ebrImage.p_Size.Y, ebrImage.GetBytePerPixel(), ebrImage.GetPtr(1), ebrImage.GetPtr(2))
+					);
+				}
+                */
 
 
+				// DialogService
 
-                // DialogService
-               
-                dialogService.Register<Dialog_ImageOpenViewModel, Dialog_ImageOpen>();
+				dialogService.Register<Dialog_ImageOpenViewModel, Dialog_ImageOpen>();
                 dialogService.Register<Dialog_Scan_ViewModel, Dialog_Scan>();
                 dialogService.Register<SettingDialog_ViewModel, SettingDialog>();
                 dialogService.Register<TK4S, TK4SModuleUI>();
                 dialogService.Register<FFUModule, FFUModuleUI>();
+                //dialogService.Register<Dialog_PortSelect_ViewModel, Dialog_PortSelect>();
+                dialogService.Register<Dialog_MapCreator_ViewModel, Dialog_MapCreator>();
 
 
 

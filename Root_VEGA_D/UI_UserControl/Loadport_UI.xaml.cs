@@ -96,7 +96,7 @@ namespace Root_VEGA_D
             textBoxPodID.DataContext = loadport.p_infoCarrier;
             else
             { textBoxPodID.IsEnabled = false; }
-            textBoxLotID.DataContext = loadport.p_infoCarrier.m_aGemSlot[0];
+            textBoxLotID.DataContext = loadport.p_infoCarrier;
             //textBoxRecipeID.DataContext = loadport.p_infoCarrier.m_aGemSlot[0];
 
             InitTimer();
@@ -106,6 +106,8 @@ namespace Root_VEGA_D
             infoCarrier.m_aInfoWafer[0] = (InfoWafer)infoCarrier.m_aGemSlot[0];
             infoCarrier.m_aInfoWafer[0].p_eState = GemSlotBase.eState.Exist;
             m_manualjob = new ManualJobSchedule(m_handler.m_engineer,m_loadport,infoCarrier);
+
+            m_loadport.m_CommonFunction = PMComplete;
         }
 
         private void M_bgwLoad_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
@@ -125,32 +127,40 @@ namespace Root_VEGA_D
 
         private void M_bgwLoad_DoWork(object sender, DoWorkEventArgs e)
         {
-            while ((EQ.IsStop() != true) && m_loadport.IsBusy()) Thread.Sleep(10);
-            Thread.Sleep(100);
+            while (!bPMComplete && (EQ.IsStop() == false)) Thread.Sleep(10);
+            m_loadport.p_open = false;
+            ModuleRunBase Docking = m_loadport.m_runDocking.Clone();
+            m_loadport.StartRun(Docking);
+
+            while (m_loadport.IsBusy() && (EQ.IsStop() == false)) Thread.Sleep(10);
+            if (m_loadport.p_infoCarrier.m_aInfoWafer[0] == null)
+            {
+                m_loadport.m_alidInforeticle.Run(true, "Reticle Info Error, Check Reticle in Loadport");
+                ModuleRunBase UnDocking = m_loadport.m_runUndocking.Clone();
+                m_loadport.StartRun(UnDocking);
+                return;
+            }
+            if (m_manualjob.ShowPopup(m_handler) == false) return;
         }
 
+        bool bPMComplete = false;
+        public void PMComplete()
+		{
+            bPMComplete = true;
+        }
         #region Button Click Event
         private void buttonLoad_Click(object sender, RoutedEventArgs e)
         {
             if (IsEnableLoad() == false) return;
             if (m_loadport.p_id == "LoadportA") EQ.p_nRunLP = 0;
             else if (m_loadport.p_id == "LoadportB") EQ.p_nRunLP = 1;
+            ModuleRunBase moduleRun = m_handler.m_vision.m_runPM.Clone();
+            m_handler.m_vision.StartRun(moduleRun);
+
             //ModuleRunBase moduleRun = m_rfid.m_runReadID.Clone();
             //m_rfid.StartRun(moduleRun);
             //while ((EQ.IsStop() != true) && m_rfid.IsBusy()) Thread.Sleep(10);
-            m_loadport.p_open = false;
-            ModuleRunBase Docking = m_loadport.m_runDocking.Clone();
-            m_loadport.StartRun(Docking);
-            //m_loadport.RunDocking();
-            if (m_loadport.p_infoCarrier.m_aInfoWafer[0] == null)
-            {
-                m_loadport.m_alidInforeticle.Run(true, "Reticle Info Error, Check Reticle in Loadport");
-                ModuleRunBase UnDocking = m_loadport.m_runUndocking.Clone();
-                m_loadport.StartRun(UnDocking);
-                //m_loadport.RunUndocking();
-                return;
-            }
-            if (m_manualjob.ShowPopup(m_handler) == false) return;
+
             m_bgwLoad.RunWorkerAsync();
         }
 

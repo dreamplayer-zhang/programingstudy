@@ -1,4 +1,5 @@
-﻿using RootTools;
+﻿using Root_Rinse_Unloader.Engineer;
+using RootTools;
 using RootTools.Control;
 using RootTools.GAFs;
 using RootTools.Module;
@@ -47,10 +48,12 @@ namespace Root_Rinse_Unloader.Module
         {
             DIO_I m_diCheck;
             public DIO_IO m_dioClamp;
+            DIO_I m_diProtrusion;
             public void GetTools(ToolBox toolBox, bool bInit)
             {
                 m_storage.p_sInfo = toolBox.GetDIO(ref m_diCheck, m_storage, m_id + ".Check");
                 m_storage.p_sInfo = toolBox.GetDIO(ref m_dioClamp, m_storage, m_id + ".Clamp");
+                m_storage.p_sInfo = toolBox.GetDIO(ref m_diProtrusion, m_storage, m_id + ".Protrusion");
                 if (bInit) m_dioClamp.Write(!m_diCheck.p_bIn); 
             }
 
@@ -76,6 +79,11 @@ namespace Root_Rinse_Unloader.Module
                     _bClamp = value;
                     OnPropertyChanged();
                 }
+            }
+
+            public bool IsProtrusion()
+            {
+                return m_diProtrusion.p_bIn;
             }
 
             public void CheckSensor()
@@ -115,6 +123,15 @@ namespace Root_Rinse_Unloader.Module
                 if (magazine.p_bCheck && (magazine.p_bClamp != bClamp)) return "Clamp Sensor Error";
             }
             return "OK";
+        }
+
+        public bool IsMagazineProtrusion()
+        {
+            foreach (Magazine magazine in m_aMagazine)
+            {
+                if (magazine.IsProtrusion()) return true;
+            }
+            return false;
         }
         #endregion
 
@@ -160,7 +177,21 @@ namespace Root_Rinse_Unloader.Module
         #endregion
 
         #region Elevator
-        Axis m_axis;
+        Loader p_loader
+        {
+            get
+            {
+                RinseU_Handler handler = (RinseU_Handler)m_engineer.ClassHandler();
+                return (handler == null) ? null : handler.m_loader;
+            }
+        }
+        bool IsLoaderDanger()
+        {
+            if (p_loader == null) return true;
+            return p_loader.IsLoaderDanger();
+        }
+
+        public Axis m_axis;
         void InitPosElevator()
         {
             m_axis.AddPos(Enum.GetNames(typeof(eMagazine)));
@@ -171,6 +202,8 @@ namespace Root_Rinse_Unloader.Module
         public string MoveMagazine(eMagazine eMagazine, int iIndex, bool bWait)
         {
             if ((iIndex < 0) || (iIndex >= 20)) return "Invalid Index";
+            if (IsMagazineProtrusion()) return "Check Storage : Strip Protrusion";
+            if (IsLoaderDanger()) return "Check Loader Position";
             m_axis.StartMove(eMagazine, -iIndex * m_dZ);
             if (bWait) return m_axis.WaitReady();
             return "OK"; 
@@ -180,6 +213,11 @@ namespace Root_Rinse_Unloader.Module
         {
             m_axis.StartMove("Stack");
             return m_axis.WaitReady();
+        }
+
+        public bool IsHighPos()
+        {
+            return m_axis.p_posCommand > (m_axis.GetPosValue("Stack") + 1000);
         }
 
         double m_fJogScale = 1;
@@ -201,6 +239,20 @@ namespace Root_Rinse_Unloader.Module
             Thread.Sleep(500);
             return "OK";
             */
+        }
+
+        public void RunLoadUp()
+        {
+            MoveMagazine(eMagazine.Magazine3, 10, true);
+            m_aMagazine[0].RunClamp(false);
+            m_aMagazine[1].RunClamp(false);
+        }
+
+        public void RunLoadDown()
+        {
+            MoveMagazine(eMagazine.Magazine1, 0, true);
+            m_aMagazine[2].RunClamp(false);
+            m_aMagazine[3].RunClamp(false);
         }
 
         void RunTreeElevator(Tree tree)
@@ -315,39 +367,42 @@ namespace Root_Rinse_Unloader.Module
         public string MoveMagazine(bool bNext)
         {
             if (bNext) m_rinse.p_iMagazine++;
-            if (IsMagazineExist(m_rinse.p_eMagazine) == false)
-            {
-                if (Run(SetNextMagazine(m_rinse.p_eMagazine))) return p_sInfo;
-            }
-            if (m_rinse.p_iMagazine >= 20)
-            {
-                m_rinse.p_iMagazine = 0;
-                if (Run(SetNextMagazine(m_rinse.p_eMagazine))) return p_sInfo;
-            }
+            if (Run(SetEnableMagazine())) return p_sInfo; 
             return MoveMagazine(m_rinse.p_eMagazine, m_rinse.p_iMagazine, true);
+        }
+
+        string SetEnableMagazine()
+        {
+            while (IsMagazineExist(m_rinse.p_eMagazine, m_rinse.p_iMagazine) == false)
+            {
+                if (Run(SetNextMagazine(m_rinse.p_eMagazine))) return p_sInfo;
+            }
+            return "OK"; 
+        }
+
+        bool IsMagazineExist(eMagazine eMagazine, int iMagazine)
+        {
+            if (iMagazine >= 20) return false;
+            bool bCheck = m_aMagazine[(int)eMagazine].p_bCheck;
+            bool bClamp = m_aMagazine[(int)eMagazine].p_bClamp;
+            return (bCheck && bClamp);
         }
 
         string SetNextMagazine(eMagazine eMagazine)
         {
+            m_rinse.p_iMagazine = 0;
             switch (eMagazine)
             {
                 case eMagazine.Magazine1:
-                    m_alidMagazineFull.p_bSet = true; 
-                    m_rinse.RunBuzzer(RinseU.eBuzzer.Finish); 
+                    m_alidMagazineFull.p_bSet = true;
+                    m_rinse.RunBuzzer(RinseU.eBuzzer.Finish);
+                    EQ.p_eState = EQ.eState.Ready;
                     return "Magazine Full";
                 case eMagazine.Magazine2: m_rinse.p_eMagazine = eMagazine.Magazine1; break;
                 case eMagazine.Magazine3: m_rinse.p_eMagazine = eMagazine.Magazine2; break;
                 case eMagazine.Magazine4: m_rinse.p_eMagazine = eMagazine.Magazine3; break;
             }
-            if (IsMagazineExist(m_rinse.p_eMagazine)) return "OK"; 
-            return SetNextMagazine(m_rinse.p_eMagazine); 
-        }
-
-        bool IsMagazineExist(eMagazine eMagazine)
-        {
-            bool bCheck = m_aMagazine[(int)eMagazine].p_bCheck;
-            bool bClamp = m_aMagazine[(int)eMagazine].p_bClamp;
-            return (bCheck && bClamp); 
+            return "OK";
         }
 
         ModuleRunBase m_runReady;

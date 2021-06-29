@@ -54,6 +54,48 @@ namespace Root_CAMELLIA
         }
     }
 
+    public class ValueToDataGridColorConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if ((string)parameter == "Background")
+            {
+                string data = Enum.GetName(typeof(RootTools.Gem.GemSlotBase.eState), value);
+                if (data == "Empty")
+                {
+                    return Brushes.Gray;
+                }
+                else if (data == "Done")
+                {
+                    return new SolidColorBrush(Color.FromRgb(134, 255, 117));
+                }
+            }
+            else
+            {
+                string data = Enum.GetName(typeof(RootTools.Gem.GemSlotBase.eState), value);
+                if (data == "Empty")
+                {
+                    return new SolidColorBrush(Color.FromRgb(150, 150, 150));
+                }
+                else
+                {
+                    return Brushes.Black;
+                }
+                //else if (data == "Done")
+                //{
+                //    return new SolidColorBrush(Color.FromRgb(134, 255, 117));
+                //}
+            }
+          
+            return Brushes.Transparent;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
     public class ValueToProgressColorConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)

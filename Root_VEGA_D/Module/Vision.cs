@@ -5,6 +5,7 @@ using Emgu.CV.Structure;
 using Emgu.CV.Util;
 using Root_EFEM.Module;
 using Root_VEGA_D_IPU.Module;
+using Root_VEGA_D.Engineer;
 using RootTools;
 using RootTools.Camera;
 using RootTools.Camera.BaslerPylon;
@@ -42,6 +43,20 @@ namespace Root_VEGA_D.Module
         public ALID m_alidShutterDownError;
         public ALID m_alidShutterUpError;
         ALID m_alid_WaferExist;
+        public ALID m_alidPMCoaxialError;
+        public ALID m_alidPMTransmittedError;
+        public ALID m_alidPMFail;
+
+        void InitGAF()
+        {
+            m_visionHomeError = m_gaf.GetALID(this, "Vision Home Error", "Vision Home Error");
+            m_visionInspectError = m_gaf.GetALID(this, "Vision Inspect Error", "Vision Inspect Error");
+            m_alidShutterDownError = m_gaf.GetALID(this, "VS Shutter Error", "Shutter is not down");
+            m_alidShutterUpError = m_gaf.GetALID(this, "VS Shutter Error", "Shutter is not up");
+            m_alidPMCoaxialError = m_gaf.GetALID(this, "PM Error", "Coaxial Light PM Test is failed");
+            m_alidPMTransmittedError = m_gaf.GetALID(this, "PM Error", "Transmitted Light PM Test is failed");
+            m_alidPMFail = m_gaf.GetALID(this, "PM Fail", "PM is Fail, Pod is not load");
+        }
         public void SetAlarm()
         {
             m_alid_WaferExist.Run(true, "Vision Wafer Exist Error");
@@ -80,6 +95,7 @@ namespace Root_VEGA_D.Module
 
         TCPIPComm_VEGA_D m_tcpipCommServer;
         RADSControl m_RADSControl;
+
 
         #region [Getter Setter]
         public Axis AxisRotate { get => m_axisRotate; private set => m_axisRotate = value; }
@@ -124,13 +140,11 @@ namespace Root_VEGA_D.Module
             p_sInfo = m_toolBox.Get(ref m_LensLinearTurret, this, "LensTurret");
 
             p_sInfo = m_toolBox.Get(ref m_memoryPool, this, "Memory", 1);
-            m_alid_WaferExist = m_gaf.GetALID(this, "Vision Wafer Exist", "Vision Wafer Exist");
             //m_remote.GetTools(bInit);
 
             InitALID();
 
-            bool bUseRADS = true;
-            p_sInfo = m_toolBox.Get(ref m_RADSControl, this, "RADSControl", bUseRADS);
+            p_sInfo = m_toolBox.Get(ref m_RADSControl, this, "RADSControl", true);
         }
         void InitALID()
         {
@@ -140,9 +154,10 @@ namespace Root_VEGA_D.Module
             m_alidShutterDownError = m_gaf.GetALID(this, "VS Shutter Error", "Shutter is not down");
             m_alidShutterUpError = m_gaf.GetALID(this, "VS Shutter Error", "Shutter is not up");
             m_alidReticleLocateInfoError = m_gaf.GetALID(this, "Reticle Locate Info is not Correct", "Reticle Locate Info is not Correct");
+            m_alidPMCoaxialError = m_gaf.GetALID(this, "PM Coaxial Check Error", "Coaxial Light PM Test is failed");
+            m_alidPMTransmittedError = m_gaf.GetALID(this, "PM Transmitted Check Error", "Transmitted Light PM Test is failed");
         }
         #endregion
-
 
         #region Grab Mode
         int m_lGrabMode = 0;
@@ -171,7 +186,7 @@ namespace Root_VEGA_D.Module
             foreach (GrabMode grabMode in m_aGrabMode)
             {
                 grabMode.m_ptXYAlignData = new RPoint(0, 0);
-                grabMode.m_dVRSFocusPos = 0;
+                //grabMode.m_dVRSFocusPos = 0;
             }
             this.RunTree(Tree.eMode.RegWrite);
             this.RunTree(Tree.eMode.Init);
@@ -193,6 +208,26 @@ namespace Root_VEGA_D.Module
         void RunTreeSetup(Tree tree)
         {
             m_eCheckWafer = (eCheckWafer)tree.Set(m_eCheckWafer, m_eCheckWafer, "CheckWafer", "CheckWafer");
+        }
+        #endregion
+
+        #region Light
+        public List<string> p_asLightSet
+        {
+            get
+            {
+                List<string> asLight = new List<string>();
+                foreach (Light light in m_lightSet.m_aLight) asLight.Add(light.m_sName);
+                return asLight;
+            }
+        }
+        public Light GetLight(string sLight)
+        {
+            foreach (Light light in m_lightSet.m_aLight)
+            {
+                if (sLight == light.m_sName) return light;
+            }
+            return null;
         }
         #endregion
 
@@ -653,15 +688,20 @@ namespace Root_VEGA_D.Module
                 while (((crtROI.Width + nSpare) % 4) != 0) nSpare++;
                 crtROI = new CRect(crtROI.Left, crtROI.Top, crtROI.Right + nSpare, crtROI.Bottom);
             }
-            ImageData img = new ImageData(crtROI.Width, crtROI.Height, 1);
-            IntPtr p = mem.GetPtr();
-            img.SetData_12bit(p, crtROI, (int)(mem.W / mem.p_nByte));
+            string strTempFile = "D:\\AlignMarkTemplateImage\\TempAreaImage.bmp";
+            ImageData tempImgData = new ImageData(mem);
+            tempImgData.FileSaveGrayBMP(strTempFile, crtROI, 1);
 
-            byte[] barr = img.GetByteArray();
-            System.Drawing.Bitmap bmp = img.GetBitmapToArray(crtROI.Width, crtROI.Height, barr);
-            Image<Gray, byte> imgReturn = new Image<Gray, byte>(bmp);
+            return new Image<Gray, byte>(strTempFile);
+            //ImageData img = new ImageData(crtROI.Width, crtROI.Height, 1);
+            //IntPtr p = mem.GetPtr();
+            //img.SetData_12bit(p, crtROI, (int)(mem.W / mem.p_nByte));
 
-            return imgReturn;
+            //byte[] barr = img.GetByteArray();
+            //System.Drawing.Bitmap bmp = img.GetBitmapToArray(crtROI.Width, crtROI.Height, barr);
+            //Image<Gray, byte> imgReturn = new Image<Gray, byte>(bmp);
+
+            //return imgReturn;
         }
 
         public bool TemplateMatching(MemoryData mem, CRect crtSearchArea, Image<Gray, byte> imgSrc, Image<Gray, byte> imgTemplate, out CPoint cptCenter, double dMatchScore)
@@ -704,6 +744,90 @@ namespace Root_VEGA_D.Module
             cptCenter.Y = (int)(crtSearchArea.Top + ptMaxRelative.Y) + (int)(nHeightDiff / 2);
 
             return bFoundTemplate;
+        }
+        public string RunLineScan(GrabMode grabmode, MemoryData mem, CPoint memOffset, int nSnapCount, double posX, double startPosY, double endPosY, double startTriggerY, double endTriggerY)
+        {
+            if (grabmode == null) return "Grabmode of RunLineScan is null.";
+
+            Camera_Dalsa camMain = grabmode.m_camera as Camera_Dalsa;
+            if (camMain == null)
+                return "Main Camara is null";
+
+            // 시작위치로 이동
+            if (Run(AxisXY.StartMove(posX, startPosY)))
+                return p_sInfo;
+            if (Run(AxisXY.WaitReady()))
+                return p_sInfo;
+
+            // 분주비 재설정
+            int nEncoderMul = camMain.GetEncoderMultiplier();
+            int nEncoderDiv = camMain.GetEncoderDivider();
+            camMain.SetEncoderMultiplier(1);
+            camMain.SetEncoderDivider(1);
+            camMain.SetEncoderMultiplier(nEncoderMul);
+            camMain.SetEncoderDivider(nEncoderDiv);
+
+            // 트리거 설정
+            AxisXY.p_axisY.SetTrigger(startTriggerY, endTriggerY, grabmode.m_dTrigger, 0.001, true);
+
+            // 카메라 스냅 시작
+            grabmode.StartGrab(mem, memOffset, (int)(nSnapCount * 0.98), grabmode.m_GD);
+
+            // 이동하면서 그랩
+            if (Run(AxisXY.p_axisY.StartMove(endPosY)))
+                return p_sInfo;
+
+            // 라인스캔 완료 대기
+            if (Run(AxisXY.p_axisY.WaitReady()))
+                return p_sInfo;
+
+            // 이미지 스냅 스레드 동작중이라면 중지
+            while (camMain.p_CamInfo.p_eState != eCamState.Ready && !EQ.IsStop())
+            {
+                Thread.Sleep(10);
+            }
+            return "OK";
+        }
+        public string StartRADS(int nOffset = 0)
+        {
+            if (CamRADS == null) return "RADS Cam is null";
+
+            RADSControl.m_timer.Start();
+            RADSControl.p_IsRun = true;
+            RADSControl.StartRADS();
+
+            StopWatch sw = new StopWatch();
+            if (CamRADS.p_CamInfo._OpenStatus == false) CamRADS.Connect();
+            while (CamRADS.p_CamInfo._OpenStatus == false)
+            {
+                if (sw.ElapsedMilliseconds > 15000)
+                {
+                    sw.Stop();
+                    return "RADS Camera Not Connected";
+                }
+            }
+            sw.Stop();
+
+            // Offset 설정
+            RADSControl.p_connect.SetADSOffset(nOffset);
+
+            // RADS 카메라 설정
+            CamRADS.SetMulticast();
+            CamRADS.GrabContinuousShot();
+
+            return "OK";
+        }
+
+        public string StopRADS()
+        {
+            if (CamRADS == null) return "RADS Cam is null";
+
+            RADSControl.m_timer.Stop();
+            RADSControl.p_IsRun = false;
+            RADSControl.StopRADS();
+            if (CamRADS.p_CamInfo._IsGrabbing == true) CamRADS.StopGrab();
+
+            return "OK";
         }
         #endregion
 
@@ -760,12 +884,8 @@ namespace Root_VEGA_D.Module
             Run_GrabLineScan runGrabLineScan = PeekModuleRun() as Run_GrabLineScan;
             if (runGrabLineScan != null)
             {
-                // 현재 GrabLineScan 진행중이었다면
-                if (runGrabLineScan.p_eRunState == ModuleRunBase.eRunState.Run)
-                {
-                    // EQ Stop 상태로 변경하고 이미지그랩 중에 중단되었다는 상태값 설정
-                    runGrabLineScan.m_bWaitRun = false;
-                }
+                // EQ Stop 상태로 변경하고 이미지그랩 중에 중단되었다는 상태값 설정
+                runGrabLineScan.p_bWaitRun = false;
             }
         }
         private void EventAccept(Socket socket)
@@ -773,14 +893,14 @@ namespace Root_VEGA_D.Module
             Run_GrabLineScan runGrabLineScan = PeekModuleRun() as Run_GrabLineScan;
             if (runGrabLineScan != null)
             {
-                // 현재 GrabLineScan 진행중이었다면
-                if (runGrabLineScan.p_eRunState == ModuleRunBase.eRunState.Run)
+                if(m_bDisconnectedGrabLineScanning)
                 {
-                    // EQ Stop 상태로 변경하고 이미지그랩 중에 중단되었다는 상태값 설정
-                    m_bDisconnectedGrabLineScanning = true;
+                    // 이미지 스캔 중 연결이 끊겼다는 상태값을 리셋
+                    m_bDisconnectedGrabLineScanning = false;
 
-                    // 재연결 시까지 RunGrabLineScan은 대기
-                    runGrabLineScan.m_bWaitRun = false;
+                    // 대기중인 RunGrabLineScan 재개
+                    runGrabLineScan.p_bWaitRun = false;
+
                 }
             }
         }
@@ -802,7 +922,7 @@ namespace Root_VEGA_D.Module
                         m_bDisconnectedGrabLineScanning = true;
 
                         // 재연결 시까지 RunGrabLineScan은 대기
-                        runGrabLineScan.m_bWaitRun = true;
+                        runGrabLineScan.p_bWaitRun = true;
 
                         // IPU와 소켓통신 재 연결 될때까지의 상태 리셋 타이머 실행
                         DispatcherTimer timer = new DispatcherTimer();
@@ -835,13 +955,13 @@ namespace Root_VEGA_D.Module
                                     Run_GrabLineScan runGrabLineScan = PeekModuleRun() as Run_GrabLineScan;
                                     if (runGrabLineScan != null)
                                     {
-                                        runGrabLineScan.m_nCurScanLine = curScanLine;
-                                        runGrabLineScan.m_grabMode.m_ScanLineNum = totalScanLine;
-                                        runGrabLineScan.m_grabMode.m_ScanStartLine = startScanLine;
-
                                         lock (runGrabLineScan.m_lockWaitRun)
                                         {
-                                            runGrabLineScan.m_bWaitRun = false;
+                                            runGrabLineScan.m_nCurScanLine = curScanLine;
+                                            runGrabLineScan.m_grabMode.m_ScanLineNum = totalScanLine;
+                                            runGrabLineScan.m_grabMode.m_ScanStartLine = startScanLine;
+
+                                            runGrabLineScan.p_bWaitRun = false;
                                         }   
                                     }
                                 }
@@ -1016,6 +1136,7 @@ namespace Root_VEGA_D.Module
         #endregion
 
         #region ModuleRun
+        public ModuleRunBase m_runPM;
         protected override void InitModuleRuns()
         {
             AddModuleRunList(new Run_Test(this), true, "Test");
@@ -1028,6 +1149,7 @@ namespace Root_VEGA_D.Module
             //AddModuleRunList(new Run_AutoFocus(this), false, "Run AutoFocus");
             AddModuleRunList(new Run_MakeTemplateImage(this), true, "Run Make TemplateImage");
             AddModuleRunList(new Run_PatternAlign(this), true, "Run Pattern Align");
+            m_runPM = AddModuleRunList(new Run_PM(this,(VEGA_D_Handler)m_engineer.ClassHandler()), true, "Run PM");
         }
         #endregion
     }

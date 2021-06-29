@@ -1,5 +1,6 @@
 ﻿using RootTools_Vision;
 using System.IO;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 
@@ -70,17 +71,22 @@ namespace Root_WIND2.UI_User
         public readonly UI_User.FrontsideMask frontsideMask = new UI_User.FrontsideMask();
         public readonly UI_User.FrontsideSpec frontsideSpec = new UI_User.FrontsideSpec();
         public readonly UI_User.FrontsideInspect frontsideInspect = new UI_User.FrontsideInspect();
+        
 
         // BACK
+        //btnBackProduct
+        public readonly UI_User.BacksideProduct backsideProduct = new UI_User.BacksideProduct();
         public readonly UI_User.BacksideSetup backsideSetup = new UI_User.BacksideSetup();
         public readonly UI_User.BacksideInspect backsideInspect = new UI_User.BacksideInspect();
+        public readonly UI_User.BacksideSpec backsideSpec = new BacksideSpec();
 
-		// EDGE
-		public readonly UI_User.EdgesideSetup edgesideSetup = new UI_User.EdgesideSetup();
+        // EDGE
+        public readonly UI_User.EdgesideSetup edgesideSetup = new UI_User.EdgesideSetup();
 		public readonly UI_User.EdgesideInspect edgesideInspect = new UI_User.EdgesideInspect();
 
-        // EBR
-        public readonly UI_User.EBRSetup ebrSetup = new UI_User.EBRSetup();
+		// EBR
+		public readonly UI_User.EBRSetup ebrSetup = new UI_User.EBRSetup();
+		public readonly UI_User.EBRInspect ebrInspect = new UI_User.EBRInspect();
 
         // Camera
         public readonly UI_User.CameraVRS cameraVrs = new UI_User.CameraVRS();
@@ -140,23 +146,25 @@ namespace Root_WIND2.UI_User
             get => frontsideInspectVM;
         }
 
-        #region [Camera ViewModes]
-        private UI_User.CameraVRS_ImageViewer_ViewModel cameraVrsVM = new UI_User.CameraVRS_ImageViewer_ViewModel();
-        public UI_User.CameraVRS_ImageViewer_ViewModel CameraVrsVM
-        {
-            get => cameraVrsVM;
-        }
-
-        #endregion
-
-
         #endregion
 
         #region [Back ViewModels]
+        private UI_User.BacksideProduct_ViewModel backsideProductVM = new BacksideProduct_ViewModel();
+        public UI_User.BacksideProduct_ViewModel BacksideProductVM
+        {
+            get => this.backsideProductVM;
+        }
+
         private UI_User.BacksideSetup_ViewModel backsideSetupVM = new UI_User.BacksideSetup_ViewModel();
         public UI_User.BacksideSetup_ViewModel BacksideROIVM
         {
             get => this.backsideSetupVM;
+        }
+
+        private UI_User.BacksideSpec_ViewModel backsideSpecVM = new UI_User.BacksideSpec_ViewModel();
+        public UI_User.BacksideSpec_ViewModel BacksideSpecVM
+        {
+            get => this.backsideSpecVM;
         }
 
         private UI_User.BacksideInspect_ViewModel backsideInspectVM = new UI_User.BacksideInspect_ViewModel();
@@ -180,10 +188,16 @@ namespace Root_WIND2.UI_User
 		#endregion
 
 		#region [EBR ViewModels]
-		private UI_User.EBRSetup_ViewModel ebrSetupVM = new UI_User.EBRSetup_ViewModel();
+        private UI_User.EBRSetup_ViewModel ebrSetupVM = new UI_User.EBRSetup_ViewModel();
         public UI_User.EBRSetup_ViewModel EBRSetupVM
         {
             get => ebrSetupVM;
+        }
+
+        private UI_User.EBRInspect_ViewModel ebrInspectVM = new UI_User.EBRInspect_ViewModel();
+        public UI_User.EBRInspect_ViewModel EBRInspectVM
+        {
+            get => ebrInspectVM;
         }
         #endregion
 
@@ -193,6 +207,13 @@ namespace Root_WIND2.UI_User
         {
             get => cameraAlignVM;
         }
+
+        private UI_User.CameraVRS_ViewModel cameraVrsVM = new UI_User.CameraVRS_ViewModel();
+        public UI_User.CameraVRS_ViewModel CameraVrsVM
+        {
+            get => cameraVrsVM;
+        }
+
         #endregion
 
         #endregion
@@ -675,6 +696,18 @@ namespace Root_WIND2.UI_User
             }
         }
 
+        public ICommand btnEBRInspect
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    SetPage(ebrInspect);
+                    ebrInspect.DataContext = ebrInspectVM;
+                });
+            }
+        }
+        
         public ICommand btnNewRecipeEBR
         {
             get => new RelayCommand(() =>
@@ -779,6 +812,18 @@ namespace Root_WIND2.UI_User
         #endregion
 
         #region [Command Back]
+
+        public ICommand btnBackProduct
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    SetPage(backsideProduct);
+                    backsideProduct.DataContext = backsideProductVM;
+                });
+            }
+        }
         public ICommand btnBackSetup
         {
             get
@@ -787,6 +832,18 @@ namespace Root_WIND2.UI_User
                 {
                     SetPage(backsideSetup);
                     backsideSetup.DataContext = backsideSetupVM;
+                });
+            }
+        }
+
+        public ICommand btnBackSpec
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    SetPage(backsideSpec);
+                    backsideSpec.DataContext = backsideSpecVM;
                 });
             }
         }
@@ -823,7 +880,7 @@ namespace Root_WIND2.UI_User
                     if (!dir.Exists)
                         dir.Create();
 
-                    RecipeFront recipe = GlobalObjects.Instance.Get<RecipeFront>();
+                    RecipeBack recipe = GlobalObjects.Instance.Get<RecipeBack>();
                     recipe.Clear();
 
                     recipe.Name = sFileNameNoExt;
@@ -841,7 +898,7 @@ namespace Root_WIND2.UI_User
             {
                 return new RelayCommand(() =>
                 {
-                    RecipeFront recipe = GlobalObjects.Instance.Get<RecipeFront>();
+                    RecipeBack recipe = GlobalObjects.Instance.Get<RecipeBack>();
                     if (recipe.RecipePath != "")
                     {
                         recipe.Save(recipe.RecipePath);
@@ -896,7 +953,7 @@ namespace Root_WIND2.UI_User
                         if (!dir.Exists)
                             dir.Create();
 
-                        RecipeFront recipe = GlobalObjects.Instance.Get<RecipeFront>();
+                        RecipeBack recipe = GlobalObjects.Instance.Get<RecipeBack>();
                         recipe.Read(sFullPath);
 
                         UpdateCurrentPanel();
@@ -928,6 +985,109 @@ namespace Root_WIND2.UI_User
                 {
                     SetPage(cameraAlign);
                     cameraAlign.DataContext = CameraAlignVM;
+                });
+            }
+        }
+
+        public ICommand btnNewRecipeAlign
+        {
+            get => new RelayCommand(() =>
+            {
+                System.Windows.Forms.SaveFileDialog dlg = new System.Windows.Forms.SaveFileDialog();
+                dlg.InitialDirectory = Constants.RootPath.RecipeAlignRootPath;
+                dlg.Title = "Save Recipe";
+                dlg.Filter = "ATI files (*.rcp)|*.rcp|All files (*.*)|*.*";
+                if (dlg.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                {
+                    string sFolderPath = Path.GetDirectoryName(dlg.FileName); // 디렉토리명
+                    string sFileNameNoExt = Path.GetFileNameWithoutExtension(dlg.FileName); // Only 파일이름
+                    string sFileName = Path.GetFileName(dlg.FileName); // 파일이름 + 확장자
+                    string sRecipeFolderPath = Path.Combine(sFolderPath, sFileNameNoExt); // 디렉토리명
+                    string sFullPath = Path.Combine(sRecipeFolderPath, sFileName); // 레시피 이름으 된 폴더안의 rcp 파일 경로
+
+                    DirectoryInfo dir = new DirectoryInfo(sRecipeFolderPath);
+                    if (!dir.Exists)
+                        dir.Create();
+
+                    RecipeAlign recipe = GlobalObjects.Instance.Get<RecipeAlign>();
+                    recipe.Clear();
+
+                    recipe.Name = sFileNameNoExt;
+                    recipe.RecipePath = sFullPath;
+                    recipe.RecipeFolderPath = sRecipeFolderPath;
+
+                    recipe.Save(sFullPath);
+                }
+            });
+        }
+
+        public ICommand btnSaveRecipeAlign
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    RecipeAlign recipe = GlobalObjects.Instance.Get<RecipeAlign>();
+                    if (recipe.RecipePath != "")
+                    {
+                        recipe.Save(recipe.RecipePath);
+                    }
+                    else
+                    {
+                        System.Windows.Forms.SaveFileDialog dlg = new System.Windows.Forms.SaveFileDialog();
+                        dlg.InitialDirectory = Constants.RootPath.RecipeAlignRootPath;
+                        dlg.Title = "Save Recipe";
+                        dlg.Filter = "ATI files (*.rcp)|*.rcp|All files (*.*)|*.*";
+                        if (dlg.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                        {
+                            string sFolderPath = Path.GetDirectoryName(dlg.FileName); // 디렉토리명
+                            string sFileNameNoExt = Path.GetFileNameWithoutExtension(dlg.FileName); // Only 파일이름
+                            string sFileName = Path.GetFileName(dlg.FileName); // 파일이름 + 확장자
+                            string sRecipeFolderPath = Path.Combine(sFolderPath, sFileNameNoExt); // 디렉토리명
+                            string sFullPath = Path.Combine(sRecipeFolderPath, sFileName); // 레시피 이름으 된 폴더안의 rcp 파일 경로
+
+                            DirectoryInfo dir = new DirectoryInfo(sRecipeFolderPath);
+                            if (!dir.Exists)
+                                dir.Create();
+
+                            recipe.Name = sFileNameNoExt;
+                            recipe.RecipePath = sFullPath;
+                            recipe.RecipeFolderPath = sRecipeFolderPath;
+
+                            recipe.Save(sFullPath);
+                        }
+                    }
+                });
+            }
+        }
+
+        public ICommand btnLoadRecipeAlign
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    System.Windows.Forms.OpenFileDialog dlg = new System.Windows.Forms.OpenFileDialog();
+                    dlg.InitialDirectory = Constants.RootPath.RecipeAlignRootPath;
+                    dlg.Title = "Load Recipe";
+                    dlg.Filter = "ATI files (*.rcp)|*.rcp|All files (*.*)|*.*";
+                    if (dlg.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                    {
+                        string sFolderPath = Path.GetDirectoryName(dlg.FileName); // 디렉토리명
+                        string sFileNameNoExt = Path.GetFileNameWithoutExtension(dlg.FileName); // Only 파일이름
+                        string sFileName = Path.GetFileName(dlg.FileName); // 파일이름 + 확장자
+                        string sFullPath = Path.Combine(sFolderPath, sFileName); // 레시피 이름으 된 폴더안의 rcp 파일 경로
+
+                        DirectoryInfo dir = new DirectoryInfo(sFolderPath);
+                        if (!dir.Exists)
+                            dir.Create();
+
+                        RecipeAlign recipe = GlobalObjects.Instance.Get<RecipeAlign>();
+                        recipe.Read(sFullPath);
+
+                        UpdateCurrentPanel();
+                        WIND2EventManager.OnRecipeUpdated(this, new RecipeEventArgs());
+                    }
                 });
             }
         }

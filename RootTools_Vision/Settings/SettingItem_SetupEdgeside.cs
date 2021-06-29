@@ -38,6 +38,52 @@ namespace RootTools_Vision
         }
         private string klarfSavePath = "D:\\Klarf";
 
+        [Category("Klarf")]
+        [DisplayName("Whole Circle Image Size Width")]
+        public int OutputImageSizeWidth
+        {
+            get
+            {
+                return outputImageSizeWidth;
+            }
+            set
+            {
+                outputImageSizeWidth = value;
+            }
+        }
+        private int outputImageSizeWidth = 1000;
+
+
+        [Category("Klarf")]
+        [DisplayName("Whole Circle Image Size Height")]
+        public int OutputImageSizeHeight
+        {
+            get
+            {
+                return outputImageSizeHeight;
+            }
+            set
+            {
+                outputImageSizeHeight = value;
+            }
+        }
+        private int outputImageSizeHeight = 1000;
+
+        [Category("Klarf")]
+        [DisplayName("Circle Thickness")]
+        public int Thickness
+        {
+            get
+            {
+                return thickness;
+            }
+            set
+            {
+                thickness = value;
+            }
+        }
+        private int thickness = 50;
+
         [Category("Common")]
         [DisplayName("Defect Image Path")]
         public string DefectImagePath
@@ -52,65 +98,5 @@ namespace RootTools_Vision
             }
         }
         private string defectImagePath = "D:\\DefectImage";
-
-        [Category("Database")]
-        [DisplayName("Server Name")]
-        public string SerevrName
-        {
-            get
-            {
-                return serverName;
-            }
-            set
-            {
-                serverName = value;
-            }
-        }
-        private string serverName = "localhost";
-
-        [Category("Database")]
-        [DisplayName("Database Name")]
-        public string DBName
-        {
-            get
-            {
-                return dbName;
-            }
-            set
-            {
-                dbName = value;
-            }
-        }
-        private string dbName = "wind2";
-
-        [Category("Database")]
-        [DisplayName("User ID")]
-        public string DBUserID
-        {
-            get
-            {
-                return dbUserID;
-            }
-            set
-            {
-                dbUserID = value;
-            }
-        }
-        private string dbUserID = "root";
-
-        [Category("Database")]
-        [DisplayName("Password")]
-        public string DBPassword
-        {
-            get
-            {
-                return dbPassword;
-            }
-            set
-            {
-                dbPassword = value;
-            }
-        }
-        private string dbPassword = "root";
     }
 }

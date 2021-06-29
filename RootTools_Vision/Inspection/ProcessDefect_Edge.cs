@@ -12,45 +12,35 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using static RootTools_Vision.Tools;
 
 namespace RootTools_Vision
 {
 	public class ProcessDefect_Edge : WorkBase
 	{
-        string TableName;
+		public ProcessDefect_Edge()
+		{
+
+		}
+
+		string TableName = "defect";
 		public ProcessDefect_Edge(string tableName)
 		{
             TableName = tableName;
         }
 
-		private EdgeSurfaceParameter parameterEdge;
-		private EdgeSurfaceRecipe recipeEdge;
-
-		private GrabModeEdge grabModeTop;
-		private GrabModeEdge grabModeSide;
-		private GrabModeEdge grabModeBtm;
-
-		public void SetGrabMode(GrabModeBase top, GrabModeBase side, GrabModeBase btm)
-		{
-			grabModeTop = (GrabModeEdge)top;
-			grabModeSide = (GrabModeEdge)side;
-			grabModeBtm = (GrabModeEdge)btm;
-		}
-
 		public override WORK_TYPE Type => WORK_TYPE.DEFECTPROCESS_ALL;
 
 		protected override bool Preparation()
 		{
-			if (this.parameterEdge == null || this.recipeEdge == null)
-			{
-				this.parameterEdge = this.parameter as EdgeSurfaceParameter;
-				this.recipeEdge = recipe.GetItem<EdgeSurfaceRecipe>();
-			}
 			return true;
 		}
 
 		protected override bool Execution()
 		{
+			ProcessDefectEdgeParameter param = this.recipe.GetItem<ProcessDefectEdgeParameter>();
+			if (param.Use == false) return true;
+
 			DoProcessDefect_Edge();
 			return true;
 		}
@@ -60,249 +50,142 @@ namespace RootTools_Vision
 			if (this.currentWorkplace.Index != 0)
 				return;
 
-			List<Defect> topMergeDefectList = Tools.MergeDefect(CollectDefectData((int)EdgeSurface.EdgeMapPositionX.Top), this.recipe.GetItem<EdgeSurfaceParameter>().EdgeParamBaseTop.MergeDist);
-			List<Defect> sideMergeDefectList = Tools.MergeDefect(CollectDefectData((int)EdgeSurface.EdgeMapPositionX.Side), this.recipe.GetItem<EdgeSurfaceParameter>().EdgeParamBaseSide.MergeDist);
-			List<Defect> btmMergeDefectList = Tools.MergeDefect(CollectDefectData((int)EdgeSurface.EdgeMapPositionX.Btm), this.recipe.GetItem<EdgeSurfaceParameter>().EdgeParamBaseBtm.MergeDist);
+			ProcessDefectEdgeParameter processDefectParam = this.recipe.GetItem<ProcessDefectEdgeParameter>();
 
-			List<Defect> MergeDefectList = new List<Defect>();
+			List<Defect> topDefectList = CollectDefectData(EdgeSurface.EdgeDefectCode.Top);
+			List<Defect> btmDefectList = CollectDefectData(EdgeSurface.EdgeDefectCode.Btm);
+			List<Defect> sideDefectList = CollectDefectData(EdgeSurface.EdgeDefectCode.Side);
+
+			List<Defect> topMergeDefectList;
+			List<Defect> btmMergeDefectList;
+			List<Defect> sideMergeDefectList;
+
+			if (processDefectParam.UseMergeDefect)
+			{
+				topMergeDefectList = Tools.MergeDefect(topDefectList, processDefectParam.MergeDefectDistnace);
+				btmMergeDefectList = Tools.MergeDefect(btmDefectList, processDefectParam.MergeDefectDistnace);
+				sideMergeDefectList = Tools.MergeDefect(sideDefectList, processDefectParam.MergeDefectDistnace);
+			}
+			else
+			{
+				topMergeDefectList = topDefectList;
+				btmMergeDefectList = btmDefectList;
+				sideMergeDefectList = sideDefectList;
+			}
+
+			List<Defect> mergeDefectList = new List<Defect>();
 			foreach (Defect defect in topMergeDefectList)
-				MergeDefectList.Add(defect);
-			foreach (Defect defect in sideMergeDefectList)
-				MergeDefectList.Add(defect);
+				mergeDefectList.Add(defect);
 			foreach (Defect defect in btmMergeDefectList)
-				MergeDefectList.Add(defect);
+				mergeDefectList.Add(defect);
+			foreach (Defect defect in sideMergeDefectList)
+				mergeDefectList.Add(defect);
 
 			// Top/Side/Btm 별 Defect Merge 후 Index 재정렬
-			MergeDefectList = RearrangeDefectIndex(MergeDefectList);
+			mergeDefectList = RearrangeDefectIndex(mergeDefectList);
+			// 각도 계산
+			mergeDefectList = CalculateAngle(mergeDefectList);
 
-			foreach (Defect defect in MergeDefectList)
+			foreach (Defect defect in mergeDefectList)
 				this.currentWorkplace.DefectList.Add(defect);
 
-			if (MergeDefectList.Count > 0)
-				DatabaseManager.Instance.AddDefectDataList(MergeDefectList, TableName);
+			if (mergeDefectList.Count > 0)
+				DatabaseManager.Instance.AddDefectDataListNoAutoCount(mergeDefectList, TableName);
+
+			#region Klarf / Defect Image 저장
 
 			string sInspectionID = DatabaseManager.Instance.GetInspectionID();
 			Settings settings = new Settings();
 			SettingItem_SetupEdgeside settings_edgeside = settings.GetItem<SettingItem_SetupEdgeside>();
+			SharedBufferInfo topSharedBufferInfo, btmSharedBufferInfo, sideSharedBufferInfo;
+			topSharedBufferInfo = GetSharedBufferInfo(0);
+			btmSharedBufferInfo = GetSharedBufferInfo(3);
+			sideSharedBufferInfo = GetSharedBufferInfo(6);
 
-			for (int i = 0; i < MergeDefectList.Count; i++)
+			string path = Path.Combine(settings_edgeside.DefectImagePath, sInspectionID);
+			DirectoryInfo di = new DirectoryInfo(path);
+			if (!di.Exists)
+				di.Create();
+
+			for (int i = 0; i < mergeDefectList.Count; i++)
+			//Parallel.For(0, mergeDefectList.Count, i =>
 			{
-				SharedBufferInfo sharedBufferInfo = GetBufferInfoByChipX(MergeDefectList[i].m_nChipIndexX);
-				Tools.SaveDefectImage(Path.Combine(settings_edgeside.DefectImagePath, sInspectionID), MergeDefectList[i], sharedBufferInfo, i + 1);
+				Bitmap mergeImage = MergeEdgesideImages(mergeDefectList[i]);
+				if (mergeImage != null)
+					mergeImage.Save(Path.Combine(path, mergeDefectList[i].m_nDefectIndex.ToString() + ".bmp"));
 			}
+			//);
 
-			if (settings_edgeside.UseKlarf)
-			{
-				KlarfData_Lot klarfData = new KlarfData_Lot();
-				Directory.CreateDirectory(settings_edgeside.KlarfSavePath);
+			// EDGE 전체 원형 이미지 저장
+			EdgeSurfaceParameter surfaceParam = this.recipe.GetItem<EdgeSurfaceParameter>();
+			Tools.SaveEdgeCircleImage(Path.Combine(settings_edgeside.DefectImagePath, sInspectionID, (mergeDefectList.Count + 1).ToString()), settings_edgeside.OutputImageSizeWidth, settings_edgeside.OutputImageSizeHeight, settings_edgeside.Thickness
+								  , topSharedBufferInfo, surfaceParam.EdgeParamBaseTop.StartPosition, surfaceParam.EdgeParamBaseTop.EndPosition
+								  , sideSharedBufferInfo, surfaceParam.EdgeParamBaseSide.StartPosition, surfaceParam.EdgeParamBaseSide.EndPosition
+								  , btmSharedBufferInfo, surfaceParam.EdgeParamBaseBtm.StartPosition, surfaceParam.EdgeParamBaseBtm.EndPosition);
 
-				//klarfData.AddSlot(recipe.WaferMap, MergeDefectList, this.recipe.GetItem<OriginRecipe>());
-				//klarfData.WaferStart(recipe.WaferMap, DateTime.Now);
-				//klarfData.SetResultTimeStamp();
+			#endregion
 
-				//klarfData.SaveKlarf(settings_edgeside.KlarfSavePath, false);
-
-				//SaveEdgesideTiff(settings_edgeside.KlarfSavePath, MergeDefectList, this.currentWorkplace.SharedBufferInfo);
-				Tools.SaveTiffImage(settings_edgeside.KlarfSavePath, MergeDefectList, this.currentWorkplace.SharedBufferInfo);
-			}
 			//WorkEventManager.OnInspectionDone(this.currentWorkplace, new InspectionDoneEventArgs(new List<CRect>(), true));
 			WorkEventManager.OnIntegratedProcessDefectDone(this.currentWorkplace, new IntegratedProcessDefectDoneEventArgs());
 		}
 
-		public System.Drawing.Bitmap MergeEdgesideImages(Defect defect)
+		/// <summary>
+		/// Top/Side/Btm 별 SharedBufferInfo 생성 후 Return
+		/// </summary>
+		/// <param name="index"></param>
+		/// <returns></returns>
+		private SharedBufferInfo GetSharedBufferInfo(int index)
 		{
-			SharedBufferInfo sharedBufferInfo_Top = GetBufferInfoByChipX((int)EdgeSurface.EdgeMapPositionX.Top);
-			SharedBufferInfo sharedBufferInfo_Side = GetBufferInfoByChipX((int)EdgeSurface.EdgeMapPositionX.Side);
-			SharedBufferInfo sharedBufferInfo_Btm = GetBufferInfoByChipX((int)EdgeSurface.EdgeMapPositionX.Btm);
-
-			// TOP DEFECT 일 경우
-			if (defect.m_nChipIndexX == (int)EdgeSurface.EdgeMapPositionX.Top)
-			{
-				int heightPerDegree = (int)(grabModeTop.m_nImageHeight / grabModeTop.m_nScanDegree);
-				int side = (int)(grabModeTop.m_nCameraPositionOffset - grabModeSide.m_nCameraPositionOffset + defect.m_fRelY) * heightPerDegree;
-				int btm = (int)(grabModeTop.m_nCameraPositionOffset - grabModeBtm.m_nCameraPositionOffset + defect.m_fRelY) * heightPerDegree;
-
-				Rect defectRect = defect.GetRect();
-				int edge = FindEdge(sharedBufferInfo_Top, new Rect(0, defectRect.Y, 500/*parameterEdge.EdgeParamBaseTop.ROIWidth*/, parameterEdge.EdgeParamBaseTop.ROIHeight));
-				int width = 500/*parameterEdge.EdgeParamBaseTop.ROIWidth*/ - edge;
-
-				Rect calcDefectRect_Top = new Rect(edge, defectRect.Y - (parameterEdge.EdgeParamBaseTop.ROIHeight / 2), width, parameterEdge.EdgeParamBaseTop.ROIHeight);
-				//Rect calcDefectRect_Top = new Rect(0, defectRect.Y - (parameterEdge.EdgeParamBaseTop.ROIHeight /2), parameterEdge.EdgeParamBaseTop.ROIWidth, parameterEdge.EdgeParamBaseTop.ROIHeight);
-				Rect calcDefectRect_Side = new Rect(0, side - (parameterEdge.EdgeParamBaseTop.ROIHeight / 2), 500/*parameterEdge.EdgeParamBaseTop.ROIWidth*/, parameterEdge.EdgeParamBaseTop.ROIHeight);
-				Rect calcDefectRect_Btm = new Rect(0, btm - (parameterEdge.EdgeParamBaseTop.ROIHeight / 2), 500/*parameterEdge.EdgeParamBaseTop.ROIWidth*/, parameterEdge.EdgeParamBaseTop.ROIHeight);
-
-				Bitmap bitmapTop = Tools.CovertBufferToBitmap(sharedBufferInfo_Top, calcDefectRect_Top);
-				Bitmap bitmapSide = Tools.CovertBufferToBitmap(sharedBufferInfo_Side, calcDefectRect_Side);
-				Bitmap bitmapBtm = Tools.CovertBufferToBitmap(sharedBufferInfo_Btm, calcDefectRect_Btm);
-				Bitmap filpBtm = Tools.FlipYImage(bitmapBtm);
-
-				Bitmap bitmap = new Bitmap(width + bitmapSide.Width + bitmapBtm.Width, bitmapTop.Height);
-				Graphics g = Graphics.FromImage(bitmap);
-				g.DrawImage(bitmapTop, 0, 0);
-				g.DrawImage(bitmapSide, width, 0);
-				g.DrawImage(filpBtm/*bitmapBtm*/, width + bitmapSide.Width, 0);
-				bitmap.Save(@"D:\test" + defect.m_nDefectIndex.ToString() + ".bmp");
-
-				return bitmap;
-			}
-
-			return null;
+			IntPtr sharedBufferR_Gray = this.currentWorkplace.SharedBufferInfo.PtrList[index];
+			IntPtr sharedBufferG = this.currentWorkplace.SharedBufferInfo.PtrList[index + 1];
+			IntPtr sharedBufferB = this.currentWorkplace.SharedBufferInfo.PtrList[index + 2];
+			
+			SharedBufferInfo sharedBufferInfo = new SharedBufferInfo(sharedBufferR_Gray,
+																	 this.currentWorkplace.SharedBufferInfo.Width,
+																	 this.currentWorkplace.SharedBufferInfo.Height,
+																	 this.currentWorkplace.SharedBufferByteCnt,
+																	 sharedBufferG,
+																	 sharedBufferB);
+			return sharedBufferInfo;
 		}
 
-		private int FindEdge(SharedBufferInfo info, Rect rect)
-		{
-			byte[] buffer = Tools.ConvertBufferToArrayRect(info, rect);
-			CRect cRect = new CRect((int)rect.Left, (int)rect.Top, (int)rect.Right, (int)rect.Bottom);
-
-			Bitmap bitmap = Tools.ConvertArrayToBitmapRect(buffer, cRect.Width, cRect.Height, 1, cRect);
-			bitmap.Save(@"D:\1.bmp");
-
-			int edge = FindEdge(buffer, (int)rect.Width, (int)rect.Height, 20);
-
-			return edge;
-		}
-
-		private int FindEdge(byte[] arrSrc, int width, int height, int searchLevel = 70)
-		{
-			int min = 256;
-			int max = 0;
-			int prox = min + (int)((max - min) * searchLevel * 0.01);
-
-			if (searchLevel >= 100)
-				prox = max;
-			else if (searchLevel <= 0)
-				prox = min;
-
-			int startPtX = 0;
-			int startPtY = 0;
-			int avg, avgNext;
-			int edge = width;
-
-			avgNext = MeanOfYCoordinates(arrSrc, startPtY, startPtX, width, height);
-			for (int x = startPtX + 1; x < width; x++)
-			{
-				avg = avgNext;
-				avgNext = MeanOfYCoordinates(arrSrc, startPtY, x, width, height);
-
-				if ((avg >= prox && prox > avgNext) || (avg <= prox && prox < avgNext))
-				{
-					edge = x;
-					x = width + 1;
-				}
-			}
-			return edge;
-		}
-
-		private int MeanOfYCoordinates(byte[] arrSrc, int startPtY, int findPtX, int width, int height)
-		{
-			int avg = 0;
-
-			for (int y = startPtY; y < width * height; y += width)
-				avg += arrSrc[y + findPtX];
-
-			if (avg != 0)
-				avg /= (height - startPtY + 1);
-
-			return avg;
-		}
-
-		private void SaveEdgesideTiff(string Path, List<Defect> dataList, SharedBufferInfo sharedBuffer)
-		{
-			Path += "\\";
-			DirectoryInfo di = new DirectoryInfo(Path);
-			if (!di.Exists)
-				di.Create();
-
-			ArrayList inputImage = new ArrayList();
-			for (int i = 0; i < dataList.Count; i++)
-			{
-				MemoryStream image = new MemoryStream();
-				//System.Drawing.Bitmap bitmap = Tools.CovertBufferToBitmap(sharedBuffer, dataList[i].GetRect());
-				System.Drawing.Bitmap bitmap = MergeEdgesideImages(dataList[i]);
-				bitmap.Save(image, ImageFormat.Tiff);
-				inputImage.Add(image);
-			}
-
-			ImageCodecInfo info = null;
-			foreach (ImageCodecInfo ice in ImageCodecInfo.GetImageEncoders())
-			{
-				if (ice.MimeType == "image/tiff")
-				{
-					info = ice;
-					break;
-				}
-			}
-
-			string test = "test";
-			Path += test + ".tiff";
-
-			EncoderParameters ep = new EncoderParameters(2);
-
-			bool firstPage = true;
-
-			System.Drawing.Image img = null;
-
-			for (int i = 0; i < inputImage.Count; i++)
-			{
-				System.Drawing.Image img_src = System.Drawing.Image.FromStream((Stream)inputImage[i]);
-				Guid guid = img_src.FrameDimensionsList[0];
-				System.Drawing.Imaging.FrameDimension dimension = new System.Drawing.Imaging.FrameDimension(guid);
-
-				for (int nLoopFrame = 0; nLoopFrame < img_src.GetFrameCount(dimension); nLoopFrame++)
-				{
-					img_src.SelectActiveFrame(dimension, nLoopFrame);
-
-					ep.Param[0] = new EncoderParameter(System.Drawing.Imaging.Encoder.Compression, Convert.ToInt32(EncoderValue.CompressionLZW));
-
-					if (firstPage)
-					{
-						img = img_src;
-
-						ep.Param[1] = new EncoderParameter(System.Drawing.Imaging.Encoder.SaveFlag, Convert.ToInt32(EncoderValue.MultiFrame));
-						img.Save(Path, info, ep);
-
-						firstPage = false;
-						continue;
-					}
-
-					ep.Param[1] = new EncoderParameter(System.Drawing.Imaging.Encoder.SaveFlag, Convert.ToInt32(EncoderValue.FrameDimensionPage));
-					img.SaveAdd(img_src, ep);
-				}
-			}
-			if (inputImage.Count == 0)
-			{
-				File.Create(Path);
-				return;
-			}
-
-			ep.Param[1] = new EncoderParameter(System.Drawing.Imaging.Encoder.SaveFlag, Convert.ToInt32(EncoderValue.Flush));
-			img.SaveAdd(ep);
-		}
-
-		public List<Defect> CollectDefectData(int chipX)
+		private List<Defect> CollectDefectData(EdgeSurface.EdgeDefectCode defectCode)
 		{
 			List<Defect> DefectList = new List<Defect>();
-
 			foreach (Workplace workplace in workplaceBundle)
 			{
-				if (workplace.MapIndexX == chipX)
+				foreach (Defect defect in workplace.DefectList)
 				{
-					foreach (Defect defect in workplace.DefectList)
+					if (defect.m_nDefectCode == (int)defectCode)
 						DefectList.Add(defect);
 				}
 			}
 			return DefectList;
 		}
 
-		private SharedBufferInfo GetBufferInfoByChipX(int chipX)
+		/// <summary>
+		/// Top/Btm/Side 별 Defect Data 추가.
+		/// RGB 채널 Index : 
+		/// Top - 0,1,2 / Btm - 3,4,5 / Side - 6,7,8
+		/// </summary>
+		/// <param name="min">Copied Buffer R-Channel Index</param>
+		/// <param name="max">Copied Buffer B-Channel Index</param>
+		/// <returns></returns>
+		private List<Defect> CollectDefectData(int min, int max)
 		{
+			List<Defect> DefectList = new List<Defect>();
+			int index = 0;
+
 			foreach (Workplace workplace in workplaceBundle)
 			{
-				if (workplace.MapIndexX == chipX)
-					return workplace.SharedBufferInfo;
+				foreach (Defect defect in workplace.DefectList)
+				{
+					index = (defect.m_nDefectCode - 10000) / 100;
+					if (index >= min && index <= max)
+						DefectList.Add(defect);
+				}
 			}
-
-			return currentWorkplace.SharedBufferInfo;
+			return DefectList;
 		}
 
 		private List<Defect> RearrangeDefectIndex(List<Defect> defectList)
@@ -316,6 +199,169 @@ namespace RootTools_Vision
 				MergeDefectList[nDefectIndex - 1].SetDefectIndex(nDefectIndex++);
 			}
 			return MergeDefectList;
+		}
+
+		private List<Defect> CalculateAngle(List<Defect> defectList)
+		{
+			List<Defect> calAngleDefect = new List<Defect>();
+
+			foreach (Defect defect in defectList)
+			{
+				EdgeSurfaceParameterBase param = this.recipe.GetItem<EdgeSurfaceParameter>().EdgeParamBaseTop;
+				int startPosition = param.StartPosition;
+				int endPosition = param.EndPosition;
+
+				if (defect.m_nDefectCode == (int)EdgeSurface.EdgeDefectCode.Top)
+				{
+					param = this.recipe.GetItem<EdgeSurfaceParameter>().EdgeParamBaseTop;
+					startPosition = param.StartPosition;
+					endPosition = param.EndPosition;
+				}
+				else if (defect.m_nDefectCode == (int)EdgeSurface.EdgeDefectCode.Side)
+				{
+					param = this.recipe.GetItem<EdgeSurfaceParameter>().EdgeParamBaseSide;
+					startPosition = param.StartPosition;
+					endPosition = param.EndPosition;
+				}
+				else if (defect.m_nDefectCode == (int)EdgeSurface.EdgeDefectCode.Btm)
+				{
+					param = this.recipe.GetItem<EdgeSurfaceParameter>().EdgeParamBaseBtm;
+					startPosition = param.StartPosition;
+					endPosition = param.EndPosition;
+				}
+
+				double degree = (double)360 / (endPosition - startPosition) * (defect.m_fAbsY + (defect.m_fHeight / 2) - startPosition);
+				defect.m_fRelY = (float)degree;
+				calAngleDefect.Add(defect);
+			}
+
+			return calAngleDefect;
+		}
+
+		private Bitmap MergeEdgesideImages(Defect defect)
+		{
+			SharedBufferInfo topSharedBufferInfo, btmSharedBufferInfo, sideSharedBufferInfo;
+			topSharedBufferInfo = GetSharedBufferInfo(0);
+			btmSharedBufferInfo = GetSharedBufferInfo(3);
+			sideSharedBufferInfo = GetSharedBufferInfo(6);
+
+			EdgeSurfaceParameter surfaceParam = this.recipe.GetItem<EdgeSurfaceParameter>();
+			int gap90 = surfaceParam.EdgeParamBaseTop.StartPosition - surfaceParam.EdgeParamBaseBtm.StartPosition;
+			int gap45 = surfaceParam.EdgeParamBaseSide.StartPosition - surfaceParam.EdgeParamBaseBtm.StartPosition;
+
+			// Defect 중심 원본 Image
+			Rect defectRect = defect.GetRect();
+			int imageWidth = this.recipe.GetItem<OriginRecipe>().OriginWidth;
+			int imageHeight = 500; //this.recipe.GetItem<EdgeSurfaceParameter>().EdgeParamBaseTop.ROIHeight;			
+			int defectImageLeftPt = 0;
+			int defectImageTopPt = (int)(defectRect.Top + (defectRect.Height / 2) - (imageHeight / 2)); //141520;
+			
+			Bitmap topImage, sideImage, btmImage;
+			if (defect.m_nDefectCode == (int)EdgeSurface.EdgeDefectCode.Top)
+			{
+				byte[] bufferTop = Tools.ConvertBufferToArrayRect(topSharedBufferInfo, new Rect(defectImageLeftPt, defectImageTopPt, imageWidth, imageHeight));
+				int edgeTop = CLR_IP.Cpp_FindEdge(bufferTop, imageWidth, imageHeight, 0, 0, (imageWidth - 1), (imageHeight - 1), 0, surfaceParam.EdgeParamBaseTop.EdgeSearchLevel);
+				
+				if (edgeTop < 0)
+					edgeTop = 0;
+				topImage = Tools.CovertBufferToBitmap(topSharedBufferInfo, new Rect(defectImageLeftPt + edgeTop, defectImageTopPt, imageWidth - edgeTop, imageHeight));
+
+				byte[] bufferSide = Tools.ConvertBufferToArrayRect(sideSharedBufferInfo, new Rect(defectImageLeftPt, defectImageTopPt - gap45, imageWidth, imageHeight));
+				int edgeSideLeft = CLR_IP.Cpp_FindEdge(bufferSide, imageWidth, imageHeight, 0, 0, (imageWidth - 1), (imageHeight - 1), 0, surfaceParam.EdgeParamBaseSide.EdgeSearchLevel);
+				int edgeSideRight = CLR_IP.Cpp_FindEdge(bufferSide, imageWidth, imageHeight, 0, 0, (imageWidth - 1), (imageHeight - 1), 1, surfaceParam.EdgeParamBaseSide.EdgeSearchLevel);
+				
+				if (edgeSideRight - edgeSideLeft > 0)
+					sideImage = Tools.CovertBufferToBitmap(sideSharedBufferInfo, new Rect(defectImageLeftPt + edgeSideLeft, defectImageTopPt - gap45, edgeSideRight - edgeSideLeft, imageHeight));
+				else
+					sideImage = Tools.CovertBufferToBitmap(sideSharedBufferInfo, new Rect(defectImageLeftPt + edgeSideLeft, defectImageTopPt - gap45, imageWidth, imageHeight));
+
+				byte[] bufferBtm = Tools.ConvertBufferToArrayRect(topSharedBufferInfo, new Rect(defectImageLeftPt, defectImageTopPt - gap90, imageWidth, imageHeight));
+				int edgeBtm = CLR_IP.Cpp_FindEdge(bufferBtm, imageWidth, imageHeight, 0, 0, (imageWidth - 1), (imageHeight - 1), 0, surfaceParam.EdgeParamBaseBtm.EdgeSearchLevel);
+				
+				if (edgeBtm < 0)
+					edgeBtm = 0;
+				btmImage = Tools.CovertBufferToBitmap(btmSharedBufferInfo, new Rect(defectImageLeftPt + edgeBtm, defectImageTopPt - gap90, imageWidth - edgeBtm, imageHeight));
+
+				//topImage = Tools.CovertBufferToBitmap(topSharedBufferInfo, new Rect(imageLeftPt, imageTopPt, imageWidth, imageHeight));
+				//sideImage = Tools.CovertBufferToBitmap(sideSharedBufferInfo, new Rect(imageLeftPt, imageTopPt - gap45, imageWidth, imageHeight));
+				//btmImage = Tools.CovertBufferToBitmap(btmSharedBufferInfo, new Rect(imageLeftPt, imageTopPt - gap90, imageWidth, imageHeight));
+				Tools.DrawBitmapRect(ref topImage, (float)(defectImageLeftPt - edgeTop + defectRect.Left), (float)(defectRect.Top - defectImageTopPt), defect.m_fWidth, defect.m_fHeight, PenColor.RED);
+			}
+			else if (defect.m_nDefectCode == (int)EdgeSurface.EdgeDefectCode.Side)
+			{
+				byte[] bufferTop = Tools.ConvertBufferToArrayRect(topSharedBufferInfo, new Rect(defectImageLeftPt, defectImageTopPt + gap45, imageWidth, imageHeight));
+				int edgeTop = CLR_IP.Cpp_FindEdge(bufferTop, imageWidth, imageHeight, 0, 0, (imageWidth - 1), (imageHeight - 1), 0, surfaceParam.EdgeParamBaseTop.EdgeSearchLevel);
+				
+				if (edgeTop < 0)
+					edgeTop = 0; 
+				topImage = Tools.CovertBufferToBitmap(topSharedBufferInfo, new Rect(defectImageLeftPt + edgeTop, defectImageTopPt + gap45, imageWidth - edgeTop, imageHeight));
+
+				byte[] bufferSide = Tools.ConvertBufferToArrayRect(sideSharedBufferInfo, new Rect(defectImageLeftPt, defectImageTopPt, imageWidth, imageHeight));
+				int edgeSideLeft = CLR_IP.Cpp_FindEdge(bufferSide, imageWidth, imageHeight, 0, 0, (imageWidth - 1), (imageHeight - 1), 0, surfaceParam.EdgeParamBaseSide.EdgeSearchLevel);
+				int edgeSideRight = CLR_IP.Cpp_FindEdge(bufferSide, imageWidth, imageHeight, 0, 0, (imageWidth - 1), (imageHeight - 1), 1, surfaceParam.EdgeParamBaseSide.EdgeSearchLevel);
+
+				if (edgeSideRight - edgeSideLeft > 0)
+					sideImage = Tools.CovertBufferToBitmap(sideSharedBufferInfo, new Rect(defectImageLeftPt + edgeSideLeft, defectImageTopPt, edgeSideRight - edgeSideLeft, imageHeight));
+				else
+					sideImage = Tools.CovertBufferToBitmap(sideSharedBufferInfo, new Rect(defectImageLeftPt + edgeSideLeft, defectImageTopPt, imageWidth, imageHeight));
+
+				byte[] bufferBtm = Tools.ConvertBufferToArrayRect(topSharedBufferInfo, new Rect(defectImageLeftPt, defectImageTopPt - gap45, imageWidth, imageHeight));
+				int edgeBtm = CLR_IP.Cpp_FindEdge(bufferBtm, imageWidth, imageHeight, 0, 0, (imageWidth - 1), (imageHeight - 1), 0, surfaceParam.EdgeParamBaseBtm.EdgeSearchLevel);
+
+				if (edgeBtm < 0)
+					edgeBtm = 0;
+				btmImage = Tools.CovertBufferToBitmap(btmSharedBufferInfo, new Rect(defectImageLeftPt + edgeBtm, defectImageTopPt - gap45, imageWidth - edgeBtm, imageHeight));
+
+				//topImage = Tools.CovertBufferToBitmap(topSharedBufferInfo, new Rect(imageLeftPt, imageTopPt + gap45, imageWidth, imageHeight));
+				//sideImage = Tools.CovertBufferToBitmap(sideSharedBufferInfo, new Rect(imageLeftPt, imageTopPt, imageWidth, imageHeight));
+				//btmImage = Tools.CovertBufferToBitmap(btmSharedBufferInfo, new Rect(imageLeftPt, imageTopPt - gap45, imageWidth, imageHeight));
+				Tools.DrawBitmapRect(ref sideImage, (float)(defectImageLeftPt - edgeSideLeft + defectRect.Left), (float)(defectRect.Top - defectImageTopPt), defect.m_fWidth, defect.m_fHeight, PenColor.RED);
+			}
+			else if (defect.m_nDefectCode == (int)EdgeSurface.EdgeDefectCode.Btm)
+			{
+				byte[] bufferTop = Tools.ConvertBufferToArrayRect(topSharedBufferInfo, new Rect(defectImageLeftPt, defectImageTopPt + gap90, imageWidth, imageHeight));
+				int edgeTop = CLR_IP.Cpp_FindEdge(bufferTop, imageWidth, imageHeight, 0, 0, (imageWidth - 1), (imageHeight - 1), 0, surfaceParam.EdgeParamBaseTop.EdgeSearchLevel);
+				
+				if (edgeTop < 0)
+					edgeTop = 0;
+				topImage = Tools.CovertBufferToBitmap(topSharedBufferInfo, new Rect(defectImageLeftPt + edgeTop, defectImageTopPt + gap90, imageWidth - edgeTop, imageHeight));
+
+				byte[] bufferSide = Tools.ConvertBufferToArrayRect(sideSharedBufferInfo, new Rect(defectImageLeftPt, defectImageTopPt + gap45, imageWidth, imageHeight));
+				int edgeSideLeft = CLR_IP.Cpp_FindEdge(bufferSide, imageWidth, imageHeight, 0, 0, (imageWidth - 1), (imageHeight - 1), 0, surfaceParam.EdgeParamBaseSide.EdgeSearchLevel);
+				int edgeSideRight = CLR_IP.Cpp_FindEdge(bufferSide, imageWidth, imageHeight, 0, 0, (imageWidth - 1), (imageHeight - 1), 1, surfaceParam.EdgeParamBaseSide.EdgeSearchLevel);
+				
+				if (edgeSideRight - edgeSideLeft > 0)
+					sideImage = Tools.CovertBufferToBitmap(sideSharedBufferInfo, new Rect(defectImageLeftPt + edgeSideLeft, defectImageTopPt + gap45, edgeSideRight - edgeSideLeft, imageHeight));
+				else
+					sideImage = Tools.CovertBufferToBitmap(sideSharedBufferInfo, new Rect(defectImageLeftPt + edgeSideLeft, defectImageTopPt + gap45, imageWidth, imageHeight));
+
+				byte[] bufferBtm = Tools.ConvertBufferToArrayRect(topSharedBufferInfo, new Rect(defectImageLeftPt, defectImageTopPt, imageWidth, imageHeight));
+				int edgeBtm = CLR_IP.Cpp_FindEdge(bufferBtm, imageWidth, imageHeight, 0, 0, (imageWidth - 1), (imageHeight - 1), 0, surfaceParam.EdgeParamBaseBtm.EdgeSearchLevel);
+
+				if (edgeBtm < 0)
+					edgeBtm = 0;
+				btmImage = Tools.CovertBufferToBitmap(btmSharedBufferInfo, new Rect(defectImageLeftPt + edgeBtm, defectImageTopPt, imageWidth - edgeBtm, imageHeight));
+
+				//topImage = Tools.CovertBufferToBitmap(topSharedBufferInfo, new Rect(imageLeftPt, imageTopPt + gap90, imageWidth, imageHeight));
+				//sideImage = Tools.CovertBufferToBitmap(sideSharedBufferInfo, new Rect(imageLeftPt, imageTopPt + gap45, imageWidth, imageHeight));
+				//btmImage = Tools.CovertBufferToBitmap(btmSharedBufferInfo, new Rect(imageLeftPt, imageTopPt, imageWidth, imageHeight));
+				Tools.DrawBitmapRect(ref btmImage, (float)(defectImageLeftPt - edgeBtm + defectRect.Left), (float)(defectRect.Top - defectImageTopPt), defect.m_fWidth, defect.m_fHeight, PenColor.RED);
+			}
+			else
+				return null;
+
+			Bitmap filpTop = Tools.FlipXImage(topImage);
+			Bitmap filpSide = Tools.FlipXImage(sideImage);
+
+			Bitmap bitmap = new Bitmap(topImage.Width + sideImage.Width + btmImage.Width, imageHeight);
+			Graphics g = Graphics.FromImage(bitmap);
+			g.DrawImage(filpTop, 0, 0);
+			g.DrawImage(filpSide, filpTop.Width, 0);
+			g.DrawImage(btmImage, filpTop.Width + filpSide.Width, 0);
+
+			Tools.DrawBitmapText(ref bitmap, "Angle : " + defect.m_fRelY.ToString("F3"), 50, 50, 30, PenColor.RED);
+
+			return bitmap;
 		}
 	}
 }
