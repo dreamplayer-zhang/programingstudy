@@ -120,7 +120,7 @@ namespace Root_Rinse_Loader
 
             buttonMode.IsEnabled = (EQ.p_eState == EQ.eState.Ready) && (m_handler.m_rinse.p_eStateUnloader == EQ.eState.Ready);
             buttonHome.IsEnabled = EQ.p_eState != EQ.eState.Run;
-            buttonStart.IsEnabled = m_handler.m_rinse.IsEnableStart();
+            buttonStart.IsEnabled = m_handler.m_rinse.IsEnableStart() && (m_handler.m_storage.IsProtrusion() == false);
             buttonPause.IsEnabled = EQ.p_eState == EQ.eState.Run;
             buttonReset.IsEnabled = (EQ.p_eState == EQ.eState.Error) || (EQ.p_eState == EQ.eState.Ready);
             buttonPickerSet.IsEnabled = EQ.p_bPickerSet || ((EQ.p_eState == EQ.eState.Ready) && (m_handler.m_rinse.p_eMode == RinseL.eRunMode.Stack));
@@ -169,6 +169,7 @@ namespace Root_Rinse_Loader
 
         private void buttonStart_Click(object sender, RoutedEventArgs e)
         {
+            if (m_handler.m_storage.IsProtrusion()) return; 
             EQ.p_bStop = false;
             foreach (Storage.Magazine magazine in m_handler.m_storage.m_aMagazine) magazine.RunClamp(magazine.p_bCheck); 
             EQ.p_eState = EQ.eState.Run;
