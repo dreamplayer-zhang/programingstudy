@@ -3910,13 +3910,16 @@ namespace Root_CAMELLIA
                 PointAddMode = "Normal";
             }
 
-            p_isCustomize = false;
-            CheckSelectPoint();
-            m_customizeRD.Clone(dataManager.recipeDM.TeachingRD);
-            //dataManager.recipeDM.TeachingRD.test(
-            p_TabIndex = 0;
-            InitCandidatePoint(dataManager.recipeDM.TeachingRD);
-            UpdateView();
+            if (p_isCustomize)
+            {
+                p_isCustomize = false;
+                CheckSelectPoint();
+                m_customizeRD.Clone(dataManager.recipeDM.TeachingRD);
+                //dataManager.recipeDM.TeachingRD.test(
+                p_TabIndex = 0;
+                InitCandidatePoint(dataManager.recipeDM.TeachingRD);
+                UpdateView();
+            }
         }
 
         public void UpdateGridCombo(bool isSave = true)
