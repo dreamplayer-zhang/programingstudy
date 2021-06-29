@@ -106,6 +106,8 @@ namespace RootTools.Comm
             catch (Exception e)
             {
                 if (m_socket != null) m_commLog.Add(CommLog.eType.Info, "CallBack Exception : " + e.Message);
+                m_socket.Close();
+                InitServer();
             }
         }
         #endregion
