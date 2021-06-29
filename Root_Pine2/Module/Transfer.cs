@@ -133,7 +133,6 @@ namespace Root_Pine2.Module
 
             #region Axis
             double m_dxPulse = 0;
-            public double m_dZ = 0;
             public InfoStrip.eMagazine m_ePosDst = InfoStrip.eMagazine.Magazine0;
             public double m_xOffset = 0; 
             public string RunMove(InfoStrip.eMagazine ePos, bool bPushPos, bool bWait = true)
@@ -174,7 +173,6 @@ namespace Root_Pine2.Module
             public void RunTree(Tree tree)
             {
                 m_dxPulse = tree.Set(m_dxPulse, m_dxPulse, "dPulse", "Distance between Buffer (pulse)");
-                m_dZ = tree.Set(m_dZ, m_dZ, "dZ", "Distance between Buffer (pulse)");
             }
 
             Transfer m_transfer; 
@@ -405,7 +403,7 @@ namespace Root_Pine2.Module
                 return m_pusher.WaitUnlock();
             }
             if (Run(m_buffer.RunMove(infoStrip.p_eMagazine, false, false))) return p_sInfo;
-            if (Run(m_magazineEV.RunMove(infoStrip, 0))) return p_sInfo;
+            if (Run(m_magazineEV.RunMove(infoStrip))) return p_sInfo;
             if (Run(m_buffer.RunMove(infoStrip.p_eMagazine, false, true))) return p_sInfo;
             m_pusher.p_bEnable = (m_pusher.p_infoStrip == null);
             try
@@ -453,7 +451,7 @@ namespace Root_Pine2.Module
             InfoStrip infoStrip = m_pusher.p_infoStrip; 
             if (infoStrip == null) return "OK";
             if (Run(m_buffer.RunMove(infoStrip.p_eMagazine, true, false))) return p_sInfo;
-            if (Run(m_magazineEV.RunMove(infoStrip, m_buffer.m_dZ))) return p_sInfo;
+            if (Run(m_magazineEV.RunMove(infoStrip))) return p_sInfo;
             if (Run(m_buffer.RunMove(infoStrip.p_eMagazine, true, true))) return p_sInfo;
             m_gripper.p_bEnable = (m_gripper.p_infoStrip != null);
             if (Run(m_pusher.RunPusher())) return p_sInfo;

@@ -4223,19 +4223,16 @@ namespace Root_CAMELLIA
                 PointAddMode = "Normal";
             }
 
-
             if (p_isCustomize)
             {
+                p_isCustomize = false;
+                CheckSelectPoint();
                 m_customizeRD.Clone(dataManager.recipeDM.TeachingRD);
                 //dataManager.recipeDM.TeachingRD.test(
                 p_TabIndex = 0;
                 InitCandidatePoint(dataManager.recipeDM.TeachingRD);
                 UpdateView();
-                CheckSelectPoint();
-                p_isCustomize = false;
             }
-          
-
         }
 
         public void UpdateGridCombo(bool isSave = true)
