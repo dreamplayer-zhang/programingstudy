@@ -395,8 +395,10 @@ namespace RootTools
         {
             OnUpdateImage();
         }
+
         public Bitmap GetBitmapToArray(int width, int height, byte[] imageData)
         {
+            // need to edit (same with GetByteToBitmap)
             var bmp = new Bitmap(width, height, System.Drawing.Imaging.PixelFormat.Format8bppIndexed);
             bmp.Palette = mono;
             using (var stream = new MemoryStream(imageData))
@@ -412,24 +414,20 @@ namespace RootTools
             }
             return bmp;
         }
+
         public Bitmap GetByteToBitmap(int width, int height, byte[] imageData)
         {
             var bmp = new Bitmap(width, height, System.Drawing.Imaging.PixelFormat.Format8bppIndexed);
-
             bmp.Palette = mono;
-
             using (var stream = new MemoryStream(imageData))
             {
-
                 System.Drawing.Imaging.BitmapData bmpData = bmp.LockBits(new Rectangle(0, 0,
                                                                 bmp.Width,
                                                                 bmp.Height),
                                                   System.Drawing.Imaging.ImageLockMode.WriteOnly,
                                                   bmp.PixelFormat);
-
                 IntPtr pNative = bmpData.Scan0;
                 Marshal.Copy(imageData, 0, pNative, imageData.Length);
-
                 bmp.UnlockBits(bmpData);
             }
             return bmp;
@@ -542,7 +540,7 @@ namespace RootTools
                 Marshal.Copy((IntPtr)((long)GetPtr() + rect.Left + ((long)i + (long)rect.Top) * p_Size.X), aBuf, position, rect.Width);
                 position += rect.Width;
             }
-            return GetBitmapToArray(rect.Width, rect.Height, aBuf);
+            return GetByteToBitmap(rect.Width, rect.Height, aBuf);
         }
 
         public unsafe BitmapSource GetBitMapSource(int nByteCnt = 1)

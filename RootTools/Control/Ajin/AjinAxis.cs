@@ -329,15 +329,15 @@ namespace RootTools.Control.Ajin
 
         void GetAxisStatusHome()
         {
-            int i = 0; uint u0 = 0, u1 = 0; double f0 = 0, f1 = 0;
-            AXM("AxmHomeGetMethod", CAXM.AxmHomeGetMethod(m_nAxis, ref i, ref u0, ref u1, ref f0, ref f1));
-            m_eHomeDir = (eMoveDir)i;
-            m_eHomeSignal = (eHomeSignal)u0;
-            m_eHomeZPhase = (eHomeZPhase)u1;
+            //int i = 0; uint u0 = 0, u1 = 0; double f0 = 0, f1 = 0;
+            //AXM("AxmHomeGetMethod", CAXM.AxmHomeGetMethod(m_nAxis, ref i, ref u0, ref u1, ref f0, ref f1));
+            //m_eHomeDir = (eMoveDir)i;
+            //m_eHomeSignal = (eHomeSignal)u0;
+            //m_eHomeZPhase = (eHomeZPhase)u1;
         }
 
         void RunTreeSettingHome(Tree tree)
-        {
+        {   
             m_eHomeDir = (eMoveDir)tree.Set(m_eHomeDir, m_eHomeDir, "Dir", "Search Home Direction");
             m_eHomeSignal = (eHomeSignal)tree.Set(m_eHomeSignal, m_eHomeSignal, "Signal", "Search Home Sensor");
             m_eHomeZPhase = (eHomeZPhase)tree.Set(m_eHomeZPhase, m_eHomeZPhase, "ZPhase", "Search Home ZPhase");
@@ -503,14 +503,14 @@ namespace RootTools.Control.Ajin
         public void SetAxisStatus()
         {
             if (m_nAxis < 0) return;
-            AXM("AxmMotSetPulseOutMethod", CAXM.AxmMotSetPulseOutMethod(m_nAxis, (uint)m_ePulse));
-            AXM("AxmMotSetEncInputMethod", CAXM.AxmMotSetEncInputMethod(m_nAxis, (uint)m_eEncoder));
-            AXM("AxmSignalSetServoOnLevel", CAXM.AxmSignalSetServoOnLevel(m_nAxis, (uint)m_nServoOnLevel));
-            AXM("AxmSignalSetLimit", CAXM.AxmSignalSetLimit(m_nAxis, 0, (uint)m_eLimitP, (uint)m_eLimitM));
-            AXM("AxmSignalSetInpos", CAXM.AxmSignalSetInpos(m_nAxis, (uint)m_eInPos));
-            AXM("AxmSignalSetServoAlarm", CAXM.AxmSignalSetServoAlarm(m_nAxis, (uint)m_eAlarm));
-            AXM("AxmSignalSetStop", CAXM.AxmSignalSetStop(m_nAxis, 0, (uint)m_eEmergency));
-            AXM("AxmHomeSetSignalLevel", CAXM.AxmHomeSetSignalLevel(m_nAxis, (uint)m_eHome));
+            //AXM("AxmMotSetPulseOutMethod", CAXM.AxmMotSetPulseOutMethod(m_nAxis, (uint)m_ePulse));
+            //AXM("AxmMotSetEncInputMethod", CAXM.AxmMotSetEncInputMethod(m_nAxis, (uint)m_eEncoder));
+            //AXM("AxmSignalSetServoOnLevel", CAXM.AxmSignalSetServoOnLevel(m_nAxis, (uint)m_nServoOnLevel));
+            //AXM("AxmSignalSetLimit", CAXM.AxmSignalSetLimit(m_nAxis, 0, (uint)m_eLimitP, (uint)m_eLimitM));
+            //AXM("AxmSignalSetInpos", CAXM.AxmSignalSetInpos(m_nAxis, (uint)m_eInPos));
+            //AXM("AxmSignalSetServoAlarm", CAXM.AxmSignalSetServoAlarm(m_nAxis, (uint)m_eAlarm));
+            //AXM("AxmSignalSetStop", CAXM.AxmSignalSetStop(m_nAxis, 0, (uint)m_eEmergency));
+            //AXM("AxmHomeSetSignalLevel", CAXM.AxmHomeSetSignalLevel(m_nAxis, (uint)m_eHome));
         }
 
         void InitAxis()
@@ -794,8 +794,8 @@ namespace RootTools.Control.Ajin
         public override void RunTreeSetting(Tree.eMode mode)
         {
             m_treeRootSetting.p_eMode = mode;
-            RunTreeSettingProperty(m_treeRootSetting.GetTree("Property"));
             RunTreeSettingHome(m_treeRootSetting.GetTree("Home"));
+            RunTreeSettingProperty(m_treeRootSetting.GetTree("Property"));
             RunTreeSettingMode(m_treeRootSetting.GetTree("Mode"));
             RunTreeSettingSensor(m_treeRootSetting.GetTree("Sensor"));
             RunTreeSettingTrigger(m_treeRootSetting.GetTree("Trigger"));
