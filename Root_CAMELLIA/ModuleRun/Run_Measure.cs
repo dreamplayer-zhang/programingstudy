@@ -185,14 +185,17 @@ namespace Root_CAMELLIA.Module
             string rootPath = m_module.p_dataSavePath;
             try
             {
-                if(m_module.p_infoWafer == null)
+                if (m_module.p_infoWafer == null)
                 {
                     return true;
                 }
                 string[] path = rootPath.Split('\\');
                 if(m_module.p_dataSavePath == "")
                 {
-                    rootPath = BaseDefine.Dir_MeasureSaveRootPath + m_module.p_infoWafer.p_sRecipe;
+                    if (m_module.p_infoWafer.p_sRecipe == "")
+                        rootPath = BaseDefine.Dir_MeasureSaveRootPath + DataManager.Instance.recipeDM.LoadRecipeName;
+                    else
+                        rootPath = BaseDefine.Dir_MeasureSaveRootPath + m_module.p_infoWafer.p_sRecipe;
                 }
                 //if (System.IO.Directory.Exists(rootPath))
                 //{

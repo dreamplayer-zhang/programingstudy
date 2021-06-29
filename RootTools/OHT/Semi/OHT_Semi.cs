@@ -459,11 +459,11 @@ namespace RootTools.OHT.Semi
                     //m_carrier.p_eTransfer = GemCarrierBase.eTransfer.ReadyToLoad; khd
                     if (m_carrier.p_eAccessLP == GemCarrierBase.eAccessLP.Manual && !m_bPresent && !m_bPlaced && m_carrier.p_eTransfer != GemCarrierBase.eTransfer.ReadyToUnload)
                     {
-                        m_carrier.p_eTransfer = GemCarrierBase.eTransfer.TransferBlocked;
+                        m_carrier.p_eReqTransfer = GemCarrierBase.eTransfer.TransferBlocked;
                     }
                     else if (m_carrier.p_eAccessLP == GemCarrierBase.eAccessLP.Manual && m_bPresent && m_bPlaced)
                     {
-                        m_carrier.p_eTransfer = GemCarrierBase.eTransfer.ReadyToLoad;
+                        m_carrier.p_eReqTransfer = GemCarrierBase.eTransfer.ReadyToLoad;
                     }
                 }
                     m_bAuto_p = m_bAuto;
