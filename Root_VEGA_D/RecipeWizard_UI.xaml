@@ -34,7 +34,7 @@
                 <RowDefinition Height="43*" />
             </Grid.RowDefinitions>
             <Button Content="Snap"
-                    Margin="8,5"
+                    Margin="8,5" Command="{Binding CmdSnap}"
                     Style="{StaticResource SetupPanelBtn}" />
             <GroupBox Header="Setting Mode" Grid.Row="1">
                 <Grid>
@@ -89,16 +89,14 @@
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="3*"/>
                             <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="2*"/>
                         </Grid.ColumnDefinitions>
-                        <Button Content="Calc Angle"
+                        <Button Content="Align"
                             Margin="3"
                             Grid.Row="1" Command="{Binding CmdCalcAlign}"
                             Style="{StaticResource SetupPanelBtn}" />
-                        <ToggleButton Content="Auto" FontWeight="Bold" Grid.Column="1" Margin="0,3,3,3" IsChecked="{Binding p_isAutoCalc}"/>
-                        <Label Content="Angle : " HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Column="2"/>
-                        <TextBox Margin="3" IsReadOnly="True" Grid.Column="3" Text="{Binding p_degree}" TextAlignment="Center" VerticalAlignment="Center"/>
+                        <Label Content="Angle : " HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Column="1"/>
+                        <TextBox Margin="3" IsReadOnly="True" Grid.Column="2" Text="{Binding p_degree}" TextAlignment="Center" VerticalAlignment="Center"/>
                     </Grid>
                     
                 </Grid>

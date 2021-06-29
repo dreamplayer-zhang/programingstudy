@@ -3,12 +3,16 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shapes;
+using Root_VEGA_D.Engineer;
+using Root_VEGA_D.Module;
 using RootTools;
+using RootTools.Control;
 using RootTools.Memory;
 
 namespace Root_VEGA_D
@@ -160,19 +164,6 @@ namespace Root_VEGA_D
             set
             {
                 SetProperty(ref m_degree, value);
-            }
-        }
-
-        bool m_isAutoCalc = false;
-        public bool p_isAutoCalc
-        {
-            get
-            {
-                return m_isAutoCalc;
-            }
-            set
-            {
-                SetProperty(ref m_isAutoCalc, value);
             }
         }
 
@@ -405,11 +396,14 @@ namespace Root_VEGA_D
                 SetProperty(ref m_strShot, value);
             }
         }
+
+        Vision m_vision;
         #endregion
 
         public event EventHandler<DialogCloseRequestedEventArgs> CloseRequested;
         public RecipeWizard_VM()
         {
+            m_vision = ((VEGA_D_Handler)App.m_engineer.ClassHandler()).m_vision;
             Init();
         }
 
@@ -440,7 +434,7 @@ namespace Root_VEGA_D
             }
 
             
-            double degree = Math.Atan2(calcX1 - calcX2, calcY1 - calcY2) * 180 / 3.1415f;
+            double degree = Math.Atan2(calcX1 - calcX2, calcY1 - calcY2) * 180 / Math.PI;
 
             if (degree > 0)
             {
@@ -504,7 +498,32 @@ namespace Root_VEGA_D
             {
                 return new RelayCommand(() =>
                 {
-                    CalcAngle();
+                    Axis rotate = m_vision.AxisRotate;
+                    double moveVal = p_degree * 1000;
+                    Thread thread = new Thread(() =>
+                    {
+                        rotate.StartMove(rotate.p_posActual - moveVal);
+                        rotate.WaitReady();
+                    });
+                    thread.Start();
+                });
+            }
+        }
+
+        public ICommand CmdSnap
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    Thread thread = new Thread(() =>
+                    {
+                        Run_GrabLineScan grab = m_vision.CloneModuleRun("GrabLineScan") as Run_GrabLineScan;
+                        grab.m_grabMode.m_ScanStartLine = 0;
+                        grab.m_grabMode.m_ScanLineNum = 2;
+                        m_vision.StartRun(grab);
+                    });
+                    thread.Start();
                 });
             }
         }
@@ -561,10 +580,7 @@ namespace Root_VEGA_D
                         }
                     }
 
-                    if (p_isAutoCalc)
-                    {
-                        CalcAngle();
-                    }
+                    CalcAngle();
                 }
                 else
                 {
@@ -926,6 +942,8 @@ namespace Root_VEGA_D
         public override void MouseMove(object sender, MouseEventArgs e)
         {
             base.MouseMove(sender,e);
+
+            this.p_Cursor = Cursors.Pen;
             CPoint CanvasPt = new CPoint(p_MouseX, p_MouseY);
             CPoint MemPt = GetMemPoint(CanvasPt);
             p_MouseMemX = MemPt.X;
