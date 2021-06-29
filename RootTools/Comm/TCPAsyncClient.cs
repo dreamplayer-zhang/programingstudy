@@ -136,7 +136,7 @@ namespace RootTools.Comm
         static readonly object g_lock = new object();
         public string Send(string sMsg)
         {
-            if (m_socket == null) return "Not Connected";
+            if (m_socket == null || !m_socket.Connected) return "Not Connected";
             lock (g_lock)
             {
                 Async async = new Async(1);

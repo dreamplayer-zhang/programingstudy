@@ -326,7 +326,7 @@ namespace Root_Pine2_Vision.Module
                 {
                     _lSnap = value;
 
-                    if (m_treeRecipe.p_eMode == Tree.eMode.JobOpen)
+                    if (m_treeRecipe.p_eMode == Tree.eMode.JobOpen && m_vision.p_eRemote == eRemote.Client)
                     {
                         while (m_aSnap.Count > value) m_aSnap.RemoveAt(m_aSnap.Count - 1);
                         while (m_aSnap.Count < value) m_aSnap.Add(new Snap(m_vision));
@@ -494,7 +494,7 @@ namespace Root_Pine2_Vision.Module
                 p_dProductWidth = tree.Set(p_dProductWidth, p_dProductWidth, "Product Width", "Product Width(mm)", bVisible);
                 p_lSnap = tree.Set(p_lSnap, p_lSnap, "Count", "Snap Count", bVisible, true);
 
-                if (m_treeRecipe.p_eMode != Tree.eMode.JobOpen)
+                if (!(m_treeRecipe.p_eMode == Tree.eMode.JobOpen && m_vision.p_eRemote == eRemote.Client))
                 {
                     if (p_eSnapMode == eSnapMode.RGB || p_eSnapMode == eSnapMode.ALL)
                         m_lightPowerRGB.RunTree(tree.GetTree("Light").GetTree("RGB Light", true, bVisible), bVisible);
