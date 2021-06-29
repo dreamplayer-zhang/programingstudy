@@ -140,7 +140,7 @@ namespace RootTools.GAFs
             p_brushAlarm = (p_aSetALID.Count > 0) ? Brushes.Red : Brushes.White;
 
             bool isEQError = false;
-            foreach (ALID alid in p_aALID)
+            foreach (ALID alid in p_aSetALID)
             {
                 if (alid.p_bEQError)
                 {

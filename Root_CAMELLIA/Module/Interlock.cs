@@ -153,7 +153,7 @@ namespace Root_CAMELLIA.Module
             m_alidVacLow.Run(!m_diVacLow.p_bIn, "Please Check Vac Low Sensor");
             if (m_diInterlock_key.p_bIn)
             {
-                if (!m_diDoorLock.p_bIn)
+                if (!m_doDoorLock.p_bOut)
                     m_doDoorLock.Write(true);
 
                 Thread.Sleep(10);
