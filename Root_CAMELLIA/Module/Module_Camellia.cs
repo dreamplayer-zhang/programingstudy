@@ -38,6 +38,7 @@ namespace Root_CAMELLIA.Module
     {
         public DataManager m_DataManager;
         public MainWindow_ViewModel mwvm;
+        
         InfoCarrier[] infoCarrier = new InfoCarrier[2];
         Log m_camelliaLog;
         #region ToolBox
@@ -254,14 +255,17 @@ namespace Root_CAMELLIA.Module
             m_axisLifter.AddPos(Enum.GetNames(typeof(eAxisPos)));
             m_axisLifter.AddIO(m_axisXReady);
             m_axisLifter.AddIO(m_axisYReady);
+            m_stageAxisZ.AddPos(Enum.GetNames(typeof(eAxisPos)));
+            m_tiltAxisXY.p_axisX.AddPos(Enum.GetNames(typeof(eAxisPos)));
+            m_tiltAxisXY.p_axisY.AddPos(Enum.GetNames(typeof(eAxisPos)));
 
-            m_axisXY.p_axisX.AddIO(m_axisLifterHome1);
-            m_axisXY.p_axisX.AddIO(m_axisLifterHome2);
-            m_axisXY.p_axisX.AddIO(m_axisLifterHome3);
+            //m_axisXY.p_axisX.AddIO(m_axisLifterHome1);
+            //m_axisXY.p_axisX.AddIO(m_axisLifterHome2);
+            //m_axisXY.p_axisX.AddIO(m_axisLifterHome3);
 
-            m_axisXY.p_axisY.AddIO(m_axisLifterHome1);
-            m_axisXY.p_axisY.AddIO(m_axisLifterHome2);
-            m_axisXY.p_axisY.AddIO(m_axisLifterHome3);
+            //m_axisXY.p_axisY.AddIO(m_axisLifterHome1);
+            //m_axisXY.p_axisY.AddIO(m_axisLifterHome2);
+            //m_axisXY.p_axisY.AddIO(m_axisLifterHome3);
             //m_axisLifter.AddIO(m_vaccum);
             m_axisLifter.p_vaccumDIO_I = m_vacuum;
         }
@@ -422,6 +426,23 @@ namespace Root_CAMELLIA.Module
                 p_eState = eState.Error;
                 return "AxisZ Home Error";
             }
+
+            p_stageAxisZ.StartHome();
+
+            if(p_stageAxisZ.WaitReady() != "OK")
+            {
+                p_eState = eState.Error;
+                return "Axis StageZ Home Error";
+            }
+
+            p_stageAxisZ.StartMove(eAxisPos.Ready);
+
+            if(p_stageAxisZ.WaitReady() != "OK")
+            {
+                p_eState = eState.Error;
+                return "Axis StageZ Move Ready Error";
+            }
+
             p_eState = (p_sInfo == "OK") ? eState.Ready : eState.Error;
 
             return p_sInfo;
@@ -646,7 +667,7 @@ namespace Root_CAMELLIA.Module
 
         private string MoveReadyPos()
         {
-            if (p_axisLifter.IsInPos(ePosition.Position_0)) return "OK";
+            if (p_axisLifter.IsInPos(eAxisPos.Ready)) return "OK";
 
             /* XY Ready 위치 이동 */
             if (Run(p_axisXY.p_axisX.StartMove(eAxisPos.Ready)))
@@ -668,7 +689,9 @@ namespace Root_CAMELLIA.Module
 
         public string RunMoveReady()
         {
-
+            string info = MoveReadyPos();
+            if (info != "OK")
+                return info;
             return "OK";
         }
 
@@ -676,9 +699,12 @@ namespace Root_CAMELLIA.Module
         {
             //App.m_SSLoggerNet.WriteXFRLog(nID, SSLNet.XFR_EVENTID.GET, SSLNet.STATUS.START,);
             //m_CamVRS.FunctionConnect();
+            //MarsLogManager.Instance.WritePRC(EQ.p_nRunLP, BaseDefine.LOG_DEVICE_ID, SSLNet.PRC_EVENTID.Process, SSLNet.STATUS.END, this.p_id, 0);
+            //MarsLogManager.Instance.WriteFNC(EQ.p_nRunLP, BaseDefine.LOG_DEVICE_ID, "Move Ready Position", SSLNet.STATUS.START);
             string info = MoveReadyPos();
             if (info != "OK")
                 return info;
+            //MarsLogManager.Instance.WriteFNC(EQ.p_nRunLP, BaseDefine.LOG_DEVICE_ID, "Move Ready Position", SSLNet.STATUS.END);
             return "OK";
         }
 
@@ -721,6 +747,7 @@ namespace Root_CAMELLIA.Module
             GeneralTools.MakeDirectory(p_dataSavePath);
 
             MarsLogManager.Instance.ChangeMaterial(EQ.p_nRunLP, p_infoWafer.m_nSlot + 1, p_infoWafer.p_sLotID, p_infoWafer.p_sCarrierID, p_infoWafer.p_sRecipe);
+            MarsLogManager.Instance.WritePRC(EQ.p_nRunLP, BaseDefine.LOG_DEVICE_ID, SSLNet.PRC_EVENTID.Process, SSLNet.STATUS.START, this.p_id, 0);
             return "OK";
         }
 

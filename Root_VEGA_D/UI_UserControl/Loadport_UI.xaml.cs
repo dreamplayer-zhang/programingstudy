@@ -140,7 +140,10 @@ namespace Root_VEGA_D
                 m_loadport.StartRun(UnDocking);
                 return;
             }
-            if (m_manualjob.ShowPopup(m_handler) == false) return;
+            Application.Current.Dispatcher.Invoke(delegate
+            {
+                if (m_manualjob.ShowPopup(m_handler) == false) return;
+            });
         }
 
         bool bPMComplete = false;

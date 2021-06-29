@@ -159,7 +159,7 @@ namespace Root_WIND2.UI_User
 				KlarfData_Lot klarfData = new KlarfData_Lot();
 				Directory.CreateDirectory(settings_edgeside.KlarfSavePath);
 
-				klarfData.SetModuleName("Edge");
+				klarfData.SetModuleName("Edgeside");
 				klarfData.LotStart(settings_edgeside.KlarfSavePath, infoWafer, recipe.WaferMap, grabMode);
 				klarfData.WaferStart(recipe.WaferMap, infoWafer);
 				klarfData.AddSlot(recipe.WaferMap, defects, recipe.GetItem<OriginRecipe>());

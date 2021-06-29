@@ -40,8 +40,11 @@ namespace Root_Pine2.Module
             #endregion
 
             #region Axis
+            string c_sReady = "Ready";
             void InitPosition()
             {
+                m_axis[0].AddPos(c_sReady);
+                m_axis[1].AddPos(c_sReady);
                 foreach (InfoStrip.eMagazine ePos in Enum.GetValues(typeof(InfoStrip.eMagazine)))
                 {
                     m_axis[GetAxisID(ePos)].AddPos(ePos.ToString()); 
@@ -54,6 +57,16 @@ namespace Root_Pine2.Module
                 return (ePos <= m_ePosLeft) ? 0 : 1; 
             }
 
+            public string RunMoveReady(bool bWait = true)
+            {
+                m_axis[0].StartMove(c_sReady);
+                m_axis[1].StartMove(c_sReady);
+                if (bWait == false) return "OK";
+                if (m_axis[0].WaitReady() != "OK") return "Move Ready Error";
+                if (m_axis[1].WaitReady() != "OK") return "Move Ready Error";
+                return "OK";
+            }
+
             public string RunMove(InfoStrip.eMagazine ePos, bool bWait = true)
             {
                 Axis axis = m_axis[GetAxisID(ePos)]; 
@@ -63,8 +76,7 @@ namespace Root_Pine2.Module
 
             public void Reset()
             {
-                m_axis[0].StartMove(0);
-                m_axis[1].StartMove(0);
+                RunMoveReady(false); 
             }
             #endregion
 
@@ -120,8 +132,9 @@ namespace Root_Pine2.Module
             #endregion
 
             #region Axis
-            double m_dPulse = 0;
+            double m_dxPulse = 0;
             public InfoStrip.eMagazine m_ePosDst = InfoStrip.eMagazine.Magazine0;
+            public double m_xOffset = 0; 
             public string RunMove(InfoStrip.eMagazine ePos, bool bPushPos, bool bWait = true)
             {
                 if (m_transfer.m_pusher.p_bLock) return "Lock by Sorter Picker";
@@ -129,8 +142,9 @@ namespace Root_Pine2.Module
                 m_transfer.m_pusher.p_bEnable = false;
                 m_transfer.m_gripper.p_bEnable = false; 
                 m_ePosDst = ePos;
-                double dPos = 1000 * (95 - m_transfer.m_pine2.p_widthStrip);
-                m_axis.StartMove(ePos, (bPushPos ? 0 : m_dPulse) + dPos); 
+                double dPos = 1000 * (m_transfer.m_pine2.m_widthDefaultStrip - m_transfer.m_pine2.p_widthStrip) / 2;
+                m_xOffset = (bPushPos ? m_dxPulse : 0) + dPos; 
+                m_axis.StartMove(ePos, m_xOffset); 
                 return bWait ? m_axis.WaitReady() : "OK";
             }
             #endregion
@@ -158,7 +172,7 @@ namespace Root_Pine2.Module
 
             public void RunTree(Tree tree)
             {
-                m_dPulse = tree.Set(m_dPulse, m_dPulse, "dPulse", "Distance between Buffer (pulse)"); 
+                m_dxPulse = tree.Set(m_dxPulse, m_dxPulse, "dPulse", "Distance between Buffer (pulse)");
             }
 
             Transfer m_transfer; 
@@ -451,10 +465,17 @@ namespace Root_Pine2.Module
         public override string StateReady()
         {
             if (EQ.p_eState != EQ.eState.Run) return "OK";
-            if (m_pine2.p_eMode != Pine2.eRunMode.Magazine) return "OK";
-            if (m_pusher.p_infoStrip != null) return StartUnload();
-            if (m_gripper.p_infoStrip == null) return StartLoad();
-            return StartWaitLoader(); 
+            switch (m_pine2.p_eMode)
+            {
+                case Pine2.eRunMode.Stack:
+                    m_loaderPusher.RunMoveReady(); 
+                    break;
+                case Pine2.eRunMode.Magazine:
+                    if (m_pusher.p_infoStrip != null) return StartUnload();
+                    if (m_gripper.p_infoStrip == null) return StartLoad();
+                    return StartWaitLoader();
+            }
+            return "OK"; 
         }
 
         public override string StateHome()
@@ -466,6 +487,8 @@ namespace Root_Pine2.Module
             }
             p_sInfo = base.StateHome();
             p_eState = (p_sInfo == "OK") ? eState.Ready : eState.Error;
+            m_loaderPusher.Reset();
+            m_buffer.Reset(m_pine2);
             return p_sInfo;
         }
 

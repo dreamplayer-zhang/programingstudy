@@ -119,6 +119,7 @@ namespace Root_CAMELLIA.Module
                     sw.Start();
                     if (m_DataManager.recipeDM.MeasurementRD.UseThickness)
                     {
+                        //Thread.Sleep(1);
                         Met.Nanoview.ERRORCODE_NANOVIEW rst = App.m_nanoView.GetThickness(index, m_DataManager.recipeDM.MeasurementRD.LMIteration, m_DataManager.recipeDM.MeasurementRD.DampingFactor, useAlphafit);
                         if (rst != Met.Nanoview.ERRORCODE_NANOVIEW.SR_NO_ERROR)
                         {
@@ -141,7 +142,7 @@ namespace Root_CAMELLIA.Module
                         //m_mwvm.p_RTGraph.DrawTransmittanceGraph(index, "Wavelength(nm)", "Reflectance(%)");
 
                     }
-                    m_mwvm.p_Progress = (((double)(index + 1) / m_DataManager.recipeDM.MeasurementRD.DataSelectedPoint.Count) * 100);
+                    m_mwvm.p_Progress = (double)(index + 1) / m_DataManager.recipeDM.MeasurementRD.DataSelectedPoint.Count * 100;
                     SaveRawData(index);
                     //.DataManager MetData = LibSR_Met.DataManager.GetInstance();
                     // Spectrum data Thread 추가 두개두개두개
@@ -167,7 +168,7 @@ namespace Root_CAMELLIA.Module
                     nThicknessCnt++;
                 }
 
-                if (MeasureDone && nThicknessCnt == m_DataManager.recipeDM.MeasurementRD.DataSelectedPoint.Count)
+                if (MeasureDone && (nThicknessCnt == m_DataManager.recipeDM.MeasurementRD.DataSelectedPoint.Count || m_isPointMeasure))
                 {
                     m_CalcThicknessDone = true;
                     break;
@@ -185,14 +186,17 @@ namespace Root_CAMELLIA.Module
             string rootPath = m_module.p_dataSavePath;
             try
             {
-                if(m_module.p_infoWafer == null)
+                if (m_module.p_infoWafer == null)
                 {
                     return true;
                 }
                 string[] path = rootPath.Split('\\');
                 if(m_module.p_dataSavePath == "")
                 {
-                    rootPath = BaseDefine.Dir_MeasureSaveRootPath + m_module.p_infoWafer.p_sRecipe;
+                    if (m_module.p_infoWafer.p_sRecipe == "")
+                        rootPath = BaseDefine.Dir_MeasureSaveRootPath + DataManager.Instance.recipeDM.LoadRecipeName;
+                    else
+                        rootPath = BaseDefine.Dir_MeasureSaveRootPath + m_module.p_infoWafer.p_sRecipe;
                 }
                 //if (System.IO.Directory.Exists(rootPath))
                 //{
@@ -221,7 +225,11 @@ namespace Root_CAMELLIA.Module
         {
             MarsLogManager marsLogManager = MarsLogManager.Instance;
             DataFormatter dataFormatter = new DataFormatter();
+
             string deviceID = BaseDefine.LOG_DEVICE_ID;
+            
+
+
             if (!MakeSaveDirectory())
             {
                 return "Make Directory Error";
@@ -242,10 +250,11 @@ namespace Root_CAMELLIA.Module
             m_thread = new Task(RunThread);
             m_thread.Start();
 
-            marsLogManager.WritePRC(EQ.p_nRunLP, deviceID, SSLNet.PRC_EVENTID.Process, SSLNet.STATUS.START, this.p_id, 0, materialID:m_module.p_infoWafer.p_id);
+            //marsLogManager.WritePRC(EQ.p_nRunLP, deviceID, SSLNet.PRC_EVENTID.Process, SSLNet.STATUS.START, this.p_id, 0, materialID:m_module.p_infoWafer.p_id);
             InfoWafer info = m_module.p_infoWafer;
 
 
+            marsLogManager.WritePRC(EQ.p_nRunLP, deviceID, SSLNet.PRC_EVENTID.StepProcess, SSLNet.STATUS.START, "Measure", (int)BaseDefine.Process.Measure);
             //m_SettingDataWithErrorCode = App.m_nanoView.LoadSettingParameters();
             //Met.SettingData setting = null;
             //if (m_SettingDataWithErrorCode.Item2 == Met.Nanoview.ERRORCODE_NANOVIEW.SR_NO_ERROR)
@@ -287,8 +296,6 @@ namespace Root_CAMELLIA.Module
                 {
                     centerX = m_DataManager.m_waferCentering.m_ptCenter.X;
                     centerY = m_DataManager.m_waferCentering.m_ptCenter.Y;
-                    //centerX = m_DataManager.m_waferCentering.m_ptCenter.X - (m_StageCenterPos_pulse.X - m_DataManager.m_waferCentering.m_ptCenter.X);
-                    //centerY = m_DataManager.m_waferCentering.m_ptCenter.Y - (m_StageCenterPos_pulse.Y- m_DataManager.m_waferCentering.m_ptCenter.Y);
                 }
 
                 double RatioX = (int)(BaseDefine.CanvasWidth / BaseDefine.ViewSize);
@@ -314,18 +321,17 @@ namespace Root_CAMELLIA.Module
                     }
                     if (i == 0)
                     {
-                        marsLogManager.WritePRC(EQ.p_nRunLP, deviceID, SSLNet.PRC_EVENTID.StepProcess, SSLNet.STATUS.START, "Measure", 1, materialID:m_module.p_infoWafer.p_id);
                         MeasurePoint = new RPoint(dX, dY);
                         dataFormatter.AddData("X Axis", dX, "Pulse");
                         dataFormatter.AddData("Y Axis", dY, "Pulse");
-                        marsLogManager.WriteFNC(EQ.p_nRunLP, deviceID, "Stage Move", SSLNet.STATUS.START, dataFormatter, MATERIAL_TYPE.WAFER);
-                        dataFormatter.ClearData();
+                        marsLogManager.WriteFNC(EQ.p_nRunLP, deviceID, "Stage Move", SSLNet.STATUS.START, dataFormatter);
+                        
                         if (m_module.Run(axisXY.StartMove(MeasurePoint)))
                             return p_sInfo;
                         if (m_module.Run(axisXY.WaitReady()))
                             return p_sInfo;
-                        marsLogManager.WriteFNC(EQ.p_nRunLP, deviceID, "Stage Move", SSLNet.STATUS.END);
-
+                        marsLogManager.WriteFNC(EQ.p_nRunLP, deviceID, "Stage Move", SSLNet.STATUS.END, dataFormatter);
+                        dataFormatter.ClearData();
                         m_mwvm.p_ArrowX1 = x * RatioX;
                         m_mwvm.p_ArrowY1 = -y * RatioY;
                         if (i < m_DataManager.recipeDM.MeasurementRD.DataSelectedPoint.Count - 1)
@@ -340,10 +346,7 @@ namespace Root_CAMELLIA.Module
                        
                     }
 
-                    dataFormatter.AddData("Measure X Pos", x);
-                    dataFormatter.AddData("Measure Y Pos", y);
-                    marsLogManager.WriteFNC(EQ.p_nRunLP, deviceID, "Measure", SSLNet.STATUS.START, dataFormatter, MATERIAL_TYPE.WAFER);
-                    dataFormatter.ClearData();
+                    marsLogManager.WriteFNC(EQ.p_nRunLP, deviceID, "Measure", SSLNet.STATUS.START);
                     Met.Nanoview.ERRORCODE_NANOVIEW rst = App.m_nanoView.SampleMeasure(i, x, y,
     m_mwvm.SettingViewModel.p_ExceptNIR, m_DataManager.recipeDM.MeasurementRD.UseTransmittance, m_DataManager.recipeDM.MeasurementRD.UseThickness,
     m_DataManager.recipeDM.MeasurementRD.LowerWaveLength, m_DataManager.recipeDM.MeasurementRD.UpperWaveLength);
@@ -352,7 +355,8 @@ namespace Root_CAMELLIA.Module
                         //isEQStop = false;
                         m_log.Warn(Enum.GetName(typeof(Met.Nanoview.ERRORCODE_NANOVIEW), rst));
                     }
-                    marsLogManager.WriteFNC(EQ.p_nRunLP, deviceID, "Measure", SSLNet.STATUS.END, type:MATERIAL_TYPE.WAFER);
+                    //Thread.Sleep(3);
+                    marsLogManager.WriteFNC(EQ.p_nRunLP, deviceID, "Measure", SSLNet.STATUS.END);
 
                     // SaveReflectance
                     //LibSR_Met.DataManager.GetInstance().SaveReflectance(m_resultPath + "\\" + i + "_" + DateTime.Now.ToString("HHmmss") + "Reflectance.csv", i);
@@ -361,7 +365,7 @@ namespace Root_CAMELLIA.Module
                     sw.Start();
 
                     if(i == 0)
-                        marsLogManager.WriteFNC(EQ.p_nRunLP, BaseDefine.LOG_DEVICE_ID, "GetThicness", SSLNet.STATUS.START, type: MATERIAL_TYPE.WAFER);
+                        marsLogManager.WriteFNC(EQ.p_nRunLP, BaseDefine.LOG_DEVICE_ID, "GetThicness", SSLNet.STATUS.START);
 
                     thicknessQueue.Enqueue(i);
 
@@ -376,8 +380,8 @@ namespace Root_CAMELLIA.Module
 
                         dataFormatter.AddData("X Axis", dX, "Pulse");
                         dataFormatter.AddData("Y Axis", dY, "Pulse");
-                        marsLogManager.WriteFNC(EQ.p_nRunLP, deviceID, "Stage Move", SSLNet.STATUS.START, dataFormatter, MATERIAL_TYPE.WAFER);
-                        dataFormatter.ClearData();
+                        marsLogManager.WriteFNC(EQ.p_nRunLP, deviceID, "Stage Move", SSLNet.STATUS.START, dataFormatter);
+                        
                         isMove = true;
                         if (m_module.Run(axisXY.StartMove(MeasurePoint)))
                             return p_sInfo;
@@ -400,7 +404,8 @@ namespace Root_CAMELLIA.Module
                         if (m_module.Run(axisXY.WaitReady()))
                             return p_sInfo;
 
-                        marsLogManager.WriteFNC(EQ.p_nRunLP, deviceID, "Stage Move", SSLNet.STATUS.END, type: MATERIAL_TYPE.WAFER);
+                        marsLogManager.WriteFNC(EQ.p_nRunLP, deviceID, "Stage Move", SSLNet.STATUS.END, dataFormatter);
+                        dataFormatter.ClearData();
                         isMove = false;
                     }
 
@@ -451,8 +456,7 @@ namespace Root_CAMELLIA.Module
                 }
             }
             m_log.Warn("Calc Thickness 끝 >> " + test.ElapsedMilliseconds);
-            marsLogManager.WriteFNC(EQ.p_nRunLP, BaseDefine.LOG_DEVICE_ID, "GetThicness", SSLNet.STATUS.END, type: MATERIAL_TYPE.WAFER);
-            marsLogManager.WritePRC(EQ.p_nRunLP, deviceID, SSLNet.PRC_EVENTID.StepProcess, SSLNet.STATUS.END, "Measure", 1, materialID: m_module.p_infoWafer.p_id);
+            marsLogManager.WriteFNC(EQ.p_nRunLP, BaseDefine.LOG_DEVICE_ID, "GetThicness", SSLNet.STATUS.END);
             //? 세이브?
 
             //if (m_module.Run(axisXY.StartMove(eAxisPos.Ready)))
@@ -499,8 +503,14 @@ namespace Root_CAMELLIA.Module
                
             }
 
-            marsLogManager.WritePRC(EQ.p_nRunLP, deviceID, SSLNet.PRC_EVENTID.Process, SSLNet.STATUS.END, this.p_id, 0, materialID:m_module.p_infoWafer.p_id);
-
+            marsLogManager.WritePRC(EQ.p_nRunLP, deviceID, SSLNet.PRC_EVENTID.StepProcess, SSLNet.STATUS.END, "Measure", (int)BaseDefine.Process.Measure);
+            marsLogManager.WritePRC(EQ.p_nRunLP, deviceID, SSLNet.PRC_EVENTID.Process, SSLNet.STATUS.END, this.p_id, 0);
+            marsLogManager.WriteFNC(EQ.p_nRunLP, deviceID, "Move Ready Position", SSLNet.STATUS.START);
+            if (m_module.RunMoveReady() != "OK")
+            {
+                return "Move Ready pos Error";
+            }
+            marsLogManager.WriteFNC(EQ.p_nRunLP, deviceID, "Move Ready Position", SSLNet.STATUS.END);
             return "OK";
         }
 

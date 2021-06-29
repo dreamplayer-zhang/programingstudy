@@ -87,6 +87,19 @@
                 </StackPanel>
             </Border>
         </ControlTemplate>
+        
+        <!-- RAC -->
+        <ControlTemplate x:Key="rac_menu">
+            <Border
+                Background="{StaticResource sidetap_child_background}">
+                <StackPanel Margin="0, 4, 0, 0" HorizontalAlignment="Stretch">
+                    <RadioButton Content="Product"  IsChecked="True" Style="{StaticResource sidetap_child_radiobutton}"/>
+                    <RadioButton Content="Setup" Style="{StaticResource sidetap_child_radiobutton}"/>
+                    <RadioButton Content="Align Key" Style="{StaticResource sidetap_child_radiobutton}"/>
+                    <RadioButton Content="Create" Style="{StaticResource sidetap_child_radiobutton}"/>
+                </StackPanel>
+            </Border>
+        </ControlTemplate>
 
     </UserControl.Resources>
     <Grid VerticalAlignment="Stretch">
@@ -104,6 +117,7 @@
                 <RadioButton x:Name="btnEdge" Content="EDGE" Command="{Binding btnEdgeClickedCommand}" Style="{StaticResource sidetap_parent_radiobutton}"/>
                 <RadioButton x:Name="btnEBR" Content="EBR"  Command="{Binding btnEBRClickedCommand}" Style="{StaticResource sidetap_parent_radiobutton}"/>
                 <RadioButton x:Name="btnCamera" Content="Camera"  Command="{Binding btnCameraClickedCommand}" Style="{StaticResource sidetap_parent_radiobutton}"/>
+                <RadioButton x:Name="btnRAC" Content="RAC"  Command="{Binding btnRACClickedCommand}" Style="{StaticResource sidetap_parent_radiobutton}"/>
             </StackPanel>
         </Border>
         <ContentControl Grid.Column="1">
@@ -148,6 +162,13 @@
                                      Value="True">
                             <Setter Property="Template" 
                                     Value="{StaticResource camera_menu}"/>
+                        </DataTrigger>
+
+                        <!-- RAC -->
+                        <DataTrigger Binding="{Binding ElementName=btnRAC,Path=IsChecked}"
+                                     Value="True">
+                            <Setter Property="Template" 
+                                    Value="{StaticResource rac_menu}"/>
                         </DataTrigger>
                     </Style.Triggers>
                 </Style>

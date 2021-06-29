@@ -44,12 +44,14 @@ namespace Root_Pine2.Module
             Tray6,
             Tray7,
         }
+        const string c_sPosUp = "Up";
         void InitPosition()
         {
             m_axis.AddPos(GetPosString(Vision2D.eWorks.A));
             m_axis.AddPos(GetPosString(Vision2D.eWorks.B));
             m_axis.AddPos(Enum.GetNames(typeof(ePosTransfer)));
             m_axis.AddPos(Enum.GetNames(typeof(ePosTray)));
+            m_axis.p_axisZ.AddPos(c_sPosUp);
         }
         string GetPosString(Vision2D.eWorks eWorks)
         {
@@ -84,10 +86,10 @@ namespace Root_Pine2.Module
 
         #region AvoidX
         Loader0 p_loader0 { get { return m_handler.m_loader0; } }
-        string StartMoveX(string sPos)
+        string StartMoveX(string sPos, double xOffset)
         {
             Axis axisX = p_loader0.m_axis.p_axisX;
-            double fPos = m_axis.p_axisX.GetPosValue(sPos);
+            double fPos = m_axis.p_axisX.GetPosValue(sPos) + xOffset;
             while ((fPos + axisX.m_posDst) > Loader0.c_lAxisX)
             {
                 Thread.Sleep(10);
@@ -119,21 +121,21 @@ namespace Root_Pine2.Module
         public string RunMoveBoat(Vision2D.eWorks eWorks, bool bWait = true)
         {
             string sPos = GetPosString(eWorks);
-            if (Run(StartMoveX(sPos))) return p_sInfo;
+            if (Run(StartMoveX(sPos, 0))) return p_sInfo;
             m_axis.p_axisY.StartMove(sPos);
             return bWait ? m_axis.WaitReady() : "OK";
         }
 
-        public string RunMoveTransfer(ePosTransfer ePos, bool bWait = true)
+        public string RunMoveTransfer(ePosTransfer ePos, double xOffset, bool bWait = true)
         {
-            if (Run(StartMoveX(ePos.ToString()))) return p_sInfo;
+            if (Run(StartMoveX(ePos.ToString(), xOffset))) return p_sInfo;
             m_axis.p_axisY.StartMove(ePos);
             return bWait ? m_axis.WaitReady() : "OK";
         }
 
         public string RunMoveTray(ePosTray ePos, bool bWait = true)
         {
-            if (Run(StartMoveX(ePos.ToString()))) return p_sInfo;
+            if (Run(StartMoveX(ePos.ToString(), 0))) return p_sInfo;
             m_axis.p_axisY.StartMove(ePos);
             return bWait ? m_axis.WaitReady() : "OK";
         }
@@ -160,31 +162,51 @@ namespace Root_Pine2.Module
 
         public string RunMoveUp(bool bWait = true)
         {
-            m_axis.p_axisZ.StartMove(0);
+            m_axis.p_axisZ.StartMove(c_sPosUp);
             return bWait ? m_axis.WaitReady() : "OK";
         }
         #endregion
 
         #region RunLoad
+        string StartLoadBoat()
+        {
+            Boats boats = m_handler.m_aBoats[Vision2D.eVision.Bottom];
+            if (boats.m_aBoat[Vision2D.eWorks.A].p_eStep == Boat.eStep.Done) return StartLoadBoat(Vision2D.eWorks.A);
+            if (boats.m_aBoat[Vision2D.eWorks.B].p_eStep == Boat.eStep.Done) return StartLoadBoat(Vision2D.eWorks.B);
+            return "OK";
+        }
+
+        string StartLoadBoat(Vision2D.eWorks eWorks)
+        {
+            Run_LoadBoat run = (Run_LoadBoat)m_runLoadBoat.Clone();
+            run.m_eWorks = eWorks;
+            return StartRun(run);
+        }
+
+        Vision2D.eWorks m_eWorksLoad = Vision2D.eWorks.A;
         public string RunLoad(Vision2D.eWorks eWorks)
         {
-            Boat boat = m_handler.m_aBoats[Vision2D.eVision.Bottom].m_aBoat[eWorks]; 
+            Boats boats = m_handler.m_aBoats[Vision2D.eVision.Bottom];
+            Boat boat = boats.m_aBoat[eWorks]; 
             if (m_picker.p_infoStrip != null) return "InfoStrip != null";
             if (boat.p_eStep != Boat.eStep.Done) return "Boat not Done";
             try
             {
                 if (Run(RunMoveUp())) return p_sInfo;
+                if (Run(boats.RunMoveDone(eWorks))) return p_sInfo;
                 if (Run(RunMoveBoat(eWorks))) return p_sInfo;
                 if (Run(RunMoveZ(eWorks, 0))) return p_sInfo;
                 boat.RunVacuum(false);
                 boat.RunBlow(true);
                 if (Run(m_picker.RunVacuum(true))) return p_sInfo;
+                Thread.Sleep(500);
                 boat.RunBlow(false);
                 if (Run(RunMoveUp())) return p_sInfo;
                 if (m_picker.IsVacuum() == false) return p_sInfo;
                 m_picker.p_infoStrip = boat.p_infoStrip;
                 boat.p_infoStrip = null;
                 boat.p_eStep = Boat.eStep.RunReady;
+                m_eWorksLoad = eWorks; 
             }
             finally
             {
@@ -195,21 +217,30 @@ namespace Root_Pine2.Module
         #endregion
 
         #region RunUnload
-        public string RunUnloadTransfer(ePosTransfer ePos)
+        string StartUnloadTransfer() 
         {
-            if (m_picker.p_infoStrip != null) return "InfoStrip != null";
+            Run_UnloadTransfer run = (Run_UnloadTransfer)m_runUnloadTransfer.Clone();
+            return StartRun(run);
+        }
+
+        public string RunUnloadTransfer() 
+        {
+            if (m_picker.p_infoStrip == null) return "InfoStrip == null";
             if (m_transfer.m_pusher.p_bEnable == false) return "Buffer Pusher not Enable";
             try
             {
+                ePosTransfer ePos = (ePosTransfer)m_transfer.m_buffer.m_ePosDst;
+                double xOffset = m_transfer.m_buffer.m_xOffset;
                 m_transfer.m_pusher.p_bLock = true;
                 if (Run(RunMoveUp())) return p_sInfo;
-                if (Run(RunMoveTransfer(ePos))) return p_sInfo;
+                if (Run(RunMoveTransfer(ePos, xOffset))) return p_sInfo;
                 if (Run(RunMoveZ(ePos))) return p_sInfo;
                 if (Run(m_picker.RunVacuum(false))) return p_sInfo;
                 if (Run(RunMoveUp())) return p_sInfo;
                 m_transfer.m_pusher.p_infoStrip = m_picker.p_infoStrip;
                 m_picker.p_infoStrip = null;
                 m_transfer.m_pusher.p_bLock = false;
+                if (Run(RunMoveBoat(1- m_eWorksLoad))) return p_sInfo;
             }
             finally
             {
@@ -219,19 +250,35 @@ namespace Root_Pine2.Module
             return "OK";
         }
 
-        public string RunUnloadTray(ePosTray ePos)
+        string StartUnloadTray()
         {
-            if (m_picker.p_infoStrip != null) return "InfoStrip != null";
+            Run_UnloadTray run = (Run_UnloadTray)m_runUnloadTray.Clone();
+            return StartRun(run);
+        }
+
+        public string RunUnloadTray()
+        {
+            if (m_picker.p_infoStrip == null) return "InfoStrip == null";
             try
             {
+                ePosTray ePosTray = ePosTray.Tray0;
+                if (CalcTrayPos(ref ePosTray) != "OK")
+                {
+                    EQ.p_eState = EQ.eState.Ready;
+                    m_pine2.m_buzzer.RunBuzzer(Pine2.eBuzzer.Warning);
+                    Thread.Sleep(200); 
+                    return "OK";
+                }
                 if (Run(RunMoveUp())) return p_sInfo;
-                if (Run(RunMoveTray(ePos))) return p_sInfo;
-                if (Run(RunMoveZ(ePos))) return p_sInfo;
+                if (Run(RunMoveTray(ePosTray))) return p_sInfo;
+                if (Run(RunMoveZ(ePosTray))) return p_sInfo;
                 if (Run(m_picker.RunVacuum(false))) return p_sInfo;
-                m_picker.p_infoStrip = null;
-                MagazineEV magazine = m_handler.m_magazineEV.m_aEV[(InfoStrip.eMagazine)ePos];
-                magazine.PutInfoStrip(m_picker.p_infoStrip);
                 if (Run(RunMoveUp())) return p_sInfo;
+                m_picker.p_infoStrip = null;
+                MagazineEV magazine = m_handler.m_magazineEV.m_aEV[(InfoStrip.eMagazine)ePosTray];
+                magazine.PutInfoStrip(m_picker.p_infoStrip);
+                if (Run(RunMoveBoat(1 - m_eWorksLoad))) return p_sInfo;
+                m_handler.CheckDone(); 
             }
             finally
             {
@@ -239,8 +286,31 @@ namespace Root_Pine2.Module
             }
             return "OK";
         }
-        #endregion
 
+        string CalcTrayPos(ref ePosTray eTray)
+        {
+            MagazineEVSet magazine = m_handler.m_magazineEV;
+            InfoStrip.eResult eResult = m_picker.p_infoStrip.p_eResult;
+            foreach (ePosTray ePosTray in Enum.GetValues(typeof(ePosTray)))
+            {
+                if (magazine.IsEnableStack((InfoStrip.eMagazine)ePosTray, eResult, true))
+                {
+                    eTray = ePosTray;
+                    return "OK";
+                }
+            }
+            foreach (ePosTray ePosTray in Enum.GetValues(typeof(ePosTray)))
+            {
+                if (magazine.IsEnableStack((InfoStrip.eMagazine)ePosTray, eResult, false))
+                {
+                    eTray = ePosTray;
+                    return "OK";
+                }
+            }
+            return "Error";
+        }
+
+        #endregion
 
         #region PickerSet
         double m_mmPickerSetUp = 10;
@@ -286,7 +356,23 @@ namespace Root_Pine2.Module
             m_secPickerSet = tree.Set(m_secPickerSet, m_secPickerSet, "Done", "PickerSet Done Time (sec)");
         }
         #endregion
+
         #region override
+        public override string StateHome()
+        {
+            if (EQ.p_bSimulate)
+            {
+                p_eState = eState.Ready;
+                return "OK";
+            }
+            p_sInfo = base.StateHome(m_axis.p_axisZ);
+            if (p_sInfo != "OK") return p_sInfo;
+            RunMoveUp(); 
+            p_sInfo = base.StateHome(m_axis.p_axisX, m_axis.p_axisY);
+            p_eState = (p_sInfo == "OK") ? eState.Ready : eState.Error;
+            return p_sInfo;
+        }
+
         public override string StateReady()
         {
             if (EQ.p_eState != EQ.eState.Run) return "OK";
@@ -301,51 +387,6 @@ namespace Root_Pine2.Module
             else return StartLoadBoat();
             return "OK";
         }
-
-        string StartUnloadTray()
-        {
-            MagazineEVSet magazine = m_handler.m_magazineEV;
-            InfoStrip.eResult eResult = m_picker.p_infoStrip.p_eResult; 
-            foreach (ePosTray ePosTray in Enum.GetValues(typeof(ePosTray)))
-            {
-                if (magazine.IsEnableStack((InfoStrip.eMagazine)ePosTray, eResult, true)) return StartUnloadTray(ePosTray); 
-            }
-            foreach (ePosTray ePosTray in Enum.GetValues(typeof(ePosTray)))
-            {
-                if (magazine.IsEnableStack((InfoStrip.eMagazine)ePosTray, eResult, false)) return StartUnloadTray(ePosTray);
-            }
-            return "OK";
-        }
-
-        string StartUnloadTray(ePosTray ePosTray)
-        {
-            Run_UnloadTray run = (Run_UnloadTray)m_runUnloadTray.Clone();
-            run.m_ePos = ePosTray;
-            return StartRun(run); 
-        }
-
-        string StartUnloadTransfer()
-        {
-            Run_UnloadTransfer run = (Run_UnloadTransfer)m_runUnloadTransfer.Clone();
-            run.m_ePos = (ePosTransfer)m_transfer.m_buffer.m_ePosDst;
-            return StartRun(run); 
-        }
-
-        string StartLoadBoat()
-        {
-            Boats boats = m_handler.m_aBoats[Vision2D.eVision.Bottom];
-            if (boats.m_aBoat[Vision2D.eWorks.A].p_eStep == Boat.eStep.Done) return StartLoadBoat(Vision2D.eWorks.A);
-            if (boats.m_aBoat[Vision2D.eWorks.B].p_eStep == Boat.eStep.Done) return StartLoadBoat(Vision2D.eWorks.B);
-            return "OK";
-        }
-
-        string StartLoadBoat(Vision2D.eWorks eWorks)
-        {
-            Run_LoadBoat run = (Run_LoadBoat)m_runLoadBoat.Clone();
-            run.m_eWorks = eWorks;
-            return StartRun(run); 
-        }
-
 
         public override void Reset()
         {
@@ -439,22 +480,19 @@ namespace Root_Pine2.Module
                 InitModuleRun(module);
             }
 
-            public ePosTransfer m_ePos = ePosTransfer.Transfer0;
             public override ModuleRunBase Clone()
             {
                 Run_UnloadTransfer run = new Run_UnloadTransfer(m_module);
-                run.m_ePos = m_ePos;
                 return run;
             }
 
             public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
             {
-                m_ePos = (ePosTransfer)tree.Set(m_ePos, m_ePos, "Transfer", "Select Transfer", bVisible);
             }
 
             public override string Run()
             {
-                return m_module.RunUnloadTransfer(m_ePos);
+                return m_module.RunUnloadTransfer();
             }
         }
 
@@ -467,22 +505,19 @@ namespace Root_Pine2.Module
                 InitModuleRun(module);
             }
 
-            public ePosTray m_ePos = ePosTray.Tray0; 
             public override ModuleRunBase Clone()
             {
                 Run_UnloadTray run = new Run_UnloadTray(m_module);
-                run.m_ePos = m_ePos;
                 return run;
             }
 
             public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
             {
-                m_ePos = (ePosTray)tree.Set(m_ePos, m_ePos, "Tray", "Select Tray", bVisible);
             }
 
             public override string Run()
             {
-                return m_module.RunUnloadTray(m_ePos);
+                return m_module.RunUnloadTray();
             }
         }
 

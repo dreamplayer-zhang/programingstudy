@@ -1,5 +1,6 @@
-﻿using RootTools;
-using RootTools.Camera.BaslerPylon;
+﻿using Root_EFEM.Module;
+using Root_VEGA_D.Engineer;
+using RootTools;
 using RootTools.Control;
 using RootTools.Light;
 using RootTools.Memory;
@@ -8,11 +9,7 @@ using RootTools.Trees;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
-using Root_VEGA_D.Engineer;
-using Root_EFEM.Module;
 
 namespace Root_VEGA_D.Module
 {
@@ -33,8 +30,6 @@ namespace Root_VEGA_D.Module
         string m_sMemoryGroup = "";
         string m_sMemoryData = "";
         VEGA_D_Handler m_handler;
-
-        public bool m_bIsPMCheckOK = false;
 
         List<LightData> m_lCoaxialLightData = new List<LightData>();
         List<LightData> m_lTransmittedLightData = new List<LightData>();
@@ -144,47 +139,51 @@ namespace Root_VEGA_D.Module
             }
         }
 
-        enum ePMLogType
+        void WritePMLog(bool bCoaxialResult, bool bTransmittedResult, int nCoaxialAvg, int nTransmittedAvg)
         {
-            PM_Start,
-            PM_Error,
-            PM_End,
-            PM_CoaxialLight_Result,
-            PM_Transmitted_Result,
-        }
-        StreamWriter m_writerLog = null;
-        DateTime m_dtNow;
-        void PreparePMLog()
-        {
-            m_dtNow = DateTime.Now;
+            // Create Directory, Log File
+            DateTime dt = DateTime.Now;
             string sPath = LogView._logView.p_sPath;
 
             Directory.CreateDirectory(sPath + "\\PM");
 
-            StreamWriter writer = new StreamWriter(sPath + "\\PM" + "\\" + m_dtNow.ToShortDateString() + ".txt", true, Encoding.Default);
-            if(writer != null)
+            string strFile = sPath + "\\PM" + "\\" + dt.ToShortDateString() + ".txt";
+            bool bIsLogExist = File.Exists(strFile);
+            using (StreamWriter writer = new StreamWriter(strFile, true, Encoding.Default))
             {
-                m_writerLog = writer;
+                if(!bIsLogExist)
+                {
+                    // 파일 첫 줄 작성 시 헤더 작성
+                    writer.WriteLine("Time,PM_Success,Coaxial_Result,Transmitted_Result,Coaxial_Avg,Tranmitted_Avg,USL,LSL");
+                }
+
+                string strTime = dt.Hour.ToString("00") + '.' + dt.Minute.ToString("00") + '.' + dt.Second.ToString("00") + '.' + dt.Millisecond.ToString("000");
+                string strPMSuccess = (bCoaxialResult && bTransmittedResult).ToString();
+                string strCoaxialResult = bCoaxialResult.ToString();
+                string strTransmittedResult = bTransmittedResult.ToString();
+                string strCoaxialAvg = nCoaxialAvg.ToString();
+                string strTransmittedAvg = nTransmittedAvg.ToString();
+                string strUSL = m_nUSL.ToString();
+                string strLSL = m_nLSL.ToString();
+
+                writer.WriteLine("{0},{1},{2},{3},{4},{5},{6},{7}", strTime, strPMSuccess, strCoaxialResult, strTransmittedResult, strCoaxialAvg, strTransmittedAvg, strUSL, strLSL);
             }
-        }
-        void WritePMLog(ePMLogType type, string strLog)
-        {
-            string log = m_dtNow.Hour.ToString("00") + '.' + m_dtNow.Minute.ToString("00") + '.' + m_dtNow.Second.ToString("00") + '.' + m_dtNow.Millisecond.ToString("000");
-            log += "\t" + type.ToString() + "\t" + strLog;
-            if(m_writerLog != null)
-                m_writerLog.WriteLine(log);
         }
 
         public override string Run()
         {
+            // 동축, 투과조명 시료 PM 기능 결과
+            bool bCoaxialResult = false;
+            bool bTransmittedResult = false;
+
             if (!m_bIsRun)
             {
-                m_bIsPMCheckOK = true;
+                ((Loadport_Cymechs)m_handler.m_loadport[EQ.p_nRunLP]).m_CommonFunction();
+
                 return "OK";
             }
-            else
-                m_bIsPMCheckOK = false;
 
+            // Grabmode
             if (m_grabMode == null) return "Grab Mode == null";
 
             // Memory
@@ -194,52 +193,46 @@ namespace Root_VEGA_D.Module
             // USL & LSL Check
             if (m_nLSL > m_nUSL) return "Check USL & LSL setting";
 
-            // Position
-            AxisXY axisXY = m_module.AxisXY;
-            Axis.Speed speedY = axisXY.p_axisY.GetSpeedValue(Axis.eSpeed.Move);
-
-            double dPosX = m_grabMode.m_rpAxisCenter.X + m_grabMode.m_GD.m_nFovSize * m_grabMode.m_dResX_um * 0.001 * 0.5;
-
-            double accDistance = speedY.m_acc * speedY.m_v * 0.5 * 2.0;
-            double decDistance = speedY.m_dec * speedY.m_v * 0.5 * 2.0;
-
-            double dStartTriggerY = m_grabMode.m_rpAxisCenter.Y - m_dScanDistance * 0.5;
-            double dEndTriggerY = m_grabMode.m_rpAxisCenter.Y + m_dScanDistance * 0.5;
-
-            double dStartPosY = dStartTriggerY - accDistance;
-            double dEndPosY = dEndTriggerY + decDistance;
-
-            int centerY_px = (int)(m_dScanDistance * 1000 * 0.5 / m_grabMode.m_dResY_um);
-
-            int nScanLen_px = (int)Math.Round(m_dScanDistance * 1000 / m_grabMode.m_dResY_um);
-
-            m_grabMode.m_dTrigger = Math.Round(m_grabMode.m_dResY_um * m_grabMode.m_dCamTriggerRatio, 1);
-
-            // Make PM Data List
-            int nCheckPointLenFromCenter_px = (int)(m_dLengthFromScanCenterY * 1000 / m_grabMode.m_dResY_um);
-            int nCoaxialCheckPosY_px = centerY_px - nCheckPointLenFromCenter_px;
-            int nTransmittedCheckPosY_px = centerY_px + nCheckPointLenFromCenter_px;
-
-            CRect rectCoaxial = new CRect((int)(m_grabMode.m_GD.m_nFovSize * 0.5), nCoaxialCheckPosY_px, m_nCheckArea);
-            CRect rectTransmitted = new CRect((int)(m_grabMode.m_GD.m_nFovSize * 0.5), nTransmittedCheckPosY_px, m_nCheckArea);
-
-            List<PMData> listPMData = new List<PMData>();
-            listPMData.Add(new PMData(m_lCoaxialLightData, rectCoaxial, m_dCoaxialZPos));
-            listPMData.Add(new PMData(m_lTransmittedLightData, rectTransmitted, m_dTransmittedZPos));
-
-            // Prepare Log
-            PreparePMLog();
-
-            WritePMLog(ePMLogType.PM_Start, "");
-            bool bCoaxialResult = true;
-            bool bTransmittedResult = true;
-            // Collect GV Value
             try
             {
+                // Position
+                AxisXY axisXY = m_module.AxisXY;
+                Axis.Speed speedY = axisXY.p_axisY.GetSpeedValue(Axis.eSpeed.Move);
+
+                double dPosX = m_grabMode.m_rpAxisCenter.X + m_grabMode.m_GD.m_nFovSize * m_grabMode.m_dResX_um * 0.001 * 0.5;
+
+                double accDistance = speedY.m_acc * speedY.m_v * 0.5 * 2.0;
+                double decDistance = speedY.m_dec * speedY.m_v * 0.5 * 2.0;
+
+                double dStartTriggerY = m_grabMode.m_rpAxisCenter.Y - m_dScanDistance * 0.5;
+                double dEndTriggerY = m_grabMode.m_rpAxisCenter.Y + m_dScanDistance * 0.5;
+
+                double dStartPosY = dStartTriggerY - accDistance;
+                double dEndPosY = dEndTriggerY + decDistance;
+
+                int centerY_px = (int)(m_dScanDistance * 1000 * 0.5 / m_grabMode.m_dResY_um);
+
+                int nScanLen_px = (int)Math.Round(m_dScanDistance * 1000 / m_grabMode.m_dResY_um);
+
+                m_grabMode.m_dTrigger = Math.Round(m_grabMode.m_dResY_um * m_grabMode.m_dCamTriggerRatio, 1);
+
+                // Make PM Data List
+                int nCheckPointLenFromCenter_px = (int)(m_dLengthFromScanCenterY * 1000 / m_grabMode.m_dResY_um);
+                int nCoaxialCheckPosY_px = centerY_px - nCheckPointLenFromCenter_px;
+                int nTransmittedCheckPosY_px = centerY_px + nCheckPointLenFromCenter_px;
+
+                CRect rectCoaxial = new CRect((int)(m_grabMode.m_GD.m_nFovSize * 0.5), nCoaxialCheckPosY_px, m_nCheckArea);
+                CRect rectTransmitted = new CRect((int)(m_grabMode.m_GD.m_nFovSize * 0.5), nTransmittedCheckPosY_px, m_nCheckArea);
+
+                List<PMData> listPMData = new List<PMData>();
+                listPMData.Add(new PMData(m_lCoaxialLightData, rectCoaxial, m_dCoaxialZPos));
+                listPMData.Add(new PMData(m_lTransmittedLightData, rectTransmitted, m_dTransmittedZPos));
+
                 // RADS 연결
                 if (m_module.Run(m_module.StartRADS()))
                     return p_sInfo;
 
+                // Collect GV Value
                 foreach (PMData pmData in listPMData)
                 {
                     // Turn off lights
@@ -250,11 +243,7 @@ namespace Root_VEGA_D.Module
                     {
                         Light light = m_module.GetLight(data.m_sLight);
                         if (light == null)
-                        {
-                            string sMsg = "Check Light Setting";
-                            WritePMLog(ePMLogType.PM_Error, sMsg);
-                            return sMsg;
-                        }
+                            return "Check Light Setting";
 
                         light.p_fPower = data.m_nLightPower;
                     }
@@ -307,35 +296,40 @@ namespace Root_VEGA_D.Module
                 m_log.Info(string.Format("Coaxial Light PM result : {0} (Average = {1})", bCoaxialResult ? "OK" : "Fail", listPMData[0].m_average));
                 m_log.Info(string.Format("Transmitted Light PM result : {0} (Average = {1})", bTransmittedResult ? "OK" : "Fail", listPMData[1].m_average));
 
-                WritePMLog(ePMLogType.PM_CoaxialLight_Result, bCoaxialResult.ToString() + "\t" + listPMData[0].m_average.ToString());
-                WritePMLog(ePMLogType.PM_Transmitted_Result, bTransmittedResult.ToString() + "\t" + listPMData[1].m_average.ToString());
+                WritePMLog(bCoaxialResult, bTransmittedResult, listPMData[0].m_average, listPMData[1].m_average);
 
                 // Alarm
                 m_module.m_alidPMCoaxialError.Run(!bCoaxialResult, m_module.m_alidPMCoaxialError.p_sDesc);
                 m_module.m_alidPMTransmittedError.Run(!bTransmittedResult, m_module.m_alidPMTransmittedError.p_sDesc);
-
-                if (bCoaxialResult && bTransmittedResult) m_bIsPMCheckOK = true;
             }
             catch (Exception e)
             {
+                m_log.Info(e.Message);
             }
             finally
             {
-                // Log
-                WritePMLog(ePMLogType.PM_End, "");
-                m_writerLog.Close();
-
                 // Turn off light
                 m_grabMode.SetLight(false);
 
                 // RADS 기능 off
                 m_module.StopRADS();
+
+                // PM 기능 이후 loadport 제어
+                if (bCoaxialResult && bTransmittedResult)
+                {
+                    m_log.Info("PM Success");
+                    ((Loadport_Cymechs)m_handler.m_loadport[EQ.p_nRunLP]).m_CommonFunction();
+                }
+                else
+                {
+                    m_log.Info("PM Failed");
+                    m_module.m_alidPMFail.Run(true, "PM Failed");
+                }
             }
-            if (!bCoaxialResult && !bTransmittedResult) ((Loadport_Cymechs)m_handler.m_loadport[EQ.p_nRunLP]).m_CommonFunction();
-            else m_module.m_alidPMFail.Run(true, "PM is Fail");
-            return "OK";
+            if (bCoaxialResult && bTransmittedResult)
+                return "OK";
+            else
+                return "PM Failed";
         }
     }
-
-    
 }

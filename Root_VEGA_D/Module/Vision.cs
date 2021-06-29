@@ -156,6 +156,7 @@ namespace Root_VEGA_D.Module
             m_alidReticleLocateInfoError = m_gaf.GetALID(this, "Reticle Locate Info is not Correct", "Reticle Locate Info is not Correct");
             m_alidPMCoaxialError = m_gaf.GetALID(this, "PM Coaxial Check Error", "Coaxial Light PM Test is failed");
             m_alidPMTransmittedError = m_gaf.GetALID(this, "PM Transmitted Check Error", "Transmitted Light PM Test is failed");
+            m_alidPMFail = m_gaf.GetALID(this, "PM Fail", "PM is Fail, Pod is not load");
         }
         #endregion
 
@@ -760,12 +761,16 @@ namespace Root_VEGA_D.Module
                 return p_sInfo;
 
             // 분주비 재설정
-            int nEncoderMul = camMain.GetEncoderMultiplier();
-            int nEncoderDiv = camMain.GetEncoderDivider();
-            camMain.SetEncoderMultiplier(1);
-            camMain.SetEncoderDivider(1);
-            camMain.SetEncoderMultiplier(nEncoderMul);
-            camMain.SetEncoderDivider(nEncoderDiv);
+            int nEncoderMul = 1;
+            int nEncoderDiv = 1;
+
+            camMain.p_CamParam.GetRotaryEncoderMultiplier(ref nEncoderMul);
+            camMain.p_CamParam.GetRotaryEncoderDivider(ref nEncoderDiv);
+
+            camMain.p_CamParam.SetRotaryEncoderMultiplier(1);
+            camMain.p_CamParam.SetRotaryEncoderDivider(1);
+            camMain.p_CamParam.SetRotaryEncoderMultiplier(nEncoderMul);
+            camMain.p_CamParam.SetRotaryEncoderDivider(nEncoderDiv);
 
             // 트리거 설정
             AxisXY.p_axisY.SetTrigger(startTriggerY, endTriggerY, grabmode.m_dTrigger, 0.001, true);
@@ -792,8 +797,6 @@ namespace Root_VEGA_D.Module
         {
             if (CamRADS == null) return "RADS Cam is null";
 
-            RADSControl.m_timer.Start();
-            RADSControl.p_IsRun = true;
             RADSControl.StartRADS();
 
             StopWatch sw = new StopWatch();
@@ -822,8 +825,6 @@ namespace Root_VEGA_D.Module
         {
             if (CamRADS == null) return "RADS Cam is null";
 
-            RADSControl.m_timer.Stop();
-            RADSControl.p_IsRun = false;
             RADSControl.StopRADS();
             if (CamRADS.p_CamInfo._IsGrabbing == true) CamRADS.StopGrab();
 
@@ -845,6 +846,9 @@ namespace Root_VEGA_D.Module
             m_tcpipCommServer = new TCPIPComm_VEGA_D(server);
             m_tcpipCommServer.EventReceiveData += EventReceiveData;
             m_tcpipCommServer.EventAccept += EventAccept;
+
+            // IPU와 통신 중단 시 처리 위한 타이머
+            m_timerWaitReconnect.Tick += new EventHandler(WaitReconnectTimerTick);
         }
 
         private void Vision_OnChangeState(eState eState)
@@ -867,40 +871,45 @@ namespace Root_VEGA_D.Module
                 return null;
         }
 
-        bool m_bDisconnectedGrabLineScanning = false;    // 이미지 스캔 도중 소켓통신 연결이 끊어졌을 때의 상태값
-        int m_nDisconnectedStateResetTime = 300 * 1000;              // IPU와 연결이 끊어지고 재개될때까지 대기하는 시간
-        private void ResetDisconnectedStateTimerTick(object sender, EventArgs e)
+        bool _bWaitReconn = false;              // IPU와 소켓통신 연결이 끊어졌을 때의 재연결 대기하는 상태값
+        public bool p_bWaitReconn
         {
-            // 소켓 연결 해제 이후 m_nDisconnectedStateResetTime (ms) 만큼 시간 뒤 호출되는 콜백함수
+            get { return _bWaitReconn; }
+            set
+            {
+                if (_bWaitReconn == value) return;
+
+                m_log.Info(string.Format("{0}.p_bWaitReconn {1} -> {2}", p_id, _bWaitReconn, !_bWaitReconn));
+                _bWaitReconn = value;
+            }
+        }
+
+        DispatcherTimer m_timerWaitReconnect = new DispatcherTimer();
+        private void WaitReconnectTimerTick(object sender, EventArgs e)
+        {
             DispatcherTimer timer = sender as DispatcherTimer;
             if (timer != null)
                 timer.Stop();
 
-            // 이미지 스캔을 재개하지 않을 것이므로
-            // 이미지 스캔 중 연결이 끊겼다는 상태값을 다시 리셋
-            m_bDisconnectedGrabLineScanning = false;
-
-            // 재 연결까지 Run_GrabLineScan이 대기 중이라면 상태 변경
-            Run_GrabLineScan runGrabLineScan = PeekModuleRun() as Run_GrabLineScan;
-            if (runGrabLineScan != null)
-            {
-                // EQ Stop 상태로 변경하고 이미지그랩 중에 중단되었다는 상태값 설정
-                runGrabLineScan.p_bWaitRun = false;
-            }
+            p_bWaitReconn = false;
         }
+
+        const int m_cnDisconnectedStateResetTime = 5 * 60 * 1000;              // IPU와 연결이 끊어지고 재개될때까지 대기하는 시간
         private void EventAccept(Socket socket)
         {
-            Run_GrabLineScan runGrabLineScan = PeekModuleRun() as Run_GrabLineScan;
-            if (runGrabLineScan != null)
+            if (p_bWaitReconn)
             {
-                if(m_bDisconnectedGrabLineScanning)
+                Run_GrabLineScan runGrabLineScan = PeekModuleRun() as Run_GrabLineScan;
+                if (runGrabLineScan != null)
                 {
-                    // 이미지 스캔 중 연결이 끊겼다는 상태값을 리셋
-                    m_bDisconnectedGrabLineScanning = false;
-
-                    // 대기중인 RunGrabLineScan 재개
-                    runGrabLineScan.p_bWaitRun = false;
-
+                    lock (runGrabLineScan.m_lockWaitRun)
+                    {
+                    }
+                }
+                else
+                {
+                    m_timerWaitReconnect.Stop();
+                    p_bWaitReconn = false;
                 }
             }
         }
@@ -912,25 +921,11 @@ namespace Root_VEGA_D.Module
                 if (socket.Connected)
                     return;
 
-                Run_GrabLineScan runGrabLineScan = PeekModuleRun() as Run_GrabLineScan;
-                if (runGrabLineScan != null)
-                {
-                    // 현재 GrabLineScan 진행중이었다면
-                    if (runGrabLineScan.p_eRunState == ModuleRunBase.eRunState.Run)
-                    {
-                        // EQ Stop 상태로 변경하고 이미지그랩 중에 중단되었다는 상태값 설정
-                        m_bDisconnectedGrabLineScanning = true;
+                p_bWaitReconn = true;
 
-                        // 재연결 시까지 RunGrabLineScan은 대기
-                        runGrabLineScan.p_bWaitRun = true;
-
-                        // IPU와 소켓통신 재 연결 될때까지의 상태 리셋 타이머 실행
-                        DispatcherTimer timer = new DispatcherTimer();
-                        timer.Interval = TimeSpan.FromMilliseconds(m_nDisconnectedStateResetTime);
-                        timer.Tick += new EventHandler(ResetDisconnectedStateTimerTick);
-                        timer.Start();
-                    }
-                }
+                m_timerWaitReconnect.Stop();
+                m_timerWaitReconnect.Interval = TimeSpan.FromMilliseconds(m_cnDisconnectedStateResetTime);
+                m_timerWaitReconnect.Start();
             }
             else
             {
@@ -945,7 +940,7 @@ namespace Root_VEGA_D.Module
                     {
                         case TCPIPComm_VEGA_D.Command.resume:
                             {
-                                if (m_bDisconnectedGrabLineScanning)
+                                if (p_bWaitReconn)
                                 {
                                     // 이전에 이미지 그랩 작업을 이어서 할 수 있도록 처리
                                     int totalScanLine = int.Parse(mapParam[TCPIPComm_VEGA_D.PARAM_NAME_TOTALSCANLINECOUNT]);
@@ -960,17 +955,12 @@ namespace Root_VEGA_D.Module
                                             runGrabLineScan.m_nCurScanLine = curScanLine;
                                             runGrabLineScan.m_grabMode.m_ScanLineNum = totalScanLine;
                                             runGrabLineScan.m_grabMode.m_ScanStartLine = startScanLine;
-
-                                            runGrabLineScan.p_bWaitRun = false;
-                                        }   
+                                        }
                                     }
                                 }
-                                else
-                                {
-                                    // EQ Stop 상태를 변경하여 이미지 스캔을 재개하지 않을 것이므로
-                                    // 이미지 스캔 중 연결이 끊겼다는 상태값을 다시 리셋
-                                    m_bDisconnectedGrabLineScanning = false;
-                                }
+
+                                m_timerWaitReconnect.Stop();
+                                p_bWaitReconn = false;
                             }
                             break;
                         case TCPIPComm_VEGA_D.Command.Result:

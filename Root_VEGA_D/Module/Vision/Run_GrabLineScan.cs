@@ -33,18 +33,6 @@ namespace Root_VEGA_D.Module
         string m_sGrabMode = "";
         public bool m_bIPUCompleted = true;
         public int m_nCurScanLine = 0;
-        bool m_bWaitRun = false;
-        public bool p_bWaitRun
-        {
-            get { return m_bWaitRun; }
-            set
-            {
-                if (m_bWaitRun == value) return;
-
-                m_log.Info(string.Format("{0}.p_bWaitRun {1} -> {2}", p_id, m_bWaitRun, !m_bWaitRun));
-                m_bWaitRun = value;
-            }
-        }
         public object m_lockWaitRun = new object();
         public string p_sGrabMode
         {
@@ -68,7 +56,6 @@ namespace Root_VEGA_D.Module
             run.p_sGrabMode = p_sGrabMode;
             run.m_bIPUCompleted = m_bIPUCompleted;
             run.m_nCurScanLine = m_nCurScanLine;
-            run.m_bWaitRun = m_bWaitRun;
             //run.m_dTDIToVRSOffsetZ = m_dTDIToVRSOffsetZ;
 
             return run;
@@ -562,7 +549,7 @@ namespace Root_VEGA_D.Module
                     return p_sInfo;
 
                 // IPU 접속 대기
-                while (p_bWaitRun && !EQ.IsStop())
+                while (m_module.p_bWaitReconn && !EQ.IsStop())
                 {
                     Thread.Sleep(10);
                 }
@@ -596,7 +583,7 @@ namespace Root_VEGA_D.Module
 
                     lock (m_lockWaitRun)
                     {
-                        if (p_bWaitRun)
+                        if (m_module.p_bWaitReconn)
                         {
                             Thread.Sleep(10);
                             continue;
@@ -613,7 +600,7 @@ namespace Root_VEGA_D.Module
 
                         // 메모리 오프셋
                         CPoint cpMemoryOffset = new CPoint(m_grabMode.m_cpMemoryOffset);
-                        cpMemoryOffset.X += m_grabMode.m_ScanStartLine * grabData.m_nFovSize;
+                        cpMemoryOffset.X += nLineIndex * grabData.m_nFovSize;
 
                         // Grab 방향 및 시작, 종료 위치 설정
                         m_grabMode.m_eGrabDirection = eGrabDirection.Forward;

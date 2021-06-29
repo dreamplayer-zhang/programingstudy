@@ -76,8 +76,9 @@ namespace Root_Pine2_Vision.Module
         #region Protocol
         public enum eProtocol
         {
-            Snap,
             RecipeOpen,
+            SnapInfo,
+            Snap,
             SnapDone,
         }
 
@@ -85,7 +86,9 @@ namespace Root_Pine2_Vision.Module
         {
             public eProtocol m_eProtocol;
             public string m_sRecipe = "";
-            public int m_iSnap = 0;
+            public int m_iSnap = 0;          // Snap Done Line Index (0 Base)
+            public int m_nSnapMode = 0;      // 0 : RGB 단일, 1 : PAS 단일, 2 : RGB, APS 모두
+            public int m_nLineNum = 0;
             public string m_sSend = "";
             public string m_sInfo = "";
 
@@ -118,7 +121,7 @@ namespace Root_Pine2_Vision.Module
             {
                 m_eProtocol = eProtocol;
                 m_sRecipe = sRecipe;
-                m_sSend = "<" + nID.ToString("000,") + eProtocol.ToString() + "," + sRecipe + ">"; 
+                m_sSend = "<" + nID.ToString("000") + "," + eProtocol.ToString() + "," + sRecipe + ">";
             }
 
             public Protocol(int nID, eProtocol eProtocol, string sRecipe, int iSnap)
@@ -126,7 +129,16 @@ namespace Root_Pine2_Vision.Module
                 m_eProtocol = eProtocol;
                 m_sRecipe = sRecipe;
                 m_iSnap = iSnap;
-                m_sSend = "<" + nID.ToString("000,") + eProtocol.ToString() + "," + sRecipe + "," + iSnap.ToString() + ">";
+                m_sSend = "<" + nID.ToString("000") + "," + eProtocol.ToString() + "," + sRecipe + "," + iSnap.ToString() + ">";
+            }
+
+            public Protocol(int nID, eProtocol eProtocol, string sRecipe, int nScanMode, int nLineNum)
+            {
+                m_eProtocol = eProtocol;
+                m_sRecipe = sRecipe;
+                m_nSnapMode = nScanMode;
+                m_nLineNum = nLineNum;
+                m_sSend = "<" + nID.ToString("000") + "," + eProtocol.ToString() + "," + sRecipe + "," + m_nSnapMode.ToString() + "," + m_nLineNum.ToString() + ">";
             }
         }
         Queue<Protocol> m_qProtocol = new Queue<Protocol>();
@@ -134,17 +146,30 @@ namespace Root_Pine2_Vision.Module
         #endregion
 
         #region TCPIP
-        int m_iProtocol = 0; 
+        int m_iProtocol = 0;
+        string m_sRecipe = ""; 
         public string SendRecipe(string sRecipe)
         {
+            if (m_sRecipe == sRecipe) return "OK";
+            m_sRecipe = sRecipe; 
+            if (m_bStartProcess == false) return "OK";
             Protocol protocol = new Protocol(m_iProtocol, eProtocol.RecipeOpen, sRecipe);
             m_qProtocol.Enqueue(protocol);
             return protocol.WaitReply(); 
         }
 
-        public string SendSnapDone(string sRecipe, int iSnap)
+        public string SendSnapDone(int iSnap)
         {
-            Protocol protocol = new Protocol(m_iProtocol, eProtocol.SnapDone, sRecipe, iSnap);
+            if (m_bStartProcess == false) return "OK";
+            Protocol protocol = new Protocol(m_iProtocol, eProtocol.SnapDone, m_sRecipe, iSnap);
+            m_qProtocol.Enqueue(protocol);
+            return protocol.WaitReply();
+        }
+
+        public string SendSnapInfo(string sRecipe, int nSnapMode, int nLineNum)
+        {
+            if (m_bStartProcess == false) return "OK";
+            Protocol protocol = new Protocol(m_iProtocol, eProtocol.SnapInfo, sRecipe, nSnapMode, nLineNum);
             m_qProtocol.Enqueue(protocol);
             return protocol.WaitReply();
         }
@@ -237,7 +262,7 @@ namespace Root_Pine2_Vision.Module
         }
 
         public string m_idProcess = "VisionWorks2";
-        bool IsProcessRun()
+        public bool IsProcessRun()
         {
             Process[] aProcess = Process.GetProcessesByName(m_idProcess);
             if (aProcess.Length == 0) return false;
