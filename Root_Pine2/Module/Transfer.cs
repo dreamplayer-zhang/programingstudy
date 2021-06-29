@@ -402,6 +402,7 @@ namespace Root_Pine2.Module
                 Thread.Sleep(2000);
                 return m_pusher.WaitUnlock();
             }
+            if (Run(m_loaderPusher.RunMove(infoStrip.p_eMagazine, false))) return p_sInfo; 
             if (Run(m_buffer.RunMove(infoStrip.p_eMagazine, false, false))) return p_sInfo;
             if (Run(m_magazineEV.RunMove(infoStrip))) return p_sInfo;
             if (Run(m_buffer.RunMove(infoStrip.p_eMagazine, false, true))) return p_sInfo;

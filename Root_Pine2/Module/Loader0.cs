@@ -157,7 +157,6 @@ namespace Root_Pine2.Module
         public string RunAvoidX(double fPos)
         {
             m_axis.p_axisX.StartMove(fPos);
-            m_axis.p_axisY.StartMove(ePosTransfer.Transfer0);
             return m_axis.p_axisX.WaitReady();
         }
         #endregion

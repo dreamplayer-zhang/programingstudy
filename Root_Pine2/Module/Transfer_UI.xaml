@@ -22,10 +22,10 @@
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
                 <Grid Grid.Column="0" Margin="3" Background="Beige">
-                    <TextBlock x:Name="textBlockA" HorizontalAlignment="Center"/>
+                    <TextBlock x:Name="textBlockB" HorizontalAlignment="Center"/>
                 </Grid>
                 <Grid Grid.Column="1" Margin="3" Background="Beige">
-                    <TextBlock x:Name="textBlockB" HorizontalAlignment="Center"/>
+                    <TextBlock x:Name="textBlockA" HorizontalAlignment="Center"/>
                 </Grid>
             </Grid>
             <tree:TreeUI Grid.Row="1" x:Name="treeRootUI" IsEnabled="False"/>
