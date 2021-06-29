@@ -64,7 +64,7 @@ namespace RootTools
                 m_sSLoggerNet.WritePRCLog(port, device, eventID, status, stepName, stepNum);
         }
 
-        public void WriteFNC(int port, string device, string eventID, STATUS status, DataFormatter dataFormatter = null, MATERIAL_TYPE? type = null)
+        public void WriteFNC(int port, string device, string eventID, STATUS status, DataFormatter dataFormatter = null, MATERIAL_TYPE? type = MATERIAL_TYPE.WAFER)
         {
             if (!m_useLog)
                 return;

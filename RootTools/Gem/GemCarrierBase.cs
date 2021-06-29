@@ -326,7 +326,7 @@ namespace RootTools.Gem
             if (m_gem.p_eControl != eControl.ONLINEREMOTE)
             {
                 p_eStateCarrierID = eGemState.VerificationOK;
-                p_eTransfer = eTransfer.TransferBlocked;
+                p_eReqTransfer = eTransfer.TransferBlocked;
                 return;
             }
 

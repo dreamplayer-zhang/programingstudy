@@ -183,7 +183,8 @@ namespace RootTools_CLR
 		for (int i = 0; i < startPoint->Length; i++)
 		{
 			vtStartPoint.push_back(Point(startPoint[i]->x, startPoint[i]->y));
-			vtLength.push_back((int)length[i]);
+			int nLen = length[i];
+			vtLength.push_back(nLen);
 		}
 		IP::Masking(pSrc, pDst, vtStartPoint, vtLength, nMemW, nMemH);
 

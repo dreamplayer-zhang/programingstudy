@@ -188,12 +188,12 @@ namespace Root_Pine2.Module
             }
 
             double m_dSlot = 6000;
-            public string MoveToTransfer(InfoStrip infoStrip, double dZ)
+            public string MoveToTransfer(InfoStrip infoStrip)
             {
                 if (m_conveyor.IsCheck(Conveyor.eCheck.Inside)) return "Conveyer Inside Sensor Checked";
                 m_infoStripPos = null;
                 ePos ePos = (infoStrip.p_eMagazinePos == InfoStrip.eMagazinePos.Up) ? ePos.TransferUp : ePos.TransferDown;
-                m_axis.StartMove(ePos, dZ - m_dSlot * infoStrip.p_nStrip);
+                m_axis.StartMove(ePos, -m_dSlot * infoStrip.p_nStrip);
                 string sMove = m_axis.WaitReady();
                 if (sMove == "OK") m_infoStripPos = infoStrip;
                 return sMove;
@@ -619,20 +619,19 @@ namespace Root_Pine2.Module
         #endregion
 
         #region Move Transfer
-        public string StartMoveTransfer(InfoStrip infoStrip, double dZ)
+        public string StartMoveTransfer(InfoStrip infoStrip)
         {
             if (m_elevator.IsSamePos(infoStrip)) return "OK";
             Run_MoveTransfer run = (Run_MoveTransfer)m_runMoveTransfer.Clone();
             run.m_infoStrip = infoStrip;
-            run.m_dZ = dZ; 
             return StartRun(run); 
         }
 
-        public string RunMoveTransfer(InfoStrip infoStrip, double dZ)
+        public string RunMoveTransfer(InfoStrip infoStrip)
         {
             if (infoStrip == null) return "InfoStrip not Found";
             p_sLED = infoStrip.m_sLED; 
-            return m_elevator.MoveToTransfer(infoStrip, dZ);
+            return m_elevator.MoveToTransfer(infoStrip);
         }
         #endregion
 
@@ -850,24 +849,21 @@ namespace Root_Pine2.Module
             }
 
             public InfoStrip m_infoStrip;
-            public double m_dZ = 0; 
             public override ModuleRunBase Clone()
             {
                 Run_MoveTransfer run = new Run_MoveTransfer(m_module);
                 run.m_infoStrip = m_infoStrip.Clone();
-                run.m_dZ = m_dZ; 
                 return run;
             }
 
             public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
             {
                 m_infoStrip.RunTreeMagazine(tree, bVisible);
-                m_dZ = tree.Set(m_dZ, m_dZ, "dZ", "Z Offset (pulse)", bVisible); 
             }
 
             public override string Run()
             {
-                return m_module.RunMoveTransfer(m_infoStrip, m_dZ);
+                return m_module.RunMoveTransfer(m_infoStrip);
             }
         }
         #endregion

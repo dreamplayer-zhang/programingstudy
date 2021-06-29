@@ -797,8 +797,6 @@ namespace Root_VEGA_D.Module
         {
             if (CamRADS == null) return "RADS Cam is null";
 
-            RADSControl.m_timer.Start();
-            RADSControl.p_IsRun = true;
             RADSControl.StartRADS();
 
             StopWatch sw = new StopWatch();
@@ -827,8 +825,6 @@ namespace Root_VEGA_D.Module
         {
             if (CamRADS == null) return "RADS Cam is null";
 
-            RADSControl.m_timer.Stop();
-            RADSControl.p_IsRun = false;
             RADSControl.StopRADS();
             if (CamRADS.p_CamInfo._IsGrabbing == true) CamRADS.StopGrab();
 
