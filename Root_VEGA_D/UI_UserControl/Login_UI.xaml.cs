@@ -35,5 +35,20 @@ namespace Root_VEGA_D
 			m_engineer.m_login.CheckLogin(textBoxPW.Text);
 			textBlockLoginLevel.Foreground = m_engineer.m_login.p_sUserName == "Logout" ? Brushes.Red : Brushes.Green;
 		}
-	}
+
+        private void textBoxID_KeyDown(object sender, KeyEventArgs e)
+        {
+			if(e.Key == Key.Enter)
+            {
+				m_engineer.m_login.p_sComboName = textBoxID.Text;
+				m_engineer.m_login.CheckLogin(textBoxPW.Text);
+				textBlockLoginLevel.Foreground = m_engineer.m_login.p_sUserName == "Logout" ? Brushes.Red : Brushes.Green;
+			}
+
+			if(e.Key == Key.Escape)
+            {
+				Close();
+            }
+        }
+    }
 }

@@ -63,6 +63,10 @@ namespace RootTools.Comm
             Queue<string> m_qSend = new Queue<string>();
             public string Send(string sMsg)
             {
+                if(sMsg == null)
+                {
+                    return "OK";
+                }
                 m_qSend.Enqueue(sMsg);
                 return "OK"; 
             }
