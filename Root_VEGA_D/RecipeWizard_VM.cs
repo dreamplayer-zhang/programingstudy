@@ -17,7 +17,7 @@ using RootTools.Memory;
 
 namespace Root_VEGA_D
 {
-    public class RecipeWizard_VM : RootViewer_ViewModel, IDialogRequestClose
+    public class RecipeWizard_VM : RootViewer_ViewModel
     {
         #region Property
         public enum Coordinate
@@ -399,8 +399,6 @@ namespace Root_VEGA_D
 
         Vision m_vision;
         #endregion
-
-        public event EventHandler<DialogCloseRequestedEventArgs> CloseRequested;
         public RecipeWizard_VM()
         {
             m_vision = ((VEGA_D_Handler)App.m_engineer.ClassHandler()).m_vision;
@@ -411,6 +409,7 @@ namespace Root_VEGA_D
         {
             //p_rootViewer = new RootViewer_ViewModel();
             this.init(new ImageData(App.m_engineer.ClassMemoryTool().GetMemory("Vision.Memory", "Vision", "Main")));
+            this.p_VisibleMenu = System.Windows.Visibility.Collapsed;
         }
 
         #region Function

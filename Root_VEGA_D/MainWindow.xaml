@@ -371,6 +371,7 @@
                         <ColumnDefinition />
                         <ColumnDefinition />
                         <ColumnDefinition />
+                        <ColumnDefinition />
                     </Grid.ColumnDefinitions>
                     <Grid Grid.Column="0"
                           Margin="5">
@@ -396,6 +397,14 @@
                                 Margin="0"
                                 Style="{StaticResource SetupPanelBtn}"
                                 Click="btnLogin_Click"/>
+                    </Grid>
+                    <Grid Grid.Column="3"
+                          Margin="5">
+                        <Button
+                                Content="Review"
+                                Margin="0"
+                                Style="{StaticResource SetupPanelBtn}"
+                                Command="{Binding CmdReview}"/>
                     </Grid>
                 </Grid>
                 <!--Left Panel-->
@@ -467,7 +476,7 @@
                                             <RowDefinition Height="10*" />
                                             <RowDefinition Height="15*" />
                                             <RowDefinition Height="15*" />
-                                            <RowDefinition Height="15*" />
+                                            <RowDefinition Height="8*" />
                                             <RowDefinition Height="8*" />
 
                                         </Grid.RowDefinitions>
@@ -543,15 +552,10 @@
                                             </Grid>
                                         </GroupBox>
                                         <GroupBox Header="Isolator IO"
-                                                  Grid.Column="0"
-                                                  Grid.Row="6" Grid.ColumnSpan="2">
+                                                  Grid.Column="1"
+                                                  Grid.Row="6" Grid.ColumnSpan="1">
                                             <Grid>
                                                 <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition/>
-                                                    <ColumnDefinition/>
-                                                    <ColumnDefinition/>
-                                                    <ColumnDefinition/>
-                                                    <ColumnDefinition/>
                                                     <ColumnDefinition/>
                                                     <ColumnDefinition/>
                                                     <ColumnDefinition/>
@@ -561,47 +565,50 @@
                                                 <Grid.RowDefinitions>
                                                     <RowDefinition Height="1*"/>
                                                     <RowDefinition Height="2*"/>
+                                                    <RowDefinition Height="0.4*"/>
+                                                    <RowDefinition Height="1*"/>
+                                                    <RowDefinition Height="2*"/>
                                                 </Grid.RowDefinitions>
                                                 <TextBlock Text="FP Isolator" Grid.Column="0" Grid.Row="0" 
                                                            HorizontalAlignment="Center" FontSize="12"/>
                                                 <ToggleButton  x:Name="btnFP_Isolator" Width ="{PriorityBinding}" Background="Green" Grid.Column="0" Grid.Row="1" IsHitTestVisible="false"
-                    Style="{StaticResource IO_indicator}" HorizontalAlignment="Center" Margin="2"/>
+                    Style="{StaticResource IO_indicator}" HorizontalAlignment="Center"/>
                                                 <TextBlock Text="Isolator V" Grid.Column="1" Grid.Row="0"
                                                            HorizontalAlignment="Center" FontSize="12"/>
                                                 <ToggleButton x:Name="btnIsolator_V" Width ="{PriorityBinding}" Background="Green" Grid.Column="1" Grid.Row="1" IsHitTestVisible="false"
-                    Style="{StaticResource IO_indicator}" HorizontalAlignment="Center" Margin="2"/>
+                    Style="{StaticResource IO_indicator}" HorizontalAlignment="Center"/>
                                                 <TextBlock Text="Factory Air Pad" Grid.Column="2" Grid.Row="0"
                                                            HorizontalAlignment="Center" FontSize="12"/>
                                                 <ToggleButton x:Name="btn_Factory_Air_Pad" Width ="{PriorityBinding}" Background="Green" Grid.Column="2" Grid.Row="1" IsHitTestVisible="false"
-                    Style="{StaticResource IO_indicator}" HorizontalAlignment="Center" Margin="2"/>
+                    Style="{StaticResource IO_indicator}" HorizontalAlignment="Center"/>
                                                 <TextBlock Text="Air Tank" Grid.Column="3" Grid.Row="0"
                                                            HorizontalAlignment="Center" FontSize="12"/>
                                                 <ToggleButton x:Name="btn_Air_Tank" Width ="{PriorityBinding}" Background="Green" Grid.Column="3" Grid.Row="1" IsHitTestVisible="false"
-                    Style="{StaticResource IO_indicator}" HorizontalAlignment="Center" Margin="2"/>
+                    Style="{StaticResource IO_indicator}" HorizontalAlignment="Center"/>
                                                 <TextBlock Text="X Bottom" Grid.Column="4" Grid.Row="0"
                                                            HorizontalAlignment="Center" FontSize="12"/>
                                                 <ToggleButton x:Name="btn_X_Bottom" Width ="{PriorityBinding}" Background="Green" Grid.Column="4" Grid.Row="1" IsHitTestVisible="false"
-                    Style="{StaticResource IO_indicator}" HorizontalAlignment="Center" Margin="2"/>
-                                                <TextBlock Text="X Side Master" Grid.Column="5" Grid.Row="0"
+                    Style="{StaticResource IO_indicator}" HorizontalAlignment="Center"/>
+                                                <TextBlock Text="X Side Master" Grid.Column="0" Grid.Row="3"
                                                            HorizontalAlignment="Center" FontSize="12"/>
-                                                <ToggleButton x:Name="btn_X_Side_Master" Width ="{PriorityBinding}" Background="Green" Grid.Column="5" Grid.Row="1" IsHitTestVisible="false"
-                    Style="{StaticResource IO_indicator}" HorizontalAlignment="Center" Margin="2"/>
-                                                <TextBlock Text="X Side Slave" Grid.Column="6" Grid.Row="0"
+                                                <ToggleButton x:Name="btn_X_Side_Master" Width ="{PriorityBinding}" Background="Green" Grid.Column="0" Grid.Row="4" IsHitTestVisible="false"
+                    Style="{StaticResource IO_indicator}" HorizontalAlignment="Center"/>
+                                                <TextBlock Text="X Side Slave" Grid.Column="1" Grid.Row="3"
                                                            HorizontalAlignment="Center" FontSize="12"/>
-                                                <ToggleButton x:Name="btn_X_Side_Slave" Width ="{PriorityBinding}" Background="Green" Grid.Column="6" Grid.Row="1" IsHitTestVisible="false"
-                    Style="{StaticResource IO_indicator}" HorizontalAlignment="Center" Margin="2"/>
-                                                <TextBlock Text="Y Bottom" Grid.Column="7" Grid.Row="0"
+                                                <ToggleButton x:Name="btn_X_Side_Slave" Width ="{PriorityBinding}" Background="Green" Grid.Column="1" Grid.Row="4" IsHitTestVisible="false"
+                    Style="{StaticResource IO_indicator}" HorizontalAlignment="Center"/>
+                                                <TextBlock Text="Y Bottom" Grid.Column="2" Grid.Row="3"
                                                            HorizontalAlignment="Center" FontSize="12"/>
-                                                <ToggleButton x:Name="btn_Y_Bottom" Width ="{PriorityBinding}" Background="Green" Grid.Column="7" Grid.Row="1" IsHitTestVisible="false"
-                    Style="{StaticResource IO_indicator}" HorizontalAlignment="Center" Margin="2"/>
-                                                <TextBlock Text="Y Side Master" Grid.Column="8" Grid.Row="0"
+                                                <ToggleButton x:Name="btn_Y_Bottom" Width ="{PriorityBinding}" Background="Green" Grid.Column="2" Grid.Row="4" IsHitTestVisible="false"
+                    Style="{StaticResource IO_indicator}" HorizontalAlignment="Center"/>
+                                                <TextBlock Text="Y Side Master" Grid.Column="3" Grid.Row="3"
                                                            HorizontalAlignment="Center" FontSize="12"/>
-                                                <ToggleButton x:Name="btn_Y_Side_Master" Width ="{PriorityBinding}" Background="Green" Grid.Column="8" Grid.Row="1" IsHitTestVisible="false"
-                    Style="{StaticResource IO_indicator}" HorizontalAlignment="Center" Margin="2"/>
-                                                <TextBlock Text="Y Side Slave" Grid.Column="9" Grid.Row="0"
+                                                <ToggleButton x:Name="btn_Y_Side_Master" Width ="{PriorityBinding}" Background="Green" Grid.Column="3" Grid.Row="4" IsHitTestVisible="false"
+                    Style="{StaticResource IO_indicator}" HorizontalAlignment="Center"/>
+                                                <TextBlock Text="Y Side Slave" Grid.Column="4" Grid.Row="3"
                                                            HorizontalAlignment="Center" FontSize="12"/>
-                                                <ToggleButton x:Name="btn_Y_Side_Slave" Width ="{PriorityBinding}" Background="Green" Grid.Column="9" Grid.Row="1" IsHitTestVisible="false"
-                    Style="{StaticResource IO_indicator}" HorizontalAlignment="Center" Margin="2"/>
+                                                <ToggleButton x:Name="btn_Y_Side_Slave" Width ="{PriorityBinding}" Background="Green" Grid.Column="4" Grid.Row="4" IsHitTestVisible="false"
+                    Style="{StaticResource IO_indicator}" HorizontalAlignment="Center"/>
                                             </Grid>
                                         </GroupBox>
                                         <GroupBox Header="Illumination Info"
@@ -624,7 +631,7 @@
                                             </UniformGrid>
                                         </GroupBox>
                                         <GroupBox Header="Coordinate Info"
-                                                  Grid.Column="0"
+                                                  Grid.Column="0" Grid.RowSpan="3"
                                                   Grid.Row="3">
                                             <Grid Margin="5,2">
                                                 <Grid.RowDefinitions>
@@ -682,54 +689,58 @@
 
                                                 </DataGrid>
                                             </Grid>
-
                                         </GroupBox>
-                                        <GroupBox Header="FFU"
-                                                  Grid.Row="4"
+                                        <Grid Grid.Row="6">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="2*"/>
+                                            </Grid.ColumnDefinitions>
+                                            <GroupBox Header="FDC"
                                                   Grid.Column="0">
-                                            <Grid Margin="5,2">
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition/>
-                                                    <ColumnDefinition/>
-                                                    <ColumnDefinition/>
-                                                    <ColumnDefinition/>
-                                                </Grid.ColumnDefinitions>
-                                                <module:FFU_Fan_UI Grid.Row="0" x:Name="FanUI0"/>
-                                                <module:FFU_Fan_UI Grid.Column="1" x:Name="FanUI1"/>
-                                                <module:FFU_Fan_UI Grid.Column="2" x:Name="FanUI2"/>
-                                                <module:FFU_Fan_UI Grid.Column="3" x:Name="FanUI3"/>
-                                            </Grid>
-                                        </GroupBox>
-                                        <GroupBox Header="FDC"
-                                                  Grid.Row="5"
-                                                  Grid.Column="0">
-                                            <Grid Margin="5,2">
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="2*"/>
-                                                    <ColumnDefinition Width="0.65*"/>
-                                                    <ColumnDefinition Width="1*"/>
-                                                    <ColumnDefinition Width="2*"/>
-                                                    <ColumnDefinition Width="0.65*"/>
-                                                    <ColumnDefinition Width="1*"/>
-                                                </Grid.ColumnDefinitions>
-                                                <TextBlock Grid.Column="0" Text="CDA 1"
+                                                <Grid Margin="5,2">
+                                                    <Grid.RowDefinitions>
+                                                        <RowDefinition/>
+                                                        <RowDefinition/>
+                                                    </Grid.RowDefinitions>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="2*"/>
+                                                        <ColumnDefinition Width="0.65*"/>
+                                                        <ColumnDefinition Width="1*"/>
+                                                    </Grid.ColumnDefinitions>
+                                                    <TextBlock Grid.Column="0" Text="CDA 1" FontSize="12"
                                                            HorizontalAlignment="Left"/>
-                                                <TextBlock Grid.Column="1"
+                                                    <TextBlock Grid.Column="1" 
                                                            HorizontalAlignment="Left"
-                                                           x:Name="FDC_CDA1"
+                                                           x:Name="FDC_CDA1" FontSize="12"
                                                            Text="{Binding p_CDA1_Value}"/>
-                                                <TextBlock Grid.Column="2" Text="MPa"
+                                                    <TextBlock Grid.Column="2" Text="MPa" FontSize="12"
                                                            HorizontalAlignment="Left"/>
-                                                <TextBlock Grid.Column="3" Text="INSPECT CDA"
-                                                           HorizontalAlignment="Center"/>
-                                                <TextBlock Grid.Column="4"
-                                                           x:Name="FDC_CDA2"
+                                                    <TextBlock  Grid.Row="1"  Grid.Column="0" Text="INSPECT CDA" FontSize="12"
+                                                           HorizontalAlignment="Left"/>
+                                                    <TextBlock  Grid.Row="1"  Grid.Column="1"
+                                                           x:Name="FDC_CDA2" FontSize="12"
                                                            Text="{Binding p_CDA2_Value}"
                                                            HorizontalAlignment="Left" />
-                                                <TextBlock Grid.Column="5" Text="MPa"
+                                                    <TextBlock  Grid.Row="1"  Grid.Column="2" Text="MPa" FontSize="12"
                                                            HorizontalAlignment="Left"/>
-                                            </Grid>
-                                        </GroupBox>
+                                                </Grid>
+                                            </GroupBox>
+                                            <GroupBox Header="FFU" Grid.Column="1">
+                                                <Grid Margin="5,2">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition/>
+                                                        <ColumnDefinition/>
+                                                        <ColumnDefinition/>
+                                                        <ColumnDefinition/>
+                                                    </Grid.ColumnDefinitions>
+                                                    <module:FFU_Fan_UI Grid.Row="0" x:Name="FanUI0"/>
+                                                    <module:FFU_Fan_UI Grid.Column="1" x:Name="FanUI1"/>
+                                                    <module:FFU_Fan_UI Grid.Column="2" x:Name="FanUI2"/>
+                                                    <module:FFU_Fan_UI Grid.Column="3" x:Name="FanUI3"/>
+                                                </Grid>
+                                            </GroupBox>
+                                        </Grid>
+                                    
                                         <Grid Grid.Column="1"
                                               Grid.Row="2">
                                             <GroupBox  Header="Inspection Info"
@@ -800,33 +811,59 @@
                                                 </Grid>
                                             </GroupBox>
                                         </Grid>
-                                        <GroupBox Header="Inspection Area"
+                                        <Grid Grid.Column="1" Grid.Row="3" Grid.RowSpan="3">
+                                            <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition/>
+                                                        <ColumnDefinition Width="450"/>
+                                                    </Grid.ColumnDefinitions> 
+                                                    <Grid.RowDefinitions>
+                                                        <RowDefinition Height="450"/>
+                                                    </Grid.RowDefinitions>
+                                                    <!--<Image Source="Resource/ReticleMap2.PNG"
+                                                       Stretch="Fill"
+                                                       Margin="10" />-->
+                                                <GroupBox Header="Key">
+                                                    <Grid>
+                                                        <Grid.RowDefinitions>
+                                                            <RowDefinition/>
+                                                            <RowDefinition/>
+                                                            <RowDefinition/>
+                                                        </Grid.RowDefinitions>
+                                                        <Border Background="Black" Margin="3">
+                                                            <TextBlock Foreground="White">Key 1</TextBlock>
+                                                        </Border>
+                                                        <Border Background="Black" Grid.Row="1" Margin="3">
+                                                            <TextBlock Foreground="White">Key 1</TextBlock>
+                                                        </Border>
+                                                        <Border Background="Black" Grid.Row="2" Margin="3">
+                                                            <TextBlock Foreground="White">Key 1</TextBlock>
+                                                        </Border>
+                                                    </Grid>
+                                                </GroupBox>
+                                                <GroupBox Header="Inspection Area"
                                                   Grid.Column="1"
                                                   Grid.Row="3"
                                                   Grid.RowSpan="3">
 
-                                            <Grid Background="Black">
-                                                <!--<Image Source="Resource/ReticleMap2.PNG"
-                                                       Stretch="Fill"
-                                                       Margin="10" />-->
-                                                <Viewbox>
-                                                    <Canvas Width="1000"
+                                                    <Viewbox Grid.Column="1">
+                                                        <Canvas Width="1000" Background="Black"
                                                             Height="1000">
-                                                        <TextBlock Text="Pattern Area"
+                                                            <TextBlock Text="Pattern Area"
                                                                    Canvas.Left="230"
                                                                    Canvas.Top="70"
                                                                    FontSize="15"
                                                                    FontWeight="Bold"
                                                                    Panel.ZIndex="5"
                                                                    Height="20" />
-                                                        <TextBlock Text="NonPattern Area"
+                                                            <TextBlock Text="NonPattern Area"
                                                                    Canvas.Left="160"
                                                                    Canvas.Top="20"
                                                                    FontSize="15"
                                                                    FontWeight="Bold"
                                                                    Panel.ZIndex="5"
                                                                    Height="20" />
-                                                        <Rectangle Stroke="Coral"
+                                                            <Rectangle Stroke="Coral"
                                                                    Fill="Coral"
                                                                    StrokeThickness="4"
                                                                    Opacity="0.3"
@@ -835,7 +872,7 @@
                                                                    Height="856"
                                                                    Canvas.Left="225"
                                                                    Canvas.Top="70" />
-                                                        <Rectangle Stroke="SteelBlue"
+                                                            <Rectangle Stroke="SteelBlue"
                                                                    Fill="SteelBlue"
                                                                    StrokeThickness="4"
                                                                    Opacity="0.3"
@@ -844,10 +881,11 @@
                                                                    Canvas.Left="155"
                                                                    Canvas.Top="20" />
 
-                                                    </Canvas>
-                                                </Viewbox>
-                                            </Grid>
-                                        </GroupBox>
+                                                        </Canvas>
+                                                    </Viewbox>
+                                            </GroupBox>
+                                                </Grid>
+                                        </Grid>
                                     </Grid>
                                 </StackPanel>
                             </ScrollViewer>
@@ -887,27 +925,27 @@
                                                     </UniformGrid>
                                                     <StackPanel Grid.Row="1"
                                                                 VerticalAlignment="Center">
-                                                        <TextBlock Text="Main Progress"
+                                                        <TextBlock Text="Snap Progress"
                                                                    FontWeight="Bold"
                                                                    HorizontalAlignment="Left" />
                                                         <Grid>
                                                             <ProgressBar Height="30"
-                                                                         Value="7" />
-                                                            <TextBlock Text="7%"
+                                                                         Value="37" />
+                                                            <TextBlock Text="37%"
                                                                        Foreground="Black"
                                                                        FontWeight="Bold" />
                                                         </Grid>
                                                     </StackPanel>
                                                     <StackPanel Grid.Row="2"
                                                                 VerticalAlignment="Center">
-                                                        <TextBlock Text="Sub Progress"
+                                                        <TextBlock Text="Inspection Progress"
                                                                    FontWeight="Bold"
                                                                    HorizontalAlignment="Left" />
                                                         <Grid>
-                                                            <ProgressBar Height="20"
-                                                                         Value="80"
+                                                            <ProgressBar Height="30"
+                                                                         Value="10"
                                                                          Grid.ColumnSpan="2" />
-                                                            <TextBlock Text="Sub Process Name"
+                                                            <TextBlock Text="10%"
                                                                        Foreground="Black" />
                                                         </Grid>
                                                     </StackPanel>
@@ -986,20 +1024,33 @@
                                         </Grid>
                                         <Grid Grid.Column="1"
                                               Grid.Row="1">
-                                            <Grid.RowDefinitions>
-                                                <RowDefinition Height="1*" />
-                                                <RowDefinition Height="1*" />
-                                            </Grid.RowDefinitions>
-
-                                            <GroupBox Header="Defect Image"
-                                                      Grid.Row="0">
-                                                <Grid Background="Black">
-                                                    <TextBlock Text="Defect Image"
+                                            <GroupBox Header="Defect Image">
+                                                <GroupBox>
+                                                    <Grid>
+                                                        <Grid.RowDefinitions>
+                                                            <RowDefinition/>
+                                                            <RowDefinition/>
+                                                            <RowDefinition/>
+                                                        </Grid.RowDefinitions>
+                                                        <Grid Background="Black" Margin="3">
+                                                            <TextBlock Text="Defect Image 1"
                                                                Foreground="White" />
-                                                </Grid>
+                                                        </Grid>
+                                                        <Grid Background="Black" Grid.Row="1" Margin="3">
+                                                            <TextBlock Text="Defect Image 2"
+                                                               Foreground="White" />
+                                                        </Grid>
+                                                        <Grid Background="Black" Grid.Row="2" Margin="3">
+                                                            <TextBlock Text="Defect Image 3"
+                                                               Foreground="White" />
+                                                        </Grid>
+
+
+                                                    </Grid>
+                                                </GroupBox>
                                             </GroupBox>
 
-                                            <GroupBox Header="Module State"
+                                            <!--<GroupBox Header="Module State"
                                                       Grid.Row="1">
                                                 <Grid>
                                                     <Grid.RowDefinitions>
@@ -1090,22 +1141,18 @@
                                                     </Grid>
 
                                                 </Grid>
-                                            </GroupBox>
+                                            </GroupBox>-->
 
                                         </Grid>
                                     </Grid>
                                 </StackPanel>
                             </ScrollViewer>
                         </TabItem>
-                        <TabItem Header="Review" x:Name="ReviewTab"
-                                 Style="{StaticResource ResourceKey=WizardTabItem}">
-                            <Button Content="test"/>
-                        </TabItem>
                         <TabItem Header="Engineer" x:Name="engineerTab"
                                  Style="{StaticResource ResourceKey=WizardTabItem}">
                             <engineer:VEGA_D_Engineer_UI x:Name="engineerUI"/>
                         </TabItem>
-                        <TabItem Header="Viewer" x:Name="ViewerTab"
+                        <!--<TabItem Header="Viewer" x:Name="ViewerTab"
                                  Style="{StaticResource ResourceKey=WizardTabItem}">
                             <Grid Grid.Column="0" Grid.Row="2">
                                 <Grid.RowDefinitions>
@@ -1126,9 +1173,9 @@
                                 <Grid Grid.Column="1">
                                     <GroupBox Header="Map">
                                         <Grid Background="Black">
-                                            <!--<Image Source="Resource/ReticleMap2.PNG"
+                                            --><!--<Image Source="Resource/ReticleMap2.PNG"
                                        Margin="20,10"
-                                       Stretch="Fill" />-->
+                                       Stretch="Fill" />--><!--
                                         </Grid>
                                     </GroupBox>
                                 </Grid>
@@ -1526,10 +1573,10 @@
                                     </GroupBox>
                                 </Grid>
                             </Grid>
-                        </TabItem>
+                        </TabItem>-->
                         <TabItem Header="Recipe Manager" x:Name="RecipeManagerTab"
                                  Style="{StaticResource ResourceKey=WizardTabItem}" Visibility="Visible">
-                            <local:RecipeManager_UI />
+                            <local:RecipeManager_UI DataContext="{Binding p_recipeManager_ViewModel}" />
 
                             <!--<ScrollViewer Background="White">
                                 <StackPanel>
@@ -2234,10 +2281,10 @@
                                 </StackPanel>
                             </ScrollViewer>-->
                         </TabItem>
-                        <TabItem Header="Recipe Wizard" x:Name="RecipeWizardTab"
+                        <!--<TabItem Header="Recipe Wizard" x:Name="RecipeWizardTab"
                                  Style="{StaticResource WizardTabItem}" Visibility="Visible">
                             <local:RecipeWizard_UI DataContext="{Binding p_recipeWizard_ViewModel}" />
-                        </TabItem>
+                        </TabItem>-->
                         <!--<TabItem Header="Run"
                                  Style="{StaticResource ResourceKey=WizardTabItem}">
                             <ScrollViewer Background="AliceBlue">

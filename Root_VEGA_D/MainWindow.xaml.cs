@@ -121,11 +121,11 @@ namespace Root_VEGA_D
             RobotState.DataContext = m_handler.m_wtr;
             VisionState.DataContext = m_handler.m_vision;
             btnLogin.DataContext = m_engineer.m_login;
-            engineerTab.Visibility = (m_engineer.m_login.p_eLevel >= Login.eLevel.Operator) ? Visibility.Visible : Visibility.Collapsed;
-            ReviewTab.Visibility = (m_engineer.m_login.p_eLevel >= Login.eLevel.Operator) ? Visibility.Visible : Visibility.Collapsed;
+            engineerTab.Visibility = (m_engineer.m_login.p_eLevel >= Login.eLevel.Admin) ? Visibility.Visible : Visibility.Collapsed;
+            //ReviewTab.Visibility = (m_engineer.m_login.p_eLevel >= Login.eLevel.Operator) ? Visibility.Visible : Visibility.Collapsed;
             RunTab.Visibility = (m_engineer.m_login.p_eLevel >= Login.eLevel.Operator) ? Visibility.Visible : Visibility.Collapsed;
             RecipeManagerTab.Visibility = (m_engineer.m_login.p_eLevel >= Login.eLevel.Operator) ? Visibility.Visible : Visibility.Collapsed; ;
-            RecipeWizardTab.Visibility = (m_engineer.m_login.p_eLevel >= Login.eLevel.Operator) ? Visibility.Visible : Visibility.Collapsed;
+            //RecipeWizardTab.Visibility = (m_engineer.m_login.p_eLevel >= Login.eLevel.Operator) ? Visibility.Visible : Visibility.Collapsed;
             //TextBlockRetID.DataContext = m_handler.m_aLoadport[0].p_infoCarrier.m_aGemSlot[0];
         }
 
@@ -303,11 +303,11 @@ namespace Root_VEGA_D
 		{
             m_login = new Login_UI(m_engineer);
             m_login.ShowDialog();
-            engineerTab.Visibility = (m_engineer.m_login.p_eLevel >= Login.eLevel.Operator) ? Visibility.Visible : Visibility.Collapsed;
-            ReviewTab.Visibility = (m_engineer.m_login.p_eLevel >= Login.eLevel.Operator) ? Visibility.Visible : Visibility.Collapsed;
+            engineerTab.Visibility = (m_engineer.m_login.p_eLevel >= Login.eLevel.Admin) ? Visibility.Visible : Visibility.Collapsed;
+            //ReviewTab.Visibility = (m_engineer.m_login.p_eLevel >= Login.eLevel.Operator) ? Visibility.Visible : Visibility.Collapsed;
             RunTab.Visibility = (m_engineer.m_login.p_eLevel >= Login.eLevel.Operator) ? Visibility.Visible : Visibility.Collapsed;
             RecipeManagerTab.Visibility = (m_engineer.m_login.p_eLevel >= Login.eLevel.Operator) ? Visibility.Visible : Visibility.Collapsed;
-            RecipeWizardTab.Visibility = (m_engineer.m_login.p_eLevel >= Login.eLevel.Operator) ? Visibility.Visible : Visibility.Collapsed;
+            //RecipeWizardTab.Visibility = (m_engineer.m_login.p_eLevel >= Login.eLevel.Operator) ? Visibility.Visible : Visibility.Collapsed;
         }
 
 		private void btnOHT_Click(object sender, RoutedEventArgs e)

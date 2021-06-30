@@ -207,6 +207,7 @@
     <Compile Include="Module\OHT_UI.xaml.cs">
       <DependentUpon>OHT_UI.xaml</DependentUpon>
     </Compile>
+    <Compile Include="RecipeManager_VM.cs" />
     <Compile Include="UI_UserControl\Login_UI.xaml.cs">
       <DependentUpon>Login_UI.xaml</DependentUpon>
     </Compile>
