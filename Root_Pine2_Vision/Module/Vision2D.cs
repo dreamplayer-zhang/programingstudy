@@ -153,13 +153,15 @@ namespace Root_Pine2_Vision.Module
         #endregion
 
         #region Send Recipe
-        public void SendRecipe(string sRecipe)
+        public string SendRecipe(string sRecipe)
         {
-            if (p_eRemote == eRemote.Client) RemoteRun(eRemoteRun.SendRecipe, eRemote.Client, sRecipe);
+            if (p_eRemote == eRemote.Client) return RemoteRun(eRemoteRun.SendRecipe, eRemote.Client, sRecipe);
             else
             {
-                m_aWorks[eWorks.A].SendRecipe(sRecipe);
-                m_aWorks[eWorks.B].SendRecipe(sRecipe);
+                string sRunA = m_aWorks[eWorks.A].SendRecipe(sRecipe);
+                string sRunB = m_aWorks[eWorks.B].SendRecipe(sRecipe);
+                if ((sRunA == "OK") && (sRunB == "OK")) return "OK";
+                return "A = " + sRunA + ", B = " + sRunB; 
             }
         }
         #endregion
@@ -793,7 +795,7 @@ namespace Root_Pine2_Vision.Module
                 {
                     case eRemoteRun.StateHome: return m_module.StateHome();
                     case eRemoteRun.RunLight: m_module.RunLight(m_lightPower); break;
-                    case eRemoteRun.SendRecipe: m_module.SendRecipe(m_sRecipe); break;
+                    case eRemoteRun.SendRecipe: return m_module.SendRecipe(m_sRecipe); 
                 }
                 return "OK";
             }

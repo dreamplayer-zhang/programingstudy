@@ -107,12 +107,15 @@ namespace Root_Pine2_Vision.Module
                 return sSend.Substring(l, sSend.Length - l - 1); 
             }
 
-            public string WaitReply()
+            public string WaitReply(int secTimeout)
             {
+                int msTimeout = 1000 * secTimeout; 
+                StopWatch sw = new StopWatch(); 
                 while (m_bWait)
                 {
                     Thread.Sleep(10);
-                    if (EQ.IsStop()) return "EQ Stop"; 
+                    if (EQ.IsStop()) return "EQ Stop";
+                    if (sw.ElapsedMilliseconds > msTimeout) return "Protocol Recieve Timeout"; 
                 }
                 return m_sInfo;
             }
@@ -147,6 +150,7 @@ namespace Root_Pine2_Vision.Module
 
         #region TCPIP
         int m_iProtocol = 0;
+        int m_secTimeout = 2; 
         string m_sRecipe = ""; 
         public string SendRecipe(string sRecipe)
         {
@@ -155,7 +159,7 @@ namespace Root_Pine2_Vision.Module
             if (m_bStartProcess == false) return "OK";
             Protocol protocol = new Protocol(m_iProtocol, eProtocol.RecipeOpen, sRecipe);
             m_qProtocol.Enqueue(protocol);
-            return protocol.WaitReply(); 
+            return protocol.WaitReply(m_secTimeout); 
         }
 
         public string SendSnapDone(int iSnap)
@@ -163,7 +167,7 @@ namespace Root_Pine2_Vision.Module
             if (m_bStartProcess == false) return "OK";
             Protocol protocol = new Protocol(m_iProtocol, eProtocol.SnapDone, m_sRecipe, iSnap);
             m_qProtocol.Enqueue(protocol);
-            return protocol.WaitReply();
+            return protocol.WaitReply(m_secTimeout);
         }
 
         public string SendSnapInfo(string sRecipe, int nSnapMode, int nLineNum)
@@ -171,7 +175,7 @@ namespace Root_Pine2_Vision.Module
             if (m_bStartProcess == false) return "OK";
             Protocol protocol = new Protocol(m_iProtocol, eProtocol.SnapInfo, sRecipe, nSnapMode, nLineNum);
             m_qProtocol.Enqueue(protocol);
-            return protocol.WaitReply();
+            return protocol.WaitReply(m_secTimeout);
         }
 
         void ThreadSend()
