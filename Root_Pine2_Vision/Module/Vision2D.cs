@@ -555,8 +555,6 @@ namespace Root_Pine2_Vision.Module
         public Dictionary<eWorks, Recipe> m_RunningRecipe = new Dictionary<eWorks, Recipe>();   // 현재 Run 중인 Recipe
         void InitRecipe()
         {
-            m_UIRecipe.Add(eWorks.A, new Recipe(this, eWorks.A));
-            m_UIRecipe.Add(eWorks.B, new Recipe(this, eWorks.B));
             m_RunningRecipe.Add(eWorks.A, new Recipe(this, eWorks.A));
             m_RunningRecipe.Add(eWorks.B, new Recipe(this, eWorks.B));
         }
@@ -725,6 +723,8 @@ namespace Root_Pine2_Vision.Module
         Recipe_UI m_ui;
         void InitVision_Snap_UI()
         {
+            m_UIRecipe.Add(eWorks.A, new Recipe(this, eWorks.A));
+            m_UIRecipe.Add(eWorks.B, new Recipe(this, eWorks.B));
             m_ui = new Recipe_UI();
             m_ui.Init(this);
             m_aTool.Add(m_ui);
