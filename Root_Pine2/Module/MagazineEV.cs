@@ -67,12 +67,13 @@ namespace Root_Pine2.Module
                 if (bInit) m_doMove.AllOff();
             }
 
+            public bool m_bInv = false; 
             public void RunSwitch(int nBlink)
             {
                 switch (m_magazineEV.p_eState)
                 {
                     case eState.Run: m_dioSwitch.Write(nBlink % 2 == 0); break;
-                    default: m_dioSwitch.Write(nBlink <= 1); break;
+                    default: m_dioSwitch.Write(m_bInv ? (nBlink > 1) : (nBlink <= 1)); break;
                 }
             }
 
@@ -637,6 +638,7 @@ namespace Root_Pine2.Module
                     Thread.Sleep(10);
                     if (EQ.IsStop()) return "EQ Stop";
                 }
+                m_conveyor.m_bInv = false;
                 if (Run(m_elevator.RunAlign(true))) return p_sInfo;
                 if (Run(m_elevator.MoveToConveyor(eMagazinePos, (m_pine2.p_eMode == Pine2.eRunMode.Magazine) ? 7 : 0))) return p_sInfo;
                 if (Run(m_elevator.RunAlign(false))) return p_sInfo;

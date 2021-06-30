@@ -108,7 +108,6 @@ namespace Root_Pine2.Module
                 nBlink = (nBlink + 1) % 8;
             }
         }
-
         #endregion
 
         public MagazineEVSet()
