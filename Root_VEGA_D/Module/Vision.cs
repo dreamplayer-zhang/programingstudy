@@ -797,8 +797,6 @@ namespace Root_VEGA_D.Module
         {
             if (CamRADS == null) return "RADS Cam is null";
 
-            RADSControl.m_timer.Start();
-            RADSControl.p_IsRun = true;
             RADSControl.StartRADS();
 
             StopWatch sw = new StopWatch();
@@ -827,8 +825,6 @@ namespace Root_VEGA_D.Module
         {
             if (CamRADS == null) return "RADS Cam is null";
 
-            RADSControl.m_timer.Stop();
-            RADSControl.p_IsRun = false;
             RADSControl.StopRADS();
             if (CamRADS.p_CamInfo._IsGrabbing == true) CamRADS.StopGrab();
 
@@ -978,6 +974,16 @@ namespace Root_VEGA_D.Module
                                         // IPU에서 이미지 검사 완료되었기 때문에 해당 상태변수 true로 변경
                                         runGrabLineScan.m_bIPUCompleted = true;
                                     }
+                                }
+                            }
+                            break;
+                        case TCPIPComm_VEGA_D.Command.InspStatus:
+                            {
+                                Run_GrabLineScan runGrabLineScan = PeekModuleRun() as Run_GrabLineScan;
+                                if (runGrabLineScan != null)
+                                {
+                                    int nEndLine = int.Parse(mapParam[TCPIPComm_VEGA_D.PARAM_NAME_INSPENDLINE]);
+
                                 }
                             }
                             break;

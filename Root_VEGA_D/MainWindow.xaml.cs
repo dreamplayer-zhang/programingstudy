@@ -75,7 +75,7 @@ namespace Root_VEGA_D
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             if (!Directory.Exists(@"C:\Recipe\VEGA_D")) Directory.CreateDirectory(@"C:\Recipe\VEGA_D");
-            Init();
+
         }
 
         private void Window_Closing(object sender, CancelEventArgs e)
@@ -85,23 +85,31 @@ namespace Root_VEGA_D
         #endregion
 
         VEGA_D_Handler m_handler;
-        VEGA_D_Engineer m_engineer = new VEGA_D_Engineer();
+        VEGA_D_Engineer m_engineer;
         Loadport_Cymechs[] m_loadport_Cymechs = new Loadport_Cymechs[2];
         Login_UI m_login;
         OHTs_UI m_ohts= new OHTs_UI();
         Login.eLevel m_level;
+
+        RecipeWizard_VM recipeWizardVM;
         public MainWindow()
         {
             InitializeComponent();
+
+            Init();
+            this.DataContext = new MainWindow_ViewModel(this);
         }
+
         void Init()
         {
+            m_engineer = App.m_engineer;
+
             m_engineer.Init("VEGA_D");
             engineerUI.Init(m_engineer);
             m_handler = m_engineer.m_handler;
             loadportA.Init(m_handler.m_aLoadport[0], m_handler, m_handler.m_aRFID[0]);
             loadportB.Init(m_handler.m_aLoadport[1], m_handler, m_handler.m_aRFID[1]);
-            RecipeWizard_UI.init(m_engineer);
+            //RecipeWizard_UI.init(m_engineer);
             InitTimer();
             InitFFU();
             m_loadport_Cymechs[0] = (Loadport_Cymechs)m_handler.m_aLoadport[0];
@@ -113,9 +121,11 @@ namespace Root_VEGA_D
             RobotState.DataContext = m_handler.m_wtr;
             VisionState.DataContext = m_handler.m_vision;
             btnLogin.DataContext = m_engineer.m_login;
-            engineerTab.Visibility = (m_engineer.m_login.p_eLevel >= Login.eLevel.Operator) ? Visibility.Visible : Visibility.Collapsed;
-            ReviewTab.Visibility = (m_engineer.m_login.p_eLevel >= Login.eLevel.Operator) ? Visibility.Visible : Visibility.Collapsed;
+            engineerTab.Visibility = (m_engineer.m_login.p_eLevel >= Login.eLevel.Admin) ? Visibility.Visible : Visibility.Collapsed;
+            //ReviewTab.Visibility = (m_engineer.m_login.p_eLevel >= Login.eLevel.Operator) ? Visibility.Visible : Visibility.Collapsed;
             RunTab.Visibility = (m_engineer.m_login.p_eLevel >= Login.eLevel.Operator) ? Visibility.Visible : Visibility.Collapsed;
+            RecipeManagerTab.Visibility = (m_engineer.m_login.p_eLevel >= Login.eLevel.Operator) ? Visibility.Visible : Visibility.Collapsed; ;
+            //RecipeWizardTab.Visibility = (m_engineer.m_login.p_eLevel >= Login.eLevel.Operator) ? Visibility.Visible : Visibility.Collapsed;
             //TextBlockRetID.DataContext = m_handler.m_aLoadport[0].p_infoCarrier.m_aGemSlot[0];
         }
 
@@ -293,9 +303,11 @@ namespace Root_VEGA_D
 		{
             m_login = new Login_UI(m_engineer);
             m_login.ShowDialog();
-            engineerTab.Visibility = (m_engineer.m_login.p_eLevel >= Login.eLevel.Operator) ? Visibility.Visible : Visibility.Collapsed;
-            ReviewTab.Visibility = (m_engineer.m_login.p_eLevel >= Login.eLevel.Operator) ? Visibility.Visible : Visibility.Collapsed;
+            engineerTab.Visibility = (m_engineer.m_login.p_eLevel >= Login.eLevel.Admin) ? Visibility.Visible : Visibility.Collapsed;
+            //ReviewTab.Visibility = (m_engineer.m_login.p_eLevel >= Login.eLevel.Operator) ? Visibility.Visible : Visibility.Collapsed;
             RunTab.Visibility = (m_engineer.m_login.p_eLevel >= Login.eLevel.Operator) ? Visibility.Visible : Visibility.Collapsed;
+            RecipeManagerTab.Visibility = (m_engineer.m_login.p_eLevel >= Login.eLevel.Operator) ? Visibility.Visible : Visibility.Collapsed;
+            //RecipeWizardTab.Visibility = (m_engineer.m_login.p_eLevel >= Login.eLevel.Operator) ? Visibility.Visible : Visibility.Collapsed;
         }
 
 		private void btnOHT_Click(object sender, RoutedEventArgs e)

@@ -552,31 +552,40 @@ namespace Root_CAMELLIA.LibSR_Met
             {
                 sPath += ".csv";
             }
-            StreamWriter writer = new StreamWriter(sPath);
-            RawData raw = m_RawData[nPointIdx];
-            if (writer == null)
+            try
             {
+                StreamWriter writer = new StreamWriter(sPath);
+                RawData raw = m_RawData[nPointIdx];
+                if (writer == null)
+                {
+                    return false;
+                }
+                writer.WriteLine("GoF," + Math.Round(raw.dGoF, 6).ToString());
+                for (int n = 1; n < raw.Thickness.Count - 1; n++)
+                {
+                    writer.WriteLine(m_LayerData[n].sRefName + "," + (raw.Thickness[n]).ToString());
+                }
+                writer.WriteLine("Wavelength,Reflectance,Transmittance");
+                for (int n = 0; n < raw.nNIRDataNum; n++)
+                {
+                    if (bTransmittance)
+                    {
+                        writer.WriteLine(raw.Wavelength[n].ToString() + "," + raw.Reflectance[n].ToString() + "," + raw.Transmittance[n].ToString());
+                    }
+                    else
+                    {
+                        writer.WriteLine(raw.Wavelength[n].ToString() + "," + raw.Reflectance[n].ToString());
+                    }
+                }
+                writer.Close();
+                return true;
+            }
+            catch (Exception e)
+            {
+
                 return false;
             }
-            writer.WriteLine("GoF," + Math.Round(raw.dGoF, 6).ToString());
-            for (int n = 1; n < raw.Thickness.Count-1; n++)
-            {
-                writer.WriteLine(m_LayerData[n].sRefName + "," + (raw.Thickness[n]).ToString());
-            }
-            writer.WriteLine("Wavelength,Reflectance,Transmittance");
-            for (int n = 0; n < raw.nNIRDataNum; n++)
-            {
-                if (bTransmittance)
-                {
-                    writer.WriteLine(raw.Wavelength[n].ToString() + "," + raw.Reflectance[n].ToString() + "," + raw.Transmittance[n].ToString());
-                }
-                else
-                {
-                    writer.WriteLine(raw.Wavelength[n].ToString() + "," + raw.Reflectance[n].ToString());
-                }
-            }
-            writer.Close();
-            return true;
+           
         }
 
         public bool SaveResultFileDCOL(string sPath, string sFoupID, string sLotID, string sToolID, string sWaferID, string sSlotID, string sSWVersion, string sRCPName)

@@ -299,7 +299,10 @@ namespace Root_CAMELLIA
                     if (EQ.p_bSimulate)
                         p_loadport.p_infoCarrier.p_eAccessLP = GemCarrierBase.eAccessLP.Manual;
                     else
+                    {
                         p_loadport.p_infoCarrier.p_eReqAccessLP = GemCarrierBase.eAccessLP.Manual;
+                        p_loadport.m_OHTsemi.m_bAuto = false;
+                    }
                 });
             }
         }
@@ -313,7 +316,10 @@ namespace Root_CAMELLIA
                     if (EQ.p_bSimulate)
                         p_loadport.p_infoCarrier.p_eAccessLP = GemCarrierBase.eAccessLP.Auto;
                     else
+                    {
                         p_loadport.p_infoCarrier.p_eReqAccessLP = GemCarrierBase.eAccessLP.Auto;
+                        p_loadport.m_OHTsemi.m_bAuto = true;
+                    }
                 });
             }
         }
