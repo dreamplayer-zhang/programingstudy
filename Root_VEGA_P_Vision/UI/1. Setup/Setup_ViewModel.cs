@@ -194,26 +194,40 @@ namespace Root_VEGA_P_Vision
         void LoadAllRecipe()
         {
             /*
-             RootPath -> Recipe -> 부분별 Recipe
+             RootPath -> Recipe -> 부분별 Recipe Reading하고 PodInfo UI Update
              */
-            System.Windows.Forms.OpenFileDialog dlg = new System.Windows.Forms.OpenFileDialog();
-            dlg.InitialDirectory = App.RecipeRootPath;
-            dlg.Title = "Load Recipe";
-            dlg.Filter = "ATI files (*.rcp)|*.rcp|All files (*.*)|*.*";
-            if (dlg.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            DirectoryInfo dir = new DirectoryInfo(App.RecipeRootPath);
+
+            foreach(DirectoryInfo dirInfo in dir.GetDirectories()) // Recipe Lists
             {
-                string sFolderPath = Path.GetDirectoryName(dlg.FileName); // 디렉토리명
-                string sFileName = Path.GetFileName(dlg.FileName); // 파일이름 + 확장자
+                DirectoryInfo[] infos = dirInfo.GetDirectories();
 
-                DirectoryInfo dir = new DirectoryInfo(sFolderPath);
-                if (!dir.Exists)
-                    dir.Create();
+                if (infos.Length != 4)
+                    return;
 
-                recipeCoverFront.Read(Path.Combine(sFolderPath,App.RecipeNames[0]+"_"+sFileName));
-                recipeCoverBack.Read(Path.Combine(sFolderPath, "RecipeCoverBack_" + sFileName));
-                recipePlateFront.Read(Path.Combine(sFolderPath, "RecipePlateFront_" + sFileName));
-                recipePlateBack.Read(Path.Combine(sFolderPath, "RecipePlateBack_" + sFileName));
+                //foreach(DirectoryInfo info in infos)
+
+
             }
+            
+            //System.Windows.Forms.OpenFileDialog dlg = new System.Windows.Forms.OpenFileDialog();
+            //dlg.InitialDirectory = App.RecipeRootPath;
+            //dlg.Title = "Load Recipe";
+            //dlg.Filter = "ATI files (*.rcp)|*.rcp|All files (*.*)|*.*";
+            //if (dlg.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            //{
+            //    string sFolderPath = Path.GetDirectoryName(dlg.FileName); // 디렉토리명
+            //    string sFileName = Path.GetFileName(dlg.FileName); // 파일이름 + 확장자
+
+            //    DirectoryInfo dir = new DirectoryInfo(sFolderPath);
+            //    if (!dir.Exists)
+            //        dir.Create();
+
+            //    recipeCoverFront.Read(Path.Combine(sFolderPath,App.RecipeNames[0]+"_"+sFileName));
+            //    recipeCoverBack.Read(Path.Combine(sFolderPath, "RecipeCoverBack_" + sFileName));
+            //    recipePlateFront.Read(Path.Combine(sFolderPath, "RecipePlateFront_" + sFileName));
+            //    recipePlateBack.Read(Path.Combine(sFolderPath, "RecipePlateBack_" + sFileName));
+            //}
         }
         void LoadRecipe()
         {

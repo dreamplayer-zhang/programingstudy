@@ -39,7 +39,6 @@ namespace Root_VEGA_P_Vision
             get => itemName;
             set => SetProperty(ref itemName, value);
         }
-        string memstr;
         InspectionItem_ViewModel inspectionItem;
         RecipeItemBase recipeItemBase;
         public RecipeItemBase RecipeItemBase
@@ -47,14 +46,20 @@ namespace Root_VEGA_P_Vision
             get => recipeItemBase;
             set => SetProperty(ref recipeItemBase, value);
         }
-        public InspectionOneItem_ViewModel(string itemName,string memstr,InspectionItem_ViewModel inspectionItem,RecipeItemBase recipeItemBase)
+        RecipeBase recipe;
+        public InspectionOneItem_ViewModel(string itemName,InspectionItem_ViewModel inspectionItem,RecipeBase recipe,RecipeItemBase recipeItemBase)
         {
             Main = new InspectionOneItem();
             Main.DataContext = this;
             this.recipeItemBase = recipeItemBase;
             this.inspectionItem = inspectionItem;
             ItemName = itemName;
-            this.memstr = memstr;
+            this.recipe = recipe;
+            VegaPEventManager.LoadedAllRecipe += VegaPEventManager_LoadedAllRecipe;
+        }
+
+        private void VegaPEventManager_LoadedAllRecipe(object sender, LoadAllRecipeEventArgs e)
+        {
         }
 
         public ICommand btnHeader
@@ -68,7 +73,7 @@ namespace Root_VEGA_P_Vision
         public ICommand btnAdd
         {
             get => new RelayCommand(() => {
-                ConditionItem_ViewModel item = new ConditionItem_ViewModel(ListItem.Count+1, memstr);
+                ConditionItem_ViewModel item = new ConditionItem_ViewModel(ListItem.Count+1,recipe,recipeItemBase);
 
                 ListItem.Add(item.Main);
             });

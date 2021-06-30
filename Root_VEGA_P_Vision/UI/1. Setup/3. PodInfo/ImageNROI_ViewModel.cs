@@ -88,7 +88,10 @@ namespace Root_VEGA_P_Vision
 
         private void VegaPEventManager_ImageROIBtn(object sender, ImageROIEventArgs e)
         {
-            selectedViewer.SetImageData(GlobalObjects.Instance.GetNamed<ImageData>(e.memstr));
+            //selectedViewer.SetImageData(GlobalObjects.Instance.GetNamed<ImageData>(e.memstr));
+            selectedViewer.Recipe = e.recipe;
+            selectedItemList.Init(e.recipeItem, true);
+            surfaceParamTree.SurfaceParameter = e.parameterBase;
         }
 
         public ICommand btnSaveMasterImage

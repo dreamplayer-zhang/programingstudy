@@ -58,25 +58,23 @@ namespace Root_VEGA_P_Vision
             set => SetProperty(ref side, value);
         }
         public RecipeBase recipeBase { get; set; }
-        string parts;
         #endregion
-        public InspectionItem_ViewModel(string memstr,PodInfo_ViewModel podInfo, RecipeBase recipeBase,bool bhighRes = true, bool bside = true) //하나의 Recipe에 대한 것
+        public InspectionItem_ViewModel(PodInfo_ViewModel podInfo, RecipeBase recipeBase,bool bhighRes = true, bool bside = true) //하나의 Recipe에 대한 것
         {
             Main = new InspectionItem();
             Main.DataContext = this;
 
-            string[] PartSide = memstr.Split('.');
-            parts = PartSide[0] + PartSide[1];
             bHighRes = bhighRes;
             bSide = bside; 
             this.podInfo = podInfo;
             this.recipeBase = recipeBase;
-            particle = new InspectionOneItem_ViewModel("Particle",PartSide[0]+".Main."+PartSide[1],this,recipeBase.GetItem<LowResRecipe>());
+
+            particle = new InspectionOneItem_ViewModel("Particle",this,recipeBase,recipeBase.GetItem<LowResRecipe>());
             if(bhighRes)
-                highres = new InspectionOneItem_ViewModel("HighRes", PartSide[0] + ".Stack." + PartSide[1],this,recipeBase.GetItem<HighResRecipe>());
-            stain = new InspectionOneItem_ViewModel("Stain", PartSide[0] + ".Stain." + PartSide[1],this,recipeBase.GetItem<StainRecipe>());
+                highres = new InspectionOneItem_ViewModel("HighRes",this,recipeBase,recipeBase.GetItem<HighResRecipe>());
+            stain = new InspectionOneItem_ViewModel("Stain",this,recipeBase,recipeBase.GetItem<StainRecipe>());
             if(bside)
-                side = new InspectionOneItem_ViewModel("Side", PartSide[0] + ".Side." + PartSide[1],this,recipeBase.GetItem<SideRecipe>());
+                side = new InspectionOneItem_ViewModel("Side",this,recipeBase,recipeBase.GetItem<SideRecipe>());
 
             VegaPEventManager.RecipeUpdated += VegaPEventManager_RecipeUpdated;
         }

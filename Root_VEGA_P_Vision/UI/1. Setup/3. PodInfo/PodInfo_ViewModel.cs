@@ -60,15 +60,16 @@ namespace Root_VEGA_P_Vision
             Main = new PodInfo_Panel();
             Main.DataContext = this;
             imageNROI = new ImageNROI_ViewModel(this);
-            CFItem = new InspectionItem_ViewModel("EIP_Cover.Front",this, GlobalObjects.Instance.Get<RecipeCoverFront>(), false);
-            CBItem = new InspectionItem_ViewModel("EIP_Cover.Back",this, GlobalObjects.Instance.Get<RecipeCoverBack>(),true,false);
-            BFItem = new InspectionItem_ViewModel("EIP_Plate.Front",this, GlobalObjects.Instance.Get<RecipePlateFront>());
-            BBItem = new InspectionItem_ViewModel("EIP_Plate.Back", this, GlobalObjects.Instance.Get<RecipePlateBack>(), false, false);
+            CFItem = new InspectionItem_ViewModel(this, GlobalObjects.Instance.Get<RecipeCoverFront>(), false);
+            CBItem = new InspectionItem_ViewModel(this, GlobalObjects.Instance.Get<RecipeCoverBack>(),true,false);
+            BFItem = new InspectionItem_ViewModel(this, GlobalObjects.Instance.Get<RecipePlateFront>());
+            BBItem = new InspectionItem_ViewModel(this, GlobalObjects.Instance.Get<RecipePlateBack>(), false, false);
 
             selectedRecipeItem = CFItem.ParticleItem.RecipeItemBase;
             SubPanel = imageNROI.Main;
         }
 
+        #region RelayCommand
         public ICommand btnBack
         {
             get => new RelayCommand(() => { home.m_Setup.SetHome(); });
@@ -97,6 +98,7 @@ namespace Root_VEGA_P_Vision
                 BBItem.Visible = !BBItem.Visible;
             });
         }
+        #endregion
 
         public void SetRecipe(RecipeItemBase selectedItem)
         {
