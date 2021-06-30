@@ -415,17 +415,24 @@ namespace Root_CAMELLIA
         public void CalcRecover()
         {
             m_process.CalcRecover();
-            CalcDockingUndocking();
+            CalcDockingUndocking(true);
         }
 
-        void CalcDockingUndocking()
+        void CalcDockingUndocking(bool isRecovery = false)
         {
             List<CAMELLIA_Process.Sequence> aSequence = new List<CAMELLIA_Process.Sequence>();
             while (m_process.p_qSequence.Count > 0) aSequence.Add(m_process.p_qSequence.Dequeue());
             List<ILoadport> aDock = new List<ILoadport>();
             foreach (ILoadport loadport in m_aLoadport)
             {
-                if (CalcDocking(loadport, aSequence)) aDock.Add(loadport);
+                if (CalcDocking(loadport, aSequence))
+                {
+                    aDock.Add(loadport);
+                    //if (!isRecovery)
+                    //{
+                    //    CalcInitCal(loadport, aSequence);
+                    //}
+                }
             }
             while (aSequence.Count > 0)
             {
@@ -445,6 +452,22 @@ namespace Root_CAMELLIA
                 }
             }
             m_process.RunTree(Tree.eMode.Init);
+        }
+
+        bool CalcInitCal(ILoadport loadport, List<CAMELLIA_Process.Sequence> aSequence)
+        {
+            foreach (EFEM_Process.Sequence sequence in aSequence)
+            {
+                //if (loadport.p_id == sequence.m_infoWafer.m_sModule) return true; 
+                if (loadport.p_id == sequence.m_infoWafer.m_sModule) //return true;
+                {
+                    ModuleRunBase runInitCal = (Run_InitCalibration)m_camellia.CloneModuleRun("InitCalibration");
+                    EFEM_Process.Sequence sequenceDock = new EFEM_Process.Sequence(runInitCal, sequence.m_infoWafer);
+                    m_process.p_qSequence.Enqueue(sequenceDock);
+                    return true;
+                }
+            }
+            return false;
         }
 
         bool CalcDocking(ILoadport loadport, List<CAMELLIA_Process.Sequence> aSequence)

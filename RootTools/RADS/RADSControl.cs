@@ -1,7 +1,10 @@
 ﻿using RootTools.Comm;
 using RootTools.Trees;
 using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Net;
+using System.Text;
 using System.Timers;
 using System.Windows.Controls;
 using System.Windows.Forms.DataVisualization.Charting;
@@ -208,6 +211,7 @@ namespace RootTools.RADS
 				this.SearchComplete();
 		}
 
+		List<int> m_lstVoltageLog = new List<int>();
 
 		DateTime m_tickTime;
 		double m_dVoltageSum = 0;
@@ -250,7 +254,7 @@ namespace RootTools.RADS
 				m_dElapsedTime += diffTime.TotalMilliseconds;
 				m_dVoltageSum += p_nVoltage * diffTime.TotalMilliseconds;
 
-				if (m_dElapsedTime > 60 * 1000)
+				if (m_dElapsedTime > 10 * 1000)
 				{
 					m_log.Info(string.Format("Average Voltage: {0}", m_dVoltageSum / m_dElapsedTime));
 
@@ -259,7 +263,34 @@ namespace RootTools.RADS
 				}
 
 				m_tickTime = e.SignalTime;
+
+				// 100개의 Voltage 데이터가 모일 때마다 별도 파일로 로그 작성
+				m_lstVoltageLog.Add(p_nVoltage);
+				if(m_lstVoltageLog.Count >= 100)
+                {
+					WriteVoltageLog();
+
+					m_lstVoltageLog.Clear();
+                }
 			}
+		}
+
+		void WriteVoltageLog()
+		{
+			DateTime dt = DateTime.Now;
+			string sPath = LogView._logView.p_sPath;
+
+			if(!Directory.Exists(sPath + "\\RADS_Voltage"))
+				Directory.CreateDirectory(sPath + "\\RADS_Voltage");
+
+			string strFile = sPath + "\\RADS_Voltage" + "\\" + dt.ToShortDateString() + ".txt";
+			string strTime = dt.Hour.ToString("00") + '.' + dt.Minute.ToString("00") + '.' + dt.Second.ToString("00") + '.' + dt.Millisecond.ToString("000");
+
+			using (StreamWriter writer = new StreamWriter(strFile, true, Encoding.Default))
+            {
+				string strValues = string.Join(", ", m_lstVoltageLog.ToArray());
+				writer.WriteLine(strTime + "\t" + strValues);
+            }
 		}
 
 		public void Dispose()
@@ -283,6 +314,11 @@ namespace RootTools.RADS
 
 		public void StartRADS()
 		{
+			m_tickTime = DateTime.Now;
+
+			m_timer.Start();
+			p_IsRun = true;
+
 			if (p_connect.Start())
 			{
 				p_connect.ChangeViewStatus(true);
@@ -293,6 +329,15 @@ namespace RootTools.RADS
 
 		public void StopRADS()
 		{
+			m_dVoltageSum = 0;
+			m_dElapsedTime = 0;
+
+			WriteVoltageLog();
+			m_lstVoltageLog.Clear();
+
+			m_timer.Stop();
+			p_IsRun = false;
+
 			if (p_connect.Stop())
 			{
 				p_connect.ChangeViewStatus(false);

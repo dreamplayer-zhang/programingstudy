@@ -225,7 +225,7 @@ namespace Root_Pine2.Module
 
         public string RunUnloadTransfer() 
         {
-            if (m_picker.p_infoStrip != null) return "InfoStrip != null";
+            if (m_picker.p_infoStrip == null) return "InfoStrip == null";
             if (m_transfer.m_pusher.p_bEnable == false) return "Buffer Pusher not Enable";
             try
             {
@@ -278,7 +278,7 @@ namespace Root_Pine2.Module
                 MagazineEV magazine = m_handler.m_magazineEV.m_aEV[(InfoStrip.eMagazine)ePosTray];
                 magazine.PutInfoStrip(m_picker.p_infoStrip);
                 if (Run(RunMoveBoat(1 - m_eWorksLoad))) return p_sInfo;
-                m_handler.CheckDone(); 
+                m_handler.CheckFinish(); 
             }
             finally
             {

@@ -41,6 +41,11 @@ namespace Root_Pine2.Module
             return null; 
         }
 
+        public double CalcXOffset(InfoStrip infoStrip)
+        {
+            return m_aEV[infoStrip.p_eMagazine].CalcXOffset(infoStrip); 
+        }
+
         public string PutInfoStrip(InfoStrip infoStrip)
         {
             if (infoStrip == null) return "InfoStrip == null";

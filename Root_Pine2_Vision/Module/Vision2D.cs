@@ -153,25 +153,29 @@ namespace Root_Pine2_Vision.Module
         #endregion
 
         #region Send Recipe
-        public void SendRecipe(string sRecipe)
+        public string SendRecipe(string sRecipe)
         {
-            if (p_eRemote == eRemote.Client) RemoteRun(eRemoteRun.SendRecipe, eRemote.Client, sRecipe);
+            if (p_eRemote == eRemote.Client) return RemoteRun(eRemoteRun.SendRecipe, eRemote.Client, sRecipe);
             else
             {
-                m_aWorks[eWorks.A].SendRecipe(sRecipe);
-                m_aWorks[eWorks.B].SendRecipe(sRecipe);
+                string sRunA = m_aWorks[eWorks.A].SendRecipe(sRecipe);
+                string sRunB = m_aWorks[eWorks.B].SendRecipe(sRecipe);
+                if ((sRunA == "OK") && (sRunB == "OK")) return "OK";
+                return "A = " + sRunA + ", B = " + sRunB; 
             }
         }
         #endregion
 
         #region GrabData
         public int m_nLine = 78800;
+        public bool m_bUseBiDirectional = true;
         public class Grab
         {
             public int m_nFovStart = 0;
             public int m_nFovSize = 12000;
             public int m_nReverseOffset = 0;
             public int m_nOverlap = 0;
+            public int m_nYOffset = 0;
             public double m_dResolution = 3.8;
             public double[] m_dScale = new double[3] { 1, 1, 1 };
             public double[] m_dShift = new double[3] { 0, 0, 0 };
@@ -206,6 +210,7 @@ namespace Root_Pine2_Vision.Module
                 m_dResolution = tree.Set(m_dResolution, m_dResolution, "Pixel Resolution", "Pixel Resolution (um/pixel)");
                 m_nReverseOffset = tree.Set(m_nReverseOffset, m_nReverseOffset, "Reverse Offset", "Reverse Offset (pixel)");
                 m_nOverlap = tree.Set(m_nOverlap, m_nOverlap, "Overlap", "Overlap (pixel)");
+                m_nYOffset = tree.Set(m_nYOffset, m_nYOffset, "YOffset", "YOffset (pixel)");
             }
 
             void RunTreeFOV(Tree tree)
@@ -271,13 +276,14 @@ namespace Root_Pine2_Vision.Module
                     return snap;
                 }
 
-                public GrabData GetGrabData(eWorks eWorks, CPoint cpOffset)
+                public GrabData GetGrabData(eWorks eWorks, CPoint cpOffset, int nOverlap)
                 {
                     GrabData data = new GrabData();
                     data.bInvY = (m_eDirection == eDirection.Forward);
-                    data.m_nOverlap = m_nOverlap;
+                    data.m_nOverlap = nOverlap;
                     data.nScanOffsetY = 0;   /*m_cpMemory.Y;*/
                     data.ReverseOffsetY = cpOffset.Y; /*m_cpMemory.Y;*/ /* + m_vision.m_nLine */
+                    data.m_bUseFlipVertical = true;
                     m_vision.m_aGrabData[eWorks].SetData(data);
                     return data;
                 }
@@ -326,7 +332,7 @@ namespace Root_Pine2_Vision.Module
                 {
                     _lSnap = value;
 
-                    if (m_treeRecipe.p_eMode == Tree.eMode.JobOpen)
+                    if (m_treeRecipe.p_eMode == Tree.eMode.JobOpen && m_vision.p_eRemote == eRemote.Client)
                     {
                         while (m_aSnap.Count > value) m_aSnap.RemoveAt(m_aSnap.Count - 1);
                         while (m_aSnap.Count < value) m_aSnap.Add(new Snap(m_vision));
@@ -376,12 +382,15 @@ namespace Root_Pine2_Vision.Module
                     else
                         p_lSnap = nSnapCount;       // RGB 또는 APS인 경우 총 Snap 횟수.
 
+                    double dSnapStartXPos = (dFOVmm / 2) * (nSnapCount - 1); // Stage Center에서부터 첫 Snap 위치까지 거리
+                    double dStageXOffset = 0;
                     int nSnapLineIndex = 0;
                     for (int i = 0; i < p_lSnap; i++)
                     {
                         nSnapLineIndex = i % nSnapCount;    // nSnapCount = 3인경우, RGB(0,1,2), APS(0,1,2), ALL(0,1,2,0,1,2)
                         m_aSnap.Add(new Snap(m_vision));
-                        m_aSnap[i].m_dpAxis = new RPoint(nSnapLineIndex * dFOVmm, 0);
+                        dStageXOffset = dSnapStartXPos - dFOVmm * nSnapLineIndex;
+                        m_aSnap[i].m_dpAxis = new RPoint(dStageXOffset, 0);
                         m_aSnap[i].m_nOverlap = nOverlap;
 
                         if (nSnapLineIndex % 2 == 0)  // 정방향
@@ -494,7 +503,7 @@ namespace Root_Pine2_Vision.Module
                 p_dProductWidth = tree.Set(p_dProductWidth, p_dProductWidth, "Product Width", "Product Width(mm)", bVisible);
                 p_lSnap = tree.Set(p_lSnap, p_lSnap, "Count", "Snap Count", bVisible, true);
 
-                if (m_treeRecipe.p_eMode != Tree.eMode.JobOpen)
+                if (!(m_treeRecipe.p_eMode == Tree.eMode.JobOpen && m_vision.p_eRemote == eRemote.Client))
                 {
                     if (p_eSnapMode == eSnapMode.RGB || p_eSnapMode == eSnapMode.ALL)
                         m_lightPowerRGB.RunTree(tree.GetTree("Light").GetTree("RGB Light", true, bVisible), bVisible);
@@ -567,18 +576,31 @@ namespace Root_Pine2_Vision.Module
             EQ.p_bStop = false;
             int nFOVpx = m_aGrabData[eWorks].m_nFovSize;
             int nReverseOffset = m_aGrabData[eWorks].m_nReverseOffset;
+            int nOverlap = m_aGrabData[eWorks].m_nOverlap;
+            int nYOffset = m_aGrabData[eWorks].m_nYOffset;
             Recipe.eSnapMode nSnapMode = m_recipe[eWorks].p_eSnapMode;
             int nTotalSnap = m_recipe[eWorks].p_lSnap;
             int nSnapLineIndex = (nSnapMode == Recipe.eSnapMode.ALL) ? iSnap % (nTotalSnap / 2) : iSnap % (nTotalSnap);
 
             CPoint cpOffset;    // 이미지 시작점
-            if (recipe.m_eDirection == Recipe.Snap.eDirection.Forward)
-                cpOffset = new CPoint(nSnapLineIndex * nFOVpx, nReverseOffset);
+            if (m_bUseBiDirectional)
+            {
+                if (recipe.m_eDirection == Recipe.Snap.eDirection.Forward)
+                    cpOffset = new CPoint(nSnapLineIndex * nFOVpx, nReverseOffset);
+                else
+                    cpOffset = new CPoint(nSnapLineIndex * nFOVpx, 0);
+            }
             else
-                cpOffset = new CPoint(nSnapLineIndex * nFOVpx, 0);
+            {
+                recipe.m_eDirection = Recipe.Snap.eDirection.Forward;
+                cpOffset = new CPoint(nSnapLineIndex * nFOVpx, nReverseOffset);
+            }
 
             MemoryData memory = m_aWorks[eWorks].p_memSnap[(int)recipe.m_eEXT];
-            GrabData grabData = recipe.GetGrabData(eWorks, cpOffset);
+            GrabData grabData = recipe.GetGrabData(eWorks, cpOffset, nOverlap);
+
+            grabData.nScanOffsetY = (nSnapLineIndex ) * nYOffset;
+
             DalsaParameterSet.eUserSet nUserset = (recipe.m_eEXT == Recipe.Snap.eEXT.EXT1) ? DalsaParameterSet.eUserSet.UserSet2 : DalsaParameterSet.eUserSet.UserSet3;  // RGB : Userset2 , APS : Userset3
             
             try
@@ -662,6 +684,7 @@ namespace Root_Pine2_Vision.Module
                 p_lLight = tree.GetTree("Light").Set(p_lLight, p_lLight, "Channel", "Light Channel Count");
                 m_eVision = (eVision)tree.GetTree("Vision").Set(m_eVision, m_eVision, "Type", "Vision Type");
                 m_nLine = tree.GetTree("Camera").Set(m_nLine, m_nLine, "Line", "Memory Snap Lines (pixel)");
+                m_bUseBiDirectional = tree.GetTree("Camera").Set(m_bUseBiDirectional, m_bUseBiDirectional, "BiDirectional Scan", "Use BiDirectional Scan");
                 m_aWorks[eWorks.A].RunTree(tree.GetTree("Works " + m_aWorks[eWorks.A].p_id));
                 m_aWorks[eWorks.B].RunTree(tree.GetTree("Works " + m_aWorks[eWorks.B].p_id));
                 m_aGrabData[eWorks.A].RunTree(tree.GetTree("GrabData A"));
@@ -779,7 +802,7 @@ namespace Root_Pine2_Vision.Module
                 {
                     case eRemoteRun.StateHome: return m_module.StateHome();
                     case eRemoteRun.RunLight: m_module.RunLight(m_lightPower); break;
-                    case eRemoteRun.SendRecipe: m_module.SendRecipe(m_sRecipe); break;
+                    case eRemoteRun.SendRecipe: return m_module.SendRecipe(m_sRecipe); 
                 }
                 return "OK";
             }
