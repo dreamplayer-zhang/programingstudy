@@ -158,6 +158,8 @@ namespace Root_Pine2_Vision.Module
             if (p_eRemote == eRemote.Client) return RemoteRun(eRemoteRun.SendRecipe, eRemote.Client, sRecipe);
             else
             {
+                m_recipe[eWorks.A].RecipeOpen(sRecipe);
+                m_recipe[eWorks.B].RecipeOpen(sRecipe);
                 string sRunA = m_aWorks[eWorks.A].SendRecipe(sRecipe);
                 string sRunB = m_aWorks[eWorks.B].SendRecipe(sRecipe);
                 if ((sRunA == "OK") && (sRunB == "OK")) return "OK";
@@ -368,7 +370,7 @@ namespace Root_Pine2_Vision.Module
                 set
                 {
                     _dProductWidth = value;
-                    if (m_treeRecipe.p_eMode == Tree.eMode.JobOpen) return;
+                    if (m_treeRecipe.p_eMode == Tree.eMode.JobOpen && m_vision.p_eRemote == eRemote.Client) return;
                     
                     m_aSnap.Clear();
                     int nFOVpx = m_vision.m_aGrabData[m_eWorks].m_nFovSize;
