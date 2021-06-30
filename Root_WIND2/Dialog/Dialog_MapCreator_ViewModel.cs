@@ -1,5 +1,6 @@
 ﻿using RootTools;
 using RootTools_Vision;
+using RootTools_CLR;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -210,13 +211,13 @@ namespace Root_WIND2
             }
         }
 
-        private double resizeFactor = 0.5;
-        public double ResizeFactor
+        private int resizeScaleFactor = 20;
+        public int ResizeScaleFactor
         {
-            get => this.resizeFactor;
+            get => this.resizeScaleFactor;
             set
             {
-                SetProperty<double>(ref this.resizeFactor, value);
+                SetProperty<int>(ref this.resizeScaleFactor, value);
             }
         }
 
@@ -250,7 +251,7 @@ namespace Root_WIND2
             }
         }
 
-        int[] searchedWaferMap = new int[30000];
+        int[] searchedWaferMap = null;
         public int[] SearchedWaferMap
         {
             get => this.searchedWaferMap;
@@ -292,85 +293,94 @@ namespace Root_WIND2
         {
             if (this.ChipWidth > 0 && this.ChipHeight > 0 && this.roiWidth > 0 && this.roiHeight > 0 && this.ChipX >= this.RoiX && this.ChipX + this.ChipWidth <= this.RoiX + this.RoiWidth && this.ChipY >= this.RoiY && this.ChipY + this.ChipHeight <= this.RoiY + this.RoiHeight)
             {
-                Bitmap bitmapChipBox = this.ImageViewerVM.p_ImageData.GetRectImage(this.imageViewerVM.selectChipBox);
-                Bitmap bitmapRoiBox = this.ImageViewerVM.p_ImageData.GetRectImage(this.imageViewerVM.selectRoiBox);
-
-                System.Drawing.Size resizeChip = new System.Drawing.Size((int)(bitmapChipBox.Width * this.ResizeFactor), (int)(bitmapChipBox.Height * this.ResizeFactor));
-                System.Drawing.Size resizeRoi = new System.Drawing.Size((int)(bitmapRoiBox.Width * this.ResizeFactor), (int)(bitmapRoiBox.Height * this.ResizeFactor));
-                Bitmap bitmapChipBoxResized = new Bitmap(bitmapChipBox, resizeChip);
-                Bitmap bitmapRoiBoxResized = new Bitmap(bitmapRoiBox, resizeRoi);
-
-                byte[] byteChipBoxResized = null;
-                byte[] byteRoiBoxResized = null;
-
-                if (bitmapChipBoxResized != null)
-                {
-                    byteChipBoxResized = GetBitmapToArray(bitmapChipBoxResized);
-
-                    this.ResizedChipWidth = bitmapChipBoxResized.Width;
-                    this.ResizedChipHeight = bitmapChipBoxResized.Height;
-                }
-                if (bitmapRoiBoxResized != null)
-                {
-                    byteRoiBoxResized = GetBitmapToArray(bitmapRoiBoxResized);
-
-                    this.ResizedRoiWidth = bitmapRoiBoxResized.Width;
-                    this.ResizedRoiHeight = bitmapRoiBoxResized.Height;
-                }
-
                 CPoint ptOriginChip = new CPoint(this.ChipX, this.ChipY);
                 CPoint ptOffsetChip = new CPoint((this.ChipX - this.RoiX) % this.ChipWidth, (this.ChipY - this.RoiY) % this.ChipHeight);
                 C3Point ptSearchedChip = new C3Point();
                 int idx = 0;
                 int chipCount = 0;
+                int[] tempWaferMap = new int[30000];
 
-                for (int y = this.RoiY + ptOffsetChip.Y; y < this.RoiY + this.RoiHeight - this.ChipHeight + 1; y+=this.ChipHeight)
+                this.ResizedChipWidth = this.ChipWidth / this.ResizeScaleFactor;
+                this.ResizedChipHeight = this.ChipHeight / this.ResizeScaleFactor;
+                this.ResizedRoiWidth = this.RoiWidth / this.ResizeScaleFactor;
+                this.ResizedRoiHeight = this.RoiHeight / this.ResizeScaleFactor;
+
+                byte[] byteChipBoxResized = new byte[this.ResizedChipWidth * this.ResizedChipHeight];
+                byte[] byteRoiBoxResized = new byte[this.ResizedRoiWidth * this.ResizedRoiHeight];
+
+                ImageData imageData = this.ImageViewerVM.p_ImageData;
+                IntPtr mainImage = new IntPtr();
+                mainImage = imageData.GetPtr(0);
+
+                unsafe
+                {
+                    fixed (byte* ptrChipBoxResized = new byte[this.ResizedChipWidth * this.ResizedChipHeight])
+                    {
+                        CLR_IP.Cpp_SubSampling((byte*)mainImage, ptrChipBoxResized, this.ImageViewerVM.p_ImageData.p_Size.X, this.ImageViewerVM.p_ImageData.p_Size.Y, this.ChipX, this.ChipY, this.ChipX + this.ChipWidth, this.ChipY + this.ChipHeight, this.ResizeScaleFactor);
+                        Marshal.Copy((IntPtr)ptrChipBoxResized, byteChipBoxResized, 0, this.ResizedChipWidth * this.ResizedChipHeight);
+                    }
+                    fixed (byte* ptrRoiBoxResized = new byte[this.ResizedRoiWidth * this.ResizedRoiHeight])
+                    {
+                        CLR_IP.Cpp_SubSampling((byte*)mainImage, ptrRoiBoxResized, this.ImageViewerVM.p_ImageData.p_Size.X, this.ImageViewerVM.p_ImageData.p_Size.Y, this.RoiX, this.RoiY, this.RoiX + this.RoiWidth, this.RoiY + this.RoiHeight, this.ResizeScaleFactor);
+                        Marshal.Copy((IntPtr)ptrRoiBoxResized, byteRoiBoxResized, 0, this.ResizedRoiWidth * this.ResizedRoiHeight);
+                    }
+                }
+
+                for (int y = this.RoiY + ptOffsetChip.Y; y < this.RoiY + this.RoiHeight - this.ChipHeight + 1; y += this.ChipHeight)
                 {
                     this.MapHeight = this.MapHeight + 1;
                     for (int x = this.RoiX + ptOffsetChip.X; x < this.RoiX + this.RoiWidth - this.ChipWidth + 1; x += this.ChipWidth)
                     {
-                        ptSearchedChip = GetDiffSum(byteChipBoxResized, byteRoiBoxResized, new CPoint(x, y), this.ResizeFactor);
+                        ptSearchedChip = GetDiffSum(byteChipBoxResized, byteRoiBoxResized, new CPoint(x, y), this.ResizeScaleFactor);
                         if (ptSearchedChip.Z > 0)
                         {
-                            if (Math.Abs(ptSearchedChip.X - ptOriginChip.X) > 5 || Math.Abs(ptSearchedChip.Y - ptOriginChip.Y) > 5) // exception for offset pixel error range
+                            if (Math.Abs(ptSearchedChip.X - ptOriginChip.X) > 5 * this.ResizeScaleFactor || Math.Abs(ptSearchedChip.Y - ptOriginChip.Y) > 5 * this.ResizeScaleFactor) // exception for offset pixel error range
                             {
                                 this.ptOffset.Add(ptSearchedChip);
                             }
                             else
                             {
                                 this.ptOffset.Add(new C3Point(ptOriginChip.X, ptOriginChip.Y, 100));
-                                
                             }
                             chipCount = chipCount + 1;
-                            this.SearchedWaferMap[idx] = 1;
+                            tempWaferMap[idx] = 1;
                         }
                         else
                         {
                             this.ptOffset.Add(ptSearchedChip);
-                            this.SearchedWaferMap[idx] = 0;
+                            tempWaferMap[idx] = 0;
                         }
                         idx = idx + 1;
                     }
                 }
+
                 this.MapWidth = idx / this.MapHeight;
+                this.SearchedWaferMap = new int[this.MapWidth * this.MapHeight];
+
+                for (int j = 0; j < this.MapHeight; j++)
+                {
+                    for (int i = 0; i < this.MapWidth; i++)
+                    {
+                        this.SearchedWaferMap[this.MapWidth * j + i] = tempWaferMap[this.MapWidth * j + i];
+                    }
+                }
 
                 this.ImageViewerVM.searchedChipPoint = ptOffset;
                 this.ImageViewerVM.MapWidth = this.MapWidth;
                 this.ImageViewerVM.MapHeight = this.MapHeight;
-                this.ImageViewerVM.SearchedWaferMap = searchedWaferMap;
+                this.ImageViewerVM.SearchedWaferMap = this.SearchedWaferMap;
 
                 foreach (var item in this.ptOffset)
                 {
                     this.ImageViewerVM.DrawSearchedChipBox(item);
                 }
                 this.ImageViewerVM.RedrawShapes();
+                this.ImageViewerVM.IsFindDone = true;
+                MessageBox.Show("Found " + chipCount.ToString() + " Chip(s)!");
 
                 RecipeType_WaferMap waferMap = GlobalObjects.Instance.Get<RecipeFront>().WaferMap;
-                Array.Copy(this.SearchedWaferMap, this.SearchedWaferMap, this.MapWidth * this.MapHeight);
+                //Array.Copy(this.SearchedWaferMap, this.SearchedWaferMap, this.MapWidth * this.MapHeight);
                 waferMap.CreateWaferMap(this.MapWidth, this.MapHeight, this.SearchedWaferMap);
-                this.ImageViewerVM.IsFindDone = true;
-
-                MessageBox.Show("Found " + chipCount.ToString() + " Chip(s)!");
             }
             else
             {
@@ -427,7 +437,7 @@ namespace Root_WIND2
             UInt64 TotalSum = 0;
             UInt64 PrevMinSum = 18446744073709551615;
             C3Point ptOriginChip = new C3Point();
-            CPoint ptStartResized = new CPoint((int)((ptStart.X - this.RoiX) * resizeFactor), (int)((ptStart.Y - this.RoiY) * resizeFactor));
+            CPoint ptStartResized = new CPoint((int)((ptStart.X - this.RoiX) / resizeFactor), (int)((ptStart.Y - this.RoiY) / resizeFactor));
 
             int nSize = this.ResizedChipHeight * this.ResizedChipWidth;
             double m_fSimilarityRev = (double)100 / (double)255 / nSize;
@@ -449,8 +459,8 @@ namespace Root_WIND2
                     if (TotalSum < PrevMinSum)
                     {
                         PrevMinSum = TotalSum;
-                        ptOriginChip.X = (int)(x / resizeFactor) + this.RoiX;
-                        ptOriginChip.Y = (int)(y / resizeFactor) + this.RoiY;
+                        ptOriginChip.X = (int)(x * resizeFactor) + this.RoiX;
+                        ptOriginChip.Y = (int)(y * resizeFactor) + this.RoiY;
                     }
                     TotalSum = 0;
                 }
