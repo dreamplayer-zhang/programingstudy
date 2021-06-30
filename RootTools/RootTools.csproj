@@ -216,7 +216,8 @@
     <Reference Include="QRCoder, Version=1.3.6.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\QRCoder.1.3.6\lib\net40\QRCoder.dll</HintPath>
     </Reference>
-    <Reference Include="SSLNet">
+    <Reference Include="SSLNet, Version=1.0.7845.34598, Culture=neutral, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Lib\MarsLog\SSLNet.dll</HintPath>
     </Reference>
     <Reference Include="System" />

@@ -749,6 +749,34 @@ namespace Root_CAMELLIA
             }
         }
 
+        private string _MeasureRepeatCount = "1";
+        public string MeasureRepeatCount
+        {
+            get
+            {
+                return _MeasureRepeatCount;
+            }
+            set
+            {
+                int val;
+                if (value == "")
+                {
+                    _MeasureRepeatCount = "1";
+                    dataManager.recipeDM.TeachingRD.MeasureRepeatCount = 0;
+                }
+                else if (int.TryParse(value, out val))
+                {
+                    _MeasureRepeatCount = val.ToString();
+                    dataManager.recipeDM.TeachingRD.MeasureRepeatCount = val;
+                }
+                else
+                {
+                    _MeasureRepeatCount = dataManager.recipeDM.TeachingRD.MeasureRepeatCount.ToString();
+                }
+                SetProperty(ref _MeasureRepeatCount, value);
+            }
+        }
+
         private float _LowerWaveLength = 350.0f;
         public float LowerWaveLength
         {

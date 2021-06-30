@@ -60,7 +60,7 @@ namespace Root_CAMELLIA
         public ModuleList m_moduleList;
         public CAMELLIA_Recipe m_recipe;
         //public CAMELLIA_Process m_process;
-        public EFEM_Process m_process;
+        public CAMELLIA_Process m_process;
         public Module_Camellia m_camellia;
         public HomeProgress_UI m_HomeProgress = new HomeProgress_UI();
         public Module_FDC m_FDC;
@@ -97,7 +97,7 @@ namespace Root_CAMELLIA
             InitModule(m_FFU);
             m_recipe = new CAMELLIA_Recipe("Recipe", m_engineer);
             foreach (ModuleBase module in m_moduleList.m_aModule.Keys) m_recipe.AddModule(module);
-            m_process = new EFEM_Process("Process", m_engineer, iWTR, m_aLoadport);
+            m_process = new CAMELLIA_Process("Process", m_engineer, iWTR, m_aLoadport);
         }
 
         void InitModule(ModuleBase module)
@@ -420,7 +420,7 @@ namespace Root_CAMELLIA
 
         void CalcDockingUndocking()
         {
-            List<EFEM_Process.Sequence> aSequence = new List<EFEM_Process.Sequence>();
+            List<CAMELLIA_Process.Sequence> aSequence = new List<CAMELLIA_Process.Sequence>();
             while (m_process.p_qSequence.Count > 0) aSequence.Add(m_process.p_qSequence.Dequeue());
             List<ILoadport> aDock = new List<ILoadport>();
             foreach (ILoadport loadport in m_aLoadport)
@@ -429,7 +429,7 @@ namespace Root_CAMELLIA
             }
             while (aSequence.Count > 0)
             {
-                EFEM_Process.Sequence sequence = aSequence[0];
+                CAMELLIA_Process.Sequence sequence = aSequence[0];
                 m_process.p_qSequence.Enqueue(sequence);
                 aSequence.RemoveAt(0);
                 for (int n = aDock.Count - 1; n >= 0; n--)
@@ -438,7 +438,7 @@ namespace Root_CAMELLIA
                     if (CalcUnload(aDock[n], aSequence))
                     {
                         ModuleRunBase runUndocking = aDock[n].GetModuleRunUndocking().Clone();
-                        EFEM_Process.Sequence sequenceUndock = new EFEM_Process.Sequence(runUndocking, sequence.m_infoWafer);
+                        CAMELLIA_Process.Sequence sequenceUndock = new CAMELLIA_Process.Sequence(runUndocking, sequence.m_infoWafer);
                         m_process.p_qSequence.Enqueue(sequenceUndock);
                         aDock.RemoveAt(n);
                     }
@@ -447,16 +447,16 @@ namespace Root_CAMELLIA
             m_process.RunTree(Tree.eMode.Init);
         }
 
-        bool CalcDocking(ILoadport loadport, List<EFEM_Process.Sequence> aSequence)
+        bool CalcDocking(ILoadport loadport, List<CAMELLIA_Process.Sequence> aSequence)
         {
-            foreach (EFEM_Process.Sequence sequence in aSequence)
+            foreach (CAMELLIA_Process.Sequence sequence in aSequence)
             {
                 //if (loadport.p_id == sequence.m_infoWafer.m_sModule) return true; 
                 if (loadport.p_id == sequence.m_infoWafer.m_sModule) //return true;
                 {
                     if (loadport.p_infoCarrier.p_eState == InfoCarrier.eState.Dock) return true;
                     ModuleRunBase runDocking = loadport.GetModuleRunDocking().Clone();
-                    EFEM_Process.Sequence sequenceDock = new EFEM_Process.Sequence(runDocking, sequence.m_infoWafer);
+                    CAMELLIA_Process.Sequence sequenceDock = new CAMELLIA_Process.Sequence(runDocking, sequence.m_infoWafer);
                     m_process.p_qSequence.Enqueue(sequenceDock);
                     return true;
                 }
@@ -464,9 +464,9 @@ namespace Root_CAMELLIA
             return false;
         }
 
-        bool CalcUnload(ILoadport loadport, List<EFEM_Process.Sequence> aSequence)
+        bool CalcUnload(ILoadport loadport, List<CAMELLIA_Process.Sequence> aSequence)
         {
-            foreach (EFEM_Process.Sequence sequence in aSequence)
+            foreach (CAMELLIA_Process.Sequence sequence in aSequence)
             {
                 if (loadport.p_id == sequence.m_infoWafer.m_sModule) return false;
             }

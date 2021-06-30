@@ -31,7 +31,14 @@ namespace RootTools
 
         MarsLogManager()
         {
-            m_sSLoggerNet = new SSLoggerNet();
+            try
+            {
+                m_sSLoggerNet = new SSLoggerNet();
+            }
+            catch (Exception e)
+            {
+                string ess = e.ToString();
+            }
         }
         public void ChangeMaterial(int port, int slot, string lot, string foup, string recipe)
         {

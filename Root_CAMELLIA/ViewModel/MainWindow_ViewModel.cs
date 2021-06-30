@@ -248,7 +248,7 @@ namespace Root_CAMELLIA
             p_XGem = (XGem_New)App.m_engineer.ClassGem();
 
             MarsLogManager instance = MarsLogManager.Instance;
-            instance.m_useLog = true;
+            instance.m_useLog = false;
         }
 
         string m_curUser = "Offline";
