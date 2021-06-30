@@ -168,6 +168,19 @@ namespace Root_Pine2_Vision.Module
         }
         #endregion
 
+        #region Send SnapInfo
+        public string SendSnapInfo(eWorks eWorks)
+        {
+            if (p_eRemote == eRemote.Client) return RemoteRun(eRemoteRun.SendSnapInfo, eRemote.Client, eWorks);
+            else
+            {
+                int nSnapCount = m_recipe[eWorks].p_lSnap;               // 총 Snap 횟수
+                int nSnapMode = (int)m_recipe[eWorks].p_eSnapMode;       // Snap Mode (RGB, APS, ALL)
+                return m_aWorks[eWorks].SendSnapInfo(m_recipe[eWorks].m_sRecipe, nSnapMode, nSnapCount); // 3. VisionWorks2 Receive SnapInfo
+            }
+        }
+        #endregion
+
         #region GrabData
         public int m_nLine = 78800;
         public bool m_bUseBiDirectional = true;
@@ -325,7 +338,7 @@ namespace Root_Pine2_Vision.Module
                 }
             }
             public List<Snap> m_aSnap = new List<Snap>();
-
+            public string m_sRecipe = "";
             public int _lSnap = 0;
             public int p_lSnap
             {
@@ -439,6 +452,7 @@ namespace Root_Pine2_Vision.Module
             {
                 Recipe recipe = new Recipe(m_vision, m_eWorks);
                 recipe.m_eWorks = m_eWorks;
+                recipe.m_sRecipe = m_sRecipe;
                 recipe.m_lightPowerRGB = m_lightPowerRGB.Clone();
                 recipe.m_lightPowerAPS = m_lightPowerAPS.Clone();
                 foreach (Snap snap in m_aSnap) recipe.m_aSnap.Add(snap.Clone());
@@ -458,6 +472,7 @@ namespace Root_Pine2_Vision.Module
 
             public void RecipeOpen(string sRecipe)
             {
+                m_sRecipe = sRecipe;
                 string sPath = EQ.c_sPathRecipe + "\\" + sRecipe;
                 Directory.CreateDirectory(sPath);
                 string sFile = sPath + "\\" + m_vision.m_eVision.ToString() + m_eWorks.ToString() + c_sExt;
@@ -529,6 +544,7 @@ namespace Root_Pine2_Vision.Module
                 InitTreeRecipe();
             }
         }
+
         public Dictionary<eWorks, Recipe> m_recipe = new Dictionary<eWorks, Recipe>();
         void InitRecipe()
         {
@@ -733,7 +749,8 @@ namespace Root_Pine2_Vision.Module
         {
             StateHome,
             RunLight,
-            SendRecipe
+            SendRecipe,
+            SendSnapInfo
         }
 
         Run_Remote GetRemoteRun(eRemoteRun eRemoteRun, eRemote eRemote, dynamic value)
@@ -746,6 +763,7 @@ namespace Root_Pine2_Vision.Module
                 case eRemoteRun.StateHome: break;
                 case eRemoteRun.RunLight: run.m_lightPower = value; break;
                 case eRemoteRun.SendRecipe: run.m_sRecipe = value; break;
+                case eRemoteRun.SendSnapInfo: run.m_eWorks = value; break;
             }
             return run;
         }
@@ -776,12 +794,14 @@ namespace Root_Pine2_Vision.Module
             public eRemoteRun m_eRemoteRun = eRemoteRun.StateHome;
             public LightPower m_lightPower;
             public string m_sRecipe = "";
+            public eWorks m_eWorks = eWorks.A;
             public override ModuleRunBase Clone()
             {
                 Run_Remote run = new Run_Remote(m_module);
                 run.m_eRemoteRun = m_eRemoteRun;
                 run.m_lightPower = m_lightPower.Clone();
                 run.m_sRecipe = m_sRecipe;
+                run.m_eWorks = m_eWorks;
                 return run;
             }
 
@@ -793,6 +813,7 @@ namespace Root_Pine2_Vision.Module
                 {
                     case eRemoteRun.RunLight: m_lightPower.RunTree(tree.GetTree("Light Power", true, bVisible), bVisible); break;
                     case eRemoteRun.SendRecipe: m_sRecipe = tree.Set(m_sRecipe, m_sRecipe, "Recipe", "Recipe", bVisible); break;
+                    case eRemoteRun.SendSnapInfo: m_eWorks = (eWorks)tree.Set(m_eWorks, m_eWorks, "Works", "Works", bVisible); break;
                     default: break;
                 }
             }
@@ -805,6 +826,7 @@ namespace Root_Pine2_Vision.Module
                     case eRemoteRun.StateHome: return m_module.StateHome();
                     case eRemoteRun.RunLight: m_module.RunLight(m_lightPower); break;
                     case eRemoteRun.SendRecipe: return m_module.SendRecipe(m_sRecipe); 
+                    case eRemoteRun.SendSnapInfo: return m_module.SendSnapInfo(m_eWorks); 
                 }
                 return "OK";
             }
