@@ -2,6 +2,7 @@
 using System;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading;
 using System.Windows.Controls;
 
 namespace RootTools.Comm
@@ -109,6 +110,24 @@ namespace RootTools.Comm
         }
         #endregion
 
+        #region ThreadConnect
+        bool m_bThreadConnect = false; 
+        Thread m_threadConnect;
+        public void ThreadConnect()
+        {
+            m_bThreadConnect = true;
+            Thread.Sleep(5000); 
+            while (m_bThreadConnect)
+            {
+                Thread.Sleep(1000);
+                if (_bUse == true)
+                {
+                    if ((m_socket != null) && (m_socket.Connected == false)) Connect();
+                }
+            }
+        }
+        #endregion
+
         #region Receive
         AsyncCallback m_cbReceive;
         void CallBackReceive(IAsyncResult ar)
@@ -206,7 +225,7 @@ namespace RootTools.Comm
         public string p_id { get; set; }
         int m_lMaxBuffer = 4096;
         Log m_log;
-        System.Threading.Thread th;
+        
         public TCPAsyncClient(string id, Log log, int lMaxBuffer = 4096)
         {
             p_id = id;
@@ -214,32 +233,17 @@ namespace RootTools.Comm
             m_log = log;
             InitCommLog();
             InitTree();
-            th = new System.Threading.Thread(Try);
-            th.Start();
-        }
-        ~TCPAsyncClient()
-        {
-            th.Abort();
-        }
-        public void Try()
-        {
-            while (true)
-            {
-
-                System.Threading.Thread.Sleep(1000);
-                if (_bUse == true)
-                {
-                    if (m_socket != null)
-                        if (m_socket.Connected == false)
-                        {
-                            Connect();
-                        }
-                }
-            }
+            m_threadConnect = new Thread(ThreadConnect);
+            m_threadConnect.Start();
         }
 
         public void ThreadStop()
         {
+            if (m_bThreadConnect)
+            {
+                m_bThreadConnect = false;
+                m_threadConnect.Join(); 
+            }
             if (m_socket != null) m_socket.Close();
             m_socket = null;
             m_commLog.Add(CommLog.eType.Info, "Socket Closed");
