@@ -1,0 +1,42 @@
+﻿<UserControl x:Class="Root_CAMELLIA.CAMELLIA_Process_UI"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Root_CAMELLIA"
+             xmlns:tree="clr-namespace:RootTools.Trees;assembly=RootTools"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="2*"/>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="5*"/>
+        </Grid.ColumnDefinitions>
+        <StackPanel Grid.Column="0" Orientation="Vertical">
+            <StackPanel Orientation="Horizontal" Margin="2">
+                <Label Content="EQ :"/>
+                <Label x:Name="labelEQState" Content="{Binding p_eState}" Margin="2"/>
+            </StackPanel>
+            <CheckBox x:Name="checkBoxStop" Content="EQ.Stop" IsChecked="{Binding p_bStop}" Margin="2"/>
+            <CheckBox x:Name="checkBoxPause" Content="EQ.Pause" IsChecked="{Binding p_bPause}" Margin="2"/>
+            <CheckBox x:Name="checkBoxSimulate" Content="EQ.Simulate" IsChecked="{Binding p_bSimulate}" Margin="2"/>
+            <Label Content="{Binding p_sInfo}" Margin="2,22,2,2" HorizontalAlignment="Left"/>
+            <Button x:Name="buttonClearInfoReticle" Content="Clear" Margin="2" Click="buttonClearInfoReticle_Click"/>
+            <Button x:Name="buttonSetRecover" Content="Set Recover" Margin="2" Click="buttonSetRecover_Click"/>
+            <Button x:Name="buttonRunStep" Content="Run Step" Margin="2,22,2,2" Click="buttonRunStep_Click"/>
+        </StackPanel>
+        <GridSplitter Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="AliceBlue" ShowsPreview="True" Width="3"/>
+        <TabControl Grid.Column="2">
+            <TabItem Header="InfoWafer">
+                <tree:TreeUI x:Name="treeInfoWaferUI"/>
+            </TabItem>
+            <TabItem Header="Locate">
+                <tree:TreeUI x:Name="treeLocateUI"/>
+            </TabItem>
+            <TabItem Header="Sequence">
+                <tree:TreeUI x:Name="treeSequenceUI"/>
+            </TabItem>
+        </TabControl>
+    </Grid>
+</UserControl>

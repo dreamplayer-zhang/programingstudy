@@ -10,11 +10,11 @@ namespace Root_CAMELLIA.LibSR_Met
     {
         //PM
         public const string PATH_LOG = @"C:\Log\";
-        public const string PATH_PM_RESULT_FOLDER = @"C:\Camellia\PM\PM_Result\";
-        public const string PATH_PM_FILE = @"C:\Camellia\Init\PM.cpm";
-        public const string PATH_PM_REFLECTANCE_FILE = @"C:\Camellia\Init\PMReflectance.csv";
-        public const string PATH_MONITORING_RESULT_FOLDER = @"C:\Camellia\Data\Monitoring_Result\";
-        public const string PATH_LAMP_INITIAL_FILE = @"C:\Camellia\Init\Timedata.txt";
+        public const string PATH_PM_RESULT_FOLDER = @"C:\Camellia2\PM\PM_Result\";
+        public const string PATH_PM_FILE = @"C:\Camellia2\Init\PM.cpm";
+        public const string PATH_PM_REFLECTANCE_FILE = @"C:\Camellia2\Init\PMReflectance.csv";
+        public const string PATH_MONITORING_RESULT_FOLDER = @"C:\Camellia2\Data\Monitoring_Result\";
+        public const string PATH_LAMP_INITIAL_FILE = @"C:\Camellia2\Init\Timedata.txt";
         public const int PM_REFLECTANCE_CHECK_WAVELENGTH_COUNT = 10;
         //PM-Align
         public const double PM_CAMERA_PIXEL_RESOLUTION = 1.098;
