@@ -313,6 +313,7 @@ namespace Root_Pine2.Module
 
         string StartLoadTransfer() 
         {
+            if (m_transfer.m_gripper.p_infoStrip == null) return "OK";
             Run_LoadTransfer run = (Run_LoadTransfer)m_runLoadTransfer.Clone();
             return StartRun(run);
         }
