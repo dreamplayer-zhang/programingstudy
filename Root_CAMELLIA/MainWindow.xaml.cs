@@ -94,7 +94,6 @@ namespace Root_CAMELLIA
             dlgOHT = new OHTs_UI();
             dlgOHT.Init((CAMELLIA_Handler)m_engineer.ClassHandler());
 
-
             SplashScreenHelper.ShowText("Handler Initialize Done");
 
             SplashScreenHelper.ShowText("Log View Initialize");
@@ -111,8 +110,8 @@ namespace Root_CAMELLIA
             //sSLoggerNet.WriteFNCLog(1, "1", "1", STATUS.START);
             //data.AddData("test", 1);
             //data.Serialize();
-            MarsLogManager instance = MarsLogManager.Instance;
-            instance.m_useLog = true;
+            //MarsLogManager instance = MarsLogManager.Instance;
+            //instance.m_useLog = true;
             //instance.m_sSLoggerNet.WriteFNCLog(EQ.p_nRunLP, m_handler.m_loadport[0].p_id, "Test", STATUS.START);
             //instance.m_sSLoggerNet.WriteFNCLog(EQ.p_nRunLP, m_handler.m_loadport[0].p_id, "Test", STATUS.END,  MATERIAL_TYPE.FOUP);
 

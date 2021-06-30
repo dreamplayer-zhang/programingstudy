@@ -25,6 +25,7 @@ namespace Root_Pine2_Vision.Module
             {
                 InitMemory();
                 m_tcpip.EventReceiveData += M_tcpip_EventReceiveData;
+                m_tcpip.ThreadStop();
             }
         }
 

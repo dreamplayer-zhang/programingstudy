@@ -271,7 +271,8 @@
     <Reference Include="ScottPlot.WPF, Version=4.0.39.0, Culture=neutral, PublicKeyToken=e53b06131e34a3aa, processorArchitecture=MSIL">
       <HintPath>..\packages\ScottPlot.WPF.4.0.39\lib\net472\ScottPlot.WPF.dll</HintPath>
     </Reference>
-    <Reference Include="SSLNet">
+    <Reference Include="SSLNet, Version=1.0.7845.34598, Culture=neutral, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Lib\MarsLog\SSLNet.dll</HintPath>
     </Reference>
     <Reference Include="System" />
@@ -465,6 +466,9 @@
     </Compile>
     <Compile Include="Control\LoadingControl.xaml.cs">
       <DependentUpon>LoadingControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI_Engineer\Camellia_Process_UI.xaml.cs">
+      <DependentUpon>Camellia_Process_UI.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI_UserControl\CustomMessageBox.xaml.cs">
       <DependentUpon>CustomMessageBox.xaml</DependentUpon>
@@ -709,6 +713,10 @@
     <Page Include="UI_Engineer\Camellia_ToolBox.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI_Engineer\Camellia_Process_UI.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="UI_UserControl\CustomMessageBox.xaml">
       <SubType>Designer</SubType>
