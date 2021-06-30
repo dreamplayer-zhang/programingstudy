@@ -45,7 +45,9 @@ namespace Root_Pine2.Module
 
         public string RunMoveSnapStart(Vision2D.eWorks eWorks, Vision2D.Recipe.Snap snapData, bool bWait = true)
         {
-            m_axisCam.StartMove(eWorks, new RPoint(m_xCamScale * snapData.m_dpAxis.X, 0));
+            double xp = m_xCamScale * snapData.m_dpAxis.X;
+            double yp = 1000 * (m_pine2.m_thicknessDefault - m_pine2.p_widthStrip); 
+            m_axisCam.StartMove(eWorks, new RPoint(xp, 0));
             if (Run(m_aBoat[eWorks].RunMoveSnapStart(snapData, bWait))) return p_sInfo;
             return bWait ? m_axisCam.p_axisX.WaitReady() : "OK";
         }

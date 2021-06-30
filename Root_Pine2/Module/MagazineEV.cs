@@ -496,6 +496,15 @@ namespace Root_Pine2.Module
 
         public override void Reset()
         {
+            if (m_elevator.m_bProduct[InfoStrip.eMagazinePos.Down])
+            {
+                m_aMagazine[InfoStrip.eMagazinePos.Down] = null;
+            }
+            if (m_elevator.m_bProduct[InfoStrip.eMagazinePos.Up])
+            {
+                m_aMagazine[InfoStrip.eMagazinePos.Up] = null;
+                m_stack = null; 
+            }
             base.Reset();
         }
         #endregion
