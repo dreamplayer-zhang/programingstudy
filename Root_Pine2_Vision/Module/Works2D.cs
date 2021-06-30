@@ -244,6 +244,7 @@ namespace Root_Pine2_Vision.Module
                     {
                         if (IsMemoryPool() && (IsProcessRun() == false))
                         {
+                            m_sRecipe = "";
                             m_tcpip.ThreadStop();
                             m_tcpip.InitClient();
                             ProcessStartInfo startInfo = new ProcessStartInfo(m_sFileVisionWorks);
