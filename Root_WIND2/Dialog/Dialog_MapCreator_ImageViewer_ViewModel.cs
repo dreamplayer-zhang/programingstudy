@@ -236,7 +236,7 @@ namespace Root_WIND2
             }
         }
 
-        private int[] searchedWaferMap = new int[30000];
+        private int[] searchedWaferMap = null;
         public int[] SearchedWaferMap
         {
             get => this.searchedWaferMap;
@@ -411,7 +411,7 @@ namespace Root_WIND2
                     this.IsFindDone = false;
                     this.MapWidth = 0;
                     this.MapHeight = 0;
-                    this.SearchedWaferMap = new int[30000];
+                    this.SearchedWaferMap = null;
                     rectList.Clear();
                     gridList.Clear();
                     searchedChipPoint.Clear();
