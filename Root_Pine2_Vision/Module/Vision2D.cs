@@ -158,8 +158,10 @@ namespace Root_Pine2_Vision.Module
             if (p_eRemote == eRemote.Client) return RemoteRun(eRemoteRun.SendRecipe, eRemote.Client, sRecipe);
             else
             {
-                m_recipe[eWorks.A].RecipeOpen(sRecipe);
-                m_recipe[eWorks.B].RecipeOpen(sRecipe);
+                //m_recipe[eWorks.A].RecipeOpen(sRecipe);
+                //m_recipe[eWorks.B].RecipeOpen(sRecipe);
+                m_RunningRecipe[eWorks.A].RecipeOpen(sRecipe);
+                m_RunningRecipe[eWorks.B].RecipeOpen(sRecipe);
                 string sRunA = m_aWorks[eWorks.A].SendRecipe(sRecipe);
                 string sRunB = m_aWorks[eWorks.B].SendRecipe(sRecipe);
                 if ((sRunA == "OK") && (sRunB == "OK")) return "OK";
@@ -174,9 +176,13 @@ namespace Root_Pine2_Vision.Module
             if (p_eRemote == eRemote.Client) return RemoteRun(eRemoteRun.SendSnapInfo, eRemote.Client, eWorks);
             else
             {
-                int nSnapCount = m_recipe[eWorks].p_lSnap;               // 총 Snap 횟수
-                int nSnapMode = (int)m_recipe[eWorks].p_eSnapMode;       // Snap Mode (RGB, APS, ALL)
-                return m_aWorks[eWorks].SendSnapInfo(m_recipe[eWorks].m_sRecipe, nSnapMode, nSnapCount); // 3. VisionWorks2 Receive SnapInfo
+                //int nSnapCount = m_recipe[eWorks].p_lSnap;               // 총 Snap 횟수
+                //int nSnapMode = (int)m_recipe[eWorks].p_eSnapMode;       // Snap Mode (RGB, APS, ALL)
+                //return m_aWorks[eWorks].SendSnapInfo(m_recipe[eWorks].m_sRecipe, nSnapMode, nSnapCount); // 3. VisionWorks2 Receive SnapInfo
+                
+                int nSnapCount = m_RunningRecipe[eWorks].p_lSnap;               // 총 Snap 횟수
+                int nSnapMode = (int)m_RunningRecipe[eWorks].p_eSnapMode;       // Snap Mode (RGB, APS, ALL)
+                return m_aWorks[eWorks].SendSnapInfo(m_RunningRecipe[eWorks].m_sRecipe, nSnapMode, nSnapCount); // 3. VisionWorks2 Receive SnapInfo
             }
         }
         #endregion
@@ -545,11 +551,14 @@ namespace Root_Pine2_Vision.Module
             }
         }
 
-        public Dictionary<eWorks, Recipe> m_recipe = new Dictionary<eWorks, Recipe>();
+        public Dictionary<eWorks, Recipe> m_UIRecipe = new Dictionary<eWorks, Recipe>();          // Recipe Teach용 Recipe (UI) 
+        public Dictionary<eWorks, Recipe> m_RunningRecipe = new Dictionary<eWorks, Recipe>();   // 현재 Run 중인 Recipe
         void InitRecipe()
         {
-            m_recipe.Add(eWorks.A, new Recipe(this, eWorks.A));
-            m_recipe.Add(eWorks.B, new Recipe(this, eWorks.B));
+            m_UIRecipe.Add(eWorks.A, new Recipe(this, eWorks.A));
+            m_UIRecipe.Add(eWorks.B, new Recipe(this, eWorks.B));
+            m_RunningRecipe.Add(eWorks.A, new Recipe(this, eWorks.A));
+            m_RunningRecipe.Add(eWorks.B, new Recipe(this, eWorks.B));
         }
 
         public List<string> p_asRecipe
@@ -596,8 +605,10 @@ namespace Root_Pine2_Vision.Module
             int nReverseOffset = m_aGrabData[eWorks].m_nReverseOffset;
             int nOverlap = m_aGrabData[eWorks].m_nOverlap;
             int nYOffset = m_aGrabData[eWorks].m_nYOffset;
-            Recipe.eSnapMode nSnapMode = m_recipe[eWorks].p_eSnapMode;
-            int nTotalSnap = m_recipe[eWorks].p_lSnap;
+            //Recipe.eSnapMode nSnapMode = m_recipe[eWorks].p_eSnapMode;
+            //int nTotalSnap = m_recipe[eWorks].p_lSnap;
+            Recipe.eSnapMode nSnapMode = m_RunningRecipe[eWorks].p_eSnapMode;
+            int nTotalSnap = m_RunningRecipe[eWorks].p_lSnap;
             int nSnapLineIndex = (nSnapMode == Recipe.eSnapMode.ALL) ? iSnap % (nTotalSnap / 2) : iSnap % (nTotalSnap);
 
             CPoint cpOffset;    // 이미지 시작점
@@ -616,7 +627,6 @@ namespace Root_Pine2_Vision.Module
 
             MemoryData memory = m_aWorks[eWorks].p_memSnap[(int)recipe.m_eEXT];
             GrabData grabData = recipe.GetGrabData(eWorks, cpOffset, nOverlap);
-
             grabData.nScanOffsetY = (nSnapLineIndex ) * nYOffset;
 
             DalsaParameterSet.eUserSet nUserset = (recipe.m_eEXT == Recipe.Snap.eEXT.EXT1) ? DalsaParameterSet.eUserSet.UserSet2 : DalsaParameterSet.eUserSet.UserSet3;  // RGB : Userset2 , APS : Userset3
@@ -934,17 +944,29 @@ namespace Root_Pine2_Vision.Module
 
             public override string Run()
             {
-                m_module.m_recipe[m_eWorks].RecipeOpen(m_sRecipe);                  // 1. Root Vision Recipe Open
+                m_module.m_RunningRecipe[m_eWorks].RecipeOpen(m_sRecipe);                  // 1. Root Vision Recipe Open
 
                 // Root Vision -> VisionWorks2
                 if (m_module.m_aWorks[m_eWorks].IsProcessRun())
                 {
                     m_module.m_aWorks[m_eWorks].SendRecipe(m_sRecipe);                  // 2. VisionWorks2 Recipe Open 
-                    int nSnapCount = m_module.m_recipe[m_eWorks].p_lSnap;               // 총 Snap 횟수
-                    int nSnapMode = (int)m_module.m_recipe[m_eWorks].p_eSnapMode;       // Snap Mode (RGB, APS, ALL)
+                    int nSnapCount = m_module.m_RunningRecipe[m_eWorks].p_lSnap;               // 총 Snap 횟수
+                    int nSnapMode = (int)m_module.m_RunningRecipe[m_eWorks].p_eSnapMode;       // Snap Mode (RGB, APS, ALL)
                     m_module.m_aWorks[m_eWorks].SendSnapInfo(m_sRecipe, nSnapMode, nSnapCount); // 3. VisionWorks2 Receive SnapInfo
                 }
                 return m_module.ReqSnap(m_sRecipe, m_eWorks);
+
+                //m_module.m_recipe[m_eWorks].RecipeOpen(m_sRecipe);                  // 1. Root Vision Recipe Open
+
+                //// Root Vision -> VisionWorks2
+                //if (m_module.m_aWorks[m_eWorks].IsProcessRun())
+                //{
+                //    m_module.m_aWorks[m_eWorks].SendRecipe(m_sRecipe);                  // 2. VisionWorks2 Recipe Open 
+                //    int nSnapCount = m_module.m_recipe[m_eWorks].p_lSnap;               // 총 Snap 횟수
+                //    int nSnapMode = (int)m_module.m_recipe[m_eWorks].p_eSnapMode;       // Snap Mode (RGB, APS, ALL)
+                //    m_module.m_aWorks[m_eWorks].SendSnapInfo(m_sRecipe, nSnapMode, nSnapCount); // 3. VisionWorks2 Receive SnapInfo
+                //}
+                //return m_module.ReqSnap(m_sRecipe, m_eWorks);
             }
         }
         #endregion
