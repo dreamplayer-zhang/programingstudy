@@ -923,12 +923,17 @@ namespace RootTools.Camera.Dalsa
             int fB = (int)((double)m_GD.m_nFovSize / m_GD.m_dScaleB);
             int nFovSize = Math.Max(fB, Math.Max(fR, fG));
             nFovSize = nFovSize + nOverlap;
+            if(m_GD.m_nFovSize > nFovSize)
+            {
+                nFovSize = m_GD.m_nFovSize;
+            }
 
             if (nCamWidth < nFovStart + nFovSize)
             {
                 MessageBox.Show("FovStart+ nFovSize+ nOverlap가 CamWidth보다 큽니다.(" + nFovStart.ToString() + " + " + nFovSize.ToString() + " > " + nCamWidth.ToString() + ")");
                 nFovSize = nCamWidth - nFovStart;
             }
+
             int nBufSize = nCamHeight * nCamWidth;
             long nMemWidth = m_Memory.W;
 
@@ -945,30 +950,34 @@ namespace RootTools.Camera.Dalsa
                 }
             }
 
+            int nXShiftR = (m_GD.m_dShiftR >= 0) ? (int)(m_GD.m_dShiftR) : (int)Math.Ceiling(m_GD.m_dShiftR);    // 정수값만 취함 (5.7 -> 5, -5.7 -> -5)
+            int nXShiftG = (m_GD.m_dShiftG >= 0) ? (int)(m_GD.m_dShiftG) : (int)Math.Ceiling(m_GD.m_dShiftG);
+            int nXShiftB = (m_GD.m_dShiftB >= 0) ? (int)(m_GD.m_dShiftB) : (int)Math.Ceiling(m_GD.m_dShiftB);
+
             if (m_GD.m_dScaleR != m_dPReXScaleR
-                || m_GD.m_dShiftR != m_dPReXShiftR
+                || (m_GD.m_dShiftR - nXShiftR) != m_dPReXShiftR
                 || nFovSize != m_nPreWidthR)
             {
                 m_dPReXScaleR = m_GD.m_dScaleR;
-                m_dPReXShiftR = m_GD.m_dShiftR;
+                m_dPReXShiftR = m_GD.m_dShiftR - nXShiftR;
                 m_nPreWidthR = nFovSize;
                 m_clrip.Cpp_CreatInterpolationData(0, m_dPReXScaleR, m_dPReXShiftR, m_nPreWidthR);
             }
             if (m_GD.m_dScaleG != m_dPReXScaleG
-                || m_GD.m_dShiftG != m_dPReXShiftG
+                || (m_GD.m_dShiftG - nXShiftG) != m_dPReXShiftG
                 || nFovSize != m_nPreWidthG)
             {
                 m_dPReXScaleG = m_GD.m_dScaleG;
-                m_dPReXShiftG = m_GD.m_dShiftG;
+                m_dPReXShiftG = m_GD.m_dShiftG - nXShiftG;
                 m_nPreWidthG = nFovSize;
                 m_clrip.Cpp_CreatInterpolationData(1, m_dPReXScaleG, m_dPReXShiftG, m_nPreWidthG);
             }
             if (m_GD.m_dScaleB != m_dPReXScaleB
-                || m_GD.m_dShiftG != m_dPReXShiftB
+                || (m_GD.m_dShiftB - nXShiftB) != m_dPReXShiftB
                 || nFovSize != m_nPreWidthB)
             {
                 m_dPReXScaleB = m_GD.m_dScaleB;
-                m_dPReXShiftB = m_GD.m_dShiftB;
+                m_dPReXShiftB = m_GD.m_dShiftB - nXShiftB;
                 m_nPreWidthB = nFovSize;
                 m_clrip.Cpp_CreatInterpolationData(2, m_dPReXScaleB, m_dPReXShiftB, m_nPreWidthB);
             }
@@ -1011,14 +1020,21 @@ namespace RootTools.Camera.Dalsa
                         int ypG = yp + m_GD.m_nYShiftG;
                         int ypB = yp + m_GD.m_nYShiftB;
 
+                        if (m_GD.m_bUseFlipVertical == true)     // 영상 상하 반전
+                        {
+                            ypR = m_Memory.p_sz.Y - yp + m_GD.m_nYShiftR;
+                            ypG = m_Memory.p_sz.Y - yp + m_GD.m_nYShiftG;
+                            ypB = m_Memory.p_sz.Y - yp + m_GD.m_nYShiftB;
+                        }
+
                         if (ypR < 0) ypR = 0;
                         if (ypG < 0) ypG = 0;
                         if (ypB < 0) ypB = 0;
 
-                        long nR = nScanOffsetX + ypR * nMemWidth;
-                        long nG = nScanOffsetX + ypG * nMemWidth;
-                        long nB = nScanOffsetX + ypB * nMemWidth;
-                        IntPtr srcPtr = ipSrc + nCamWidth * y * nByteCnt + nFovStart;
+                        long nR = nScanOffsetX + ypR * nMemWidth + nXShiftR;
+                        long nG = nScanOffsetX + ypG * nMemWidth + nXShiftG;
+                        long nB = nScanOffsetX + ypB * nMemWidth + nXShiftB;
+                        IntPtr srcPtr = ipSrc + nCamWidth * y * nByteCnt + nFovStart* nByteCnt ;
                         IntPtr RedPtr = (IntPtr)((long)m_RedMemPtr + nR);
                         IntPtr GreenPtr = (IntPtr)((long)m_GreenMemPtr + nG);
                         IntPtr BluePtr = (IntPtr)((long)m_BlueMemPtr + nB);

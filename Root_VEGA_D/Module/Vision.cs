@@ -977,6 +977,16 @@ namespace Root_VEGA_D.Module
                                 }
                             }
                             break;
+                        case TCPIPComm_VEGA_D.Command.InspStatus:
+                            {
+                                Run_GrabLineScan runGrabLineScan = PeekModuleRun() as Run_GrabLineScan;
+                                if (runGrabLineScan != null)
+                                {
+                                    int nEndLine = int.Parse(mapParam[TCPIPComm_VEGA_D.PARAM_NAME_INSPENDLINE]);
+
+                                }
+                            }
+                            break;
                         default:
                             break;
                     }
