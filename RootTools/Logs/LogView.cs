@@ -176,6 +176,7 @@ namespace RootTools
 
         public void ThreadStop()
         {
+            m_client.ThreadStop(); 
             m_timer.Stop(); 
         }
     }
