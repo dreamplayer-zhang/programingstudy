@@ -173,6 +173,7 @@ namespace Root_Pine2_Vision.Module
             public int m_nFovSize = 12000;
             public int m_nReverseOffset = 0;
             public int m_nOverlap = 0;
+            public int m_nYOffset = 0;
             public double m_dResolution = 3.8;
             public double[] m_dScale = new double[3] { 1, 1, 1 };
             public double[] m_dShift = new double[3] { 0, 0, 0 };
@@ -207,6 +208,7 @@ namespace Root_Pine2_Vision.Module
                 m_dResolution = tree.Set(m_dResolution, m_dResolution, "Pixel Resolution", "Pixel Resolution (um/pixel)");
                 m_nReverseOffset = tree.Set(m_nReverseOffset, m_nReverseOffset, "Reverse Offset", "Reverse Offset (pixel)");
                 m_nOverlap = tree.Set(m_nOverlap, m_nOverlap, "Overlap", "Overlap (pixel)");
+                m_nYOffset = tree.Set(m_nYOffset, m_nYOffset, "YOffset", "YOffset (pixel)");
             }
 
             void RunTreeFOV(Tree tree)
@@ -279,6 +281,7 @@ namespace Root_Pine2_Vision.Module
                     data.m_nOverlap = nOverlap;
                     data.nScanOffsetY = 0;   /*m_cpMemory.Y;*/
                     data.ReverseOffsetY = cpOffset.Y; /*m_cpMemory.Y;*/ /* + m_vision.m_nLine */
+                    data.m_bUseFlipVertical = true;
                     m_vision.m_aGrabData[eWorks].SetData(data);
                     return data;
                 }
@@ -572,6 +575,7 @@ namespace Root_Pine2_Vision.Module
             int nFOVpx = m_aGrabData[eWorks].m_nFovSize;
             int nReverseOffset = m_aGrabData[eWorks].m_nReverseOffset;
             int nOverlap = m_aGrabData[eWorks].m_nOverlap;
+            int nYOffset = m_aGrabData[eWorks].m_nYOffset;
             Recipe.eSnapMode nSnapMode = m_recipe[eWorks].p_eSnapMode;
             int nTotalSnap = m_recipe[eWorks].p_lSnap;
             int nSnapLineIndex = (nSnapMode == Recipe.eSnapMode.ALL) ? iSnap % (nTotalSnap / 2) : iSnap % (nTotalSnap);
@@ -592,6 +596,9 @@ namespace Root_Pine2_Vision.Module
 
             MemoryData memory = m_aWorks[eWorks].p_memSnap[(int)recipe.m_eEXT];
             GrabData grabData = recipe.GetGrabData(eWorks, cpOffset, nOverlap);
+
+            grabData.nScanOffsetY = (nSnapLineIndex ) * nYOffset;
+
             DalsaParameterSet.eUserSet nUserset = (recipe.m_eEXT == Recipe.Snap.eEXT.EXT1) ? DalsaParameterSet.eUserSet.UserSet2 : DalsaParameterSet.eUserSet.UserSet3;  // RGB : Userset2 , APS : Userset3
             
             try

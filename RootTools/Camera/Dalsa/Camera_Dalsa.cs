@@ -1020,6 +1020,13 @@ namespace RootTools.Camera.Dalsa
                         int ypG = yp + m_GD.m_nYShiftG;
                         int ypB = yp + m_GD.m_nYShiftB;
 
+                        if (m_GD.m_bUseFlipVertical == true)     // 영상 상하 반전
+                        {
+                            ypR = m_Memory.p_sz.Y - yp + m_GD.m_nYShiftR;
+                            ypG = m_Memory.p_sz.Y - yp + m_GD.m_nYShiftG;
+                            ypB = m_Memory.p_sz.Y - yp + m_GD.m_nYShiftB;
+                        }
+
                         if (ypR < 0) ypR = 0;
                         if (ypG < 0) ypG = 0;
                         if (ypB < 0) ypB = 0;
