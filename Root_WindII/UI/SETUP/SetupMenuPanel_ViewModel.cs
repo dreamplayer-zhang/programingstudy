@@ -346,6 +346,17 @@ namespace Root_WindII
             }
         }
 
+        public ICommand btnRACClickedCommand
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+
+                });
+            }
+        }
+
         #endregion
 
         #region [Command Home]
