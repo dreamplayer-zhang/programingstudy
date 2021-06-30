@@ -456,13 +456,13 @@ namespace Root_CAMELLIA
 
         bool CalcInitCal(ILoadport loadport, List<CAMELLIA_Process.Sequence> aSequence)
         {
-            foreach (EFEM_Process.Sequence sequence in aSequence)
+            foreach (CAMELLIA_Process.Sequence sequence in aSequence)
             {
                 //if (loadport.p_id == sequence.m_infoWafer.m_sModule) return true; 
                 if (loadport.p_id == sequence.m_infoWafer.m_sModule) //return true;
                 {
                     ModuleRunBase runInitCal = (Run_InitCalibration)m_camellia.CloneModuleRun("InitCalibration");
-                    EFEM_Process.Sequence sequenceDock = new EFEM_Process.Sequence(runInitCal, sequence.m_infoWafer);
+                    CAMELLIA_Process.Sequence sequenceDock = new CAMELLIA_Process.Sequence(runInitCal, sequence.m_infoWafer);
                     m_process.p_qSequence.Enqueue(sequenceDock);
                     return true;
                 }
