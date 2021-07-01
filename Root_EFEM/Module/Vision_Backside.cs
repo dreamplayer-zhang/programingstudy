@@ -104,6 +104,15 @@ namespace Root_EFEM.Module
             return null;
         }
 
+        public GrabModeBack GetGrabMode(int index)
+        {
+            if (m_aGrabMode?.Count > 0)
+            {
+                return m_aGrabMode[index];
+            }
+            return null;
+        }
+
         void RunTreeGrabMode(Tree tree)
         {
             m_lGrabMode = tree.Set(m_lGrabMode, m_lGrabMode, "Count", "Grab Mode Count");
