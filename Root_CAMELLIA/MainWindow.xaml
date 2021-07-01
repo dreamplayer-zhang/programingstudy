@@ -20,7 +20,7 @@
         AllowsTransparency="False"
         WindowStartupLocation="CenterScreen"
         ResizeMode="CanResizeWithGrip"
-        Height="1020"  MinHeight="920" MinWidth="1820"
+        Height="1020"  MinHeight="620" MinWidth="1020"
         Width="1920"
         Title="CAMELLIA2"
         Loaded="Window_Loaded" Icon="CamelIcon.ico"
@@ -302,7 +302,7 @@
         <!--Main Panel-->
         <Grid Grid.Row="3">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="750"/>
+                <ColumnDefinition Width="1.5*"/>
                 <ColumnDefinition Width="1*"/>
                 <ColumnDefinition Width="1*"/>
                 <ColumnDefinition Width="0.3*"/>

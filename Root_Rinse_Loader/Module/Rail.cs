@@ -25,6 +25,14 @@ namespace Root_Rinse_Loader.Module
         }
         #endregion
 
+        #region GAF
+        ALID m_alidAxis;
+        void InitALID()
+        {
+            m_alidAxis = m_gaf.GetALID(this, "Rotate Axis Alarm", "Rotate Axis Alarm");
+        }
+        #endregion
+
         #region Line
         public class Line
         {
@@ -67,6 +75,15 @@ namespace Root_Rinse_Loader.Module
             }
             foreach (Line line in m_aLine) line.m_bExist = false;
         }
+
+        public bool IsStartOn()
+        {
+            foreach (Line line in m_aLine)
+            {
+                if (line.m_diCheck[2].p_bIn) return true;
+            }
+            return false;
+        }
         #endregion
 
         #region Width
@@ -93,7 +110,6 @@ namespace Root_Rinse_Loader.Module
 
         #region Rotate
         Axis m_axisRotate;
-
         public string RunRotate(bool bRotate)
         {
             if (bRotate) m_axisRotate.Jog(m_rinse.p_fRotateSpeed, "Move");
@@ -144,6 +160,7 @@ namespace Root_Rinse_Loader.Module
             {
                 Thread.Sleep(10);
                 foreach (Line line in m_aLine) line.CheckSensor();
+                m_alidAxis.p_bSet = m_axisRotate.p_sensorAlarm; 
             }
         }
         #endregion
@@ -159,7 +176,8 @@ namespace Root_Rinse_Loader.Module
         public Rail(string id, IEngineer engineer, RinseL rinse)
         {
             p_id = id;
-            m_rinse = rinse; 
+            m_rinse = rinse;
+            InitALID(); 
             InitLines(); 
             InitBase(id, engineer);
             InitThreadCheck();

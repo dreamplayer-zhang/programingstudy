@@ -32,16 +32,15 @@
                     <Button Content="Open" Command="{Binding btnOpenCommand}" Style="{StaticResource imageViewer_toolbar_button}"/>
                     <Button Content="Save" Command="{Binding btnSaveCommand}" Style="{StaticResource imageViewer_toolbar_button}"/>
                     <Button Content="Clear" Command="{Binding btnClearCommand}" Style="{StaticResource imageViewer_toolbar_button}"/>
-                    <Button IsEnabled="False" Content="RGB" Style="{StaticResource imageViewer_toolbar_button}"/>
 
                     <TextBlock Text="Tool" Margin="12,0,4,0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
                     <CheckBox Content="Select&#xa; Chip" IsChecked="{Binding IsSelectChipChecked, Mode=TwoWay}" Command="{Binding btnModeSelectChipCommand}" Style="{StaticResource imageViewer_toolbar_checkbox}"/>
                     <CheckBox Content="Select&#xa; ROI" IsChecked="{Binding IsSelectRoiChecked, Mode=TwoWay}" Command="{Binding btnModeSelectRoiCommand}" Style="{StaticResource imageViewer_toolbar_checkbox}"/>
-                    <CheckBox Content="Wafer&#xa;Mode" IsChecked="{Binding IsWaferModeChecked, Mode=TwoWay}" Command="{Binding btnWaferModeCommand}" Style="{StaticResource imageViewer_toolbar_checkbox}"/>
+                    <Button Content="Clear" Command="{Binding btnDrawClearCommand}" Style="{StaticResource imageViewer_toolbar_button}"/>
 
-                    <TextBlock Text="View" Margin="12,0,4,0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                    <Button Content="FULL" Command="{Binding btnViewFullCommand}" Style="{StaticResource imageViewer_toolbar_button}"/>
-                    <Button Content="BOX" Command="{Binding btnViewBoxCommand}" Style="{StaticResource imageViewer_toolbar_button}"/>
+                    <TextBlock Text="Mode" Margin="12,0,4,0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                    <CheckBox Content="Draw" IsChecked="{Binding IsDrawChecked, Mode=TwoWay}" IsEnabled ="{Binding IsFindDone}" Command="{Binding btnModeDrawCommand}" Style="{StaticResource imageViewer_toolbar_checkbox}"/>
+                    <CheckBox Content="Erase" IsChecked="{Binding IsEraseChecked, Mode=TwoWay}" IsEnabled ="{Binding IsFindDone}" Command="{Binding btnModeEraseCommand}" Style="{StaticResource imageViewer_toolbar_checkbox}"/>
                 </StackPanel>
                 <Grid Grid.Row="1" >
                     <tools:RootViewer />
@@ -53,7 +52,7 @@
                       Margin="4"
                       Style="{StaticResource main_view_groupbox}">
                 <StackPanel Orientation="Vertical" Margin="12, 12, 12, 12">
-                    <!-- Origin Row -->
+                    <!-- Selected Chip Size -->
                     <Grid HorizontalAlignment="Stretch" Style="{StaticResource group_box_grid_item}">
                         <Grid.ColumnDefinitions >
                             <ColumnDefinition Width="120"/>
@@ -67,8 +66,8 @@
                         <TextBlock Text="x" Grid.Column="3"  HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         <TextBox Grid.Column="4" Text="{Binding ChipHeight}" IsEnabled="False" HorizontalContentAlignment="Center"/>
                     </Grid>
-                
-                    <!-- Origin Row Right Top -->
+
+                    <!-- Selected ROI Size -->
                     <Grid HorizontalAlignment="Stretch" Style="{StaticResource group_box_grid_item}">
                         <Grid.ColumnDefinitions >
                             <ColumnDefinition Width="120"/>
@@ -83,7 +82,7 @@
                         <TextBox Grid.Column="4" IsEnabled="False" Text="{Binding RoiHeight}" HorizontalContentAlignment="Center"/>
                     </Grid>
 
-                    <!-- Image Offset -->
+                    <!-- Similarity -->
                     <Grid HorizontalAlignment="Stretch" Style="{StaticResource group_box_grid_item}">
                         <Grid.ColumnDefinitions >
                             <ColumnDefinition Width="120"/>
@@ -94,16 +93,25 @@
                         <TextBox Grid.Column="2" IsEnabled="True" Text="{Binding ChipSimilarity}" HorizontalContentAlignment="Center"/>
                     </Grid>
 
-                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                        <Button Content="Stop" Command="{Binding btnStopFindChipCommand}" Width ="130" Style="{StaticResource groupbox_button}"/>
-                        <Button Content="Find Chip" Command="{Binding btnStartFindChipCommand}" Width ="130" Style="{StaticResource groupbox_button}"/>
-                    </StackPanel>
+                    <!-- Resize Scale Factor -->
+                    <Grid HorizontalAlignment="Stretch" Style="{StaticResource group_box_grid_item}">
+                        <Grid.ColumnDefinitions >
+                            <ColumnDefinition Width="120"/>
+                            <ColumnDefinition Width="30"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="Resize Scale Factor: " Style="{StaticResource group_box_item_name_text}"/>
+                        <TextBox Grid.Column="2" IsEnabled="True" Text="{Binding ResizeScaleFactor}" HorizontalContentAlignment="Center"/>
+                    </Grid>
+
+                    <!-- Find Chip -->
+                    <Grid HorizontalAlignment="Stretch" Style="{StaticResource group_box_grid_item}">
+                        <Grid.ColumnDefinitions >
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Button Content="Find Chip" Command="{Binding btnStartFindChipCommand}" Width ="Auto" Style="{StaticResource groupbox_button}"/>
+                    </Grid>
                 </StackPanel>
-            
-            </GroupBox>
-            <GroupBox Header="Chip Editor"
-                      Margin="4"
-                      Style="{StaticResource main_view_groupbox}">
             </GroupBox>
         </StackPanel>
 

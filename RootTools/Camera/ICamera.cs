@@ -30,6 +30,8 @@ namespace RootTools.Camera
         public int m_nYShiftR = 0; // 채널별 Y 영상 맺히는 위치
         public int m_nYShiftG = 0;
         public int m_nYShiftB = 0;
+
+        public bool m_bUseFlipVertical = false;   // VisionWorks2 - Root Memory 간의 영상 상하 반전을 위함. (버퍼 아래서부터 이미지 올림)
     }
     public interface ICamera
     {

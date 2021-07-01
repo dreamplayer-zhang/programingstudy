@@ -1729,7 +1729,8 @@ namespace Root_CAMELLIA.LibSR_Met
                 {
                     if (OutputData.Contains("Time:"))
                     {
-                        filepath = Application.StartupPath + "\\Timedata.txt";
+                        filepath = string.Empty;
+                        filepath = @"C:\Camellia\Init\Timedata.txt";
 
                         FileInfo fi = new FileInfo(filepath);
 
@@ -1773,10 +1774,11 @@ namespace Root_CAMELLIA.LibSR_Met
                             m_Hr = m_Hr_Org;
                         }
                         value = m_Hr;
-                        strtime = string.Format("{0}:{1}:{2}", m_Hr, m_Min, m_Sec);
+                        strtime = string.Format("{ 0}:{1}:{2}", m_Hr, m_Min, m_Sec);
                         using (StreamWriter SW = new StreamWriter(filepath))
                         {
                             SW.WriteLine(strtime);
+                            m_DM.m_Log.WriteLog(LogType.Datas, "Lamp Use Time" + strtime);
                         }
                     }
 
@@ -1814,7 +1816,8 @@ namespace Root_CAMELLIA.LibSR_Met
                     {
                         if (OutputData.Contains("Time:"))
                         {
-                            filepath = Application.StartupPath + "\\Timedata.txt";
+                            filepath = string.Empty;
+                            filepath = @"C:\Camellia\Init\Timedata.txt";
 
                             FileInfo fi = new FileInfo(filepath);
 
@@ -1872,6 +1875,7 @@ namespace Root_CAMELLIA.LibSR_Met
                             using (StreamWriter SW = new StreamWriter(filepath))
                             {
                                 SW.WriteLine(strtime);
+                                m_DM.m_Log.WriteLog(LogType.Datas, "Lamp Use Time" + strtime);
                             }
                         }
 
@@ -1905,7 +1909,8 @@ namespace Root_CAMELLIA.LibSR_Met
                 {
                     if (OutputData.Contains("Time:"))
                     {
-                        filepath = Application.StartupPath + "\\Timedata.txt";
+                        filepath = string.Empty;
+                        filepath = @"C:\Camellia\Init\Timedata.txt";
 
                         FileInfo fi = new FileInfo(filepath);
 
@@ -1961,8 +1966,10 @@ namespace Root_CAMELLIA.LibSR_Met
                         using (StreamWriter SW = new StreamWriter(filepath))
                         {
                             SW.WriteLine(strtime);
+                            m_DM.m_Log.WriteLog(LogType.Datas, "Lamp Use Time" + strtime);
                         }
                         sp.Write("c");
+                        
                     }
                     else
                     {
@@ -1976,6 +1983,7 @@ namespace Root_CAMELLIA.LibSR_Met
                 }
 
             }
+            
             return value;
         }
         private void UpdateLampTime(bool Initialize)

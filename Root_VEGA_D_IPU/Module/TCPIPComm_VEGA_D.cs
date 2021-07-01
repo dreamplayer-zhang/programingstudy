@@ -58,6 +58,7 @@ namespace Root_VEGA_D_IPU.Module
             RcpName,
             Result,
             resume,
+            InspStatus,
         }
 
         // start command
@@ -71,6 +72,9 @@ namespace Root_VEGA_D_IPU.Module
         public const string PARAM_NAME_TOTALSCANLINECOUNT = "TOTALSCANLINECOUNT";
         public const string PARAM_NAME_CURRENTSCANLINE = "CURRENTSCANLINE";
         public const string PARAM_NAME_STARTSCANLINE = "STARTSCANLINE";
+        public const string PARAM_NAME_BOT_ALIGN_MARKER_POS_X = "BOT_ALIGN_MARKER_POS_X";
+        public const string PARAM_NAME_BOT_ALIGN_MARKER_POS_Y = "BOT_ALIGN_MARKER_POS_Y";
+        public const string PARAM_NAME_INSPENDLINE = "INSPENDLINE";
 
         const string COMMAND_NAME = "CMD";
 

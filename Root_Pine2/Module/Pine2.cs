@@ -7,6 +7,7 @@ using RootTools.ToolBoxs;
 using RootTools.Trees;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 using System.Threading;
 using System.Windows.Threading;
@@ -396,7 +397,7 @@ namespace Root_Pine2.Module
             {
                 if (_thickness == value) return;
                 _thickness = value;
-                OnPropertyChanged(); 
+                OnPropertyChanged();
             }
         }
 
@@ -407,7 +408,7 @@ namespace Root_Pine2.Module
             set
             {
                 _lStack = value;
-                OnPropertyChanged(); 
+                OnPropertyChanged();
             }
         }
 
@@ -430,19 +431,7 @@ namespace Root_Pine2.Module
             {
                 if (_b3D == value) return;
                 _b3D = value;
-                OnPropertyChanged(); 
-            }
-        }
-
-        string _sRecipe = "";
-        public string p_sRecipe
-        {
-            get { return _sRecipe; }
-            set
-            {
-                if (_sRecipe == value) return;
-                _sRecipe = value;
-                m_handler.p_sRecipe = value; 
+                OnPropertyChanged();
             }
         }
         #endregion
@@ -514,10 +503,30 @@ namespace Root_Pine2.Module
             m_thicknessDefault = tree.GetTree("Default Strip").Set(m_thicknessDefault, m_thicknessDefault, "Thickness", "Strip Thickness (um)");
             p_lStack = tree.GetTree("Stack").Set(p_lStack, p_lStack, "Stack Count", "Strip Max Stack Count");
             p_lStackPaper = tree.GetTree("Stack").Set(p_lStackPaper, p_lStackPaper, "Paper Count", "Paper Max Stack Count");
-            if (tree.p_treeRoot.p_eMode != Tree.eMode.RegRead)
-            {
-                p_sRecipe = tree.GetTree("Mode").Set(p_sRecipe, p_sRecipe, "Recipe", "Recipe");
-            }
+        }
+        #endregion
+
+        #region Recipe
+        const string c_sExt = ".pine2";
+        public void RecipeSave()
+        {
+            if (m_handler.p_sRecipe == "") return; 
+            string sPath = EQ.c_sPathRecipe + "\\" + m_handler.p_sRecipe;
+            Directory.CreateDirectory(sPath);
+            string sFile = sPath + "\\Pine2" + c_sExt;
+            m_treeRootSetup.m_job = new Job(sFile, true, m_log);
+            RunTree(Tree.eMode.JobSave);
+            m_treeRootSetup.m_job.Close();
+        }
+
+        public void RecipeOpen(string sRecipe)
+        {
+            string sPath = EQ.c_sPathRecipe + "\\" + sRecipe;
+            Directory.CreateDirectory(sPath);
+            string sFile = sPath + "\\Pine2" + c_sExt;
+            m_treeRootSetup.m_job = new Job(sFile, false, m_log);
+            RunTree(Tree.eMode.JobOpen);
+            m_treeRootSetup.m_job.Close();
         }
         #endregion
 

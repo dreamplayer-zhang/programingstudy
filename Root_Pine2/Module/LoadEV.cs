@@ -175,8 +175,16 @@ namespace Root_Pine2.Module
         #region StateReady
         public override string StateReady()
         {
-            if (m_diTop.p_bIn && p_eMove == eMove.Stop) p_eMove = eMove.Down;
-            if (!m_diTop.p_bIn && p_eMove == eMove.Down) p_eMove = eMove.Stop;
+            switch (EQ.p_eState)
+            {
+                case EQ.eState.Run:
+                    if (m_diCheck.p_bIn && (p_bDone == false)) StartLoad();
+                    break;
+                default:
+                    if (m_diTop.p_bIn && p_eMove == eMove.Stop) p_eMove = eMove.Down;
+                    if (!m_diTop.p_bIn && p_eMove == eMove.Down) p_eMove = eMove.Stop;
+                    break; 
+            }
             return "OK";
         }
         #endregion
@@ -189,6 +197,12 @@ namespace Root_Pine2.Module
                 StopWatch sw = new StopWatch();
                 int msTimeout = (int)(1000 * secTimeout);
                 p_bCheck = m_diCheck.p_bIn;
+                if (p_bCheck == false)
+                {
+                    p_bDone = false; 
+                    m_pine2.m_buzzer.RunBuzzer(Pine2.eBuzzer.Finish); 
+                    return "OK"; 
+                }
                 try
                 {
                     if (m_dioEV.m_aBitDI[1].p_bOn)
@@ -218,7 +232,7 @@ namespace Root_Pine2.Module
                         if (sw.ElapsedMilliseconds > msTimeout) return "RunLoad Timeout : Top Sensor Up";
                     }
                     p_eMove = eMove.Stop;
-                    p_bDone = p_bCheck;
+                    p_bDone = m_diCheck.p_bIn;
                     return "OK";
                 }
                 finally
@@ -267,6 +281,7 @@ namespace Root_Pine2.Module
         public override void Reset()
         {
             base.Reset();
+            p_bDone = false; 
             StartLoad();
         }
         #endregion
@@ -279,8 +294,10 @@ namespace Root_Pine2.Module
         #endregion
 
         readonly object m_csLock = new object();
-        public LoadEV(string id, IEngineer engineer)
+        Pine2 m_pine2; 
+        public LoadEV(string id, IEngineer engineer, Pine2 pine2)
         {
+            m_pine2 = pine2; 
             base.InitBase(id, engineer);
         }
 
