@@ -530,6 +530,19 @@ namespace Root_Pine2.Module
         }
         #endregion
 
+        #region Lot
+        string _sLotID = "";
+        public string p_sLotID
+        {
+            get { return _sLotID; }
+            set
+            {
+                _sLotID = value;
+                OnPropertyChanged(); 
+            }
+        }
+        #endregion
+
         Pine2_Handler m_handler; 
         public Pine2(string id, IEngineer engineer)
         {

@@ -49,7 +49,7 @@ namespace Root_Pine2.Module
         {
             p_eMagazine = eMagazine.Magazine0; 
             p_nStrip = nStrip;
-            p_id = "Strip" + nStrip.ToString("000"); 
+            p_id = "Strip." + nStrip.ToString("000"); 
         }
 
         public bool m_bPaper = false; 
