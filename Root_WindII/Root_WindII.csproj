@@ -243,7 +243,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Constants.cs" />
-    <Compile Include="DataConverter.cs" />
+    <Compile Include="Tools\DataConverter.cs" />
     <Compile Include="Engineer\WIND2EventArgs.cs" />
     <Compile Include="Engineer\WIND2EventManager.cs" />
     <Compile Include="Engineer\WindII_Warning.cs" />
@@ -259,6 +259,7 @@
     <Compile Include="Recipe\RecipeEBR.cs" />
     <Compile Include="Recipe\RecipeEdge.cs" />
     <Compile Include="Recipe\RecipeFront.cs" />
+    <Compile Include="Tools\StepTableData.cs" />
     <Compile Include="UI\SelectMode.xaml.cs">
       <DependentUpon>SelectMode.xaml</DependentUpon>
     </Compile>
@@ -391,6 +392,8 @@
     <Compile Include="Warning_UI.xaml.cs">
       <DependentUpon>Warning_UI.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Tools\XMLData.cs" />
+    <Compile Include="Tools\XMLParser.cs" />
     <Page Include="Engineer\WindII_Engineer_UI.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
