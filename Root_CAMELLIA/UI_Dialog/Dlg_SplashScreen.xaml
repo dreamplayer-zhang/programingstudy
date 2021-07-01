@@ -7,7 +7,7 @@
         xmlns:Icon="clr-namespace:Root_CAMELLIA.Control.Icon"
         xmlns:gif="http://wpfanimatedgif.codeplex.com"
         mc:Ignorable="d" WindowStartupLocation="CenterScreen" WindowStyle="None" ShowInTaskbar="False" Topmost="True" ResizeMode="NoResize"
-        Title="Dlg_SplashScreen" Height="400" Width="600" BorderBrush="Black" BorderThickness="1" Background="Black">
+        Title="Camellia2" Height="400" Width="600" BorderBrush="Black" BorderThickness="1" Background="Black">
     <Window.Resources>
         <local:ValueToProgressColorConverter x:Key="ColorConverter"/>
     </Window.Resources>
@@ -40,7 +40,7 @@
             <!--<Image gif:ImageBehavior.RepeatBehavior="Forever" gif:ImageBehavior.AnimatedSource="pack://application:,,/Resource/splash.gif" Stretch="Fill" Margin="3" />-->
             <!--<ProgressBar Grid.ColumnSpan="2" Margin="3" Style="{StaticResource CustomProgress}" Grid.Row="1" Value="{Binding SplashProgressValue, UpdateSourceTrigger=PropertyChanged}" Foreground="{Binding SplashProgressValue, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource ColorConverter}}"></ProgressBar>-->
             <!--<TextBlock Text="{Binding SplashScreenText}" FontSize="20" Foreground="AliceBlue" VerticalAlignment="Center" Margin="3,384,15,3"/>-->
-            <TextBlock Text="{Binding SplashScreenText}" FontSize="15" Foreground="AliceBlue" VerticalAlignment="Center" Height="auto" FontWeight="Bold" Width="auto" HorizontalAlignment="Right" Margin="0,371,10,10" Grid.Column="1"/>
+            <TextBlock Text="{Binding SplashScreenText}" FontSize="15" Foreground="{Binding SplashScreenBrush}" VerticalAlignment="Center" Height="auto" FontWeight="Bold" Width="auto" HorizontalAlignment="Right" Margin="0,371,10,10" Grid.Column="1"/>
         </Grid>
         <Separator Margin="8,148,356,230" Height="20"/>
         <!--<Grid Background="Black" Margin="29,32,525,343"/>-->

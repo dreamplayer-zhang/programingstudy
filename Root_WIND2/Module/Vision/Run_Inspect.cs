@@ -50,7 +50,6 @@ namespace Root_WIND2.Module
             klarfData.WaferStart(recipe.WaferMap, infoWafer);
             klarfData.AddSlot(recipe.WaferMap, defectList, recipe.GetItem<OriginRecipe>(), useTDIReview, useVrsReview);
             klarfData.SaveKlarf();
-
         }
 
         private void LotEnd(InfoWafer infoWafer)

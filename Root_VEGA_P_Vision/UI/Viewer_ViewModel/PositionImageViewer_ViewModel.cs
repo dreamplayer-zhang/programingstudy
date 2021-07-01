@@ -27,11 +27,12 @@ namespace Root_VEGA_P_Vision
         public event FeatureBoxDoneEvent FeatureBoxDone;
         public event ManualAlignDoneEvent ManualAlignDone;
 
-        RecipeBase recipe;
+        public RecipeBase recipe;
         public PositionImageViewer_ViewModel(string imageData,RecipeBase recipe):base(imageData)
         {
             this.recipe = recipe;
             p_VisibleMenu = Visibility.Collapsed;
+            p_ROILayer = null;
             InitializeUIElements();
         }
         private enum BoxProcess

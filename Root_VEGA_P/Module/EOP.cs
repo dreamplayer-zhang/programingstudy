@@ -56,6 +56,7 @@ namespace Root_VEGA_P.Module
 
         public string RunMove(ePos ePos)
         {
+            if (!m_door.IsCylinder(true)) return p_sInfo;
             m_axis.StartMove(ePos);
             return m_axis.WaitReady();
         }
@@ -246,7 +247,7 @@ namespace Root_VEGA_P.Module
                 return "Run Clamp Timeout"; 
             }
 
-            bool IsClamp(bool bClamp)
+            public bool IsClamp(bool bClamp)
             {
                 for (int n = 0; n < 4; n++)
                 {
@@ -267,7 +268,7 @@ namespace Root_VEGA_P.Module
                     int nPod = (value != null) ? (int)value.p_ePod : -1;
                     _infoPod = value;
                     m_reg.Write("InfoPod", nPod);
-                    value.WriteReg();
+                    value?.WriteReg();
                     OnPropertyChanged();
                 }
             }
@@ -312,12 +313,19 @@ namespace Root_VEGA_P.Module
             }
 
             public string BeforeGet() 
-            { 
+            {
+                //if (!IsClamp(true))
+                //    return "Clamp Opened!";
+                    
+                //RunRotate(ePos.Ready);
+                //RunClamp(false);
                 return "OK";
             }
 
             public string BeforePut(InfoPod infoPod)
             {
+                //RunRotate(ePos.Ready);
+                //RunClamp(false);
                 return "OK";
             }
 
@@ -328,7 +336,9 @@ namespace Root_VEGA_P.Module
 
             public string AfterPut()
             {
-                RunRotate(ePos.Rotate);
+                //RunClamp(true);
+                //if(IsClamp(true))
+                //    RunRotate(ePos.Rotate);
                 //forget
                 return "OK";
             }
@@ -472,7 +482,7 @@ namespace Root_VEGA_P.Module
                 return "Run Cylinder Up Timeout";
             }
 
-            bool IsCylinder(bool bUp)
+            public bool IsCylinder(bool bUp)
             {
                 for (int n = 0; n < 2; n++)
                 {
@@ -493,7 +503,7 @@ namespace Root_VEGA_P.Module
                     int nPod = (value != null) ? (int)value.p_ePod : -1;
                     _infoPod = value;
                     m_reg.Write("InfoPod", nPod);
-                    value.WriteReg();
+                    value?.WriteReg();
                     OnPropertyChanged();
                 }
             }
@@ -712,7 +722,9 @@ namespace Root_VEGA_P.Module
             try
             {
                 if (Run(m_dome.RunRotate(Dome.ePos.Rotate))) return p_sInfo;
+                if (Run(m_dome.RunDomeSnap())) return p_sInfo;
                 if (Run(m_door.RunCylinderUp(false))) return p_sInfo;
+                if (Run(m_door.RunDoorSnap())) return p_sInfo;
                 if (Run(RunMove(ePos.Forward))) return p_sInfo;
                 if (Run(RunCoverDown(true))) return p_sInfo;
                 //if (Run(m_dome.m_particleCounterSet.RunParticleCounter(runCount.m_dataDome.m_asNozzle))) return p_sInfo;
@@ -741,8 +753,10 @@ namespace Root_VEGA_P.Module
         public override void Reset()
         {
             base.Reset();
-            RunMove(ePos.Backward); 
-            m_dome.RunRotate(Dome.ePos.Ready);
+            RunMove(ePos.Backward);
+            if(m_dome.m_axisRotate.p_bServoOn)
+                m_dome.RunRotate(Dome.ePos.Ready);
+
             m_door.RunCylinderUp(true); 
         }
 
@@ -755,7 +769,7 @@ namespace Root_VEGA_P.Module
             //여기
             m_dome.InitCamera();
             m_door.InitCamera();
-            string sHome = base.StateHome(m_axis);
+            string sHome = StateHome(m_axis);
             p_eState = (sHome == "OK") ? eState.Ready : eState.Error;
             Reset(); 
             return sHome;

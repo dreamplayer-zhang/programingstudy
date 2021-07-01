@@ -9,12 +9,7 @@
              xmlns:Tools="clr-namespace:RootTools;assembly=RootTools"
              d:DesignHeight="836" d:DesignWidth="1912">
     <Grid>
-        <TabControl Grid.Column="1" Style="{StaticResource ImageViewerTabControlStyle}">
-            <i:Interaction.Triggers>
-                <i:EventTrigger EventName="SelectionChanged">
-                    <i:InvokeCommandAction Command="{Binding TabChanged}"/>
-                </i:EventTrigger>
-            </i:Interaction.Triggers>
+        <TabControl Grid.Column="1" Style="{StaticResource ImageViewerTabControlStyle}" SelectedIndex="{Binding SelectedTab}">
             <TabItem Header="EIP Cover Top"
                                  Width="120" Style="{StaticResource ImageViewerTabItemStyle}">
                     <Tools:RootViewer DataContext="{Binding CoverTop_ImageViewer}"/>

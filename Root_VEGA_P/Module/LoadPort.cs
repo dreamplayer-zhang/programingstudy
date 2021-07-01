@@ -496,10 +496,13 @@ namespace Root_VEGA_P.Module
                     m_infoPods.NewInfoPod(4);
                     return "OK";
                 }
+                m_infoPods.ClearInfoPod(); //일단
                 switch (m_infoPods.p_eState)
                 {
-                    case InfoPods.eState.Dock: return "OK";
-                    //case InfoPods.eState.Empty: return "Pod not Exist";
+                    case InfoPods.eState.Dock: 
+                        return "OK";
+                    //case InfoPods.eState.Empty: 
+                    //    return "Pod not Exist";
                 }
                 string sRFID = "";
                 m_RFID.Read(out sRFID);
@@ -511,7 +514,7 @@ namespace Root_VEGA_P.Module
                 if (Run(m_stage.RunVacuum(true))) return p_sInfo;
                 if (Run(m_door.RunDoor(true))) return p_sInfo;
                 if (Run(m_stage.RunMove(Stage.ePos.Barcode))) return p_sInfo;
-                if (Run(m_camBCD.ReadBCD())) return p_sInfo;
+                //if (Run(m_camBCD.ReadBCD())) return p_sInfo;
                 //forget
                 if (Run(m_stage.RunMove(Stage.ePos.Inside))) return p_sInfo;
                 if (Run(m_door.RunDoor(false))) return p_sInfo;
@@ -548,7 +551,8 @@ namespace Root_VEGA_P.Module
 
         public string IsGetOK()
         {
-            if (p_eState != eState.Ready) return p_id + " eState not Ready";
+            if (p_eState != eState.Ready) 
+                return p_id + " eState not Ready";
             return (p_infoPod != null) ? "OK" : p_id + " IsGetOK - Pod not Exist";
         }
 
@@ -627,8 +631,8 @@ namespace Root_VEGA_P.Module
             if (Run(base.StateHome())) return p_sInfo;
             if (Run(m_stage.RunMove(Stage.ePos.Outside))) return p_sInfo;
 
-            //if(m_camBCD!=null)
-            //    m_camBCD.Connect();
+            if (m_camBCD != null)
+                m_camBCD.Connect();
 
             return m_door.RunDoor(false);
         }

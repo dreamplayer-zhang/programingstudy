@@ -51,6 +51,7 @@ namespace Root_VEGA_P_Vision
         RecipeCoverBack recipeCoverBack;
         RecipePlateFront recipePlateFront;
         RecipePlateBack recipePlateBack;
+        RecipeBase[] recipes;
 
         public Setup_ViewModel()
         {
@@ -60,10 +61,12 @@ namespace Root_VEGA_P_Vision
 
         public void init()
         {
-            recipeCoverFront = GlobalObjects.Instance.Get<RecipeCoverFront>();
-            recipeCoverBack  = GlobalObjects.Instance.Get<RecipeCoverBack>();
-            recipePlateFront = GlobalObjects.Instance.Get<RecipePlateFront>();
-            recipePlateBack  = GlobalObjects.Instance.Get<RecipePlateBack>();
+            recipes = new RecipeBase[4];
+
+            recipes[0] = recipeCoverFront = GlobalObjects.Instance.Get<RecipeCoverFront>();
+            recipes[1] = recipeCoverBack = GlobalObjects.Instance.Get<RecipeCoverBack>();
+            recipes[2] = recipePlateFront = GlobalObjects.Instance.Get<RecipePlateFront>();
+            recipes[3] = recipePlateBack = GlobalObjects.Instance.Get<RecipePlateBack>();
 
             InitAllPanel();
             InitAllNaviBtn();
@@ -156,7 +159,7 @@ namespace Root_VEGA_P_Vision
             {
                 return new RelayCommand(() =>
                 {
-                    CreateRecipe();
+                    CreateRecipe(false);
                 });
             }
 
@@ -175,34 +178,41 @@ namespace Root_VEGA_P_Vision
 
         void SaveRecipe()
         {
-            if (!recipeCoverFront.RecipePath.Equals(""))
+            foreach (RecipeBase recipe in recipes)
             {
-                recipeCoverFront.Save(recipeCoverFront.RecipePath);
-                return;
+                if (!recipe.RecipePath.Equals(""))
+                {
+                    //기존에 Recipe가 열려있을 때
+                    recipe.Save(recipe.RecipePath);
+                    MessageBox.Show("Recipe Saved!");
+                    return;
+                }
             }
 
-            if (!recipeCoverBack.RecipePath.Equals(""))
+            CreateRecipe(true);
+        }
+        void LoadAllRecipe()
+        {
+            /*
+             RootPath -> Recipe -> 부분별 Recipe Reading하고 PodInfo UI Update
+             */
+            DirectoryInfo dir = new DirectoryInfo(App.RecipeRootPath);
+
+            foreach(DirectoryInfo dirInfo in dir.GetDirectories()) // Recipe Lists
             {
-                recipeCoverBack.Save(recipeCoverBack.RecipePath);
-                return;
+                DirectoryInfo[] infos = dirInfo.GetDirectories();
+
+                if (infos.Length != 4)
+                    return;
+
+                //foreach(DirectoryInfo info in infos)
+
+
             }
-
-            if (!recipePlateFront.RecipePath.Equals(""))
-            {
-                recipePlateFront.Save(recipePlateFront.RecipePath);
-                return;
-            }
-
-            if (!recipePlateBack.RecipePath.Equals(""))
-            {
-                recipePlateBack.Save(recipePlateBack.RecipePath);
-                return;
-            }
-
-
+            
             //System.Windows.Forms.OpenFileDialog dlg = new System.Windows.Forms.OpenFileDialog();
             //dlg.InitialDirectory = App.RecipeRootPath;
-            //dlg.Title = "Save Recipe";
+            //dlg.Title = "Load Recipe";
             //dlg.Filter = "ATI files (*.rcp)|*.rcp|All files (*.*)|*.*";
             //if (dlg.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             //{
@@ -213,12 +223,11 @@ namespace Root_VEGA_P_Vision
             //    if (!dir.Exists)
             //        dir.Create();
 
-            //    recipeCoverFront.Save(Path.Combine(sFolderPath, "RecipeCoverFront_" + sFileName));
-            //    recipeCoverBack.Save(Path.Combine(sFolderPath, "RecipeCoverBack_" + sFileName));
-            //    recipePlateFront.Save(Path.Combine(sFolderPath, "RecipePlateFront_" + sFileName));
-            //    recipePlateBack.Save(Path.Combine(sFolderPath, "RecipePlateBack_" + sFileName));
+            //    recipeCoverFront.Read(Path.Combine(sFolderPath,App.RecipeNames[0]+"_"+sFileName));
+            //    recipeCoverBack.Read(Path.Combine(sFolderPath, "RecipeCoverBack_" + sFileName));
+            //    recipePlateFront.Read(Path.Combine(sFolderPath, "RecipePlateFront_" + sFileName));
+            //    recipePlateBack.Read(Path.Combine(sFolderPath, "RecipePlateBack_" + sFileName));
             //}
-            CreateRecipe();
         }
         void LoadRecipe()
         {
@@ -229,19 +238,32 @@ namespace Root_VEGA_P_Vision
             if (dlg.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
                 string sFolderPath = Path.GetDirectoryName(dlg.FileName); // 디렉토리명
+                string sFileNameNoExt = Path.GetFileNameWithoutExtension(dlg.FileName); // Only 파일이름
                 string sFileName = Path.GetFileName(dlg.FileName); // 파일이름 + 확장자
 
-                DirectoryInfo dir = new DirectoryInfo(sFolderPath);
-                if (!dir.Exists)
-                    dir.Create();
+                bool saveRes = false;
+                int selectedIdx = -1;
+                for(int i=0;i<4;i++)
+                    if(sFileName.Contains(App.RecipeNames[i]))
+                    {
+                        saveRes = recipes[i].Read(Path.Combine(sFolderPath, sFileName));
+                        selectedIdx = i;
+                        break;
+                    }
 
-                recipeCoverFront.Read(Path.Combine(sFolderPath,"RecipeCoverFront_"+sFileName));
-                recipeCoverBack.Read(Path.Combine(sFolderPath, "RecipeCoverBack_" + sFileName));
-                recipePlateFront.Read(Path.Combine(sFolderPath, "RecipePlateFront_" + sFileName));
-                recipePlateBack.Read(Path.Combine(sFolderPath, "RecipePlateBack_" + sFileName));
+                if (saveRes)
+                {
+                    MessageBox.Show("Recipe Loaded!");
+                    VegaPEventManager.OnRecipeUpdated(this, new RecipeEventArgs(recipes[selectedIdx]));
+                }
             }
         }
-        
+        public ICommand btnSaveAsRecipe
+        {
+            get => new RelayCommand(() => {
+                CreateRecipe(false);
+            });
+        }
         public ICommand btnLoadRecipe
         {
             get
@@ -252,11 +274,16 @@ namespace Root_VEGA_P_Vision
                 });
             }
         }
-
-        void CreateRecipe()
+        public ICommand btnLoadAllRecipe
+        {
+            get => new RelayCommand(() => {
+                LoadAllRecipe();
+            });
+        }
+        void CreateRecipe(bool IsCreate)
         {
             System.Windows.Forms.SaveFileDialog dlg = new System.Windows.Forms.SaveFileDialog();
-            dlg.InitialDirectory = Constants.RootPath.RecipeEBRRootPath;
+            dlg.InitialDirectory = App.RecipeRootPath;
             dlg.Title = "Save Recipe";
             dlg.Filter = "ATI files (*.rcp)|*.rcp|All files (*.*)|*.*";
             if (dlg.ShowDialog() == System.Windows.Forms.DialogResult.OK)
@@ -265,21 +292,38 @@ namespace Root_VEGA_P_Vision
                 string sFileNameNoExt = Path.GetFileNameWithoutExtension(dlg.FileName); // Only 파일이름
                 string sFileName = Path.GetFileName(dlg.FileName); // 파일이름 + 확장자
                 string sRecipeFolderPath = Path.Combine(sFolderPath, sFileNameNoExt); // 디렉토리명
-                string sFullPath = Path.Combine(sRecipeFolderPath, sFileName); // 레시피 이름으 된 폴더안의 rcp 파일 경로
 
-                DirectoryInfo dir = new DirectoryInfo(sRecipeFolderPath);
-                if (!dir.Exists)
-                    dir.Create();
+                string[] RecipeFilePaths = { sRecipeFolderPath + @"\RecipeCoverFront", sRecipeFolderPath + @"\RecipeCoverBack",
+                sRecipeFolderPath + @"\RecipePlateFront", sRecipeFolderPath + @"\RecipePlateBack"};
 
-                recipeCoverFront.Clear();
-                recipeCoverBack.Clear();
-                recipePlateFront.Clear();
-                recipePlateBack.Clear();
+                foreach (string path in RecipeFilePaths)
+                {
+                    DirectoryInfo dir = new DirectoryInfo(path);
+                    if (!dir.Exists)
+                        dir.Create();
+                }
 
-                recipeCoverFront.Save(Path.Combine(sFolderPath, "RecipeCoverFront_" + sFileName));
-                recipeCoverBack.Save(Path.Combine(sFolderPath, "RecipeCoverBack_" + sFileName));
-                recipePlateFront.Save(Path.Combine(sFolderPath, "RecipePlateFront_" + sFileName));
-                recipePlateBack.Save(Path.Combine(sFolderPath, "RecipePlateBack_" + sFileName));
+                if(!IsCreate)
+                {
+                    if (!recipeCoverFront.RecipePath.Equals(""))
+                        recipeCoverFront.Clear();
+                    if (!recipeCoverBack.RecipePath.Equals(""))
+                        recipeCoverBack.Clear();
+                    if (!recipePlateFront.RecipePath.Equals(""))
+                        recipePlateFront.Clear();
+                    if (!recipePlateBack.RecipePath.Equals(""))
+                        recipePlateBack.Clear();
+                }                
+
+                bool saveRes = false;
+                saveRes = recipeCoverFront.Save(Path.Combine(RecipeFilePaths[0], "RecipeCoverFront_" + sFileName));
+                saveRes = recipeCoverBack.Save(Path.Combine(RecipeFilePaths[1], "RecipeCoverBack_" + sFileName));
+                saveRes = recipePlateFront.Save(Path.Combine(RecipeFilePaths[2], "RecipePlateFront_" + sFileName));
+                saveRes = recipePlateBack.Save(Path.Combine(RecipeFilePaths[3], "RecipePlateBack_" + sFileName));
+                if (saveRes)
+                {
+                    MessageBox.Show("Recipe Created!");
+                }
             }
         }
 

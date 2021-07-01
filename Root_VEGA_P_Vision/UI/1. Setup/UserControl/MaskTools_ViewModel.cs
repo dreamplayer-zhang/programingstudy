@@ -35,11 +35,11 @@ namespace Root_VEGA_P_Vision
             set
             {
                 if (value > 255)
-                    SetProperty(ref nThickness, 255);
+                    SetProperty(ref nThreshold, 255);
                 else if (value < 0)
-                    SetProperty(ref nThickness, 0);
+                    SetProperty(ref nThreshold, 0);
                 else
-                    SetProperty(ref nThickness, value);
+                    SetProperty(ref nThreshold, value);
             }
         }
         public int p_nselectedUpdown

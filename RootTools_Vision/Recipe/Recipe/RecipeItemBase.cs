@@ -22,10 +22,15 @@ namespace RootTools_Vision
     [XmlInclude(typeof(PBIRecipe))]
     [XmlInclude(typeof(VerticalWireRecipe))]
     [XmlInclude(typeof(FrontAlignRecipe))]
+    #region[EUVPod]
     [XmlInclude(typeof(EUVOriginRecipe))]
     [XmlInclude(typeof(EUVPodSurfaceRecipe))]
     [XmlInclude(typeof(EUVPositionRecipe))]
-
+    [XmlInclude(typeof(StainRecipe))]
+    [XmlInclude(typeof(SideRecipe))]
+    [XmlInclude(typeof(LowResRecipe))]
+    [XmlInclude(typeof(HighResRecipe))]
+    #endregion
     public abstract class RecipeItemBase : ObservableObject, IComparable<RecipeItemBase>, IRecipe
     {
         public int CompareTo(RecipeItemBase other)

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using RootTools_Vision;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -16,6 +17,16 @@ namespace Root_VEGA_P_Vision
         ImageNROI_ViewModel imageNROI;
         InspectionItem_ViewModel cfItem,cbItem,bfItem,bbItem;
         UserControl subPanel;
+        string selectedItem;
+        public RecipeItemBase selectedRecipeItem { get; set; }
+        public string SelectedItem
+        {
+            get => selectedItem;
+            set
+            {
+                SetProperty(ref selectedItem, value);
+            }
+        }
 
         #region Property
         public UserControl SubPanel
@@ -49,13 +60,16 @@ namespace Root_VEGA_P_Vision
             Main = new PodInfo_Panel();
             Main.DataContext = this;
             imageNROI = new ImageNROI_ViewModel(this);
-            CFItem = new InspectionItem_ViewModel("EIP_Cover.Front",false);
-            CBItem = new InspectionItem_ViewModel("EIP_Cover.Back");
-            BFItem = new InspectionItem_ViewModel("EIP_Plate.Front");
-            BBItem = new InspectionItem_ViewModel("EIP_Plate.Back",false,false);
+            CFItem = new InspectionItem_ViewModel(this, GlobalObjects.Instance.Get<RecipeCoverFront>(), false);
+            CBItem = new InspectionItem_ViewModel(this, GlobalObjects.Instance.Get<RecipeCoverBack>(),true,false);
+            BFItem = new InspectionItem_ViewModel(this, GlobalObjects.Instance.Get<RecipePlateFront>());
+            BBItem = new InspectionItem_ViewModel(this, GlobalObjects.Instance.Get<RecipePlateBack>(), false, false);
 
+            selectedRecipeItem = CFItem.ParticleItem.RecipeItemBase;
             SubPanel = imageNROI.Main;
         }
+
+        #region RelayCommand
         public ICommand btnBack
         {
             get => new RelayCommand(() => { home.m_Setup.SetHome(); });
@@ -83,6 +97,12 @@ namespace Root_VEGA_P_Vision
             get => new RelayCommand(() => {
                 BBItem.Visible = !BBItem.Visible;
             });
+        }
+        #endregion
+
+        public void SetRecipe(RecipeItemBase selectedItem)
+        {
+            imageNROI.SelectedItemList.Init(selectedItem, true);
         }
     }
 }

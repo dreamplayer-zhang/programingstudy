@@ -187,6 +187,27 @@ namespace Root_WIND2.UI_User
             }
         }
 
+        public RelayCommand btnOriginSaveCommand
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    OriginRecipe originRecipe = GlobalObjects.Instance.Get<RecipeFront>().GetItem<OriginRecipe>();
+
+                    originRecipe.OriginX = this.OriginX;
+                    originRecipe.OriginY = this.OriginY;
+
+                    originRecipe.OriginWidth = this.OriginWidth;
+                    originRecipe.OriginHeight = this.OriginHeight;
+
+                    originRecipe.DiePitchX = this.PitchX;
+                    originRecipe.DiePitchY = this.PitchY;
+
+                });
+            }
+        }
+
         public RelayCommand btnOriginClearCommand
         {
             get

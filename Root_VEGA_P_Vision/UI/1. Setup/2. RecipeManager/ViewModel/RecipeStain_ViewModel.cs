@@ -19,7 +19,7 @@ namespace Root_VEGA_P_Vision
 {
     public class RecipeStain_ViewModel : ObservableObject
     {       
-        public RecipeMask_ViewModel recipeSetting;
+        public RecipeMask_ViewModel recipeMask;
         public RecipeStain_Panel Main;
         MaskRootViewer_ViewModel selectedViewer;
 
@@ -32,6 +32,7 @@ namespace Root_VEGA_P_Vision
             {
                 SetProperty(ref selectedIdx, value);
                 selectedViewer.SelectedIdx = value;
+                selectedViewer.SetMask();
             }
         }
         public List<int> MemNumList
@@ -71,27 +72,27 @@ namespace Root_VEGA_P_Vision
         }
         #endregion
 
-        public RecipeStain_ViewModel(RecipeMask_ViewModel recipeSetting)
+        public RecipeStain_ViewModel(RecipeMask_ViewModel recipeMask)
         {
-            this.recipeSetting = recipeSetting;
+            this.recipeMask = recipeMask;
             Main = new RecipeStain_Panel();
             Main.DataContext = this;
             RecipeCoverFront recipeCoverFront = GlobalObjects.Instance.Get<RecipeCoverFront>();
 
-            EIPcovertop_ImageViewerVM = new MaskRootViewer_ViewModel("EIP_Cover.Stain.Front", recipeSetting.MaskTools,
+            EIPcovertop_ImageViewerVM = new MaskRootViewer_ViewModel("EIP_Cover.Stain.Front", recipeMask.MaskTools,
                 recipeCoverFront, recipeCoverFront.GetItem<EUVOriginRecipe>().StainOriginInfo, recipeCoverFront.GetItem<EUVPodSurfaceParameter>().PodStain.MaskIndex);
 
             RecipeCoverBack recipeCoverBack = GlobalObjects.Instance.Get<RecipeCoverBack>();
 
-            EIPcoverbottom_ImageViewerVM = new MaskRootViewer_ViewModel("EIP_Cover.Stain.Back", recipeSetting.MaskTools,
+            EIPcoverbottom_ImageViewerVM = new MaskRootViewer_ViewModel("EIP_Cover.Stain.Back", recipeMask.MaskTools,
                 recipeCoverBack, recipeCoverBack.GetItem<EUVOriginRecipe>().StainOriginInfo, recipeCoverBack.GetItem<EUVPodSurfaceParameter>().PodStain.MaskIndex);
 
             RecipePlateFront recipePlateFront = GlobalObjects.Instance.Get<RecipePlateFront>();
-            EIPbasetop_ImageViewerVM = new MaskRootViewer_ViewModel("EIP_Plate.Stain.Front", recipeSetting.MaskTools,
+            EIPbasetop_ImageViewerVM = new MaskRootViewer_ViewModel("EIP_Plate.Stain.Front", recipeMask.MaskTools,
                 recipePlateFront, recipePlateFront.GetItem<EUVOriginRecipe>().StainOriginInfo, recipePlateFront.GetItem<EUVPodSurfaceParameter>().PodStain.MaskIndex);
 
             RecipePlateBack recipePlateBack = GlobalObjects.Instance.Get<RecipePlateBack>();
-            EIPbasebottom_ImageViewerVM = new MaskRootViewer_ViewModel("EIP_Plate.Stain.Back", recipeSetting.MaskTools,
+            EIPbasebottom_ImageViewerVM = new MaskRootViewer_ViewModel("EIP_Plate.Stain.Back", recipeMask.MaskTools,
                 recipePlateBack, recipePlateBack.GetItem<EUVOriginRecipe>().StainOriginInfo, recipePlateBack.GetItem<EUVPodSurfaceParameter>().PodStain.MaskIndex);
 
             selectedViewer = EIPCoverTop_ImageViewerVM;
@@ -147,7 +148,7 @@ namespace Root_VEGA_P_Vision
                         selectedViewer = EIPBaseBottom_ImageViewerVM;
                         break;
                 }
-                recipeSetting.SurfaceParameter = selectedViewer.Recipe.GetItem<EUVPodSurfaceParameter>();
+                recipeMask.SurfaceParameterBase = selectedViewer.Recipe.GetItem<EUVPodSurfaceParameter>().PodStain;
                 selectedViewer.SetMask();
             });
         }

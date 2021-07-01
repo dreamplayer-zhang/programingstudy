@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+             xmlns:PackIcon="http://metro.mahapps.com/winfx/xaml/iconpacks"
              mc:Ignorable="d" Background="{StaticResource MainBackGroundColor}" 
              d:DesignHeight="887" d:DesignWidth="1912">
 
@@ -104,7 +105,7 @@
                             <RowDefinition Height="2*"/>
 
                         </Grid.RowDefinitions>
-                        <Image Grid.Row="0" Source="/Root_VEGA_P_Vision;component/Control/Icon/Resource/system_task_127px.png" Margin="40"/>
+                            <Image Grid.Row="0" Source="/Root_VEGA_P_Vision;component/Control/Icon/Resource/Review_ico.JPG" Margin="20,30,20,10"/>
                         <TextBlock Text="Review" Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="35"/>
                     </Grid>
                     <Grid Grid.Row="1">

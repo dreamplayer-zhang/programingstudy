@@ -65,6 +65,7 @@ namespace RootTools_Vision
             originInfo.LoadMasterImage(RecipeFolderPath, fileName);
         }
     }
+    [Serializable]
     public class OriginInfo : ObservableObject
     {
         CPoint origin, originSize;

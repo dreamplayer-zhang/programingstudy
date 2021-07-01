@@ -118,7 +118,8 @@ namespace Root_WIND2.UI_User
 
                 if (info.ImplementedInterfaces.Contains(typeof(IMaskInspection)) == true)
                 {
-                    item.p_InspROI = item.p_cInspROI[((IMaskInspection)parameterBase).MaskIndex];
+                    if (item.p_cInspROI.Count != 0) 
+                        item.p_InspROI = item.p_cInspROI[((IMaskInspection)parameterBase).MaskIndex];
                 }
 
 

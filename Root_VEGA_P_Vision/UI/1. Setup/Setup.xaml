@@ -30,6 +30,8 @@
                         <ColumnDefinition/>
                         <ColumnDefinition/>
                         <ColumnDefinition/>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
                     </Grid.ColumnDefinitions>
                     <Grid Grid.Column="0">
                         <Button FontWeight="Bold" FontSize="13" 
@@ -38,7 +40,7 @@
                                     Command="{Binding p_CurrentPanel.DataContext.btnBack}"
                                     Background="{StaticResource MainThema}">
                             <StackPanel Orientation="Horizontal">
-                                <PackIcon:PackIconMaterial Kind="ArrowLeftBold"/>
+                                <PackIcon:PackIconMaterial Kind="ArrowLeftBold" Foreground="White"/>
                             </StackPanel>
                         </Button>
                     </Grid>
@@ -50,7 +52,7 @@
                                     Background="{StaticResource MainThema}">
                             <StackPanel Orientation="Horizontal">
                                 <!--<TextBlock Text="Home"/>-->
-                                <PackIcon:PackIconMaterial Kind="Home" />
+                                <PackIcon:PackIconMaterial Kind="Home" Foreground="White"/>
                             </StackPanel>
                         </Button>
                     </Grid>
@@ -62,7 +64,7 @@
                                     Command="{Binding btnNewRecipe}">
                             <Button.Content>
                                 <StackPanel Orientation="Horizontal">
-                                    <PackIcon:PackIconMaterial Kind="FolderPlus"/>
+                                    <PackIcon:PackIconMaterial Kind="FolderPlus" Foreground="White"/>
                                 </StackPanel>
                             </Button.Content>
                         </Button>
@@ -76,11 +78,22 @@
                             <StackPanel Orientation="Horizontal">
                                 <!--<TextBlock Text="Load"/>-->
                                 <!--<material:PackIcon Kind="FolderOpen"/>-->
-                                <PackIcon:PackIconMaterial Kind="FolderOpen" />
+                                <PackIcon:PackIconMaterial Kind="FolderOpen" Foreground="White"/>
                             </StackPanel>
                         </Button>
                     </Grid>
                     <Grid Grid.Column="4">
+                        <Button FontWeight="Bold" FontSize="13" 
+                                    BorderThickness="0,0,0,0"
+                                    ToolTip="Load All Recipe"
+                                    Background="{StaticResource MainThema}"
+                                    Command="{Binding btnLoadAllRecipe}">
+                            <StackPanel Orientation="Horizontal">
+                                <PackIcon:PackIconMaterial Kind="FolderMultiple" Foreground="White" />
+                            </StackPanel>
+                        </Button>
+                    </Grid>
+                    <Grid Grid.Column="5">
                         <Button FontWeight="Bold" FontSize="13" 
                                     ToolTip="Save Recipe"
                                     BorderThickness="0"
@@ -88,7 +101,20 @@
                                     Command="{Binding btnSaveRecipe}">
                             <Button.Content>
                                 <StackPanel Orientation="Horizontal">
-                                    <PackIcon:PackIconMaterial Kind="ContentSave" />
+                                    <PackIcon:PackIconMaterial Kind="ContentSave" Foreground="White"/>
+                                </StackPanel>
+                            </Button.Content>
+                        </Button>
+                    </Grid>
+                    <Grid Grid.Column="6">
+                        <Button FontWeight="Bold" FontSize="13" 
+                                    ToolTip="Save As"
+                                    BorderThickness="0"
+                                    Background="{StaticResource MainThema}"
+                                    Command="{Binding btnSaveAsRecipe}">
+                            <Button.Content>
+                                <StackPanel Orientation="Horizontal">
+                                    <PackIcon:PackIconMaterial Kind="ContentSaveEdit" Foreground="White"/>
                                 </StackPanel>
                             </Button.Content>
                         </Button>

@@ -22,5 +22,10 @@ namespace Root_VEGA_P_Vision
         {
             ImageROIBtn?.Invoke(obj, args);
         }
+        public static event EventHandler<LoadAllRecipeEventArgs> LoadedAllRecipe;
+        public static void OnLoadedAllRecipe(object obj, LoadAllRecipeEventArgs args)
+        {
+            LoadedAllRecipe?.Invoke(obj, args);
+        }
     }
 }

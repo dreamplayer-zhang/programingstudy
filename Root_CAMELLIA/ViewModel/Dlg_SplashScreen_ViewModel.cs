@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Media;
 
 namespace Root_CAMELLIA
 {
@@ -16,6 +17,16 @@ namespace Root_CAMELLIA
             set
             {
                 SetProperty(ref splashScreenText, value);
+            }
+        }
+
+        private Brush splashScreenBrush = Brushes.AliceBlue;
+        public Brush SplashScreenBrush
+        {
+            get { return splashScreenBrush; }
+            set
+            {
+                SetProperty(ref splashScreenBrush, value);
             }
         }
 

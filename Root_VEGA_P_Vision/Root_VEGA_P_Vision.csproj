@@ -272,6 +272,10 @@
     <Compile Include="UI\1. Setup\3. PodInfo\ZStackROI_Panel.xaml.cs">
       <DependentUpon>ZStackROI_Panel.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UI\1. Setup\4. Maintenance\PodInfoRecipe.xaml.cs">
+      <DependentUpon>PodInfoRecipe.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\1. Setup\4. Maintenance\PodInfoRecipe_ViewModel.cs" />
     <Compile Include="UI\1. Setup\UserControl\AlignFeatureInfo.xaml.cs">
       <DependentUpon>AlignFeatureInfo.xaml</DependentUpon>
     </Compile>
@@ -291,6 +295,9 @@
       <DependentUpon>InspectionOneItem.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\1. Setup\UserControl\InspectionOneItem_ViewModel.cs" />
+    <Compile Include="UI\1. Setup\UserControl\ListView_TwoTB.xaml.cs">
+      <DependentUpon>ListView_TwoTB.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI\1. Setup\UserControl\MaskTools_Panel.xaml.cs">
       <DependentUpon>MaskTools_Panel.xaml</DependentUpon>
     </Compile>
@@ -299,6 +306,10 @@
       <DependentUpon>OriginInfo_UI.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\1. Setup\UserControl\OriginInfo_ViewModel.cs" />
+    <Compile Include="UI\1. Setup\UserControl\RecipeItemListView.xaml.cs">
+      <DependentUpon>RecipeItemListView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\1. Setup\UserControl\RecipeItemListView_ViewModel.cs" />
     <Compile Include="UI\1. Setup\UserControl\ROIListItem.xaml.cs">
       <DependentUpon>ROIListItem.xaml</DependentUpon>
     </Compile>
@@ -316,6 +327,7 @@
     </Compile>
     <Compile Include="UI\1. Setup\3. PodInfo\ImageNROI_ViewModel.cs" />
     <Compile Include="UI\1. Setup\3. PodInfo\PodInfo_ViewModel.cs" />
+    <Compile Include="UI\Interfaces\IPage.cs" />
     <Compile Include="UI\Viewer_ViewModel\MaskRootViewer_ViewModel.cs" />
     <Compile Include="UI\1. Setup\2. RecipeManager\ViewModel\MaskViewer_ViewModel.cs" />
     <Compile Include="UI\Viewer_ViewModel\OriginImageViewer_ViewModel.cs" />
@@ -479,6 +491,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="UI\1. Setup\4. Maintenance\PodInfoRecipe.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="UI\1. Setup\UserControl\AlignFeatureInfo.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -499,11 +515,19 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="UI\1. Setup\UserControl\ListView_TwoTB.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="UI\1. Setup\UserControl\MaskTools_Panel.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UI\1. Setup\UserControl\OriginInfo_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\1. Setup\UserControl\RecipeItemListView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -726,6 +750,9 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\add_Plus.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Control\Icon\Resource\Review_ico.JPG" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

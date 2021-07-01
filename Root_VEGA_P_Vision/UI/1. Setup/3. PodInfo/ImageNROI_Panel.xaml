@@ -79,8 +79,11 @@
                       StrokeThickness="0.7"
                       VerticalAlignment="Top"
                       X2="1"/>
-                <TabControl Grid.Row="2" Style="{StaticResource ImageViewerTabControlStyle}">
+                <TabControl Grid.Row="2" Style="{StaticResource ImageViewerTabControlStyle}" BorderBrush="{StaticResource MainThema}" BorderThickness="1">
                     <TabItem Header="GrabMode" Height="30" Width="80" Style="{StaticResource InspectionTabItemStyle}">
+                        <ScrollViewer>
+                            <local:RecipeItemListView DataContext="{Binding SelectedItemList}"/>
+                        </ScrollViewer>
                     </TabItem>
                     <TabItem Header="Inspection" Height="30" Width="80" Style="{StaticResource InspectionTabItemStyle}">
                         <local:SurfaceParam_Tree DataContext="{Binding SurfaceParamTree}"/>

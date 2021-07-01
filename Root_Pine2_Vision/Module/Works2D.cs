@@ -137,14 +137,16 @@ namespace Root_Pine2_Vision.Module
         int m_iProtocol = 0; 
         public string SendRecipe(string sRecipe)
         {
+            if (m_bStartProcess == false) return "OK";
             Protocol protocol = new Protocol(m_iProtocol, eProtocol.RecipeOpen, sRecipe);
             m_qProtocol.Enqueue(protocol);
             return protocol.WaitReply(); 
         }
 
-        public string SendSnapDone(string sRecipe, int iSnap)
+        public string SendSnapDone(int iSnap)
         {
-            Protocol protocol = new Protocol(m_iProtocol, eProtocol.SnapDone, sRecipe, iSnap);
+            if (m_bStartProcess == false) return "OK";
+            Protocol protocol = new Protocol(m_iProtocol, eProtocol.SnapDone, m_vision.p_sRecipe, iSnap);
             m_qProtocol.Enqueue(protocol);
             return protocol.WaitReply();
         }

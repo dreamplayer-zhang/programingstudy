@@ -9,12 +9,7 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
-        <TabControl Grid.Column="1" Style="{StaticResource ImageViewerTabControlStyle}">
-            <i:Interaction.Triggers>
-                <i:EventTrigger EventName="SelectionChanged">
-                    <i:InvokeCommandAction Command="{Binding TabChanged}"/>
-                </i:EventTrigger>
-            </i:Interaction.Triggers>
+        <TabControl Grid.Column="1" Style="{StaticResource ImageViewerTabControlStyle}" SelectedIndex="{Binding SelectedTab}">
             <TabItem Header="Top"
                                  Width="120" Style="{StaticResource ImageViewerTabItemStyle}">
                     <Tools:RootViewer DataContext="{Binding Top_ViewerVM}"/>

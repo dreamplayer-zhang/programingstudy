@@ -16,6 +16,18 @@ namespace Root_VEGA_P_Vision
         MaskTools_ViewModel maskTools;
         MaskRootViewer_ViewModel selectedViewer;
         SurfaceParam_Tree_ViewModel surfaceParamTree;
+        RecipeItemListView_ViewModel selectedItemList;
+        RecipeItemBase recipeItem;
+        public RecipeItemBase RecipeItem
+        {
+            get => recipeItem;
+            set => SetProperty(ref recipeItem, value);
+        }
+        public RecipeItemListView_ViewModel SelectedItemList
+        {
+            get => selectedItemList;
+            set => SetProperty(ref selectedItemList, value);
+        }
         public SurfaceParam_Tree_ViewModel SurfaceParamTree
         {
             get => surfaceParamTree;
@@ -43,12 +55,43 @@ namespace Root_VEGA_P_Vision
                 recipe,recipe.GetItem<EUVOriginRecipe>().TDIOriginInfo,recipe.GetItem<EUVPodSurfaceParameter>().PodTDI.MaskIndex);
 
             surfaceParamTree = new SurfaceParam_Tree_ViewModel(GlobalObjects.Instance.Get<RecipeCoverFront>().GetItem<EUVPodSurfaceParameter>().PodStain);
+            selectedItemList = new RecipeItemListView_ViewModel();
+            selectedItemList.Init(recipe.GetItem<LowResRecipe>(), true);
+            selectedItemList.RecipeItemChanged += SelectedItemList_RecipeItemChanged;
             VegaPEventManager.ImageROIBtn += VegaPEventManager_ImageROIBtn;
+        }
+
+        private void SelectedItemList_RecipeItemChanged(RecipeItem item)
+        {
+            RecipeItemBase  _item;
+
+            _item = (LowResRecipe)selectedItemList.RecipeObj;
+
+            switch (podInfo.SelectedItem)
+            {
+                case "Particle":
+                    _item = (LowResRecipe)selectedItemList.RecipeObj;
+                    break;
+                case "Stain":
+                    _item = (StainRecipe)selectedItemList.RecipeObj;
+                    break;
+                case "HighRes":
+                    _item = (HighResRecipe)selectedItemList.RecipeObj;
+                    break;
+                case "Side":
+                    _item = (SideRecipe)selectedItemList.RecipeObj;
+                    break;
+            }
+
+            recipeItem = _item;
         }
 
         private void VegaPEventManager_ImageROIBtn(object sender, ImageROIEventArgs e)
         {
-            selectedViewer.SetImageData(GlobalObjects.Instance.GetNamed<ImageData>(e.memstr));
+            //selectedViewer.SetImageData(GlobalObjects.Instance.GetNamed<ImageData>(e.memstr));
+            selectedViewer.Recipe = e.recipe;
+            selectedItemList.Init(e.recipeItem, true);
+            surfaceParamTree.SurfaceParameter = e.parameterBase;
         }
 
         public ICommand btnSaveMasterImage

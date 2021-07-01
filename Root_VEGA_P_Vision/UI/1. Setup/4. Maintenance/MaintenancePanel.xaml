@@ -18,12 +18,15 @@
                     <RadioButton Content="Engineer" IsChecked="True"
                             Command="{Binding btnHandler}"
                             Style="{StaticResource SetupPannelRadioBtn}"/>
-                    <RadioButton Content="ToolBox"
+                    <RadioButton Content="Pod Info"
+                            Command="{Binding btnPodInfo}"
+                            Style="{StaticResource SetupPannelRadioBtn}"/>
+                    <!--<RadioButton Content="ToolBox"
                             Command="{Binding btnToolBox}"
                             Style="{StaticResource SetupPannelRadioBtn}"/>
                     <RadioButton Content="ViewerTest"
                             Command="{Binding btnViewerTest}"
-                            Style="{StaticResource SetupPannelRadioBtn}"/>
+                            Style="{StaticResource SetupPannelRadioBtn}"/>-->
                 </StackPanel>
                 <RadioButton Content="Back"
                         Command="{Binding btnBack}"
@@ -31,7 +34,10 @@
                         VerticalAlignment="Bottom"/>
             </Grid>
         </Border>
-        <Grid Grid.Column="1" x:Name="SubPanel"/>
+        <!--<Grid Grid.Column="1" x:Name="SubPanel"/>-->
+        <Grid Grid.Column="1">
+            <ContentControl Content="{Binding pSubPanel}"/>
+        </Grid>
 
 
     </Grid>

@@ -339,7 +339,7 @@ namespace RootTools.Gem.XGem
                 case -10029: return "Exceed Maximum Item Size";     // exceed maximum item size.
                 case -10030: return "Fail to Create Mutex";         // Fail to create mutex.
                 case -10031: return "Invalid SECS2 Message";        // invalid SECS2 message. SECS2 message format error.
-                case -10032: return "Fail to Delete MSG List";      // Fail to delete msg list
+                case -10032: return "Fail to Delete MSG List";      // Fail to delete msg listQ
                 case -10033: return "Create Event Handle Error";    // Fail to create API’s event handle.
                 case -10034: return "Fail to Start Process";        // Fail to start XGem300Pro process.
                 case -30001: return "Fail to Read Rtartup Info";    // Fail to read startup information

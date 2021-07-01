@@ -16,7 +16,7 @@ namespace Root_VEGA_P_Vision
 {
     public class Recipe1um_ViewModel : ObservableObject
     {
-        public RecipeMask_ViewModel recipeSetting;
+        public RecipeMask_ViewModel recipeMask;
         public Recipe1um_Panel Main;
 
         MaskRootViewer_ViewModel EIPcoverBottom_TDI, EIPbasePlateTop_TDI, EIPcoverBottom_Stacking, basePlateROI1, basePlateROI2, selectedViewer;
@@ -29,6 +29,12 @@ namespace Root_VEGA_P_Vision
         }
 
         #region Property
+        bool selectedViewerVisibility;
+        public bool SelectedViewerVisibility
+        {
+            get => selectedViewerVisibility;
+            set => SetProperty(ref selectedViewerVisibility,value);
+        }
         private ObservableCollection<UIElement> ROIlist = new ObservableCollection<UIElement>();
         public ObservableCollection<UIElement> ROIList
         {
@@ -51,6 +57,8 @@ namespace Root_VEGA_P_Vision
                     selectedViewer = EIPCoverBottom_TDI;
                 else
                     selectedViewer = EIPBasePlateTop_TDI;
+
+                recipeMask.SurfaceParameterBase = selectedViewer.Recipe.GetItem<EUVPodSurfaceParameter>().PodStacking;
 
                 selectedViewer.SetMask();
             }
@@ -86,26 +94,27 @@ namespace Root_VEGA_P_Vision
             set => SetProperty(ref basePlateROI2, value);
         }
         #endregion
-        public Recipe1um_ViewModel(RecipeMask_ViewModel recipeSetting)
+        public Recipe1um_ViewModel(RecipeMask_ViewModel recipeMask)
         {
-            this.recipeSetting = recipeSetting;
+            this.recipeMask = recipeMask;
             Main = new Recipe1um_Panel();
             Main.DataContext = this;
+            SelectedViewerVisibility = false;
             RecipeCoverBack recipeCoverBack = GlobalObjects.Instance.Get<RecipeCoverBack>();
-            EIPcoverBottom_TDI = new MaskRootViewer_ViewModel("EIP_Cover.Main.Back", recipeSetting.MaskTools,
+            EIPcoverBottom_TDI = new MaskRootViewer_ViewModel("EIP_Cover.Main.Back", recipeMask.MaskTools,
                 recipeCoverBack, recipeCoverBack.GetItem<EUVOriginRecipe>().TDIOriginInfo,recipeCoverBack.GetItem<EUVPodSurfaceParameter>().PodTDI.MaskIndex);
 
             RecipePlateFront recipePlateFront = GlobalObjects.Instance.Get<RecipePlateFront>();
-            EIPbasePlateTop_TDI = new MaskRootViewer_ViewModel("EIP_Plate.Main.Front", recipeSetting.MaskTools,
+            EIPbasePlateTop_TDI = new MaskRootViewer_ViewModel("EIP_Plate.Main.Front", recipeMask.MaskTools,
                 recipePlateFront, recipePlateFront.GetItem<EUVOriginRecipe>().TDIOriginInfo,recipePlateFront.GetItem<EUVPodSurfaceParameter>().PodTDI.MaskIndex);
 
-            EIPcoverBottom_Stacking = new MaskRootViewer_ViewModel("EIP_Cover.Stack.Back", recipeSetting.MaskTools,
+            EIPcoverBottom_Stacking = new MaskRootViewer_ViewModel("EIP_Cover.Stack.Back", recipeMask.MaskTools,
                 recipeCoverBack,recipeCoverBack.GetItem<EUVOriginRecipe>().TDIOriginInfo,recipeCoverBack.GetItem<EUVPodSurfaceParameter>().PodStacking.MaskIndex);
 
-            basePlateROI1 = new MaskRootViewer_ViewModel("EIP_Cover.Stack.Back", recipeSetting.MaskTools,
+            basePlateROI1 = new MaskRootViewer_ViewModel("EIP_Cover.Stack.Back", recipeMask.MaskTools,
                 recipeCoverBack, recipeCoverBack.GetItem<EUVOriginRecipe>().TDIOriginInfo, recipeCoverBack.GetItem<EUVPodSurfaceParameter>().PodStacking.MaskIndex);
 
-            basePlateROI2 = new MaskRootViewer_ViewModel("EIP_Plate.Stack.Front", recipeSetting.MaskTools,
+            basePlateROI2 = new MaskRootViewer_ViewModel("EIP_Plate.Stack.Front", recipeMask.MaskTools,
                 recipePlateFront, recipePlateFront.GetItem<EUVOriginRecipe>().TDIOriginInfo, recipePlateFront.GetItem<EUVPodSurfaceParameter>().PodTDI.MaskIndex);
 
             SelectedViewer = EIPCoverBottom_TDI;
@@ -152,7 +161,7 @@ namespace Root_VEGA_P_Vision
               {
                   ROIListItem item = new ROIListItem(curROIListItem);
                   ROIList.Add(item);
-                  recipeSetting.Main.btnAdd.IsChecked = false;
+                  recipeMask.Main.btnAdd.IsChecked = false;
               });
         }
         public ICommand btnDelete
@@ -162,7 +171,7 @@ namespace Root_VEGA_P_Vision
                 ROIList.RemoveAt(ROIListIdx);
                 if (ROIList.Count == 0)
                     ROIListIdx = -1;
-                recipeSetting.Main.btnDelete.IsChecked = false;
+                recipeMask.Main.btnDelete.IsChecked = false;
 
             });
         }

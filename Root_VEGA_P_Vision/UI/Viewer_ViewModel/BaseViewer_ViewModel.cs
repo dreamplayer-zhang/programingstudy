@@ -116,6 +116,9 @@ namespace Root_VEGA_P_Vision
                     System.Drawing.Imaging.PixelFormat format = System.Drawing.Imaging.PixelFormat.Format8bppIndexed;
                     format = System.Drawing.Imaging.PixelFormat.Format8bppIndexed;
 
+                    if(p_CanvasWidth>0)
+                        m_CanvasWidth = m_CanvasWidth - m_CanvasWidth % 4;
+
                     int stride = (int)Math.Ceiling((double)p_CanvasWidth / 4) * 4;
                     System.Drawing.Bitmap bmp = new System.Drawing.Bitmap(p_CanvasWidth, p_CanvasHeight, format);
                     ColorPalette palette = bmp.Palette;

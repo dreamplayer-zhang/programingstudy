@@ -68,8 +68,9 @@ namespace RootTools_Vision
             return true;
         }
     }
-
+    [Serializable]
     public class EUVPodSurfaceRecipeBase:ObservableObject
     {
+        public EUVPodSurfaceRecipeBase() { }
     }
 }
