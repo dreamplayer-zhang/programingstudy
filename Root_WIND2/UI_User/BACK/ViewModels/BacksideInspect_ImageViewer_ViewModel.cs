@@ -227,8 +227,10 @@ namespace Root_WIND2.UI_User
                 {
                     using (var sr = new StreamReader(Constants.FilePath.BacksideCenterPointFilePath))
                     {
-                        XmlSerializer xs = new XmlSerializer(typeof(CPoint));
-                        CPoint centerPt = (CPoint)xs.Deserialize(sr);
+                        XmlSerializer xs = new XmlSerializer(typeof(BacksideCircleData));
+
+                        BacksideCircleData data = (BacksideCircleData)xs.Deserialize(sr);
+                        CPoint centerPt = data.CenterPoint;
 
                         SetSearchedCenter(centerPt);
                     }
@@ -487,6 +489,41 @@ namespace Root_WIND2.UI_User
             DrawExclusivePolygon();
 
             isRedrawing = false;
+        }
+
+        public void UpdateImageViewer()
+        {
+            foreach (TRect rt in rectList)
+            {
+                if (p_DrawElement.Contains(rt.UIElement) == true)
+                {
+                    Rectangle rectangle = rt.UIElement as Rectangle;
+                    CPoint canvasLeftTop = GetCanvasPoint(new CPoint(rt.MemoryRect.Left, rt.MemoryRect.Top));
+                    CPoint canvasRightBottom = GetCanvasPoint(new CPoint(rt.MemoryRect.Right, rt.MemoryRect.Bottom));
+
+                    rectangle.Width = canvasRightBottom.X - canvasLeftTop.X;
+                    rectangle.Height = canvasRightBottom.Y - canvasLeftTop.Y;
+
+                    Canvas.SetLeft(rectangle, canvasLeftTop.X);
+                    Canvas.SetTop(rectangle, canvasLeftTop.Y);
+                }
+            }
+
+            //foreach (TRect rt in boxList)
+            //{
+            //    if (p_UIElement.Contains(rt.UIElement) == true)
+            //    {
+            //        Rectangle rectangle = rt.UIElement as Rectangle;
+            //        CPoint canvasLeftTop = GetCanvasPoint(new CPoint(rt.MemoryRect.Left, rt.MemoryRect.Top));
+            //        CPoint canvasRightBottom = GetCanvasPoint(new CPoint(rt.MemoryRect.Right, rt.MemoryRect.Bottom));
+
+            //        rectangle.Width = Math.Abs(canvasRightBottom.X - canvasLeftTop.X);
+            //        rectangle.Height = Math.Abs(canvasRightBottom.Y - canvasLeftTop.Y);
+
+            //        Canvas.SetLeft(rectangle, canvasLeftTop.X);
+            //        Canvas.SetTop(rectangle, canvasLeftTop.Y);
+            //    }
+            //}
         }
 
         public void RemoveObjectsByTag(string tag)

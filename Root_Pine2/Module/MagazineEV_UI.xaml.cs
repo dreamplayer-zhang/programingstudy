@@ -46,8 +46,8 @@ namespace Root_Pine2.Module
             }
             else
             {
-                gridUp.Background = m_magazineEV.m_elevator.m_bProduct[InfoStrip.eMagazinePos.Up] ? Brushes.AliceBlue : Brushes.Beige;
-                gridDown.Background = m_magazineEV.m_elevator.m_bProduct[InfoStrip.eMagazinePos.Down] ? Brushes.AliceBlue : Brushes.Beige;
+                gridUp.Background = m_magazineEV.m_elevator.m_bProduct[InfoStrip.eMagazinePos.Up] ? Brushes.LightBlue : Brushes.Beige;
+                gridDown.Background = m_magazineEV.m_elevator.m_bProduct[InfoStrip.eMagazinePos.Down] ? Brushes.LightBlue : Brushes.Beige;
             }
         }
 

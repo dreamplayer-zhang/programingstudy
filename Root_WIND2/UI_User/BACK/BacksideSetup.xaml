@@ -42,6 +42,8 @@
 
                     <TextBlock Text="Center Point" Margin="12,0,4,0" VerticalAlignment="Center" HorizontalAlignment="Center"/>
                     <CheckBox Content="Circle" IsChecked="{Binding IsROIChecked, Mode=TwoWay}" Command="{Binding btnROICommand}" Style="{StaticResource imageViewer_toolbar_checkbox}"/>
+                    <TextBox Text="{Binding InspectionCircleDiameter, UpdateSourceTrigger=PropertyChanged}" KeyDown="TextBox_KeyDown" Width="60" Height="24" Margin="4,0,0,0" TextAlignment="Center"/>
+                    <TextBlock Text="[mm]" VerticalAlignment="Center" TextAlignment="Center" Width="30" Height="auto" Margin="4,0,0,0"/>
                     <Button Content="Detect" Command="{Binding btnCircleDetectCommand}" Style="{StaticResource imageViewer_toolbar_button}"/>
                     <Button Content="Save" Command="{Binding btnCircleSaveCommand}" Style="{StaticResource imageViewer_toolbar_button}"/>
                     <Button Content="Clear" Command="{Binding btnCircleClearCommand}" Style="{StaticResource imageViewer_toolbar_button}"/>

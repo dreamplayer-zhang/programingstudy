@@ -208,7 +208,14 @@ namespace Root_WIND2.UI_User
         public void LoadRecipe()
         {
             RecipeType_WaferMap waferMap = GlobalObjects.Instance.Get<RecipeBack>().WaferMap;
-            this.MapViewerVM.CreateMap(waferMap.MapSizeX, waferMap.MapSizeY, waferMap.Data);
+            if (waferMap.UseExtraMap)
+            {
+                this.MapViewerVM.CreateMap(waferMap.ExtraMapSizeX, waferMap.ExtraMapSizeY, waferMap.ExtraMapdata);
+            }
+            else
+            {
+                this.MapViewerVM.CreateMap(waferMap.MapSizeX, waferMap.MapSizeY, waferMap.Data);
+            }
         }
 
         private void ROIDone_Callback(CPoint centerPt, int radius)

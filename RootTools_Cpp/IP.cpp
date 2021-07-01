@@ -112,9 +112,9 @@ void IP::Threshold(BYTE* pSrc, BYTE* pDst, int nW, int nH, bool bDark, int thres
 {
    
     Mat imgSrc = Mat(nH, nW, CV_8UC1, pSrc);
-    imgSrc = imgSrc.reshape(0, nW);
+    //imgSrc = imgSrc.reshape(0, nW); // ...?
     Mat imgDst = Mat(nH, nW, CV_8UC1, pDst);
-    imgDst = imgDst.reshape(0, nW);
+    //imgDst = imgDst.reshape(0, nW);
 
 
     if (bDark)
@@ -152,22 +152,22 @@ float IP::Average(BYTE* pSrc, int nW, int nH)
 }
 float IP::Average(BYTE* pSrc, int nMemW, int nMemH, Point ptLT, Point ptRB)
 {
-    uint64 roiW = (ptRB.x - (int64)ptLT.x);
-    uint64 roiH = (ptRB.y - (int64)ptLT.y);
+    uint64 nROIW = (ptRB.x - (int64)ptLT.x);
+    uint64 nROIH = (ptRB.y - (int64)ptLT.y);
 
-    PBYTE imgROI = new BYTE[roiW * roiH];
+    BYTE* pImgHeader = NULL;
+    uint64 nSum = 0;
     for (int64 r = ptLT.y; r < ptRB.y; r++)
     {
-        BYTE* pImg = &pSrc[r * nMemW + ptLT.x];
-        memcpy(&imgROI[roiW * (r - (int64)ptLT.y)], pImg, roiW);
+        pImgHeader = &pSrc[r * nMemW + ptLT.x];
+        for (int64 c = 0; c < nROIW; c++, pImgHeader++)
+        {
+            nSum += *pImgHeader;
+        }
     }
-
-    Mat imgSrc = Mat(roiH, roiW, CV_8UC1, imgROI);
-
-    delete[] imgROI;
-
-    return (cv::sum(cv::sum(imgSrc)))[0] / (roiW * roiH); // mean 함수의 return Type = Scalar
-
+    
+    delete pImgHeader;
+    return nSum / (nROIW * nROIH);
 }
 
 void IP::Labeling(BYTE* pSrc, BYTE* pBin, std::vector<LabeledData>& vtOutLabeled, int nW, int nH, bool bDark)
@@ -208,6 +208,12 @@ void IP::Labeling(BYTE* pSrc, BYTE* pBin, std::vector<LabeledData>& vtOutLabeled
         data.value = (bDark) ? min : max;
         vtOutLabeled.push_back(data);
     }
+
+    hierarchy.clear(); // vector의 size를 0으로 줄임
+    std::vector< Vec4i>(hierarchy).swap(hierarchy); // vector의 capacity를 0으로 줄임
+    
+    contours.clear(); // vector의 size를 0으로 줄임
+    std::vector<std::vector<Point>>(contours).swap(contours); // vector의 capacity를 0으로 줄임
 }
 // Surface 전용 Subpixel Inspection
 void IP::Labeling_SubPix(BYTE* pSrc, BYTE* pBin, std::vector<LabeledData>& vtOutLabeled, int nW, int nH, bool bDark, int thresh, float Scale)
@@ -283,6 +289,18 @@ void IP::Labeling_SubPix(BYTE* pSrc, BYTE* pBin, std::vector<LabeledData>& vtOut
         data.area = round((size / Scale + abs(128 - data.value) / 255) * 100) / 100.0;
 
         vtOutLabeled.push_back(data);
+
+        hierarchy.clear(); // vector의 size를 0으로 줄임
+        std::vector< Vec4i>(hierarchy).swap(hierarchy); // vector의 capacity를 0으로 줄임
+
+        contours.clear(); // vector의 size를 0으로 줄임
+        std::vector<std::vector<Point>>(contours).swap(contours); // vector의 capacity를 0으로 줄임
+
+        Up_hierarchy.clear(); // vector의 size를 0으로 줄임
+        std::vector< Vec4i>(Up_hierarchy).swap(Up_hierarchy); // vector의 capacity를 0으로 줄임
+
+        Up_contours.clear(); // vector의 size를 0으로 줄임
+        std::vector<std::vector<Point>>(Up_contours).swap(Up_contours); // vector의 capacity를 0으로 줄임
     }
 }
 
@@ -346,6 +364,53 @@ float IP::TemplateMatching(BYTE* pSrc, BYTE* pTemp, Point& outMatchPoint, int nM
 
     return (chMax * 100 > 1) ? chMax * 100 : 1; // Matching Score
 }
+// Trigger가 커질 경우 OpenCV 함수는 점점 느려짐... First Chip Trigger 등을 사용하려면 
+//static float TemplateMatching_IPP(BYTE* pSrc, BYTE* pTemp, Point& outMatchPoint, int nSrcW, int nSrcH, int nTempW, int nTempH, Point ptLT, Point ptRB, int method, int nByteCnt, int nChIdx);
+//{
+//    IppiSize SizeFeature = { rtRef.width, rtRef.height };
+//    IppiSize SizeSrc = { rtRef.width + nX2 - nX1, rtRef.height + nY2 - nY1 };
+//    int nFeatureStep = SizeFeature.width * sizeof(Ipp8u);
+//    int nFeatureSize = SizeFeature.width * SizeFeature.height;
+//    int nSrcStep = SizeSrc.width * sizeof(Ipp8u);
+//    int nSrcSize = SizeSrc.width * SizeSrc.height;
+//
+//    int dstStep = (SizeSrc.width) * sizeof(Ipp32f);
+//    Ipp8u* pFeature = new Ipp8u[nFeatureSize];
+//    Ipp8u* pSrc = new Ipp8u[nSrcSize];
+//    Ipp32f* pDst = NULL;
+//
+//    for (int i = 0; i < SizeFeature.height; i++)
+//        memcpy(&pFeature[i * SizeFeature.width], ppRefMem[i], SizeFeature.width);
+//
+//    for (int i = 0; i < SizeSrc.height; i++)
+//    {
+//        if (i + ptStart.y + nY1 < 0 || ptStart.x + nX1 < 0)
+//        {
+//            if (ptStart.y + nY1 < 0)	ptStart.y += 1;
+//            if (ptStart.x + nX1 < 0)	ptStart.x += 1;
+//        }
+//
+//        memcpy(&pSrc[i * SizeSrc.width], &ppMem[i + ptStart.y + nY1][ptStart.x + nX1], SizeSrc.width);
+//    }
+//    Ipp32f fMax;
+//    int nMaxX = 0;
+//    int nMaxY = 0;
+//    cv::Point ptResult;
+//
+//    pDst = new Ipp32f[nSrcSize];
+//
+//    ippiCrossCorrSame_NormLevel_8u32f_C1R(pSrc, nSrcStep, SizeSrc, pFeature, nFeatureStep, SizeFeature, pDst, dstStep);
+//    ippiMaxIndx_32f_C1R(pDst, dstStep, SizeSrc, &fMax, &nMaxX, &nMaxY);
+//    ptResult = cv::Point(nMaxX + nX1 - rtRef.x, nMaxY + nY1 - rtRef.y);
+//
+//    int nScore = (int)(fMax * 100);
+//    if (pDst != NULL)
+//        delete[] pDst;
+//    delete[] pFeature;
+//    delete[] pSrc;
+//
+//    return ptResult;
+//}
 
 // D2D 
 void IP::SubtractAbs(BYTE* pSrc1, BYTE* pSrc2, BYTE* pDst, int nW, int nH)
@@ -727,6 +792,7 @@ void IP::CreateGoldenImage_Avg(BYTE* pSrc, BYTE* pDst, int imgNum, int nMemW, in
 
         pResult += nChipW;
     }
+    delete[] pChipLT;
     //Mat imgDst = Mat(nChipH, nChipW, CV_8UC1, pDst); // Golden Image Debug
 }
 void IP::CreateGoldenImage_Median(BYTE* pSrc, BYTE* pDst, int imgNum, int nMemW, int nMemH, std::vector<Point> vtROILT, int nChipW, int nChipH)
@@ -792,7 +858,7 @@ void IP::CreateGoldenImage_Median(BYTE* pSrc, BYTE* pDst, int imgNum, int nMemW,
 
                     Ref_Min = _mm256_min_epu8(Ref, Ref_Min);
                     Ref_Max = _mm256_max_epu8(Ref, Ref_Max);
-
+ 
                     Ref_High = _mm256_unpackhi_epi8(Ref, ZeroData);
                     Ref_Low = _mm256_unpacklo_epi8(Ref, ZeroData);
 
@@ -1127,6 +1193,7 @@ void IP::CreateGoldenImage_Avg(BYTE** pSrc, BYTE* pDst, int imgNum, int nW, int 
 
     imgAccumlate.convertTo(imgDst, CV_8UC1, 1. / imgNum);
 }
+
 void IP::CreateGoldenImage_MedianAvg(BYTE** pSrc, BYTE* pDst, int imgNum, int nW, int nH)
 {
     Mat imgAccumlate = Mat::zeros(nH, nW, CV_16UC1);
@@ -1452,7 +1519,7 @@ void IP::AverageBlur(BYTE* pSrc, BYTE* pDst, int nW, int nH)
     Mat imgSrc = Mat(nH, nW, CV_8UC1, pSrc);
     Mat imgDst = Mat(nH, nW, CV_8UC1, pDst);
 
-    cv::boxFilter(imgSrc, imgDst, CV_8UC1, cv::Size(3,3), cv::Point(-1,-1), false, cv::BorderTypes::BORDER_DEFAULT);
+    cv::boxFilter(imgSrc, imgDst, CV_8UC1, cv::Size(3,3), cv::Point(-1,-1), true, cv::BorderTypes::BORDER_DEFAULT);
 }
 void IP::MedianBlur(BYTE* pSrc, BYTE* pDst, int nW, int nH, int FilterSz)
 {
@@ -2011,20 +2078,26 @@ void IP::SplitColorChannel(BYTE* pSrc, BYTE* pOutImg, int nW, int nH, Point ptLT
         pHeader += (nByteCnt * nPitch * nDownSample);
     }
 
-    Mat imgSrc = Mat((ptRB.y - ptLT.y) / nDownSample, ((ptRB.x - ptLT.x) / nDownSample) / 3, CV_8UC1, pOutImg); // Debug
+    //Mat imgSrc = Mat((ptRB.y - ptLT.y) / nDownSample, ((ptRB.x - ptLT.x) / nDownSample) / 3, CV_8UC1, pOutImg); // Debug
 }
 void IP::SubSampling(BYTE* pSrc, BYTE* pOutImg, int nW, int nH, Point ptLT, Point ptRB, int nDownSample)
 {
     uint64_t nIdx = 0;
     uint64_t nWidth = (ptRB.x - ptLT.x);
     nWidth -= nWidth % nDownSample;
+    uint64_t nHeight = (ptRB.y - ptLT.y);
+    nHeight -= nHeight % nDownSample;
 
-    byte* pHeader = pSrc;
-    byte* pDownSample = pOutImg;
+    //byte* pHeader = pSrc;
+    //byte* pDownSample = pOutImg;
 
-    for (uint64_t j = ptLT.y; j < ptRB.y; j += nDownSample)
-        for (uint64_t i = ptLT.x; i < ptLT.x + nWidth; i += nDownSample)
-            pOutImg[nIdx++] = pSrc[j * nWidth + i];
+    for (uint64_t j = 0; j < nHeight; j += nDownSample)
+    {
+        for (uint64_t i = 0; i < nWidth; i += nDownSample)
+        {
+            pOutImg[nIdx++] = pSrc[(j + ptLT.y) * nW + (i + ptLT.x)];
+        }
+    }
 
     //Mat imgSrc = Mat((ptRB.y - ptLT.y) / nDownSample, (ptRB.x - ptLT.x) / nDownSample, CV_8UC1, pOutImg); // Debug
 }
@@ -2102,7 +2175,7 @@ void IP::SobelEdgeDetection(BYTE* pSrc, BYTE* pDst, int nW, int nH, int nDerivat
 {
     Mat imgSrc = Mat(nH, nW, CV_8UC1, pSrc);
     Mat imgSobel = Mat();
-    Mat imgAbsGradX = Mat();
+    Mat imgAbsGradX = Mat(nH, nW, CV_8UC1, pDst);
 
     /*int nDerivativeX = 1;
     int nDerivativeY = 0;
@@ -2113,7 +2186,7 @@ void IP::SobelEdgeDetection(BYTE* pSrc, BYTE* pDst, int nW, int nH, int nDerivat
     Sobel(imgSrc, imgSobel, CV_8UC1, nDerivativeX, nDerivativeY, nKernelSize, nScale, nDelta);
     convertScaleAbs(imgSobel, imgAbsGradX);
 
-    pDst = imgAbsGradX.ptr<BYTE>();
+    //pDst = imgAbsGradX.ptr<BYTE>();
 }
 
 void IP::Histogram(BYTE* pSrc, BYTE* pDst, int nW, int nH, int channels, int dims, int histSize, float* ranges)

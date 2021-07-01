@@ -49,8 +49,8 @@
                 <ColumnDefinition/>
                 <ColumnDefinition/>
             </Grid.ColumnDefinitions>
-            <TextBlock HorizontalAlignment="Center" Grid.Column="0" Text="RPM" Foreground="Black"/>
-            <TextBlock HorizontalAlignment="Center" Grid.Column="1" Text="{Binding p_nRPM}" Foreground="Black"/>
+            <TextBlock HorizontalAlignment="Center" Grid.Column="0" FontSize="12" Text="RPM" Foreground="Black"/>
+            <TextBlock HorizontalAlignment="Center" Grid.Column="1" FontSize="12" Text="{Binding p_nRPM}" Foreground="Black"/>
         </Grid>
     </Grid>
 </UserControl>

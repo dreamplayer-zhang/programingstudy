@@ -48,9 +48,9 @@ namespace Root_WindII_Option.Engineer
         void InitModule()
         {
             p_moduleList = new ModuleList(m_engineer);
-            m_visionEdge = new Vision_Edgeside("EdgeVision", m_engineer, ModuleBase.eRemote.Server);
+            m_visionEdge = new Vision_Edgeside("EdgeSide Vision", m_engineer, ModuleBase.eRemote.Server);
             InitModule(m_visionEdge);
-            m_visionBack = new Vision_Backside("BackVision", m_engineer, ModuleBase.eRemote.Server);
+            m_visionBack = new Vision_Backside("BackSide Vision", m_engineer, ModuleBase.eRemote.Server);
             InitModule(m_visionBack);
 
             //InitBackside(ModuleBase.eRemote.Server); 

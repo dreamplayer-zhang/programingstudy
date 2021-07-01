@@ -699,12 +699,14 @@ namespace RootTools.Control
         {
             m_trigger.Set(fPos0, fPos1, dPos, bCmd, -1);
             RunTrigger(true, m_trigger);
+            p_log.Info("SetTrigger : " + dPos.ToString() + ", " + fPos0.ToString() + " ~ " + fPos1.ToString()); 
         }
 
         public void SetTrigger(double fPos0, double fPos1, double dPos, double dUptime, bool bCmd)
         {
             m_trigger.Set(fPos0, fPos1, dPos, bCmd, dUptime);
             RunTrigger(true, m_trigger);
+            p_log.Info("SetTrigger : " + dPos.ToString() + ", " + fPos0.ToString() + " ~ " + fPos1.ToString());
         }
 
         public virtual void RunTrigger(bool bOn, Trigger trigger = null) { }

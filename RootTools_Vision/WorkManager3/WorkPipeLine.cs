@@ -9,8 +9,13 @@ using System.Windows;
 
 namespace RootTools_Vision.WorkManager3
 {
+
+    public delegate void WorkPipeLineDoneHandler();
+
     public class WorkPipeLine
     {
+        public event WorkPipeLineDoneHandler WorkPipeLineDone;
+
         List<WorkPipe> pipes;
 
         WorkPipe pipeSnap;
@@ -55,11 +60,29 @@ namespace RootTools_Vision.WorkManager3
             pipeInspection.SetNextPipe(pipeDefectProcess);
             pipeDefectProcess.SetNextPipe(pipeDefectProcessAll);
 
+            pipeSnap.WorkPipeDone += WorkPipeLineDone_Callback;
+            pipeAlignment.WorkPipeDone += WorkPipeLineDone_Callback;
+            pipeInspection.WorkPipeDone += WorkPipeLineDone_Callback;
+            pipeDefectProcess.WorkPipeDone += WorkPipeLineDone_Callback;
+            pipeDefectProcessAll.WorkPipeDone += WorkPipeLineDone_Callback;
+
             pipes.Add(pipeSnap);
             pipes.Add(pipeAlignment);
             pipes.Add(pipeInspection);
             pipes.Add(pipeDefectProcess);
             pipes.Add(pipeDefectProcessAll);
+        }
+
+
+        private void  WorkPipeLineDone_Callback()
+        {
+            if(CheckPipesReady() == true)
+            {
+                if(this.WorkPipeLineDone != null)
+                {
+                    WorkPipeLineDone();
+                }
+            }
         }
 
         private bool CheckPipesReady()
@@ -101,7 +124,7 @@ namespace RootTools_Vision.WorkManager3
             bool result = true;
             foreach (WorkPipe pipe in pipes)
             {
-                if(pipe.Start(cts.Token) == false)
+                if(pipe.Start(cts) == false)
                 {
                     result = false;
                 }
@@ -121,11 +144,13 @@ namespace RootTools_Vision.WorkManager3
             bool result = true;
             if (cts != null)
             {
-                cts.Cancel();
+                //cts.Cancel();
                 
                 foreach (WorkPipe pipe in pipes)
                 {
                     if(!pipe.TryStop()) result = false;
+
+                    //pipe.Abort();
                 }
             }
 
