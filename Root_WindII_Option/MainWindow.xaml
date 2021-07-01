@@ -35,119 +35,133 @@
         <Border Grid.Row="0"
                 Grid.Column="1"
                 Background="{StaticResource main_background}">
-            <StackPanel Orientation="Horizontal">
-                <Menu Foreground="White"
+            <Grid>
+                <StackPanel Orientation="Horizontal">
+                    <Menu Foreground="White"
                       Background="{StaticResource main_background}">
-                    <MenuItem >
-                        <MenuItem.Header>
-                            <Grid Width="70"
+                        <MenuItem >
+                            <MenuItem.Header>
+                                <Grid Width="70"
                                   Height="25">
-                                <TextBlock Text="File"
+                                    <TextBlock Text="File"
                                            FontSize="13"
                                            FontWeight="Bold"
                                            VerticalAlignment="Center"
                                            HorizontalAlignment="Center" />
-                            </Grid>
-                        </MenuItem.Header>
-                        <MenuItem Header="New" Foreground="Black"/>
-                        <MenuItem Header="Load" Foreground="Black"/>
-                        <MenuItem Header="Save"  Foreground="Black"/>
-                        <MenuItem Header="Save As"  Foreground="Black"/>
-                    </MenuItem>
-                    <MenuItem>
-                        <MenuItem.Header>
-                            <Grid Width="70"
+                                </Grid>
+                            </MenuItem.Header>
+                            <MenuItem Header="New" Foreground="Black"/>
+                            <MenuItem Header="Load" Foreground="Black"/>
+                            <MenuItem Header="Save"  Foreground="Black"/>
+                            <MenuItem Header="Save As"  Foreground="Black"/>
+                        </MenuItem>
+                        <MenuItem>
+                            <MenuItem.Header>
+                                <Grid Width="70"
                                   Height="25">
-                                <TextBlock Text="View"
+                                    <TextBlock Text="View"
                                            FontSize="13"
                                            FontWeight="Bold"
                                            VerticalAlignment="Center"
                                            HorizontalAlignment="Center" />
-                            </Grid>
-                        </MenuItem.Header>
-                        <MenuItem Header="Log"  Foreground="Black">
+                                </Grid>
+                            </MenuItem.Header>
+                            <MenuItem Header="Log"  Foreground="Black">
 
-                        </MenuItem>
-                        <MenuItem Header="Alarm"  Foreground="Black">
+                            </MenuItem>
+                            <MenuItem Header="Alarm"  Foreground="Black">
 
-                        </MenuItem>
-                        <MenuItem Header="FDC"  Foreground="Black">
+                            </MenuItem>
+                            <MenuItem Header="FDC"  Foreground="Black">
 
+                            </MenuItem>
                         </MenuItem>
-                    </MenuItem>
-                    <MenuItem>
-                        <MenuItem.Header>
-                            <Grid Width="70"
+                        <MenuItem>
+                            <MenuItem.Header>
+                                <Grid Width="70"
                                   Height="25">
-                                <TextBlock Text="Tool"
+                                    <TextBlock Text="Tool"
                                            FontSize="13"
                                            FontWeight="Bold"
                                            VerticalAlignment="Center"
                                            HorizontalAlignment="Center" />
-                            </Grid>
-                        </MenuItem.Header>
-                        <MenuItem Header="Login"  Foreground="Black">
+                                </Grid>
+                            </MenuItem.Header>
+                            <MenuItem Header="Login"  Foreground="Black">
 
-                        </MenuItem>
-                        <MenuItem Header="RTR"  Foreground="Black">
+                            </MenuItem>
+                            <MenuItem Header="RTR"  Foreground="Black">
 
-                        </MenuItem>
-                        <MenuItem Header="Loadport"  Foreground="Black">
+                            </MenuItem>
+                            <MenuItem Header="Loadport"  Foreground="Black">
 
+                            </MenuItem>
                         </MenuItem>
-                    </MenuItem>
-                    <MenuItem>
-                        <MenuItem.Header>
-                            <Grid Width="100"
+                        <MenuItem>
+                            <MenuItem.Header>
+                                <Grid Width="100"
                                   Height="25">
-                                <TextBlock Text="Network"
+                                    <TextBlock Text="Network"
                                            FontSize="13"
                                            FontWeight="Bold"
                                            VerticalAlignment="Center"
                                            HorizontalAlignment="Center" />
-                            </Grid>
-                        </MenuItem.Header>
-                        <MenuItem Header="Online"  Foreground="Black">
+                                </Grid>
+                            </MenuItem.Header>
+                            <MenuItem Header="Online"  Foreground="Black">
 
-                        </MenuItem>
-                        <MenuItem Header="Offline"  Foreground="Black">
+                            </MenuItem>
+                            <MenuItem Header="Offline"  Foreground="Black">
 
-                        </MenuItem>
-                        <MenuItem Header="GEM"  Foreground="Black">
+                            </MenuItem>
+                            <MenuItem Header="GEM"  Foreground="Black">
+                                <MenuItem Header="Online" HorizontalAlignment="Left" Command="{Binding GemOnlineClickCommand}"/>
+                                <MenuItem Header="Local" HorizontalAlignment="Left" Command="{Binding GemLocalClickCommand}"/>
+                                <MenuItem Header="Offline" HorizontalAlignment="Left" Command="{Binding GemOfflineClickCommand}"/>
 
+                            </MenuItem>
                         </MenuItem>
-                    </MenuItem>
-                    <MenuItem>
-                        <MenuItem.Header>
-                            <Grid Width="100"
+                        <MenuItem>
+                            <MenuItem.Header>
+                                <Grid Width="100"
                                   Height="25">
-                                <TextBlock Text="Mode Select"
+                                    <TextBlock Text="Mode Select"
                                            FontSize="13"
                                            FontWeight="Bold"
                                            VerticalAlignment="Center"
                                            HorizontalAlignment="Center" />
-                            </Grid>
-                        </MenuItem.Header>
-                        <MenuItem Header="Main" x:Name="mode_main" IsCheckable="True" IsChecked="{Binding IsCheckModeMain, Mode=TwoWay}"  Foreground="Black"/>
-                        <MenuItem Header="Setup" x:Name="mode_setup" IsCheckable="True" IsChecked="{Binding IsCheckModeSetup, Mode=TwoWay}" Foreground="Black"/>
-                        <MenuItem Header="Review" x:Name="mode_review" IsCheckable="True" IsChecked="{Binding IsCheckModeReview}" Foreground="Black"/>
-                        <MenuItem Header="Operation" x:Name="mode_operation" IsCheckable="True" IsChecked="{Binding IsCheckModeOperation}" Foreground="Black"/>
-                        <MenuItem Header="Engineer" x:Name="mode_engineer" IsCheckable="True" IsChecked="{Binding IsCheckModeEngineer}" Foreground="Black"/>
-                    </MenuItem>
-                    <MenuItem Command="{Binding btnPopUpSetting}">
-                        <MenuItem.Header>
-                            <Grid Width="100"
+                                </Grid>
+                            </MenuItem.Header>
+                            <MenuItem Header="Main" x:Name="mode_main" IsCheckable="True" IsChecked="{Binding IsCheckModeMain, Mode=TwoWay}"  Foreground="Black"/>
+                            <MenuItem Header="Setup" x:Name="mode_setup" IsCheckable="True" IsChecked="{Binding IsCheckModeSetup, Mode=TwoWay}" Foreground="Black"/>
+                            <MenuItem Header="Review" x:Name="mode_review" IsCheckable="True" IsChecked="{Binding IsCheckModeReview}" Foreground="Black"/>
+                            <MenuItem Header="Operation" x:Name="mode_operation" IsCheckable="True" IsChecked="{Binding IsCheckModeOperation}" Foreground="Black"/>
+                            <MenuItem Header="Engineer" x:Name="mode_engineer" IsCheckable="True" IsChecked="{Binding IsCheckModeEngineer}" Foreground="Black"/>
+                        </MenuItem>
+                        <MenuItem Command="{Binding btnPopUpSetting}">
+                            <MenuItem.Header>
+                                <Grid Width="100"
                                   Height="25">
-                                <TextBlock Text="Setting"
+                                    <TextBlock Text="Setting"
                                            FontSize="13"
                                            FontWeight="Bold"
                                            VerticalAlignment="Center"
                                            HorizontalAlignment="Center" />
+                                </Grid>
+                            </MenuItem.Header>
+                        </MenuItem>
+                    </Menu>
+                </StackPanel>
+                <Menu HorizontalAlignment="Right" Background="{StaticResource main_background}">
+                    <MenuItem Width="120" Height="30" Padding="0" HorizontalAlignment="Right" IsEnabled="False">
+                        <MenuItem.Header>
+                            <Grid Width="120">
+                                <TextBlock Name="GemControlState" Text="OFFLINE" FontSize="12" FontWeight="Bold" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="White"/>
                             </Grid>
                         </MenuItem.Header>
                     </MenuItem>
                 </Menu>
-            </StackPanel>
+            </Grid>
         </Border>
         <Grid Grid.Row="1">
             <ContentControl Content="{Binding p_CurrentPanel}">
@@ -156,13 +170,13 @@
                         <Style.Triggers>
                             <!--Main-->
                             <DataTrigger Binding="{Binding ElementName=mode_main, Path=IsChecked}"
-                                         Value="true">
-                                <Setter Property="Template" Value="{StaticResource selectmode}"/>
+                                    Value="true">
+                                <Setter Property="Template" Value="{StaticResource selectmode}" />
                             </DataTrigger>
                             <!--Setup-->
                             <DataTrigger Binding="{Binding ElementName=mode_setup, Path=IsChecked}"
-                                         Value="true">
-                                <Setter Property="Template" Value="{StaticResource setup}"/>
+                                    Value="true">
+                                <Setter Property="Template" Value="{StaticResource setup}" />
                             </DataTrigger>
                             <!--Setup-->
                             <!--<DataTrigger Binding="{Binding ElementName=mode_review, Path=IsChecked}"
@@ -179,14 +193,21 @@
                 </ContentControl.Style>
             </ContentControl>
         </Grid>
-
-        <GridSplitter Grid.Row="2" 
-                      Height="5"
-                      HorizontalAlignment="Stretch"
-                      VerticalAlignment="Stretch"
-                      ShowsPreview="True"/>
-        <TabControl>
-           
-        </TabControl>
+        <GridSplitter Grid.Row="2" Height="5" HorizontalAlignment="Stretch"
+                VerticalAlignment="Stretch" ShowsPreview="True" />
+        <Border Grid.Row="3" Grid.ColumnSpan="2" Panel.ZIndex="99" Margin="3">
+            <TabControl Grid.Row="2">
+                <TabItem Header="Log" FontSize="10">
+                </TabItem>
+                <TabItem Header="Warning" FontSize="10">
+                    <ContentControl Content="{Binding p_CurrentSubPanel}">
+                    </ContentControl>
+                </TabItem>
+                <TabItem Header="Inspection" FontSize="10" />
+                <TabItem Header="I/O" FontSize="10" />
+                <TabItem Header="Network" FontSize="10" />
+                <TabItem Header="Result" FontSize="10" />
+            </TabControl>
+        </Border>
     </Grid>
 </Window>
