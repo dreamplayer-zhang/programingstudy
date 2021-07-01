@@ -26,11 +26,7 @@ namespace Root_VEGA_D
     /// </summary>
     public partial class PM_UI : UserControl
     {
-        Vision m_vision;
-        
         DataTable dataTable;
-
-        public TreeRoot m_treeRootRun;
 
         public PM_UI()
         {
@@ -39,17 +35,6 @@ namespace Root_VEGA_D
 
         public void Init(Vision vision)
         {
-            m_vision = vision;
-
-            m_treeRootRun = new TreeRoot("PM", m_vision.m_log);
-            m_vision.m_treeRootRun.UpdateTree += M_treeRootRun_UpdateTree;
-            m_treeRootRun.UpdateTree += M_treeRootRun_UpdateTree;
-
-            RunTreeRun(Tree.eMode.RegRead);
-
-            treePMSetting.Init(m_vision.m_treeRootRun);
-            RunTreeRun(Tree.eMode.Init);
-
             // Data table column setting
             dataTable = new DataTable();
             dataTable.Columns.Add("Date");
@@ -65,39 +50,6 @@ namespace Root_VEGA_D
 
             // Update chart
             UpdatePMLogChart();
-        }
-
-        private void M_treeRootRun_UpdateTree()
-        {
-            RunTreeRun(Tree.eMode.Update);
-            RunTreeRun(Tree.eMode.RegWrite);
-            RunTreeRun(Tree.eMode.Init);
-        }
-
-        public void RunTreeRun(Tree.eMode mode)
-        {
-            Run_PM moduleRun = GetModuleRun();
-            if(moduleRun != null)
-            {
-                //m_vision.m_treeRootRun.p_eMode = mode;
-                m_treeRootRun.p_eMode = mode;
-                //moduleRun.RunTree(m_vision.m_treeRootRun.GetTree(moduleRun.m_sModuleRun, true, true), true);
-                moduleRun.RunTree(m_treeRootRun.GetTree(moduleRun.m_sModuleRun, true, true), true);
-            }
-        }
-
-        Run_PM GetModuleRun()
-        {
-            return m_vision.CloneModuleRun("PM") as Run_PM;
-        }
-
-        private void btnPM_Click(object sender, RoutedEventArgs e)
-        {
-            Run_PM moduleRun = m_vision.CloneModuleRun("PM") as Run_PM;
-            if (moduleRun != null)
-            {
-                m_vision.StartRun(moduleRun);
-            }
         }
 
         private void btnUpdate_Click(object sender, RoutedEventArgs e)
