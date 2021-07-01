@@ -27,6 +27,8 @@ namespace Root_VEGA_D
 			m_engineer = engineer;
 			textBlockLoginLevel.DataContext = m_engineer.m_login;
 			textBlockLoginLevel.Foreground = m_engineer.m_login.p_sUserName == "Logout" ? Brushes.Red : Brushes.Green;
+
+			textBoxID.Focus();
 		}
 
 		private void Login_Click(object sender, RoutedEventArgs e)
