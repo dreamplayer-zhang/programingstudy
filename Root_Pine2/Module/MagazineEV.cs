@@ -141,7 +141,7 @@ namespace Root_Pine2.Module
         {
             int iPos = (int)infoStrip.p_eMagazinePos;
             int iSlot = infoStrip.p_nStrip; 
-            return (m_xOffset[iPos, 1] * iSlot) + (m_xOffset[iPos, 0] * (19 - iSlot)) / 19; 
+            return (iSlot * m_xOffset[iPos, 1] + (19 - iSlot) * m_xOffset[iPos, 0]) / 19; 
         }
 
         void RunTreeXOffset(Tree tree)
@@ -192,7 +192,7 @@ namespace Root_Pine2.Module
                 if (m_bProduct[InfoStrip.eMagazinePos.Down])
                 {
                     double fPos = m_axis.GetPosValue(ePos) + fOffset;
-                    double fDown = m_axis.GetPosValue(InfoStrip.eMagazinePos.Down) - 10000;
+                    double fDown = m_axis.GetPosValue(Elevator.ePos.ConveyorDown) - 10000;
                     if ((m_axis.p_posCommand > fPos) && (fDown > fPos)) return "Can't Move Down cause Down Magazine";
                 }
                 m_axis.StartMove(ePos, fOffset);

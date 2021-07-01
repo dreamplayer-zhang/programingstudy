@@ -490,6 +490,11 @@ namespace Root_Pine2.Module
                 p_eState = eState.Ready;
                 return "OK";
             }
+            if (m_gripper.IsExist() || m_pusher.IsExist())
+            {
+                p_eState = eState.Init;
+                return "Check Strip Sensor";
+            }
             p_sInfo = base.StateHome();
             p_eState = (p_sInfo == "OK") ? eState.Ready : eState.Error;
             m_loaderPusher.Reset();
