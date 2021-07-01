@@ -41,7 +41,7 @@
                     <TextBlock x:Name="textBlockLoginLevel" FontSize="40" Text="{Binding p_eLevel}" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center"></TextBlock>
                 </Border>
                 <Border Grid.Column="1" BorderBrush="Black" BorderThickness="1" Margin="5">
-                    <Button x:Name="btnLogin" Content="Login" FontSize="40" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold" Click="Login_Click" Height="79" Margin="-1" Width="187"/>
+                    <Button x:Name="btnLogin" Content="Login" FontSize="40" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold" Click="Login_Click" Height="79" Margin="1" Width="187"/>
                     <!--<Button x:Name="login" Content="login" FontSize="40" HorizontalContentAlignment="center" VerticalContentAlignment="center" FontWeight="bold" Click="">
                     </Button>-->
                 </Border>
