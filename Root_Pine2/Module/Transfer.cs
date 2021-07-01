@@ -1,4 +1,5 @@
-﻿using RootTools;
+﻿using Root_Pine2.Engineer;
+using RootTools;
 using RootTools.Control;
 using RootTools.Module;
 using RootTools.ToolBoxs;
@@ -461,8 +462,10 @@ namespace Root_Pine2.Module
             m_gripper.p_bEnable = (m_gripper.p_infoStrip != null);
             if (Run(m_pusher.RunPusher())) return p_sInfo;
             m_magazineEV.PutInfoStrip(infoStrip);
-            m_pusher.p_infoStrip = null; 
-            return m_gripper.WaitUnlock(); 
+            m_pusher.p_infoStrip = null;
+            if (Run(m_gripper.WaitUnlock())) return p_sInfo; 
+            m_engineer.ClassHandler().CheckFinish();
+            return "OK"; 
         }
         #endregion
 

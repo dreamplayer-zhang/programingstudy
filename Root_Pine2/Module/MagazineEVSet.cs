@@ -15,7 +15,7 @@ namespace Root_Pine2.Module
             foreach (MagazineEV magazineEV in m_aEV.Values)
             {
                 MagazineEV.Magazine magazine = magazineEV.m_aMagazine[InfoStrip.eMagazinePos.Down]; 
-                if ((magazine != null) && (magazine.m_qStripReady.Count > 0))
+                if ((magazine != null) && (magazine.m_qStripReady.Count > 0) && (magazineEV.p_eState == ModuleBase.eState.Ready))
                 {
                     if (nStripMin > magazine.m_qStripReady.Count)
                     {
@@ -28,7 +28,7 @@ namespace Root_Pine2.Module
             foreach (MagazineEV magazineEV in m_aEV.Values)
             {
                 MagazineEV.Magazine magazine = magazineEV.m_aMagazine[InfoStrip.eMagazinePos.Up];
-                if ((magazine != null) && (magazine.m_qStripReady.Count > 0) && (magazineEV.m_aMagazine[InfoStrip.eMagazinePos.Down] == null))
+                if ((magazine != null) && (magazine.m_qStripReady.Count > 0) && (magazineEV.m_aMagazine[InfoStrip.eMagazinePos.Down] == null) && (magazineEV.p_eState == ModuleBase.eState.Ready))
                 {
                     if (nStripMin > magazine.m_qStripReady.Count)
                     {
