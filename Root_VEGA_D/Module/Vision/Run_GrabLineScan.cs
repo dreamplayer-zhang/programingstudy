@@ -27,7 +27,7 @@ namespace Root_VEGA_D.Module
     {
         Vision m_module;
 
-        public delegate void OnGrabLineScanEvent(Run_GrabLineScan moduleRun);
+        public delegate void OnGrabLineScanEvent(Run_GrabLineScan moduleRun, object data);
 
         //bool m_bInvDir = false;
         public GrabMode m_grabMode = null;
@@ -59,6 +59,12 @@ namespace Root_VEGA_D.Module
             run.m_bIPUCompleted = m_bIPUCompleted;
             run.m_nCurScanLine = m_nCurScanLine;
             //run.m_dTDIToVRSOffsetZ = m_dTDIToVRSOffsetZ;
+
+            run.LineScanInit = LineScanInit;
+            run.AlignCompleted = AlignCompleted;
+            run.LineScanStarting = LineScanStarting;
+            run.LineScanCompleted = LineScanCompleted;
+            run.LineScanEnd = LineScanEnd;
 
             return run;
         }
@@ -267,7 +273,7 @@ namespace Root_VEGA_D.Module
             return "OK";
         }
 
-        public event OnGrabLineScanEvent AlignComleted;
+        public event OnGrabLineScanEvent AlignCompleted;
         string RunAlign(MemoryData mem, int nSnapCount, double startPosY, double endPosY, double startTriggerY, double endTriggerY, out CRect rectBotMarker)
         {
             rectBotMarker = new CRect(0, 0, 0, 0);
@@ -425,7 +431,7 @@ namespace Root_VEGA_D.Module
             {
                 m_grabMode.SetLight(false);
 
-                if(AlignComleted != null) AlignComleted(this);
+                if(AlignCompleted != null) AlignCompleted(this, null);
             }
 
             m_log.Info("Align Failed");
@@ -483,11 +489,16 @@ namespace Root_VEGA_D.Module
                 return false;
         }
 
+        public event OnGrabLineScanEvent LineScanInit;
         public event OnGrabLineScanEvent LineScanStarting;
         public event OnGrabLineScanEvent LineScanCompleted;
+        public event OnGrabLineScanEvent LineScanEnd;
         public override string Run()
         {
             if (m_grabMode == null) return "Grab Mode == null";
+
+            // LineScanInit Event
+            if (LineScanInit != null) LineScanInit(this, m_grabMode.m_ScanLineNum);
 
             // StopWatch 설정
             StopWatch snapTimeWatcher = new StopWatch();
@@ -598,7 +609,7 @@ namespace Root_VEGA_D.Module
                         }
 
                         // 라인스캔 시작할 때 이벤트 함수 호출
-                        if (LineScanStarting != null) LineScanStarting(this);
+                        if (LineScanStarting != null) LineScanStarting(this, new int[2] { m_grabMode.m_ScanLineNum, m_nCurScanLine });
 
                         // 이동 위치 계산
                         //int nScanSpeed = Convert.ToInt32((double)m_grabMode.m_nMaxFrame * m_grabMode.m_dTrigger * (double)m_grabMode.m_nScanRate / 100);
@@ -687,11 +698,11 @@ namespace Root_VEGA_D.Module
                             m_module.TcpipCommServer.SendMessage(TCPIPComm_VEGA_D.Command.LineEnd);
                         }
 
+                        // 라인스캔 끝났을 때 이벤트 함수 호출
+                        if (LineScanCompleted != null) LineScanCompleted(this, new int[2] { m_grabMode.m_ScanLineNum, m_nCurScanLine });
+
                         // 다음 이미지 획득을 위해 변수 값 변경
                         m_nCurScanLine++;
-
-                        // 라인스캔 끝났을 때 이벤트 함수 호출
-                        if (LineScanCompleted != null) LineScanCompleted(this);
                     }
                 }
                 m_grabMode.m_camera.StopGrab();
@@ -721,6 +732,9 @@ namespace Root_VEGA_D.Module
 
                 // RADS 기능 off
                 StopRADS();
+
+                // LineScanEnd Event
+                if (LineScanEnd != null) LineScanEnd(this, null);
             }
         }
     }
