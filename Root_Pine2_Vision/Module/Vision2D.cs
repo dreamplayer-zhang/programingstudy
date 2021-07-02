@@ -107,11 +107,16 @@ namespace Root_Pine2_Vision.Module
             }
         }
 
+        LightPower prevLightPower = null;
         public void RunLight(LightPower lightPower)
         {
             if (p_eRemote == eRemote.Client) RemoteRun(eRemoteRun.RunLight, eRemote.Client, lightPower);
             else
             {
+                if(prevLightPower != null && LightPower.IsSameLight(prevLightPower, lightPower))
+                    return;
+
+                prevLightPower = lightPower.Clone();
                 SetRGBW(lightPower.m_eRGBW);
                 for (int n = 0; n < p_lLight; n++)
                 {
