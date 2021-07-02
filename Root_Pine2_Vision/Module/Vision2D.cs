@@ -650,10 +650,6 @@ namespace Root_Pine2_Vision.Module
                 MessageBox.Show(ex.ToString());
                 m_camera.StopGrab();
             }
-            finally
-            {
-                RunLightOff();
-            }
             return "OK";
         }
         #endregion
