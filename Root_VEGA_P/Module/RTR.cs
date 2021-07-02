@@ -677,8 +677,8 @@ namespace Root_VEGA_P.Module
                 return "OK";
             }
             int posRTR = child.GetTeachRTR(child.p_infoPod);
-            int nArm = GetArmID(child.p_infoPod);
             if (posRTR < 0) return "RTR Teach Position Not Defined";
+            int nArm = GetArmID(child.p_infoPod);
             if (child.p_eState != eState.Ready)
             {
                 if (Run(WriteCmd(eCmd.GetReady, posRTR, 1, nArm))) return p_sInfo;
@@ -724,11 +724,11 @@ namespace Root_VEGA_P.Module
                 if (EQ.IsStop()) return "Stop";
                 Thread.Sleep(100);
             }
+            if (Run(child.BeforePut(p_infoPod))) return p_sInfo;
+            if (Run(child.IsPutOK(p_infoPod))) return p_sInfo;
             int posRTR = child.GetTeachRTR(p_infoPod);
             int nArm = GetArmID(p_infoPod);
             if (posRTR < 0) return "RTR Teach Position Not Defined";
-            if (Run(child.BeforePut(p_infoPod))) return p_sInfo;
-            if (Run(child.IsPutOK(p_infoPod))) return p_sInfo;
             child.p_infoPod = p_infoPod;
             try
             {

@@ -153,24 +153,34 @@ namespace Root_VEGA_P_Vision.Module
                 }
 
                 p_infoPod = infoPod;
+                //p_infoPod.p_bTurn = !p_infoPod.p_bTurn; //아직 flipping 하면서 put 하는게 안됨
+
                 return "OK";
             }
         }
 
         public string AfterGet()
         {
-            if (Run(RunLifter(false)))
-                return p_sInfo;
-            return "OK";
+            if (p_eRemote == eRemote.Client) return RemoteRun(eRemoteRun.AfterGet, eRemote.Client, null);
+            else
+            {
+                if (Run(RunLifter(false)))
+                    return p_sInfo;
+                return "OK";
+
+            }
         }
 
         public string AfterPut()
         {
-            if (Run(RunLifter(false)))
-                return p_sInfo;
+            if (p_eRemote == eRemote.Client) return RemoteRun(eRemoteRun.AfterPut, eRemote.Client, null);
+            else
+            {
+                if (Run(RunLifter(false)))
+                    return p_sInfo;
 
-            //p_infoPod.p_bTurn = !p_infoPod.p_bTurn;
-            return "OK";
+                return "OK";
+            }
         }
 
         public bool IsPodExist(InfoPod.ePod ePod)
@@ -296,6 +306,8 @@ namespace Root_VEGA_P_Vision.Module
             Reset,
             BeforeGet,
             BeforePut,
+            AfterGet,
+            AfterPut,
             TestResult,
         }
 
@@ -311,6 +323,8 @@ namespace Root_VEGA_P_Vision.Module
                 case eRemoteRun.Reset: break;
                 case eRemoteRun.BeforeGet: break;
                 case eRemoteRun.BeforePut: run.m_infoPod = value; break;
+                case eRemoteRun.AfterGet: break;
+                case eRemoteRun.AfterPut: break;
             }
             return run;
         }
@@ -372,6 +386,8 @@ namespace Root_VEGA_P_Vision.Module
                     case eRemoteRun.Reset: m_module.Reset(); break;
                     case eRemoteRun.BeforeGet: return m_module.BeforeGet();
                     case eRemoteRun.BeforePut: return m_module.BeforePut(m_infoPod);
+                    case eRemoteRun.AfterGet: return m_module.AfterGet();
+                    case eRemoteRun.AfterPut: return m_module.AfterPut();
                 }
                 return "OK";
             }

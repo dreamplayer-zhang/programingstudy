@@ -601,7 +601,10 @@ namespace Root_VEGA_P.Module
         int[] m_teachRTR = new int[4] { 0, 0, 0, 0 }; 
         public int GetTeachRTR(InfoPod infoPod)
         {
-            return m_teachRTR[(int)infoPod.p_ePod]; 
+            if (infoPod != null)
+                return m_teachRTR[(int)infoPod.p_ePod];
+            else 
+                return -1;
         }
 
         public void RunTreeTeach(Tree tree)

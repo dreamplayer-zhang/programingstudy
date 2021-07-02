@@ -56,7 +56,15 @@ namespace Root_VEGA_P.Module
 
         public string RunMove(ePos ePos)
         {
-            if (!m_door.IsCylinder(true)) return p_sInfo;
+            if(ePos.Equals(ePos.Forward)) //앞으로 갈때
+            {
+                if (m_door.IsCylinder(true)) //실린더 올라가있으면 움직이지마 
+                    return "Check Cylinder";
+
+                if (!m_dome.IsCheckRotate()) //Dome 안돌아가져있으면 움직이지마
+                    return "Check Dome Rotate";
+            }
+
             m_axis.StartMove(ePos);
             return m_axis.WaitReady();
         }
@@ -69,10 +77,14 @@ namespace Root_VEGA_P.Module
             Down
         }
         double m_secCoverDown = 3; 
-        public string RunCoverDown(bool bDown)
+        public string RunCoverDown(bool bDown) 
         {
+            //Dome 안돌아가져있으면 하면안됨
+            if (!m_dome.IsCheckRotate())
+                return "Dome is ReadyPos";
+
             m_doCoverDown.Write(bDown ? eCover.Down : eCover.Up);
-            m_doCoverDownX.Write(bDown ? eCover.Down : eCover.Up);
+            //m_doCoverDownX.Write(bDown ? eCover.Down : eCover.Up);
             StopWatch sw = new StopWatch();
             int msDown = (int)(1000 * m_secCoverDown);
             while (sw.ElapsedMilliseconds < msDown)
@@ -134,6 +146,17 @@ namespace Root_VEGA_P.Module
 
             public string RunRotate(ePos ePos)
             {
+                if (IsCheckDome()) //돔 있는데
+                {
+                    if (IsClamp(false)) //클램프 열려있으면 돌지마
+                        return "UnClamp";
+                }
+
+                //돌기전에 Y축 뒤로 밀어
+                string str = m_EOP.RunMove(EOP.ePos.Backward);
+                if (!str.Equals("OK"))
+                    return str;
+
                 m_axisRotate.StartMove(ePos);
                 return m_axisRotate.WaitReady();
             }
@@ -235,6 +258,12 @@ namespace Root_VEGA_P.Module
             double m_secClamp = 3;
             public string RunClamp(bool bClamp)
             {
+                if(!bClamp)
+                {
+                    if (IsCheckRotate())
+                        return "Rotated";
+                }
+
                 m_doClamp.Write(bClamp ? eClamp.Clamp : eClamp.Unclamp); 
                 StopWatch sw = new StopWatch();
                 int msClamp = (int)(1000 * m_secClamp); 
@@ -314,32 +343,59 @@ namespace Root_VEGA_P.Module
 
             public string BeforeGet() 
             {
-                //if (!IsClamp(true))
-                //    return "Clamp Opened!";
-                    
-                //RunRotate(ePos.Ready);
-                //RunClamp(false);
+                //돔은 가져가기전에
+                // ReadyPos -> Clamp Open
+
+                string str = RunRotate(ePos.Ready);
+                if (!str.Equals("OK"))
+                    return str;
+
+                str = RunClamp(false);
+                if (!str.Equals("OK"))
+                    return str;
+
                 return "OK";
             }
 
             public string BeforePut(InfoPod infoPod)
             {
-                //RunRotate(ePos.Ready);
-                //RunClamp(false);
+                //돔은 놓기전에 ReadyPos -> Clamp Open
+                string str = RunRotate(ePos.Ready);
+                if (!str.Equals("OK"))
+                    return str;
+
+                str = RunClamp(false);
+                if (!str.Equals("OK"))
+                    return str;
                 return "OK";
             }
 
             public string AfterGet()
             {
+                //돔이 있으면 문제 있는거
+                if (IsCheckDome())
+                    return "Dome Exist";
+
                 return "OK";
             }
 
             public string AfterPut()
             {
-                //RunClamp(true);
-                //if(IsClamp(true))
-                //    RunRotate(ePos.Rotate);
-                //forget
+                //놓고난 다음에 
+                //돔이 있으면
+
+                //Clamp Close -> Rotate Pos
+
+                if (!IsCheckDome())
+                    return "Dome doesn't Exist";
+
+                string str = RunClamp(true);
+                if (!str.Equals("OK"))
+                    return str;
+                str = RunRotate(ePos.Rotate);
+                if (!str.Equals("OK"))
+                    return str;
+
                 return "OK";
             }
 
