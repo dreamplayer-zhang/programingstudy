@@ -123,10 +123,14 @@ namespace Root_Pine2_Vision.Module
 
         public void RunLightOff()
         {
-            for (int n = 0; n < p_lLight; n++)
+            if (p_eRemote == eRemote.Client) RemoteRun(eRemoteRun.RunLightOff, eRemote.Client, 0);
+            else
             {
-                Light light = m_lightSet.m_aLight[n];
-                if (light.m_light != null) light.m_light.p_fSetPower = 0;
+                for (int n = 0; n < p_lLight; n++)
+                {
+                    Light light = m_lightSet.m_aLight[n];
+                    if (light.m_light != null) light.m_light.p_fSetPower = 0;
+                }
             }
         }
         #endregion
@@ -764,6 +768,7 @@ namespace Root_Pine2_Vision.Module
         {
             StateHome,
             RunLight,
+            RunLightOff,
             SendRecipe,
             SendSnapInfo
         }
@@ -840,6 +845,7 @@ namespace Root_Pine2_Vision.Module
                 {
                     case eRemoteRun.StateHome: return m_module.StateHome();
                     case eRemoteRun.RunLight: m_module.RunLight(m_lightPower); break;
+                    case eRemoteRun.RunLightOff: m_module.RunLightOff(); break;
                     case eRemoteRun.SendRecipe: return m_module.SendRecipe(m_sRecipe); 
                     case eRemoteRun.SendSnapInfo: return m_module.SendSnapInfo(m_eWorks); 
                 }
