@@ -550,27 +550,33 @@ namespace RootTools.Camera.Matrox
             int iBlock = 0;
             MemoryData m = param.mem;
             Debug.WriteLine("memoffset X : " + param.memoffset.X + "memoffset Y : "+param.memoffset.Y);
-            while (iBlock<m_nGrabCount)
+            try
             {
-                if (iBlock >= m_nGrabTrigger) continue;
-                Thread.Sleep(200);
-                m_MemPtr = m.GetPtr(iBlock);
-
-                Debug.WriteLine("line : " + iBlock);
-                MIL.MbufGet2d(m_MilBuffers[(iBlock) % p_nBuf], 0, 0, p_nWidth, p_nHeight, srcarr);
-                Parallel.For(0, p_nHeight, (y) =>
+                while (iBlock < m_nGrabCount)
                 {
-                    fixed (byte* p = srcarr)
+                    if (iBlock >= m_nGrabTrigger) continue;
+                    Thread.Sleep(200);
+                    m_MemPtr = m.GetPtr(iBlock);
+
+                    Debug.WriteLine("line : " + iBlock);
+                    MIL.MbufGet2d(m_MilBuffers[(iBlock) % p_nBuf], 0, 0, p_nWidth, p_nHeight, srcarr);
+                    Parallel.For(0, p_nHeight, (y) =>
                     {
-                        IntPtr srcPtr = (IntPtr)p + p_nWidth * y;
-                        IntPtr dstPtr = (IntPtr)((long)m_MemPtr + param.memoffset.X + (param.memoffset.Y+ y) * m_Memory.W);
-                        Buffer.MemoryCopy((void*)srcPtr, (void*)dstPtr, p_nWidth, p_nWidth);
-                    }
-                });
-                iBlock++;
+                        fixed (byte* p = srcarr)
+                        {
+                            IntPtr srcPtr = (IntPtr)p + p_nWidth * y;
+                            IntPtr dstPtr = (IntPtr)((long)m_MemPtr + param.memoffset.X + (param.memoffset.Y + y) * m_Memory.W);
+                            Buffer.MemoryCopy((void*)srcPtr, (void*)dstPtr, p_nWidth, p_nWidth);
+                        }
+                    });
+                    iBlock++;
+                }
+            }finally
+            {
+                p_CamInfo.p_eState = eCamState.Ready;
+                userObjectHandle.Free();
             }
-            p_CamInfo.p_eState = eCamState.Ready;
-            userObjectHandle.Free();
+
         }
         unsafe void RunGrabLineScanThread()
         {

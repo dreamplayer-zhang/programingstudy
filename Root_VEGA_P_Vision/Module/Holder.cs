@@ -12,7 +12,7 @@ namespace Root_VEGA_P_Vision.Module
         DIO_I2O2 m_dioLifter;
         DIO_I m_diCover;
         DIO_I m_diPlate;
-        DIO_I m_diExist; 
+        DIO_I m_diExist;
         public override void GetTools(bool bInit)
         {
             if (p_eRemote == eRemote.Server)
@@ -51,7 +51,12 @@ namespace Root_VEGA_P_Vision.Module
 
         public string RunLifter(bool bUp)
         {
-            return m_dioLifter.RunSol(bUp); 
+            return m_dioLifter.RunSol(bUp);
+        }
+        public bool IsLifterUp()
+        {
+            if (m_dioLifter.m_aBitDI[1]==null) return false;
+            return m_dioLifter.m_aBitDI[1].p_bOn;
         }
         #endregion
 
@@ -65,7 +70,7 @@ namespace Root_VEGA_P_Vision.Module
                 int nPod = (value != null) ? (int)value.p_ePod : -1;
                 _infoPod = value;
                 m_reg.Write("InfoPod", nPod);
-                value.WriteReg();
+                value?.WriteReg();
                 OnPropertyChanged();
             }
         }
@@ -107,6 +112,22 @@ namespace Root_VEGA_P_Vision.Module
             if (p_eRemote == eRemote.Client) return RemoteRun(eRemoteRun.BeforeGet, eRemote.Client, null);
             else
             {
+                switch (CheckSensor())
+                {
+                    case eCheck.Cover:
+                        if (!p_infoPod.p_ePod.Equals(InfoPod.ePod.EIP_Cover)) return "Not Cover";
+                        if (Run(RunLifter(true))) return p_sInfo;
+                        break;
+                    case eCheck.Plate:
+                        if (!p_infoPod.p_ePod.Equals(InfoPod.ePod.EIP_Plate)) return "Not Plate";
+                        if (Run(RunLifter(false))) return p_sInfo;
+                        break;
+                    case eCheck.Empty:
+                        return "Buffer Is Empty!";
+                    case eCheck.Error:
+                        return "Error";
+                }
+                p_infoPod = null;
                 return "OK";
             }
         }
@@ -116,18 +137,39 @@ namespace Root_VEGA_P_Vision.Module
             if (p_eRemote == eRemote.Client) return RemoteRun(eRemoteRun.BeforePut, eRemote.Client, infoPod);
             else
             {
+                eCheck state = CheckSensor();
+                if (!state.Equals(eCheck.Empty))
+                    return "Buffer Is Not Empty!";
+
+                if (infoPod.p_ePod.Equals(InfoPod.ePod.EIP_Cover))
+                {
+                    if (Run(RunLifter(true)))
+                        return p_sInfo;
+                }
+                else if (infoPod.p_ePod.Equals(InfoPod.ePod.EIP_Plate))
+                {
+                    if (Run(RunLifter(false))) 
+                        return p_sInfo;
+                }
+
+                p_infoPod = infoPod;
                 return "OK";
             }
         }
 
         public string AfterGet()
         {
+            if (Run(RunLifter(false)))
+                return p_sInfo;
             return "OK";
         }
 
         public string AfterPut()
         {
-            p_infoPod.p_bTurn = !p_infoPod.p_bTurn;
+            if (Run(RunLifter(false)))
+                return p_sInfo;
+
+            //p_infoPod.p_bTurn = !p_infoPod.p_bTurn;
             return "OK";
         }
 
@@ -138,7 +180,7 @@ namespace Root_VEGA_P_Vision.Module
 
         public bool IsEnableRecovery()
         {
-            return p_infoPod != null; 
+            return p_infoPod != null;
         }
         #endregion
 
@@ -154,9 +196,9 @@ namespace Root_VEGA_P_Vision.Module
                 switch (infoPod.p_ePod)
                 {
                     case InfoPod.ePod.EIP_Cover: return m_teachCover[nTurn];
-                    case InfoPod.ePod.EIP_Plate: return m_teachPlate[nTurn]; 
+                    case InfoPod.ePod.EIP_Plate: return m_teachPlate[nTurn];
                 }
-                return -1; 
+                return -1;
             }
 
             public void RunTree(Tree tree)
@@ -171,11 +213,11 @@ namespace Root_VEGA_P_Vision.Module
                 teach[1] = tree.Set(teach[1], teach[1], "Bottom", "RND RTR Teach");
             }
         }
-        TeachRTR m_teach; 
+        TeachRTR m_teach;
 
         public int GetTeachRTR(InfoPod infoPod)
         {
-            return m_teach.GetTeach(infoPod); 
+            return m_teach.GetTeach(infoPod);
         }
 
         public void RunTreeTeach(Tree tree)
@@ -206,7 +248,7 @@ namespace Root_VEGA_P_Vision.Module
             if (p_eRemote == eRemote.Client) return RemoteRun(eRemoteRun.StateHome, eRemote.Client, null);
             else
             {
-                Thread.Sleep(2000); 
+                Thread.Sleep(2000);
                 p_sInfo = base.StateHome();
                 p_eState = (p_sInfo == "OK") ? eState.Ready : eState.Error;
                 return "OK";
@@ -224,6 +266,7 @@ namespace Root_VEGA_P_Vision.Module
 
         public Holder(string id, IEngineer engineer, eRemote eRemote)
         {
+            m_reg = new Registry(id + "_InfoPod");
             m_teach = new TeachRTR();
             InitBase(id, engineer, eRemote);
             OnChangeState += Holder_OnChangeState;
@@ -253,23 +296,23 @@ namespace Root_VEGA_P_Vision.Module
             Reset,
             BeforeGet,
             BeforePut,
-            TestResult, 
+            TestResult,
         }
 
         Run_Remote GetRemoteRun(eRemoteRun eRemoteRun, eRemote eRemote, dynamic value)
         {
             Run_Remote run = new Run_Remote(this);
             run.m_eRemoteRun = eRemoteRun;
-            run.m_eRemote = eRemote; 
+            run.m_eRemote = eRemote;
             switch (eRemoteRun)
             {
-                case eRemoteRun.ServerState: run.m_eState = value; break; 
+                case eRemoteRun.ServerState: run.m_eState = value; break;
                 case eRemoteRun.StateHome: break;
                 case eRemoteRun.Reset: break;
                 case eRemoteRun.BeforeGet: break;
                 case eRemoteRun.BeforePut: run.m_infoPod = value; break;
             }
-            return run; 
+            return run;
         }
 
         string RemoteRun(eRemoteRun eRemoteRun, eRemote eRemote, dynamic value)
