@@ -722,8 +722,6 @@ namespace Root_Pine2_Vision.Module
                 m_bUseBiDirectional = tree.GetTree("Camera").Set(m_bUseBiDirectional, m_bUseBiDirectional, "BiDirectional Scan", "Use BiDirectional Scan");
                 m_aWorks[eWorks.A].RunTree(tree.GetTree("Works " + m_aWorks[eWorks.A].p_id));
                 m_aWorks[eWorks.B].RunTree(tree.GetTree("Works " + m_aWorks[eWorks.B].p_id));
-                m_aWorks[eWorks.A].RunTreeCamOffset(tree.GetTree("Camera X Offset A"));
-                m_aWorks[eWorks.B].RunTreeCamOffset(tree.GetTree("Camera X Offset B"));
                 m_aGrabData[eWorks.A].RunTree(tree.GetTree("GrabData A"));
                 m_aGrabData[eWorks.B].RunTree(tree.GetTree("GrabData B"));
             }

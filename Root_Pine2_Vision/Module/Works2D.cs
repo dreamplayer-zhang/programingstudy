@@ -288,19 +288,6 @@ namespace Root_Pine2_Vision.Module
         }
         #endregion
 
-        #region Camera Offset
-        public RPoint[] m_aCam2Offset = new RPoint[2] { new RPoint(), new RPoint() };
-        public RPoint[] m_aCam3Offset = new RPoint[3] { new RPoint(), new RPoint(), new RPoint() };
-        public void RunTreeCamOffset(Tree tree)
-        {
-            m_aCam2Offset[0] = tree.GetTree("2 Line").Set(m_aCam2Offset[0], m_aCam2Offset[0], "0", "Camera X Offset (um)");
-            m_aCam2Offset[1] = tree.GetTree("2 Line").Set(m_aCam2Offset[1], m_aCam2Offset[1], "1", "Camera X Offset (um)");
-            m_aCam3Offset[0] = tree.GetTree("3 Line").Set(m_aCam3Offset[0], m_aCam3Offset[0], "0", "Camera X Offset (um)");
-            m_aCam3Offset[1] = tree.GetTree("3 Line").Set(m_aCam3Offset[1], m_aCam3Offset[1], "1", "Camera X Offset (um)");
-            m_aCam3Offset[2] = tree.GetTree("3 Line").Set(m_aCam3Offset[2], m_aCam3Offset[2], "2", "Camera X Offset (um)");
-        }
-        #endregion
-
         public void Reset()
         {
             m_protocolSend = null;
