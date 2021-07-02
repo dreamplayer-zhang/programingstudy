@@ -541,6 +541,17 @@ namespace Root_Pine2.Module
                 OnPropertyChanged(); 
             }
         }
+
+        int _iBundle = 0;
+        public int p_iBundle
+        {
+            get { return _iBundle; }
+            set
+            {
+                _iBundle = value;
+                OnPropertyChanged();
+            }
+        }
         #endregion
 
         Pine2_Handler m_handler; 

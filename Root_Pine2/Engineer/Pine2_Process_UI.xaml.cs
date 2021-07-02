@@ -39,7 +39,8 @@ namespace Root_Pine2.Engineer
             textBoxThickness.DataContext = m_pine2; 
             textBlock3D.DataContext = m_pine2;
 
-            textBoxLotID.DataContext = m_pine2; 
+            textBoxLotID.DataContext = m_pine2;
+            textBoxBundle.DataContext = m_pine2; 
 
             InitMagazineEV_UI();
             InitLoaderUI(handler.m_loader0, gridLoader, 6);
@@ -54,7 +55,7 @@ namespace Root_Pine2.Engineer
         List<MagazineEV_UI> m_aMagazineUI = new List<MagazineEV_UI>(); 
         void InitMagazineEV_UI()
         {
-            MagazineEVSet set = m_handler.m_magazineEV;
+            MagazineEVSet set = m_handler.m_magazineEVSet;
             foreach (InfoStrip.eMagazine eMagazine in Enum.GetValues(typeof(InfoStrip.eMagazine)))
             {
                 MagazineEV_UI ui = new MagazineEV_UI();
@@ -192,7 +193,8 @@ namespace Root_Pine2.Engineer
 
         private void buttonNewLot_Click(object sender, RoutedEventArgs e)
         {
-            //forget
+            m_handler.m_loadEV.p_iStrip = 0;
+            m_handler.m_pine2.p_iBundle = 0; 
         }
         #endregion
     }

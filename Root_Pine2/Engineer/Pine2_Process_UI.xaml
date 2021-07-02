@@ -88,6 +88,14 @@
                         <TextBox Grid.Column="1" x:Name="textBoxLotID" Text="{Binding p_sLotID}" Margin="3" VerticalAlignment="Center" TextAlignment="Center"/>
                     </Grid>
                     <Button x:Name="buttonNewLot" Content="New Lot" Margin="3" Click="buttonNewLot_Click"/>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Label Grid.Column="0" Content="Bundle :" Margin="3" VerticalAlignment="Center"/>
+                        <TextBox Grid.Column="1" x:Name="textBoxBundle" Text="{Binding p_iBundle}" Margin="3" VerticalAlignment="Center" TextAlignment="Center"/>
+                    </Grid>
                 </StackPanel>
             </GroupBox>
         </Grid>

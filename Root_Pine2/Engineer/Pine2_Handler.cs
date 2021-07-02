@@ -66,7 +66,7 @@ namespace Root_Pine2.Engineer
         public ModuleList p_moduleList { get; set; }
         public Pine2 m_pine2;
         public LoadEV m_loadEV;
-        public MagazineEVSet m_magazineEV = new MagazineEVSet();
+        public MagazineEVSet m_magazineEVSet;
         public Transfer m_transfer;
         public Dictionary<Vision2D.eVision, Vision2D> m_aVision = new Dictionary<Vision2D.eVision, Vision2D>();
         public Dictionary<Vision2D.eVision, Boats> m_aBoats = new Dictionary<Vision2D.eVision, Boats>(); 
@@ -87,7 +87,7 @@ namespace Root_Pine2.Engineer
             InitBoats(Vision2D.eVision.Bottom);
             InitBoats(Vision2D.eVision.Top2D);
             InitBoats(Vision2D.eVision.Top3D);
-            InitModule(m_transfer = new Transfer("Transter", m_engineer, m_pine2, m_magazineEV));
+            InitModule(m_transfer = new Transfer("Transter", m_engineer, m_pine2, m_magazineEVSet));
             InitModule(m_loader0 = new Loader0("Loader0", m_engineer, this));
             InitModule(m_loader1 = new Loader1("Loader1", m_engineer, this));
             InitModule(m_loader2 = new Loader2("Loader2", m_engineer, this));
@@ -125,10 +125,11 @@ namespace Root_Pine2.Engineer
 
         void InitMagazineEV()
         {
+            m_magazineEVSet = new MagazineEVSet(m_pine2);
             foreach (InfoStrip.eMagazine eMagazine in Enum.GetValues(typeof(InfoStrip.eMagazine)))
             {
                 MagazineEV magazineEV = new MagazineEV(eMagazine, m_engineer, m_pine2);
-                m_magazineEV.m_aEV.Add(eMagazine, magazineEV);
+                m_magazineEVSet.m_aEV.Add(eMagazine, magazineEV);
                 InitModule(magazineEV); 
             }
         }
@@ -215,7 +216,7 @@ namespace Root_Pine2.Engineer
             if (IsFinish() == false) return;
             m_pine2.m_buzzer.RunBuzzer(Pine2.eBuzzer.Finish);
             EQ.p_eState = EQ.eState.Ready;
-            foreach (MagazineEV magazineEV in m_magazineEV.m_aEV.Values) magazineEV.StartFinish(); 
+            foreach (MagazineEV magazineEV in m_magazineEVSet.m_aEV.Values) magazineEV.StartFinish(); 
         }
 
         bool IsFinish()
@@ -314,7 +315,7 @@ namespace Root_Pine2.Engineer
 
         public void ThreadStop()
         {
-            m_magazineEV.ThreadStop(); 
+            m_magazineEVSet.ThreadStop(); 
             if (m_bThread)
             {
                 m_bThread = false;
