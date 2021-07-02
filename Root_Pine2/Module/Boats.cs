@@ -195,6 +195,29 @@ namespace Root_Pine2.Module
                 m_aBoat[eWorks].p_eStep = Boat.eStep.Run;
                 m_aBoat[eWorks].m_doTriggerSwitch.Write(true); 
                 int iSnap = 0;
+                for(int i = 0; i < m_aBoat[eWorks].m_recipe.m_aSnap.Count; i++)
+                {
+                    Vision2D.Recipe.Snap snap = m_aBoat[eWorks].m_recipe.m_aSnap[i];
+                    m_vision.RunLight(snap.m_lightPower);
+                    m_bSnapReady = false;
+                    m_vision.StartSnap(snap, eWorks, iSnap);
+                    if (Run(RunMoveSnapStart(eWorks, snap))) return p_sInfo;
+                    while (m_bSnapReady == false)
+                    {
+                        Thread.Sleep(10);
+                        if (EQ.IsStop()) return "EQ Stop";
+                    }
+
+                    if (Run(m_aBoat[eWorks].RunSnap())) return p_sInfo;
+                    if (i < m_aBoat[eWorks].m_recipe.m_aSnap.Count-1)
+                    {
+                        if (Run(RunMoveSnapStart(eWorks, m_aBoat[eWorks].m_recipe.m_aSnap[i + 1]))) return p_sInfo;
+                    }
+                    if (m_vision.IsBusy()) EQ.p_bStop = true;
+                    iSnap++;
+
+                }
+                /*
                 foreach (Vision2D.Recipe.Snap snap in m_aBoat[eWorks].m_recipe.m_aSnap)
                 {
                     m_vision.RunLight(snap.m_lightPower);
@@ -206,10 +229,12 @@ namespace Root_Pine2.Module
                         Thread.Sleep(10);
                         if (EQ.IsStop()) return "EQ Stop"; 
                     }
+                   
                     if (Run(m_aBoat[eWorks].RunSnap())) return p_sInfo;
+                  
                     if (m_vision.IsBusy()) EQ.p_bStop = true;
                     iSnap++; 
-                }
+                }*/
                 m_vision.RunLightOff();
                 m_aBoat[eWorks].p_eStep = Boat.eStep.Done;
             }
