@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading;
 
 namespace Root_Pine2.Module
 {
@@ -109,7 +110,7 @@ namespace Root_Pine2.Module
             m_aBoat[eWorks].p_eStep = Boat.eStep.Run;
             if (Run(m_aBoat[eWorks].RunMove(p_ePosUnload))) return p_sInfo;
             m_aBoat[eWorks].p_eStep = Boat.eStep.Done;
-            if (m_aBoat[eWorks].p_infoStrip != null) m_aBoat[eWorks].p_infoStrip.p_eResult = InfoStrip.eResult.Rework; 
+            if (m_aBoat[eWorks].p_infoStrip != null) m_aBoat[eWorks].p_infoStrip.p_eResult = InfoStrip.eResult.POS; 
             return "OK";
         }
         #endregion
@@ -178,6 +179,7 @@ namespace Root_Pine2.Module
             return StartRun(run);
         }
 
+        bool m_bSnapReady = false; 
         public string RunSnap(Vision2D.eWorks eWorks, bool bReadRecipe)
         {
             StopWatch sw = new StopWatch();
@@ -196,8 +198,14 @@ namespace Root_Pine2.Module
                 foreach (Vision2D.Recipe.Snap snap in m_aBoat[eWorks].m_recipe.m_aSnap)
                 {
                     m_vision.RunLight(snap.m_lightPower);
+                    m_bSnapReady = false; 
                     m_vision.StartSnap(snap, eWorks, iSnap);
                     if (Run(RunMoveSnapStart(eWorks, snap))) return p_sInfo;
+                    while (m_bSnapReady == false)
+                    {
+                        Thread.Sleep(10);
+                        if (EQ.IsStop()) return "EQ Stop"; 
+                    }
                     if (Run(m_aBoat[eWorks].RunSnap())) return p_sInfo;
                     if (m_vision.IsBusy()) EQ.p_bStop = true;
                     iSnap++; 
@@ -261,6 +269,10 @@ namespace Root_Pine2.Module
                 m_aBoat[eWorks].p_sRecipe = ""; 
                 m_aBoat[eWorks].p_sRecipe = sRecipe; 
                 StartSnap(eWorks, true); 
+            }
+            if (asRead[1] == Works2D.eProtocol.SnapReady.ToString())
+            {
+                m_bSnapReady = true; 
             }
         }
         #endregion

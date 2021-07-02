@@ -282,9 +282,12 @@ namespace Root_Pine2.Module
             try
             {
                 if (Run(RunMoveUp())) return p_sInfo;
-                if (Run(RunMove(c_sPosKeyence))) return p_sInfo; 
-                if (Run(RunMoveZ(c_sPosKeyence, 0))) return p_sInfo;
-                m_keyence.ReadCode(); 
+                if (m_pine2.p_bUseKeyence)
+                {
+                    if (Run(RunMove(c_sPosKeyence))) return p_sInfo;
+                    if (Run(RunMoveZ(c_sPosKeyence, 0))) return p_sInfo;
+                    m_keyence.ReadCode();
+                }
                 if (Run(RunMoveLoadEV())) return p_sInfo;
                 if (Run(RunMoveZ(c_sPosLoadEV, 0))) return p_sInfo;
                 m_loadEV.p_bBlow = true;
@@ -293,9 +296,12 @@ namespace Root_Pine2.Module
                 if (Run(RunShakeUp(nShake, dzShakeUp))) return p_sInfo;
                 m_loadEV.p_eMove = LoadEV.eMove.Stop;
                 m_loadEV.p_bBlow = false;
-                if (Run(RunMoveZ(c_sPosPaper, 0))) return p_sInfo;
-                if (Run(RunMovePaper())) return p_sInfo;
-                m_loadEV.CheckPaper(); 
+                if (m_pine2.p_bCheckPaper)
+                {
+                    if (Run(RunMoveZ(c_sPosPaper, 0))) return p_sInfo;
+                    if (Run(RunMovePaper())) return p_sInfo;
+                }
+                m_loadEV.CheckPaper();
                 if (Run(RunMoveUp())) return p_sInfo;
                 if (m_picker.IsVacuum() == false) return p_sInfo;
                 m_picker.p_infoStrip = m_loadEV.GetNewInfoStrip();
@@ -359,7 +365,7 @@ namespace Root_Pine2.Module
                 if (Run(RunMoveZPaper(ePosTray))) return p_sInfo;
                 if (Run(m_picker.RunVacuum(false))) return p_sInfo;
                 m_picker.p_infoStrip = null;
-                MagazineEV magazine = m_handler.m_magazineEV.m_aEV[(InfoStrip.eMagazine)ePosTray];
+                MagazineEV magazine = m_handler.m_magazineEVSet.m_aEV[(InfoStrip.eMagazine)ePosTray];
                 magazine.PutInfoStrip(null); 
                 if (Run(RunMoveUp())) return p_sInfo;
                 if (Run(RunMoveLoadEV())) return p_sInfo;
@@ -373,7 +379,7 @@ namespace Root_Pine2.Module
 
         string GetPaperTray(ref ePosTray ePosTray)
         {
-            MagazineEVSet magazine = m_handler.m_magazineEV;
+            MagazineEVSet magazine = m_handler.m_magazineEVSet;
             for (InfoStrip.eMagazine eMagazine = InfoStrip.eMagazine.Magazine7; eMagazine >= InfoStrip.eMagazine.Magazine0; eMagazine--)
             {
                 if (magazine.IsEnableStack(eMagazine, InfoStrip.eResult.Paper, true))

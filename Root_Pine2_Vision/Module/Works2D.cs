@@ -81,6 +81,7 @@ namespace Root_Pine2_Vision.Module
             SnapInfo,
             Snap,
             SnapDone,
+            SnapReady
         }
 
         public class Protocol

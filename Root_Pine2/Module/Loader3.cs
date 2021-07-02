@@ -269,14 +269,15 @@ namespace Root_Pine2.Module
                     Thread.Sleep(200); 
                     return "OK";
                 }
-                foreach (MagazineEV magazineEV in m_handler.m_magazineEV.m_aEV.Values) magazineEV.m_conveyor.m_bInv = false;
-                MagazineEV magazine = m_handler.m_magazineEV.m_aEV[(InfoStrip.eMagazine)ePosTray];
+                foreach (MagazineEV magazineEV in m_handler.m_magazineEVSet.m_aEV.Values) magazineEV.m_conveyor.m_bInv = false;
+                MagazineEV magazine = m_handler.m_magazineEVSet.m_aEV[(InfoStrip.eMagazine)ePosTray];
                 magazine.m_conveyor.m_bInv = true; 
                 if (Run(RunMoveUp())) return p_sInfo;
                 if (Run(RunMoveTray(ePosTray))) return p_sInfo;
                 if (Run(RunMoveZ(ePosTray))) return p_sInfo;
                 if (Run(m_picker.RunVacuum(false))) return p_sInfo;
                 if (Run(RunMoveUp())) return p_sInfo;
+                m_picker.p_infoStrip.m_iBundle = magazine.m_stack.p_iBundle; 
                 m_picker.p_infoStrip = null;
                 magazine.PutInfoStrip(m_picker.p_infoStrip);
                 if (Run(RunMoveBoat(1 - m_eWorksLoad))) return p_sInfo;
@@ -291,7 +292,7 @@ namespace Root_Pine2.Module
 
         string CalcTrayPos(ref ePosTray eTray)
         {
-            MagazineEVSet magazine = m_handler.m_magazineEV;
+            MagazineEVSet magazine = m_handler.m_magazineEVSet;
             InfoStrip.eResult eResult = m_picker.p_infoStrip.p_eResult;
             foreach (ePosTray ePosTray in Enum.GetValues(typeof(ePosTray)))
             {

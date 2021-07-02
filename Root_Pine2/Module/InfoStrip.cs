@@ -10,10 +10,10 @@ namespace Root_Pine2.Module
         public enum eResult
         {
             Init,
-            Good,
-            XOut,
-            Rework,
-            Error,
+            GOOD,
+            DEF,
+            POS,
+            BCD,
             Paper,
         }
         eResult _eResult = eResult.Init; 
@@ -44,12 +44,12 @@ namespace Root_Pine2.Module
                 OnPropertyChanged(); 
             }
         }
-        public int p_nStrip { get; set; }
-        public InfoStrip(int nStrip)
+        public int p_iStrip { get; set; }
+        public InfoStrip(int iStrip)
         {
             p_eMagazine = eMagazine.Magazine0; 
-            p_nStrip = nStrip;
-            p_id = "Strip." + nStrip.ToString("000"); 
+            p_iStrip = iStrip;
+            p_id = iStrip.ToString("0000"); 
         }
 
         public bool m_bPaper = false; 
@@ -76,19 +76,21 @@ namespace Root_Pine2.Module
             Down
         }
         public eMagazinePos p_eMagazinePos { get; set; }
+        public int m_iBundle = 0; 
         public string m_sLED; 
-        public InfoStrip(eMagazine eMagazine, eMagazinePos eMagazinePos, int nStrip)
+        public InfoStrip(eMagazine eMagazine, eMagazinePos eMagazinePos, int iBundle, int iStrip)
         {
             p_eMagazine = eMagazine;
             p_eMagazinePos = eMagazinePos;
-            p_nStrip = nStrip;
-            p_id = eMagazine.ToString() + "." + eMagazinePos.ToString() + "." + nStrip.ToString("00"); 
-            m_sLED = ((p_eMagazinePos == eMagazinePos.Up) ? "Up" : "Dn") + p_nStrip.ToString("00");
+            m_iBundle = iBundle; 
+            p_iStrip = iStrip;
+            p_id = iStrip.ToString("0000"); 
+            m_sLED = ((p_eMagazinePos == eMagazinePos.Up) ? "UP" : "DN") + p_iStrip.ToString("00");
         }
 
         public InfoStrip Clone()
         {
-            return new InfoStrip(p_eMagazine, p_eMagazinePos, p_nStrip); 
+            return new InfoStrip(p_eMagazine, p_eMagazinePos, m_iBundle, p_iStrip); 
         }
 
         public delegate void dgOnDispose(InfoStrip infoStrip);
@@ -102,15 +104,15 @@ namespace Root_Pine2.Module
         {
             if (p_eMagazine != infoStrip.p_eMagazine) return false;
             if (p_eMagazinePos != infoStrip.p_eMagazinePos) return false;
-            return (p_nStrip == infoStrip.p_nStrip); 
+            return (p_iStrip == infoStrip.p_iStrip); 
         }
 
         public void RunTreeMagazine(Tree tree, bool bVisible)
         {
             p_eMagazinePos = (eMagazinePos)tree.Set(p_eMagazinePos, p_eMagazinePos, "Magazine", "Magazine Position", bVisible);
-            p_nStrip = tree.Set(p_nStrip, p_nStrip, "Strip", "Magazine Strip Slot ID (0 ~ 19)", bVisible);
-            if (p_nStrip < 0) p_nStrip = 0;
-            if (p_nStrip > 19) p_nStrip = 19;
+            p_iStrip = tree.Set(p_iStrip, p_iStrip, "Strip", "Magazine Strip Slot ID (0 ~ 19)", bVisible);
+            if (p_iStrip < 0) p_iStrip = 0;
+            if (p_iStrip > 19) p_iStrip = 19;
         }
     }
 }
