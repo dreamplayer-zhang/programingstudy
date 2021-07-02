@@ -236,7 +236,7 @@ namespace Root_WIND2
             }
         }
 
-        private int[] searchedWaferMap = new int[30000];
+        private int[] searchedWaferMap = null;
         public int[] SearchedWaferMap
         {
             get => this.searchedWaferMap;
@@ -411,7 +411,7 @@ namespace Root_WIND2
                     this.IsFindDone = false;
                     this.MapWidth = 0;
                     this.MapHeight = 0;
-                    this.SearchedWaferMap = new int[30000];
+                    this.SearchedWaferMap = null;
                     rectList.Clear();
                     gridList.Clear();
                     searchedChipPoint.Clear();
@@ -767,6 +767,7 @@ namespace Root_WIND2
                                 this.SearchedWaferMap[idx] = 1;
                                 searchedChipPoint[idx].Z = searchedChipPoint[idx].Z - 100;
                                 DrawSearchedChipBox(searchedChipPoint[idx]);
+
                                 RecipeType_WaferMap waferMap = GlobalObjects.Instance.Get<RecipeFront>().WaferMap;
                                 Array.Copy(this.SearchedWaferMap, this.SearchedWaferMap, this.MapWidth * this.MapHeight);
                                 waferMap.CreateWaferMap(this.MapWidth, this.MapHeight, this.SearchedWaferMap);
@@ -803,11 +804,71 @@ namespace Root_WIND2
                         if (memPt.X >= item.MemoryRect.Left && memPt.X <= item.MemoryRect.Right && memPt.Y >= item.MemoryRect.Top && memPt.Y <= item.MemoryRect.Bottom)
                         {
                             int idx = rectList.IndexOf(item);
+                            int sumRow = 0;
+                            int sumCol = 0;
+
                             if (this.SearchedWaferMap[idx] == 1)
                             {
                                 this.SearchedWaferMap[idx] = 0;
                                 searchedChipPoint[idx].Z = searchedChipPoint[idx].Z + 100;
                                 DrawSearchedChipBox(searchedChipPoint[idx]);
+
+                                // Check empty column
+                                for (int j = 0; j < this.MapWidth; j++)
+                                {
+                                    for (int i = 0; i < this.MapHeight; i++)
+                                    {
+                                        sumCol = sumCol + this.SearchedWaferMap[this.MapWidth * i + j];
+                                    }
+                                    if (sumCol == 0) // Clear column
+                                    {
+                                        for (int i = 0; i < this.MapHeight; i++)
+                                        {
+                                            int removeIdx = this.MapWidth * i + j - i;
+
+                                            this.SearchedWaferMap = this.SearchedWaferMap.Where((source, index) => index != removeIdx).ToArray();
+                                            this.searchedChipPoint.RemoveAt(removeIdx);
+                                            p_UIElement.Remove(rectList[removeIdx].CanvasRect);
+                                            p_UIElement.Remove(gridList[removeIdx]);
+                                            this.rectList.RemoveAt(removeIdx);
+                                            this.gridList.RemoveAt(removeIdx);
+                                        }
+                                        this.MapWidth = this.MapWidth - 1;
+                                    }
+                                    else
+                                    {
+                                        sumCol = 0;
+                                    }
+                                }
+
+                                // Check empty row
+                                for (int j = 0; j < this.MapHeight; j++)
+                                {
+                                    for (int i = 0; i < this.MapWidth; i++)
+                                    {
+                                        sumRow = sumRow + this.SearchedWaferMap[this.MapWidth * j + i];
+                                    }
+                                    if (sumRow == 0) // Clear row
+                                    {
+                                        for (int i = 0; i < this.MapWidth; i++)
+                                        {
+                                            int removeIdx = this.MapWidth * j;
+
+                                            this.SearchedWaferMap = this.SearchedWaferMap.Where((source, index) => index != removeIdx).ToArray();
+                                            this.searchedChipPoint.RemoveAt(removeIdx);
+                                            p_UIElement.Remove(rectList[removeIdx].CanvasRect);
+                                            p_UIElement.Remove(gridList[removeIdx]);
+                                            this.rectList.RemoveAt(removeIdx);
+                                            this.gridList.RemoveAt(removeIdx);
+                                        }
+                                        this.MapHeight = this.MapHeight - 1;
+                                    }
+                                    else
+                                    {
+                                        sumRow = 0;
+                                    }
+                                }
+
                                 RecipeType_WaferMap waferMap = GlobalObjects.Instance.Get<RecipeFront>().WaferMap;
                                 Array.Copy(this.SearchedWaferMap, this.SearchedWaferMap, this.MapWidth * this.MapHeight);
                                 waferMap.CreateWaferMap(this.MapWidth, this.MapHeight, this.SearchedWaferMap);
@@ -1190,14 +1251,33 @@ namespace Root_WIND2
             {
                 p_UIElement.Add(rect.CanvasRect);
             }
-            rectList.Add(rect);
 
             grid.Children.Add(tb);
             if (!p_UIElement.Contains(grid))
             {
                 p_UIElement.Add(grid);
             }
-            gridList.Add(grid);
+
+            bool isNew = true;
+            foreach (var item in rectList)
+            {
+                int idx = rectList.IndexOf(item);
+
+                if (item.MemPointBuffer == rect.MemPointBuffer)
+                {
+                    p_UIElement.Remove(rectList[idx].CanvasRect);
+                    p_UIElement.Remove(gridList[idx]);
+                    rectList[idx] = rect;
+                    gridList[idx] = grid;
+                    isNew = false;
+                    break;
+                }
+            }
+            if (isNew == true)
+            {
+                rectList.Add(rect);
+                gridList.Add(grid);
+            }
         }
 
         public void RedrawShapes()

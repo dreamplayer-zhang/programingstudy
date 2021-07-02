@@ -31,7 +31,14 @@ namespace RootTools
 
         MarsLogManager()
         {
-            m_sSLoggerNet = new SSLoggerNet();
+            try
+            {
+                m_sSLoggerNet = new SSLoggerNet();
+            }
+            catch (Exception e)
+            {
+                string ess = e.ToString();
+            }
         }
         public void ChangeMaterial(int port, int slot, string lot, string foup, string recipe)
         {
@@ -64,7 +71,7 @@ namespace RootTools
                 m_sSLoggerNet.WritePRCLog(port, device, eventID, status, stepName, stepNum);
         }
 
-        public void WriteFNC(int port, string device, string eventID, STATUS status, DataFormatter dataFormatter = null, MATERIAL_TYPE? type = null)
+        public void WriteFNC(int port, string device, string eventID, STATUS status, DataFormatter dataFormatter = null, MATERIAL_TYPE? type = MATERIAL_TYPE.WAFER)
         {
             if (!m_useLog)
                 return;

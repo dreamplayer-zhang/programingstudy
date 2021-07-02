@@ -10,6 +10,7 @@ using RootTools.Light;
 using RootTools.Memory;
 using RootTools.Module;
 using RootTools.Trees;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Threading;
@@ -45,6 +46,7 @@ namespace Root_EFEM.Module
 		Camera_Dalsa camEdgeSide;
 		Camera_Dalsa camEdgeBtm;
 		Camera_Matrox camEBR;
+
 		ALID alid_WaferExist;
 
 		#region Getter/Setter
@@ -93,10 +95,6 @@ namespace Root_EFEM.Module
 		}
 		#endregion
 
-
-		
-
-
 		#region GrabMode
 		int m_lGrabMode = 0;
 		public ObservableCollection<GrabModeEdge> m_aGrabMode = new ObservableCollection<GrabModeEdge>();
@@ -118,6 +116,15 @@ namespace Root_EFEM.Module
 			{
 				if (sGrabMode == grabMode.p_sName)
 					return grabMode;
+			}
+			return null;
+		}
+
+		public GrabModeEdge GetGrabMode(int index)
+		{
+			if (m_aGrabMode?.Count > 0 && (m_aGrabMode.Count - 1 >= index))
+			{
+				return m_aGrabMode[index];
 			}
 			return null;
 		}
@@ -203,6 +210,15 @@ namespace Root_EFEM.Module
 		void RunTreeAxis(Tree tree)
 		{
 			pulseRound = tree.Set(pulseRound, pulseRound, "Rotate Pulse / Round", "Rotate Axis Pulse / 1 Round (pulse)");
+		}
+
+		public enum eAxisPosEdge
+		{
+			Ready,
+		}
+		void InitPosAxis()
+		{
+			AxisRotate.AddPos(Enum.GetNames(typeof(eAxisPosEdge)));
 		}
 		#endregion
 

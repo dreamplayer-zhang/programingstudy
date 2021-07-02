@@ -2195,10 +2195,19 @@ void IP::SubSampling(BYTE* pSrc, BYTE* pOutImg, int nW, int nH, Point ptLT, Poin
     uint64_t nIdx = 0;
     uint64_t nWidth = (ptRB.x - ptLT.x);
     nWidth -= nWidth % nDownSample;
+    uint64_t nHeight = (ptRB.y - ptLT.y);
+    nHeight -= nHeight % nDownSample;
 
-    for (uint64_t j = ptLT.y; j < ptRB.y; j += nDownSample)
-        for (uint64_t i = ptLT.x; i < ptLT.x + nWidth; i += nDownSample)
-            pOutImg[nIdx++] = pSrc[j * nWidth + i];
+    //byte* pHeader = pSrc;
+    //byte* pDownSample = pOutImg;
+
+    for (uint64_t j = 0; j < nHeight; j += nDownSample)
+    {
+        for (uint64_t i = 0; i < nWidth; i += nDownSample)
+        {
+            pOutImg[nIdx++] = pSrc[(j + ptLT.y) * nW + (i + ptLT.x)];
+        }
+    }
 
     //Mat imgSrc = Mat((ptRB.y - ptLT.y) / nDownSample, (ptRB.x - ptLT.x) / nDownSample, CV_8UC1, pOutImg); // Debug
 }

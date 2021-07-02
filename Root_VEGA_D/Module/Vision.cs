@@ -797,8 +797,6 @@ namespace Root_VEGA_D.Module
         {
             if (CamRADS == null) return "RADS Cam is null";
 
-            RADSControl.m_timer.Start();
-            RADSControl.p_IsRun = true;
             RADSControl.StartRADS();
 
             StopWatch sw = new StopWatch();
@@ -827,8 +825,6 @@ namespace Root_VEGA_D.Module
         {
             if (CamRADS == null) return "RADS Cam is null";
 
-            RADSControl.m_timer.Stop();
-            RADSControl.p_IsRun = false;
             RADSControl.StopRADS();
             if (CamRADS.p_CamInfo._IsGrabbing == true) CamRADS.StopGrab();
 
@@ -853,6 +849,20 @@ namespace Root_VEGA_D.Module
 
             // IPU와 통신 중단 시 처리 위한 타이머
             m_timerWaitReconnect.Tick += new EventHandler(WaitReconnectTimerTick);
+
+            // GrabLineScan 이벤트 설정
+            foreach (ModuleRunBase moduleRunBase in m_aModuleRun)
+            {
+                Run_GrabLineScan moduleRun = moduleRunBase as Run_GrabLineScan;
+                if (moduleRun != null)
+                {
+                    moduleRun.LineScanInit += ModuleRun_LineScanInit;
+                    moduleRun.AlignCompleted += Run_GrabLineScan_AlignCompleted;
+                    moduleRun.LineScanStarting += Run_GrabLineScan_LineScanStarting;
+                    moduleRun.LineScanCompleted += Run_GrabLineScan_LineScanCompleted;
+                    moduleRun.LineScanEnd += ModuleRun_LineScanEnd;
+                }
+            }
         }
 
         private void Vision_OnChangeState(eState eState)
@@ -978,6 +988,19 @@ namespace Root_VEGA_D.Module
                                         // IPU에서 이미지 검사 완료되었기 때문에 해당 상태변수 true로 변경
                                         runGrabLineScan.m_bIPUCompleted = true;
                                     }
+                                }
+                            }
+                            break;
+                        case TCPIPComm_VEGA_D.Command.InspStatus:
+                            {
+                                Run_GrabLineScan runGrabLineScan = PeekModuleRun() as Run_GrabLineScan;
+                                if (runGrabLineScan != null)
+                                {
+                                    int nEndLine = int.Parse(mapParam[TCPIPComm_VEGA_D.PARAM_NAME_INSPENDLINE]);
+                                    
+                                    // Call Line Inspection End Event Function
+                                    if (LineScanStatusChanged != null)
+                                        LineScanStatusChanged(this, runGrabLineScan, LineScanStatus.LineInspCompleted, new int[2] { runGrabLineScan.m_grabMode.m_ScanLineNum, nEndLine });
                                 }
                             }
                             break;
@@ -1145,6 +1168,48 @@ namespace Root_VEGA_D.Module
             AddModuleRunList(new Run_PatternAlign(this), true, "Run Pattern Align");
             m_runPM = AddModuleRunList(new Run_PM(this,(VEGA_D_Handler)m_engineer.ClassHandler()), true, "Run PM");
         }
+        #endregion
+
+        #region Event
+        public delegate void OnLineScanEvent(Vision vision, Run_GrabLineScan moduleRun, LineScanStatus status, object data);
+
+        public enum LineScanStatus
+        {
+            Init,
+            AlignCompleted,
+            LineScanStarting,
+            LineScanCompleted,
+            LineInspCompleted,
+            End,
+        }
+        public event OnLineScanEvent LineScanStatusChanged;
+
+        void Run_GrabLineScan_AlignCompleted(Run_GrabLineScan moduleRun, object data)
+        {
+            if (LineScanStatusChanged != null)
+                LineScanStatusChanged(this, moduleRun, LineScanStatus.AlignCompleted, data);
+        }
+        void Run_GrabLineScan_LineScanStarting(Run_GrabLineScan moduleRun, object data)
+        {
+            if (LineScanStatusChanged != null)
+                LineScanStatusChanged(this, moduleRun, LineScanStatus.LineScanStarting, data);
+        }
+        void Run_GrabLineScan_LineScanCompleted(Run_GrabLineScan moduleRun, object data)
+        {
+            if (LineScanStatusChanged != null)
+                LineScanStatusChanged(this, moduleRun, LineScanStatus.LineScanCompleted, data);
+        }
+        private void ModuleRun_LineScanInit(Run_GrabLineScan moduleRun, object data)
+        {
+            if (LineScanStatusChanged != null)
+                LineScanStatusChanged(this, moduleRun, LineScanStatus.Init, data);
+        }
+        private void ModuleRun_LineScanEnd(Run_GrabLineScan moduleRun, object data)
+        {
+            if (LineScanStatusChanged != null)
+                LineScanStatusChanged(this, moduleRun, LineScanStatus.End, data);
+        }
+
         #endregion
     }
 }

@@ -21,7 +21,7 @@
         </Border>
 
         <Border Grid.Row="0" Grid.Column="1" BorderBrush="Black" Margin="0,5,5,5" BorderThickness="0,1,1,1">
-            <TextBox  Background="White" HorizontalContentAlignment="Center"  VerticalContentAlignment="Center" FontSize="40" Margin="5" x:Name="textBoxID" Padding="5,0,5,0" ></TextBox>
+            <TextBox  Background="White" HorizontalContentAlignment="Center"  VerticalContentAlignment="Center" FontSize="40" Margin="5" x:Name="textBoxID" Padding="5,0,5,0" KeyDown="textBoxID_KeyDown"></TextBox>
         </Border>
 
         <Border Grid.Row="1" Grid.Column="0"  BorderBrush="Black" Margin="5,5,0,5" BorderThickness="1,1,0,1">
@@ -29,7 +29,7 @@
         </Border>
 
         <Border Grid.Row="1" Grid.Column="1" BorderBrush="Black" Margin="0,5,5,5" BorderThickness="0,1,1,1">
-            <TextBox Background="White" HorizontalContentAlignment="Center"  VerticalContentAlignment="Center" FontSize="40" Margin="5" x:Name="textBoxPW" Padding="5,0,5,0"></TextBox>
+            <TextBox Background="White" HorizontalContentAlignment="Center"  VerticalContentAlignment="Center" FontSize="40" Margin="5" x:Name="textBoxPW" Padding="5,0,5,0" KeyDown="textBoxID_KeyDown"></TextBox>
         </Border>
         <Border Grid.Row="2" Grid.ColumnSpan="2">
             <Grid>
@@ -41,7 +41,7 @@
                     <TextBlock x:Name="textBlockLoginLevel" FontSize="40" Text="{Binding p_eLevel}" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center"></TextBlock>
                 </Border>
                 <Border Grid.Column="1" BorderBrush="Black" BorderThickness="1" Margin="5">
-                    <Button x:Name="btnLogin" Content="Login" FontSize="40" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold" Click="Login_Click"/>
+                    <Button x:Name="btnLogin" Content="Login" FontSize="40" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold" Click="Login_Click" Height="79" Margin="1" Width="187"/>
                     <!--<Button x:Name="login" Content="login" FontSize="40" HorizontalContentAlignment="center" VerticalContentAlignment="center" FontWeight="bold" Click="">
                     </Button>-->
                 </Border>

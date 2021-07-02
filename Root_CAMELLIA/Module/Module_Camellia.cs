@@ -689,7 +689,9 @@ namespace Root_CAMELLIA.Module
 
         public string RunMoveReady()
         {
-
+            string info = MoveReadyPos();
+            if (info != "OK")
+                return info;
             return "OK";
         }
 
@@ -697,9 +699,12 @@ namespace Root_CAMELLIA.Module
         {
             //App.m_SSLoggerNet.WriteXFRLog(nID, SSLNet.XFR_EVENTID.GET, SSLNet.STATUS.START,);
             //m_CamVRS.FunctionConnect();
+            //MarsLogManager.Instance.WritePRC(EQ.p_nRunLP, BaseDefine.LOG_DEVICE_ID, SSLNet.PRC_EVENTID.Process, SSLNet.STATUS.END, this.p_id, 0);
+            //MarsLogManager.Instance.WriteFNC(EQ.p_nRunLP, BaseDefine.LOG_DEVICE_ID, "Move Ready Position", SSLNet.STATUS.START);
             string info = MoveReadyPos();
             if (info != "OK")
                 return info;
+            //MarsLogManager.Instance.WriteFNC(EQ.p_nRunLP, BaseDefine.LOG_DEVICE_ID, "Move Ready Position", SSLNet.STATUS.END);
             return "OK";
         }
 
@@ -733,7 +738,6 @@ namespace Root_CAMELLIA.Module
         {
             // Make Directory
             //App.m_SSLoggerNet.WriteXFRLog(nID, SSLNet.XFR_EVENTID.GET, SSLNet.STATUS.END,);
-            MarsLogManager.Instance.WritePRC(EQ.p_nRunLP, BaseDefine.LOG_DEVICE_ID, SSLNet.PRC_EVENTID.Process, SSLNet.STATUS.END, this.p_id, 0);
             return "OK";
         }
 

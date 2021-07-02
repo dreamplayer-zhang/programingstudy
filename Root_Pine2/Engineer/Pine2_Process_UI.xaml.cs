@@ -37,7 +37,9 @@ namespace Root_Pine2.Engineer
             textBlockMode.DataContext = m_pine2;
             textBoxWidth.DataContext = m_pine2;
             textBoxThickness.DataContext = m_pine2; 
-            textBlock3D.DataContext = m_pine2; 
+            textBlock3D.DataContext = m_pine2;
+
+            textBoxLotID.DataContext = m_pine2; 
 
             InitMagazineEV_UI();
             InitLoaderUI(handler.m_loader0, gridLoader, 6);
@@ -186,6 +188,11 @@ namespace Root_Pine2.Engineer
                     m_handler.Reset();
                     break; 
             }
+        }
+
+        private void buttonNewLot_Click(object sender, RoutedEventArgs e)
+        {
+            //forget
         }
         #endregion
     }

@@ -136,12 +136,16 @@ namespace Root_Rinse_Loader.Module
                 if (magazine.IsProtrusion())
                 {
                     m_alidProtrusion.Run(true, "Check Storage : Strip Protrusion");
+                    m_rail.RunRotate(false);
+                    m_roller.RunRotate(false); 
                     return true;
                 }
             }
             if (m_rail.IsStartOn())
             {
                 m_alidProtrusion.Run(true, "Check Rail Sensor");
+                m_rail.RunRotate(false);
+                m_roller.RunRotate(false);
                 return true;
             }
             return false; 
@@ -412,7 +416,11 @@ namespace Root_Rinse_Loader.Module
                 p_eState = eState.Ready;
                 return "OK";
             }
-            if (IsProtrusion()) return "Protrusion Error";
+            if (IsProtrusion())
+            {
+                p_eState = eState.Error; 
+                return "Protrusion Error";
+            }
             foreach (Magazine magazine in m_aMagazine) magazine.RunClamp(magazine.p_bCheck);
             p_sInfo = base.StateHome();
             p_eState = (p_sInfo == "OK") ? eState.Ready : eState.Error;

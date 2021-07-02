@@ -32,11 +32,13 @@ namespace Root_Rinse_Unloader.Module
 
         #region GAF
         ALID m_alidArrived;
-        ALID m_alidPusher; 
+        ALID m_alidPusher;
+        ALID m_alidAxis;
         void InitALID()
         {
             m_alidArrived = m_gaf.GetALID(this, "Arrived", "Arrived Sensor Timeout");
             m_alidPusher = m_gaf.GetALID(this, "Pusher", "Pusher Error");
+            m_alidAxis = m_gaf.GetALID(this, "Rotate Axis Alarm", "Rotate Axis Alarm");
         }
         #endregion
 
@@ -152,6 +154,7 @@ namespace Root_Rinse_Unloader.Module
 
         public string RunRotate(bool bRotate)
         {
+            m_alidAxis.p_bSet = m_axisRotate.p_sensorAlarm;
             if (bRotate) m_axisRotate.Jog(m_rinse.p_fRotateSpeed, "Move");
             else m_axisRotate.StopAxis(); 
             return "OK";

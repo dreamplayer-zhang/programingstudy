@@ -105,9 +105,8 @@ namespace Root_VEGA_D.Module
                 // RADS 연결
                 if (m_grabMode.pUseRADS && m_module.RADSControl.p_IsRun == false)
                 {
-                    m_module.RADSControl.m_timer.Start();
-                    m_module.RADSControl.p_IsRun = true;
                     m_module.RADSControl.StartRADS();
+
                     StopWatch sw = new StopWatch();
                     if (camRADS.p_CamInfo._OpenStatus == false) camRADS.Connect();
                     while (camRADS.p_CamInfo._OpenStatus == false)
@@ -248,9 +247,8 @@ namespace Root_VEGA_D.Module
                 // RADS 기능 off
                 if (m_grabMode.pUseRADS && m_module.RADSControl.p_IsRun == true)
                 {
-                    m_module.RADSControl.m_timer.Stop();
-                    m_module.RADSControl.p_IsRun = false;
                     m_module.RADSControl.StopRADS();
+
                     if (camRADS.p_CamInfo._IsGrabbing == true) camRADS.StopGrab();
                 }
             }

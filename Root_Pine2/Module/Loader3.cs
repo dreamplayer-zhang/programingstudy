@@ -225,7 +225,7 @@ namespace Root_Pine2.Module
 
         public string RunUnloadTransfer() 
         {
-            if (m_picker.p_infoStrip != null) return "InfoStrip != null";
+            if (m_picker.p_infoStrip == null) return "InfoStrip == null";
             if (m_transfer.m_pusher.p_bEnable == false) return "Buffer Pusher not Enable";
             try
             {
@@ -269,16 +269,18 @@ namespace Root_Pine2.Module
                     Thread.Sleep(200); 
                     return "OK";
                 }
+                foreach (MagazineEV magazineEV in m_handler.m_magazineEV.m_aEV.Values) magazineEV.m_conveyor.m_bInv = false;
+                MagazineEV magazine = m_handler.m_magazineEV.m_aEV[(InfoStrip.eMagazine)ePosTray];
+                magazine.m_conveyor.m_bInv = true; 
                 if (Run(RunMoveUp())) return p_sInfo;
                 if (Run(RunMoveTray(ePosTray))) return p_sInfo;
                 if (Run(RunMoveZ(ePosTray))) return p_sInfo;
                 if (Run(m_picker.RunVacuum(false))) return p_sInfo;
                 if (Run(RunMoveUp())) return p_sInfo;
                 m_picker.p_infoStrip = null;
-                MagazineEV magazine = m_handler.m_magazineEV.m_aEV[(InfoStrip.eMagazine)ePosTray];
                 magazine.PutInfoStrip(m_picker.p_infoStrip);
                 if (Run(RunMoveBoat(1 - m_eWorksLoad))) return p_sInfo;
-                m_handler.CheckDone(); 
+                m_handler.CheckFinish(); 
             }
             finally
             {

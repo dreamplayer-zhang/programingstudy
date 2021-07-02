@@ -74,17 +74,33 @@
                     </StackPanel>
                 </StackPanel>
             </GroupBox>
+            <GroupBox Grid.Column="3" BorderBrush="Black" BorderThickness="1" Margin="3">
+                <GroupBox.Header>
+                    <TextBlock Text="Lot" Foreground="Black" FontWeight="Bold" />
+                </GroupBox.Header>
+                <StackPanel Orientation="Vertical">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Label Grid.Column="0" Content="LotID :" Margin="3" VerticalAlignment="Center"/>
+                        <TextBox Grid.Column="1" x:Name="textBoxLotID" Text="{Binding p_sLotID}" Margin="3" VerticalAlignment="Center" TextAlignment="Center"/>
+                    </Grid>
+                    <Button x:Name="buttonNewLot" Content="New Lot" Margin="3" Click="buttonNewLot_Click"/>
+                </StackPanel>
+            </GroupBox>
         </Grid>
         <Grid Grid.Row="1" x:Name="gridBoat">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="0.2*"/>
+                <ColumnDefinition Width="0.05*"/>
+                <ColumnDefinition Width="1.15*"/>
+                <ColumnDefinition Width="1.15*"/>
+                <ColumnDefinition Width="1.15*"/>
+                <ColumnDefinition Width="0.05*"/>
                 <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="0.2*"/>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="0.2*"/>
+                <ColumnDefinition Width="0.05*"/>
             </Grid.ColumnDefinitions>
             <Grid Grid.Column="6" x:Name="gridLoader1">
                 <Grid.RowDefinitions>
@@ -102,11 +118,11 @@
         <Grid Grid.Row="2" x:Name="gridLoader">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="0.4*"/>
-                <ColumnDefinition Width="0.4*"/>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="0.4*"/>
-                <ColumnDefinition Width="0.4*"/>
+                <ColumnDefinition Width="0.35*"/>
+                <ColumnDefinition Width="0.35*"/>
+                <ColumnDefinition Width="1.2*"/>
+                <ColumnDefinition Width="0.35*"/>
+                <ColumnDefinition Width="0.35*"/>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
