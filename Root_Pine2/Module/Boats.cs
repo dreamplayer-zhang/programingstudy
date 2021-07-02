@@ -35,7 +35,7 @@ namespace Root_Pine2.Module
         void InitPosition()
         {
             m_axisCam.AddPos(c_sPosReady);
-            m_axisCam.AddPos(Enum.GetNames(typeof(Vision2D.eWorks))); 
+            m_axisCam.AddPos(Enum.GetNames(typeof(Vision2D.eWorks)));
         }
 
         public string RunMoveCamera(Vision2D.eWorks ePos, bool bWait = true)
