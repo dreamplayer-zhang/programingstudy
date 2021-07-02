@@ -8,6 +8,7 @@ using RootTools.Module;
 using RootTools.Trees;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Net.Sockets;
 using System.Text;
@@ -661,6 +662,13 @@ namespace Root_Pine2_Vision.Module
                 // Root Vision -> VisionWorks2
                 if (m_aWorks[eWorks].IsProcessRun())
                     m_aWorks[eWorks].SendSnapDone(iSnap);
+
+                
+               /* if (nSnapMode == Recipe.eSnapMode.ALL && (nTotalSnap/2-1) == iSnap) // 미리 체인지 하기위함
+                {
+                    System.Threading.Thread th = new Thread(UpdateUserset);
+                    th.Start();
+                }*/
             }
             catch (Exception ex)
             {
@@ -669,6 +677,16 @@ namespace Root_Pine2_Vision.Module
             }
             return "OK";
         }
+
+        private void UpdateUserset()
+        {
+            if (m_camera.p_CamParam.p_eUserSetCurrent == DalsaParameterSet.eUserSet.UserSet2)
+                m_camera.p_CamParam.p_eUserSetCurrent = DalsaParameterSet.eUserSet.UserSet3;
+            else if (m_camera.p_CamParam.p_eUserSetCurrent == DalsaParameterSet.eUserSet.UserSet3)
+                m_camera.p_CamParam.p_eUserSetCurrent = DalsaParameterSet.eUserSet.UserSet2;
+        }
+
+      
         #endregion
 
         #region Request
