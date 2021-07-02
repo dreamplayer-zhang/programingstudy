@@ -633,8 +633,16 @@ namespace Root_Pine2_Vision.Module
             {
                 if (m_camera.p_CamParam.p_eUserSetCurrent != nUserset)
                     m_camera.p_CamParam.p_eUserSetCurrent = nUserset;
+                
+                m_camera.m_bGrabThreadOn = false;
                 m_camera.GrabLineScan(memory, cpOffset, m_nLine, grabData);
+                while(m_camera.m_bGrabThreadOn != true)
+                {
+                    Thread.Sleep(10);
+                    if (EQ.IsStop()) return "EQ Stop";
+                }
                 ReqSnapReady(eWorks);
+
                 while (m_camera.p_CamInfo.p_eState != eCamState.Ready)
                 {
                     Thread.Sleep(10);
