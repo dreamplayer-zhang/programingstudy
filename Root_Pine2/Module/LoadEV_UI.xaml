@@ -17,8 +17,15 @@
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
-            <Grid Grid.Row="0" Background="Beige" Margin="3">
-                <TextBlock x:Name="textBlockDone" HorizontalAlignment="Center"/>
+            <Grid Grid.Row="0" Background="Beige" Margin="3" >
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" x:Name="textBlockDone" HorizontalAlignment="Center"/>
+                    <TextBlock Grid.Column="1" x:Name="textBlockStrip" Text="{Binding p_iStrip}" HorizontalAlignment="Center"/>
+                </Grid>
             </Grid>
             <Grid Grid.Row="1" Margin="3" Background="White">
                 <TextBlock x:Name="textBlockInfo" Text="{Binding p_sInfo}"/>

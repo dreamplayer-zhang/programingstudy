@@ -434,6 +434,40 @@ namespace Root_Pine2.Module
                 OnPropertyChanged();
             }
         }
+
+        bool _bUseKeyence = true;
+        public bool p_bUseKeyence
+        {
+            get { return _bUseKeyence; }
+            set
+            {
+                if (_bUseKeyence == value) return;
+                m_log.Info("p_bUseBCD = " + value.ToString());
+                _bUseKeyence = value;
+                OnPropertyChanged();
+            }
+        }
+
+        bool _bCheckPaper = true;
+        public bool p_bCheckPaper
+        {
+            get { return _bCheckPaper; }
+            set
+            {
+                if (_bCheckPaper == value) return;
+                m_log.Info("p_bCheckPaper = " + value.ToString());
+                _bCheckPaper = value;
+                OnPropertyChanged();
+            }
+        }
+
+        void RunTreeMode(Tree tree)
+        {
+            p_eMode = (eRunMode)tree.Set(p_eMode, p_eMode, "Mode", "RunMode");
+            p_b3D = tree.Set(p_b3D, p_b3D, "3D", "RunMode");
+            p_bUseKeyence = tree.Set(p_bUseKeyence, p_bUseKeyence, "Keyence", "RunMode");
+            p_bCheckPaper = tree.Set(p_bCheckPaper, p_bCheckPaper, "Check Paper", "RunMode");
+        }
         #endregion
 
         #region Thread DIO
@@ -495,8 +529,7 @@ namespace Root_Pine2.Module
         {
             base.RunTree(tree);
             m_buzzer.RunTree(tree.GetTree("Buzzer")); 
-            p_eMode = (eRunMode)tree.GetTree("Mode").Set(p_eMode, p_eMode, "Mode", "RunMode");
-            p_b3D = tree.GetTree("Mode").Set(p_b3D, p_b3D, "3D", "RunMode");
+            RunTreeMode(tree.GetTree("Mode"));
             p_widthStrip = tree.GetTree("Strip").Set(p_widthStrip, p_widthStrip, "Width", "Strip Width (mm)");
             p_thickness = tree.GetTree("Strip").Set(p_thickness, p_thickness, "Thickness", "Strip Thickness (um)");
             m_widthDefaultStrip = tree.GetTree("Default Strip").Set(m_widthDefaultStrip, m_widthDefaultStrip, "Width", "Strip Width (mm)");
@@ -537,11 +570,14 @@ namespace Root_Pine2.Module
             get { return _sLotID; }
             set
             {
+                if (_sLotID == value) return; 
                 _sLotID = value;
                 OnPropertyChanged(); 
+
             }
         }
 
+        Registry m_reg = new Registry("Pine2");
         int _iBundle = 0;
         public int p_iBundle
         {
@@ -550,6 +586,7 @@ namespace Root_Pine2.Module
             {
                 _iBundle = value;
                 OnPropertyChanged();
+                m_reg.Write("Bundle", value); 
             }
         }
         #endregion
@@ -558,7 +595,8 @@ namespace Root_Pine2.Module
         public Pine2(string id, IEngineer engineer)
         {
             p_id = id;
-            m_handler = (Pine2_Handler)engineer.ClassHandler(); 
+            m_handler = (Pine2_Handler)engineer.ClassHandler();
+            p_iBundle = m_reg.Read("Bundle", 0); 
             InitBase(id, engineer);
 
             InitThread();

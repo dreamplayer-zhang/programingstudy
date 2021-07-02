@@ -634,6 +634,7 @@ namespace Root_Pine2_Vision.Module
                 if (m_camera.p_CamParam.p_eUserSetCurrent != nUserset)
                     m_camera.p_CamParam.p_eUserSetCurrent = nUserset;
                 m_camera.GrabLineScan(memory, cpOffset, m_nLine, grabData);
+                ReqSnapReady(eWorks);
                 while (m_camera.p_CamInfo.p_eState != eCamState.Ready)
                 {
                     Thread.Sleep(10);
@@ -676,6 +677,14 @@ namespace Root_Pine2_Vision.Module
                 Thread.Sleep(10);
                 if (EQ.IsStop()) return "EQ Stop";
             }
+            return "OK";
+        }
+
+        public string ReqSnapReady(eWorks eWorks)
+        {
+            string sSend = m_nReq.ToString("000") + "," + Works2D.eProtocol.Snap.ToString() + "," +  eWorks.ToString();
+            m_sReceive = "";
+            m_tcpRequest.Send(sSend);
             return "OK";
         }
         #endregion

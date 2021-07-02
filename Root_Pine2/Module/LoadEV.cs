@@ -45,19 +45,6 @@ namespace Root_Pine2.Module
             }
         }
 
-        bool _bUsePaper = true;
-        public bool p_bUsePaper
-        {
-            get { return _bUsePaper; }
-            set
-            {
-                if (_bUsePaper == value) return;
-                m_log.Info("p_bUsePaper = " + value.ToString());
-                _bUsePaper = value;
-                OnPropertyChanged();
-            }
-        }
-
         bool _bCheck = false;
         public bool p_bCheck
         {
@@ -111,6 +98,7 @@ namespace Root_Pine2.Module
         #endregion
 
         #region InfoStrip
+        Registry m_reg = new Registry("LoadEV");
         int _iStrip = 0;
         public int p_iStrip
         {
@@ -120,6 +108,7 @@ namespace Root_Pine2.Module
                 if (_iStrip == value) return;
                 _iStrip = value;
                 OnPropertyChanged();
+                m_reg.Write("iStrip", value); 
             }
         }
 
@@ -138,7 +127,7 @@ namespace Root_Pine2.Module
 
         public void CheckPaper()
         {
-            p_bPaper = m_diPaper.p_bIn && p_bUsePaper;
+            p_bPaper = m_diPaper.p_bIn && m_pine2.p_bCheckPaper;
         }
         #endregion
 
@@ -269,13 +258,7 @@ namespace Root_Pine2.Module
         public override void RunTree(Tree tree)
         {
             base.RunTree(tree);
-            RunTreeSetup(tree.GetTree("Setup"));
             RunTreeBlow(tree.GetTree("Use Blow"));
-        }
-
-        void RunTreeSetup(Tree tree)
-        {
-            p_bUsePaper = tree.Set(p_bUsePaper, p_bUsePaper, "Use Paper", "Use Paper");
         }
 
         public override void Reset()
@@ -297,7 +280,8 @@ namespace Root_Pine2.Module
         Pine2 m_pine2; 
         public LoadEV(string id, IEngineer engineer, Pine2 pine2)
         {
-            m_pine2 = pine2; 
+            m_pine2 = pine2;
+            p_iStrip = m_reg.Read("iStrip", 0);
             base.InitBase(id, engineer);
         }
 

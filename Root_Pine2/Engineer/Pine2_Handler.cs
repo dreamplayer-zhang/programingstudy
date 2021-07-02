@@ -29,6 +29,14 @@ namespace Root_Pine2.Engineer
         }
         #endregion
 
+        #region Lot
+        public void NewLot()
+        {
+            m_pine2.p_iBundle = 0;
+            m_loadEV.p_iStrip = 0; 
+        }
+        #endregion
+
         #region Recipe
         string _sRecipe = ""; 
         public string p_sRecipe

@@ -30,7 +30,7 @@
                 </GroupBox.Header>
                 <StackPanel Orientation="Vertical">
                     <StackPanel Orientation="Horizontal" Margin="3">
-                        <Label Content="EQ :"/>
+                        <Label Content="EQ :" Margin="3"/>
                         <Label x:Name="labelEQState" Content="{Binding p_eState}" Margin="3"/>
                     </StackPanel>
                     <CheckBox x:Name="checkBoxStop" Content="EQ.Stop" IsChecked="{Binding p_bStop}" Margin="3"/>
@@ -96,6 +96,15 @@
                         <Label Grid.Column="0" Content="Bundle :" Margin="3" VerticalAlignment="Center"/>
                         <TextBox Grid.Column="1" x:Name="textBoxBundle" Text="{Binding p_iBundle}" Margin="3" VerticalAlignment="Center" TextAlignment="Center"/>
                     </Grid>
+                </StackPanel>
+            </GroupBox>
+            <GroupBox Grid.Column="4" BorderBrush="Black" BorderThickness="1" Margin="3">
+                <GroupBox.Header>
+                    <TextBlock Text="Stack" Foreground="Black" FontWeight="Bold" />
+                </GroupBox.Header>
+                <StackPanel Orientation="Vertical">
+                    <CheckBox x:Name="checkBoxKeyence" Content="Read Barcode" IsChecked="{Binding p_bUseKeyence}" Margin="3"/>
+                    <CheckBox x:Name="checkBoxPaper" Content="Check Paper" IsChecked="{Binding p_bCheckPaper}" Margin="3"/>
                 </StackPanel>
             </GroupBox>
         </Grid>

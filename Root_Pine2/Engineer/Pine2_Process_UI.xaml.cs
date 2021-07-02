@@ -40,7 +40,10 @@ namespace Root_Pine2.Engineer
             textBlock3D.DataContext = m_pine2;
 
             textBoxLotID.DataContext = m_pine2;
-            textBoxBundle.DataContext = m_pine2; 
+            textBoxBundle.DataContext = m_pine2;
+
+            checkBoxKeyence.DataContext = m_pine2;
+            checkBoxPaper.DataContext = m_pine2; 
 
             InitMagazineEV_UI();
             InitLoaderUI(handler.m_loader0, gridLoader, 6);
