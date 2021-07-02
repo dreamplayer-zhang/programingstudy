@@ -56,15 +56,34 @@ namespace RootTools_Vision
             bool isDarkInsp = !parameterBackside.IsBright; // Option
             int nGrayLevel = parameterBackside.Intensity; // Option
             int nDefectSz = parameterBackside.Size; // Option     
-
+            bool bAdaptiveIntensity = parameterBackside.IsAdaptiveIntensity;
+            int nAdaptiveOffset = parameterBackside.AdaptiveOffset;
             int chipW = this.currentWorkplace.Width; // 현재는 ROI = Chip이기 때문에 사용. 추후 실제 Chip H, W를 Recipe에서 가지고 오자
             int chipH = this.currentWorkplace.Height;
 
-            byte[] arrBinImg = new byte[chipW * chipH]; // Threashold 결과 array
+            byte[] arrBinImg = Enumerable.Repeat<byte>(255, chipH * chipW).ToArray<byte>(); // Threashold 결과 array
+            // Masking - 검사영역 255, 비검사 영역 0
+            OuterMasking(ref arrBinImg);
 
+            if(bAdaptiveIntensity)
+            { 
+                nGrayLevel = CLR_IP.Cpp_CalcAdaptiveThresholdParam(workplaceBuffer, arrBinImg, chipW, chipH, nAdaptiveOffset);
+            
+                if(nGrayLevel == -1)
+                    nGrayLevel = parameterBackside.Intensity;
+            }
 
-           
-
+            if (isDarkInsp)
+            {
+                // 비검사 영역을 255로 만들어 Threhosld에 걸리지 않게 해줌
+                CLR_IP.Cpp_Bitwise_NOT(arrBinImg, arrBinImg, chipW, chipH);
+                CLR_IP.Cpp_Bitwise_OR(workplaceBuffer, arrBinImg, workplaceBuffer, chipW, chipH);
+            }
+            else
+            {
+                // 비검사 영역을 0으로 만들어 Threshold에 걸리지 않게 해줌
+                CLR_IP.Cpp_Bitwise_AND(workplaceBuffer, arrBinImg, workplaceBuffer, chipW, chipH);
+            }
 
             // Dark
             CLR_IP.Cpp_Threshold(workplaceBuffer, arrBinImg, chipW, chipH, isDarkInsp, nGrayLevel);
@@ -87,12 +106,6 @@ namespace RootTools_Vision
                 default:
                     break;
             }
-
-
-
-            // Masking
-            OuterMasking(ref arrBinImg);
-
 
             // Labeling
             var Label = CLR_IP.Cpp_Labeling(workplaceBuffer, arrBinImg, chipW, chipH, isDarkInsp);
@@ -179,6 +192,10 @@ namespace RootTools_Vision
                     if (absX_2 + absY_2 > radius_2)
                     {
                         imgArr[(long)index] = 0;
+                    }
+                    else
+                    {
+                        imgArr[(long)index] = 255;
                     }
                 }
             }
