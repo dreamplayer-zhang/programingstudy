@@ -986,6 +986,7 @@ namespace RootTools.Camera.Dalsa
             const int nTimeOutInterval = 10; // ms
             int nScanAxisTimeOut = nTimeOut_10s / nTimeOutInterval;
             int previBlock = 0;
+            Console.WriteLine("Grab Loop Start");
             while (iBlock < m_nGrabCount)
             {
                 if (previBlock == iBlock)
@@ -1108,6 +1109,7 @@ namespace RootTools.Camera.Dalsa
                 }
             }
             p_CamInfo.p_eState = eCamState.Ready;
+            Console.WriteLine("Grab Loop End");
         }
         unsafe void Overlap(byte* pS, byte* pD, int nOverlap)
         {

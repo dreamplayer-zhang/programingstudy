@@ -210,6 +210,7 @@ namespace Root_Pine2.Module
                     if (m_vision.IsBusy()) EQ.p_bStop = true;
                     iSnap++; 
                 }
+                m_vision.RunLightOff();
                 m_aBoat[eWorks].p_eStep = Boat.eStep.Done;
             }
             catch (Exception e) { p_sInfo = e.Message; }
