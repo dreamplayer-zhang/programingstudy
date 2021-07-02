@@ -703,7 +703,8 @@ namespace Root_VEGA_P.Module
             {
                 if (IsPodExist()) 
                     child.p_infoPod = null;
-                else p_infoPod = null;
+                else
+                    p_infoPod = null;
             }
             return IsPodExist() ? "OK" : "RTR Get Error : " + child.p_id;
         }
@@ -739,8 +740,10 @@ namespace Root_VEGA_P.Module
             }
             finally
             {
-                if (IsPodExist()) child.p_infoPod = null;
-                else p_infoPod = null;
+                if (IsPodExist()) 
+                    child.p_infoPod = null;
+                else 
+                    p_infoPod = null;
             }
             return IsPodExist() ? "RTR Put Error : " + child.p_id : "OK";
         }

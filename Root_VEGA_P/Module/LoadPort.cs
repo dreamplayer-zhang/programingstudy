@@ -496,7 +496,7 @@ namespace Root_VEGA_P.Module
                     m_infoPods.NewInfoPod(4);
                     return "OK";
                 }
-                m_infoPods.ClearInfoPod(); //일단
+
                 switch (m_infoPods.p_eState)
                 {
                     case InfoPods.eState.Dock: 
@@ -521,6 +521,8 @@ namespace Root_VEGA_P.Module
                 if (Run(m_stage.RunPodOpen(true))) return p_sInfo;
                 if (Run(m_stage.RunVacuum(false))) return p_sInfo;
                 m_infoPods.NewInfoPod(4);
+
+                
                 return "OK";
             }
             finally { m_bDocking = false; }

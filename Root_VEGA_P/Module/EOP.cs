@@ -754,9 +754,14 @@ namespace Root_VEGA_P.Module
         {
             base.Reset();
             RunMove(ePos.Backward);
-            if(m_dome.m_axisRotate.p_bServoOn)
-                m_dome.RunRotate(Dome.ePos.Ready);
-
+            if(!m_dome.m_axisRotate.p_bServoOn)
+            {
+                m_dome.m_axisRotate.ServoOn(true);
+                if (Run(m_dome.m_axisRotate.StartHome())) 
+                    return;
+            }    
+                
+            m_dome.RunRotate(Dome.ePos.Ready);
             m_door.RunCylinderUp(true); 
         }
 
