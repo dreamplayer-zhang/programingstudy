@@ -33,7 +33,23 @@ namespace Root_Pine2.Engineer
         public void NewLot()
         {
             m_pine2.p_iBundle = 0;
-            m_loadEV.p_iStrip = 0; 
+            m_loadEV.p_iStrip = 0;
+            m_sLotSend = "";
+            SendLotInfo(); 
+        }
+
+        string m_sLotSend = "";
+        void SendLotInfo()
+        {
+            if (m_sLotSend == m_pine2.p_sLotID) return;
+            int nMode = (m_pine2.p_eMode == Pine2.eRunMode.Magazine) ? 1 : 0; 
+            foreach (Boats boats in m_aBoats.Values)
+            {
+                Pine2.VisionOption option = m_pine2.m_aVisionOption[boats.m_vision.m_eVision];
+                Vision2D.LotInfo lotInfo = new Vision2D.LotInfo(nMode, p_sRecipe, m_pine2.p_sLotID, option.p_bLotMix, option.p_bBarcode, option.p_nBarcode, option.p_lBarcode); 
+                boats.m_vision.SendLotInfo(lotInfo);
+            }
+            m_sLotSend = m_pine2.p_sLotID;
         }
         #endregion
 

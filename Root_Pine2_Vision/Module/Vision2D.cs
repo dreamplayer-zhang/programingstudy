@@ -163,14 +163,12 @@ namespace Root_Pine2_Vision.Module
         }
         #endregion
 
-        #region Send Recipe
+        #region Send Info
         public string SendRecipe(string sRecipe)
         {
             if (p_eRemote == eRemote.Client) return RemoteRun(eRemoteRun.SendRecipe, eRemote.Client, sRecipe);
             else
             {
-                //m_recipe[eWorks.A].RecipeOpen(sRecipe);
-                //m_recipe[eWorks.B].RecipeOpen(sRecipe);
                 m_RunningRecipe[eWorks.A].RecipeOpen(sRecipe);
                 m_RunningRecipe[eWorks.B].RecipeOpen(sRecipe);
                 string sRunA = m_aWorks[eWorks.A].SendRecipe(sRecipe);
@@ -179,9 +177,7 @@ namespace Root_Pine2_Vision.Module
                 return "A = " + sRunA + ", B = " + sRunB; 
             }
         }
-        #endregion
 
-        #region Send SnapInfo
         public string SendSnapInfo(eWorks eWorks)
         {
             if (p_eRemote == eRemote.Client) return RemoteRun(eRemoteRun.SendSnapInfo, eRemote.Client, eWorks);
@@ -194,6 +190,61 @@ namespace Root_Pine2_Vision.Module
                 int nSnapCount = m_RunningRecipe[eWorks].p_lSnap;               // 총 Snap 횟수
                 int nSnapMode = (int)m_RunningRecipe[eWorks].p_eSnapMode;       // Snap Mode (RGB, APS, ALL)
                 return m_aWorks[eWorks].SendSnapInfo(m_RunningRecipe[eWorks].m_sRecipe, nSnapMode, nSnapCount); // 3. VisionWorks2 Receive SnapInfo
+            }
+        }
+
+        public class LotInfo
+        {
+            public int m_nMode = 0;
+            public string m_sRecipe = "";
+            public string m_sLotID = "";
+            public bool m_bLotMix = false;
+            public bool m_bBarcode = false;
+            public int m_nBarcode = 0;
+            public int m_lBarcode = 0;
+
+            public LotInfo Clone()
+            {
+                return new LotInfo(m_nMode, m_sRecipe, m_sLotID, m_bLotMix, m_bBarcode, m_nBarcode, m_lBarcode); 
+            }
+
+            public string GetString()
+            {
+                return m_nMode.ToString() + "," + m_sRecipe + "," + m_sLotID + "," + (m_bBarcode ? "1," : "0,") + (m_bLotMix ? "1," : "0,") + m_nBarcode.ToString() + "," + m_lBarcode.ToString(); 
+            }
+
+            public void RunTree(Tree tree, bool bVisible)
+            {
+                m_nMode = tree.Set(m_nMode, m_nMode, "Mode", "Operation Mode (1 = Magazine, 0 = Stack)", bVisible);
+                m_sRecipe = tree.Set(m_sRecipe, m_sRecipe, "Recipe", "Recipe Name", bVisible);
+                m_sLotID = tree.Set(m_sLotID, m_sLotID, "LotID", "Lot Name", bVisible);
+                m_bLotMix = tree.Set(m_bLotMix, m_bLotMix, "Lot Mix", "Check Lot Mix", bVisible);
+                m_bBarcode = tree.Set(m_bBarcode, m_bBarcode, "Barcode", "Read Barcode", bVisible);
+                m_nBarcode = tree.Set(m_nBarcode, m_nBarcode, "Barcode Start", "Read Barcode Start Pos (pixel)", bVisible);
+                m_lBarcode = tree.Set(m_lBarcode, m_lBarcode, "Barcode Length", "Read Barcode Length (pixel)", bVisible);
+            }
+
+            public LotInfo(int nMode, string sRecipe, string sLotID, bool bLotMix, bool bBarcode, int nBarcode, int lBarcode)
+            {
+                m_nMode = nMode;
+                m_sRecipe = sRecipe;
+                m_sLotID = sLotID;
+                m_bLotMix = bLotMix;
+                m_bBarcode = bBarcode;
+                m_nBarcode = nBarcode;
+                m_lBarcode = lBarcode; 
+            }
+        }
+
+        public string SendLotInfo(LotInfo lotInfo)
+        {
+            if (p_eRemote == eRemote.Client) return RemoteRun(eRemoteRun.SendLotInfo, eRemote.Client, lotInfo);
+            else
+            {
+                string sRunA = m_aWorks[eWorks.A].SendLotInfo(lotInfo);
+                string sRunB = m_aWorks[eWorks.B].SendLotInfo(lotInfo);
+                if ((sRunA == "OK") && (sRunB == "OK")) return "OK";
+                return sRunA + ", " + sRunB; 
             }
         }
         #endregion
@@ -802,7 +853,8 @@ namespace Root_Pine2_Vision.Module
             RunLight,
             RunLightOff,
             SendRecipe,
-            SendSnapInfo
+            SendSnapInfo,
+            SendLotInfo,
         }
 
         Run_Remote GetRemoteRun(eRemoteRun eRemoteRun, eRemote eRemote, dynamic value)
@@ -816,6 +868,7 @@ namespace Root_Pine2_Vision.Module
                 case eRemoteRun.RunLight: run.m_lightPower = value; break;
                 case eRemoteRun.SendRecipe: run.m_sRecipe = value; break;
                 case eRemoteRun.SendSnapInfo: run.m_eWorks = value; break;
+                case eRemoteRun.SendLotInfo: run.m_lotInfo = value; break;
             }
             return run;
         }
@@ -847,6 +900,7 @@ namespace Root_Pine2_Vision.Module
             public LightPower m_lightPower;
             public string m_sRecipe = "";
             public eWorks m_eWorks = eWorks.A;
+            public LotInfo m_lotInfo = null; 
             public override ModuleRunBase Clone()
             {
                 Run_Remote run = new Run_Remote(m_module);
@@ -854,6 +908,7 @@ namespace Root_Pine2_Vision.Module
                 run.m_lightPower = m_lightPower.Clone();
                 run.m_sRecipe = m_sRecipe;
                 run.m_eWorks = m_eWorks;
+                run.m_lotInfo = m_lotInfo.Clone(); 
                 return run;
             }
 
@@ -866,6 +921,7 @@ namespace Root_Pine2_Vision.Module
                     case eRemoteRun.RunLight: m_lightPower.RunTree(tree.GetTree("Light Power", true, bVisible), bVisible); break;
                     case eRemoteRun.SendRecipe: m_sRecipe = tree.Set(m_sRecipe, m_sRecipe, "Recipe", "Recipe", bVisible); break;
                     case eRemoteRun.SendSnapInfo: m_eWorks = (eWorks)tree.Set(m_eWorks, m_eWorks, "Works", "Works", bVisible); break;
+                    case eRemoteRun.SendLotInfo: m_lotInfo.RunTree(tree.GetTree("LotInfo"), bVisible); break; 
                     default: break;
                 }
             }
@@ -879,7 +935,8 @@ namespace Root_Pine2_Vision.Module
                     case eRemoteRun.RunLight: m_module.RunLight(m_lightPower); break;
                     case eRemoteRun.RunLightOff: m_module.RunLightOff(); break;
                     case eRemoteRun.SendRecipe: return m_module.SendRecipe(m_sRecipe); 
-                    case eRemoteRun.SendSnapInfo: return m_module.SendSnapInfo(m_eWorks); 
+                    case eRemoteRun.SendSnapInfo: return m_module.SendSnapInfo(m_eWorks);
+                    case eRemoteRun.SendLotInfo: return m_module.SendLotInfo(m_lotInfo); 
                 }
                 return "OK";
             }

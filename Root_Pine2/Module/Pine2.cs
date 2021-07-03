@@ -1,4 +1,5 @@
 ﻿using Root_Pine2.Engineer;
+using Root_Pine2_Vision.Module;
 using RootTools;
 using RootTools.Comm;
 using RootTools.Control;
@@ -572,6 +573,7 @@ namespace Root_Pine2.Module
             m_thicknessDefault = tree.GetTree("Default Strip").Set(m_thicknessDefault, m_thicknessDefault, "Thickness", "Strip Thickness (um)");
             p_lStack = tree.GetTree("Stack").Set(p_lStack, p_lStack, "Stack Count", "Strip Max Stack Count");
             p_lStackPaper = tree.GetTree("Stack").Set(p_lStackPaper, p_lStackPaper, "Paper Count", "Paper Max Stack Count");
+            RunTreeVisionOption(tree.GetTree("VisionOption")); 
         }
         #endregion
 
@@ -627,9 +629,81 @@ namespace Root_Pine2.Module
         }
         #endregion
 
+        #region VisionOption
+        public class VisionOption : NotifyProperty
+        {
+            bool _bLotMix = false;
+            public bool p_bLotMix
+            {
+                get { return _bLotMix; }
+                set
+                {
+                    _bLotMix = value;
+                    OnPropertyChanged(); 
+                }
+            }
+
+            bool _bBarcode = false; 
+            public bool p_bBarcode
+            {
+                get { return _bBarcode; }
+                set
+                {
+                    _bBarcode = value;
+                    OnPropertyChanged();
+                }
+            }
+
+            int _nBarcode = 0;
+            public int p_nBarcode
+            {
+                get { return _nBarcode; }
+                set
+                {
+                    _nBarcode = value;
+                    OnPropertyChanged(); 
+                }
+            }
+
+            int _lBarcode = 0;
+            public int p_lBarcode
+            {
+                get { return _lBarcode; }
+                set
+                {
+                    _lBarcode = value;
+                    OnPropertyChanged();
+                }
+            }
+
+            public void RunTree(Tree tree)
+            {
+                p_bLotMix = tree.Set(p_bLotMix, p_bLotMix, "LotMix", "Lot Mix Inspect");
+                p_bBarcode = tree.Set(p_bBarcode, p_bBarcode, "Barcode", "Barcode Inspect");
+                p_nBarcode = tree.Set(p_nBarcode, p_nBarcode, "Barcode Start", "Barcode Start Position (pixel)", p_bBarcode);
+                p_lBarcode = tree.Set(p_lBarcode, p_lBarcode, "Barcode Length", "Barcode Length (pixel)", p_bBarcode);
+            }
+        }
+        public Dictionary<Vision2D.eVision, VisionOption> m_aVisionOption = new Dictionary<Vision2D.eVision, VisionOption>(); 
+        void InitVisionOption()
+        {
+            m_aVisionOption.Add(Vision2D.eVision.Top3D, new VisionOption());
+            m_aVisionOption.Add(Vision2D.eVision.Top2D, new VisionOption());
+            m_aVisionOption.Add(Vision2D.eVision.Bottom, new VisionOption());
+        }
+
+        void RunTreeVisionOption(Tree tree)
+        {
+            m_aVisionOption[Vision2D.eVision.Top3D].RunTree(tree.GetTree("Top3D"));
+            m_aVisionOption[Vision2D.eVision.Top2D].RunTree(tree.GetTree("Top2D"));
+            m_aVisionOption[Vision2D.eVision.Bottom].RunTree(tree.GetTree("Bottom"));
+        }
+        #endregion
+
         Pine2_Handler m_handler; 
         public Pine2(string id, IEngineer engineer)
         {
+            InitVisionOption(); 
             p_id = id;
             m_handler = (Pine2_Handler)engineer.ClassHandler();
             p_iBundle = m_reg.Read("Bundle", 0); 
