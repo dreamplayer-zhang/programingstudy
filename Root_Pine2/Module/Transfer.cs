@@ -1,4 +1,5 @@
-﻿using RootTools;
+﻿using Root_Pine2.Engineer;
+using RootTools;
 using RootTools.Control;
 using RootTools.Module;
 using RootTools.ToolBoxs;
@@ -467,6 +468,7 @@ namespace Root_Pine2.Module
             if (Run(m_buffer.RunMove(infoStrip.p_eMagazine, xOffset, true, true))) return p_sInfo;
             m_gripper.p_bEnable = (m_gripper.p_infoStrip != null);
             if (Run(m_pusher.RunPusher())) return p_sInfo;
+            ((Pine2_Handler)m_engineer.ClassHandler()).SendSortInfo(infoStrip); 
             m_magazineEV.PutInfoStrip(infoStrip);
             m_pusher.p_infoStrip = null;
             if (Run(m_gripper.WaitUnlock())) return p_sInfo; 

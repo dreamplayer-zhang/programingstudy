@@ -42,14 +42,31 @@ namespace Root_Pine2.Engineer
         void SendLotInfo()
         {
             if (m_sLotSend == m_pine2.p_sLotID) return;
-            int nMode = (m_pine2.p_eMode == Pine2.eRunMode.Magazine) ? 1 : 0; 
-            foreach (Boats boats in m_aBoats.Values)
-            {
-                Pine2.VisionOption option = m_pine2.m_aVisionOption[boats.m_vision.m_eVision];
-                Vision2D.LotInfo lotInfo = new Vision2D.LotInfo(nMode, p_sRecipe, m_pine2.p_sLotID, option.p_bLotMix, option.p_bBarcode, option.p_nBarcode, option.p_lBarcode); 
-                boats.m_vision.SendLotInfo(lotInfo);
-            }
+            int nMode = (m_pine2.p_eMode == Pine2.eRunMode.Magazine) ? 1 : 0;
+            if (m_pine2.p_b3D) SendLotInfo(m_aBoats[Vision2D.eVision.Top3D], nMode);
+            SendLotInfo(m_aBoats[Vision2D.eVision.Top2D], nMode);
+            SendLotInfo(m_aBoats[Vision2D.eVision.Bottom], nMode);
             m_sLotSend = m_pine2.p_sLotID;
+        }
+
+        void SendLotInfo(Boats boats, int nMode)
+        {
+            Pine2.VisionOption option = m_pine2.m_aVisionOption[boats.m_vision.m_eVision];
+            Vision2D.LotInfo lotInfo = new Vision2D.LotInfo(nMode, p_sRecipe, m_pine2.p_sLotID, option.p_bLotMix, option.p_bBarcode, option.p_nBarcode, option.p_lBarcode);
+            boats.m_vision.SendLotInfo(lotInfo);
+        }
+
+        public void SendSortInfo(InfoStrip infoStrip)
+        {
+            if (m_pine2.p_b3D) SendSortInfo(m_aBoats[Vision2D.eVision.Top3D], infoStrip);
+            SendSortInfo(m_aBoats[Vision2D.eVision.Top2D], infoStrip);
+            SendSortInfo(m_aBoats[Vision2D.eVision.Bottom], infoStrip);
+        }
+
+        void SendSortInfo(Boats boats, InfoStrip infoStrip)
+        {
+            Vision2D.SortInfo sortinfo = new Vision2D.SortInfo(infoStrip.m_eWorks, infoStrip.p_id, infoStrip.m_iBundle.ToString("00"));
+            boats.m_vision.SendSortInfo(sortinfo); 
         }
         #endregion
 

@@ -232,7 +232,9 @@ namespace Root_Pine2.Module
         {
             if (p_inspectStrip == null) return "InspectStrip id null";
             if (p_inspectStrip.p_id != sStripID) return "Strip ID MisMatch";
-            return p_inspectStrip.SetResult(eVision, sStripResult, sX, sY, sMapResult); 
+            string sRun = p_inspectStrip.SetResult(eVision, sStripResult, sX, sY, sMapResult); 
+            p_inspectStrip = null;
+            return sRun; 
         }
         #endregion
 

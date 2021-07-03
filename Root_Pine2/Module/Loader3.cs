@@ -277,7 +277,8 @@ namespace Root_Pine2.Module
                 if (Run(RunMoveZ(ePosTray))) return p_sInfo;
                 if (Run(m_picker.RunVacuum(false))) return p_sInfo;
                 if (Run(RunMoveUp())) return p_sInfo;
-                m_picker.p_infoStrip.m_iBundle = magazine.m_stack.p_iBundle; 
+                m_picker.p_infoStrip.m_iBundle = magazine.m_stack.p_iBundle;
+                m_handler.SendSortInfo(m_picker.p_infoStrip); 
                 m_picker.p_infoStrip = null;
                 magazine.PutInfoStrip(m_picker.p_infoStrip);
                 if (Run(RunMoveBoat(1 - m_eWorksLoad))) return p_sInfo;

@@ -187,6 +187,11 @@ namespace Root_Pine2.Module
             StopWatch sw = new StopWatch();
             try
             {
+                while (m_aBoat[eWorks].p_inspectStrip != null)
+                {
+                    Thread.Sleep(10);
+                    if (EQ.IsStop()) return "EQ Stop"; 
+                }
                 if (bReadRecipe)
                 {
                     string sRecipe = m_aBoat[eWorks].p_sRecipe;
