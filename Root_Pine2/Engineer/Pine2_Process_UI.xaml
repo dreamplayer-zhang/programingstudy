@@ -124,8 +124,43 @@
                     <CheckBox x:Name="checkBoxBlow" Content="Use Blow" IsChecked="{Binding p_bUseBlow}" Margin="3"/>
                     <CheckBox x:Name="checkBoxIonBlow" Content="Use Ion Blow" IsChecked="{Binding p_bUseIonBlow}" Margin="3"/>
                     <CheckBox x:Name="checkBoxAlignBlow" Content="Use Align Blow" IsChecked="{Binding p_bUseAlignBlow}" Margin="3"/>
-                    <CheckBox x:Name="checkBoxCycleStop" Content="Cycle Stop" IsChecked="{Binding p_bCycleStop}" Margin="3"/>
-
+                </StackPanel>
+            </GroupBox>
+            <GroupBox Grid.Column="5" x:Name="groupBoxVision" BorderBrush="Black" BorderThickness="1" Margin="3">
+                <GroupBox.Header>
+                    <TextBlock Text="Vision" Foreground="Black" FontWeight="Bold" />
+                </GroupBox.Header>
+                <StackPanel Orientation="Vertical">
+                    <CheckBox x:Name="checkBoxLotMix3D" Content="LotMix Top3D" IsChecked="{Binding p_bLotMix}" Margin="2"/>
+                    <CheckBox x:Name="checkBoxBarcode3D" Content="Barcode" IsChecked="{Binding p_bBarcode}" Margin="2"/>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBox Grid.Column="0" x:Name="textBoxBarcode3D" Text="{Binding p_nBarcode}" Margin="2" VerticalAlignment="Center" TextAlignment="Center"/>
+                        <TextBox Grid.Column="1" x:Name="textBoxBarcodeLength3D" Text="{Binding p_lBarcode}" Margin="2" VerticalAlignment="Center" TextAlignment="Center"/>
+                    </Grid>
+                    <CheckBox x:Name="checkBoxLotMix2D" Content="LotMix Top2D" IsChecked="{Binding p_bLotMix}" Margin="2,4,2,2"/>
+                    <CheckBox x:Name="checkBoxBarcode2D" Content="Barcode" IsChecked="{Binding p_bBarcode}" Margin="2"/>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBox Grid.Column="0" x:Name="textBoxBarcode2D" Text="{Binding p_nBarcode}" Margin="2" VerticalAlignment="Center" TextAlignment="Center"/>
+                        <TextBox Grid.Column="1" x:Name="textBoxBarcodeLength2D" Text="{Binding p_lBarcode}" Margin="2" VerticalAlignment="Center" TextAlignment="Center"/>
+                    </Grid>
+                    <CheckBox x:Name="checkBoxLotMixBottom" Content="LotMix Bottom" IsChecked="{Binding p_bLotMix}" Margin="2,4,2,2"/>
+                    <CheckBox x:Name="checkBoxBarcodeBottom" Content="Barcode" IsChecked="{Binding p_bBarcode}" Margin="2"/>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBox Grid.Column="0" x:Name="textBoxBarcodeBottom" Text="{Binding p_nBarcode}" Margin="2" VerticalAlignment="Center" TextAlignment="Center"/>
+                        <TextBox Grid.Column="1" x:Name="textBoxBarcodeLengthBottom" Text="{Binding p_lBarcode}" Margin="2" VerticalAlignment="Center" TextAlignment="Center"/>
+                    </Grid>
                 </StackPanel>
             </GroupBox>
         </Grid>

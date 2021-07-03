@@ -15,6 +15,7 @@
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
             <Grid Grid.Row="0" x:Name="gridLoad" Background="Beige" Margin="3" PreviewMouseLeftButtonDown="gridLoad_PreviewMouseLeftButtonDown">
@@ -27,10 +28,11 @@
                     <TextBlock Grid.Column="1" x:Name="textBlockStrip" Text="{Binding p_iStrip}" HorizontalAlignment="Center"/>
                 </Grid>
             </Grid>
-            <Grid Grid.Row="1" Margin="3" Background="White">
+            <CheckBox Grid.Row="1" x:Name="checkBoxCycleStop" Content="Cycle Stop" IsChecked="{Binding p_bCycleStop}" Margin="3"/>
+            <Grid Grid.Row="2" Margin="3" Background="White">
                 <TextBlock x:Name="textBlockInfo" Text="{Binding p_sInfo}"/>
             </Grid>
-            <tree:TreeUI Grid.Row="2" x:Name="treeRootUI" IsEnabled="False"/>
+            <tree:TreeUI Grid.Row="3" x:Name="treeRootUI" IsEnabled="False"/>
         </Grid>
     </GroupBox>
 </UserControl>

@@ -275,7 +275,6 @@ namespace Root_Pine2.Module
                 if (sRun != "OK")
                 {
                     p_sInfo = sRun;
-                    EQ.p_bStop = true;
                     p_eState = eState.Error;
                 }
             }
@@ -284,13 +283,11 @@ namespace Root_Pine2.Module
 
         #region Request
         TCPAsyncServer m_tcpRequest;
-
         private void M_tcpRequest_EventReciveData(byte[] aBuf, int nSize, Socket socket)
         {
             string sRead = Encoding.Default.GetString(aBuf, 0, nSize);
             if (sRead.Length <= 0) return;
             ReadRequest(sRead); 
-            m_tcpRequest.Send(sRead); 
         }
 
         void ReadRequest(string sRead)
@@ -304,11 +301,13 @@ namespace Root_Pine2.Module
                 Vision2D.eWorks eWorks = (asRead[3] == "A") ? Vision2D.eWorks.A : Vision2D.eWorks.B;
                 m_aBoat[eWorks].p_sRecipe = ""; 
                 m_aBoat[eWorks].p_sRecipe = sRecipe; 
-                StartSnap(eWorks, true); 
+                StartSnap(eWorks, true);
+                m_tcpRequest.Send(sRead);
             }
             if (asRead[1] == Works2D.eProtocol.SnapReady.ToString())
             {
-                m_bSnapReady = true; 
+                m_bSnapReady = true;
+                m_tcpRequest.Send(sRead);
             }
         }
         #endregion

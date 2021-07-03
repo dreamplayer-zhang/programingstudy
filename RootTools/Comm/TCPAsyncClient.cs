@@ -95,6 +95,7 @@ namespace RootTools.Comm
             try
             {
                 //if (m_socket == null) return;
+                m_socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
                 m_socket.Connect(p_sIP, p_nPort);
                 Async async = new Async(m_lMaxBuffer);
                 async.m_socket = m_socket;
@@ -121,9 +122,6 @@ namespace RootTools.Comm
                 Thread.Sleep(1000);
                 if (_bUse == true)
                 {
-                    if(m_socket == null)
-                        m_socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-
                     if (m_socket.Connected == false)
                         Connect();
                 }

@@ -81,7 +81,8 @@ namespace Root_Pine2_Vision.Module
             SnapInfo,
             Snap,
             SnapDone,
-            SnapReady
+            SnapReady,
+            LotInfo
         }
 
         public class Protocol
@@ -93,6 +94,7 @@ namespace Root_Pine2_Vision.Module
             public int m_nLineNum = 0;
             public string m_sSend = "";
             public string m_sInfo = "";
+            public Vision2D.LotInfo m_lotInfo = null; 
 
             bool m_bWait = true; 
             public void ReceiveData(string sSend)
@@ -145,6 +147,13 @@ namespace Root_Pine2_Vision.Module
                 m_nLineNum = nLineNum;
                 m_sSend = "<" + nID.ToString("000") + "," + eProtocol.ToString() + "," + sRecipe + "," + m_nSnapMode.ToString() + "," + m_nLineNum.ToString() + ">";
             }
+
+            public Protocol(int nID, eProtocol eProtocol, Vision2D.LotInfo lotInfo)
+            {
+                m_eProtocol = eProtocol;
+                m_lotInfo = lotInfo;
+                m_sSend = "<" + nID.ToString("000") + "," + eProtocol.ToString() + "," + lotInfo.GetString(); 
+            }
         }
         Queue<Protocol> m_qProtocol = new Queue<Protocol>();
         Protocol m_protocolSend = null;
@@ -176,6 +185,14 @@ namespace Root_Pine2_Vision.Module
         {
             if (m_bStartProcess == false) return "OK";
             Protocol protocol = new Protocol(m_iProtocol, eProtocol.SnapInfo, sRecipe, nSnapMode, nLineNum);
+            m_qProtocol.Enqueue(protocol);
+            return protocol.WaitReply(m_secTimeout);
+        }
+
+        public string SendLotInfo(Vision2D.LotInfo lotInfo)
+        {
+            if (m_bStartProcess == false) return "OK";
+            Protocol protocol = new Protocol(m_iProtocol, eProtocol.LotInfo, lotInfo);
             m_qProtocol.Enqueue(protocol);
             return protocol.WaitReply(m_secTimeout);
         }
