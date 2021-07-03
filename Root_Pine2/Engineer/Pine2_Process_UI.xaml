@@ -98,13 +98,34 @@
                     </Grid>
                 </StackPanel>
             </GroupBox>
-            <GroupBox Grid.Column="4" BorderBrush="Black" BorderThickness="1" Margin="3">
+            <GroupBox Grid.Column="4" x:Name="groupBoxStack" BorderBrush="Black" BorderThickness="1" Margin="3">
                 <GroupBox.Header>
                     <TextBlock Text="Stack" Foreground="Black" FontWeight="Bold" />
                 </GroupBox.Header>
                 <StackPanel Orientation="Vertical">
                     <CheckBox x:Name="checkBoxKeyence" Content="Read Barcode" IsChecked="{Binding p_bUseKeyence}" Margin="3"/>
                     <CheckBox x:Name="checkBoxPaper" Content="Check Paper" IsChecked="{Binding p_bCheckPaper}" Margin="3"/>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Label Grid.Column="0" Content="Max Stack :" Margin="3" VerticalAlignment="Center"/>
+                        <TextBox Grid.Column="1" x:Name="textBoxlStack" Text="{Binding p_lStack}" Margin="3" VerticalAlignment="Center" TextAlignment="Center"/>
+                    </Grid>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Label Grid.Column="0" Content="Max Paper :" Margin="3" VerticalAlignment="Center"/>
+                        <TextBox Grid.Column="1" x:Name="textBoxlStackPaper" Text="{Binding p_lStackPaper}" Margin="3" VerticalAlignment="Center" TextAlignment="Center"/>
+                    </Grid>
+                    <CheckBox x:Name="checkBoxBlow" Content="Use Blow" IsChecked="{Binding p_bUseBlow}" Margin="3"/>
+                    <CheckBox x:Name="checkBoxIonBlow" Content="Use Ion Blow" IsChecked="{Binding p_bUseIonBlow}" Margin="3"/>
+                    <CheckBox x:Name="checkBoxAlignBlow" Content="Use Align Blow" IsChecked="{Binding p_bUseAlignBlow}" Margin="3"/>
+                    <CheckBox x:Name="checkBoxCycleStop" Content="Cycle Stop" IsChecked="{Binding p_bCycleStop}" Margin="3"/>
+
                 </StackPanel>
             </GroupBox>
         </Grid>

@@ -204,7 +204,7 @@ namespace RootTools.Control
         #endregion
 
         #region SW Limit
-        bool[] m_bSWLimit = new bool[2] { false, false };
+        protected bool[] m_bSWLimit = new bool[2] { false, false };
         protected bool m_bSWBoardLimit = false;
 
         protected string CheckSWLimit(ref double fPosDst)
@@ -215,7 +215,11 @@ namespace RootTools.Control
             if (m_bSWLimit[0])
             {
                 if (fPosDst >= fPosMinusLimit) return "OK";
-                if (fPosNow < fPosMinusLimit) return "SW Minus Limit Error : " + fPosDst.ToString();
+                if (fPosNow < fPosMinusLimit)
+                {
+                    EQ.p_bStop = true;
+                    return "SW Minus Limit Error : " + fPosDst.ToString();
+                }
                 fPosDst = fPosMinusLimit;
                 return "OK";
             }
@@ -223,7 +227,11 @@ namespace RootTools.Control
             if (m_bSWLimit[1])
             {
                 if (fPosDst <= fPosPlusLimit) return "OK";
-                if (fPosNow > fPosPlusLimit) return "SW Plus Limit Error : " + fPosDst.ToString();
+                if (fPosNow > fPosPlusLimit)
+                {
+                    EQ.p_bStop = true;
+                    return "SW Plus Limit Error : " + fPosDst.ToString();
+                }
                 fPosDst = fPosPlusLimit;
                 return "OK";
             }
@@ -234,8 +242,16 @@ namespace RootTools.Control
         {
             if (vJog == 0) return "OK";
             double fPosNow = p_posCommand;
-            if (m_bSWLimit[0] && (vJog < 0) && (fPosNow <= m_aPos[p_asPos[0]])) return "SW Minus Limit Error";
-            if (m_bSWLimit[1] && (vJog > 0) && (fPosNow >= m_aPos[p_asPos[1]])) return "SW Plus Limit Error";
+            if (m_bSWLimit[0] && (vJog < 0) && (fPosNow <= m_aPos[p_asPos[0]]))
+            {
+                EQ.p_bStop = true;
+                return "SW Minus Limit Error";
+            }
+            if (m_bSWLimit[1] && (vJog > 0) && (fPosNow >= m_aPos[p_asPos[1]]))
+            {
+                EQ.p_bStop = true;
+                return "SW Plus Limit Error";
+            }
             return "OK";
         }
 
@@ -404,7 +420,7 @@ namespace RootTools.Control
             if (EQ.IsStop()) return p_id + " EQ Stop";
             if (EQ.p_bSimulate) return "OK";
             //if (p_eState != eState.Ready) return p_id + " Axis State not Ready : " + p_eState.ToString();
-            return CheckSWLimit (fScale * m_speedNow.m_v);
+            return CheckSWLimit(fScale * m_speedNow.m_v);
         }
 
         public virtual void StopAxis(bool bSlowStop = true) { }

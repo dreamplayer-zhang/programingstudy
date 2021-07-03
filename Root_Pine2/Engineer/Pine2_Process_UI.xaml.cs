@@ -43,7 +43,13 @@ namespace Root_Pine2.Engineer
             textBoxBundle.DataContext = m_pine2;
 
             checkBoxKeyence.DataContext = m_pine2;
-            checkBoxPaper.DataContext = m_pine2; 
+            checkBoxPaper.DataContext = m_pine2;
+            textBoxlStack.DataContext = m_pine2;
+            textBoxlStackPaper.DataContext = m_pine2;
+            checkBoxBlow.DataContext = m_pine2;
+            checkBoxIonBlow.DataContext = m_pine2;
+            checkBoxAlignBlow.DataContext = m_pine2;
+            checkBoxCycleStop.DataContext = handler.m_loadEV; 
 
             InitMagazineEV_UI();
             InitLoaderUI(handler.m_loader0, gridLoader, 6);
@@ -154,6 +160,7 @@ namespace Root_Pine2.Engineer
             buttonStop.IsEnabled = (EQ.p_eState == EQ.eState.Run); 
             buttonReset.IsEnabled = (EQ.p_eState == EQ.eState.Ready) || (EQ.p_eState == EQ.eState.Error);
             buttonHome.IsEnabled = (EQ.p_eState == EQ.eState.Ready) || (EQ.p_eState == EQ.eState.Init) || (EQ.p_eState == EQ.eState.Error);
+            groupBoxStack.IsEnabled = m_pine2.p_eMode == Pine2.eRunMode.Stack; 
         }
 
         private void buttonRecipeSave_Click(object sender, RoutedEventArgs e)

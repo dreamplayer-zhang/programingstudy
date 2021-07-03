@@ -105,6 +105,13 @@ namespace Root_Pine2.Module
                 }
                 finally { dioPusher.Write(false); }
             }
+
+            public bool IsPusherOff()
+            {
+                if (m_dioPusher[0].m_aBitDI[0].p_bOn == false) return false;
+                if (m_dioPusher[1].m_aBitDI[0].p_bOn == false) return false;
+                return true; 
+            }
             #endregion
         }
         LoaderPusher m_loaderPusher = new LoaderPusher();
@@ -301,7 +308,7 @@ namespace Root_Pine2.Module
         #region Pusher
         public class Pusher : NotifyProperty
         {
-            DIO_I2O m_dioPusher;
+            public DIO_I2O m_dioPusher;
             DIO_I m_diOverload;
             DIO_Is m_diCheck;
             public void GetTools(ToolBox toolBox, Transfer module, bool bInit)
@@ -465,6 +472,15 @@ namespace Root_Pine2.Module
             if (Run(m_gripper.WaitUnlock())) return p_sInfo; 
             m_engineer.ClassHandler().CheckFinish();
             return "OK"; 
+        }
+        #endregion
+
+        #region Pusher Safe
+        public bool IsPusherOff()
+        {
+            if (m_loaderPusher.IsPusherOff() == false) return false;
+            if (m_pusher.m_dioPusher.m_aBitDI[0].p_bOn == false) return false; 
+            return true; 
         }
         #endregion
 
