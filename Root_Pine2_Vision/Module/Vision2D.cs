@@ -136,6 +136,7 @@ namespace Root_Pine2_Vision.Module
                 {
                     Light light = m_lightSet.m_aLight[n];
                     if (light.m_light != null) light.m_light.p_fSetPower = 0;
+                    prevLightPower.m_aPower[n] = 0;
                 }
             }
         }
