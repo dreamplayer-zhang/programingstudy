@@ -8,6 +8,7 @@ using RootTools.Module;
 using RootTools.Trees;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Net.Sockets;
 using System.Text;
@@ -107,11 +108,16 @@ namespace Root_Pine2_Vision.Module
             }
         }
 
+        LightPower prevLightPower = null;
         public void RunLight(LightPower lightPower)
         {
             if (p_eRemote == eRemote.Client) RemoteRun(eRemoteRun.RunLight, eRemote.Client, lightPower);
             else
             {
+                if(prevLightPower != null && LightPower.IsSameLight(prevLightPower, lightPower))
+                    return;
+
+                prevLightPower = lightPower.Clone();
                 SetRGBW(lightPower.m_eRGBW);
                 for (int n = 0; n < p_lLight; n++)
                 {
@@ -688,8 +694,16 @@ namespace Root_Pine2_Vision.Module
             {
                 if (m_camera.p_CamParam.p_eUserSetCurrent != nUserset)
                     m_camera.p_CamParam.p_eUserSetCurrent = nUserset;
+                
+                m_camera.m_bGrabThreadOn = false;
                 m_camera.GrabLineScan(memory, cpOffset, m_nLine, grabData);
+                while(m_camera.m_bGrabThreadOn != true)
+                {
+                    Thread.Sleep(10);
+                    if (EQ.IsStop()) return "EQ Stop";
+                }
                 ReqSnapReady(eWorks);
+
                 while (m_camera.p_CamInfo.p_eState != eCamState.Ready)
                 {
                     Thread.Sleep(10);
@@ -699,6 +713,13 @@ namespace Root_Pine2_Vision.Module
                 // Root Vision -> VisionWorks2
                 if (m_aWorks[eWorks].IsProcessRun())
                     m_aWorks[eWorks].SendSnapDone(iSnap);
+
+                
+               /* if (nSnapMode == Recipe.eSnapMode.ALL && (nTotalSnap/2-1) == iSnap) // 미리 체인지 하기위함
+                {
+                    System.Threading.Thread th = new Thread(UpdateUserset);
+                    th.Start();
+                }*/
             }
             catch (Exception ex)
             {
@@ -707,6 +728,16 @@ namespace Root_Pine2_Vision.Module
             }
             return "OK";
         }
+
+        private void UpdateUserset()
+        {
+            if (m_camera.p_CamParam.p_eUserSetCurrent == DalsaParameterSet.eUserSet.UserSet2)
+                m_camera.p_CamParam.p_eUserSetCurrent = DalsaParameterSet.eUserSet.UserSet3;
+            else if (m_camera.p_CamParam.p_eUserSetCurrent == DalsaParameterSet.eUserSet.UserSet3)
+                m_camera.p_CamParam.p_eUserSetCurrent = DalsaParameterSet.eUserSet.UserSet2;
+        }
+
+      
         #endregion
 
         #region Request

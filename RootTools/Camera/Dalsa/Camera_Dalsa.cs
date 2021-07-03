@@ -157,6 +157,7 @@ namespace RootTools.Camera.Dalsa
         int m_nPreWidthG = 8000;
         int m_nPreWidthB = 8000;
 
+        public bool m_bGrabThreadOn = false;   // true When thread is arrived in Grab Loop
         const int thread = 12;
         const int threadBuff = 16000;
         CLR_IP m_clrip = new CLR_IP();
@@ -987,6 +988,7 @@ namespace RootTools.Camera.Dalsa
             int nScanAxisTimeOut = nTimeOut_10s / nTimeOutInterval;
             int previBlock = 0;
             Console.WriteLine("Grab Loop Start");
+            m_bGrabThreadOn = true;
             while (iBlock < m_nGrabCount)
             {
                 if (previBlock == iBlock)
