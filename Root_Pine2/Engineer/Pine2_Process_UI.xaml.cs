@@ -49,7 +49,19 @@ namespace Root_Pine2.Engineer
             checkBoxBlow.DataContext = m_pine2;
             checkBoxIonBlow.DataContext = m_pine2;
             checkBoxAlignBlow.DataContext = m_pine2;
-            checkBoxCycleStop.DataContext = handler.m_loadEV; 
+
+            checkBoxLotMix3D.DataContext = m_pine2.m_aVisionOption[Vision2D.eVision.Top3D];
+            checkBoxBarcode3D.DataContext = m_pine2.m_aVisionOption[Vision2D.eVision.Top3D];
+            textBoxBarcode3D.DataContext = m_pine2.m_aVisionOption[Vision2D.eVision.Top3D];
+            textBoxBarcodeLength3D.DataContext = m_pine2.m_aVisionOption[Vision2D.eVision.Top3D];
+            checkBoxLotMix2D.DataContext = m_pine2.m_aVisionOption[Vision2D.eVision.Top2D];
+            checkBoxBarcode2D.DataContext = m_pine2.m_aVisionOption[Vision2D.eVision.Top2D];
+            textBoxBarcode2D.DataContext = m_pine2.m_aVisionOption[Vision2D.eVision.Top2D];
+            textBoxBarcodeLength2D.DataContext = m_pine2.m_aVisionOption[Vision2D.eVision.Top2D];
+            checkBoxLotMixBottom.DataContext = m_pine2.m_aVisionOption[Vision2D.eVision.Bottom];
+            checkBoxBarcodeBottom.DataContext = m_pine2.m_aVisionOption[Vision2D.eVision.Bottom];
+            textBoxBarcodeBottom.DataContext = m_pine2.m_aVisionOption[Vision2D.eVision.Bottom];
+            textBoxBarcodeLengthBottom.DataContext = m_pine2.m_aVisionOption[Vision2D.eVision.Bottom];
 
             InitMagazineEV_UI();
             InitLoaderUI(handler.m_loader0, gridLoader, 6);
@@ -140,7 +152,14 @@ namespace Root_Pine2.Engineer
             foreach (Boats_UI ui in m_aBoatsUI) ui.OnTimer();
             m_transferUI.OnTimer();
             m_loadEVUI.OnTimer();
-            OnTimerRun(); 
+            OnTimerRun();
+
+            textBoxBarcode3D.IsEnabled = m_pine2.m_aVisionOption[Vision2D.eVision.Top3D].p_bBarcode;
+            textBoxBarcodeLength3D.IsEnabled = m_pine2.m_aVisionOption[Vision2D.eVision.Top3D].p_bBarcode;
+            textBoxBarcode2D.IsEnabled = m_pine2.m_aVisionOption[Vision2D.eVision.Top2D].p_bBarcode;
+            textBoxBarcodeLength2D.IsEnabled = m_pine2.m_aVisionOption[Vision2D.eVision.Top2D].p_bBarcode;
+            textBoxBarcodeBottom.IsEnabled = m_pine2.m_aVisionOption[Vision2D.eVision.Bottom].p_bBarcode;
+            textBoxBarcodeLengthBottom.IsEnabled = m_pine2.m_aVisionOption[Vision2D.eVision.Bottom].p_bBarcode;
         }
 
         private void textBlockMode_PreviewMouseDown(object sender, MouseButtonEventArgs e)
@@ -203,8 +222,7 @@ namespace Root_Pine2.Engineer
 
         private void buttonNewLot_Click(object sender, RoutedEventArgs e)
         {
-            m_handler.m_loadEV.p_iStrip = 0;
-            m_handler.m_pine2.p_iBundle = 0; 
+            m_handler.NewLot(); 
         }
         #endregion
     }
