@@ -211,7 +211,7 @@ namespace Root_Pine2.Module
                     m_vision.RunLight(snap.m_lightPower);
                     m_bSnapReady = false;
                     m_vision.StartSnap(snap, eWorks, iSnap);
-                    if (Run(RunMoveSnapStart(eWorks, snap))) return p_sInfo;
+                    if (Run(RunMoveSnapStart(eWorks, snap, i % xLine))) return p_sInfo;
                     while (m_bSnapReady == false)
                     {
                         Thread.Sleep(10);
@@ -221,7 +221,7 @@ namespace Root_Pine2.Module
                     if (Run(m_aBoat[eWorks].RunSnap())) return p_sInfo;
                     if (i < m_aBoat[eWorks].m_recipe.m_aSnap.Count-1)
                     {
-                        if (Run(RunMoveSnapStart(eWorks, m_aBoat[eWorks].m_recipe.m_aSnap[i + 1]))) return p_sInfo;
+                        if (Run(RunMoveSnapStart(eWorks, m_aBoat[eWorks].m_recipe.m_aSnap[i + 1], i % xLine))) return p_sInfo;
                     }
                     if (m_vision.IsBusy()) EQ.p_bStop = true;
                     iSnap++;
