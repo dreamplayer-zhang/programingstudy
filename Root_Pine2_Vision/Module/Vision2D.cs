@@ -740,8 +740,8 @@ namespace Root_Pine2_Vision.Module
       
         #endregion
 
-        #region Request
-        int m_nReq = 0;
+        #region Request  
+        int m_nReq = 0; //forget
         string m_sReceive = "";
         TCPAsyncClient m_tcpRequest;
         private void M_tcpRequest_EventReceiveData(byte[] aBuf, int nSize, Socket socket)
@@ -768,6 +768,14 @@ namespace Root_Pine2_Vision.Module
             m_sReceive = "";
             m_tcpRequest.Send(sSend);
             return "OK";
+        }
+
+        public string ReqInspDone(string sStripID, string sStripResult, string sX, string sY, string sMapResult, eWorks eWorks)
+        {
+            string sSend = m_nReq.ToString("000") + "," + Works2D.eProtocol.SnapReady.ToString();
+            sSend += sStripID + "," + sStripResult + "," + sX + "," + sY + "," + sMapResult + "," + eWorks.ToString();
+            m_tcpRequest.Send(sSend); 
+            return "OK"; 
         }
         #endregion
 

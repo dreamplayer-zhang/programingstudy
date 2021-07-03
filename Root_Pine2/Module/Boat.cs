@@ -223,7 +223,17 @@ namespace Root_Pine2.Module
                     m_recipe.RecipeOpen(value); 
             }
         }
-        public Vision2D.Recipe m_recipe; 
+        public Vision2D.Recipe m_recipe;
+        #endregion
+
+        #region Inspect
+        public InfoStrip p_inspectStrip { get; set; }
+        public string InspectDone(Vision2D.eVision eVision, string sStripID, string sStripResult, string sX, string sY, string sMapResult)
+        {
+            if (p_inspectStrip == null) return "InspectStrip id null";
+            if (p_inspectStrip.p_id != sStripID) return "Strip ID MisMatch";
+            return p_inspectStrip.SetResult(eVision, sStripResult, sX, sY, sMapResult); 
+        }
         #endregion
 
         public void Reset(ModuleBase.eState eState)
@@ -234,7 +244,16 @@ namespace Root_Pine2.Module
             RunVacuum(false); 
         }
 
-        public InfoStrip p_infoStrip { get; set; }
+        InfoStrip _infoStrip = null;
+        public InfoStrip p_infoStrip 
+        { 
+            get { return _infoStrip; }
+            set
+            {
+                _infoStrip = value;
+                if (value != null) p_inspectStrip = value; 
+            }
+        }
         public string p_id { get; set; }
         Boats m_boats;
         public Boat(string id, Boats boats, Vision2D.eWorks eWorks)

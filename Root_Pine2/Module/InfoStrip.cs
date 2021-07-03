@@ -1,6 +1,8 @@
 ﻿using Root_Pine2_Vision.Module;
 using RootTools;
 using RootTools.Trees;
+using System;
+using System.Collections.Generic;
 
 namespace Root_Pine2.Module
 {
@@ -16,7 +18,7 @@ namespace Root_Pine2.Module
             BCD,
             Paper,
         }
-        eResult _eResult = eResult.Init; 
+        eResult _eResult = eResult.Init;
         public eResult p_eResult
         {
             get { return _eResult; }
@@ -24,7 +26,57 @@ namespace Root_Pine2.Module
             {
                 if (_eResult == value) return;
                 _eResult = value;
-                OnPropertyChanged(); 
+                OnPropertyChanged();
+            }
+        }
+
+        public CPoint m_szMap = new CPoint();
+        public string SetResult(Vision2D.eVision eVision, string sStripResult, string sX, string sY, string sMapResult)
+        {
+            string sResult = "OK";
+            try
+            {
+                eResult eResult = GetResult(sStripResult);
+                if (eResult == eResult.Init) return "Invalid Result"; 
+                if (p_eResult < eResult) p_eResult = eResult; 
+                m_szMap.X = Convert.ToInt32(sX);
+                m_szMap.Y = Convert.ToInt32(sY);
+                SetMapResult(sMapResult); 
+            }
+            catch (Exception e) { sResult = "SetResult Exception : " + e.Message; }
+            return sResult;
+        }
+
+        eResult GetResult(string sStripResult)
+        {
+            foreach (eResult eResult in Enum.GetValues(typeof(eResult)))
+            {
+                if (sStripResult == eResult.ToString()) return eResult; 
+            }
+            return eResult.Init; 
+        }
+
+        public List<List<int>> m_aMapResult = new List<List<int>>();
+        void SetMapResult(string sMapResult)
+        {
+            while (m_aMapResult.Count < m_szMap.Y) m_aMapResult.Add(new List<int>()); 
+            for (int yp = 0; yp < m_szMap.Y; yp++)
+            {
+                while (m_aMapResult[yp].Count < m_szMap.X) m_aMapResult[yp].Add(1); 
+            }
+            int y = 0;
+            int x = 0;
+            foreach (char c in sMapResult)
+            {
+                switch (c)
+                {
+                    case '0': if (m_aMapResult[y][x] == 1) m_aMapResult[y][x] = 0; break;
+                    case '1': break;
+                    default:
+                        int n = c - '0';
+                        if (m_aMapResult[y][x] < n) m_aMapResult[y][x] = n;
+                        break; 
+                }
             }
         }
         #endregion

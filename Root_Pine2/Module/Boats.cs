@@ -284,6 +284,19 @@ namespace Root_Pine2.Module
                 m_bSnapReady = true;
                 m_tcpRequest.Send(sRead);
             }
+            if (asRead[1] == Works2D.eProtocol.InspDone.ToString())
+            {
+                string sStripID = asRead[2];
+                string sStripResult = asRead[3];
+                string sX = asRead[4];
+                string sY = asRead[5];
+                string sMapResult = asRead[6];
+                string sWork = asRead[7];
+                foreach (Vision2D.eWorks eWorks in Enum.GetValues(typeof(Vision2D.eWorks)))
+                {
+                    if (sWork == eWorks.ToString()) m_aBoat[eWorks].InspectDone(m_vision.m_eVision, sStripID, sStripResult, sX, sY, sMapResult);
+                }
+            }
         }
         #endregion
 
