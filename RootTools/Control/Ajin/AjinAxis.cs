@@ -567,7 +567,7 @@ namespace RootTools.Control.Ajin
             Thread.Sleep(2000);
             while (m_bThread)
             {
-                Thread.Sleep(100);
+                Thread.Sleep(10);
                 switch (p_eState)
                 {
                     case eState.Home:

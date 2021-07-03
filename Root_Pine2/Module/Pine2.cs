@@ -460,6 +460,39 @@ namespace Root_Pine2.Module
                 OnPropertyChanged();
             }
         }
+        
+        bool _bUseBlow = true;
+        public bool p_bUseBlow
+        {
+            get { return _bUseBlow; }
+            set
+            {
+                _bUseBlow = value;
+                OnPropertyChanged(); 
+            }
+        }
+
+        bool _bUseIonBlow = true;
+        public bool p_bUseIonBlow
+        {
+            get { return _bUseIonBlow; }
+            set
+            {
+                _bUseIonBlow = value;
+                OnPropertyChanged(); 
+            }
+        }
+
+        bool _bUseAlignBlow = true;
+        public bool p_bUseAlignBlow
+        {
+            get { return _bUseAlignBlow; }
+            set
+            {
+                _bUseAlignBlow = value;
+                OnPropertyChanged(); 
+            }
+        }
 
         void RunTreeMode(Tree tree)
         {
@@ -467,6 +500,9 @@ namespace Root_Pine2.Module
             p_b3D = tree.Set(p_b3D, p_b3D, "3D", "RunMode");
             p_bUseKeyence = tree.Set(p_bUseKeyence, p_bUseKeyence, "Keyence", "RunMode");
             p_bCheckPaper = tree.Set(p_bCheckPaper, p_bCheckPaper, "Check Paper", "RunMode");
+            p_bUseBlow = tree.Set(p_bUseBlow, p_bUseBlow, "Blow", "Use Blow");
+            p_bUseIonBlow = tree.Set(p_bUseIonBlow, p_bUseIonBlow, "Ion Blow", "Use Blow");
+            p_bUseAlignBlow = tree.Set(p_bUseAlignBlow, p_bUseAlignBlow, "Align Blow", "Use Blow");
         }
         #endregion
 

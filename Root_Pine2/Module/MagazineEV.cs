@@ -1,4 +1,5 @@
-﻿using RootTools;
+﻿using Root_Pine2.Engineer;
+using RootTools;
 using RootTools.Control;
 using RootTools.Module;
 using RootTools.ToolBoxs;
@@ -189,6 +190,7 @@ namespace Root_Pine2.Module
 
             string MoveElevator(Enum ePos, double fOffset = 0)
             {
+                if (m_handler.m_transfer.IsPusherOff() == false) return "Check Transfer Pusher";
                 if (m_bProduct[InfoStrip.eMagazinePos.Down])
                 {
                     double fPos = m_axis.GetPosValue(ePos) + fOffset;
@@ -303,9 +305,11 @@ namespace Root_Pine2.Module
             }
 
             Conveyor m_conveyor;
-            public Elevator(Conveyor conveyor)
+            Pine2_Handler m_handler;
+            public Elevator(Conveyor conveyor, Pine2_Handler handler)
             {
                 m_conveyor = conveyor;
+                m_handler = handler; 
                 m_bProduct.Add(InfoStrip.eMagazinePos.Up, false);
                 m_bProduct.Add(InfoStrip.eMagazinePos.Down, false);
             }
@@ -740,11 +744,11 @@ namespace Root_Pine2.Module
         #endregion
 
         InfoStrip.eMagazine p_eMagazine { get; set; }
-        Pine2 m_pine2; 
+        Pine2 m_pine2;
         public MagazineEV(InfoStrip.eMagazine eMagazine, IEngineer engineer, Pine2 pine2)
         {
             m_conveyor = new Conveyor(this);
-            m_elevator = new Elevator(m_conveyor);
+            m_elevator = new Elevator(m_conveyor, (Pine2_Handler)engineer.ClassHandler());
             InitMagazine(); 
             p_eMagazine = eMagazine;
             string sID = eMagazine.ToString();

@@ -58,9 +58,6 @@ namespace Root_Pine2.Module
             }
         }
 
-        bool m_bUseBlow = true;
-        bool m_bUseIonBlow = true;
-        bool m_bUseAlignBlow = true;
         bool _bBlow = false;
         public bool p_bBlow
         {
@@ -71,9 +68,9 @@ namespace Root_Pine2.Module
                 _bBlow = value;
                 m_log.Info("p_bBlow = " + value.ToString());
                 OnPropertyChanged();
-                m_doBlow.Write(value && m_bUseBlow);
-                m_doAlignBlow.Write(value && m_bUseAlignBlow);
-                m_doIonBlow.Write(value && m_bUseIonBlow);
+                m_doBlow.Write(value && m_pine2.p_bUseBlow);
+                m_doAlignBlow.Write(value && m_pine2.p_bUseAlignBlow);
+                m_doIonBlow.Write(value && m_pine2.p_bUseIonBlow);
             }
         }
 
@@ -89,11 +86,15 @@ namespace Root_Pine2.Module
             }
         }
 
-        void RunTreeBlow(Tree tree)
+        bool _bCycleStop = false; 
+        public bool p_bCycleStop
         {
-            m_bUseBlow = tree.Set(m_bUseBlow, m_bUseBlow, "Blow", "Use Blow");
-            m_bUseIonBlow = tree.Set(m_bUseIonBlow, m_bUseIonBlow, "Ion Blow", "Use Blow");
-            m_bUseAlignBlow = tree.Set(m_bUseAlignBlow, m_bUseAlignBlow, "Align Blow", "Use Blow");
+            get { return _bCycleStop; }
+            set
+            {
+                _bCycleStop = value;
+                OnPropertyChanged(); 
+            }
         }
         #endregion
 
@@ -167,7 +168,7 @@ namespace Root_Pine2.Module
             switch (EQ.p_eState)
             {
                 case EQ.eState.Run:
-                    if (m_diCheck.p_bIn && (p_bDone == false)) StartLoad();
+                    if ((p_bCycleStop == false) && m_diCheck.p_bIn && (p_bDone == false)) StartLoad();
                     break;
                 default:
                     if (m_diTop.p_bIn && p_eMove == eMove.Stop) p_eMove = eMove.Down;
@@ -258,7 +259,6 @@ namespace Root_Pine2.Module
         public override void RunTree(Tree tree)
         {
             base.RunTree(tree);
-            RunTreeBlow(tree.GetTree("Use Blow"));
         }
 
         public override void Reset()
