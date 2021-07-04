@@ -135,6 +135,26 @@ namespace RootTools.Camera.Dalsa
             UserSet16,
         }
 
+        public enum eFlatFieldUserSet
+        {
+            Factory = 0,
+            UserSet1,
+            UserSet2,
+            UserSet3,
+            UserSet4,
+            UserSet5,
+            UserSet6,
+            UserSet7,
+            UserSet8,
+            UserSet9,
+            UserSet10,
+            UserSet11,
+            UserSet12,
+            UserSet13,
+            UserSet14,
+            UserSet15,
+            UserSet16,
+        }
 
         public Log m_log;
         SapAcqDevice m_sapCam;
@@ -243,6 +263,21 @@ namespace RootTools.Camera.Dalsa
                     m_nRotaryEncoderDivider = value;
             }
         }
+        eFlatFieldUserSet m_eFlatFieldCorrection = eFlatFieldUserSet.Factory;
+        public eFlatFieldUserSet p_eFlatFieldCorrection
+        {
+            get { return m_eFlatFieldCorrection; }
+            set
+            {
+                if (SetFlatFieldCorrection(value))
+                {
+                    if (LoadCalibration())
+                        m_eFlatFieldCorrection = value;
+                }
+            }
+        }
+
+
         eDir m_eDir = eDir.Forward;
         public eDir p_eDir
         {
@@ -492,6 +527,31 @@ namespace RootTools.Camera.Dalsa
 
             return bOk;
         }
+
+        public bool SetFlatFieldCorrection(eFlatFieldUserSet userset)
+        {
+            if (m_sapCam == null) return false;
+
+            return m_sapCam.SetFeatureValue("flatfieldCorrectionCurrentActiveSet", userset.ToString());
+        }
+        public bool GetFlatFieldCorrection(ref eUserSet userset)
+        {
+            if (m_sapCam == null) return false;
+
+            string sReturn;
+            bool bOk = m_sapCam.GetFeatureValue("flatfieldCorrectionCurrentActiveSet", out sReturn);
+            if (bOk)
+                userset = (eUserSet)Enum.Parse(typeof(eUserSet), sReturn);
+
+            return bOk;
+        }
+        public bool LoadCalibration()
+        {
+            if (m_sapCam == null) return false;
+
+            return m_sapCam.SetFeatureValue("flatfieldCalibrationLoad", "");
+        }
+
         public void SetCamHandle(SapAcqDevice device, SapAcquisition acquisition)
         {
             m_sapCam = device;

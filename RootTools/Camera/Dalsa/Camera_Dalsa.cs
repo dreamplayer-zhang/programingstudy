@@ -246,6 +246,7 @@ namespace RootTools.Camera.Dalsa
             RunSetTree(treeRoot.GetTree("Connect Set"));
             RunImageRoiTree(treeRoot.GetTree("Buffer Image ROI", true, m_sapXfer != null));
             RunCameraConfig(treeRoot.GetTree("Camera Config", true, m_sapXfer != null), m_sapXfer != null);
+            RunCameraControl(treeRoot.GetTree("Camera Control", true, m_sapXfer != null), m_sapXfer != null);
         }
 
         void RunSetTree(Tree tree)
@@ -276,6 +277,12 @@ namespace RootTools.Camera.Dalsa
             p_CamParam.p_eUserSetCurrent = (DalsaParameterSet.eUserSet)tree.Set(p_CamParam.p_eUserSetCurrent, p_CamParam.p_eUserSetCurrent, "Current UserSet", "Selects and Current UserSet", bVisible);
             p_CamParam.p_nRotaryEncoderMultiplier = tree.Set(p_CamParam.p_nRotaryEncoderMultiplier, p_CamParam.p_nRotaryEncoderMultiplier, "RotaryEncoderMultiplier", "Specifies a multiplication factor for the rotary encoder output pulse generator", bVisible);
             p_CamParam.p_nRotaryEncoderDivider = tree.Set(p_CamParam.p_nRotaryEncoderDivider, p_CamParam.p_nRotaryEncoderDivider, "RotaryEncoderDivider", "Specifies a division factor for the rotary encoder output pulse generator", bVisible);
+        }
+
+        void RunCameraControl(Tree tree, bool bVisible)
+        {
+            p_CamParam.p_eFlatFieldCorrection = (DalsaParameterSet.eFlatFieldUserSet)tree.Set(p_CamParam.p_eFlatFieldCorrection, p_CamParam.p_eFlatFieldCorrection, "Flat Field Correction Current Active Set", "Selects the User PRNU and FPN set to save/load", bVisible);
+            p_CamParam.p_eFlatFieldCorrection = (DalsaParameterSet.eFlatFieldUserSet)tree.Set(p_CamParam.p_eFlatFieldCorrection, p_CamParam.p_eFlatFieldCorrection, "Flat Field Correction Current Active Set", "Selects the User PRNU and FPN set to save/load", bVisible);
         }
 
         #endregion 
