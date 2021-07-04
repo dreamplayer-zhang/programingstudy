@@ -156,6 +156,17 @@ namespace RootTools.Camera.Dalsa
             UserSet16,
         }
 
+        public enum eAnalogGain
+        {
+            One,
+            Two,
+            Four,
+            Eight,
+        }
+
+        public static string[] m_aAnalogGain = new string[4] { "1", "2", "4", "8" };
+
+
         public Log m_log;
         SapAcqDevice m_sapCam;
         SapAcquisition m_SapGrabber;
