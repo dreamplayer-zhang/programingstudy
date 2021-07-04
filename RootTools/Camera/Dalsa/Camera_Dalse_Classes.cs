@@ -263,16 +263,17 @@ namespace RootTools.Camera.Dalsa
                     m_nRotaryEncoderDivider = value;
             }
         }
-        eFlatFieldUserSet m_eFlatFieldCorrection = eFlatFieldUserSet.Factory;
+        eFlatFieldUserSet m_eFlatFieldUserSet = eFlatFieldUserSet.Factory;
         public eFlatFieldUserSet p_eFlatFieldCorrection
         {
-            get { return m_eFlatFieldCorrection; }
+            get { return m_eFlatFieldUserSet; }
             set
             {
-                if (SetFlatFieldCorrection(value))
+                if (m_eFlatFieldUserSet == value) return;
+                if (SetFlatFieldUserSet(value))
                 {
                     if (LoadCalibration())
-                        m_eFlatFieldCorrection = value;
+                        m_eFlatFieldUserSet = value;
                 }
             }
         }
@@ -436,6 +437,10 @@ namespace RootTools.Camera.Dalsa
             if (GetRotaryEncoderMultiplier(ref nEncoderVal)) m_nRotaryEncoderMultiplier = nEncoderVal;
             if (GetRotaryEncoderDivider(ref nEncoderVal)) m_nRotaryEncoderDivider = nEncoderVal;
 
+            // Get default Flat Field UserSet
+            eFlatFieldUserSet FlatFieldUserset = eFlatFieldUserSet.Factory;
+            if (GetFlatFieldoUserSet(ref FlatFieldUserset)) m_eFlatFieldUserSet = FlatFieldUserset;
+
         }
         public void SetAreaParams()
         {
@@ -528,20 +533,20 @@ namespace RootTools.Camera.Dalsa
             return bOk;
         }
 
-        public bool SetFlatFieldCorrection(eFlatFieldUserSet userset)
+        public bool SetFlatFieldUserSet(eFlatFieldUserSet userset)
         {
             if (m_sapCam == null) return false;
 
             return m_sapCam.SetFeatureValue("flatfieldCorrectionCurrentActiveSet", userset.ToString());
         }
-        public bool GetFlatFieldCorrection(ref eUserSet userset)
+        public bool GetFlatFieldoUserSet(ref eFlatFieldUserSet userset)
         {
             if (m_sapCam == null) return false;
 
             string sReturn;
             bool bOk = m_sapCam.GetFeatureValue("flatfieldCorrectionCurrentActiveSet", out sReturn);
             if (bOk)
-                userset = (eUserSet)Enum.Parse(typeof(eUserSet), sReturn);
+                userset = (eFlatFieldUserSet)Enum.Parse(typeof(eFlatFieldUserSet), sReturn);
 
             return bOk;
         }
@@ -556,6 +561,12 @@ namespace RootTools.Camera.Dalsa
         {
             m_sapCam = device;
             m_SapGrabber = acquisition;
+        }
+
+        public void DisconnectCamHandle()
+        {
+            m_sapCam = null;
+            m_SapGrabber = null;
         }
 
         public void ValueChange(object value, [CallerMemberName] string propertyName = null)
