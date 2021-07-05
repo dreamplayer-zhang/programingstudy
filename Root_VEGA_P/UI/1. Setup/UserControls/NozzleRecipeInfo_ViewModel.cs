@@ -38,7 +38,7 @@ namespace Root_VEGA_P
             set => SetProperty(ref nozzleListIdx, value);
         }
         public NozzleRecipeInfo_Panel Main;
-        public NozzleRecipeInfo_ViewModel(string ImgSrc,NozzleSet nozzleSet)
+        public NozzleRecipeInfo_ViewModel(string ImgSrc,NozzleSet nozzleSet) 
         {
             Main = new NozzleRecipeInfo_Panel();
             Main.DataContext = this;

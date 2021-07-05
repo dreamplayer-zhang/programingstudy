@@ -21,18 +21,18 @@ namespace Root_VEGA_P
     public partial class FileItem : UserControl
     {
         string fileName;
-        double weight;
+        string weight;
         public string FileName
         {
             get => fileName;
             set => fileName = value;
         }
-        public double Weight
+        public string Weight
         {
             get => weight;
             set => weight = value;
         }
-        public FileItem(string FileName,double Weight)
+        public FileItem(string FileName,string Weight)
         {
             InitializeComponent();
             this.FileName = FileName;

@@ -9,14 +9,13 @@
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="0.8*"/>
+            <ColumnDefinition Width="2*"/>
+            <ColumnDefinition Width="2*"/>
             <ColumnDefinition Width="0.8*"/>
         </Grid.ColumnDefinitions>
-        <CheckBox Width="60" HorizontalContentAlignment="Center" HorizontalAlignment="Center" Grid.Row="0" IsChecked="{Binding IsEnabled}"/>
-        <TextBlock Width="95"  HorizontalAlignment="Center" Grid.Column="1" Text="{Binding Num}"/>
-        <TextBlock Width="50"  HorizontalAlignment="Center" Grid.Column="2" Text="{Binding Pressure}"/>
-        <TextBlock Grid.Column="3" Text="{Binding Sec}"/>
+        <CheckBox HorizontalAlignment="Center" Grid.Row="0" IsChecked="{Binding IsEnabled}"/>
+        <TextBlock HorizontalAlignment="Center" Grid.Column="1" Text="{Binding Num}"/>
+        <TextBlock HorizontalAlignment="Center" Grid.Column="2" Text="{Binding Pressure}"/>
+        <TextBlock HorizontalAlignment="Center"  Grid.Column="3" Text="{Binding Sec}"/>
     </Grid>
 </UserControl>

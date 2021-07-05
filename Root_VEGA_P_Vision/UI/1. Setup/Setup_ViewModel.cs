@@ -196,38 +196,43 @@ namespace Root_VEGA_P_Vision
             /*
              RootPath -> Recipe -> 부분별 Recipe Reading하고 PodInfo UI Update
              */
-            DirectoryInfo dir = new DirectoryInfo(App.RecipeRootPath);
 
-            foreach(DirectoryInfo dirInfo in dir.GetDirectories()) // Recipe Lists
+            PodIDInfo podIDInfo = new PodIDInfo();
+            podIDInfo.ReadReg();
+            DirectoryInfo dir = new DirectoryInfo(App.RecipeRootPath + podIDInfo.DualPodID); //현재 파드 정보 Path
+
+            List<RecipeCoverFront> liCF = new List<RecipeCoverFront>();
+            List<RecipeCoverBack> liCB = new List<RecipeCoverBack>();
+            List<RecipePlateFront> liPF = new List<RecipePlateFront>();
+            List<RecipePlateBack> liPB = new List<RecipePlateBack>();
+
+            
+            foreach (DirectoryInfo dirInfo in dir.GetDirectories()) // Recipe Lists
             {
                 DirectoryInfo[] infos = dirInfo.GetDirectories();
 
                 if (infos.Length != 4)
                     return;
 
-                //foreach(DirectoryInfo info in infos)
+                RecipeCoverFront cf = new RecipeCoverFront();
+                RecipeCoverBack cb = new RecipeCoverBack();
+                RecipePlateFront pf = new RecipePlateFront();
+                RecipePlateBack pb = new RecipePlateBack();
 
+                if(cb.Read(infos[0].FullName+"\\"+infos[0].Name+"_"+dirInfo.Name+".rcp"))
+                    liCB.Add(cb);
 
+                if(cf.Read(infos[1].FullName + "\\" + infos[1].Name + "_" + dirInfo.Name + ".rcp"))
+                    liCF.Add(cf);
+
+                if(pb.Read(infos[2].FullName + "\\" + infos[2].Name + "_" + dirInfo.Name + ".rcp"))
+                    liPB.Add(pb);
+
+                if(pf.Read(infos[3].FullName + "\\" + infos[3].Name + "_" + dirInfo.Name + ".rcp"))
+                    liPF.Add(pf);
             }
-            
-            //System.Windows.Forms.OpenFileDialog dlg = new System.Windows.Forms.OpenFileDialog();
-            //dlg.InitialDirectory = App.RecipeRootPath;
-            //dlg.Title = "Load Recipe";
-            //dlg.Filter = "ATI files (*.rcp)|*.rcp|All files (*.*)|*.*";
-            //if (dlg.ShowDialog() == System.Windows.Forms.DialogResult.OK)
-            //{
-            //    string sFolderPath = Path.GetDirectoryName(dlg.FileName); // 디렉토리명
-            //    string sFileName = Path.GetFileName(dlg.FileName); // 파일이름 + 확장자
 
-            //    DirectoryInfo dir = new DirectoryInfo(sFolderPath);
-            //    if (!dir.Exists)
-            //        dir.Create();
-
-            //    recipeCoverFront.Read(Path.Combine(sFolderPath,App.RecipeNames[0]+"_"+sFileName));
-            //    recipeCoverBack.Read(Path.Combine(sFolderPath, "RecipeCoverBack_" + sFileName));
-            //    recipePlateFront.Read(Path.Combine(sFolderPath, "RecipePlateFront_" + sFileName));
-            //    recipePlateBack.Read(Path.Combine(sFolderPath, "RecipePlateBack_" + sFileName));
-            //}
+            VegaPEventManager.OnLoadedAllRecipe(this, new LoadAllRecipeEventArgs(liCF, liCB, liPF, liPB));
         }
         void LoadRecipe()
         {
@@ -238,52 +243,62 @@ namespace Root_VEGA_P_Vision
             if (dlg.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
                 string sFolderPath = Path.GetDirectoryName(dlg.FileName); // 디렉토리명
-                string sFileNameNoExt = Path.GetFileNameWithoutExtension(dlg.FileName); // Only 파일이름
                 string sFileName = Path.GetFileName(dlg.FileName); // 파일이름 + 확장자
 
-                bool saveRes = false;
-                int selectedIdx = -1;
-                for(int i=0;i<4;i++)
-                    if(sFileName.Contains(App.RecipeNames[i]))
+                //부분별 Recipe Open할 때
+                if (sFileName.Contains("Recipe"))
+                    LoadPartsRecipe(sFileName, sFolderPath);
+                else
+                {
+                    for(int i=0;i<4;i++)
                     {
-                        saveRes = recipes[i].Read(Path.Combine(sFolderPath, sFileName));
-                        selectedIdx = i;
-                        break;
+                        if(recipes[i].Read(Path.Combine(sFolderPath+"\\"+App.RecipeNames[i], App.RecipeNames[i] + "_" + sFileName)))
+                            VegaPEventManager.OnRecipeUpdated(this, new RecipeEventArgs(recipes[i]));
                     }
 
-                if (saveRes)
-                {
                     MessageBox.Show("Recipe Loaded!");
-                    VegaPEventManager.OnRecipeUpdated(this, new RecipeEventArgs(recipes[selectedIdx]));
                 }
+            }
+        }
+
+        void LoadPartsRecipe(string sFileName,string sFolderPath)
+        {
+            bool saveRes = false;
+            int selectedIdx = -1;
+
+            for (int i = 0; i < 4; i++)
+                if (sFileName.Contains(App.RecipeNames[i]))
+                {
+                    saveRes = recipes[i].Read(Path.Combine(sFolderPath, sFileName));
+                    selectedIdx = i;
+                    break;
+                }
+
+            if (saveRes)
+            {
+                MessageBox.Show("Recipe Loaded!");
+                VegaPEventManager.OnRecipeUpdated(this, new RecipeEventArgs(recipes[selectedIdx]));
             }
         }
         public ICommand btnSaveAsRecipe
         {
-            get => new RelayCommand(() => {
-                CreateRecipe(false);
-            });
+            get => new RelayCommand(() => CreateRecipe(false));
         }
         public ICommand btnLoadRecipe
         {
-            get
-            {
-                return new RelayCommand(() =>
-                {
-                    LoadRecipe();
-                });
-            }
+            get =>new RelayCommand(()=>LoadRecipe());
         }
         public ICommand btnLoadAllRecipe
         {
-            get => new RelayCommand(() => {
-                LoadAllRecipe();
-            });
+            get => new RelayCommand(()=>LoadAllRecipe());
         }
         void CreateRecipe(bool IsCreate)
         {
             System.Windows.Forms.SaveFileDialog dlg = new System.Windows.Forms.SaveFileDialog();
-            dlg.InitialDirectory = App.RecipeRootPath;
+            PodIDInfo podIDInfo = new PodIDInfo();
+            podIDInfo.ReadReg();
+
+            dlg.InitialDirectory = App.RecipeRootPath+podIDInfo.DualPodID;
             dlg.Title = "Save Recipe";
             dlg.Filter = "ATI files (*.rcp)|*.rcp|All files (*.*)|*.*";
             if (dlg.ShowDialog() == System.Windows.Forms.DialogResult.OK)
@@ -313,13 +328,22 @@ namespace Root_VEGA_P_Vision
                         recipePlateFront.Clear();
                     if (!recipePlateBack.RecipePath.Equals(""))
                         recipePlateBack.Clear();
-                }                
+                }
+
+                using (StreamWriter writer = new StreamWriter(sRecipeFolderPath+"\\"+sFileName, true))
+                {
+                    //가라템;;
+                    string time = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+
+                    writer.WriteLine(time + " - SaveRecipe()");
+                }
 
                 bool saveRes = false;
                 saveRes = recipeCoverFront.Save(Path.Combine(RecipeFilePaths[0], "RecipeCoverFront_" + sFileName));
                 saveRes = recipeCoverBack.Save(Path.Combine(RecipeFilePaths[1], "RecipeCoverBack_" + sFileName));
                 saveRes = recipePlateFront.Save(Path.Combine(RecipeFilePaths[2], "RecipePlateFront_" + sFileName));
                 saveRes = recipePlateBack.Save(Path.Combine(RecipeFilePaths[3], "RecipePlateBack_" + sFileName));
+
                 if (saveRes)
                 {
                     MessageBox.Show("Recipe Created!");

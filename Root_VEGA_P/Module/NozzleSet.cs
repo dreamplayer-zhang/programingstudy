@@ -90,7 +90,7 @@ namespace Root_VEGA_P.Module
             {
                 List<string> asFile = new List<string>();
                 string sExt = "." + m_sExt; 
-                string sPath = EQ.c_sPathRecipe + "\\Nozzle";
+                string sPath = App.RecipeRootPath + "\\Nozzle";
                 DirectoryInfo directory = new DirectoryInfo(sPath);
                 if (!directory.Exists)
                     directory.Create();
@@ -104,7 +104,7 @@ namespace Root_VEGA_P.Module
 
         public void FileSave(string sFile)
         {
-            string sPath = EQ.c_sPathRecipe + "\\Nozzle"; 
+            string sPath = App.RecipeRootPath + "\\Nozzle"; 
             Directory.CreateDirectory(sPath);
             Job job = new Job(sPath + "\\" + sFile + "." +m_sExt, true, m_module.m_log);
             m_treeRootJob.m_job = job;
@@ -116,7 +116,7 @@ namespace Root_VEGA_P.Module
 
         public void FileOpen(string sFile)
         {
-            string sPath = EQ.c_sPathRecipe + "\\Nozzle";
+            string sPath = App.RecipeRootPath + "\\Nozzle";
             Directory.CreateDirectory(sPath);
             Job job = new Job(sPath + "\\" + sFile + "." + m_sExt, false, m_module.m_log);
             m_treeRootJob.m_job = job;
@@ -131,7 +131,7 @@ namespace Root_VEGA_P.Module
             Microsoft.Win32.SaveFileDialog dlg = new Microsoft.Win32.SaveFileDialog();
             dlg.DefaultExt = "." + m_sExt;
             dlg.Filter = "Nozzle File (*." + m_sExt + ")|*." + m_sExt;
-            dlg.InitialDirectory = EQ.c_sPathRecipe + "\\Nozzle";
+            dlg.InitialDirectory = App.RecipeRootPath + "\\Nozzle";
             if (dlg.ShowDialog() == false) return;
             FileSave(GetFileTitle(dlg.SafeFileName)); 
         }
@@ -142,7 +142,7 @@ namespace Root_VEGA_P.Module
             string sExt = "." + m_sExt; 
             dlg.DefaultExt = sExt;
             dlg.Filter = "Nozzle File (*" + sExt + ")|*" + sExt;
-            dlg.InitialDirectory = EQ.c_sPathRecipe + "\\Nozzle";
+            dlg.InitialDirectory = App.RecipeRootPath + "\\Nozzle";
             if (dlg.ShowDialog() == false) return;
             FileOpen(GetFileTitle(dlg.SafeFileName));
         }

@@ -67,7 +67,26 @@ namespace Root_VEGA_P_Vision
 
             selectedRecipeItem = CFItem.ParticleItem.RecipeItemBase;
             SubPanel = imageNROI.Main;
+
+            VegaPEventManager.LoadedAllRecipe += VegaPEventManager_LoadedAllRecipe;
         }
+
+        private void VegaPEventManager_LoadedAllRecipe(object sender, LoadAllRecipeEventArgs e)
+        {
+            foreach(var v in e.CoverFrontRecipes)
+                CFItem.UpdateLoadedRecipe(v);
+
+            foreach (var v in e.CoverBackRecipes)
+                CBItem.UpdateLoadedRecipe(v);
+            
+            foreach (var v in e.PlateFrontRecipes)
+                BFItem.UpdateLoadedRecipe(v);
+            
+            foreach (var v in e.PlateBackRecipes)
+                BBItem.UpdateLoadedRecipe(v);
+
+            MessageBox.Show("All the Recipes are Loaded!!");
+        } 
 
         #region RelayCommand
         public ICommand btnBack

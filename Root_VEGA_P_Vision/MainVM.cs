@@ -117,13 +117,18 @@ namespace Root_VEGA_P_Vision
 
                     RecipeBase recipe = GlobalObjects.Instance.Get<RecipeCoverFront>();
                     recipe.Read(sFullPath);
+                    VegaPEventManager.OnRecipeUpdated(this, new RecipeEventArgs(recipe));
+
                     recipe = GlobalObjects.Instance.Get<RecipeCoverBack>();
                     recipe.Read(sFullPath);
+                    VegaPEventManager.OnRecipeUpdated(this, new RecipeEventArgs(recipe));
+
                     recipe = GlobalObjects.Instance.Get<RecipePlateFront>();
                     recipe.Read(sFullPath);
+                    VegaPEventManager.OnRecipeUpdated(this, new RecipeEventArgs(recipe));
+
                     recipe = GlobalObjects.Instance.Get<RecipePlateBack>();
                     recipe.Read(sFullPath);
-
                     VegaPEventManager.OnRecipeUpdated(this, new RecipeEventArgs(recipe));
                 }
             });

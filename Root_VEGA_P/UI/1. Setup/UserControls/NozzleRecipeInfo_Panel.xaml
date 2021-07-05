@@ -38,14 +38,14 @@
                 <ColumnDefinition Width="0.8*"/>
             </Grid.ColumnDefinitions>
             <TextBlock Text="Enable" Style="{StaticResource NozzleHeaderText}" />
-            <TextBlock Grid.Column="1" Text="Nozzle No." HorizontalAlignment="Right" Style="{StaticResource NozzleHeaderText}"/>
-            <TextBlock Grid.Column="2" Text="Pressure" HorizontalAlignment="Right" Style="{StaticResource NozzleHeaderText}"/>
+            <TextBlock Grid.Column="1" Text="Nozzle No." HorizontalAlignment="Center" Style="{StaticResource NozzleHeaderText}"/>
+            <TextBlock Grid.Column="2" Text="Pressure" HorizontalAlignment="Center" Style="{StaticResource NozzleHeaderText}"/>
             <TextBlock Grid.Column="3" Text="Sec" Style="{StaticResource NozzleHeaderText}"/>
         </Grid>
-        <ListBox Grid.Row="4" Background="Transparent" ItemsSource="{Binding NozzleList}" SelectedIndex="{Binding NozzleListIdx}">
+        <ListBox Grid.Row="4" Background="Transparent" HorizontalContentAlignment="Stretch" ItemsSource="{Binding NozzleList}" SelectedIndex="{Binding NozzleListIdx}">
             <ListBox.ItemsPanel>
                 <ItemsPanelTemplate>
-                    <WrapPanel Orientation="Vertical" HorizontalAlignment="Stretch"/>
+                    <StackPanel Orientation="Vertical"/>
                 </ItemsPanelTemplate>
             </ListBox.ItemsPanel>
         </ListBox>

@@ -58,7 +58,7 @@ namespace Root_VEGA_P
             fileList = new ObservableCollection<UIElement>();
             for (int i = 0; i < 5; i++)
             {
-                FileItem item = new FileItem("Pod "+i,2.34);
+                FileItem item = new FileItem("Pod "+i,"2.34kg");
                 fileList.Add(item);
             }
         }

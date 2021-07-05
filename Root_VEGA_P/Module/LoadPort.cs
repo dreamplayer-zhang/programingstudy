@@ -521,7 +521,6 @@ namespace Root_VEGA_P.Module
                 if (Run(m_stage.RunPodOpen(true))) return p_sInfo;
                 if (Run(m_stage.RunVacuum(false))) return p_sInfo;
                 m_infoPods.NewInfoPod(4);
-
                 
                 return "OK";
             }

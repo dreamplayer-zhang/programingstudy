@@ -45,5 +45,13 @@ namespace Root_VEGA_P_Vision
         public readonly List<RecipePlateFront> PlateFrontRecipes;
         public readonly List<RecipePlateBack> PlateBackRecipes;
 
+        public LoadAllRecipeEventArgs(List<RecipeCoverFront> coverFront, List<RecipeCoverBack> coverBack, List<RecipePlateFront> plateFront, List<RecipePlateBack> plateBack)
+        {
+            CoverFrontRecipes = coverFront;
+            CoverBackRecipes = coverBack;
+            PlateFrontRecipes = plateFront;
+            PlateBackRecipes = plateBack;
+        }
+
     }
 }

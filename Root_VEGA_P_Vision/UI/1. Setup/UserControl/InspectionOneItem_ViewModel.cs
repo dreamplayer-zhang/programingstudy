@@ -55,11 +55,6 @@ namespace Root_VEGA_P_Vision
             this.inspectionItem = inspectionItem;
             ItemName = itemName;
             this.recipe = recipe;
-            VegaPEventManager.LoadedAllRecipe += VegaPEventManager_LoadedAllRecipe;
-        }
-
-        private void VegaPEventManager_LoadedAllRecipe(object sender, LoadAllRecipeEventArgs e)
-        {
         }
 
         public ICommand btnHeader
@@ -73,10 +68,13 @@ namespace Root_VEGA_P_Vision
         public ICommand btnAdd
         {
             get => new RelayCommand(() => {
-                ConditionItem_ViewModel item = new ConditionItem_ViewModel(ListItem.Count+1,recipe,recipeItemBase);
-
-                ListItem.Add(item.Main);
+                AddItem(recipe, recipeItemBase);
             });
+        }
+        public void AddItem(RecipeBase recipe, RecipeItemBase recipeItemBase)
+        {
+            ConditionItem_ViewModel item = new ConditionItem_ViewModel(ListItem.Count + 1, recipe, recipeItemBase,this);
+            ListItem.Add(item.Main);
         }
     }
 }

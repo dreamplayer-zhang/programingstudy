@@ -17,5 +17,12 @@ namespace Root_VEGA_P
         public const string mDoor = "Door";
         public const string mPool = "EOP.Memory";
         public const string mGroup = "Memory";
+
+        //FilePath
+        public const string RootPath = @"C:\Root\";
+        public const string RecipeRootPath = @"C:\Root\Recipe\Vega-P\";
+        public const string ImageRootPath = @"D:\Images\";
+        public const string SettingFilePath = @"C:\Root\Setting.ini";
+        public const string RootSetupPath = RootPath + @"Setup\";
     }
 }

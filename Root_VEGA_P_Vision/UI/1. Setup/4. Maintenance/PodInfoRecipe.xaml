@@ -32,11 +32,7 @@
                       VerticalAlignment="Top"
                       X2="1"/>
             </Grid>
-            <UniformGrid Rows="4" Grid.Row="1" DataContext="{Binding PodIDInfo}">
-                <TextBlock Text="Pod Name" Style="{StaticResource ParamText}" HorizontalAlignment="Center"/>
-                <Border Grid.Column="1" Style="{StaticResource InfoTextBox}" Margin="6">
-                    <TextBox Text="{Binding Path=PodName}" BorderBrush="White" Margin="6,2,6,2"/>
-                </Border>
+            <UniformGrid Rows="3" Grid.Row="1" DataContext="{Binding PodIDInfo}">
                 <TextBlock Text="Weight" Style="{StaticResource ParamText}" HorizontalAlignment="Center"/>
                 <Border Grid.Column="1" Style="{StaticResource InfoTextBox}" Margin="6">
                     <TextBox Text="{Binding Path=Weight}" BorderBrush="White" Margin="6,2,6,2"/>
@@ -70,10 +66,10 @@
                         <RowDefinition Height="2*"/>
                     </Grid.RowDefinitions>
                     <UniformGrid Rows="1" Background="{StaticResource MainThema}">
-                        <TextBlock Style="{StaticResource ROIListHeader}" Text="Pod Name"/>
                         <TextBlock Style="{StaticResource ROIListHeader}" Text="Dual Pod ID"/>
+                        <TextBlock Style="{StaticResource ROIListHeader}" Text="Pod Weight(kg)"/>
                     </UniformGrid>
-                    <ListBox Grid.Row="1" Background="Transparent" ItemsSource="{Binding PodList}" SelectedIndex="{Binding PodListIdx}">
+                    <ListBox Grid.Row="1" Background="Transparent" HorizontalContentAlignment="Stretch" ItemsSource="{Binding PodList}" SelectedIndex="{Binding PodListIdx}">
                         <ListBox.ItemsPanel>
                             <ItemsPanelTemplate>
                                 <StackPanel Orientation="Vertical" />
@@ -85,6 +81,7 @@
             <UniformGrid Grid.Row="5" Rows="1" Margin="5,3,5,3">
                 <Button Content="Save" Command="{Binding btnSave}" Style="{StaticResource ImageBaseBtn}"/>
                 <Button Content="Load" Command="{Binding btnLoad}" Style="{StaticResource ImageBaseBtn}"/>
+                <Button Content="Delete" Command="{Binding btnDelete}" Style="{StaticResource ImageBaseBtn}"/>
             </UniformGrid>
         </Grid>
 

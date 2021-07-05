@@ -61,13 +61,13 @@
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
-                <TextBlock Text="File Name" Style="{StaticResource NozzleHeaderText}" />
+                <TextBlock Text="Dual Pod ID" Style="{StaticResource NozzleHeaderText}" />
                 <TextBlock Grid.Column="1" Text="Weight" HorizontalAlignment="Center" Style="{StaticResource NozzleHeaderText}"/>
             </Grid>
-            <ListBox Grid.Row="6" Background="Transparent" ItemsSource="{Binding FileList}">
+            <ListBox Grid.Row="6" Background="Transparent" HorizontalContentAlignment="Stretch" ItemsSource="{Binding FileList}">
                 <ListBox.ItemsPanel>
                     <ItemsPanelTemplate>
-                        <WrapPanel Orientation="Vertical" HorizontalAlignment="Stretch"/>
+                        <StackPanel  Orientation="Vertical" HorizontalAlignment="Stretch"/>
                     </ItemsPanelTemplate>
                 </ListBox.ItemsPanel>
             </ListBox>

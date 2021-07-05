@@ -75,8 +75,24 @@ namespace Root_VEGA_P_Vision
             stain = new InspectionOneItem_ViewModel("Stain",this,recipeBase,recipeBase.GetItem<StainRecipe>());
             if(bside)
                 side = new InspectionOneItem_ViewModel("Side",this,recipeBase,recipeBase.GetItem<SideRecipe>());
-
+             
             VegaPEventManager.RecipeUpdated += VegaPEventManager_RecipeUpdated;
+        }
+        public void Clear()
+        {
+            particle.ListItem.Clear();
+            highres.ListItem.Clear();
+            stain.ListItem.Clear();
+            side.ListItem.Clear();
+        }
+        public void UpdateLoadedRecipe(RecipeBase recipeBase)
+        {
+            particle.AddItem(recipeBase, recipeBase.GetItem<LowResRecipe>());
+            if (bHighRes)
+                highres.AddItem(recipeBase, recipeBase.GetItem<HighResRecipe>());
+            stain.AddItem(recipeBase, recipeBase.GetItem<StainRecipe>());
+            if (bside)
+                side.AddItem(recipeBase, recipeBase.GetItem<SideRecipe>());
         }
 
         private void VegaPEventManager_RecipeUpdated(object sender, RecipeEventArgs e) //e.recipe가 지금 Recipe랑 일치한다면 

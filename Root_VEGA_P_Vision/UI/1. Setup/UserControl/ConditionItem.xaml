@@ -21,7 +21,7 @@
                 <TextBlock Grid.Column="1" Foreground="White" Text="{Binding ConditionCnt}" Margin="3"/>
 
             </Grid>
-            <Button Content="Delete"/>
+            <Button Content="Delete" Command="{Binding btnDelete}"/>
             <TextBlock Foreground="White" Text="Enable" Margin="3"/>
             <CheckBox IsChecked="{Binding IsEnable}" Margin="3"/>
             <TextBlock Foreground="White" Text="DefectCode" Margin="3"/>
@@ -29,15 +29,7 @@
             <TextBlock Foreground="White" Text="DefectName" Margin="3"/>
             <TextBox Foreground="Black" Text="{Binding DefectName}" Margin="3"/>
         </UniformGrid>
-        <Button Grid.Row="1" Content="Image &amp; ROI"  Command="{Binding btnImagenROI}" Margin="4,0,4,0">
-            <Button.Template >
-                <ControlTemplate TargetType="{x:Type Button}">
-                    <Border CornerRadius="10" HorizontalAlignment="Stretch" Padding="5" VerticalAlignment="Stretch" Background="{StaticResource ButtonBackGroundColor}">
-                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" ContentTemplate="{TemplateBinding ContentTemplate}"/>
-                    </Border>
-                </ControlTemplate>
-            </Button.Template>
-        </Button>
+        <Button Grid.Row="1" Content="Image &amp; ROI"  Command="{Binding btnImagenROI}" Style="{StaticResource ImageROIBtn}"/>
     </Grid>
 
 </UserControl>

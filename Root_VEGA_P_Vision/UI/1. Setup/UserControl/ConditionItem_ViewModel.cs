@@ -21,7 +21,7 @@ namespace Root_VEGA_P_Vision
             get => conditioncnt;
             set => SetProperty(ref conditioncnt, value);
         }
-        public bool IsEnable
+        public bool IsEnable 
         {
             get => isEnable;
             set => SetProperty(ref isEnable, value);
@@ -36,16 +36,26 @@ namespace Root_VEGA_P_Vision
             get => defectName;
             set => SetProperty(ref defectName, value);
         }
+        InspectionOneItem_ViewModel inspectionOneItem;
+        public InspectionOneItem_ViewModel InspectionOneItem
+        {
+            get => inspectionOneItem;
+            set => SetProperty(ref inspectionOneItem, value);
+        }
         #endregion
         RecipeItemBase recipeItem;
         EUVPodSurfaceParameterBase parameterBase;
-        public ConditionItem_ViewModel(int Num,RecipeBase recipe,RecipeItemBase recipeItem)
+        public ConditionItem_ViewModel(int Num,RecipeBase recipe,RecipeItemBase recipeItem,InspectionOneItem_ViewModel inspectionOneItem)
         {
             Main = new ConditionItem();
             Main.DataContext = this;
             ConditionCnt = Num;
             this.recipe = recipe;
             this.recipeItem = recipeItem;
+            this.inspectionOneItem = inspectionOneItem;
+
+            //DefectName = recipeItem.
+
             Type t = recipeItem.GetType();
             if(t.Name.Contains("LowResRecipe"))
                 parameterBase = recipe.GetItem<EUVPodSurfaceParameter>().PodTDI;
@@ -62,6 +72,12 @@ namespace Root_VEGA_P_Vision
         {
             get => new RelayCommand(() => {
                     VegaPEventManager.OnImageROIBtnClicked(this, new ImageROIEventArgs(recipe,recipeItem, parameterBase));
+            });
+        }
+        public ICommand btnDelete
+        {
+            get => new RelayCommand(() => {
+                InspectionOneItem.ListItem.RemoveAt(ConditionCnt-1);
             });
         }
     }

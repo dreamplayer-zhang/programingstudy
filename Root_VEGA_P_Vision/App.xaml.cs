@@ -25,6 +25,8 @@ namespace Root_VEGA_P_Vision
         public const string mInspection = "Inspection";
 
         //FilePath
+
+        //Folder 구조 : RootPath -> PodPK -> Recipe -> Parts Recipe
         public const string RootPath = @"C:\Root\";
         public const string RecipeRootPath = @"C:\Root\Recipe\Vega-P\";
         public const string ImageRootPath = @"D:\Images\";
