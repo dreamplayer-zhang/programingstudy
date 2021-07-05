@@ -227,6 +227,9 @@ namespace Root_Pine2.Module
 
         public Vision2D.SnapInfo GetSnapInfo()
         {
+            if(p_infoStrip == null)
+                return new Vision2D.SnapInfo(m_recipe.m_eWorks, (int)m_recipe.p_eSnapMode, "", m_recipe.p_lSnap);
+
             return new Vision2D.SnapInfo(m_recipe.m_eWorks, (int)m_recipe.p_eSnapMode, p_infoStrip.p_id, m_recipe.p_lSnap); 
         }
         #endregion
