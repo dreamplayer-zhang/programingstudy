@@ -192,6 +192,7 @@ namespace Root_Pine2.Module
                     Thread.Sleep(10);
                     if (EQ.IsStop()) return "EQ Stop"; 
                 }
+                m_aBoat[eWorks].p_inspectStrip = m_aBoat[eWorks].p_infoStrip; 
                 if (bReadRecipe)
                 {
                     string sRecipe = m_aBoat[eWorks].p_sRecipe;

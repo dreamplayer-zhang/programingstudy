@@ -241,6 +241,7 @@ namespace Root_Pine2.Module
         public void Reset(ModuleBase.eState eState)
         {
             p_infoStrip = null;
+            p_inspectStrip = null; 
             m_doTriggerSwitch.Write(false);
             if (eState == ModuleBase.eState.Ready) p_eStep = eStep.RunReady;
             RunVacuum(false); 
@@ -253,7 +254,7 @@ namespace Root_Pine2.Module
             set
             {
                 _infoStrip = value;
-                if (value != null) p_inspectStrip = value; 
+                OnPropertyChanged(); 
             }
         }
         public string p_id { get; set; }
