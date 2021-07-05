@@ -1206,7 +1206,7 @@ namespace Root_CAMELLIA.LibSR_Met
                
                 Stopwatch sw2 = new Stopwatch();
                 sw2.Start();
-                m_Calculation.PointCalcTransmittance_OptimizingSi(nPointIndex, ConstValue.SI_AVG_OFFSET_RANGE, ConstValue.SI_AVG_OFFSET_STEP, nDNum, dThickness, CalTWavelenghList);
+                //m_Calculation.PointCalcTransmittance_OptimizingSi(nPointIndex, ConstValue.SI_AVG_OFFSET_RANGE, ConstValue.SI_AVG_OFFSET_STEP, nDNum, dThickness, CalTWavelenghList);
                 sw2.Stop();
                 Debug.WriteLine("CalPoint t >> " + sw2.ElapsedMilliseconds.ToString());
                 return true;
@@ -1214,8 +1214,6 @@ namespace Root_CAMELLIA.LibSR_Met
             catch (Exception ex)
             {
                 m_DM.m_Log.WriteLog(LogType.Operating, "Cal Transmittance Fail!");
-                //MessageBox.Show("Cal Transmittance Fail!");
-
                 return false;
             }
         }

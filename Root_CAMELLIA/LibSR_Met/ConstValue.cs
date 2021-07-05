@@ -21,7 +21,7 @@ namespace Root_CAMELLIA.LibSR_Met
         public const double PM_STAGE_PULSE = 10;
         //
         public const int SPECTROMETER_MAX_PIXELSIZE = 5001;  //350nm ~ 1500nm (1nm 간격)
-        public const int RAWDATA_POINT_MAX_SIZE = 100;
+        public const int RAWDATA_POINT_MAX_SIZE = 3000;
 
         public const string NONE = "None";
 

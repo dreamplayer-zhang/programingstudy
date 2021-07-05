@@ -372,11 +372,27 @@ namespace Root_CAMELLIA.LibSR_Met
             {
                 comboBoxDataIndex.Items.Clear();
 
-                for (int n = 0; n < ConstValue.RAWDATA_POINT_MAX_SIZE; n++)
+                if (m_DM.nRepeatCount == 1)
                 {
-                    if (m_DM.m_RawData[n].bDataExist)
+                    for (int n = 0; n < ConstValue.RAWDATA_POINT_MAX_SIZE; n++)
                     {
-                        comboBoxDataIndex.Items.Add(n+1);
+                        if (m_DM.m_RawData[n].bDataExist)
+                        {
+                            comboBoxDataIndex.Items.Add(n + 1);
+                        }
+                    }
+                }
+                else
+                {
+                    for (int n = 0; n < ConstValue.RAWDATA_POINT_MAX_SIZE; n++)
+
+                    {
+                        if (m_DM.m_RawData[n].bDataExist)
+                        {
+                            comboBoxDataIndex.Items.Add(n + 1);
+                        }
+
+
                     }
                 }
             }

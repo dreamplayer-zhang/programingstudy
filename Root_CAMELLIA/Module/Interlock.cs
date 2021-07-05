@@ -155,8 +155,9 @@ namespace Root_CAMELLIA.Module
             {
                 if (!m_doDoorLock.p_bOut)
                     m_doDoorLock.Write(true);
-
-                Thread.Sleep(10);
+            }
+            else
+            {
                 m_alidDoorLock.Run(!m_diDoorLock.p_bIn, "Please Check Door Lock");
             }
             if (!m_diMCReset.p_bIn)
