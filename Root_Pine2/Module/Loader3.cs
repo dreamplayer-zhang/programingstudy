@@ -294,6 +294,11 @@ namespace Root_Pine2.Module
         string CalcTrayPos(ref ePosTray eTray)
         {
             MagazineEVSet magazine = m_handler.m_magazineEVSet;
+            while (m_picker.p_infoStrip.p_eResult == InfoStrip.eResult.Init)
+            {
+                Thread.Sleep(10);
+                if (EQ.IsStop()) return "EQ Stop"; 
+            }
             InfoStrip.eResult eResult = m_picker.p_infoStrip.p_eResult;
             foreach (ePosTray ePosTray in Enum.GetValues(typeof(ePosTray)))
             {

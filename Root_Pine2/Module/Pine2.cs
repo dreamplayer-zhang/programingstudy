@@ -3,6 +3,7 @@ using Root_Pine2_Vision.Module;
 using RootTools;
 using RootTools.Comm;
 using RootTools.Control;
+using RootTools.GAFs;
 using RootTools.Module;
 using RootTools.ToolBoxs;
 using RootTools.Trees;
@@ -176,10 +177,10 @@ namespace Root_Pine2.Module
         #endregion
 
         #region GAF
-        //public ALID m_alidAirEmergency;
+        public ALID m_alidNewLot;
         void InitALID()
         {
-            //m_alidAirEmergency = m_gaf.GetALID(this, "Air Emergency", "Air Emergency");
+            m_alidNewLot = m_gaf.GetALID(this, "NewLot", "New Lot Communication Error");
         }
         #endregion
 
