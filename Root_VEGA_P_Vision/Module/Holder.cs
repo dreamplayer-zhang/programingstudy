@@ -166,8 +166,8 @@ namespace Root_VEGA_P_Vision.Module
             {
                 if (Run(RunLifter(false)))
                     return p_sInfo;
-                return "OK";
 
+                return "OK";
             }
         }
 

@@ -497,25 +497,29 @@ namespace Root_VEGA_P.Module
                     return "OK";
                 }
 
+                m_infoPods.CheckPlaced(m_infoPods.p_ePresentSensor);
+
                 switch (m_infoPods.p_eState)
                 {
                     case InfoPods.eState.Dock: 
                         return "OK";
-                    //case InfoPods.eState.Empty: 
-                    //    return "Pod not Exist";
+                    case InfoPods.eState.Empty:
+                        return "Pod not Exist";
                 }
+
                 string sRFID = "";
                 m_RFID.Read(out sRFID);
-                m_infoPods.p_sCarrierID = sRFID;
+
+                //m_infoPods.p_sCarrierID = sRFID;
                 //m_infoPods.SendCarrierID(m_infoPods.p_sCarrierID);
+
                 m_bDocking = true;
                 if (m_stage.p_bPlaced == false) return "Not Placed";
                 if (m_stage.p_bPresent == false) return "Not Present";
                 if (Run(m_stage.RunVacuum(true))) return p_sInfo;
                 if (Run(m_door.RunDoor(true))) return p_sInfo;
                 if (Run(m_stage.RunMove(Stage.ePos.Barcode))) return p_sInfo;
-                //if (Run(m_camBCD.ReadBCD())) return p_sInfo;
-                //forget
+                if (Run(m_camBCD.ReadBCD())) return p_sInfo;
                 if (Run(m_stage.RunMove(Stage.ePos.Inside))) return p_sInfo;
                 if (Run(m_door.RunDoor(false))) return p_sInfo;
                 if (Run(m_stage.RunPodOpen(true))) return p_sInfo;
@@ -540,6 +544,7 @@ namespace Root_VEGA_P.Module
                 if (Run(m_stage.RunMove(Stage.ePos.Outside))) return p_sInfo;
                 if (Run(m_door.RunDoor(false))) return p_sInfo;
                 if (Run(m_stage.RunVacuum(false))) return p_sInfo;
+
                 m_infoPods.ClearInfoPod();
                 return "OK";
             }
