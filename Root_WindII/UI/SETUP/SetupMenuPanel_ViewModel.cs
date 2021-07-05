@@ -100,6 +100,7 @@ namespace Root_WindII
 
         // RAC
         public readonly RACProduct racProduct = new RACProduct();
+        public readonly RACSetup racSetup = new RACSetup();
         #endregion
 
         //#region [ViewModels]
@@ -218,6 +219,11 @@ namespace Root_WindII
         public RACProduct_ViewModel RACProductVM
         {
             get => racProductVM;
+        }
+        private RACSetup_ViewModel racSetupVM = new RACSetup_ViewModel();
+        public RACSetup_ViewModel RACSetupVM
+        {
+            get => racSetupVM;
         }
         #endregion
 
@@ -368,6 +374,7 @@ namespace Root_WindII
                 });
             }
         }
+
         #endregion
 
         #region [Command Home]
@@ -781,7 +788,18 @@ namespace Root_WindII
                 return new RelayCommand(() =>
                 {
                     SetPage(racProduct);
-                    racProduct.DataContext = racProductVM;
+                    racProduct.DataContext = RACProductVM;
+                });
+            }
+        }
+        public ICommand btnRACSetup
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    SetPage(racSetup);
+                    racSetup.DataContext = RACSetupVM;
                 });
             }
         }

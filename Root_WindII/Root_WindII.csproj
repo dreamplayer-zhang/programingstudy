@@ -346,18 +346,23 @@
       <DependentUpon>ModuleView.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\SETUP\Interfaces\IPage.cs" />
-    <Compile Include="UI\SETUP\RAC\RACProduct.xaml.cs">
-      <DependentUpon>RACProduct.xaml</DependentUpon>
+    <Compile Include="UI\SETUP\RAC\MapFileListViewer.xaml.cs">
+      <DependentUpon>MapFileListViewer.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\SETUP\RAC\MapFileSelectionViewer.xaml.cs">
       <DependentUpon>MapFileSelectionViewer.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI\SETUP\RAC\MapFileListViewer.xaml.cs">
-      <DependentUpon>MapFileListViewer.xaml</DependentUpon>
+    <Compile Include="UI\SETUP\RAC\RACProduct.xaml.cs">
+      <DependentUpon>RACProduct.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\SETUP\RAC\RACSetup.xaml.cs">
+      <DependentUpon>RACSetup.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\SETUP\RAC\ViewModels\MapFileListViewer_ViewModel.cs" />
     <Compile Include="UI\SETUP\RAC\ViewModels\MapFileSelectionViewer_ViewModel.cs" />
     <Compile Include="UI\SETUP\RAC\ViewModels\RACProduct_ViewModel.cs" />
+    <Compile Include="UI\SETUP\RAC\ViewModels\RACSetup_ImageViewer_ViewModel.cs" />
+    <Compile Include="UI\SETUP\RAC\ViewModels\RACSetup_ViewModel.cs" />
     <Compile Include="UI\SETUP\Setup.xaml.cs">
       <DependentUpon>Setup.xaml</DependentUpon>
     </Compile>
@@ -521,7 +526,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="UI\SETUP\RAC\RACProduct.xaml">
+    <Page Include="UI\SETUP\RAC\MapFileListViewer.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -529,9 +534,13 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="UI\SETUP\RAC\MapFileListViewer.xaml">
+    <Page Include="UI\SETUP\RAC\RACProduct.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\SETUP\RAC\RACSetup.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UI\SETUP\Setup.xaml">
       <SubType>Designer</SubType>
@@ -632,9 +641,7 @@
       <Install>false</Install>
     </BootstrapperPackage>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="UI\SETUP\RAC\ViewModels\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>copy /Y "$(SolutionDir)Lib\CRT_Runtime\10.0.18362.0\x64_bin\ucrt\ucrtbased.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\ucrtbased.dll"
