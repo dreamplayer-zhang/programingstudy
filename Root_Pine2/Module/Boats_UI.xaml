@@ -16,6 +16,7 @@
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
@@ -27,10 +28,10 @@
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
-                <Grid Grid.Column="0" Margin="3" Background="Beige">
+                <Grid Grid.Column="0" x:Name="gridStripB" Margin="3" Background="Beige">
                     <TextBlock x:Name="textBlockB" HorizontalAlignment="Center"/>
                 </Grid>
-                <Grid Grid.Column="1" Margin="3" Background="Beige">
+                <Grid Grid.Column="1" x:Name="gridStripA" Margin="3" Background="Beige">
                     <TextBlock x:Name="textBlockA" HorizontalAlignment="Center"/>
                 </Grid>
             </Grid>
@@ -46,8 +47,11 @@
                     <TextBlock x:Name="textBlockStepA" HorizontalAlignment="Center"/>
                 </Grid>
             </Grid>
-            <tree:TreeUI Grid.Row="3" x:Name="treeRootUI" IsEnabled="False"/>
-            <tree:TreeUI Grid.Row="4" x:Name="treeVisionUI" IsEnabled="False"/>
+            <Grid Grid.Row="3" Margin="3" Background="White">
+                <TextBlock x:Name="textBlockInfo" Text="{Binding p_sInfo}"/>
+            </Grid>
+            <tree:TreeUI Grid.Row="4" x:Name="treeRootUI" IsEnabled="False"/>
+            <tree:TreeUI Grid.Row="5" x:Name="treeVisionUI" IsEnabled="False"/>
         </Grid>
     </GroupBox>
 </UserControl>

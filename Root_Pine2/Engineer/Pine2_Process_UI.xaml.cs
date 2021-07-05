@@ -37,7 +37,31 @@ namespace Root_Pine2.Engineer
             textBlockMode.DataContext = m_pine2;
             textBoxWidth.DataContext = m_pine2;
             textBoxThickness.DataContext = m_pine2; 
-            textBlock3D.DataContext = m_pine2; 
+            textBlock3D.DataContext = m_pine2;
+
+            textBoxLotID.DataContext = m_pine2;
+            textBoxBundle.DataContext = m_pine2;
+
+            checkBoxKeyence.DataContext = m_pine2;
+            checkBoxPaper.DataContext = m_pine2;
+            textBoxlStack.DataContext = m_pine2;
+            textBoxlStackPaper.DataContext = m_pine2;
+            checkBoxBlow.DataContext = m_pine2;
+            checkBoxIonBlow.DataContext = m_pine2;
+            checkBoxAlignBlow.DataContext = m_pine2;
+
+            checkBoxLotMix3D.DataContext = m_pine2.m_aVisionOption[Vision2D.eVision.Top3D];
+            checkBoxBarcode3D.DataContext = m_pine2.m_aVisionOption[Vision2D.eVision.Top3D];
+            textBoxBarcode3D.DataContext = m_pine2.m_aVisionOption[Vision2D.eVision.Top3D];
+            textBoxBarcodeLength3D.DataContext = m_pine2.m_aVisionOption[Vision2D.eVision.Top3D];
+            checkBoxLotMix2D.DataContext = m_pine2.m_aVisionOption[Vision2D.eVision.Top2D];
+            checkBoxBarcode2D.DataContext = m_pine2.m_aVisionOption[Vision2D.eVision.Top2D];
+            textBoxBarcode2D.DataContext = m_pine2.m_aVisionOption[Vision2D.eVision.Top2D];
+            textBoxBarcodeLength2D.DataContext = m_pine2.m_aVisionOption[Vision2D.eVision.Top2D];
+            checkBoxLotMixBottom.DataContext = m_pine2.m_aVisionOption[Vision2D.eVision.Bottom];
+            checkBoxBarcodeBottom.DataContext = m_pine2.m_aVisionOption[Vision2D.eVision.Bottom];
+            textBoxBarcodeBottom.DataContext = m_pine2.m_aVisionOption[Vision2D.eVision.Bottom];
+            textBoxBarcodeLengthBottom.DataContext = m_pine2.m_aVisionOption[Vision2D.eVision.Bottom];
 
             InitMagazineEV_UI();
             InitLoaderUI(handler.m_loader0, gridLoader, 6);
@@ -52,7 +76,7 @@ namespace Root_Pine2.Engineer
         List<MagazineEV_UI> m_aMagazineUI = new List<MagazineEV_UI>(); 
         void InitMagazineEV_UI()
         {
-            MagazineEVSet set = m_handler.m_magazineEV;
+            MagazineEVSet set = m_handler.m_magazineEVSet;
             foreach (InfoStrip.eMagazine eMagazine in Enum.GetValues(typeof(InfoStrip.eMagazine)))
             {
                 MagazineEV_UI ui = new MagazineEV_UI();
@@ -128,7 +152,14 @@ namespace Root_Pine2.Engineer
             foreach (Boats_UI ui in m_aBoatsUI) ui.OnTimer();
             m_transferUI.OnTimer();
             m_loadEVUI.OnTimer();
-            OnTimerRun(); 
+            OnTimerRun();
+
+            textBoxBarcode3D.IsEnabled = m_pine2.m_aVisionOption[Vision2D.eVision.Top3D].p_bBarcode;
+            textBoxBarcodeLength3D.IsEnabled = m_pine2.m_aVisionOption[Vision2D.eVision.Top3D].p_bBarcode;
+            textBoxBarcode2D.IsEnabled = m_pine2.m_aVisionOption[Vision2D.eVision.Top2D].p_bBarcode;
+            textBoxBarcodeLength2D.IsEnabled = m_pine2.m_aVisionOption[Vision2D.eVision.Top2D].p_bBarcode;
+            textBoxBarcodeBottom.IsEnabled = m_pine2.m_aVisionOption[Vision2D.eVision.Bottom].p_bBarcode;
+            textBoxBarcodeLengthBottom.IsEnabled = m_pine2.m_aVisionOption[Vision2D.eVision.Bottom].p_bBarcode;
         }
 
         private void textBlockMode_PreviewMouseDown(object sender, MouseButtonEventArgs e)
@@ -148,6 +179,7 @@ namespace Root_Pine2.Engineer
             buttonStop.IsEnabled = (EQ.p_eState == EQ.eState.Run); 
             buttonReset.IsEnabled = (EQ.p_eState == EQ.eState.Ready) || (EQ.p_eState == EQ.eState.Error);
             buttonHome.IsEnabled = (EQ.p_eState == EQ.eState.Ready) || (EQ.p_eState == EQ.eState.Init) || (EQ.p_eState == EQ.eState.Error);
+            groupBoxStack.IsEnabled = m_pine2.p_eMode == Pine2.eRunMode.Stack; 
         }
 
         private void buttonRecipeSave_Click(object sender, RoutedEventArgs e)
@@ -186,6 +218,11 @@ namespace Root_Pine2.Engineer
                     m_handler.Reset();
                     break; 
             }
+        }
+
+        private void buttonNewLot_Click(object sender, RoutedEventArgs e)
+        {
+            m_handler.NewLot(); 
         }
         #endregion
     }
