@@ -178,18 +178,45 @@ namespace Root_Pine2_Vision.Module
             }
         }
 
-        public string SendSnapInfo(eWorks eWorks)
+        public class SnapInfo
         {
-            if (p_eRemote == eRemote.Client) return RemoteRun(eRemoteRun.SendSnapInfo, eRemote.Client, eWorks);
+            public eWorks m_eWorks = eWorks.A;
+            public int m_nSnapMode = 0;
+            public string m_sStripID = "0000";
+            public int m_nLine = 0; 
+
+            public SnapInfo Clone()
+            {
+                return new SnapInfo(m_eWorks, m_nSnapMode, m_sStripID, m_nLine); 
+            }
+
+            public string GetString()
+            {
+                return m_nSnapMode.ToString() + "," + m_sStripID + "," + m_nLine.ToString(); 
+            }
+
+            public void RunTree(Tree tree, bool bVisible)
+            {
+                m_eWorks = (eWorks)tree.Set(m_eWorks, m_eWorks, "eWorks", "eWorks", bVisible);
+                m_nSnapMode = tree.Set(m_nSnapMode, m_nSnapMode, "SnapMode", "Snap Mode (0 = RGB, 1 = APS, 3 = ALL)", bVisible);
+                m_sStripID = tree.Set(m_sStripID, m_sStripID, "StripID", "Strip ID", bVisible);
+                m_nLine = tree.Set(m_nLine, m_nLine, "SnapLine", "Snap Line Number", bVisible);
+            }
+
+            public SnapInfo(eWorks eWorks, int nSnapMode, string sStripID, int nLine)
+            {
+                m_eWorks = eWorks; 
+                m_nSnapMode = nSnapMode;
+                m_sStripID = sStripID;
+                m_nLine = nLine; 
+            }
+        }
+        public string SendSnapInfo(SnapInfo snapInfo)
+        {
+            if (p_eRemote == eRemote.Client) return RemoteRun(eRemoteRun.SendSnapInfo, eRemote.Client, snapInfo);
             else
             {
-                //int nSnapCount = m_recipe[eWorks].p_lSnap;               // 총 Snap 횟수
-                //int nSnapMode = (int)m_recipe[eWorks].p_eSnapMode;       // Snap Mode (RGB, APS, ALL)
-                //return m_aWorks[eWorks].SendSnapInfo(m_recipe[eWorks].m_sRecipe, nSnapMode, nSnapCount); // 3. VisionWorks2 Receive SnapInfo
-
-                int nSnapCount = m_RunningRecipe[eWorks].p_lSnap;               // 총 Snap 횟수
-                int nSnapMode = (int)m_RunningRecipe[eWorks].p_eSnapMode;       // Snap Mode (RGB, APS, ALL)
-                return m_aWorks[eWorks].SendSnapInfo(m_RunningRecipe[eWorks].m_sRecipe, nSnapMode, nSnapCount); // 3. VisionWorks2 Receive SnapInfo
+                return m_aWorks[snapInfo.m_eWorks].SendSnapInfo(snapInfo); // 3. VisionWorks2 Receive SnapInfo
             }
         }
 
@@ -1046,7 +1073,7 @@ namespace Root_Pine2_Vision.Module
                 case eRemoteRun.StateHome: break;
                 case eRemoteRun.RunLight: run.m_lightPower = value; break;
                 case eRemoteRun.SendRecipe: run.m_sRecipe = value; break;
-                case eRemoteRun.SendSnapInfo: run.m_eWorks = value; break;
+                case eRemoteRun.SendSnapInfo: run.m_snapInfo = value; break;
                 case eRemoteRun.SendLotInfo: run.m_lotInfo = value; break;
                 case eRemoteRun.SendSortInfo: run.m_sortInfo = value; break;
             }
@@ -1080,6 +1107,7 @@ namespace Root_Pine2_Vision.Module
             public LightPower m_lightPower;
             public string m_sRecipe = "";
             public eWorks m_eWorks = eWorks.A;
+            public SnapInfo m_snapInfo = new SnapInfo(eWorks.A, 0, "", 0); 
             public LotInfo m_lotInfo = new LotInfo(0, "", "", false, false, 0, 0);
             public SortInfo m_sortInfo = new SortInfo(eWorks.A, "", "");
             public override ModuleRunBase Clone()
@@ -1102,7 +1130,7 @@ namespace Root_Pine2_Vision.Module
                 {
                     case eRemoteRun.RunLight: m_lightPower.RunTree(tree.GetTree("Light Power", true, bVisible), bVisible); break;
                     case eRemoteRun.SendRecipe: m_sRecipe = tree.Set(m_sRecipe, m_sRecipe, "Recipe", "Recipe", bVisible); break;
-                    case eRemoteRun.SendSnapInfo: m_eWorks = (eWorks)tree.Set(m_eWorks, m_eWorks, "Works", "Works", bVisible); break;
+                    case eRemoteRun.SendSnapInfo: m_snapInfo.RunTree(tree.GetTree("SnapInfo"), bVisible); break;
                     case eRemoteRun.SendLotInfo: m_lotInfo.RunTree(tree.GetTree("LotInfo"), bVisible); break;
                     case eRemoteRun.SendSortInfo: m_sortInfo.RunTree(tree.GetTree("SortInfo"), bVisible); break;
                     default: break;
@@ -1118,7 +1146,7 @@ namespace Root_Pine2_Vision.Module
                     case eRemoteRun.RunLight: m_module.RunLight(m_lightPower); break;
                     case eRemoteRun.RunLightOff: m_module.RunLightOff(); break;
                     case eRemoteRun.SendRecipe: return m_module.SendRecipe(m_sRecipe);
-                    case eRemoteRun.SendSnapInfo: return m_module.SendSnapInfo(m_eWorks);
+                    case eRemoteRun.SendSnapInfo: return m_module.SendSnapInfo(m_snapInfo);
                     case eRemoteRun.SendLotInfo: return m_module.SendLotInfo(m_lotInfo);
                     case eRemoteRun.SendSortInfo: return m_module.SendSortInfo(m_sortInfo);
                 }
@@ -1236,7 +1264,8 @@ namespace Root_Pine2_Vision.Module
                     m_module.m_aWorks[m_eWorks].SendRecipe(m_sRecipe);                  // 2. VisionWorks2 Recipe Open 
                     int nSnapCount = m_module.m_RunningRecipe[m_eWorks].p_lSnap;               // 총 Snap 횟수
                     int nSnapMode = (int)m_module.m_RunningRecipe[m_eWorks].p_eSnapMode;       // Snap Mode (RGB, APS, ALL)
-                    m_module.m_aWorks[m_eWorks].SendSnapInfo(m_sRecipe, nSnapMode, nSnapCount); // 3. VisionWorks2 Receive SnapInfo
+                    SnapInfo snapInfo = new SnapInfo(m_eWorks, nSnapMode, "0000", nSnapCount); 
+                    m_module.SendSnapInfo(snapInfo); 
                 }
                 return m_module.ReqSnap(m_sRecipe, m_eWorks);
 
