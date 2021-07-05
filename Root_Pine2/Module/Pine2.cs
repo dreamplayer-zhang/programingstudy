@@ -749,7 +749,7 @@ namespace Root_Pine2.Module
             {
                 m_infoStrip.m_eWorks = (Vision2D.eWorks)tree.Set(m_infoStrip.m_eWorks, m_infoStrip.m_eWorks, "eWorks", "Select Boat", bVisible);
                 m_infoStrip.p_id = tree.Set(m_infoStrip.p_id, m_infoStrip.p_id, "StripID", "Strip ID", bVisible);
-                m_infoStrip.m_iBundle = tree.Set(m_infoStrip.m_iBundle, m_infoStrip.m_iBundle, "StripID", "Strip ID", bVisible);
+                m_infoStrip.m_iBundle = tree.Set(m_infoStrip.m_iBundle, m_infoStrip.m_iBundle, "Bundle", "Bundle", bVisible);
             }
 
             public override string Run()
