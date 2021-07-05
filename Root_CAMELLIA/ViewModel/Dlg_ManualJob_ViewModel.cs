@@ -334,7 +334,6 @@ namespace Root_CAMELLIA
             }
             m_infoCarrier.SetSelectMapData(m_infoCarrier);
             EQ.p_nRnR = p_checkRnR ? p_RnR : 0;
-
             CloseRequested(this, new DialogCloseRequestedEventArgs(true));
         }
 

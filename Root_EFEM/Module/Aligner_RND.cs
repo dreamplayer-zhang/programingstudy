@@ -633,6 +633,9 @@ namespace Root_EFEM.Module
         {
             //string sPut = SendCmd(eCmd.VacuumOn);
             //m_bgwWaferExist.RunWorkerAsync(true);
+            MarsLogManager marsLogManager = MarsLogManager.Instance;
+            marsLogManager.ChangeMaterial(EQ.p_nRunLP, p_infoWafer.m_nSlot, p_infoWafer.p_sLotID, p_infoWafer.p_sCarrierID, p_infoWafer.p_sRecipe);
+
             return "OK"; 
         }
 
