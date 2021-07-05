@@ -81,14 +81,24 @@ namespace RootTools.Comm
         void CallBackAccept(IAsyncResult ar)
         {
             if (m_socket == null) return;
-            m_socketComm = m_socket.EndAccept(ar);
-            Async async = new Async(m_lMaxBuffer);
-            async.m_socket = m_socketComm;
-            m_cbReceive = new AsyncCallback(CallBackReceive);
-            m_socketComm.BeginReceive(async.m_aBuf, 0, m_lMaxBuffer, SocketFlags.None, m_cbReceive, async);
-            m_commLog.Add(CommLog.eType.Info, "Accept Client Socket");
+            try
+            {
+                m_socketComm = m_socket.EndAccept(ar);
+                Async async = new Async(m_lMaxBuffer);
+                async.m_socket = m_socketComm;
+                m_cbReceive = new AsyncCallback(CallBackReceive);
+                m_socketComm.BeginReceive(async.m_aBuf, 0, m_lMaxBuffer, SocketFlags.None, m_cbReceive, async);
+                m_commLog.Add(CommLog.eType.Info, "Accept Client Socket");
+            }
+            catch (Exception e)
+            {
+                m_commLog.Add(CommLog.eType.Info, "CallBackAccept Exception" + e.ToString());
+                if(m_socket != null)
+                    m_socket.Close();
+                InitServer();
+            }
+            #endregion
         }
-        #endregion
 
         #region Receive
         AsyncCallback m_cbReceive;
@@ -105,7 +115,7 @@ namespace RootTools.Comm
             }
             catch (Exception e)
             {
-                if (m_socket != null) m_commLog.Add(CommLog.eType.Info, "CallBack Exception : " + e.Message);
+                if (m_socket != null) m_commLog.Add(CommLog.eType.Info, "CallBackReceive Exception : " + e.Message);
                 m_socket.Close();
                 InitServer();
             }

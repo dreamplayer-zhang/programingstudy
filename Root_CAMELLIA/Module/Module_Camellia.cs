@@ -759,11 +759,6 @@ namespace Root_CAMELLIA.Module
         eCheckWafer m_eCheckWafer = eCheckWafer.InfoWafer;
         public bool IsWaferExist(int nID)
         {
-            //if(EQ.p_eState != EQ.eState.Home && p_eState == eState.Home)
-            //{
-            //    StateHome();
-            //}
-            //SetAlarm();
             switch (m_eCheckWafer)
             {
                 case eCheckWafer.Sensor:

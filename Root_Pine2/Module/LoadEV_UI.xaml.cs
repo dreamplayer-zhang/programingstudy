@@ -46,5 +46,10 @@ namespace Root_Pine2.Module
             m_nQueue[1] = m_loadEV.m_qModuleRemote.Count;
             m_loadEV.RunTreeQueue(Tree.eMode.Init);
         }
+
+        private void gridLoad_PreviewMouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            m_loadEV.StartLoad(); 
+        }
     }
 }

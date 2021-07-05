@@ -25,6 +25,7 @@ namespace Root_Pine2_Vision.Module
             {
                 InitMemory();
                 m_tcpip.EventReceiveData += M_tcpip_EventReceiveData;
+                m_tcpip.ThreadStop();
             }
         }
 
@@ -80,6 +81,10 @@ namespace Root_Pine2_Vision.Module
             SnapInfo,
             Snap,
             SnapDone,
+            SnapReady,
+            LotInfo,
+            InspDone,
+            SortInfo
         }
 
         public class Protocol
@@ -91,6 +96,8 @@ namespace Root_Pine2_Vision.Module
             public int m_nLineNum = 0;
             public string m_sSend = "";
             public string m_sInfo = "";
+            public Vision2D.LotInfo m_lotInfo = null;
+            public Vision2D.SortInfo m_sortInfo = null;
 
             bool m_bWait = true; 
             public void ReceiveData(string sSend)
@@ -143,6 +150,20 @@ namespace Root_Pine2_Vision.Module
                 m_nLineNum = nLineNum;
                 m_sSend = "<" + nID.ToString("000") + "," + eProtocol.ToString() + "," + sRecipe + "," + m_nSnapMode.ToString() + "," + m_nLineNum.ToString() + ">";
             }
+
+            public Protocol(int nID, eProtocol eProtocol, Vision2D.LotInfo lotInfo)
+            {
+                m_eProtocol = eProtocol;
+                m_lotInfo = lotInfo;
+                m_sSend = "<" + nID.ToString("000") + "," + eProtocol.ToString() + "," + lotInfo.GetString() + ">"; 
+            }
+
+            public Protocol(int nID, eProtocol eProtocol, Vision2D.SortInfo sortInfo)
+            {
+                m_eProtocol = eProtocol;
+                m_sortInfo = sortInfo;
+                m_sSend = "<" + nID.ToString("000") + "," + eProtocol.ToString() + "," + sortInfo.GetString() + ">";
+            }
         }
         Queue<Protocol> m_qProtocol = new Queue<Protocol>();
         Protocol m_protocolSend = null;
@@ -174,6 +195,22 @@ namespace Root_Pine2_Vision.Module
         {
             if (m_bStartProcess == false) return "OK";
             Protocol protocol = new Protocol(m_iProtocol, eProtocol.SnapInfo, sRecipe, nSnapMode, nLineNum);
+            m_qProtocol.Enqueue(protocol);
+            return protocol.WaitReply(m_secTimeout);
+        }
+
+        public string SendLotInfo(Vision2D.LotInfo lotInfo)
+        {
+            if (m_bStartProcess == false) return "OK";
+            Protocol protocol = new Protocol(m_iProtocol, eProtocol.LotInfo, lotInfo);
+            m_qProtocol.Enqueue(protocol);
+            return protocol.WaitReply(m_secTimeout);
+        }
+
+        public string SendSortInfo(Vision2D.SortInfo sortInfo)
+        {
+            if (m_bStartProcess == false) return "OK";
+            Protocol protocol = new Protocol(m_iProtocol, eProtocol.SortInfo, sortInfo);
             m_qProtocol.Enqueue(protocol);
             return protocol.WaitReply(m_secTimeout);
         }
@@ -210,6 +247,16 @@ namespace Root_Pine2_Vision.Module
                     string sInfo = m_vision.ReqSnap(sRecipe, p_eWorks);
                     m_tcpip.Send(sSend.Substring(0, sSend.Length - 1) + "," + sInfo + "]"); 
                 }
+                if (asSend[1] == eProtocol.InspDone.ToString())
+                {
+                    string sStripID = asSend[2]; 
+                    string sStripResult = asSend[3];
+                    string sX = asSend[4];
+                    string sY = asSend[5];
+                    string sMapResult = asSend[6];
+                    string sInfo = m_vision.ReqInspDone(sStripID, sStripResult, sX, sY, sMapResult, p_eWorks);
+                    m_tcpip.Send(sSend.Substring(0, sSend.Length - 1) + "," + sInfo + "]");
+                }
             }
             catch (Exception) { }
         }
@@ -243,6 +290,7 @@ namespace Root_Pine2_Vision.Module
                     {
                         if (IsMemoryPool() && (IsProcessRun() == false))
                         {
+                            m_sRecipe = "";
                             m_tcpip.ThreadStop();
                             m_tcpip.InitClient();
                             ProcessStartInfo startInfo = new ProcessStartInfo(m_sFileVisionWorks);

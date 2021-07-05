@@ -93,6 +93,17 @@
                         <TextBox Grid.Column="2" IsEnabled="True" Text="{Binding ChipSimilarity}" HorizontalContentAlignment="Center"/>
                     </Grid>
 
+                    <!-- Resize Scale Factor -->
+                    <Grid HorizontalAlignment="Stretch" Style="{StaticResource group_box_grid_item}">
+                        <Grid.ColumnDefinitions >
+                            <ColumnDefinition Width="120"/>
+                            <ColumnDefinition Width="30"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="Resize Scale Factor: " Style="{StaticResource group_box_item_name_text}"/>
+                        <TextBox Grid.Column="2" IsEnabled="True" Text="{Binding ResizeScaleFactor}" HorizontalContentAlignment="Center"/>
+                    </Grid>
+
                     <!-- Find Chip -->
                     <Grid HorizontalAlignment="Stretch" Style="{StaticResource group_box_grid_item}">
                         <Grid.ColumnDefinitions >

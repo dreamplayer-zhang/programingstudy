@@ -24,7 +24,8 @@ namespace Root_Pine2.Module
             m_boats = boats;
             DataContext = boats;
             treeRootUI.Init(boats.m_treeRootQueue);
-            treeVisionUI.Init(boats.m_vision.m_treeRootQueue); 
+            treeVisionUI.Init(boats.m_vision.m_treeRootQueue);
+            textBlockInfo.DataContext = boats; 
             boats.RunTreeQueue(Tree.eMode.Init);
         }
 
@@ -41,6 +42,8 @@ namespace Root_Pine2.Module
             textBlockVision.Foreground = m_boats.m_vision.m_remote.p_bEnable ? Brushes.Red : Brushes.LightGray; 
             textBlockA.Text = (m_boats.m_aBoat[Vision2D.eWorks.A].p_infoStrip != null) ? m_boats.m_aBoat[Vision2D.eWorks.A].p_infoStrip.p_id : "";
             textBlockB.Text = (m_boats.m_aBoat[Vision2D.eWorks.B].p_infoStrip != null) ? m_boats.m_aBoat[Vision2D.eWorks.B].p_infoStrip.p_id : "";
+            gridStripA.Background = (m_boats.m_aBoat[Vision2D.eWorks.A].p_inspectStrip != null) ? Brushes.Orange : Brushes.Beige;
+            gridStripB.Background = (m_boats.m_aBoat[Vision2D.eWorks.B].p_inspectStrip != null) ? Brushes.Orange : Brushes.Beige;
             textBlockStepA.Text = m_boats.m_aBoat[Vision2D.eWorks.A].p_eStep.ToString();
             textBlockStepB.Text = m_boats.m_aBoat[Vision2D.eWorks.B].p_eStep.ToString();
             OnRunTree();

@@ -88,7 +88,7 @@ namespace RootTools
                 m_sSLoggerNet.WriteFNCLog(port, device, eventID, status, dataFormatter, (MATERIAL_TYPE)type);
             else if (isDataExist && !isExist)
                 m_sSLoggerNet.WriteFNCLog(port, device, eventID, status, dataFormatter);
-            else if (isDataExist && isExist)
+            else if (!isDataExist && isExist)
                 m_sSLoggerNet.WriteFNCLog(port, device, eventID, status, (MATERIAL_TYPE)type);
             else
                 m_sSLoggerNet.WriteFNCLog(port, device, eventID, status);

@@ -1,4 +1,5 @@
 ﻿using Root_Pine2.Engineer;
+using Root_Pine2_Vision.Module;
 using RootTools;
 using RootTools.Comm;
 using RootTools.Control;
@@ -434,6 +435,76 @@ namespace Root_Pine2.Module
                 OnPropertyChanged();
             }
         }
+
+        bool _bUseKeyence = true;
+        public bool p_bUseKeyence
+        {
+            get { return _bUseKeyence; }
+            set
+            {
+                if (_bUseKeyence == value) return;
+                m_log.Info("p_bUseBCD = " + value.ToString());
+                _bUseKeyence = value;
+                OnPropertyChanged();
+            }
+        }
+
+        bool _bCheckPaper = true;
+        public bool p_bCheckPaper
+        {
+            get { return _bCheckPaper; }
+            set
+            {
+                if (_bCheckPaper == value) return;
+                m_log.Info("p_bCheckPaper = " + value.ToString());
+                _bCheckPaper = value;
+                OnPropertyChanged();
+            }
+        }
+        
+        bool _bUseBlow = true;
+        public bool p_bUseBlow
+        {
+            get { return _bUseBlow; }
+            set
+            {
+                _bUseBlow = value;
+                OnPropertyChanged(); 
+            }
+        }
+
+        bool _bUseIonBlow = true;
+        public bool p_bUseIonBlow
+        {
+            get { return _bUseIonBlow; }
+            set
+            {
+                _bUseIonBlow = value;
+                OnPropertyChanged(); 
+            }
+        }
+
+        bool _bUseAlignBlow = true;
+        public bool p_bUseAlignBlow
+        {
+            get { return _bUseAlignBlow; }
+            set
+            {
+                _bUseAlignBlow = value;
+                OnPropertyChanged(); 
+            }
+        }
+
+        void RunTreeMode(Tree tree)
+        {
+            p_eMode = (eRunMode)tree.Set(p_eMode, p_eMode, "Mode", "RunMode");
+            p_b3D = tree.Set(p_b3D, p_b3D, "3D", "RunMode");
+            p_bUseKeyence = tree.Set(p_bUseKeyence, p_bUseKeyence, "Keyence", "RunMode");
+            p_bCheckPaper = tree.Set(p_bCheckPaper, p_bCheckPaper, "Check Paper", "RunMode");
+            p_bUseBlow = tree.Set(p_bUseBlow, p_bUseBlow, "Blow", "Use Blow");
+            p_bUseIonBlow = tree.Set(p_bUseIonBlow, p_bUseIonBlow, "Ion Blow", "Use Blow");
+            p_bUseAlignBlow = tree.Set(p_bUseAlignBlow, p_bUseAlignBlow, "Align Blow", "Use Blow");
+        }
         #endregion
 
         #region Thread DIO
@@ -495,14 +566,14 @@ namespace Root_Pine2.Module
         {
             base.RunTree(tree);
             m_buzzer.RunTree(tree.GetTree("Buzzer")); 
-            p_eMode = (eRunMode)tree.GetTree("Mode").Set(p_eMode, p_eMode, "Mode", "RunMode");
-            p_b3D = tree.GetTree("Mode").Set(p_b3D, p_b3D, "3D", "RunMode");
+            RunTreeMode(tree.GetTree("Mode"));
             p_widthStrip = tree.GetTree("Strip").Set(p_widthStrip, p_widthStrip, "Width", "Strip Width (mm)");
             p_thickness = tree.GetTree("Strip").Set(p_thickness, p_thickness, "Thickness", "Strip Thickness (um)");
             m_widthDefaultStrip = tree.GetTree("Default Strip").Set(m_widthDefaultStrip, m_widthDefaultStrip, "Width", "Strip Width (mm)");
             m_thicknessDefault = tree.GetTree("Default Strip").Set(m_thicknessDefault, m_thicknessDefault, "Thickness", "Strip Thickness (um)");
             p_lStack = tree.GetTree("Stack").Set(p_lStack, p_lStack, "Stack Count", "Strip Max Stack Count");
             p_lStackPaper = tree.GetTree("Stack").Set(p_lStackPaper, p_lStackPaper, "Paper Count", "Paper Max Stack Count");
+            RunTreeVisionOption(tree.GetTree("VisionOption")); 
         }
         #endregion
 
@@ -530,11 +601,112 @@ namespace Root_Pine2.Module
         }
         #endregion
 
+        #region Lot
+        string _sLotID = "";
+        public string p_sLotID
+        {
+            get { return _sLotID; }
+            set
+            {
+                if (_sLotID == value) return; 
+                _sLotID = value;
+                OnPropertyChanged(); 
+
+            }
+        }
+
+        Registry m_reg = new Registry("Pine2");
+        int _iBundle = 0;
+        public int p_iBundle
+        {
+            get { return _iBundle; }
+            set
+            {
+                _iBundle = value;
+                OnPropertyChanged();
+                m_reg.Write("Bundle", value); 
+            }
+        }
+        #endregion
+
+        #region VisionOption
+        public class VisionOption : NotifyProperty
+        {
+            bool _bLotMix = false;
+            public bool p_bLotMix
+            {
+                get { return _bLotMix; }
+                set
+                {
+                    _bLotMix = value;
+                    OnPropertyChanged(); 
+                }
+            }
+
+            bool _bBarcode = false; 
+            public bool p_bBarcode
+            {
+                get { return _bBarcode; }
+                set
+                {
+                    _bBarcode = value;
+                    OnPropertyChanged();
+                }
+            }
+
+            int _nBarcode = 0;
+            public int p_nBarcode
+            {
+                get { return _nBarcode; }
+                set
+                {
+                    _nBarcode = value;
+                    OnPropertyChanged(); 
+                }
+            }
+
+            int _lBarcode = 0;
+            public int p_lBarcode
+            {
+                get { return _lBarcode; }
+                set
+                {
+                    _lBarcode = value;
+                    OnPropertyChanged();
+                }
+            }
+
+            public void RunTree(Tree tree)
+            {
+                p_bLotMix = tree.Set(p_bLotMix, p_bLotMix, "LotMix", "Lot Mix Inspect");
+                p_bBarcode = tree.Set(p_bBarcode, p_bBarcode, "Barcode", "Barcode Inspect");
+                p_nBarcode = tree.Set(p_nBarcode, p_nBarcode, "Barcode Start", "Barcode Start Position (pixel)", p_bBarcode);
+                p_lBarcode = tree.Set(p_lBarcode, p_lBarcode, "Barcode Length", "Barcode Length (pixel)", p_bBarcode);
+            }
+        }
+        public Dictionary<Vision2D.eVision, VisionOption> m_aVisionOption = new Dictionary<Vision2D.eVision, VisionOption>(); 
+        void InitVisionOption()
+        {
+            m_aVisionOption.Add(Vision2D.eVision.Top3D, new VisionOption());
+            m_aVisionOption.Add(Vision2D.eVision.Top2D, new VisionOption());
+            m_aVisionOption.Add(Vision2D.eVision.Bottom, new VisionOption());
+        }
+
+        void RunTreeVisionOption(Tree tree)
+        {
+            m_aVisionOption[Vision2D.eVision.Top3D].RunTree(tree.GetTree("Top3D"));
+            m_aVisionOption[Vision2D.eVision.Top2D].RunTree(tree.GetTree("Top2D"));
+            m_aVisionOption[Vision2D.eVision.Bottom].RunTree(tree.GetTree("Bottom"));
+        }
+        #endregion
+
         Pine2_Handler m_handler; 
         public Pine2(string id, IEngineer engineer)
         {
+            InitVisionOption(); 
             p_id = id;
-            m_handler = (Pine2_Handler)engineer.ClassHandler(); 
+            m_handler = (Pine2_Handler)engineer.ClassHandler();
+            p_iBundle = m_reg.Read("Bundle", 0); 
             InitBase(id, engineer);
 
             InitThread();
