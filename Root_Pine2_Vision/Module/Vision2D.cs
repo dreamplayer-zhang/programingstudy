@@ -1064,8 +1064,8 @@ namespace Root_Pine2_Vision.Module
             public LightPower m_lightPower;
             public string m_sRecipe = "";
             public eWorks m_eWorks = eWorks.A;
-            public LotInfo m_lotInfo = null;
-            public SortInfo m_sortInfo = null;
+            public LotInfo m_lotInfo = new LotInfo(0, "", "", false, false, 0, 0);
+            public SortInfo m_sortInfo = new SortInfo(eWorks.A, "", "");
             public override ModuleRunBase Clone()
             {
                 Run_Remote run = new Run_Remote(m_module);
