@@ -199,7 +199,7 @@ namespace Root_Pine2.Module
                     m_aBoat[eWorks]._sRecipe = "";
                     m_aBoat[eWorks].p_sRecipe = sRecipe; 
                 }
-                m_vision.SendSnapInfo(eWorks);
+                m_vision.SendSnapInfo(m_aBoat[eWorks].GetSnapInfo());
                 m_aBoat[eWorks].p_eStep = Boat.eStep.Run;
                 m_aBoat[eWorks].m_doTriggerSwitch.Write(true);
                 int xLine = m_aBoat[eWorks].m_recipe.m_aSnap.Count;
