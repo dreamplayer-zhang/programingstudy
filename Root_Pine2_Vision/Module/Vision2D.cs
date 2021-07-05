@@ -928,7 +928,7 @@ namespace Root_Pine2_Vision.Module
 
         public string ReqInspDone(string sStripID, string sStripResult, string sX, string sY, string sMapResult, eWorks eWorks)
         {
-            string sSend = m_nReq.ToString("000") + "," + Works2D.eProtocol.SnapReady.ToString();
+            string sSend = m_nReq.ToString("000") + "," + Works2D.eProtocol.InspDone.ToString() + ",";
             sSend += sStripID + "," + sStripResult + "," + sX + "," + sY + "," + sMapResult + "," + eWorks.ToString();
             m_tcpRequest.Send(sSend);
             return "OK";
