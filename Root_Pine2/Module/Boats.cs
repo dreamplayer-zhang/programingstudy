@@ -327,6 +327,7 @@ namespace Root_Pine2.Module
                 {
                     if (sWork == eWorks.ToString()) m_aBoat[eWorks].InspectDone(m_vision.m_eVision, sStripID, sStripResult, sX, sY, sMapResult);
                 }
+                m_tcpRequest.Send(sRead);
             }
         }
         #endregion
