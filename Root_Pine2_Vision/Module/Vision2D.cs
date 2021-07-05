@@ -67,12 +67,12 @@ namespace Root_Pine2_Vision.Module
                 return power;
             }
 
-            public void RunTree(Tree tree, bool bVisible)
+            public void RunTree(Tree tree, bool bVisible, bool bReadOnly = false)
             {
-                m_eRGBW = (eRGBW)tree.Set(m_eRGBW, m_eRGBW, "RGBW", "Set RGBW", bVisible);
+                m_eRGBW = (eRGBW)tree.Set(m_eRGBW, m_eRGBW, "RGBW", "Set RGBW", bVisible, bReadOnly);
                 for (int n = 0; n < m_aPower.Count; n++)
                 {
-                    m_aPower[n] = tree.Set(m_aPower[n], m_aPower[n], n.ToString("00"), "Light Power (0 ~ 100)", bVisible);
+                    m_aPower[n] = tree.Set(m_aPower[n], m_aPower[n], n.ToString("00"), "Light Power (0 ~ 100)", bVisible, bReadOnly);
                 }
             }
 
@@ -532,24 +532,24 @@ namespace Root_Pine2_Vision.Module
                     return cp;
                 }
 
-                public void RunTree(Tree tree, bool bVisible)
+                public void RunTree(Tree tree, bool bVisible, bool bReadOnly = false)
                 {
-                    RunTreeStage(tree.GetTree("Stage", true, bVisible), bVisible);
-                    RunTreeMemory(tree.GetTree("Memory", true, bVisible), bVisible);
-                    m_lightPower.RunTree(tree.GetTree("Light", true, bVisible), bVisible);
+                    RunTreeStage(tree.GetTree("Stage", true, bVisible), bVisible, bReadOnly);
+                    RunTreeMemory(tree.GetTree("Memory", true, bVisible), bVisible, bReadOnly);
+                    m_lightPower.RunTree(tree.GetTree("Light", true, bVisible), bVisible, bReadOnly);
                 }
 
-                void RunTreeStage(Tree tree, bool bVisible)
+                void RunTreeStage(Tree tree, bool bVisible, bool bReadOnly = false)
                 {
-                    m_dpAxis = tree.Set(m_dpAxis, m_dpAxis, "Offset", "Axis Offset (mm)", bVisible);
-                    m_eDirection = (eDirection)tree.Set(m_eDirection, m_eDirection, "Direction", "Scan Direction", bVisible);
+                    m_dpAxis = tree.Set(m_dpAxis, m_dpAxis, "Offset", "Axis Offset (mm)", bVisible, bReadOnly);
+                    m_eDirection = (eDirection)tree.Set(m_eDirection, m_eDirection, "Direction", "Scan Direction", bVisible, false);
                 }
 
-                void RunTreeMemory(Tree tree, bool bVisible)
+                void RunTreeMemory(Tree tree, bool bVisible, bool bReadOnly = false)
                 {
-                    m_eEXT = (eEXT)tree.Set(m_eEXT, m_eEXT, "EXT", "Select EXT", bVisible);
-                    m_cpMemory = tree.Set(m_cpMemory, m_cpMemory, "Offset", "Memory Offset Address (pixel)", bVisible);
-                    m_nOverlap = tree.Set(m_nOverlap, m_nOverlap, "Overlap", "Memory Overlap Size (pixel)", bVisible);
+                    m_eEXT = (eEXT)tree.Set(m_eEXT, m_eEXT, "EXT", "Select EXT", bVisible, bReadOnly);
+                    m_cpMemory = tree.Set(m_cpMemory, m_cpMemory, "Offset", "Memory Offset Address (pixel)", bVisible, bReadOnly);
+                    m_nOverlap = tree.Set(m_nOverlap, m_nOverlap, "Overlap", "Memory Overlap Size (pixel)", bVisible, bReadOnly);
                 }
 
                 Vision2D m_vision;
@@ -751,7 +751,7 @@ namespace Root_Pine2_Vision.Module
                 }
 
                 for (int n = 0; n < m_aSnap.Count; n++)
-                    m_aSnap[n].RunTree(tree.GetTree("Snap").GetTree("Snap" + n.ToString("00"), false, bVisible, true), bVisible);
+                    m_aSnap[n].RunTree(tree.GetTree("Snap").GetTree("Snap" + n.ToString("00"), false, bVisible), bVisible, true);
 
             }
             #endregion
@@ -844,24 +844,23 @@ namespace Root_Pine2_Vision.Module
 
             DalsaParameterSet.eUserSet nUserset = m_eCamUserSet;
 
-            if (nSnapLineIndex == 0)
-            {
-                if (nSnapMode == Recipe.eSnapMode.ALL)
-                {
-                    if (iSnap == 0)
-                        SetCalibration(eCalMode.RGB);
-                    else
-                        SetCalibration(eCalMode.APS);
-                }
-                else
-                    SetCalibration((eCalMode)nSnapMode);
-            }
-            //DalsaParameterSet.eUserSet nUserset = (recipe.m_eEXT == Recipe.Snap.eEXT.EXT1) ? DalsaParameterSet.eUserSet.UserSet2 : DalsaParameterSet.eUserSet.UserSet3;  // RGB : Userset2 , APS : Userset3
-
             try
             {
                 if (m_camera.p_CamParam.p_eUserSetCurrent != nUserset)
                     m_camera.p_CamParam.p_eUserSetCurrent = nUserset;
+
+                if (nSnapLineIndex == 0)
+                {
+                    if (nSnapMode == Recipe.eSnapMode.ALL)
+                    {
+                        if (iSnap == 0)
+                            SetCalibration(eCalMode.RGB);
+                        else
+                            SetCalibration(eCalMode.APS);
+                    }
+                    else
+                        SetCalibration((eCalMode)nSnapMode);
+                }
 
                 m_camera.m_bGrabThreadOn = false;
                 m_camera.GrabLineScan(memory, cpOffset, m_nLine, grabData);
@@ -907,6 +906,20 @@ namespace Root_Pine2_Vision.Module
 
         private void SetCalibration(eCalMode eMode)
         {
+            CalibrationData data = m_aCalData[eMode];
+            m_camera.p_CamParam.SetFlatFieldUserSet(data.m_eCalUserSet);
+            m_camera.p_CamParam.LoadCalibration();
+            m_camera.p_CamParam.SetAnalogGain(data.m_eAnalogGain);
+            m_camera.p_CamParam.ChangeGainSelector(DalsaParameterSet.eGainSelector.System);
+            m_camera.p_CamParam.SetGain(data.m_dSystemGain);
+            m_camera.p_CamParam.ChangeGainSelector(DalsaParameterSet.eGainSelector.All);
+            m_camera.p_CamParam.SetGain(data.m_dAllRowsGain);
+            m_camera.p_CamParam.ChangeGainSelector(DalsaParameterSet.eGainSelector.Blue);
+            m_camera.p_CamParam.SetGain(data.m_dBlueGain);
+            m_camera.p_CamParam.ChangeGainSelector(DalsaParameterSet.eGainSelector.Green);
+            m_camera.p_CamParam.SetGain(data.m_dGreenGain);
+            m_camera.p_CamParam.ChangeGainSelector(DalsaParameterSet.eGainSelector.Red);
+            m_camera.p_CamParam.SetGain(data.m_dRedGain);
             return;
         }
 
@@ -946,6 +959,7 @@ namespace Root_Pine2_Vision.Module
         {
             string sSend = m_nReq.ToString("000") + "," + Works2D.eProtocol.InspDone.ToString() + ",";
             sSend += sStripID + "," + sStripResult + "," + sX + "," + sY + "," + sMapResult + "," + eWorks.ToString();
+            m_sReceive = "";
             m_tcpRequest.Send(sSend);
             return "OK";
         }

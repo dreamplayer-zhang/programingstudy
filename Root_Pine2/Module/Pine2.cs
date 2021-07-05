@@ -719,5 +719,45 @@ namespace Root_Pine2.Module
             ThreadDIOStop(); 
             base.ThreadStop();
         }
+
+        #region ModuleRun
+        protected override void InitModuleRuns()
+        {
+            AddModuleRunList(new Run_SendSortInfo(this), false, "Move Boat");
+        }
+
+        public class Run_SendSortInfo : ModuleRunBase
+        {
+            Pine2 m_module;
+            public Run_SendSortInfo(Pine2 module)
+            {
+                m_infoStrip.p_id = "0000";
+                m_infoStrip.m_iBundle = 0; 
+                m_module = module;
+                InitModuleRun(module);
+            }
+
+            InfoStrip m_infoStrip = new InfoStrip(0);
+            public override ModuleRunBase Clone()
+            {
+                Run_SendSortInfo run = new Run_SendSortInfo(m_module);
+                run.m_infoStrip = m_infoStrip; 
+                return run;
+            }
+
+            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
+            {
+                m_infoStrip.m_eWorks = (Vision2D.eWorks)tree.Set(m_infoStrip.m_eWorks, m_infoStrip.m_eWorks, "eWorks", "Select Boat", bVisible);
+                m_infoStrip.p_id = tree.Set(m_infoStrip.p_id, m_infoStrip.p_id, "StripID", "Strip ID", bVisible);
+                m_infoStrip.m_iBundle = tree.Set(m_infoStrip.m_iBundle, m_infoStrip.m_iBundle, "Bundle", "Bundle", bVisible);
+            }
+
+            public override string Run()
+            {
+                m_module.m_handler.SendSortInfo(m_infoStrip);
+                return "OK";
+            }
+        }
+        #endregion
     }
 }
