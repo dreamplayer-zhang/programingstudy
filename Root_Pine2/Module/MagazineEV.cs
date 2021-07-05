@@ -145,6 +145,13 @@ namespace Root_Pine2.Module
             return (iSlot * m_xOffset[iPos, 1] + (19 - iSlot) * m_xOffset[iPos, 0]) / 19; 
         }
 
+        public double CalcXOffset()
+        {
+            int iPos = (m_elevator.m_ePosTransfer == Elevator.ePos.TransferDown) ? 1 : 0;
+            int iSlot = m_elevator.m_iSlotTransfer;
+            return (iSlot * m_xOffset[iPos, 1] + (19 - iSlot) * m_xOffset[iPos, 0]) / 19;
+        }
+
         void RunTreeXOffset(Tree tree)
         {
             m_xOffset[0, 1] = tree.Set(m_xOffset[0, 1], m_xOffset[0, 1], "Up 19", "Transfer X Offset (pulse)");
@@ -222,12 +229,15 @@ namespace Root_Pine2.Module
             }
 
             double m_dSlot = 6000;
+            public ePos m_ePosTransfer = ePos.TransferUp;
+            public int m_iSlotTransfer = 0;
             public string MoveToTransfer(InfoStrip infoStrip)
             {
                 if (m_conveyor.IsCheck(Conveyor.eCheck.Inside)) return "Conveyer Inside Sensor Checked";
                 m_infoStripPos = null;
-                ePos ePos = (infoStrip.p_eMagazinePos == InfoStrip.eMagazinePos.Up) ? ePos.TransferUp : ePos.TransferDown;
-                string sRun = MoveElevator(ePos, -m_dSlot * infoStrip.p_iStrip);
+                m_ePosTransfer = (infoStrip.p_eMagazinePos == InfoStrip.eMagazinePos.Up) ? ePos.TransferUp : ePos.TransferDown;
+                m_iSlotTransfer = infoStrip.p_iStrip; 
+                string sRun = MoveElevator(m_ePosTransfer, -m_dSlot * m_iSlotTransfer);
                 if (sRun != "OK") return sRun;
                 string sMove = m_axis.WaitReady();
                 if (sMove == "OK") m_infoStripPos = infoStrip;
