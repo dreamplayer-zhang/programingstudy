@@ -291,7 +291,7 @@ namespace Root_Pine2_Vision.Module
         public double m_dResolution = 3.8;
         public int m_nLine = 78800;
         public bool m_bUseBiDirectional = true;
-        public DalsaParameterSet.eUserSet m_eCurrUserSet = DalsaParameterSet.eUserSet.Default;
+        public DalsaParameterSet.eUserSet m_eCamUserSet = DalsaParameterSet.eUserSet.Default;
         public Dictionary<eCalMode, CalibrationData> m_aCalData = new Dictionary<eCalMode, CalibrationData>();
 
         public enum eCalMode
@@ -336,27 +336,35 @@ namespace Root_Pine2_Vision.Module
             public double m_dSystemGain
             {
                 get { return _dSystemGain; }
-                set { if (value >= 1 && value <= 9.99902) _dSystemGain = value; }
+                set { if (CheckGainRange(value)) _dSystemGain = value; }
             }
             public double m_dAllRowsGain
             {
                 get { return _dAllRowsGain; }
-                set { if (value >= 1 && value <= 9.99902) _dAllRowsGain = value; }
+                set { if (CheckGainRange(value)) _dAllRowsGain = value; }
             }
             public double m_dRedGain
             {
                 get { return _dRedGain; }
-                set { if (value >= 1 && value <= 9.99902) _dRedGain = value; }
+                set { if (CheckGainRange(value)) _dRedGain = value; }
             }
             public double m_dGreenGain
             {
                 get { return _dGreenGain; }
-                set { if (value >= 1 && value <= 9.99902) _dGreenGain = value; }
+                set { if (CheckGainRange(value)) _dGreenGain = value; }
             }
             public double m_dBlueGain
             {
                 get { return _dBlueGain; }
-                set { if (value >= 1 && value <= 9.99902) _dBlueGain = value; }
+                set { if (CheckGainRange(value)) _dBlueGain = value; }
+            }
+
+            public bool CheckGainRange(double dGain)
+            {
+                if (dGain >= 1 && dGain <= 9.99902) 
+                    return true; 
+                else 
+                    return false;
             }
 
             public void RunTree(Tree tree)
@@ -808,7 +816,8 @@ namespace Root_Pine2_Vision.Module
             GrabData grabData = recipe.GetGrabData(eWorks, cpOffset, nOverlap);
             grabData.nScanOffsetY = (nSnapLineIndex) * nYOffset;
 
-            DalsaParameterSet.eUserSet nUserset = (recipe.m_eEXT == Recipe.Snap.eEXT.EXT1) ? DalsaParameterSet.eUserSet.UserSet2 : DalsaParameterSet.eUserSet.UserSet3;  // RGB : Userset2 , APS : Userset3
+            DalsaParameterSet.eUserSet nUserset = m_eCamUserSet;
+            //DalsaParameterSet.eUserSet nUserset = (recipe.m_eEXT == Recipe.Snap.eEXT.EXT1) ? DalsaParameterSet.eUserSet.UserSet2 : DalsaParameterSet.eUserSet.UserSet3;  // RGB : Userset2 , APS : Userset3
 
             try
             {
@@ -939,7 +948,7 @@ namespace Root_Pine2_Vision.Module
             m_dResolution = tree.Set(m_dResolution, m_dResolution, "Pixel Resolution", "Pixel Resolution (um/pixel)");
             m_nLine = tree.Set(m_nLine, m_nLine, "Line", "Memory Snap Lines (pixel)");
             m_bUseBiDirectional = tree.Set(m_bUseBiDirectional, m_bUseBiDirectional, "BiDirectional Scan", "Use BiDirectional Scan");
-            m_eCurrUserSet = (DalsaParameterSet.eUserSet)tree.Set(m_eCurrUserSet, m_eCurrUserSet, "UserSet", "Select Camera UserSet");
+            m_eCamUserSet = (DalsaParameterSet.eUserSet)tree.Set(m_eCamUserSet, m_eCamUserSet, "UserSet", "Select Camera UserSet");
             RunCalibrationTree(tree.GetTree("Calibration"));
         }
 

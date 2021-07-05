@@ -163,9 +163,16 @@ namespace RootTools.Camera.Dalsa
             Four,
             Eight,
         }
-
         public static string[] m_aAnalogGain = new string[4] { "1", "2", "4", "8" };
 
+        public enum eGainSelector
+        {
+            System,
+            All,
+            Blue,
+            Green,
+            Red,
+        }
 
         public Log m_log;
         SapAcqDevice m_sapCam;
@@ -566,6 +573,27 @@ namespace RootTools.Camera.Dalsa
             if (m_sapCam == null) return false;
 
             return m_sapCam.SetFeatureValue("flatfieldCalibrationLoad", "");
+        }
+
+        public bool SetAnalogGain(eAnalogGain eGain)
+        {
+            if (m_sapCam == null) return false;
+
+            return m_sapCam.SetFeatureValue("AnalogGain", eGain.ToString());
+        }
+
+        public bool ChangeGainSelector(eGainSelector eSelector)
+        {
+            if (m_sapCam == null) return false;
+
+            return m_sapCam.SetFeatureValue("GainSelector", eSelector.ToString());
+        }
+
+        public bool SetGain(double dGain)
+        {
+            if (m_sapCam == null) return false;
+
+            return m_sapCam.SetFeatureValue("Gain", dGain);
         }
 
         public void SetCamHandle(SapAcqDevice device, SapAcquisition acquisition)
