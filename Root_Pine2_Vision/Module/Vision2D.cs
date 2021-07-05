@@ -792,13 +792,12 @@ namespace Root_Pine2_Vision.Module
             int nReverseOffset = m_aGrabData[eWorks].m_nReverseOffset;
             int nOverlap = m_aGrabData[eWorks].m_nOverlap;
             int nYOffset = m_aGrabData[eWorks].m_nYOffset;
-            //Recipe.eSnapMode nSnapMode = m_recipe[eWorks].p_eSnapMode;
-            //int nTotalSnap = m_recipe[eWorks].p_lSnap;
             Recipe.eSnapMode nSnapMode = m_RunningRecipe[eWorks].p_eSnapMode;
             int nTotalSnap = m_RunningRecipe[eWorks].p_lSnap;
             int nSnapLineIndex = (nSnapMode == Recipe.eSnapMode.ALL) ? iSnap % (nTotalSnap / 2) : iSnap % (nTotalSnap);
 
-            CPoint cpOffset;    // 이미지 시작점
+            // 이미지 시작점 설정
+            CPoint cpOffset;    
             if (m_bUseBiDirectional)
             {
                 if (recipe.m_eDirection == Recipe.Snap.eDirection.Forward)
@@ -817,6 +816,19 @@ namespace Root_Pine2_Vision.Module
             grabData.nScanOffsetY = (nSnapLineIndex) * nYOffset;
 
             DalsaParameterSet.eUserSet nUserset = m_eCamUserSet;
+
+            if (nSnapLineIndex == 0)
+            {
+                if (nSnapMode == Recipe.eSnapMode.ALL)
+                {
+                    if (iSnap == 0)
+                        SetCalibration(eCalMode.RGB);
+                    else
+                        SetCalibration(eCalMode.APS);
+                }
+                else
+                    SetCalibration((eCalMode)nSnapMode);
+            }
             //DalsaParameterSet.eUserSet nUserset = (recipe.m_eEXT == Recipe.Snap.eEXT.EXT1) ? DalsaParameterSet.eUserSet.UserSet2 : DalsaParameterSet.eUserSet.UserSet3;  // RGB : Userset2 , APS : Userset3
 
             try
@@ -866,6 +878,10 @@ namespace Root_Pine2_Vision.Module
                 m_camera.p_CamParam.p_eUserSetCurrent = DalsaParameterSet.eUserSet.UserSet2;
         }
 
+        private void SetCalibration(eCalMode eMode)
+        {
+            return;
+        }
 
         #endregion
 
