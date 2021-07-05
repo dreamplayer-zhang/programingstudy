@@ -35,7 +35,6 @@ namespace Root_VEGA_P.Module
             //toolBox.Get(ref lightSet, m_EOP);
             p_sInfo = m_toolBox.Get(ref lightSet, this);
             p_sInfo = m_toolBox.GetDIO(ref m_doCoverDown, this, "Cover", Enum.GetNames(typeof(eCover)));
-            p_sInfo = m_toolBox.GetDIO(ref m_doCoverDownX, this, "Cover X", Enum.GetNames(typeof(eCover)));
             m_dome.GetTools(m_toolBox, bInit);
             m_door.GetTools(m_toolBox, bInit); 
             if (bInit) InitPos();

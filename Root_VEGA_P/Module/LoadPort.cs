@@ -572,6 +572,9 @@ namespace Root_VEGA_P.Module
 
         public string BeforeGet()
         {
+            //LoadPort Blow 상태 확인
+            //Door Lock 상태 확인
+            //if()
             return "OK"; 
         }
 
@@ -639,9 +642,6 @@ namespace Root_VEGA_P.Module
             if (Run(m_door.RunDoor(true))) return p_sInfo;
             if (Run(base.StateHome())) return p_sInfo;
             if (Run(m_stage.RunMove(Stage.ePos.Outside))) return p_sInfo;
-
-            if (m_camBCD != null)
-                m_camBCD.Connect();
 
             return m_door.RunDoor(false);
         }

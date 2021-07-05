@@ -261,7 +261,7 @@ namespace RootTools.Camera.CognexDM150
 
                 m_dm.SendCommand("TRIGGER ON");
             }
-            catch
+            catch(Exception e)
             {
                 m_log.Info("Send Command Fail !!");
                 return "Send Command Fail !!";
