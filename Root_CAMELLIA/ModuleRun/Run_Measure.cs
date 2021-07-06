@@ -349,7 +349,7 @@ namespace Root_CAMELLIA.Module
                        
                         if (m_DataManager.recipeDM.MeasurementRD.MeasureRepeatCount == 1)
                         {
-                            nTotalRawDataIndex = i;
+                            nTotalRawDataIndex = i+1;
                         }
                         else
                         {
@@ -466,7 +466,7 @@ namespace Root_CAMELLIA.Module
 
             if (!m_isPointMeasure)
             {
-                SaveSlotData(m_DataManager.recipeDM.MeasurementRD.MeasureRepeatCount);
+               // SaveSlotData(m_DataManager.recipeDM.MeasurementRD.MeasureRepeatCount);
             }
             else
             {
