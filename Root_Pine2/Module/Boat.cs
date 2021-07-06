@@ -246,6 +246,19 @@ namespace Root_Pine2.Module
         }
         #endregion
 
+        #region Works Connect
+        bool _bWorksConnect = false; 
+        public bool p_bWorksConnect
+        {
+            get { return _bWorksConnect; }
+            set
+            {
+                _bWorksConnect = value;
+                OnPropertyChanged(); 
+            }
+        }
+        #endregion
+
         public void Reset(ModuleBase.eState eState)
         {
             p_infoStrip = null;

@@ -331,6 +331,12 @@ namespace Root_Pine2.Module
                 }
                 m_tcpRequest.Send(sRead);
             }
+            if (asRead[1] == Works2D.eProtocol.WorksConnect.ToString())
+            {
+                Vision2D.eWorks eWorks = (asRead[2] == "A") ? Vision2D.eWorks.A : Vision2D.eWorks.B;
+                bool bConnect = (asRead[3] == "1");
+                m_aBoat[eWorks].p_bWorksConnect = bConnect; 
+            }
         }
         #endregion
 

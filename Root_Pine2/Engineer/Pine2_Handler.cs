@@ -72,7 +72,7 @@ namespace Root_Pine2.Engineer
         #endregion
 
         #region Recipe
-        string _sRecipe = ""; 
+        public string _sRecipe = ""; 
         public string p_sRecipe
         {
             get { return _sRecipe; }

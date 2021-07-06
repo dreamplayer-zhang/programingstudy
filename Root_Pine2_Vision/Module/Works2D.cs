@@ -16,7 +16,7 @@ namespace Root_Pine2_Vision.Module
     public class Works2D
     {
         MemoryPool m_memoryPool;
-        TCPAsyncClient m_tcpip;
+        public TCPAsyncClient m_tcpip;
         public void GetTools(ToolBox toolBox, bool bInit)
         {
             toolBox.Get(ref m_memoryPool, m_vision, "Memory" + p_id, 1);
@@ -84,7 +84,8 @@ namespace Root_Pine2_Vision.Module
             SnapReady,
             LotInfo,
             InspDone,
-            SortingData
+            SortingData,
+            WorksConnect
         }
 
         public class Protocol

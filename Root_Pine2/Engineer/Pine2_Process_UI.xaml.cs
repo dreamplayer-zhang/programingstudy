@@ -238,6 +238,13 @@ namespace Root_Pine2.Engineer
         {
             m_handler.NewLot();
         }
+
+        private void buttonSend_Click(object sender, RoutedEventArgs e)
+        {
+            string sRecipe = m_handler.p_sRecipe;
+            m_handler._sRecipe = "";
+            m_handler.p_sRecipe = sRecipe;
+        }
         #endregion
     }
 }

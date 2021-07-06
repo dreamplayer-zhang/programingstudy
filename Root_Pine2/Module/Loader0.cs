@@ -291,7 +291,7 @@ namespace Root_Pine2.Module
                 if (Run(RunMoveLoadEV())) return p_sInfo;
                 if (Run(RunMoveZ(c_sPosLoadEV, 0))) return p_sInfo;
                 m_loadEV.p_bBlow = true;
-                if (Run(m_picker.RunVacuum(true))) return p_sInfo;
+                if (Run(m_picker.RunVacuum(true))) return "OK";
                 m_loadEV.p_eMove = LoadEV.eMove.Down; 
                 if (Run(RunShakeUp(nShake, dzShakeUp))) return p_sInfo;
                 m_loadEV.p_eMove = LoadEV.eMove.Stop;
