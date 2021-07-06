@@ -2730,7 +2730,7 @@ namespace Root_CAMELLIA
                     circleData[i].height, circleData[i].MeasurementOffsetX, circleData[i].MeasurementOffsetY);
                 circle.Transform(RatioX, RatioY);
 
-                circle.ScaleOffset(ZoomScale, OffsetX, OffsetY);
+                circle.ScaleOffset(1, 0, 0);
                 Circle c = drawGeometryManager.GetRect(circle, CenterX, CenterY);
                 dataCandidatePoint.SetData(c, (int)(circle.width), (int)(circle.height), 95);
 
@@ -3139,7 +3139,7 @@ namespace Root_CAMELLIA
                 CCircle circle = new CCircle(data[i].x, data[i].y, data[i].width,
                     data[i].height, data[i].MeasurementOffsetX, data[i].MeasurementOffsetY);
                 circle.Transform(RatioX, RatioY);
-                circle.ScaleOffset(ZoomScale, OffsetX, OffsetY);
+                circle.ScaleOffset(1, 0, 0);
 
                 Circle c = drawGeometryManager.GetRect(circle, CenterX, CenterY);
                 dataSelectedPoint.SetData(c, (int)(circle.width), (int)(circle.height), 96, true);

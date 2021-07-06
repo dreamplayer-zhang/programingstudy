@@ -723,9 +723,9 @@ namespace Root_EFEM.Module
 
         public override void Reset()
         {
-            SendCmd(eCmd.SlowStop);
-            SendCmd(eCmd.ClearError);
-            SendCmd(eCmd.ResetPos);
+            Run(SendCmd(eCmd.SlowStop));
+            Run(SendCmd(eCmd.ClearError));
+            Run(SendCmd(eCmd.ResetPos));
             base.Reset();
         }
         #endregion

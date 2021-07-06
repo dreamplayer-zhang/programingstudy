@@ -88,7 +88,7 @@ namespace Root_CAMELLIA
             m_handler = m_engineer.m_handler;
             //loadportA.Init(m_handler.m_aLoadport[0], m_handler, m_handler.m_aRFID[0]);
             //loadportB.Init(m_handler.m_aLoadport[1], m_handler, m_handler.m_aRFID[1]);
-            marsLogManager = MarsLogManager.Instance;
+            //marsLogManager = MarsLogManager.Instance;
             int nLPNum = m_handler.m_aLoadport.Count;
             //for (int i = 0; i < nLPNum; i++) dlgOHT.Init(m_handler.m_aLoadport[i].m_OHTsemi);
             dlgOHT = new OHTs_UI();
@@ -119,7 +119,7 @@ namespace Root_CAMELLIA
 
             //sw.WriteLine("asdf");
 
-           
+
         }
 
         DispatcherTimer m_timer = new DispatcherTimer();
@@ -138,10 +138,7 @@ namespace Root_CAMELLIA
 
             if (DateTime.Now.Minute == 0 && DateTime.Now.Second == 0 && !isCFGWrite)
             {
-                DataFormatter data = new DataFormatter();
-                data.AddData("Version", BaseDefine.Configuration.Version3);
-                marsLogManager.WriteCFG("Vision", "Version", data);
-                data.ClearData();
+                MarsLogManager.Instance.WriteCFG("Vision", BaseDefine.Category.EQUIPMENT.ToString(), "Version", BaseDefine.Configuration.Version3);
                 isCFGWrite = true;
             }
 
