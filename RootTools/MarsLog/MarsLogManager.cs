@@ -42,6 +42,8 @@ namespace RootTools
         }
         public void ChangeMaterial(int port, int slot, string lot, string foup, string recipe)
         {
+            if (!m_useLog)
+                return;
             m_sSLoggerNet.ChangeMaterial(port, slot, lot, foup, recipe);
         }
 

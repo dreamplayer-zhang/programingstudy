@@ -119,6 +119,7 @@
                                     <DataGridTextColumn.ElementStyle>
                                         <Style TargetType="TextBlock">
                                             <Setter Property="Background" Value="{Binding p_state, Converter={StaticResource DataGridColorConverter}, ConverterParameter=Background}"/>
+                                            <Setter Property="ToolTip" Value="{Binding p_recipeID}"/>
                                             <Setter Property="TextAlignment" Value="Center"/>
                                             <Setter Property="VerticalAlignment" Value="Stretch"/>
                                             <Setter Property="Foreground" Value="{Binding p_state, Converter={StaticResource DataGridColorConverter}}"/>

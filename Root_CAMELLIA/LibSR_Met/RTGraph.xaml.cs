@@ -49,7 +49,7 @@ namespace Root_CAMELLIA.LibSR_Met
             }
         }
 
-        public void DrawReflectanceGraph(int nPointIndex, string xlabel, string ylabel, double[] xvalues = null, double[] yvalues = null, double[] yvalues2 = null)
+        public void DrawReflectanceGraph(int nPointIndex, string xlabel, string ylabel, int nRepeatCount, double[] xvalues = null, double[] yvalues = null, double[] yvalues2 = null )
         {
             Dispatcher.Invoke(new Action(() =>
             {
@@ -114,22 +114,33 @@ namespace Root_CAMELLIA.LibSR_Met
 
                     if (m_DM.bThickness)
                     {
-                        sResult = string.Format("Point: {0}\nX Pos: {1}\nY Pos: {2}\nThickness:\n", nPointIndex, data.dX, data.dY);
+                        int nPointIdx = 0;
+                        if (nRepeatCount == 1)
+                        {
+                            nPointIdx = nPointIndex+1;
+                        }
+                        else
+                        {
+                            nPointIdx = (nPointIndex % nRepeatCount)+1;
+                        }
+                                                sResult = string.Format("Point: {0}\nX Pos: {1}\nY Pos: {2}\nThickness:\n", nPointIdx, data.dX, data.dY);
 
                         if (data.Thickness != null && data.Thickness.Count > 0)
                         {
-                            for (int n = 0; n < m_DM.m_LayerData.Count; n++)
+                            for (int n = 1; n < m_DM.m_LayerData.Count-1; n++)
                             {
-                                sResult += string.Concat(m_DM.m_LayerData[n].hostname) + " : " + data.Thickness[n].ToString("0.###") + "Å\n";
+                                sResult += string.Concat(m_DM.m_LayerData[n].hostname) + " : " + data.Thickness[n].ToString("0.####") + "Å\n";
                             }
                         }
 
                         if (data.dGoF < 0.0)
                         {
-                            data.dGoF = 0.0;
+                            data.dGoF = 0.00000;
                         }
-                        sResult += "GOF: " + data.dGoF.ToString() + "\n";
+                        
+                        sResult += "GOF: " + data.dGoF.ToString("0.#####") + "\n";
                     }
+
                 }
                 else
                 {
@@ -245,7 +256,7 @@ namespace Root_CAMELLIA.LibSR_Met
                             yvalues2[a] = Convert.ToDouble(column3[a + 1]);
                         }
 
-                        DrawReflectanceGraph((int)comboBoxDataIndex.SelectedIndex, "Wavelength [nm]", "Reflectance [%]" ,xvalues, yvalues);
+                        DrawReflectanceGraph((int)comboBoxDataIndex.SelectedIndex, "Wavelength [nm]", "Reflectance [%]",1 ,xvalues, yvalues);
                         if (m_DM.bTransmittance)
                         {
                             DrawTransmittanceGraph((int)comboBoxDataIndex.SelectedIndex, "Wavelength [nm]", "Transmittance [%]", xvalues, yvalues2);
@@ -262,7 +273,7 @@ namespace Root_CAMELLIA.LibSR_Met
                     {
                         return;
                     }
-                    DrawReflectanceGraph((int)comboBoxDataIndex.SelectedIndex, "Wavelength [nm]", "Reflectance [%]");
+                    DrawReflectanceGraph((int)comboBoxDataIndex.SelectedIndex, "Wavelength [nm]", "Reflectance [%]", m_DM.nRepeatCount);
                     if (m_DM.bTransmittance)
                     {
                         DrawTransmittanceGraph((int)comboBoxDataIndex.SelectedIndex, "Wavelength [nm]", "Transmittance [%]");
@@ -372,11 +383,28 @@ namespace Root_CAMELLIA.LibSR_Met
             {
                 comboBoxDataIndex.Items.Clear();
 
-                for (int n = 0; n < ConstValue.RAWDATA_POINT_MAX_SIZE; n++)
+                if (m_DM.nRepeatCount == 1)
                 {
-                    if (m_DM.m_RawData[n].bDataExist)
+                    for (int n = 0; n < ConstValue.RAWDATA_POINT_MAX_SIZE; n++)
                     {
-                        comboBoxDataIndex.Items.Add(n+1);
+                        if (m_DM.m_RawData[n].bDataExist)
+                        {
+                            comboBoxDataIndex.Items.Add(n + 1);
+                        }
+                    }
+                }
+                else
+                {
+                    for (int n = 0; n < ConstValue.RAWDATA_POINT_MAX_SIZE; n++)
+
+                    {
+                        if (m_DM.m_RawData[n].bDataExist)
+                        {
+                            comboBoxDataIndex.Items.Add(n + 1);
+                        }
+
+
+
                     }
                 }
             }
