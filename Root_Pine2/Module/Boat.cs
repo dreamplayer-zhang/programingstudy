@@ -236,11 +236,11 @@ namespace Root_Pine2.Module
 
         #region Inspect
         public InfoStrip p_inspectStrip { get; set; }
-        public string InspectDone(string sStripID, string sStripResult, string sX, string sY, string sMapResult)
+        public string InspectDone(Vision2D.eVision eVision, string sStripID, string sStripResult, string sX, string sY, string sMapResult)
         {
             if (p_inspectStrip == null) return "InspectStrip id null";
             if (p_inspectStrip.p_id != sStripID) return "Strip ID MisMatch";
-            string sRun = p_inspectStrip.SetResult(sStripResult, sX, sY, sMapResult); 
+            string sRun = p_inspectStrip.SetResult(eVision, sStripResult, sX, sY, sMapResult); 
             p_inspectStrip = null;
             return sRun; 
         }
