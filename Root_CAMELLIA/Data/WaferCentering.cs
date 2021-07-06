@@ -66,15 +66,6 @@ namespace Root_CAMELLIA.Data
             }
             ptAvgRB = new Point(sumX / m_ptRB.Count, sumY / m_ptRB.Count);
 
-            //if (bThickness)
-            //{
-            //    sData += "," + (m_RawData[n].Thickness[i] * m_ThicknessData[i].m_dThicknessScale + m_ThicknessData[i].m_dThicknessOffset).ToString("0.####");
-            //}
-            //else
-            //{
-            //    sData += "," + (0).ToString("0.####");
-            //}
-
             double LTX = ptLTPulse.X + ((ptROI.X / 2) - ptAvgLT.X) * resolutionX * 10;
             double LTY = ptLTPulse.Y - ((ptROI.Y / 2) - ptAvgLT.Y) * resolutionX * 10;
 

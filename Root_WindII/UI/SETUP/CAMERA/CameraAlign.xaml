@@ -135,7 +135,7 @@
                       Margin="4" 
                       Header="Motion Control Viewer"
                       Style="{StaticResource main_view_groupbox}">
-                <local:MotionControlViewer />
+                <local:MotionViewer />
             </GroupBox>
             
             <local:MotionController Grid.Row="2" DataContext="{Binding MotionControllerVM}"/>

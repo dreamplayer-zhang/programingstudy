@@ -44,7 +44,10 @@ namespace RootTools_Vision.WorkManager3
                 int originWidth = originRecipe.OriginWidth;
                 int originHeight = originRecipe.OriginHeight;
 
-                if(waferMap.UseExtraMap == true)
+                int startOffsetX = 0;
+                int startOffsetY = 0;
+
+                if (waferMap.UseExtraMap == true)
                 {
                     mapData = waferMap.ExtraMapdata;
                     mapSizeX = waferMap.ExtraMapSizeX;
@@ -57,6 +60,18 @@ namespace RootTools_Vision.WorkManager3
 
                     originAbsX = originRecipe.OriginX - waferMap.ExtraDieOffsetX * originWidth;
                     originAbsY = originRecipe.OriginY - waferMap.ExtraDieOffsetY * originHeight;
+
+                    if (originAbsX < 0)
+                    {
+                        startOffsetX = -originAbsX;
+                        originAbsX = 0;
+                    }
+                    if (originAbsY < 0)
+                    {
+                        startOffsetY = -originAbsY;
+                        originAbsY = 0;
+                    }
+
                 }
 
 

@@ -364,53 +364,96 @@ float IP::TemplateMatching(BYTE* pSrc, BYTE* pTemp, Point& outMatchPoint, int nM
 
     return (chMax * 100 > 1) ? chMax * 100 : 1; // Matching Score
 }
-// Trigger가 커질 경우 OpenCV 함수는 점점 느려짐... First Chip Trigger 등을 사용하려면 
-//static float TemplateMatching_IPP(BYTE* pSrc, BYTE* pTemp, Point& outMatchPoint, int nSrcW, int nSrcH, int nTempW, int nTempH, Point ptLT, Point ptRB, int method, int nByteCnt, int nChIdx);
-//{
-//    IppiSize SizeFeature = { rtRef.width, rtRef.height };
-//    IppiSize SizeSrc = { rtRef.width + nX2 - nX1, rtRef.height + nY2 - nY1 };
-//    int nFeatureStep = SizeFeature.width * sizeof(Ipp8u);
-//    int nFeatureSize = SizeFeature.width * SizeFeature.height;
-//    int nSrcStep = SizeSrc.width * sizeof(Ipp8u);
-//    int nSrcSize = SizeSrc.width * SizeSrc.height;
-//
-//    int dstStep = (SizeSrc.width) * sizeof(Ipp32f);
-//    Ipp8u* pFeature = new Ipp8u[nFeatureSize];
-//    Ipp8u* pSrc = new Ipp8u[nSrcSize];
-//    Ipp32f* pDst = NULL;
-//
-//    for (int i = 0; i < SizeFeature.height; i++)
-//        memcpy(&pFeature[i * SizeFeature.width], ppRefMem[i], SizeFeature.width);
-//
-//    for (int i = 0; i < SizeSrc.height; i++)
-//    {
-//        if (i + ptStart.y + nY1 < 0 || ptStart.x + nX1 < 0)
-//        {
-//            if (ptStart.y + nY1 < 0)	ptStart.y += 1;
-//            if (ptStart.x + nX1 < 0)	ptStart.x += 1;
-//        }
-//
-//        memcpy(&pSrc[i * SizeSrc.width], &ppMem[i + ptStart.y + nY1][ptStart.x + nX1], SizeSrc.width);
-//    }
-//    Ipp32f fMax;
-//    int nMaxX = 0;
-//    int nMaxY = 0;
-//    cv::Point ptResult;
-//
-//    pDst = new Ipp32f[nSrcSize];
-//
-//    ippiCrossCorrSame_NormLevel_8u32f_C1R(pSrc, nSrcStep, SizeSrc, pFeature, nFeatureStep, SizeFeature, pDst, dstStep);
-//    ippiMaxIndx_32f_C1R(pDst, dstStep, SizeSrc, &fMax, &nMaxX, &nMaxY);
-//    ptResult = cv::Point(nMaxX + nX1 - rtRef.x, nMaxY + nY1 - rtRef.y);
-//
-//    int nScore = (int)(fMax * 100);
-//    if (pDst != NULL)
-//        delete[] pDst;
-//    delete[] pFeature;
-//    delete[] pSrc;
-//
-//    return ptResult;
-//}
+
+    float IP::TemplateMatching_LargeTrigger(BYTE* pSrc, BYTE* pTemp, Point& outMatchPoint, int nMemW, int nMemH, int nTempW, int nTempH, Point ptLT, Point ptRB, int method, int nByteCnt, int nChIdx)
+    {
+        int nROIW = ptRB.x - ptLT.x;
+        int nROIH = ptRB.y - ptLT.y;
+
+        float fScale = 0.1;//(nTempW < nTempH) ? 300.0 / (float)nTempW : 300.0 / (float)nTempH;
+
+        cv::Size szROI = cv::Size(nROIW, nROIH);
+        LPBYTE imgROI = new BYTE[szROI.width * szROI.height];
+
+        for (int64 r = ptLT.y; r < ptRB.y; r++)
+        {
+            BYTE* pImg = &pSrc[r * nMemW + ptLT.x];
+            memcpy(&imgROI[(int64)nROIW * (r - ptLT.y)], pImg, nROIW);
+        }
+
+        Mat matSrc = Mat(szROI.height, szROI.width, CV_8UC1, imgROI);
+        Mat matFeature;
+        
+        if (nByteCnt == 1)
+        {
+            matFeature = Mat(nTempH, nTempW, CV_8UC1, pTemp);
+        }
+        else if (nByteCnt == 3)
+        {
+            Mat imgTemp = Mat(nTempH, nTempW, CV_8UC3, pTemp);
+            Mat bgr[3];
+            split(imgTemp, bgr);
+
+            matFeature = bgr[2 - nChIdx].clone();
+        }
+
+        // 2. Image Resize
+        cv::Size szDownSrc = cv::Size(szROI.width * fScale, szROI.height * fScale);
+        cv::Size szDownFeature = cv::Size(nTempW * fScale, nTempH * fScale);
+        LPBYTE pSrc_Down = new BYTE[szDownSrc.width * szDownSrc.height];
+        LPBYTE pFeature_Down = new BYTE[szDownFeature.width * szDownFeature.height];
+        Mat matSrc_Down, matFeature_Down;
+
+        cv::resize(matSrc, matSrc_Down, szDownSrc, 0, CV_INTER_LINEAR);
+        cv::resize(matFeature, matFeature_Down, szDownFeature, 0, 0, CV_INTER_LINEAR);
+
+        // 3. Rough Position
+        Mat matResult;
+        double maxVal;
+        cv::Point maxLoc;
+
+        cv::matchTemplate(matSrc_Down, matFeature_Down, matResult, method);
+        cv::minMaxLoc(matResult, NULL, &maxVal, NULL, &maxLoc, Mat());
+
+        cv::Point ptRoughTrans = cv::Point(maxLoc.x / fScale, maxLoc.y / fScale);
+
+        delete[] pSrc_Down;
+        delete[] pFeature_Down;
+        matResult.release();
+
+        // 4. Detail Position 
+        int nRoughPosMargin = 25;
+        cv::Size szDetailROI = cv::Size(nTempW + nRoughPosMargin * 2, nTempH + nRoughPosMargin * 2);
+
+        int nROIStartX = ptRoughTrans.x - nRoughPosMargin;
+        nROIStartX = (nROIStartX < 0) ? 0 : nROIStartX;
+        nROIStartX = (nROIStartX + szDetailROI.width + nRoughPosMargin > szROI.width) ? szROI.width - (szDetailROI.width + nRoughPosMargin) : nROIStartX;
+        int nROIStartY = ptRoughTrans.y - nRoughPosMargin;
+        nROIStartY = (nROIStartX < 0) ? 0 : nROIStartY;
+        nROIStartY = (nROIStartY + szDetailROI.height + nRoughPosMargin > szROI.height) ? szROI.height - (szDetailROI.height + nRoughPosMargin) : nROIStartY;
+
+        Mat matDetailROI = matSrc(cv::Rect(nROIStartX, nROIStartY, szDetailROI.width, szDetailROI.height));
+
+        cv::matchTemplate(matDetailROI, matFeature, matResult, method);
+        cv::minMaxLoc(matResult, NULL, &maxVal, NULL, &maxLoc, Mat());
+
+        
+        float fMatchingScore = (maxVal * 100);
+
+        outMatchPoint = Point(maxLoc.x + nROIStartX + ptLT.x, maxLoc.y + nROIStartY + ptLT.y);
+
+        // 5. ~Memory Free~
+        matDetailROI.release();
+        matResult.release();
+        matSrc.release();
+        matFeature.release();
+        matSrc_Down.release();
+        matFeature_Down.release();
+
+        delete[] pSrc;
+
+        return fMatchingScore;
+    }
 
 // D2D 
 void IP::SubtractAbs(BYTE* pSrc1, BYTE* pSrc2, BYTE* pDst, int nW, int nH)
@@ -1506,6 +1549,40 @@ void IP::Multiply(BYTE* pSrc1, float* pSrc2, BYTE* pDst, int nW, int nH)
     fImgSrc1.convertTo(imgDst, CV_8UC1);
 }
 
+void IP::Multiply(BYTE* pSrc1, BYTE* pSrc2, BYTE* pDst, int nW, int nH)
+{
+    Mat imgSrc1 = Mat(nH, nW, CV_8UC1, pSrc1);
+    Mat imgSrc2 = Mat(nH, nW, CV_8UC1, pSrc2);
+    Mat imgDst = Mat(nH, nW, CV_8UC1, pDst);
+
+    cv::multiply(imgSrc1, imgSrc2, imgDst);
+}
+
+void IP::Bitwise_NOT(BYTE* pSrc, BYTE* pDst, int nW, int nH)
+{
+    Mat imgSrc = Mat(nH, nW, CV_8UC1, pSrc);
+    Mat imgDst = Mat(nH, nW, CV_8UC1, pDst);
+
+    cv::bitwise_not(imgSrc, imgDst);
+}
+
+void IP::Bitwise_AND(BYTE* pSrc1, BYTE* pSrc2, BYTE* pDst, int nW, int nH)
+{
+    Mat imgSrc1 = Mat(nH, nW, CV_8UC1, pSrc1);
+    Mat imgSrc2 = Mat(nH, nW, CV_8UC1, pSrc2);
+    Mat imgDst = Mat(nH, nW, CV_8UC1, pDst);
+
+    cv::bitwise_and(imgSrc1, imgSrc2, imgDst);
+}
+
+void IP::Bitwise_OR(BYTE* pSrc1, BYTE* pSrc2, BYTE* pDst, int nW, int nH)
+{
+    Mat imgSrc1 = Mat(nH, nW, CV_8UC1, pSrc1);
+    Mat imgSrc2 = Mat(nH, nW, CV_8UC1, pSrc2);
+    Mat imgDst = Mat(nH, nW, CV_8UC1, pDst);
+
+    cv::bitwise_or(imgSrc1, imgSrc2, imgDst);
+}
 // Filtering
 void IP::GaussianBlur(BYTE* pSrc, BYTE* pDst, int nW, int nH, int nSigma)
 {
@@ -1761,7 +1838,40 @@ std::vector<byte> IP::GenerateMapData(std::vector<Point> vtContour, float& outOr
 
     return pMapData_Trans;
 }
+int IP::CalcAdaptiveThresholdParam(BYTE* pSrc, BYTE* pMask, int nW, int nH, int nGap_DominantGV2ParamGV)
+{
+    uint64_t nCnt = 0; 
+    uint64_t nValidPixelCnt = 0;
+    uint64_t pHist[256];
+    int nBandwidth = 10;
+    memset(pHist, 0, 256 * sizeof(uint64_t));
 
+    uint64_t bufferLen = (uint64_t)nW * nH;
+    for (uint64_t i = 0; i < bufferLen; i++) 
+    {
+        if(pMask != 0)
+        {
+            pHist[pSrc[i]]++;
+            nValidPixelCnt++;
+        }
+    }
+
+    for (int i = nGap_DominantGV2ParamGV; i < nGap_DominantGV2ParamGV + nBandwidth; i++) 
+    {
+        nCnt += pHist[i];
+    }
+
+    for (int i = nGap_DominantGV2ParamGV; i < 254 - nBandwidth; i++) 
+    {
+        if (nCnt > nValidPixelCnt / 10) {
+            return i - nGap_DominantGV2ParamGV;
+        }
+        nCnt = nCnt - pHist[i];
+        nCnt += pHist[i + nBandwidth];
+    }
+
+    return -1;    
+}
 // Image(Feature/Defect Image) Load/Save - (추후 C#단으로 올려야 할 듯) 
 void IP::SaveBMP(String sFilePath, BYTE* pSrc, int nW, int nH, int nByteCnt)
 {
@@ -2085,13 +2195,19 @@ void IP::SubSampling(BYTE* pSrc, BYTE* pOutImg, int nW, int nH, Point ptLT, Poin
     uint64_t nIdx = 0;
     uint64_t nWidth = (ptRB.x - ptLT.x);
     nWidth -= nWidth % nDownSample;
+    uint64_t nHeight = (ptRB.y - ptLT.y);
+    nHeight -= nHeight % nDownSample;
 
-    byte* pHeader = pSrc;
-    byte* pDownSample = pOutImg;
+    //byte* pHeader = pSrc;
+    //byte* pDownSample = pOutImg;
 
-    for (uint64_t j = ptLT.y; j < ptRB.y; j += nDownSample)
-        for (uint64_t i = ptLT.x; i < ptLT.x + nWidth; i += nDownSample)
-            pOutImg[nIdx++] = pSrc[j * nWidth + i];
+    for (uint64_t j = 0; j < nHeight; j += nDownSample)
+    {
+        for (uint64_t i = 0; i < nWidth; i += nDownSample)
+        {
+            pOutImg[nIdx++] = pSrc[(j + ptLT.y) * nW + (i + ptLT.x)];
+        }
+    }
 
     //Mat imgSrc = Mat((ptRB.y - ptLT.y) / nDownSample, (ptRB.x - ptLT.x) / nDownSample, CV_8UC1, pOutImg); // Debug
 }

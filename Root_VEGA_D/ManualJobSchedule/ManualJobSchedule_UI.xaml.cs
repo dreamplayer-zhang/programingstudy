@@ -112,7 +112,8 @@ namespace Root_VEGA_D
             InfoWafer infoWafer = m_infoCarrier.GetInfoWafer(0);
             if (infoWafer != null)
             {
-                infoWafer.RecipeOpen("C:\\Recipe\\VEGA_D\\" + "OnlyOne.Vega_D");
+                infoWafer.RecipeOpen("C:\\Recipe\\VEGA_D\\" + m_infoWafer.p_sRecipe);
+                //infoWafer.RecipeOpen("C:\\Recipe\\VEGA_D\\" + "OnlyOne.Vega_D");
                 //m_handler.m_RNRinfoWafer = infoWafer;
                 m_handler.AddSequence(infoWafer);
                 m_handler.CalcSequence();

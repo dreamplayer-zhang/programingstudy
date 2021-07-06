@@ -81,12 +81,22 @@ namespace RootTools.Comm
         void CallBackAccept(IAsyncResult ar)
         {
             if (m_socket == null) return;
-            m_socketComm = m_socket.EndAccept(ar);
-            Async async = new Async(m_lMaxBuffer);
-            async.m_socket = m_socketComm;
-            m_cbReceive = new AsyncCallback(CallBackReceive);
-            m_socketComm.BeginReceive(async.m_aBuf, 0, m_lMaxBuffer, SocketFlags.None, m_cbReceive, async);
-            m_commLog.Add(CommLog.eType.Info, "Accept Client Socket");
+            try
+            {
+                m_socketComm = m_socket.EndAccept(ar);
+                Async async = new Async(m_lMaxBuffer);
+                async.m_socket = m_socketComm;
+                m_cbReceive = new AsyncCallback(CallBackReceive);
+                m_socketComm.BeginReceive(async.m_aBuf, 0, m_lMaxBuffer, SocketFlags.None, m_cbReceive, async);
+                m_commLog.Add(CommLog.eType.Info, "Accept Client Socket");
+            }
+            catch (Exception e)
+            {
+                m_commLog.Add(CommLog.eType.Info, "CallBackAccept Exception" + e.ToString());
+                if(m_socket != null)
+                    m_socket.Close();
+                InitServer();
+            }
         }
         #endregion
 
@@ -100,12 +110,12 @@ namespace RootTools.Comm
             {
                 int lReceive = async.m_socket.EndReceive(ar);
                 if (lReceive > 0) EventReciveData(async.m_aBuf, lReceive, async.m_socket);
-                if (m_bCommLog) m_commLog.Add(CommLog.eType.Receive, (lReceive < 64) ? Encoding.ASCII.GetString(async.m_aBuf, 0, lReceive) : "Large Data");
+                if (m_bCommLog) m_commLog.Add(CommLog.eType.Receive, (lReceive < 256) ? Encoding.ASCII.GetString(async.m_aBuf, 0, lReceive) : "Large Data");
                 async.m_socket.BeginReceive(async.m_aBuf, 0, m_lMaxBuffer, SocketFlags.None, m_cbReceive, async);
             }
             catch (Exception e)
             {
-                if (m_socket != null) m_commLog.Add(CommLog.eType.Info, "CallBack Exception : " + e.Message);
+                if (m_socket != null) m_commLog.Add(CommLog.eType.Info, "CallBackReceive Exception : " + e.Message);
                 m_socket.Close();
                 InitServer();
             }

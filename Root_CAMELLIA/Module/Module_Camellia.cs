@@ -747,7 +747,7 @@ namespace Root_CAMELLIA.Module
             GeneralTools.MakeDirectory(p_dataSavePath);
 
             MarsLogManager.Instance.ChangeMaterial(EQ.p_nRunLP, p_infoWafer.m_nSlot + 1, p_infoWafer.p_sLotID, p_infoWafer.p_sCarrierID, p_infoWafer.p_sRecipe);
-            MarsLogManager.Instance.WritePRC(EQ.p_nRunLP, BaseDefine.LOG_DEVICE_ID, SSLNet.PRC_EVENTID.Process, SSLNet.STATUS.START, this.p_id, 0);
+            MarsLogManager.Instance.WritePRC(EQ.p_nRunLP, BaseDefine.LOG_DEVICE_ID, SSLNet.PRC_EVENTID.Process, SSLNet.STATUS.START, SSLNet.MATERIAL_TYPE.WAFER, this.p_id, 0);
             return "OK";
         }
 
@@ -759,11 +759,6 @@ namespace Root_CAMELLIA.Module
         eCheckWafer m_eCheckWafer = eCheckWafer.InfoWafer;
         public bool IsWaferExist(int nID)
         {
-            //if(EQ.p_eState != EQ.eState.Home && p_eState == eState.Home)
-            //{
-            //    StateHome();
-            //}
-            //SetAlarm();
             switch (m_eCheckWafer)
             {
                 case eCheckWafer.Sensor:

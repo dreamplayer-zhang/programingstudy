@@ -97,6 +97,11 @@ namespace Root_WindII
         // Camera
         public readonly CameraVRS cameraVrs = new CameraVRS();
         public readonly CameraAlign cameraAlign = new CameraAlign();
+
+        // RAC
+        public readonly RACProduct racProduct = new RACProduct();
+        public readonly RACSetup racSetup = new RACSetup();
+        public readonly RACAlignKey racAlignKey = new RACAlignKey();
         #endregion
 
         //#region [ViewModels]
@@ -209,6 +214,26 @@ namespace Root_WindII
         //    get => cameraAlignVM;
         //}
         //#endregion
+
+        #region [RAC ViewModels]
+        private RACProduct_ViewModel racProductVM = new RACProduct_ViewModel();
+        public RACProduct_ViewModel RACProductVM
+        {
+            get => racProductVM;
+        }
+        private RACSetup_ViewModel racSetupVM = new RACSetup_ViewModel();
+
+        public RACSetup_ViewModel RACSetupVM
+        {
+            get => racSetupVM;
+        }
+
+        private RACAlignKey_ViewModel racAlignKeyVM = new RACAlignKey_ViewModel();
+        public RACAlignKey_ViewModel RACAlignKeyVM
+        {
+            get => racAlignKeyVM;
+        }
+        #endregion
 
         public SetupMenuPanel_ViewModel()
         {
@@ -342,6 +367,18 @@ namespace Root_WindII
                 {
                     SetPage(cameraVrs);
                     //cameraVrs.DataContext = cameraVrsVM;
+                });
+            }
+        }
+
+        public ICommand btnRACClickedCommand
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    SetPage(racProduct);
+                    racProduct.DataContext = racProductVM;
                 });
             }
         }
@@ -746,6 +783,43 @@ namespace Root_WindII
                 {
                     SetPage(cameraAlign);
                     //cameraAlign.DataContext = CameraAlignVM;
+                });
+            }
+        }
+        #endregion
+
+        #region [Command RAC]
+        public ICommand btnRACProduct
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    SetPage(racProduct);
+                    racProduct.DataContext = RACProductVM;
+                });
+            }
+        }
+        public ICommand btnRACSetup
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    SetPage(racSetup);
+                    racSetup.DataContext = RACSetupVM;
+                });
+            }
+        }
+
+        public ICommand btnRACAlignKey
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    SetPage(racAlignKey);
+                    racAlignKey.DataContext = RACAlignKeyVM;
                 });
             }
         }

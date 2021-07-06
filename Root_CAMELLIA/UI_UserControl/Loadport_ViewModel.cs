@@ -217,7 +217,7 @@ namespace Root_CAMELLIA
             }
         }
 
-        Dlg_ManualJob_ViewModel manualJob_ViewModel;
+        Dlg_ManualJob_ViewModel manualJob_ViewModel { get; set; }
         DialogService dialogService;
         #endregion
 
@@ -410,6 +410,7 @@ namespace Root_CAMELLIA
                             }
                             else
                             {
+                                ((CAMELLIA_Handler)App.m_engineer.ClassHandler()).p_process.MakeRnRSeq();
                                 int idx = 1;
                                 ObservableCollection<DataGridWaferInfo> temp = new ObservableCollection<DataGridWaferInfo>();
 
@@ -488,13 +489,13 @@ namespace Root_CAMELLIA
             {
                 return false;
             }
-            bool bReadyLoadport = (p_loadport.p_eState == ModuleBase.eState.Ready);
+            bool bReadyLoadport = p_loadport.p_eState == ModuleBase.eState.Ready;
             bool bReadyToLoad = true;
             if (App.m_engineer.p_bUseXGem && !p_loadport.p_infoCarrier.m_gem.p_bOffline)
-                bReadyToLoad = (p_loadport.p_infoCarrier.p_eTransfer == GemCarrierBase.eTransfer.ReadyToLoad);
+                bReadyToLoad = p_loadport.p_infoCarrier.p_eTransfer == GemCarrierBase.eTransfer.ReadyToLoad;
             
-            bool bReadyState = (p_loadport.m_qModuleRun.Count == 0);
-            bool bEQReadyState = (EQ.p_eState == EQ.eState.Ready);
+            bool bReadyState = p_loadport.m_qModuleRun.Count == 0;
+            bool bEQReadyState = EQ.p_eState == EQ.eState.Ready;
             //if (m_loadport.p_infoCarrier.p_eState != InfoCarrier.eState.Placed) return false;
             bool bPlaced = p_loadport.CheckPlaced();
             if (m_handler.IsEnableRecovery() == true) return false;
@@ -503,11 +504,11 @@ namespace Root_CAMELLIA
 
         bool IsEnableUnloadReq()
         {
-            bool bReadyLoadport = (p_loadport.p_eState == ModuleBase.eState.Ready);
+            bool bReadyLoadport = p_loadport.p_eState == ModuleBase.eState.Ready;
             bool bReadyToUnload = true;
             if (App.m_engineer.p_bUseXGem && !p_loadport.p_infoCarrier.m_gem.p_bOffline)
-                bReadyToUnload = (p_loadport.p_infoCarrier.p_eTransfer == GemCarrierBase.eTransfer.ReadyToUnload);
-            bool bAccess = (p_loadport.p_infoCarrier.p_eAccessLP == GemCarrierBase.eAccessLP.Auto);
+                bReadyToUnload = p_loadport.p_infoCarrier.p_eTransfer == GemCarrierBase.eTransfer.ReadyToUnload;
+            bool bAccess = p_loadport.p_infoCarrier.p_eAccessLP == GemCarrierBase.eAccessLP.Auto;
             bool bPlaced = p_loadport.CheckPlaced();
             return bReadyLoadport && bReadyToUnload && bAccess && bPlaced;
         }

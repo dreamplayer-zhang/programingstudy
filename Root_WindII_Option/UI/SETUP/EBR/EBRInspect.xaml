@@ -1,0 +1,151 @@
+﻿<UserControl x:Class="Root_WindII_Option.UI.EBRInspect"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:lvc="clr-namespace:LiveCharts.Wpf;assembly=LiveCharts.Wpf"
+             xmlns:tools="clr-namespace:RootTools;assembly=RootTools"
+             xmlns:vision="clr-namespace:RootTools_Vision;assembly=RootTools_Vision"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    
+    <UserControl.Resources>
+        <Style x:Key="inspection_menu_button" TargetType="Button">
+            <Setter Property="Background" Value="{StaticResource groupbox_button_normal}"/>
+            <Setter Property="Foreground" Value="{StaticResource groupbox_button_text}"/>
+            <Setter Property="Margin" Value="4,4,0,4"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Width" Value="120"/>
+            <Setter Property="VerticalAlignment" Value="Stretch"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Border BorderThickness="0" 
+                                Width="{TemplateBinding Width}"
+                                Height="{TemplateBinding Height}"
+                                CornerRadius="6"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{StaticResource sidetap_parent_menu_text}"
+                                HorizontalAlignment="{TemplateBinding HorizontalAlignment}">
+                            <ContentPresenter  VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                               HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"/>
+                        </Border>
+
+                        <ControlTemplate.Triggers>
+                            <Trigger  Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="{StaticResource groupbox_button_mouseover}"/>
+                            </Trigger>
+                            <Trigger  Property="IsPressed" Value="True">
+                                <Setter Property="Background" Value="{StaticResource groupbox_button_press}"/>
+                                <Setter Property="Foreground" Value="{StaticResource groupbox_button_press_text}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </UserControl.Resources>
+    
+    <Grid Background="{StaticResource main_view_background}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="46"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        
+        <StackPanel Orientation="Horizontal">
+            <Button Content="Start" Command="{Binding btnStart}"  Style="{StaticResource inspection_menu_button}"/>
+            <Button Content="Snap" Command="{Binding btnSnap}" Style="{StaticResource inspection_menu_button}"/>
+            <Button Content="Stop" Command="{Binding btnStop}" Style="{StaticResource inspection_menu_button}"/>
+            <Button Content="Clear" Command="{Binding btnClear}" Style="{StaticResource inspection_menu_button}"/>
+            <Button Content="Save Klarf" Command="{Binding btnSaveKlarf}" Style="{StaticResource inspection_menu_button}"/>
+        </StackPanel>
+
+        <Grid Grid.Row="1" Background="{StaticResource main_view_background}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="2*"/>
+                <ColumnDefinition Width="1*"/>
+            </Grid.ColumnDefinitions>
+
+            <Grid Grid.Column="0">
+                <GroupBox Header="Image Viewer" 
+                      Margin="4"
+                      Style="{StaticResource main_view_groupbox}">
+                    <tools:RootViewer DataContext="{Binding ImageViewerVM}"/>
+                </GroupBox>
+            </Grid>
+
+            <!-- new -->
+            <Grid Grid.Column="1" Background="{StaticResource main_view_background}">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="1*"/>
+                    <RowDefinition Height="1*"/>
+                </Grid.RowDefinitions>
+
+                <Grid Grid.Row="0" Background="{StaticResource main_view_background}">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="1*"/>
+                        <ColumnDefinition Width="1*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <GroupBox Grid.Column="0" 
+                      Header="Inspection state"
+                      Margin="4"
+                      Style="{StaticResource main_view_groupbox}">
+                        <vision:MapViewer DataContext="{Binding MapViewerVM}"  Margin="4"/>
+                    </GroupBox>
+
+                    <GroupBox Grid.Column="1" Margin="4"
+                                  Style="{StaticResource main_view_groupbox}"
+                                  Header="Measurement Image">
+                        <Grid Background="Black">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="43*"/>
+                                <ColumnDefinition Width="482*"/>
+                            </Grid.ColumnDefinitions>
+                            <Image Source="{Binding MeasurementImage}" Grid.ColumnSpan="2">
+                            </Image>
+                        </Grid>
+                    </GroupBox>
+                </Grid>
+
+                <GroupBox Grid.Row="1" Header="Graph" Margin="4"
+                                  Style="{StaticResource main_view_groupbox}"
+                                  Background="{StaticResource GroupBoxBackground}">
+                    <TabControl>
+                        <TabItem Header="EBR">
+                            <Grid Background="White">
+                                <lvc:CartesianChart Series="{Binding EBRGraph.Series}"
+                                                            LegendLocation="Top"
+                                                            DisableAnimations="true">
+
+                                </lvc:CartesianChart>
+                            </Grid>
+                        </TabItem>
+
+                        <TabItem Header="Bevel">
+                            <Grid Background="White">
+                                <lvc:CartesianChart Series="{Binding BevelGraph.Series}"
+                                                            LegendLocation="Top"
+                                                            DisableAnimations="true">
+                                </lvc:CartesianChart>
+                            </Grid>
+                        </TabItem>
+                    </TabControl>
+                </GroupBox>
+                
+            </Grid>
+
+            <GroupBox Grid.Column="2" 
+                      Header="Measurement List"
+                      Margin="4,0,4,4"
+                      Style="{StaticResource main_view_groupbox}" >
+                <tools:Database_DataView DataContext="{Binding DataViewerVM}" Margin="4">
+                </tools:Database_DataView>
+            </GroupBox>
+        </Grid>
+    </Grid>
+</UserControl>

@@ -1380,9 +1380,8 @@ namespace Root_WIND2.UI_User
                 }
             }
 
-
             waferMap.UseExtraMap = true;
-            waferMap.CreateExtraMap(newSizeX, newSizeY, newExtraMapData, startX, startY);
+            waferMap.CreateExtraMap(newSizeX, newSizeY, newExtraMapData, dieLeftCount, dieTopCount);
 
             return rectList;
         }
