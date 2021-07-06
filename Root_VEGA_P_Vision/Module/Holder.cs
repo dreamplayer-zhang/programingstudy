@@ -153,7 +153,7 @@ namespace Root_VEGA_P_Vision.Module
                 }
 
                 p_infoPod = infoPod;
-                //p_infoPod.p_bTurn = !p_infoPod.p_bTurn; //아직 flipping 하면서 put 하는게 안됨
+                p_infoPod.p_bTurn = !p_infoPod.p_bTurn; //아직 flipping 하면서 put 하는게 안됨
 
                 return "OK";
             }

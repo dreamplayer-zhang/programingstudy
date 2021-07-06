@@ -437,8 +437,11 @@ namespace Root_VEGA_P.Module
             public string Run_GetWeight()
             {
                 string sInfo = ConnectRS232();
-                if (sInfo != "OK") return sInfo;
-                return "OK";
+                sInfo = m_rs232.Send("00RW");
+                return sInfo;
+
+                //if (sInfo != "OK") return sInfo;
+                //return "OK";
             }
 
             private void M_rs232_OnReceive(string sRead)
@@ -507,6 +510,7 @@ namespace Root_VEGA_P.Module
                         return "Pod not Exist";
                 }
 
+                m_stage.RunWeigh();
                 string sRFID = "";
                 m_RFID.Read(out sRFID);
 

@@ -24,8 +24,9 @@ namespace Root_VEGA_P.Module
         MemoryPool memoryPool;
 
         Axis m_axis;
-        DIO_Os m_doCoverDown;
-        DIO_Os m_doCoverDownX;
+        DIO_Os m_doDomeCoverDown;
+        DIO_Os m_doDoorCoverDown;
+
         LightSet lightSet;
 
         public override void GetTools(bool bInit)
@@ -34,7 +35,8 @@ namespace Root_VEGA_P.Module
             p_sInfo = m_toolBox.GetAxis(ref m_axis, this, "Y");
             //toolBox.Get(ref lightSet, m_EOP);
             p_sInfo = m_toolBox.Get(ref lightSet, this);
-            p_sInfo = m_toolBox.GetDIO(ref m_doCoverDown, this, "Cover", Enum.GetNames(typeof(eCover)));
+            p_sInfo = m_toolBox.GetDIO(ref m_doDomeCoverDown, this, "DomeCover", Enum.GetNames(typeof(eCover)));
+            p_sInfo = m_toolBox.GetDIO(ref m_doDoorCoverDown, this, "DoorCover", Enum.GetNames(typeof(eCover)));
             m_dome.GetTools(m_toolBox, bInit);
             m_door.GetTools(m_toolBox, bInit); 
             if (bInit) InitPos();
@@ -76,25 +78,36 @@ namespace Root_VEGA_P.Module
             Down
         }
         double m_secCoverDown = 3; 
-        public string RunCoverDown(bool bDown) 
+        public string RunDomeCoverDown(bool bDown) 
         {
             //Dome 안돌아가져있으면 하면안됨
             if (!m_dome.IsCheckRotate())
                 return "Dome is ReadyPos";
 
-            m_doCoverDown.Write(bDown ? eCover.Down : eCover.Up);
-            //m_doCoverDownX.Write(bDown ? eCover.Down : eCover.Up);
+            m_doDomeCoverDown.Write(bDown ? eCover.Down : eCover.Up);
             StopWatch sw = new StopWatch();
             int msDown = (int)(1000 * m_secCoverDown);
             while (sw.ElapsedMilliseconds < msDown)
             {
                 Thread.Sleep(10);
                 if (EQ.IsStop()) return "EQ Stop";
-                if (m_dome.IsCoverDown(bDown) && m_door.IsCoverDown(bDown)) return "OK";
+                if (m_dome.IsCoverDown(bDown)) return "OK";
             }
-            return "Run CoverDown Timeout";
+            return "Run DomeCoverDown Timeout";
         }
+        public string RunDoorCoverDown(bool bDown)        {
 
+            m_doDoorCoverDown.Write(bDown ? eCover.Down : eCover.Up);
+            StopWatch sw = new StopWatch();
+            int msDown = (int)(1000 * m_secCoverDown);
+            while (sw.ElapsedMilliseconds < msDown)
+            {
+                Thread.Sleep(10);
+                if (EQ.IsStop()) return "EQ Stop";
+                if (m_door.IsCylinderDown(bDown)) return "OK";
+            }
+            return "Run DoorCoverDown Timeout";
+        }
         void RunTreeCoverDown(Tree tree)
         {
             m_secCoverDown = tree.Set(m_secCoverDown, m_secCoverDown, "Timeout", "Run Cover UpDown Timeout (sec)"); 
@@ -112,7 +125,7 @@ namespace Root_VEGA_P.Module
             DIO_Is m_diCheckDome;
             DIO_Os m_doClamp;
             DIO_Is[] m_diClamp = new DIO_Is[2] { null, null };
-            DIO_Is[] m_diCoverDown = new DIO_Is[2] { null, null };
+            DIO_I[] m_diCoverDown = new DIO_I[2];
             //LightSet lightSet;
 
             public void GetTools(ToolBox toolBox, bool bInit)
@@ -125,8 +138,8 @@ namespace Root_VEGA_P.Module
                 toolBox.GetDIO(ref m_doClamp, m_EOP, p_id + ".Clamp", Enum.GetNames(typeof(eClamp)));
                 toolBox.GetDIO(ref m_diClamp[0], m_EOP, p_id + ".Unclamp", new string[] { "0", "1", "2", "3" });
                 toolBox.GetDIO(ref m_diClamp[1], m_EOP, p_id + ".Clamp", new string[] { "0", "1", "2", "3" });
-                toolBox.GetDIO(ref m_diCoverDown[0], m_EOP, p_id + ".CoverUp", new string[] { "0", "1" });
-                toolBox.GetDIO(ref m_diCoverDown[1], m_EOP, p_id + ".CoverDown", new string[] { "0", "1" });
+                toolBox.GetDIO(ref m_diCoverDown[0], m_EOP, p_id + ".CoverUp");
+                toolBox.GetDIO(ref m_diCoverDown[1], m_EOP, p_id + ".CoverDown");
                 m_particleCounterSet.GetTools(toolBox, bInit);
                 if (bInit) InitPos();
             }
@@ -239,12 +252,11 @@ namespace Root_VEGA_P.Module
 
             public bool IsCoverDown(bool bDown)
             {
-                for (int n = 0; n < 2; n++)
-                {
-                    if (m_diCoverDown[0].ReadDI(n) == bDown) return false;
-                    if (m_diCoverDown[1].ReadDI(n) == !bDown) return false;
-                }
-                return true;
+                if(bDown) //내려왔냐고 물어봤을때
+                    return !m_diCoverDown[0].p_bIn && m_diCoverDown[1].p_bIn;
+
+                else //올라왔냐 물어봤을때
+                    return m_diCoverDown[0].p_bIn && !m_diCoverDown[1].p_bIn;
             }
             #endregion
 
@@ -487,13 +499,21 @@ namespace Root_VEGA_P.Module
             DIO_Is m_diCheckDoor;
             DIO_Os m_doCylinder;
             DIO_Is[] m_diCylinder = new DIO_Is[2] { null, null };
+            DIO_Os m_doVac;
+            DIO_I m_diCheckVac;
+            DIO_I[] m_diCoverDown = new DIO_I[2];
+
             public void GetTools(ToolBox toolBox, bool bInit)
             {
                 toolBox.GetCamera(ref camDoor, m_EOP, p_id + ".Cam Door");
+                toolBox.GetDIO(ref m_diCheckVac, m_EOP, p_id + ".CheckVac");
+                toolBox.GetDIO(ref m_doVac, m_EOP, p_id + ".Vac",Enum.GetNames(typeof(eVac)));
                 toolBox.GetDIO(ref m_diCheckDoor, m_EOP, p_id + ".Check", new string[] { "0", "1" });
                 toolBox.GetDIO(ref m_doCylinder, m_EOP, p_id + ".Cylinder", Enum.GetNames(typeof(eCylinder)));
                 toolBox.GetDIO(ref m_diCylinder[0], m_EOP, p_id + ".Cylinder Down", new string[] { "0", "1" });
                 toolBox.GetDIO(ref m_diCylinder[1], m_EOP, p_id + ".Cylinder Up", new string[] { "0", "1" });
+                toolBox.GetDIO(ref m_diCoverDown[0], m_EOP, p_id + ".CoverUp");
+                toolBox.GetDIO(ref m_diCoverDown[1], m_EOP, p_id + ".CoverDown");
                 m_particleCounterSet.GetTools(toolBox, bInit);
                 if (bInit) { }
             }
@@ -505,7 +525,7 @@ namespace Root_VEGA_P.Module
                 return m_diCheckDoor.ReadDI(0) && m_diCheckDoor.ReadDI(1);
             }
 
-            public bool IsCoverDown(bool bDown)
+            public bool IsCylinderDown(bool bDown)
             {
                 for (int n = 0; n < 2; n++)
                 {
@@ -514,8 +534,50 @@ namespace Root_VEGA_P.Module
                 }
                 return true;
             }
+            public bool IsVac()
+            {
+                return m_diCheckVac.p_bIn;
+            }
+            public bool IsCoverDown(bool bDown)
+            {
+                if (bDown) //내려왔냐고 물어봤을때
+                    return !m_diCoverDown[0].p_bIn && m_diCoverDown[1].p_bIn;
+
+                else //올라왔냐고 물어봤을때
+                    return m_diCoverDown[0].p_bIn && !m_diCoverDown[1].p_bIn;
+            }
             #endregion
 
+            #region Vac
+            public string RunVac(bool bOn)
+            {
+                m_doVac.Write(bOn ? eVac.On : eVac.Off);
+
+                StopWatch sw = new StopWatch();
+                int msUp = (int)(1000 * m_secUp);
+                while (sw.ElapsedMilliseconds < msUp)
+                {
+                    Thread.Sleep(10);
+                    if (EQ.IsStop()) return "EQ Stop";
+                    if(bOn)
+                    {
+                        if (IsVac())
+                            return "OK";
+                    }
+                    else
+                    {
+                        if (!IsVac())
+                            return "OK";
+                    }
+                }
+                return "Run Door Vac Timeout";
+            }
+
+            public enum eVac
+            {
+                Off,On
+            }
+            #endregion
             #region Cylinder Up
             public enum eCylinder
             {
@@ -604,22 +666,39 @@ namespace Root_VEGA_P.Module
 
             public string BeforeGet()
             {
-                return RunCylinderUp(true); 
+                string str = RunCylinderUp(true);
+                if (!str.Equals("OK"))
+                    return str;
+                str = RunVac(false);
+                if (!str.Equals("OK"))
+                    return str;
+                return "OK"; 
             }
 
             public string BeforePut(InfoPod infoPod)
             {
-                return RunCylinderUp(true);
+                string str = RunCylinderUp(true);
+                if (!str.Equals("OK"))
+                    return str;
+                str = RunVac(false);
+                if (!str.Equals("OK"))
+                    return str;
+                return "OK";
             }
 
             public string AfterGet()
             {
-                return "OK";
+                return RunCylinderUp(false);
             }
 
             public string AfterPut()
             {
-                //forget
+                string str = RunCylinderUp(false);
+                if (!str.Equals("OK"))
+                    return str;
+                str = RunVac(true);
+                if (!str.Equals("OK"))
+                    return str;
                 return "OK";
             }
 
@@ -769,37 +848,60 @@ namespace Root_VEGA_P.Module
         {
             if (runCount.m_bCheckPod)
             {
-                if (m_dome.IsCheckDome() == false) return "Dome Check Error";
-                if (m_door.IsCheckDoor() == false) return "Door Check Error";
+                if(runCount.p_id.Contains("Dome"))
+                    if (m_dome.IsCheckDome() == false) return "Dome Check Error";
+                else if(runCount.p_id.Contains("Door"))
+                    if (m_door.IsCheckDoor() == false) return "Door Check Error";
             }
             if (Run(RunMove(ePos.Backward))) return p_sInfo; 
             if (Run(m_dome.RunClamp(true))) return p_sInfo;
             try
             {
-                if (Run(m_dome.RunRotate(Dome.ePos.Rotate))) return p_sInfo;
-                if (Run(m_dome.RunDomeSnap())) return p_sInfo;
-                if (Run(m_door.RunCylinderUp(false))) return p_sInfo;
-                if (Run(m_door.RunDoorSnap())) return p_sInfo;
-                if (Run(RunMove(ePos.Forward))) return p_sInfo;
-                if (Run(RunCoverDown(true))) return p_sInfo;
-                //if (Run(m_dome.m_particleCounterSet.RunParticleCounter(runCount.m_dataDome.m_asNozzle))) return p_sInfo;
-                //if (Run(m_door.m_particleCounterSet.RunParticleCounter(runCount.m_dataDoor.m_asNozzle))) return p_sInfo;
-                if (Run(RunCoverDown(false))) return p_sInfo;
-                if (Run(RunMove(ePos.Backward))) return p_sInfo;
-                if (Run(m_door.RunCylinderUp(true))) return p_sInfo;
-                if (Run(m_dome.RunRotate(Dome.ePos.Ready))) return p_sInfo;
-                if (Run(m_dome.RunClamp(false))) return p_sInfo;
+                if(runCount.p_id.Contains("Dome"))
+                {
+                    if (Run(RunDomeParticleCounter()))
+                        return p_sInfo;
+                }
+
+                else if(runCount.p_id.Contains("Door"))
+                {
+                    if (Run(RunDoorParticleCounter()))
+                        return p_sInfo;
+                }
             }
             finally
             {
-                string sMove = RunMove(ePos.Backward);
-                m_door.RunCylinderUp(true);
-                if (sMove == "OK")
-                {
-                    m_dome.RunRotate(Dome.ePos.Ready);
-                    m_dome.RunClamp(false);
-                }
+                string sMove = RunDomeCoverDown(false);
+                sMove = RunMove(ePos.Backward);
+                //m_door.RunCylinderUp(true);
+                //if (sMove == "OK")
+                //{
+                //    m_dome.RunRotate(Dome.ePos.Ready);
+                //    m_dome.RunClamp(false);
+                //}
             }
+            return "OK";
+        }
+        public string RunDomeParticleCounter()
+        {
+            if (Run(m_dome.RunDomeSnap())) return p_sInfo;
+            if (Run(RunMove(ePos.Forward))) return p_sInfo;
+            if (Run(RunDomeCoverDown(true))) return p_sInfo;
+            //if (Run(m_dome.m_particleCounterSet.RunParticleCounter(runCount.m_dataDome.m_asNozzle))) return p_sInfo;
+            if (Run(RunDomeCoverDown(false))) return p_sInfo;
+            if (Run(RunMove(ePos.Backward))) return p_sInfo;
+
+            return "OK";
+        }
+        public string RunDoorParticleCounter()
+        {
+            if (Run(m_door.RunDoorSnap())) return p_sInfo;
+            if (Run(RunMove(ePos.Forward))) return p_sInfo;
+            if (Run(RunDomeCoverDown(true))) return p_sInfo;
+            //if (Run(m_door.m_particleCounterSet.RunParticleCounter(runCount.m_dataDoor.m_asNozzle))) return p_sInfo;
+            if (Run(RunDomeCoverDown(false))) return p_sInfo;
+            if (Run(RunMove(ePos.Backward))) return p_sInfo;
+
             return "OK";
         }
         #endregion
@@ -809,6 +911,7 @@ namespace Root_VEGA_P.Module
         {
             base.Reset();
             RunMove(ePos.Backward);
+            m_axis.WaitReady();
             if(!m_dome.m_axisRotate.p_bServoOn)
             {
                 m_dome.m_axisRotate.ServoOn(true);
@@ -827,10 +930,18 @@ namespace Root_VEGA_P.Module
         {
             if (EQ.p_bSimulate) return "OK";
             //여기
-            m_dome.InitCamera();
-            m_door.InitCamera();
-            string sHome = StateHome(m_axis);
-            p_eState = (sHome == "OK") ? eState.Ready : eState.Error;
+            //m_dome.InitCamera();
+            //m_door.InitCamera();
+
+            if (m_dome.IsCoverDown(true))
+                RunDomeCoverDown(false);
+            if (m_door.IsCoverDown(true))
+                RunDoorCoverDown(false);
+
+            string sHome = m_axis.StartHome();
+            m_axis.WaitReady();
+            p_eState = sHome.Equals("OK")? eState.Ready : eState.Error;
+
             Reset(); 
             return sHome;
         }
@@ -1004,7 +1115,7 @@ namespace Root_VEGA_P.Module
                 {
                     case eSol.Dome_Clamp: return m_module.m_dome.RunClamp(m_bOn);
                     case eSol.Door_Cylinder: return m_module.m_door.RunCylinderUp(m_bOn);
-                    case eSol.EOP_Cover: return m_module.RunCoverDown(m_bOn); 
+                    case eSol.EOP_Cover: return m_module.RunDomeCoverDown(m_bOn); 
                 }
                 return "OK";
             }
