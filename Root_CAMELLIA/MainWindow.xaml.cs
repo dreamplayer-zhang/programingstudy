@@ -138,7 +138,7 @@ namespace Root_CAMELLIA
 
             if (DateTime.Now.Minute == 0 && DateTime.Now.Second == 0 && !isCFGWrite)
             {
-                marsLogManager.WriteCFG("Vision", BaseDefine.Category.EQUIPMENT.ToString(), "Version", BaseDefine.Configuration.Version3);
+                MarsLogManager.Instance.WriteCFG("Vision", BaseDefine.Category.EQUIPMENT.ToString(), "Version", BaseDefine.Configuration.Version3);
                 isCFGWrite = true;
             }
 

@@ -135,13 +135,20 @@ namespace RootTools
                 MessageBox.Show("dataFormatter가 존재 할 시 unit, ecid는 공백이면 안됩니다.");
                 return;
             }
+            try
+            {
+                if (isDataExist)
+                    m_sSLoggerNet.WriteCFGLog(device, categoryID, cfgID, value, dataFormatter, unit, ecid);
+                else if (!isDataExist && unit != "" && ecid != "")
+                    m_sSLoggerNet.WriteCFGLog(device, categoryID, cfgID, value, unit, ecid);
+                else
+                    m_sSLoggerNet.WriteCFGLog(device, categoryID, cfgID, value);
+            }
+            catch (Exception e)
+            {
 
-            if (isDataExist)
-                m_sSLoggerNet.WriteCFGLog(device, categoryID, cfgID, value, dataFormatter, unit, ecid);
-            else if (!isDataExist && unit != "" && ecid != "")
-                m_sSLoggerNet.WriteCFGLog(device, categoryID, cfgID, value, unit, ecid);
-            else
-                m_sSLoggerNet.WriteCFGLog(device, categoryID, cfgID, value);
+            }
+
         }
 
         //public DataFormatter GetDataFormatter()

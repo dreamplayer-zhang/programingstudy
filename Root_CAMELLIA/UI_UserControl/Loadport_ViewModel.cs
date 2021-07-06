@@ -217,7 +217,7 @@ namespace Root_CAMELLIA
             }
         }
 
-        Dlg_ManualJob_ViewModel manualJob_ViewModel;
+        Dlg_ManualJob_ViewModel manualJob_ViewModel { get; set; }
         DialogService dialogService;
         #endregion
 

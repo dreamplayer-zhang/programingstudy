@@ -1046,10 +1046,27 @@ namespace Root_EFEM.Module
                     Thread.Sleep(10);
                     if (EQ.p_bStop) return p_sInfo + "EQ Stop";
                 }
+
+                int firstIdx = -1;
+                int lastIdx = -1;
                 for (int i=0; i<m_infoCarrier.m_aGemSlot.Count; i++)
                 {
-                    if (m_infoCarrier.m_aGemSlot[i].p_eState == GemSlotBase.eState.Select) 
+                    if (m_infoCarrier.m_aGemSlot[i].p_eState == GemSlotBase.eState.Select)
+                    {
+                        if (firstIdx == -1)
+                            firstIdx = i;
+
+                        m_infoCarrier.m_aInfoWafer[i] = (InfoWafer)m_infoCarrier.m_aGemSlot[i];
                         m_infoCarrier.StartProcess(m_infoCarrier.m_aGemSlot[i].p_id);
+                        lastIdx = i;
+                    }
+                }
+                if (firstIdx == lastIdx)
+                    m_infoCarrier.m_aInfoWafer[firstIdx].p_eWaferOrder = InfoWafer.eWaferOrder.FirstLastWafer;
+                else
+                {
+                    m_infoCarrier.m_aInfoWafer[firstIdx].p_eWaferOrder = InfoWafer.eWaferOrder.FirstWafer;
+                    m_infoCarrier.m_aInfoWafer[lastIdx].p_eWaferOrder = InfoWafer.eWaferOrder.LastWafer;
                 }
 
                 return sResult;

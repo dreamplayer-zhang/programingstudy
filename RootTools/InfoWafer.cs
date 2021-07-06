@@ -85,7 +85,15 @@ namespace RootTools
             LastWafer,
             FirstLastWafer,
         }
-        public eWaferOrder _eWaferOrder = eWaferOrder.MiddleWafer;
+        eWaferOrder _eWaferOrder = eWaferOrder.MiddleWafer;
+        public eWaferOrder p_eWaferOrder
+        {
+            get { return _eWaferOrder; }
+            set
+            {
+                _eWaferOrder = value;
+            }
+        }
 
         eWaferSize _eSize = eWaferSize.e300mm;
         public eWaferSize p_eSize
