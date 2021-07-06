@@ -84,7 +84,7 @@ namespace Root_Pine2_Vision.Module
             SnapReady,
             LotInfo,
             InspDone,
-            SortInfo
+            SortingData
         }
 
         public class Protocol
@@ -218,7 +218,7 @@ namespace Root_Pine2_Vision.Module
         public string SendSortInfo(Vision2D.SortInfo sortInfo)
         {
             if (m_bStartProcess == false) return "OK";
-            Protocol protocol = new Protocol(m_iProtocol, eProtocol.SortInfo, sortInfo);
+            Protocol protocol = new Protocol(m_iProtocol, eProtocol.SortingData, sortInfo);
             m_qProtocol.Enqueue(protocol);
             return protocol.WaitReply(m_secTimeout);
         }
