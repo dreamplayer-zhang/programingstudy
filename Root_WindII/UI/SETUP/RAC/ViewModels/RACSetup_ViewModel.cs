@@ -25,8 +25,8 @@ namespace Root_WindII
             }
         }
 
-        XMLCONTENTS _XMLData;
-        public XMLCONTENTS XMLData
+        XMLData _XMLData;
+        public XMLData XMLData
         {
             get
             {
@@ -50,7 +50,7 @@ namespace Root_WindII
 
         public void OriginBoxReset_Callback()
         {
-            XMLData = new XMLCONTENTS();
+            XMLData = new XMLData();
             try
             {
                 GeneralFunction.Read(XMLData, @"D:\RACXMLTEST\ProductB.XML");
