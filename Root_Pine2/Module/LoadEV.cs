@@ -182,6 +182,7 @@ namespace Root_Pine2.Module
         #region RunLoad
         public string RunLoad(double secTimeout)
         {
+            if (p_bCycleStop) return "OK";
             lock (m_csLock)
             {
                 StopWatch sw = new StopWatch();

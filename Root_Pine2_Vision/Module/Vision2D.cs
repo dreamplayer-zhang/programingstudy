@@ -301,7 +301,7 @@ namespace Root_Pine2_Vision.Module
             {
                 m_eWorks = eWorks;
                 m_sStripID = sStripID;
-                m_sSortID = sStripID;
+                m_sSortID = sSortID;
             }
         }
         public string SendSortInfo(SortInfo sortInfo)
@@ -970,6 +970,7 @@ namespace Root_Pine2_Vision.Module
         {
             m_aWorks[eWorks.A].Reset();
             m_aWorks[eWorks.B].Reset();
+            foreach (Remote.Protocol protocol in m_remote.m_aProtocol) protocol.m_bDone = true; 
             base.Reset();
         }
         #endregion

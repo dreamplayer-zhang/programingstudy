@@ -534,7 +534,7 @@ namespace Root_Pine2.Module
             {
                 switch (m_pine2.p_eMode)
                 {
-                    case Pine2.eRunMode.Stack: return m_loadEV.p_bDone ? StartRun(m_runLoadEV) : "OK";
+                    case Pine2.eRunMode.Stack: return (m_loadEV.p_bDone && (m_loadEV.p_bCycleStop == false)) ? StartRun(m_runLoadEV) : "OK";
                     case Pine2.eRunMode.Magazine: return m_transfer.m_gripper.p_bEnable ? StartLoadTransfer() : "OK";
                 }
             }
