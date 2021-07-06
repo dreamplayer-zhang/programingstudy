@@ -141,7 +141,7 @@ namespace RootTools.Comm
                 if (lReceive > 0)
                 {
                     if (EventReceiveData != null) EventReceiveData(async.m_aBuf, lReceive, async.m_socket);
-                    if (m_bCommLog) m_commLog.Add(CommLog.eType.Receive, (lReceive < 64) ? Encoding.Default.GetString(async.m_aBuf, 0, lReceive) : "Large Data");
+                    if (m_bCommLog) m_commLog.Add(CommLog.eType.Receive, (lReceive < 256) ? Encoding.Default.GetString(async.m_aBuf, 0, lReceive) : "Large Data");
                 }
                 async.m_socket.BeginReceive(async.m_aBuf, 0, m_lMaxBuffer, SocketFlags.None, m_cbReceive, async);
             }

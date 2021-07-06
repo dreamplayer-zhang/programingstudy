@@ -158,7 +158,7 @@ namespace Root_Pine2.Module
         {
             try
             {
-                m_axis.SetTrigger(m_axis.m_trigger.m_aPos[0], m_axis.m_trigger.m_aPos[1], m_axis.m_trigger.m_dPos, 4, true);
+                m_axis.SetTrigger(m_axis.m_trigger.m_aPos[0], m_axis.m_trigger.m_aPos[1], m_axis.m_trigger.m_dPos, 5, true);
                 //m_axis.RunTrigger(true);
                 m_axis.StartMove(m_pSnap[1], "Snap");
                 return m_axis.WaitReady();
@@ -224,15 +224,23 @@ namespace Root_Pine2.Module
             }
         }
         public Vision2D.Recipe m_recipe;
+
+        public Vision2D.SnapInfo GetSnapInfo()
+        {
+            if(p_infoStrip == null)
+                return new Vision2D.SnapInfo(m_recipe.m_eWorks, (int)m_recipe.p_eSnapMode, "", m_recipe.p_lSnap);
+
+            return new Vision2D.SnapInfo(m_recipe.m_eWorks, (int)m_recipe.p_eSnapMode, p_infoStrip.p_id, m_recipe.p_lSnap); 
+        }
         #endregion
 
         #region Inspect
         public InfoStrip p_inspectStrip { get; set; }
-        public string InspectDone(Vision2D.eVision eVision, string sStripID, string sStripResult, string sX, string sY, string sMapResult)
+        public string InspectDone(string sStripID, string sStripResult, string sX, string sY, string sMapResult)
         {
             if (p_inspectStrip == null) return "InspectStrip id null";
             if (p_inspectStrip.p_id != sStripID) return "Strip ID MisMatch";
-            string sRun = p_inspectStrip.SetResult(eVision, sStripResult, sX, sY, sMapResult); 
+            string sRun = p_inspectStrip.SetResult(sStripResult, sX, sY, sMapResult); 
             p_inspectStrip = null;
             return sRun; 
         }
@@ -241,6 +249,7 @@ namespace Root_Pine2.Module
         public void Reset(ModuleBase.eState eState)
         {
             p_infoStrip = null;
+            p_inspectStrip = null; 
             m_doTriggerSwitch.Write(false);
             if (eState == ModuleBase.eState.Ready) p_eStep = eStep.RunReady;
             RunVacuum(false); 
@@ -253,7 +262,7 @@ namespace Root_Pine2.Module
             set
             {
                 _infoStrip = value;
-                if (value != null) p_inspectStrip = value; 
+                OnPropertyChanged(); 
             }
         }
         public string p_id { get; set; }

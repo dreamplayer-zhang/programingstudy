@@ -659,7 +659,8 @@ namespace Root_Pine2.Module
 
             public override string Run()
             {
-                return m_module.m_buffer.RunMove(m_eMagazine, 0, m_bPushPos);
+                double xOffset = m_module.m_magazineEV.m_aEV[m_eMagazine].CalcXOffset(); 
+                return m_module.m_buffer.RunMove(m_eMagazine, xOffset, m_bPushPos);
             }
         }
 

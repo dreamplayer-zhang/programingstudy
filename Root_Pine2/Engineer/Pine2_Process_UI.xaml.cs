@@ -3,6 +3,7 @@ using Root_Pine2_Vision.Module;
 using RootTools;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -70,7 +71,9 @@ namespace Root_Pine2.Engineer
             InitLoaderUI(handler.m_loader3, gridLoader, 0);
             InitBoatsUI();
             InitTransferUI();
-            InitLoadEVUI(); 
+            InitLoadEVUI();
+
+            m_bgwNewLot.DoWork += M_bgwNewLot_DoWork;
         }
 
         List<MagazineEV_UI> m_aMagazineUI = new List<MagazineEV_UI>(); 
@@ -220,9 +223,20 @@ namespace Root_Pine2.Engineer
             }
         }
 
+        BackgroundWorker m_bgwNewLot = new BackgroundWorker();
         private void buttonNewLot_Click(object sender, RoutedEventArgs e)
         {
-            m_handler.NewLot(); 
+            if (m_bgwNewLot.IsBusy)
+            {
+                m_handler.m_pine2.m_alidNewLot.p_bSet = true; 
+                return; 
+            }
+            m_bgwNewLot.RunWorkerAsync();
+        }
+
+        private void M_bgwNewLot_DoWork(object sender, DoWorkEventArgs e)
+        {
+            m_handler.NewLot();
         }
         #endregion
     }

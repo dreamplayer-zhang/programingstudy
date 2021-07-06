@@ -192,13 +192,15 @@ namespace Root_Pine2.Module
                     Thread.Sleep(10);
                     if (EQ.IsStop()) return "EQ Stop"; 
                 }
+                m_aBoat[eWorks].p_inspectStrip = m_aBoat[eWorks].p_infoStrip;
+                m_aBoat[eWorks].p_inspectStrip.StartInspect(); 
                 if (bReadRecipe)
                 {
                     string sRecipe = m_aBoat[eWorks].p_sRecipe;
                     m_aBoat[eWorks]._sRecipe = "";
                     m_aBoat[eWorks].p_sRecipe = sRecipe; 
                 }
-                m_vision.SendSnapInfo(eWorks);
+                m_vision.SendSnapInfo(m_aBoat[eWorks].GetSnapInfo());
                 m_aBoat[eWorks].p_eStep = Boat.eStep.Run;
                 m_aBoat[eWorks].m_doTriggerSwitch.Write(true);
                 int xLine = m_aBoat[eWorks].m_recipe.m_aSnap.Count;
@@ -324,8 +326,9 @@ namespace Root_Pine2.Module
                 string sWork = asRead[7];
                 foreach (Vision2D.eWorks eWorks in Enum.GetValues(typeof(Vision2D.eWorks)))
                 {
-                    if (sWork == eWorks.ToString()) m_aBoat[eWorks].InspectDone(m_vision.m_eVision, sStripID, sStripResult, sX, sY, sMapResult);
+                    if (sWork == eWorks.ToString()) m_aBoat[eWorks].InspectDone(sStripID, sStripResult, sX, sY, sMapResult);
                 }
+                m_tcpRequest.Send(sRead);
             }
         }
         #endregion
