@@ -258,7 +258,7 @@ namespace RootTools.Light
             const int m_msWaitReply = 2000; 
             public override void SetPower()
             {
-                double fPower = p_bOn ? p_fSetPower : 0;
+                double fPower = p_fSetPower ;
                 fPower *= p_fScalePower;
                 m_lightTool.AddProtocol(eCmd.Dimming, (int)(c_maxPower * fPower / 100), this);
             }

@@ -413,9 +413,9 @@ namespace Root_EFEM.Module
 				camEdgeSide.Connect();
 			if (camEdgeBtm != null && camEdgeBtm.p_CamInfo.p_eState == RootTools.Camera.Dalsa.eCamState.Init)
 				camEdgeBtm.Connect();
-			if (camEBR != null && camEBR.p_CamInfo.p_eState == RootTools.Camera.Matrox.eCamState.Init)
-				camEBR.Connect();
-			return "OK";
+            if (camEBR != null && camEBR.p_CamInfo.p_eState == RootTools.Camera.Matrox.eCamState.Init)
+                camEBR.Connect();
+            return "OK";
 		}
 
 		public override string StateHome()
@@ -426,11 +426,10 @@ namespace Root_EFEM.Module
 			if (p_eRemote == eRemote.Client) return RemoteRun(eRemoteRun.StateHome, eRemote.Client, null);
 			else
 			{
+                OpenCamera();
+                p_bStageVac = true;
 
-			//OpenCamera();
-			p_bStageVac = true;
-
-				axisEdgeX.StartHome();
+                axisEdgeX.StartHome();
 				axisEbrX.StartHome();
 				axisEbrZ.StartHome();
 				if (axisEdgeX.WaitReady() != "OK")

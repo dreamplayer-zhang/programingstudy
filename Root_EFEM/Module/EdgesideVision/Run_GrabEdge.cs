@@ -111,11 +111,15 @@ namespace Root_EFEM.Module.EdgesideVision
 				//double triggerStart = curr + startDegree * pulsePerDegree;
 				double triggerStart = gmTop.m_nStartDegree * pulsePerDegree;
 				double triggerDest = triggerStart + gmTop.m_nScanDegree * pulsePerDegree;
+				
+				// 시계 방향
 				//double moveStart = triggerStart - axisR.GetSpeedValue(Axis.eSpeed.Move).m_acc * scanSpeed;   //y 축 이동 시작 지점 
 				//double moveEnd = triggerDest + axisR.GetSpeedValue(Axis.eSpeed.Move).m_acc * scanSpeed;  // Y 축 이동 끝 지점
+				// 반시계 방향
 				double moveStart = triggerDest + axisR.GetSpeedValue(Axis.eSpeed.Move).m_acc * scanSpeed;  // Y 축 이동 끝 지점
-				double moveEnd = triggerStart - axisR.GetSpeedValue(Axis.eSpeed.Move).m_acc * scanSpeed;   //y 축 이동 시작 지점 
-				int grabCount = Convert.ToInt32(gmTop.m_nScanDegree * pulsePerDegree * gmTop.m_dCamTriggerRatio);
+				double moveEnd = triggerStart - axisR.GetSpeedValue(Axis.eSpeed.Move).m_acc * scanSpeed;   //y 축 이동 시작 지점
+																										   
+				int grabCount = Convert.ToInt32((gmTop.m_nScanDegree /360) * 300 * pulsePerDegree * Math.PI / gmTop.m_dRealResX_um);
 
 				if (module.Run(axisEdgeX.StartMove(sideFocusAxis)))
 					return p_sInfo;
@@ -136,7 +140,6 @@ namespace Root_EFEM.Module.EdgesideVision
 					return p_sInfo;
 				if (module.Run(axisR.WaitReady()))
 					return p_sInfo;
-
 
 				while (gmTop.m_camera.p_nGrabProgress != 100 || gmSide.m_camera.p_nGrabProgress != 100 || gmBtm.m_camera.p_nGrabProgress != 100)
 				{
