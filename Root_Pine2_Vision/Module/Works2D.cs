@@ -263,7 +263,7 @@ namespace Root_Pine2_Vision.Module
                     string sY = asSend[5];
                     string sMapResult = asSend[6].Substring(0, asSend[6].Length - 1);
                     string sInfo = m_vision.ReqInspDone(sStripID, sStripResult, sX, sY, sMapResult, p_eWorks);
-                    //m_tcpip.Send(sSend.Substring(0, sSend.Length - 1) + "," + sInfo + "]");
+                    m_tcpip.Send(sSend.Substring(0, sSend.Length - 1) + "," + sInfo + "]");
                 }
             }
             catch (Exception) { }
