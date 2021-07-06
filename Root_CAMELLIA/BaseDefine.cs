@@ -17,6 +17,12 @@ namespace Root_CAMELLIA
             Measure
         }
 
+        public enum Category
+        {
+            EQUIPMENT = 1,
+            ETC
+        }
+
 
         public const int ViewSize = 310;
         public const int WFRadius = 300;
