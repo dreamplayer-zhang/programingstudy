@@ -131,7 +131,6 @@
     <Compile Include="Database\defect.cs" />
     <Compile Include="ClonableWorkFactory.cs" />
     <Compile Include="DataTypes\CameraInfo.cs" />
-    <Compile Include="DataTypes\RAC_XMLData.cs" />
     <Compile Include="DataTypes\SharedBufferInfo.cs" />
     <Compile Include="Inspection\BacksideAlignment.cs" />
     <Compile Include="Inspection\BacksideSurface.cs" />
