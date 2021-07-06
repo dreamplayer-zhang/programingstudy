@@ -349,9 +349,6 @@
     <Compile Include="UI\SETUP\RAC\MapFileListViewer.xaml.cs">
       <DependentUpon>MapFileListViewer.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI\SETUP\RAC\MapFileSelectionViewer.xaml.cs">
-      <DependentUpon>MapFileSelectionViewer.xaml</DependentUpon>
-    </Compile>
     <Compile Include="UI\SETUP\RAC\RACProduct.xaml.cs">
       <DependentUpon>RACProduct.xaml</DependentUpon>
     </Compile>
@@ -359,7 +356,6 @@
       <DependentUpon>RACSetup.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\SETUP\RAC\ViewModels\MapFileListViewer_ViewModel.cs" />
-    <Compile Include="UI\SETUP\RAC\ViewModels\MapFileSelectionViewer_ViewModel.cs" />
     <Compile Include="UI\SETUP\RAC\ViewModels\RACProduct_ViewModel.cs" />
     <Compile Include="UI\SETUP\RAC\ViewModels\RACSetup_ImageViewer_ViewModel.cs" />
     <Compile Include="UI\SETUP\RAC\ViewModels\RACSetup_ViewModel.cs" />
@@ -527,10 +523,6 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="UI\SETUP\RAC\MapFileListViewer.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="UI\SETUP\RAC\MapFileSelectionViewer.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
