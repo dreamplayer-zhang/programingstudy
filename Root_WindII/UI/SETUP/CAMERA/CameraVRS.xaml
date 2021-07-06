@@ -198,13 +198,13 @@
                     </Grid>
                     <Grid Grid.Column="1">
                       
-                        <!--<local:MotionControlViewer/>-->
+                        <!--<local:MotionViewer/>-->
                     </Grid>
                 </Grid>
             </Grid>
         </GroupBox>
         <!--<Grid Grid.Column="1">
-            <local:MotionControlViewer/>
+            <local:MotionViewer/>
             <Grid Grid.Row="1">
                 <Grid>
                     <Grid.ColumnDefinitions>
