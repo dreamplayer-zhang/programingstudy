@@ -291,7 +291,11 @@ namespace Root_Pine2.Module
                 if (Run(RunMoveLoadEV())) return p_sInfo;
                 if (Run(RunMoveZ(c_sPosLoadEV, 0))) return p_sInfo;
                 m_loadEV.p_bBlow = true;
-                if (Run(m_picker.RunVacuum(true))) return "OK";
+                if (Run(m_picker.RunVacuum(true)))
+                {
+                    m_loadEV.p_bCycleStop = true; 
+                    return "OK";
+                }
                 m_loadEV.p_eMove = LoadEV.eMove.Down; 
                 if (Run(RunShakeUp(nShake, dzShakeUp))) return p_sInfo;
                 m_loadEV.p_eMove = LoadEV.eMove.Stop;
@@ -403,8 +407,8 @@ namespace Root_Pine2.Module
         {
             Vision2D.eVision eVision = m_pine2.p_b3D ? Vision2D.eVision.Top3D : Vision2D.eVision.Top2D;
             Boats boats = m_handler.m_aBoats[eVision];
-            if (boats.m_aBoat[Vision2D.eWorks.A].p_eStep == Boat.eStep.Ready) return StartUnloadBoat(eVision, Vision2D.eWorks.A);
-            if (boats.m_aBoat[Vision2D.eWorks.B].p_eStep == Boat.eStep.Ready) return StartUnloadBoat(eVision, Vision2D.eWorks.B);
+            if ((boats.m_aBoat[Vision2D.eWorks.A].p_eStep == Boat.eStep.Ready) && (boats.m_aBoat[Vision2D.eWorks.A].p_infoStrip == null)) return StartUnloadBoat(eVision, Vision2D.eWorks.A);
+            if ((boats.m_aBoat[Vision2D.eWorks.B].p_eStep == Boat.eStep.Ready) && (boats.m_aBoat[Vision2D.eWorks.B].p_infoStrip == null)) return StartUnloadBoat(eVision, Vision2D.eWorks.B);
             return "OK";
         }
 

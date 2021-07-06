@@ -60,6 +60,7 @@ namespace Root_Pine2.Module
 
             public string RunMoveReady(bool bWait = true)
             {
+                if ((m_axis[0].p_posCommand == m_axis[0].GetPosValue(c_sReady)) && (m_axis[1].p_posCommand == m_axis[1].GetPosValue(c_sReady))) return "OK";
                 m_axis[0].StartMove(c_sReady);
                 m_axis[1].StartMove(c_sReady);
                 if (bWait == false) return "OK";

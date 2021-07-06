@@ -278,7 +278,7 @@ namespace Root_Pine2.Module
             if (p_infoStrip == null) return "p_infoStrip == null";
             Vision2D.eWorks eWorks = p_infoStrip.m_eWorks; 
             Boats boats = m_handler.m_aBoats[Vision2D.eVision.Top2D];
-            if (boats.m_aBoat[eWorks].p_eStep == Boat.eStep.Ready) return StartUnloadBoat(eWorks);
+            if ((boats.m_aBoat[eWorks].p_eStep == Boat.eStep.Ready) && (boats.m_aBoat[eWorks].p_infoStrip == null)) return StartUnloadBoat(eWorks);
             return "OK";
         }
 
