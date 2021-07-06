@@ -62,7 +62,19 @@ namespace Root_CAMELLIA.Module
             m_dFocusZ_pulse = tree.Set(m_dFocusZ_pulse, m_dFocusZ_pulse, "Focus Z Position", "Focus Z Position(pulse)", bVisible);
         }
 
-        ConcurrentQueue<int> thicknessQueue = new ConcurrentQueue<int>();
+        struct MeasureItem
+        {
+            public int m_index;
+            public int m_repeat;
+
+            public MeasureItem(int index, int repeat)
+            {
+                m_index = index;
+                m_repeat = repeat;
+            }
+        }
+
+        ConcurrentQueue<MeasureItem> thicknessQueue = new ConcurrentQueue<MeasureItem>();
         bool MeasureDone = false;
         //bool isEQStop = false;
         private void RunThread()
@@ -74,10 +86,15 @@ namespace Root_CAMELLIA.Module
             //isEQStop = false;
             StopWatch sw = new StopWatch();
             int nThicknessCnt = 0;
+            int nTotalRawDataIndex = 0;
+            int nDataIndex = 0;
+            int nRepeatCount = m_DataManager.recipeDM.MeasurementRD.MeasureRepeatCount;
+
             while (m_bStart)
             {
-                int index;
+                MeasureItem item;
                 bool useAlphafit = true;
+                
                 if (m_isPM)
                 {
                     useAlphafit = m_isAlphaFit;
@@ -89,7 +106,7 @@ namespace Root_CAMELLIA.Module
 
                 if (EQ.IsStop())
                 {
-                    while (thicknessQueue.TryDequeue(out index))
+                    while (thicknessQueue.TryDequeue(out item))
                     {
 
                     }
@@ -97,13 +114,26 @@ namespace Root_CAMELLIA.Module
                     break;
                 }
 
-                if (thicknessQueue.TryDequeue(out index))
+                if (thicknessQueue.TryDequeue(out item))
                 {
                     sw.Start();
                     if (m_DataManager.recipeDM.MeasurementRD.UseThickness)
                     {
-                        //Thread.Sleep(1);
-                        Met.Nanoview.ERRORCODE_NANOVIEW rst = App.m_nanoView.GetThickness(index, m_DataManager.recipeDM.MeasurementRD.LMIteration, m_DataManager.recipeDM.MeasurementRD.DampingFactor, useAlphafit);
+                        Thread.Sleep(1);
+                        if (nRepeatCount == 1)
+                        {
+                            nTotalRawDataIndex = (item.m_index + 1);
+                        }
+                        else
+                        {
+                            // 여기서의 nPointIndex는 Repeat * WaferMeasure Point 개수라는 뜻 (다시 확인해서 수정 필요)
+                            nTotalRawDataIndex++;
+
+                        }
+                        nDataIndex = nTotalRawDataIndex - 1;
+                        //nDataIndex = item.m_index;
+
+                        Met.Nanoview.ERRORCODE_NANOVIEW rst = App.m_nanoView.GetThickness(nDataIndex, m_DataManager.recipeDM.MeasurementRD.LMIteration, m_DataManager.recipeDM.MeasurementRD.DampingFactor, useAlphafit);
                         if (rst != Met.Nanoview.ERRORCODE_NANOVIEW.SR_NO_ERROR)
                         {
                             //isEQStop = false;
@@ -118,8 +148,8 @@ namespace Root_CAMELLIA.Module
                         }
                     }
 
-                    m_mwvm.p_Progress = (double)(index + 1) / m_DataManager.recipeDM.MeasurementRD.DataSelectedPoint.Count * 100;
-                    SaveRawData(index);
+                    m_mwvm.p_Progress = (double)(item.m_index + 1) / m_DataManager.recipeDM.MeasurementRD.DataSelectedPoint.Count * 100;
+                    SaveRawData(item.m_index);
                     //.DataManager MetData = LibSR_Met.DataManager.GetInstance();
                     // Spectrum data Thread 추가 두개두개두개
                     //LibSR_Met.DataManager.GetInstance().SaveResultFileSlot(@"C:\Users\ATI\Desktop\SaveTest\" + index + "_" + DateTime.Now.ToString("HHmmss") + "test.csv", m_module.p_infoWafer.p_sCarrierID,
@@ -129,11 +159,23 @@ namespace Root_CAMELLIA.Module
                     //    m_DataManager.recipeDM.MeasurementRD.DataSelectedPoint[m_DataManager.recipeDM.MeasurementRD.DataMeasurementRoute[index]].y,
                     //    m_DataManager.recipeDM.MeasurementRD.LowerWaveLength,
                     //    m_DataManager.recipeDM.MeasurementRD.UpperWaveLength);
-                     
-                    LibSR_Met.DataManager.GetInstance().SaveResultFileSlot(m_slotSpectraDataPath + "\\" + index + "_" + DateTime.Now.ToString("HHmmss"), m_module.p_infoWafer, m_DataManager.recipeDM, index);
+                    string sSlotSpectraDataPath = string.Empty;
+                    if (nRepeatCount ==1)
+                    {
+                        int nDataNum = item.m_index + 1;
+                        sSlotSpectraDataPath = m_resultDataSavePath[0] + "\\Slot." + m_module.p_infoWafer.m_nSlot + "\\SpectraData" + "\\" + nDataNum.ToString() + "_" + DateTime.Now.ToString("HHmmss");
+                    }
+                    else
+                    {
+                        int nPathIndex = nDataIndex % nRepeatCount;
+                        int nDataNum = item.m_index + 1;
+                        sSlotSpectraDataPath = m_resultDataSavePath[nPathIndex] + "\\Slot." + m_module.p_infoWafer.m_nSlot + "\\SpectraData" + "\\" + nDataNum.ToString() + "_" + DateTime.Now.ToString("HHmmss");
+
+                    }
+                    LibSR_Met.DataManager.GetInstance().SaveResultFileSlot(sSlotSpectraDataPath, m_module.p_infoWafer, m_DataManager.recipeDM, item.m_index);
                     
                     //SaveRT
-                    LibSR_Met.DataManager.GetInstance().SaveRT(m_historyRTDataPath + "\\" + index + "_" + DateTime.Now.ToString("HHmmss") + "RawData.csv", index);
+                    LibSR_Met.DataManager.GetInstance().SaveRT(m_historyRTDataPath + "\\" + item.m_index + "_" + DateTime.Now.ToString("HHmmss") + "RawData.csv", item.m_index);
 
                     //foreach (LibSR_Met.ContourMapData mapdata in MetData.m_ContourMapDataR)
                     //    LibSR_Met.DataManager.GetInstance().SaveContourMapData(@"C:\Users\ATI\Desktop\SaveTest\" + index + "_R_" + mapdata.Wavelength.ToString() + "_" + DateTime.Now.ToString("HHmmss") + "_ContourMapData.csv", mapdata);
@@ -184,10 +226,11 @@ namespace Root_CAMELLIA.Module
                     {
                         m_lotStartTime = string.Empty;
                         m_lotStartTime = DateTime.Now.ToString("yyyy-MM-dd") + "T" + DateTime.Now.ToString("HH-mm");
-                        rootPath += @"\" + m_lotStartTime; 
+                        rootPath += @"\" + m_lotStartTime;
+                        m_resultDataSavePath[0] = rootPath;
                         isLotStart = false;
                     }
-                    m_resultDataSavePath[0] = rootPath;
+                   
                     m_summaryPath = m_resultDataSavePath[0] + "\\ResultData_Summary";
                     GeneralTools.MakeDirectory(m_summaryPath);
                     m_resultPath = m_resultDataSavePath[0] + "\\ResultData";
@@ -206,14 +249,15 @@ namespace Root_CAMELLIA.Module
                 {
                     for (int n = 0; n < nRepeatCount; n++)
                     {
-                        if (isLotStart && n==0)
+                        if (isLotStart)
                         {
                             m_lotStartTime = string.Empty;
                             m_lotStartTime = DateTime.Now.ToString("yyyy-MM-dd") + "T" + DateTime.Now.ToString("HH-mm");
-                            rootPath += @"\" + m_lotStartTime;
+                            //rootPath += @"\" + m_lotStartTime;
                             isLotStart = false;
                         }
-                        m_resultDataSavePath[n] = rootPath + "_" + n.ToString();
+                        //rootPath += @"\" + m_lotStartTime;
+                        m_resultDataSavePath[n] = rootPath + @"\" + m_lotStartTime + "_" + (n + 1).ToString();
                         m_summaryPath = m_resultDataSavePath[n] + "\\ResultData_Summary";
                         GeneralTools.MakeDirectory(m_summaryPath);
                         m_resultPath = m_resultDataSavePath[n] + "\\ResultData";
@@ -258,7 +302,7 @@ namespace Root_CAMELLIA.Module
             InfoWafer info = m_module.p_infoWafer;
 
 
-            marsLogManager.WritePRC(EQ.p_nRunLP, deviceID, SSLNet.PRC_EVENTID.StepProcess, SSLNet.STATUS.START, "Measure", (int)BaseDefine.Process.Measure);
+            marsLogManager.WritePRC(EQ.p_nRunLP, deviceID, SSLNet.PRC_EVENTID.StepProcess, SSLNet.STATUS.START, MATERIAL_TYPE.WAFER, "Measure", (int)BaseDefine.Process.Measure);
 
             if (!m_isPM)
             {
@@ -319,13 +363,13 @@ namespace Root_CAMELLIA.Module
                         MeasurePoint = new RPoint(dX, dY);
                         dataFormatter.AddData("X Axis", dX, "Pulse");
                         dataFormatter.AddData("Y Axis", dY, "Pulse");
-                        marsLogManager.WriteFNC(EQ.p_nRunLP, deviceID, "Stage Move", SSLNet.STATUS.START, dataFormatter);
+                        marsLogManager.WriteFNC(EQ.p_nRunLP, deviceID, "Stage Move", SSLNet.STATUS.START, dataFormatter: dataFormatter);
 
                         if (m_module.Run(axisXY.StartMove(MeasurePoint)))
                             return p_sInfo;
                         if (m_module.Run(axisXY.WaitReady()))
                             return p_sInfo;
-                        marsLogManager.WriteFNC(EQ.p_nRunLP, deviceID, "Stage Move", SSLNet.STATUS.END, dataFormatter);
+                        marsLogManager.WriteFNC(EQ.p_nRunLP, deviceID, "Stage Move", SSLNet.STATUS.END, dataFormatter: dataFormatter);
                         dataFormatter.ClearData();
                         m_mwvm.p_ArrowX1 = x * RatioX;
                         m_mwvm.p_ArrowY1 = -y * RatioY;
@@ -357,7 +401,17 @@ namespace Root_CAMELLIA.Module
                             nTotalRawDataIndex++;
                             
                         }
-                        if (!MakeSaveDirectory(true, nRepeatCount))
+                        bool isFirstRepeat = false;
+
+                        if(i==0 &&cnt==0)
+                        {
+                            isFirstRepeat = true;
+                        }
+                        else
+                        {
+                            isFirstRepeat = false;
+                        }
+                        if (!MakeSaveDirectory(isFirstRepeat, nRepeatCount))
                         {
                             return "Make Directory Error";
                         }
@@ -379,7 +433,7 @@ namespace Root_CAMELLIA.Module
                         if (i == 0 && cnt == 0)
                             marsLogManager.WriteFNC(EQ.p_nRunLP, BaseDefine.LOG_DEVICE_ID, "GetThicness", SSLNet.STATUS.START);
 
-                        thicknessQueue.Enqueue(i);
+                        thicknessQueue.Enqueue(new MeasureItem(i, cnt));
                     }
                   
 
@@ -394,7 +448,7 @@ namespace Root_CAMELLIA.Module
 
                         dataFormatter.AddData("X Axis", dX, "Pulse");
                         dataFormatter.AddData("Y Axis", dY, "Pulse");
-                        marsLogManager.WriteFNC(EQ.p_nRunLP, deviceID, "Stage Move", SSLNet.STATUS.START, dataFormatter);
+                        marsLogManager.WriteFNC(EQ.p_nRunLP, deviceID, "Stage Move", SSLNet.STATUS.START, dataFormatter: dataFormatter);
 
                         isMove = true;
                         if (m_module.Run(axisXY.StartMove(MeasurePoint)))
@@ -418,7 +472,7 @@ namespace Root_CAMELLIA.Module
                         if (m_module.Run(axisXY.WaitReady()))
                             return p_sInfo;
 
-                        marsLogManager.WriteFNC(EQ.p_nRunLP, deviceID, "Stage Move", SSLNet.STATUS.END, dataFormatter);
+                        marsLogManager.WriteFNC(EQ.p_nRunLP, deviceID, "Stage Move", SSLNet.STATUS.END, dataFormatter: dataFormatter);
                         dataFormatter.ClearData();
                         isMove = false;
                     }
@@ -442,7 +496,7 @@ namespace Root_CAMELLIA.Module
                 {
                     return "Layer Model Not Ready";
                 }
-                thicknessQueue.Enqueue(0);
+                thicknessQueue.Enqueue(new MeasureItem(0, 1));
             }
 
             MeasureDone = true;
@@ -466,7 +520,7 @@ namespace Root_CAMELLIA.Module
 
             if (!m_isPointMeasure)
             {
-               // SaveSlotData(m_DataManager.recipeDM.MeasurementRD.MeasureRepeatCount);
+                SaveSlotData(m_DataManager.recipeDM.MeasurementRD.MeasureRepeatCount);
             }
             else
             {
@@ -505,10 +559,8 @@ namespace Root_CAMELLIA.Module
                 //    LibSR_Met.DataManager.GetInstance().SaveResultFileSummary(m_summaryPath + "\\" + DateTime.Now.ToString("HHmmss") + "Summary.csv", "NoInfowaferLot", "NoInfowaferSlot", m_DataManager.recipeDM.MeasurementRD.DataSelectedPoint.Count);
                 //}
 
-                ////}
-
-                marsLogManager.WritePRC(EQ.p_nRunLP, deviceID, SSLNet.PRC_EVENTID.StepProcess, SSLNet.STATUS.END, "Measure", (int)BaseDefine.Process.Measure);
-            marsLogManager.WritePRC(EQ.p_nRunLP, deviceID, SSLNet.PRC_EVENTID.Process, SSLNet.STATUS.END, this.p_id, 0);
+            marsLogManager.WritePRC(EQ.p_nRunLP, deviceID, SSLNet.PRC_EVENTID.StepProcess, SSLNet.STATUS.END, MATERIAL_TYPE.WAFER, "Measure", (int)BaseDefine.Process.Measure);
+            marsLogManager.WritePRC(EQ.p_nRunLP, deviceID, SSLNet.PRC_EVENTID.Process, SSLNet.STATUS.END, MATERIAL_TYPE.WAFER, this.p_id, 0);
             marsLogManager.WriteFNC(EQ.p_nRunLP, deviceID, "Move Ready Position", SSLNet.STATUS.START);
             if (m_module.RunMoveReady() != "OK")
             {
@@ -608,14 +660,14 @@ namespace Root_CAMELLIA.Module
                             {
                                 sLayerName += m_Met.m_LayerData[n].hostname[s];
                             }
-                            m_Met.SaveCotourMapThicknessData(sSlotContourMapPath + "_THK_" + n.ToString() + "Layer_" + sLayerName + ".csv", n, nPointIndex, nRepeatCount, cnt);
+                            m_Met.SaveCotourMapThicknessData(sSlotContourMapPath + "_THK_" + n.ToString() + "Layer_" + sLayerName + ".csv", n, nTotalPointIndex, nRepeatCount, cnt);
                         }
                         string sSummartPath = m_resultDataSavePath[cnt] + "\\ResultData_Summary" + "\\" + m_module.p_infoWafer.p_sLotID + "-" + DateTime.Now.ToString("yyyy.MM.dd") + "_" + DateTime.Now.ToString("HH.mm.ss") + "_Summary" + m_module.p_infoWafer.p_sSlotID + ".csv";
-                        m_Met.SaveResultFileSummary(sSummartPath, m_module.p_infoWafer.p_sLotID, m_module.p_infoWafer.p_sSlotID, nPointIndex, nRepeatCount, cnt);
+                        m_Met.SaveResultFileSummary(sSummartPath, m_module.p_infoWafer.p_sLotID, m_module.p_infoWafer.p_sSlotID, nTotalPointIndex, nRepeatCount, cnt);
 
 
                         string sLotResultPath = m_resultDataSavePath[cnt] + "\\ResultData" + "\\" + m_module.p_infoWafer.p_sLotID + "-" + DateTime.Now.ToString("yyyy.MM.dd") + "_" + DateTime.Now.ToString("HH.mm.ss") + ".csv";
-                        m_Met.SaveResultFileLot(sLotResultPath, m_module.p_infoWafer, m_DataManager.recipeDM, nPointIndex, nRepeatCount, cnt);
+                        m_Met.SaveResultFileLot(sLotResultPath, m_module.p_infoWafer, m_DataManager.recipeDM, nTotalPointIndex, nRepeatCount, cnt);
                     }
                 }
             }

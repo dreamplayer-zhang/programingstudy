@@ -148,7 +148,7 @@ namespace Root_WIND2.UI_User
                 m_DataViewer_VM.pDataTable = DatabaseManager.Instance.SelectTablewithInspectionID("defect", this.inspectionID);
             });
         }
-
+         
         public RelayCommand btnLoadCurrentInspectionCommand
         {
             get => new RelayCommand(() =>

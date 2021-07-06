@@ -30,8 +30,19 @@ namespace Root_Pine2.Module
             }
         }
 
+        int m_nInspect = 0; 
+        public void StartInspect()
+        {
+            m_nInspect++; 
+        }
+
+        public bool p_bInspect
+        {
+            get { return (m_nInspect == 0); }
+        }
+
         public CPoint m_szMap = new CPoint();
-        public string SetResult(Vision2D.eVision eVision, string sStripResult, string sX, string sY, string sMapResult)
+        public string SetResult(string sStripResult, string sX, string sY, string sMapResult)
         {
             string sResult = "OK";
             try
@@ -44,6 +55,7 @@ namespace Root_Pine2.Module
                 SetMapResult(sMapResult); 
             }
             catch (Exception e) { sResult = "SetResult Exception : " + e.Message; }
+            m_nInspect--; 
             return sResult;
         }
 

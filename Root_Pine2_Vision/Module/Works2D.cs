@@ -91,13 +91,8 @@ namespace Root_Pine2_Vision.Module
         {
             public eProtocol m_eProtocol;
             public string m_sRecipe = "";
-            public int m_iSnap = 0;          // Snap Done Line Index (0 Base)
-            public int m_nSnapMode = 0;      // 0 : RGB 단일, 1 : PAS 단일, 2 : RGB, APS 모두
-            public int m_nLineNum = 0;
             public string m_sSend = "";
             public string m_sInfo = "";
-            public Vision2D.LotInfo m_lotInfo = null;
-            public Vision2D.SortInfo m_sortInfo = null;
 
             bool m_bWait = true; 
             public void ReceiveData(string sSend)
@@ -134,6 +129,7 @@ namespace Root_Pine2_Vision.Module
                 m_sSend = "<" + nID.ToString("000") + "," + eProtocol.ToString() + "," + sRecipe + ">";
             }
 
+            public int m_iSnap = 0;          // Snap Done Line Index (0 Base)
             public Protocol(int nID, eProtocol eProtocol, string sRecipe, int iSnap)
             {
                 m_eProtocol = eProtocol;
@@ -142,6 +138,8 @@ namespace Root_Pine2_Vision.Module
                 m_sSend = "<" + nID.ToString("000") + "," + eProtocol.ToString() + "," + sRecipe + "," + iSnap.ToString() + ">";
             }
 
+            public int m_nSnapMode = 0;      // 0 : RGB 단일, 1 : PAS 단일, 2 : RGB, APS 모두
+            public int m_nLineNum = 0;
             public Protocol(int nID, eProtocol eProtocol, string sRecipe, int nScanMode, int nLineNum)
             {
                 m_eProtocol = eProtocol;
@@ -151,6 +149,15 @@ namespace Root_Pine2_Vision.Module
                 m_sSend = "<" + nID.ToString("000") + "," + eProtocol.ToString() + "," + sRecipe + "," + m_nSnapMode.ToString() + "," + m_nLineNum.ToString() + ">";
             }
 
+            public Vision2D.SnapInfo m_snapInfo = null; 
+            public Protocol(int nID, eProtocol eProtocol, Vision2D.SnapInfo snapInfo)
+            {
+                m_eProtocol = eProtocol;
+                m_snapInfo = snapInfo;
+                m_sSend = "<" + nID.ToString("000") + "," + eProtocol.ToString() + "," + snapInfo.GetString() + ">";
+            }
+
+            public Vision2D.LotInfo m_lotInfo = null;
             public Protocol(int nID, eProtocol eProtocol, Vision2D.LotInfo lotInfo)
             {
                 m_eProtocol = eProtocol;
@@ -158,6 +165,7 @@ namespace Root_Pine2_Vision.Module
                 m_sSend = "<" + nID.ToString("000") + "," + eProtocol.ToString() + "," + lotInfo.GetString() + ">"; 
             }
 
+            public Vision2D.SortInfo m_sortInfo = null;
             public Protocol(int nID, eProtocol eProtocol, Vision2D.SortInfo sortInfo)
             {
                 m_eProtocol = eProtocol;
@@ -191,10 +199,10 @@ namespace Root_Pine2_Vision.Module
             return protocol.WaitReply(m_secTimeout);
         }
 
-        public string SendSnapInfo(string sRecipe, int nSnapMode, int nLineNum)
+        public string SendSnapInfo(Vision2D.SnapInfo snapInfo)
         {
             if (m_bStartProcess == false) return "OK";
-            Protocol protocol = new Protocol(m_iProtocol, eProtocol.SnapInfo, sRecipe, nSnapMode, nLineNum);
+            Protocol protocol = new Protocol(m_iProtocol, eProtocol.SnapInfo, snapInfo);
             m_qProtocol.Enqueue(protocol);
             return protocol.WaitReply(m_secTimeout);
         }
@@ -253,7 +261,7 @@ namespace Root_Pine2_Vision.Module
                     string sStripResult = asSend[3];
                     string sX = asSend[4];
                     string sY = asSend[5];
-                    string sMapResult = asSend[6];
+                    string sMapResult = asSend[6].Substring(0, asSend[6].Length - 1);
                     string sInfo = m_vision.ReqInspDone(sStripID, sStripResult, sX, sY, sMapResult, p_eWorks);
                     m_tcpip.Send(sSend.Substring(0, sSend.Length - 1) + "," + sInfo + "]");
                 }

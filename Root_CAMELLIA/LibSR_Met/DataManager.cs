@@ -257,16 +257,19 @@ namespace Root_CAMELLIA.LibSR_Met
         {
             try
             {
+                StopWatch sw = new StopWatch();
+
+                sw.Start();
                 for (int n = 0; n < ConstValue.RAWDATA_POINT_MAX_SIZE; n++)
                 {
                     m_RawData[n].bDataExist = false;
-                    m_RawData[n].Wavelength = Enumerable.Repeat(0.0, ConstValue.SPECTROMETER_MAX_PIXELSIZE).ToArray();
-                    m_RawData[n].Reflectance = Enumerable.Repeat(0.0, ConstValue.SPECTROMETER_MAX_PIXELSIZE).ToArray();
-                    m_RawData[n].VIS_Reflectance = Enumerable.Repeat(0.0, ConstValue.SPECTROMETER_MAX_PIXELSIZE).ToArray();
-                    m_RawData[n].VIS_Wavelength = Enumerable.Repeat(0.0, ConstValue.SPECTROMETER_MAX_PIXELSIZE).ToArray();
-                    m_RawData[n].Transmittance = Enumerable.Repeat(0.0, ConstValue.SPECTROMETER_MAX_PIXELSIZE).ToArray();
-                    m_RawData[n].CalcReflectance = Enumerable.Repeat(0.0, ConstValue.SPECTROMETER_MAX_PIXELSIZE).ToArray();
-                    m_RawData[n].eV = Enumerable.Repeat(0.0, ConstValue.SPECTROMETER_MAX_PIXELSIZE).ToArray();
+                    m_RawData[n].Wavelength = new double[ConstValue.SPECTROMETER_MAX_PIXELSIZE];
+                    m_RawData[n].Reflectance = new double[ConstValue.SPECTROMETER_MAX_PIXELSIZE];
+                    m_RawData[n].VIS_Reflectance = new double[ConstValue.SPECTROMETER_MAX_PIXELSIZE];
+                    m_RawData[n].VIS_Wavelength = new double[ConstValue.SPECTROMETER_MAX_PIXELSIZE];
+                    m_RawData[n].Transmittance = new double[ConstValue.SPECTROMETER_MAX_PIXELSIZE];
+                    m_RawData[n].CalcReflectance = new double[ConstValue.SPECTROMETER_MAX_PIXELSIZE];
+                    m_RawData[n].eV = new double[ConstValue.SPECTROMETER_MAX_PIXELSIZE];
                     m_RawData[n].Thickness.Clear();
                     m_RawData[n].dX = 0.0;
                     m_RawData[n].dY = 0.0;
@@ -274,6 +277,9 @@ namespace Root_CAMELLIA.LibSR_Met
                     m_RawData[n].nCalcDataNum = 0;
                     m_RawData[n].nNIRDataNum = 0;
                 }
+                sw.Stop();
+
+                System.Diagnostics.Debug.WriteLine("Clear Data " + sw.ElapsedMilliseconds);
                 return true;
             }
             catch(Exception ex)
@@ -900,7 +906,14 @@ namespace Root_CAMELLIA.LibSR_Met
                         sData += "," + m_RawData[n].dGoF.ToString("0.####");
                         for (int i = 1; i < m_RawData[n].Thickness.Count - 1; i++)
                         {
-                            sData += "," + (m_RawData[n].Thickness[i] * m_ThicknessData[i].m_dThicknessScale + m_ThicknessData[i].m_dThicknessOffset).ToString("0.####");
+                            if (bThickness)
+                            {
+                                sData += "," + (m_RawData[n].Thickness[i] * m_ThicknessData[i].m_dThicknessScale + m_ThicknessData[i].m_dThicknessOffset).ToString("0.####");
+                            }
+                            else
+                            {
+                                sData += "," + (0).ToString("0.####");
+                            }
                         }
                         sw.WriteLine(sData);
                     }
@@ -1169,7 +1182,14 @@ namespace Root_CAMELLIA.LibSR_Met
                             sData += "," + m_RawData[n].dGoF.ToString("0.####");
                             for (int i = 1; i < m_RawData[n].Thickness.Count - 1; i++)
                             {
-                                sData += "," + (m_RawData[n].Thickness[i] * m_ThicknessData[i].m_dThicknessScale + m_ThicknessData[i].m_dThicknessOffset).ToString("0.####");
+                                if (bThickness)
+                                {
+                                    sData += "," + (m_RawData[n].Thickness[i] * m_ThicknessData[i].m_dThicknessScale + m_ThicknessData[i].m_dThicknessOffset).ToString("0.####");
+                                }
+                                else
+                                {
+                                    sData += "," + (0).ToString("0.####");
+                                }
                             }
                             sw.WriteLine(sData);
                         }
@@ -1394,16 +1414,23 @@ namespace Root_CAMELLIA.LibSR_Met
                 }
 
                 StreamWriter writer = new StreamWriter(sPath);
-                writer.WriteLine("X[mm],Y[mm],Value[Å]");
+                writer.WriteLine("X[mm],Y[mm],Value[Å]");
                 string sData = string.Empty;
                 string sThicknessData = string.Empty;
                 if (isRepeat == false)
                 {
                     for (int i = 0; i < nPointIndex; i++)
                     {
-                        sThicknessData = (m_RawData[i].Thickness[nLayerIndex] * m_ThicknessData[nLayerIndex].m_dThicknessScale + m_ThicknessData[nLayerIndex].m_dThicknessOffset).ToString("0.####");
-                        writer.WriteLine(m_RawData[i].dX.ToString() + "," + m_RawData[i].dY.ToString() + "," + sThicknessData);
-
+                        if (bThickness)
+                        {
+                            sThicknessData = (m_RawData[i].Thickness[nLayerIndex] * m_ThicknessData[nLayerIndex].m_dThicknessScale + m_ThicknessData[nLayerIndex].m_dThicknessOffset).ToString("0.####");
+                            writer.WriteLine(m_RawData[i].dX.ToString() + "," + m_RawData[i].dY.ToString() + "," + sThicknessData);
+                        }
+                        else
+                        {
+                            sThicknessData = 0.ToString();
+                            writer.WriteLine(m_RawData[i].dX.ToString() + "," + m_RawData[i].dY.ToString() + "," + sThicknessData);
+                        }
                     }
                 }
                 else
@@ -1412,8 +1439,16 @@ namespace Root_CAMELLIA.LibSR_Met
                     {
                         if (i % nRepeatCount == nRepeatIndex)
                         {
-                            sThicknessData = (m_RawData[i].Thickness[nLayerIndex] * m_ThicknessData[nLayerIndex].m_dThicknessScale + m_ThicknessData[nLayerIndex].m_dThicknessOffset).ToString("0.####");
-                            writer.WriteLine(m_RawData[i].dX.ToString() + "," + m_RawData[i].dY.ToString() + "," + sThicknessData);
+                            if (bThickness)
+                            {
+                                sThicknessData = (m_RawData[i].Thickness[nLayerIndex] * m_ThicknessData[nLayerIndex].m_dThicknessScale + m_ThicknessData[nLayerIndex].m_dThicknessOffset).ToString("0.####");
+                                writer.WriteLine(m_RawData[i].dX.ToString() + "," + m_RawData[i].dY.ToString() + "," + sThicknessData);
+                            }
+                            else
+                            {
+                                sThicknessData = Convert.ToString(0.0000);
+                                writer.WriteLine(m_RawData[i].dX.ToString() + "," + m_RawData[i].dY.ToString() + "," + sThicknessData);
+                            }
                         }
                     }
                 }
@@ -1472,11 +1507,18 @@ namespace Root_CAMELLIA.LibSR_Met
                         {
                             sData += "," + m_ContourMapDataT[i].HoleData[n].Value.ToString("0.####");
                         }
-                        sData += "," + m_RawData[n].dGoF.ToString("0.####");
+                        sData += "," + m_RawData[n].dGoF.ToString("0.#####");
 
                         for (int i = 1; i < m_RawData[n].Thickness.Count - 1; i++)
                         {
-                            sData += "," + (m_RawData[n].Thickness[i] * m_ThicknessData[i].m_dThicknessScale + m_ThicknessData[i].m_dThicknessOffset).ToString("0.####");
+                            if (bThickness)
+                            {
+                                sData += "," + (m_RawData[n].Thickness[i] * m_ThicknessData[i].m_dThicknessScale + m_ThicknessData[i].m_dThicknessOffset).ToString("0.####");
+                            }
+                            else
+                            {
+                                sData += "," + (0).ToString("0.####");
+                            }
                         }
                         sw.WriteLine(sData);
                     }
@@ -1512,11 +1554,9 @@ namespace Root_CAMELLIA.LibSR_Met
                 for (n = 1; n < m_LayerData.Count - 1; n++)// Recipe 설정 Model data (박막 물질)
                 {
                     sHeader += ",";
-                    for (int s = 0; s < m_LayerData[n].hostname.Length; s++)
-                    {
-                        sHeader += m_LayerData[n].hostname[s];
-                    }
-
+                    
+                        sHeader += string.Concat(m_LayerData[n].hostname);
+                   
                 }
                 sw.WriteLine(sHeader);
 
@@ -1539,11 +1579,18 @@ namespace Root_CAMELLIA.LibSR_Met
                             {
                                 sData += "," + m_ContourMapDataT[i].HoleData[n].Value.ToString("0.####");
                             }
-                            sData += "," + m_RawData[n].dGoF.ToString("0.####");
+                            sData += "," + m_RawData[n].dGoF.ToString("0.#####");
 
                             for (int i = 1; i < m_RawData[n].Thickness.Count - 1; i++)
                             {
-                                sData += "," + (m_RawData[n].Thickness[i] * m_ThicknessData[i].m_dThicknessScale + m_ThicknessData[i].m_dThicknessOffset).ToString("0.####");
+                                if (bThickness)
+                                {
+                                    sData += "," + (m_RawData[n].Thickness[i] * m_ThicknessData[i].m_dThicknessScale + m_ThicknessData[i].m_dThicknessOffset).ToString("0.####");
+                                }
+                                else
+                                {
+                                    sData += "," + (0).ToString("0.####");
+                                }
                             }
                             sw.WriteLine(sData);
                         }
@@ -1617,21 +1664,40 @@ namespace Root_CAMELLIA.LibSR_Met
                         break;
                     }
                 }
-                for (int indexT = 0; indexT < m_ScalesListT.Count; indexT++)
+                if (bTransmittance)
                 {
-                    if (m_RawData[n].DCOLTransmittance[indexT].Wavelength == m_ContourMapDataT[indexT].Wavelength)
+                    for (int indexT = 0; indexT < m_ScalesListT.Count; indexT++)
                     {
-                        double dValue = m_RawData[n].DCOLTransmittance[indexT].RawTransmittance;
-                        HoleData holedata = new HoleData();
-                        holedata.XPos = m_RawData[n].dX;
-                        holedata.YPos = m_RawData[n].dY;
-                        dValue *= m_ScalesListT[indexT].p_scale;
-                        dValue += m_ScalesListT[indexT].p_offset;
-                        holedata.Value = dValue;
-                        m_ContourMapDataT[indexT].HoleData.Add(holedata);
+                        if (m_RawData[n].DCOLTransmittance[indexT].Wavelength == m_ContourMapDataT[indexT].Wavelength)
+                        {
+                            double dValue = m_RawData[n].DCOLTransmittance[indexT].RawTransmittance;
+                            HoleData holedata = new HoleData();
+                            holedata.XPos = m_RawData[n].dX;
+                            holedata.YPos = m_RawData[n].dY;
+                            dValue *= m_ScalesListT[indexT].p_scale;
+                            dValue += m_ScalesListT[indexT].p_offset;
+                            holedata.Value = dValue;
+                            m_ContourMapDataT[indexT].HoleData.Add(holedata);
+                        }
+                        else
+                        {
+                            double dValue = 0;
+                            HoleData holedata = new HoleData();
+                            holedata.XPos = m_RawData[n].dX;
+                            holedata.YPos = m_RawData[n].dY;
+                            dValue *= m_ScalesListT[indexT].p_scale;
+                            dValue += m_ScalesListT[indexT].p_offset;
+                            holedata.Value = dValue;
+                            m_ContourMapDataT[indexT].HoleData.Add(holedata);
+                        }
                     }
-                    else
+
+                }
+                else
+                {
+                    for (int indexT = 0; indexT < m_ScalesListT.Count; indexT++)
                     {
+
                         double dValue = 0;
                         HoleData holedata = new HoleData();
                         holedata.XPos = m_RawData[n].dX;
@@ -1643,7 +1709,6 @@ namespace Root_CAMELLIA.LibSR_Met
                     }
                 }
             }
-
         }
         #endregion
 

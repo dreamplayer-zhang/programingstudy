@@ -97,8 +97,8 @@ namespace RootTools.Comm
                     m_socket.Close();
                 InitServer();
             }
-            #endregion
         }
+        #endregion
 
         #region Receive
         AsyncCallback m_cbReceive;
@@ -110,7 +110,7 @@ namespace RootTools.Comm
             {
                 int lReceive = async.m_socket.EndReceive(ar);
                 if (lReceive > 0) EventReciveData(async.m_aBuf, lReceive, async.m_socket);
-                if (m_bCommLog) m_commLog.Add(CommLog.eType.Receive, (lReceive < 64) ? Encoding.ASCII.GetString(async.m_aBuf, 0, lReceive) : "Large Data");
+                if (m_bCommLog) m_commLog.Add(CommLog.eType.Receive, (lReceive < 256) ? Encoding.ASCII.GetString(async.m_aBuf, 0, lReceive) : "Large Data");
                 async.m_socket.BeginReceive(async.m_aBuf, 0, m_lMaxBuffer, SocketFlags.None, m_cbReceive, async);
             }
             catch (Exception e)

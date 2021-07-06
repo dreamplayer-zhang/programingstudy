@@ -6,6 +6,7 @@ using RootTools.Gem;
 using RootTools.Module;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Threading;
 using System.Windows.Controls;
@@ -78,15 +79,20 @@ namespace Root_Pine2.Engineer
             set
             {
                 if (_sRecipe == value) return;
+                if (m_bgwRecipe.IsBusy) return; 
                 _sRecipe = value;
-                m_pine2.RecipeOpen(value); 
-                if (m_aBoats.Count > 0)
-                {
-                    if (m_pine2.p_b3D) m_aBoats[Vision2D.eVision.Top3D].p_sRecipe = value;
-                    m_aBoats[Vision2D.eVision.Top2D].p_sRecipe = value;
-                    m_aBoats[Vision2D.eVision.Bottom].p_sRecipe = value;
-                }
+                m_pine2.RecipeOpen(value);
+                m_bgwRecipe.RunWorkerAsync(); 
             }
+        }
+
+        BackgroundWorker m_bgwRecipe = new BackgroundWorker();
+        private void M_bgwRecipe_DoWork(object sender, DoWorkEventArgs e)
+        {
+            if (m_aBoats.Count == 0) return;
+            if (m_pine2.p_b3D) m_aBoats[Vision2D.eVision.Top3D].p_sRecipe = p_sRecipe;
+            m_aBoats[Vision2D.eVision.Top2D].p_sRecipe = p_sRecipe;
+            m_aBoats[Vision2D.eVision.Bottom].p_sRecipe = p_sRecipe;
         }
 
         public List<string> p_asRecipe
@@ -351,6 +357,7 @@ namespace Root_Pine2.Engineer
             m_gem = engineer.ClassGem();
             InitModule();
             InitThread();
+            m_bgwRecipe.DoWork += M_bgwRecipe_DoWork;
             m_engineer.ClassMemoryTool().InitThreadProcess();
         }
 

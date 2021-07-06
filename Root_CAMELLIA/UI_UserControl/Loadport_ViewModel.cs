@@ -217,7 +217,7 @@ namespace Root_CAMELLIA
             }
         }
 
-        Dlg_ManualJob_ViewModel manualJob_ViewModel;
+        Dlg_ManualJob_ViewModel manualJob_ViewModel { get; set; }
         DialogService dialogService;
         #endregion
 
@@ -247,21 +247,29 @@ namespace Root_CAMELLIA
 
        public void StateChange(object sender, EventArgs e)
         {
-            Application.Current.Dispatcher.Invoke(new Action(() =>
-            {
-                if(p_waferList.Count == 0)
+            if (EQ.p_eState != EQ.eState.ModuleRunList)
+                Application.Current.Dispatcher.Invoke(new Action(() =>
                 {
-                    return;
-                }
-                p_waferList[24 - ((InfoWafer)sender).m_nSlot].p_state = ((InfoWafer)sender).p_eState;
-                if(((InfoWafer)sender).p_eState == GemSlotBase.eState.Done)
-                {
-                    p_totalDone++;
+                    if (p_waferList.Count == 0)
+                    {
+                        return;
+                    }
 
-                    p_progressValue = (double)p_totalDone / p_totalSelect * 100;
-                }
-                p_dataSelectIndex = 24 - ((InfoWafer)sender).m_nSlot;
-            }));
+                    if (EQ.p_nRnR > 1)
+                    {
+                        if (p_totalDone > p_totalSelect)
+                            p_totalDone = 0;
+                    }
+
+                    p_waferList[24 - ((InfoWafer)sender).m_nSlot].p_state = ((InfoWafer)sender).p_eState;
+                    if (((InfoWafer)sender).p_eState == GemSlotBase.eState.Done)
+                    {
+                        p_totalDone++;
+
+                        p_progressValue = (double)p_totalDone / p_totalSelect * 100;
+                    }
+                    p_dataSelectIndex = 24 - ((InfoWafer)sender).m_nSlot;
+                }));
         }
 
         #endregion

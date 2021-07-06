@@ -272,6 +272,7 @@ namespace Root_CAMELLIA
             {
                 return new RelayCommand(() =>
                 {
+                    p_checkRnR = false;
                     CloseRequested(this, new DialogCloseRequestedEventArgs(false));
                 });
             }
@@ -304,6 +305,9 @@ namespace Root_CAMELLIA
             string recipePath = p_selectRecipe.Replace(Path.GetExtension(p_selectRecipe), "") + "\\" + p_selectRecipe;
             string sequenceRecipePath = BaseDefine.Dir_SequenceInitialPath + p_selectRecipe;
             bool isVisionRecipeOpen = false;
+
+            int firstIdx = -1;
+            int lastIdx = -1;
             for (int i = 0; i < nSlot; i++)
             {
                 m_infoCarrier.m_aGemSlot[i].p_sRecipe = "";
@@ -328,10 +332,19 @@ namespace Root_CAMELLIA
                             return;
                         }
                         isVisionRecipeOpen = true;
+                        m_infoCarrier.m_aInfoWafer[i] = (InfoWafer)m_infoCarrier.m_aGemSlot[i];
                         m_infoCarrier.StartProcess(infoWafer.p_id);
                     }
                 }
             }
+            if (firstIdx == lastIdx)
+                m_infoCarrier.m_aInfoWafer[firstIdx].p_eWaferOrder = InfoWafer.eWaferOrder.FirstLastWafer;
+            else
+            {
+                m_infoCarrier.m_aInfoWafer[firstIdx].p_eWaferOrder = InfoWafer.eWaferOrder.FirstWafer;
+                m_infoCarrier.m_aInfoWafer[lastIdx].p_eWaferOrder = InfoWafer.eWaferOrder.LastWafer;
+            }
+
             m_infoCarrier.SetSelectMapData(m_infoCarrier);
             EQ.p_nRnR = p_checkRnR ? p_RnR : 0;
             CloseRequested(this, new DialogCloseRequestedEventArgs(true));
