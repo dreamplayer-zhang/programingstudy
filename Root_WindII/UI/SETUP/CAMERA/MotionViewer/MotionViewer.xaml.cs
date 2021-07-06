@@ -14,13 +14,13 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 
 namespace Root_WindII
-{
+{ 
     /// <summary>
-    /// MotionControlViewer.xaml에 대한 상호 작용 논리
+    /// MotionViewer.xaml에 대한 상호 작용 논리
     /// </summary>
-    public partial class MotionControlViewer : UserControl
+    public partial class MotionViewer : UserControl
     {
-        public MotionControlViewer()
+        public MotionViewer()
         {
             InitializeComponent();
         }
