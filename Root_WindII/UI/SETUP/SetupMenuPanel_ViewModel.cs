@@ -101,6 +101,7 @@ namespace Root_WindII
         // RAC
         public readonly RACProduct racProduct = new RACProduct();
         public readonly RACSetup racSetup = new RACSetup();
+        public readonly RACAlignKey racAlignKey = new RACAlignKey();
         #endregion
 
         //#region [ViewModels]
@@ -221,9 +222,16 @@ namespace Root_WindII
             get => racProductVM;
         }
         private RACSetup_ViewModel racSetupVM = new RACSetup_ViewModel();
+
         public RACSetup_ViewModel RACSetupVM
         {
             get => racSetupVM;
+        }
+
+        private RACAlignKey_ViewModel racAlignKeyVM = new RACAlignKey_ViewModel();
+        public RACAlignKey_ViewModel RACAlignKeyVM
+        {
+            get => racAlignKeyVM;
         }
         #endregion
 
@@ -800,6 +808,18 @@ namespace Root_WindII
                 {
                     SetPage(racSetup);
                     racSetup.DataContext = RACSetupVM;
+                });
+            }
+        }
+
+        public ICommand btnRACAlignKey
+        {
+            get
+            {
+                return new RelayCommand(() =>
+                {
+                    SetPage(racAlignKey);
+                    racAlignKey.DataContext = RACAlignKeyVM;
                 });
             }
         }

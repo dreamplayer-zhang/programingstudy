@@ -274,7 +274,7 @@ namespace Root_VEGA_D.Module
         }
 
         public event OnGrabLineScanEvent AlignCompleted;
-        string RunAlign(MemoryData mem, int nSnapCount, double startPosY, double endPosY, double startTriggerY, double endTriggerY, out CRect rectBotMarker)
+        string RunAlign(MemoryData mem, int nSnapCount, double startPosY, double endPosY, double startTriggerY, double endTriggerY, bool bFindBotAlignMarker, out CRect rectBotMarker)
         {
             rectBotMarker = new CRect(0, 0, 0, 0);
 
@@ -345,7 +345,7 @@ namespace Root_VEGA_D.Module
                             return p_sInfo;
 
                         // IPU 연결된 상태라면 좌하단 Align Marker 위치 전달을 위해 찾아야함
-                        if (m_module.TcpipCommServer.IsConnected())
+                        if (bFindBotAlignMarker)
                         {
                             if (m_module.Run(m_module.RunLineScan(m_grabMode, mem, memOffset, nSnapCount, dPosX, startPosY, endPosY, startTriggerY, endTriggerY)))
                                 return p_sInfo;
@@ -564,7 +564,9 @@ namespace Root_VEGA_D.Module
 
                 // 얼라인
                 CRect rectBotMarker = new CRect(0, 0, 0, 0);
-                if (m_module.Run(RunAlign(mem, nWaferSizeY_px, dStartPosY, dEndPosY, dTriggerStartPosY, dTriggerEndPosY, out rectBotMarker)))
+                if (m_module.Run(RunAlign(mem, nWaferSizeY_px, dStartPosY, dEndPosY, dTriggerStartPosY, dTriggerEndPosY, false, out rectBotMarker)))
+                    return p_sInfo;
+                if (m_module.Run(RunAlign(mem, nWaferSizeY_px, dStartPosY, dEndPosY, dTriggerStartPosY, dTriggerEndPosY, true, out rectBotMarker)))
                     return p_sInfo;
 
                 // IPU 접속 대기

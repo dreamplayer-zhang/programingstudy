@@ -193,7 +193,8 @@ namespace Root_Pine2.Module
                     if (EQ.IsStop()) return "EQ Stop"; 
                 }
                 m_aBoat[eWorks].p_inspectStrip = m_aBoat[eWorks].p_infoStrip;
-                m_aBoat[eWorks].p_inspectStrip.StartInspect(); 
+                if(m_aBoat[eWorks].p_inspectStrip != null)  // Manual Snap 시
+                    m_aBoat[eWorks].p_inspectStrip.StartInspect(); 
                 if (bReadRecipe)
                 {
                     string sRecipe = m_aBoat[eWorks].p_sRecipe;
