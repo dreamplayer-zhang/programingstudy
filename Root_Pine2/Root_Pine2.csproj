@@ -195,6 +195,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Engineer\Pine2_Main_UI.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Engineer\Pine2_Process_UI.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -214,6 +218,9 @@
     <Compile Include="Engineer\Pine2_Handler.cs" />
     <Compile Include="Engineer\Pine2_Handler_UI.xaml.cs">
       <DependentUpon>Pine2_Handler_UI.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Engineer\Pine2_Main_UI.xaml.cs">
+      <DependentUpon>Pine2_Main_UI.xaml</DependentUpon>
     </Compile>
     <Compile Include="Engineer\Pine2_Process.cs" />
     <Compile Include="Engineer\Pine2_Process_UI.xaml.cs">
