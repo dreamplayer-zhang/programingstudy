@@ -168,7 +168,7 @@ namespace Root_Pine2.Module
             switch (EQ.p_eState)
             {
                 case EQ.eState.Run:
-                    if ((p_bCycleStop == false) && m_diCheck.p_bIn && (p_bDone == false)) StartLoad();
+                    if (m_diCheck.p_bIn && (p_bDone == false)) StartLoad();
                     break;
                 default:
                     if (m_diTop.p_bIn && p_eMove == eMove.Stop) p_eMove = eMove.Down;

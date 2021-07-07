@@ -5,15 +5,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Root_WindII
+namespace Root_EFEM.Module
 {
-    public class RecipeEBR : RecipeBase
+    public class RecipeAlign : RecipeBase
     {
         public override void Initilize()
         {
-            // Regiseter Recipe Items
-            RegisterRecipeItem<EBRRecipe>();
-            RegisterParameterItem<EBRParameter>();
+            base.Initilize();
+
+            RegisterRecipeItem<FrontAlignRecipe>();
         }
     }
 }

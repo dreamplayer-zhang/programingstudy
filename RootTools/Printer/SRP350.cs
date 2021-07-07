@@ -10,10 +10,11 @@ namespace RootTools.Printer
         #region Printer
         public string[] m_asPriner =
         {
-            "BIXOLON SRP-350II"
+            "BIXOLON SRP-350II",
+            "BIXOLON SRP-350III"
         };
 
-        string _sPrinter = "BIXOLON SRP-350II"; 
+        string _sPrinter = "BIXOLON SRP-350III"; 
         public string p_sPrinter
         {
             get { return _sPrinter; }

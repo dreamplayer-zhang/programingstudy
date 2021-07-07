@@ -301,7 +301,7 @@ namespace Root_Pine2_Vision.Module
             {
                 m_eWorks = eWorks;
                 m_sStripID = sStripID;
-                m_sSortID = sStripID;
+                m_sSortID = sSortID;
             }
         }
         public string SendSortInfo(SortInfo sortInfo)
@@ -963,6 +963,45 @@ namespace Root_Pine2_Vision.Module
             m_tcpRequest.Send(sSend);
             return "OK";
         }
+
+        public string ReqWorksConnect(eWorks eWorks, bool bConnect)
+        {
+            string sSend = m_nReq.ToString("000") + "," + Works2D.eProtocol.WorksConnect.ToString() + "," + (bConnect ? "1" : "0");
+            m_sReceive = "";
+            m_tcpRequest.Send(sSend);
+            return "OK";
+        }
+        #endregion
+
+        #region Thread Check Works Connect
+        bool m_bThreadCheck = false;
+        Thread m_threadCheck; 
+        void InitThreadCheck()
+        {
+            m_threadCheck = new Thread(new ThreadStart(RunThreadCheckConnect));
+            m_threadCheck.Start();
+        }
+
+        bool[] m_bWorksConnect = new bool[2] { false, false };
+        void RunThreadCheckConnect()
+        {
+            m_bThreadCheck = true;
+            Thread.Sleep(3000); 
+            while (m_bThreadCheck)
+            {
+                Thread.Sleep(200); 
+                if (m_bWorksConnect[0] != m_aWorks[eWorks.A].m_tcpip.p_bConnect)
+                {
+                    ReqWorksConnect(eWorks.A, m_aWorks[eWorks.A].m_tcpip.p_bConnect);
+                    m_bWorksConnect[0] = m_aWorks[eWorks.A].m_tcpip.p_bConnect; 
+                }
+                if (m_bWorksConnect[1] != m_aWorks[eWorks.B].m_tcpip.p_bConnect)
+                {
+                    ReqWorksConnect(eWorks.B, m_aWorks[eWorks.B].m_tcpip.p_bConnect);
+                    m_bWorksConnect[1] = m_aWorks[eWorks.B].m_tcpip.p_bConnect;
+                }
+            }
+        }
         #endregion
 
         #region override
@@ -970,6 +1009,7 @@ namespace Root_Pine2_Vision.Module
         {
             m_aWorks[eWorks.A].Reset();
             m_aWorks[eWorks.B].Reset();
+            foreach (Remote.Protocol protocol in m_remote.m_aProtocol) protocol.m_bDone = true; 
             base.Reset();
         }
         #endregion
@@ -1057,10 +1097,16 @@ namespace Root_Pine2_Vision.Module
             InitRecipe();
             InitBase(id, engineer, eRemote);
             InitVision_Snap_UI();
+            InitThreadCheck();
         }
 
         public override void ThreadStop()
         {
+            if (m_bThreadCheck)
+            {
+                m_bThreadCheck = false;
+                m_threadCheck.Join(); 
+            }
             foreach (Works2D works in m_aWorks.Values) works.ThreadStop();
             base.ThreadStop();
         }

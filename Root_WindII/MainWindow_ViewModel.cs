@@ -389,9 +389,6 @@ namespace Root_WindII
                 
                 // Recipe
                 RecipeFront recipeFront = GlobalObjects.Instance.Register<RecipeFront>();
-                RecipeBack recipeBack = GlobalObjects.Instance.Register<RecipeBack>();
-                RecipeEdge recipeEdge = GlobalObjects.Instance.Register<RecipeEdge>();
-                RecipeEBR recipeEBR = GlobalObjects.Instance.Register<RecipeEBR>();
 
                 if (frontImage.GetPtr() != IntPtr.Zero)
                 {
