@@ -164,13 +164,13 @@ namespace Root_WindII
         }
         #endregion
 
-        //#region [Camera ViewModes]
-        //private .CameraVRS_ImageViewer_ViewModel cameraVrsVM = new .CameraVRS_ImageViewer_ViewModel();
-        //public .CameraVRS_ImageViewer_ViewModel CameraVrsVM
-        //{
-        //    get => cameraVrsVM;
-        //}
-        //#endregion
+        #region [Camera ViewModes]
+        private CameraVRS_ViewModel cameraVrsVM = new CameraVRS_ViewModel();
+        public CameraVRS_ViewModel CameraVrsVM
+        {
+            get => cameraVrsVM;
+        }
+        #endregion
 
         //#region [Back ViewModels]
         //private .BacksideSetup_ViewModel backsideSetupVM = new .BacksideSetup_ViewModel();
@@ -207,13 +207,13 @@ namespace Root_WindII
         //}
         //#endregion
 
-        //#region [Camera ViewModels]
-        //private .CameraAlign_ViewModel cameraAlignVM = new .CameraAlign_ViewModel();
-        //public .CameraAlign_ViewModel CameraAlignVM
-        //{
-        //    get => cameraAlignVM;
-        //}
-        //#endregion
+        #region [Camera ViewModels]
+        private CameraAlign_ViewModel cameraAlignVM = new CameraAlign_ViewModel();
+        public CameraAlign_ViewModel CameraAlignVM
+        {
+            get => cameraAlignVM;
+        }
+        #endregion
 
         #region [RAC ViewModels]
         private RACProduct_ViewModel racProductVM = new RACProduct_ViewModel();
@@ -366,7 +366,7 @@ namespace Root_WindII
                 return new RelayCommand(() =>
                 {
                     SetPage(cameraVrs);
-                    //cameraVrs.DataContext = cameraVrsVM;
+                    cameraVrs.DataContext = cameraVrsVM;
                 });
             }
         }
@@ -770,7 +770,7 @@ namespace Root_WindII
                 return new RelayCommand(() =>
                 {
                     SetPage(cameraVrs);
-                    //cameraVrs.DataContext = CameraVrsVM;
+                    cameraVrs.DataContext = CameraVrsVM;
                 });
             }
         }
@@ -782,7 +782,7 @@ namespace Root_WindII
                 return new RelayCommand(() =>
                 {
                     SetPage(cameraAlign);
-                    //cameraAlign.DataContext = CameraAlignVM;
+                    cameraAlign.DataContext = CameraAlignVM;
                 });
             }
         }
