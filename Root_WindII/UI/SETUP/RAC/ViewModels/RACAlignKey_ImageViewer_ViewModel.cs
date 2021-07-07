@@ -119,7 +119,6 @@ namespace Root_WindII
                     CPoint canvasLeftTop = GetCanvasPoint(new CPoint(p_MouseMemX, p_MouseMemY));
                     CPoint canvasRightBottom = GetCanvasPoint(new CPoint(p_MouseMemX, p_MouseMemY));
 
-
                     BoxUI.Width = canvasRightBottom.X - canvasLeftTop.X;
                     BoxUI.Height = canvasRightBottom.Y - canvasLeftTop.Y;
 
@@ -131,18 +130,17 @@ namespace Root_WindII
                     this.boxMemRect.Top = p_MouseMemY;
                     this.boxMemRect.Bottom = p_MouseMemY;
 
-                    if(!this.p_ViewElement.Contains(BoxUI))
+                    if (!this.p_ViewElement.Contains(BoxUI))
                     {
                         this.p_ViewElement.Add(BoxUI);
                     }
-                    
+
                     this.isBoxDrawing = true;
                 }
                 else
                 {
                     this.isBoxDrawing = false;
 
-                    
                     if (this.boxFirstPoint.Y > p_MouseMemY)
                     {
                         this.boxMemRect.Top = p_MouseMemY;
@@ -157,7 +155,6 @@ namespace Root_WindII
                     CPoint canvasLeftTop = GetCanvasPoint(new CPoint(boxMemRect.Left, boxMemRect.Top));
                     CPoint canvasRightBottom = GetCanvasPoint(new CPoint(boxMemRect.Right, boxMemRect.Bottom));
 
-                    
                     BoxUI.Width = Math.Abs(canvasRightBottom.X - canvasLeftTop.X);
                     BoxUI.Height = Math.Abs(canvasRightBottom.Y - canvasLeftTop.Y);
 

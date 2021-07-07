@@ -119,7 +119,6 @@ namespace Root_WindII
         }
         #endregion
 
-
         public CameraAlign_ViewModel()
         {
             this.imageViewerVM = new CameraAlign_ImageViewer_ViewModel();
@@ -209,15 +208,11 @@ namespace Root_WindII
             {
                 return new RelayCommand(() =>
                 {
-
-                    //if (GlobalObjects.Instance.Get<WIND2_Engineer>().m_eMode == WIND2_Engineer.eMode.Vision)
-                    //{
-                    //    if(this.ImageViewerVM.p_ImageData != null)
-                    //    {
-                    //        this.ImageViewerVM.SetImageData(visionModule.p_CamAlign.p_ImageViewer.p_ImageData);
-                    //        this.visionModule.p_CamAlign.Grabed += this.ImageViewerVM.OnUpdateImage;
-                    //    }
-                    //}
+                    if(this.ImageViewerVM.p_ImageData != null)
+                    {
+                        this.ImageViewerVM.SetImageData(visionModule.p_CamAlign.p_ImageViewer.p_ImageData);
+                        this.visionModule.p_CamAlign.Grabed += this.ImageViewerVM.OnUpdateImage;
+                    }
 
                     if (VisionModule == null) return;
 
@@ -242,7 +237,7 @@ namespace Root_WindII
         {
             get => new RelayCommand(() =>
             {
-                //VisionModule.p_CamAlign.StopGrab();
+                VisionModule.p_CamAlign.StopGrab();
             });
         }
 
@@ -316,12 +311,9 @@ namespace Root_WindII
                 ClearFeatureList();
             });
         }
-
-
         #endregion
 
         #region [Method]
-
         private void ClearFeatureList()
         {
             this.featureItemList.Clear();
@@ -353,16 +345,15 @@ namespace Root_WindII
 
         public void LoadRecipe()
         {
-            /*FrontAlignRecipe alignRecipe = GlobalObjects.Instance.Get<RecipeAlign>().GetItem<FrontAlignRecipe>();
+            FrontAlignRecipe alignRecipe = GlobalObjects.Instance.Get<RecipeAlign>().GetItem<FrontAlignRecipe>();
 
             this.FirstAxisPositionX = alignRecipe.FirstSearchPointX;
             this.FirstAxisPositionY = alignRecipe.FirstSearchPointY;
             this.SecondAxisPositionX = alignRecipe.SecondSearchPointX;
             this.SecondAxisPositionY = alignRecipe.SecondSearchPointY;
 
-            RefreshFeatureItemList();*/
+            RefreshFeatureItemList();
         }
-
         #endregion
     }
 }

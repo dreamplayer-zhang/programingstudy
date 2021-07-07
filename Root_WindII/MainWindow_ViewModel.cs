@@ -408,6 +408,8 @@ namespace Root_WindII
                     frontInspection.SetCameraInfo(camInfo);
                 }
 
+                Root_EFEM.Module.RecipeAlign recipeAlign = GlobalObjects.Instance.Register<Root_EFEM.Module.RecipeAlign>();
+
                 /*if (backImage.GetPtr() == IntPtr.Zero)
                 {
                     //MessageBox.Show("Back Inspection 생성 실패, 메모리 할당 없음");
