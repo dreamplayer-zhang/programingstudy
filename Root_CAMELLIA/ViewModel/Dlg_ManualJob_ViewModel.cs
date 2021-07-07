@@ -322,6 +322,8 @@ namespace Root_CAMELLIA
                     infoWafer.p_sCarrierID = p_carrierID;
                     if (infoWafer.p_eState == GemSlotBase.eState.Select)
                     {
+                        if (firstIdx == -1)
+                            firstIdx = i;
                         infoWafer.RecipeOpen(sequenceRecipePath);
                         string visionPath = recipePath.Replace(Path.GetExtension(recipePath), ".aco");
                         m_infoCarrier.m_aGemSlot[i].p_sRecipe = infoWafer.p_sRecipe;
@@ -332,8 +334,9 @@ namespace Root_CAMELLIA
                             return;
                         }
                         isVisionRecipeOpen = true;
-                        m_infoCarrier.m_aInfoWafer[i] = (InfoWafer)m_infoCarrier.m_aGemSlot[i];
+                        //m_infoCarrier.m_aInfoWafer[i] = (InfoWafer)m_infoCarrier.m_aGemSlot[i];
                         m_infoCarrier.StartProcess(infoWafer.p_id);
+                        lastIdx = i;
                     }
                 }
             }

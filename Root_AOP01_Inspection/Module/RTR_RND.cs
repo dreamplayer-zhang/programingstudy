@@ -939,6 +939,8 @@ namespace Root_AOP01_Inspection.Module
             public string p_sChild { get; set; }
             public eArm m_eArm = eArm.Upper;
             public int m_nChildID = 0;
+            public bool p_isExchange { get; set; } = false;
+            public int p_nExchangeSlot { get; set; } = -1;
             public override ModuleRunBase Clone()
             {
                 Run_Get run = new Run_Get(m_module);
@@ -1147,6 +1149,8 @@ namespace Root_AOP01_Inspection.Module
             public string p_sChild { get; set; }
             public eArm m_eArm = eArm.Upper;
             public int m_nChildID = 0;
+            public bool p_isExchange { get; set; } = false;
+            public int p_nExchangeSlot { get; set; } = -1;
             public override ModuleRunBase Clone()
             {
                 Run_Put run = new Run_Put(m_module);

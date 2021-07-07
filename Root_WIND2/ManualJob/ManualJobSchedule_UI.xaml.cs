@@ -255,7 +255,7 @@ namespace Root_WIND2
                 InfoWafer infoWafer = m_infoCarrier.GetInfoWafer(nSlot);
                 if (infoWafer.p_eState == GemSlotBase.eState.Select)
                 {
-                    infoWafer._eWaferOrder = InfoWafer.eWaferOrder.FirstLastWafer;
+                    infoWafer.p_eWaferOrder = InfoWafer.eWaferOrder.FirstLastWafer;
                 }
             }
             else
@@ -266,7 +266,7 @@ namespace Root_WIND2
                     InfoWafer infoWafer = m_infoCarrier.GetInfoWafer(i);
                     if (infoWafer.p_eState == GemSlotBase.eState.Select)
                     {
-                        infoWafer._eWaferOrder = InfoWafer.eWaferOrder.FirstWafer;
+                        infoWafer.p_eWaferOrder = InfoWafer.eWaferOrder.FirstWafer;
                         break;
                     }
                 }
@@ -276,7 +276,7 @@ namespace Root_WIND2
                     InfoWafer infoWafer = m_infoCarrier.GetInfoWafer(i);
                     if (infoWafer.p_eState == GemSlotBase.eState.Select)
                     {
-                        infoWafer._eWaferOrder = InfoWafer.eWaferOrder.LastWafer;
+                        infoWafer.p_eWaferOrder = InfoWafer.eWaferOrder.LastWafer;
                         break;
                     }
                 }

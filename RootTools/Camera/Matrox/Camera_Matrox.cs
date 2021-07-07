@@ -253,12 +253,13 @@ namespace RootTools.Camera.Matrox
 
         void ConnectCamera()
         {
-            // Application
+            // Application 
             if (m_MilApplication == MIL.M_NULL)
                 MIL.MappAlloc(MIL.M_NULL, MIL.M_DEFAULT, ref m_MilApplication);
             // System
             if (m_MilSystem == MIL.M_NULL)
-                MIL.MsysAlloc(MIL.M_DEFAULT, MIL.M_SYSTEM_DEFAULT, MIL.M_DEFAULT, MIL.M_DEFAULT, ref m_MilSystem);  // system discriptor 는 연결 타입  
+                MIL.MsysAlloc(MIL.M_DEFAULT, MIL.M_SYSTEM_SOLIOS, MIL.M_DEFAULT, MIL.M_DEFAULT, ref m_MilSystem);  // system discriptor 는 연결 타입
+                //MIL.MsysAlloc(MIL.M_DEFAULT, MIL.M_SYSTEM_DEFAULT, MIL.M_DEFAULT, MIL.M_DEFAULT, ref m_MilSystem);  // system discriptor 는 연결 타입
             // Display
             if (m_MilDisplay == MIL.M_NULL)
                 MIL.MdispAlloc(m_MilSystem, MIL.M_DEFAULT, "M_DEFAULT", MIL.M_WINDOWED, ref m_MilDisplay);
@@ -272,11 +273,10 @@ namespace RootTools.Camera.Matrox
                 if (nNumberOfDigitizers > 0)
                 {
                     // Digitizer
-                    if (m_MilDigitizer == MIL.M_NULL)
+                    if (m_MilDigitizer == MIL.M_NULL)  
                     {
-                        //MIL.MdigAlloc(m_MilSystem, MIL.M_DEFAULT, p_CamInfo.p_sFile, MIL.M_DEFAULT, ref m_MilDigitizer);
-                        MIL.MdigAlloc(m_MilSystem, MIL.M_DEFAULT, MIL.M_SYSTEM_DEFAULT, MIL.M_DEFAULT, ref m_MilDigitizer);
-                        //MIL.MdigAlloc(m_MilSystem, MIL.M_DEFAULT, p_CamInfo.p_sFile, MIL.M_EMULATED, ref m_MilDigitizer);
+                        MIL.MdigAlloc(m_MilSystem, MIL.M_DEFAULT, p_CamInfo.p_sFile, MIL.M_DEFAULT, ref m_MilDigitizer);
+                        //MIL.MdigAlloc(m_MilSystem, MIL.M_DEFAULT, MIL.M_SYSTEM_DEFAULT, MIL.M_DEFAULT, ref m_MilDigitizer);
 
                         p_nImgBand = (int)MIL.MdigInquire(m_MilDigitizer, MIL.M_SIZE_BAND, MIL.M_NULL);
                         p_nWidth = (int)MIL.MdigInquire(m_MilDigitizer, MIL.M_SIZE_X, MIL.M_NULL);
@@ -309,7 +309,7 @@ namespace RootTools.Camera.Matrox
                 p_nBuf--;
                 MIL.MbufFree(m_MilBuffers[p_nBuf]);
             }
-
+            p_CamInfo.p_eState = eCamState.Ready;
             //m_ImageLive.ReAllocate(new CPoint(p_nWidth, p_nHeight), 1);
             return;
         }
