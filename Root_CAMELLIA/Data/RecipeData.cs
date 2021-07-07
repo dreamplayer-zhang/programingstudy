@@ -75,6 +75,7 @@ namespace Root_CAMELLIA.Data
             data.VISIntegrationTime = VISIntegrationTime;
             data.NIRIntegrationTime = NIRIntegrationTime;
             data.UseThickness = UseThickness;
+            data.MeasureRepeatCount = MeasureRepeatCount;
             data.UseTransmittance = UseTransmittance;
             data.ModelRecipePath = ModelRecipePath;
             

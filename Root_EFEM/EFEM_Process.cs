@@ -234,9 +234,9 @@ namespace Root_EFEM
         public void MakeRnRSeq()
         {
             Queue<Sequence> aSequence = new Queue<Sequence>();
-            ModuleRunBase runUndocking = m_aLoadport[0].GetModuleRunDocking().Clone();
-            EFEM_Process.Sequence sequenceUndock = new EFEM_Process.Sequence(runUndocking, null);
-            m_qRNRSequence.Enqueue(sequenceUndock);
+            ModuleRunBase runDocking = m_aLoadport[EQ.p_nRunLP].GetModuleRunDocking().Clone();
+            EFEM_Process.Sequence sequenceDock = new EFEM_Process.Sequence(runDocking, null);
+            m_qRNRSequence.Enqueue(sequenceDock);
             //    m_qRNRSequence.Enqueue();
             while (m_qSequence.Count > 0)
             {

@@ -256,7 +256,8 @@ namespace RootTools.RADS
 
 				if (m_dElapsedTime > 10 * 1000)
 				{
-					m_log.Info(string.Format("Average Voltage: {0}", m_dVoltageSum / m_dElapsedTime));
+					double dAvr = m_dVoltageSum / m_dElapsedTime;
+					m_log.Info(string.Format("Average Voltage: {0}", dAvr.ToString(".00")));
 
 					m_dVoltageSum = 0;
 					m_dElapsedTime = 0;

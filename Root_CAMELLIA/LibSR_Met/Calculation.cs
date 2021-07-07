@@ -271,18 +271,20 @@ namespace Root_CAMELLIA.LibSR_Met
         private void PointTransmittanceData(double[] CalWL, int nPointidx)
         {
             int nDCOLTransDataNum = 0;
-            for (int n=0; n < m_DM.m_RawData[0].nNIRDataNum; n++)
+            m_DM.m_RawData[nPointidx].DCOLTransmittance.Clear();
+            for (int n = 0; n < m_DM.m_RawData[0].nNIRDataNum; n++)
             {
-                //int nDCOLTransDataNum = 0;//CalWL.Length;
-                if (nDCOLTransDataNum < CalWL.Length && m_DM.m_RawData[nPointidx].Wavelength [n] == m_DM.m_ContourMapDataT[nDCOLTransDataNum].Wavelength)
+                if (nDCOLTransDataNum < CalWL.Length && m_DM.m_RawData[nPointidx].Wavelength[n] == m_DM.m_ContourMapDataT[nDCOLTransDataNum].Wavelength)
                 {
-                    double DCOLTransData = m_DM.m_RawData[nPointidx].Transmittance[n];
-                    m_DM.m_RawData[nPointidx].DCOLTransmittance.Add(DCOLTransData);
+                    DCOLTransmittanceData DCOLData = new DCOLTransmittanceData();
+                    DCOLData.Wavelength = m_DM.m_ScalesListT[nDCOLTransDataNum].p_waveLength;
+                    DCOLData.RawTransmittance = m_DM.m_RawData[nPointidx].Transmittance[n];
+                    m_DM.m_RawData[nPointidx].DCOLTransmittance.Add(DCOLData);
                     nDCOLTransDataNum++;
                 }
             }
         }
-        public void PointCalcTransmittance_OptimizingSi(int nPointIdx, int nSiAvgOffsetRange, int nSiAvgOffsetStep, int nDNum, double[] mPn, double [] CalWL)
+        public void PointCalcTransmittance_OptimizingSi(int nPointIdx, int nSiAvgOffsetRange, int nSiAvgOffsetStep, int nDNum, double[] mPn, double[] CalWL)
         {
             int nDataMin = 9999;
             int nDataMinLayerIdx = 0;
@@ -291,7 +293,7 @@ namespace Root_CAMELLIA.LibSR_Met
             {
                 if (m_DM.m_LayerData[n].wavelength.Count < nDataMin)
                 {
-                    nDataMin =CalWL.Length;
+                    nDataMin = CalWL.Length;
                     nDataMinLayerIdx = n;
                 }
             }
@@ -393,9 +395,9 @@ namespace Root_CAMELLIA.LibSR_Met
                     dTAvg = 0.0;
                 }
 
-                m_DM.m_RawData[nPointIdx].DCOLTransmittance.Add(dTAvg);
+                m_DM.m_RawData[nPointIdx].DCOLTransmittance2.Add(dTAvg);
             }
-           // });
+            // });
             sw.Stop();
             Debug.WriteLine("task2 >> " + sw.ElapsedMilliseconds.ToString());
             //});

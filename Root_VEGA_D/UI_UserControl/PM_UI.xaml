@@ -14,26 +14,9 @@
             <RowDefinition/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="300"/>
-            <ColumnDefinition Width="Auto"/>
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
         <Grid Grid.Column="0">
-            <GroupBox Header="PM Setting" Margin="3">
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="30"/>
-                        <RowDefinition Height="*"/>
-                    </Grid.RowDefinitions>
-                    <Button Grid.Row="0" x:Name="btnPM" Content="PM" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Margin="3,5,0,0" Click="btnPM_Click"/>
-                    <tree:TreeUI Grid.Row="1" x:Name="treePMSetting" Margin="3,0,3,3"/>
-                </Grid>
-            </GroupBox>
-        </Grid>
-        <GridSplitter Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Stretch"
-                    Background="AliceBlue" BorderThickness="2" BorderBrush="LightGray"
-                    ShowsPreview="True" Width="3" />
-        <Grid Grid.Column="2">
             <GroupBox Header="PM Trend" Margin="3">
                 <Grid>
                     <Grid.RowDefinitions>

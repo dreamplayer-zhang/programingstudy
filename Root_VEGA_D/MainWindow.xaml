@@ -929,9 +929,11 @@
                                                                    FontWeight="Bold"
                                                                    HorizontalAlignment="Left" />
                                                         <Grid>
-                                                            <ProgressBar Height="30"
-                                                                         Value="37" />
-                                                            <TextBlock Text="37%"
+                                                            <ProgressBar x:Name="pbSnap"
+                                                                         Height="30"
+                                                                         Value="0" />
+                                                            <TextBlock x:Name="tbSnap"
+                                                                       Text="0%"
                                                                        Foreground="Black"
                                                                        FontWeight="Bold" />
                                                         </Grid>
@@ -942,10 +944,12 @@
                                                                    FontWeight="Bold"
                                                                    HorizontalAlignment="Left" />
                                                         <Grid>
-                                                            <ProgressBar Height="30"
-                                                                         Value="10"
+                                                            <ProgressBar x:Name="pbInsp"
+                                                                         Height="30"
+                                                                         Value="0"
                                                                          Grid.ColumnSpan="2" />
-                                                            <TextBlock Text="10%"
+                                                            <TextBlock x:Name="tbInsp"
+                                                                       Text="0%"
                                                                        Foreground="Black" />
                                                         </Grid>
                                                     </StackPanel>
