@@ -54,9 +54,6 @@ namespace Root_EFEM.Module.EdgesideVision
 		}
 		#endregion
 
-		int sideFocusAxis = 0;
-		int edgeDetectHeight = 0;
-
 		public Run_GrabEdge(Vision_Edgeside module)
 		{
 			this.module = module;
@@ -75,16 +72,11 @@ namespace Root_EFEM.Module.EdgesideVision
 			run.p_sGrabModeSide = p_sGrabModeSide;
 			run.p_sGrabModeBtm = p_sGrabModeBtm;
 
-			run.sideFocusAxis = sideFocusAxis;
-			run.edgeDetectHeight = edgeDetectHeight;
 			return run;
 		}
 
 		public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
 		{
-			sideFocusAxis = (tree.GetTree("Side Focus", false, bVisible)).Set(sideFocusAxis, sideFocusAxis, "Side Focus Axis", "Side 카메라 Focus 축 값", bVisible);
-			edgeDetectHeight = (tree.GetTree("Side Focus", false, bVisible)).Set(edgeDetectHeight, edgeDetectHeight, "Edge Detect Height", "Top Edge 검출영역 Height", bVisible);
-
 			p_sGrabModeTop = (tree.GetTree("Grab Mode", false, bVisible).Set(p_sGrabModeTop, p_sGrabModeTop, module.p_asGrabMode, "Grab Mode : Top", "Select GrabMode", bVisible));
 			p_sGrabModeSide = (tree.GetTree("Grab Mode", false, bVisible).Set(p_sGrabModeSide, p_sGrabModeSide, module.p_asGrabMode, "Grab Mode : Side", "Select GrabMode", bVisible));
 			p_sGrabModeBtm = (tree.GetTree("Grab Mode", false, bVisible).Set(p_sGrabModeBtm, p_sGrabModeBtm, module.p_asGrabMode, "Grab Mode : Bottom", "Select GrabMode", bVisible));
@@ -118,10 +110,11 @@ namespace Root_EFEM.Module.EdgesideVision
 				// 반시계 방향
 				double moveStart = triggerDest + axisR.GetSpeedValue(Axis.eSpeed.Move).m_acc * scanSpeed;  // Y 축 이동 끝 지점
 				double moveEnd = triggerStart - axisR.GetSpeedValue(Axis.eSpeed.Move).m_acc * scanSpeed;   //y 축 이동 시작 지점
-																										   
-				int grabCount = Convert.ToInt32((gmTop.m_nScanDegree /360) * 300 * pulsePerDegree * Math.PI / gmTop.m_dRealResX_um);
 
-				if (module.Run(axisEdgeX.StartMove(sideFocusAxis)))
+                int grabCount = Convert.ToInt32((gmTop.m_nScanDegree / 360) * gmTop.m_nWaferSize_mm * pulsePerDegree * Math.PI / gmTop.m_dRealResX_um);
+				//int grabCount = Convert.ToInt32((gmTop.m_nScanDegree /360) * 300 * pulsePerDegree * Math.PI / gmTop.m_dRealResX_um);
+
+				if (module.Run(axisEdgeX.StartMove(gmTop.m_nFocusX)))
 					return p_sInfo;
 				if (module.Run(axisEdgeX.WaitReady()))
 					return p_sInfo;
