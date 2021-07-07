@@ -17,7 +17,7 @@
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
-            <Grid Grid.Row="0" Background="Beige" Margin="3">
+            <Grid Grid.Row="0" x:Name="gridID" Background="Beige" Margin="3" PreviewMouseLeftButtonDown="gridID_PreviewMouseLeftButtonDown">
                 <TextBlock x:Name="textBlockStrip" Text="{Binding p_id}" HorizontalAlignment="Center"/>
             </Grid>
             <Grid Grid.Row="1" Margin="3" Background="White">
