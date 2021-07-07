@@ -32,7 +32,6 @@ namespace Root_CAMELLIA
         {
             get; set;
         }
-
         #region List InfoWafer
         //public string AddInfoWafer(InfoWafer infoWafer)
         //{
@@ -117,6 +116,8 @@ namespace Root_CAMELLIA
 
         public bool IsEnableRecovery()
         {
+            if (EQ.p_eState != EQ.eState.Ready)
+                return false;
             IWTR iWTR = (IWTR)m_wtr;
             foreach (IWTRChild child in iWTR.p_aChild)
             {
@@ -578,9 +579,10 @@ namespace Root_CAMELLIA
                                 EQ.p_nRnR--;
                                 EQ.p_eState = EQ.eState.Run;
                             }
-                            else if(EQ.p_nRnR == 1 && p_process.p_qSequence.Count == 0)
+                            else if ((EQ.p_nRnR == 1) && (p_process.p_qSequence.Count == 0))
                             {
                                 DoneEvent();
+                                EQ.p_nRnR--;
                             }
                         }
                         break;

@@ -291,7 +291,11 @@ namespace Root_Pine2.Module
                 if (Run(RunMoveLoadEV())) return p_sInfo;
                 if (Run(RunMoveZ(c_sPosLoadEV, 0))) return p_sInfo;
                 m_loadEV.p_bBlow = true;
-                if (Run(m_picker.RunVacuum(true))) return p_sInfo;
+                if (Run(m_picker.RunVacuum(true)))
+                {
+                    m_loadEV.p_bCycleStop = true; 
+                    return "OK";
+                }
                 m_loadEV.p_eMove = LoadEV.eMove.Down; 
                 if (Run(RunShakeUp(nShake, dzShakeUp))) return p_sInfo;
                 m_loadEV.p_eMove = LoadEV.eMove.Stop;
@@ -353,6 +357,30 @@ namespace Root_Pine2.Module
         #endregion
 
         #region RunUnload
+        public string StartUnloadStrip()
+        {
+            return StartRun(m_runUnloadStrip);
+        }
+
+        public string RunUnloadStrip()
+        {
+            if (p_infoStrip == null) return "OK";
+            try
+            {
+                if (Run(RunMoveUp())) return p_sInfo;
+                if (Run(RunMoveLoadEV())) return p_sInfo;
+                if (Run(RunMoveZ(c_sPosLoadEV, 5000))) return p_sInfo;
+                if (Run(m_picker.RunVacuum(false))) return p_sInfo;
+                if (Run(RunMoveUp())) return p_sInfo;
+                m_picker.p_infoStrip = null;
+            }
+            finally
+            {
+                RunMoveUp();
+            }
+            return "OK";
+        }
+
         public string RunUnloadPaper()
         {
             if (m_picker.p_infoStrip != null) return "InfoStrip != null";
@@ -403,8 +431,8 @@ namespace Root_Pine2.Module
         {
             Vision2D.eVision eVision = m_pine2.p_b3D ? Vision2D.eVision.Top3D : Vision2D.eVision.Top2D;
             Boats boats = m_handler.m_aBoats[eVision];
-            if (boats.m_aBoat[Vision2D.eWorks.A].p_eStep == Boat.eStep.Ready) return StartUnloadBoat(eVision, Vision2D.eWorks.A);
-            if (boats.m_aBoat[Vision2D.eWorks.B].p_eStep == Boat.eStep.Ready) return StartUnloadBoat(eVision, Vision2D.eWorks.B);
+            if ((boats.m_aBoat[Vision2D.eWorks.A].p_eStep == Boat.eStep.Ready) && (boats.m_aBoat[Vision2D.eWorks.A].p_infoStrip == null)) return StartUnloadBoat(eVision, Vision2D.eWorks.A);
+            if ((boats.m_aBoat[Vision2D.eWorks.B].p_eStep == Boat.eStep.Ready) && (boats.m_aBoat[Vision2D.eWorks.B].p_infoStrip == null)) return StartUnloadBoat(eVision, Vision2D.eWorks.B);
             return "OK";
         }
 
@@ -534,7 +562,7 @@ namespace Root_Pine2.Module
             {
                 switch (m_pine2.p_eMode)
                 {
-                    case Pine2.eRunMode.Stack: return m_loadEV.p_bDone ? StartRun(m_runLoadEV) : "OK";
+                    case Pine2.eRunMode.Stack: return (m_loadEV.p_bDone && (m_loadEV.p_bCycleStop == false)) ? StartRun(m_runLoadEV) : "OK";
                     case Pine2.eRunMode.Magazine: return m_transfer.m_gripper.p_bEnable ? StartLoadTransfer() : "OK";
                 }
             }
@@ -582,6 +610,7 @@ namespace Root_Pine2.Module
 
         #region ModuleRun
         ModuleRunBase m_runLoadEV;
+        ModuleRunBase m_runUnloadStrip;
         ModuleRunBase m_runLoadTransfer;
         ModuleRunBase m_runUnloadPaper;
         ModuleRunBase m_runUnloadBoat;
@@ -589,6 +618,7 @@ namespace Root_Pine2.Module
         protected override void InitModuleRuns()
         {
             m_runLoadEV = AddModuleRunList(new Run_LoadEV(this), true, "Load Strip from LoadEV");
+            m_runUnloadStrip = AddModuleRunList(new Run_UnloadStrip(this), false, "Unload Strip to GetPosition");
             m_runLoadTransfer = AddModuleRunList(new Run_LoadTransfer(this), true, "Load Strip from Transfer");
             m_runUnloadPaper = AddModuleRunList(new Run_UnloadPaper(this), true, "Unload Paper to Tray");
             m_runUnloadBoat = AddModuleRunList(new Run_UnloadBoat(this), true, "Unload Paper to Boat");
@@ -624,6 +654,31 @@ namespace Root_Pine2.Module
             public override string Run()
             {
                 return m_module.RunLoadEV(m_nShake, m_dzShakeUp);
+            }
+        }
+
+        public class Run_UnloadStrip : ModuleRunBase
+        {
+            Loader0 m_module;
+            public Run_UnloadStrip(Loader0 module)
+            {
+                m_module = module;
+                InitModuleRun(module);
+            }
+
+            public override ModuleRunBase Clone()
+            {
+                Run_UnloadStrip run = new Run_UnloadStrip(m_module);
+                return run;
+            }
+
+            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
+            {
+            }
+
+            public override string Run()
+            {
+                return m_module.RunUnloadStrip();
             }
         }
 

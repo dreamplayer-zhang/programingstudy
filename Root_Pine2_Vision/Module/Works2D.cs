@@ -16,7 +16,7 @@ namespace Root_Pine2_Vision.Module
     public class Works2D
     {
         MemoryPool m_memoryPool;
-        TCPAsyncClient m_tcpip;
+        public TCPAsyncClient m_tcpip;
         public void GetTools(ToolBox toolBox, bool bInit)
         {
             toolBox.Get(ref m_memoryPool, m_vision, "Memory" + p_id, 1);
@@ -84,7 +84,8 @@ namespace Root_Pine2_Vision.Module
             SnapReady,
             LotInfo,
             InspDone,
-            SortInfo
+            SortingData,
+            WorksConnect
         }
 
         public class Protocol
@@ -218,7 +219,7 @@ namespace Root_Pine2_Vision.Module
         public string SendSortInfo(Vision2D.SortInfo sortInfo)
         {
             if (m_bStartProcess == false) return "OK";
-            Protocol protocol = new Protocol(m_iProtocol, eProtocol.SortInfo, sortInfo);
+            Protocol protocol = new Protocol(m_iProtocol, eProtocol.SortingData, sortInfo);
             m_qProtocol.Enqueue(protocol);
             return protocol.WaitReply(m_secTimeout);
         }

@@ -57,8 +57,15 @@ namespace Root_Pine2.Engineer
             boats.m_vision.SendLotInfo(lotInfo);
         }
 
+        BackgroundWorker m_bgwSendSort = new BackgroundWorker(); 
         public void SendSortInfo(InfoStrip infoStrip)
         {
+            m_bgwSendSort.RunWorkerAsync(infoStrip); 
+        }
+
+        private void M_bgwSendSort_DoWork(object sender, DoWorkEventArgs e)
+        {
+            InfoStrip infoStrip = e.Argument as InfoStrip; 
             if (m_pine2.p_b3D) SendSortInfo(m_aBoats[Vision2D.eVision.Top3D], infoStrip);
             SendSortInfo(m_aBoats[Vision2D.eVision.Top2D], infoStrip);
             SendSortInfo(m_aBoats[Vision2D.eVision.Bottom], infoStrip);
@@ -72,7 +79,7 @@ namespace Root_Pine2.Engineer
         #endregion
 
         #region Recipe
-        string _sRecipe = ""; 
+        public string _sRecipe = ""; 
         public string p_sRecipe
         {
             get { return _sRecipe; }
@@ -358,6 +365,7 @@ namespace Root_Pine2.Engineer
             InitModule();
             InitThread();
             m_bgwRecipe.DoWork += M_bgwRecipe_DoWork;
+            m_bgwSendSort.DoWork += M_bgwSendSort_DoWork;
             m_engineer.ClassMemoryTool().InitThreadProcess();
         }
 

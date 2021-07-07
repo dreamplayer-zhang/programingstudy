@@ -30,19 +30,25 @@ namespace Root_Pine2.Module
             }
         }
 
-        int m_nInspect = 0; 
-        public void StartInspect()
+        Dictionary<Vision2D.eVision, bool> m_bInspect = new Dictionary<Vision2D.eVision, bool>();
+        void InitInspect()
         {
-            m_nInspect++; 
+            m_bInspect.Add(Vision2D.eVision.Top3D, false);
+            m_bInspect.Add(Vision2D.eVision.Top2D, false);
+            m_bInspect.Add(Vision2D.eVision.Bottom, false);
+        }
+        public void StartInspect(Vision2D.eVision eVision)
+        {
+            m_bInspect[eVision] = true; 
         }
 
         public bool p_bInspect
         {
-            get { return (m_nInspect == 0); }
+            get { return m_bInspect[Vision2D.eVision.Top3D] || m_bInspect[Vision2D.eVision.Top2D] || m_bInspect[Vision2D.eVision.Bottom]; }
         }
 
         public CPoint m_szMap = new CPoint();
-        public string SetResult(string sStripResult, string sX, string sY, string sMapResult)
+        public string SetResult(Vision2D.eVision eVision, string sStripResult, string sX, string sY, string sMapResult)
         {
             string sResult = "OK";
             try
@@ -55,7 +61,7 @@ namespace Root_Pine2.Module
                 SetMapResult(sMapResult); 
             }
             catch (Exception e) { sResult = "SetResult Exception : " + e.Message; }
-            m_nInspect--; 
+            m_bInspect[eVision] = false; 
             return sResult;
         }
 
@@ -111,6 +117,7 @@ namespace Root_Pine2.Module
         public int p_iStrip { get; set; }
         public InfoStrip(int iStrip)
         {
+            InitInspect(); 
             p_eMagazine = eMagazine.Magazine0; 
             p_iStrip = iStrip;
             p_id = iStrip.ToString("0000"); 

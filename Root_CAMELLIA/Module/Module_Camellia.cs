@@ -135,6 +135,20 @@ namespace Root_CAMELLIA.Module
             }
         }
 
+        private string _dataSavePathDate = "";
+        public string p_dataSavePathDate
+        {
+            get
+            {
+                return _dataSavePathDate;
+            }
+            set
+            {
+                _dataSavePathDate = value;
+            }
+        }
+
+
         #region InfoWafer
         string m_sInfoWafer = "";
         InfoWafer _infoWafer = null;
@@ -743,10 +757,14 @@ namespace Root_CAMELLIA.Module
 
         public string AfterPut(int nID)
         {
-            p_dataSavePath = BaseDefine.Dir_MeasureSaveRootPath + p_infoWafer.p_sRecipe;// + @"\" + DateTime.Now.ToString("yyyy-MM-dd") + "T" + DateTime.Now.ToString("HH-mm-ss");
-            GeneralTools.MakeDirectory(p_dataSavePath);
+            if (p_infoWafer.p_eWaferOrder == InfoWafer.eWaferOrder.FirstWafer || p_infoWafer.p_eWaferOrder == InfoWafer.eWaferOrder.FirstLastWafer)
+            {
+                p_dataSavePathDate = DateTime.Now.ToString("yyyy-MM-dd") + "T" + DateTime.Now.ToString("HH-mm");
+                p_dataSavePath = BaseDefine.Dir_MeasureSaveRootPath + p_infoWafer.p_sRecipe;
+                GeneralTools.MakeDirectory(p_dataSavePath);
+            }
 
-            MarsLogManager.Instance.ChangeMaterial(EQ.p_nRunLP, p_infoWafer.m_nSlot + 1, p_infoWafer.p_sLotID, p_infoWafer.p_sCarrierID, p_infoWafer.p_sRecipe);
+            MarsLogManager.Instance.ChangeMaterialSlot(EQ.p_nRunLP, p_infoWafer.m_nSlot + 1);
             MarsLogManager.Instance.WritePRC(EQ.p_nRunLP, BaseDefine.LOG_DEVICE_ID, SSLNet.PRC_EVENTID.Process, SSLNet.STATUS.START, SSLNet.MATERIAL_TYPE.WAFER, this.p_id, 0);
             return "OK";
         }

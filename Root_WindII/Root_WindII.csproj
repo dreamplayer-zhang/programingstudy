@@ -255,10 +255,8 @@
     <Compile Include="MvvmTools\PropertySupport.cs" />
     <Compile Include="MvvmTools\RelayCommand.cs" />
     <Compile Include="MvvmTools\SizeObserver.cs" />
-    <Compile Include="Recipe\RecipeBack.cs" />
-    <Compile Include="Recipe\RecipeEBR.cs" />
-    <Compile Include="Recipe\RecipeEdge.cs" />
     <Compile Include="Recipe\RecipeFront.cs" />
+    <Compile Include="Tools\PositionConverter.cs" />
     <Compile Include="Tools\StepTableData.cs" />
     <Compile Include="UI\SelectMode.xaml.cs">
       <DependentUpon>SelectMode.xaml</DependentUpon>
@@ -283,6 +281,10 @@
       <DependentUpon>MotionController.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\SETUP\CAMERA\MotionViewer\MotionController_ViewModel.cs" />
+    <Compile Include="UI\SETUP\CAMERA\ViewModels\CameraAlign_ImageViewer_ViewModel.cs" />
+    <Compile Include="UI\SETUP\CAMERA\ViewModels\CameraAlign_ViewModel.cs" />
+    <Compile Include="UI\SETUP\CAMERA\ViewModels\CameraVRS_ImageViewer_ViewModel.cs" />
+    <Compile Include="UI\SETUP\CAMERA\ViewModels\CameraVRS_ViewModel.cs" />
     <Compile Include="UI\SETUP\EBR\EBRSetup.xaml.cs">
       <DependentUpon>EBRSetup.xaml</DependentUpon>
     </Compile>
@@ -617,6 +619,10 @@
     <ProjectReference Include="..\RootTools\RootTools.csproj">
       <Project>{ce787353-5e00-4574-9f49-7cee7f087a86}</Project>
       <Name>RootTools</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\RootTools_CLR\RootTools_CLR.vcxproj">
+      <Project>{8037431c-5bb7-47cb-a0d1-aa12d577eb2a}</Project>
+      <Name>RootTools_CLR</Name>
     </ProjectReference>
     <ProjectReference Include="..\RootTools_Vision\RootTools_Vision.csproj">
       <Project>{b9fa8faa-0522-41f3-99ad-eb307e385f76}</Project>
