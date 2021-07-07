@@ -259,6 +259,18 @@
     <Compile Include="Recipe\RecipeEBR.cs" />
     <Compile Include="Recipe\RecipeEdge.cs" />
     <Compile Include="Recipe\RecipeFront.cs" />
+    <Compile Include="UI\Dialog\Dialog_PortSelect.xaml.cs">
+      <DependentUpon>Dialog_PortSelect.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\Dialog\Dialog_Scan.xaml.cs">
+      <DependentUpon>Dialog_Scan.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\Dialog\Dialog_Scan_ViewModel.cs" />
+    <Compile Include="UI\Dialog\ManualAlignViewer.xaml.cs">
+      <DependentUpon>ManualAlignViewer.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\Dialog\ManualAlignViewer_ImageViewer_ViewModel.cs" />
+    <Compile Include="UI\Dialog\ManualAlignViewer_ViewModel.cs" />
     <Compile Include="UI\SelectMode.xaml.cs">
       <DependentUpon>SelectMode.xaml</DependentUpon>
     </Compile>
@@ -414,6 +426,18 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="UI\Dialog\Dialog_PortSelect.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\Dialog\Dialog_Scan.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\Dialog\ManualAlignViewer.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="UI\SelectMode.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -605,6 +629,7 @@
       <Install>false</Install>
     </BootstrapperPackage>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>copy /Y "$(SolutionDir)Lib\CRT_Runtime\10.0.18362.0\x64_bin\ucrt\ucrtbased.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\ucrtbased.dll"
