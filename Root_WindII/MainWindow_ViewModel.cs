@@ -332,7 +332,7 @@ namespace Root_WindII
 
                 // Engineer
                 WindII_Engineer engineer = GlobalObjects.Instance.Register<WindII_Engineer>();
-                //DialogService dialogService = GlobalObjects.Instance.Register<DialogService>(this);
+                DialogService dialogService = GlobalObjects.Instance.Get<DialogService>();
                 WindII_Warning warning = GlobalObjects.Instance.Register<WindII_Warning>();
                 engineer.Init("WIND2F");
 
@@ -408,6 +408,8 @@ namespace Root_WindII
                     frontInspection.SetCameraInfo(camInfo);
                 }
 
+                Root_EFEM.Module.RecipeAlign recipeAlign = GlobalObjects.Instance.Register<Root_EFEM.Module.RecipeAlign>();
+
                 /*if (backImage.GetPtr() == IntPtr.Zero)
                 {
                     //MessageBox.Show("Back Inspection 생성 실패, 메모리 할당 없음");
@@ -457,11 +459,12 @@ namespace Root_WindII
                 */
 
                 // DialogService
-                //dialogService.Register<Dialog_ImageOpenViewModel, Dialog_ImageOpen>();
-                //dialogService.Register<Dialog_Scan_ViewModel, Dialog_Scan>();
-                //dialogService.Register<SettingDialog_ViewModel, SettingDialog>();
-                //dialogService.Register<TK4S, TK4SModuleUI>();
-                //dialogService.Register<FFUModule, FFUModuleUI>();
+                dialogService.Register<Dialog_ImageOpenViewModel, Dialog_ImageOpen>();
+                dialogService.Register<Dialog_Scan_ViewModel, Dialog_Scan>();
+                dialogService.Register<ManualAlignViewer_ViewModel, ManualAlignViewer>();
+                dialogService.Register<SettingDialog_ViewModel, SettingDialog>();
+                dialogService.Register<TK4S, TK4SModuleUI>();
+                dialogService.Register<FFUModule, FFUModuleUI>();
             }
             catch (Exception ex)
             {

@@ -15,6 +15,7 @@ namespace Root_EFEM.Module
         {
             m_alid_WaferExist.Run(true, "Aligner Wafer Exist Error");
         }
+
         #region ToolBox
         MemoryPool m_memoryPool;
         public override void GetTools(bool bInit)
@@ -149,6 +150,7 @@ namespace Root_EFEM.Module
             InfoWafer,
             Sensor
         }
+
         eCheckWafer m_eCheckWafer = eCheckWafer.InfoWafer;
         public bool IsWaferExist(int nID)
         {

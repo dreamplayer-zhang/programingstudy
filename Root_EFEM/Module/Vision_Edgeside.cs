@@ -191,15 +191,15 @@ namespace Root_EFEM.Module
 
 		public override void InitMemorys()
 		{
-			int nImageX = 1000; //camEdgeTop.GetRoiSize().X;
-			int nImageY = 1000; //(int)(pulse360 * edgeCamTriggerRatio + margin);
+			int nImageX = 1000;
+			int nImageY = 1000;
 			memoryGroup = memoryPool.GetGroup(p_id);
 			memoryEdgeTop = memoryPool.GetGroup(p_id).CreateMemory(EDGE_TYPE.EdgeTop.ToString(), 3, 1, nImageX, nImageY);
 			memoryEdgeSide = memoryPool.GetGroup(p_id).CreateMemory(EDGE_TYPE.EdgeSide.ToString(), 3, 1, nImageX, nImageY);
 			memoryEdgeBtm = memoryPool.GetGroup(p_id).CreateMemory(EDGE_TYPE.EdgeBottom.ToString(), 3, 1, nImageX, nImageY);
 
-			int ebrImageX = 1000; //camEBR.GetRoiSize().X;
-			int ebrImageY = 1000; //(int)(pulse360 * ebrCamTriggerRatio + margin);
+			int ebrImageX = 1000;
+			int ebrImageY = 1000;
 			memoryEBR = memoryPool.GetGroup(p_id).CreateMemory(EDGE_TYPE.EBR.ToString(), 1, 1, ebrImageX, ebrImageY);
 		}
 		#endregion
@@ -216,6 +216,7 @@ namespace Root_EFEM.Module
 		{
 			Ready,
 		}
+
 		void InitPosAxis()
 		{
 			AxisRotate.AddPos(Enum.GetNames(typeof(eAxisPosEdge)));
@@ -362,6 +363,7 @@ namespace Root_EFEM.Module
 			Sensor
 		}
 		eCheckWafer m_eCheckWafer = eCheckWafer.InfoWafer;
+
 		public bool IsWaferExist(int nID)
 		{
 			switch (m_eCheckWafer)
@@ -413,9 +415,9 @@ namespace Root_EFEM.Module
 				camEdgeSide.Connect();
 			if (camEdgeBtm != null && camEdgeBtm.p_CamInfo.p_eState == RootTools.Camera.Dalsa.eCamState.Init)
 				camEdgeBtm.Connect();
-			if (camEBR != null && camEBR.p_CamInfo.p_eState == RootTools.Camera.Matrox.eCamState.Init)
-				camEBR.Connect();
-			return "OK";
+            if (camEBR != null && camEBR.p_CamInfo.p_eState == RootTools.Camera.Matrox.eCamState.Init)
+                camEBR.Connect();
+            return "OK";
 		}
 
 		public override string StateHome()
@@ -426,11 +428,10 @@ namespace Root_EFEM.Module
 			if (p_eRemote == eRemote.Client) return RemoteRun(eRemoteRun.StateHome, eRemote.Client, null);
 			else
 			{
+                OpenCamera();
+                p_bStageVac = true;
 
-			//OpenCamera();
-			p_bStageVac = true;
-
-				axisEdgeX.StartHome();
+                axisEdgeX.StartHome();
 				axisEbrX.StartHome();
 				axisEbrZ.StartHome();
 				if (axisEdgeX.WaitReady() != "OK")

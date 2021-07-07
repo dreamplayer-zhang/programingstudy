@@ -61,7 +61,7 @@
             <ColumnDefinition Width="400"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
-        <GroupBox Header="Align Camera Viewer" 
+        <GroupBox Header="VRS Camera Viewer" 
                   Margin="4"
                   DataContext="{Binding ImageViewerVM}"
                   Width="{Binding ActualHeight, RelativeSource={RelativeSource self}}"

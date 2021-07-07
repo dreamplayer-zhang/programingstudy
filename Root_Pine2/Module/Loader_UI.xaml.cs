@@ -52,5 +52,14 @@ namespace Root_Pine2.Module
         {
             m_loader.StartUnloadStrip(); 
         }
+
+        private void gridInfo_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            switch (m_loader.p_eState)
+            {
+                case ModuleBase.eState.Init: m_loader.p_eState = ModuleBase.eState.Home; break;
+                case ModuleBase.eState.Error: m_loader.Reset(); break;
+            }
+        }
     }
 }

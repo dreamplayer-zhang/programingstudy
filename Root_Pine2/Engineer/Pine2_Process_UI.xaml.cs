@@ -150,6 +150,14 @@ namespace Root_Pine2.Engineer
         private void M_timer_Tick(object sender, EventArgs e)
         {
             grid.Background = (m_pine2.p_eMode == Pine2.eRunMode.Magazine) ? Brushes.Moccasin : Brushes.Silver; 
+            switch (EQ.p_eState)
+            {
+                case EQ.eState.Init: gridEQ.Background = Brushes.White; break;
+                case EQ.eState.Home: gridEQ.Background = Brushes.MediumPurple; break;
+                case EQ.eState.Ready: gridEQ.Background = Brushes.LightGreen; break;
+                case EQ.eState.Run: gridEQ.Background = Brushes.Yellow; break;
+                case EQ.eState.Error: gridEQ.Background = Brushes.OrangeRed; break;
+            }
             foreach (MagazineEV_UI ui in m_aMagazineUI) ui.OnTimer(); 
             foreach (Loader_UI ui in m_aLoaderUI) ui.OnTimer();
             foreach (Boats_UI ui in m_aBoatsUI) ui.OnTimer();
