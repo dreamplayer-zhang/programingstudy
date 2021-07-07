@@ -271,7 +271,7 @@
     <Reference Include="ScottPlot.WPF, Version=4.0.39.0, Culture=neutral, PublicKeyToken=e53b06131e34a3aa, processorArchitecture=MSIL">
       <HintPath>..\packages\ScottPlot.WPF.4.0.39\lib\net472\ScottPlot.WPF.dll</HintPath>
     </Reference>
-    <Reference Include="SSLNet, Version=1.0.7845.34598, Culture=neutral, processorArchitecture=AMD64">
+    <Reference Include="SSLNet, Version=1.0.7853.18320, Culture=neutral, processorArchitecture=AMD64">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Lib\MarsLog\SSLNet.dll</HintPath>
     </Reference>
@@ -867,6 +867,7 @@ copy /Y "$(SolutionDir)Lib\opencv_world347d.dll" "$(SolutionDir)$(ProjectName)\$
 copy /Y "$(SolutionDir)Lib\opencv_world347.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\opencv_world347.dll"
 copy /Y "$(SolutionDir)Lib\XGEM\XSmNet_M40_01_64.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\XSmNet_M40_01_64.dll"
 copy /Y "$(SolutionDir)Lib\MarsLog\SSL.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\SSL.dll"
+copy /Y "$(SolutionDir)Lib\MarsLog\SSLNet.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\SSLNet.dll"
 IF NOT EXIST "$(SolutionDir)$(ProjectName)\$(OutDir)\x64" (mkdir "$(SolutionDir)$(ProjectName)\$(OutDir)\x64")
 copy /Y "$(SolutionDir)Lib\EMGU.CV\x64\concrt140.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\x64\concrt140.dll"
 copy /Y "$(SolutionDir)Lib\EMGU.CV\x64\cvextern.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\x64\cvextern.dll"

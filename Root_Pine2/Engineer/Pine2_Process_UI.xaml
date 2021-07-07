@@ -30,7 +30,7 @@
                 </GroupBox.Header>
                 <StackPanel Orientation="Vertical">
                     <StackPanel Orientation="Horizontal" Margin="3">
-                        <Label Content="EQ :"/>
+                        <Label Content="EQ :" Margin="3"/>
                         <Label x:Name="labelEQState" Content="{Binding p_eState}" Margin="3"/>
                     </StackPanel>
                     <CheckBox x:Name="checkBoxStop" Content="EQ.Stop" IsChecked="{Binding p_bStop}" Margin="3"/>
@@ -45,6 +45,7 @@
                 <StackPanel Orientation="Vertical">
                     <ComboBox x:Name="comboRecipe" Margin="3" HorizontalContentAlignment="Center" SelectedItem="{Binding p_sRecipe}" ItemsSource="{Binding p_asRecipe}"/>
                     <Button x:Name="buttonSave" Content="Save" Margin="3" Click="buttonRecipeSave_Click"/>
+                    <Button x:Name="buttonSend" Content="ReSend" Margin="3" Click="buttonSend_Click"/>
                     <Button x:Name="buttonStart" Content="Start" Margin="3,13,3,3" Click="buttonStart_Click"/>
                     <Button x:Name="buttonStop" Content="Stop" Margin="3" Click="buttonStop_Click"/>
                     <Button x:Name="buttonReset" Content="Reset" Margin="3" Click="buttonReset_Click"/>
@@ -74,17 +75,106 @@
                     </StackPanel>
                 </StackPanel>
             </GroupBox>
+            <GroupBox Grid.Column="3" BorderBrush="Black" BorderThickness="1" Margin="3">
+                <GroupBox.Header>
+                    <TextBlock Text="Lot" Foreground="Black" FontWeight="Bold" />
+                </GroupBox.Header>
+                <StackPanel Orientation="Vertical">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Label Grid.Column="0" Content="LotID :" Margin="3" VerticalAlignment="Center"/>
+                        <TextBox Grid.Column="1" x:Name="textBoxLotID" Text="{Binding p_sLotID}" Margin="3" VerticalAlignment="Center" TextAlignment="Center"/>
+                    </Grid>
+                    <Button x:Name="buttonNewLot" Content="New Lot" Margin="3" Click="buttonNewLot_Click"/>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Label Grid.Column="0" Content="Bundle :" Margin="3" VerticalAlignment="Center"/>
+                        <TextBox Grid.Column="1" x:Name="textBoxBundle" Text="{Binding p_iBundle}" Margin="3" VerticalAlignment="Center" TextAlignment="Center"/>
+                    </Grid>
+                </StackPanel>
+            </GroupBox>
+            <GroupBox Grid.Column="4" x:Name="groupBoxStack" BorderBrush="Black" BorderThickness="1" Margin="3">
+                <GroupBox.Header>
+                    <TextBlock Text="Stack" Foreground="Black" FontWeight="Bold" />
+                </GroupBox.Header>
+                <StackPanel Orientation="Vertical">
+                    <CheckBox x:Name="checkBoxKeyence" Content="Read Barcode" IsChecked="{Binding p_bUseKeyence}" Margin="3"/>
+                    <CheckBox x:Name="checkBoxPaper" Content="Check Paper" IsChecked="{Binding p_bCheckPaper}" Margin="3"/>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Label Grid.Column="0" Content="Max Stack :" Margin="3" VerticalAlignment="Center"/>
+                        <TextBox Grid.Column="1" x:Name="textBoxlStack" Text="{Binding p_lStack}" Margin="3" VerticalAlignment="Center" TextAlignment="Center"/>
+                    </Grid>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Label Grid.Column="0" Content="Max Paper :" Margin="3" VerticalAlignment="Center"/>
+                        <TextBox Grid.Column="1" x:Name="textBoxlStackPaper" Text="{Binding p_lStackPaper}" Margin="3" VerticalAlignment="Center" TextAlignment="Center"/>
+                    </Grid>
+                    <CheckBox x:Name="checkBoxBlow" Content="Use Blow" IsChecked="{Binding p_bUseBlow}" Margin="3"/>
+                    <CheckBox x:Name="checkBoxIonBlow" Content="Use Ion Blow" IsChecked="{Binding p_bUseIonBlow}" Margin="3"/>
+                    <CheckBox x:Name="checkBoxAlignBlow" Content="Use Align Blow" IsChecked="{Binding p_bUseAlignBlow}" Margin="3"/>
+                </StackPanel>
+            </GroupBox>
+            <GroupBox Grid.Column="5" x:Name="groupBoxVision" BorderBrush="Black" BorderThickness="1" Margin="3">
+                <GroupBox.Header>
+                    <TextBlock Text="Vision" Foreground="Black" FontWeight="Bold" />
+                </GroupBox.Header>
+                <StackPanel Orientation="Vertical">
+                    <CheckBox x:Name="checkBoxLotMix3D" Content="LotMix Top3D" IsChecked="{Binding p_bLotMix}" Margin="2"/>
+                    <CheckBox x:Name="checkBoxBarcode3D" Content="Barcode" IsChecked="{Binding p_bBarcode}" Margin="2"/>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBox Grid.Column="0" x:Name="textBoxBarcode3D" Text="{Binding p_nBarcode}" Margin="2" VerticalAlignment="Center" TextAlignment="Center"/>
+                        <TextBox Grid.Column="1" x:Name="textBoxBarcodeLength3D" Text="{Binding p_lBarcode}" Margin="2" VerticalAlignment="Center" TextAlignment="Center"/>
+                    </Grid>
+                    <CheckBox x:Name="checkBoxLotMix2D" Content="LotMix Top2D" IsChecked="{Binding p_bLotMix}" Margin="2,4,2,2"/>
+                    <CheckBox x:Name="checkBoxBarcode2D" Content="Barcode" IsChecked="{Binding p_bBarcode}" Margin="2"/>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBox Grid.Column="0" x:Name="textBoxBarcode2D" Text="{Binding p_nBarcode}" Margin="2" VerticalAlignment="Center" TextAlignment="Center"/>
+                        <TextBox Grid.Column="1" x:Name="textBoxBarcodeLength2D" Text="{Binding p_lBarcode}" Margin="2" VerticalAlignment="Center" TextAlignment="Center"/>
+                    </Grid>
+                    <CheckBox x:Name="checkBoxLotMixBottom" Content="LotMix Bottom" IsChecked="{Binding p_bLotMix}" Margin="2,4,2,2"/>
+                    <CheckBox x:Name="checkBoxBarcodeBottom" Content="Barcode" IsChecked="{Binding p_bBarcode}" Margin="2"/>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBox Grid.Column="0" x:Name="textBoxBarcodeBottom" Text="{Binding p_nBarcode}" Margin="2" VerticalAlignment="Center" TextAlignment="Center"/>
+                        <TextBox Grid.Column="1" x:Name="textBoxBarcodeLengthBottom" Text="{Binding p_lBarcode}" Margin="2" VerticalAlignment="Center" TextAlignment="Center"/>
+                    </Grid>
+                </StackPanel>
+            </GroupBox>
         </Grid>
         <Grid Grid.Row="1" x:Name="gridBoat">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="0.2*"/>
+                <ColumnDefinition Width="0.05*"/>
+                <ColumnDefinition Width="1.15*"/>
+                <ColumnDefinition Width="1.15*"/>
+                <ColumnDefinition Width="1.15*"/>
+                <ColumnDefinition Width="0.05*"/>
                 <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="0.2*"/>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="0.2*"/>
+                <ColumnDefinition Width="0.05*"/>
             </Grid.ColumnDefinitions>
             <Grid Grid.Column="6" x:Name="gridLoader1">
                 <Grid.RowDefinitions>
@@ -102,11 +192,11 @@
         <Grid Grid.Row="2" x:Name="gridLoader">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="0.4*"/>
-                <ColumnDefinition Width="0.4*"/>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="0.4*"/>
-                <ColumnDefinition Width="0.4*"/>
+                <ColumnDefinition Width="0.35*"/>
+                <ColumnDefinition Width="0.35*"/>
+                <ColumnDefinition Width="1.2*"/>
+                <ColumnDefinition Width="0.35*"/>
+                <ColumnDefinition Width="0.35*"/>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>

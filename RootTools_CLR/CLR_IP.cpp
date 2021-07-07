@@ -208,6 +208,7 @@ namespace RootTools_CLR
 
 		return score;
 	}
+
 	float CLR_IP::Cpp_TemplateMatching(byte* pSrcImg, byte* pTempImg, int& outPosX, int& outPosY, int  nMemW, int  nMemH, int nTempW, int nTempH, int nROIL, int nROIT, int nROIR, int nROIB, int nMethod, int nByteCnt, int nChIdx)
 	{
 		pin_ptr<byte> pSrc = &pSrcImg[0];
@@ -215,6 +216,40 @@ namespace RootTools_CLR
 		Point Pos;
 
 		float score = IP::TemplateMatching(pSrc, pTemp, Pos, nMemW, nMemH, nTempW, nTempH, Point(nROIL, nROIT), Point(nROIR, nROIB), nMethod, nByteCnt, nChIdx);
+
+		outPosX = Pos.x;
+		outPosY = Pos.y;
+
+		pSrc = nullptr;
+		pTemp = nullptr;
+
+		return score;
+	}
+
+	float CLR_IP::Cpp_TemplateMatching_LargeTrigger(byte* pSrcImg, array<byte>^ pTempImg, int& outPosX, int& outPosY, int  nMemW, int  nMemH, int nTempW, int nTempH, int nROIL, int nROIT, int nROIR, int nROIB, int nMethod, int nByteCnt, int nChIdx)
+	{
+		pin_ptr<byte> pSrc = &pSrcImg[0];
+		pin_ptr<byte> pTemp = &pTempImg[0];
+		Point Pos;
+
+		float score = IP::TemplateMatching_LargeTrigger(pSrc, pTemp, Pos, nMemW, nMemH, nTempW, nTempH, Point(nROIL, nROIT), Point(nROIR, nROIB), nMethod, nByteCnt, nChIdx);
+
+		outPosX = Pos.x;
+		outPosY = Pos.y;
+
+		pSrc = nullptr;
+		pTemp = nullptr;
+
+		return score;
+	}
+
+	float CLR_IP::Cpp_TemplateMatching_LargeTrigger(byte* pSrcImg, byte* pTempImg, int& outPosX, int& outPosY, int  nMemW, int  nMemH, int nTempW, int nTempH, int nROIL, int nROIT, int nROIR, int nROIB, int nMethod, int nByteCnt, int nChIdx)
+	{
+		pin_ptr<byte> pSrc = &pSrcImg[0];
+		pin_ptr<byte> pTemp = &pTempImg[0];
+		Point Pos;
+
+		float score = IP::TemplateMatching_LargeTrigger(pSrc, pTemp, Pos, nMemW, nMemH, nTempW, nTempH, Point(nROIL, nROIT), Point(nROIR, nROIB), nMethod, nByteCnt, nChIdx);
 
 		outPosX = Pos.x;
 		outPosY = Pos.y;
@@ -323,7 +358,7 @@ namespace RootTools_CLR
 
 			// pass outer pinned array<int*> to UNumeric::ChangeArray as an int**
 			// (note that no casts are necessary in correct code)
-			if(imgNum < 3)
+			if (imgNum < 3)
 				IP::CreateGoldenImage_Avg(pin, pDst, imgNum, nMemW, nMemH);
 			else
 				IP::CreateGoldenImage_MedianAvg(pin, pDst, imgNum, nMemW, nMemH);
@@ -466,14 +501,64 @@ namespace RootTools_CLR
 	// Elementwise Operation
 	void CLR_IP::Cpp_Multiply(array<byte>^ pSrcImg1, array<float>^ pSrcImg2, array<byte>^ pDstImg, int  nMemW, int  nMemH)
 	{
-		pin_ptr<byte> pSrc = &pSrcImg1[0];
-		pin_ptr<float> pGolden = &pSrcImg2[0];
+		pin_ptr<byte> pSrc1 = &pSrcImg1[0];
+		pin_ptr<float> pSrc2 = &pSrcImg2[0];
 		pin_ptr<byte> pDst = &pDstImg[0];
 
-		IP::Multiply(pSrc, pGolden, pDst, nMemW, nMemH);
+		IP::Multiply(pSrc1, pSrc2, pDst, nMemW, nMemH);
+
+		pSrc1 = nullptr;
+		pSrc2 = nullptr;
+		pDst = nullptr;
+	}
+
+	void CLR_IP::Cpp_Multiply(array<byte>^ pSrcImg1, array<byte>^ pSrcImg2, array<byte>^ pDstImg, int  nMemW, int  nMemH)
+	{
+		pin_ptr<byte> pSrc1 = &pSrcImg1[0];
+		pin_ptr<byte> pSrc2 = &pSrcImg2[0];
+		pin_ptr<byte> pDst = &pDstImg[0];
+
+		IP::Multiply(pSrc1, pSrc2, pDst, nMemW, nMemH);
+
+		pSrc1 = nullptr;
+		pSrc2 = nullptr;
+		pDst = nullptr;
+	}
+
+	void CLR_IP::Cpp_Bitwise_NOT(array<byte>^ pSrcImg, array<byte>^ pDstImg, int  nMemW, int  nMemH)
+	{
+		pin_ptr<byte> pSrc = &pSrcImg[0];
+		pin_ptr<byte> pDst = &pDstImg[0];
+
+		IP::Bitwise_NOT(pSrc, pDst, nMemW, nMemH);
 
 		pSrc = nullptr;
-		pGolden = nullptr;
+		pDst = nullptr;
+	}
+
+	void CLR_IP::Cpp_Bitwise_AND(array<byte>^ pSrcImg1, array<byte>^ pSrcImg2, array<byte>^ pDstImg, int  nMemW, int  nMemH)
+	{
+		pin_ptr<byte> pSrc1 = &pSrcImg1[0];
+		pin_ptr<byte> pSrc2 = &pSrcImg2[0];
+		pin_ptr<byte> pDst = &pDstImg[0];
+
+		IP::Bitwise_AND(pSrc1, pSrc2, pDst, nMemW, nMemH);
+
+		pSrc1 = nullptr;
+		pSrc2 = nullptr;
+		pDst = nullptr;
+	}
+
+	void CLR_IP::Cpp_Bitwise_OR(array<byte>^ pSrcImg1, array<byte>^ pSrcImg2, array<byte>^ pDstImg, int  nMemW, int  nMemH)
+	{
+		pin_ptr<byte> pSrc1 = &pSrcImg1[0];
+		pin_ptr<byte> pSrc2 = &pSrcImg2[0];
+		pin_ptr<byte> pDst = &pDstImg[0];
+
+		IP::Bitwise_OR(pSrc1, pSrc2, pDst, nMemW, nMemH);
+
+		pSrc1 = nullptr;
+		pSrc2 = nullptr;
 		pDst = nullptr;
 	}
 
@@ -589,6 +674,19 @@ namespace RootTools_CLR
 			}
 		}
 		return local;
+	}
+	
+	int CLR_IP::Cpp_CalcAdaptiveThresholdParam(array<byte>^ pSrcImg, array<byte>^ pMaskImg, int  nMemW, int  nMemH, int nGap_DominantGV2ParamGV)
+	{
+		pin_ptr<byte> pSrc = &pSrcImg[0];
+		pin_ptr<byte> pMask = &pMaskImg[0];
+	
+		int nThreshold = IP::CalcAdaptiveThresholdParam(pSrc, pMask, nMemW, nMemH, nGap_DominantGV2ParamGV);
+
+		pSrc = nullptr;
+		pMask = nullptr;
+
+		return nThreshold;
 	}
 
 	// Image(Feature/Defect Image) Load/Save

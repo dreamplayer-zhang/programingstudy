@@ -255,10 +255,8 @@
     <Compile Include="MvvmTools\PropertySupport.cs" />
     <Compile Include="MvvmTools\RelayCommand.cs" />
     <Compile Include="MvvmTools\SizeObserver.cs" />
-    <Compile Include="Recipe\RecipeBack.cs" />
-    <Compile Include="Recipe\RecipeEBR.cs" />
-    <Compile Include="Recipe\RecipeEdge.cs" />
     <Compile Include="Recipe\RecipeFront.cs" />
+    <Compile Include="Tools\PositionConverter.cs" />
     <Compile Include="Tools\StepTableData.cs" />
     <Compile Include="UI\SelectMode.xaml.cs">
       <DependentUpon>SelectMode.xaml</DependentUpon>
@@ -283,9 +281,10 @@
       <DependentUpon>MotionController.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\SETUP\CAMERA\MotionViewer\MotionController_ViewModel.cs" />
-    <Compile Include="UI\SETUP\CAMERA\MotionViewer\MotionControlViewer.xaml.cs">
-      <DependentUpon>MotionControlViewer.xaml</DependentUpon>
-    </Compile>
+    <Compile Include="UI\SETUP\CAMERA\ViewModels\CameraAlign_ImageViewer_ViewModel.cs" />
+    <Compile Include="UI\SETUP\CAMERA\ViewModels\CameraAlign_ViewModel.cs" />
+    <Compile Include="UI\SETUP\CAMERA\ViewModels\CameraVRS_ImageViewer_ViewModel.cs" />
+    <Compile Include="UI\SETUP\CAMERA\ViewModels\CameraVRS_ViewModel.cs" />
     <Compile Include="UI\SETUP\EBR\EBRSetup.xaml.cs">
       <DependentUpon>EBRSetup.xaml</DependentUpon>
     </Compile>
@@ -346,18 +345,28 @@
       <DependentUpon>ModuleView.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\SETUP\Interfaces\IPage.cs" />
-    <Compile Include="UI\SETUP\RAC\RACProduct.xaml.cs">
-      <DependentUpon>RACProduct.xaml</DependentUpon>
+    <Compile Include="UI\SETUP\CAMERA\MotionViewer\MotionViewer.xaml.cs">
+      <DependentUpon>MotionViewer.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI\SETUP\RAC\MapFileSelectionViewer.xaml.cs">
-      <DependentUpon>MapFileSelectionViewer.xaml</DependentUpon>
+    <Compile Include="UI\SETUP\CAMERA\MotionViewer\MotionViewer_ViewModel.cs" />
+    <Compile Include="UI\SETUP\RAC\RACAlignKey.xaml.cs">
+      <DependentUpon>RACAlignKey.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\SETUP\RAC\MapFileListViewer.xaml.cs">
       <DependentUpon>MapFileListViewer.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UI\SETUP\RAC\RACProduct.xaml.cs">
+      <DependentUpon>RACProduct.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\SETUP\RAC\RACSetup.xaml.cs">
+      <DependentUpon>RACSetup.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\SETUP\RAC\ViewModels\RACAlignKey_ImageViewer_ViewModel.cs" />
     <Compile Include="UI\SETUP\RAC\ViewModels\MapFileListViewer_ViewModel.cs" />
-    <Compile Include="UI\SETUP\RAC\ViewModels\MapFileSelectionViewer_ViewModel.cs" />
+    <Compile Include="UI\SETUP\RAC\ViewModels\RACAlignKey_ViewModel.cs" />
     <Compile Include="UI\SETUP\RAC\ViewModels\RACProduct_ViewModel.cs" />
+    <Compile Include="UI\SETUP\RAC\ViewModels\RACSetup_ImageViewer_ViewModel.cs" />
+    <Compile Include="UI\SETUP\RAC\ViewModels\RACSetup_ViewModel.cs" />
     <Compile Include="UI\SETUP\Setup.xaml.cs">
       <DependentUpon>Setup.xaml</DependentUpon>
     </Compile>
@@ -457,10 +466,6 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="UI\SETUP\CAMERA\MotionViewer\MotionControlViewer.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
     <Page Include="UI\SETUP\EBR\EBRSetup.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -521,17 +526,25 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="UI\SETUP\RAC\RACProduct.xaml">
+    <Page Include="UI\SETUP\CAMERA\MotionViewer\MotionViewer.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="UI\SETUP\RAC\MapFileSelectionViewer.xaml">
+    <Page Include="UI\SETUP\RAC\RACAlignKey.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
     <Page Include="UI\SETUP\RAC\MapFileListViewer.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\SETUP\RAC\RACProduct.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\SETUP\RAC\RACSetup.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UI\SETUP\Setup.xaml">
       <SubType>Designer</SubType>
@@ -607,6 +620,10 @@
       <Project>{ce787353-5e00-4574-9f49-7cee7f087a86}</Project>
       <Name>RootTools</Name>
     </ProjectReference>
+    <ProjectReference Include="..\RootTools_CLR\RootTools_CLR.vcxproj">
+      <Project>{8037431c-5bb7-47cb-a0d1-aa12d577eb2a}</Project>
+      <Name>RootTools_CLR</Name>
+    </ProjectReference>
     <ProjectReference Include="..\RootTools_Vision\RootTools_Vision.csproj">
       <Project>{b9fa8faa-0522-41f3-99ad-eb307e385f76}</Project>
       <Name>RootTools_Vision</Name>
@@ -632,9 +649,7 @@
       <Install>false</Install>
     </BootstrapperPackage>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="UI\SETUP\RAC\ViewModels\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>copy /Y "$(SolutionDir)Lib\CRT_Runtime\10.0.18362.0\x64_bin\ucrt\ucrtbased.dll" "$(SolutionDir)$(ProjectName)\$(OutDir)\ucrtbased.dll"

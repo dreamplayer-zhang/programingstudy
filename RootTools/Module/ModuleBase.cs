@@ -581,7 +581,7 @@ namespace RootTools.Module
             #endregion
 
             #region List Send
-            List<Protocol> m_aProtocol = new List<Protocol>(); 
+            public List<Protocol> m_aProtocol = new List<Protocol>(); 
             void Send(Protocol protocol)
             {
                 m_aProtocol.Add(protocol); 

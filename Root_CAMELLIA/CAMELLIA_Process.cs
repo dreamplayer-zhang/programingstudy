@@ -231,12 +231,21 @@ namespace Root_CAMELLIA
 
         public Queue<Sequence> m_qRNRSequence = new Queue<Sequence>();
 
+        public void ClearRnRSeq()
+        {
+            while(m_qRNRSequence.Count > 0)
+            {
+                m_qRNRSequence.Dequeue();
+            }
+        }
+
         public void MakeRnRSeq()
         {
+            ClearRnRSeq();
             Queue<Sequence> aSequence = new Queue<Sequence>();
-            ModuleRunBase runUndocking = m_aLoadport[0].GetModuleRunDocking().Clone();
-            CAMELLIA_Process.Sequence sequenceUndock = new CAMELLIA_Process.Sequence(runUndocking, null);
-            m_qRNRSequence.Enqueue(sequenceUndock);
+            ModuleRunBase runDocking = m_aLoadport[EQ.p_nRunLP].GetModuleRunDocking().Clone();
+            CAMELLIA_Process.Sequence sequenceDock = new CAMELLIA_Process.Sequence(runDocking, null);
+            m_qRNRSequence.Enqueue(sequenceDock);
             //    m_qRNRSequence.Enqueue();
             while (m_qSequence.Count > 0)
             {

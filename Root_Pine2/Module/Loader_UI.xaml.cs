@@ -1,6 +1,7 @@
 ﻿using RootTools.Module;
 using RootTools.Trees;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media;
 
 namespace Root_Pine2.Module
@@ -45,6 +46,11 @@ namespace Root_Pine2.Module
             m_nQueue[0] = m_loader.m_qModuleRun.Count;
             m_nQueue[1] = m_loader.m_qModuleRemote.Count;
             m_loader.RunTreeQueue(Tree.eMode.Init);
+        }
+
+        private void gridID_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            m_loader.StartUnloadStrip(); 
         }
     }
 }

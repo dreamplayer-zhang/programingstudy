@@ -15,7 +15,7 @@ namespace Root_Pine2.Module
             foreach (MagazineEV magazineEV in m_aEV.Values)
             {
                 MagazineEV.Magazine magazine = magazineEV.m_aMagazine[InfoStrip.eMagazinePos.Down]; 
-                if ((magazine != null) && (magazine.m_qStripReady.Count > 0))
+                if ((magazine != null) && (magazine.m_qStripReady.Count > 0) && (magazineEV.p_eState == ModuleBase.eState.Ready))
                 {
                     if (nStripMin > magazine.m_qStripReady.Count)
                     {
@@ -28,7 +28,7 @@ namespace Root_Pine2.Module
             foreach (MagazineEV magazineEV in m_aEV.Values)
             {
                 MagazineEV.Magazine magazine = magazineEV.m_aMagazine[InfoStrip.eMagazinePos.Up];
-                if ((magazine != null) && (magazine.m_qStripReady.Count > 0) && (magazineEV.m_aMagazine[InfoStrip.eMagazinePos.Down] == null))
+                if ((magazine != null) && (magazine.m_qStripReady.Count > 0) && (magazineEV.m_aMagazine[InfoStrip.eMagazinePos.Down] == null) && (magazineEV.p_eState == ModuleBase.eState.Ready))
                 {
                     if (nStripMin > magazine.m_qStripReady.Count)
                     {
@@ -74,6 +74,7 @@ namespace Root_Pine2.Module
             if (bMatch) return false; 
             if (stack.p_eResult != InfoStrip.eResult.Init) return false;
             stack.p_eResult = eResult;
+            if (eResult == InfoStrip.eResult.DEF) stack.p_iBundle = m_pine2.p_iBundle++; 
             return true; 
         }
 
@@ -87,7 +88,7 @@ namespace Root_Pine2.Module
         #region Thread
         bool m_bThread = false;
         Thread m_thread; 
-        void initThread()
+        void InitThread()
         {
             m_thread = new Thread(new ThreadStart(RunThread));
             m_thread.Start();
@@ -110,9 +111,11 @@ namespace Root_Pine2.Module
         }
         #endregion
 
-        public MagazineEVSet()
+        Pine2 m_pine2;
+        public MagazineEVSet(Pine2 pine2)
         {
-            initThread(); 
+            m_pine2 = pine2; 
+            InitThread(); 
         }
 
         public void ThreadStop()

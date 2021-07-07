@@ -1,11 +1,11 @@
-﻿<UserControl x:Class="Root_WindII.MotionControlViewer"
+﻿<UserControl x:Class="Root_WindII.MotionViewer"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Root_WindII"
              mc:Ignorable="d" 
-             d:DesignHeight="350" d:DesignWidth="600">
+             d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
         <Style x:Key="limit_checkbox_button" TargetType="CheckBox">
             <Setter Property="Margin" Value="4,4,0,4"/>
@@ -51,7 +51,7 @@
                 <CheckBox Content="H" Grid.Column="1" Style="{StaticResource limit_checkbox_button}" FontFamily="Bahnschrift Light"/>
                 <CheckBox Content="(-)" FontSize="16"  Grid.Column="2" Style="{StaticResource limit_checkbox_button}" FontFamily="Bahnschrift Light"/>
                 <CheckBox Content="(+)" FontSize="16" Grid.Column="3" Style="{StaticResource limit_checkbox_button}" FontFamily="Bahnschrift Light"/>
-                <TextBox  Grid.Column="4" Margin="4" Height="24" IsReadOnly="True" VerticalContentAlignment="Center" HorizontalContentAlignment="Center"/>
+                <TextBox  Grid.Column="4" Text="{Binding AxisPositionX.p_posActual}" Margin="4" Height="24" IsReadOnly="True" VerticalContentAlignment="Center" HorizontalContentAlignment="Center"/>
             </Grid>
             <Grid>
                 <Grid.ColumnDefinitions>
@@ -65,7 +65,7 @@
                 <CheckBox Content="H" Grid.Column="1" Style="{StaticResource limit_checkbox_button}" FontFamily="Bahnschrift Light"/>
                 <CheckBox Content="(-)" FontSize="16"  Grid.Column="2" Style="{StaticResource limit_checkbox_button}" FontFamily="Bahnschrift Light"/>
                 <CheckBox Content="(+)" FontSize="16" Grid.Column="3" Style="{StaticResource limit_checkbox_button}" FontFamily="Bahnschrift Light"/>
-                <TextBox  Grid.Column="4" Margin="4" Height="24" IsReadOnly="True" VerticalContentAlignment="Center" HorizontalContentAlignment="Center"/>
+                <TextBox  Grid.Column="4" Text="{Binding AxisPositionY.p_posActual}" Margin="4" Height="24" IsReadOnly="True" VerticalContentAlignment="Center" HorizontalContentAlignment="Center"/>
             </Grid>
             <Grid>
                 <Grid.ColumnDefinitions>
@@ -79,7 +79,7 @@
                 <CheckBox Content="H" Grid.Column="1" Style="{StaticResource limit_checkbox_button}" FontFamily="Bahnschrift Light"/>
                 <CheckBox Content="(-)" FontSize="16"  Grid.Column="2" Style="{StaticResource limit_checkbox_button}" FontFamily="Bahnschrift Light"/>
                 <CheckBox Content="(+)" FontSize="16" Grid.Column="3" Style="{StaticResource limit_checkbox_button}" FontFamily="Bahnschrift Light"/>
-                <TextBox  Grid.Column="4" Margin="4" Height="24"  IsReadOnly="True" VerticalContentAlignment="Center" HorizontalContentAlignment="Center"/>
+                <TextBox  Grid.Column="4"  Text="{Binding AxisPositionTheta.p_posActual}" Margin="4" Height="24"  IsReadOnly="True" VerticalContentAlignment="Center" HorizontalContentAlignment="Center"/>
             </Grid>
             <Grid>
                 <Grid.ColumnDefinitions>
@@ -87,77 +87,15 @@
                     <ColumnDefinition Width="38"/>
                     <ColumnDefinition Width="38"/>
                     <ColumnDefinition Width="38"/>
-                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="138*"/>
+                    <ColumnDefinition Width="311*"/>
                 </Grid.ColumnDefinitions>
-                <TextBlock Text="Z" Foreground="White"  VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="18" FontWeight="Bold" FontFamily="Bahnschrift Light"/>
-                <CheckBox Content="H" Grid.Column="1" Style="{StaticResource limit_checkbox_button}" FontFamily="Bahnschrift Light"/>
-                <CheckBox Content="(-)" FontSize="16"  Grid.Column="2" Style="{StaticResource limit_checkbox_button}" FontFamily="Bahnschrift Light"/>
-                <CheckBox Content="(+)" FontSize="16" Grid.Column="3" Style="{StaticResource limit_checkbox_button}" FontFamily="Bahnschrift Light"/>
-                <TextBox  Grid.Column="4" Margin="4" Height="24"  IsReadOnly="True" VerticalContentAlignment="Center" HorizontalContentAlignment="Center"/>
+                <TextBlock Text="Z" Foreground="White"  VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="18" FontWeight="Bold" FontFamily="Bahnschrift Light" Margin="14,8"/>
+                <CheckBox Content="H" Grid.Column="1" Style="{StaticResource limit_checkbox_button}" FontFamily="Bahnschrift Light" Margin="6,4,2,4"/>
+                <CheckBox Content="(-)" FontSize="16"  Grid.Column="2" Style="{StaticResource limit_checkbox_button}" FontFamily="Bahnschrift Light" Margin="6,4,2,4"/>
+                <CheckBox Content="(+)" FontSize="16" Grid.Column="3" Style="{StaticResource limit_checkbox_button}" FontFamily="Bahnschrift Light" Margin="6,4,2,4"/>
+                <TextBox  Grid.Column="4"  Text="{Binding AxisPositionZ.p_posActual}" Margin="4,7" Height="24"  IsReadOnly="True" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" Grid.ColumnSpan="2"/>
             </Grid>
         </StackPanel>
     </Grid>
-    <!--<Grid Background="White">
-        <Grid>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="9*"/>
-                <ColumnDefinition Width="1.5*"/>
-            </Grid.ColumnDefinitions>
-            <GroupBox Header="Stage">
-                <Canvas Background="{StaticResource ControlBackGround}">
-                    <Grid>
-                        <Grid.RowDefinitions>
-                            <RowDefinition/>
-                            <RowDefinition/>
-                            <RowDefinition/>
-                            <RowDefinition/>
-                            <RowDefinition/>
-                        </Grid.RowDefinitions>
-                        <Path Grid.RowSpan="5" Fill="Gray" RenderTransformOrigin="0.5,0.5">
-                            <Path.RenderTransform>
-                                <TransformGroup>
-                                    <ScaleTransform/>
-                                    <SkewTransform/>
-                                    <RotateTransform Angle="48.336"/>
-                                    <TranslateTransform/>
-                                </TransformGroup>
-                            </Path.RenderTransform>
-                            <Path.Data>
-                                <GeometryGroup>
-                                    <PathGeometry FillRule="EvenOdd">
-                                        <PathFigure StartPoint="30,-2">
-                                            <PolyLineSegment>
-                                                <PolyLineSegment.Points>
-                                                    <Point>30,-2</Point>
-                                                    <Point>50,-2</Point>
-                                                    <Point>40, -12</Point>
-                                                </PolyLineSegment.Points>
-                                            </PolyLineSegment>
-                                        </PathFigure>
-                                    </PathGeometry>
-                                    <EllipseGeometry RadiusX="40" RadiusY="40" Center="40,40"/>
-                                </GeometryGroup>
-                            </Path.Data>
-                        </Path>
-                        <Border Grid.Row="3" Width="40" Height="20" BorderBrush="Black" BorderThickness="1" Background="White" HorizontalAlignment="Center" VerticalAlignment="Center" CornerRadius="10">
-                            <TextBlock Text="Angle" FontSize="12" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                        </Border>
-                        --><!--<Line  Grid.RowSpan="5" X1="1000" Y1="100" X2="1000" Y2="800" Stroke="DarkRed"  StrokeThickness="10" Panel.ZIndex="0"></Line>
-                            <TextBlock  Grid.RowSpan="5" Text="Stage" FontSize="200" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                            <Grid Grid.Row="3">
-                                <Border Width="1000" Height="Auto" BorderThickness="3" BorderBrush="DimGray" Background="Gray" HorizontalAlignment="Center" VerticalAlignment="Center" CornerRadius="110">
-                                    <TextBlock Text="Angle" FontSize="200" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                                </Border>
-                            </Grid>--><!--
-                    </Grid>
-                </Canvas>
-            </GroupBox>
-            <GroupBox Grid.Column="1" Header="Axis Z">
-                <Canvas Background="LightGray" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-                    <Border Width="60" Height="20" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Background="Gray" Margin="5" />
-                </Canvas>
-            </GroupBox>
-        </Grid>
-
-    </Grid>-->
 </UserControl>

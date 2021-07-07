@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Controls;
 
 namespace Root_WindII
 {
@@ -20,6 +21,9 @@ namespace Root_WindII
 
     public class MapFileListViewer_ViewModel : ObservableObject
     {
+        #region [Event]
+        public event SelectedCellsChangedHandler SelectedCellsChanged;
+        #endregion
 
         #region [Properties]
         private ObservableCollection<MapFileListViewerItem> mapFileListViewerItems = new ObservableCollection<MapFileListViewerItem>();
@@ -51,12 +55,18 @@ namespace Root_WindII
                 Refresh();
             }
         }
-        #endregion
 
-        /*public MapFIleListViewer_ViewModel()
+        private object selectedItem;
+        public object SelectedItem
         {
+            get => selectedItem;
+            set
+            {
 
-        }*/
+                SetProperty(ref selectedItem, value);
+            }
+        }
+        #endregion
 
         public void Refresh()
         {
@@ -78,15 +88,30 @@ namespace Root_WindII
             }
         }
 
-
         #region [Command]
-        //public ICommand LoadedCommand
-        //{
-        //    get => new RelayCommand(() =>
-        //    {
-        //        Refresh();
-        //    });
-        //}
+        public ICommand LoadedCommand
+        {
+            get => new RelayCommand(() =>
+            {
+                Refresh();
+            });
+        }
+
+        public ICommand SelectedCellsChangedCommand
+        {
+            get => new RelayCommand(() =>
+            {
+                try
+                {
+                    if (SelectedCellsChanged != null)
+                        SelectedCellsChanged(selectedItem);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message);
+                }
+            });
+        }
         #endregion
     }
 }
