@@ -582,7 +582,7 @@ namespace RootTools.Camera.Matrox
                 }
             }
             p_CamInfo.p_eState = eCamState.Ready;
-            userObjectHandle.Free();
+            //userObjectHandle.Free();
         }
 
         void GrabEvent()
