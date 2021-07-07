@@ -217,7 +217,7 @@ namespace Root_CAMELLIA
             }
         }
 
-        Dlg_ManualJob_ViewModel manualJob_ViewModel { get; set; }
+        Dlg_ManualJob_ViewModel manualJob_ViewModel;
         DialogService dialogService;
         #endregion
 
@@ -241,11 +241,17 @@ namespace Root_CAMELLIA
 
             manualJob_ViewModel = main.ManualJobViewModel;
             dialogService = main.dialogService;
+
+            m_handler.OnRnRDone += RnRDone;
         }
 
         #region Event
 
-       public void StateChange(object sender, EventArgs e)
+        public void RnRDone()
+        {
+
+        }
+        public void StateChange(object sender, EventArgs e)
         {
             if (EQ.p_eState != EQ.eState.ModuleRunList)
                 Application.Current.Dispatcher.Invoke(new Action(() =>
@@ -410,7 +416,7 @@ namespace Root_CAMELLIA
                             }
                             else
                             {
-                                ((CAMELLIA_Handler)App.m_engineer.ClassHandler()).p_process.MakeRnRSeq();
+                                m_handler.p_process.MakeRnRSeq();
                                 int idx = 1;
                                 ObservableCollection<DataGridWaferInfo> temp = new ObservableCollection<DataGridWaferInfo>();
 

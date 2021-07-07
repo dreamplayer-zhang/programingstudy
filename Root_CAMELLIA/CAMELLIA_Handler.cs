@@ -21,6 +21,13 @@ namespace Root_CAMELLIA
 {
     public class CAMELLIA_Handler : NotifyProperty, IHandler
     {
+        public delegate void EventHandler();
+        public event EventHandler OnRnRDone;
+        void DoneEvent()
+        {
+            if (OnRnRDone != null)
+                OnRnRDone();
+        }
         public ModuleList p_moduleList
         {
             get; set;
@@ -566,14 +573,14 @@ namespace Root_CAMELLIA
 
                             if ((EQ.p_nRnR > 1) && (p_process.p_qSequence.Count == 0))
                             {
-                                //while (m_aLoadport[EQ.p_nRunLP].p_infoCarrier.p_eState != InfoCarrier.eState.Placed) Thread.Sleep(10);
-                                //Thread.Sleep(1000);
-                                //p_process.p_sInfo = p_process.AddInfoWafer(m_infoRnRSlot);
-                                //CalcSequence();
                                 p_process.CopyRNRSeq();
-                                //m_nRnR--;
+                                DoneEvent();
                                 EQ.p_nRnR--;
                                 EQ.p_eState = EQ.eState.Run;
+                            }
+                            else if(EQ.p_nRnR == 1 && p_process.p_qSequence.Count == 0)
+                            {
+                                DoneEvent();
                             }
                         }
                         break;
