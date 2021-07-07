@@ -111,8 +111,7 @@ namespace Root_EFEM.Module.EdgesideVision
 				double moveStart = triggerDest + axisR.GetSpeedValue(Axis.eSpeed.Move).m_acc * scanSpeed;  // Y 축 이동 끝 지점
 				double moveEnd = triggerStart - axisR.GetSpeedValue(Axis.eSpeed.Move).m_acc * scanSpeed;   //y 축 이동 시작 지점
 
-                int grabCount = Convert.ToInt32((gmTop.m_nScanDegree / 360) * gmTop.m_nWaferSize_mm * pulsePerDegree * Math.PI / gmTop.m_dRealResX_um);
-				//int grabCount = Convert.ToInt32((gmTop.m_nScanDegree /360) * 300 * pulsePerDegree * Math.PI / gmTop.m_dRealResX_um);
+                int grabCount = Convert.ToInt32((gmTop.m_nScanDegree / 360) * gmTop.m_nWaferSize_mm * pulsePerDegree * Math.PI / gmTop.m_dRealResX_um); // m_nWaferSize_mm = 300
 
 				if (module.Run(axisEdgeX.StartMove(gmTop.m_nFocusX)))
 					return p_sInfo;
@@ -122,8 +121,8 @@ namespace Root_EFEM.Module.EdgesideVision
 					return p_sInfo;
 				if (module.Run(axisR.WaitReady()))
 					return p_sInfo;
-				axisR.SetTrigger(triggerStart, triggerDest, 1, true);
 
+				axisR.SetTrigger(triggerStart, triggerDest, 1, true);
 				gmTop.StartGrab(gmTop.m_memoryData, new CPoint(0, 0), grabCount, gmTop.m_GD, true);
 				gmTop.Grabed += m_gmTop_Grabed;
 				gmSide.StartGrab(gmSide.m_memoryData, new CPoint(0, 0), grabCount, gmSide.m_GD, true);

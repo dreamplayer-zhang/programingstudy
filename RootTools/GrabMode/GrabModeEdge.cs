@@ -56,6 +56,8 @@ namespace RootTools
 			m_nScanDegree = tree.Set(m_nScanDegree, m_nScanDegree, "Scan Degree", "스캔 각도", bVisible);
 			m_nFocusX = tree.Set(m_nFocusX, m_nFocusX, "Focus X Axis", "Focus X Axis", bVisible);
 			m_nFocusZ = tree.Set(m_nFocusZ, m_nFocusZ, "Focus Z Axis", "Focus Z Axis", bVisible);
+
+			//m_GD.nUserSet = tree.Set(m_GD.nUserSet, m_GD.nUserSet, "UserSet", "UserSet 1~10", bVisible);
 		}
 
 		private void RunTreeEdge(Tree tree, bool bVisible, bool bReadOnly)
