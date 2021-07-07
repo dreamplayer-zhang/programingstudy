@@ -226,6 +226,8 @@ namespace Root_Pine2.Module
         {
             if (p_infoStrip == null) return "OK";
             Boats boats = m_handler.m_aBoats[Vision2D.eVision.Bottom];
+            if (boats.IsBusy()) return "OK";
+            if (boats.p_eState != eState.Ready) return "OK";
             Boat boat = boats.m_aBoat[p_infoStrip.m_eWorks];
             try
             {
