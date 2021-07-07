@@ -28,7 +28,6 @@ namespace Root_CAMELLIA
             if (OnRnRDone != null)
                 OnRnRDone();
         }
-
         public ModuleList p_moduleList
         {
             get; set;

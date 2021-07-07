@@ -256,7 +256,7 @@ namespace Root_CAMELLIA
             }
         }
 
-        public Dlg_ManualJob_ViewModel manualJob_ViewModel { get; set; }
+        Dlg_ManualJob_ViewModel manualJob_ViewModel;
         DialogService dialogService;
         #endregion
 
@@ -471,7 +471,7 @@ namespace Root_CAMELLIA
                                     p_isRNR = false;
                                     p_totalRNR = 0;
                                 }
-                                ((CAMELLIA_Handler)App.m_engineer.ClassHandler()).p_process.MakeRnRSeq();
+                                m_handler.p_process.MakeRnRSeq();
                                 int idx = 1;
                                 ObservableCollection<DataGridWaferInfo> temp = new ObservableCollection<DataGridWaferInfo>();
 

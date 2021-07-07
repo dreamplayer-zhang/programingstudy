@@ -337,12 +337,18 @@ namespace Root_CAMELLIA
                         }
                         isVisionRecipeOpen = true;
                         
+
+
                         m_infoCarrier.StartProcess(infoWafer.p_id);
  
                         lastIdx = i;
                     }
                 }
             }
+            //foreach (CAMELLIA_Process.Sequence prc in App.m_engineer.m_handler.p_process.p_qSequence)
+            //{
+            //    string s = prc.p_moduleRun.p_id;
+            //}
             if (firstIdx == lastIdx)
                 m_infoCarrier.m_aInfoWafer[firstIdx].p_eWaferOrder = InfoWafer.eWaferOrder.FirstLastWafer;
             else
@@ -350,6 +356,8 @@ namespace Root_CAMELLIA
                 m_infoCarrier.m_aInfoWafer[firstIdx].p_eWaferOrder = InfoWafer.eWaferOrder.FirstWafer;
                 m_infoCarrier.m_aInfoWafer[lastIdx].p_eWaferOrder = InfoWafer.eWaferOrder.LastWafer;
             }
+
+
 
             m_infoCarrier.SetSelectMapData(m_infoCarrier);
             

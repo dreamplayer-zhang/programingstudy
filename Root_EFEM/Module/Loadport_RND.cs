@@ -924,9 +924,6 @@ namespace Root_EFEM.Module
                 dataformatter.AddData("MapID", m_infoCarrier.GetMapData());
                 marsLogManager.WriteFNC(EQ.p_nRunLP, m_module.p_id, "Carrier Load", SSLNet.STATUS.END, SSLNet.MATERIAL_TYPE.FOUP, dataformatter);
                 dataformatter.ClearData();
-
-                //m_module.m_ceidDocking.Send();
-                //marsLogManager.WriteLEH(EQ.p_nRunLP, m_module.p_id, SSLNet.LEH_EVENTID.CARRIER_LOAD);
                 return "OK";
             }
         }
@@ -1075,7 +1072,6 @@ namespace Root_EFEM.Module
                     m_infoCarrier.m_aInfoWafer[firstIdx].p_eWaferOrder = InfoWafer.eWaferOrder.FirstWafer;
                     m_infoCarrier.m_aInfoWafer[lastIdx].p_eWaferOrder = InfoWafer.eWaferOrder.LastWafer;
                 }
-
                 return sResult;
             }
             void CopySlotInfo(InfoWafer infoWafer, GemSlotBase gemSlot)

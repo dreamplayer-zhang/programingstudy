@@ -1739,7 +1739,7 @@ namespace Root_CAMELLIA.LibSR_Met
                     if (OutputData.Contains("Time:"))
                     {
                         filepath = string.Empty;
-                        filepath = @"C:\Camellia\Init\Timedata.txt";
+                        filepath = @"C:\Camellia2\Init\Timedata.txt";
 
                         FileInfo fi = new FileInfo(filepath);
 
@@ -1826,7 +1826,7 @@ namespace Root_CAMELLIA.LibSR_Met
                         if (OutputData.Contains("Time:"))
                         {
                             filepath = string.Empty;
-                            filepath = @"C:\Camellia\Init\Timedata.txt";
+                            filepath = @"C:\Camellia2\Init\Timedata.txt";
 
                             FileInfo fi = new FileInfo(filepath);
 
@@ -1919,7 +1919,7 @@ namespace Root_CAMELLIA.LibSR_Met
                     if (OutputData.Contains("Time:"))
                     {
                         filepath = string.Empty;
-                        filepath = @"C:\Camellia\Init\Timedata.txt";
+                        filepath = @"C:\Camellia2\Init\Timedata.txt";
 
                         FileInfo fi = new FileInfo(filepath);
 

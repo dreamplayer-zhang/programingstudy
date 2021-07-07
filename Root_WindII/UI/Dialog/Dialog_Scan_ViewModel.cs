@@ -1,4 +1,5 @@
-﻿using Root_WIND2.Module;
+﻿using Root_EFEM;
+using Root_EFEM.Module.FrontsideVision;
 using RootTools;
 using System;
 using System.Collections.Generic;
@@ -7,12 +8,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Root_WIND2
+namespace Root_WindII
 {
-    public class Dialog_PortSelect_ViewModel : ObservableObject, IDialogRequestClose
+    public class Dialog_Scan_ViewModel : ObservableObject, IDialogRequestClose
     {
         public event EventHandler<DialogCloseRequestedEventArgs> CloseRequested;
-        Vision m_Vision;
+        Vision_Frontside m_Vision;
         Run_GrabLineScan m_RunGrab;
 
         #region Property
@@ -83,10 +84,11 @@ namespace Root_WIND2
         }
         #endregion
 
-        public Dialog_PortSelect_ViewModel(Vision vision, Run_GrabLineScan grab)
+        public Dialog_Scan_ViewModel(Vision_Frontside vision, Run_GrabLineScan grab)
         {
             m_Vision = vision;
             m_RunGrab = grab;
+
             p_GrabMode = m_Vision.m_aGrabMode;
             if (p_GrabMode.Count != 0)
             {

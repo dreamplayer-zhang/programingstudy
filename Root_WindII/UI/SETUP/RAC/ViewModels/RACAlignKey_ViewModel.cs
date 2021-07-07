@@ -1,38 +1,25 @@
 ﻿using RootTools;
+using RootTools.Control;
 using RootTools.Module;
 using RootTools_Vision;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.IO;
+using System.Linq;
+using System.Runtime.InteropServices;
+using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Media;
-using System.Windows.Threading;
-using System.Data;
-using System.IO;
-using System.Windows.Input;
-using System.Collections.ObjectModel;
-using System.Windows.Shapes;
-using System.Linq;
-using RootTools.Control;
 using System.Windows.Controls;
+using System.Windows.Input;
+using Root_WindII.Engineer;
+using Root_EFEM;
+using Root_EFEM.Module;
 
 namespace Root_WindII
 {
-    public class RACAlignKey_ViewModel : ObservableObject
-    {
-        #region [Properties]
-        private RACAlignKey_ImageViewer_ViewModel imageViewerVM;
-        public RACAlignKey_ImageViewer_ViewModel ImageViewerVM
-        {
-            get => this.imageViewerVM;
-            set
-            {
-                SetProperty<RACAlignKey_ImageViewer_ViewModel>(ref this.imageViewerVM, value);
-            }
-        }
-        #endregion
-    }
-    /*public class RACAlignKey_ViewModel : ObservableObject, IPage
+    public class RACAlignKey_ViewModel : ObservableObject, IPage
     {
         #region [Properties]
         private RACAlignKey_ImageViewer_ViewModel imageViewerVM;
@@ -65,8 +52,8 @@ namespace Root_WindII
             }
         }
 
-        private Vision visionModule;
-        public Vision VisionModule
+        private Vision_Frontside visionModule;
+        public Vision_Frontside VisionModule
         {
             get => this.visionModule;
         }
@@ -137,19 +124,14 @@ namespace Root_WindII
         {
             this.imageViewerVM = new RACAlignKey_ImageViewer_ViewModel();
 
+            this.visionModule = GlobalObjects.Instance.Get<WindII_Engineer>().m_handler.p_VisionFront;
+            this.motionControllerVM = new MotionController_ViewModel(VisionModule.AxisXY.p_axisX, VisionModule.AxisXY.p_axisY, VisionModule.AxisRotate, VisionModule.AxisZ);
+            this.motionViewerVM = new MotionViewer_ViewModel(VisionModule.AxisXY.p_axisX, VisionModule.AxisXY.p_axisY, VisionModule.AxisRotate, VisionModule.AxisZ);
 
-            if (GlobalObjects.Instance.Get<WIND2_Engineer>().m_eMode == WIND2_Engineer.eMode.Vision)
+            if (visionModule.p_CamVRS != null)
             {
-                this.visionModule = GlobalObjects.Instance.Get<WIND2_Engineer>().m_handler.p_Vision;
-
-                this.motionControllerVM = new MotionController_ViewModel(VisionModule.AxisXY.p_axisX, VisionModule.AxisXY.p_axisY, VisionModule.AxisRotate, VisionModule.AxisZ);
-                this.motionViewerVM = new MotionViewer_ViewModel(VisionModule.AxisXY.p_axisX, VisionModule.AxisXY.p_axisY, VisionModule.AxisRotate, VisionModule.AxisZ);
-
-                if (visionModule.p_CamAlign != null)
-                {
-                    this.ImageViewerVM.SetImageData(visionModule.p_CamAlign.p_ImageViewer.p_ImageData);
-                    this.visionModule.p_CamAlign.Grabed += this.ImageViewerVM.OnUpdateImage;
-                }
+                this.ImageViewerVM.SetImageData(visionModule.p_CamVRS.p_ImageViewer.p_ImageData);
+                this.visionModule.p_CamVRS.Grabed += this.ImageViewerVM.OnUpdateImage;
             }
         }
 
@@ -227,27 +209,23 @@ namespace Root_WindII
             {
                 return new RelayCommand(() =>
                 {
-
-                    //if (GlobalObjects.Instance.Get<WIND2_Engineer>().m_eMode == WIND2_Engineer.eMode.Vision)
-                    //{
-                    //    if(this.ImageViewerVM.p_ImageData != null)
-                    //    {
-                    //        this.ImageViewerVM.SetImageData(visionModule.p_CamAlign.p_ImageViewer.p_ImageData);
-                    //        this.visionModule.p_CamAlign.Grabed += this.ImageViewerVM.OnUpdateImage;
-                    //    }
-                    //}
+                    if(this.ImageViewerVM.p_ImageData != null)
+                    {
+                        this.ImageViewerVM.SetImageData(visionModule.p_CamVRS.p_ImageViewer.p_ImageData);
+                        this.visionModule.p_CamVRS.Grabed += this.ImageViewerVM.OnUpdateImage;
+                    }
 
                     if (VisionModule == null) return;
 
-                    if (!VisionModule.p_CamAlign.m_ConnectDone)
+                    if (!VisionModule.p_CamVRS.m_ConnectDone)
                     {
-                        VisionModule.p_CamAlign.FunctionConnect();
+                        VisionModule.p_CamVRS.FunctionConnect();
                     }
                     else
                     {
-                        if (VisionModule.p_CamAlign.p_CamInfo._IsGrabbing == false)
+                        if (VisionModule.p_CamVRS.p_CamInfo._IsGrabbing == false)
                         {
-                            VisionModule.p_CamAlign.GrabContinuousShot();
+                            VisionModule.p_CamVRS.GrabContinuousShot();
                         }
                     }
 
@@ -260,7 +238,7 @@ namespace Root_WindII
         {
             get => new RelayCommand(() =>
             {
-                //VisionModule.p_CamAlign.StopGrab();
+                VisionModule.p_CamVRS.StopGrab();
             });
         }
 
@@ -334,12 +312,9 @@ namespace Root_WindII
                 ClearFeatureList();
             });
         }
-
-
         #endregion
 
         #region [Method]
-
         private void ClearFeatureList()
         {
             this.featureItemList.Clear();
@@ -381,5 +356,5 @@ namespace Root_WindII
             RefreshFeatureItemList();
         }
         #endregion
-    }*/
+    }
 }
