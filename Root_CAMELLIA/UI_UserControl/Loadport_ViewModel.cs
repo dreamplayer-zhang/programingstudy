@@ -204,6 +204,45 @@ namespace Root_CAMELLIA
             }
         }
 
+        bool m_isRNR = false;
+        public bool p_isRNR
+        {
+            get
+            {
+                return m_isRNR;
+            }
+            set
+            {
+                SetProperty(ref m_isRNR, value);
+            }
+        }
+
+        int m_totalRNR = 0;
+        public int p_totalRNR
+        {
+            get
+            {
+                return m_totalRNR;
+            }
+            set
+            {
+                SetProperty(ref m_totalRNR, value);
+            }
+        }
+
+        int m_currentRNR = 0;
+        public int p_currentRNR
+        {
+            get
+            {
+                return m_currentRNR;
+            }
+            set
+            {
+                SetProperty(ref m_currentRNR, value);
+            }
+        }
+
         double m_progressValue = 0;
         public double p_progressValue
         {
@@ -217,7 +256,7 @@ namespace Root_CAMELLIA
             }
         }
 
-        Dlg_ManualJob_ViewModel manualJob_ViewModel { get; set; }
+        public Dlg_ManualJob_ViewModel manualJob_ViewModel { get; set; }
         DialogService dialogService;
         #endregion
 
@@ -241,11 +280,18 @@ namespace Root_CAMELLIA
 
             manualJob_ViewModel = main.ManualJobViewModel;
             dialogService = main.dialogService;
+
+            m_handler.OnRnRDone += M_handler_OnRnRDone;
         }
 
         #region Event
 
-       public void StateChange(object sender, EventArgs e)
+        private void M_handler_OnRnRDone()
+        {
+            p_currentRNR++;
+        }
+
+        private void StateChange(object sender, EventArgs e)
         {
             if (EQ.p_eState != EQ.eState.ModuleRunList)
                 Application.Current.Dispatcher.Invoke(new Action(() =>
@@ -255,10 +301,12 @@ namespace Root_CAMELLIA
                         return;
                     }
 
-                    if (EQ.p_nRnR > 1)
+                    //p_currentRNR = m_handler.p_currentRNR;
+
+                    if (p_totalDone >= p_totalSelect)
                     {
-                        if (p_totalDone > p_totalSelect)
-                            p_totalDone = 0;
+                        p_totalDone = 0;
+                        
                     }
 
                     p_waferList[24 - ((InfoWafer)sender).m_nSlot].p_state = ((InfoWafer)sender).p_eState;
@@ -390,6 +438,7 @@ namespace Root_CAMELLIA
                     {
                         p_infoCarrier = p_loadport.p_infoCarrier;
                         p_waferList.Clear();
+                        p_isRNR = false;
                         p_CurrentRecipeID = "";
                         p_dataSelectIndex = 0;
                         p_totalSelect = 0;
@@ -410,6 +459,18 @@ namespace Root_CAMELLIA
                             }
                             else
                             {
+                                p_currentRNR = 0;
+                                p_isRNR = viewModel.p_checkRnR;
+                                if (viewModel.p_checkRnR)
+                                {
+                                    p_isRNR = true;
+                                    p_totalRNR = EQ.p_nRnR;
+                                }
+                                else
+                                {
+                                    p_isRNR = false;
+                                    p_totalRNR = 0;
+                                }
                                 ((CAMELLIA_Handler)App.m_engineer.ClassHandler()).p_process.MakeRnRSeq();
                                 int idx = 1;
                                 ObservableCollection<DataGridWaferInfo> temp = new ObservableCollection<DataGridWaferInfo>();
