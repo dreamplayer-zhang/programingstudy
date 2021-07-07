@@ -924,6 +924,7 @@ namespace Root_EFEM.Module
                 dataformatter.AddData("MapID", m_infoCarrier.GetMapData());
                 marsLogManager.WriteFNC(EQ.p_nRunLP, m_module.p_id, "Carrier Load", SSLNet.STATUS.END, SSLNet.MATERIAL_TYPE.FOUP, dataformatter);
                 dataformatter.ClearData();
+
                 //m_module.m_ceidDocking.Send();
                 //marsLogManager.WriteLEH(EQ.p_nRunLP, m_module.p_id, SSLNet.LEH_EVENTID.CARRIER_LOAD);
                 return "OK";
@@ -1062,7 +1063,7 @@ namespace Root_EFEM.Module
                         if (firstIdx == -1)
                             firstIdx = i;
 
-                        m_infoCarrier.m_aInfoWafer[i] = (InfoWafer)m_infoCarrier.m_aGemSlot[i];
+                        CopySlotInfo(m_infoCarrier.m_aInfoWafer[i], m_infoCarrier.m_aGemSlot[i]);
                         m_infoCarrier.StartProcess(m_infoCarrier.m_aGemSlot[i].p_id);
                         lastIdx = i;
                     }
@@ -1076,6 +1077,15 @@ namespace Root_EFEM.Module
                 }
 
                 return sResult;
+            }
+            void CopySlotInfo(InfoWafer infoWafer, GemSlotBase gemSlot)
+            {
+                infoWafer.p_sRecipe = gemSlot.p_sRecipe;
+                infoWafer.p_sCarrierID = gemSlot.p_sCarrierID;
+                infoWafer.p_sLocID = gemSlot.p_sLocID;
+                infoWafer.p_sLotID = gemSlot.p_sLotID;
+                infoWafer.p_eState = gemSlot.p_eState;
+                infoWafer.p_sSlotID = gemSlot.p_sSlotID;
             }
         }
         #endregion

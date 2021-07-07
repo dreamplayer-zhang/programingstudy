@@ -172,7 +172,7 @@ namespace Root_CAMELLIA.Module
                         sSlotSpectraDataPath = m_resultDataSavePath[nPathIndex] + "\\Slot." + m_module.p_infoWafer.m_nSlot + "\\SpectraData" + "\\" + nDataNum.ToString() + "_" + DateTime.Now.ToString("HHmmss");
 
                     }
-                    LibSR_Met.DataManager.GetInstance().SaveResultFileSlot(sSlotSpectraDataPath, m_module.p_infoWafer, m_DataManager.recipeDM, item.m_index);
+                    LibSR_Met.DataManager.GetInstance().SaveResultFileSlot(sSlotSpectraDataPath, m_module.p_infoWafer, m_DataManager.recipeDM, nDataIndex, item.m_index);
                     
                     //SaveRT
                     LibSR_Met.DataManager.GetInstance().SaveRT(m_historyRTDataPath + "\\" + item.m_index + "_" + DateTime.Now.ToString("HHmmss") + "RawData.csv", item.m_index);

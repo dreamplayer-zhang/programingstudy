@@ -742,7 +742,7 @@ namespace Root_CAMELLIA.LibSR_Met
                 }
                 sw.WriteLine(sHeader);
 
-                int nTHKNum = m_LayerData.Count - 1;
+                int nTHKNum = m_LayerData.Count - 2;
 
                 double dMeanGoF = 0, dMinGoF = 9999, dMaxGoF = 0, dStddevGoF = 0, d3SigmaGoF = 0;
                 List<double> StddevGoFTmp = new List<double>();
@@ -862,8 +862,6 @@ namespace Root_CAMELLIA.LibSR_Met
                 for (int n = 0; n < nPointIdx; n++)
                 {
                     if (m_RawData[n].Wavelength.Length != 0)
-                    // 수정? Save 파일에 저장되는 파장 데이터들이 350~1500nm 범위 배열인지 확인할것
-                    // 또한 저장되도록 지정된 파장 배열 범위가 350~1500nm 인지 확인할 것
                     {
                         sData = (n + 1).ToString();
                         double dThicknessSum = 0;
@@ -905,7 +903,7 @@ namespace Root_CAMELLIA.LibSR_Met
                 }
                 sw.WriteLine(sHeader);
 
-                for (int n = 0; n < m_RawData.Length; n++)
+                for (int n = 0; n < nPointIdx; n++)
                 {
                     if (m_RawData[n].Wavelength.Count() != 0)
                     {
@@ -915,7 +913,6 @@ namespace Root_CAMELLIA.LibSR_Met
                         {
                             sData += "," + m_ContourMapDataR[i].HoleData[n].Value.ToString("0.####");
                         }
-                        sw.WriteLine(sData);
                         for (int i = 0; i < m_ContourMapDataT.Count; i++)
                         {
                             sData += "," + m_ContourMapDataT[i].HoleData[n].Value.ToString("0.####");
@@ -1512,7 +1509,7 @@ namespace Root_CAMELLIA.LibSR_Met
             }
         }
 
-        public bool SaveResultFileSlot(string sPath, InfoWafer infoWafer, RecipeDataManager recipeData, int nPointIdx)
+        public bool SaveResultFileSlot(string sPath, InfoWafer infoWafer, RecipeDataManager recipeData, int nPointIdx, int nPointCount)
         {
             if (Path.GetExtension(sPath) != ".csv")
             {
@@ -1557,8 +1554,8 @@ namespace Root_CAMELLIA.LibSR_Met
                     sw.WriteLine("DATA TYPE," + "TF");
                     sw.WriteLine("RECIPE," + recipeData.TeachRecipeName);
                     // m_DataManager.recipeDM.MeasurementRD.DataSelectedPoint[m_DataManager.recipeDM.MeasurementRD.DataMeasurementRoute[index]].x
-                    sw.WriteLine("X_Position," + recipeData.MeasurementRD.DataSelectedPoint[recipeData.MeasurementRD.DataMeasurementRoute[nPointIdx]].x.ToString("F3"));
-                    sw.WriteLine("Y_Position," + recipeData.MeasurementRD.DataSelectedPoint[recipeData.MeasurementRD.DataMeasurementRoute[nPointIdx]].y.ToString("F3"));
+                    sw.WriteLine("X_Position," + recipeData.MeasurementRD.DataSelectedPoint[recipeData.MeasurementRD.DataMeasurementRoute[nPointCount]].x.ToString("F3"));
+                    sw.WriteLine("Y_Position," + recipeData.MeasurementRD.DataSelectedPoint[recipeData.MeasurementRD.DataMeasurementRoute[nPointCount]].y.ToString("F3"));
                     sw.WriteLine();
                 }
 

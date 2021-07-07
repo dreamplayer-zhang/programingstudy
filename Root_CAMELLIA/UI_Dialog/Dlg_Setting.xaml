@@ -383,7 +383,7 @@
                                                                >
                                                                 <PackIcon:PackIconBoxIcons.Style>
                                                                     <Style TargetType="PackIcon:PackIconBoxIcons">
-                                                                        <Setter Property="Foreground" Value="Black"> </Setter>
+                                                                        <Setter Property="Foreground" Value="Black"></Setter>
                                                                         <Style.Triggers>
                                                                             <Trigger Property="IsEnabled" Value="False">
                                                                                 <Setter Property="Foreground" Value="#FF8080A4"></Setter>
@@ -496,7 +496,7 @@
                 </Grid>
             </GroupBox>
             <GroupBox Grid.Row="2" Header="Setting">
-                 <Grid>
+                <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="30" />
                         <RowDefinition Height="30" />
@@ -504,13 +504,7 @@
                         <RowDefinition Height="30" />
                         <RowDefinition Height="30" />
                     </Grid.RowDefinitions>
-                    <Grid Margin="0,3" Grid.Row="1">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="1.5*" />
-                            <ColumnDefinition Width="0.6*" />
-                            <ColumnDefinition Width="2*" />
-                        </Grid.ColumnDefinitions>
-                    </Grid>
+                    
                     <Grid Margin="0,3" Grid.Row="0">
                         <Grid.RowDefinitions>
                         </Grid.RowDefinitions>
@@ -540,6 +534,26 @@
                                    VerticalAlignment="Center" />
                             <ToggleButton Grid.Column="1"  Style="{StaticResource CustomToggleButton}" IsChecked="{Binding p_UseThickness, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
                         </Grid>
+                    </Grid>
+                    <Grid Margin="0,3" Grid.Row="1">
+                        <Grid.RowDefinitions>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="1.5*"/>
+                                <ColumnDefinition Width="0.6*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="Cal DCOL Transmittance"
+                                   Margin="10,0,0,0"
+                                   Grid.Column="0"
+                                   VerticalAlignment="Center" />
+                            <ToggleButton Grid.Column="1"  Style="{StaticResource CustomToggleButton}" IsChecked="{Binding p_CalDCOLtransmittance, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        </Grid>
+                       
                     </Grid>
                 </Grid>
             </GroupBox>

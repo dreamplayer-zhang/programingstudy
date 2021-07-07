@@ -53,7 +53,7 @@ namespace Root_CAMELLIA.LibSR_Met
         public MaterialList m_MaterialListSave;
         public LayerList m_LayerListSave;
         string m_sConfigPath = string.Empty;
-
+        public bool isCalDCOLTransmittance = false;
         public bool isExceptNIR = false;
         public bool bCheckSampleCal = false;
         //double[] m_Spectrum;
@@ -1201,15 +1201,24 @@ namespace Root_CAMELLIA.LibSR_Met
                     dThickness[i] = m_SR.Thickness[nCalLayer];
                 }
                 Stopwatch sw1 = new Stopwatch();
-                sw1.Start();
-                m_Calculation.CalcTransmittance_OptimizingSi(nPointIndex, ConstValue.SI_AVG_OFFSET_RANGE, ConstValue.SI_AVG_OFFSET_STEP, nDNum, dThickness, CalTWavelenghList);
-                sw1.Stop();
-                Debug.WriteLine("Cal t >> " + sw1.ElapsedMilliseconds.ToString());
-               
                 Stopwatch sw2 = new Stopwatch();
-                sw2.Start();
-                //m_Calculation.PointCalcTransmittance_OptimizingSi(nPointIndex, ConstValue.SI_AVG_OFFSET_RANGE, ConstValue.SI_AVG_OFFSET_STEP, nDNum, dThickness, CalTWavelenghList);
-                sw2.Stop();
+                if (!isCalDCOLTransmittance)
+                {
+                    sw1.Start();
+                    m_Calculation.CalcTransmittance_OptimizingSi(nPointIndex, ConstValue.SI_AVG_OFFSET_RANGE, ConstValue.SI_AVG_OFFSET_STEP, nDNum, dThickness, CalTWavelenghList);
+                    sw1.Stop();
+                    Debug.WriteLine("Cal t >> " + sw1.ElapsedMilliseconds.ToString());
+                }
+                else
+                {
+                    
+                    sw2.Start();
+                    m_Calculation.PointCalcTransmittance_OptimizingSi(nPointIndex, ConstValue.SI_AVG_OFFSET_RANGE, ConstValue.SI_AVG_OFFSET_STEP, nDNum, dThickness, CalTWavelenghList);
+                    sw2.Stop();
+                    Debug.WriteLine("CalPoint t >> " + sw2.ElapsedMilliseconds.ToString());
+                }
+               
+                
                 Debug.WriteLine("CalPoint t >> " + sw2.ElapsedMilliseconds.ToString());
                 return true;
             }
