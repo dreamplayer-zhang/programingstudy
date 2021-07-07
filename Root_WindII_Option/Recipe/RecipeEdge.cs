@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Root_WindII
+namespace Root_WindII_Option
 {
     public class RecipeEdge : RecipeBase
     {

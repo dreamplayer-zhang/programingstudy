@@ -204,6 +204,45 @@ namespace Root_CAMELLIA
             }
         }
 
+        bool m_isRNR = false;
+        public bool p_isRNR
+        {
+            get
+            {
+                return m_isRNR;
+            }
+            set
+            {
+                SetProperty(ref m_isRNR, value);
+            }
+        }
+
+        int m_totalRNR = 0;
+        public int p_totalRNR
+        {
+            get
+            {
+                return m_totalRNR;
+            }
+            set
+            {
+                SetProperty(ref m_totalRNR, value);
+            }
+        }
+
+        int m_currentRNR = 0;
+        public int p_currentRNR
+        {
+            get
+            {
+                return m_currentRNR;
+            }
+            set
+            {
+                SetProperty(ref m_currentRNR, value);
+            }
+        }
+
         double m_progressValue = 0;
         public double p_progressValue
         {
@@ -241,27 +280,44 @@ namespace Root_CAMELLIA
 
             manualJob_ViewModel = main.ManualJobViewModel;
             dialogService = main.dialogService;
+
+            m_handler.OnRnRDone += M_handler_OnRnRDone;
         }
 
         #region Event
 
-       public void StateChange(object sender, EventArgs e)
+        private void M_handler_OnRnRDone()
         {
-            Application.Current.Dispatcher.Invoke(new Action(() =>
-            {
-                if(p_waferList.Count == 0)
-                {
-                    return;
-                }
-                p_waferList[24 - ((InfoWafer)sender).m_nSlot].p_state = ((InfoWafer)sender).p_eState;
-                if(((InfoWafer)sender).p_eState == GemSlotBase.eState.Done)
-                {
-                    p_totalDone++;
+            p_currentRNR++;
+        }
 
-                    p_progressValue = (double)p_totalDone / p_totalSelect * 100;
-                }
-                p_dataSelectIndex = 24 - ((InfoWafer)sender).m_nSlot;
-            }));
+        private void StateChange(object sender, EventArgs e)
+        {
+            if (EQ.p_eState != EQ.eState.ModuleRunList)
+                Application.Current.Dispatcher.Invoke(new Action(() =>
+                {
+                    if (p_waferList.Count == 0)
+                    {
+                        return;
+                    }
+
+                    //p_currentRNR = m_handler.p_currentRNR;
+
+                    if (p_totalDone >= p_totalSelect)
+                    {
+                        p_totalDone = 0;
+                        
+                    }
+
+                    p_waferList[24 - ((InfoWafer)sender).m_nSlot].p_state = ((InfoWafer)sender).p_eState;
+                    if (((InfoWafer)sender).p_eState == GemSlotBase.eState.Done)
+                    {
+                        p_totalDone++;
+
+                        p_progressValue = (double)p_totalDone / p_totalSelect * 100;
+                    }
+                    p_dataSelectIndex = 24 - ((InfoWafer)sender).m_nSlot;
+                }));
         }
 
         #endregion
@@ -299,7 +355,10 @@ namespace Root_CAMELLIA
                     if (EQ.p_bSimulate)
                         p_loadport.p_infoCarrier.p_eAccessLP = GemCarrierBase.eAccessLP.Manual;
                     else
+                    {
                         p_loadport.p_infoCarrier.p_eReqAccessLP = GemCarrierBase.eAccessLP.Manual;
+                        p_loadport.m_OHTsemi.m_bAuto = false;
+                    }
                 });
             }
         }
@@ -313,7 +372,10 @@ namespace Root_CAMELLIA
                     if (EQ.p_bSimulate)
                         p_loadport.p_infoCarrier.p_eAccessLP = GemCarrierBase.eAccessLP.Auto;
                     else
+                    {
                         p_loadport.p_infoCarrier.p_eReqAccessLP = GemCarrierBase.eAccessLP.Auto;
+                        p_loadport.m_OHTsemi.m_bAuto = true;
+                    }
                 });
             }
         }
@@ -376,6 +438,7 @@ namespace Root_CAMELLIA
                     {
                         p_infoCarrier = p_loadport.p_infoCarrier;
                         p_waferList.Clear();
+                        p_isRNR = false;
                         p_CurrentRecipeID = "";
                         p_dataSelectIndex = 0;
                         p_totalSelect = 0;
@@ -396,6 +459,19 @@ namespace Root_CAMELLIA
                             }
                             else
                             {
+                                p_currentRNR = 0;
+                                p_isRNR = viewModel.p_checkRnR;
+                                if (viewModel.p_checkRnR)
+                                {
+                                    p_isRNR = true;
+                                    p_totalRNR = EQ.p_nRnR;
+                                }
+                                else
+                                {
+                                    p_isRNR = false;
+                                    p_totalRNR = 0;
+                                }
+                                m_handler.p_process.MakeRnRSeq();
                                 int idx = 1;
                                 ObservableCollection<DataGridWaferInfo> temp = new ObservableCollection<DataGridWaferInfo>();
 
@@ -474,13 +550,13 @@ namespace Root_CAMELLIA
             {
                 return false;
             }
-            bool bReadyLoadport = (p_loadport.p_eState == ModuleBase.eState.Ready);
+            bool bReadyLoadport = p_loadport.p_eState == ModuleBase.eState.Ready;
             bool bReadyToLoad = true;
             if (App.m_engineer.p_bUseXGem && !p_loadport.p_infoCarrier.m_gem.p_bOffline)
-                bReadyToLoad = (p_loadport.p_infoCarrier.p_eTransfer == GemCarrierBase.eTransfer.ReadyToLoad);
+                bReadyToLoad = p_loadport.p_infoCarrier.p_eTransfer == GemCarrierBase.eTransfer.ReadyToLoad;
             
-            bool bReadyState = (p_loadport.m_qModuleRun.Count == 0);
-            bool bEQReadyState = (EQ.p_eState == EQ.eState.Ready);
+            bool bReadyState = p_loadport.m_qModuleRun.Count == 0;
+            bool bEQReadyState = EQ.p_eState == EQ.eState.Ready;
             //if (m_loadport.p_infoCarrier.p_eState != InfoCarrier.eState.Placed) return false;
             bool bPlaced = p_loadport.CheckPlaced();
             if (m_handler.IsEnableRecovery() == true) return false;
@@ -489,11 +565,11 @@ namespace Root_CAMELLIA
 
         bool IsEnableUnloadReq()
         {
-            bool bReadyLoadport = (p_loadport.p_eState == ModuleBase.eState.Ready);
+            bool bReadyLoadport = p_loadport.p_eState == ModuleBase.eState.Ready;
             bool bReadyToUnload = true;
             if (App.m_engineer.p_bUseXGem && !p_loadport.p_infoCarrier.m_gem.p_bOffline)
-                bReadyToUnload = (p_loadport.p_infoCarrier.p_eTransfer == GemCarrierBase.eTransfer.ReadyToUnload);
-            bool bAccess = (p_loadport.p_infoCarrier.p_eAccessLP == GemCarrierBase.eAccessLP.Auto);
+                bReadyToUnload = p_loadport.p_infoCarrier.p_eTransfer == GemCarrierBase.eTransfer.ReadyToUnload;
+            bool bAccess = p_loadport.p_infoCarrier.p_eAccessLP == GemCarrierBase.eAccessLP.Auto;
             bool bPlaced = p_loadport.CheckPlaced();
             return bReadyLoadport && bReadyToUnload && bAccess && bPlaced;
         }

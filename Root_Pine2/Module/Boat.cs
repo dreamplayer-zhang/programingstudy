@@ -33,11 +33,34 @@ namespace Root_Pine2.Module
             }
         }
 
+        public bool IsEnableRun()
+        {
+            return (p_eStep == eStep.Ready) && (p_infoStrip != null);
+        }
+
+        public bool IsDone()
+        {
+            return p_eStep == eStep.Done; 
+        }
+
         BackgroundWorker m_bgwRunReady = new BackgroundWorker();
         private void M_bgwRunReady_DoWork(object sender, DoWorkEventArgs e)
         {
             m_axis.StartMove(m_boats.p_ePosLoad);
             p_eStep = (m_axis.WaitReady() == "OK") ? eStep.Ready : eStep.Init;
+        }
+        #endregion
+
+        #region Camera Offset
+        public RPoint[] m_aCam2Offset = new RPoint[2] { new RPoint(), new RPoint() };
+        public RPoint[] m_aCam3Offset = new RPoint[3] { new RPoint(), new RPoint(), new RPoint() };
+        public void RunTreeCamOffset(Tree tree)
+        {
+            m_aCam2Offset[0] = tree.GetTree("2 Line").Set(m_aCam2Offset[0], m_aCam2Offset[0], "0", "Camera X Offset (um)");
+            m_aCam2Offset[1] = tree.GetTree("2 Line").Set(m_aCam2Offset[1], m_aCam2Offset[1], "1", "Camera X Offset (um)");
+            m_aCam3Offset[0] = tree.GetTree("3 Line").Set(m_aCam3Offset[0], m_aCam3Offset[0], "0", "Camera X Offset (um)");
+            m_aCam3Offset[1] = tree.GetTree("3 Line").Set(m_aCam3Offset[1], m_aCam3Offset[1], "1", "Camera X Offset (um)");
+            m_aCam3Offset[2] = tree.GetTree("3 Line").Set(m_aCam3Offset[2], m_aCam3Offset[2], "2", "Camera X Offset (um)");
         }
         #endregion
 
@@ -85,40 +108,48 @@ namespace Root_Pine2.Module
             return bWait ? m_axis.WaitReady() : "OK";
         }
 
-        public string MoveSnap(double dPosAcc)
-        {
-            m_axis.StartMove(m_axis.m_trigger.m_aPos[0] + dPosAcc);
-            return m_axis.WaitReady();
-        }
-
         double[] m_pSnap = new double[2] { 0, 0 }; 
-        void CalcSnapPos(Vision2D.Recipe.Snap snapData)
+        void CalcSnapPos(Vision2D.Recipe.Snap snapData, int yOffset)
         {
+            CalcAccDist();
             double pStart = m_axis.GetPosValue(ePos.SnapStart) + m_yScale * snapData.m_dpAxis.Y;
             double pEnd = pStart + m_yScale * m_mmSnap;
             //double pEnd = m_pSnap[0] + m_yScale * m_mmSnap;
-            m_axis.m_trigger.m_aPos[0] = pStart;
-            m_axis.m_trigger.m_aPos[1] = pEnd; 
             double dpAcc = m_yScale * m_mmAcc; 
             switch (snapData.m_eDirection)
             {
                 case Vision2D.Recipe.Snap.eDirection.Forward:
-                    m_pSnap[0] = pStart - dpAcc;
-                    m_pSnap[1] = pEnd + dpAcc;
+                    m_pSnap[0] = pStart - dpAcc + yOffset;
+                    m_pSnap[1] = pEnd + dpAcc + yOffset;
+                    m_axis.m_trigger.m_aPos[0] = pStart + yOffset;
+                    m_axis.m_trigger.m_aPos[1] = pEnd + yOffset + 100;
                     break;
                 case Vision2D.Recipe.Snap.eDirection.Backward:
-                    m_pSnap[0] = pEnd + dpAcc;
-                    m_pSnap[1] = pStart - dpAcc;
+                    m_pSnap[0] = pEnd + dpAcc + yOffset;
+                    m_pSnap[1] = pStart - dpAcc + yOffset;
+                    m_axis.m_trigger.m_aPos[0] = pStart + yOffset - 100;
+                    m_axis.m_trigger.m_aPos[1] = pEnd + yOffset;
                     break;
             }
         }
 
-        double m_yScale = 10000;
+        double m_yScale = 10000;    // upulse
         double m_mmSnap = 300;
         double m_mmAcc = 20;
-        public string RunMoveSnapStart(Vision2D.Recipe.Snap snapData, bool bWait = true)
+
+        public void CalcAccDist()
         {
-            CalcSnapPos(snapData);
+            Axis.Speed SnapSpeed = m_axis.GetSpeedValue("Snap");
+            double dVel = SnapSpeed.m_v / m_yScale;    // 최종 속도 (등속도)       [mm/s]
+            double dSec = SnapSpeed.m_acc;             // 가속하는데 걸리는 시간   [s]
+
+            double dAcc = dVel / dSec;
+            m_mmAcc = 0.5 * dAcc * dSec * dSec;         // 가속하는 거리 [mm]
+        }
+
+        public string RunMoveSnapStart(Vision2D.Recipe.Snap snapData, int yOffset, bool bWait = true)
+        {
+            CalcSnapPos(snapData, yOffset);
             m_axis.StartMove(m_pSnap[0]);
             return bWait ? m_axis.WaitReady() : "OK";
         }
@@ -127,7 +158,7 @@ namespace Root_Pine2.Module
         {
             try
             {
-                m_axis.SetTrigger(m_axis.m_trigger.m_aPos[0], m_axis.m_trigger.m_aPos[1], m_axis.m_trigger.m_dPos, true);
+                m_axis.SetTrigger(m_axis.m_trigger.m_aPos[0], m_axis.m_trigger.m_aPos[1], m_axis.m_trigger.m_dPos, 5, true);
                 //m_axis.RunTrigger(true);
                 m_axis.StartMove(m_pSnap[1], "Snap");
                 return m_axis.WaitReady();
@@ -180,28 +211,73 @@ namespace Root_Pine2.Module
         #endregion
 
         #region Recipe
-        string _sRecipe = "";
+        public string _sRecipe = "";
         public string p_sRecipe
         {
             get { return _sRecipe; }
             set
             {
-                if (_sRecipe == value) return;
+                if (_sRecipe == value) return; 
                 _sRecipe = value;
-                m_recipe.RecipeOpen(value); 
+                if(value != "")
+                    m_recipe.RecipeOpen(value); 
             }
         }
-        public Vision2D.Recipe m_recipe; 
+        public Vision2D.Recipe m_recipe;
+
+        public Vision2D.SnapInfo GetSnapInfo()
+        {
+            if(p_infoStrip == null)
+                return new Vision2D.SnapInfo(m_recipe.m_eWorks, (int)m_recipe.p_eSnapMode, "", m_recipe.p_lSnap);
+
+            return new Vision2D.SnapInfo(m_recipe.m_eWorks, (int)m_recipe.p_eSnapMode, p_infoStrip.p_id, m_recipe.p_lSnap); 
+        }
+        #endregion
+
+        #region Inspect
+        public InfoStrip p_inspectStrip { get; set; }
+        public string InspectDone(Vision2D.eVision eVision, string sStripID, string sStripResult, string sX, string sY, string sMapResult)
+        {
+            if (p_inspectStrip == null) return "InspectStrip id null";
+            if (p_inspectStrip.p_id != sStripID) return "Strip ID MisMatch";
+            string sRun = p_inspectStrip.SetResult(eVision, sStripResult, sX, sY, sMapResult); 
+            p_inspectStrip = null;
+            return sRun; 
+        }
+        #endregion
+
+        #region Works Connect
+        bool _bWorksConnect = false; 
+        public bool p_bWorksConnect
+        {
+            get { return _bWorksConnect; }
+            set
+            {
+                _bWorksConnect = value;
+                OnPropertyChanged(); 
+            }
+        }
         #endregion
 
         public void Reset(ModuleBase.eState eState)
         {
             p_infoStrip = null;
-            m_doTriggerSwitch.Write(false); 
+            p_inspectStrip = null; 
+            m_doTriggerSwitch.Write(false);
             if (eState == ModuleBase.eState.Ready) p_eStep = eStep.RunReady;
+            RunVacuum(false); 
         }
 
-        public InfoStrip p_infoStrip { get; set; }
+        InfoStrip _infoStrip = null;
+        public InfoStrip p_infoStrip 
+        { 
+            get { return _infoStrip; }
+            set
+            {
+                _infoStrip = value;
+                OnPropertyChanged(); 
+            }
+        }
         public string p_id { get; set; }
         Boats m_boats;
         public Boat(string id, Boats boats, Vision2D.eWorks eWorks)

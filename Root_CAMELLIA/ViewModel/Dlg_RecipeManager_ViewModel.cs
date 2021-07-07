@@ -749,6 +749,39 @@ namespace Root_CAMELLIA
             }
         }
 
+        private string _MeasureRepeatCount = "1";
+        public string MeasureRepeatCount
+        {
+            get
+            {
+                return _MeasureRepeatCount;
+            }
+            set
+            {
+                int val;
+                if (value == "")
+                {
+                    _MeasureRepeatCount = "1";
+                    dataManager.recipeDM.TeachingRD.MeasureRepeatCount = 0;
+                }
+                else if (int.TryParse(value, out val))
+                {
+                    if(val >= 30)
+                    {
+                        val = 30;
+                    }
+                    _MeasureRepeatCount = val.ToString();
+                    dataManager.recipeDM.TeachingRD.MeasureRepeatCount = val;
+                }
+                else
+                {
+                    _MeasureRepeatCount = dataManager.recipeDM.TeachingRD.MeasureRepeatCount.ToString();
+                }
+                SetProperty(ref _MeasureRepeatCount, value);
+                RaisePropertyChanged("MeasureRepeatCount");
+            }
+        }
+
         private float _LowerWaveLength = 350.0f;
         public float LowerWaveLength
         {
@@ -2702,7 +2735,7 @@ namespace Root_CAMELLIA
                     circleData[i].height, circleData[i].MeasurementOffsetX, circleData[i].MeasurementOffsetY);
                 circle.Transform(RatioX, RatioY);
 
-                circle.ScaleOffset(ZoomScale, OffsetX, OffsetY);
+                circle.ScaleOffset(1, 0, 0);
                 Circle c = drawGeometryManager.GetRect(circle, CenterX, CenterY);
                 dataCandidatePoint.SetData(c, (int)(circle.width), (int)(circle.height), 95);
 
@@ -2987,7 +3020,7 @@ namespace Root_CAMELLIA
         {
             NIRIntegrationTime = dataManager.recipeDM.TeachingRD.NIRIntegrationTime.ToString();
             VISIntegrationTime = dataManager.recipeDM.TeachingRD.VISIntegrationTime.ToString();
-
+            MeasureRepeatCount = dataManager.recipeDM.TeachingRD.MeasureRepeatCount.ToString();
             p_UseThickness = dataManager.recipeDM.TeachingRD.UseThickness;
             p_UseTransmittance = dataManager.recipeDM.TeachingRD.UseTransmittance;
 
@@ -3111,7 +3144,7 @@ namespace Root_CAMELLIA
                 CCircle circle = new CCircle(data[i].x, data[i].y, data[i].width,
                     data[i].height, data[i].MeasurementOffsetX, data[i].MeasurementOffsetY);
                 circle.Transform(RatioX, RatioY);
-                circle.ScaleOffset(ZoomScale, OffsetX, OffsetY);
+                circle.ScaleOffset(1, 0, 0);
 
                 Circle c = drawGeometryManager.GetRect(circle, CenterX, CenterY);
                 dataSelectedPoint.SetData(c, (int)(circle.width), (int)(circle.height), 96, true);
@@ -4223,19 +4256,16 @@ namespace Root_CAMELLIA
                 PointAddMode = "Normal";
             }
 
-
             if (p_isCustomize)
             {
+                p_isCustomize = false;
+                CheckSelectPoint();
                 m_customizeRD.Clone(dataManager.recipeDM.TeachingRD);
                 //dataManager.recipeDM.TeachingRD.test(
                 p_TabIndex = 0;
                 InitCandidatePoint(dataManager.recipeDM.TeachingRD);
                 UpdateView();
-                CheckSelectPoint();
-                p_isCustomize = false;
             }
-          
-
         }
 
         public void UpdateGridCombo(bool isSave = true)

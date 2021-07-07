@@ -82,12 +82,13 @@ namespace Root_EFEM.Module.BacksideVision
             int nCamWidth = m_MaingrabMode.m_camera.GetRoiSize().X;
             int nCamHeight = m_MaingrabMode.m_camera.GetRoiSize().Y;
             m_MaingrabMode.m_dTrigger = Convert.ToInt32(10 * m_MaingrabMode.m_dTargetResY_um);  // 1pulse = 0.1um -> 10pulse = 1um
-            double dXScale = m_MaingrabMode.m_dTargetResX_um * 10; //resolution to pulse
+            
+            double dXScale = m_MaingrabMode.m_dRealResX_um * 10; //resolution to pulse
             int nWaferSizeY_px = Convert.ToInt32(m_MaingrabMode.m_nWaferSize_mm * nMMPerUM / m_MaingrabMode.m_dTargetResY_um);  // 웨이퍼 영역의 Y픽셀 갯수
             int nTotalTriggerCount = Convert.ToInt32(m_MaingrabMode.m_dTrigger * nWaferSizeY_px);   // 스캔영역 중 웨이퍼 스캔 구간의 Trigger pulse
             int nScanSpeed = Convert.ToInt32((double)m_MaingrabMode.m_nMaxFrame * m_MaingrabMode.m_dTrigger * nCamHeight * m_MaingrabMode.m_nScanRate / 100);
-            int nScanOffset_pulse = 40000;
-
+            int nScanOffset_pulse = 40000;// (int)((double)nScanSpeed * axisXY.p_axisY.GetSpeedValue(Axis.eSpeed.Move).m_acc * 0.5) * 2; // Old 40000
+            
             string strPool = m_MaingrabMode.m_memoryPool.p_id;
             string strGroup = m_MaingrabMode.m_memoryGroup.p_id;
             string strMemory = m_MaingrabMode.m_memoryData.p_id;
@@ -183,7 +184,6 @@ namespace Root_EFEM.Module.BacksideVision
             {
                 m_MaingrabMode.SetLight(false);
             }
-
         }
 
         private void GrabMode_Grabed(object sender, EventArgs e)

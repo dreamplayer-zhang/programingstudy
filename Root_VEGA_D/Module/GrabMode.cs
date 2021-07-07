@@ -261,6 +261,8 @@ namespace Root_VEGA_D.Module
         public int m_nBottomCenterY = 0;
         public string p_sTopTemplateFile = "";
         public string p_sBottomTemplateFile = "";
+        public CPoint m_ptBotAlignMarkerOffset = new CPoint();
+        public bool m_bUseFindEdge = true;
 
         void RunTreeAlign(Tree tree, bool bVisible, bool bReadOnly)
         {
@@ -270,6 +272,8 @@ namespace Root_VEGA_D.Module
             m_nCenterX = tree.Set(m_nCenterX, m_nCenterX, "Center X", "Template Matching Search Target Center X", bVisible);
             m_nTopCenterY = tree.Set(m_nTopCenterY, m_nTopCenterY, "Top Center Y", "Template Matching Search Target Top Center Y", bVisible);
             m_nBottomCenterY = tree.Set(m_nBottomCenterY, m_nBottomCenterY, "Bottom Center Y", "Template Matching Search Target Bottom Center Y", bVisible);
+            m_ptBotAlignMarkerOffset = tree.Set(m_ptBotAlignMarkerOffset, m_ptBotAlignMarkerOffset, "Offset", "Offset from left bottom position", bVisible);
+            m_bUseFindEdge = tree.Set(m_bUseFindEdge, m_bUseFindEdge, "Use FindEdge", "Use FindEdge function", bVisible);
 
             p_sTopTemplateFile = tree.SetFile(p_sTopTemplateFile, p_sTopTemplateFile, "bmp", "Top File", "TopTemplate File");
             p_sBottomTemplateFile = tree.SetFile(p_sBottomTemplateFile, p_sBottomTemplateFile, "bmp", "Bottom File", "BottomTemplate File");

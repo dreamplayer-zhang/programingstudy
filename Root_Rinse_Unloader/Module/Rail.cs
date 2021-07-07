@@ -32,11 +32,13 @@ namespace Root_Rinse_Unloader.Module
 
         #region GAF
         ALID m_alidArrived;
-        ALID m_alidPusher; 
+        ALID m_alidPusher;
+        ALID m_alidAxis;
         void InitALID()
         {
             m_alidArrived = m_gaf.GetALID(this, "Arrived", "Arrived Sensor Timeout");
             m_alidPusher = m_gaf.GetALID(this, "Pusher", "Pusher Error");
+            m_alidAxis = m_gaf.GetALID(this, "Rotate Axis Alarm", "Rotate Axis Alarm");
         }
         #endregion
 
@@ -111,6 +113,18 @@ namespace Root_Rinse_Unloader.Module
         {
             for (int n = 0; n < 4; n++) m_aLine.Add(new Line("Line" + n.ToString(), this));
         }
+
+        public bool IsStripExist()
+        {
+            foreach (Line line in m_aLine)
+            {
+                for (int n = 0; n < 3; n++)
+                {
+                    if (line.m_diCheck[n].p_bIn) return true; 
+                }
+            }
+            return false; 
+        }
         #endregion
 
         #region Width
@@ -140,6 +154,7 @@ namespace Root_Rinse_Unloader.Module
 
         public string RunRotate(bool bRotate)
         {
+            m_alidAxis.p_bSet = m_axisRotate.p_sensorAlarm;
             if (bRotate) m_axisRotate.Jog(m_rinse.p_fRotateSpeed, "Move");
             else m_axisRotate.StopAxis(); 
             return "OK";
@@ -319,6 +334,15 @@ namespace Root_Rinse_Unloader.Module
                 }
             }
             return true;
+        }
+
+        public bool IsArriveOn()
+        {
+            foreach (Line line in m_aLine)
+            {
+                if (line.m_diCheck[2].p_bIn) return true; 
+            }
+            return false; 
         }
 
         bool IsReadyPush()

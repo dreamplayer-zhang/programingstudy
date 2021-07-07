@@ -46,8 +46,8 @@ namespace Root_Pine2.Module
             }
             else
             {
-                gridUp.Background = m_magazineEV.m_elevator.m_bProduct[InfoStrip.eMagazinePos.Up] ? Brushes.AliceBlue : Brushes.Beige;
-                gridDown.Background = m_magazineEV.m_elevator.m_bProduct[InfoStrip.eMagazinePos.Down] ? Brushes.AliceBlue : Brushes.Beige;
+                gridUp.Background = m_magazineEV.m_elevator.m_bProduct[InfoStrip.eMagazinePos.Up] ? Brushes.LightBlue : Brushes.Beige;
+                gridDown.Background = m_magazineEV.m_elevator.m_bProduct[InfoStrip.eMagazinePos.Down] ? Brushes.LightBlue : Brushes.Beige;
             }
         }
 
@@ -73,6 +73,15 @@ namespace Root_Pine2.Module
             if (EQ.p_eState == EQ.eState.Run) return;
             if (m_magazineEV.m_elevator.m_bProduct[InfoStrip.eMagazinePos.Down] == false) return;
             m_magazineEV.StartUnload();
+        }
+
+        private void gridInfo_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            switch (m_magazineEV.p_eState)
+            {
+                case ModuleBase.eState.Init: m_magazineEV.p_eState = ModuleBase.eState.Home; break;
+                case ModuleBase.eState.Error: m_magazineEV.Reset(); break;
+            }
         }
     }
 }

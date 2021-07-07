@@ -1,4 +1,5 @@
-﻿using RootTools;
+﻿using Root_Pine2.Engineer;
+using RootTools;
 using RootTools.Control;
 using RootTools.Module;
 using RootTools.ToolBoxs;
@@ -59,6 +60,7 @@ namespace Root_Pine2.Module
 
             public string RunMoveReady(bool bWait = true)
             {
+                if ((m_axis[0].p_posCommand == m_axis[0].GetPosValue(c_sReady)) && (m_axis[1].p_posCommand == m_axis[1].GetPosValue(c_sReady))) return "OK";
                 m_axis[0].StartMove(c_sReady);
                 m_axis[1].StartMove(c_sReady);
                 if (bWait == false) return "OK";
@@ -105,6 +107,13 @@ namespace Root_Pine2.Module
                 }
                 finally { dioPusher.Write(false); }
             }
+
+            public bool IsPusherOff()
+            {
+                if (m_dioPusher[0].m_aBitDI[0].p_bOn == false) return false;
+                if (m_dioPusher[1].m_aBitDI[0].p_bOn == false) return false;
+                return true; 
+            }
             #endregion
         }
         LoaderPusher m_loaderPusher = new LoaderPusher();
@@ -133,9 +142,9 @@ namespace Root_Pine2.Module
 
             #region Axis
             double m_dxPulse = 0;
-            public double m_dZ = 0;
             public InfoStrip.eMagazine m_ePosDst = InfoStrip.eMagazine.Magazine0;
-            public string RunMove(InfoStrip.eMagazine ePos, bool bPushPos, bool bWait = true)
+            public double m_xOffset = 0; 
+            public string RunMove(InfoStrip.eMagazine ePos, double xOffset, bool bPushPos, bool bWait = true)
             {
                 if (m_transfer.m_pusher.p_bLock) return "Lock by Sorter Picker";
                 if (m_transfer.m_gripper.p_bLock) return "Lock by Loader Picker";
@@ -143,7 +152,10 @@ namespace Root_Pine2.Module
                 m_transfer.m_gripper.p_bEnable = false; 
                 m_ePosDst = ePos;
                 double dPos = 1000 * (m_transfer.m_pine2.m_widthDefaultStrip - m_transfer.m_pine2.p_widthStrip) / 2;
-                m_axis.StartMove(ePos, (bPushPos ? 0 : m_dxPulse) + dPos); 
+                m_xOffset = (bPushPos ? m_dxPulse : 0) + dPos + xOffset;
+                foreach (MagazineEV magazineEV in m_transfer.m_magazineEV.m_aEV.Values) magazineEV.m_conveyor.m_bInv = false;
+                m_transfer.m_magazineEV.m_aEV[ePos].m_conveyor.m_bInv = true; 
+                m_axis.StartMove(ePos, m_xOffset); 
                 return bWait ? m_axis.WaitReady() : "OK";
             }
             #endregion
@@ -172,7 +184,6 @@ namespace Root_Pine2.Module
             public void RunTree(Tree tree)
             {
                 m_dxPulse = tree.Set(m_dxPulse, m_dxPulse, "dPulse", "Distance between Buffer (pulse)");
-                m_dZ = tree.Set(m_dZ, m_dZ, "dZ", "Distance between Buffer (pulse)");
             }
 
             Transfer m_transfer; 
@@ -299,7 +310,7 @@ namespace Root_Pine2.Module
         #region Pusher
         public class Pusher : NotifyProperty
         {
-            DIO_I2O m_dioPusher;
+            public DIO_I2O m_dioPusher;
             DIO_I m_diOverload;
             DIO_Is m_diCheck;
             public void GetTools(ToolBox toolBox, Transfer module, bool bInit)
@@ -402,9 +413,11 @@ namespace Root_Pine2.Module
                 Thread.Sleep(2000);
                 return m_pusher.WaitUnlock();
             }
-            if (Run(m_buffer.RunMove(infoStrip.p_eMagazine, false, false))) return p_sInfo;
-            if (Run(m_magazineEV.RunMove(infoStrip, 0))) return p_sInfo;
-            if (Run(m_buffer.RunMove(infoStrip.p_eMagazine, false, true))) return p_sInfo;
+            double xOffset = m_magazineEV.CalcXOffset(infoStrip);
+            if (Run(m_loaderPusher.RunMove(infoStrip.p_eMagazine, false))) return p_sInfo; 
+            if (Run(m_buffer.RunMove(infoStrip.p_eMagazine, xOffset, false, false))) return p_sInfo;
+            if (Run(m_magazineEV.RunMove(infoStrip))) return p_sInfo;
+            if (Run(m_buffer.RunMove(infoStrip.p_eMagazine, xOffset, false, true))) return p_sInfo;
             m_pusher.p_bEnable = (m_pusher.p_infoStrip == null);
             try
             {
@@ -450,14 +463,27 @@ namespace Root_Pine2.Module
         {
             InfoStrip infoStrip = m_pusher.p_infoStrip; 
             if (infoStrip == null) return "OK";
-            if (Run(m_buffer.RunMove(infoStrip.p_eMagazine, true, false))) return p_sInfo;
-            if (Run(m_magazineEV.RunMove(infoStrip, m_buffer.m_dZ))) return p_sInfo;
-            if (Run(m_buffer.RunMove(infoStrip.p_eMagazine, true, true))) return p_sInfo;
+            double xOffset = m_magazineEV.CalcXOffset(infoStrip);
+            if (Run(m_buffer.RunMove(infoStrip.p_eMagazine, xOffset, true, false))) return p_sInfo;
+            if (Run(m_magazineEV.RunMove(infoStrip))) return p_sInfo;
+            if (Run(m_buffer.RunMove(infoStrip.p_eMagazine, xOffset, true, true))) return p_sInfo;
             m_gripper.p_bEnable = (m_gripper.p_infoStrip != null);
             if (Run(m_pusher.RunPusher())) return p_sInfo;
+            ((Pine2_Handler)m_engineer.ClassHandler()).SendSortInfo(infoStrip); 
             m_magazineEV.PutInfoStrip(infoStrip);
-            m_pusher.p_infoStrip = null; 
-            return m_gripper.WaitUnlock(); 
+            m_pusher.p_infoStrip = null;
+            if (Run(m_gripper.WaitUnlock())) return p_sInfo; 
+            m_engineer.ClassHandler().CheckFinish();
+            return "OK"; 
+        }
+        #endregion
+
+        #region Pusher Safe
+        public bool IsPusherOff()
+        {
+            if (m_loaderPusher.IsPusherOff() == false) return false;
+            if (m_pusher.m_dioPusher.m_aBitDI[0].p_bOn == false) return false; 
+            return true; 
         }
         #endregion
 
@@ -484,6 +510,11 @@ namespace Root_Pine2.Module
             {
                 p_eState = eState.Ready;
                 return "OK";
+            }
+            if (m_gripper.IsExist() || m_pusher.IsExist())
+            {
+                p_eState = eState.Init;
+                return "Check Strip Sensor";
             }
             p_sInfo = base.StateHome();
             p_eState = (p_sInfo == "OK") ? eState.Ready : eState.Error;
@@ -534,6 +565,7 @@ namespace Root_Pine2.Module
         {
             AddModuleRunList(new Run_ChangeWidth(this), false, "Run Change Width");
             AddModuleRunList(new Run_LoaderPusher(this), false, "Run Load Pusher");
+            AddModuleRunList(new Run_MoveTranfer(this), false, "Run MoveTray");
             AddModuleRunList(new Run_Grip(this), false, "Run Grip Strip");
             AddModuleRunList(new Run_Pusher(this), false, "Run Push Strip");
             m_runLoad = AddModuleRunList(new Run_RunLoad(this), false, "Run Load to Transfer");
@@ -598,6 +630,38 @@ namespace Root_Pine2.Module
             {
                 if (m_bPush) return m_module.m_loaderPusher.RunPusher(m_eMagazine);
                 else return m_module.m_loaderPusher.RunMove(m_eMagazine); 
+            }
+        }
+
+        public class Run_MoveTranfer : ModuleRunBase
+        {
+            Transfer m_module;
+            public Run_MoveTranfer(Transfer module)
+            {
+                m_module = module;
+                InitModuleRun(module);
+            }
+
+            InfoStrip.eMagazine m_eMagazine = InfoStrip.eMagazine.Magazine0;
+            bool m_bPushPos = false;
+            public override ModuleRunBase Clone()
+            {
+                Run_MoveTranfer run = new Run_MoveTranfer(m_module);
+                run.m_eMagazine = m_eMagazine;
+                run.m_bPushPos = m_bPushPos;
+                return run;
+            }
+
+            public override void RunTree(Tree tree, bool bVisible, bool bRecipe = false)
+            {
+                m_eMagazine = (InfoStrip.eMagazine)tree.Set(m_eMagazine, m_eMagazine, "MagazineEV", "MagazineEV", bVisible);
+                m_bPushPos = tree.Set(m_bPushPos, m_bPushPos, "Pusher Pos", "Pusher Position", bVisible);
+            }
+
+            public override string Run()
+            {
+                double xOffset = m_module.m_magazineEV.m_aEV[m_eMagazine].CalcXOffset(); 
+                return m_module.m_buffer.RunMove(m_eMagazine, xOffset, m_bPushPos);
             }
         }
 

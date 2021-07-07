@@ -131,13 +131,17 @@ namespace RootTools_Vision
 
                     if(mapData != null)
                     {
-                        if(mapData[y * sizeY + x] == 0)
+                        if(mapData[y * sizeX + x] == (int)CHIP_TYPE.NO_CHIP)
                         {
                             rect.Fill = Brushes.DimGray;
                         }
-                        else
+                        else if (mapData[y * sizeX + x] == (int)CHIP_TYPE.NORMAL)
                         {
                             rect.Fill = Brushes.YellowGreen;
+                        }
+                        else if (mapData[y * sizeX + x] == (int)CHIP_TYPE.EXTRA)
+                        {
+                            rect.Fill = Brushes.Yellow;
                         }
                     }
                     else

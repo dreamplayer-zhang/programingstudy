@@ -10,6 +10,7 @@ using RootTools.Light;
 using RootTools.Memory;
 using RootTools.Module;
 using RootTools.Trees;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Threading;
@@ -45,6 +46,7 @@ namespace Root_EFEM.Module
 		Camera_Dalsa camEdgeSide;
 		Camera_Dalsa camEdgeBtm;
 		Camera_Matrox camEBR;
+
 		ALID alid_WaferExist;
 
 		#region Getter/Setter
@@ -93,10 +95,6 @@ namespace Root_EFEM.Module
 		}
 		#endregion
 
-
-		
-
-
 		#region GrabMode
 		int m_lGrabMode = 0;
 		public ObservableCollection<GrabModeEdge> m_aGrabMode = new ObservableCollection<GrabModeEdge>();
@@ -118,6 +116,15 @@ namespace Root_EFEM.Module
 			{
 				if (sGrabMode == grabMode.p_sName)
 					return grabMode;
+			}
+			return null;
+		}
+
+		public GrabModeEdge GetGrabMode(int index)
+		{
+			if (m_aGrabMode?.Count > 0 && (m_aGrabMode.Count - 1 >= index))
+			{
+				return m_aGrabMode[index];
 			}
 			return null;
 		}
@@ -184,15 +191,15 @@ namespace Root_EFEM.Module
 
 		public override void InitMemorys()
 		{
-			int nImageX = 1000; //camEdgeTop.GetRoiSize().X;
-			int nImageY = 1000; //(int)(pulse360 * edgeCamTriggerRatio + margin);
+			int nImageX = 1000;
+			int nImageY = 1000;
 			memoryGroup = memoryPool.GetGroup(p_id);
 			memoryEdgeTop = memoryPool.GetGroup(p_id).CreateMemory(EDGE_TYPE.EdgeTop.ToString(), 3, 1, nImageX, nImageY);
 			memoryEdgeSide = memoryPool.GetGroup(p_id).CreateMemory(EDGE_TYPE.EdgeSide.ToString(), 3, 1, nImageX, nImageY);
 			memoryEdgeBtm = memoryPool.GetGroup(p_id).CreateMemory(EDGE_TYPE.EdgeBottom.ToString(), 3, 1, nImageX, nImageY);
 
-			int ebrImageX = 1000; //camEBR.GetRoiSize().X;
-			int ebrImageY = 1000; //(int)(pulse360 * ebrCamTriggerRatio + margin);
+			int ebrImageX = 1000;
+			int ebrImageY = 1000;
 			memoryEBR = memoryPool.GetGroup(p_id).CreateMemory(EDGE_TYPE.EBR.ToString(), 1, 1, ebrImageX, ebrImageY);
 		}
 		#endregion
@@ -203,6 +210,16 @@ namespace Root_EFEM.Module
 		void RunTreeAxis(Tree tree)
 		{
 			pulseRound = tree.Set(pulseRound, pulseRound, "Rotate Pulse / Round", "Rotate Axis Pulse / 1 Round (pulse)");
+		}
+
+		public enum eAxisPosEdge
+		{
+			Ready,
+		}
+
+		void InitPosAxis()
+		{
+			AxisRotate.AddPos(Enum.GetNames(typeof(eAxisPosEdge)));
 		}
 		#endregion
 
@@ -346,6 +363,7 @@ namespace Root_EFEM.Module
 			Sensor
 		}
 		eCheckWafer m_eCheckWafer = eCheckWafer.InfoWafer;
+
 		public bool IsWaferExist(int nID)
 		{
 			switch (m_eCheckWafer)
@@ -397,9 +415,9 @@ namespace Root_EFEM.Module
 				camEdgeSide.Connect();
 			if (camEdgeBtm != null && camEdgeBtm.p_CamInfo.p_eState == RootTools.Camera.Dalsa.eCamState.Init)
 				camEdgeBtm.Connect();
-			if (camEBR != null && camEBR.p_CamInfo.p_eState == RootTools.Camera.Matrox.eCamState.Init)
-				camEBR.Connect();
-			return "OK";
+            if (camEBR != null && camEBR.p_CamInfo.p_eState == RootTools.Camera.Matrox.eCamState.Init)
+                camEBR.Connect();
+            return "OK";
 		}
 
 		public override string StateHome()
@@ -410,11 +428,10 @@ namespace Root_EFEM.Module
 			if (p_eRemote == eRemote.Client) return RemoteRun(eRemoteRun.StateHome, eRemote.Client, null);
 			else
 			{
+                OpenCamera();
+                p_bStageVac = true;
 
-			//OpenCamera();
-			p_bStageVac = true;
-
-				axisEdgeX.StartHome();
+                axisEdgeX.StartHome();
 				axisEbrX.StartHome();
 				axisEbrZ.StartHome();
 				if (axisEdgeX.WaitReady() != "OK")

@@ -225,6 +225,9 @@ namespace RootTools.Control.Ajin
             if (useLimit)
             {
                 CAXM.AxmSignalSetSoftLimit(m_nAxis, Convert.ToUInt32(!useLimit), 0, 1, m_aPos[p_asPos[3]], m_aPos[p_asPos[2]]);
+
+                uint a = 0, b = 0;
+                CAXM.AxmSignalReadSoftLimit(m_nAxis, ref a, ref b);
             }
           
             p_sInfo = base.StartHome();
@@ -237,13 +240,6 @@ namespace RootTools.Control.Ajin
             p_eState = eState.Home;
             Thread.Sleep(10);
 
-            uint use = Convert.ToUInt32(useLimit);
-            CAXM.AxmSignalSetSoftLimit(m_nAxis, use, 0, 1, m_aPos[p_asPos[3]], m_aPos[p_asPos[2]]);
-
-            if (useLimit)
-            {
-                CAXM.AxmSignalSetSoftLimit(m_nAxis, Convert.ToUInt32(useLimit), 0, 1, m_aPos[p_asPos[3]], m_aPos[p_asPos[2]]);
-            }
             return "OK";
         }
 
@@ -571,7 +567,7 @@ namespace RootTools.Control.Ajin
             Thread.Sleep(2000);
             while (m_bThread)
             {
-                Thread.Sleep(100);
+                Thread.Sleep(10);
                 switch (p_eState)
                 {
                     case eState.Home:
@@ -590,6 +586,16 @@ namespace RootTools.Control.Ajin
                             if (nStat == 1)
                             {
                                 p_sInfo = p_id + " -> Home Finished " + (m_swMove.ElapsedMilliseconds / 1000).ToString("0.0 sec");
+
+                                if (m_bSWBoardLimit)
+                                {
+                                    CAXM.AxmSignalSetSoftLimit(m_nAxis, Convert.ToUInt32(m_bSWBoardLimit), 0, 1, m_aPos[p_asPos[3]], m_aPos[p_asPos[2]]);
+
+                                    uint a = 0, b = 0;
+                                    CAXM.AxmSignalReadSoftLimit(m_nAxis, ref a, ref b);
+
+                                }
+
                                 p_eState = eState.Ready;
                             }
                         }
@@ -789,6 +795,14 @@ namespace RootTools.Control.Ajin
         public override void RunTreePos(Tree tree, string sUnit)
         {
             base.RunTreePos(tree, sUnit);
+
+            bool useLimit = m_bSWBoardLimit;
+            uint use = Convert.ToUInt32(useLimit);
+            uint res = CAXM.AxmSignalSetSoftLimit(m_nAxis, use, 0, 1, m_aPos[p_asPos[3]], m_aPos[p_asPos[2]]);
+
+            uint a = 0, b = 0;
+            CAXM.AxmSignalReadSoftLimit(m_nAxis, ref a, ref b);
+
         }
 
         public override void RunTreeSetting(Tree.eMode mode)

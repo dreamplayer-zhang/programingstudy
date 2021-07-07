@@ -245,8 +245,7 @@ namespace Root_CAMELLIA
             App.m_engineer.m_login.OnChangeUser += ChangeUser;
 
             //((XGem)p_XGem).p_eComm;
-            p_XGem = (XGem)App.m_engineer.ClassGem();
-
+            p_XGem = (XGem_New)App.m_engineer.ClassGem();
             MarsLogManager instance = MarsLogManager.Instance;
             instance.m_useLog = true;
         }
@@ -282,8 +281,8 @@ namespace Root_CAMELLIA
             p_curUserLevel = App.m_engineer.m_login.p_eLevel;
         }
 
-        XGem m_XGem;
-        public XGem p_XGem
+        XGem_New m_XGem;
+        public XGem_New p_XGem
         {
             get
             {
@@ -1104,7 +1103,7 @@ namespace Root_CAMELLIA
             {
                 return new RelayCommand(() =>
                 {
-                    if (m_XGem != null && m_XGem.p_eComm == XGem.eCommunicate.COMMUNICATING)
+                    if (m_XGem != null && m_XGem.p_eComm == XGem_New.eCommunicate.COMMUNICATING)
                         m_XGem.p_eReqControl = XGem.eControl.OFFLINE;
                     else
                         CustomMessageBox.Show("Error", "Comm State is Not Communicating", MessageBoxButton.OK, CustomMessageBox.MessageBoxImage.Error); 
@@ -1118,7 +1117,7 @@ namespace Root_CAMELLIA
             {
                 return new RelayCommand(() =>
                 {
-                    if (m_XGem != null && m_XGem.p_eComm == XGem.eCommunicate.COMMUNICATING)
+                    if (m_XGem != null && m_XGem.p_eComm == XGem_New.eCommunicate.COMMUNICATING)
                         m_XGem.p_eReqControl = XGem.eControl.ONLINEREMOTE;
                     else
                         CustomMessageBox.Show("Error", "Comm State is Not Communicating", MessageBoxButton.OK, CustomMessageBox.MessageBoxImage.Error);
@@ -1132,7 +1131,7 @@ namespace Root_CAMELLIA
             {
                 return new RelayCommand(() =>
                 {
-                    if(m_XGem != null && m_XGem.p_eComm == XGem.eCommunicate.COMMUNICATING)
+                    if(m_XGem != null && m_XGem.p_eComm == XGem_New.eCommunicate.COMMUNICATING)
                         m_XGem.p_eReqControl = XGem.eControl.LOCAL;
                     else
                         CustomMessageBox.Show("Error", "Comm State is Not Communicating", MessageBoxButton.OK, CustomMessageBox.MessageBoxImage.Error);

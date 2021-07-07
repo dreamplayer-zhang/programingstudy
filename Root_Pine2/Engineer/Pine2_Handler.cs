@@ -6,6 +6,8 @@ using RootTools.Gem;
 using RootTools.Module;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.IO;
 using System.Threading;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -28,22 +30,88 @@ namespace Root_Pine2.Engineer
         }
         #endregion
 
+        #region Lot
+        public void NewLot()
+        {
+            m_pine2.p_iBundle = 0;
+            m_loadEV.p_iStrip = 0;
+            m_sLotSend = "";
+            SendLotInfo(); 
+        }
+
+        string m_sLotSend = "";
+        void SendLotInfo()
+        {
+            if (m_sLotSend == m_pine2.p_sLotID) return;
+            int nMode = (m_pine2.p_eMode == Pine2.eRunMode.Magazine) ? 1 : 0;
+            if (m_pine2.p_b3D) SendLotInfo(m_aBoats[Vision2D.eVision.Top3D], nMode);
+            SendLotInfo(m_aBoats[Vision2D.eVision.Top2D], nMode);
+            SendLotInfo(m_aBoats[Vision2D.eVision.Bottom], nMode);
+            m_sLotSend = m_pine2.p_sLotID;
+        }
+
+        void SendLotInfo(Boats boats, int nMode)
+        {
+            Pine2.VisionOption option = m_pine2.m_aVisionOption[boats.m_vision.m_eVision];
+            Vision2D.LotInfo lotInfo = new Vision2D.LotInfo(nMode, p_sRecipe, m_pine2.p_sLotID, option.p_bLotMix, option.p_bBarcode, option.p_nBarcode, option.p_lBarcode);
+            boats.m_vision.SendLotInfo(lotInfo);
+        }
+
+        BackgroundWorker m_bgwSendSort = new BackgroundWorker(); 
+        public void SendSortInfo(InfoStrip infoStrip)
+        {
+            m_bgwSendSort.RunWorkerAsync(infoStrip); 
+        }
+
+        private void M_bgwSendSort_DoWork(object sender, DoWorkEventArgs e)
+        {
+            InfoStrip infoStrip = e.Argument as InfoStrip; 
+            if (m_pine2.p_b3D) SendSortInfo(m_aBoats[Vision2D.eVision.Top3D], infoStrip);
+            SendSortInfo(m_aBoats[Vision2D.eVision.Top2D], infoStrip);
+            SendSortInfo(m_aBoats[Vision2D.eVision.Bottom], infoStrip);
+        }
+
+        void SendSortInfo(Boats boats, InfoStrip infoStrip)
+        {
+            Vision2D.SortInfo sortinfo = new Vision2D.SortInfo(infoStrip.m_eWorks, infoStrip.p_id, infoStrip.m_iBundle.ToString("00"));
+            boats.m_vision.SendSortInfo(sortinfo); 
+        }
+        #endregion
+
         #region Recipe
-        string _sRecipe = ""; 
+        public string _sRecipe = ""; 
         public string p_sRecipe
         {
             get { return _sRecipe; }
             set
             {
                 if (_sRecipe == value) return;
+                if (m_bgwRecipe.IsBusy) return; 
                 _sRecipe = value;
-                if (m_aBoats.Count > 0)
-                {
-                    m_aBoats[Vision2D.eVision.Top3D].p_sRecipe = value;
-                    m_aBoats[Vision2D.eVision.Top2D].p_sRecipe = value;
-                    m_aBoats[Vision2D.eVision.Bottom].p_sRecipe = value;
-                }
+                m_pine2.RecipeOpen(value);
+                m_bgwRecipe.RunWorkerAsync(); 
             }
+        }
+
+        BackgroundWorker m_bgwRecipe = new BackgroundWorker();
+        private void M_bgwRecipe_DoWork(object sender, DoWorkEventArgs e)
+        {
+            if (m_aBoats.Count == 0) return;
+            if (m_pine2.p_b3D) m_aBoats[Vision2D.eVision.Top3D].p_sRecipe = p_sRecipe;
+            m_aBoats[Vision2D.eVision.Top2D].p_sRecipe = p_sRecipe;
+            m_aBoats[Vision2D.eVision.Bottom].p_sRecipe = p_sRecipe;
+        }
+
+        public List<string> p_asRecipe
+        {
+            get
+            {
+                List<string> asRecipe = new List<string>();
+                DirectoryInfo info = new DirectoryInfo(EQ.c_sPathRecipe);
+                foreach (DirectoryInfo dir in info.GetDirectories()) asRecipe.Add(dir.Name);
+                return asRecipe;
+            }
+            set { }
         }
         #endregion
 
@@ -52,7 +120,7 @@ namespace Root_Pine2.Engineer
         public ModuleList p_moduleList { get; set; }
         public Pine2 m_pine2;
         public LoadEV m_loadEV;
-        public MagazineEVSet m_magazineEV = new MagazineEVSet();
+        public MagazineEVSet m_magazineEVSet;
         public Transfer m_transfer;
         public Dictionary<Vision2D.eVision, Vision2D> m_aVision = new Dictionary<Vision2D.eVision, Vision2D>();
         public Dictionary<Vision2D.eVision, Boats> m_aBoats = new Dictionary<Vision2D.eVision, Boats>(); 
@@ -65,7 +133,7 @@ namespace Root_Pine2.Engineer
             m_swInit.Start(); 
             p_moduleList = new ModuleList(m_engineer);
             InitModule(m_pine2 = new Pine2("Pine2", m_engineer));
-            InitModule(m_loadEV = new LoadEV("LoadEV", m_engineer));
+            InitModule(m_loadEV = new LoadEV("LoadEV", m_engineer, m_pine2));
             InitMagazineEV();
             InitVision(Vision2D.eVision.Bottom);
             InitVision(Vision2D.eVision.Top2D);
@@ -73,7 +141,7 @@ namespace Root_Pine2.Engineer
             InitBoats(Vision2D.eVision.Bottom);
             InitBoats(Vision2D.eVision.Top2D);
             InitBoats(Vision2D.eVision.Top3D);
-            InitModule(m_transfer = new Transfer("Transter", m_engineer, m_pine2, m_magazineEV));
+            InitModule(m_transfer = new Transfer("Transter", m_engineer, m_pine2, m_magazineEVSet));
             InitModule(m_loader0 = new Loader0("Loader0", m_engineer, this));
             InitModule(m_loader1 = new Loader1("Loader1", m_engineer, this));
             InitModule(m_loader2 = new Loader2("Loader2", m_engineer, this));
@@ -111,10 +179,11 @@ namespace Root_Pine2.Engineer
 
         void InitMagazineEV()
         {
+            m_magazineEVSet = new MagazineEVSet(m_pine2);
             foreach (InfoStrip.eMagazine eMagazine in Enum.GetValues(typeof(InfoStrip.eMagazine)))
             {
                 MagazineEV magazineEV = new MagazineEV(eMagazine, m_engineer, m_pine2);
-                m_magazineEV.m_aEV.Add(eMagazine, magazineEV);
+                m_magazineEVSet.m_aEV.Add(eMagazine, magazineEV);
                 InitModule(magazineEV); 
             }
         }
@@ -198,6 +267,33 @@ namespace Root_Pine2.Engineer
         #region IHandler
         public void CheckFinish()
         {
+            if (IsFinish() == false) return;
+            m_pine2.m_buzzer.RunBuzzer(Pine2.eBuzzer.Finish);
+            EQ.p_eState = EQ.eState.Ready;
+            foreach (MagazineEV magazineEV in m_magazineEVSet.m_aEV.Values) magazineEV.StartFinish(); 
+        }
+
+        bool IsFinish()
+        {
+            if (m_loader0.p_infoStrip != null) return false;
+            if (m_loader1.p_infoStrip != null) return false;
+            if (m_loader2.p_infoStrip != null) return false;
+            if (m_loader3.p_infoStrip != null) return false;
+            if (m_aBoats[Vision2D.eVision.Top3D].m_aBoat[Vision2D.eWorks.A].p_infoStrip != null) return false;
+            if (m_aBoats[Vision2D.eVision.Top3D].m_aBoat[Vision2D.eWorks.B].p_infoStrip != null) return false;
+            if (m_aBoats[Vision2D.eVision.Top2D].m_aBoat[Vision2D.eWorks.A].p_infoStrip != null) return false;
+            if (m_aBoats[Vision2D.eVision.Top2D].m_aBoat[Vision2D.eWorks.B].p_infoStrip != null) return false;
+            if (m_aBoats[Vision2D.eVision.Bottom].m_aBoat[Vision2D.eWorks.A].p_infoStrip != null) return false;
+            if (m_aBoats[Vision2D.eVision.Bottom].m_aBoat[Vision2D.eWorks.B].p_infoStrip != null) return false;
+            if (m_transfer.m_gripper.p_infoStrip != null) return false;
+            if (m_transfer.m_pusher.p_infoStrip != null) return false;
+            switch (m_pine2.p_eMode)
+            {
+                case Pine2.eRunMode.Stack:
+                    if (m_loadEV.p_bCheck) return false;
+                    break;
+            }
+            return true;
         }
 
         public dynamic GetGemSlot(string sSlot)
@@ -207,12 +303,11 @@ namespace Root_Pine2.Engineer
 
         public string AddSequence(dynamic infoSlot)
         {
-            throw new NotImplementedException();
+            return "OK"; 
         }
 
         public void CalcSequence()
         {
-            throw new NotImplementedException();
         }
         #endregion
 
@@ -269,12 +364,14 @@ namespace Root_Pine2.Engineer
             m_gem = engineer.ClassGem();
             InitModule();
             InitThread();
+            m_bgwRecipe.DoWork += M_bgwRecipe_DoWork;
+            m_bgwSendSort.DoWork += M_bgwSendSort_DoWork;
             m_engineer.ClassMemoryTool().InitThreadProcess();
         }
 
         public void ThreadStop()
         {
-            m_magazineEV.ThreadStop(); 
+            m_magazineEVSet.ThreadStop(); 
             if (m_bThread)
             {
                 m_bThread = false;

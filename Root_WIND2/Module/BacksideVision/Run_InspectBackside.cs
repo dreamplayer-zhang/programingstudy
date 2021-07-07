@@ -111,8 +111,8 @@ namespace Root_WIND2.Module
 
             // Check Lot Start
             if ((infoWafer != null) && (
-                (infoWafer._eWaferOrder == InfoWafer.eWaferOrder.FirstLastWafer) ||
-                (infoWafer._eWaferOrder == InfoWafer.eWaferOrder.FirstWafer)))
+                (infoWafer.p_eWaferOrder == InfoWafer.eWaferOrder.FirstLastWafer) ||
+                (infoWafer.p_eWaferOrder == InfoWafer.eWaferOrder.FirstWafer)))
                 LotStart(settings_backside.KlarfSavePath, recipe, infoWafer, m_grabMode);
 
             
@@ -138,7 +138,7 @@ namespace Root_WIND2.Module
                 if (workManager.OpenRecipe(m_sRecipeName) == false)
                     return "Recipe Open Fail";
 
-                workManager.Start(false);
+                workManager.Start();
 
             }
             else
@@ -198,8 +198,8 @@ namespace Root_WIND2.Module
             }
 
             if ((infoWafer != null) && (
-                (infoWafer._eWaferOrder == InfoWafer.eWaferOrder.FirstLastWafer) ||
-                (infoWafer._eWaferOrder == InfoWafer.eWaferOrder.LastWafer)))
+                (infoWafer.p_eWaferOrder == InfoWafer.eWaferOrder.FirstLastWafer) ||
+                (infoWafer.p_eWaferOrder == InfoWafer.eWaferOrder.LastWafer)))
                 LotEnd(infoWafer);
 
            

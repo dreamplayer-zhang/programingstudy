@@ -135,6 +135,20 @@ namespace Root_CAMELLIA.Module
             }
         }
 
+        private string _dataSavePathDate = "";
+        public string p_dataSavePathDate
+        {
+            get
+            {
+                return _dataSavePathDate;
+            }
+            set
+            {
+                _dataSavePathDate = value;
+            }
+        }
+
+
         #region InfoWafer
         string m_sInfoWafer = "";
         InfoWafer _infoWafer = null;
@@ -689,7 +703,9 @@ namespace Root_CAMELLIA.Module
 
         public string RunMoveReady()
         {
-
+            string info = MoveReadyPos();
+            if (info != "OK")
+                return info;
             return "OK";
         }
 
@@ -697,9 +713,12 @@ namespace Root_CAMELLIA.Module
         {
             //App.m_SSLoggerNet.WriteXFRLog(nID, SSLNet.XFR_EVENTID.GET, SSLNet.STATUS.START,);
             //m_CamVRS.FunctionConnect();
+            //MarsLogManager.Instance.WritePRC(EQ.p_nRunLP, BaseDefine.LOG_DEVICE_ID, SSLNet.PRC_EVENTID.Process, SSLNet.STATUS.END, this.p_id, 0);
+            //MarsLogManager.Instance.WriteFNC(EQ.p_nRunLP, BaseDefine.LOG_DEVICE_ID, "Move Ready Position", SSLNet.STATUS.START);
             string info = MoveReadyPos();
             if (info != "OK")
                 return info;
+            //MarsLogManager.Instance.WriteFNC(EQ.p_nRunLP, BaseDefine.LOG_DEVICE_ID, "Move Ready Position", SSLNet.STATUS.END);
             return "OK";
         }
 
@@ -733,17 +752,20 @@ namespace Root_CAMELLIA.Module
         {
             // Make Directory
             //App.m_SSLoggerNet.WriteXFRLog(nID, SSLNet.XFR_EVENTID.GET, SSLNet.STATUS.END,);
-            MarsLogManager.Instance.WritePRC(EQ.p_nRunLP, BaseDefine.LOG_DEVICE_ID, SSLNet.PRC_EVENTID.Process, SSLNet.STATUS.END, this.p_id, 0);
             return "OK";
         }
 
         public string AfterPut(int nID)
         {
-            p_dataSavePath = BaseDefine.Dir_MeasureSaveRootPath + p_infoWafer.p_sRecipe;// + @"\" + DateTime.Now.ToString("yyyy-MM-dd") + "T" + DateTime.Now.ToString("HH-mm-ss");
-            GeneralTools.MakeDirectory(p_dataSavePath);
+            if (p_infoWafer.p_eWaferOrder == InfoWafer.eWaferOrder.FirstWafer || p_infoWafer.p_eWaferOrder == InfoWafer.eWaferOrder.FirstLastWafer)
+            {
+                p_dataSavePathDate = DateTime.Now.ToString("yyyy-MM-dd") + "T" + DateTime.Now.ToString("HH-mm");
+                p_dataSavePath = BaseDefine.Dir_MeasureSaveRootPath + p_infoWafer.p_sRecipe;
+                GeneralTools.MakeDirectory(p_dataSavePath);
+            }
 
-            MarsLogManager.Instance.ChangeMaterial(EQ.p_nRunLP, p_infoWafer.m_nSlot + 1, p_infoWafer.p_sLotID, p_infoWafer.p_sCarrierID, p_infoWafer.p_sRecipe);
-            MarsLogManager.Instance.WritePRC(EQ.p_nRunLP, BaseDefine.LOG_DEVICE_ID, SSLNet.PRC_EVENTID.Process, SSLNet.STATUS.START, this.p_id, 0);
+            MarsLogManager.Instance.ChangeMaterialSlot(EQ.p_nRunLP, p_infoWafer.m_nSlot + 1);
+            MarsLogManager.Instance.WritePRC(EQ.p_nRunLP, BaseDefine.LOG_DEVICE_ID, SSLNet.PRC_EVENTID.Process, SSLNet.STATUS.START, SSLNet.MATERIAL_TYPE.WAFER, this.p_id, 0);
             return "OK";
         }
 
@@ -755,11 +777,6 @@ namespace Root_CAMELLIA.Module
         eCheckWafer m_eCheckWafer = eCheckWafer.InfoWafer;
         public bool IsWaferExist(int nID)
         {
-            //if(EQ.p_eState != EQ.eState.Home && p_eState == eState.Home)
-            //{
-            //    StateHome();
-            //}
-            //SetAlarm();
             switch (m_eCheckWafer)
             {
                 case eCheckWafer.Sensor:

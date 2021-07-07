@@ -336,22 +336,30 @@
                                 <TextBox Grid.Row="1" Grid.Column="2" TextAlignment="Center" VerticalContentAlignment="Center" IsReadOnly="True" IsReadOnlyCaretVisible="True" Margin="75,2,2,2" Grid.ColumnSpan="2" Text="{Binding ModelPath}" IsEnabled="{Binding p_UseThickness}"/>
                             </Grid>
                         </Grid>
-                        <UniformGrid Columns="2" Grid.Row="3">
-                            <Grid Margin="5" Background="Gainsboro">
+                        <UniformGrid Columns="3" Grid.Row="3">
+                            <Grid Margin="3" Background="Gainsboro">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="18*"/>
                                     <ColumnDefinition Width="12*"/>
                                 </Grid.ColumnDefinitions>
-                                <TextBlock Text="Integration Time (VIS)" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="0"/>
-                                <TextBox Grid.Column="1" Margin="3" Text="{Binding VISIntegrationTime, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" TextAlignment="Center" VerticalContentAlignment="Center"></TextBox>
+                                <TextBlock Text="Integration Time (VIS)" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="0" TextAlignment="Center" TextWrapping="WrapWithOverflow"/>
+                                <TextBox Grid.Column="1" Margin="5" Text="{Binding VISIntegrationTime, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" TextAlignment="Center" VerticalContentAlignment="Center"></TextBox>
                             </Grid>
-                            <Grid Margin="5" Background="Gainsboro">
+                            <Grid Margin="3" Background="Gainsboro">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="18*"/>
                                     <ColumnDefinition Width="12*"/>
                                 </Grid.ColumnDefinitions>
-                                <TextBlock Text="Integration Time (NIR)" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="0"/>
-                                <TextBox Grid.Column="1" Margin="3" Text="{Binding NIRIntegrationTime, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" TextAlignment="Center" VerticalContentAlignment="Center"  IsEnabled="{Binding p_SettingViewModel.p_ExceptNIR, Converter={StaticResource BoolConverter}}" />
+                                <TextBlock Text="Integration Time (NIR)" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="0" TextAlignment="Center" TextWrapping="WrapWithOverflow"/>
+                                <TextBox Grid.Column="1" Margin="5" Text="{Binding NIRIntegrationTime, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" TextAlignment="Center" VerticalContentAlignment="Center"  IsEnabled="{Binding p_SettingViewModel.p_ExceptNIR, Converter={StaticResource BoolConverter}}" />
+                            </Grid>
+                            <Grid Margin="3" Background="Gainsboro">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="18*"/>
+                                    <ColumnDefinition Width="12*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="Measure Repeat Count" VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Column="0" TextAlignment="Center" TextWrapping="WrapWithOverflow"/>
+                                <TextBox Grid.Column="1" Margin="5" Text="{Binding MeasureRepeatCount, UpdateSourceTrigger=PropertyChanged}" TextAlignment="Center" VerticalContentAlignment="Center" />
                             </Grid>
                         </UniformGrid>
                     </Grid>

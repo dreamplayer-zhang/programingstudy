@@ -24,11 +24,7 @@ namespace Root_Pine2
             m_engineer.Init("Pine2");
             engineerUI.Init(m_engineer);
             m_handler = (Pine2_Handler)m_engineer.ClassHandler();
-            Init();
-        }
-
-        void Init()
-        {
+            mainUI.Init(m_handler); 
         }
         #endregion
 

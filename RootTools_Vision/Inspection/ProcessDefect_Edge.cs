@@ -249,7 +249,7 @@ namespace RootTools_Vision
 
 			// Defect 중심 원본 Image
 			Rect defectRect = defect.GetRect();
-			int imageWidth = this.recipe.GetItem<OriginRecipe>().OriginWidth;
+			int imageWidth = this.currentWorkplace.SharedBufferWidth;
 			int imageHeight = 500; //this.recipe.GetItem<EdgeSurfaceParameter>().EdgeParamBaseTop.ROIHeight;			
 			int defectImageLeftPt = 0;
 			int defectImageTopPt = (int)(defectRect.Top + (defectRect.Height / 2) - (imageHeight / 2)); //141520;

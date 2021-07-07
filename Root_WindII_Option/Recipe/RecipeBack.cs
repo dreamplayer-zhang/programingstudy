@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Root_WindII
+namespace Root_WindII_Option
 {
     public class RecipeBack : RecipeBase
     {
@@ -18,6 +18,9 @@ namespace Root_WindII
             // Regiseter Parameter Items
             //RegisterParameterItem<PositionParameter>();
             RegisterParameterItem<BacksideSurfaceParameter>();
+
+            this.UseExclusiveRegion = true;
+            this.ExclusiveRegionFilePath = Constants.FilePath.BacksideExclusiveRegionFilePath;
         }
     }
 }

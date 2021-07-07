@@ -118,12 +118,16 @@ namespace RootTools.GAFs
 
         private void M_timerSetALID_Tick(object sender, EventArgs e)
         {
+            bool isShow = false;
             for (int n = p_aSetALID.Count - 1; n >= 0; n--)
             {
-                if (p_aSetALID[n].p_bSet == false) p_aSetALID.RemoveAt(n);
+                if (p_aSetALID[n].p_bSet == false)
+                {
+                    p_aSetALID.RemoveAt(n);
+                    isShow = true;
+                }
             }
 
-            bool isShow = false;
             foreach (ALID alid in p_aALID)
             {   
                 if (alid.p_bSet && (IsExistSetALID(alid) == false))
@@ -132,12 +136,28 @@ namespace RootTools.GAFs
                     isShow = true;
                 }
             }
-            if (isShow)
+
+            p_brushAlarm = (p_aSetALID.Count > 0) ? Brushes.Red : Brushes.White;
+
+            bool isEQError = false;
+            foreach (ALID alid in p_aSetALID)
+            {
+                if (alid.p_bEQError)
+                {
+                    isEQError = true;
+                    break;
+                }
+            }
+
+            if (isEQError && !p_alarmBlink)
+                p_alarmBlink = true;
+            else if(!isEQError)
+                p_alarmBlink = false;
+
+            if (isShow && p_aALID.Count != 0)
             {
                 ShowPopup();
-            }
-            p_brushAlarm = (p_aSetALID.Count > 0) ? Brushes.Red : Brushes.White;
-            p_alarmListBlink = (p_aSetALID.Count > 0) ? true : false;
+            }     
         }
 
         bool IsExistSetALID(ALID alid)

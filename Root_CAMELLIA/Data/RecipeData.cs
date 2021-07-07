@@ -20,6 +20,7 @@ namespace Root_CAMELLIA.Data
         public List<WavelengthItem> WaveLengthTransmittance { get; set; } = new List<WavelengthItem>();
         public int VISIntegrationTime { get; set; } = 20;
         public int NIRIntegrationTime { get; set; } = 150;
+        public int MeasureRepeatCount { get; set; } = 1;
         public bool UseThickness { get; set; } = true;
         public bool UseTransmittance { get; set; } = true;
         //public List<string> MaterialList = new List<string>();
@@ -74,6 +75,7 @@ namespace Root_CAMELLIA.Data
             data.VISIntegrationTime = VISIntegrationTime;
             data.NIRIntegrationTime = NIRIntegrationTime;
             data.UseThickness = UseThickness;
+            data.MeasureRepeatCount = MeasureRepeatCount;
             data.UseTransmittance = UseTransmittance;
             data.ModelRecipePath = ModelRecipePath;
             
