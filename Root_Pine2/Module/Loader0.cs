@@ -162,17 +162,8 @@ namespace Root_Pine2.Module
         #endregion
 
         #region AxisXY
-        string MoveSafeY()
-        {
-            Axis axisY = m_axis.p_axisY;
-            if (axisY.p_posCommand <= axisY.GetPosValue(ePosTransfer.Transfer0)) return "OK";
-            axisY.StartMove(ePosTransfer.Transfer0);
-            return axisY.WaitReady(); 
-        }
-
         public string RunMoveTransfer(ePosTransfer ePos, double xOffset, bool bWait = true)
         {
-            if (Run(MoveSafeY())) return p_sInfo; 
             if (Run(StartMoveX(ePos.ToString(), xOffset))) return p_sInfo; 
             m_axis.p_axisY.StartMove(ePos);
             return bWait ? m_axis.WaitReady() : "OK";
@@ -180,7 +171,6 @@ namespace Root_Pine2.Module
 
         public string RunMoveBoat(eUnloadVision eVision, Vision2D.eWorks eWorks, bool bWait = true)
         {
-            if (Run(MoveSafeY())) return p_sInfo;
             string sPos = GetPosString(eVision, eWorks);
             if (Run(StartMoveX(sPos, 0))) return p_sInfo;
             m_axis.p_axisY.StartMove(sPos);
@@ -553,6 +543,15 @@ namespace Root_Pine2.Module
         public override string StateReady()
         {
             if (EQ.p_eState != EQ.eState.Run) return "OK";
+            if (m_pine2.p_eMode == Pine2.eRunMode.Magazine)
+            {
+                double fPos = m_axis.p_axisY.GetPosValue(ePosTransfer.Transfer0) + 5000;
+                if (m_axis.p_axisY.p_posCommand > fPos)
+                {
+                    m_axis.p_axisY.StartMove(fPos);
+                    m_axis.p_axisY.WaitReady(); 
+                }
+            }
             if (m_picker.p_infoStrip != null)
             {
                 if (m_picker.p_infoStrip.m_bPaper) return StartRun(m_runUnloadPaper); 

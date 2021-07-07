@@ -78,5 +78,14 @@ namespace Root_Pine2.Module
             if (m_boats.p_eState != ModuleBase.eState.Ready) return;
             m_boats.m_aBoat[Vision2D.eWorks.B].RunMove(Boat.ePos.Vision, false);
         }
+
+        private void GridInfo_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            switch (m_boats.p_eState)
+            {
+                case ModuleBase.eState.Init: m_boats.p_eState = ModuleBase.eState.Home; break;
+                case ModuleBase.eState.Error: m_boats.Reset(); break; 
+            }
+        }
     }
 }
